@@ -14,6 +14,7 @@ const reportData = {
     regime: "EXPANSION",
     scores: { tightness: 62, riskAppetite: 45, baseRate: 5.25, curveSlope: -0.4 },
     diagnostics: { confidence: "HIGH", nearestThresholdDelta: 9 },
+    policyAssessment: { refusal: { refused: false, reasons: [] } },
   },
   reportDynamics: {
     directionLabel: "deteriorating",
@@ -37,6 +38,7 @@ const postureState = {
     transitionWatch: "ON",
   },
   whatFlipsNext: {
+    flipTrigger: "Funding pressure falls 20 pts to 70 or below (90 today).",
     thresholds: ["tightness < 60 for 2 consecutive refreshes"],
   },
 } as any;

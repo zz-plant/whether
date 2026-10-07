@@ -126,7 +126,13 @@ export const buildPublishedBriefRecord = ({
     recordDate,
     recordDateLabel: reportData.recordDateLabel,
     headline: `${homeBriefModel.postureWithStageLabel} — week of ${reportData.recordDateLabel}`,
-    summary: homeBriefModel.operatingStanceLine,
+    /* The week's call as the contract states it, the sentence every paste and
+       the Monday sends printed that week. It was the home model's own stance
+       line, which on a week the conditions changed came from another branch of
+       the stance rule than the stored call: "Ship fixes and releases that pay
+       back quickly; hold anything you could not reverse." frozen beside pastes
+       that said "Favour releases that pay back quickly and can be rolled back." */
+    summary: snapshot.weeklyCall.currentCall,
     postureLabel: homeBriefModel.postureWithStageLabel,
     regime: reportData.assessment.regime,
     confidenceLabel: homeBriefModel.confidenceLabel,

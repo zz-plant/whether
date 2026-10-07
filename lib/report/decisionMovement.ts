@@ -17,6 +17,7 @@ import { comparisonBasis } from "./comparisonBasis";
 import type { ActionStripItem } from "./operatingCalls";
 import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import type { ComparedWith, ReportDynamics } from "./reportDataTypes";
+import { buildCallChangeLine } from "./reportEvidence";
 
 /**
  * What the week's move did to the decisions, not to the market.
@@ -373,23 +374,74 @@ export const buildDecisionMovementForReport = ({
 
 /**
  * The line over "What changed this week". With a comparison it is what the week did to the
- * decisions; on a quiet week (`quietDayLine` is set) it is followed by the nearest line, so
- * "nothing changed" arrives with the one thing that would change it. Without a comparison
- * that could be read against the lines it is the quiet-day line, and failing that the
- * direction the scores moved.
+ * decisions; on a quiet week (`quietDayLine` is set) it is followed by the quiet-day line,
+ * so "nothing changed" arrives with the one thing that would change it. Without a
+ * comparison that could be read against the lines it is the direction the scores moved.
+ *
+ * It appended the nearest market move (`buildFlipProximity`) until 2026-10-07, and fell back
+ * to the quiet-day line without a movement, which could not happen: the quiet-day line needs
+ * a week whose guidance held, and that needs the movement.
  */
 export const buildChangedLead = ({
   movement,
   quietDayLine,
-  nearestLine,
   fallback,
 }: {
   movement: Pick<DecisionMovement, "sentence" | "moved"> | null;
   quietDayLine: string | null;
-  nearestLine: string | undefined;
   fallback: string;
 }): string => {
-  if (!movement) return quietDayLine ?? fallback;
+  if (!movement) return fallback;
   const quiet = quietDayLine !== null && movement.moved.length === 0;
-  return quiet && nearestLine ? `${movement.sentence} ${nearestLine}` : movement.sentence;
+  return quiet ? `${movement.sentence} ${quietDayLine}` : movement.sentence;
+};
+
+type CallChangeSource = Parameters<typeof buildCallChangeLine>[0];
+
+/**
+ * The quiet-day read: on a week whose guidance held against the earlier reading, what would
+ * change it (`buildCallChangeLine`), so a returning reader learns both that nothing moved
+ * and the one thing that would. Null on any other week: one that moved has its own lead,
+ * and one with nothing compared has nothing to call quiet.
+ *
+ * It read "Conditions unchanged — If the 1-month Treasury bill rate rises 0.15%, conditions
+ * turn Cloudy." until 2026-10-07: the nearest market move, in "%" for a move in a rate, and
+ * on a held week a rate move standing where the hold's own condition belongs.
+ */
+export const buildQuietDayRead = ({
+  guidanceChange,
+  ...source
+}: CallChangeSource & {
+  /** What the week did to the guidance (`describeGuidanceChange`); the read prints only when it held. */
+  guidanceChange: GuidanceChange | null;
+}): string | null => (guidanceChange === "held" ? buildCallChangeLine(source) : null);
+
+/**
+ * The standup line: one line for a team's daily or sprint standup, saying whether the
+ * guidance moved this week and what would change it (`buildCallChangeLine`), from what the
+ * week did to the guidance (`describeGuidanceChange`). A held week says the guidance is on
+ * hold whatever the scores did, since the hold is the guidance.
+ *
+ * Until 2026-10-07 the second half was the nearest market move from `buildFlipProximity`,
+ * in its own unit: "Conditions changed to Stormy, 0.22% from flip; review pace." on a week
+ * every other surface said the nearer line was risk appetite's, 9 points away, and
+ * "Guidance unchanged, 0.15% from flip; no pace change." on a held week whose guidance
+ * changes when the two scores agree, not when a rate moves. Before that it read the
+ * operating latitude's move, so "Call unchanged" printed over a crossed pause line.
+ */
+export const buildStandupLine = ({
+  regime,
+  change,
+  ...source
+}: CallChangeSource & {
+  regime: RegimeKey;
+  /** What the week did to the guidance; null when nothing was compared. */
+  change: GuidanceChange | null;
+}): string => {
+  const callChange = buildCallChangeLine(source);
+  if (source.weeklyCall.policyOverrideActive) return `Guidance on hold this week; no pace change. ${callChange}`;
+  if (change === null) return `No earlier reading to compare with. ${callChange}`;
+  if (change === "held") return `Guidance unchanged; no pace change. ${callChange}`;
+  if (change === "conditions") return `Conditions changed to ${getRegimePublicLabel(regime)}; review pace. ${callChange}`;
+  return `Guidance changed at a pause or resume line; review pace. ${callChange}`;
 };

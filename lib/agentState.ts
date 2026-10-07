@@ -169,18 +169,25 @@ const scoreHeadline = (score: AgentState["scores"]["tightness"]) => {
  * The guidance, from the week's report and its posture state. `/api/cli/status` prints the same
  * four facts as its `call`, under the names it had first (`lib/cli/contracts.ts`), so the CLI and
  * an agent cannot be told different guidance for one reading.
+ *
+ * On a held week what would change the guidance is the hold's condition, the
+ * brief's "Conditions change if" (`whatFlipsNext.flipTrigger`). This listed the two
+ * score lines there too, "Funding pressure above 70" and "Risk appetite at or below
+ * 50", beside a call that said to keep last week's plan until the scores agree.
  */
 export const buildAgentGuidance = ({
   reportData,
   postureState,
 }: {
-  reportData: Pick<AgentInterfaceContext["reportData"], "actionNowShort" | "startItems" | "stopItems">;
+  reportData: Pick<AgentInterfaceContext["reportData"], "actionNowShort" | "startItems" | "stopItems" | "assessment">;
   postureState: Pick<AgentInterfaceContext["postureState"], "whatFlipsNext">;
 }): AgentState["guidance"] => ({
   call: reportData.actionNowShort,
   doNow: reportData.startItems,
   avoidNow: reportData.stopItems,
-  flipConditions: [...postureState.whatFlipsNext.thresholds],
+  flipConditions: reportData.assessment.policyAssessment.refusal.refused
+    ? [postureState.whatFlipsNext.flipTrigger]
+    : [...postureState.whatFlipsNext.thresholds],
 });
 
 export const buildAgentState = (

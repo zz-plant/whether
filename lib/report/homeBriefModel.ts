@@ -92,6 +92,8 @@ export type HomeReportData = {
     directionLabel: ReportDynamics["directionLabel"];
     /** Whether the conditions changed against the earlier reading; absent reads as no. */
     regimeChanged?: ReportDynamics["regimeChanged"];
+    /** The earlier reading's conditions when they changed: which way the week reads. */
+    previousRegime?: ReportDynamics["previousRegime"];
     changedSignals: Array<{
       key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
       delta: number;

@@ -1,6 +1,6 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
-import { buildFlipThreshold } from "../report/reportEvidence";
+import { buildWeekCallChangesIf } from "../report/reportEvidence";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
 const CONFIDENCE_COPY = {
@@ -51,12 +51,14 @@ export const formatConfidenceSentence = (confidence: SummaryConfidence) =>
   `${CONFIDENCE_COPY[confidence]}.`;
 
 /**
- * "Conditions change if: …", the canonical sentence (`buildFlipThreshold`) under
- * its canonical label, as the published brief's Slack and email copy print it:
- * how far each score sits from the line where conditions change, in points.
+ * "Conditions change if: …", the canonical sentence (`buildWeekCallChangesIf`)
+ * under its canonical label, as the published brief's Slack and email copy print
+ * it: how far each score sits from the line where conditions change, in points,
+ * or on a held reading the hold's own condition. It printed the lines on a held
+ * reading too, beside a guidance that said a line was not what would change it.
  */
 export const formatConditionsChangeLine = (assessment: RegimeAssessment) =>
-  `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildFlipThreshold(assessment)}`;
+  `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildWeekCallChangesIf(assessment)}`;
 
 /**
  * What the weekly and monthly summaries say when conditions changed on a shock

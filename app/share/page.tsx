@@ -14,7 +14,7 @@ import { briefReadingLines, buildBoardSlideBullets } from "../../lib/export/brie
 import { buildAreaRows } from "../operate/areaRows";
 import { buildPortfolioNote } from "../../lib/export/portfolioNote";
 import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
-import { buildFlipProximity, buildStandupFlipLine } from "../../lib/report/flipProximity";
+import { buildStandupLine } from "../../lib/report/decisionMovement";
 import { buildPullPolicyBlocks } from "../../lib/report/operatingCalls";
 import { buildWipGuidance } from "../../lib/report/wipPolicy";
 import {
@@ -81,18 +81,21 @@ const buildCurrentShareArtifact = async () => {
      guardrail block per business area, built from the same bounded-rule fields
      the hero and Slack brief print. No tokens, no tracker integration — the
      operator pastes the block into the work item description and the card
-     carries posture + pause trigger + flip condition. */
-  const proximity = buildFlipProximity(assessment);
+     carries the conditions, the pause and resume lines, and what would change
+     the guidance, in the brief's own sentence. */
   const guardrailTagBlocks = buildGuardrailTagBlocks({
     actionStripItems,
     postureLabel: document.conditions.line,
     recordDate: treasury.record_date,
-    flipWatchSentence: proximity.map((entry) => entry.sentence)[0],
+    callChangesIf: document.slots.callChangesIf,
   });
-  const standupLine = buildStandupFlipLine({
+  /* Whether the guidance moved, and what would change it, through the builder
+     the quiet-day line on / reads (`buildCallChangeLine`). */
+  const standupLine = buildStandupLine({
     regime: assessment.regime,
     change: snapshot.homeBriefModel.weeklyLeadershipSummary.guidanceChange,
-    proximity,
+    weeklyCall: snapshot.weeklyCall,
+    assessment,
   });
   /* Kanban pull policies: the same pause/resume conditions re-verbed for a
      pull system, copyable for a board header or wiki. */
@@ -217,7 +220,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "standup",
       group: "Chat",
       label: "Standup line",
-      hint: "One sentence for a daily standup: whether the call moved and how far it is from changing.",
+      hint: "One line for a daily standup: whether the guidance moved this week, and what would change it.",
       kind: "text",
       text: artifact.standupLine,
       copyLabel: "Copy standup line",

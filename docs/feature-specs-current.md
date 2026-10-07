@@ -995,6 +995,10 @@ published scores — the bare curve formula was eleven points off on the bundled
 refusing to offer a rise in risk appetite while the volatility veto caps it. An axis it cannot
 measure honestly (an imputed input, no crossing within three points) is left out rather than
 reported at the scan's edge. Nearest move first; the label is `DECISION_CONTRACT_LABELS.watch.flipWatch`.
+(Changed 2026-10-07, §1.1.55: the moves translate the "Conditions change if" sentence's own lines, in its
+order and in percentage points, none for a line it calls already crossed and none on a held week; they print
+only in the "In interest-rate terms" fold under that sentence, and every one-line surface states the sentence's
+nearer line in points instead.)
 
 ### 1.1.19 The score through its weather (2026-09-17)
 
@@ -2447,8 +2451,85 @@ the claims in `docs/claims-ledger.md`) found the week's action built three ways.
 - **One builder.** `buildWeekActionNow` (`reportEvidence.ts`) is the week's action for the loader and
   the snapshot alike. The page card, the share card and the contract read that value first.
 
-A Monday routine reads the live surfaces after the send and reports any claim that disagrees across them
+A routine reads the live surfaces early each Tuesday, after the Monday send, and reports any claim that disagrees across them
 (`docs/agents/lessons/automation-and-deploy-gate.md`).
+
+### 1.1.55 The rest of the ledger, held on every surface (2026-10-07)
+
+`tests/weeklyClaimParity.test.tsx` now holds every claim in `docs/claims-ledger.md` on the ordinary and the
+held week: the call, the week's direction, the comparison date, the two scores, what would change the
+guidance and why a held week holds, beside the conditions, guidance, record date and confidence it held
+before. It added the surfaces that print them: the Monday Slack post and email, the `/api/decision` memo
+(`buildDecisionMemo`), the `/share` standup line, the homepage quiet-day line (`buildHomeQuietDayRead`) and
+the frozen archive record. A surface that does not print a claim is not held to it. What it found:
+
+- **What would change the guidance had two builders.** The contract's "Conditions change if" is in score
+  points; `lib/report/flipProximity.ts` answered in interest rates, and four one-line surfaces printed its
+  first move alone as the nearest. On the ordinary week the standup read "Conditions changed to Stormy,
+  0.22% from flip; review pace." while every other surface said the nearer line was risk appetite's, 9
+  points away; on the held week, "Guidance unchanged, 0.15% from flip; no pace change." beside guidance that
+  changes when the two scores agree. They now read one builder. `buildCallChangeLines`
+  (`lib/report/reportEvidence.ts`) is the sentence's clauses as values, and `buildFlipThreshold` joins them;
+  `buildCallChangeLine` reshapes them for a line with room for one clause: the nearer line in points, or a
+  held week's own condition. The standup reads "Conditions changed to Stormy; review pace. Conditions change
+  if: Risk appetite rises 9 pts to clear 50 (41 today)." and, held, "Guidance on hold this week; no pace
+  change. Conditions change if: The two scores point the same way for a second reading; until then the
+  guidance is not changing." (`buildStandupLine`, `lib/report/decisionMovement.ts`). The quiet-day line,
+  which read "Conditions unchanged — If the 1-month Treasury bill rate rises 0.15%, conditions turn
+  Cloudy.", closes the what-changed lead with the same line ("…Last week's guidance stands. Conditions change
+  if: …"); the lapsed-return panel prints it, and the `/share` work-item blocks print the contract's whole
+  sentence under "What would change this guidance".
+- **The interest-rate moves, kept as a translation.** Read against the code, each move crossed the same line
+  as the sentence's clause on its axis, but the set was a different answer: sorted by the size of a move in
+  two different rates (a 0.22-point bill-rate move to a line 38 points away led a 0.25-point curve move to one
+  9 points away); scanning for any change of quadrant, so while the machine held a crossing it reported a 0.01
+  move toward conditions the scores were already in, beside "(already true at 41)"; and on a held week it said
+  what market move turns the conditions under a sentence whose condition is the scores agreeing. It now
+  translates the sentence's lines, in its order, scanning for the line itself; a line already crossed and a
+  held week get none. It prints only in the "In interest-rate terms" fold under "Conditions change if",
+  labelled by score, because it is the one place the page says what has to happen in the market. The move is
+  in percentage points ("rises 0.22 percentage points"), not "0.22%" (`formatPointsMove`, now in
+  `lib/formatters.ts` with the flash alert's), and "flip" is gone from the copy.
+- **A held week's "Conditions change if" was the score lines off the contract.** The report loader's
+  `flipThreshold`, the posture state's `whatFlipsNext.flipTrigger` and the home model said the two lines on a
+  held week, so `/api/decision`'s memo and shift summary ended "Conditions change if: Funding pressure rises
+  25 pts to clear 70 (45 today) or risk appetite falls 12 pts to 50 or below (62 today)." beside a trigger
+  that said the scores had to agree, the weekly mandate's `nextFlip` said the same, and the agent state and
+  `/api/cli/status` listed "Funding pressure above 70" and "Risk appetite at or below 50" as what would change
+  held guidance. All read `buildWeekCallChangesIf` now, the hold's condition on a held week; so do `/trust`,
+  `/signals/[cluster]`, `/resolve` and the frozen record, which print the loader's.
+- **The call was composed twice.** The operating snapshot compared the week (§1.1.54) but passed no regime
+  alert, so the stored call took the stance rule's no-change branch on a week the conditions changed:
+  "Favour releases that pay back quickly and can be rolled back." in every paste, the embed and the Monday
+  sends, where the page's own model, the `/api/decision` memo and the frozen record's summary said "Ship
+  fixes and releases that pay back quickly; hold anything you could not reverse." The snapshot builds the
+  alert from its comparison as the loader does, the memo is built around the contract's call, pause line and
+  sentence, and the frozen record's summary is the contract's `currentCall`.
+- **Every change of conditions read "tightening".** `resolveWeeklyTone` now reads which way the conditions
+  moved (`REGIME_SEVERITY_RANK`, from `ReportDynamics.previousRegime`): harsher tightens, milder eases, or
+  holds while a pause line is met. A week the machine confirmed Sunny over a Stormy brief on the same scores
+  had headlined "Conditions are tightening. Keep what is working, and don't start anything new this week.",
+  with "Conditions tightened this week." in the memo; it reads "Conditions are easing. Grow what is working,
+  one milestone at a time." Without the earlier conditions the old rule stands.
+- **A card detail that could not render** (`cardCallDetail`, `app/page.tsx`) is gone: the card's call is
+  the week's action, so the detail always equalled it.
+
+Left as they are, and named in the test: the agent state's `change.direction` is the comparison's own label
+("mixed" on the ordinary week beside "Conditions are tightening."), not the headline's tone; changing it is an
+API decision. The Monday sends print no comparison date, because the snapshot they render carries no earlier
+reading; the test holds that as an absence. On the held week the Monday post's section reaches Slack's limit
+before its "Why this could be wrong" block.
+
+The last four places that printed "Conditions change if" from the raw lines read `buildWeekCallChangesIf`
+too: the archive summaries' change line (`formatConditionsChangeLine`), the regime-change alert's reversal
+line, the answer pages' trigger (still for the score the page is about), and the CLI's expanded view
+(`reversalTrigger`, `flipConditionsCompact`). On a held week each named a line beside a hold.
+
+A frozen record names the engine that scored it only when this engine reproduces its scores from the record's
+own inputs, the check that already decides whether the inputs are kept; it named `ENGINE_VERSION` on every
+record, though the scores can come from an operating snapshot an earlier deploy stored. The report loader and
+the operating snapshot choose the comparison reading through one rule (`selectWeekComparison`,
+`monthEndComparisonReading`, `lib/report/weekComparison.ts`).
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

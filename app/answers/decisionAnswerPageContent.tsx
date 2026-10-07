@@ -23,7 +23,7 @@ import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { buildFlipThreshold } from "../../lib/report/reportEvidence";
+import { buildFlipThreshold, buildWeekCallChangesIf } from "../../lib/report/reportEvidence";
 import { formatThresholdNumber } from "../../lib/formatters";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 import {
@@ -166,9 +166,10 @@ export async function DecisionAnswerPageContent({
      if risk appetite falls below 50, or funding pressure rises above 70" in
      every regime, so a Freezing week, already past both, was told to watch for
      them. */
-  const thresholdTrigger = `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildFlipThreshold(
-    assessment,
-    page.thresholdFocus === "tightness" ? "tightness" : page.thresholdFocus === "risk" ? "riskAppetite" : undefined,
+  const focus = page.thresholdFocus === "tightness" ? "tightness" : page.thresholdFocus === "risk" ? "riskAppetite" : undefined;
+  /* On a held week, the hold's own condition: a line is not what changes the guidance then. */
+  const thresholdTrigger = `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildWeekCallChangesIf(assessment, (week) =>
+    buildFlipThreshold(week, focus),
   )}`;
 
   const compositeReadings: Array<{ key: CompositeSignalKey; score: number; line: number }> = [

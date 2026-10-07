@@ -27,9 +27,8 @@ import {
 import { formatDateUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
-import { buildQuietDayRead } from "../lib/report/flipProximity";
 import { buildChangedLead } from "../lib/report/decisionMovement";
-import { splitWeeklyCall } from "../lib/report/reportEvidence";
+import { buildCallChangeLine, splitWeeklyCall } from "../lib/report/reportEvidence";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { DEFAULT_RUNWAY_BAND, runwayBandPhrase } from "../lib/report/operatorRunway";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
@@ -52,6 +51,7 @@ import { DoAndShareSection } from "./components/home/DoAndShareSection";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import {
   buildHomeAreaRows,
+  buildHomeQuietDayRead,
   buildSignalChangeRows,
   describeConditionsTrail,
   describeEarlierConditions,
@@ -242,7 +242,6 @@ async function PageContent({
   const tightnessPressure = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightnessPressure;
   const tightnessSaturated = homepage.weeklyDecisionCardModel.diagnostics.currentScores.tightnessSaturated;
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
-  const weeklyLeadershipSummary = homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary;
 
   /* The sticky strip's badge, from the headline's own tone. It searched
      `trendLabel` ("Improving", "Deteriorating", …) for "tighten" and "ease",
@@ -272,30 +271,24 @@ async function PageContent({
   /* The card prints the action; the week's direction rides on the stamp line.
      Copy Brief, the sticky strip and every paste keep the composed call. */
   const cardCall = splitWeeklyCall(primaryCall);
-  const actionNowShort = homepage.weeklyDecisionCardModel.decision.actionNowShort;
-  const cardCallDetail =
-    actionNowShort && splitWeeklyCall(actionNowShort).action !== cardCall.action ? actionNowShort : undefined;
 
+  /* The change line in the market's units, line by line in the order the
+     "Conditions change if" sentence names them; none on a held week, whose
+     sentence is the hold's condition (`buildFlipProximity`). Only the "In
+     interest-rate terms" fold under that sentence prints them. */
   const v2HeroSignalData = {
     ...buildV2HeroSignalData(reportData),
-    flipProximity: buildFlipProximity(reportData.assessment).map((entry) => entry.sentence),
+    flipProximity: buildFlipProximity(reportData.assessment),
   };
 
-  /* The quiet-day read: the line a returning reader on a non-Monday needs to
-     know the call still stands and how far it is from flipping. Derived from
-     the same snapshot the hero draws, so the verdict and the flip watch cannot
-     disagree; absent on a week the call moved. */
-  /* "Conditions unchanged" is a claim about a comparison: never on a read with
-     no previous week, never on a week the guidance moved (a crossed pause or
-     resume line, or new conditions: `guidanceChange`, not the latitude's move),
-     and never on an archived week, which the banner above dates. */
-  const quietDayLine =
-    previousScores && !reportData.regimeAlert && !historicalSelection
-      ? buildQuietDayRead({
-          steadyWeek: weeklyLeadershipSummary.guidanceChange === "held",
-          flipProximity: v2HeroSignalData.flipProximity,
-        })
-      : null;
+  /* The quiet-day read: on a live week whose guidance held, what would change
+     it, from the same builder as every paste's "Conditions change if"
+     (`buildCallChangeLine`): the nearer line in points, or a held week's own
+     condition. Never on a week the guidance moved (a crossed pause or resume
+     line, or new conditions: `guidanceChange`, not the latitude's move), and
+     never on an archived week, which the banner above dates. */
+  const quietDayLine = buildHomeQuietDayRead(homepage, { historical: Boolean(historicalSelection) });
+  const callChangeLine = buildCallChangeLine({ weeklyCall: homepage.weeklyCall, assessment: reportData.assessment });
 
   // The first rule is the one whose pause sentence the guardrail slot prints
   // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
@@ -373,7 +366,6 @@ async function PageContent({
   const movementSentence = buildChangedLead({
     movement: decisionMovement,
     quietDayLine,
-    nearestLine: v2HeroSignalData.flipProximity[0],
     fallback: describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }),
   });
   const scoreLadders = [
@@ -569,7 +561,6 @@ async function PageContent({
               <DecisionHero
                 titleLevel={cadenceCall ? "h2" : "h1"}
                 weeklyCall={cardCall.action}
-                callDetail={cardCallDetail}
                 regime={regime}
                 direction={historicalSelection ? undefined : cardCall.directionLabel}
                 earlier={earlierConditions}
@@ -605,7 +596,8 @@ async function PageContent({
                     regimeLabel: publicRegimeLabel,
                     call: primaryCall,
                   }}
-                  flipProximitySentence={v2HeroSignalData.flipProximity[0]}
+                  /* On a quiet week the lead below already ends with it. */
+                  callChangeLine={quietDayLine ? undefined : callChangeLine}
                   boardDeckHref={`/api/export/board-slide?format=pptx&stage=${encodeURIComponent(activeStage)}`}
                   linesCrossedLead={movementSentence}
                 />
@@ -680,13 +672,13 @@ async function PageContent({
               isHistorical={Boolean(historicalSelection)}
             />
 
-            {/* 4. What would change the call: the two ladders with their three
-                lines and the earlier reading’s dot, the flip watch under the axis each
-                sentence describes, and — only on a week the call moved — what
-                happened the last time it moved this way. */}
+            {/* 4. What would change the guidance: the two ladders with their three
+                lines and the earlier reading’s dot, each line of "Conditions change
+                if" in interest-rate terms under it, and — only on a week the call
+                moved — what happened the last time it moved this way. */}
             <WhatWouldChangeSection
               ladders={scoreLadders}
-              flipProximity={buildFlipProximity(reportData.assessment)}
+              flipProximity={v2HeroSignalData.flipProximity}
               reversalTrigger={reversalTriggerLabel}
               resumeWhen={resumeWhenLabel}
               guardrail={guardrailLabel}

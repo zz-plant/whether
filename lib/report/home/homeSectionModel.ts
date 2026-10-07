@@ -9,7 +9,8 @@ import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { describeScoreMovement } from "../scoreMovement";
-import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
+import { buildQuietDayRead, type AreaMovementKind, type DecisionMovement } from "../decisionMovement";
+import type { HomePageAssembly } from "./contracts";
 
 /**
  * The homepage as five sections in the reader's order: the call, what changed,
@@ -149,6 +150,26 @@ export const describeWeeklyMovement = ({
     : INPUT_MOVEMENT_SENTENCE[describeInputMovement(tightnessDelta, riskAppetiteDelta)](
         basis.date ? basis.since : "this week",
       );
+
+/**
+ * The homepage's quiet-day line for this assembly (`buildQuietDayRead`): what would change
+ * the guidance, on a live week whose guidance held against the earlier reading. Nothing on
+ * an archived week, which the banner dates, or on one whose conditions or call-change line
+ * moved (`regimeAlert`), which leads with that. The page and the claim-parity test both read
+ * it here, so the line under test is the one the page prints.
+ */
+export const buildHomeQuietDayRead = (
+  homepage: Pick<HomePageAssembly, "reportResult" | "weeklyCall" | "weeklyDecisionCardModel">,
+  { historical }: { historical: boolean },
+): string | null => {
+  const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
+  if (historical || reportData.regimeAlert) return null;
+  return buildQuietDayRead({
+    guidanceChange: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.guidanceChange,
+    weeklyCall: homepage.weeklyCall,
+    assessment: reportData.assessment,
+  });
+};
 
 /** One side of an area's rule as a row prints it: the line, the distance in words, and the two facts behind the words. */
 type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean; metric: RuleConditionMetric };

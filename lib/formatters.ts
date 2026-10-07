@@ -180,6 +180,14 @@ export const formatScoreValue = (value: number) => value.toFixed(0);
 export const formatThresholdNumber = (value: number) =>
   Number.isInteger(value) ? value.toFixed(0) : value.toFixed(1);
 
+/**
+ * "0.30 percentage points": a move in a rate, or in the gap between two, is a
+ * difference of rates, never a percent of one. The flash alert and the homepage's
+ * interest-rate translation of the change line both print it; the translation
+ * said "0.22%" until 2026-10-07, a 0.22% change of a 3.68% rate read literally.
+ */
+export const formatPointsMove = (value: number) => `${Math.abs(value).toFixed(2)} percentage points`;
+
 export const formatMonthYearShortFromValue = (value: string) =>
   formatDateValue(value, monthYearShortUtcFormatter);
 

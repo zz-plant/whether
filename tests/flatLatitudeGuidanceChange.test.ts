@@ -1,7 +1,8 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
-import { buildQuietDayRead, buildStandupFlipLine } from "../lib/report/flipProximity";
+import { buildQuietDayRead, buildStandupLine } from "../lib/report/decisionMovement";
+import { buildFlipThreshold } from "../lib/report/reportEvidence";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import { buildBriefDocument } from "../lib/report/briefDocument";
 import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
@@ -46,12 +47,18 @@ const buildWeek = (overrides: { regimeChanged?: boolean; previousRegime?: "VOLAT
     },
   });
 
+/* The week's reading and its "Conditions change if", as the weekly contract states them. */
+const reading = {
+  regime: "DEFENSIVE" as const,
+  thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+  scores: { tightness: 57, riskAppetite: 54 },
+};
+const source = { weeklyCall: { policyOverrideActive: false, callChangesIf: buildFlipThreshold(reading) }, assessment: reading };
+
 describe("a flat operating latitude over a week the guidance changed", () => {
   it("keeps the latitude's line about the number when a pause line was crossed", () => {
     const model = buildWeek();
     const summary = model.weeklyLeadershipSummary;
-    /* What the homepage passes the quiet-day read (`app/page.tsx`). */
-    const steadyWeek = summary.guidanceChange === "held";
 
     assert.equal(summary.boldnessDelta, 0, "the latitude did not move");
     assert.ok((model.decisionMovement?.moved.length ?? 0) > 0, "a pause line was crossed");
@@ -59,13 +66,13 @@ describe("a flat operating latitude over a week the guidance changed", () => {
     assert.equal(summary.shorthandLine, "Operating latitude unchanged since Sep 29.");
 
     assert.equal(
-      buildStandupFlipLine({ regime: "DEFENSIVE", change: summary.guidanceChange, proximity: [] }),
-      "Guidance changed at a pause or resume line, no near flip; review pace.",
+      buildStandupLine({ regime: "DEFENSIVE", change: summary.guidanceChange, ...source }),
+      "Guidance changed at a pause or resume line; review pace. Conditions change if: Risk appetite falls 4 pts to 50 or below (54 today).",
     );
     assert.equal(
-      buildQuietDayRead({ steadyWeek, flipProximity: ["If funding pressure falls 2 points, conditions turn Stormy."] }),
+      buildQuietDayRead({ guidanceChange: summary.guidanceChange, ...source }),
       null,
-      "no \"Conditions unchanged\" over a crossed pause line",
+      "no quiet-day line over a crossed pause line",
     );
   });
 
@@ -76,8 +83,8 @@ describe("a flat operating latitude over a week the guidance changed", () => {
     assert.equal(summary.boldnessDelta, 0);
     assert.equal(summary.guidanceChange, "conditions");
     assert.equal(
-      buildStandupFlipLine({ regime: "DEFENSIVE", change: summary.guidanceChange, proximity: [] }),
-      "Conditions changed to Cloudy, no near flip; review pace.",
+      buildStandupLine({ regime: "DEFENSIVE", change: summary.guidanceChange, ...source }),
+      "Conditions changed to Cloudy; review pace. Conditions change if: Risk appetite falls 4 pts to 50 or below (54 today).",
     );
   });
 

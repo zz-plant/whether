@@ -24,7 +24,7 @@ import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
 import { buildComparedWith } from "./comparisonBasis";
 import { rescoreStoredInputs, type ComparisonReading, type RescoreStoredInputs } from "./comparisonReading";
-import { buildWeekActionNow } from "./reportEvidence";
+import { buildWeekActionNow, buildWeekCallChangesIf } from "./reportEvidence";
 import { monthEndComparisonReading, selectWeekComparison } from "./weekComparison";
 import { explainScoreMovement } from "./scoreMovement";
 import type {
@@ -612,7 +612,10 @@ export const loadReportDataUncachedInternal = async ({
   // guardrail slot on the trust and evidence pages carried lines like
   // "Over-engineering before demand proves out" under "Pause if:".
   const guardrailThreshold = actionStripItems[0]?.triggerThreshold ?? stopItems[0];
-  const flipThreshold = deps.buildFlipThreshold(assessment);
+  /* What would change the guidance, the hold's condition on a held week
+     (`buildWeekCallChangesIf`): /trust, /signals, /resolve and the frozen record
+     print it under "Conditions change if". */
+  const flipThreshold = buildWeekCallChangesIf(assessment, deps.buildFlipThreshold);
   const reportEvidenceItems = deps.buildReportEvidenceItems({
     reportDynamics,
     assessment,
@@ -746,7 +749,10 @@ export const buildFallbackReportDataInternal = ({
   // guardrail slot on the trust and evidence pages carried lines like
   // "Over-engineering before demand proves out" under "Pause if:".
   const guardrailThreshold = actionStripItems[0]?.triggerThreshold ?? stopItems[0];
-  const flipThreshold = deps.buildFlipThreshold(assessment);
+  /* What would change the guidance, the hold's condition on a held week
+     (`buildWeekCallChangesIf`): /trust, /signals, /resolve and the frozen record
+     print it under "Conditions change if". */
+  const flipThreshold = buildWeekCallChangesIf(assessment, deps.buildFlipThreshold);
   const reportEvidenceItems = deps.buildReportEvidenceItems({
     reportDynamics: fallbackReportDynamics,
     assessment,

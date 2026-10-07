@@ -151,3 +151,37 @@ export const buildBriefArtifactFromSnapshot = ({
   weeklyCall: WeeklyCallContract;
   title: string;
 }): BriefArtifact => briefArtifactOf(buildBriefDocument(briefSourceFromReportData(reportData), weeklyCall, { title }));
+
+/**
+ * The /api/decision memo, from the assembled week. Its action, pause line,
+ * "Conditions change if", shift summary and memo lines are the weekly contract's,
+ * as every paste prints them (docs/claims-ledger.md); `tests/weeklyClaimParity.test.tsx`
+ * holds it to them. The action read the home model's, which says the same sentence
+ * by a second path, and the memo lines and shift summary were the home model's own:
+ * on the held week the parity test renders they said "Conditions change if: Funding
+ * pressure rises 25 pts to clear 70 (45 today) or risk appetite falls 12 pts to 50 or
+ * below (62 today)." beside a trigger that said the scores had to agree first.
+ */
+export const buildDecisionMemo = (homepage: Pick<HomePageAssembly, "weeklyCall" | "weeklyDecisionCardModel">) => {
+  const model = homepage.weeklyDecisionCardModel;
+  return {
+    action: homepage.weeklyCall.actionNow,
+    stance: model.status.postureLabel,
+    postureWithStage: model.status.postureWithStageLabel,
+    regime: model.status.regimeKey ?? "EXPANSION",
+    confidence: model.status.confidenceLabel,
+    guardrail: model.decision.guardrail,
+    reversalTrigger: model.decision.reversalTrigger,
+    decisionShift: model.decision.decisionShiftSummary,
+    revisitDecisions: model.decision.revisitDecisions,
+    actionStripItems: model.decision.actionStripItems?.map((item) => ({
+      area: item.areaActionNow,
+      threshold: item.triggerThreshold,
+      reversal: item.reversalCondition,
+    })),
+    watchItems: model.decision.flipThreshold
+      ? [model.decision.flipThreshold]
+      : model.decision.compactFlipConditionLabels ?? [],
+    weeklyMemoLines: model.decision.weeklyMemoLines,
+  };
+};

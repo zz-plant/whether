@@ -1,26 +1,49 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { buildFlipProximity, buildQuietDayRead, buildStandupFlipLine } from "../lib/report/flipProximity";
+import { buildFlipProximity } from "../lib/report/flipProximity";
+import { buildQuietDayRead, buildStandupLine } from "../lib/report/decisionMovement";
+import { buildCallChangeLine, buildCallChangeLines, buildFlipThreshold, buildWeekCallChangesIf } from "../lib/report/reportEvidence";
+import { describePolicyHold } from "../lib/report/regimeDescription";
 import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
 import { classifyRegimeQuadrant } from "../lib/regimeStateMachine";
 import type { TreasuryData } from "../lib/types";
+import { macros, treasury as heldTreasury } from "./factories/exportFixtures";
 
 const withYields = (yields: TreasuryData["yields"]): RegimeAssessment =>
   evaluateRegime({ ...snapshotData, yields }, undefined, macroSeries);
 
-describe("flip proximity", () => {
-  it("reports the nearest market move first, in the input's units, naming the regime it would land in", () => {
+/* The export fixture's reading: its two scores disagree, so the policy layer holds it. */
+const held = evaluateRegime(heldTreasury, undefined, macros);
+
+/** The contract's two fields these read, as the weekly contract sets them for a reading. */
+const callOf = (assessment: RegimeAssessment) => ({
+  policyOverrideActive: assessment.policyAssessment.refusal.refused,
+  callChangesIf: buildWeekCallChangesIf(assessment),
+});
+
+describe("the change line in interest-rate terms", () => {
+  it("translates each line of the change sentence, in its order, in percentage points", () => {
     const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
-    const [nearest, next] = buildFlipProximity(assessment);
-    assert.ok(nearest && next, "both axes are reachable from this reading");
-    assert.ok(Math.abs(nearest.inputMove) <= Math.abs(next.inputMove));
-    for (const entry of [nearest, next]) {
+    const lines = buildCallChangeLines(assessment).filter((line) => !line.tripped);
+    const moves = buildFlipProximity(assessment);
+    assert.ok(moves.length > 0, "a line is reachable from this reading");
+    /* The sentence's order, not the size of the move: sorted by move, a 0.22-point
+       bill-rate move to a line 38 points away led a 0.25-point curve move to one 9
+       points away, and the one-line surfaces printed it alone as the nearest. */
+    assert.deepEqual(
+      moves.map((entry) => entry.axis),
+      lines.map((line) => line.metric).filter((metric) => moves.some((entry) => entry.axis === metric)),
+    );
+    for (const entry of moves) {
       // In the market's own terms, with no abbreviation: "10Y−2Y" was the one
       // bond-desk token in the one line saying how close the call is to changing.
-      assert.match(entry.sentence, /^If (long rates (rise|fall) \d+\.\d{2}% (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2}%), conditions turn (Sunny|Cloudy|Stormy|Freezing)\.$/);
-      assert.doesNotMatch(entry.sentence, /10Y|2Y|1M\b/);
+      assert.match(
+        entry.sentence,
+        /^If (long rates (rise|fall) \d+\.\d{2} percentage points (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2} percentage points), conditions turn (Sunny|Cloudy|Stormy|Freezing)\.$/,
+      );
+      assert.doesNotMatch(entry.sentence, /%|10Y|2Y|1M\b|flip/);
       assert.notEqual(entry.crossesTo, assessment.regime);
       assert.doesNotMatch(entry.sentence, /tightness|riskAppetite|threshold|score/i, "reader copy carries no engine vocabulary");
     }
@@ -73,73 +96,73 @@ describe("flip proximity", () => {
     assert.ok(base.scores.riskAppetite <= base.thresholds.riskAppetiteRegime);
     assert.equal(risk, undefined);
   });
+
+  /* While the machine held a crossing behind its confirmation gate, the scan asked
+     for any change of quadrant from the published conditions, found one at the
+     first step, and reported a 0.01 move toward conditions the scores already sat
+     in; the sentence above it said "(already true at 41)". */
+  it("translates no line the change sentence calls already crossed", () => {
+    const stormy = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+    assert.ok(stormy.scores.riskAppetite <= stormy.thresholds.riskAppetiteRegime, "the scores sit on the risk-off side");
+    const heldSunny = { ...stormy, regime: "EXPANSION" as const };
+    const crossed = buildCallChangeLines(heldSunny).find((line) => line.tripped);
+    assert.equal(crossed?.metric, "riskAppetite", "published Sunny, risk appetite is already through its line");
+    const moves = buildFlipProximity(heldSunny);
+    assert.ok(moves.every((entry) => entry.axis !== "riskAppetite"));
+    assert.ok(moves.every((entry) => Math.abs(entry.inputMove) > 0.01));
+  });
+
+  it("says nothing on a held week, whose change sentence is the hold's condition", () => {
+    assert.equal(held.policyAssessment.refusal.refused, true, "the fixture is held");
+    assert.deepEqual(buildFlipProximity(held), []);
+  });
+});
+
+describe("what would change the guidance, in one line", () => {
+  it("is the nearer line in points, a clause of the change sentence", () => {
+    const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+    const line = buildCallChangeLine({ weeklyCall: callOf(assessment), assessment });
+    const nearest = [...buildCallChangeLines(assessment)].sort((left, right) => (left.distance ?? 0) - (right.distance ?? 0))[0];
+    assert.ok(nearest);
+    assert.equal(line, `Conditions change if: ${nearest.text}.`);
+    assert.ok(buildFlipThreshold(assessment).toLowerCase().includes(nearest.text.toLowerCase()));
+  });
+
+  it("is the hold's own condition on a held week", () => {
+    const hold = describePolicyHold(held.policyAssessment.refusal);
+    assert.equal(buildCallChangeLine({ weeklyCall: callOf(held), assessment: held }), `Conditions change if: ${hold.callChangesIf}`);
+  });
 });
 
 describe("quiet-day read", () => {
-  const sentences = [
-    "If long rates fall 0.15% closer to short rates, conditions turn Cloudy.",
-    "If the 1-month Treasury bill rate falls 0.40%, conditions turn Stormy.",
-  ];
+  const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+  const source = { weeklyCall: callOf(assessment), assessment };
 
-  it("leads a steady week with the conditions-unchanged verdict and the nearest flip distance", () => {
-    const line = buildQuietDayRead({ steadyWeek: true, flipProximity: sentences });
-    assert.equal(line, "Conditions unchanged — If long rates fall 0.15% closer to short rates, conditions turn Cloudy.");
+  it("says what would change a week whose guidance held", () => {
+    assert.equal(buildQuietDayRead({ guidanceChange: "held", ...source }), buildCallChangeLine(source));
   });
 
-  it("renders nothing when conditions moved this week", () => {
-    assert.equal(buildQuietDayRead({ steadyWeek: false, flipProximity: sentences }), null);
+  it("renders nothing on a week the guidance moved, or with nothing compared", () => {
+    assert.equal(buildQuietDayRead({ guidanceChange: "conditions", ...source }), null);
+    assert.equal(buildQuietDayRead({ guidanceChange: "lines", ...source }), null);
+    assert.equal(buildQuietDayRead({ guidanceChange: null, ...source }), null);
   });
 
-  it("renders nothing when no axis has a reachable crossing", () => {
-    assert.equal(buildQuietDayRead({ steadyWeek: true, flipProximity: [] }), null);
-  });
-
-  it("reuses the hero's flip sentence verbatim rather than re-minting it", () => {
-    const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
-    const heroSentences = buildFlipProximity(assessment).map((entry) => entry.sentence);
-    const line = buildQuietDayRead({ steadyWeek: true, flipProximity: heroSentences });
+  it("carries no market move, percent or flip", () => {
+    const line = buildQuietDayRead({ guidanceChange: "held", ...source });
     assert.ok(line);
-    assert.ok(heroSentences.some((sentence) => line!.includes(sentence)));
+    assert.doesNotMatch(line, /%|flip|Treasury bill|long rates/i);
   });
 });
 
-describe("standup flip line", () => {
-  it("formats a week whose guidance held with nearest move and no pace change", () => {
-    const proximity = [
-      {
-        axis: "riskAppetite" as const,
-        input: "curveSlope" as const,
-        inputMove: 0.08,
-        pointsToBoundary: 3,
-        crossesTo: "DEFENSIVE" as const,
-        sentence: "If long rates rise 0.08% further above short rates, conditions turn Cloudy.",
-      },
-    ];
-    const line = buildStandupFlipLine({
-      regime: "EXPANSION",
-      change: "held",
-      proximity,
-    });
-    assert.equal(line, "Guidance unchanged, 0.08% from flip; no pace change.");
-  });
+describe("standup line", () => {
+  const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+  const source = { weeklyCall: callOf(assessment), assessment };
+  const callChange = buildCallChangeLine(source);
 
-  it("names the new conditions when they changed, with the nearest move and review pace", () => {
-    const proximity = [
-      {
-        axis: "tightness" as const,
-        input: "baseRate" as const,
-        inputMove: -0.15,
-        pointsToBoundary: 6,
-        crossesTo: "SCARCITY" as const,
-        sentence: "If base rate falls 0.15%, conditions turn Freezing.",
-      },
-    ];
-    const line = buildStandupFlipLine({
-      regime: "DEFENSIVE",
-      change: "conditions",
-      proximity,
-    });
-    assert.equal(line, "Conditions changed to Cloudy, 0.15% from flip; review pace.");
+  it("says whether the guidance moved, then what would change it", () => {
+    assert.equal(buildStandupLine({ regime: "EXPANSION", change: "held", ...source }), `Guidance unchanged; no pace change. ${callChange}`);
+    assert.equal(buildStandupLine({ regime: "DEFENSIVE", change: "conditions", ...source }), `Conditions changed to Cloudy; review pace. ${callChange}`);
   });
 
   /* The line read the operating latitude's move: a flat latitude over a crossed
@@ -148,32 +171,27 @@ describe("standup flip line", () => {
      nothing to compare said "unchanged". */
   it("says the guidance changed at a line when the conditions did not, and claims nothing without a comparison", () => {
     assert.equal(
-      buildStandupFlipLine({ regime: "DEFENSIVE", change: "lines", proximity: [] }),
-      "Guidance changed at a pause or resume line, no near flip; review pace.",
+      buildStandupLine({ regime: "DEFENSIVE", change: "lines", ...source }),
+      `Guidance changed at a pause or resume line; review pace. ${callChange}`,
     );
-    assert.equal(
-      buildStandupFlipLine({ regime: "DEFENSIVE", change: null, proximity: [] }),
-      "No earlier reading to compare with; no near flip.",
-    );
+    assert.equal(buildStandupLine({ regime: "DEFENSIVE", change: null, ...source }), `No earlier reading to compare with. ${callChange}`);
   });
 
-  it("handles a week with no reachable crossing cleanly", () => {
-    const line = buildStandupFlipLine({
-      regime: "VOLATILE",
-      change: "held",
-      proximity: [],
-    });
-    assert.equal(line, "Guidance unchanged, no near flip; no pace change.");
+  /* "Guidance unchanged, 0.15% from flip; no pace change." on the held fixture: a
+     rate move named as what changes guidance the hold says is not changing. */
+  it("says a held week is on hold, whatever the scores did, with the hold's condition", () => {
+    const hold = describePolicyHold(held.policyAssessment.refusal);
+    for (const change of ["held", "conditions", "lines", null] as const) {
+      assert.equal(
+        buildStandupLine({ regime: held.regime, change, weeklyCall: callOf(held), assessment: held }),
+        `Guidance on hold this week; no pace change. Conditions change if: ${hold.callChangesIf}`,
+      );
+    }
   });
 
-  it("derives the distance consistently from real proximity output", () => {
-    const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
-    const proximity = buildFlipProximity(assessment);
-    const line = buildStandupFlipLine({
-      regime: assessment.regime,
-      change: "held",
-      proximity,
-    });
-    assert.match(line, /^Guidance unchanged, \d+\.\d{2}% from flip; no pace change\.$/);
+  it("carries no market move, percent or flip", () => {
+    for (const change of ["held", "conditions", "lines", null] as const) {
+      assert.doesNotMatch(buildStandupLine({ regime: assessment.regime, change, ...source }), /%|flip|Treasury bill|long rates/i);
+    }
   });
 });
