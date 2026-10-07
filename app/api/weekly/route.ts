@@ -11,11 +11,14 @@ export const dynamic = "force-dynamic";
 export async function GET() {
   return buildCadenceRouteResponse({
     route: "/api/weekly",
-    buildSummary: ({ assessment, treasury, treasuryProvenance, weeklyRecordDateLabel }) =>
+    // The record date, not `weeklyRecordDateLabel` (the week-ending Friday): the
+    // summary prints it as "Updated …" and returns it as `recordDateLabel`, which
+    // on Monday Oct 5, 2026 read "Oct 9, 2026", a date still in the future.
+    buildSummary: ({ assessment, treasury, treasuryProvenance, recordDateLabel }) =>
       buildWeeklySummary({
         assessment,
         provenance: treasuryProvenance,
-        recordDateLabel: weeklyRecordDateLabel,
+        recordDateLabel,
         record: treasury,
       }),
     buildExtraPayload: async ({ reportData, summary }) => {

@@ -111,7 +111,6 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
     treasury,
     treasuryProvenance,
     recordDateLabel,
-    weeklyRecordDateLabel,
   } = reportData;
 
   /* One confidence, the one every page and every other route publishes
@@ -136,11 +135,14 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
      returns the matching summary shape with no type assertion — a conditional
      expression cannot narrow against a generic and would need one. */
   const summaryBuilders: { [C in AgentCadence]: () => SummaryByCadence[C] } = {
+    /* The record date, not `weeklyRecordDateLabel` (the week-ending Friday). The
+       RSS live item prints this as "Record date:", and on the Oct 5, 2026 reading
+       it said Oct 9 beside a guid and pubDate dated Oct 5. */
     weekly: () =>
       buildWeeklySummary({
         assessment: summarizedAssessment,
         provenance: treasuryProvenance,
-        recordDateLabel: weeklyRecordDateLabel,
+        recordDateLabel,
         record: treasury,
       }),
     monthly: () =>
@@ -156,6 +158,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
         provenance: treasuryProvenance,
         recordDateLabel,
         periodLabel: getQuarterLabel(treasury.record_date) ?? recordDateLabel,
+        record: treasury,
       }),
     yearly: () =>
       buildYearlySummary({
@@ -163,6 +166,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
         provenance: treasuryProvenance,
         recordDateLabel,
         periodLabel: getYearLabel(treasury.record_date) ?? recordDateLabel,
+        record: treasury,
       }),
   };
 

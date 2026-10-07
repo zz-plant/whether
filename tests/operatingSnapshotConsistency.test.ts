@@ -124,3 +124,23 @@ describe("OperatingSnapshot read consistency", () => {
     assert.equal(deliveryRead.currentRegime, persisted.assessment.regime);
   });
 });
+
+/*
+ * The freshness hours were parsed back out of the display label
+ * (`Number.parseFloat(formatAgeHours(…))`), which drops the unit: a reading
+ * fetched six minutes earlier ("6m.") stored 6 hours, a three-month-old one 3.
+ */
+describe("OperatingSnapshot freshness", () => {
+  it("stores hours since the fetch, from the timestamps", () => {
+    const now = new Date("2026-10-05T12:06:00.000Z");
+    const snapshot = buildOperatingSnapshot({
+      treasury: { ...snapshotData, record_date: "2026-10-05", fetched_at: "2026-10-05T12:00:00.000Z" },
+      macroSeries: macroSeries.map((series) => ({ ...series, fetched_at: "2026-07-05T12:00:00.000Z" })),
+      now,
+    });
+
+    assert.equal(snapshot.provenance.ageLabel, "6m.");
+    assert.equal(snapshot.freshness.treasuryAgeHours, 0.1);
+    assert.ok(snapshot.freshness.macroAgeHours > 2000, `${snapshot.freshness.macroAgeHours}`);
+  });
+});

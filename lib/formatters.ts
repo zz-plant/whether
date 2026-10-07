@@ -123,6 +123,32 @@ export const formatAgeHours = (value: string | null, now: Date) => {
   return span ? `${span}.` : "—";
 };
 
+/** Each unit `formatAgeSpan` writes, in milliseconds. */
+const AGE_SPAN_UNIT_MS = new Map<string, number>([
+  ["s", MS_PER_SECOND],
+  ["m", MS_PER_MINUTE],
+  ["h", MS_PER_HOUR],
+  ["d", MS_PER_DAY],
+  ["mo", MS_PER_MONTH],
+]);
+
+/**
+ * Hours in a label `formatAgeSpan` or `formatAgeHours` wrote ("6m.", "14h",
+ * "3mo."), or null for anything else ("—"). Prefer the timestamp when one is in
+ * reach; this is for a caller that holds only the label.
+ *
+ * `/api/summary-delta` read the digits alone, so "6m." (six minutes) published
+ * `weeklyAgeHours: 6` and a three-month-old snapshot ("3mo.") published 3.
+ */
+export const parseAgeSpanHours = (label: string): number | null => {
+  const match = /^(\d+)(mo|s|m|h|d)\.?$/.exec(label.trim());
+  const unitMs = match ? AGE_SPAN_UNIT_MS.get(match[2]) : undefined;
+  if (!match || unitMs === undefined) {
+    return null;
+  }
+  return (Number.parseInt(match[1], 10) * unitMs) / MS_PER_HOUR;
+};
+
 const formatNumberValue = (value: number | null) => {
   if (value === null || Number.isNaN(value)) {
     return "—";

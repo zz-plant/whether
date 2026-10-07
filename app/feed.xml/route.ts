@@ -108,7 +108,8 @@ export async function GET() {
     const recordDateLabel = summary.recordDateLabel ?? recordDateIso;
     /* The published confidence, worded as the archive items below word theirs. This
        printed `summary.confidence`, the engine's own label, as a raw code ("MEDIUM")
-       while the page said "High confidence". */
+       while the page said "High confidence". The phrase carries its own noun, so it
+       stands alone: under a "Confidence:" label it read "Confidence: Medium confidence." */
     const confidence = formatConfidenceChipLabel(brief.confidence.label);
 
     /*
@@ -126,12 +127,11 @@ export async function GET() {
           isPermaLink: false,
           pubDate: toRfc822(recordDateIso),
           imageUrl: buildSocialImageUrl(),
-          description: `Conditions: ${regime}. ${DECISION_CONTRACT_LABELS.slot.action}: ${action}. Confidence: ${confidence}.`,
+          description: `Conditions: ${regime}. ${DECISION_CONTRACT_LABELS.slot.action}: ${action}. ${confidence}.`,
           html: [
             `        <p><strong>Conditions:</strong> ${escapeXml(regime)}</p>`,
             `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(action)}</p>`,
-            `        <p><strong>Confidence:</strong> ${escapeXml(confidence)}</p>`,
-            `        <p><strong>Record date:</strong> ${escapeXml(recordDateLabel)}</p>`,
+            `        <p><strong>Record date:</strong> ${escapeXml(recordDateLabel)} · ${escapeXml(confidence)}</p>`,
             `        <p><a href="${siteUrl}/">View the live brief →</a></p>`,
             `        <p style="font-size:0.85rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
           ].join("\n"),

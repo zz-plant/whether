@@ -7,6 +7,7 @@ describe("summaryCopyRenderer", () => {
     const copy = renderWeeklySummaryCopy({
       title: "Weekly action summary",
       summary: "Growth Mode posture: example. Priority: scale proven bets.",
+      confidence: "HIGH",
       provenance: {
         sourceLabel: "US Treasury Daily Treasury Yield Curve Rates",
         timestampLabel: "Feb 20, 2026, 10:00 AM",
@@ -37,13 +38,57 @@ describe("summaryCopyRenderer", () => {
     assert.match(copy, /Source: US Treasury Daily Treasury Yield Curve Rates/);
     assert.doesNotMatch(copy, /\(https?:\/\//);
     assert.match(copy, /RECOMMENDED MOVES FOR PRODUCT TEAMS \(NOW\)\n\n• /);
-    assert.match(copy, /GOVERNANCE PARAMETER ADJUSTMENTS/);
+  });
+
+  /*
+   * The Oct 5, 2026 paste said Medium in its summary sentence and "Confidence:
+   * Canonical snapshot (high confidence)" under RECOMMENDATION CONFIDENCE and in
+   * the stamp, because both printed the provenance tier. It also listed the
+   * governance settings as engine codes ("Rollback requirement:
+   * EXPLICIT_KILL_CRITERIA"), which no reader-facing vocabulary defines.
+   */
+  it("prints the published confidence word and no governance codes", () => {
+    const copy = renderWeeklySummaryCopy({
+      title: "Weekly action summary — Oct 5, 2026",
+      summary: "Freezing: example.",
+      recordDateLabel: "Oct 5, 2026",
+      confidence: "MEDIUM",
+      provenance: {
+        sourceLabel: "Federal Reserve Economic Data (FRED)",
+        timestampLabel: "Oct 5, 2026, 2:03 AM UTC",
+        ageLabel: "2d.",
+        statusLabel: "Canonical snapshot (high confidence)",
+      },
+      structured: {
+        climate: { label: "Capital is tight", summary: ["Capital is expensive."] },
+        recommendedMoves: ["Protect runway"],
+        executionPriorities: ["Retention"],
+        watchouts: ["Adding headcount before revenue is committed"],
+        planningLanguage: "Freeze discretionary scope.",
+        executionConstraints: ["Shorten payback windows and preserve cash."],
+        governanceParameters: {
+          hiringThreshold: "HIGH",
+          paybackWindowTolerance: "STANDARD",
+          rollbackRequirement: "EXPLICIT_KILL_CRITERIA",
+          approvalVelocity: "BALANCED",
+          expansionScope: "BALANCED",
+          experimentationTolerance: "MEDIUM",
+        },
+      },
+    });
+
+    assert.match(copy, /RECOMMENDATION CONFIDENCE\n\nConfidence: Medium\n/);
+    assert.match(copy, /· Confidence: Medium$/);
+    assert.match(copy, /Updated Oct 5, 2026/);
+    assert.doesNotMatch(copy, /Canonical snapshot|high confidence/i);
+    assert.doesNotMatch(copy, /GOVERNANCE PARAMETER|EXPLICIT_KILL_CRITERIA|BALANCED|STANDARD/);
   });
 
   it("renders monthly copy with bulleted constraints and provenance", () => {
     const copy = renderMonthlySummaryCopy({
       title: "Monthly action summary",
       summary: "Efficiency Mode posture: example. Priority: retain and reduce fixed cost.",
+      confidence: "MEDIUM",
       provenance: {
         sourceLabel: "US Treasury",
         sourceUrl: "https://example.com/source",
@@ -92,6 +137,10 @@ describe("summaryCopyRenderer", () => {
     assert.match(copy, /TOP REVERSALS/);
     assert.match(copy, /EXECUTION CONSTRAINTS/);
     assert.match(copy, /EXECUTION CONSTRAINTS\n\n• Sequence delivery around revenue durability/);
-    assert.match(copy, /Source:\nSource: US Treasury \(https:\/\/example\.com\/source\)/);
+    // The source line once sat under a bare "Source:" heading: "Source:\nSource: …".
+    assert.match(copy, /\n\nSource: US Treasury \(https:\/\/example\.com\/source\)\n/);
+    assert.doesNotMatch(copy, /Source:\nSource:/);
+    assert.match(copy, /· Confidence: Medium$/);
+    assert.doesNotMatch(copy, /Confidence: Live/);
   });
 });

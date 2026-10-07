@@ -1,3 +1,4 @@
+import { parseAgeSpanHours } from "../formatters";
 import type { MonthlySummary } from "./monthlySummary";
 import type { WeeklySummary } from "./weeklySummary";
 
@@ -25,11 +26,6 @@ type SummaryDelta = {
     statusChanged: boolean;
   };
   bullets: string[];
-};
-
-const parseAgeLabel = (label: string) => {
-  const match = label.match(/(\d+)/);
-  return match ? Number.parseInt(match[1], 10) : null;
 };
 
 const formatCountLabel = (count: number, singular: string, plural = `${singular}s`) =>
@@ -79,17 +75,20 @@ export const buildSummaryDelta = (weeklySummary: WeeklySummary, monthlySummary: 
     (constraint) => !monthlyConstraintSet.has(constraint)
   );
   const unchanged = monthlySummary.constraints.filter((constraint) => weeklyConstraintSet.has(constraint));
-  const weeklyAgeHours = parseAgeLabel(weeklySummary.provenance.ageLabel);
-  const monthlyAgeHours = parseAgeLabel(monthlySummary.provenance.ageLabel);
+  // Unit-aware: this read the digits alone, so the age label "6m." (six minutes) became 6 hours.
+  const weeklyAgeHours = parseAgeSpanHours(weeklySummary.provenance.ageLabel);
+  const monthlyAgeHours = parseAgeSpanHours(monthlySummary.provenance.ageLabel);
   const ageDeltaHours =
     weeklyAgeHours === null || monthlyAgeHours === null
       ? null
-      : monthlyAgeHours - weeklyAgeHours;
+      : Math.round((monthlyAgeHours - weeklyAgeHours) * 10) / 10;
   const statusChanged = weeklySummary.provenance.statusLabel !== monthlySummary.provenance.statusLabel;
   const regimeChanged = weeklySummary.regime !== monthlySummary.regime;
+  // Reader words from the naming table ("conditions", the weather label). This
+  // read "Regime steady in Freezing.", the engine's noun in a reader sentence.
   const regimeBullet = regimeChanged
-    ? `Regime shifted to ${monthlySummary.regimeLabel}.`
-    : `Regime steady in ${monthlySummary.regimeLabel}.`;
+    ? `Conditions changed to ${monthlySummary.regimeLabel}.`
+    : `Conditions held at ${monthlySummary.regimeLabel}.`;
   const constraintBullet = `${buildConstraintSummary(added, removed)}.`;
   const provenance = {
     weeklyAgeHours,
