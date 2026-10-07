@@ -286,9 +286,6 @@ type WeeklyLeadershipSummary = {
   steadyWeek: boolean;
   notchShiftLabel: string;
   shorthandLine: string;
-  hiringWindow: string;
-  expansionWindow: string;
-  raiseWindow: string;
   netDeltaLabel: string;
   /** The earlier reading `boldnessDelta` is measured against; absent where the week does not date it. */
   comparedWith?: ComparedWith;

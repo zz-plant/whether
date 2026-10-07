@@ -4,7 +4,6 @@ import {
   buildBoldnessScore,
   buildWeeklyLeadershipBriefModel,
   getNetDeltaLabel,
-  getWindowState,
   toTrendLabel,
 } from "../lib/report/weeklyLeadershipBrief";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
@@ -18,14 +17,10 @@ describe("weeklyLeadershipBrief helpers", () => {
     assert.equal(buildBoldnessScore(100, 0), 0);
   });
 
-  it("trend and window labels are deterministic", () => {
+  it("trend labels are deterministic", () => {
     assert.equal(toTrendLabel(3), "Strengthening");
     assert.equal(toTrendLabel(-3), "Cooling");
     assert.equal(toTrendLabel(0), "Flat");
-
-    assert.equal(getWindowState(80, { open: 38, strong: 64 }), "Strong");
-    assert.equal(getWindowState(40, { open: 38, strong: 64 }), "Open");
-    assert.equal(getWindowState(20, { open: 38, strong: 64 }), "Constrained");
   });
 
   it("buildWeeklyLeadershipBriefModel returns expected shape", () => {

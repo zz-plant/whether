@@ -364,6 +364,15 @@ export const loadReportDataUncachedInternal = async ({
   const alignedHistoricalMacro = historicalSelection
     ? alignMacroSeriesToAsOf(macroSeries, treasury.record_date)
     : null;
+  /* The macro series as of the record date: the live read's own series, or for
+     a historical selection each series' last observation on or before that
+     month-end, and null where its history does not reach back that far. This is
+     the series the report returns, not just the one it scores with. Until
+     2026-10-07 the return carried `macroSeries`, the series fetched today, so
+     /history/compare printed this week's 1.46% borrowing premium, 3.35%
+     inflation and 4.2% unemployment under Mar 31, 2020 and a "0.00%" change
+     between the two months. `macroSeries` itself stays live for what is about
+     today's feeds: the live comparison, source health and provenance. */
   const assessmentMacroSeries = historicalSelection
     ? alignedHistoricalMacro?.series ?? []
     : macroSeries;
@@ -510,10 +519,12 @@ export const loadReportDataUncachedInternal = async ({
       : undefined,
   });
   const regimeTrend = deps.deriveRegimeTrend(previousAssessment, assessment);
+  // As of the record date, like the assessment: a replayed month's forecast
+  // read today's macro downside bias.
   const forecast = deps.buildForecastModel({
     assessment,
     reportDynamics,
-    macroSeries,
+    macroSeries: assessmentMacroSeries,
   });
   const lastYearComparison =
     lastYearSnapshot && lastYearAssessment
@@ -588,7 +599,7 @@ export const loadReportDataUncachedInternal = async ({
     liveAssessment,
     liveTreasury,
     macroProvenance,
-    macroSeries,
+    macroSeries: assessmentMacroSeries,
     macroCoverage: historicalSelection
       ? alignedHistoricalMacro?.coverage ?? {
         mode: "treasury-only" as const,
