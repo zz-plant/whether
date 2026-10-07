@@ -1054,5 +1054,11 @@
     "regime": "EXPANSION",
     "tightness": 63,
     "riskAppetite": 56
+  },
+  {
+    "record_date": "2026-09-30",
+    "regime": "DEFENSIVE",
+    "tightness": 90,
+    "riskAppetite": 56
   }
 ]
