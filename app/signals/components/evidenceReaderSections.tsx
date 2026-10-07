@@ -228,7 +228,11 @@ export const SignalsCallLinesSection = ({
     showMicroDecisionRows ? <BoundedValue>{value}</BoundedValue> : value;
   return (
     <ReportSection id="call-lines" title={DECISION_CONTRACT_LABELS.watch.flipWatch}>
-      <div className="grid gap-6 md:grid-cols-2">
+      {/* Each rail capped at 28rem, the wide track `ScoreLadder` lays its
+          labels out for (ui-ux-standards §XVII, §XVIII). Two equal columns
+          of the report width stretched each rail to about 620px on a desktop,
+          with 11px numbers strung along it and the two rails 650px apart. */}
+      <div className="grid gap-x-10 gap-y-6 md:grid-cols-[repeat(2,minmax(0,28rem))]">
         {ladders.map((ladder) => (
           <ScoreLadder
             key={ladder.key}

@@ -146,3 +146,17 @@ describe("/signals answers each closed question in its summary", () => {
     for (const domain of domains) assert.ok(habits.toLowerCase().includes(domain.toLowerCase()), domain);
   });
 });
+
+describe("/signals what-changed table and rails", () => {
+  it("gives the short-term rate a reason like every other row, not a bare dash", () => {
+    const row = html.slice(html.indexOf('data-signal="baseRate"'), html.indexOf("</tr>", html.indexOf('data-signal="baseRate"')));
+    assert.match(row, /Rates are the biggest single input to funding pressure/);
+    assert.doesNotMatch(row, /<td[^>]*><span class="text-slate-500">—<\/span><\/td>\s*$/);
+  });
+
+  it("caps each rail at the wide track its labels are laid out for", () => {
+    const callLines = html.slice(html.indexOf('id="call-lines"'), html.indexOf('id="instruments"'));
+    assert.match(callLines, /md:grid-cols-\[repeat\(2,minmax\(0,28rem\)\)\]/);
+    assert.doesNotMatch(callLines, /md:grid-cols-2\b/);
+  });
+});

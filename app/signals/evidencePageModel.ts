@@ -46,12 +46,18 @@ type FocusFilter = {
   instruments: Array<{ label: string; why: string; href: string }>;
 };
 
+/* Why the short-term rate matters, said once for both filters that show it.
+   The unfiltered table printed a bare "—" in its row while every other row
+   had a sentence, and the Inflation filter already had this one. */
+const BASE_RATE_NOTE = "Rates are the biggest single input to funding pressure";
+
 const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
   all: {
     signals: ["tightness", "riskAppetite", "baseRate", "curveSlope"],
     notes: {
       tightness: "How hard current conditions make new long-payback commitments",
       riskAppetite: "How willing markets are to fund risk and faster expansion",
+      baseRate: BASE_RATE_NOTE,
       curveSlope: "The earliest sign of whether this week's conditions will hold",
     },
     instruments: [],
@@ -67,7 +73,7 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
   inflation: {
     signals: ["baseRate", "tightness"],
     notes: {
-      baseRate: "Rates are the biggest single input to funding pressure",
+      baseRate: BASE_RATE_NOTE,
       tightness: "When money is tight, higher costs are harder to pass on",
     },
     instruments: [
