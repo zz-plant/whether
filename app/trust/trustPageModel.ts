@@ -14,7 +14,7 @@ import {
 } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
-import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
+import { buildDegradedSourceRows, buildSourceBoardRows } from "../../lib/report/sourceHealth";
 import { buildLadderLines } from "../components/ui/scoreLadder";
 import type { TrustStripProps } from "../components/trustStrip";
 import type { ScorePositions } from "./formulaReference";
@@ -144,7 +144,10 @@ export async function buildTrustPageModel() {
      section headed "System status", and "Sources & freshness" for one headed
      "Cite this call" (now "Cite this guidance") — so the rail offered "Sources" and "Sources & freshness"
      next to each other, and the second went to a citation block. The id stays
-     as it is; an anchor someone has already linked to outlives its label. */
+     as it is; an anchor someone has already linked to outlives its label.
+     In page order (§XI). The rail listed Sources second and the thresholds
+     method before the revisit triggers, while the page drew the formula first,
+     the method next and every other section folded at its foot. */
   const sectionLinks = [
     { href: "#trust-snapshot", label: "System status" },
     // Only when the telemetry read is configured: an index entry for a section that
@@ -152,13 +155,13 @@ export async function buildTrustPageModel() {
     ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),
     // Same rule: an index entry for a section that never renders is a broken anchor.
     ...(readerReturnsLine ? [{ href: "#reader-returns", label: "Reader returns" }] : []),
+    { href: "#formula-reference", label: "Formula reference" },
     { href: "#source-board", label: "Sources" },
     { href: "#sources-freshness", label: "Cite this guidance" },
     { href: "#confidence-limits", label: "Confidence & limits" },
-    { href: "#formula-reference", label: "Formula reference" },
-    { href: "#framework", label: "Using the thresholds" },
     { href: "#revisit-call", label: "Revisit triggers" },
     { href: "#meeting-snippet", label: "Meeting snippet" },
+    { href: "#framework", label: "Using the thresholds" },
   ];
 
   const reportShellModel: ReportShellModel = {
@@ -200,6 +203,7 @@ export async function buildTrustPageModel() {
     reportData,
     isFallback,
     degradedSourceRows,
+    sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),
     confidenceLabel,
     trustSummary,
     citationLine,

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import type { MacroSeriesReading, TreasuryData } from "../lib/types";
 import {
+  buildSourceBoardRows,
   buildSourceHealthRows,
   summarizeSourceHealthCoverage,
   buildDegradedSourceRows,
@@ -272,5 +273,58 @@ describe("degraded sources", () => {
       buildTreasury({ fetched_at: "2026-03-10T20:00:00.000Z", isLive: false }),
     );
     assert.deepEqual(names, ["Treasury"]);
+  });
+});
+
+describe("the /trust source board", () => {
+  /*
+   * The board is drawn open under the score derivation. Its rows must say what
+   * the strip's count says, in the strip's words: a row the strip counts as
+   * degraded is never drawn as fine, and the curated source inside its window is
+   * never drawn as a problem.
+   */
+  const now = new Date("2026-03-11T00:00:00.000Z");
+  const liveIds: MacroSeriesReading["id"][] = ["CPI_YOY", "UNEMPLOYMENT_RATE", "BBB_CREDIT_SPREAD", "HY_CREDIT_SPREAD", "CHICAGO_FCI", "VIX_INDEX"];
+  const curatedIds: MacroSeriesReading["id"][] = ["VC_FUNDING_VELOCITY", "TECH_LAYOFF_TREND", "SAAS_VALUATION_MULTIPLE", "EARNINGS_REVISION_INDEX", "AI_COMPUTE_COST_TREND", "REGULATORY_RISK_TRACKER"];
+  const healthRows = ({ treasuryLive = true, curatedAt = "2026-03-01T00:00:00.000Z", marketLive = true } = {}) =>
+    buildSourceHealthRows({
+      treasury: buildTreasury({ fetched_at: "2026-03-10T20:00:00.000Z", isLive: treasuryLive }),
+      macroSeries: [
+        ...liveIds.map((id) =>
+          buildMacroSeriesReading({ id, fetched_at: "2026-03-10T09:00:00.000Z", isLive: marketLive || id === "CPI_YOY" || id === "UNEMPLOYMENT_RATE" }),
+        ),
+        ...curatedIds.map((id) => buildMacroSeriesReading({ id, fetched_at: curatedAt, isLive: false })),
+      ],
+      now,
+    });
+
+  it("draws every source, live ones as live and the curated one as current", () => {
+    const rows = buildSourceBoardRows(healthRows());
+    assert.deepEqual(rows.map((row) => row.sourceName), ["Treasury", "Market stress", "Inflation", "Labor", "Startup/private markets"]);
+    assert.deepEqual(rows.map((row) => row.stateLabel), ["Live", "Live", "Live", "Live", "Current"]);
+    assert.ok(rows.every((row) => row.asIntended));
+    assert.equal(rows.at(-1)?.live, false, "current by design is not the same as live");
+    assert.equal(rows[0]?.updatedLabel, "Updated Mar 10, 2026, 8:00 PM UTC");
+  });
+
+  it("names a cached or stale source in the strip's words, and counts what the strip counts", () => {
+    const health = healthRows({ treasuryLive: false, curatedAt: "2026-01-01T00:00:00.000Z", marketLive: false });
+    const rows = buildSourceBoardRows(health);
+    const byName = new Map(rows.map((row) => [row.sourceName, row]));
+    assert.equal(byName.get("Treasury")?.stateLabel, "Cached copy");
+    assert.equal(byName.get("Market stress")?.stateLabel, "Cached copy");
+    assert.equal(byName.get("Startup/private markets")?.stateLabel, "Stale · 2mo old", "how stale, not only that it is");
+    assert.deepEqual(
+      rows.filter((row) => !row.asIntended).map((row) => row.sourceName),
+      buildDegradedSourceRows(health).map((row) => row.sourceName),
+      "the board and the strip count the same rows",
+    );
+  });
+
+  it("says when a source has never answered rather than printing a date", () => {
+    const [treasury] = buildSourceBoardRows(buildSourceHealthRows({ treasury: buildTreasury({ fetched_at: undefined }), macroSeries: [], now }));
+    assert.equal(treasury?.stateLabel, "Not confirmed");
+    assert.equal(treasury?.updatedLabel, "No update on record");
+    assert.equal(treasury?.asIntended, false);
   });
 });
