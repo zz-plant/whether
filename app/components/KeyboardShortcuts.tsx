@@ -14,6 +14,19 @@ const SHORTCUTS: Record<string, string> = Object.fromEntries([
 ]);
 
 /**
+ * Whether a key event lands somewhere that takes typing: a text field, a `<select>`
+ * (it types ahead on letters), or a contenteditable (it takes them literally). No
+ * single-letter shortcut acts there. Exported because focus mode's `F` and the
+ * presentation frames' arrows bind keys outside this file and each used to carry a
+ * hand-written copy, one of which had no contenteditable.
+ */
+export const isTypingTarget = (target: EventTarget | null): boolean =>
+  target instanceof HTMLInputElement
+  || target instanceof HTMLTextAreaElement
+  || target instanceof HTMLSelectElement
+  || (target instanceof HTMLElement && target.isContentEditable);
+
+/**
  * Whether a global single-key shortcut may act, given what currently has focus.
  *
  * Exported so the rule is testable without a DOM: the regression it encodes was
@@ -29,14 +42,7 @@ const SHORTCUTS: Record<string, string> = Object.fromEntries([
  */
 export const shortcutTargetIsNeutral = (active: Element | null): boolean => {
   if (!active || active === document.body) return true;
-  if (active instanceof HTMLElement && active.isContentEditable) return false;
-  if (
-    active instanceof HTMLInputElement
-    || active instanceof HTMLTextAreaElement
-    || active instanceof HTMLSelectElement
-  ) {
-    return false;
-  }
+  if (isTypingTarget(active)) return false;
   // A section J/K parked focus on. It has no key behaviour of its own.
   if (active instanceof HTMLElement && active.hasAttribute("data-page-section")) return true;
   return false;
@@ -81,12 +87,7 @@ export function KeyboardShortcuts() {
 
   useEffect(() => {
     const handle = (e: KeyboardEvent) => {
-      const typingTarget =
-        e.target instanceof HTMLInputElement
-        || e.target instanceof HTMLTextAreaElement
-        || e.target instanceof HTMLSelectElement
-        || (e.target instanceof HTMLElement && e.target.isContentEditable);
-      if (typingTarget) return;
+      if (isTypingTarget(e.target)) return;
 
       if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
         e.preventDefault();
