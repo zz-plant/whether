@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { evaluateRegime } from "../lib/regimeEngine";
+import { macroSeries } from "../lib/macroSnapshot";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
 import { buildMonthlySummary } from "../lib/summary/monthlySummary";
 import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
@@ -97,22 +98,45 @@ describe("buildWeeklySummary", () => {
       isLive: true,
       yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
     };
-    const assessment = evaluateRegime(record);
+    /* With the market series the reading is not held, so its change line is the lines. */
+    const assessment = evaluateRegime(record, undefined, macroSeries);
     assert.equal(assessment.regime, "SCARCITY");
+    assert.equal(assessment.policyAssessment.refusal.refused, false);
     assert.equal(assessment.scores.tightness, 90);
-    assert.equal(assessment.scores.riskAppetite, 48);
-    assert.equal(assessment.diagnostics.intensity, "MILD");
+    assert.equal(assessment.scores.riskAppetite, 37);
 
     const provenance = { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" };
     const changeLine =
-      "Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).";
+      "Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 13 pts to clear 50 (37 today).";
     for (const summary of [
       buildWeeklySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
       buildMonthlySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
     ]) {
-      assert.ok(summary.summary.includes(`The read is workable but not settled. ${changeLine}`), summary.summary);
+      assert.ok(summary.summary.includes(changeLine), summary.summary);
       assert.doesNotMatch(summary.copy, /moving|barely/);
     }
+  });
+
+  /* Rates alone leave too many inputs missing, so the reading is held. The change line
+     named both scores' lines beside "The guidance is not changing this week" until
+     2026-10-07; it is the hold's own condition now (docs/claims-ledger.md). */
+  it("says what ends the hold on a held reading, not a line", () => {
+    const record = {
+      source: "https://example.com/treasury",
+      record_date: "2026-10-05",
+      fetched_at: "2026-10-05T12:00:00.000Z",
+      isLive: true,
+      yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
+    };
+    const assessment = evaluateRegime(record);
+    assert.equal(assessment.policyAssessment.refusal.refused, true);
+    const provenance = { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" };
+    const summary = buildWeeklySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record });
+    assert.ok(
+      summary.summary.includes("Conditions change if: The missing inputs return in a live reading; until then the guidance is not changing."),
+      summary.summary,
+    );
+    assert.doesNotMatch(summary.summary, /pts to clear|or below \(/);
   });
 
   it("dates the paste by the record date it is handed and prints the published confidence", () => {
