@@ -36,10 +36,12 @@ export const operationsSectionLinks: {
   // /operate used to carry three: this list (six labels in a different order,
   // two of them naming panels inside other steps and none naming the Test
   // step), the stepper's own sticky chip row, and a card grid at the tail.
+  // Rules first since 2026-10-07: the area table, the do/don't lists, then the
+  // test that checks a move against them.
   plan: [
-    { href: "#ops-decision-shield", label: "Test a decision" },
-    { href: "#ops-playbook", label: "Rules before you commit" },
     { href: "#ops-monthly-action-summary", label: "Rule for each area" },
+    { href: "#ops-playbook", label: "Rules before you commit" },
+    { href: "#ops-decision-shield", label: "Test a decision" },
     { href: "#ops-plan-lines", label: "Set this plan's lines" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
     { href: "#ops-export-briefs", label: "Share the brief" },

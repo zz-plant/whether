@@ -249,7 +249,8 @@ pages between 2,500 and 8,000px tall. The changes, per surface:
   key-number gauges and the inversion timeline; the two twelve-month lines are a
   `SignalSparklineStrip` (current value, move over the window, series with interquartile band);
   the fossil-record table is behind a `?fossil=1` disclosure.
-- **Plan** opens with "Test a decision" (§1.1.36); the sticky one-row strip is section navigation
+- **Plan** opens with "This week's rule for each area" (§1.1.46; it opened with "Test a decision"
+  from §1.1.36 until 2026-10-07); the sticky one-row strip is section navigation
   only (the checklist toggles, which did nothing but turn themselves on, were retired 2026-09-08).
 - **Weekly brief** no longer carries "Decisions to reconsider" or "Close the week" (retired
   2026-09-08: each asked the reader to maintain browser-local state the product could not pay
@@ -1578,9 +1579,10 @@ in the order a reader asks:
 - **What would change this guidance.** The two score ladders with their Pause if and Resume when lines.
 - **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are
   interest rates doing? · Has the yield curve inverted in the last year? · How have the two scores
-  moved this year? · What would the call be with different lines? · What did the brief say in an
+  moved this year? · What would conditions be with different lines? · What did the brief say in an
   earlier month? · Which past cycle looks most like this one? · Which habits from the zero-rate
-  years still shape your company?
+  years still shape your company? Since 2026-10-07 each summary carries its answer after the
+  question (§1.1.45).
 
 The page used to open on "What this means now", the brief's call restated under the shell's own
 stamp, and the charts disclosure opened by default: about 2,000px of charts before the other five
@@ -1922,10 +1924,11 @@ Slack, Notion, and Linear targets.
 
 ## 5) Playbooks, summaries, and briefings
 
-### 5.1 Playbook & operator requests
+### 5.1 Playbook
 The playbook surfaces start/stop/fence actions based on the current regime, sourced from the
-insight database and operator request catalog in `data/recommendations.ts` and
-`lib/operatorRequests.ts`.
+insight database in `data/recommendations.ts`. The operator request catalog
+(`lib/operatorRequests.ts`), drawn as "Execution asks" under `/operate`'s Share step, was removed
+on 2026-10-07 (§1.1.46): it was a product backlog that listed shipped features as not yet built.
 
 ### 5.2 Weekly + monthly summaries
 Weekly and monthly summaries are generated from the current assessment for use in the overview
@@ -2558,7 +2561,7 @@ work-item tags, the pull policies and the role memos. That was about 5,700px on 
   (Slack post, Full brief, Standup line), Meetings (Meeting pack, Monday agenda, Slide text), Docs
   and email (Email, Investor update, Portfolio note, Citation), Tickets and boards (Ticket brief,
   Work-item tags, Pull policies), Team (Role memos). It is a list from `md` up and the platform's
-  grouped `<select>` below it. There is one preview (`BriefPreview`, shared with the share rail)
+  grouped `<select>` below it. There is one preview (`BriefPreview`, shared with the share rail; the Chat formats draw through `ChatPreview` since §1.1.48)
   and one copy action, so a reader reads exactly what they will paste before copying it.
 - **Two Slack texts, kept on purpose.** *Slack post* is the rail's short block, the shape a
   channel skims. *Full brief* is the weekly operator brief, every area's rule and lines. Each is
@@ -2839,3 +2842,183 @@ below moves data the page already computed to where the eye lands first; nothing
   `tests/homeDecisionPicker.test.tsx` (choices and count), `tests/firstRunOrientationGuide.test.tsx`
   (standfirst).
 
+### 1.1.45 Resolve answers, and Evidence's questions carry their answers (2026-10-07)
+
+A screenshot review of `/resolve` and `/signals` in both themes, returning reader, phone and desktop.
+
+- **`/resolve` answers before the click.** The intro promises "one yes-or-no answer per open
+  decision" and the list printed eleven questions with a sentence of enduring advice each. Every
+  decision answer now carries its lead area's standing (the first area it maps, the one whose rule
+  its page's card prints) as a stamp: "Pause line crossed" in the caution ink, or "4 pts from its
+  pause line" (`describeAnswerStanding` in `lib/report/answerStanding.ts`, over
+  `describeAreaPauseStatus`). The rows are `buildHomeAreaRows`, fed from the snapshot the page
+  already loads exactly as `app/page.tsx` feeds the homepage's "What are you deciding?" choices,
+  so the two print the same words. Climate answers ("Startup funding climate this week", "Is it
+  risk-on or risk-off…") carry the week's weather word in the regime ink; the explanation ("How to
+  brief executives…") carries nothing. The count sits over the list ("Pause lines crossed in 4 of 5
+  areas this week.", `describePauseLineCount`). No reader calibration is applied: the answer page
+  a row opens reads the published lines too, so a row and its page agree; a reader with a stage
+  cookie can see a different distance on `/`, which is scaled to them.
+- **Stamps are sharp** (§XIV): `rounded-sm`, a column of their own from `sm`, under the title on a
+  phone.
+- **The browse disclosure is a row.** It was a `weather-surface` whose padding the report row
+  zeroes, so the closed state drew a 16px-radius bar with its text against the border. It is a
+  native `<details>` under `weather-auto-chevron`, ruled off like `/signals`' instruments. The two
+  chip-boxed links under the list (SaaS valuation context, historical comparison) are inline links.
+- **`/signals` "Deeper evidence" answers in its summaries** (§XII): rates ("1-month rate 4.05%, up
+  from 3.85% on Aug 31"), inversion ("Yes: 2Y−3M below zero in 6 of 12 months, 10Y−2Y in none"),
+  score trends ("Funding pressure down 27 to 63, risk appetite down 6 to 56 (12 month-ends to Aug
+  2026)"), the lines in force, the change count of the month-by-month timeline, the reference
+  cycle (unchanged), and the zero-rate habit areas. Builders in
+  `lib/report/evidenceInstrumentSummaries.ts`; where a panel computes the value (the sparkline
+  window, the runs of conditions) the panel and the summary call the same function (§XV). The
+  rates panel's "Latest" line named this week's date over charts that end at the last month-end
+  and printed no rate; it prints this week's four rates and says the charts are month-ends. The
+  line-settings question says "conditions" instead of the retired "the call". The rows drop their
+  side inset on a phone so the questions align with the section title.
+- **"What changed"**: the short-term rate's "Why it matters" was a bare dash in the unfiltered
+  table; it carries the sentence the Inflation filter already had. The focus filters were checked
+  and kept: each shows a different subset of the four rows with its own notes and follow-up links.
+- **"What would change this guidance"**: each score ladder is capped at 28rem, the wide track its
+  labels are laid out for (§XVII, §XVIII); the two had stretched to about 620px each on a desktop.
+- Seen, not changed: `ScoreCell` prints the short-term rate as "4.0%" beside the chip's "4.05%"
+  (and the gauge "0.5pp" beside "0.47pp") — one figure at two precisions in one row, in a shared
+  primitive the answer pages also draw. The timeline's "Current: Aug 2026" names the last month-end
+  on a live October reading.
+- Tests: `tests/resolveAnswerStanding.test.tsx`, `tests/evidenceInstrumentSummaries.test.ts`,
+  `tests/signalsPageFold.test.tsx` (renamed question pinned on purpose; every answer checked against
+  its opened panel; the base-rate note; the ladder cap).
+
+### 1.1.48 `/trust` leads with its sources; `/share` shows what it hands over (2026-10-07)
+
+A screenshot review found both pages describing the thing a reader came for instead of showing it.
+
+**`/trust`.** The page's open content was the thresholds essay ("Why it works", the editor's
+healthcare background) and a blank five-prompt form that read as unfinished, while the sources —
+the rail's second entry, and what the page exists to check — sat folded at the foot under
+"Detailed verification & sources" as two timestamps. The per-source health rows
+(`reportData.sourceHealth`) were built for every reading and drawn nowhere but as the strip's count.
+
+- **Source board, open, under "How the scores are built"** (`app/trust/sourceBoard.tsx`). One row
+  per source — Treasury, Market stress, Inflation, Labor, Startup/private markets — with its state
+  in the strip's words (Live, Current, Cached copy, Stale · 2mo old, Not confirmed), its cadence
+  and when it last answered (UTC), then the two source links. `buildSourceBoardRows`
+  (`lib/report/sourceHealth.ts`) judges "as intended" with the predicate `buildDegradedSourceRows`
+  uses, so the board and the strip's "All sources live" / "Partly cached" count the same rows.
+  Raw fallback reasons stay off the board: they are diagnostic strings, some naming series ids.
+  `#source-board` is unchanged (`DATA_CURRENCY_ACTION_HREF` points at it).
+- **The rest of the verification stays folded on a healthy week**, under "Citation, limits and
+  revisit triggers" (citation, limits, calibration link, warnings, snippet). The `?sources=1` key
+  still opens it, so shared links keep working.
+- **"How to use the thresholds" is last.** Its worked example stays open; the three definitions
+  with the essay, and the blank form, are native `<details>`. `#template` is on the form's own
+  `<details>`, so `/template` lands on it and the shell's anchor handler opens it; `/threshold`
+  (`#framework`) opens both.
+- **Rail in page order** (§XI): status, formula, sources, the four folded sections, the method.
+- This opens a source board, which §XII lists among things to collapse. On `/trust` the check is
+  the page's job, so the compact board is its content; the detail behind it is what folds.
+  Recorded in §XII.
+- Desktop 3,622 → 2,547px, phone 4,983 → 3,491px (same day's data, returning reader).
+- Tests: `tests/trustSourceBoard.test.tsx` (board open after the formula and before anything
+  folded, every source drawn, rail in page order, method and form folded, `#template` on the
+  form's disclosure), `tests/sourceHealth.test.ts` (board rows and the strip agree).
+
+**`/share`.**
+
+- **Chat formats are drawn as the channel shows them.** The Slack post previewed as raw markup
+  in monospace. `parseSlackMrkdwn` (`lib/export/slackMrkdwn.ts`) reads the subset the chat formats
+  write (`*bold*`, `_italic_`, `>` quote lines, bare http(s) URLs) into data, and `ChatPreview`
+  (`app/share/chatPreview.tsx`) builds React nodes from it: bold, one quote bar per quoted run,
+  links. Nothing is injected as HTML; unrecognised text stays text. When the drawing differs from
+  the text, "Show the text that copies" holds the exact text. Per format (`preview: "chat"`): the
+  Slack post, full brief and standup line draw as chat. The meeting pack, agenda, slide text,
+  email, investor update, portfolio note, citation and ticket keep the plain preview
+  (`BriefPreview`), because there the text is the artifact. The copy button copies the same
+  text; `tests/briefFormatsPinned.test.ts` is unchanged.
+- **The images are shown.** "Files and images for a deck or a thread" was four cards that
+  described a slide and a card and showed neither. The PPTX, PDF and SVG draw one slide from one
+  payload (`lib/export/boardSlideDeck.ts`), so they are one card with the slide's picture
+  (`/api/image/slide?stage=seed`) and three captioned files; the brief card shows
+  `/api/image/brief`. This reverses the component's "deliberately links rather than thumbnails"
+  on cost grounds that no longer hold: two pictures, not four; both routes answer with
+  `s-maxage=3600`; both load lazily below the copy formats. `next/image` with `unoptimized` (the
+  worker's `/_vinext/image` resizes static assets only) sets the size attributes, lazy loading
+  and async decoding; a scrolled capture measured CLS 0 at 430px and 1280px. From `sm` both
+  pictures sit in a 3:2 frame so the cards' titles align; the slide letterboxes rather than crops.
+- **This week's readings** above the picker were 12px across the 72rem column (~150 characters a
+  line). They are `text-fluid-xs` (the §VI floor for explanatory text) capped at 48rem.
+- Seen, not changed: the seed-stage slide prints a stage-specific action and a "Conditions change
+  if" line ("Risk appetite rises above 50 … Conditions then turn Cloudy") that differs from the
+  Slack post's on the same page, now that both are visible together. The slide payload comes from
+  `lib/export/exportSnapshot.ts`; whether the two should agree is for that module's owner.
+- Tests: `tests/slackMrkdwn.test.ts`, `tests/sharePageCurrentBrief.test.tsx` (chat drawing and
+  raw text, per-format preview choice, markup-looking text stays escaped, two sized lazy images).
+
+### 1.1.46 `/operate` leads with this week's rules (2026-10-07)
+
+A screenshot review of the plan page found it opening on the least informative thing it has: under
+the tabs, "Test a decision" with the full stress-test form (runway, monthly spend, a model select, a
+three-line box, example chips) above a "Decision verdict" panel that said there was no verdict. On a
+phone that form was everything below the intro. The page's job (`docs/agents/ui-ux-standards.md`
+§VIII: operating guardrails) was behind it, and the area table — the pause and resume lines, which
+§XII says are never collapsed — sat closed three steps down as a title and one sentence.
+
+- **Order.** This week's rule for each area (open), Rules before you commit (open), Test a decision
+  (open, compact), Set this plan's lines, Finance strategy, Share the brief, then Risk checks. The
+  section index (`operationsSectionLinks.plan`, the sidebar and the phone chip row) follows. The
+  area table is the same `AreaTable` the brief prints, from the same rows (`buildAreaRows`), not a
+  second build. This reverses §1.1.36's lead, which put the reader's own decision first; the test
+  keeps its open state and moves after the lines it checks against.
+- Step ids are unchanged, so `#ops-monthly-action-summary` (the brief, the portfolio note, the
+  redirects in `next.config.js`), `#ops-playbook`, `#ops-decision-shield` and `#ops-plan-lines`
+  still open their sections.
+- **Test a decision opens as one field.** The mode switch and the plan box with its examples; the
+  runway, spend and model fields join once a plan is typed (and stay while it is edited), and the
+  verdict panel exists only once there is a plan to grade (`PlanStressTestMode`). Compare mode
+  draws no recommendation box until a plan is typed. Copy verdict, Copy link and Record this
+  decision render only once the mode on screen has a verdict: before, Copy verdict on an empty box
+  copied the list mode's default verdict, one the reader had never seen. The stress-test and
+  compare modes no longer draw a surface inside the step, so the verdict sits two frames deep and
+  its sizing note three (§XIII). The example buttons are `weather-pill` controls (44px on touch)
+  rather than 20px chips, with their label on its own line on a phone so they pair up.
+- **Closed steps say what is behind them** (§XII, "a summary that shows the current values"). Set
+  this plan's lines names the areas its form starts from ("Start from the published pause and
+  resume lines for Hiring, Roadmap, Fundraising, Spending and New bets, …"); Finance strategy prints
+  the quarter's runway target ("Target 24+ months of runway; freeze non-essential spend.",
+  `financeStrategyFor`); Share the brief names its four formats from `BRIEF_FORMATS`. They used to
+  read as a title and a sentence about the gesture, which is what made them look like empty boxes.
+  The lines step is left out when no rule has a numeric line, rather than opening on nothing.
+- **Finance strategy is flat.** `FinanceStrategyPanel` drops its own header ("Finance Strategy
+  Mode", a subtitle and a method sentence), the "Executive summary" surface and the "Deep dive"
+  disclosure, which between them printed the runway target three times four frames deep; it is
+  one definition list (hiring throttle, budget focus, signals to watch) under the step's line. The
+  undrawn `title`/`subtitle`/`description` left `data/recommendations.ts` with it.
+- Tests: `tests/planPageLead.test.ts` (order, open state, closed-step lines),
+  `tests/decisionShieldPanel.test.tsx` (compact and typed states), `tests/planningCliPage.test.tsx`
+  (index order).
+- **Risk checks and the resources disclosure have their padding back.** Both carried
+  `weather-panel`, whose padding the report row zeroes for an unboxed section
+  (`.weather-report-section-row > .weather-panel`), so each drew its border against its own text.
+  A week with no warning is one line under the heading, without the `weather-surface` slab, the
+  "each one names an assumption" sentence, or "Recheck the rules" (kept for weeks that have a
+  warning, which now draw as amber-ruled segments rather than lifted surfaces). The resources
+  summary says what it holds ("3 operating guides and 4 templates you can fill in and share.") and
+  its guide cards are plain bordered links rather than surfaces lifted inside a frame the depth
+  ladder cannot see.
+- **No "Execution asks" under Share.** The section under the share picker ("Current asks for the
+  people driving execution") was `lib/operatorRequests.ts`, a product backlog of "expansion
+  requests expected after launch" that listed API access and historical comparisons as not yet
+  built, though both ship. It is removed with its panel (`app/components/appendix/ReferencePanels.tsx`);
+  its two ids stay as aliases of the Share step. That left `DataProvenanceStrip` with no caller —
+  every caller had passed `showProvenance: false`, so it had rendered nowhere — and it is deleted
+  with its test and the two status icons only it drew. Still open: `reportData.internalProvenance`
+  (`lib/report/reportDataLoader.ts`) is now computed and drawn nowhere.
+- **The lead table's "Line set by" links leave for the brief.** `AreaTable` takes
+  `signalLinkBase`; `/operate` passes "/", so "Funding pressure" and "Risk appetite" open
+  `/#signal-funding-pressure` and `/#signal-risk-appetite` rather than in-page anchors this page
+  never draws. `/share` and the answer pages carry the same dead in-page links and are not changed
+  here.
+- **Rules before you commit opens on the rules.** "Show all rules" and its count follow the three
+  lists they change instead of sitting above the heading, and the count says what it counts ("The
+  top 3 of each list.", where it said "per area"). Risk checks and the resources disclosure take the
+  closed steps' fill, so the page's frames read as one set in the light theme too.

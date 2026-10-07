@@ -12,6 +12,7 @@ import { toRoute, type Route } from "../../../lib/navigation/routeType";
 import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngine";
 import { buildThresholdSearchParams, THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
+import { formatChangeLines } from "../../../lib/report/evidenceInstrumentSummaries";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
 import { SpinnerIcon } from "../../components/uiIcons";
 import { createBrowserSource, useBrowserSource } from "../../components/browserSource";
@@ -323,10 +324,7 @@ export const ThresholdsPanel = ({
               <dt className="text-slate-400">Defaults:</dt>
               {/* Each number named: "3.5% · 70/50" asked the reader to know
                   which score each figure belonged to. */}
-              <dd className="font-semibold tabular-nums text-slate-200">
-                rate {appliedDefaults.baseRateTightness}% · funding pressure {appliedDefaults.tightnessRegime} ·
-                risk appetite {appliedDefaults.riskAppetiteRegime}
-              </dd>
+              <dd className="font-semibold tabular-nums text-slate-200">{formatChangeLines(appliedDefaults)}</dd>
             </dl>
           }
         />

@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { isValidElement, type ReactNode } from "react";
 import SharePage from "../app/share/page";
 import { SharePageFormats } from "../app/share/sharePageFormats";
+import { ChatPreview } from "../app/share/chatPreview";
 import { macroSeries } from "../lib/macroSnapshot";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
@@ -125,6 +126,54 @@ describe("/share current weekly artifact", () => {
       assert.ok(label, `known area ${area}`);
       assert.match(row ?? "", new RegExp(`Copy ${decisionAreaLabel(label)} tag`), `${area}'s button is in its own row`);
     }
+  });
+
+  /* The Slack post previewed as its own markup: asterisks, `> •` prefixes, a monospace block.
+     The chat formats draw as the channel will now; the copy action still copies the text. */
+  it("draws the chat formats as the channel shows them, with the copied text one tap away", async () => {
+    const html = renderToStaticMarkup(await SharePage());
+    const { options, textOf } = await shareOptions();
+
+    assert.match(html, /data-chat-preview/, "the page opens on the Slack post, drawn");
+    assert.match(html, /<strong[^>]*>Whether Weekly Brief — [^<]+<\/strong>/, "the bold title is bold, not wrapped in asterisks");
+    assert.match(html, /border-l-4/, "the quoted lines sit beside a bar");
+    assert.match(html, /<a href="https:\/\/[^"]+\/brief\/[^"]+"[^>]*>/, "the brief link is a link");
+    // The exact text that copies is still on the page, behind the drawing.
+    const raw = /<pre aria-label="Text of Slack post"[^>]*>([\s\S]*?)<\/pre>/.exec(html)?.[1] ?? "";
+    assert.ok(raw.includes("*Whether Weekly Brief"), "the text keeps its markup");
+
+    // Decided per format: the chat formats draw; where the text is the artifact, it previews as text.
+    const preview = (id: string) => {
+      const option = options.find((candidate) => candidate.id === id);
+      return option?.kind === "text" ? (option.preview ?? "text") : option?.kind;
+    };
+    assert.deepEqual(["slack-post", "full-brief", "standup"].map(preview), ["chat", "chat", "chat"]);
+    assert.deepEqual(["meeting-pack", "agenda", "slide-text", "email", "citation", "ticket-brief", "portfolio-note"].map(preview), Array(7).fill("text"));
+    assert.match(textOf("slack-post"), /^\*Whether Weekly Brief/, "the option still carries the markup it copies");
+  });
+
+  it("builds the drawing as nodes, so text that looks like markup stays text", () => {
+    const html = renderToStaticMarkup(<ChatPreview label="Slack post" text={'*Hi* <img src=x onerror="alert(1)"> https://whether.work/brief'} />);
+    assert.doesNotMatch(html, /<img/);
+    assert.match(html, /&lt;img src=x/);
+    assert.match(html, /<strong[^>]*>Hi<\/strong>/);
+  });
+
+  /* The four file cards described a slide and a card and showed neither. The three slide files
+     draw one slide, so they are one card with one picture; the brief card has its own. */
+  it("shows each picture once, sized before it loads", async () => {
+    const html = renderToStaticMarkup(await SharePage());
+    const images = [...html.matchAll(/<img [^>]*>/g)].map(([tag]) => tag);
+
+    assert.equal(images.length, 2, "one picture per distinct image");
+    for (const tag of images) {
+      assert.match(tag, /src="\/api\/image\/(slide\?stage=seed|brief)"/);
+      assert.match(tag, /width="1200"/);
+      assert.match(tag, /height="(675|800)"/);
+      assert.match(tag, /loading="lazy"/);
+      assert.match(tag, /alt="[^"]{20,}"/, "the alt says what the picture shows");
+    }
+    for (const label of ["Download PPTX", "Download PDF", "Open SVG", "Open brief card"]) assert.match(html, new RegExp(label));
   });
 
   /* DD-041: the formats were stacked sections, about 5,700px on desktop with the Slack text drawn

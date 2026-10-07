@@ -7,6 +7,7 @@ import {
   type InvestorUpdateSnippetParts,
 } from "../../lib/export/investorUpdateSnippet";
 import { BriefPreview } from "../components/briefFormatPicker";
+import { ChatPreview } from "./chatPreview";
 import { locationHashSource, useBrowserSource, useHydrated } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
@@ -44,7 +45,20 @@ type ShareFormatBase = {
 
 export type ShareFormatOption = ShareFormatBase &
   (
-    | { kind: "text"; text: string; copyLabel: string; commitment: ActivationCommitment; offersCalendar?: boolean }
+    | {
+        kind: "text";
+        text: string;
+        copyLabel: string;
+        commitment: ActivationCommitment;
+        offersCalendar?: boolean;
+        /**
+         * "chat" draws the text as the channel will (bold, quote bars, links)
+         * for the formats posted into Slack. Every other format previews as the
+         * text itself, because there the text is the artifact: a Markdown
+         * agenda, a ticket, an email.
+         */
+        preview?: "chat";
+      }
     /** Composed in the browser: its last paragraph reads the reader's runway band, and the page is cached. */
     | { kind: "investor"; parts: InvestorUpdateSnippetParts; copyLabel: string }
     | { kind: "panel"; content: ReactNode }
@@ -148,11 +162,14 @@ export function SharePageFormats({
     <section id="formats" className="weather-panel weather-section-stack p-0" aria-labelledby="copy-call-heading">
       <h2 id="copy-call-heading" className="text-xl font-semibold text-white sm:text-2xl">Copy this week&apos;s guidance</h2>
       {/* Labelled and ruled at the left, so the lines read as the readings
-          behind every format rather than the opening of the text below. */}
+          behind every format rather than the opening of the text below. At the
+          explanatory floor (§VI, text-fluid-xs) and a reading measure: at 12px
+          across the full 72rem column each line ran to ~150 characters, the
+          densest text on the page, above the preview it explains. */}
       {scoreReferences.length > 0 ? (
-        <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
+        <div className="max-w-3xl space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
           <p id="copy-call-scores-label" className="type-eyebrow">This week&apos;s readings</p>
-          <ul className="space-y-1 text-xs tabular-nums text-slate-300" aria-labelledby="copy-call-scores-label">
+          <ul className="space-y-1.5 text-fluid-xs leading-5 tabular-nums text-slate-300" aria-labelledby="copy-call-scores-label">
             {scoreReferences.map((line) => (
               <li key={line}>{line}</li>
             ))}
@@ -222,7 +239,11 @@ export function SharePageFormats({
             selected.content
           ) : (
             <>
-              <BriefPreview label={selected.label} text={text} />
+              {selected.kind === "text" && selected.preview === "chat" ? (
+                <ChatPreview label={selected.label} text={text} />
+              ) : (
+                <BriefPreview label={selected.label} text={text} />
+              )}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <ClipboardActionRow
                   label={selected.copyLabel}

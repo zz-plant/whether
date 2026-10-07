@@ -1,4 +1,4 @@
-import { formatAgeSpan } from "../formatters";
+import { formatAgeSpan, formatTimestampUTC } from "../formatters";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
@@ -291,6 +291,51 @@ export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
       modeLabel: formatSourceModeLabel(row.mode),
       freshnessStatus: formatSourceFreshnessLabel(row),
     }));
+
+/** One row of the `/trust` source board: what a reader checks about a source at a glance. */
+export type SourceBoardRow = {
+  sourceName: string;
+  cadenceLabel: string;
+  /** "Live", "Current", "Cached copy", "Stale · 9d old" or "Not confirmed". */
+  stateLabel: string;
+  /** Answering live and inside its window. */
+  live: boolean;
+  /** What the source is meant to be right now: the test the trust strip counts. A curated source inside its window is as intended without being live. */
+  asIntended: boolean;
+  /** When it last answered, in UTC, or the absence in words. */
+  updatedLabel: string;
+};
+
+/*
+ * The state word, in the strip's vocabulary ("All sources live", "Partly
+ * cached"), so a reader who sees "Partly cached" under the h1 finds the cached
+ * row by the same word. Age and absence come first: a live source that has not
+ * answered inside its window is stale before it is anything else.
+ */
+const sourceBoardState = (row: SourceHealthRow): string => {
+  if (row.freshnessStatus === "unknown") return "Not confirmed";
+  if (row.freshnessStatus === "stale") return row.ageLabel ? `Stale · ${row.ageLabel} old` : "Stale";
+  if (row.mode === "live") return "Live";
+  return row.expectsLive ? "Cached copy" : "Current";
+};
+
+/**
+ * The board `/trust` draws open under the score derivation: every source, how
+ * often it updates, when it last answered and whether it answered live. The
+ * degraded rows above are the subset the strip counts; this is the whole set,
+ * so a healthy week shows what "All sources live" was judged from.
+ */
+export const buildSourceBoardRows = (rows: SourceHealthRow[]): SourceBoardRow[] =>
+  rows.map((row) => ({
+    sourceName: row.sourceName,
+    cadenceLabel: row.cadenceLabel,
+    stateLabel: sourceBoardState(row),
+    live: row.mode === "live" && row.freshnessStatus === "fresh",
+    asIntended: !isDegradedSource(row),
+    updatedLabel: row.lastSuccessfulFetchAt
+      ? `Updated ${formatTimestampUTC(row.lastSuccessfulFetchAt)}`
+      : "No update on record",
+  }));
 
 export const formatSourceModeLabel = (mode: SourceModeStatus) => {
   if (mode === "live") return "Live";

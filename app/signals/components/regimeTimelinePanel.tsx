@@ -3,6 +3,7 @@ import type { RegimeKey } from "../../../lib/regimeEngine";
 import { REGIME_LABELS, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
 import { formatMonthLabel, formatMonthShortLabel } from "../../../lib/timeMachine/monthFormatting";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
+import { describeConditionChanges, summarizeConditionRuns } from "../../../lib/report/evidenceInstrumentSummaries";
 
 
 type RegimeRun = {
@@ -41,26 +42,6 @@ const collectPreservedParams = (searchParams?: RegimeTimelinePanelProps["searchP
   return preservedParams;
 };
 
-const buildRegimeRuns = (series: TimeMachineRegimeEntry[]) => {
-  return series.reduce<RegimeRun[]>((runs, entry) => {
-    const lastRun = runs.at(-1);
-
-    if (!lastRun || lastRun.regime !== entry.regime) {
-      runs.push({
-        regime: entry.regime,
-        count: 1,
-        start: entry,
-        end: entry,
-      });
-      return runs;
-    }
-
-    lastRun.count += 1;
-    lastRun.end = entry;
-    return runs;
-  }, []);
-};
-
 const formatRunSpan = (run: RegimeRun) => {
   if (run.start.year === run.end.year && run.start.month === run.end.month) {
     return formatMonthLabel(run.start.year, run.start.month);
@@ -85,19 +66,6 @@ const getSelectedMarkerOffset = (selectedIndex: number, totalMonths: number) => 
   return `calc(${((selectedIndex + 0.5) / Math.max(totalMonths, 1)) * 100}% - 0.5px)`;
 };
 
-const getTimelineSummary = (runs: RegimeRun[]) => {
-  const changeCount = Math.max(runs.length - 1, 0);
-  const longestRun = runs.reduce<RegimeRun | null>((longest, run) => {
-    if (!longest || run.count > longest.count) {
-      return run;
-    }
-
-    return longest;
-  }, null);
-
-  return { changeCount, longestRun };
-};
-
 export const RegimeTimelinePanel = ({
   series,
   selectedYear,
@@ -106,9 +74,12 @@ export const RegimeTimelinePanel = ({
 }: RegimeTimelinePanelProps) => {
   const currentLabel = formatMonthLabel(selectedYear, selectedMonth);
   const preservedParams = collectPreservedParams(searchParams);
-  const runs = buildRegimeRuns(series);
+  /* The runs and the change count through the function the closed summary
+     over this panel reads, so "3 changes across the last 24 months" is one
+     derivation in both places. */
+  const conditionRuns = summarizeConditionRuns(series);
+  const { runs, longestRun } = conditionRuns;
   const selectedIndex = getSelectedMonthIndex(series, selectedYear, selectedMonth);
-  const { changeCount, longestRun } = getTimelineSummary(runs);
 
   const buildHref = (month: number, year: number) => {
     const nextParams = new URLSearchParams(preservedParams.toString());
@@ -200,7 +171,7 @@ export const RegimeTimelinePanel = ({
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Changes in conditions</p>
               <p className="mt-2 text-sm text-slate-200">
-                {changeCount} changes across the last {series.length} months.
+                {describeConditionChanges(conditionRuns)}.
               </p>
             </div>
             <div className="weather-surface p-4">

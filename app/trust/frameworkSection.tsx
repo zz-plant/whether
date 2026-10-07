@@ -39,8 +39,8 @@ const slotLabelClass = (slot: keyof typeof DECISION_SLOT_TONE) =>
  * This was /threshold (and before that /threshold plus /template). It had no
  * inbound link from any primary surface, so the one page that explained how to
  * use the thresholds sat two menus away from the page that derives them. It
- * lives beside the formula now; /threshold and /template redirect to the two
- * anchors below.
+ * lives on /trust now, after the checks on this week's reading; /threshold and
+ * /template redirect to the two anchors below.
  */
 export function FrameworkSection() {
   return (
@@ -49,7 +49,34 @@ export function FrameworkSection() {
       title="How to use the thresholds"
       description="Each decision here has three parts: an action, a threshold that pauses it, and a condition that reverses it. It works because it separates what you will do from the conditions under which you will stop."
     >
-      <div className="space-y-8">
+      <div className="space-y-4">
+        {/* Open: the description says what the three parts are, and this is
+            them filled in with the lines the brief publishes. Everything else
+            in the section is folded below it. */}
+        <section className="space-y-3">
+          <h3 className="type-eyebrow">In practice</h3>
+          {/* A worked example, ruled at the left like a quoted answer, not boxed:
+              in the same surface as the three definitions, it read as a fourth
+              definition rather than the three filled in. */}
+          <div className="space-y-2 border-l-2 border-sky-500/50 pl-4">
+            <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Hire only for roles that pay back inside six months.</p>
+            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses {EXAMPLE_LINES.tightnessPause}.</p>
+            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>
+          </div>
+        </section>
+
+        {/* Folded since 2026-10-07. Open, the definitions and the essay were
+            most of /trust, and on a page a reader opens to check whether the
+            week's reading is current they read as the page's subject. They
+            explain a method (§XII: the explanation behind a claim folds; the
+            claim does not). Native <details>: the text stays server-rendered,
+            so find-in-page, a search engine and the /threshold redirect's
+            #framework still reach it. */}
+        <details className="weather-auto-chevron group">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
+            The three parts, and why a stopping condition works
+          </summary>
+        <div className="mt-4 space-y-8">
         {/* The section description above already says what a bounded decision
             is. This paragraph restated it almost word for word, so the first
             thing a reader met on this section was the same sentence twice. */}
@@ -86,27 +113,23 @@ export function FrameworkSection() {
             </Link>{" "}
             first: clinical workflows, physician financial guidance, and contested medical claims, where a decision with no stopping condition can mean patient harm, regulatory action, or fiduciary breach. It is applied here to macro uncertainty because the same logic applies: the cost of continuing past the stopping point is higher than the cost of pausing too early.
           </p>
-        </section>
-
-        <section className="space-y-4">
-          <h3 className="type-eyebrow">In practice</h3>
-          {/* A worked example, ruled at the left like a quoted answer, not boxed:
-              in the same surface as the three definitions above it, it read as a
-              fourth definition rather than the three filled in. */}
-          <div className="space-y-2 border-l-2 border-sky-500/50 pl-4">
-            <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Hire only for roles that pay back inside six months.</p>
-            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses {EXAMPLE_LINES.tightnessPause}.</p>
-            <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>
-          </div>
           <p className="text-sm text-slate-300 leading-relaxed">
             The threshold makes the decision concrete. The reversal makes it temporary. Together they make the decision safe to start.
           </p>
         </section>
+        </div>
+        </details>
 
-        {/* The anchor /template redirects to, so an external link to the form
-            still lands on the form rather than the top of the explainer. */}
-        <section id="template" className="space-y-4 border-t border-slate-700/50 pt-6">
-          <h3 className="type-eyebrow">Fill one in</h3>
+        {/* The anchor /template redirects to, on the disclosure itself, so an
+            external link to the form lands on it and opens it: the shell's
+            anchor handler opens a <details> it is sent to. Folded because a
+            blank form open on the page read as an unfinished one; it is
+            incidental state, so no query key (§XII). */}
+        <details id="template" className="weather-auto-chevron group">
+          <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
+            Fill one in: a blank form to print or copy
+          </summary>
+        <div className="mt-4 space-y-4">
           <p className="text-sm text-slate-300 leading-relaxed">
             Fill these out before the decision is urgent — that is when the framework is most useful.
             Print this section or copy the structure into your planning document.
@@ -151,8 +174,8 @@ export function FrameworkSection() {
           <p className="text-fluid-micro text-slate-400 italic">
             No signup required. No data collected. This template is free to use, copy, and share.
           </p>
-        </section>
-
+        </div>
+        </details>
       </div>
     </ReportSection>
   );
