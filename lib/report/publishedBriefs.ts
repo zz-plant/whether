@@ -287,8 +287,8 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
     /** A stored rule or action sentence, in today's signal names and whole points. */
     sentence: translateStoredSentence,
     /* w31 stored an item from the avoid list, "Over-engineering before demand
-       proves out", where the pause line goes, and the card printed it under
-       "Pause if" as though it were a trigger. A pause line is a score against a
+       proves out", where the pause line goes, and the card printed it in the
+       pause slot as though it were a trigger. A pause line is a score against a
        number; with no number in it there is no line, and the slot is left out. */
     pauseIf: /\d/.test(brief.guardrailThreshold) ? translateStoredSentence(brief.guardrailThreshold) : null,
     conditionsChangeIf: translateRetiredFlipLine(brief.flipThreshold) ?? translateStoredSentence(brief.flipThreshold),
