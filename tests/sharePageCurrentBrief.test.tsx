@@ -159,6 +159,23 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /<strong[^>]*>Hi<\/strong>/);
   });
 
+  /* The four file cards described a slide and a card and showed neither. The three slide files
+     draw one slide, so they are one card with one picture; the brief card has its own. */
+  it("shows each picture once, sized before it loads", async () => {
+    const html = renderToStaticMarkup(await SharePage());
+    const images = [...html.matchAll(/<img [^>]*>/g)].map(([tag]) => tag);
+
+    assert.equal(images.length, 2, "one picture per distinct image");
+    for (const tag of images) {
+      assert.match(tag, /src="\/api\/image\/(slide\?stage=seed|brief)"/);
+      assert.match(tag, /width="1200"/);
+      assert.match(tag, /height="(675|800)"/);
+      assert.match(tag, /loading="lazy"/);
+      assert.match(tag, /alt="[^"]{20,}"/, "the alt says what the picture shows");
+    }
+    for (const label of ["Download PPTX", "Download PDF", "Open SVG", "Open brief card"]) assert.match(html, new RegExp(label));
+  });
+
   /* DD-041: the formats were stacked sections, about 5,700px on desktop with the Slack text drawn
      three times. One picker now, under one heading; the files and the embed keep their own. */
   it("draws one picker under one heading, and keeps the anchors other pages land on", async () => {
