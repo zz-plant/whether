@@ -46,7 +46,7 @@ import {
   resolveWeekEndingIsoDateUTC,
 } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
-import { findWeeklyComparisonReading } from "./comparisonReading";
+import { findWeeklyComparisonReading, type RescoreStoredInputs } from "./comparisonReading";
 import { getPublishedBriefs } from "./publishedBriefs";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { getRegimePublicLabel } from "../regimePresentation";
@@ -214,8 +214,8 @@ const reportDataDependencies = () => ({
   getTimeMachineYieldCurveSeries,
   getTimeMachineSnapshots,
   getPreviousTimeMachineSnapshot,
-  findWeeklyComparisonReading: (recordDate: string) =>
-    findWeeklyComparisonReading(getPublishedBriefs(), recordDate, ENGINE_VERSION),
+  findWeeklyComparisonReading: (recordDate: string, rescore: RescoreStoredInputs) =>
+    findWeeklyComparisonReading(getPublishedBriefs(), recordDate, ENGINE_VERSION, rescore),
   findTimeMachineSnapshot,
   findTimeMachineGovernedAssessment,
   DEFAULT_REGIME_SERIES_MONTHS,

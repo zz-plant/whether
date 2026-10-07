@@ -496,6 +496,15 @@ python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob(
   636, so signed figures set in the sans don't line up down a column, even with `tabular-nums`. In
   Chivo Mono, `-`, `+` and `−` share the 600-unit advance. That is one more reason a column of
   signed figures is mono (§XV).
+- **A first visit draws a stand-in sized to Archivo, not system-ui.** Measured 2026-10-07 on `/`
+  with the font requests held back in Playwright (dev server; system-ui was Inter in that
+  container): the swap reflowed the decision chips at 430px, 0.108 by the layout-shift formula
+  over element rects (0.044 in the one run Chrome's `layout-shift` observer attributed it; it
+  reported 0 on the rest), and 0.008 at 1280px. `"Archivo Fallback"` in `fonts.css` (Arial or
+  Liberation Sans at `size-adjust: 98.81%`, and Arial Bold at 88.1% for the 87.5% display width)
+  sets the page's copy within about 1% of Archivo. After: 0.0001 at 430px and 0.009 at 1280px
+  (observer 0.0000 and 0.0001). The 1280px remainder is a `max-w-[64ch]` paragraph: `ch` is
+  measured on "0", which no override matches. Re-measure when a face or `--font-sans` changes.
 
 ## XXIII. Motion a reader doesn't notice
 
@@ -509,7 +518,9 @@ and the rest are short and interruptible.
   `sm` breakpoint's padding while a window resized. `tests/craftDetails.test.ts` rejects it.
 - **Feedback on a repeated action is a state change, not an animation.** A copy confirmation swaps
   its label and a tab switch swaps its content. By the tenth use, a transition on a repeated action
-  is felt as latency.
+  is felt as latency. J and K jump to the next section (`scrollIntoView({ behavior: "auto" })` in
+  `KeyboardShortcuts.tsx`) rather than glide; a scroll the page makes on its own, like the phone
+  chip row keeping its chip in view, may still go through `scrollBehaviorFor(true)`.
 - **Use transitions, not keyframes, for anything a reader can reverse partway:** a disclosure, a
   hover, a press. A transition retargets from where it is; a keyframe animation restarts.
   Keyframes are for one-way entrances and loading shimmer.

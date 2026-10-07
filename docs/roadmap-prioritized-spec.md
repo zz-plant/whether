@@ -186,7 +186,7 @@ update without a reload.
 
 ### T3.1 Standup flip line (sprint ceremonies)
 
-**Why**: a one-sentence standup input ("Call unchanged, 0.08% from flip; no pace change") reuses the
+**Why**: a one-sentence standup input ("Guidance unchanged, 0.08% from flip; no pace change") reuses the
 daily cron + `flipProximity.ts` and puts the call at the top of the most frequent ceremony.
 
 **Scope**

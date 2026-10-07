@@ -191,6 +191,12 @@ change looked the same in `data/`. `ENGINE_VERSION` (`lib/regimeEngineCore.ts`) 
   synthetic grid and pins the digest to the version, so a scoring change under an unchanged version fails.
   The grid is synthetic so a regeneration of the bundled data never reads as a new calibration. Bump the
   version and add a digest; never overwrite an old one.
+- A bump no longer drops "what changed this week" to the month-end (2026-10-07). Published briefs store
+  the inputs their scores were scored from (`inputs`), and the week after a bump scores last week's again
+  with the new engine (`rescoreStoredInputs`, `lib/report/comparisonReading.ts`; spec §1.1.53). A
+  calibration that starts reading an input records do not store has to add it to the stored inputs
+  (`PublishedBriefInputsSchema`, `buildStoredInputs`); `tests/weeklyComparison.test.tsx` fails when the
+  set of market series that moves a score changes.
 
 **The weekly, quarterly and yearly archives are pinned the same way (2026-10-06).** They store no scores, so
 `tests/regimeArchiveReplay.test.ts` holds their regime and record date: all 452 weeks inside the bundled VIX

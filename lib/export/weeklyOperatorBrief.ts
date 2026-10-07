@@ -11,8 +11,8 @@ type WeeklyOperatorBriefPayload = {
   date: string;
   boldnessBudget?: {
     score: number;
-    delta: number;
-    line: string;
+    /** The latitude's move; null when nothing was compared, and the paste then prints no move. */
+    delta: number | null;
     /** The earlier reading `delta` is measured against; the paste says "vs last week" without one. */
     comparedWith?: ComparedWith;
   };
@@ -49,18 +49,19 @@ export const buildWeeklyOperatorBriefPayload = (
   }: {
     weeklyLeadershipSummary?: {
       boldnessScore: number;
-      boldnessDelta: number;
-      shorthandLine: string;
+      boldnessDelta: number | null;
       comparedWith?: ComparedWith;
     };
     customTeamNote?: string;
   } = {},
 ): WeeklyOperatorBriefPayload => {
+  /* The number and its move, once. The paste printed the home model's
+     shorthand under it, "This week's guidance is unchanged.", read off the same
+     number: a latitude that did not move over a week that paused four areas. */
   const boldnessBudget = weeklyLeadershipSummary
     ? {
         score: weeklyLeadershipSummary.boldnessScore,
         delta: weeklyLeadershipSummary.boldnessDelta,
-        line: weeklyLeadershipSummary.shorthandLine,
         ...(weeklyLeadershipSummary.comparedWith ? { comparedWith: weeklyLeadershipSummary.comparedWith } : {}),
       }
     : undefined;
@@ -94,20 +95,25 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     .filter((bullet) => bullet.trim().length > 0)
     .filter((bullet) => bullet !== payload.actionNow);
 
-  const boldnessDeltaLabel = payload.boldnessBudget
-    ? payload.boldnessBudget.delta === 0
-      ? "no change"
-      : `${payload.boldnessBudget.delta > 0 ? "+" : ""}${payload.boldnessBudget.delta.toFixed(0)} ${Math.abs(payload.boldnessBudget.delta) === 1 ? "point" : "points"}`
-    : null;
+  const latitude = payload.boldnessBudget;
+  /* The move is the number's, and only where a comparison was made: "vs last
+     week: no change" on a reading with nothing to compare was a finding nobody
+     made. */
+  const latitudeMove = latitude && latitude.delta !== null
+    ? ` · ${comparisonBasis(latitude.comparedWith).versus}: ${
+        latitude.delta === 0
+          ? "no change"
+          : `${latitude.delta > 0 ? "+" : ""}${latitude.delta.toFixed(0)} ${Math.abs(latitude.delta) === 1 ? "point" : "points"}`
+      }`
+    : "";
 
   return [
     `Weekly Operator Brief — ${payload.date}`,
     /* The number never travels without what it measures: a paste is read by
        people who have not seen the hero that explains it. */
-    payload.boldnessBudget
-      ? `${OPERATING_LATITUDE_LABEL}: ${payload.boldnessBudget.score}/100 (${OPERATING_LATITUDE_GLOSS}) · ${comparisonBasis(payload.boldnessBudget.comparedWith).versus}: ${boldnessDeltaLabel}`
+    latitude
+      ? `${OPERATING_LATITUDE_LABEL}: ${latitude.score}/100 (${OPERATING_LATITUDE_GLOSS})${latitudeMove}`
       : null,
-    payload.boldnessBudget?.line ?? null,
     `Conditions: ${payload.conditions}`,
     payload.confidence,
     payload.customTeamNote ? `\nTeam context: ${payload.customTeamNote}` : null,

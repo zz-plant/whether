@@ -1,4 +1,5 @@
 import type { RegimeAssessment } from "../regimeEngine";
+import { formatThresholdNumber } from "../formatters";
 import { getRegimeProfile } from "./regimeDescription";
 import { getRegimePublicLabel } from "../regimePresentation";
 import type { BoundedDecisionRule, DecisionArea } from "./boundedDecisionRules";
@@ -113,7 +114,7 @@ export const buildSeoDecisionPayload = ({
   const immediateAction = primaryRule?.doNow[0] ?? fallbackImmediateAction;
   const triggerThreshold =
     primaryRule?.pauseTrigger ??
-    `Risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} or funding pressure rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
+    `Risk appetite falls below ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)} or funding pressure rises above ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`;
   const reversalCondition =
     primaryRule?.resumeTrigger ??
     "Both scores move back past their lines and stay there for two weekly readings.";

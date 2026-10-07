@@ -62,7 +62,7 @@
 :root {
   --weather-shell-pad-inline: 1rem;
   color-scheme: dark;
-  --font-sans: "Archivo", system-ui, sans-serif;
+  --font-sans: "Archivo", "Archivo Fallback", system-ui, sans-serif;
   /* The display voice is the same family set narrower, not a second face
      (fonts.css). Deliberately outside @theme: there is no `font-display`
      utility, and adding the key here would mint one. The display voice

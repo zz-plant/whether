@@ -244,11 +244,17 @@ async function PageContent({
   const riskAppetite = homepage.weeklyDecisionCardModel.diagnostics.currentScores.riskAppetite;
   const weeklyLeadershipSummary = homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary;
 
-  const signalDirection: SignalDirection = (
-    homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("tighten") ? "tighten"
-    : homepage.weeklyDecisionCardModel.status.trendLabel?.toLowerCase().includes("ease") ? "ease"
-    : "hold"
-  );
+  /* The sticky strip's badge, from the headline's own tone. It searched
+     `trendLabel` ("Improving", "Deteriorating", …) for "tighten" and "ease",
+     which no label contains, so the badge read "Steady" on every week, the
+     tightening ones included. No badge where the hero states no direction
+     either: nothing to compare, a held week, or an archived one. */
+  const weeklyTone = historicalSelection ? null : homepage.weeklyDecisionCardModel.status.weeklyTone ?? null;
+  const signalDirection: SignalDirection | undefined =
+    weeklyTone === "tightening" ? "tighten"
+    : weeklyTone === "easing" ? "ease"
+    : weeklyTone === "holding" ? "hold"
+    : undefined;
 
   /* `/share` builds the same object from the same fields, so the derivation
    * lives in lib/report rather than here — the guardrail label alone has three
@@ -279,14 +285,14 @@ async function PageContent({
      know the call still stands and how far it is from flipping. Derived from
      the same snapshot the hero draws, so the verdict and the flip watch cannot
      disagree; absent on a week the call moved. */
-  /* "Call unchanged" is a claim about a comparison: never on a read with no
-     previous week (`steadyWeek` is computed from a zero move there), never on a
-     week the call moved (a sub-point move can still be the confirming read),
+  /* "Conditions unchanged" is a claim about a comparison: never on a read with
+     no previous week, never on a week the guidance moved (a crossed pause or
+     resume line, or new conditions: `guidanceChange`, not the latitude's move),
      and never on an archived week, which the banner above dates. */
   const quietDayLine =
     previousScores && !reportData.regimeAlert && !historicalSelection
       ? buildQuietDayRead({
-          steadyWeek: weeklyLeadershipSummary.steadyWeek,
+          steadyWeek: weeklyLeadershipSummary.guidanceChange === "held",
           flipProximity: v2HeroSignalData.flipProximity,
         })
       : null;

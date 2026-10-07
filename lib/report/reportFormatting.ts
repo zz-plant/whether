@@ -1,7 +1,7 @@
 import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { SourceFreshnessStatus } from "./sourceHealth";
-import { formatScoreValue } from "../formatters";
+import { formatScoreValue, formatThresholdNumber } from "../formatters";
 import { REGIME_LABELS } from "../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 /* Value import against a type-only back-edge: `signalTranslations` imports
@@ -65,12 +65,12 @@ export const buildRegimeAlert = (
 
   if (wasTight !== isTight) {
     reasons.push(
-      `Funding pressure crossed ${isTight ? "above" : "below"} ${formatScoreValue(tightnessThreshold)}.`
+      `Funding pressure crossed ${isTight ? "above" : "below"} ${formatThresholdNumber(tightnessThreshold)}.`
     );
   }
   if (wasBrave !== isBrave) {
     reasons.push(
-      `Risk appetite crossed ${isBrave ? "above" : "below"} ${formatScoreValue(riskThreshold)}.`
+      `Risk appetite crossed ${isBrave ? "above" : "below"} ${formatThresholdNumber(riskThreshold)}.`
     );
   }
   if (reasons.length === 0) {
@@ -121,7 +121,7 @@ export const formatBoundaryDistance = ({
   label: string;
   points: number;
   threshold: number;
-}): string => `${label} is ${points.toFixed(1)} points from its ${threshold.toFixed(1)} line.`;
+}): string => `${label} is ${points.toFixed(1)} points from its ${formatThresholdNumber(threshold)} line.`;
 
 export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): string =>
   confidencePlainLabels[confidence];

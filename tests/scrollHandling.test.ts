@@ -104,11 +104,24 @@ describe("sticky rows scroll themselves, never the page", () => {
 });
 
 describe("J and K", () => {
-  it("focus without a scroll, then make one scroll to the section start that honours reduced motion", async () => {
+  it("focus without a scroll, then jump to the section start without animating", async () => {
     const source = await readFile("app/components/KeyboardShortcuts.tsx", "utf8");
     assert.match(source, /focus\(\{ preventScroll: true \}\)/);
-    assert.match(source, /scrollIntoView\(\{ behavior: scrollBehaviorFor\(true\), block: "start" \}\)/);
-    assert.doesNotMatch(source, /behavior: "smooth"/);
+    // A repeated key press is a state change, not an animation (ui-ux-standards §XXIII).
+    // Until 2026-10-07 each press asked for scrollBehaviorFor(true), a smooth glide.
+    assert.match(source, /scrollIntoView\(\{ behavior: "auto", block: "start" \}\)/);
+    assert.doesNotMatch(source, /scrollBehaviorFor\(true\)|behavior: "smooth"/);
+  });
+
+  it("jumps because no stylesheet turns 'auto' smooth", async () => {
+    // `behavior: "auto"` defers to the scroller's computed scroll-behavior, so an
+    // html { scroll-behavior: smooth } anywhere would animate every key press again.
+    const offenders: string[] = [];
+    for (const file of await appFiles([".tsx", ".ts", ".css"])) {
+      const source = await readFile(file, "utf8");
+      if (/scroll-behavior:\s*smooth|\bscroll-smooth\b/.test(source)) offenders.push(file);
+    }
+    assert.deepEqual(offenders, []);
   });
 });
 

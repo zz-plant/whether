@@ -1338,7 +1338,8 @@ crossed, and `0`, "The guidance is holding where it was on Aug 31.", `steadyWeek
 exports' "Operating latitude … · vs Aug 31: no change" can be printed over a week the scores moved. The
 guidance is the same on that week, which is what the sentence claims; the number is the open question.
 Building the previous assessment from the dynamics whenever a comparison exists would change `steadyWeek`,
-and with it the quiet-day line, so it is recorded here and not changed.
+and with it the quiet-day line, so it is recorded here and not changed. (Changed 2026-10-07, §1.1.52: the
+move is measured whenever a comparison exists, and "nothing changed" lines no longer read it.)
 
 ### 1.1.27 Say what moved the score (2026-09-29)
 
@@ -2344,6 +2345,107 @@ The sweeps in §1.1.49–§1.1.50 left two decisions open. Both are decided here
 w38–w40 did not record their engine, and `ENGINE_VERSION` changed on 2026-10-06, so no record in the
 archive counts yet: the week compares with the month-end, as before, until the first record frozen
 after this change is 5–14 days old.
+
+### 1.1.52 Contradictions left from the sweeps (2026-10-07)
+
+Four facts were still stated two ways on one page or paste.
+
+- **The payback bar.** A chosen stage said "fund the channels that convert repeatably and pay back
+  inside 12 months" (Series A) and "only where the cash comes back inside the year" (Bootstrapped)
+  under a Spending rule that approves new spend only inside 6 months. Both read
+  `SPENDING_PAYBACK_BAR_MONTHS` now (`lib/report/boundedDecisionRules.ts`): a stage adds emphasis and
+  never relaxes the Spending bar, the precedent the tight-runway bar set in §1.1.51.
+- **Operating latitude and the guidance.** The latitude blends the two scores, so it stays flat on a
+  week one score crosses a pause line, and every "nothing changed" line read it: a week that paused
+  four areas printed "This week's guidance is unchanged." (operator paste, `/history/compare`), "Call
+  unchanged" (`/share` standup) and "The guidance is holding where it was on Aug 31." The latitude's
+  line now speaks about the number ("Operating latitude unchanged since Sep 29.", `getNetDeltaLabel`),
+  measured whenever a comparison exists rather than only on a regime alert (closing §1.1.26's "found,
+  not changed"), and the quiet-day and standup lines read `describeGuidanceChange`
+  (`lib/report/decisionMovement.ts`: `regimeChanged` or the movement's conditions change, then a crossed
+  pause or resume line, else held). `steadyWeek`, `notchShiftLabel` and `netDeltaLabel` are gone; the
+  last two were read nowhere.
+- **Line precision.** The home model's "how close conditions are" line, the flip meter, the
+  signal-influence rows and the regime-alert reasons printed the change line as "70.0"; the canonical
+  "Conditions change if" sentence and the answer pages rounded it with `toFixed(0)`. All of them print
+  through `formatThresholdNumber` (lib/formatters.ts), as the area rules do: whole points unless the
+  line carries a decimal.
+- **The week's direction beside the guidance.** The headline's rule (an improving week holds while a
+  pause line is met, §1.1.51) is `resolveWeeklyTone` (`lib/report/reportEvidence.ts`), and every
+  `directionLabel` reader was audited against it: `/api/decision`'s memo said "Conditions loosened this
+  week." beside "Conditions are holding.", and the homepage sticky strip's badge read "Steady" every
+  week, because it searched the trend label for words no label contains; both take the headline's tone
+  now. A week with nothing to compare states no direction: the headline is the action alone (it said
+  "Conditions are holding." beside "No previous reading to compare this week against."), the memo says
+  so (it said "No material signal shift this week."), and the strip draws no badge.
+
+### 1.1.53 The weekly basis survives a scoring change (2026-10-07)
+
+§1.1.51 compares a week with last week's brief only when the same `ENGINE_VERSION` scored both, so
+every scoring change dropped the weekly basis to the month-end for a week or two, until a record frozen
+by the new engine was five days old. A record now stores what the engine scored, and a later engine
+scores it again.
+
+- **What a record stores.** `inputs` on the published record (`PublishedBriefSchema`,
+  `lib/report/publishedBriefs.ts`, validated with zod on read), built by `buildStoredInputs`
+  (`lib/report/comparisonReading.ts`) inside `buildPublishedBriefRecord`, which both freeze writers
+  share. Only what the scorer reads for the two scores and the conditions: the Treasury yields the
+  short-term rate and the curve come from; the two one-month-bill prints the tightening-speed term
+  measures between (`resolveBaseRateVelocityPair`, the pair the Time Machine cache also stores, not the
+  92 days of history it was found in); the values of the five market series that adjust the scores
+  (high-yield spread, Chicago financial conditions, VIX, venture funding, tech layoffs); and the last
+  ten VIX closes, which the market-stress veto means. Not stored: sparkline histories, provenance, and
+  the BBB spread, inflation and unemployment the policy layer reads, since nothing the policy layer
+  computes reaches the scores or the conditions. About 380 bytes, or 680 in the file's indented form,
+  on a record of about 7.7KB. Absent on every record frozen before.
+- **Stored only when it reproduces the record.** The builder scores the inputs again through the path
+  next week takes and keeps them only if that reproduces the week's funding pressure, risk appetite,
+  short-term rate and curve exactly. On a mismatch the record stores none, and a later engine passes it
+  over like a record frozen before inputs were stored: inputs that did not produce a citable record's
+  scores would print a move no market made.
+- **The re-score.** `findWeeklyComparisonReading` reads a record scored by today's engine as stored. One
+  scored by another engine, or by one it did not record, is scored again from its inputs by the
+  re-scorer the loader passes in, `rescoreStoredInputs(deps.evaluateRegime, thresholds)`: the current
+  engine under the reading's thresholds. A record with no inputs is passed over, as before. The finder
+  stays pure and calls the re-scorer once, for the record it chose. `observedBaseRate` applies to a
+  re-scored reading as to a stored one, so a rate the engine scored as missing is not compared. The
+  engine is untouched; the re-score is in `lib/report`. The re-scored reading was scored from the same
+  inputs by the same engine as this week's, so there is no rates-versus-inputs split to make.
+- **No machine state, as for the month-end.** The month-end comparison re-scores its snapshot with no
+  machine state (`evaluateRegime(previousSnapshot, thresholds)`), and so does this: the conditions are
+  the quadrant the re-scored scores sit in. Where the confirmation gate was holding a flip, they differ
+  from the ones published. Risk appetite one point over its line, published Stormy while the gate held,
+  re-scores as Sunny. The machine moves the conditions, never the scores, and threading it would mean
+  storing its state from an engine that is no longer scoring.
+- **Limits.** A re-score is like-for-like as far as the new engine reads what the record stored. An
+  engine that reads another input, a longer VIX window or a different speed-term lookback scores an old
+  record on what it has: ten closes and the pair the old lookback chose. `tests/weeklyComparison.test.tsx`
+  moves every market series the engine knows and fails if the set that moves a score stops being the
+  set records store, so a scoring change that starts reading a new series is caught in the change that
+  makes it.
+
+No record in the archive stores inputs yet: the first is the next freeze.
+
+### 1.1.54 One week's guidance, said once on every surface (2026-10-07)
+
+A parity test that renders one week through every surface (`tests/weeklyClaimParity.test.tsx`, against
+the claims in `docs/claims-ledger.md`) found the week's action built three ways.
+
+- **Ordinary week.** The pastes, the Monday send and `/brief.md` led with the lead area's rule ("Limit
+  hiring to backfills and mission-critical roles…"). The page, the embed and the share card led with the
+  week's headline ("Conditions are tightening. Keep only the bets you can stop…"). The cause was the
+  stored operating snapshot: it built its weekly call with no comparison, so it could not know the week's
+  direction. It now compares the week as the page does (`resolveWeekComparison`), and the weekly call
+  leads with the headline. The lead area's rule stays first among the Do now lines.
+- **Held week.** The agent state and `/signals` read a week action that ignored the hold, and said
+  "Conditions are easing. Grow what is working" beside a hold. The page held in its own words ("Slow
+  approvals, require reversible bets…") while the pastes used the hold reason's. Every surface now prints
+  the hold reason's action (`describePolicyHold`).
+- **One builder.** `buildWeekActionNow` (`reportEvidence.ts`) is the week's action for the loader and
+  the snapshot alike. The page card, the share card and the contract read that value first.
+
+A Monday routine reads the live surfaces after the send and reports any claim that disagrees across them
+(`docs/agents/lessons/automation-and-deploy-gate.md`).
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

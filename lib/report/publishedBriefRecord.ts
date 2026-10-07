@@ -12,9 +12,9 @@
  */
 import { formatIsoWeekSlug, getIsoWeekInfo, type IsoWeek } from "../isoWeek";
 import { previousScoresFromDynamics } from "../export/scoreReference";
-import { ENGINE_VERSION } from "../regimeEngine";
+import { ENGINE_VERSION, evaluateRegime } from "../regimeEngine";
 import { assessPublishReadiness } from "./briefPublishGuard";
-import { observedBaseRate } from "./comparisonReading";
+import { buildStoredInputs, observedBaseRate, rescoreStoredInputs } from "./comparisonReading";
 import type { PublishedBrief } from "./publishedBriefs";
 import { FRED_SOURCE_LABEL } from "./provenanceStatus";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "./weeklyBriefSnapshot";
@@ -37,7 +37,8 @@ import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnap
  * so next week's brief can compare its own with them. Records frozen before
  * these were stored carry the two scores alone, and a week compared with one of
  * them prints no move for either rate. So is the engine that scored them: next
- * week compares with this record only if the same engine scores it.
+ * week compares with these scores as stored only if the same engine scores it,
+ * and otherwise with the record's inputs scored again (`storedInputs`).
  */
 const scoresWithComparison = (reportData: WeeklyBriefSnapshotResult["reportData"]): NonNullable<PublishedBrief["scores"]> => {
   const { scores } = reportData.assessment;
@@ -60,6 +61,34 @@ const scoresWithComparison = (reportData: WeeklyBriefSnapshotResult["reportData"
   };
 };
 
+/**
+ * What the engine scored this week from, so that after a scoring change next
+ * week can score it again rather than drop to the month-end
+ * (`rescoreStoredInputs`, lib/report/comparisonReading.ts). Before 2026-10-07 a
+ * record stored its scores and the engine that produced them, and nothing else,
+ * so every `ENGINE_VERSION` bump left no brief to compare with for a week or two.
+ *
+ * Stored only when re-scoring them now, through the same path next week will
+ * take, reproduces the week's scores exactly. A record is append-only and
+ * citable, and inputs that did not produce its scores would print a move that
+ * no market made, so on a mismatch the record keeps none and a later engine
+ * passes it over, as it does every record frozen before inputs were stored. The
+ * conditions are not compared: the published ones went through the machine's
+ * confirmation gate, which the re-score does not (the comparison's note on
+ * `rescoreStoredInputs` says why).
+ */
+const storedInputs = (reportData: WeeklyBriefSnapshotResult["reportData"], recordDate: string) => {
+  const { assessment } = reportData;
+  const inputs = buildStoredInputs(reportData.treasury, reportData.macroSeries);
+  const { scores } = rescoreStoredInputs(evaluateRegime, assessment.thresholds)(inputs, recordDate);
+  const reproduced =
+    scores.tightness === assessment.scores.tightness &&
+    scores.riskAppetite === assessment.scores.riskAppetite &&
+    scores.baseRate === observedBaseRate(assessment.scores) &&
+    scores.curveSlope === assessment.scores.curveSlope;
+  return reproduced ? inputs : null;
+};
+
 type PublishedBriefRecordInput = {
   reportData: WeeklyBriefSnapshotResult["reportData"];
   snapshot: WeeklyBriefSnapshot;
@@ -77,6 +106,7 @@ export const buildPublishedBriefRecord = ({
   existing,
 }: PublishedBriefRecordInput): PublishedBrief => {
   const { homeBriefModel } = snapshot;
+  const inputs = storedInputs(reportData, recordDate);
   return {
     slug: formatIsoWeekSlug(isoWeek),
     year: isoWeek.year,
@@ -120,6 +150,7 @@ export const buildPublishedBriefRecord = ({
      * carries that reading's date either way (`scoresWithComparison`).
      */
     scores: scoresWithComparison(reportData),
+    ...(inputs ? { inputs } : {}),
     evidence: reportData.reportEvidenceItems.map((item) => ({
       title: item.title,
       detail: item.immediateImplication,

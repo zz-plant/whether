@@ -91,7 +91,7 @@ const buildCurrentShareArtifact = async () => {
   });
   const standupLine = buildStandupFlipLine({
     regime: assessment.regime,
-    steadyWeek: snapshot.homeBriefModel.weeklyLeadershipSummary?.steadyWeek ?? true,
+    change: snapshot.homeBriefModel.weeklyLeadershipSummary.guidanceChange,
     proximity,
   });
   /* Kanban pull policies: the same pause/resume conditions re-verbed for a

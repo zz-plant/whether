@@ -130,11 +130,16 @@ export const buildWeeklyCallContract = ({
     canonicalDecisionCopy?.operatingCall
     ?? homeBriefModel.operatingStanceLine
     ?? FALLBACK_CURRENT_CALL;
+  /* The week's action is the headline the page prints (`homeBriefModel.actionNowShort`,
+     docs/claims-ledger.md). The lead area's rule led here until 2026-10-07, so every
+     paste opened "Guidance: Limit hiring to backfills…" under a page, an embed and a
+     share card that opened "Keep only the bets you can stop"; it is the first of the
+     Do now lines below, where it always also was. */
   const defaultActionNow =
-    canonicalDecisionCopy?.doNowLines[0]
-    ?? homeBriefModel.actionNowShort
-    ?? actionStripItems[0]?.areaActionNow
-    ?? defaultCurrentCall;
+    homeBriefModel.actionNowShort?.trim()
+    || canonicalDecisionCopy?.doNowLines[0]
+    || actionStripItems[0]?.areaActionNow
+    || defaultCurrentCall;
   const defaultPauseIf =
     actionStripItems[0]?.triggerThreshold
     ?? homeBriefModel.guardrailThreshold
