@@ -147,7 +147,12 @@ export const formatMonthShortUtc = (month: number) =>
 
 export const formatMonthLongYearUtc = (year: number, month: number) =>
   monthLongYearUtcFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
+/* An index is a count on its own scale ("Tech layoff trend: 66"), so it keeps
+   only the places it has; the forced two printed "66.00" beside "3.12%". */
+const indexFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
+
 export const formatNumberWithUnit = (value: number | null, unit: string) => {
+  if (unit === "index" && value !== null && !Number.isNaN(value)) return indexFormatter.format(value);
   const formatted = formatNumberValue(value);
   return formatted === "—" ? formatted : `${formatted}${formatUnitSuffix(unit)}`;
 };

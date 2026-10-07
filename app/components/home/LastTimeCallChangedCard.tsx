@@ -43,14 +43,14 @@ export function LastTimeCallChangedCard({
         <ScoreCell
           label={regimeSignalLabel.tightness}
           value={record.tightness.later}
-          line={{ value: callChangeLines.tightness, label: DECISION_CONTRACT_LABELS.watch.postureFlips }}
+          line={{ value: callChangeLines.tightness, label: DECISION_CONTRACT_LABELS.watch.changeLine }}
           previous={record.tightness.atChange}
           previousLabel={changedAt}
         />
         <ScoreCell
           label={regimeSignalLabel.riskAppetite}
           value={record.riskAppetite.later}
-          line={{ value: callChangeLines.riskAppetite, label: DECISION_CONTRACT_LABELS.watch.postureFlips }}
+          line={{ value: callChangeLines.riskAppetite, label: DECISION_CONTRACT_LABELS.watch.changeLine }}
           previous={record.riskAppetite.atChange}
           previousLabel={changedAt}
         />

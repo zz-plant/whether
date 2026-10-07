@@ -17,7 +17,7 @@ import {
  * against its pause line before anything is clicked, and — from `md` up — a map
  * of where the reading sits and the month-ends that led there.
  */
-const slot = (met: boolean, points: number) => ({ line: "Funding pressure > 76", distance: "", points, met });
+const slot = (met: boolean, points: number) => ({ line: "Funding pressure > 76", distance: "", points, met, metric: "tightness" as const });
 
 describe("where each decision stands, before a click", () => {
   it("says a crossed pause line as a state, and an uncrossed one as a distance", () => {

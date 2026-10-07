@@ -66,7 +66,7 @@ describe("weekly operator brief export adapters", () => {
       },
     });
 
-    assert.equal(payload.date, "2026-03-06");
+    assert.equal(payload.date, "2026-03-04", "the reading's own date, not the Friday of its week");
     assert.equal(payload.regimeStage, "Defensive · Late Cycle");
     assert.deepEqual(payload.boldnessBudget, {
       score: 42,
@@ -98,15 +98,15 @@ describe("weekly operator brief export adapters", () => {
     });
     const text = buildWeeklyOperatorBriefPlainText(payload);
 
-    assert.match(text, /Weekly Operator Brief — 2026-03-06/);
+    assert.match(text, /Weekly Operator Brief — 2026-03-04/);
     // The number never travels without what it measures.
     assert.match(text, /Operating latitude: 58\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: \+4 points/);
     assert.match(text, /^Low confidence$/m);
     assert.doesNotMatch(text, /\bLOW\b|Boldness/);
     assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
     assert.match(text, /Conditions:/);
-    assert.match(text, /^Guidance: Stage approvals and protect runway\.$/m);
-    assert.match(text, /^Do now: Pause net-new fixed burn commitments this week\.$/m);
+    assert.match(text, /^Guidance: Pause net-new fixed burn commitments this week\. Stage approvals and protect runway\.$/m);
+    assert.doesNotMatch(text, /^Do now:/m);
     // The pause line under its label carries the condition only, not the rule's own verb.
     assert.match(text, /^Pause if: Funding pressure rises above 76$/m);
     assert.match(text, /Why this could be wrong:/);

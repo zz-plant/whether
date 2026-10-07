@@ -94,13 +94,13 @@ const slot = (text: string, label: string): string | undefined => {
 
 const assertSameCall = (post: string, mail: string, snapshot: OperatingSnapshot) => {
   const { weeklyCall } = snapshot;
-  // The email labels the action "Action now" and the post "Do now"; the sentence is one.
-  assert.equal(slot(post, "Do now"), slot(mail, "Action now"));
-  assert.equal(slot(post, "Do now"), weeklyCall.actionNow);
+  // The email prints the action under "Action now"; the post's guidance opens on the same sentence.
+  assert.ok(slot(post, "Guidance")?.startsWith(slot(mail, "Action now") ?? "\u0000"), "the post's guidance opens on the email's action");
+  assert.ok(slot(post, "Guidance")?.startsWith(weeklyCall.actionNow));
   assert.equal(slot(post, "Pause if"), slot(mail, "Pause if"));
   assert.equal(slot(post, "Conditions change if"), slot(mail, "Conditions change if"));
   assert.equal(slot(post, "Conditions change if"), weeklyCall.callChangesIf);
-  assert.equal(slot(post, "Guidance"), weeklyCall.currentCall);
+  assert.ok(slot(post, "Guidance")?.endsWith(weeklyCall.currentCall), "the stance follows the action in the post's guidance");
 };
 
 describe("the Monday Slack post carries the email's call", () => {
@@ -113,8 +113,8 @@ describe("the Monday Slack post carries the email's call", () => {
     const mail = await mailedText(snapshot, now);
 
     assertSameCall(post, mail, snapshot);
-    assert.equal(slot(post, "Guidance"), POLICY_OVERRIDE_CALL.currentCall);
-    assert.equal(slot(post, "Do now"), POLICY_OVERRIDE_CALL.actionNow);
+    assert.equal(slot(post, "Guidance"), `${POLICY_OVERRIDE_CALL.actionNow} ${POLICY_OVERRIDE_CALL.currentCall}`);
+    assert.equal(slot(post, "Do now"), undefined, "the action is not repeated under a second label");
     assert.equal(slot(mail, "Pause if"), POLICY_OVERRIDE_CALL.pauseIf);
   });
 

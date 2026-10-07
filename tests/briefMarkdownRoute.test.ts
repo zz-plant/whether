@@ -62,7 +62,10 @@ describe("/brief.md", () => {
     assert.ok(call, "expected a 'This Week's Guidance' section");
 
     // The three parts of a bounded decision, which is what this section promises.
-    assert.match(call.body, /\*\*Do now:\*\*\s*\S/);
+    // The guidance itself opens the section, unlabelled, as the heading names it;
+    // a "Do now" line under it repeated its first sentence.
+    assert.match(call.body.trimStart(), /^[A-Z][^*\n]+\./);
+    assert.doesNotMatch(call.body, /\*\*Do now:\*\*/);
     assert.match(call.body, /\*\*Pause if:\*\*\s*\S/);
     assert.match(call.body, /\*\*Conditions change if:\*\*\s*\S/);
     assert.match(call.body, /\*\*Resume when:\*\*\s*\S/);

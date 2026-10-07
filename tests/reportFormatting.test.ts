@@ -12,8 +12,10 @@ describe("reportFormatting regime signal helpers", () => {
   it("formats regime signal values with score vs decimal precision", () => {
     assert.equal(formatRegimeSignalValue(63.7, "tightness"), "64");
     assert.equal(formatRegimeSignalValue(48.2, "riskAppetite"), "48");
-    assert.equal(formatRegimeSignalValue(5.26, "baseRate"), "5.3");
-    assert.equal(formatRegimeSignalValue(-0.44, "curveSlope"), "-0.4");
+    /* Rates as quoted: the chip's two figures must subtract to the move the sentence states. */
+    assert.equal(formatRegimeSignalValue(5.26, "baseRate"), "5.26");
+    assert.equal(formatRegimeSignalValue(4.05, "baseRate"), "4.05");
+    assert.equal(formatRegimeSignalValue(-0.44, "curveSlope"), "-0.44");
     assert.equal(formatRegimeSignalValue(null, "curveSlope"), "—");
   });
 

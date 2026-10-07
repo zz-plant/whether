@@ -75,7 +75,12 @@ export const buildWeeklyMandateEnvelope = (
       "### What to hold",
       ...constraints.map((item) => `- ${item}`),
       "",
-      `Last change in conditions: ${postureState.lastCommittedChangeEvent.timestamp ?? "not recorded"} · ${postureState.lastCommittedChangeEvent.reason}`,
+      /* Only when there is one to date: with none on record this printed
+         "not recorded · No committed transition event in store.", the event
+         store's own name for an empty table. */
+      ...(postureState.lastCommittedChangeEvent.timestamp
+        ? [`Last change in conditions: ${postureState.lastCommittedChangeEvent.timestamp.slice(0, 10)} · ${postureState.lastCommittedChangeEvent.reason}`]
+        : []),
       `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${document.slots.callChangesIf}`,
       ...(resumeLine ? [`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${resumeLine}`] : []),
       ...(flipConditionLabels.length > 0

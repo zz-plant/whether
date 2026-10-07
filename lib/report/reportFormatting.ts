@@ -162,7 +162,9 @@ export const formatRegimeSignalValue = (value: number | null, key: RegimeSignalK
     return formatScoreValue(value);
   }
 
-  return value.toFixed(1);
+  /* Rates as they are quoted, 4.05 not 4.0: at one place the brief's chip read
+     "3.9 → 4.0" beside a sentence saying the rate rose 0.2. */
+  return value.toFixed(2);
 };
 
 export const formatTrendArrow = (delta: number | null): "↑" | "↓" | "→" => {

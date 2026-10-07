@@ -17,6 +17,7 @@ import { RunHistorySection } from "./runHistorySection";
 import { SourceBoard } from "./sourceBoard";
 import { ReaderReturnsSection } from "./readerReturnsSection";
 import { buildTrustPageModel } from "./trustPageModel";
+import { formatDecisionReversal } from "../../lib/report/reportFormatting";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -85,7 +86,13 @@ export default async function MethodPage({
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
-              <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> confidence is back to high and conditions have held for a second reading.</li>
+              {/* The lead area's resume line, as the brief and every paste print
+                  it. This slot said "confidence is back to high and conditions
+                  have held for a second reading" under the same label, so the
+                  page named a second resume line the plan never uses. */}
+              {reportData.actionStripItems[0]?.reversalCondition ? (
+                <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatDecisionReversal(reportData.actionStripItems[0].reversalCondition)}</li>
+              ) : null}
             </ul>
           </article>
           <article className="weather-hub-card space-y-3 px-4 py-4">

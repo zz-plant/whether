@@ -79,14 +79,17 @@ describe("assembleHomePage streaming contract", () => {
     const headerOperatorBriefCopy = buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(
       buildBriefDocument(briefSourceFromReportData(reportDataForCopy), homepage.weeklyCall),
       {
-        date: reportDataForCopy.weeklyRecordDate,
         weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
       },
     ));
 
-    assert.match(headerOperatorBriefCopy, /Weekly Operator Brief/);
+    assert.ok(
+      headerOperatorBriefCopy.startsWith(`Weekly Operator Brief — ${reportDataForCopy.treasury.record_date}`),
+      "headed with the reading's date, not the Friday of its week",
+    );
     assert.match(headerOperatorBriefCopy, /Conditions:/);
-    assert.match(headerOperatorBriefCopy, /Do now:/);
+    assert.match(headerOperatorBriefCopy, /^Guidance: /m);
+    assert.doesNotMatch(headerOperatorBriefCopy, /^Do now:/m, "the guidance is not repeated under a second label");
     assert.match(headerOperatorBriefCopy, /Pause if:/);
     assert.match(headerOperatorBriefCopy, /Why this could be wrong:/);
     assert.match(headerOperatorBriefCopy, /Conditions change if:/);

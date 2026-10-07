@@ -59,6 +59,7 @@ export function WhatItChangesSection({
           distance: row.resumeQualifier ? `${row.resume.distance} · only when ${row.resumeQualifier}` : row.resume.distance,
         }
       : undefined,
+    scores: [row.pause?.metric, row.resume?.metric].filter((metric) => metric !== undefined),
     changed: row.changed,
     href: toRoute(`${planHref}#ops-monthly-action-summary`),
     note: isHistorical ? undefined : <RunwayAreaNote regime={regime} area={row.area} />,

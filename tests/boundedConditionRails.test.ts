@@ -65,7 +65,8 @@ describe("buildBoundedConditionRails", () => {
     });
 
     assert.equal(hiring.pauseTrigger, "Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44.");
-    assert.equal(hiring.resumeTrigger, "Resume the held roles when funding pressure falls below 66 and risk appetite is above 54.");
+    /* A line the reading already meets says so, beside the one still to come. */
+    assert.equal(hiring.resumeTrigger, "Resume the held roles when funding pressure is below 66 (already true at 32) and risk appetite is above 54.");
     assert.deepEqual(rails.map((rail) => [rail.guardrail, rail.clearsAt]), [[76, 66], [44, 54]]);
   });
 
@@ -194,5 +195,20 @@ describe("buildSharedCorridorRails", () => {
     assert.equal(guardrailMatchesRule("Pause irreversible approvals while the policy override remains active.", hiring), false);
     assert.equal(guardrailMatchesRule("Funding pressure crosses 60", hiring, 60), false);
     assert.equal(guardrailMatchesRule(undefined, hiring), false);
+  });
+});
+
+describe("a rule line the reading already meets", () => {
+  it("says the pause applies instead of reading as a move still to come", () => {
+    const [hiring] = buildCanonicalBoundedDecisionRules({
+      regime: "SCARCITY",
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores: { tightness: 90, riskAppetite: 48 },
+    });
+    assert.equal(
+      hiring.pauseTrigger,
+      "Pause net-new hiring if funding pressure is above 76 (already true at 90) or risk appetite falls below 44.",
+    );
+    assert.doesNotMatch(hiring.pauseTrigger, /rises above 76/);
   });
 });

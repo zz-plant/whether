@@ -39,9 +39,9 @@ const OPTIONS: DecisionPickerOption[] = decisionAreaOrder.map((area, index) => (
      week of Oct 5, 2026 read at the default calibration. */
   pause:
     index === 1
-      ? { line: "Risk appetite < 40", distance: "4 pts away", points: 4, met: false }
-      : { line: "Funding pressure > 76", distance: "crossed", points: 14, met: true },
-  resume: { line: "Funding pressure < 66", distance: "17 pts away", points: 17, met: false },
+      ? { line: "Risk appetite < 40", distance: "4 pts away", points: 4, met: false, metric: "riskAppetite" }
+      : { line: "Funding pressure > 76", distance: "crossed", points: 14, met: true, metric: "tightness" },
+  resume: { line: "Funding pressure < 66", distance: "17 pts away", points: 17, met: false, metric: "tightness" },
 }));
 
 const LAST_TIME = findLastTimeCallChanged({

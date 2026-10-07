@@ -58,7 +58,7 @@ describe("deriveDecisionKnobs", () => {
 });
 
 describe("buildWeeklyLockCommitment", () => {
-  it("returns measurable flip conditions and owner cadence", () => {
+  it("returns the edges of the reading's quadrant and owner cadence", () => {
     const commitment = buildWeeklyLockCommitment({
       regime: "DEFENSIVE",
       tightnessRegime: 70,
@@ -67,10 +67,13 @@ describe("buildWeeklyLockCommitment", () => {
       freshnessDegraded: false,
     });
 
-    assert.equal(commitment.currentCall, "Focus on efficiency: Limit new commitments to 12-month payback. Pause if risk < 40; resume when > 50.");
-    assert.equal(commitment.flipConditions.length, 3);
-    assert.match(commitment.flipConditions[0], /Funding pressure ≤ 66/);
-    assert.match(commitment.flipConditions[1], /Risk appetite ≥ 49/);
+    /* Cloudy sits above the funding-pressure line and above the risk-appetite
+       line: it changes by falling to either. */
+    assert.deepEqual(commitment.flipConditions, ["Funding pressure at or below 70", "Risk appetite at or below 45"]);
+    assert.deepEqual(
+      commitment.flipLines.map((lines) => lines.map(({ metric, operator, value }) => ({ metric, operator, value }))),
+      [[{ metric: "tightness", operator: "<=", value: 70 }], [{ metric: "riskAppetite", operator: "<=", value: 45 }]],
+    );
     assert.match(commitment.ownerCadence, /next weekly review/);
     assert.equal(commitment.trustMarkers.length, 0);
   });
@@ -85,6 +88,23 @@ describe("buildWeeklyLockCommitment", () => {
     });
 
     assert.deepEqual(commitment.trustMarkers, ["Confidence: Guarded", "Freshness: Stale"]);
+    assert.deepEqual(commitment.flipConditions, ["Funding pressure above 62", "Risk appetite above 52"]);
     assert.match(commitment.ownerCadence, /daily until live data/);
+  });
+});
+
+describe("buildWeeklyLockCommitment across the four conditions", () => {
+  const exits = (regime: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION") =>
+    buildWeeklyLockCommitment({ regime, tightnessRegime: 70, riskAppetiteRegime: 50, confidenceDegraded: false, freshnessDegraded: false })
+      .flipConditions;
+
+  it("names the lines each quadrant leaves by, never a pause or resume line", () => {
+    assert.deepEqual(exits("SCARCITY"), ["Funding pressure at or below 70", "Risk appetite above 50"]);
+    assert.deepEqual(exits("DEFENSIVE"), ["Funding pressure at or below 70", "Risk appetite at or below 50"]);
+    assert.deepEqual(exits("VOLATILE"), ["Funding pressure above 70", "Risk appetite above 50"]);
+    assert.deepEqual(exits("EXPANSION"), ["Funding pressure above 70", "Risk appetite at or below 50"]);
+    for (const regime of ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const) {
+      assert.ok(exits(regime).every((line) => !/tighten again|two readings|66|54|76|44/.test(line)), regime);
+    }
   });
 });

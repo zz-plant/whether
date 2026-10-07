@@ -19,8 +19,8 @@ import { featuredAnswerPages } from "../app/answers/selectors";
  */
 
 const ROWS: Pick<HomeAreaRow, "area" | "pause">[] = [
-  { area: "hiring", pause: { line: "Funding pressure > 76", distance: "crossed", points: 14, met: true } },
-  { area: "product-tempo", pause: { line: "Risk appetite < 44", distance: "4 pts away", points: 4, met: false } },
+  { area: "hiring", pause: { line: "Funding pressure > 76", distance: "crossed", points: 14, met: true, metric: "tightness" } },
+  { area: "product-tempo", pause: { line: "Risk appetite < 44", distance: "4 pts away", points: 4, met: false, metric: "riskAppetite" } },
 ];
 
 describe("an answer's standing this week", () => {

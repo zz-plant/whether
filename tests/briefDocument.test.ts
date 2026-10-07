@@ -98,7 +98,7 @@ describe("the brief document", () => {
     const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall);
 
     assert.equal(document.areaRows.length, 5);
-    assert.ok(document.areaRows.every((row) => row.nearestPause || row.nearestResume), "every row knows how far its lines are");
+    assert.ok(document.areaRows.every((row) => row.nearestPause || row.bindingResume), "every row knows how far its lines are");
   });
 
   it("publishes the artifact half to the island, and the island parses back to it", () => {

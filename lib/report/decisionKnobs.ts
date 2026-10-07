@@ -2,7 +2,6 @@ import type { RegimeKey } from "../regimeEngine";
 import { buildRuleCondition, type RuleCondition } from "./boundedDecisionRules";
 import { REGIME_LABELS } from "../regimePresentation";
 import type { RegimeStateTransition } from "../regimeStateMachine";
-import { formatDecisionReversal, formatDecisionThreshold } from "./reportFormatting";
 
 /**
  * Loop stage owner: posture → decision.
@@ -123,7 +122,6 @@ type DecisionKnobContext = {
 };
 
 type WeeklyLockCommitment = {
-  currentCall: string;
   flipConditions: string[];
   /**
    * The numeric lines behind each `flipConditions` entry, index-aligned. A
@@ -140,13 +138,6 @@ type WeeklyLockCommitmentContext = {
   riskAppetiteRegime: number;
   confidenceDegraded: boolean;
   freshnessDegraded: boolean;
-};
-
-const weeklyCallByRegime: Record<RegimeKey, string> = {
-  SCARCITY: "Capital is tight: Freeze discretionary spend. Pause if funding pressure > 60; resume when < 50.",
-  DEFENSIVE: "Focus on efficiency: Limit new commitments to 12-month payback. Pause if risk < 40; resume when > 50.",
-  VOLATILE: "Conditions uncertain: Prioritize reversible moves. Pause if funding pressure > 60; resume when < 50.",
-  EXPANSION: "Growth conditions: Scale high-margin lanes. Pause if risk < 40; resume when > 50.",
 };
 
 const describeSignalQuality = (weakSignalCount: number) => {
@@ -265,6 +256,22 @@ export const deriveDecisionKnobs = (context: DecisionKnobContext): DecisionKnob[
   });
 };
 
+/**
+ * Where the published conditions change, one line per score: the edges of the
+ * quadrant the reading sits in, which is what the state machine classifies on
+ * (`classifyRegime`: funding pressure above the line, risk appetite at or below
+ * it, picks the quadrant). The same lines `buildFlipThreshold` writes as the
+ * brief's "Conditions change if".
+ *
+ * Until 2026-10-07 these were the same three lines in every regime — "Funding
+ * pressure ≤ 66 for two readings in a row", "Risk appetite ≥ 54 for two
+ * readings in a row" and "Funding pressure > 76 or risk appetite < 44: tighten
+ * again" — the pause and resume lines of the default stage, offset from the
+ * change lines by fixed amounts. So a Freezing week's Slack post said
+ * conditions change at 66 when the homepage said 70, told a Sunny week to watch
+ * funding pressure fall below a line it was already under, and told a week
+ * already past 76 to "tighten again" if it crossed 76.
+ */
 export const buildWeeklyLockCommitment = ({
   regime,
   tightnessRegime,
@@ -272,33 +279,30 @@ export const buildWeeklyLockCommitment = ({
   confidenceDegraded,
   freshnessDegraded,
 }: WeeklyLockCommitmentContext): WeeklyLockCommitment => {
-  const tightenBy = 6;
-  const loosenBy = 4;
-
   const trustMarkers = [
     confidenceDegraded ? "Confidence: Guarded" : "",
     freshnessDegraded ? "Freshness: Stale" : "",
   ].filter((marker) => marker.length > 0);
 
-  const tightnessLoosen = Math.max(tightnessRegime - loosenBy, 0);
-  const riskLoosen = Math.min(riskAppetiteRegime + loosenBy, 100);
-  const tightnessTighten = Math.min(tightnessRegime + tightenBy, 100);
-  const riskTighten = Math.max(riskAppetiteRegime - tightenBy, 0);
+  /* Freezing and Cloudy sit above the funding-pressure line, so they leave it
+     by falling to it; Freezing and Stormy sit at or below the risk-appetite
+     line, so they leave it by rising above it. */
+  const tightnessExit: RuleCondition =
+    regime === "SCARCITY" || regime === "DEFENSIVE"
+      ? buildRuleCondition("tightness", "<=", tightnessRegime)
+      : buildRuleCondition("tightness", ">", tightnessRegime);
+  const riskExit: RuleCondition =
+    regime === "SCARCITY" || regime === "VOLATILE"
+      ? buildRuleCondition("riskAppetite", ">", riskAppetiteRegime)
+      : buildRuleCondition("riskAppetite", "<=", riskAppetiteRegime);
+  const describeExit = (condition: RuleCondition) =>
+    `${condition.metric === "tightness" ? "Funding pressure" : "Risk appetite"} ${
+      condition.operator === "<=" ? "at or below" : "above"
+    } ${condition.value}`;
 
   return {
-    currentCall: weeklyCallByRegime[regime],
-    flipConditions: [
-      formatDecisionThreshold(`Funding pressure ≤ ${tightnessLoosen} for two readings in a row.`),
-      formatDecisionThreshold(`Risk appetite ≥ ${riskLoosen} for two readings in a row.`),
-      formatDecisionReversal(
-        `Funding pressure > ${tightnessTighten} or risk appetite < ${riskTighten}: tighten again.`
-      ),
-    ],
-    flipLines: [
-      [buildRuleCondition("tightness", "<=", tightnessLoosen)],
-      [buildRuleCondition("riskAppetite", ">=", riskLoosen)],
-      [buildRuleCondition("tightness", ">", tightnessTighten), buildRuleCondition("riskAppetite", "<", riskTighten)],
-    ],
+    flipConditions: [describeExit(tightnessExit), describeExit(riskExit)],
+    flipLines: [[tightnessExit], [riskExit]],
     ownerCadence: confidenceDegraded || freshnessDegraded
       ? "Re-check daily until live data is back."
       : "Re-check at the next weekly review.",

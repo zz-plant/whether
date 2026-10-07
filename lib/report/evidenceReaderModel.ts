@@ -7,6 +7,7 @@ import type { ActionStripItem } from "./operatingCalls";
 import { buildSharedCorridorRails } from "./operatingCalls";
 import { describeSignalDirection } from "./signalClusterReading";
 import { comparisonBasis } from "./comparisonBasis";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { describeScoreMovement } from "./scoreMovement";
 import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
@@ -79,7 +80,7 @@ export type SignalReferenceRow = {
 };
 
 /** The line at which the call itself changes; the ladder's own label for that kind. */
-const CALL_CHANGE_LINE_LABEL = "Change line";
+const CALL_CHANGE_LINE_LABEL = DECISION_CONTRACT_LABELS.watch.changeLine;
 const INVERSION_LINE_LABEL = "Inversion line";
 const BASE_RATE_LINE_LABEL = "Pressure line";
 
@@ -98,8 +99,9 @@ const BETTER_WHEN: Record<RegimeSignalKey, "higher" | "lower"> = {
 };
 
 const SCORE_UNITS: ScoreUnits = {};
-const PERCENT_UNITS: ScoreUnits = { suffix: "%", scale: "", distance: "" };
-const SPREAD_UNITS: ScoreUnits = { suffix: "pp", scale: "", distance: "" };
+/* Two places, as the rate is quoted and as the row's header prints it. */
+const PERCENT_UNITS: ScoreUnits = { suffix: "%", scale: "", distance: "", decimals: 2 };
+const SPREAD_UNITS: ScoreUnits = { suffix: "pp", scale: "", distance: "", decimals: 2 };
 
 const SIGNED_WHOLE = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0, signDisplay: "exceptZero" });
 const SIGNED_TWO = new Intl.NumberFormat("en-US", {
