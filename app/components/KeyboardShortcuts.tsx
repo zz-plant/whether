@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HelpModal } from "./home/HelpModal";
+import { openShareRail } from "./globalShareRail";
 import { scrollBehaviorFor } from "./scrollRowToItem";
 import { shortcutNavigationLayers } from "../../lib/navigation/informationArchitecture";
 
@@ -41,6 +42,16 @@ export const shortcutTargetIsNeutral = (active: Element | null): boolean => {
   if (active instanceof HTMLElement && active.hasAttribute("data-page-section")) return true;
   return false;
 };
+
+/**
+ * ⇧S, the key the command palette prints beside "Share brief". It printed the key
+ * from the day the palette shipped and nothing bound it. Shift alone: ⌘⇧S and
+ * Ctrl+⇧S belong to focus mode (`focusModeController`).
+ */
+export const isShareRailShortcut = (
+  event: Pick<KeyboardEvent, "key" | "shiftKey" | "metaKey" | "ctrlKey" | "altKey">,
+): boolean =>
+  event.shiftKey && !event.metaKey && !event.ctrlKey && !event.altKey && event.key.toLowerCase() === "s";
 
 /**
  * What J and K move between, on any page.
@@ -85,6 +96,12 @@ export function KeyboardShortcuts() {
       }
 
       if (e.metaKey || e.ctrlKey || e.altKey) return;
+
+      if (isShareRailShortcut(e) && shortcutTargetIsNeutral(document.activeElement)) {
+        e.preventDefault();
+        openShareRail();
+        return;
+      }
 
       if (e.key === "?") {
         e.preventDefault();

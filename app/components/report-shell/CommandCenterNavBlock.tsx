@@ -1,6 +1,5 @@
 import { ReportCta } from "../reportCta";
 import { ScreenshotCaption } from "../screenshotCaption";
-import { ShareRailButton } from "./ShareRailButton";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
 import { OperatingLoopGlyph, type OperatingLoopStep } from "../illustrations/OperatingLoopGlyph";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
@@ -22,7 +21,6 @@ export function CommandCenterNavBlock({
   recordDateLabel,
   primaryCta,
   exportCta,
-  showShare = false,
   statusLabel,
   statusPrefix,
   trustStatusLabel,
@@ -43,8 +41,6 @@ export function CommandCenterNavBlock({
   activeStep?: OperatingLoopStep;
   primaryCta?: ReportCtaProps;
   exportCta?: ExportCtaProps | null;
-  /** Opens the one global share rail — the same formats, the same island, as / and /share. */
-  showShare?: boolean;
   statusLabel: string;
   statusPrefix?: string;
   trustStatusLabel: string;
@@ -75,7 +71,7 @@ export function CommandCenterNavBlock({
   // Same rule for the refresh stamp: /history passes no fetch time, and
   // printed "Updated " with nothing after it.
   const showStamp = Boolean(fetchedAtLabel) || Boolean(resolvedNextRefreshLabel);
-  const showActions = Boolean(primaryCta) || showShare || Boolean(exportCta);
+  const showActions = Boolean(primaryCta) || Boolean(exportCta);
   // A phone gets the week's word, the title and one meta line before the
   // first task block (ui-ux-standards §XI). Until 2026-10-07 the intro on
   // /operate, /signals and /trust was a 2×2 trust grid, a link, the refresh
@@ -191,9 +187,7 @@ export function CommandCenterNavBlock({
                     {primaryCta.label}
                   </ReportCta>
                 ) : null}
-                {showShare ? (
-                  <ShareRailButton />
-                ) : exportCta ? (
+                {exportCta ? (
                   <ReportCta
                     href={exportCta.href}
                     copyText={exportCta.copyText}

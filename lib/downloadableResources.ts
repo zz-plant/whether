@@ -24,7 +24,7 @@ export const downloadableResources = {
     },
     secondaryCta: {
       href: "/operate",
-      label: "Open guided version in Planning",
+      label: "Open the guided version in the plan",
       conversionEvent: "request",
     },
     internalLinks: [

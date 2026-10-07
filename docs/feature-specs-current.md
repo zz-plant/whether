@@ -301,6 +301,9 @@ The command palette (`Cmd+K`) now includes quick actions beyond navigation:
 Plus navigation commands for all primary and supporting routes. The `HelpModal` (`?` shortcut)
 documents the full keyboard shortcut set including section navigation (`j`/`k`), route shortcuts
 (`e`/`p`/`h`/`t`/`r`), and the new action shortcuts.
+The palette printed `⇧S` from the day it shipped while nothing bound it; since 2026-10-06
+`KeyboardShortcuts` binds it to the share rail (Shift alone: `⌘⇧S` is focus mode's) and the help
+dialog lists it.
 
 ### 1.1.5 Calendar ritual integration (2026-08-29)
 `SubscribeForm` (`app/components/SubscribeForm.tsx`) now offers a Google Calendar Monday Ritual
@@ -2427,7 +2430,9 @@ shell so every report route inherits them:
   the bottom bar's tabs, and under the intro it was a second navigation band pushing the first
   task block down.
 - **`/operate` drops the hero Share button.** The Share step further down the same page owns
-  sharing; on a phone both were in one viewport as "Share the brief" twice.
+  sharing; on a phone both were in one viewport as "Share the brief" twice. With no route left
+  setting it, the shell's `showShare` slot and `ShareRailButton` were deleted on 2026-10-06; the
+  global share rail opens from the command palette and `⇧S`.
 - **The refresh stamp reads "Signals refreshed …"**, not "Updated …" — two dates print inside one
   viewport and the reader has to be able to tell the pipeline's fetch from the reading's record
   date apart. The data-status vocabulary renames `live` to "All sources live": "Live" beside a

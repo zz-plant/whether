@@ -36,7 +36,7 @@ export const canonicalSurfaceRedirectPairs = [
   // Legacy methodology → Trust hub
   ["/methodology", "/trust#formula-reference"],
   // Consolidated under Trust hub
-  ["/sources", "/trust#sources-freshness"],
+  ["/sources", "/trust#source-board"],
   ["/confidence", "/trust#confidence-limits"],
   // Decision answer root → Decide hub
   ["/answers", "/resolve#direct-answers"],
