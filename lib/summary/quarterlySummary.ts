@@ -3,6 +3,7 @@
  * Mirrors monthly summary structure with quarter-specific framing.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import type { ConfidenceRecord } from "../report/confidence";
 import {
   buildCadenceSummary,
   type CadenceSummaryProvenance,
@@ -43,11 +44,14 @@ export const buildQuarterlySummary = ({
   provenance,
   recordDateLabel,
   periodLabel,
+  record,
 }: {
   assessment: RegimeAssessment;
   provenance: QuarterlySummaryProvenance;
   recordDateLabel?: string;
   periodLabel?: string;
+  /** The record the reading came from, so a stale fallback lowers the stamp's confidence. */
+  record?: ConfidenceRecord | null;
 }): QuarterlySummary =>
   buildCadenceSummary({
     cadence: "quarterly",
@@ -56,6 +60,7 @@ export const buildQuarterlySummary = ({
     provenance,
     recordDateLabel,
     periodLabel,
+    record,
   });
 
 export const getQuarterLabel = formatQuarterLabel;

@@ -9,6 +9,7 @@ import {
   formatMonthLongYearUtc,
   formatAgeSpan,
   formatAgeHours,
+  parseAgeSpanHours,
 } from "../lib/formatters";
 import {
   formatQuarterLabel,
@@ -135,5 +136,16 @@ describe("age formatting", () => {
     assert.equal(formatAgeHours(ago(12 * MINUTE), now), "12m.");
     assert.equal(formatAgeHours("2026-02-02T00:00:00.000Z", now), "7mo.");
     assert.equal(formatAgeHours(null, now), "\u2014");
+  });
+
+  // Parsing only the digits read "6m." as 6 hours and "3mo." as 3.
+  it("reads a label back into hours by its unit", () => {
+    assert.equal(parseAgeSpanHours(formatAgeHours(ago(6 * MINUTE), now)), 0.1);
+    assert.equal(parseAgeSpanHours(formatAgeHours(ago(6 * HOUR), now)), 6);
+    assert.equal(parseAgeSpanHours(formatAgeSpan(ago(18 * DAY), now) ?? ""), 18 * 24);
+    assert.equal(parseAgeSpanHours(formatAgeHours(ago(30 * SECOND), now)), 30 / 3600);
+    assert.ok((parseAgeSpanHours("3mo.") ?? 0) > 2000);
+    assert.equal(parseAgeSpanHours("\u2014"), null);
+    assert.equal(parseAgeSpanHours("6 hours"), null);
   });
 });

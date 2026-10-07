@@ -22,6 +22,9 @@ export async function GET() {
     distanceToFlip: model.diagnostics.regimeDistance.pointsToFlip,
     flipDimension: model.diagnostics.regimeDistance.dimensionLabel,
     fetchedAt: model.artifact.fetchedAtLabel,
-    recordDate: model.artifact.recordDateLabel,
+    /* The reading's record date. This read `model.artifact.recordDateLabel`, which
+       the card fills with the week-ending Friday, so the Oct 5, 2026 reading
+       answered `recordDate: "Oct 9, 2026"`, four days after it was recorded. */
+    recordDate: homepage.reportShell.recordDateLabel,
   });
 }

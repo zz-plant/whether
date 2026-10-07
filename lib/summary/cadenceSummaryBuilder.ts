@@ -1,8 +1,10 @@
 import { buildComplianceStamp } from "../exportNotices";
+import { formatExportConfidenceWord } from "../export/exportTerms";
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
+import type { ConfidenceRecord } from "../report/confidence";
 import { joinSentences } from "../report/reportFormatting";
-import { formatSourceLine } from "./summaryFormatting";
+import { formatSourceLine, resolveSummaryConfidence } from "./summaryFormatting";
 
 export type CadenceSummaryProvenance = {
   sourceLabel: string;
@@ -21,6 +23,8 @@ type CadenceSummaryParams = {
   provenance: CadenceSummaryProvenance;
   recordDateLabel?: string;
   periodLabel?: string;
+  /** The record the reading came from, so a stale fallback lowers the stamp's confidence. */
+  record?: ConfidenceRecord | null;
 };
 
 type CadenceSummaryBase = {
@@ -53,6 +57,7 @@ export const buildCadenceSummary = ({
   provenance,
   recordDateLabel,
   periodLabel,
+  record,
 }: CadenceSummaryParams): CadenceSummaryBase => {
   const regimeLabel = getRegimePublicLabel(assessment.regime);
   const guidance = guidanceMap[assessment.regime];
@@ -65,10 +70,13 @@ export const buildCadenceSummary = ({
     ? `${cadenceTitle[cadence]} — ${periodLabel}`
     : cadenceTitle[cadence];
   const sourceLine = formatSourceLine(provenance);
+  // The published confidence word, as the weekly and monthly stamps print it. This
+  // printed `provenance.statusLabel` ("Canonical snapshot (high confidence)"), the
+  // data tier, which is not the confidence any page publishes.
   const complianceStamp = buildComplianceStamp({
     sourceLine,
     timestamp: provenance.timestampLabel,
-    confidence: provenance.statusLabel,
+    confidence: formatExportConfidenceWord(resolveSummaryConfidence(assessment, record)),
   });
 
   const copy = [
@@ -78,7 +86,7 @@ export const buildCadenceSummary = ({
     "Execution constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
-    "Source:",
+    // A bare "Source:" heading sat above this line, so the paste read "Source:\nSource: …".
     `Source: ${sourceLine}`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,

@@ -1,49 +1,44 @@
 import { buildComplianceStamp } from "../exportNotices";
-import { formatSourceLine } from "./summaryFormatting";
+import { formatExportConfidenceWord } from "../export/exportTerms";
+import { formatSourceLine, type SummaryConfidence } from "./summaryFormatting";
 import type { MonthlyStructured, SummaryProvenance, WeeklyStructured } from "./summaryTypes";
 
 const toBullets = (items: string[]) => items.map((item) => `• ${item}`);
 
-const renderGovernanceLines = (governance: WeeklyStructured["governanceParameters"]) => {
-  if (!governance) {
-    return [] as string[];
-  }
-
-  return [
-    "",
-    "---",
-    "",
-    "GOVERNANCE PARAMETER ADJUSTMENTS",
-    "",
-    `• Hiring threshold: ${governance.hiringThreshold}`,
-    `• Payback window tolerance: ${governance.paybackWindowTolerance}`,
-    `• Rollback requirement: ${governance.rollbackRequirement}`,
-    `• Approval velocity: ${governance.approvalVelocity}`,
-    `• Expansion scope: ${governance.expansionScope}`,
-    `• Experimentation tolerance: ${governance.experimentationTolerance}`,
-    "",
-  ];
-};
-
+/*
+ * The paste's confidence, and the stamp's: the published word ("Medium"), the one
+ * the summary sentence above it states. Both used to print `provenance.statusLabel`,
+ * the data tier ("Canonical snapshot (high confidence)"), so the Oct 5, 2026 paste
+ * said Medium in its summary and high confidence under RECOMMENDATION CONFIDENCE.
+ *
+ * The weekly paste also listed `structured.governanceParameters` as raw codes
+ * ("Rollback requirement: EXPLICIT_KILL_CRITERIA", "Approval velocity: BALANCED").
+ * No reader-facing vocabulary defines those six settings, so the paste no longer
+ * prints them; the structured payload still carries them for agents.
+ */
 export const renderWeeklySummaryCopy = ({
   title,
   summary,
   recordDateLabel,
+  confidence,
   provenance,
   structured,
 }: {
   title: string;
   summary: string;
+  /** The reading's record date ("Oct 5, 2026"), never the week-ending Friday. */
   recordDateLabel?: string;
+  confidence: SummaryConfidence;
   provenance: SummaryProvenance;
   structured: WeeklyStructured;
 }) => {
   const updatedLabel = recordDateLabel ? `Updated ${recordDateLabel}` : "Updated —";
   const sourceLine = formatSourceLine(provenance);
+  const confidenceWord = formatExportConfidenceWord(confidence);
   const complianceStamp = buildComplianceStamp({
     sourceLine,
     timestamp: provenance.timestampLabel,
-    confidence: provenance.statusLabel,
+    confidence: confidenceWord,
   });
 
   return [
@@ -103,12 +98,11 @@ export const renderWeeklySummaryCopy = ({
     ...toBullets(structured.executionConstraints),
     "",
     "",
-    ...renderGovernanceLines(structured.governanceParameters),
     "---",
     "",
     "RECOMMENDATION CONFIDENCE",
     "",
-    `Confidence: ${provenance.statusLabel}`,
+    `Confidence: ${confidenceWord}`,
     "Uncertainty: this is an interpretive read, not a forecast. Check the assumptions against your own numbers before you act on it.",
     "",
     "",
@@ -127,18 +121,20 @@ export const renderWeeklySummaryCopy = ({
 export const renderMonthlySummaryCopy = ({
   title,
   summary,
+  confidence,
   provenance,
   structured,
 }: {
   title: string;
   summary: string;
+  confidence: SummaryConfidence;
   provenance: SummaryProvenance;
   structured: MonthlyStructured;
 }) => {
   const complianceStamp = buildComplianceStamp({
     sourceLine: structured.provenance.source,
     timestamp: provenance.timestampLabel,
-    confidence: provenance.statusLabel,
+    confidence: formatExportConfidenceWord(confidence),
   });
 
   return [
@@ -175,7 +171,7 @@ export const renderMonthlySummaryCopy = ({
     "",
     ...toBullets(structured.executionConstraints),
     "",
-    "Source:",
+    // A bare "Source:" heading sat above this line, so the paste read "Source:\nSource: …".
     `Source: ${structured.provenance.source}`,
     `Timestamp: ${structured.provenance.timestamp}`,
     `Data age: ${structured.provenance.dataAge}`,
