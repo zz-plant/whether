@@ -3068,3 +3068,42 @@ strip across a phone's first screen, a footer set louder than the pages above it
   the record, with a key of only the conditions it draws; it reads the timeline the entries print
   and adds no data or claim. Measured: 6,293 → 5,455px desktop, about 8,220 → 7,680px phone.
   `tests/productCanon.test.ts` holds the stamps and one square per essay.
+
+### 1.1.49 One sentence per slot: the template copy that filled in the wrong value (2026-10-07)
+
+A read of every reader-facing output for one week (pages, the Monday Slack post, the slide, brief.md,
+the mandate, the agent views) found sentences assembled from templates whose filled-in values
+contradicted another surface, or the reading itself.
+
+- **Where conditions change.** The posture state's lines (`buildWeeklyLockCommitment`,
+  `lib/report/decisionKnobs.ts`) were the same three in every regime — "Funding pressure ≤ 66 for
+  two readings in a row", "Risk appetite ≥ 54 for two readings in a row", "Funding pressure > 76
+  or risk appetite < 44: tighten again" — the default stage's resume and pause lines under the
+  change line's label. The Monday post, the mandate, `/api/agent`, the CLI and the embed printed
+  them, so a Freezing week was told conditions change at 66 when the homepage said 70, and to
+  "tighten again" past a line it had already crossed. They are the edges of the reading's quadrant
+  now, and the posture state's trigger is the brief's own sentence (`buildFlipThreshold`). A read
+  built without that sentence (the stored snapshot the slide prints) gets both lines rather than
+  the nearest alone; the answer pages print it for the score they are about, where they said
+  "Trigger tighter mode if …" in every regime.
+- **The guidance.** "Guidance:" printed the operating stance in the Monday post, brief.md and the
+  operator brief, and the do-now line on the homepage, the email and the post `/share` copies.
+  Every paste now leads with the do-now line, then the stance when it says more
+  (`formatGuidance`, `lib/export/briefBuilders.ts`), and no "Do now" line repeats it.
+- **Rule lines.** A line the reading already meets says so — "Pause if funding pressure is above 76
+  (already true at 90)" — where every rule read as a move still to come. An area's resume distance
+  is the line holding it back (`bindingResume`), not the nearest of its AND-ed lines ("6 pts away"
+  while funding pressure was 24 away), and "Line set by" names the scores the printed lines are
+  drawn on, where it was fixed per area.
+- **Figures and dates.** Rates print as quoted (4.05%), where the brief's chip read "3.9 → 4.0"
+  beside a sentence saying the rate rose 0.2 to 4.1; index values print without ".00". brief.md and
+  the operator brief are headed with the reading's date, not the Friday of its week. The evidence
+  timeline's month reads "Showing:", where "Current: Aug 2026" sat under an October reading.
+- **Labels.** `/trust`'s "Resume when" is the plan's resume line, not a second one about
+  confidence; the last-time card's value label is "Change line"
+  (`DECISION_CONTRACT_LABELS.watch.changeLine`); the Slack post's "Why this could be wrong" reads
+  the confidence instead of telling every week "the scores sit near a line", and no longer opens a
+  line "If it is:"; the mandate drops "No committed transition event in store."; refusal reasons
+  say "guidance", not "posture".
+
+`tests/fixtures/briefFormats.golden.json` was regenerated in the commits that moved these strings.
