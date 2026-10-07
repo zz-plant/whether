@@ -2558,7 +2558,7 @@ work-item tags, the pull policies and the role memos. That was about 5,700px on 
   (Slack post, Full brief, Standup line), Meetings (Meeting pack, Monday agenda, Slide text), Docs
   and email (Email, Investor update, Portfolio note, Citation), Tickets and boards (Ticket brief,
   Work-item tags, Pull policies), Team (Role memos). It is a list from `md` up and the platform's
-  grouped `<select>` below it. There is one preview (`BriefPreview`, shared with the share rail)
+  grouped `<select>` below it. There is one preview (`BriefPreview`, shared with the share rail; the Chat formats draw through `ChatPreview` since §1.1.48)
   and one copy action, so a reader reads exactly what they will paste before copying it.
 - **Two Slack texts, kept on purpose.** *Slack post* is the rail's short block, the shape a
   channel skims. *Full brief* is the weekly operator brief, every area's rule and lines. Each is
@@ -2839,3 +2839,67 @@ below moves data the page already computed to where the eye lands first; nothing
   `tests/homeDecisionPicker.test.tsx` (choices and count), `tests/firstRunOrientationGuide.test.tsx`
   (standfirst).
 
+### 1.1.48 `/trust` leads with its sources; `/share` shows what it hands over (2026-10-07)
+
+A screenshot review found both pages describing the thing a reader came for instead of showing it.
+
+**`/trust`.** The page's open content was the thresholds essay ("Why it works", the editor's
+healthcare background) and a blank five-prompt form that read as unfinished, while the sources —
+the rail's second entry, and what the page exists to check — sat folded at the foot under
+"Detailed verification & sources" as two timestamps. The per-source health rows
+(`reportData.sourceHealth`) were built for every reading and drawn nowhere but as the strip's count.
+
+- **Source board, open, under "How the scores are built"** (`app/trust/sourceBoard.tsx`). One row
+  per source — Treasury, Market stress, Inflation, Labor, Startup/private markets — with its state
+  in the strip's words (Live, Current, Cached copy, Stale · 2mo old, Not confirmed), its cadence
+  and when it last answered (UTC), then the two source links. `buildSourceBoardRows`
+  (`lib/report/sourceHealth.ts`) judges "as intended" with the predicate `buildDegradedSourceRows`
+  uses, so the board and the strip's "All sources live" / "Partly cached" count the same rows.
+  Raw fallback reasons stay off the board: they are diagnostic strings, some naming series ids.
+  `#source-board` is unchanged (`DATA_CURRENCY_ACTION_HREF` points at it).
+- **The rest of the verification stays folded on a healthy week**, under "Citation, limits and
+  revisit triggers" (citation, limits, calibration link, warnings, snippet). The `?sources=1` key
+  still opens it, so shared links keep working.
+- **"How to use the thresholds" is last.** Its worked example stays open; the three definitions
+  with the essay, and the blank form, are native `<details>`. `#template` is on the form's own
+  `<details>`, so `/template` lands on it and the shell's anchor handler opens it; `/threshold`
+  (`#framework`) opens both.
+- **Rail in page order** (§XI): status, formula, sources, the four folded sections, the method.
+- This opens a source board, which §XII lists among things to collapse. On `/trust` the check is
+  the page's job, so the compact board is its content; the detail behind it is what folds.
+  Recorded in §XII.
+- Desktop 3,622 → 2,547px, phone 4,983 → 3,491px (same day's data, returning reader).
+- Tests: `tests/trustSourceBoard.test.tsx` (board open after the formula and before anything
+  folded, every source drawn, rail in page order, method and form folded, `#template` on the
+  form's disclosure), `tests/sourceHealth.test.ts` (board rows and the strip agree).
+
+**`/share`.**
+
+- **Chat formats are drawn as the channel shows them.** The Slack post previewed as raw markup
+  in monospace. `parseSlackMrkdwn` (`lib/export/slackMrkdwn.ts`) reads the subset the chat formats
+  write (`*bold*`, `_italic_`, `>` quote lines, bare http(s) URLs) into data, and `ChatPreview`
+  (`app/share/chatPreview.tsx`) builds React nodes from it: bold, one quote bar per quoted run,
+  links. Nothing is injected as HTML; unrecognised text stays text. When the drawing differs from
+  the text, "Show the text that copies" holds the exact text. Per format (`preview: "chat"`): the
+  Slack post, full brief and standup line draw as chat. The meeting pack, agenda, slide text,
+  email, investor update, portfolio note, citation and ticket keep the plain preview
+  (`BriefPreview`), because there the text is the artifact. The copy button copies the same
+  text; `tests/briefFormatsPinned.test.ts` is unchanged.
+- **The images are shown.** "Files and images for a deck or a thread" was four cards that
+  described a slide and a card and showed neither. The PPTX, PDF and SVG draw one slide from one
+  payload (`lib/export/boardSlideDeck.ts`), so they are one card with the slide's picture
+  (`/api/image/slide?stage=seed`) and three captioned files; the brief card shows
+  `/api/image/brief`. This reverses the component's "deliberately links rather than thumbnails"
+  on cost grounds that no longer hold: two pictures, not four; both routes answer with
+  `s-maxage=3600`; both load lazily below the copy formats. `next/image` with `unoptimized` (the
+  worker's `/_vinext/image` resizes static assets only) sets the size attributes, lazy loading
+  and async decoding; a scrolled capture measured CLS 0 at 430px and 1280px. From `sm` both
+  pictures sit in a 3:2 frame so the cards' titles align; the slide letterboxes rather than crops.
+- **This week's readings** above the picker were 12px across the 72rem column (~150 characters a
+  line). They are `text-fluid-xs` (the §VI floor for explanatory text) capped at 48rem.
+- Seen, not changed: the seed-stage slide prints a stage-specific action and a "Conditions change
+  if" line ("Risk appetite rises above 50 … Conditions then turn Cloudy") that differs from the
+  Slack post's on the same page, now that both are visible together. The slide payload comes from
+  `lib/export/exportSnapshot.ts`; whether the two should agree is for that module's owner.
+- Tests: `tests/slackMrkdwn.test.ts`, `tests/sharePageCurrentBrief.test.tsx` (chat drawing and
+  raw text, per-format preview choice, markup-looking text stays escaped, two sized lazy images).
