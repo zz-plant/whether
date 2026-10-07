@@ -1578,9 +1578,10 @@ in the order a reader asks:
 - **What would change this guidance.** The two score ladders with their Pause if and Resume when lines.
 - **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are
   interest rates doing? · Has the yield curve inverted in the last year? · How have the two scores
-  moved this year? · What would the call be with different lines? · What did the brief say in an
+  moved this year? · What would conditions be with different lines? · What did the brief say in an
   earlier month? · Which past cycle looks most like this one? · Which habits from the zero-rate
-  years still shape your company?
+  years still shape your company? Since 2026-10-07 each summary carries its answer after the
+  question (§1.1.45).
 
 The page used to open on "What this means now", the brief's call restated under the shell's own
 stamp, and the charts disclosure opened by default: about 2,000px of charts before the other five
@@ -2839,3 +2840,49 @@ below moves data the page already computed to where the eye lands first; nothing
   `tests/homeDecisionPicker.test.tsx` (choices and count), `tests/firstRunOrientationGuide.test.tsx`
   (standfirst).
 
+### 1.1.45 Resolve answers, and Evidence's questions carry their answers (2026-10-07)
+
+A screenshot review of `/resolve` and `/signals` in both themes, returning reader, phone and desktop.
+
+- **`/resolve` answers before the click.** The intro promises "one yes-or-no answer per open
+  decision" and the list printed eleven questions with a sentence of enduring advice each. Every
+  decision answer now carries its lead area's standing (the first area it maps, the one whose rule
+  its page's card prints) as a stamp: "Pause line crossed" in the caution ink, or "4 pts from its
+  pause line" (`describeAnswerStanding` in `lib/report/answerStanding.ts`, over
+  `describeAreaPauseStatus`). The rows are `buildHomeAreaRows`, fed from the snapshot the page
+  already loads exactly as `app/page.tsx` feeds the homepage's "What are you deciding?" choices,
+  so the two print the same words. Climate answers ("Startup funding climate this week", "Is it
+  risk-on or risk-off…") carry the week's weather word in the regime ink; the explanation ("How to
+  brief executives…") carries nothing. The count sits over the list ("Pause lines crossed in 4 of 5
+  areas this week.", `describePauseLineCount`). No reader calibration is applied: the answer page
+  a row opens reads the published lines too, so a row and its page agree; a reader with a stage
+  cookie can see a different distance on `/`, which is scaled to them.
+- **Stamps are sharp** (§XIV): `rounded-sm`, a column of their own from `sm`, under the title on a
+  phone.
+- **The browse disclosure is a row.** It was a `weather-surface` whose padding the report row
+  zeroes, so the closed state drew a 16px-radius bar with its text against the border. It is a
+  native `<details>` under `weather-auto-chevron`, ruled off like `/signals`' instruments. The two
+  chip-boxed links under the list (SaaS valuation context, historical comparison) are inline links.
+- **`/signals` "Deeper evidence" answers in its summaries** (§XII): rates ("1-month rate 4.05%, up
+  from 3.85% on Aug 31"), inversion ("Yes: 2Y−3M below zero in 6 of 12 months, 10Y−2Y in none"),
+  score trends ("Funding pressure down 27 to 63, risk appetite down 6 to 56 (12 month-ends to Aug
+  2026)"), the lines in force, the change count of the month-by-month timeline, the reference
+  cycle (unchanged), and the zero-rate habit areas. Builders in
+  `lib/report/evidenceInstrumentSummaries.ts`; where a panel computes the value (the sparkline
+  window, the runs of conditions) the panel and the summary call the same function (§XV). The
+  rates panel's "Latest" line named this week's date over charts that end at the last month-end
+  and printed no rate; it prints this week's four rates and says the charts are month-ends. The
+  line-settings question says "conditions" instead of the retired "the call". The rows drop their
+  side inset on a phone so the questions align with the section title.
+- **"What changed"**: the short-term rate's "Why it matters" was a bare dash in the unfiltered
+  table; it carries the sentence the Inflation filter already had. The focus filters were checked
+  and kept: each shows a different subset of the four rows with its own notes and follow-up links.
+- **"What would change this guidance"**: each score ladder is capped at 28rem, the wide track its
+  labels are laid out for (§XVII, §XVIII); the two had stretched to about 620px each on a desktop.
+- Seen, not changed: `ScoreCell` prints the short-term rate as "4.0%" beside the chip's "4.05%"
+  (and the gauge "0.5pp" beside "0.47pp") — one figure at two precisions in one row, in a shared
+  primitive the answer pages also draw. The timeline's "Current: Aug 2026" names the last month-end
+  on a live October reading.
+- Tests: `tests/resolveAnswerStanding.test.tsx`, `tests/evidenceInstrumentSummaries.test.ts`,
+  `tests/signalsPageFold.test.tsx` (renamed question pinned on purpose; every answer checked against
+  its opened panel; the base-rate note; the ladder cap).
