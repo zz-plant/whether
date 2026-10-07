@@ -24,7 +24,7 @@ import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
 import { isRuleConditionMet } from "./boundedDecisionRules";
 import { buildComparedWith } from "./comparisonBasis";
-import { observedBaseRate, type ComparisonReading } from "./comparisonReading";
+import { observedBaseRate, rescoreStoredInputs, type ComparisonReading, type RescoreStoredInputs } from "./comparisonReading";
 import { explainScoreMovement } from "./scoreMovement";
 import type {
   ComparedWith,
@@ -71,8 +71,11 @@ type ReportDataLoaderDependencies = {
   getTimeMachineYieldCurveSeries: (months: number, asOf?: string) => TimeMachineYieldCurveEntry[];
   getTimeMachineSnapshots: () => Array<TreasuryData & { year: number; month: number }>;
   getPreviousTimeMachineSnapshot: (recordDate: string) => TreasuryData | null;
-  /** Last week's published brief as a comparison, or null where the archive has none in range (`findWeeklyComparisonReading`). */
-  findWeeklyComparisonReading: (recordDate: string) => ComparisonReading | null;
+  /**
+   * Last week's published brief as a comparison, or null where the archive has none in range
+   * (`findWeeklyComparisonReading`). A brief scored by another engine is scored again by `rescore`.
+   */
+  findWeeklyComparisonReading: (recordDate: string, rescore: RescoreStoredInputs) => ComparisonReading | null;
   findTimeMachineSnapshot: (recordDate: string) => TreasuryData | null;
   findTimeMachineGovernedAssessment: (
     recordDate: string,
@@ -545,13 +548,16 @@ export const loadReportDataUncachedInternal = async ({
   /* What changed this week is against last week's published brief, where the
      archive has one from the previous one to two weeks: it was scored the way
      this reading is, so the moves are like-for-like and there is no
-     rates-versus-inputs split to make. The month-end is the fallback. A replay
+     rates-versus-inputs split to make. A brief scored by an earlier engine is
+     like-for-like once its stored inputs are scored again by this one, under
+     these thresholds and, like the month-end above, with no machine state
+     (`rescoreStoredInputs`). The month-end is the fallback. A replay
      is a walk of month-ends, and a threshold override rescores this reading
      against lines the brief was not published with, so both keep the month-end. */
   const weeklyReading =
     historicalSelection || hasThresholdOverrides(searchParams)
       ? null
-      : deps.findWeeklyComparisonReading(treasury.record_date);
+      : deps.findWeeklyComparisonReading(treasury.record_date, rescoreStoredInputs(deps.evaluateRegime, thresholds));
   const comparison: WeekComparison | null = weeklyReading
     ? { reading: weeklyReading, comparedWith: buildComparedWith(weeklyReading.recordDate, treasury.record_date) }
     : monthEndComparison;

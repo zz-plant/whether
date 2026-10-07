@@ -63,10 +63,49 @@ const PublishedBriefScoresSchema = z.object({
   baseRate: z.number().nullable().optional(),
   curveSlope: z.number().nullable().optional(),
   /**
-   * The engine that scored them (`ENGINE_VERSION`). Next week compares with this
-   * record only under the same engine; absent on records frozen before it was stored.
+   * The engine that scored them (`ENGINE_VERSION`). Next week compares with these
+   * scores as stored only under the same engine; under another it scores the record's
+   * `inputs` again, and passes over a record that has none. Absent on records frozen
+   * before it was stored.
    */
   engineVersion: z.string().optional(),
+});
+
+/**
+ * What the engine scored the week's scores and conditions from, so that under a later
+ * engine the next week can score them again and still compare with this record
+ * (`buildStoredInputs` and `rescoreStoredInputs`, lib/report/comparisonReading.ts).
+ * Only what the scorer reads for those: the yields the short-term rate and the curve
+ * come from, the two short-term-rate prints the tightening-speed term measures
+ * between, the corroborating market reads that adjust the scores (where the reading
+ * had a value), and the VIX closes the market-stress veto means (where it had ten).
+ * Absent on records frozen before 2026-10-07, and on one whose inputs did not
+ * reproduce its scores when it was frozen.
+ */
+const PublishedBriefInputsSchema = z.object({
+  yields: z.object({
+    fedFunds: z.number().nullable().optional(),
+    oneMonth: z.number().nullable(),
+    threeMonth: z.number().nullable().optional(),
+    twoYear: z.number().nullable(),
+    tenYear: z.number().nullable(),
+  }),
+  baseRateWindow: z
+    .object({
+      compareDate: z.string(),
+      compareValue: z.number(),
+      latestDate: z.string(),
+      latestValue: z.number(),
+    })
+    .optional(),
+  macro: z.object({
+    HY_CREDIT_SPREAD: z.number().optional(),
+    CHICAGO_FCI: z.number().optional(),
+    VIX_INDEX: z.number().optional(),
+    VC_FUNDING_VELOCITY: z.number().optional(),
+    TECH_LAYOFF_TREND: z.number().optional(),
+  }),
+  vixCloses: z.array(z.number()).optional(),
 });
 
 const PublishedBriefEvidenceSchema = z.object({
@@ -95,6 +134,8 @@ export const PublishedBriefSchema = z.object({
   decisions: z.array(PublishedBriefDecisionSchema),
   /** The two composite readings the call was scored on. Absent on records frozen before they were recorded. */
   scores: PublishedBriefScoresSchema.optional(),
+  /** The inputs `scores` and `regime` were scored from. Absent on records frozen before they were stored. */
+  inputs: PublishedBriefInputsSchema.optional(),
   evidence: z.array(PublishedBriefEvidenceSchema),
   sourceLabel: z.string(),
   sourceUrl: z.string().optional(),
