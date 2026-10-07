@@ -45,7 +45,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 
 ### Sprint ceremonies — weekly execution commitments
 - [x] **Grooming guardrail tags** — Shipped: `buildGuardrailTagBlocks` (`lib/export/issueTrackerBrief.ts`) builds one paste-ready block per business area (posture, `Action now` / `Pause if` / `Change course if`, flip watch, week stamp), copyable from `/share` (`GuardrailTagControls`); no tokens, no tracker integration (2026-09-18).
-- [x] **Commitment lint in planning** — Shipped: MCP `lint_sprint_goal` (`lib/mcp/httpMcpServer.ts`) takes a sprint goal or story plan and returns `holds | pauses | needs_reversal_guardrail` with the bounded rule's pause trigger and reversal, reusing `stressTestDecisionPlan` (2026-09-18).
+- [x] **Commitment lint in planning** — Shipped: MCP `lint_sprint_goal` (`lib/agent/tools.ts`) takes a sprint goal or story plan and returns `holds | pauses | needs_reversal_guardrail` with the bounded rule's pause trigger and reversal, reusing `stressTestDecisionPlan` (2026-09-18).
 - [x] **Standup flip line** — Shipped: `buildStandupFlipLine` (`lib/report/flipProximity.ts`) produces a one-sentence standup input ("Call unchanged, 0.08% from flip; no pace change"), copyable from `/share` (`ShareCopyControls`) for daily and sprint ceremonies (2026-09-26).
 - [ ] **Sprint-posture recap + retro violation report** — compare the sprint's logged decisions (`lib/events/decisionEventStore.ts`) against the regime's bounded rules and surface the mismatches ("committed to a speculative build in a DEFENSIVE regime").
 
@@ -123,13 +123,12 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 ## Milestone 7 — Operator Demand Expansion (Week 7)
 - [x] Broaden macro inputs beyond the yield curve (inflation, unemployment, credit spreads) with explicit source links.
 - [x] Add adjustable regime thresholds with audit trails for custom tuning.
-- [ ] Decision Shield expansion logic exists in code but is not exposed as a primary live route.
+- [x] Expose Decision Shield on a primary live route. Shipped: the `Test a decision` step on `/operate` (`#ops-decision-shield`, `DecisionShieldPanel`).
 - [x] Add export/share flows (PDF, slide-ready summary, scheduled email or Slack brief).
 - [x] Build an Insight Database with citations to evidence and historical precedents.
 - [x] Add time-series comparisons (“then vs now”) with regime change diffs.
 - [x] Add alerts/notifications on regime changes.
-- [ ] Saved Decision Shield scenarios/presets exist in component logic but are not surfaced in the
-  primary route map.
+- [x] Surface saved Decision Shield scenarios/presets. Shipped: the `Saved scenarios` section inside `DecisionShieldPanel` on `/operate`.
 - [x] Surface deep data provenance per sensor (direct source URLs, formulas, timestamps).
 - [x] Introduce an API/export endpoint for embedding regimes in internal dashboards.
 
@@ -152,7 +151,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - [x] Launch executive briefing pack (Slack/email/slide-ready) with citations and regime summary.
 - [x] Add regime-shift alerting with reason codes and Time Machine deep links.
 - [x] Add weekly digest output with “what changed” delta summary.
-- [x] Allow role-specific alert routing (CFO/COO/CTO/CPO presets). Shipped: tagged alert decisions with department and rolePreset metadata (2026-09-04).
+- [ ] Allow role-specific alert routing (CFO/COO/CTO/CPO presets). Partial: alert decisions carry `department` and `rolePreset` tags (`lib/alert/alertEvaluator.ts`, 2026-09-04), but no delivery path reads them, so every subscriber and Slack webhook receives every alert.
 
 ## Milestone 10 — Decision Memory + Scenario Studio (Week 10)
 - [x] Decision Memory log with immutable records (regime, sensors, thresholds, sources). Shipped: append-only ledger on `/operate/memory` with CSV export (2026-09).
@@ -249,6 +248,6 @@ Track these items to present Whether as a Reforge-grade operating system.
 - [x] Weekly/monthly briefing APIs are stable and copy-ready with citations. Shipped: `/api/weekly`, `/api/monthly`, `/brief.md`, and `/api/integrations/weekly-mandate` (2026-08).
 - [ ] Insight Database includes precedent case studies per regime.
 - [x] Decision Memory logs are immutable and exportable. Shipped: `/api/decision-memory` and `/decisions` (2026-09). `/operate/memory` was retired into a redirect to `/history` — which is the *published* archive, not the reader's own — and this line went on claiming it for weeks, during which no browser could read or write the ledger at all.
-- [x] Role-based presets ship for CFO/COO/CTO/CPO workflows. Shipped: stakeholder briefs on /operate and role-calibrated alert routing (2026-09-04).
+- [x] Role-based presets ship for CFO/COO/CTO/CPO workflows. Shipped: stakeholder briefs on /operate (2026-09-04). Alerts are tagged by role but not yet routed by it (see Milestone 9).
 - [x] Source health panel surfaces stale or failed data feeds. Shipped: System status and Source board on `/trust`.
 - [x] Live macro fetchers replace snapshot-only CPI/unemployment/BBB inputs. Shipped: live FRED fetchers in `lib/fred.ts` (2026-08).

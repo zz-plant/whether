@@ -48,10 +48,9 @@ This diagram shows the core path through the system. Data comes in, the core log
 graph TB
     subgraph "Data Ingestion Layer"
         A1[Treasury API] -->|Yields + Data| A2[treasuryClient.ts]
-        A3[Macro Sources] -->|Signals| A4[snapshot.ts]
-        A2 --> A5[treasuryNormalizer.ts]
-        A4 --> A5
-        A5 --> A6[sensors.ts]
+        A3[snapshot_fallback.json] -->|Fallback reading| A4[snapshot.ts]
+        A2 --> A6[sensors.ts]
+        A4 --> A6
     end
     
     subgraph "Core Logic Layer"
@@ -236,7 +235,6 @@ Composes the full homepage. It coordinates data loading, model assembly, and sec
 
 **Key Functions:**
 - `assembleHomePage()` — Full page assembly
-- `buildCommandBarPayload()` — Command center data
 
 ---
 
@@ -248,7 +246,7 @@ The app layer delivers the outputs of the reasoning system across the primary wo
 app/
 ├── page.tsx                          # Homepage (Weekly Brief: /)
 ├── operate/                          # Plan workflow (/operate)
-│   └── page.tsx                      # 4-step progressive execution stepper
+│   └── page.tsx                      # Stepper: Areas, Rules, Test, Lines (live weeks), Finance, Share
 ├── signals/                          # Evidence workflow (/signals)
 │   └── page.tsx                      # Dual-mode sensor array & diagnostics
 ├── resolve/                          # Resolve workflow (/resolve)
@@ -293,7 +291,6 @@ The API layer exposes the same core reasoning in machine-readable form.
 |----------|--------|---------|
 | `/api/regime-alerts` | GET, POST | Read/create regime alert events |
 | `/api/decision-memory` | GET, POST | List/create decision memory entries |
-| `/api/alert-preferences` | GET, POST | Manage delivery preferences |
 | `/api/decision-events` | GET | Retrieve regime transition events |
 
 ### Integration & Agent APIs
@@ -322,7 +319,7 @@ The data layer uses structured files, live fetchers with fallback caches, and KV
 | `macro_snapshot.json` | Current macro indicators with sources |
 | `weekly_summaries_2018_2026.json` | Historical weekly briefs |
 | `monthly_summaries_2012_2025.json` | Monthly summaries |
-| `summary_archive_weekly.json` | Materialized weekly archive |
+| `summary_archive.json` | Materialized weekly, monthly, quarterly, and yearly summaries (Time Machine archive) |
 | `recommendations.ts` | Playbook insight database |
 
 ### Cache & fallback files
@@ -342,7 +339,7 @@ flowchart TD
     B --> C[Structured summary builders<br/>lib/summary/weeklySummary.ts<br/>lib/summary/monthlySummary.ts]
     C --> D[Copy renderer<br/>summary.copy derived from structured]
     C --> E[/api/weekly + /api/monthly<br/>structured + provenance + copy/]
-    F[data/summary_archive_weekly.json] --> G[parseSummaryArchive<br/>materialized hydration]
+    F[data/summary_archive.json] --> G[parseSummaryArchive<br/>materialized hydration]
     G --> C
 ```
 
