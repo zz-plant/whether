@@ -20,7 +20,7 @@ import { createHomePageReportDataLoader } from "../lib/report/homePageData";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { findPublishedBrief, getPublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
 import { loadReportData } from "../lib/report/reportData";
-import { buildReportDynamics, buildReportEvidenceItems } from "../lib/report/reportEvidence";
+import { buildActionNowShort, buildReportDynamics, buildReportEvidenceItems } from "../lib/report/reportEvidence";
 import { buildRegimeAlert } from "../lib/report/reportFormatting";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { snapshotData } from "../lib/snapshot";
@@ -261,5 +261,23 @@ describe("the assembled homepage on Oct 5, 2026", () => {
     assert.equal(replay.treasury.record_date.slice(0, 7), "2020-03");
     assert.equal(replay.reportDynamics.comparedWith?.recordDate.slice(0, 7), "2020-02");
     assert.deepEqual(replay.monthEndComparison?.comparedWith, replay.reportDynamics.comparedWith);
+  });
+});
+
+describe("the headline on a week that improved while a pause applies", () => {
+  it("holds rather than tells the reader to resume paused work", () => {
+    /* Against last week's brief, risk appetite rose 4 on Oct 5 while funding
+       pressure sat 14 points past the pause line for four areas. */
+    const paused = buildActionNowShort({ directionLabel: "improving", regimeChanged: false, regime: "SCARCITY", pauseApplies: true });
+    assert.equal(paused, "Conditions are holding. Keep spend flat and require paybacks inside 6 months.");
+    assert.doesNotMatch(paused, /Resume paused work/);
+    assert.match(
+      buildActionNowShort({ directionLabel: "improving", regimeChanged: false, regime: "SCARCITY", pauseApplies: false }),
+      /^Conditions are easing\./,
+    );
+    assert.match(
+      buildActionNowShort({ directionLabel: "deteriorating", regimeChanged: false, regime: "SCARCITY", pauseApplies: true }),
+      /^Conditions are tightening\./,
+    );
   });
 });

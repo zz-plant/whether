@@ -82,10 +82,21 @@ export const buildActionNowShort = ({
   directionLabel,
   regimeChanged,
   regime = "DEFENSIVE",
-}: Pick<ReportDynamics, "directionLabel" | "regimeChanged"> & { regime?: RegimeKey }): string => {
+  pauseApplies = false,
+}: Pick<ReportDynamics, "directionLabel" | "regimeChanged"> & {
+  regime?: RegimeKey;
+  /**
+   * True while any area's pause line is met. An improving week then holds
+   * rather than eases: against last week's brief a four-point rise in risk
+   * appetite made the Oct 5 Freezing headline "Conditions are easing. Resume
+   * paused work with clear milestones." with funding pressure fourteen points
+   * past the pause line for four areas.
+   */
+  pauseApplies?: boolean;
+}): string => {
   const tone: WeeklyTone =
     directionLabel === "improving"
-      ? "easing"
+      ? pauseApplies ? "holding" : "easing"
       : regimeChanged || directionLabel === "deteriorating"
         ? "tightening"
         : "holding";

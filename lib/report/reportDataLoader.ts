@@ -22,6 +22,7 @@ import { loadRegimeMachineSnapshot } from "../storage/regimeMachineSnapshotStore
 import type { PlaybookEntry } from "../playbook";
 import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
+import { isRuleConditionMet } from "./boundedDecisionRules";
 import { buildComparedWith } from "./comparisonBasis";
 import type { ComparisonReading } from "./comparisonReading";
 import { explainScoreMovement } from "./scoreMovement";
@@ -148,7 +149,9 @@ type ReportDataLoaderDependencies = {
     limit?: number;
     resolveGovernedAssessment?: (recordDate: string) => RegimeAssessment | null;
   }) => HistoricalAnalog[];
-  buildActionNowShort: (args: Pick<ReportDynamics, "directionLabel" | "regimeChanged"> & { regime?: RegimeAssessment["regime"] }) => string;
+  buildActionNowShort: (
+    args: Pick<ReportDynamics, "directionLabel" | "regimeChanged"> & { regime?: RegimeAssessment["regime"]; pauseApplies?: boolean },
+  ) => string;
   buildFlipThreshold: (assessment: RegimeAssessment) => string;
   buildReportEvidenceItems: (args: {
     reportDynamics: ReportDynamics;
@@ -286,6 +289,15 @@ const alignMacroSeriesToAsOf = (macroSeries: MacroSeriesReading[], asOf: string)
     },
   };
 };
+
+
+/* Whether any area's pause line is met by this reading, from the rule data
+   itself: the guidance bundle builds its strip items without scores, so their
+   `nearestPause` is unset here. */
+const anyPauseLineMet = (
+  items: readonly Pick<ActionStripItem, "pauseConditions">[],
+  scores: { tightness: number; riskAppetite: number },
+) => items.some((item) => (item.pauseConditions ?? []).some((condition) => isRuleConditionMet(condition, scores[condition.metric])));
 
 export const loadReportDataUncachedInternal = async ({
   searchParams,
@@ -602,7 +614,11 @@ export const loadReportDataUncachedInternal = async ({
     currentTrendDirection: reportDynamics.directionLabel,
     resolveGovernedAssessment,
   });
-  const actionNowShort = deps.buildActionNowShort({ ...reportDynamics, regime: assessment.regime });
+  const actionNowShort = deps.buildActionNowShort({
+    ...reportDynamics,
+    regime: assessment.regime,
+    pauseApplies: anyPauseLineMet(actionStripItems, assessment.scores),
+  });
   // A threshold, not a playbook "stop" item. This read stopItems[0], so the
   // guardrail slot on the trust and evidence pages carried lines like
   // "Over-engineering before demand proves out" under "Pause if:".
@@ -733,7 +749,11 @@ export const buildFallbackReportDataInternal = ({
     regimeChanged: false,
     directionLabel: "unavailable",
   };
-  const actionNowShort = deps.buildActionNowShort({ ...fallbackReportDynamics, regime: assessment.regime });
+  const actionNowShort = deps.buildActionNowShort({
+    ...fallbackReportDynamics,
+    regime: assessment.regime,
+    pauseApplies: anyPauseLineMet(actionStripItems, assessment.scores),
+  });
   // A threshold, not a playbook "stop" item. This read stopItems[0], so the
   // guardrail slot on the trust and evidence pages carried lines like
   // "Over-engineering before demand proves out" under "Pause if:".
