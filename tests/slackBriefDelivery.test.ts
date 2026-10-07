@@ -91,11 +91,22 @@ describe("Slack brief delivery", () => {
     }
   });
 
-  it("truncates past Slack's section limit instead of failing", () => {
-    const blocks = buildSlackBriefBlocks("x".repeat(4000), "2026-08-17");
-    const section = blocks[1] as { text: { text: string } };
-    assert.ok(section.text.text.length <= 3000);
-    assert.match(section.text.text, /truncated/);
+  /* The Monday post outgrew one section in October 2026 and was cut mid-word. */
+  it("carries a brief past Slack's section limit whole, across sections split between lines", () => {
+    const lines = Array.from({ length: 60 }, (_, index) => `• Line ${index}: ${"y".repeat(80)}`);
+    const brief = lines.join("\n");
+    const sections = buildSlackBriefBlocks(brief, "2026-08-17").flatMap((block) =>
+      block.type === "section" && typeof block.text?.text === "string" ? [block.text.text] : [],
+    );
+    assert.ok(sections.length > 1, "more than one section");
+    for (const text of sections) assert.ok(text.length <= 3000, `${text.length} characters`);
+    assert.equal(sections.join("\n"), brief, "nothing cut, no line split");
+    assert.doesNotMatch(sections.join("\n"), /truncated/);
+
+    const oneLine = buildSlackBriefBlocks("x".repeat(4000), "2026-08-17").flatMap((block) =>
+      block.type === "section" && typeof block.text?.text === "string" ? [block.text.text] : [],
+    );
+    assert.equal(oneLine.join(""), "x".repeat(4000), "a line longer than a section is split inside it");
   });
 
   it("delivers to webhooks registered in SlackWebhookStore", async () => {

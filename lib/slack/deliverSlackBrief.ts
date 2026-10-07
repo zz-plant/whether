@@ -46,18 +46,48 @@ type SlackDeliveryResult = {
 export const isSlackWebhookUrl = (value: string): boolean =>
   value.startsWith("https://hooks.slack.com/");
 
-/* Slack caps a section's mrkdwn text at 3000 characters. */
+/* Slack caps a section's mrkdwn text at 3000 characters, and a message at 50 blocks. */
 const SECTION_TEXT_LIMIT = 2900;
+const MAX_SECTIONS = 40;
+
+/**
+ * The brief as consecutive sections, each under Slack's limit, split between lines.
+ * It was one section cut at the limit, and the Monday post outgrew it: the ordinary
+ * week stopped at "Put a payback figure on every discretionar… (truncated — full
+ * brief on the site)" and the held week lost its "What to hold" list. A line longer
+ * than a section is split inside it; past MAX_SECTIONS the rest is cut, as before.
+ */
+const splitSectionText = (text: string): string[] => {
+  const sections: string[] = [];
+  let current = "";
+  for (const line of text.split("\n")) {
+    const pieces = line.length > SECTION_TEXT_LIMIT
+      ? Array.from({ length: Math.ceil(line.length / SECTION_TEXT_LIMIT) }, (_, index) =>
+          line.slice(index * SECTION_TEXT_LIMIT, (index + 1) * SECTION_TEXT_LIMIT))
+      : [line];
+    for (const piece of pieces) {
+      const next = current ? `${current}\n${piece}` : piece;
+      if (next.length > SECTION_TEXT_LIMIT && current) {
+        sections.push(current);
+        current = piece;
+      } else {
+        current = next;
+      }
+    }
+  }
+  if (current) sections.push(current);
+  if (sections.length <= MAX_SECTIONS) return sections;
+  const kept = sections.slice(0, MAX_SECTIONS);
+  kept[MAX_SECTIONS - 1] = `${kept[MAX_SECTIONS - 1]}\n… (truncated — full brief on the site)`;
+  return kept;
+};
 
 export const buildSlackBriefBlocks = (
   briefText: string,
   recordDate: string,
   options: { imageUrl?: string } = {},
 ) => {
-  const body =
-    briefText.length > SECTION_TEXT_LIMIT
-      ? `${briefText.slice(0, SECTION_TEXT_LIMIT)}\n… (truncated — full brief on the site)`
-      : briefText;
+  const sections = splitSectionText(briefText);
 
   return [
     { type: "header", text: { type: "plain_text", text: `Whether Weekly Brief — ${recordDate}` } },
@@ -66,7 +96,7 @@ export const buildSlackBriefBlocks = (
     ...(options.imageUrl
       ? [{ type: "image", image_url: options.imageUrl, alt_text: `Whether weekly guidance card for ${recordDate}` }]
       : []),
-    { type: "section", text: { type: "mrkdwn", text: body } },
+    ...sections.map((text) => ({ type: "section", text: { type: "mrkdwn", text } })),
     {
       type: "actions",
       elements: [
