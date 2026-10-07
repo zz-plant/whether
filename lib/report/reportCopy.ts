@@ -146,6 +146,16 @@ export const NO_LIVE_READING_CALL = {
   callChangesIf: "A live reading lands; until then the guidance is not changing.",
 } as const;
 
+/**
+ * What a past month prints where the record holds no value for an input. The
+ * macro series reach back about three months, so a replayed Mar 2020 has no
+ * borrowing premium, inflation or unemployment figure of its own; it printed
+ * this week's until 2026-10-07. Said, not left blank, so the gap reads as the
+ * record's and not as a page that failed to load. `period` names the month
+ * where the cell does not sit under it.
+ */
+export const describeMacroNotOnRecord = (period = "this month") => `Not on record for ${period}`;
+
 export const PRIMARY_AUDIENCE_SUMMARY =
   "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
 

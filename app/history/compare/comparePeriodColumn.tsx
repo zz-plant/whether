@@ -1,4 +1,4 @@
-import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
 import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
 import {
   classifyScoreBand,
@@ -28,8 +28,8 @@ export const findMacroValue = (series: MacroSeriesReading[] | undefined, id: Mac
   return typeof reading?.value === "number" ? reading.value : null;
 };
 
-const formatPercent = (value: number | null, digits = 2) =>
-  value === null ? "N/A" : `${value.toFixed(digits)}%`;
+const formatPercent = (value: number | null, digits = 2, missing = "N/A") =>
+  value === null ? missing : `${value.toFixed(digits)}%`;
 
 const SignalRow = ({ label, value, meaning }: { label: string; value: string; meaning?: string }) => (
   <tr className="border-b border-slate-800/50 last:border-0">
@@ -68,6 +68,9 @@ export function ComparePeriodColumn({
   const scores = report.assessment.scores;
   const spread = getCurveSpread(report.treasury.yields);
   const periodNoun = label.toLowerCase();
+  /* The macro series go back about three months; a replayed month further back
+     has no value of its own, and says so rather than borrowing this week's. */
+  const macroMissing = report.historicalSelection ? describeMacroNotOnRecord() : "N/A";
 
   return (
     <div className="space-y-6">
@@ -135,15 +138,15 @@ export function ComparePeriodColumn({
             <SignalRow
               label="Corporate borrowing premium"
               meaning="Extra interest mid-grade companies pay over the government."
-              value={formatPercent(findMacroValue(report.macroSeries, "BBB_CREDIT_SPREAD"))}
+              value={formatPercent(findMacroValue(report.macroSeries, "BBB_CREDIT_SPREAD"), 2, macroMissing)}
             />
             <SignalRow
               label="Inflation, year over year"
-              value={formatPercent(findMacroValue(report.macroSeries, "CPI_YOY"))}
+              value={formatPercent(findMacroValue(report.macroSeries, "CPI_YOY"), 2, macroMissing)}
             />
             <SignalRow
               label="Unemployment rate"
-              value={formatPercent(findMacroValue(report.macroSeries, "UNEMPLOYMENT_RATE"), 1)}
+              value={formatPercent(findMacroValue(report.macroSeries, "UNEMPLOYMENT_RATE"), 1, macroMissing)}
             />
           </tbody>
         </table>
