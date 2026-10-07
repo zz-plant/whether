@@ -12,6 +12,7 @@ import type { PublishedLine } from "./alertEvaluator";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { emailTextFooter, renderEmailShell } from "../email/emailShell";
 import { siteUrl } from "../siteUrl";
+import { formatScoreValue } from "../formatters";
 
 /** What a flash asks of the reader, in the mail's text and HTML alike. */
 const FLASH_GUIDANCE =
@@ -136,7 +137,11 @@ export const thresholdCrossingEmail = (
 ): EmailContent => {
   const metricLabel = regimeSignalLabel[line.metric];
   const lineName = LINE_NAME[line.kind];
-  const reading = `${metricLabel} is ${value.toFixed(1)}; ${lineName} is ${line.value}.`;
+  /* Whole points, the way every page and the brief print a score. This read
+     "Funding pressure is 90.0; the pause line is 76." and "90.0 / 76": a
+     decimal the scores are never published with, beside a line printed without one. */
+  const score = formatScoreValue(value);
+  const reading = `${metricLabel} is ${score}; ${lineName} is ${line.value}.`;
   const whatToDo = `It crossed ${value > line.value ? "above" : "below"} that line since the last alert. ${describeLineCrossing(line, value)}`;
   const subject = `Whether Alert — ${metricLabel} crossed ${lineName} (${line.value})`;
   const text = [
@@ -153,10 +158,10 @@ export const thresholdCrossingEmail = (
     body: [
       alertBanner(
         severity,
-        `<strong>${metricLabel}</strong> is <strong>${value.toFixed(1)}</strong>; ${lineName} is <strong>${line.value}</strong>. ${whatToDo}`,
+        `<strong>${metricLabel}</strong> is <strong>${score}</strong>; ${lineName} is <strong>${line.value}</strong>. ${whatToDo}`,
       ),
       `<div style="margin-top:12px;">`,
-      sectionBlock(metricLabel, `${value.toFixed(1)} / ${line.value}`, "#fbbf24", "#fde68a"),
+      sectionBlock(metricLabel, `${score} / ${line.value}`, "#fbbf24", "#fde68a"),
       `</div>`,
     ].join("\n"),
     unsubscribeToken,

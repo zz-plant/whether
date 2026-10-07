@@ -73,7 +73,7 @@ describe("score trend summary", () => {
   const points = (values: number[]) => values.map((value, index) => ({ label: index === values.length - 1 ? "Aug 2026" : `M${index}`, value }));
 
   it("reads one window per series, as the cells do", () => {
-    assert.deepEqual(summarizeScoreWindow(points([90, 63])), { first: 90, last: 63, delta: -27, periodLabel: "Aug 2026" });
+    assert.deepEqual(summarizeScoreWindow(points([90, 63])), { first: 90, last: 63, delta: -27, periodLabel: "Aug 2026", months: 1 });
     assert.equal(summarizeScoreWindow(points([90])), null, "one point is not a window");
   });
 
@@ -83,7 +83,13 @@ describe("score trend summary", () => {
         { label: "Funding pressure", points: points([90, 70, 63]) },
         { label: "Risk appetite", points: points([56, 60, 56.2]) },
       ]),
-      "Funding pressure down 27 to 63, risk appetite unchanged at 56 (3 month-ends to Aug 2026)",
+      "Funding pressure down 27 to 63, risk appetite unchanged at 56 (2 months to Aug 2026)",
+    );
+    /* Thirteen month-ends are a twelve-month move. Twelve were printed as one,
+       which is how an eleven-month change of -6 read as the year's. */
+    assert.match(
+      describeScoreTrendSummary([{ label: "Risk appetite", points: points([66, 62, 60, 62, 68, 70, 64, 52, 61, 59, 52, 59, 56]) }]) ?? "",
+      /^Risk appetite down 10 to 56 \(12 months to Aug 2026\)$/,
     );
     assert.equal(describeScoreTrendSummary([{ label: "Funding pressure", points: [] }]), null);
   });

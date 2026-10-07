@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { renderToStaticMarkup } from "react-dom/server";
 import {
   buildPostureArchivePath,
   findPostureArchivePeriod,
@@ -91,5 +92,65 @@ describe("posture archive index", () => {
 
   it("builds archive paths under the history hub", () => {
     assert.equal(buildPostureArchivePath("2022-q2"), "/history/2022-q2");
+  });
+
+  /* The quarterly and yearly entries reach back to 2010; the record starts at the
+     first month-end, Jan 31, 2012. The ten earlier periods had no readings behind
+     them and were listed beside "Record starts Jan 31, 2012" as closed years. */
+  it("starts where the record starts, with readings behind every period", () => {
+    for (const period of periods) {
+      assert.ok(period.asOf >= "2012-01-31", `${period.slug} closes before the record starts`);
+      assert.ok(period.sampleCount > 0 && period.regimeMix.length > 0, `${period.slug} has no readings behind it`);
+    }
+    assert.equal(isPostureArchiveSlug("2011"), false);
+    assert.equal(isPostureArchiveSlug("2010-q4"), false);
+    assert.ok(!postureArchiveYears.some((year) => Number(year.slug) < 2012));
+  });
+
+  /* /history/2022-q3 was headlined Stormy, with Stormy's guidance, over 9 Freezing
+     weeks of 14; /history/2018 was Stormy over 48 Sunny weeks of 52. */
+  it("headlines each period with the conditions most of its readings held, and words for those conditions", () => {
+    for (const period of periods) {
+      const most = Math.max(...period.regimeMix.map((share) => share.periods));
+      const held = period.regimeMix.find((share) => share.regime === period.regime);
+      assert.equal(held?.periods, most, `${period.slug} is headlined ${period.operatorLabel}, which held ${held?.periods ?? 0} of ${period.sampleCount}`);
+      assert.ok(period.headline.startsWith(`${period.operatorLabel} mode.`), `${period.slug}: "${period.headline}" is about other conditions`);
+    }
+    assert.equal(findPostureArchivePeriod("2022-q3")?.operatorLabel, "Freezing");
+    assert.equal(findPostureArchivePeriod("2018")?.operatorLabel, "Sunny");
+    /* A tie goes to the conditions in force at the close: 2022 split 22 Stormy, 22 Freezing. */
+    assert.equal(findPostureArchivePeriod("2022")?.operatorLabel, "Freezing");
+  });
+
+  it("lists each year's quarters under the conditions their own pages lead with", () => {
+    for (const year of periods.filter((period) => period.kind === "year")) {
+      for (const child of year.children) {
+        assert.equal(child.operatorLabel, findPostureArchivePeriod(child.slug)?.operatorLabel, `${year.slug} lists ${child.slug} differently`);
+      }
+    }
+  });
+});
+
+describe("/history/[period] says what its own split says", () => {
+  const render = async (period: string) => {
+    const page = await import("../app/history/[period]/page");
+    return renderToStaticMarkup(await page.default({ params: Promise.resolve({ period }) }));
+  };
+
+  it("leads a split period with the conditions most readings held and how it closed", async () => {
+    const html = await render("2018");
+    assert.match(html, />Mostly Sunny</);
+    assert.match(html, /Sunny for 48 of 52 weekly readings; Stormy at the close\./);
+    assert.doesNotMatch(html, /keep the plan flexible/, "Stormy's guidance for a year that was mostly Sunny");
+    assert.doesNotMatch(html, /for the whole period/);
+    /* A tie is not "mostly": 2022 split 22 Stormy, 22 Freezing. */
+    const tied = await render("2022");
+    assert.doesNotMatch(tied, /Mostly/);
+    assert.match(tied, /Freezing for 22 of 52 weekly readings, tied with Stormy\./);
+  });
+
+  it("says conditions held for the whole period only where every reading did", async () => {
+    assert.match(await render("2024"), /Conditions held at Freezing for the whole period\./);
+    assert.doesNotMatch(await render("2022-q3"), /for the whole period/);
   });
 });

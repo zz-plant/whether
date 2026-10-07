@@ -1,4 +1,7 @@
+import type { RegimeAssessment } from "../regimeEngine";
 import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecord } from "../report/confidence";
+import { buildFlipThreshold } from "../report/reportEvidence";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
 const CONFIDENCE_COPY = {
   HIGH: "The read is solid",
@@ -33,20 +36,27 @@ export const resolveSummaryConfidence = (
 ): SummaryConfidence =>
   SUMMARY_CONFIDENCE_BY_PUBLISHED_LABEL[resolvePublishedConfidence({ assessment, record }).label];
 
-const INTENSITY_COPY = {
-  STRONG: "the signals behind it are moving hard",
-  STANDARD: "the signals behind it are moving at a normal clip",
-  MILD: "the signals behind it are barely moving",
-} as const;
+/**
+ * Renders the published confidence as prose rather than a `Confidence: high`
+ * label, which reads like a debug dump in a shared artifact.
+ *
+ * It used to go on ", and the signals behind it are barely moving", worded from
+ * the engine's `diagnostics.intensity`. That band is not a speed: it is the raw
+ * distance from the nearer score to its line, so the Oct 5, 2026 week (risk
+ * appetite 2 points under its line) said "barely moving" while funding pressure
+ * had risen 27 points since Aug 31. What it actually measures is said by
+ * `formatConditionsChangeLine`, in the numbers every other surface prints.
+ */
+export const formatConfidenceSentence = (confidence: SummaryConfidence) =>
+  `${CONFIDENCE_COPY[confidence]}.`;
 
 /**
- * Renders confidence + intensity as prose rather than a `Confidence: high (mild
- * signal)` label pair, which reads like a debug dump in a shared artifact.
+ * "Conditions change if: …", the canonical sentence (`buildFlipThreshold`) under
+ * its canonical label, as the published brief's Slack and email copy print it:
+ * how far each score sits from the line where conditions change, in points.
  */
-export const formatConfidenceSentence = (
-  confidence: SummaryConfidence,
-  intensity: keyof typeof INTENSITY_COPY,
-) => `${CONFIDENCE_COPY[confidence]}, and ${INTENSITY_COPY[intensity]}.`;
+export const formatConditionsChangeLine = (assessment: RegimeAssessment) =>
+  `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildFlipThreshold(assessment)}`;
 
 type SourceLineInput = {
   sourceLabel: string;

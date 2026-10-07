@@ -36,7 +36,10 @@ export default async function SignalsPage({
   const model = await buildSignalsPageModel(resolvedSearchParams);
   const visibleRowKeys = new Set(model.changedSignalRows.map((row) => row.key));
   const rowHref = (key: RegimeSignalKey) => (visibleRowKeys.has(key) ? `#${key}` : `/signals#${key}`);
-  const monthlyRegimeHistory = getMonthlyRegimeHistory().slice(-12);
+  /* Thirteen month-ends, so the move the strip prints spans twelve months. It
+     took twelve and printed "-6 over 12 mo" for risk appetite, Sep 2025 to
+     Aug 2026 — eleven months; over twelve (from 66 in Aug 2025) it is -10. */
+  const monthlyRegimeHistory = getMonthlyRegimeHistory().slice(-13);
   const tightnessTrend = monthlyRegimeHistory.flatMap((entry) =>
     typeof entry.tightness === "number"
       ? [{ label: formatMonthYearShortFromValue(entry.record_date), value: entry.tightness }]

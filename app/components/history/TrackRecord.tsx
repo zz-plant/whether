@@ -190,7 +190,12 @@ export function TrackRecordTable({
   }
 
   const earlierRows = record.allRows.slice(record.rows.length);
-  const oldestShownDate = record.rows[record.rows.length - 1]?.recordDate ?? record.firstRecordDate;
+  /* The range is the earlier table's own ends, newest first like its rows. It
+     ended at the oldest row of the table *above* — "Jan 31, 2012 to Sep 30,
+     2025" over a table starting at Aug 29, 2025, with Sep 2025 already the last
+     of the twelve recent rows — so one month was claimed by both tables. */
+  const earlierNewestDate = earlierRows[0]?.recordDate;
+  const earlierOldestDate = earlierRows[earlierRows.length - 1]?.recordDate;
 
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
@@ -221,11 +226,11 @@ export function TrackRecordTable({
             rows={record.rows}
             caption={`The ${record.rows.length} most recent monthly readings, newest first, with the operating latitude score behind each one.`}
           />
-          {earlierRows.length > 0 ? (
+          {earlierNewestDate && earlierOldestDate ? (
             <div>
               <p className="mb-2 text-fluid-nano type-eyebrow text-slate-500">
                 Earlier months ({earlierRows.length.toLocaleString("en-US")}) ·{" "}
-                {formatDateUTC(record.firstRecordDate)} to {formatDateUTC(oldestShownDate)}
+                {formatDateUTC(earlierOldestDate)} to {formatDateUTC(earlierNewestDate)}
               </p>
               <RecordTable
                 rows={earlierRows}

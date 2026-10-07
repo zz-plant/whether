@@ -1,8 +1,10 @@
 import { buildComplianceStamp } from "../exportNotices";
+import { formatExportConfidenceWord } from "../export/exportTerms";
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
+import type { ConfidenceRecord } from "../report/confidence";
 import { joinSentences } from "../report/reportFormatting";
-import { formatSourceLine } from "./summaryFormatting";
+import { formatSourceLine, resolveSummaryConfidence } from "./summaryFormatting";
 
 export type CadenceSummaryProvenance = {
   sourceLabel: string;
@@ -21,6 +23,8 @@ type CadenceSummaryParams = {
   provenance: CadenceSummaryProvenance;
   recordDateLabel?: string;
   periodLabel?: string;
+  /** The record the reading came from, so a stale fallback lowers the stamp's confidence. */
+  record?: ConfidenceRecord | null;
 };
 
 type CadenceSummaryBase = {
@@ -46,6 +50,19 @@ const cadenceTitle: Record<CadenceSummaryName, string> = {
   yearly: "Yearly action summary",
 };
 
+/**
+ * The sentence a quarterly or yearly summary leads with: the conditions, what
+ * they mean, and the period's job. The archive index rebuilds it for a period
+ * whose readings mostly sat in other conditions than its closing reading did
+ * (`scripts/generatePostureArchiveIndex.ts`), so both say it the same way.
+ */
+export const buildCadenceSummarySentence = (
+  cadence: CadenceSummaryName,
+  regime: RegimeAssessment["regime"],
+  description: string,
+  guidance: string,
+) => joinSentences(`${getRegimePublicLabel(regime)} mode`, description, `${cadenceJobLine[cadence]} ${guidance}`);
+
 export const buildCadenceSummary = ({
   cadence,
   guidanceMap,
@@ -53,22 +70,22 @@ export const buildCadenceSummary = ({
   provenance,
   recordDateLabel,
   periodLabel,
+  record,
 }: CadenceSummaryParams): CadenceSummaryBase => {
   const regimeLabel = getRegimePublicLabel(assessment.regime);
   const guidance = guidanceMap[assessment.regime];
-  const summary = joinSentences(
-    `${regimeLabel} mode`,
-    assessment.description,
-    `${cadenceJobLine[cadence]} ${guidance}`,
-  );
+  const summary = buildCadenceSummarySentence(cadence, assessment.regime, assessment.description, guidance);
   const title = periodLabel
     ? `${cadenceTitle[cadence]} — ${periodLabel}`
     : cadenceTitle[cadence];
   const sourceLine = formatSourceLine(provenance);
+  // The published confidence word, as the weekly and monthly stamps print it. This
+  // printed `provenance.statusLabel` ("Canonical snapshot (high confidence)"), the
+  // data tier, which is not the confidence any page publishes.
   const complianceStamp = buildComplianceStamp({
     sourceLine,
     timestamp: provenance.timestampLabel,
-    confidence: provenance.statusLabel,
+    confidence: formatExportConfidenceWord(resolveSummaryConfidence(assessment, record)),
   });
 
   const copy = [
@@ -78,7 +95,7 @@ export const buildCadenceSummary = ({
     "Execution constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
-    "Source:",
+    // A bare "Source:" heading sat above this line, so the paste read "Source:\nSource: …".
     `Source: ${sourceLine}`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,

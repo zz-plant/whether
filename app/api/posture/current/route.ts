@@ -7,6 +7,8 @@ import { POSTURE_API_VERSION } from "../../../../lib/types";
 import { describeConditions, describeWeeklyDirection } from "../../../../lib/export/exportTerms";
 import { formatSignalReading } from "../../../../lib/report/signalTranslations";
 import { comparisonBasis } from "../../../../lib/report/comparisonBasis";
+import type { RegimeAssessment } from "../../../../lib/regimeEngine";
+import type { ReportDynamics } from "../../../../lib/report/reportDataTypes";
 
 export const runtime = "edge";
 
@@ -42,19 +44,7 @@ export async function GET() {
   const confidence = homeBriefModel.confidencePercent / 100;
   const week = reportData.treasury.record_date;
 
-  /*
-   * `summary` is the one field an integrator shows a person, so it is written
-   * in the page's words: the weather label with its meaning, the week's
-   * direction, and the funding score with its scale. It used to read
-   * "Expansion posture, stable, tightness 12/100" — the engine key, the word
-   * the site retired, and the internal score name. The machine fields beside
-   * it keep their names; renaming them would break the published contract.
-   */
-  const summary = [
-    `Conditions: ${describeConditions(regime)}.`,
-    `${comparisonBasis(reportData.reportDynamics.comparedWith).versus}: ${describeWeeklyDirection(direction)}.`,
-    `${formatSignalReading("tightness", reportData.assessment.scores.tightness)}.`,
-  ].join(" ");
+  const summary = buildPostureSummary(reportData);
 
   const body: PostureApiResponse = {
     regime,
@@ -76,6 +66,35 @@ export async function GET() {
     },
   });
 }
+
+/**
+ * `summary` is the one field an integrator shows a person, so it is written in
+ * the page's words: the weather label with its meaning, the direction since the
+ * reading it is compared with, and the funding score with its scale. It used to
+ * read "Expansion posture, stable, tightness 12/100" — the engine key, the word
+ * the site retired, and the internal score name. The machine fields beside it
+ * keep their names; renaming them would break the published contract.
+ *
+ * The direction clause read "…hard to raise). vs Aug 31: mixed." — a sentence
+ * opening lowercase, on a week both scores had worsened (the direction counted
+ * the scores' own inputs as votes; `buildReportDynamics` no longer does). It
+ * opens with "Since" now, and is left out when there was nothing to compare
+ * with rather than saying "not compared".
+ */
+export const buildPostureSummary = ({
+  assessment,
+  reportDynamics,
+}: {
+  assessment: Pick<RegimeAssessment, "regime" | "scores">;
+  reportDynamics: Pick<ReportDynamics, "directionLabel" | "comparedWith">;
+}): string =>
+  [
+    `Conditions: ${describeConditions(assessment.regime)}.`,
+    ...(reportDynamics.directionLabel === "unavailable"
+      ? []
+      : [`Since ${comparisonBasis(reportDynamics.comparedWith).reference}: ${describeWeeklyDirection(reportDynamics.directionLabel)}.`]),
+    `${formatSignalReading("tightness", assessment.scores.tightness)}.`,
+  ].join(" ");
 
 export async function OPTIONS() {
   return new NextResponse(null, {

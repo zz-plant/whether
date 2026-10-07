@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { GET } from "../app/feed.xml/route";
+import { formatDateUTC } from "../lib/formatters";
 import { buildPublishedBriefPath, getPublishedBriefs } from "../lib/report/publishedBriefs";
 import { siteUrl } from "../lib/siteUrl";
 
@@ -55,6 +56,24 @@ describe("feed.xml", () => {
     const outsideCdata = xml.replace(/<!\[CDATA\[[\s\S]*?\]\]>/g, "");
     assert.ok(!/&(?!amp;|lt;|gt;|quot;|#)/.test(outsideCdata), "no unescaped ampersand outside CDATA");
     assert.equal((xml.match(/<item>/g) ?? []).length, (xml.match(/<\/item>/g) ?? []).length);
+  });
+
+  /*
+   * The live item printed "Record date: Oct 9, 2026" (the week-ending Friday) under
+   * a guid and pubDate dated Oct 5, and its confidence as "Confidence: Medium
+   * confidence." Its record date is the one its guid names, and its confidence reads
+   * as the published items' do.
+   */
+  it("dates the live item by its record date and states confidence once", async () => {
+    const xml = await (await GET()).text();
+    const live = items(xml).find((block) => tag(block, "link") === `${siteUrl}/`);
+    if (!live) return; // the archive already carries this week
+
+    const recordDate = tag(live, "guid").replace("whether-brief-live-", "");
+    assert.match(recordDate, /^\d{4}-\d{2}-\d{2}$/);
+    assert.equal(tag(live, "pubDate"), new Date(recordDate).toUTCString());
+    assert.match(live, new RegExp(`<strong>Record date:</strong> ${formatDateUTC(recordDate)} · (High|Medium|Low) confidence</p>`));
+    assert.doesNotMatch(live, /Confidence:/);
   });
 
   it("is announced from the root layout", () => {

@@ -10,6 +10,8 @@ import {
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import { graph } from "../../../lib/seo/pageStructuredData";
 import { revisitDecisionPhrase } from "../../../lib/report/decisionTransmissionCopy";
+import { comparisonBasis } from "../../../lib/report/comparisonBasis";
+import { describeScoresMovement } from "../../../lib/report/evidenceReaderModel";
 import {
   canonicalCapitalDisciplinePath,
   findResourcePillarBySlug,
@@ -80,14 +82,18 @@ const buildSectionAnchor = (heading: string) =>
 const loadPostureLine = async (route: string) => {
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
   const { homeBriefModel, displayRegime } = snapshot;
+  /* The answer pages' direction and basis (app/answers/decisionAnswerCopy.ts):
+     this printed the engine's `directionLabel` "this week", which on Oct 5 was
+     "and mixed this week; revisit last week's decisions" for two scores that
+     had both worsened since Aug 31. */
+  const movement = describeScoresMovement(reportData.reportDynamics);
+  const basis = comparisonBasis(reportData.reportDynamics.comparedWith);
   const direction =
-    reportData.reportDynamics.directionLabel === "unavailable"
-      ? ", with no comparison to last week available"
-      : ` and ${reportData.reportDynamics.directionLabel} this week`;
+    movement === null ? ", with no comparison to last week available" : ` and ${movement} ${basis.since}`;
   return {
     reportData,
     snapshot,
-    postureSummary: `Conditions are ${displayRegime.label}${direction}; ${revisitDecisionPhrase(homeBriefModel.revisitDecisions)}.`,
+    postureSummary: `Conditions are ${displayRegime.label}${direction}; ${revisitDecisionPhrase(homeBriefModel.revisitDecisions, basis)}.`,
   };
 };
 

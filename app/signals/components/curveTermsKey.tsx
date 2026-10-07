@@ -1,7 +1,7 @@
 /**
  * Expands the bond-desk shorthand the curve charts are labelled in.
  *
- * The axes say "10Y-2Y", "2Y-3M", and "bp" because that is what fits in a 100-unit
+ * The axes say "10Y-2Y", "2Y-3M", "pp" and "bp" because that is what fits in a 100-unit
  * viewBox. That is fine for a reader who already trades bonds and unreadable for
  * everyone else, so every surface that renders those labels renders this key with
  * them. Shared so the curve surfaces cannot drift apart on what a term means.
@@ -11,7 +11,17 @@
  * end in a "Full glossary" link, and that page is gone.
  */
 
-type CurveTerm = "spread10Y2Y" | "spread2Y3M" | "maturities" | "bp";
+type CurveTerm = "spread10Y2Y" | "spread2Y3M" | "maturities" | "pp" | "bp";
+
+/**
+ * A spread's level — the recession warning gauge or its short-end sibling — in
+ * percentage points, the unit the gauge's row on the same page prints it in
+ * ("0.47pp"). The charts printed the one gauge three ways on one screen:
+ * "Latest: 0.42%" under the ribbon, "+41.0 bp" under the inversion lines, and
+ * 0.41pp in the row. A move in a rate stays in bp; a gap between two rates is
+ * this.
+ */
+export const formatSpread = (value: number | null) => (typeof value === "number" ? `${value.toFixed(2)}pp` : "n/a");
 
 const TERM_COPY: Record<CurveTerm, { label: string; toneClass: string; definition: string }> = {
   spread10Y2Y: {
@@ -28,6 +38,11 @@ const TERM_COPY: Record<CurveTerm, { label: string; toneClass: string; definitio
     label: "1M, 3M, 2Y, 10Y",
     toneClass: "text-slate-300",
     definition: "How long the government is borrowing for: one/three months, two/ten years.",
+  },
+  pp: {
+    label: "pp",
+    toneClass: "text-slate-300",
+    definition: "Percentage point — the unit of a gap between two rates: 5% minus 4% is 1pp.",
   },
   bp: {
     label: "bp",

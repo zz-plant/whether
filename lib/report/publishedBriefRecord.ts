@@ -11,18 +11,39 @@
  * wrong record (lib/report/briefPublishGuard.ts has the 2026-08-29 history).
  */
 import { formatIsoWeekSlug, getIsoWeekInfo, type IsoWeek } from "../isoWeek";
+import { previousScoresFromDynamics } from "../export/scoreReference";
 import { assessPublishReadiness } from "./briefPublishGuard";
 import type { PublishedBrief } from "./publishedBriefs";
-
-/** The signal's change since the previous read, or null when there is no prior week. */
-const weeklyDelta = (
-  reportData: { reportDynamics: { changedSignals: ReadonlyArray<{ key: string; delta: number }>; anomalySignals: ReadonlyArray<{ key: string; delta: number }> } },
-  key: "tightness" | "riskAppetite",
-): number | null =>
-  reportData.reportDynamics.changedSignals.find((signal) => signal.key === key)?.delta
-  ?? reportData.reportDynamics.anomalySignals.find((signal) => signal.key === key)?.delta
-  ?? null;
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "./weeklyBriefSnapshot";
+
+/**
+ * The two scores' moves, and the reading they are measured against.
+ *
+ * The comparison behind the week's dynamics is the previous month-end snapshot,
+ * not last week, and the record used to keep the moves without the date: w38,
+ * w39 and w40 all stored a move from Aug 31's 63/56, and the page printed each
+ * as "vs prior week". A move is stored only with the reading it is against, so
+ * a record with no named comparison stores none rather than one nobody can date.
+ * The earlier scores come from `previousScoresFromDynamics`, the derivation every
+ * paste and page shares, so a signal that moved under the reporting floor is a
+ * zero move rather than a missing one.
+ */
+const scoresWithComparison = (reportData: WeeklyBriefSnapshotResult["reportData"]): NonNullable<PublishedBrief["scores"]> => {
+  const current = {
+    tightness: reportData.assessment.scores.tightness,
+    riskAppetite: reportData.assessment.scores.riskAppetite,
+  };
+  const previous = previousScoresFromDynamics(reportData.reportDynamics, current);
+  const comparedWith = previous?.comparedWith;
+  if (!previous || !comparedWith) return { ...current, tightnessDelta: null, riskAppetiteDelta: null };
+  const move = (metric: keyof typeof current) => Math.round((current[metric] - previous[metric]) * 10) / 10;
+  return {
+    ...current,
+    tightnessDelta: move("tightness"),
+    riskAppetiteDelta: move("riskAppetite"),
+    comparedWith: { recordDate: comparedWith.recordDate, label: comparedWith.label },
+  };
+};
 
 type PublishedBriefRecordInput = {
   reportData: WeeklyBriefSnapshotResult["reportData"];
@@ -73,21 +94,16 @@ export const buildPublishedBriefRecord = ({
       pauseQualifier: rule.pause.qualifier,
       resumeQualifier: rule.resume.qualifier,
     })),
-    scores: {
-      tightness: reportData.assessment.scores.tightness,
-      riskAppetite: reportData.assessment.scores.riskAppetite,
-      /*
-       * The week-over-week move, from `reportDynamics`, because `/brief/[week]`
-       * renders these as "vs last week" and this archive is append-only and
-       * citable. They used to read `diagnostics`, whose two fields carry a
-       * distance from the regime threshold — so a week that moved nothing at
-       * all would have been published, permanently, as having moved by however
-       * far the score happened to sit above the line. No record carries the
-       * wrong number: the field predates every entry in the archive.
-       */
-      tightnessDelta: weeklyDelta(reportData, "tightness"),
-      riskAppetiteDelta: weeklyDelta(reportData, "riskAppetite"),
-    },
+    /*
+     * The moves come from `reportDynamics`. They used to read `diagnostics`,
+     * whose two fields carry a distance from the regime threshold — so a week
+     * that moved nothing at all would have been published, permanently, as
+     * having moved by however far the score sat above the line. A comment here
+     * then called the `reportDynamics` move "the week-over-week move", which it
+     * is not: it is the move since the previous month-end, and it now carries
+     * that reading's date (`scoresWithComparison`).
+     */
+    scores: scoresWithComparison(reportData),
     evidence: reportData.reportEvidenceItems.map((item) => ({
       title: item.title,
       detail: item.immediateImplication,

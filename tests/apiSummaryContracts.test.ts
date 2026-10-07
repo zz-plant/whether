@@ -4,6 +4,7 @@ import { GET as getWeeklyRoute } from "../app/api/weekly/route";
 import { GET as getMonthlyRoute } from "../app/api/monthly/route";
 import { GET as getQuarterlyRoute } from "../app/api/quarterly/route";
 import { GET as getYearlyRoute } from "../app/api/yearly/route";
+import { formatDateUTC, formatWeekEndingUTC } from "../lib/formatters";
 
 
 const CANONICAL_REGIMES = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
@@ -68,6 +69,25 @@ describe("summary route contracts", () => {
     const body = (await response.json()) as Record<string, unknown>;
     assertBaseSummaryContract(body);
     assertWeeklyMonthlyExtras(body);
+  });
+
+  /*
+   * The weekly summary was handed the week-ending Friday as its record date, so on
+   * Monday Oct 5, 2026 /api/weekly returned `recordDateLabel: "Oct 9, 2026"` and its
+   * paste said "Updated Oct 9, 2026", a date still in the future. The bundled
+   * reading is a Wednesday, so the two labels differ here too.
+   */
+  it("dates /api/weekly by the reading's record date, not the week-ending Friday", async () => {
+    const body = await (await getWeeklyRoute()).json();
+    const recordDate: string = body.agentHandoff.payload.report_date;
+    const recordDateLabel = formatDateUTC(recordDate);
+
+    assert.equal(body.recordDateLabel, recordDateLabel);
+    assert.equal(body.summary.title, `Weekly action summary — ${recordDateLabel}`);
+    assert.match(body.copy, new RegExp(`\\nUpdated ${recordDateLabel}\\n`));
+    if (formatWeekEndingUTC(recordDate) !== recordDateLabel) {
+      assert.ok(!body.copy.includes(formatWeekEndingUTC(recordDate)), "the week-ending Friday is not printed as the update date");
+    }
   });
 
   it("keeps /api/monthly response contract stable", async () => {

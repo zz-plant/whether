@@ -78,4 +78,60 @@ describe("buildWeeklySummary", () => {
     assert.equal(stale.confidence, "MEDIUM");
     assert.ok(stale.summary.includes("The read is workable but not settled"), stale.summary);
   });
+
+  /*
+   * The Oct 5, 2026 shape: Freezing, funding pressure 90 (20 over its line), risk
+   * appetite 48 (2 under). The summaries said "the signals behind it are barely
+   * moving" because the engine's intensity band is the raw distance to the
+   * nearer line (2 points), while funding pressure had risen 27 points since
+   * Aug 31. The sentence now states that distance, in the canonical words.
+   */
+  it("states how far each score sits from its line, not a speed it never measured", () => {
+    const record = {
+      source: "https://example.com/treasury",
+      record_date: "2026-10-05",
+      fetched_at: "2026-10-05T12:00:00.000Z",
+      isLive: true,
+      yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
+    };
+    const assessment = evaluateRegime(record);
+    assert.equal(assessment.regime, "SCARCITY");
+    assert.equal(assessment.scores.tightness, 90);
+    assert.equal(assessment.scores.riskAppetite, 48);
+    assert.equal(assessment.diagnostics.intensity, "MILD");
+
+    const provenance = { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" };
+    const changeLine =
+      "Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).";
+    for (const summary of [
+      buildWeeklySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
+      buildMonthlySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
+    ]) {
+      assert.ok(summary.summary.includes(`The read is workable but not settled. ${changeLine}`), summary.summary);
+      assert.doesNotMatch(summary.copy, /moving|barely/);
+    }
+  });
+
+  it("dates the paste by the record date it is handed and prints the published confidence", () => {
+    const record = {
+      source: "https://example.com/treasury",
+      record_date: "2026-10-05",
+      fetched_at: "2026-10-05T12:00:00.000Z",
+      isLive: true,
+      yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
+    };
+    const assessment = evaluateRegime(record);
+    const weekly = buildWeeklySummary({
+      assessment,
+      provenance: { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" },
+      recordDateLabel: "Oct 5, 2026",
+      record,
+    });
+
+    assert.equal(weekly.confidence, "MEDIUM");
+    assert.equal(weekly.title, "Weekly action summary — Oct 5, 2026");
+    assert.match(weekly.copy, /\nUpdated Oct 5, 2026\n/);
+    assert.match(weekly.copy, /\nConfidence: Medium\n/);
+    assert.doesNotMatch(weekly.copy, /high confidence|EXPLICIT_KILL_CRITERIA|SLOWER_STRUCTURED|REVERSIBLE_ONLY/);
+  });
 });

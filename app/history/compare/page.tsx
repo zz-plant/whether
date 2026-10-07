@@ -13,6 +13,7 @@ import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
 import { ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
 import { DateSelector, type DateOption } from "./DateSelector";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
+import { describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
 
 export const runtime = "edge";
 
@@ -95,6 +96,18 @@ export default async function HistoryComparePage({
 
   const bbbA = findMacroValue(reportA.macroSeries, "BBB_CREDIT_SPREAD");
   const bbbB = findMacroValue(reportB.macroSeries, "BBB_CREDIT_SPREAD");
+  /* A period with no premium on record is named, never read as zero. The detail
+     filled a missing side with `?? 0` and printed "0.00%" beside a real figure;
+     and while the report carried this week's macro series for every month, both
+     sides were today's, so it read "0.00% … 1.46% vs 1.46%" for Mar 2020. */
+  const bbbMissing = [
+    bbbA === null ? `Period A (${reportA.recordDateLabel})` : null,
+    bbbB === null ? `Period B (${reportB.recordDateLabel})` : null,
+  ].filter((entry): entry is string => entry !== null);
+  const bbbDetail =
+    bbbA !== null && bbbB !== null
+      ? `Extra interest mid-grade companies pay over the government: ${bbbA.toFixed(2)}% vs ${bbbB.toFixed(2)}%`
+      : `Extra interest mid-grade companies pay over the government. ${describeMacroNotOnRecord(bbbMissing.join(" or "))}.`;
 
   /* Each score drawn once, period A filled and period B hollow, against the
      lines in force for period A: its pause and resume lines from the rules it
@@ -201,8 +214,8 @@ export default async function HistoryComparePage({
                 from (Moody's BBB corporate yield over the 10-year Treasury). */}
             <StatTile
               label="Corporate borrowing premium, A minus B"
-              value={bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "N/A"}
-              detail={`Extra interest mid-grade companies pay over the government: ${(bbbA ?? 0).toFixed(2)}% vs ${(bbbB ?? 0).toFixed(2)}%`}
+              value={bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "—"}
+              detail={bbbDetail}
             />
           </div>
           <p className="mt-2 text-fluid-xs text-slate-400">

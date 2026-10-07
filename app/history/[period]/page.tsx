@@ -65,9 +65,44 @@ const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
 const DESCRIPTION_LIMIT = 160;
 const countChanges = (count: number) =>
   count === 0 ? "conditions held throughout" : count === 1 ? "conditions changed once" : `conditions changed ${count} times`;
+
+/*
+ * A period is headlined with the conditions that held for most of its readings
+ * (`scripts/generatePostureArchiveIndex.ts`); where the readings split, the tag
+ * says so. It was the closing reading from another series, bare: /history/2018
+ * was "Stormy" over 48 Sunny weeks of 52, and /history/2022-q3 was "Stormy" over
+ * 9 Freezing weeks of 14 that ended Freezing.
+ */
+const mixOf = (period: PostureArchivePeriod) => [...period.regimeMix].sort((left, right) => right.periods - left.periods);
+const isTied = (period: PostureArchivePeriod) => {
+  const mix = mixOf(period);
+  return mix.length > 1 && mix[0].periods === mix[1].periods;
+};
+const headlineConditions = (period: PostureArchivePeriod) => {
+  const label = toWeatherLabel(period.operatorLabel);
+  return period.regimeMix.length > 1 && !isTied(period) ? `Mostly ${label}` : label;
+};
+/** The conditions at the period's last reading: where its last change went, or what it held. */
+const closingConditions = (period: PostureArchivePeriod) =>
+  toWeatherLabel(period.transitions[period.transitions.length - 1]?.toLabel ?? period.operatorLabel);
+
+/** "Sunny for 48 of 52 weekly readings; Stormy at the close." The sentence the tag stands for. */
+const describeHeadline = (period: PostureArchivePeriod): string | null => {
+  const mix = mixOf(period);
+  const headline = mix.find((share) => share.regime === period.regime);
+  if (!headline || period.sampleCount <= 0) return null;
+  const label = toWeatherLabel(headline.label);
+  if (mix.length === 1) return `${label} for all ${period.sampleCount} ${cadenceNoun(period)}.`;
+  const tiedWith = mix.filter((share) => share.regime !== period.regime && share.periods === headline.periods);
+  const tie = tiedWith.length > 0 ? `, tied with ${tiedWith.map((share) => toWeatherLabel(share.label)).join(" and ")}` : "";
+  const closing = closingConditions(period);
+  const close = closing === label ? "" : `; ${closing} at the close`;
+  return `${label} for ${headline.periods} of ${period.sampleCount} ${cadenceNoun(period)}${tie}${close}.`;
+};
+
 const describePeriod = (period: PostureArchivePeriod) => {
   const label = toWeatherLabel(period.operatorLabel);
-  const lead = `Conditions in ${period.title} closed ${label}.`;
+  const lead = `Conditions in ${period.title} closed ${closingConditions(period)}.`;
   const unit = period.sampleCadence === "weekly" ? "weekly" : "monthly";
   const mix = [...period.regimeMix].sort((left, right) => right.periods - left.periods);
   const facts = period.sampleCount > 0 && mix.length > 0
@@ -81,8 +116,9 @@ const describePeriod = (period: PostureArchivePeriod) => {
  * The card's side panel: this period's own record, where every archive card used
  * to carry the same "A closed period" box. The count, the mix as a bar in the
  * regimes' colours, and how often conditions changed — the facts a link to 2022
- * has and a link to 2014 does not. The ten 2010–2011 periods have no readings
- * behind them and keep the fixed panel.
+ * has and a link to 2014 does not. A period with no readings behind it would
+ * keep the fixed panel; the ten 2010–2011 periods that had none predated the
+ * record and are no longer in the index.
  */
 const recordCardPanel = (period: PostureArchivePeriod): Record<string, string> => {
   if (period.sampleCount <= 0 || period.regimeMix.length === 0) return {};
@@ -130,7 +166,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   if (!period) return {};
 
   return buildPageMetadata({
-    title: `${period.title} conditions — ${toWeatherLabel(period.operatorLabel)}`,
+    title: `${period.title} conditions — ${headlineConditions(period)}`,
     description: describePeriod(period),
     path: buildPostureArchivePath(period.slug),
     imageAlt: `Whether's reading of conditions in ${period.title}`,
@@ -142,7 +178,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     imageParams: {
       template: "record",
       eyebrow: "History",
-      title: `${period.title}: ${toWeatherLabel(period.operatorLabel)}`,
+      title: `${period.title}: ${headlineConditions(period)}`,
       /* The fact half only ("Money is cheap and available."): the instruction half
          is advice for this week, not for a closed year. */
       subtitle: getRegimeWeatherRationale(period.regime).split(/(?<=\.)\s/)[0] ?? "",
@@ -158,6 +194,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
   if (!period) notFound();
 
+  const headlineSentence = describeHeadline(period);
   const parent = period.parentSlug ? findPostureArchivePeriod(period.parentSlug) : undefined;
   const previous = period.previousSlug ? findPostureArchivePeriod(period.previousSlug) : undefined;
   const next = period.nextSlug ? findPostureArchivePeriod(period.nextSlug) : undefined;
@@ -170,7 +207,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
   const articleStructuredData = graph([
     {
       "@type": "Article",
-      headline: `${period.title} conditions — ${toWeatherLabel(period.operatorLabel)}`,
+      headline: `${period.title} conditions — ${headlineConditions(period)}`,
       description: describePeriod(period),
       datePublished: period.asOf,
       dateModified: period.asOf,
@@ -204,11 +241,12 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           period is closed. */}
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div>
-          <Tag tone={regimeTone[period.regime]}>{toWeatherLabel(period.operatorLabel)}</Tag>
+          <Tag tone={regimeTone[period.regime]}>{headlineConditions(period)}</Tag>
         </div>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           Conditions in {period.title}
         </h1>
+        {headlineSentence ? <p className="text-sm font-semibold text-slate-100">{headlineSentence}</p> : null}
         <p className="text-sm text-slate-300">{period.headline}</p>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">Standing guidance:</span> {period.guidance}
@@ -275,14 +313,16 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
             ))}
           </ul>
         </section>
-      ) : (
+      ) : period.regimeMix.length === 1 ? (
+        /* Only where every reading inside the period says so. /history/2011 printed
+           it with no readings at all, above its own Sunny Q1 and Q2. */
         <section className="weather-panel space-y-2 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Changes in conditions inside {period.title}</h2>
           <p className="text-sm text-slate-300">
-            Conditions held at {toWeatherLabel(period.operatorLabel)} for the whole period.
+            Conditions held at {toWeatherLabel(period.regimeMix[0].label)} for the whole period.
           </p>
         </section>
-      )}
+      ) : null}
 
       {period.rates.length ? (
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">

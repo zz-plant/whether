@@ -69,27 +69,39 @@ export const describeInversionSummary = ({
 };
 
 /**
- * One sparkline's window: its first and last points and the move between
- * them. The strip's cells print these and the summary over the strip reads
- * them, so the two quote the same numbers.
+ * One sparkline's window: its first and last points, the move between them,
+ * and how many months that move spans. The strip's cells print these and the
+ * summary over the strip reads them, so the two quote the same numbers.
+ *
+ * `months` is the gaps between consecutive month-ends, one fewer than the
+ * points. The strip used to label its window with the point count, so twelve
+ * month-ends (Sep 2025 to Aug 2026) printed "-6 over 12 mo" for a move that
+ * spans eleven; the twelve months to Aug 2026 start at Aug 2025, where risk
+ * appetite was 66, and the move is -10.
  */
 export const summarizeScoreWindow = (points: ReadonlyArray<{ label: string; value: number }>) => {
   const first = points[0];
   const last = points[points.length - 1];
   if (!first || !last || points.length < 2) return null;
-  return { first: first.value, last: last.value, delta: last.value - first.value, periodLabel: last.label };
+  return {
+    first: first.value,
+    last: last.value,
+    delta: last.value - first.value,
+    periodLabel: last.label,
+    months: points.length - 1,
+  };
 };
 
 /**
- * "Funding pressure down 27 to 63, risk appetite down 6 to 56 (12 month-ends
- * to Aug 2026)". Rounded as the cells round. Null when no series can be drawn.
+ * "Funding pressure down 27 to 63, risk appetite down 10 to 56 (12 months to
+ * Aug 2026)". Rounded as the cells round. Null when no series can be drawn.
  */
 export const describeScoreTrendSummary = (
   series: ReadonlyArray<{ label: string; points: ReadonlyArray<{ label: string; value: number }> }>,
 ): string | null => {
   const windows = series.flatMap((item) => {
     const window = summarizeScoreWindow(item.points);
-    return window ? [{ label: item.label, months: item.points.length, ...window }] : [];
+    return window ? [{ label: item.label, ...window }] : [];
   });
   const lead = windows[0];
   if (!lead) return null;
@@ -100,7 +112,7 @@ export const describeScoreTrendSummary = (
     if (moved === 0) return `${name} unchanged at ${last}`;
     return `${name} ${moved > 0 ? "up" : "down"} ${Math.abs(moved)} to ${last}`;
   });
-  return `${clauses.join(", ")} (${lead.months} month-ends to ${lead.periodLabel})`;
+  return `${clauses.join(", ")} (${lead.months} ${lead.months === 1 ? "month" : "months"} to ${lead.periodLabel})`;
 };
 
 /** The lines a reading is judged against, named: "rate 3.5% · funding pressure 70 · risk appetite 50". */

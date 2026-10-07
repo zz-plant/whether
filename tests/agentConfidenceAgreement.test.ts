@@ -40,15 +40,11 @@ describe("the agent interface's confidence", () => {
     assert.deepEqual(brief.confidence, { label: published.confidenceLabel, percent: published.confidencePercent });
     assert.equal(brief.summary.confidence, publishedInEngineWords);
     assert.ok(
-      brief.summary.summary.includes(
-        formatConfidenceSentence(publishedInEngineWords, disagreeing.reportData.assessment.diagnostics.intensity),
-      ),
+      brief.summary.summary.includes(formatConfidenceSentence(publishedInEngineWords)),
       "the prose says what the field says",
     );
     assert.ok(
-      !brief.summary.summary.includes(
-        formatConfidenceSentence(engineLabel === "LOW" ? "LOW" : "HIGH", disagreeing.reportData.assessment.diagnostics.intensity),
-      ),
+      !brief.summary.summary.includes(formatConfidenceSentence(engineLabel === "LOW" ? "LOW" : "HIGH")),
       "and not what the engine's gate says",
     );
   });
@@ -76,9 +72,11 @@ describe("the agent interface's confidence", () => {
     const feed = await (await getFeed()).text();
 
     assert.ok(
-      feed.includes(`Confidence: ${formatConfidenceChipLabel(expected.label)}.`),
+      feed.includes(`. ${formatConfidenceChipLabel(expected.label)}.</description>`),
       "the live item carries the published confidence, not the engine's code",
     );
     assert.doesNotMatch(feed, /Confidence: (LOW|MEDIUM|HIGH)\b/);
+    // The phrase names itself; under a label it read "Confidence: Medium confidence."
+    assert.doesNotMatch(feed, /Confidence:(<\/strong>)? (High|Medium|Low) confidence/);
   });
 });

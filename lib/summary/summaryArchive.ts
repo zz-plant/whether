@@ -161,7 +161,6 @@ const MonthlySummaryArchiveSchema = BaseSummarySchema.extend({
     regimeLabel: summary.regimeLabel,
     guidance: summary.guidance,
     confidence: summary.confidence,
-    intensity: summary.intensity,
     transitionWatch: summary.transitionWatch,
     constraints: summary.constraints,
     provenance: summary.provenance,

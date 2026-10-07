@@ -3,11 +3,6 @@ import { comparisonBasis, type ComparisonBasis } from "./comparisonBasis";
 
 type TrendLabel = "Strengthening" | "Flat" | "Cooling";
 
-type WindowThresholds = {
-  open: number;
-  strong: number;
-};
-
 type WeeklyLeadershipAssessment = Pick<RegimeAssessment, "regime"> & {
   scores: {
     tightness: RegimeAssessment["scores"]["tightness"];
@@ -41,16 +36,6 @@ export const toTrendLabel = (delta: number): TrendLabel => {
     return "Cooling";
   }
   return "Flat";
-};
-
-export const getWindowState = (value: number, thresholds: WindowThresholds) => {
-  if (value >= thresholds.strong) {
-    return "Strong";
-  }
-  if (value >= thresholds.open) {
-    return "Open";
-  }
-  return "Constrained";
 };
 
 /**
@@ -100,21 +85,13 @@ export const buildWeeklyLeadershipBriefModel = ({
     : boldnessScore;
   const boldnessDelta = boldnessScore - previousBoldness;
 
-  const hiringWindow = getWindowState(100 - assessment.scores.tightness, {
-    open: 38,
-    strong: 64,
-  });
-  const expansionWindow = getWindowState(assessment.scores.riskAppetite, {
-    open: 45,
-    strong: 65,
-  });
-  const previousHiringWindow = previousAssessment
-    ? getWindowState(100 - previousAssessment.scores.tightness, {
-        open: 38,
-        strong: 64,
-      })
-    : hiringWindow;
-
+  /* No hiring, expansion or fundraising "window" any more. Each graded a score
+     against cutoffs no rule publishes (100 minus funding pressure at 38/64, risk
+     appetite at 45/65, the boldness move at ±2), and /history/compare, the one
+     surface that printed them, showed "Expansion pace: Open" beside "Freeze new
+     commitments". It prints each area against its own pause line now
+     (`describeAreaPauseStatus`). `revisitYes`, read nowhere, went with the
+     hiring window it compared. */
   const tightnessDelta = previousAssessment
     ? assessment.scores.tightness - previousAssessment.scores.tightness
     : 0;
@@ -130,16 +107,11 @@ export const buildWeeklyLeadershipBriefModel = ({
   return {
     boldnessScore,
     boldnessDelta,
-    hiringWindow,
-    expansionWindow,
-    raiseWindow:
-      boldnessDelta >= 2 ? "Improving" : boldnessDelta <= -2 ? "Narrowing" : "Stable",
     expansionTrend: toTrendLabel(
       assessment.scores.riskAppetite -
         (previousAssessment?.scores.riskAppetite ?? assessment.scores.riskAppetite),
     ),
     stabilityWeeks: Math.max(stabilityWeeks, 1),
-    revisitYes: Math.abs(boldnessDelta) >= 6 || hiringWindow !== previousHiringWindow,
     tightnessDelta,
     riskDelta,
     curveDelta,
