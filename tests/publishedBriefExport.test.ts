@@ -4,6 +4,7 @@ import {
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefSlackUpdate,
   findPublishedBrief,
+  publishedBriefDisplay,
   type PublishedBrief,
 } from "../lib/report/publishedBriefs";
 import { buildCanonicalUrl } from "../lib/seo";
@@ -17,7 +18,13 @@ describe("published brief readings block", () => {
     assert.ok(base);
     const brief: PublishedBrief = {
       ...base,
-      scores: { tightness: 32, riskAppetite: 52, tightnessDelta: -8, riskAppetiteDelta: -7 },
+      scores: {
+        tightness: 32,
+        riskAppetite: 52,
+        tightnessDelta: -8,
+        riskAppetiteDelta: -7,
+        comparedWith: { recordDate: "2026-06-30", label: "Jun 30" },
+      },
       decisions: [
         {
           ...base.decisions[0],
@@ -27,15 +34,127 @@ describe("published brief readings block", () => {
       ],
     };
 
-    /* Value, the line it is judged against, the distance, last week — the four
-       parts `formatScoreReference` prints wherever a score appears, so the
-       archive reads the way the page does. */
+    /* Value, the line it is judged against, the distance, the earlier reading — the
+       four parts `formatScoreReference` prints wherever a score appears, so the
+       archive reads the way the page does. The earlier reading carries its date. */
     assert.deepEqual(buildPublishedBriefReadingLines(brief), [
-      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · pause line 76 · 44 pts below · last week 40 · resume line 66 (already met)",
-      "Risk appetite 52 of 100 (investors are selective about risk) · pause line 44 · 8 pts above · last week 59 · resume line 54 (2 pts away)",
+      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · pause line 76 · 44 pts below · was 40 on Jun 30 · resume line 66 (already met)",
+      "Risk appetite 52 of 100 (investors are selective about risk) · pause line 44 · 8 pts above · was 59 on Jun 30 · resume line 54 (2 pts away)",
     ]);
     assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure 32 of 100/);
     assert.deepEqual(buildPublishedBriefReadingLines(base), [], "a record frozen without scores prints no readings block");
+
+    /* A move with no named reading and no frozen week before it prints no earlier reading at all. */
+    const lines = buildPublishedBriefReadingLines({
+      ...brief,
+      scores: { tightness: 32, riskAppetite: 52, tightnessDelta: -8, riskAppetiteDelta: -7 },
+    });
+    assert.equal(lines.length, 2);
+    for (const line of lines) assert.doesNotMatch(line, /last week|was \d+ on/);
+  });
+});
+
+/*
+ * w38, w39 and w40 stored their moves against Aug 31 (63/56) without saying so,
+ * and the page printed them as "+27.0 vs prior week" and the pastes as "last week
+ * 63" — three consecutive weeks claiming the same "last week". A record that names
+ * no reading is measured against the frozen week before it, in whole points.
+ */
+describe("published brief comparisons", () => {
+  it("measures an undated record against the frozen week before it", () => {
+    const w40 = findPublishedBrief("2026-w40");
+    assert.ok(w40?.scores);
+    assert.equal(w40.scores.comparedWith, undefined, "the fixture is a record frozen before the date was stored");
+    const display = publishedBriefDisplay(w40);
+    assert.equal(display.scoreChange("tightness"), "+5 vs Sep 22");
+    assert.equal(display.scoreChange("riskAppetite"), "+5 vs Sep 22");
+    const slack = buildPublishedBriefSlackUpdate(w40);
+    assert.match(slack, /Funding pressure 90 of 100 .* · was 85 on Sep 22 ·/);
+    assert.doesNotMatch(slack, /last week 63|vs prior week/);
+  });
+
+  it("prints no move for a record with no named reading and no frozen week before it", () => {
+    const w38 = findPublishedBrief("2026-w38");
+    assert.ok(w38?.scores);
+    const display = publishedBriefDisplay(w38);
+    assert.equal(display.scoreChange("tightness"), null);
+    assert.equal(display.previous, null);
+    assert.doesNotMatch(buildPublishedBriefSlackUpdate(w38), /last week|was \d+ on/);
+  });
+
+  it("uses the reading a record names over the week before it", () => {
+    const w40 = findPublishedBrief("2026-w40");
+    assert.ok(w40?.scores);
+    const dated: PublishedBrief = {
+      ...w40,
+      scores: { ...w40.scores, comparedWith: { recordDate: "2026-08-31", label: "Aug 31" } },
+    };
+    assert.equal(publishedBriefDisplay(dated).scoreChange("tightness"), "+27 vs Aug 31", "whole points, named by the reading");
+  });
+
+  it("replaces the retired movement sentence with the move the record can name", () => {
+    const w39 = findPublishedBrief("2026-w39");
+    const w38 = findPublishedBrief("2026-w38");
+    assert.ok(w39 && w38);
+    assert.match(w39.whatChanged, /^Pressure increased by \+3\.0 this week/, "the stored record is untouched");
+    assert.equal(publishedBriefDisplay(w39).whatChanged, "The scores moved toward tighter money since Sep 15.");
+    assert.equal(
+      publishedBriefDisplay(w38).whatChanged,
+      "Conditions tightened. This record does not name the earlier reading it compared with.",
+    );
+    const w40 = findPublishedBrief("2026-w40");
+    assert.ok(w40);
+    assert.equal(publishedBriefDisplay(w40).whatChanged, w40.whatChanged, "a sentence that names its reading is kept");
+  });
+});
+
+/*
+ * The first record was frozen with the engine's names: "Cash availability" for the
+ * funding-pressure score (so "cash availability tightens above 76" read as its
+ * opposite), "Market risk appetite", "flips this call" with "70.0" and "52.0", and an
+ * avoid-list item ("Over-engineering before demand proves out") in the pause slot.
+ */
+describe("published brief stored-sentence translation", () => {
+  it("restates w31's change line in the form later records carry", () => {
+    const w31 = findPublishedBrief("2026-w31");
+    assert.ok(w31);
+    assert.equal(
+      publishedBriefDisplay(w31).conditionsChangeIf,
+      "Funding pressure above 70 (52 today) or risk appetite at or below 50 (58 today).",
+    );
+  });
+
+  it("puts a crossed line first and keeps a sentence it cannot parse in today's words", () => {
+    const w31 = findPublishedBrief("2026-w31");
+    assert.ok(w31);
+    const crossed = publishedBriefDisplay({
+      ...w31,
+      flipThreshold:
+        "One flip condition is already tripped. Cash availability flips this call if it climbs above 70.0, from 52.0 today. Market risk appetite is already in the flip zone at 48.0 and only has to stay at or below 50.0.",
+    }).conditionsChangeIf;
+    assert.equal(crossed, "Risk appetite at or below 50 (already true at 48) or funding pressure above 70 (52 today).");
+    const unparsed = publishedBriefDisplay({ ...w31, flipThreshold: "Cash availability climbs above 70.0." }).conditionsChangeIf;
+    assert.equal(unparsed, "Funding pressure climbs above 70.");
+  });
+
+  it("translates retired signal names and whole points without touching a rate", () => {
+    const w31 = findPublishedBrief("2026-w31");
+    assert.ok(w31);
+    const { sentence } = publishedBriefDisplay(w31);
+    assert.equal(
+      sentence("Pause net-new hiring if cash availability tightens above 76 or market risk appetite falls below 44."),
+      "Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44.",
+    );
+    assert.equal(sentence("Cash availability eases below 66.0"), "Funding pressure falls below 66");
+    assert.equal(sentence("after the curve returns above 0.0%"), "after the curve returns above 0.0%");
+  });
+
+  it("leaves the pause slot out where the record stored no line", () => {
+    const w31 = findPublishedBrief("2026-w31");
+    const w40 = findPublishedBrief("2026-w40");
+    assert.ok(w31 && w40);
+    assert.equal(publishedBriefDisplay(w31).pauseIf, null);
+    assert.equal(publishedBriefDisplay(w40).pauseIf, w40.guardrailThreshold);
   });
 });
 
@@ -55,18 +174,22 @@ describe("published brief date-pinned exports", () => {
 
     assert.match(slack, /Whether Weekly Brief — Jul 30, 2026/);
     assert.match(slack, /Conditions: (Sunny|Cloudy|Stormy|Freezing) \(medium confidence\)/);
-    assert.match(slack, /• What changed: Pressure increased by \+1\.2 this week\./);
+    /* The stored sentences, as the display layer restates them (`publishedBriefDisplay`):
+       no "+1.2" in no unit, no "flips this call", no stop-item under "Pause if". */
+    assert.match(slack, /• What changed: Conditions tightened\. This record does not name the earlier reading it compared with\./);
     assert.match(slack, /• Guidance: Keep expansion selective/);
     assert.match(slack, /• Do now: Conditions tightening — freeze new commitments and keep spend flexible\./);
-    assert.match(slack, /• Pause if: Over-engineering before demand proves out/);
-    assert.match(slack, /• Conditions change if: No flip condition is tripped yet\./);
+    assert.match(slack, /This week's decision \(Guidance \/ Do now \/ Conditions change if\):/);
+    assert.doesNotMatch(slack, /Over-engineering/);
+    assert.match(slack, /• Conditions change if: Funding pressure above 70 \(52 today\) or risk appetite at or below 50 \(58 today\)\./);
+    assert.doesNotMatch(slack, /flip|Cash availability|cash availability|Market risk appetite|market risk appetite|\d\.0\b(?!%)/);
 
     // Area-level bounded decisions
     assert.match(slack, /• Hiring: Selective hiring for revenue-linked and reliability roles\./);
     assert.match(slack, /Do now: Prioritize revenue-linked and reliability roles/);
-    assert.match(slack, /Pause if: Pause net-new hiring/);
+    assert.match(slack, /Pause if: Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44\./);
     // The rule's own verb is dropped, so the label is not said twice.
-    assert.match(slack, /Resume when: Cash availability eases below 66 and market risk appetite is above 54/);
+    assert.match(slack, /Resume when: Funding pressure falls below 66 and risk appetite is above 54/);
     assert.doesNotMatch(slack, /Resume when: Resume/);
 
     // Provenance
@@ -87,16 +210,18 @@ describe("published brief date-pinned exports", () => {
     assert.match(email, /Conditions: (Sunny|Cloudy|Stormy|Freezing)\n/);
     assert.match(email, /Confidence: Medium confidence/);
     assert.match(email, /Executive summary: Keep expansion selective/);
-    assert.match(email, /What changed this week:\nPressure increased by \+1\.2 this week\./);
+    assert.match(email, /What changed this week:\nConditions tightened\. This record does not name the earlier reading it compared with\./);
     assert.match(email, /• Action now: Conditions tightening — freeze new commitments and keep spend flexible\./);
-    assert.ok(email.includes(`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: Over-engineering before demand proves out`));
-    assert.ok(email.includes(`• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: No flip condition is tripped yet.`));
+    assert.ok(!email.includes(`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: Over-engineering`), "a stop-item is not a pause line");
+    assert.ok(
+      email.includes(`• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: Funding pressure above 70 (52 today) or risk appetite at or below 50 (58 today).`),
+    );
 
     // Area decisions
     assert.match(email, /• Roadmap: Speed up product work tied to activation and retention goals\./);
     assert.match(email, /- Action: Speed up on product bets/);
-    assert.match(email, /- Pause if: Pause long-payback bets/);
-    assert.match(email, /- Resume when: Market risk appetite is above 54/);
+    assert.match(email, /- Pause if: Pause long-payback bets if risk appetite falls below 44/);
+    assert.match(email, /- Resume when: Risk appetite is above 54/);
     assert.doesNotMatch(email, /Resume when: Resume/);
 
     // Provenance & citations

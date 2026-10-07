@@ -1,4 +1,3 @@
-import { formatSignedDeltaOrNull } from "../../../lib/formatters";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
@@ -54,8 +53,6 @@ const nearestLine = (
     .map((line) => toThresholdDistance(line, scores))
     .sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
 
-const formatDelta = formatSignedDeltaOrNull;
-
 type Params = { week: string };
 
 /**
@@ -76,7 +73,7 @@ const briefTitle = buildPublishedBriefTitle;
    what changed. */
 const BRIEF_DESCRIPTION_LIMIT = 160;
 const briefDescription = (brief: PublishedBrief) => {
-  const full = `${brief.summary} What changed: ${brief.whatChanged}`;
+  const full = `${brief.summary} What changed: ${publishedBriefDisplay(brief).whatChanged}`;
   return full.length <= BRIEF_DESCRIPTION_LIMIT ? full : brief.summary;
 };
 
@@ -132,10 +129,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         scores: brief.scores,
       })
     : [];
+  /* Each move names the reading it is against ("+5 vs Sep 22"). This printed
+     the stored delta as "+27.0 vs prior week" on w40, and the delta was against
+     Aug 31: five weeks, a decimal the scores never had, and the wrong week. */
   const readings = brief.scores
     ? [
-        { key: "tightness" as const, label: regimeSignalLabel.tightness, value: brief.scores.tightness, delta: formatDelta(brief.scores.tightnessDelta), worseWhenUp: true },
-        { key: "riskAppetite" as const, label: regimeSignalLabel.riskAppetite, value: brief.scores.riskAppetite, delta: formatDelta(brief.scores.riskAppetiteDelta), worseWhenUp: false },
+        { key: "tightness" as const, label: regimeSignalLabel.tightness, value: brief.scores.tightness, change: display.scoreChange("tightness"), worseWhenUp: true },
+        { key: "riskAppetite" as const, label: regimeSignalLabel.riskAppetite, value: brief.scores.riskAppetite, change: display.scoreChange("riskAppetite"), worseWhenUp: false },
       ]
     : [];
   const frozenScores = brief.scores;
@@ -187,8 +187,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             ...(brief.actionNow.trim() !== brief.summary.trim()
               ? [{ label: DECISION_CONTRACT_LABELS.action.doNow, value: brief.actionNow }]
               : []),
-            { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: brief.guardrailThreshold },
-            { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: brief.flipThreshold },
+            ...(display.pauseIf ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: display.pauseIf }] : []),
+            { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
           ]}
           trust={null}
           captionDetail={`Week of ${brief.recordDateLabel} · ${display.confidence}`}
@@ -227,7 +227,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             delta. */}
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">What changed this week</h2>
-          <p className="text-sm text-slate-300">{brief.whatChanged}</p>
+          <p className="text-sm text-slate-300">{display.whatChanged}</p>
         </section>
 
         <PublishedBriefCopyControls
@@ -243,8 +243,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             <dl className="grid gap-4 sm:grid-cols-2">
               {readings.map((reading) => {
                 const rail = rails.find((candidate) => candidate.metric === reading.key);
-                const deltaUp = reading.delta?.startsWith("+");
-                const deltaTone = reading.delta
+                const deltaUp = reading.change?.startsWith("+");
+                const deltaTone = reading.change
                   ? deltaUp === reading.worseWhenUp
                     ? "text-semantic-caution-fg"
                     : "text-semantic-easing-fg"
@@ -255,7 +255,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                     <dd className="mt-0.5 flex items-baseline gap-2 tabular-nums">
                       <span className="text-2xl font-semibold text-slate-100">{reading.value}</span>
                       <span className="text-sm text-slate-500">/100</span>
-                      {reading.delta ? <span className={`text-sm ${deltaTone}`}>{reading.delta} vs prior week</span> : null}
+                      {reading.change ? <span className={`text-sm ${deltaTone}`}>{reading.change}</span> : null}
                     </dd>
                     {/* What the number meant that week, so a cited record does not
                         need the reader to know which end of the scale is bad. */}
@@ -328,11 +328,11 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                     {brief.decisions.map((decision) => (
                       <tr key={decision.area} className="border-b border-slate-800/50 align-top">
                         <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">{labelForArea(decision.area)}</th>
-                        <td className="py-2 pr-3" data-label={DECISION_CONTRACT_LABELS.action.doNow}>{decision.doNow || decision.call}</td>
+                        <td className="py-2 pr-3" data-label={DECISION_CONTRACT_LABELS.action.doNow}>{display.sentence(decision.doNow || decision.call)}</td>
                         <td className="py-2 pr-3 text-xs" data-label={DECISION_CONTRACT_LABELS.threshold.pauseIf}>
                           <RuleLines
                             conditions={decision.pause ?? []}
-                            fallback={decision.pauseTrigger}
+                            fallback={display.sentence(decision.pauseTrigger)}
                             nearest={nearestLine(decision.pause, frozenScores)}
                             kind="pause"
                             qualifier={decision.pauseQualifier}
@@ -341,7 +341,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                         <td className="py-2 text-xs" data-label={publicDecisionLabels.reversal}>
                           <RuleLines
                             conditions={decision.resume ?? []}
-                            fallback={decision.resumeTrigger}
+                            fallback={display.sentence(decision.resumeTrigger)}
                             nearest={nearestLine(decision.resume, frozenScores)}
                             kind="resume"
                             qualifier={decision.resumeQualifier}
@@ -357,15 +357,17 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                 {brief.decisions.map((decision) => (
                   <li key={decision.area} className="space-y-1 border-l-2 border-slate-700/60 pl-4">
                     <p className="text-sm font-semibold text-slate-100">{labelForArea(decision.area)}</p>
-                    <p className="text-sm text-slate-300">{decision.call}</p>
-                    {decision.doNow ? <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.action.doNow}: {decision.doNow}</p> : null}
+                    <p className="text-sm text-slate-300">{display.sentence(decision.call)}</p>
+                    {decision.doNow ? <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.action.doNow}: {display.sentence(decision.doNow)}</p> : null}
+                    {/* w31 said "cash availability tightens above 76" here, the
+                        funding-pressure line under a name that ran the other way. */}
                     <p className="text-sm text-slate-300">
                       <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span>{" "}
-                      <BoundedValue>{decision.pauseTrigger}</BoundedValue>
+                      <BoundedValue>{display.sentence(decision.pauseTrigger)}</BoundedValue>
                     </p>
                     <p className="text-sm text-slate-300">
                       <span className="font-semibold text-slate-100">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span>{" "}
-                      <BoundedValue>{decision.resumeTrigger}</BoundedValue>
+                      <BoundedValue>{display.sentence(decision.resumeTrigger)}</BoundedValue>
                     </p>
                   </li>
                 ))}
