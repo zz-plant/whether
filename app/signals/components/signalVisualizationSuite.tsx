@@ -262,8 +262,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
         />
 
         <div className="mt-3 grid grid-cols-1 gap-2 lg:grid-cols-12">
-          {/* The gauge the title names: 10Y−2Y, in pp, as its row higher up
-              prints it. This drew an unnamed blend (0.7 of 10Y−2Y plus 0.3 of
+          {/* The gauge the title names: 10Y−2Y, in pp, the unit its row higher
+              up prints it in. This drew an unnamed blend (0.7 of 10Y−2Y plus 0.3 of
               2Y−3M) and printed "Latest: 0.42%" for Aug 31, beside a row giving
               the same gauge as 0.41pp on Aug 31 and 0.47pp this week. The last
               block is a month-end, and the line under it says so. */}
