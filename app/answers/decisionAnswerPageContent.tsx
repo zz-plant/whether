@@ -14,6 +14,7 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import Link from "next/link";
 import { SecondaryPageSection } from "../components/secondaryPageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
+import { navigationLayerByKey } from "../../lib/navigation/informationArchitecture";
 import { ActionLink } from "../components/ui/actionLink";
 import { ScoreLadder } from "../components/ui/scoreLadder";
 import { AreaTable } from "../components/ui/areaTable";
@@ -183,7 +184,7 @@ export async function DecisionAnswerPageContent({
         <Breadcrumbs
           items={[
             { label: "Home", href: "/" },
-            { label: "Decision Tools", href: "/resolve" },
+            { label: navigationLayerByKey.resolve.label, href: navigationLayerByKey.resolve.href },
             { label: page.title },
           ]}
         />
@@ -351,7 +352,6 @@ export async function DecisionAnswerPageContent({
         <SecondaryPageSection title={headings.next}>
           <div className="flex flex-wrap gap-2">
             <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
-            <ActionLink href="/resolve#unresolved-question-router" variant="pill">Decision Tools</ActionLink>
             <ActionLink href="/operate" variant="pill">Plan the week</ActionLink>
             <ActionLink href="/resolve#direct-answers" variant="pill">More direct answers</ActionLink>
             {relatedPages.map((related) => (

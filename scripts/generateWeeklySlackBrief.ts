@@ -1,11 +1,14 @@
 /**
- * Generate the weekly Slack brief artifact.
+ * Generate the weekly Slack brief text into `artifacts/weekly-slack-brief.txt`
+ * (gitignored), the input `bun run audit:jev-copy -- --mode brief` judges.
  *
- * Refuses to publish data that is not live, for the same reason the freeze does:
- * this file is the brief people paste into a channel, and a run during a
- * live-data outage used to write the bundled snapshot under a "Weekly Brief"
- * heading and exit 0. `docs/briefs/latest-weekly-slack-brief.md` sat on a
- * 2026-06-17 snapshot for ten weeks that way, looking like a current brief.
+ * Refuses data that is not live, for the same reason the freeze does: a run
+ * during a live-data outage used to write the bundled snapshot under a "Weekly
+ * Brief" heading and exit 0. The committed copy this script also wrote,
+ * `docs/briefs/latest-weekly-slack-brief.md`, sat on a 2026-06-17 snapshot for
+ * ten weeks that way, went stale again from 2026-09-14, and was deleted on
+ * 2026-10-06: nothing read it, and `/share`, `GET /api/brief/slack` and the
+ * Monday post all build this same text from the live read.
  *
  * Pass `--allow-fallback` for local or offline artifact generation; the output
  * is then stamped so nobody mistakes it for a live reading.
@@ -22,7 +25,6 @@ const run = async () => {
   const { values } = parseArgs({
     options: {
       out: { type: "string", default: "artifacts/weekly-slack-brief.txt" },
-      format: { type: "string", default: "text" },
       "allow-fallback": { type: "boolean", default: false },
     },
   });
@@ -52,21 +54,7 @@ const run = async () => {
   const fallbackNotice = readiness.ok
     ? null
     : `NOT LIVE DATA — ${readiness.reason}`;
-  const format = values.format === "markdown" ? "markdown" : "text";
-  const output =
-    format === "markdown"
-      ? [
-          "# Latest Weekly Slack Brief",
-          "",
-          ...(fallbackNotice ? [`> **${fallbackNotice}**`, ""] : []),
-          `Generated from Whether data snapshot: **${treasury.record_date}**.`,
-          "",
-          "```text",
-          brief,
-          "```",
-          "",
-        ].join("\n")
-      : `${fallbackNotice ? `${fallbackNotice}\n\n` : ""}${brief}\n`;
+  const output = `${fallbackNotice ? `${fallbackNotice}\n\n` : ""}${brief}\n`;
   const outPath = values.out;
   const outDir = outPath.slice(0, outPath.lastIndexOf("/"));
 
@@ -75,7 +63,7 @@ const run = async () => {
   }
 
   await writeFile(outPath, output, "utf8");
-  console.log(`Wrote weekly Slack brief ${format} output to ${outPath}`);
+  console.log(`Wrote weekly Slack brief to ${outPath}`);
 };
 
 void run();

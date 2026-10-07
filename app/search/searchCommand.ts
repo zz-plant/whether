@@ -35,7 +35,7 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
   if (commandJob === "resolve") {
     return results.some((entry) => entry.type === "toolkit")
       ? buildToolkitLibraryHref(query)
-      : "/resolve#unresolved-question-router";
+      : "/resolve#direct-answers";
   }
 
   if (commandJob === "risk") {

@@ -23,7 +23,7 @@ export function PillarCtaBlock({ title, body, keyword, sourceSlug, downloadLabel
           data-conversion-surface="pillar-cta"
           data-conversion-keyword={keyword}
         >
-          Open Planning
+          Open the plan
         </ActionLink>
         <ActionLink
           href={`/resources/capital-posture-template?source=${encodeURIComponent(sourceSlug)}`}

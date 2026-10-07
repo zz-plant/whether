@@ -27,6 +27,7 @@ import type { RunwayBand } from "../lib/report/operatorRunway";
 import { assessment, fixtureBriefDocument, fixtureWeeklyCall, treasury, macros } from "./factories/exportFixtures";
 import { renderOgElement } from "../app/api/og/renderOgElement";
 import { collectPageShareCards } from "./fixtures/pageShareCards";
+import { SearchResults } from "../app/search/searchResults";
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
@@ -87,6 +88,10 @@ const BANNED: { name: string; pattern: RegExp }[] = [
      only knew the capitalised forms. */
   { name: "retired score name", pattern: /\b(boldness|latitude signal)\b/i },
   { name: "glossary pointer", pattern: /\b(Open the glossary|Full glossary|Look up a term|What these terms mean)\b/ },
+  /* The header's names are Brief, Plan, Evidence, Resolve, Trust and History
+     (lib/navigation/informationArchitecture.ts). Search results, the answer pages and the 404
+     page still said "Decision Tools", and the resource CTAs "Open Planning", until 2026-10-06. */
+  { name: "retired nav name", pattern: /\bDecision Tools\b|\b(Open|in) Planning\b/ },
 ];
 
 /*
@@ -184,6 +189,13 @@ const routeSurfaces: Surface[] = [
   { name: "/calibration", text: async () => visibleText(renderToStaticMarkup((await import("../app/calibration/page")).default())) },
   { name: "/concepts", text: async () => visibleText(renderToStaticMarkup((await import("../app/concepts/page")).default())) },
   { name: "/api-docs", text: async () => visibleText(renderToStaticMarkup((await import("../app/api-docs/page")).default())) },
+  { name: "/404", text: async () => visibleText(renderToStaticMarkup((await import("../app/not-found")).default())) },
+  {
+    name: "/resources/decision-shield-overview",
+    text: async () => visibleText(renderToStaticMarkup((await import("../app/resources/decision-shield-overview/page")).default())),
+  },
+  /* One query reaching the role-and-stage and toolkit entries, whose title and summary named the old hub. */
+  { name: "/search?q=guides toolkits", text: () => visibleText(renderToStaticMarkup(<SearchResults initialQuery="guides toolkits" />)) },
 ];
 
 const snapshot = buildOperatingSnapshot({ treasury, macroSeries: macros });

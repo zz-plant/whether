@@ -77,7 +77,6 @@ export type ReportShellModel = {
   actions?: {
     primaryCta?: ReportCtaProps;
     exportCta?: ExportCtaProps | null;
-    showShare?: boolean;
     nextStep?: NextStep;
     nextRefreshLabel?: string;
   };
@@ -109,7 +108,6 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
     actions: {
       primaryCta,
       exportCta = null,
-      showShare = false,
       nextStep,
       nextRefreshLabel,
     } = {},
@@ -174,7 +172,6 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             recordDateLabel={recordDateLabel}
             primaryCta={primaryCta}
             exportCta={exportCta}
-            showShare={showShare}
             statusLabel={statusLabel}
             statusPrefix={statusPrefix}
             trustStatusLabel={trustReadiness.headline}
