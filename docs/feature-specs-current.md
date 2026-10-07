@@ -1459,7 +1459,7 @@ to Freezing at 90 and 43. The card now adds `Against this week:` (`describeAgain
 and this week's when they differ, each score then and now with what it means (`signalReadingMeaning`), and
 "It is one earlier outcome, not a forecast." unless it is the same change with both scores within 5 points.
 
-**Found, not changed.** The comparison is the previous month-end snapshot (§1.1.26), so every brief in a month
+**Found, not changed (decided in §1.1.51: the basis is last week's published brief).** The comparison is the previous month-end snapshot (§1.1.26), so every brief in a month
 restates the same crossing: w40 would say what w38 said. A weekly basis for the archive is the previous
 *published record* (its `scores` and `decisions[].pause/resume` are enough to run the same derivation), which
 means both freeze writers (`scripts/freezeWeeklyBrief.ts`, `worker/workflows/weeklyBriefFreeze.ts`) supply
@@ -2292,6 +2292,52 @@ The read in §1.1.49 went on to the other surfaces that assemble sentences from 
   when it is true. Periods ending before the record's first month-end are not generated, and their
   URLs redirect to `/history` (`next.config.js`).
 
+### 1.1.51 Two owner calls: replays judged on their own inputs; "this week" against last week (2026-10-07)
+
+The sweeps in §1.1.49–§1.1.50 left two decisions open. Both are decided here.
+
+- **Replayed months are judged on the inputs the archive carries.** The archive has no credit-spread,
+  inflation or unemployment history for most months, so the policy layer held every replayed month for
+  missing inputs while `/history`'s strip showed that month's conditions unheld. The replay walk now
+  passes `inputsNotOnRecord` (`buildReplayContext`, `lib/timeMachine/regimeReplay.ts`, worked out per
+  step from what the step carries): those inputs still score 0 in the policy composites but no longer
+  count toward the missing-input hold. A live read whose feeds are absent or answer with no value is
+  still held — that is a feed failure, not an archive gap. `ENGINE_VERSION` is unchanged: with the
+  option omitted the scorer answers the same. Of 176 replayed months, 154 now print their conditions'
+  guidance and match the strip; 21 are held because the two scores disagree (March 2020 among them)
+  and one because the signals are spread too far apart.
+- **A held week says why.** `POLICY_OVERRIDE_CALL` is keyed by refusal code; each reason has its own
+  call, action, change line and "why this could be wrong", read through `describePolicyHold`
+  (`lib/report/regimeDescription.ts`) on the guidance, every share format, the home headline, the
+  cadence cards and the trust strip. It said "The two scores point in different directions" whatever
+  the reason. A stored record whose reason cannot be read gets a hold that names none.
+- **"What changed this week" is against last week's published brief.** `findWeeklyComparisonReading`
+  (`lib/report/comparisonReading.ts`) takes the most recent published record dated 5–14 days before
+  the reading, never one on or after it; with none, and always on a replay or a threshold override,
+  the previous month-end is the fallback and is named by its date as before. The month-end basis made
+  every Monday in a month repeat one crossing: the Oct 5 brief still led "Since Aug 31, conditions
+  changed from Sunny to Freezing" three weeks after the change. A published record was scored the
+  way this reading is, so against it there is no rates-versus-inputs split and no "built from interest
+  rates alone" note; the conditions map still draws month-ends and keeps that note. Records before w41
+  stored only the two scores, so the base rate and curve rows print "—" until new records, which now
+  store `scores.baseRate` and `scores.curveSlope`, are in range.
+- **An improving week holds while a pause applies.** Against a week, small moves now set the tone,
+  and a four-point rise in risk appetite turned the Oct 5 headline into "Conditions are easing. Resume
+  paused work with clear milestones." with funding pressure fourteen points past the pause line for
+  four areas. `buildActionNowShort` reads an improving week as holding while any area's pause line is
+  met.
+- **Stage lines name the published lines.** A stage's watch line, its "Pause if" once the stage is
+  chosen, read "tighten if funding pressure moves within 20.0 points of the line", with today's gap
+  as the number; it names the area rules' pause line now, and the resume discipline their resume
+  lines. The tight-runway bar is the Spending rule's 6 months rather than a looser 9.
+- **Leftover wording.** Cadence summaries open on the conditions word and head their sections in
+  reader terms; the source is "Federal Reserve Economic Data (FRED)" and provenance labels no longer
+  claim a confidence; alert reasons and the digest print whole points against a named line and the
+  conditions word; the recession warning gauge on cluster pages is in percentage points.
+
+On Oct 5 the homepage reads "Holding this week · Keep spend flat and require paybacks inside 6
+months." and "Conditions held steady since Sep 29; no pause or resume line was crossed."
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
@@ -2696,7 +2742,7 @@ that never came:
 **The Monday post and the email print one call.** The post's call slots (Guidance, Do now, Pause
 if, Resume when, Conditions change if) were derived from the lead area row and
 `assessment.description`, while the email read the snapshot's `WeeklyCallContract`, which swaps
-in `POLICY_OVERRIDE_CALL` on a held week. So a held week mailed "the guidance is not changing this
+in `POLICY_OVERRIDE_CALL` (keyed by refusal reason since §1.1.51) on a held week. So a held week mailed "the guidance is not changing this
 week" and posted the lead area's own action and pause line, and an ordinary week posted a
 different change line from the one mailed. The post reads the contract now, on the Monday path,
 the manual `POST /api/brief/slack/deliver` path and `GET /api/brief/slack`: the pause line as its
