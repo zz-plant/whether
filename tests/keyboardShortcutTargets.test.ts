@@ -89,21 +89,23 @@ describe("global shortcut targets", () => {
   });
 });
 
+/* The fields a keydown carries, so a predicate test is the decision a handler makes,
+   not its text. */
+const press = (key: string, modifiers: Partial<Record<"shiftKey" | "metaKey" | "ctrlKey" | "altKey", boolean>> = {}) => ({
+  key,
+  shiftKey: false,
+  metaKey: false,
+  ctrlKey: false,
+  altKey: false,
+  ...modifiers,
+});
+
 describe("the share shortcut the palette advertises", () => {
   /*
    * The palette printed ⇧S beside "Share brief" from the commit that added it, and nothing
    * bound the key (found 2026-10-06). ⌘⇧S was bound — to focus mode. Called with the
    * fields a keydown carries, so this is the decision the handler makes, not its text.
    */
-  const press = (key: string, modifiers: Partial<Record<"shiftKey" | "metaKey" | "ctrlKey" | "altKey", boolean>> = {}) => ({
-    key,
-    shiftKey: false,
-    metaKey: false,
-    ctrlKey: false,
-    altKey: false,
-    ...modifiers,
-  });
-
   it("opens the share rail on ⇧S and on nothing else", async () => {
     const { isShareRailShortcut } = await import("../app/components/KeyboardShortcuts");
 
@@ -113,6 +115,33 @@ describe("the share shortcut the palette advertises", () => {
     assert.equal(isShareRailShortcut(press("S", { shiftKey: true, metaKey: true })), false, "⌘⇧S belongs to focus mode");
     assert.equal(isShareRailShortcut(press("S", { shiftKey: true, ctrlKey: true })), false, "Ctrl+⇧S belongs to focus mode");
     assert.equal(isShareRailShortcut(press("S", { shiftKey: true, altKey: true })), false, "⌥⇧S types a character on a Mac");
+  });
+});
+
+describe("the focus-mode key", () => {
+  /*
+   * F ignored the modifiers, so ⌘F and Ctrl+F — find-in-page — opened the presentation
+   * and had their default prevented (reproduced in Chromium on / on 2026-10-07: both set
+   * `data-focus-mode`, and so did Alt+F). The typing guard also skipped contenteditable.
+   * The second argument is the target guard's verdict; the guard itself needs a DOM.
+   */
+  it("toggles on F alone and leaves the browser's chords to the browser", async () => {
+    const { isFocusModeShortcut } = await import("../app/components/focusModeController");
+
+    assert.equal(isFocusModeShortcut(press("f"), false), true, "F is the advertised key");
+    assert.equal(isFocusModeShortcut(press("F", { shiftKey: true }), false), true, "⇧F is bound to nothing else");
+    assert.equal(isFocusModeShortcut(press("f", { metaKey: true }), false), false, "⌘F is find-in-page");
+    assert.equal(isFocusModeShortcut(press("f", { ctrlKey: true }), false), false, "Ctrl+F is find-in-page");
+    assert.equal(isFocusModeShortcut(press("f", { altKey: true }), false), false, "Alt+F is the browser menu on Windows and Linux");
+    assert.equal(isFocusModeShortcut(press("f"), true), false, "F in a field types an f");
+  });
+
+  it("keeps ⌘⇧S and Ctrl+⇧S, including from a field", async () => {
+    const { isFocusModeShortcut } = await import("../app/components/focusModeController");
+
+    assert.equal(isFocusModeShortcut(press("S", { shiftKey: true, metaKey: true }), false), true);
+    assert.equal(isFocusModeShortcut(press("S", { shiftKey: true, ctrlKey: true }), true), true, "a chord types nothing");
+    assert.equal(isFocusModeShortcut(press("S", { shiftKey: true }), false), false, "⇧S alone is the share rail's");
   });
 });
 
