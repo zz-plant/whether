@@ -10,9 +10,9 @@ import { describeWeeklyMovement } from "../lib/report/home/homeSectionModel";
 import { CadenceCallCard } from "../app/components/CadenceCallCard";
 import { buildCadenceCallModel } from "../lib/report/cadenceCallModel";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
-import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
+import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "../lib/report/reportCopy";
 import { buildWeeklyCallContract } from "../lib/report/weeklyCallContract";
-import { evaluateRegime, type RegimeKey } from "../lib/regimeEngine";
+import { evaluateRegime, type PolicyRefusalCode, type RegimeKey } from "../lib/regimeEngine";
 import type { TreasuryData } from "../lib/types";
 
 const mockAny: any = mock;
@@ -64,19 +64,19 @@ const rawAssessment = evaluateRegime(treasury);
 
 /* The refusal is set explicitly either way, so neither case depends on what
    this fixture's inverted curve happens to make the policy engine decide. */
-const withRefusal = (refused: boolean, reasons: string[]) => ({
+const withRefusal = (refused: boolean, reasons: string[], reasonCodes: PolicyRefusalCode[] = []) => ({
   ...rawAssessment,
   policyAssessment: {
     ...rawAssessment.policyAssessment,
-    refusal: { ...rawAssessment.policyAssessment.refusal, refused, reasons },
+    refusal: { ...rawAssessment.policyAssessment.refusal, refused, reasons, reasonCodes },
   },
 });
 
 /** A live week whose two scores agree. */
 const liveAssessment = withRefusal(false, []);
 
-/** The engine's refusal: the policy scores disagree, so no direction is supported. */
-const refusedAssessment = withRefusal(true, ["Too many inputs are missing."]);
+/** The engine's refusal: too many inputs are missing, so no direction is supported. */
+const refusedAssessment = withRefusal(true, ["Too many inputs are missing."], ["inputs-missing"]);
 
 const homeBriefModelFor = (assessment: typeof liveAssessment) =>
   buildHomeBriefModel({
@@ -117,9 +117,14 @@ describe("a degraded state says what is missing", () => {
     assert.doesNotMatch(plain(html), /\bposture\b/i, "the fallback h1 no longer reads '<weather> posture'");
   });
 
-  it("holds the call in the reader's terms when the two scores disagree", () => {
-    for (const [slot, sentence] of Object.entries(POLICY_OVERRIDE_CALL)) {
-      assertDegradedSentence(sentence, `POLICY_OVERRIDE_CALL.${slot}`);
+  it("holds the call in the reader's terms, whatever it is held for", () => {
+    const holds = [...Object.entries(POLICY_OVERRIDE_CALL), ["unnamed", POLICY_OVERRIDE_CALL_UNNAMED] as const];
+    for (const [reason, hold] of holds) {
+      for (const slot of ["currentCall", "actionNow", "pauseIf", "callChangesIf", "whyCouldBeWrong"] as const) {
+        assertDegradedSentence(hold[slot], `POLICY_OVERRIDE_CALL[${reason}].${slot}`);
+      }
+      // A clause, printed as "Hold anything you can't undo until <it>".
+      assert.doesNotMatch(hold.holdsUntil, ABSTRACTS_INSTEAD, `POLICY_OVERRIDE_CALL[${reason}].holdsUntil`);
     }
 
     const contract = buildWeeklyCallContract({
@@ -128,7 +133,7 @@ describe("a degraded state says what is missing", () => {
     });
 
     assert.equal(contract.policyOverrideActive, true);
-    assert.equal(contract.currentCall, POLICY_OVERRIDE_CALL.currentCall);
+    assert.equal(contract.currentCall, POLICY_OVERRIDE_CALL["inputs-missing"].currentCall);
     for (const [slot, sentence] of [
       ["currentCall", contract.currentCall],
       ["actionNow", contract.actionNow],

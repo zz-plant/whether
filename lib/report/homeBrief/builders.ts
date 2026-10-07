@@ -17,7 +17,8 @@ import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { areaLinesFromRules, buildDecisionMovement } from "../decisionMovement";
 import { previousScoresFromDynamics } from "../../export/scoreReference";
 import { formatThresholdNumber } from "../../formatters";
-import { NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "../reportCopy";
+import { NO_LIVE_READING_CALL } from "../reportCopy";
+import { describePolicyHold } from "../regimeDescription";
 import {
   REGIME_SEVERITY_RANK,
   getRegimeDisplayLabel,
@@ -375,13 +376,12 @@ export const buildHomeBriefModelInternal = (
     currentRegime: assessment.regime,
   });
   const refusal = assessment.policyAssessment?.refusal;
-  const policyOverrideActive = refusal?.refused ?? false;
-  const policyOverrideReasons = refusal?.reasons ?? [];
-  const policyOverrideReason = policyOverrideReasons[0] ?? null;
-  /* The same sentence the weekly contract and the cadence cards lead with under
-     a refusal, read from one table rather than restated here. */
-  const effectiveOperatingStanceLine = policyOverrideActive
-    ? POLICY_OVERRIDE_CALL.currentCall
+  const policyOverrideReason = refusal?.reasons?.[0] ?? null;
+  /* The held guidance for the reason this week is held, from the table the
+     weekly contract and the cadence cards read, so the three say the same. */
+  const policyHold = refusal?.refused ? describePolicyHold(refusal) : null;
+  const effectiveOperatingStanceLine = policyHold
+    ? policyHold.currentCall
     : operatingStanceLine;
 
   const failureModes: HomeBriefTrustWarning[] = buildTrustWarnings({
@@ -415,8 +415,7 @@ export const buildHomeBriefModelInternal = (
     },
     isFallbackSnapshot: isSavedCopy(treasury) && !historicalSelection,
     isHistoricalSelection: Boolean(historicalSelection),
-    policyRefusalActive: policyOverrideActive,
-    policyRefusalReasons: policyOverrideReasons,
+    policyHold,
   });
 
   const displayRegime = getRegimeDisplayLabel({
@@ -506,8 +505,8 @@ export const buildHomeBriefModelInternal = (
   const sharedFlipCorridor = formatSharedFlipCorridor(decisionRules);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
-  const conciseActionNow = policyOverrideActive
-    ? "Slow approvals, require reversible bets, and cap new experiments until disagreement clears."
+  const conciseActionNow = policyHold
+    ? `Slow approvals, require reversible bets, and cap new experiments until ${policyHold.holdsUntil}.`
     : (explicitStartupVariantMode || runwayCalibrated)
       ? startupVariantPolicy.adjustmentsByMode[startupVariantMode]?.doNowAdjustments[0]?.trim()
         || actionNowShort?.trim()
@@ -606,11 +605,14 @@ export const buildHomeBriefModelInternal = (
        preferring it is how /operate and /trust said Medium where / said High. */
     confidenceLabel,
     confidencePercent,
-    signalConfidenceReason: policyOverrideActive
+    /* The stored reason, which leads with the same code as the hold. It fell
+       back to "The two scores disagree, or too many inputs are missing", which
+       named two reasons for a hold that has one; a refusal always stores it. */
+    signalConfidenceReason: policyHold
       ? joinSentences(
           signalConfidenceReason,
           "The guidance is also being held this week",
-          policyOverrideReason ?? "The two scores disagree, or too many inputs are missing",
+          policyOverrideReason,
         )
       : signalConfidenceReason,
     regimeHeader: {

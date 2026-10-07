@@ -6,7 +6,7 @@ import { evaluateRegime } from "../lib/regimeEngine";
 import { getMonthlyActionGuidance } from "../lib/summary/monthlySummary";
 import { getQuarterlyActionGuidance } from "../lib/summary/quarterlySummary";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
-import type { RegimeKey } from "../lib/regimeEngine";
+import type { PolicyRefusalCode, RegimeKey } from "../lib/regimeEngine";
 
 const rawAssessment = evaluateRegime({
   source: "https://example.com/treasury",
@@ -23,11 +23,11 @@ const rawAssessment = evaluateRegime({
 /** Refusal is forced off for the default fixture and on for the override case. A bare
  *  treasury reading with no macro series refuses on its own, which would otherwise make
  *  every guidance assertion below test the override path by accident. */
-const withRefusal = (refused: boolean, reasons: string[] = []) => ({
+const withRefusal = (refused: boolean, reasons: string[] = [], reasonCodes: PolicyRefusalCode[] = []) => ({
   ...rawAssessment,
   policyAssessment: {
     ...rawAssessment.policyAssessment,
-    refusal: { ...rawAssessment.policyAssessment.refusal, refused, reasons },
+    refusal: { ...rawAssessment.policyAssessment.refusal, refused, reasons, reasonCodes },
   },
 });
 
@@ -232,18 +232,21 @@ describe("buildCadenceCallModel", () => {
   it("holds the call rather than repeating regime guidance under a policy override", () => {
     const model = buildCadenceCallModel({
       horizon: "monthly",
-      assessment: withRefusal(true, ["Too many inputs are missing."]),
+      assessment: withRefusal(true, ["Too many inputs are missing."], ["inputs-missing"]),
       recordDate: "2026-08-31",
       regimeHistory: monthlyHistory,
     });
+    const hold = POLICY_OVERRIDE_CALL["inputs-missing"];
 
     assert.equal(model.overrideReason, "Too many inputs are missing.");
     // Not `actionNow`: the weekly hero directly below the card leads with that under a
     // refusal, and two identical sentences on one screen is a copy defect.
-    assert.equal(model.headline, POLICY_OVERRIDE_CALL.currentCall);
-    assert.notEqual(model.headline, POLICY_OVERRIDE_CALL.actionNow);
-    assert.equal(model.boundedRule.threshold, POLICY_OVERRIDE_CALL.pauseIf);
-    assert.equal(model.boundedRule.reversal, POLICY_OVERRIDE_CALL.callChangesIf);
+    assert.equal(model.headline, hold.currentCall);
+    assert.notEqual(model.headline, hold.actionNow);
+    assert.equal(model.boundedRule.threshold, hold.pauseIf);
+    assert.equal(model.boundedRule.reversal, hold.callChangesIf);
+    // Held for missing inputs, so the card does not say the scores disagree.
+    assert.doesNotMatch(`${model.headline} ${model.boundedRule.action} ${model.boundedRule.reversal}`, /two scores/);
     assert.ok(!model.headline.includes(getMonthlyActionGuidance(assessment.regime)));
     // The regime itself is unchanged by a refusal — only the instruction is.
     assert.equal(model.regime, assessment.regime);

@@ -34,6 +34,7 @@ import type {
   WeeklyConfidencePoint,
 } from "./reportDataTypes";
 import type { TimeMachineRegimeEntry, TimeMachineYieldCurveEntry } from "../timeMachine/timeMachineCache";
+import { buildReplayContext } from "../timeMachine/regimeReplay";
 import type { OperatingSnapshot } from "../operatingState/types";
 
 type ReportSearchParams = {
@@ -392,17 +393,20 @@ export const loadReportDataUncachedInternal = async ({
    * published a different regime than /history and the archives list for the
    * same month — the compare cards contradicted the very options that selected
    * them. Falls back to the point evaluation only when the date sits outside
-   * the walk.
+   * the walk, and that fallback is still a replay: judged on the inputs on
+   * record for the month (`buildReplayContext`), so a series whose history does
+   * not reach back that far is absent from the record, not a missing input.
    */
   const governedHistoricalAssessment = historicalSelection
     ? deps.findTimeMachineGovernedAssessment(treasury.record_date, thresholds)
     : null;
+  const pointEvaluationContext = historicalSelection
+    ? buildReplayContext({ treasury, macroSeries: assessmentMacroSeries, baseRateHistory: treasury.oneMonthHistory })
+    : { baseRateHistory: treasury.oneMonthHistory };
   const assessment = projectsOperatingSnapshot && operatingSnapshot
     ? operatingSnapshot.assessment
     : governedHistoricalAssessment ??
-      deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot, {
-        baseRateHistory: treasury.oneMonthHistory,
-      });
+      deps.evaluateRegime(treasury, thresholds, assessmentMacroSeries, previousMachineSnapshot, pointEvaluationContext);
   const liveAssessment = shouldLoadHistoricalLiveComparison
     ? deps.evaluateRegime(liveTreasury, thresholds, macroSeries, previousMachineSnapshot, {
         baseRateHistory: liveTreasury.oneMonthHistory,

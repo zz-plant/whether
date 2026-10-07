@@ -1,6 +1,6 @@
 import type { RegimeDiagnostics } from "../regimeEngine";
 import { formatConfidenceChipLabel, type CompactFreshnessMeta } from "./reportFormatting";
-import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { DECISION_CONTRACT_LABELS, type PolicyHoldCall } from "./reportCopy";
 import type { RegimeStateTransition } from "../regimeStateMachine";
 
 type TrustStatusTone = "stable" | "warning" | "historical";
@@ -443,16 +443,15 @@ export const buildDecisionReadinessState = ({
   freshnessState,
   isFallbackSnapshot,
   isHistoricalSelection = false,
-  policyRefusalActive = false,
-  policyRefusalReasons = [],
+  policyHold = null,
 }: {
   confidenceLabel: "HIGH" | "MED" | "LOW";
   freshnessLabel?: string;
   freshnessState?: Partial<SourceFreshnessState>;
   isFallbackSnapshot: boolean;
   isHistoricalSelection?: boolean;
-  policyRefusalActive?: boolean;
-  policyRefusalReasons?: string[];
+  /** Set when the guidance is held: the held guidance for the reason it is held (`describePolicyHold`). */
+  policyHold?: PolicyHoldCall | null;
 }): DecisionReadinessState => {
   const resolvedFreshness = resolveFreshnessState({
     freshnessLabel,
@@ -488,11 +487,11 @@ export const buildDecisionReadinessState = ({
     };
   }
 
-  if (policyRefusalActive) {
+  if (policyHold) {
     return {
       label: "Act with caution",
       tone: "warning",
-      detail: `The guidance is being held this week: ${policyRefusalReasons[0] ?? "the two scores point in different directions."} Keep approvals reversible.`,
+      detail: `${policyHold.currentCall} Keep approvals reversible.`,
     };
   }
 
@@ -546,8 +545,7 @@ export const buildTrustStatus = ({
   confidenceLabel = "MED",
   freshnessLabel = FALLBACK_FRESHNESS_LABEL,
   freshnessState,
-  policyRefusalActive = false,
-  policyRefusalReasons = [],
+  policyHold = null,
   historicalMacroCoverageLabel,
 }: {
   historicalSelection: boolean;
@@ -559,8 +557,8 @@ export const buildTrustStatus = ({
   confidenceLabel?: "HIGH" | "MED" | "LOW";
   freshnessLabel?: string;
   freshnessState?: Partial<SourceFreshnessState>;
-  policyRefusalActive?: boolean;
-  policyRefusalReasons?: string[];
+  /** Set when the guidance is held: the held guidance for the reason it is held (`describePolicyHold`). */
+  policyHold?: PolicyHoldCall | null;
   historicalMacroCoverageLabel?: string | null;
 }) => {
   const confidenceLow = confidenceLabel === "LOW";
@@ -579,16 +577,21 @@ export const buildTrustStatus = ({
     ? "Historical snapshot"
     : isFallback
       ? "Using cached data"
-      : policyRefusalActive
-        ? "Live data, but signals unstable"
+      /* Not "signals unstable": a hold is also missing inputs, and the detail
+         below names which reason this one is. */
+      : policyHold
+        ? "Live data, but guidance held"
       : "Live · all sources answered";
 
+  /* The hold's own sentence, which names its reason. This read "the two scores
+     point in different directions" for every hold, then appended the stored
+     reason, so a week held for missing inputs said both. */
   const detail = historicalSelection
     ? `A past week, not this one — not for live decisions.${historicalMacroCoverageDetail}`
     : isFallback
       ? `Live data is late; this is a cached reading. Keep last week's plan and hold anything you can't undo until it returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
-      : policyRefusalActive
-        ? `Live data is in, but the two scores point in different directions, so the guidance is not changing this week. Hold approvals.${policyRefusalReasons[0] ? ` Reason: ${policyRefusalReasons[0]}` : ""}`
+      : policyHold
+        ? `${policyHold.currentCall} Hold approvals.`
       /* About the data, not the decision: "nothing here argues for holding
          back" read as this week's action in a week whose guidance was to
          freeze new commitments. */
@@ -598,13 +601,13 @@ export const buildTrustStatus = ({
     ? `${historicalAction} Switch to current live data before changing spending pace.`
     : isFallback
       ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source.`
-      : policyRefusalActive
-        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores point the same way again.`
+      : policyHold
+        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${policyHold.holdsUntil}.`
       : stableAction;
 
   const tone: TrustStatusTone = historicalSelection
     ? "historical"
-    : isFallback || policyRefusalActive
+    : isFallback || policyHold
       ? "warning"
       : "stable";
 
@@ -618,8 +621,8 @@ export const buildTrustStatus = ({
     ? "A past week. Not for live approvals."
     : isFallback
       ? "Only moves you can undo, until a live update lands."
-      : policyRefusalActive
-        ? "Only moves you can undo, until the two scores agree."
+      : policyHold
+        ? `Only moves you can undo, until ${policyHold.holdsUntil}.`
       : "Use this live reading for this week's approvals; the pause lines in this week's guidance apply.";
 
   const outageExitGate = buildOutageExitGate({

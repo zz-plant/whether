@@ -31,10 +31,13 @@ describe("Meeting Slide & Notion Exporter", () => {
        Monday post printed the held call. */
     const held = buildOperatingSnapshot({ treasury: mockTreasury, macroSeries: [] });
     assert.equal(held.weeklyCall.policyOverrideActive, true);
+    // A live read with no macro series is held because inputs are missing, and says so.
+    assert.deepEqual(held.assessment.policyAssessment.refusal.reasonCodes, ["inputs-missing"]);
+    const hold = POLICY_OVERRIDE_CALL["inputs-missing"];
     const seed = buildExportSlidePayload(held, "seed");
     assert.equal(seed.stageLabel, "Seed");
-    assert.equal(seed.actionNow, POLICY_OVERRIDE_CALL.actionNow);
-    assert.equal(seed.pauseIf, POLICY_OVERRIDE_CALL.pauseIf);
+    assert.equal(seed.actionNow, hold.actionNow);
+    assert.equal(seed.pauseIf, hold.pauseIf);
     assert.equal(seed.resumeWhen, undefined, "a held call has one resume line, its change line");
   });
 

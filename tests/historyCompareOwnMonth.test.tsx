@@ -101,14 +101,19 @@ describe("/history/compare draws each period from its own month", () => {
 
   it("states the held guidance's pause line as a condition", async () => {
     const { columnB } = await renderCompare({ yearB: "2020", monthB: "3" });
+    /* Held because its two scores disagree. Until 2026-10-07 every replayed
+       month was held for missing inputs, the record carrying no macro series. */
+    const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
 
-    assert.ok(columnB.includes(`Pause if ${POLICY_OVERRIDE_CALL.pauseIf}`), "Mar 2020 is a held month");
-    assert.doesNotMatch(
-      POLICY_OVERRIDE_CALL.pauseIf,
-      /^(Hold|Keep|Pause|Cap|Freeze|Slow|Stop|Defer)\b/,
-      `"Pause if: ${POLICY_OVERRIDE_CALL.pauseIf}" reads as an instruction`,
-    );
-    assert.ok(!POLICY_OVERRIDE_CALL.actionNow.includes(POLICY_OVERRIDE_CALL.pauseIf), "and does not repeat the action");
+    assert.ok(columnB.includes(`Pause if ${hold.pauseIf}`), "Mar 2020 is a held month");
+    for (const [reason, { pauseIf, actionNow }] of Object.entries(POLICY_OVERRIDE_CALL)) {
+      assert.doesNotMatch(
+        pauseIf,
+        /^(Hold|Keep|Pause|Cap|Freeze|Slow|Stop|Defer)\b/,
+        `"Pause if: ${pauseIf}" reads as an instruction (${reason})`,
+      );
+      assert.ok(!actionNow.includes(pauseIf), `and does not repeat the action (${reason})`);
+    }
   });
 
   /* Jan 2025 is Freezing at funding pressure 90 and risk appetite 54: the old
