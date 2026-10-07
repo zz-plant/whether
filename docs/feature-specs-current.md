@@ -1923,10 +1923,11 @@ Slack, Notion, and Linear targets.
 
 ## 5) Playbooks, summaries, and briefings
 
-### 5.1 Playbook & operator requests
+### 5.1 Playbook
 The playbook surfaces start/stop/fence actions based on the current regime, sourced from the
-insight database and operator request catalog in `data/recommendations.ts` and
-`lib/operatorRequests.ts`.
+insight database in `data/recommendations.ts`. The operator request catalog
+(`lib/operatorRequests.ts`), drawn as "Execution asks" under `/operate`'s Share step, was removed
+on 2026-10-07 (§1.1.46): it was a product backlog that listed shipped features as not yet built.
 
 ### 5.2 Weekly + monthly summaries
 Weekly and monthly summaries are generated from the current assessment for use in the overview
@@ -2891,3 +2892,11 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   summary says what it holds ("3 operating guides and 4 templates you can fill in and share.") and
   its guide cards are plain bordered links rather than surfaces lifted inside a frame the depth
   ladder cannot see.
+- **No "Execution asks" under Share.** The section under the share picker ("Current asks for the
+  people driving execution") was `lib/operatorRequests.ts`, a product backlog of "expansion
+  requests expected after launch" that listed API access and historical comparisons as not yet
+  built, though both ship. It is removed with its panel (`app/components/appendix/ReferencePanels.tsx`);
+  its two ids stay as aliases of the Share step. That left `DataProvenanceStrip` with no caller —
+  every caller had passed `showProvenance: false`, so it had rendered nowhere — and it is deleted
+  with its test and the two status icons only it drew. Still open: `reportData.internalProvenance`
+  (`lib/report/reportDataLoader.ts`) is now computed and drawn nowhere.

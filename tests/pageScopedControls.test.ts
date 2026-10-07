@@ -41,12 +41,11 @@ describe("document-scoped controls stay at the document layer", () => {
     assert.deepEqual(hosts, PAGE_LEVEL_HOSTS);
   });
 
-  it("keeps the reload out of the provenance strip, which mounts many times per page", () => {
-    const strip = stripComments(readFileSync(`${APP_DIR}/components/dataProvenanceStrip.tsx`, "utf8"));
-
-    assert.doesNotMatch(strip, /ManualRefreshButton/);
-    assert.doesNotMatch(strip, /location\.reload/);
-  });
+  /* A second test here read `dataProvenanceStrip.tsx` to keep the reload out of
+     it. The strip was deleted on 2026-10-07: its last two callers, on /operate,
+     both passed `showProvenance: false`, so it rendered nowhere. The intent —
+     the reload control drawn only where the page is the unit — is the test
+     above, which reads every file under app/. */
 
   it("claims no more than a reload in the control's own copy", () => {
     const button = readFileSync(`${APP_DIR}/components/manualRefreshButton.tsx`, "utf8");

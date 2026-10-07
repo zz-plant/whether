@@ -17,7 +17,6 @@ import { siteUrl } from "../../lib/siteUrl";
 import { HistoricalBanner } from "../components/historicalBanner";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
-import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
 import { FinanceStrategyPanel, financeStrategyFor } from "../components/appendix/financeStrategyPanel";
 import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
 import type { ReportShellModel } from "../components/reportShell";
@@ -103,7 +102,6 @@ export async function buildPlanningPageModel(
     fenceItems,
     fetchedAtLabel,
     historicalSelection,
-    internalProvenance,
     playbook,
     recordDateLabel,
     startItems,
@@ -365,44 +363,40 @@ export async function buildPlanningPageModel(
             label: "Share",
             title: "Share the brief",
             description: shareSummary,
+            // The two request ids are kept as aliases so an old link still opens this
+            // step. The "Execution asks" section they named was a product backlog
+            // ("expansion requests expected after launch") that listed API access
+            // and historical comparisons as not yet built, though both ship; it
+            // was removed on 2026-10-07.
             hashAliases: [
               "ops-export-briefs-panel",
               "ops-operator-requests",
               "ops-operator-requests-panel",
               "regime-alert-log",
             ],
-            children: h("div", { className: "space-y-6" },
-              // The step header above already reads Share / Share the brief, and the export
-              // panel names the action in its own header; a third header between them restated both.
-              h(ReportSection, { variant: "split",
-                hideHeader: true,
-                id: "ops-export-briefs-panel",
-                title: "Share the brief",
-                children: h(Fragment, null,
-                // The same picker /share and the global rail use, reading the same
-                // island — one artifact pipeline. The eleven-button export panel
-                // that sat here built the brief a second way through its own lib.
-                h(BriefIslandPicker, {
-                  scoreReferences: buildReadingLines(reportData.assessment, {
-                    actionStripItems,
-                    previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),
-                  }),
+            // The step header above already reads Share / Share the brief, and the export
+            // panel names the action in its own header; a third header between them restated both.
+            children: h(ReportSection, { variant: "split",
+              hideHeader: true,
+              id: "ops-export-briefs-panel",
+              title: "Share the brief",
+              children: h(Fragment, null,
+              // The same picker /share and the global rail use, reading the same
+              // island — one artifact pipeline. The eleven-button export panel
+              // that sat here built the brief a second way through its own lib.
+              h(BriefIslandPicker, {
+                scoreReferences: buildReadingLines(reportData.assessment, {
+                  actionStripItems,
+                  previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),
                 }),
-                h("p", { className: "text-xs leading-5 text-slate-400" },
-                  "Email, meeting pack, role memos, calendar hold and the embed live on ",
-                  h("a", { href: "/share", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the share page"),
-                  ".",
-                ),
-                ),
               }),
-              h(ReportSection, { variant: "split",
-                id: "ops-operator-requests-panel",
-                label: "Coordinate",
-                title: "Execution asks",
-                description: "Current asks for the people driving execution.",
-                children: h(OperatorRequestsPanel, { provenance: internalProvenance, showProvenance: false }),
-              }),
-            ),
+              h("p", { className: "text-xs leading-5 text-slate-400" },
+                "Email, meeting pack, role memos, calendar hold and the embed live on ",
+                h("a", { href: "/share", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the share page"),
+                ".",
+              ),
+              ),
+            }),
           },
         ],
       }),
