@@ -22,7 +22,7 @@ import { loadRegimeMachineSnapshot } from "../storage/regimeMachineSnapshotStore
 import type { PlaybookEntry } from "../playbook";
 import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
-import { isRuleConditionMet } from "./boundedDecisionRules";
+import { anyPauseLineMet } from "./reportEvidence";
 import { buildComparedWith } from "./comparisonBasis";
 import { observedBaseRate, type ComparisonReading } from "./comparisonReading";
 import { explainScoreMovement } from "./scoreMovement";
@@ -290,14 +290,6 @@ const alignMacroSeriesToAsOf = (macroSeries: MacroSeriesReading[], asOf: string)
   };
 };
 
-
-/* Whether any area's pause line is met by this reading, from the rule data
-   itself: the guidance bundle builds its strip items without scores, so their
-   `nearestPause` is unset here. */
-const anyPauseLineMet = (
-  items: readonly Pick<ActionStripItem, "pauseConditions">[],
-  scores: { tightness: number; riskAppetite: number },
-) => items.some((item) => (item.pauseConditions ?? []).some((condition) => isRuleConditionMet(condition, scores[condition.metric])));
 
 export const loadReportDataUncachedInternal = async ({
   searchParams,

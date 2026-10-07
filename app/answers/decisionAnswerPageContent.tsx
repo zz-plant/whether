@@ -24,6 +24,7 @@ import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildFlipThreshold } from "../../lib/report/reportEvidence";
+import { formatThresholdNumber } from "../../lib/formatters";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 import {
   DATA_CURRENCY_ACTION,
@@ -118,7 +119,7 @@ export async function DecisionAnswerPageContent({
        "Threshold context: risk appetite 42 vs 50, tightness 79 vs 70" — two bare
        comparisons, one of them under the engine's name for a score the rest of
        the site calls funding pressure. */
-    answer: `${page.shortAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${assessment.thresholds.riskAppetiteRegime.toFixed(0)} line where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${assessment.thresholds.tightnessRegime.toFixed(0)}.`,
+    answer: `${page.shortAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)} line where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`,
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,

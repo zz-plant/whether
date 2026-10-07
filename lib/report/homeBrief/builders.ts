@@ -1,4 +1,4 @@
-import { buildFlipThreshold } from "../reportEvidence";
+import { anyPauseLineMet, buildFlipThreshold, resolveWeeklyTone } from "../reportEvidence";
 import {
   buildCanonicalBoundedDecisionRules,
   decisionAreaLabel,
@@ -14,7 +14,7 @@ import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolvePublishedConfidence
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
-import { areaLinesFromRules, buildDecisionMovement } from "../decisionMovement";
+import { areaLinesFromRules, buildDecisionMovement, describeGuidanceChange } from "../decisionMovement";
 import { previousScoresFromDynamics } from "../../export/scoreReference";
 import { formatThresholdNumber } from "../../formatters";
 import { NO_LIVE_READING_CALL } from "../reportCopy";
@@ -199,33 +199,26 @@ export const buildFlipRiskMeterState = (
   buildFlipRiskMeterStateInternal(regimeDistance);
 
 /*
- * A replayed month is not "this week". The line said "This week's guidance is
- * more defensive." under Mar 31, 2020 on /history/compare, so a past month reads
- * as the move against its own earlier month-end, dated by it ("More defensive
- * since Feb 28."), and as no comparison where the record starts. The live
- * sentence is unchanged: it is pinned in every share format.
+ * The operating latitude's move, in a sentence about the number. It was "This
+ * week's guidance is unchanged." whenever the latitude did not move, and the
+ * latitude is a blend of the two scores: it stayed flat on weeks one score
+ * crossed a pause line, so the sentence said the guidance held beside guidance
+ * that had changed. Whether it changed is `guidanceChange`.
+ *
+ * A replayed month is not "this week": it reads as the move against its own
+ * earlier month-end, dated by it ("Operating latitude down since Feb 28."), and
+ * as no comparison where the record starts. A live week with nothing to compare
+ * says so rather than "unchanged".
  */
 const buildLeadershipShorthandLine = (
-  boldnessDelta: number,
-  historical?: { compared: boolean; basis: ComparisonBasis },
+  boldnessDelta: number | null,
+  basis: ComparisonBasis,
+  historical: boolean,
 ) => {
-  if (historical) {
-    return historical.compared && historical.basis.date
-      ? getNetDeltaLabel(boldnessDelta, historical.basis)
-      : "No earlier month-end to compare with.";
+  if (boldnessDelta === null || (historical && !basis.date)) {
+    return historical ? "No earlier month-end to compare with." : "No previous week to compare.";
   }
-
-  const magnitude = Math.abs(boldnessDelta);
-
-  if (magnitude === 0) {
-    return "This week's guidance is unchanged.";
-  }
-
-  const size = magnitude >= 12 ? "sharply " : magnitude >= 4 ? "" : "slightly ";
-
-  return boldnessDelta > 0
-    ? `This week's guidance is ${size}more aggressive.`
-    : `This week's guidance is ${size}more defensive.`;
+  return getNetDeltaLabel(boldnessDelta, basis);
 };
 
 export const buildHomeBriefModelInternal = (
@@ -327,21 +320,20 @@ export const buildHomeBriefModelInternal = (
   const weeklyDeltaBySignal = new Map(
     (reportDynamics?.changedSignals ?? []).map((item) => [item.key, item.delta]),
   );
-  const previousAssessment = previousRegime
+  /* The earlier reading's two scores, through the derivation every paste shares;
+     null when nothing was compared. The operating latitude's move and the
+     decision movement below both read it. The latitude's earlier reading used to
+     exist only when a regime alert did, which needs a change line crossed, so
+     every other week printed "no change" for a number that had moved
+     (§1.1.26's "found, not changed"). */
+  const previousReading = previousScoresFromDynamics(reportDynamics, {
+    tightness: assessment.scores.tightness,
+    riskAppetite: assessment.scores.riskAppetite,
+  });
+  const previousAssessment = previousReading
     ? {
-        ...assessment,
-        regime: previousRegime,
-        scores: {
-          ...assessment.scores,
-          tightness: assessment.scores.tightness - (weeklyDeltaBySignal.get("tightness") ?? 0),
-          riskAppetite: assessment.scores.riskAppetite - (weeklyDeltaBySignal.get("riskAppetite") ?? 0),
-          baseRate: assessment.scores.baseRate !== undefined
-            ? assessment.scores.baseRate - (weeklyDeltaBySignal.get("baseRate") ?? 0)
-            : assessment.scores.baseRate,
-          curveSlope: assessment.scores.curveSlope === null
-            ? null
-            : (assessment.scores.curveSlope ?? 0) - (weeklyDeltaBySignal.get("curveSlope") ?? 0),
-        },
+        regime: previousRegime ?? assessment.regime,
+        scores: { tightness: previousReading.tightness, riskAppetite: previousReading.riskAppetite },
       }
     : null;
   const postureTrajectory: PostureTrajectoryState = {
@@ -368,7 +360,6 @@ export const buildHomeBriefModelInternal = (
     last4Boldness: [],
     hiringTrendDelta: (weeklyDeltaBySignal.get("riskAppetite") ?? 0) - (weeklyDeltaBySignal.get("tightness") ?? 0),
     stabilityWeeks: transitionWatch === "ON" ? 1 : 2,
-    basis,
   });
   const operatingStanceLine = buildOperatingStanceLine({
     severityDelta,
@@ -548,14 +539,28 @@ export const buildHomeBriefModelInternal = (
      below that says what changed reads it instead of naming a direction. */
   const decisionMovement = buildDecisionMovement({
     scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
-    previous: previousScoresFromDynamics(reportDynamics, {
-      tightness: assessment.scores.tightness,
-      riskAppetite: assessment.scores.riskAppetite,
-    }),
+    previous: previousReading,
     thresholds: assessment.thresholds,
     regime: assessment.regime,
     areas: areaLinesFromRules(decisionRules),
   });
+  /* What the week did to the guidance, for every line that says nothing changed:
+     the conditions word, then the pause and resume lines, never the latitude. */
+  const guidanceChange = describeGuidanceChange({
+    movement: decisionMovement,
+    regimeChanged: reportDynamics?.regimeChanged,
+  });
+  /* The week's direction by the headline's rule (`resolveWeeklyTone`): an
+     improving week holds while a pause line is met. A held week's headline is
+     the hold, which states no direction, so the model's `weeklyTone` is null
+     there; the memo still says what the readings did. */
+  const comparisonTone = reportDynamics
+    ? resolveWeeklyTone({
+        directionLabel: reportDynamics.directionLabel,
+        regimeChanged: reportDynamics.regimeChanged === true,
+        pauseApplies: anyPauseLineMet(actionStripItems, assessment.scores),
+      })
+    : null;
   const weeklyMovement = buildWeeklyMovementMetric({
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
@@ -624,6 +629,7 @@ export const buildHomeBriefModelInternal = (
       }),
     },
     trendLabel,
+    weeklyTone: policyHold ? null : comparisonTone,
     regimeSignalIndicators,
     inputInfluence,
     postureTrajectory,
@@ -632,6 +638,7 @@ export const buildHomeBriefModelInternal = (
     weeklyMemoLines: buildWeeklyMemoLines({
       operatingStanceLine: effectiveOperatingStanceLine,
       trendLabel,
+      weeklyTone: comparisonTone,
       transitionWatch,
       pauseIf: guardrail,
       callChangesIf: conciseFlipThreshold,
@@ -673,14 +680,13 @@ export const buildHomeBriefModelInternal = (
     decisionReadiness,
     weeklyLeadershipSummary: {
       boldnessScore: weeklyLeadershipSummary.boldnessScore,
-      boldnessDelta: weeklyLeadershipSummary.boldnessDelta,
-      steadyWeek: weeklyLeadershipSummary.steadyWeek,
-      notchShiftLabel: weeklyLeadershipSummary.notchShiftLabel,
+      boldnessDelta: previousAssessment ? weeklyLeadershipSummary.boldnessDelta : null,
+      guidanceChange,
       shorthandLine: buildLeadershipShorthandLine(
-        weeklyLeadershipSummary.boldnessDelta,
-        historicalSelection ? { compared: previousAssessment !== null, basis } : undefined,
+        previousAssessment ? weeklyLeadershipSummary.boldnessDelta : null,
+        basis,
+        Boolean(historicalSelection),
       ),
-      netDeltaLabel: weeklyLeadershipSummary.netDeltaLabel,
       ...(reportDynamics?.comparedWith ? { comparedWith: reportDynamics.comparedWith } : {}),
     },
     guardrail,
@@ -787,6 +793,7 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       signalConfidenceReason: homeBriefModel.signalConfidenceReason,
       regimeHeader: homeBriefModel.regimeHeader,
       trendLabel: homeBriefModel.trendLabel,
+      weeklyTone: homeBriefModel.weeklyTone,
       confidenceHistory,
       confidenceTrend,
       transitionWatch: homeBriefModel.transitionWatch,

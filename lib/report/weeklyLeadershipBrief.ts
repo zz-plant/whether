@@ -1,5 +1,6 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { comparisonBasis, type ComparisonBasis } from "./comparisonBasis";
+import { OPERATING_LATITUDE_LABEL } from "./reportCopy";
 
 type TrendLabel = "Strengthening" | "Flat" | "Cooling";
 
@@ -18,8 +19,6 @@ type WeeklyLeadershipBriefInputs = {
   last4Boldness: number[];
   hiringTrendDelta: number;
   stabilityWeeks: number;
-  /** What `previousAssessment` is; "last week" wording when the week does not date it. */
-  basis?: ComparisonBasis;
 };
 
 const clamp = (value: number, min: number, max: number) =>
@@ -39,31 +38,23 @@ export const toTrendLabel = (delta: number): TrendLabel => {
 };
 
 /**
- * How much more or less room the guidance gives than at the earlier reading.
- * The earlier reading is named by its date where the week records one
- * (`comparisonBasis`): "more aggressive since Aug 31", not "than last week".
+ * How the operating latitude moved since the earlier reading, said of the number
+ * and nothing else. The earlier reading is named by its date where the week
+ * records one (`comparisonBasis`): "since Aug 31", or "since last week".
+ *
+ * It said "The guidance is holding where it was on Aug 31." on a zero move, and
+ * "More defensive" otherwise. The latitude is a blend of the two scores, so it
+ * can stay flat while one of them crosses a pause line: the sentence then said
+ * the guidance held beside guidance that had changed. Whether the guidance
+ * changed is `describeGuidanceChange` (`decisionMovement.ts`).
  */
 export const getNetDeltaLabel = (delta: number, basis: ComparisonBasis = comparisonBasis()) => {
-  const against = basis.date ? basis.since : "than last week";
-  if (delta >= 12) {
-    return `Materially more aggressive ${against}.`;
+  if (delta === 0) {
+    return `${OPERATING_LATITUDE_LABEL} unchanged ${basis.since}.`;
   }
-  if (delta >= 4) {
-    return `More aggressive ${against}.`;
-  }
-  if (delta > 0) {
-    return `Slightly more aggressive ${against}.`;
-  }
-  if (delta <= -12) {
-    return `Materially more defensive ${against}.`;
-  }
-  if (delta <= -4) {
-    return `More defensive ${against}.`;
-  }
-  if (delta < 0) {
-    return `Slightly more defensive ${against}.`;
-  }
-  return `The guidance is holding where it was ${basis.when}.`;
+  const magnitude = Math.abs(delta);
+  const size = magnitude >= 12 ? " sharply" : magnitude >= 4 ? "" : " slightly";
+  return `${OPERATING_LATITUDE_LABEL} ${delta > 0 ? "up" : "down"}${size} ${basis.since}.`;
 };
 
 export const buildWeeklyLeadershipBriefModel = ({
@@ -71,7 +62,6 @@ export const buildWeeklyLeadershipBriefModel = ({
   previousAssessment,
   hiringTrendDelta,
   stabilityWeeks,
-  basis,
 }: WeeklyLeadershipBriefInputs) => {
   const boldnessScore = buildBoldnessScore(
     assessment.scores.tightness,
@@ -117,16 +107,10 @@ export const buildWeeklyLeadershipBriefModel = ({
     curveDelta,
     hiringTrend,
     inputsComplete: assessment.inputs?.every((input) => input.value !== null) ?? true,
-    // Keep `steadyWeek` and `notchShiftLabel` derived from the same threshold so
-    // the "nothing moved" copy and the notch counter can never disagree.
-    steadyWeek: Math.abs(boldnessDelta) <= 1,
-    notchShiftLabel:
-      boldnessDelta > 1
-        ? `+${Math.max(1, Math.round(boldnessDelta / 3))} notch`
-        : boldnessDelta < -1
-          ? `${Math.min(-1, Math.round(boldnessDelta / 3))} notch`
-          : "+0 notch",
-    netDeltaLabel: getNetDeltaLabel(boldnessDelta, basis),
+    /* No `steadyWeek`, `notchShiftLabel` or `netDeltaLabel` any more. The first
+       drove "nothing changed" copy from this number's move, which can be zero on
+       a week a pause line was crossed; the other two were read nowhere. The
+       latitude's own sentence is `getNetDeltaLabel`. */
     macroLabel:
       assessment.regime === "EXPANSION" ? "Money cheap and available" : "Money expensive or scarce",
   };

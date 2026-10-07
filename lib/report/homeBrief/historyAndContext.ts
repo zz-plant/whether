@@ -1,4 +1,5 @@
 import { getWeeklyPostureHistory } from "../../summary/weeklyPostureHistory";
+import { formatThresholdNumber } from "../../formatters";
 import { REGIME_LABELS } from "../../regimePresentation";
 import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY } from "../sectorSensitivity";
 import { formatBoundaryDistance, joinSentences, regimeSignalLabelByKey } from "../reportFormatting";
@@ -292,7 +293,7 @@ export const buildWhyThisCall = ({
     {
       key: "distance-to-regime-change",
       label: "How close conditions are to changing",
-      detail: pendingFlipDetail ?? `${formatBoundaryDistance({ label: boundaryLabel, points: nearestGap, threshold: boundaryThreshold })} If it ${boundaryDirection} ${boundaryThreshold.toFixed(1)}, ${boundaryConsequence}.`,
+      detail: pendingFlipDetail ?? `${formatBoundaryDistance({ label: boundaryLabel, points: nearestGap, threshold: boundaryThreshold })} If it ${boundaryDirection} ${formatThresholdNumber(boundaryThreshold)}, ${boundaryConsequence}.`,
     },
     {
       key: "momentum",
@@ -328,7 +329,7 @@ export const buildFlipRiskMeterState = (
   const pointsToFlip = Math.max(0, Math.round(regimeDistance.pointsToFlip));
   const clampedDistance = Math.min(pointsToFlip, 12);
   const progressPercent = Math.max(10, Math.round(((12 - clampedDistance) / 12) * 100));
-  const triggerLabel = `${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "above" : "to or below"} ${regimeDistance.thresholdValue.toFixed(1)}.`;
+  const triggerLabel = `${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "above" : "to or below"} ${formatThresholdNumber(regimeDistance.thresholdValue)}.`;
 
   if (pointsToFlip <= 3) {
     return {

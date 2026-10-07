@@ -1338,7 +1338,8 @@ crossed, and `0`, "The guidance is holding where it was on Aug 31.", `steadyWeek
 exports' "Operating latitude … · vs Aug 31: no change" can be printed over a week the scores moved. The
 guidance is the same on that week, which is what the sentence claims; the number is the open question.
 Building the previous assessment from the dynamics whenever a comparison exists would change `steadyWeek`,
-and with it the quiet-day line, so it is recorded here and not changed.
+and with it the quiet-day line, so it is recorded here and not changed. (Changed 2026-10-07, §1.1.52: the
+move is measured whenever a comparison exists, and "nothing changed" lines no longer read it.)
 
 ### 1.1.27 Say what moved the score (2026-09-29)
 
@@ -2344,6 +2345,39 @@ The sweeps in §1.1.49–§1.1.50 left two decisions open. Both are decided here
 w38–w40 did not record their engine, and `ENGINE_VERSION` changed on 2026-10-06, so no record in the
 archive counts yet: the week compares with the month-end, as before, until the first record frozen
 after this change is 5–14 days old.
+
+### 1.1.52 Contradictions left from the sweeps (2026-10-07)
+
+Four facts were still stated two ways on one page or paste.
+
+- **The payback bar.** A chosen stage said "fund the channels that convert repeatably and pay back
+  inside 12 months" (Series A) and "only where the cash comes back inside the year" (Bootstrapped)
+  under a Spending rule that approves new spend only inside 6 months. Both read
+  `SPENDING_PAYBACK_BAR_MONTHS` now (`lib/report/boundedDecisionRules.ts`): a stage adds emphasis and
+  never relaxes the Spending bar, the precedent the tight-runway bar set in §1.1.51.
+- **Operating latitude and the guidance.** The latitude blends the two scores, so it stays flat on a
+  week one score crosses a pause line, and every "nothing changed" line read it: a week that paused
+  four areas printed "This week's guidance is unchanged." (operator paste, `/history/compare`), "Call
+  unchanged" (`/share` standup) and "The guidance is holding where it was on Aug 31." The latitude's
+  line now speaks about the number ("Operating latitude unchanged since Sep 29.", `getNetDeltaLabel`),
+  measured whenever a comparison exists rather than only on a regime alert (closing §1.1.26's "found,
+  not changed"), and the quiet-day and standup lines read `describeGuidanceChange`
+  (`lib/report/decisionMovement.ts`: `regimeChanged` or the movement's conditions change, then a crossed
+  pause or resume line, else held). `steadyWeek`, `notchShiftLabel` and `netDeltaLabel` are gone; the
+  last two were read nowhere.
+- **Line precision.** The home model's "how close conditions are" line, the flip meter, the
+  signal-influence rows and the regime-alert reasons printed the change line as "70.0"; the canonical
+  "Conditions change if" sentence and the answer pages rounded it with `toFixed(0)`. All of them print
+  through `formatThresholdNumber` (lib/formatters.ts), as the area rules do: whole points unless the
+  line carries a decimal.
+- **The week's direction beside the guidance.** The headline's rule (an improving week holds while a
+  pause line is met, §1.1.51) is `resolveWeeklyTone` (`lib/report/reportEvidence.ts`), and every
+  `directionLabel` reader was audited against it: `/api/decision`'s memo said "Conditions loosened this
+  week." beside "Conditions are holding.", and the homepage sticky strip's badge read "Steady" every
+  week, because it searched the trend label for words no label contains; both take the headline's tone
+  now. A week with nothing to compare states no direction: the headline is the action alone (it said
+  "Conditions are holding." beside "No previous reading to compare this week against."), the memo says
+  so (it said "No material signal shift this week."), and the strip draws no badge.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

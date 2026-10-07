@@ -31,6 +31,7 @@ import {
 import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import { BASE_RATE_SOURCE_LABELS } from "./regimeDescription";
 import { getRegimePublicLabel } from "../regimePresentation";
+import type { GuidanceChange } from "./decisionMovement";
 
 type FlipProximity = {
   axis: "riskAppetite" | "tightness";
@@ -165,7 +166,12 @@ export const buildQuietDayRead = ({
   steadyWeek,
   flipProximity,
 }: {
-  /** True when the week did not move the posture enough to shift a notch. */
+  /**
+   * True when the week's guidance held: no change of conditions and no pause or
+   * resume line crossed (`describeGuidanceChange`). It was the operating
+   * latitude moving a point or less, which is also true of a week that crossed
+   * a pause line while the other score moved the opposite way.
+   */
   steadyWeek: boolean;
   /** The hero's flip-proximity sentences, nearest first. */
   flipProximity: readonly string[];
@@ -179,25 +185,29 @@ export const buildQuietDayRead = ({
 /**
  * The standup flip line: a one-sentence input for engineering/leadership standups.
  *
- * Teams need a compact, zero-friction answer for "did macro conditions move
- * this week, and how close are we to a pace change?" When conditions held,
- * it reports the call unchanged, the nearest flip distance, and "no pace change."
- * When conditions shifted, it names the new call, the distance to the next flip,
- * and calls for a pace review.
+ * Teams need a compact, zero-friction answer for "did the guidance move this
+ * week, and how close are we to a pace change?" It answers from what the week
+ * did to the guidance (`describeGuidanceChange`): held, the conditions changed,
+ * or a pause or resume line was crossed under the same conditions. It read the
+ * operating latitude's move, so a two-point move with nothing crossed said
+ * "Call changed to Cloudy" on a week that stayed Cloudy, a flat latitude over a
+ * crossed pause line said "Call unchanged", and a week with nothing to compare
+ * said "unchanged" too.
  */
 export const buildStandupFlipLine = ({
   regime,
-  steadyWeek,
+  change,
   proximity = [],
 }: {
   regime: RegimeKey;
-  steadyWeek: boolean;
+  /** What the week did to the guidance; null when nothing was compared. */
+  change: GuidanceChange | null;
   proximity?: readonly FlipProximity[];
 }): string => {
   const nearest = proximity[0];
   const distance = nearest ? `${formatMove(nearest.inputMove)} from flip` : "no near flip";
-  if (steadyWeek) {
-    return `Call unchanged, ${distance}; no pace change.`;
-  }
-  return `Call changed to ${getRegimePublicLabel(regime)}, ${distance}; review pace.`;
+  if (change === null) return `No earlier reading to compare with; ${distance}.`;
+  if (change === "held") return `Guidance unchanged, ${distance}; no pace change.`;
+  if (change === "conditions") return `Conditions changed to ${getRegimePublicLabel(regime)}, ${distance}; review pace.`;
+  return `Guidance changed at a pause or resume line, ${distance}; review pace.`;
 };

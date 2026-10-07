@@ -24,10 +24,13 @@ type WeeklyCard = HomePageAssembly["weeklyDecisionCardModel"];
  */
 export const deriveBriefCallFields = (card: WeeklyCard) => {
   const { decision } = card;
+  /* The last fallback is the week's action. It was the operating latitude's
+     shorthand, "This week's guidance is unchanged.", a sentence about a number
+     standing in the guidance's own slot. */
   const primaryCall =
     decision.canonicalDecisionCopy?.doNowLines?.[0]
     ?? decision.actionNowShort
-    ?? decision.weeklyLeadershipSummary.shorthandLine;
+    ?? decision.immediateDecision;
   const flipConditionLabels = decision.compactFlipConditionLabels ?? [];
   const revisitQueue = decision.revisitQueue;
   const revisitAreaIds = new Set(revisitQueue.map((item) => item.id));

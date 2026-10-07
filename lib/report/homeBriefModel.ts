@@ -1,6 +1,7 @@
 import type { MacroSeriesReading, TreasuryMetadata } from "../types";
 import type { RegimeStateTransition } from "../regimeStateMachine";
-import type { DecisionMovement } from "./decisionMovement";
+import type { DecisionMovement, GuidanceChange } from "./decisionMovement";
+import type { WeeklyTone } from "./reportEvidence";
 import type { ComparedWith } from "./reportDataTypes";
 import type {
   DecisionTransmission,
@@ -89,6 +90,8 @@ export type HomeReportData = {
   recordDateLabel?: string;
   reportDynamics?: {
     directionLabel: ReportDynamics["directionLabel"];
+    /** Whether the conditions changed against the earlier reading; absent reads as no. */
+    regimeChanged?: ReportDynamics["regimeChanged"];
     changedSignals: Array<{
       key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
       delta: number;
@@ -278,16 +281,18 @@ type StartRouteDeltaBlock = {
 
 type WeeklyLeadershipSummary = {
   boldnessScore: number;
-  boldnessDelta: number;
+  /** The operating latitude's move since the earlier reading; null when nothing was compared. */
+  boldnessDelta: number | null;
   /**
-   * True when the week did not move the posture enough to shift a notch — the
-   * same threshold that produces a `+0 notch` label. Renderers use this to
-   * state "nothing changed" once instead of repeating it per delta widget.
+   * What the week did to the guidance (`describeGuidanceChange`): the conditions
+   * changed, a pause or resume line was crossed, or neither; null when nothing
+   * was compared. Renderers that say "nothing changed" read this, never the
+   * latitude's move, which can be zero on a week a line was crossed. It was
+   * `steadyWeek`, the latitude moving a point or less, until 2026-10-07.
    */
-  steadyWeek: boolean;
-  notchShiftLabel: string;
+  guidanceChange: GuidanceChange | null;
+  /** The latitude's move in a sentence about the number only (`getNetDeltaLabel`). */
   shorthandLine: string;
-  netDeltaLabel: string;
   /** The earlier reading `boldnessDelta` is measured against; absent where the week does not date it. */
   comparedWith?: ComparedWith;
 };
@@ -326,6 +331,13 @@ export type WeeklyDecisionCardViewModel = {
       primaryRisk: string;
     };
     trendLabel: string;
+    /**
+     * The week's direction as the headline reads it (`resolveWeeklyTone`); null when
+     * nothing was compared, or when the week is held and its headline is the hold. Every
+     * badge or arrow that names the week's direction beside the guidance reads this, not
+     * `trendLabel`, which is the scores' own direction.
+     */
+    weeklyTone?: WeeklyTone | null;
     confidenceHistory?: WeeklyConfidencePoint[];
     confidenceTrend?: ConfidenceTrendFraming;
     transitionWatch: "ON" | "OFF";

@@ -38,17 +38,26 @@ describe("weeklyLeadershipBrief helpers", () => {
     assert.equal(model.stabilityWeeks, 3);
     assert.equal(model.hiringTrend, "Strengthening");
     assert.equal(model.inputsComplete, true);
-    assert.equal(getNetDeltaLabel(2), "Slightly more aggressive than last week.");
+    assert.equal(getNetDeltaLabel(2), "Operating latitude up slightly since last week.");
   });
 
   it("names the earlier reading by its date when the week records one", () => {
     const aug31 = comparisonBasis({ label: "Aug 31" });
 
-    assert.equal(getNetDeltaLabel(-17, aug31), "Materially more defensive since Aug 31.");
-    assert.equal(getNetDeltaLabel(5, aug31), "More aggressive since Aug 31.");
-    assert.equal(getNetDeltaLabel(0, aug31), "The guidance is holding where it was on Aug 31.");
-    // Without a date the sentences are the ones the site always printed.
-    assert.equal(getNetDeltaLabel(-17), "Materially more defensive than last week.");
-    assert.equal(getNetDeltaLabel(0), "The guidance is holding where it was last week.");
+    assert.equal(getNetDeltaLabel(-17, aug31), "Operating latitude down sharply since Aug 31.");
+    assert.equal(getNetDeltaLabel(5, aug31), "Operating latitude up since Aug 31.");
+    assert.equal(getNetDeltaLabel(0, aug31), "Operating latitude unchanged since Aug 31.");
+    assert.equal(getNetDeltaLabel(-17), "Operating latitude down sharply since last week.");
+    assert.equal(getNetDeltaLabel(0), "Operating latitude unchanged since last week.");
+  });
+
+  /* The latitude is a blend of the two scores, so it can stay flat on a week the
+     guidance changed. Its sentence said "The guidance is holding where it was on
+     Aug 31." on a zero move; it speaks about the number now, and never about the
+     guidance, at any size of move. */
+  it("never says anything about the guidance", () => {
+    for (const delta of [-17, -5, -1, 0, 1, 5, 17]) {
+      assert.doesNotMatch(getNetDeltaLabel(delta), /guidance|aggressive|defensive/i);
+    }
   });
 });

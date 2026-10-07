@@ -12,8 +12,12 @@ import { HOME_SECTIONS } from "../../lib/report/home/homeSectionModel";
 
 type Props = {
   call: string;
-  /** Weekly posture direction. Names the movement; the glyph is drawn from it. */
-  direction: SignalDirection;
+  /**
+   * The week's direction as the headline reads it; the glyph is drawn from it.
+   * Absent where there is none to state (nothing compared, or an archived
+   * week), and then no badge is drawn.
+   */
+  direction?: SignalDirection;
   /** The weather word, so the strip states the call the way the hero does. */
   weatherWord: string;
   /** The confidence word ("High", "Medium", "Low"); the strip adds "confidence", since a bare "High" beside the call does not say what is high. */
@@ -125,7 +129,7 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
       `Whether · ${weatherWord} · ${confidenceWord} confidence`,
       // Plain-text artifact, so the compact glyph is right here — sourced from
       // the shared map rather than re-derived.
-      `${DIRECTION_ARROW[direction]} ${call}`,
+      direction ? `${DIRECTION_ARROW[direction]} ${call}` : call,
       ...(shareLines ?? []),
       "whether.work",
     ].filter(Boolean).join(" — ");
@@ -165,12 +169,14 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
               takes the top surface step rather than a hand-mixed pair of shadows. */}
           <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 shadow-[var(--elev-4)] backdrop-blur-xl lg:max-w-md">
             <span className="flex min-w-0 flex-1 items-center gap-2 text-fluid-xs font-semibold leading-tight text-slate-100">
-              <span
-                className={`inline-flex size-7 items-center justify-center rounded-lg text-sm font-bold ${DIRECTION_BADGE[direction].tone}`}
-              >
-                <TrendGlyph direction={DIRECTION_BADGE[direction].glyph} className="h-4 w-4" />
-                <span className="sr-only">{`${DIRECTION_LABEL[direction]} this week.`}</span>
-              </span>
+              {direction ? (
+                <span
+                  className={`inline-flex size-7 items-center justify-center rounded-lg text-sm font-bold ${DIRECTION_BADGE[direction].tone}`}
+                >
+                  <TrendGlyph direction={DIRECTION_BADGE[direction].glyph} className="h-4 w-4" />
+                  <span className="sr-only">{`${DIRECTION_LABEL[direction]} this week.`}</span>
+                </span>
+              ) : null}
               {/* The weather word, not the operating-latitude score it used to
                   print: the page no longer shows that number anywhere, and a
                   strip that restates the call should restate it in the words
