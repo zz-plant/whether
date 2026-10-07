@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
+  buildCanonicalBoundedDecisionRules,
   buildScopedVariantDecisionAdjustment,
+  SPENDING_PAYBACK_BAR_MONTHS,
   startupVariantModes,
   type StartupVariantMode,
 } from "../lib/report/boundedDecisionRules";
@@ -116,6 +118,52 @@ describe("runway-scaled decision rules", () => {
     assert.match(tight.reversalTriggerDiscipline, /twelve months|round is signed/i);
     // The stage's own emphasis still follows the gate.
     assert.ok(tight.thresholdEmphasis.endsWith(adjustmentFor("series-a").thresholdEmphasis));
+  });
+
+  /*
+   * A tight runway said "every stage rule below now needs a nine-month payback
+   * first" and asked "six to nine months" of every hire, over a Spending rule
+   * that approves new spend only inside six. Tightening printed a looser bar.
+   */
+  it("never prints a payback bar looser than the Spending rule's at a tight runway", () => {
+    const spending = buildCanonicalBoundedDecisionRules({ regime: "SCARCITY", thresholds, scores }).find((rule) => rule.area === "burn-discipline");
+    assert.match(spending?.recommendation ?? "", new RegExp(`inside ${SPENDING_PAYBACK_BAR_MONTHS} months`));
+    for (const { mode } of startupVariantModes) {
+      const tight = adjustmentFor(mode, { runwayBand: "tight" });
+      // The runway's own sentences: the gate before the stage's emphasis, and the first do-now.
+      const gate = tight.thresholdEmphasis.slice(0, -adjustmentFor(mode).thresholdEmphasis.length);
+      const bars = [gate, tight.doNowAdjustments[0] ?? ""].flatMap((line) =>
+        [...line.matchAll(/(\d+|six|nine|twelve)[- ]months?/gi)].map((match) => match[1]),
+      );
+      assert.deepEqual(bars, [String(SPENDING_PAYBACK_BAR_MONTHS), String(SPENDING_PAYBACK_BAR_MONTHS)], `${mode}: ${gate}`);
+      assert.doesNotMatch(`${gate} ${tight.doNowAdjustments[0]}`, /nine|six to/i);
+    }
+  });
+
+  /*
+   * Series A in a Freezing week read "Reverse the hold only after the trigger
+   * clears", naming no line; each stage now names the resume line or lines the
+   * area rules print, with their numbers.
+   */
+  it("names the area rules' resume lines in every stage's resume line", () => {
+    const freezing = { tightnessRegime: 70, riskAppetiteRegime: 50 };
+    const live = { tightness: 90, riskAppetite: 48 };
+    const resumeFor = (mode: StartupVariantMode) =>
+      buildScopedVariantDecisionAdjustment({ mode, thresholds: freezing, scores: live }).reversalTriggerDiscipline;
+
+    assert.equal(
+      resumeFor("series-a"),
+      "Reverse the hold only after risk appetite is above 54 and conversion holds for two weekly reviews.",
+    );
+    assert.match(resumeFor("seed"), /funding pressure falls below 66/);
+    assert.match(resumeFor("series-b"), /funding pressure falls below 66 and risk appetite is above 54/);
+    assert.match(resumeFor("growth"), /risk appetite is above 54/);
+    assert.match(resumeFor("public"), /funding pressure falls below 66/);
+    assert.match(resumeFor("bootstrapped"), /funding pressure falls below 66, risk appetite is above 54/);
+    for (const { mode } of startupVariantModes) {
+      assert.doesNotMatch(resumeFor(mode), /the trigger|the line\b|their resume lines/, mode);
+      assert.match(resumeFor(mode), /\b(66|54)\b/, mode);
+    }
   });
 
   it("offers a counter-cyclical move above 24 months without dropping the payback bar", () => {

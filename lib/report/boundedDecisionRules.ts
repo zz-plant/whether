@@ -317,6 +317,16 @@ const fmt = formatThresholdNumber;
 export const SPENDING_PAYBACK_BAR_MONTHS = 6;
 
 /**
+ * The payback bar a tight runway (6–12 months of cash) puts in front of every
+ * stage rule, hires and growth campaigns included. Derived from the Spending
+ * bar so it can never be looser: it said "a nine-month payback" and "six to
+ * nine months" on hires until 2026-10-07, which "tightened" a Spending rule
+ * printed on the same page at six. A tight runway extends the Spending bar to
+ * everything; it does not relax it anywhere.
+ */
+const TIGHT_RUNWAY_PAYBACK_BAR_MONTHS = SPENDING_PAYBACK_BAR_MONTHS;
+
+/**
  * The four lines every area's pause and resume conditions are drawn from, set
  * apart from the change lines so a score must travel past a line, not touch it,
  * before a rule moves. One source for the rules below and for the track record's
@@ -507,6 +517,16 @@ export const buildScopedVariantDecisionAdjustment = ({
   const riskGap = Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime);
   const tightnessGap = Math.abs(scores.tightness - thresholds.tightnessRegime);
   const resolvedBand = resolveRunwayBand(runwayBand, runwayMonths);
+  /*
+   * The resume lines a stage's hold lifts on: the same two lines, with the same
+   * numbers and wording, the area rules print (`sharedDecisionLines`,
+   * `describeRuleCondition`). Series A read "Reverse the hold only after the
+   * trigger clears", naming no line and no number, and Series B and Public named
+   * "their resume lines" and "the line" without saying where either sat.
+   */
+  const { tightnessResume, riskResume } = sharedDecisionLines(thresholds);
+  const tightnessResumeLine = describeRuleCondition(buildRuleCondition("tightness", "<", tightnessResume), "resume", scores);
+  const riskResumeLine = describeRuleCondition(buildRuleCondition("riskAppetite", ">", riskResume), "resume", scores);
 
   const getBaseAdjustment = (): ScopedVariantDecisionAdjustment => {
     if (mode === "seed") {
@@ -530,7 +550,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           }),
         ],
         thresholdEmphasis: "Protect runway first; fund one proof of demand at a time rather than breadth.",
-        reversalTriggerDiscipline: "Reverse the hold only after two improving readings in a row and one shipped milestone with traction.",
+        reversalTriggerDiscipline: `Reverse the hold only after ${tightnessResumeLine} for two readings in a row and one shipped milestone shows traction.`,
       };
     }
 
@@ -554,7 +574,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           }),
         ],
         thresholdEmphasis: "Payback first: fund the channels that convert repeatably and pay back inside 12 months.",
-        reversalTriggerDiscipline: "Reverse the hold only after the trigger clears and conversion holds for two weekly reviews.",
+        reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion holds for two weekly reviews.`,
       };
     }
 
@@ -578,7 +598,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           }),
         ],
         thresholdEmphasis: "Efficiency first: show the margin gain before adding headcount.",
-        reversalTriggerDiscipline: "Reverse the hold only when risk appetite and funding pressure both cross their resume lines in the same week.",
+        reversalTriggerDiscipline: `Reverse the hold only when, in the same week, ${tightnessResumeLine} and ${riskResumeLine}.`,
       };
     }
 
@@ -602,7 +622,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           }),
         ],
         thresholdEmphasis: "Prove customer acquisition cost payback, retention and support capacity before adding fixed cost.",
-        reversalTriggerDiscipline: "Reverse the hold only after risk appetite and conversion both improve for two weekly readings.",
+        reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion improves, both for two weekly readings.`,
       };
     }
 
@@ -626,7 +646,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           }),
         ],
         thresholdEmphasis: "Earnings durability first: cash conversion and hitting guidance before growth.",
-        reversalTriggerDiscipline: "Reverse the hold only when funding pressure moves away from the line and guidance confidence improves with it.",
+        reversalTriggerDiscipline: `Reverse the hold only when ${tightnessResumeLine} and confidence in your earnings guidance improves with it.`,
       };
     }
 
@@ -650,7 +670,7 @@ export const buildScopedVariantDecisionAdjustment = ({
         }),
       ],
       thresholdEmphasis: "Cash first: commitments you can reverse, over growth that looks good.",
-      reversalTriggerDiscipline: "Reverse the hold only after cash payback holds for two weekly readings in a row.",
+      reversalTriggerDiscipline: `Reverse the hold only after ${tightnessResumeLine}, ${riskResumeLine}, and cash payback holds for two weekly readings in a row.`,
     };
   };
 
@@ -710,7 +730,7 @@ const scaleAdjustmentToRunway = (
       runwayBand: band,
       runwayLabel,
       doNowAdjustments: [
-        "Require a cash payback case of six to nine months on every new hire and growth campaign.",
+        `Require a cash payback case inside ${TIGHT_RUNWAY_PAYBACK_BAR_MONTHS} months on every new hire and growth campaign.`,
         "If you plan to raise, start planning now; a year of cash leaves room for one process, not two.",
         ...base.doNowAdjustments,
       ],
@@ -718,7 +738,7 @@ const scaleAdjustmentToRunway = (
         "Cash gate: pause unbudgeted initiatives if net burn grows faster than gross margin.",
         ...base.watchAdjustments,
       ],
-      thresholdEmphasis: `Tight runway: every stage rule below now needs a nine-month payback first. ${base.thresholdEmphasis}`,
+      thresholdEmphasis: `Tight runway: every stage rule below now needs a payback inside ${TIGHT_RUNWAY_PAYBACK_BAR_MONTHS} months first. ${base.thresholdEmphasis}`,
       reversalTriggerDiscipline: "Lift the payback gate once runway clears twelve months or the round is signed; until then the stage rule's own resume condition still applies.",
     };
   }

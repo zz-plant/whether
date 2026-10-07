@@ -14,6 +14,7 @@ import { formatIsoWeekSlug, getIsoWeekInfo, type IsoWeek } from "../isoWeek";
 import { previousScoresFromDynamics } from "../export/scoreReference";
 import { assessPublishReadiness } from "./briefPublishGuard";
 import type { PublishedBrief } from "./publishedBriefs";
+import { FRED_SOURCE_LABEL } from "./provenanceStatus";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "./weeklyBriefSnapshot";
 
 /**
@@ -109,7 +110,12 @@ export const buildPublishedBriefRecord = ({
       detail: item.immediateImplication,
       sourceUrl: reportData.treasury.source,
     })),
-    sourceLabel: reportData.treasuryProvenance?.statusLabel ?? "US Treasury via FRED",
+    /* The source, not the status. This stored `treasuryProvenance.statusLabel`, so
+       every record froze "Canonical snapshot (high confidence)" as its source, a
+       confidence it never computed (`publishedBriefDisplay` still translates those).
+       The status now reads "Latest recorded reading", which a record would keep
+       saying long after it stopped being true. */
+    sourceLabel: reportData.treasuryProvenance?.sourceLabel ?? FRED_SOURCE_LABEL,
     sourceUrl: reportData.treasury.source,
     freshnessLabel: reportData.fetchedAtLabel,
     correction: existing?.correction ?? null,

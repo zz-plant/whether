@@ -185,7 +185,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
       recordDateLabel: "Mar 1, 2026",
       timestampLabel: "Mar 1, 2026 00:00 UTC",
       ageLabel: "0h",
-      statusLabel: "Live (high confidence)",
+      statusLabel: "Live reading",
     },
     macroSeries: [],
     macroCoverage: {
@@ -239,7 +239,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
       recordDateLabel: "Mar 1, 2026",
       timestampLabel: "Mar 1, 2026 00:00 UTC",
       ageLabel: "0h",
-      statusLabel: "Live (high confidence)",
+      statusLabel: "Live reading",
     },
     sourceHealth: [],
     materializedSignals: null,

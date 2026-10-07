@@ -58,6 +58,19 @@ export const formatConfidenceSentence = (confidence: SummaryConfidence) =>
 export const formatConditionsChangeLine = (assessment: RegimeAssessment) =>
   `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildFlipThreshold(assessment)}`;
 
+/**
+ * What the weekly and monthly summaries say when conditions changed on a shock
+ * crossing: a score jumped far past its line in one reading, so the change did
+ * not wait for the second reading every other change does.
+ *
+ * Both used to print "This flip crossed its line in one jump, so no published
+ * reversal condition fired", the engine's account of itself: "flip" and
+ * "reversal condition" are names lib/report/AGENTS.md retired, and "its line"
+ * named no line. One sentence for both, so they cannot drift apart again.
+ */
+export const SHOCK_CROSSING_CUE =
+  "A score jumped well past the line where conditions change in a single reading, so conditions changed without the second reading that normally confirms a change. Treat the change as unconfirmed until the next reading.";
+
 type SourceLineInput = {
   sourceLabel: string;
   sourceUrl?: string;

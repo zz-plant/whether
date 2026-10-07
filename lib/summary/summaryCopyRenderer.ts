@@ -46,7 +46,10 @@ export const renderWeeklySummaryCopy = ({
     summary,
     "",
     "---",
-    "WHETHER · Capital Posture Governance",
+    // Was "WHETHER · Capital Posture Governance": the engine's name for itself, in
+    // the line a pasted brief is identified by. The category line is the site's
+    // (`lib/seo.ts` `canonicalPositioningLine`), so the paste says what the site does.
+    "WHETHER · Weekly operating guidance",
     "",
     updatedLabel,
     "",
@@ -141,7 +144,11 @@ export const renderMonthlySummaryCopy = ({
     title,
     summary,
     "",
-    "MONTHLY POSTURE",
+    // "MONTHLY POSTURE" and "BOUNDED NEXT ACTIONS" until 2026-10-07: the section
+    // holds the month's conditions word ("Freezing"), and "posture" and "bounded"
+    // are engine words lib/report/AGENTS.md retired from reader copy. The
+    // structured payload keeps its `posture` key for agents.
+    "CONDITIONS THIS MONTH",
     "",
     structured.posture.label,
     "",
@@ -151,7 +158,7 @@ export const renderMonthlySummaryCopy = ({
     "",
     `> ${structured.planningLanguage}`,
     "",
-    "BOUNDED NEXT ACTIONS",
+    "NEXT ACTIONS",
     "",
     ...toBullets(structured.boundedNextActions),
     "",

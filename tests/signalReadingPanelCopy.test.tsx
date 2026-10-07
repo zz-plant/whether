@@ -74,10 +74,13 @@ describe("signal watch pages say what they measure in plain words", () => {
     assert.match(text, /Movement \+27 points since Aug 31\./);
   });
 
-  it("states the curve reading as a percentage and its moves in percentage points", () => {
+  /* The figure was "-0.3%": a gap between two rates, printed as a rate, at a coarser
+     place than the move under it. */
+  it("states the curve reading and its moves in percentage points, at two places", () => {
     const text = render("yield-curve-flip-watch");
-    assert.match(text, /-0\.3%/);
-    assert.match(text, /percentage points below zero, where long-term rates drop below short-term rates/);
+    assert.match(text, /-0\.30\s+percentage points: the 10-year rate minus the 2-year rate/);
+    assert.match(text, /0\.30 percentage points below zero, where long-term rates drop below short-term rates/);
+    assert.match(text, /Built from\s+2-year rate 4\.60% · 10-year rate 4\.30%/);
     assert.match(text, /-0\.12 percentage points since last week/);
     assert.match(text, /Long-term rates are below short-term rates now/);
   });

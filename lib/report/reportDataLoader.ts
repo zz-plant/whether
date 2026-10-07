@@ -1,10 +1,12 @@
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import type { RegimeAssessment, RegimeThresholds, RegimeTrend } from "../regimeEngine";
 import {
+  FRED_SOURCE_LABEL,
   PROVENANCE_CATALOG_STATUS,
   PROVENANCE_FALLBACK_STATUS,
   PROVENANCE_STATUS,
   historicalMacroStatus,
+  publisherSourceLabel,
   resolveProvenanceStatus,
   type ReportProvenance,
 } from "./provenanceStatus";
@@ -429,8 +431,10 @@ export const loadReportDataUncachedInternal = async ({
   // Annotated rather than inferred: the fallback loader stamps these fields with
   // its own labels, and both loaders have to produce one type.
   const treasuryProvenance: ReportProvenance = {
-    sourceLabel: operatingSnapshot?.provenance.sourceLabel
-      ?? (canonicalInputs ? "Canonical ingestion (FRED)" : "Federal Reserve Economic Data (FRED)"),
+    // "Canonical ingestion (FRED)" on the ingested path until 2026-10-07, printed as the
+    // source of every cadence summary: the pipeline's name, where a reader wants the
+    // publisher. A snapshot stored before then still says "Canonical snapshot (FRED)".
+    sourceLabel: publisherSourceLabel(operatingSnapshot?.provenance.sourceLabel ?? FRED_SOURCE_LABEL),
     sourceUrl: treasury.source,
     recordDateLabel,
     timestampLabel: fetchedAtLabel,

@@ -5,6 +5,7 @@ import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../app/seo
 import { buildSeoDecisionPayload, type SeoDecisionPayload } from "../report/seoDecisionPayload";
 import type { DecisionArea } from "../report/boundedDecisionRules";
 import type { ReportData } from "../report/reportData";
+import { PROVENANCE_STATUS } from "../report/provenanceStatus";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { getLatestTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { findSignalsCluster } from "../../app/signals/clusterRoutes";
@@ -133,7 +134,8 @@ const evidenceForCluster = (cluster: string, items: ReportData["reportEvidenceIt
 const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: PayloadContext, siblingsInCluster: { pageKey: string; interpretationLabel?: string; currentCall?: string; immediateAction?: string; evidenceTitles?: string[]; }[] = []): ProgrammaticPayloadRecord => {
   const isTestRuntime = process.env.NODE_ENV === "test";
   const seoFreshnessLabel = isTestRuntime ? "0h" : context.reportData.fetchedAtLabel;
-  const seoProvenanceStatusLabel = isTestRuntime ? "Live (high confidence)" : context.reportData.treasuryProvenance?.statusLabel;
+  // The live tier's own label, which read "Live (high confidence)" until 2026-10-07.
+  const seoProvenanceStatusLabel = isTestRuntime ? PROVENANCE_STATUS.live : context.reportData.treasuryProvenance?.statusLabel;
   const seoFetchedAtIso = isTestRuntime ? new Date().toISOString() : context.reportData.treasury.fetched_at;
   const { reportData, isFallbackSnapshot, snapshot } = context;
   const { homeBriefModel } = snapshot;

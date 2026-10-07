@@ -16,7 +16,7 @@ describe("summaryCopyRenderer", () => {
       },
       structured: {
         climate: {
-          label: "✅ RISK-ON / CAPITAL-LOOSE",
+          label: "✅ Sunny: Money is cheap and available.",
           summary: ["Capital is accessible and risk appetite is healthy."],
         },
         recommendedMoves: ["Prioritize speed and distribution over perfection"],
@@ -128,10 +128,10 @@ describe("summaryCopyRenderer", () => {
       },
     });
 
-    assert.match(copy, /MONTHLY POSTURE/);
+    assert.match(copy, /CONDITIONS THIS MONTH/);
     assert.match(copy, /PLANNING LANGUAGE TO USE/);
     assert.match(copy, /> Plan the month around scale proven bets/);
-    assert.match(copy, /BOUNDED NEXT ACTIONS/);
+    assert.match(copy, /\nNEXT ACTIONS\n/);
     assert.match(copy, /MONTHLY OPERATING RULES/);
     assert.match(copy, /Action: Run no more than three concurrent experiments/);
     assert.match(copy, /TOP REVERSALS/);

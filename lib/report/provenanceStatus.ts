@@ -11,9 +11,17 @@ import type { TreasuryMetadata } from "../types";
  * nothing said that, and nothing showed whether a branch was reachable.
  */
 
+/*
+ * `canonical` read "Canonical snapshot (high confidence)" and `live` "Live (high
+ * confidence)" until 2026-10-07. Nothing here computes a confidence: these say
+ * where the reading came from, and the published confidence (`confidence.ts`) is
+ * a separate figure that on Oct 5, 2026 was Medium. "Canonical snapshot" was the
+ * pipeline's name for a reading the scheduled update recorded; the reader's is
+ * that it is the latest one recorded.
+ */
 export const PROVENANCE_STATUS = {
-  canonical: "Canonical snapshot (high confidence)",
-  live: "Live (high confidence)",
+  canonical: "Latest recorded reading",
+  live: "Live reading",
   cached: "Cached (medium)",
   simulated: "Simulated (low)",
   treasuryOnly: "Treasury-only (low)",
@@ -71,6 +79,24 @@ export const resolveProvenanceStatus = ({
   if (isCanonical) return PROVENANCE_STATUS.canonical;
   return isLive ? PROVENANCE_STATUS.live : PROVENANCE_STATUS.cached;
 };
+
+/**
+ * The treasury source as a reader names it. Every summary's source line read
+ * "Canonical ingestion (FRED)" until 2026-10-07, and the saved operating
+ * snapshot's "Canonical snapshot (FRED)": the pipeline's names for where a
+ * reading came from, where a reader wants the publisher.
+ */
+export const FRED_SOURCE_LABEL = "Federal Reserve Economic Data (FRED)";
+
+/**
+ * A stored source label as a reader should meet it. Operating snapshots written
+ * before 2026-10-07 still carry "Canonical snapshot (FRED)", and a brief
+ * document can be built from one, so the publisher's name replaces the
+ * pipeline's at read; the saved-copy marker already says when the numbers are
+ * not a live read.
+ */
+export const publisherSourceLabel = (sourceLabel: string) =>
+  /^canonical\b/i.test(sourceLabel) ? FRED_SOURCE_LABEL : sourceLabel;
 
 /** One provenance strip's worth of facts, as the loader hands it to a page. */
 export type ReportProvenance = {

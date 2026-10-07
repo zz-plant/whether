@@ -464,12 +464,12 @@ describe("decision memory and alert routes", () => {
       assert.equal(body.backend, "local-fallback");
       // The seeded alert is from February. It still counts toward alertCount, but
       // the digest speaks for one week: a months-old crossing is reported as the
-      // last recorded change, never as this week's call.
-      assert.equal(body.digest?.summary, "No regime-change alerts this week.");
+      // last recorded alert, never as this week's guidance.
+      assert.equal(body.digest?.summary, "No alerts this week.");
       assert.ok(Array.isArray(body.digest?.bullets));
       assert.ok(
         body.digest?.bullets?.some((bullet) =>
-          bullet.startsWith("Last recorded change: SCARCITY as of 2026-02-16"),
+          bullet.startsWith("Last recorded alert: conditions were Freezing as of Feb 16, 2026"),
         ),
         "the February crossing is still surfaced, labelled as history",
       );
