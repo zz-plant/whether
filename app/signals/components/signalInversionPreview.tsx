@@ -1,5 +1,5 @@
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
-import { CurveTermsKey } from "./curveTermsKey";
+import { CurveTermsKey, formatSpread } from "./curveTermsKey";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 import { InstrumentQuestion } from "./instrumentQuestion";
 import { describeInversionSummary } from "../../../lib/report/evidenceInstrumentSummaries";
@@ -53,9 +53,6 @@ const toMonthlyPoints = (series: YieldCurvePoint[]): MonthlyPoint[] => {
     }))
     .slice(-12);
 };
-
-const formatBp = (value: number | null) =>
-  typeof value === "number" ? `${value >= 0 ? "+" : ""}${(value * 100).toFixed(1)} bp` : "n/a";
 
 const countMonthsBelowZero = (values: Array<number | null>) =>
   values.filter((value): value is number => typeof value === "number" && value < 0).length;
@@ -181,22 +178,24 @@ export function SignalInversionPreview({
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
             <span className="inline-flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
-              <span>10Y−2Y <strong className="font-semibold text-slate-100">{formatBp(latest?.spread10Y2Y ?? null)}</strong></span>
+              <span>10Y−2Y <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread10Y2Y ?? null)}</strong></span>
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" />
-              <span>2Y−3M <strong className="font-semibold text-slate-100">{formatBp(latest?.spread2Y3M ?? null)}</strong></span>
+              <span>2Y−3M <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread2Y3M ?? null)}</strong></span>
             </span>
             <span>{monthlyPoints[0]?.label} → {latest?.label}</span>
             {/* Autoscaled to the visible window, so the extent has to be stated. */}
             <span className="tabular-nums text-slate-400">
-              Vertical scale {spreadMin.toFixed(2)}% to {spreadMax.toFixed(2)}%
+              Vertical scale {formatSpread(spreadMin)} to {formatSpread(spreadMax)}
             </span>
           </div>
-          {/* Expands the axis shorthand. Without it, "10Y-2Y +14.2 bp" is
-              unreadable to anyone who has not traded bonds. */}
+          {/* Expands the axis shorthand. Without it, "10Y−2Y 0.41pp" is
+              unreadable to anyone who has not traded bonds. The readings were
+              in bp ("+41.0 bp") on a page whose gauge row prints the same
+              spread as 0.41pp, so the key defines pp now. */}
           <CurveTermsKey
-            terms={["spread10Y2Y", "spread2Y3M", "bp"]}
+            terms={["spread10Y2Y", "spread2Y3M", "pp"]}
             className="mt-3 border-t border-slate-800/80 pt-3"
           />
         </div>

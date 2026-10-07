@@ -47,7 +47,6 @@ type YieldCurvePoint = {
   tenYear: number | null;
   spread10Y2Y: number | null;
   spread2Y3M: number | null;
-  curveSignal: number | null;
 };
 
 type TrendPoint = { label: string; value: number };

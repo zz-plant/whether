@@ -3,14 +3,16 @@
 import { useMemo, useState } from "react";
 import type { TreasuryData } from "../../../lib/types";
 import { SegmentedControl } from "../../components/ui/segmentedControl";
-import { formatMonthLabel, formatMonthShortLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
+import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
-import { CurveTermsKey } from "./curveTermsKey";
+import { CurveTermsKey, formatSpread } from "./curveTermsKey";
 
-type Cadence = "weekly" | "monthly" | "yearly";
+/* No "Weekly". The series is the month-end archive, one reading a month, so the
+   weekly option drew the same month-end points under day labels and called
+   them weekly. */
+type Cadence = "monthly" | "yearly";
 
 const CADENCE_OPTIONS = [
-  { key: "weekly", label: "Weekly" },
   { key: "monthly", label: "Monthly" },
   { key: "yearly", label: "Yearly" },
 ] as const satisfies ReadonlyArray<{ key: Cadence; label: string }>;
@@ -25,7 +27,6 @@ type YieldCurvePoint = {
   tenYear: number | null;
   spread10Y2Y: number | null;
   spread2Y3M: number | null;
-  curveSignal: number | null;
 };
 
 type SignalVisualizationSuiteProps = {
@@ -41,12 +42,14 @@ type ChartPoint = {
   tenYear: number | null;
   spread10Y2Y: number | null;
   spread2Y3M: number | null;
-  curveSignal: number | null;
 };
 
 const formatPercent = (value: number | null) => (typeof value === "number" ? `${value.toFixed(2)}%` : "n/a");
-const formatBp = (value: number | null) => (typeof value === "number" ? `${value >= 0 ? "+" : ""}${value.toFixed(1)} bp` : "n/a");
-const toBp = (value: number | null) => (typeof value === "number" ? value * 100 : null);
+/* Whole basis points. Rates are published to two decimals of a percent, so a
+   move between two of them is a whole number of bp, and "+84.0 bp" printed a
+   tenth nobody measured. */
+const SIGNED_WHOLE_BP = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0, signDisplay: "exceptZero" });
+const formatBpMove = (value: number | null) => (typeof value === "number" ? `${SIGNED_WHOLE_BP.format(value)} bp` : "n/a");
 
 const getLabel = (recordDate: string, cadence: Cadence) => {
   const date = new Date(recordDate);
@@ -55,10 +58,7 @@ const getLabel = (recordDate: string, cadence: Cadence) => {
   const year = date.getUTCFullYear();
   if (cadence === "yearly") return `${year}`;
 
-  const month = date.getUTCMonth() + 1;
-  if (cadence === "monthly") return formatMonthLabel(year, month);
-
-  return `${formatMonthShortLabel(year, month)} ${date.getUTCDate()}, ${year}`;
+  return formatMonthLabel(year, date.getUTCMonth() + 1);
 };
 
 const mean = (values: Array<number | null>) => {
@@ -68,19 +68,6 @@ const mean = (values: Array<number | null>) => {
 };
 
 const byCadence = (series: YieldCurvePoint[], cadence: Cadence): ChartPoint[] => {
-  if (cadence === "weekly") {
-    return series.map((point) => ({
-      label: getLabel(point.recordDate, cadence),
-      oneMonth: point.oneMonth,
-      threeMonth: point.threeMonth,
-      twoYear: point.twoYear,
-      tenYear: point.tenYear,
-      spread10Y2Y: point.spread10Y2Y,
-      spread2Y3M: point.spread2Y3M,
-      curveSignal: point.curveSignal,
-    }));
-  }
-
   const grouped = new Map<string, YieldCurvePoint[]>();
   series.forEach((point) => {
     const date = new Date(point.recordDate);
@@ -97,7 +84,6 @@ const byCadence = (series: YieldCurvePoint[], cadence: Cadence): ChartPoint[] =>
     tenYear: mean(points.map((point) => point.tenYear)),
     spread10Y2Y: mean(points.map((point) => point.spread10Y2Y)),
     spread2Y3M: mean(points.map((point) => point.spread2Y3M)),
-    curveSignal: mean(points.map((point) => point.curveSignal)),
   }));
 };
 
@@ -137,6 +123,12 @@ const SERIES = {
 /** Vertical extent as text. A chart with no stated scale cannot be read off. */
 const formatRange = (min: number, max: number, unit: string) =>
   `${min.toFixed(2)} to ${max.toFixed(2)}${unit}`;
+
+/** What the ribbon's last block is: one month-end, or a year's month-ends averaged. */
+const RIBBON_PERIOD: Record<Cadence, string> = {
+  monthly: "month-end",
+  yearly: "month-end average",
+};
 
 const ribbonTone = (value: number | null) => {
   if (value === null) return "bg-slate-700/70";
@@ -221,6 +213,9 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
      colour-matched inversion chips and once in the definitions row. A third
      labelling on top of the data was the one that had to go. */
 
+  /* Month-end to month-end. The series is the monthly archive, and this panel
+     was titled "Biggest weekly rate moves" over rows reading "Mar 31, 2022 ·
+     2Y +84.0 bp" — a month's move, dated like a week. */
   const topShocks = yieldCurveSeries
     .map((point, index) => {
       if (index === 0) return null;
@@ -228,7 +223,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
       const delta2Y = typeof point.twoYear === "number" && typeof previous.twoYear === "number" ? (point.twoYear - previous.twoYear) * 100 : null;
       const delta10Y = typeof point.tenYear === "number" && typeof previous.tenYear === "number" ? (point.tenYear - previous.tenYear) * 100 : null;
       return {
-        label: getLabel(point.recordDate, "weekly"),
+        label: getLabel(point.recordDate, "monthly"),
         delta2Y,
         delta10Y,
         rank: Math.max(Math.abs(delta2Y ?? 0), Math.abs(delta10Y ?? 0)),
@@ -262,17 +257,26 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
         {/* Five panels labelled entirely in maturities and spreads. The key goes
             above them, not below, so the shorthand is defined before it is used. */}
         <CurveTermsKey
-          terms={["maturities", "spread10Y2Y", "spread2Y3M", "bp"]}
+          terms={["maturities", "spread10Y2Y", "spread2Y3M", "pp", "bp"]}
           className="mt-3 border-b border-slate-800/80 pb-3"
         />
 
         <div className="mt-3 grid grid-cols-1 gap-2 lg:grid-cols-12">
+          {/* The gauge the title names: 10Y−2Y, in pp, as its row higher up
+              prints it. This drew an unnamed blend (0.7 of 10Y−2Y plus 0.3 of
+              2Y−3M) and printed "Latest: 0.42%" for Aug 31, beside a row giving
+              the same gauge as 0.41pp on Aug 31 and 0.47pp this week. The last
+              block is a month-end, and the line under it says so. */}
           <FlatPanel className="lg:col-span-12">
-            <PanelTitle title="Recession warning gauge over time" subtitle="One block per period: green is normal, amber is flattening, red is inverted." />
+            <PanelTitle title="Recession warning gauge over time" subtitle="Ten-year minus two-year rate, one block per period: green is normal, amber is flattening, red is inverted." />
             <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
-              {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.curveSignal)}`} title={`${point.label}: ${formatPercent(point.curveSignal)}`} />) : <div className="flex-1 bg-slate-700/70" />}
+              {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.spread10Y2Y)}`} title={`${point.label}: ${formatSpread(point.spread10Y2Y)}`} />) : <div className="flex-1 bg-slate-700/70" />}
             </div>
-            <p className="mono text-xs text-slate-300">Latest: {formatPercent(latest?.curveSignal ?? null)}</p>
+            {latest ? (
+              <p className="text-xs tabular-nums text-slate-300">
+                {latest.label} {RIBBON_PERIOD[cadence]}: {formatSpread(latest.spread10Y2Y)}
+              </p>
+            ) : null}
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8 lg:row-span-2">
@@ -403,7 +407,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </svg>
             {monthlyScatter.length ? (
               <p className="text-fluid-xs tabular-nums text-slate-400">
-                X {formatRange(scatterXMin, scatterXMax, "%")} · Y {formatRange(scatterYMin, scatterYMax, "%")}
+                X {formatRange(scatterXMin, scatterXMax, "%")} · Y {formatRange(scatterYMin, scatterYMax, "pp")}
               </p>
             ) : null}
             <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction, not just position.</p>
@@ -428,22 +432,22 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               <span>{midPoint?.label ?? "Mid"}</span>
               <span>{latest?.label ?? "Latest"}</span>
             </div>
-            <p className="text-xs text-slate-300">10Y−2Y {formatBp(toBp(latest?.spread10Y2Y ?? null))} · 2Y−3M {formatBp(toBp(latest?.spread2Y3M ?? null))}</p>
-            <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(spreadMin, spreadMax, "%")}</p>
+            <p className="text-xs tabular-nums text-slate-300">10Y−2Y {formatSpread(latest?.spread10Y2Y ?? null)} · 2Y−3M {formatSpread(latest?.spread2Y3M ?? null)}</p>
+            <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(spreadMin, spreadMax, "pp")}</p>
             {hasSpreadGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-4">
-            <PanelTitle title="Biggest weekly rate moves" subtitle="The weeks the two-year and ten-year rates moved most, largest first." />
+            <PanelTitle title="Biggest monthly rate moves" subtitle="The months the two-year and ten-year rates moved most, month-end to month-end, largest first." />
             <ul className="space-y-1 text-xs text-slate-200">
               {topShocks.length ? (
                 topShocks.map((shock) => (
-                  <li key={shock.label} className="px-1 py-0.5">
-                    <span className="mono text-slate-400">{shock.label}</span> · 2Y {formatBp(shock.delta2Y)} · 10Y {formatBp(shock.delta10Y)}
+                  <li key={shock.label} className="px-1 py-0.5 tabular-nums">
+                    <span className="mono text-slate-400">{shock.label}</span> · 2Y {formatBpMove(shock.delta2Y)} · 10Y {formatBpMove(shock.delta10Y)}
                   </li>
                 ))
               ) : (
-                <li className="text-slate-400">No past weeks to compare.</li>
+                <li className="text-slate-400">No earlier month to compare.</li>
               )}
             </ul>
           </FlatPanel>
