@@ -11,9 +11,10 @@ There was a `Deploy` workflow that ran `wrangler deploy` on every push to main.
 It never once succeeded — the repo has no `CLOUDFLARE_API_TOKEN` secret, so
 Wrangler exited on every run from 2026-05-30 onward — while Workers Builds
 shipped those same commits. It was removed in Aug 2026 because a permanently
-red check on every merge is the signal that hides a real deploy failure. `CI`
-still runs lint, typecheck, test, assets, and build on both pushes and PRs, so
-nothing stopped being verified.
+red check on every merge is the signal that hides a real deploy failure. GitHub `CI` has
+been dispatch-only since 2026-08-21 (billed Actions minutes), so verification moved to
+`.husky/pre-push` locally and to Cloudflare Workers Builds, whose `bun run check:vinext`
+gates every push — nothing stopped being verified.
 
 The commands below are for out-of-band deploys from a workstation (`wrangler
 login` first) and for verifying a build locally.
@@ -326,10 +327,11 @@ Dry-run commands skip this preflight because they do not upload.
 
 The active `vinext@0.2.1` lane no longer emits the prior Rolldown option-validation warnings for `treeshake.preset` or `experimentalMinChunkSize` during `bun run build`.
 
-If CI reports a new warning class, treat it as action-required until triaged and either:
+If a build (local, or the Workers Builds log) reports a new warning class, treat it as action-required until triaged and either:
 1. fixed in code/dependencies, or
 2. intentionally accepted and documented in the build/deploy notes for the current Vinext version.
 
 ## Shared UI import exceptions
 
-- `app/components/uiIcons.tsx` now imports Lucide icons from `lucide-react/dist/esm/icons/*` so the shared client chunk only analyzes the icons the weekly brief and operations surfaces actually render.
+- None live today: `app/components/uiIcons.tsx` imports Lucide icons from `lucide-react` directly, and `simple-icons` is not a dependency (the inlined-SVG workaround that `app/components/workAppIcon.tsx` carried is gone with it).
+- If a shared client module ever needs per-icon or third-party brand icons again, treat any deep import path inside shared UI (`lucide-react/dist/esm/icons/*`, `simple-icons/components/*`) as an explicit bundle-cost tradeoff that must be re-measured in `bun run build`.

@@ -1,6 +1,6 @@
 # /concepts enhancement opportunities
 
-> **⚠️ HISTORICAL** — `/concepts` was retired and permanently redirects to `/trust`. See `docs/feature-specs-current.md` §1.6 for the current Trust hub spec.
+> **⚠️ HISTORICAL** — these proposals target the old `/concepts` timeline and article pages. The route was retired, then restored on 2026-09-23 as the product-writing reading list (`app/concepts/page.tsx`); the article pages did not come back, and `/concepts/*` redirects to `/concepts`.
 
 This note captures product and UX improvements for the `/concepts` timeline and article pages.
 

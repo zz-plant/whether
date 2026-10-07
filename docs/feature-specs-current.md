@@ -28,6 +28,12 @@ Dynamic decision copy follows the same bounded contract across weekly, evidence,
 - Desktop section outlines wrap long labels; the mobile section index uses readable shared metadata text and contains horizontal overscroll.
 - The shared area table and homepage signal table stack below `md`, including landscape phone widths. Shared controls retain at least 44px touch targets on tablets; the compact 36px treatment requires a fine pointer with hover. Native text fields remain at least 16px on coarse pointers.
 
+### Shared page spacing (2026-10-04)
+
+The brief, report pages, answer pages and share groups use the spacing roles in `docs/agents/ui-ux-standards.md` §XXI. Page stacks own section separation; section stacks own heading/body gaps; framed cards own their insets. Report rows no longer add padding on top of an unboxed section's padding, and secondary-page titles and bodies share one left edge. The brief's company-control shelf uses aligned label columns above `sm`; phone controls stay in the header, with constraint notes retained when present. Narrative order, thresholds and export payloads are unchanged.
+
+The share page centers its groups in a 72rem column and limits the shared copy preview to 48rem, with equal-width format tabs. Runway labels, timeline status badges and palette help use the metadata type scale; scenario explanations and the budget memo use the readable small-body scale. Timeline month/zoom controls and its drag track retain 44px targets on phones and coarse-pointer tablets, with compact controls available on desktop. These refinements preserve the copied payloads and history navigation behavior.
+
 ### 1.0 Rationalized IA (one screen + reachable depth)
 Primary IA is now a single surface — the **Weekly Brief** — with everything else reachable
 as supporting layers, deep links, or URL-driven states of `/`:
@@ -37,119 +43,75 @@ as supporting layers, deep links, or URL-driven states of `/`:
 - `/history`, `/history/compare`: supporting archive and scrub/playback
 
 Supporting surfaces are intentionally subordinate:
-- `/toolkits` is a supporting instrument library under **Resolve**
-- `/learn/failure-modes` is a supporting diagnostic reference under **Trust**
-- `/guides`, `/resources/*`, `/answers`, `/solutions/*`, `/concepts`, and `/startup-macro-posture*` remain secondary discovery or distribution surfaces rather than primary workflow hubs
+- `/toolkits/[slug]` pages are supporting instruments under **Resolve**
+- `/resources` and `/resources/*`, `/answers/[slug]`, and `/concepts` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 - SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
-- Secondary libraries such as `/guides`, `/toolkits`, `/posture`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
-- `/guides` and top-level `/toolkits` entry URLs are helper entrypoints under their parent workflow hubs rather than standalone primary destinations
-- `/guides` now acts as a compatibility redirect into query-selected translation states on `/resolve`, so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
-- `/toolkits` now also acts as a compatibility redirect into the query-selected toolkit shortlist on `/resolve`, so toolkit search and browse state live inside the canonical Resolve workflow rather than as a standalone library route.
-- `/posture` now acts as a compatibility redirect back to the Weekly Brief. Live posture reference no longer ships as a standalone workflow.
-- `/search` now acts as a command-only redirect into the next canonical workflow state instead of rendering its own browse surface.
-- `/resources` now redirects straight back into Planning's export/artifact checkpoint; deeper governance material still lives on focused `/resources/[slug]` detail pages.
+- Secondary pages such as `/toolkits/[slug]`, `/search`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
+- `/guides` is a compatibility redirect into query-selected translation states on `/resolve` (`/guides/[stakeholder]` to `?stakeholder=`, `/guides/stage/[stage]` to `?stage=`), so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
+- `/toolkits` permanently redirects to `/` (`next.config.js`). Toolkit search and browse state (`?toolkitQuery=`) live inside the Browse disclosure on `/resolve`, and each toolkit keeps its own `/toolkits/[slug]` page.
+- `/posture` and `/startup-macro-posture` redirect back to the Weekly Brief (`/startup-macro-posture/index` to `/trust#formula-reference`), and `/solutions/*` redirects into `/resolve` or a toolkit page. Live posture reference no longer ships as a standalone workflow.
+- `/search` renders its results on the server (`app/search/page.tsx`); the hub the top match belongs to is offered as the first action rather than redirected to.
+- `/resources` is a hub page (`app/resources/page.tsx`) listing the governance frameworks and the decision guides; deeper governance material lives on focused `/resources/[slug]` detail pages.
 - `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
-- `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/guides` or `/concepts`
-- `/learn/failure-modes` permanently redirects into the trust workflow rather than acting as an independently indexable content hub.
+- `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/resolve` or `/concepts`
+- `/learn/failure-modes` permanently redirects into the trust workflow (`/trust#revisit-call`) rather than acting as an independently indexable content hub.
 - `/concepts` is a page again (restored 2026-09-23): one list of widely read product-management writing, each entry placed on the month-end record (conditions that month, how long they had held), with the essays' share per set of conditions beside the months' share so no coincidence reads as a cause. Every entry's first-publication month was checked against its source. Sub-paths (the first version's detail, focus, audience and conflicts pages) redirect to `/concepts`. Module: `lib/productCanon.ts`; test: `tests/productCanon.test.ts`.
 
-The homepage keeps interpretation layers optional and query-driven: the default weekly brief omits interpretation context entirely, and interpretation panels render only when a non-default `?view=` is explicitly selected.
+The homepage renders no interpretation layer. A non-default `?view=` still selects one and the home assembly builds it (`buildInterpretationLayer`, called from `lib/report/homePageAssembler.ts`), but nothing reads it: its panel had no call site and was deleted on 2026-08-14, and the exports stopped receiving it on 2026-10-06 (§5.3.1).
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
-Report-shell routes (`/signals`, `/operate`, `/resolve`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, do not inject a default export CTA on non-home routes, and the compact global nav stays quiet by default on mobile behind a collapsed workflow picker.
-Primary navigation now keeps the Weekly Brief as the only primary destination. Plan,
-Evidence, Resolve, and Trust are supporting layers under the brief, reachable from the mobile
-drawer, command palette, and in-flow CTAs (`Build this week's plan`) — never as equal-weight
-desktop nav peers.
+Report-shell routes (`/signals`, `/operate`, `/resolve`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, and do not inject a default export CTA on non-home routes.
+Navigation reads the loop from one array in IA order (`navigationLayers`,
+`lib/navigation/informationArchitecture.ts`). The Weekly Brief is the one `primary` layer; Plan,
+Evidence, Resolve, Trust and History are `supporting` layers that name a parent. From `md` up the
+header draws all six as text tabs with the active one underlined
+(`app/components/globalHeaderNavClient.tsx`); below `md` a bottom tab bar carries Brief, Plan and
+Evidence beside Search and More, and More opens a sheet with the rest
+(`app/components/MobileTabBar.tsx`). The command palette mounts every loop layer.
 
 ### 1.1 Weekly briefing (/) 
-The home report is a weekly briefing view delivered through the shared `ReportShell` layout. It
-includes status metadata (data freshness, confidence label, offline badges), fixed navigation
-links, and section anchors used across the report experience.
+The home page is the weekly brief. It renders in `Shell` (`app/components/Shell.tsx`), not the
+report shell the other reading routes use, and since 2026-09-22 it is five sections in the order a
+reader asks them (`HOME_SECTIONS` in `lib/report/home/homeSectionModel.ts`; `app/page.tsx`):
 
-The home page is now the canonical weekly workspace. The top fold keeps the `WeeklyDecisionCard`
-hero plus share/copy actions, then the page continues as a compact handoff sequence:
-- planning handoff,
-- evidence/trust exception handoff,
-- optional deeper-surface chooser.
+1. **The guidance** (`#weekly-call`). `DecisionHero` is the card a reader screenshots: the
+   conditions stamp with the week's direction and, when conditions changed, what they were at the
+   earlier reading; the action as the headline; the trust strip; and from `md` up the conditions
+   map (`RegimeRadar`) with its path of month-ends (§1.1.42, §1.1.44). A monthly or quarterly
+   horizon adds `CadenceCallCard` above it. Under the card sit `SinceLastVisit` and
+   `YourRecordNote` (live briefs only), then Copy Brief (`ShareBriefButton`, DD-005's one primary
+   action) and the Plan horizon control.
+2. **What changed this week** (`WhatChangedSection`): one row per signal, the earlier reading →
+   this week's with the comparison dated (§1.1.26), each composite score on its ladder with what
+   moved it (§1.1.27), under the movement sentence (§1.1.28).
+3. **What that changes for you** (`WhatItChangesSection`): each decision area's rule with its
+   pause and resume lines and the distance to each (`AreaTable`), the stage and runway calibration
+   (`#company-calibration`), and, on a live brief with a runway figure, the runway-conditioned
+   notes (§1.1.16).
+4. **What would change this guidance** (`WhatWouldChangeSection`): the two score ladders, the
+   market move that would cross each change line, and, on a week the guidance moved, what happened
+   the last time it moved this way.
+5. **Do and share** (`DoAndShareSection`): the plan as the one primary button, the slide and image
+   copies, subscribe and the browser push alert, and the citable permalink.
 
-The home top fold now separates metadata from decision contract: a compact current-outlook strip
-shows posture, trend, confidence, and flip-window context, and the canonical weekly call appears
-once below it with explicit `Action now`, `Pause if`, and `Change course if` fields. The share rail
-now keeps the weekly operator brief and short snapshot as the only default-scan actions, while board
-packaging, print/export, and company-specific exception controls sit inside a secondary disclosure.
-The weekly brief now also states its primary audience assumption directly: Whether defaults to
-U.S.-based operators and a U.S. market baseline, then asks the user to pressure-test that read
-against company-specific demand, retention, and cash signals.
-Operator-workflow telemetry still logs artifact-mode selection and route transitions across the core
-weekly loop.
-On phones the hero's signal readout (funding pressure / risk appetite / conditions) collapses to a
-one-line summary via a native disclosure that keeps all three values visible; it opens automatically
-on ≥640px viewports (DD-004 mobile-compression work, 2026-08-11).
-The weekly-call module now also surfaces a compact weekly scalar block before the bounded decision strip:
-- boldness budget score and weekly delta,
-- hiring, expansion, and fundraising windows,
-- a scan-first “What can we do this week?” ledger using `Do now`, `Stop or tighten if`, and
-  `Open up again when`, with structured lane states translated into explicit action phrases,
-- one-line net delta shorthand.
-The canonical weekly-call block now also includes:
-- a compact decision-readiness verdict (`Act`, `Act with caution`, or `Hold`) inside the trust row,
-- a bounded revisit queue (up to three items) when this week’s move implies specific decisions should be reopened, carrying why each lane is queued rather than restating the bounded action the ledger below already prints verbatim,
-- a plain-language steady-week state (`No change` / `Last week’s calls stand.`) driven by `weeklyLeadershipSummary.steadyWeek`, replacing the repetition of “no change vs last week” across the delta widgets,
-- a shared flip corridor stated once above the bounded-decision ledger when every lane clears on the same conditions, so correlated levers read as correlated,
-- a delta-only brief in the share rail for repeat readers who only need the weekly change, reopen items, and current hold / reopen lines.
-The current homepage hierarchy now makes the action lane dominant: `Do this now` leads the top fold, `What changed` supports it, and `Recheck now` plus readiness/trust sit in a smaller secondary lane rather than competing as equal-width cards.
-The artifact rail now follows a routine-first hierarchy:
-- one recommended artifact mode,
-- one primary share/copy path,
-- quick variants for repeat readers (`delta brief`, `call snapshot`),
-- a direct handoff into Planning for board/governance repackaging and company-specific exceptions.
-On the homepage, the artifact rail is now visually collapsed behind one default path: the first scan exposes one recommended share/copy action, while alternate artifact modes and heavier packaging sit behind a `More formats` disclosure.
-Citation and continuity details remain adjacent but lower-emphasis, instead of repeating a second share summary around the primary artifact card.
-Translation help sits beside the term it translates rather than on a separate page.
-Across deeper workflow, answer, toolkit, trust, and export surfaces, the public-facing decision contract now standardizes on `Current call`, `Action now`, `Pause if`, `Resume when` and `Call changes if` as the primary scan labels.
-Those four lines now come from one shared weekly-call contract rather than route-local copy assembly, so the homepage card, copy CTA, command bar, and exported operator brief stay aligned on the core call. The call-change side of that contract is `callChangesIf` (where the call changes, labelled `Call changes if`) plus, only when a stage is set, `resumeWhen` (the stage's discipline for lifting its hold, labelled `Resume when`); a stage adds the second line and never replaces the first. Shared copy/export artifacts also lead with the canonical Operating latitude from the weekly leadership summary, with tightness reserved for pause/guardrail conditions.
-The weekly brief sequence now favors `Operating latitude -> current call -> operating levers -> share actions -> route handoff` rather than surfacing deep proof or team translation before the transmission surface.
-The homepage global header now keeps the weekly brief calmer: it shows the direct next paths first, while the broader workspace chooser on `/` is tucked behind a collapsed `Browse workspaces` control rather than rendering as an always-open rail.
-The lower homepage handoff now renders as a subordinate next-step layer instead of a second equal-weight dashboard band: one compact planning card leads, proof/trust remain visible exception checks, and replay/tool paths sit behind a collapsed optional disclosure with smaller follow-on links rather than a second open card grid.
-The collapsed `Route this week's call` disclosure groups the downstream paths into Plan (capital posture, ship call), Resolve (by role, toolkits), Rule (blank decision form, reversal checklist), and Compare (past epochs, full archive), keeping them one expand away from the leading plan card.
+A first visit sees "What are you deciding?" (`DecisionPicker`) under the card, with sections 2 to 5
+folded until "Show the full brief" (§1.1.21, §1.1.42). `StickyCallStrip` carries the guidance from
+`md` up. An archived month drops the trust strip for an archive caption and leaves out
+`SinceLastVisit`, `YourRecordNote` and the runway notes. `/` mounts `ActivationTracker` and
+`OperatorWorkflowRouteTracker`; the workflow stream records route transitions (§1.1.30).
 
-The home page now leads with a canonical **What changed this week?** block inside the hero,
-rendered by `WeeklyChangeReport` (`app/components/hero/weeklyChangeReport.tsx`). It reads as three
-bands — *What changed*, *What that changes for you*, *What stays the same* — so a movement always
-arrives with its consequence and a consequence always arrives with its cause. Each change opens to
-its evidence: the reading, the movement, the record date, the source, and the decision areas it
-drives. A week where nothing moved collapses to one sentence plus the unchanged list rather than
-three headings over two empty sections.
+The decision contract's labels come from `DECISION_CONTRACT_LABELS` (`lib/report/reportCopy.ts`):
+`Do now` / `Action now`, `Pause if`, `Resume when`, and `Conditions change if`. The lines are built in
+one weekly-call contract (`WeeklyCallContract`, `lib/report/weeklyCallContract.ts`) rather than
+route-local copy assembly, so the card, Copy Brief and the exported briefs agree. Its change side is
+`callChangesIf` (where the conditions change) plus, only when a stage is set, `resumeWhen` (the
+stage's discipline for lifting its hold); a stage adds the second line and never replaces the first.
+A term carries its meaning where it appears (§1.5).
 
-It replaced a single revisit list that rendered `item.recheck || item.reason`, which dropped the
-signal move entirely on a multi-item week — `reason` is `driver + recheck`, and `recheck` won the
-`||`. `RevisitQueueItem.driver` already carried that sentence and its doc comment asks renderers
-listing several items to hoist the shared driver rather than repeat it; grouping by driver is that
-hoist. Movement is read from `signalIndicators`, not the queue, because `revisitDecisions` is false
-whenever the direction is "stable" — a week that moved without tripping a threshold has an empty
-queue and still has to say what moved. A signal whose published delta rounds to zero at the one
-decimal it reports is not a change: `formatTrendArrow` returns `→` only for an exact `0`, so a
-`-0.04` arrives as `↓` beside the label "-0.0 vs last week". Below-the-fold tool racks (transition
-probability, regime history chart, what-if simulators, ticker, source-disagreement, evidence
-drawer) were removed from `/` as surfaces that competed with the decision-attention block; their
-engines stay internal (see section 8). Company context below the call is the browser-held
-runway-conditioned notes panel (see section 1.1.9); the removed `CompanyMetricsPanel` "Your
-numbers" widget has no successor component, only that panel and the shared operator profile.
-
-The evidence handoff keeps trust compact on home by showing one summary plus explicit route
-ownership for `/signals` and `/trust` instead of reproducing those workflows inline.
-The shared report shell no longer inserts extra homepage header / command chrome ahead of the weekly card, so the canonical brief remains the first major decision block.
-The planning handoff compresses the weekly action, guardrail, and finance/share summary before
-deeper review in `/operate`. Historical replay now belongs to `/signals` rather than running as
-an inline home interaction. Role, situation, and toolkit paths are handled as explicit downstream
-surfaces after planning rather than as a parallel home workflow.
-The default post-brief path is now Planning; Evidence and Trust are framed as exception checks when
-the weekly call still needs proof.
-Planning is now rendered as the visible next step on home, while Evidence and Trust are reduced to compact exception cards rather than a second homepage narrative.
-
-The optional `?view=evidence` mode still renders the high-density analytical matrix with direct row
-labels, embedded threshold context, and restrained accent usage for outlier conditions.
+`WeeklyChangeReport` (`app/components/hero/weeklyChangeReport.tsx`), the hero block whose three
+bands (*What changed*, *What that changes for you*, *What stays the same*) this order grew from, was
+deleted on 2026-09-22 with the hero cards beside it. The tool racks removed from `/` before that
+(transition probability, regime history chart, what-if simulators) are recorded in section 8.
 
 Copy strategy for briefing and onboarding surfaces favors concise, action-first language: one headline plus one support sentence before primary actions, with deeper rationale moved into expandable or secondary sections.
 Route summaries and hero copy favor user-job phrasing over internal product nouns, especially on Evidence, Planning, Resolve, and Trust.
@@ -158,8 +120,8 @@ Weekly Brief URLs now emit week-specific Open Graph and Twitter preview cards. S
 current brief or a historical Time Machine selection preview the selected week’s posture, immediate
 decision, flip condition, and core rate context instead of falling back to a generic site card.
 
-Cold opens into `/` now use a share-card-aligned loading state before the full report resolves, so
-social clicks land on the same action-first artifact structure rather than a generic skeleton.
+Cold opens into `/` show the shared route loading shell (`app/loading.tsx`, `RouteLoadingShell`)
+until the report resolves.
 
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
 The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate
@@ -575,7 +537,7 @@ sections inline; `cadenceSummaryCardAdapter.tsx` and `summaryCardCadences.ts` ar
 (section order, the `/api/monthly` link, the raw copy block, provenance). The chain that began this
 pass at four links is one component and one card.
 
-### 1.1.11 Modes and settings that changed nothing (2026-09-07)
+### 1.1.14a Modes and settings that changed nothing (2026-09-07)
 A settings-layer pass, tracing every mode and toggle in the product to whatever was supposed to
 consume it. Four did not reach one.
 
@@ -628,8 +590,8 @@ consume it. Four did not reach one.
 Covered by `tests/persistedUiBootstrap.test.ts`, `tests/embedRoute.test.ts`,
 `tests/telemetryDynamicRoute.test.ts`, and `tests/alertPreferenceRequest.test.ts`.
 
-### 1.1.12 Alert mail that could not reach anyone (2026-09-07)
-Follow-up to §1.1.11, after tracing the alert channel toggles past the UI into the delivery
+### 1.1.14b Alert mail that could not reach anyone (2026-09-07)
+Follow-up to §1.1.14a, after tracing the alert channel toggles past the UI into the delivery
 path. The toggles were not merely awaiting a delivery path — they wrote to a keyspace the
 existing, working one could not route.
 
@@ -668,13 +630,13 @@ existing, working one could not route.
 
 Also in this pass: `lib/report/imageBriefSearchParams.ts` gated stage on `isOperatorStage`
 in two places, so `?stage=growth` on `/api/image/brief` or a shared brief link serialized
-through and was then dropped — the same defect §1.1.11 fixed in `/api/embed`, still live
+through and was then dropped — the same defect §1.1.14a fixed in `/api/embed`, still live
 one route over. Both now use `parseOperatorStageParam`.
 
 Covered by `tests/alertDelivery.test.ts`, `tests/alertsPanelClaims.test.tsx`, and
 `tests/imageBriefSearchParams.test.ts`.
 
-### 1.1.13 Controls at the wrong layer of parentage (2026-09-07)
+### 1.1.14c Controls at the wrong layer of parentage (2026-09-07)
 A pass over every control whose effect leaves the container it sits in. Three did.
 
 - **A page reload was rendered eleven times, each looking panel-scoped.**
@@ -722,7 +684,7 @@ zero-offset halos, which §XIII allows as emphasis.
 
 Covered by `tests/pageScopedControls.test.ts`.
 
-### 1.1.14 Header, nav and footer, looked at rather than reasoned about (2026-09-07)
+### 1.1.14d Header, nav and footer, looked at rather than reasoned about (2026-09-07)
 A screenshot pass over the global chrome — `bun run ui:iterate` plus header/footer crops at
 430px and 1600px, before and after. Four of the five findings were only visible in a picture.
 
@@ -739,7 +701,7 @@ A screenshot pass over the global chrome — `bun run ui:iterate` plus header/fo
   would have been no better: it would link to the page the reader is on. The slot now returns
   null unless it names somewhere the primary action does not, and the caller renders nothing.
 - **The right edge was a strip of identical squares.** Each header control carried its own
-  border and fill — five of them on the home brief once Present moved up in §1.1.13 —
+  border and fill — five of them on the home brief once Present moved up in §1.1.14c —
   competing with the cadence segmented control beside them for the same "bordered group"
   reading. One container now owns the border; the buttons are hairline-divided cells.
 - **The footer had no brand and three anonymous centred rows.** Twenty-four links, ranked by
@@ -797,7 +759,7 @@ A justified-removal pass over the remaining UI. Four removals, two repairs:
   renders appears above the fold in `#weekly-call` — a change moved content only where the reader
   could not see it. Selection now scrolls to that section, honoring `prefers-reduced-motion`.
   Whether monthly and quarterly deserve a slot on `/` at all stays the open IA question from
-  §1.1.14; no cadence telemetry exists to settle it, so it is a product decision, not a measurement.
+  §1.1.14d; no cadence telemetry exists to settle it, so it is a product decision, not a measurement.
 - **The sticky call strip's `Jump` menu is gone.** It listed the same five anchors as
   `BriefSectionNav`, on the same page, at the same widths. The strip keeps the call, the copy
   control, and the image download.
@@ -1193,6 +1155,89 @@ deadlock" on every request where the quote source declined, because `lib/saasMul
 early without reading the refused responses' bodies while fetching the basket in parallel. They are
 released now.
 
+### 1.1.24a The phone gets the reading, not the shell (2026-09-25)
+
+A mobile review of `/operate`, `/signals` and the archive mode found the report routes opening
+with chrome that restated the route instead of the week: a "Weekly brief" kicker above every H1,
+the operating-loop glyph as a second navigation band under the bottom tab bar, a hero Share button
+duplicating the page's own Share step, and a chips row that clipped its overflow with no affordance.
+The intro also inverted the hierarchy the product claims — "Freezing" printed in micro type under a
+display-size "Plan", on a page whose route name the bottom bar already carries. Changes, all in the
+shell so every report route inherits them:
+
+- **`CommandCenterNavBlock`: no kicker.** "Weekly brief" above every H1 restated the route the
+  header tab, the sidebar and the bottom bar already name, and made distinct pages read as
+  variations of one landing page.
+- **The status word leads the intro.** The regime word prints first, in the regime ink, at the
+  reading's own size; the trust headline and record date follow it in the meta half of the same
+  line. The H1 drops to `text-fluid-base` below `lg` — the bottom bar owns the route name on a
+  phone; the week's word is the fact the reader came for.
+- **The operating-loop glyph is desktop-only** (`hidden lg:flex`): on a phone its four steps are
+  the bottom bar's tabs, and under the intro it was a second navigation band pushing the first
+  task block down.
+- **`/operate` drops the hero Share button.** The Share step further down the same page owns
+  sharing; on a phone both were in one viewport as "Share the brief" twice.
+- **The refresh stamp reads "Signals refreshed …"**, not "Updated …" — two dates print inside one
+  viewport and the reader has to be able to tell the pipeline's fetch from the reading's record
+  date apart. The data-status vocabulary renames `live` to "All sources live": "Live" beside a
+  dated reading claimed something about the page, when what is live is the sources.
+- **`MobileSectionChips` fades its hidden edges** wherever content sits beyond them — a row that
+  silently clips reads as broken labels, not as something you can scroll (the DD-001 affordance
+  call, applied to the outline row).
+- **Shell spacing tightens below `lg`** (`space-y-6 sm:space-y-8 lg:space-y-12`, section paddings
+  `py-5 lg:py-8`): 40px between the chips row, the offline notice and the intro was unused space
+  above the first task block, not separation.
+- **The week checklist count is `text-sm`.** "0 of 5 done this week" is the most actionable fact
+  under the intro and printed in the same micro size as the trust metadata above it. Since
+  2026-10-02 it heads the checklist ("Steps for this week", the count at the right over the Done
+  boxes, a rule under both) with 24px above, instead of sitting directly under the trust strip as
+  if it were one of its facts (DD-037).
+
+**Command palette (`Cmd+K`).** Below `md` the palette is a bottom sheet, not a centered dialog:
+touch-height rows (`min-h-11`), no keyboard-shortcut badges, no shortcut footer, no pre-selected
+highlight (with no hardware keyboard the index never moves, and a permanent first-row highlight
+only competes with the field above), and a neutral placeholder — the e/p/h mnemonics are for the
+keyboard help, not the phone's only path to `/search`. The `.weather-kbd` badges hide behind a
+wrapper span because the class is unlayered CSS and outranks the `hidden` utility.
+
+**Archive mode.** The historical banner is one row with one action — "Archived view · Viewing
+August 2026 · data as of Aug 31 · Back to this week". It was an eyebrow, a title, a paragraph and
+up to three buttons, occupying half a phone screen before the historical guidance began; "Earlier
+month" and "Pick a date" went with it, because the calendar picker beside the week title and the
+palette's archive commands are where going deeper into the archive lives. The "Past week" tag
+beside the week title is gone too — the banner is the mode's one marker, and the tag read as
+another control while saying what the banner had already said. `CompactTrustPopover` renders
+nothing in historical mode; its sources and dates are only truth for a live reading.
+
+**The weather rationale is the condition, not the advice.** `REGIME_WEATHER_RATIONALES` keeps
+the money fact and drops the instruction half ("Move faster", "Conserve cash"): beside a cautionary
+call it read as two recommendations disagreeing, when the truth is one condition and one
+constraint — the stamp states the condition, the heading owns the instruction. Consumers that
+already took the fact half (the OG subtitle, the investor snippet) are unchanged.
+
+**The trust strip's flip-risk cell answers "Not expected"**, not "No": the boolean says nothing is
+near its line this reading; printed as "No" beside Medium confidence it read as a promise about
+the future the confidence cell had just declined to make.
+
+Measured at 430px after the change: no document overflow on `/`, `/operate`, `/signals`,
+`/history` or archive mode; `/operate`'s first task block begins at y≈498 (intro ends at 317);
+the archive banner is 123px with one action; the palette sheet spans the bottom 613px of the
+viewport with 56px rows.
+
+### 1.1.24b The confidence record grades the recent year (2026-09-25)
+
+The calibration study's table is a whole-archive average, and nothing said whether it still
+described the current year — a finding from 2012–2024 wearing a 2026 date would read the same.
+`lib/report/calibrationDrift.ts` now grades the most recent twelve month-end readings from the
+same extract, per band: did readings at that distance still hold more often than the percent
+publishes for it? A rate-delta comparison against the historical baseline was built first and
+rejected: eleven graded readings make a five-point threshold flag a two-reading band, which is
+noise promoted to a claim. The published check is a direction, not a threshold. "Stable" and
+"drifting" render one sentence in `ConfidenceRecordBody` (shared by `/calibration` and
+`/history`, so the two cannot say different things); "unmeasured" renders nothing — a year too
+thin to grade is a gap, not a guess. `tests/calibrationDrift.test.ts` pins the real archive's
+current "stable" verdict, so the sentence and the data fail together.
+
 ### 1.1.25 The brief card says what the exports say (2026-09-29)
 
 `/api/image/brief` — the PNG `/share` lists and the card a Slack channel or link unfurl shows — set its
@@ -1570,926 +1615,7 @@ true.
 - `/trust`'s worked example quotes the published lines (`sharedDecisionLines`): resume below 66,
   not 64, which no rule used.
 
-### 1.2 Evidence report (/signals)
-The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
-in the order a reader asks:
-
-- **What changed.** One table of every signal: from → to, its line, and why it matters. The focus
-  filters narrow it and travel in the URL.
-- **What would change this guidance.** The two score ladders with their Pause if and Resume when lines.
-- **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are
-  interest rates doing? · Has the yield curve inverted in the last year? · How have the two scores
-  moved this year? · What would conditions be with different lines? · What did the brief say in an
-  earlier month? · Which past cycle looks most like this one? · Which habits from the zero-rate
-  years still shape your company? Since 2026-10-07 each summary carries its answer after the
-  question (§1.1.45).
-
-The page used to open on "What this means now", the brief's call restated under the shell's own
-stamp, and the charts disclosure opened by default: about 2,000px of charts before the other five
-instruments. The call stays on the brief. Links that targeted `#decision-summary` (search, and the
-month picker's "Back to this week") land on `#what-changed`. `?advanced=1` still opens the month
-picker, `?fossil=1` the fossil record, and threshold parameters the line settings.
-
-The inversion preview shows a labeled zero line, time anchors, direct end labels, and visible
-breaks when monthly spread reads are missing. The deeper yield-curve diagnostics now direct-label multi-series lines, preserve gaps
-instead of connecting through missing data, and encode scatterplot recency through a chronological
-path plus a highlighted latest point.
-
-### 1.3 Plan overview (/operate)
-Planning is the detailed execution depth page for the home workspace. The default surface is a
-progressive flow of steps: the weekly plan, sharing the brief, the rules before committing,
-setting this plan's lines (§1.1.31; live weeks only), testing a decision, and finance strategy.
-
-Only one step is expanded at a time, while the other steps collapse into summary cards. The home
-Planning handoff also now uses a more stateful board treatment with explicit owner, approval-state,
-and change-course cues instead of sentence-only summaries. Existing
-hash deep links are preserved by mapping section-level hashes into the relevant step.
-The share step now also houses the operator follow-through surfaces that were previously disconnected from the core loop:
-- per-profile alert delivery controls and recent send history,
-- Decision Memory export and latest-entry recall,
-- share artifacts, explainer mode, board/governance repackaging, company-specific exceptions, delivery controls, and audit history in one checkpoint before the brief leaves the room.
-The execution stepper shows owner, approval state, and `reopen when` metadata on both the active
-step and collapsed summaries. (This paragraph used to describe a mixed-literacy translation model on
-`/operate` — a top-of-page router to decision, evidence, trust or share help, plus persisted assist
-panels. No such router or panel existed; the only trace in the code was a table of storage keys
-nothing wrote, deleted in §1.1.11.)
-Shared report-shell routes now avoid stacking a separate trust summary panel ahead of the first task block; trust status stays compressed inside the intro layer unless a route explicitly promotes a deeper trust section.
-
-### 1.4 Planning workstreams
-- **Weekly plan** (`/operate`): the default execution
-  path with weekly plan, guardrails, finance strategy, export brief, scoped alert delivery controls, Decision Memory recall/export, and operator requests.
-
-### 1.5 Home, and why there is no glossary (`/`)
-The homepage is the only canonical first-time and returning weekly workspace. There is no
-glossary route (retired 2026-09-22; `/glossary` redirects to `/trust#formula-reference`). A
-term carries its meaning where it appears instead: a 0–100 score prints with its scale
-(`formatSignalReading`), the three lines have names that say what happens, weather names carry
-their one-line meaning, and the instrument names only a formula needs are defined on the
-formula cards. `tests/readerVocabulary.test.tsx` bans the retired names and the pointers to the
-old page. `llms-full.txt` keeps a Terms block (`TERM_DEFINITIONS`) for machine readers.
-See `docs/glossary-retirement-plan.md`.
-
-### 1.5.1 About and identity framing (`/about`)
-The About page is where the product says what it claims. Since 2026-10-01 it carries, in order:
-- **What is new here**: two claims and no more — lines decided before they are needed (each area's
-  action, pause line and resume line, set apart), and a record that grades itself (`/history` track
-  record, `/calibration`). It says the inputs are not new.
-- **Where it fits, and where it does not**: a cadence sentence derived from the archive
-  (`describeRecordCadence` over `buildTrackRecord`: conditions changed, and months a pause or resume
-  line was crossed, `lineCrossingMonths`), then the decisions it fits (multi-quarter commitments,
-  plans a group approves once, venture-backed U.S. companies with one to two years of runway) and
-  the ones it does not (single decisions, under six months of runway, funding that does not follow
-  U.S. rates, what to build).
-- **Who writes it**, with the method's healthcare origin attributed to the editor and linked.
-- **What it is built from**, naming only what enters the two scores; inflation and unemployment are
-  stated as tracked but unscored.
-
-### 1.6 Trust hub (/trust) and formula reference
-`/trust` is the canonical trust-audit hub linked from Weekly Brief. It summarizes current
-confidence, freshness, source coverage, and revisit conditions, then keeps active false-signal
-warnings inside the same Trust surface before linking out to `/trust#formula-reference`. The legacy `/sources` and `/confidence`
-entry URLs now redirect at the routing layer back into the canonical Trust anchors instead of acting
-as parallel trust pages.
-The page now opens with a binary trust verdict (`safe to use`, `use cautiously`, or historical-only)
-inside the trust snapshot block so operators can decide whether a deeper audit is necessary without a separate preamble card.
-The opening trust snapshot stays trust-specific: freshness, source coverage, and use boundary are shown first, while the live weekly call remains on `/`.
-
-`/methodology` now permanently redirects to `/trust#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, FRED CPI, FRED labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
-
-The methodology reference also now clarifies scope: the two scores are built from Treasury rates (the one-month bill and the 10Y−2Y slope) with capped stress adjustments (high-yield spread, Chicago Fed index, VIX, venture pace, layoffs). CPI, unemployment and the BBB spread feed the separate policy assessment, not the scores or the conditions. The operating outputs are a translation layer rather than a claim of bespoke precision.
-Failure-mode diagnostics are now handled through the Trust and Planning workflows rather than as a standalone indexable library. Planning now exposes compact false-signal checks before guardrail approval so operators can pressure-test the weekly plan without leaving the core loop.
-
-### 1.7 Share-preview assets for canonical hubs
-High-priority hub routes now ship dedicated static SVG social preview assets for:
-- `/posture`
-- `/signals`
-- `/operate`
-- `/resolve`
-- `/resources`
-- `/startup-macro-posture` and `/startup-macro-posture/index`
-- `/guides`
-- `/answers` and `/answers/[slug]`
-
-Secondary hubs (`/guides`, `/resources`, `/toolkits`) now lead with immediate value and
-focused next actions while reinforcing their parent workflow hub. `/answers` now redirects directly
-back into the canonical Resolve quick-answer path instead of maintaining a separate hub shell.
-Full helper libraries remain below the featured paths when those surfaces render a library view.
-`/guides` now owns both stakeholder and stage detail states behind query-selected panels, but supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
-`/search` remains product-accessible only as a command router URL: it forwards the query directly into the next primary workflow surface instead of acting like a browse-first library.
-`/resolve/team-context` no longer operates as a standalone personalization branch; it now redirects into Planning, and the home unresolved-utility fallback is the ship checklist rather than a separate company-profile workflow. `/resolve` itself now leads with one best-next-step path, keeps alternate answers and translation paths behind a lower-emphasis disclosure by default, and uses a smaller fallback chooser after that; team/stage views and tool depth stay hidden until explicitly selected.
-The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect back into the canonical Resolve answer flow. The active resource-article set is likewise reduced to a focused practical subset, with retired long-form briefs redirecting back into Planning's artifact checkpoint rather than a standalone Resources hub.
-
-The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
-
-Planning now opens with a weekly approval boundary before any broader monthly synthesis. The monthly action summary remains available as a secondary disclosure inside the first planning step instead of being the first primary payload.
-
-Report-shell route intros are now compressed more aggressively on mobile so the first page-specific task block lands faster in the viewport; the route brief still orients the operator, but no longer needs a second always-visible decision panel on small screens.
-
-Trust readiness language is now stricter on trust and planning surfaces: cached or medium-reliability states stay in staged-approval language (`use with caution` / `approvals staged`) instead of presenting as fully ready-to-use.
-Trust/readiness computation now consumes structured freshness state (`fresh` / `stale` / `unknown` plus `live` / `cached` / `historical`) instead of relying on rendered freshness labels, so stale-but-present timestamps no longer pass as ready-to-use.
-
-## 2) Data sourcing & provenance
-
-### 2.1 Treasury yields (live + fallback)
-- Canonical in-product source: FRED CSV Treasury constant-maturity series (`DGS1MO`, `DGS3MO`, `DGS2`, `DGS10`).
-- Secondary/provenance source: US Treasury Fiscal Data API is used only for validation workflows and source cross-checking, not for runtime scoring.
-- Data is normalized into a `TreasuryData` shape and stamped with `record_date`, `fetched_at`,
-  and source metadata.
-- If live fetch is unavailable, the report falls back to `data/snapshot_fallback.json` and marks the
-  response as cached with a fallback reason.
-
-### 2.2 Macro snapshot
-- Core series now include CPI, unemployment, BBB OAS, HY OAS, Chicago Fed NFCI, and VIX with live fetch support where available.
-- Startup/operator overlays (VC funding velocity, tech layoff trend, SaaS multiples) and structural overlays (earnings revisions, AI compute cost trend, regulatory risk tracker) are shipped via snapshot-backed series for deterministic fallback.
-- Each series carries a source URL, record date, and freshness metadata.
-
-### 2.3 Time Machine cache
-- Historical Treasury snapshots are served from `data/time_machine_cache.json`.
-- Each entry also carries the period's VIX reading with a trailing daily tail
-  (`vixHistory`) and the resolved base-rate velocity pair
-  (`baseRateVelocityWindow`), so the runtime replay evaluates the market-stress
-  veto and tightening-speed term on the same daily cadence the archive
-  generators use. The runtime governed walk must publish the same regime and
-  scores as `data/summary_archive.json` for every month on record; the parity
-  test in `tests/regimeGovernance.test.ts` pins this.
-- Historical selections resolve their assessment from the governed walk
-  (`findTimeMachineGovernedAssessment`), not a point evaluation against the
-  live machine snapshot, so a selected month reads the same call on every
-  surface — brief, compare cards, and `/history`.
-- The confidence history and the analog ranking resolve each historical month
-  from that same governed walk, so a stress month's confidence and distance to
-  flip carry the VIX haircut and veto the record was published with. The
-  current record date resolves to the live assessment instead.
-- A partial generator run (`HISTORY_START_YEAR`, which
-  `time-machine:update-summaries` sets to 2024) walks from the first year and
-  filters only which records it writes, so a merge lands the same
-  confirmations a full replay produces.
-- One walk (2026-10-06): the runtime replay and all three generators thread the
-  engine through `replayRegimeWalk` (`lib/timeMachine/regimeReplay.ts`), and the
-  generators' period logic is `scripts/regimeArchiveReplay.ts`.
-  `tests/regimeArchiveReplay.test.ts` replays every cadence offline from series
-  rebuilt out of the bundled data and holds it to the archive on record.
-- Every entry a generator writes carries `engineVersion` (`ENGINE_VERSION`, the
-  engine calibration that scored it). It is additive: entries written earlier have
-  none, and the archive reader ignores it.
-- A flip is a shock only when the one-step move is 25 points or more *and* the
-  prior reading sat outside the 5-point near band; from inside the band the
-  warning could have fired, so the flip confirms through the gate.
-- The Time Machine UI validates available months, shows cache coverage, and uses cached
-  summary archives for weekly/monthly/quarterly/yearly playback.
-- Historical assessment now attempts to align macro-series history to the selected `asOf` date and records explicit coverage labels (`historical aligned`, `historical aligned partial`, or `treasury-only`) so historical vs. live comparisons stay structurally comparable when data exists and honestly degraded when it does not.
-
-## 3) Regime engine & scoring
-
-### 3.1 Inputs
-- **Base rate**: 1‑month Treasury yield (fallback to 3‑month if missing).
-- **Curve slope**: 10Y − 2Y yield spread.
-- **Macro overlays (boundary calibration)**: HY OAS, Chicago Fed NFCI, VIX, VC funding velocity, and tech layoff trend adjust tightness/risk appetite before final classification and trigger multi-weak-read warnings.
-
-### 3.2 Scores
-- **Tightness score (0–100)**: adds 90 points if base rate > threshold and 25 points if the curve
-  is inverted; capped at 100.
-- **Risk appetite score (0–100)**: maps curve slope linearly from -1.0% to 1.5%.
-
-### 3.3 Regime classification
-Regime is determined by tightness vs. risk appetite thresholds (defaults are 70 and 50
-respectively). Thresholds can be overridden via URL parameters, and the UI maintains an audit log
-of operator changes.
-
-Canonical taxonomy is the four-quadrant set only: `SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`.
-Policy pilot outputs (`RISK_ON`, `SAFETY_MODE`, `TRANSITION`) are a separate posture layer and do not replace regime keys used by Decision Shield, alerts, or UI matrix logic.
-
-### 3.4 Outputs
-Adjustment semantics:
-- Macro overlays modify tightness/risk-appetite scores before classification, so they can change the resulting regime when signals are near boundaries.
-- Diagnostics (`boundaryContributors`, weak-read warnings, confidence) explain *why* adjustments applied.
-- Recommendations and constraints always derive from the final classified regime.
-
-The regime assessment includes:
-- Current regime label + description
-- Tightness and risk appetite scores
-- Constraint list for the current regime
-- Data warnings when inputs are missing
-- Input metadata for provenance display
-
-
-
-### 3.4.1 Sector sensitivity overlay (decision translation layer)
-### 3.4.2 Trust and fallback behavior for missing sector/company context
-- Sector query fallback: unknown or empty `?sector` values resolve to canonical fallback `b2b-saas`.
-- Missing company-rule payload fallback (interpretation `company` view): render available bounded rules in provided priority order and cap to the top three; if fewer than three exist, render only available rules without blocking the page.
-- Trust posture: these fallbacks are translation-layer only and never mutate base regime classification, canonical confidence label, or trigger thresholds.
-
-- Sector overlays are **secondary interpretations only** and do not mutate base regime classification.
-- Canonical sector taxonomy:
-  - `b2b-saas` → higher upside sensitivity (`Expansion+`, `Mixed+` when warranted)
-  - `consumer` → neutral calibration (`Expansion (neutral)`, `Mixed (neutral)`, etc.)
-  - `infrastructure` → higher downside sensitivity (`Mixed-`, `Defensive-` when warranted)
-  - `fintech` → mixed calibration with tighter downside checks and selective upside (`Mixed (neutral)|Mixed-` in boundary weeks)
-  - `healthcare` → conservative calibration favoring hold/tighten near thresholds (`Defensive (neutral)|Defensive-` as warranted)
-  - `ai-platforms` → aggressive upside calibration (`Expansion+`, `Mixed+` with stronger loosen bias when warranted)
-- Overlay output contract (`deriveSectorAdjustedPosture`):
-  - `basePostureLabel`
-  - `adjustedPostureLabel` (`+`, `-`, or `(neutral)` variant formatting)
-  - `postureVariant` (`plus|neutral|minus`)
-  - `adjustmentStrength` (`none|light|moderate|strong`)
-  - `adjustmentDelta` (signed scalar, damped near regime boundaries)
-  - `actionBias` (`tighten|hold|loosen`) and `reversalCondition` for bounded decision translation
-- Calculation semantics: normalize tightness and risk-appetite distance from thresholds, apply sector multipliers + offset, then damp the resulting delta by nearest-threshold distance so overlays do not oscillate during boundary weeks.
-- Boundary rule: overlays are damped as scores approach regime thresholds so route-to-route language remains stable during transition weeks.
-
-### 3.5 Policy-spec pilot layer (new)
-A policy-alignment pilot now runs **alongside** the legacy regime engine in the assessment payload:
-- Versioned policy metadata (`policy-v1`) is emitted for traceability.
-- Signal normalization fields include z-score, directional transform, and clipped z-score for base rate, slope, BBB spread, CPI YoY, and unemployment; Treasury signals use the local long-range archive when available, while other policy signals normalize against the available local history window.
-- Composite outputs expose `cts` and `ras` values without replacing legacy tightness/risk-appetite outputs yet.
-- A refusal state is included when disagreement/volatility/data-gap guards trigger, returning explicit fallback directives (`NO_POSTURE_CHANGE_RECOMMENDED`, `REVERSIBLE_BETS_ONLY`).
-
-This pilot remains additive at the scoring layer, but refusal is now binding at the guidance layer: if the policy layer refuses a posture change, readiness is capped, operator copy shifts to reversible-only execution language, and export/share surfaces must not present the move as a clean posture upgrade or downgrade.
-
-## 4) Decision support tooling
-
-### 4.1 Decisions workstream status
-Decisions is an active first-class workflow surface in shipped navigation (`/resolve`) with an
-action-first top fold anchored to the live weekly call:
-- one recommended next path derived from the live weekly call,
-- direct-answer and team-translation alternatives at lower visual weight,
-- then ship checklist, Planning handoff, and role/situation browsing below the primary chooser.
-
-`/toolkits` remains available as the supporting instrument library for Resolve, but it is no longer treated as a peer primary hub in navigation.
-
-Decision Shield logic/components remain integrated through decision and operations surfaces.
-
-### 4.2 Decision templates
-Copy-ready decision templates remain available inside operations brief/export surfaces for async
-review notes and leadership discussion.
-
-### 4.3 Export behavior
-Briefing/report exports remain available where they package current signal-driven guidance.
-Integration payload exports are also available through `/api/integrations/weekly-mandate` for
-Slack, Notion, and Linear targets.
-
-### 4.4 Forecast confidence + runway-risk semantics
-- Forecast confidence messaging is anchored to **boundary distance + crossing risk**, not long-horizon macro prediction.
-- `forecast` interpretation copy must include:
-  - highest-likelihood next posture (`regimeProbabilities` top value),
-  - crossing-risk label (`low|medium|high`),
-  - points-to-threshold distance + momentum direction.
-- Runway planner risk messaging uses bounded bands:
-  - risk score is clamped to 0–100 with labels `low|moderate|high|critical`,
-  - recommendations include explicit raise window, burn adjustment range, and reversal language,
-  - posture/regime flips should change urgency and guardrail strictness, not just copy tone.
-- Cash, net burn and dates (2026-10-01), for a founder without a finance lead:
-  - **Cash in the bank** is a profile figure (`cashUsd`). With spend in, runway is worked out as
-    cash ÷ (spend − revenue) by `resolveProfileRunway`, which every reader of runway now goes
-    through: the planner, the commitment test, the runway notes, the plan stress test and the band
-    cookie. Cash and a typed runway replace each other (`setOperatorProfileField`), a band pick that
-    excludes the runway clears whichever stated it, and a shared plan link carries `?cash=` and
-    replaces both of the recipient's when it carries either. A link's figure is read whole or not at
-    all (money also takes the k/M/B shorthand): `parseFloat` read a hand-edited `?cash=2.1M` as $2.10
-    and `?runway=14months` as 14. Revenue at or above spend reads as
-    cash-flow positive: no runway, and the planner says so instead of asking for one. That holds
-    whichever way the runway was given: a typed runway beside revenue that covers spend used to size
-    a full plan and date a cash-out month while the same company with its cash entered was told there
-    was no runway to plan against. A cash-flow-positive company sits in the open-ended band (24+ mo,
-    `runwayBandForProfileRunway`), and revenue coming to cover spend moves the band cookie there. It
-    used to leave the cookie wherever the last burning figure had put it, so cash $600k, then spend
-    $200k, then revenue $250k kept `/` saying "With less than 6 months of runway, cash is what limits
-    you" and the server scaling the rules to that band, beside "cash is not running down".
-  - **One meaning of burn.** `monthlyBurnUsd` is total spend (the planner subtracts revenue from
-    it, and its field now says "Monthly spend"). The commitment test, the runway notes' 10%-cut
-    arithmetic and the stress test's cash estimate used it as net burn, which overstated runway
-    whenever revenue was coming in: 12 months, $200k spend, $150k revenue and a $20k hire printed
-    10.9 months left for 8.6. They read `netMonthlyBurnUsd` now, and the stress test receives the
-    cash balance it always accepted and was never given. The stress test's form has no revenue box,
-    so its sizing line names net burn with both figures ("$50k a month of net burn ($200k spend less
-    $150k revenue) × 12 months of runway"); it printed "$50k a month" with $50k on no screen. When
-    revenue covers spending it says so and asks for cash in the bank (`companyFinancialProfileFor`
-    passes a net burn at or below zero through), where it said "sizing it needs your cash or monthly
-    burn" with runway and spend both filled.
-  - **Dates and dollars.** `describeRunwayPlanInYourNumbers` restates the plan in calendar months
-    and dollars on the planner's cards, its copy block and the budget memo: the month cash runs out,
-    the raise window as months, the burn adjustment as dollars of spend and the runway it buys, and
-    the gap to the safe band's floor as cash or as a net-burn target. Arithmetic on the plan and the
-    reader's figures only; dates wait for hydration so a server render cannot print another month.
-    The raise window closes by the month cash runs out at the latest, and opens now when that
-    leaves nothing before it (critical risk opened it at months 0–2 whatever the runway, so 1.5
-    months of cash read "the window closes around Dec 2026. Cash runs out around Nov 2026."). The
-    plan scores the same runway the dated lines print: its floor is a tenth of a month, the
-    profile's own, where it was one month, so 0.3 months was scored as 1 and printed as 0.3.
-    Months count on the reader's calendar (`formatMonthAfter`): whole months are calendar months,
-    with a late day held at the end of a short month, and a fraction is that share of the month
-    after by days. It added 30.44-day months in UTC, so Oct 1 plus one month printed "Oct 2026", a
-    raise window at months 1–3 printed Oct–Dec, and Jan 30 plus one printed "Mar".
-- Own lines, a reachable test, and crossings at the reader's runway (2026-10-02):
-  - **Your own runway lines** (`#ops-runway-lines` on the planner): "start raising at" and "pause
-    hiring at" a number of months of runway (`raiseAtRunwayMonths`, `hiringPauseAtRunwayMonths` in
-    the profile, `?raiseAt=` / `?hirePauseAt=` on the link). Each prints the month it arrives at
-    today's net burn, or that it is already here, and travels in the copy block and the memo.
-    The company's lines beside the published ones, never in place of them.
-  - **The commitment test for a returning reader.** "Test a decision against your runway" is a
-    folded disclosure under the area table in "What it changes" (`CommitmentTestDisclosure`), with
-    an area select for the runway note. The section folds on a first visit and the picker hides
-    once the brief is open, so the two copies are never on screen together.
-  - **Burn multiple capped.** The planner's risk score read spend ÷ revenue uncapped, so $1k of
-    revenue against $150k of spend scored critical (150x) where the same company with no revenue
-    scored moderate (4x). It is capped at the no-revenue 4x now; earning something never scores
-    worse than earning nothing, and 20 months at $150k spend and $20k revenue reads a raise in
-    months 2–5 rather than "now".
-  - **Crossing emails at the reader's runway.** Every company on the published lines is emailed the
-    same day a line is crossed. The plan-lines form can send the reader's runway band (a checkbox,
-    on by default when a band is set; the band, never a figure), held as `pendingPlanRunway` with
-    the lines and promoted with them on confirmation. A crossing email then adds the note this
-    guidance carries for that area at that band, or the band's own stance where it has none, and
-    dates the band (`describePlanLineCrossing`). New lines without a band clear the old one; the
-    confirmation email names the band; `/privacy` 2.1 lists it.
-  - **Outcome claims removed.** The analog playbook stated two competitor outcomes with no source
-    ("burned 35% of the cash buffer", "shipped faster while competitors stalled"); the agent tool
-    description in `/llms.txt` promised "what the winners did" and listed three of the four periods;
-    two stakeholder-guide lines promised fewer surprises and avoided cuts. Each now states what was
-    done or how to judge, not a result the record cannot show.
-- Runway planner inputs are the operator's, or absent (2026-09-06). The panel used to open
-  pre-filled with a fictional company (12 months, $700k burn, $450k revenue, 12% monthly growth)
-  and offer to copy a board memo built from it; an emptied field became zero and read as
-  "critical". Now `lib/report/runwayPlannerInputs.ts` resolves the request from the shared
-  operator profile and reports which of runway (or cash), monthly spend, and monthly revenue is missing;
-  the panel shows that sentence instead of a verdict until all three are entered. Growth is
-  optional and blank reads as flat, which the output says. The memo lists its inputs and no
-  longer claims to be "safe for board presentation".
-- The `company` and `financial` interpretation views have never received a company profile
-  from any caller, so they always describe the built-in default (`lib/report/companyProfile.ts`:
-  Series B, $1–10M ARR, 12–18 months of runway). Their summaries now say so and point to the
-  runway planner; the copy is the fix, because the assembler runs server-side and cannot see
-  the browser-held profile.
-
-## 5) Playbooks, summaries, and briefings
-
-### 5.1 Playbook
-The playbook surfaces start/stop/fence actions based on the current regime, sourced from the
-insight database in `data/recommendations.ts`. The operator request catalog
-(`lib/operatorRequests.ts`), drawn as "Execution asks" under `/operate`'s Share step, was removed
-on 2026-10-07 (§1.1.46): it was a product backlog that listed shipped features as not yet built.
-
-### 5.2 Weekly + monthly summaries
-Weekly and monthly summaries are generated from the current assessment for use in the overview
-page and APIs. These summaries are structured-first payloads (sections + provenance metadata) with
-copy blocks rendered from the same structured data for sharing/export.
-
-### 5.4 Structured summary contract (weekly/monthly)
-Weekly/monthly summaries use a structured-first contract and render raw copy from that structure.
-
-```mermaid
-flowchart LR
-  R[Regime + constraints] --> S[Structured fields]
-  S --> U[UI sections
-(climate, moves, constraints, provenance)]
-  S --> C[Copy block
-for sharing/export]
-  S --> A[API payload
-structured + copy + provenance]
-```
-
-Required weekly structure:
-- `climate.label`, `climate.summary[]`
-- `recommendedMoves[]`, `executionPriorities[]`, `watchouts[]`
-- `planningLanguage`, `executionConstraints[]`
-
-Required monthly structure:
-- `executionConstraints[]`
-- `provenance.source`, `provenance.timestamp`, `provenance.dataAge`
-
-Archive compatibility formula for legacy records:
-
-$$
-\text{structured}_{legacy} =
-\begin{cases}
-\text{existing structured}, & \text{if present} \\
-\text{buildStructured}(regime, constraints, provenance), & \text{otherwise}
-\end{cases}
-$$
-
-### 5.5 Prioritized refactors (summary system)
-- **P0 (implemented):** Shared structured→copy renderer across weekly/monthly for deterministic formatting reuse.
-  - Renderer module: `lib/summary/summaryCopyRenderer.ts`
-  - Shared contracts: `lib/summary/summaryTypes.ts`
-  - Coverage: `tests/summaryCopyRenderer.test.ts`
-- **P1 (implemented):** Offline archive materialization for historical `structured` fields, with guardrail coverage ensuring weekly/monthly entries are materialized.
-- **P1 (implemented):** API contract tests for `/api/weekly` and `/api/monthly` structured payload guarantees.
-- **P2 (partially implemented):** Monthly `planningLanguage` parity is now shipped across structured output, copy rendering, and cadence-card display.
-- **P2 (open):** Broader monthly section expansion toward weekly parity remains open where operator value is clear. Re-review during roadmap grooming so status remains current and does not drift in this “as built” audit.
-
-### 5.3 Briefing exports
-Planning briefings support copy-ready briefs and executive narratives with sensor data and
-macro context embedded for leadership consumption. `/share` owns the copy formats (Slack, email,
-meeting pack, issue tracker, investor update) and the file and image artifacts (board slide as
-PPTX and PDF, meeting slide as SVG, brief card as PNG); see §1.1.18.
-
-Interpretation context (homepage-selected `?view=`) no longer travels into the exports. The
-Slack, board and citation builders took an optional interpretation block, and the only caller that
-passed one was the home assembly's `leadershipArtifactPayloadPromise`, which nothing rendered; the
-block went with it (§5.3.1). The homepage still renders the selected layer itself.
-
-#### 5.3.1 One brief document every format renders from (2026-10-06)
-
-Parallel builds of the week that only tests reached were deleted rather than kept for a consumer
-that never came:
-
-- `leadershipArtifactPayloadPromise` on the home assembly (`lib/report/home/artifactPayload.ts`),
-  which built a second meeting pack, a board note, a "guidance snapshot" and a delta-only brief
-  beside the ones `/share` serves. It was the only caller of `buildBoardBrief`,
-  `buildWeeklyBoardSnippetPlainText` and `buildWeeklyCallSnapshotPlainText`, which went with it. The
-  "delta-only brief in the share rail" in §1.1 was this payload and never rendered.
-- `buildWeeklyOperatorBriefPayload` no longer takes the `WeeklyCallContract` as optional. Without one it
-  re-derived every slot from the action strip, the posture state and the canonical copy in a
-  fallback chain of its own; every production caller passes the contract. Its `flipWatchLine`
-  (the nearest crossing in market units) was set only on that branch, so it never printed in a
-  production paste; it was removed with the branch.
-- `buildWeeklyOperatorBriefSlackBlocks` and `buildWeeklyOperatorBriefCardText`, called only from
-  tests.
-
-**The Monday post and the email print one call.** The post's call slots (Guidance, Do now, Pause
-if, Resume when, Conditions change if) were derived from the lead area row and
-`assessment.description`, while the email read the snapshot's `WeeklyCallContract`, which swaps
-in `POLICY_OVERRIDE_CALL` on a held week. So a held week mailed "the guidance is not changing this
-week" and posted the lead area's own action and pause line, and an ordinary week posted a
-different change line from the one mailed. The post reads the contract now, on the Monday path,
-the manual `POST /api/brief/slack/deliver` path and `GET /api/brief/slack`: the pause line as its
-condition only (`pauseConditionOnly`, as the email prints it), the lead area's resume line plus a
-stage's when one is set, and no resume line on a held call, whose change line is its one resume
-line. `tests/mondaySlackMatchesEmail.test.ts` holds the two to the same lines on a held and an
-ordinary week.
-
-Every format's output is pinned on four weeks (ordinary, saved copy, held, a stage-and-runway
-reader) through its production entry point in `tests/briefFormatsPinned.test.ts`; a change that
-means to move a string regenerates `tests/fixtures/briefFormats.golden.json` with
-`WHETHER_UPDATE_BRIEF_GOLDEN=1` in the same commit.
-
-**`BriefDocument`** (`lib/report/briefArtifact.ts`) is the week as one object, built once by
-`buildBriefDocument(source, weeklyCall, { stage? })` (`lib/report/briefDocument.ts`) from a reading
-(`briefSourceFromSnapshot` for the cron's `OperatingSnapshot`, `briefSourceFromReportData` for the
-read path) and its `WeeklyCallContract`. It extends `BriefArtifact`, the share rail's object, rather
-than sitting beside it; the island a page publishes is its artifact half (`briefArtifactOf`), and
-`buildBriefArtifactFromSnapshot` is that half, so /share and /operate publish one derivation. It
-carries:
-
-- the call slots from the contract, the pause line as its condition only (`pauseConditionOnly`),
-  `resumeWhen` and `callChangesIf` apart, and the policy-override flag;
-- the conditions under one label, the contract's `regimeStage` (the weather word, with how long it
-  has held when the read path knows);
-- the published confidence, resolved once (`resolvePublishedConfidence`);
-- provenance: the source as a reader names it, the record date, whether it is a saved copy, and the
-  permalink. "Canonical snapshot (FRED)" and "Canonical ingestion (FRED)" name the pipeline; the
-  document names the publisher (`publisherSourceLabel`), and the saved-copy marker says the rest;
-- the readings, the area rows as the page derives them (each line with its distance), the operating
-  limits, and the every-band runway framing the portfolio note prints. The reader's own band is a
-  cookie, which a cached page cannot read, so the investor update composes it in the browser.
-
-A `stage` lays that stage over the call as the homepage does (`applyStageToWeeklyCall`), so a held
-call stays held whatever the stage.
-
-**The slide is built one way.** It was built from the island in the browser (the share panel's
-"Slide" format and "Copy as a slide") and from the operating snapshot on the server (the SVG, PPTX
-and PDF routes). The browser's way stood 50 in for a missing risk appetite and "MED" for a missing
-confidence, printed the conditions label as the reader's stage ("Stage: Stormy"), handed the weather
-word to the badge as if it were the engine key (so a Freezing slide wore Sunny's colour), judged
-the scores against the engine's default lines, and printed the flip conditions as the resume line,
-which on a held week put "why the guidance is held" under "Resume when". The server's way never
-said a reading was a saved copy, and printed a stage's action over a held call. Both now go through
-`briefArtifactToSlidePayload`; the routes pass a `BriefDocument` (`buildExportSlidePayload`), and
-the island carries the fields the slide reads (`regime`, `recordDate`, `lines`, `stageLabel`,
-`sourceLabel`). The island's two scores and its confidence are required: a malformed island
-yields no slide rather than a stand-in. The flip conditions print as "Watch this week". §1.1.12's
-reading of them as "the resume thresholds" was the mislabel.
-
-**The Slack brief, the board slide bullets and the ticket brief render the document**
-(`buildSlackBrief(document)`, `buildBoardSlideBullets(document)`,
-`buildIssueTrackerMarkdownBrief(document, format)`), and `ExportLayerOptions` /
-`ModeledExportDecisionPayload` are gone. Every Slack caller builds the same document: the Monday
-post from the snapshot, and `GET /api/brief/slack`, the manual deliver and
-`scripts/generateWeeklySlackBrief.ts` through `buildBriefDocumentFromReport`, under the call the
-read path serves every page. The script had passed no options, so `docs/briefs/` printed stand-ins
-every week: "Keep last week's approvals as they are; start nothing new." as the action, the no-
-reading pause line, and "Live data is back and conditions have held for a week." as the resume
-line, on live data. The area rows carry their distances on every path ("(crossed)", "(44 pts
-away)", "(already met)"): the snapshot path built them without the scores. Blocks no production
-caller reached went with the options: the "This week's guidance" recap (whose "Points from the
-change line: 0.0", "Could conditions change next week: no" and "no live reading this week" were
-stand-ins on /share's meeting pack, the one place it printed), the historical-analogs block, the
-failure-mode warning and the interpretation block.
-
-**The weekly email reads the same document** (`sendWeeklyBrief`): its action, pause line, change
-lines, conditions line and readings row come from the snapshot's document, and the readings row
-takes the document's confidence instead of resolving its own. Its text did not change.
-
-**The investor update and the portfolio note render the document**
-(`buildInvestorUpdateSnippetParts(document, monthlyHistory)`, `buildPortfolioNote(document, areas)`),
-and keep their two runway framings: the investor update is one founder's letter, so the browser
-composes the reader's band into it (`formatInvestorUpdateSnippet`); the portfolio note goes from one
-sender to many companies, so it prints the document's every-band runway. The month-end history
-stays the investor update's own input (a letter compares itself with the last one), and the area
-lines stay the portfolio note's (the area tables' joined lines). Both close with
-`formatSourceFooter`; the month-end pulse mail (`lib/alert/monthEndPulse.ts`) builds the same
-document for its block. On a saved-copy week the footer names the publisher, not "Canonical snapshot
-(FRED)".
-
-**The integration mandate renders the document** (`buildWeeklyMandatePayload(target, document,
-postureState)`, `/api/integrations/weekly-mandate`). It printed the posture state's lock-commitment
-line as "Conditions change if" — a different line from the brief's — and its other flip conditions
-as "- Resume when:" bullets, one of which ended "tighten again". The markdown now prints the brief's
-change line, the resume line the Slack post prints (none on a held week), and the flip conditions as
-"Watch this week". The posture state still supplies the last change in conditions and the JSON's
-structured `metadata.nextFlip`, which is the posture state's own and can name a different line from
-the markdown's. Its invented fallback ("Check again after the next update.") went: the route always
-builds a posture state, so the parameter is required.
-
-**/share offers one Slack text and the meeting pack carries it.** The pack pasted the long Monday
-post beside the picker's Slack post, under a different call on a held week. Its "SLACK POST"
-section is the picker's post now.
-
-**One provenance footer.** `formatSourceFooter` (`lib/export/exportTerms.ts`) prints "Source:
-{publisher}, {date}, via whether.work" and "(saved copy, not a live reading)" when it is one. Every
-slide format closes with confidence and that footer; the SVG and the deck carry the conditions in
-the subtitle instead of the source, and the right-aligned "whether.work" went, since the footer
-names it.
-
-**The operator brief and the citations read the document.** `buildWeeklyOperatorBriefPayload(document,
-{ date?, weeklyLeadershipSummary?, customTeamNote? })` takes the slots, the conditions line and the
-published confidence from the document instead of resolving its own; its payload's `pauseIf` is the
-condition only, which is what its plain text already printed. `buildCallCitation` takes the
-document's conditions line, confidence and provenance. The answer pages pass the call's
-`regimeStage` and the home model's published band, so on a held week their citation names "Sunny",
-as every other format does, where it named the home model's "Sunny for 9 months". /share offers one
-citation, the picker's (`formatBriefArtifact(document, "citation")`), and the meeting pack's
-CITATION section is that one; it carried the answer pages' beside it. The email closes with the
-document's source footer and the permanent link instead: the picker's citation prints the island's
-call (the do-now line) as "Guidance", under the brief's own "Guidance". `buildBriefPermalinkLine`
-went with its last caller.
-
-### 5.6 Signal Ops (live)
-- Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).
-- Alert payloads include reason codes, source URLs, and Time Machine deep links.
-- Alert creation enforces trigger filtering and a 24-hour cooldown unless the regime flips again.
-- Weekly digest output is available via `/api/weekly-digest`, including score deltas and dominant
-  reason messages.
-- Alert headlines now name the decision the alert affects rather than the raw signal move:
-  `RECONSIDER HIRING` / `WATCH SPENDING` / `RECONSIDER OPERATING POSTURE`, from
-  `buildDecisionVerdictHeadline` (`lib/alert/decisionDeltaRules.ts`). Slack blocks
-  (`/api/check-regime-change`) and email templates (`lib/alert/alertTemplates.ts`) lead with the
-  verdict and keep the raw regime/signal detail as support.
-
-### 5.7 Decision staleness (protect stale decisions)
-- Decision Memory records an **assumption snapshot** at write time — the tightness, risk appetite,
-  and regime watch lines that had to hold for the decision to make sense
-  (`DecisionAssumptionSnapshot` in `lib/decisionMemory.ts`).
-- `lib/report/decisionStaleness.ts` compares current conditions against a recorded snapshot and
-  emits a bounded verdict: **RECONSIDER** (two supporting assumptions moved outside the recorded
-  range), **WATCH** (one moved), or **No change** (all hold).
-- The home page renders `DecisionStalenessPanel` below the hero: it reads the client's saved
-  decision memory from localStorage, runs the staleness engine against this week's conditions,
-  and surfaces "N DECISIONS NEED ATTENTION" with per-decision verdicts and a "No change" lane.
-  It renders only when the operator has saved decisions; empty state is silent.
-- Decision memory is scoped to one browser, and the surfaces say so (2026-09-06). Identity is a
-  random id in localStorage (`whether-client-id`); clearing site data or opening a second device
-  starts a new history with no recovery path, and the staleness panel reads localStorage only.
-  The memory panel, the staleness empty state, and the settings panel state this scope rather
-  than implying an account. Every save path — `DecisionMemoryButton`, the Decision Shield on
-  `/operate`, and the plan stress test on `/` — mirrors the server's entry through one helper
-  (`app/components/decisionMemoryLocalCache.ts`) and reports "Saved in this browser" when the
-  API answered from its in-memory fallback (`degraded: true`), instead of "Logged to Memory".
-- The plan stress test's "Track in Memory" now stores something. It used to post
-  `{ kind: "plan-evaluation", … }`, a shape `/api/decision-memory` has never accepted, and set
-  its own "Tracked in Memory" state without reading the 400. It posts a `decision` entry via
-  `buildPlanStressTestMemoryPayload` (`lib/decisionMemory.ts`) — the same shape the Decision
-  Shield writes, with the graded sentence as `decision.context` — checks `response.ok`, and
-  shows "Save failed — retry" otherwise (`tests/planStressTestMemoryPayload.test.ts`).
-- The Decision Shield on `/operate` now exports and records what is on screen (2026-09-26). The
-  share text and the Decision Memory payload follow the active plan mode: in natural-language
-  mode the share artifact is the plan stress test (plan text, model, verdict, sizing, fragile
-  assumptions, guardrail, reversal trigger — bootstrapped mode prints the profile's gross margin)
-  and the memory entry records the plan's detected category and action with the stress-test
-  outcome; in compare mode it exports both plans, both verdicts, and the recommendation. Both
-  previously exported the dropdown-mode reading even when the operator had just graded a plan,
-  so the artifact could contradict the verdict beside it. The compare-mode verdict badges also
-  split UNSAFE (rose) from RISKY (amber); both used to render amber
-  (`tests/decisionShield.test.ts`).
-- The hero's canonical revisit block now reads **What changed this week?** and renders three bands
-  (change, consequence, unchanged) via `WeeklyChangeReport`. See section 2 for why the previous
-  single-list form dropped the signal move on a multi-item week.
-
-## 6) APIs (server routes)
-
-### 6.1 Data APIs
-- `GET /api/treasury` — normalized Treasury yield data with fallback support.
-
-### 6.2 Summary APIs
-- `GET /api/weekly` — weekly summary payload with structured sections, copy text, and provenance.
-- `GET /api/monthly` — monthly summary payload with structured sections, copy text, and provenance.
-- `GET /api/quarterly` — quarterly summary payload with provenance.
-- `GET /api/yearly` — yearly summary payload with provenance.
-- `GET /api/summary-delta` — difference between weekly and monthly summaries.
-- `GET /api/cadence` — alignment check between weekly and monthly constraints.
-
-### 6.3 Signal Ops APIs
-- `GET /api/regime-alerts` — list logged regime alerts.
-- `POST /api/regime-alerts` — create an alert when trigger/cooldown rules pass.
-- `GET /api/weekly-digest` — digest summary generated from logged alerts.
-- `GET /api/alert-preferences` / `POST /api/alert-preferences` — per-client delivery preferences.
-- `GET /api/alert-deliveries` / `POST /api/alert-deliveries` — delivery logs and send attempts, filterable by `clientId` for per-profile audit views.
-
-### 6.4 Decision audit APIs
-- `GET /api/decision-memory` / `POST /api/decision-memory` — append-only Decision Shield audit entries, filterable by `clientId`, with CSV export support.
-- Entries carry an `assumptions` snapshot (conditions that had to hold at decision time) so the
-  decision-staleness engine can compare current conditions against the recorded range.
-
-### 6.5 Integration APIs
-- `GET /api/integrations/weekly-mandate?target=slack|notion|linear` — target-specific weekly
-  mandate export payload.
-
-### 6.6 Open Graph
-- `GET /api/og` — PNG Open Graph image with regime metadata (supports Time Machine selection); `template=report` is the weekly card.
-- `GET /api/image/brief` — the brief card as a 1200×800 PNG: the call, both scores against their pause and resume lines, confidence and source (§1.1.25). Takes the page's `?month=`, `?year=`, `?sector=`, `?stage=` and `?cadence=` context.
-
-### 6.7 Agent access (MCP)
-- `GET /api/agent?view=state` — the compact state to decide from (§6.9); `?view=full` (the default) is the whole brief.
-- `POST /api/mcp` (no `?tool` param) — **MCP streamable-HTTP transport** (JSON-RPC 2.0,
-  protocol 2025-06-18): `initialize`, `ping`, `tools/list`, `tools/call` over
-  `application/json` responses. Standard MCP clients can mount `https://whether.work/api/mcp`
-  directly. The tools are defined once in `lib/agent/tools.ts`; the transport is `lib/mcp/httpMcpServer.ts`.
-- `GET /api/mcp?tool=<name>` — every tool as a plain GET (§6.9); `POST /api/mcp?tool=subscribe` unchanged.
-- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/server.ts`, the one `/api/mcp` runs): the same tools, plus
-  `pull_recent_site_info`.
-
-### 6.9 One state, one tool registry (2026-09-29)
-Agents met the product through four surfaces that disagreed about what Whether says and how to ask.
-Changes, all additive except where noted:
-
-- **One confidence.** The full agent payload, the legacy `?tool=get_brief` answer and the RSS item said
-  MEDIUM (the engine's confirmation gate) on a week the page, `/api/scores` and the CLI called High. They
-  carry the published confidence now. `/api/weekly` and `/api/monthly` (and `/api/cadence`,
-  `/api/summary-delta`) followed on 2026-10-06: the summary builders read `resolveSummaryConfidence`
-  (`lib/summary/summaryFormatting.ts`, the published label in the stored LOW / MEDIUM / HIGH spelling) for
-  both `summary.confidence` and the prose sentence, and the routes pass the record so a stale fallback
-  lowers it as it does on the page. The archives regenerate from the same builders, so the next run rewrites
-  `summary.confidence`, the confidence sentence in `summary.summary`, `structured.posture.summary[0]`
-  (monthly) and `copy` wherever the two ladders disagree: 55 of the 176 monthly entries on record (23 LOW
-  and 25 MEDIUM to HIGH, 7 LOW to MEDIUM); the weekly count is not computable offline because weekly
-  entries store no scores. One consequence to know: the published ladder ignores the engine's shock
-  downgrade, so a shock week's summary now says what the page says (Dec 2025: HIGH, not LOW) and the shock
-  sentence beside it carries the warning.
-- **The state** (`lib/agentState.ts`, `agentStateSchema`): about a tenth of the full brief. `automation.ready`
-  first; each score against its pause, resume and change lines; `perWeek`, and what the move is made of.
-  Served at `?view=state`, as MCP `get_state` (with an `outputSchema`) and as `whether state`.
-- **One registry** (`lib/agent/tools.ts`) for the remote server, the local server and the GET shim: five
-  tools on the local server against twelve remote, under two names, is one list of 13 (plus the local-only
-  `pull_recent_site_info`). Read-only annotations on every tool; compact JSON in `content`, the same object
-  in `structuredContent` (always an object: `get_decision_rules` for one regime is now `{ "DEFENSIVE": [...] }`
-  and was an array, which the SDK client rejected; **breaking** for a caller that read the array).
-- **Inputs** (`lib/agent/inputs.ts`, parsed and refused by the generic `lib/agent/registry.ts`): a regime by key or by the site's weather word in any case; empty
-  arguments are absent; numbers may be text and zero is a value; unknown arguments and values are refused
-  with what would have worked. `get_context` with `SUNNY` answered zero weeks as a success; `?tool=` with
-  an unknown name answered the brief with a 200 (now a 400); a cadence the server did not know became
-  weekly (now refused). `get_context` and `get_projection` fill what is left out from today's reading and
-  say so in `inputs`.
-- **Discovery from the registry**: the manifest lists `mcp.tools`, `start` pointers, `views` and the
-  `automation` check (it promised "MCP tools" and listed none); `/llms.txt` and `/api-docs` name every tool;
-  `tests/agentDiscoveryParity.test.ts` holds each place that names a tool to the registry.
-- **`get_context` counts months.** Its counts came from the Time Machine's regime series, one entry per month-end, and were named `weeksActive` / `historicalAvgWeeks`: "8 weeks" was 8 months (§1.1.26, the same period-word defect). They are `monthsActive` / `historicalAvgMonths` now (**breaking** for a caller reading the old names; its only caller in the repo is the tool), with the `latestSnapshot` they run to, and a `note` when the count is 0 because the regime is newer than the last month-end.
-- **`get_projection` is direction-aware** (`projectRegimeFromPace`, `lib/report/regimeContext.ts`): it steps
-  the scores by their weekly pace and classifies each step with the engine's own quadrant table, so a score
-  moving away from its line does not cross it and the regime it lands in is the table's, not a guess. Called
-  with no arguments (today's scores at today's pace) the old function reported a crossing within a week
-  on the Sep 25 read, when both scores were moving deeper into the regime.
-  **Found, not changed:** `getRegimeProjection`, the function it replaced for the tool, still drives the
-  alert path (`lib/alert/checkRegimeChange.ts`, "Conditions could change soon" to Slack, and the
-  `regime:weeks-to-flip` state), and that path has two defects of its own. The function divides the nearest
-  line's distance by the fastest pace whichever way either score moves, and the caller passes it
-  `reportDynamics.changedSignals[].delta`, which is the change since the previous *month-end* snapshot
-  (§1.1.26), as if it were a weekly pace. Both make the alert early or spurious. What Slack subscribers are
-  sent is an owner decision; the fix is to call `projectRegimeFromPace` with the pace `get_state` publishes
-  as `perWeek`.
-- **Browsers.** `/api/mcp` answers its CORS preflight and carries `Access-Control-Allow-Origin: *` on the JSON-RPC transport and the reads; `?tool=subscribe` stays closed.
-- **CLI**: `whether state` (and `--require-ready`, which exits 8 when the data is not live and current); a mistyped command is refused as one (it was answered "too many arguments for 'status'"); `changes` names the dated reading it compares with, uses reader names and says what moved a score.
-- **What the change did to the decisions** (§1.1.28): the state carries `change.summary` (one sentence) and `change.crossed` (the areas whose pause or resume state changed since `comparedWith`, grouped by how they moved, with the lines that decided it; empty when none did); `whether changes` prints the same sentence under `DECISIONS`, and the changes contract carries it as `decision`. Additive.
-
-### 6.8 Alert cadence (2026-08-11; flash 2026-09-17)
-Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls
-`/api/check-regime-change` and `/api/alert-deliveries` in addition to the Monday run, so a
-regime flip or threshold crossing pushes the day it lands instead of waiting up to six days.
-Both endpoints are transition-based (KV last-known state: `regime:*`, `alert:state`), so
-daily runs stay silent unless something actually crossed. Since 2026-09-17 the same two steps
-also judge a flash (§1.1.18): an outsized move in the short rate or the curve between the
-previous snapshot and this one, which is measured against the previous read rather than the
-alert state. The brief email remains weekly-only — the cadence promise is weekly; only rule
-firings break cadence.
-
-## 7) Non-goals (as enforced in UI copy)
-- The UI is framed as operational guidance, not financial advice.
-- Evidence is deterministic and traceable; no predictive ML output is used.
-
-## 8) Demo and interactive features (2026-05-23)
-
-### 8.1 What-if simulator tools (removed Aug 2026)
-`app/components/home/DecisionSimulator.tsx` and `app/components/ScenarioSimulator.tsx` rendered
-below the hero on `/`. Both were removed as below-the-fold tool racks that competed with the
-weekly decision-attention block. The scenario what-if still lives in the decision-attention flow
-only where it changes a revisit verdict; it is no longer a standalone home surface.
-
-### 8.2 Regime transition probability (removed Aug 2026)
-`app/components/home/RegimeTransitionProbability.tsx` computed an empirical one-month exit rate
-for the current regime from monthly time-machine observations. The card and the hero's
-`transitionForecast` line were removed from home. `computeTransitionProbability` remains as an
-internal model diagnostic at `lib/timeMachine/transitionProbability.ts`; it is not rendered as a
-user surface.
-
-### 8.3 Regime history over time (removed Aug 2026)
-`app/components/RegimeHistory.tsx` rendered the trailing 24 months of `getMonthlyRegimeHistory()`
-as a bar chart in the lower home band. Removed from home; the engine
-(`getMonthlyRegimeHistory`, `lib/summary/monthlyRegimeHistory.ts`) stays for evidence/replay
-surfaces.
-
-### 8.4 Decision records (canonical: decision memory)
-**Location**: `lib/decisionMemory.ts`, `/api/decision-memory`, `app/operate/memory/`,
-`app/components/DecisionMemoryButton.tsx`, `app/components/home/DecisionStalenessPanel.tsx`.
-
-The one system of record for "what did we decide and when": server-backed entries keyed by
-client id, saved from the hero, browsed on `/operate/memory`, and checked for staleness on `/`.
-The brief says how many of a browser's decisions rest on conditions that moved (`YourRecordNote`, §1.1.28); the rows are on `/decisions`.
-
-Removed Aug 2026: `VisitorContext` (this section's previous subject) was deleted earlier without
-a spec update, and with it the only writer of the `whether_decision_history` localStorage key.
-The `DecisionArchive` table on `/history` kept reading that key, so it rendered nothing for every
-visitor — it and `useDecisionHistory` are now deleted too. Do not add a second decision-record
-store; extend decision memory instead.
-
-### 8.5 Reliability score
-**Location**: Computed in `app/page.tsx`, rendered in `BriefHero.tsx` next to the tightness number.
-
-Combines confidence (HIGH=90/MED=60/LOW=30), freshness (live=100/cached=50), and source coverage into a 0-100 score. Color-coded: emerald ≥80, amber ≥60, rose <60.
-
-### 8.6 Degraded-state decision guidance
-**Location**: `BriefHero.tsx` "What to adjust" section.
-
-When sources are degraded or the reliability score drops below 60, an amber warning appears: "Stage all irreversible decisions until the next clean refresh."
-
-### 8.7 Print layout
-**Location**: `app/styles/layout.css` @media print block.
-
-Hides navigation, sidebar, and non-essential chrome. Converts dark theme to light (white bg, dark text). A4 page size with `break-inside: avoid` on cards.
-
-### Demo recording guide
-To record GIFs of interactive features:
-
-```bash
-bun run dev                                    # Start dev server
-```
-
-**Reliability cascade GIF**: Open `/` with simulated degraded state (set `?offline=1` or use cached data). Record the hero: emerald reliability score → amber warning in "What to adjust." ~5 seconds.
-
-**Print layout GIF**: Open `/`, Cmd+P, show print preview with clean white layout. ~5 seconds.
-
-For screen recording, use macOS QuickTime (File → New Screen Recording) or Kap (https://getkap.co). Convert to GIF with `ffmpeg` or gifski.
-
-## 9) Vocabulary and trust-state consolidation (2026-09-02)
-
-Ten product-sense fixes landed together; the semantic ones are recorded here so downstream
-surfaces do not reintroduce the old words.
-
-- **One regime vocabulary.** `getRegimeOperatorLabel` and `getRegimeDisplayLabel` both return the
-  weather name (Freezing / Cloudy / Stormy / Sunny). "Expand", "Guarded Expand", "Conserve",
-  "Defend", "Contraction", "Transitional Mixed", and "Guarded Expansion" are no longer rendered.
-  Archived labels in `data/*.json` are translated at render time with `toWeatherLabel`
-  (`lib/regimeLabels.ts`). The `modifier` field (Guarded / Transitional) survives as data.
-- **One data-status vocabulary.** `DATA_STATUS_LABELS` in `lib/report/trustStatus.ts` — Live,
-  Partly cached, Cached snapshot, Historical snapshot — is what the freshness pill, the hero
-  provenance line, the report-shell masthead, and the Trust page status card all render. The
-  masthead headline is derived from state via `resolveTrustReadinessCopy`; it no longer sniffs
-  the detail string for words like "low".
-- **Regime-aware weekly headline.** `buildActionNowShort` takes the regime, so a softening Sunny
-  week reads "keep what is working. Don't start anything new this week" rather than "freeze new
-  commitments", which contradicted every downstream page.
-- **Guardrail slot is a threshold.** `reportDataLoader` fills `guardrailThreshold` from the first
-  action-strip trigger instead of the playbook's first "stop" item.
-- **Condition phrasing.** `formatDecisionThreshold` / `formatDecisionReversal` strip the verb and
-  its object ("Pause net-new hiring if …" → "Funding pressure rises above 76 …") so slot labels
-  that already carry the verb read as sentences. `formatThresholdNumber` drops the `.0` on integer
-  thresholds everywhere a threshold is printed.
-- **Historical analog.** The Evidence page shows the four match coordinates (then vs now) and
-  names the block "Nearest reference cycle". The API field is `matchScore` (0-100, `100 / (1 + d)`
-  over the spread-normalised coordinate distance). It replaced `correlationScore`, which was
-  neither a correlation nor unbounded below: it was floored at 65, so the worst possible match
-  reported 65% similarity to every API and MCP consumer.
-- **Header.** The desktop nav renders the operator loop from `resolveGlobalHeaderLoopLinks`
-  (supporting layers hidden below `lg`); the top-level API link moved under More. The live
-  masthead no longer prints a "15m cadence" refresh label.
-
-### 9.1 Reversal and resume conditions (2026-09-02, follow-up)
-
-- **`buildFlipThreshold` returns one bounded condition.** It used to return three sentences: a
-  status ("No flip condition is tripped yet.") plus two that each repeated "flips this call",
-  under slot labels that already carry that verb. Because the compaction helpers cut a phrase at
-  its first period, the Slack export of a frozen brief read "Re-open when: No flip condition is
-  tripped yet." and carried no threshold at all. It now reads
-  `Funding pressure above 70 (63 today) or risk appetite at or below 50 (56 today).`
-  A boundary already crossed says "(already true at N)" and sorts first.
-- **The Evidence page's "Safe again when" shows the resume trigger.** It rendered `flipThreshold`,
-  the condition that *breaks* the call, which `/trust` correctly labels "This recommendation
-  breaks if" — so the same string appeared under opposite meanings on two pages. It now reads
-  `actionStripItems[0].reversalCondition`, symmetric with the pause trigger in "Wrong if" above it.
-  (2026-09-29: both rows now print the canonical slot labels, "Pause if" and "Resume when";
-  "Wrong if" / "Safe again when" were a third name for the pair.)
-- **The hero's resume row is labeled `clearsWhen`, not `flipWatch`.** That row holds the resume
-  thresholds (66 / 54), and sat directly under the reversal row (70 / 50) as a near-synonym
-  carrying different numbers, leaving three unexplained pairs stacked in one box.
-- **`sectorSensitivity` reversal copy** uses `formatThresholdNumber`, so the sector tilt no longer
-  prints "above 70.0".
-
-Archived briefs in `data/published_briefs.json` keep the wording they were published with; the
-archive is append-only and its exports are expected to read as they did on the day.
-
-### 1.1.25 The phone gets the reading, not the shell (2026-09-25)
-
-A mobile review of `/operate`, `/signals` and the archive mode found the report routes opening
-with chrome that restated the route instead of the week: a "Weekly brief" kicker above every H1,
-the operating-loop glyph as a second navigation band under the bottom tab bar, a hero Share button
-duplicating the page's own Share step, and a chips row that clipped its overflow with no affordance.
-The intro also inverted the hierarchy the product claims — "Freezing" printed in micro type under a
-display-size "Plan", on a page whose route name the bottom bar already carries. Changes, all in the
-shell so every report route inherits them:
-
-- **`CommandCenterNavBlock`: no kicker.** "Weekly brief" above every H1 restated the route the
-  header tab, the sidebar and the bottom bar already name, and made distinct pages read as
-  variations of one landing page.
-- **The status word leads the intro.** The regime word prints first, in the regime ink, at the
-  reading's own size; the trust headline and record date follow it in the meta half of the same
-  line. The H1 drops to `text-fluid-base` below `lg` — the bottom bar owns the route name on a
-  phone; the week's word is the fact the reader came for.
-- **The operating-loop glyph is desktop-only** (`hidden lg:flex`): on a phone its four steps are
-  the bottom bar's tabs, and under the intro it was a second navigation band pushing the first
-  task block down.
-- **`/operate` drops the hero Share button.** The Share step further down the same page owns
-  sharing; on a phone both were in one viewport as "Share the brief" twice.
-- **The refresh stamp reads "Signals refreshed …"**, not "Updated …" — two dates print inside one
-  viewport and the reader has to be able to tell the pipeline's fetch from the reading's record
-  date apart. The data-status vocabulary renames `live` to "All sources live": "Live" beside a
-  dated reading claimed something about the page, when what is live is the sources.
-- **`MobileSectionChips` fades its hidden edges** wherever content sits beyond them — a row that
-  silently clips reads as broken labels, not as something you can scroll (the DD-001 affordance
-  call, applied to the outline row).
-- **Shell spacing tightens below `lg`** (`space-y-6 sm:space-y-8 lg:space-y-12`, section paddings
-  `py-5 lg:py-8`): 40px between the chips row, the offline notice and the intro was unused space
-  above the first task block, not separation.
-- **The week checklist count is `text-sm`.** "0 of 5 done this week" is the most actionable fact
-  under the intro and printed in the same micro size as the trust metadata above it. Since
-  2026-10-02 it heads the checklist ("Steps for this week", the count at the right over the Done
-  boxes, a rule under both) with 24px above, instead of sitting directly under the trust strip as
-  if it were one of its facts (DD-037).
-
-**Command palette (`Cmd+K`).** Below `md` the palette is a bottom sheet, not a centered dialog:
-touch-height rows (`min-h-11`), no keyboard-shortcut badges, no shortcut footer, no pre-selected
-highlight (with no hardware keyboard the index never moves, and a permanent first-row highlight
-only competes with the field above), and a neutral placeholder — the e/p/h mnemonics are for the
-keyboard help, not the phone's only path to `/search`. The `.weather-kbd` badges hide behind a
-wrapper span because the class is unlayered CSS and outranks the `hidden` utility.
-
-**Archive mode.** The historical banner is one row with one action — "Archived view · Viewing
-August 2026 · data as of Aug 31 · Back to this week". It was an eyebrow, a title, a paragraph and
-up to three buttons, occupying half a phone screen before the historical guidance began; "Earlier
-month" and "Pick a date" went with it, because the calendar picker beside the week title and the
-palette's archive commands are where going deeper into the archive lives. The "Past week" tag
-beside the week title is gone too — the banner is the mode's one marker, and the tag read as
-another control while saying what the banner had already said. `CompactTrustPopover` renders
-nothing in historical mode; its sources and dates are only truth for a live reading.
-
-**The weather rationale is the condition, not the advice.** `REGIME_WEATHER_RATIONALES` keeps
-the money fact and drops the instruction half ("Move faster", "Conserve cash"): beside a cautionary
-call it read as two recommendations disagreeing, when the truth is one condition and one
-constraint — the stamp states the condition, the heading owns the instruction. Consumers that
-already took the fact half (the OG subtitle, the investor snippet) are unchanged.
-
-**The trust strip's flip-risk cell answers "Not expected"**, not "No": the boolean says nothing is
-near its line this reading; printed as "No" beside Medium confidence it read as a promise about
-the future the confidence cell had just declined to make.
-
-Measured at 430px after the change: no document overflow on `/`, `/operate`, `/signals`,
-`/history` or archive mode; `/operate`'s first task block begins at y≈498 (intro ends at 317);
-the archive banner is 123px with one action; the palette sheet spans the bottom 613px of the
-viewport with 56px rows.
-
-### 1.1.26 The confidence record grades the recent year (2026-09-25)
-
-The calibration study's table is a whole-archive average, and nothing said whether it still
-described the current year — a finding from 2012–2024 wearing a 2026 date would read the same.
-`lib/report/calibrationDrift.ts` now grades the most recent twelve month-end readings from the
-same extract, per band: did readings at that distance still hold more often than the percent
-publishes for it? A rate-delta comparison against the historical baseline was built first and
-rejected: eleven graded readings make a five-point threshold flag a two-reading band, which is
-noise promoted to a claim. The published check is a direction, not a threshold. "Stable" and
-"drifting" render one sentence in `ConfidenceRecordBody` (shared by `/calibration` and
-`/history`, so the two cannot say different things); "unmeasured" renders nothing — a year too
-thin to grade is a gap, not a guess. `tests/calibrationDrift.test.ts` pins the real archive's
-current "stable" verdict, so the sentence and the data fail together.
-
-### 1.1.30 Visual relationship and causal navigation across weekly brief sections (2026-10-02)
+### 1.1.32a Visual relationship and causal navigation across weekly brief sections (2026-10-02)
 
 Visual navigation upgrades across the five homepage sections to sharpen decision transmission without adding framework bloat or novel taxonomies:
 1. **2D Regime Climate Radar (`RegimeRadar.tsx`) in Section 4 (`WhatWouldChangeSection.tsx`):** A lightweight, pure-SVG 2D coordinate plane mapping the macro environment across the 4 weather quadrants (Freezing, Cloudy, Stormy, Sunny) defined by Funding pressure and Risk appetite relative to the call-change boundary lines supplied by the active thresholds. Renders the current reading $(R, T)$, previous reading with trailing vector, and a dashed projection guide to the nearest boundary. The caption measures the score distance to that plotted call-change line; company-specific pause-line distances stay in the section heading and ladders. Radar labels use theme-aware semantic ink.
@@ -2536,20 +1662,6 @@ word in the intro ("All sources live • As of Oct 2"), and again in the `TrustS
   or padding between them. `signalsEvidenceSections()` returns a keyed array the page spreads into the
   shell.
 
-
-### 1.1.42 The homepage, after a product-design critique (2026-10-06)
-
-- **Card:** the headline is the action ("Freeze new commitments and protect runway."); the week's direction rides on the stamp line ("· Tightening this week", `splitWeeklyCall` in `lib/report/reportEvidence.ts`). Pastes and the sticky strip keep the composed call.
-- **One structure:** "What are you deciding?" (`home/DecisionPicker.tsx`) shows for every reader; only the alert form, the record line and "Show the full brief" are first-visit only. It says whose lines the answers use ("Lines set for Series A with 12–24 months of runway") and links to `#company-calibration`.
-- **One subscribe form:** `SubscribeForm` offers "Only when it changes" or "Every Monday too"; the first visit starts on alerts. `FlipAlertForm` is gone.
-- **Lines stated once in points:** "What would change" drops the red "0 points — … crossed" counter and the boxed rules panel; the call-change line sits beside the quadrant, with the market move folded under "In interest-rate terms". `thresholdBusinessConsequence` had no other reader and is removed.
-- **Colour:** the ladders' change line is neutral, not the regime accent; a crossed pause line is caution amber, not red.
-- **Dates:** when the frozen record is not today's reading, the footer says so ("The reading above is from Oct 2. The last frozen record is dated Sep 29.") instead of "Citable permalink".
-- **Controls row:** the duplicate confidence chip (`CompactTrustPopover`) is gone; the cadence control is labelled "Plan horizon"; the trust strip's "Could change next week" gives its reason on every route.
-- **What changed:** each signal shows its name, what it governs and what moved it; the scale and meaning fold under "What the score means".
-- **Do and share:** the plan is the one primary button; the four arrow links are in the footer and header.
-- **Copy:** the movement lead is short sentences, one cause each; "the last time conditions moved this way" now says "tightened"/"eased" and names both moves when they differ.
-
 ### 1.1.35 `/share`: one format picker instead of a wall of sections (2026-10-06)
 
 `/share` stacked every format as its own section: the share rail's four-format picker, a grid of
@@ -2584,32 +1696,6 @@ work-item tags, the pull policies and the role memos. That was about 5,700px on 
 - `/operate`'s "Share the brief" step keeps the rail's four formats
   (`app/components/briefIslandPicker.tsx`) and links to `/share` for the rest.
 
-
-### 1.1.41 Two page frames: report and reading (2026-10-06)
-
-Report routes (`/signals`, `/trust`, `/operate`, `/resolve`, `/history`) use `ReportShell`, which builds
-on `PageShell`; the utility pages (`/share`, `/pricing`, `/search`, the API docs, the legal pages) use
-`PageShell` directly, without the status-led intro. Every page that is read rather than operated uses
-`ContentPageShell` (`app/components/ui/contentPageShell.tsx`) with one of three measures: `prose`
-(48rem), `content` (56rem) or `wide` (72rem, new).
-
-Before, the reading pages had three frames. `SecondaryPageShell` (answers, calibration, concepts,
-decisions, the 404) had its own widths and a navy backdrop, so an answer page and a signal-watch page
-opened on the same card at different widths. Five routes hand-rolled a `<main>` with no `id`: the
-published brief record, `/about`, `/contact`, the decision-shield overview and every resource
-article. On those the layout's "Skip to content" link went nowhere. The landmark audit passed them,
-because its streamed-route fallback found the 404 boundary's `<main>` in every flight payload.
-
-- Answers and the 404 take `content`; calibration, concepts, decisions and the articles (with their
-  rail) take `wide`; the brief record, about, contact and the overview take `prose`.
-- `SecondaryPageShell` and its CSS (`.weather-secondary-shell*`, the compact and narrow widths) are
-  deleted; `SecondaryPageHeader` and `SecondaryPageSection` stay as section components.
-- Resource articles lose the "Start from Weekly Brief" and "Return to Planning" pills that rendered
-  above their `<main>`. The link back to the brief is in the live-guidance block, under a dated line
-  ("As of Oct 2, 2026 · signals refreshed …") that replaces the paste-ready citation and its URLs.
-- `tests/readingFrameRoutes.test.tsx` renders each reading route and holds it to one
-  `<main id="main-content">`, and the article to nothing before it.
-
 ### 1.1.36 `/operate` opens on the reader's decision, not a copy of the brief (2026-10-06)
 
 The plan page opened on a "Weekly plan" step that restated the brief: the score rails, an Action now
@@ -2631,28 +1717,6 @@ own lines — were closed, two and three sections down.
   moves Copy verdict, Copy link and Record this decision below the verdict they act on.
 - Step ids are unchanged, so every deep link — `#ops-monthly-action-summary` from the brief, the
   portfolio note, the CLI — still opens its section.
-
-
-### 1.1.40 The governance guides: one copy of each section, the reference folded (2026-10-06)
-
-The three `/resources/*` governance guides ran to about 12,000px on a desktop and 18,700 on a phone.
-Four reference sections (the board Q&A, the anti-patterns, the 12-month cadence, the director
-checklist) were the same 945 words on all three URLs. A sentence splitter re-cut every paragraph into
-two-sentence chunks on ".", "!" and "?", so a quoted question printed a lone "," or "'" as its own
-paragraph. The parent guide listed itself under "Related pages". None of the three said what
-conditions were.
-
-- **One copy.** The four shared sections live on the parent guide; the framework and reversibility
-  guides link to them (`updatedAt` 2026-10-06 on both).
-- **Reference folded.** A section can carry `reference: true` (`lib/resourceContentSource.ts`). The
-  argument reads open, then its closing note, then the template CTA, then a Reference section of
-  closed disclosures. The index lists the argument, then the reference on one line.
-- **As written.** Paragraphs render as authored. "Back to top" (eleven per page) is gone.
-- **This week.** The header states the week's conditions and what they mean for last week's decisions
-  (the sentence the articles already print), with the record date and a link to the brief. It
-  replaces the "Start from Weekly Brief" and "Return to Planning" pills (AGENTS.md, "Thin SEO page").
-- Measured on the parent guide: 12,013 → 7,034 px desktop, 18,762 → 11,139 px phone. Tests:
-  `tests/resourcePillarPage.test.tsx`.
 
 ### 1.1.37 Pages reached from search open on the brief's card (2026-10-06)
 
@@ -2696,12 +1760,6 @@ like nothing the reader had seen on Monday.
 - Tests: `tests/publishedBriefPageOrder.test.tsx` (the card, one `h1`, one call-change label, the
   correction inside the card).
 
-### Shared page spacing (2026-10-04)
-
-The brief, report pages, answer pages and share groups use the spacing roles in `docs/agents/ui-ux-standards.md` §XXI. Page stacks own section separation; section stacks own heading/body gaps; framed cards own their insets. Report rows no longer add padding on top of an unboxed section's padding, and secondary-page titles and bodies share one left edge. The brief's company-control shelf uses aligned label columns above `sm`; phone controls stay in the header, with constraint notes retained when present. Narrative order, thresholds and export payloads are unchanged.
-
-The share page centers its groups in a 72rem column and limits the shared copy preview to 48rem, with equal-width format tabs. Runway labels, timeline status badges and palette help use the metadata type scale; scenario explanations and the budget memo use the readable small-body scale. Timeline month/zoom controls and its drag track retain 44px targets on phones and coarse-pointer tablets, with compact controls available on desktop. These refinements preserve the copied payloads and history navigation behavior.
-
 ### 1.1.39 `/history` answers its two questions in order (2026-10-06)
 
 The page summary names two jobs: look up what the guidance said in any past month, and how it held
@@ -2720,6 +1778,64 @@ own near the foot, ten screens from the strip that draws the same months.
 - Measured: 3,964 → 3,160 px desktop, about 6,160 → 4,990 px phone. Tests:
   `tests/recordRoutesReadingOrder.test.tsx`.
 
+### 1.1.40 The governance guides: one copy of each section, the reference folded (2026-10-06)
+
+The three `/resources/*` governance guides ran to about 12,000px on a desktop and 18,700 on a phone.
+Four reference sections (the board Q&A, the anti-patterns, the 12-month cadence, the director
+checklist) were the same 945 words on all three URLs. A sentence splitter re-cut every paragraph into
+two-sentence chunks on ".", "!" and "?", so a quoted question printed a lone "," or "'" as its own
+paragraph. The parent guide listed itself under "Related pages". None of the three said what
+conditions were.
+
+- **One copy.** The four shared sections live on the parent guide; the framework and reversibility
+  guides link to them (`updatedAt` 2026-10-06 on both).
+- **Reference folded.** A section can carry `reference: true` (`lib/resourceContentSource.ts`). The
+  argument reads open, then its closing note, then the template CTA, then a Reference section of
+  closed disclosures. The index lists the argument, then the reference on one line.
+- **As written.** Paragraphs render as authored. "Back to top" (eleven per page) is gone.
+- **This week.** The header states the week's conditions and what they mean for last week's decisions
+  (the sentence the articles already print), with the record date and a link to the brief. It
+  replaces the "Start from Weekly Brief" and "Return to Planning" pills (AGENTS.md, "Thin SEO page").
+- Measured on the parent guide: 12,013 → 7,034 px desktop, 18,762 → 11,139 px phone. Tests:
+  `tests/resourcePillarPage.test.tsx`.
+
+### 1.1.41 Two page frames: report and reading (2026-10-06)
+
+Report routes (`/signals`, `/trust`, `/operate`, `/resolve`, `/history`) use `ReportShell`, which builds
+on `PageShell`; the utility pages (`/share`, `/pricing`, `/search`, the API docs, the legal pages) use
+`PageShell` directly, without the status-led intro. Every page that is read rather than operated uses
+`ContentPageShell` (`app/components/ui/contentPageShell.tsx`) with one of three measures: `prose`
+(48rem), `content` (56rem) or `wide` (72rem, new).
+
+Before, the reading pages had three frames. `SecondaryPageShell` (answers, calibration, concepts,
+decisions, the 404) had its own widths and a navy backdrop, so an answer page and a signal-watch page
+opened on the same card at different widths. Five routes hand-rolled a `<main>` with no `id`: the
+published brief record, `/about`, `/contact`, the decision-shield overview and every resource
+article. On those the layout's "Skip to content" link went nowhere. The landmark audit passed them,
+because its streamed-route fallback found the 404 boundary's `<main>` in every flight payload.
+
+- Answers and the 404 take `content`; calibration, concepts, decisions and the articles (with their
+  rail) take `wide`; the brief record, about, contact and the overview take `prose`.
+- `SecondaryPageShell` and its CSS (`.weather-secondary-shell*`, the compact and narrow widths) are
+  deleted; `SecondaryPageHeader` and `SecondaryPageSection` stay as section components.
+- Resource articles lose the "Start from Weekly Brief" and "Return to Planning" pills that rendered
+  above their `<main>`. The link back to the brief is in the live-guidance block, under a dated line
+  ("As of Oct 2, 2026 · signals refreshed …") that replaces the paste-ready citation and its URLs.
+- `tests/readingFrameRoutes.test.tsx` renders each reading route and holds it to one
+  `<main id="main-content">`, and the article to nothing before it.
+
+### 1.1.42 The homepage, after a product-design critique (2026-10-06)
+
+- **Card:** the headline is the action ("Freeze new commitments and protect runway."); the week's direction rides on the stamp line ("· Tightening this week", `splitWeeklyCall` in `lib/report/reportEvidence.ts`). Pastes and the sticky strip keep the composed call.
+- **One structure:** "What are you deciding?" (`home/DecisionPicker.tsx`) shows for every reader; only the alert form, the record line and "Show the full brief" are first-visit only. It says whose lines the answers use ("Lines set for Series A with 12–24 months of runway") and links to `#company-calibration`.
+- **One subscribe form:** `SubscribeForm` offers "Only when it changes" or "Every Monday too"; the first visit starts on alerts. `FlipAlertForm` is gone.
+- **Lines stated once in points:** "What would change" drops the red "0 points — … crossed" counter and the boxed rules panel; the call-change line sits beside the quadrant, with the market move folded under "In interest-rate terms". `thresholdBusinessConsequence` had no other reader and is removed.
+- **Colour:** the ladders' change line is neutral, not the regime accent; a crossed pause line is caution amber, not red.
+- **Dates:** when the frozen record is not today's reading, the footer says so ("The reading above is from Oct 2. The last frozen record is dated Sep 29.") instead of "Citable permalink".
+- **Controls row:** the duplicate confidence chip (`CompactTrustPopover`) is gone; the cadence control is labelled "Plan horizon"; the trust strip's "Could change next week" gives its reason on every route.
+- **What changed:** each signal shows its name, what it governs and what moved it; the scale and meaning fold under "What the score means".
+- **Do and share:** the plan is the one primary button; the four arrow links are in the footer and header.
+- **Copy:** the movement lead is short sentences, one cause each; "the last time conditions moved this way" now says "tightened"/"eased" and names both moves when they differ.
 
 ### 1.1.43 Delivery channels: one Slack poster, one email shell, one tally, one send record (2026-10-06)
 
@@ -2889,71 +2005,6 @@ A screenshot review of `/resolve` and `/signals` in both themes, returning reade
   `tests/signalsPageFold.test.tsx` (renamed question pinned on purpose; every answer checked against
   its opened panel; the base-rate note; the ladder cap).
 
-### 1.1.48 `/trust` leads with its sources; `/share` shows what it hands over (2026-10-07)
-
-A screenshot review found both pages describing the thing a reader came for instead of showing it.
-
-**`/trust`.** The page's open content was the thresholds essay ("Why it works", the editor's
-healthcare background) and a blank five-prompt form that read as unfinished, while the sources —
-the rail's second entry, and what the page exists to check — sat folded at the foot under
-"Detailed verification & sources" as two timestamps. The per-source health rows
-(`reportData.sourceHealth`) were built for every reading and drawn nowhere but as the strip's count.
-
-- **Source board, open, under "How the scores are built"** (`app/trust/sourceBoard.tsx`). One row
-  per source — Treasury, Market stress, Inflation, Labor, Startup/private markets — with its state
-  in the strip's words (Live, Current, Cached copy, Stale · 2mo old, Not confirmed), its cadence
-  and when it last answered (UTC), then the two source links. `buildSourceBoardRows`
-  (`lib/report/sourceHealth.ts`) judges "as intended" with the predicate `buildDegradedSourceRows`
-  uses, so the board and the strip's "All sources live" / "Partly cached" count the same rows.
-  Raw fallback reasons stay off the board: they are diagnostic strings, some naming series ids.
-  `#source-board` is unchanged (`DATA_CURRENCY_ACTION_HREF` points at it).
-- **The rest of the verification stays folded on a healthy week**, under "Citation, limits and
-  revisit triggers" (citation, limits, calibration link, warnings, snippet). The `?sources=1` key
-  still opens it, so shared links keep working.
-- **"How to use the thresholds" is last.** Its worked example stays open; the three definitions
-  with the essay, and the blank form, are native `<details>`. `#template` is on the form's own
-  `<details>`, so `/template` lands on it and the shell's anchor handler opens it; `/threshold`
-  (`#framework`) opens both.
-- **Rail in page order** (§XI): status, formula, sources, the four folded sections, the method.
-- This opens a source board, which §XII lists among things to collapse. On `/trust` the check is
-  the page's job, so the compact board is its content; the detail behind it is what folds.
-  Recorded in §XII.
-- Desktop 3,622 → 2,547px, phone 4,983 → 3,491px (same day's data, returning reader).
-- Tests: `tests/trustSourceBoard.test.tsx` (board open after the formula and before anything
-  folded, every source drawn, rail in page order, method and form folded, `#template` on the
-  form's disclosure), `tests/sourceHealth.test.ts` (board rows and the strip agree).
-
-**`/share`.**
-
-- **Chat formats are drawn as the channel shows them.** The Slack post previewed as raw markup
-  in monospace. `parseSlackMrkdwn` (`lib/export/slackMrkdwn.ts`) reads the subset the chat formats
-  write (`*bold*`, `_italic_`, `>` quote lines, bare http(s) URLs) into data, and `ChatPreview`
-  (`app/share/chatPreview.tsx`) builds React nodes from it: bold, one quote bar per quoted run,
-  links. Nothing is injected as HTML; unrecognised text stays text. When the drawing differs from
-  the text, "Show the text that copies" holds the exact text. Per format (`preview: "chat"`): the
-  Slack post, full brief and standup line draw as chat. The meeting pack, agenda, slide text,
-  email, investor update, portfolio note, citation and ticket keep the plain preview
-  (`BriefPreview`), because there the text is the artifact. The copy button copies the same
-  text; `tests/briefFormatsPinned.test.ts` is unchanged.
-- **The images are shown.** "Files and images for a deck or a thread" was four cards that
-  described a slide and a card and showed neither. The PPTX, PDF and SVG draw one slide from one
-  payload (`lib/export/boardSlideDeck.ts`), so they are one card with the slide's picture
-  (`/api/image/slide?stage=seed`) and three captioned files; the brief card shows
-  `/api/image/brief`. This reverses the component's "deliberately links rather than thumbnails"
-  on cost grounds that no longer hold: two pictures, not four; both routes answer with
-  `s-maxage=3600`; both load lazily below the copy formats. `next/image` with `unoptimized` (the
-  worker's `/_vinext/image` resizes static assets only) sets the size attributes, lazy loading
-  and async decoding; a scrolled capture measured CLS 0 at 430px and 1280px. From `sm` both
-  pictures sit in a 3:2 frame so the cards' titles align; the slide letterboxes rather than crops.
-- **This week's readings** above the picker were 12px across the 72rem column (~150 characters a
-  line). They are `text-fluid-xs` (the §VI floor for explanatory text) capped at 48rem.
-- Seen, not changed: the seed-stage slide prints a stage-specific action and a "Conditions change
-  if" line ("Risk appetite rises above 50 … Conditions then turn Cloudy") that differs from the
-  Slack post's on the same page, now that both are visible together. The slide payload comes from
-  `lib/export/exportSnapshot.ts`; whether the two should agree is for that module's owner.
-- Tests: `tests/slackMrkdwn.test.ts`, `tests/sharePageCurrentBrief.test.tsx` (chat drawing and
-  raw text, per-format preview choice, markup-looking text stays escaped, two sized lazy images).
-
 ### 1.1.46 `/operate` leads with this week's rules (2026-10-07)
 
 A screenshot review of the plan page found it opening on the least informative thing it has: under
@@ -3068,3 +2119,914 @@ strip across a phone's first screen, a footer set louder than the pages above it
   the record, with a key of only the conditions it draws; it reads the timeline the entries print
   and adds no data or claim. Measured: 6,293 → 5,455px desktop, about 8,220 → 7,680px phone.
   `tests/productCanon.test.ts` holds the stamps and one square per essay.
+
+### 1.1.48 `/trust` leads with its sources; `/share` shows what it hands over (2026-10-07)
+
+A screenshot review found both pages describing the thing a reader came for instead of showing it.
+
+**`/trust`.** The page's open content was the thresholds essay ("Why it works", the editor's
+healthcare background) and a blank five-prompt form that read as unfinished, while the sources —
+the rail's second entry, and what the page exists to check — sat folded at the foot under
+"Detailed verification & sources" as two timestamps. The per-source health rows
+(`reportData.sourceHealth`) were built for every reading and drawn nowhere but as the strip's count.
+
+- **Source board, open, under "How the scores are built"** (`app/trust/sourceBoard.tsx`). One row
+  per source — Treasury, Market stress, Inflation, Labor, Startup/private markets — with its state
+  in the strip's words (Live, Current, Cached copy, Stale · 2mo old, Not confirmed), its cadence
+  and when it last answered (UTC), then the two source links. `buildSourceBoardRows`
+  (`lib/report/sourceHealth.ts`) judges "as intended" with the predicate `buildDegradedSourceRows`
+  uses, so the board and the strip's "All sources live" / "Partly cached" count the same rows.
+  Raw fallback reasons stay off the board: they are diagnostic strings, some naming series ids.
+  `#source-board` is unchanged (`DATA_CURRENCY_ACTION_HREF` points at it).
+- **The rest of the verification stays folded on a healthy week**, under "Citation, limits and
+  revisit triggers" (citation, limits, calibration link, warnings, snippet). The `?sources=1` key
+  still opens it, so shared links keep working.
+- **"How to use the thresholds" is last.** Its worked example stays open; the three definitions
+  with the essay, and the blank form, are native `<details>`. `#template` is on the form's own
+  `<details>`, so `/template` lands on it and the shell's anchor handler opens it; `/threshold`
+  (`#framework`) opens both.
+- **Rail in page order** (§XI): status, formula, sources, the four folded sections, the method.
+- This opens a source board, which §XII lists among things to collapse. On `/trust` the check is
+  the page's job, so the compact board is its content; the detail behind it is what folds.
+  Recorded in §XII.
+- Desktop 3,622 → 2,547px, phone 4,983 → 3,491px (same day's data, returning reader).
+- Tests: `tests/trustSourceBoard.test.tsx` (board open after the formula and before anything
+  folded, every source drawn, rail in page order, method and form folded, `#template` on the
+  form's disclosure), `tests/sourceHealth.test.ts` (board rows and the strip agree).
+
+**`/share`.**
+
+- **Chat formats are drawn as the channel shows them.** The Slack post previewed as raw markup
+  in monospace. `parseSlackMrkdwn` (`lib/export/slackMrkdwn.ts`) reads the subset the chat formats
+  write (`*bold*`, `_italic_`, `>` quote lines, bare http(s) URLs) into data, and `ChatPreview`
+  (`app/share/chatPreview.tsx`) builds React nodes from it: bold, one quote bar per quoted run,
+  links. Nothing is injected as HTML; unrecognised text stays text. When the drawing differs from
+  the text, "Show the text that copies" holds the exact text. Per format (`preview: "chat"`): the
+  Slack post, full brief and standup line draw as chat. The meeting pack, agenda, slide text,
+  email, investor update, portfolio note, citation and ticket keep the plain preview
+  (`BriefPreview`), because there the text is the artifact. The copy button copies the same
+  text; `tests/briefFormatsPinned.test.ts` is unchanged.
+- **The images are shown.** "Files and images for a deck or a thread" was four cards that
+  described a slide and a card and showed neither. The PPTX, PDF and SVG draw one slide from one
+  payload (`lib/export/boardSlideDeck.ts`), so they are one card with the slide's picture
+  (`/api/image/slide?stage=seed`) and three captioned files; the brief card shows
+  `/api/image/brief`. This reverses the component's "deliberately links rather than thumbnails"
+  on cost grounds that no longer hold: two pictures, not four; both routes answer with
+  `s-maxage=3600`; both load lazily below the copy formats. `next/image` with `unoptimized` (the
+  worker's `/_vinext/image` resizes static assets only) sets the size attributes, lazy loading
+  and async decoding; a scrolled capture measured CLS 0 at 430px and 1280px. From `sm` both
+  pictures sit in a 3:2 frame so the cards' titles align; the slide letterboxes rather than crops.
+- **This week's readings** above the picker were 12px across the 72rem column (~150 characters a
+  line). They are `text-fluid-xs` (the §VI floor for explanatory text) capped at 48rem.
+- Seen, not changed: the seed-stage slide prints a stage-specific action and a "Conditions change
+  if" line ("Risk appetite rises above 50 … Conditions then turn Cloudy") that differs from the
+  Slack post's on the same page, now that both are visible together. The slide payload comes from
+  `lib/export/exportSnapshot.ts`; whether the two should agree is for that module's owner.
+- Tests: `tests/slackMrkdwn.test.ts`, `tests/sharePageCurrentBrief.test.tsx` (chat drawing and
+  raw text, per-format preview choice, markup-looking text stays escaped, two sized lazy images).
+
+### 1.2 Evidence report (/signals)
+The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
+in the order a reader asks:
+
+- **What changed.** One table of every signal: from → to, its line, and why it matters. The focus
+  filters narrow it and travel in the URL.
+- **What would change this guidance.** The two score ladders with their Pause if and Resume when lines.
+- **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are
+  interest rates doing? · Has the yield curve inverted in the last year? · How have the two scores
+  moved this year? · What would conditions be with different lines? · What did the brief say in an
+  earlier month? · Which past cycle looks most like this one? · Which habits from the zero-rate
+  years still shape your company? Since 2026-10-07 each summary carries its answer after the
+  question (§1.1.45).
+
+The page used to open on "What this means now", the brief's call restated under the shell's own
+stamp, and the charts disclosure opened by default: about 2,000px of charts before the other five
+instruments. The call stays on the brief. Links that targeted `#decision-summary` (search, and the
+month picker's "Back to this week") land on `#what-changed`. `?advanced=1` still opens the month
+picker, `?fossil=1` the fossil record, and threshold parameters the line settings.
+
+The inversion preview shows a labeled zero line, time anchors, direct end labels, and visible
+breaks when monthly spread reads are missing. The deeper yield-curve diagnostics now direct-label multi-series lines, preserve gaps
+instead of connecting through missing data, and encode scatterplot recency through a chronological
+path plus a highlighted latest point.
+
+### 1.3 Plan overview (/operate)
+Planning is the detailed execution page behind the brief (`app/operate/planningPageModel.ts`).
+Since 2026-10-07 (§1.1.46) its steps run: This week's rule for each area, Rules before you commit
+and Test a decision (the three open on arrival), Set this plan's lines (§1.1.31; live weeks only,
+and left out when no rule has a numeric line), Finance strategy, and Share the brief, with Risk
+checks ("Warnings to read before you approve") after them. A deep link opens its step without
+closing the others, and retired section hashes map onto the step that replaced them
+(`hashAliases`).
+
+The Share step is the share rail's four formats (`BriefIslandPicker`,
+`app/components/briefIslandPicker.tsx`), with a link to `/share` for email, the meeting pack, role
+memos, the calendar hold and the embed. It no longer carries alert delivery controls, Decision
+Memory recall (§8.4) or the operator-request list (§1.1.46). The stepper accepts owner and
+approval-state fields, and no step sets them (DD-045). (This paragraph used to describe a
+mixed-literacy translation model on `/operate` — a top-of-page router to decision, evidence, trust
+or share help, plus persisted assist panels. No such router or panel existed; the only trace in the
+code was a table of storage keys nothing wrote, deleted in §1.1.14a.)
+Shared report-shell routes now avoid stacking a separate trust summary panel ahead of the first task block; trust status stays compressed inside the intro layer unless a route explicitly promotes a deeper trust section.
+
+### 1.4 Planning workstreams
+- **Weekly plan** (`/operate`): the steps in §1.3.
+- **Runway planner** (`/operate/financial`): burn, raise timing and a memo from the reader's own
+  figures (§4.4).
+- **Scenario studio** (`/operate/scenarios`): what the plan looks like if the numbers were
+  different.
+
+Both render from `app/operate/[workstream]/page.tsx`, which reads `WORKSTREAMS` in
+`app/operate/workstreams.ts`.
+
+### 1.5 Home, and why there is no glossary (`/`)
+The homepage is the only canonical first-time and returning weekly workspace. There is no
+glossary route (retired 2026-09-22; `/glossary` redirects to `/trust#formula-reference`). A
+term carries its meaning where it appears instead: a 0–100 score prints with its scale
+(`formatSignalReading`), the three lines have names that say what happens, weather names carry
+their one-line meaning, and the instrument names only a formula needs are defined on the
+formula cards. `tests/readerVocabulary.test.tsx` bans the retired names and the pointers to the
+old page. `llms-full.txt` keeps a Terms block (`TERM_DEFINITIONS`) for machine readers.
+See `docs/glossary-retirement-plan.md`.
+
+### 1.5.1 About and identity framing (`/about`)
+The About page is where the product says what it claims. Since 2026-10-01 it carries, in order:
+- **What is new here**: two claims and no more — lines decided before they are needed (each area's
+  action, pause line and resume line, set apart), and a record that grades itself (`/history` track
+  record, `/calibration`). It says the inputs are not new.
+- **Where it fits, and where it does not**: a cadence sentence derived from the archive
+  (`describeRecordCadence` over `buildTrackRecord`: conditions changed, and months a pause or resume
+  line was crossed, `lineCrossingMonths`), then the decisions it fits (multi-quarter commitments,
+  plans a group approves once, venture-backed U.S. companies with one to two years of runway) and
+  the ones it does not (single decisions, under six months of runway, funding that does not follow
+  U.S. rates, what to build).
+- **Who writes it**, with the method's healthcare origin attributed to the editor and linked.
+- **What it is built from**, naming only what enters the two scores; inflation and unemployment are
+  stated as tracked but unscored.
+
+### 1.6 Trust hub (/trust) and formula reference
+`/trust` is the canonical trust-audit hub linked from the Weekly Brief. Its intro carries the trust
+strip (record date, sources, confidence, and whether the guidance could change next week). The page
+then runs, in order (`app/trust/page.tsx`, §1.1.48): System status (`#trust-snapshot`: the U.S.
+baseline the brief starts from and the use boundary), the pipeline's run history when one is
+configured, How the scores are built (`#formula-reference`), the source board (`#source-board`),
+then the citation, confidence limits, confidence record, revisit triggers and meeting snippet, and
+last the thresholds method. Those five sections fold under "Citation, limits and revisit triggers"
+on a week with live data and no warning, and are open otherwise. The legacy `/sources` and
+`/confidence` entry URLs redirect at the routing layer to `#sources-freshness` and
+`#confidence-limits` instead of acting as parallel trust pages. The live weekly call stays on `/`.
+
+`/methodology` now permanently redirects to `/trust#formula-reference`, which documents the sensor methodology and the public data sources used in the report (FRED Treasury series, FRED CPI, FRED labor, FRED credit spreads, FRED VIX, and Chicago Fed NFCI).
+
+The methodology reference also now clarifies scope: the two scores are built from Treasury rates (the one-month bill and the 10Y−2Y slope) with capped stress adjustments (high-yield spread, Chicago Fed index, VIX, venture pace, layoffs). CPI, unemployment and the BBB spread feed the separate policy assessment, not the scores or the conditions. The operating outputs are a translation layer rather than a claim of bespoke precision.
+Failure-mode diagnostics are now handled through the Trust and Planning workflows rather than as a standalone indexable library. Planning now exposes compact false-signal checks before guardrail approval so operators can pressure-test the weekly plan without leaving the core loop.
+
+### 1.7 Share-preview assets for canonical hubs
+Every route's share preview is a PNG that `/api/og` draws from a template the page names
+(`imageParams` in `buildPageMetadata`, `lib/seo.ts`): `signals`, `operations`, `solutions`,
+`answers`, `guides`, `method`, `record`, `compare`, `reading` and `report`. A page that names none
+gets the `plain` card with its own title and description. The static SVG cards
+under `public/social/` were deleted on 2026-09-10, because social unfurlers refuse `image/svg+xml`;
+`tests/hubRouteSocialAssets.test.ts` fails if a route declares an SVG `og:image`.
+
+`/resources` is the one secondary hub with a page of its own, listing the governance frameworks and
+the decision guides. `/guides` and `/toolkits` redirect (§1.0), and `/answers`
+redirects to the direct answers on `/resolve` (`/resolve#direct-answers`) instead of maintaining a
+separate hub shell.
+`/resolve` owns the stakeholder and stage states behind query-selected panels (`?stakeholder=`, `?stage=`, `?library=`), and supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
+`/search` is product-accessible and noindex. It renders the matches on the server and offers the hub the top match belongs to as the first action, rather than forwarding the query there.
+`/resolve/team-context` no longer operates as a standalone personalization branch; it redirects into Planning (`/operate#ops-monthly-action-summary`). `/resolve` itself is described in §4.1.
+The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect to `/resolve#direct-answers`. The active resource-article set is likewise reduced to a focused practical subset: retired long-form briefs redirect to Planning's Share step (`/planning#ops-export-briefs`, which lands on `/operate`), and the remaining guides are listed on `/resources`.
+
+The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
+
+The monthly guidance has one home, the Monthly horizon on the brief (`/?cadence=monthly`); the plan's first step links to it rather than carrying a second copy.
+
+Report-shell route intros are now compressed more aggressively on mobile so the first page-specific task block lands faster in the viewport; the route brief still orients the operator, but no longer needs a second always-visible decision panel on small screens.
+
+Trust readiness language is now stricter on trust and planning surfaces: cached or medium-reliability states stay in staged-approval language (`use with caution` / `approvals staged`) instead of presenting as fully ready-to-use.
+Trust/readiness computation now consumes structured freshness state (`fresh` / `stale` / `unknown` plus `live` / `cached` / `historical`) instead of relying on rendered freshness labels, so stale-but-present timestamps no longer pass as ready-to-use.
+
+## 2) Data sourcing & provenance
+
+### 2.1 Treasury yields (live + fallback)
+- Canonical in-product source: FRED CSV Treasury constant-maturity series (`DGS1MO`, `DGS3MO`, `DGS2`, `DGS10`).
+- Secondary/provenance source: US Treasury Fiscal Data API is used only for validation workflows and source cross-checking, not for runtime scoring.
+- Data is normalized into a `TreasuryData` shape and stamped with `record_date`, `fetched_at`,
+  and source metadata.
+- If live fetch is unavailable, the report falls back to `data/snapshot_fallback.json` and marks the
+  response as cached with a fallback reason.
+
+### 2.2 Macro snapshot
+- Core series now include CPI, unemployment, BBB OAS, HY OAS, Chicago Fed NFCI, and VIX with live fetch support where available.
+- Startup/operator overlays (VC funding velocity, tech layoff trend, SaaS multiples) and structural overlays (earnings revisions, AI compute cost trend, regulatory risk tracker) are shipped via snapshot-backed series for deterministic fallback.
+- Each series carries a source URL, record date, and freshness metadata.
+
+### 2.3 Time Machine cache
+- Historical Treasury snapshots are served from `data/time_machine_cache.json`.
+- Each entry also carries the period's VIX reading with a trailing daily tail
+  (`vixHistory`) and the resolved base-rate velocity pair
+  (`baseRateVelocityWindow`), so the runtime replay evaluates the market-stress
+  veto and tightening-speed term on the same daily cadence the archive
+  generators use. The runtime governed walk must publish the same regime and
+  scores as `data/summary_archive.json` for every month on record; the parity
+  test in `tests/regimeGovernance.test.ts` pins this.
+- Historical selections resolve their assessment from the governed walk
+  (`findTimeMachineGovernedAssessment`), not a point evaluation against the
+  live machine snapshot, so a selected month reads the same call on every
+  surface — brief, compare cards, and `/history`.
+- The confidence history and the analog ranking resolve each historical month
+  from that same governed walk, so a stress month's confidence and distance to
+  flip carry the VIX haircut and veto the record was published with. The
+  current record date resolves to the live assessment instead.
+- A partial generator run (`HISTORY_START_YEAR`, which
+  `time-machine:update-summaries` sets to 2024) walks from the first year and
+  filters only which records it writes, so a merge lands the same
+  confirmations a full replay produces.
+- One walk (2026-10-06): the runtime replay and all three generators thread the
+  engine through `replayRegimeWalk` (`lib/timeMachine/regimeReplay.ts`), and the
+  generators' period logic is `scripts/regimeArchiveReplay.ts`.
+  `tests/regimeArchiveReplay.test.ts` replays every cadence offline from series
+  rebuilt out of the bundled data and holds it to the archive on record.
+- Every entry a generator writes carries `engineVersion` (`ENGINE_VERSION`, the
+  engine calibration that scored it). It is additive: entries written earlier have
+  none, and the archive reader ignores it.
+- A flip is a shock only when the one-step move is 25 points or more *and* the
+  prior reading sat outside the 5-point near band; from inside the band the
+  warning could have fired, so the flip confirms through the gate.
+- The Time Machine UI validates available months, shows cache coverage, and uses cached
+  summary archives for weekly/monthly/quarterly/yearly playback.
+- Historical assessment now attempts to align macro-series history to the selected `asOf` date and records explicit coverage labels (`historical aligned`, `historical aligned partial`, or `treasury-only`) so historical vs. live comparisons stay structurally comparable when data exists and honestly degraded when it does not.
+
+## 3) Regime engine & scoring
+
+### 3.1 Inputs
+- **Base rate**: 1‑month Treasury yield (fallback to 3‑month if missing).
+- **Curve slope**: 10Y − 2Y yield spread.
+- **Macro overlays (boundary calibration)**: HY OAS, Chicago Fed NFCI, VIX, VC funding velocity, and tech layoff trend adjust tightness/risk appetite before final classification and trigger multi-weak-read warnings.
+
+### 3.2 Scores
+- **Tightness score (0–100)**: adds 90 points if base rate > threshold and 25 points if the curve
+  is inverted; capped at 100.
+- **Risk appetite score (0–100)**: maps curve slope linearly from -1.0% to 1.5%.
+
+### 3.3 Regime classification
+Regime is determined by tightness vs. risk appetite thresholds (defaults are 70 and 50
+respectively). Thresholds can be overridden via URL parameters, and the UI maintains an audit log
+of operator changes.
+
+Canonical taxonomy is the four-quadrant set only: `SCARCITY`, `DEFENSIVE`, `VOLATILE`, `EXPANSION`.
+Policy pilot outputs (`RISK_ON`, `SAFETY_MODE`, `TRANSITION`) are a separate posture layer and do not replace regime keys used by Decision Shield, alerts, or UI matrix logic.
+
+### 3.4 Outputs
+Adjustment semantics:
+- Macro overlays modify tightness/risk-appetite scores before classification, so they can change the resulting regime when signals are near boundaries.
+- Diagnostics (`boundaryContributors`, weak-read warnings, confidence) explain *why* adjustments applied.
+- Recommendations and constraints always derive from the final classified regime.
+
+The regime assessment includes:
+- Current regime label + description
+- Tightness and risk appetite scores
+- Constraint list for the current regime
+- Data warnings when inputs are missing
+- Input metadata for provenance display
+
+
+
+### 3.4.1 Sector sensitivity overlay (decision translation layer)
+- Sector overlays are **secondary interpretations only** and do not mutate base regime classification.
+- Canonical sector taxonomy:
+  - `b2b-saas` → higher upside sensitivity (`Expansion+`, `Mixed+` when warranted)
+  - `consumer` → neutral calibration (`Expansion (neutral)`, `Mixed (neutral)`, etc.)
+  - `infrastructure` → higher downside sensitivity (`Mixed-`, `Defensive-` when warranted)
+  - `fintech` → mixed calibration with tighter downside checks and selective upside (`Mixed (neutral)|Mixed-` in boundary weeks)
+  - `healthcare` → conservative calibration favoring hold/tighten near thresholds (`Defensive (neutral)|Defensive-` as warranted)
+  - `ai-platforms` → aggressive upside calibration (`Expansion+`, `Mixed+` with stronger loosen bias when warranted)
+- Overlay output contract (`deriveSectorAdjustedPosture`):
+  - `basePostureLabel`
+  - `adjustedPostureLabel` (`+`, `-`, or `(neutral)` variant formatting)
+  - `postureVariant` (`plus|neutral|minus`)
+  - `adjustmentStrength` (`none|light|moderate|strong`)
+  - `adjustmentDelta` (signed scalar, damped near regime boundaries)
+  - `actionBias` (`tighten|hold|loosen`) and `reversalCondition` for bounded decision translation
+- Calculation semantics: normalize tightness and risk-appetite distance from thresholds, apply sector multipliers + offset, then damp the resulting delta by nearest-threshold distance so overlays do not oscillate during boundary weeks.
+- Boundary rule: overlays are damped as scores approach regime thresholds so route-to-route language remains stable during transition weeks.
+
+### 3.4.2 Trust and fallback behavior for missing sector/company context
+- Sector query fallback: unknown or empty `?sector` values resolve to canonical fallback `b2b-saas`.
+- Missing company-rule payload fallback (interpretation `company` view): render available bounded rules in provided priority order and cap to the top three; if fewer than three exist, render only available rules without blocking the page.
+- Trust posture: these fallbacks are translation-layer only and never mutate base regime classification, canonical confidence label, or trigger thresholds.
+
+### 3.5 Policy-spec pilot layer (new)
+A policy-alignment pilot now runs **alongside** the legacy regime engine in the assessment payload:
+- Versioned policy metadata (`policy-v1`) is emitted for traceability.
+- Signal normalization fields include z-score, directional transform, and clipped z-score for base rate, slope, BBB spread, CPI YoY, and unemployment; Treasury signals use the local long-range archive when available, while other policy signals normalize against the available local history window.
+- Composite outputs expose `cts` and `ras` values without replacing legacy tightness/risk-appetite outputs yet.
+- A refusal state is included when disagreement/volatility/data-gap guards trigger, returning explicit fallback directives (`NO_POSTURE_CHANGE_RECOMMENDED`, `REVERSIBLE_BETS_ONLY`).
+
+This pilot remains additive at the scoring layer, but refusal is now binding at the guidance layer: if the policy layer refuses a posture change, readiness is capped, operator copy shifts to reversible-only execution language, and export/share surfaces must not present the move as a clean posture upgrade or downgrade.
+
+## 4) Decision support tooling
+
+### 4.1 Decisions workstream status
+Decisions is an active first-class workflow surface in shipped navigation (`/resolve`,
+`app/resolve/page.tsx`). It leads with the direct answers under this week's guidance, each carrying
+its lead area's standing and the pause-line count over the list (§1.1.45); two context links
+follow, then role, stage, situation and toolkit browsing behind one disclosure. Its next step is the
+plan.
+
+The toolkit library is a panel inside that disclosure, filtered by `?toolkitQuery=`
+(`app/resolve/components/toolkitLibraryPanels.tsx`). Top-level `/toolkits` redirects to `/`, and
+each toolkit keeps its own `/toolkits/[slug]` page.
+
+Decision Shield logic/components remain integrated through decision and operations surfaces.
+
+### 4.2 Decision templates
+Copy-ready decision templates remain available inside operations brief/export surfaces for async
+review notes and leadership discussion.
+
+### 4.3 Export behavior
+Briefing/report exports remain available where they package current signal-driven guidance.
+Integration payload exports are also available through `/api/integrations/weekly-mandate` for
+Slack, Notion, and Linear targets.
+
+### 4.4 Forecast confidence + runway-risk semantics
+- Forecast confidence messaging is anchored to **boundary distance + crossing risk**, not long-horizon macro prediction.
+- `forecast` interpretation copy must include:
+  - highest-likelihood next posture (the top `next90DayProbabilities` value, `lib/report/forecastModel.ts`),
+  - crossing-risk label (`low|medium|high`),
+  - points-to-threshold distance + momentum direction.
+- Runway planner risk messaging uses bounded bands:
+  - risk score is clamped to 0–100 with labels `low|moderate|high|critical`,
+  - recommendations include explicit raise window, burn adjustment range, and reversal language,
+  - posture/regime flips should change urgency and guardrail strictness, not just copy tone.
+- Cash, net burn and dates (2026-10-01), for a founder without a finance lead:
+  - **Cash in the bank** is a profile figure (`cashUsd`). With spend in, runway is worked out as
+    cash ÷ (spend − revenue) by `resolveProfileRunway`, which every reader of runway now goes
+    through: the planner, the commitment test, the runway notes, the plan stress test and the band
+    cookie. Cash and a typed runway replace each other (`setOperatorProfileField`), a band pick that
+    excludes the runway clears whichever stated it, and a shared plan link carries `?cash=` and
+    replaces both of the recipient's when it carries either. A link's figure is read whole or not at
+    all (money also takes the k/M/B shorthand): `parseFloat` read a hand-edited `?cash=2.1M` as $2.10
+    and `?runway=14months` as 14. Revenue at or above spend reads as
+    cash-flow positive: no runway, and the planner says so instead of asking for one. That holds
+    whichever way the runway was given: a typed runway beside revenue that covers spend used to size
+    a full plan and date a cash-out month while the same company with its cash entered was told there
+    was no runway to plan against. A cash-flow-positive company sits in the open-ended band (24+ mo,
+    `runwayBandForProfileRunway`), and revenue coming to cover spend moves the band cookie there. It
+    used to leave the cookie wherever the last burning figure had put it, so cash $600k, then spend
+    $200k, then revenue $250k kept `/` saying "With less than 6 months of runway, cash is what limits
+    you" and the server scaling the rules to that band, beside "cash is not running down".
+  - **One meaning of burn.** `monthlyBurnUsd` is total spend (the planner subtracts revenue from
+    it, and its field now says "Monthly spend"). The commitment test, the runway notes' 10%-cut
+    arithmetic and the stress test's cash estimate used it as net burn, which overstated runway
+    whenever revenue was coming in: 12 months, $200k spend, $150k revenue and a $20k hire printed
+    10.9 months left for 8.6. They read `netMonthlyBurnUsd` now, and the stress test receives the
+    cash balance it always accepted and was never given. The stress test's form has no revenue box,
+    so its sizing line names net burn with both figures ("$50k a month of net burn ($200k spend less
+    $150k revenue) × 12 months of runway"); it printed "$50k a month" with $50k on no screen. When
+    revenue covers spending it says so and asks for cash in the bank (`companyFinancialProfileFor`
+    passes a net burn at or below zero through), where it said "sizing it needs your cash or monthly
+    burn" with runway and spend both filled.
+  - **Dates and dollars.** `describeRunwayPlanInYourNumbers` restates the plan in calendar months
+    and dollars on the planner's cards, its copy block and the budget memo: the month cash runs out,
+    the raise window as months, the burn adjustment as dollars of spend and the runway it buys, and
+    the gap to the safe band's floor as cash or as a net-burn target. Arithmetic on the plan and the
+    reader's figures only; dates wait for hydration so a server render cannot print another month.
+    The raise window closes by the month cash runs out at the latest, and opens now when that
+    leaves nothing before it (critical risk opened it at months 0–2 whatever the runway, so 1.5
+    months of cash read "the window closes around Dec 2026. Cash runs out around Nov 2026."). The
+    plan scores the same runway the dated lines print: its floor is a tenth of a month, the
+    profile's own, where it was one month, so 0.3 months was scored as 1 and printed as 0.3.
+    Months count on the reader's calendar (`formatMonthAfter`): whole months are calendar months,
+    with a late day held at the end of a short month, and a fraction is that share of the month
+    after by days. It added 30.44-day months in UTC, so Oct 1 plus one month printed "Oct 2026", a
+    raise window at months 1–3 printed Oct–Dec, and Jan 30 plus one printed "Mar".
+- Own lines, a reachable test, and crossings at the reader's runway (2026-10-02):
+  - **Your own runway lines** (`#ops-runway-lines` on the planner): "start raising at" and "pause
+    hiring at" a number of months of runway (`raiseAtRunwayMonths`, `hiringPauseAtRunwayMonths` in
+    the profile, `?raiseAt=` / `?hirePauseAt=` on the link). Each prints the month it arrives at
+    today's net burn, or that it is already here, and travels in the copy block and the memo.
+    The company's lines beside the published ones, never in place of them.
+  - **The commitment test for a returning reader.** "Test a decision against your runway" is a
+    folded disclosure under the area table in "What it changes" (`CommitmentTestDisclosure`), with
+    an area select for the runway note. The section folds on a first visit and the picker hides
+    once the brief is open, so the two copies are never on screen together.
+  - **Burn multiple capped.** The planner's risk score read spend ÷ revenue uncapped, so $1k of
+    revenue against $150k of spend scored critical (150x) where the same company with no revenue
+    scored moderate (4x). It is capped at the no-revenue 4x now; earning something never scores
+    worse than earning nothing, and 20 months at $150k spend and $20k revenue reads a raise in
+    months 2–5 rather than "now".
+  - **Crossing emails at the reader's runway.** Every company on the published lines is emailed the
+    same day a line is crossed. The plan-lines form can send the reader's runway band (a checkbox,
+    on by default when a band is set; the band, never a figure), held as `pendingPlanRunway` with
+    the lines and promoted with them on confirmation. A crossing email then adds the note this
+    guidance carries for that area at that band, or the band's own stance where it has none, and
+    dates the band (`describePlanLineCrossing`). New lines without a band clear the old one; the
+    confirmation email names the band; `/privacy` 2.1 lists it.
+  - **Outcome claims removed.** The analog playbook stated two competitor outcomes with no source
+    ("burned 35% of the cash buffer", "shipped faster while competitors stalled"); the agent tool
+    description in `/llms.txt` promised "what the winners did" and listed three of the four periods;
+    two stakeholder-guide lines promised fewer surprises and avoided cuts. Each now states what was
+    done or how to judge, not a result the record cannot show.
+- Runway planner inputs are the operator's, or absent (2026-09-06). The panel used to open
+  pre-filled with a fictional company (12 months, $700k burn, $450k revenue, 12% monthly growth)
+  and offer to copy a board memo built from it; an emptied field became zero and read as
+  "critical". Now `lib/report/runwayPlannerInputs.ts` resolves the request from the shared
+  operator profile and reports which of runway (or cash), monthly spend, and monthly revenue is missing;
+  the panel shows that sentence instead of a verdict until all three are entered. Growth is
+  optional and blank reads as flat, which the output says. The memo lists its inputs and no
+  longer claims to be "safe for board presentation".
+- The `company` and `financial` interpretation views have never received a company profile
+  from any caller, so they always describe the built-in default (`lib/report/companyProfile.ts`:
+  Series B, $1–10M ARR, 12–18 months of runway). Their summaries now say so and point to the
+  runway planner; the copy is the fix, because the assembler runs server-side and cannot see
+  the browser-held profile.
+
+## 5) Playbooks, summaries, and briefings
+
+### 5.1 Playbook
+The playbook surfaces start/stop/fence actions based on the current regime, sourced from the
+insight database in `data/recommendations.ts`. The operator request catalog
+(`lib/operatorRequests.ts`), drawn as "Execution asks" under `/operate`'s Share step, was removed
+on 2026-10-07 (§1.1.46): it was a product backlog that listed shipped features as not yet built.
+
+### 5.2 Weekly + monthly summaries
+Weekly and monthly summaries are generated from the current assessment for use in the overview
+page and APIs. These summaries are structured-first payloads (sections + provenance metadata) with
+copy blocks rendered from the same structured data for sharing/export.
+
+### 5.3 Briefing exports
+Planning briefings support copy-ready briefs and executive narratives with sensor data and
+macro context embedded for leadership consumption. `/share` owns the copy formats (Slack, email,
+meeting pack, issue tracker, investor update) and the file and image artifacts (board slide as
+PPTX and PDF, meeting slide as SVG, brief card as PNG); see §1.1.18.
+
+Interpretation context (homepage-selected `?view=`) no longer travels into the exports. The
+Slack, board and citation builders took an optional interpretation block, and the only caller that
+passed one was the home assembly's `leadershipArtifactPayloadPromise`, which nothing rendered; the
+block went with it (§5.3.1). Nothing renders the selected layer now: the home assembly still
+builds it, and no component reads it (§1.0).
+
+#### 5.3.1 One brief document every format renders from (2026-10-06)
+
+Parallel builds of the week that only tests reached were deleted rather than kept for a consumer
+that never came:
+
+- `leadershipArtifactPayloadPromise` on the home assembly (`lib/report/home/artifactPayload.ts`),
+  which built a second meeting pack, a board note, a "guidance snapshot" and a delta-only brief
+  beside the ones `/share` serves. It was the only caller of `buildBoardBrief`,
+  `buildWeeklyBoardSnippetPlainText` and `buildWeeklyCallSnapshotPlainText`, which went with it. The
+  "delta-only brief in the share rail" in §1.1 was this payload and never rendered.
+- `buildWeeklyOperatorBriefPayload` no longer takes the `WeeklyCallContract` as optional. Without one it
+  re-derived every slot from the action strip, the posture state and the canonical copy in a
+  fallback chain of its own; every production caller passes the contract. Its `flipWatchLine`
+  (the nearest crossing in market units) was set only on that branch, so it never printed in a
+  production paste; it was removed with the branch.
+- `buildWeeklyOperatorBriefSlackBlocks` and `buildWeeklyOperatorBriefCardText`, called only from
+  tests.
+
+**The Monday post and the email print one call.** The post's call slots (Guidance, Do now, Pause
+if, Resume when, Conditions change if) were derived from the lead area row and
+`assessment.description`, while the email read the snapshot's `WeeklyCallContract`, which swaps
+in `POLICY_OVERRIDE_CALL` on a held week. So a held week mailed "the guidance is not changing this
+week" and posted the lead area's own action and pause line, and an ordinary week posted a
+different change line from the one mailed. The post reads the contract now, on the Monday path,
+the manual `POST /api/brief/slack/deliver` path and `GET /api/brief/slack`: the pause line as its
+condition only (`pauseConditionOnly`, as the email prints it), the lead area's resume line plus a
+stage's when one is set, and no resume line on a held call, whose change line is its one resume
+line. `tests/mondaySlackMatchesEmail.test.ts` holds the two to the same lines on a held and an
+ordinary week.
+
+Every format's output is pinned on four weeks (ordinary, saved copy, held, a stage-and-runway
+reader) through its production entry point in `tests/briefFormatsPinned.test.ts`; a change that
+means to move a string regenerates `tests/fixtures/briefFormats.golden.json` with
+`WHETHER_UPDATE_BRIEF_GOLDEN=1` in the same commit.
+
+**`BriefDocument`** (`lib/report/briefArtifact.ts`) is the week as one object, built once by
+`buildBriefDocument(source, weeklyCall, { stage? })` (`lib/report/briefDocument.ts`) from a reading
+(`briefSourceFromSnapshot` for the cron's `OperatingSnapshot`, `briefSourceFromReportData` for the
+read path) and its `WeeklyCallContract`. It extends `BriefArtifact`, the share rail's object, rather
+than sitting beside it; the island a page publishes is its artifact half (`briefArtifactOf`), and
+`buildBriefArtifactFromSnapshot` is that half, so /share and /operate publish one derivation. It
+carries:
+
+- the call slots from the contract, the pause line as its condition only (`pauseConditionOnly`),
+  `resumeWhen` and `callChangesIf` apart, and the policy-override flag;
+- the conditions under one label, the contract's `regimeStage` (the weather word, with how long it
+  has held when the read path knows);
+- the published confidence, resolved once (`resolvePublishedConfidence`);
+- provenance: the source as a reader names it, the record date, whether it is a saved copy, and the
+  permalink. "Canonical snapshot (FRED)" and "Canonical ingestion (FRED)" name the pipeline; the
+  document names the publisher (`publisherSourceLabel`), and the saved-copy marker says the rest;
+- the readings, the area rows as the page derives them (each line with its distance), the operating
+  limits, and the every-band runway framing the portfolio note prints. The reader's own band is a
+  cookie, which a cached page cannot read, so the investor update composes it in the browser.
+
+A `stage` lays that stage over the call as the homepage does (`applyStageToWeeklyCall`), so a held
+call stays held whatever the stage.
+
+**The slide is built one way.** It was built from the island in the browser (the share panel's
+"Slide" format and "Copy as a slide") and from the operating snapshot on the server (the SVG, PPTX
+and PDF routes). The browser's way stood 50 in for a missing risk appetite and "MED" for a missing
+confidence, printed the conditions label as the reader's stage ("Stage: Stormy"), handed the weather
+word to the badge as if it were the engine key (so a Freezing slide wore Sunny's colour), judged
+the scores against the engine's default lines, and printed the flip conditions as the resume line,
+which on a held week put "why the guidance is held" under "Resume when". The server's way never
+said a reading was a saved copy, and printed a stage's action over a held call. Both now go through
+`briefArtifactToSlidePayload`; the routes pass a `BriefDocument` (`buildExportSlidePayload`), and
+the island carries the fields the slide reads (`regime`, `recordDate`, `lines`, `stageLabel`,
+`sourceLabel`). The island's two scores and its confidence are required: a malformed island
+yields no slide rather than a stand-in. The flip conditions print as "Watch this week". §1.1.12's
+reading of them as "the resume thresholds" was the mislabel.
+
+**The Slack brief, the board slide bullets and the ticket brief render the document**
+(`buildSlackBrief(document)`, `buildBoardSlideBullets(document)`,
+`buildIssueTrackerMarkdownBrief(document, format)`), and `ExportLayerOptions` /
+`ModeledExportDecisionPayload` are gone. Every Slack caller builds the same document: the Monday
+post from the snapshot, and `GET /api/brief/slack`, the manual deliver and
+`scripts/generateWeeklySlackBrief.ts` through `buildBriefDocumentFromReport`, under the call the
+read path serves every page. The script had passed no options, so `docs/briefs/` printed stand-ins
+every week: "Keep last week's approvals as they are; start nothing new." as the action, the no-
+reading pause line, and "Live data is back and conditions have held for a week." as the resume
+line, on live data. The area rows carry their distances on every path ("(crossed)", "(44 pts
+away)", "(already met)"): the snapshot path built them without the scores. Blocks no production
+caller reached went with the options: the "This week's guidance" recap (whose "Points from the
+change line: 0.0", "Could conditions change next week: no" and "no live reading this week" were
+stand-ins on /share's meeting pack, the one place it printed), the historical-analogs block, the
+failure-mode warning and the interpretation block.
+
+**The weekly email reads the same document** (`sendWeeklyBrief`): its action, pause line, change
+lines, conditions line and readings row come from the snapshot's document, and the readings row
+takes the document's confidence instead of resolving its own. Its text did not change.
+
+**The investor update and the portfolio note render the document**
+(`buildInvestorUpdateSnippetParts(document, monthlyHistory)`, `buildPortfolioNote(document, areas)`),
+and keep their two runway framings: the investor update is one founder's letter, so the browser
+composes the reader's band into it (`formatInvestorUpdateSnippet`); the portfolio note goes from one
+sender to many companies, so it prints the document's every-band runway. The month-end history
+stays the investor update's own input (a letter compares itself with the last one), and the area
+lines stay the portfolio note's (the area tables' joined lines). Both close with
+`formatSourceFooter`; the month-end pulse mail (`lib/alert/monthEndPulse.ts`) builds the same
+document for its block. On a saved-copy week the footer names the publisher, not "Canonical snapshot
+(FRED)".
+
+**The integration mandate renders the document** (`buildWeeklyMandatePayload(target, document,
+postureState)`, `/api/integrations/weekly-mandate`). It printed the posture state's lock-commitment
+line as "Conditions change if" — a different line from the brief's — and its other flip conditions
+as "- Resume when:" bullets, one of which ended "tighten again". The markdown now prints the brief's
+change line, the resume line the Slack post prints (none on a held week), and the flip conditions as
+"Watch this week". The posture state still supplies the last change in conditions and the JSON's
+structured `metadata.nextFlip`, which is the posture state's own and can name a different line from
+the markdown's. Its invented fallback ("Check again after the next update.") went: the route always
+builds a posture state, so the parameter is required.
+
+**/share offers one Slack text and the meeting pack carries it.** The pack pasted the long Monday
+post beside the picker's Slack post, under a different call on a held week. Its "SLACK POST"
+section is the picker's post now.
+
+**One provenance footer.** `formatSourceFooter` (`lib/export/exportTerms.ts`) prints "Source:
+{publisher}, {date}, via whether.work" and "(saved copy, not a live reading)" when it is one. Every
+slide format closes with confidence and that footer; the SVG and the deck carry the conditions in
+the subtitle instead of the source, and the right-aligned "whether.work" went, since the footer
+names it.
+
+**The operator brief and the citations read the document.** `buildWeeklyOperatorBriefPayload(document,
+{ date?, weeklyLeadershipSummary?, customTeamNote? })` takes the slots, the conditions line and the
+published confidence from the document instead of resolving its own; its payload's `pauseIf` is the
+condition only, which is what its plain text already printed. `buildCallCitation` takes the
+document's conditions line, confidence and provenance. The answer pages pass the call's
+`regimeStage` and the home model's published band, so on a held week their citation names "Sunny",
+as every other format does, where it named the home model's "Sunny for 9 months". /share offers one
+citation, the picker's (`formatBriefArtifact(document, "citation")`), and the meeting pack's
+CITATION section is that one; it carried the answer pages' beside it. The email closes with the
+document's source footer and the permanent link instead: the picker's citation prints the island's
+call (the do-now line) as "Guidance", under the brief's own "Guidance". `buildBriefPermalinkLine`
+went with its last caller.
+
+### 5.4 Structured summary contract (weekly/monthly)
+Weekly/monthly summaries use a structured-first contract and render raw copy from that structure.
+
+```mermaid
+flowchart LR
+  R[Regime + constraints] --> S[Structured fields]
+  S --> U[UI sections
+(climate, moves, constraints, provenance)]
+  S --> C[Copy block
+for sharing/export]
+  S --> A[API payload
+structured + copy + provenance]
+```
+
+Required weekly structure:
+- `climate.label`, `climate.summary[]`
+- `recommendedMoves[]`, `executionPriorities[]`, `watchouts[]`
+- `planningLanguage`, `executionConstraints[]`
+
+Required monthly structure:
+- `executionConstraints[]`
+- `provenance.source`, `provenance.timestamp`, `provenance.dataAge`
+
+Archive compatibility formula for legacy records:
+
+$$
+\text{structured}_{legacy} =
+\begin{cases}
+\text{existing structured}, & \text{if present} \\
+\text{buildStructured}(regime, constraints, provenance), & \text{otherwise}
+\end{cases}
+$$
+
+### 5.5 Prioritized refactors (summary system)
+- **P0 (implemented):** Shared structured→copy renderer across weekly/monthly for deterministic formatting reuse.
+  - Renderer module: `lib/summary/summaryCopyRenderer.ts`
+  - Shared contracts: `lib/summary/summaryTypes.ts`
+  - Coverage: `tests/summaryCopyRenderer.test.ts`
+- **P1 (implemented):** Offline archive materialization for historical `structured` fields, with guardrail coverage ensuring weekly/monthly entries are materialized.
+- **P1 (implemented):** API contract tests for `/api/weekly` and `/api/monthly` structured payload guarantees.
+- **P2 (partially implemented):** Monthly `planningLanguage` parity is now shipped across structured output, copy rendering, and cadence-card display.
+- **P2 (open):** Broader monthly section expansion toward weekly parity remains open where operator value is clear. Re-review during roadmap grooming so status remains current and does not drift in this “as built” audit.
+
+### 5.6 Signal Ops (live)
+- Regime alerts are persisted and retrievable through API (`/api/regime-alerts`).
+- Alert payloads include reason codes, source URLs, and Time Machine deep links.
+- Alert creation enforces trigger filtering and a 24-hour cooldown unless the regime flips again.
+- Weekly digest output is available via `/api/weekly-digest`, including score deltas and dominant
+  reason messages.
+- Alert headlines now name the decision the alert affects rather than the raw signal move:
+  `RECONSIDER HIRING` / `WATCH SPENDING` / `RECONSIDER OPERATING POSTURE`, from
+  `buildDecisionVerdictHeadline` (`lib/alert/decisionDeltaRules.ts`). Slack blocks
+  (`/api/check-regime-change`) and email templates (`lib/alert/alertTemplates.ts`) lead with the
+  verdict and keep the raw regime/signal detail as support.
+
+### 5.7 Decision staleness (protect stale decisions)
+- Decision Memory records an **assumption snapshot** at write time — the tightness, risk appetite,
+  and regime watch lines that had to hold for the decision to make sense
+  (`DecisionAssumptionSnapshot` in `lib/decisionMemory.ts`).
+- `assessDecisionStaleness` (`lib/report/decisionStaleness.ts`) compares current conditions
+  against a recorded snapshot and emits a bounded verdict: **RECONSIDER** (two supporting
+  assumptions moved outside the recorded range), **WATCH** (one moved), or **STAND** (all hold).
+- The verdicts render on `/decisions` (`app/decisions/page.tsx`, noindex): every entry this browser
+  recorded, checked against this week's reading. The brief carries one line for a browser that has
+  recorded something (`YourRecordNote`, §1.1.28). `DecisionStalenessPanel`, which ran the same check
+  from localStorage below the hero, was retired on 2026-09-08 with the other features that asked the
+  reader to keep browser state.
+- Decision memory is scoped to one browser, and the surfaces say so (2026-09-06). Identity is a
+  random id in localStorage (`whether-client-id`); clearing site data or opening a second device
+  starts a new history with no recovery path, and `/decisions` states that scope rather than
+  implying an account. The one writer in the app is the Decision Shield's "Record this decision" on
+  `/operate` (`app/operate/components/recordDecisionButton.tsx`), through `logDecisionToLedger`
+  (`app/components/decisionLedgerClient.ts`); a failed write says so and names the reason.
+  `DecisionMemoryButton` and the local mirror (`app/components/decisionMemoryLocalCache.ts`) went
+  on 2026-09-08.
+- The plan stress test's "Track in Memory" posted `{ kind: "plan-evaluation", … }`, a shape
+  `/api/decision-memory` has never accepted, until 2026-09-06, when it moved to a `decision` entry
+  built by `buildPlanStressTestMemoryPayload` (`lib/decisionMemory.ts`). The control went on
+  2026-09-08; the builder is now reached only from `tests/planStressTestMemoryPayload.test.ts`, and
+  the Decision Shield records the plan mode itself (below).
+- The Decision Shield on `/operate` now exports and records what is on screen (2026-09-26). The
+  share text and the Decision Memory payload follow the active plan mode: in natural-language
+  mode the share artifact is the plan stress test (plan text, model, verdict, sizing, fragile
+  assumptions, guardrail, reversal trigger — bootstrapped mode prints the profile's gross margin)
+  and the memory entry records the plan's detected category and action with the stress-test
+  outcome; in compare mode it exports both plans, both verdicts, and the recommendation. Both
+  previously exported the dropdown-mode reading even when the operator had just graded a plan,
+  so the artifact could contradict the verdict beside it. The compare-mode verdict badges also
+  split UNSAFE (rose) from RISKY (amber); both used to render amber
+  (`tests/decisionShield.test.ts`).
+
+## 6) APIs (server routes)
+
+### 6.1 Data APIs
+- `GET /api/treasury` — normalized Treasury yield data with fallback support.
+
+### 6.2 Summary APIs
+- `GET /api/weekly` — weekly summary payload with structured sections, copy text, and provenance.
+- `GET /api/monthly` — monthly summary payload with structured sections, copy text, and provenance.
+- `GET /api/quarterly` — quarterly summary payload with provenance.
+- `GET /api/yearly` — yearly summary payload with provenance.
+- `GET /api/summary-delta` — difference between weekly and monthly summaries.
+- `GET /api/cadence` — alignment check between weekly and monthly constraints.
+
+### 6.3 Signal Ops APIs
+- `GET /api/regime-alerts` — list logged regime alerts.
+- `POST /api/regime-alerts` — create an alert when trigger/cooldown rules pass.
+- `GET /api/weekly-digest` — digest summary generated from logged alerts.
+- Alert email consent is a field on the subscription: `alerts` on `POST /api/email/subscribe`, applied to a confirmed address only once its inbox confirms (§1.1.32). `/api/alert-preferences` was deleted on 2026-09-07 (§1.1.14b).
+- `GET /api/alert-deliveries` / `POST /api/alert-deliveries` — delivery logs and send attempts, filterable by `clientId` for per-profile audit views.
+
+### 6.4 Decision audit APIs
+- `GET /api/decision-memory` / `POST /api/decision-memory` — append-only Decision Shield audit entries, filterable by `clientId`, with CSV export support.
+- Entries carry an `assumptions` snapshot (conditions that had to hold at decision time) so the
+  decision-staleness engine can compare current conditions against the recorded range.
+
+### 6.5 Integration APIs
+- `GET /api/integrations/weekly-mandate?target=slack|notion|linear` — target-specific weekly
+  mandate export payload.
+
+### 6.6 Open Graph
+- `GET /api/og` — PNG Open Graph image with regime metadata (supports Time Machine selection); `template=report` is the weekly card.
+- `GET /api/image/brief` — the brief card as a 1200×800 PNG: the call, both scores against their pause and resume lines, confidence and source (§1.1.25). Takes the page's `?month=`, `?year=`, `?sector=`, `?stage=` and `?cadence=` context.
+
+### 6.7 Agent access (MCP)
+- `GET /api/agent?view=state` — the compact state to decide from (§6.9); `?view=full` (the default) is the whole brief.
+- `POST /api/mcp` (no `?tool` param) — **MCP streamable-HTTP transport** (JSON-RPC 2.0,
+  protocol 2025-06-18): `initialize`, `ping`, `tools/list`, `tools/call` over
+  `application/json` responses. Standard MCP clients can mount `https://whether.work/api/mcp`
+  directly. The tools are defined once in `lib/agent/tools.ts`; the transport is `lib/mcp/httpMcpServer.ts`.
+- `GET /api/mcp?tool=<name>` — every tool as a plain GET (§6.9); `POST /api/mcp?tool=subscribe` unchanged.
+- `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/server.ts`, the one `/api/mcp` runs): the same tools, plus
+  `pull_recent_site_info`.
+
+### 6.8 Alert cadence (2026-08-11; flash 2026-09-17)
+Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls
+`/api/check-regime-change` and `/api/alert-deliveries` in addition to the Monday run, so a
+regime flip or threshold crossing pushes the day it lands instead of waiting up to six days.
+Both endpoints are transition-based (KV last-known state: `regime:*`, `alert:state`), so
+daily runs stay silent unless something actually crossed. Since 2026-09-17 the same two steps
+also judge a flash (§1.1.18): an outsized move in the short rate or the curve between the
+previous snapshot and this one, which is measured against the previous read rather than the
+alert state. The brief email remains weekly-only — the cadence promise is weekly; only rule
+firings break cadence.
+
+### 6.9 One state, one tool registry (2026-09-29)
+Agents met the product through four surfaces that disagreed about what Whether says and how to ask.
+Changes, all additive except where noted:
+
+- **One confidence.** The full agent payload, the legacy `?tool=get_brief` answer and the RSS item said
+  MEDIUM (the engine's confirmation gate) on a week the page, `/api/scores` and the CLI called High. They
+  carry the published confidence now. `/api/weekly` and `/api/monthly` (and `/api/cadence`,
+  `/api/summary-delta`) followed on 2026-10-06: the summary builders read `resolveSummaryConfidence`
+  (`lib/summary/summaryFormatting.ts`, the published label in the stored LOW / MEDIUM / HIGH spelling) for
+  both `summary.confidence` and the prose sentence, and the routes pass the record so a stale fallback
+  lowers it as it does on the page. The archives regenerate from the same builders, so the next run rewrites
+  `summary.confidence`, the confidence sentence in `summary.summary`, `structured.posture.summary[0]`
+  (monthly) and `copy` wherever the two ladders disagree: 55 of the 176 monthly entries on record (23 LOW
+  and 25 MEDIUM to HIGH, 7 LOW to MEDIUM); the weekly count is not computable offline because weekly
+  entries store no scores. One consequence to know: the published ladder ignores the engine's shock
+  downgrade, so a shock week's summary now says what the page says (Dec 2025: HIGH, not LOW) and the shock
+  sentence beside it carries the warning.
+- **The state** (`lib/agentState.ts`, `agentStateSchema`): about a tenth of the full brief. `automation.ready`
+  first; each score against its pause, resume and change lines; `perWeek`, and what the move is made of.
+  Served at `?view=state`, as MCP `get_state` (with an `outputSchema`) and as `whether state`.
+- **One registry** (`lib/agent/tools.ts`) for the remote server, the local server and the GET shim: five
+  tools on the local server against twelve remote, under two names, is one list of 13 (plus the local-only
+  `pull_recent_site_info`). Read-only annotations on every tool; compact JSON in `content`, the same object
+  in `structuredContent` (always an object: `get_decision_rules` for one regime is now `{ "DEFENSIVE": [...] }`
+  and was an array, which the SDK client rejected; **breaking** for a caller that read the array).
+- **Inputs** (`lib/agent/inputs.ts`, parsed and refused by the generic `lib/agent/registry.ts`): a regime by key or by the site's weather word in any case; empty
+  arguments are absent; numbers may be text and zero is a value; unknown arguments and values are refused
+  with what would have worked. `get_context` with `SUNNY` answered zero weeks as a success; `?tool=` with
+  an unknown name answered the brief with a 200 (now a 400); a cadence the server did not know became
+  weekly (now refused). `get_context` and `get_projection` fill what is left out from today's reading and
+  say so in `inputs`.
+- **Discovery from the registry**: the manifest lists `mcp.tools`, `start` pointers, `views` and the
+  `automation` check (it promised "MCP tools" and listed none); `/llms.txt` and `/api-docs` name every tool;
+  `tests/agentDiscoveryParity.test.ts` holds each place that names a tool to the registry.
+- **`get_context` counts months.** Its counts came from the Time Machine's regime series, one entry per month-end, and were named `weeksActive` / `historicalAvgWeeks`: "8 weeks" was 8 months (§1.1.26, the same period-word defect). They are `monthsActive` / `historicalAvgMonths` now (**breaking** for a caller reading the old names; its only caller in the repo is the tool), with the `latestSnapshot` they run to, and a `note` when the count is 0 because the regime is newer than the last month-end.
+- **`get_projection` is direction-aware** (`projectRegimeFromPace`, `lib/report/regimeContext.ts`): it steps
+  the scores by their weekly pace and classifies each step with the engine's own quadrant table, so a score
+  moving away from its line does not cross it and the regime it lands in is the table's, not a guess. Called
+  with no arguments (today's scores at today's pace) the old function reported a crossing within a week
+  on the Sep 25 read, when both scores were moving deeper into the regime.
+  **Found, not changed:** `getRegimeProjection`, the function it replaced for the tool, still drives the
+  alert path (`lib/alert/checkRegimeChange.ts`, "Conditions could change soon" to Slack, and the
+  `regime:weeks-to-flip` state), and that path has two defects of its own. The function divides the nearest
+  line's distance by the fastest pace whichever way either score moves, and the caller passes it
+  `reportDynamics.changedSignals[].delta`, which is the change since the previous *month-end* snapshot
+  (§1.1.26), as if it were a weekly pace. Both make the alert early or spurious. What Slack subscribers are
+  sent is an owner decision; the fix is to call `projectRegimeFromPace` with the pace `get_state` publishes
+  as `perWeek`.
+- **Browsers.** `/api/mcp` answers its CORS preflight and carries `Access-Control-Allow-Origin: *` on the JSON-RPC transport and the reads; `?tool=subscribe` stays closed.
+- **CLI**: `whether state` (and `--require-ready`, which exits 8 when the data is not live and current); a mistyped command is refused as one (it was answered "too many arguments for 'status'"); `changes` names the dated reading it compares with, uses reader names and says what moved a score.
+- **What the change did to the decisions** (§1.1.28): the state carries `change.summary` (one sentence) and `change.crossed` (the areas whose pause or resume state changed since `comparedWith`, grouped by how they moved, with the lines that decided it; empty when none did); `whether changes` prints the same sentence under `DECISIONS`, and the changes contract carries it as `decision`. Additive.
+
+## 7) Non-goals (as enforced in UI copy)
+- The UI is framed as operational guidance, not financial advice.
+- Evidence is deterministic and traceable; no predictive ML output is used.
+
+## 8) Demo and interactive features (2026-05-23)
+
+### 8.1 What-if simulator tools (removed Aug 2026)
+`app/components/home/DecisionSimulator.tsx` and `app/components/ScenarioSimulator.tsx` rendered
+below the hero on `/`. Both were removed as below-the-fold tool racks that competed with the
+weekly decision-attention block. The scenario what-if still lives in the decision-attention flow
+only where it changes a revisit verdict; it is no longer a standalone home surface.
+
+### 8.2 Regime transition probability (removed Aug 2026)
+`app/components/home/RegimeTransitionProbability.tsx` computed an empirical one-month exit rate
+for the current regime from monthly time-machine observations. The card and the hero's
+`transitionForecast` line were removed from home. `computeTransitionProbability`
+(`lib/timeMachine/transitionProbability.ts`) stayed as an internal diagnostic until 2026-09-16,
+when it was deleted because only its own test imported it.
+
+### 8.3 Regime history over time (removed Aug 2026)
+`app/components/RegimeHistory.tsx` rendered the trailing 24 months of `getMonthlyRegimeHistory()`
+as a bar chart in the lower home band. Removed from home; the engine
+(`getMonthlyRegimeHistory`, `lib/summary/monthlyRegimeHistory.ts`) stays for evidence/replay
+surfaces.
+
+### 8.4 Decision records (canonical: decision memory)
+**Location**: `lib/decisionMemory.ts`, `/api/decision-memory`, `app/decisions/page.tsx`,
+`app/operate/components/recordDecisionButton.tsx`, `app/components/home/YourRecordNote.tsx`.
+
+The one system of record for "what did we decide and when": server-backed entries keyed by
+client id, recorded from the Decision Shield on `/operate`, and listed with their staleness
+verdicts on `/decisions` (§5.7). The brief says how many of a browser's decisions rest on conditions
+that moved (`YourRecordNote`, §1.1.28). `/operate/memory` redirects to `/history`
+(`next.config.js`).
+
+Removed Aug 2026: `VisitorContext` (this section's previous subject) was deleted earlier without
+a spec update, and with it the only writer of the `whether_decision_history` localStorage key.
+The `DecisionArchive` table on `/history` kept reading that key, so it rendered nothing for every
+visitor — it and `useDecisionHistory` are now deleted too. Do not add a second decision-record
+store; extend decision memory instead.
+
+### 8.5 Reliability score (removed Aug 2026)
+A 0–100 score combining confidence (HIGH=90/MED=60/LOW=30), freshness (live=100/cached=50) and
+source coverage, colour-coded emerald ≥80, amber ≥60, rose <60. It was drawn in `BriefHero.tsx`
+(deleted 2026-06-10) and later in `DeltaTrustStrip`, and left the product on 2026-08-01. The trust
+strip's sources, confidence and record date carry what it summarized.
+
+### 8.6 Degraded-state decision guidance
+**Location**: `app/page.tsx`, `resolveDataStatusGuidance` in `lib/report/trustStatus.ts`.
+
+When the reading is a fallback snapshot or a source is degraded, an amber line above the brief
+states that data state's guidance, for example "Live data is late. Keep last week's plan; hold new
+hires, spend and vendor contracts until it returns." The reliability-score warning this section
+first described ("Stage all irreversible decisions until the next clean refresh.") left
+`BriefHero.tsx` on 2026-05-23.
+
+### 8.7 Print layout
+**Location**: the `@media print` blocks in `app/styles/layout-effects.css` (imported by
+`app/styles/layout.css`) and `app/styles/surfaces.css`.
+
+Hides navigation, sidebar, and non-essential chrome. Converts dark theme to light (white bg, dark text). A4 page size with `break-inside: avoid` on cards.
+
+### Demo recording guide
+To record GIFs of interactive features:
+
+```bash
+bun run dev                                    # Start dev server
+```
+
+**Print layout GIF**: Open `/`, Cmd+P, show print preview with clean white layout. ~5 seconds.
+
+For screen recording, use macOS QuickTime (File → New Screen Recording) or Kap (https://getkap.co). Convert to GIF with `ffmpeg` or gifski.
+
+## 9) Vocabulary and trust-state consolidation (2026-09-02)
+
+Ten product-sense fixes landed together; the semantic ones are recorded here so downstream
+surfaces do not reintroduce the old words.
+
+- **One regime vocabulary.** `getRegimeOperatorLabel` and `getRegimeDisplayLabel` both return the
+  weather name (Freezing / Cloudy / Stormy / Sunny). "Expand", "Guarded Expand", "Conserve",
+  "Defend", "Contraction", "Transitional Mixed", and "Guarded Expansion" are no longer rendered.
+  Archived labels in `data/*.json` are translated at render time with `toWeatherLabel`
+  (`lib/regimeLabels.ts`). The `modifier` field (Guarded / Transitional) survives as data.
+- **One data-status vocabulary.** `DATA_STATUS_LABELS` in `lib/report/trustStatus.ts` — Live,
+  Partly cached, Cached snapshot, Historical snapshot — is what the freshness pill, the hero
+  provenance line, the report-shell masthead, and the Trust page status card all render. The
+  masthead headline is derived from state via `resolveTrustReadinessCopy`; it no longer sniffs
+  the detail string for words like "low".
+- **Regime-aware weekly headline.** `buildActionNowShort` takes the regime, so a softening Sunny
+  week reads "keep what is working. Don't start anything new this week" rather than "freeze new
+  commitments", which contradicted every downstream page.
+- **Guardrail slot is a threshold.** `reportDataLoader` fills `guardrailThreshold` from the first
+  action-strip trigger instead of the playbook's first "stop" item.
+- **Condition phrasing.** `formatDecisionThreshold` / `formatDecisionReversal` strip the verb and
+  its object ("Pause net-new hiring if …" → "Funding pressure rises above 76 …") so slot labels
+  that already carry the verb read as sentences. `formatThresholdNumber` drops the `.0` on integer
+  thresholds everywhere a threshold is printed.
+- **Historical analog.** The Evidence page shows the four match coordinates (then vs now) and
+  names the block "Nearest reference cycle". The API field is `matchScore` (0-100, `100 / (1 + d)`
+  over the spread-normalised coordinate distance). It replaced `correlationScore`, which was
+  neither a correlation nor unbounded below: it was floored at 65, so the worst possible match
+  reported 65% similarity to every API and MCP consumer.
+- **Header.** The desktop nav renders the operator loop from `resolveGlobalHeaderLoopLinks`
+  (supporting layers hidden below `lg`); the top-level API link moved under More. The live
+  masthead no longer prints a "15m cadence" refresh label.
+
+### 9.1 Reversal and resume conditions (2026-09-02, follow-up)
+
+- **`buildFlipThreshold` returns one bounded condition.** It used to return three sentences: a
+  status ("No flip condition is tripped yet.") plus two that each repeated "flips this call",
+  under slot labels that already carry that verb. Because the compaction helpers cut a phrase at
+  its first period, the Slack export of a frozen brief read "Re-open when: No flip condition is
+  tripped yet." and carried no threshold at all. It now reads
+  `Funding pressure above 70 (63 today) or risk appetite at or below 50 (56 today).`
+  A boundary already crossed says "(already true at N)" and sorts first.
+- **The Evidence page's "Safe again when" shows the resume trigger.** It rendered `flipThreshold`,
+  the condition that *breaks* the call, which `/trust` correctly labels "This recommendation
+  breaks if" — so the same string appeared under opposite meanings on two pages. It now reads
+  `actionStripItems[0].reversalCondition`, symmetric with the pause trigger in "Wrong if" above it.
+  (2026-09-29: both rows now print the canonical slot labels, "Pause if" and "Resume when";
+  "Wrong if" / "Safe again when" were a third name for the pair.)
+- **The hero's resume row is labeled `clearsWhen`, not `flipWatch`.** That row holds the resume
+  thresholds (66 / 54), and sat directly under the reversal row (70 / 50) as a near-synonym
+  carrying different numbers, leaving three unexplained pairs stacked in one box.
+- **`sectorSensitivity` reversal copy** uses `formatThresholdNumber`, so the sector tilt no longer
+  prints "above 70.0".
+
+Archived briefs in `data/published_briefs.json` keep the wording they were published with; the
+archive is append-only and its exports are expected to read as they did on the day.
