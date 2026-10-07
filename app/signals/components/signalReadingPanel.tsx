@@ -56,8 +56,9 @@ export function SignalReadingPanel({
         {/* Suppressed with the figure: a movement line under "the spread
             cannot be computed" is two contradictory claims about the same week.
             Headed "Movement", not "Week over week": the line names its own
-            basis ("+27 points since Aug 31."), which is the last month-end
-            snapshot, and the heading called a five-week gap a week. */}
+            basis ("+27 points since Aug 31."), which was the last month-end
+            snapshot until 2026-10-07, and the heading called a five-week gap a
+            week. It is last week's brief now where the archive has one. */}
         {hasValue ? (
           <div className="flex flex-wrap gap-x-2">
             <dt className="shrink-0 font-semibold text-slate-400">Movement</dt>

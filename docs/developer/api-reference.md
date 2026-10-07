@@ -97,14 +97,14 @@ curl -s "http://localhost:3000/api/agent?view=state" \
   | jq '{headline, automation, confidence, pause: {tightness: .scores.tightness.pause, riskAppetite: .scores.riskAppetite.pause}}'
 ```
 
-Check `automation.ready` before acting on it without a person looking. Every `previous`, `delta` and `perWeek` is measured against `change.comparedWith`, the previous month-end snapshot, not last week.
+Check `automation.ready` before acting on it without a person looking. Every `previous`, `delta` and `perWeek` is measured against `change.comparedWith`: last week's published brief, or the previous month-end snapshot where the archive has no brief from the previous one to two weeks (`change.days` says which). Against last week's brief `moved` is empty and `note` is null: both readings were scored the same way, so there is no rates-versus-inputs split to make.
 
 `confidence` at the root of the full response is the published confidence, the one the page and `/api/scores` carry, and `summary.confidence` matches it on this route. `/api/weekly` and `/api/monthly` still return the engine's own label in `summary.confidence`.
 
 The nested `agentHandoff.payload` now exposes:
 
 - `decision_rules` for bounded operating rules by area
-- `decision_delta` for change interpretation: `changed_signals` carry `from`, `to` and `delta`, and `compared_with` (`{ record_date, label }`, or `null` where a source did not date it) names the reading `from` is: the previous month-end snapshot, not last week. Its `summary` says "since Aug 31" where it used to say "this week"
+- `decision_delta` for change interpretation: `changed_signals` carry `from`, `to` and `delta`, and `compared_with` (`{ record_date, label }`, or `null` where a source did not date it) names the reading `from` is: last week's published brief, or the previous month-end snapshot where there is none. Its `summary` says "since Sep 29" where it used to say "this week"
 - `flip_watch` for primary trigger, reversal conditions, and boundary pressure
 - `skills` for deterministic downstream output ordering
 

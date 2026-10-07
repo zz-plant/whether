@@ -81,18 +81,30 @@ export type ReportDynamics = {
    */
   directionLabel: "improving" | "deteriorating" | "mixed" | "stable" | "unavailable";
   /**
-   * What every move above is measured against. The loader compares with the
-   * previous Time Machine snapshot, which is monthly, so this is usually the
-   * last month-end and not last week; surfaces print this date where they
-   * used to print "last week" (`comparisonBasis`). Absent when there was no
-   * comparison, and where a source did not say which reading it compared with.
+   * What every move above is measured against: last week's published brief,
+   * or the previous month-end snapshot where the archive has no brief from the
+   * previous one to two weeks (`lib/report/comparisonReading.ts`). Surfaces
+   * print this date where they used to print "last week" (`comparisonBasis`).
+   * Absent when there was no comparison, and where a source did not say which
+   * reading it compared with.
    */
   comparedWith?: ComparedWith;
   /**
+   * The inputs the earlier reading carries no value for, so no move is recorded
+   * for them and none is printed: a row says "—", not "unchanged". Briefs
+   * published before 2026-10-07 stored the two scores and not the short-term
+   * rate or the recession warning gauge. Absent when every signal was compared.
+   */
+  notCompared?: Array<"baseRate" | "curveSlope">;
+  /**
    * What the move in each score is made of, where the loader could reproduce
-   * the score it shows from its inputs. Absent when there was no comparison,
-   * and on a replay or a stored snapshot whose score cannot be rebuilt here:
-   * a split that does not add up to the number on the page is not printed.
+   * the score it shows from its inputs. Only against a month-end: that reading
+   * is scored from interest rates alone, so the split says which part of a
+   * move is an input it never had. Last week's brief was scored the way today's
+   * reading is, so there is nothing of that kind to split out. Absent when there
+   * was no comparison, and on a replay or a stored snapshot whose score cannot
+   * be rebuilt here: a split that does not add up to the number on the page is
+   * not printed.
    */
   movement?: Partial<Record<"tightness" | "riskAppetite", ScoreMovement>>;
   signalContributions?: NormalizedSignalContribution[];
@@ -104,7 +116,8 @@ export type ReportEvidenceItem = {
   lastUpdated?: string | null;
   supportingBullets: string[];
   confidenceLabel: string;
-  directionLabel: "Tightening" | "Easing" | "Unchanged";
+  /** "Not compared" for a rate the earlier reading did not record (`ReportDynamics.notCompared`). */
+  directionLabel: "Tightening" | "Easing" | "Unchanged" | "Not compared";
   immediateImplication: string;
 };
 

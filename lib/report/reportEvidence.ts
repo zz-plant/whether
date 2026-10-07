@@ -14,6 +14,7 @@ import type {
   ReportDynamics,
   ReportEvidenceItem,
 } from "./reportDataTypes";
+import type { ComparisonReading } from "./comparisonReading";
 import type { RegimeKey } from "../regimeEngine";
 
 type WeeklyTone = "tightening" | "easing" | "holding";
@@ -273,6 +274,10 @@ const curveSlopeImplication = (delta: number): string =>
     ? `Keep the ${SPENDING_PAYBACK_BAR_MONTHS}-month payback bar on new spend; a rising gauge does not lengthen it.`
     : `Keep the ${SPENDING_PAYBACK_BAR_MONTHS}-month payback bar on new spend; a falling gauge is a reason to hold it, not stretch it.`;
 
+/* For a rate the earlier reading did not record (`ReportDynamics.notCompared`). */
+const NOT_COMPARED_BULLET = "Not compared: the earlier reading did not record it.";
+const NOT_COMPARED_IMPLICATION = "No move to read this week: the earlier reading did not record it.";
+
 const signalImmediateImplication = (
   key: ReportDynamics["changedSignals"][number]["key"],
   delta: number,
@@ -314,13 +319,17 @@ export const buildReportEvidenceItems = ({
   signalOrder.map((key) => {
     const movedSignal = reportDynamics.changedSignals.find((item) => item.key === key);
     const delta = movedSignal?.delta ?? 0;
+    /* A rate the earlier reading did not record moved by an unknown amount, and
+       "No measurable move" would be a comparison nobody made. */
+    const compared = !reportDynamics.notCompared?.some((uncompared) => uncompared === key);
     /* Which way is worse depends on the signal. This read the delta's sign
        alone, so risk appetite falling 56 to 48 printed "Easing" and the
        recession warning gauge rising printed "Tightening" — the opposite of
        every other surface that judges the same move (`isImprovingSignalDelta`,
        the weekly direction, /api/cli/changes). */
-    const directionLabel: ReportEvidenceItem["directionLabel"] =
-      delta === 0 ? "Unchanged" : isImprovingSignalDelta(key, delta) ? "Easing" : "Tightening";
+    const directionLabel: ReportEvidenceItem["directionLabel"] = !compared
+      ? "Not compared"
+      : delta === 0 ? "Unchanged" : isImprovingSignalDelta(key, delta) ? "Easing" : "Tightening";
 
     const thresholdDistance =
       key === "tightness"
@@ -330,7 +339,9 @@ export const buildReportEvidenceItems = ({
           : null;
 
     const supportingBullets = [
-      delta === 0
+      !compared
+        ? NOT_COMPARED_BULLET
+        : delta === 0
         ? "No measurable move against the prior snapshot."
         : `Moved ${delta > 0 ? "+" : ""}${delta.toFixed(1)} against the prior snapshot, ${directionLabel.toLowerCase()} the read.`,
       thresholdDistance === null
@@ -354,9 +365,11 @@ export const buildReportEvidenceItems = ({
          line. It reads the distance now, in the published confidence's bands. */
       confidenceLabel: formatConfidencePlainLabel(resolveLineDistanceLabel(assessment, evidenceLineBySignal[key])),
       directionLabel,
-      immediateImplication: signalImmediateImplication(key, delta),
+      immediateImplication: compared ? signalImmediateImplication(key, delta) : NOT_COMPARED_IMPLICATION,
     };
   });
+
+type SignalMove = { key: ReportDynamics["changedSignals"][number]["key"]; label: string; delta: number };
 
 export const buildReportDynamics = ({
   current,
@@ -365,7 +378,12 @@ export const buildReportDynamics = ({
   movement,
 }: {
   current: ReturnType<typeof evaluateRegime>;
-  previous: ReturnType<typeof evaluateRegime> | null;
+  /**
+   * The earlier reading, as much of it as the moves need: a month-end
+   * assessment, or last week's published brief, whose records before
+   * 2026-10-07 carry no short-term rate or recession warning gauge.
+   */
+  previous: Pick<ComparisonReading, "regime" | "scores"> | null;
   /** Which reading `previous` is, so the moves can be named against it. */
   comparedWith?: ComparedWith;
   /** What each score's move is made of, from `buildScoreMovement`. */
@@ -385,28 +403,31 @@ export const buildReportDynamics = ({
     };
   }
 
-  const comparisons = [
+  /* A rate missing from either reading has no move, not a zero one and not the
+     whole of the other reading: the curve used to be read as 0 where it was
+     missing, so a gauge at 0.47 against no reading moved "+0.47". */
+  const notCompared = (["baseRate", "curveSlope"] as const).filter(
+    (key) => current.scores[key] === null || previous.scores[key] === null,
+  );
+  const rateMoves = (["baseRate", "curveSlope"] as const).flatMap((key): SignalMove[] => {
+    const now = current.scores[key];
+    const before = previous.scores[key];
+    return now === null || before === null ? [] : [{ key, label: signalLabels[key], delta: now - before }];
+  });
+  const moves: SignalMove[] = [
     {
-      key: "tightness" as const,
+      key: "tightness",
       label: signalLabels.tightness,
       delta: current.scores.tightness - previous.scores.tightness,
     },
     {
-      key: "riskAppetite" as const,
+      key: "riskAppetite",
       label: signalLabels.riskAppetite,
       delta: current.scores.riskAppetite - previous.scores.riskAppetite,
     },
-    {
-      key: "baseRate" as const,
-      label: signalLabels.baseRate,
-      delta: current.scores.baseRate - previous.scores.baseRate,
-    },
-    {
-      key: "curveSlope" as const,
-      label: signalLabels.curveSlope,
-      delta: (current.scores.curveSlope ?? 0) - (previous.scores.curveSlope ?? 0),
-    },
-  ].filter((item) => Math.abs(item.delta) >= 0.01);
+    ...rateMoves,
+  ];
+  const comparisons = moves.filter((item) => Math.abs(item.delta) >= 0.01);
 
   const { anomalies, changes } = comparisons.reduce(
     (accumulator, item) => {
@@ -464,6 +485,7 @@ export const buildReportDynamics = ({
     regimeChanged: current.regime !== previous.regime,
     directionLabel,
     ...(comparedWith ? { comparedWith } : {}),
+    ...(notCompared.length > 0 ? { notCompared } : {}),
     ...(movement ? { movement } : {}),
     signalContributions: resolveSignalInfluence(current),
   };

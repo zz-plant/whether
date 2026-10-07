@@ -5,11 +5,14 @@ import type { ComparedWith } from "./reportDataTypes";
  *
  * Every "last week" the product printed was the change since the previous Time
  * Machine snapshot (`getPreviousTimeMachineSnapshot`), and that cache is
- * monthly: the Sep 18 and the Sep 25 reads both compare with Aug 31. A reader
+ * monthly: the Sep 18 and the Sep 25 reads both compared with Aug 31. A reader
  * who saw "last week 63" beside "+27 since last week" was told a week when the
  * gap was nearly four. The loader records the date it compared with
  * (`ReportDynamics.comparedWith`), and every surface that prints a comparison
- * prints it through this one function.
+ * prints it through this one function. Since 2026-10-07 that date is last
+ * week's published brief ("since Sep 29"), and the month-end only where the
+ * archive has no brief from the previous one to two weeks
+ * (`lib/report/comparisonReading.ts`); either is named the same way.
  *
  * Where a caller has no date the wording stays "last week", so a source that
  * cannot name its basis reads as it always did instead of inventing one.

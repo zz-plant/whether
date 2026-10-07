@@ -101,8 +101,9 @@ export function getRegimeContext(currentRegime: string): RegimeContext {
  * Direction-blind: it divides the nearest line's distance by the fastest pace, whichever way
  * either score is moving, so two scores running away from both lines read as a crossing in a
  * week. The alert path (`lib/alert/checkRegimeChange.ts`) still calls this, and feeds it the
- * change since the previous month-end snapshot as if it were a weekly pace; changing what
- * that posts to Slack is a decision for the owner and is not made here
+ * change since the week's comparison reading as a weekly pace: since 2026-10-07 that is last
+ * week's brief, a week, where the archive has one, and otherwise still the previous month-end
+ * snapshot; changing what that posts to Slack is a decision for the owner and is not made here
  * (docs/feature-specs-current.md §6.9). The agent tool asks `projectRegimeFromPace`.
  */
 export function getRegimeProjection(
