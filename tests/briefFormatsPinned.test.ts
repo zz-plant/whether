@@ -187,7 +187,7 @@ const collectRoutes = async (out: Record<string, string>) => {
   const slack: unknown = await (await getSlackBriefRoute()).json();
   out["slack route: brief"] = String(typeof slack === "object" && slack !== null ? Reflect.get(slack, "brief") : "");
 
-  /* What `scripts/generateWeeklySlackBrief.ts` writes to docs/briefs: the same read, the same call. */
+  /* What `scripts/generateWeeklySlackBrief.ts` writes for the Jev brief audit: the same read, the same call. */
   const report = await loadReportData();
   out["weekly slack artifact script"] = buildSlackBrief(await buildBriefDocumentFromReport(report, { degraded: false }));
 
