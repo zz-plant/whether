@@ -6,7 +6,7 @@ import {
   buildTrustStatus,
 } from "../lib/report/trustStatus";
 import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
-import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
+import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, type PolicyHoldCall } from "../lib/report/reportCopy";
 
 describe("buildTrustStatus trust tones", () => {
   /* Live data adds nothing to the guidance, so the stable copy says so and no
@@ -73,23 +73,33 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(result.outageType, "historical-snapshot");
   });
 
-  it("returns policy-refusal trust copy that holds approvals and surfaces the reason", () => {
-    const result = buildTrustStatus({
-      historicalSelection: false,
-      isFallback: false,
-      historicalAction: "unused",
-      fallbackAction: "unused",
-      stableAction: "unused",
-      policyRefusalActive: true,
-      policyRefusalReasons: ["Composite disagreement exceeded threshold."],
-    });
+  it("returns policy-refusal trust copy that holds approvals and states the reason it is held for", () => {
+    const build = (policyHold: PolicyHoldCall) =>
+      buildTrustStatus({
+        historicalSelection: false,
+        isFallback: false,
+        historicalAction: "unused",
+        fallbackAction: "unused",
+        stableAction: "unused",
+        policyHold,
+      });
 
-    assert.equal(result.trustStatusTone, "warning");
-    assert.match(result.trustStatusLabel, /Live data, but signals unstable/);
-    assert.match(result.trustStatusDetail, /the two scores point in different directions, so the guidance is not changing this week/);
-    assert.match(result.trustStatusDetail, /Reason: Composite disagreement exceeded threshold\./);
-    assert.match(result.trustStatusAction, /Keep approvals reversible\./);
-    assert.ok(result.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores point the same way again`));
+    const disagree = build(POLICY_OVERRIDE_CALL["signals-disagree"]);
+    assert.equal(disagree.trustStatusTone, "warning");
+    assert.equal(disagree.trustStatusLabel, "Live data, but guidance held");
+    assert.match(disagree.trustStatusDetail, /The two scores point in different directions, so the guidance is not changing this week/);
+    assert.match(disagree.trustStatusAction, /Keep approvals reversible\./);
+    assert.ok(disagree.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores agree.`));
+    assert.equal(disagree.decisionImpactWindow, "Only moves you can undo, until the two scores agree.");
+
+    /* A week held for missing inputs printed "the two scores point in different
+       directions" here, and "signals unstable" above it. */
+    const missing = build(POLICY_OVERRIDE_CALL["inputs-missing"]);
+    assert.match(missing.trustStatusDetail, /^Too many inputs are missing this week/);
+    assert.ok(missing.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the missing inputs return.`));
+    for (const text of [missing.trustStatusLabel, missing.trustStatusDetail, missing.trustStatusAction, missing.decisionImpactWindow]) {
+      assert.doesNotMatch(text, /two scores|unstable/, text);
+    }
   });
 
   it("keeps compact freshness/trust wording aligned for degraded snapshots", () => {
@@ -178,13 +188,27 @@ describe("buildTrustStatus trust tones", () => {
         ageHours: 1,
       },
       isFallbackSnapshot: false,
-      policyRefusalActive: true,
-      policyRefusalReasons: ["Composite disagreement exceeded threshold."],
+      policyHold: POLICY_OVERRIDE_CALL["signals-dispersed"],
     });
 
     assert.equal(caution.label, "Act with caution");
-    assert.match(caution.detail, /The guidance is being held this week: Composite disagreement exceeded threshold\./);
-    assert.doesNotMatch(caution.detail, /policy override|posture/i);
+    assert.equal(caution.detail, `${POLICY_OVERRIDE_CALL["signals-dispersed"].currentCall} Keep approvals reversible.`);
+    assert.doesNotMatch(caution.detail, /policy override|posture|two scores/i);
+  });
+
+  /* Missing inputs lower the confidence too, so a week held for them is LOW, and
+     the low-confidence branch said only that conditions sat close to a line. */
+  it("holds on low confidence in the words of the reason a held week is held", () => {
+    const held = buildDecisionReadinessState({
+      confidenceLabel: "LOW",
+      freshnessLabel: "Updated 1h ago",
+      isFallbackSnapshot: false,
+      policyHold: POLICY_OVERRIDE_CALL["inputs-missing"],
+    });
+
+    assert.equal(held.label, "Hold");
+    assert.ok(held.detail.startsWith(POLICY_OVERRIDE_CALL["inputs-missing"].currentCall), held.detail);
+    assert.doesNotMatch(held.detail, /close to a line/);
   });
 
 });

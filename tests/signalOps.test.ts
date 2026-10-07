@@ -316,9 +316,9 @@ describe("signalOps", () => {
     // Production served "DEFENSIVE regime as of 2026-04-09" from a single June
     // alert while the live posture was EXPANSION. The digest may be quiet; it
     // must never restate a months-old crossing as the current call.
-    assert.equal(digest.summary, "No regime-change alerts this week.");
+    assert.equal(digest.summary, "No alerts this week.");
     assert.ok(
-      digest.bullets.some((bullet) => bullet.startsWith("Last recorded change: DEFENSIVE as of")),
+      digest.bullets.includes("Last recorded alert: conditions were Cloudy as of Jan 8, 2026."),
       "the older crossing is still reported, labelled as history",
     );
     assert.ok(
@@ -343,6 +343,60 @@ describe("signalOps", () => {
 
     const digest = buildWeeklyDigest([fresh], { now });
 
-    assert.match(digest.summary, /^DEFENSIVE regime as of /);
+    assert.equal(digest.summary, "Conditions are Cloudy as of Jan 8, 2026.");
+  });
+
+  /*
+   * The Oct 5 alert, as /api/regime-alerts and the digest printed it: "Trigger
+   * 90.00 vs Spending pause line 76.00", "Trigger 0.00 vs The line where
+   * conditions change 0.00" for the change of conditions, "SCARCITY regime as of
+   * 2026-10-05", and "Funding pressure delta: +0.00" with no earlier alert to
+   * measure against.
+   */
+  it("states each crossing in whole points with its line named, and the digest in the conditions word", () => {
+    const payload = buildSignalAlertPayload(
+      basePayload(assessment("EXPANSION", 63, 56), assessment("SCARCITY", 90, 48)),
+    );
+    const spend = payload.reasons.find((reason) => reason.code === "tightness-upshift");
+    assert.equal(
+      spend?.message,
+      "RECONSIDER SPENDING. Pause new discretionary spend if funding pressure is above 76 (already true at 90). Funding pressure 90 crossed the Spending pause line at 76. Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
+    );
+    const change = payload.reasons.find((reason) => reason.code === "regime-change");
+    assert.equal(
+      change?.message,
+      "RECONSIDER THE GUIDANCE. Conditions changed from Sunny to Freezing; reread last week's plan. Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).",
+    );
+    for (const reason of payload.reasons) {
+      assert.doesNotMatch(reason.message, /Trigger|\d\.\d\d|\b0\.00\b|The line where conditions change/);
+    }
+
+    const event: RegimeAlertEvent = {
+      eventId: "evt-oct",
+      sourceVersion: "test",
+      canonicalTimestampSource: "request-received-at",
+      id: "1",
+      createdAt: "2026-10-05T12:00:00.000Z",
+      payload: { ...payload, currentRecordDate: "2026-10-05" },
+    };
+    const digest = buildWeeklyDigest([event], { now: Date.parse("2026-10-06T00:00:00.000Z") });
+    assert.equal(digest.summary, "Conditions are Freezing as of Oct 5, 2026.");
+    assert.deepEqual(digest.bullets.slice(0, 2), ["Funding pressure 90.", "Risk appetite 48."]);
+    assert.ok(digest.bullets.some((bullet) => bullet.includes("reread last week's plan. Conditions change if: Funding pressure")));
+    assert.ok(digest.bullets.every((bullet) => !bullet.includes("Reversal: Conditions change if")));
+
+    const earlier: RegimeAlertEvent = {
+      ...event,
+      id: "0",
+      payload: { ...event.payload, currentAssessment: assessment("DEFENSIVE", 77.4, 51) },
+    };
+    const twoAlerts = buildWeeklyDigest([event, earlier], { now: Date.parse("2026-10-06T00:00:00.000Z") });
+    assert.deepEqual(twoAlerts.bullets.slice(0, 2), [
+      "Funding pressure 90, +13 points since the previous alert.",
+      "Risk appetite 48, -3 points since the previous alert.",
+    ]);
+    for (const line of [digest.summary, ...digest.bullets, ...twoAlerts.bullets]) {
+      assert.doesNotMatch(line, /SCARCITY|DEFENSIVE|regime|delta|\d\.\d\d/, line);
+    }
   });
 });

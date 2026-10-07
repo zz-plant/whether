@@ -19,7 +19,7 @@
 import { fetchTreasuryData } from "../treasury/treasuryClient";
 import { snapshotData } from "../snapshot";
 import { buildSensorReadings } from "../sensors";
-import { deriveRegimeTrend, evaluateRegime } from "../regimeEngine";
+import { deriveRegimeTrend, ENGINE_VERSION, evaluateRegime } from "../regimeEngine";
 import {
   getLatestTimeMachineSnapshot,
   getTimeMachineCoverage,
@@ -46,6 +46,8 @@ import {
   resolveWeekEndingIsoDateUTC,
 } from "../formatters";
 import { buildRegimeAlert } from "./reportFormatting";
+import { findWeeklyComparisonReading } from "./comparisonReading";
+import { getPublishedBriefs } from "./publishedBriefs";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { logReportDependencyFailure } from "./reportError";
@@ -212,6 +214,8 @@ const reportDataDependencies = () => ({
   getTimeMachineYieldCurveSeries,
   getTimeMachineSnapshots,
   getPreviousTimeMachineSnapshot,
+  findWeeklyComparisonReading: (recordDate: string) =>
+    findWeeklyComparisonReading(getPublishedBriefs(), recordDate, ENGINE_VERSION),
   findTimeMachineSnapshot,
   findTimeMachineGovernedAssessment,
   DEFAULT_REGIME_SERIES_MONTHS,

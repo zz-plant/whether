@@ -53,12 +53,15 @@ describe("the brief document", () => {
   it("keeps a held call held, with or without a stage", () => {
     const snapshot = buildOperatingSnapshot({ treasury: exportTreasury, macroSeries: macros, now: new Date("2026-03-05T12:00:00.000Z") });
     assert.equal(snapshot.weeklyCall.policyOverrideActive, true);
+    // Held because the two scores disagree; missing inputs are the second reason, and the first leads.
+    assert.deepEqual(snapshot.assessment.policyAssessment.refusal.reasonCodes, ["signals-disagree", "inputs-missing"]);
+    const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
 
     for (const stage of [null, "seed"] as const) {
       const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall, { stage });
       assert.equal(document.slots.policyOverrideActive, true);
-      assert.equal(document.slots.actionNow, POLICY_OVERRIDE_CALL.actionNow);
-      assert.equal(document.slots.pauseIf, POLICY_OVERRIDE_CALL.pauseIf);
+      assert.equal(document.slots.actionNow, hold.actionNow);
+      assert.equal(document.slots.pauseIf, hold.pauseIf);
       assert.equal(document.slots.resumeWhen, undefined);
     }
   });
@@ -87,9 +90,12 @@ describe("the brief document", () => {
     const document = buildBriefDocument(briefSourceFromSnapshot(saved), saved.weeklyCall);
     assert.equal(document.provenance.isFallback, true);
     assert.equal(document.isFallback, true);
-    /* The snapshot names its own pipeline ("Canonical snapshot (FRED)"); the document names the publisher. */
-    assert.equal(saved.provenance.sourceLabel, "Canonical snapshot (FRED)");
+    /* The snapshot named its own pipeline ("Canonical snapshot (FRED)") until 2026-10-07; both
+       now name the publisher, and a snapshot stored before then is translated at read. */
+    assert.equal(saved.provenance.sourceLabel, "Federal Reserve Economic Data (FRED)");
     assert.equal(document.provenance.sourceLabel, "Federal Reserve Economic Data (FRED)");
+    const stored = { ...saved, provenance: { ...saved.provenance, sourceLabel: "Canonical snapshot (FRED)" } };
+    assert.equal(buildBriefDocument(briefSourceFromSnapshot(stored), stored.weeklyCall).provenance.sourceLabel, "Federal Reserve Economic Data (FRED)");
     assert.doesNotMatch(JSON.stringify(document), /Canonical/);
   });
 

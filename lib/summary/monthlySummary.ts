@@ -14,6 +14,7 @@ import {
   formatConfidenceSentence,
   formatSourceLine,
   resolveSummaryConfidence,
+  SHOCK_CROSSING_CUE,
   type SummaryConfidence,
 } from "./summaryFormatting";
 
@@ -211,9 +212,8 @@ export const buildMonthlySummary = ({
   const transitionCue = assessment.diagnostics.transitionWatch
     ? "A score is sitting near the line where conditions change, so hold major scope changes until the next reading."
     : "";
-  const shockCue = assessment.diagnostics.shockCrossing
-    ? "This flip crossed its line in one jump, so no published reversal condition fired — treat the change in conditions as unconfirmed until the next read."
-    : "";
+  // The weekly summary's sentence (`SHOCK_CROSSING_CUE`), which says why it replaced "This flip crossed its line…".
+  const shockCue = assessment.diagnostics.shockCrossing ? SHOCK_CROSSING_CUE : "";
   const summary = joinSentences(
     `${regimeLabel}: ${assessment.description}`,
     `The priority this month is to ${guidance}`,

@@ -20,8 +20,9 @@ import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/compa
  * by sending a reader to a glossary.
  *
  * The column and the ladders' hollow dot name the reading they compare with
- * ("Aug 31 → this week"): it is the previous monthly snapshot, and the column
- * used to say "Last week" over it.
+ * ("Sep 29 → this week"): last week's published brief, or the previous
+ * month-end where there is none. The column used to say "Last week" over a
+ * month-end. A row the earlier reading did not record draws "—".
  */
 const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasis }) => {
   if (row.previous === null || row.delta === null) {

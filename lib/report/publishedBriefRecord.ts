@@ -12,36 +12,51 @@
  */
 import { formatIsoWeekSlug, getIsoWeekInfo, type IsoWeek } from "../isoWeek";
 import { previousScoresFromDynamics } from "../export/scoreReference";
+import { ENGINE_VERSION } from "../regimeEngine";
 import { assessPublishReadiness } from "./briefPublishGuard";
+import { observedBaseRate } from "./comparisonReading";
 import type { PublishedBrief } from "./publishedBriefs";
+import { FRED_SOURCE_LABEL } from "./provenanceStatus";
 import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnapshotResult } from "./weeklyBriefSnapshot";
 
 /**
  * The two scores' moves, and the reading they are measured against.
  *
- * The comparison behind the week's dynamics is the previous month-end snapshot,
- * not last week, and the record used to keep the moves without the date: w38,
+ * The comparison behind the week's dynamics was the previous month-end snapshot
+ * until 2026-10-07, and the record used to keep the moves without the date: w38,
  * w39 and w40 all stored a move from Aug 31's 63/56, and the page printed each
- * as "vs prior week". A move is stored only with the reading it is against, so
- * a record with no named comparison stores none rather than one nobody can date.
- * The earlier scores come from `previousScoresFromDynamics`, the derivation every
- * paste and page shares, so a signal that moved under the reporting floor is a
- * zero move rather than a missing one.
+ * as "vs prior week". It is last week's published brief now, with the month-end
+ * as the fallback (`lib/report/comparisonReading.ts`); either way a move is
+ * stored only with the reading it is against, so a record with no named
+ * comparison stores none rather than one nobody can date. The earlier scores
+ * come from `previousScoresFromDynamics`, the derivation every paste and page
+ * shares, so a signal that moved under the reporting floor is a zero move rather
+ * than a missing one.
+ *
+ * The short-term rate and the recession warning gauge are stored as published,
+ * so next week's brief can compare its own with them. Records frozen before
+ * these were stored carry the two scores alone, and a week compared with one of
+ * them prints no move for either rate. So is the engine that scored them: next
+ * week compares with this record only if the same engine scores it.
  */
 const scoresWithComparison = (reportData: WeeklyBriefSnapshotResult["reportData"]): NonNullable<PublishedBrief["scores"]> => {
-  const current = {
-    tightness: reportData.assessment.scores.tightness,
-    riskAppetite: reportData.assessment.scores.riskAppetite,
+  const { scores } = reportData.assessment;
+  const current = { tightness: scores.tightness, riskAppetite: scores.riskAppetite };
+  const rates = {
+    baseRate: observedBaseRate(scores),
+    curveSlope: scores.curveSlope,
+    engineVersion: ENGINE_VERSION,
   };
   const previous = previousScoresFromDynamics(reportData.reportDynamics, current);
   const comparedWith = previous?.comparedWith;
-  if (!previous || !comparedWith) return { ...current, tightnessDelta: null, riskAppetiteDelta: null };
+  if (!previous || !comparedWith) return { ...current, tightnessDelta: null, riskAppetiteDelta: null, ...rates };
   const move = (metric: keyof typeof current) => Math.round((current[metric] - previous[metric]) * 10) / 10;
   return {
     ...current,
     tightnessDelta: move("tightness"),
     riskAppetiteDelta: move("riskAppetite"),
     comparedWith: { recordDate: comparedWith.recordDate, label: comparedWith.label },
+    ...rates,
   };
 };
 
@@ -100,8 +115,9 @@ export const buildPublishedBriefRecord = ({
      * that moved nothing at all would have been published, permanently, as
      * having moved by however far the score sat above the line. A comment here
      * then called the `reportDynamics` move "the week-over-week move", which it
-     * is not: it is the move since the previous month-end, and it now carries
-     * that reading's date (`scoresWithComparison`).
+     * was not until 2026-10-07: it was the move since the previous month-end.
+     * It is the move since last week's brief where the archive has one, and it
+     * carries that reading's date either way (`scoresWithComparison`).
      */
     scores: scoresWithComparison(reportData),
     evidence: reportData.reportEvidenceItems.map((item) => ({
@@ -109,7 +125,12 @@ export const buildPublishedBriefRecord = ({
       detail: item.immediateImplication,
       sourceUrl: reportData.treasury.source,
     })),
-    sourceLabel: reportData.treasuryProvenance?.statusLabel ?? "US Treasury via FRED",
+    /* The source, not the status. This stored `treasuryProvenance.statusLabel`, so
+       every record froze "Canonical snapshot (high confidence)" as its source, a
+       confidence it never computed (`publishedBriefDisplay` still translates those).
+       The status now reads "Latest recorded reading", which a record would keep
+       saying long after it stopped being true. */
+    sourceLabel: reportData.treasuryProvenance?.sourceLabel ?? FRED_SOURCE_LABEL,
     sourceUrl: reportData.treasury.source,
     freshnessLabel: reportData.fetchedAtLabel,
     correction: existing?.correction ?? null,

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import type { TreasuryData } from "../../../lib/types";
 import { SegmentedControl } from "../../components/ui/segmentedControl";
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
+import { formatDateUTC } from "../../../lib/formatters";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 import { CurveTermsKey, formatSpread } from "./curveTermsKey";
 
@@ -244,10 +245,13 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
         {/* This week's four rates, then what the charts are. The line said
             "Latest: Oct 5" over charts whose last point was the Aug 31
             month-end, and printed no rate; the closed summary quotes this
-            week's 1-month rate, so the panel it opens prints it too. */}
+            week's 1-month rate, so the panel it opens prints it too. The date
+            was the raw record field ("Latest: 2026-10-05") where every other
+            line on the page reads "Oct 5, 2026"; it is formatted in UTC, as
+            the server formats it, so the client renders the same string. */}
         <div className="mt-3 space-y-1 border-b border-slate-800/80 pb-3 text-xs">
           <p className="tabular-nums text-slate-300">
-            Latest: {treasury.record_date} · {treasury.isLive ? "Live reading" : "Last saved reading"} · 1M{" "}
+            Latest: {formatDateUTC(treasury.record_date)} · {treasury.isLive ? "Live reading" : "Last saved reading"} · 1M{" "}
             {formatPercent(treasury.yields.oneMonth)} · 3M {formatPercent(treasury.yields.threeMonth ?? null)} · 2Y{" "}
             {formatPercent(treasury.yields.twoYear)} · 10Y {formatPercent(treasury.yields.tenYear)}
           </p>

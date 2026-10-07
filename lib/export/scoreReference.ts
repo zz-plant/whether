@@ -64,12 +64,13 @@ const roundToTenth = (value: number) => Math.round(value * 10) / 10;
  * (`tests/noComparisonHonesty.test.ts`); a signal absent from both lists moved
  * under the reporting floor, so the earlier reading equals this week's for it.
  *
- * The comparison behind the dynamics is `getPreviousTimeMachineSnapshot`, and
- * that cache is monthly: today the earlier reading is the last month-end (Aug 31
- * for both the Sep 18 and the Sep 25 reads), not last week. The date rides along
- * as `comparedWith` so every surface that prints these scores can say so
- * (`lib/report/comparisonBasis.ts`); `docs/feature-specs-current.md` §1.1.25
- * has the evidence.
+ * The comparison behind the dynamics is last week's published brief, or the
+ * previous month-end where the archive has none from the previous one to two
+ * weeks (`lib/report/comparisonReading.ts`); until 2026-10-07 it was always the
+ * month-end (Aug 31 for both the Sep 18 and the Sep 25 reads). The date rides
+ * along as `comparedWith` so every surface that prints these scores can say
+ * which (`lib/report/comparisonBasis.ts`); `docs/feature-specs-current.md`
+ * §1.1.25 has the evidence.
  */
 export const previousScoresFromDynamics = (
   dynamics: SignalDynamicsSource | null | undefined,

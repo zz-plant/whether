@@ -54,12 +54,12 @@ export type SignalClusterReading = {
    * numbers can be acted on. `value` stays numeric for comparisons and tests.
    */
   displayValue: string | null;
-  /** Rendered after the number: "of 100", "%". */
+  /** The figure's unit, after the number where a surface prints one (the share card): "", "percentage points". */
   unit: string;
   /** How to read the scale, in words. */
   scaleNote: string;
   threshold: { value: number; label: string };
-  /** The move since the comparison reading (the last month-end snapshot, named in `directionLabel`). Null when there is no prior reading to compare. */
+  /** The move since the comparison reading (last week's brief or the last month-end snapshot, named in `directionLabel`). Null when there is no prior reading to compare. */
   delta: number | null;
   /** Which direction is the comfortable one, for colouring the move. */
   betterWhen: "higher" | "lower";
@@ -75,10 +75,14 @@ export type SignalClusterReading = {
   unavailableReason: string | null;
 };
 
-const ONE_DECIMAL = new Intl.NumberFormat("en-US", {
-  minimumFractionDigits: 1,
-  maximumFractionDigits: 1,
+/* Two places, as rates are quoted. The gauge and its inputs were one ("0.5"), beside
+   a two-place move ("+0.06") on the same panel. */
+const TWO_PLACES = new Intl.NumberFormat("en-US", {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
 });
+/** The recession warning gauge's unit: a gap between two rates, in percentage points. */
+const GAUGE_UNIT = " percentage points";
 const WHOLE = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 const SIGNED_WHOLE = new Intl.NumberFormat("en-US", {
   maximumFractionDigits: 0,
@@ -118,10 +122,19 @@ const basisOf = (reportData: SignalReadingSource) => comparisonBasis(reportData.
 const findInputValue = (reportData: SignalReadingSource, id: string) =>
   reportData.assessment.inputs.find((input) => input.id === id);
 
+/**
+ * A "Built from" input, at the two places a rate is quoted and the /signals rows
+ * print. It was one place in "%" for all four, so the capital page read
+ * "Recession warning gauge 0.5%" where /signals read 0.47pp, and the curve page
+ * built a 0.47 gauge from "2-year rate 4.8% · 10-year rate 5.3%", which subtract
+ * to 0.5. The gauge is a gap between two rates, so it is in percentage points,
+ * written out: this page has no key for "pp" (`curveTermsKey.tsx` is on /signals).
+ */
 const formatInput = (reportData: SignalReadingSource, id: string, label: string): SignalReadingInput | null => {
   const input = findInputValue(reportData, id);
   if (!input || input.value === null) return null;
-  return { label, value: `${ONE_DECIMAL.format(input.value)}${input.unit}` };
+  if (id === "curve-slope") return { label, value: `${TWO_PLACES.format(input.value)}${GAUGE_UNIT}` };
+  return { label, value: `${TWO_PLACES.format(input.value)}${input.unit}` };
 };
 
 /**
@@ -151,7 +164,7 @@ export const describeSignalDirection = (
   }
   if (delta === 0) {
     /* "Unchanged from last week." where the week is undated, and the date
-       where it is: the comparison is the previous monthly snapshot. */
+       where it is: the comparison is last week's brief or the previous month-end. */
     return { label: basis.date ? `Unchanged ${basis.since}.` : `Unchanged from last week.`, tone: "unchanged" };
   }
 
@@ -294,22 +307,28 @@ export const buildSignalClusterReading = (
    */
   const delta = slope === null ? null : findDelta(reportData, "curveSlope");
   /*
-   * One unit per quantity: the figure is a percentage, written "%", and every move or
-   * distance measured on it is in percentage points, written out. "pp" and "bp" are
-   * desk shorthand; this page has no key to expand them (the charts on /signals do).
+   * One unit for the gauge, its distance and its move: percentage points, at two
+   * places, written out. "pp" and "bp" are desk shorthand; this page has no key to
+   * expand them (the charts on /signals do).
+   *
+   * The figure was "0.5%" at one place, the distance "0.5 percentage points above
+   * zero", and the move beside them "+0.06 percentage points": a reading rounded
+   * coarser than its own weekly change, in a unit (%) the /signals row for the same
+   * gauge does not use (0.47pp). The share card printed `${displayValue} ${unit}`,
+   * so it read "0.5% %".
    */
-  const direction = describeSignalDirection(delta, "higher", " percentage points", SIGNED_TWO, basisOf(reportData));
+  const direction = describeSignalDirection(delta, "higher", GAUGE_UNIT, SIGNED_TWO, basisOf(reportData));
 
   return {
     measure: "Recession warning gauge",
     value: slope,
-    displayValue: slope === null ? null : `${ONE_DECIMAL.format(slope)}%`,
-    unit: "%",
-    scaleNote: "10-year minus 2-year rate",
+    displayValue: slope === null ? null : TWO_PLACES.format(slope),
+    unit: GAUGE_UNIT.trim(),
+    scaleNote: `${GAUGE_UNIT.trim()}: the 10-year rate minus the 2-year rate`,
     threshold: { value: 0, label: ZERO_LINE_LABEL },
     delta,
     betterWhen: "higher",
-    distanceLabel: describeDistance(slope, 0, " percentage points", ZERO_LINE_LABEL, ONE_DECIMAL),
+    distanceLabel: describeDistance(slope, 0, GAUGE_UNIT, ZERO_LINE_LABEL, TWO_PLACES),
     directionLabel: direction.label,
     directionTone: direction.tone,
     inputs: [

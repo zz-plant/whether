@@ -11,9 +11,10 @@ export const decisionTransmissionSearchDescription =
  */
 /*
  * Named by the reading the week was compared with. It said "last week's
- * decisions" whatever that was, and the comparison is the last month-end
+ * decisions" whatever that was, and the comparison was the last month-end
  * snapshot: on Oct 5 the scores had moved since Aug 31, five weeks earlier, and
- * the answer pages told a reader to revisit last week's decisions. Where the
+ * the answer pages told a reader to revisit last week's decisions. It is last
+ * week's brief now where the archive has one, and still named by date. Where the
  * comparison is undated the wording stays "last week", as `comparisonBasis`
  * leaves it.
  */

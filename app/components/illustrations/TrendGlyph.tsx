@@ -70,8 +70,10 @@ export const describeTrend = ({
   const suffix = unit ? ` ${unit}` : "";
   const at = current === undefined ? "" : ` to ${formatTrendValue(current)}${suffix}`;
 
+  /* "unchanged since Sep 29 to 90" read as a move that never happened; a flat
+     reading is stated where it stands. Rare against a month-end, routine week to week. */
   if (delta === null || delta === undefined || !Number.isFinite(delta) || delta === 0) {
-    return `${label} unchanged ${period}${at}.`;
+    return `${label} unchanged ${period}${current === undefined ? "" : `, at ${formatTrendValue(current)}${suffix}`}.`;
   }
 
   const size = `${formatTrendValue(Math.abs(delta))}${suffix}`;

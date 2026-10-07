@@ -17,6 +17,8 @@ type DecisionDeltaRule = {
   code: string;
   decisionArea: DecisionArea;
   action: string;
+  /** The score that crossed the line. Absent on a change of conditions, which is not one line. */
+  metric?: RuleConditionMetric;
   thresholdLabel: string;
   thresholdValue: number;
   reversal: string;
@@ -113,6 +115,7 @@ export const buildDecisionDeltaRules = (
         code: `${codePrefix}-${direction === "up" ? "upshift" : "downshift"}`,
         decisionArea,
         action,
+        metric,
         thresholdLabel: `${decisionAreaLabel(area)} ${kind} line`,
         thresholdValue: line.value,
         reversal,
@@ -129,7 +132,10 @@ export const buildDecisionDeltaRules = (
       code: "regime-change",
       decisionArea: "posture",
       action: `Conditions changed from ${getRegimePublicLabel(previous.regime)} to ${getRegimePublicLabel(current.regime)}; reread last week's plan.`,
-      thresholdLabel: "The line where conditions change",
+      /* Not one line, so no number: 0 here is a placeholder, and the alert's
+         reason printed it as "Trigger 0.00 vs The line where conditions change
+         0.00". `reversal` names both lines with their numbers. */
+      thresholdLabel: "The change line",
       thresholdValue: 0,
       reversal: `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildFlipThreshold(current)}`,
       metricValue: 0,

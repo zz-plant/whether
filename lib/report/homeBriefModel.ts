@@ -32,7 +32,7 @@ import {
 } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import type { PostureStateContract } from "./postureStateContract";
-import type { RegimeDiagnostics, RegimeKey } from "../regimeEngine";
+import type { PolicyRefusalCode, RegimeDiagnostics, RegimeKey } from "../regimeEngine";
 import type { CanonicalDecisionCopy } from "./canonicalDecisionCopy";
 import type { WeeklyCallContract } from "./weeklyCallContract";
 import {
@@ -80,6 +80,7 @@ export type HomeReportData = {
       refusal?: {
         refused?: boolean;
         reasons?: string[];
+        reasonCodes?: PolicyRefusalCode[];
       };
     };
   };

@@ -52,14 +52,18 @@ describe("buildSlackBrief", () => {
   it("prints a held call's lines and no competing resume line", () => {
     const held = fixtureWeeklyCall({
       ...assessment,
-      policyAssessment: { ...assessment.policyAssessment, refusal: { refused: true, reasons: ["The two scores disagree."] } },
+      policyAssessment: {
+        ...assessment.policyAssessment,
+        refusal: { refused: true, reasons: ["The two scores disagree."], reasonCodes: ["signals-disagree"] },
+      },
     });
     assert.equal(held.policyOverrideActive, true);
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall: held }));
+    const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
 
-    assert.equal(slot(brief, "Guidance"), joinSentences(POLICY_OVERRIDE_CALL.actionNow, POLICY_OVERRIDE_CALL.currentCall));
-    assert.equal(slot(brief, "Pause if"), POLICY_OVERRIDE_CALL.pauseIf);
-    assert.equal(slot(brief, "Conditions change if"), POLICY_OVERRIDE_CALL.callChangesIf);
+    assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall));
+    assert.equal(slot(brief, "Pause if"), hold.pauseIf);
+    assert.equal(slot(brief, "Conditions change if"), hold.callChangesIf);
     assert.equal(slot(brief, "Resume when"), "");
     assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Conditions change if\):/);
   });

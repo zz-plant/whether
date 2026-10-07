@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { GitHubRepoClient, fromBase64Utf8, toBase64Utf8 } from "../lib/github/repoClient";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../lib/isoWeek";
+import { ENGINE_VERSION } from "../lib/regimeEngine";
 import { PublishedBriefSchema, getPublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
 import {
   PUBLISHED_BRIEFS_FILE_PATH,
@@ -12,6 +13,7 @@ import {
   readPublishedBriefsFromBranch,
 } from "../lib/report/publishedBriefPullRequest";
 import { assembleCurrentWeekBrief, buildPublishedBriefRecord } from "../lib/report/publishedBriefRecord";
+import { findWeeklyComparisonReading } from "../lib/report/comparisonReading";
 import { buildWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { buildReportDataFixture } from "./fixtures/reportFixtures";
 
@@ -330,5 +332,38 @@ describe("assembleCurrentWeekBrief", () => {
     assert.equal(undated.scores?.comparedWith, undefined);
     assert.equal(undated.scores?.tightnessDelta, null, "a move against a reading nobody named is not stored");
     assert.equal(undated.scores?.riskAppetiteDelta, null);
+  });
+
+  /* Next week compares with this record, and w38–w40 stored no rate to compare with,
+     nor the engine that scored them. */
+  it("stores the short-term rate, the recession warning gauge and the engine it published, so next week can compare them", () => {
+    const isoWeek = getIsoWeekInfo(new Date(liveReportData.treasury.record_date));
+    const record = buildPublishedBriefRecord({ reportData: liveReportData, snapshot: liveSnapshot, recordDate: liveReportData.treasury.record_date, isoWeek });
+    assert.equal(record.scores?.baseRate, liveReportData.assessment.scores.baseRate);
+    assert.equal(record.scores?.curveSlope, liveReportData.assessment.scores.curveSlope);
+    assert.ok(PublishedBriefSchema.safeParse(record).success);
+
+    assert.equal(record.scores?.engineVersion, ENGINE_VERSION);
+
+    const nextWeek = new Date(Date.parse(`${record.recordDate}T00:00:00.000Z`) + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+    assert.equal(findWeeklyComparisonReading([record], nextWeek, "engine-next"), null, "a scoring change since is not a market move");
+    assert.deepEqual(findWeeklyComparisonReading([record], nextWeek, ENGINE_VERSION)?.scores, {
+      tightness: liveReportData.assessment.scores.tightness,
+      riskAppetite: liveReportData.assessment.scores.riskAppetite,
+      baseRate: liveReportData.assessment.scores.baseRate,
+      curveSlope: liveReportData.assessment.scores.curveSlope,
+    });
+
+    const missingRate = buildReportDataFixture({
+      treasury: { isLive: true, fallback_at: undefined, fallback_reason: undefined },
+      assessment: { scores: { baseRateUsed: "MISSING", baseRate: 0 } },
+    });
+    const withoutRate = buildPublishedBriefRecord({
+      reportData: missingRate,
+      snapshot: buildWeeklyBriefSnapshot({ reportData: missingRate, degraded: false }),
+      recordDate: missingRate.treasury.record_date,
+      isoWeek,
+    });
+    assert.equal(withoutRate.scores?.baseRate, null, "a missing rate scores as 0, which is not a reading");
   });
 });

@@ -86,7 +86,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "- Start with get_state (or /api/agent?view=state): it is a tenth the size of the full brief and says whether to act on it",
     "- Prefer /brief.md for reading and summarization tasks — it's Markdown, structured, and instant",
     "- Use /api/agent for structured data processing, integration, or when you need specific cadence windows",
-    "- Scores are compared with the previous month-end reading, named by date (`comparedWith`), not with last week",
+    "- Scores are compared with last week's published brief, or with the previous month-end reading where there is none from the previous one to two weeks; either is named by date (`comparedWith`)",
     "- The homepage (/) includes JSON-LD structured data (schema.org/Report) with decision artifacts",
     "- All endpoints include provenance metadata — preserve it in downstream outputs",
     "- Informational only: not investment, legal, tax or employment advice, and not a forecast",

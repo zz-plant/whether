@@ -119,9 +119,10 @@ export const buildSignalChangeRows = ({
  * tests/noComparisonHonesty.test.ts exists to keep off the page.
  *
  * The move is measured against the earlier reading the week's dynamics name
- * (`comparisonBasis`), so it says "since Aug 31" where it used to say "this
- * week": the reading behind these deltas is the last month-end. A caller
- * with no date keeps "this week".
+ * (`comparisonBasis`), so it says "since Sep 29" where it used to say "this
+ * week": the reading behind these deltas is last week's published brief, or
+ * the last month-end where there is none. A caller with no date keeps "this
+ * week".
  */
 const NO_COMPARISON_SENTENCE = "No previous week to compare the scores against.";
 
@@ -212,9 +213,10 @@ export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">
 
 /**
  * What conditions were at the earlier reading, for the card's stamp line on a
- * reading whose conditions differ from it: "Was Sunny on Aug 31". Dated by the
- * comparison's own basis, because the earlier reading is a month-end snapshot
- * and "this week" would claim a change the reading cannot date.
+ * reading whose conditions differ from it: "Was Freezing on Sep 29". Dated by
+ * the comparison's own basis, because the earlier reading is last week's brief
+ * or, where there is none, a month-end snapshot, and "this week" would claim a
+ * change the reading cannot date.
  */
 export const describeEarlierConditions = ({
   previousLabel,

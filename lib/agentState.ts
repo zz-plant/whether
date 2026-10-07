@@ -92,7 +92,7 @@ export const agentStateSchema = z.object({
     comparedWith: z
       .object({ recordDate: z.string(), label: z.string() })
       .nullable()
-      .describe("The earlier reading every `previous` and `delta` is measured against: the previous month-end snapshot, not last week."),
+      .describe("The earlier reading every `previous` and `delta` is measured against: last week's published brief, or the previous month-end snapshot where there is none from the previous one to two weeks. `days` says which."),
     days: z.number().nullable().describe("Days between that reading and this one."),
     note: z.string().nullable().describe("A caveat on `moved` where a part is an input the earlier score never had."),
     summary: z

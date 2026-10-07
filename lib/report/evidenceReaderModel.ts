@@ -22,14 +22,16 @@ import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
  * ladder on a scenario page and a paste from an answer page agree on the
  * previous value, the line and the distance.
  *
- * The earlier reading is the previous monthly snapshot, and each row names it by
- * date (`previousLabel`, from `comparisonBasis`) instead of calling it last week.
+ * The earlier reading is last week's published brief, or the previous month-end
+ * where there is none (`lib/report/comparisonReading.ts`), and each row names it
+ * by date (`previousLabel`, from `comparisonBasis`) instead of calling it last week.
  * A comparison is a fact only when one happened. `buildReportDynamics`
  * records a signal's move in `changedSignals` (or `anomalySignals` when it
  * moved past the sanity bound), and says `directionLabel: "unavailable"` when
  * there was no previous reading at all — so a signal absent from both lists
  * under a real comparison moved less than the 0.01 floor, and reads as
- * unmoved; under no comparison it has no previous value. `previous` is null
+ * unmoved, unless the earlier reading did not record it (`notCompared`); under
+ * no comparison it has no previous value. `previous` is null
  * only where nothing is known, which is what the primitives require
  * (`tests/noComparisonHonesty.test.ts`). The exports, the homepage and /trust
  * read last week through `findSignalDelta` too, so a signal that did not move
@@ -37,7 +39,7 @@ import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
  */
 
 
-type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel" | "comparedWith" | "movement">;
+type DynamicsSource = Pick<ReportDynamics, "changedSignals" | "anomalySignals" | "directionLabel" | "comparedWith" | "movement" | "notCompared">;
 
 /**
  * Just what a signal's recorded move needs. The homepage model is handed a looser
@@ -49,6 +51,8 @@ type SignalDeltaSource = {
   directionLabel: ReportDynamics["directionLabel"];
   changedSignals: ReadonlyArray<{ key: RegimeSignalKey; delta: number }>;
   anomalySignals?: ReadonlyArray<{ key: RegimeSignalKey; delta: number }>;
+  /** Signals the earlier reading did not record: no move, not a zero one. */
+  notCompared?: ReadonlyArray<RegimeSignalKey>;
 };
 
 /** `SignalDeltaSource` plus the reading the moves are against and what they are made of, where the source has them. */
@@ -112,10 +116,13 @@ const SIGNED_TWO = new Intl.NumberFormat("en-US", {
 
 /**
  * The recorded move for a signal, from either list it can land in: null when
- * no comparison was made, 0 when one was and the signal moved under the floor.
+ * no comparison was made, or when the earlier reading did not record this
+ * signal (last week's brief, before it stored the two rates); 0 when one was
+ * and the signal moved under the floor.
  */
 export const findSignalDelta = (dynamics: SignalDeltaSource, key: RegimeSignalKey): number | null => {
   if (dynamics.directionLabel === "unavailable") return null;
+  if (dynamics.notCompared?.includes(key)) return null;
   return (
     dynamics.changedSignals.find((signal) => signal.key === key)?.delta
     ?? dynamics.anomalySignals?.find((signal) => signal.key === key)?.delta

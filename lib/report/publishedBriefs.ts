@@ -55,6 +55,18 @@ const PublishedBriefScoresSchema = z.object({
   riskAppetiteDelta: z.number().nullable().optional(),
   /** The earlier reading the deltas are measured against (`ReportDynamics.comparedWith`). */
   comparedWith: z.object({ recordDate: z.string(), label: z.string() }).optional(),
+  /**
+   * The short-term rate and the recession warning gauge the week published, so the next
+   * week's brief can compare them with this one (`findWeeklyComparisonReading`). Absent
+   * on records frozen before they were stored, and null where the reading had none.
+   */
+  baseRate: z.number().nullable().optional(),
+  curveSlope: z.number().nullable().optional(),
+  /**
+   * The engine that scored them (`ENGINE_VERSION`). Next week compares with this
+   * record only under the same engine; absent on records frozen before it was stored.
+   */
+  engineVersion: z.string().optional(),
 });
 
 const PublishedBriefEvidenceSchema = z.object({

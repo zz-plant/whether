@@ -69,6 +69,13 @@ describe("the /signals chart suite labels the month-end archive as monthly", () 
     assert.doesNotMatch(text, /[+-]?\d+\.\d bp/, "a spread level in bp");
     assert.match(text, /pp Percentage point/, "pp is defined on the panel that prints it");
   });
+
+  /* The top line read "Latest: 2026-10-05", the raw record field, on a page that
+     dates everything else "Oct 5, 2026". */
+  it("dates this week's rates the way the rest of the page does", () => {
+    assert.match(text, /Latest: Mar 1, 2026 · Live reading · 1M 5\.20%/);
+    assert.doesNotMatch(text, /\d{4}-\d{2}-\d{2}/, "a raw ISO date");
+  });
 });
 
 describe("the inversion chart prints its spreads as the gauge row does", () => {
