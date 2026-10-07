@@ -2,17 +2,21 @@ import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
 import { describe, it } from "bun:test";
 
-import { parsePrePushBase } from "../scripts/pre-push-range.mjs";
+import { parsePrePushRange } from "../scripts/pre-push-range.mjs";
 
 /*
- * The pre-push hook judges the review preflight against what the push actually sends:
- * the remote sha from the plan git writes to the hook's stdin.
+ * The pre-push hook judges the review preflight on what the push actually sends: the
+ * remote sha as base and the local sha as head, from the plan git writes to the hook's
+ * stdin. The head matters because the pushed ref need not be the one checked out.
  */
-describe("parsePrePushBase", () => {
+describe("parsePrePushRange", () => {
   const MAIN_UPDATE = "refs/heads/main 1111111111111111111111111111111111111111 refs/heads/main 2222222222222222222222222222222222222222\n";
 
-  it("returns the remote sha from a branch update line", () => {
-    assert.equal(parsePrePushBase(MAIN_UPDATE), "2222222222222222222222222222222222222222");
+  it("returns the pushed range from a branch update line", () => {
+    assert.deepEqual(parsePrePushRange(MAIN_UPDATE), {
+      base: "2222222222222222222222222222222222222222",
+      head: "1111111111111111111111111111111111111111",
+    });
   });
 
   it("skips deletions and reads the first real update", () => {
@@ -20,7 +24,7 @@ describe("parsePrePushBase", () => {
       "refs/heads/gone 0000000000000000000000000000000000000000 refs/heads/gone 3333333333333333333333333333333333333333\n" +
       MAIN_UPDATE;
 
-    assert.equal(parsePrePushBase(text), "2222222222222222222222222222222222222222");
+    assert.equal(parsePrePushRange(text)?.head, "1111111111111111111111111111111111111111");
   });
 
   it("skips new branches, which have no remote state to review against", () => {
@@ -28,25 +32,25 @@ describe("parsePrePushBase", () => {
       "refs/heads/new 1111111111111111111111111111111111111111 refs/heads/new 0000000000000000000000000000000000000000\n" +
       MAIN_UPDATE;
 
-    assert.equal(parsePrePushBase(text), "2222222222222222222222222222222222222222");
+    assert.equal(parsePrePushRange(text)?.base, "2222222222222222222222222222222222222222");
   });
 
   it("returns null when nothing qualifies, so the hook keeps its default base", () => {
-    assert.equal(parsePrePushBase(""), null);
+    assert.equal(parsePrePushRange(""), null);
     assert.equal(
-      parsePrePushBase("refs/heads/new 1111111111111111111111111111111111111111 refs/heads/new 0000000000000000000000000000000000000000\n"),
+      parsePrePushRange("refs/heads/new 1111111111111111111111111111111111111111 refs/heads/new 0000000000000000000000000000000000000000\n"),
       null,
     );
   });
 
-  it("reads stdin and prints the base for the hook to export", () => {
+  it("reads stdin and prints the pair for the hook to export", () => {
     const run = spawnSync(process.execPath, [new URL("../scripts/pre-push-range.mjs", import.meta.url).pathname], {
       input: MAIN_UPDATE,
       encoding: "utf8",
     });
 
     assert.equal(run.status, 0);
-    assert.equal(run.stdout, "2222222222222222222222222222222222222222\n");
+    assert.equal(run.stdout, "2222222222222222222222222222222222222222 1111111111111111111111111111111111111111\n");
   });
 
   it("prints nothing for a push it cannot scope", () => {

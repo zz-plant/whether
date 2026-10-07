@@ -204,7 +204,7 @@ a failing test or a dead export, and the suite was green through all of them.
   editing at push time, so the gate failed on work the push did not contain — the same failure the
   hook's own caveat warns about, now removed for the check that can be scoped precisely.
   `.husky/pre-push` reads git's stdin plan (`<local ref> <local sha> <remote ref> <remote sha>` per
-  ref) through `scripts/pre-push-range.mjs` and exports the remote sha as `REVIEW_HOTSPOT_BASE`.
+  ref) through `scripts/pre-push-range.mjs` and exports the pair as `REVIEW_HOTSPOT_BASE`/`HEAD`.
   A new branch, a deletion, and a manual run print nothing and keep the default base; a remote sha
   the local repo has never fetched fails verification and falls back the same way, so every way
   the scoping can fail costs a wider scan rather than a skipped one.
@@ -216,8 +216,11 @@ a failing test or a dead export, and the suite was green through all of them.
   <base>` against the working tree, and the base is the merge-base with `main`, `HEAD~1` on `main`
   itself, or `--base`/`REVIEW_HOTSPOT_BASE`. The merge-base covers both earlier findings at once: a
   branch is judged on everything it changes however many commits that is, and a merge commit's
-  first parent is never the base. What it gives up is the pre-push hook's blindness to other
-  sessions' uncommitted edits; the hook's own caveat covers that, and `git status` says whose it is.
+  first parent is never the base. The one option left is `--head`/`REVIEW_HOTSPOT_HEAD`, a commit
+  to compare with instead of the working tree: the first cut dropped it and the hook passed only
+  the base, and Codex pointed out that `git push origin release` from another branch would then
+  judge the checked-out tree rather than the pushed ref. The hook passes both shas, so a push is
+  commit-to-commit again and never sees another session's uncommitted edits.
 
 **Two findings from that audit were wrong and are recorded here as such.** The mockup route being
 publicly reachable — it is gated, and the gate has its own recorded argument. And `/operate` showing
