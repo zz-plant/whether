@@ -5,7 +5,7 @@ import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { buildBriefMarkdown } from "../app/brief.md/route";
 import { FrameworkSection } from "../app/trust/frameworkSection";
-import { TrackRecordTiles } from "../app/components/history/TrackRecord";
+import { TrackRecordTable, TrackRecordTiles } from "../app/components/history/TrackRecord";
 import { TrustStrip } from "../app/components/trustStrip";
 import { computeDiagnostics } from "../lib/regimeEngineDiagnostics";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
@@ -113,6 +113,38 @@ describe("/history dates what it is showing", () => {
 
     assert.match(html, /month-end conditions/i);
     assert.match(html, /Through /);
+  });
+
+  /*
+   * The disclosure's second table was headed "Earlier months (164) · Jan 31,
+   * 2012 to Sep 30, 2025" over rows that start at Aug 29, 2025: the range ended
+   * at the oldest row of the twelve-row table above it, so Sep 2025 was claimed
+   * by both.
+   */
+  it("dates the earlier-months table by its own first and last rows", () => {
+    const fifteenMonths: TimeMachineRegimeEntry[] = Array.from({ length: 15 }, (_unused, index) => {
+      const year = 2024 + Math.floor(index / 12);
+      const month = (index % 12) + 1;
+      return {
+        year,
+        month,
+        recordDate: `${year}-${String(month).padStart(2, "0")}-28`,
+        regime: "EXPANSION" as const,
+        summary: "",
+        tightness: 40,
+        riskAppetite: 60,
+      };
+    });
+    const longRecord = buildTrackRecord(fifteenMonths);
+    assert.ok(longRecord);
+    const text = renderToStaticMarkup(<TrackRecordTable record={longRecord} allMonthsOpen />)
+      .replace(/<!-- -->/g, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ");
+    const recentOldest = longRecord.rows[longRecord.rows.length - 1]!.recordDate;
+    assert.equal(recentOldest, "2024-04-28", "the recent table's oldest row");
+    assert.match(text, /Earlier months \(3\) · Jan 28, 2024 to Mar 28, 2024/);
+    assert.doesNotMatch(text, /Earlier months[^·]*· [^ ]+ \d+, \d{4} to Apr 28, 2024/, "the range reaches into the table above");
   });
 
   it("keeps the phase map's panel and caveat on the same fact", () => {
