@@ -145,6 +145,29 @@ describe("product canon: the list itself", () => {
     assert.doesNotMatch(html, /scale proven bets|guidance that month/i);
   });
 
+  /* 2026-10-07: each entry's conditions are the regime's stamp, coloured from
+     the data-regime tokens, and a strip above the list draws one square per
+     essay by year. Both read the timeline the entries print. */
+  it("stamps each reading in its regime's colour and draws every essay once in the year strip", async () => {
+    const { getTimeMachineRegimeSeries } = await import("../lib/timeMachine/timeMachineCache");
+    const timeline = buildCanonTimeline(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
+    const page = await import("../app/concepts/page");
+    const html = renderToStaticMarkup(page.default());
+    for (const entry of timeline) {
+      const start = html.indexOf(`id="${entry.slug}"`);
+      const item = html.slice(start, html.indexOf("</li>", start));
+      if (entry.reading.kind === "reading") {
+        assert.match(item, new RegExp(`data-regime="${entry.reading.regime}" class="weather-tag weather-tag-regime type-stamp">${entry.reading.conditions}<`), entry.slug);
+      } else {
+        assert.doesNotMatch(item, /weather-tag-regime/, `${entry.slug} has no conditions to stamp`);
+      }
+    }
+    const strip = /<figure[^>]*data-essay-year-strip[^>]*>([\s\S]*?)<\/figure>/.exec(html)?.[1] ?? "";
+    assert.ok(strip, "the strip renders");
+    assert.equal((strip.match(/<span[^>]*title="/g) ?? []).length, timeline.length, "one square per essay");
+    assert.doesNotMatch(strip.replace(/<[^>]+>/g, " "), /SCARCITY|DEFENSIVE|VOLATILE|EXPANSION/, "no engine keys in the key");
+  });
+
   /* Two ways into the rest of the site: each reading opens its year in the
      archive, and "this week" opens the published brief it compares against. */
   it("links readings to archive years that exist, and this week to its published brief", async () => {

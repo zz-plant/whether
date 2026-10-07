@@ -12,6 +12,9 @@ import { TrustStrip, type TrustStripProps } from "../trustStrip";
  * mission line, a trust action and a role switcher that it never read or that
  * no route ever passed, an inline "↓" link that always pointed at the block
  * directly beneath it, and a secondary button that always pointed at `/`.
+ *
+ * Below `sm` a route with a trust strip draws three lines: the status word
+ * (with the screenshot caption), the title, and the strip as one meta line.
  */
 export function CommandCenterNavBlock({
   pageTitle,
@@ -73,6 +76,19 @@ export function CommandCenterNavBlock({
   // printed "Updated " with nothing after it.
   const showStamp = Boolean(fetchedAtLabel) || Boolean(resolvedNextRefreshLabel);
   const showActions = Boolean(primaryCta) || showShare || Boolean(exportCta);
+  // A phone gets the week's word, the title and one meta line before the
+  // first task block (ui-ux-standards §XI). Until 2026-10-07 the intro on
+  // /operate, /signals and /trust was a 2×2 trust grid, a link, the refresh
+  // stamp and the caption, each on its own row: about 260px of a 932px
+  // screen restating what `/` had just shown. Below `sm` the refresh stamp
+  // drops (the record date is the date a phone reader needs; /trust lists
+  // each feed's time), the strip runs as one line, and the caption moves up
+  // beside the status word when that row is the word alone. Beside a
+  // "sources • as of" line (/resolve, /history) it would wrap under it, so
+  // there it stays at the foot of the block.
+  const captionBesideStatus = Boolean(statusLabel) && !introMetaRest;
+  const stampRowOnPhone = Boolean(resolvedNextRefreshLabel) || !captionBesideStatus;
+  const rightColumnOnPhone = stampRowOnPhone || showActions;
 
   return (
     <section
@@ -84,7 +100,10 @@ export function CommandCenterNavBlock({
           full-width box holding a max-w-3xl column, so ~40% of every report
           hero rendered empty — and the CTAs sat a title, a summary and a meta
           line below the fold-line they belong on. */}
-      <div className="space-y-2 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-10 lg:space-y-0">
+      {/* A flex gap rather than space-y: the right column is hidden on a phone
+          when nothing in it shows there, and a margin on the left column would
+          still have opened 8px under the meta line. */}
+      <div className="flex flex-col gap-2 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-10 lg:gap-y-0">
         <div className="min-w-0 space-y-1.5">
           {/* No kicker. "Weekly brief" above every H1 restated the route the
               header tab, the sidebar and the bottom bar already name, and it
@@ -95,17 +114,23 @@ export function CommandCenterNavBlock({
               prints in the regime ink at the reading's own size; the trust
               headline and the record date stay micro under it. */}
           {statusLabel ? (
-            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
-              {statusPrefix ? (
-                <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
-              ) : null}
-              {/* The week's word in the stamp's shape, the same placard the
-                  hero's tag and the sticky strip print. */}
-              <span className="type-stamp text-fluid-base text-[color:var(--regime-ink)]">{statusLabel}</span>
-              {introMetaRest ? (
-                <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
-              ) : null}
-            </p>
+            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
+                {statusPrefix ? (
+                  <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
+                ) : null}
+                {/* The week's word in the stamp's shape, the same placard the
+                    hero's tag and the sticky strip print. */}
+                <span className="type-stamp text-fluid-base text-[color:var(--regime-ink)]">{statusLabel}</span>
+                {introMetaRest ? (
+                  <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
+                ) : null}
+              </p>
+              {/* Phone: the caption shares the status word's row instead of
+                  taking one of its own at the foot of the block. From `sm` it
+                  sits in the stamp row, below. */}
+              {captionBesideStatus ? <ScreenshotCaption className="ml-auto sm:hidden" /> : null}
+            </div>
           ) : introMetaRest ? (
             <p className="text-fluid-xs font-medium leading-4 text-slate-400">{introMetaRest}</p>
           ) : null}
@@ -121,10 +146,10 @@ export function CommandCenterNavBlock({
           <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
             {pageSummary}
           </p>
-          {trustStrip ? <TrustStrip {...trustStrip} className="pt-2" /> : null}
+          {trustStrip ? <TrustStrip {...trustStrip} phoneLayout="line" className="sm:pt-2" /> : null}
         </div>
 
-        <div className="space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0">
+        <div className={`space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0 ${rightColumnOnPhone ? "" : "max-sm:hidden"}`.trim()}>
             {activeStep ? (
               /* Phone: hidden. The loop the glyph draws is the bottom bar's
                  row of tabs there, and under the intro it was a second
@@ -137,17 +162,20 @@ export function CommandCenterNavBlock({
             {/* The stamp row also carries the caption: the intro is the block a
                 phone screenshot of a report route catches, and a crop of it
                 should still say whose page it came from. It shares the row
-                rather than adding one, so the first task block does not move. */}
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right">
+                rather than adding one, so the first task block does not move.
+                On a phone with a status word the caption is beside it instead. */}
+            <div className={`flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right ${stampRowOnPhone ? "" : "max-sm:hidden"}`.trim()}>
                 {/* "Signals refreshed", not "Updated": two dates print inside
                     one viewport (this and "As of" above), and the reader has
                     to be able to tell the pipeline's fetch from the reading's
                     record date apart. */}
-                {fetchedAtLabel ? <span>Signals refreshed {fetchedAtLabel}</span> : null}
+                {fetchedAtLabel ? <span className="max-sm:hidden">Signals refreshed {fetchedAtLabel}</span> : null}
                 {resolvedNextRefreshLabel ? (
                   <span>{resolvedNextRefreshLabel}</span>
                 ) : null}
-                <ScreenshotCaption className={showStamp ? "ml-auto lg:ml-0" : undefined} />
+                <ScreenshotCaption
+                  className={`${showStamp ? "ml-auto lg:ml-0" : ""} ${captionBesideStatus ? "max-sm:hidden" : ""}`.trim() || undefined}
+                />
               </div>
 
             {showActions ? (

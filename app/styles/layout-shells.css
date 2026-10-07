@@ -467,6 +467,18 @@ html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba
   color: var(--app-text-secondary);
 }
 
+/* The four conditions as a stamp, in their own hue: wash, edge and ink come
+   from the data-regime tokens (ui-ux-standards §XVI), so a tag keyed to a
+   regime cannot drift from the hero's stamp or pick a hue at the call site.
+   The ink token is per theme, so there is no light override. Pair it with
+   `.type-stamp`, the regime word's face; the size is the metadata floor. */
+.weather-tag-regime {
+  border-color: color-mix(in srgb, var(--regime-accent) 40%, transparent);
+  background: color-mix(in srgb, var(--regime-accent) 14%, transparent);
+  color: var(--regime-ink);
+  font-size: var(--text-fluid-nano);
+}
+
 .weather-panel,
 .weather-panel-static,
 .weather-secondary-header,
