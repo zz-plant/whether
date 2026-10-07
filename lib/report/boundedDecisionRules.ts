@@ -483,26 +483,6 @@ export const startupVariantModes: Array<{ mode: StartupVariantMode; label: strin
   { mode: "bootstrapped", label: "Bootstrapped" },
 ];
 
-const MIN_BOUNDARY_GAP = 0.1;
-
-const describeBoundaryGap = ({
-  dimension,
-  gap,
-  whenNearBoundary,
-  whenAway,
-}: {
-  dimension: string;
-  gap: number;
-  whenNearBoundary: (dimension: string) => string;
-  whenAway: (formattedGap: string) => string;
-}) => {
-  if (!Number.isFinite(gap) || gap <= 0.05) {
-    return whenNearBoundary(dimension);
-  }
-
-  return whenAway(Math.max(MIN_BOUNDARY_GAP, gap).toFixed(1));
-};
-
 export const buildScopedVariantDecisionAdjustment = ({
   mode,
   thresholds,
@@ -514,8 +494,6 @@ export const buildScopedVariantDecisionAdjustment = ({
   runwayMonths?: number;
   runwayBand?: RunwayBand;
 }): ScopedVariantDecisionAdjustment => {
-  const riskGap = Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime);
-  const tightnessGap = Math.abs(scores.tightness - thresholds.tightnessRegime);
   const resolvedBand = resolveRunwayBand(runwayBand, runwayMonths);
   /*
    * The resume lines a stage's hold lifts on: the same two lines, with the same
@@ -524,7 +502,17 @@ export const buildScopedVariantDecisionAdjustment = ({
    * trigger clears", naming no line and no number, and Series B and Public named
    * "their resume lines" and "the line" without saying where either sat.
    */
-  const { tightnessResume, riskResume } = sharedDecisionLines(thresholds);
+  const { tightnessResume, riskResume, tightnessPause, riskPause } = sharedDecisionLines(thresholds);
+  /*
+   * The pause lines a stage watches, likewise the area rules' own. The stage
+   * lines read "tighten if funding pressure moves within 20.0 points of the
+   * line", where the 20.0 was today's distance from the change line, so the
+   * condition held the moment it was printed, and on a crossed week "moving
+   * within" it meant conditions easing. The first of these is the stage's
+   * "Pause if" (`applyStageToWeeklyCall`).
+   */
+  const tightnessPauseLine = describeRuleCondition(buildRuleCondition("tightness", ">", tightnessPause), "pause", scores);
+  const riskPauseLine = describeRuleCondition(buildRuleCondition("riskAppetite", "<", riskPause), "pause", scores);
   const tightnessResumeLine = describeRuleCondition(buildRuleCondition("tightness", "<", tightnessResume), "resume", scores);
   const riskResumeLine = describeRuleCondition(buildRuleCondition("riskAppetite", ">", riskResume), "resume", scores);
 
@@ -542,12 +530,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't make several permanent hires before one milestone lands.",
         ],
         watchAdjustments: [
-          describeBoundaryGap({
-            dimension: "tightness",
-            gap: tightnessGap,
-            whenNearBoundary: () => "Runway trigger: tighten now; funding pressure is already at the line where conditions change.",
-            whenAway: (formattedGap) => `Runway trigger: tighten if funding pressure moves within ${formattedGap} points of the line for 2 readings in a row.`,
-          }),
+          `Runway trigger: tighten if ${tightnessPauseLine} for 2 readings in a row.`,
         ],
         thresholdEmphasis: "Protect runway first; fund one proof of demand at a time rather than breadth.",
         reversalTriggerDiscipline: `Reverse the hold only after ${tightnessResumeLine} for two readings in a row and one shipped milestone shows traction.`,
@@ -566,12 +549,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't run two expansion programs at once; you won't know which one paid back.",
         ],
         watchAdjustments: [
-          describeBoundaryGap({
-            dimension: "risk appetite",
-            gap: riskGap,
-            whenNearBoundary: () => "Payback trigger: revisit the plan now; risk appetite is already at the line where conditions change.",
-            whenAway: (formattedGap) => `Payback trigger: revisit the plan if risk appetite moves within ${formattedGap} points of the line.`,
-          }),
+          `Payback trigger: revisit the plan if ${riskPauseLine}.`,
         ],
         thresholdEmphasis: "Payback first: fund the channels that convert repeatably and pay back inside 12 months.",
         reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion holds for two weekly reviews.`,
@@ -590,12 +568,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't add fixed cost on the assumption that valuations recover.",
         ],
         watchAdjustments: [
-          describeBoundaryGap({
-            dimension: "tightness",
-            gap: tightnessGap,
-            whenNearBoundary: () => "Leverage trigger: hold expansion now; funding pressure is already at the line where conditions change.",
-            whenAway: (formattedGap) => `Leverage trigger: hold expansion if funding pressure moves within ${formattedGap} points of the line.`,
-          }),
+          `Leverage trigger: hold expansion if ${tightnessPauseLine}.`,
         ],
         thresholdEmphasis: "Efficiency first: show the margin gain before adding headcount.",
         reversalTriggerDiscipline: `Reverse the hold only when, in the same week, ${tightnessResumeLine} and ${riskResumeLine}.`,
@@ -614,12 +587,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't grow revenue faster than support and margin can carry it.",
         ],
         watchAdjustments: [
-          describeBoundaryGap({
-            dimension: "risk appetite",
-            gap: riskGap,
-            whenNearBoundary: () => "Growth trigger: re-sequence expansion now; risk appetite is already at the line where conditions change.",
-            whenAway: (formattedGap) => `Growth trigger: re-sequence expansion if risk appetite moves within ${formattedGap} points of the line.`,
-          }),
+          `Growth trigger: re-sequence expansion if ${riskPauseLine}.`,
         ],
         thresholdEmphasis: "Prove customer acquisition cost payback, retention and support capacity before adding fixed cost.",
         reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion improves, both for two weekly readings.`,
@@ -638,12 +606,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't fund programs that only meet guidance if the market re-rates.",
         ],
         watchAdjustments: [
-          describeBoundaryGap({
-            dimension: "tightness",
-            gap: tightnessGap,
-            whenNearBoundary: () => "Guidance trigger: tighten discretionary spend now; funding pressure is already at the line where conditions change.",
-            whenAway: (formattedGap) => `Guidance trigger: tighten discretionary spend if funding pressure moves within ${formattedGap} points of the line.`,
-          }),
+          `Guidance trigger: tighten discretionary spend if ${tightnessPauseLine}.`,
         ],
         thresholdEmphasis: "Earnings durability first: cash conversion and hitting guidance before growth.",
         reversalTriggerDiscipline: `Reverse the hold only when ${tightnessResumeLine} and confidence in your earnings guidance improves with it.`,
@@ -662,12 +625,7 @@ export const buildScopedVariantDecisionAdjustment = ({
         "Don't start anything that needs outside money to finish.",
       ],
       watchAdjustments: [
-        describeBoundaryGap({
-          dimension: "a boundary",
-          gap: Math.min(riskGap, tightnessGap),
-          whenNearBoundary: () => "Cash trigger: tighten spend now; at least one score is already at the line where conditions change.",
-          whenAway: (formattedGap) => `Cash trigger: tighten spend if either score comes within ${formattedGap} points of its line.`,
-        }),
+        `Cash trigger: tighten spend if ${tightnessPauseLine} or ${riskPauseLine}.`,
       ],
       thresholdEmphasis: "Cash first: commitments you can reverse, over growth that looks good.",
       reversalTriggerDiscipline: `Reverse the hold only after ${tightnessResumeLine}, ${riskResumeLine}, and cash payback holds for two weekly readings in a row.`,

@@ -128,24 +128,21 @@ it("builds scoped variant adjustments with reversal discipline", () => {
 });
 
 
-it("avoids zero-distance watch copy at regime boundaries", () => {
-  const seedAdjustment = buildScopedVariantDecisionAdjustment({
-    mode: "seed",
-    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
-    scores: { tightness: 62.01, riskAppetite: 55 },
-  });
-
-  assert.match(seedAdjustment.watchAdjustments[0] ?? "", /already at the line where conditions change/i);
-  assert.doesNotMatch(seedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
-
-  const bootstrappedAdjustment = buildScopedVariantDecisionAdjustment({
-    mode: "bootstrapped",
-    thresholds: { tightnessRegime: 62, riskAppetiteRegime: 48 },
-    scores: { tightness: 62.02, riskAppetite: 48.01 },
-  });
-
-  assert.match(bootstrappedAdjustment.watchAdjustments[0] ?? "", /tighten spend now/i);
-  assert.doesNotMatch(bootstrappedAdjustment.watchAdjustments[0] ?? "", /0\.0 points/i);
+it("watches each stage's published pause line, never today's distance from the change line", () => {
+  /* The stage lines read "tighten if funding pressure moves within 20.0 points of the
+     line", with today's gap as the number: true the moment it printed. */
+  const freezing = { thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 }, scores: { tightness: 90, riskAppetite: 48 } };
+  const seed = buildScopedVariantDecisionAdjustment({ mode: "seed", ...freezing });
+  assert.equal(seed.watchAdjustments[0], "Runway trigger: tighten if funding pressure is above 76 (already true at 90) for 2 readings in a row.");
+  const seriesA = buildScopedVariantDecisionAdjustment({ mode: "series-a", ...freezing });
+  assert.equal(seriesA.watchAdjustments[0], "Payback trigger: revisit the plan if risk appetite falls below 44.");
+  const bootstrapped = buildScopedVariantDecisionAdjustment({ mode: "bootstrapped", ...freezing });
+  assert.match(bootstrapped.watchAdjustments[0] ?? "", /funding pressure is above 76 \(already true at 90\) or risk appetite falls below 44/);
+  for (const mode of ["seed", "series-a", "series-b", "growth", "public", "bootstrapped"] as const) {
+    const line = buildScopedVariantDecisionAdjustment({ mode, ...freezing }).watchAdjustments[0] ?? "";
+    assert.doesNotMatch(line, /moves within|comes within|points of (the|its) line/, mode);
+    assert.match(line, /\b(76|44)\b/, mode);
+  }
 });
 
 
