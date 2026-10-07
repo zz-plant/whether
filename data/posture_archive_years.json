@@ -2,7 +2,7 @@
   {
     "slug": "2025",
     "title": "2025",
-    "operatorLabel": "Sunny"
+    "operatorLabel": "Cloudy"
   },
   {
     "slug": "2024",
@@ -37,7 +37,7 @@
   {
     "slug": "2018",
     "title": "2018",
-    "operatorLabel": "Stormy"
+    "operatorLabel": "Sunny"
   },
   {
     "slug": "2017",
@@ -67,16 +67,6 @@
   {
     "slug": "2012",
     "title": "2012",
-    "operatorLabel": "Sunny"
-  },
-  {
-    "slug": "2011",
-    "title": "2011",
-    "operatorLabel": "Stormy"
-  },
-  {
-    "slug": "2010",
-    "title": "2010",
     "operatorLabel": "Sunny"
   }
 ]

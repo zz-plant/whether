@@ -13,6 +13,10 @@ import { getRegimePublicLabel } from "../lib/regimePresentation";
 import type { RegimeKey } from "../lib/regimeEngine";
 import type { PostureArchivePeriod, PostureArchiveRegimeShare } from "../lib/summary/postureArchiveTypes";
 import { extractCalibrationMonths } from "../lib/report/confidenceCalibration";
+import { getRegimeProfile } from "../lib/report/regimeDescription";
+import { buildCadenceSummarySentence } from "../lib/summary/cadenceSummaryBuilder";
+import { getQuarterlyActionGuidance } from "../lib/summary/quarterlySummary";
+import { getYearlyActionGuidance } from "../lib/summary/yearlySummary";
 import rawArchive from "../data/summary_archive.json";
 
 const OUTPUT_PATH = new URL("../data/posture_archive_index.json", import.meta.url);
@@ -101,6 +105,61 @@ const buildRates = (entry: SummaryArchiveEntry) =>
     sourceUrl: input.sourceUrl,
   }));
 
+/**
+ * The conditions a period page is headlined with: the ones that held for most
+ * of the readings its split is drawn from, and on a tie the one in force at
+ * the close.
+ *
+ * The label used to be the quarterly or yearly archive entry's, which is one
+ * reading on the period's last day from a different series than the split
+ * beside it. /history/2022-q3 was headlined Stormy over "9 of 14 weeks
+ * Freezing" and "Aug 5, 2022 Stormy → Freezing", because the quarterly entry for
+ * Sep 30 read Stormy while the weekly readings for the same day read Freezing;
+ * /history/2018 was Stormy, with "the job this year" written for Stormy, over 48
+ * Sunny weeks of 52. A period with no readings keeps its entry's label.
+ */
+const prevailingRegime = (samples: Sample[], fallback: RegimeKey): RegimeKey => {
+  const mix = buildRegimeMix(samples);
+  const most = mix[0]?.periods;
+  if (most === undefined) return fallback;
+  const tied = new Set(mix.filter((share) => share.periods === most).map((share) => share.regime));
+  return [...samples].reverse().find((sample) => tied.has(sample.regime))?.regime ?? fallback;
+};
+
+type PeriodText = Pick<PostureArchivePeriod, "headline" | "guidance" | "constraints">;
+type PeriodCadence = "quarterly" | "yearly";
+
+const textOf = (entry: SummaryArchiveEntry): PeriodText => ({
+  headline: normalizeModeWording(entry.summary.summary),
+  guidance: entry.summary.guidance,
+  constraints: entry.summary.constraints,
+});
+
+/**
+ * The words a period page prints for its headline conditions. Its own entry's
+ * when they are about those conditions; otherwise the archive's words for those
+ * conditions at the same cadence, from another period's entry; and where the
+ * archive never recorded them (no year closed Cloudy, but 2025 was mostly
+ * Cloudy), the sentence the summary builders would write today.
+ */
+const textForConditions = (
+  entry: SummaryArchiveEntry,
+  regime: RegimeKey,
+  cadence: PeriodCadence,
+  archived: ReadonlyMap<string, PeriodText>,
+): PeriodText => {
+  if (entry.summary.regime === regime) return textOf(entry);
+  const stored = archived.get(`${cadence}:${regime}`);
+  if (stored) return stored;
+  const profile = getRegimeProfile(regime);
+  const guidance = cadence === "yearly" ? getYearlyActionGuidance(regime) : getQuarterlyActionGuidance(regime);
+  return {
+    headline: buildCadenceSummarySentence(cadence, regime, profile.description, guidance),
+    guidance,
+    constraints: profile.constraints,
+  };
+};
+
 const buildPeriod = ({
   entry,
   slug,
@@ -109,6 +168,7 @@ const buildPeriod = ({
   quarter,
   samples,
   sampleCadence,
+  archivedText,
 }: {
   entry: SummaryArchiveEntry;
   slug: string;
@@ -117,33 +177,35 @@ const buildPeriod = ({
   quarter?: number;
   samples: Sample[];
   sampleCadence: "weekly" | "monthly" | null;
-}): PostureArchivePeriod => ({
-  slug,
-  kind,
-  year: entry.year,
-  quarter,
-  title,
-  asOf: entry.asOf,
-  recordDateLabel: entry.summary.recordDateLabel ?? formatDate(entry.asOf),
-  regime: entry.summary.regime,
-  regimeLabel: entry.summary.regimeLabel,
-  operatorLabel: getRegimePublicLabel(entry.summary.regime),
-  headline: normalizeModeWording(entry.summary.summary),
-  guidance: entry.summary.guidance,
-  constraints: entry.summary.constraints,
-  rates: buildRates(entry),
-  sourceLabel: entry.summary.provenance.sourceLabel,
-  sourceUrl: entry.summary.provenance.sourceUrl,
-  statusLabel: entry.summary.provenance.statusLabel,
-  sampleCadence,
-  sampleCount: samples.length,
-  regimeMix: samples.length ? buildRegimeMix(samples) : [],
-  transitions: samples.length ? buildTransitions(samples) : [],
-  children: [],
-  parentSlug: null,
-  previousSlug: null,
-  nextSlug: null,
-});
+  archivedText: ReadonlyMap<string, PeriodText>;
+}): PostureArchivePeriod => {
+  const regime = prevailingRegime(samples, entry.summary.regime);
+  return {
+    slug,
+    kind,
+    year: entry.year,
+    quarter,
+    title,
+    asOf: entry.asOf,
+    recordDateLabel: entry.summary.recordDateLabel ?? formatDate(entry.asOf),
+    regime,
+    regimeLabel: getRegimePublicLabel(regime),
+    operatorLabel: getRegimePublicLabel(regime),
+    ...textForConditions(entry, regime, kind === "year" ? "yearly" : "quarterly", archivedText),
+    rates: buildRates(entry),
+    sourceLabel: entry.summary.provenance.sourceLabel,
+    sourceUrl: entry.summary.provenance.sourceUrl,
+    statusLabel: entry.summary.provenance.statusLabel,
+    sampleCadence,
+    sampleCount: samples.length,
+    regimeMix: samples.length ? buildRegimeMix(samples) : [],
+    transitions: samples.length ? buildTransitions(samples) : [],
+    children: [],
+    parentSlug: null,
+    previousSlug: null,
+    nextSlug: null,
+  };
+};
 
 const generate = () => {
   const archive = getSummaryArchive();
@@ -152,12 +214,37 @@ const generate = () => {
     throw new Error("Summary archive is empty or failed validation; refusing to write an empty index.");
   }
 
+  /*
+   * The record starts at the first month-end reading (Jan 31, 2012), which is
+   * where /history and the month strip start it. The quarterly and yearly
+   * entries reach back to 2010, and each became a page — ten of them, with no
+   * readings behind them, listed beside "Record starts Jan 31, 2012" as closed
+   * years on the record. /history/2011 said "Conditions held at Stormy for the
+   * whole period" over its own Sunny Q1 and Q2. A period that closes before the
+   * record starts is left out of the index, so nothing lists or serves it.
+   */
+  const recordStart = archive
+    .filter((entry) => entry.cadence === "monthly" || entry.cadence === "weekly")
+    .map((entry) => entry.asOf)
+    .sort()[0];
+  if (!recordStart) {
+    throw new Error("Summary archive has no monthly or weekly readings; refusing to write an index with no record behind it.");
+  }
+  const onRecord = (entry: SummaryArchiveEntry) => entry.asOf >= recordStart;
+
   const yearEntries = archive.filter(
-    (entry): entry is Extract<SummaryArchiveEntry, { cadence: "yearly" }> => entry.cadence === "yearly",
+    (entry): entry is Extract<SummaryArchiveEntry, { cadence: "yearly" }> => entry.cadence === "yearly" && onRecord(entry),
   );
   const quarterEntries = archive.filter(
-    (entry): entry is Extract<SummaryArchiveEntry, { cadence: "quarterly" }> => entry.cadence === "quarterly",
+    (entry): entry is Extract<SummaryArchiveEntry, { cadence: "quarterly" }> => entry.cadence === "quarterly" && onRecord(entry),
   );
+
+  /* The archive's own words for each set of conditions at each cadence: one entry's, the first seen. */
+  const archivedText = new Map<string, PeriodText>();
+  for (const entry of [...yearEntries, ...quarterEntries]) {
+    const key = `${entry.cadence}:${entry.summary.regime}`;
+    if (!archivedText.has(key)) archivedText.set(key, textOf(entry));
+  }
 
   /** Weekly coverage starts in 2018; monthly in 2012. Use the finest series available per period. */
   const resolveSamples = (matches: (entry: SummaryArchiveEntry) => boolean) => {
@@ -179,6 +266,7 @@ const generate = () => {
       title: String(entry.year),
       samples,
       sampleCadence: cadence,
+      archivedText,
     });
   });
 
@@ -198,6 +286,7 @@ const generate = () => {
       quarter,
       samples,
       sampleCadence: cadence,
+      archivedText,
     });
 
     // Years without an annual summary (currently 2026) get no page, so those
