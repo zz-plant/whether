@@ -137,10 +137,14 @@ describe("/share current weekly artifact", () => {
     assert.match(html, /data-chat-preview/, "the page opens on the Slack post, drawn");
     assert.match(html, /<strong[^>]*>Whether Weekly Brief — [^<]+<\/strong>/, "the bold title is bold, not wrapped in asterisks");
     assert.match(html, /border-l-4/, "the quoted lines sit beside a bar");
-    assert.match(html, /<a href="https:\/\/[^"]+\/brief\/[^"]+"[^>]*>/, "the brief link is a link");
     // The exact text that copies is still on the page, behind the drawing.
     const raw = /<pre aria-label="Text of Slack post"[^>]*>([\s\S]*?)<\/pre>/.exec(html)?.[1] ?? "";
     assert.ok(raw.includes("*Whether Weekly Brief"), "the text keeps its markup");
+    /* Whichever page the post links, the frozen week or the live one: this fixture's
+       Jun 17 reading has no frozen week, and it cited a later one until 2026-10-07. */
+    const fullBrief = /Full brief: (https:\/\/\S+)/.exec(raw)?.[1];
+    assert.ok(fullBrief, "the post carries its full-brief link");
+    assert.ok(html.includes(`<a href="${fullBrief}"`), `the brief link is a link: ${fullBrief}`);
 
     // Decided per format: the chat formats draw; where the text is the artifact, it previews as text.
     const preview = (id: string) => {

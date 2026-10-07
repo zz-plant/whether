@@ -103,6 +103,13 @@ should run the weekly generator between the monthly and quarterly ones, verify w
 inside the window this section describes, and moved to Tuesday 02:13 UTC the same day; it now also
 checks that the month-end archive is current.
 
+**A freeze must not move a pinned test (2026-10-07).** The routine pushes through the pre-push gate,
+so any test that reads the newest frozen week fails its push and no freeze PR opens. The brief-format
+golden did: every paste's "Full brief" link cited the newest frozen week even for fixtures dated weeks
+before it (`selectCitablePermalinkBrief` let a negative age through), so appending w41 would have moved
+twenty-odd pinned strings. It now cites the newest week frozen at or before the reading. Before changing
+anything the freeze touches, append a week in a scratch copy (`bun run brief:freeze`) and run the suite.
+
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
 needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.
 Two more once the provider keys are set: `api.stlouisfed.org` (FRED API, `FRED_API_KEY`) and
