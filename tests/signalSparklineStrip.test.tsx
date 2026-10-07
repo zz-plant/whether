@@ -17,7 +17,6 @@ describe("SignalSparklineStrip", () => {
     {
       key: "tightness",
       label: "Funding pressure",
-      windowLabel: "12 mo",
       points: [
         { label: "Sep 2025", value: 90 },
         { label: "Feb 2026", value: 71 },
@@ -54,10 +53,27 @@ describe("SignalSparklineStrip", () => {
     assert.ok(!html.includes("Aug 2026"));
   });
 
+  /*
+   * The page passed twelve month-ends with a window label of "12 mo", so a move
+   * from the first to the last point — eleven months, Sep 2025 to Aug 2026 —
+   * printed as "-6 over 12 mo". The window's length is the gaps between its
+   * points, and the strip takes it from the points rather than from a label.
+   */
+  it("labels the move with the months it spans, not the points it draws", () => {
+    const text = renderToStaticMarkup(<SignalSparklineStrip series={series} />)
+      .replace(/<!-- -->/g, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ");
+
+    assert.match(text, /-27 over 2 mo/);
+    assert.match(text, /2 mo · /);
+    assert.doesNotMatch(text, /3 mo/, "three points span two months");
+  });
+
   it("renders nothing for a series too short to draw", () => {
     const html = renderToStaticMarkup(
       <SignalSparklineStrip
-        series={[{ key: "tightness", label: "Funding pressure", windowLabel: "12 mo", points: [{ label: "Aug 2026", value: 63 }] }]}
+        series={[{ key: "tightness", label: "Funding pressure", points: [{ label: "Aug 2026", value: 63 }] }]}
       />,
     );
 

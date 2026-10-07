@@ -177,8 +177,8 @@ export const SignalsInstrumentsSection = ({
     series: yieldCurveSeries,
   });
   const scoreSeries = [
-    { key: "tightness", label: regimeSignalLabel.tightness, points: tightnessTrend, windowLabel: `${tightnessTrend.length} mo` },
-    { key: "riskAppetite", label: regimeSignalLabel.riskAppetite, points: riskAppetiteTrend, increaseIsPositive: true, windowLabel: `${riskAppetiteTrend.length} mo` },
+    { key: "tightness", label: regimeSignalLabel.tightness, points: tightnessTrend },
+    { key: "riskAppetite", label: regimeSignalLabel.riskAppetite, points: riskAppetiteTrend, increaseIsPositive: true },
   ];
   const trendsAnswer = describeScoreTrendSummary(scoreSeries);
   const pastMonthsAnswer = regimeSeries.length > 0 ? describeConditionChanges(summarizeConditionRuns(regimeSeries)) : null;
