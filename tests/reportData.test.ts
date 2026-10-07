@@ -100,6 +100,23 @@ describe("buildReportDynamics", () => {
     assert.equal(dynamics.directionLabel, "mixed");
   });
 
+  /* Aug 31 → Oct 5 2026: both scores worse, the recession warning gauge up
+     0.06. Counting the gauge — an input to risk appetite — as a vote beside
+     the scores read "mixed", and /api/posture/current said "vs Aug 31: mixed". */
+  it("takes the direction from the scores when either moved, not from their inputs", () => {
+    const previous = makeAssessment({ tightness: 63, riskAppetite: 56, baseRate: 4.0, curveSlope: 0.5, regime: "EXPANSION" });
+    const current = makeAssessment({ tightness: 90, riskAppetite: 48, baseRate: 4.2, curveSlope: 0.56, regime: "SCARCITY" });
+
+    assert.equal(buildReportDynamics({ current, previous }).directionLabel, "deteriorating");
+  });
+
+  it("lets the inputs decide a week the scores held", () => {
+    const previous = makeAssessment({ tightness: 70, riskAppetite: 45, baseRate: 4.0, curveSlope: 0.5 });
+    const current = makeAssessment({ tightness: 70, riskAppetite: 45, baseRate: 3.9, curveSlope: 0.6 });
+
+    assert.equal(buildReportDynamics({ current, previous }).directionLabel, "improving");
+  });
+
   it("orders changed signals by largest absolute movement", () => {
     const previous = makeAssessment({ tightness: 50, riskAppetite: 50, baseRate: 4, curveSlope: 0.1 });
     const current = makeAssessment({ tightness: 50.2, riskAppetite: 60, baseRate: 4.5, curveSlope: 0.15 });

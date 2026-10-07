@@ -407,8 +407,19 @@ export const buildReportDynamics = ({
 
   const sortedChanges = changes.sort((a, b) => Math.abs(b.delta) - Math.abs(a.delta));
 
-  const improvingMoves = sortedChanges.filter((item) => isImprovingSignalDelta(item.key, item.delta)).length;
-  const deterioratingMoves = sortedChanges.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length;
+  /*
+   * The direction is the scores' when either score moved. The base rate and the
+   * curve slope are what the two scores are built from, and counting them as
+   * votes beside the scores let an input outvote its own output: Oct 5 against
+   * Aug 31 read "mixed" — funding pressure up 27 and risk appetite down 8, both
+   * worse, beside a recession warning gauge up 0.06 — and /api/posture/current
+   * told readers "vs Aug 31: mixed". The inputs still decide a week the scores
+   * held.
+   */
+  const scoreChanges = sortedChanges.filter((item) => item.key === "tightness" || item.key === "riskAppetite");
+  const directionVotes = scoreChanges.length > 0 ? scoreChanges : sortedChanges;
+  const improvingMoves = directionVotes.filter((item) => isImprovingSignalDelta(item.key, item.delta)).length;
+  const deterioratingMoves = directionVotes.filter((item) => !isImprovingSignalDelta(item.key, item.delta)).length;
   const directionLabel: ReportDynamics["directionLabel"] =
     sortedChanges.length === 0
       ? "stable"
