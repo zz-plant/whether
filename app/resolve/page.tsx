@@ -200,7 +200,7 @@ export default async function DecidePage({
             );
           })}
         </ul>
-        {/* Two references the answers lean on, as links under the list they
+        {/* Two references the answers lean on, linked under the list they
             serve. They were two chip-boxed buttons floating between the list
             and the browse disclosure, belonging to neither. */}
         <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5">
