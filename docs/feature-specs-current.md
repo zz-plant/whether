@@ -492,10 +492,11 @@ macros)`, `weeklyOperatorBrief` takes an operating-snapshot payload, `meetingSli
 `MeetingSlidePayload`, and `briefArtifact` takes the presentation model. Four Slack builders, two
 citation builders, three board/slide builders.
 
-**Only the presentation half was unified, deliberately.** `buildSlackBrief` feeds
-`scripts/generateWeeklySlackBrief.ts`, and `buildCallCitation` feeds `weeklyBriefSnapshot` — both
-write into the published, citable archive, which is append-only. Changing their output is a
-product decision about published records, not a refactor, so they are pinned where they are. What
+**Only the presentation half was unified, deliberately.** `buildSlackBrief` feeds the Monday
+Slack post (`lib/slack/deliverSlackBrief.ts`), and `buildCallCitation` feeds `weeklyBriefSnapshot` —
+both publish text that cannot be quietly changed afterwards: a sent post, a cited call. Changing
+their output is a product decision about published records, not a refactor, so they are pinned
+where they are. What
 merged is the part with no such constraint:
 
 - The share panel's "Slide" format and `CopyMeetingSlideButton` were emitting two different

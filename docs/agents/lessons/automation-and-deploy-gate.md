@@ -7,15 +7,32 @@ Moved out of `CLAUDE.md`. Read when a routine, the brief freeze, a send path, or
 The recurring data jobs run as scheduled Claude Code routines, not GitHub Actions. Each one runs
 the same scripts the old workflow did, opens a PR, and never merges it.
 
-| Routine | Cadence (UTC) | Produces |
-| --- | --- | --- |
-| Whether — regime history refresh | Mon 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
-| Whether — weekly brief refresh & freeze | Mon 13:00 | `docs/briefs/latest-weekly-slack-brief.md`, `artifacts/weekly-slack-brief.txt`, and current week appended to `data/published_briefs.json` |
+| Routine | ID | Cadence (UTC) | Produces |
+| --- | --- | --- | --- |
+| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Mon 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
+| Whether — weekly brief freeze | `trig_01WrbhhT73Ve4bsFK83UNyu9` | Thu 13:00 | current week appended to `data/published_briefs.json` |
 
-Since 2026-09-14 the freeze also runs as a Cloudflare Workflow (`worker/workflows/weeklyBriefFreeze.ts`),
-started by the Worker's Monday cron where `WHETHER_BRIEF_FREEZE_WORKFLOW=1` (the preview lane, for
-now). It runs inside Cloudflare, where FRED is reachable, so the egress allowlist below is not in
-its way; it shares the record builder with `brief:freeze` and opens the same
+A third, "Whether — weekly Slack brief refresh" (`trig_017b1YkXqvsje8pseMXcUftp`, Mon 13:00),
+regenerated `docs/briefs/latest-weekly-slack-brief.md`. That file was deleted on 2026-10-06. Nothing
+in `app/`, `lib/` or `worker/` read it, and `/share`, `GET /api/brief/slack` and the Monday post all
+build the same text from the live read, so the committed copy could only ever be the older one —
+and it was: refreshed once in seven weeks, it still said 2026-09-14 while the archive held w40.
+`bun run brief:weekly:artifact` still writes `artifacts/weekly-slack-brief.txt` (gitignored) for the
+Jev brief audit. The script no longer takes `--format markdown`, so that routine, if it fires again,
+fails at its third step instead of re-adding the file.
+
+Since 2026-09-14 the freeze can also run as a Cloudflare Workflow
+(`worker/workflows/weeklyBriefFreeze.ts`), started by the Worker's Monday cron where
+`WHETHER_BRIEF_FREEZE_WORKFLOW=1`. **It has never run.** The flag is set only under
+`[env.preview]`, no `whether-preview` Worker has ever been deployed (`wrangler versions list --env
+preview` fails on the missing script), and `wrangler workflows instances list
+whether-weekly-brief-freeze` returned no instances on 2026-10-06. Every week in the archive came from
+the Thursday routine. The commits say which writer it was: the Workflow's would read `chore: freeze
+the <slug> brief`, while the routine's read `chore: freeze weekly brief to its permanent dated URL`
+and carry a `Claude-Session` trailer.
+
+Once switched on, it runs inside Cloudflare, where FRED is reachable, so the egress allowlist below
+is not in its way; it shares the record builder with `brief:freeze` and opens the same
 `automation/weekly-brief-freeze-<slug>` branch, so it and the routine cannot both freeze a week
 differently. Details: `docs/cloudflare-deployment-runbook.md` ("Trial infrastructure").
 
@@ -55,6 +72,18 @@ Manage them at <https://claude.ai/code/routines>. When an expected PR does not a
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
 same from the repo. Every one of these jobs previously failed at its PR step while reporting green,
 so the routines are told to end a run with `FAILED` rather than claim success without a PR.
+
+**A Monday routine runs at the end of the account's usage week (2026-10-06).** The seven-day usage
+cap resets Tuesday 01:00 UTC, so a routine fired Monday at 12:00 or 13:00 UTC competes with
+everything the account did that week. The Slack brief refresh fired seven Mondays from 2026-08-24:
+six were rejected by the cap before the model took a turn, one correctly refused fallback data while
+FRED was still blocked, and the one refresh that reached `main` came from a person typing "Try again"
+the next evening. The regime history refresh was rejected the same way on 2026-09-21, 09-28 and
+10-05. The Thursday freeze has never hit the cap. A rejected run never reaches the prompt's `FAILED`
+instruction: it ends on "You've hit your weekly limit", and the `USAGE_LIMIT_REACHED` status lives
+only in the routine's run log (`RemoteTrigger` `list_runs` / `get_run_log`, or the routines page),
+so the repo saw what looked like quiet weeks. Schedule a routine early in the usage week, and read
+the run log before the code when its pull request does not appear.
 
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
 needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.
@@ -119,7 +148,8 @@ cannot be corrected after it lands, and a channel told nothing on Monday can ask
 handed a stale reading under this week's heading cannot tell.
 
 `data/published_briefs.json` held a single week for as long as the routine could not complete a good
-run; the Workflow froze `2026-w38` on 2026-09-17, so it holds two and fills forward from there.
+run. Its first good run froze `2026-w38` on 2026-09-17 — the three Thursdays before it refused
+fallback data while FRED was blocked — and w39 and w40 followed, so it fills forward from there.
 That archive is **not backfilled**, deliberately. Its value is that it is evidence the call was
 published every week; writing retroactive `publishedAt` stamps for weeks that were never published
 would fabricate exactly the cadence it exists to prove, and `/history` now shows those numbers to
