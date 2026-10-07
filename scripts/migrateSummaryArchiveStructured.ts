@@ -81,7 +81,6 @@ const run = async () => {
             regimeLabel: getRegimePublicLabel(normalizedEntry.summary?.regime ?? "VOLATILE"),
             guidance: normalizedEntry.summary?.guidance ?? "keep monthly commitments inside reversible, bounded operating rules",
             confidence: normalizedEntry.summary?.confidence ?? "MEDIUM",
-            intensity: normalizedEntry.summary?.intensity ?? "STANDARD",
             transitionWatch: normalizedEntry.summary?.transitionWatch ?? false,
             constraints: normalizedEntry.summary?.constraints ?? [],
             provenance: normalizedEntry.summary?.provenance ?? {

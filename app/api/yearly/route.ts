@@ -14,6 +14,7 @@ export async function GET() {
         provenance: treasuryProvenance,
         recordDateLabel,
         periodLabel,
+        record: treasury,
       });
     },
   });

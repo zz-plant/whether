@@ -207,7 +207,8 @@ describe("delivering plan-line alerts", () => {
       regime: "VOLATILE",
       tightness: 74,
       riskAppetite: 50,
-      posture: "Hold irreversible moves.",
+      actionNow: "Hold irreversible moves.",
+      callChangesIf: "Risk appetite rises 1 pt to clear 50 (50 today).",
       recordDate: "2026-09-29",
       previousScores: { tightness: 70, riskAppetite: 50 },
     };
@@ -231,7 +232,8 @@ describe("delivering plan-line alerts", () => {
         regime: "DEFENSIVE",
         tightness: 74,
         riskAppetite: 50,
-        posture: "Hold irreversible moves.",
+        actionNow: "Hold irreversible moves.",
+        callChangesIf: "Funding pressure falls 4 pts to 70 or below (74 today).",
         recordDate: "2026-09-29",
         previousScores: { tightness: 70, riskAppetite: 50 },
       });
@@ -257,7 +259,7 @@ describe("published-line alerts", () => {
 
     // 63 → 90 passes 66, 70 and 76: one letter, about the pause line.
     const decisions = evaluateAlert(
-      { regime: "SCARCITY", tightness: 90, riskAppetite: 56, posture: "", recordDate: "2026-09-29" },
+      { regime: "SCARCITY", tightness: 90, riskAppetite: 56, actionNow: "", callChangesIf: "", recordDate: "2026-09-29" },
       { regime: "SCARCITY", tightness: 63, riskAppetite: 56, lastSentAt: "2026-01-01T00:00:00.000Z" },
     ).filter((decision) => decision.type === "threshold");
     assert.equal(decisions.length, 1);
@@ -266,7 +268,7 @@ describe("published-line alerts", () => {
 
     // 75 is no longer a line: a move from 74 to 75.5 says nothing.
     const quiet = evaluateAlert(
-      { regime: "SCARCITY", tightness: 75.5, riskAppetite: 56, posture: "", recordDate: "2026-09-29" },
+      { regime: "SCARCITY", tightness: 75.5, riskAppetite: 56, actionNow: "", callChangesIf: "", recordDate: "2026-09-29" },
       { regime: "SCARCITY", tightness: 74, riskAppetite: 56, lastSentAt: "2026-01-01T00:00:00.000Z" },
     ).filter((decision) => decision.type === "threshold");
     assert.deepEqual(quiet, []);

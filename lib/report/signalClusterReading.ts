@@ -59,7 +59,7 @@ export type SignalClusterReading = {
   /** How to read the scale, in words. */
   scaleNote: string;
   threshold: { value: number; label: string };
-  /** Week-over-week move. Null when there is no prior reading to compare. */
+  /** The move since the comparison reading (the last month-end snapshot, named in `directionLabel`). Null when there is no prior reading to compare. */
   delta: number | null;
   /** Which direction is the comfortable one, for colouring the move. */
   betterWhen: "higher" | "lower";
@@ -171,7 +171,7 @@ export const describeSignalDirection = (
  * a risk-appetite reading of 52 — a number two points *above* it. "Short of"
  * carries a judgement ("not yet reached") that only holds for one of the two
  * directions, and reads as plainly false for the other. Above and below are true
- * for both; the colour on the week-over-week row carries the judgement.
+ * for both; the colour on the movement row carries the judgement.
  *
  * `unit` carries its own leading space (" points", " percentage points"), so the
  * distance line reads as prose while the headline figure above it stays compact.

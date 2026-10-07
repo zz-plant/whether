@@ -3,6 +3,7 @@
  * Mirrors monthly summary structure with year-specific framing.
  */
 import type { RegimeAssessment } from "../regimeEngine";
+import type { ConfidenceRecord } from "../report/confidence";
 import {
   buildCadenceSummary,
   type CadenceSummaryProvenance,
@@ -43,11 +44,14 @@ export const buildYearlySummary = ({
   provenance,
   recordDateLabel,
   periodLabel,
+  record,
 }: {
   assessment: RegimeAssessment;
   provenance: YearlySummaryProvenance;
   recordDateLabel?: string;
   periodLabel?: string;
+  /** The record the reading came from, so a stale fallback lowers the stamp's confidence. */
+  record?: ConfidenceRecord | null;
 }): YearlySummary =>
   buildCadenceSummary({
     cadence: "yearly",
@@ -56,6 +60,7 @@ export const buildYearlySummary = ({
     provenance,
     recordDateLabel,
     periodLabel,
+    record,
   });
 
 export const getYearLabel = formatYearLabel;

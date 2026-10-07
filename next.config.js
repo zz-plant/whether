@@ -117,6 +117,13 @@ export const iaConsolidationRedirectPairs = [
   // History surfaces consolidated into /history
   ["/archive", "/history"],
   ["/regime-changes", "/history"],
+  // The 2010 and 2011 period pages predated the record's first month-end
+  // (Jan 31, 2012) and printed readings as if they were on it. They are no
+  // longer generated (2026-10-07); a link to one lands on the record instead.
+  ...["2010", "2011"].flatMap((year) => [
+    [`/history/${year}`, "/history"],
+    ...["q1", "q2", "q3", "q4"].map((quarter) => [`/history/${year}-${quarter}`, "/history"]),
+  ]),
   // Redirect stubs — kept as permanent redirects for external links
   ["/current-regime", "/"],
   ["/this-week", "/"],

@@ -118,8 +118,11 @@ describe("archive cards", () => {
     assert.doesNotMatch(text, /A closed period/);
   });
 
-  it("keep the fixed panel for a period with no readings behind it", async () => {
-    const text = (await cardFor(await ogImageOf(periodMetadata({ params: Promise.resolve({ period: "2010" }) })))).text.join(" ");
+  /* The fixture was /history/2010, a page with no readings behind it. The ten
+     2010–2011 periods predated the record and left the index, so the fixed
+     panel is reached only by a card that carries no panel of its own. */
+  it("keep the fixed panel for a card with no record of its own", async () => {
+    const text = (await card("template=record&eyebrow=History&title=T")).text.join(" ");
     assert.match(text, /A closed period/);
   });
 });

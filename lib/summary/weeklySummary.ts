@@ -7,7 +7,12 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import { joinSentences } from "../report/reportFormatting";
 import { renderWeeklySummaryCopy } from "./summaryCopyRenderer";
 import type { ConfidenceRecord } from "../report/confidence";
-import { formatConfidenceSentence, resolveSummaryConfidence, type SummaryConfidence } from "./summaryFormatting";
+import {
+  formatConditionsChangeLine,
+  formatConfidenceSentence,
+  resolveSummaryConfidence,
+  type SummaryConfidence,
+} from "./summaryFormatting";
 
 import type { SummaryProvenance, WeeklyStructured } from "./summaryTypes";
 
@@ -24,6 +29,7 @@ export type WeeklySummary = {
   /** The published confidence (`resolveSummaryConfidence`), not the engine's confirmation gate. */
   confidence: SummaryConfidence;
   transitionWatch: boolean;
+  /** The engine's band for how far the nearer score sits from its line, in raw points. Not a speed of movement. */
   intensity: RegimeAssessment["diagnostics"]["intensity"];
   constraints: string[];
   recordDateLabel: string | null;
@@ -268,7 +274,8 @@ export const buildWeeklySummary = ({
   const summary = joinSentences(
     `${stagedRegimeLabel}: ${assessment.description}`,
     `The priority this week is to ${guidance}`,
-    formatConfidenceSentence(confidence, assessment.diagnostics.intensity),
+    formatConfidenceSentence(confidence),
+    formatConditionsChangeLine(assessment),
     transitionCue,
     shockCue,
     refusalCue,
@@ -286,6 +293,7 @@ export const buildWeeklySummary = ({
     title,
     summary,
     recordDateLabel,
+    confidence,
     provenance,
     structured,
   });

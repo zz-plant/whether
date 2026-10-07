@@ -51,12 +51,13 @@ const assertCadenceCopy = ({
     "Execution constraints:",
     ...assessment.constraints.map((item) => `• ${item}`),
     "",
-    "Source:",
+    // No bare "Source:" heading above the source line (the paste read "Source:\nSource: …"),
+    // and the stamp carries the published confidence word, not the data tier ("Live").
     `Source: ${provenance.sourceLabel} (${provenance.sourceUrl})`,
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,
     "",
-    `Source: ${provenance.sourceLabel} (${provenance.sourceUrl}) · ${provenance.timestampLabel} · Confidence: Live`,
+    `Source: ${provenance.sourceLabel} (${provenance.sourceUrl}) · ${provenance.timestampLabel} · Confidence: High`,
   ].join("\n");
 
   assert.equal(summary.copy, expectedCopy);

@@ -10,6 +10,7 @@ import { joinSentences } from "../report/reportFormatting";
 import { renderMonthlySummaryCopy } from "./summaryCopyRenderer";
 import type { ConfidenceRecord } from "../report/confidence";
 import {
+  formatConditionsChangeLine,
   formatConfidenceSentence,
   formatSourceLine,
   resolveSummaryConfidence,
@@ -30,6 +31,7 @@ export type MonthlySummary = {
   /** The published confidence (`resolveSummaryConfidence`), not the engine's confirmation gate. */
   confidence: SummaryConfidence;
   transitionWatch: boolean;
+  /** The engine's band for how far the nearer score sits from its line, in raw points. Not a speed of movement. */
   intensity: RegimeAssessment["diagnostics"]["intensity"];
   constraints: string[];
   recordDateLabel: string | null;
@@ -101,31 +103,55 @@ const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyStructur
   ];
 };
 
+/**
+ * What re-opens paused work this month: the resume lines of the month's own
+ * operating rules, off the same bands (`buildHorizonThresholdBands`), so the
+ * reversal and the rules above it quote one set of numbers.
+ *
+ * The bullet used to read "Restart paused work once the next reading confirms
+ * conditions held". In Freezing, conditions holding means still Freezing, which
+ * is why the work is paused, so it told the reader to restart while frozen. The
+ * resume lines are what lifts a pause, in every regime.
+ */
+const getMonthlyRestartLine = (assessment: RegimeAssessment) => {
+  const { tightnessResume, riskResume } = buildHorizonThresholdBands(assessment);
+
+  if (assessment.regime === "VOLATILE") {
+    return `Reopen paused experiments when risk appetite is above ${formatThresholdNumber(riskResume)}, and paused fixed-cost approvals when funding pressure falls below ${formatThresholdNumber(tightnessResume)}.`;
+  }
+
+  return `Restart paused work when funding pressure is below ${formatThresholdNumber(tightnessResume)} and risk appetite is above ${formatThresholdNumber(riskResume)}.`;
+};
+
+/** An archived month carries no scores, so its restart line has no numbers to quote. */
+const RESTART_LINE_WITHOUT_SCORES = "Restart paused work only once the resume lines in the operating rules hold.";
+
 export const buildMonthlyStructured = ({
   regimeLabel,
   guidance,
   confidence,
-  intensity,
   transitionWatch,
   constraints,
   provenance,
   operatingRules = [],
+  restartWhen = RESTART_LINE_WITHOUT_SCORES,
 }: {
   regimeLabel: string;
   guidance: string;
   confidence: SummaryConfidence;
-  intensity: RegimeAssessment["diagnostics"]["intensity"];
   transitionWatch: boolean;
   constraints: string[];
   provenance: MonthlySummaryProvenance;
   operatingRules?: MonthlyStructured["operatingRules"];
+  /** The resume lines that re-open paused work (`getMonthlyRestartLine`). */
+  restartWhen?: string;
 }): MonthlyStructured => {
   // The guidance sentence is stated once, in the planning language, which is the
   // line meant to be pasted. It used to be repeated verbatim in the posture
   // summary, the next actions, and the operating rule as well — five copies of
   // one sentence on a single card, which reads as generated because it was.
   const postureSummary = [
-    formatConfidenceSentence(confidence, intensity),
+    formatConfidenceSentence(confidence),
     transitionWatch
       ? "Conditions are close to a boundary, so keep reversals cheap."
       : "Conditions are clear of their boundaries.",
@@ -138,7 +164,7 @@ export const buildMonthlyStructured = ({
   ];
   const reversalConditions = [
     transitionWatch
-      ? "Restart paused work once the next reading confirms conditions held."
+      ? restartWhen
       : "Re-check the plan if conditions or the confidence behind them weaken.",
     "Re-check the plan as soon as any execution constraint starts to bind.",
   ];
@@ -191,7 +217,8 @@ export const buildMonthlySummary = ({
   const summary = joinSentences(
     `${regimeLabel}: ${assessment.description}`,
     `The priority this month is to ${guidance}`,
-    formatConfidenceSentence(confidence, assessment.diagnostics.intensity),
+    formatConfidenceSentence(confidence),
+    formatConditionsChangeLine(assessment),
     transitionCue,
     shockCue,
   );
@@ -202,15 +229,16 @@ export const buildMonthlySummary = ({
     regimeLabel,
     guidance,
     confidence,
-    intensity: assessment.diagnostics.intensity,
     transitionWatch: assessment.diagnostics.transitionWatch,
     constraints: assessment.constraints,
     provenance,
     operatingRules,
+    restartWhen: getMonthlyRestartLine(assessment),
   });
   const copy = renderMonthlySummaryCopy({
     title,
     summary,
+    confidence,
     provenance,
     structured,
   });

@@ -2230,6 +2230,68 @@ contradicted another surface, or the reading itself.
 
 `tests/fixtures/briefFormats.golden.json` was regenerated in the commits that moved these strings.
 
+### 1.1.50 The rest of the sweep: evidence cards, summaries, embed and alerts, replayed months (2026-10-07)
+
+The read in §1.1.49 went on to the other surfaces that assemble sentences from a reading.
+
+- **Evidence cards** (`/signals/<watch>/<decision>`, `/api/cli/diagnostics`, newly frozen briefs).
+  Each signal's label describes how far that signal sits from its own line, with the bands the
+  published confidence uses (`resolveLineDistanceLabel`, `lib/report/confidence.ts`); it described
+  the size of the week's move, so a score 2 points from its line read "well clear". Direction says
+  whether the move made conditions tighter or easier for that signal (`isImprovingSignalDelta`), so
+  falling risk appetite is "Tightening" and a rising recession warning gauge "Easing"; funding
+  pressure is titled "Funding pressure", not "Capital conditions". The gauge's line repeats the
+  Spending rule's 6-month payback bar (`SPENDING_PAYBACK_BAR_MONTHS`) instead of setting its own 12-
+  or 9-month cap beside conditions the reading contradicted.
+- **Cadence summaries** (`/api/weekly`, `/api/monthly`, `/api/quarterly`, `/api/yearly`,
+  `/api/summary-delta`, `/api/cadence`, the agent interface, the RSS live item, `/api/scores`). Dated
+  by the reading's record date, never the week-ending Friday, which printed "Updated Oct 9" on Oct
+  7. Each states the published confidence word and then "Conditions change if:" with the canonical
+  sentence; "the signals behind it are barely moving" is gone, because the number behind it was a
+  distance, not a speed. The weekly paste's confidence line is the published word, not the data
+  tier, and it no longer lists the engine's governance settings as raw keys. The monthly reversal
+  names the resume lines that re-open paused work. `/api/summary-delta` says "Conditions held at …"
+  and reads an age label's unit, where "6m." became six hours.
+- **Embed and alerts.** The embed's "Watch" line was Hiring's resume condition; it prints the
+  weekly call's "Conditions change if" (and a calibrated stage's "Resume when"), the published
+  confidence word in place of "MED", the record date, and one do-now item per line. The
+  regime-change email prints the do-now line under "Action now" (it carried the regime's
+  description) and the brief's change line (it said "the readings return to the previous
+  conditions", the wrong way out). The decision deltas behind `/api/regime-alerts` and the digest
+  fire on each area's published pause and resume lines, not the change lines. Threshold alerts print
+  whole points; the weekly email says "1 point". The week's direction is judged on the two scores
+  whenever either moved, so `/api/posture/current` reads "Since Aug 31: worse." where the gauge's
+  0.06 rise had made a 27-point tightening "mixed".
+- **Replayed months** (`/history/compare`, every `?month=&year=` read). The loader returns the macro
+  series as of the selected month-end (`assessmentMacroSeries`) and null where a series' history
+  does not reach; the compare page printed today's credit premium, inflation and unemployment under
+  March 2020 and called the difference 0.00%. A missing value says "Not on record for this month".
+  Each period column lists the five areas against that period's published pause lines, replacing
+  hiring, expansion and fundraising "windows" graded on cutoffs no rule publishes ("Expansion pace:
+  Open" under Freezing). A replayed month's caption is its move against the earlier month-end, not
+  "This week's guidance …", and a held week's "Pause if" reads as a condition: "The decision can't
+  be undone while the guidance is held."
+- **Charts that draw the month-end archive** (`/signals`, `/history`). Rate moves are "Biggest
+  monthly rate moves", dated by month in whole basis points; the weekly cadence option, which redrew
+  month-end points under day labels, is gone. The recession warning gauge ribbon draws 10Y−2Y (it
+  drew an unnamed blend, so it read 0.42 beside the row's 0.41pp) and every spread on `/signals` is
+  in pp. A "12-month" change is measured across 13 month-ends, where 12 points spanned 11 months
+  (risk appetite "fell 6" was a fall of 10). "Earlier months" names its own range; the phase map's
+  count is "Months under each set of conditions" and says how many plotted months sit in another
+  quadrant. Cluster and answer pages name the reading they compare against ("since Aug 31", not
+  "Week over week" or "last week") and take their direction word from the two scores.
+- **Frozen records and archive periods.** `/brief/[week]` shows its stored record through one
+  translation layer (`publishedBriefDisplay`) that the page, the feed and both copy formats read;
+  the records are not rewritten. Each move names the reading it is measured against — the record's
+  stored `scores.comparedWith`, or the frozen week before it — where w40 printed "+27.0 vs prior
+  week" against an Aug 31 reading five weeks earlier; future records store the comparison. Retired
+  names and phrasing ("cash availability", "flips this call", "70.0") are restated in today's words,
+  and a stored "Pause if" with no number is left out. `/history/[period]` pages are headlined with
+  the conditions most of the period's readings held (a tie goes to the close), where 2022-Q3 read
+  "Stormy" over a split that was 9 of 14 weeks Freezing; "held for the whole period" prints only
+  when it is true. Periods ending before the record's first month-end are not generated, and their
+  URLs redirect to `/history` (`next.config.js`).
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

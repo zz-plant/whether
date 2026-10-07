@@ -123,6 +123,33 @@ export const findSignalDelta = (dynamics: SignalDeltaSource, key: RegimeSignalKe
   );
 };
 
+/**
+ * Which way conditions moved against the comparison reading, from the two
+ * scores conditions are made of, each judged on its own better side: higher
+ * funding pressure is worse, higher risk appetite is better. Null when nothing
+ * was compared.
+ *
+ * Not `directionLabel`, which also counts the short-term rate and the
+ * recession warning gauge as moves of their own. On Oct 5 both scores had
+ * worsened since Aug 31 (funding pressure 63 to 90, risk appetite 56 to 48) and
+ * the gauge had steepened 0.06pp, so `directionLabel` was "mixed" and the
+ * answer pages printed "Conditions are Freezing and mixed".
+ */
+export const describeScoresMovement = (
+  dynamics: SignalDeltaSource,
+): "improving" | "worsening" | "mixed" | "holding" | null => {
+  if (dynamics.directionLabel === "unavailable") return null;
+  const sides = (["tightness", "riskAppetite"] as const).map((key) => {
+    const delta = findSignalDelta(dynamics, key) ?? 0;
+    if (delta === 0) return "flat";
+    return (BETTER_WHEN[key] === "higher") === delta > 0 ? "better" : "worse";
+  });
+  if (sides.includes("better") && sides.includes("worse")) return "mixed";
+  if (sides.includes("better")) return "improving";
+  if (sides.includes("worse")) return "worsening";
+  return "holding";
+};
+
 const previousFrom = (value: number | null, delta: number | null) =>
   value === null || delta === null ? null : value - delta;
 

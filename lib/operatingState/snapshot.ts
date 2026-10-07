@@ -44,6 +44,20 @@ export const hashOperatingInputs = (treasury: TreasuryData, macroSeries: MacroSe
   return Math.abs(hash).toString(16).padStart(8, "0");
 };
 
+const MS_PER_HOUR = 60 * 60 * 1000;
+
+/**
+ * Hours since a timestamp, from the timestamp; zero when it does not parse.
+ * The freshness fields used to parse the display label back
+ * (`Number.parseFloat(formatAgeHours(…))`), which drops the unit, so a reading
+ * fetched six minutes ago ("6m.") stored 6 hours and a three-month-old one
+ * ("3mo.") stored 3.
+ */
+const hoursSince = (timestamp: string, now: Date): number => {
+  const parsed = Date.parse(timestamp);
+  return Number.isFinite(parsed) ? Math.max(0, now.getTime() - parsed) / MS_PER_HOUR : 0;
+};
+
 export const buildOperatingSnapshot = ({
   treasury,
   macroSeries,
@@ -99,9 +113,9 @@ export const buildOperatingSnapshot = ({
     homeBriefModel,
   });
 
-  const treasuryAgeHours = Number.parseFloat(formatAgeHours(treasury.fetched_at, now)) || 0;
+  const treasuryAgeHours = hoursSince(treasury.fetched_at, now);
   const macroAgeHours = macroSeries.length > 0
-    ? Math.max(...macroSeries.map((s) => Number.parseFloat(formatAgeHours(s.fetched_at, now)) || 0))
+    ? Math.max(...macroSeries.map((s) => hoursSince(s.fetched_at, now)))
     : treasuryAgeHours;
 
   const freshnessStatus = treasury.isLive ? "fresh" : "fallback";

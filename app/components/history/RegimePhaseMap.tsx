@@ -488,8 +488,14 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               }
             />
 
+            {/* Published conditions, not dot positions, and headed so. It read
+                "Months in each quadrant" while counting the conditions each month
+                published, which trail a dot that has crossed a line until the
+                crossing holds — Apr 2025 sat at 90/55, in the Cloudy quadrant,
+                and was counted as Freezing. The count is the honest one for a
+                record; the heading and the line under it now say which it is. */}
             <div>
-              <p className="type-eyebrow text-fluid-nano">Months in each quadrant</p>
+              <p className="type-eyebrow text-fluid-nano">Months under each set of conditions</p>
               <ul className="mt-2 space-y-1.5">
                 {model.occupancy.map((row) => (
                   <li key={row.regime} className="grid grid-cols-[4.5rem_1fr_2.5rem] items-center gap-2 text-fluid-nano">
@@ -510,6 +516,11 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                   </li>
                 ))}
               </ul>
+              <p className="mt-2 text-fluid-nano text-slate-500">
+                {model.offQuadrantMonths === 0
+                  ? "The conditions each month published, which here is also the quadrant every dot sits in."
+                  : `The conditions each month published, not the quadrant its dot sits in: the two differ in ${model.offQuadrantMonths.toLocaleString("en-US")} of these ${model.points.length.toLocaleString("en-US")} months.`}
+              </p>
             </div>
           </div>
         </div>

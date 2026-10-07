@@ -305,4 +305,30 @@ describe("assembleCurrentWeekBrief", () => {
     assert.equal(record.year, isoWeek.year);
     assert.equal(record.week, isoWeek.week);
   });
+
+  /* w38–w40 stored moves from Aug 31 with no date, and the page called each "vs prior week". */
+  it("stores the scores' moves only with the reading they are measured against", () => {
+    const isoWeek = getIsoWeekInfo(new Date(liveReportData.treasury.record_date));
+    const comparedWith = { recordDate: "2026-01-30", label: "Jan 30" };
+    const datedReport = buildReportDataFixture({
+      treasury: { isLive: true, fallback_at: undefined, fallback_reason: undefined },
+      reportDynamics: { ...liveReportData.reportDynamics, comparedWith },
+    });
+    const dated = buildPublishedBriefRecord({
+      reportData: datedReport,
+      snapshot: buildWeeklyBriefSnapshot({ reportData: datedReport, degraded: false }),
+      recordDate: datedReport.treasury.record_date,
+      isoWeek,
+    });
+    assert.deepEqual(dated.scores?.comparedWith, comparedWith);
+    assert.equal(dated.scores?.tightnessDelta, 2, "the fixture's funding-pressure move");
+    assert.equal(dated.scores?.riskAppetiteDelta, 0, "a score under the reporting floor moved by zero, not by nothing");
+    assert.ok(PublishedBriefSchema.safeParse(dated).success);
+
+    const undated = buildPublishedBriefRecord({ reportData: liveReportData, snapshot: liveSnapshot, recordDate: liveReportData.treasury.record_date, isoWeek });
+    assert.equal(liveReportData.reportDynamics.comparedWith, undefined);
+    assert.equal(undated.scores?.comparedWith, undefined);
+    assert.equal(undated.scores?.tightnessDelta, null, "a move against a reading nobody named is not stored");
+    assert.equal(undated.scores?.riskAppetiteDelta, null);
+  });
 });

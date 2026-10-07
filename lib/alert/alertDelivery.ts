@@ -16,6 +16,7 @@ import { assessReadingReadiness, resolveOperatingSnapshot } from "../operatingSt
 import { getRegimePublicLabel } from "../regimePresentation";
 import { sentMarkers } from "../delivery/onceFor";
 import { describeConditions } from "../export/exportTerms";
+import { buildBriefDocumentFromReport } from "../report/briefDocument";
 
 const ALERT_STATE_KEY = "alert:state";
 const ALERT_DELIVERED_PREFIX = "alert:delivered:";
@@ -108,12 +109,18 @@ export const deliverAlertToSubscriber = async (
       template = flashMoveEmail(alert.flash, unsubscribeToken);
     } else if (alert.type === "regime_change") {
       /* The engine key reached every subscriber here ("shifted to SCARCITY");
-         the weather word and what it means for money is what a reader acts on. */
+         the weather word and what it means for money is what a reader acts on.
+         The action slot printed the assessment's description ("Capital is
+         expensive…"), which is not an action, and the change slot printed "The
+         readings return to the previous conditions for two updates in a row.",
+         which on Oct 5 was wrong: risk appetite clearing 50 alone moved
+         Freezing to Cloudy, not back to Sunny. Both are the week's guidance now,
+         the sentences the brief prints under the same labels. */
       template = decisionVerdictEmail({
         headline: `CONDITIONS TURNED ${getRegimePublicLabel(conditions.regime).toUpperCase()}`,
         why: `Conditions are now ${describeConditions(conditions.regime)}. Last week's plan rested on the previous conditions.`,
-        actionNow: conditions.posture,
-        reversal: "The readings return to the previous conditions for two updates in a row.",
+        actionNow: conditions.actionNow,
+        reversal: conditions.callChangesIf,
         unsubscribeToken,
       });
     } else if (alert.line) {
@@ -192,6 +199,11 @@ export const runScheduledAlertDelivery = async (options?: {
   const assessment = reading.source === "report" ? reading.report.assessment : reading.snapshot.assessment;
   const recordDate =
     reading.source === "report" ? reading.report.recordDateLabel : reading.snapshot.provenance.recordDateLabel;
+  /* The call the brief prints for this reading: the snapshot's own contract, or
+     for a report read the one the Slack brief builds from the same read. */
+  const weeklyCall = reading.source === "report"
+    ? (await buildBriefDocumentFromReport(reading.report, { degraded: reading.degraded })).slots
+    : reading.weeklyCall;
 
   /* Consecutive reads exist only when the cron handed both over. */
   let flashMoves: AlertConditions["flashMoves"];
@@ -208,7 +220,8 @@ export const runScheduledAlertDelivery = async (options?: {
     regime: assessment.regime,
     tightness: assessment.scores.tightness,
     riskAppetite: assessment.scores.riskAppetite,
-    posture: assessment.description,
+    actionNow: weeklyCall.actionNow,
+    callChangesIf: weeklyCall.callChangesIf,
     recordDate,
     thresholds: assessment.thresholds,
     previousScores,

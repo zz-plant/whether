@@ -1,8 +1,11 @@
 import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
-import { buildBriefEmbedHtml, buildWhetherBriefUrl } from "../app/api/embed/route";
+import { buildBriefEmbedData, buildBriefEmbedHtml, buildBriefEmbedText, buildWhetherBriefUrl } from "../app/api/embed/route";
 import { OPERATOR_STAGE_OPTIONS, parseOperatorStageParam } from "../lib/report/operatorStage";
+import { assembleHomePage } from "../lib/report/homePageAssembler";
+import { buildFlipThreshold } from "../lib/report/reportEvidence";
+import { buildAssessmentFixture, buildReportDataFixture } from "./fixtures/reportFixtures";
 import { siteUrl } from "../lib/siteUrl";
 
 const briefData = {
@@ -80,7 +83,6 @@ describe("embed route helpers", () => {
     assert.doesNotMatch(source, /=\s*"Two consecutive weeks of confirming signals"/);
     assert.doesNotMatch(source, /\|\|\s*"Monitor economic indicators"/);
     assert.match(source, /primaryAction\?\.reversalCondition/);
-    assert.match(source, /primaryAction\?\.triggerThreshold/);
   });
 
   it("has the distributed script call the origin it was served from", async () => {
@@ -107,6 +109,97 @@ describe("embed route helpers", () => {
   it("renders the calibrated stage in the meta line, and nothing when there is none", () => {
     assert.match(buildBriefEmbedHtml({ ...briefData, stageLabel: "Series B+" }), /Series B\+/);
     assert.doesNotMatch(buildBriefEmbedHtml(briefData), /Series|Seed|Bootstrapped/);
+  });
+});
+
+/*
+ * The Oct 5 2026 reading: Freezing, funding pressure 90 against its change
+ * line of 70, risk appetite 48 against 50, taken on a Monday whose week ends
+ * on Friday Oct 9. The embed printed "Watch: Funding pressure < 66" (Hiring's
+ * resume line, 24 points off) where the brief prints the change line, "MED"
+ * where it prints a confidence word, the engine's "Regime:", the week's
+ * Friday as the date, and a do-now list joined on commas its items also use.
+ */
+describe("the embed says what the brief says", () => {
+  const freezing = buildAssessmentFixture({ regime: "SCARCITY", scores: { tightness: 90, riskAppetite: 48 } });
+  const assembleFreezingWeek = (companyStage: ReturnType<typeof parseOperatorStageParam> = null) =>
+    assembleHomePage(
+      { searchParams: undefined, operatorContext: { companyStage, companyRunway: null, ticker: null } },
+      {
+        loadHomePageReportData: async () => ({
+          ok: true,
+          data: buildReportDataFixture({
+            assessment: { regime: "SCARCITY", scores: { tightness: 90, riskAppetite: 48 } },
+            treasury: { record_date: "2026-10-05" },
+            weeklyRecordDate: "2026-10-09",
+            statusLabel: "Freezing",
+            flipThreshold: buildFlipThreshold(freezing),
+          }),
+        }),
+      },
+    );
+
+  it("prints the change line under the brief's label, not a rule's resume line", async () => {
+    const homepage = await assembleFreezingWeek();
+    const data = buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: null });
+    const text = buildBriefEmbedText(data);
+
+    assert.equal(data.flipTrigger, homepage.weeklyCall.callChangesIf);
+    assert.match(data.flipTrigger ?? "", /risk appetite rises 2 pts to clear 50 \(48 today\)/);
+    assert.match(text, /^Conditions change if: Funding pressure falls 20 pts to 70 or below/m);
+    assert.match(buildBriefEmbedHtml(data), /Conditions change if:<\/strong> Funding pressure falls 20 pts/);
+    for (const output of [text, buildBriefEmbedHtml(data)]) {
+      assert.doesNotMatch(output, /Watch:/);
+      assert.doesNotMatch(output, /Funding pressure &lt; 66|Funding pressure < 66/);
+    }
+  });
+
+  it("leads with the guidance every other paste leads with", async () => {
+    const homepage = await assembleFreezingWeek();
+    const data = buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: null });
+    const text = buildBriefEmbedText(data);
+
+    /* The do-now line first, then the stance, under "Guidance" — as the Slack
+       post and brief.md print it — not "Operating guidance" / "Decision now". */
+    assert.match(text, new RegExp(`^Guidance: ${data.actionNow.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "m"));
+    for (const output of [text, buildBriefEmbedHtml(data)]) {
+      assert.doesNotMatch(output, /Operating guidance|Decision now/);
+    }
+  });
+
+  it("prints a calibrated stage's resume line under its own label, beside the change line", async () => {
+    const homepage = await assembleFreezingWeek("series-a");
+    const text = buildBriefEmbedText(buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: "series-a" }));
+
+    const change = text.indexOf("Conditions change if: ");
+    const resume = text.indexOf("Resume when: ");
+    assert.ok(change >= 0 && resume > change, text);
+  });
+
+  it("names the conditions and the confidence in the reader's words, dated by the reading", async () => {
+    const data = buildBriefEmbedData(await assembleFreezingWeek(), { ticker: "", ref: "embed", companyStage: null });
+    const text = buildBriefEmbedText(data);
+    const html = buildBriefEmbedHtml(data);
+
+    assert.match(text, /^Conditions: Freezing • (High|Medium|Low) confidence • As of 2026-10-05$/m);
+    assert.match(html, /Freezing · (High|Medium|Low) confidence · As of 2026-10-05/);
+    for (const output of [text, html, JSON.stringify(data)]) {
+      assert.doesNotMatch(output, /\b(HIGH|MED|MEDIUM|LOW)\b/);
+      assert.doesNotMatch(output, /Regime:/);
+      assert.doesNotMatch(output, /2026-10-09/);
+    }
+  });
+
+  it("lists each do-now item on its own line", async () => {
+    const data = buildBriefEmbedData(await assembleFreezingWeek(), { ticker: "", ref: "embed", companyStage: null });
+    const lines = buildBriefEmbedText(data).split("\n");
+
+    assert.ok(data.doNowItems.some((item) => item.includes(",")), "the fixture week carries an item with its own comma");
+    assert.deepEqual(
+      lines.filter((line) => line.startsWith("- ")),
+      data.doNowItems.map((item) => `- ${item}`),
+    );
+    assert.ok(lines.includes("Do now:"));
   });
 });
 

@@ -95,7 +95,10 @@ describe("buildForecastModel", () => {
 
     assert.equal(sumProbabilities(model.next90DayProbabilities), 100);
     assert.equal(sumProbabilities(model.next4WeekProbabilities), 100);
-    assert.equal(dynamics.directionLabel, "mixed");
+    /* Funding pressure holds at its ceiling and risk appetite falls 2: the one
+       score that moved got worse. This read "mixed" while the base rate's
+       easing, which the held score does not show, counted as a vote. */
+    assert.equal(dynamics.directionLabel, "deteriorating");
     assert.ok(
       model.boundaryPressure.crossingRisk === "medium" ||
         model.boundaryPressure.crossingRisk === "high",

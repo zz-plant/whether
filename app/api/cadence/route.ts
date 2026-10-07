@@ -9,11 +9,12 @@ export const revalidate = 3600;
 
 export async function GET() {
   const reportResult = await loadReportDataSafe(undefined, { route: "/api/cadence" });
-  const { assessment, treasury, treasuryProvenance, recordDateLabel, weeklyRecordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
+  const { assessment, treasury, treasuryProvenance, recordDateLabel } = reportResult.ok ? reportResult.data : reportResult.fallback;
+  // The record date, as /api/weekly passes it; this passed the week-ending Friday.
   const weeklySummary = buildWeeklySummary({
     assessment,
     provenance: treasuryProvenance,
-    recordDateLabel: weeklyRecordDateLabel,
+    recordDateLabel,
     record: treasury,
   });
   const monthlySummary = buildMonthlySummary({

@@ -13,7 +13,7 @@ import {
 import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolvePublishedConfidence } from "../confidence";
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
-import { comparisonBasis } from "../comparisonBasis";
+import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { areaLinesFromRules, buildDecisionMovement } from "../decisionMovement";
 import { previousScoresFromDynamics } from "../../export/scoreReference";
 import { formatThresholdNumber } from "../../formatters";
@@ -69,7 +69,7 @@ import {
   buildInputInfluenceItems,
   buildRegimeSignalIndicators,
 } from "./signalIndicators";
-import { buildWeeklyLeadershipBriefModel } from "../weeklyLeadershipBrief";
+import { buildWeeklyLeadershipBriefModel, getNetDeltaLabel } from "../weeklyLeadershipBrief";
 import type {
   CanonicalFlipCondition,
   HomeBriefTrustWarning,
@@ -197,7 +197,23 @@ export const buildFlipRiskMeterState = (
 ): WeeklyDecisionCardViewModel["diagnostics"]["flipRiskMeter"] =>
   buildFlipRiskMeterStateInternal(regimeDistance);
 
-const buildLeadershipShorthandLine = (boldnessDelta: number) => {
+/*
+ * A replayed month is not "this week". The line said "This week's guidance is
+ * more defensive." under Mar 31, 2020 on /history/compare, so a past month reads
+ * as the move against its own earlier month-end, dated by it ("More defensive
+ * since Feb 28."), and as no comparison where the record starts. The live
+ * sentence is unchanged: it is pinned in every share format.
+ */
+const buildLeadershipShorthandLine = (
+  boldnessDelta: number,
+  historical?: { compared: boolean; basis: ComparisonBasis },
+) => {
+  if (historical) {
+    return historical.compared && historical.basis.date
+      ? getNetDeltaLabel(boldnessDelta, historical.basis)
+      : "No earlier month-end to compare with.";
+  }
+
   const magnitude = Math.abs(boldnessDelta);
 
   if (magnitude === 0) {
@@ -658,10 +674,10 @@ export const buildHomeBriefModelInternal = (
       boldnessDelta: weeklyLeadershipSummary.boldnessDelta,
       steadyWeek: weeklyLeadershipSummary.steadyWeek,
       notchShiftLabel: weeklyLeadershipSummary.notchShiftLabel,
-      shorthandLine: buildLeadershipShorthandLine(weeklyLeadershipSummary.boldnessDelta),
-      hiringWindow: weeklyLeadershipSummary.hiringWindow,
-      expansionWindow: weeklyLeadershipSummary.expansionWindow,
-      raiseWindow: weeklyLeadershipSummary.raiseWindow,
+      shorthandLine: buildLeadershipShorthandLine(
+        weeklyLeadershipSummary.boldnessDelta,
+        historicalSelection ? { compared: previousAssessment !== null, basis } : undefined,
+      ),
       netDeltaLabel: weeklyLeadershipSummary.netDeltaLabel,
       ...(reportDynamics?.comparedWith ? { comparedWith: reportDynamics.comparedWith } : {}),
     },

@@ -49,6 +49,31 @@ describe("signal watch pages say what they measure in plain words", () => {
     });
   }
 
+  /*
+   * The comparison is the last month-end snapshot, and the panel headed the
+   * line "Week over week" over "+27 points since Aug 31." on Oct 5 — five weeks.
+   * The line names its basis; the heading no longer names a different one.
+   */
+  it("heads the move without calling the comparison a week", () => {
+    const dated: SignalReadingSource = {
+      ...source(),
+      reportDynamics: {
+        changedSignals: [{ key: "tightness", label: "Funding pressure", delta: 27 }],
+        anomalySignals: [],
+        comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
+      },
+    };
+    const text = renderToStaticMarkup(
+      <SignalReadingPanel reading={buildSignalClusterReading("capital-tightness-watch", dated)} recordDateLabel="Oct 5, 2026" />,
+    )
+      .replace(/<!-- -->/g, "")
+      .replace(/<[^>]+>/g, " ")
+      .replace(/\s+/g, " ");
+
+    assert.doesNotMatch(text, /week over week/i);
+    assert.match(text, /Movement \+27 points since Aug 31\./);
+  });
+
   it("states the curve reading as a percentage and its moves in percentage points", () => {
     const text = render("yield-curve-flip-watch");
     assert.match(text, /-0\.3%/);
