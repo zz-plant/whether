@@ -94,7 +94,7 @@ const describeHeadline = (period: PostureArchivePeriod): string | null => {
   const label = toWeatherLabel(headline.label);
   if (mix.length === 1) return `${label} for all ${period.sampleCount} ${cadenceNoun(period)}.`;
   const tiedWith = mix.filter((share) => share.regime !== period.regime && share.periods === headline.periods);
-  const tie = tiedWith.length > 0 ? `, as many as ${tiedWith.map((share) => toWeatherLabel(share.label)).join(" and ")}` : "";
+  const tie = tiedWith.length > 0 ? `, tied with ${tiedWith.map((share) => toWeatherLabel(share.label)).join(" and ")}` : "";
   const closing = closingConditions(period);
   const close = closing === label ? "" : `; ${closing} at the close`;
   return `${label} for ${headline.periods} of ${period.sampleCount} ${cadenceNoun(period)}${tie}${close}.`;

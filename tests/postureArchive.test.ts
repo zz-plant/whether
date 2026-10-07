@@ -143,6 +143,10 @@ describe("/history/[period] says what its own split says", () => {
     assert.match(html, /Sunny for 48 of 52 weekly readings; Stormy at the close\./);
     assert.doesNotMatch(html, /keep the plan flexible/, "Stormy's guidance for a year that was mostly Sunny");
     assert.doesNotMatch(html, /for the whole period/);
+    /* A tie is not "mostly": 2022 split 22 Stormy, 22 Freezing. */
+    const tied = await render("2022");
+    assert.doesNotMatch(tied, /Mostly/);
+    assert.match(tied, /Freezing for 22 of 52 weekly readings, tied with Stormy\./);
   });
 
   it("says conditions held for the whole period only where every reading did", async () => {
