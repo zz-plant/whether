@@ -31,10 +31,10 @@ means pushing unverified. Skip it with `SKIP_PREPUSH=1 git push` or `git push --
 **The hook clears git's exported environment before running the gate, and must keep doing so.**
 Git hands every hook `GIT_DIR`, `GIT_INDEX_FILE`, and friends, and every `git` the gate shells out
 to inherits them — which silently redirects those calls at the pushing repository.
-`tests/checkGateMarker.test.ts` builds a throwaway repo with `git init` and gets this one instead;
-`review:hotspot-preflight` resolves `HEAD~1` against the wrong index. Both pass standalone and fail
+`tests/deployGateWorktree.test.ts` builds a throwaway repo with `git init` and gets this one instead;
+`review:hotspot-preflight` resolves its base against the wrong index. Both pass standalone and fail
 only under the hook, so the symptom reads as flakiness. Reproduce it with
-`GIT_DIR=$PWD/.git bun run test tests/checkGateMarker.test.ts`. Note that
+`GIT_DIR=$PWD/.git bun run test tests/deployGateWorktree.test.ts`. Note that
 this worktree is often shared with other sessions, so a pre-push failure may be someone else's
 in-flight edit rather than yours — check `git status` first. The hook runs `run-checks.mjs --preset
 pre-push` (lint, lint:types, typecheck, test, assets, suppressions, dead-exports, hotspot-preflight,
@@ -54,6 +54,7 @@ open the one that matches the task instead of reading them all.
 | reader-facing strings, source-reading tests, page-vs-page claims | [tests-and-copy-rules](docs/agents/lessons/tests-and-copy-rules.md) |
 | a new module, an API field, share/OG/SEO metadata, a cache, a warning banner, runway | [dead-features-and-honesty](docs/agents/lessons/dead-features-and-honesty.md) |
 | `lib/regimeEngineCore.ts`, confidence, anything printing a score or delta | [regime-scoring](docs/agents/lessons/regime-scoring.md) |
+| `lib/runtime/`, a binding, KV, a store singleton, a retry | [runtime-helpers](docs/agents/lessons/runtime-helpers.md) |
 | choosing a first file | [hot-files](docs/agents/hot-files.md) |
 
 ### Rules that catch changes here (one line each; the lesson files hold the why)
@@ -93,7 +94,6 @@ open the one that matches the task instead of reading them all.
 | `bun run agent:route -- "<task>"` | Recommends docs, first files, and minimum checks for a task. |
 | `bun run agent:handoff -- --job "<job>"` | Generates a canonical subagent handoff packet with repo defaults. |
 | `bun run agent:index` | Refreshes the repo cache under `artifacts/agent/`. |
-| `bun run agent:prewarm` | Checks LM Studio, warms the fast local model role, refreshes the repo cache. |
 
 Details: [docs/agents/mcp-and-skills-playbook.md](docs/agents/mcp-and-skills-playbook.md).
 
@@ -113,7 +113,7 @@ recapture correctly.
 
 | Command | What it does |
 | --- | --- |
-| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. Default range is the last commit **plus** uncommitted changes; `--base <sha>` is commit-to-commit and sees no dirty tree; `--working-tree` is uncommitted only. The printed range says which. On pre-push, `.husky/pre-push` scopes it to the commits the push actually sends (`scripts/pre-push-range.mjs` reads git's stdin plan), so it neither judges other sessions' uncommitted work nor misses commits 2..n of a multi-commit push. |
+| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags decision-logic files changed without tests and added `as` casts. One comparison: the working tree against a base, which is the merge-base with `main` (so a branch is judged on everything it changes), `HEAD~1` on `main` itself, or `--base <ref>`. On pre-push the hook sets the base to the remote's sha (`scripts/pre-push-range.mjs` reads git's stdin plan), so a push is judged on what it sends. |
 | `bun run audit:jev-copy` | Advisory, needs a running server and Workers AI credentials: asks Jev (`typesafe/jev`) the 2026-09-22 copy audit's four questions of every sentence on the reader routes; `-- --mode brief` asks whether the generated brief contradicts the latest published call. Exits non-zero if any Jev call failed. Not in the gate — the suite is offline and a model's answer is not a check. Jev is never used for the call itself. |
 | `bun run telemetry:streams` | Rows per Analytics Engine stream over a window, with each stream's consumer. A stream at zero is dead code or a broken emitter. |
 | `bun run review:comment-trends` | Summarizes recurring PR review comment patterns from GitHub. |

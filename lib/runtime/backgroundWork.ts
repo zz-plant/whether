@@ -1,8 +1,7 @@
 /**
- * Detached background work for Cloudflare Workers. The worker entry installs the
- * active request's `ctx.waitUntil` here so library code can keep work alive past
- * the response without importing worker types. Outside Workers (bun tests, node
- * scripts, dev server) the work simply runs detached in-process.
+ * Detached background work for Cloudflare Workers. The worker entry installs the active
+ * request's `ctx.waitUntil` here so library code can keep work alive past the response
+ * without importing worker types. Outside Workers the work simply runs detached in-process.
  */
 type WaitUntil = (promise: Promise<unknown>) => void;
 
