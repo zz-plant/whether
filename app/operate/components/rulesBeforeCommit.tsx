@@ -8,9 +8,8 @@ import type { PlaybookEntry } from "../../../lib/playbook";
  * summary above them.
  *
  * This is what `PlaybookPanel` carried besides its per-area rows. The rows
- * are an `AreaTable` in the weekly plan step now — the consequence tier,
- * directly under the call it follows from — and the lists are what is left
- * to read before committing. The leadership phrases are evidence for the
+ * are an `AreaTable` in the step above this one — the page's first, since
+ * 2026-10-07 — and the lists are what is left to read before committing. The leadership phrases are evidence for the
  * lists (§XII), so they sit behind a native disclosure with no query key.
  */
 const visible = <T,>(items: readonly T[], showAll: boolean) => (showAll ? items : items.slice(0, 3));

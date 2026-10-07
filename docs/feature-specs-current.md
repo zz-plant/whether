@@ -249,7 +249,8 @@ pages between 2,500 and 8,000px tall. The changes, per surface:
   key-number gauges and the inversion timeline; the two twelve-month lines are a
   `SignalSparklineStrip` (current value, move over the window, series with interquartile band);
   the fossil-record table is behind a `?fossil=1` disclosure.
-- **Plan** opens with "Test a decision" (§1.1.36); the sticky one-row strip is section navigation
+- **Plan** opens with "This week's rule for each area" (§1.1.46; it opened with "Test a decision"
+  from §1.1.36 until 2026-10-07); the sticky one-row strip is section navigation
   only (the checklist toggles, which did nothing but turn themselves on, were retired 2026-09-08).
 - **Weekly brief** no longer carries "Decisions to reconsider" or "Close the week" (retired
   2026-09-08: each asked the reader to maintain browser-local state the product could not pay
@@ -2839,3 +2840,21 @@ below moves data the page already computed to where the eye lands first; nothing
   `tests/homeDecisionPicker.test.tsx` (choices and count), `tests/firstRunOrientationGuide.test.tsx`
   (standfirst).
 
+### 1.1.46 `/operate` leads with this week's rules (2026-10-07)
+
+A screenshot review of the plan page found it opening on the least informative thing it has: under
+the tabs, "Test a decision" with the full stress-test form (runway, monthly spend, a model select, a
+three-line box, example chips) above a "Decision verdict" panel that said there was no verdict. On a
+phone that form was everything below the intro. The page's job (`docs/agents/ui-ux-standards.md`
+§VIII: operating guardrails) was behind it, and the area table — the pause and resume lines, which
+§XII says are never collapsed — sat closed three steps down as a title and one sentence.
+
+- **Order.** This week's rule for each area (open), Rules before you commit (open), Test a decision
+  (open, compact), Set this plan's lines, Finance strategy, Share the brief, then Risk checks. The
+  section index (`operationsSectionLinks.plan`, the sidebar and the phone chip row) follows. The
+  area table is the same `AreaTable` the brief prints, from the same rows (`buildAreaRows`), not a
+  second build. This reverses §1.1.36's lead, which put the reader's own decision first; the test
+  keeps its open state and moves after the lines it checks against.
+- Step ids are unchanged, so `#ops-monthly-action-summary` (the brief, the portfolio note, the
+  redirects in `next.config.js`), `#ops-playbook`, `#ops-decision-shield` and `#ops-plan-lines`
+  still open their sections.
