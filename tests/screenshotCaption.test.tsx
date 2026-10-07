@@ -55,4 +55,36 @@ describe("screenshot caption", () => {
       assert.ok(captionOf(html).includes(host));
     }
   });
+
+  /* A phone gets the week's word, the title and one meta line before the
+     first task block (ui-ux-standards §XI). The caption stays inside the
+     block, beside the status word, rather than on a row of its own. */
+  it("rides beside the status word on a phone when the strip carries the meta line", () => {
+    const html = renderToStaticMarkup(
+      <CommandCenterNavBlock
+        pageTitle="Plan"
+        pageSummary="This week's guidance, turned into rules."
+        recordDateLabel="Oct 5, 2026"
+        statusLabel="Freezing"
+        trustStatusLabel="All sources live"
+        fetchedAtLabel="Oct 7, 2026, 12:19 AM UTC"
+        showOfflineBadge={false}
+        offlineBadgeLabel=""
+        trustStrip={{
+          recordDateLabel: "Oct 5, 2026",
+          sourcesLive: true,
+          sourcesLabel: "All sources live",
+          confidenceLabel: "MED",
+          couldChangeNextWeek: false,
+          href: "/trust",
+        }}
+      />,
+    );
+    const captions = [...html.matchAll(/data-screenshot-caption="[^"]*" class="([^"]*)"/g)].map(([, cls]) => cls);
+    assert.equal(captions.length, 2, "one for a phone, one for the stamp row from sm");
+    assert.match(captions[0], /(^|\s)sm:hidden(\s|$)/);
+    assert.ok(html.indexOf("data-screenshot-caption") < html.indexOf("<h1"), "the phone caption sits on the status row");
+    assert.match(captions[1], /max-sm:hidden/);
+    assert.match(html, /<span class="max-sm:hidden">Signals refreshed/, "the refresh stamp is a desktop line");
+  });
 });

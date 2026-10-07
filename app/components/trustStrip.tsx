@@ -23,6 +23,12 @@ export type TrustStripProps = {
   changeReason?: string;
   /** Where the full explanation lives. Omit on /trust itself. */
   href?: "/trust";
+  /** How the strip sits below `sm`. "grid" (the default) is the two-column
+   *  grid, label over value. "line" runs the pairs as one wrapped line and,
+   *  when the strip links to /trust, leaves out the two facts that are in
+   *  their routine state (every source live, confidence not Low): the report
+   *  intro's job on a phone is to orient, and /trust is one tap away. */
+  phoneLayout?: "grid" | "line";
   className?: string;
 };
 
@@ -42,12 +48,22 @@ export function TrustStrip({
   couldChangeNextWeek,
   changeReason,
   href,
+  phoneLayout = "grid",
   className = "",
 }: TrustStripProps) {
-  const cells: { label: string; value: string; tone?: "caution" | "easing" }[] = [
+  /* `routine`: the fact is in the state a reader does not need to act on.
+     Only the phone line leaves those out, and only when the strip links to
+     the page that states them; an exception (cached sources, Low confidence)
+     always prints. */
+  const cells: { label: string; value: string; tone?: "caution" | "easing"; routine?: boolean }[] = [
     { label: "As of", value: recordDateLabel },
-    { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caution" },
-    { label: "Confidence", value: CONFIDENCE_WORD[confidenceLabel], tone: confidenceLabel === "LOW" ? "caution" : undefined },
+    { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caution", routine: sourcesLive },
+    {
+      label: "Confidence",
+      value: CONFIDENCE_WORD[confidenceLabel],
+      tone: confidenceLabel === "LOW" ? "caution" : undefined,
+      routine: confidenceLabel !== "LOW",
+    },
     /* "Not expected", not "No". The boolean says nothing is near its line
      * *this* reading; printed as "No" beside a Medium confidence it read as
      * a promise about the future the confidence cell had just declined to
@@ -63,24 +79,38 @@ export function TrustStrip({
      shade then reads into the next pair: "Confidence High Could change next
      week Not expected". Below `sm` each pair is a cell of a two-column grid,
      label over value; from `sm` they run on one line, a pair kept tighter than
-     the gap between pairs. */
+     the gap between pairs.
+
+     The "line" layout keeps the pairs apart with a dot instead, which each
+     cell after the first draws before itself. No space sits on either side of
+     the dot, so a wrap can only fall inside a label or a value and never
+     strands a dot at the start of a line (the defect the footer's separators
+     had). A space between label and value keeps the copied text readable. */
+  const line = phoneLayout === "line";
+  const foldRoutine = line && Boolean(href);
+  const layout = line
+    ? "text-xs max-sm:leading-5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-1"
+    : "grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-1";
+  const cellLayout = (folded: boolean) =>
+    line
+      ? `${folded ? "max-sm:hidden" : "max-sm:inline"} max-sm:not-first:before:mx-1.5 max-sm:not-first:before:text-slate-600 max-sm:not-first:before:content-['·'] sm:flex sm:flex-row sm:items-baseline sm:gap-1.5`
+      : "flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-1.5";
+  const termLayout = line ? "max-sm:inline " : "";
   return (
-    <div
-      className={`grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-1 ${className}`.trim()}
-      data-trust-strip
-    >
+    <div className={`${layout} ${className}`.trim()} data-trust-strip>
       <dl className="contents">
         {cells.map((cell) => (
-          <div key={cell.label} className="flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-1.5">
-            <dt className="text-slate-500">{cell.label}</dt>
+          <div key={cell.label} className={cellLayout(foldRoutine && Boolean(cell.routine))}>
+            <dt className={`${termLayout}text-slate-500`}>{cell.label}</dt>
+            {line ? " " : null}
             <dd
-              className={
+              className={`${termLayout}${
                 cell.tone === "caution"
                   ? "font-medium text-semantic-caution-fg"
                   : cell.tone === "easing"
                     ? "font-medium text-semantic-easing-fg"
                     : "font-medium text-slate-200"
-              }
+              }`}
             >
               {cell.value}
             </dd>
@@ -88,9 +118,19 @@ export function TrustStrip({
         ))}
       </dl>
       {href ? (
-        <Link href={href} className="weather-hit col-span-2 justify-self-start text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-          How this is judged
-        </Link>
+        <>
+          {line ? (
+            <span aria-hidden="true" className="mx-1.5 text-slate-600 sm:hidden">
+              ·
+            </span>
+          ) : null}
+          <Link
+            href={href}
+            className={`weather-hit ${line ? "" : "col-span-2 justify-self-start "}text-slate-400 underline decoration-slate-600 underline-offset-4 hover:text-slate-200`}
+          >
+            How this is judged
+          </Link>
+        </>
       ) : null}
     </div>
   );

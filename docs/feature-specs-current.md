@@ -2839,3 +2839,22 @@ below moves data the page already computed to where the eye lands first; nothing
   `tests/homeDecisionPicker.test.tsx` (choices and count), `tests/firstRunOrientationGuide.test.tsx`
   (standfirst).
 
+### 1.1.45 Shared chrome: the report intro on a phone, the footer, /pricing and /concepts (2026-10-07)
+
+A screenshot review of the shared chrome found the report intro restating the homepage's trust
+strip across a phone's first screen, a footer set louder than the pages above it, a plain fact on
+`/pricing` drawn in the warning ink, and `/concepts` as about 6,000px of one small-text column.
+
+- **The report intro on a phone** (`CommandCenterNavBlock`, every `ReportShell` route). Below `sm`
+  a route with a trust strip draws three lines: the status word in the regime ink with the
+  screenshot caption beside it, the title, and the strip as one wrapped meta line
+  (`TrustStrip` `phoneLayout="line"`). The line always carries the record date and "Could change
+  next week"; it leaves out "Sources" and "Confidence" while they are routine (every source live,
+  confidence not Low) and the strip links to `/trust`, and prints them whenever they are not. On
+  `/trust`, where the strip is the page's System status and has no link, all four facts print. The
+  refresh stamp ("Signals refreshed …") is a desktop line; a route whose status line carries
+  "sources • as of" (`/resolve`, `/history`) keeps the caption at the foot of the block, where it
+  does not wrap under the status line. The intro on `/operate` measured about 260px of a 932px
+  screen and is about 135px; on `/trust` about 235px and is about 155px. From `sm` up nothing
+  changed. Tests: `tests/visualPrimitives.test.tsx` (what folds), `tests/screenshotCaption.test.tsx`
+  (where the caption sits on a phone).
