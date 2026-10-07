@@ -1,7 +1,26 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { isTypingTarget } from "./KeyboardShortcuts";
 import { PresentationFrames } from "./presentationFrames";
+
+/**
+ * Whether a keydown toggles focus mode: ⌘⇧S or Ctrl+⇧S from anywhere, or F with
+ * no ⌘, Ctrl or Alt held, from anywhere that does not take typing.
+ *
+ * F used to ignore the modifiers, so ⌘F and Ctrl+F — the browser's find-in-page —
+ * opened the presentation and had their default prevented: on the brief, find
+ * never opened. Alt+F is the browser's menu on Windows and Linux. Shift stays
+ * allowed, as it does for the route keys; ⇧F is bound to nothing else.
+ */
+export const isFocusModeShortcut = (
+  event: Pick<KeyboardEvent, "key" | "shiftKey" | "metaKey" | "ctrlKey" | "altKey">,
+  typing: boolean,
+): boolean => {
+  const key = event.key.toLowerCase();
+  if ((event.metaKey || event.ctrlKey) && event.shiftKey && key === "s") return true;
+  return key === "f" && !event.metaKey && !event.ctrlKey && !event.altKey && !typing;
+};
 
 export function FocusModeController() {
   const [isFocusMode, setIsFocusMode] = useState(false);
@@ -24,11 +43,7 @@ export function FocusModeController() {
   useEffect(() => {
     const handleToggle = () => setIsFocusMode((value) => !value);
     const handleKeyDown = (event: KeyboardEvent) => {
-      const target = event.target as HTMLElement | null;
-      const isTyping = target && ["INPUT", "TEXTAREA", "SELECT"].includes(target.tagName);
-      const isShortcut = (event.metaKey || event.ctrlKey) && event.shiftKey && event.key.toLowerCase() === "s";
-
-      if (isShortcut || (event.key.toLowerCase() === "f" && !isTyping)) {
+      if (isFocusModeShortcut(event, isTypingTarget(event.target))) {
         event.preventDefault();
         setIsFocusMode((value) => !value);
       } else if (event.key === "Escape") {

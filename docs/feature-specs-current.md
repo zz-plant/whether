@@ -266,6 +266,9 @@ documents the full keyboard shortcut set including section navigation (`j`/`k`),
 The palette printed `⇧S` from the day it shipped while nothing bound it; since 2026-10-06
 `KeyboardShortcuts` binds it to the share rail (Shift alone: `⌘⇧S` is focus mode's) and the help
 dialog lists it.
+`F` acts only with no `⌘`, `Ctrl` or `Alt` held, and never from a text field, select or
+contenteditable (`isFocusModeShortcut`, since 2026-10-07). It used to ignore the modifiers, so
+`⌘F`/`Ctrl+F` opened the presentation and blocked the browser's find-in-page.
 
 ### 1.1.5 Calendar ritual integration (2026-08-29)
 `SubscribeForm` (`app/components/SubscribeForm.tsx`) now offers a Google Calendar Monday Ritual
