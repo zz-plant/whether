@@ -71,10 +71,18 @@
  * Arial's, and each override is Archivo's own (ascender 878, descender 210,
  * line gap 0, of 1000) divided by it.
  *   text, wdth 100 wght 400       0.4509em over Arial 0.4563em      = 98.81%
+ *   semibold, wdth 100 wght 600   0.4691em over Arial Bold 0.4937em = 95.02%
+ *   bold, wdth 100 wght 700       0.4857em over Arial Bold 0.4937em = 98.39%
  *   display, wdth 87.5 wght 700   0.4349em over Arial Bold 0.4937em = 88.10%
  * The display face answers font-stretch 87.5% (--font-stretch-display) with
- * real Arial Bold, the call's weight; at 125% (the stamp) the browser takes the
- * normal-width face. The unicode-range is Archivo's, so a character Archivo
+ * real Arial Bold, the call's weight. At normal width, 600 and 700-900 take
+ * their own Arial Bold faces: with only the regular face they were drawn as
+ * synthetic bold, which does not widen the glyphs, so until the swap semibold
+ * set 3-4.5% and bold 6.5-8% narrower than Archivo (headless Chromium against
+ * the shipped file, 2026-10-07). 500 stays on the regular face (Archivo 500 is
+ * 0.4595em). At 125% (the stamp) the browser takes the normal-width faces, so
+ * the stamp is real bold but about a quarter narrower until the swap: widening
+ * through size-adjust would make it taller too. The unicode-range is Archivo's, so a character Archivo
  * does not draw still falls to system-ui after the swap, as it did before.
  * One thing no override can match: a `ch` width (max-w-[64ch]) is measured on
  * "0", which is 573 units in Archivo and 549 here, so a ch-wide column is 4%
@@ -102,6 +110,34 @@
   size-adjust: 88.1%;
   ascent-override: 99.66%;
   descent-override: 23.84%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+0394, U+2000-206F, U+20AC, U+2122, U+2190-2195, U+2212,
+    U+2215, U+2248, U+2260, U+2264-2265, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  font-style: normal;
+  font-weight: 600;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  size-adjust: 95.02%;
+  ascent-override: 92.4%;
+  descent-override: 22.1%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+0394, U+2000-206F, U+20AC, U+2122, U+2190-2195, U+2212,
+    U+2215, U+2248, U+2260, U+2264-2265, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  font-style: normal;
+  font-weight: 700 900;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  size-adjust: 98.39%;
+  ascent-override: 89.23%;
+  descent-override: 21.34%;
   line-gap-override: 0%;
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
     U+0304, U+0308, U+0329, U+0394, U+2000-206F, U+20AC, U+2122, U+2190-2195, U+2212,
