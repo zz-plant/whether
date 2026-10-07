@@ -2858,3 +2858,12 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
 - Step ids are unchanged, so `#ops-monthly-action-summary` (the brief, the portfolio note, the
   redirects in `next.config.js`), `#ops-playbook`, `#ops-decision-shield` and `#ops-plan-lines`
   still open their sections.
+- **Test a decision opens as one field.** The mode switch and the plan box with its examples; the
+  runway, spend and model fields join once a plan is typed (and stay while it is edited), and the
+  verdict panel exists only once there is a plan to grade (`PlanStressTestMode`). Compare mode
+  draws no recommendation box until a plan is typed. Copy verdict, Copy link and Record this
+  decision render only once the mode on screen has a verdict: before, Copy verdict on an empty box
+  copied the list mode's default verdict, one the reader had never seen. The stress-test and
+  compare modes no longer draw a surface inside the step, so the verdict sits two frames deep and
+  its sizing note three (§XIII). The example buttons are `weather-pill` controls (44px on touch)
+  rather than 20px chips, with their label on its own line on a phone so they pair up.

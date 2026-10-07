@@ -94,6 +94,13 @@ export const DecisionShieldPanel = ({
     [lifecycle, category, action]
   );
 
+  /* Whether the mode on screen has graded anything. Until it has, Copy verdict
+     copied the list mode's default (a growth-stage hire) — a verdict the reader
+     never saw — and Record would have filed it, so the row waits for one. The
+     list mode always has a selection, so it always has a verdict. */
+  const hasVerdict =
+    planMode === "dropdown" || (planMode === "natural_language" ? planReady : comparisonReady);
+
   return (
     /* The body only. The plan page's step already asks the question and names the
        moves; this panel used to ask it again in its own header, put Copy verdict,
@@ -121,16 +128,15 @@ export const DecisionShieldPanel = ({
           </div>
         ) : null}
 
-        <div className="space-y-5">
-          {/* Mode Switcher */}
-          <div className="border-b border-slate-800 pb-3">
-            <SegmentedControl
-              options={planModeOptions}
-              value={planMode}
-              onSelect={setPlanMode}
-              ariaLabel="How to describe the decision"
-            />
-          </div>
+        <div className="space-y-4">
+          {/* No rule under the switch: the step header above already draws one,
+              and two rules around a three-button row read as a toolbar band. */}
+          <SegmentedControl
+            options={planModeOptions}
+            value={planMode}
+            onSelect={setPlanMode}
+            ariaLabel="How to describe the decision"
+          />
 
           {planMode === "natural_language" && (
             <PlanStressTestMode
@@ -244,24 +250,26 @@ export const DecisionShieldPanel = ({
           )}
 
           {/* What to do with the verdict, after it: copy it, link to it, or keep it
-              on the record against this week's reading. */}
-          <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border-subtle)] pt-4">
-            <ClipboardActionRow
-              label="Copy verdict"
-              state={getClipboardUiState("verdict", clipboardState)}
-              buttonVariant="pill"
-              stateIcons={{ copying: <SpinnerIcon className="h-3 w-3" /> }}
-              onClick={handleCopy}
-            />
-            <ClipboardActionRow
-              label="Copy link"
-              state={getClipboardUiState("link", clipboardState)}
-              buttonVariant="pill"
-              buttonLabels={{ copied: "Link copied" }}
-              onClick={handleCopyLink}
-            />
-            <RecordDecisionButton buildPayload={buildLedgerPayload} />
-          </div>
+              on the record against this week's reading. Only once there is one. */}
+          {hasVerdict ? (
+            <div className="flex flex-wrap items-center gap-3 border-t border-[var(--border-subtle)] pt-4">
+              <ClipboardActionRow
+                label="Copy verdict"
+                state={getClipboardUiState("verdict", clipboardState)}
+                buttonVariant="pill"
+                stateIcons={{ copying: <SpinnerIcon className="h-3 w-3" /> }}
+                onClick={handleCopy}
+              />
+              <ClipboardActionRow
+                label="Copy link"
+                state={getClipboardUiState("link", clipboardState)}
+                buttonVariant="pill"
+                buttonLabels={{ copied: "Link copied" }}
+                onClick={handleCopyLink}
+              />
+              <RecordDecisionButton buildPayload={buildLedgerPayload} />
+            </div>
+          ) : null}
         </div>
       </div>
     </section>
