@@ -1,4 +1,5 @@
 import type { CSSProperties, ReactNode } from "react";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 /**
  * A score drawn against its lines.
@@ -45,7 +46,7 @@ type ScoreLadderProps = {
 const LINE_LABELS: Record<LadderLineKind, string> = {
   pause: "Pause",
   resume: "Resume",
-  callChange: "Change line",
+  callChange: DECISION_CONTRACT_LABELS.watch.changeLine,
 };
 
 const LINE_CLASS: Record<LadderLineKind, string> = {

@@ -58,8 +58,9 @@ export const buildCanonicalDecisionCopy = ({
   const compactFlipConditions = homeBriefModel.canonicalFlipConditions
     .map((condition) => condition.label.trim())
     .filter((label) => label.length > 0);
+  /* The posture state's lines are the two halves of the trigger, so listing
+     them in the watch list restated the change line printed beside it. */
   const flipConditions = [
-    ...postureState.whatFlipsNext.thresholds,
     ...compactFlipConditions,
     ...homeBriefModel.compactFlipConditionLabels,
   ]

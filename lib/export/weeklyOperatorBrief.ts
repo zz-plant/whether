@@ -1,8 +1,8 @@
-import { resolveWeekEndingIsoDateUTC } from "../formatters";
 import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../report/reportCopy";
 import { formatExportConfidence, pauseConditionOnly } from "./exportTerms";
 import type { BriefDocument } from "../report/briefArtifact";
 import { publicDecisionLabels } from "../report/reportFormatting";
+import { formatGuidance } from "./briefBuilders";
 import { weeklyCallChangeLines } from "../report/weeklyCallContract";
 import { comparisonBasis } from "../report/comparisonBasis";
 import type { ComparedWith } from "../report/reportDataTypes";
@@ -44,11 +44,9 @@ type WeeklyOperatorBriefPayload = {
 export const buildWeeklyOperatorBriefPayload = (
   document: BriefDocument,
   {
-    date,
     weeklyLeadershipSummary,
     customTeamNote,
   }: {
-    date?: string;
     weeklyLeadershipSummary?: {
       boldnessScore: number;
       boldnessDelta: number;
@@ -69,7 +67,10 @@ export const buildWeeklyOperatorBriefPayload = (
   const { slots } = document;
 
   return {
-    date: date ?? resolveWeekEndingIsoDateUTC(document.provenance.recordDate),
+    /* The reading's date, as the Slack post, the slide and the mandate head
+       themselves. It was the Friday of the reading's week, so a brief read on a
+       Wednesday was headed with a date two days away. */
+    date: document.provenance.recordDate,
     boldnessBudget,
     regimeStage: document.conditions.label,
     conditions: document.conditions.line,
@@ -111,8 +112,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
     payload.confidence,
     payload.customTeamNote ? `\nTeam context: ${payload.customTeamNote}` : null,
     "",
-    `${publicDecisionLabels.call}: ${payload.currentCall}`,
-    `${publicDecisionLabels.action}: ${payload.actionNow}`,
+    `${publicDecisionLabels.call}: ${formatGuidance(payload)}`,
     `${publicDecisionLabels.threshold}: ${pauseConditionOnly(payload.pauseIf)}`,
     ...weeklyCallChangeLines(payload).map(({ label, value }) => `${label}: ${value}`),
     ...(supportingActionLines.length > 0

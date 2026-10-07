@@ -12,8 +12,12 @@ import {
   classifyConfidenceTrend,
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
+import type { RegimeAssessment } from "../lib/regimeEngine";
 import { resolveSectorKey } from "../lib/report/sectorSensitivity";
-import { resolveConfidencePercent } from "../lib/report/confidence";
+import { resolveConfidencePercent, resolvePublishedConfidence } from "../lib/report/confidence";
+import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
+import { formatConfidencePlainLabel } from "../lib/report/reportFormatting";
+import { assessment as fixtureAssessment } from "./factories/exportFixtures";
 
 const makeTreasury = (
   record_date: string,
@@ -126,45 +130,94 @@ describe("buildReportDynamics", () => {
 });
 
 describe("buildReportEvidenceItems", () => {
-  const makeAssessment = ({
-    tightness,
-    riskAppetite,
-    baseRate,
-    curveSlope,
-    regime = "VOLATILE",
-  }: {
-    tightness: number;
-    riskAppetite: number;
-    baseRate: number;
-    curveSlope: number;
-    regime?: "SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION";
-  }) =>
-    ({
-      regime,
-      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
-      scores: { tightness, riskAppetite, baseRate, curveSlope },
-    }) as ReturnType<typeof evaluateRegime>;
-
-  it("uses improving polarity for positive curve-slope deltas", () => {
-    const reportDynamics = {
-      changedSignals: [{ key: "curveSlope" as const, label: "Curve slope", delta: 0.3 }],
-    } as ReturnType<typeof buildReportDynamics>;
-
+  /*
+   * The reading of Oct 5, 2026 against Aug 31: Freezing, funding pressure 63 -> 90
+   * (line 70), risk appetite 56 -> 48 (line 50), the recession warning gauge
+   * +0.41% -> +0.47%. Built through `buildReportDynamics` so the moves are the
+   * ones the loader would hand the builder.
+   */
+  const weekOf = (current: { tightness: number; riskAppetite: number; curveSlope: number }) => {
+    const previous: RegimeAssessment = {
+      ...fixtureAssessment,
+      regime: "EXPANSION",
+      scores: { ...fixtureAssessment.scores, tightness: 63, riskAppetite: 56, curveSlope: 0.41 },
+    };
+    const assessment: RegimeAssessment = {
+      ...fixtureAssessment,
+      regime: "SCARCITY",
+      scores: { ...fixtureAssessment.scores, ...current },
+    };
     const items = buildReportEvidenceItems({
-      reportDynamics,
-      assessment: makeAssessment({ tightness: 45, riskAppetite: 55, baseRate: 4.5, curveSlope: 0.2 }),
-      lastUpdated: "2025-02-01",
+      reportDynamics: buildReportDynamics({ current: assessment, previous }),
+      assessment,
+      lastUpdated: "2026-10-05",
     });
+    const item = (key: "tightness" | "riskAppetite" | "baseRate" | "curveSlope") => {
+      const found = items.find((entry) => entry.key === key);
+      assert.ok(found, `evidence item for ${key}`);
+      return found;
+    };
+    return { assessment, items, item };
+  };
 
-    const curveSlopeItem = items.find((item) => item.key === "curveSlope");
+  const oct5 = { tightness: 90, riskAppetite: 48, curveSlope: 0.47 };
 
-    assert.match(curveSlopeItem?.immediateImplication ?? "", /12-month payback/i);
-    assert.match(curveSlopeItem?.immediateImplication ?? "", /curve remains above 0\.0%/i);
-    // Score thresholds render as whole numbers, matching the guardrail line and
-    // every other surface that formats a score. The trailing ".0" this used to
-    // assert claimed a precision the model does not carry.
-    assert.match(curveSlopeItem?.immediateImplication ?? "", /funding pressure stays below 70\b/i);
-    assert.doesNotMatch(curveSlopeItem?.immediateImplication ?? "", /stays below 70\.0/i);
+  it("titles each item with the signal's canonical name, never the retired 'Capital conditions'", () => {
+    const { items, item } = weekOf(oct5);
+    assert.equal(item("tightness").title, "Funding pressure");
+    assert.equal(item("riskAppetite").title, "Risk appetite");
+    assert.equal(item("curveSlope").title, "Recession warning gauge");
+    assert.ok(items.every((entry) => entry.title !== "Capital conditions"));
+  });
+
+  it("calls a move tightening or easing by which way is worse for that signal, not by its sign", () => {
+    const { item } = weekOf(oct5);
+    // Funding pressure up is worse; risk appetite down is worse; the gauge up is better.
+    assert.equal(item("tightness").directionLabel, "Tightening");
+    assert.equal(item("riskAppetite").directionLabel, "Tightening");
+    assert.equal(item("curveSlope").directionLabel, "Easing");
+    assert.equal(item("baseRate").directionLabel, "Unchanged");
+    assert.match(item("riskAppetite").supportingBullets[0] ?? "", /-8\.0 .*tightening the read/);
+    assert.match(item("curveSlope").supportingBullets[0] ?? "", /easing the read/);
+  });
+
+  it("labels distance from the line by the distance, not by the size of the week's move", () => {
+    const { assessment, item } = weekOf(oct5);
+    // Risk appetite moved 8 points and sits 2 from its line: it is not "well clear".
+    assert.doesNotMatch(item("riskAppetite").confidenceLabel, /well clear/);
+    // The nearest line is the one the page's own confidence is measured from, so
+    // that card and the trust strip say the same word.
+    assert.equal(
+      item("riskAppetite").confidenceLabel,
+      formatConfidencePlainLabel(resolvePublishedConfidence({ assessment }).label),
+    );
+    // Funding pressure is 20 points past its line: that one is well clear.
+    assert.match(item("tightness").confidenceLabel, /^High \(well clear/);
+
+    // The other way round: a half-point move used to read Low ("close to the
+    // line") whatever the distance. 6.5 points above the risk line is not close.
+    const quiet = weekOf({ ...oct5, riskAppetite: 56.5 });
+    assert.match(quiet.item("riskAppetite").confidenceLabel, /^High/);
+  });
+
+  it("states the recession warning gauge's payback bar as the Spending rule's, with no condition the reading contradicts", () => {
+    const spending = buildCanonicalBoundedDecisionRules({
+      regime: "SCARCITY",
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores: { tightness: 90, riskAppetite: 48 },
+    }).find((rule) => rule.area === "burn-discipline");
+    const bar = /inside (\d+) months/.exec(spending?.recommendation ?? "")?.[1];
+    assert.ok(bar, "the Spending rule states a payback bar");
+
+    for (const curveSlope of [0.53, 0.35, -0.2]) {
+      const line = weekOf({ ...oct5, curveSlope }).item("curveSlope").immediateImplication;
+      assert.match(line, new RegExp(`\\b${bar}-month payback bar on new spend`), line);
+      // The old line chose 12 or 9 months, said the curve "returns above 0.0%"
+      // when it was already above, and "funding pressure stays below 70" at 90.
+      assert.doesNotMatch(line, /\b(12|9)-month|returns above|remains above|stays below|funding pressure/i, line);
+    }
+    assert.match(weekOf({ ...oct5, curveSlope: 0.53 }).item("curveSlope").immediateImplication, /rising gauge/);
+    assert.match(weekOf({ ...oct5, curveSlope: 0.35 }).item("curveSlope").immediateImplication, /falling gauge/);
   });
 });
 
@@ -459,6 +512,22 @@ describe("buildFlipThreshold", () => {
         riskAppetite: 45,
       },
     }) as ReturnType<typeof evaluateRegime>;
+
+  it("states one score's half alone for a page about that score", () => {
+    const reading = {
+      regime: "SCARCITY" as const,
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores: { tightness: 90, riskAppetite: 48 },
+    };
+    /* The answer pages said "Trigger tighter mode if funding pressure rises
+       above 70" on a Freezing week already at 90; the line out is the other way. */
+    assert.equal(buildFlipThreshold(reading, "tightness"), "Funding pressure falls 20 pts to 70 or below (90 today).");
+    assert.equal(buildFlipThreshold(reading, "riskAppetite"), "Risk appetite rises 2 pts to clear 50 (48 today).");
+    assert.equal(
+      buildFlipThreshold(reading),
+      "Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).",
+    );
+  });
 
   it("returns a future crossing for scarcity regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("SCARCITY"));

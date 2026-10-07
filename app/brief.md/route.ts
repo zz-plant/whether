@@ -10,6 +10,7 @@ import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { formatDecisionReversal, formatDecisionThreshold } from "../../lib/report/reportFormatting";
 import { describeConditions, pauseConditionOnly } from "../../lib/export/exportTerms";
+import { formatGuidance } from "../../lib/export/briefBuilders";
 
 type HomePage = Awaited<ReturnType<typeof assembleHomePage>>;
 
@@ -52,10 +53,11 @@ export function buildBriefMarkdown(homepage: HomePage): string {
   const decisions = actionItems
     .map((item) =>
       [
+        /* A dash, not parentheses: a line the reading already meets carries
+           "(already true at 90)", which nested inside them. */
         `- ${item.areaActionNow}`,
-        `(${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(item.triggerThreshold)} · ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.reversalCondition)}`,
+        ` — ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(item.triggerThreshold)} · ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.reversalCondition)}`,
         ...(item.latencyLine ? [` · ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
-        ")",
       ].join(""),
     )
     .join("\n");
@@ -85,13 +87,12 @@ export function buildBriefMarkdown(homepage: HomePage): string {
   const operatorCopy = buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(
     buildBriefDocument(briefSourceFromReportData(reportData), homepage.weeklyCall),
     {
-      date: reportData.weeklyRecordDate,
       weeklyLeadershipSummary: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary,
     },
   ));
 
   const markdown = md`
-# Whether Weekly Brief — ${reportData.weeklyRecordDate}
+# Whether Weekly Brief — ${reportData.treasury.record_date}
 
 > **Conditions:** ${describeConditions(reportData.assessment.regime, postureLabel)}  
 > **Confidence:** ${trustCue}  
@@ -101,9 +102,7 @@ export function buildBriefMarkdown(homepage: HomePage): string {
 
 ## This Week's Guidance
 
-${weeklyCall.currentCall}
-
-**${DECISION_CONTRACT_LABELS.action.doNow}:** ${weeklyCall.actionNow}
+${formatGuidance(weeklyCall)}
 
 **${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${pauseConditionOnly(weeklyCall.pauseIf)}
 

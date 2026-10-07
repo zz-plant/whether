@@ -178,8 +178,10 @@ export const buildWeeklyCallContract = ({
   const flipConditionLabels = policyOverrideActive
     ? dedupeLines(
         [
-          policyOverrideReason ? `Why the guidance is held: ${policyOverrideReason}` : undefined,
-          "Hold anything you can't undo until the two scores agree.",
+          /* Items, not sentences: the list prints joined with "; ", and a
+             closing period read "the guidance.; Hold". */
+          policyOverrideReason ? `Why the guidance is held: ${policyOverrideReason.replace(/\.\s*$/, "")}` : undefined,
+          "Hold anything you can't undo until the two scores agree",
           ...defaultFlipConditionLabels,
         ],
         4,

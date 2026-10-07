@@ -9,6 +9,7 @@ import {
   formatMonthLongYearUtc,
   formatAgeSpan,
   formatAgeHours,
+  formatTimestampUTC,
 } from "../lib/formatters";
 import {
   formatQuarterLabel,
@@ -27,6 +28,19 @@ describe("formatNumberWithUnit", () => {
 
   it("keeps percent values unchanged", () => {
     assert.equal(formatNumberWithUnit(3.75, "%"), "3.75%");
+  });
+});
+
+describe("formatTimestampUTC", () => {
+  // One shape on every runtime: Bun on macOS formats this skeleton as "Mar 10, 2026 at 8:00 PM
+  // UTC" through the system ICU, Node and workerd as below.
+  it("writes the same label whatever ICU the runtime carries", () => {
+    assert.equal(formatTimestampUTC("2026-03-10T20:00:00Z"), "Mar 10, 2026, 8:00 PM UTC");
+    assert.equal(formatTimestampUTC("2026-10-07T00:19:00.000Z"), "Oct 7, 2026, 12:19 AM UTC");
+  });
+
+  it("returns an unparseable value as given", () => {
+    assert.equal(formatTimestampUTC("not a date"), "not a date");
   });
 });
 

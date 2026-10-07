@@ -1,3 +1,4 @@
+import { buildFlipThreshold } from "../reportEvidence";
 import {
   buildCanonicalBoundedDecisionRules,
   decisionAreaLabel,
@@ -509,7 +510,17 @@ export const buildHomeBriefModelInternal = (
     .filter((label) => label.length > 0)
     .filter((label, index, labels) => labels.indexOf(label) === index)
     .slice(0, 4);
-  const conciseFlipThreshold = postureState?.whatFlipsNext.flipTrigger?.trim() || flipThreshold?.trim() || reversalTrigger || compactFlipConditionLabels[0];
+  /* Both lines, from the reading itself, when the caller passed neither: a read
+     built without the report's sentence (the stored operating snapshot, which
+     the slide and the Monday sends print) fell through to the nearest line
+     alone, so the slide's "Conditions change if" named one line where the
+     homepage named two. */
+  const conciseFlipThreshold =
+    postureState?.whatFlipsNext.flipTrigger?.trim()
+    || flipThreshold?.trim()
+    || buildFlipThreshold(assessment)
+    || reversalTrigger
+    || compactFlipConditionLabels[0];
   const decisionMatrix = buildDecisionMatrixPayload({
     regime: assessment.regime,
     thresholds: assessment.thresholds,
