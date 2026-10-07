@@ -224,9 +224,9 @@ const uniqueLines = (lines: readonly CrossedLine[]) =>
  * line): the caller keeps its "no previous reading" sentence rather than getting a claim
  * that nothing crossed from a comparison nobody made.
  *
- * "Since Aug 31" names the reading the move is against — the previous month-end snapshot,
- * not last week (`lib/report/comparisonBasis.ts`) — and reads "this week" where the source
- * did not date it.
+ * "Since Sep 29" names the reading the move is against — last week's published brief, or
+ * the previous month-end snapshot where there is none (`lib/report/comparisonBasis.ts`) —
+ * and reads "this week" where the source did not date it.
  */
 export const buildDecisionMovement = ({
   scores,

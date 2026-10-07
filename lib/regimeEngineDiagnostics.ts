@@ -310,9 +310,14 @@ export const computeDiagnostics = (
   };
 };
 
+/** The two scores and the lines they are judged against: all a trend reads, so an earlier reading need not be a full assessment. */
+type TrendReading = Pick<RegimeAssessment, "thresholds"> & {
+  scores: Pick<RegimeAssessment["scores"], "tightness" | "riskAppetite">;
+};
+
 export const deriveRegimeTrend = (
-  previous: RegimeAssessment | null,
-  current: RegimeAssessment,
+  previous: TrendReading | null,
+  current: TrendReading,
 ): RegimeTrend => {
   if (!previous) {
     return "STABLE";

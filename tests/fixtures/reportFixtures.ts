@@ -179,6 +179,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
     lastYearComparison: null,
     liveAssessment: null,
     liveTreasury,
+    monthEndComparison: null,
     macroProvenance: {
       sourceLabel: "FRED & US Treasury",
       sourceUrl: treasury.source,

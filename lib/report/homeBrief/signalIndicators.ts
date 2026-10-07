@@ -54,7 +54,8 @@ export const buildRegimeSignalIndicators = ({
 }): RegimeSignalIndicator[] => {
   const changedSignals = reportDynamics?.changedSignals ?? [];
   /* The composite scores, the base rate and the curve are moved against the
-     previous monthly snapshot, and say so by its date. The two market inputs
+     week's comparison reading (last week's brief, or the previous month-end),
+     and say so by its date. The two market inputs
      below move against their own previous observation, which is a different
      comparison, so they keep "vs last week". */
   const versusPrevious = comparisonBasis(reportDynamics?.comparedWith).versus;

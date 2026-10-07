@@ -59,7 +59,7 @@ export type SignalClusterReading = {
   /** How to read the scale, in words. */
   scaleNote: string;
   threshold: { value: number; label: string };
-  /** The move since the comparison reading (the last month-end snapshot, named in `directionLabel`). Null when there is no prior reading to compare. */
+  /** The move since the comparison reading (last week's brief or the last month-end snapshot, named in `directionLabel`). Null when there is no prior reading to compare. */
   delta: number | null;
   /** Which direction is the comfortable one, for colouring the move. */
   betterWhen: "higher" | "lower";
@@ -164,7 +164,7 @@ export const describeSignalDirection = (
   }
   if (delta === 0) {
     /* "Unchanged from last week." where the week is undated, and the date
-       where it is: the comparison is the previous monthly snapshot. */
+       where it is: the comparison is last week's brief or the previous month-end. */
     return { label: basis.date ? `Unchanged ${basis.since}.` : `Unchanged from last week.`, tone: "unchanged" };
   }
 

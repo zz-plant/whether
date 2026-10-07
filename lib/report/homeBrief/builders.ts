@@ -274,9 +274,9 @@ export const buildHomeBriefModelInternal = (
      when the regime held and when there is nothing to compare it to, and this
      rendered the comparative sentence for both — including onto the OG share
      card, which is the version of this line that travels furthest.
-     The comparison is the previous monthly snapshot, so a week that records
-     its date says "since Aug 31" (`comparisonBasis`) and one that does not
-     keeps "than last week". */
+     The comparison is last week's brief or the previous month-end, so a week
+     that records its date says "since Sep 29" (`comparisonBasis`) and one that
+     does not keeps "than last week". */
   const basis = comparisonBasis(reportDynamics?.comparedWith);
   const againstPrevious = basis.date ? basis.since : "than last week";
   const postureDeltaLabel =

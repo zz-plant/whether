@@ -76,8 +76,9 @@ export const buildWeeklyMovementMetric = ({
   /** What the week did to the decisions (`buildDecisionMovement`); the archive's "what changed". */
   movementSentence?: string;
 }) => {
-  /* The comparison is the previous monthly snapshot, so a week that records its
-     date says "since Aug 31" where these sentences used to say "this week". */
+  /* The comparison is last week's brief or the previous month-end, so a week
+     that records its date says "since Sep 29" where these sentences used to say
+     "this week". */
   const window = basis.date ? basis.since : "this week";
   /* Absence of a comparison scores nothing. Without this the inputs of "no
      previous reading" and "a week that moved nothing" are identical — both are

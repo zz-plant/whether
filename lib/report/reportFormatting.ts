@@ -37,9 +37,15 @@ const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
 /** The one table, re-exported under the name this module's callers already use. */
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = regimeSignalLabel;
 
+/**
+ * A change of conditions, or a crossed call-change line, between the earlier
+ * reading and this one. The earlier reading needs only its conditions and its
+ * two scores, so a published brief serves as well as a full assessment; both
+ * readings are judged against today's lines.
+ */
 export const buildRegimeAlert = (
   current: RegimeAssessment,
-  previous: RegimeAssessment,
+  previous: Pick<RegimeAssessment, "regime"> & { scores: Pick<RegimeAssessment["scores"], "tightness" | "riskAppetite"> },
   currentRecordDate: string,
   previousRecordDate: string
 ) => {

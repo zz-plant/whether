@@ -215,8 +215,9 @@ async function PageContent({
     homepage.weeklyDecisionCardModel.decision.reportDynamics,
     { tightness: reportData.assessment.scores.tightness, riskAppetite: reportData.assessment.scores.riskAppetite },
   );
-  /* What that earlier reading is: the previous monthly snapshot, named by its
-     date wherever this page used to say "last week". */
+  /* What that earlier reading is: last week's published brief, or the previous
+     month-end where the archive has none, named by its date wherever this page
+     used to say "last week". */
   const basis = comparisonBasis(homepage.weeklyDecisionCardModel.decision.reportDynamics.comparedWith);
   const tightnessDelta = previousScores ? reportData.assessment.scores.tightness - previousScores.tightness : 0;
   const riskAppetiteDelta = previousScores ? reportData.assessment.scores.riskAppetite - previousScores.riskAppetite : 0;
@@ -427,10 +428,15 @@ async function PageContent({
         : [],
     )
     .slice(-CONDITIONS_TRAIL_MONTHS);
+  /* The path is month-ends whichever reading the week compares with, so its
+     like-for-like note reads the month-end split and is dated by the month-end. */
   const conditionsTrail = {
     points: conditionsTrailEntries.map((entry) => ({ tightness: entry.tightness, riskAppetite: entry.riskAppetite })),
     caption: describeConditionsTrail(conditionsTrailEntries.map((entry) => entry.recordDate)),
-    caveat: describeScoreMovementCaveat(homepage.weeklyDecisionCardModel.decision.reportDynamics.movement, basis),
+    caveat: describeScoreMovementCaveat(
+      reportData.monthEndComparison?.movement,
+      comparisonBasis(reportData.monthEndComparison?.comparedWith),
+    ),
   };
   /* On a reading whose conditions differ from the earlier one, the card's stamp
      line says what they were, dated by the comparison's own basis. */

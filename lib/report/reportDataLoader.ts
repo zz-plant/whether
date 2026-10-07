@@ -1,5 +1,5 @@
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
-import type { RegimeAssessment, RegimeThresholds, RegimeTrend } from "../regimeEngine";
+import type { RegimeAssessment, RegimeThresholds } from "../regimeEngine";
 import {
   FRED_SOURCE_LABEL,
   PROVENANCE_CATALOG_STATUS,
@@ -23,6 +23,7 @@ import type { PlaybookEntry } from "../playbook";
 import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
 import { buildComparedWith } from "./comparisonBasis";
+import type { ComparisonReading } from "./comparisonReading";
 import { explainScoreMovement } from "./scoreMovement";
 import type {
   ComparedWith,
@@ -58,10 +59,7 @@ type ReportDataLoaderDependencies = {
   loadMacroSeries: (fetcher?: typeof fetch) => Promise<MacroSeriesReading[]>;
   buildSensorReadings: (treasury: TreasuryData) => SensorReading[];
   evaluateRegime: typeof import("../regimeEngine").evaluateRegime;
-  deriveRegimeTrend: (
-    previous: RegimeAssessment | null,
-    current: RegimeAssessment,
-  ) => RegimeTrend;
+  deriveRegimeTrend: typeof import("../regimeEngine").deriveRegimeTrend;
   parseThresholdsFromSearchParams: (searchParams?: ReportSearchParams) => RegimeThresholds;
   resolveTimeMachineSelection: (searchParams?: ReportSearchParams) => { asOf: string; month: number; year: number; banner: string } | null;
   parseTimeMachineRequest: (searchParams?: ReportSearchParams) => { month?: number; year?: number } | null;
@@ -72,6 +70,8 @@ type ReportDataLoaderDependencies = {
   getTimeMachineYieldCurveSeries: (months: number, asOf?: string) => TimeMachineYieldCurveEntry[];
   getTimeMachineSnapshots: () => Array<TreasuryData & { year: number; month: number }>;
   getPreviousTimeMachineSnapshot: (recordDate: string) => TreasuryData | null;
+  /** Last week's published brief as a comparison, or null where the archive has none in range (`findWeeklyComparisonReading`). */
+  findWeeklyComparisonReading: (recordDate: string) => ComparisonReading | null;
   findTimeMachineSnapshot: (recordDate: string) => TreasuryData | null;
   findTimeMachineGovernedAssessment: (
     recordDate: string,
@@ -102,7 +102,7 @@ type ReportDataLoaderDependencies = {
   };
   buildRegimeAlert: (
     current: RegimeAssessment,
-    previous: RegimeAssessment,
+    previous: Pick<ComparisonReading, "regime" | "scores">,
     currentRecordDate: string,
     previousRecordDate: string
   ) => {
@@ -116,7 +116,7 @@ type ReportDataLoaderDependencies = {
   } | null;
   buildReportDynamics: (args: {
     current: RegimeAssessment;
-    previous: RegimeAssessment | null;
+    previous: ComparisonReading | null;
     comparedWith?: ComparedWith;
     movement?: ReportDynamics["movement"];
   }) => ReportDynamics;
@@ -163,6 +163,16 @@ type ReportDataLoaderDependencies = {
   }) => SourceHealthRow[];
   buildSnapshotFallbackTreasury: (snapshot: TreasuryData, now?: Date) => TreasuryData;
   buildFallbackForecastModel: () => ForecastModel;
+};
+
+/**
+ * The reading a week is compared with, the date it is named by, and, against a
+ * month-end only, what each score's move is made of (`ReportDynamics.movement`).
+ */
+type WeekComparison = {
+  reading: ComparisonReading;
+  comparedWith: ComparedWith | undefined;
+  movement?: ReportDynamics["movement"];
 };
 
 type LoadReportDataUncachedArgs = {
@@ -494,39 +504,58 @@ export const loadReportDataUncachedInternal = async ({
           },
         }
       : null;
-  const regimeAlert =
-    previousAssessment && previousSnapshot
-      ? deps.buildRegimeAlert(
-          assessment,
-          previousAssessment,
-          treasury.record_date,
-          previousSnapshot.record_date,
-        )
+  /* The previous month-end snapshot as a comparison, named by its date. Its
+     moves are split by what made them: the month-end is scored from rates alone
+     (above), so today's inputs are scored in stages to say which part of each
+     move is rates and which is an input the month-end score never had. No split
+     is printed unless the stages rebuild the assessment on the page. The
+     conditions map draws month-ends, so its like-for-like note reads this split
+     whichever reading the week itself compares with. */
+  const monthEndComparison: WeekComparison | null =
+    previousSnapshot && previousAssessment
+      ? {
+          reading: {
+            recordDate: previousSnapshot.record_date,
+            regime: previousAssessment.regime,
+            scores: previousAssessment.scores,
+          },
+          comparedWith: buildComparedWith(previousSnapshot.record_date, treasury.record_date),
+          movement: explainScoreMovement({
+            previous: previousAssessment.scores,
+            current: assessment.scores,
+            treasury,
+            thresholds,
+            macroSeries: assessmentMacroSeries,
+            evaluate: deps.evaluateRegime,
+          }),
+        }
       : null;
+  /* What changed this week is against last week's published brief, where the
+     archive has one from the previous one to two weeks: it was scored the way
+     this reading is, so the moves are like-for-like and there is no
+     rates-versus-inputs split to make. The month-end is the fallback. A replay
+     is a walk of month-ends, and a threshold override rescores this reading
+     against lines the brief was not published with, so both keep the month-end. */
+  const weeklyReading =
+    historicalSelection || hasThresholdOverrides(searchParams)
+      ? null
+      : deps.findWeeklyComparisonReading(treasury.record_date);
+  const comparison: WeekComparison | null = weeklyReading
+    ? { reading: weeklyReading, comparedWith: buildComparedWith(weeklyReading.recordDate, treasury.record_date) }
+    : monthEndComparison;
+  const regimeAlert = comparison
+    ? deps.buildRegimeAlert(assessment, comparison.reading, treasury.record_date, comparison.reading.recordDate)
+    : null;
   const reportDynamics = deps.buildReportDynamics({
     current: assessment,
-    previous: previousAssessment,
-    /* The moves are against this snapshot, and the cache behind it is monthly:
-       naming its date is what stops them reading as a week's. */
-    comparedWith: previousSnapshot
-      ? buildComparedWith(previousSnapshot.record_date, treasury.record_date)
-      : undefined,
-    /* What the moves are made of. The earlier reading is scored from rates
-       alone (above), so today's inputs are scored in stages to say which part
-       of each move is rates and which is an input the earlier score never had.
-       No split is printed unless the stages rebuild the assessment on the page. */
-    movement: previousAssessment
-      ? explainScoreMovement({
-          previous: previousAssessment.scores,
-          current: assessment.scores,
-          treasury,
-          thresholds,
-          macroSeries: assessmentMacroSeries,
-          evaluate: deps.evaluateRegime,
-        })
-      : undefined,
+    previous: comparison?.reading ?? null,
+    comparedWith: comparison?.comparedWith,
+    movement: comparison?.movement,
   });
-  const regimeTrend = deps.deriveRegimeTrend(previousAssessment, assessment);
+  const regimeTrend = deps.deriveRegimeTrend(
+    comparison ? { scores: comparison.reading.scores, thresholds } : null,
+    assessment,
+  );
   // As of the record date, like the assessment: a replayed month's forecast
   // read today's macro downside bias.
   const forecast = deps.buildForecastModel({
@@ -606,6 +635,10 @@ export const loadReportDataUncachedInternal = async ({
     lastYearComparison,
     liveAssessment,
     liveTreasury,
+    /** The previous month-end as a comparison, for the conditions map's month-end path; null with no month-end before this reading. */
+    monthEndComparison: monthEndComparison
+      ? { comparedWith: monthEndComparison.comparedWith, movement: monthEndComparison.movement }
+      : null,
     macroProvenance,
     macroSeries: assessmentMacroSeries,
     macroCoverage: historicalSelection
@@ -739,6 +772,7 @@ export const buildFallbackReportDataInternal = ({
     lastYearComparison: null,
     liveAssessment,
     liveTreasury: fallbackTreasury,
+    monthEndComparison: null,
     macroProvenance: {
       sourceLabel: "FRED & US Treasury",
       sourceUrl: fallbackTreasury.source,
