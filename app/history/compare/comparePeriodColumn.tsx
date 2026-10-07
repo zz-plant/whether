@@ -103,7 +103,7 @@ export function ComparePeriodColumn({
         <h2 className="mt-4 text-xl font-bold text-slate-100">
           {status.postureWithStageLabel || status.postureLabel}
         </h2>
-        <p className="mt-2 text-sm italic text-slate-300">&ldquo;{summary.shorthandLine}&rdquo;</p>
+        <p className="mt-2 text-sm text-slate-300">&ldquo;{summary.shorthandLine}&rdquo;</p>
       </div>
 
       <div className="weather-panel space-y-4 p-6">

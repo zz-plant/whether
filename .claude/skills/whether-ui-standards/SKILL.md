@@ -27,6 +27,15 @@ The canonical rules live in `docs/agents/ui-ux-standards.md`. Read it before edi
 | XII | Disclosure — what earns collapsing, and URL-carried open state |
 | XIII | Depth and enclosure — the outermost container owns the elevation |
 | XIV | Shape register — sharp asserts (stamps, controls), soft holds (cards, surfaces); no text-bearing pills |
+| XV | Encoding a number — the figure register (mono for columns, `tabular-nums` in prose), and when to draw the line |
+| XVI | Colour that means something — the regime ink and accent |
+| XVII | Responsive diagrams |
+| XVIII | Type register — one family in three widths, capitals for stamps only, one encoding per fact |
+| XIX | Reading order — document order is visual order |
+| XX | Comprehension before the export action |
+| XXI | Spacing ownership |
+| XXII | What the font files draw — no glyph, style or feature the shipped files lack |
+| XXIII | Motion a reader doesn't notice — named properties, no animation on repeated actions, short and interruptible |
 
 Sections VIII and XI are the ones most often violated by accident, because they're about *what belongs where* rather than about code. Before adding a card, ask which layer owns that information. If copy fits two layers, it goes on the earliest one and the later one links out.
 
@@ -52,9 +61,13 @@ These come from the Web Interface Guidelines and matter specifically for this co
 
 **Safe areas.** `mobile-workflows.css` and `typography.css` already use `env(safe-area-inset-*)`. Any new fixed or sticky element — bottom bars, sheets, the sticky call strip — needs the same treatment or it will sit under the home indicator.
 
+## Read the font file, not the font's name
+
+A type designer's habit (§XXII): a page can only set what `public/fonts/*.woff2` contains. Before you put a symbol in copy or chrome, or reach for an OpenType feature, list what the file draws. §XXII gives the fontTools one-liner. The shipped Archivo draws ↑ ↓ but not → ≤ ≥, has no italic, and has no `case`, `zero` or small capitals. Anything outside the file is set in the reader's OS font, so it looks different on every platform. Chrome marks come from `app/components/uiIcons.tsx`, and `tests/craftDetails.test.ts` holds the line for the common ones.
+
 ## Reduced motion is under-covered
 
-Only three of the fourteen files in `app/styles/` have a `prefers-reduced-motion` block. Any new transition or reveal needs one. Section IX limits reveal motion to `transform` and `opacity`; reduced-motion users should get the end state immediately, not a slower version of the animation.
+Eight of the fourteen files in `app/styles/` have a `prefers-reduced-motion` block (counted 2026-10-07). Any new transition or reveal needs one. Section IX limits reveal motion to `transform` and `opacity`; reduced-motion users should get the end state immediately, not a slower version of the animation.
 
 ## Auditing rather than authoring
 

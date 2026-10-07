@@ -11,6 +11,7 @@ import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 import { ToolkitPlaybookGlyph } from "../../components/illustrations/ToolkitPlaybookGlyph";
+import { ArrowRightIcon } from "../../components/uiIcons";
 type Params = { slug: string };
 
 export const dynamicParams = true;
@@ -150,7 +151,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
             return (
               <li key={item}>
                 <Link href={instrumentHref} className="inline-flex min-h-[44px] items-center gap-2 text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100">
-                  <span aria-hidden="true">↗</span>
+                  <ArrowRightIcon className="h-3.5 w-3.5 shrink-0" />
                   <span>{item}</span>
                 </Link>
               </li>

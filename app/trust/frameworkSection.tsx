@@ -139,7 +139,7 @@ export function FrameworkSection() {
             <div className="space-y-2">
               <p className="type-eyebrow">The decision</p>
               <div className="border-b border-slate-600 pb-2">
-                <p className="text-sm text-slate-400 italic">What are you considering doing?</p>
+                <p className="text-sm text-slate-400">What are you considering doing?</p>
               </div>
               <div className="h-16 border-b border-slate-700/50" />
             </div>
@@ -171,7 +171,7 @@ export function FrameworkSection() {
 
           <TemplateActions />
 
-          <p className="text-fluid-micro text-slate-400 italic">
+          <p className="text-fluid-micro text-slate-400">
             No signup required. No data collected. This template is free to use, copy, and share.
           </p>
         </div>

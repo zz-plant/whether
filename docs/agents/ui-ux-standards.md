@@ -451,3 +451,60 @@ Added 2026-09-24 with DD-033 (`docs/design-debt-prioritized.md`).
 - Check rendered section edges and distances on mobile and desktop. A uniform search-and-replace of every gap loses the distinction between a label, a content group and a new section.
 - Share groups use a centered 72rem column; the shared format picker caps its preview at 48rem and aligns the tab grid to that width. Keep the subscription and return link on the same page edge.
 - Timeline month and zoom buttons and the draggable track keep 44px touch targets. Compact sizes apply only from `sm` with a fine pointer and hover support.
+
+## XXII. What the font files draw (type as material)
+
+Added 2026-10-07 with DD-060 (`docs/design-debt-prioritized.md`). The habit is a type designer's
+and font engineer's: Wei Huang (Work Sans, Fragment Mono) and the foundries that circle works
+with. A page can only set what the font file contains, so read the file, not the font's name.
+The shipped files are `public/fonts/*.woff2`. Before relying on a glyph or a feature, list the
+file's characters and features with fontTools, the same Python `scripts/generate-og-fonts.mjs`
+needs:
+
+```
+python3 -c "from fontTools.ttLib import TTFont; f=TTFont('public/fonts/archivo-variable.woff2'); print(''.join(sorted(chr(c) for c in f.getBestCmap() if c > 0xFF))); print(sorted({r.FeatureTag for r in f['GSUB'].table.FeatureList.FeatureRecord}))"
+```
+
+- **A character the face does not draw is set in another typeface.** The shipped Archivo is a
+  generic Latin subset. It draws ↑ and ↓, but not → ← ≤ ≥ ≈ ≠ Δ, and Chivo Mono draws none of the
+  arrows. Each missing character falls back, glyph by glyph, to whatever the reader's OS has: a
+  different weight, size and baseline on every platform.
+  - In chrome, draw the mark with the icon set (`app/components/uiIcons.tsx`). The disclosure
+    chevron is a masked SVG (`app/styles/controls.css`), never a triangle glyph.
+  - In copy, use the word where it reads as well ("at or below").
+  - The arrows already in copy are fixed at the file (DD-060), not by rewriting the copy.
+  - `tests/craftDetails.test.ts` rejects ▾ ▸ ↗ ✓ ✔ ✕ ✗ under `app/`.
+- **No style the files don't ship.** Both faces are upright only, so `italic` makes the browser
+  slant the roman: a faux oblique that reads as a rendering fault. Mark a quotation with quotation
+  marks, and a prompt with the muted ink. The one exception is the chat preview's `<em>`
+  (`app/share/chatPreview.tsx`), which shows how a chat client renders `_text_`. The test rejects
+  the `italic` utility and `font-style: italic` elsewhere.
+- **No feature the subset dropped.** The files keep `tnum`, `pnum`, `frac`, `liga` and `kern`.
+  They have no small capitals, `case`, `zero` or old-style figures, so
+  `font-variant-caps: small-caps` would synthesize scaled capitals, lighter than the real ones
+  beside them. Capitals stay full size and tracked (§XVIII).
+- **The figure register absorbs the sign.** In Archivo the hyphen is 333 units wide and `+` is
+  636, so signed figures set in the sans don't line up down a column, even with `tabular-nums`. In
+  Chivo Mono, `-`, `+` and `−` share the 600-unit advance. That is one more reason a column of
+  signed figures is mono (§XV).
+
+## XXIII. Motion a reader doesn't notice
+
+Added 2026-10-07. This extends §I and §IX with the habits of the interaction designers whose work
+this site's controls most resemble: Rauno Freiberg, Emil Kowalski, Jakub Krehel and Vercel's Web
+Interface Guidelines. On a control someone uses every week, the best transition is often none,
+and the rest are short and interruptible.
+
+- **Name what moves.** Use `transition-colors`, `transition-transform`, or the bare `transition`
+  utility, which is a named list. Never use `transition-all`: on the page shell it animated the
+  `sm` breakpoint's padding while a window resized. `tests/craftDetails.test.ts` rejects it.
+- **Feedback on a repeated action is a state change, not an animation.** A copy confirmation swaps
+  its label and a tab switch swaps its content. By the tenth use, a transition on a repeated action
+  is felt as latency.
+- **Use transitions, not keyframes, for anything a reader can reverse partway:** a disclosure, a
+  hover, a press. A transition retargets from where it is; a keyframe animation restarts.
+  Keyframes are for one-way entrances and loading shimmer.
+- **Keep it short and ease-out.** Feedback runs under 200ms, and a panel or sheet under 300ms,
+  entering with `ease-out`. An exit is quicker than its entrance.
+- **Every new transition has a reduced-motion end state:** `motion-reduce:transition-none` on the
+  element, or a `prefers-reduced-motion` block beside the rule.

@@ -3,6 +3,7 @@ import { ActionLink } from "../components/ui/actionLink";
 import Link from "next/link";
 import { buildPageMetadata } from "../../lib/seo";
 import { UrlDetails } from "../components/ui/urlDetails";
+import { ChevronDownIcon } from "../components/uiIcons";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
 import {
@@ -214,8 +215,8 @@ export default async function MethodPage({
           summary={
             <>
               <span>Citation, limits and revisit triggers</span>
-              <span aria-hidden="true" className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-400 transition group-open:rotate-180">
-                ▾
+              <span aria-hidden="true" className="inline-flex rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-1.5 text-slate-400 transition group-open:rotate-180 motion-reduce:transition-none">
+                <ChevronDownIcon className="h-3.5 w-3.5" />
               </span>
             </>
           }
