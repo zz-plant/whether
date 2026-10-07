@@ -16,6 +16,17 @@
 export const DISPLAY_EM = 0.45;
 export const SANS_EM = 0.49;
 
+/**
+ * Characters a full em wide, counted as two. An average cannot absorb them:
+ * → ← ↔ advance 1000 units of 1000 in every card face, and — and ‰ about the
+ * same in the text faces (— is 875 in the call's semi-condensed face). Counted
+ * at the average, a run of them measures under half its drawn width, and since
+ * 2026-10-07 the cards print the arrow as itself instead of "->". Letters stay
+ * in the average they were measured in.
+ */
+const WIDE = /[\u2190\u2192\u2194\u2014\u2030]/g;
+const measure = (text: string): number => text.length + (text.match(WIDE)?.length ?? 0);
+
 /** The lines `text` wraps to at `fontSize` in `width`, by greedy word wrap. */
 export const wrappedLines = (text: string, fontSize: number, width: number, em: number): string[] => {
   const perLine = Math.max(1, Math.floor(width / (fontSize * em)));
@@ -23,7 +34,7 @@ export const wrappedLines = (text: string, fontSize: number, width: number, em: 
   let current = "";
   for (const word of text.split(/\s+/).filter(Boolean)) {
     const next = current ? `${current} ${word}` : word;
-    if (next.length <= perLine || !current) {
+    if (measure(next) <= perLine || !current) {
       current = next;
     } else {
       lines.push(current);

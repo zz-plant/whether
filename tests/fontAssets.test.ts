@@ -129,6 +129,9 @@ const fontFaces = [...css.matchAll(/@font-face\s*\{([^}]*)\}/g)].map(([, block])
   },
 }));
 
+/** The local, metric-matched faces drawn while Archivo is in flight. */
+const FALLBACK = "Archivo Fallback";
+
 const face = (family: string) => {
   const found = fontFaces.find((candidate) => candidate.family === family);
   assert.ok(found, `fonts.css declares ${family}`);
@@ -151,7 +154,9 @@ describe("the web fonts", () => {
   });
 
   it("are the files the stylesheet and the preload ask for", () => {
-    for (const { family, file } of fontFaces) assert.ok(existsSync(join(FONT_DIR, file)), `${family}: ${file}`);
+    for (const { family, file } of fontFaces.filter((candidate) => candidate.family !== FALLBACK)) {
+      assert.ok(file && existsSync(join(FONT_DIR, file)), `${family}: ${file}`);
+    }
     const preload = /<link rel="preload" href="\/fonts\/([^"]+)"/.exec(readFileSync("app/layout.tsx", "utf8"))?.[1];
     assert.equal(preload, face("Archivo").file, "the preload is the Archivo file the stylesheet loads");
   });
@@ -166,6 +171,27 @@ describe("the web fonts", () => {
       }
     }
     assert.match(readFileSync("app/styles/tokens.css", "utf8"), /--font-mono:\s*"Chivo Mono",\s*"Archivo"/);
+  });
+
+  /* Until 2026-10-07 a first visit drew system-ui until Archivo arrived, and on a 430px
+     phone the swap reflowed the home page's decision chips (ui-ux-standards §XXII). */
+  it("stand in for Archivo on a first visit with local faces sized to it, the display width included", () => {
+    const tokens = readFileSync("app/styles/tokens.css", "utf8");
+    const fallbacks = [...css.matchAll(/@font-face\s*\{([^}]*)\}/g)]
+      .map(([, block]) => block)
+      .filter((block) => block.includes(`font-family: "${FALLBACK}"`));
+    assert.equal(fallbacks.length, 2);
+    for (const block of fallbacks) {
+      assert.doesNotMatch(block, /url\(/, "a stand-in is a face the reader already has, never a download");
+      assert.match(block, /src:\s*local\("Arial/);
+      for (const descriptor of ["size-adjust", "ascent-override", "descent-override", "line-gap-override"]) {
+        assert.match(block, new RegExp(`${descriptor}:\\s*[\\d.]+%;`), `${descriptor} is set`);
+      }
+    }
+    const displayStretch = /--font-stretch-display:\s*([\d.]+%)/.exec(tokens)?.[1];
+    assert.ok(displayStretch);
+    assert.ok(fallbacks.some((block) => block.includes(`font-stretch: ${displayStretch};`)), "the display voice has its own stand-in");
+    assert.match(tokens, /--font-sans:\s*"Archivo",\s*"Archivo Fallback",\s*system-ui/);
   });
 });
 
