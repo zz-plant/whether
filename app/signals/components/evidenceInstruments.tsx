@@ -13,6 +13,13 @@ import { RegimeTimelinePanel } from "./regimeTimelinePanel";
 import { FossilRecordSection } from "./fossilRecordSection";
 import type { SignalsPageSearchParams } from "../evidencePageModel";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
+import {
+  describeConditionChanges,
+  describeRatesSummary,
+  describeScoreTrendSummary,
+  summarizeConditionRuns,
+} from "../../../lib/report/evidenceInstrumentSummaries";
+import { InstrumentQuestion } from "./instrumentQuestion";
 
 /**
  * The fourth section of the evidence page: the instruments. Charts, the line
@@ -48,10 +55,11 @@ type TrendPoint = { label: string; value: number };
 /* No space-y here: Tailwind's space-y puts a bottom margin on every child but
    the last, and the summary is one, so a closed row came out 13px taller than
    its neighbours. Each body spaces itself. */
-const DISCLOSURE_CLASS = "weather-auto-chevron weather-panel p-5";
+/* No side inset on a phone, like the section title above the list
+   (`px-5 max-sm:px-0`): the rows are unboxed, so their questions align with
+   the page column, and an opened chart keeps the full width. */
+const DISCLOSURE_CLASS = "weather-auto-chevron weather-panel p-5 max-sm:px-0";
 const SUMMARY_CLASS = "cursor-pointer select-none text-base font-semibold text-slate-100";
-/* The answer's own particulars after the question, quieter than it. */
-const SUMMARY_DETAIL_CLASS = "font-normal text-slate-400";
 
 /* A score carries its scale ("72/100"); a bare "72" beside "3.50%" read as the same kind of number. */
 const formatCoordinate = (value: number, unit: "%" | "pts") =>
@@ -68,12 +76,10 @@ const AnalogPatternDisclosure = ({ assessment }: { assessment: Pick<RegimeAssess
   return (
     <details id="analog-pattern" className={DISCLOSURE_CLASS}>
       <summary className={SUMMARY_CLASS}>
-        <span>
-          Which past cycle looks most like this one?{" "}
-          <span className={SUMMARY_DETAIL_CLASS}>
-            {analog.analogPeriod} · {analog.regimeType}
-          </span>
-        </span>
+        <InstrumentQuestion
+          question="Which past cycle looks most like this one?"
+          answer={`${analog.analogPeriod} · ${analog.regimeType}`}
+        />
       </summary>
       <div className="space-y-4">
         <p className="text-fluid-xs text-slate-400">
@@ -161,7 +167,22 @@ export const SignalsInstrumentsSection = ({
   invalidHistoricalSelection: boolean;
   monthPickerOpen: boolean;
   searchParams?: SignalsPageSearchParams;
-}) => (
+}) => {
+  /* Each closed question carries its answer (§XII), from the values the panel
+     under it draws: this week's rates beside the month-end archive the rate
+     charts plot, the two series the score cells print, and the runs the
+     month-by-month timeline counts. */
+  const ratesAnswer = describeRatesSummary({
+    current: { recordDate: treasury.record_date, oneMonth: treasury.yields.oneMonth },
+    series: yieldCurveSeries,
+  });
+  const scoreSeries = [
+    { key: "tightness", label: regimeSignalLabel.tightness, points: tightnessTrend, windowLabel: `${tightnessTrend.length} mo` },
+    { key: "riskAppetite", label: regimeSignalLabel.riskAppetite, points: riskAppetiteTrend, increaseIsPositive: true, windowLabel: `${riskAppetiteTrend.length} mo` },
+  ];
+  const trendsAnswer = describeScoreTrendSummary(scoreSeries);
+  const pastMonthsAnswer = regimeSeries.length > 0 ? describeConditionChanges(summarizeConditionRuns(regimeSeries)) : null;
+  return (
   /* Ruled off from "What would change this guidance": its last line ran into
      this eyebrow closer than the gaps inside either section, so the evidence
      appendix read as more of the guidance. */
@@ -181,7 +202,9 @@ export const SignalsInstrumentsSection = ({
         box each would put the charts' own cards three frames deep (§XIII). */}
     <div className="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]">
       <details id="signal-diagnostics" className={DISCLOSURE_CLASS}>
-        <summary className={SUMMARY_CLASS}>What are interest rates doing?</summary>
+        <summary className={SUMMARY_CLASS}>
+          <InstrumentQuestion question="What are interest rates doing?" answer={ratesAnswer} />
+        </summary>
         <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
       </details>
 
@@ -192,7 +215,9 @@ export const SignalsInstrumentsSection = ({
       />
 
       <details id="trends" className={DISCLOSURE_CLASS}>
-        <summary className={SUMMARY_CLASS}>How have the two scores moved this year?</summary>
+        <summary className={SUMMARY_CLASS}>
+          <InstrumentQuestion question="How have the two scores moved this year?" answer={trendsAnswer} />
+        </summary>
         <div className="space-y-4">
           {/* The table above publishes *this week's* reading and this series is
               the month-end archive, so the two disagree by design — for the same
@@ -202,12 +227,7 @@ export const SignalsInstrumentsSection = ({
             Month-end readings from the archive, so the latest figure here is the last
             completed month rather than this week&rsquo;s score above.
           </p>
-          <SignalSparklineStrip
-            series={[
-              { key: "tightness", label: regimeSignalLabel.tightness, points: tightnessTrend, windowLabel: `${tightnessTrend.length} mo` },
-              { key: "riskAppetite", label: regimeSignalLabel.riskAppetite, points: riskAppetiteTrend, increaseIsPositive: true, windowLabel: `${riskAppetiteTrend.length} mo` },
-            ]}
-          />
+          <SignalSparklineStrip series={scoreSeries} />
         </div>
       </details>
 
@@ -217,9 +237,9 @@ export const SignalsInstrumentsSection = ({
         id="past-months"
         queryKey="advanced"
         initialOpen={monthPickerOpen}
-        className="weather-auto-chevron weather-panel p-5"
+        className={DISCLOSURE_CLASS}
         summaryClassName={SUMMARY_CLASS}
-        summary={<span>What did the brief say in an earlier month?</span>}
+        summary={<InstrumentQuestion question="What did the brief say in an earlier month?" answer={pastMonthsAnswer} />}
       >
         <TimeMachinePanel
           selectedYear={selectedYear}
@@ -250,4 +270,5 @@ export const SignalsInstrumentsSection = ({
       />
     </div>
   </section>
-);
+  );
+};

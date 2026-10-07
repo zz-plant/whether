@@ -7,6 +7,7 @@ import {
   type SparklineTone,
 } from "../../components/ui/sparkline";
 import { TrendGlyph, trendDirectionFromDelta, trendToneClass } from "../../components/illustrations/TrendGlyph";
+import { summarizeScoreWindow } from "../../../lib/report/evidenceInstrumentSummaries";
 
 type SignalSparklineSeries = {
   key: string;
@@ -39,16 +40,17 @@ export function SignalSparklineStrip({ series }: { series: SignalSparklineSeries
 
   return (
     <ul className="grid gap-3 sm:grid-cols-2" aria-label="Signal readings over the window">
-      {drawable.map((item) => {
+      {drawable.flatMap((item) => {
+        /* The window through the function the summary over this strip reads,
+           so the closed question and the opened cells quote the same move. */
+        const window = summarizeScoreWindow(item.points);
+        if (!window) return [];
+        const { last, delta, periodLabel: latestPeriodLabel } = window;
         const values = item.points.map((point) => point.value);
-        const first = values[0];
-        const last = values[values.length - 1];
-        const delta = last - first;
         const direction = trendDirectionFromDelta(delta);
         const tone: SparklineTone =
           delta === 0 ? "unchanged" : (delta > 0) === Boolean(item.increaseIsPositive) ? "easing" : "tightening";
         const domain = sparklineDomain(values);
-        const latestPeriodLabel = item.points[item.points.length - 1]?.label;
         return (
           <li key={item.key} className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2.5">
             <div className="flex items-baseline justify-between gap-2">
