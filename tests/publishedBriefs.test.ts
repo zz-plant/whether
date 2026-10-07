@@ -131,6 +131,18 @@ describe("citable permalink recency gate", () => {
     );
   });
 
+  /* A replayed or saved reading is not described by a week frozen after it. Until
+     2026-10-07 the Aug 28 golden fixture cited w40 (Sep 29), and each freeze moved it. */
+  it("never cites a week frozen after the reading", () => {
+    const dayBefore = shiftDays(latest.recordDate, -1);
+    const cited = selectCitablePermalinkBrief(dayBefore);
+    assert.notEqual(cited?.slug, latest.slug);
+    if (cited) {
+      assert.ok(cited.recordDate <= dayBefore, `${cited.slug} is dated ${cited.recordDate}, after ${dayBefore}`);
+    }
+    assert.equal(selectCitablePermalinkBrief("2000-01-03"), undefined, "a reading before the archive cites nothing");
+  });
+
   it("withholds the permalink once the freeze job has fallen behind", () => {
     // The failure this guards: the archive stops being written, and the homepage
     // keeps date-stamping itself with the last week that was frozen.

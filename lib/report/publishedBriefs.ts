@@ -483,17 +483,26 @@ export const publishedBriefAgeInDays = (brief: PublishedBrief, currentRecordDate
  * claim is freshness is a negative claim, so absence is the safer failure.
  */
 export const selectCitablePermalinkBrief = (currentRecordDate: string): PublishedBrief | undefined => {
-  if (!latestPublishedBrief) {
+  /* The newest frozen week at or before the reading. It was the newest frozen week
+     whatever the reading's date: a negative age passed the staleness gate, so a
+     replayed or saved reading (Aug 28) cited a later week (w40, frozen Sep 29) as
+     its "Permanent record", and every freeze moved the pinned brief formats, which
+     fails the freeze routine's own push at the pre-push gate. */
+  const brief = briefs.find((candidate) => {
+    const age = publishedBriefAgeInDays(candidate, currentRecordDate);
+    return age !== null && age >= 0;
+  });
+  if (!brief) {
     return undefined;
   }
 
-  const age = publishedBriefAgeInDays(latestPublishedBrief, currentRecordDate);
+  const age = publishedBriefAgeInDays(brief, currentRecordDate);
 
   if (age === null || age > PUBLISHED_BRIEF_STALE_AFTER_DAYS) {
     return undefined;
   }
 
-  return latestPublishedBrief;
+  return brief;
 };
 
 export const buildPublishedBriefPath = (slug: string) => `/brief/${slug}` as const;

@@ -2531,6 +2531,10 @@ record, though the scores can come from an operating snapshot an earlier deploy 
 the operating snapshot choose the comparison reading through one rule (`selectWeekComparison`,
 `monthEndComparisonReading`, `lib/report/weekComparison.ts`).
 
+
+A shared brief's "Full brief" link and its "Permanent record" line cite the newest week frozen at or
+before the reading (`selectCitablePermalinkBrief`). They cited the newest frozen week whatever the
+reading's date, so a replayed or saved reading pointed at a week frozen after it.
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
