@@ -97,9 +97,8 @@ export function ToolkitLibraryPanels({
         </div>
       ) : (
         <div className="space-y-3 rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-4 text-sm text-slate-200">
-          <p>No tool matched “{normalizedQuery}”. Try a broader task label or return to the question chooser above.</p>
+          <p>No tool matched “{normalizedQuery}”. Try a broader task label, or one of the direct answers above.</p>
           <div className="flex flex-wrap gap-2">
-            <Link href="/resolve#unresolved-question-router" className="weather-hub-chip">Return to question chooser</Link>
             <Link href="/resolve#direct-answers" className="weather-hub-chip">Try direct answers</Link>
           </div>
           {closestToolkits.length > 0 ? (

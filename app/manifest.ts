@@ -45,8 +45,8 @@ export default function manifest(): MetadataRoute.Manifest {
         url: "/",
       },
       {
-        name: "Planning",
-        short_name: "Planning",
+        name: "Plan",
+        short_name: "Plan",
         description: "Open approvals, guardrails, and operating levers.",
         url: "/operate",
       },
