@@ -254,7 +254,9 @@ export async function buildPlanningPageModel(
               h("section", { className: "space-y-4" },
                 /* One row per area, in the order every surface uses, with the rule and
                    both its lines — the same table the brief prints. */
-                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area" }),
+                // "/": the "Line set by" links name the brief's score anchors, which
+                // this page does not draw; in-page they went nowhere.
+                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area", signalLinkBase: "/" }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
                     ? "Items to revisit. Recheck last week's approvals before adding fixed cost or widening scope."

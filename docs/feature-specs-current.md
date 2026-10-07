@@ -2900,3 +2900,8 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   every caller had passed `showProvenance: false`, so it had rendered nowhere — and it is deleted
   with its test and the two status icons only it drew. Still open: `reportData.internalProvenance`
   (`lib/report/reportDataLoader.ts`) is now computed and drawn nowhere.
+- **The lead table's "Line set by" links leave for the brief.** `AreaTable` takes
+  `signalLinkBase`; `/operate` passes "/", so "Funding pressure" and "Risk appetite" open
+  `/#signal-funding-pressure` and `/#signal-risk-appetite` rather than in-page anchors this page
+  never draws. `/share` and the answer pages carry the same dead in-page links and are not changed
+  here.

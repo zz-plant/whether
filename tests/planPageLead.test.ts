@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { isValidElement, type ReactNode } from "react";
 import { OperationsExecutionStepper } from "../app/operate/components/planningExecutionStepper";
+import { AreaTable } from "../app/components/ui/areaTable";
 import { buildPlanningPageModel } from "../app/operate/planningPageModel";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 import { insightDatabase } from "../data/recommendations";
@@ -58,6 +59,11 @@ describe("/operate opening", () => {
         ["ops-decision-shield", true],
       ],
     );
+    // The lead is the brief's own table, and its "Line set by" links leave for the brief,
+    // the only page that draws the score anchors they name.
+    const [table] = propsHandedTo(steps[0]?.children, AreaTable);
+    assert.ok(table, "the first step is the AreaTable");
+    assert.equal(table.signalLinkBase, "/");
     // The rest wait for a click, and the index lists the steps in the order the page draws them.
     assert.ok(steps.slice(3).every((step) => !step.defaultOpen));
     const indexed = operationsSectionLinks.plan.map((link) => link.href.slice(1));
