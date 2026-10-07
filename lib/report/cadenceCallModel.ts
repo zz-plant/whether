@@ -24,7 +24,8 @@ import {
 } from "../summary/horizonOperatingRules";
 import { formatQuarterLabel } from "../summary/summaryFormatting";
 import { formatMonthYearShortFromValue } from "../formatters";
-import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL } from "./reportCopy";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { describePolicyHold } from "./regimeDescription";
 
 /** The two horizons the selector offers beside the weekly default. */
 export type CadenceCallHorizon = "monthly" | "quarterly";
@@ -299,19 +300,22 @@ export const buildCadenceCallModel = ({
     recordDate,
   });
 
-  const overrideReason = assessment.policyAssessment.refusal.refused
-    ? assessment.policyAssessment.refusal.reasons[0] ?? "The two scores disagree."
-    : null;
+  const { refusal } = assessment.policyAssessment;
+  /* The held guidance for the reason this month is held. The reason line fell
+     back to "The two scores disagree." whatever the reason; it falls back to the
+     hold's own sentence now, which a refusal never needs since it stores one. */
+  const hold = refusal.refused ? describePolicyHold(refusal) : null;
+  const overrideReason = hold ? refusal.reasons[0] ?? hold.currentCall : null;
 
   // `currentCall` up top, `actionNow` in the rule. The weekly hero directly below
   // already leads with `actionNow` under a refusal, and leading with it here too put
   // the identical sentence on screen twice. `currentCall` is the posture-level form of
   // the same hold, which is the right altitude for a horizon card anyway.
-  const boundedRule: HorizonOperatingRule = overrideReason
+  const boundedRule: HorizonOperatingRule = hold
     ? {
-        action: POLICY_OVERRIDE_CALL.actionNow,
-        threshold: POLICY_OVERRIDE_CALL.pauseIf,
-        reversal: POLICY_OVERRIDE_CALL.callChangesIf,
+        action: hold.actionNow,
+        threshold: hold.pauseIf,
+        reversal: hold.callChangesIf,
       }
     : buildHorizonOperatingRule({
         assessment,
@@ -323,12 +327,12 @@ export const buildCadenceCallModel = ({
     horizon,
     cadenceLabel: copy.cadenceLabel,
     periodLabel,
-    headline: overrideReason ? POLICY_OVERRIDE_CALL.currentCall : asImperative(guidance),
+    headline: hold ? hold.currentCall : asImperative(guidance),
     regime: assessment.regime,
     regimeLabel: getRegimePublicLabel(assessment.regime),
     description: assessment.description,
     boundedRule,
-    boundedBands: overrideReason ? [] : buildHorizonSignalBands({ assessment, previousScores }),
+    boundedBands: hold ? [] : buildHorizonSignalBands({ assessment, previousScores }),
     overrideReason,
     history,
     historyLabel: copy.historyLabel,

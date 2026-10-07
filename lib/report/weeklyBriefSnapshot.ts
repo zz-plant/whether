@@ -9,6 +9,7 @@ import { loadReportDataSafe, type LoadReportDataSafeResult, type ReportData, typ
 import { buildCompactFreshnessMeta, type CompactFreshnessMeta } from "./reportFormatting";
 import { resolveSectorKey, type SectorKey } from "./sectorSensitivity";
 import { buildTrustStatus } from "./trustStatus";
+import { describePolicyHold } from "./regimeDescription";
 import type { PostureStateContract } from "./postureStateContract";
 import { applyStageToWeeklyCall, buildWeeklyCallContract, type WeeklyCallContract } from "./weeklyCallContract";
 import type { StartupVariantMode } from "./boundedDecisionRules";
@@ -119,8 +120,9 @@ export const buildWeeklyBriefSnapshot = ({
     confidenceLabel: homeBriefModel.confidenceLabel,
     freshnessLabel: reportData.fetchedAtLabel,
     freshnessState: freshnessMeta,
-    policyRefusalActive: reportData.assessment.policyAssessment.refusal.refused,
-    policyRefusalReasons: reportData.assessment.policyAssessment.refusal.reasons,
+    policyHold: reportData.assessment.policyAssessment.refusal.refused
+      ? describePolicyHold(reportData.assessment.policyAssessment.refusal)
+      : null,
     historicalMacroCoverageLabel: reportData.macroCoverage?.label ?? null,
     ...defaultTrustStatusCopy,
   });

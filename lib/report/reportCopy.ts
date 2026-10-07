@@ -1,3 +1,5 @@
+import type { PolicyRefusalCode } from "../regimeEngineCore";
+
 type ReportLinkCopy = {
   href: string;
   label: string;
@@ -118,29 +120,89 @@ export const DECISION_CONTRACT_LABELS = {
   },
 } as const;
 
+/** The guidance on a held week, slot by slot, for one reason it is held. */
+export type PolicyHoldCall = {
+  currentCall: string;
+  actionNow: string;
+  pauseIf: string;
+  /** What ends the hold for this reason. Printed under "Conditions change if". */
+  callChangesIf: string;
+  /** The same, as the clause after "until": "Hold anything you can't undo until …". */
+  holdsUntil: string;
+  /** Printed as the reason this week's guidance could be wrong. */
+  whyCouldBeWrong: string;
+};
+
+/* Printed after "Pause if", so it is a condition. It was "Hold anything you
+   can't undo while the two scores disagree.", an instruction that repeated the
+   action above it and read "Pause if: Hold anything…" in every format. It names
+   the hold, not one reason for it, so every reason shares it. */
+const HELD_PAUSE_IF = "The decision can't be undone while the guidance is held.";
+
 /**
- * The call when the policy engine refuses to support a posture change.
+ * The guidance when the policy engine refuses to support a change, one entry
+ * per refusal code (`PolicyRefusalCode`); `describePolicyHold`
+ * (`regimeDescription.ts`) picks the entry for a refusal's first code.
  *
  * Every horizon has to say the same thing here. The regime-derived guidance keeps
  * reading "scale proven bets" through a refusal, so a surface that renders it while
  * the weekly call says "slow approvals" puts two opposite instructions on one screen.
- * Both the weekly contract and the cadence lead read these.
+ * The weekly contract, the home brief, the cadence lead and the trust strip read these.
  *
  * Written in the reader's terms: what is held and why. "Policy override" and
  * "policy signals" name the engine's mechanism, which a reader cannot act on.
+ * Until 2026-10-07 this was one entry, the disagreement's, printed for every
+ * hold: a week held because inputs were missing told the reader its two scores
+ * pointed in different directions.
  */
 export const POLICY_OVERRIDE_CALL = {
-  currentCall: "The two scores point in different directions, so the guidance is not changing this week.",
-  actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
-  /* Printed after "Pause if", so it is a condition. It was "Hold anything you
-     can't undo while the two scores disagree.", an instruction that repeated the
-     action above it and read "Pause if: Hold anything…" in every format. It names
-     the hold, not one reason for it: a hold also comes from missing inputs, which
-     is every replayed month, whose record carries no macro series. */
-  pauseIf: "The decision can't be undone while the guidance is held.",
-  callChangesIf:
-    "The two scores point the same way for a second reading; until then the guidance is not changing.",
-} as const;
+  "signals-disagree": {
+    currentCall: "The two scores point in different directions, so the guidance is not changing this week.",
+    actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
+    pauseIf: HELD_PAUSE_IF,
+    callChangesIf:
+      "The two scores point the same way for a second reading; until then the guidance is not changing.",
+    holdsUntil: "the two scores agree",
+    whyCouldBeWrong: "The two scores disagree, so this week's direction can't be read with confidence.",
+  },
+  /* The spread of the two scores and the two composites behind them, taken at
+     one instant: not a move over time, so nothing here says "swung" or "lately". */
+  "signals-dispersed": {
+    currentCall:
+      "The signals are spread too far apart to agree on a direction, so the guidance is not changing this week.",
+    actionNow:
+      "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the signals line up.",
+    pauseIf: HELD_PAUSE_IF,
+    callChangesIf: "The signals line up on a later reading; until then the guidance is not changing.",
+    holdsUntil: "the signals line up",
+    whyCouldBeWrong: "The signals are spread too far apart, so this week's direction can't be read with confidence.",
+  },
+  /* A live read only: a replayed month is judged on the inputs its record
+     carries (`RegimeEvaluationContext.inputsNotOnRecord`), so "this week" is true. */
+  "inputs-missing": {
+    currentCall: "Too many inputs are missing this week, so the guidance is not changing.",
+    actionNow:
+      "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the missing inputs return.",
+    pauseIf: HELD_PAUSE_IF,
+    callChangesIf: "The missing inputs return in a live reading; until then the guidance is not changing.",
+    holdsUntil: "the missing inputs return",
+    whyCouldBeWrong: "Too many inputs are missing, so this week's direction can't be read with confidence.",
+  },
+} as const satisfies Record<PolicyRefusalCode, PolicyHoldCall>;
+
+/**
+ * A hold whose reason the record does not say: one stored before the reason
+ * codes were kept, with a sentence the table no longer writes. It names the
+ * hold and no reason, since a guessed reason is the defect the table replaced.
+ */
+export const POLICY_OVERRIDE_CALL_UNNAMED = {
+  currentCall: "The guidance is on hold, so it is not changing this week.",
+  actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the hold lifts.",
+  pauseIf: HELD_PAUSE_IF,
+  callChangesIf: "The hold lifts on a later reading; until then the guidance is not changing.",
+  holdsUntil: "the hold lifts",
+  whyCouldBeWrong: "The guidance is on hold, so this week's direction can't be read with confidence.",
+} as const satisfies PolicyHoldCall;
 
 /**
  * The call when no live reading produced one.

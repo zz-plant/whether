@@ -14,18 +14,13 @@ import {
   type PolicyAssessment,
   type PolicyBand,
   type PolicyPosture,
+  type PolicyRefusalCode,
   type PolicyRefusalState,
   type PolicySignalNormalization,
   type RegimeThresholds,
 } from "./regimeEngineCore";
 
-/**
- * Why the posture refused to move, as a code. The reader's sentence for each is
- * written in `lib/report/regimeDescription.ts`.
- */
-export type PolicyRefusalCode = "signals-disagree" | "signals-dispersed" | "inputs-missing";
-
-type PolicyRefusalScoring = Omit<PolicyRefusalState, "reasons"> & {
+type PolicyRefusalScoring = Omit<PolicyRefusalState, "reasons" | "reasonCodes"> & {
   reasonCodes: PolicyRefusalCode[];
 };
 
@@ -79,6 +74,35 @@ const POLICY_FALLBACK_STD_DEV = {
 
 const getSignalById = (macroSeries: MacroSeriesReading[], id: MacroSeriesReading["id"]) =>
   macroSeries.find((entry) => entry.id === id) ?? null;
+
+/** The policy's five inputs as it reads them from one reading, null where the reading has no value. */
+const readPolicyInputValues = (
+  treasury: TreasuryData,
+  macroSeries: MacroSeriesReading[],
+): Record<PolicySignalNormalization["id"], number | null> => {
+  const baseRate = getBaseRate(treasury.yields);
+  return {
+    BASE_RATE: baseRate.used === "MISSING" ? null : baseRate.value,
+    CURVE_SLOPE: computeCurveSlope(treasury.yields),
+    BBB_CREDIT_SPREAD: getSignalById(macroSeries, "BBB_CREDIT_SPREAD")?.value ?? null,
+    CPI_YOY: getSignalById(macroSeries, "CPI_YOY")?.value ?? null,
+    UNEMPLOYMENT_RATE: getSignalById(macroSeries, "UNEMPLOYMENT_RATE")?.value ?? null,
+  };
+};
+
+/**
+ * The policy inputs a reading carries no value for, read exactly as the policy
+ * reads them. A replay passes these to `evaluateRegime` as `inputsNotOnRecord`
+ * (`lib/timeMachine/regimeReplay.ts`): what a month's record does not carry is
+ * absent from the record, not missing from a read.
+ */
+export const policyInputsWithoutValue = (
+  treasury: TreasuryData,
+  macroSeries: MacroSeriesReading[],
+): PolicySignalNormalization["id"][] => {
+  const values = readPolicyInputValues(treasury, macroSeries);
+  return POLICY_SPEC_V1.signals.map((signal) => signal.id).filter((id) => typeof values[id] !== "number");
+};
 
 const computeRollingStats = (
   historyValues: Array<number | null>,
@@ -142,9 +166,10 @@ export const computePolicyAssessment = (
   legacyTightness: number,
   legacyRiskAppetite: number,
   policyHistory: readonly TreasuryPolicyHistoryPoint[],
+  /** Inputs the record does not carry for this date (`RegimeEvaluationContext.inputsNotOnRecord`). */
+  inputsNotOnRecord: readonly PolicySignalNormalization["id"][] = [],
 ): PolicyScoring => {
-  const baseRate = getBaseRate(treasury.yields);
-  const slope = computeCurveSlope(treasury.yields);
+  const values = readPolicyInputValues(treasury, macroSeries);
   const bbb = getSignalById(macroSeries, "BBB_CREDIT_SPREAD");
   const cpi = getSignalById(macroSeries, "CPI_YOY");
   const unemployment = getSignalById(macroSeries, "UNEMPLOYMENT_RATE");
@@ -178,7 +203,7 @@ export const computePolicyAssessment = (
 
   const baseRateZ = pushNormalization(
     "BASE_RATE",
-    baseRate.used === "MISSING" ? null : baseRate.value,
+    values.BASE_RATE,
     "HIGHER_IS_TIGHTER",
     thresholds.baseRateTightness,
     treasuryHistory.map((point) => point.baseRate),
@@ -186,7 +211,7 @@ export const computePolicyAssessment = (
   );
   const slopeZ = pushNormalization(
     "CURVE_SLOPE",
-    slope,
+    values.CURVE_SLOPE,
     "HIGHER_IS_LOOSER",
     0,
     treasuryHistory.map((point) => point.curveSlope),
@@ -194,7 +219,7 @@ export const computePolicyAssessment = (
   );
   const bbbZ = pushNormalization(
     "BBB_CREDIT_SPREAD",
-    bbb?.value ?? null,
+    values.BBB_CREDIT_SPREAD,
     "HIGHER_IS_TIGHTER",
     2,
     getHistoricalValuesBeforeDate(bbb?.history, bbb?.record_date ?? treasury.record_date),
@@ -202,7 +227,7 @@ export const computePolicyAssessment = (
   );
   pushNormalization(
     "CPI_YOY",
-    cpi?.value ?? null,
+    values.CPI_YOY,
     "HIGHER_IS_TIGHTER",
     2.5,
     getHistoricalValuesBeforeDate(cpi?.history, cpi?.record_date ?? treasury.record_date),
@@ -210,7 +235,7 @@ export const computePolicyAssessment = (
   );
   pushNormalization(
     "UNEMPLOYMENT_RATE",
-    unemployment?.value ?? null,
+    values.UNEMPLOYMENT_RATE,
     "HIGHER_IS_TIGHTER",
     4,
     getHistoricalValuesBeforeDate(unemployment?.history, unemployment?.record_date ?? treasury.record_date),
@@ -242,7 +267,13 @@ export const computePolicyAssessment = (
   const distanceFromNeutral = Math.min(Math.abs(cts), Math.abs(ras));
   const signalDispersion = computeVolatility([cts, ras, legacyTightness / 100, legacyRiskAppetite / 100]);
 
-  const missingCount = normalizations.filter((entry) => entry.clippedZ === null).length;
+  /* An input the record does not carry for this date is not missing from this
+     read, so it counts toward neither the refusal nor the pin below. Only a
+     replay names any; an absent feed on a live read always counts. */
+  const notOnRecord = new Set(inputsNotOnRecord);
+  const missingCount = normalizations.filter(
+    (entry) => entry.clippedZ === null && !notOnRecord.has(entry.id),
+  ).length;
   const refusalReasonCodes: PolicyRefusalCode[] = [];
   if (signalDisagreement >= POLICY_SPEC_V1.refusal.disagreementThreshold) {
     refusalReasonCodes.push("signals-disagree");

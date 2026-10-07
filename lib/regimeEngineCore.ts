@@ -139,9 +139,23 @@ interface PolicyConfidenceIndex {
   signalDispersion: number;
 }
 
+/**
+ * Why the posture refused to move, as a code. The reader's sentence for each is
+ * written in `lib/report/regimeDescription.ts`, and the held guidance for each
+ * in `lib/report/reportCopy.ts`.
+ */
+export type PolicyRefusalCode = "signals-disagree" | "signals-dispersed" | "inputs-missing";
+
 export interface PolicyRefusalState {
   refused: boolean;
   reasons: string[];
+  /**
+   * The codes `reasons` were written from, in the same order, set on a refusal.
+   * The held guidance is chosen by the first of them, so a held week states the
+   * reason it was held for rather than one sentence for every hold. Optional
+   * because a record stored before 2026-10-07 carries only the sentences.
+   */
+  reasonCodes?: PolicyRefusalCode[];
   fallbackMessage?: "NO_POSTURE_CHANGE_RECOMMENDED" | "PROCEED_WITH_CAUTION";
   executionMode?: "REVERSIBLE_BETS_ONLY";
 }
@@ -385,6 +399,19 @@ export interface RegimeEvaluationContext {
   /** Base-rate observations ascending by date. Only the trailing window is
    *  read; the rest is ignored. */
   baseRateHistory?: readonly { date: string; value: number | null }[] | null;
+  /**
+   * Policy inputs the record carries no value for on this date. A replay sets
+   * it (`lib/timeMachine/regimeReplay.ts`): the archive holds no credit-spread,
+   * inflation or unemployment history for most months, and a replayed month is
+   * judged on the inputs the archive carries for it. A listed input still
+   * scores 0 in the composites, as any absent one does, but it does not count
+   * toward the missing-input refusal or the missing-input pin to TRANSITION.
+   *
+   * A live read never sets it, so a feed that failed this week still counts:
+   * a hold for missing inputs is a live-read failure, not a property of
+   * history. Every caller that omits it scores exactly as before.
+   */
+  inputsNotOnRecord?: readonly PolicySignalNormalization["id"][];
 }
 
 const daysBetweenDates = (laterIso: string, earlierIso: string): number => {

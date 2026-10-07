@@ -53,12 +53,15 @@ describe("the brief document", () => {
   it("keeps a held call held, with or without a stage", () => {
     const snapshot = buildOperatingSnapshot({ treasury: exportTreasury, macroSeries: macros, now: new Date("2026-03-05T12:00:00.000Z") });
     assert.equal(snapshot.weeklyCall.policyOverrideActive, true);
+    // Held because the two scores disagree; missing inputs are the second reason, and the first leads.
+    assert.deepEqual(snapshot.assessment.policyAssessment.refusal.reasonCodes, ["signals-disagree", "inputs-missing"]);
+    const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
 
     for (const stage of [null, "seed"] as const) {
       const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall, { stage });
       assert.equal(document.slots.policyOverrideActive, true);
-      assert.equal(document.slots.actionNow, POLICY_OVERRIDE_CALL.actionNow);
-      assert.equal(document.slots.pauseIf, POLICY_OVERRIDE_CALL.pauseIf);
+      assert.equal(document.slots.actionNow, hold.actionNow);
+      assert.equal(document.slots.pauseIf, hold.pauseIf);
       assert.equal(document.slots.resumeWhen, undefined);
     }
   });

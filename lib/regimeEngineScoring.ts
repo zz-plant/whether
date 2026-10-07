@@ -161,6 +161,14 @@ export const scoreRegime = (
     diagnostics: diagnosticsWithShock,
     warnings,
     thresholds,
-    policy: computePolicyAssessment(treasury, thresholds, macroSeries, tightness, riskAppetite, policyHistory),
+    policy: computePolicyAssessment(
+      treasury,
+      thresholds,
+      macroSeries,
+      tightness,
+      riskAppetite,
+      policyHistory,
+      context.inputsNotOnRecord,
+    ),
   };
 };

@@ -25,6 +25,8 @@ import {
   TIGHTNESS_INVERSION_POINTS,
   TREASURY_SOURCE_LABEL,
   type PolicyAssessment,
+  type PolicyRefusalCode,
+  type PolicyRefusalState,
   type RegimeAssessment,
   type RegimeKey,
   type RegimeScores,
@@ -32,7 +34,7 @@ import {
   type RegimeThresholds,
 } from "../regimeEngineCore";
 import type { MacroContributorCode } from "../regimeEngineDiagnostics";
-import type { PolicyRefusalCode, PolicyScoring } from "../regimeEnginePolicy";
+import type { PolicyScoring } from "../regimeEnginePolicy";
 import type { RegimeScoring, RegimeWarning } from "../regimeEngineScoring";
 import type {
   RegimeLineCrossing,
@@ -41,6 +43,7 @@ import type {
   RegimeTransitionCause,
 } from "../regimeStateMachine";
 import type { TreasuryData } from "../types";
+import { POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 
 const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: string[] }> = {
@@ -259,10 +262,13 @@ const describeRegimeWarning = (warning: RegimeWarning): string => {
 
 /* In the reader's word for the call, "guidance" (lib/report/AGENTS.md): these
    print after "Why the guidance is held:", where "move the posture" named the
-   engine's state instead. */
+   engine's state instead. The dispersion sentence said "swung too hard over
+   the past 30 days" until 2026-10-07; the measure is the spread of four
+   readings taken at the same instant (`PolicyConfidenceIndex.signalDispersion`),
+   with no window at all. */
 const POLICY_REFUSAL_COPY: Record<PolicyRefusalCode, string> = {
   "signals-disagree": "The two scores disagree too sharply to change the guidance.",
-  "signals-dispersed": "The signals have swung too hard over the past 30 days to trust a change in the guidance.",
+  "signals-dispersed": "The signals are spread too far apart to trust a change in the guidance.",
   "inputs-missing": "Too many inputs are missing to support a change in the guidance.",
 };
 
@@ -271,8 +277,44 @@ const describePolicyAssessment = (policy: PolicyScoring): PolicyAssessment => {
   const reasons = reasonCodes.map((code) => POLICY_REFUSAL_COPY[code]);
   return {
     ...policy,
-    refusal: refused ? { refused, reasons, fallbackMessage, executionMode } : { refused, reasons },
+    refusal: refused ? { refused, reasons, reasonCodes, fallbackMessage, executionMode } : { refused, reasons },
   };
+};
+
+/** What a hold is read from: the stored refusal, or the slice of it a loose model type carries. */
+type HeldRefusal = Partial<Pick<PolicyRefusalState, "reasons" | "reasonCodes">>;
+
+const isPolicyRefusalCode = (value: string): value is PolicyRefusalCode => Object.hasOwn(POLICY_REFUSAL_COPY, value);
+const POLICY_REFUSAL_CODES = Object.keys(POLICY_REFUSAL_COPY).filter(isPolicyRefusalCode);
+
+/**
+ * Why a held week is held, as the code that leads its reasons: the stored code
+ * when the record carries one, else the stored sentence read back through the
+ * table above (a record written before the codes were kept), else null.
+ */
+const resolvePolicyRefusalCode = (refusal: HeldRefusal): PolicyRefusalCode | null => {
+  const [storedCode] = refusal.reasonCodes ?? [];
+  if (storedCode) return storedCode;
+  for (const reason of refusal.reasons ?? []) {
+    const code = POLICY_REFUSAL_CODES.find((candidate) => POLICY_REFUSAL_COPY[candidate] === reason);
+    if (code) return code;
+  }
+  return null;
+};
+
+/**
+ * The held guidance for a refusal, in the words of the reason it was held for.
+ *
+ * Every hold printed the disagreement's sentences until 2026-10-07 — "The two
+ * scores point in different directions" — whatever the code, so a week held for
+ * missing inputs (every replayed month, then) said the scores disagreed. When
+ * several reasons apply, the first code leads, as it leads `reasons`. A record
+ * whose reason cannot be read gets a hold that names no reason rather than a
+ * wrong one.
+ */
+export const describePolicyHold = (refusal: HeldRefusal) => {
+  const code = resolvePolicyRefusalCode(refusal);
+  return code ? POLICY_OVERRIDE_CALL[code] : POLICY_OVERRIDE_CALL_UNNAMED;
 };
 
 const describeLineCrossing = ({ axis, direction, threshold }: RegimeLineCrossing) =>

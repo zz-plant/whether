@@ -113,9 +113,12 @@ describe("the Monday Slack post carries the email's call", () => {
     const mail = await mailedText(snapshot, now);
 
     assertSameCall(post, mail, snapshot);
-    assert.equal(slot(post, "Guidance"), `${POLICY_OVERRIDE_CALL.actionNow} ${POLICY_OVERRIDE_CALL.currentCall}`);
+    // Held first because the two scores disagree, so the post leads with that reason's lines.
+    assert.equal(snapshot.assessment.policyAssessment.refusal.reasonCodes?.[0], "signals-disagree");
+    const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
+    assert.equal(slot(post, "Guidance"), `${hold.actionNow} ${hold.currentCall}`);
     assert.equal(slot(post, "Do now"), undefined, "the action is not repeated under a second label");
-    assert.equal(slot(mail, "Pause if"), POLICY_OVERRIDE_CALL.pauseIf);
+    assert.equal(slot(mail, "Pause if"), hold.pauseIf);
   });
 
   it("on an ordinary week", async () => {

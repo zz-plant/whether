@@ -6,7 +6,8 @@ import {
   buildScopedVariantDecisionAdjustment,
   type StartupVariantMode,
 } from "./boundedDecisionRules";
-import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL, POLICY_OVERRIDE_CALL } from "./reportCopy";
+import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL } from "./reportCopy";
+import { describePolicyHold } from "./regimeDescription";
 
 import { resolveRunwayBand, type RunwayBand } from "./operatorRunway";
 
@@ -119,6 +120,8 @@ export const buildWeeklyCallContract = ({
   const actionStripItems = homeBriefModel.actionStripItems ?? [];
   const policyOverrideActive = assessment.policyAssessment.refusal.refused;
   const policyOverrideReason = assessment.policyAssessment.refusal.reasons[0] ?? null;
+  /* The held guidance for the reason this week is held, read only when it is. */
+  const hold = describePolicyHold(assessment.policyAssessment.refusal);
   const regimeStage =
     canonicalDecisionCopy?.currentRegimeLabel
     ?? homeBriefModel.postureWithStageLabel
@@ -145,16 +148,16 @@ export const buildWeeklyCallContract = ({
     ?? FALLBACK_CALL_CHANGES_IF;
 
   const currentCall = policyOverrideActive
-    ? POLICY_OVERRIDE_CALL.currentCall
+    ? hold.currentCall
     : defaultCurrentCall;
   const actionNow = policyOverrideActive
-    ? POLICY_OVERRIDE_CALL.actionNow
+    ? hold.actionNow
     : defaultActionNow;
   const pauseIf = policyOverrideActive
-    ? POLICY_OVERRIDE_CALL.pauseIf
+    ? hold.pauseIf
     : defaultPauseIf;
   const callChangesIf = policyOverrideActive
-    ? POLICY_OVERRIDE_CALL.callChangesIf
+    ? hold.callChangesIf
     : defaultCallChangesIf;
   const doNowBullets = policyOverrideActive
     ? dedupeLines([actionNow, ...buildPolicyOverrideActionLines(assessment)], 3)
@@ -181,14 +184,14 @@ export const buildWeeklyCallContract = ({
           /* Items, not sentences: the list prints joined with "; ", and a
              closing period read "the guidance.; Hold". */
           policyOverrideReason ? `Why the guidance is held: ${policyOverrideReason.replace(/\.\s*$/, "")}` : undefined,
-          "Hold anything you can't undo until the two scores agree",
+          `Hold anything you can't undo until ${hold.holdsUntil}`,
           ...defaultFlipConditionLabels,
         ],
         4,
       )
     : defaultFlipConditionLabels;
   const whyCouldBeWrong = policyOverrideActive
-    ? "The two scores disagree, or too many inputs are missing, so this week’s direction may be overstated."
+    ? hold.whyCouldBeWrong
     : homeBriefModel.confidenceLabel === "HIGH"
       ? "Even at high confidence, individual signals can reverse before the next weekly update. Keep approvals staged until the next data refresh confirms the guidance."
       : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s guidance.";
