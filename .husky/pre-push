@@ -20,14 +20,16 @@
 # two tests that caught it). Keep this line.
 unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_PREFIX GIT_QUARANTINE_PATH GIT_REFLOG_ACTION
 
-# Judge the review preflight against what this push sends: the remote sha from the plan
-# git writes to stdin. A new branch, a deletion, or a manual run prints nothing and the
-# preflight keeps its default base (the merge-base with main).
+# Judge the review preflight on what this push sends: remote sha to local sha, from the plan
+# git writes to stdin. The local sha matters because the pushed ref need not be the one
+# checked out. A new branch, a deletion, or a manual run prints nothing and the preflight
+# keeps its default (the working tree against the merge-base with main).
 if [ ! -t 0 ]; then
-  push_base=$(bun scripts/pre-push-range.mjs)
-  if [ -n "$push_base" ]; then
-    REVIEW_HOTSPOT_BASE="$push_base"
-    export REVIEW_HOTSPOT_BASE
+  push_range=$(bun scripts/pre-push-range.mjs)
+  if [ -n "$push_range" ]; then
+    REVIEW_HOTSPOT_BASE="${push_range% *}"
+    REVIEW_HOTSPOT_HEAD="${push_range#* }"
+    export REVIEW_HOTSPOT_BASE REVIEW_HOTSPOT_HEAD
   fi
 fi
 

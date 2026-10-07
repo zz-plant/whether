@@ -3,19 +3,21 @@
  * Review preflight: the working tree compared with a base commit.
  *
  * Fails when a decision-logic file changed with no test change beside it, or when an
- * added line carries an `as` type assertion. One comparison only: everything on disk
- * against `base`, so committed and uncommitted work are judged together.
+ * added line carries an `as` type assertion. One comparison: `base` to `head`, where head
+ * is the working tree unless a commit is named, so a local run judges committed and
+ * uncommitted work together.
  *
  *   base = --base <ref> | REVIEW_HOTSPOT_BASE | merge-base with main | HEAD~1
+ *   head = --head <ref> | REVIEW_HOTSPOT_HEAD | the working tree
  *
  * The merge-base default means a branch is judged on what it changes against main,
  * however many commits that is, and a merge commit does not read the base's own lines
  * as new. On main itself (merge-base is HEAD) the last commit is the base. The pre-push
- * hook passes the remote's sha as REVIEW_HOTSPOT_BASE, so a push is judged on exactly
- * what it sends. docs/agents/lessons/tests-and-copy-rules.md has the history.
+ * hook passes the remote and local shas, so a push is judged on exactly the commits it
+ * sends, whichever ref is checked out. docs/agents/lessons/tests-and-copy-rules.md.
  *
  * Usage:
- *   node scripts/review-hotspot-preflight.mjs [--base <ref>]
+ *   node scripts/review-hotspot-preflight.mjs [--base <ref>] [--head <ref>]
  */
 
 import { existsSync, readFileSync } from "node:fs";
@@ -72,8 +74,13 @@ function resolveBase() {
   return resolveDiffBase({ explicit, mergeBase, head, hasParent });
 }
 
-function changedFiles(base) {
-  const output = execText("git", ["diff", "--name-only", base]);
+/** What `git diff` compares `base` with: a named commit, or the working tree when none is. */
+function resolveHead() {
+  return verifiedRef(readArg("--head", process.env.REVIEW_HOTSPOT_HEAD || ""));
+}
+
+function changedFiles(base, head) {
+  const output = execText("git", ["diff", "--name-only", base, ...(head ? [head] : [])]);
   return output
     .split("\n")
     .map((file) => file.trim())
@@ -140,8 +147,8 @@ export function isUnsafeAssertion(code) {
   return /\sas\s+[A-Za-z_$<{(]/.test(withoutStrings) && !/\sas\s+const\b/.test(withoutStrings);
 }
 
-function addedTypeAssertions(base) {
-  const diff = execText("git", ["diff", "--unified=0", base, "--", "*.ts", "*.tsx"]);
+function addedTypeAssertions(base, head) {
+  const diff = execText("git", ["diff", "--unified=0", base, ...(head ? [head] : []), "--", "*.ts", "*.tsx"]);
   if (!diff) return [];
 
   const commentLinesFor = (file) =>
@@ -195,26 +202,29 @@ function main() {
       "Review hotspot preflight",
       "",
       "Usage:",
-      "  node scripts/review-hotspot-preflight.mjs [--base <ref>]",
+      "  node scripts/review-hotspot-preflight.mjs [--base <ref>] [--head <ref>]",
       "",
-      "Compares the working tree with <ref>. Default: the merge-base with main,",
-      "or HEAD~1 on main itself. REVIEW_HOTSPOT_BASE sets it from the environment.",
+      "Compares <base> with <head>, or with the working tree when no head is given.",
+      "Default base: the merge-base with main, or HEAD~1 on main itself.",
+      "REVIEW_HOTSPOT_BASE and REVIEW_HOTSPOT_HEAD set them from the environment.",
       "",
     ].join("\n"));
     process.exit(0);
   }
 
   const base = resolveBase();
-  const files = changedFiles(base);
+  const head = resolveHead();
+  const compared = head ? `${base}..${head}` : `working tree against ${base}`;
+  const files = changedFiles(base, head);
 
   if (files.length === 0) {
-    console.log(`No changed files against ${base} for review-hotspot preflight.`);
+    console.log(`No changed files (${compared}) for review-hotspot preflight.`);
     return;
   }
 
   const riskySourceChanges = files.filter(requiresTestCoverage);
   const hasTestChanges = files.some(isTestFile);
-  const assertionOffenders = addedTypeAssertions(base);
+  const assertionOffenders = addedTypeAssertions(base, head);
 
   const failures = [];
 
@@ -233,7 +243,7 @@ function main() {
     );
   }
 
-  console.log(`Review hotspot preflight: working tree against ${base}`);
+  console.log(`Review hotspot preflight: ${compared}`);
   console.log(`Changed files: ${files.length}`);
   console.log(`Risk-tagged source files: ${riskySourceChanges.length}`);
   console.log(`Test files changed: ${hasTestChanges ? "yes" : "no"}`);
