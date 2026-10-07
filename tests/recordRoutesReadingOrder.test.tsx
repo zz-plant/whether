@@ -59,16 +59,27 @@ describe("/history leads with the record's answer", () => {
     assert.equal(html.split(CALL_CHANGE_RULE).length - 1, 1, "the change rule is stated once on /history");
   });
 
-  it("names the newest published week above the month strip when it is newer than the strip", async () => {
+  it("names the newest published week above the month strip only when it is newer than the strip", async () => {
     /* The strip ends at a month-end and says what held; every other route shows
        the week. Without this line /history read Sunny while the brief read
        Freezing, one click apart, and nothing said why. */
     const { getPublishedBriefs, publishedBriefDisplay } = await import("../lib/report/publishedBriefs");
+    const { getTimeMachineRegimeSeries } = await import("../lib/timeMachine/timeMachineCache");
+    const { buildTrackRecord } = await import("../lib/report/trackRecord");
     const page = await import("../app/history/page");
     const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
     const latest = [...getPublishedBriefs()].sort((a, b) => b.recordDate.localeCompare(a.recordDate))[0];
     assert.ok(latest);
+    const stripEnd = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER))?.latestRecordDate ?? "";
     const line = html.indexOf("Since the last month-end, the week of");
+    /* Between a month-end landing and the next Thursday freeze merging, the
+       newest published week is older than the strip, and the page says nothing
+       the strip does not (2026-10-07: the Sep 29 week under a Sep 30 strip).
+       This held the bridge to whichever case the bundled data was in. */
+    if (latest.recordDate <= stripEnd) {
+      assert.equal(line, -1, "no bridge for a week the strip already covers");
+      return;
+    }
     assert.ok(line !== -1, "the bridge line renders");
     assert.ok(line < html.indexOf("data-month-strip"), "above the strip it qualifies");
     assert.ok(html.slice(line, line + 400).includes(publishedBriefDisplay(latest).conditions));

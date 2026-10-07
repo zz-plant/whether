@@ -9,9 +9,9 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 
 | Routine | ID | Cadence (UTC) | Produces |
 | --- | --- | --- | --- |
-| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
+| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json`, `time_machine_cache.json`, `confidence_record_months.json`, `weekly_summaries_2018_2026.json`, `summary_memory_rail_weekly.json` (see below on the prompt) |
 | Whether — weekly brief freeze | `trig_01WrbhhT73Ve4bsFK83UNyu9` | Thu 13:00 | current week appended to `data/published_briefs.json` |
-| Whether — Monday claims read-through | `trig_011a4rsy55K1ouAC4K3NfJs5` | Mon 15:47 | nothing committed: a read-only report comparing each claim in `docs/claims-ledger.md` across the live surfaces, and whether the weekly comparison basis is live |
+| Whether — claims read-through (Tue, after the Monday send) | `trig_011EVxtoaiNMXk6CnKUPdfnZ` | Tue 02:13 | nothing committed: a read-only report, pushed to the owner's phone, comparing each claim in `docs/claims-ledger.md` across the live surfaces, and whether the weekly and month-end comparison bases are current |
 
 A third, "Whether — weekly Slack brief refresh" (`trig_017b1YkXqvsje8pseMXcUftp`, disabled),
 regenerated `docs/briefs/latest-weekly-slack-brief.md`. That file was deleted on 2026-10-06. Nothing
@@ -86,6 +86,22 @@ only in the routine's run log (`RemoteTrigger` `list_runs` / `get_run_log`, or t
 so the repo saw what looked like quiet weeks. The regime history refresh moved from Monday to
 Tuesday 12:00 UTC on 2026-10-06 for this reason. Schedule a routine early in the usage week, and read
 the run log before the code when its pull request does not appear.
+
+**The refresh committed three of the five files it writes (2026-10-07).** `generateMonthlySummaries.ts`
+also writes `data/time_machine_cache.json` and `data/confidence_record_months.json`, and the routine's
+prompt said "Commit only those three data files". The cache is what the live week compares with when
+last week's brief cannot be used, so even a refresh that landed would have left it behind; the manual
+August refresh (`ad6a8c9a`) was the last commit to carry it. With the three rejected Mondays on top,
+the live week of 2026-10-05 compared itself with Aug 31, five weeks back. The archive was refreshed
+through Sep 30 by hand the same day. The routine also never ran `generateWeeklySummaries.ts`, so the
+weekly archive stopped at Sep 11 (last refreshed by hand on 2026-09-14), and once the month-ends
+moved past it `tests/regimeArchiveReplay.test.ts` failed on the count of replayable weeks, which
+would block the routine's own push at the pre-push gate. The prompt can only be edited by its owner
+(the routine was created through the HTTP API, and an agent may edit only routines it created): it
+should run the weekly generator between the monthly and quarterly ones, verify with
+`regimeArchiveReplay.test.ts` too, and commit all seven files. The claims read-through was first scheduled Monday 15:47 UTC,
+inside the window this section describes, and moved to Tuesday 02:13 UTC the same day; it now also
+checks that the month-end archive is current.
 
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
 needs three of them: `fred.stlouisfed.org`, `home.treasury.gov`, and `query1.finance.yahoo.com`.
