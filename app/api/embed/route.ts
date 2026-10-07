@@ -12,6 +12,8 @@ import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
 import { parseOperatorRunwayParam } from "../../../lib/report/operatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { formatConfidenceChipLabel } from "../../../lib/report/reportFormatting";
+import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
 import { siteUrl } from "../../../lib/siteUrl";
 import { USE_CONSTRAINT_SUMMARY, buildUseConstraint } from "../../../lib/report/useConstraint";
 
@@ -41,57 +43,7 @@ export async function GET(request: Request) {
       operatorContext,
     });
 
-    const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
-    const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "Standard";
-    const confidenceLabel = homepage.weeklyDecisionCardModel.status.confidenceLabel;
-    const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
-    const flipConditionLabels = homepage.weeklyDecisionCardModel.decision.compactFlipConditionLabels ?? [];
-    const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
-    const operatingStanceLine = homepage.weeklyDecisionCardModel.decision.operatingStanceLine;
-    const operatingCall = canonicalDecision?.operatingCall ?? operatingStanceLine;
-    const actionNow = homepage.weeklyDecisionCardModel.decision.actionNowShort || homepage.weeklyDecisionCardModel.decision.immediateDecision;
-    const doNowItems = actionItems.map((item) => item.areaActionNow);
-    /*
-     * Both of these are read off the same action strip `doNowItems` comes from.
-     *
-     * `reversalCondition` used to be the literal "Two consecutive weeks of
-     * confirming signals" — the same sentence every week, for every regime, in a
-     * field nothing renders and only `format=json` returns. So the one consumer
-     * it had was an integrator reading it as a fact about this week's call. The
-     * value was already in scope: `reversalCondition` and `triggerThreshold` are
-     * non-optional siblings of the `areaActionNow` on the line above, and every
-     * other surface in this repo reads them.
-     *
-     * `flipTrigger` fell back to "Monitor economic indicators", which is advice
-     * no reading produced. An empty list means the call has no flip condition to
-     * publish; the field is omitted rather than filled.
-     */
-    const primaryAction = actionItems[0];
-    const flipTrigger = flipConditionLabels[0] ?? primaryAction?.triggerThreshold ?? null;
-    const reversalCondition = primaryAction?.reversalCondition ?? null;
-    const dataFreshness = homepage.reportShell.fetchedAtLabel;
-
-    const briefUrl = buildWhetherBriefUrl({ ticker: tickerParam, ref });
-    const attributionUrl = buildWhetherBriefUrl({ ref });
-
-    // Build brief data object
-    const briefData = {
-      operatingCall,
-      actionNow,
-      doNowItems,
-      flipTrigger,
-      reversalCondition,
-      dataFreshness,
-      postureLabel,
-      confidenceLabel,
-      regimeLabel: homepage.reportShell.statusLabel,
-      recordDate: reportData.weeklyRecordDate,
-      tickerLabel: tickerParam || null,
-      stageLabel: companyStage ? operatorStageLabel(companyStage) : null,
-      sourceLabel: homepage.reportShell.treasurySource,
-      briefUrl,
-      attributionUrl,
-    };
+    const briefData = buildBriefEmbedData(homepage, { ticker: tickerParam, ref, companyStage });
 
     if (format === "json") {
       return NextResponse.json({
@@ -109,20 +61,7 @@ export async function GET(request: Request) {
     }
 
     if (format === "text") {
-      const text = [
-        `Whether — Weekly brief${tickerParam ? ` for ${tickerParam}` : ""}`,
-        `Regime: ${briefData.regimeLabel} • Confidence: ${confidenceLabel} • ${briefData.recordDate}`,
-        ``,
-        `Operating guidance: ${operatingCall}`,
-        `Decision now: ${actionNow}`,
-        ...(doNowItems.length > 0 ? [`${DECISION_CONTRACT_LABELS.action.doNow}: ${doNowItems.join(", ")}`] : []),
-        ...(flipTrigger ? [`Watch: ${flipTrigger}`] : []),
-        ``,
-        `Get your own weekly brief: ${briefData.attributionUrl}`,
-        USE_CONSTRAINT_SUMMARY,
-      ].join("\n");
-
-      return new NextResponse(text, {
+      return new NextResponse(buildBriefEmbedText(briefData), {
         headers: {
           "Content-Type": "text/plain; charset=utf-8",
           "X-Whether-Embed-Version": "1",
@@ -155,12 +94,86 @@ export async function GET(request: Request) {
   }
 }
 
+type HomePage = Awaited<ReturnType<typeof assembleHomePage>>;
+
+/**
+ * What every format of the embed says, from the assembled homepage. Separated
+ * from the transport for the reason `buildBriefMarkdown` is: `assembleHomePage`
+ * needs Next's incremental cache, which a route handler has and a test does
+ * not, so a test assembles the page from a fixture and reads what this builds.
+ */
+export const buildBriefEmbedData = (
+  homepage: HomePage,
+  { ticker, ref, companyStage }: { ticker: string; ref: string; companyStage: ReturnType<typeof parseOperatorStageParam> },
+): BriefEmbedData => {
+  const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
+  const postureLabel = homepage.weeklyDecisionCardModel.status.postureWithStageLabel ?? "Standard";
+  /* The published band as a reader says it ("Medium confidence"). This was
+     the code itself, so the widget's meta line read "Freezing · MED" and the
+     text format "Confidence: MED" inside somebody else's newsletter. */
+  const confidenceLabel = formatConfidenceChipLabel(homepage.weeklyDecisionCardModel.status.confidenceLabel);
+  const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
+  const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
+  const operatingStanceLine = homepage.weeklyDecisionCardModel.decision.operatingStanceLine;
+  const operatingCall = canonicalDecision?.operatingCall ?? operatingStanceLine;
+  const actionNow = homepage.weeklyDecisionCardModel.decision.actionNowShort || homepage.weeklyDecisionCardModel.decision.immediateDecision;
+  const doNowItems = actionItems.map((item) => item.areaActionNow);
+  /*
+   * Read off the same action strip `doNowItems` comes from.
+   *
+   * `reversalCondition` used to be the literal "Two consecutive weeks of
+   * confirming signals" — the same sentence every week, for every regime, in a
+   * field nothing renders and only `format=json` returns. So the one consumer
+   * it had was an integrator reading it as a fact about this week's call. The
+   * value was already in scope: `reversalCondition` is a non-optional sibling
+   * of the `areaActionNow` on the line above, and every other surface in this
+   * repo reads it.
+   *
+   * `flipTrigger` fell back to "Monitor economic indicators", which is advice
+   * no reading produced; the field is omitted rather than filled. It then
+   * printed "Watch: Funding pressure < 66" — the first of the rules' resume
+   * conditions (`compactFlipConditionLabels`), falling back to the lead rule's
+   * pause line. On Oct 5 that was Hiring's resume line, 24 points away, while
+   * the line that changes conditions was risk appetite clearing 50, 2 points
+   * away. It is now the brief's own "Conditions change if" sentence, printed
+   * under that label, with a stage's resume line under its own.
+   */
+  const primaryAction = actionItems[0];
+  const flipTrigger = homepage.weeklyCall.callChangesIf.trim() || null;
+  const resumeWhen = homepage.weeklyCall.resumeWhen?.trim() || null;
+  const reversalCondition = primaryAction?.reversalCondition ?? null;
+
+  return {
+    operatingCall,
+    actionNow,
+    doNowItems,
+    flipTrigger,
+    ...(resumeWhen ? { resumeWhen } : {}),
+    reversalCondition,
+    dataFreshness: homepage.reportShell.fetchedAtLabel,
+    postureLabel,
+    confidenceLabel,
+    regimeLabel: homepage.reportShell.statusLabel,
+    /* The reading's own date. `weeklyRecordDate` is the Friday of its week,
+       so a Monday reading went out as "As of 2026-10-09", four days after it
+       was taken and two days in the future on the day it was read. */
+    recordDate: reportData.treasury.record_date,
+    tickerLabel: ticker || null,
+    stageLabel: companyStage ? operatorStageLabel(companyStage) : null,
+    sourceLabel: homepage.reportShell.treasurySource,
+    briefUrl: buildWhetherBriefUrl({ ticker, ref }),
+    attributionUrl: buildWhetherBriefUrl({ ref }),
+  };
+};
+
 type BriefEmbedData = {
   operatingCall: string;
   actionNow: string;
   doNowItems: string[];
-  /** Null when the call published no flip condition. Never filler. */
+  /** Where conditions change: the brief's "Conditions change if" sentence. Null when the call published none. Never filler. */
   flipTrigger: string | null;
+  /** Set only when a stage is calibrated: that stage's resume line, printed under its own label. */
+  resumeWhen?: string;
   /** Null when the call published no reversal condition. Never filler. */
   reversalCondition: string | null;
   dataFreshness: string;
@@ -211,14 +224,48 @@ const escapeHtml = (value: string): string =>
 
 const escapeAttribute = escapeHtml;
 
+/* The change line under the brief's label, and a stage's resume line under its
+   own, through the helper every surface that prints them reads. */
+const embedChangeLines = ({ flipTrigger, resumeWhen }: Pick<BriefEmbedData, "flipTrigger" | "resumeWhen">) =>
+  flipTrigger ? weeklyCallChangeLines({ callChangesIf: flipTrigger, resumeWhen }) : [];
+
+/** `format=text`: the embed as plain lines a newsletter build step inserts. */
+export const buildBriefEmbedText = (data: BriefEmbedData): string =>
+  [
+    `Whether — Weekly brief${data.tickerLabel ? ` for ${data.tickerLabel}` : ""}`,
+    /* This line read "Regime: Freezing • Confidence: MED": the engine's noun
+       and the confidence code, where every other surface prints the weather
+       word under "Conditions" and the band as a word. */
+    `Conditions: ${data.regimeLabel} • ${data.confidenceLabel} • As of ${data.recordDate}`,
+    ``,
+    `Operating guidance: ${data.operatingCall}`,
+    `Decision now: ${data.actionNow}`,
+    /* One item per line. Joined with commas, items that carry their own
+       ("If you plan to raise, prepare…", "…within a week, each with a review
+       date") ran into each other and the list could not be read back. */
+    ...(data.doNowItems.length > 0
+      ? [`${DECISION_CONTRACT_LABELS.action.doNow}:`, ...data.doNowItems.map((item) => `- ${item}`)]
+      : []),
+    ...embedChangeLines(data).map(({ label, value }) => `${label}: ${value}`),
+    ``,
+    `Get your own weekly brief: ${data.attributionUrl}`,
+    USE_CONSTRAINT_SUMMARY,
+  ].join("\n");
+
 export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
-  const { operatingCall, actionNow, doNowItems, flipTrigger, postureLabel, confidenceLabel, recordDate, tickerLabel, stageLabel, attributionUrl } = data;
+  const { operatingCall, actionNow, doNowItems, postureLabel, confidenceLabel, recordDate, tickerLabel, stageLabel, attributionUrl } = data;
   // `stageLabel` is only ever a stage the brief was actually calibrated for —
   // the route derives it from the parsed stage, not the raw parameter — so the
   // meta line can carry it without claiming a calibration that did not happen.
   const metaParts = [postureLabel, confidenceLabel, `As of ${recordDate}`, tickerLabel, stageLabel].filter(Boolean);
   const doNowHtml = doNowItems
     .map((item) => `<p style="font-size:13px;color:rgba(255,255,255,0.6);margin:2px 0;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">${escapeHtml(item)}</p>`)
+    .join("");
+  const changeLinesHtml = embedChangeLines(data)
+    .map(
+      ({ label, value }) =>
+        `<div style="background:rgba(245,158,11,0.08);border-left:3px solid rgba(245,158,11,0.4);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px;color:rgba(252,211,77,0.8);"><strong style="color:rgba(251,191,36,0.9);">${escapeHtml(label)}:</strong> ${escapeHtml(value)}</div>`,
+    )
     .join("");
 
   return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;margin:0;padding:16px;background:#0d0f12;border:1px solid rgba(255,255,255,0.06);border-radius:12px;color:rgba(255,255,255,0.9);">
@@ -232,7 +279,7 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
   </div>
   <p style="font-size:14px;color:rgba(255,255,255,0.7);margin:12px 0;"><strong style="color:rgba(255,255,255,0.8);">Decision now:</strong> ${escapeHtml(actionNow)}</p>
   ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.4);margin:0 0 4px 0;">${DECISION_CONTRACT_LABELS.action.doNow}</p>${doNowHtml}</div>` : ""}
-  ${flipTrigger ? `<div style="background:rgba(245,158,11,0.08);border-left:3px solid rgba(245,158,11,0.4);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px;color:rgba(252,211,77,0.8);"><strong style="color:rgba(251,191,36,0.9);">Watch:</strong> ${escapeHtml(flipTrigger)}</div>` : ""}
+  ${changeLinesHtml}
   <div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:rgba(255,255,255,0.3);display:flex;justify-content:space-between;">
     <span>${escapeHtml(USE_CONSTRAINT_SUMMARY)}</span>
   </div>
