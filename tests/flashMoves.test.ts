@@ -70,7 +70,8 @@ describe("flash alerts in the evaluator and the mail", () => {
     regime: "DEFENSIVE",
     tightness: 78,
     riskAppetite: 42,
-    posture: "Stage approvals",
+    actionNow: "Stage approvals",
+    callChangesIf: "Funding pressure falls 8 pts to 70 or below (78 today).",
     recordDate: "2026-09-16",
     ...over,
   });

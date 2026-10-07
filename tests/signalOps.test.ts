@@ -9,7 +9,7 @@ import {
   type SignalAlertInputPayload,
 } from "../lib/signalOps";
 import { DEFAULT_THRESHOLDS, type RegimeAssessment } from "../lib/regimeEngine";
-import { buildDecisionVerdictHeadline } from "../lib/alert/decisionDeltaRules";
+import { buildDecisionDeltaRules, buildDecisionVerdictHeadline } from "../lib/alert/decisionDeltaRules";
 
 const assessment = (
   regime: RegimeAssessment["regime"],
@@ -112,8 +112,9 @@ describe("signalOps", () => {
 
   it("suppresses jittering unsustained non-severe crossings", () => {
     const first = buildSignalAlertPayload(
-      basePayload(assessment("DEFENSIVE", 69, 54), assessment("DEFENSIVE", 71, 54)),
+      basePayload(assessment("DEFENSIVE", 75, 54), assessment("DEFENSIVE", 77, 54)),
     );
+    assert.ok(first.decisionDeltas.some((delta) => delta.code === "tightness-upshift"));
     assert.equal(shouldCreateSignalAlert(first), false);
 
     const latest: RegimeAlertEvent = {
@@ -128,12 +129,12 @@ describe("signalOps", () => {
           {
             code: "tightness-upshift",
             decisionArea: "spend",
-            actionText: "Tighten discretionary spend and hold non-critical hiring reqs.",
-            triggerValue: 71,
-            thresholdLabel: "Tightness regime threshold",
-            thresholdValue: 70,
+            actionText: "Pause new discretionary spend if funding pressure rises above 76.",
+            triggerValue: 77,
+            thresholdLabel: "Spending pause line",
+            thresholdValue: 76,
             confidence: "MEDIUM",
-            reversalText: "Re-tighten if funding pressure rises back above 70 for two updates.",
+            reversalText: "Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
             gate: "pass",
             severe: false,
           },
@@ -144,7 +145,7 @@ describe("signalOps", () => {
     };
 
     const jitter = buildSignalAlertPayload(
-      basePayload(assessment("DEFENSIVE", 70.8, 54), assessment("DEFENSIVE", 71.2, 54)),
+      basePayload(assessment("DEFENSIVE", 76.8, 54), assessment("DEFENSIVE", 77.2, 54)),
       latest,
     );
 
@@ -153,12 +154,12 @@ describe("signalOps", () => {
 
   it("suppresses low-confidence deltas unless severe thresholds are exceeded", () => {
     const lowConfidence = buildSignalAlertPayload(
-      basePayload(assessment("DEFENSIVE", 68, 55), assessment("DEFENSIVE", 73, 49, "LOW")),
+      basePayload(assessment("DEFENSIVE", 68, 55), assessment("DEFENSIVE", 78, 49, "LOW")),
     );
     assert.equal(lowConfidence.decisionDeltas.length, 0);
 
     const severeLowConfidence = buildSignalAlertPayload(
-      basePayload(assessment("DEFENSIVE", 68, 55), assessment("SCARCITY", 84, 39, "LOW")),
+      basePayload(assessment("DEFENSIVE", 68, 55), assessment("SCARCITY", 88, 33, "LOW")),
     );
     assert.ok(severeLowConfidence.decisionDeltas.length > 0);
     assert.ok(severeLowConfidence.decisionDeltas.every((delta) => delta.gate === "downgrade"));
@@ -181,12 +182,12 @@ describe("signalOps", () => {
           {
             code: "tightness-downshift",
             decisionArea: "spend",
-            actionText: "Loosen budget holds for pre-approved growth bets.",
-            triggerValue: 68,
-            thresholdLabel: "Tightness regime threshold",
-            thresholdValue: 70,
+            actionText: "Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
+            triggerValue: 65,
+            thresholdLabel: "Spending resume line",
+            thresholdValue: 66,
             confidence: "MEDIUM",
-            reversalText: "Re-tighten if funding pressure rises back above 70 for two updates.",
+            reversalText: "Pause new discretionary spend if funding pressure rises above 76.",
             gate: "pass",
             severe: false,
           },
@@ -197,7 +198,7 @@ describe("signalOps", () => {
     };
 
     const reversalPayload = buildSignalAlertPayload(
-      basePayload(assessment("SCARCITY", 72, 45), assessment("DEFENSIVE", 69, 51)),
+      basePayload(assessment("SCARCITY", 68, 45), assessment("DEFENSIVE", 63, 51)),
       latestEvent,
     );
 
@@ -222,6 +223,45 @@ describe("signalOps", () => {
     const summary = buildDeliverySummary(latest);
     assert.match(summary, /SCARCITY/);
     assert.match(summary, /tightness-upshift/);
+  });
+
+  /*
+   * The area rules fired on the change lines and printed them as the areas'
+   * lines: "Re-open spend only if funding pressure falls back to 70" (Spending
+   * resumes below 66) and a hiring pause the week risk appetite crossed 50
+   * (Hiring pauses below 44). And the regime change said the way out was the
+   * previous conditions, when on Oct 5 risk appetite clearing 50 alone meant
+   * Cloudy, not Sunny.
+   */
+  it("states the published area lines, and where conditions change next", () => {
+    const deltas = buildDecisionDeltaRules(assessment("EXPANSION", 63, 56), assessment("SCARCITY", 90, 48));
+
+    const spend = deltas.find((delta) => delta.code === "tightness-upshift");
+    assert.equal(spend?.thresholdValue, 76);
+    assert.equal(spend?.action, "Pause new discretionary spend if funding pressure rises above 76.");
+    assert.equal(spend?.reversal, "Resume new spend when funding pressure falls below 66 and the payback figures still hold.");
+    assert.equal(
+      deltas.some((delta) => delta.decisionArea === "hiring"),
+      false,
+      "risk appetite fell through 50, not through Hiring's pause line at 44",
+    );
+
+    const change = deltas.find((delta) => delta.code === "regime-change");
+    assert.equal(
+      change?.reversal,
+      "Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).",
+    );
+
+    const hiring = buildDecisionDeltaRules(assessment("SCARCITY", 90, 48), assessment("SCARCITY", 90, 43)).find(
+      (delta) => delta.code === "risk-appetite-downshift",
+    );
+    assert.equal(hiring?.thresholdValue, 44);
+    assert.match(hiring?.action ?? "", /^Pause net-new hiring if .*risk appetite falls below 44\.$/);
+    assert.match(hiring?.reversal ?? "", /funding pressure falls below 66 and risk appetite is above 54/);
+
+    for (const delta of deltas) {
+      assert.doesNotMatch(`${delta.action} ${delta.reversal}`, /falls back to 70|previous conditions/);
+    }
   });
 
   it("names the decision the alert affects in the verdict headline, not the raw signal move", () => {
