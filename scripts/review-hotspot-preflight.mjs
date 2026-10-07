@@ -23,7 +23,7 @@
 import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-import { execText } from "./exec.mjs";
+import { execOutput, execText } from "./exec.mjs";
 
 const args = process.argv.slice(2);
 
@@ -151,8 +151,19 @@ function addedTypeAssertions(base, head) {
   const diff = execText("git", ["diff", "--unified=0", base, ...(head ? [head] : []), "--", "*.ts", "*.tsx"]);
   if (!diff) return [];
 
-  const commentLinesFor = (file) =>
-    existsSync(file) ? blockCommentLines(readFileSync(file, "utf8")) : new Set();
+  // Comment context comes from the same tree the diff's new side describes: the named head
+  // commit when there is one, the working tree otherwise. `execOutput`, not `execText`: a
+  // trimmed leading blank line would shift every line number.
+  const commentLinesFor = (file) => {
+    if (head) {
+      try {
+        return blockCommentLines(execOutput("git", ["show", `${head}:${file}`]));
+      } catch {
+        return new Set();
+      }
+    }
+    return existsSync(file) ? blockCommentLines(readFileSync(file, "utf8")) : new Set();
+  };
 
   const offenders = [];
   let file = null;
