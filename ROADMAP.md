@@ -33,7 +33,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 
 ### DAU — event and state only, never cadence
 - [x] **Flash days are the honest DAU spikes** — `lib/alert/flashMoves.ts` fires on real market moves, irregularly; DAU rises on those days and cannot be scheduled.
-- [x] **Productize the quiet day** — Shipped: `buildQuietDayRead` (`lib/report/flipProximity.ts`) + `QuietDayRead` render a call-unchanged verdict with the nearest flip distance under the live call on `/`, from the same snapshot the hero draws; nothing on a week the call moved (2026-09-18).
+- [x] **Productize the quiet day** — Shipped: `buildQuietDayRead` (`lib/report/flipProximity.ts`) + `QuietDayRead` render a call-unchanged verdict with the nearest flip distance under the live call on `/`, from the same snapshot the hero draws; nothing on a week the call moved (2026-09-18). Since 2026-10-07 it says what would change the guidance through the contract's own line (`buildQuietDayRead` in `lib/report/decisionMovement.ts`: the nearer change line in points, or a held week's condition), not the nearest market move (`docs/feature-specs-current.md` §1.1.55).
 - [x] **Push only on real moves** — already the design (`sendRegimePush.ts`); preserve it, it is the guardrail that keeps push an accelerator instead of a churn driver.
 
 ### QAU — monthly/quarterly stakes as return reasons
@@ -44,9 +44,9 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - [ ] **History/compare as the lapsed-user magnet** — `/history/[period]` and Time Machine are pure QAU surfaces: regime at last visit vs today, score deltas, flip proximity.
 
 ### Sprint ceremonies — weekly execution commitments
-- [x] **Grooming guardrail tags** — Shipped: `buildGuardrailTagBlocks` (`lib/export/issueTrackerBrief.ts`) builds one paste-ready block per business area (posture, `Action now` / `Pause if` / `Change course if`, flip watch, week stamp), copyable from `/share` (`GuardrailTagControls`); no tokens, no tracker integration (2026-09-18).
+- [x] **Grooming guardrail tags** — Shipped: `buildGuardrailTagBlocks` (`lib/export/issueTrackerBrief.ts`) builds one paste-ready block per business area (posture, `Action now` / `Pause if` / `Change course if`, flip watch, week stamp), copyable from `/share` (`GuardrailTagControls`); no tokens, no tracker integration (2026-09-18). Since 2026-10-07 the block's "What would change this guidance" is the brief's own "Conditions change if" sentence, not a market move (§1.1.55).
 - [x] **Commitment lint in planning** — Shipped: MCP `lint_sprint_goal` (`lib/agent/tools.ts`) takes a sprint goal or story plan and returns `holds | pauses | needs_reversal_guardrail` with the bounded rule's pause trigger and reversal, reusing `stressTestDecisionPlan` (2026-09-18).
-- [x] **Standup flip line** — Shipped: `buildStandupFlipLine` (`lib/report/flipProximity.ts`) produces a one-sentence standup input ("Call unchanged, 0.08% from flip; no pace change"), copyable from `/share` (`ShareCopyControls`) for daily and sprint ceremonies (2026-09-26).
+- [x] **Standup flip line** — Shipped: `buildStandupFlipLine` (`lib/report/flipProximity.ts`) produces a one-sentence standup input ("Call unchanged, 0.08% from flip; no pace change"), copyable from `/share` (`ShareCopyControls`) for daily and sprint ceremonies (2026-09-26). Since 2026-10-07 it is `buildStandupLine` (`lib/report/decisionMovement.ts`): "Conditions changed to Stormy; review pace. Conditions change if: Risk appetite rises 9 pts to clear 50 (41 today).", and on a held week "Guidance on hold this week; no pace change." with the hold's condition (§1.1.55).
 - [ ] **Sprint-posture recap + retro violation report** — compare the sprint's logged decisions (`lib/events/decisionEventStore.ts`) against the regime's bounded rules and surface the mismatches ("committed to a speculative build in a DEFENSIVE regime").
 
 **Non-goal for sprint presence**: do not become a sprint tool (scrum dashboards, burndown, velocity). Presence stays decision-shaped — the macro guardrail attached to commitments, not a project manager.

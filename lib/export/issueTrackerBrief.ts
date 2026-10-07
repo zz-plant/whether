@@ -84,10 +84,10 @@ export const buildIssueTrackerMarkdownBrief = (
  *
  * This is the credential-free slice of the Linear/Jira sync: no tokens are
  * stored and nothing is written to the tracker — the operator copies one block
- * per area into the card description, and the card now carries posture, the
- * pause trigger, the flip condition, and the flip watch. The block uses the
- * same bounded-rule fields the Slack brief and the hero print, so a card
- * cannot state a threshold the weekly call does not.
+ * per area into the card description, and the card now carries the conditions,
+ * the area's pause and resume lines, and what would change the guidance. The
+ * block uses the same bounded-rule fields the Slack brief and the hero print, so
+ * a card cannot state a threshold the weekly call does not.
  */
 export type GuardrailTagBlock = {
   /** Business-area lever, e.g. `hiring-stance`. */
@@ -104,13 +104,19 @@ export const buildGuardrailTagBlocks = ({
   actionStripItems,
   postureLabel,
   recordDate,
-  flipWatchSentence,
+  callChangesIf,
 }: {
   actionStripItems: readonly ActionStripItem[];
   postureLabel: string;
   recordDate: string;
-  /** The nearest flip distance in the market's units, as the hero prints it. */
-  flipWatchSentence?: string;
+  /**
+   * What would change the guidance: the brief's "Conditions change if" sentence
+   * (`WeeklyCallContract.callChangesIf`), the hold's own condition on a held week.
+   * It was the nearest market move ("If the 1-month Treasury bill rate rises 0.15%,
+   * conditions turn Cloudy."), which on a held week named a rate move beside
+   * guidance the hold says is not changing.
+   */
+  callChangesIf?: string;
 }): GuardrailTagBlock[] =>
   actionStripItems.map((item) => ({
     area: item.lever,
@@ -124,7 +130,7 @@ export const buildGuardrailTagBlocks = ({
       `**${DECISION_CONTRACT_LABELS.action.actionNow}:** ${item.areaActionNow}`,
       `**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${formatDecisionThreshold(item.triggerThreshold)}`,
       `**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${formatDecisionReversal(item.reversalCondition)}`,
-      ...(flipWatchSentence ? [`**${DECISION_CONTRACT_LABELS.watch.flipWatch}:** ${flipWatchSentence}`] : []),
+      ...(callChangesIf ? [`**${DECISION_CONTRACT_LABELS.watch.flipWatch}:** ${callChangesIf}`] : []),
       `_Week of ${recordDate}_`,
     ].join("\n"),
   }));

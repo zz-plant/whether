@@ -5,6 +5,7 @@ import { buildWeeklyCallContract } from "../report/weeklyCallContract";
 import { buildHomeBriefModel } from "../report/homeBriefModel";
 import { buildGuidanceBundleFromAssessment, buildReportDynamics, buildWeekActionNow } from "../report/reportEvidence";
 import { resolveWeekComparison } from "../report/weekComparison";
+import { buildRegimeAlert } from "../report/reportFormatting";
 import { FRED_SOURCE_LABEL, PROVENANCE_STATUS } from "../report/provenanceStatus";
 import { buildSensorReadings } from "../sensors";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC, formatWeekEndingUTC } from "../formatters";
@@ -111,7 +112,15 @@ export const buildOperatingSnapshot = ({
     stopItems,
     actionStripItems,
     actionNowShort: buildWeekActionNow({ assessment, reportDynamics, actionStripItems }),
-    regimeAlert: null,
+    /* From the same comparison, as the report loader builds it. This was null, so the
+       stored call (`currentCall`, which every paste, the embed and the Monday sends
+       print) took the stance rule's no-change branch on a week the conditions changed:
+       "Favour releases that pay back quickly and can be rolled back." where the page's
+       own model, the /api/decision memo and the frozen record said "Ship fixes and
+       releases that pay back quickly; hold anything you could not reverse." */
+    regimeAlert: comparison
+      ? buildRegimeAlert(assessment, comparison.reading, recordDate, comparison.reading.recordDate)
+      : null,
     asOf: treasury.fetched_at,
     recordDateLabel: formatDateUTC(recordDate),
     weeklyRecordDateLabel: formatWeekEndingUTC(recordDate),

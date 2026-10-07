@@ -101,20 +101,25 @@ export const elapsedWeeksSuffix = (previousRecordDate: string, currentRecordDate
  * markup — the fallback — is what hydration renders too.
  *
  * A return after more than a week (`within_month` or `lapsed`) leads with a
- * delta panel — regime, call, and flip proximity — plus a one-click board
+ * delta panel — regime, call, and what would change it — plus a one-click board
  * deck, because that reader is at a board or planning cadence, not a Monday
  * ritual. The weekly ritual return (`next_week`) keeps the compact line.
  */
 export function SinceLastVisit({
   current,
-  flipProximitySentence,
+  callChangeLine,
   boardDeckHref,
   linesCrossedLead,
   fallback = null,
 }: {
   current: SeenCall;
-  /** The nearest flip distance in the market's units, as the hero prints it. */
-  flipProximitySentence?: string;
+  /**
+   * What would change the guidance, labelled (`buildCallChangeLine`). It was the
+   * nearest market move ("If the 1-month Treasury bill rate rises 0.15%, conditions
+   * turn Cloudy."), which on a held week named a rate move beside guidance the
+   * hold says is not changing.
+   */
+  callChangeLine?: string;
   /** One-click board deck download for the lapsed return path. */
   boardDeckHref?: string;
   /** The lead sentence describing whether any operating lines were crossed. */
@@ -196,7 +201,7 @@ export function SinceLastVisit({
       </div>
       <p className="text-fluid-xs leading-5 text-white/60">
         {callChanged ? <>Then: “{previous.call}” · Now: “{current.call}”</> : <>The guidance holds: “{current.call}”</>}
-        {flipProximitySentence ? <span className="block text-sky-200/80">{flipProximitySentence}</span> : null}
+        {callChangeLine ? <span className="block text-sky-200/80">{callChangeLine}</span> : null}
         {linesCrossedLead ? <span className="block text-slate-300">{linesCrossedLead}</span> : null}
       </p>
       {boardDeckHref ? (

@@ -1,8 +1,15 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "../lib/report/homeBriefModel";
-import { buildActionNowShort, resolveWeeklyTone, splitWeeklyCall } from "../lib/report/reportEvidence";
+import {
+  buildActionNowShort,
+  buildReportDynamics,
+  buildWeekActionNow,
+  resolveWeeklyTone,
+  splitWeeklyCall,
+} from "../lib/report/reportEvidence";
 import type { ReportDynamics } from "../lib/report/reportDataTypes";
+import { assessment } from "./factories/exportFixtures";
 
 /*
  * `resolveWeeklyTone` is the headline's rule for the week's direction: an improving week
@@ -67,5 +74,71 @@ describe("the week's direction beside the guidance", () => {
     const headline = buildActionNowShort({ directionLabel: "unavailable", regimeChanged: false, regime: "SCARCITY" });
     assert.equal(headline, "Keep spend flat and require paybacks inside 6 months.");
     assert.equal(splitWeeklyCall(headline).directionLabel, undefined, "no \"Holding this week\" stamp");
+  });
+});
+
+/*
+ * A change of conditions reads the way the conditions moved (`REGIME_SEVERITY_RANK`).
+ * Every change read "tightening" until 2026-10-07: a week the machine confirmed Sunny
+ * over a Stormy brief on the same scores headlined "Conditions are tightening. Keep what
+ * is working, and don't start anything new this week.", and a month-end Freezing to
+ * Cloudy did the same, in the headline, the sticky strip and the memo.
+ */
+describe("a change of conditions, by the way they moved", () => {
+  const sameScores = { ...assessment.scores, baseRate: assessment.scores.baseRate };
+
+  it("eases when the conditions get milder on the same scores", () => {
+    // Published Stormy while the machine held the flip; this week it confirms Sunny.
+    const dynamics = buildReportDynamics({ current: assessment, previous: { regime: "VOLATILE", scores: sameScores } });
+    assert.equal(dynamics.directionLabel, "stable");
+    assert.equal(dynamics.regimeChanged, true);
+    assert.equal(dynamics.previousRegime, "VOLATILE");
+    assert.equal(
+      buildWeekActionNow({ assessment, reportDynamics: dynamics, actionStripItems: [] }),
+      "Conditions are easing. Grow what is working, one milestone at a time.",
+    );
+  });
+
+  it("tightens when the conditions get harsher", () => {
+    const stormy = { ...assessment, regime: "VOLATILE" as const };
+    const dynamics = buildReportDynamics({ current: stormy, previous: { regime: "EXPANSION", scores: sameScores } });
+    assert.equal(
+      buildWeekActionNow({ assessment: stormy, reportDynamics: dynamics, actionStripItems: [] }),
+      "Conditions are tightening. Keep only the bets you can stop, and run fewer experiments at once.",
+    );
+  });
+
+  it("eases a month-end Freezing to Cloudy on mixed scores, and holds it while a pause line is met", () => {
+    const change = { directionLabel: "mixed" as const, regimeChanged: true, previousRegime: "SCARCITY" as const, regime: "DEFENSIVE" as const };
+    assert.equal(resolveWeeklyTone(change), "easing");
+    assert.equal(resolveWeeklyTone({ ...change, pauseApplies: true }), "holding");
+    assert.equal(buildActionNowShort(change), "Conditions are easing. Resume paused work with clear milestones.");
+    // Without the earlier conditions the old rule stands: a change reads as tightening.
+    assert.equal(resolveWeeklyTone({ directionLabel: "mixed", regimeChanged: true, regime: "DEFENSIVE" }), "tightening");
+  });
+
+  it("carries the same direction into the home model's badge and memo", () => {
+    const milder = buildHomeBriefModel({
+      assessment: {
+        regime: "DEFENSIVE",
+        diagnostics: { transitionWatch: false },
+        thresholds: { tightnessRegime: 50, riskAppetiteRegime: 50 },
+        scores: { tightness: 52, riskAppetite: 54 },
+      },
+      regimeAlert: { previousRegime: "SCARCITY" },
+      stopItems: ["Guardrail"],
+      reportDynamics: {
+        directionLabel: "mixed",
+        regimeChanged: true,
+        previousRegime: "SCARCITY",
+        changedSignals: [
+          { key: "tightness", delta: 1 },
+          { key: "riskAppetite", delta: 6 },
+        ],
+        anomalySignals: [],
+      },
+    });
+    assert.equal(milder.weeklyTone, "easing");
+    assert.equal(milder.weeklyMemoLines[0], "Conditions loosened this week.");
   });
 });

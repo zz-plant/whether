@@ -4,7 +4,7 @@ import type { PostureTransitionEvent } from "../storage/postureTransitionEventRe
 import { resolvePublishedConfidence, type ConfidenceRecord } from "./confidence";
 import { buildWeeklyLockCommitment } from "./decisionKnobs";
 import { type RuleCondition } from "./boundedDecisionRules";
-import { buildFlipThreshold } from "./reportEvidence";
+import { buildWeekCallChangesIf } from "./reportEvidence";
 
 export type PostureStateContract = {
   currentState: {
@@ -120,9 +120,12 @@ export const buildPostureStateContract = ({
         },
     /* The trigger is the brief's own "Conditions change if" sentence, with each
        line's distance and today's reading, so the Slack post, the mandate and
-       the agent views state the line the homepage does. */
+       the agent views state the line the homepage does. On a held week that
+       sentence is the hold's condition (`buildWeekCallChangesIf`); this printed
+       the two lines there, beside a brief that said the guidance changes when
+       the two scores agree. */
     whatFlipsNext: {
-      flipTrigger: buildFlipThreshold(assessment),
+      flipTrigger: buildWeekCallChangesIf(assessment),
       thresholds: lockCommitment.flipConditions,
       thresholdLines: lockCommitment.flipLines,
       reversalConditions: lockCommitment.flipConditions.slice(1),

@@ -37,6 +37,13 @@ type FlipProximityLine = { axis: "tightness" | "riskAppetite"; sentence: string 
  * quadrant, and the market move folds under it for the reader who wants it in
  * the market's units.
  *
+ * The fold translates that sentence and nothing else (`buildFlipProximity`):
+ * one market move per line it names, in its order, in percentage points. It
+ * was its own answer until 2026-10-07, ordered by the size of the move and in
+ * "%" ("If the 1-month Treasury bill rate rises 0.22%, conditions turn
+ * Freezing."), and on a held week it offered a rate move under a sentence
+ * whose condition is the scores agreeing; a held week now has no fold.
+ *
  * From `md` up the quadrant is drawn in the card at the top of the page, with
  * its month-end path, so this section stops drawing it there: one picture of
  * where the reading sits per screen. Below `md` the card has no room for it and
