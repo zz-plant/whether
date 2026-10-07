@@ -1,8 +1,6 @@
 import type { ReportDynamics } from "./reportData";
 import { regimeSignalLabel } from "./signalTranslations";
 
-type ReportSignalDirection = "tightening" | "easing" | "unchanged";
-
 /**
  * Canonical operator-facing signal names.
  *
@@ -19,7 +17,3 @@ export const signalOrder: Array<ReportDynamics["changedSignals"][number]["key"]>
   "baseRate",
   "curveSlope",
 ];
-
-export const resolveSignalDirection = (delta: number): ReportSignalDirection =>
-  delta > 0 ? "tightening" : delta < 0 ? "easing" : "unchanged";
-

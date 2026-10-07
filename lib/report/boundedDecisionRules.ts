@@ -310,6 +310,13 @@ export const guardrailMatchesRule = (
 const fmt = formatThresholdNumber;
 
 /**
+ * The Spending rule's payback bar, in months, in every condition. One number so
+ * the evidence line for the recession warning gauge states the same bar as the
+ * rule printed above it (`reportEvidence.ts`).
+ */
+export const SPENDING_PAYBACK_BAR_MONTHS = 6;
+
+/**
  * The four lines every area's pause and resume conditions are drawn from, set
  * apart from the change lines so a score must travel past a line, not touch it,
  * before a rule moves. One source for the rules below and for the track record's
@@ -393,8 +400,8 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
     },
     "burn-discipline": {
       area: "burn-discipline",
-      recommendation: "Approve new spend only if it pays back inside 6 months.",
-      doNow: ["Put a payback figure on every discretionary line before approving it; 6 months is the bar."],
+      recommendation: `Approve new spend only if it pays back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
+      doNow: [`Put a payback figure on every discretionary line before approving it; ${SPENDING_PAYBACK_BAR_MONTHS} months is the bar.`],
       avoidNow: ["Don't sign a multi-quarter commitment without a payback figure."],
       scope: "Hiring, vendor and marketing spend that commits you for more than one quarter.",
       pause: { verb: "Pause new discretionary spend", join: "or", conditions: [tightnessPauseLine] },

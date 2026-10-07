@@ -42,7 +42,7 @@ const hasImputedInputs = ({ scores }: ConfidenceInputs): boolean =>
   scores.baseRateUsed === "MISSING" || scores.curveSlope === null;
 
 /**
- * Points from the nearest regime boundary, on the tightness scale.
+ * Each score's distance from its own line, both on the tightness scale.
  *
  * The two gaps are not directly comparable: tightness moves 180 points per point
  * of base rate, risk appetite 40 per point of slope. Taking `min()` of the raw
@@ -51,10 +51,31 @@ const hasImputedInputs = ({ scores }: ConfidenceInputs): boolean =>
  * is converted to its tightness equivalent first, so "nearest" means nearest in
  * the move the underlying rate or slope would have to make.
  */
-export const resolveDistanceToFlip = ({ scores, thresholds }: ConfidenceInputs): number => {
-  const tightnessGap = Math.abs(scores.tightness - thresholds.tightnessRegime);
-  const riskGap = Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime);
-  return Math.min(tightnessGap, riskGap * RISK_GAP_TO_TIGHTNESS_EQUIVALENT);
+const resolveLineGaps = ({ scores, thresholds }: ConfidenceInputs) => ({
+  tightness: Math.abs(scores.tightness - thresholds.tightnessRegime),
+  riskAppetite: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime) * RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
+});
+
+/** Points from the nearest regime boundary, on the tightness scale. */
+export const resolveDistanceToFlip = (inputs: ConfidenceInputs): number => {
+  const gaps = resolveLineGaps(inputs);
+  return Math.min(gaps.tightness, gaps.riskAppetite);
+};
+
+/**
+ * How far a reading sits from a line, in the bands the published confidence
+ * uses: a score's own line, or the nearest for a signal that only feeds them. The
+ * published label is this for `nearest`, before any stale-fallback step down, so
+ * a per-signal label never claims more room than the guidance's own confidence
+ * allows at its nearest line.
+ */
+export const resolveLineDistanceLabel = (
+  inputs: ConfidenceInputs,
+  line: "tightness" | "riskAppetite" | "nearest",
+): "HIGH" | "MED" | "LOW" => {
+  if (hasImputedInputs(inputs)) return "LOW";
+  const gap = line === "nearest" ? resolveDistanceToFlip(inputs) : resolveLineGaps(inputs)[line];
+  return gap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : gap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
 };
 
 export const resolveConfidencePercentFromDistance = (
@@ -103,9 +124,7 @@ const resolvePublishedConfidenceLabel = ({
   recordDate?: string | null;
   now?: number;
 }): "HIGH" | "MED" | "LOW" => {
-  if (hasImputedInputs({ scores, thresholds })) return "LOW";
-  const gap = resolveDistanceToFlip({ scores, thresholds });
-  const geometric = gap <= REGIME_CONFIDENCE_NEAR_THRESHOLD ? "LOW" : gap <= REGIME_CONFIDENCE_MEDIUM_THRESHOLD ? "MED" : "HIGH";
+  const geometric = resolveLineDistanceLabel({ scores, thresholds }, "nearest");
   const ageHours = isFallbackData && recordDate
     ? Math.max(0, (now - Date.parse(`${recordDate}T00:00:00.000Z`)) / 3_600_000)
     : 0;
