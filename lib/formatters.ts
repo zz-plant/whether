@@ -83,8 +83,23 @@ export const resolveWeekEndingIsoDateUTC = (value: string) => {
 export const formatWeekEndingUTC = (value: string) =>
   formatDateUTC(resolveWeekEndingIsoDateUTC(value));
 
-export const formatTimestampUTC = (value: string) =>
-  formatDateValue(value, timestampFormatter);
+/*
+ * Assembled from parts, not `timestampFormatter.format()`: the glue between the date and the
+ * time is ICU locale data, not an option. Node and workerd write "Mar 10, 2026, 8:00 PM UTC";
+ * Bun on macOS reads the system ICU (74) and writes "Mar 10, 2026 at 8:00 PM UTC". So one
+ * reading printed two ways depending on the machine — the frozen briefs in
+ * data/published_briefs.json carry both — and a test of the label passed in the build container
+ * and failed on a workstation (2026-10-07).
+ */
+export const formatTimestampUTC = (value: string) => {
+  const date = parseDateValue(value);
+  if (!date) {
+    return value;
+  }
+  const parts = timestampFormatter.formatToParts(date);
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((entry) => entry.type === type)?.value ?? "";
+  return `${part("month")} ${part("day")}, ${part("year")}, ${part("hour")}:${part("minute")} ${part("dayPeriod")} ${part("timeZoneName")}`;
+};
 
 /**
  * Coarse age, no trailing punctuation: "45s", "12m", "6h", "18d", "7mo".
