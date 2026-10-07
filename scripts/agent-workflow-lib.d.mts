@@ -52,35 +52,6 @@ export type RepoIndexPaths = {
   testMap: string;
 };
 
-export type FetchLikeResponse = {
-  ok: boolean;
-  status?: number;
-  json(): Promise<unknown>;
-};
-
-export type FetchLike = (
-  input: string,
-  init?: {
-    method?: string;
-    headers?: Record<string, string>;
-    signal?: AbortSignal;
-    body?: string;
-  },
-) => Promise<FetchLikeResponse>;
-
-export function buildCompactIndexSummary(index: RepoIndex): {
-  counts: RepoIndex["fileMap"]["counts"];
-  agentGuides: string[];
-  skills: string[];
-  testsSample: string[];
-  taskProfiles: Array<{
-    id: string;
-    label: string;
-    docs: string[];
-    targets: string[];
-  }>;
-};
-
 export function buildDoctorReport(args?: {
   repoRoot?: string;
   task?: string;
@@ -126,42 +97,6 @@ export function buildHandoffPacket(args?: {
   };
 };
 
-export function buildPrewarmReport(args?: {
-  repoRoot?: string;
-  outDir?: string;
-  skipIndex?: boolean;
-  modelRole?: string;
-  commandRunner?: (command: string, args: string[], cwd: string) => string;
-  commandProbe?: (command: string) => boolean;
-}): {
-  repoRoot: string;
-  commands: {
-    lms: boolean;
-    ensureModel: boolean;
-  };
-  lmStudio: {
-    running: boolean;
-    port: number | null;
-    raw: unknown;
-  };
-  modelWarm: {
-    attempted: boolean;
-    role: string;
-    ok: boolean;
-    output: string;
-  };
-  index:
-    | {
-        generated: false;
-        reason: string;
-      }
-    | {
-        generated: true;
-        outputDirectory: string;
-        paths: RepoIndexPaths;
-      };
-};
-
 export function buildRepoIndex(args?: { repoRoot?: string }): RepoIndex;
 
 export function writeRepoIndex(args?: {
@@ -173,33 +108,4 @@ export function writeRepoIndex(args?: {
   index: RepoIndex;
 };
 
-export function readRepoIndex(args?: {
-  repoRoot?: string;
-  outDir?: string;
-}):
-  | {
-      outputDirectory: string;
-      paths: RepoIndexPaths;
-      index: RepoIndex;
-    }
-  | null;
-
 export function classifyTask(task: string): TaskProfile;
-
-export function classifyTaskWithLocalModel(args?: {
-  task?: string;
-  repoRoot?: string;
-  fetchImpl?: FetchLike;
-  baseUrl?: string;
-  model?: string;
-  timeoutMs?: number;
-  outDir?: string;
-  refreshIndex?: boolean;
-}): Promise<{
-  route: TaskProfile;
-  mode: "fallback" | "local-model";
-  fallbackReason?: string;
-  indexPath?: string;
-  model?: string;
-  baseUrl?: string;
-}>;

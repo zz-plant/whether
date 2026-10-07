@@ -2,7 +2,7 @@
  * What `scripts/agent-workflow-lib.mjs` knows about this repository.
  *
  * The library is the engine — keyword routing, the doctor report, handoff packets, the
- * repo index, the local-model router — and names nothing about Whether. This file is the
+ * repo index — and names nothing about Whether. This file is the
  * Whether part: the task profiles a request is routed to (with the docs, first files and
  * checks each one recommends), the fallback profile, the core product surfaces the index
  * calls out, and where the repo-local skills live.
@@ -10,9 +10,6 @@
 
 /** Where the canonical repo-local skills live. `.codex/skills/` is generated from it (`bun run skills:sync`). */
 export const SKILLS_DIRECTORY = ".claude/skills";
-
-/** The name the local-model router uses for this repository in its prompt. */
-export const REPOSITORY_NAME = "Whether";
 
 /** The canonical product surfaces the repo index lists as their own category. */
 export const CORE_SURFACES = [

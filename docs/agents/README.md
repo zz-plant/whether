@@ -19,16 +19,14 @@ Start here when you want the fastest correct repo orientation:
 If you will delegate work to a subagent, also read the delegation packet in `mcp-and-skills-playbook.md` before handing work off.
 
 Long-form reasoning behind repo rules lives in `lessons/` (toolchain and gates, automation and the
-deploy gate, tests and copy, dead features and honesty, regime scoring); `hot-files.md` lists the
+deploy gate, tests and copy, dead features and honesty, regime scoring, runtime helpers); `hot-files.md` lists the
 files most work lands in. Open the one that matches the task.
 
 Useful helpers:
 - `bun run agent:doctor`
 - `bun run agent:route -- "<task>"`
-- `bun run agent:route -- --local "<task>"`
 - `bun run agent:handoff -- --job "<job>"`
 - `bun run agent:index`
-- `bun run agent:prewarm`
 
 ## Fast start
 
