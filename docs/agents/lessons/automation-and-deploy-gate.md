@@ -180,8 +180,8 @@ deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck te
 included, runs lint, typecheck, the suite, and the asset check, and then the landmark audit,
 before anything is built or deployed. (Since 2026-10-06 the command is
 `bun scripts/run-checks.mjs --preset deploy`: the same two stages and the same signal, declared
-once in `scripts/check-tasks.mjs` beside the pre-push hook's preset, which `vinext-run.mjs` reads
-too. The lists had been written out in four places and a test compared two of them.) The audit runs second and alone because it spawns a dev
+once in `scripts/check-tasks.mjs` beside the pre-push hook's preset. The lists had been written out
+in four places and a test compared two of them.) The audit runs second and alone because it spawns a dev
 server and compiles every route against it; on a small box a server competing with lint, tsc,
 and the suite for cores turns a slow route into one that "never answered". **A failing test does
 block a deploy.**
@@ -198,33 +198,28 @@ see the toolchain note above for why that never did anything.) The runner also p
 suite it spawns: `bun test` only defaults it when unset, and a build container that sets
 `NODE_ENV=production` runs the suite in production mode, where `programmaticPayloadBuilder` stops
 relaxing its freshness contract and fails on fallback data. Those rules had only ever applied inside
-`scripts/vinext-run.mjs`'s inner gate — a step the build reaches *after* the outer command has
-already passed. `audit` and `hotspot-preflight` still run on pre-push (preflight) and in
+the build step's own inner gate (since removed) — a step the build reached *after* the outer command
+had already passed. `audit` and `hotspot-preflight` still run on pre-push (preflight) and in
 `bun run check` (both); they are excluded from the deploy path, not from the repo.
 
 This paragraph used to say the opposite — that the production branch skips the gate, so "a flaky
 test can never block a deploy" — and that sentence cost two days. Builds failed on all 27 commits
 from 2026-08-31 to 2026-09-01 while the doc said they couldn't, so nobody read the build log; the
-site served Aug-30 code for two days and the fix had to be deployed by hand. The confusion is that
-there are *two* gates. `scripts/vinext-run.mjs` does skip lint/typecheck/test/assets on the
-production branch, and still logs which way it went (`[vinext-run] check gate: …`) — but that gate
-guards `vinext-run build`, which CI only reaches *after* `bun run check` has already passed. The
-inner gate never decides whether a deploy happens.
+site served Aug-30 code for two days and the fix had to be deployed by hand. The confusion was that
+there were *two* gates: `scripts/vinext-run.mjs` also ran the checks before `vinext build` on
+preview branches, and skipped them on production, but that gate guarded only the build step, which
+the deploy reached *after* `bun run check` had already passed. The inner gate never decided whether
+a deploy happened.
 
-**The inner gate no longer repeats the outer one (2026-09-03).** Both were deliberate and each was
-documented on its own; nothing recorded that on a preview build the second could never fail, because
-the first had just passed on the same tree. It was the most expensive thing in the build — roughly a
-minute of lint, typecheck, suite, assets and landmarks re-run on every pull-request push, for no
-signal. Deleting the inner gate would have fixed the waste and given up the guarantee: the build
-command lives in the Cloudflare dashboard, so no test here can prove it still names `check:vinext`,
-and "a gate that quietly stops running is worse than no gate at all" is a rule this repo has already
-paid to learn. So the inner gate is skipped **by evidence**: `run-checks.mjs` under
-`WHETHER_DEPLOY_GATE=1` records which checks passed for the current commit
-(`scripts/check-gate-marker.mjs`, into gitignored `.cache/check-gate/`), and `vinext-run build` runs
-whichever of `GATE_TASKS` that record does not cover — all five, if the dashboard command ever stops
-writing one. The record is refused for a dirty tree, for another commit, and after six hours, so
-every way it can go wrong costs a repeated run rather than a skipped gate. The build log says which
-way it went.
+**The inner gate is gone (2026-10-07).** From 2026-09-03 it was skipped "by evidence": the outer run
+wrote a per-commit marker of what had passed (`scripts/check-gate-marker.mjs`, under
+`.cache/check-gate/`), and `vinext-run build` ran only what the marker did not cover, so that a
+dashboard command silently changed away from `check:vinext` would still be gated. That was a
+marker file, an age bound, a dirty-tree rule, a union across the two stages, a 250-line test and a
+second arrival in every doc, to defend against a dashboard setting no test can read. The guarantee
+it bought is now a line in `docs/cloudflare-deployment-runbook.md`: if the dashboard's build command
+changes, change the `deploy` preset, because the dashboard has no test. `vinext-run.mjs` only starts
+the Vinext CLI, and `tests/deployGateTestScope.test.ts` holds it to importing none of the gate.
 
 **A bound set under the real cost manufactures the failure it claims to detect (2026-09-17).** The
 landmark audit's per-route bound was 60s in the deploy gate. The gate spawns its own dev server, so
@@ -238,10 +233,10 @@ diff** — here, `git archive` into a scratch directory with `node_modules` hard
 `--base-url` pointed at an unused port so the audit starts its own cold server instead of reusing a
 warm one. The bound is still a bound: a route that never answers fails the gate.
 
-**The build container's checkout is not necessarily the commit (2026-09-17), and the gate now
-refuses one that is not.** After `fa1cc6e` merged, every build failed on two assertions — the memo
-example still reading as the blank form, and `public/embed.js` still holding the hardcoded origin —
-while `lint`, `typecheck` and every other test passed, and the same suite was green here through six
+**The build container's checkout is not necessarily the commit (2026-09-17), and the gate refuses
+one that is not.** After `fa1cc6e` merged, every build failed on two assertions — the memo example
+still reading as the blank form, and `public/embed.js` still holding the hardcoded origin — while
+`lint`, `typecheck` and every other test passed, and the same suite was green here through six
 consecutive `WHETHER_DEPLOY_GATE=1` runs. The tell was inside one file: in `tests/embedRoute.test.ts`
 the case that reads `public/embed.js` failed while the case beside it, reading `app/api/embed/route.ts`
 and `app/share/embedBuilder.tsx` from the same commit, passed. `app/`, `lib/` and `tests/` were fresh
@@ -251,17 +246,15 @@ the mechanism: something wrote over `public/` after the clone. Two files from on
 disagree in a checkout, so a split like that is never a test problem, and the repo's answers for a
 flaky suite — run it again, run it alone, replay the seed — cannot find it.
 
-`scripts/check-gate-marker.mjs` had the answer the entire time and threw it away: `headCommit()`
-returns `""` for a dirty tree, so the marker was silently not written, and its own doc comment
-asserted that "the build container checks out clean, so this only ever fires locally". Believing
-that sentence cost a day and three wrong public hypotheses. `worktreeDrift()` now reports the
-drifted paths instead of collapsing them into `""`, and under `WHETHER_DEPLOY_GATE=1`
+`worktreeDrift()` (`scripts/exec.mjs`) reports the drifted paths, and under `WHETHER_DEPLOY_GATE=1`
 `run-checks.mjs` prints `HEAD <sha>` and **refuses before running any task** when a tracked file on
 disk differs from it. It is a refusal, not a note, for `check:dead-exports`'s reason and one worse
 than it: the results would be about something other than the commit, *and* the assets that deploy
 come from the same tree, so a green run would ship the drift. Untracked files are reported and
 allowed — a build container may leave something extra behind, which does not make the commit's own
-content wrong.
+content wrong. (The marker had this answer the whole time and threw it away: its `headCommit()`
+returned `""` for a dirty tree and its doc comment asserted the container "checks out clean".
+Believing that sentence cost a day and three wrong public hypotheses.)
 
 Clearing the project's build cache in the Cloudflare dashboard is the remedy, and it is a dashboard
 action: no push from here can fix a stale cache, and deleting the two assertions would have made
