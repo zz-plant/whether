@@ -200,6 +200,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       text: brief("slack"),
       copyLabel: "Copy Slack post",
       commitment: "copied_slack",
+      preview: "chat",
     },
     {
       id: "full-brief",
@@ -210,6 +211,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       text: artifact.fullBrief,
       copyLabel: "Copy full brief",
       commitment: "copied_slack",
+      preview: "chat",
     },
     {
       id: "standup",
@@ -220,6 +222,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       text: artifact.standupLine,
       copyLabel: "Copy standup line",
       commitment: "copied_brief",
+      preview: "chat",
     },
     {
       id: "meeting-pack",

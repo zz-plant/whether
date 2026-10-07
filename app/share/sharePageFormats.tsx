@@ -7,6 +7,7 @@ import {
   type InvestorUpdateSnippetParts,
 } from "../../lib/export/investorUpdateSnippet";
 import { BriefPreview } from "../components/briefFormatPicker";
+import { ChatPreview } from "./chatPreview";
 import { locationHashSource, useBrowserSource, useHydrated } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
@@ -44,7 +45,20 @@ type ShareFormatBase = {
 
 export type ShareFormatOption = ShareFormatBase &
   (
-    | { kind: "text"; text: string; copyLabel: string; commitment: ActivationCommitment; offersCalendar?: boolean }
+    | {
+        kind: "text";
+        text: string;
+        copyLabel: string;
+        commitment: ActivationCommitment;
+        offersCalendar?: boolean;
+        /**
+         * "chat" draws the text as the channel will (bold, quote bars, links)
+         * for the formats posted into Slack. Every other format previews as the
+         * text itself, because there the text is the artifact: a Markdown
+         * agenda, a ticket, an email.
+         */
+        preview?: "chat";
+      }
     /** Composed in the browser: its last paragraph reads the reader's runway band, and the page is cached. */
     | { kind: "investor"; parts: InvestorUpdateSnippetParts; copyLabel: string }
     | { kind: "panel"; content: ReactNode }
@@ -222,7 +236,11 @@ export function SharePageFormats({
             selected.content
           ) : (
             <>
-              <BriefPreview label={selected.label} text={text} />
+              {selected.kind === "text" && selected.preview === "chat" ? (
+                <ChatPreview label={selected.label} text={text} />
+              ) : (
+                <BriefPreview label={selected.label} text={text} />
+              )}
               <div className="flex flex-wrap items-center gap-x-4 gap-y-2">
                 <ClipboardActionRow
                   label={selected.copyLabel}
