@@ -356,3 +356,19 @@ details[open] > summary[data-chevron]::after,
   position: absolute;
   inset: -8px;
 }
+
+/* A link in a list of links (the site footer). A 44px row on a touch screen;
+   with a mouse the row is the line the text needs, like the compact controls
+   above. Every footer link was a 44px row at every width, which made a list
+   of seventeen links the tallest, loudest block on a short page. */
+.weather-list-link {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  touch-action: manipulation;
+}
+@media (min-width: 640px) and (hover: hover) and (pointer: fine) {
+  .weather-list-link {
+    min-height: 1.75rem;
+  }
+}

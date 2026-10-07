@@ -204,6 +204,31 @@ describe("TrustStrip", () => {
     assert.match(html, /href="\/trust"/);
     assert.doesNotMatch(html, /HIGH|MED|LOW/, "the engine's confidence key must not reach the reader");
   });
+
+  /* The report intro's phone line (ui-ux-standards §XI): the record date and
+     the could-change fact always print; a fact in its routine state folds
+     behind the link to /trust, and an exception never does. */
+  it("folds only the routine facts on a phone, and only when it links to /trust", () => {
+    const cellClass = (html: string, label: string) =>
+      new RegExp(`<div class="([^"]*)"><dt[^>]*>${label}</dt>`).exec(html)?.[1] ?? "";
+    const base = { recordDateLabel: "Oct 5, 2026", sourcesLabel: "All sources live", couldChangeNextWeek: true, changeReason: "risk appetite is 2 pts from its line" };
+
+    const routine = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" href="/trust" phoneLayout="line" />);
+    assert.match(cellClass(routine, "Sources"), /max-sm:hidden/);
+    assert.match(cellClass(routine, "Confidence"), /max-sm:hidden/);
+    assert.doesNotMatch(cellClass(routine, "As of"), /max-sm:hidden/);
+    assert.doesNotMatch(cellClass(routine, "Could change next week"), /max-sm:hidden/);
+
+    const exceptions = renderToStaticMarkup(
+      <TrustStrip {...base} sourcesLive={false} sourcesLabel="Cached snapshot" confidenceLabel="LOW" href="/trust" phoneLayout="line" />,
+    );
+    assert.doesNotMatch(cellClass(exceptions, "Sources"), /max-sm:hidden/, "cached sources always print");
+    assert.doesNotMatch(cellClass(exceptions, "Confidence"), /max-sm:hidden/, "Low confidence always prints");
+
+    /* /trust has no link to fold behind: the strip is its System status. */
+    const onTrust = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" phoneLayout="line" />);
+    assert.doesNotMatch(onTrust, /max-sm:hidden/);
+  });
 });
 
 describe("MonthStrip", () => {

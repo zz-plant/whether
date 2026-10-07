@@ -3022,3 +3022,49 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   lists they change instead of sitting above the heading, and the count says what it counts ("The
   top 3 of each list.", where it said "per area"). Risk checks and the resources disclosure take the
   closed steps' fill, so the page's frames read as one set in the light theme too.
+
+### 1.1.47 Shared chrome: the report intro on a phone, the footer, /pricing and /concepts (2026-10-07)
+
+A screenshot review of the shared chrome found the report intro restating the homepage's trust
+strip across a phone's first screen, a footer set louder than the pages above it, a plain fact on
+`/pricing` drawn in the warning ink, and `/concepts` as about 6,000px of one small-text column.
+
+- **The report intro on a phone** (`CommandCenterNavBlock`, every `ReportShell` route). Below `sm`
+  a route with a trust strip draws three lines: the status word in the regime ink with the
+  screenshot caption beside it, the title, and the strip as one wrapped meta line
+  (`TrustStrip` `phoneLayout="line"`). The line always carries the record date and "Could change
+  next week"; it leaves out "Sources" and "Confidence" while they are routine (every source live,
+  confidence not Low) and the strip links to `/trust`, and prints them whenever they are not. On
+  `/trust`, where the strip is the page's System status and has no link, all four facts print. The
+  refresh stamp ("Signals refreshed …") is a desktop line; a route whose status line carries
+  "sources • as of" (`/resolve`, `/history`) keeps the caption at the foot of the block, where it
+  does not wrap under the status line. Measured at 430×932 with touch: the intro on `/operate`
+  and `/signals` 259 → 127px (the first section starts at 282px instead of 414px), `/trust`
+  235 → 147px, `/resolve` 180 → 153px. From `sm` up nothing changed. Tests: `tests/visualPrimitives.test.tsx` (what folds), `tests/screenshotCaption.test.tsx`
+  (where the caption sits on a phone).
+- **The footer** (`app/layout.tsx`). Its seventeen links were `text-fluid-sm` in 44px rows at
+  every width, larger than most body copy on the pages above, and each group was split into two
+  equal halves of an equal half, so short words sat about 100px apart. Links are `text-fluid-xs`
+  now and take `.weather-list-link` (`controls.css`): a 44px row on a touch screen, a 28px row with
+  a fine pointer and hover from `sm`, the same condition the compact controls use. From `sm` each
+  group is as wide as its links, 48px from the next. The Shortcuts button is hidden on a screen
+  with no hover, where it listed keys for a keyboard the phone does not have. Measured with a
+  mouse at 1280px: 439 → 359px tall; on a 430px touch phone 679 → 587px, the rows keeping 44px.
+- **`/pricing`.** "Cannot be bought yet. A request records that you want it." prints in the price's
+  qualifier ink (`text-slate-400`), not the caution amber: it is a plain fact about the offer, and
+  amber read it as a warning about the product. The "What a request does" section lost its 20px
+  side inset from `sm`, which set it out of line with the title and the cards (§XXI: an unboxed
+  section sits on the page column), and "What that means in practice" takes `.weather-hit`, the
+  44px target every inline link in a sentence has. `tests/pricing.test.ts` holds the ink.
+- **`/concepts` (Product writing).** Each entry's conditions were 14px grey text after "Conditions
+  that month:", the smallest thing in the entry and the one fact the page adds. They are the
+  regime's stamp now: `Tag` takes a `regime` and draws `.weather-tag-regime` with `.type-stamp`,
+  its wash, edge and ink from the `data-regime` tokens (§XVI), followed by how long the conditions
+  had held. From `sm` each entry has a 10rem rail (date, stamp, run) beside the title, authors and
+  argument, so the rail reads down the page as a timeline; on a phone the rail is the entry's first
+  line. The date, not the conditions word, opens that year in the archive (the stamp is not a link:
+  nothing capitalised is clickable, §XVIII). Above the list, a year strip draws one square per
+  essay from the oldest year to the newest, filled in the conditions that month and hollow before
+  the record, with a key of only the conditions it draws; it reads the timeline the entries print
+  and adds no data or claim. Measured: 6,293 → 5,455px desktop, about 8,220 → 7,680px phone.
+  `tests/productCanon.test.ts` holds the stamps and one square per essay.

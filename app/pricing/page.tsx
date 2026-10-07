@@ -70,9 +70,11 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
       <p className="text-2xl font-bold text-white">{formatMonthlyPrice(plan)}</p>
       {/* Beside the price, not under the cards. It sat in a section after all
           three buttons, so a reader clicked "Request Pro access" before
-          learning there was nothing to buy. */}
+          learning there was nothing to buy. In the price's qualifier ink, not
+          the caution amber it had: it is a plain fact about the offer, and
+          amber read it as a warning about the product. */}
       {!isFree && !PAID_PLANS_ON_SALE ? (
-        <p className="-mt-2 text-fluid-xs font-medium text-amber-200">Cannot be bought yet. A request records that you want it.</p>
+        <p className="-mt-2 text-fluid-xs text-slate-400">Cannot be bought yet. A request records that you want it.</p>
       ) : null}
       <p className="text-fluid-xs text-slate-300">{plan.tagline}</p>
 
@@ -124,7 +126,7 @@ export default function PricingPage() {
               reader cannot verify is worth less than the work behind making it
               true, and there is real work behind this one. */}
           <p className="max-w-2xl text-fluid-xs text-slate-400">
-            <Link href="/privacy" className="text-sky-300 underline-offset-2 hover:underline">
+            <Link href="/privacy" className="weather-hit text-sky-300 underline-offset-2 hover:underline">
               What that means in practice
             </Link>
             : every store, cookie and measurement, listed.
@@ -140,8 +142,10 @@ export default function PricingPage() {
         {/* What a request does. While nothing is on sale, the honest sentence is that
             it records interest and nothing else; the cohort paragraph below claims a
             reserved rate and an onboarding schedule, which only exist once checkout is
-            wired, so it renders only when the plans are on sale. */}
-        <section className="weather-panel space-y-3 px-5 max-sm:px-0 py-5">
+            wired, so it renders only when the plans are on sale.
+            Unboxed, so it sits on the page column (ui-ux-standards §XXI): a 20px
+            side inset from `sm` put it out of line with the title and the cards. */}
+        <section className="weather-panel space-y-3 px-0 py-5">
           <h2 className="type-eyebrow">{PAID_PLANS_ON_SALE ? "Priority onboarding" : "What a request does"}</h2>
           {PAID_PLANS_ON_SALE ? (
             <p className="max-w-2xl text-fluid-xs text-slate-300">

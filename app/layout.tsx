@@ -239,7 +239,7 @@ export default function RootLayout({
           <PremiumFunnelTracker />
           {children}
         </ToastProviderRoot>
-        <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-10">
+        <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-8 sm:py-10">
           <div className="mx-auto max-w-5xl">
             {/* Brand first. The footer opened straight into three centred rows of
                 anonymous links: no wordmark, no statement of what the product is,
@@ -257,8 +257,12 @@ export default function RootLayout({
               {/* Two labelled columns rather than two centred rows. Centring gave
                   the five surfaces the product is about the same rank and the same
                   scan path as Embed and RSS; a heading per group says which is
-                  which before the reader has read a single link. */}
-              <div className="grid gap-6 sm:grid-cols-2 sm:gap-8">
+                  which before the reader has read a single link.
+                  From `sm` each group is as wide as its links. Two equal grid
+                  halves, each split into two equal columns, spread seventeen
+                  short words across the whole width with ~100px of air between
+                  "Brief" and "Trust". */}
+              <div className="grid gap-5 sm:flex sm:flex-wrap sm:gap-x-12 sm:gap-y-6">
                 <nav aria-labelledby="footer-product-heading" className="space-y-1">
                   <p id="footer-product-heading" className="type-eyebrow text-slate-400">The weekly loop</p>
                   {/* Wraps horizontally on mobile, stacks on `sm`. A vertical list
@@ -268,12 +272,12 @@ export default function RootLayout({
                       Two columns from `sm`, like the list beside it: seven links
                       at 44px each made this the tallest thing in the footer and
                       set the footer's height on every page. */}
-                  <ul className="flex flex-wrap gap-x-5 sm:block sm:columns-2">
+                  <ul className="flex flex-wrap gap-x-5 sm:block sm:columns-2 sm:gap-x-8">
                     {navigationLayers.map((layer) => (
                       <li key={layer.href} className="break-inside-avoid">
                         <Link
                           href={layer.href}
-                          className="inline-flex min-h-[44px] items-center text-fluid-sm text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
+                          className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
                         >
                           {layer.navLabel ?? layer.label}
                         </Link>
@@ -291,12 +295,12 @@ export default function RootLayout({
                   {/* Same shape as the column beside it: wrapping row on mobile,
                       stacked list on `sm`, where twelve entries at the 44px touch
                       target still read as a scannable column rather than a tower. */}
-                  <ul className="flex flex-wrap gap-x-4 sm:block sm:columns-2 sm:gap-x-5">
+                  <ul className="flex flex-wrap gap-x-4 sm:block sm:columns-2 sm:gap-x-8">
                     {utilityLinks.map((link) => (
                       <li key={link.href} className="break-inside-avoid">
                         <Link
                           href={link.href}
-                          className="inline-flex min-h-[44px] items-center text-fluid-sm text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
+                          className="weather-list-link text-fluid-xs text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
                         >
                           {link.label}
                         </Link>
@@ -306,7 +310,7 @@ export default function RootLayout({
                       {/* A file, not a page — stays an <a> and outside the link set. */}
                       <a
                         href="/feed.xml"
-                        className="inline-flex min-h-[44px] items-center text-fluid-sm text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
+                        className="weather-list-link text-fluid-xs text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
                       >
                         RSS
                       </a>
@@ -327,17 +331,17 @@ export default function RootLayout({
                 aria-label="Legal and credits"
                 className="flex flex-wrap items-center gap-x-6 gap-y-0 text-fluid-micro text-[var(--footer-legal)]"
               >
-                <Link href="/decisions" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Your record</Link>
-                <Link href="/privacy" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Privacy</Link>
-                <Link href="/acceptable-use-policy" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Acceptable Use</Link>
-                <Link href="/terms-of-service" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Terms</Link>
-                <a href="https://github.com/zz-plant/whether" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-legal-hover)]" target="_blank" rel="noreferrer">GitHub</a>
-                <span className="inline-flex min-h-[44px] items-center">
+                <Link href="/decisions" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Your record</Link>
+                <Link href="/privacy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Privacy</Link>
+                <Link href="/acceptable-use-policy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Acceptable Use</Link>
+                <Link href="/terms-of-service" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Terms</Link>
+                <a href="https://github.com/zz-plant/whether" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]" target="_blank" rel="noreferrer">GitHub</a>
+                <span className="inline-flex items-center">
                   Built by
-                  <a href="https://kanav.net" className="ml-1 inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">Kanav Jain</a>
+                  <a href="https://kanav.net" className="weather-list-link ml-1 no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">Kanav Jain</a>
                 </span>
-                <a href="https://nextconsensus.com" className="inline-flex min-h-[44px] items-center no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">NextConsensus</a>
-                <span className="inline-flex min-h-[44px] items-center">© 2026 Whether</span>
+                <a href="https://nextconsensus.com" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-link-hover)]" target="_blank" rel="noreferrer">NextConsensus</a>
+                <span className="inline-flex items-center">© 2026 Whether</span>
               </nav>
               {/* Inside the footer now. It used to render after `</footer>`, so a
                   keyboard hint floated alone under the copyright, attached to
