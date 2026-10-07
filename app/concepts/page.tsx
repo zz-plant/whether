@@ -5,10 +5,11 @@ import { buildProductCanonStructuredData } from "../../lib/seo/pageStructuredDat
 import { SecondaryPageHeader, SecondaryPageSection } from "../components/secondaryPageShell";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
+import { Tag } from "../components/ui/tag";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPublishedBriefPath, latestPublishedBrief, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { REGIME_STYLE_TOKENS, getOrderedRegimeLegend } from "../../lib/regimePresentation";
+import { getOrderedRegimeLegend } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
 import {
   buildCanonBaseRate,
@@ -61,39 +62,119 @@ const monthsLabel = (months: number) => (months === 1 ? "1 month" : `${months} m
    so a reading from it stays plain text rather than linking to a 404. */
 const archivedYears = new Set(postureArchiveYears.map((year) => year.slug));
 
-function ReadingLabel({ reading, year, recordStart }: { reading: CanonReading; year: number; recordStart: string | null }) {
+/* The conditions the month an essay came out, as the regime's stamp, then how
+   long they had held. It was grey 14px text after "Conditions that month:", so
+   the one fact the page exists to add read as the smallest thing in each entry. */
+function ReadingLabel({ reading, recordStart }: { reading: CanonReading; recordStart: string | null }) {
   if (reading.kind === "before-record") {
     return (
-      <span className="text-slate-400">
+      <span className="text-xs text-slate-400">
         Before the record{recordStart ? `, which starts ${recordStart}` : ""}
       </span>
     );
   }
   if (reading.kind === "after-record") {
-    return <span className="text-slate-400">After the latest month-end on record</span>;
+    return <span className="text-xs text-slate-400">After the latest month-end on record</span>;
   }
-  const tokens = REGIME_STYLE_TOKENS[reading.regime];
   return (
-    <span className="inline-flex items-center gap-2">
-      <span aria-hidden="true" className={`inline-block h-2 w-2 rounded-full ${tokens.marker}`} />
-      {archivedYears.has(String(year)) ? (
-        <a
-          href={buildPostureArchivePath(String(year))}
-          className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white"
-        >
-          {reading.conditions}
-        </a>
-      ) : (
-        <span className="text-slate-100">{reading.conditions}</span>
-      )}
-      <span className="text-slate-400">
+    <>
+      <Tag regime={reading.regime}>{reading.conditions}</Tag>
+      <span className="text-xs text-slate-400">
         {reading.heldSinceRecordStart
-          ? `· at least ${monthsLabel(reading.heldMonths)} running, since the record starts`
+          ? `at least ${monthsLabel(reading.heldMonths)} running, since the record starts`
           : reading.heldMonths === 1
-            ? "· the first month of it"
-            : `· ${monthsLabel(reading.heldMonths)} running`}
+            ? "the first month of it"
+            : `${monthsLabel(reading.heldMonths)} running`}
       </span>
-    </span>
+    </>
+  );
+}
+
+type TimelineEssay = ReturnType<typeof buildCanonTimeline>[number];
+
+/*
+ * Where the list falls by year: one column per year from the oldest essay to
+ * the newest, one square per essay, filled in the conditions the month it came
+ * out and hollow outside the record. The list below is 24 entries long, and
+ * this is the one view of it that shows the clusters and the colours at once.
+ * Drawn from the same timeline the entries print; aria-hidden, with the same
+ * facts in a sentence for a screen reader, which also has the list itself.
+ */
+function EssayYearStrip({ timeline, recordStart }: { timeline: readonly TimelineEssay[]; recordStart: string | null }) {
+  if (timeline.length === 0) return null;
+  const firstYear = timeline[0].published.year;
+  const lastYear = timeline[timeline.length - 1].published.year;
+  const years = Array.from({ length: lastYear - firstYear + 1 }, (_, index) => firstYear + index);
+  const byYear = new Map<number, TimelineEssay[]>();
+  for (const essay of timeline) byYear.set(essay.published.year, [...(byYear.get(essay.published.year) ?? []), essay]);
+  /* The key lists only what the strip draws (ui-ux-standards §XVI), in the
+     order the table above lists the conditions. */
+  const drawn = new Set(timeline.flatMap((essay) => (essay.reading.kind === "reading" ? [essay.reading.regime] : [])));
+  const legend = getOrderedRegimeLegend().filter((entry) => drawn.has(entry.regime));
+  const beforeRecord = timeline.some((essay) => essay.reading.kind === "before-record");
+  const afterRecord = timeline.some((essay) => essay.reading.kind === "after-record");
+  const labelled = (year: number) => year === firstYear || year === lastYear || (year % 5 === 0 && year - firstYear > 2 && lastYear - year > 2);
+  return (
+    <figure className="max-w-2xl space-y-2" data-essay-year-strip>
+      <p className="sr-only">
+        {`${timeline.length} essays by year of first publication, ${firstYear} to ${lastYear}, each marked with the conditions the month it came out.`}
+      </p>
+      <div aria-hidden="true" className="grid grid-flow-col auto-cols-fr items-end gap-px border-b border-[color:var(--border-default)] pb-1">
+        {years.map((year) => (
+          <div key={year} className="flex flex-col-reverse items-center gap-0.5">
+            {(byYear.get(year) ?? []).map((essay) =>
+              essay.reading.kind === "reading" ? (
+                <span
+                  key={essay.slug}
+                  data-regime={essay.reading.regime}
+                  title={`${essay.title}, ${formatCanonPublished(essay)}: ${essay.reading.conditions}`}
+                  className="block size-2.5 rounded-sm bg-[var(--regime-accent)] sm:size-3"
+                />
+              ) : (
+                <span
+                  key={essay.slug}
+                  title={`${essay.title}, ${formatCanonPublished(essay)}`}
+                  className="block size-2.5 rounded-sm border border-[color:var(--app-text-muted)] sm:size-3"
+                />
+              ),
+            )}
+          </div>
+        ))}
+      </div>
+      <div aria-hidden="true" className="grid grid-flow-col auto-cols-fr text-fluid-nano tabular-nums text-slate-400">
+        {years.map((year) => (
+          /* A year is wider than its column on a phone. Flex alignment, not
+             text-align, so it overflows both ways about the column's centre
+             (text that does not fit is start-aligned whatever text-align says),
+             and the end labels hang inward instead of past the gutter. */
+          <span
+            key={year}
+            className={`flex whitespace-nowrap ${year === firstYear ? "justify-start" : year === lastYear ? "justify-end" : "justify-center"}`}
+          >
+            {labelled(year) ? year : ""}
+          </span>
+        ))}
+      </div>
+      <ul aria-hidden="true" className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300">
+        {legend.map((entry) => (
+          <li key={entry.regime} className="flex items-center gap-1.5">
+            <span aria-hidden="true" data-regime={entry.regime} className="inline-block size-2.5 rounded-sm bg-[var(--regime-accent)]" />
+            {entry.label}
+          </li>
+        ))}
+        {[
+          beforeRecord ? `Before the record${recordStart ? `, which starts ${recordStart}` : ""}` : null,
+          afterRecord ? "After the latest month-end on record" : null,
+        ].map((label) =>
+          label ? (
+            <li key={label} className="flex items-center gap-1.5">
+              <span aria-hidden="true" className="inline-block size-2.5 rounded-sm border border-[color:var(--app-text-muted)]" />
+              {label}
+            </li>
+          ) : null,
+        )}
+      </ul>
+    </figure>
   );
 }
 
@@ -197,32 +278,61 @@ export default function ProductCanonPage() {
         title="The list, oldest first"
         description="The date is first publication. Where an essay became a book, the note says which one the date is."
       >
-        <ol className="space-y-5">
-          {timeline.map((essay) => (
-            <li key={essay.slug} id={essay.slug} className="border-t border-slate-800 pt-4 first:border-t-0 first:pt-0">
-              <p className="type-eyebrow">
-                <time dateTime={`${essay.published.year}-${String(essay.published.month).padStart(2, "0")}`}>
-                  {formatCanonPublished(essay)}
-                </time>
-              </p>
-              <h3 className="mt-1 text-base font-semibold text-slate-100">
-                <a
-                  href={essay.sourceUrl}
-                  rel="noopener noreferrer"
-                  className="underline decoration-slate-600 underline-offset-4 hover:text-white"
-                >
-                  {essay.title}
-                </a>
-              </h3>
-              <p className="text-sm text-slate-400">{formatCanonAuthors(essay)}</p>
-              <p className="mt-2 text-sm text-slate-300">{essay.argument}</p>
-              {essay.publishedNote ? <p className="mt-1 text-xs text-slate-400">{essay.publishedNote}</p> : null}
-              <p className="mt-2 text-sm">
-                <span className="text-slate-400">Conditions that month: </span>
-                <ReadingLabel reading={essay.reading} year={essay.published.year} recordStart={recordStart} />
-              </p>
-            </li>
-          ))}
+        <EssayYearStrip timeline={timeline} recordStart={recordStart} />
+        {/* From `sm` each entry has a rail: when it came out and the conditions
+            that month, as a stamp. Down the page the rail reads as a timeline
+            and the stamps as the record's colours, so the list can be scanned
+            for either without reading every entry. On a phone the rail is the
+            entry's first line. The date opens that year in the archive. */}
+        <ol className="mt-6 space-y-5">
+          {timeline.map((essay) => {
+            const year = String(essay.published.year);
+            const published = (
+              <time dateTime={`${year}-${String(essay.published.month).padStart(2, "0")}`}>
+                {formatCanonPublished(essay)}
+              </time>
+            );
+            return (
+              <li
+                key={essay.slug}
+                id={essay.slug}
+                className="grid gap-x-8 gap-y-2 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0 sm:grid-cols-[10rem_minmax(0,1fr)]"
+              >
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 sm:flex-col sm:items-start">
+                  <p className="type-eyebrow">
+                    {archivedYears.has(year) ? (
+                      <a
+                        href={buildPostureArchivePath(year)}
+                        className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200"
+                      >
+                        {published}
+                      </a>
+                    ) : (
+                      published
+                    )}
+                  </p>
+                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 max-sm:contents">
+                    <span className="sr-only">Conditions that month: </span>
+                    <ReadingLabel reading={essay.reading} recordStart={recordStart} />
+                  </p>
+                </div>
+                <div className="min-w-0 max-w-[68ch]">
+                  <h3 className="text-base font-semibold text-slate-100">
+                    <a
+                      href={essay.sourceUrl}
+                      rel="noopener noreferrer"
+                      className="underline decoration-slate-600 underline-offset-4 hover:text-white"
+                    >
+                      {essay.title}
+                    </a>
+                  </h3>
+                  <p className="text-sm text-slate-400">{formatCanonAuthors(essay)}</p>
+                  <p className="mt-2 text-sm text-slate-300">{essay.argument}</p>
+                  {essay.publishedNote ? <p className="mt-1 text-xs text-slate-400">{essay.publishedNote}</p> : null}
+                </div>
+              </li>
+            );
+          })}
         </ol>
       </SecondaryPageSection>
 
@@ -246,7 +356,7 @@ export default function ProductCanonPage() {
             <ActionLink href="/history" variant="inline">
               the history page
             </ActionLink>
-            , computed by the same method behind this week&rsquo;s guidance. Each essay&rsquo;s conditions link to that year&rsquo;s page in the archive.
+            , computed by the same method behind this week&rsquo;s guidance. Each essay&rsquo;s date links to that year&rsquo;s page in the archive.
           </li>
           <li>
             Essays: linked at each title, to the author or original publisher wherever it is still online.

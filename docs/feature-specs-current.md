@@ -2872,3 +2872,15 @@ strip across a phone's first screen, a footer set louder than the pages above it
   side inset from `sm`, which set it out of line with the title and the cards (§XXI: an unboxed
   section sits on the page column), and "What that means in practice" takes `.weather-hit`, the
   44px target every inline link in a sentence has. `tests/pricing.test.ts` holds the ink.
+- **`/concepts` (Product writing).** Each entry's conditions were 14px grey text after "Conditions
+  that month:", the smallest thing in the entry and the one fact the page adds. They are the
+  regime's stamp now: `Tag` takes a `regime` and draws `.weather-tag-regime` with `.type-stamp`,
+  its wash, edge and ink from the `data-regime` tokens (§XVI), followed by how long the conditions
+  had held. From `sm` each entry has a 10rem rail (date, stamp, run) beside the title, authors and
+  argument, so the rail reads down the page as a timeline; on a phone the rail is the entry's first
+  line. The date, not the conditions word, opens that year in the archive (the stamp is not a link:
+  nothing capitalised is clickable, §XVIII). Above the list, a year strip draws one square per
+  essay from the oldest year to the newest, filled in the conditions that month and hollow before
+  the record, with a key of only the conditions it draws; it reads the timeline the entries print
+  and adds no data or claim. Measured: 6,293 → 5,455px desktop, about 8,220 → 7,680px phone.
+  `tests/productCanon.test.ts` holds the stamps and one square per essay.
