@@ -61,7 +61,7 @@ describe("signal watch pages say what they measure in plain words", () => {
         changedSignals: [{ key: "tightness", label: "Funding pressure", delta: 27 }],
         anomalySignals: [],
         comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
-      } as unknown as SignalReadingSource["reportDynamics"],
+      },
     };
     const text = renderToStaticMarkup(
       <SignalReadingPanel reading={buildSignalClusterReading("capital-tightness-watch", dated)} recordDateLabel="Oct 5, 2026" />,
