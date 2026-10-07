@@ -250,10 +250,8 @@ export const buildWeeklyDecisionCardModel = (
     weeklyLeadershipSummary: {
       boldnessScore: 58,
       boldnessDelta: -2,
-      steadyWeek: false,
-      notchShiftLabel: "-1 notch",
-      shorthandLine: "We're -1 notch bold this week.",
-      netDeltaLabel: "Slightly more defensive than last week.",
+      guidanceChange: "lines",
+      shorthandLine: "Operating latitude down slightly since last week.",
     },
     weeklyMovement: { score: 1.2, direction: "tightening", summary: "Model pressure increased by +1.2 this week; tighten approvals until a conditions reverse." },
     decisionMovement: null,

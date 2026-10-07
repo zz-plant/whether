@@ -62,17 +62,12 @@ describe("weekly operator brief export adapters", () => {
       weeklyLeadershipSummary: {
         boldnessScore: 42,
         boldnessDelta: -3,
-        shorthandLine: "The call moved slightly more defensive this week.",
       },
     });
 
     assert.equal(payload.date, "2026-03-04", "the reading's own date, not the Friday of its week");
     assert.equal(payload.regimeStage, "Defensive · Late Cycle");
-    assert.deepEqual(payload.boldnessBudget, {
-      score: 42,
-      delta: -3,
-      line: "The call moved slightly more defensive this week.",
-    });
+    assert.deepEqual(payload.boldnessBudget, { score: 42, delta: -3 });
     // Two points above the tightness line: the published band is Low, whatever
     // the fixture's engine code says.
     assert.equal(payload.confidence, "Low confidence");
@@ -93,7 +88,6 @@ describe("weekly operator brief export adapters", () => {
       weeklyLeadershipSummary: {
         boldnessScore: 58,
         boldnessDelta: 4,
-        shorthandLine: "The call moved more aggressive this week.",
       },
     });
     const text = buildWeeklyOperatorBriefPlainText(payload);
@@ -130,7 +124,6 @@ describe("weekly operator brief export adapters", () => {
       weeklyLeadershipSummary: {
         boldnessScore: 33,
         boldnessDelta: -17,
-        shorthandLine: "This week's guidance is sharply more defensive.",
         comparedWith: { recordDate: "2026-08-31", label: "Aug 31" },
       },
     });
@@ -139,6 +132,28 @@ describe("weekly operator brief export adapters", () => {
     assert.deepEqual(payload.boldnessBudget?.comparedWith, { recordDate: "2026-08-31", label: "Aug 31" });
     assert.match(text, /higher means more room\) · vs Aug 31: -17 points/);
     assert.doesNotMatch(text, /vs last week/);
+  });
+
+  /* The paste printed the latitude's shorthand under the number: "This week's guidance
+     is unchanged." whenever the latitude did not move, which it does not on a week one
+     score crosses a pause line while the other moves the opposite way. The number line
+     says the move once, about the number, and nothing about the guidance. */
+  it("speaks about the latitude number only, and claims no move without a comparison", () => {
+    const flat = buildWeeklyOperatorBriefPlainText(
+      buildWeeklyOperatorBriefPayload(documentFor(), {
+        weeklyLeadershipSummary: { boldnessScore: 51, boldnessDelta: 0, comparedWith: { recordDate: "2026-09-29", label: "Sep 29" } },
+      }),
+    );
+    assert.match(flat, /^Operating latitude: 51\/100 \(room to hire, spend and commit; higher means more room\) · vs Sep 29: no change\nConditions:/m);
+    assert.doesNotMatch(flat, /guidance is (unchanged|holding)/i);
+
+    const notCompared = buildWeeklyOperatorBriefPlainText(
+      buildWeeklyOperatorBriefPayload(documentFor(), {
+        weeklyLeadershipSummary: { boldnessScore: 51, boldnessDelta: null },
+      }),
+    );
+    assert.match(notCompared, /^Operating latitude: 51\/100 \(room to hire, spend and commit; higher means more room\)$/m);
+    assert.doesNotMatch(notCompared, /no change|vs last week/);
   });
 
   it("embeds customTeamNote when provided", () => {

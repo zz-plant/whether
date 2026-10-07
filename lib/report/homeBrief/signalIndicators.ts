@@ -1,4 +1,5 @@
 import { DEFAULT_THRESHOLDS } from "../../regimeEngine";
+import { formatThresholdNumber } from "../../formatters";
 import { buildSignalInfluence } from "../regimeDescription";
 import {
   formatRegimeSignalValue,
@@ -230,7 +231,7 @@ const buildInputInfluenceDescription = ({
 
   if (key === "tightness") {
     const gap = rawValue - assessment.thresholds.tightnessRegime;
-    const tightnessLine = assessment.thresholds.tightnessRegime.toFixed(1);
+    const tightnessLine = formatThresholdNumber(assessment.thresholds.tightnessRegime);
     const threshold = assessment.thresholds.tightnessRegime;
     const watchBuffer = 8;
     return gap >= 0
@@ -260,7 +261,7 @@ const buildInputInfluenceDescription = ({
 
   if (key === "riskAppetite") {
     const gap = rawValue - assessment.thresholds.riskAppetiteRegime;
-    const riskLine = assessment.thresholds.riskAppetiteRegime.toFixed(1);
+    const riskLine = formatThresholdNumber(assessment.thresholds.riskAppetiteRegime);
     const threshold = assessment.thresholds.riskAppetiteRegime;
     const watchBuffer = 8;
     return gap >= 0

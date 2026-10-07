@@ -312,6 +312,32 @@ export const buildDecisionMovement = ({
 };
 
 /**
+ * What the week did to the guidance: `"conditions"` when the conditions changed (the
+ * week's `regimeChanged`, or a change the movement names), `"lines"` when an area's pause
+ * or resume line was crossed under the same conditions, `"held"` when neither — the week
+ * the movement sentence calls "Last week's guidance stands" — and null when nothing was
+ * compared.
+ *
+ * Not the operating latitude. That number is a blend of the two scores, so it can stay
+ * flat while one score crosses a pause line and the other moves the opposite way; every
+ * "nothing changed" claim read it until 2026-10-07, and "This week's guidance is
+ * unchanged." printed over weeks that paused four areas.
+ */
+export type GuidanceChange = "conditions" | "lines" | "held";
+
+export const describeGuidanceChange = ({
+  movement,
+  regimeChanged,
+}: {
+  movement: Pick<DecisionMovement, "moved" | "conditions"> | null;
+  regimeChanged: boolean | undefined;
+}): GuidanceChange | null => {
+  if (regimeChanged === true || movement?.conditions) return "conditions";
+  if (!movement) return null;
+  return movement.moved.length > 0 ? "lines" : "held";
+};
+
+/**
  * The first form of the headline that fits `maxLength`, so the most it can say whole. When
  * none does (an earlier reading with an unusually long label), the shortest, for the
  * caller's own clamp to finish: it cuts less of a sentence than it would of the full one.

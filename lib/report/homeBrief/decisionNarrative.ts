@@ -2,6 +2,7 @@ import type { RegimeConfidenceLabel } from "../../regimePresentation";
 import { isImprovingSignalDelta } from "../reportData";
 import type { Regime, SignalChange } from "../homeBriefModel";
 import type { ReportDynamics } from "../reportDataTypes";
+import type { WeeklyTone } from "../reportEvidence";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 
@@ -223,20 +224,38 @@ const trendMemoLines: Record<string, string> = {
   Mixed: "Signals split this week: some loosened, some tightened.",
 };
 
+/*
+ * The memo's first line, through the headline's rule (`resolveWeeklyTone`). It
+ * read the score direction alone, so `/api/decision` answered "Conditions
+ * loosened this week." beside an action that opened "Conditions are holding."
+ * while a pause line was met, and a week with nothing to compare fell through to
+ * "No material signal shift this week.", a finding from a comparison nobody made.
+ */
+const weeklyMemoLead = (trendLabel: string, weeklyTone: WeeklyTone | null) => {
+  if (weeklyTone === null) return "No previous reading to compare this week against.";
+  if (weeklyTone === "tightening") return trendMemoLines.Deteriorating;
+  if (weeklyTone === "easing") return trendMemoLines.Improving;
+  if (trendLabel === "Improving") return "The readings improved this week, but a pause line still applies, so the guidance holds.";
+  return trendMemoLines[trendLabel] ?? trendMemoLines.Stable;
+};
+
 export const buildWeeklyMemoLines = ({
   operatingStanceLine,
   trendLabel,
+  weeklyTone,
   transitionWatch,
   pauseIf,
   callChangesIf,
 }: {
   operatingStanceLine: string;
   trendLabel: string;
+  /** The week's direction as the headline reads it; null when nothing was compared. */
+  weeklyTone: WeeklyTone | null;
   transitionWatch: "ON" | "OFF";
   pauseIf: string;
   callChangesIf: string;
 }) => [
-  trendMemoLines[trendLabel] ?? trendMemoLines.Stable,
+  weeklyMemoLead(trendLabel, weeklyTone),
   operatingStanceLine,
   // The stance line is already line 2, so this line adds the watch state and its
   // condition instead of restating it.

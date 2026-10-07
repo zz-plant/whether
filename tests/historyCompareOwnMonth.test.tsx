@@ -164,7 +164,10 @@ describe("the period caption on a replayed month", () => {
     assert.equal(modelFor({}).weeklyLeadershipSummary.shorthandLine, "No earlier month-end to compare with.");
   });
 
-  it("dates the move by the earlier month-end, and keeps the live sentence for a live week", () => {
+  /* The caption is the operating latitude's move, about the number. It read "This week's
+     guidance is …" on a live week, a claim about the guidance made from a blend of the two
+     scores. */
+  it("dates the latitude's move by the earlier reading, on a replayed month and a live week alike", () => {
     const compared = {
       regimeAlert: { previousRegime: assessment.regime },
       reportDynamics: {
@@ -173,10 +176,25 @@ describe("the period caption on a replayed month", () => {
         comparedWith: { recordDate: "2011-12-30", label: "Dec 30, 2011" },
       },
     };
-    assert.equal(modelFor(compared).weeklyLeadershipSummary.shorthandLine, "More defensive since Dec 30, 2011.");
+    assert.equal(modelFor(compared).weeklyLeadershipSummary.shorthandLine, "Operating latitude down since Dec 30, 2011.");
     assert.equal(
       modelFor({ ...compared, historicalSelection: null }).weeklyLeadershipSummary.shorthandLine,
-      "This week's guidance is more defensive.",
+      "Operating latitude down since Dec 30, 2011.",
     );
+  });
+
+  /* The latitude's earlier reading was built only when a regime alert existed, so a month
+     compared with its earlier month-end, with no change line crossed, read "No earlier
+     month-end to compare with." over a ten-point fall in risk appetite. */
+  it("measures the move whenever a comparison exists, not only when a change line was crossed", () => {
+    const summary = modelFor({
+      reportDynamics: {
+        directionLabel: "deteriorating",
+        changedSignals: [{ key: "riskAppetite", delta: -10 }],
+        comparedWith: { recordDate: "2011-12-30", label: "Dec 30, 2011" },
+      },
+    }).weeklyLeadershipSummary;
+    assert.equal(summary.boldnessDelta, -7);
+    assert.equal(summary.shorthandLine, "Operating latitude down since Dec 30, 2011.");
   });
 });

@@ -53,7 +53,7 @@ MAKE THE PRODUCT
 - Home hero already renders a **revisit panel**: "Revisit last week's decisions?" with
   `revisitDecisions` / `revisitQueue` (`app/components/DecisionHero.tsx:295-322`). This is
   the seed of the north-star screen.
-- A **steady-week state** already exists (`weeklyLeadershipSummary.steadyWeek` →
+- A **steady-week state** already exists (`weeklyLeadershipSummary.guidanceChange === "held"`, was `steadyWeek` →
   "No change / Last week's calls stand").
 - **Decision Memory** exists (`lib/decisionMemory.ts`, `/operate/memory`,
   `DecisionMemoryButton`) but nothing compares recorded decision-time conditions against

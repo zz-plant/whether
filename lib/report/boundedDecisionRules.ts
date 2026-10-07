@@ -551,7 +551,12 @@ export const buildScopedVariantDecisionAdjustment = ({
         watchAdjustments: [
           `Payback trigger: revisit the plan if ${riskPauseLine}.`,
         ],
-        thresholdEmphasis: "Payback first: fund the channels that convert repeatably and pay back inside 12 months.",
+        /*
+         * The Spending bar, not a stage bar of its own: this said "pay back inside
+         * 12 months" until 2026-10-07, beside a Spending rule that approves new
+         * spend only inside six. A stage adds emphasis; it never relaxes that bar.
+         */
+        thresholdEmphasis: `Payback first: fund the channels that convert repeatably and pay back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
         reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion holds for two weekly reviews.`,
       };
     }
@@ -618,7 +623,8 @@ export const buildScopedVariantDecisionAdjustment = ({
       label: "Bootstrapped",
       description: "Keep cash in the bank and let customer value compound.",
       doNowAdjustments: [
-        "Fund growth from revenue, and only where the cash comes back inside the year.",
+        // The Spending bar again; "inside the year" read as a 12-month bar until 2026-10-07.
+        `Fund growth from revenue, and only where the cash comes back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
         "Make investments in stages you can pause without breaking operations.",
       ],
       avoidAdjustments: [

@@ -104,7 +104,7 @@ describe("quiet-day read", () => {
 });
 
 describe("standup flip line", () => {
-  it("formats a steady week with nearest move and no pace change", () => {
+  it("formats a week whose guidance held with nearest move and no pace change", () => {
     const proximity = [
       {
         axis: "riskAppetite" as const,
@@ -117,13 +117,13 @@ describe("standup flip line", () => {
     ];
     const line = buildStandupFlipLine({
       regime: "EXPANSION",
-      steadyWeek: true,
+      change: "held",
       proximity,
     });
-    assert.equal(line, "Call unchanged, 0.08% from flip; no pace change.");
+    assert.equal(line, "Guidance unchanged, 0.08% from flip; no pace change.");
   });
 
-  it("formats a changed call with the new regime, nearest move, and review pace", () => {
+  it("names the new conditions when they changed, with the nearest move and review pace", () => {
     const proximity = [
       {
         axis: "tightness" as const,
@@ -136,19 +136,34 @@ describe("standup flip line", () => {
     ];
     const line = buildStandupFlipLine({
       regime: "DEFENSIVE",
-      steadyWeek: false,
+      change: "conditions",
       proximity,
     });
-    assert.equal(line, "Call changed to Cloudy, 0.15% from flip; review pace.");
+    assert.equal(line, "Conditions changed to Cloudy, 0.15% from flip; review pace.");
+  });
+
+  /* The line read the operating latitude's move: a flat latitude over a crossed
+     pause line said "Call unchanged", a two-point move with nothing crossed said
+     "Call changed to Cloudy" on a week that stayed Cloudy, and a reading with
+     nothing to compare said "unchanged". */
+  it("says the guidance changed at a line when the conditions did not, and claims nothing without a comparison", () => {
+    assert.equal(
+      buildStandupFlipLine({ regime: "DEFENSIVE", change: "lines", proximity: [] }),
+      "Guidance changed at a pause or resume line, no near flip; review pace.",
+    );
+    assert.equal(
+      buildStandupFlipLine({ regime: "DEFENSIVE", change: null, proximity: [] }),
+      "No earlier reading to compare with; no near flip.",
+    );
   });
 
   it("handles a week with no reachable crossing cleanly", () => {
     const line = buildStandupFlipLine({
       regime: "VOLATILE",
-      steadyWeek: true,
+      change: "held",
       proximity: [],
     });
-    assert.equal(line, "Call unchanged, no near flip; no pace change.");
+    assert.equal(line, "Guidance unchanged, no near flip; no pace change.");
   });
 
   it("derives the distance consistently from real proximity output", () => {
@@ -156,9 +171,9 @@ describe("standup flip line", () => {
     const proximity = buildFlipProximity(assessment);
     const line = buildStandupFlipLine({
       regime: assessment.regime,
-      steadyWeek: true,
+      change: "held",
       proximity,
     });
-    assert.match(line, /^Call unchanged, \d+\.\d{2}% from flip; no pace change\.$/);
+    assert.match(line, /^Guidance unchanged, \d+\.\d{2}% from flip; no pace change\.$/);
   });
 });
