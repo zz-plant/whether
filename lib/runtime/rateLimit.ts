@@ -1,26 +1,11 @@
 /**
- * Workers rate limiting bindings, declared as `[[ratelimits]]` in wrangler.toml and
- * installed on globalThis with every other binding (worker/index.ts, `installBindings`).
- *
- * Two limiters, because one binding carries one limit:
- *
- * - WHETHER_SUBSCRIBE_RATE_LIMITER guards the subscribe endpoints. Each accepted POST sends
- *   a verification email from this product's domain, so an unguarded endpoint is a way to
- *   flood a stranger's inbox with mail signed by whether.work and to burn the send quota.
- * - WHETHER_PUBLIC_WRITE_RATE_LIMITER guards the browser telemetry intake and the per-ticker
- *   quote proxy. The intake is public by necessity; the proxy's upstream rate-limits this
- *   Worker as a whole, so one abusive caller used to cost every visitor the comps.
- *
- * The binding is permissive and eventually consistent: counters are per Cloudflare
- * location and updated in the background, so a burst can briefly exceed the limit. That
- * is the right tool for abuse control and the wrong one for accounting, which nothing
- * here uses it for.
- *
- * Absent the binding — bun tests, node scripts, `bun run dev` — every check allows the
- * request and reports `enforced: false`, so a deployment without the binding behaves as it
- * did before this file existed rather than refusing everyone.
+ * Workers rate limiting bindings (`[[ratelimits]]` in wrangler.toml, installed on globalThis
+ * with every other binding). One binding carries one limit: the subscribe endpoints (each
+ * accepted POST sends mail from this domain) and the public writes (telemetry intake, the
+ * quote proxy whose upstream limits the Worker as a whole). Permissive and eventually
+ * consistent, which is right for abuse control and wrong for accounting. Absent the binding
+ * every check allows and reports `enforced: false`. docs/agents/lessons/runtime-helpers.md.
  */
-
 type RateLimiterName = "WHETHER_SUBSCRIBE_RATE_LIMITER" | "WHETHER_PUBLIC_WRITE_RATE_LIMITER";
 
 type RateLimiterBinding = {
@@ -31,8 +16,7 @@ type RateLimitDecision =
   | { allowed: true; enforced: boolean }
   | { allowed: false; enforced: true };
 
-/* Narrowed at runtime rather than asserted: the binding is whatever the runtime installed on
-   globalThis, so both the method and the shape of its answer are checked before use. */
+// Narrowed at runtime: the binding is whatever the runtime installed on globalThis.
 const resolveBinding = (name: RateLimiterName): RateLimiterBinding | null => {
   const candidate: unknown = Reflect.get(globalThis, name);
   if (typeof candidate !== "object" || candidate === null) return null;
@@ -48,9 +32,9 @@ const resolveBinding = (name: RateLimiterName): RateLimiterBinding | null => {
 };
 
 /**
- * The caller's address, as Cloudflare saw it. `cf-connecting-ip` is set by the edge and
- * cannot be forged past it; `x-forwarded-for` is the local-dev stand-in. With neither,
- * every anonymous caller shares one bucket, which is the safe direction to fail.
+ * The caller's address as Cloudflare saw it (`cf-connecting-ip` cannot be forged past the
+ * edge; `x-forwarded-for` is the local-dev stand-in). With neither, every anonymous caller
+ * shares one bucket, which is the safe direction to fail.
  */
 export const clientKeyFor = (request: Request): string => {
   const edgeAddress = request.headers.get("cf-connecting-ip")?.trim();

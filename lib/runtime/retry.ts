@@ -1,18 +1,10 @@
 /**
- * Retry, backoff and circuit breaking for upstream reads.
- *
- * `lib/fred.ts` and `lib/treasury/treasuryClient.ts` each grew their own copy of all three —
- * the retry loop, the sleep between attempts, and the "is this the suite?" check that zeroes
- * that sleep — and the Treasury client called FRED's CSV export through its copy. The policy
- * (how many attempts, which failures are worth another one, how long to wait) stays with each
- * caller; the mechanism lives here once.
+ * Retry, backoff and circuit breaking for upstream reads. The policy (attempts, which
+ * failures are worth another, how long to wait) stays with each caller; the mechanism
+ * lives here once. docs/agents/lessons/runtime-helpers.md.
  */
 
-/**
- * Under `bun test` every upstream is a stub that fails at once, so a backoff sleep adds pure
- * wall clock to the suite without exercising anything; callers zero their backoff here. The
- * retry path itself still runs.
- */
+/** Under `bun test` every upstream is a stub that fails at once, so callers zero their backoff. */
 export const isTestRuntime = (): boolean =>
   typeof process !== "undefined" && process.env?.NODE_ENV === "test";
 
@@ -59,8 +51,7 @@ export const withRetry = async <T>(
         break;
       }
 
-      // Only sleep when the budget can still fund an attempt afterwards;
-      // otherwise the backoff is pure delay in front of a guaranteed failure.
+      // Only sleep when the budget can still fund an attempt afterwards.
       const backoff = backoffMs * (attempt + 1);
       if (elapsed() + backoff >= budgetMs) {
         break;

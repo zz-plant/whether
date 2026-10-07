@@ -2,53 +2,37 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
   blockCommentLines,
-  describeDiffRange,
   isUnsafeAssertion,
-  resolveDefaultDiffRange,
+  resolveDiffBase,
 } from "../scripts/review-hotspot-preflight.mjs";
 
 /*
- * The default range, and the one shape it used to get wrong.
- *
- * `HEAD~1` is the first parent. On a merge commit that is the pre-merge branch
- * tip, so the scan read everything the *base* brought in as newly added by this
- * change: merging `main` into a branch on 2026-09-17 flagged an `as` cast that
- * had been on `main` for a day, and the merge resolving that PR's conflict could
- * only be pushed with SKIP_PREPUSH=1. Checked against that commit, the first
- * parent surfaces seven lines of the base's own code and `HEAD^2...HEAD`
- * surfaces none.
+ * One comparison: the working tree against a base. The base is the merge-base with main
+ * so a branch is judged on what it changes, and a merge commit does not read the base's
+ * own lines as new (docs/agents/lessons/tests-and-copy-rules.md).
  */
-describe("the default diff range", () => {
-  it("compares against the last commit on an ordinary commit", () => {
-    assert.deepEqual(resolveDefaultDiffRange({ hasHeadParent: true, parentCount: 1 }), ["HEAD~1"]);
+describe("the diff base", () => {
+  const MERGE_BASE = "2222222222222222222222222222222222222222";
+  const HEAD = "1111111111111111111111111111111111111111";
+
+  it("takes an explicit base first, which is how the pre-push hook scopes a push", () => {
+    assert.equal(resolveDiffBase({ explicit: "abc123", mergeBase: MERGE_BASE, head: HEAD, hasParent: true }), "abc123");
   });
 
-  it("compares against the merged-in base on a merge commit, not the first parent", () => {
-    assert.deepEqual(resolveDefaultDiffRange({ hasHeadParent: true, parentCount: 2 }), ["HEAD^2...HEAD", "HEAD"]);
-    assert.deepEqual(resolveDefaultDiffRange({ hasHeadParent: true, parentCount: 3 }), ["HEAD^2...HEAD", "HEAD"]);
+  it("compares a branch against where it left main", () => {
+    assert.equal(resolveDiffBase({ mergeBase: MERGE_BASE, head: HEAD, hasParent: true }), MERGE_BASE);
   });
 
-  /*
-   * The second range is the point. A three-dot range ignores the working tree,
-   * and every branch cut from this repo's main starts at a merge commit — so a
-   * merge range alone would have made a fresh branch's uncommitted edits
-   * invisible until its first commit, which is a worse failure than the one the
-   * merge case fixes.
-   */
-  it("keeps uncommitted work in scope on a merge commit", () => {
-    assert.ok(resolveDefaultDiffRange({ hasHeadParent: true, parentCount: 2 }).includes("HEAD"));
+  it("compares against the last commit on main itself, where the merge-base is HEAD", () => {
+    assert.equal(resolveDiffBase({ mergeBase: HEAD, head: HEAD, hasParent: true }), "HEAD~1");
   });
 
-  it("falls back to the working tree in a repository with no parent commit", () => {
-    assert.deepEqual(resolveDefaultDiffRange({ hasHeadParent: false, parentCount: 0 }), ["HEAD"]);
+  it("falls back to the last commit when there is no main to compare with", () => {
+    assert.equal(resolveDiffBase({ mergeBase: "", head: HEAD, hasParent: true }), "HEAD~1");
   });
 
-  it("says which ranges it used", () => {
-    assert.match(describeDiffRange("HEAD~1"), /the last commit plus any uncommitted changes/);
-    assert.match(describeDiffRange("HEAD"), /uncommitted changes only/);
-    assert.match(describeDiffRange(["HEAD~1"]), /the last commit plus any uncommitted changes/);
-    assert.match(describeDiffRange(["HEAD^2...HEAD", "HEAD"]), /merge commit/);
-    assert.match(describeDiffRange(["HEAD^2...HEAD", "HEAD"]), /plus any uncommitted changes/);
+  it("falls back to the working tree in a repository with one commit", () => {
+    assert.equal(resolveDiffBase({ mergeBase: "", head: HEAD, hasParent: false }), "HEAD");
   });
 });
 

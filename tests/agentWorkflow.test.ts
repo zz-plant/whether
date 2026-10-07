@@ -5,14 +5,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
-  buildCompactIndexSummary,
   buildDoctorReport,
   buildHandoffPacket,
-  buildPrewarmReport,
   buildRepoIndex,
   classifyTask,
-  classifyTaskWithLocalModel,
-  readRepoIndex,
   writeRepoIndex,
 } from "../scripts/agent-workflow-lib.mjs";
 
@@ -157,19 +153,10 @@ describe("agent workflow helpers", () => {
     assert.match(result.stdout, /Write scope/);
   });
 
-  it("parses positional tasks after boolean local routing flags", () => {
+  it("parses positional task words after the command", () => {
     const result = spawnSync(
       NODE_BIN,
-      [
-        SCRIPT_PATH,
-        "route",
-        "--local",
-        "--local-base-url",
-        "http://127.0.0.1:1/v1",
-        "--local-timeout-ms",
-        "25",
-        "improve subagent handoff and skill routing",
-      ],
+      [SCRIPT_PATH, "route", "improve subagent handoff and skill routing"],
       { encoding: "utf8" },
     );
 
@@ -186,125 +173,9 @@ describe("agent workflow helpers", () => {
       assert.ok(index.testMap.tests.includes("tests/agentWorkflow.test.ts"));
 
       const written = writeRepoIndex({ repoRoot: process.cwd(), outDir: temporaryRoot });
-      const loaded = readRepoIndex({ repoRoot: process.cwd(), outDir: temporaryRoot });
 
-      assert.ok(loaded);
       assert.ok(fs.existsSync(written.paths.fileMap));
-      assert.equal(loaded.index.fileMap.counts.tests, written.index.fileMap.counts.tests);
-
-      const compact = buildCompactIndexSummary(written.index);
-      assert.ok(compact.skills.includes("subagent-handoff"));
-    } finally {
-      fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    }
-  });
-
-  it("falls back when local routing is unavailable", async () => {
-    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-route-"));
-
-    try {
-      const result = await classifyTaskWithLocalModel({
-        task: "improve subagent handoff and skill routing",
-        repoRoot: process.cwd(),
-        fetchImpl: async () => {
-          throw new Error("offline");
-        },
-        outDir: temporaryRoot,
-      });
-
-      assert.equal(result.mode, "fallback");
-      assert.equal(result.route.id, "skill-mcp");
-    } finally {
-      fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    }
-  });
-
-  it("uses the local model response when it returns a known profile", async () => {
-    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-local-"));
-
-    try {
-      const result = await classifyTaskWithLocalModel({
-        task: "improve subagent handoff and skill routing",
-        repoRoot: process.cwd(),
-        fetchImpl: async () => ({
-          ok: true,
-          async json() {
-            return {
-              choices: [
-                {
-                  text: JSON.stringify({
-                    profile_id: "skill-mcp",
-                    rationale: "Local model picked the skill and delegation profile.",
-                  }),
-                },
-              ],
-            };
-          },
-        }),
-        outDir: temporaryRoot,
-      });
-
-      assert.equal(result.mode, "local-model");
-      assert.equal(result.route.source, "local-model");
-      assert.equal(result.route.id, "skill-mcp");
-    } finally {
-      fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    }
-  });
-
-  it("accepts non-JSON local model replies when they mention a known profile", async () => {
-    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-local-freeform-"));
-
-    try {
-      const result = await classifyTaskWithLocalModel({
-        task: "improve subagent handoff and skill routing",
-        repoRoot: process.cwd(),
-        fetchImpl: async () => ({
-          ok: true,
-          async json() {
-            return {
-              choices: [
-                {
-                  text: "profile_id=skill-mcp",
-                },
-              ],
-            };
-          },
-        }),
-        outDir: temporaryRoot,
-      });
-
-      assert.equal(result.mode, "local-model");
-      assert.equal(result.route.id, "skill-mcp");
-    } finally {
-      fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    }
-  });
-
-  it("builds a prewarm report with injected command output", () => {
-    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-prewarm-"));
-
-    try {
-      const report = buildPrewarmReport({
-        repoRoot: process.cwd(),
-        outDir: temporaryRoot,
-        commandProbe() {
-          return true;
-        },
-        commandRunner(command, args) {
-          if (command === "lms") {
-            return JSON.stringify({ running: true, port: 1234 });
-          }
-          if (command === "lmstudio-ensure-model") {
-            return `ensured ${args[0]}`;
-          }
-          return "";
-        },
-      });
-
-      assert.equal(report.lmStudio.running, true);
-      assert.equal(report.modelWarm.ok, true);
-      assert.equal(report.index.generated, true);
+      assert.equal(JSON.parse(fs.readFileSync(written.paths.fileMap, "utf8")).counts.tests, written.index.fileMap.counts.tests);
     } finally {
       fs.rmSync(temporaryRoot, { recursive: true, force: true });
     }

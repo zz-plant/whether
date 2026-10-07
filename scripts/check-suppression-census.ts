@@ -1,37 +1,20 @@
 #!/usr/bin/env bun
 /**
- * Counts the ways this repo can tell a check to look away, and fails when the
- * count goes up.
+ * Counts the ways this repo can tell a check to look away, and fails when a count rises.
  *
- * Every ratchet in the gate — the disabled-rule burn-down, the type-aware
- * findings, the test suite — shares one cheap defeat: suppress the finding
- * instead of fixing it. `// oxlint-disable-next-line`, `@ts-expect-error`, and
- * `it.skip` all turn a red check green while leaving the defect in place, and
- * none of them show up in the number the ratchet reports. An agent (or a person)
- * optimizing "lint is clean" will find that path before it finds the fix,
- * because it is shorter.
+ * Every other ratchet in the gate can be turned green by suppressing the finding instead of
+ * fixing it, and none of them notice. This counts the suppressions themselves — inline lint
+ * disables, `@ts-*` comments, skipped tests, rules switched off globally, rules switched
+ * off by an `overrides` block — against a hand-edited baseline that may fall and may not
+ * rise, plus a floor on test files. A decrease passes and prints the replacement baseline.
  *
- * So the suppressions are themselves a metric, with a baseline that may fall and
- * may not rise. A burn-down that trades a lint finding for a disable comment
- * moves one number down and this one up, and the gate rejects it — which is the
- * whole point: it makes the shortcut cost more than the fix.
- *
- * This file is the mechanism and names nothing about the repository it scans.
- * The roots, the lint config, the self-exclusions, the baseline and the test-file
- * floor are `suppressionCensusConfig` in `scripts/census.config.ts`. The baseline
- * is a hand-edited value there rather than a generated file: lowering it is a real
- * edit, so it lands in the same diff as the work that earned it and is visible in
- * review, instead of being a regenerated artifact nobody reads.
- *
- * On a decrease the check passes and prints the replacement baseline. It does not
- * fail on an improvement: the gate's job is stopping regressions, and failing a
- * build because someone deleted an unused import teaches people to avoid the
- * check rather than to lower it.
+ * This file is the mechanism and names nothing about the repository it scans; that is
+ * `suppressionCensusConfig` in `scripts/census.config.ts`. Why the baseline is a hand edit
+ * and why the override category counts: docs/agents/lessons/toolchain-and-gates.md.
  *
  * Usage:
  *   bun run scripts/check-suppression-census.ts
- */
-import { readFileSync } from 'node:fs';
+ */import { readFileSync } from 'node:fs';
 import { join, relative } from 'node:path';
 
 import { suppressionCensusConfig } from './census.config';
@@ -89,10 +72,8 @@ const CATEGORIES: Category[] = [
 ];
 
 /**
- * Rules switched off in the lint config without a scoped override that turns
- * them back on. A rule that is globally off only so an `overrides` block can
- * apply it where it matters — a file-size budget, an import fence — is
- * configuration, not debt, and is reported separately rather than counted.
+ * Rules switched off in the lint config. A rule off globally only so an `overrides` block
+ * can apply it where it matters is configuration, reported separately and not counted.
  */
 type RuleAudit = { disabled: string[]; scoped: string[]; overrideDisabled: string[] };
 
@@ -106,11 +87,7 @@ const isEnabled = (value: unknown): boolean =>
   value === 2 ||
   (Array.isArray(value) && value[0] !== 'off' && value[0] !== 0);
 
-/**
- * Narrow a parsed JSON value to a plain object. Asserting the config's shape
- * instead would let a malformed file report zero disabled rules — a meter that
- * lies clean is worse than one that fails, so `auditLintRules` throws instead.
- */
+/** Narrow a parsed JSON value to a plain object; a malformed config throws in `auditLintRules` rather than reporting zero. */
 export function toRecord(value: unknown): Record<string, unknown> {
   const record: Record<string, unknown> = {};
   if (value === null || typeof value !== 'object' || Array.isArray(value)) return record;
@@ -145,12 +122,7 @@ export function auditLintRules(config: SuppressionCensusConfig = suppressionCens
     (overridden.has(rule) ? scoped : disabled).push(rule);
   }
 
-  /*
-   * A rule enforced everywhere except one `overrides` block is not configuration —
-   * it is a suppression with a wider blast radius than a disable comment, and until
-   * this counted it was the cheapest way to silence a finding without moving any
-   * number in this census.
-   */
+  // A rule enforced everywhere except one `overrides` block is a suppression with a wider blast radius.
   const overrideDisabled = [...silenced].filter((rule) => !isOff(topLevel[rule]));
 
   return {

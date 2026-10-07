@@ -1,50 +1,33 @@
 #!/usr/bin/env sh
-# core.hooksPath points at `.husky`, not husky's generated `.husky/_`, so this file is
-# what git executes directly — hence the shebang. `.husky/_` is gitignored, so it exists
-# only where `bun install` has run; a linked worktree got no hooks at all and pushed
-# unverified in silence (2026-09-01). `.husky/pre-push` is tracked, so every worktree has
-# it. `bun run prepare` re-points hooksPath after husky resets it on install.
-# The check gate. Not a mirror of CI any more: as of 2026-08-22 the GitHub
-# workflows are manual-only, because this private repo's Actions minutes are
-# billed and the account stopped paying for them. Nothing else runs lint,
-# typecheck, tests, assets, or the review hotspot preflight on the way out, so a
-# skip here means the push is unverified. Cloudflare Workers Builds still builds
-# and deploys every push, which is the one remote gate left.
+# core.hooksPath points at `.husky`, so this tracked file is what git executes directly;
+# `.husky/_` is gitignored and a linked worktree would have no hooks otherwise.
+# `bun run prepare` re-points hooksPath after husky resets it on install.
 #
-# Runs concurrently, ~40s. The task list is the `pre-push` preset in
-# scripts/check-tasks.mjs, declared once beside the deploy gate's.
+# The check gate: the GitHub workflows are manual-only, so a skip here means the push is
+# unverified. Cloudflare Workers Builds still builds and deploys every push. The task list
+# is the `pre-push` preset in scripts/check-tasks.mjs.
 #
 # Escape hatches:
 #   SKIP_PREPUSH=1 git push     # skip just this hook
 #   git push --no-verify        # skip all hooks
 #
-# Caveat: this repo's working tree is often shared with other concurrent Claude
-# sessions, so a failure here can belong to someone else's in-flight edit rather
-# than to what you are pushing. Check `git status` before assuming it is yours.
+# This worktree is often shared with other sessions, so a failure here can belong to
+# someone else's in-flight edit. Check `git status` before assuming it is yours.
 [ "$SKIP_PREPUSH" = "1" ] && exit 0
 
-# Git exports these to every hook, and they are inherited by every `git` this gate
-# shells out to. That silently redirects those calls at the pushing repository:
-# `tests/checkGateMarker.test.ts` builds a throwaway repo with `git init` and gets
-# this one instead, and `review:hotspot-preflight` resolves `HEAD~1` against the
-# wrong index. Both pass standalone and failed only here, which is the tell.
+# Git exports these to every hook and every `git` the gate shells out to inherits them,
+# which silently redirects those calls at the pushing repository (CLAUDE.md records the
+# two tests that caught it). Keep this line.
 unset GIT_DIR GIT_INDEX_FILE GIT_WORK_TREE GIT_PREFIX GIT_QUARANTINE_PATH GIT_REFLOG_ACTION
 
-# Scope the review preflight to what this push actually sends. Git writes one
-# "<local ref> <local sha> <remote ref> <remote sha>" line per ref to stdin; the
-# preflight reads that range as REVIEW_HOTSPOT_BASE/HEAD instead of its default
-# ("last commit plus every uncommitted edit"), which is wrong for a push on both
-# ends: it fails on other sessions' in-flight work this push does not contain,
-# and it never sees commits 2..n of a multi-commit push, which the deploy gate
-# does not re-check either — those commits were reviewed nowhere. A new branch
-# (no remote sha), a deletion (nothing sent), or a manual run keeps the default
-# range; scripts/pre-push-range.mjs prints nothing in exactly those cases.
+# Judge the review preflight against what this push sends: the remote sha from the plan
+# git writes to stdin. A new branch, a deletion, or a manual run prints nothing and the
+# preflight keeps its default base (the merge-base with main).
 if [ ! -t 0 ]; then
-  push_range=$(bun scripts/pre-push-range.mjs)
-  if [ -n "$push_range" ]; then
-    REVIEW_HOTSPOT_BASE="${push_range% *}"
-    REVIEW_HOTSPOT_HEAD="${push_range#* }"
-    export REVIEW_HOTSPOT_BASE REVIEW_HOTSPOT_HEAD
+  push_base=$(bun scripts/pre-push-range.mjs)
+  if [ -n "$push_base" ]; then
+    REVIEW_HOTSPOT_BASE="$push_base"
+    export REVIEW_HOTSPOT_BASE
   fi
 fi
 

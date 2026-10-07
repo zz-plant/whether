@@ -1,15 +1,8 @@
 /**
- * A `fetch` that refuses to leave the machine.
- *
- * The mechanism behind `scripts/test-network-guard.ts`, which is what `bunfig.toml`
- * preloads and where this repo's own choices live: the escape-hatch variable, the
- * guidance a blocked test prints, and the per-run ingestion store. Nothing here names
- * them, so the guard reads the same in any suite that wants its tests to serve their
- * own upstreams.
- *
- * Loopback and relative URLs pass: a server the suite itself started is the suite
- * owning its upstream rather than reaching for someone else's. Everything else throws,
- * with a message that names only the origin.
+ * A `fetch` that refuses to leave the machine. Loopback and relative URLs pass; everything
+ * else throws, naming only the origin. The suite's own choices (escape hatch, guidance,
+ * the per-run ingestion store) are `scripts/test-network-guard.ts`; nothing here names them.
+ * docs/agents/lessons/toolchain-and-gates.md, "The suite runs offline".
  */
 
 /** What the wrapped fetch calls itself, and what it tells a test the first time it blocks one. */
@@ -20,10 +13,7 @@ export type NetworkGuardOptions = {
   guidance: string;
 };
 
-/**
- * Loopback and relative URLs — a server the suite itself started, so serving it is
- * the suite owning its upstream rather than reaching for someone else's.
- */
+/** Loopback and relative URLs: a server the suite itself started. */
 export const isLocalTarget = (url: string): boolean => {
   if (!/^[a-z][a-z0-9+.-]*:/i.test(url)) return true; // relative: never leaves the process
   let parsed: URL;
@@ -37,11 +27,7 @@ export const isLocalTarget = (url: string): boolean => {
   if (host === "localhost" || host === "::1") return true;
   // RFC 6761 reserves .localhost for loopback.
   if (host.endsWith(".localhost")) return true;
-  /*
-   * 127.0.0.0/8, matched as an address rather than as a prefix. `/^127\./` also
-   * accepts `127.0.0.1.example.com`, which is a perfectly ordinary remote host that
-   * anyone can register — the check has to see four octets and nothing else.
-   */
+  // 127.0.0.0/8 as four octets, not as a prefix: `127.0.0.1.example.com` is a remote host.
   const octets = host.split(".");
   return (
     octets.length === 4 &&
@@ -59,18 +45,9 @@ export const targetUrl = (input: Parameters<typeof fetch>[0]): string => {
 };
 
 /**
- * What a blocked request may safely be called in an error: its origin, and nothing after.
- *
- * The message goes to test output and, in a deploy gate, to a build log — so it must not
- * carry a credential. Plenty of URLs are credentials in their entirety: a webhook URL
- * holds its secret in the *path* (`hooks.slack.com/services/T…/B…/…`), and query strings
- * are no safer — API keys ride in them.
- *
- * The origin is kept and everything else dropped, rather than the path being scrubbed by
- * pattern. A heuristic has to be right about every shape of secret anyone adds later; the
- * origin is right by construction, and it is the whole of what the message needs to be
- * useful — it names the upstream to serve, which is the decision the reader has to make.
- * `URL.origin` also drops any `user:pass@` userinfo.
+ * The origin and nothing after it. A webhook URL holds its secret in the path and an API
+ * key rides in the query, so the origin is the only part a log line may carry; it also
+ * names the upstream to serve, which is the decision the reader has to make.
  */
 export const redactTarget = (url: string): string => {
   try {
@@ -82,11 +59,7 @@ export const redactTarget = (url: string): string => {
 
 /**
  * Wraps `passThrough` so anything but a local target throws instead of leaving the box.
- *
- * The thrown message is one line on purpose. Code under test catches these and logs
- * them, so a multi-line message is reprinted for every blocked call and buries the run.
- * The guidance is worth having once per process, the first time a run is blocked, and
- * never again.
+ * The thrown message is one line; the guidance prints once per process.
  */
 export function createGuardedFetch(
   passThrough: typeof fetch,
@@ -95,9 +68,7 @@ export function createGuardedFetch(
 ): typeof fetch {
   let explained = false;
 
-  // Annotated as the return type rather than asserted onto one: the parameters are
-  // then contextually typed from `fetch` itself, so this stays honest about the
-  // signature instead of asking the compiler to take its word for it.
+  // Annotated, not asserted, so the parameters are contextually typed from `fetch` itself.
   const guardedFetch: typeof fetch = async (input, init) => {
     const url = targetUrl(input);
     if (isLocalTarget(url)) return passThrough(input, init);

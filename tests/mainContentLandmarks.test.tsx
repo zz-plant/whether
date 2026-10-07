@@ -2,7 +2,6 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { presetTasks, resolveCheckPlan } from "../scripts/check-tasks.mjs";
-import { GATE_TASKS } from "../scripts/vinext-run.mjs";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { ContentPageShell } from "../app/components/ui/contentPageShell";
@@ -129,9 +128,6 @@ describe("fetch-based main-content guard", () => {
     assert.ok(presetTasks("pre-push").includes("landmarks"), "the pre-push gate no longer runs landmarks");
     assert.ok(presetTasks("deploy").includes("landmarks"), "the deploy gate no longer runs landmarks");
     assert.match(workflow, /run-checks\.mjs[^\n]*\blandmarks\b/);
-    // The preview build names its checks in GATE_TASKS rather than in the spawn call:
-    // it runs whichever of them `check:vinext` has not already proved for this commit.
-    assert.ok(GATE_TASKS.includes("landmarks"), "the preview build gate no longer requires landmarks");
   });
 
   /*

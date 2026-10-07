@@ -241,3 +241,47 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   The payload is read only for a route that paints none, and the rows a boundary names as its
   `fallback` are skipped there. Against 6404891a, the commit before #1518 fixed those pages, the old
   audit passed all 35 routes and the new one fails exactly the five.
+
+- **The test runner's guards (moved here from its header, 2026-10-07).** `scripts/run-tests.mjs`
+  only ever looks under `./tests`, so a test file written anywhere else is silently never run, and
+  reads as coverage in review because it is a real suite that passes when invoked directly.
+  `lib/report/forecastModel.test.ts` sat outside for long enough to accumulate 14 cases against a
+  core model, none of which the suite executed. The runner now fails on a stray test file, scanning
+  from the repository root rather than from a list of source roots: an allowlist of roots reproduces
+  the bug it is meant to catch, because the next stray file lands in the directory nobody thought to
+  list. Only build output, vendored code and generated artifacts are skipped; a genuine second suite
+  belongs in `SKIP_DIRECTORIES` with a note. `tests/tools/` is the other scope rule: suites there
+  drive interpreters the build image does not guarantee (today: none; it held a Python analytics
+  script until 2026-09-16), so the deploy gate leaves the directory out and says so only when it
+  excluded something, while every local run and pre-push still runs it. The stripped environment
+  (see the two entries above on API keys and Cloudflare credentials) also drops `SLACK_WEBHOOK_URL`
+  and `PREMIUM_FUNNEL_WEBHOOK_URL`, for a sharper reason than rerouting a fixture: a webhook URL *is*
+  the credential, secret and all, in the path, and `lib/premiumFunnel.ts` hands one straight to the
+  global `fetch`, so with one exported a test could post to a real Slack channel. The network guard
+  would catch and name it by origin only, but the suite should not be holding the secret at all.
+
+- **The landmark audit's smaller rules (moved here from its headers, 2026-10-07).**
+  - *Readiness, not health.* `/api/health` reports 503 whenever report data is degraded, and an
+    offline FRED is enough, but a degraded server still renders every route's markup, which is all
+    the audit reads. Treating 503 as "not ready" made the check unrunnable offline and sent it off to
+    start a second dev server that vinext refuses to run in the same directory. Any HTTP response
+    means listening; only a transport error means not.
+  - *Concurrency scales with the box.* Route fetches are mostly waiting on the dev server's
+    compile. Measured 2026-09-03 on four cores, the 40-route audit took 51.8s at a concurrency of 4
+    and 33.0s at 8, and 12 bought nothing more. The default is twice the cores, capped at 8, floored
+    at the 4 a two-core build container always had, so the small container behaves exactly as before.
+  - *Streamed routes are read from the flight payload.* A client-streamed route's landmark reaches
+    the response as an escaped RSC flight row inside a script, not as markup. On 2026-08-31 scanning
+    only for `<main>` tags reported 21 of 40 routes as missing a landmark they had; by 2026-10-06
+    every one of the 35 audited routes painted its landmark as markup. The payload is read only for
+    a route that paints no `<main>` at all, and presence is judged rather than counts, because React
+    re-emits a segment's rows when a stream resumes.
+  - *Dead `#anchor`s are judged across routes.* Four dead in-page anchors were found by hand on
+    2026-09-16, all in code that never rendered, so no reader could click one and report it. The
+    audit collects every id a route renders (markup and flight payload both) and every `#anchor` it
+    links to, and fails only an anchor no audited route renders at all. Per page would be a claim
+    about the data: plenty of targets render only under a condition (figures entered, a degraded
+    banner), and that would go red in a container whose log cannot be read from here.
+  - *A dynamic route needs a sample URL per renderer.* `collectMainContentRouteSamples` throws when
+    a new dynamic page has no representative URL pinned, and `/resources/[slug]` pins one pillar and
+    one article so a shared route file cannot hide a regression in either branch.

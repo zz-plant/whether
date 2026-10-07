@@ -1,4 +1,14 @@
 #!/usr/bin/env node
+/**
+ * Runs the suite under ./tests with the environment the suite owns.
+ *
+ * Rules, each recorded in docs/agents/lessons/toolchain-and-gates.md:
+ * - a test file outside ./tests fails the run, because the runner would never execute it;
+ * - the deploy gate leaves out tests/tools/ (external interpreters), shuffles the order
+ *   and takes a longer per-test ceiling; a local run is unchanged;
+ * - NODE_ENV is pinned to test, and provider keys, webhook URLs and Cloudflare credentials
+ *   are stripped, so a result never depends on what a shell or a build container exports.
+ */
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 
@@ -8,37 +18,14 @@ import { walkFiles } from './walk-files.mjs';
 const TEST_ROOT_ARG = './tests';
 const TEST_ROOT = path.resolve(TEST_ROOT_ARG);
 const TEST_FILE_PATTERN = /\.(test|spec)\.(c|m)?(t|j)sx?$/;
-/*
- * The deploy gate runs inside the Cloudflare build container, which is smaller
- * than a dev machine, and this repo documents the consequence — vinext-run's own
- * comment notes "the flakiness in this repo is real: whetherCli tests fail under
- * CPU contention". So the gate gets a longer per-test ceiling: slower to give up,
- * which is the right trade for the only remote signal this repo has. Overridable,
- * and it does not change a local run.
- *
- * It used to also drop `--max-concurrency` from 8 to 2, described here as "fewer
- * workers". That was a misreading of the flag, and measuring it on 2026-09-03 said
- * so: `--max-concurrency` bounds how many tests declared with `test.concurrent`
- * run at once, and this suite declares none, so the value changed nothing. The
- * same 20 files took 8.26s at 1 and 8.10s at 8. Bun runs every file in one
- * process, sequentially, and exposes no worker count to lower — which is also why
- * docs/agents/lessons/automation-and-deploy-gate.md can say module state leaks between files. The knob is gone rather
- * than re-tuned: a setting that reads as protection and provides none is worse
- * than no setting, because it stops anyone looking for the real cause. The real
- * contention here is `tests/whetherCli.test.ts` spawning 62 Node processes while
- * lint and tsc share the same cores, and no test-runner flag reaches that.
- */
+
 const inDeployGate = isDeployGate();
+// The build container is smaller than a dev machine; slower to give up is the right trade there.
 const testTimeoutMs = process.env.BUN_TEST_TIMEOUT_MS ?? (inDeployGate ? "120000" : "60000");
 
-/*
- * Every walk below is the shared one (scripts/walk-files.mjs) with symlinks left out,
- * which is what the `Dirent` loops it replaced did: a link is neither a file nor a
- * directory to `readdir`. An unreadable directory contributes nothing, as before.
- */
 const isTestFile = (file) => TEST_FILE_PATTERN.test(path.basename(file));
 
-/** Every test file under ./tests, in directory order. */
+/** Every test file under ./tests, in directory order. Symlinks are left out, as a `Dirent` walk does. */
 const collectTestFiles = () => walkFiles(TEST_ROOT, { followSymlinks: false }).filter(isTestFile);
 
 if (collectTestFiles().length === 0) {
@@ -46,20 +33,9 @@ if (collectTestFiles().length === 0) {
   process.exit(1);
 }
 
-// The runner only ever looks under ./tests, so a test file written anywhere else
-// is silently never run — and reads as coverage in review because it is a real
-// suite that passes when invoked directly. lib/report/forecastModel.test.ts sat
-// outside for long enough to accumulate 14 cases against a core model, none of
-// which the suite executed. Fail loudly instead: a stray file is either misplaced
-// or a duplicate, and both want a decision rather than silence.
-//
-// Scanned from the repository root rather than from a list of source roots. An
-// allowlist of roots reproduces the bug it is meant to catch, because the next
-// stray file lands in the directory nobody thought to list — this repo has src/,
-// packages/, e2e/, types/, tasks/ and content/ alongside the obvious ones. Only
-// build output, vendored code and generated artifacts are skipped; a genuine
-// second suite (a Playwright project, say) belongs in SKIP_DIRECTORIES with a
-// note, so excluding it stays a decision on the record.
+// Scanned from the repository root: an allowlist of source roots is how the next stray
+// file lands in the directory nobody listed. Only build output and generated artifacts
+// are skipped; a genuine second suite belongs here with a note.
 const SKIP_DIRECTORIES = new Set([
   'node_modules',
   'tests', // the suite the runner already executes
@@ -89,13 +65,10 @@ if (strayTestFiles.length > 0) {
   process.exit(1);
 }
 
-// Flags that consume the following argv entry as their value, so we do not
-// mistake that value for a test path filter.
+// Flags that consume the following argv entry, so its value is not mistaken for a path filter.
 const VALUE_FLAGS = new Set(['-t', '--test-name-pattern', '--timeout', '--reporter', '--reporter-outfile']);
 
-// Bun treats bare (non-flag) args as path filters. If the caller supplied one,
-// appending TEST_ROOT_ARG would widen the run back to the whole suite, so only
-// default to ./tests when no filter was given.
+// Bun treats bare args as path filters; appending ./tests to one would widen the run back out.
 function hasPathFilter(args) {
   for (let i = 0; i < args.length; i += 1) {
     const arg = args[i];
@@ -110,23 +83,9 @@ function hasPathFilter(args) {
 }
 
 /*
- * Tests that shell out to an interpreter this repo does not ship.
- *
- * tests/tools/ holds suites that drive external tooling — today the Python
- * analytics script in scripts/. They are real tests and run on every
- * `bun run test`, `bun run check`, and pre-push. What they must not do is gate a
- * deploy: the Cloudflare build image guarantees Bun and Node, not python3, and
- * the check gate in vinext-run.mjs runs inside the deploy path. A deploy that
- * fails because the build image lacks an interpreter used by an analytics script
- * is a deploy blocked by something that cannot affect the deployed artifact.
- *
- * So the gate excludes this directory and says so. Nothing is skipped or
- * quarantined — the suite still runs everywhere a contributor runs tests.
- *
- * The directory is empty as of 2026-09-16: its one suite drove an operator
- * feedback script that nothing in the product read. The guard stays for the next
- * one, and now prints only when it actually excluded something — "excluding 0
- * test file(s)" in a deploy log reads like a suite was skipped.
+ * tests/tools/ holds suites that drive interpreters the build image does not guarantee.
+ * They run on every `bun run test`, `bun run check` and pre-push; they do not gate a deploy.
+ * The directory is empty today; the guard prints only when it excluded something.
  */
 const TOOL_TEST_DIRECTORY = path.join(TEST_ROOT, 'tools');
 
@@ -152,47 +111,13 @@ if (excludeToolTests) {
 }
 
 const targetArgs = hasPathFilter(extraArgs) ? extraArgs : [...extraArgs, ...defaultTargets];
-/*
- * Passed only when someone asks for it. Bun's own default applies otherwise, and
- * for a suite with no `test.concurrent` any value is inert either way — see the
- * note at the top of this file. Kept readable so a future concurrent suite has
- * the knob available.
- */
+// Passed only when asked for: `--max-concurrency` bounds `test.concurrent`, which this suite has none of.
 const concurrency = process.env.BUN_TEST_CONCURRENCY;
 const concurrencyArgs = concurrency ? [`--max-concurrency=${concurrency}`] : [];
-/*
- * `bun test` sets NODE_ENV=test only when nothing else has. A build container often
- * has — NODE_ENV=production is a common build variable — and then the suite runs in
- * production mode without anyone asking for it. Under that mode
- * lib/seo/programmaticPayloadBuilder.ts stops relaxing its freshness and provenance
- * contract, so on fallback data (any box that cannot reach FRED) one test fails that
- * passes everywhere NODE_ENV happens to be unset. A result that depends on ambient
- * NODE_ENV is not a result about the code, so the runner pins it. Overridable, for
- * the one run that deliberately wants another mode.
- */
+// `bun test` defaults NODE_ENV only when it is unset; a build container often sets production.
 const childEnv = { ...process.env, NODE_ENV: process.env.WHETHER_TEST_NODE_ENV ?? 'test' };
-/*
- * The suite serves its own upstreams. A data key in the developer's shell would route
- * FRED or market-data reads to the real API in the middle of a test and make a fixture
- * miss, so the runner strips them: a result that depends on what happens to be exported
- * in a shell is not a result about the code.
- *
- * The webhook URLs are stripped for a second reason on top of that one: their value *is*
- * the credential, secret and all, in the path. `lib/premiumFunnel.ts` hands
- * PREMIUM_FUNNEL_WEBHOOK_URL straight to the global `fetch`, so with one exported in the
- * environment a test could post to a real Slack channel — and the network guard, catching
- * it, would name it. The guard redacts to an origin (scripts/test-network-guard.ts), but
- * the suite should not be holding the secret in the first place. Tests that need one set
- * their own; tests/apiBillingWebhookRoute.test.ts does.
- *
- * The Cloudflare four are here because the build container *always* has them: Workers
- * Builds exports CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN so wrangler can deploy.
- * `resolveAnalyticsReadConfig` reads both, so a test asserting "unconfigured" — which is
- * the state a developer machine is in — was true here and false there. That is exactly the
- * defect this list exists to prevent, and it cost five red builds to find, because the one
- * environment that disagreed was the one whose log could not be read. A real analytics
- * token in scope would also let a read leave the box for the live API.
- */
+// The suite serves its own upstreams. Webhook URLs are credentials in their entirety; the
+// Cloudflare four are always present in the build container and nowhere else.
 for (const key of [
   'FRED_API_KEY',
   'ALPHA_VANTAGE_API_KEY',
@@ -206,13 +131,8 @@ for (const key of [
   delete childEnv[key];
 }
 
-/*
- * Order. Bun runs every file in one process, so module-level state (mock.module patches,
- * memoized loaders, the FRED circuit breaker) leaks between files, and a suite that only
- * ever runs in one order can pass because of that order — docs/agents/lessons/automation-and-deploy-gate.md records a build that
- * did. The deploy gate shuffles; bun prints the seed on every run, and BUN_TEST_SEED=<seed>
- * replays one. A local run keeps a fixed order unless BUN_TEST_RANDOMIZE=1 asks otherwise.
- */
+// One process runs every file, so module state leaks between them; the gate shuffles and
+// bun prints the seed, which BUN_TEST_SEED replays.
 const randomize = inDeployGate || process.env.BUN_TEST_RANDOMIZE === '1';
 const seed = process.env.BUN_TEST_SEED;
 const orderArgs = seed ? ['--randomize', `--seed=${seed}`] : randomize ? ['--randomize'] : [];

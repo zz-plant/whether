@@ -1,37 +1,21 @@
 #!/usr/bin/env bun
 /**
- * Counts exported declarations that nothing else references, and fails when the
- * count rises above the baseline.
+ * Counts exported declarations that nothing else references, data files nothing reads,
+ * and modules only a test imports; fails when the export count rises above the baseline.
  *
- * On 2026-09-15 a hand sweep found 232 runtime exports and 324 exported types
- * under `app/`, `lib/` and `worker/` that no other file mentioned, plus nine
- * whole modules nothing imported. Nothing in the gate had noticed, because an
- * unused export is not a lint finding, not a type error, and not a failing
- * test: it is dead weight that every reader has to rule out before they can
- * trust the module's surface. The sweep deleted them; this check keeps the
- * number from climbing back.
+ * "Referenced" is cheap on purpose: the name appears as an identifier in any other scanned
+ * file. That over-counts, so a reported orphan is nearly always real; a symbol reached only
+ * through a runtime string or a file type outside `referenceExtensions` reads as dead, and
+ * the answer is to widen the scan, not delete the export. The scan refuses a tree it cannot
+ * fully read, because a partial tree reports *more* dead exports, not fewer.
  *
- * "Referenced" is deliberately cheap: the export's name appears as an
- * identifier in any other scanned file, across every source, config and
- * workflow extension the repo uses. That mostly over-counts — a comment or an
- * unrelated symbol with the same name keeps an export alive — so a reported
- * orphan is nearly always real. It is not a proof: a symbol named only from a
- * file type outside `referenceExtensions`, or reached only through a runtime
- * string, reads as dead. When this check fails on an export you believe is
- * live, say where it is consumed from; that is a gap in the scan, not a
- * verdict. Names the framework and runtime consume by convention
- * (`frameworkExports`) are exempt because the framework is the reference.
- *
- * This file is the mechanism and names nothing about the repository it scans.
- * What it scans — the roots, the extensions, the framework's convention names,
- * the data directories, the baseline — is `deadExportsConfig` in
- * `scripts/census.config.ts`, and lowering the baseline is an edit there that
- * lands with the work that earned it.
+ * This file is the mechanism and names nothing about the repository it scans; that is
+ * `deadExportsConfig` in `scripts/census.config.ts`. History and the three sweeps that
+ * motivated each scan: docs/agents/lessons/toolchain-and-gates.md.
  *
  * Usage:
  *   bun run scripts/check-dead-exports.ts
- */
-import { readFileSync, readdirSync, statSync } from "node:fs";
+ */import { readFileSync, readdirSync, statSync } from "node:fs";
 import { extname, join, relative } from "node:path";
 
 import { deadExportsConfig } from "./census.config";
@@ -80,11 +64,7 @@ export const DEAD_EXPORT_BASELINE = deadExportsConfig.baseline;
 
 export type DeadExport = { file: string; name: string; kind: "runtime" | "type" };
 
-/**
- * Guarded for the same reason the walk is: a dangling symlink, or a path that
- * disappears between the `readdirSync` and the stat, must cost one entry rather
- * than crash the whole census.
- */
+/** Guarded: a dangling symlink or a vanished path costs one entry, not the census. */
 const isDirectory = (path: string): boolean | null => {
   try {
     return statSync(path).isDirectory();
@@ -142,18 +122,9 @@ const countByRoot = (files: Map<string, string>): Map<string, number> => {
 };
 
 /**
- * Refuse to answer from a tree this cannot read.
- *
- * Every verdict here is "no other file mentions this name", so a scan that
- * reaches fewer files reports *more* dead exports — a checkout missing
- * `tests/` would condemn hundreds of live exports, and the failure would read
- * as a real finding. This is the same trap the landmark audit records, where a
- * container that reached no route at all would have reported zero violations:
- * an unreadable tree must fail as an unreadable tree, by name, not be scored.
- *
- * Only callers that pass `requireCompleteTree` are judged: the unit tests
- * scaffold two-file trees on purpose, and a partial tree is exactly what they
- * are measuring.
+ * Refuse to answer from a tree this cannot read: a checkout missing `tests/` would condemn
+ * hundreds of live exports and the failure would read as a real finding. Only callers that
+ * pass `requireCompleteTree` are judged; the unit tests scaffold two-file trees on purpose.
  */
 const assertScanIsPlausible = (references: Map<string, string>, config: DeadExportsConfig) => {
   const counts = countByRoot(references);
@@ -212,21 +183,10 @@ export const censusDeadExports = (
 };
 
 /**
- * Data files nothing reads.
- *
- * The export census cannot see these: a JSON file declares no exports, so a
- * dataset that every consumer has been deleted from scores zero findings and
- * sits there looking like part of the product. Two were found on 2026-09-16 —
- * `data/concept_conflicts.json`, a which-principle-wins-per-regime mapping whose
- * slugs matched no content that still exists, and `data/cohort_feedback.json`,
- * 31KB of eight named operators over six weeks, feeding a Python analytics
- * script wired to no command, no route and no reader.
- *
- * Matched on the filename with and without its extension, which is how an import
- * names one, so this over-matches rather than under-matches: a file mentioned
- * anywhere at all passes. A reported orphan is therefore close to certain. Which
- * roots count as a mention — and why a test does not — is `dataReferenceRoots`
- * in the config.
+ * Data files nothing reads. A JSON file declares no exports, so the export census cannot
+ * see one every consumer was deleted from. Matched on the filename with and without its
+ * extension, so this over-matches; which roots count as a mention, and why a test does
+ * not, is `dataReferenceRoots` in the config.
  */
 export const censusOrphanedDataFiles = (root = REPO_ROOT, config: DeadExportsConfig = deadExportsConfig): string[] => {
   const dataFiles = collect(root, config, config.dataRoots, config.dataExtensions, false);
@@ -249,21 +209,9 @@ export const censusOrphanedDataFiles = (root = REPO_ROOT, config: DeadExportsCon
 const IMPORT_PATTERN = /(?:from|import)\s*\(?\s*["']((?:\.|\.\.)\/[^"']+)["']/g;
 
 /**
- * Modules only a test imports.
- *
- * The export census cannot catch these, and deliberately: a helper used inside
- * its own module and exported for a test is a legitimate seam, and this repo has
- * two hundred of them. What is not a seam is a whole module that no shipping
- * file imports — a feature built, tested, and reachable by nobody. Four were
- * found that way on 2026-09-16 and nine more on 2026-09-17: an SDK client, a
- * second Slack dispatcher, a sector-overlay model, a ship/wait/kill checklist,
- * a runtime boundary whose config resolution had drifted from the resolvers
- * production actually uses.
- *
- * Judged per module rather than per symbol, which is what makes it precise:
- * `driverDecisionViews.ts` has four exports only its test names and is imported
- * by the homepage, so it is a seam and passes. Who counts as a consumer is
- * `consumerRoots` in the config.
+ * Modules only a test imports. A helper exported for its own test is a legitimate seam; a
+ * whole module no shipping file imports is a feature reachable by nobody. Judged per
+ * module, which is what makes it precise. Who counts as a consumer is `consumerRoots`.
  */
 export const censusTestOnlyModules = (root = REPO_ROOT, config: DeadExportsConfig = deadExportsConfig): string[] => {
   const shipped = collect(root, config, config.declarationRoots, config.declarationExtensions, false);
