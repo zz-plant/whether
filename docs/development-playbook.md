@@ -22,15 +22,27 @@ For baseline project orientation, start with `CONTRIBUTING.md`.
 4. **Validate before push**
    - Typical: `bun run lint && bun run test`
    - Broad/high-risk: `bun run check`
+5. **Know what the gates run**
+   - `git push` runs `.husky/pre-push`: the `pre-push` preset in `scripts/check-tasks.mjs` (lint,
+     lint:types, typecheck, test, assets, suppressions, dead-exports, hotspot-preflight, landmarks).
+     `SKIP_PREPUSH=1` skips it, and the push is then unverified.
+   - Cloudflare Workers Builds runs `bun run check:vinext`, the `deploy` preset, on every push,
+     `main` included. A failure there blocks the deploy, not the merge.
+   - GitHub Actions is manual-only (`workflow_dispatch`), so nothing on GitHub blocks a merge. Run
+     `bun run check` before merging; it adds `audit`, which needs the network.
+   - Details and failure triage: `docs/cloudflare-deployment-runbook.md`.
 
 ## 2) Scope management and PR sizing
 
 - Favor PRs that can be reviewed in a single pass.
 - Keep one intent per PR.
-- Split large work into stacked PRs where possible:
+- Split large work into a sequence of PRs, each opened against `main`:
   - PR 1: enabling refactor/infrastructure
   - PR 2: behavioral change
   - PR 3: cleanup and documentation follow-through
+- Don't stack PRs on each other's branches. A squash merge leaves the parent branch alive, so GitHub
+  never retargets the child, and it merges into the stale branch instead of `main` (#1513 on
+  2026-10-06 needed a re-landing PR). Wait for the parent to merge, or fold both into one PR.
 
 ## 3) Risk-based validation matrix
 

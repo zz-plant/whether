@@ -1,7 +1,8 @@
 name: Monthly Summary Refresh
 
-# The Monday 12:00 UTC cadence moved to a scheduled Claude Code routine when the account
-# stopped paying for Actions minutes: "Whether — regime history refresh",
+# The weekly cadence moved to a scheduled Claude Code routine when the account stopped paying
+# for Actions minutes: "Whether — regime history refresh", Tuesday 12:00 UTC (Monday until
+# 2026-10-06, when the account's weekly usage cap rejected it three weeks running),
 # https://claude.ai/code/routines/trig_016331bnhHUZx2SWjWew2z5m
 # Kept runnable by hand for a restored Actions budget or a one-off backfill.
 on:
