@@ -5,6 +5,8 @@ import { buildCanonicalBoundedDecisionRules, isRuleConditionMet, SPENDING_PAYBAC
 import { signalOrder } from "./briefFormatting";
 import { resolveLineDistanceLabel } from "./confidence";
 import { formatBoundaryDistance, formatConfidencePlainLabel } from "./reportFormatting";
+import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { REGIME_SEVERITY_RANK } from "../regimePresentation";
 import { formatScoreValue, formatThresholdNumber } from "../formatters";
 import { regimeSignalLabel } from "./signalTranslations";
 import { normalizeSignalContributions } from "./signalFormatting";
@@ -86,7 +88,7 @@ export const anyPauseLineMet = (
   scores: { tightness: number; riskAppetite: number },
 ) => items.some((item) => (item.pauseConditions ?? []).some((condition) => isRuleConditionMet(condition, scores[condition.metric])));
 
-type WeeklyToneInputs = Pick<ReportDynamics, "directionLabel" | "regimeChanged"> & {
+type WeeklyToneInputs = Pick<ReportDynamics, "directionLabel" | "regimeChanged" | "previousRegime"> & {
   /**
    * True while any area's pause line is met (`anyPauseLineMet`). An improving
    * week then holds rather than eases: against last week's brief a four-point
@@ -104,14 +106,28 @@ type WeeklyToneInputs = Pick<ReportDynamics, "directionLabel" | "regimeChanged">
  * compared: a reading with no earlier one has no direction to state, and
  * "Conditions are holding." on that week claimed a comparison nobody made,
  * beside "No previous reading to compare this week against."
+ *
+ * A change of conditions reads the way the conditions moved
+ * (`REGIME_SEVERITY_RANK`): to harsher ones it tightens, to milder ones it eases,
+ * or holds while a pause line is met. Every change of conditions read
+ * "tightening" until 2026-10-07, so a week the machine confirmed Sunny over a
+ * Stormy brief on the same scores headlined "Conditions are tightening. Keep what
+ * is working, and don't start anything new this week.", and a month-end Freezing
+ * to Cloudy did the same. Without the earlier conditions the old rule stands.
  */
 export const resolveWeeklyTone = ({
   directionLabel,
   regimeChanged,
+  previousRegime,
+  regime,
   pauseApplies = false,
-}: WeeklyToneInputs): WeeklyTone | null => {
+}: WeeklyToneInputs & { regime?: RegimeKey }): WeeklyTone | null => {
   if (directionLabel === "unavailable") return null;
-  if (directionLabel === "improving") return pauseApplies ? "holding" : "easing";
+  const severityMove = regimeChanged && previousRegime && regime
+    ? REGIME_SEVERITY_RANK[regime] - REGIME_SEVERITY_RANK[previousRegime]
+    : 0;
+  if (severityMove > 0) return "tightening";
+  if (severityMove < 0 || directionLabel === "improving") return pauseApplies ? "holding" : "easing";
   return regimeChanged || directionLabel === "deteriorating" ? "tightening" : "holding";
 };
 
@@ -119,7 +135,7 @@ export const buildActionNowShort = ({
   regime = "DEFENSIVE",
   ...inputs
 }: WeeklyToneInputs & { regime?: RegimeKey }): string => {
-  const tone = resolveWeeklyTone(inputs);
+  const tone = resolveWeeklyTone({ ...inputs, regime });
   /* With no comparison the action stands alone: the holding row without the
      direction its first sentence states. */
   return tone ? ACTION_NOW_BY_REGIME[regime][tone] : splitWeeklyCall(ACTION_NOW_BY_REGIME[regime].holding).action;
@@ -144,7 +160,7 @@ export const buildWeekActionNow = (
     actionStripItems,
   }: {
     assessment: Pick<RegimeAssessment, "regime" | "scores" | "policyAssessment">;
-    reportDynamics: Pick<ReportDynamics, "directionLabel" | "regimeChanged">;
+    reportDynamics: Pick<ReportDynamics, "directionLabel" | "regimeChanged" | "previousRegime">;
     actionStripItems: readonly Pick<ActionStripItem, "pauseConditions">[];
   },
   build: typeof buildActionNowShort = buildActionNowShort,
@@ -154,6 +170,7 @@ export const buildWeekActionNow = (
   return build({
     directionLabel: reportDynamics.directionLabel,
     regimeChanged: reportDynamics.regimeChanged,
+    ...(reportDynamics.previousRegime ? { previousRegime: reportDynamics.previousRegime } : {}),
     regime: assessment.regime,
     pauseApplies: anyPauseLineMet(actionStripItems, assessment.scores),
   });
@@ -180,6 +197,118 @@ export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof 
   };
 };
 
+type CallChangeInputs = {
+  regime: RegimeKey;
+  thresholds: Pick<ReturnType<typeof evaluateRegime>["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
+  scores: { tightness: number; riskAppetite: number };
+};
+
+/**
+ * One of the two lines that would change the conditions, as `buildFlipThreshold`
+ * states it: which score, which way, the line, today's reading and the distance.
+ * The surfaces with room for one clause, and the homepage's interest-rate
+ * translation, reshape these rather than re-deriving a line of their own.
+ */
+type CallChangeLine = {
+  metric: "tightness" | "riskAppetite";
+  /** Which side of the line changes the conditions: `riseAbove` is `now > threshold`, `fallToOrBelow` is `now <= threshold`. */
+  direction: "riseAbove" | "fallToOrBelow";
+  threshold: number;
+  /** "Funding pressure above 70": the line alone, with no reading. */
+  boundary: string;
+  /** Whole points to the line; 0 when it is already crossed, null without a reading. */
+  distance: number | null;
+  tripped: boolean;
+  /** The clause as the sentence prints it, capitalized: "Risk appetite rises 9 pts to clear 50 (41 today)". */
+  text: string;
+};
+
+/**
+ * The two lines that would change the conditions, a crossed one first, then
+ * funding pressure before risk appetite: the clauses of `buildFlipThreshold`,
+ * as values.
+ */
+export const buildCallChangeLines = (
+  assessment: CallChangeInputs,
+  /** One score's half alone, for a page about the decisions that score rules. */
+  only?: "tightness" | "riskAppetite",
+): CallChangeLine[] => {
+  const conditionLine = ({
+    metric,
+    now,
+    threshold,
+    direction,
+  }: {
+    metric: CallChangeLine["metric"];
+    now: number;
+    threshold: number;
+    direction: CallChangeLine["direction"];
+  }): CallChangeLine => {
+    const label = regimeSignalLabel[metric];
+    const boundary = `${label} ${direction === "riseAbove" ? "above" : "at or below"} ${formatThresholdNumber(threshold)}`;
+
+    if (typeof now !== "number" || !Number.isFinite(now)) {
+      return { metric, direction, threshold, boundary, distance: null, tripped: false, text: boundary };
+    }
+
+    const tripped = direction === "riseAbove" ? now > threshold : now <= threshold;
+    if (tripped) {
+      return {
+        metric,
+        direction,
+        threshold,
+        boundary,
+        distance: 0,
+        tripped,
+        text: `${boundary} (already true at ${formatScoreValue(now)})`,
+      };
+    }
+
+    // Distance to the line, whole points: the scores are published as integers
+    // and a fraction here would be precision the reader cannot act on. The two
+    // directions keep their inequality — reaching 70 flips an "at or below"
+    // boundary, reaching 50 does not flip an "above" one, so that side says
+    // "clear".
+    const distance = Math.max(1, Math.round(Math.abs(threshold - now)));
+    const unit = distance === 1 ? "pt" : "pts";
+    const move = direction === "riseAbove"
+      ? `rises ${distance} ${unit} to clear ${formatThresholdNumber(threshold)}`
+      : `falls ${distance} ${unit} to ${formatThresholdNumber(threshold)} or below`;
+    return { metric, direction, threshold, boundary, distance, tripped, text: `${label} ${move} (${formatScoreValue(now)} today)` };
+  };
+
+  const tightnessDirection: CallChangeLine["direction"] =
+    assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE" ? "fallToOrBelow" : "riseAbove";
+  const riskDirection: CallChangeLine["direction"] =
+    assessment.regime === "SCARCITY" || assessment.regime === "VOLATILE" ? "riseAbove" : "fallToOrBelow";
+
+  const lines = [
+    ...(only === "riskAppetite"
+      ? []
+      : [
+          conditionLine({
+            metric: "tightness",
+            now: assessment.scores?.tightness,
+            threshold: assessment.thresholds.tightnessRegime,
+            direction: tightnessDirection,
+          }),
+        ]),
+    ...(only === "tightness"
+      ? []
+      : [
+          conditionLine({
+            metric: "riskAppetite",
+            now: assessment.scores?.riskAppetite,
+            threshold: assessment.thresholds.riskAppetiteRegime,
+            direction: riskDirection,
+          }),
+        ]),
+  ];
+
+  // Stable sort: a crossed boundary leads, otherwise the declared order holds.
+  return [...lines].sort((a, b) => Number(b.tripped) - Number(a.tripped));
+};
+
 /**
  * The conditions that would flip the current call, as one bounded condition.
  *
@@ -202,82 +331,67 @@ export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof 
  * it — "Funding pressure falls 13 pts to 70 or below (83 today)" — the way a rain alert
  * opens with the minutes, not the radar. The boundary and the live reading
  * stay, because the archive and the embed cite them.
+ *
+ * The clauses are `buildCallChangeLines`, joined, so a surface that prints one
+ * of the two lines reads it from there rather than cutting this sentence.
  */
 export const buildFlipThreshold = (
-  assessment: {
-    regime: RegimeKey;
-    thresholds: Pick<ReturnType<typeof evaluateRegime>["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
-    scores: { tightness: number; riskAppetite: number };
-  },
+  assessment: CallChangeInputs,
   /** One score's half alone, for a page about the decisions that score rules. */
   only?: "tightness" | "riskAppetite",
-): string => {
-  const tightnessThreshold = assessment.thresholds.tightnessRegime;
-  const riskThreshold = assessment.thresholds.riskAppetiteRegime;
-  const tightnessNow = assessment.scores?.tightness;
-  const riskNow = assessment.scores?.riskAppetite;
-
-  const conditionText = ({
-    label,
-    now,
-    threshold,
-    direction,
-  }: {
-    label: string;
-    now: number;
-    threshold: number;
-    direction: "riseAbove" | "fallToOrBelow";
-  }) => {
-    const boundary = direction === "riseAbove"
-      ? `above ${formatThresholdNumber(threshold)}`
-      : `at or below ${formatThresholdNumber(threshold)}`;
-
-    if (typeof now !== "number" || !Number.isFinite(now)) {
-      return { text: `${label} ${boundary}`, tripped: false };
-    }
-
-    const tripped = direction === "riseAbove" ? now > threshold : now <= threshold;
-    if (tripped) {
-      return { text: `${label} ${boundary} (already true at ${formatScoreValue(now)})`, tripped };
-    }
-
-    // Distance to the line, whole points: the scores are published as integers
-    // and a fraction here would be precision the reader cannot act on. The two
-    // directions keep their inequality — reaching 70 flips an "at or below"
-    // boundary, reaching 50 does not flip an "above" one, so that side says
-    // "clear".
-    const distance = Math.max(1, Math.round(Math.abs(threshold - now)));
-    const unit = distance === 1 ? "pt" : "pts";
-    const move = direction === "riseAbove"
-      ? `rises ${distance} ${unit} to clear ${formatThresholdNumber(threshold)}`
-      : `falls ${distance} ${unit} to ${formatThresholdNumber(threshold)} or below`;
-    return { text: `${label} ${move} (${formatScoreValue(now)} today)`, tripped };
-  };
-
-  const tightnessDirection: "riseAbove" | "fallToOrBelow" =
-    assessment.regime === "SCARCITY" || assessment.regime === "DEFENSIVE" ? "fallToOrBelow" : "riseAbove";
-  const riskDirection: "riseAbove" | "fallToOrBelow" =
-    assessment.regime === "SCARCITY" || assessment.regime === "VOLATILE" ? "riseAbove" : "fallToOrBelow";
-
-  const conditions = [
-    ...(only === "riskAppetite"
-      ? []
-      : [conditionText({ label: regimeSignalLabel.tightness, now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection })]),
-    ...(only === "tightness"
-      ? []
-      : [conditionText({ label: regimeSignalLabel.riskAppetite, now: riskNow, threshold: riskThreshold, direction: riskDirection })]),
-  ];
-
-  // Stable sort: a crossed boundary leads, otherwise the declared order holds.
-  const ordered = [...conditions].sort((a, b) => Number(b.tripped) - Number(a.tripped));
-
+): string =>
   // Signal names are capitalized as labels but sit mid-sentence after "or" here,
   // matching how the bounded rules already write them in prose.
-  return `${ordered
-    .map((condition, index) =>
-      index === 0 ? condition.text : condition.text.charAt(0).toLowerCase() + condition.text.slice(1),
-    )
+  `${buildCallChangeLines(assessment, only)
+    .map((line, index) => (index === 0 ? line.text : line.text.charAt(0).toLowerCase() + line.text.slice(1)))
     .join(" or ")}.`;
+
+/**
+ * What would change the guidance this week (docs/claims-ledger.md): the two lines
+ * that change the conditions, or, on a held week, what ends the hold, in the words
+ * of the reason it is held (`describePolicyHold`). The weekly contract always said
+ * the hold's; the report loader, the posture state and the home model said the
+ * lines, so on a held week /api/decision's memo printed "Conditions change if:
+ * Funding pressure rises 25 pts to clear 70 (45 today) or risk appetite falls 12 pts
+ * to 50 or below (62 today)." beside a trigger that said "The two scores point the
+ * same way for a second reading; until then the guidance is not changing."
+ */
+export const buildWeekCallChangesIf = <Assessment extends CallChangeInputs & Pick<RegimeAssessment, "policyAssessment">>(
+  assessment: Assessment,
+  build: (assessment: Assessment) => string = buildFlipThreshold,
+): string => {
+  const { refusal } = assessment.policyAssessment;
+  return refusal.refused ? describePolicyHold(refusal).callChangesIf : build(assessment);
+};
+
+/**
+ * What would change the guidance, as one labelled clause, for a line with room for
+ * one: the /share standup, the homepage's quiet-day line and its lapsed-return
+ * panel. On a held week it is the hold's own condition (the contract's
+ * `callChangesIf`); on any other, the nearer of `buildCallChangeLines` in points, a
+ * clause of the contract's sentence.
+ *
+ * These printed the nearest market move from `buildFlipProximity` until 2026-10-07:
+ * "Conditions changed to Stormy, 0.22% from flip; review pace." and "Conditions
+ * unchanged — If the 1-month Treasury bill rate rises 0.22%, conditions turn
+ * Freezing." Nearest by the size of a move in two different rates, it named the
+ * funding-pressure line 38 points away where every other surface's nearer line was
+ * risk appetite's, 9 points away; and on a held week, "Guidance unchanged, 0.15% from
+ * flip; no pace change." named a rate move as what would change guidance the hold
+ * says is not changing.
+ */
+export const buildCallChangeLine = ({
+  weeklyCall,
+  assessment,
+}: {
+  weeklyCall: { policyOverrideActive: boolean; callChangesIf: string };
+  assessment: CallChangeInputs;
+}): string => {
+  const [nearest] = [...buildCallChangeLines(assessment)].sort(
+    (left, right) => (left.distance ?? Number.POSITIVE_INFINITY) - (right.distance ?? Number.POSITIVE_INFINITY),
+  );
+  const clause = weeklyCall.policyOverrideActive || !nearest ? weeklyCall.callChangesIf : `${nearest.text}.`;
+  return `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${clause}`;
 };
 
 const signalAnomalyThresholds: Record<ReportDynamics["changedSignals"][number]["key"], number> = {
@@ -553,6 +667,7 @@ export const buildReportDynamics = ({
     anomalySignals: anomalies,
     totalSignalChanges: sortedChanges.length,
     regimeChanged: current.regime !== previous.regime,
+    ...(current.regime !== previous.regime ? { previousRegime: previous.regime } : {}),
     directionLabel,
     ...(comparedWith ? { comparedWith } : {}),
     ...(notCompared.length > 0 ? { notCompared } : {}),

@@ -14,6 +14,7 @@ const reportData = {
     regime: "EXPANSION",
     scores: { tightness: 62, riskAppetite: 45, baseRate: 5.25, curveSlope: -0.4 },
     diagnostics: { confidence: "HIGH", nearestThresholdDelta: 9 },
+    policyAssessment: { refusal: { refused: false, reasons: [] } },
   },
   reportDynamics: {
     directionLabel: "deteriorating",

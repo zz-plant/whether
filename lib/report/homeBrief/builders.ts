@@ -48,11 +48,13 @@ import { buildDecisionMatrixPayload } from "./decisionMatrix";
 import { buildPrimaryRiskLabel } from "./risk";
 import { extractExecutiveOperationalStance } from "./executiveOperationalStance";
 import {
+  appendCallChangesIf,
   buildDecisionShiftSummary,
   buildOperatingStanceLine,
   buildReadThisCardItems,
   buildSignalConfidenceReason,
   buildWeeklyMemoLines,
+  describeWeeklyMemoLead,
   buildWeeklyMovementMetric,
   buildWhyItMattersLine,
   resolvePrimaryShiftRegimeKey,
@@ -523,13 +525,19 @@ export const buildHomeBriefModelInternal = (
      built without the report's sentence (the stored operating snapshot, which
      the slide and the Monday sends print) fell through to the nearest line
      alone, so the slide's "Conditions change if" named one line where the
-     homepage named two. */
-  const conciseFlipThreshold =
-    postureState?.whatFlipsNext.flipTrigger?.trim()
-    || flipThreshold?.trim()
-    || buildFlipThreshold(assessment)
-    || reversalTrigger
-    || compactFlipConditionLabels[0];
+     homepage named two. A held week's is the hold's own condition, as the
+     weekly contract's is (`buildWeekCallChangesIf`): this said the two lines,
+     so on a held week /api/decision's memo and shift summary printed
+     "Conditions change if: Funding pressure rises 25 pts to clear 70 (45 today)
+     or risk appetite falls 12 pts to 50 or below (62 today)." beside a trigger
+     that said "The two scores point the same way for a second reading". */
+  const conciseFlipThreshold = policyHold
+    ? policyHold.callChangesIf
+    : postureState?.whatFlipsNext.flipTrigger?.trim()
+      || flipThreshold?.trim()
+      || buildFlipThreshold(assessment)
+      || reversalTrigger
+      || compactFlipConditionLabels[0];
   const decisionMatrix = buildDecisionMatrixPayload({
     regime: assessment.regime,
     thresholds: assessment.thresholds,
@@ -561,9 +569,12 @@ export const buildHomeBriefModelInternal = (
     ? resolveWeeklyTone({
         directionLabel: reportDynamics.directionLabel,
         regimeChanged: reportDynamics.regimeChanged === true,
+        ...(reportDynamics.previousRegime ? { previousRegime: reportDynamics.previousRegime } : {}),
+        regime: assessment.regime,
         pauseApplies: anyPauseLineMet(actionStripItems, assessment.scores),
       })
     : null;
+  const weeklyMemoLead = describeWeeklyMemoLead(trendLabel, comparisonTone);
   const weeklyMovement = buildWeeklyMovementMetric({
     severityDelta,
     changedSignals: reportDynamics?.changedSignals ?? [],
@@ -638,10 +649,12 @@ export const buildHomeBriefModelInternal = (
     postureTrajectory,
     currentScores,
     operatingStanceLine: effectiveOperatingStanceLine,
+    /* Kept apart so the card model can build the memo again around the weekly
+       contract's call (`buildWeeklyDecisionCardViewModel`). */
+    weeklyMemoLead,
     weeklyMemoLines: buildWeeklyMemoLines({
+      lead: weeklyMemoLead,
       operatingStanceLine: effectiveOperatingStanceLine,
-      trendLabel,
-      weeklyTone: comparisonTone,
       transitionWatch,
       pauseIf: guardrail,
       callChangesIf: conciseFlipThreshold,
@@ -804,7 +817,18 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     },
     decision: {
       operatingStanceLine: weeklyCall?.currentCall ?? homeBriefModel.operatingStanceLine,
-      weeklyMemoLines: homeBriefModel.weeklyMemoLines,
+      /* The memo around the contract's call, pause line and "Conditions change if",
+         as every paste prints them; the home model's own call can come from another
+         branch of the stance rule than the stored contract's. */
+      weeklyMemoLines: weeklyCall
+        ? buildWeeklyMemoLines({
+            lead: homeBriefModel.weeklyMemoLead,
+            operatingStanceLine: weeklyCall.currentCall,
+            transitionWatch: homeBriefModel.transitionWatch,
+            pauseIf: weeklyCall.pauseIf,
+            callChangesIf: weeklyCall.callChangesIf,
+          })
+        : homeBriefModel.weeklyMemoLines,
       netConstraintSummary: homeBriefModel.netConstraintSummary,
       guardrail: weeklyCall?.pauseIf ?? homeBriefModel.guardrail,
       reversalTrigger: weeklyCall?.callChangesIf ?? homeBriefModel.reversalTrigger,
@@ -817,7 +841,9 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       canonicalDecisionCopy,
       canonicalFlipConditions: homeBriefModel.canonicalFlipConditions,
       reportDynamics,
-      decisionShiftSummary: homeBriefModel.decisionShiftSummary,
+      decisionShiftSummary: weeklyCall
+        ? appendCallChangesIf(homeBriefModel.decisionShiftHeadline, weeklyCall.callChangesIf)
+        : homeBriefModel.decisionShiftSummary,
       decisionShiftHeadline: homeBriefModel.decisionShiftHeadline,
       transitionProbabilities: homeBriefModel.transitionProbabilities,
       decisionRules: homeBriefModel.decisionRules,

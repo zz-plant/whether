@@ -74,7 +74,7 @@ describe("the by-area Changed column", () => {
     assert.ok(rows.every((row) => row.changed === undefined && row.changedKind === undefined));
     assert.doesNotMatch(renderTable(rows), /<th[^>]*>Changed<\/th>/);
     assert.equal(
-      buildChangedLead({ movement, quietDayLine: null, nearestLine: undefined, fallback: "unused" }),
+      buildChangedLead({ movement, quietDayLine: null, fallback: "unused" }),
       "Conditions held steady since Aug 31; no pause or resume line was crossed. Last week's guidance stands.",
     );
   });
@@ -90,26 +90,24 @@ describe("the by-area Changed column", () => {
 describe("buildChangedLead", () => {
   const held = week({ from: { tightness: 85, riskAppetite: 39 }, to: { tightness: 85, riskAppetite: 39 }, regime: "SCARCITY" }).movement;
   const crossed = week({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" }).movement;
-  const nearest = "If long rates fall 0.15% closer to short rates, conditions turn Cloudy.";
+  const quietDayLine = "Conditions change if: Risk appetite rises 11 pts to clear 50 (39 today).";
 
-  it("follows a quiet week's sentence with the nearest line, and only then", () => {
+  it("follows a quiet week's sentence with the quiet-day line, and only then", () => {
     assert.equal(
-      buildChangedLead({ movement: held, quietDayLine: `Conditions unchanged — ${nearest}`, nearestLine: nearest, fallback: "unused" }),
-      `Conditions held steady since Aug 31; no pause or resume line was crossed. Last week's guidance stands. ${nearest}`,
+      buildChangedLead({ movement: held, quietDayLine, fallback: "unused" }),
+      `Conditions held steady since Aug 31; no pause or resume line was crossed. Last week's guidance stands. ${quietDayLine}`,
     );
     // Not a quiet week, or a week a line was crossed: the sentence stands alone.
     assert.equal(
-      buildChangedLead({ movement: held, quietDayLine: null, nearestLine: nearest, fallback: "unused" }),
+      buildChangedLead({ movement: held, quietDayLine: null, fallback: "unused" }),
       "Conditions held steady since Aug 31; no pause or resume line was crossed. Last week's guidance stands.",
     );
-    assert.equal(
-      buildChangedLead({ movement: crossed, quietDayLine: `Conditions unchanged — ${nearest}`, nearestLine: nearest, fallback: "unused" }),
-      crossed?.sentence,
-    );
+    assert.equal(buildChangedLead({ movement: crossed, quietDayLine, fallback: "unused" }), crossed?.sentence);
   });
 
-  it("falls back to the quiet-day line, then to the direction the scores moved, where no lines could be read", () => {
-    assert.equal(buildChangedLead({ movement: null, quietDayLine: "quiet", nearestLine: nearest, fallback: "direction" }), "quiet");
-    assert.equal(buildChangedLead({ movement: null, quietDayLine: null, nearestLine: nearest, fallback: "direction" }), "direction");
+  /* It fell back to the quiet-day line first, which needs a week whose guidance held
+     and so a movement: that branch could not be reached. */
+  it("falls back to the direction the scores moved where no lines could be read", () => {
+    assert.equal(buildChangedLead({ movement: null, quietDayLine: null, fallback: "direction" }), "direction");
   });
 });

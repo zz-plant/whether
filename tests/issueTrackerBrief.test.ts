@@ -104,12 +104,12 @@ describe("buildGuardrailTagBlocks", () => {
     },
   ];
 
-  it("builds one block per business area, each carrying posture, pause trigger and flip condition", () => {
+  it("builds one block per business area, each carrying the conditions, the pause and resume lines and what would change the guidance", () => {
     const blocks = buildGuardrailTagBlocks({
       actionStripItems: items,
       postureLabel: "Cloudy",
       recordDate: "2026-03-04",
-      flipWatchSentence: "0.15% flatter on the 10Y−2Y curve would change conditions.",
+      callChangesIf: "The two scores point the same way for a second reading; until then the guidance is not changing.",
     });
 
     assert.equal(blocks.length, 2);
@@ -128,25 +128,34 @@ describe("buildGuardrailTagBlocks", () => {
     assert.match(blocks[1].markdown, /Keep expansion bets reversible\./);
   });
 
-  it("carries the flip watch sentence when one is given", () => {
+  /* It carried the nearest market move ("If the 1-month Treasury bill rate rises
+     0.15%, conditions turn Cloudy."), which on a held week named a rate move beside
+     guidance the hold says is not changing. */
+  it("carries the brief's own sentence for what would change the guidance", () => {
     const blocks = buildGuardrailTagBlocks({
       actionStripItems: items,
       postureLabel: "Cloudy",
       recordDate: "2026-03-04",
-      flipWatchSentence: "0.15% flatter on the 10Y−2Y curve would change conditions.",
+      callChangesIf: "The two scores point the same way for a second reading; until then the guidance is not changing.",
     });
 
-    assert.ok(blocks.every((block) => block.markdown.includes("0.15% flatter on the 10Y−2Y curve would change conditions.")));
+    assert.ok(
+      blocks.every((block) =>
+        block.markdown.includes(
+          "**What would change this guidance:** The two scores point the same way for a second reading; until then the guidance is not changing.",
+        ),
+      ),
+    );
   });
 
-  it("omits the flip watch line when no axis is reachable", () => {
+  it("omits the line when it is not given", () => {
     const blocks = buildGuardrailTagBlocks({
       actionStripItems: items,
       postureLabel: "Cloudy",
       recordDate: "2026-03-04",
     });
 
-    assert.ok(blocks.every((block) => !block.markdown.includes("would change conditions")));
+    assert.ok(blocks.every((block) => !block.markdown.includes("What would change this guidance")));
   });
 
   it("returns no blocks for an empty action strip", () => {

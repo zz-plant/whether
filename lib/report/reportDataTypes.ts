@@ -1,4 +1,5 @@
 import type { NormalizedSignalContribution } from "./signalFormatting";
+import type { RegimeKey } from "../regimeEngine";
 
 export type LastYearComparison = {
   current: {
@@ -68,6 +69,12 @@ export type ReportDynamics = {
   }>;
   totalSignalChanges: number;
   regimeChanged: boolean;
+  /**
+   * The earlier reading's conditions, when they differ from this week's: which way
+   * a change of conditions went, for the headline's tone (`resolveWeeklyTone`).
+   * Absent when the conditions held or nothing was compared.
+   */
+  previousRegime?: RegimeKey;
   /**
    * Which way the week moved — or `"unavailable"` when there was no previous
    * reading to compare against, which is not the same fact as "nothing moved".

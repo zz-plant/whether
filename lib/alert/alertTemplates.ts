@@ -7,12 +7,12 @@
  */
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { formatPointsMove, type FlashMove } from "./flashMoves";
+import type { FlashMove } from "./flashMoves";
 import type { PublishedLine } from "./alertEvaluator";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { emailTextFooter, renderEmailShell } from "../email/emailShell";
 import { siteUrl } from "../siteUrl";
-import { formatScoreValue } from "../formatters";
+import { formatPointsMove, formatScoreValue } from "../formatters";
 
 /** What a flash asks of the reader, in the mail's text and HTML alike. */
 const FLASH_GUIDANCE =

@@ -18,6 +18,7 @@
  */
 
 import { regimeSignalLabel } from "../report/signalTranslations";
+import { formatPointsMove } from "../formatters";
 
 /** A policy-sized move of the short rate between two consecutive reads, in percentage points. */
 export const FLASH_BASE_RATE_MOVE = 0.25;
@@ -70,9 +71,6 @@ const daysBetween = (from: string, to: string): number | null => {
   if (Number.isNaN(fromMs) || Number.isNaN(toMs)) return null;
   return Math.abs(toMs - fromMs) / DAY_MS;
 };
-
-/** "0.30 percentage points": a spread's move is a difference of rates, never a percent of one. */
-export const formatPointsMove = (value: number) => `${Math.abs(value).toFixed(2)} percentage points`;
 
 const describe = (metric: FlashMetric, from: number, to: number, current: FlashInputs, previous: FlashInputs): FlashMove => {
   const delta = to - from;

@@ -42,7 +42,7 @@ export const buildDecisionShiftSummary = ({
   reversalTrigger?: string;
 }) => {
   const withTrigger = (headline: string) =>
-    reversalTrigger ? `${headline} ${CALL_CHANGES_IF}: ${reversalTrigger}` : headline;
+    reversalTrigger ? appendCallChangesIf(headline, reversalTrigger) : headline;
   if (directionLabel === "unavailable") {
     /* Nothing was compared, so "no significant change" is not available to say.
        The call still stands on where the signals sit; what is missing is the
@@ -231,7 +231,7 @@ const trendMemoLines: Record<string, string> = {
  * while a pause line was met, and a week with nothing to compare fell through to
  * "No material signal shift this week.", a finding from a comparison nobody made.
  */
-const weeklyMemoLead = (trendLabel: string, weeklyTone: WeeklyTone | null) => {
+export const describeWeeklyMemoLead = (trendLabel: string, weeklyTone: WeeklyTone | null) => {
   if (weeklyTone === null) return "No previous reading to compare this week against.";
   if (weeklyTone === "tightening") return trendMemoLines.Deteriorating;
   if (weeklyTone === "easing") return trendMemoLines.Improving;
@@ -239,30 +239,46 @@ const weeklyMemoLead = (trendLabel: string, weeklyTone: WeeklyTone | null) => {
   return trendMemoLines[trendLabel] ?? trendMemoLines.Stable;
 };
 
+/**
+ * The /api/decision memo: the week's direction (`describeWeeklyMemoLead`), the call,
+ * then the watch state with its line. The card model builds it again from the weekly
+ * contract (`buildWeeklyDecisionCardViewModel`), so the memo prints the contract's
+ * call and its "Conditions change if": it printed the home model's own until
+ * 2026-10-07, and on the ordinary week the parity test renders that was "Ship fixes
+ * and releases that pay back quickly; hold anything you could not reverse." beside
+ * every paste's "Favour releases that pay back quickly and can be rolled back.".
+ */
 export const buildWeeklyMemoLines = ({
+  lead,
   operatingStanceLine,
-  trendLabel,
-  weeklyTone,
   transitionWatch,
   pauseIf,
   callChangesIf,
 }: {
+  /** `describeWeeklyMemoLead`: the week's direction by the headline's rule. */
+  lead: string;
   operatingStanceLine: string;
-  trendLabel: string;
-  /** The week's direction as the headline reads it; null when nothing was compared. */
-  weeklyTone: WeeklyTone | null;
   transitionWatch: "ON" | "OFF";
   pauseIf: string;
   callChangesIf: string;
 }) => [
-  weeklyMemoLead(trendLabel, weeklyTone),
+  lead,
   operatingStanceLine,
   // The stance line is already line 2, so this line adds the watch state and its
   // condition instead of restating it.
   transitionWatch === "ON"
     ? `Conditions could change next week, so keep hiring, roadmap, and spend decisions reversible until the next live weekly refresh. ${pauseIf}`
-    : `Conditions are not expected to change next week, so this week's guidance holds. ${CALL_CHANGES_IF}: ${callChangesIf}`,
+    : appendCallChangesIf("Conditions are not expected to change next week, so this week's guidance holds.", callChangesIf),
 ];
+
+/**
+ * A sentence followed by what would change the guidance, under its label: the shift
+ * summary and the memo's last line both end this way. The card model appends the
+ * weekly contract's sentence to the home model's shift headline with it, so the
+ * label and the joint are written once.
+ */
+export const appendCallChangesIf = (headline: string, callChangesIf: string) =>
+  `${headline} ${CALL_CHANGES_IF}: ${callChangesIf}`;
 
 export const buildWhyItMattersLine = ({
   weeklyMovement,
