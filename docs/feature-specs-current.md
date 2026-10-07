@@ -2516,9 +2516,8 @@ the frozen archive record. A surface that does not print a claim is not held to 
 
 Left as they are, and named in the test: the agent state's `change.direction` is the comparison's own label
 ("mixed" on the ordinary week beside "Conditions are tightening."), not the headline's tone; changing it is an
-API decision. The Monday sends print no comparison date, because the snapshot they render carries no earlier
-reading; the test holds that as an absence. On the held week the Monday post's section reaches Slack's limit
-before its "Why this could be wrong" block.
+API decision. (Two more were left here and are fixed below: the Monday sends printed no comparison date, and the
+Monday post was cut at Slack's section limit.)
 
 The last four places that printed "Conditions change if" from the raw lines read `buildWeekCallChangesIf`
 too: the archive summaries' change line (`formatConditionsChangeLine`), the regime-change alert's reversal
@@ -2535,6 +2534,14 @@ the operating snapshot choose the comparison reading through one rule (`selectWe
 A shared brief's "Full brief" link and its "Permanent record" line cite the newest week frozen at or
 before the reading (`selectCitablePermalinkBrief`). They cited the newest frozen week whatever the
 reading's date, so a replayed or saved reading pointed at a week frozen after it.
+
+The Monday sends name what the week is compared with. They render the stored operating snapshot, which kept no
+earlier reading, so the email and Slack post said "Conditions are tightening" against nothing named; the
+snapshot's document now reads the comparison its weekly call was built from (`resolveWeekDynamics`,
+`lib/report/weekComparison.ts`), and the email prints the "What changed this week" line every paste opens that
+section with (`briefWeekChangeLine`). The Monday Slack post is carried whole across sections split between
+lines: it had outgrown Slack's 3,000-character section and was cut mid-word ("Put a payback figure on every
+discretionar… (truncated — full brief on the site)").
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
