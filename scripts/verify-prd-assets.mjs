@@ -21,8 +21,8 @@ const assets = [
   { path: "/whether-logo.svg", expectedType: /image\/svg\+xml/ },
 
   // Web Fonts
-  { path: "/fonts/archivo-variable.woff2", expectedType: /font\/woff2/ },
-  { path: "/fonts/chivo-mono-variable.woff2", expectedType: /font\/woff2/ },
+  { path: "/fonts/archivo-variable.55ade54a.woff2", expectedType: /font\/woff2/ },
+  { path: "/fonts/chivo-mono-variable.def202bf.woff2", expectedType: /font\/woff2/ },
 
   // Satori / OG Fonts
   { path: "/fonts/og/archivo-semicondensed-700.ttf", expectedType: /font\/(ttf|sfnt)|application\/(x-font-ttf|font-sfnt|octet-stream)/ },

@@ -63,7 +63,7 @@ These come from the Web Interface Guidelines and matter specifically for this co
 
 ## Read the font file, not the font's name
 
-A type designer's habit (§XXII): a page can only set what `public/fonts/*.woff2` contains. Before you put a symbol in copy or chrome, or reach for an OpenType feature, list what the file draws. §XXII gives the fontTools one-liner. The shipped Archivo draws ↑ ↓ but not → ≤ ≥, has no italic, and has no `case`, `zero` or small capitals. Anything outside the file is set in the reader's OS font, so it looks different on every platform. Chrome marks come from `app/components/uiIcons.tsx`, and `tests/craftDetails.test.ts` holds the line for the common ones.
+A type designer's habit (§XXII): a page can only set what `public/fonts/*.woff2` contains. Before you put a symbol in copy or chrome, or reach for an OpenType feature, list what the file draws. §XXII gives the fontTools one-liner. The files are subset to the site's text (`app/styles/fonts.css` records the build). Archivo draws → ← ↑ ↓ ≤ ≥ ≈ ≠ Δ ‰ −, but no ▾ ✓ ✕ or other symbols, no italic and no small capitals. Anything outside the file is set in the reader's OS font, so it looks different on every platform. Chrome marks come from `app/components/uiIcons.tsx`, and `tests/craftDetails.test.ts` holds the line for the common ones. A symbol the copy needs goes into the file, under a new hashed name (`tests/fontAssets.test.ts`).
 
 ## Reduced motion is under-covered
 

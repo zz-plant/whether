@@ -82,6 +82,9 @@ svg :where(.type-eyebrow, .type-badge) {
   @apply font-semibold uppercase;
   font-size: var(--fs-micro);
   letter-spacing: 0.08em;
+  /* Case-sensitive forms: Archivo lifts the hyphen to sit between capitals
+     rather than at x-height. */
+  font-feature-settings: "case";
 }
 
 /* The regime stamp: the week's word (Freezing, Sunny, Stormy, Cloudy) set in
@@ -96,6 +99,7 @@ svg :where(.type-eyebrow, .type-badge) {
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  font-feature-settings: "case";
 }
 
 .type-data {

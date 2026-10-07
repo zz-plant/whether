@@ -92,8 +92,11 @@
      The rule that matters most: one number, one face. The boldness score
      rendered mono in the sticky strip and sans in the hero, which read as two
      different quantities on one screen. If a figure appears on more than one
-     surface, it is the same figure everywhere. */
-  --font-mono: "Chivo Mono", ui-monospace, monospace;
+     surface, it is the same figure everywhere.
+
+     Archivo is second in the stack because Chivo Mono draws no arrows: an
+     arrow in mono text falls to the sibling face rather than to the OS. */
+  --font-mono: "Chivo Mono", "Archivo", ui-monospace, monospace;
   --text-primary: var(--app-text);
   --footer-link: #cbd5e1;
   --footer-link-hover: #ffffff;

@@ -29,7 +29,9 @@ const DOCUMENT_CACHE = `whether-documents-${VERSION}`;
 const ASSET_CACHE = `whether-assets-${VERSION}`;
 const CACHES = [DOCUMENT_CACHE, ASSET_CACHE];
 
-/* Hashed by the build, so a hit is always the right bytes and a miss is cheap. */
+/* Hashed, so a hit is always the right bytes and a miss is cheap: /_next/static/
+   by the build, /fonts/ by name (each file carries its SHA-256 prefix, held by
+   tests/fontAssets.test.ts), so a changed font is a new URL. */
 const isImmutableAsset = (url) =>
   url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/fonts/");
 
