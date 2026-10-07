@@ -1,15 +1,18 @@
 import { ENGINE_VERSION, evaluateRegime, type RegimeThresholds } from "../regimeEngine";
 import { getPreviousTimeMachineSnapshot } from "../timeMachine/timeMachineCache";
 import { buildComparedWith } from "./comparisonBasis";
-import { findWeeklyComparisonReading, observedBaseRate, type ComparisonReading } from "./comparisonReading";
+import { findWeeklyComparisonReading, observedBaseRate, rescoreStoredInputs, type ComparisonReading } from "./comparisonReading";
 import { getPublishedBriefs } from "./publishedBriefs";
 import type { ComparedWith } from "./reportDataTypes";
 
 /**
  * The reading a live week is compared with, chosen the way the report loader
- * chooses it: last week's published brief when one scored by this engine is in
- * range (`findWeeklyComparisonReading`), else the previous month-end, re-scored
- * by the current engine.
+ * chooses it, from the same two pieces: last week's published brief when one is
+ * in range and scored by this engine or re-scorable from its stored inputs
+ * (`findWeeklyComparisonReading`), else the previous month-end, re-scored by the
+ * current engine. The loader keeps its own two lines because it also needs the
+ * month-end's movement split for the conditions map; tests/weeklyClaimParity
+ * holds the two to one answer.
  *
  * The operating snapshot builds its weekly call from this. It used to build the
  * call with no comparison at all, so the stored call, which every paste and the
@@ -19,9 +22,14 @@ import type { ComparedWith } from "./reportDataTypes";
  */
 export const resolveWeekComparison = (
   recordDate: string,
-  thresholds?: Partial<RegimeThresholds>,
+  thresholds: RegimeThresholds,
 ): { reading: ComparisonReading; comparedWith: ComparedWith | undefined } | null => {
-  const weekly = findWeeklyComparisonReading(getPublishedBriefs(), recordDate, ENGINE_VERSION);
+  const weekly = findWeeklyComparisonReading(
+    getPublishedBriefs(),
+    recordDate,
+    ENGINE_VERSION,
+    rescoreStoredInputs(evaluateRegime, thresholds),
+  );
   if (weekly) return { reading: weekly, comparedWith: buildComparedWith(weekly.recordDate, recordDate) };
 
   const monthEnd = getPreviousTimeMachineSnapshot(recordDate);

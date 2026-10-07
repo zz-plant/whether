@@ -2345,6 +2345,53 @@ w38–w40 did not record their engine, and `ENGINE_VERSION` changed on 2026-10-0
 archive counts yet: the week compares with the month-end, as before, until the first record frozen
 after this change is 5–14 days old.
 
+### 1.1.53 The weekly basis survives a scoring change (2026-10-07)
+
+§1.1.51 compares a week with last week's brief only when the same `ENGINE_VERSION` scored both, so
+every scoring change dropped the weekly basis to the month-end for a week or two, until a record frozen
+by the new engine was five days old. A record now stores what the engine scored, and a later engine
+scores it again.
+
+- **What a record stores.** `inputs` on the published record (`PublishedBriefSchema`,
+  `lib/report/publishedBriefs.ts`, validated with zod on read), built by `buildStoredInputs`
+  (`lib/report/comparisonReading.ts`) inside `buildPublishedBriefRecord`, which both freeze writers
+  share. Only what the scorer reads for the two scores and the conditions: the Treasury yields the
+  short-term rate and the curve come from; the two one-month-bill prints the tightening-speed term
+  measures between (`resolveBaseRateVelocityPair`, the pair the Time Machine cache also stores, not the
+  92 days of history it was found in); the values of the five market series that adjust the scores
+  (high-yield spread, Chicago financial conditions, VIX, venture funding, tech layoffs); and the last
+  ten VIX closes, which the market-stress veto means. Not stored: sparkline histories, provenance, and
+  the BBB spread, inflation and unemployment the policy layer reads, since nothing the policy layer
+  computes reaches the scores or the conditions. About 380 bytes, or 680 in the file's indented form,
+  on a record of about 7.7KB. Absent on every record frozen before.
+- **Stored only when it reproduces the record.** The builder scores the inputs again through the path
+  next week takes and keeps them only if that reproduces the week's funding pressure, risk appetite,
+  short-term rate and curve exactly. On a mismatch the record stores none, and a later engine passes it
+  over like a record frozen before inputs were stored: inputs that did not produce a citable record's
+  scores would print a move no market made.
+- **The re-score.** `findWeeklyComparisonReading` reads a record scored by today's engine as stored. One
+  scored by another engine, or by one it did not record, is scored again from its inputs by the
+  re-scorer the loader passes in, `rescoreStoredInputs(deps.evaluateRegime, thresholds)`: the current
+  engine under the reading's thresholds. A record with no inputs is passed over, as before. The finder
+  stays pure and calls the re-scorer once, for the record it chose. `observedBaseRate` applies to a
+  re-scored reading as to a stored one, so a rate the engine scored as missing is not compared. The
+  engine is untouched; the re-score is in `lib/report`. The re-scored reading was scored from the same
+  inputs by the same engine as this week's, so there is no rates-versus-inputs split to make.
+- **No machine state, as for the month-end.** The month-end comparison re-scores its snapshot with no
+  machine state (`evaluateRegime(previousSnapshot, thresholds)`), and so does this: the conditions are
+  the quadrant the re-scored scores sit in. Where the confirmation gate was holding a flip, they differ
+  from the ones published. Risk appetite one point over its line, published Stormy while the gate held,
+  re-scores as Sunny. The machine moves the conditions, never the scores, and threading it would mean
+  storing its state from an engine that is no longer scoring.
+- **Limits.** A re-score is like-for-like as far as the new engine reads what the record stored. An
+  engine that reads another input, a longer VIX window or a different speed-term lookback scores an old
+  record on what it has: ten closes and the pair the old lookback chose. `tests/weeklyComparison.test.tsx`
+  moves every market series the engine knows and fails if the set that moves a score stops being the
+  set records store, so a scoring change that starts reading a new series is caught in the change that
+  makes it.
+
+No record in the archive stores inputs yet: the first is the next freeze.
+
 ### 1.1.54 One week's guidance, said once on every surface (2026-10-07)
 
 A parity test that renders one week through every surface (`tests/weeklyClaimParity.test.tsx`, against

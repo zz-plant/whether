@@ -93,7 +93,7 @@ export const buildOperatingSnapshot = ({
 
   /* Compared as the page compares the week, so the stored weekly call carries
      the week's direction (docs/claims-ledger.md). */
-  const comparison = resolveWeekComparison(recordDate, thresholds);
+  const comparison = resolveWeekComparison(recordDate, assessment.thresholds);
   const reportDynamics = buildReportDynamics({
     current: assessment,
     previous: comparison?.reading ?? null,

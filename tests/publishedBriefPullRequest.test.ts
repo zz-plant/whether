@@ -2,8 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { GitHubRepoClient, fromBase64Utf8, toBase64Utf8 } from "../lib/github/repoClient";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../lib/isoWeek";
-import { ENGINE_VERSION } from "../lib/regimeEngine";
-import { PublishedBriefSchema, getPublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
+import { macroSeries } from "../lib/macroSnapshot";
+import { ENGINE_VERSION, evaluateRegime } from "../lib/regimeEngine";
+import { PublishedBriefIndexSchema, PublishedBriefSchema, getPublishedBriefs, type PublishedBrief } from "../lib/report/publishedBriefs";
 import {
   PUBLISHED_BRIEFS_FILE_PATH,
   buildPublishedBriefFileUpdate,
@@ -13,9 +14,9 @@ import {
   readPublishedBriefsFromBranch,
 } from "../lib/report/publishedBriefPullRequest";
 import { assembleCurrentWeekBrief, buildPublishedBriefRecord } from "../lib/report/publishedBriefRecord";
-import { findWeeklyComparisonReading } from "../lib/report/comparisonReading";
+import { findWeeklyComparisonReading, rescoreStoredInputs } from "../lib/report/comparisonReading";
 import { buildWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
-import { buildReportDataFixture } from "./fixtures/reportFixtures";
+import { buildReportDataFixture, buildTreasuryFixture } from "./fixtures/reportFixtures";
 
 const bundled = getPublishedBriefs();
 const newest = bundled[0];
@@ -346,8 +347,11 @@ describe("assembleCurrentWeekBrief", () => {
     assert.equal(record.scores?.engineVersion, ENGINE_VERSION);
 
     const nextWeek = new Date(Date.parse(`${record.recordDate}T00:00:00.000Z`) + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-    assert.equal(findWeeklyComparisonReading([record], nextWeek, "engine-next"), null, "a scoring change since is not a market move");
-    assert.deepEqual(findWeeklyComparisonReading([record], nextWeek, ENGINE_VERSION)?.scores, {
+    const rescore = rescoreStoredInputs(evaluateRegime, liveReportData.assessment.thresholds);
+    /* The fixture's scores are hand-set, not its treasury's, so it stores no inputs ("the inputs a record stores" below). */
+    assert.equal(record.inputs, undefined);
+    assert.equal(findWeeklyComparisonReading([record], nextWeek, "engine-next", rescore), null, "a scoring change since is not a market move");
+    assert.deepEqual(findWeeklyComparisonReading([record], nextWeek, ENGINE_VERSION, rescore)?.scores, {
       tightness: liveReportData.assessment.scores.tightness,
       riskAppetite: liveReportData.assessment.scores.riskAppetite,
       baseRate: liveReportData.assessment.scores.baseRate,
@@ -365,5 +369,92 @@ describe("assembleCurrentWeekBrief", () => {
       isoWeek,
     });
     assert.equal(withoutRate.scores?.baseRate, null, "a missing rate scores as 0, which is not a reading");
+  });
+});
+
+/*
+ * A record frozen from 2026-10-07 stores what the engine scored, so that after an
+ * ENGINE_VERSION bump next week scores it again instead of dropping to the
+ * month-end (docs/feature-specs-current.md §1.1.53).
+ */
+describe("the inputs a record stores", () => {
+  const recordDate = "2026-03-02";
+  const isoWeek = getIsoWeekInfo(new Date(recordDate));
+  /* A week whose scores are its own inputs': the engine scored this treasury and these series. */
+  const treasury = buildTreasuryFixture({
+    record_date: recordDate,
+    isLive: true,
+    yields: { oneMonth: 3.62, threeMonth: 3.7, twoYear: 3.55, tenYear: 4.1 },
+    /* 91 days before the latest print: the tightening-speed term resolves this pair. */
+    oneMonthHistory: [
+      { date: "2025-12-01", value: 3.1 },
+      { date: "2026-01-02", value: 3.3 },
+      { date: "2026-03-02", value: 3.62 },
+    ],
+  });
+  const assessment = evaluateRegime(treasury, undefined, macroSeries, null, { baseRateHistory: treasury.oneMonthHistory });
+  const scoredReport = buildReportDataFixture({
+    treasury,
+    macroSeries,
+    assessment: { regime: assessment.regime, scores: assessment.scores, thresholds: assessment.thresholds },
+  });
+  const record = buildPublishedBriefRecord({
+    reportData: scoredReport,
+    snapshot: buildWeeklyBriefSnapshot({ reportData: scoredReport, degraded: false }),
+    recordDate,
+    isoWeek,
+  });
+
+  it("are what the scorer read: the yields, the speed term's two prints, the scored series' values, the VIX closes", () => {
+    assert.ok(assessment.scores.baseRateVelocityPoints, "the fixture exercises the tightening-speed term");
+    const value = (id: string) => macroSeries.find((series) => series.id === id)?.value;
+    assert.deepEqual(record.inputs, {
+      yields: { oneMonth: 3.62, threeMonth: 3.7, twoYear: 3.55, tenYear: 4.1 },
+      baseRateWindow: { compareDate: "2025-12-01", compareValue: 3.1, latestDate: "2026-03-02", latestValue: 3.62 },
+      macro: {
+        HY_CREDIT_SPREAD: value("HY_CREDIT_SPREAD"),
+        CHICAGO_FCI: value("CHICAGO_FCI"),
+        VIX_INDEX: value("VIX_INDEX"),
+        VC_FUNDING_VELOCITY: value("VC_FUNDING_VELOCITY"),
+        TECH_LAYOFF_TREND: value("TECH_LAYOFF_TREND"),
+      },
+      vixCloses: (macroSeries.find((series) => series.id === "VIX_INDEX")?.history ?? []).map((point) => point.value).slice(-10),
+    });
+  });
+
+  it("re-score, under the engine that froze them, to the record's scores exactly", () => {
+    const { inputs } = record;
+    assert.ok(inputs);
+    const rescored = rescoreStoredInputs(evaluateRegime, assessment.thresholds)(inputs, recordDate);
+    assert.deepEqual(rescored.scores, {
+      tightness: record.scores?.tightness,
+      riskAppetite: record.scores?.riskAppetite,
+      baseRate: record.scores?.baseRate,
+      curveSlope: record.scores?.curveSlope,
+    });
+    assert.equal(rescored.regime, record.regime);
+  });
+
+  it("round-trip through the archive schema as the file is written, and are refused when malformed", () => {
+    const written: unknown = JSON.parse(fileBody([record]));
+    const [read] = PublishedBriefIndexSchema.parse(written);
+    assert.ok(read.inputs);
+    assert.deepEqual([read], written, "nothing stripped, nothing added");
+    assert.deepEqual(read.inputs, record.inputs);
+    assert.equal(PublishedBriefSchema.safeParse({ ...read, inputs: { ...read.inputs, vixCloses: ["16.8"] } }).success, false);
+    assert.equal(PublishedBriefSchema.safeParse({ ...read, inputs: { macro: {} } }).success, false, "no yields, no record of what was scored");
+    assert.ok(PublishedBriefSchema.safeParse({ ...read, inputs: undefined }).success, "a record frozen before inputs were stored");
+  });
+
+  it("are not stored when they do not reproduce the record's scores", () => {
+    /* The default fixture's scores are hand-set: funding pressure 72 where its treasury scores 95. */
+    const handSet = buildReportDataFixture({ treasury: { isLive: true, fallback_at: undefined, fallback_reason: undefined } });
+    const unscored = buildPublishedBriefRecord({
+      reportData: handSet,
+      snapshot: buildWeeklyBriefSnapshot({ reportData: handSet, degraded: false }),
+      recordDate: handSet.treasury.record_date,
+      isoWeek: getIsoWeekInfo(new Date(handSet.treasury.record_date)),
+    });
+    assert.equal("inputs" in unscored, false, "absent, not undefined: the record re-reads as written");
   });
 });
