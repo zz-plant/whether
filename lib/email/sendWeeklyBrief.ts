@@ -35,7 +35,9 @@ const distanceFromLine = (
   if (points === 0) return { label: "sitting on the line where conditions change", worse: true };
 
   const side = vsThreshold > 0 ? "above" : "below";
-  return { label: `${points} points ${side} the line where conditions change`, worse: side === worseSide };
+  /* A score one point off its line read "1 points above the line…". */
+  const unit = points === 1 ? "point" : "points";
+  return { label: `${points} ${unit} ${side} the line where conditions change`, worse: side === worseSide };
 };
 
 /**
