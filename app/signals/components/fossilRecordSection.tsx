@@ -1,5 +1,7 @@
 import { insightDatabase } from "../../../data/recommendations";
 import { UrlDetails } from "../../components/ui/urlDetails";
+import { describeFossilSummary } from "../../../lib/report/evidenceInstrumentSummaries";
+import { InstrumentQuestion } from "./instrumentQuestion";
 
 /**
  * The last of the evidence page's instruments: a disclosure titled with the
@@ -28,7 +30,12 @@ export function FossilRecordSection({
       initialOpen={open}
       className={className}
       summaryClassName={summaryClassName}
-      summary={<span>Which habits from the zero-rate years still shape your company?</span>}
+      summary={
+        <InstrumentQuestion
+          question="Which habits from the zero-rate years still shape your company?"
+          answer={describeFossilSummary(fossilRecord.rows)}
+        />
+      }
     >
       {/* The header used to carry a mono chip reading "Now: {regime}", which
           restated the page's status line one screen up, and the table ended

@@ -5,6 +5,8 @@ import { Collapsible } from "@base-ui/react/collapsible";
 import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
 import { ThresholdsPanel } from "./thresholdsPanel";
+import { InstrumentQuestion } from "./instrumentQuestion";
+import { formatChangeLines } from "../../../lib/report/evidenceInstrumentSummaries";
 
 const hasThresholdParams = (params: URLSearchParams) => {
   return (
@@ -39,7 +41,7 @@ export const AdvancedThresholdsSection = ({
     /* A row in the instruments list like the others: the question is the
        control. It was an eyebrow, a heading and a separate "Open the line
        settings · Show / hide" button, three lines for one toggle. */
-    <section id="advanced-controls" className="weather-panel p-5" aria-label="Line settings">
+    <section id="advanced-controls" className="weather-panel p-5 max-sm:px-0" aria-label="Line settings">
       {/* Kept as a JS collapsible rather than a native `<details>`, on
           purpose: `ThresholdsPanel` restores a saved draft into the URL from
           a mount effect, and a `<details>` mounts its content whether or not
@@ -50,7 +52,13 @@ export const AdvancedThresholdsSection = ({
           type="button"
           className="group weather-focus-ring flex min-h-[44px] w-full cursor-pointer select-none items-center justify-between gap-3 text-left text-base font-semibold text-slate-100"
         >
-          <span>What would the call be with different lines?</span>
+          {/* "Conditions", not "the call": the retired word did three jobs
+              (lib/report/AGENTS.md). The answer is the lines in force, in the
+              words the panel's own defaults line uses. */}
+          <InstrumentQuestion
+            question="What would conditions be with different lines?"
+            answer={`Set at ${formatChangeLines(currentThresholds)}`}
+          />
           <span aria-hidden="true" className="text-[color:var(--app-text-muted)] transition-transform group-data-[panel-open]:rotate-180">
             ▾
           </span>

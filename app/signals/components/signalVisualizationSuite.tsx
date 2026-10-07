@@ -246,8 +246,17 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
     <div id="visual-diagnostics" className="min-w-0 space-y-4">
       <div className="rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
 
-        <div className="mt-3 border-b border-slate-800/80 pb-3 text-xs text-slate-300">
-          Latest: {treasury.record_date} · {treasury.isLive ? "Live reading" : "Last saved reading"}
+        {/* This week's four rates, then what the charts are. The line said
+            "Latest: Oct 5" over charts whose last point was the Aug 31
+            month-end, and printed no rate; the closed summary quotes this
+            week's 1-month rate, so the panel it opens prints it too. */}
+        <div className="mt-3 space-y-1 border-b border-slate-800/80 pb-3 text-xs">
+          <p className="tabular-nums text-slate-300">
+            Latest: {treasury.record_date} · {treasury.isLive ? "Live reading" : "Last saved reading"} · 1M{" "}
+            {formatPercent(treasury.yields.oneMonth)} · 3M {formatPercent(treasury.yields.threeMonth ?? null)} · 2Y{" "}
+            {formatPercent(treasury.yields.twoYear)} · 10Y {formatPercent(treasury.yields.tenYear)}
+          </p>
+          <p className="text-slate-400">The charts plot month-end readings.</p>
         </div>
 
         {/* Five panels labelled entirely in maturities and spreads. The key goes

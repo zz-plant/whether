@@ -1,6 +1,8 @@
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 import { CurveTermsKey } from "./curveTermsKey";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
+import { InstrumentQuestion } from "./instrumentQuestion";
+import { describeInversionSummary } from "../../../lib/report/evidenceInstrumentSummaries";
 
 type YieldCurvePoint = {
   year: number;
@@ -104,7 +106,17 @@ export function SignalInversionPreview({
 
   return (
     <details id="curve-context" className={className}>
-      <summary className={summaryClassName}>Has the yield curve inverted in the last year?</summary>
+      {/* The answer from the counts the caption under the chart prints. */}
+      <summary className={summaryClassName}>
+        <InstrumentQuestion
+          question="Has the yield curve inverted in the last year?"
+          answer={describeInversionSummary({
+            months: monthlyPoints.length,
+            inverted10Y2Y: monthsInverted10Y2Y,
+            inverted2Y3M: monthsInverted2Y3M,
+          })}
+        />
+      </summary>
       <div className="space-y-4">
         {/* The chart is labelled in bond-desk shorthand. This says what it is
             before the reader has to decode the axes. */}
