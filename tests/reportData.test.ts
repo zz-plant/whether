@@ -460,6 +460,22 @@ describe("buildFlipThreshold", () => {
       },
     }) as ReturnType<typeof evaluateRegime>;
 
+  it("states one score's half alone for a page about that score", () => {
+    const reading = {
+      regime: "SCARCITY" as const,
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores: { tightness: 90, riskAppetite: 48 },
+    };
+    /* The answer pages said "Trigger tighter mode if funding pressure rises
+       above 70" on a Freezing week already at 90; the line out is the other way. */
+    assert.equal(buildFlipThreshold(reading, "tightness"), "Funding pressure falls 20 pts to 70 or below (90 today).");
+    assert.equal(buildFlipThreshold(reading, "riskAppetite"), "Risk appetite rises 2 pts to clear 50 (48 today).");
+    assert.equal(
+      buildFlipThreshold(reading),
+      "Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).",
+    );
+  });
+
   it("returns a future crossing for scarcity regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("SCARCITY"));
     // One sentence, both boundaries, each carrying its live reading.

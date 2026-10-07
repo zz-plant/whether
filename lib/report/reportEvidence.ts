@@ -134,11 +134,15 @@ export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof 
  * opens with the minutes, not the radar. The boundary and the live reading
  * stay, because the archive and the embed cite them.
  */
-export const buildFlipThreshold = (assessment: {
-  regime: RegimeKey;
-  thresholds: Pick<ReturnType<typeof evaluateRegime>["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
-  scores: { tightness: number; riskAppetite: number };
-}): string => {
+export const buildFlipThreshold = (
+  assessment: {
+    regime: RegimeKey;
+    thresholds: Pick<ReturnType<typeof evaluateRegime>["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
+    scores: { tightness: number; riskAppetite: number };
+  },
+  /** One score's half alone, for a page about the decisions that score rules. */
+  only?: "tightness" | "riskAppetite",
+): string => {
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   const tightnessNow = assessment.scores?.tightness;
@@ -187,8 +191,12 @@ export const buildFlipThreshold = (assessment: {
     assessment.regime === "SCARCITY" || assessment.regime === "VOLATILE" ? "riseAbove" : "fallToOrBelow";
 
   const conditions = [
-    conditionText({ label: regimeSignalLabel.tightness, now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection }),
-    conditionText({ label: regimeSignalLabel.riskAppetite, now: riskNow, threshold: riskThreshold, direction: riskDirection }),
+    ...(only === "riskAppetite"
+      ? []
+      : [conditionText({ label: regimeSignalLabel.tightness, now: tightnessNow, threshold: tightnessThreshold, direction: tightnessDirection })]),
+    ...(only === "tightness"
+      ? []
+      : [conditionText({ label: regimeSignalLabel.riskAppetite, now: riskNow, threshold: riskThreshold, direction: riskDirection })]),
   ];
 
   // Stable sort: a crossed boundary leads, otherwise the declared order holds.

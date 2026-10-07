@@ -53,10 +53,11 @@ export function buildBriefMarkdown(homepage: HomePage): string {
   const decisions = actionItems
     .map((item) =>
       [
+        /* A dash, not parentheses: a line the reading already meets carries
+           "(already true at 90)", which nested inside them. */
         `- ${item.areaActionNow}`,
-        ` (${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(item.triggerThreshold)} · ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.reversalCondition)}`,
+        ` — ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(item.triggerThreshold)} · ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.reversalCondition)}`,
         ...(item.latencyLine ? [` · ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
-        ")",
       ].join(""),
     )
     .join("\n");

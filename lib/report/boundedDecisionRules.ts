@@ -1,6 +1,6 @@
 import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { RegimeKey } from "../regimeEngine";
-import { formatThresholdNumber } from "../formatters";
+import { formatScoreValue, formatThresholdNumber } from "../formatters";
 import { decisionLatencyByArea, type DecisionLatency } from "./decisionLatency";
 import {
   extractCompactClause as extractCompactClauseFromFormatting,
@@ -127,10 +127,26 @@ export const isRuleConditionMet = (condition: RuleCondition, current: number): b
  * The one sentence form of a condition. A rising line reads "rises above", a
  * falling one "falls below"; a resume line on risk appetite reads "is above"
  * because that side of the rule is a state to hold, not a move to watch.
+ *
+ * A line the reading already meets says so, the way the change line does
+ * ("is above 76 (already true at 90)"). Until 2026-10-07 every line read as a
+ * move still to come, so a week at 90 was told to pause "if funding pressure
+ * rises above 76" on every surface that prints the rule, beside a table
+ * marking the same line crossed.
  */
-const describeRuleCondition = (condition: RuleCondition, side: "pause" | "resume"): string => {
+const describeRuleCondition = (
+  condition: RuleCondition,
+  side: "pause" | "resume",
+  scores?: { tightness: number; riskAppetite: number },
+): string => {
   const metric = ruleMetricLabel[condition.metric].toLowerCase();
   const value = formatThresholdNumber(condition.value);
+  const current = scores?.[condition.metric];
+  if (current !== undefined && isRuleConditionMet(condition, current)) {
+    const state =
+      condition.operator === ">" ? "is above" : condition.operator === ">=" ? "is at or above" : condition.operator === "<" ? "is below" : "is at or below";
+    return `${metric} ${state} ${value} (already true at ${formatScoreValue(current)})`;
+  }
   switch (condition.operator) {
     case ">":
       return side === "resume" && condition.metric === "riskAppetite"
@@ -146,9 +162,13 @@ const describeRuleCondition = (condition: RuleCondition, side: "pause" | "resume
 };
 
 /** The sentence every surface prints for a clause, derived from its data. */
-const formatRuleClause = (clause: BoundedRuleClause, side: "pause" | "resume"): string => {
+const formatRuleClause = (
+  clause: BoundedRuleClause,
+  side: "pause" | "resume",
+  scores?: { tightness: number; riskAppetite: number },
+): string => {
   const parts = [
-    ...clause.conditions.map((condition) => describeRuleCondition(condition, side)),
+    ...clause.conditions.map((condition) => describeRuleCondition(condition, side, scores)),
     ...(clause.qualifier ? [clause.qualifier] : []),
   ];
   if (parts.length === 0) return `${clause.verb}.`;
@@ -158,11 +178,12 @@ const formatRuleClause = (clause: BoundedRuleClause, side: "pause" | "resume"): 
 
 const withDerivedTriggers = (
   rule: Omit<BoundedDecisionRule, "pauseTrigger" | "resumeTrigger" | "flipConditions" | "latency">,
+  scores: { tightness: number; riskAppetite: number },
 ): BoundedDecisionRule => ({
   ...rule,
   latency: decisionLatencyByArea[rule.area],
-  pauseTrigger: formatRuleClause(rule.pause, "pause"),
-  resumeTrigger: formatRuleClause(rule.resume, "resume"),
+  pauseTrigger: formatRuleClause(rule.pause, "pause", scores),
+  resumeTrigger: formatRuleClause(rule.resume, "resume", scores),
   flipConditions: rule.resume.conditions,
 });
 
@@ -403,7 +424,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
     },
   };
 
-  return areaOrder.map((area) => withDerivedTriggers(rulesByArea[area]));
+  return areaOrder.map((area) => withDerivedTriggers(rulesByArea[area], scores));
 };
 
 /**

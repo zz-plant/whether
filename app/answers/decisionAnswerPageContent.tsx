@@ -22,6 +22,7 @@ import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
+import { buildFlipThreshold } from "../../lib/report/reportEvidence";
 import { buildDecisionAnswerContextSummary } from "./decisionAnswerCopy";
 import {
   DATA_CURRENCY_ACTION,
@@ -158,15 +159,15 @@ export async function DecisionAnswerPageContent({
    */
   const headings = buildAnswerSectionHeadings(page);
 
-  /* The third branch was the one written in the engine's terms — "risk appetite <
-     50 or tightness > 70" — with an operator the other two spell out and a name
-     no other surface uses for that score. */
-  const thresholdTrigger =
-    page.thresholdFocus === "tightness"
-      ? `Trigger tighter mode if funding pressure rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`
-      : page.thresholdFocus === "risk"
-        ? `Trigger tighter mode if risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}.`
-        : `Trigger tighter mode if risk appetite falls below ${assessment.thresholds.riskAppetiteRegime.toFixed(0)}, or funding pressure rises above ${assessment.thresholds.tightnessRegime.toFixed(0)}.`;
+  /* The brief's own change line, for the score this page is about, in the
+     direction that leaves this week's conditions. It was "Trigger tighter mode
+     if risk appetite falls below 50, or funding pressure rises above 70" in
+     every regime, so a Freezing week, already past both, was told to watch for
+     them. */
+  const thresholdTrigger = `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildFlipThreshold(
+    assessment,
+    page.thresholdFocus === "tightness" ? "tightness" : page.thresholdFocus === "risk" ? "riskAppetite" : undefined,
+  )}`;
 
   const compositeReadings: Array<{ key: CompositeSignalKey; score: number; line: number }> = [
     { key: "tightness", score: Math.round(assessment.scores.tightness), line: assessment.thresholds.tightnessRegime },
