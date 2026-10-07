@@ -1,5 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   blockCommentLines,
   isUnsafeAssertion,
@@ -111,5 +115,74 @@ describe("prose inside an edited doc comment", () => {
 
     assert.equal(isUnsafeAssertion(editedLine), true, "the line alone is indistinguishable");
     assert.ok(blockCommentLines(file).has(2), "but the file says line 2 is a comment");
+  });
+});
+
+/*
+ * With a named head the diff's new side is that commit, so comment context has to come
+ * from the same commit: a line that is a comment on disk must not excuse an assertion the
+ * pushed commit carries. Run against a real repository, because the branch under test is
+ * `git show <head>:<file>`.
+ */
+describe("comment context with a named head", () => {
+  const SCRIPT = join(process.cwd(), "scripts", "review-hotspot-preflight.mjs");
+
+  /* Git hands a hook GIT_DIR and friends, and every git below would run against the
+     pushing repository instead of this scaffold (CLAUDE.md, the pre-push hook). */
+  const gitFreeEnv = () => {
+    const env = { ...process.env };
+    for (const key of Object.keys(env)) if (key.startsWith("GIT_")) delete env[key];
+    return env;
+  };
+
+  const scaffold = () => {
+    const repository = mkdtempSync(join(tmpdir(), "hotspot-head-"));
+    const env = gitFreeEnv();
+    const git = (...args: string[]) => {
+      const run = spawnSync("git", args, { cwd: repository, encoding: "utf8", env });
+      assert.equal(run.status, 0, `git ${args.join(" ")}: ${run.stderr}`);
+      return run.stdout.trim();
+    };
+    git("init", "--quiet");
+    git("config", "user.email", "test@example.com");
+    git("config", "user.name", "test");
+    writeFileSync(join(repository, "lib.ts"), "const a = 1;\n");
+    git("add", "lib.ts");
+    git("commit", "--quiet", "-m", "base");
+    const base = git("rev-parse", "HEAD");
+    writeFileSync(join(repository, "lib.ts"), "const v = input as Foo;\n");
+    git("commit", "--quiet", "-am", "head");
+    const head = git("rev-parse", "HEAD");
+    // On disk, line 1 is a comment; in the head commit, line 1 is the assertion.
+    writeFileSync(join(repository, "lib.ts"), "// line one is a comment on disk\n");
+    const preflight = (...args: string[]) =>
+      spawnSync(process.execPath, [SCRIPT, ...args], { cwd: repository, encoding: "utf8", env });
+    return { repository, base, head, preflight };
+  };
+
+  it("reads comment lines from the head commit, so a pushed assertion is not excused by the disk", () => {
+    const { repository, base, head, preflight } = scaffold();
+    try {
+      const run = preflight("--base", base, "--head", head);
+      const output = `${run.stdout}${run.stderr}`;
+      assert.equal(run.status, 1, output);
+      assert.match(output, /Unsafe assertion additions: 1/);
+      assert.ok(output.includes("lib.ts: const v = input as Foo;"), output);
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
+  });
+
+  it("still reads the working tree when no head is named", () => {
+    const { repository, base, preflight } = scaffold();
+    try {
+      const run = preflight("--base", base);
+      const output = `${run.stdout}${run.stderr}`;
+      assert.equal(run.status, 0, output);
+      assert.match(output, /working tree against/);
+      assert.match(output, /Unsafe assertion additions: 0/);
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
   });
 });
