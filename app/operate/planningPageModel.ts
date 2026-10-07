@@ -141,10 +141,10 @@ export async function buildPlanningPageModel(
   const financeSummary =
     financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
   const resourcesSummary = `${resourcePillarPages.length} operating guides and ${operationsResourceLibrary.length} templates you can fill in and share.`;
-  const shareSummary = `Copy this week's brief as ${listOf(
+  const shareSummary = `Copy this week's brief in one of ${BRIEF_FORMATS.length} formats, ready to paste: ${listOf(
     BRIEF_FORMATS.map((format) => format.label),
     "disjunction",
-  )} text, ready to paste.`;
+  )}.`;
   /* Freshness and confidence, once, under the h1 before anything asks the
      reader to act. The shell draws it in the intro (DD-040). */
   const trustStrip = {

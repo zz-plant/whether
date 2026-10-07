@@ -86,7 +86,7 @@ describe("/operate opening", () => {
       "the finance step's line is a regime's runway target",
     );
     // The four formats the step copies.
-    assert.equal(description("ops-export-briefs"), "Copy this week's brief as Slack, Slide, Citation or Agenda text, ready to paste.");
+    assert.equal(description("ops-export-briefs"), "Copy this week's brief in one of 4 formats, ready to paste: Slack, Slide, Citation or Agenda.");
 
     for (const retired of [
       "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",
