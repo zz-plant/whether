@@ -9,7 +9,7 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 
 | Routine | ID | Cadence (UTC) | Produces |
 | --- | --- | --- | --- |
-| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json`, `time_machine_cache.json`, `confidence_record_months.json` (the scripts write all five; see below on the prompt) |
+| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json`, `time_machine_cache.json`, `confidence_record_months.json`, `weekly_summaries_2018_2026.json`, `summary_memory_rail_weekly.json` (see below on the prompt) |
 | Whether — weekly brief freeze | `trig_01WrbhhT73Ve4bsFK83UNyu9` | Thu 13:00 | current week appended to `data/published_briefs.json` |
 | Whether — claims read-through (Tue, after the Monday send) | `trig_011EVxtoaiNMXk6CnKUPdfnZ` | Tue 02:13 | nothing committed: a read-only report, pushed to the owner's phone, comparing each claim in `docs/claims-ledger.md` across the live surfaces, and whether the weekly and month-end comparison bases are current |
 
@@ -93,9 +93,13 @@ prompt said "Commit only those three data files". The cache is what the live wee
 last week's brief cannot be used, so even a refresh that landed would have left it behind; the manual
 August refresh (`ad6a8c9a`) was the last commit to carry it. With the three rejected Mondays on top,
 the live week of 2026-10-05 compared itself with Aug 31, five weeks back. The archive was refreshed
-through Sep 30 by hand the same day. The prompt can only be edited by its owner (the routine was
-created through the HTTP API, and an agent may edit only routines it created): steps 5 and 7 and the
-last line should name all five files. The claims read-through was first scheduled Monday 15:47 UTC,
+through Sep 30 by hand the same day. The routine also never ran `generateWeeklySummaries.ts`, so the
+weekly archive stopped at Sep 11 (last refreshed by hand on 2026-09-14), and once the month-ends
+moved past it `tests/regimeArchiveReplay.test.ts` failed on the count of replayable weeks, which
+would block the routine's own push at the pre-push gate. The prompt can only be edited by its owner
+(the routine was created through the HTTP API, and an agent may edit only routines it created): it
+should run the weekly generator between the monthly and quarterly ones, verify with
+`regimeArchiveReplay.test.ts` too, and commit all seven files. The claims read-through was first scheduled Monday 15:47 UTC,
 inside the window this section describes, and moved to Tuesday 02:13 UTC the same day; it now also
 checks that the month-end archive is current.
 

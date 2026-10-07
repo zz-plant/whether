@@ -1,18 +1,18 @@
 [
   {
-    "record_date": "2026-08-21",
-    "regime": "EXPANSION"
-  },
-  {
-    "record_date": "2026-08-28",
-    "regime": "EXPANSION"
-  },
-  {
-    "record_date": "2026-09-04",
-    "regime": "EXPANSION"
-  },
-  {
     "record_date": "2026-09-11",
+    "regime": "DEFENSIVE"
+  },
+  {
+    "record_date": "2026-09-18",
+    "regime": "DEFENSIVE"
+  },
+  {
+    "record_date": "2026-09-25",
+    "regime": "DEFENSIVE"
+  },
+  {
+    "record_date": "2026-10-02",
     "regime": "DEFENSIVE"
   }
 ]
