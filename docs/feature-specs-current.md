@@ -3149,3 +3149,23 @@ The read in §1.1.49 went on to the other surfaces that assemble sentences from 
   Open" under Freezing). A replayed month's caption is its move against the earlier month-end, not
   "This week's guidance …", and a held week's "Pause if" reads as a condition: "The decision can't
   be undone while the guidance is held."
+- **Charts that draw the month-end archive** (`/signals`, `/history`). Rate moves are "Biggest
+  monthly rate moves", dated by month in whole basis points; the weekly cadence option, which redrew
+  month-end points under day labels, is gone. The recession warning gauge ribbon draws 10Y−2Y (it
+  drew an unnamed blend, so it read 0.42 beside the row's 0.41pp) and every spread on `/signals` is
+  in pp. A "12-month" change is measured across 13 month-ends, where 12 points spanned 11 months
+  (risk appetite "fell 6" was a fall of 10). "Earlier months" names its own range; the phase map's
+  count is "Months under each set of conditions" and says how many plotted months sit in another
+  quadrant. Cluster and answer pages name the reading they compare against ("since Aug 31", not
+  "Week over week" or "last week") and take their direction word from the two scores.
+- **Frozen records and archive periods.** `/brief/[week]` shows its stored record through one
+  translation layer (`publishedBriefDisplay`) that the page, the feed and both copy formats read;
+  the records are not rewritten. Each move names the reading it is measured against — the record's
+  stored `scores.comparedWith`, or the frozen week before it — where w40 printed "+27.0 vs prior
+  week" against an Aug 31 reading five weeks earlier; future records store the comparison. Retired
+  names and phrasing ("cash availability", "flips this call", "70.0") are restated in today's words,
+  and a stored "Pause if" with no number is left out. `/history/[period]` pages are headlined with
+  the conditions most of the period's readings held (a tie goes to the close), where 2022-Q3 read
+  "Stormy" over a split that was 9 of 14 weeks Freezing; "held for the whole period" prints only
+  when it is true. Periods ending before the record's first month-end are not generated, and their
+  URLs redirect to `/history` (`next.config.js`).
