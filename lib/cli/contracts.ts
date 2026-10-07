@@ -208,20 +208,26 @@ export const buildCliStatusContract = ({ reportData, postureState, degraded }: {
   };
 };
 
-export const buildCliStatusExpandedContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusExpandedContract => ({
-  ...buildCliStatusContract({ reportData, postureState, degraded }),
-  view: "expanded",
-  boundedDecision: {
-    guardrailThreshold: reportData.stopItems[0] ?? "Keep current approvals staged.",
-    reversalTrigger: postureState.whatFlipsNext.thresholds[0] ?? "Re-open risk only after threshold pressure eases.",
-    flipConditionsCompact: postureState.whatFlipsNext.thresholds.slice(0, 3),
-    topDeltas: reportData.reportDynamics.changedSignals.slice(0, 3).map((signal) => ({
-      metric: metricLabel[signal.key],
-      delta: Number(signal.delta.toFixed(2)),
-      direction: signal.delta >= 0 ? ("up" as const) : ("down" as const),
-    })),
-  },
-});
+export const buildCliStatusExpandedContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliStatusExpandedContract => {
+  const status = buildCliStatusContract({ reportData, postureState, degraded });
+  return {
+    ...status,
+    view: "expanded",
+    boundedDecision: {
+      guardrailThreshold: reportData.stopItems[0] ?? "Keep current approvals staged.",
+      /* What would change the guidance, from its one builder (`buildWeekCallChangesIf`, via
+         the posture state), and the status view's own conditions. Both read the raw lines
+         until 2026-10-07, which on a held week are not what changes the guidance. */
+      reversalTrigger: postureState.whatFlipsNext.flipTrigger,
+      flipConditionsCompact: status.call.flipConditions.slice(0, 3),
+      topDeltas: reportData.reportDynamics.changedSignals.slice(0, 3).map((signal) => ({
+        metric: metricLabel[signal.key],
+        delta: Number(signal.delta.toFixed(2)),
+        direction: signal.delta >= 0 ? ("up" as const) : ("down" as const),
+      })),
+    },
+  };
+};
 
 export const buildCliCallContract = ({ reportData, postureState, degraded }: { reportData: ReportData; postureState: PostureStateContract; degraded: boolean }): CliCallContract => ({
   version: "v1",

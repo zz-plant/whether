@@ -9,6 +9,8 @@ import SharePage from "../app/share/page";
 import { SharePageFormats } from "../app/share/sharePageFormats";
 import { buildAgentState } from "../lib/agentState";
 import { loadAgentInterfaceContext } from "../lib/agentInterface";
+import { buildCliStatusExpandedContract } from "../lib/cli/contracts";
+import { formatConditionsChangeLine } from "../lib/summary/summaryFormatting";
 import { formatGuidance } from "../lib/export/briefBuilders";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
@@ -18,7 +20,7 @@ import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore
 import type { OperatingSnapshot } from "../lib/operatingState/types";
 import { getRegimePublicLabel, REGIME_SEVERITY_RANK } from "../lib/regimePresentation";
 import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
-import { buildChangedLead } from "../lib/report/decisionMovement";
+import { buildChangedLead, buildQuietDayRead } from "../lib/report/decisionMovement";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { buildHomeQuietDayRead } from "../lib/report/home/homeSectionModel";
 import { describeWeeklyMemoLead } from "../lib/report/homeBrief/decisionNarrative";
@@ -173,7 +175,13 @@ const renderWeek = async (treasury: TreasuryData, readings: MacroSeriesReading[]
     markdown: buildBriefMarkdown(home),
     embedText: buildBriefEmbedText(embed),
     card: buildBriefImagePayload(home),
-    agent: buildAgentState(await loadAgentInterfaceContext("claim-parity")),
+    ...(await (async () => {
+      const context = await loadAgentInterfaceContext("claim-parity");
+      return {
+        agent: buildAgentState(context),
+        cli: buildCliStatusExpandedContract({ reportData: context.reportData, postureState: context.postureState, degraded: false }),
+      };
+    })()),
     memo: buildDecisionMemo(home),
     standup: share.options.flatMap((option) => (option.id === "standup" && option.kind === "text" ? [option.text] : []))[0] ?? "",
     quietDay: buildHomeQuietDayRead(home, { historical: false }),
@@ -350,11 +358,15 @@ describe("one week, one set of claims, every surface", () => {
       });
 
       it("says what would change the guidance through one builder", async () => {
-        const { reportData, home, document, markdown, embedText, agent, memo, standup, quietDay, record, slack, email } =
+        const { reportData, home, document, markdown, embedText, agent, cli, memo, standup, quietDay, record, slack, email } =
           await render(week);
         const { assessment } = reportData;
         const { callChangesIf } = home.weeklyCall;
         const label = "Conditions change if";
+        /* The CLI's expanded view and the archive summaries' line read the raw lines until
+           2026-10-07, so a held week named a line beside the hold. */
+        assert.equal(cli.boundedDecision.reversalTrigger, callChangesIf, "the CLI's expanded view");
+        assert.equal(formatConditionsChangeLine(assessment), `${label}: ${callChangesIf}`, "the summaries' change line");
 
         assert.equal(callChangesIf, buildWeekCallChangesIf(assessment), "the contract states the claim's builder");
         assert.equal(document.slots.callChangesIf, callChangesIf, "the brief document every paste renders");
@@ -382,10 +394,18 @@ describe("one week, one set of claims, every surface", () => {
         if (week.held) {
           assert.equal(callChangeLine, `${label}: ${callChangesIf}`);
           assert.deepEqual(agent.guidance.flipConditions, [callChangesIf], "the agent state");
-          /* The quiet-day line, and the lead it closes. */
-          assert.equal(quietDay, `${label}: ${callChangesIf}`, "the homepage quiet-day line");
-          const lead = buildChangedLead({ movement: decision.decisionMovement, quietDayLine: quietDay, fallback: "unused" });
-          assert.ok(lead.endsWith(` ${label}: ${callChangesIf}`), "the homepage's what-changed lead");
+          /* The quiet-day line, and the lead it closes. The page prints it only on a
+             week whose guidance held against the comparison reading, which turns on
+             the bundled month-end: this fixture held against Aug 31 and changed
+             against Sep 30 (2026-10-07). Whenever it prints, it is the hold's
+             condition. */
+          const heldLine = buildQuietDayRead({ guidanceChange: "held", weeklyCall: home.weeklyCall, assessment });
+          assert.equal(heldLine, `${label}: ${callChangesIf}`, "the quiet-day line on a week that held");
+          assert.ok(quietDay === null || quietDay === heldLine, `the homepage quiet-day line: ${quietDay}`);
+          if (quietDay !== null) {
+            const lead = buildChangedLead({ movement: decision.decisionMovement, quietDayLine: quietDay, fallback: "unused" });
+            assert.ok(lead.endsWith(` ${label}: ${callChangesIf}`), "the homepage's what-changed lead");
+          }
           /* No surface says what moves the conditions in place of the hold. */
           assert.deepEqual(buildFlipProximity(assessment), [], "the homepage's interest-rate terms");
           const lines = buildFlipThreshold(assessment);

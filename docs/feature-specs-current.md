@@ -2520,6 +2520,17 @@ API decision. The Monday sends print no comparison date, because the snapshot th
 reading; the test holds that as an absence. On the held week the Monday post's section reaches Slack's limit
 before its "Why this could be wrong" block.
 
+The last four places that printed "Conditions change if" from the raw lines read `buildWeekCallChangesIf`
+too: the archive summaries' change line (`formatConditionsChangeLine`), the regime-change alert's reversal
+line, the answer pages' trigger (still for the score the page is about), and the CLI's expanded view
+(`reversalTrigger`, `flipConditionsCompact`). On a held week each named a line beside a hold.
+
+A frozen record names the engine that scored it only when this engine reproduces its scores from the record's
+own inputs, the check that already decides whether the inputs are kept; it named `ENGINE_VERSION` on every
+record, though the scores can come from an operating snapshot an earlier deploy stored. The report loader and
+the operating snapshot choose the comparison reading through one rule (`selectWeekComparison`,
+`monthEndComparisonReading`, `lib/report/weekComparison.ts`).
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

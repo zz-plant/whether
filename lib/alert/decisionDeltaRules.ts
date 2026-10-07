@@ -8,7 +8,7 @@ import {
   type RuleConditionMetric,
 } from "../report/boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { buildFlipThreshold } from "../report/reportEvidence";
+import { buildWeekCallChangesIf } from "../report/reportEvidence";
 
 type DecisionArea = "posture" | "hiring" | "spend" | "risk";
 type ConfidenceLevel = RegimeAssessment["diagnostics"]["confidence"];
@@ -137,7 +137,8 @@ export const buildDecisionDeltaRules = (
          0.00". `reversal` names both lines with their numbers. */
       thresholdLabel: "The change line",
       thresholdValue: 0,
-      reversal: `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildFlipThreshold(current)}`,
+      /* The hold's condition on a held reading, as every other surface says it. */
+      reversal: `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildWeekCallChangesIf(current)}`,
       metricValue: 0,
       crossed: true,
       direction: "up",
