@@ -24,6 +24,16 @@ describe("weekly email readings", () => {
     assert.match(readings[1].meaning ?? "", /^investors are /);
   });
 
+  it("counts one point as a point", () => {
+    const readings = buildWeeklyEmailReadings({
+      readings: { scores: { tightness: 71, riskAppetite: 48 }, vsThreshold: { tightness: 1, riskAppetite: -2 } },
+      confidence: "MED",
+    });
+
+    assert.equal(readings[0].distance?.label, "1 point above the line where conditions change");
+    assert.equal(readings[1].distance?.label, "2 points below the line where conditions change");
+  });
+
   it("sends nothing numeric without a snapshot rather than inventing a reading", () => {
     assert.deepEqual(buildWeeklyEmailReadings(undefined), []);
   });

@@ -8,7 +8,8 @@ const conditions = (over: Partial<AlertConditions> = {}): AlertConditions => ({
   regime: "DEFENSIVE",
   tightness: 78,
   riskAppetite: 42,
-  posture: "Stage approvals",
+  actionNow: "Stage approvals",
+  callChangesIf: "Funding pressure falls 8 pts to 70 or below (78 today).",
   recordDate: "2026-08-18",
   ...over,
 });
@@ -88,5 +89,20 @@ describe("alert email copy", () => {
     const sentiment = thresholdCrossingEmail(riskChange, 42, null);
     assert.match(sentiment.subject, /Risk appetite crossed the line where conditions change \(50\)/);
     assert.ok(!/investor appetite/i.test(sentiment.text));
+  });
+
+  /* "Funding pressure is 90.0; the pause line is 76." and "90.0 / 76": every
+     other surface prints a score in whole points. */
+  it("prints the score in whole points, as the brief does", () => {
+    const [tightnessPause] = publishedScoreLines();
+    const mail = thresholdCrossingEmail(tightnessPause, 90, null);
+    assert.match(mail.text, /^Funding pressure is 90; the pause line is 76\.$/m);
+    assert.match(mail.html, />90 \/ 76</);
+    assert.doesNotMatch(mail.text + mail.html, /\b90\.0\b/);
+
+    const [decision] = evaluateAlert(conditions({ tightness: 90 }), lastKnown({ tightness: 63 })).filter(
+      (d) => d.type === "threshold",
+    );
+    assert.equal(decision?.headline, "Funding pressure crossed 76 (now 90)");
   });
 });

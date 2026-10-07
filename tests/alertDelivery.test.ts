@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
-import { deliverAlerts, deliverAlertToSubscriber } from "../lib/alert/alertDelivery";
+import { deliverAlerts, deliverAlertToSubscriber, runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
+import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
+import { macroSeries } from "../lib/macroSnapshot";
+import { snapshotData } from "../lib/snapshot";
 import { resetSubscriberStore, type SubscriberStore } from "../lib/email/subscriberStore";
 import type { EmailDeliveryAdapter } from "../lib/email/emailDelivery";
 import type { AlertDecision } from "../lib/alert/alertEvaluator";
@@ -44,9 +47,12 @@ const CONDITIONS = {
   regime: "VOLATILE",
   tightness: 60,
   riskAppetite: 40,
-  posture: "Hold irreversible moves until conditions resolve.",
+  actionNow: "Hold irreversible moves until conditions resolve.",
+  callChangesIf: "Funding pressure rises 10 pts to clear 70 (60 today) or risk appetite rises 10 pts to clear 50 (40 today).",
   recordDate: "2026-08-22",
 };
+
+const escapeRegExp = (value: string) => value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
 
 let store: SubscriberStore;
 let kv: FakeKv;
@@ -175,6 +181,24 @@ describe("alert mail", () => {
     assert.match(sends[0].text, /\/api\/email\/unsubscribe\?token=token-123/);
   });
 
+  /*
+   * The regime-change letter printed the assessment's description ("Capital is
+   * expensive…") under "Action now" and "The readings return to the previous
+   * conditions for two updates in a row." under "Conditions change if" — on
+   * Oct 5 risk appetite clearing 50 alone moved Freezing to Cloudy, not back.
+   * Both slots carry the week's guidance, from the contract the brief prints.
+   */
+  it("states the week's action and change line under the brief's labels", async () => {
+    const { adapter, sends } = recordingAdapter();
+
+    await deliverAlertToSubscriber("operator@example.com", REGIME_CHANGE, CONDITIONS, adapter, null);
+
+    assert.match(sends[0].text, new RegExp(`^Action now: ${escapeRegExp(CONDITIONS.actionNow)}$`, "m"));
+    assert.match(sends[0].text, new RegExp(`^Conditions change if: ${escapeRegExp(CONDITIONS.callChangesIf)}$`, "m"));
+    assert.ok(sends[0].html.includes(CONDITIONS.callChangesIf));
+    assert.doesNotMatch(sends[0].text + sends[0].html, /return to the previous conditions/);
+  });
+
   it("omits the link rather than sending a broken one when there is no token", async () => {
     const { adapter, sends } = recordingAdapter();
 
@@ -189,5 +213,25 @@ describe("alert mail", () => {
     assert.equal(sends.length, 1);
     assert.doesNotMatch(sends[0].html, /unsubscribe/i);
     assert.doesNotMatch(sends[0].text, /unsubscribe/i);
+  });
+});
+
+describe("the scheduled alert run", () => {
+  it("mails the guidance the snapshot publishes, not the assessment's description", async () => {
+    await subscribeVerified("operator@example.com", { alerts: true });
+    const snapshot = buildOperatingSnapshot({ treasury: snapshotData, macroSeries, now: new Date("2026-08-31T12:00:00.000Z") });
+    const texts: string[] = [];
+    Object.assign(globalThis, { EMAIL: { send: async (message: { text: string }) => { texts.push(message.text); } } });
+    try {
+      const result = await runScheduledAlertDelivery({ snapshot });
+      assert.equal(result.sent, 1, "a first run with no state is a regime change");
+    } finally {
+      Reflect.deleteProperty(globalThis, "EMAIL");
+    }
+
+    assert.match(texts[0], new RegExp(`^Action now: ${escapeRegExp(snapshot.weeklyCall.actionNow)}$`, "m"));
+    assert.match(texts[0], new RegExp(`^Conditions change if: ${escapeRegExp(snapshot.weeklyCall.callChangesIf)}$`, "m"));
+    assert.ok(snapshot.assessment.description.length > 0);
+    assert.ok(!texts[0].includes(snapshot.assessment.description), "the description is not an action");
   });
 });

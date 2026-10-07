@@ -4,6 +4,7 @@ import { sharedDecisionLines } from "../report/boundedDecisionRules";
 import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../regimeEngineCore";
 import type { FlashMove } from "./flashMoves";
 import { regimeSignalLabel } from "../report/signalTranslations";
+import { formatScoreValue } from "../formatters";
 
 type RolePreset = "CFO" | "COO" | "CTO" | "CPO";
 
@@ -11,7 +12,14 @@ export type AlertConditions = {
   regime: string;
   tightness: number;
   riskAppetite: number;
-  posture: string;
+  /**
+   * The weekly call's do-now line, as the brief prints it under "Action now".
+   * This was `posture`, filled with the assessment's description ("Capital is
+   * expensive…"), and the regime-change letter printed that under "Action now".
+   */
+  actionNow: string;
+  /** The brief's "Conditions change if" sentence for this reading. */
+  callChangesIf: string;
   recordDate: string;
   /** Raw-input moves since the previous read that clear a flash threshold (`flashMoves.ts`). */
   flashMoves?: FlashMove[];
@@ -126,7 +134,8 @@ const buildThresholdDecision = (line: PublishedLine, score: number): AlertDecisi
   return {
     type: "threshold",
     severity: line.kind === "resume" ? "info" : "warning",
-    headline: `${label} crossed ${line.value} (now ${score.toFixed(1)})`,
+    /* Whole points, as every page prints a score; "(now 90.0)" was a precision the scores never had. */
+    headline: `${label} crossed ${line.value} (now ${formatScoreValue(score)})`,
     metric,
     line,
     department: metric === "credit" ? "Finance" : "Operations",

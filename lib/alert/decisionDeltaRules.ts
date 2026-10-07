@@ -1,5 +1,14 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
+import {
+  buildCanonicalBoundedDecisionRules,
+  decisionAreaLabel,
+  isRuleConditionMet,
+  type RuleCondition,
+  type RuleConditionMetric,
+} from "../report/boundedDecisionRules";
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { buildFlipThreshold } from "../report/reportEvidence";
 
 type DecisionArea = "posture" | "hiring" | "spend" | "risk";
 type ConfidenceLevel = RegimeAssessment["diagnostics"]["confidence"];
@@ -28,65 +37,91 @@ const MIN_ALERT_CONFIDENCE: ConfidenceLevel = "MEDIUM";
 const isConfidenceBelowMinimum = (confidence: ConfidenceLevel) =>
   confidenceRank[confidence] < confidenceRank[MIN_ALERT_CONFIDENCE];
 
-const crossedAbove = (previous: number, current: number, threshold: number) =>
-  previous <= threshold && current > threshold;
+/*
+ * Which published area each score's crossings speak for. Funding pressure files
+ * under Spending and risk appetite under Hiring, as the verdict headlines always
+ * have; the lines and the sentences are now those areas' own.
+ */
+const SCORE_AREAS: ReadonlyArray<{
+  metric: RuleConditionMetric;
+  /** The published area, by the key its rules carry. */
+  area: Parameters<typeof decisionAreaLabel>[0];
+  decisionArea: DecisionArea;
+  codePrefix: string;
+}> = [
+  { metric: "tightness", area: "burn-discipline", decisionArea: "spend", codePrefix: "tightness" },
+  { metric: "riskAppetite", area: "hiring", decisionArea: "hiring", codePrefix: "risk-appetite" },
+];
 
-const crossedBelow = (previous: number, current: number, threshold: number) =>
-  previous > threshold && current <= threshold;
+const becameMet = (condition: RuleCondition, previous: number, current: number) =>
+  !isRuleConditionMet(condition, previous) && isRuleConditionMet(condition, current);
 
+const shiftOf = (condition: RuleCondition): "up" | "down" =>
+  condition.operator === ">" || condition.operator === ">=" ? "up" : "down";
+
+/**
+ * What a move between two readings did to the published decisions.
+ *
+ * The area rules fired on the change lines (70 and 50) and wrote those lines
+ * into their sentences: "Re-open spend only if funding pressure falls back to
+ * 70", while the published Spending rule resumes below 66, and "Pause net-new
+ * hiring" the week risk appetite crossed 50, while the published Hiring rule
+ * pauses below 44. They fire on the area's own pause and resume lines now and
+ * say the area's own published sentences, so /api/regime-alerts and the weekly
+ * digest state the lines every page prints. The codes keep their meaning
+ * (`tightness-upshift` is funding pressure crossing up into a pause).
+ *
+ * The regime change said "Go back only if the previous conditions hold across
+ * two readings in a row", and the next change is rarely a way back: on Oct 5
+ * risk appetite clearing 50 alone moved Freezing to Cloudy. It names where
+ * conditions change with the brief's own sentence instead.
+ */
 export const buildDecisionDeltaRules = (
   previous: RegimeAssessment,
   current: RegimeAssessment,
 ): DecisionDeltaRule[] => {
   const rules: DecisionDeltaRule[] = [];
+  const areaRules = buildCanonicalBoundedDecisionRules({
+    regime: current.regime,
+    thresholds: current.thresholds,
+    scores: current.scores,
+  });
 
-  const tightnessThreshold = current.thresholds.tightnessRegime;
-  const riskThreshold = current.thresholds.riskAppetiteRegime;
-
-  const tightnessUp = crossedAbove(previous.scores.tightness, current.scores.tightness, tightnessThreshold);
-  const tightnessDown = crossedBelow(previous.scores.tightness, current.scores.tightness, tightnessThreshold);
-
-  if (tightnessUp || tightnessDown) {
-    const margin = Math.abs(current.scores.tightness - tightnessThreshold);
-    rules.push({
-      code: tightnessUp ? "tightness-upshift" : "tightness-downshift",
-      decisionArea: "spend",
-      action: tightnessUp
-        ? "Tighten discretionary spend and hold non-critical hiring reqs."
-        : "Loosen budget holds for pre-approved growth bets.",
-      thresholdLabel: "Funding pressure line",
-      thresholdValue: tightnessThreshold,
-      reversal: tightnessUp
-        ? `Re-open spend only if funding pressure falls back to ${tightnessThreshold} or below for two updates.`
-        : `Re-tighten if funding pressure rises back above ${tightnessThreshold} for two updates.`,
-      metricValue: current.scores.tightness,
-      crossed: true,
-      direction: tightnessUp ? "up" : "down",
-      severe: margin >= 10,
-    });
-  }
-
-  const riskUp = crossedAbove(previous.scores.riskAppetite, current.scores.riskAppetite, riskThreshold);
-  const riskDown = crossedBelow(previous.scores.riskAppetite, current.scores.riskAppetite, riskThreshold);
-
-  if (riskUp || riskDown) {
-    const margin = Math.abs(current.scores.riskAppetite - riskThreshold);
-    rules.push({
-      code: riskUp ? "risk-appetite-upshift" : "risk-appetite-downshift",
-      decisionArea: "hiring",
-      action: riskUp
-        ? "Restart paused pipeline roles tied to revenue capacity."
-        : "Pause net-new hiring outside committed customer delivery.",
-      thresholdLabel: "Risk appetite line",
-      thresholdValue: riskThreshold,
-      reversal: riskUp
-        ? `Pause again if risk appetite drops back to ${riskThreshold} or lower for two updates.`
-        : `Resume only if risk appetite recovers above ${riskThreshold} for two updates.`,
-      metricValue: current.scores.riskAppetite,
-      crossed: true,
-      direction: riskUp ? "up" : "down",
-      severe: margin >= 10,
-    });
+  for (const { metric, area, decisionArea, codePrefix } of SCORE_AREAS) {
+    const rule = areaRules.find((candidate) => candidate.area === area);
+    if (!rule) continue;
+    const previousScore = previous.scores[metric];
+    const currentScore = current.scores[metric];
+    const sides = [
+      {
+        kind: "pause",
+        line: rule.pause.conditions.find((condition) => condition.metric === metric),
+        action: rule.pauseTrigger,
+        reversal: rule.resumeTrigger,
+      },
+      {
+        kind: "resume",
+        line: rule.resume.conditions.find((condition) => condition.metric === metric),
+        action: rule.resumeTrigger,
+        reversal: rule.pauseTrigger,
+      },
+    ];
+    for (const { kind, line, action, reversal } of sides) {
+      if (!line || !becameMet(line, previousScore, currentScore)) continue;
+      const direction = shiftOf(line);
+      rules.push({
+        code: `${codePrefix}-${direction === "up" ? "upshift" : "downshift"}`,
+        decisionArea,
+        action,
+        thresholdLabel: `${decisionAreaLabel(area)} ${kind} line`,
+        thresholdValue: line.value,
+        reversal,
+        metricValue: currentScore,
+        crossed: true,
+        direction,
+        severe: Math.abs(currentScore - line.value) >= 10,
+      });
+    }
   }
 
   if (previous.regime !== current.regime) {
@@ -96,7 +131,7 @@ export const buildDecisionDeltaRules = (
       action: `Conditions changed from ${getRegimePublicLabel(previous.regime)} to ${getRegimePublicLabel(current.regime)}; reread last week's plan.`,
       thresholdLabel: "The line where conditions change",
       thresholdValue: 0,
-      reversal: "Go back only if the previous conditions hold across two readings in a row.",
+      reversal: `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${buildFlipThreshold(current)}`,
       metricValue: 0,
       crossed: true,
       direction: "up",
