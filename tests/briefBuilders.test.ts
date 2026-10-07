@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { regimeSignalLabel } from "../lib/report/signalTranslations";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
+import { joinSentences } from "../lib/report/reportFormatting";
 
 import { assessment, fixtureBriefDocument, fixtureWeeklyCall } from "./factories/exportFixtures";
 
@@ -17,14 +18,18 @@ describe("buildSlackBrief", () => {
     const weeklyCall = fixtureWeeklyCall();
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall }));
 
-    assert.equal(slot(brief, "Guidance"), weeklyCall.currentCall);
-    assert.equal(slot(brief, "Do now"), weeklyCall.actionNow);
+    /* The guidance opens on the do-now line the homepage, the email and the
+       /share post lead with, and the stance follows it. The two used to print
+       under "Guidance" and "Do now", so "Guidance:" meant a different sentence
+       here than in every other paste. */
+    assert.equal(slot(brief, "Guidance"), joinSentences(weeklyCall.actionNow, weeklyCall.currentCall));
+    assert.ok(slot(brief, "Guidance").startsWith(weeklyCall.actionNow));
+    assert.equal(slot(brief, "Do now"), "", "no second slot repeats the guidance");
     assert.equal(slot(brief, "Pause if"), weeklyCall.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), weeklyCall.callChangesIf);
     for (const label of ["Pause if", "Resume when", "Conditions change if"]) {
       assert.ok(!assessment.constraints.includes(slot(brief, label)), `${label} is filled from the operating-constraints list`);
     }
-    assert.notEqual(slot(brief, "Guidance"), slot(brief, "Do now"), "Guidance and Do now print the same sentence");
     assert.doesNotMatch(brief, /start nothing new/);
   });
 
@@ -38,8 +43,8 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /^• Pause if: Funding pressure rises above 76$/m);
     assert.match(brief, /^• Resume when: Funding pressure falls below 66 and risk appetite is above 54$/m);
     assert.doesNotMatch(brief, /Pause if: Pause|Resume when: Resume/);
-    assert.match(brief, /This week's decision \(Guidance \/ Do now \/ Pause if \/ Resume when \/ Conditions change if\):/);
-    const order = ["• Guidance:", "• Do now:", "• Pause if:", "• Resume when:", "• Conditions change if:"].map((label) => brief.indexOf(label));
+    assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Resume when \/ Conditions change if\):/);
+    const order = ["• Guidance:", "• Pause if:", "• Resume when:", "• Conditions change if:"].map((label) => brief.indexOf(label));
     assert.deepEqual([...order].sort((left, right) => left - right), order, "the slots print in the page's order");
   });
 
@@ -51,12 +56,11 @@ describe("buildSlackBrief", () => {
     assert.equal(held.policyOverrideActive, true);
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall: held }));
 
-    assert.equal(slot(brief, "Guidance"), POLICY_OVERRIDE_CALL.currentCall);
-    assert.equal(slot(brief, "Do now"), POLICY_OVERRIDE_CALL.actionNow);
+    assert.equal(slot(brief, "Guidance"), joinSentences(POLICY_OVERRIDE_CALL.actionNow, POLICY_OVERRIDE_CALL.currentCall));
     assert.equal(slot(brief, "Pause if"), POLICY_OVERRIDE_CALL.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), POLICY_OVERRIDE_CALL.callChangesIf);
     assert.equal(slot(brief, "Resume when"), "");
-    assert.match(brief, /This week's decision \(Guidance \/ Do now \/ Pause if \/ Conditions change if\):/);
+    assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Conditions change if\):/);
   });
 
   it("states each reading against the corridor as numbers, not a paragraph", () => {
@@ -73,7 +77,7 @@ describe("buildSlackBrief", () => {
 
   it("resolves its change-course cross-reference to a label it actually prints", () => {
     const brief = buildSlackBrief(fixtureBriefDocument());
-    const referenced = brief.match(/If it is: see "([^"]+)"/)?.[1];
+    const referenced = brief.match(/What would show it: "([^"]+)"/)?.[1];
     assert.ok(referenced, "no change-course cross-reference found");
     assert.ok(brief.includes(`• ${referenced}:`), `cross-reference points at "${referenced}", which the brief never prints`);
   });
@@ -118,7 +122,10 @@ describe("buildSlackBrief", () => {
     assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /^• High confidence$/m);
     assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
-    assert.match(brief, /• The scores sit near a line; a small move could change conditions\./);
+    /* The contract's sentence, which reads the confidence: this High week is
+       not told it sits near a line. */
+    assert.doesNotMatch(brief, /The scores sit near a line/);
+    assert.match(brief, /• Even at high confidence, individual signals can reverse/);
   });
 
   it("carries each area's timing line into the per-area rows", () => {

@@ -281,7 +281,9 @@ export async function DecisionAnswerPageContent({
               rule: rule.doNow[0] ?? rule.recommendation,
               pause: { line: rule.pauseTrigger },
               resume: { line: rule.resumeTrigger },
+              scores: [...rule.pause.conditions, ...rule.resume.conditions].map((condition) => condition.metric),
             }))}
+            signalLinkBase="/"
           />
         </SecondaryPageSection>
 

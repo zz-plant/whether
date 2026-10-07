@@ -4,6 +4,7 @@ import type { PostureTransitionEvent } from "../storage/postureTransitionEventRe
 import { resolvePublishedConfidence, type ConfidenceRecord } from "./confidence";
 import { buildWeeklyLockCommitment } from "./decisionKnobs";
 import { type RuleCondition } from "./boundedDecisionRules";
+import { buildFlipThreshold } from "./reportEvidence";
 
 export type PostureStateContract = {
   currentState: {
@@ -114,11 +115,14 @@ export const buildPostureStateContract = ({
           timestamp: committedTransition ? `${recordDate}T00:00:00.000Z` : null,
           fromState: null,
           toState: committedTransition?.candidateState ?? assessment.regime,
-          reason: committedTransition?.transitionReason ?? "No committed transition event in store.",
+          reason: committedTransition?.transitionReason ?? "No change in conditions is on record.",
           source: "state-machine",
         },
+    /* The trigger is the brief's own "Conditions change if" sentence, with each
+       line's distance and today's reading, so the Slack post, the mandate and
+       the agent views state the line the homepage does. */
     whatFlipsNext: {
-      flipTrigger: lockCommitment.flipConditions[0] ?? "Recheck thresholds on next refresh.",
+      flipTrigger: buildFlipThreshold(assessment),
       thresholds: lockCommitment.flipConditions,
       thresholdLines: lockCommitment.flipLines,
       reversalConditions: lockCommitment.flipConditions.slice(1),

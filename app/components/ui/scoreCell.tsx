@@ -46,19 +46,40 @@ export type ScoreUnits = {
   scale?: string;
   /** The word for a distance, e.g. "pts". "" prints the suffix instead. */
   distance?: string;
+  /**
+   * Decimal places a fractional figure keeps. Rates are quoted to two
+   * (4.05%), and at one the cell printed 4.0% under a header reading 4.05%,
+   * beside a 3.9% that was 3.85%, a 0.2-point move between them.
+   */
+  decimals?: number;
 };
 
-const DEFAULT_UNITS: Required<ScoreUnits> = { suffix: "", scale: "of 100", distance: "pts" };
+const DEFAULT_UNITS: Required<ScoreUnits> = { suffix: "", scale: "of 100", distance: "pts", decimals: 1 };
 
 const resolveUnits = (units?: ScoreUnits): Required<ScoreUnits> => ({ ...DEFAULT_UNITS, ...units });
+
+const numberFormatters = new Map<number, Intl.NumberFormat>();
+/* A score prints whole, or with one place when it has a fraction. A rate
+   prints every place it is quoted to (3.50%, 4.05%), as the row's header and
+   the brief's chips do. Rounded as written: `toFixed` took 4.05 down to 4.0
+   (its binary value is 4.0499…) while the sentence beside it said 4.1. */
+const formatPoints = (points: number, decimals = DEFAULT_UNITS.decimals) => {
+  const formatter =
+    numberFormatters.get(decimals)
+    ?? new Intl.NumberFormat("en-US", {
+      minimumFractionDigits: decimals > 1 ? decimals : 0,
+      maximumFractionDigits: decimals,
+      useGrouping: false,
+    });
+  numberFormatters.set(decimals, formatter);
+  return formatter.format(points);
+};
 
 /* "1 pts above" was printing wherever a reading sat one point from its line. */
 const formatDistance = (distance: number, units: Required<ScoreUnits>) =>
   units.distance
-    ? `${formatPoints(distance)} ${distance === 1 && units.distance === "pts" ? "pt" : units.distance}`
-    : `${formatPoints(distance)}${units.suffix}`;
-
-const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) : points.toFixed(1));
+    ? `${formatPoints(distance, units.decimals)} ${distance === 1 && units.distance === "pts" ? "pt" : units.distance}`
+    : `${formatPoints(distance, units.decimals)}${units.suffix}`;
 
 /**
  * The four parts of a score's reference, separately. A surface that sets the
@@ -78,14 +99,14 @@ export const scoreReferenceParts = ({
   const distance = Math.abs(value - line.value);
   const side = distance === 0 ? "at" : value > line.value ? "above" : "below";
   const previousValue =
-    typeof previous === "number" && Number.isFinite(previous) ? `${formatPoints(previous)}${resolved.suffix}` : null;
+    typeof previous === "number" && Number.isFinite(previous) ? `${formatPoints(previous, resolved.decimals)}${resolved.suffix}` : null;
   return {
     /** "Funding pressure 90 of 100" */
-    reading: `${label} ${formatPoints(value)}${resolved.suffix}${resolved.scale ? ` ${resolved.scale}` : ""}`,
+    reading: `${label} ${formatPoints(value, resolved.decimals)}${resolved.suffix}${resolved.scale ? ` ${resolved.scale}` : ""}`,
     /** "90": the number alone, as it prints beside its label. */
-    value: `${formatPoints(value)}${resolved.suffix}`,
+    value: `${formatPoints(value, resolved.decimals)}${resolved.suffix}`,
     /** "pause line 76" */
-    line: `${line.label} ${formatPoints(line.value)}${resolved.suffix}`,
+    line: `${line.label} ${formatPoints(line.value, resolved.decimals)}${resolved.suffix}`,
     /** "14 pts above", or "at the line" */
     distance: distance === 0 ? "at the line" : `${formatDistance(distance, resolved)} ${side}`,
     /** "was 63 on Aug 31", or "last week 63" with no date; null when there is no previous reading to compare. */
@@ -114,17 +135,17 @@ export function ScoreCell({ label, value, line, previous = null, previousLabel =
     <dl className={`grid grid-cols-[auto_1fr] gap-x-3 gap-y-0.5 text-xs ${className}`.trim()}>
       <dt className="text-slate-400">{label}</dt>
       <dd className="tabular-nums text-slate-100">
-        <span className="text-base font-semibold">{formatPoints(value)}{resolved.suffix}</span>
+        <span className="text-base font-semibold">{formatPoints(value, resolved.decimals)}{resolved.suffix}</span>
         {resolved.scale ? <span className="text-slate-400"> {resolved.scale}</span> : null}
       </dd>
       <dt className="text-slate-400">{line.label}</dt>
       <dd className="tabular-nums text-slate-300">
-        {formatPoints(line.value)}{resolved.suffix} · {side}
+        {formatPoints(line.value, resolved.decimals)}{resolved.suffix} · {side}
       </dd>
       {hasPrevious ? (
         <>
           <dt className="text-slate-400">{previousLabel}</dt>
-          <dd className="tabular-nums text-slate-300">{formatPoints(previous)}{resolved.suffix}</dd>
+          <dd className="tabular-nums text-slate-300">{formatPoints(previous, resolved.decimals)}{resolved.suffix}</dd>
         </>
       ) : null}
       {children}

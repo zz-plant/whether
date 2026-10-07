@@ -60,12 +60,16 @@ export type ActionStripItem = {
   currentStateLabel?: "Closed" | "Guarded" | "Staged" | "Open";
   currentStateStep?: 0 | 1 | 2 | 3;
   corridorProgressPercent?: number;
-  tightenDistanceLabel?: string;
-  reopenDistanceLabel?: string;
   /** Nearest pause line and the points to it; zero once tripped. */
   nearestPause?: RuleThresholdDistance;
-  /** Nearest resume line and the points to it; zero once it holds. */
-  nearestResume?: RuleThresholdDistance;
+  /**
+   * The resume line holding the area back, and the points to it: the furthest
+   * line still unmet, because a resume needs every one of its lines; zero once
+   * they all hold. It was the nearest line, so a row read "Funding pressure < 66
+   * and Risk appetite > 54 · 6 pts away" while funding pressure was 24 points
+   * from its line and still kept the area paused.
+   */
+  bindingResume?: RuleThresholdDistance;
   priorityDistancePoints?: number;
   priorityOrderIndex?: number;
 };
@@ -167,9 +171,7 @@ type DecisionLaneState = {
   currentLane: "blocked" | "caution" | "allowed";
   corridorProgressPercent: number;
   nearestPause?: RuleThresholdDistance;
-  nearestResume?: RuleThresholdDistance;
-  tightenDistanceLabel: string;
-  reopenDistanceLabel: string;
+  bindingResume?: RuleThresholdDistance;
 };
 
 const stateLabelByStep = ["Closed", "Guarded", "Staged", "Open"] as const;
@@ -359,20 +361,6 @@ export const parenthesizePointsToLine = (
   met: boolean | undefined,
 ): string => `(${formatPointsToLine(points, kind, met)})`;
 
-const formatDistanceLabel = (distance: RuleThresholdDistance | undefined, kind: "caution" | "reopen") => {
-  if (!distance) {
-    return kind === "caution" ? "Caution line unavailable." : "Reopen line unavailable.";
-  }
-
-  if (distance.satisfied) {
-    return kind === "caution"
-      ? `${metricLabel(distance.metric)} already crossed the caution line.`
-      : `${metricLabel(distance.metric)} already clears the reopen line.`;
-  }
-
-  return `${metricLabel(distance.metric)} ${distance.pointsToLine.toFixed(1)} pts to ${kind === "caution" ? "caution" : "reopen"}.`;
-};
-
 const sortThresholdDistance = (left: RuleThresholdDistance, right: RuleThresholdDistance) =>
   left.pointsToLine - right.pointsToLine;
 
@@ -390,7 +378,10 @@ const resolveDecisionLaneState = ({
   const pauseConditions = rule.pause.conditions.map((condition) => toThresholdDistance(condition, scores));
   const resumeConditions = rule.resume.conditions.map((condition) => toThresholdDistance(condition, scores));
   const nearestPause = [...pauseConditions].sort(sortThresholdDistance)[0];
-  const nearestResume = [...resumeConditions].sort(sortThresholdDistance)[0];
+  const unmetResume = resumeConditions.filter((condition) => !condition.satisfied);
+  const bindingResume = unmetResume.length > 0
+    ? [...unmetResume].sort(sortThresholdDistance).at(-1)
+    : resumeConditions[0];
   const pauseSatisfied = pauseConditions.some((condition) => condition.satisfied);
   const resumeSatisfiedCount = resumeConditions.filter((condition) => condition.satisfied).length;
 
@@ -412,9 +403,7 @@ const resolveDecisionLaneState = ({
     currentLane: currentStateStep === 0 ? "blocked" : currentStateStep === 1 ? "caution" : "allowed",
     corridorProgressPercent: progressByStep[currentStateStep],
     nearestPause,
-    nearestResume,
-    tightenDistanceLabel: formatDistanceLabel(nearestPause, "caution"),
-    reopenDistanceLabel: formatDistanceLabel(nearestResume, "reopen"),
+    bindingResume,
   };
 };
 
@@ -437,13 +426,11 @@ export const buildActionStripItems = (rules: BoundedDecisionRule[], scores?: Cur
       pauseQualifier: rule?.pause.qualifier,
       resumeQualifier: rule?.resume.qualifier,
       nearestPause: laneState?.nearestPause,
-      nearestResume: laneState?.nearestResume,
+      bindingResume: laneState?.bindingResume,
       currentStateLabel: laneState?.currentStateLabel,
       currentStateStep: laneState?.currentStateStep,
       corridorProgressPercent: laneState?.corridorProgressPercent,
-      tightenDistanceLabel: laneState?.tightenDistanceLabel,
-      reopenDistanceLabel: laneState?.reopenDistanceLabel,
-      priorityDistancePoints: laneState?.nearestPause?.pointsToLine ?? laneState?.nearestResume?.pointsToLine,
+      priorityDistancePoints: laneState?.nearestPause?.pointsToLine ?? laneState?.bindingResume?.pointsToLine,
       priorityOrderIndex: index,
     };
   });

@@ -4,7 +4,7 @@ import type { BriefDocument } from "../report/briefArtifact";
 import { buildComplianceStamp } from "../exportNotices";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels } from "../report/reportFormatting";
+import { formatDecisionReversal, formatDecisionThreshold, joinSentences, publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
@@ -66,12 +66,26 @@ export const briefResumeLine = (document: BriefDocument): string | null => {
   return lines.length > 0 ? lines.join("; ") : null;
 };
 
+/**
+ * The guidance as a paste leads with it: the do-now line, which the homepage,
+ * the email and the post /share copies all print as the guidance, then the
+ * operating stance behind it when it says more.
+ *
+ * These formats printed the stance under "Guidance" and the do-now line under
+ * "Do now", so one week's "Guidance:" read "Approve only renewals…" in the
+ * Monday post and "Conditions are tightening. Freeze new commitments…" in the
+ * post /share copies, while the homepage's heading was the second.
+ */
+export const formatGuidance = (slots: Pick<BriefDocument["slots"], "actionNow" | "currentCall">): string =>
+  slots.currentCall.trim() === slots.actionNow.trim()
+    ? joinSentences(slots.actionNow)
+    : joinSentences(slots.actionNow, slots.currentCall);
+
 const briefCallSlots = (document: BriefDocument): CallSlot[] => {
   const { slots } = document;
   const resumeLine = briefResumeLine(document);
   return [
-    { label: publicDecisionLabels.call, value: slots.currentCall },
-    { label: publicDecisionLabels.action, value: slots.actionNow },
+    { label: publicDecisionLabels.call, value: formatGuidance(slots) },
     { label: publicDecisionLabels.threshold, value: slots.pauseIf },
     ...(resumeLine ? [{ label: publicDecisionLabels.reversal, value: resumeLine }] : []),
     { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: slots.callChangesIf },
@@ -107,7 +121,7 @@ export const buildAreaRowLines = (document: BriefDocument) =>
  */
 const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
   const lines = kind === "pause" ? item.pauseConditions : item.resumeConditions;
-  const nearest = kind === "pause" ? item.nearestPause : item.nearestResume;
+  const nearest = kind === "pause" ? item.nearestPause : item.bindingResume;
   const qualifier = kind === "pause" ? item.pauseQualifier : item.resumeQualifier;
   if (!lines || lines.length === 0) {
     return kind === "pause" ? formatDecisionThreshold(item.triggerThreshold) : formatDecisionReversal(item.reversalCondition);
@@ -185,13 +199,18 @@ export const briefReadingLines = (document: BriefDocument) =>
  * both printed `failureModes[0].warning`, so a brief with a warning carried it
  * twice under two headers. No caller has passed a failure mode since, so the
  * block states what the confidence measures and where to look if it is wrong.
+ *
+ * The middle line is the contract's, which reads the confidence. It was "The
+ * scores sit near a line; a small move could change conditions" every week,
+ * including a High week twenty points from both lines, and the last line
+ * opened "If it is:", a question the reader had not been asked.
  */
 const buildWhyThisCouldBeWrongBlock = (document: BriefDocument) => [
   "",
   "Why this could be wrong:",
   `• ${formatExportConfidence(document.confidence)}`,
-  "• The scores sit near a line; a small move could change conditions. Hold anything you can't undo.",
-  `• If it is: see "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, plus the readings.`,
+  `• ${document.slots.whyCouldBeWrong}`,
+  `• What would show it: "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, and the readings.`,
 ];
 
 const buildCitationLines = (document: BriefDocument) => [

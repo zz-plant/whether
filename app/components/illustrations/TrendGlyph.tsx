@@ -20,7 +20,8 @@
 
 export type TrendDirection = "up" | "down" | "mixed" | "flat";
 
-const numberFormatter = new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 });
+/* Two places, so a rate's sentence states the figures its chip draws (4.05, not 4.1). */
+const numberFormatter = new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 });
 
 const formatTrendValue = (value: number) => numberFormatter.format(value);
 

@@ -75,7 +75,7 @@ describe("/share current weekly artifact", () => {
     // The exports lead with the conditions label; "Posture" was the export header before the
     // 2026-09-22 copy pass renamed it, and is no longer a word the page prints.
     assert.match(fullBrief, /Conditions:/);
-    assert.match(fullBrief, /Do now/);
+    assert.match(fullBrief, /^Guidance: /m);
     assert.match(fullBrief, /Pause if/);
     assert.match(fullBrief, /Transmit the committed action\./);
     // The meeting pack carries the Slack brief's per-area lines, resume line included.

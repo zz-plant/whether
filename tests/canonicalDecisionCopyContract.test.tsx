@@ -120,8 +120,8 @@ describe("canonical decision copy contract", () => {
     assert.equal(payload.callChangesIf, canonical.flipTrigger);
     assert.equal(payload.flipConditionLabels[0], canonical.flipConditions[0]);
     assert.match(text, /^Conditions: Defensive — Watchful/m);
-    assert.match(text, /^Guidance: Stage approvals and protect runway\.$/m);
-    assert.match(text, /^Do now: Pause net-new fixed burn commitments this week\.$/m);
+    assert.match(text, /^Guidance: Pause net-new fixed burn commitments this week\. Stage approvals and protect runway\.$/m);
+    assert.doesNotMatch(text, /^Do now:/m);
     assert.match(text, /^Conditions change if: Flip when tightness falls below 65 and holds\.$/m);
   });
 

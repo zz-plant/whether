@@ -1,6 +1,11 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { decisionAreaLabel, decisionAreaOrder, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import {
+  decisionAreaLabel,
+  decisionAreaOrder,
+  type DecisionArea,
+  type RuleConditionMetric,
+} from "../../../lib/report/boundedDecisionRules";
 import type { Route } from "../../../lib/navigation/routeType";
 
 /**
@@ -21,6 +26,12 @@ export type AreaRowData = {
   pause?: { line: ReactNode; distance?: ReactNode };
   /** The resume line and the distance to it. */
   resume?: { line: ReactNode; distance?: ReactNode };
+  /**
+   * The scores the printed lines are drawn on, for the "Line set by" note
+   * under the area. Absent on a row whose lines are sentences, which falls back
+   * to the score the area is usually ruled by.
+   */
+  scores?: readonly RuleConditionMetric[];
   /** What moved for this area this week, if anything. */
   changed?: ReactNode;
   /** Where to read more: the area's toolkit, scenario or answer. */
@@ -54,6 +65,27 @@ type AreaTableProps = {
 };
 
 const orderIndex = (area: DecisionArea) => decisionAreaOrder.indexOf(area);
+
+/* The score an area is usually ruled by, for a row that does not say. */
+const usualScores: Record<DecisionArea, readonly RuleConditionMetric[]> = {
+  hiring: ["tightness"],
+  "burn-discipline": ["tightness"],
+  "product-tempo": ["riskAppetite"],
+  "expansion-bets": ["riskAppetite"],
+  "capital-raising": ["tightness", "riskAppetite"],
+};
+
+/*
+ * The scores named under the area are the scores its printed lines are drawn
+ * on. They were fixed per area, so on a week New bets paused on funding
+ * pressure the row read "Line set by Risk appetite" over "Funding pressure >
+ * 76", and Hiring's "Funding pressure > 76 or Risk appetite < 44" sat under
+ * "Line set by Funding pressure".
+ */
+const scoresSettingRow = (row: AreaRowData): readonly RuleConditionMetric[] => {
+  const named = row.scores && row.scores.length > 0 ? row.scores : usualScores[row.area];
+  return (["tightness", "riskAppetite"] as const).filter((score) => named.includes(score));
+};
 
 /* The column names, repeated inside each cell for the stacked phone layout,
    where the header row is not drawn. Hidden from md up, where the header is. */
@@ -151,13 +183,23 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
                   decisionAreaLabel(row.area)
                 )}
                 <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                  {row.area === "hiring" || row.area === "burn-discipline" ? (
-                    <>Line set by <a href={fundingHref} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a></>
-                  ) : row.area === "product-tempo" || row.area === "expansion-bets" ? (
-                    <>Line set by <a href={riskHref} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
-                  ) : row.area === "capital-raising" ? (
-                    <>Lines set by <a href={fundingHref} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> &amp; <a href={riskHref} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
-                  ) : null}
+                  {(() => {
+                    const scores = scoresSettingRow(row);
+                    const links = scores.map((score) => (
+                      <a
+                        key={score}
+                        href={score === "tightness" ? fundingHref : riskHref}
+                        className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300"
+                      >
+                        {score === "tightness" ? "Funding pressure" : "Risk appetite"}
+                      </a>
+                    ));
+                    return scores.length > 1 ? (
+                      <>Lines set by {links[0]} &amp; {links[1]}</>
+                    ) : (
+                      <>Line set by {links[0]}</>
+                    );
+                  })()}
                 </span>
               </th>
               <td className="py-2.5 pr-3 text-slate-200 max-md:col-span-2 max-md:p-0">

@@ -1,7 +1,7 @@
 import type { ActionStripItem } from "../../lib/report/operatingCalls";
 import { formatPointsToLine } from "../../lib/report/operatingCalls";
 import { operatingLeverToDecisionArea } from "../../lib/report/businessAreaMap";
-import type { DecisionArea, RuleCondition } from "../../lib/report/boundedDecisionRules";
+import type { DecisionArea, RuleCondition, RuleConditionMetric } from "../../lib/report/boundedDecisionRules";
 import type { Route } from "../../lib/navigation/routeType";
 import { findLeadAnswerForArea } from "../answers/decisionPages";
 
@@ -25,6 +25,8 @@ export type AreaRowText = {
   rule: string;
   pause?: { line: string; distance?: string };
   resume?: { line: string; distance?: string };
+  /** The scores the printed lines are drawn on. */
+  scores?: RuleConditionMetric[];
   href?: Route;
 };
 
@@ -63,8 +65,9 @@ export const buildAreaRows = (items: readonly ActionStripItem[]): AreaRowText[] 
       },
       resume: {
         line: resumeConditions.length > 0 ? joinConditions(resumeConditions, "and", item.resumeQualifier) : item.reversalCondition,
-        distance: resumeConditions.length > 0 ? distanceTo(item.nearestResume, "resume") : undefined,
+        distance: resumeConditions.length > 0 ? distanceTo(item.bindingResume, "resume") : undefined,
       },
+      scores: [...pauseConditions, ...resumeConditions].map((condition) => condition.metric),
       href: answerHrefForArea(area),
     };
   });

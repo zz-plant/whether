@@ -134,7 +134,11 @@ export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof 
  * opens with the minutes, not the radar. The boundary and the live reading
  * stay, because the archive and the embed cite them.
  */
-export const buildFlipThreshold = (assessment: ReturnType<typeof evaluateRegime>): string => {
+export const buildFlipThreshold = (assessment: {
+  regime: RegimeKey;
+  thresholds: Pick<ReturnType<typeof evaluateRegime>["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
+  scores: { tightness: number; riskAppetite: number };
+}): string => {
   const tightnessThreshold = assessment.thresholds.tightnessRegime;
   const riskThreshold = assessment.thresholds.riskAppetiteRegime;
   const tightnessNow = assessment.scores?.tightness;

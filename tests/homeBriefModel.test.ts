@@ -336,7 +336,12 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.reversalTrigger, /(R|r)isk appetite falls to or below 50 \(56 today\)/i);
+    /* Both of Sunny's edges, each in the direction that leaves it: the same
+       sentence the brief prints, not the nearest line alone. */
+    assert.equal(
+      model.reversalTrigger,
+      "Funding pressure rises 30 pts to clear 40 (10 today) or risk appetite falls 6 pts to 50 or below (56 today).",
+    );
     assert.equal(model.flipThreshold, model.reversalTrigger);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
     assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");
@@ -529,9 +534,9 @@ describe("buildHomeBriefModel", () => {
     const baseRateInfluence = model.inputInfluence.find((item) => item.key === "baseRate");
     const curveInfluence = model.inputInfluence.find((item) => item.key === "curveSlope");
 
-    assert.equal(baseRate?.valueLabel, "5.4");
+    assert.equal(baseRate?.valueLabel, "5.40");
     assert.equal(baseRate?.isFallback, false);
-    assert.equal(curveSlope?.valueLabel, "-0.3");
+    assert.match(curveSlope?.valueLabel ?? "", /^-0\.\d\d$/);
     assert.equal(curveSlope?.isFallback, false);
     assert.match(baseRateInfluence?.pressureLabel ?? "", /Payback pressure|Neutral rate read|Rate relief/);
     assert.match(curveInfluence?.effectDetail ?? "", /curve|expansion confidence|inverted/i);
@@ -619,11 +624,13 @@ describe("buildHomeBriefModel", () => {
     assert.equal(matrix.rows.length, 4);
     assert.equal(matrix.rows[0]?.cells.approve.text, "Stage approvals on short-cycle proof");
     assert.equal(matrix.rows[0]?.cells.delay.text, "Delay irreversible commitments");
-    assert.match(matrix.rows[0]?.cells.flip.text ?? "", /Funding pressure ≤/);
-    assert.match(matrix.rows[3]?.cells.flip.text ?? "", /: tighten again/i);
+    /* Cloudy leaves its quadrant by falling to either line. */
+    assert.equal(matrix.rows[0]?.cells.flip.text, "Funding pressure at or below 50");
+    assert.equal(matrix.rows[1]?.cells.flip.text, "Risk appetite at or below 50");
+    assert.doesNotMatch(matrix.rows[3]?.cells.flip.text ?? "", /tighten again/i);
     assert.equal(matrix.rows[0]?.cells.approve.action, "Stage approvals on short-cycle proof");
     assert.match(matrix.rows[0]?.cells.approve.threshold ?? "", /Pause if thresholds weaken/);
-    assert.match(matrix.rows[0]?.cells.flip.reversal ?? "", /Funding pressure ≤/);
+    assert.equal(matrix.rows[0]?.cells.flip.reversal, "Funding pressure at or below 50");
   });
 
 

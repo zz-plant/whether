@@ -103,6 +103,12 @@ export const DECISION_CONTRACT_LABELS = {
      * name, between two it had just learned.
      */
     postureFlips: "Conditions change if",
+    /**
+     * The same line as a noun, where a value sits against it: "Change line 70 ·
+     * 20 pts above". "Conditions change if 70 · 30 pts above" was the label
+     * above in that slot, a conditional with no condition after it.
+     */
+    changeLine: "Change line",
     watchThisWeek: "Watch this week",
     watchNext: "Watch next",
   },

@@ -319,7 +319,7 @@ describe("flip watch under a held call", () => {
         timestamp: null,
         fromState: null,
         toState: "EXPANSION",
-        reason: "No committed transition event in store.",
+        reason: "No change in conditions is on record.",
         source: "state-machine",
       },
       whatFlipsNext: {

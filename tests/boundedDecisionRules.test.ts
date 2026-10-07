@@ -93,7 +93,7 @@ it("ensures every operating lever item includes bounded decision fields", () => 
   }
 });
 
-it("keeps caution and reopen distances available with crossing/above-below threshold wording", () => {
+it("keeps the pause line nearest the reading and the resume line holding the area back", () => {
   const rules = buildCanonicalBoundedDecisionRules({
     regime: "DEFENSIVE",
     thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
@@ -103,9 +103,13 @@ it("keeps caution and reopen distances available with crossing/above-below thres
   const items = buildActionStripItems(rules, { tightness: 72, riskAppetite: 48 });
   const hiringItem = items.find((item) => item.lever === "hiring-stance");
   assert.ok(hiringItem);
-  assert.doesNotMatch(hiringItem.tightenDistanceLabel ?? "", /unavailable/i);
-  assert.doesNotMatch(hiringItem.reopenDistanceLabel ?? "", /unavailable/i);
-  assert.match(hiringItem.reopenDistanceLabel ?? "", /funding pressure|risk appetite/i);
+  assert.ok(hiringItem.nearestPause, "the pause side knows how far its line is");
+  assert.ok(hiringItem.bindingResume, "the resume side knows how far its line is");
+  /* A resume needs every line, so the one shown is the furthest still unmet. */
+  const unmet = (hiringItem.resumeConditions ?? [])
+    .map((condition) => Math.abs(condition.value - (condition.metric === "tightness" ? 72 : 48)))
+    .filter((points) => points > 0);
+  assert.equal(hiringItem.bindingResume?.pointsToLine, Math.max(...unmet));
 });
 
 

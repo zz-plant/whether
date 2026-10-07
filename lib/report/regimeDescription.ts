@@ -257,10 +257,13 @@ const describeRegimeWarning = (warning: RegimeWarning): string => {
   }
 };
 
+/* In the reader's word for the call, "guidance" (lib/report/AGENTS.md): these
+   print after "Why the guidance is held:", where "move the posture" named the
+   engine's state instead. */
 const POLICY_REFUSAL_COPY: Record<PolicyRefusalCode, string> = {
-  "signals-disagree": "The underlying signals disagree too sharply to move the posture.",
-  "signals-dispersed": "Signals have swung too hard over the past 30 days to trust a posture change.",
-  "inputs-missing": "Too many inputs are missing to support a posture change.",
+  "signals-disagree": "The two scores disagree too sharply to change the guidance.",
+  "signals-dispersed": "The signals have swung too hard over the past 30 days to trust a change in the guidance.",
+  "inputs-missing": "Too many inputs are missing to support a change in the guidance.",
 };
 
 const describePolicyAssessment = (policy: PolicyScoring): PolicyAssessment => {

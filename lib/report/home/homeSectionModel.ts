@@ -4,7 +4,7 @@ import { classifyScoreBand, scoreBandScaleLabel } from "../signalTranslations";
 import { describeInputMovement } from "../inputMovement";
 import { formatPointsToLine, toThresholdDistance, type ActionStripItem, type RuleThresholdDistance } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import type { BoundedDecisionRule, DecisionArea, RuleCondition } from "../boundedDecisionRules";
+import type { BoundedDecisionRule, DecisionArea, RuleCondition, RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -150,7 +150,7 @@ export const describeWeeklyMovement = ({
       );
 
 /** One side of an area's rule as a row prints it: the line, the distance in words, and the two facts behind the words. */
-type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean };
+type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean; metric: RuleConditionMetric };
 
 export type HomeAreaRow = {
   area: DecisionArea;
@@ -175,6 +175,7 @@ const lineSlot = (distance: RuleThresholdDistance | undefined, kind: "pause" | "
   distance
     ? {
         line: distance.label,
+        metric: distance.metric,
         distance: formatPointsToLine(distance.pointsToLine, kind, distance.satisfied),
         points: distance.pointsToLine,
         met: distance.satisfied,
@@ -314,7 +315,7 @@ export const buildHomeAreaRows = ({
           "pause",
         ),
         resume: lineSlot(
-          item.resumeConditions?.length ? resumeLineToShow(distancesFor(item.resumeConditions, scores)) : item.nearestResume,
+          item.resumeConditions?.length ? resumeLineToShow(distancesFor(item.resumeConditions, scores)) : item.bindingResume,
           "resume",
         ),
         ...changedFor(area),
