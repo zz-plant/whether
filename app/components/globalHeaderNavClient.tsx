@@ -4,6 +4,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { usePathname } from "next/navigation";
 import { useEffect, useMemo, useRef } from "react";
+import { ChevronDownIcon } from "./uiIcons";
 import {
   resolveGlobalHeaderLoopLinks,
   type GlobalHeaderNavigationLink,
@@ -184,7 +185,7 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
           className="min-h-11 list-none cursor-pointer rounded-md px-2.5 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 flex items-center gap-1 text-slate-400 font-medium hover:text-slate-100 focus-visible:outline-2 focus-visible:outline-sky-400 [&::-webkit-details-marker]:hidden"
         >
           <span>More</span>
-          <span aria-hidden="true" className="text-slate-500 transition-transform group-open:rotate-180">▾</span>
+          <ChevronDownIcon className="h-3.5 w-3.5 text-slate-500 transition-transform group-open:rotate-180 motion-reduce:transition-none" />
         </summary>
         <div className="absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-slate-800/70 bg-slate-950/95 p-1.5 shadow-xl backdrop-blur-lg">
           <p className="px-3 pb-1 pt-1.5 type-eyebrow text-slate-500">Tools &amp; reference</p>

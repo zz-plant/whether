@@ -259,7 +259,7 @@ input:not([type="range"]) {
   }
 }
 
-/* The single disclosure contract: 44px target, focus ring, and the rotating ▾.
+/* The single disclosure contract: 44px target, focus ring, and the rotating chevron.
    Opt in three ways, all equivalent — `data-chevron` on the summary, the
    `list-none` class on the summary, or `weather-auto-chevron` on the parent
    details. This block is the only definition; decision-flow.css used to repeat
@@ -285,10 +285,21 @@ summary.list-none:focus-visible,
   box-shadow: var(--focus-halo);
 }
 
+/* The chevron is the icon set's (uiIcons' ChevronDownIcon: lucide's path at its
+   1.8 stroke), drawn as a mask in the muted ink. It was a text glyph, U+25BE,
+   which neither Archivo nor Chivo Mono draws, so every disclosure on the site
+   borrowed its caret from whatever symbol font the reader's OS had: a different
+   size, weight and baseline per platform, beside the SVG chevrons on the header
+   pills. The mask's stroke only sets coverage; the colour is the background. */
 summary[data-chevron]::after,
 .weather-auto-chevron > summary::after {
-  content: "▾";
-  color: var(--app-text-muted);
+  content: "";
+  flex: none;
+  width: 1rem;
+  height: 1rem;
+  background-color: var(--app-text-muted);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") center / contain no-repeat;
   transition: transform 150ms ease;
 }
 

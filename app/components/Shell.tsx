@@ -3,7 +3,10 @@ import { FocusModeController } from "./focusModeController";
 import { Skeleton } from "./skeleton";
 import { regimeAccentStyle, regimeDataAttribute } from "../../lib/regimeAccent";
 
-const shellMainClassName = "mx-auto max-w-[72rem] px-4 py-4 sm:py-5 transition-all weather-page-enter";
+/* No transition here: one on every property animated the padding change at the
+   `sm` breakpoint while a window resized (§I, never animate layout). The entrance
+   is weather-page-enter's. */
+const shellMainClassName = "mx-auto max-w-[72rem] px-4 py-4 sm:py-5 weather-page-enter";
 
 export function Shell({
   children,
@@ -70,7 +73,7 @@ export function Shell({
     // height below the fold on every short page — the first-visit brief ended
     // in a band of empty ground before the footer. PageShell grows the same way.
     <div
-      className="weather-regime-ground flex-1 bg-[var(--bg-body)] text-[var(--app-text)] transition-all"
+      className="weather-regime-ground flex-1 bg-[var(--bg-body)] text-[var(--app-text)] transition-colors"
       data-regime={regimeDataAttribute(regime)}
       style={regimeAccentStyle(regime)}
     >

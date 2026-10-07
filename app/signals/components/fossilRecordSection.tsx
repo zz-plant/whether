@@ -99,7 +99,7 @@ export function FossilRecordSection({
                 <td className="py-3 pr-3 text-slate-100 font-medium align-top leading-relaxed">
                   {row.highRateArtifact}
                 </td>
-                <td className="py-3 text-slate-300 align-top leading-relaxed text-fluid-nano italic">
+                <td className="py-3 text-slate-300 align-top leading-relaxed text-fluid-nano">
                   &ldquo;{row.insight}&rdquo;
                 </td>
               </tr>

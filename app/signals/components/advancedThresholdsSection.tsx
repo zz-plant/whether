@@ -6,6 +6,7 @@ import type { RegimeThresholds } from "../../../lib/regimeEngine";
 import { THRESHOLD_PARAM_KEYS } from "../../../lib/thresholds";
 import { ThresholdsPanel } from "./thresholdsPanel";
 import { InstrumentQuestion } from "./instrumentQuestion";
+import { ChevronDownIcon } from "../../components/uiIcons";
 import { formatChangeLines } from "../../../lib/report/evidenceInstrumentSummaries";
 
 const hasThresholdParams = (params: URLSearchParams) => {
@@ -59,9 +60,7 @@ export const AdvancedThresholdsSection = ({
             question="What would conditions be with different lines?"
             answer={`Set at ${formatChangeLines(currentThresholds)}`}
           />
-          <span aria-hidden="true" className="text-[color:var(--app-text-muted)] transition-transform group-data-[panel-open]:rotate-180">
-            ▾
-          </span>
+          <ChevronDownIcon className="h-4 w-4 shrink-0 text-[color:var(--app-text-muted)] transition-transform group-data-[panel-open]:rotate-180 motion-reduce:transition-none" />
         </Collapsible.Trigger>
         <Collapsible.Panel className="mt-4">
           <ThresholdsPanel currentThresholds={currentThresholds} />
