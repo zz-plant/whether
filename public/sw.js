@@ -30,10 +30,13 @@ const ASSET_CACHE = `whether-assets-${VERSION}`;
 const CACHES = [DOCUMENT_CACHE, ASSET_CACHE];
 
 /* Hashed, so a hit is always the right bytes and a miss is cheap: /_next/static/
-   by the build, /fonts/ by name (each file carries its SHA-256 prefix, held by
-   tests/fontAssets.test.ts), so a changed font is a new URL. */
+   by the build, the page fonts in /fonts/ by name (each file carries its SHA-256
+   prefix, held by tests/fontAssets.test.ts), so a changed font is a new URL.
+   /fonts/og/ is not: the share-card faces keep their names when regenerated, and
+   only the server's card renderer reads them, so they stay off this cache. */
 const isImmutableAsset = (url) =>
-  url.pathname.startsWith("/_next/static/") || url.pathname.startsWith("/fonts/");
+  url.pathname.startsWith("/_next/static/") ||
+  (url.pathname.startsWith("/fonts/") && !url.pathname.startsWith("/fonts/og/"));
 
 const isDocumentRequest = (request) =>
   request.mode === "navigate" || request.headers.get("accept")?.includes("text/html");

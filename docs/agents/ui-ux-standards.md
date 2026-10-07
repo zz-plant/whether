@@ -504,7 +504,12 @@ python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob(
   Liberation Sans at `size-adjust: 98.81%`, and Arial Bold at 88.1% for the 87.5% display width)
   sets the page's copy within about 1% of Archivo. After: 0.0001 at 430px and 0.009 at 1280px
   (observer 0.0000 and 0.0001). The 1280px remainder is a `max-w-[64ch]` paragraph: `ch` is
-  measured on "0", which no override matches. Re-measure when a face or `--font-sans` changes.
+  measured on "0", which no override matches. Semibold and bold at normal width have their own
+  Arial Bold faces (95.02% for 600, 98.39% for 700–900): on the regular face alone they were
+  synthetic bold, which does not widen the glyphs, and set 3–8% narrower than Archivo; with them a
+  20px line measures −0.2% (600) and −0.3% (700) in headless Chromium. Every weight a page sets
+  needs a real face here, not only the ones measured on `/`. Re-measure when a face or
+  `--font-sans` changes.
 
 ## XXIII. Motion a reader doesn't notice
 

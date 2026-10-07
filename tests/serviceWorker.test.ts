@@ -34,6 +34,17 @@ describe("service worker", () => {
     assert.match(source, /url\.origin !== self\.location\.origin\)\s*return;/);
   });
 
+  /* Cache-first is safe only for a URL whose bytes cannot change. The page fonts
+     carry their hash in the name; the share-card faces in /fonts/og/ are
+     regenerated in place, so they stay off the immutable cache. */
+  it("treats only hashed URLs as immutable, not the share-card faces", async () => {
+    const source = await readWorker();
+    const rule = /const isImmutableAsset = \(url\) =>([\s\S]*?);\n/.exec(source)?.[1] ?? "";
+    assert.ok(rule, "isImmutableAsset is gone or renamed");
+    assert.match(rule, /startsWith\("\/fonts\/"\)/);
+    assert.match(rule, /!url\.pathname\.startsWith\("\/fonts\/og\/"\)/);
+  });
+
   /*
    * Cache-first for a document is how a site serves last week forever. The live
    * answer has to win whenever there is one; the cache is the fallback, and the

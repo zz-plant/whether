@@ -180,7 +180,9 @@ describe("the web fonts", () => {
     const fallbacks = [...css.matchAll(/@font-face\s*\{([^}]*)\}/g)]
       .map(([, block]) => block)
       .filter((block) => block.includes(`font-family: "${FALLBACK}"`));
-    assert.equal(fallbacks.length, 2);
+    /* Regular, semibold and bold at normal width, and the display width. Semibold and
+       bold were synthetic until 2026-10-07: a faux bold does not widen the glyphs. */
+    assert.equal(fallbacks.length, 4);
     for (const block of fallbacks) {
       assert.doesNotMatch(block, /url\(/, "a stand-in is a face the reader already has, never a download");
       assert.match(block, /src:\s*local\("Arial/);
@@ -191,6 +193,12 @@ describe("the web fonts", () => {
     const displayStretch = /--font-stretch-display:\s*([\d.]+%)/.exec(tokens)?.[1];
     assert.ok(displayStretch);
     assert.ok(fallbacks.some((block) => block.includes(`font-stretch: ${displayStretch};`)), "the display voice has its own stand-in");
+    const normalWidth = fallbacks.filter((block) => !block.includes("font-stretch"));
+    for (const weight of ["font-weight: 600;", "font-weight: 700 900;"]) {
+      const face = normalWidth.find((block) => block.includes(weight));
+      assert.ok(face, `normal-width text at ${weight} has a real bold stand-in`);
+      assert.match(face, /local\("Arial Bold"\)/);
+    }
     assert.match(tokens, /--font-sans:\s*"Archivo",\s*"Archivo Fallback",\s*system-ui/);
   });
 });
