@@ -6,6 +6,8 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { buildBriefMarkdown } from "../app/brief.md/route";
 import { FrameworkSection } from "../app/trust/frameworkSection";
 import { TrackRecordTable, TrackRecordTiles } from "../app/components/history/TrackRecord";
+import { RegimePhaseMap } from "../app/components/history/RegimePhaseMap";
+import type { RegimeKey } from "../lib/types";
 import { TrustStrip } from "../app/components/trustStrip";
 import { computeDiagnostics } from "../lib/regimeEngineDiagnostics";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
@@ -145,6 +147,40 @@ describe("/history dates what it is showing", () => {
     assert.equal(recentOldest, "2024-04-28", "the recent table's oldest row");
     assert.match(text, /Earlier months \(3\) · Jan 28, 2024 to Mar 28, 2024/);
     assert.doesNotMatch(text, /Earlier months[^·]*· [^ ]+ \d+, \d{4} to Apr 28, 2024/, "the range reaches into the table above");
+  });
+
+  /*
+   * "Months in each quadrant" counted the conditions each month published,
+   * which trail a dot that has crossed a line: Apr 2025, at 90/55 in the Cloudy
+   * quadrant, was counted as Freezing. The heading says what is counted now,
+   * and the line under it says how many months the two disagree on.
+   */
+  it("heads the phase map's month count with what it counts", () => {
+    const point = (recordDate: string, tightness: number, riskAppetite: number, regime: RegimeKey) => ({
+      recordDate,
+      tightness,
+      riskAppetite,
+      regime,
+    });
+    const html = renderToStaticMarkup(
+      <RegimePhaseMap
+        series={[
+          point("2025-02-28", 90, 45, "SCARCITY"),
+          point("2025-03-31", 90, 51, "SCARCITY"),
+          point("2025-04-30", 90, 55, "SCARCITY"),
+          point("2025-05-30", 90, 58, "DEFENSIVE"),
+        ]}
+        activeSpan="5y"
+        spanHref={(span) => `/history?span=${span}`}
+        totalMonths={4}
+        open
+      />,
+    );
+    const text = html.replace(/<!-- -->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+    assert.doesNotMatch(text, /Months in each quadrant/);
+    assert.match(text, /Months under each set of conditions/);
+    assert.match(text, /not the quadrant its dot sits in: the two differ in 2 of these 4 months/);
   });
 
   it("keeps the phase map's panel and caveat on the same fact", () => {

@@ -92,6 +92,13 @@ type PhaseGap = {
   flipsToLabel: string;
 };
 
+/**
+ * Months *published* under one set of conditions — the state machine's regime
+ * for the month, not the quadrant its dot sits in. The two differ while a
+ * crossing waits to hold, which is why the panel that prints these is not
+ * headed "Months in each quadrant": under that heading Apr 2025, a dot at
+ * 90/55 in the Cloudy quadrant, was counted as Freezing.
+ */
 type PhaseOccupancy = {
   regime: RegimeKey;
   regimeLabel: string;
@@ -111,6 +118,8 @@ type RegimePhaseModel = {
   thresholds: { tightness: number; riskAppetite: number };
   gaps: Record<PhaseAxis, PhaseGap>;
   occupancy: PhaseOccupancy[];
+  /** Months whose published conditions are not the quadrant their dot sits in. */
+  offQuadrantMonths: number;
   /** Months whose funding pressure was clipped at the ceiling. */
   saturatedMonths: number;
 };
@@ -263,6 +272,9 @@ export const buildRegimePhaseModel = (
       ),
     },
     occupancy,
+    offQuadrantMonths: points.filter(
+      (point) => regimeAtCoordinates(point.tightness, point.riskAppetite, thresholds) !== point.regime,
+    ).length,
     saturatedMonths: points.filter((point) => point.saturated).length,
   };
 };

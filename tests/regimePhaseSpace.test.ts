@@ -95,6 +95,26 @@ describe("buildRegimePhaseModel", () => {
     assert.notEqual(gaps.riskAppetite.flipsTo, current.regime);
   });
 
+  /*
+   * Occupancy counts the published conditions, which trail a dot that has
+   * crossed a line until the crossing holds. /history headed the count "Months
+   * in each quadrant" and counted Apr 2025 — a dot at 90/55, in the Cloudy
+   * quadrant — as Freezing; the model now says how many months differ, so the
+   * panel can say what it counts.
+   */
+  it("counts the months whose published conditions are not their dot's quadrant", () => {
+    const lagged: PhaseSeriesEntry[] = [
+      entry("2025-02-28", 90, 45),
+      { ...entry("2025-03-31", 90, 51), regime: "SCARCITY" },
+      { ...entry("2025-04-30", 90, 55), regime: "SCARCITY" },
+      entry("2025-05-30", 90, 58),
+    ];
+    const model = buildRegimePhaseModel(lagged)!;
+    assert.equal(model.offQuadrantMonths, 2);
+    assert.equal(model.occupancy.find((row) => row.regime === "SCARCITY")?.months, 3, "the published months, not the dots");
+    assert.equal(buildRegimePhaseModel(series)!.offQuadrantMonths, 0);
+  });
+
   it("counts occupancy over the whole window and breaks ties towards the harsher regime", () => {
     const model = buildRegimePhaseModel(series)!;
     // DEFENSIVE and EXPANSION each hold two of the four months.
