@@ -462,25 +462,34 @@ file's characters and features with fontTools, the same Python `scripts/generate
 needs:
 
 ```
-python3 -c "from fontTools.ttLib import TTFont; f=TTFont('public/fonts/archivo-variable.woff2'); print(''.join(sorted(chr(c) for c in f.getBestCmap() if c > 0xFF))); print(sorted({r.FeatureTag for r in f['GSUB'].table.FeatureList.FeatureRecord}))"
+python3 -c "import glob; from fontTools.ttLib import TTFont; f=TTFont(glob.glob('public/fonts/archivo-variable.*.woff2')[0]); print(''.join(sorted(chr(c) for c in f.getBestCmap() if c > 0xFF))); print(sorted({r.FeatureTag for r in f['GSUB'].table.FeatureList.FeatureRecord}))"
 ```
 
-- **A character the face does not draw is set in another typeface.** The shipped Archivo is a
-  generic Latin subset. It draws ↑ and ↓, but not → ← ≤ ≥ ≈ ≠ Δ, and Chivo Mono draws none of the
-  arrows. Each missing character falls back, glyph by glyph, to whatever the reader's OS has: a
-  different weight, size and baseline on every platform.
-  - In chrome, draw the mark with the icon set (`app/components/uiIcons.tsx`). The disclosure
-    chevron is a masked SVG (`app/styles/controls.css`), never a triangle glyph.
-  - In copy, use the word where it reads as well ("at or below").
-  - The arrows already in copy are fixed at the file (DD-060), not by rewriting the copy.
-  - `tests/craftDetails.test.ts` rejects ▾ ▸ ↗ ✓ ✔ ✕ ✗ under `app/`.
+- **A character the face does not draw is set in another typeface.** Each missing character falls
+  back, glyph by glyph, to whatever the reader's OS has: a different weight, size and baseline on
+  every platform.
+  - **What the files draw.** Since 2026-10-07 (DD-060) the files are subset to the site's text,
+    and `app/styles/fonts.css` records the build. Archivo draws → ← ↑ ↓ ↔ ≤ ≥ ≈ ≠ Δ ‰ −. Chivo
+    Mono draws the same less the arrows, and `--font-mono` falls back to Archivo for those.
+  - **What they don't draw.** ▾ ✓ ✕ ⌘, or any other symbol. In chrome, draw the mark with the
+    icon set (`app/components/uiIcons.tsx`). The disclosure chevron is a masked SVG
+    (`app/styles/controls.css`), never a triangle glyph. `tests/craftDetails.test.ts` rejects
+    ▾ ▸ ↗ ✓ ✔ ✕ ✗ under `app/`.
+  - **When the copy needs a new symbol, fix the file, not the copy.** Add the codepoint to the
+    subset command and the `unicode-range` in `fonts.css`, and ship the file under its new hashed
+    name. `tests/fontAssets.test.ts` checks that each face draws the symbols the copy uses, that
+    the stylesheet routes them to it, and that each file is named by its SHA-256, since
+    `public/sw.js` never refetches a `/fonts/` URL. Then run `scripts/generate-og-fonts.mjs` so
+    the share cards draw it too. In copy, a word still beats a symbol where it reads as well
+    ("at or below").
 - **No style the files don't ship.** Both faces are upright only, so `italic` makes the browser
   slant the roman: a faux oblique that reads as a rendering fault. Mark a quotation with quotation
   marks, and a prompt with the muted ink. The one exception is the chat preview's `<em>`
   (`app/share/chatPreview.tsx`), which shows how a chat client renders `_text_`. The test rejects
   the `italic` utility and `font-style: italic` elsewhere.
-- **No feature the subset dropped.** The files keep `tnum`, `pnum`, `frac`, `liga` and `kern`.
-  They have no small capitals, `case`, `zero` or old-style figures, so
+- **No feature the files lack.** The files keep `tnum`, `pnum`, `frac`, `liga`, `kern`, `case`
+  and `zero`. `case` is on for the stamps (`.type-badge`, `.type-stamp`), where it lifts the
+  hyphen to sit between capitals. The files have no small capitals or old-style figures, so
   `font-variant-caps: small-caps` would synthesize scaled capitals, lighter than the real ones
   beside them. Capitals stay full size and tracked (§XVIII).
 - **The figure register absorbs the sign.** In Archivo the hyphen is 333 units wide and `+` is

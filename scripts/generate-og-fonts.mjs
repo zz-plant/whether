@@ -26,10 +26,10 @@ const sourceDir = path.join(root, "public", "fonts");
 const outDir = path.join(root, "public", "fonts", "og");
 
 const faces = [
-  { file: "archivo-variable.woff2", out: "archivo-semicondensed-700.ttf", axes: { wght: 700, wdth: 87.5 } },
-  { file: "archivo-variable.woff2", out: "archivo-400.ttf", axes: { wght: 400, wdth: 100 } },
-  { file: "archivo-variable.woff2", out: "archivo-600.ttf", axes: { wght: 600, wdth: 100 } },
-  { file: "archivo-variable.woff2", out: "archivo-expanded-700.ttf", axes: { wght: 700, wdth: 125 } },
+  { file: "archivo-variable.55ade54a.woff2", out: "archivo-semicondensed-700.ttf", axes: { wght: 700, wdth: 87.5 } },
+  { file: "archivo-variable.55ade54a.woff2", out: "archivo-400.ttf", axes: { wght: 400, wdth: 100 } },
+  { file: "archivo-variable.55ade54a.woff2", out: "archivo-600.ttf", axes: { wght: 600, wdth: 100 } },
+  { file: "archivo-variable.55ade54a.woff2", out: "archivo-expanded-700.ttf", axes: { wght: 700, wdth: 125 } },
 ];
 
 const instancerScript = `

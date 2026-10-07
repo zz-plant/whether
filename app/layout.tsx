@@ -191,7 +191,7 @@ export default function RootLayout({
             that sets every line above the fold — text, the call, the stamp — so it
             is the one preload. Chivo Mono sets aligned figures and paste previews,
             all below the fold; it loads when the stylesheet first asks for it. */}
-        <link rel="preload" href="/fonts/archivo-variable.woff2" as="font" type="font/woff2" crossOrigin="" />
+        <link rel="preload" href="/fonts/archivo-variable.55ade54a.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
         <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
         <link rel="prefetch" href="/operate" />

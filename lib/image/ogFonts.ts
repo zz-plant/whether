@@ -19,19 +19,22 @@ export const OG_FONT_BODY = "Archivo";
 export const OG_FONT_STAMP = "Archivo Expanded";
 
 /**
- * The self-hosted faces are Latin subsets (232 codepoints), so a handful of
- * symbols the site's prose uses freely have no glyph. Satori answers a missing
- * glyph by downloading a Google font for it, and when that download fails it
- * aborts the render *after* the response headers are already sent -- the caller
- * gets a 200 with an empty body, which is how the decision card silently began
- * downloading as a 0-byte PNG. Rewriting them keeps every image inside the subset.
+ * What the cards print in place of the site's symbols.
+ *
+ * Satori answers a glyph the faces lack by downloading a Google font for it, and
+ * when that download fails it aborts the render *after* the response headers are
+ * already sent -- the caller gets a 200 with an empty body, which is how the
+ * decision card silently began downloading as a 0-byte PNG. The faces were
+ * Fontsource's generic Latin subset then, without →, ≤ or ≥, and all three were
+ * rewritten here; → printed as "->". Since 2026-10-07 the faces are subset to the
+ * site's text (app/styles/fonts.css) and draw all three, so the arrow prints as
+ * itself. The comparisons stay words by choice.
  */
 const UNSUPPORTED_GLYPHS: ReadonlyArray<readonly [RegExp, string]> = [
-  /* Words, not "<=": the cards travel to people who do not read code, and the
+  /* Words, not "≤": the cards travel to people who do not read code, and the
      sentences these come from ("Funding pressure ≤ 66") read naturally either way. */
   [/\s*\u2264\s*/g, " at or below "],
   [/\s*\u2265\s*/g, " at or above "],
-  [/\u2192/g, "->"],
 ];
 
 /** Rewrites text so an image template can only emit glyphs the faces carry. */

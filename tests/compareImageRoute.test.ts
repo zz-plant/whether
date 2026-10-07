@@ -70,10 +70,10 @@ describe("epoch compare OG template", () => {
     assert.deepEqual(violations, []);
   });
 
-  it("uses only glyphs the OG font subset can draw", () => {
+  it("writes comparisons as words, and keeps the arrow the faces draw", () => {
     const imageText = collectText(renderCompareOgImage(baseProps));
-    assert.doesNotMatch(imageText, /[\u2264\u2265\u2192]/);
-    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a at or below b at or above c -> d");
+    assert.doesNotMatch(imageText, /[\u2264\u2265]/);
+    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a at or below b at or above c \u2192 d");
   });
 
   it("produces a non-empty PNG", async () => {

@@ -344,21 +344,21 @@ describe("brief decision card render", () => {
     assert.deepEqual(findSatoriLayoutViolations(renderBriefImage(fullCardProps)), []);
   });
 
-  it("rewrites glyphs the OG font subset cannot draw", () => {
-    const imageText = collectText(
-      renderBriefImage({
-        ...briefImageProps,
-        decision: "Hold hiring \u2192 reassess next week if funding pressure \u2265 76.",
-        contextLabel: "Tightness \u2264 66",
-      }),
-    );
+  it("keeps the arrow the faces draw, and writes comparisons as words", () => {
+    const props = {
+      ...briefImageProps,
+      decision: "Hold hiring \u2192 reassess next week if funding pressure \u2265 76.",
+      contextLabel: "Tightness \u2264 66",
+    };
+    const imageText = collectText(renderBriefImage(props));
 
-    // The faces are Latin subsets; an uncovered glyph sends satori to a Google
-    // font download, and that failing aborts the render the same way.
-    assert.doesNotMatch(imageText, /[\u2264\u2265\u2192]/);
+    assert.doesNotMatch(imageText, /[\u2264\u2265]/);
+    assert.match(imageText, /Hold hiring \u2192 reassess/);
     assert.match(imageText, /funding pressure at or above 76/);
     assert.match(imageText, /Tightness at or below 66/);
-    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a at or below b at or above c -> d");
+    // Until 2026-10-07 the faces had no arrow and the cards printed "->";
+    // tests/fontAssets.test.ts holds that the card faces draw it now.
+    assert.equal(toImageSafeText("a \u2264 b \u2265 c \u2192 d"), "a at or below b at or above c \u2192 d");
   });
 
   it("produces a non-empty PNG, for an ordinary week and for the fullest card", async () => {
