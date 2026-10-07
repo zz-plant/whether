@@ -2905,3 +2905,7 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   `/#signal-funding-pressure` and `/#signal-risk-appetite` rather than in-page anchors this page
   never draws. `/share` and the answer pages carry the same dead in-page links and are not changed
   here.
+- **Rules before you commit opens on the rules.** "Show all rules" and its count follow the three
+  lists they change instead of sitting above the heading, and the count says what it counts ("The
+  top 3 of each list.", where it said "per area"). Risk checks and the resources disclosure take the
+  closed steps' fill, so the page's frames read as one set in the light theme too.

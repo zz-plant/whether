@@ -74,20 +74,6 @@ export function RulesBeforeCommit({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-slate-300">
-          {isExpanded ? "Full rule list." : "Top 3 rules per area."}
-        </p>
-        <button
-          type="button"
-          onClick={handleToggle}
-          aria-expanded={isExpanded}
-          aria-controls={rulesId}
-          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold hover:border-sky-400/70 hover:text-slate-100 cursor-pointer"
-        >
-          {isExpanded ? "Show top 3 only" : "Show all rules"}
-        </button>
-      </div>
       <div>
         <p className="type-label text-slate-400">Rules for this week</p>
         <h3 className="type-section text-slate-100">{playbook?.title ?? "Rules for new commitments"}</h3>
@@ -108,6 +94,23 @@ export function RulesBeforeCommit({
             </ul>
           </div>
         ))}
+      </div>
+      {/* After the lists it changes, not above the heading: the step opened on a
+          control and a count before a reader had seen a rule. "Per area" was
+          wrong too; the cut is per list. */}
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={handleToggle}
+          aria-expanded={isExpanded}
+          aria-controls={rulesId}
+          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold hover:border-sky-400/70 hover:text-slate-100 cursor-pointer"
+        >
+          {isExpanded ? "Show top 3 only" : "Show all rules"}
+        </button>
+        <p className="text-xs text-slate-400">
+          {isExpanded ? "Every rule in each list." : "The top 3 of each list."}
+        </p>
       </div>
       {playbook ? (
         <details className="weather-auto-chevron">

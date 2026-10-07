@@ -408,7 +408,7 @@ export async function buildPlanningPageModel(
          warning this week" in a box heavier than the section holding it. A week
          with no warning is one line now, and "Recheck the rules" waits for a
          warning to recheck them against. */
-      h("section", { id: "ops-failure-patterns", className: "mt-6 space-y-3 rounded-xl border border-[var(--border-subtle)] p-4 sm:p-5", "aria-labelledby": "ops-failure-patterns-title" },
+      h("section", { id: "ops-failure-patterns", className: "mt-6 space-y-3 rounded-xl border border-[var(--border-subtle)] bg-slate-950/[0.05] p-4 sm:p-5", "aria-labelledby": "ops-failure-patterns-title" },
         h("div", { className: "space-y-1" },
           h("p", { className: "type-eyebrow type-eyebrow-section" }, "Risk checks"),
           h("h2", { id: "ops-failure-patterns-title", className: "text-lg font-semibold text-slate-100" }, "Warnings to read before you approve"),
@@ -437,7 +437,7 @@ export async function buildPlanningPageModel(
          guides" alone, in sky, on a padding the report row had zeroed — a title
          in a box. The guide cards inside drew a lifted surface each, inside a
          frame the depth ladder cannot see; they are plain bordered links now. */
-      h("details", { className: "weather-auto-chevron mt-6 rounded-xl border border-[var(--border-subtle)] p-4 sm:p-5" },
+      h("details", { className: "weather-auto-chevron mt-6 rounded-xl border border-[var(--border-subtle)] bg-slate-950/[0.05] p-4 sm:p-5" },
         h("summary", { className: "cursor-pointer" },
           h("span", { className: "min-w-0" },
             h("span", { className: "block text-sm font-semibold text-slate-100" }, "Resource templates and guides"),
