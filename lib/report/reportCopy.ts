@@ -126,7 +126,12 @@ export const DECISION_CONTRACT_LABELS = {
 export const POLICY_OVERRIDE_CALL = {
   currentCall: "The two scores point in different directions, so the guidance is not changing this week.",
   actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
-  pauseIf: "Hold anything you can't undo while the two scores disagree.",
+  /* Printed after "Pause if", so it is a condition. It was "Hold anything you
+     can't undo while the two scores disagree.", an instruction that repeated the
+     action above it and read "Pause if: Hold anything…" in every format. It names
+     the hold, not one reason for it: a hold also comes from missing inputs, which
+     is every replayed month, whose record carries no macro series. */
+  pauseIf: "The decision can't be undone while the guidance is held.",
   callChangesIf:
     "The two scores point the same way for a second reading; until then the guidance is not changing.",
 } as const;

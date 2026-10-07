@@ -1,5 +1,7 @@
 import { DECISION_CONTRACT_LABELS, describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
 import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
+import { decisionAreaLabel, decisionAreaOrder } from "../../../lib/report/boundedDecisionRules";
+import { buildHomeAreaRows, describeAreaPauseStatus } from "../../../lib/report/home/homeSectionModel";
 import {
   classifyScoreBand,
   compositeSignalScales,
@@ -63,14 +65,33 @@ export function ComparePeriodColumn({
   report: ReportData;
   label: string;
 }) {
-  const summary = snapshot.weeklyDecisionCardModel.decision.weeklyLeadershipSummary;
-  const status = snapshot.weeklyDecisionCardModel.status;
+  const { decision, status } = snapshot.weeklyDecisionCardModel;
+  const summary = decision.weeklyLeadershipSummary;
   const scores = report.assessment.scores;
   const spread = getCurveSpread(report.treasury.yields);
-  const periodNoun = label.toLowerCase();
   /* The macro series go back about three months; a replayed month further back
      has no value of its own, and says so rather than borrowing this week's. */
   const macroMissing = report.historicalSelection ? describeMacroNotOnRecord() : "N/A";
+  /*
+   * Each area against its own pause line, in the site's one area order, from the
+   * rows and words the homepage and /resolve print. These rows were "Hiring
+   * window", "Expansion pace" and "Fundraising window": words graded against
+   * cutoffs no rule publishes (risk appetite 45/65 for expansion), so a Freezing
+   * week whose guidance said "freeze new commitments" printed "Expansion pace:
+   * Open" at risk appetite 48. "Pace" is also the word for speed up / hold / slow
+   * down. Read from the period's published lines, the row cannot disagree with
+   * the rules beside it.
+   */
+  const areaRows = buildHomeAreaRows({
+    actionStripItems: decision.actionStripItems,
+    decisionRules: decision.decisionRules ?? [],
+    movement: null,
+    scores: { tightness: scores.tightness, riskAppetite: scores.riskAppetite },
+  });
+  const areaStanding = decisionAreaOrder.map((area) => {
+    const row = areaRows.find((candidate) => candidate.area === area);
+    return { area, text: (row ? describeAreaPauseStatus(row)?.text : undefined) ?? "—" };
+  });
 
   return (
     <div className="space-y-6">
@@ -86,20 +107,15 @@ export function ComparePeriodColumn({
       </div>
 
       <div className="weather-panel space-y-4 p-6">
-        <h3 className="type-eyebrow">Rules in {periodNoun}</h3>
+        {/* The label as given: lowercasing it printed "Rules in period a". */}
+        <h3 className="type-eyebrow">Rules in {label}</h3>
         <div className="space-y-2">
-          <p className="text-sm">
-            <span className="font-medium text-slate-400">Hiring window:</span>{" "}
-            <span className="font-semibold text-slate-100">{summary.hiringWindow}</span>
-          </p>
-          <p className="text-sm">
-            <span className="font-medium text-slate-400">Expansion pace:</span>{" "}
-            <span className="font-semibold text-slate-100">{summary.expansionWindow}</span>
-          </p>
-          <p className="text-sm">
-            <span className="font-medium text-slate-400">Fundraising window:</span>{" "}
-            <span className="font-semibold text-slate-100">{summary.raiseWindow}</span>
-          </p>
+          {areaStanding.map(({ area, text }) => (
+            <p key={area} className="text-sm">
+              <span className="font-medium text-slate-400">{decisionAreaLabel(area)}:</span>{" "}
+              <span className="font-semibold text-slate-100">{text}</span>
+            </p>
+          ))}
         </div>
 
         <dl className="space-y-3 border-t border-slate-800/80 pt-4">
@@ -125,7 +141,7 @@ export function ComparePeriodColumn({
       </div>
 
       <div className="weather-panel p-6">
-        <h3 className="type-eyebrow mb-4">Signals in {periodNoun}</h3>
+        <h3 className="type-eyebrow mb-4">Signals in {label}</h3>
         <table className="w-full text-left text-sm">
           <tbody>
             <ScoreRow signalKey="tightness" score={scores.tightness} />

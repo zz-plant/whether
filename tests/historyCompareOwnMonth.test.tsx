@@ -2,8 +2,14 @@ import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
+import { evaluateRegime } from "../lib/regimeEngine";
+import { decisionAreaLabel, decisionAreaOrder, isRuleConditionMet } from "../lib/report/boundedDecisionRules";
+import { operatingLeverToDecisionArea } from "../lib/report/businessAreaMap";
+import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
 import { loadReportData } from "../lib/report/reportData";
-import type { MacroSeriesId } from "../lib/types";
+import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
+import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
+import type { MacroSeriesId, TreasuryData } from "../lib/types";
 
 const mockAny: any = mock;
 
@@ -20,9 +26,10 @@ mockAny.module("next/navigation", () => ({
  * /history/compare prints two months side by side, and each column has to be
  * that month's. It printed this week's borrowing premium, inflation and
  * unemployment under Mar 31, 2020 (the report returned the macro series fetched
- * today for every selection), and "0.00%" for the change between them. Every
- * check here reads a value against the thing it claims to be, so a reword cannot
- * pass by accident.
+ * today for every selection), "0.00%" for the change between them, "This week's
+ * guidance" over a month six years back, and "Expansion pace: Open" on a
+ * Freezing month whose guidance froze new commitments. Every check here reads a
+ * value against the thing it claims to be, so a reword cannot pass by accident.
  *
  * Offline: the replayed months read the bundled archive, the current week the
  * bundled snapshot.
@@ -79,5 +86,92 @@ describe("/history/compare draws each period from its own month", () => {
 
     assert.doesNotMatch(text, /0\.00%/, "a missing side was read as zero");
     assert.match(text, /Not on record for Period B \(Mar 31, 2020\)\./);
+  });
+
+  it("names each period as labelled, and does not call a past month 'this week'", async () => {
+    const { text, columnB } = await renderCompare({ yearB: "2020", monthB: "3" });
+
+    for (const heading of ["Rules in Period A", "Signals in Period A", "Rules in Period B", "Signals in Period B"]) {
+      assert.ok(text.includes(heading), `${heading} renders`);
+    }
+    assert.doesNotMatch(text, /\bperiod [ab]\b/, "the label kept its case");
+    assert.doesNotMatch(columnB, /this week/i, "Mar 2020 is not this week");
+    assert.match(columnB, /since Feb \d{1,2}\.|holding where it was on Feb \d{1,2}\./, "the move is dated by the earlier month-end");
+  });
+
+  it("states the held guidance's pause line as a condition", async () => {
+    const { columnB } = await renderCompare({ yearB: "2020", monthB: "3" });
+
+    assert.ok(columnB.includes(`Pause if ${POLICY_OVERRIDE_CALL.pauseIf}`), "Mar 2020 is a held month");
+    assert.doesNotMatch(
+      POLICY_OVERRIDE_CALL.pauseIf,
+      /^(Hold|Keep|Pause|Cap|Freeze|Slow|Stop|Defer)\b/,
+      `"Pause if: ${POLICY_OVERRIDE_CALL.pauseIf}" reads as an instruction`,
+    );
+    assert.ok(!POLICY_OVERRIDE_CALL.actionNow.includes(POLICY_OVERRIDE_CALL.pauseIf), "and does not repeat the action");
+  });
+
+  /* Jan 2025 is Freezing at funding pressure 90 and risk appetite 54: the old
+     expansion cutoff (45) read that as "Open". */
+  it("states each area against its own published pause line, which a Freezing month has crossed", async () => {
+    const { columnA } = await renderCompare({ yearA: "2025", monthA: "1", yearB: "2020", monthB: "3" });
+    const { reportData } = await loadWeeklyBriefSnapshot({ year: "2025", month: "1" });
+    assert.equal(reportData.assessment.regime, "SCARCITY");
+
+    assert.doesNotMatch(columnA, /Expansion pace|Hiring window|Fundraising window|\bOpen\b/);
+    const scores = reportData.assessment.scores;
+    for (const area of decisionAreaOrder) {
+      const item = reportData.actionStripItems.find((candidate) => operatingLeverToDecisionArea[candidate.lever] === area);
+      const crossed = (item?.pauseConditions ?? []).some((line) => isRuleConditionMet(line, scores[line.metric]));
+      const row = new RegExp(`${decisionAreaLabel(area)}\\s*:\\s*Pause line crossed`);
+      assert.equal(row.test(columnA), crossed, `${decisionAreaLabel(area)} agrees with its pause line at ${scores.tightness}/${scores.riskAppetite}`);
+    }
+    assert.match(columnA, /New bets\s*:\s*Pause line crossed/, "new commitments are paused, as the guidance says");
+  });
+});
+
+describe("the period caption on a replayed month", () => {
+  const treasury: TreasuryData = {
+    record_date: "2012-01-31",
+    fetched_at: "2026-09-15T00:00:00Z",
+    source: "US Treasury",
+    isLive: false,
+    yields: { oneMonth: 0.03, threeMonth: 0.05, twoYear: 0.22, tenYear: 1.83 },
+  };
+  /* Mid-scale scores, so a ten-point move is not lost to the boldness clamp. */
+  const evaluated = evaluateRegime(treasury);
+  const assessment = { ...evaluated, scores: { ...evaluated.scores, tightness: 50, riskAppetite: 50 } };
+  const modelFor = (overrides: Partial<Parameters<typeof buildHomeBriefModel>[0]>) =>
+    buildHomeBriefModel({
+      assessment,
+      treasury,
+      sensors: [],
+      macroSeries: [],
+      reportDynamics: { directionLabel: "unavailable", changedSignals: [] },
+      startItems: [],
+      stopItems: [],
+      regimeAlert: null,
+      historicalSelection: { month: 1, year: 2012, banner: "" },
+      ...overrides,
+    });
+
+  it("says there is nothing to compare where the record starts", () => {
+    assert.equal(modelFor({}).weeklyLeadershipSummary.shorthandLine, "No earlier month-end to compare with.");
+  });
+
+  it("dates the move by the earlier month-end, and keeps the live sentence for a live week", () => {
+    const compared = {
+      regimeAlert: { previousRegime: assessment.regime },
+      reportDynamics: {
+        directionLabel: "deteriorating" as const,
+        changedSignals: [{ key: "riskAppetite" as const, delta: -10 }],
+        comparedWith: { recordDate: "2011-12-30", label: "Dec 30, 2011" },
+      },
+    };
+    assert.equal(modelFor(compared).weeklyLeadershipSummary.shorthandLine, "More defensive since Dec 30, 2011.");
+    assert.equal(
+      modelFor({ ...compared, historicalSelection: null }).weeklyLeadershipSummary.shorthandLine,
+      "This week's guidance is more defensive.",
+    );
   });
 });
