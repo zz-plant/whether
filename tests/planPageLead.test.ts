@@ -25,6 +25,21 @@ const propsHandedTo = <P,>(node: ReactNode, component: (props: P) => ReactNode):
   return [...own, ...propsHandedTo(node.props.children, component)];
 };
 
+type Props = { id?: string; className?: string; children?: ReactNode };
+
+/** Every element in the tree, depth first, read without rendering. */
+const elementsIn = (node: ReactNode): { type: unknown; props: Props }[] => {
+  if (Array.isArray(node)) return node.flatMap((child: ReactNode) => elementsIn(child));
+  if (!isValidElement<Props>(node)) return [];
+  return [{ type: node.type, props: node.props }, ...elementsIn(node.props.children)];
+};
+
+const textIn = (node: ReactNode): string => {
+  if (typeof node === "string" || typeof node === "number") return String(node);
+  if (Array.isArray(node)) return node.map((child: ReactNode) => textIn(child)).join("");
+  return isValidElement<Props>(node) ? textIn(node.props.children) : "";
+};
+
 const loadSteps = async () => {
   const { children } = await buildPlanningPageModel();
   const [stepper] = propsHandedTo(children, OperationsExecutionStepper);
@@ -74,5 +89,37 @@ describe("/operate opening", () => {
     ]) {
       assert.ok(!steps.some((step) => step.description === retired), `"${retired}" is back`);
     }
+  });
+});
+
+/*
+ * The two blocks after the steps. Both carried `weather-panel`, whose padding
+ * the report row zeroes for an unboxed section, so each drew a border against
+ * its own text; the resources disclosure read "Resource templates and guides"
+ * and nothing else.
+ */
+describe("/operate tail", () => {
+  it("frames Risk checks with its own padding and draws a quiet week as one line", async () => {
+    const { children } = await buildPlanningPageModel();
+    const section = elementsIn(children).find((element) => element.props.id === "ops-failure-patterns");
+    assert.ok(section, "the risk checks section renders");
+    assert.doesNotMatch(section.props.className ?? "", /\bweather-panel\b/);
+    assert.match(section.props.className ?? "", /\bp-4\b/);
+    const text = textIn(section.props.children);
+    if (text.includes("No warning this week")) {
+      // Nothing to recheck the rules against, and no slab around the sentence.
+      assert.ok(!text.includes("Recheck the rules"));
+      assert.ok(!elementsIn(section.props.children).some((element) => /weather-surface/.test(element.props.className ?? "")));
+    }
+  });
+
+  it("says in the resources summary what the disclosure holds", async () => {
+    const { children } = await buildPlanningPageModel();
+    const summary = elementsIn(children).find((element) => element.type === "summary");
+    assert.ok(summary, "the resources disclosure renders");
+    assert.match(
+      textIn(summary.props.children),
+      /^Resource templates and guides\d+ operating guides and \d+ templates you can fill in and share\.$/,
+    );
   });
 });

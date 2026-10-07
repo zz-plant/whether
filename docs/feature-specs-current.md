@@ -2882,3 +2882,12 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
 - Tests: `tests/planPageLead.test.ts` (order, open state, closed-step lines),
   `tests/decisionShieldPanel.test.tsx` (compact and typed states), `tests/planningCliPage.test.tsx`
   (index order).
+- **Risk checks and the resources disclosure have their padding back.** Both carried
+  `weather-panel`, whose padding the report row zeroes for an unboxed section
+  (`.weather-report-section-row > .weather-panel`), so each drew its border against its own text.
+  A week with no warning is one line under the heading, without the `weather-surface` slab, the
+  "each one names an assumption" sentence, or "Recheck the rules" (kept for weeks that have a
+  warning, which now draw as amber-ruled segments rather than lifted surfaces). The resources
+  summary says what it holds ("3 operating guides and 4 templates you can fill in and share.") and
+  its guide cards are plain bordered links rather than surfaces lifted inside a frame the depth
+  ladder cannot see.
