@@ -2867,3 +2867,18 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   compare modes no longer draw a surface inside the step, so the verdict sits two frames deep and
   its sizing note three (§XIII). The example buttons are `weather-pill` controls (44px on touch)
   rather than 20px chips, with their label on its own line on a phone so they pair up.
+- **Closed steps say what is behind them** (§XII, "a summary that shows the current values"). Set
+  this plan's lines names the areas its form starts from ("Start from the published pause and
+  resume lines for Hiring, Roadmap, Fundraising, Spending and New bets, …"); Finance strategy prints
+  the quarter's runway target ("Target 24+ months of runway; freeze non-essential spend.",
+  `financeStrategyFor`); Share the brief names its four formats from `BRIEF_FORMATS`. They used to
+  read as a title and a sentence about the gesture, which is what made them look like empty boxes.
+  The lines step is left out when no rule has a numeric line, rather than opening on nothing.
+- **Finance strategy is flat.** `FinanceStrategyPanel` drops its own header ("Finance Strategy
+  Mode", a subtitle and a method sentence), the "Executive summary" surface and the "Deep dive"
+  disclosure, which between them printed the runway target three times four frames deep; it is
+  one definition list (hiring throttle, budget focus, signals to watch) under the step's line. The
+  undrawn `title`/`subtitle`/`description` left `data/recommendations.ts` with it.
+- Tests: `tests/planPageLead.test.ts` (order, open state, closed-step lines),
+  `tests/decisionShieldPanel.test.tsx` (compact and typed states), `tests/planningCliPage.test.tsx`
+  (index order).

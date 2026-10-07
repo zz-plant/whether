@@ -358,11 +358,9 @@ export const insightDatabase = {
       },
     ],
   },
+  // `/operate`'s Finance strategy step: the runway target is the step's line,
+  // the rest its body (app/components/appendix/financeStrategyPanel.tsx).
   financeStrategyMode: {
-    title: "Finance Strategy Mode",
-    subtitle: "Runway posture guidance without internal financial inputs",
-    description:
-      "Public macro data sets the default capital posture. These guardrails define how conservative to be without needing internal finance models.",
     regimes: [
       {
         key: "SCARCITY",

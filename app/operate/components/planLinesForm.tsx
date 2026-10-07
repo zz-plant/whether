@@ -124,11 +124,12 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
   if (defaults.length === 0) return null;
 
   return (
-    <form onSubmit={handleSubmit} aria-labelledby="plan-lines-heading" data-testid="plan-lines-form" className="space-y-4">
-      <p id="plan-lines-heading" className="max-w-[68ch] text-sm text-slate-300">
-        These start at the published lines. Move the numbers your plan needs, for example releasing the second
-        half of a hiring plan only once funding pressure falls below 60, and untick any area you are not
-        planning. You get one email the day a line you set is crossed.
+    <form onSubmit={handleSubmit} aria-label={"Set this plan's lines"} data-testid="plan-lines-form" className="space-y-4">
+      {/* The step's own line already says these start at the published lines and
+          that a crossing sends one email; this says how to use them. */}
+      <p className="max-w-[68ch] text-sm text-slate-300">
+        For example, release the second half of a hiring plan only once funding pressure falls below 60. Untick
+        any area you are not planning.
       </p>
 
       <ul className="space-y-3">

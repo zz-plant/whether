@@ -19,7 +19,7 @@ import { HistoricalBanner } from "../components/historicalBanner";
 import { LiveDataFallbackAlert } from "../components/liveDataFallbackAlert";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 import { OperatorRequestsPanel } from "../components/appendix/ReferencePanels";
-import { FinanceStrategyPanel } from "../components/appendix/financeStrategyPanel";
+import { FinanceStrategyPanel, financeStrategyFor } from "../components/appendix/financeStrategyPanel";
 import { RulesBeforeCommit } from "./components/rulesBeforeCommit";
 import type { ReportShellModel } from "../components/reportShell";
 import { AreaTable } from "../components/ui/areaTable";
@@ -28,7 +28,8 @@ import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { buildAreaRows } from "./areaRows";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { PlanLinesForm } from "./components/planLinesForm";
-import { buildCanonicalBoundedDecisionRules } from "../../lib/report/boundedDecisionRules";
+import { buildCanonicalBoundedDecisionRules, decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import { BRIEF_FORMATS } from "../../lib/report/briefArtifact";
 import { planLinesFromRules } from "../../lib/alert/planLines";
 import { BriefIslandPicker } from "../components/briefIslandPicker";
 import { buildReadingLines } from "../../lib/export/briefBuilders";
@@ -110,7 +111,6 @@ export async function buildPlanningPageModel(
     statusLabel,
     stopItems,
     treasury,
-    treasuryProvenance,
   } = reportData;
   const isFallback = isSavedCopy(treasury);
   const { trustStatusTone } = snapshot.trustStatus;
@@ -125,6 +125,28 @@ export async function buildPlanningPageModel(
     resourceSupportingPages.decisionShieldOverview,
   ] as const;
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
+  /* What each closed step holds, said on the closed step (§XII: "a summary that
+     shows the current values"). Until 2026-10-07 the three read "Move the
+     published pause and resume lines…", "Budget direction and cash timing for
+     the quarter." and "Copy or download the brief in the format you need." —
+     a title and a sentence about the gesture, which read as empty boxes. */
+  const planLineDefaults = planLinesFromRules(buildCanonicalBoundedDecisionRules({
+    regime: assessment.regime,
+    thresholds: assessment.thresholds,
+    scores: assessment.scores,
+  }));
+  const listOf = (items: readonly string[], type: "conjunction" | "disjunction") =>
+    new Intl.ListFormat("en-GB", { style: "long", type }).format(items);
+  const planLinesSummary = `Start from the published pause and resume lines for ${listOf(
+    planLineDefaults.map((line) => decisionAreaLabel(line.area)),
+    "conjunction",
+  )}, move the ones your plan needs, and get an email the day one is crossed.`;
+  const financeSummary =
+    financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
+  const shareSummary = `Copy this week's brief as ${listOf(
+    BRIEF_FORMATS.map((format) => format.label),
+    "disjunction",
+  )} text, ready to paste.`;
   /* Freshness and confidence, once, under the h1 before anything asks the
      reader to act. The shell draws it in the intro (DD-040). */
   const trustStrip = {
@@ -304,38 +326,29 @@ export async function buildPlanningPageModel(
           /* The use the record fits: lines agreed once, and an email the day one is
              crossed. Live weeks only — lines started from a past month's rules
              would watch a reading nobody is planning against. */
-          ...(historicalSelection
+          ...(historicalSelection || planLineDefaults.length === 0
             ? []
             : [{
               id: "ops-plan-lines",
               label: "Lines",
               title: "Set this plan's lines",
-              description: "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",
-              children: h(PlanLinesForm, {
-                defaults: planLinesFromRules(buildCanonicalBoundedDecisionRules({
-                  regime: assessment.regime,
-                  thresholds: assessment.thresholds,
-                  scores: assessment.scores,
-                })),
-              }),
+              description: planLinesSummary,
+              children: h(PlanLinesForm, { defaults: planLineDefaults }),
             }]),
           {
             id: "ops-finance-strategy",
             label: "Finance",
             title: "Finance strategy",
-            description: "Budget direction and cash timing for the quarter.",
+            // The runway target, the stance's headline; the panel draws the rest.
+            description: financeSummary,
             hashAliases: ["ops-finance-strategy-panel"],
-            // The step header above and FinanceStrategyPanel's own header both state this already.
+            // The step header above states this; FinanceStrategyPanel has no header of its own.
             children: h(ReportSection, { variant: "split",
               hideHeader: true,
               id: "ops-finance-strategy-panel",
               title: "Finance strategy",
               children: h(Fragment, null,
-              h(FinanceStrategyPanel, {
-                regime: assessment.regime,
-                provenance: treasuryProvenance,
-                showProvenance: false,
-              }),
+              h(FinanceStrategyPanel, { regime: assessment.regime }),
               // The planner has one owner, /operate/financial. The same 520-line
               // panel was mounted here as well, so two routes carried one form
               // and the URL a reader shared depended on which they had open.
@@ -351,7 +364,7 @@ export async function buildPlanningPageModel(
             id: "ops-export-briefs",
             label: "Share",
             title: "Share the brief",
-            description: "Copy or download the brief in the format you need.",
+            description: shareSummary,
             hashAliases: [
               "ops-export-briefs-panel",
               "ops-operator-requests",
