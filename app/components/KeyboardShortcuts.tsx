@@ -147,11 +147,13 @@ export function KeyboardShortcuts() {
 
   /* One button. The strip used to announce "J K Navigate sections" on every
      route beside it; the palette footer and the help dialog both list the
-     keys, so the footer's job is to open the list, not to be a third copy. */
+     keys, so the footer's job is to open the list, not to be a third copy.
+     Not on a screen with no hover (a phone): it is a list of keys that screen
+     has no keyboard for, and it was the footer's last row of its own. */
   return (
     <>
       <HelpModal open={helpOpen} onClose={() => setHelpOpen(false)} />
-      <p className="flex items-center justify-center py-2 text-center text-fluid-micro text-[var(--app-text-muted)]">
+      <p className="flex items-center justify-center py-2 text-center text-fluid-micro text-[var(--app-text-muted)] [@media(hover:none)]:hidden">
         <button
           type="button"
           onClick={openHelp}

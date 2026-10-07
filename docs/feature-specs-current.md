@@ -2858,3 +2858,11 @@ strip across a phone's first screen, a footer set louder than the pages above it
   screen and is about 135px; on `/trust` about 235px and is about 155px. From `sm` up nothing
   changed. Tests: `tests/visualPrimitives.test.tsx` (what folds), `tests/screenshotCaption.test.tsx`
   (where the caption sits on a phone).
+- **The footer** (`app/layout.tsx`). Its seventeen links were `text-fluid-sm` in 44px rows at
+  every width, larger than most body copy on the pages above, and each group was split into two
+  equal halves of an equal half, so short words sat about 100px apart. Links are `text-fluid-xs`
+  now and take `.weather-list-link` (`controls.css`): a 44px row on a touch screen, a 28px row with
+  a fine pointer and hover from `sm`, the same condition the compact controls use. From `sm` each
+  group is as wide as its links, 48px from the next. The Shortcuts button is hidden on a screen
+  with no hover, where it listed keys for a keyboard the phone does not have. Measured with a
+  mouse at 1280px: about 440 → 360px tall; on a touch phone the rows keep their 44px.
