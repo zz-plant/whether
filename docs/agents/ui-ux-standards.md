@@ -149,7 +149,9 @@ Scope: every `<details>`, `Collapsible`, and `Accordion` in `app/`.
 
 - MUST: collapse **evidence for a claim made above it** — the derivation, the source board, the raw
   series, the chart terminal, the per-signal breakdown. The reader has already been told the
-  conclusion; the disclosure is there for the person who wants to check it.
+  conclusion; the disclosure is there for the person who wants to check it. On `/trust` the check
+  is the page's job, so its compact source board (one line per source) is open under the
+  derivation and the detail behind it folds (2026-10-07, `docs/feature-specs-current.md` §1.1.48).
 - NEVER: collapse **the claim itself**, or anything a reader needs in order to act this week. The
   weekly call, what to do now, the pause condition, and the reversal condition are always visible.
 - NEVER: collapse the only explanation of a term or number that appears above the fold. If a label

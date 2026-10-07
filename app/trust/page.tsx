@@ -14,6 +14,7 @@ import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord"
 import { FormulaReference } from "./formulaReference";
 import { FrameworkSection } from "./frameworkSection";
 import { RunHistorySection } from "./runHistorySection";
+import { SourceBoard } from "./sourceBoard";
 import { ReaderReturnsSection } from "./readerReturnsSection";
 import { buildTrustPageModel } from "./trustPageModel";
 
@@ -38,6 +39,7 @@ export default async function MethodPage({
   const {
     reportData,
     isFallback,
+    sourceBoardRows,
     citationLine,
     warnings,
     meetingSnippet,
@@ -48,43 +50,12 @@ export default async function MethodPage({
     reportShellModel,
   } = await buildTrustPageModel();
 
+  /* What is folded on a healthy week: the citation, the limits, the warnings
+     and the snippet. The source board used to lead this group; it is open
+     under the derivation now (`SourceBoard`), because it is the evidence the
+     strip's "Sources" verdict was judged from. */
   const secondaryContent = (
     <>
-      <ReportSection
-        id="source-board"
-        title="Sources and last update"
-        description="Where each feed comes from and when it last refreshed."
-      >
-        {/* One card. A second, "Before you share or approve", held two pills to
-            sections the rail already lists. */}
-        <article className="weather-hub-card space-y-3 px-4 py-4">
-          {/* Split from the Sources card in System status rather than
-              repeating it: that card owns each source's *status*, so this one
-              owns when each last updated and where it came from. It used to
-              print the status labels too, which put "Canonical snapshot (high
-              confidence)" on the page four times. Decision date and Trust
-              summary rows dropped for the same reason — both are stated in the
-              System status block above. */}
-          <p className="type-eyebrow">Source freshness</p>
-          <ul className="space-y-2 text-sm text-slate-300">
-            <li><span className="text-slate-400">Treasury:</span> {reportData.treasuryProvenance.timestampLabel}</li>
-            <li><span className="text-slate-400">Macro:</span> {reportData.macroProvenance.timestampLabel}</li>
-          </ul>
-          <div className="flex flex-wrap gap-2 text-xs">
-            {/* Both source URLs are optional. As bare <a href={undefined}> these
-                rendered a pill that looked clickable but was neither a link nor
-                keyboard-focusable; the typed href on the shared primitive is what
-                surfaced it. Render the affordance only when there is somewhere to go. */}
-            {reportData.treasuryProvenance.sourceUrl ? (
-              <ActionLink href={reportData.treasuryProvenance.sourceUrl} target="_blank" rel="noreferrer" variant="pill">Treasury source</ActionLink>
-            ) : null}
-            {reportData.macroProvenance.sourceUrl ? (
-              <ActionLink href={reportData.macroProvenance.sourceUrl} target="_blank" rel="noreferrer" variant="pill">Macro source</ActionLink>
-            ) : null}
-          </div>
-        </article>
-      </ReportSection>
-
       <ReportSection
         id="sources-freshness"
         title="Cite this guidance"
@@ -214,17 +185,28 @@ export default async function MethodPage({
 
       <FormulaReference positions={scorePositions} />
 
-      <FrameworkSection />
+      {/* Open, under the derivation: the page's question is whether the
+          reading is current enough to act on, and this is where that is
+          checked. It sat folded at the foot of the page, under the method
+          essay and a blank form. */}
+      <SourceBoard
+        rows={sourceBoardRows}
+        treasurySourceUrl={reportData.treasuryProvenance.sourceUrl}
+        macroSourceUrl={reportData.macroProvenance.sourceUrl}
+      />
 
+      {/* The query key stays "sources": a link someone already shared with
+          `?sources=1` still opens this panel, though the board itself is
+          above it now. The summary names what is behind it (§XII). */}
       {!isFallback && warnings.length === 0 ? (
         <UrlDetails
           queryKey="sources"
           initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "sources")}
-          className="group mt-6 rounded-xl border border-[color:var(--border-default)] bg-slate-950/20 px-5 py-4"
+          className="group rounded-xl border border-[color:var(--border-default)] bg-slate-950/20 px-5 py-4"
           summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow select-none"
           summary={
             <>
-              <span>Detailed verification &amp; sources</span>
+              <span>Citation, limits and revisit triggers</span>
               <span aria-hidden="true" className="rounded-md border border-slate-700/50 bg-slate-950/50 px-2.5 py-1 text-xs text-slate-400 transition group-open:rotate-180">
                 ▾
               </span>
@@ -238,6 +220,10 @@ export default async function MethodPage({
       ) : (
         secondaryContent
       )}
+
+      {/* Last: how to use the lines is method, not a check on this week's
+          reading (§VIII). Its essay and its blank form are folded inside. */}
+      <FrameworkSection />
     </ReportShell>
   );
 }
