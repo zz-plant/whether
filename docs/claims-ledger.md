@@ -40,7 +40,7 @@ remove, not to fix.
 - **A claim's meaning is the owner's; its wording is `lib/report/`'s.** Changing what a claim means
   (when an improving week counts as holding, which reading a week is compared with) is a decision
   recorded in `docs/feature-specs-current.md`, not a copy edit.
-- **The Monday read-through checks the live week.** A scheduled read after the Monday freeze opens
+- **The weekly read-through checks the live week.** A scheduled read early each Tuesday, after the Monday send, opens
   the production surfaces for that week and compares each claim across them. It reports a
   disagreement rather than fixing it, because a disagreement on live data the suite did not catch is
   a missing test first.
