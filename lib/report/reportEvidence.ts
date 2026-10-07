@@ -1,8 +1,9 @@
 import { DEFAULT_THRESHOLDS, evaluateRegime } from "../regimeEngine";
 import { buildSignalInfluence } from "./regimeDescription";
 import { getPlaybookGuidance } from "../playbook";
-import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
-import { resolveSignalDirection, signalOrder } from "./briefFormatting";
+import { buildCanonicalBoundedDecisionRules, SPENDING_PAYBACK_BAR_MONTHS } from "./boundedDecisionRules";
+import { signalOrder } from "./briefFormatting";
+import { resolveLineDistanceLabel } from "./confidence";
 import { formatBoundaryDistance, formatConfidencePlainLabel } from "./reportFormatting";
 import { formatScoreValue } from "../formatters";
 import { regimeSignalLabel } from "./signalTranslations";
@@ -45,7 +46,7 @@ const ACTION_NOW_BY_REGIME: Record<RegimeKey, Record<WeeklyTone, string>> = {
   SCARCITY: {
     tightening: "Conditions are tightening. Freeze new commitments and protect runway.",
     easing: "Conditions are easing. Resume paused work with clear milestones.",
-    holding: "Conditions are holding. Keep spend flat and require paybacks inside 6 months.",
+    holding: `Conditions are holding. Keep spend flat and require paybacks inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
   },
 };
 
@@ -230,29 +231,39 @@ const resolveSignalInfluence = (assessment: ReturnType<typeof evaluateRegime>) =
       }),
   );
 
+/* Evidence items are titled with the canonical signal names. Funding pressure
+   used to be titled "Capital conditions", a name the site retired, on
+   /api/cli/diagnostics and the capital-tightness watch pages; frozen briefs that
+   stored it are translated at render (`publishedBriefs.ts`). */
 const signalLabels: Record<ReportDynamics["changedSignals"][number]["key"], string> = regimeSignalLabel;
 
-/* Only `tightness` has an evidence-section title of its own; the rest are the
-   canonical signal names. */
-const evidenceTitleBySignal: Record<ReportDynamics["changedSignals"][number]["key"], string> = {
-  ...regimeSignalLabel,
-  tightness: "Capital conditions",
+/* The line each signal's distance is read against. Base rate and the recession
+   warning gauge have no line of their own (their bullet says so); they feed the
+   guidance, so they read its nearest line. */
+const evidenceLineBySignal: Record<ReportDynamics["changedSignals"][number]["key"], "tightness" | "riskAppetite" | "nearest"> = {
+  tightness: "tightness",
+  riskAppetite: "riskAppetite",
+  baseRate: "nearest",
+  curveSlope: "nearest",
 };
 
-const EVIDENCE_SIGNAL_MAGNITUDE_HIGH = 3;
-const EVIDENCE_SIGNAL_MAGNITUDE_MEDIUM = 1;
-
-const toConfidenceLabel = (delta: number): "LOW" | "MED" | "HIGH" => {
-  const magnitude = Math.abs(delta);
-  if (magnitude >= EVIDENCE_SIGNAL_MAGNITUDE_HIGH) return "HIGH";
-  if (magnitude >= EVIDENCE_SIGNAL_MAGNITUDE_MEDIUM) return "MED";
-  return "LOW";
-};
+/* The recession warning gauge's line, stated in the Spending rule's bar. It
+   used to set a cap of its own — 12 months with the curve above zero, 9 below —
+   beside a Spending rule that says 6 in every condition, and to attach
+   conditions that could not hold: the 12-month branch said "reopen
+   longer-payback work after the curve returns above 0.0%" when it was only
+   chosen with the curve already above zero, and "funding pressure stays below
+   70" printed in a week at 90. No rule lengthens the bar, so the line promises
+   no reopening and states no condition; it says what the gauge's move does to
+   the bar, which is nothing. */
+const curveSlopeImplication = (delta: number): string =>
+  delta > 0
+    ? `Keep the ${SPENDING_PAYBACK_BAR_MONTHS}-month payback bar on new spend; a rising gauge does not lengthen it.`
+    : `Keep the ${SPENDING_PAYBACK_BAR_MONTHS}-month payback bar on new spend; a falling gauge is a reason to hold it, not stretch it.`;
 
 const signalImmediateImplication = (
   key: ReportDynamics["changedSignals"][number]["key"],
   delta: number,
-  assessment: ReturnType<typeof evaluateRegime>,
 ) => {
   if (delta === 0) {
     return "No material operating change this week.";
@@ -276,11 +287,7 @@ const signalImmediateImplication = (
       : "Maintain discipline while testing selective long-payback upside.";
   }
 
-  const curveLine = assessment.scores.curveSlope ?? 0;
-  const paybackCap = curveLine > 0 ? 12 : 9;
-  return delta > 0
-    ? `Allow projects up to ${paybackCap}-month payback only while the curve remains above 0.0% and funding pressure stays below ${formatScoreValue(assessment.thresholds.tightnessRegime)}.`
-    : `Cap new projects at ${paybackCap}-month payback; reopen longer-payback work after the curve returns above 0.0% and funding pressure stays below ${formatScoreValue(assessment.thresholds.tightnessRegime)}.`;
+  return curveSlopeImplication(delta);
 };
 
 export const buildReportEvidenceItems = ({
@@ -295,9 +302,13 @@ export const buildReportEvidenceItems = ({
   signalOrder.map((key) => {
     const movedSignal = reportDynamics.changedSignals.find((item) => item.key === key);
     const delta = movedSignal?.delta ?? 0;
-    const direction = resolveSignalDirection(delta);
-    const directionLabel =
-      direction === "tightening" ? "Tightening" : direction === "easing" ? "Easing" : "Unchanged";
+    /* Which way is worse depends on the signal. This read the delta's sign
+       alone, so risk appetite falling 56 to 48 printed "Easing" and the
+       recession warning gauge rising printed "Tightening" — the opposite of
+       every other surface that judges the same move (`isImprovingSignalDelta`,
+       the weekly direction, /api/cli/changes). */
+    const directionLabel: ReportEvidenceItem["directionLabel"] =
+      delta === 0 ? "Unchanged" : isImprovingSignalDelta(key, delta) ? "Easing" : "Tightening";
 
     const thresholdDistance =
       key === "tightness"
@@ -309,7 +320,7 @@ export const buildReportEvidenceItems = ({
     const supportingBullets = [
       delta === 0
         ? "No measurable move against the prior snapshot."
-        : `Moved ${delta > 0 ? "+" : ""}${delta.toFixed(1)} against the prior snapshot, ${direction === "tightening" ? "tightening" : "easing"} the read.`,
+        : `Moved ${delta > 0 ? "+" : ""}${delta.toFixed(1)} against the prior snapshot, ${directionLabel.toLowerCase()} the read.`,
       thresholdDistance === null
         ? `${signalLabels[key]} feeds this week's guidance but has no line of its own that changes it.`
         : formatBoundaryDistance({
@@ -321,12 +332,17 @@ export const buildReportEvidenceItems = ({
 
     return {
       key,
-      title: evidenceTitleBySignal[key],
+      title: signalLabels[key],
       lastUpdated,
       supportingBullets,
-      confidenceLabel: formatConfidencePlainLabel(toConfidenceLabel(delta)),
+      /* The label's words are about distance from the line ("High (well clear
+         of the line where conditions change)"), and it used to be chosen by
+         the size of the week's move instead: risk appetite falling 8 points
+         printed "well clear" on a page that said it sat 2 points from its
+         line. It reads the distance now, in the published confidence's bands. */
+      confidenceLabel: formatConfidencePlainLabel(resolveLineDistanceLabel(assessment, evidenceLineBySignal[key])),
       directionLabel,
-      immediateImplication: signalImmediateImplication(key, delta, assessment),
+      immediateImplication: signalImmediateImplication(key, delta),
     };
   });
 
