@@ -1,173 +1,5 @@
 [
   {
-    "slug": "2010",
-    "kind": "year",
-    "year": 2010,
-    "title": "2010",
-    "asOf": "2010-12-31",
-    "recordDateLabel": "Dec 31, 2010",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
-    "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
-    "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.07,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.61,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 3.3,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 2.69,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [
-      {
-        "slug": "2010-q1",
-        "title": "Q1 2010",
-        "regime": "EXPANSION",
-        "operatorLabel": "Sunny",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
-      },
-      {
-        "slug": "2010-q2",
-        "title": "Q2 2010",
-        "regime": "EXPANSION",
-        "operatorLabel": "Sunny",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
-      },
-      {
-        "slug": "2010-q3",
-        "title": "Q3 2010",
-        "regime": "EXPANSION",
-        "operatorLabel": "Sunny",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
-      },
-      {
-        "slug": "2010-q4",
-        "title": "Q4 2010",
-        "regime": "EXPANSION",
-        "operatorLabel": "Sunny",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
-      }
-    ],
-    "parentSlug": null,
-    "previousSlug": null,
-    "nextSlug": "2011"
-  },
-  {
-    "slug": "2011",
-    "kind": "year",
-    "year": 2011,
-    "title": "2011",
-    "asOf": "2011-12-31",
-    "recordDateLabel": "Dec 30, 2011",
-    "regime": "VOLATILE",
-    "regimeLabel": "Stormy",
-    "operatorLabel": "Stormy",
-    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this year is to keep the plan flexible, sequence bets with exit ramps, and protect the core business.",
-    "guidance": "keep the plan flexible, sequence bets with exit ramps, and protect the core business",
-    "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.01,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.25,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 1.89,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 1.64,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [
-      {
-        "slug": "2011-q1",
-        "title": "Q1 2011",
-        "regime": "EXPANSION",
-        "operatorLabel": "Sunny",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
-      },
-      {
-        "slug": "2011-q2",
-        "title": "Q2 2011",
-        "regime": "EXPANSION",
-        "operatorLabel": "Sunny",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
-      },
-      {
-        "slug": "2011-q3",
-        "title": "Q3 2011",
-        "regime": "VOLATILE",
-        "operatorLabel": "Stormy",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
-      },
-      {
-        "slug": "2011-q4",
-        "title": "Q4 2011",
-        "regime": "VOLATILE",
-        "operatorLabel": "Stormy",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
-      }
-    ],
-    "parentSlug": null,
-    "previousSlug": "2010",
-    "nextSlug": "2012"
-  },
-  {
     "slug": "2012",
     "kind": "year",
     "year": 2012,
@@ -255,7 +87,7 @@
       }
     ],
     "parentSlug": null,
-    "previousSlug": "2011",
+    "previousSlug": null,
     "nextSlug": "2013"
   },
   {
@@ -720,15 +552,15 @@
     "title": "2018",
     "asOf": "2018-12-31",
     "recordDateLabel": "Dec 31, 2018",
-    "regime": "VOLATILE",
-    "regimeLabel": "Stormy",
-    "operatorLabel": "Stormy",
-    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this year is to keep the plan flexible, sequence bets with exit ramps, and protect the core business.",
-    "guidance": "keep the plan flexible, sequence bets with exit ramps, and protect the core business",
+    "regime": "EXPANSION",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
+    "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
@@ -810,9 +642,9 @@
       {
         "slug": "2018-q4",
         "title": "Q4 2018",
-        "regime": "VOLATILE",
-        "operatorLabel": "Stormy",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "EXPANSION",
+        "operatorLabel": "Sunny",
+        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       }
     ],
     "parentSlug": null,
@@ -1197,9 +1029,9 @@
       {
         "slug": "2022-q1",
         "title": "Q1 2022",
-        "regime": "VOLATILE",
-        "operatorLabel": "Stormy",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "EXPANSION",
+        "operatorLabel": "Sunny",
+        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
       },
       {
         "slug": "2022-q2",
@@ -1211,9 +1043,9 @@
       {
         "slug": "2022-q3",
         "title": "Q3 2022",
-        "regime": "VOLATILE",
-        "operatorLabel": "Stormy",
-        "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs"
+        "regime": "SCARCITY",
+        "operatorLabel": "Freezing",
+        "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans"
       },
       {
         "slug": "2022-q4",
@@ -1439,15 +1271,15 @@
     "title": "2025",
     "asOf": "2025-12-31",
     "recordDateLabel": "Dec 31, 2025",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this year is to commit to growth investments, scale core winners, and maintain payback discipline.",
-    "guidance": "commit to growth investments, scale core winners, and maintain payback discipline",
+    "regime": "DEFENSIVE",
+    "regimeLabel": "Cloudy",
+    "operatorLabel": "Cloudy",
+    "headline": "Cloudy mode. Capital is expensive but funding stays selective. Operate for efficiency. The job this year is to anchor the roadmap on retention, reliability, and margin resilience.",
+    "guidance": "anchor the roadmap on retention, reliability, and margin resilience",
     "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
+      "Focus on margin expansion and retention.",
+      "Cut low-leverage experiments.",
+      "Convert demand with tighter sales cycles."
     ],
     "rates": [
       {
@@ -1543,462 +1375,14 @@
       {
         "slug": "2025-q4",
         "title": "Q4 2025",
-        "regime": "EXPANSION",
-        "operatorLabel": "Sunny",
-        "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady"
+        "regime": "DEFENSIVE",
+        "operatorLabel": "Cloudy",
+        "guidance": "prioritize durable revenue, reduce structural cost, and sequence bets around resilience"
       }
     ],
     "parentSlug": null,
     "previousSlug": "2024",
     "nextSlug": null
-  },
-  {
-    "slug": "2010-q1",
-    "kind": "quarter",
-    "year": 2010,
-    "quarter": 1,
-    "title": "Q1 2010",
-    "asOf": "2010-03-31",
-    "recordDateLabel": "Mar 31, 2010",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
-    "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.15,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 1.02,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 3.84,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 2.82,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [],
-    "parentSlug": "2010",
-    "previousSlug": null,
-    "nextSlug": "2010-q2"
-  },
-  {
-    "slug": "2010-q2",
-    "kind": "quarter",
-    "year": 2010,
-    "quarter": 2,
-    "title": "Q2 2010",
-    "asOf": "2010-06-30",
-    "recordDateLabel": "Jun 30, 2010",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
-    "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.17,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.61,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 2.97,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 2.3600000000000003,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [],
-    "parentSlug": "2010",
-    "previousSlug": "2010-q1",
-    "nextSlug": "2010-q3"
-  },
-  {
-    "slug": "2010-q3",
-    "kind": "quarter",
-    "year": 2010,
-    "quarter": 3,
-    "title": "Q3 2010",
-    "asOf": "2010-09-30",
-    "recordDateLabel": "Sep 30, 2010",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
-    "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.14,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.42,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 2.53,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 2.11,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [],
-    "parentSlug": "2010",
-    "previousSlug": "2010-q2",
-    "nextSlug": "2010-q4"
-  },
-  {
-    "slug": "2010-q4",
-    "kind": "quarter",
-    "year": 2010,
-    "quarter": 4,
-    "title": "Q4 2010",
-    "asOf": "2010-12-31",
-    "recordDateLabel": "Dec 31, 2010",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
-    "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.07,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.61,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 3.3,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 2.69,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [],
-    "parentSlug": "2010",
-    "previousSlug": "2010-q3",
-    "nextSlug": "2011-q1"
-  },
-  {
-    "slug": "2011-q1",
-    "kind": "quarter",
-    "year": 2011,
-    "quarter": 1,
-    "title": "Q1 2011",
-    "asOf": "2011-03-31",
-    "recordDateLabel": "Mar 31, 2011",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
-    "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.05,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.8,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 3.47,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 2.67,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [],
-    "parentSlug": "2011",
-    "previousSlug": "2010-q4",
-    "nextSlug": "2011-q2"
-  },
-  {
-    "slug": "2011-q2",
-    "kind": "quarter",
-    "year": 2011,
-    "quarter": 2,
-    "title": "Q2 2011",
-    "asOf": "2011-06-30",
-    "recordDateLabel": "Jun 30, 2011",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
-    "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.01,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.45,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 3.18,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 2.73,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [],
-    "parentSlug": "2011",
-    "previousSlug": "2011-q1",
-    "nextSlug": "2011-q3"
-  },
-  {
-    "slug": "2011-q3",
-    "kind": "quarter",
-    "year": 2011,
-    "quarter": 3,
-    "title": "Q3 2011",
-    "asOf": "2011-09-30",
-    "recordDateLabel": "Sep 30, 2011",
-    "regime": "VOLATILE",
-    "regimeLabel": "Stormy",
-    "operatorLabel": "Stormy",
-    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
-    "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.02,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.25,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 1.92,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 1.67,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [],
-    "parentSlug": "2011",
-    "previousSlug": "2011-q2",
-    "nextSlug": "2011-q4"
-  },
-  {
-    "slug": "2011-q4",
-    "kind": "quarter",
-    "year": 2011,
-    "quarter": 4,
-    "title": "Q4 2011",
-    "asOf": "2011-12-31",
-    "recordDateLabel": "Dec 30, 2011",
-    "regime": "VOLATILE",
-    "regimeLabel": "Stormy",
-    "operatorLabel": "Stormy",
-    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
-    "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
-    ],
-    "rates": [
-      {
-        "label": "The 1-month Treasury bill (1M)",
-        "value": 0.01,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS1MO"
-      },
-      {
-        "label": "US Treasury 2Y",
-        "value": 0.25,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS2"
-      },
-      {
-        "label": "US Treasury 10Y",
-        "value": 1.89,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      },
-      {
-        "label": "Yield curve slope (10Y - 2Y)",
-        "value": 1.64,
-        "unit": "%",
-        "sourceUrl": "https://fred.stlouisfed.org/series/DGS10"
-      }
-    ],
-    "sourceLabel": "US Treasury Daily Treasury Yield Curve Rates (via FRED)",
-    "sourceUrl": "https://fred.stlouisfed.org/series/DGS10",
-    "statusLabel": "Historical (simulated)",
-    "sampleCadence": null,
-    "sampleCount": 0,
-    "regimeMix": [],
-    "transitions": [],
-    "children": [],
-    "parentSlug": "2011",
-    "previousSlug": "2011-q3",
-    "nextSlug": "2012-q1"
   },
   {
     "slug": "2012-q1",
@@ -2060,7 +1444,7 @@
     "transitions": [],
     "children": [],
     "parentSlug": "2012",
-    "previousSlug": "2011-q4",
+    "previousSlug": null,
     "nextSlug": "2012-q2"
   },
   {
@@ -3709,15 +3093,15 @@
     "title": "Q4 2018",
     "asOf": "2018-12-31",
     "recordDateLabel": "Dec 31, 2018",
-    "regime": "VOLATILE",
-    "regimeLabel": "Stormy",
-    "operatorLabel": "Stormy",
-    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "regime": "EXPANSION",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
+    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
@@ -4573,15 +3957,15 @@
     "title": "Q1 2022",
     "asOf": "2022-03-31",
     "recordDateLabel": "Mar 31, 2022",
-    "regime": "VOLATILE",
-    "regimeLabel": "Stormy",
-    "operatorLabel": "Stormy",
-    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "regime": "EXPANSION",
+    "regimeLabel": "Sunny",
+    "operatorLabel": "Sunny",
+    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
+    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Prioritize reach and learning velocity over perfect finish.",
+      "Spend with clear guardrails, even if some experiments fail.",
+      "Scale capacity ahead of demand only where leading signals stay strong."
     ],
     "rates": [
       {
@@ -4714,15 +4098,15 @@
     "title": "Q3 2022",
     "asOf": "2022-09-30",
     "recordDateLabel": "Sep 30, 2022",
-    "regime": "VOLATILE",
-    "regimeLabel": "Stormy",
-    "operatorLabel": "Stormy",
-    "headline": "Stormy mode. Capital is cheaper but funding is wary. Build trust and resilience. The job this quarter is to balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs.",
-    "guidance": "balance experiments with clear guardrails, keep approvals reversible, and protect core KPIs",
+    "regime": "SCARCITY",
+    "regimeLabel": "Freezing",
+    "operatorLabel": "Freezing",
+    "headline": "Freezing mode. Capital is expensive and lenders are pulling back. Prioritize survival over growth. The job this quarter is to lock discretionary spend, extend runway, and demand tighter payback before expanding plans.",
+    "guidance": "lock discretionary spend, extend runway, and demand tighter payback before expanding plans",
     "constraints": [
-      "Ship reliability and security before novelty.",
-      "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees."
+      "Shorten payback windows and preserve cash.",
+      "Delay speculative hiring or large platform rewrites.",
+      "Route roadmap bets through revenue certainty."
     ],
     "rates": [
       {
@@ -5586,15 +4970,15 @@
     "title": "Q4 2025",
     "asOf": "2025-12-31",
     "recordDateLabel": "Dec 31, 2025",
-    "regime": "EXPANSION",
-    "regimeLabel": "Sunny",
-    "operatorLabel": "Sunny",
-    "headline": "Sunny mode. Capital is available and financing conditions are supportive. The weekly call sets the tempo inside that window. The job this quarter is to scale the strongest plays, invest in growth engines, and keep payback discipline steady.",
-    "guidance": "scale the strongest plays, invest in growth engines, and keep payback discipline steady",
+    "regime": "DEFENSIVE",
+    "regimeLabel": "Cloudy",
+    "operatorLabel": "Cloudy",
+    "headline": "Cloudy mode. Capital is expensive but funding stays selective. Operate for efficiency. The job this quarter is to prioritize durable revenue, reduce structural cost, and sequence bets around resilience.",
+    "guidance": "prioritize durable revenue, reduce structural cost, and sequence bets around resilience",
     "constraints": [
-      "Prioritize reach and learning velocity over perfect finish.",
-      "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong."
+      "Focus on margin expansion and retention.",
+      "Cut low-leverage experiments.",
+      "Convert demand with tighter sales cycles."
     ],
     "rates": [
       {

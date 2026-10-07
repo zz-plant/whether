@@ -234,10 +234,11 @@ describe("product canon: the archive's side of the link", () => {
     assert.ok(essaysPublishedIn({ year: 2016 }).length > 0, "the fixture year has essays");
   });
 
+  /* 2024, not 2010: the 2010 and 2011 pages predated the record and are gone. */
   it("leaves the section out of a year with none", async () => {
     const page = await import("../app/history/[period]/page");
-    const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ period: "2010" }) }));
-    assert.equal(essaysPublishedIn({ year: 2010 }).length, 0);
+    const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ period: "2024" }) }));
+    assert.equal(essaysPublishedIn({ year: 2024 }).length, 0);
     assert.doesNotMatch(html, /Product writing published in/);
   });
 });

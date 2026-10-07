@@ -31,11 +31,23 @@ describe("/brief/[week] leads with the delta, then the share tool", () => {
     const card = html.slice(html.indexOf('id="share-ready-artifact"'), html.indexOf("What changed this week"));
 
     assert.match(card, /type-stamp/, "the regime word is the card's stamp");
-    assert.match(card, /Pause if/);
+    /* w31 stored an avoid-list item where the pause line goes; the card leaves the slot out rather than print it as a trigger. */
+    assert.doesNotMatch(card, /Over-engineering/);
     assert.match(card, /Conditions change if/);
+    assert.match(card, /Funding pressure above 70 \(52 today\)/);
     assert.match(card, /Week of /, "a crop of the card carries its week");
     assert.equal(html.match(/<h1[\s>]/g)?.length, 1, "the week's title is the page's one h1");
     assert.equal(html.match(/>Conditions change if<\/dt>/g)?.length, 1, "the call-change line is labelled once outside the paste preview");
+  });
+
+  /* w40 printed "+27.0 vs prior week": the stored move was against Aug 31, five
+     weeks back, and the week before had read 85, not 63. */
+  it("names the reading each move is against, in whole points", async () => {
+    const page = await import("../app/brief/[week]/page");
+    const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ week: "2026-w40" }) }));
+    const readings = html.slice(html.indexOf("The numbers behind the guidance"));
+    assert.match(readings, />\+5 vs Sep 22</);
+    assert.doesNotMatch(html, /vs prior week|\+27\.0|last week 63/);
   });
 
   it("prints the w31 correction inside the card", async () => {

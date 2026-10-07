@@ -89,7 +89,8 @@ const publishedItems = (): FeedItem[] =>
         `        <p><strong>Conditions:</strong> ${escapeXml(display.conditions)}</p>`,
         `        <p>${escapeXml(brief.summary)}</p>`,
         `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(brief.actionNow)}</p>`,
-        `        <p><strong>What changed:</strong> ${escapeXml(brief.whatChanged)}</p>`,
+        /* Through the display layer: w38 and w39 stored "Pressure increased by +3.0 this week", a figure in no unit against Aug 31. */
+        `        <p><strong>What changed:</strong> ${escapeXml(display.whatChanged)}</p>`,
         `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · ${escapeXml(display.confidence)}</p>`,
         `        <p><a href="${escapeXml(link)}">Read the published brief →</a></p>`,
       ].join("\n"),

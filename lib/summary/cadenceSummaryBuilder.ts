@@ -50,6 +50,19 @@ const cadenceTitle: Record<CadenceSummaryName, string> = {
   yearly: "Yearly action summary",
 };
 
+/**
+ * The sentence a quarterly or yearly summary leads with: the conditions, what
+ * they mean, and the period's job. The archive index rebuilds it for a period
+ * whose readings mostly sat in other conditions than its closing reading did
+ * (`scripts/generatePostureArchiveIndex.ts`), so both say it the same way.
+ */
+export const buildCadenceSummarySentence = (
+  cadence: CadenceSummaryName,
+  regime: RegimeAssessment["regime"],
+  description: string,
+  guidance: string,
+) => joinSentences(`${getRegimePublicLabel(regime)} mode`, description, `${cadenceJobLine[cadence]} ${guidance}`);
+
 export const buildCadenceSummary = ({
   cadence,
   guidanceMap,
@@ -61,11 +74,7 @@ export const buildCadenceSummary = ({
 }: CadenceSummaryParams): CadenceSummaryBase => {
   const regimeLabel = getRegimePublicLabel(assessment.regime);
   const guidance = guidanceMap[assessment.regime];
-  const summary = joinSentences(
-    `${regimeLabel} mode`,
-    assessment.description,
-    `${cadenceJobLine[cadence]} ${guidance}`,
-  );
+  const summary = buildCadenceSummarySentence(cadence, assessment.regime, assessment.description, guidance);
   const title = periodLabel
     ? `${cadenceTitle[cadence]} — ${periodLabel}`
     : cadenceTitle[cadence];
