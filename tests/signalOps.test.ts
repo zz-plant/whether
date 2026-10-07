@@ -256,7 +256,7 @@ describe("signalOps", () => {
       (delta) => delta.code === "risk-appetite-downshift",
     );
     assert.equal(hiring?.thresholdValue, 44);
-    assert.match(hiring?.action ?? "", /^Pause net-new hiring if .*risk appetite falls below 44\.$/);
+    assert.match(hiring?.action ?? "", /^Pause net-new hiring if .*risk appetite is below 44 \(already true at 43\)\.$/);
     assert.match(hiring?.reversal ?? "", /funding pressure falls below 66 and risk appetite is above 54/);
 
     for (const delta of deltas) {
