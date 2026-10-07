@@ -339,6 +339,18 @@ describe("brief decision card render", () => {
     assert.ok(printed.length <= 78, `the scope ran to ${printed.length} characters`);
   });
 
+  it("counts an arrow as the full em it draws, so a line of them wraps", () => {
+    // Twenty characters fit at 24px in this width by the average. Ten arrows and the spaces
+    // between them are 19 characters, but draw 11.9em (285px) in a 235px line.
+    const width = 24 * SANS_EM * 20;
+    const arrows = Array.from({ length: 10 }, () => "→").join(" ");
+    const letters = Array.from({ length: 10 }, () => "a").join(" ");
+
+    assert.equal(wrappedLines(letters, 24, width, SANS_EM).length, 1);
+    assert.equal(wrappedLines(arrows, 24, width, SANS_EM).length, 2, "the arrows were counted as letters");
+    assert.equal(wrappedLines(arrows.replace(/→/g, "—"), 24, width, SANS_EM).length, 2);
+  });
+
   it("emits no <div> that satori would reject mid-render", () => {
     assert.deepEqual(findSatoriLayoutViolations(renderBriefImage(briefImageProps)), []);
     assert.deepEqual(findSatoriLayoutViolations(renderBriefImage(fullCardProps)), []);

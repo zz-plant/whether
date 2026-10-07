@@ -474,10 +474,13 @@ const PAGE_WIDTH = pt(SLIDE_WIDTH_PX);
 const PAGE_HEIGHT = pt(SLIDE_HEIGHT_PX);
 
 /*
- * The standard fonts encode WinAnsi, and `embedFont` throws on a character
- * outside it. The rule copy is plain prose but carries dashes, curly quotes
- * and the middle dot, all of which WinAnsi has; anything else is mapped to
- * its nearest ASCII or dropped rather than failing the whole export.
+ * The standard fonts encode WinAnsi, which has no arrow, ≤, ≥ or minus sign.
+ * @cantoo/pdf-lib encodes a character outside it as "?" (checked 2026-10-07:
+ * "a → b" encodes as "a ? b"); upstream pdf-lib throws. The rule copy is plain
+ * prose but carries dashes, curly quotes and the middle dot, all of which
+ * WinAnsi has; anything else is mapped to its nearest ASCII or dropped rather
+ * than printed as a question mark. This is the PDF only: the .pptx above sets
+ * its text in Calibri, which draws →, and passes the arrow through.
  */
 const toWinAnsi = (text: string) =>
   text

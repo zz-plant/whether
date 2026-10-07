@@ -52,6 +52,62 @@
     U+2215, U+2248, U+2260, U+2264-2265, U+FEFF, U+FFFD;
 }
 
+/*
+ * Metric-matched stand-ins for the first visit, while the Archivo file is in
+ * flight (--font-sans lists "Archivo Fallback" second). Until 2026-10-07 the
+ * page drew system-ui until the swap, at normal width (measured with Inter as
+ * system-ui: 8-9% wider than Archivo, 17% wider than the call's semi-condensed
+ * bold), and on a 430px phone the swap reflowed the home page's decision
+ * chips. With these faces the home page's copy sets within about 1% of
+ * Archivo before the swap.
+ * docs/agents/ui-ux-standards.md §XXII has the measurements.
+ *
+ * Arial ships on Windows, macOS and iOS; Liberation Sans is its
+ * metric-compatible twin on Linux, so the same numbers fit both. Android has
+ * neither and falls through to system-ui as before. Each face is scaled so
+ * its average advance matches Archivo's, measured on the same letter-frequency
+ * string for both fonts ("aaabcdeeeefghiijklmnnoopqrrssttuvwxyz" plus six
+ * spaces, the string next/font uses): size-adjust is Archivo's average over
+ * Arial's, and each override is Archivo's own (ascender 878, descender 210,
+ * line gap 0, of 1000) divided by it.
+ *   text, wdth 100 wght 400       0.4509em over Arial 0.4563em      = 98.81%
+ *   display, wdth 87.5 wght 700   0.4349em over Arial Bold 0.4937em = 88.10%
+ * The display face answers font-stretch 87.5% (--font-stretch-display) with
+ * real Arial Bold, the call's weight; at 125% (the stamp) the browser takes the
+ * normal-width face. The unicode-range is Archivo's, so a character Archivo
+ * does not draw still falls to system-ui after the swap, as it did before.
+ * One thing no override can match: a `ch` width (max-w-[64ch]) is measured on
+ * "0", which is 573 units in Archivo and 549 here, so a ch-wide column is 4%
+ * narrower until the swap.
+ */
+@font-face {
+  font-family: "Archivo Fallback";
+  font-style: normal;
+  src: local("Arial"), local("ArialMT"), local("Liberation Sans"), local("LiberationSans");
+  size-adjust: 98.81%;
+  ascent-override: 88.86%;
+  descent-override: 21.25%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+0394, U+2000-206F, U+20AC, U+2122, U+2190-2195, U+2212,
+    U+2215, U+2248, U+2260, U+2264-2265, U+FEFF, U+FFFD;
+}
+
+@font-face {
+  font-family: "Archivo Fallback";
+  font-style: normal;
+  font-weight: 100 900;
+  font-stretch: 87.5%;
+  src: local("Arial Bold"), local("Arial-BoldMT"), local("Liberation Sans Bold"), local("LiberationSans-Bold");
+  size-adjust: 88.1%;
+  ascent-override: 99.66%;
+  descent-override: 23.84%;
+  line-gap-override: 0%;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+0394, U+2000-206F, U+20AC, U+2122, U+2190-2195, U+2212,
+    U+2215, U+2248, U+2260, U+2264-2265, U+FEFF, U+FFFD;
+}
+
 @font-face {
   font-family: "Chivo Mono";
   font-style: normal;

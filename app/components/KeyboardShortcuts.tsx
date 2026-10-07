@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HelpModal } from "./home/HelpModal";
 import { openShareRail } from "./globalShareRail";
-import { scrollBehaviorFor } from "./scrollRowToItem";
 import { shortcutNavigationLayers } from "../../lib/navigation/informationArchitecture";
 
 /* One source: the IA declares each layer's key, the header tabs show it on
@@ -132,8 +131,12 @@ export function KeyboardShortcuts() {
           // started from wherever that jump landed: two movements per key. Focus without
           // scrolling, then make the one scroll — to the section's start, under the sticky
           // stack the html scroll-padding describes, the way a hash link lands it.
+          // The scroll is a jump, not an animation: J pressed five times in a row is
+          // five state changes, and a glide on each is felt as latency (ui-ux-standards
+          // §XXIII). A jump is also the reduced-motion end state, so the preference needs
+          // no branch here.
           target.focus({ preventScroll: true });
-          target.scrollIntoView({ behavior: scrollBehaviorFor(true), block: "start" });
+          target.scrollIntoView({ behavior: "auto", block: "start" });
         }
         return;
       }
