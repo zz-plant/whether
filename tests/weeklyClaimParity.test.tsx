@@ -315,9 +315,6 @@ describe("one week, one set of claims, every surface", () => {
         }
       });
 
-      /* The Monday sends print no comparison: the operating snapshot they are built
-         from carries no earlier reading (`briefSourceFromSnapshot`). Held here as an
-         absence, so a send that starts printing one has to print this one. */
       it("compares the week with the same reading everywhere", async () => {
         const { reportData, home, document, markdown, card, agent, memo, record, slack, email } = await render(week);
         const comparedWith = reportData.reportDynamics.comparedWith;
@@ -332,8 +329,12 @@ describe("one week, one set of claims, every surface", () => {
         assert.deepEqual(agent.change.comparedWith, comparedWith, "the agent state");
         assert.ok(memo.decisionShift.includes(label), "the /api/decision memo");
         assert.deepEqual(record.scores?.comparedWith, comparedWith, "the frozen record");
-        for (const text of [slack, email]) {
-          assert.doesNotMatch(text, /\bsince [A-Z][a-z]{2} \d{1,2}\b|\bwas \d+ on\b|\bvs [A-Z][a-z]{2} \d{1,2}\b/i, "the Monday sends");
+        /* The Monday sends render the stored snapshot, which kept no earlier reading
+           until 2026-10-07: they said "Conditions are tightening" against nothing named. */
+        for (const [surface, text] of Object.entries({ "the Monday post": slack, "the Monday email": email })) {
+          const named = [...text.matchAll(/(?:\bSince|\bwas \d+ on|\bvs) ([A-Z][a-z]{2} \d{1,2})\b/g)].map(([, date]) => date);
+          assert.ok(named.length > 0, `${surface} names what the week is compared with:\n${text}`);
+          assert.deepEqual([...new Set(named)], [label], `${surface} names one comparison, the page's`);
         }
       });
 

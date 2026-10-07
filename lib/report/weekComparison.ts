@@ -3,6 +3,7 @@ import { getPreviousTimeMachineSnapshot } from "../timeMachine/timeMachineCache"
 import { buildComparedWith } from "./comparisonBasis";
 import { findWeeklyComparisonReading, observedBaseRate, rescoreStoredInputs, type ComparisonReading } from "./comparisonReading";
 import { getPublishedBriefs } from "./publishedBriefs";
+import { buildReportDynamics } from "./reportEvidence";
 import type { ComparedWith } from "./reportDataTypes";
 import type { TreasuryData } from "../types";
 
@@ -47,7 +48,7 @@ export const selectWeekComparison = <MonthEnd extends WeekComparisonChoice>(
  * area's rule while the page, which compares at read time, led with "Conditions
  * are tightening. Keep only the bets you can stop" (docs/claims-ledger.md).
  */
-export const resolveWeekComparison = (
+const resolveWeekComparison = (
   recordDate: string,
   thresholds: RegimeThresholds,
 ): WeekComparisonChoice | null =>
@@ -63,3 +64,22 @@ export const resolveWeekComparison = (
       };
     },
   );
+
+/**
+ * A stored reading's comparison and the dynamics built from it. The operating
+ * snapshot builds its weekly call from these, and the Monday sends read the same
+ * earlier reading when they render the snapshot (`briefSourceFromSnapshot`), so
+ * the email and Slack post name the week the call was compared with. They named
+ * none until 2026-10-07: the snapshot kept no earlier reading.
+ */
+export const resolveWeekDynamics = (assessment: RegimeAssessment, recordDate: string) => {
+  const comparison = resolveWeekComparison(recordDate, assessment.thresholds);
+  return {
+    comparison,
+    reportDynamics: buildReportDynamics({
+      current: assessment,
+      previous: comparison?.reading ?? null,
+      comparedWith: comparison?.comparedWith,
+    }),
+  };
+};

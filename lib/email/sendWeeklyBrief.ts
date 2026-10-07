@@ -1,5 +1,5 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
-import { emailTextFooter, renderEmailShell } from "./emailShell";
+import { emailTextFooter, escapeHtml, renderEmailShell } from "./emailShell";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { assessSnapshotReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
@@ -12,6 +12,7 @@ import { fanOut } from "../delivery/fanOut";
 import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 import type { BriefDocument } from "../report/briefArtifact";
 import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
+import { briefWeekChangeLine, EXPORT_SECTION_HEADINGS } from "../export/briefBuilders";
 
 /**
  * How far a reading sits from the line that would change the call, and which
@@ -193,6 +194,9 @@ export const sendWeeklyBrief = async (options?: {
   const regime = document.conditions.regime;
   const regimeLabel = getRegimePublicLabel(regime);
   const readings = buildWeeklyEmailReadings(document);
+  /* What moved since the earlier reading, named by its date, as every paste opens
+     "What changed this week". Absent on a week with nothing compared. */
+  const weekChange = briefWeekChangeLine(document);
   const actionNow = document.slots.actionNow;
   const pauseIf = document.slots.pauseIf;
   const changeLines = weeklyCallChangeLines(document.slots);
@@ -215,6 +219,7 @@ export const sendWeeklyBrief = async (options?: {
         `Whether Weekly Brief — ${recordDate}`,
         `Conditions: ${document.conditions.line}`,
         ...readingsText(readings),
+        ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
         `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
         ...changeLines.map(({ label, value }) => `${label}: ${value}`),
@@ -234,6 +239,9 @@ export const sendWeeklyBrief = async (options?: {
         `<p style="font-size:0.85rem;margin:4px 0 0;color:#cbd5e1;">${getRegimeWeatherRationale(regime)}</p>`,
         `</td></tr></table>`,
         readingsHtml(readings),
+        ...(weekChange
+          ? [`<p style="font-size:0.9rem;margin:12px 0 0;color:#cbd5e1;"><strong style="color:#f1f5f9;">${EXPORT_SECTION_HEADINGS.changed}:</strong> ${escapeHtml(weekChange)}</p>`]
+          : []),
       );
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,

@@ -15,6 +15,7 @@ import { buildSensorReadings } from "../sensors";
 import { describeConditions, pauseConditionOnly } from "../export/exportTerms";
 import { buildBriefPermalinkUrl } from "../export/briefPermalink";
 import { previousScoresFromDynamics, type PreviousReading } from "../export/scoreReference";
+import { resolveWeekDynamics } from "./weekComparison";
 import { buildPostureState } from "./postureStateSource";
 import type { PostureStateContract } from "./postureStateContract";
 import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
@@ -38,19 +39,28 @@ type BriefDocumentSource = {
   sourceLabel: string;
   /** The readings the read path already holds; derived from the treasury record when absent. */
   sensors?: readonly SensorReading[];
-  /** The earlier scores, when the read carries a comparison. A snapshot holds no previous week. */
+  /** The earlier scores, when the read carries a comparison. */
   previousScores?: PreviousReading | null;
   /** A Time Machine read, which publishes no live confidence. */
   historical?: boolean;
 };
 
-/** The reading the cron just materialized. */
+/**
+ * The reading the cron just materialized, with the earlier reading its weekly call
+ * was compared with (`resolveWeekDynamics`, the snapshot's own). It carried none
+ * until 2026-10-07, so the Monday email and Slack post said "Conditions are
+ * tightening" and never against what.
+ */
 export const briefSourceFromSnapshot = (snapshot: OperatingSnapshot): BriefDocumentSource => ({
   assessment: snapshot.assessment,
   treasury: snapshot.treasury,
   macroSeries: snapshot.macroSeries,
   recordDateLabel: snapshot.provenance.recordDateLabel,
   sourceLabel: snapshot.provenance.sourceLabel,
+  previousScores: previousScoresFromDynamics(
+    resolveWeekDynamics(snapshot.assessment, snapshot.recordDate).reportDynamics,
+    snapshot.assessment.scores,
+  ),
 });
 
 /** The reading the page read path serves, with the comparison it carries. */

@@ -153,6 +153,32 @@ const formatItemLines = (item: ActionStripItem, kind: "pause" | "resume") => {
  * Takes the reading rather than the document because the plan page prints the
  * same lines above its own picker from the report read.
  */
+/** What the week did to the decisions against the earlier reading ("Since Sep 30, conditions changed …"); null without one. */
+const weekChangeLine = (
+  reading: { scores: { tightness: number; riskAppetite: number }; thresholds: RegimeAssessment["thresholds"]; regime: RegimeAssessment["regime"] },
+  items: readonly ActionStripItem[],
+  previous: PreviousReading | null,
+): string | null =>
+  buildDecisionMovement({
+    scores: { tightness: reading.scores.tightness, riskAppetite: reading.scores.riskAppetite },
+    previous,
+    thresholds: reading.thresholds,
+    regime: reading.regime,
+    areas: areaLinesFromActionStrip(items),
+  })?.sentence ?? null;
+
+/**
+ * The document's "What changed this week" lead, the line every paste opens that
+ * section with. The Monday email prints it too: it listed the two scores and said
+ * nothing about what moved, or since when.
+ */
+export const briefWeekChangeLine = (document: BriefDocument): string | null =>
+  weekChangeLine(
+    { scores: document.readings.scores, thresholds: document.readings.thresholds, regime: document.conditions.regime },
+    document.areaRows,
+    document.readings.previous,
+  );
+
 export const buildReadingLines = (
   reading: {
     scores: { tightness: number; riskAppetite: number };
@@ -168,13 +194,7 @@ export const buildReadingLines = (
   /* What the week did to the decisions leads: the readings under it are the evidence,
      and a paste read by someone who never sees the page should get the consequence
      first. Absent, like the earlier reading it is measured against, without one. */
-  const decisionLine = buildDecisionMovement({
-    scores,
-    previous,
-    thresholds: reading.thresholds,
-    regime: reading.regime,
-    areas: areaLinesFromActionStrip(items),
-  })?.sentence;
+  const decisionLine = weekChangeLine(reading, items, previous);
   return [
     ...(decisionLine ? [decisionLine] : []),
     ...buildScoreReferenceLines({
