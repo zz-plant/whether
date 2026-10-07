@@ -238,7 +238,7 @@ describe("signalOps", () => {
 
     const spend = deltas.find((delta) => delta.code === "tightness-upshift");
     assert.equal(spend?.thresholdValue, 76);
-    assert.equal(spend?.action, "Pause new discretionary spend if funding pressure rises above 76.");
+    assert.equal(spend?.action, "Pause new discretionary spend if funding pressure is above 76 (already true at 90).");
     assert.equal(spend?.reversal, "Resume new spend when funding pressure falls below 66 and the payback figures still hold.");
     assert.equal(
       deltas.some((delta) => delta.decisionArea === "hiring"),
