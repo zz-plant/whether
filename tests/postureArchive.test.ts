@@ -114,7 +114,12 @@ describe("posture archive index", () => {
       const most = Math.max(...period.regimeMix.map((share) => share.periods));
       const held = period.regimeMix.find((share) => share.regime === period.regime);
       assert.equal(held?.periods, most, `${period.slug} is headlined ${period.operatorLabel}, which held ${held?.periods ?? 0} of ${period.sampleCount}`);
-      assert.ok(period.headline.startsWith(`${period.operatorLabel} mode.`), `${period.slug}: "${period.headline}" is about other conditions`);
+      /* Archived entries lead "Freezing mode."; a period the archive never closed in
+         its conditions takes the sentence the builders write today, "Freezing: …". */
+      assert.ok(
+        period.headline.startsWith(`${period.operatorLabel} mode.`) || period.headline.startsWith(`${period.operatorLabel}: `),
+        `${period.slug}: "${period.headline}" is about other conditions`,
+      );
     }
     assert.equal(findPostureArchivePeriod("2022-q3")?.operatorLabel, "Freezing");
     assert.equal(findPostureArchivePeriod("2018")?.operatorLabel, "Sunny");

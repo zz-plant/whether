@@ -4,6 +4,7 @@ import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import { buildWeeklyCallContract } from "../report/weeklyCallContract";
 import { buildHomeBriefModel } from "../report/homeBriefModel";
 import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";
+import { FRED_SOURCE_LABEL, PROVENANCE_STATUS } from "../report/provenanceStatus";
 import { buildSensorReadings } from "../sensors";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC, formatWeekEndingUTC } from "../formatters";
 import type { OperatingSnapshot } from "./types";
@@ -137,13 +138,17 @@ export const buildOperatingSnapshot = ({
     assessment,
     weeklyCall,
     machineState,
+    /* The source is the publisher whether or not this read was live; `statusLabel` says
+       which. Until 2026-10-07 a saved copy was sourced "Canonical snapshot (FRED)" and
+       both sides claimed "(high confidence)", a figure nothing here computes and the
+       published confidence often contradicts. A saved copy is the cached tier. */
     provenance: {
-      sourceLabel: treasury.isLive ? "Federal Reserve Economic Data (FRED)" : "Canonical snapshot (FRED)",
+      sourceLabel: FRED_SOURCE_LABEL,
       sourceUrl: treasury.source,
       recordDateLabel: formatDateUTC(recordDate),
       timestampLabel: formatTimestampUTC(treasury.fetched_at),
       ageLabel: formatAgeHours(treasury.fetched_at, now),
-      statusLabel: treasury.isLive ? "Live (high confidence)" : "Canonical snapshot (high confidence)",
+      statusLabel: treasury.isLive ? PROVENANCE_STATUS.live : PROVENANCE_STATUS.cached,
       isLive: treasury.isLive,
     },
     freshness: {

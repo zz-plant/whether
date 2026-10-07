@@ -55,13 +55,18 @@ const cadenceTitle: Record<CadenceSummaryName, string> = {
  * they mean, and the period's job. The archive index rebuilds it for a period
  * whose readings mostly sat in other conditions than its closing reading did
  * (`scripts/generatePostureArchiveIndex.ts`), so both say it the same way.
+ *
+ * It led with "Freezing mode." until 2026-10-07: a "mode" the weather word is
+ * not, and a sentence of its own with nothing in it. It now opens the way the
+ * weekly and monthly summaries do, "Freezing: <what the conditions mean>".
+ * Archived entries keep the words they were stored with.
  */
 export const buildCadenceSummarySentence = (
   cadence: CadenceSummaryName,
   regime: RegimeAssessment["regime"],
   description: string,
   guidance: string,
-) => joinSentences(`${getRegimePublicLabel(regime)} mode`, description, `${cadenceJobLine[cadence]} ${guidance}`);
+) => joinSentences(`${getRegimePublicLabel(regime)}: ${description}`, `${cadenceJobLine[cadence]} ${guidance}`);
 
 export const buildCadenceSummary = ({
   cadence,

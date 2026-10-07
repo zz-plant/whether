@@ -6,7 +6,8 @@ import { decisionAreaLabel } from "../boundedDecisionRules";
 import { getRegimePublicLabel } from "../../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../publishedBriefs";
-import { briefArtifactOf, briefSourceFromReportData, buildBriefDocument, publisherSourceLabel } from "../briefDocument";
+import { briefArtifactOf, briefSourceFromReportData, buildBriefDocument } from "../briefDocument";
+import { publisherSourceLabel } from "../provenanceStatus";
 
 type HomePageAssembly = Awaited<ReturnType<typeof assembleHomePage>>;
 type WeeklyCard = HomePageAssembly["weeklyDecisionCardModel"];

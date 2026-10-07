@@ -1,5 +1,10 @@
 import type { RegimeAssessment, RegimeChangeReason } from "./regimeEngine";
 import { applyConfidenceGate, buildDecisionDeltaRules, buildDecisionVerdictHeadline } from "./alert/decisionDeltaRules";
+import { formatDateUTC, formatScoreValue, formatSignedDelta, formatThresholdNumber } from "./formatters";
+import { getRegimePublicLabel } from "./regimePresentation";
+import { ruleMetricLabel, type RuleConditionMetric } from "./report/boundedDecisionRules";
+import { DECISION_CONTRACT_LABELS } from "./report/reportCopy";
+import { joinSentences } from "./report/reportFormatting";
 
 type AlertChannel = "slack" | "email" | "webhook";
 
@@ -64,6 +69,20 @@ export type AlertDeliveryEvent = {
 const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 const MIN_SUSTAINED_PERIODS = 2;
 
+/**
+ * The crossing an alert reports, in the score's name and whole points: "Funding
+ * pressure 90 crossed the Spending pause line at 76." It read "Trigger 90.00 vs
+ * Spending pause line 76.00" — two decimals on scores published as whole
+ * numbers — and on a change of conditions "Trigger 0.00 vs The line where
+ * conditions change 0.00", placeholders printed as a reading. A change of
+ * conditions crosses no single line, so it says nothing here; its reversal
+ * sentence names both lines with their numbers.
+ */
+const describeCrossing = (delta: { metric?: RuleConditionMetric; metricValue: number; thresholdLabel: string; thresholdValue: number }) =>
+  delta.metric
+    ? `${ruleMetricLabel[delta.metric]} ${formatScoreValue(delta.metricValue)} crossed the ${delta.thresholdLabel} at ${formatThresholdNumber(delta.thresholdValue)}`
+    : "";
+
 export const buildSignalAlertPayload = (
   payload: SignalAlertInputPayload,
   latestAlert?: RegimeAlertEvent,
@@ -95,10 +114,10 @@ export const buildSignalAlertPayload = (
   }, {});
 
   const reasons: RegimeChangeReason[] =
-    decisionDeltas.length > 0
-      ? decisionDeltas.map((delta) => ({
+    gated.length > 0
+      ? gated.map((delta) => ({
           code: delta.code,
-          message: `${buildDecisionVerdictHeadline(delta)}. ${delta.actionText} Trigger ${delta.triggerValue.toFixed(2)} vs ${delta.thresholdLabel} ${delta.thresholdValue.toFixed(2)}. ${delta.reversalText}`,
+          message: joinSentences(buildDecisionVerdictHeadline(delta), delta.action, describeCrossing(delta), delta.reversal),
         }))
       : payload.reasons ?? [{ code: "signals-updated", message: "Signal values updated with no threshold crossing." }];
 
@@ -187,34 +206,49 @@ export const buildWeeklyDigest = (
   const latest = thisWeek[0];
   const previous = thisWeek[1];
 
+  /*
+   * In the conditions word and the date every page prints. The digest said
+   * "SCARCITY regime as of 2026-10-05", "Last recorded change: SCARCITY" and "No
+   * regime-change alerts this week": the engine's key and its name for conditions.
+   * A stored alert is not always a change of conditions (a line crossing raises
+   * one too), so the history line names the alert and the conditions it read.
+   */
+  const conditionsOf = (alert: RegimeAlertEvent) =>
+    `${getRegimePublicLabel(alert.payload.currentAssessment.regime)} as of ${formatDateUTC(alert.payload.currentRecordDate)}`;
+
   if (!latest) {
     // alerts[0] is the newest: the event log lists newest-first.
     const lastRecorded = alerts[0];
     return {
-      summary: "No regime-change alerts this week.",
+      summary: "No alerts this week.",
       bullets: [
         "Evidence updated with no threshold crossings.",
-        ...(lastRecorded
-          ? [
-              `Last recorded change: ${lastRecorded.payload.currentAssessment.regime} as of ${lastRecorded.payload.currentRecordDate}.`,
-            ]
-          : []),
+        ...(lastRecorded ? [`Last recorded alert: conditions were ${conditionsOf(lastRecorded)}.`] : []),
       ],
     };
   }
 
   const currentScores = latest.payload.currentAssessment.scores;
   const previousScores = previous?.payload.currentAssessment.scores;
-  const tightnessDelta = previousScores ? currentScores.tightness - previousScores.tightness : 0;
-  const riskDelta = previousScores ? currentScores.riskAppetite - previousScores.riskAppetite : 0;
+  /* Whole points, and only against an earlier alert this week. With none, both
+     lines printed "+0.00", a move nobody measured. */
+  const scoreLine = (label: string, current: number, before: number | undefined) =>
+    before === undefined
+      ? `${label} ${formatScoreValue(current)}.`
+      : `${label} ${formatScoreValue(current)}, ${formatSignedDelta(Math.round(current) - Math.round(before))} points since the previous alert.`;
 
   return {
-    summary: `${latest.payload.currentAssessment.regime} regime as of ${latest.payload.currentRecordDate}.`,
+    summary: `Conditions are ${conditionsOf(latest)}.`,
     bullets: [
-      `Funding pressure delta: ${tightnessDelta >= 0 ? "+" : ""}${tightnessDelta.toFixed(2)}.`,
-      `Risk appetite delta: ${riskDelta >= 0 ? "+" : ""}${riskDelta.toFixed(2)}.`,
+      scoreLine(ruleMetricLabel.tightness, currentScores.tightness, previousScores?.tightness),
+      scoreLine(ruleMetricLabel.riskAppetite, currentScores.riskAppetite, previousScores?.riskAppetite),
       ...latest.payload.decisionDeltas.map(
-        (delta) => `${buildDecisionVerdictHeadline(delta)} — ${delta.actionText} Reversal: ${delta.reversalText}`,
+        /* A change of conditions carries its own label ("Conditions change if: …"),
+           which read "Reversal: Conditions change if: …" under this one. */
+        (delta) =>
+          `${buildDecisionVerdictHeadline(delta)} — ${delta.actionText} ${
+            delta.reversalText.startsWith(`${DECISION_CONTRACT_LABELS.watch.postureFlips}:`) ? "" : "Reversal: "
+          }${delta.reversalText}`,
       ),
     ],
   };

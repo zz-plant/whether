@@ -206,14 +206,14 @@ describe("signal cluster reading", () => {
       buildReportData({ scores: { curveSlope: -0.4 } }),
     );
     assert.match(inverted.caveat ?? "", /inverted/);
-    assert.match(inverted.distanceLabel, /0\.4 percentage points below zero, where long-term rates drop below short-term rates/);
+    assert.match(inverted.distanceLabel, /0\.40 percentage points below zero, where long-term rates drop below short-term rates/);
 
     const positive = buildSignalClusterReading(
       "yield-curve-flip-watch",
       buildReportData({ scores: { curveSlope: 0.6 } }),
     );
     assert.equal(positive.caveat, null);
-    assert.match(positive.distanceLabel, /0\.6 percentage points above zero/);
+    assert.match(positive.distanceLabel, /0\.60 percentage points above zero/);
   });
 
   /*
@@ -243,7 +243,8 @@ describe("signal cluster reading", () => {
 
     const tightness = buildSignalClusterReading("capital-tightness-watch", reportData);
     assert.deepEqual(tightness.inputs.map((input) => input.label), ["Short-term borrowing rate", "Recession warning gauge"]);
-    assert.equal(tightness.inputs[0]?.value, "3.7%");
+    assert.equal(tightness.inputs[0]?.value, "3.70%");
+    assert.equal(tightness.inputs[1]?.value, "0.30 percentage points");
 
     const curve = buildSignalClusterReading("yield-curve-flip-watch", reportData);
     assert.deepEqual(curve.inputs.map((input) => input.label), ["2-year rate", "10-year rate"]);
@@ -276,7 +277,7 @@ describe("signal cluster reading", () => {
       buildReportData({ scores: { curveSlope: 4.5 - 4.21 } }),
     );
 
-    assert.equal(reading.displayValue, "0.3%");
+    assert.equal(reading.displayValue, "0.29");
     assert.ok(
       !/\d\.\d{3,}/.test(reading.displayValue ?? ""),
       `displayValue must be rounded for display, got ${reading.displayValue}`,
@@ -292,21 +293,40 @@ describe("signal cluster reading", () => {
     assert.equal(reading.displayValue, null);
   });
 
-  it("writes the figure as a percentage and every move on it in percentage points", () => {
-    const reading = buildSignalClusterReading(
-      "yield-curve-flip-watch",
-      buildReportData({
-        scores: { curveSlope: 0.3 },
-        changedSignals: [{ key: "curveSlope", label: "Curve slope", delta: -0.18 }],
-      }),
-    );
+  /*
+   * The Oct 5, 2026 page: "0.5%" over "0.5 percentage points above zero" beside a
+   * "+0.06 percentage points" move, built from "2-year rate 4.8% · 10-year rate
+   * 5.3%", while the /signals row for the same gauge read 0.47pp. The capital
+   * page's "Built from" line said "Recession warning gauge 0.5%".
+   */
+  it("writes the gauge, its distance and its move in percentage points at two places", () => {
+    const reportData = buildReportData({
+      scores: { curveSlope: 5.31 - 4.84 },
+      changedSignals: [{ key: "curveSlope", label: "Curve slope", delta: 0.06 }],
+      inputs: [
+        { id: "base-rate", label: "Base rate", value: 4.05, unit: "%" },
+        { id: "curve-slope", label: "Curve slope", value: 5.31 - 4.84, unit: "%" },
+        { id: "two-year", label: "2-year", value: 4.84, unit: "%" },
+        { id: "ten-year", label: "10-year", value: 5.31, unit: "%" },
+      ],
+    });
+    const reading = buildSignalClusterReading("yield-curve-flip-watch", reportData);
 
-    // One unit per quantity, and no desk shorthand: this page has no key for "pp" or "bp".
-    assert.equal(reading.displayValue, "0.3%");
-    assert.match(reading.distanceLabel, /0\.3 percentage points above/);
-    assert.match(reading.directionLabel, /-0\.18 percentage points since last week/);
-    for (const line of [reading.displayValue, reading.distanceLabel, reading.directionLabel]) {
-      assert.ok(!/\b(pp|bp)\b/.test(line ?? ""), `desk shorthand in "${line}"`);
+    // One unit for the quantity, and no desk shorthand: this page has no key for "pp" or "bp".
+    assert.equal(reading.displayValue, "0.47");
+    assert.equal(reading.scaleNote, "percentage points: the 10-year rate minus the 2-year rate");
+    assert.equal(reading.unit, "percentage points");
+    assert.match(reading.distanceLabel, /^0\.47 percentage points above zero/);
+    assert.match(reading.directionLabel, /^\+0\.06 percentage points since last week/);
+    assert.deepEqual(reading.inputs.map((input) => input.value), ["4.84%", "5.31%"]);
+
+    const capital = buildSignalClusterReading("capital-tightness-watch", reportData);
+    assert.deepEqual(capital.inputs.map((input) => `${input.label} ${input.value}`), [
+      "Short-term borrowing rate 4.05%",
+      "Recession warning gauge 0.47 percentage points",
+    ]);
+    for (const line of [reading.displayValue, reading.distanceLabel, reading.directionLabel, ...capital.inputs.map((input) => input.value)]) {
+      assert.ok(!/\b(pp|bp)\b|\d%/.test(line ?? "") || /^\d+\.\d\d%$/.test(line ?? ""), `"${line}"`);
     }
   });
 });

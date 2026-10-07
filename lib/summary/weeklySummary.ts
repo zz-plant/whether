@@ -3,7 +3,7 @@
  * Keeps weekly action copy consistent across UI and shared endpoints.
  */
 import type { RegimeAssessment } from "../regimeEngine";
-import { getRegimePublicLabel } from "../regimePresentation";
+import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
 import { joinSentences } from "../report/reportFormatting";
 import { renderWeeklySummaryCopy } from "./summaryCopyRenderer";
 import type { ConfidenceRecord } from "../report/confidence";
@@ -11,6 +11,7 @@ import {
   formatConditionsChangeLine,
   formatConfidenceSentence,
   resolveSummaryConfidence,
+  SHOCK_CROSSING_CUE,
   type SummaryConfidence,
 } from "./summaryFormatting";
 
@@ -69,9 +70,19 @@ const weeklyActionGuidanceSaturatedFinancing: Record<RegimeAssessment["regime"],
     "scale selectively inside proven demand lanes, and keep rollback criteria explicit",
 };
 
+/*
+ * The paste's MARKET CLIMATE line, in the weather word and its one fact about
+ * money (`REGIME_WEATHER_RATIONALES`). It printed the policy engine's codes —
+ * "⚠️ RISK-OFF / CAPITAL-TIGHT" under a summary that opened "Freezing:" —
+ * a second vocabulary for the same four states, in capitals the reader
+ * vocabulary test could not see.
+ */
+const climateLabelFor = (regime: RegimeAssessment["regime"], mark: "⚠️" | "✅") =>
+  `${mark} ${getRegimePublicLabel(regime)}: ${getRegimeWeatherRationale(regime)}`;
+
 const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemplate> = {
   SCARCITY: {
-    climateLabel: "⚠️ RISK-OFF / CAPITAL-TIGHT",
+    climateLabel: climateLabelFor("SCARCITY", "⚠️"),
     climateSummary: [
       "Capital is expensive and risk tolerance is down.",
       "Assume slower approvals, tighter scrutiny, and low patience for long-horizon bets.",
@@ -95,7 +106,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "“Prioritize short-payback, reversible work and stop expansion bets that raise burn or depend on a rebound in risk appetite.”",
   },
   DEFENSIVE: {
-    climateLabel: "⚠️ RISK-SELECTIVE / CAPITAL-TIGHT",
+    climateLabel: climateLabelFor("DEFENSIVE", "⚠️"),
     climateSummary: [
       "Capital is expensive, but risk appetite is selective rather than frozen.",
       "Expect tighter ROI gates and a focus on efficiency over growth-at-any-price.",
@@ -119,7 +130,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "“Commit to efficiency-first bets that improve retention and margins, and enforce explicit payback gates on every expansion proposal.”",
   },
   VOLATILE: {
-    climateLabel: "⚠️ RISK-OFF / CAPITAL-LOOSE",
+    climateLabel: climateLabelFor("VOLATILE", "⚠️"),
     climateSummary: [
       "Capital is available, but risk tolerance is muted.",
       "Expect buyers to favor reliability and proof over novelty.",
@@ -143,7 +154,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "“Lead with reliability and evidence, and keep launches reversible until buyer confidence strengthens.”",
   },
   EXPANSION: {
-    climateLabel: "✅ RISK-ON / CAPITAL-LOOSE",
+    climateLabel: climateLabelFor("EXPANSION", "✅"),
     climateSummary: [
       "Capital is accessible and financing conditions are supportive.",
       "Expect faster approvals and higher tolerance for bold bets.",
@@ -259,15 +270,17 @@ export const buildWeeklySummary = ({
   const transitionCue = assessment.diagnostics.transitionWatch
     ? "A score is sitting near the line where conditions change, so check again before expanding any commitment."
     : "";
-  const shockCue = assessment.diagnostics.shockCrossing
-    ? "This flip crossed its line in one jump, so no published reversal condition fired — treat the change in conditions as unconfirmed until the next read."
-    : "";
+  const shockCue = assessment.diagnostics.shockCrossing ? SHOCK_CROSSING_CUE : "";
+  /* This led with "A policy override is holding the posture in place" and closed
+     "until they reconcile": two retired engine names, and a "they" that had no
+     antecedent when the reason was missing inputs rather than disagreeing scores.
+     It now says what the hold does, in the guidance's own word, and when it ends. */
   const refusalCue = assessment.policyAssessment.refusal.refused
     ? joinSentences(
-        "A policy override is holding the posture in place",
+        "The guidance is not changing this week",
         assessment.policyAssessment.refusal.reasons[0]
           ?? "The signals disagree, or too many inputs are missing",
-        "Keep approvals reversible until they reconcile",
+        "Keep approvals reversible until the hold lifts",
       )
     : "";
   const stagedRegimeLabel = stageLabel ? `${regimeLabel} — ${stageLabel}` : regimeLabel;

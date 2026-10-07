@@ -28,6 +28,13 @@ import { assessment, fixtureBriefDocument, fixtureWeeklyCall, treasury, macros }
 import { renderOgElement } from "../app/api/og/renderOgElement";
 import { collectPageShareCards } from "./fixtures/pageShareCards";
 import { SearchResults } from "../app/search/searchResults";
+import { evaluateRegime } from "../lib/regimeEngine";
+import { REGIME_ORDER } from "../lib/regimePresentation";
+import { buildSignalAlertPayload, buildWeeklyDigest } from "../lib/signalOps";
+import { buildMonthlySummary } from "../lib/summary/monthlySummary";
+import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
+import { buildWeeklyStructured, buildWeeklySummary } from "../lib/summary/weeklySummary";
+import { buildYearlySummary } from "../lib/summary/yearlySummary";
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
@@ -64,9 +71,11 @@ mockAny.module("next/navigation", () => ({
 const BANNED: { name: string; pattern: RegExp }[] = [
   { name: "engine key", pattern: /\b(SCARCITY|DEFENSIVE|VOLATILE|EXPANSION)\b/ },
   { name: "engine score name", pattern: /\b(tightness|riskAppetite|noindex)\b/ },
+  /* "canonical" since 2026-10-07: every summary's source line read "Canonical ingestion (FRED)"
+     and the saved snapshot's "Canonical snapshot (FRED)", the pipeline's names for itself. */
   {
     name: "infrastructure",
-    pattern: /\b(pipeline|payload|replay|audit trail|outage mode|policy override|ingestion|telemetry|worker|cron|isolate)\b/i,
+    pattern: /\b(pipeline|payload|replay|audit trail|outage mode|policy override|ingestion|canonical|telemetry|worker|cron|isolate)\b/i,
   },
   { name: "mechanism name", pattern: /\b(hysteresis|confirmation gate|dwelt|whipsaw|classification line)\b/i },
   {
@@ -74,8 +83,14 @@ const BANNED: { name: string; pattern: RegExp }[] = [
     pattern: /Financial implications|Runway risk:|Raise window:|Burn adjustment:|CEO \+ Finance|Mon\/Thu|Executive Stance|Seed Stage|Board of Directors/,
   },
   /* "Risk-On or Risk-Off" is the market idiom a searcher types, and the title of the page that
-     answers it; "Risk-On" alone is the engine's old name for a pace. */
-  { name: "policy-engine vocabulary", pattern: /\b(policy signals|policy override|Safety Mode|Risk-On(?!\s+or\s+Risk-Off)|Capital-Tight|Capital-Loose)\b/ },
+     answers it; "Risk-On" alone is the engine's old name for a pace. Any case since 2026-10-07:
+     the weekly paste printed "⚠️ RISK-OFF / CAPITAL-TIGHT" past a rule that only knew
+     "Capital-Tight", because no summary was a surface here either. ("MONTHLY POSTURE" and
+     "Capital Posture Governance" are the "posture" ratchet's, which already ignores case.) */
+  {
+    name: "policy-engine vocabulary",
+    pattern: /\b(policy signals|policy override|Safety Mode|Risk-On(?!\s+or\s+Risk-Off)|(?<!Risk-On\s+or\s+)Risk-Off|Risk-Selective|Capital-Tight|Capital-Loose)\b/i,
+  },
   { name: "UI implementation detail", pattern: /\bYCURVE\b|1\.91:1|16:9|without a reload|hidden by default/ },
   /* The retired names for the three lines and the latitude score (2026-09-22). Each had a
      glossary entry whose job was telling it apart from its neighbour; the names that replaced
@@ -216,6 +231,78 @@ const record: TrackRecord = {
   allRows: [],
 };
 
+/*
+ * The cadence summaries (/api/weekly, /api/monthly, /api/quarterly, /api/yearly) and the alert
+ * digest, which none of the surfaces above reach. Their pastes carried "Capital Posture
+ * Governance", "RISK-OFF / CAPITAL-TIGHT", "MONTHLY POSTURE", "Freezing mode." and "Canonical
+ * ingestion (FRED)" through every rule here until 2026-10-07. Judged on the Oct 5, 2026 reading
+ * (Freezing, 90 and 48) with a shock crossing and a held week switched on, so the rare cues
+ * are read too, on the saved snapshot's provenance, and with every conditions word's climate
+ * line.
+ */
+function summarySurfaces(): Surface[] {
+  const record = {
+    source: "https://fred.stlouisfed.org/series/DGS1MO",
+    record_date: "2026-10-05",
+    fetched_at: "2026-10-05T12:00:00.000Z",
+    isLive: true,
+    yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
+  };
+  const live = evaluateRegime(record);
+  const held = {
+    ...live,
+    diagnostics: { ...live.diagnostics, shockCrossing: true },
+    policyAssessment: {
+      ...live.policyAssessment,
+      refusal: { refused: true, reasons: ["Too many inputs are missing to support a change in the guidance."] },
+    },
+  };
+  const { provenance } = buildOperatingSnapshot({ treasury: { ...treasury, isLive: false }, macroSeries: macros });
+  const recordDateLabel = "Oct 5, 2026";
+  const previous = { ...live, regime: "EXPANSION" as const, scores: { ...live.scores, tightness: 63, riskAppetite: 56 } };
+  const alert = buildSignalAlertPayload({
+    previousRecordDate: "2026-08-31",
+    currentRecordDate: "2026-10-05",
+    previousAssessment: previous,
+    currentAssessment: live,
+    sourceUrls: [record.source],
+    timeMachineHref: "/history",
+  });
+  const event = {
+    eventId: "e",
+    sourceVersion: "test",
+    canonicalTimestampSource: "request-received-at" as const,
+    id: "1",
+    createdAt: "2026-10-05T12:00:00.000Z",
+    payload: alert,
+  };
+  const digestText = (now: number) => {
+    const digest = buildWeeklyDigest([event], { now });
+    return [digest.summary, ...digest.bullets].join("\n");
+  };
+  return [
+    { name: "weekly summary", text: () => buildWeeklySummary({ assessment: held, provenance, recordDateLabel, record }).copy },
+    { name: "monthly summary", text: () => buildMonthlySummary({ assessment: held, provenance, recordDateLabel, record }).copy },
+    { name: "quarterly summary", text: () => buildQuarterlySummary({ assessment: live, provenance, periodLabel: "Q4 2026", record }).copy },
+    { name: "yearly summary", text: () => buildYearlySummary({ assessment: live, provenance, periodLabel: "2026", record }).copy },
+    {
+      name: "weekly climate lines",
+      text: () =>
+        REGIME_ORDER.map((regime) => {
+          const { climate } = buildWeeklyStructured({
+            regime,
+            constraints: [],
+            governanceParameters: live.policyAssessment.governanceParameters,
+          });
+          return [climate.label, ...climate.summary].join("\n");
+        }).join("\n"),
+    },
+    { name: "alert reasons", text: () => alert.reasons.map((reason) => reason.message).join("\n") },
+    { name: "alert digest", text: () => digestText(Date.parse("2026-10-06T00:00:00.000Z")) },
+    { name: "alert digest (quiet week)", text: () => digestText(Date.parse("2026-11-06T00:00:00.000Z")) },
+  ];
+}
+
 const artifactSurfaces: Surface[] = [
   { name: "Slack brief", text: () => buildSlackBrief(fixtureBriefDocument()) },
   { name: "call citation", text: () => buildCallCitation(fixtureBriefDocument()) },
@@ -256,6 +343,7 @@ const artifactSurfaces: Surface[] = [
       ].join("\n"),
   },
   { name: "record summary", text: () => buildRecordSummary(record, "https://example.test") },
+  ...summarySurfaces(),
 ];
 
 const cache = new Map<string, Promise<string>>();

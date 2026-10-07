@@ -18,7 +18,7 @@ import { previousScoresFromDynamics, type PreviousReading } from "../export/scor
 import { buildPostureState } from "./postureStateSource";
 import type { PostureStateContract } from "./postureStateContract";
 import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
-import { isSavedCopy } from "./provenanceStatus";
+import { isSavedCopy, publisherSourceLabel } from "./provenanceStatus";
 
 /**
  * What a brief document is built from: one reading, wherever it was read.
@@ -64,16 +64,6 @@ export const briefSourceFromReportData = (reportData: ReportData | ReportDataFal
   previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),
   historical: Boolean(reportData.historicalSelection),
 });
-
-/**
- * The source as a reader names it. "Canonical snapshot (FRED)" and "Canonical
- * ingestion (FRED)" are the pipeline's names for where a reading came from; a
- * reader wants the publisher, and the saved-copy marker already says when the
- * numbers are not a live read. One provenance footer now closes every format,
- * so the pipeline's name would otherwise have spread from two of them to all.
- */
-export const publisherSourceLabel = (sourceLabel: string) =>
-  /^canonical\b/i.test(sourceLabel) ? "Federal Reserve Economic Data (FRED)" : sourceLabel;
 
 /**
  * The area rows as the page derives them: the canonical rules, judged against

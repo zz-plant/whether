@@ -3,7 +3,10 @@ import { describe, it } from "bun:test";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
 import { buildMonthlySummary } from "../lib/summary/monthlySummary";
+import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
+import { SHOCK_CROSSING_CUE } from "../lib/summary/summaryFormatting";
 import { buildWeeklySummary } from "../lib/summary/weeklySummary";
+import { buildYearlySummary } from "../lib/summary/yearlySummary";
 
 describe("buildWeeklySummary", () => {
   it("generates a copy block that starts with summary context and bulleted weekly sections", () => {
@@ -133,5 +136,49 @@ describe("buildWeeklySummary", () => {
     assert.match(weekly.copy, /\nUpdated Oct 5, 2026\n/);
     assert.match(weekly.copy, /\nConfidence: Medium\n/);
     assert.doesNotMatch(weekly.copy, /high confidence|EXPLICIT_KILL_CRITERIA|SLOWER_STRUCTURED|REVERSIBLE_ONLY/);
+  });
+
+  /*
+   * The Oct 5, 2026 pastes, read end to end: "WHETHER · Capital Posture
+   * Governance", "⚠️ RISK-OFF / CAPITAL-TIGHT" under a summary opening
+   * "Freezing:", "MONTHLY POSTURE" and "BOUNDED NEXT ACTIONS", "Freezing mode."
+   * leading the quarter and the year, and — on a held or shock week — "A policy
+   * override is holding the posture in place" and "This flip crossed its line".
+   */
+  it("speaks in the conditions word on every cadence, including a held or shock week", () => {
+    const record = {
+      source: "https://example.com/treasury",
+      record_date: "2026-10-05",
+      fetched_at: "2026-10-05T12:00:00.000Z",
+      isLive: true,
+      yields: { oneMonth: 4.2, twoYear: 4.0, tenYear: 4.2 },
+    };
+    const live = evaluateRegime(record);
+    const assessment = {
+      ...live,
+      diagnostics: { ...live.diagnostics, shockCrossing: true },
+      policyAssessment: {
+        ...live.policyAssessment,
+        refusal: { refused: true, reasons: ["Too many inputs are missing to support a change in the guidance."] },
+      },
+    };
+    const provenance = { sourceLabel: "Federal Reserve Economic Data (FRED)", timestampLabel: "Oct 5, 2026", ageLabel: "2d.", statusLabel: "Latest recorded reading" };
+    const weekly = buildWeeklySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record });
+    const monthly = buildMonthlySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record });
+    const quarterly = buildQuarterlySummary({ assessment, provenance, periodLabel: "Q4 2026", record });
+    const yearly = buildYearlySummary({ assessment, provenance, periodLabel: "2026", record });
+
+    assert.match(weekly.copy, /\nWHETHER · Weekly operating guidance\n/);
+    assert.match(weekly.copy, /\nMARKET CLIMATE\n\n⚠️ Freezing: Money is expensive and hard to raise\.\n/);
+    assert.match(weekly.summary, /The guidance is not changing this week\. Too many inputs are missing to support a change in the guidance\. Keep approvals reversible until the hold lifts\./);
+    for (const summary of [weekly, monthly]) {
+      assert.ok(summary.summary.includes(SHOCK_CROSSING_CUE), summary.summary);
+    }
+    assert.match(monthly.copy, /\nCONDITIONS THIS MONTH\n\nFreezing\n/);
+    assert.ok(quarterly.summary.startsWith(`Freezing: ${live.description}`), quarterly.summary);
+    assert.ok(yearly.summary.startsWith(`Freezing: ${live.description}`), yearly.summary);
+    for (const copy of [weekly.copy, monthly.copy, quarterly.copy, yearly.copy]) {
+      assert.doesNotMatch(copy, /posture|policy override|bounded|\bflip|reversal condition|\bmode\b|RISK-(ON|OFF|SELECTIVE)|CAPITAL-(TIGHT|LOOSE)|SCARCITY/i);
+    }
   });
 });

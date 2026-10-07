@@ -323,16 +323,17 @@ describe("saturated-financing tempo", () => {
 });
 
 describe("shock-crossing honesty in published copy", () => {
-  it("weekly and monthly summaries admit an unconfirmed flip", () => {
+  /* Said, until 2026-10-07, as "This flip crossed its line in one jump, so no
+     published reversal condition fired": the same admission in the engine's words. */
+  it("weekly and monthly summaries admit an unconfirmed change of conditions", () => {
     for (const build of [buildWeeklySummary, buildMonthlySummary]) {
       const summary = build({
         assessment: assessment({ regime: "SCARCITY", shockCrossing: true }),
         provenance: summaryProvenance,
       });
-      assert.match(
-        summary.summary,
-        /no published reversal condition fired/,
-      );
+      assert.match(summary.summary, /without the second reading that normally confirms a change/);
+      assert.match(summary.summary, /unconfirmed until the next reading\./);
+      assert.doesNotMatch(summary.summary, /flip|reversal condition/);
     }
   });
 
@@ -341,7 +342,7 @@ describe("shock-crossing honesty in published copy", () => {
       assessment: assessment({ regime: "SCARCITY" }),
       provenance: summaryProvenance,
     });
-    assert.doesNotMatch(summary.summary, /reversal condition/);
+    assert.doesNotMatch(summary.summary, /unconfirmed/);
   });
 });
 
