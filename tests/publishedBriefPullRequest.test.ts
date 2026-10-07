@@ -337,26 +337,23 @@ describe("assembleCurrentWeekBrief", () => {
 
   /* Next week compares with this record, and w38–w40 stored no rate to compare with,
      nor the engine that scored them. */
-  it("stores the short-term rate, the recession warning gauge and the engine it published, so next week can compare them", () => {
+  it("stores the short-term rate and the recession warning gauge it published, so next week can compare them", () => {
     const isoWeek = getIsoWeekInfo(new Date(liveReportData.treasury.record_date));
     const record = buildPublishedBriefRecord({ reportData: liveReportData, snapshot: liveSnapshot, recordDate: liveReportData.treasury.record_date, isoWeek });
     assert.equal(record.scores?.baseRate, liveReportData.assessment.scores.baseRate);
     assert.equal(record.scores?.curveSlope, liveReportData.assessment.scores.curveSlope);
     assert.ok(PublishedBriefSchema.safeParse(record).success);
 
-    assert.equal(record.scores?.engineVersion, ENGINE_VERSION);
-
+    /* The fixture's scores are hand-set, not its treasury's, so no engine reproduces
+       them: the record names no engine and stores no inputs ("the inputs a record
+       stores" below), and next week passes it over under any engine. It named this
+       engine until 2026-10-07, which next week would have compared with as stored. */
     const nextWeek = new Date(Date.parse(`${record.recordDate}T00:00:00.000Z`) + 7 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
     const rescore = rescoreStoredInputs(evaluateRegime, liveReportData.assessment.thresholds);
-    /* The fixture's scores are hand-set, not its treasury's, so it stores no inputs ("the inputs a record stores" below). */
+    assert.equal(record.scores?.engineVersion, undefined);
     assert.equal(record.inputs, undefined);
+    assert.equal(findWeeklyComparisonReading([record], nextWeek, ENGINE_VERSION, rescore), null);
     assert.equal(findWeeklyComparisonReading([record], nextWeek, "engine-next", rescore), null, "a scoring change since is not a market move");
-    assert.deepEqual(findWeeklyComparisonReading([record], nextWeek, ENGINE_VERSION, rescore)?.scores, {
-      tightness: liveReportData.assessment.scores.tightness,
-      riskAppetite: liveReportData.assessment.scores.riskAppetite,
-      baseRate: liveReportData.assessment.scores.baseRate,
-      curveSlope: liveReportData.assessment.scores.curveSlope,
-    });
 
     const missingRate = buildReportDataFixture({
       treasury: { isLive: true, fallback_at: undefined, fallback_reason: undefined },
@@ -435,6 +432,20 @@ describe("the inputs a record stores", () => {
     assert.equal(rescored.regime, record.regime);
   });
 
+  it("name the engine that reproduced them, and are compared with as stored under it", () => {
+    assert.equal(record.scores?.engineVersion, ENGINE_VERSION);
+    const nextWeek = "2026-03-09";
+    const notRescored = () => {
+      throw new Error("a record this engine scored is compared as stored");
+    };
+    assert.deepEqual(findWeeklyComparisonReading([record], nextWeek, ENGINE_VERSION, notRescored)?.scores, {
+      tightness: assessment.scores.tightness,
+      riskAppetite: assessment.scores.riskAppetite,
+      baseRate: record.scores?.baseRate,
+      curveSlope: assessment.scores.curveSlope,
+    });
+  });
+
   it("round-trip through the archive schema as the file is written, and are refused when malformed", () => {
     const written: unknown = JSON.parse(fileBody([record]));
     const [read] = PublishedBriefIndexSchema.parse(written);
@@ -456,5 +467,6 @@ describe("the inputs a record stores", () => {
       isoWeek: getIsoWeekInfo(new Date(handSet.treasury.record_date)),
     });
     assert.equal("inputs" in unscored, false, "absent, not undefined: the record re-reads as written");
+    assert.equal(unscored.scores && "engineVersion" in unscored.scores, false, "nor the engine, whose scores these are not");
   });
 });

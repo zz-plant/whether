@@ -39,14 +39,25 @@ import { loadWeeklyBriefSnapshot, type WeeklyBriefSnapshot, type WeeklyBriefSnap
  * them prints no move for either rate. So is the engine that scored them: next
  * week compares with these scores as stored only if the same engine scores it,
  * and otherwise with the record's inputs scored again (`storedInputs`).
+ *
+ * The engine is stamped only when this engine reproduces the scores from the
+ * record's own inputs (`inputsReproduced`). It was stamped on every record, but
+ * the scores can come from an operating snapshot a previous deploy stored, and a
+ * record naming this engine beside an earlier engine's scores would be compared
+ * as stored next week: a move made by the scoring change, printed as the
+ * market's. Unstamped and without inputs, next week passes it over for the
+ * month-end, as it does every record frozen before the engine was stored.
  */
-const scoresWithComparison = (reportData: WeeklyBriefSnapshotResult["reportData"]): NonNullable<PublishedBrief["scores"]> => {
+const scoresWithComparison = (
+  reportData: WeeklyBriefSnapshotResult["reportData"],
+  inputsReproduced: boolean,
+): NonNullable<PublishedBrief["scores"]> => {
   const { scores } = reportData.assessment;
   const current = { tightness: scores.tightness, riskAppetite: scores.riskAppetite };
   const rates = {
     baseRate: observedBaseRate(scores),
     curveSlope: scores.curveSlope,
-    engineVersion: ENGINE_VERSION,
+    ...(inputsReproduced ? { engineVersion: ENGINE_VERSION } : {}),
   };
   const previous = previousScoresFromDynamics(reportData.reportDynamics, current);
   const comparedWith = previous?.comparedWith;
@@ -149,7 +160,7 @@ export const buildPublishedBriefRecord = ({
      * It is the move since last week's brief where the archive has one, and it
      * carries that reading's date either way (`scoresWithComparison`).
      */
-    scores: scoresWithComparison(reportData),
+    scores: scoresWithComparison(reportData, inputs !== null),
     ...(inputs ? { inputs } : {}),
     evidence: reportData.reportEvidenceItems.map((item) => ({
       title: item.title,

@@ -23,8 +23,9 @@ import type { PlaybookEntry } from "../playbook";
 import type { SourceHealthRow } from "./sourceHealth";
 import type { ActionStripItem } from "./operatingCalls";
 import { buildComparedWith } from "./comparisonBasis";
-import { observedBaseRate, rescoreStoredInputs, type ComparisonReading, type RescoreStoredInputs } from "./comparisonReading";
+import { rescoreStoredInputs, type ComparisonReading, type RescoreStoredInputs } from "./comparisonReading";
 import { buildWeekActionNow } from "./reportEvidence";
+import { monthEndComparisonReading, selectWeekComparison } from "./weekComparison";
 import { explainScoreMovement } from "./scoreMovement";
 import type {
   ComparedWith,
@@ -521,11 +522,7 @@ export const loadReportDataUncachedInternal = async ({
   const monthEndComparison: WeekComparison | null =
     previousSnapshot && previousAssessment
       ? {
-          reading: {
-            recordDate: previousSnapshot.record_date,
-            regime: previousAssessment.regime,
-            scores: { ...previousAssessment.scores, baseRate: observedBaseRate(previousAssessment.scores) },
-          },
+          reading: monthEndComparisonReading(previousSnapshot, previousAssessment),
           comparedWith: buildComparedWith(previousSnapshot.record_date, treasury.record_date),
           movement: explainScoreMovement({
             previous: previousAssessment.scores,
@@ -550,9 +547,7 @@ export const loadReportDataUncachedInternal = async ({
     historicalSelection || hasThresholdOverrides(searchParams)
       ? null
       : deps.findWeeklyComparisonReading(treasury.record_date, rescoreStoredInputs(deps.evaluateRegime, thresholds));
-  const comparison: WeekComparison | null = weeklyReading
-    ? { reading: weeklyReading, comparedWith: buildComparedWith(weeklyReading.recordDate, treasury.record_date) }
-    : monthEndComparison;
+  const comparison: WeekComparison | null = selectWeekComparison(treasury.record_date, weeklyReading, () => monthEndComparison);
   const regimeAlert = comparison
     ? deps.buildRegimeAlert(assessment, comparison.reading, treasury.record_date, comparison.reading.recordDate)
     : null;

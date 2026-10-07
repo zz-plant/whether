@@ -30,6 +30,7 @@ import { buildActionNowShort, buildReportDynamics, buildReportEvidenceItems } fr
 import { buildRegimeAlert } from "../lib/report/reportFormatting";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { snapshotData } from "../lib/snapshot";
+import { selectWeekComparison } from "../lib/report/weekComparison";
 import type { TreasuryData } from "../lib/types";
 import { buildAssessmentFixture } from "./fixtures/reportFixtures";
 
@@ -124,6 +125,27 @@ describe("the reading a week compares with", () => {
  * record frozen with its inputs is scored again by the engine reading it
  * (§1.1.53 of docs/feature-specs-current.md).
  */
+describe("the one rule the loader and the stored snapshot choose by", () => {
+  const monthEnd = {
+    reading: { recordDate: "2026-09-30", regime: "DEFENSIVE" as const, scores: { tightness: 90, riskAppetite: 56, baseRate: null, curveSlope: null } },
+    comparedWith: buildComparedWith("2026-09-30", "2026-10-05"),
+  };
+
+  it("takes last week's brief, named by its date, and never builds the month-end", () => {
+    const weekly: ComparisonReading = { recordDate: "2026-09-29", regime: "SCARCITY", scores: { tightness: 80, riskAppetite: 40, baseRate: null, curveSlope: null } };
+    const chosen = selectWeekComparison("2026-10-05", weekly, () => {
+      throw new Error("the month-end is not scored when last week's brief is compared with");
+    });
+    assert.equal(chosen?.reading, weekly);
+    assert.deepEqual(chosen?.comparedWith, buildComparedWith("2026-09-29", "2026-10-05"));
+  });
+
+  it("falls back to the month-end only where no brief can be compared with", () => {
+    assert.equal(selectWeekComparison("2026-10-05", null, () => monthEnd), monthEnd);
+    assert.equal(selectWeekComparison("2026-10-05", null, () => null), null);
+  });
+});
+
 describe("a brief frozen by an earlier engine", () => {
   /* Last week's reading: a 52bp rise in the bill over 91 days, so the tightening-speed term fires. */
   const lastWeek: TreasuryData = {
