@@ -191,7 +191,8 @@ function StepPanel({
 
 /**
  * The plan page's sections, each expandable, in the order a reader works the
- * week: test the move in front of them, read the rules, then the reference.
+ * week: each area's rule and its lines, the do/don't lists, then the test that
+ * checks one move against them.
  * Openness follows `resolveInitialOpenStepIds`, and a deep link opens its
  * target without closing anything.
  */

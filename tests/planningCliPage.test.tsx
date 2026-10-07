@@ -10,12 +10,13 @@ describe("operations navigation", () => {
 
   it("indexes the plan page in page order, one entry per section", () => {
     // The six sections, then the risk-checks tail — the order a reader meets
-    // them. Plan-first since 2026-10-06: the reader's own decision leads, then
-    // the rules, then the area reference the brief also prints.
+    // them. Rules-first since 2026-10-07: each area's rule and its lines lead,
+    // then the do/don't lists, then the test that checks one move against them.
+    // (2026-10-06 led with the test, which opened the page on an empty form.)
     assert.deepEqual(operationsSectionLinks.plan.map((link) => link.href), [
-      "#ops-decision-shield",
-      "#ops-playbook",
       "#ops-monthly-action-summary",
+      "#ops-playbook",
+      "#ops-decision-shield",
       "#ops-plan-lines",
       "#ops-finance-strategy",
       "#ops-export-briefs",

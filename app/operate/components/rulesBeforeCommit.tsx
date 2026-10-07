@@ -8,9 +8,8 @@ import type { PlaybookEntry } from "../../../lib/playbook";
  * summary above them.
  *
  * This is what `PlaybookPanel` carried besides its per-area rows. The rows
- * are an `AreaTable` in the weekly plan step now — the consequence tier,
- * directly under the call it follows from — and the lists are what is left
- * to read before committing. The leadership phrases are evidence for the
+ * are an `AreaTable` in the step above this one — the page's first, since
+ * 2026-10-07 — and the lists are what is left to read before committing. The leadership phrases are evidence for the
  * lists (§XII), so they sit behind a native disclosure with no query key.
  */
 const visible = <T,>(items: readonly T[], showAll: boolean) => (showAll ? items : items.slice(0, 3));
@@ -75,20 +74,6 @@ export function RulesBeforeCommit({
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <p className="text-xs text-slate-300">
-          {isExpanded ? "Full rule list." : "Top 3 rules per area."}
-        </p>
-        <button
-          type="button"
-          onClick={handleToggle}
-          aria-expanded={isExpanded}
-          aria-controls={rulesId}
-          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold hover:border-sky-400/70 hover:text-slate-100 cursor-pointer"
-        >
-          {isExpanded ? "Show top 3 only" : "Show all rules"}
-        </button>
-      </div>
       <div>
         <p className="type-label text-slate-400">Rules for this week</p>
         <h3 className="type-section text-slate-100">{playbook?.title ?? "Rules for new commitments"}</h3>
@@ -109,6 +94,23 @@ export function RulesBeforeCommit({
             </ul>
           </div>
         ))}
+      </div>
+      {/* After the lists it changes, not above the heading: the step opened on a
+          control and a count before a reader had seen a rule. "Per area" was
+          wrong too; the cut is per list. */}
+      <div className="flex flex-wrap items-center gap-3">
+        <button
+          type="button"
+          onClick={handleToggle}
+          aria-expanded={isExpanded}
+          aria-controls={rulesId}
+          className="weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold hover:border-sky-400/70 hover:text-slate-100 cursor-pointer"
+        >
+          {isExpanded ? "Show top 3 only" : "Show all rules"}
+        </button>
+        <p className="text-xs text-slate-400">
+          {isExpanded ? "Every rule in each list." : "The top 3 of each list."}
+        </p>
       </div>
       {playbook ? (
         <details className="weather-auto-chevron">

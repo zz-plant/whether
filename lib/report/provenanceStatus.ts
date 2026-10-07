@@ -40,7 +40,7 @@ export const PROVENANCE_FALLBACK_STATUS = {
  */
 export const PROVENANCE_CATALOG_STATUS = "Curated catalog (static)";
 
-export type ProvenanceStripStatus =
+type ProvenanceStripStatus =
   | ProvenanceStatusLabel
   | (typeof PROVENANCE_FALLBACK_STATUS)[keyof typeof PROVENANCE_FALLBACK_STATUS]
   | typeof PROVENANCE_CATALOG_STATUS;

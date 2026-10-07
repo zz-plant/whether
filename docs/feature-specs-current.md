@@ -249,7 +249,8 @@ pages between 2,500 and 8,000px tall. The changes, per surface:
   key-number gauges and the inversion timeline; the two twelve-month lines are a
   `SignalSparklineStrip` (current value, move over the window, series with interquartile band);
   the fossil-record table is behind a `?fossil=1` disclosure.
-- **Plan** opens with "Test a decision" (§1.1.36); the sticky one-row strip is section navigation
+- **Plan** opens with "This week's rule for each area" (§1.1.46; it opened with "Test a decision"
+  from §1.1.36 until 2026-10-07); the sticky one-row strip is section navigation
   only (the checklist toggles, which did nothing but turn themselves on, were retired 2026-09-08).
 - **Weekly brief** no longer carries "Decisions to reconsider" or "Close the week" (retired
   2026-09-08: each asked the reader to maintain browser-local state the product could not pay
@@ -1923,10 +1924,11 @@ Slack, Notion, and Linear targets.
 
 ## 5) Playbooks, summaries, and briefings
 
-### 5.1 Playbook & operator requests
+### 5.1 Playbook
 The playbook surfaces start/stop/fence actions based on the current regime, sourced from the
-insight database and operator request catalog in `data/recommendations.ts` and
-`lib/operatorRequests.ts`.
+insight database in `data/recommendations.ts`. The operator request catalog
+(`lib/operatorRequests.ts`), drawn as "Execution asks" under `/operate`'s Share step, was removed
+on 2026-10-07 (§1.1.46): it was a product backlog that listed shipped features as not yet built.
 
 ### 5.2 Weekly + monthly summaries
 Weekly and monthly summaries are generated from the current assessment for use in the overview
@@ -2951,3 +2953,72 @@ the rail's second entry, and what the page exists to check — sat folded at the
   `lib/export/exportSnapshot.ts`; whether the two should agree is for that module's owner.
 - Tests: `tests/slackMrkdwn.test.ts`, `tests/sharePageCurrentBrief.test.tsx` (chat drawing and
   raw text, per-format preview choice, markup-looking text stays escaped, two sized lazy images).
+
+### 1.1.46 `/operate` leads with this week's rules (2026-10-07)
+
+A screenshot review of the plan page found it opening on the least informative thing it has: under
+the tabs, "Test a decision" with the full stress-test form (runway, monthly spend, a model select, a
+three-line box, example chips) above a "Decision verdict" panel that said there was no verdict. On a
+phone that form was everything below the intro. The page's job (`docs/agents/ui-ux-standards.md`
+§VIII: operating guardrails) was behind it, and the area table — the pause and resume lines, which
+§XII says are never collapsed — sat closed three steps down as a title and one sentence.
+
+- **Order.** This week's rule for each area (open), Rules before you commit (open), Test a decision
+  (open, compact), Set this plan's lines, Finance strategy, Share the brief, then Risk checks. The
+  section index (`operationsSectionLinks.plan`, the sidebar and the phone chip row) follows. The
+  area table is the same `AreaTable` the brief prints, from the same rows (`buildAreaRows`), not a
+  second build. This reverses §1.1.36's lead, which put the reader's own decision first; the test
+  keeps its open state and moves after the lines it checks against.
+- Step ids are unchanged, so `#ops-monthly-action-summary` (the brief, the portfolio note, the
+  redirects in `next.config.js`), `#ops-playbook`, `#ops-decision-shield` and `#ops-plan-lines`
+  still open their sections.
+- **Test a decision opens as one field.** The mode switch and the plan box with its examples; the
+  runway, spend and model fields join once a plan is typed (and stay while it is edited), and the
+  verdict panel exists only once there is a plan to grade (`PlanStressTestMode`). Compare mode
+  draws no recommendation box until a plan is typed. Copy verdict, Copy link and Record this
+  decision render only once the mode on screen has a verdict: before, Copy verdict on an empty box
+  copied the list mode's default verdict, one the reader had never seen. The stress-test and
+  compare modes no longer draw a surface inside the step, so the verdict sits two frames deep and
+  its sizing note three (§XIII). The example buttons are `weather-pill` controls (44px on touch)
+  rather than 20px chips, with their label on its own line on a phone so they pair up.
+- **Closed steps say what is behind them** (§XII, "a summary that shows the current values"). Set
+  this plan's lines names the areas its form starts from ("Start from the published pause and
+  resume lines for Hiring, Roadmap, Fundraising, Spending and New bets, …"); Finance strategy prints
+  the quarter's runway target ("Target 24+ months of runway; freeze non-essential spend.",
+  `financeStrategyFor`); Share the brief names its four formats from `BRIEF_FORMATS`. They used to
+  read as a title and a sentence about the gesture, which is what made them look like empty boxes.
+  The lines step is left out when no rule has a numeric line, rather than opening on nothing.
+- **Finance strategy is flat.** `FinanceStrategyPanel` drops its own header ("Finance Strategy
+  Mode", a subtitle and a method sentence), the "Executive summary" surface and the "Deep dive"
+  disclosure, which between them printed the runway target three times four frames deep; it is
+  one definition list (hiring throttle, budget focus, signals to watch) under the step's line. The
+  undrawn `title`/`subtitle`/`description` left `data/recommendations.ts` with it.
+- Tests: `tests/planPageLead.test.ts` (order, open state, closed-step lines),
+  `tests/decisionShieldPanel.test.tsx` (compact and typed states), `tests/planningCliPage.test.tsx`
+  (index order).
+- **Risk checks and the resources disclosure have their padding back.** Both carried
+  `weather-panel`, whose padding the report row zeroes for an unboxed section
+  (`.weather-report-section-row > .weather-panel`), so each drew its border against its own text.
+  A week with no warning is one line under the heading, without the `weather-surface` slab, the
+  "each one names an assumption" sentence, or "Recheck the rules" (kept for weeks that have a
+  warning, which now draw as amber-ruled segments rather than lifted surfaces). The resources
+  summary says what it holds ("3 operating guides and 4 templates you can fill in and share.") and
+  its guide cards are plain bordered links rather than surfaces lifted inside a frame the depth
+  ladder cannot see.
+- **No "Execution asks" under Share.** The section under the share picker ("Current asks for the
+  people driving execution") was `lib/operatorRequests.ts`, a product backlog of "expansion
+  requests expected after launch" that listed API access and historical comparisons as not yet
+  built, though both ship. It is removed with its panel (`app/components/appendix/ReferencePanels.tsx`);
+  its two ids stay as aliases of the Share step. That left `DataProvenanceStrip` with no caller —
+  every caller had passed `showProvenance: false`, so it had rendered nowhere — and it is deleted
+  with its test and the two status icons only it drew. Still open: `reportData.internalProvenance`
+  (`lib/report/reportDataLoader.ts`) is now computed and drawn nowhere.
+- **The lead table's "Line set by" links leave for the brief.** `AreaTable` takes
+  `signalLinkBase`; `/operate` passes "/", so "Funding pressure" and "Risk appetite" open
+  `/#signal-funding-pressure` and `/#signal-risk-appetite` rather than in-page anchors this page
+  never draws. `/share` and the answer pages carry the same dead in-page links and are not changed
+  here.
+- **Rules before you commit opens on the rules.** "Show all rules" and its count follow the three
+  lists they change instead of sitting above the heading, and the count says what it counts ("The
+  top 3 of each list.", where it said "per area"). Risk checks and the resources disclosure take the
+  closed steps' fill, so the page's frames read as one set in the light theme too.

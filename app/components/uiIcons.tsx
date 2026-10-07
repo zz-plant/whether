@@ -18,7 +18,6 @@ import {
   X,
 } from 'lucide-react';
 
-import type { SVGProps } from "react";
 
 type IconProps = LucideProps & { title?: string };
 
@@ -84,20 +83,6 @@ export const MoonIcon = ({ className = "h-4 w-4", title: _title, ...props }: Ico
 
 export const ShareIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
   <Share2 className={className} {...baseProps} {...props} />
-);
-
-export const StatusLiveIcon = ({ className = "h-2.5 w-2.5", title, ...props }: SVGProps<SVGSVGElement> & { title?: string }) => (
-  <svg viewBox="0 0 8 8" fill="currentColor" className={className} aria-hidden="true" {...props}>
-    {title ? <title>{title}</title> : null}
-    <circle cx="4" cy="4" r="3" />
-  </svg>
-);
-
-export const StatusStaticIcon = ({ className = "h-2.5 w-2.5", title, ...props }: SVGProps<SVGSVGElement> & { title?: string }) => (
-  <svg viewBox="0 0 8 8" fill="currentColor" className={className} aria-hidden="true" {...props}>
-    {title ? <title>{title}</title> : null}
-    <rect x="1" y="1" width="6" height="6" rx="0.5" />
-  </svg>
 );
 
 /**

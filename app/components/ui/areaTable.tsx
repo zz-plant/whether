@@ -45,6 +45,12 @@ type AreaTableProps = {
   caption: string;
   /** Hide the "what changed" column when no row carries one. */
   className?: string;
+  /**
+   * Where the "Line set by" links find the two scores. They name anchors only
+   * the brief draws (`WhatChangedSection`), so a table on another page passes
+   * "/" to send them there; left empty, they stay in the page.
+   */
+  signalLinkBase?: "" | "/";
 };
 
 const orderIndex = (area: DecisionArea) => decisionAreaOrder.indexOf(area);
@@ -104,7 +110,9 @@ const LineCell = ({
  * pause and resume lines side by side, each labelled in its cell. One DOM for
  * both, so the row order and content cannot drift between layouts.
  */
-export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
+export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }: AreaTableProps) {
+  const fundingHref = `${signalLinkBase}#signal-funding-pressure`;
+  const riskHref = `${signalLinkBase}#signal-risk-appetite`;
   const ordered = [...rows].sort((a, b) => orderIndex(a.area) - orderIndex(b.area));
   const showChanged = ordered.some((row) => row.changed);
   const showAction = ordered.some((row) => row.action);
@@ -144,11 +152,11 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                 )}
                 <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
                   {row.area === "hiring" || row.area === "burn-discipline" ? (
-                    <>Line set by <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a></>
+                    <>Line set by <a href={fundingHref} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a></>
                   ) : row.area === "product-tempo" || row.area === "expansion-bets" ? (
-                    <>Line set by <a href="#signal-risk-appetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
+                    <>Line set by <a href={riskHref} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
                   ) : row.area === "capital-raising" ? (
-                    <>Lines set by <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> &amp; <a href="#signal-risk-appetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
+                    <>Lines set by <a href={fundingHref} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> &amp; <a href={riskHref} className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a></>
                   ) : null}
                 </span>
               </th>
