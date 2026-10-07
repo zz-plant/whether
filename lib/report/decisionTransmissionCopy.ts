@@ -1,3 +1,5 @@
+import type { ComparisonBasis } from "./comparisonBasis";
+
 export const decisionTransmissionSearchDescription =
   "For hiring, fundraising, spending and runway: what to do now, the line that pauses it, and the line that resumes it.";
 
@@ -7,8 +9,22 @@ export const decisionTransmissionSearchDescription =
  * re-word it independently as "recheck last week's approvals" — the
  * approvals-committee register the 2026-09-22 copy audit retired.
  */
-export const revisitDecisionPhrase = (revisit: boolean) =>
-  revisit ? "revisit last week's decisions" : "last week's decisions stand";
+/*
+ * Named by the reading the week was compared with. It said "last week's
+ * decisions" whatever that was, and the comparison is the last month-end
+ * snapshot: on Oct 5 the scores had moved since Aug 31, five weeks earlier, and
+ * the answer pages told a reader to revisit last week's decisions. Where the
+ * comparison is undated the wording stays "last week", as `comparisonBasis`
+ * leaves it.
+ */
+export const revisitDecisionPhrase = (revisit: boolean, basis: ComparisonBasis) => {
+  if (basis.date) {
+    return revisit
+      ? `revisit decisions made on the ${basis.date} reading`
+      : `decisions made on the ${basis.date} reading stand`;
+  }
+  return revisit ? "revisit last week's decisions" : "last week's decisions stand";
+};
 
 export const homeDecisionFaqItems = [
   {

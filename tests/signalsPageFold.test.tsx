@@ -114,11 +114,11 @@ describe("/signals answers each closed question in its summary", () => {
   it("score trends: the move each cell prints, from the same window", () => {
     assert.equal(
       summaryAnswer(withTrends, "How have the two scores moved this year?"),
-      "Funding pressure down 27 to 63, risk appetite down 6 to 56 (3 month-ends to M3)",
+      "Funding pressure down 27 to 63, risk appetite down 6 to 56 (2 months to M3)",
     );
     const cells = withTrends.slice(withTrends.indexOf('id="trends"'));
     assert.match(cells, /63<\/span>/);
-    assert.match(cells, /-27(<!-- -->)? over (<!-- -->)?3 mo/);
+    assert.match(cells, /-27(<!-- -->)? over (<!-- -->)?2(<!-- -->)? mo/);
     assert.equal(summaryAnswer(html, "How have the two scores moved this year?"), undefined, "no series, no answer");
   });
 

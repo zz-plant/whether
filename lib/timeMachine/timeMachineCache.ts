@@ -400,7 +400,6 @@ export type TimeMachineYieldCurveEntry = {
   tenYear: number | null;
   spread10Y2Y: number | null;
   spread2Y3M: number | null;
-  curveSignal: number | null;
 };
 
 export const getTimeMachineYieldCurveSeries = (
@@ -432,11 +431,10 @@ export const getTimeMachineYieldCurveSeries = (
       typeof twoYear === "number" && typeof threeMonth === "number"
         ? twoYear - threeMonth
         : null;
-    const curveSignal =
-      typeof spread10Y2Y === "number" && typeof spread2Y3M === "number"
-        ? 0.7 * spread10Y2Y + 0.3 * spread2Y3M
-        : null;
-
+    /* No `curveSignal`. It was a blend (0.7 of 10Y−2Y plus 0.3 of 2Y−3M) that
+       the /signals ribbon drew under the recession warning gauge's name, which
+       is 10Y−2Y alone; the ribbon draws the gauge now and nothing else read
+       the blend. */
     return {
       year: snapshot.year,
       month: snapshot.month,
@@ -447,7 +445,6 @@ export const getTimeMachineYieldCurveSeries = (
       tenYear,
       spread10Y2Y,
       spread2Y3M,
-      curveSignal,
     };
   });
 };

@@ -146,6 +146,23 @@ describe("HistoricalTrendChart", () => {
     assert.match(html, /aria-label="[^"]*Latest [^"]*55/);
   });
 
+  /*
+   * /history printed "Risk appetite fell 6 over 12 months to 56" under a chart of
+   * twelve month-ends, Sep 2025 to Aug 2026: the move from the first point to
+   * the last spans eleven months, and the change over twelve was -10.
+   */
+  it("names the span its move covers, which is one fewer step than its points", () => {
+    const html = renderToStaticMarkup(
+      <HistoricalTrendChart label="Risk appetite" color="green" points={points} increaseIsPositive periodLabel="months" />,
+    );
+    const text = html.replace(/<!-- -->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+
+    assert.match(text, /Risk appetite rose 15 over 2 months to 55\./);
+    assert.match(text, /2 months to Mar 2026/);
+    assert.match(html, /aria-label="Risk appetite over 2 months,/);
+    assert.doesNotMatch(text, /3 months/, "the point count is not the span");
+  });
+
   it("shares its projection with the inline sparkline instead of a second implementation", () => {
     const values = points.map((p) => p.value);
     const domain = sparklineDomain(values);

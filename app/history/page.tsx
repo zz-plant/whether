@@ -66,8 +66,11 @@ export default async function HistoryPage({
   // "Record starts Aug 2021" beside a year strip that reached 2010 was three
   // answers to one question. The grading section below still reads 60 months.
   const fullSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
-  const tightnessTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.tightness }));
-  const riskAppetiteTrend = regimeSeries.slice(-12).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
+  /* Thirteen month-ends for a twelve-month move. Twelve read "Risk appetite
+     fell 6 over 12 months to 56" across Sep 2025 to Aug 2026, which is eleven
+     months; from Aug 2025 (66) it fell 10. */
+  const tightnessTrend = regimeSeries.slice(-13).map((entry) => ({ date: entry.recordDate, value: entry.tightness }));
+  const riskAppetiteTrend = regimeSeries.slice(-13).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
   const publishedBriefs = getPublishedBriefs();
   const trackRecord = buildTrackRecord(fullSeries);
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);

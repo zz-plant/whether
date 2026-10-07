@@ -15,8 +15,6 @@ type SignalSparklineSeries = {
   points: SparklinePoint[];
   /** Appetite-style scores improve when they rise; pressure-style ones worsen. */
   increaseIsPositive?: boolean;
-  /** How the strip names the window, e.g. "12 mo". */
-  windowLabel: string;
 };
 
 /**
@@ -45,7 +43,10 @@ export function SignalSparklineStrip({ series }: { series: SignalSparklineSeries
            so the closed question and the opened cells quote the same move. */
         const window = summarizeScoreWindow(item.points);
         if (!window) return [];
-        const { last, delta, periodLabel: latestPeriodLabel } = window;
+        /* The window's length comes from the window, not from a caller's
+           `windowLabel`: the page named it by its point count, so twelve
+           month-ends printed "-6 over 12 mo" for an eleven-month move. */
+        const { last, delta, months, periodLabel: latestPeriodLabel } = window;
         const values = item.points.map((point) => point.value);
         const direction = trendDirectionFromDelta(delta);
         const tone: SparklineTone =
@@ -55,7 +56,7 @@ export function SignalSparklineStrip({ series }: { series: SignalSparklineSeries
           <li key={item.key} className="rounded-lg border border-slate-800/60 bg-slate-950/30 px-3 py-2.5">
             <div className="flex items-baseline justify-between gap-2">
               <p className="text-fluid-nano text-slate-400">{item.label}</p>
-              <p className="text-fluid-nano tabular-nums text-slate-500">{item.windowLabel} · {rangeLabel(domain)}</p>
+              <p className="text-fluid-nano tabular-nums text-slate-500">{months} mo · {rangeLabel(domain)}</p>
             </div>
             <div className="mt-1 flex items-end justify-between gap-3">
               <div className="min-w-0">
@@ -65,7 +66,7 @@ export function SignalSparklineStrip({ series }: { series: SignalSparklineSeries
                   <span className={`ml-2 inline-flex items-center gap-1 text-fluid-xs ${trendToneClass(direction, item.increaseIsPositive)}`}>
                     <TrendGlyph direction={direction} className="h-3 w-3" />
                     {delta > 0 ? "+" : ""}
-                    {delta.toFixed(0)} over {item.windowLabel}
+                    {delta.toFixed(0)} over {months} mo
                   </span>
                 </p>
                 {latestPeriodLabel ? (

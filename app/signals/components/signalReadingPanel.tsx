@@ -53,11 +53,14 @@ export function SignalReadingPanel({
             <dd className="min-w-0">{reading.distanceLabel}</dd>
           </div>
         ) : null}
-        {/* Suppressed with the figure: a week-over-week line under "the spread
-            cannot be computed" is two contradictory claims about the same week. */}
+        {/* Suppressed with the figure: a movement line under "the spread
+            cannot be computed" is two contradictory claims about the same week.
+            Headed "Movement", not "Week over week": the line names its own
+            basis ("+27 points since Aug 31."), which is the last month-end
+            snapshot, and the heading called a five-week gap a week. */}
         {hasValue ? (
           <div className="flex flex-wrap gap-x-2">
-            <dt className="shrink-0 font-semibold text-slate-400">Week over week</dt>
+            <dt className="shrink-0 font-semibold text-slate-400">Movement</dt>
             <dd className={`min-w-0 ${directionClassName[reading.directionTone]}`}>{reading.directionLabel}</dd>
           </div>
         ) : null}

@@ -71,7 +71,7 @@ export async function DecisionAnswerPageContent({
   const contextSummary = buildDecisionAnswerContextSummary({
     displayLabel: displayRegime.label,
     canonicalRegime: displayRegime.canonicalRegime,
-    momentumLabel: reportDynamics.directionLabel,
+    reportDynamics,
     revisitDecisions: homeBriefModel.revisitDecisions,
   });
   /*
