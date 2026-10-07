@@ -9,17 +9,17 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 
 | Routine | ID | Cadence (UTC) | Produces |
 | --- | --- | --- | --- |
-| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Mon 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
+| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
 | Whether — weekly brief freeze | `trig_01WrbhhT73Ve4bsFK83UNyu9` | Thu 13:00 | current week appended to `data/published_briefs.json` |
 
-A third, "Whether — weekly Slack brief refresh" (`trig_017b1YkXqvsje8pseMXcUftp`, Mon 13:00),
+A third, "Whether — weekly Slack brief refresh" (`trig_017b1YkXqvsje8pseMXcUftp`, disabled),
 regenerated `docs/briefs/latest-weekly-slack-brief.md`. That file was deleted on 2026-10-06. Nothing
 in `app/`, `lib/` or `worker/` read it, and `/share`, `GET /api/brief/slack` and the Monday post all
 build the same text from the live read, so the committed copy could only ever be the older one —
 and it was: refreshed once in seven weeks, it still said 2026-09-14 while the archive held w40.
 `bun run brief:weekly:artifact` still writes `artifacts/weekly-slack-brief.txt` (gitignored) for the
-Jev brief audit. The script no longer takes `--format markdown`, so that routine, if it fires again,
-fails at its third step instead of re-adding the file.
+Jev brief audit. The routine was disabled the same day; if it is ever re-enabled, its third step fails
+on the removed `--format markdown` instead of re-adding the file.
 
 Since 2026-09-14 the freeze can also run as a Cloudflare Workflow
 (`worker/workflows/weeklyBriefFreeze.ts`), started by the Worker's Monday cron where
@@ -82,7 +82,8 @@ the next evening. The regime history refresh was rejected the same way on 2026-0
 10-05. The Thursday freeze has never hit the cap. A rejected run never reaches the prompt's `FAILED`
 instruction: it ends on "You've hit your weekly limit", and the `USAGE_LIMIT_REACHED` status lives
 only in the routine's run log (`RemoteTrigger` `list_runs` / `get_run_log`, or the routines page),
-so the repo saw what looked like quiet weeks. Schedule a routine early in the usage week, and read
+so the repo saw what looked like quiet weeks. The regime history refresh moved from Monday to
+Tuesday 12:00 UTC on 2026-10-06 for this reason. Schedule a routine early in the usage week, and read
 the run log before the code when its pull request does not appear.
 
 These routines run in a sandbox whose egress proxy denies hosts by policy, and the data pipeline
