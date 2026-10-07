@@ -2345,6 +2345,27 @@ w38–w40 did not record their engine, and `ENGINE_VERSION` changed on 2026-10-0
 archive counts yet: the week compares with the month-end, as before, until the first record frozen
 after this change is 5–14 days old.
 
+### 1.1.54 One week's guidance, said once on every surface (2026-10-07)
+
+A parity test that renders one week through every surface (`tests/weeklyClaimParity.test.tsx`, against
+the claims in `docs/claims-ledger.md`) found the week's action built three ways.
+
+- **Ordinary week.** The pastes, the Monday send and `/brief.md` led with the lead area's rule ("Limit
+  hiring to backfills and mission-critical roles…"). The page, the embed and the share card led with the
+  week's headline ("Conditions are tightening. Keep only the bets you can stop…"). The cause was the
+  stored operating snapshot: it built its weekly call with no comparison, so it could not know the week's
+  direction. It now compares the week as the page does (`resolveWeekComparison`), and the weekly call
+  leads with the headline. The lead area's rule stays first among the Do now lines.
+- **Held week.** The agent state and `/signals` read a week action that ignored the hold, and said
+  "Conditions are easing. Grow what is working" beside a hold. The page held in its own words ("Slow
+  approvals, require reversible bets…") while the pastes used the hold reason's. Every surface now prints
+  the hold reason's action (`describePolicyHold`).
+- **One builder.** `buildWeekActionNow` (`reportEvidence.ts`) is the week's action for the loader and
+  the snapshot alike. The page card, the share card and the contract read that value first.
+
+A Monday routine reads the live surfaces after the send and reports any claim that disagrees across them
+(`docs/agents/lessons/automation-and-deploy-gate.md`).
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

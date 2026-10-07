@@ -505,8 +505,11 @@ export const buildHomeBriefModelInternal = (
   const sharedFlipCorridor = formatSharedFlipCorridor(decisionRules);
   const executiveOperationalStance = extractExecutiveOperationalStance({ roleAwareTemplates, decisionRules });
 
+  /* A held week's action is the hold's (`POLICY_OVERRIDE_CALL`), the sentence the
+     pastes print. This said "Slow approvals, require reversible bets, and cap new
+     experiments until …" on the page while every paste said the reason's own. */
   const conciseActionNow = policyHold
-    ? `Slow approvals, require reversible bets, and cap new experiments until ${policyHold.holdsUntil}.`
+    ? policyHold.actionNow
     : (explicitStartupVariantMode || runwayCalibrated)
       ? startupVariantPolicy.adjustmentsByMode[startupVariantMode]?.doNowAdjustments[0]?.trim()
         || actionNowShort?.trim()

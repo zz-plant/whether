@@ -3,7 +3,8 @@ import { ENGINE_VERSION, evaluateRegime, type RegimeThresholds } from "../regime
 import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import { buildWeeklyCallContract } from "../report/weeklyCallContract";
 import { buildHomeBriefModel } from "../report/homeBriefModel";
-import { buildGuidanceBundleFromAssessment, buildReportDynamics } from "../report/reportEvidence";
+import { buildGuidanceBundleFromAssessment, buildReportDynamics, buildWeekActionNow } from "../report/reportEvidence";
+import { resolveWeekComparison } from "../report/weekComparison";
 import { FRED_SOURCE_LABEL, PROVENANCE_STATUS } from "../report/provenanceStatus";
 import { buildSensorReadings } from "../sensors";
 import { formatAgeHours, formatDateUTC, formatTimestampUTC, formatWeekEndingUTC } from "../formatters";
@@ -90,7 +91,14 @@ export const buildOperatingSnapshot = ({
   const epoch = now.toISOString();
   const id = `op_${recordDate}_${inputHash}`;
 
-  const reportDynamics = buildReportDynamics({ current: assessment, previous: null });
+  /* Compared as the page compares the week, so the stored weekly call carries
+     the week's direction (docs/claims-ledger.md). */
+  const comparison = resolveWeekComparison(recordDate, thresholds);
+  const reportDynamics = buildReportDynamics({
+    current: assessment,
+    previous: comparison?.reading ?? null,
+    comparedWith: comparison?.comparedWith,
+  });
   const sensors = buildSensorReadings(treasury);
   const { startItems, stopItems, actionStripItems } = buildGuidanceBundleFromAssessment(assessment);
 
@@ -102,6 +110,7 @@ export const buildOperatingSnapshot = ({
     startItems,
     stopItems,
     actionStripItems,
+    actionNowShort: buildWeekActionNow({ assessment, reportDynamics, actionStripItems }),
     regimeAlert: null,
     asOf: treasury.fetched_at,
     recordDateLabel: formatDateUTC(recordDate),

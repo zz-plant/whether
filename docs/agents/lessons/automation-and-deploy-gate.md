@@ -11,6 +11,7 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 | --- | --- | --- | --- |
 | Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json` |
 | Whether — weekly brief freeze | `trig_01WrbhhT73Ve4bsFK83UNyu9` | Thu 13:00 | current week appended to `data/published_briefs.json` |
+| Whether — Monday claims read-through | `trig_011a4rsy55K1ouAC4K3NfJs5` | Mon 15:47 | nothing committed: a read-only report comparing each claim in `docs/claims-ledger.md` across the live surfaces, and whether the weekly comparison basis is live |
 
 A third, "Whether — weekly Slack brief refresh" (`trig_017b1YkXqvsje8pseMXcUftp`, disabled),
 regenerated `docs/briefs/latest-weekly-slack-brief.md`. That file was deleted on 2026-10-06. Nothing

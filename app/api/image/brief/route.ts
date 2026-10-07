@@ -65,9 +65,11 @@ export const buildBriefImagePayload = (
   const callChangeLines = model.diagnostics.postureTrajectory?.thresholds;
 
   return {
+    /* The week's action, as the weekly call contract and every paste lead with it
+       (docs/claims-ledger.md). */
     decision:
-      model.decision.canonicalDecisionCopy?.doNowLines?.[0] ??
-      model.decision.actionNowShort ??
+      model.decision.actionNowShort?.trim() ||
+      model.decision.canonicalDecisionCopy?.doNowLines?.[0] ||
       model.decision.immediateDecision,
     regime: shell.regime,
     /* The derivation `/share` and every paste print: the lines the scores are

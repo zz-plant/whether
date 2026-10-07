@@ -24,10 +24,11 @@ type WeeklyCard = HomePageAssembly["weeklyDecisionCardModel"];
  */
 export const deriveBriefCallFields = (card: WeeklyCard) => {
   const { decision } = card;
+  /* The week's action, as the weekly call contract leads with it (docs/claims-ledger.md). */
   const primaryCall =
-    decision.canonicalDecisionCopy?.doNowLines?.[0]
-    ?? decision.actionNowShort
-    ?? decision.weeklyLeadershipSummary.shorthandLine;
+    decision.actionNowShort?.trim()
+    || decision.canonicalDecisionCopy?.doNowLines?.[0]
+    || decision.weeklyLeadershipSummary.shorthandLine;
   const flipConditionLabels = decision.compactFlipConditionLabels ?? [];
   const revisitQueue = decision.revisitQueue;
   const revisitAreaIds = new Set(revisitQueue.map((item) => item.id));

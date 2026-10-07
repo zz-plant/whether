@@ -1,14 +1,14 @@
-import { DEFAULT_THRESHOLDS, evaluateRegime } from "../regimeEngine";
-import { buildSignalInfluence } from "./regimeDescription";
+import { DEFAULT_THRESHOLDS, evaluateRegime, type RegimeAssessment } from "../regimeEngine";
+import { buildSignalInfluence, describePolicyHold } from "./regimeDescription";
 import { getPlaybookGuidance } from "../playbook";
-import { buildCanonicalBoundedDecisionRules, SPENDING_PAYBACK_BAR_MONTHS } from "./boundedDecisionRules";
+import { buildCanonicalBoundedDecisionRules, isRuleConditionMet, SPENDING_PAYBACK_BAR_MONTHS } from "./boundedDecisionRules";
 import { signalOrder } from "./briefFormatting";
 import { resolveLineDistanceLabel } from "./confidence";
 import { formatBoundaryDistance, formatConfidencePlainLabel } from "./reportFormatting";
 import { formatScoreValue } from "../formatters";
 import { regimeSignalLabel } from "./signalTranslations";
 import { normalizeSignalContributions } from "./signalFormatting";
-import { buildActionStripItems } from "./operatingCalls";
+import { buildActionStripItems, type ActionStripItem } from "./operatingCalls";
 import type {
   ComparedWith,
   ReportDynamics,
@@ -101,6 +101,43 @@ export const buildActionNowShort = ({
         ? "tightening"
         : "holding";
   return ACTION_NOW_BY_REGIME[regime][tone];
+};
+
+/**
+ * The week's action: the first sentence of the guidance on every surface
+ * (docs/claims-ledger.md). The report loader and the operating snapshot both
+ * build it here, so the page, every paste and the Monday send say one thing.
+ *
+ * A held week's is the hold's, in the words of the reason it is held
+ * (`describePolicyHold`): the loader's copy ignored the hold, and the agent state
+ * said "Conditions are easing. Grow what is working" beside a page and a paste
+ * that said the guidance was not changing. An improving week holds while any
+ * area's pause line is met, read from the rule data itself, since the guidance
+ * bundle builds its strip items without scores.
+ */
+export const buildWeekActionNow = (
+  {
+    assessment,
+    reportDynamics,
+    actionStripItems,
+  }: {
+    assessment: Pick<RegimeAssessment, "regime" | "scores" | "policyAssessment">;
+    reportDynamics: Pick<ReportDynamics, "directionLabel" | "regimeChanged">;
+    actionStripItems: readonly Pick<ActionStripItem, "pauseConditions">[];
+  },
+  build: typeof buildActionNowShort = buildActionNowShort,
+): string => {
+  const { refusal } = assessment.policyAssessment;
+  if (refusal.refused) return describePolicyHold(refusal).actionNow;
+  const pauseApplies = actionStripItems.some((item) =>
+    (item.pauseConditions ?? []).some((condition) => isRuleConditionMet(condition, assessment.scores[condition.metric])),
+  );
+  return build({
+    directionLabel: reportDynamics.directionLabel,
+    regimeChanged: reportDynamics.regimeChanged,
+    regime: assessment.regime,
+    pauseApplies,
+  });
 };
 
 export const buildGuidanceBundleFromAssessment = (assessment: ReturnType<typeof evaluateRegime>) => {
