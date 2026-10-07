@@ -12,7 +12,8 @@ import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
 import { parseOperatorRunwayParam } from "../../../lib/report/operatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { formatConfidenceChipLabel } from "../../../lib/report/reportFormatting";
+import { formatConfidenceChipLabel, publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { formatGuidance } from "../../../lib/export/briefBuilders";
 import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
 import { siteUrl } from "../../../lib/siteUrl";
 import { USE_CONSTRAINT_SUMMARY, buildUseConstraint } from "../../../lib/report/useConstraint";
@@ -238,8 +239,10 @@ export const buildBriefEmbedText = (data: BriefEmbedData): string =>
        word under "Conditions" and the band as a word. */
     `Conditions: ${data.regimeLabel} • ${data.confidenceLabel} • As of ${data.recordDate}`,
     ``,
-    `Operating guidance: ${data.operatingCall}`,
-    `Decision now: ${data.actionNow}`,
+    /* The guidance as every other paste leads with it (`formatGuidance`): the
+       do-now line, then the stance. This printed the two under labels of its
+       own, "Operating guidance" and "Decision now", in the other order. */
+    `${publicDecisionLabels.call}: ${formatGuidance({ actionNow: data.actionNow, currentCall: data.operatingCall })}`,
     /* One item per line. Joined with commas, items that carry their own
        ("If you plan to raise, prepare…", "…within a week, each with a review
        date") ran into each other and the list could not be read back. */
@@ -274,10 +277,9 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
     <span style="font-size:10px;color:rgba(255,255,255,0.3);">${escapeHtml(metaParts.join(" · "))}</span>
   </div>
   <div style="background:rgba(56,189,248,0.08);border-left:3px solid rgba(56,189,248,0.4);padding:12px 14px;border-radius:6px;margin:8px 0;">
-    <p style="font-size:11px;font-weight:600;color:rgba(125,211,252,0.9);margin:0 0 4px 0;letter-spacing:0.04em;">Operating guidance</p>
-    <p style="font-size:16px;font-weight:600;color:rgba(255,255,255,0.9);margin:0;line-height:1.4;">${escapeHtml(operatingCall)}</p>
+    <p style="font-size:11px;font-weight:600;color:rgba(125,211,252,0.9);margin:0 0 4px 0;letter-spacing:0.04em;">${publicDecisionLabels.call}</p>
+    <p style="font-size:16px;font-weight:600;color:rgba(255,255,255,0.9);margin:0;line-height:1.4;">${escapeHtml(formatGuidance({ actionNow, currentCall: operatingCall }))}</p>
   </div>
-  <p style="font-size:14px;color:rgba(255,255,255,0.7);margin:12px 0;"><strong style="color:rgba(255,255,255,0.8);">Decision now:</strong> ${escapeHtml(actionNow)}</p>
   ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.4);margin:0 0 4px 0;">${DECISION_CONTRACT_LABELS.action.doNow}</p>${doNowHtml}</div>` : ""}
   ${changeLinesHtml}
   <div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:rgba(255,255,255,0.3);display:flex;justify-content:space-between;">

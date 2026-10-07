@@ -154,6 +154,19 @@ describe("the embed says what the brief says", () => {
     }
   });
 
+  it("leads with the guidance every other paste leads with", async () => {
+    const homepage = await assembleFreezingWeek();
+    const data = buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: null });
+    const text = buildBriefEmbedText(data);
+
+    /* The do-now line first, then the stance, under "Guidance" — as the Slack
+       post and brief.md print it — not "Operating guidance" / "Decision now". */
+    assert.match(text, new RegExp(`^Guidance: ${data.actionNow.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "m"));
+    for (const output of [text, buildBriefEmbedHtml(data)]) {
+      assert.doesNotMatch(output, /Operating guidance|Decision now/);
+    }
+  });
+
   it("prints a calibrated stage's resume line under its own label, beside the change line", async () => {
     const homepage = await assembleFreezingWeek("series-a");
     const text = buildBriefEmbedText(buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: "series-a" }));
