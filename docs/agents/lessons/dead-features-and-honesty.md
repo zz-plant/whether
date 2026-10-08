@@ -16,6 +16,9 @@ test and not a dead export. It is invisible to the whole gate.
   `FirstVisitExplainer`: that element is already the one thing on `/` addressed to someone who has
   never seen the page, and its own comment records what it cost the last time that spot grew a
   second block. Its first link pointed at `#executive-snapshot`, an id no page renders.
+  Rendering it was not the end of it: tested only for being on the page, it kept naming sections the
+  page did not draw ("Summary", "Proof", "Actions") and a stage-and-runway rule the picker under it
+  contradicted, until 2026-10-08. A guide's test has to check its nouns against the page's.
 - **`computeReliabilityScore`** averaged confidence as 90/60/30, an offline flag as 100/50, and a
   degraded-source ratio over `max(degraded + 3, 4)` into a 0-100 figure with three colour bands.
   Its own tests pinned MED at 87 and LOW at 77 with every source healthy, against bands calling 80

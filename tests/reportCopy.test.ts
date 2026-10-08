@@ -1,23 +1,30 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
-  FIRST_TIME_GUIDE_HIGHLIGHTS,
-  FIRST_TIME_GUIDE_NEXT_LINKS,
+  DECISION_CONTRACT_LABELS,
+  FIRST_TIME_GUIDE_LINES,
   FIRST_TIME_GUIDE_STEPS,
   TERM_DEFINITIONS,
 } from "../lib/report/reportCopy";
+import { CALL_CHANGE_RULE } from "../lib/report/trackRecordCopy";
 
 describe("reportCopy", () => {
-  it("defines first-time guide content with three ordered steps", () => {
-    assert.equal(FIRST_TIME_GUIDE_STEPS.length, 3);
+  it("defines the first-time guide as three steps named for what the page shows", () => {
     assert.deepEqual(
       FIRST_TIME_GUIDE_STEPS.map((step) => step.label),
-      ["Summary", "Proof", "Actions"],
+      ["Read the guidance", "Pick what you're deciding", "Act on it"],
     );
     FIRST_TIME_GUIDE_STEPS.forEach((step) => {
       assert.ok(step.detail.length > 20);
-      assert.match(step.example, /^Example decision:/);
+      assert.match(step.detail, /\.$/);
     });
+  });
+
+  it("tells the change line from an area's pause and resume lines", () => {
+    const [change, areaLines] = FIRST_TIME_GUIDE_LINES;
+    assert.equal(change?.label, DECISION_CONTRACT_LABELS.watch.changeLine);
+    assert.ok(change?.detail.includes(CALL_CHANGE_RULE), "the change line says how conditions change");
+    assert.match(areaLines?.detail ?? "", /stage and runway move both/);
   });
 
   it("defines each term once, in a sentence", () => {
@@ -27,10 +34,5 @@ describe("reportCopy", () => {
       assert.ok(entry.term);
       assert.match(entry.summary, /\.$/);
     });
-  });
-
-  it("keeps the first-time guide's quick links", () => {
-    assert.ok(FIRST_TIME_GUIDE_HIGHLIGHTS.length > 0);
-    assert.ok(FIRST_TIME_GUIDE_NEXT_LINKS.length >= 3);
   });
 });

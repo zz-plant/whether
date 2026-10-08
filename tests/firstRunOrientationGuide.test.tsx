@@ -3,11 +3,10 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FirstVisitExplainer } from "../app/components/homeFirstRunOrientation";
 import { canonicalPositioningLine, websiteName } from "../lib/seo";
-import {
-  FIRST_TIME_GUIDE_HIGHLIGHTS,
-  FIRST_TIME_GUIDE_NEXT_LINKS,
-  FIRST_TIME_GUIDE_STEPS,
-} from "../lib/report/reportCopy";
+import type { RegimeKey } from "../lib/regimeEngine";
+import { FIRST_TIME_GUIDE_LINES, FIRST_TIME_GUIDE_STEPS } from "../lib/report/reportCopy";
+import { navigationLayerByKey } from "../lib/navigation/informationArchitecture";
+import { REGIME_LABELS, REGIME_ORDER, REGIME_WEATHER_RATIONALES } from "../lib/regimePresentation";
 
 /*
  * The guide existed and no page rendered it.
@@ -23,7 +22,7 @@ import {
  * So this file asserts the rendered markup, not the constants.
  */
 
-/* React escapes an apostrophe to `&#x27;`, and one highlight has one. Decoded
+/* React escapes an apostrophe to `&#x27;`, and the steps carry several. Decoded
    here so the assertion compares the copy rather than the encoding. */
 const decode = (html: string) =>
   html
@@ -31,26 +30,68 @@ const decode = (html: string) =>
     .replaceAll("&quot;", '"')
     .replaceAll("&amp;", "&");
 
-const markup = () => decode(renderToStaticMarkup(<FirstVisitExplainer />));
+const markup = (currentRegime?: RegimeKey) =>
+  decode(renderToStaticMarkup(<FirstVisitExplainer currentRegime={currentRegime} />));
 
 describe("first-run orientation guide", () => {
-  it("renders every step, with the example that makes it concrete", () => {
+  it("renders every step", () => {
     const html = markup();
 
     for (const step of FIRST_TIME_GUIDE_STEPS) {
       assert.ok(html.includes(step.label), `step "${step.label}" is not on the page`);
-      assert.ok(html.includes(step.example), `step "${step.label}" lost its example`);
+      assert.ok(html.includes(step.detail), `step "${step.label}" lost its detail`);
     }
   });
 
-  it("renders the highlights and the links out", () => {
+  /*
+   * Its first version named steps the page never drew ("Summary", "Proof", "Actions"),
+   * pointed at "the score details" and "the planning page", linked "Past snapshots" for the
+   * tab called History, and said a stage and runway changed "the notes under the guidance and
+   * nothing else" above a picker that says they set the lines.
+   */
+  it("uses the page's own names, not a second vocabulary", () => {
     const html = markup();
 
-    for (const highlight of FIRST_TIME_GUIDE_HIGHLIGHTS) {
-      assert.ok(html.includes(highlight.text), `highlight missing: ${highlight.text}`);
+    for (const retired of ["Summary.", "Proof.", "Actions.", "score details", "planning page", "Past snapshots", "nothing else"]) {
+      assert.ok(!html.includes(retired), `the guide still says "${retired}"`);
     }
-    for (const link of FIRST_TIME_GUIDE_NEXT_LINKS) {
-      assert.ok(html.includes(`href="${link.href}"`), `link missing: ${link.href}`);
+    assert.ok(html.includes("What are you deciding?"), "step two names the picker by its heading");
+  });
+
+  it("says what each of the four conditions means, and marks this week's", () => {
+    const html = markup("SCARCITY");
+
+    for (const regime of REGIME_ORDER) {
+      assert.ok(html.includes(REGIME_LABELS[regime]), `${REGIME_LABELS[regime]} is missing`);
+      assert.ok(html.includes(REGIME_WEATHER_RATIONALES[regime]), `${REGIME_LABELS[regime]} lost its meaning`);
+    }
+    assert.equal((html.match(/This week\./g) ?? []).length, 1, "exactly one condition is marked");
+    assert.match(html, new RegExp(`${REGIME_WEATHER_RATIONALES.SCARCITY}<span[^>]*> This week\\.`));
+    // An archived week passes no conditions, so nothing claims to be this week's.
+    assert.ok(!markup().includes("This week."));
+  });
+
+  it("tells the change line from an area's pause and resume lines", () => {
+    const html = markup();
+
+    for (const line of FIRST_TIME_GUIDE_LINES) {
+      assert.ok(html.includes(line.label), `line "${line.label}" is missing`);
+      assert.ok(html.includes(line.detail), `line "${line.label}" lost its detail`);
+    }
+  });
+
+  /*
+   * The guide ends on the tabs a newcomer opens next, named as the header names them and
+   * described as the IA describes them. Its own list was a third copy of the IA.
+   */
+  it("links out to header tabs by their header names", () => {
+    const html = markup();
+
+    for (const key of ["planning", "signals", "history"] as const) {
+      const layer = navigationLayerByKey[key];
+      assert.ok(html.includes(`href="${layer.href}"`), `link missing: ${layer.href}`);
+      assert.ok(html.includes(`>${layer.navLabel ?? layer.label}</a>`), `${layer.href} is not labelled with its tab name`);
+      assert.ok(html.includes(layer.description), `${layer.href} lost its description`);
     }
   });
 
@@ -68,17 +109,6 @@ describe("first-run orientation guide", () => {
     assert.ok(html.includes("<details"), "the guide is not collapsed");
     assert.ok(html.indexOf("read each") > guide, "the longer explanation belongs inside the guide");
     assert.match(html, /aria-label="Dismiss introduction"/, "the compact dismiss control keeps its name");
-  });
-
-  /*
-   * The one in-page target it has. `#executive-snapshot` was the original, and
-   * no page has ever rendered that id — the guide was never rendered either, so
-   * nobody could click it and find out.
-   */
-  it("points its in-page link at a section the homepage renders", () => {
-    const inPage = FIRST_TIME_GUIDE_NEXT_LINKS.filter((link) => link.href.startsWith("#"));
-
-    assert.deepEqual(inPage.map((link) => link.href), ["#weekly-call"]);
   });
 
   it("tells a reader who followed a paste what they are looking at, in the same slot", () => {

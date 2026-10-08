@@ -2,16 +2,21 @@
 
 import Link from "next/link";
 import { X } from "lucide-react";
-import {
-  FIRST_TIME_GUIDE_HIGHLIGHTS,
-  FIRST_TIME_GUIDE_NEXT_LINKS,
-  FIRST_TIME_GUIDE_STEPS,
-} from "../../lib/report/reportCopy";
+import { FIRST_TIME_GUIDE_LINES, FIRST_TIME_GUIDE_STEPS } from "../../lib/report/reportCopy";
+import { navigationLayerByKey, type NavigationLayerKey } from "../../lib/navigation/informationArchitecture";
+import type { RegimeKey } from "../../lib/regimeEngine";
+import { getOrderedRegimeLegend, REGIME_STYLE_TOKENS } from "../../lib/regimePresentation";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
 import { canonicalPositioningLine } from "../../lib/seo";
 import { createBrowserSource, useBrowserSource } from "./browserSource";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
+
+/* The guide ends on the tabs a newcomer goes to next, named and described by
+   the navigation IA. It kept its own three links, one of them "Past snapshots"
+   for a tab the header calls History, and the IA module records what a third
+   copy of it costs. */
+const GUIDE_NEXT_LAYERS: readonly NavigationLayerKey[] = ["planning", "signals", "history"];
 
 /* Module-level on purpose: the dismissal writes to the document, which the
    React compiler's immutability rule refuses inside a component body. */
@@ -65,7 +70,14 @@ const dismissedSource = createBrowserSource<boolean>({
  * already cover every width — so a first visit showed the same four stage
  * buttons twice within one screen. The stage is asked once, in the hero.
  */
-export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
+export function FirstVisitExplainer({
+  arrival,
+  currentRegime,
+}: {
+  arrival?: "share";
+  /** This week's conditions, marked in the guide's key. Left out for an archived week. */
+  currentRegime?: RegimeKey;
+} = {}) {
   const dismissed = useBrowserSource(dismissedSource);
 
   if (dismissed) {
@@ -128,14 +140,13 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
       {/*
         Collapsed, under the line it belongs to.
 
-        The three steps, the four highlights and the next links have been written
-        and tested since before this component existed, in `reportCopy.ts`, and no
-        page rendered any of them — `tests/reportCopy.test.ts` asserted there were
-        exactly three steps and that each carried an example, which is what kept
-        them alive past every gate. They go here rather than in a panel of their
-        own: this element is already the one thing on the page addressed to
-        someone who has never seen it, and the comment above records what it cost
-        the last time this spot grew a second block of controls.
+        The guide was written and tested in `reportCopy.ts` before any page
+        rendered it, which is how its steps came to name sections the page never
+        drew. It goes here rather than in a panel of its own: this element is
+        already the one thing on the page addressed to someone who has never
+        seen it, and the comment above records what it cost the last time this
+        spot grew a second block of controls. Folded, it costs a returning
+        reader nothing, and the layout hides the whole element for one.
       */}
       <details className="weather-auto-chevron group mt-1">
         {/* The label and its count are one flex item, not two.
@@ -155,7 +166,7 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
 
         {arrival !== "share" ? (
           <p className="mt-2 max-w-[64ch] leading-relaxed text-slate-300">
-            Two scores, read each Monday against the lines that pause or resume hiring, spend and raising: how hard it is to raise money, and how much risk investors will fund.
+            Two scores, read each Monday: funding pressure, how hard it is to raise money, and risk appetite, how much risk investors will fund.
           </p>
         ) : null}
 
@@ -165,29 +176,55 @@ export function FirstVisitExplainer({ arrival }: { arrival?: "share" } = {}) {
               <span className="font-semibold text-slate-200">
                 {index + 1}. {step.label}.
               </span>{" "}
-              <span className="text-slate-300">{step.detail}</span>{" "}
-              <span className="text-slate-400">{step.example}</span>
+              <span className="text-slate-300">{step.detail}</span>
             </li>
           ))}
         </ol>
 
-        <ul className="mt-3 max-w-[72ch] space-y-1 text-slate-400">
-          {FIRST_TIME_GUIDE_HIGHLIGHTS.map((highlight) => (
-            <li key={highlight.text}>— {highlight.text}</li>
-          ))}
-        </ul>
-
-        <div className="mt-3 flex flex-wrap gap-x-4 gap-y-1">
-          {FIRST_TIME_GUIDE_NEXT_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="inline-flex min-h-[44px] items-center text-sky-200 underline decoration-sky-700 underline-offset-4 hover:text-sky-100"
-            >
-              {link.label}
-            </Link>
-          ))}
+        {/* The card prints one weather word and the chart four, and only the
+            word in force came with its meaning. A first visit could not tell
+            Cloudy from Stormy, or which corner it would rather be in. */}
+        <div className="mt-3 max-w-[72ch]">
+          <p id="first-run-conditions-label" className="font-semibold text-slate-200">The four conditions</p>
+          <ul aria-labelledby="first-run-conditions-label" className="mt-1 grid gap-x-6 gap-y-1 sm:grid-cols-2">
+            {getOrderedRegimeLegend().map((entry) => (
+              <li key={entry.regime} className="leading-relaxed text-slate-300">
+                <span className={`font-semibold ${REGIME_STYLE_TOKENS[entry.regime].accent.text}`}>{entry.weather}</span>{" "}
+                {entry.weatherRationale}
+                {entry.regime === currentRegime ? <span className="text-slate-400"> This week.</span> : null}
+              </li>
+            ))}
+          </ul>
         </div>
+
+        <div className="mt-3 max-w-[72ch]">
+          <p id="first-run-lines-label" className="font-semibold text-slate-200">Two kinds of line</p>
+          <dl aria-labelledby="first-run-lines-label" className="mt-1 space-y-1">
+            {FIRST_TIME_GUIDE_LINES.map((line) => (
+              <div key={line.label} className="leading-relaxed">
+                <dt className="inline font-semibold text-slate-200">{line.label}.</dt>{" "}
+                <dd className="inline text-slate-300">{line.detail}</dd>
+              </div>
+            ))}
+          </dl>
+        </div>
+
+        <ul className="mt-3 max-w-[72ch] space-y-1">
+          {GUIDE_NEXT_LAYERS.map((key) => {
+            const layer = navigationLayerByKey[key];
+            return (
+              <li key={key} className="text-slate-400">
+                <Link
+                  href={layer.href}
+                  className="inline-flex min-h-[44px] items-center font-medium text-sky-200 underline decoration-sky-700 underline-offset-4 hover:text-sky-100 sm:min-h-0"
+                >
+                  {layer.navLabel ?? layer.label}
+                </Link>{" "}
+                {layer.description}
+              </li>
+            );
+          })}
+        </ul>
       </details>
     </section>
   );

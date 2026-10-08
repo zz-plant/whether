@@ -1427,8 +1427,9 @@ confirmation), and reads "this week" where the source did not date the earlier r
 **Where it prints.** The lead over "What changed this week" (followed by the nearest line on a quiet week,
 `buildChangedLead`); the by-area table's **Changed** column, which used to carry a fixed re-check sentence for
 whichever three areas the largest moves pointed at whether or not the rule had anything to re-check, and now
-says what happened to that area's own lines ("Pause now applies: risk appetite fell through 44."), says
-"No line crossed since Aug 31." for an area a move did not touch, and draws no column on a week nothing
+says what happened to that area's own lines ("Pause now applies: risk appetite fell through 44."), names
+the side of its lines an area a move did not touch held on ("Pause still applies: no line crossed since Aug
+31.", §1.1.56), and draws no column on a week nothing
 crossed; the first-visit picker's amber note for the chosen area; `weeklyMovement.summary`, and so the frozen
 record's `whatChanged` (new freezes only: the archive is append-only, and w38 and w39 keep the sentence they
 were frozen with); `decisionShiftSummary` and `decisionShiftHeadline`, which are the "Changed:" line in the
@@ -2544,6 +2545,38 @@ snapshot's document now reads the comparison its weekly call was built from (`re
 section with (`briefWeekChangeLine`). The Monday Slack post is carried whole across sections split between
 lines: it had outgrown Slack's 3,000-character section and was cut mid-word ("Put a payback figure on every
 discretionar… (truncated — full brief on the site)").
+
+### 1.1.56 The newcomer's guide uses the page's words; each tab says what it is for (2026-10-08)
+
+A first visit met "Freezing", a four-corner chart, "2 pts from its line", "Pause line crossed" and "Change
+line 70" within one screen, and nothing on `/` said what the other three weather words meant or that the
+change line and an area's pause and resume lines are different lines. The one element addressed to a
+newcomer, "How to read this page" in `FirstVisitExplainer`, did not help: its steps were named "Summary",
+"Proof" and "Actions", which no section is called; it sent the reader to "the score details" and "the
+planning page"; it linked "Past snapshots" for the tab called History; and it said a stage and runway
+changed "the notes under the guidance and nothing else" above a picker that says they set the lines.
+
+- **The guide** (`FIRST_TIME_GUIDE_STEPS`, `FIRST_TIME_GUIDE_LINES` in `lib/report/reportCopy.ts`) now
+  names the scores by their labels, gives three steps named for what they point at ("Read the guidance",
+  "Pick what you're deciding", "Act on it"), lists the four conditions with their meanings
+  (`getOrderedRegimeLegend`, laid out in the chart's corners and marking this week's on a live reading),
+  tells the change line (with `CALL_CHANGE_RULE`, which `/` did not otherwise print) from each area's pause
+  and resume lines, and ends on Plan, Evidence and History with the IA's own names and descriptions.
+  `FIRST_TIME_GUIDE_HIGHLIGHTS` and `FIRST_TIME_GUIDE_NEXT_LINKS` are deleted; the second was a third copy
+  of the IA. It stays folded, and hidden for a returning browser.
+- **A held area names its side of the lines.** "No line crossed since Sep 30." printed alone beside "Pause
+  if Funding pressure > 76 · crossed" read as the row contradicting itself. An area held past its pause
+  line now reads "Pause still applies: no line crossed since Sep 30.", one held past its resume line
+  "Resume line still met: …", and one between its lines keeps the plain sentence (`describeHeld`,
+  `lib/report/decisionMovement.ts`). This prints in the picker's note and the by-area **Changed** column.
+- **Tabs say what they are for.** The desktop tabs' hover title is the IA description (with the one-key
+  jump after it), where it was the tab's own name. The phone's More sheet lists every page under "Pages"
+  with the same line, where it listed bare names under "Operator loop" with keycaps a phone cannot press;
+  the utility links carry their descriptions there too, as they already did on desktop. Evidence's
+  description says "lines", not "thresholds".
+
+`tests/firstRunOrientationGuide.test.tsx` renders the guide and fails on any of its retired nouns.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
