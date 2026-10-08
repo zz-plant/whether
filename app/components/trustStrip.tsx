@@ -108,6 +108,10 @@ export function TrustStrip({
                 alone, so "Could change next week Risk appetite is 2 pts" ran together. */}
             <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500`}>{cell.label}</dt>
             {line ? " " : null}
+            {/* A state carries a dot as well as its ink, so "Partly cached" and
+                "2 pts from its line" read as flags at a glance and survive a
+                greyscale screenshot. Round, because it is a marker (§XIV); a
+                pseudo-element, so the cell's text is still only its value. */}
             <dd
               className={`${termLayout}${
                 cell.tone === "caution"
@@ -115,7 +119,7 @@ export function TrustStrip({
                   : cell.tone === "easing"
                     ? "font-medium text-semantic-easing-fg"
                     : "font-medium text-slate-200"
-              }`}
+              }${cell.tone ? " before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:align-middle before:content-['']" : ""}`}
             >
               {cell.value}
             </dd>

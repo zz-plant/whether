@@ -64,6 +64,17 @@ describe("homepage heading contract", () => {
     assert.equal(headingFor(html, "weekly-call-title"), "h2");
   });
 
+  it("prints what the weather word means under the call, not on the stamp line", () => {
+    /* The stamp line ran the meaning, the week's direction and the earlier
+       conditions together ahead of the call; the meaning is the line under it. */
+    const html = renderToStaticMarkup(<DecisionHero {...heroProps} weeklyCall="Freeze new commitments." direction="Tightening this week" />);
+    const call = html.indexOf('id="weekly-call-title"');
+    const meaning = html.indexOf("data-regime-meaning");
+    assert.ok(call > 0 && meaning > call, "the meaning follows the call");
+    assert.match(html, /data-regime-meaning="true">Money is available but pricey\.</);
+    assert.ok(html.indexOf("Tightening this week") < call, "the week's direction stays on the stamp line");
+  });
+
   it("anchors the share-ready artifact on the card that is the artifact", () => {
     const html = renderToStaticMarkup(<DecisionHero {...heroProps} />);
     assert.match(html, /id="share-ready-artifact"/);

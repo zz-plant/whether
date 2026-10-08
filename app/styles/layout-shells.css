@@ -61,8 +61,17 @@
   min-width: 0;
 }
 .weather-home-section {
-  margin-top: 16px;
-  padding-top: var(--layout-content-gap);
+  margin-top: var(--layout-content-gap);
+  padding-top: var(--layout-section-gap);
+}
+/* More air between the brief's five answers from md up, where the page is
+   read top to bottom rather than thumbed: the hairline alone separated them,
+   and at 32px apart the sections ran together. */
+@media (min-width: 768px) {
+  .weather-home-section {
+    margin-top: var(--layout-section-gap);
+    padding-top: var(--space-xl);
+  }
 }
 
 /* Four company choices form equal cells instead of wrapping three then one.

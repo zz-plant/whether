@@ -230,6 +230,41 @@ describe("AreaTable", () => {
   });
 });
 
+describe("AreaTable moved rows", () => {
+  it("marks the area the week moved, and only that one", () => {
+    const html = renderToStaticMarkup(
+      <AreaTable
+        caption="test"
+        rows={[
+          { area: "hiring", rule: "Backfills only.", changed: "Pause still applies: no line crossed since Sep 30." },
+          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Resume line no longer met: risk appetite fell through 54.", moved: true },
+        ]}
+      />,
+    );
+    const rows = html.split("data-area=").slice(1);
+    assert.doesNotMatch(rows[0] ?? "", /data-moved/);
+    assert.match(rows[1] ?? "", /data-moved="true"/);
+  });
+
+  it("draws a line in force as a stamp, and a distance still to go as text", () => {
+    const html = renderToStaticMarkup(
+      <AreaTable
+        caption="test"
+        rows={[
+          {
+            area: "hiring",
+            rule: "Backfills only.",
+            pause: { line: "Funding pressure > 76", distance: "crossed" },
+            resume: { line: "Funding pressure < 66", distance: "24 pts away" },
+          },
+        ]}
+      />,
+    );
+    assert.match(html, /class="[^"]*rounded-sm border[^"]*text-semantic-caution-fg[^"]*">crossed</);
+    assert.doesNotMatch(html, /class="[^"]*rounded-sm[^"]*">24 pts away</);
+  });
+});
+
 describe("TrustStrip", () => {
   it("is four facts and, off /trust, a link", () => {
     const html = renderToStaticMarkup(

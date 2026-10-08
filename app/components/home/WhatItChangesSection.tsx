@@ -61,6 +61,7 @@ export function WhatItChangesSection({
       : undefined,
     scores: [row.pause?.metric, row.resume?.metric].filter((metric) => metric !== undefined),
     changed: row.changed,
+    moved: row.changed !== undefined && row.changedKind !== undefined && row.changedKind !== "held",
     href: toRoute(`${planHref}#ops-monthly-action-summary`),
     note: isHistorical ? undefined : <RunwayAreaNote regime={regime} area={row.area} />,
   }));

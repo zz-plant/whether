@@ -39,8 +39,12 @@
      lets it grow past the old 36px cap and still hold two lines on a phone and
      on desktop. It was 54px in a serif once, a magazine cover line; the cap
      stays because a 7vw ceiling wrapped it to seven lines and pushed the brief
-     below the fold. */
-  --text-display: clamp(1.625rem, 1.25rem + 1.6vw, 2.5rem);
+     below the fold. The ceiling rose from 2.5rem to 3.25rem on 2026-10-08,
+     with the floor moved only 2px: the call is the one thing the card is
+     screenshotted for, and at 40px on a desktop it sat at the weight of the
+     section headings below it. Semi-condensed, it still holds two lines in
+     the card's 42rem measure. */
+  --text-display: clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem);
   --color-app-text-secondary: var(--app-text-secondary);
 }
 
@@ -181,11 +185,15 @@
   --app-text-muted: #a7b3c4;
 
   /* Regime atmosphere — a top-of-page posture tint that fades into --bg-body.
-     Must stay theme-aware: a fixed dark tint washes out the light surface. */
-  --atmosphere-expansion: rgba(6, 78, 59, 0.34);
-  --atmosphere-defensive: rgba(69, 39, 3, 0.28);
-  --atmosphere-scarcity: rgba(76, 5, 25, 0.30);
-  --atmosphere-volatile: rgba(46, 16, 101, 0.28);
+     Must stay theme-aware: a fixed dark tint washes out the light surface.
+     Held to about a third of its old strength (2026-10-08): at 0.30 a Freezing
+     week dyed the whole first screen maroon, so the hero's own rose — its top
+     rule, stamp and map point — had nothing to stand out from. The regime
+     reads as a signal on the card, not as the colour of the room. */
+  --atmosphere-expansion: rgba(6, 78, 59, 0.12);
+  --atmosphere-defensive: rgba(69, 39, 3, 0.10);
+  --atmosphere-scarcity: rgba(76, 5, 25, 0.11);
+  --atmosphere-volatile: rgba(46, 16, 101, 0.10);
   /* Resolved by the data-regime map below; transparent under no regime, so a
      page with no call to make sits on --bg-body itself rather than under the
      flat 3% sky wash the interior backdrop used to paint over every route.
@@ -481,10 +489,10 @@ html[data-theme="light"] {
   /* Kept in lockstep with --border-default / --border-strong above. */
 
   /* Light-surface posture tint: same hues, held to a wash so text keeps contrast. */
-  --atmosphere-expansion: rgba(16, 185, 129, 0.10);
-  --atmosphere-defensive: rgba(217, 119, 6, 0.10);
-  --atmosphere-scarcity: rgba(225, 29, 72, 0.09);
-  --atmosphere-volatile: rgba(124, 58, 237, 0.09);
+  --atmosphere-expansion: rgba(16, 185, 129, 0.05);
+  --atmosphere-defensive: rgba(217, 119, 6, 0.05);
+  --atmosphere-scarcity: rgba(225, 29, 72, 0.045);
+  --atmosphere-volatile: rgba(124, 58, 237, 0.045);
 
   /* Phase-map quadrants and furniture. Same hues, re-mixed for a white plot
      ground: the dark washes rely on a light tint lifting off a dark ground and
