@@ -20,11 +20,13 @@ export type Workstream = {
 export const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
   financial: {
     slug: "financial",
-    title: "Runway planner: burn, raise timing, and a memo",
-    description: "Enter runway, burn and revenue to get a safe runway band, a raise window, and a memo sized to this week's guidance.",
-    imageAlt: "Whether runway planner view",
+    /* The title in the words people search; the heading keeps the tool's name, which the nav,
+       the breadcrumb and every link into this page use. */
+    title: "Startup runway calculator: burn, raise timing and a memo",
+    description: "Enter cash, monthly spend and revenue to work out your runway, a safe runway band, a raise window and a memo sized to this week's guidance.",
+    imageAlt: "Whether startup runway calculator",
     pageTitle: "Runway planner",
-    pageSummary: "Burn, raise timing, and a memo, sized to this week's guidance.",
+    pageSummary: "A startup runway calculator: burn, raise timing and a memo, sized to this week's guidance.",
   },
   scenarios: {
     slug: "scenarios",

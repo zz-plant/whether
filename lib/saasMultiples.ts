@@ -49,6 +49,12 @@ export const SAAS_BASKET = SAAS_BASKET_COMPANIES.map((company) => company.ticker
 
 type MarketDataProvider = "yahoo" | "alpha-vantage";
 
+/** The source a reader is told the basket came from. /comps said "Yahoo Finance" whichever one answered. */
+export const MARKET_DATA_PROVIDER_LABELS: Record<MarketDataProvider, string> = {
+  yahoo: "Yahoo Finance",
+  "alpha-vantage": "Alpha Vantage",
+};
+
 export type SaaSValuationSnapshot = {
   medianEvToRevenue: number | null;
   medianRevenueGrowth: number | null;

@@ -5,7 +5,7 @@ import { createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
 import { PRICING_SUMMARY, type PricingPlan } from "../pricing";
-import type { SaaSValuationSnapshot } from "../saasMultiples";
+import { MARKET_DATA_PROVIDER_LABELS, type SaaSValuationSnapshot } from "../saasMultiples";
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
 
 /**
@@ -216,7 +216,7 @@ export const buildCompsStructuredData = ({
       "@type": "WebPage",
       "@id": `${url}#webpage`,
       url,
-      name: "Public SaaS Valuation Multiples",
+      name: "SaaS Valuation Multiples",
       inLanguage: "en",
       isPartOf: isPartOfSite,
       ...(data ? { mainEntity: { "@id": `${url}#dataset` } } : {}),
@@ -236,7 +236,7 @@ export const buildCompsStructuredData = ({
             variableMeasured: measured,
             isBasedOn: {
               "@type": "CreativeWork",
-              name: data.source === "alpha-vantage" ? "Alpha Vantage" : "Yahoo Finance",
+              name: MARKET_DATA_PROVIDER_LABELS[data.source],
             },
           },
         ]

@@ -91,7 +91,7 @@
     "decisionNote": "Approve [role] to address [bottleneck] within [cost envelope]. Hold further hiring if [cash or outcome limit] is breached. Reopen after [funding and delivery evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Hiring freeze or selective hiring?",
+        "label": "Should we freeze hiring this week?",
         "href": "/answers/should-we-freeze-or-selectively-hire"
       }
     ]
@@ -150,7 +150,7 @@
     "decisionNote": "Begin [preparation or investor outreach] by [date] to fund [milestone]. Revisit the plan if [cash date or investor evidence] slips. Accept terms within [agreed limits]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Public SaaS valuation context",
+        "label": "SaaS valuation multiples",
         "href": "/comps"
       },
       {
@@ -183,19 +183,19 @@
     "decisionNote": "We will reduce [spend] by [amount] to fund [milestone]. Protect [delivery or retention commitment]. Restore spend when [cash buffer and business result] hold. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Runway planning guide",
+        "label": "How much runway should a startup have?",
         "href": "/resources/how-much-runway-do-we-need-tightening-market"
       },
       {
-        "label": "Stress-test the cash plan",
+        "label": "Startup runway calculator",
         "href": "/operate/financial"
       }
     ]
   },
   {
     "slug": "should-we-freeze-or-selectively-hire",
-    "keyword": "should we freeze hiring or selectively hire",
-    "title": "Should we freeze hiring or hire selectively?",
+    "keyword": "should we freeze hiring",
+    "title": "Should we freeze hiring this week?",
     "category": "decision",
     "shortAnswer": "Use a hiring freeze when the cash plan cannot support new commitments; assess essential backfills and critical roles individually.",
     "directAnswer": "Review open requisitions against cash, customer commitments and existing capacity. Give every exception a named approver, a full cost and a review date, and define the evidence needed to reopen hiring.",
@@ -217,7 +217,7 @@
     "decisionNote": "Hold [requisitions] and allow exceptions for [specific need]. Defer [work] to match capacity. Reopen when [cash and workload criteria] hold. Approver: [name]. Review: [date].",
     "supportingLinks": [
       {
-        "label": "Hiring in a high-rate environment",
+        "label": "The standing policy: which roles to keep, gate or pause",
         "href": "/resources/should-we-freeze-hiring-high-interest-rate-environment"
       }
     ]

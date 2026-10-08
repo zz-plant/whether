@@ -46,6 +46,15 @@ Yahoo Finance's unofficial quote endpoint, which rate-limits and blocks without 
 EV/Revenue and revenue growth directly; the snapshot's `source` field says which one answered.
 The per-company detail route keeps Yahoo either way, because OVERVIEW carries no balance sheet.
 
+**The keyless path is refused outright, not throttled (checked 2026-10-08).** Yahoo's `quoteSummary`
+answers 429 "Edge: Too Many Requests" to a request with no browser user agent and 401 "Invalid Crumb"
+to one with it: it wants a cookie and crumb pair. So every ticker comes back unavailable,
+`fetchSaaSValuations` throws `QuoteSourceUnavailableError`, `/api/comps` answers its documented 503
+(`{"error":"quote_source_unavailable","detail":"quote source returned 429"}` in production), and
+`/comps` shows the outage notice and no figures. Setting the key is the fix, but not by itself: the
+free tier allows 5 requests a minute and 25 a day (`docs/research/2026-09-03-alternative-data-endpoints.md`),
+and the basket sends 15 at once on every uncached render.
+
 ## Ingest coordinator (trial)
 
 `worker/ingestCoordinator.ts` is a SQLite-backed Durable Object that owns the materialized

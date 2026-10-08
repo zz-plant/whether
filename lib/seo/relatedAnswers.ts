@@ -66,3 +66,22 @@ export const selectRelatedAnswers = <T extends RelatedAnswerCandidate>(
       || left.candidate.slug.localeCompare(right.candidate.slug))
     .slice(0, limit)
     .map((entry) => entry.candidate);
+
+/**
+ * The answers that cite a page among their supporting links, for that page to
+ * link back to.
+ *
+ * The hiring-freeze answer cited the hiring-freeze guide and the guide never
+ * named the answer, so two pages on one question competed for it in search with
+ * nothing telling a reader, or a crawler, which was which: the answer carries
+ * this week's guidance, the guide the standing policy. Reading the link the
+ * answer already declares keeps the pair in step without a second list.
+ */
+export const selectAnswersCiting = <T extends { slug: string; supportingLinks: readonly { href: string }[] }>(
+  path: string,
+  candidates: readonly T[],
+  { isEligible = () => true }: { isEligible?: (slug: string) => boolean } = {},
+): T[] =>
+  candidates
+    .filter((candidate) => isEligible(candidate.slug) && candidate.supportingLinks.some((link) => link.href === path))
+    .sort((left, right) => left.slug.localeCompare(right.slug));

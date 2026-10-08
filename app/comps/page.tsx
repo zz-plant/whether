@@ -1,14 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { cache } from "react";
 import { ActionLink } from "../components/ui/actionLink";
 import { PageShell } from "../components/pageShell";
-import { buildPageMetadata } from "../../lib/seo";
+import { buildPageMetadata, formatTitleMonth } from "../../lib/seo";
+import { formatDateUTC } from "../../lib/formatters";
 import { buildCompsStructuredData } from "../../lib/seo/pageStructuredData";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 // Slot labels come from the one vocabulary source; Invariant 8 fails the suite
 // when a surface spells them itself.
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import {
+  MARKET_DATA_PROVIDER_LABELS,
   SAAS_BASKET,
   SAAS_BASKET_COMPANIES,
   fetchSaaSValuations,
@@ -20,14 +23,6 @@ import { ValuationMultiplesGlyph } from "../components/illustrations/ValuationMu
 
 export const runtime = "edge";
 export const revalidate = 900;
-
-export const metadata: Metadata = buildPageMetadata({
-  title: "Public SaaS Valuation Multiples",
-  description:
-    "Median EV/Revenue and revenue growth across a 15-company public SaaS basket, and what those multiples imply for private fundraising conditions.",
-  path: "/comps",
-  imageAlt: "Whether public SaaS valuation multiples",
-});
 
 const formatMultiple = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}x`);
 const formatPercent = (value: number | null) => (value === null ? "—" : `${value.toFixed(1)}%`);
@@ -53,8 +48,12 @@ type CompsState =
  * outage rather than a basket of dashes (the distinction `/api/comps` draws with
  * its 503), and any other error still renders the page. Nothing here can fail a
  * build or a request.
+ *
+ * Cached per request: the title and the page both need the read, and fetching
+ * the basket twice would double the upstream calls on the path where they are
+ * already being refused.
  */
-const loadComps = async (): Promise<CompsState> => {
+const loadComps = cache(async (): Promise<CompsState> => {
   try {
     return { status: "ok", data: await fetchSaaSValuations() };
   } catch (error) {
@@ -63,7 +62,25 @@ const loadComps = async (): Promise<CompsState> => {
     }
     return { status: "error" };
   }
-};
+});
+
+/*
+ * The title in the words people search ("SaaS valuation multiples 2026"),
+ * with the month of the read that produced the numbers. The month comes from
+ * the basket's own `fetchedAt`, the date printed beside the figures: with no
+ * basket there is no month to claim, and the title says what the page is
+ * without one.
+ */
+export async function generateMetadata(): Promise<Metadata> {
+  const comps = await loadComps();
+  const month = comps.status === "ok" ? formatTitleMonth(comps.data.fetchedAt) : null;
+  return buildPageMetadata({
+    title: month ? `SaaS Valuation Multiples, ${month}` : "SaaS Valuation Multiples: Public SaaS EV/Revenue",
+    description: `Median EV/Revenue multiple and revenue growth across ${SAAS_BASKET.length} public SaaS companies, with the date of the read and this week's fundraising guidance.`,
+    path: "/comps",
+    imageAlt: "Whether SaaS valuation multiples",
+  });
+}
 
 export default async function CompsPage() {
   /*
@@ -87,6 +104,8 @@ export default async function CompsPage() {
    * not answer it. `decisionRules` carries a real per-area rule.
    */
   const capitalRule = brief.snapshot.homeBriefModel.decisionRules.find((rule) => rule.area === "capital-raising");
+  /* The same date the title's month comes from, printed beside the figures it dates. */
+  const readMonth = comps.status === "ok" ? formatTitleMonth(comps.data.fetchedAt) : null;
 
   return (
     <PageShell
@@ -97,30 +116,36 @@ export default async function CompsPage() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2 max-w-2xl">
             <h1 className="text-fluid-2xl font-semibold text-slate-100">
-              Public SaaS valuation multiples
+              SaaS valuation multiples{readMonth ? `, ${readMonth}` : ""}
             </h1>
             <p className="text-sm text-slate-300">
               Median enterprise value to revenue multiples for a basket of {SAAS_BASKET.length} public
-              SaaS companies, read from Yahoo Finance.
+              SaaS companies.
             </p>
           </div>
           <ValuationMultiplesGlyph size={64} className="self-start sm:self-center" />
         </div>
 
         {comps.status === "ok" ? (
-          <div className="grid gap-4 sm:grid-cols-3">
-            <div className="weather-surface px-4 py-4 space-y-1">
-              <p className="type-eyebrow">Median EV/Revenue</p>
-              <p className="text-2xl font-semibold text-slate-100">{formatMultiple(comps.data.medianEvToRevenue)}</p>
+          <div className="space-y-2">
+            <div className="grid gap-4 sm:grid-cols-3">
+              <div className="weather-surface px-4 py-4 space-y-1">
+                <p className="type-eyebrow">Median EV/Revenue</p>
+                <p className="text-2xl font-semibold text-slate-100">{formatMultiple(comps.data.medianEvToRevenue)}</p>
+              </div>
+              <div className="weather-surface px-4 py-4 space-y-1">
+                <p className="type-eyebrow">Median Revenue Growth</p>
+                <p className="text-2xl font-semibold text-slate-100">{formatPercent(comps.data.medianRevenueGrowth)}</p>
+              </div>
+              <div className="weather-surface px-4 py-4 space-y-1">
+                <p className="type-eyebrow">Companies Tracked</p>
+                <p className="text-2xl font-semibold text-slate-100">{comps.data.companyCount}/{SAAS_BASKET.length}</p>
+              </div>
             </div>
-            <div className="weather-surface px-4 py-4 space-y-1">
-              <p className="type-eyebrow">Median Revenue Growth</p>
-              <p className="text-2xl font-semibold text-slate-100">{formatPercent(comps.data.medianRevenueGrowth)}</p>
-            </div>
-            <div className="weather-surface px-4 py-4 space-y-1">
-              <p className="type-eyebrow">Companies Tracked</p>
-              <p className="text-2xl font-semibold text-slate-100">{comps.data.companyCount}/{SAAS_BASKET.length}</p>
-            </div>
+            <p className="text-xs text-slate-500">
+              As of <time dateTime={comps.data.fetchedAt}>{formatDateUTC(comps.data.fetchedAt)}</time>, from{" "}
+              {MARKET_DATA_PROVIDER_LABELS[comps.data.source]}.
+            </p>
           </div>
         ) : comps.status === "source-down" ? (
           <p className="text-sm text-slate-400">
