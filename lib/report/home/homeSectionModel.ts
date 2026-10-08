@@ -262,12 +262,12 @@ export const describeConditionsTrail = (recordDates: readonly string[]): string 
   const firstDate = new Date(`${first.slice(0, 10)}T00:00:00Z`);
   const lastDate = new Date(`${last.slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(firstDate.getTime()) || Number.isNaN(lastDate.getTime())) return null;
-  if (recordDates.length === 1) return `Path: the ${MONTH_YEAR.format(lastDate)} month-end, then now.`;
+  if (recordDates.length === 1) return `Trail: the ${MONTH_YEAR.format(lastDate)} month-end, then this week.`;
   const range =
     firstDate.getUTCFullYear() === lastDate.getUTCFullYear()
       ? `${MONTH_SHORT.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`
       : `${MONTH_YEAR.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`;
-  return `Path: month-ends ${range}, then now.`;
+  return `Trail: month-ends ${range}, then this week.`;
 };
 
 const nearest = (distances: RuleThresholdDistance[]) =>

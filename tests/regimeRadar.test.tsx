@@ -116,11 +116,11 @@ describe("RegimeRadar path", () => {
       <RegimeRadar
         {...base}
         trail={trail}
-        trailCaption="Path: month-ends Jun–Aug 2026, then now."
+        trailCaption="Trail: month-ends Jun–Aug 2026, then this week."
         caveat="The Aug 31 scores were built from interest rates alone."
       />,
     );
-    assert.match(html, /Path: month-ends Jun–Aug 2026, then now\./);
+    assert.match(html, /Trail: month-ends Jun–Aug 2026, then this week\./);
     assert.match(html, /built from interest rates alone/);
   });
 

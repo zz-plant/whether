@@ -1,6 +1,7 @@
 "use client";
 
 import { useId } from "react";
+import { cn } from "../../../lib/utils";
 
 /**
  * The one segmented control.
@@ -77,7 +78,12 @@ type SegmentedControlProps<Key extends string> = {
 const CONTAINER = {
   segmented:
     "inline-flex flex-wrap items-center gap-0.5 rounded-sm border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-0.5",
-  choices: "flex flex-wrap items-center gap-2",
+  /* A grid that fills the row: every option the same width, five across where
+     they fit, two on a phone with an odd last one spanning the row. As a
+     wrapping flex row the cards stopped two-thirds of the way across and left
+     a one-card orphan under the pair. */
+  choices:
+    "grid grid-cols-2 gap-2 sm:[grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr))] max-sm:[&>*:nth-child(odd):last-child]:col-span-2",
 } as const;
 
 /* 44px on touch, dropping to 36px only for a fine pointer (controls.css).
@@ -92,7 +98,10 @@ const OPTION_BASE =
 
 const OPTION = {
   segmented: `${OPTION_BASE} rounded-sm text-slate-400 peer-hover:bg-slate-800/50`,
-  choices: `${OPTION_BASE} rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] text-slate-300 peer-hover:border-[color:var(--border-strong)] peer-checked:border-sky-500/50`,
+  choices: cn(
+    OPTION_BASE,
+    "w-full justify-start rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] text-slate-300 peer-hover:border-[color:var(--border-strong)] peer-checked:border-sky-500/50",
+  ),
 } as const;
 
 export function SegmentedControl<Key extends string>({

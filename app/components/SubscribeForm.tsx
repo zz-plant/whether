@@ -117,8 +117,11 @@ export function SubscribeForm({
     <div className={compact
       ? "space-y-2 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-surface)] px-4 py-3"
       : "weather-section-border space-y-3"}>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div>
+      {/* The channel control sits on the title line, and the description runs
+          the full width under both. Centred beside a four-line paragraph it
+          floated in the card's top-right corner with the text squeezed to half. */}
+      <div className="space-y-1">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           <p className="text-fluid-sm font-medium text-white">
             {channel === "slack"
               ? "Automate Monday brief delivery directly to Slack"
@@ -126,33 +129,32 @@ export function SubscribeForm({
                 ? "Tell me when the guidance changes"
                 : "Get the guidance every Monday, and a note the day it changes"}
           </p>
-          <p className="mt-0.5 max-w-[64ch] text-fluid-xs text-slate-400">
-            {channel === "slack"
-              ? "Every Monday at 9:00 AM ET, the brief arrives in the channel you choose."
-              : alertsOnly
-                ? <>
-                    {condition ? <>Next change to watch: {condition} </> : null}
-                    One email on the day the guidance changes, a score crosses one of its lines, or a market
-                    input makes an outsized move.
-                  </>
-                : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
-          </p>
-        </div>
 
-        {/* The one segmented control (segmentedControl.tsx): a radio group,
-            so arrows move between the two channels and the pair is one tab
-            stop, rather than two buttons with a hand-drawn selected state. */}
-        <SegmentedControl
-          ariaLabel="Delivery channel"
-          options={CHANNEL_OPTIONS}
-          value={channel}
-          onSelect={(next) => {
-            setChannel(next);
-            setStatus("idle");
-            setMessage("");
-          }}
-          className="self-start sm:self-auto"
-        />
+          {/* The one segmented control (segmentedControl.tsx): a radio group,
+              so arrows move between the two channels and the pair is one tab
+              stop, rather than two buttons with a hand-drawn selected state. */}
+          <SegmentedControl
+            ariaLabel="Delivery channel"
+            options={CHANNEL_OPTIONS}
+            value={channel}
+            onSelect={(next) => {
+              setChannel(next);
+              setStatus("idle");
+              setMessage("");
+            }}
+          />
+        </div>
+        <p className="max-w-[72ch] text-fluid-xs text-slate-400">
+          {channel === "slack"
+            ? "Every Monday at 9:00 AM ET, the brief arrives in the channel you choose."
+            : alertsOnly
+              ? <>
+                  {condition ? <>Next change to watch: {condition} </> : null}
+                  One email on the day the guidance changes, a score crosses one of its lines, or a market
+                  input makes an outsized move.
+                </>
+              : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
+        </p>
       </div>
 
       {channel === "email" ? (

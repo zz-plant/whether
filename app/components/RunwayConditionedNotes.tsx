@@ -84,9 +84,9 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
             reader chooses, so this says so rather than letting the default
             read as an answer the reader gave. */}
         <p className="text-fluid-nano text-slate-400">
-          Choose your cash runway above and each rule below gains a line on what it changes at that runway:
-          which area protects runway fastest, and what a burn cut buys. It shows{" "}
-          {runwayBandLabel(DEFAULT_RUNWAY_BAND)} until you choose.
+          Pick your cash runway above. Each rule below then says what it changes at that runway:
+          which area protects runway fastest, and what a burn cut buys. Until you choose, it shows{" "}
+          {runwayBandLabel(DEFAULT_RUNWAY_BAND)}.
         </p>
       </div>
     );

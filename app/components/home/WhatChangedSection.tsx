@@ -80,7 +80,7 @@ export function WhatChangedSection({
               its level, so it needs room: left to itself the browser gave it the
               width of its longest word and wrapped the notes one word per line. */}
           <colgroup className="max-md:hidden">
-            <col className="w-[15rem]" />
+            <col className="w-[19rem]" />
             <col className="w-[11rem]" />
             <col />
           </colgroup>
@@ -107,7 +107,7 @@ export function WhatChangedSection({
                         ? "signal-base-rate"
                         : "signal-curve-slope"
                 }
-                className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-1 max-md:gap-y-4 max-md:py-4"
+                className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
                 data-signal={row.key}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-md:p-0">
@@ -184,37 +184,36 @@ export function WhatChangedSection({
                   </div>
                 </th>
                 <td className="whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0">
-                  <div className="flex flex-col gap-1">
-                    {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
-                    {row.saturatedPressure !== undefined ? (
-                      /* A clipped score cannot move, so the chip reads flat at the
-                         moment conditions are most extreme. Say it. The raw
-                         pressure is what is missing from a score that has
-                         stopped being able to report a move. */
-                      <span className="mt-1 block max-w-[18rem] whitespace-normal text-amber-300/80">
-                        Off the top of the scale. The score can&rsquo;t rise further, so it can&rsquo;t show a move.
-                        {" "}It would read {row.saturatedPressure.toFixed(0)}.
-                      </span>
-                    ) : null}
-                  </div>
+                  {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
                 </td>
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">
                   {row.lines && typeof row.value === "number" ? (
-                    <ScoreLadder
-                      label={<span className="sr-only">{row.label}</span>}
-                      value={row.value}
-                      previous={comparisonUnavailable ? null : row.previous}
-                      previousLabel={basis.label}
-                      lines={row.lines}
-                    />
+                    <div className="space-y-2">
+                      <ScoreLadder
+                        label={<span className="sr-only">{row.label}</span>}
+                        value={row.value}
+                        previous={comparisonUnavailable ? null : row.previous}
+                        previousLabel={basis.label}
+                        lines={row.lines}
+                      />
+                      {row.saturatedPressure !== undefined ? (
+                        /* A clipped score cannot move, so the chip reads flat at the
+                           moment conditions are most extreme. Say it, under the
+                           ladder that has the width for a sentence: in the chip
+                           column it wrapped to four lines and stretched the row. */
+                        <p className="max-w-[48ch] text-xs text-amber-300/80">
+                          Pinned at the top of its scale, so it can&rsquo;t show a move. It would read {row.saturatedPressure.toFixed(0)}.
+                        </p>
+                      ) : null}
+                    </div>
                   ) : (
                     /* An input, not a score: the call is decided on the two scores
                        it feeds. "No line of its own" was false for the base rate,
                        which funding pressure judges against a line. */
                     <span className="text-xs text-slate-500">
                       {row.key === "baseRate"
-                        ? "Feeds funding pressure; conditions are judged on that score."
-                        : "Feeds both scores; conditions are judged on those."}
+                        ? "Judged through funding pressure's lines."
+                        : "Judged through the lines of both scores."}
                     </span>
                   )}
                 </td>

@@ -122,8 +122,8 @@ export const describeAgainstToday = (record: LastTimeCallChanged): { alike: bool
     ...(samePair
       ? []
       : [`That change was ${changedAt.fromLabel} to ${changedAt.toLabel}; this week's is ${getRegimePublicLabel(today.from)} to ${getRegimePublicLabel(today.to)}.`]),
-    `Then, funding pressure was ${reading("tightness", record.tightness.atChange)} and risk appetite ${reading("riskAppetite", record.riskAppetite.atChange)}; now they are ${reading("tightness", today.tightness)} and ${reading("riskAppetite", today.riskAppetite)}.`,
-    ...(alike ? [] : ["It is one earlier outcome, not a forecast."]),
+    `Funding pressure was ${reading("tightness", record.tightness.atChange)} then and is ${reading("tightness", today.tightness)} now; risk appetite was ${reading("riskAppetite", record.riskAppetite.atChange)} and is ${reading("riskAppetite", today.riskAppetite)}.`,
+    ...(alike ? [] : ["One earlier outcome, not a forecast."]),
   ];
   return { alike, text: sentences.join(" ") };
 };
