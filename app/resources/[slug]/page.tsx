@@ -37,10 +37,13 @@ import {
 import { resourceArticles } from "../../../lib/resourceArticles";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import {
+  isIndexableAnswerSlug,
   isIndexableResourceArticleSlug,
   isIndexableResourcePillarSlug,
   noindexRobots,
 } from "../../../lib/seo/indexationPolicy";
+import { selectAnswersCiting } from "../../../lib/seo/relatedAnswers";
+import { answerPages } from "../../answers/decisionPages";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
@@ -164,6 +167,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
     const { homeBriefModel } = snapshot;
     const decisionAreas = getResourceArticleDecisionAreas(article);
     const mappedRules = homeBriefModel.decisionRules.filter((rule) => decisionAreas.includes(rule.area)).slice(0, 3);
+    const weeklyAnswers = selectAnswersCiting(`/resources/${article.slug}`, answerPages, { isEligible: isIndexableAnswerSlug })
+      .map((answer) => ({ href: `/answers/${answer.slug}`, title: answer.title }));
 
     /* The link back to the brief is inside the article's live-guidance block.
        It was a pair of pills ("Start from Weekly Brief", "Return to Planning")
@@ -177,6 +182,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           mappedRules,
           freshnessLabel: reportData.fetchedAtLabel,
           recordDateLabel: reportData.recordDateLabel,
+          weeklyAnswers,
         }}
       />
     );

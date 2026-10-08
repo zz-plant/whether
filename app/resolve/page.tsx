@@ -204,7 +204,7 @@ export default async function DecidePage({
             serve. They were two chip-boxed buttons floating between the list
             and the browse disclosure, belonging to neither. */}
         <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5">
-          <ActionLink href="/comps" variant="inline">Public SaaS valuation context</ActionLink>
+          <ActionLink href="/comps" variant="inline">SaaS valuation multiples</ActionLink>
           <ActionLink href="/history/compare" variant="inline">Compare historical funding conditions</ActionLink>
         </nav>
         <GuidedTranslationPanels searchParams={resolvedSearchParams} />

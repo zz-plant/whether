@@ -2577,6 +2577,41 @@ changed "the notes under the guidance and nothing else" above a picker that says
 
 `tests/firstRunOrientationGuide.test.tsx` renders the guide and fails on any of its retired nouns.
 
+### 1.1.57 Titles in the words people search, dated by the data (2026-10-08)
+
+A crawl and a round of search research found the pages that answer high-demand questions titled in
+the product's words: "Public SaaS Valuation Multiples", "Runway planner", "How much runway do we
+need…", and eleven answers ending in "(Live operator answer)", which no one searches for.
+
+- **A month in a title is a claim about the data** (`formatTitleMonth`, `withUpdatedMarker` in
+  `lib/seo.ts`). It comes from the date of what the page prints, never the clock or a literal, and a
+  page with no date gets no marker.
+- **`/comps`** is "SaaS Valuation Multiples, October 2026", the month from the basket's `fetchedAt`.
+  The heading carries the same month and the figures an "As of" line with that date and the source
+  that answered (`MARKET_DATA_PROVIDER_LABELS`; the page said "Yahoo Finance" whichever did). With no
+  basket the title is "SaaS Valuation Multiples: Public SaaS EV/Revenue" and no month appears.
+  Production served no basket when checked on 2026-10-08 (see `docs/agents/data-and-platform.md` →
+  Market data provider), so the month shows once a quote source answers.
+- **Answers** end in "(updated Oct 2026)", the month of the reading they state
+  (`reportData.treasury.record_date`).
+- **Guides** end in "(updated …)" from their own `updatedAt` and print it under the heading, so the
+  title, the page, `dateModified` and the sitemap name one date. The runway guide leads with "How much
+  runway should a startup have?".
+- **`/operate/financial`** is titled "Startup runway calculator: burn, raise timing and a memo". The
+  heading keeps "Runway planner", the name the nav, breadcrumb and links use.
+- **The hiring-freeze pair stays two pages.** "Should we freeze hiring this week?" is the answer, with
+  this week's guidance; "Hiring freeze policy for high interest rates" is the guide, the standing
+  policy for which roles to keep, gate behind milestones or pause. A canonical would drop one of two
+  different questions from search. The answer already cited the guide; the guide now links back from
+  its guidance block to every indexable answer that cites it (`selectAnswersCiting`,
+  `lib/seo/relatedAnswers.ts`).
+- **Published weeks describe themselves differently** (`buildPublishedBriefDescription`,
+  `lib/report/publishedBriefs.ts`). The summary belongs to the conditions, so w40 and w41 shared one
+  description; a week's description is now the guidance and what changed, or its first sentence, and
+  the week's date leads when that would still be too long or match another week.
+
+`tests/searchTitles.test.tsx`, `tests/compsAsOf.test.tsx` and `tests/snippetLength.test.ts` hold them.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

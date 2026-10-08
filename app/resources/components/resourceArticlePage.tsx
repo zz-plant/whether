@@ -5,7 +5,9 @@ import {
   buildPageImageUrl,
   buildPageMetadata,
   organizationName,
+  withUpdatedMarker,
 } from "../../../lib/seo";
+import { formatDateUTC } from "../../../lib/formatters";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import { graph } from "../../../lib/seo/pageStructuredData";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
@@ -104,10 +106,12 @@ const resolveImportedEmbed = (embed: ResourceArticleEmbed): { src: string; title
   };
 };
 
+/* The guide's own `updatedAt` dates the title, the line under the heading, the
+   sitemap and `dateModified`, so all four move together when the copy does. */
 export const buildResourceArticleMetadata = (article: ResourceArticle): Metadata =>
   ({
     ...buildPageMetadata({
-      title: article.title,
+      title: withUpdatedMarker(article.title, article.updatedAt),
       description: article.description,
       path: `/resources/${article.slug}`,
       imageAlt: article.title,
@@ -129,6 +133,8 @@ type ResourceDecisionArtifact = {
   freshnessLabel: string;
   /** The reading's own date; the paste-ready citation printed here ran to three lines of URLs. */
   recordDateLabel: string;
+  /** The answer pages that cite this guide: the same question, with this week's guidance. */
+  weeklyAnswers?: Array<{ href: string; title: string }>;
 };
 
 export function ResourceArticlePage({ article, decisionArtifact }: { article: ResourceArticle; decisionArtifact?: ResourceDecisionArtifact }) {
@@ -192,6 +198,17 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
                   </article>
                 ))}
               </div>
+              {decisionArtifact.weeklyAnswers && decisionArtifact.weeklyAnswers.length > 0 ? (
+                <p className="text-sm text-slate-200 print:text-slate-700">
+                  This week&apos;s guidance:{" "}
+                  {decisionArtifact.weeklyAnswers.map((answer, index) => (
+                    <span key={answer.href}>
+                      {index > 0 ? " · " : null}
+                      <Link href={answer.href} className="text-sky-200 underline underline-offset-4">{answer.title}</Link>
+                    </span>
+                  ))}
+                </p>
+              ) : null}
               <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
                 <span>As of {decisionArtifact.recordDateLabel} · signals refreshed {decisionArtifact.freshnessLabel}</span>
                 <ActionLink href="/" variant="inline" className="print:hidden">Open this week&apos;s brief</ActionLink>
@@ -202,6 +219,9 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
           <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
             <p className="type-eyebrow">Operating brief</p>
             <h1 className="text-2xl font-semibold text-slate-100 print:text-slate-900 sm:text-3xl">{article.title}</h1>
+            <p className="text-xs text-slate-400">
+              Updated <time dateTime={article.updatedAt}>{formatDateUTC(article.updatedAt)}</time>
+            </p>
             <p className="text-sm text-slate-200 print:text-slate-700">{article.description}</p>
             <div className="flex flex-wrap gap-2 text-sm">
               <Link href="/resources/decision-shield-overview" className="text-sky-200 underline underline-offset-4">Decision Shield</Link>

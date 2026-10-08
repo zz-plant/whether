@@ -5,6 +5,7 @@ import ResourceRoutePage, {
   generateStaticParams,
 } from "../app/resources/[slug]/page";
 import { findResourceArticleBySlug } from "../lib/resourceArticles";
+import { formatMonthYearShortFromValue } from "../lib/formatters";
 
 describe("resource article slug route", () => {
   it("includes article slugs in static params for pre-rendering", () => {
@@ -27,7 +28,8 @@ describe("resource article slug route", () => {
       params: Promise.resolve({ slug: article.slug }),
     });
 
-    assert.equal(metadata.title, article.title);
+    /* Dated by the guide's own `updatedAt`, the date the page prints under its heading. */
+    assert.equal(metadata.title, `${article.title} (updated ${formatMonthYearShortFromValue(article.updatedAt)})`);
     assert.equal(metadata.description, article.description);
   });
 

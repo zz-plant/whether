@@ -409,6 +409,36 @@ export const getPublishedBriefs = () => briefs;
 export const buildPublishedBriefTitle = (brief: PublishedBrief) =>
   `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
 
+/* About what a search result shows of a description. */
+const BRIEF_DESCRIPTION_LIMIT = 160;
+
+const firstSentence = (text: string) => /^.*?[.!?](?=\s|$)/.exec(text)?.[0] ?? text;
+
+/* The guidance, then what moved: in full if it fits a snippet, else its first sentence. */
+const preferredBriefDescription = (brief: PublishedBrief): string | undefined => {
+  const { whatChanged } = publishedBriefDisplay(brief);
+  return [`${brief.summary} What changed: ${whatChanged}`, `${brief.summary} ${firstSentence(whatChanged)}`].find(
+    (candidate) => candidate.length <= BRIEF_DESCRIPTION_LIMIT,
+  );
+};
+
+/**
+ * A published week's meta description, different from every other week's.
+ *
+ * The summary is the conditions' own sentence, so every week under the same
+ * conditions shares it. w40 and w41 shipped the identical description ("Approve
+ * only renewals, work already promised to customers, and hires that bring in
+ * revenue."), because each one's "what changed" ran past the snippet and the
+ * page fell back to the summary alone. Where the preferred wording is too long
+ * or another week would carry the same words, the week's date leads, and no two
+ * weeks share a date.
+ */
+export const buildPublishedBriefDescription = (brief: PublishedBrief, siblings: readonly PublishedBrief[] = briefs) => {
+  const preferred = preferredBriefDescription(brief);
+  const shared = siblings.some((other) => other.slug !== brief.slug && preferredBriefDescription(other) === preferred);
+  return preferred !== undefined && !shared ? preferred : `Week of ${brief.recordDateLabel}: ${brief.summary}`;
+};
+
 /**
  * The week's card, as its page, its feed item and its news sitemap entry all
  * name it: the conditions in the weather words and the week as a date, not the

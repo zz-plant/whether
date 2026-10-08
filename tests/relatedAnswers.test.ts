@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { selectRelatedAnswers, type RelatedAnswerCandidate } from "../lib/seo/relatedAnswers";
+import { selectAnswersCiting, selectRelatedAnswers, type RelatedAnswerCandidate } from "../lib/seo/relatedAnswers";
 import { answerPages } from "../app/answers/decisionPages";
 import { isIndexableAnswerSlug } from "../lib/seo/indexationPolicy";
 
@@ -97,5 +97,23 @@ describe("related answers", () => {
         assert.ok(isIndexableAnswerSlug(entry.slug), `${entry.slug} is linked but not indexable`);
       }
     }
+  });
+});
+
+describe("answers citing a page", () => {
+  const citing = (slug: string, hrefs: string[]) => ({ slug, supportingLinks: hrefs.map((href) => ({ href })) });
+
+  it("returns the answers whose supporting links name the page, eligible ones only, in slug order", () => {
+    const found = selectAnswersCiting(
+      "/resources/guide",
+      [citing("b", ["/resources/guide"]), citing("a", ["/signals", "/resources/guide"]), citing("c", ["/resources/other"]), citing("hidden", ["/resources/guide"])],
+      { isEligible: (slug) => slug !== "hidden" },
+    );
+    assert.deepEqual(found.map((entry) => entry.slug), ["a", "b"]);
+  });
+
+  it("finds the hiring-freeze answer from the hiring-freeze guide", () => {
+    const found = selectAnswersCiting("/resources/should-we-freeze-hiring-high-interest-rate-environment", answerPages, { isEligible: isIndexableAnswerSlug });
+    assert.deepEqual(found.map((entry) => entry.slug), ["should-we-freeze-or-selectively-hire"]);
   });
 });

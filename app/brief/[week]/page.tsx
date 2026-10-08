@@ -17,6 +17,7 @@ import {
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefImageParams,
   buildPublishedBriefImageUrl,
+  buildPublishedBriefDescription,
   buildPublishedBriefPath,
   buildPublishedBriefTitle,
   buildPublishedBriefSlackUpdate,
@@ -68,15 +69,6 @@ export function generateStaticParams() {
 
 const briefTitle = buildPublishedBriefTitle;
 
-/* The call, then what moved if it fits a snippet. Both published weeks ran
-   190–204 characters, so the part a search result cut was the one that said
-   what changed. */
-const BRIEF_DESCRIPTION_LIMIT = 160;
-const briefDescription = (brief: PublishedBrief) => {
-  const full = `${brief.summary} What changed: ${publishedBriefDisplay(brief).whatChanged}`;
-  return full.length <= BRIEF_DESCRIPTION_LIMIT ? full : brief.summary;
-};
-
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { week } = await params;
   const brief = findPublishedBrief(week);
@@ -85,7 +77,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const metadata = buildPageMetadata({
     title: briefTitle(brief),
-    description: briefDescription(brief),
+    description: buildPublishedBriefDescription(brief),
     path: buildPublishedBriefPath(brief.slug),
     imageAlt: `Whether's guidance for the week of ${brief.recordDateLabel}`,
     imageParams: buildPublishedBriefImageParams(brief),
@@ -145,7 +137,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
     {
       "@type": "Article",
       headline: briefTitle(brief),
-      description: briefDescription(brief),
+      description: buildPublishedBriefDescription(brief),
       datePublished: brief.publishedAt,
       dateModified: brief.publishedAt,
       author: buildAuthorSchema(),

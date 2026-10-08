@@ -17,6 +17,8 @@ declare module "bun:test" {
     target: T,
     method: K,
   ): MockFunction;
+  /** Fixes the clock `new Date()` and `Date.now()` read; with no argument, restores the real one. */
+  export function setSystemTime(time?: Date | number): void;
   export const mock: {
     restore(): void;
     clearAllMocks(): void;

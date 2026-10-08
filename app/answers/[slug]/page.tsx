@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { permanentRedirect } from "next/navigation";
-import { buildPageMetadata } from "../../../lib/seo";
+import { buildPageMetadata, withUpdatedMarker } from "../../../lib/seo";
 import {
   findDecisionPage,
   highValueAnswerStaticParams,
@@ -28,12 +28,15 @@ export const buildDecisionAnswerMetadata = ({
   slug,
   payload,
   shortAnswer,
+  readingDateIso,
 }: {
   title: string;
   slug: string;
   payload: ReturnType<typeof buildSeoDecisionPayload>;
   /** The page's own one-line answer. See the description note below. */
   shortAnswer?: string;
+  /** The date of the reading the page's call comes from; the title's "(updated …)" month. */
+  readingDateIso?: string;
 }): Metadata => {
   /*
    * The page's own answer, and nothing that moves week to week.
@@ -49,7 +52,7 @@ export const buildDecisionAnswerMetadata = ({
    * page and in the social card, not in a description a crawler caches.
    */
   const metadata = buildPageMetadata({
-    title: `${title} (Live operator answer)`,
+    title: withUpdatedMarker(title, readingDateIso),
     description: shortAnswer ?? `${payload.currentCall} Action: ${payload.immediateAction}`,
     path: `/answers/${slug}`,
     imageAlt: title,
@@ -129,7 +132,13 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
 
-  return buildDecisionAnswerMetadata({ title: page.title, slug: page.slug, payload, shortAnswer: page.shortAnswer });
+  return buildDecisionAnswerMetadata({
+    title: page.title,
+    slug: page.slug,
+    payload,
+    shortAnswer: page.shortAnswer,
+    readingDateIso: reportData.treasury.record_date,
+  });
 }
 
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
