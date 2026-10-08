@@ -173,7 +173,7 @@ export function DecisionPicker({
             </p>
           ) : null}
           <p className="text-fluid-xs text-slate-400">
-            Pick one. The answer holds until a score crosses one of its lines; most weeks, none does.
+            Pick one. Its answer holds until a score crosses one of its lines, and most weeks none does.
           </p>
           {/* The answers are scaled to a stage and a runway, and the controls
               that set them sat mid-page under the content they change. This

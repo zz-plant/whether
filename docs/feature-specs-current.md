@@ -1465,7 +1465,8 @@ scores stood three months on, which reads as a forecast to anyone who is not tol
 On the Sep 25 read it found Stormy to Freezing at funding pressure 79 and risk appetite 7; this week is Sunny
 to Freezing at 90 and 43. The card now adds `Against this week:` (`describeAgainstToday`): the change it was
 and this week's when they differ, each score then and now with what it means (`signalReadingMeaning`), and
-"It is one earlier outcome, not a forecast." unless it is the same change with both scores within 5 points.
+"One earlier outcome, not a forecast." unless it is the same change with both scores within 5 points.
+(Reworded 2026-10-08: each score reads "was 79 then and is 90 now", not "Then, … ; now they are …".)
 
 **Found, not changed (decided in §1.1.51: the basis is last week's published brief).** The comparison is the previous month-end snapshot (§1.1.26), so every brief in a month
 restates the same crossing: w40 would say what w38 said. A weekly basis for the archive is the previous
@@ -1934,7 +1935,8 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
 
 A screenshot review of `/` found it accurate and dull: the week's change ("this week they went
 from Sunny to Freezing") sat in a paragraph below the fold, the one line with suspense ("Could
-change next week: Yes, risk appetite is 2 pts from its line") was styled as metadata, the only
+change next week: Yes, risk appetite is 2 pts from its line"; since 2026-10-08 the value is the reason
+alone, "Risk appetite is 2 pts from its line") was styled as metadata, the only
 picture (the conditions quadrant) was about 200px wide two-thirds of the way down, the decision
 picker asked before it answered, and a first visit opened on the category tagline. Every change
 below moves data the page already computed to where the eye lands first; nothing new is derived.
@@ -1949,7 +1951,7 @@ below moves data the page already computed to where the eye lands first; nothing
   screen. On `/` it is `RegimeRadar` with a **path**: the last six month-ends before the
   reading's month (the month in progress is left out, because the cron writes it from the same
   week the current point draws), joined to the current point, older dots fainter. The path's
-  domain ("Path: month-ends Mar–Aug 2026, then now.", `describeConditionsTrail`) and, when the
+  domain ("Trail: month-ends Mar–Aug 2026, then this week.", `describeConditionsTrail`) and, when the
   earlier scores were built from fewer inputs, the like-for-like note (`describeScoreMovementCaveat`)
   sit under the trust row as `asideNote`, so the map stays compact; its distance caption is off
   there because the trust row already says it. The left column stretches to the map's height and

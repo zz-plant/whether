@@ -63,13 +63,13 @@ describe("the map in the card", () => {
   it("names the month-ends its path draws", () => {
     assert.equal(
       describeConditionsTrail(["2026-03-31", "2026-04-30", "2026-08-31"]),
-      "Path: month-ends Mar–Aug 2026, then now.",
+      "Trail: month-ends Mar–Aug 2026, then this week.",
     );
     assert.equal(
       describeConditionsTrail(["2025-11-28", "2026-02-27"]),
-      "Path: month-ends Nov 2025–Feb 2026, then now.",
+      "Trail: month-ends Nov 2025–Feb 2026, then this week.",
     );
-    assert.equal(describeConditionsTrail(["2026-08-31"]), "Path: the Aug 2026 month-end, then now.");
+    assert.equal(describeConditionsTrail(["2026-08-31"]), "Trail: the Aug 2026 month-end, then this week.");
     assert.equal(describeConditionsTrail([]), null);
   });
 
@@ -79,11 +79,11 @@ describe("the map in the card", () => {
         weeklyCall="Freeze new commitments and protect runway."
         regime="SCARCITY"
         aside={<figure data-testid="map" />}
-        asideNote={["Path: month-ends Mar–Aug 2026, then now."]}
+        asideNote={["Trail: month-ends Mar–Aug 2026, then this week."]}
       />,
     );
     assert.match(withMap, /<div class="max-md:hidden"><figure data-testid="map"/);
-    assert.match(withMap, /max-md:hidden[^"]*" data-aside-note="true">Path: month-ends Mar–Aug 2026, then now\./);
+    assert.match(withMap, /max-md:hidden[^"]*" data-aside-note="true">Trail: month-ends Mar–Aug 2026, then this week\./);
 
     const plain = renderToStaticMarkup(<DecisionHero weeklyCall="Hold." regime="SCARCITY" />);
     assert.doesNotMatch(plain, /max-md:hidden|data-aside-note|md:grid/);

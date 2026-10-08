@@ -383,7 +383,8 @@ describe("/ and /brief.md agree on whether conditions could change next week", (
     const briefTrustLine = brief.split("\n").find((line) => line.startsWith("> **Confidence:**"));
     assert.ok(stripValue, "expected the strip to state whether conditions could change next week");
     assert.ok(briefTrustLine, "expected /brief.md to open with its confidence line");
-    return { stripSaysYes: stripValue?.startsWith("Yes") ?? false, briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
+    // The strip answers with the reason ("Risk appetite is 2 pts from its line") or a bare "Yes"; "Not expected" is the no.
+    return { stripSaysYes: stripValue !== undefined && stripValue !== "Not expected", briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
   };
 
   it("says not expected on the week of Sep 29, on both", async () => {

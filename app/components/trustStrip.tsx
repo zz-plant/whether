@@ -71,7 +71,10 @@ export function TrustStrip({
      * and lets the adjacent confidence qualify it. */
     {
       label: "Could change next week",
-      value: couldChangeNextWeek ? (changeReason ? `Yes, ${changeReason}` : "Yes") : "Not expected",
+      // The reason is the answer: "Risk appetite is 2 pts from its line", not "Yes, risk…".
+      value: couldChangeNextWeek
+        ? (changeReason ? `${changeReason.charAt(0).toUpperCase()}${changeReason.slice(1)}` : "Yes")
+        : "Not expected",
       tone: couldChangeNextWeek ? "caution" : undefined,
     },
   ];

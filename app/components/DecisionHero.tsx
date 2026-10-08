@@ -152,11 +152,14 @@ export function DecisionHero({
 
           {regimeKey ? (
             <span className="text-xs leading-relaxed text-slate-400">
-              {REGIME_WEATHER_RATIONALES[regimeKey]}
+              {/* The rationale ends in a full stop; followed by a middle dot it
+                  read "hard to raise. · Tightening this week". */}
+              {direction || earlier ? REGIME_WEATHER_RATIONALES[regimeKey].replace(/\.$/, "") : REGIME_WEATHER_RATIONALES[regimeKey]}
               {direction ? <span className="text-slate-300"> · {direction}</span> : null}
               {earlier ? (
                 <span className="font-semibold" style={{ color: "var(--regime-ink)" }} data-earlier-conditions>
-                  {" "}<span className="whitespace-nowrap">· {earlier}</span>
+                  {/* The separator stays on the line before; a wrapped line must not open with "·". */}
+                  {" · "}<span className="whitespace-nowrap">{earlier}</span>
                 </span>
               ) : null}
             </span>

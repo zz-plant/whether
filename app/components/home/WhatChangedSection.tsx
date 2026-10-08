@@ -80,7 +80,7 @@ export function WhatChangedSection({
               its level, so it needs room: left to itself the browser gave it the
               width of its longest word and wrapped the notes one word per line. */}
           <colgroup className="max-md:hidden">
-            <col className="w-[15rem]" />
+            <col className="w-[19rem]" />
             <col className="w-[11rem]" />
             <col />
           </colgroup>
@@ -202,8 +202,7 @@ export function WhatChangedSection({
                            ladder that has the width for a sentence: in the chip
                            column it wrapped to four lines and stretched the row. */
                         <p className="max-w-[48ch] text-xs text-amber-300/80">
-                          Off the top of the scale. The score can&rsquo;t rise further, so it can&rsquo;t show a move.
-                          {" "}It would read {row.saturatedPressure.toFixed(0)}.
+                          Pinned at the top of its scale, so it can&rsquo;t show a move. It would read {row.saturatedPressure.toFixed(0)}.
                         </p>
                       ) : null}
                     </div>
@@ -213,8 +212,8 @@ export function WhatChangedSection({
                        which funding pressure judges against a line. */
                     <span className="text-xs text-slate-500">
                       {row.key === "baseRate"
-                        ? "Feeds funding pressure; conditions are judged on that score."
-                        : "Feeds both scores; conditions are judged on those."}
+                        ? "Judged through funding pressure's lines."
+                        : "Judged through the lines of both scores."}
                     </span>
                   )}
                 </td>
