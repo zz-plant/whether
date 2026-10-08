@@ -39,7 +39,9 @@ export function LastTimeCallChangedCard({
         <span className="font-semibold text-white">{changedAt}:</span> {record.changedAt.fromLabel} to{" "}
         {record.changedAt.toLabel}. By {after}, {record.monthsLater} months on, the scores stood here.
       </p>
-      <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+      {/* Two cells packed to the left edge, not one per half of the page: each is
+          three short lines, and halves left the second one stranded mid-page. */}
+      <div className="grid gap-x-10 gap-y-3 sm:grid-cols-[max-content_max-content]">
         <ScoreCell
           label={regimeSignalLabel.tightness}
           value={record.tightness.later}
