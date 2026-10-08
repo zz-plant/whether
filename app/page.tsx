@@ -498,7 +498,10 @@ async function PageContent({
           <PublishedCallWatcher
             rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
           />
-          <FirstVisitExplainer arrival={arrivedFromShare ? "share" : undefined} />
+          <FirstVisitExplainer
+            arrival={arrivedFromShare ? "share" : undefined}
+            currentRegime={historicalSelection ? undefined : regime}
+          />
           {/* Browse the week before the call. Horizon and confidence details
               follow the call beside Copy Brief, so wrapping controls cannot
               push the reading below the first phone viewport. */}

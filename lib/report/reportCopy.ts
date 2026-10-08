@@ -1,15 +1,9 @@
 import type { PolicyRefusalCode } from "../regimeEngineCore";
+import { CALL_CHANGE_RULE } from "./trackRecordCopy";
 
-type ReportLinkCopy = {
-  href: string;
-  label: string;
-  description?: string;
-};
-
-type FirstTimeGuideStep = {
+type FirstTimeGuideEntry = {
   label: string;
   detail: string;
-  example: string;
 };
 
 type TermDefinition = {
@@ -17,8 +11,6 @@ type TermDefinition = {
   term: string;
   summary: string;
 };
-
-type HighlightBullet = { text: string };
 
 // Single vocabulary for the bounded-decision contract (action / threshold /
 // reversal). UI surfaces read the imperative forms (Do now, Pause if, Resume
@@ -36,8 +28,8 @@ type HighlightBullet = { text: string };
 // discover that four words were two.
 //
 // The imperative pair won because the rest of the product already taught it:
-// `FIRST_TIME_GUIDE_HIGHLIGHTS` names "Action now + Pause if + Change course
-// if", `/trust`'s framework explainer works the example in those words, and
+// the first-time guide named "Action now + Pause if + Change course if"
+// (its highlights, since retired), `/trust`'s framework explainer works the example in those words, and
 // the glossary glosses the noun as "Guardrail (pause trigger)" — the synonym
 // was always the second name for the imperative, never the other way round.
 //
@@ -232,45 +224,52 @@ export const describeMacroNotOnRecord = (period = "this month") => `Not on recor
 export const PRIMARY_AUDIENCE_SUMMARY =
   "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
 
-/* Written to one reader. The earlier version assumed a room — "align on that
-   first before debating edge cases", "only if someone asks why" — and the page
-   knows nothing about who else is there. */
-export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
+/*
+ * The newcomer's guide on `/` ("How to read this page"), in the page's own words.
+ *
+ * Its first version named steps the page did not draw ("Summary", "Proof",
+ * "Actions"), sent the reader to "the score details" and "the planning page",
+ * and said a stage and runway changed "the notes under the guidance and nothing
+ * else" beside a picker that says they set the lines. A guide whose nouns are
+ * not on the screen is a second vocabulary to learn. Each step here names the
+ * label it points at, and each line names what the reader will see it drawn as.
+ */
+export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideEntry[] = [
   {
-    label: "Summary",
+    label: "Read the guidance",
     detail:
-      "Read the guidance first: what to do, what to pause, and what would change it. It starts from the U.S. market environment, not from your company.",
-    example: "Example decision: defer expansion hires when cash is tight.",
+      "The weather word names this week's conditions; the headline under it says what to do. The strip below shows how fresh the data is and how close a score is to changing conditions.",
   },
   {
-    label: "Proof",
+    label: "Pick what you're deciding",
     detail:
-      "Open the score details only if you want to know why the guidance changed or which line is closest.",
-    example: "Example decision: check the recession warning gauge before approving a project that pays back slowly.",
+      "Each choice under “What are you deciding?” gives that area's rule this week, the line that pauses it and the line that resumes it.",
   },
   {
-    label: "Actions",
+    label: "Act on it",
     detail:
-      "Use the planning page to set your plan's pause and resume lines, and get an email the day one is crossed.",
-    example: "Example decision: release the second half of a hiring plan only once funding pressure falls below 60.",
+      "Copy the brief into Slack, build this week's plan from it, or get an email the day a line is crossed.",
   },
 ];
 
-export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
+/*
+ * The page draws three lines on one 0-100 scale and names two kinds: the change
+ * line on the Conditions chart and the score rows, and each area's pause and
+ * resume lines in the picker. A first visit meets "2 pts from its line", "Pause
+ * line crossed" and "Change line 70" within one screen and has to work out
+ * that they are different lines. `CALL_CHANGE_RULE` is said once per page, and
+ * `/` did not otherwise say it.
+ */
+export const FIRST_TIME_GUIDE_LINES: FirstTimeGuideEntry[] = [
   {
-    text: `The guidance is three lines: ${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf}, ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}.`,
+    label: DECISION_CONTRACT_LABELS.watch.changeLine,
+    detail: `One per score, drawn dashed across the Conditions chart. ${CALL_CHANGE_RULE}`,
   },
-  { text: "Your stage and runway, if you set them, change the notes under the guidance and nothing else." },
-  { text: "Confidence says how far the scores sit from the line where conditions change." },
-  { text: "Past weeks are one click away; this week's guidance comes first." },
-];
-
-export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
-  /* Was `#executive-snapshot`, which no page renders. The guide had never been
-     rendered either, so nobody could click it and find that out. */
-  { href: "#weekly-call", label: "This week's guidance" },
-  { href: "/operate#ops-playbook", label: "Plan" },
-  { href: "/signals?advanced=1#time-machine", label: "Past snapshots" },
+  {
+    label: "Pause and resume lines",
+    detail:
+      "Each area has its own pair: its decisions pause past the pause line and re-open past the resume line. Your stage and runway move both.",
+  },
 ];
 
 /**

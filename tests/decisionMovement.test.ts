@@ -88,8 +88,19 @@ describe("buildDecisionMovement", () => {
       result.sentence,
       "Conditions held steady since Sep 15; no pause or resume line was crossed. Last week's guidance stands.",
     );
-    assert.ok(result.areas.every((entry) => entry.kind === "held" && entry.text === "No line crossed since Sep 15."));
+    /* Each area names the side of its lines it held on: printed alone, "No line crossed" sat
+       beside "Pause if Funding pressure > 76 · crossed" and read as the row contradicting itself. */
+    assert.ok(result.areas.every((entry) => entry.kind === "held" && entry.text === "Pause still applies: no line crossed since Sep 15."));
     assert.equal(result.headline, result.sentence, "a week that crossed nothing has no evidence to leave out");
+  });
+
+  it("says only that nothing crossed for an area held between its lines", () => {
+    // 70 and 50 sit inside every area's pause and resume lines: nothing is paused or met.
+    const result = movement({ from: { tightness: 70, riskAppetite: 50 }, to: { tightness: 72, riskAppetite: 49 }, regime: "DEFENSIVE" });
+
+    assert.ok(result);
+    assert.ok(result.areas.every((entry) => entry.kind === "held" && entry.state === "hold"));
+    assert.ok(result.areas.every((entry) => entry.text === "No line crossed since Aug 31."));
   });
 
   it("does not turn a small move across a line into a held week", () => {

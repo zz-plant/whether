@@ -5,7 +5,7 @@ Scope: Shipped UI flows in `app/` as implemented on 2026-10-06.
 
 Validation note: checked on 2026-10-06 against the code at `bc520ac3`. Each quoted label, heading and nav name was matched in `app/` and `lib/`, each route in `app/**/page.tsx`, and each redirect in `next.config.js`. `<…>` marks text filled in at runtime. The flows were not walked in a browser.
 
-Navigation: the header tabs are `Brief` (`/`) · `Plan` (`/operate`) · `Evidence` (`/signals`) · `Resolve` (`/resolve`) · `Trust` (`/trust`) · `History` (`/history`), followed by a `More` menu that holds `Share`, `Compare periods`, `Search` and the other utility links. A phone shows `Brief`, `Plan`, `Evidence`, `Search` and `More` in a bottom bar. Most report pages index their sections under `On this page` on a wide screen and as a chip row on a narrow one.
+Navigation: the header tabs are `Brief` (`/`) · `Plan` (`/operate`) · `Evidence` (`/signals`) · `Resolve` (`/resolve`) · `Trust` (`/trust`) · `History` (`/history`), followed by a `More` menu that holds `Share`, `Compare periods`, `Search` and the other utility links. A phone shows `Brief`, `Plan`, `Evidence`, `Search` and `More` in a bottom bar, and `More` lists every page with a line saying what it is for (the line a desktop tab shows on hover). Most report pages index their sections under `On this page` on a wide screen and as a chip row on a narrow one.
 
 ## 1. Get this week’s operating call fast
 
@@ -14,7 +14,7 @@ Navigation: the header tabs are `Brief` (`/`) · `Plan` (`/operate`) · `Evidenc
 **Clicks**
 1. Open `/` or click `Brief` in the header.
 2. Read the call card: the conditions word, the call, and the trust strip (`As of`, `Sources`, `Confidence`, `Could change next week`).
-3. On a first visit, pick an answer under `What are you deciding?` or click `Show the full brief`. A returning visit opens on the full brief: `What changed this week`, `What that changes for you`, `What would change this guidance`, `Do and share`.
+3. On a first visit, `How to read this page` above the week title opens the three steps, what each of the four conditions means, and how the change line differs from an area's pause and resume lines. Pick an answer under `What are you deciding?` or click `Show the full brief`. A returning visit opens on the full brief: `What changed this week`, `What that changes for you`, `What would change this guidance`, `Do and share`.
 4. For execution detail, click `Build this week’s plan →` under `Do and share` (the label follows the `Plan horizon` choice), or `Plan` in the header.
 
 **Current output**

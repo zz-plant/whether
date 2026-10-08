@@ -52,7 +52,7 @@ export const navigationLayers: NavigationLayer[] = [
     href: "/signals",
     label: "Evidence",
     navLabel: "Evidence",
-    description: "See what changed, what drove it, and the thresholds worth watching.",
+    description: "See what changed, what drove it, and the lines worth watching.",
     boundary: "Use this when you want the proof behind the guidance.",
     tier: "supporting",
     parentKey: "weekly-brief",

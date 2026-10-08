@@ -30,8 +30,13 @@ export function MobileNavContent({ loopLinks: propLoopLinks, currentPathname, on
       <div className="mx-auto mb-3 h-1 w-10 rounded-sm bg-slate-700" />
       <div className="space-y-4">
         <div>
+          {/* "Operator loop" was the repo's name for these pages, not a
+              reader's. The sheet is the one place a phone lists every tab, so
+              each says what it is for (the IA's description, the same line the
+              command palette prints) rather than a one-key shortcut a phone has
+              no keyboard to press. */}
           <p className="px-4 type-eyebrow mb-1.5">
-            Operator loop
+            Pages
           </p>
           <nav className="space-y-0.5" aria-label="Primary operator routes">
             {items.map((link) => {
@@ -43,16 +48,14 @@ export function MobileNavContent({ loopLinks: propLoopLinks, currentPathname, on
                     href={link.href}
                     aria-current={isActive ? "page" : undefined}
                     onClick={onClose}
-                    className={`flex items-center justify-between rounded-lg px-4 py-2.5 text-sm font-medium no-underline transition-colors ${
+                    className={`flex flex-col gap-0.5 rounded-lg px-4 py-2.5 text-sm font-medium no-underline transition-colors ${
                       isActive
                         ? "bg-sky-500/14 text-sky-100 font-semibold"
                         : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
                     }`}
                   >
-                    <span>{link.label}</span>
-                    {link.shortcut ? (
-                      <kbd className="weather-kbd uppercase">{link.shortcut}</kbd>
-                    ) : null}
+                    <span>{link.navLabel ?? link.label}</span>
+                    <span className="text-fluid-micro font-normal text-slate-400">{link.description}</span>
                   </Link>
                 </div>
               );
@@ -73,13 +76,14 @@ export function MobileNavContent({ loopLinks: propLoopLinks, currentPathname, on
                   href={link.href as Route}
                   aria-current={isActive ? "page" : undefined}
                   onClick={onClose}
-                  className={`flex items-center gap-3 rounded-lg px-4 py-2.5 text-sm font-medium no-underline transition-colors ${
+                  className={`flex flex-col gap-0.5 rounded-lg px-4 py-2.5 text-sm font-medium no-underline transition-colors ${
                     isActive
                       ? "bg-sky-500/14 text-sky-100 font-semibold"
                       : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100"
                   }`}
                 >
-                  {link.label}
+                  <span>{link.label}</span>
+                  <span className="text-fluid-micro font-normal text-slate-400">{link.description}</span>
                 </Link>
               );
             })}
@@ -139,7 +143,11 @@ export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) 
           key={link.href}
           href={link.href}
           aria-current={link.isActive ? "page" : undefined}
-          title={link.shortcut ? `${link.navLabel ?? link.label} — press ${link.shortcut}` : undefined}
+          /* What the tab is for, on hover. Six one-word tabs ("Resolve",
+             "Trust") name a page without saying what is on it; the IA has
+             carried a line for each since it was written, and only the
+             command palette printed it. */
+          title={link.shortcut ? `${link.description} Press ${link.shortcut}.` : link.description}
           className={`group relative flex min-h-11 items-center gap-1.5 rounded-md px-2.5 py-1.5 text-fluid-xs tracking-[0.02em] no-underline transition-colors duration-150 focus-visible:outline-2 focus-visible:outline-sky-400 ${
             link.isActive
               ? "text-white font-semibold"

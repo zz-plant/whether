@@ -165,6 +165,23 @@ const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
   resumeLost: "Resume line no longer met",
 };
 
+/*
+ * A held area says which side of its lines it held on. "No line crossed since Sep 30" printed
+ * alone beside "Pause if Funding pressure > 76 · crossed" read as the row contradicting itself:
+ * the first is about the week, the second about where the score stands. Naming the state the
+ * area held in joins them. Between its lines there is nothing to add.
+ */
+const HELD_STATE_TEXT: Record<AreaState, string | null> = {
+  pause: "Pause still applies",
+  resume: "Resume line still met",
+  hold: null,
+};
+
+const describeHeld = (state: AreaState, window: string) => {
+  const prefix = HELD_STATE_TEXT[state];
+  return prefix ? `${prefix}: no line crossed ${window}.` : `No line crossed ${window}.`;
+};
+
 const GROUP_CLAUSE: Record<Exclude<AreaMovementKind, "held">, (areas: string) => string> = {
   paused: (areas) => `the pause now applies to ${areas}`,
   lifted: (areas) => `the pause no longer applies to ${areas}`,
@@ -199,7 +216,7 @@ const moveOf = (
   const crossed = decisive[kind].map(({ metric, label, value, direction }) => ({ metric, label, value, direction }));
   const text =
     kind === "held"
-      ? `No line crossed ${window}.`
+      ? describeHeld(to, window)
       : `${from === "pause" && kind === "resumable" ? "Pause lifted, resume line met" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
   return { area: lines.area, kind, state: to, crossed, text };
 };

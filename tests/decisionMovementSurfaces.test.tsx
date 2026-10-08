@@ -62,10 +62,11 @@ describe("the by-area Changed column", () => {
     const { rows } = week({ from: { tightness: 60, riskAppetite: 60 }, to: { tightness: 80, riskAppetite: 60 }, regime: "DEFENSIVE" });
     const byArea = new Map(rows.map((row) => [row.area, row]));
 
-    assert.equal(byArea.get("product-tempo")?.changed, "No line crossed since Aug 31.");
+    // The roadmap held past its resume line, and says so.
+    assert.equal(byArea.get("product-tempo")?.changed, "Resume line still met: no line crossed since Aug 31.");
     assert.equal(byArea.get("product-tempo")?.changedKind, "held");
     assert.equal(byArea.get("hiring")?.changedKind, "paused");
-    assert.match(renderTable(rows), /No line crossed since Aug 31\./);
+    assert.match(renderTable(rows), /Resume line still met: no line crossed since Aug 31\./);
   });
 
   it("draws no column on a week nothing crossed a line: the lead says it once", () => {
