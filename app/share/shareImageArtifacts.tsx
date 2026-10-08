@@ -51,7 +51,7 @@ const IMAGE_ARTIFACTS: readonly ImageArtifact[] = [
     title: "Board slide",
     meta: "PPTX · PDF · SVG",
     description:
-      "One slide: the guidance, its pause line, what would change it and both scores. All three files draw this slide. Swap ?stage= for seed, series-a, series-b, or growth.",
+      "One slide: the guidance, its pause line, what would change it and both scores. All three files draw it for a seed-stage company; change stage= in a file's link to series-a, series-b or growth.",
     preview: {
       src: "/api/image/slide?stage=seed",
       width: 1200,
@@ -83,7 +83,7 @@ const IMAGE_ARTIFACTS: readonly ImageArtifact[] = [
     title: "Brief card",
     meta: "PNG · 1200×800",
     description:
-      "Raster card for a thread, a Slack post, or anywhere an SVG will not render. Takes the same cadence and company-context params as the brief.",
+      "A PNG for a thread, a Slack post, or anywhere an SVG will not render. The same stage, sector and ticker settings as the brief apply to its link.",
     preview: {
       src: "/api/image/brief",
       width: 1200,
@@ -94,7 +94,7 @@ const IMAGE_ARTIFACTS: readonly ImageArtifact[] = [
       {
         href: "/api/image/brief",
         label: "Open brief card",
-        use: "",
+        use: "Opens in a new tab. Save it, or drag it straight into the thread.",
         download: false,
       },
     ],

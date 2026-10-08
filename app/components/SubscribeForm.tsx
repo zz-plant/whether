@@ -268,7 +268,7 @@ export function SubscribeForm({
             className="weather-hit inline-flex items-center gap-1.5 font-medium text-sky-400 hover:text-sky-300 transition-colors"
           >
             <Calendar className="size-3" aria-hidden="true" />
-            <span>Add Monday Calendar Hold (9:00 AM)</span>
+            <span>Add a Monday calendar hold (9:00 AM)</span>
           </a>
         )}
       </div>

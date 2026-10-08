@@ -66,8 +66,9 @@ export default async function MethodPage({
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)]">
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <p className="type-eyebrow">Meeting citation</p>
+            {/* No "For a recap or sourcing note." under it: the section's own
+                description says that, one line above. */}
             <p className="text-sm text-slate-200">{citationLine}</p>
-            <p className="text-xs text-slate-400">For a recap or sourcing note.</p>
             <div className="flex flex-wrap gap-2 text-xs">
               <ActionLink href="#trust-snapshot" variant="pill">System status</ActionLink>
               <ActionLink href="#formula-reference" variant="pill">Formula notes</ActionLink>
