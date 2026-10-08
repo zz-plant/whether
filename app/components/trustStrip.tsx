@@ -104,7 +104,9 @@ export function TrustStrip({
       <dl className="contents">
         {cells.map((cell) => (
           <div key={cell.label} className={cellLayout(foldRoutine && Boolean(cell.routine))}>
-            <dt className={`${termLayout}text-slate-500`}>{cell.label}</dt>
+            {/* On the one-line phone layout the label and value are told apart by shade
+                alone, so "Could change next week Risk appetite is 2 pts" ran together. */}
+            <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500`}>{cell.label}</dt>
             {line ? " " : null}
             <dd
               className={`${termLayout}${

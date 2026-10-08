@@ -259,8 +259,8 @@ export async function buildPlanningPageModel(
                 h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area", signalLinkBase: "/" }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
-                    ? "Items to revisit. Recheck last week's approvals before adding fixed cost or widening scope."
-                    : `No items to revisit. Keep the current plan unless funding pressure crosses ${assessment.thresholds.tightnessRegime}.`,
+                    ? "To revisit: recheck last week's approvals before adding fixed cost or widening scope."
+                    : `Nothing to revisit: keep the current plan unless funding pressure crosses ${assessment.thresholds.tightnessRegime}.`,
                 ),
               ),
               // The monthly call has one owner: the Monthly tab on the brief. A
@@ -283,7 +283,7 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Rules",
             title: "Rules before you commit",
-            description: "Do, don't, and limit rules for new commitments.",
+            description: "What to stop, what to start, and what to keep limited this week.",
             hashAliases: ["ops-playbook-panel"],
             // The step header above states this, and PlaybookPanel carries its own header below.
             children: h(ReportSection, { variant: "split",

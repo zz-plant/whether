@@ -132,7 +132,7 @@ describe("the evidence page", () => {
     );
 
     assert.match(html, /Feeds into <a href="#call-lines"[^>]*>Funding pressure<\/a>/);
-    assert.match(html, /Sets operating boundary lines/);
+    assert.match(html, /Sets the pause and resume lines/);
   });
 });
 

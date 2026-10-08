@@ -2087,7 +2087,7 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   here.
 - **Rules before you commit opens on the rules.** "Show all rules" and its count follow the three
   lists they change instead of sitting above the heading, and the count says what it counts ("The
-  top 3 of each list.", where it said "per area"). Risk checks and the resources disclosure take the
+  top 3 of each list." — since 2026-10-08 "Showing the top 3 of each list." — where it said "per area"). Risk checks and the resources disclosure take the
   closed steps' fill, so the page's frames read as one set in the light theme too.
 
 ### 1.1.47 Shared chrome: the report intro on a phone, the footer, /pricing and /concepts (2026-10-07)
