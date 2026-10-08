@@ -109,7 +109,7 @@ export function RulesBeforeCommit({
           {isExpanded ? "Show top 3 only" : "Show all rules"}
         </button>
         <p className="text-xs text-slate-400">
-          {isExpanded ? "Every rule in each list." : "The top 3 of each list."}
+          {isExpanded ? "Showing every rule." : "Showing the top 3 of each list."}
         </p>
       </div>
       {playbook ? (

@@ -58,7 +58,7 @@ export const AdvancedThresholdsSection = ({
               words the panel's own defaults line uses. */}
           <InstrumentQuestion
             question="What would conditions be with different lines?"
-            answer={`Set at ${formatChangeLines(currentThresholds)}`}
+            answer={`Lines now: ${formatChangeLines(currentThresholds)}`}
           />
           <ChevronDownIcon className="h-4 w-4 shrink-0 text-[color:var(--app-text-muted)] transition-transform group-data-[panel-open]:rotate-180 motion-reduce:transition-none" />
         </Collapsible.Trigger>

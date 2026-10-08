@@ -111,6 +111,15 @@ export const SignalsWhatChangedSection = ({
           signal label into a narrow strip. */}
       <div className="md:overflow-x-auto overscroll-x-contain">
         <table className="w-full border-collapse text-left text-sm max-md:block md:min-w-[36rem]">
+          {/* The movement note needs the second column's width more than the signal
+              name needs the first's: left to the browser, "+3 from the yield curve…"
+              wrapped to four lines beside a one-line "Why it matters". */}
+          <colgroup className="max-md:hidden">
+            <col className="w-[14rem]" />
+            <col className="w-[20rem]" />
+            <col className="w-[15rem]" />
+            {showNotes ? <col /> : null}
+          </colgroup>
           <caption className="sr-only">{`Every signal this week, against its line and ${basis.reference}`}</caption>
           <thead className="max-md:hidden">
             <tr className="border-b border-slate-800/80 text-xs text-slate-400">
@@ -150,7 +159,7 @@ export const SignalsWhatChangedSection = ({
                     </span>
                   ) : (
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Sets operating boundary lines
+                      Sets the pause and resume lines
                     </span>
                   )}
                 </th>
@@ -160,7 +169,7 @@ export const SignalsWhatChangedSection = ({
                       went; this says which inputs took it there, and that the
                       earlier score was built from rates alone. */}
                   {row.movement ? (
-                    <p className="mt-1.5 max-w-[18rem] text-pretty text-xs leading-5 text-slate-400" data-movement={row.key}>
+                    <p className="mt-1.5 max-w-[26rem] text-pretty text-xs leading-5 text-slate-400" data-movement={row.key}>
                       {row.movement}
                     </p>
                   ) : null}

@@ -126,7 +126,7 @@ describe("/signals answers each closed question in its summary", () => {
     const { thresholds } = model.assessment;
     assert.equal(
       summaryAnswer(withTrends, "What would conditions be with different lines?"),
-      `Set at rate ${thresholds.baseRateTightness}% · funding pressure ${thresholds.tightnessRegime} · risk appetite ${thresholds.riskAppetiteRegime}`,
+      `Lines now: rate ${thresholds.baseRateTightness}% · funding pressure ${thresholds.tightnessRegime} · risk appetite ${thresholds.riskAppetiteRegime}`,
     );
   });
 
