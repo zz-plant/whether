@@ -54,6 +54,25 @@ const QUESTION_BY_AREA: Record<DecisionArea, string> = {
   "expansion-bets": "Start something new",
 };
 
+/**
+ * How far the reading is from a line, as a stamp: a status, so sharp (§XIV).
+ * A pause line in force takes the caution ink and a resume line that is met
+ * the easing ink, the two inks their columns carry in the area table; a line
+ * not yet reached stays neutral.
+ */
+function LineDistance({ distance, met, kind }: { distance: string; met: boolean; kind: "pause" | "resume" }) {
+  const tone = !met
+    ? "border-[color:var(--border-strong)] text-slate-300"
+    : kind === "pause"
+      ? "border-semantic-caution-border/50 bg-semantic-caution-border/10 text-semantic-caution-fg"
+      : "border-semantic-easing-border/50 bg-semantic-easing-border/10 text-semantic-easing-fg";
+  return (
+    <span className={`inline-block whitespace-nowrap rounded-sm border px-1.5 py-px align-baseline text-fluid-nano font-semibold tabular-nums ${tone}`}>
+      {distance}
+    </span>
+  );
+}
+
 export type DecisionPickerOption = HomeAreaRow & {
   /** The answer page that argues this area at length, when one exists. */
   answer?: { href: string; title: string };
@@ -164,7 +183,7 @@ export function DecisionPicker({
           the record reading as more of the alert's copy. */}
       <div className="space-y-4">
         <div className="space-y-1">
-          <h2 id="first-visit-decision-heading" className="text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
+          <h2 id="first-visit-decision-heading" className="text-fluid-xl font-semibold tracking-[-0.015em] text-slate-100">
             What are you deciding?
           </h2>
           {pauseLineCount ? (
@@ -213,9 +232,14 @@ export function DecisionPicker({
         </div>
 
         {active ? (
-          <div aria-live="polite" className="space-y-2 border-l-2 border-sky-500/50 pl-4">
+          /* A card, not a sky rule down its left edge: sky is the colour of a
+             link, and the rule read as a quote rather than as the answer. */
+          <div
+            aria-live="polite"
+            className="space-y-3 rounded-xl border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] px-4 py-4 sm:px-5"
+          >
             <p className="type-eyebrow">{decisionAreaLabel(active.area)}</p>
-            <p className="max-w-[64ch] text-fluid-sm font-semibold leading-snug text-white">{active.rule}</p>
+            <p className="max-w-[56ch] text-fluid-lg font-semibold leading-snug text-white">{active.rule}</p>
             {active.changed ? (
               /* Amber for an area the week moved, slate for one it did not: the
                  same table cell says "No line crossed" for both. */
@@ -223,12 +247,13 @@ export function DecisionPicker({
                 {active.changed}
               </p>
             ) : null}
-            <dl className="grid max-w-[64ch] gap-1 text-fluid-xs text-slate-300 sm:grid-cols-[auto_1fr] sm:gap-x-4">
+            <dl className="grid max-w-[64ch] gap-x-4 gap-y-2 text-fluid-xs text-slate-200 sm:grid-cols-[auto_1fr] sm:items-baseline">
               {active.pause ? (
                 <>
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
                   <dd>
-                    {active.pause.line} <span className="text-slate-400">· {active.pause.distance}</span>
+                    <span className="tabular-nums">{active.pause.line}</span>{" "}
+                    <LineDistance distance={active.pause.distance} met={active.pause.met} kind="pause" />
                   </dd>
                 </>
               ) : null}
@@ -236,7 +261,8 @@ export function DecisionPicker({
                 <>
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
                   <dd>
-                    {active.resume.line} <span className="text-slate-400">· {active.resume.distance}</span>
+                    <span className="tabular-nums">{active.resume.line}</span>{" "}
+                    <LineDistance distance={active.resume.distance} met={active.resume.met} kind="resume" />
                   </dd>
                 </>
               ) : null}

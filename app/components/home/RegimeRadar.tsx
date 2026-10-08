@@ -93,7 +93,10 @@ export function RegimeRadar({
 
       <svg
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-        className="block h-auto w-full max-w-[200px]"
+        /* 256px at most: the plot is the card's one picture, and at 200px its
+           month-end trail bunched into a knot beside the current point. The
+           viewBox text scales with it, to about 13px at the cap (§XVII). */
+        className="block h-auto w-full max-w-[256px]"
         aria-hidden="true"
       >
         <title>{`Funding pressure ${tightness} vs risk appetite ${riskAppetite} (${weatherLabel})`}</title>

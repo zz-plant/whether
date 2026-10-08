@@ -73,9 +73,9 @@ const weatherIconMap: Record<RegimeKey, typeof Sun> = {
 };
 
 /**
- * The state tier, and nothing else: the weather word, what it means for money
- * in one line, the call as the page's heading with its longer sentence as
- * body, and the trust strip. Everything the card used to carry after that —
+ * The state tier, and nothing else: the weather word, the call as the page's
+ * heading, what the word means for money in one line under it, the call's
+ * longer sentence where it says more, and the trust strip. Everything the card used to carry after that —
  * the four signals, the rules by area, the lines and the flip watch, the share
  * actions — is a section of its own under it, in the order a reader asks the
  * questions. What is left fits above the fold on a phone.
@@ -128,16 +128,20 @@ export function DecisionHero({
         {/* With a graphic beside it, the left column stretches to the graphic's
             height and the trust row sits at its foot, so the call is not left
             floating over an empty band. */}
-        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,16rem)] md:gap-6" : undefined}>
-        <div className="flex min-w-0 flex-col gap-3">
-        {/* The regime stamp and its meaning, grouped on the eyebrow line so the eye path flows directly into the call. */}
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
+        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-8" : undefined}>
+        <div className="flex min-w-0 flex-col gap-3 sm:gap-4">
+        {/* The kicker: the regime stamp, then what the week did — its direction
+            and, on a week conditions moved, what they were. The regime's
+            meaning is the line under the call, not this one: on the eyebrow it
+            ran four facts together ("hard to raise · Tightening this week ·
+            Was Cloudy on Sep 30") ahead of the call they lead into. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
           <span
             className="type-stamp inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs"
             style={{
               color: "var(--regime-ink)",
-              borderColor: "color-mix(in srgb, var(--regime-accent) 40%, transparent)",
-              backgroundColor: "color-mix(in srgb, var(--regime-accent) 14%, transparent)",
+              borderColor: "color-mix(in srgb, var(--regime-accent) 45%, transparent)",
+              backgroundColor: "color-mix(in srgb, var(--regime-accent) 15%, transparent)",
             }}
           >
             {regimeKey ? (
@@ -150,16 +154,13 @@ export function DecisionHero({
             <span>{regimeWeatherLabel}</span>
           </span>
 
-          {regimeKey ? (
-            <span className="text-xs leading-relaxed text-slate-400">
-              {/* The rationale ends in a full stop; followed by a middle dot it
-                  read "hard to raise. · Tightening this week". */}
-              {direction || earlier ? REGIME_WEATHER_RATIONALES[regimeKey].replace(/\.$/, "") : REGIME_WEATHER_RATIONALES[regimeKey]}
-              {direction ? <span className="text-slate-300"> · {direction}</span> : null}
+          {direction || earlier ? (
+            <span className="text-fluid-xs font-medium leading-relaxed text-slate-200">
+              {direction}
               {earlier ? (
                 <span className="font-semibold" style={{ color: "var(--regime-ink)" }} data-earlier-conditions>
                   {/* The separator stays on the line before; a wrapped line must not open with "·". */}
-                  {" · "}<span className="whitespace-nowrap">{earlier}</span>
+                  {direction ? " · " : null}<span className="whitespace-nowrap">{earlier}</span>
                 </span>
               ) : null}
             </span>
@@ -181,7 +182,7 @@ export function DecisionHero({
             >
               {question}
             </TitleTag>
-            <p className="max-w-2xl text-pretty text-display font-bold leading-[1.1] tracking-[-0.01em] text-white">
+            <p className="max-w-2xl text-pretty text-display font-bold leading-[1.05] tracking-[-0.015em] text-white">
               {call}
             </p>
           </>
@@ -189,11 +190,19 @@ export function DecisionHero({
           <TitleTag
             id="weekly-call-title"
             style={{ viewTransitionName: "page-title" }}
-            className="max-w-2xl text-pretty text-display font-bold leading-[1.1] tracking-[-0.01em] text-white"
+            className="max-w-2xl text-pretty text-display font-bold leading-[1.05] tracking-[-0.015em] text-white"
           >
             {call}
           </TitleTag>
         )}
+
+        {/* What the weather word means for money, as the line under the call:
+            the stamp names the week, the call says what to do, this says why. */}
+        {regimeKey ? (
+          <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
+            {REGIME_WEATHER_RATIONALES[regimeKey]}
+          </p>
+        ) : null}
 
         {lines && lines.length > 0 ? (
           <dl className="grid max-w-2xl gap-x-5 gap-y-2 text-sm sm:grid-cols-[max-content_1fr]">
@@ -216,7 +225,13 @@ export function DecisionHero({
             directly under the call. The chip-and-popover in the meta row and the
             trust line at the foot of the card both said this; neither said it
             where a reader deciding whether to act would look first. */}
-        {trust ? <TrustStrip {...trust} href="/trust" className="pt-1 md:mt-auto" /> : null}
+        {trust ? (
+          <TrustStrip
+            {...trust}
+            href="/trust"
+            className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4 md:mt-auto"
+          />
+        ) : null}
         {aside && asideNote && asideNote.length > 0 ? (
           <p className={`text-fluid-nano text-slate-400 max-md:hidden${trust ? "" : " md:mt-auto"}`} data-aside-note>
             {asideNote.join(" ")}

@@ -578,7 +578,7 @@ async function PageContent({
                     currentRegime={regime}
                     trail={conditionsTrail.points}
                     showDistance={false}
-                    className="ml-auto w-full max-w-[240px]"
+                    className="ml-auto w-full max-w-[288px]"
                   />
                 }
                 asideNote={[conditionsTrail.caption, conditionsTrail.caveat].flatMap((line) => (line ? [line] : []))}

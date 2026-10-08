@@ -10,8 +10,9 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
  * wait, and it was rendered as text ("64 pts away"), as rails inside a box, as
  * a sparkline, as a quadrant SVG on /trust and as bare numbers on the answer
  * pages — six drawings of one idea. This is the one drawing: a track, the
- * lines labelled, this week's dot, last week's dot, and the distance to the
- * nearest line as the one number. Every surface that shows a score draws it.
+ * lines labelled with the range each guards shaded, this week's dot, last
+ * week's dot and the move between them, and the distance to the nearest line
+ * as the one number. Every surface that shows a score draws it.
  *
  * Presentational: it takes numbers and knows nothing about the engine.
  */
@@ -59,6 +60,43 @@ const LINE_CLASS: Record<LadderLineKind, string> = {
 };
 
 const clampPercent = (value: number, max: number) => Math.min(100, Math.max(0, (value / max) * 100));
+
+/* Two places, so a subtraction's float error ("8.000000000000007%") never reaches the markup. */
+const roundPercent = (percent: number) => Math.round(percent * 100) / 100;
+
+/* The range each line guards, tinted in its line's colour at a fraction of
+   its strength: a reading inside the amber band is paused, one inside the
+   green band may resume, and the reader sees which side of a line the dot is
+   on without comparing two numbers. */
+const ZONE_CLASS: Record<"pause" | "resume", string> = {
+  pause: "bg-semantic-caution-border/25",
+  resume: "bg-semantic-easing-border/20",
+};
+
+/** Whether `line` guards the range above it, judged against another line on the track; undefined when there is none to judge by. */
+const guardsAbove = (line: LadderLine, other: LadderLine | undefined) =>
+  other && other.value !== line.value ? line.value > other.value : undefined;
+
+/*
+ * The pause and resume ranges, each on the side its line faces. A line faces
+ * away from the other: funding pressure pauses above 76 and resumes below 66,
+ * risk appetite pauses below 44 and resumes above 54. The change line settles
+ * it when only one of the pair is drawn. A line with nothing to face away
+ * from gets no range, rather than a guess at its direction.
+ */
+const ladderZones = (lines: readonly LadderLine[], max: number) => {
+  const pause = lines.find((line) => line.kind === "pause");
+  const resume = lines.find((line) => line.kind === "resume");
+  const change = lines.find((line) => line.kind === "callChange");
+  return [
+    { kind: "pause" as const, line: pause, above: pause ? guardsAbove(pause, resume) ?? guardsAbove(pause, change) : undefined },
+    { kind: "resume" as const, line: resume, above: resume ? guardsAbove(resume, pause) ?? guardsAbove(resume, change) : undefined },
+  ].flatMap(({ kind, line, above }) => {
+    if (!line || above === undefined) return [];
+    const at = clampPercent(line.value, max);
+    return [{ kind, left: roundPercent(above ? at : 0), width: roundPercent(above ? 100 - at : at) }];
+  });
+};
 
 const formatPoints = (points: number) => (points % 1 === 0 ? points.toFixed(0) : points.toFixed(1));
 
@@ -190,6 +228,16 @@ export function ScoreLadder({
   const laidOut = narrow.map(({ line, row }) => ({ line, row, wideRow: wideRows.get(line) ?? row }));
   const maxRow = (key: "row" | "wideRow") => Math.max(0, ...laidOut.map((entry) => entry[key]));
   const hasPrevious = typeof previous === "number" && Number.isFinite(previous);
+  const zones = ladderZones(lines, max);
+  /* The move from the earlier reading to this one, as a segment between the
+     two dots, so a week's change reads as a distance travelled. */
+  const move =
+    hasPrevious && previous !== value
+      ? {
+          left: roundPercent(Math.min(clampPercent(previous, max), clampPercent(value, max))),
+          width: roundPercent(Math.abs(clampPercent(value, max) - clampPercent(previous, max))),
+        }
+      : null;
   const trackStyle: TrackStyle = {
     "--ladder-rows": maxRow("row"),
     "--ladder-rows-wide": maxRow("wideRow"),
@@ -205,7 +253,16 @@ export function ScoreLadder({
         style={trackStyle}
         aria-hidden="true"
       >
-        <div className="absolute inset-x-0 top-3 h-1.5 rounded-full bg-slate-800" />
+        <div className="absolute inset-x-0 top-3 h-1.5 overflow-hidden rounded-full bg-slate-800">
+          {zones.map((zone) => (
+            <span
+              key={zone.kind}
+              data-ladder-zone={zone.kind}
+              className={`absolute inset-y-0 ${ZONE_CLASS[zone.kind]}`}
+              style={{ left: `${zone.left}%`, width: `${zone.width}%` }}
+            />
+          ))}
+        </div>
         {/* Ticks first, then every label as a second layer. Each line used to
             be one translated wrapper holding its tick and its label; a
             transform makes a stacking context, so a later line's tick painted
@@ -230,9 +287,16 @@ export function ScoreLadder({
             {tickText(line)}
           </span>
         ))}
+        {move ? (
+          <span
+            data-ladder-move
+            className="absolute top-[14px] h-0.5 bg-slate-300"
+            style={{ left: `${move.left}%`, width: `${move.width}%` }}
+          />
+        ) : null}
         {hasPrevious ? (
           <span
-            className="absolute top-2.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-slate-300 bg-transparent"
+            className="absolute top-2.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-slate-300 bg-[var(--bg-body)]"
             style={{ left: `${clampPercent(previous, max)}%` }}
             title={`${previousLabel}: ${formatPoints(previous)}`}
           />

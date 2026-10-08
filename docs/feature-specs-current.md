@@ -2612,6 +2612,43 @@ need…", and eleven answers ending in "(Live operator answer)", which no one se
 
 `tests/searchTitles.test.tsx`, `tests/compsAsOf.test.tsx` and `tests/snippetLength.test.ts` hold them.
 
+### 1.1.58 The homepage facelift: a quiet ground and a louder call (2026-10-08)
+
+A visual pass on `/`, from a mockup reviewed before it was built. Nothing new is derived and no
+reader-facing sentence changed; every change is where a value sits or how it is drawn.
+
+- **The ground.** `--atmosphere-*` is about a third of its old strength (dark 0.28–0.34 → 0.10–0.12,
+  light 0.09–0.10 → 0.045–0.05), still painted by `.weather-regime-ground` on both shells (§XVI). A
+  Freezing week no longer dyes the first screen maroon, so the card's own rose reads as the signal.
+- **The card** (`.weather-hero-card`, `DecisionHero`). The regime is a solid 3px rule across the top
+  edge; the fill and border keep a trace of the hue (5% and 12%). The stamp line is the stamp and
+  what the week did ("Tightening this week · Was Cloudy on Sep 30"); the weather word's meaning
+  ("Money is expensive and hard to raise.") is the line under the call, so the eye goes stamp →
+  call → why. `--text-display` tops out at 3.25rem instead of 2.5rem (floor 1.75rem); the call still
+  holds two lines in the 42rem measure. The trust strip sits over a hairline, and a cell in a caution
+  or easing state carries a dot (a pseudo-element, so the cell's text is only its value). The map's
+  plot is capped at 256px instead of 200px, in an 18rem column.
+- **Sections.** `HomeSection` and the picker set their headings at `text-fluid-xl` (20–26px) instead
+  of 16–18px, leads at `text-fluid-sm`, with `--layout-section-gap` above each hairline from `md`.
+- **The picker's answer** is a card instead of a sky rule down its left edge, the rule at
+  `text-fluid-lg`, and each line's distance a stamp: caution when a pause line is in force, easing
+  when a resume line is met, neutral otherwise.
+- **The area table.** The row whose lines the week crossed (`changedKind` other than `held`) takes a
+  caution tint and its "Changed" cell the caution ink (`AreaRowData.moved`). A line in force is drawn
+  as a stamp; a distance still to go stays text.
+- **Every `ScoreLadder`** shades the range each line guards — amber beyond the pause line, green
+  beyond the resume line, each on the side it faces, judged from the other lines on the track, and
+  none where there is nothing to judge by — and draws the move between the earlier dot and this
+  week's. This reaches `/signals`, `/trust`, the answer pages and `/history/compare` too.
+
+Considered and not built, because they break a rule here: a distance meter on each picker choice (a
+third drawing of the distance the ladders and the second line already state, §XV), "+2 pts → Cloudy"
+cards in "What would change" (a second derivation of the "Conditions change if" sentence, §XV), and
+boxed share cards (a frame inside the section's hairline, §XIII).
+
+`tests/visualPrimitives.test.tsx` (zones, the move, the moved row, the in-force stamp) and
+`tests/homePageHeading.test.tsx` (the meaning under the call) hold them.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

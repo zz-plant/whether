@@ -34,6 +34,12 @@ export type AreaRowData = {
   scores?: readonly RuleConditionMetric[];
   /** What moved for this area this week, if anything. */
   changed?: ReactNode;
+  /**
+   * The week crossed one of this area's own lines. The row takes a caution
+   * tint and its "Changed" cell the caution ink, so the one area whose answer
+   * moved is found without reading five cells that mostly say nothing did.
+   */
+  moved?: boolean;
   /** Where to read more: the area's toolkit, scenario or answer. */
   href?: Route;
   hrefLabel?: string;
@@ -115,21 +121,27 @@ const LineCell = ({
   /* A crossed pause line is a pause in force: caution, the colour of the
      column it sits in. It was red, the same red a Freezing week paints the
      page, the stamp and the change line, so "in force" read as "error". Near
-     a line is the quieter tint of the same hue. */
+     a line is the quieter tint of the same hue. A line in force is a status,
+     so it is drawn as a stamp (§XIV); a distance still to go stays text. */
+  const inForce = isCrossed && (kind === "pause" || kind === "resume");
   const distanceClass =
     kind === "pause" && isCrossed
-      ? "text-semantic-caution-fg font-semibold"
+      ? "border-semantic-caution-border/50 bg-semantic-caution-border/10 text-semantic-caution-fg font-semibold"
       : kind === "pause" && isNear
         ? "text-amber-200/80 font-medium"
         : kind === "resume" && isCrossed
-          ? "text-emerald-300 font-medium"
+          ? "border-semantic-easing-border/50 bg-semantic-easing-border/10 text-semantic-easing-fg font-semibold"
           : "text-slate-400";
 
   return (
     <>
       {value.line}
       {value.distance ? (
-        <span className={`block text-xs ${distanceClass}`.trim()}>{value.distance}</span>
+        <span
+          className={`${inForce ? "mt-1 w-fit rounded-sm border px-1.5 py-px" : ""} block text-xs ${distanceClass}`.trim()}
+        >
+          {value.distance}
+        </span>
       ) : null}
     </>
   );
@@ -171,8 +183,11 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
             <tr
               key={row.area}
               id={`area-${row.area}`}
-              className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-2 max-md:py-3"
+              className={`border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-2 max-md:py-3${
+                row.moved ? " bg-amber-500/[0.06]" : ""
+              }`}
               data-area={row.area}
+              data-moved={row.moved ? "true" : undefined}
             >
               <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-md:col-span-2 max-md:p-0">
                 {row.href ? (
@@ -215,7 +230,11 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
                 <LineCell value={row.resume} kind="resume" />
               </td>
               {showChanged ? (
-                <td className={`py-2.5 pr-3 text-slate-300 max-md:col-span-2 max-md:p-0 ${row.changed ? "" : "max-md:hidden"}`.trim()}>
+                <td
+                  className={`py-2.5 pr-3 max-md:col-span-2 max-md:p-0 ${row.moved ? "font-medium text-amber-200/90" : "text-slate-300"} ${
+                    row.changed ? "" : "max-md:hidden"
+                  }`.trim()}
+                >
                   <CellLabel className="text-slate-400">Changed</CellLabel>
                   {row.changed ?? <span className="text-slate-500">—</span>}
                 </td>

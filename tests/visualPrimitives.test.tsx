@@ -94,6 +94,41 @@ describe("ScoreLadder", () => {
     assert.match(html, /--ladder-rows:1;--ladder-rows-wide:0/);
   });
 
+  it("shades the range each line guards, on the side it faces", () => {
+    /* Funding pressure pauses above its pause line and resumes below its
+       resume line; risk appetite is the other way up. The side comes from the
+       lines themselves, never from which score it is. */
+    const zone = (html: string, kind: string) =>
+      new RegExp(`data-ladder-zone="${kind}"[^>]*style="left:([\\d.]+)%;width:([\\d.]+)%"`).exec(html)?.slice(1).map(Number);
+    const pressure = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={90} lines={lines} />);
+    assert.deepEqual(zone(pressure, "pause"), [76, 24]);
+    assert.deepEqual(zone(pressure, "resume"), [0, 66]);
+
+    const appetite: LadderLine[] = [
+      { kind: "pause", value: 44 },
+      { kind: "callChange", value: 50 },
+      { kind: "resume", value: 54 },
+    ];
+    const risk = renderToStaticMarkup(<ScoreLadder label="Risk appetite" value={48} lines={appetite} />);
+    assert.deepEqual(zone(risk, "pause"), [0, 44]);
+    assert.deepEqual(zone(risk, "resume"), [54, 46]);
+
+    /* One of the pair, faced by the change line; none at all with no second line to face away from. */
+    const pauseOnly = renderToStaticMarkup(
+      <ScoreLadder label="Funding pressure" value={60} lines={[{ kind: "pause", value: 76 }, { kind: "callChange", value: 70 }]} />,
+    );
+    assert.deepEqual(zone(pauseOnly, "pause"), [76, 24]);
+    const changeOnly = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={60} lines={[{ kind: "callChange", value: 70 }]} />);
+    assert.doesNotMatch(changeOnly, /data-ladder-zone/);
+  });
+
+  it("draws the move between the two dots only when the reading moved", () => {
+    const moved = renderToStaticMarkup(<ScoreLadder label="Risk appetite" value={48} previous={56} lines={lines} />);
+    assert.match(moved, /data-ladder-move[^>]*style="left:48%;width:8%"/);
+    const still = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={90} previous={90} lines={lines} />);
+    assert.doesNotMatch(still, /data-ladder-move/);
+  });
+
   it("builds the three lines from the numbers a surface has, drawing only the ones it states", () => {
     assert.deepEqual(buildLadderLines({ pause: 76, resume: 66, callChange: 70 }), [
       { kind: "pause", value: 76 },
@@ -192,6 +227,41 @@ describe("AreaTable", () => {
       assert.match(row, />Resume line</);
     }
     assert.doesNotMatch(html, /class="[^"]*(?<![:\w-])min-w-\[/, "no minimum width outside sm, or the table scrolls sideways on a phone");
+  });
+});
+
+describe("AreaTable moved rows", () => {
+  it("marks the area the week moved, and only that one", () => {
+    const html = renderToStaticMarkup(
+      <AreaTable
+        caption="test"
+        rows={[
+          { area: "hiring", rule: "Backfills only.", changed: "Pause still applies: no line crossed since Sep 30." },
+          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Resume line no longer met: risk appetite fell through 54.", moved: true },
+        ]}
+      />,
+    );
+    const rows = html.split("data-area=").slice(1);
+    assert.doesNotMatch(rows[0] ?? "", /data-moved/);
+    assert.match(rows[1] ?? "", /data-moved="true"/);
+  });
+
+  it("draws a line in force as a stamp, and a distance still to go as text", () => {
+    const html = renderToStaticMarkup(
+      <AreaTable
+        caption="test"
+        rows={[
+          {
+            area: "hiring",
+            rule: "Backfills only.",
+            pause: { line: "Funding pressure > 76", distance: "crossed" },
+            resume: { line: "Funding pressure < 66", distance: "24 pts away" },
+          },
+        ]}
+      />,
+    );
+    assert.match(html, /class="[^"]*rounded-sm border[^"]*text-semantic-caution-fg[^"]*">crossed</);
+    assert.doesNotMatch(html, /class="[^"]*rounded-sm[^"]*">24 pts away</);
   });
 });
 
