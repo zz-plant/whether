@@ -232,7 +232,9 @@ export function SharePageFormats({
 
         <div className="min-w-0 space-y-3" data-share-format={selected.id}>
           <div className="space-y-1">
-            <h3 className="text-fluid-base font-semibold text-slate-100">{selected.label}</h3>
+            {/* Below `md` the select above already shows the format's name, so
+                the heading printed it twice in a row; it stays for the outline. */}
+            <h3 className="text-fluid-base font-semibold text-slate-100 max-md:sr-only">{selected.label}</h3>
             <p className="text-xs leading-relaxed text-slate-400">{hint}</p>
           </div>
           {selected.kind === "panel" ? (

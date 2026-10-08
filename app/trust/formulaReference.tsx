@@ -37,6 +37,9 @@ type ScorePosition = {
 };
 export type ScorePositions = { tightness: ScorePosition; riskAppetite: ScorePosition };
 
+/** "How hard…" to "how hard…", for a definition that follows its term mid-sentence. */
+const lowerFirst = (sentence: string) => `${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}`;
+
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
 
 /** Base rate at which the rate component of tightness saturates. */
@@ -221,11 +224,12 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           <li>
             <span className="font-semibold text-slate-100">1. Read two things off public U.S.
             market data.</span>{" "}
+            {/* "Funding pressure is how hard…", one sentence each. With an em dash
+                the definition's own capital ("Funding pressure — How hard…")
+                read as a new sentence starting mid-line. */}
             <span className="text-slate-300">
-              {signalPlainEnglish.tightness.plainLabel} &mdash;{" "}
-              {signalPlainEnglish.tightness.whatItMeasures}{" "}
-              {signalPlainEnglish.riskAppetite.plainLabel} &mdash;{" "}
-              {signalPlainEnglish.riskAppetite.whatItMeasures}
+              {signalPlainEnglish.tightness.plainLabel} is {lowerFirst(signalPlainEnglish.tightness.whatItMeasures)}{" "}
+              {signalPlainEnglish.riskAppetite.plainLabel} is {lowerFirst(signalPlainEnglish.riskAppetite.whatItMeasures)}
             </span>
           </li>
           <li>
@@ -415,8 +419,8 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           "expand invisible hitboxes"). As boxes, each one set its own line to
           44px and the paragraph read with a gap under its first line. */}
       <p className="mt-3 text-xs leading-5 text-slate-400">
-        Every constant above is imported from the scoring engine, not retyped — if the engine
-        changes, this page changes with it.{" "}
+        Every constant above is read from the scoring engine, so a change there changes this
+        page.{" "}
         <a
           href={ENGINE_SOURCE_URL}
           target="_blank"
@@ -425,7 +429,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         >
           Read the engine source →
         </a>{" "}
-        For the act / pause / reverse method the thresholds feed, see{" "}
+        To put the lines to work, see{" "}
         <a href="#framework" className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
           how to use the thresholds ↓
         </a>
