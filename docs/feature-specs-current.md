@@ -3252,6 +3252,10 @@ Stormy's 2.5:1, as Sunny's (2.4) and Cloudy's (2.0) were before: no condition fi
 alone, since each sits beside its glyph and its word. The golden pins moved for the slide HTML, the
 slide SVG and the deck's hash only.
 
+Before and after, at 390 and 1280px, in both themes and in greyscale, with the OG card, the slide
+and the weekly email: `docs/assets/palette-directions/applied-*.jpg`. The week differs between the
+two captures because §1.1.66 re-scored it in between (Freezing before, Cloudy after).
+
 Left on the old palette: the brand mark (`public/favicon*.svg`, `icon*.svg`, `whether-logo.svg`,
 `app/brandAssets.ts` and the raster icons), which is its own decision, and
 `scripts/generate-scenes.ts`, which renders marketing scenes and nothing on the site.
