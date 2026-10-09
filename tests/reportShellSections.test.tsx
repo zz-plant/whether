@@ -38,7 +38,6 @@ describe("ReportShell extracted sections", () => {
         statusLabel="DEFENSIVE"
         trustStatusLabel="HIGH"
         fetchedAtLabel="Mar 6"
-        resolvedNextRefreshLabel="15m cadence"
         showOfflineBadge={false}
         offlineBadgeLabel="Cached"
       />,

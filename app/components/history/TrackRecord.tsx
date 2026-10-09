@@ -104,9 +104,14 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
 );
 
 /**
- * The record's answer: four figures and the held-since line, with room beside
- * them for the confidence record (`aside`), which grades the same months on the
- * other question a reader asks of a record.
+ * The record's answer: three figures and the rule that makes a change rare, with
+ * room beside them for the confidence record (`aside`), which grades the same
+ * months on the other question a reader asks of a record.
+ *
+ * Each fact once (2026-10-09). A "Record starts" tile printed the date the two
+ * count tiles already carry as their window, and a sentence under the tiles
+ * ("Through Sep 30, 2026, month-end conditions had been Cloudy since Sep 30,
+ * 2026") restated the held tile and the page intro's stamp.
  */
 export function TrackRecordTiles({
   record,
@@ -153,19 +158,15 @@ export function TrackRecordTiles({
               value={record.currentHoldMonths.toLocaleString("en-US")}
               unit={record.currentHoldMonths === 1 ? "mo" : "mos"}
             />
-            <StatTile label="Changes in conditions" value={record.regimeChanges.toLocaleString("en-US")} unit={changeRate} />
-            <StatTile label="Record starts" value={formatDateUTC(record.firstRecordDate)} />
+            <StatTile
+              className="col-span-2"
+              label="Changes in conditions"
+              value={record.regimeChanges.toLocaleString("en-US")}
+              unit={changeRate}
+            />
           </div>
 
-          {/* "The call has been X" read as a statement about the call on the site
-              today. Every figure in this panel comes from the month-end series, so
-              it is a statement about closed months, and the two disagree whenever
-              the month in progress has moved — which is how this page said "Sunny"
-              on a week the brief was calling Freezing. */}
           <p className="text-fluid-xs text-slate-400">
-            Through {formatDateUTC(record.latestRecordDate)}, month-end conditions had been{" "}
-            <span className="font-medium text-slate-200">{record.currentRegimeLabel}</span>{" "}
-            since {formatDateUTC(record.currentHoldStartDate)}.{" "}
             {CALL_CHANGE_RULE} One noisy month cannot move it, so unchanged conditions are the usual state and a
             change is the event worth reading.
           </p>

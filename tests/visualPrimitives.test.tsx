@@ -360,9 +360,14 @@ describe("MonthStrip", () => {
   it("counts changes and the current run from the data", () => {
     assert.deepEqual(describeCurrentRun(entries), { label: "Cloudy", held: 3, since: "2026-05-31", latest: "2026-07-31" });
     const html = renderToStaticMarkup(<MonthStrip entries={[...entries].reverse()} />);
-    assert.match(html, /1 change in conditions/);
-    assert.match(html, /Cloudy, held 3 months since May 2026/);
-    const visible = html.replace(/<[^>]+>/g, " ");
+    /* The count and the run are /history's tiles and stamp; the band keeps them only
+       in its text alternative, and its caption is its domain (2026-10-09). */
+    const srOnly = /<p class="sr-only">([\s\S]*?)<\/p>/.exec(html)?.[1]?.replace(/<!--[\s\S]*?-->/g, "") ?? "";
+    assert.match(srOnly, /1 change; Cloudy held 3 months\./);
+    const caption = /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(html)?.[1]?.replace(/<[^>]+>/g, "") ?? "";
+    assert.equal(caption.replace(/\s+/g, " ").trim(), "Mar 2026 – Jul 2026");
+    const visible = html.replace(/<p class="sr-only">[\s\S]*?<\/p>/, "").replace(/<[^>]+>/g, " ");
+    assert.doesNotMatch(visible, /change in conditions|held 3 months/, "no visible restatement of the tiles or the stamp");
     assert.doesNotMatch(visible, /EXPANSION|DEFENSIVE/, "the strip must not print engine keys (the data-regime attribute is how it gets its colour)");
     /* Five month segments, one glyph per condition in the key, and one per run
        long enough to carry it (both runs here), so the band reads in greyscale. */

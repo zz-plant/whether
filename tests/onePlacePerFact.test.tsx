@@ -27,8 +27,8 @@ import { sinceLastVisitDelta } from "../app/components/home/SinceLastVisit";
  * Each fact once per page, in its most useful form (2026-10-09). The homepage
  * printed the four conditions twice above the fold, the change from Cloudy to
  * Freezing three times, the two scores about five times and the stage and runway
- * as a sentence over the two controls that show them. These pin which element
- * keeps each fact.
+ * as a sentence over the two controls that show them; /history printed "Cloudy,
+ * held 1 month" four times. These pin which element keeps each fact.
  *
  * `/` suspends at its data boundary in this suite, so its sections render here
  * from the props `app/page.tsx` builds, and the wiring is read from the route.
@@ -155,5 +155,27 @@ describe("the desktop sticky strip waits for the card to leave the screen", () =
   it("is gated on the card, as the phone line is", () => {
     const strip = readFileSync("app/components/StickyCallStrip.tsx", "utf8");
     assert.match(strip, /\{showStrip && heroLeft \? \(/);
+  });
+});
+
+describe("/history prints each record fact once", () => {
+  it("held months on the stamp and the tile, the counts on their tiles, the margin study as its headline", async () => {
+    const page = await import("../app/history/page");
+    const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve({}) }));
+    const visible = text(html.replace(/<p class="sr-only">[\s\S]*?<\/p>/g, ""));
+
+    assert.match(visible, /Last completed month/);
+    assert.equal((visible.match(/Current conditions held/g) ?? []).length, 1);
+    assert.doesNotMatch(visible, /held \d+ months? since|month-end conditions had been/);
+    assert.doesNotMatch(visible, /\d+ changes in conditions/, "the change count is its tile's");
+    const readings = /Months on record (\d+)/.exec(visible)?.[1];
+    assert.ok(readings, "the readings tile prints the count");
+    assert.ok(!visible.includes(`${readings} month-end readings`), "the reading count is its tile's");
+    assert.doesNotMatch(visible, /Record starts|Fixed historical snapshot/);
+
+    const margin = visible.slice(visible.indexOf("What the margin has been worth"));
+    assert.match(margin, /^What the margin has been worth Across \d+ month-to-month comparisons, conditions were the same the following month \d+ times, or \d+%\./);
+    assert.doesNotMatch(html, /Points from the line/, "the band table is /calibration's");
+    assert.match(html, /href="\/calibration"/);
   });
 });

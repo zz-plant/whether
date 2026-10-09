@@ -111,11 +111,17 @@ describe("/history dates what it is showing", () => {
     );
   });
 
-  it("stamps the period the record runs through", () => {
+  /* The period is the page intro's stamp ("Last completed month", "Data as of"),
+     not a sentence under the tiles restating the held tile (2026-10-09). The tiles
+     carry their window, and the held figure prints once. */
+  it("leaves the period to the intro's stamp and prints the held months once", () => {
     const html = renderToStaticMarkup(<TrackRecordTiles record={record} />);
 
-    assert.match(html, /month-end conditions/i);
-    assert.match(html, /Through /);
+    assert.doesNotMatch(html, /Through |month-end conditions had been/i);
+    assert.doesNotMatch(html, /Record starts/, "the start date is the count tiles' window");
+    const text = html.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    assert.equal((text.match(/Current conditions held/g) ?? []).length, 1);
+    assert.match(text, /since Jan 2024/);
   });
 
   /*

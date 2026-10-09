@@ -17,12 +17,13 @@ import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
  * in conditions since 2012 cannot support re-fitting it, and a curve fitted to
  * the base rate would report ~97% for every week and discriminate nothing.
  *
- * Two surfaces draw it. /calibration is the study's own URL and wraps the body
- * in a section. /history sets it beside the track-record tiles, because "how
- * often did the call hold" and "how often was the confidence label right" are
+ * /calibration is the study's own URL and wraps the body in a section. /history
+ * sets its headline beside the track-record tiles (`ConfidenceRecordSummary`),
+ * because "how often did the call hold" and "how often was the margin right" are
  * the same question asked twice, and a reader judging the record should meet
- * both answers in one place. The body is one component so the two cannot
- * drift into two tables of the same thing.
+ * both answers in one place. It drew the whole study there until 2026-10-09,
+ * table and all, one link away from the page that owns it; the summary is the
+ * study's own first sentence, so the two cannot drift.
  */
 
 /* The margin is what the API calls `confidence` (2026-10-09); the study grades it under its display name. */
@@ -47,14 +48,31 @@ const loadRecord = () => {
   return { bands, totals, baseRate: (totals.held / totals.months) * 100 };
 };
 
+/** The study's headline: how often conditions held from one month-end to the next. */
+const BaseRateSentence = ({ totals, baseRate }: Pick<NonNullable<ReturnType<typeof loadRecord>>, "totals" | "baseRate">) => (
+  <>
+    Across {totals.months} month-to-month comparisons, conditions were the same the following
+    month {totals.held} times, or {percentFormat(baseRate)}.
+  </>
+);
+
+/** The headline alone, for /history, which links to the study rather than reprinting it. */
+export function ConfidenceRecordSummary() {
+  const record = loadRecord();
+  if (!record) return null;
+  return (
+    <p className="text-sm text-slate-200" data-confidence-record-summary>
+      <BaseRateSentence totals={record.totals} baseRate={record.baseRate} />
+    </p>
+  );
+}
+
 /**
- * The paragraph, the table and the footnote.
- *
- * `CALL_CHANGE_RULE` is printed once per page (lib/report/AGENTS.md). /history
- * already states it under the track-record tiles this body sits beside, so
- * only /calibration asks for it here.
+ * The paragraph, the table and the footnote, which closes on `CALL_CHANGE_RULE`
+ * (printed once per page, lib/report/AGENTS.md). Only /calibration draws the body
+ * now; /history states the rule under its track-record tiles.
  */
-export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includeCallChangeRule?: boolean }) {
+function ConfidenceRecordBody() {
   const record = loadRecord();
   if (!record) return null;
   const { bands, totals, baseRate } = record;
@@ -62,8 +80,7 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
   return (
     <div className="space-y-3">
       <p className="text-sm text-slate-200">
-        Across {totals.months} month-to-month comparisons, conditions were the same the following
-        month {totals.held} times, or {percentFormat(baseRate)}. Every band below held more often
+        <BaseRateSentence totals={totals} baseRate={baseRate} /> Every band below held more often
         than the percent published for it, and the two closest bands run in the wrong order — so
         the margin is a distance, not a probability. It says how much room there is before the line
         where conditions change; the count beside it says how often that room mattered.
@@ -102,7 +119,8 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
       <p className="text-fluid-xs text-slate-400">
         Derived from the month-end archive each time this page is built, so it improves as the
         record grows. A held month means conditions did not change.
-        {includeCallChangeRule ? <> {CALL_CHANGE_RULE}</> : null}
+        {" "}
+        {CALL_CHANGE_RULE}
       </p>
     </div>
   );
