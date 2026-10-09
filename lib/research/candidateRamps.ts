@@ -60,7 +60,7 @@ export type RampInputs = {
 };
 
 /** Why a ramp could not read its input as registered. */
-type RampFlag = "no-input" | "window-short" | "unguarded";
+export type RampFlag = "no-input" | "window-short" | "unguarded";
 
 type RampReading = {
   /** The value the ramp read: the one-month bill, or the two bills' median for the guard. */
@@ -155,7 +155,7 @@ type RampScore = {
  * machine state untouched when the ramp cannot read, so a gap does not reset a
  * candidate's record.
  */
-const scoreWithRamp = ({
+export const scoreWithRamp = ({
   ramp,
   treasury,
   macroSeries,
