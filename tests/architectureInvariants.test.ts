@@ -705,6 +705,8 @@ describe("Architecture Invariants", () => {
       "lib/policy/governance.ts",
       "lib/policy/transforms.ts",
       "lib/thresholds.ts",
+      // The candidate ramps score in parallel with the engine and keep its boundary.
+      "lib/research/candidateRamps.ts",
     ];
     const ALSO_ALLOWED = new Set(["lib/types.ts"]);
 

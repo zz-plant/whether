@@ -18,6 +18,14 @@ import { getTimeMachineSnapshots } from "../../lib/timeMachine/timeMachineCache"
 
 export const RATE_INPUTS_PATH = "data/research/premise-test-rate-inputs.json";
 
+/** The last month-end of the registered record (§2): 177 month-ends, January 2012 to September 2026.
+ *  Later cache months are outside the test, so a monthly refresh does not change it. */
+export const REGISTERED_RECORD_END = "2026-09-30";
+
+/** The archive's month-ends inside the registered record. */
+export const registeredRecordSnapshots = () =>
+  getTimeMachineSnapshots().filter((snapshot) => snapshot.record_date <= REGISTERED_RECORD_END);
+
 const FIRST_WINDOW_MONTH = "2002-01";
 const LAST_WINDOW_MONTH = "2011-12";
 
@@ -85,7 +93,7 @@ const build = async (): Promise<RateInputs> => {
   }
 
   const dislocationPairs: DislocationPair[] = [];
-  for (const snapshot of getTimeMachineSnapshots()) {
+  for (const snapshot of registeredRecordSnapshots()) {
     const date = snapshot.record_date;
     const reference = midMonthReference(date, printing);
     if (!reference) {
@@ -131,6 +139,7 @@ const build = async (): Promise<RateInputs> => {
  * month-ends run unbroken, each month-end pair sits on an archive record date
  * with the archive's own bill values, its reference is on or before the 15th of
  * the same month, and every episode date sits inside its registered window.
+ * Judged against the registered record only, so a later cache month is not a defect.
  */
 export const validateRateInputs = (raw: unknown): string[] => {
   const parsed = RateInputsSchema.safeParse(raw);
@@ -151,10 +160,10 @@ export const validateRateInputs = (raw: unknown): string[] => {
     problems.push(`window month-ends: ${inputs.oneMonthBillMonthEnds.length}, expected 120`);
   }
 
-  const archive = new Map(getTimeMachineSnapshots().map((snapshot) => [snapshot.record_date, snapshot.yields]));
+  const archive = new Map(registeredRecordSnapshots().map((snapshot) => [snapshot.record_date, snapshot.yields]));
   const monthEnds = inputs.dislocationPairs.filter((pair) => pair.set === "month-end");
   if (monthEnds.length !== archive.size) {
-    problems.push(`month-end pairs: ${monthEnds.length}, the archive has ${archive.size} record dates`);
+    problems.push(`month-end pairs: ${monthEnds.length}, the registered record has ${archive.size} month-ends`);
   }
   for (const pair of monthEnds) {
     const yields = archive.get(pair.date);

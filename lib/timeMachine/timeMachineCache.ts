@@ -287,6 +287,38 @@ const regimeAssessmentMemo = new Map<string, Map<string, RegimeAssessment>>();
  * veto) when the cache carries one. The threading itself is `replayRegimeWalk`,
  * the same loop the archive generators run.
  */
+/**
+ * What each cached month-end hands a replay: its Treasury reading, its VIX
+ * reading with the stored daily tail, and its trailing base-rate window. The
+ * governed walk below replays these; so does the candidate-ramp research
+ * (`lib/research/shadowRamps.ts`, `scripts/research/premiseTest.ts`), which is
+ * how a candidate's record reads exactly the inputs the published one did.
+ */
+export const buildTimeMachineReplaySteps = () =>
+  sortedSnapshots.map((snapshot, index) => {
+    const velocityWindow = snapshot.baseRateVelocityWindow;
+    const baseRateHistory = velocityWindow
+      ? [
+          { date: velocityWindow.compareDate, value: velocityWindow.compareValue },
+          { date: velocityWindow.latestDate, value: velocityWindow.latestValue },
+        ]
+      : sortedSnapshots
+          .slice(Math.max(0, index - 5), index + 1)
+          .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
+    const macroSeries =
+      typeof snapshot.vix === "number"
+        ? [
+            buildReplayVixReading({
+              value: snapshot.vix,
+              recordDate: snapshot.record_date,
+              fetchedAt: snapshot.fetched_at,
+              history: snapshot.vixHistory ?? [],
+            }),
+          ]
+        : [];
+    return { treasury: snapshot, snapshot, macroSeries, baseRateHistory };
+  });
+
 const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMachineRegimeEntry[] => {
   const walkKey = buildRegimeWalkCacheKey(overrides);
   const memoized = regimeWalkMemo.get(walkKey);
@@ -294,32 +326,7 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
     return memoized;
   }
 
-  const replay = replayRegimeWalk(
-    sortedSnapshots.map((snapshot, index) => {
-      const velocityWindow = snapshot.baseRateVelocityWindow;
-      const baseRateHistory = velocityWindow
-        ? [
-            { date: velocityWindow.compareDate, value: velocityWindow.compareValue },
-            { date: velocityWindow.latestDate, value: velocityWindow.latestValue },
-          ]
-        : sortedSnapshots
-            .slice(Math.max(0, index - 5), index + 1)
-            .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
-      const macroSeries =
-        typeof snapshot.vix === "number"
-          ? [
-              buildReplayVixReading({
-                value: snapshot.vix,
-                recordDate: snapshot.record_date,
-                fetchedAt: snapshot.fetched_at,
-                history: snapshot.vixHistory ?? [],
-              }),
-            ]
-          : [];
-      return { treasury: snapshot, snapshot, macroSeries, baseRateHistory };
-    }),
-    overrides,
-  );
+  const replay = replayRegimeWalk(buildTimeMachineReplaySteps(), overrides);
 
   const assessments = new Map<string, RegimeAssessment>();
   const walk: TimeMachineRegimeEntry[] = replay.map(({ step: { snapshot }, assessment }) => {
