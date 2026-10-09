@@ -200,10 +200,10 @@ describe("a brief frozen by an earlier engine", () => {
       return series;
     });
     const expected = evaluateRegime(lastWeek, DEFAULT_THRESHOLDS, stressed, null, { baseRateHistory: lastWeek.oneMonthHistory });
-    /* The veto moves the published score; spreads, conditions, venture funding and layoffs move
-       the off-record ones. The close alone (18) takes nothing. */
-    assert.equal(expected.diagnostics.boundaryContributors.length, 1, "the record's series moved the published score");
-    assert.deepEqual(expected.scores.offRecord?.inputs, ["HY_CREDIT_SPREAD", "CHICAGO_FCI", "VC_FUNDING_VELOCITY", "TECH_LAYOFF_TREND"]);
+    /* Conditions and the veto move the published scores; the high-yield spread, venture funding
+       and layoffs move the off-record ones. The close alone (18) takes nothing. */
+    assert.equal(expected.diagnostics.boundaryContributors.length, 2, "the record's series moved the published scores");
+    assert.deepEqual(expected.scores.offRecord?.inputs, ["HY_CREDIT_SPREAD", "VC_FUNDING_VELOCITY", "TECH_LAYOFF_TREND"]);
     assert.deepEqual(
       scoreStoredInputs(evaluateRegime, DEFAULT_THRESHOLDS, buildStoredInputs(lastWeek, stressed), "2026-09-29").scores.offRecord,
       expected.scores.offRecord,

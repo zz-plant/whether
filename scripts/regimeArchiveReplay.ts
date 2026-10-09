@@ -31,6 +31,8 @@ import { resolveYearRange } from "./summaryRange";
 type ArchiveInputs = {
   datasets: TreasuryDatasets;
   vixDataset: SeriesDataset | null;
+  /** The Chicago Fed index, weekly; on the record basis since engine-2026-10-09b. */
+  chicagoFciDataset: SeriesDataset;
   /** The run's clock: fetch timestamps, data ages and the last completed week. */
   now: Date;
 };
@@ -137,7 +139,7 @@ const buildWeekDescriptors = (
  * threads every week of the range even when `HISTORY_WEEKS` scopes the write,
  * so a merge lands with the confirmations a full replay would have produced.
  */
-export const buildWeeklyArchive = ({ datasets, vixDataset, now }: ArchiveInputs): {
+export const buildWeeklyArchive = ({ datasets, vixDataset, chicagoFciDataset, now }: ArchiveInputs): {
   entries: WeeklySummaryArchiveEntry[];
   effectiveEndYear: number;
   mode: ArchiveMode;
@@ -168,6 +170,7 @@ export const buildWeeklyArchive = ({ datasets, vixDataset, now }: ArchiveInputs)
     periods: weeks,
     datasets,
     vixDataset,
+    chicagoFciDataset,
     fetchedAt,
     coverage: "week-lag",
   })
@@ -224,6 +227,11 @@ export type TimeMachineCacheEntry = TreasuryData & {
    *  The runtime replay evaluates the same delta from this pair that this walk
    *  computes from the full daily window. */
   baseRateVelocityWindow?: BaseRateVelocityWindow | null;
+  /** The Chicago Fed index a reader had at the entry's date (published five days
+   *  after the week it measures), and the weekly observations a reader had in
+   *  the 60 days before, so a replay can rebuild the series from the entries alone. */
+  chicagoFci?: number | null;
+  chicagoFciHistory?: { date: string; value: number | null }[] | null;
 };
 
 const isSameMonthAndYear = (value: string, asOf: string) => {
@@ -243,7 +251,7 @@ const isSameMonthAndYear = (value: string, asOf: string) => {
  * month instant-committed its quadrant and later confirmations could differ
  * from the full replay the merge target was built from.
  */
-export const buildMonthlyArchive = ({ datasets, vixDataset, now }: ArchiveInputs): {
+export const buildMonthlyArchive = ({ datasets, vixDataset, chicagoFciDataset, now }: ArchiveInputs): {
   entries: MonthlySummaryArchiveEntry[];
   timeMachineEntries: TimeMachineCacheEntry[];
   mode: ArchiveMode;
@@ -273,6 +281,7 @@ export const buildMonthlyArchive = ({ datasets, vixDataset, now }: ArchiveInputs
     periods,
     datasets,
     vixDataset,
+    chicagoFciDataset,
     fetchedAt,
     coverage: "period-end",
     checkRecordDate: ({ year, month, asOf }, recordDate) =>
@@ -301,12 +310,14 @@ export const buildMonthlyArchive = ({ datasets, vixDataset, now }: ArchiveInputs
         engineVersion: ENGINE_VERSION,
       };
     }),
-    timeMachineEntries: readings.map(({ period: { year, month }, asOfTime, treasury, vixReading }) => ({
+    timeMachineEntries: readings.map(({ period: { year, month }, asOfTime, treasury, vixReading, chicagoFciReading }) => ({
       year,
       month,
       vix: vixReading?.value ?? null,
       vixHistory: vixReading?.history ?? null,
       baseRateVelocityWindow: resolveBaseRateVelocityWindow(datasets.oneMonth, asOfTime),
+      chicagoFci: chicagoFciReading?.value ?? null,
+      chicagoFciHistory: chicagoFciReading?.history ?? null,
       ...treasury,
     })),
     mode: isPartial ? "merge" : "replace",
@@ -360,7 +371,7 @@ const isSameYear = (value: string, asOf: string) => {
  * built, and the replay keeps it. A partial run (`HISTORY_START_YEAR`) still
  * walks from the first year and only filters which records it writes.
  */
-export const buildQuarterlyYearlyArchive = ({ datasets, vixDataset, now }: ArchiveInputs): {
+export const buildQuarterlyYearlyArchive = ({ datasets, vixDataset, chicagoFciDataset, now }: ArchiveInputs): {
   quarterlyEntries: QuarterlySummaryArchiveEntry[];
   yearlyEntries: YearlySummaryArchiveEntry[];
   mode: ArchiveMode;
@@ -394,6 +405,7 @@ export const buildQuarterlyYearlyArchive = ({ datasets, vixDataset, now }: Archi
     periods,
     datasets,
     vixDataset,
+    chicagoFciDataset,
     fetchedAt,
     coverage: "period-end",
     checkRecordDate: (period, recordDate) => {

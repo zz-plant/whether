@@ -46,11 +46,20 @@ export type ComparedWith = {
  * What a score's move is made of (`lib/report/scoreMovement.ts`). The earlier
  * reading is scored from interest rates alone; today's also carries the
  * rate-speed term and the market inputs the record scores, so a move is not
- * only the market moving. `startupMarket` and `credit` stay in the union for
- * what the inputs outside the record would add (`ScoringBasis.notCounted`);
- * since 2026-10-09 neither is a part of a published move.
+ * only the market moving. `financialConditions` is the Chicago Fed index,
+ * on the record basis since engine-2026-10-09b. `startupMarket` and `credit`
+ * (the high-yield spread) stay in the union for what the inputs outside the
+ * record would add (`ScoringBasis.notCounted`); since 2026-10-09 neither is a
+ * part of a published move.
  */
-export type ScoreMovementSource = "rates" | "curve" | "rateSpeed" | "credit" | "startupMarket" | "marketStress";
+export type ScoreMovementSource =
+  | "rates"
+  | "curve"
+  | "rateSpeed"
+  | "financialConditions"
+  | "credit"
+  | "startupMarket"
+  | "marketStress";
 
 export type ScoreMovement = {
   /** Points each source added to the score, signed, in the order they are named. Zeros are left out. */

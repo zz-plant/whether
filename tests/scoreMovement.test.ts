@@ -95,11 +95,12 @@ describe("explainScoreMovement", () => {
       /* Outside the record: scored into `offRecord`, no part of the published move. */
       { name: "startup-market inputs", series: startupInputs, tightness: ["rates", "rateSpeed"], riskAppetite: ["curve"] },
       { name: "stock-market volatility", series: volatility, tightness: ["rates", "rateSpeed"], riskAppetite: ["curve", "marketStress"] },
-      { name: "credit stress", series: credit, tightness: ["rates", "rateSpeed"], riskAppetite: ["curve"] },
+      /* The Chicago Fed index counts (engine-2026-10-09b); the high-yield spread beside it does not. */
+      { name: "credit stress", series: credit, tightness: ["rates", "rateSpeed", "financialConditions"], riskAppetite: ["curve"] },
       {
         name: "all of them",
         series: [...credit, ...volatility, ...startupInputs],
-        tightness: ["rates", "rateSpeed"],
+        tightness: ["rates", "rateSpeed", "financialConditions"],
         riskAppetite: ["curve", "marketStress"],
       },
     ];
@@ -116,9 +117,9 @@ describe("explainScoreMovement", () => {
 
   it("leaves the inputs outside the record out of the move, while the score still reports what they would add", () => {
     const { previous, current, movement } = explain([...startupInputs, ...volatility, ...credit]);
-    const withoutThem = explain(volatility);
+    const withoutThem = explain([...volatility, ...credit.filter((series) => series.id === "CHICAGO_FCI")]);
 
-    assert.deepEqual(movement, withoutThem.movement, "the startup-market and credit reads change no part");
+    assert.deepEqual(movement, withoutThem.movement, "the startup-market reads and the high-yield spread change no part");
     assert.deepEqual(
       { tightness: current.tightness, riskAppetite: current.riskAppetite },
       { tightness: withoutThem.current.tightness, riskAppetite: withoutThem.current.riskAppetite },
@@ -172,12 +173,12 @@ describe("what a row and a paste say about the move", () => {
           parts: [
             { source: "rates", points: 30 },
             { source: "rateSpeed", points: 12 },
-            { source: "credit", points: -4 },
+            { source: "financialConditions", points: -4 },
           ],
         },
         aug31,
       ) ?? "",
-      /^\+30 from interest rates, \+12 from the recent pace of rate rises and -4 from credit-market and financial-conditions stress\./,
+      /^\+30 from interest rates, \+12 from the recent pace of rate rises and -4 from financial-conditions stress\./,
     );
   });
 
@@ -204,11 +205,11 @@ describe("what a row and a paste say about the move", () => {
     const cancelling: ScoreMovement = {
       parts: [
         { source: "rates", points: 5 },
-        { source: "credit", points: -5 },
+        { source: "financialConditions", points: -5 },
       ],
     };
 
-    assert.match(describeScoreMovementLine({ tightness: cancelling }, aug31) ?? "", /funding pressure did not change \(\+5 from interest rates and -5 from credit/);
+    assert.match(describeScoreMovementLine({ tightness: cancelling }, aug31) ?? "", /funding pressure did not change \(\+5 from interest rates and -5 from financial-conditions stress/);
   });
 
   it("is written in the page's words, never the engine's", () => {

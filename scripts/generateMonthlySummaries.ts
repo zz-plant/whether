@@ -58,8 +58,8 @@ const writeTimeMachineCache = async ({
 
 const generateMonthlySummaries = async () => {
   const now = new Date();
-  const { datasets, vixDataset } = await fetchArchiveDatasets();
-  const { entries: output, timeMachineEntries, mode } = buildMonthlyArchive({ datasets, vixDataset, now });
+  const { datasets, vixDataset, chicagoFciDataset } = await fetchArchiveDatasets();
+  const { entries: output, timeMachineEntries, mode } = buildMonthlyArchive({ datasets, vixDataset, chicagoFciDataset, now });
 
   await writeSummaryFile({
     path: OUTPUT_PATH,

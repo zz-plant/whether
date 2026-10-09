@@ -10,8 +10,8 @@ import { buildQuarterlyYearlyArchive } from "./regimeArchiveReplay";
 
 const generateQuarterlyAndYearlySummaries = async () => {
   const now = new Date();
-  const { datasets, vixDataset } = await fetchArchiveDatasets();
-  const { quarterlyEntries, yearlyEntries, mode } = buildQuarterlyYearlyArchive({ datasets, vixDataset, now });
+  const { datasets, vixDataset, chicagoFciDataset } = await fetchArchiveDatasets();
+  const { quarterlyEntries, yearlyEntries, mode } = buildQuarterlyYearlyArchive({ datasets, vixDataset, chicagoFciDataset, now });
 
   await writeSummaryArchive({ quarterlyEntries, yearlyEntries, mode });
 };

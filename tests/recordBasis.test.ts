@@ -132,6 +132,7 @@ describe("the record basis", () => {
   it("moves only what the archive scores: every record-basis input has a value at every cached month-end", () => {
     const cacheField: Partial<Record<MacroSeriesId, (entry: ReturnType<typeof getTimeMachineSnapshots>[number]) => unknown>> = {
       VIX_INDEX: (entry) => entry.vix,
+      CHICAGO_FCI: (entry) => entry.chicagoFci,
     };
     const snapshots = getTimeMachineSnapshots();
     assert.ok(snapshots.length >= 176);
