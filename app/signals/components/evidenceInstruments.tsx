@@ -191,7 +191,7 @@ export const SignalsInstrumentsSection = ({
     <div className="px-5 max-sm:px-0">
       <p className="type-eyebrow type-eyebrow-section">Deeper evidence</p>
       <h2 id="instruments-heading" className="mt-1 text-base font-semibold text-slate-100 sm:text-lg">
-        Charts, past months, and the checks that would overturn the guidance.
+        Charts, past months and checks
       </h2>
     </div>
 

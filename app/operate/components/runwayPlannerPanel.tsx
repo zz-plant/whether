@@ -235,8 +235,10 @@ export function RunwayPlannerPanel({
   return (
     <section className="weather-panel-static mt-6 space-y-4 p-6" aria-label="Runway planner">
       <div>
+        {/* No heading of its own: the page's h1 is "Runway planner", and this
+            panel is the page's only content, so an h3 restating it gave the
+            outline the same name twice. */}
         <p className="type-label text-slate-400">Runway and burn</p>
-        <h3 className="text-lg font-semibold text-slate-100">Runway planner</h3>
         <p className="mt-2 text-sm text-slate-300">
           Check your runway plan against this week&apos;s guidance so burn, fundraising timing, and the lines that pause and resume spending stay aligned.
         </p>

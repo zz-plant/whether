@@ -186,7 +186,7 @@ export function RegimeRadar({
           strokeDasharray="3 3"
           strokeWidth="1"
         >
-          <title>{`Funding pressure boundary at ${tightnessThreshold}`}</title>
+          <title>{`Funding pressure change line at ${tightnessThreshold}`}</title>
         </line>
         <line
           x1={boundaryX}
@@ -197,7 +197,7 @@ export function RegimeRadar({
           strokeDasharray="3 3"
           strokeWidth="1"
         >
-          <title>{`Risk appetite boundary at ${riskAppetiteThreshold}`}</title>
+          <title>{`Risk appetite change line at ${riskAppetiteThreshold}`}</title>
         </line>
 
         {/* Boundary outer frame */}
@@ -333,7 +333,9 @@ export function RegimeRadar({
 
       {showDistance || (hasTrail && (trailCaption || caveat)) ? (
         <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
-          {showDistance ? <span className="block">{pointsToBoundary} points to nearest change line</span> : null}
+          {showDistance ? (
+            <span className="block">{`${pointsToBoundary} ${pointsToBoundary === 1 ? "point" : "points"} to the nearest change line`}</span>
+          ) : null}
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
         </figcaption>

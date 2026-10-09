@@ -16,7 +16,7 @@ import { decisionAreaLabel, type DecisionArea } from "../report/boundedDecisionR
  * areas, and threshold focus.
  */
 type AnswerSectionHeadingInput = {
-  audience: string;
+  applyHeading: string;
   mappedDecisionAreas: readonly DecisionArea[];
   thresholdFocus: "tightness" | "risk" | "both";
 };
@@ -39,11 +39,12 @@ export const buildAnswerSectionHeadings = (page: AnswerSectionHeadingInput) => (
   /** Labels the copy button. The same affordance on every page. */
   copy: "Copy this answer",
   /**
-   * The audience is what makes this one unique across the corpus, and it is
-   * also the honest framing: the section shows one call, and who has to act on
-   * it is what a reader is checking.
+   * Written per page (`applyHeading` in content/answers/pages.json). It was
+   * "What this means for {audience}", which named who reads the section rather
+   * than what it answers, and read "What this means for Founders, finance
+   * leaders and board operators" on the climate page.
    */
-  posture: `What this means for ${page.audience}`,
+  posture: page.applyHeading,
   rules: `Rules in force: ${joinAreas(page.mappedDecisionAreas)}`,
   threshold: `What would change this answer: ${THRESHOLD_FOCUS_LABELS[page.thresholdFocus]}`,
   /** Labels the provenance block. The same block on every page. */
