@@ -220,7 +220,7 @@ const AGENT_TOOLS = [
     name: "lint_sprint_goal",
     title: "Lint a sprint goal against today's conditions",
     description:
-      "Takes a sprint goal or story-level plan and says whether it holds, pauses, or needs a reversal guardrail under today's conditions, with the bounded-rule trigger that would fire. A sprint goal is a planned decision at smaller granularity, so this reuses the stress-test engine.",
+      "Takes a sprint goal or story-level plan and says whether it holds, pauses, or needs a written way to undo it under today's conditions, with the pause line that would fire. A sprint goal is a planned decision at smaller granularity, so this reuses the stress-test engine.",
     input: {
       goalText: textInput.describe("The sprint goal or story-level plan in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),

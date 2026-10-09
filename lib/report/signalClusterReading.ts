@@ -196,12 +196,15 @@ const describeDistance = (
   thresholdLabel: string,
   formatter: Intl.NumberFormat = WHOLE,
 ): string => {
-  if (value === null) return `Threshold: ${thresholdLabel}.`;
+  if (value === null) return `Change line: ${thresholdLabel}.`;
 
   const gap = Math.abs(value - threshold);
   if (gap === 0) return `Exactly at ${thresholdLabel}.`;
 
-  return `${formatter.format(gap)}${unit} ${value > threshold ? "above" : "below"} ${thresholdLabel}.`;
+  const amount = formatter.format(gap);
+  /* "1 points below the line" on the risk-appetite watch page (site review, 2026-10-09). */
+  const units = amount === "1" && unit === " points" ? " point" : unit;
+  return `${amount}${units} ${value > threshold ? "above" : "below"} ${thresholdLabel}.`;
 };
 
 /** Zero is the line itself, so it is named for what crossing it means. */
