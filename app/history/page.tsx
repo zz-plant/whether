@@ -17,8 +17,9 @@ import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord, countRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../../lib/formatters";
-import { toWeatherLabel } from "../../lib/regimeLabels";
+import { regimeKeyFromLabel, toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
+import { ConditionIcon } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { HistoryExplorer } from "./historyExplorer";
 import type { Metadata } from "next";
@@ -191,14 +192,20 @@ export default async function HistoryPage({
           <div className="space-y-2">
             <h3 className="type-eyebrow">Each closed year</h3>
             <ul className="flex flex-wrap gap-2">
-              {postureArchiveYears.map((year) => (
-                <li key={year.slug}>
-                  <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill">
-                    {year.title}
-                    <span className="ml-2 text-slate-400">{toWeatherLabel(year.operatorLabel)}</span>
-                  </ActionLink>
-                </li>
-              ))}
+              {postureArchiveYears.map((year) => {
+                const yearRegime = regimeKeyFromLabel(year.operatorLabel);
+                return (
+                  <li key={year.slug}>
+                    <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill">
+                      {year.title}
+                      <span className="ml-2 inline-flex items-center gap-1 text-slate-400">
+                        {yearRegime ? <ConditionIcon regime={yearRegime} /> : null}
+                        {toWeatherLabel(year.operatorLabel)}
+                      </span>
+                    </ActionLink>
+                  </li>
+                );
+              })}
             </ul>
           </div>
           <p className="text-sm text-slate-300">
@@ -246,7 +253,8 @@ export default async function HistoryPage({
                   <p className="text-sm font-semibold text-slate-100 line-clamp-1">{publishedBriefDisplay(brief).headline}</p>
                   <p className="flex items-center justify-between gap-2">
                     <span className="text-fluid-micro tabular-nums text-slate-400">{brief.recordDateLabel}</span>
-                    <Tag tone="slate">{getRegimePublicLabel(brief.regime)}</Tag>
+                    {/* The conditions stamp every page draws: glyph, word and hue. */}
+                    <Tag regime={brief.regime}>{getRegimePublicLabel(brief.regime)}</Tag>
                   </p>
                   <p className="text-fluid-xs text-slate-400 line-clamp-2">{brief.summary}</p>
                 </Link>

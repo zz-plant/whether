@@ -4,8 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
 import { Tag } from "../../components/ui/tag";
+import { ConditionLabel } from "../../components/ui/conceptIcons";
 import { formatNumberWithUnit } from "../../../lib/formatters";
-import type { RegimeKey } from "../../../lib/regimeEngine";
 import { getRegimeWeatherRationale } from "../../../lib/regimePresentation";
 import {
   buildCanonicalUrl,
@@ -48,13 +48,6 @@ export function generateStaticParams() {
 }
 
 const shareFormatter = new Intl.NumberFormat("en-US", { style: "percent", maximumFractionDigits: 0 });
-
-const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
-  EXPANSION: "emerald",
-  VOLATILE: "amber",
-  DEFENSIVE: "sky",
-  SCARCITY: "rose",
-};
 
 /*
  * The search snippet for a period, so it has to say what is particular to it.
@@ -249,7 +242,10 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           period is closed. */}
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div>
-          <Tag tone={regimeTone[period.regime]}>{headlineConditions(period)}</Tag>
+          {/* The conditions stamp, in the regime's own hue and glyph. It took a
+              tone from a table of this page's own, which drew Cloudy in sky (the
+              link colour) and Stormy in amber (Cloudy's hue). */}
+          <Tag regime={period.regime}>{headlineConditions(period)}</Tag>
         </div>
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           Conditions in {period.title}
@@ -301,8 +297,10 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           </p>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.regimeMix.map((share) => (
-              <li key={share.regime} className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="font-semibold text-slate-100">{share.label}</span>
+              <li key={share.regime} className="flex flex-wrap items-center justify-between gap-2">
+                <ConditionLabel regime={share.regime} className="font-semibold text-slate-100">
+                  {toWeatherLabel(share.label)}
+                </ConditionLabel>
                 <span>
                   {shareFormatter.format(share.share / 100)} · {share.periods} of {period.sampleCount}
                 </span>
@@ -317,10 +315,13 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           <h2 className="text-lg font-semibold text-slate-100">Changes in conditions inside {period.title}</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.transitions.map((transition) => (
-              <li key={transition.asOf} className="flex flex-wrap items-baseline gap-2">
+              <li key={transition.asOf} className="flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-slate-100">{transition.dateLabel}</span>
-                <span>
-                  {toWeatherLabel(transition.fromLabel)} → {toWeatherLabel(transition.toLabel)}
+                <span className="inline-flex flex-wrap items-center gap-1.5">
+                  <ConditionLabel regime={transition.from}>{toWeatherLabel(transition.fromLabel)}</ConditionLabel>
+                  <span aria-hidden="true">→</span>
+                  <span className="sr-only">to</span>
+                  <ConditionLabel regime={transition.to}>{toWeatherLabel(transition.toLabel)}</ConditionLabel>
                 </span>
               </li>
             ))}
@@ -405,8 +406,9 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
                   href={buildPostureArchivePath(child.slug)}
                   className="flex min-h-[44px] flex-col gap-1 rounded-lg px-2 py-2 transition-colors hover:bg-slate-800/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                 >
-                  <span className="text-sm font-semibold text-slate-100">
-                    {child.title} — {toWeatherLabel(child.operatorLabel)}
+                  <span className="flex flex-wrap items-center gap-x-1.5 text-sm font-semibold text-slate-100">
+                    {child.title} —{" "}
+                    <ConditionLabel regime={child.regime}>{toWeatherLabel(child.operatorLabel)}</ConditionLabel>
                   </span>
                   <span className="text-sm text-slate-300">{child.guidance}</span>
                 </Link>

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { X } from "lucide-react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { getOrderedRegimeLegend, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
+import { ConditionIcon } from "../ui/conceptIcons";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { formatThresholdNumber } from "../../../lib/formatters";
@@ -121,6 +122,8 @@ export function ConditionsLegend({
           const appetite = side(sides.appetiteAbove, appetiteLine);
           return (
             <span key={entry.regime}>
+              {/* Inline, not a flex pair: the legend is one sentence that wraps. */}
+              <ConditionIcon regime={entry.regime} className="mr-1 inline align-[-3px]" />
               <span className={`font-semibold ${REGIME_STYLE_TOKENS[entry.regime].accent.text}`}>{entry.weather}</span>
               {index === 0
                 ? `: ${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite}`
