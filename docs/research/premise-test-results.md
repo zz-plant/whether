@@ -14,9 +14,9 @@ recomputes it from the committed inputs and fails if a figure moves.
 | **P3.** The record-basis call does at least as well as the live-basis call | **Not testable.** No published weekly brief has an outcome two quarters later yet (n = 0). |
 | **Decision rule** | **No candidate passes. The current ramp stays**, and no switch pull request is opened. |
 
-What the data does show is timing: both scores move with deal count in the same quarter, and the
-relationship fades by the fourth quarter ahead, which is the far end of the window the premise
-names (see "Lead and lag").
+What the data does show is timing: both scores move most closely with deal count in the same
+quarter, and the relationship roughly halves by four quarters ahead and is gone by six. The
+readings describe fundraising as it happens more than they anticipate it (see "Lead and lag").
 
 ## Data
 
@@ -170,8 +170,8 @@ Spearman `ρ(score at s, growth at s+k)`, all quarters with a mature outcome:
 | +6 | 49 | 0.16 | −0.10 | −0.18 | 0.01 |
 | +8 | 47 | 0.28 | −0.06 | −0.28 | −0.10 |
 
-Both scores track deal count most closely in the same quarter and the next one, and the
-relationship has largely gone by four quarters ahead. For deal value, funding pressure turns
+Both scores track deal count most closely in the same quarter and the next one; the correlation
+roughly halves by four quarters ahead and is near zero by six. For deal value, funding pressure turns
 positive from three quarters ahead: the 2023–2024 tight readings were followed by the 2025–2026
 rise in deal value. These are point estimates on overlapping, autocorrelated quarters.
 
