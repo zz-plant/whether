@@ -5,13 +5,18 @@ const strictHtmlChecks = process.env.WHETHER_SMOKE_STRICT_HTML === "1";
 
 const pageChecks = [
   { path: "/", required: ["weekly brief", "share-ready-artifact", "build this week's plan"] },
-  { path: "/evidence", required: ["evidence", "what this means now"] },
+  // "Why it changed" is the page's tab and header name since 2026-10-08; the tab
+  // that read "Evidence" is gone, so the word is no longer a safe marker.
+  { path: "/evidence", required: ["why it changed", "what this means now"] },
   /* "decision help" was asked of /planning here until 2026-10-01; the page stopped
      rendering it on 2026-09-15, so every run since failed on a page that was up.
      The plan-lines step is what /pricing, the Monday email and the homepage picker
      all link to. */
-  { path: "/operate", required: ["weekly plan", "set this plan's lines"] },
-  { path: "/resolve", required: ["resolve", "toolkit-library"] },
+  // "weekly plan" was the planning switcher's first tab; the Decide group's tabs
+  // replaced it on 2026-10-08.
+  { path: "/operate", required: ["decide", "set this plan's lines"] },
+  // Guides took Resolve's direct answers and its toolkit library (2026-10-08).
+  { path: "/resources", required: ["more-tools", "toolkit-library"] },
   { path: "/acceptable-use-policy", required: ["acceptable use"] },
   { path: "/terms-of-service", required: ["terms of service"] },
 ];
@@ -19,6 +24,8 @@ const pageChecks = [
 const redirectChecks = [
   { from: "/learn", to: "/trust" },
   { from: "/planning", to: "/operate" },
+  { from: "/resolve", to: "/operate" },
+  { from: "/answers", to: "/resources" },
 ];
 
 const retiredRouteChecks = ["/templates"];

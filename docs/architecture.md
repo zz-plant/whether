@@ -69,9 +69,9 @@ graph TB
     end
     
     subgraph "App Layer"
-        C1 --> D1[/app/page.tsx - Weekly Brief]
-        C2 --> D2[/signals - Evidence]
-        C3 --> D3[/resolve - Resolve]
+        C1 --> D1[/app/page.tsx - This week]
+        C2 --> D2[/signals - Why it changed]
+        C3 --> D3[/resources - Guides]
         C4 --> D4[/api/* endpoints]
     end
     
@@ -244,16 +244,17 @@ The app layer delivers the outputs of the reasoning system across the primary wo
 
 ```
 app/
-├── page.tsx                          # Homepage (Weekly Brief: /)
-├── operate/                          # Plan workflow (/operate)
-│   └── page.tsx                      # Stepper: Areas, Rules, Test, Lines (live weeks), Finance, Share
-├── signals/                          # Evidence workflow (/signals)
+├── page.tsx                          # This week (/): the weekly brief
+├── operate/                          # Decide (/operate)
+│   └── page.tsx                      # Stepper: Areas, Rules, Test, Lines (live weeks), Finance
+├── signals/                          # Why it changed (/signals), under This week
 │   └── page.tsx                      # Dual-mode sensor array & diagnostics
-├── resolve/                          # Resolve workflow (/resolve)
-│   └── page.tsx                      # Action-first role translation & toolkits
-├── trust/                            # Trust hub (/trust)
+├── resources/                        # Guides (/resources)
+│   └── page.tsx                      # Direct answers and guides by decision area, frameworks, More tools
+├── resolve/[slug]/                   # Help by role or situation (/resolve/<slug>); /resolve itself redirects
+├── trust/                            # How much to trust this week (/trust), under This week
 │   └── page.tsx                      # System status, source board, formula ref
-├── history/                          # Archive & compare (/history)
+├── history/                          # Record (/history), with compare (/history/compare)
 │   └── page.tsx                      # Multi-quarter timeline & board annex export
 ├── api/                              # JSON, agent, and cadence endpoints
 │   ├── weekly/                       # Weekly summary payload

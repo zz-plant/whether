@@ -34,7 +34,53 @@ The brief, report pages, answer pages and share groups use the spacing roles in 
 
 The share page centers its groups in a 72rem column and limits the shared copy preview to 48rem, with equal-width format tabs. Runway labels, timeline status badges and palette help use the metadata type scale; scenario explanations and the budget memo use the readable small-body scale. Timeline month/zoom controls and its drag track retain 44px targets on phones and coarse-pointer tablets, with compact controls available on desktop. These refinements preserve the copied payloads and history navigation behavior.
 
+### 1.0a Four groups: This week, Decide, Record, Guides (2026-10-08)
+
+The header carries four groups, each with a hub, read from one module
+(`navigationGroups` and `navigationPages`, `lib/navigation/informationArchitecture.ts`):
+
+| Group | Hub | Pages (sub-tabs, then secondary links) |
+| --- | --- | --- |
+| This week | `/` | Why it changed (`/signals`), How much to trust this week (`/trust`) |
+| Decide | `/operate` | Runway planner (`/operate/financial`), Scenarios (`/operate/scenarios`), SaaS multiples (`/comps`) |
+| Record | `/history` | Compare periods (`/history/compare`), Calibration (`/calibration`); Product writing (`/concepts`); cross-links to Sources (`/trust#source-board`) and How the scores are built (`/trust#formula-reference`) |
+| Guides | `/resources` | the direct answers and guides by decision area, the frameworks and templates, and More tools |
+
+- **One name per address.** A hub page carries its group's label: the H1 on `/operate` is "Decide"
+  and on `/history` "Record". `/signals` keeps its URL; it is "Why it changed" in the tabs, the
+  breadcrumb and the header sublabel.
+- **Header.** From `md`: the wordmark, the four group tabs (one-key jumps `w`, `d`, `r`, `g`), then
+  the utility links Use it elsewhere (`/share`), Pricing and About in lighter type, then search
+  (⌘K) and theme. There is no More menu. Below `md` the bottom bar carries the four groups and
+  More; More opens a sheet with Search, every group's pages and the utility links
+  (`app/components/MobileTabBar.tsx`, `app/components/globalHeaderNavClient.tsx`).
+- **Sub-tabs.** `SectionTabs` (`app/components/sectionTabs.tsx`) draws the group's pages above the
+  intro on every page of a group with more than one (the report shell takes `page.currentPath`;
+  `/comps`, `/calibration` and `/concepts` render it themselves). It replaced the planning
+  switcher and the "Signals · Conditions · Plan · Share" loop strip beside the intro.
+- **Breadcrumbs** come from `buildGroupBreadcrumbs` (`lib/navigation/breadcrumbs.ts`): the group,
+  the page when it is not the hub, then the caller's crumbs — "This week › Why it changed",
+  "Decide › Runway planner", "Record › Week of …", "Guides › <question>",
+  "Guides › More tools › For CEO". A hub alone gets Home first.
+- **Footer.** The brand column carries the utility links (Use it elsewhere, API & MCP, Pricing,
+  About, Search, RSS); then one column per group, headed by the group's name linking its hub.
+- **Resolve folded in.** `/resolve` 308s to `/operate#ops-decision-shield` (Test a decision); with
+  a `stakeholder`, `stage`, `library` or `toolkitQuery` selection it goes to
+  `/resources#more-tools`, where those views render (`resolveSelectionRedirects`, `next.config.js`).
+  Its direct answers, with this week's standing stamped beside each, are on Guides grouped by
+  decision area; Help by role, Help by situation, the role and stage guides and the toolkit library
+  are Guides' More tools. `/resolve/<slug>` and `/toolkits/<slug>` keep their addresses.
+  `/answers` goes to `/resources#answers`, `/guides/*` to Guides' More tools.
+- **Sharing has one home.** `/share` holds every format, the slide and card clipboard buttons
+  (moved from the brief), the meeting snippet (moved from `/trust`) and the links to API & MCP and
+  RSS. The brief's Do and share, Trust and Decide each carry one "Share or embed this →" link
+  (`app/components/shareOrEmbedLink.tsx`); Decide's Share step is gone. Trust's one-line citation
+  is served by `/share`'s Citation format. A frozen week keeps its date-pinned copy panel.
+- **Discoverability.** The sitemap drops `/resolve` and ranks `/resources` as a hub; `/llms.txt`
+  carries a Site section built from the same groups.
+
 ### 1.0 Rationalized IA (one screen + reachable depth)
+*Superseded for navigation by §1.0a; the route notes below still hold unless §1.0a says otherwise.*
 Primary IA is now a single surface — the **Weekly Brief** — with everything else reachable
 as supporting layers, deep links, or URL-driven states of `/`:
 - `/` — **Weekly Brief**: the canonical posture, decision delta, and share artifact (the product)
@@ -91,8 +137,9 @@ reader asks them (`HOME_SECTIONS` in `lib/report/home/homeSectionModel.ts`; `app
 4. **What would change this guidance** (`WhatWouldChangeSection`): the two score ladders, the
    market move that would cross each change line, and, on a week the guidance moved, what happened
    the last time it moved this way.
-5. **Do and share** (`DoAndShareSection`): the plan as the one primary button, the slide and image
-   copies, subscribe and the browser push alert, and the citable permalink.
+5. **Do and share** (`DoAndShareSection`): the plan as the one primary button, one "Share or embed
+   this →" link to `/share` (which holds the slide and image copies since 2026-10-08), subscribe and
+   the browser push alert, and the citable permalink.
 
 A first visit sees "What are you deciding?" (`DecisionPicker`) under the card, with sections 2 to 5
 folded until "Show the full brief" (§1.1.21, §1.1.42). `StickyCallStrip` carries the guidance from
@@ -1709,8 +1756,7 @@ work-item tags, the pull policies and the role memos. That was about 5,700px on 
 - **Calendar link built in the browser.** "Add a Monday review" is computed from the reader's
   next Monday after hydration, under the meeting pack and the agenda. Building it during server
   render was the page's one hydration mismatch.
-- `/operate`'s "Share the brief" step keeps the rail's four formats
-  (`app/components/briefIslandPicker.tsx`) and links to `/share` for the rest.
+- `/operate` has no share step since 2026-10-08 (§1.0a); it links to `/share` once.
 
 ### 1.1.36 `/operate` opens on the reader's decision, not a copy of the brief (2026-10-06)
 
@@ -2704,14 +2750,13 @@ path plus a highlighted latest point.
 Planning is the detailed execution page behind the brief (`app/operate/planningPageModel.ts`).
 Since 2026-10-07 (§1.1.46) its steps run: This week's rule for each area, Rules before you commit
 and Test a decision (the three open on arrival), Set this plan's lines (§1.1.31; live weeks only,
-and left out when no rule has a numeric line), Finance strategy, and Share the brief, with Risk
-checks ("Warnings to read before you approve") after them. A deep link opens its step without
+and left out when no rule has a numeric line) and Finance strategy, with Risk checks ("Warnings
+to read before you approve") after them; the Share step left on 2026-10-08 (§1.0a). A deep link opens its step without
 closing the others, and retired section hashes map onto the step that replaced them
 (`hashAliases`).
 
-The Share step is the share rail's four formats (`BriefIslandPicker`,
-`app/components/briefIslandPicker.tsx`), with a link to `/share` for email, the meeting pack, role
-memos, the calendar hold and the embed. It no longer carries alert delivery controls, Decision
+The page hands off to `/share` in its next-step card ("Share or embed this →"). It no longer
+carries a share step, alert delivery controls, Decision
 Memory recall (§8.4) or the operator-request list (§1.1.46). The stepper accepts owner and
 approval-state fields, and no step sets them (DD-045). (This paragraph used to describe a
 mixed-literacy translation model on `/operate` — a top-of-page router to decision, evidence, trust
