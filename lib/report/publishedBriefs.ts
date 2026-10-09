@@ -9,6 +9,7 @@
  *
  * Append the current week with `bun run brief:freeze`.
  */
+import { formatWeekMondayUTC } from "../formatters";
 import { weeklyHeadline } from "./reportEvidence";
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
@@ -422,9 +423,12 @@ export const publishedBriefHeadline = (brief: Pick<PublishedBrief, "actionNow" |
     policyOverrideActive: HELD_CALLS.has(brief.summary.trim()),
   });
 
+/** The week's name: its Monday (`formatWeekMondayUTC`), never the record's own weekday. */
+export const publishedBriefWeekLabel = (brief: Pick<PublishedBrief, "recordDate">) => formatWeekMondayUTC(brief.recordDate);
+
 /** The page's `<h1>` and `<title>`; the news sitemap must carry the same words. */
 export const buildPublishedBriefTitle = (brief: PublishedBrief) =>
-  `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
+  `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${publishedBriefWeekLabel(brief)}`;
 
 /* About what a search result shows of a description. */
 const BRIEF_DESCRIPTION_LIMIT = 160;
@@ -453,7 +457,7 @@ const preferredBriefDescription = (brief: PublishedBrief): string | undefined =>
 export const buildPublishedBriefDescription = (brief: PublishedBrief, siblings: readonly PublishedBrief[] = briefs) => {
   const preferred = preferredBriefDescription(brief);
   const shared = siblings.some((other) => other.slug !== brief.slug && preferredBriefDescription(other) === preferred);
-  return preferred !== undefined && !shared ? preferred : `Week of ${brief.recordDateLabel}: ${brief.summary}`;
+  return preferred !== undefined && !shared ? preferred : `Week of ${publishedBriefWeekLabel(brief)}: ${brief.summary}`;
 };
 
 /**
@@ -464,7 +468,7 @@ export const buildPublishedBriefDescription = (brief: PublishedBrief, siblings: 
  */
 export const buildPublishedBriefImageParams = (brief: PublishedBrief) => ({
   template: "brief-chart",
-  week: brief.recordDateLabel,
+  week: publishedBriefWeekLabel(brief),
   posture: publishedBriefDisplay(brief).conditions,
   regime: brief.regime,
 });
@@ -631,7 +635,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
 
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
-    `Whether Leadership Update — Week of ${brief.recordDateLabel}`,
+    `Whether Leadership Update — Week of ${publishedBriefWeekLabel(brief)}`,
     "",
     `Conditions: ${display.conditions}`,
     `Margin: ${display.confidence.toLowerCase()}`,

@@ -85,6 +85,6 @@ describe("screenshot caption", () => {
     assert.match(captions[0], /(^|\s)sm:hidden(\s|$)/);
     assert.ok(html.indexOf("data-screenshot-caption") < html.indexOf("<h1"), "the phone caption sits on the status row");
     assert.match(captions[1], /max-sm:hidden/);
-    assert.match(html, /<span class="max-sm:hidden">Signals refreshed/, "the refresh stamp is a desktop line");
+    assert.match(html, /<span class="max-sm:hidden">Checked /, "the checked stamp is a desktop line");
   });
 });

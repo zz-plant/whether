@@ -210,7 +210,7 @@ describe("published brief date-pinned exports", () => {
     assert.ok(july30Brief);
     const email = buildPublishedBriefEmailUpdate(july30Brief);
 
-    assert.match(email, /Whether Leadership Update — Week of Jul 30, 2026/);
+    assert.match(email, /Whether Leadership Update — Week of Jul 27, 2026/, "the week by its Monday");
     assert.match(email, /Conditions: (Sunny|Cloudy|Stormy|Freezing)\n/);
     assert.match(email, /^Margin: within reach of the line$/m);
     assert.match(email, /^• Guidance: Conditions are tightening\. Keep expansion selective/m);

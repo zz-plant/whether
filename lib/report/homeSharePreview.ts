@@ -1,5 +1,6 @@
 import type { RegimeKey } from "../regimeEngine";
 import { weeklyHeadline } from "./reportEvidence";
+import { formatWeekMondayUTC } from "../formatters";
 import { getRegimeWeatherRationale } from "../regimePresentation";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { fitMovementHeadline } from "./decisionMovement";
@@ -160,7 +161,9 @@ export const loadHomeSharePreview = async (
 
   const sharePath = buildHomeSharePath(searchParams);
   const imageUrl = buildOgImageUrl(buildImageParams(searchParams));
-  const weekLabel = reportData.weeklyRecordDateLabel;
+  /* The week by its Monday, the name every surface gives it; the card said
+     "Week ending" the Friday after the reading. */
+  const weekLabel = formatWeekMondayUTC(reportData.treasury.record_date);
   const statusLabel = weeklyDecisionCardModel.status.statusLabel;
   const contextLabel = notLiveReadingLabel({
     historicalBanner: reportData.historicalSelection?.banner ?? null,

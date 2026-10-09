@@ -31,7 +31,7 @@ export function SignalReadingPanel({
         <h2 id="signal-reading-heading" className="type-eyebrow type-eyebrow-section">
           {reading.measure} · this week
         </h2>
-        <p className="text-xs text-slate-500">As of {recordDateLabel}</p>
+        <p className="text-xs text-slate-500">Data as of {recordDateLabel}</p>
       </div>
 
       {hasValue ? (

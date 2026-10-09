@@ -63,7 +63,7 @@ export function CommandCenterNavBlock({
     // Interpolated only when there is a date. `As of ${x}` is a truthy string
     // even when x is "", so the filter below could never drop it, and a caller
     // passing no record date printed a bare "As of" with nothing after it.
-    !trustStrip && recordDateLabel ? `As of ${recordDateLabel}` : null,
+    !trustStrip && recordDateLabel ? `Data as of ${recordDateLabel}` : null,
     showOfflineBadge ? offlineBadgeLabel : null,
   ]
     .filter(Boolean)
@@ -161,11 +161,12 @@ export function CommandCenterNavBlock({
                 rather than adding one, so the first task block does not move.
                 On a phone with a status word the caption is beside it instead. */}
             <div className={`flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right ${stampRowOnPhone ? "" : "max-sm:hidden"}`.trim()}>
-                {/* "Signals refreshed", not "Updated": two dates print inside
-                    one viewport (this and "As of" above), and the reader has
-                    to be able to tell the pipeline's fetch from the reading's
-                    record date apart. */}
-                {fetchedAtLabel ? <span className="max-sm:hidden">Signals refreshed {fetchedAtLabel}</span> : null}
+                {/* Two dates print inside one viewport, so each says what it
+                    is: the strip's "Data as of" is the reading the guidance
+                    rests on, and this is when the sources were last checked
+                    (2026-10-09; it read "Signals refreshed", which did not say
+                    which of the two mattered). */}
+                {fetchedAtLabel ? <span className="max-sm:hidden">Checked {fetchedAtLabel}</span> : null}
                 {resolvedNextRefreshLabel ? (
                   <span>{resolvedNextRefreshLabel}</span>
                 ) : null}

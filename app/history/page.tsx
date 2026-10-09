@@ -12,7 +12,7 @@ import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordBody } from "../components/his
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
@@ -169,7 +169,7 @@ export default async function HistoryPage({
           <h2 id="call-by-month-heading" className="text-xl font-semibold text-white sm:text-2xl">Conditions by month</h2>
           {weekAfterRecord ? (
             <p className="text-sm text-slate-300">
-              Since the last month-end, the week of {weekAfterRecord.recordDateLabel} was published as{" "}
+              Since the last month-end, the week of {publishedBriefWeekLabel(weekAfterRecord)} was published as{" "}
               <span className="font-semibold text-white">{publishedBriefDisplay(weekAfterRecord).conditions}</span>.{" "}
               <ActionLink href={buildPublishedBriefPath(weekAfterRecord.slug)} variant="inline">
                 Read that week

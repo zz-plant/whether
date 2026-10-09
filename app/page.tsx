@@ -24,7 +24,7 @@ import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
-import { formatDateUTC } from "../lib/formatters";
+import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { buildChangedLead } from "../lib/report/decisionMovement";
@@ -200,6 +200,9 @@ async function PageContent({
     ? runwayScopedAdjustment.thresholdEmphasis
     : undefined;
 
+  /* The week by its Monday, as the frozen brief and every share name it. The
+     reading's own date (often a Wednesday) is the trust strip's "Data as of". */
+  const weekOfLabel = `Week of ${formatWeekMondayUTC(reportData.treasury.record_date)}`;
   const asOfDate = timeMachineRequest
     ? resolveHistoricalDate(timeMachineRequest.year, timeMachineRequest.month)
     : null;
@@ -534,7 +537,7 @@ async function PageContent({
                     filtered chart, not a filtered calendar. Passing the aligned
                     series here removed every period after the archived month. */}
                 <TimeMachineCalendarPicker
-                  currentDateLabel={cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
+                  currentDateLabel={cadenceTitle ?? weekOfLabel}
                   isHistorical={Boolean(historicalSelection)}
                   history={regimeHistory}
                 />
@@ -594,7 +597,7 @@ async function PageContent({
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
                 trust={historicalSelection ? null : trustStripProps}
-                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}` : undefined}
+                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? weekOfLabel}` : undefined}
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
                   today; combining it with an archived regime would date the

@@ -26,6 +26,7 @@ import {
   labelForArea,
   publishedBriefDisplay,
   publishedBriefHeadline,
+  publishedBriefWeekLabel,
   publishedBriefStaticParams,
   type PublishedBrief,
   type PublishedRuleLine,
@@ -80,7 +81,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     title: briefTitle(brief),
     description: buildPublishedBriefDescription(brief),
     path: buildPublishedBriefPath(brief.slug),
-    imageAlt: `Whether's guidance for the week of ${brief.recordDateLabel}`,
+    imageAlt: `Whether's guidance for the week of ${publishedBriefWeekLabel(brief)}`,
     imageParams: buildPublishedBriefImageParams(brief),
   });
 
@@ -160,7 +161,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         items={[
           { label: "Home", href: "/" },
           { label: "History", href: "/history" },
-          { label: `Week of ${brief.recordDateLabel}` },
+          { label: `Week of ${publishedBriefWeekLabel(brief)}` },
         ]}
       />
 
@@ -188,7 +189,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
           ]}
           trust={null}
-          captionDetail={`Week of ${brief.recordDateLabel} · Margin: ${display.confidence.toLowerCase()}`}
+          captionDetail={`Week of ${publishedBriefWeekLabel(brief)} · Margin: ${display.confidence.toLowerCase()}`}
         />
 
         <header className="space-y-3">
@@ -228,7 +229,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         </section>
 
         <PublishedBriefCopyControls
-          recordDateLabel={brief.recordDateLabel}
+          weekLabel={publishedBriefWeekLabel(brief)}
           slackUpdate={slackUpdate}
           emailUpdate={emailUpdate}
           permanentUrl={canonicalUrl}
@@ -413,12 +414,12 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         <nav aria-label="Adjacent weeks" className="flex flex-wrap gap-2">
           {previous ? (
             <ActionLink href={buildPublishedBriefPath(previous.slug)} variant="ghost">
-              ← Week of {previous.recordDateLabel}
+              ← Week of {publishedBriefWeekLabel(previous)}
             </ActionLink>
           ) : null}
           {next ? (
             <ActionLink href={buildPublishedBriefPath(next.slug)} variant="ghost">
-              Week of {next.recordDateLabel} →
+              Week of {publishedBriefWeekLabel(next)} →
             </ActionLink>
           ) : null}
         </nav>

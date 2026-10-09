@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { publishedBriefWeekLabel } from "../lib/report/publishedBriefs";
 import { describe, it } from "bun:test";
 
 import { generateMetadata as scenarioMetadata } from "../app/signals/[cluster]/[decision-scenario]/page";
@@ -47,9 +48,9 @@ describe("search snippets", () => {
 
   it("leads with the week's date when two weeks would say the same thing", () => {
     const [latest] = getPublishedBriefs();
-    const twin = { ...latest, slug: "2099-w01", recordDateLabel: "Jan 5, 2099" };
+    const twin = { ...latest, slug: "2099-w01", recordDate: "2099-01-07", recordDateLabel: "Jan 7, 2099" };
     const pair = [latest, twin];
-    assert.equal(buildPublishedBriefDescription(latest, pair), `Week of ${latest.recordDateLabel}: ${latest.summary}`);
+    assert.equal(buildPublishedBriefDescription(latest, pair), `Week of ${publishedBriefWeekLabel(latest)}: ${latest.summary}`);
     assert.equal(buildPublishedBriefDescription(twin, pair), `Week of Jan 5, 2099: ${latest.summary}`);
   });
 });

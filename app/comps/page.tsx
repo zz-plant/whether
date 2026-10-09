@@ -159,7 +159,7 @@ export default async function CompsPage() {
         <section className="weather-surface space-y-2 px-4 py-4">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
             <h2 className="type-eyebrow text-slate-400">Against this week&apos;s guidance</h2>
-            <p className="text-xs text-slate-500">As of {reportData.recordDateLabel}</p>
+            <p className="text-xs text-slate-500">Data as of {reportData.recordDateLabel}</p>
           </div>
           <dl className="space-y-1.5 text-sm text-slate-200">
             <div className="flex flex-wrap gap-x-2">

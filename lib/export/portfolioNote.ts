@@ -1,7 +1,7 @@
 import type { BriefDocument } from "../report/briefArtifact";
 import { decisionAreaLabel, type DecisionArea } from "../report/boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { formatDateUTC, formatThresholdNumber } from "../formatters";
+import { formatThresholdNumber, formatWeekMondayUTC } from "../formatters";
 import { signalReadingMeaning } from "../report/signalTranslations";
 import { formatDocumentMargin, formatSourceFooter } from "./exportTerms";
 import { buildCanonicalUrl } from "../seo";
@@ -66,7 +66,7 @@ export const buildPortfolioNote = (document: BriefDocument, areas: readonly Port
   });
 
   return [
-    `For the companies we back: this week's funding climate, from Whether (week of ${formatDateUTC(document.provenance.recordDate)}).`,
+    `For the companies we back: this week's funding climate, from Whether (week of ${formatWeekMondayUTC(document.provenance.recordDate)}).`,
     "",
     `Conditions: ${document.conditions.line}. ${confidence}.`,
     `Funding pressure is ${formatThresholdNumber(tightness)} of 100 (${signalReadingMeaning("tightness", tightness)}); risk appetite is ${formatThresholdNumber(riskAppetite)} of 100 (${signalReadingMeaning("riskAppetite", riskAppetite)}).`,

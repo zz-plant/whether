@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { formatWeekMondayUTC } from "../../lib/formatters";
 import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
@@ -347,7 +348,9 @@ export default async function SharePage() {
           <div className="max-w-2xl space-y-2">
             {/* The week, where the kicker read "Current weekly artifact" — the
                 product's internal noun for what a reader calls the brief. */}
-            <p className="type-eyebrow type-eyebrow-section">Week of {artifact.recordDateLabel}</p>
+            <p className="type-eyebrow type-eyebrow-section">
+              Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
+            </p>
             <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
             <p className="text-sm leading-relaxed text-white/60">
               Paste it into Slack, a meeting doc, a ticket or a letter. Every format carries the same

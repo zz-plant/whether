@@ -150,7 +150,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
         {/* The week-ending Friday (`formatWeekEndingUTC`), not the record date: printed
             bare, a Monday card read "Sep 25" two days before it, which looked like a
             reading from the future. */}
-        <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED }}>{`Week ending ${preview.weekLabel}`}</div>
+        <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED }}>{`Week of ${preview.weekLabel}`}</div>
       </div>
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 26 }}>

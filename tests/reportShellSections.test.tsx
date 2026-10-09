@@ -51,11 +51,11 @@ describe("ReportShell extracted sections", () => {
     // ink, at the reading's own size; the trust headline and the record date
     // follow it in the meta half of the same line.
     assert.match(html, /text-\[color:var\(--regime-ink\)\]">DEFENSIVE<\/span>/);
-    assert.match(html, /HIGH • As of Mar 5/);
+    assert.match(html, /HIGH • Data as of Mar 5/);
     assert.match(html, /Decision summary/);
     // The refresh stamp is labelled for what it is — the pipeline's fetch,
     // distinct from the reading's record date in the status line above.
-    assert.match(html, /Signals refreshed Mar 6/);
+    assert.match(html, /Checked Mar 6/);
     assert.match(html, /Start/);
     assert.match(html, /Export/);
   });
@@ -77,7 +77,7 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.doesNotMatch(html, /Updated/);
-    assert.match(html, /As of Jul 31, 2026/);
+    assert.match(html, /Data as of Jul 31, 2026/);
   });
 
   it("renders no hero button unless a route asks for one", () => {
