@@ -13,7 +13,6 @@ import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibrat
 import { countRecord } from "../../lib/report/trackRecord";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { formatMonthYearShortFromValue } from "../../lib/formatters";
-import { CalibrationCurveGlyph } from "../components/illustrations/CalibrationCurveGlyph";
 import { SectionTabs } from "../components/sectionTabs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 
@@ -63,7 +62,6 @@ export default function CalibrationPage() {
       <SecondaryPageHeader
         title="Margin calibration study"
         description={`The published margin, checked against ${totals.months} month-to-month comparisons since 2012: how often conditions held at each distance from the line where they change.`}
-        aside={<CalibrationCurveGlyph size={64} />}
       />
 
       <ConfidenceRecordSection />

@@ -288,11 +288,6 @@ a.weather-hub-link-card:hover {
   padding: 0;
 }
 
-.weather-secondary-header-layout {
-  display: grid;
-  gap: var(--layout-content-gap);
-}
-
 .weather-secondary-heading {
   display: grid;
   gap: 16px;
@@ -328,10 +323,6 @@ a.weather-hub-link-card:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-}
-
-.weather-secondary-aside {
-  min-width: 0;
 }
 
 .weather-secondary-section {
@@ -502,14 +493,6 @@ html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba
 @layer components {
   .weather-panel {
     padding: var(--space-lg) var(--space-lg);
-  }
-}
-
-@media (min-width: 1024px) {
-
-  .weather-secondary-header-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
-    align-items: start;
   }
 }
 

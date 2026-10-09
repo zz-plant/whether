@@ -20,7 +20,6 @@ import {
   type SaaSValuationSnapshot,
 } from "../../lib/saasMultiples";
 
-import { ValuationMultiplesGlyph } from "../components/illustrations/ValuationMultiplesGlyph";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -125,7 +124,6 @@ export default async function CompsPage() {
               SaaS companies.
             </p>
           </div>
-          <ValuationMultiplesGlyph size={64} className="self-start sm:self-center" />
         </div>
 
         {comps.status === "ok" ? (

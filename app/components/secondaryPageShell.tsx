@@ -5,7 +5,6 @@ type SecondaryPageHeaderProps = {
   title: string;
   description?: string;
   actions?: ReactNode;
-  aside?: ReactNode;
 };
 
 type SecondaryPageSectionProps = {
@@ -24,18 +23,14 @@ export function SecondaryPageHeader({
   title,
   description,
   actions,
-  aside,
 }: SecondaryPageHeaderProps) {
   return (
     <section className="weather-panel weather-secondary-header">
-      <div className="weather-secondary-header-layout">
-        <div className="weather-secondary-heading">
-          {eyebrow ? <p className="weather-secondary-eyebrow">{eyebrow}</p> : null}
-          <h1 className="weather-secondary-title">{title}</h1>
-          {description ? <p className="weather-secondary-description">{description}</p> : null}
-          {actions ? <div className="weather-secondary-actions">{actions}</div> : null}
-        </div>
-        {aside ? <div className="weather-secondary-aside">{aside}</div> : null}
+      <div className="weather-secondary-heading">
+        {eyebrow ? <p className="weather-secondary-eyebrow">{eyebrow}</p> : null}
+        <h1 className="weather-secondary-title">{title}</h1>
+        {description ? <p className="weather-secondary-description">{description}</p> : null}
+        {actions ? <div className="weather-secondary-actions">{actions}</div> : null}
       </div>
     </section>
   );

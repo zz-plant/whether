@@ -6,7 +6,6 @@ import {
   SecondaryPageSection,
 } from "../components/secondaryPageShell";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
-import { DecisionShieldGlyph } from "../components/illustrations/DecisionShieldGlyph";
 import { DecisionRecordPanel } from "./decisionRecordPanel";
 import { DecisionRecordDownloads } from "./decisionRecordDownloads";
 import { ContentPageShell } from "../components/ui/contentPageShell";
@@ -49,19 +48,12 @@ export default async function DecisionsPage() {
   const scores = reportData.assessment.scores;
   return (
     <ContentPageShell measure="wide">
+      {/* No kicker and no emblem card (2026-10-09). "Your decisions" restated the
+          title under it, and the card beside it ("Stored in this browser only")
+          said what the first section's description says in full. */}
       <SecondaryPageHeader
-        eyebrow="Your decisions"
         title="Your decision record"
         description="Every decision you recorded, checked against this week's reading. A decision is only as good as the conditions it assumed, so this page tells you which of those have moved."
-        aside={(
-          <div className="weather-surface flex items-center gap-3.5 px-4 py-3.5">
-            <DecisionShieldGlyph size={44} />
-            <div className="space-y-0.5 text-xs text-slate-300">
-              <p className="font-semibold text-slate-100">Your decision log</p>
-              <p className="text-fluid-nano text-slate-400">Stored in this browser only. Not linked to you.</p>
-            </div>
-          </div>
-        )}
       />
       <SecondaryPageSection
         title="Recorded from this browser"
