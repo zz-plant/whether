@@ -9,6 +9,7 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { buildScoreReferenceLines } from "./scoreReference";
 import { describeConditions, formatExportConfidence, formatSourceFooter } from "./exportTerms";
+import { fitLines, wrappedLines } from "../image/textFit";
 
 /*
  * The slide's three slot labels are the page's. `callChangesIf` carries the
@@ -192,6 +193,17 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
 `.trim();
 }
 
+/** A decision card's text area: the 1040px card less 32px of padding on each side. */
+const CARD_TEXT_WIDTH = 976;
+/**
+ * Per-character widths for the slide's system sans, set above what it measures on
+ * this copy. It runs wider than the Archivo faces `lib/image/textFit.ts` was measured
+ * on: the 92-character call drawn at 20px/700 overran the card (2026-10-09), which puts
+ * the bold average above 0.53em.
+ */
+const SLIDE_BOLD_EM = 0.56;
+const SLIDE_TEXT_EM = 0.53;
+
 /**
  * Generates a standalone 16:9 1200x675 SVG presentation slide
  */
@@ -202,6 +214,27 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   // Escape XML entities
   const esc = (text: string) =>
     text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+
+  // SVG text does not wrap, so a card's line is wrapped here: at most two lines, one
+  // size smaller at a time before anything is cut, and a cut ends at a word.
+  const cardBody = (text: string, size: number, weight: number, fill: string): string => {
+    const em = weight >= 700 ? SLIDE_BOLD_EM : SLIDE_TEXT_EM;
+    let fontSize = size;
+    let lines = wrappedLines(text, fontSize, CARD_TEXT_WIDTH, em);
+    while (lines.length > 2 && fontSize > size - 3) {
+      fontSize -= 1;
+      lines = wrappedLines(text, fontSize, CARD_TEXT_WIDTH, em);
+    }
+    if (lines.length > 2) {
+      lines = wrappedLines(fitLines(text, fontSize, CARD_TEXT_WIDTH, em, 2), fontSize, CARD_TEXT_WIDTH, em).slice(0, 2);
+    }
+    const lineHeight = Math.round(fontSize * 1.3);
+    const firstBaseline = lines.length === 1 ? 72 : 62;
+    const spans = lines
+      .map((line, index) => `<tspan x="32"${index === 0 ? "" : ` dy="${lineHeight}"`}>${esc(line)}</tspan>`)
+      .join("");
+    return `<text x="32" y="${firstBaseline}" font-family="-apple-system, system-ui, sans-serif" font-size="${fontSize}" font-weight="${weight}" fill="${fill}">${spans}</text>`;
+  };
 
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
   <defs>
@@ -241,7 +274,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#38bdf8"/>
     <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#38bdf8" letter-spacing="1.5">1. ${SLIDE_LABELS.action.toUpperCase()}</text>
-    <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="20" font-weight="700" fill="#ffffff">${esc(payload.actionNow)}</text>
+    ${cardBody(payload.actionNow, 20, 700, "#ffffff")}
   </g>
 
   <!-- Card 2: Pause If -->
@@ -249,7 +282,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#f59e0b"/>
     <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. ${SLIDE_LABELS.pause.toUpperCase()}</text>
-    <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.pauseIf)}</text>
+    ${cardBody(payload.pauseIf, 18, 500, "#cbd5e1")}
   </g>
 
   <!-- Card 3: Call changes if -->
@@ -257,7 +290,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
     <rect width="6" height="110" rx="3" fill="#10b981"/>
     <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. ${SLIDE_LABELS.callChange.toUpperCase()}</text>
-    <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.callChangesIf)}</text>
+    ${cardBody(payload.callChangesIf, 18, 500, "#cbd5e1")}
   </g>
 
   <!-- Footer: each score against its line, then the margin -->

@@ -126,7 +126,7 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    only: Sunny, Cloudy, Stormy and Freezing by funding pressure above or below its change line and
    risk appetite above or below its, linked to the method. From `md` up the card's conditions map is
    the definition (each change line's value at its end, "How they are set" under it), so the legend
-   gives way to it (§1.1.62). It replaced the standfirst and the folded "How to read this page".
+   gives way to it (§1.1.63). It replaced the standfirst and the folded "How to read this page".
    Dismissible; the layout hides it for a browser that has rendered the brief before. The week
    picker above the card names the week by its Monday and is a label, not a heading.
 1. **The verdict** (`#weekly-call`). `DecisionHero` is the card a reader screenshots: the conditions
@@ -2866,7 +2866,20 @@ beside every glyph on the shared components and the routes that render offline, 
 imports a concept glyph or reads a mapping outside the shared components, and that the text
 artifacts carry no icon markup.
 
-### 1.1.62 One place per fact (2026-10-09)
+### 1.1.62 The meeting slide's cards wrap their text (2026-10-09)
+
+The SVG meeting slide (`formatMeetingSlideSvg`, `lib/export/meetingSlideExport.ts`) drew each
+decision card's line as one SVG `<text>`, which does not wrap. After §1.1.60 made the headline the
+week's concrete call, the 92-character call ran past its card ("…hires that bring in revenu"), and
+the rule lines' new reading sentence put "Pause if" near the edge too. Each card's text now wraps
+onto at most two lines with `wrappedLines` from `lib/image/textFit.ts`, steps down one size at a time
+(up to three) before anything is cut, and cuts at a word with an ellipsis as a last resort. The
+slide's system sans runs wider than the Archivo faces `textFit` was measured on, so the slide uses
+its own, higher per-character widths (0.56em bold, 0.53em regular). The PPTX deck's text boxes wrap
+natively and are unchanged. `tests/meetingSlideExport.test.ts` pins a two-line call, a one-line
+call and the cut.
+
+### 1.1.63 One place per fact (2026-10-09)
 
 Each fact prints once per page, in its most useful form: a chart or a bar over a sentence that
 restates it, a control over a sentence describing its state. A summary followed by its detail stays

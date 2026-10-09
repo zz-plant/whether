@@ -416,7 +416,7 @@ Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
 - **Draw each encoding once.** A fact already carried by position and a key does not also need a
   box, a hue and a case. When a block has a border *and* a coloured heading *and* capitals, pick
   one.
-- **Print each fact once per page** (2026-10-09, `docs/feature-specs-current.md` §1.1.62). A fact
+- **Print each fact once per page** (2026-10-09, `docs/feature-specs-current.md` §1.1.63). A fact
   restated in another element at the same level of detail is clutter: a sentence over the control
   that shows the same selection, a banner over the section that says it, a score in five places.
   Keep the richer form (a chart or bar over a sentence, a control over a sentence describing its
