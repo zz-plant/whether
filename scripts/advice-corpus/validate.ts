@@ -3,6 +3,7 @@
  * Stage 5: validation (pre-registration §7).
  *
  *   bun run advice-corpus:validate -- --sample     # draw the 160 and write each one's model input, blind
+ *   bun run advice-corpus:validate -- --fresh      # after a rubric revision: 50 more, none of the 160 (D4)
  *   bun run advice-corpus:validate -- --score      # agreement between the hand labels and the model
  *   bun run advice-corpus:validate -- --spotcheck  # the 40-post audit file for the owner
  *
@@ -52,6 +53,18 @@ export function drawValidationSample(posts: readonly PostEntry[], seed = SEEDS.v
     source: entry.post.source,
     stratum: entry.stratum,
   }));
+}
+
+const FRESH_PATH = join(CACHE.validation, "fresh.json");
+const FreshSchema = z.array(z.object({ vid: z.string(), id: z.string(), source: z.string() }));
+export const FRESH_SEED = 20261013;
+
+/** D4's check on the revision: 50 classified posts at random, none of them in the first 160. */
+export function drawFreshSample(posts: readonly PostEntry[], exclude: ReadonlySet<string>, seed = FRESH_SEED) {
+  const pool = [...posts].sort((a, b) => a.id.localeCompare(b.id)).filter((post) => !exclude.has(post.id));
+  return shuffled(pool, seededRandom(seed))
+    .slice(0, 50)
+    .map((post, index) => ({ vid: `F${String(index + 1).padStart(3, "0")}`, id: post.id, source: post.source }));
 }
 
 const HandLabelSchema = z.object({
@@ -116,6 +129,14 @@ function score() {
     const model = byId.get(item.id);
     if (label && model) pairs.push({ stratum: item.stratum, hand: label, model });
   }
+  const freshPairs: Pair[] = [];
+  if (existsSync(FRESH_PATH)) {
+    for (const item of FreshSchema.parse(JSON.parse(readFileSync(FRESH_PATH, "utf8")))) {
+      const label = hand.get(item.vid);
+      const model = byId.get(item.id);
+      if (label && model) freshPairs.push({ stratum: "fresh", hand: label, model });
+    }
+  }
   const report = (subset: Pair[], name: string) => {
     const stance = cohensKappa(subset.map((pair) => pair.hand.stance), subset.map((pair) => pair.model.stance));
     const capital = cohensKappa(subset.map((pair) => pair.hand.capital_relevant), subset.map((pair) => String(pair.model.capitalRelevant)));
@@ -126,13 +147,17 @@ function score() {
   };
   const all = report(pairs, "all");
   const randomOnly = report(pairs.filter((pair) => pair.stratum.startsWith("random")), "random 100");
+  const fresh = freshPairs.length > 0 ? report(freshPairs, "fresh 50") : null;
   const stances = ["expand", "conserve", "craft", "none"] as const;
   const matrix = confusionMatrix(pairs.map((pair) => pair.hand.stance), pairs.map((pair) => pair.model.stance), stances);
   const handNonCandidates = pairs.filter((pair) => pair.stratum === "random-sample");
   const sampledPosts = postsFile.posts.filter((post) => post.prefilter === "sample");
   const result = {
+    promptVersion: postsFile.promptVersion,
     all,
     randomOnly,
+    fresh,
+    freshStanceConfusion: confusionMatrix(freshPairs.map((pair) => pair.hand.stance), freshPairs.map((pair) => pair.model.stance), stances),
     stanceConfusion: { rows: "hand", columns: "model", categories: stances, matrix },
     capitalConfusion: confusionMatrix(pairs.map((pair) => pair.hand.capital_relevant), pairs.map((pair) => String(pair.model.capitalRelevant)), ["true", "false"]),
     prefilterMiss: {
@@ -162,6 +187,20 @@ function main() {
     }
     writeFileSync(SAMPLE_PATH, JSON.stringify(sample, null, 1));
     console.log(`[validate] ${sample.length} items in ${itemsDirectory}`);
+    return;
+  }
+  if (args.includes("--fresh")) {
+    const postsFile = readPostsFile();
+    const first = new Set(SampleSchema.parse(JSON.parse(readFileSync(SAMPLE_PATH, "utf8"))).map((item) => item.id));
+    const fresh = drawFreshSample(postsFile.posts, first);
+    const itemsDirectory = join(CACHE.validation, "items");
+    mkdirSync(itemsDirectory, { recursive: true });
+    for (const item of fresh) {
+      const post = readPost(item.source, item.id);
+      writeFileSync(join(itemsDirectory, `${item.vid}.txt`), buildClassifierInput(post.title, post.text));
+    }
+    writeFileSync(FRESH_PATH, JSON.stringify(fresh, null, 1));
+    console.log(`[validate] ${fresh.length} fresh items in ${itemsDirectory}`);
     return;
   }
   if (args.includes("--score")) {

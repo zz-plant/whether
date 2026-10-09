@@ -4,14 +4,15 @@
  * The validation hand labels follow the same rubric, so the two are comparable.
  *
  * PROMPT_VERSION changes whenever a word of the prompt changes; a label records the version
- * it was made under.
+ * it was made under. `advice-v1` was registered first; `advice-v2` replaced it after the
+ * validation (pre-registration §11, D4), and every post was labelled again under it.
  */
 import { z } from "zod";
 
 import { ADVICE_STANCES } from "../../lib/adviceStance";
 import { HEAD_WORDS, SNIPPET_WORDS, SNIPPETS } from "./paths";
 
-export const PROMPT_VERSION = "advice-v1";
+export const PROMPT_VERSION = "advice-v2";
 
 export const STANCES = ["expand", "conserve", "craft", "none"] as const;
 export const AUDIENCES = ["founders", "lps", "general"] as const;
@@ -149,25 +150,26 @@ export const SYSTEM_PROMPT = [
   "You label blog posts and essays written by venture investors. Read the post and answer with one JSON object.",
   "",
   "Fields:",
-  "- capital_relevant (boolean): true when a substantial part of the post (its main point, or at least a full paragraph) is about money decisions at a startup or the market for startup capital: fundraising timing, amount, valuation or terms; burn, runway or spending; hiring pace or headcount; growth targets against efficiency; profitability; layoffs; venture or public markets as they bear on startups. False for product, culture, management, technology theses, policy or personal posts that do not dwell on money.",
+  "- capital_relevant (boolean): true when a substantial part of the post (its main point, or at least a full paragraph) is about money at a startup or the market for startup capital: fundraising timing, amount, valuation or terms (term sheets, SAFEs, pro rata, dilution, option pools); burn, runway or spending, including benchmarks of what to spend; hiring pace, headcount or compensation; growth targets against efficiency; profitability; layoffs; venture or public markets as they bear on startups. This field is independent of the stance: a craft post on how to run a fundraise, a spending benchmark, a term-sheet explainer or a post of venture-market data that prescribes nothing is still capital_relevant. False for posts that do not spend a paragraph on money.",
   "- audience: \"founders\" when the post is addressed to founders, operators, executives, portfolio companies or startup employees; \"lps\" when it is addressed to investors (limited partners, fund managers, other VCs) or is about running or investing in funds; \"general\" when it is for the public, policymakers or readers at large.",
   "- stance: what the post tells founders to do about their company. Advice about personal life, possessions or personal finances is none.",
   `  - "expand": ${definition("expand")}`,
   `  - "conserve": ${definition("conserve")}`,
   `  - "craft": ${definition("craft")}`,
-  "  - \"none\": gives founders no advice at all: news, portfolio or hiring announcements, market or policy commentary that prescribes nothing, personal essays, or advice only for investors.",
+  "  - \"none\": gives founders no advice at all: news, portfolio or hiring announcements, a company's results, market or policy commentary that prescribes nothing, personal essays, or advice only for investors.",
   "- metrics_named: the business metrics the post explicitly mentions, from this list only: " + METRIC_KEYS.join(", ") + ". Most posts mention none or one or two; never list a metric the text does not mention. Use [] when it names none.",
   "- evidence: a verbatim quote from the post of at most 15 words that best supports the stance. Use \"\" when the stance is none.",
   "- confidence: \"high\", \"medium\" or \"low\": how sure you are of the stance.",
   "",
   "Rules for the stance:",
-  "1. Judge what the post tells founders to do, not what it describes. A post that only reports that valuations fell is none unless it says what to do about it.",
-  "2. Raising money: raising to accelerate, or raising as much as possible while money is easy, is expand; raising to extend runway or survive is conserve; how to run a raise (pitching, process, terms) is craft.",
-  "3. Hiring: hiring ahead or faster is expand; freezing, slowing or cutting is conserve; how to interview, recruit or onboard is craft.",
-  "4. If the post weighs both directions, choose the one it recommends on balance. A framework or checklist takes the direction it serves: one for cutting burn or extending runway is conserve, one for accelerating is expand. Only a post that recommends neither direction and offers a way to decide is craft.",
-  "5. Expand and conserve are advice about money, so a post with either stance is capital_relevant.",
-  "6. Any concrete how-to advice to founders or operators (management, product, hiring practice, marketing, sales, productivity, working with a board, running a fundraise) is craft, however short. Use none only when the post gives founders no advice at all.",
-  "7. Ignore anything you know about when the post was written or what markets did afterwards. Judge only the text given.",
+  "1. Judge what the post tells founders to do, not what it describes. Reporting what companies or investors are doing (raising bigger rounds, cutting burn, growing fast), market data, valuation analysis and forecasts are none unless the post also tells the reader what to do; advice usually says should, must, need to, don't, or recommends. A company's announcement of its own growth is none.",
+  "2. Raising money: raising more than the plan needs in order to accelerate, or raising as much as possible while money is easy, is expand; raising to extend runway or survive is conserve; how to run a raise (pitching, process, terms, sizing a round to reach the next milestone) is craft.",
+  "3. Hiring: hiring ahead or faster is expand; freezing, slowing or cutting is conserve; how to interview, recruit, onboard or structure a team is craft.",
+  "4. Growth: expand needs money or headcount: spend more, hire ahead, take bigger or more bets, or put growth ahead of efficiency. Advice on how to grow (marketing, sales, customer success, product, pricing, retention) that asks for no extra spending or headcount is craft.",
+  "5. If the post weighs both directions, choose the one it recommends on balance. A framework or checklist takes the direction it serves: one for cutting burn or extending runway is conserve, one for accelerating is expand. Only a post that recommends neither direction and offers a way to decide is craft.",
+  "6. Expand and conserve are advice about money, so a post with either stance is capital_relevant.",
+  "7. Any concrete how-to advice to founders or operators is craft, however short: management, leadership, product, hiring practice, marketing, sales, storytelling, culture, careers, productivity, working with a board, running a fundraise. Interviews, profiles, case studies and Q&As that pass on lessons founders can use are craft. Use none only when the post gives founders no advice at all.",
+  "8. Ignore anything you know about when the post was written or what markets did afterwards. Judge only the text given.",
 ].join("\n");
 
 export const RESPONSE_SCHEMA = {
@@ -208,7 +210,7 @@ export const clipQuote = (quote: string) => quote.trim().replace(/^["“”']+|[
 
 /**
  * The model's answer as a label, or an error saying why not. Registered post-processing:
- * a directional stance makes the post capital-relevant (rule 5); unknown metrics, duplicates
+ * a directional stance makes the post capital-relevant (rule 6 of advice-v2, 5 of v1); unknown metrics, duplicates
  * and metrics whose words do not appear in `text` (the model's input) are dropped; the quote
  * is clipped to 15 words.
  */
