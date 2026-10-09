@@ -162,7 +162,10 @@ export default async function HistoryComparePage({
     <ReportShell
       model={{
         status: {
-          statusLabel: reportA.statusLabel,
+          /* No status word: a page about two periods has no one week's conditions
+             to state, and "Freezing" in the intro restated Period A's heading below
+             it while Period B said something else (2026-10-09). */
+          statusLabel: "",
           recordDateLabel: reportA.recordDateLabel,
           fetchedAtLabel: reportA.fetchedAtLabel,
         },

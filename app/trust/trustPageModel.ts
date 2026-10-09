@@ -94,16 +94,10 @@ export async function buildTrustPageModel() {
   /* The row labels used to be "Trigger", "Impact" and "Recovery" — three nouns
      from the incident-review register, on a page addressed to someone deciding
      whether to act this week. Each is now the question the row answers. */
+  /* A "What would go wrong" row led these until 2026-10-09: no detail, because
+     #confidence-limits above prints the condition, and only a link back to that
+     section. */
   const revisitBullets: Array<{ label: string; detail?: string; href: string; linkLabel: string }> = [
-    {
-      // No detail: this row's own link points at #confidence-limits, and that
-      // section already prints reportData.flipThreshold under "Call changes
-      // if". Carrying the sentence here too put the same
-      // long condition on screen twice within one section.
-      label: "What would go wrong",
-      href: "#confidence-limits",
-      linkLabel: "Check the limits",
-    },
     {
       label: "What it would change",
       detail: reportData.actionNowShort,
@@ -161,8 +155,9 @@ export async function buildTrustPageModel() {
       fetchedAtLabel: reportData.fetchedAtLabel,
     },
     page: {
+      /* No summary (2026-10-09): "Check whether this week's guidance is current
+         enough to act on." said the title again under it. */
       pageTitle: "How much to trust this week's guidance",
-      pageSummary: "Check whether this week's guidance is current enough to act on.",
       sectionLinks,
       currentPath: "/trust",
     },

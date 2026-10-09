@@ -177,8 +177,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             stamp, call, lines, date, source. It used to be a panel of tags with
             the call as body text under a generic title, so a screenshot of a
             cited week looked like nothing the reader had seen on Monday. */}
+        {/* The card's heading is the week, without the conditions: the stamp
+            directly above it names them, and the heading said "Freezing:" again
+            (2026-10-09). The page's <title> and its structured data keep the
+            full title, where there is no stamp. The caption at the card's foot
+            carries the margin only, since the heading in the same card dates it. */}
         <DecisionHero
-          question={briefTitle(brief)}
+          question={`Guidance for the week of ${publishedBriefWeekLabel(brief)}`}
           /* The week's headline action, from the one source the live brief uses
              (`weeklyHeadline`): the stored call, with the stored action's direction
              on the stamp line. The action itself printed as a do-now line here, a
@@ -196,7 +201,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
           ]}
           trust={null}
-          captionDetail={`Week of ${publishedBriefWeekLabel(brief)} · Margin: ${display.confidence.toLowerCase()}`}
+          captionDetail={`Margin: ${display.confidence.toLowerCase()}`}
         />
 
         <header className="space-y-3">

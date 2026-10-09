@@ -162,12 +162,10 @@ export function ConfidenceRecordSection() {
   if (!loadRecord()) return null;
 
   return (
-    <ReportSection
-      id="confidence-record"
-      title={CONFIDENCE_RECORD_TITLE}
-      description="The margin measures how far the scores sit from the line where conditions change. This is what readings at that distance actually did."
-    >
-      <ConfidenceRecordBody includeCallChangeRule />
+    /* No description: the page's own intro, directly above, says what the margin
+       measures and what this checks it against (2026-10-09). */
+    <ReportSection id="confidence-record" title={CONFIDENCE_RECORD_TITLE}>
+      <ConfidenceRecordBody />
     </ReportSection>
   );
 }

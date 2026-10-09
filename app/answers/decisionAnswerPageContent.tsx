@@ -12,7 +12,6 @@ import { buildAnswerFaqStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildAnswerSectionHeadings } from "../../lib/seo/answerSectionHeadings";
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
-import Link from "next/link";
 import { SecondaryPageSection } from "../components/secondaryPageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
@@ -234,6 +233,9 @@ export async function DecisionAnswerPageContent({
           </p>
         ) : null}
 
+        {/* The quick copy for a reader who knows what they want (§XX). The related
+            questions that sat beside it are the "Next" section's, which lists
+            the same ones and more (2026-10-09). */}
         <div className="flex flex-wrap items-center gap-2">
           <ReportCta
             href={pagePath}
@@ -248,26 +250,12 @@ export async function DecisionAnswerPageContent({
             }}
             className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
           />
-          {relatedPages.length > 0 ? (
-            <nav aria-label="Related operator questions" className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-slate-400 font-medium">Related:</span>
-              {relatedPages.slice(0, 3).map((related) => (
-                <Link
-                  key={related.slug}
-                  href={`/answers/${related.slug}`}
-                  className="weather-focus-ring inline-flex min-h-11 items-center rounded-md border border-slate-800 bg-slate-900/60 px-2.5 py-2 text-slate-300 hover:border-slate-700 hover:text-white transition-colors"
-                >
-                  {related.title} →
-                </Link>
-              ))}
-            </nav>
-          ) : null}
         </div>
 
         <SecondaryPageSection title={headings.posture}>
           <div className="space-y-2 text-sm text-slate-200">
-            <p className="text-xs text-slate-400">Market guidance as of {recordDateLabel}</p>
-            {/* The guidance and its action are the card's now; this section says how to use them. */}
+            {/* The guidance and its action are the card's now, dated by its trust
+                strip ("Data as of"); this section says how to use them. */}
             <p>{page.directAnswer}</p>
             <p>{contextSummary.summaryLine}</p>
             {contextSummary.classificationLine ? (

@@ -86,18 +86,23 @@ describe("Guides prints each answer's standing", async () => {
     return html.slice(start, html.indexOf("</li>", start));
   };
 
-  it("a decision row carries the homepage's words for its lead area", () => {
+  /* Once per area, beside its name (2026-10-09): every decision answer in a group
+     argues that area first, and each row printed the same stamp. */
+  it("an area's heading carries the homepage's words once, and its decision rows none", () => {
     for (const page of answerPages.filter((candidate) => candidate.category === "decision")) {
-      const row = rows.find((candidate) => candidate.area === page.mappedDecisionAreas[0]);
+      const area = page.mappedDecisionAreas[0];
+      const row = rows.find((candidate) => candidate.area === area);
       const status = row ? describeAreaPauseStatus(row) : undefined;
       assert.ok(status, `${page.slug} has a standing this week`);
-      const markup = rowFor(page.slug);
+      const groupStart = html.indexOf(`id="area-${area}"`);
+      const heading = html.slice(groupStart, html.indexOf("<ul", groupStart));
       /* The shared state badge: its glyph, then the homepage's words. */
       assert.match(
-        markup,
+        heading,
         new RegExp(`data-answer-standing="${status.state}"[^>]*><svg[^>]*lucide-${GLYPH[status.state]}[\\s\\S]*?</svg><span>${status.text}<`),
         page.slug,
       );
+      assert.doesNotMatch(rowFor(page.slug), /data-answer-standing/, `${page.slug} does not repeat its area's stamp`);
     }
   });
 
@@ -120,7 +125,7 @@ describe("Guides prints each answer's standing", async () => {
 
   it("draws the stamps sharp and the More tools disclosure as a row, not a pill-shaped surface", () => {
     const stamps = html.match(/<span data-answer-standing="[^"]+"[^>]* class="[^"]*"/g) ?? [];
-    assert.ok(stamps.length >= answerPages.length - 1);
+    assert.ok(stamps.length >= 2, "the area stamps and the climate stamp");
     for (const stamp of stamps) {
       assert.match(stamp, /\brounded-sm\b/);
       assert.doesNotMatch(stamp, /rounded-(full|lg|xl|2xl)/);

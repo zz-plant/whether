@@ -83,10 +83,9 @@ export default async function MethodPage({
             <p className="text-sm text-slate-200">
               If a warning below is active, check the source dates before going ahead.
             </p>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <ActionLink href="#source-board" variant="pill">Recheck freshness</ActionLink>
-              <ActionLink href="#revisit-call" variant="pill">Revisit triggers</ActionLink>
-            </div>
+            {/* No buttons to #source-board and #revisit-call (2026-10-09): the page's
+                index names both sections, and "Check source dates" closes the
+                section below. */}
           </article>
         </div>
       </ReportSection>

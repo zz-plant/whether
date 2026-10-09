@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { buildPageMetadata } from "../../../lib/seo";
+import { buildBreadcrumbList, buildPageMetadata } from "../../../lib/seo";
+import { graph } from "../../../lib/seo/pageStructuredData";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import { PremiumGate } from "../components/PremiumGate";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
 import { ScenarioStudioSimulator } from "../components/scenarioStudioSimulator";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
-import { Breadcrumbs } from "../../components/ui/breadcrumbs";
-import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 
 import { WORKSTREAMS, isWorkstream, workstreamSlugs } from "../workstreams";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
@@ -72,10 +72,13 @@ export default async function OperateWorkstreamPage({
           trustStatusTone,
           showOfflineBadge: isFallback && !reportData.historicalSelection,
         },
+        /* The trail as structured data only. A visible "Decide / Runway planner"
+           sat under the sub-tab row that names the same two pages and marks the
+           same one current (2026-10-09). */
+        payloads: { structuredData: graph([buildBreadcrumbList(buildGroupBreadcrumbs(currentPath))]) },
       }}
     >
       <div className="space-y-6">
-        <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs(currentPath))} />
         {entry.slug === "financial" ? (
           <div id="ops-runway-planner">
             <PremiumGate

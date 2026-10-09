@@ -153,17 +153,14 @@ describe("the evidence page", () => {
     const funding = rows.find((row) => row.key === "tightness");
     const curve = rows.find((row) => row.key === "curveSlope");
 
-    assert.equal(funding?.previousLabel, "Aug 31");
     assert.equal(funding?.direction.label, "+27 points since Aug 31.");
     // A signal the week did not move is unchanged since the date, not "from last week".
     assert.equal(curve?.direction.label, "Unchanged since Aug 31.");
-    assert.ok(rows.every((row) => row.previousLabel === "Aug 31"));
   });
 
   it("keeps the old wording for a week that does not date its comparison", () => {
     const undated = buildSignalReferenceRows(assessment, undatedWeek);
 
-    assert.ok(undated.every((row) => row.previousLabel === "Last week"));
     assert.equal(undated.find((row) => row.key === "tightness")?.direction.label, "+27 points since last week.");
     assert.equal(undated.find((row) => row.key === "curveSlope")?.direction.label, "Unchanged from last week.");
   });

@@ -190,11 +190,14 @@ export default async function CompsPage() {
               </div>
             )}
           </dl>
-          <p className="text-sm text-slate-300">
-            {comps.status === "ok" && comps.data.medianEvToRevenue !== null
-              ? `The ${formatMultiple(comps.data.medianEvToRevenue)} median compares enterprise value with reported revenue in this public basket. Use it to discuss valuation assumptions alongside the dated fundraising guidance; it does not price a private round.`
-              : "With no median available, the fundraising guidance still uses the brief's macro signals. The public valuation comparison is missing, not zero."}
-          </p>
+          {/* Only when the median is missing. With one, this said how to use it and
+              that it does not price a private round, which "Use public multiples in a
+              fundraising discussion" below says in full (2026-10-09). */}
+          {comps.status === "ok" && comps.data.medianEvToRevenue !== null ? null : (
+            <p className="text-sm text-slate-300">
+              With no median available, the fundraising guidance still uses the brief&apos;s macro signals. The public valuation comparison is missing, not zero.
+            </p>
+          )}
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100">
             Open the weekly brief
           </Link>

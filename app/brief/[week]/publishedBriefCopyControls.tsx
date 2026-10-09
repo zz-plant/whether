@@ -114,12 +114,11 @@ export function PublishedBriefCopyControls({
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs text-slate-400">
-          <span>
-            {activeFormat === "slack" ? "Slack preview" : "Email preview"} (week of {weekLabel})
-          </span>
-          <span className="font-mono text-fluid-nano text-slate-500">Date-pinned record</span>
-        </div>
+        {/* The format alone (2026-10-09): the heading above names the week and
+            the line under it says the copies are date-pinned. */}
+        <p className="text-xs text-slate-400">
+          {activeFormat === "slack" ? "Slack preview" : "Email preview"}
+        </p>
         {/* The clip needs to read as "there is more", not as a rendering fault.
             max-h-64 cuts horizontally through a line of glyphs, and macOS
             overlay scrollbars stay hidden until you scroll, so the block just

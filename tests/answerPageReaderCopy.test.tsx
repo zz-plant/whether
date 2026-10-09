@@ -53,7 +53,8 @@ describe("answer page reader copy", () => {
       assert.ok(visible.includes(page.shortAnswer), `${slug} lost its question-specific answer`);
       assert.ok(visible.includes("Company inputs to check"));
       assert.ok(visible.includes("Decision note to complete"));
-      assert.ok(visible.includes("Market guidance as of"));
+      assert.ok(visible.includes("Data as of"), "the card's trust strip dates the market guidance, once");
+      assert.ok(!visible.includes("Market guidance as of"), "and no second line dates it again");
       assert.ok(visible.includes('href="/"'));
       const faqScript = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)?.[1];
       assert.ok(faqScript?.includes(page.shortAnswer), "structured answer must retain the same enduring answer");
