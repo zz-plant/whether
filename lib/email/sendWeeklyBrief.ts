@@ -252,7 +252,7 @@ export const sendWeeklyBrief = async (options?: {
         `<p style="font-size:0.85rem;margin:4px 0 0;color:${OG_TEXT_SECONDARY};">${getRegimeWeatherRationale(regime)}</p>`,
         `</td></tr></table>`,
         readingsHtml(readings),
-        `<p style="font-size:0.8rem;margin:8px 0 0;color:#94a3b8;">${escapeHtml(basisLine)}</p>`,
+        `<p style="font-size:0.8rem;margin:8px 0 0;color:${OG_TEXT_MUTED};">${escapeHtml(basisLine)}</p>`,
         ...(weekChange
           ? [`<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${EXPORT_SECTION_HEADINGS.changed}:</strong> ${escapeHtml(weekChange)}</p>`]
           : []),
