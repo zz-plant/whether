@@ -2643,7 +2643,8 @@ changed "the notes under the guidance and nothing else" above a picker that says
   the utility links carry their descriptions there too, as they already did on desktop. Evidence's
   description says "lines", not "thresholds".
 
-`tests/firstRunOrientationGuide.test.tsx` renders the guide and fails on any of its retired nouns.
+`tests/firstRunOrientationGuide.test.tsx` rendered the guide and failed on any of its retired nouns; the
+guide gave way to the conditions legend on 2026-10-09, held by `tests/conditionsLegend.test.tsx` (§1.1.60).
 
 ### 1.1.57 Titles in the words people search, dated by the data (2026-10-08)
 

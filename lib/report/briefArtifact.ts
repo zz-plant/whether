@@ -386,7 +386,7 @@ export const resolveBriefUrl = (artifact: BriefArtifact, origin: string) =>
  * The `ref` value a pasted brief carries, and the query the homepage reads it
  * back from. A reader who lands on `/` with it arrived from a teammate's
  * paste, not a search or a bookmark, and is greeted as one
- * (`app/components/homeFirstRunOrientation.tsx`).
+ * (`app/components/home/ConditionsLegend.tsx`).
  */
 export const SHARE_REFERRAL_PARAM = "ref";
 export const SHARE_REFERRAL_VALUE = "share";
