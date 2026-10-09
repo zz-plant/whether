@@ -127,7 +127,7 @@ export function RegimeRadar({
           y={PLOT_Y}
           width={boundaryX - PLOT_X}
           height={boundaryY - PLOT_Y}
-          fill="var(--phase-scarcity, rgba(244, 63, 94, 0.09))"
+          fill="var(--phase-scarcity)"
         />
         {/* Top-Right: Cloudy (Defensive) */}
         <rect
@@ -135,7 +135,7 @@ export function RegimeRadar({
           y={PLOT_Y}
           width={PLOT_RIGHT - boundaryX}
           height={boundaryY - PLOT_Y}
-          fill="var(--phase-defensive, rgba(245, 158, 11, 0.09))"
+          fill="var(--phase-defensive)"
         />
         {/* Bottom-Left: Stormy (Volatile) */}
         <rect
@@ -143,7 +143,7 @@ export function RegimeRadar({
           y={boundaryY}
           width={boundaryX - PLOT_X}
           height={PLOT_BOTTOM - boundaryY}
-          fill="var(--phase-volatile, rgba(139, 92, 246, 0.09))"
+          fill="var(--phase-volatile)"
         />
         {/* Bottom-Right: Sunny (Expansion) */}
         <rect
@@ -151,15 +151,17 @@ export function RegimeRadar({
           y={boundaryY}
           width={PLOT_RIGHT - boundaryX}
           height={PLOT_BOTTOM - boundaryY}
-          fill="var(--phase-expansion, rgba(16, 185, 129, 0.09))"
+          fill="var(--phase-expansion)"
         />
 
-        {/* Quadrant corner labels */}
+        {/* Quadrant corner labels, each in its condition's ink. These read the
+            line-state families until 2026-10-09 (Sunny in the clear ink,
+            Cloudy in the caution one), which tied a condition to a state. */}
         <text
           x={PLOT_X + 6}
           y={PLOT_Y + 12}
           className="text-[10px] font-bold uppercase tracking-wider"
-          fill="var(--color-semantic-reversal-fg)"
+          fill="var(--color-condition-freezing-ink)"
         >
           Freezing
         </text>
@@ -168,7 +170,7 @@ export function RegimeRadar({
           y={PLOT_Y + 12}
           textAnchor="end"
           className="text-[10px] font-bold uppercase tracking-wider"
-          fill="var(--color-semantic-caution-fg)"
+          fill="var(--color-condition-cloudy-ink)"
         >
           Cloudy
         </text>
@@ -176,7 +178,7 @@ export function RegimeRadar({
           x={PLOT_X + 6}
           y={PLOT_BOTTOM - 6}
           className="text-[10px] font-bold uppercase tracking-wider"
-          fill="var(--color-semantic-stormy-fg)"
+          fill="var(--color-condition-stormy-ink)"
         >
           Stormy
         </text>
@@ -185,7 +187,7 @@ export function RegimeRadar({
           y={PLOT_BOTTOM - 6}
           textAnchor="end"
           className="text-[10px] font-bold uppercase tracking-wider"
-          fill="var(--color-semantic-easing-fg)"
+          fill="var(--color-condition-sunny-ink)"
         >
           Sunny
         </text>
@@ -206,7 +208,7 @@ export function RegimeRadar({
           y1={boundaryY}
           x2={PLOT_RIGHT}
           y2={boundaryY}
-          stroke="rgba(148, 163, 184, 0.35)"
+          stroke="var(--phase-boundary)"
           strokeDasharray="3 3"
           strokeWidth="1"
         >
@@ -217,7 +219,7 @@ export function RegimeRadar({
           y1={PLOT_Y}
           x2={boundaryX}
           y2={PLOT_BOTTOM}
-          stroke="rgba(148, 163, 184, 0.35)"
+          stroke="var(--phase-boundary)"
           strokeDasharray="3 3"
           strokeWidth="1"
         >
@@ -250,7 +252,7 @@ export function RegimeRadar({
           width={PLOT_SIZE}
           height={PLOT_SIZE}
           fill="none"
-          stroke="rgba(51, 65, 85, 0.6)"
+          stroke="var(--border-strong)"
           strokeWidth="1"
         />
 
@@ -261,7 +263,7 @@ export function RegimeRadar({
             y1={currentY}
             x2={currentX}
             y2={boundaryY}
-            stroke="var(--regime-accent, #38bdf8)"
+            stroke="var(--regime-accent)"
             strokeDasharray="2 2"
             strokeWidth="1"
             strokeOpacity="0.7"
@@ -272,7 +274,7 @@ export function RegimeRadar({
             y1={currentY}
             x2={boundaryX}
             y2={currentY}
-            stroke="var(--regime-accent, #38bdf8)"
+            stroke="var(--regime-accent)"
             strokeDasharray="2 2"
             strokeWidth="1"
             strokeOpacity="0.7"
@@ -317,7 +319,7 @@ export function RegimeRadar({
               y1={prevY}
               x2={currentX}
               y2={currentY}
-              stroke="#94a3b8"
+              stroke="var(--app-text-muted)"
               strokeWidth="1.2"
               strokeDasharray="2 2"
               strokeOpacity="0.6"
@@ -327,7 +329,7 @@ export function RegimeRadar({
               cy={prevY}
               r="2.5"
               fill="none"
-              stroke="#94a3b8"
+              stroke="var(--app-text-muted)"
               strokeWidth="1.2"
               strokeOpacity="0.7"
             />
@@ -342,7 +344,7 @@ export function RegimeRadar({
             cy={currentY}
             r="6.5"
             fill="none"
-            stroke="var(--regime-accent, #38bdf8)"
+            stroke="var(--regime-accent)"
             strokeWidth="1.5"
             strokeOpacity="0.6"
           />
@@ -350,7 +352,7 @@ export function RegimeRadar({
             cx={currentX}
             cy={currentY}
             r="3.5"
-            fill="var(--regime-accent, #38bdf8)"
+            fill="var(--regime-accent)"
           />
         </g>
 

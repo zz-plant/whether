@@ -34,7 +34,7 @@
   font-size: 16px;
   border-radius: var(--radius-lg);
   border-width: 1px;
-  color: rgb(241 245 249);
+  color: var(--app-text);
   border-color: var(--border-strong);
   background: var(--bg-nested);
   box-shadow: var(--elev-2);
@@ -65,8 +65,10 @@
     background-color 200ms ease;
 }
 
+/* The action colour as a fill, with the ground as its label (--cta-ink). */
 .weather-button-primary {
-  @apply border text-slate-100;
+  @apply border;
+  color: var(--cta-ink);
   border-color: var(--cta-border);
   border-radius: var(--radius-lg);
   font-weight: 600;
@@ -100,7 +102,7 @@
 
 .weather-cta-primary {
   border-color: var(--cta-border);
-  color: rgb(241 245 249);
+  color: var(--cta-ink);
   background: var(--cta-fill);
   box-shadow: var(--cta-shadow);
 }
@@ -140,10 +142,10 @@ input:not([type="range"]) {
    below was showing. The state rides on `aria-current`, which is what the
    links already set for assistive tech, so the paint and the announcement
    cannot disagree. The fill matches the selected segment in a segmented
-   control (bg-sky-500/15). */
+   control (bg-sky-500/15, which is the action ink at 15%). */
 .weather-pill[aria-current="page"] {
-  border-color: rgba(125, 211, 252, 0.6);
-  background-color: rgba(14, 165, 233, 0.15);
+  border-color: var(--accent-action);
+  background-color: color-mix(in srgb, var(--accent-action) 14%, transparent);
   color: var(--app-text);
 }
 
@@ -160,28 +162,28 @@ input:not([type="range"]) {
   a.weather-pill:hover,
   button.weather-pill:hover {
     transform: translateY(-1px);
-    border-color: rgba(125, 211, 252, 0.34);
+    border-color: var(--accent-border);
     box-shadow: var(--elev-2);
   }
 
   a.weather-button:hover,
   button.weather-button:hover {
     transform: translateY(-1px);
-    border-color: rgba(103, 232, 249, 0.36);
+    border-color: var(--accent-border);
     box-shadow: var(--elev-2);
   }
 
   a.weather-button-primary:hover,
   button.weather-button-primary:hover {
     transform: translateY(-2px);
-    border-color: rgba(125, 211, 252, 0.9);
+    border-color: var(--cta-border);
     box-shadow: var(--cta-shadow-hover);
   }
 
   a.weather-cta-primary:hover,
   button.weather-cta-primary:hover {
     transform: translateY(-1px);
-    border-color: rgba(125, 211, 252, 0.9);
+    border-color: var(--cta-border);
     box-shadow: var(--cta-shadow-hover);
   }
 }
@@ -201,11 +203,11 @@ input:not([type="range"]) {
   transform: translateY(-200%);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-strong);
-  background: rgba(15, 23, 42, 0.95);
+  background: var(--bg-raised);
   padding: 0.6rem 1.2rem;
   font-size: 0.75rem;
   text-transform: none;
-  color: rgba(248, 250, 252, 0.9);
+  color: var(--app-text);
 }
 
 .skip-link:focus-visible {

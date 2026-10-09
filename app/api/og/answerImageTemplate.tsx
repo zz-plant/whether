@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactElement } from "react";
-import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_BORDER } from "./ogTheme";
+import { GlyphMotif, OG_ACCENT, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY, OG_BORDER } from "./ogTheme";
 
 /**
  * The social card for an answer page.
@@ -16,8 +16,6 @@ import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG
  * implies — the two lines someone scrolling a channel needs to decide whether
  * to open the link.
  */
-const ACCENT = "#34d399";
-
 const frameStyle: CSSProperties = {
   display: "flex",
   flexDirection: "column",
@@ -44,20 +42,20 @@ export const renderAnswerOgImage = ({
 }): ReactElement => (
   <div style={frameStyle}>
     <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-      <GlyphMotif tone={ACCENT} size={34} />
+      <GlyphMotif tone={OG_ACCENT} size={34} />
       <div style={{ display: "flex", fontSize: 24, fontWeight: 600, letterSpacing: "0.16em", color: OG_TEXT_MUTED }}>
         OPERATOR ANSWER
       </div>
     </div>
 
-    <div style={{ display: "flex", height: 3, background: ACCENT, opacity: 0.5, marginTop: 20 }} />
+    <div style={{ display: "flex", height: 3, background: OG_ACCENT, opacity: 0.5, marginTop: 20 }} />
 
     <div style={{ display: "flex", flex: 1, gap: 40, marginTop: 36 }}>
       <div style={{ display: "flex", flexDirection: "column", flex: 1 }}>
         <div style={{ display: "flex", fontSize: 54, fontWeight: 700, lineHeight: 1.08, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, color: OG_TEXT }}>
           {question}
         </div>
-        <div style={{ display: "flex", fontSize: 27, lineHeight: 1.35, color: "#cbd5e1", marginTop: 22 }}>
+        <div style={{ display: "flex", fontSize: 27, lineHeight: 1.35, color: OG_TEXT_SECONDARY, marginTop: 22 }}>
           {shortAnswer}
         </div>
       </div>
@@ -73,18 +71,18 @@ export const renderAnswerOgImage = ({
           background: OG_PANEL,
         }}
       >
-        <div style={{ display: "flex", fontSize: 20, fontWeight: 600, letterSpacing: "0.12em", color: ACCENT }}>
+        <div style={{ display: "flex", fontSize: 20, fontWeight: 600, letterSpacing: "0.12em", color: OG_TEXT_MUTED }}>
           THIS WEEK
         </div>
-        <div style={{ display: "flex", fontSize: call.length > 100 ? 23 : call.length > 70 ? 25 : 28, fontWeight: 700, lineHeight: 1.2, color: "#f8fafc", marginTop: 14 }}>
+        <div style={{ display: "flex", fontSize: call.length > 100 ? 23 : call.length > 70 ? 25 : 28, fontWeight: 700, lineHeight: 1.2, color: OG_TEXT, marginTop: 14 }}>
           {call}
         </div>
-        <div style={{ display: "flex", fontSize: 21, lineHeight: 1.4, color: "#94a3b8", marginTop: 14 }}>
+        <div style={{ display: "flex", fontSize: 21, lineHeight: 1.4, color: OG_TEXT_MUTED, marginTop: 14 }}>
           {action}
         </div>
       </div>
     </div>
 
-    <div style={{ display: "flex", fontSize: 22, color: "#64748b", marginTop: 28 }}>{kicker}</div>
+    <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED, marginTop: 28 }}>{kicker}</div>
   </div>
 );

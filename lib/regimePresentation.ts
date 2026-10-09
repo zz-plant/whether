@@ -87,57 +87,43 @@ export const REGIME_SEVERITY_RANK: Record<RegimeKey, number> = {
   SCARCITY: 3,
 };
 
+/**
+ * A condition as Tailwind classes, for markup that names a regime without a
+ * `data-regime` attribute. Every class reads the condition utilities in
+ * app/styles/tokens.css (`bg-condition-*` is the fill, `text-condition-*-ink`
+ * the text colour), never a stock hue: until 2026-10-09 these were emerald,
+ * amber, violet and rose, the same ramps the line states and the warnings use,
+ * so a Sunny marker and a "copied" tick were one green.
+ */
 export const REGIME_STYLE_TOKENS: Record<
   RegimeKey,
   {
     marker: string;
     badge: string;
     accent: {
-      panel: string;
-      dot: string;
       text: string;
     };
   }
 > = {
   SCARCITY: {
-    marker: "bg-rose-400",
-    badge: "border-rose-500/60 bg-rose-500/15 text-rose-100",
-    accent: {
-      panel: "from-rose-600/20 via-rose-500/10 to-transparent border-rose-500/40",
-      dot: "bg-rose-500",
-      text: "text-rose-200",
-    },
+    marker: "bg-condition-freezing",
+    badge: "border-condition-freezing/60 bg-condition-freezing/15 text-condition-freezing-ink",
+    accent: { text: "text-condition-freezing-ink" },
   },
   DEFENSIVE: {
-    marker: "bg-amber-400",
-    badge: "border-amber-400/60 bg-amber-400/15 text-amber-100",
-    accent: {
-      panel: "from-amber-500/20 via-amber-400/10 to-transparent border-amber-400/40",
-      dot: "bg-amber-400",
-      text: "text-amber-200",
-    },
+    marker: "bg-condition-cloudy",
+    badge: "border-condition-cloudy/60 bg-condition-cloudy/15 text-condition-cloudy-ink",
+    accent: { text: "text-condition-cloudy-ink" },
   },
   VOLATILE: {
-    // Violet across the board, matching REGIME_HEX_COLORS. The marker was
-    // already indigo while the badge and panel were sky, so one regime drew
-    // in two hues — and sky is the action accent, so a Stormy badge read as
-    // a button.
-    marker: "bg-violet-400",
-    badge: "border-violet-400/60 bg-violet-400/15 text-violet-100",
-    accent: {
-      panel: "from-violet-500/20 via-violet-400/10 to-transparent border-violet-400/40",
-      dot: "bg-violet-400",
-      text: "text-violet-200",
-    },
+    marker: "bg-condition-stormy",
+    badge: "border-condition-stormy/60 bg-condition-stormy/15 text-condition-stormy-ink",
+    accent: { text: "text-condition-stormy-ink" },
   },
   EXPANSION: {
-    marker: "bg-emerald-400",
-    badge: "border-emerald-400/60 bg-emerald-400/15 text-emerald-100",
-    accent: {
-      panel: "from-emerald-500/20 via-emerald-400/10 to-transparent border-emerald-400/40",
-      dot: "bg-emerald-400",
-      text: "text-emerald-200",
-    },
+    marker: "bg-condition-sunny",
+    badge: "border-condition-sunny/60 bg-condition-sunny/15 text-condition-sunny-ink",
+    accent: { text: "text-condition-sunny-ink" },
   },
 };
 

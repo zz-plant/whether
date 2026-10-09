@@ -5,7 +5,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-slate-950: #101114;
+  --color-slate-950: #12171a;
   /* The text-fluid-* utilities. --fs-* in :root carries the same values for
      plain CSS rules (.type-label, .type-badge); keep the two in step. */
   --text-fluid-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
@@ -16,22 +16,47 @@
   --text-fluid-lg: clamp(1.0625rem, 0.9rem + 0.7vw, 1.25rem);
   --text-fluid-xl: clamp(1.25rem, 1rem + 1.1vw, 1.625rem);
   --text-fluid-2xl: clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem);
-  --color-semantic-tightening-fg: #fca5a5;
-  --color-semantic-tightening-border: #f87171;
-  --color-semantic-easing-fg: #86efac;
-  --color-semantic-easing-border: #4ade80;
-  --color-semantic-unchanged-border: #64748b;
-  --color-semantic-caution-fg: #fcd34d;
-  --color-semantic-caution-border: #f59e0b;
-  --color-semantic-caution-bg: #3b2d0b;
-  --color-semantic-reversal-fg: #fda4af;
-  /* The Stormy regime as text. Violet, not sky: sky is the action accent on
-     every link, button and focus ring here, so a Stormy week used to paint
-     the call in the colour that elsewhere means "click". A regime hue that
-     no control borrows is the only way the call stays tellable from the
-     chrome around it. Same levels as the families above — 300 on the dark
-     ground, 700 in the light block. */
-  --color-semantic-stormy-fg: #c4b5fd;
+  /* Colour carries two things on this site and nothing else (Synoptic,
+     docs/design/palette-directions.md): the four conditions, and where a line
+     stands. Everything else is ink.
+
+     Line states. A pause line crossed or close prints in the front red; a
+     line cleared, or a resume line met, prints in the neutral ink and lets
+     the play glyph say "clear". Until 2026-10-09 these were Sunny's green and
+     Cloudy's amber, so a cleared line read as "Sunny" and a crossed one as
+     "Cloudy"; on Synoptic's light theme those two inks are one brown. The
+     values live in :root and the light block (--line-*); the semantic
+     families below alias them, so every consumer of the caution, tightening
+     and easing inks moved with them. */
+  --color-semantic-tightening-fg: var(--line-crossed-ink);
+  --color-semantic-tightening-border: var(--line-crossed);
+  --color-semantic-caution-fg: var(--line-crossed-ink);
+  --color-semantic-caution-border: var(--line-crossed);
+  --color-semantic-caution-bg: var(--line-crossed-bg);
+  --color-semantic-easing-fg: var(--line-clear-ink);
+  --color-semantic-easing-border: var(--line-clear);
+  /* "Resume when": a resume line, so the clear ink. */
+  --color-semantic-reversal-fg: var(--line-clear-ink);
+  --color-semantic-unchanged-border: var(--app-text-muted);
+
+  /* Conditions. One fill per condition, the same in both themes and the same
+     four hexes as REGIME_HEX_COLORS (lib/regimePhaseSpace.ts) and the
+     data-regime map below; tests/regimeColourContract.test.tsx holds all
+     three together. Warm is risk appetite on (Sunny, Cloudy), cool is off
+     (Stormy, Freezing); light is cheap money (Sunny, Stormy), dense is dear
+     (Cloudy, Freezing). Red-green deficiency keeps the blue-yellow axis and
+     lightness, which are the two things these differ on: Sunny and Freezing,
+     5.6 apart for a deuteranope on the old emerald and rose, are 34.6 apart
+     here. The ink is the condition as text: a light tint on the dark ground,
+     a dark one in the light block, each clearing 4.5:1 on ground and panel. */
+  --color-condition-sunny: #d9a82c;
+  --color-condition-cloudy: #9d7a4a;
+  --color-condition-stormy: #8f96e0;
+  --color-condition-freezing: #3a6fa3;
+  --color-condition-sunny-ink: #f5cf5a;
+  --color-condition-cloudy-ink: #d6b98a;
+  --color-condition-stormy-ink: #b9bfff;
+  --color-condition-freezing-ink: #8cc0ec;
 
   /* Text role tokens */
   /* Display sizes the weekly-call headline (its only consumer, DecisionHero),
@@ -102,10 +127,10 @@
      arrow in mono text falls to the sibling face rather than to the OS. */
   --font-mono: "Chivo Mono", "Archivo", ui-monospace, monospace;
   --text-primary: var(--app-text);
-  --footer-link: #cbd5e1;
-  --footer-link-hover: #ffffff;
-  --footer-legal: #cbd5e1;
-  --footer-legal-hover: #ffffff;
+  --footer-link: var(--app-text-secondary);
+  --footer-link-hover: var(--app-text);
+  --footer-legal: var(--app-text-secondary);
+  --footer-legal-hover: var(--app-text);
 
   /* Type scale */
   /* nano/micro are the dense operator end (badges, metadata) and are unchanged.
@@ -153,47 +178,58 @@
   --radius-4xl: 24px;
   --radius-full: 9999px;
 
-  /* Surfaces — the ladder has to be wide enough to read as depth. The previous
-     stack (#111316 → #15171b → #1a1d22 over #08090b) spanned ~3% luminance, so
-     cards separated only by their hairline borders and the page read flat.
-     Body stays put; each panel tier steps up roughly twice as far. (DD-006) */
-  --bg-body: #08090b;
-  --bg-panel: #13161b;
-  --bg-surface: #181b21;
-  --bg-surface-muted: rgba(22, 25, 31, 0.78);
-  --bg-raised: #1f232a;
-  --bg-nested: #0d0f12;
-  --bg-nested-light: rgba(255, 255, 255, 0.05);
+  /* Surfaces — the ladder has to be wide enough to read as depth: each tier
+     steps clearly off the one under it, or cards separate only by their
+     hairlines and the page reads flat (DD-006). Synoptic's night chart since
+     2026-10-09: a cool green-grey rather than the blue-black slate it
+     replaced, so the dark theme is the same chart paper with the lights off. */
+  --bg-body: #0f1316;
+  --bg-panel: #171c20;
+  --bg-surface: #1c2226;
+  --bg-surface-muted: rgba(28, 34, 38, 0.82);
+  --bg-raised: #232a2f;
+  --bg-nested: #12171a;
+  --bg-nested-light: rgba(237, 240, 238, 0.05);
 
   /* Borders — at the old 0.045-0.085 alphas a card edge was below the visible
      threshold on most panels, which forced every separation onto luminance the
      surfaces above don't have. Faint stays decorative; subtle and up must
-     actually be seen. (DD-006) */
-  --border-faint: rgba(226, 232, 240, 0.06);
-  --border-subtle: rgba(226, 232, 240, 0.10);
-  --border-default: rgba(226, 232, 240, 0.13);
-  --border-strong: rgba(226, 232, 240, 0.19);
+     actually be seen. (DD-006) Drawn in the text ink, so a border is the
+     page's own colour thinned rather than a second grey. */
+  --border-faint: rgba(237, 240, 238, 0.06);
+  --border-subtle: rgba(237, 240, 238, 0.10);
+  --border-default: rgba(237, 240, 238, 0.14);
+  --border-strong: rgba(237, 240, 238, 0.21);
 
-  --app-text: #f4f7fb;
-  /* Secondary/muted are the two most-rendered inks on the page: slate-400/500
-     both alias to --app-text-muted (574 call sites). slate-400 (#94a3b8) passes
-     AA on #08090b but as the *majority* text color it read uniformly dim, which
-     is the DD-006 complaint. Muted now sits between slate-400 and slate-300;
-     secondary between slate-300 and slate-200, so the three roles stay
-     distinguishable. */
-  --app-text-secondary: #d7dee8;
-  --app-text-muted: #a7b3c4;
+  /* Ink. Also the action colour: links, buttons and focus rings draw in it,
+     and links keep their underline. A fifth hue that meant "click" (sky,
+     until 2026-10-09) was the main reason the page read as several bright
+     accents, and it was what forced Stormy off blue. Secondary and muted are
+     the two most-rendered inks (slate-400/500 alias muted, 574 call sites),
+     so the three roles stay far enough apart to be told apart. */
+  --app-text: #edf0ee;
+  --app-text-secondary: #cdd3d1;
+  --app-text-muted: #a0a9a7;
+
+  /* Line states (the semantic families in @theme alias these). The front red
+     clears 5.2:1 on the panel and on the crossed stamp's own 10% tint; clear
+     is the ink. --line-clear is the clear state as a mark (a stamp's edge, a
+     chart line), one step down from the ink so it does not outweigh text. */
+  --line-crossed-ink: #f2685c;
+  --line-crossed: #e5484d;
+  --line-crossed-bg: #2d1a1e;
+  --line-clear-ink: var(--app-text);
+  --line-clear: var(--app-text-secondary);
 
   /* Regime atmosphere — a top-of-page posture tint that fades into --bg-body.
      Must stay theme-aware: a fixed dark tint washes out the light surface.
-     Held to about a third of its old strength (2026-10-08): at 0.30 a Freezing
-     week dyed the whole first screen maroon, so the hero's own rose — its top
-     rule, stamp and map point — had nothing to stand out from. The regime
-     reads as a signal on the card, not as the colour of the room. */
-  --atmosphere-expansion: rgba(6, 78, 59, 0.12);
-  --atmosphere-defensive: rgba(69, 39, 3, 0.10);
-  --atmosphere-scarcity: rgba(76, 5, 25, 0.11);
-  --atmosphere-volatile: rgba(46, 16, 101, 0.10);
+     Held low (2026-10-08): at 0.30 a Freezing week dyed the whole first screen,
+     so the hero's own rule, stamp and map point had nothing to stand out from.
+     The regime reads as a signal on the card, not as the colour of the room. */
+  --atmosphere-expansion: rgba(217, 168, 44, 0.06);
+  --atmosphere-defensive: rgba(157, 122, 74, 0.06);
+  --atmosphere-scarcity: rgba(58, 111, 163, 0.06);
+  --atmosphere-volatile: rgba(143, 150, 224, 0.06);
   /* Resolved by the data-regime map below; transparent under no regime, so a
      page with no call to make sits on --bg-body itself rather than under the
      flat 3% sky wash the interior backdrop used to paint over every route.
@@ -208,24 +244,24 @@
      the pastel that reads on the dark surfaces here, the 700-level that clears
      AA on the light ground below. Until 2026-09-15 the hero painted itself teal
      whatever the week said, so a Freezing call sat in the colour the stripe
-     uses for Sunny. The neutral fallback is slate, the same as regimeAccent.ts. */
-  --regime-accent: #94a3b8;
+     uses for Sunny. The neutral fallback is a grey, the same as regimeAccent.ts. */
+  --regime-accent: #939c9a;
   --regime-ink: var(--app-text-secondary);
 
-  /* Regime phase map (app/components/history/RegimePhaseMap.tsx) ---------
-     Quadrant washes for the plane the classifier actually cuts. Held far below
-     the --atmosphere-* tints above: those are full-page backdrops with nothing
-     over them, while these carry axis ticks, a trace, and markers, and have to
-     read as ground rather than as fill. The marker hues come from
-     REGIME_HEX_COLORS in lib/regimePhaseSpace.ts — 500-level, legible on both
-     ground colours — so only the washes and the chart furniture live here. */
-  --phase-scarcity: rgba(244, 63, 94, 0.11);
-  --phase-defensive: rgba(245, 158, 11, 0.10);
-  --phase-volatile: rgba(139, 92, 246, 0.10);
-  --phase-expansion: rgba(16, 185, 129, 0.08);
-  --phase-grid: rgba(148, 163, 184, 0.14);
-  --phase-boundary: rgba(226, 232, 240, 0.45);
-  --phase-trace: rgba(148, 163, 184, 0.85);
+  /* Regime phase map (the conditions chart and RegimePhaseMap) -----------
+     Quadrant washes for the plane the classifier actually cuts. This chart is
+     the site's signature (§XXV), so its washes carry the colour field: each
+     quadrant at a fifth of its condition's fill, which is still ground under
+     the axis ticks, the trace and the markers. The marker hues come from
+     REGIME_HEX_COLORS in lib/regimePhaseSpace.ts, so only the washes and the
+     chart furniture live here. */
+  --phase-scarcity: rgba(58, 111, 163, 0.20);
+  --phase-defensive: rgba(157, 122, 74, 0.20);
+  --phase-volatile: rgba(143, 150, 224, 0.20);
+  --phase-expansion: rgba(217, 168, 44, 0.20);
+  --phase-grid: rgba(237, 240, 238, 0.14);
+  --phase-boundary: rgba(237, 240, 238, 0.45);
+  --phase-trace: rgba(205, 211, 209, 0.80);
 
   /* Elevation ------------------------------------------------------------
      Two token families, deliberately not interchangeable:
@@ -278,14 +314,17 @@
   --shadow-sm: var(--elev-1);
   --shadow-mid: var(--elev-2);
 
-  /* Accent colors — reserved by function */
-  --accent-action: #38bdf8;
-  --accent-info: #60a5fa;
-  --accent-success: #34d399;
-  --accent-warning: #fbbf24;
-  --accent-danger: #f87171;
-  --accent-border: rgba(56, 189, 248, 0.35);
-  --accent-border-soft: rgba(56, 189, 248, 0.15);
+  /* Accent colors — reserved by function. Action and info are the ink (see
+     --app-text); success is the clear state and warning and danger the
+     crossed one, so a chart that marks "safe" and "trouble" speaks the line
+     states' language. */
+  --accent-action: #edf0ee;
+  --accent-info: var(--accent-action);
+  --accent-success: var(--line-clear-ink);
+  --accent-warning: var(--line-crossed-ink);
+  --accent-danger: var(--line-crossed-ink);
+  --accent-border: rgba(237, 240, 238, 0.38);
+  --accent-border-soft: rgba(237, 240, 238, 0.16);
 
   /* Z-index scale */
   --z-dropdown: 10;
@@ -294,16 +333,16 @@
   --z-modal: 40;
   --z-toast: 50;
 
-  /* CTA button. The previous stops (#47cce a → #208bc4, stock sky/cyan) put
-     .weather-button-primary's text-slate-100 at 1.73:1 against the top of the
-     gradient and 3.45:1 against the bottom — both under AA for the app's most
-     prominent control. It was a gradient from #2b6c8c to #1e5673 under a white
-     top highlight until 2026-10-09; it is the top stop, flat, which holds 5.3:1
-     against the same ink. */
-  --cta-fill: #2b6c8c;
-  --cta-shadow: 0 6px 12px -10px rgba(6, 22, 32, 0.85);
-  --cta-shadow-hover: 0 8px 16px -10px rgba(6, 22, 32, 0.95);
-  --cta-border: rgba(125, 174, 200, 0.55);
+  /* CTA button: the action colour as a fill, flat. It was a stock sky/cyan
+     gradient, then a flat steel blue (#2b6c8c) under light ink, until
+     2026-10-09; the action colour is the ink now, so the fill is the ink and
+     the label is the ground (--cta-ink), 16:1 on the dark theme and 18:1 on
+     the light one. */
+  --cta-fill: var(--accent-action);
+  --cta-ink: var(--bg-body);
+  --cta-shadow: none;
+  --cta-shadow-hover: none;
+  --cta-border: var(--accent-action);
 
   /* Interactive */
   --transition-fast: 200ms ease;
@@ -358,14 +397,14 @@ body {
 }
 
 ::selection {
-  background: rgba(56, 189, 248, 0.35);
-  color: rgb(240 249 255);
+  background: var(--accent-border);
+  color: var(--app-text);
 }
 
 /* Scrollbar */
 html, body {
   scrollbar-width: thin;
-  scrollbar-color: rgba(100, 116, 139, 0.45) transparent;
+  scrollbar-color: var(--border-strong) transparent;
 }
 
 /* Screenshot mode — clean, self-contained view for sharing */
@@ -378,7 +417,7 @@ html[data-screenshot="true"] .lg\:grid-cols-\[1fr_18rem\] { grid-template-column
 html[data-screenshot="true"] .max-w-\[72rem\] { max-width: 100% !important; }
 html[data-screenshot="true"] { font-size: 16px; }
 html[data-screenshot="true"] body {
-  border: 1px solid rgba(56,189,248,0.12);
+  border: 1px solid var(--border-subtle);
   min-height: 100dvh;
 }
 
@@ -391,6 +430,11 @@ html[data-screenshot="true"] body {
   --color-slate-300: var(--app-text-secondary);
   --color-slate-400: var(--app-text-muted);
   --color-slate-500: var(--app-text-muted);
+  /* The line-state utilities: text-line-crossed-fg, border-line-clear-border/50. */
+  --color-line-crossed-fg: var(--line-crossed-ink);
+  --color-line-crossed-border: var(--line-crossed);
+  --color-line-clear-fg: var(--line-clear-ink);
+  --color-line-clear-border: var(--line-clear);
   --font-heading: var(--font-sans);
   --font-sans: var(--font-sans);
   --color-ring: var(--ring);
@@ -438,112 +482,141 @@ html[data-screenshot="true"] body {
   --ring: oklch(0.556 0 0);
 }
 
+/* The stock hue ramps components name directly, folded onto the roles above
+   (2026-10-09). About 630 class names say emerald, amber, rose, sky or cyan,
+   and none of them meant the hue: emerald meant clear (a copied link, a
+   success toast, a met line), amber and rose meant caution and danger, sky
+   and cyan meant "click". Pointing each ramp at its role carries every one
+   to the Synoptic palette at once, in both themes, because the roles resolve
+   per theme. New code names the role (text-line-crossed-fg, the --accent-*
+   and text tokens), not the hue.
+
+   - emerald: the clear state, which is the ink.
+   - rose: the crossed state, the front red.
+   - amber: caution, the same red as text; as a fill (500) it is the red at
+     half strength, so a scale that steps amber to rose (a gauge flattening,
+     then inverted; "risky", then "dangerous") still has two steps.
+   - sky, cyan: the action colour, which is the ink. 700 is an underline's
+     colour, the ink thinned against the ground.
+   Conditions never draw from these: they have their own utilities
+   (bg-condition-*, text-condition-*-ink) and the data-regime map. Violet,
+   which only ever meant Stormy, is unused. */
+:root {
+  --color-emerald-100: var(--line-clear-ink);
+  --color-emerald-200: var(--line-clear-ink);
+  --color-emerald-300: var(--line-clear-ink);
+  --color-emerald-400: var(--line-clear-ink);
+  --color-emerald-500: var(--line-clear);
+  --color-emerald-600: var(--line-clear);
+  --color-amber-50: var(--line-crossed-ink);
+  --color-amber-100: var(--line-crossed-ink);
+  --color-amber-200: var(--line-crossed-ink);
+  --color-amber-300: var(--line-crossed-ink);
+  --color-amber-400: var(--line-crossed-ink);
+  --color-amber-500: color-mix(in srgb, var(--line-crossed) 55%, var(--bg-body));
+  --color-amber-600: color-mix(in srgb, var(--line-crossed) 55%, var(--bg-body));
+  --color-rose-100: var(--line-crossed-ink);
+  --color-rose-200: var(--line-crossed-ink);
+  --color-rose-300: var(--line-crossed-ink);
+  --color-rose-400: var(--line-crossed-ink);
+  --color-rose-500: var(--line-crossed);
+  --color-rose-600: var(--line-crossed);
+  --color-sky-50: var(--accent-action);
+  --color-sky-100: var(--accent-action);
+  --color-sky-200: var(--accent-action);
+  --color-sky-300: var(--accent-action);
+  --color-sky-400: var(--accent-action);
+  --color-sky-500: var(--accent-action);
+  --color-sky-600: var(--accent-action);
+  --color-sky-700: color-mix(in srgb, var(--accent-action) 45%, var(--bg-body));
+  --color-sky-950: color-mix(in srgb, var(--accent-action) 12%, var(--bg-body));
+  --color-cyan-100: var(--accent-action);
+  --color-cyan-200: var(--accent-action);
+  --color-cyan-300: var(--accent-action);
+  --color-cyan-400: var(--accent-action);
+  /* The dark end of slate, which the @theme inline block leaves at stock
+     blue-grey: folded onto the night chart's own greys. */
+  --color-slate-600: #636768;
+  --color-slate-700: #44484a;
+  --color-slate-800: var(--bg-raised);
+  --color-slate-900: var(--bg-panel);
+  --color-slate-950: var(--bg-nested);
+}
+
 html[data-theme="light"] {
   color-scheme: light;
-  --footer-link: #475569;
-  --footer-link-hover: #0f172a;
-  --footer-legal: #475569;
-  --footer-legal-hover: #334155;
-  /* One temperature. The ground and the section surface were warm (a cream,
-     a bone) while raised and nested were stock slate — so the report-shell
-     intro card, every toast and popover, and the sticky call strip rendered
-     as blue-grey slabs on a warm page. Raised is now white: on a light ground
-     a surface that floats reads lighter than what it floats over, and the
-     elevation ladder already gives it the shadow; nested steps below the
-     ground in the ground's own hue. */
-  --bg-body: #faf8f5;
+  /* Synoptic's chart paper (2026-10-09): a cool green-grey ground, white
+     panels, and the ink near-black with a trace of the same green. It was a
+     cream (#faf8f5) with slate text, the other generated-design default. One
+     temperature: raised is white, since on a light ground a surface that
+     floats reads lighter than what it floats over, and nested steps below the
+     ground in the ground's own hue. Every tier that sits on the ground is
+     lighter than it, as on the dark ladder ("closer is lighter"). */
+  --bg-body: #f1f4f3;
   --bg-panel: #ffffff;
-  /* Lighter than the ground, like every other tier that sits on it: the dark
-     ladder reads "closer is lighter", and a surface darker than the body
-     read as sunken on the light theme while the raised tier beside it read
-     as lifted — two directions for one metaphor. */
-  --bg-surface: #fdfcfa;
-  --bg-surface-muted: rgba(253, 252, 250, 0.8);
+  --bg-surface: #fbfcfc;
+  --bg-surface-muted: rgba(251, 252, 252, 0.82);
   --bg-raised: #ffffff;
-  --bg-nested: #f0ede7;
-  --bg-nested-light: rgba(0, 0, 0, 0.035);
+  --bg-nested: #e6ebe9;
+  --bg-nested-light: rgba(18, 23, 25, 0.035);
 
-  /* Matched to the dark ladder's measured contrast against its own ground.
-     DD-006 raised the dark alphas because below a threshold "a card edge is
-     below the visible threshold", but noted the light theme was "verified
-     unaffected" and left it alone — nobody could reach the light theme to
-     notice, since the toggle was never rendered. Light was consistently a step
-     weaker than dark (subtle 1.10 vs 1.21, default 1.20 vs 1.31, strong 1.41 vs
-     1.58 against their respective grounds), which is why the light page read
-     washed out. These alphas reproduce the dark ratios on #faf8f5. */
-  --border-faint: rgba(0, 0, 0, 0.045);
-  --border-subtle: rgba(0, 0, 0, 0.085);
-  --border-default: rgba(0, 0, 0, 0.12);
-  --border-strong: rgba(0, 0, 0, 0.195);
+  /* The ink thinned, at the same steps as the dark ladder, so a border reads
+     as strongly against this ground as the dark one does against its own
+     (DD-006 found the light theme a step weaker on every tier). */
+  --border-faint: rgba(18, 23, 25, 0.06);
+  --border-subtle: rgba(18, 23, 25, 0.10);
+  --border-default: rgba(18, 23, 25, 0.14);
+  --border-strong: rgba(18, 23, 25, 0.21);
 
-  --app-text: #0f172a;
-  --app-text-secondary: #334155;
-  /* slate-600, not slate-500: muted text is the target of text-slate-400/500 and
-     at 12-13px slate-500 lands at 3.9-4.5:1 on --bg-body, just under AA. */
-  --app-text-muted: #475569;
-  /* Kept in lockstep with --border-default / --border-strong above. */
+  /* Muted clears 6.2:1 on the ground at 12-13px; the old slate-500 there
+     landed under AA, which is why muted sits this dark. */
+  --app-text: #121719;
+  --app-text-secondary: #384145;
+  --app-text-muted: #525c60;
 
-  /* Light-surface posture tint: same hues, held to a wash so text keeps contrast. */
-  --atmosphere-expansion: rgba(16, 185, 129, 0.05);
-  --atmosphere-defensive: rgba(217, 119, 6, 0.05);
-  --atmosphere-scarcity: rgba(225, 29, 72, 0.045);
-  --atmosphere-volatile: rgba(124, 58, 237, 0.045);
+  --line-crossed-ink: #b4232a;
+  --line-crossed: #d13b37;
+  --line-crossed-bg: #fbefef;
 
-  /* Phase-map quadrants and furniture. Same hues, re-mixed for a white plot
-     ground: the dark washes rely on a light tint lifting off a dark ground and
-     invert to nearly nothing on #ffffff, and the grid and trace have to darken
-     rather than lighten to stay visible at all. */
-  --phase-scarcity: rgba(225, 29, 72, 0.10);
-  --phase-defensive: rgba(217, 119, 6, 0.11);
-  --phase-volatile: rgba(124, 58, 237, 0.09);
-  --phase-expansion: rgba(5, 150, 105, 0.08);
-  --phase-grid: rgba(15, 23, 42, 0.10);
-  --phase-boundary: rgba(15, 23, 42, 0.34);
-  --phase-trace: rgba(51, 65, 85, 0.70);
+  --color-condition-sunny-ink: #7a5800;
+  --color-condition-cloudy-ink: #74552a;
+  --color-condition-stormy-ink: #4a4fc0;
+  --color-condition-freezing-ink: #1d5585;
 
-  /* 700-level so accent-tinted labels and badges clear 4.5:1 on --bg-body. */
-  --accent-action: #0369a1;
-  --accent-info: #1d4ed8;
-  --accent-success: #047857;
-  --accent-warning: #b45309;
-  --accent-danger: #b91c1c;
+  /* The dark end of slate on this ground: borders and a switch's track. */
+  --color-slate-600: #6f797c;
+  --color-slate-700: #525c60;
 
-  /* Semantic / decision / trust families were dark-only, so every chip, badge
-     and decision label painted a dark-tuned pastel (#86efac, #6ee7b7) onto
-     --bg-body and landed near 1.5:1. Foregrounds are 700-level to clear 4.5:1
-     there; borders sit at 400/500 and backgrounds at 50/100 because consumers
-     mix the bg token down to ~12% before painting. */
-  --color-semantic-tightening-fg: #b91c1c;
-  --color-semantic-tightening-border: #ef4444;
-  --color-semantic-easing-fg: #047857;
-  --color-semantic-easing-border: #10b981;
-  --color-semantic-unchanged-border: #94a3b8;
-  --color-semantic-caution-fg: #b45309;
-  --color-semantic-caution-border: #f59e0b;
-  --color-semantic-caution-bg: #fef3c7;
-  --color-semantic-reversal-fg: #be123c;
-  --color-semantic-stormy-fg: #6d28d9;
+  /* Light-surface posture tint: the condition fills, held to a wash so text keeps contrast. */
+  --atmosphere-expansion: rgba(217, 168, 44, 0.04);
+  --atmosphere-defensive: rgba(157, 122, 74, 0.04);
+  --atmosphere-scarcity: rgba(58, 111, 163, 0.04);
+  --atmosphere-volatile: rgba(143, 150, 224, 0.04);
 
-  /* Accent tints and the CTA treatment were dark-only, so the primary button
-     kept a bright cyan fill tuned for a near-black page. */
-  --accent-border: rgba(3, 105, 161, 0.30);
-  --accent-border-soft: rgba(3, 105, 161, 0.14);
-  /* Flat at what was the gradient's top stop (2026-10-09). An earlier top stop,
-     #0284c7, held only 4.10:1 against the white ink the light theme forces on
-     this button (see the rule near the end of this file); #0369a1 holds 5.9:1. */
-  --cta-fill: #0369a1;
-  --cta-border: rgba(3, 105, 161, 0.5);
-  --cta-shadow: 0 4px 10px -8px rgba(3, 105, 161, 0.45);
-  --cta-shadow-hover: 0 6px 14px -8px rgba(3, 105, 161, 0.55);
+  /* Phase-map quadrants and furniture, re-mixed for a white plot ground: the
+     washes a touch lighter than on the dark chart, and the grid and trace
+     darken rather than lighten to stay visible at all. */
+  --phase-scarcity: rgba(58, 111, 163, 0.16);
+  --phase-defensive: rgba(157, 122, 74, 0.16);
+  --phase-volatile: rgba(143, 150, 224, 0.16);
+  --phase-expansion: rgba(217, 168, 44, 0.16);
+  --phase-grid: rgba(18, 23, 25, 0.10);
+  --phase-boundary: rgba(18, 23, 25, 0.34);
+  --phase-trace: rgba(56, 65, 69, 0.70);
+
+  --accent-action: #121719;
+  --accent-border: rgba(18, 23, 25, 0.30);
+  --accent-border-soft: rgba(18, 23, 25, 0.14);
+  --cta-ink: #ffffff;
 
   /* Only the shadow COLORS flip — the --elev-* geometry is shared, so a card is
      the same height in both themes and only the ink changes. Light shadows need
-     roughly a quarter of the dark alpha: on #f8fafc the eye reads a 0.28 shadow
-     as a dirty smear, while on #08090b it barely separates the card at all.
-     A blue-black rather than neutral black keeps it from looking like soot. */
-  --shadow-color-faint: rgba(15, 23, 42, 0.04);
-  --shadow-color-soft: rgba(15, 23, 42, 0.07);
-  --shadow-color-mid: rgba(15, 23, 42, 0.11);
+     roughly a quarter of the dark alpha: on a light ground the eye reads a 0.28
+     shadow as a dirty smear. Tinted with the ink rather than neutral black, so
+     it does not look like soot. */
+  --shadow-color-faint: rgba(18, 23, 25, 0.04);
+  --shadow-color-soft: rgba(18, 23, 25, 0.07);
+  --shadow-color-mid: rgba(18, 23, 25, 0.11);
 
   /* A white top edge on a white card is invisible at best and a seam at worst. */
   --edge-highlight: rgba(255, 255, 255, 0);
@@ -570,15 +643,18 @@ html[data-theme="light"] {
 /* The regime map. Attribute values are the RegimeKey names; the inline
    `--regime-accent` that regimeAccentStyle sets on page shells still wins
    where present, and these give any element that names its regime the same
-   accent without a style prop. Ink comes from the semantic families, which
-   already carry a per-theme value, so a stamp is legible on both grounds.
+   accent without a style prop. The accent is the condition's fill, the same
+   hex as REGIME_HEX_COLORS; the ink is the condition's own text colour, which
+   carries a per-theme value, so a stamp is legible on both grounds. Until
+   2026-10-09 the ink came from the line-state families, so Sunny printed in
+   the "clear" ink and Cloudy in the "caution" one.
    Atmosphere is the top-of-page wash both shells paint (.weather-regime-ground),
    resolved here so the brief and the report routes cannot key it differently —
    the report backdrop used to hold its own hue table, with Sunny in teal. */
-[data-regime="EXPANSION"] { --regime-accent: #10b981; --regime-ink: var(--color-semantic-easing-fg); --regime-atmosphere: var(--atmosphere-expansion); }
-[data-regime="SCARCITY"] { --regime-accent: #f43f5e; --regime-ink: var(--color-semantic-reversal-fg); --regime-atmosphere: var(--atmosphere-scarcity); }
-[data-regime="DEFENSIVE"] { --regime-accent: #f59e0b; --regime-ink: var(--color-semantic-caution-fg); --regime-atmosphere: var(--atmosphere-defensive); }
-[data-regime="VOLATILE"] { --regime-accent: #8b5cf6; --regime-ink: var(--color-semantic-stormy-fg); --regime-atmosphere: var(--atmosphere-volatile); }
+[data-regime="EXPANSION"] { --regime-accent: #d9a82c; --regime-ink: var(--color-condition-sunny-ink); --regime-atmosphere: var(--atmosphere-expansion); }
+[data-regime="SCARCITY"] { --regime-accent: #3a6fa3; --regime-ink: var(--color-condition-freezing-ink); --regime-atmosphere: var(--atmosphere-scarcity); }
+[data-regime="DEFENSIVE"] { --regime-accent: #9d7a4a; --regime-ink: var(--color-condition-cloudy-ink); --regime-atmosphere: var(--atmosphere-defensive); }
+[data-regime="VOLATILE"] { --regime-accent: #8f96e0; --regime-ink: var(--color-condition-stormy-ink); --regime-atmosphere: var(--atmosphere-volatile); }
 
 /* Light mode: remap opacity-based v2 styles onto the three text roles.
    154 usages spread across 12 alpha steps used to be mapped one line at a time,
@@ -587,8 +663,8 @@ html[data-theme="light"] {
    alpha lands on a role, so a new text-white/NN can never render blank.
 
    /75 and up is primary text, /50-/70 is secondary, below /50 is muted.
-   The muted floor is --app-text-muted (#475569) because #64748b measured
-   4.49:1 on #faf8f5 — just under AA. */
+   The muted floor is --app-text-muted, the lightest text role that clears AA
+   on this ground. */
 [data-theme="light"] body { color: var(--app-text); }
 [data-theme="light"] [class^="text-white"], [data-theme="light"] [class*=" text-white"] { color: var(--app-text-muted) !important; }
 [data-theme="light"] [class^="text-white/5"], [data-theme="light"] [class*=" text-white/5"],
@@ -614,7 +690,7 @@ html:not([data-theme="light"]) [class^="text-white/5"], html:not([data-theme="li
 }
 
 /* Slate text is bound to theme text roles via @theme inline in this file */
-[data-theme="light"] .bg-white\/\[0\.04\] { background: rgba(0,0,0,0.03) !important; }
+[data-theme="light"] .bg-white\/\[0\.04\] { background: var(--bg-nested-light) !important; }
 /* Catch-all first: a white border is invisible on this theme's near-white
    ground, and the hand-maintained list below had drifted badly from actual
    usage — it covers four alphas while the app uses eleven, leaving 24 of 41
@@ -624,15 +700,12 @@ html:not([data-theme="light"]) [class^="text-white/5"], html:not([data-theme="li
 [data-theme="light"] [class*="border-white/"] { border-color: var(--border-default); }
 [data-theme="light"] [class*="divide-white/"] > * + * { border-color: var(--border-default); }
 
-[data-theme="light"] .border-white\/\[0\.06\] { border-color: rgba(0,0,0,0.06) !important; }
-[data-theme="light"] .border-white\/\[0\.08\] { border-color: rgba(0,0,0,0.08) !important; }
+[data-theme="light"] .border-white\/\[0\.06\] { border-color: var(--border-faint) !important; }
+[data-theme="light"] .border-white\/\[0\.08\] { border-color: var(--border-subtle) !important; }
 
 html[data-theme="light"] .weather-input,
 html[data-theme="light"] .weather-control { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
 html[data-theme="light"] .weather-button { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
-/* White, not navy: the light CTA fill is a saturated blue (see
-   --cta-fill above), so dark-on-blue would sit near 1.5:1. */
-html[data-theme="light"] .weather-button-primary { color: #ffffff; }
 /* controls.css fills these from the dark surface tokens; without a light
    counterpart the pill kept a near-black background while text-slate-100
    flipped to dark, so the /evidence header chip rendered dark-on-dark. */
@@ -645,102 +718,23 @@ html[data-theme="light"] .weather-pill {
 /* The selected pill (controls.css), which the rule above would otherwise
    repaint as an unselected one. */
 html[data-theme="light"] .weather-pill[aria-current="page"] {
-  border-color: rgba(3, 105, 161, 0.55);
-  background-color: rgba(14, 165, 233, 0.12);
+  border-color: var(--accent-action);
+  background-color: color-mix(in srgb, var(--accent-action) 10%, transparent);
 }
 /* Dark nested surfaces (bg-slate-800/900/950 at any alpha) inverted to a light
    tint. Enumerating single alphas missed bg-slate-950/45, which composited to a
    mid-grey card that swallowed its own label text on /evidence. Anchored to a
-   class boundary so hover:/focus: variants keep their own treatment.
-   background-color only: the regime shells in lib/regimePresentation.ts carry a
-   gradient via background-image and must stay dark in both themes. */
+   class boundary so hover:/focus: variants keep their own treatment. */
 html[data-theme="light"] [class^="bg-slate-950"], html[data-theme="light"] [class*=" bg-slate-950"],
-html[data-theme="light"] [class^="bg-slate-900"], html[data-theme="light"] [class*=" bg-slate-900"] { background-color: rgba(0,0,0,0.035) !important; }
-
-/* The same inversion for the semantic 900/950 tints, which the slate rule above
-   does not cover: rose, amber and emerald at those tiers stayed dark in this
-   theme, so the threshold buffer bar composited a 40% near-black rose over the
-   cream ground and rendered as muddy mauve. Mapped to the matching 50-tier
-   rather than to the neutral grey the slate rule uses — these carry the warning
-   and all-clear roles, and flattening them to grey would turn meaning into
-   decoration. Class-boundary anchored like the rules above, so hover:/focus:
-   variants keep their own treatment. */
-html[data-theme="light"] [class^="bg-rose-950"], html[data-theme="light"] [class*=" bg-rose-950"],
-html[data-theme="light"] [class^="bg-rose-900"], html[data-theme="light"] [class*=" bg-rose-900"] { background-color: #fff1f2 !important; }
-html[data-theme="light"] [class^="bg-amber-950"], html[data-theme="light"] [class*=" bg-amber-950"],
-html[data-theme="light"] [class^="bg-amber-900"], html[data-theme="light"] [class*=" bg-amber-900"] { background-color: #fffbeb !important; }
-html[data-theme="light"] [class^="bg-emerald-950"], html[data-theme="light"] [class*=" bg-emerald-950"],
-html[data-theme="light"] [class^="bg-emerald-900"], html[data-theme="light"] [class*=" bg-emerald-900"] { background-color: #ecfdf5 !important; }
-html[data-theme="light"] [class^="bg-sky-950"], html[data-theme="light"] [class*=" bg-sky-950"],
-html[data-theme="light"] [class^="bg-sky-900"], html[data-theme="light"] [class*=" bg-sky-900"] { background-color: #f0f9ff !important; }
-html[data-theme="light"] [class^="bg-slate-800"], html[data-theme="light"] [class*=" bg-slate-800"] { background-color: rgba(0,0,0,0.05) !important; }
+html[data-theme="light"] [class^="bg-slate-900"], html[data-theme="light"] [class*=" bg-slate-900"] { background-color: var(--bg-nested-light) !important; }
+html[data-theme="light"] [class^="bg-slate-800"], html[data-theme="light"] [class*=" bg-slate-800"] { background-color: rgba(18, 23, 25, 0.05) !important; }
 html[data-theme="light"] [class^="border-slate-800"], html[data-theme="light"] [class*=" border-slate-800"],
-html[data-theme="light"] [class^="border-slate-900"], html[data-theme="light"] [class*=" border-slate-900"] { border-color: rgba(0,0,0,0.10) !important; }
-/* Light mode: keep decision-semantic hues legible on the light surface.
-   These labels ("Guardrail:", "Trigger:", "HOLD", "REVISIT") render at 12-13px,
-   so they need 4.5:1, and the 50-500 shades only reach 1.6-3.9 on --bg-body.
-   The whole light end of each hue therefore collapses onto the 700 shade.
-
-   Matching on the class attribute rather than naming each shade/alpha pair:
-   the enumerated form silently missed /60 and the -100 shades, which is how
-   "54/100 - low" and the active nav pills ended up near-white on near-white.
-   Selectors are anchored to a class boundary (^= or *=" ") so variant-prefixed
-   classes like hover:text-sky-100 fall through to the :hover rules below and
-   keep a distinct state instead of being flattened to the base color.
-
-   Shades 100-400 only. text-<hue>-50 is deliberately excluded: it is used as
-   light text on the dark regime shells in lib/regimePresentation.ts, which stay
-   dark in both themes. text-<hue>-500 has no usages, so nothing needs it. */
-html[data-theme="light"] [class^="text-emerald-1"], html[data-theme="light"] [class*=" text-emerald-1"],
-html[data-theme="light"] [class^="text-emerald-2"], html[data-theme="light"] [class*=" text-emerald-2"],
-html[data-theme="light"] [class^="text-emerald-3"], html[data-theme="light"] [class*=" text-emerald-3"],
-html[data-theme="light"] [class^="text-emerald-4"], html[data-theme="light"] [class*=" text-emerald-4"] { color: #047857 !important; }
-
-html[data-theme="light"] [class^="text-amber-1"], html[data-theme="light"] [class*=" text-amber-1"],
-html[data-theme="light"] [class^="text-amber-2"], html[data-theme="light"] [class*=" text-amber-2"],
-html[data-theme="light"] [class^="text-amber-3"], html[data-theme="light"] [class*=" text-amber-3"],
-/* amber-800, not amber-700: #b45309 measured 4.49:1 on --bg-panel, which is
-   under AA by a hair — and amber is the warning role, so it is exactly the text
-   that must stay readable. Hover moves to amber-900 below to keep the state
-   change visible. */
-html[data-theme="light"] [class^="text-amber-4"], html[data-theme="light"] [class*=" text-amber-4"] { color: #92400e !important; }
-
-html[data-theme="light"] [class^="text-sky-1"], html[data-theme="light"] [class*=" text-sky-1"],
-html[data-theme="light"] [class^="text-sky-2"], html[data-theme="light"] [class*=" text-sky-2"],
-html[data-theme="light"] [class^="text-sky-3"], html[data-theme="light"] [class*=" text-sky-3"],
-/* sky-800, not sky-700: #0369a1 measures 4.42:1 on the active cadence tab's
-   own bg-sky-500/14 tint, just under AA. On the page ground it passed either
-   way, so the tint is what decides it. Hover drops to sky-900 below. */
-html[data-theme="light"] [class^="text-sky-4"], html[data-theme="light"] [class*=" text-sky-4"] { color: #075985 !important; }
-
-html[data-theme="light"] [class^="text-rose-1"], html[data-theme="light"] [class*=" text-rose-1"],
-html[data-theme="light"] [class^="text-rose-2"], html[data-theme="light"] [class*=" text-rose-2"],
-html[data-theme="light"] [class^="text-rose-3"], html[data-theme="light"] [class*=" text-rose-3"],
-html[data-theme="light"] [class^="text-rose-4"], html[data-theme="light"] [class*=" text-rose-4"] { color: #b91c1c !important; }
-
-/* The two remaining hues, each a handful of call sites: violet is the
-   "change course if" eyebrow on /operate and /history/compare, cyan a
-   scenario label. Same 100-400 floor as the rest. */
-html[data-theme="light"] [class^="text-violet-1"], html[data-theme="light"] [class*=" text-violet-1"],
-html[data-theme="light"] [class^="text-violet-2"], html[data-theme="light"] [class*=" text-violet-2"],
-html[data-theme="light"] [class^="text-violet-3"], html[data-theme="light"] [class*=" text-violet-3"],
-html[data-theme="light"] [class^="text-violet-4"], html[data-theme="light"] [class*=" text-violet-4"] { color: #6d28d9 !important; }
-html[data-theme="light"] [class^="text-cyan-1"], html[data-theme="light"] [class*=" text-cyan-1"],
-html[data-theme="light"] [class^="text-cyan-2"], html[data-theme="light"] [class*=" text-cyan-2"],
-html[data-theme="light"] [class^="text-cyan-3"], html[data-theme="light"] [class*=" text-cyan-3"],
-html[data-theme="light"] [class^="text-cyan-4"], html[data-theme="light"] [class*=" text-cyan-4"] { color: #155e75 !important; }
-
-/* Hover lands one step darker so the state stays readable as a change. */
-html[data-theme="light"] [class*="hover:text-emerald-"]:hover { color: #065f46 !important; }
-html[data-theme="light"] [class*="hover:text-amber-"]:hover { color: #78350f !important; }
-html[data-theme="light"] [class*="hover:text-sky-"]:hover { color: #0c4a6e !important; }
-html[data-theme="light"] [class*="hover:text-rose-"]:hover { color: #991b1b !important; }
-
-/* Focus rings are authored as sky-200/300/400 (51 usages) — bright cyan that
-   reads on the dark surface and washes out on white. The ring is the primary
-   keyboard affordance, so it tracks the theme rather than the palette. */
-html[data-theme="light"] [class*="outline-sky-"]:focus-visible { outline-color: #0369a1 !important; }
-html[data-theme="light"] [class*="ring-sky-"]:focus-visible { --tw-ring-color: #0369a1 !important; }
+html[data-theme="light"] [class^="border-slate-900"], html[data-theme="light"] [class*=" border-slate-900"] { border-color: var(--border-subtle) !important; }
+/* The hue patches that lived here — a 700-level hex per hue for text-<hue>-*,
+   a darker one on hover, a dark blue for every sky focus ring, a 50-level
+   wash for each 900/950 tint — went on 2026-10-09: the ramps resolve to roles
+   (the block after .dark above), and the roles carry their own light values,
+   so text-amber-300 is the light red here without a rule of its own. */
 
 /* Retina resolves the tight contact layer honestly; on 1x displays it rounds to
    a hard 1px line and reads as a second border, so soften it there. Borders move
@@ -752,12 +746,12 @@ html[data-theme="light"] [class*="ring-sky-"]:focus-visible { --tw-ring-color: #
   :root {
     --shadow-color-soft: rgba(0, 0, 0, 0.22);
     --shadow-color-mid: rgba(0, 0, 0, 0.36);
-    --border-faint: rgba(226, 232, 240, 0.075);
-    --border-subtle: rgba(226, 232, 240, 0.095);
+    --border-faint: rgba(237, 240, 238, 0.075);
+    --border-subtle: rgba(237, 240, 238, 0.095);
   }
 
   html[data-theme="light"] {
-    --border-faint: rgba(0, 0, 0, 0.055);
-    --border-subtle: rgba(0, 0, 0, 0.07);
+    --border-faint: rgba(18, 23, 25, 0.07);
+    --border-subtle: rgba(18, 23, 25, 0.09);
   }
 }

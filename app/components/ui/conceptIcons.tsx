@@ -21,9 +21,10 @@ import { ICON_STROKE_WIDTH } from "../uiIcons";
  * - One size scale: 16px inline, 20px on a card. A caller drawing inside a
  *   scaled SVG passes `width` and `height` in that drawing's units instead.
  * - Colour from the tokens the words already use: a condition in its regime
- *   ink (`data-regime` resolves `--regime-ink`), a state in the caution or
- *   easing ink, an area in the text colour around it. Shape and colour then say
- *   the same thing, and the shape alone still says it in greyscale.
+ *   ink (`data-regime` resolves `--regime-ink`), a state in the line-state
+ *   ink (the front red, or the neutral ink for clear), an area in the text
+ *   colour around it. Shape and colour then say the same thing, and the shape
+ *   alone still says it in greyscale.
  * - Plain-text artifacts (pastes, RSS, llms.txt, email text) carry none of
  *   this; they render words only.
  */
@@ -105,20 +106,22 @@ export function AreaLabel({ area, size = "inline", className }: { area: Decision
   );
 }
 
-/* Caution for a pause line crossed or close, easing for one cleared or a
-   resume line met: the inks the pause and resume columns already print in. */
+/* The line states' own tokens, not a condition's: the front red for a pause
+   line crossed or close, the neutral ink for one cleared or a resume line met,
+   so the play glyph is what says "clear". Until 2026-10-09 these were the
+   caution and easing families, which were also Cloudy's and Sunny's inks. */
 const LINE_STATE_INK: Record<LineState, string> = {
-  crossed: "text-semantic-caution-fg",
-  near: "text-semantic-caution-fg",
-  clear: "text-semantic-easing-fg",
+  crossed: "text-line-crossed-fg",
+  near: "text-line-crossed-fg",
+  clear: "text-line-clear-fg",
 };
 
 /* A line in force is a status, so it is drawn as a stamp (§XIV); "close" keeps
    the neutral edge, because nothing has happened yet. */
 const LINE_STATE_STAMP: Record<LineState, string> = {
-  crossed: "border-semantic-caution-border/50 bg-semantic-caution-border/10 font-semibold",
+  crossed: "border-line-crossed-border/50 bg-line-crossed-border/10 font-semibold",
   near: "border-[color:var(--border-strong)] font-medium",
-  clear: "border-semantic-easing-border/50 bg-semantic-easing-border/10 font-semibold",
+  clear: "border-line-clear-border/50 bg-line-clear-border/10 font-semibold",
 };
 
 /** The state's glyph alone, for a key whose words sit beside it ("Pause 76", "Resume 66"). */

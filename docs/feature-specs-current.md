@@ -3195,6 +3195,71 @@ reports the test, and the rule kept the current ramp.
   `lib/research/premiseTestDocs.ts`, which `scripts/research/publishPremiseTestDocs.ts` builds from
   `docs/research/`; `tests/premiseTestDocs.test.ts` fails when the two differ.
 
+### 1.1.69 The Synoptic palette (2026-10-09)
+
+The owner chose Synoptic from the three directions in `docs/design/palette-directions.md` (PR
+#1566). This applies its colours and keeps the shipped type (Archivo, Chivo Mono). The rules are in
+`docs/agents/ui-ux-standards.md` §XVI; the values live in `app/styles/tokens.css`.
+
+**What colour means.** Two things and nothing else: the four conditions, and where a line stands.
+Everything else is ink, including links, buttons and focus rings (links keep their underline).
+
+| Role | Dark (default) | Light |
+| --- | --- | --- |
+| Ground / panel | night chart `#0f1316` / `#171c20` | chart paper `#f1f4f3` / `#ffffff` |
+| Ink / secondary / muted | `#edf0ee` / `#cdd3d1` / `#a0a9a7` | `#121719` / `#384145` / `#525c60` |
+| Line crossed or close: text / mark | `#f2685c` / `#e5484d` | `#b4232a` / `#d13b37` |
+| Line clear | the ink | the ink |
+| Condition fill (both themes) | Sunny `#d9a82c`, Cloudy `#9d7a4a`, Stormy `#8f96e0`, Freezing `#3a6fa3` | the same |
+| Condition ink | `#f5cf5a`, `#d6b98a`, `#b9bfff`, `#8cc0ec` | `#7a5800`, `#74552a`, `#4a4fc0`, `#1d5585` |
+
+**Conditions.** Warm is risk appetite on (Sunny, Cloudy) and cool is off (Stormy, Freezing); light
+is cheap money (Sunny, Stormy) and dense is dear (Cloudy, Freezing). One set of four fills serves
+both themes: `REGIME_HEX_COLORS`, the data-regime map and the `bg-condition-*` utilities, which
+`tests/regimeColourContract.test.tsx` holds together. Each fill sits midway between the direction's
+light and dark values. Sunny and Freezing, the best and worst conditions, were emerald and rose,
+5.6 apart for a deuteranope (OKLab ×100, Machado 2009 at full severity); they are 34.6 apart now,
+and the closest pair under either red-green deficiency is Stormy–Freezing at 16.8 and 15.4.
+
+**Line states are their own tokens** (`--line-*`, `text-line-crossed-fg`, `text-line-clear-fg`). A
+cleared line printed in Sunny's green and a crossed one in Cloudy's amber, so a state read as a
+condition. The caution, tightening and easing families now alias the line states, so every consumer
+of them moved at once: Stop and a pause line are the front red, Start and a resume line the ink,
+Keep limited the secondary ink. The radar's corner words read the condition inks.
+
+**The stock hue ramps are folded onto roles.** About 630 class names say emerald, amber, rose, sky or
+cyan, and none meant the hue. In `tokens.css` emerald is the clear ink, amber and rose the front red
+(amber at half strength as a fill, so a two-step scale keeps two steps), and sky and cyan the action
+ink. Conditions never draw from these. The light theme's per-hue `!important` patches are gone,
+because the roles carry their own light values.
+
+**Hard-coded surfaces.** The OG cards, the image card, the meeting slide (SVG and HTML), the board
+deck, the weekly email, the alert and month-end emails, the embed and its loader read
+`lib/image/ogTheme.ts`, which mirrors the dark theme and adds the line-state reds and the condition
+inks (`OG_CONDITION_INK`). The slide's and the deck's condition badge was rose for Cloudy and
+Freezing and green otherwise, so a Stormy slide wore Sunny's badge; it is the condition's own
+colour now. The static OG templates' six category hues are the ink. The rates chart on `/signals`
+tells its four terms apart by ink and dash. Print rules take the light theme's values.
+
+**Default theme.** Unchanged: dark, as the direction's recommendation says for the first
+application. The bootstrap reads only the stored preference (no system preference is consulted), and
+the toggle is unchanged. Making light the default is one line in `buildThemeBootstrapScript`.
+
+**Measured.** Every text role, condition ink and line-state ink clears 4.5:1 on its ground and panel
+in both themes; the lowest is the light muted ink at 6.2:1. The band's glyph (black at 70%) clears
+3:1 on every fill, Freezing lowest at 3.1. As marks on the light ground, Sunny's fill is 2.0:1 and
+Stormy's 2.5:1, as Sunny's (2.4) and Cloudy's (2.0) were before: no condition fill carries meaning
+alone, since each sits beside its glyph and its word. The golden pins moved for the slide HTML, the
+slide SVG and the deck's hash only.
+
+Before and after, at 390 and 1280px, in both themes and in greyscale, with the OG card, the slide
+and the weekly email: `docs/assets/palette-directions/applied-*.jpg`. The week differs between the
+two captures because §1.1.66 re-scored it in between (Freezing before, Cloudy after).
+
+Left on the old palette: the brand mark (`public/favicon*.svg`, `icon*.svg`, `whether-logo.svg`,
+`app/brandAssets.ts` and the raster icons), which is its own decision, and
+`scripts/generate-scenes.ts`, which renders marketing scenes and nothing on the site.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

@@ -84,10 +84,11 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
           })}
         </div>
         {/* Each long run carries its condition's glyph, so the band reads without
-            colour: Freezing's rose and Stormy's violet are one grey in
-            greyscale, and so are Sunny's green and Cloudy's amber. Dark ink on
-            the 500-level hue in both themes; runs too short for a 16px glyph
-            are named by the key below. */}
+            colour. Under the old hues Freezing and Stormy were one grey in
+            greyscale; the Synoptic fills differ in lightness, but Sunny and
+            Stormy still sit close in grey. Dark ink on the condition's fill in
+            both themes (3.1:1 on Freezing, the lowest); runs too short for a
+            16px glyph are named by the key below. */}
         {stripRuns(sorted).map((run) => {
           const share = run.length / sorted.length;
           return isRegimeKey(run.regime) && share >= RUN_GLYPH_MIN_SHARE_SM ? (

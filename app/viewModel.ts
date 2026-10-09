@@ -15,11 +15,12 @@ export const CONFIDENCE_COLOR = (label: string) =>
 
 // Record<string, string> lets consumers index dictionary keys at call sites.
 // satisfies checks that all RegimeKey values have entries — remove a regime, get a compile error.
+// The condition fills from tokens.css, the same four as REGIME_HEX_COLORS.
 export const REGIME_COLORS: Record<string, string> = {
-  SCARCITY: "bg-rose-400/60",
-  DEFENSIVE: "bg-amber-400/60",
-  VOLATILE: "bg-violet-400/60",
-  EXPANSION: "bg-emerald-400/60",
+  SCARCITY: "bg-condition-freezing/60",
+  DEFENSIVE: "bg-condition-cloudy/60",
+  VOLATILE: "bg-condition-stormy/60",
+  EXPANSION: "bg-condition-sunny/60",
 } satisfies Record<RegimeKey, string>;
 
 export const formatBoldnessDeltaLabel = (delta: number) => {

@@ -14,7 +14,7 @@ export const actionPage = (title: string, body: string, status = 200) =>
     [
       "<!DOCTYPE html><html lang='en'><head><meta charset='utf-8'><meta name='viewport' content='width=device-width,initial-scale=1'>",
       `<meta name='robots' content='noindex'><title>${escapeHtml(title)} · Whether</title></head>`,
-      "<body style='font-family:sans-serif;max-width:480px;margin:40px auto;padding:20px;color:#1e293b;text-align:center;'>",
+      "<body style='font-family:sans-serif;max-width:480px;margin:40px auto;padding:20px;color:#121719;text-align:center;'>",
       "<main>",
       `<h1 style='font-size:1.1rem;font-weight:600;'>${escapeHtml(title)}</h1>`,
       body,
@@ -31,17 +31,17 @@ export const actionPage = (title: string, body: string, status = 200) =>
     },
   );
 
-export const actionParagraph = (text: string) => `<p style='font-size:0.95rem;color:#475569;'>${escapeHtml(text)}</p>`;
+export const actionParagraph = (text: string) => `<p style='font-size:0.95rem;color:#384145;'>${escapeHtml(text)}</p>`;
 
 export const ACTION_HOME_LINK =
-  "<a href='/' style='display:inline-block;margin-top:16px;padding:8px 16px;border-radius:6px;background:#0f172a;color:#fff;text-decoration:none;font-size:0.9rem;'>Return to Whether</a>";
+  "<a href='/' style='display:inline-block;margin-top:16px;padding:8px 16px;border-radius:6px;background:#121719;color:#fff;text-decoration:none;font-size:0.9rem;'>Return to Whether</a>";
 
 /** The one button the page offers, posting the token back to `action`. */
 export const actionForm = (action: string, token: string, label: string) =>
   [
     `<form method='post' action='${escapeHtml(action)}'>`,
     `<input type='hidden' name='token' value='${escapeHtml(token)}'>`,
-    `<button type='submit' style='margin-top:8px;padding:10px 20px;border:0;border-radius:6px;background:#0f172a;color:#fff;font-weight:600;font-size:0.95rem;cursor:pointer;'>${escapeHtml(label)}</button>`,
+    `<button type='submit' style='margin-top:8px;padding:10px 20px;border:0;border-radius:6px;background:#121719;color:#fff;font-weight:600;font-size:0.95rem;cursor:pointer;'>${escapeHtml(label)}</button>`,
     "</form>",
   ].join("");
 

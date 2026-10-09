@@ -17,9 +17,10 @@
     display: none !important;
   }
 
+  /* Paper takes the light theme's values as literals (surfaces.css says which). */
   body {
     background: white !important;
-    color: #0f172a !important;
+    color: #121719 !important;
     font-size: 11pt;
     line-height: 1.5;
   }
@@ -30,20 +31,20 @@
   }
 
   h1, h2, h3, [class*="text-slate-100"], [class*="text-slate-50"] {
-    color: #0f172a !important;
+    color: #121719 !important;
   }
 
   [class*="text-slate-300"], [class*="text-slate-400"] {
-    color: #475569 !important;
+    color: #525c60 !important;
   }
 
   [class*="text-slate-200"] {
-    color: #334155 !important;
+    color: #384145 !important;
   }
 
   [class*="bg-slate-950"], [class*="bg-slate-900"], [class*="bg-slate-800"] {
     background: white !important;
-    border-color: #e2e8f0 !important;
+    border-color: #dcdfde !important;
   }
 
   [class*="bg-gradient"], [class*="from-slate"], [class*="to-slate"] {
@@ -51,27 +52,18 @@
   }
 
   [class*="text-slate-50"] {
-    color: #0f172a !important;
+    color: #121719 !important;
   }
 
-  [class*="text-rose-200"], [class*="text-rose-300"] {
-    color: #b91c1c !important;
-  }
-
-  [class*="text-emerald-200"], [class*="text-emerald-300"] {
-    color: #047857 !important;
-  }
-
-  [class*="text-sky-200"], [class*="text-sky-300"] {
-    color: #0369a1 !important;
-  }
-
+  /* The crossed red. Emerald and sky are the ink, which h1-h3 and body
+     already print in. */
+  [class*="text-rose-200"], [class*="text-rose-300"],
   [class*="text-amber-200"], [class*="text-amber-300"] {
-    color: #b45309 !important;
+    color: #b4232a !important;
   }
 
   [data-page-section] {
-    border-color: #d1d5db !important;
+    border-color: #cfd1d1 !important;
     background: white !important;
     break-inside: avoid;
     page-break-inside: avoid;
@@ -79,8 +71,8 @@
   }
 
   [data-page-section] h2 {
-    color: #374151 !important;
-    border-bottom: 1px solid #e5e7eb;
+    color: #384145 !important;
+    border-bottom: 1px solid #dcdfde;
     padding-bottom: 0.25rem;
     margin-bottom: 0.5rem;
   }
