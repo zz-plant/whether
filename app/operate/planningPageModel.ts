@@ -23,7 +23,6 @@ import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { PlanLinesForm } from "./components/planLinesForm";
 import { buildCanonicalBoundedDecisionRules, decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import { planLinesFromRules } from "../../lib/alert/planLines";
-import { SHARE_OR_EMBED_NEXT_STEP } from "../components/shareOrEmbedLink";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
@@ -163,15 +162,10 @@ export async function buildPlanningPageModel(
         showOfflineBadge: isFallback && !historicalSelection,
         strip: trustStrip,
       },
-      actions: {
-        // No hero Share, and no Share step: until 2026-10-08 this page carried
-        // the brief picker as its last step, one of five places the site
-        // offered to share the same week. Every format, the embed, the
-        // citation and the API live on /share; this is the one link to it, in
-        // the shell's one predictable place. It replaced the handoff to
-        // Resolve, which folded into this page's Test step and into Guides.
-        nextStep: SHARE_OR_EMBED_NEXT_STEP,
-      },
+      // No hero Share, no Share step and no closing "Share or embed this"
+      // card: every format, the embed, the citation and the API live on
+      // /share, which the header's "Use it elsewhere" and the footer reach
+      // from every page (the card went on 2026-10-09).
       payloads: {
         structuredData,
         historicalBanner: historicalSelection

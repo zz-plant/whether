@@ -121,11 +121,11 @@ describe("/operate tail", () => {
 
   /* The "Resource templates and guides" disclosure listed the guides Guides lists, and
      the Share step offered four of /share's formats. Since 2026-10-08 the page ends on
-     its risk checks and hands off to /share once, in the shell's next-step card. */
-  it("ends on the risk checks and hands sharing to /share once", async () => {
+     its risk checks; the closing "Share or embed this" card that followed them repeated
+     the header's and the footer's way to /share and went on 2026-10-09. */
+  it("ends on the risk checks, with no closing share card", async () => {
     const { children, reportShellModel } = await buildPlanningPageModel();
     assert.ok(!elementsIn(children).some((element) => element.type === "summary"), "no resources disclosure");
-    assert.equal(reportShellModel.actions?.nextStep?.href, "/share");
-    assert.equal(reportShellModel.actions?.nextStep?.label, "Share or embed this →");
+    assert.equal(reportShellModel.actions, undefined);
   });
 });
