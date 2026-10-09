@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { MARGIN_LABEL, formatMarginBand, formatMarginReading } from "../../lib/report/reportFormatting";
+import { SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
 
 /**
  * Freshness and confidence, once, in the same place on every reading route.
@@ -29,6 +30,14 @@ export type TrustStripProps = {
   couldChangeNextWeek: boolean;
   /** Why it could, when the distance does not already say: "a change is waiting on a second reading". */
   changeReason?: string;
+  /**
+   * Which inputs set the scores (`resolveScoringBasis`): the cell's value, and
+   * after it what the inputs left out would do to a line, where they would
+   * move one ("Startup-market inputs would put risk appetite at 49, below its
+   * change line"). `note` is the one place a page says why its conditions
+   * differ from the published week's, where the basis is the reason.
+   */
+  basis: { key: ScoringBasisKey; value: string; warning: string | null; note?: string | null };
   /** Where the full explanation lives. Omit on /trust itself. */
   href?: "/trust";
   /** How the strip sits below `sm`. "grid" (the default) is the two-column
@@ -62,15 +71,25 @@ export function TrustStrip({
   margin,
   couldChangeNextWeek,
   changeReason,
+  basis,
   href,
   phoneLayout = "grid",
   className = "",
 }: TrustStripProps) {
+  const basisDetail = [basis.warning, basis.note].filter((part): part is string => Boolean(part)).join(" ");
   /* `routine`: the fact is in the state a reader does not need to act on.
      Only the phone line leaves those out, and only when the strip links to
      the page that states them; an exception (cached sources, Low confidence)
      always prints. */
-  const cells: { label: string; value: string; detail?: string; tone?: "caution" | "easing"; routine?: boolean }[] = [
+  const cells: {
+    label: string;
+    value: string;
+    detail?: string;
+    /** Which fact the detail is, for a reader of the markup: the next-week forecast, or the basis's warning. */
+    detailKind?: "next-week" | "basis";
+    tone?: "caution" | "easing";
+    routine?: boolean;
+  }[] = [
     /* "Data as of": the date the guidance rests on. The report intro's other date
        is when the sources were last checked, and it says so (2026-10-09). */
     { label: "Data as of", value: recordDateLabel },
@@ -85,7 +104,20 @@ export function TrustStrip({
       label: MARGIN_LABEL,
       value: describeMarginCell(margin, confidenceLabel),
       detail: describeNextWeek(couldChangeNextWeek, changeReason),
+      detailKind: "next-week",
       tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caution" : undefined,
+    },
+    /* Which inputs set the scores, on every call (2026-10-09). Routine on the
+       record's own inputs with nothing left out that would move a line: the
+       phone line folds it like live sources, and /trust is one tap away. A
+       warning, a stored reading scored on more inputs than the record, or the
+       note on why the published week differs always prints. */
+    {
+      label: SCORING_BASIS_LABEL,
+      value: basis.value,
+      ...(basisDetail ? { detail: basisDetail, detailKind: "basis" as const } : {}),
+      tone: basisDetail || basis.key === "extended" ? "caution" : undefined,
+      routine: !basisDetail && basis.key === "record",
     },
   ];
   /* A phone wraps the four pairs, and a label told from a value only by its
@@ -121,7 +153,9 @@ export function TrustStrip({
           >
             {/* On the one-line phone layout the label and value are told apart by shade
                 alone, so "Could change next week Risk appetite is 2 pts" ran together. */}
-            <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500`}>{cell.label}</dt>
+            {/* A label never wraps: beside a long value ("Scored on" before a warning) it
+                broke onto two lines and read as two labels. */}
+            <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>{cell.label}</dt>
             {line ? " " : null}
             {/* A state carries a dot as well as its ink, so "Partly cached" and
                 "2 pts from its line" read as flags at a glance and survive a
@@ -138,7 +172,11 @@ export function TrustStrip({
             >
               {cell.value}
               {cell.detail ? (
-                <span className="font-normal text-slate-400" data-next-week>
+                <span
+                  className="font-normal text-slate-400"
+                  data-next-week={cell.detailKind === "next-week" ? "" : undefined}
+                  data-basis-warning={cell.detailKind === "basis" ? "" : undefined}
+                >
                   {" · "}
                   {cell.detail}
                 </span>

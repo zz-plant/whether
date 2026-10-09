@@ -201,7 +201,9 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
           ]}
           trust={null}
-          captionDetail={`Margin: ${display.confidence.toLowerCase()}`}
+          /* The margin and the basis, inside the card's border: a crop of a cited week
+             keeps which inputs set its scores (2026-10-09). */
+          captionDetail={`Margin: ${display.confidence.toLowerCase()} · ${display.basis.sentence.replace(/\.$/, "")}`}
         />
 
         <header className="space-y-3">

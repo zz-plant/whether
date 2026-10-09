@@ -105,6 +105,34 @@ describe("checkRegimeChange Slack delivery", () => {
     assert.equal(active.includes("https://hooks.slack.com/services/T0/B0/revoked"), false);
   });
 
+  /* The record basis (2026-10-09): the bundled reading is Sunny on the record's inputs and
+     Stormy with its curated startup-market inputs counted, so a change from Stormy is the
+     basis at work, and the alert says so rather than leave it read as the market. */
+  it("says when the inputs left out would have kept the earlier conditions", async () => {
+    const kv = new FakeKv();
+    Object.assign(globalThis, { WHETHER_DURABLE_KV: kv });
+
+    const snapshot = buildSnapshot();
+    assert.equal(snapshot.assessment.regime, "EXPANSION");
+    await kv.put("regime:last-known", "VOLATILE");
+    resetSlackWebhookStore();
+    await getSlackWebhookStore().subscribe("https://hooks.slack.com/services/T0/B0/basis");
+    const posted: string[] = [];
+    globalThis.fetch = async (_input: RequestInfo | URL, init?: RequestInit) => {
+      posted.push(typeof init?.body === "string" ? init.body : "");
+      return new Response("ok", { status: 200 });
+    };
+
+    const result = await checkRegimeChange({ snapshot });
+    const cause = "Startup-market inputs, which the guidance leaves out because the record cannot test them, would have kept conditions Stormy.";
+    assert.ok(result.alerts?.[0]?.includes(cause), result.alerts?.[0]);
+    assert.ok(posted.some((body) => body.includes(cause)), "the Slack post carries it");
+
+    await kv.put("regime:last-known", "DEFENSIVE");
+    const unrelated = await checkRegimeChange({ snapshot });
+    assert.doesNotMatch(unrelated.alerts?.[0] ?? "", /leaves out/, "not when those inputs would not have held it");
+  });
+
   it("does not post anywhere on a quiet run where the regime has not moved", async () => {
     const kv = new FakeKv();
     Object.assign(globalThis, { WHETHER_DURABLE_KV: kv });

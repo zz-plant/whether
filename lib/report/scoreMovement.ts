@@ -127,7 +127,7 @@ const SOURCE_LABEL: Record<ScoreMovementMetric, Partial<Record<ScoreMovementSour
 };
 
 /** What a score's source is called on the page: the parts of a move, and the inputs a score leaves out (`scoringBasis.ts`). */
-const scoreSourceLabel = (metric: ScoreMovementMetric, source: ScoreMovementSource) =>
+export const scoreSourceLabel = (metric: ScoreMovementMetric, source: ScoreMovementSource) =>
   SOURCE_LABEL[metric][source] ?? "other inputs";
 
 const METRIC_NAME: Record<ScoreMovementMetric, string> = {

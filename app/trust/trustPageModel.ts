@@ -57,6 +57,7 @@ export async function buildTrustPageModel() {
     degradedSourceCount: degradedSourceRows.length,
     confidenceLabel: homeBriefModel.confidenceLabel,
     assessment: reportData.assessment,
+    scoringBasis: reportData.scoringBasis,
   });
   /* Where the two scores sit against their lines, for the ladders that open
      "How the scores are built". The earlier reading comes from `previousScoresFromDynamics`,

@@ -167,7 +167,7 @@ export default async function MethodPage({
 
       {readerReturns ? <ReaderReturnsSection line={readerReturns.line} generatedAt={readerReturns.generatedAt} /> : null}
 
-      <FormulaReference positions={scorePositions} />
+      <FormulaReference positions={scorePositions} scoringBasis={reportData.scoringBasis} />
 
       {/* Open, under the derivation: the page's question is whether the
           reading is current enough to act on, and this is where that is

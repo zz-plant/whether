@@ -1,5 +1,5 @@
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
-import type { RegimeAssessment, RegimeThresholds } from "../regimeEngine";
+import { ENGINE_VERSION, type RegimeAssessment, type RegimeThresholds } from "../regimeEngine";
 import {
   FRED_SOURCE_LABEL,
   PROVENANCE_CATALOG_STATUS,
@@ -27,6 +27,7 @@ import { rescoreStoredInputs, type ComparisonReading, type RescoreStoredInputs }
 import { buildWeekActionNow, buildWeekCallChangesIf } from "./reportEvidence";
 import { monthEndComparisonReading, selectWeekComparison } from "./weekComparison";
 import { explainScoreMovement } from "./scoreMovement";
+import { resolveScoringBasis } from "./scoringBasis";
 import type {
   ComparedWith,
   ConfidenceTrendFraming,
@@ -627,9 +628,17 @@ export const loadReportDataUncachedInternal = async ({
     macroStatusLabel: macroProvenance.statusLabel,
     now,
   });
+  /* Which inputs set these scores: the stored snapshot's engine where the read
+     projects one (a snapshot written before the record basis counted every
+     input), the current engine otherwise. */
+  const scoringBasis = resolveScoringBasis({
+    engineVersion: projectsOperatingSnapshot && operatingSnapshot ? operatingSnapshot.engineVersion : ENGINE_VERSION,
+    assessment,
+  });
 
   return {
     assessment,
+    scoringBasis,
     cacheCoverage,
     cacheMonthsByYear,
     fetchedAtLabel,
@@ -767,6 +776,7 @@ export const buildFallbackReportDataInternal = ({
 
   return {
     assessment,
+    scoringBasis: resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment }),
     cacheCoverage,
     cacheMonthsByYear,
     fetchedAtLabel,

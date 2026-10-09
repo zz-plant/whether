@@ -11,6 +11,7 @@ import { buildDecisionMovementForReport } from "./report/decisionMovement";
 import { findSignalDelta } from "./report/evidenceReaderModel";
 import { buildSharedCorridorRails } from "./report/operatingCalls";
 import { describeScoreMovementCaveat, listScoreMovementParts } from "./report/scoreMovement";
+import { toScoringBasisPayload } from "./report/scoringBasis";
 import { signalReadingMeaning } from "./report/signalTranslations";
 import { buildUseConstraint } from "./report/useConstraint";
 import { siteUrl } from "./siteUrl";
@@ -58,6 +59,31 @@ const scoreSchema = z.object({
     .array(z.object({ source: z.string(), label: z.string(), points: z.number() }))
     .describe("What `delta` is made of, signed; the points add up to `delta`. Empty when nothing moved or the split is not available."),
 });
+
+/** Which inputs set the scores (`lib/report/scoringBasis.ts`), shared by the state and the full brief. */
+const scoringBasisSchema = z
+  .object({
+    key: z
+      .enum(["record", "extended"])
+      .describe("record: only the inputs the archive scores every month-end move the scores, so the record and the calibration study test the score that sets the guidance. extended: a reading scored before 2026-10-09, whose scores also counted inputs the record cannot test."),
+    label: z.string().describe("The basis in the words a reader sees beside the call."),
+    warning: z
+      .string()
+      .nullable()
+      .describe("What the inputs left out would do, when they would put a score past a change, pause or resume line the published score is not past. Null otherwise."),
+    notCounted: z
+      .array(
+        z.object({
+          score: z.enum(["tightness", "riskAppetite"]),
+          inputs: z.string().describe("What the inputs left out are called."),
+          value: z.number().describe("The score with them counted."),
+          published: z.number().describe("The published score, which leaves them out."),
+          line: z.string().nullable().describe("The line they would carry the score past; null when none."),
+        }),
+      )
+      .describe("Each score the inputs outside the record would move. They move nothing published."),
+  })
+  .describe("Which inputs set the scores. Additive: every other field is unchanged.");
 
 export const agentStateSchema = z.object({
   version: z.literal("v1"),
@@ -128,6 +154,7 @@ export const agentStateSchema = z.object({
     avoidNow: z.array(z.string()),
     flipConditions: z.array(z.string()).describe("What would change the guidance."),
   }),
+  scoringBasis: scoringBasisSchema,
   use: z.object({ summary: z.string(), humanReview: z.string(), policy: z.string() }),
   links: z.object({ brief: z.string(), full: z.string(), trust: z.string() }),
 });
@@ -278,6 +305,7 @@ export const buildAgentState = (
       })),
     },
     guidance: buildAgentGuidance({ reportData, postureState }),
+    scoringBasis: toScoringBasisPayload(reportData.scoringBasis),
     use: buildUseConstraint(),
     links: {
       brief: endpoints.brief,

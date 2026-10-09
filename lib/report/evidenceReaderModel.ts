@@ -9,6 +9,7 @@ import { describeSignalDirection } from "./signalClusterReading";
 import { comparisonBasis } from "./comparisonBasis";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { describeScoreMovement } from "./scoreMovement";
+import { describeNotCountedScore, joinSentences, type ScoringBasis } from "./scoringBasis";
 import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
@@ -165,6 +166,7 @@ const rowFor = (
   line: SignalReferenceRow["line"],
   units: ScoreUnits,
   dynamics: DynamicsSource,
+  scoringBasis?: Pick<ScoringBasis, "notCounted">,
 ): SignalReferenceRow => {
   const delta = value === null ? null : findSignalDelta(dynamics, key);
   const isScore = key === "tightness" || key === "riskAppetite";
@@ -187,7 +189,7 @@ const rowFor = (
     units,
     betterWhen: BETTER_WHEN[key],
     direction,
-    movement: isScore ? describeScoreMovement(key, dynamics.movement?.[key], basis) : null,
+    movement: isScore ? joinSentences(describeScoreMovement(key, dynamics.movement?.[key], basis), describeNotCountedScore(key, scoringBasis)) : null,
     watchHref: WATCH_HREF_BY_KEY[key],
   };
 };
@@ -196,11 +198,13 @@ const rowFor = (
 export const buildSignalReferenceRows = (
   assessment: Pick<RegimeAssessment, "scores" | "thresholds">,
   dynamics: DynamicsSource,
+  /** What each score leaves out (`ReportData.scoringBasis`), said under its row after the move. */
+  scoringBasis?: Pick<ScoringBasis, "notCounted">,
 ): SignalReferenceRow[] => {
   const { scores, thresholds } = assessment;
   return [
-    rowFor("tightness", scores.tightness, { value: thresholds.tightnessRegime, label: CALL_CHANGE_LINE_LABEL }, SCORE_UNITS, dynamics),
-    rowFor("riskAppetite", scores.riskAppetite, { value: thresholds.riskAppetiteRegime, label: CALL_CHANGE_LINE_LABEL }, SCORE_UNITS, dynamics),
+    rowFor("tightness", scores.tightness, { value: thresholds.tightnessRegime, label: CALL_CHANGE_LINE_LABEL }, SCORE_UNITS, dynamics, scoringBasis),
+    rowFor("riskAppetite", scores.riskAppetite, { value: thresholds.riskAppetiteRegime, label: CALL_CHANGE_LINE_LABEL }, SCORE_UNITS, dynamics, scoringBasis),
     rowFor("baseRate", scores.baseRate, { value: thresholds.baseRateTightness, label: BASE_RATE_LINE_LABEL }, PERCENT_UNITS, dynamics),
     rowFor("curveSlope", scores.curveSlope, { value: 0, label: INVERSION_LINE_LABEL }, SPREAD_UNITS, dynamics),
   ];
@@ -279,6 +283,8 @@ export const buildTrustStripProps = ({
   degradedSourceCount = 0,
   confidenceLabel,
   assessment,
+  scoringBasis,
+  basisNote,
 }: {
   recordDateLabel: string;
   isFallback: boolean;
@@ -286,6 +292,10 @@ export const buildTrustStripProps = ({
   /** Sources answering from a fallback (`buildDegradedSourceRows(...).length`). */
   degradedSourceCount?: number;
   confidenceLabel: TrustStripProps["confidenceLabel"];
+  /** Which inputs set the scores, and what the ones left out would do (`ReportData.scoringBasis`). */
+  scoringBasis: Pick<ScoringBasis, "key" | "value" | "warning">;
+  /** Why the published week's conditions differ, where the basis is why (`describePublishedWeekBasis`): the homepage's alone. */
+  basisNote?: string | null;
   assessment: Parameters<typeof couldCallChangeNextWeek>[0] & {
     scores?: ConfidenceInputs["scores"];
     thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
@@ -304,4 +314,5 @@ export const buildTrustStripProps = ({
     : {}),
   couldChangeNextWeek: couldCallChangeNextWeek(assessment),
   changeReason: couldCallChangeNextWeek(assessment) ? describeChangeReason(assessment) : undefined,
+  basis: { key: scoringBasis.key, value: scoringBasis.value, warning: scoringBasis.warning, note: basisNote ?? null },
 });

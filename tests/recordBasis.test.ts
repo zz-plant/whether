@@ -5,6 +5,9 @@ import rawPublishedBriefs from "../data/published_briefs.json";
 import { DEFAULT_THRESHOLDS, ENGINE_VERSION, RECORD_BASIS_MARKET_INPUTS, evaluateRegime } from "../lib/regimeEngine";
 import type { RegimeMachineSnapshot } from "../lib/regimeStateMachine";
 import { buildCanonicalBoundedDecisionRules, isRuleConditionMet } from "../lib/report/boundedDecisionRules";
+import { scoreStoredInputs } from "../lib/report/comparisonReading";
+import { findPublishedBrief } from "../lib/report/publishedBriefs";
+import { describePublishedWeekBasis, resolveScoringBasis, scoringBasisForEngine } from "../lib/report/scoringBasis";
 import { getTimeMachineSnapshots } from "../lib/timeMachine/timeMachineCache";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../lib/types";
 
@@ -91,6 +94,41 @@ describe("the record basis", () => {
     assert.deepEqual(assessment.scores.offRecord, { tightness: 90, riskAppetite: 48, inputs: ["VC_FUNDING_VELOCITY", "TECH_LAYOFF_TREND"] });
   });
 
+  it("still shows what the inputs left out say, as a warning when they would cross a line", () => {
+    const assessment = evaluateRegime(OCT_7, DEFAULT_THRESHOLDS, [...ON_RECORD_READS, ...STARTUP_READS]);
+    const basis = resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment });
+
+    assert.equal(basis.key, "record");
+    assert.equal(basis.sentence, "Scored on the record's inputs.");
+    assert.deepEqual(basis.notCounted, [
+      {
+        metric: "riskAppetite",
+        source: "startupMarket",
+        label: "startup-market inputs",
+        score: 48,
+        published: 59,
+        line: "its change line",
+      },
+    ]);
+    assert.equal(basis.warning, "Startup-market inputs would put risk appetite at 48, below its change line.");
+  });
+
+  it("names an area's line when the inputs left out would cross no change line, and says nothing when they cross none", () => {
+    /* A 0.6% curve: risk appetite 64 on the record; the curated reads take 11, to 53, under the resume line at 54. */
+    const steeper = { ...OCT_7, yields: { ...OCT_7.yields, tenYear: 5.39 } };
+    const resumeOnly = resolveScoringBasis({
+      engineVersion: ENGINE_VERSION,
+      assessment: evaluateRegime(steeper, DEFAULT_THRESHOLDS, STARTUP_READS),
+    });
+    assert.equal(resumeOnly.warning, "Startup-market inputs would put risk appetite at 53, below the resume line for Hiring, Roadmap, Fundraising and New bets.");
+
+    /* A 1.2% curve: risk appetite 88; less 11 is 77, past no line the published score is not past. */
+    const steep = { ...OCT_7, yields: { ...OCT_7.yields, tenYear: 5.99 } };
+    const crossesNone = resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment: evaluateRegime(steep, DEFAULT_THRESHOLDS, STARTUP_READS) });
+    assert.equal(crossesNone.warning, null);
+    assert.equal(crossesNone.notCounted[0]?.line, null, "still listed, as what the score leaves out");
+  });
+
   it("moves only what the archive scores: every record-basis input has a value at every cached month-end", () => {
     const cacheField: Partial<Record<MacroSeriesId, (entry: ReturnType<typeof getTimeMachineSnapshots>[number]) => unknown>> = {
       VIX_INDEX: (entry) => entry.vix,
@@ -105,8 +143,47 @@ describe("the record basis", () => {
     }
   });
 
-  it("is a new calibration, under a new engine version", () => {
+  it("names the engines whose published scores counted every input", () => {
     assert.notEqual(ENGINE_VERSION, "engine-2026-10-06");
+    assert.equal(scoringBasisForEngine(ENGINE_VERSION), "record");
+    assert.equal(scoringBasisForEngine("engine-2026-10-06"), "extended");
+    assert.equal(scoringBasisForEngine(undefined), "extended", "a record frozen before engines were named");
+    const extended = resolveScoringBasis({
+      engineVersion: "engine-2026-10-06",
+      assessment: evaluateRegime(OCT_7, DEFAULT_THRESHOLDS, [...ON_RECORD_READS, ...STARTUP_READS]),
+    });
+    assert.equal(extended.sentence, "Scored on more inputs than the record.");
+    assert.equal(extended.warning, null, "its scores already counted them");
+  });
+});
+
+describe("the published week the live reading differs from", () => {
+  const w41 = findPublishedBrief("2026-w41");
+
+  it("says why once the live conditions leave the week's, when the inputs the record cannot test are why", () => {
+    assert.ok(w41?.inputs, "w41 stored its inputs");
+    const rescored = scoreStoredInputs(evaluateRegime, DEFAULT_THRESHOLDS, w41.inputs, w41.recordDate);
+    const published = { regime: w41.regime, weekLabel: "Oct 5, 2026", engineVersion: w41.scores?.engineVersion };
+
+    assert.equal(
+      describePublishedWeekBasis({ live: { regime: "DEFENSIVE" }, published, rescored }),
+      "The brief published for the week of Oct 5, 2026 read Freezing only because it counted startup-market inputs, which the record cannot test.",
+    );
+    assert.equal(describePublishedWeekBasis({ live: { regime: "SCARCITY" }, published, rescored }), null, "while the live call still agrees");
+  });
+
+  it("says nothing for a week scored on the record's inputs, or one whose inputs on the record would publish the same", () => {
+    assert.ok(w41?.inputs);
+    const rescored = scoreStoredInputs(evaluateRegime, DEFAULT_THRESHOLDS, w41.inputs, w41.recordDate);
+    assert.equal(
+      describePublishedWeekBasis({ live: { regime: "DEFENSIVE" }, published: { regime: "SCARCITY", weekLabel: "Oct 12", engineVersion: ENGINE_VERSION }, rescored }),
+      null,
+    );
+    const quiet = scoreStoredInputs(evaluateRegime, DEFAULT_THRESHOLDS, { ...w41.inputs, macro: { VIX_INDEX: 15 } }, w41.recordDate);
+    assert.equal(
+      describePublishedWeekBasis({ live: { regime: "EXPANSION" }, published: { regime: "SCARCITY", weekLabel: "Oct 5", engineVersion: undefined }, rescored: quiet }),
+      null,
+    );
   });
 });
 

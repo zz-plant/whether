@@ -285,11 +285,14 @@ describe("AreaTable moved rows", () => {
 });
 
 describe("TrustStrip", () => {
-  it("is three facts and, off /trust, a link", () => {
+  const onRecord = { key: "record" as const, value: "The record's inputs", warning: null };
+
+  it("is four facts and, off /trust, a link", () => {
     const html = renderToStaticMarkup(
-      <TrustStrip recordDateLabel="Sep 18, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="HIGH" couldChangeNextWeek={false} href="/trust" />,
+      <TrustStrip recordDateLabel="Sep 18, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="HIGH" couldChangeNextWeek={false} basis={onRecord} href="/trust" />,
     );
-    assert.deepEqual([...html.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]), ["Data as of", "Sources", "Margin"]);
+    assert.deepEqual([...html.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]), ["Data as of", "Sources", "Margin", "Scored on"]);
+    assert.match(html, /The record(&#x27;|')s inputs/, "the call states its basis");
     assert.match(html, /Not expected to change next week/, "the margin cell says whether the call could change");
     assert.match(html, /href="\/trust"/);
     assert.doesNotMatch(html, /HIGH|MED|LOW/, "the engine's confidence key must not reach the reader");
@@ -308,6 +311,7 @@ describe("TrustStrip", () => {
         confidenceLabel="LOW"
         margin={{ signal: "riskAppetite", points: 1 }}
         couldChangeNextWeek
+        basis={onRecord}
       />,
     );
     assert.match(html, />Risk appetite 1 pt from its change line<span[^>]*data-next-week[^>]*> · Could change next week<\/span>/);
@@ -315,11 +319,11 @@ describe("TrustStrip", () => {
     assert.doesNotMatch(html, /<dt[^>]*>Could change next week<\/dt>/, "no fourth cell");
     assert.equal((html.match(/1 pt/g) ?? []).length, 1, "the distance prints once");
     const waiting = renderToStaticMarkup(
-      <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="MED" margin={{ signal: "tightness", points: 9 }} couldChangeNextWeek changeReason="a change is waiting on a second reading" />,
+      <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="MED" margin={{ signal: "tightness", points: 9 }} couldChangeNextWeek changeReason="a change is waiting on a second reading" basis={onRecord} />,
     );
     assert.match(waiting, /Could change next week: a change is waiting on a second reading/);
     const imputed = renderToStaticMarkup(
-      <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="LOW" margin={null} couldChangeNextWeek={false} />,
+      <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="LOW" margin={null} couldChangeNextWeek={false} basis={onRecord} />,
     );
     assert.match(imputed, /Not measured: an input is missing/);
   });
@@ -330,7 +334,7 @@ describe("TrustStrip", () => {
   it("folds only the routine facts on a phone, and only when it links to /trust", () => {
     const cellClass = (html: string, label: string) =>
       new RegExp(`<div class="([^"]*)"><dt[^>]*>${label}</dt>`).exec(html)?.[1] ?? "";
-    const base = { recordDateLabel: "Oct 5, 2026", sourcesLabel: "All sources live", couldChangeNextWeek: true };
+    const base = { recordDateLabel: "Oct 5, 2026", sourcesLabel: "All sources live", couldChangeNextWeek: true, basis: onRecord };
 
     const routine = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" href="/trust" phoneLayout="line" />);
     assert.match(cellClass(routine, "Sources"), /max-sm:hidden/);
@@ -343,9 +347,49 @@ describe("TrustStrip", () => {
     assert.doesNotMatch(cellClass(exceptions, "Sources"), /max-sm:hidden/, "cached sources always print");
     assert.doesNotMatch(cellClass(exceptions, "Margin"), /max-sm:hidden/, "a margin close to the line always prints");
 
+    assert.match(cellClass(routine, "Scored on"), /max-sm:hidden/, "the record's own inputs fold like live sources");
+    const warned = renderToStaticMarkup(
+      <TrustStrip
+        {...base}
+        sourcesLive
+        confidenceLabel="MED"
+        href="/trust"
+        phoneLayout="line"
+        basis={{ ...onRecord, warning: "Startup-market inputs would put risk appetite at 49, below its change line." }}
+      />,
+    );
+    assert.doesNotMatch(cellClass(warned, "Scored on"), /max-sm:hidden/, "a warning always prints");
+    const extended = renderToStaticMarkup(
+      <TrustStrip {...base} sourcesLive confidenceLabel="MED" href="/trust" phoneLayout="line" basis={{ key: "extended", value: "More inputs than the record", warning: null }} />,
+    );
+    assert.doesNotMatch(cellClass(extended, "Scored on"), /max-sm:hidden/, "a reading scored on more than the record always says so");
+
     /* /trust has no link to fold behind: the strip is its System status. */
     const onTrust = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" phoneLayout="line" />);
     assert.doesNotMatch(onTrust, /max-sm:hidden/);
+  });
+
+  /* The record basis (2026-10-09): the inputs the record cannot test move no line, and
+     where they would, the cell says so after the basis, with the published week's note. */
+  it("prints what the inputs left out would do to a line, and the published week's note, in the basis cell", () => {
+    const html = renderToStaticMarkup(
+      <TrustStrip
+        recordDateLabel="Oct 9, 2026"
+        sourcesLive
+        sourcesLabel="All sources live"
+        confidenceLabel="MED"
+        couldChangeNextWeek={false}
+        basis={{
+          ...onRecord,
+          warning: "Startup-market inputs would put risk appetite at 49, below its change line.",
+          note: "The brief for the week of Oct 6 read Freezing.",
+        }}
+      />,
+    );
+    assert.match(
+      html,
+      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
+    );
   });
 });
 

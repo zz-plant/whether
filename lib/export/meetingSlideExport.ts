@@ -50,6 +50,8 @@ export interface MeetingSlidePayload {
   lines?: { tightness: number; riskAppetite: number };
   confidence: string;
   provenance: string;
+  /** Which inputs set the scores, as a sentence ("Scored on the record's inputs."); the footer prints it after the source. */
+  basis?: string;
   /** The operating call itself. The snapshot path has only `actionNow`, which
    *  is why this is optional: it renders as the stance line when the two differ. */
   call?: string;
@@ -98,6 +100,7 @@ export const slideFooterLine = (payload: MeetingSlidePayload): string =>
     sourceLabel: payload.provenance,
     recordDate: payload.recordDateIso ?? payload.recordDate,
     isFallback: payload.isFallback,
+    ...(payload.basis ? { scoringBasis: { sentence: payload.basis } } : {}),
   })}`;
 
 /**
