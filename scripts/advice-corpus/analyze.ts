@@ -11,6 +11,7 @@ import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCac
 import {
   addMonths,
   compareDrivers,
+  eraShares,
   eventWindow,
   FP_LINE,
   highLowDifference,
@@ -98,7 +99,8 @@ function quarterlyH3(posts: readonly CorpusPost[], record: readonly RecordMonth[
 }
 
 function main() {
-  const postsFile = readPostsFile();
+  const postsArg = process.argv.indexOf("--posts");
+  const postsFile = postsArg > -1 ? readPostsFile(process.argv[postsArg + 1]) : readPostsFile();
   const posts = postsFile.posts.map(toCorpusPost);
   const { record, changes } = loadRecord(postsFile.window.first, postsFile.window.last);
   const months = record.map((month) => month.month);
@@ -119,6 +121,15 @@ function main() {
     };
   });
   const topFirm = [...byFirm].sort((a, b) => b.eligible - a.eligible)[0]?.firm ?? "";
+  const highMonths = new Set(record.filter(highFp).map((month) => month.month));
+  const byFirmPressure = firms.map((firm) => {
+    const side = (high: boolean) => {
+      const inSide = primary.filter((post) => post.firm === firm && highMonths.has(post.month) === high);
+      const share = (stance: string) => (inSide.length === 0 ? null : inSide.filter((post) => post.stance === stance).length / inSide.length);
+      return { posts: inSide.length, expand: share("expand"), conserve: share("conserve"), craft: share("craft") };
+    };
+    return { firm, low: side(false), high: side(true) };
+  });
   const overall = {
     classified: posts.length,
     candidates: posts.filter((post) => post.prefilter === "candidate").length,
@@ -232,11 +243,6 @@ function main() {
     conserve: eventWindow(primary, change.month, "conserve", { width: 6, replicates: REPLICATES, seed: SEEDS.bootstrap, last: postsFile.window.last }),
   }));
 
-  const eraShares = (from: string, to: string) => {
-    const inEra = primary.filter((post) => post.month >= from && post.month <= to);
-    const rows = periodShares(inEra, [from], () => from);
-    return { from, to, posts: inEra.length, ...rows[0].shares };
-  };
 
   console.log(
     JSON.stringify(
@@ -246,8 +252,9 @@ function main() {
         changes,
         overall,
         byFirm,
+        byFirmPressure,
         prefilter,
-        eras: [eraShares("2012-01", "2022-06"), eraShares("2022-07", "2025-11"), eraShares("2025-12", "2026-08")],
+        eras: eraShares(primary),
         h1: main.h1,
         h2: { ...main.h2, leading, crossCorrelation, downward },
         h3: main.h3,

@@ -16,7 +16,7 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { z } from "zod";
 
-import { monthGrid, periodShares, PRIMARY, quarterOf, selectPosts, type CorpusPost } from "./analysis";
+import { eraShares, monthGrid, periodShares, PRIMARY, quarterOf, selectPosts, type CorpusPost } from "./analysis";
 import { DATA_DIR, MONTHLY_PATH, POSTS_PATH, STUDY_END, STUDY_START } from "./paths";
 
 const pad = (value: number) => String(value).padStart(2, "0");
@@ -91,6 +91,17 @@ export function buildMonthlyFile(postsFile: PostsFile) {
     eligible: "capital-relevant posts addressed to founders, prefilter candidates; each firm present in a period weighs equally",
     eligiblePosts: eligible.length,
     firms: [...new Set(eligible.map((post) => post.firm))].sort(),
+    eras: eraShares(eligible).map((era) => ({
+      from: era.from,
+      to: era.to,
+      fundingPressure: era.fundingPressure,
+      posts: era.posts,
+      firms: era.firms,
+      expand: round(era.expand),
+      conserve: round(era.conserve),
+      craft: round(era.craft),
+      none: round(era.none),
+    })),
     months: rows(months, (month) => month),
     quarters: rows(quarters, quarterOf),
   };

@@ -323,6 +323,26 @@ export function standardisedCoefficients(y: readonly (number | null)[], a: reado
   return { fp: (rya * rbb - ryb * rab) / determinant, ra: (ryb * raa - rya * rab) / determinant, n: rows.length };
 }
 
+/**
+ * The funding-pressure eras the registration names: below the line to June 2022, above it from
+ * the July 2022 crossing to November 2025, below it again to August 2026, above it in September
+ * 2026. Firm-weighted shares over each era.
+ */
+export const FUNDING_ERAS = [
+  { from: "2012-01", to: "2022-06", fundingPressure: "at or below 70" },
+  { from: "2022-07", to: "2025-11", fundingPressure: "above 70" },
+  { from: "2025-12", to: "2026-08", fundingPressure: "at or below 70" },
+  { from: "2026-09", to: "2026-09", fundingPressure: "above 70" },
+] as const;
+
+export function eraShares(posts: readonly CorpusPost[]) {
+  return FUNDING_ERAS.map((era) => {
+    const inEra = posts.filter((post) => post.month >= era.from && post.month <= era.to);
+    const [row] = periodShares(inEra, [era.from], () => era.from);
+    return { ...era, posts: inEra.length, firms: row.firms, ...row.shares };
+  });
+}
+
 /** Months above / at or below a line, as a share of the record. */
 export const shareOfMonths = (record: readonly RecordMonth[], isHigh: (month: RecordMonth) => boolean) =>
   record.filter(isHigh).length / record.length;
