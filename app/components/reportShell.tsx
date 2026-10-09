@@ -36,7 +36,8 @@ import { MobileSectionChips } from "./mobileSectionChips";
 import type { RegimeIconType } from "./pageShell";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
-import type { OperatingLoopStep } from "./illustrations/OperatingLoopGlyph";
+import { SectionTabs } from "./sectionTabs";
+import type { Route } from "../../lib/navigation/routeType";
 import { NextStepCard, type NextStep } from "./report-shell/NextStepCard";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 import { OfflineNotice } from "./offlineNotice";
@@ -56,8 +57,10 @@ export type ReportShellModel = {
     pageTitle: string;
     pageSummary: string;
     sectionLinks: ReportSectionLink[];
-    /** The route's step in the operating loop, drawn beside the intro. */
-    activeStep?: OperatingLoopStep;
+    /** The route's address, for its group's sub-tab row above the intro. Omitted, no row renders. */
+    currentPath?: Route;
+    /** A selection the route carries across its group's pages (an archived month on Decide). */
+    tabsQuery?: string;
   };
   trust: {
     trustStatusTone: "stable" | "warning" | "historical";
@@ -96,7 +99,7 @@ export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 export const ReportShell = ({ model, children }: ReportShellProps) => {
   const {
     status: { statusLabel, statusPrefix, regime, recordDateLabel, fetchedAtLabel = "" },
-    page: { pageTitle, pageSummary, sectionLinks, activeStep },
+    page: { pageTitle, pageSummary, sectionLinks, currentPath, tabsQuery },
     trust: {
       trustStatusTone,
       degradedSourceRows,
@@ -166,6 +169,9 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               label true of whatever is on the screen. */}
           <OfflineNotice recordDateLabel={recordDateLabel} />
 
+          {/* The group's pages, as tabs, before the intro names the one this is. */}
+          {currentPath ? <SectionTabs currentPath={currentPath} query={tabsQuery} /> : null}
+
           <CommandCenterNavBlock
             pageTitle={pageTitle}
             pageSummary={pageSummary}
@@ -179,7 +185,6 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             resolvedNextRefreshLabel={resolvedNextRefreshLabel}
             showOfflineBadge={showOfflineBadge}
             offlineBadgeLabel={offlineBadgeLabel}
-            activeStep={activeStep}
             trustStrip={trustStrip}
           />
 

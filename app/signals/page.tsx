@@ -66,7 +66,7 @@ export default async function SignalsPage({
           // (editorial-guardrails.md -> Headings).
           pageSummary: "The evidence behind this week's guidance.",
           sectionLinks: model.sectionLinks,
-          activeStep: "signals",
+          currentPath: "/signals",
         },
         trust: {
           trustStatusTone: model.trust.trustStatusTone,

@@ -22,7 +22,9 @@ export const solutionRedirectPairs = [
   ["/solutions/career-paths/director-of-product", "/resolve/product"],
   ["/solutions/career-paths/vp-product", "/resolve/ceo"],
   ["/solutions/career-paths/product-strategy-chief-of-staff", "/resolve/ops-risk"],
-  ["/solutions/:path*", "/resolve"],
+  // /resolve stopped being a page on 2026-10-08; the role and situation pages it
+  // listed are Guides' "More tools", which is where a retired solution belongs.
+  ["/solutions/:path*", "/resources#more-tools"],
 ];
 
 export const canonicalSurfaceRedirectPairs = [
@@ -38,14 +40,24 @@ export const canonicalSurfaceRedirectPairs = [
   // Consolidated under Trust hub
   ["/sources", "/trust#source-board"],
   ["/confidence", "/trust#confidence-limits"],
-  // Decision answer root → Decide hub
-  ["/answers", "/resolve#direct-answers"],
-  // Nav-label aliases. The header, the page title and the IA all said "Resolve"
-  // while the directory said /answer — one letter from the unrelated /answers
-  // corpus. /resolve is the filesystem route now, so this pair inverts: the old
-  // path is the legacy name that links and habits still carry.
+  // Decision answer root → the answers on Guides, grouped by decision area
+  ["/answers", "/resources#answers"],
+  /*
+   * Resolve folded into Decide and Guides on 2026-10-08. Its page answered "one
+   * open decision": Decide's "Test a decision" step does that for the reader's
+   * own move, so the bare path lands there; its eleven direct answers are on
+   * Guides, grouped by decision area, and the browse-by-role, stage, situation
+   * and toolkit paths are Guides' "More tools". A link that carries one of those
+   * selections (`?stakeholder=` and friends, which the `/guides/*` rules below
+   * used to produce and browsers have cached as 308s) is sent to More tools by
+   * `resolveSelectionRedirects`, ahead of this rule. /resolve/<slug> pages keep
+   * their addresses.
+   */
+  ["/resolve", "/operate#ops-decision-shield"],
+  // Nav-label aliases: legacy names that links and habits still carry. /answer
+  // was Resolve's directory before /resolve; both land where Resolve went.
   ["/evidence", "/signals"],
-  ["/answer", "/resolve"],
+  ["/answer", "/operate#ops-decision-shield"],
   ["/planning", "/operate"],
   // Learn root + failure modes → Trust hub
   ["/learn", "/trust"],
@@ -98,18 +110,19 @@ export const canonicalSurfaceRedirectPairs = [
   // Guides staging redirects. These pointed at `/guides`, which stopped existing in
   // 14258b64 — so every one of them was a 308 into a 404, which is worse than a plain
   // 404 because a permanent redirect gets cached and followed. The content itself moved
-  // rather than being retired: `/resolve` reads the same `stakeholder`, `stage` and
-  // `library` params (GuidedTranslationSearchParams) and still imports the guides data
-  // from `app/guides/`, so this is a base swap that preserves every parameter.
+  // rather than being retired. Since 2026-10-08 Guides is the `/resources` page, which
+  // reads the same `stakeholder`, `stage` and `library` params
+  // (GuidedTranslationSearchParams) under "More tools" and still imports the guides
+  // data from `app/guides/`, so this is a base swap that preserves every parameter.
   // `/guides` and `/guides/stage` stay ahead of `/guides/:stakeholder`, which would
   // otherwise capture "stage" as a stakeholder slug.
-  ["/guides", "/resolve"],
-  ["/guides/stage/:stage", "/resolve?stage=:stage"],
-  ["/guides/stage", "/resolve?library=stages"],
-  ["/guides/:stakeholder", "/resolve?stakeholder=:stakeholder"],
+  ["/guides", "/resources"],
+  ["/guides/stage/:stage", "/resources?stage=:stage#more-tools"],
+  ["/guides/stage", "/resources?library=stages#more-tools"],
+  ["/guides/:stakeholder", "/resources?stakeholder=:stakeholder#more-tools"],
   // Retrofit redirects (links that soft-404)
   ["/settings", "/"],
-  ["/decision-tools", "/resolve"],
+  ["/decision-tools", "/operate#ops-decision-shield"],
   ["/toolkits", "/"],
 ];
 
@@ -141,7 +154,7 @@ export const iaConsolidationRedirectPairs = [
   ["/operate/memory", "/history"],
   ["/history/decisions", "/history"],
   // The ship checklist's one useful question is a direct answer now.
-  ["/resolve/ship-checklist", "/resolve#direct-answers"],
+  ["/resolve/ship-checklist", "/resources#answers"],
   // /state ran the brief's own pipeline and rendered a subset of the hero under
   // its own H1 — a view of `/` that read as a second, independently derived
   // answer, and competed with `/` and `/brief/[week]` for the same query.
@@ -155,7 +168,22 @@ export const iaConsolidationRedirectPairs = [
   ["/glossary", "/trust#formula-reference"],
 ];
 
+/*
+ * `/resolve` with a selection on it: the role, stage, library and toolkit views
+ * that page drew from its query string are Guides' "More tools" now. The query
+ * survives a redirect, so `/resolve?stakeholder=founders-ceos` lands on
+ * `/resources?stakeholder=founders-ceos#more-tools` with the same view open.
+ * Listed before the pairs: the bare `/resolve` rule would otherwise claim them.
+ */
+export const resolveSelectionRedirects = ["stakeholder", "stage", "library", "toolkitQuery"].map((key) => ({
+  source: "/resolve",
+  has: [{ type: "query", key }],
+  destination: "/resources#more-tools",
+  permanent: true,
+}));
+
 export const redirectEntries = [
+  ...resolveSelectionRedirects,
   ...buildPermanentRedirects(solutionRedirectPairs),
   ...buildPermanentRedirects(canonicalSurfaceRedirectPairs),
   ...buildPermanentRedirects(iaConsolidationRedirectPairs),

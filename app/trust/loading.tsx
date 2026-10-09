@@ -6,7 +6,7 @@ export default function Loading() {
       label="Loading trust status"
       description="Checking when each source last updated and how sure the reading is."
       currentPath="/trust"
-      pageTitle="Trust"
+      pageTitle="How much to trust this week"
     />
   );
 }

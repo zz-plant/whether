@@ -265,7 +265,7 @@ export const buildHomeWorkspaceModel = ({
         kicker: "Recommended unresolved path",
       },
       fallbackUtility: {
-        href: "/resolve#direct-answers",
+        href: "/resources#answers",
         title: "Direct answers",
         detail: "One yes-or-no answer per open decision, under this week's guidance.",
       },

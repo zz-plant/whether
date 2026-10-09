@@ -1,7 +1,6 @@
 import { ReportCta } from "../reportCta";
 import { ScreenshotCaption } from "../screenshotCaption";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
-import { OperatingLoopGlyph, type OperatingLoopStep } from "../illustrations/OperatingLoopGlyph";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
 
 /**
@@ -28,17 +27,11 @@ export function CommandCenterNavBlock({
   resolvedNextRefreshLabel,
   showOfflineBadge,
   offlineBadgeLabel,
-  activeStep,
   trustStrip,
 }: {
   pageTitle: string;
   pageSummary: string;
   recordDateLabel: string;
-  /** Which step of the operating loop this route is, for the glyph beside the
-   *  intro. Declared by the route: it used to be guessed from whether the
-   *  title contained "changed" or "trust", which is a string match standing in
-   *  for a fact the route already knows. Omitted, no glyph renders. */
-  activeStep?: OperatingLoopStep;
   primaryCta?: ReportCtaProps;
   exportCta?: ExportCtaProps | null;
   statusLabel: string;
@@ -146,15 +139,11 @@ export function CommandCenterNavBlock({
         </div>
 
         <div className={`space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0 ${rightColumnOnPhone ? "" : "max-sm:hidden"}`.trim()}>
-            {activeStep ? (
-              /* Phone: hidden. The loop the glyph draws is the bottom bar's
-                 row of tabs there, and under the intro it was a second
-                 navigation band pushing the first task block down. */
-              <div className="hidden lg:flex lg:justify-end">
-                <OperatingLoopGlyph activeStep={activeStep} />
-              </div>
-            ) : null}
-
+            {/* No operating-loop strip here. "Signals · Conditions · Plan ·
+                Share" sat beside the intro on /signals, /operate and /trust:
+                it read as tabs, named none of the pages it sat on and linked
+                nowhere. The group's real tabs sit above the intro now
+                (`SectionTabs`). */}
             {/* The stamp row also carries the caption: the intro is the block a
                 phone screenshot of a report route catches, and a crop of it
                 should still say whose page it came from. It shares the row

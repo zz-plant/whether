@@ -9,6 +9,7 @@ import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 import { ToolkitPlaybookGlyph } from "../../components/illustrations/ToolkitPlaybookGlyph";
 import { ArrowRightIcon } from "../../components/uiIcons";
@@ -51,12 +52,12 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           is ready the day that changes. */}
       <JsonLdScript data={buildToolkitHowTo(toolkit)} />
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Resolve", href: "/resolve" },
-          { label: "Toolkits", href: "/resolve#toolkit-library" },
-          { label: toolkit.title },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(`/toolkits/${toolkit.slug}`, [
+            { name: "More tools", path: "/resources#more-tools" },
+            { name: toolkit.title, path: `/toolkits/${toolkit.slug}` },
+          ]),
+        )}
       />
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

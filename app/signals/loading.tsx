@@ -6,7 +6,7 @@ export default function Loading() {
       label="Loading evidence"
       description="Checking what changed and why conditions moved."
       currentPath="/signals"
-      pageTitle="Evidence"
+      pageTitle="Why it changed"
     />
   );
 }

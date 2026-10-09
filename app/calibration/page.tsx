@@ -11,6 +11,7 @@ import { ActionLink } from "../components/ui/actionLink";
 import { ConfidenceRecordSection } from "../components/history/confidenceRecord";
 import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibration";
 import { CalibrationCurveGlyph } from "../components/illustrations/CalibrationCurveGlyph";
+import { SectionTabs } from "../components/sectionTabs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 
 export const runtime = "edge";
@@ -47,6 +48,7 @@ export default function CalibrationPage() {
   return (
     <ContentPageShell measure="wide">
       <JsonLdScript data={buildCalibrationStudyStructuredData({ totals })} />
+      <SectionTabs currentPath="/calibration" />
 
       <SecondaryPageHeader
         eyebrow="The record"

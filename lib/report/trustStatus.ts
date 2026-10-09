@@ -1,5 +1,5 @@
 import type { RegimeDiagnostics } from "../regimeEngine";
-import { formatConfidenceChipLabel, type CompactFreshnessMeta } from "./reportFormatting";
+import { formatConfidenceChipLabel, formatConfidencePlainLabel, type CompactFreshnessMeta } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, type PolicyHoldCall } from "./reportCopy";
 import type { RegimeStateTransition } from "../regimeStateMachine";
 
@@ -527,6 +527,45 @@ export const buildWeeklyCitationMetaLine = ({
   freshnessLabel: string;
 }) =>
   `Conditions: ${statusLabel} · ${formatConfidenceChipLabel(confidenceLabel)} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
+
+/**
+ * The status block a reader pastes into meeting notes: the conditions, the
+ * reading's dates, how sure it is, what would change it and what to do now.
+ *
+ * Built on /trust until 2026-10-08 and offered there as "Meeting snippet"; it is
+ * one of /share's formats now, beside the brief's other pastes, and is built
+ * here so the two pages could never have printed different blocks.
+ */
+export const buildMeetingSnippet = ({
+  statusLabel,
+  recordDateLabel,
+  freshnessLabel,
+  confidenceLabel,
+  isFallbackSnapshot,
+  isHistoricalSelection,
+  flipThreshold,
+  actionNow,
+}: {
+  statusLabel: string;
+  recordDateLabel: string;
+  freshnessLabel: string;
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  isFallbackSnapshot: boolean;
+  isHistoricalSelection: boolean;
+  flipThreshold: string;
+  actionNow: string;
+}) => {
+  const trustSummary = buildCompactTrustSummary({ confidenceLabel, freshnessLabel, isFallbackSnapshot, isHistoricalSelection });
+  return [
+    `Conditions: ${statusLabel}`,
+    `As of: ${recordDateLabel}`,
+    `Data refreshed: ${freshnessLabel}`,
+    `Confidence: ${formatConfidencePlainLabel(confidenceLabel)}`,
+    `Trust: ${trustSummary}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${flipThreshold}`,
+    `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
+  ].join("\n");
+};
 
 /**
  * The name for `trustStatusAction` where a reader sees it: what the state of

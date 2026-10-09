@@ -13,6 +13,7 @@ import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { SignalReadingPanel } from "../components/signalReadingPanel";
 import { buildSignalClusterReading, isSignalClusterSlug } from "../../../lib/report/signalClusterReading";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import Link from "next/link";
 import { decisionScenarioDefinitions, signalScenarioRoutes } from "../../seoRouteClusters";
 import { toRoute } from "../../../lib/navigation/routeType";
@@ -104,11 +105,9 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
   return (
     <ContentPageShell>
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Evidence", href: "/signals" },
-          { label: clusterDefinition.title },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(`/signals/${cluster}`, [{ name: clusterDefinition.title, path: `/signals/${cluster}` }]),
+        )}
       />
       {/* The signal as the card the brief opens on: the week's stamp, the signal's
           name as the heading, this week's call under it, and the lines it holds

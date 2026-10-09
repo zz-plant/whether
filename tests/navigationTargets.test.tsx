@@ -2,12 +2,13 @@ import assert from "node:assert/strict";
 import { createRequire } from "node:module";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import { isValidElement } from "react";
 import * as nextNavigation from "next/navigation";
 
 import { answerPages } from "../app/answers/decisionPages";
-import { ToolkitLibraryPanels } from "../app/resolve/components/toolkitLibraryPanels";
+import { ToolkitLibraryPanels } from "../app/resources/components/toolkitLibraryPanels";
 import { resolveSearchCommandHref, SEARCH_JOB_ORDER } from "../app/search/searchCommand";
-import { loopNavigationLayers } from "../lib/navigation/informationArchitecture";
+import { navigationGroups } from "../lib/navigation/informationArchitecture";
 import { resourcePillarPages } from "../lib/resourcesContent";
 
 /* The answer page's copy button reads the router. Spread, so the next file still gets the real module's other exports. */
@@ -43,7 +44,28 @@ const redirectPairs = [
   ...redirectTables.iaConsolidationRedirectPairs,
 ];
 
-const renderResolve = async () => renderToStaticMarkup(await (await import("../app/resolve/page")).default({}));
+const renderGuides = async () => renderToStaticMarkup(await (await import("../app/resources/page")).default({}));
+/* Decide's ids from its page model rather than a render: the stepper is a client
+   component that needs the toast provider, and a step's id (and its aliases) is what
+   a link into it names. */
+const decideIds = async () => {
+  const { buildPlanningPageModel } = await import("../app/operate/planningPageModel");
+  const { children } = await buildPlanningPageModel();
+  const ids = new Set<string>();
+  const walk = (node: unknown): void => {
+    if (Array.isArray(node)) return node.forEach(walk);
+    if (!isValidElement<{ id?: string; children?: unknown; steps?: Array<{ id: string; hashAliases?: string[]; children?: unknown }> }>(node)) return;
+    if (node.props.id) ids.add(node.props.id);
+    for (const step of node.props.steps ?? []) {
+      ids.add(step.id);
+      step.hashAliases?.forEach((alias) => ids.add(alias));
+      walk(step.children);
+    }
+    walk(node.props.children);
+  };
+  walk(children);
+  return ids;
+};
 const renderTrust = async () => renderToStaticMarkup(await (await import("../app/trust/page")).default({}));
 const renderAnswer = async () => {
   const { DecisionAnswerPageContent } = await import("../app/answers/decisionAnswerPageContent");
@@ -55,9 +77,9 @@ const renderResource = async (slug: string) =>
 
 const idsIn = (html: string) => new Set([...html.matchAll(/\sid="([^"]+)"/g)].map((match) => match[1]));
 
-/** Every `/resolve#…` and `/trust#…` href in the markup, query string allowed. */
+/** Every `/resources#…`, `/operate#…` and `/trust#…` href in the markup, query string allowed. */
 const anchoredHrefsIn = (html: string) =>
-  [...html.matchAll(/href="(\/(?:resolve|trust)(?:\?[^"#]*)?#[^"]+)"/g)].map((match) => match[1].replace(/&amp;/g, "&"));
+  [...html.matchAll(/href="(\/(?:resources|operate|trust)(?:\?[^"#]*)?#[^"]+)"/g)].map((match) => match[1].replace(/&amp;/g, "&"));
 
 /** Every link in the markup, as its href and the words it shows. */
 const linksIn = (html: string) =>
@@ -66,13 +88,20 @@ const linksIn = (html: string) =>
     text: match[2].replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim(),
   }));
 
-describe("links into /resolve and /trust land on a section the page draws", () => {
+/* /resolve folded into Decide and Guides on 2026-10-08; the anchors it owned are Guides'
+   (#answers, #more-tools, #guided-translation, #toolkit-library) and Decide's
+   (#ops-decision-shield). */
+describe("links into Guides, Decide and /trust land on a section the page draws", () => {
   it("names only ids the target page renders, from the redirects, the answer pages, the toolkit search and /search", async () => {
-    const renderedIds = { "/resolve": idsIn(await renderResolve()), "/trust": idsIn(await renderTrust()) };
+    const renderedIds: Record<string, Set<string>> = {
+      "/resources": idsIn(await renderGuides()),
+      "/operate": await decideIds(),
+      "/trust": idsIn(await renderTrust()),
+    };
 
     const links: Array<{ from: string; href: string }> = [
       ...redirectPairs
-        .filter(([, destination]) => /^\/(resolve|trust)(\?|#)/.test(destination) && destination.includes("#"))
+        .filter(([, destination]) => /^\/(resources|operate|trust)(\?|#)/.test(destination) && destination.includes("#"))
         .map(([source, destination]) => ({ from: `redirect ${source}`, href: destination })),
       ...anchoredHrefsIn(await renderAnswer()).map((href) => ({ from: "an answer page", href })),
       // A query nothing matches: the panel's empty state is where the dead chip was.
@@ -82,7 +111,7 @@ describe("links into /resolve and /trust land on a section the page draws", () =
       })),
       ...SEARCH_JOB_ORDER.flatMap((job) => {
         const href = resolveSearchCommandHref("zzqx", [], job);
-        return href && /^\/(resolve|trust)[?#]/.test(href) ? [{ from: `/search "go straight there" (${job})`, href }] : [];
+        return href && /^\/(resources|operate|trust)[?#]/.test(href) ? [{ from: `/search "go straight there" (${job})`, href }] : [];
       }),
     ];
 
@@ -90,7 +119,7 @@ describe("links into /resolve and /trust land on a section the page draws", () =
     const missing = links.filter(({ href }) => {
       const [path] = href.split(/[?#]/);
       const fragment = href.slice(href.indexOf("#") + 1);
-      return !renderedIds[path === "/trust" ? "/trust" : "/resolve"].has(fragment);
+      return !renderedIds[path]?.has(fragment);
     });
     assert.deepEqual(
       missing.map(({ from, href }) => `${from} → ${href}`),
@@ -138,13 +167,13 @@ describe("links into Plan and Resolve use the names the header prints", () => {
     assert.deepEqual(stale, [], `\n${stale.join("\n")}\n`);
   });
 
-  it("offers every layer of the header's loop on the 404 page, by its IA label", async () => {
+  it("offers every group in the header on the 404 page, by its IA label", async () => {
     const NotFound = (await import("../app/not-found")).default;
     const links = linksIn(renderToStaticMarkup(<NotFound />));
-    for (const layer of loopNavigationLayers) {
+    for (const group of navigationGroups) {
       assert.ok(
-        links.some((link) => link.href === layer.href && link.text === layer.label),
-        `the 404 page links ${layer.href} as "${layer.label}"`,
+        links.some((link) => link.href === group.href && link.text === group.label),
+        `the 404 page links ${group.href} as "${group.label}"`,
       );
     }
   });

@@ -89,8 +89,8 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
     return {
       ...buildPageMetadata({
         title: "Operator answer moved",
-        description: "This answer was retired. The current direct answers are on Resolve.",
-        path: "/resolve",
+        description: "This answer was retired. The current direct answers are on Guides.",
+        path: "/resources",
         imageAlt: "Whether: operator answer moved",
         imageParams: { template: "solutions", title: "Operator answer moved" },
       }),
@@ -144,7 +144,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
 export default async function DecisionAnswerPage({ params }: DecisionPageProps) {
   const { slug } = await params;
   if (isRetiredAnswerSlug(slug)) {
-    permanentRedirect("/resolve#direct-answers");
+    permanentRedirect("/resources#answers");
   }
 
   return <DecisionAnswerPageContent slug={slug} route={highValueStaticAnswerSlugs.includes(slug) ? "/answers/[slug]" : "/answers/[slug]:isr"} />;

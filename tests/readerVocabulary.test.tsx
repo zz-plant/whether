@@ -119,7 +119,11 @@ const RATCHET: { name: string; pattern: RegExp; baseline: number }[] = [
      the merged copy work (posture 4, regime 0, bounded 0, stance 0). The
      homepage and its components are not rendered here, so a wording fix there
      does not move these numbers — only work on the counted surfaces does. */
-  { name: "posture", pattern: /\bposture\b/gi, baseline: 4 },
+  /* 2026-10-08: posture 4 → 6 and board 10 → 11 without a word added to the site. Guides
+     (/resources, counted here) took the four templates from the plan page and the "Help by
+     role" chips from /resolve, neither of which this file renders: two template titles carry
+     "Posture" and one role chip reads "Board". Lower these when that copy moves. */
+  { name: "posture", pattern: /\bposture\b/gi, baseline: 6 },
   { name: "regime", pattern: /\bregime\b/gi, baseline: 0 },
   { name: "corridor", pattern: /\bcorridor\b/gi, baseline: 0 },
   { name: "cadence", pattern: /\bcadence\b/gi, baseline: 0 },
@@ -127,7 +131,7 @@ const RATCHET: { name: string; pattern: RegExp; baseline: number }[] = [
   { name: "bounded", pattern: /\bbounded\b/gi, baseline: 0 },
   { name: "stance", pattern: /\bstance\b/gi, baseline: 0 },
   { name: "flip", pattern: /\bflips?\b/gi, baseline: 0 },
-  { name: "board", pattern: /\bboard\b/gi, baseline: 10 },
+  { name: "board", pattern: /\bboard\b/gi, baseline: 11 },
   /* "The call" did three jobs — the recommendation, the market state and the line between
      states — and was retired on 2026-09-23 for "guidance", "conditions" and "the change line"
      (lib/report/AGENTS.md). Counted in those senses only, so the verb ("call for") and a
@@ -200,7 +204,7 @@ const routeSurfaces: Surface[] = [
   { name: "/about", text: async () => visibleText(renderToStaticMarkup((await import("../app/about/page")).default())) },
   { name: "/contact", text: async () => visibleText(renderToStaticMarkup((await import("../app/contact/page")).default())) },
   { name: "/privacy", text: async () => visibleText(renderToStaticMarkup((await import("../app/privacy/page")).default())) },
-  { name: "/resources", text: async () => visibleText(renderToStaticMarkup((await import("../app/resources/page")).default())) },
+  { name: "/resources", text: async () => visibleText(renderToStaticMarkup(await (await import("../app/resources/page")).default({}))) },
   { name: "/calibration", text: async () => visibleText(renderToStaticMarkup((await import("../app/calibration/page")).default())) },
   { name: "/concepts", text: async () => visibleText(renderToStaticMarkup((await import("../app/concepts/page")).default())) },
   { name: "/api-docs", text: async () => visibleText(renderToStaticMarkup((await import("../app/api-docs/page")).default())) },

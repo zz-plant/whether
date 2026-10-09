@@ -29,6 +29,7 @@ import {
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { essaysPublishedIn, formatCanonAuthors, formatCanonPublished } from "../../../lib/productCanon";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 
 type Params = { period: string };
@@ -225,12 +226,12 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       <JsonLdScript data={articleStructuredData} />
 
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "History", href: "/history" },
-          ...(parent ? [{ label: parent.title, href: buildPostureArchivePath(parent.slug) }] : []),
-          { label: period.title },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(buildPostureArchivePath(period.slug), [
+            ...(parent ? [{ name: parent.title, path: buildPostureArchivePath(parent.slug) }] : []),
+            { name: period.title, path: buildPostureArchivePath(period.slug) },
+          ]),
+        )}
       />
 
       {/* The breadcrumbs above already reach the brief, /history and the parent

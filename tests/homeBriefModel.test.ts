@@ -670,7 +670,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.sinceLastReview.items.length, 3);
     assert.ok(model.sinceLastReview.items.some((item) => item.href === "/signals"));
     assert.ok(model.sinceLastReview.items.some((item) => item.href === "/operate"));
-    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/resolve"));
+    // Resolve folded into Decide on 2026-10-08: a change of conditions sends the reader to recheck the plan.
+    assert.equal(model.sinceLastReview.items.find((item) => item.id === "posture-shift")?.href, "/operate");
   });
 
   it("returns compact fallback start-route copy when no meaningful delta exists", () => {

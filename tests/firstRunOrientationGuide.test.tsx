@@ -5,7 +5,7 @@ import { FirstVisitExplainer } from "../app/components/homeFirstRunOrientation";
 import { canonicalPositioningLine, websiteName } from "../lib/seo";
 import type { RegimeKey } from "../lib/regimeEngine";
 import { FIRST_TIME_GUIDE_LINES, FIRST_TIME_GUIDE_STEPS } from "../lib/report/reportCopy";
-import { navigationLayerByKey } from "../lib/navigation/informationArchitecture";
+import { findNavigationPage } from "../lib/navigation/informationArchitecture";
 import { REGIME_LABELS, REGIME_ORDER, REGIME_WEATHER_RATIONALES } from "../lib/regimePresentation";
 
 /*
@@ -88,9 +88,10 @@ describe("first-run orientation guide", () => {
     const html = markup();
 
     for (const key of ["planning", "signals", "history"] as const) {
-      const layer = navigationLayerByKey[key];
+      const layer = findNavigationPage(key);
+      assert.ok(layer, `${key} is a page in the IA`);
       assert.ok(html.includes(`href="${layer.href}"`), `link missing: ${layer.href}`);
-      assert.ok(html.includes(`>${layer.navLabel ?? layer.label}</a>`), `${layer.href} is not labelled with its tab name`);
+      assert.ok(html.includes(`>${layer.label}</a>`), `${layer.href} is not labelled with its tab name`);
       assert.ok(html.includes(layer.description), `${layer.href} lost its description`);
     }
   });

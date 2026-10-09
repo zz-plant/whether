@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 import { FIRST_TIME_GUIDE_LINES, FIRST_TIME_GUIDE_STEPS } from "../../lib/report/reportCopy";
-import { navigationLayerByKey, type NavigationLayerKey } from "../../lib/navigation/informationArchitecture";
+import { findNavigationPage, type NavigationPageKey } from "../../lib/navigation/informationArchitecture";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import { getOrderedRegimeLegend, REGIME_STYLE_TOKENS } from "../../lib/regimePresentation";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
@@ -16,7 +16,7 @@ const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
    the navigation IA. It kept its own three links, one of them "Past snapshots"
    for a tab the header calls History, and the IA module records what a third
    copy of it costs. */
-const GUIDE_NEXT_LAYERS: readonly NavigationLayerKey[] = ["planning", "signals", "history"];
+const GUIDE_NEXT_PAGES: readonly NavigationPageKey[] = ["planning", "signals", "history"];
 
 /* Module-level on purpose: the dismissal writes to the document, which the
    React compiler's immutability rule refuses inside a component body. */
@@ -210,15 +210,16 @@ export function FirstVisitExplainer({
         </div>
 
         <ul className="mt-3 max-w-[72ch] space-y-1">
-          {GUIDE_NEXT_LAYERS.map((key) => {
-            const layer = navigationLayerByKey[key];
+          {GUIDE_NEXT_PAGES.map((key) => {
+            const layer = findNavigationPage(key);
+            if (!layer) return null;
             return (
               <li key={key} className="text-slate-400">
                 <Link
                   href={layer.href}
                   className="inline-flex min-h-[44px] items-center font-medium text-sky-200 underline decoration-sky-700 underline-offset-4 hover:text-sky-100 sm:min-h-0"
                 >
-                  {layer.navLabel ?? layer.label}
+                  {layer.label}
                 </Link>{" "}
                 {layer.description}
               </li>

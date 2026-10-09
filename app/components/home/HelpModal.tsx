@@ -6,7 +6,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../ui/dialog";
-import { shortcutNavigationLayers } from "../../../lib/navigation/informationArchitecture";
+import { navigationGroups } from "../../../lib/navigation/informationArchitecture";
 
 type HelpModalProps = {
   open: boolean;
@@ -19,7 +19,7 @@ const SHORTCUTS: Array<[string, string]> = [
   ["F", "Toggle presentation / focus mode"],
   ["J", "Next section"],
   ["K", "Previous section"],
-  ...shortcutNavigationLayers.map((layer): [string, string] => [layer.shortcut.toUpperCase(), layer.description]),
+  ...navigationGroups.map((group): [string, string] => [group.shortcut.toUpperCase(), `${group.label}: ${group.description}`]),
   ["⌘K", "Search or jump to a page"],
   ["/", "Search"],
   ["?", "Show this help"],

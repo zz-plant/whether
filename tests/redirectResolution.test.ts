@@ -78,7 +78,7 @@ describe("redirect resolution", () => {
       ["/resolve/ceo/capital-raising", "/resolve/ceo"],
       ["/answer/ceo/capital-raising", "/resolve/ceo"],
       ["/toolkits/pmf/risk-appetite-watch", "/toolkits/pmf"],
-      ["/resolve/ship-checklist", "/resolve#direct-answers"],
+      ["/resolve/ship-checklist", "/resources#answers"],
       ["/evidence/capital-tightness-watch", "/signals/capital-tightness-watch"],
       ["/evidence/capital-tightness-watch/hiring", "/signals/capital-tightness-watch/hiring"],
       ["/planning/memory", "/history"],
@@ -96,7 +96,13 @@ describe("redirect resolution", () => {
   });
 
   it("keeps the bare alias and the specific stubs ahead of the wildcard", () => {
-    assert.equal(resolve("/resolve").landing, "/resolve");
+    // Resolve folded into Decide's Test step and Guides' answers on 2026-10-08.
+    assert.equal(resolve("/resolve").landing, "/operate#ops-decision-shield");
+    assert.equal(resolve("/answer").landing, "/operate#ops-decision-shield");
+    assert.equal(resolve("/answers").landing, "/resources#answers");
+    assert.equal(resolve("/guides").landing, "/resources");
+    // The helper compiles the path, not the query, so the stakeholder rule is checked by its source.
+    assert.equal(resolve("/guides/founders-ceos").landing.split("?")[0], "/resources");
     assert.equal(resolve("/evidence").landing, "/signals");
     assert.equal(resolve("/planning").landing, "/operate");
     // /operate has no data, cli, or integrations child — the wildcard must not claim these.
@@ -171,6 +177,37 @@ describe("redirect resolution", () => {
     }
 
     assert.deepEqual(dead, [], `\n${dead.join("\n")}\n`);
+  });
+
+  /*
+   * The 2026-10-08 regrouping changed which page hosts what, not which addresses
+   * answer. Every address the header, its More menu, the footer, the breadcrumbs
+   * and the bottom bar linked before it — and the legacy spellings they replaced —
+   * still serves a page or redirects, in one hop, to one that does.
+   */
+  it("still answers every address the old navigation linked, with a page or one redirect", () => {
+    const previouslyLinked = [
+      // Header tabs: Brief, Plan, Evidence, Resolve, Trust, History.
+      "/", "/operate", "/signals", "/resolve", "/trust", "/history",
+      // The More menu.
+      "/comps", "/history/compare", "/share", "/api-docs", "/pricing", "/calibration", "/concepts", "/search", "/about",
+      // The footer, the planning switcher and the breadcrumbs.
+      "/resources", "/decisions", "/privacy", "/acceptable-use-policy", "/terms-of-service", "/feed.xml",
+      "/operate/financial", "/operate/scenarios", "/resolve/ceo", "/toolkits/focus",
+      "/answers/should-startups-raise-capital-now", "/signals/capital-tightness-watch", "/brief/2026-w31", "/history/2024",
+      // Legacy spellings and hubs the links above replaced.
+      "/answers", "/answer", "/evidence", "/planning", "/guides", "/guides/founders-ceos", "/guides/stage/seed",
+      "/decision-tools", "/resolve/ship-checklist", "/sources", "/methodology", "/glossary", "/embed",
+    ];
+    const serves = (path: string) => routeMatchers.some((matcher) => matcher.test(path));
+    const broken = previouslyLinked.flatMap((url) => {
+      const next = redirectOnce(url);
+      if (next === null) return serves(url) ? [] : [`${url}: no page and no redirect`];
+      const landing = next.split(/[#?]/)[0];
+      if (redirectOnce(landing) !== null) return [`${url} → ${next} redirects again`];
+      return serves(landing) ? [] : [`${url} → ${next}: no page there`];
+    });
+    assert.deepEqual(broken, [], `\n${broken.join("\n")}\n`);
   });
 
   it("never lands on a path that is itself a redirect source", () => {
