@@ -240,7 +240,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "Resources", href: "/resources" },
+          { label: "Guides", href: "/resources" },
           { label: page.h1 },
         ]}
       />

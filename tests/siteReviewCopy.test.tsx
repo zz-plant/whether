@@ -63,4 +63,20 @@ describe("site review copy fixes", () => {
     assert.ok(w41, "the w41 record exists");
     assert.match(buildPublishedBriefTitle(w41), /the week of Oct 5, 2026$/);
   });
+
+  /* "Governance Resources" over an image titled "Governance Pillars Emblem", and a
+     blurb that "aligns risk, spend, and sequencing through confirmation logic,
+     thresholds, and reversible governance artifacts". */
+  it("calls /resources Guides, and its framework blurbs say what the reader gets", async () => {
+    const page = await import("../app/resources/page");
+    const html = renderToStaticMarkup(page.default());
+    assert.match(html, /<h1[^>]*>Guides<\/h1>/);
+    assert.equal(String(page.metadata.title ?? "").startsWith("Guides"), true, String(page.metadata.title));
+    assert.doesNotMatch(html, /Governance Pillars Emblem|Governance resources/i);
+    const text = visibleText(html);
+    assert.doesNotMatch(text, /confirmation logic|governance artifacts|escalation thresholds|board operating system/i);
+    for (const promise of ["A monthly scorecard", "A matrix that turns market signals", "A way to sort decisions by how hard they are to undo"]) {
+      assert.ok(text.includes(promise), promise);
+    }
+  });
 });

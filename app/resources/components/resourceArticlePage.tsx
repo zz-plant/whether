@@ -178,7 +178,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
             className="print:hidden"
             items={[
               { label: "Home", href: "/" },
-              { label: "Resources", href: "/resources" },
+              { label: "Guides", href: "/resources" },
               { label: article.title },
             ]}
           />

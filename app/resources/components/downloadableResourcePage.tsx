@@ -89,7 +89,7 @@ export function DownloadableResourcePage({ config }: { config: DownloadableResou
       <Breadcrumbs
         items={[
           { label: "Home", href: "/" },
-          { label: "Resources", href: "/resources" },
+          { label: "Guides", href: "/resources" },
           { label: config.metadata.title },
         ]}
       />
