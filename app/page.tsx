@@ -50,6 +50,8 @@ import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection
 import { DoAndShareSection } from "./components/home/DoAndShareSection";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import {
+  HOME_DECISION_PARAM,
+  parseHomeDecision,
   buildHomeAreaRows,
   buildHomeQuietDayRead,
   buildSignalChangeRows,
@@ -429,7 +431,11 @@ async function PageContent({
   /* The path is month-ends whichever reading the week compares with, so its
      like-for-like note reads the month-end split and is dated by the month-end. */
   const conditionsTrail = {
-    points: conditionsTrailEntries.map((entry) => ({ tightness: entry.tightness, riskAppetite: entry.riskAppetite })),
+    points: conditionsTrailEntries.map((entry) => ({
+      tightness: entry.tightness,
+      riskAppetite: entry.riskAppetite,
+      label: formatDateUTC(entry.recordDate),
+    })),
     caption: describeConditionsTrail(conditionsTrailEntries.map((entry) => entry.recordDate)),
     caveat: describeScoreMovementCaveat(
       reportData.monthEndComparison?.movement,
@@ -636,6 +642,7 @@ async function PageContent({
             {offersFirstVisitFold ? (
               <DecisionPicker
                 options={decisionPickerOptions}
+                initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM])}
                 regime={regime}
                 scores={{ tightness, riskAppetite }}
                 flipCondition={reversalTriggerLabel}

@@ -195,7 +195,7 @@ export function SubscribeForm({
             <button
               type="submit"
               disabled={status === "loading"}
-              className="weather-button-primary min-h-11 px-4 py-2 text-xs disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="weather-button-primary min-h-11 px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
             >
               {status === "loading" ? "Subscribing…" : alertsOnly ? "Email me when it changes" : "Subscribe"}
             </button>
@@ -234,7 +234,7 @@ export function SubscribeForm({
             <button
               type="submit"
               disabled={status === "loading"}
-              className="weather-button-primary min-h-11 px-4 py-2 text-xs disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="weather-button-primary min-h-11 px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
             >
               {status === "loading" ? "Connecting…" : "Connect Slack"}
             </button>

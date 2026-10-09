@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import {
+  HOME_DECISION_PARAM,
   HOME_SECTIONS,
   describeAreaPauseStatus,
   describePauseLineCount,
@@ -89,6 +90,16 @@ const revealFullBrief = ({ scroll }: { scroll: boolean }) => {
   target?.focus({ preventScroll: true });
 };
 
+/* The choice rides in the URL (`/?decision=hiring`), so a link copied after
+   picking opens on the same answer, server-rendered. Replace, not push: picking
+   another decision is not a step Back should retrace. The router's own state
+   object is passed through so the app router keeps its entry. */
+const recordDecisionInUrl = (area: DecisionArea) => {
+  const url = new URL(window.location.href);
+  url.searchParams.set(HOME_DECISION_PARAM, area);
+  window.history.replaceState(window.history.state, "", url);
+};
+
 /** A link to a folded section (the sticky strip, a shared `#what-would-change`) unfolds the brief. */
 const hashTargetsFoldedBrief = () => {
   const id = window.location.hash.slice(1);
@@ -104,6 +115,7 @@ export function DecisionPicker({
   lastTime,
   turningPoints,
   calibration,
+  initialSelected,
 }: {
   options: readonly DecisionPickerOption[];
   /** This week's conditions, which pick the runway note the runway test quotes. */
@@ -121,9 +133,11 @@ export function DecisionPicker({
   turningPoints: readonly { label: string; href: string }[];
   /** Who the lines below are scaled for. The controls that set it sit in the brief, under "What that changes for you". */
   calibration?: { stageLabel: string; runwayPhrase: string; chosen: boolean };
+  /** The decision the URL names (`?decision=`), open on first paint. */
+  initialSelected?: DecisionArea;
 }) {
   const router = useRouter();
-  const [selected, setSelected] = useState<DecisionArea | undefined>(undefined);
+  const [selected, setSelected] = useState<DecisionArea | undefined>(initialSelected);
   // A runway typed into the test below moves the band the folded rules are
   // scaled to without re-rendering them (that would close this card). The
   // reveal is when they are next seen, so that is when they catch up.
@@ -214,7 +228,10 @@ export function DecisionPicker({
         <SegmentedControl
           options={segmentedOptions}
           value={selected}
-          onSelect={setSelected}
+          onSelect={(area) => {
+            setSelected(area);
+            recordDecisionInUrl(area);
+          }}
           ariaLabel="What are you deciding?"
           layout="choices"
         />

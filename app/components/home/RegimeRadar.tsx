@@ -13,7 +13,7 @@ type RegimeRadarProps = {
    * point. Month-ends on the brief; the domain is stated in `trailCaption`.
    * When present it replaces the single earlier dot, which is its last point.
    */
-  trail?: ReadonlyArray<{ tightness: number; riskAppetite: number }>;
+  trail?: ReadonlyArray<{ tightness: number; riskAppetite: number; label?: string }>;
   /** What the path's dots are (UI standards §XV: state the domain of a graphic). */
   trailCaption?: string | null;
   /** The like-for-like note when the earlier readings were scored from fewer inputs. */
@@ -59,7 +59,12 @@ export function RegimeRadar({
   const currentX = xFor(riskAppetite);
   const currentY = yFor(tightness);
 
-  const trailPoints = (trail ?? []).map((point) => ({ x: xFor(point.riskAppetite), y: yFor(point.tightness) }));
+  const trailPoints = (trail ?? []).map((point) => ({
+    x: xFor(point.riskAppetite),
+    y: yFor(point.tightness),
+    /* A dated dot names its reading on hover, in the words the current marker uses. */
+    title: point.label ? `${point.label}: Funding pressure ${point.tightness}, Risk appetite ${point.riskAppetite}` : undefined,
+  }));
   const hasTrail = trailPoints.length > 0;
   const hasPrevious =
     !hasTrail &&
@@ -244,14 +249,19 @@ export function RegimeRadar({
               strokeOpacity="0.55"
             />
             {trailPoints.map((point, index) => (
-              <circle
-                key={`${point.x}-${point.y}-${index}`}
-                cx={point.x}
-                cy={point.y}
-                r="2.4"
-                fill="var(--app-text-muted)"
-                fillOpacity={0.3 + (0.6 * (index + 1)) / trailPoints.length}
-              />
+              <g key={`${point.x}-${point.y}-${index}`}>
+                {point.title ? <title>{point.title}</title> : null}
+                <circle
+                  cx={point.x}
+                  cy={point.y}
+                  r="2.4"
+                  fill="var(--app-text-muted)"
+                  fillOpacity={0.3 + (0.6 * (index + 1)) / trailPoints.length}
+                />
+                {/* A 2.4-unit dot is a 3px target at the card's size; this
+                    transparent ring is what the pointer has to find. */}
+                {point.title ? <circle cx={point.x} cy={point.y} r="7" fill="transparent" /> : null}
+              </g>
             ))}
           </g>
         ) : null}

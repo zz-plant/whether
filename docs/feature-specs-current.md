@@ -2649,6 +2649,31 @@ boxed share cards (a frame inside the section's hairline, §XIII).
 `tests/visualPrimitives.test.tsx` (zones, the move, the moved row, the in-force stamp) and
 `tests/homePageHeading.test.tsx` (the meaning under the call) hold them.
 
+### 1.1.59 The brief remembers the decision, and the facelift's loose ends (2026-10-08)
+
+- **A link carries the decision.** Picking a choice under "What are you deciding?" writes
+  `?decision=<area>` into the URL (`HOME_DECISION_PARAM`, `lib/report/home/homeSectionModel.ts`)
+  with `history.replaceState`, so a link copied after picking opens on that answer, and Back does
+  not retrace each pick. The page reads the parameter on the server (`parseHomeDecision`, areas
+  only), so the answer is in the first paint. The canonical stays `/`.
+- **The map names its dots.** Each month-end on the card's conditions path carries a hover title
+  ("Aug 31, 2026: Funding pressure 63, Risk appetite 56"), in the words the current marker already
+  used, with a 7-unit transparent target around the 2.4-unit dot.
+- **One intro across the routes.** `.weather-page-intro` (`/signals`, `/operate`, `/trust`) takes
+  the hero's treatment from §1.1.58: the regime as a 3px top rule, a trace of it in the fill and
+  border. It had kept the tinted slab the hero dropped.
+- **One type size for a row of controls.** `ActionLink` and the subscribe button are set at
+  `text-fluid-xs`, the size of the clipboard buttons beside them. "Build this week's plan" printed
+  2px smaller than the two copy buttons it leads.
+- **A class glued to an interpolation is never generated.** §1.1.58 wrote
+  `max-md:py-3${row.moved ? …}`; Tailwind scans that as one token it cannot parse, so the area
+  table's phone rows lost their padding and ran into each other. Four more sites had the same shape
+  and were saved only by the class appearing elsewhere. All five have a space before `${` now, and
+  `tests/tailwindClassBoundaries.test.ts` fails on the shape anywhere under `app/`. On a phone the
+  moved row's tint is inset from its text, and the other rows' "Changed" cells sit in the muted ink.
+
+`tests/homeDecisionPicker.test.tsx` holds the parameter, its parse and the replace.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
