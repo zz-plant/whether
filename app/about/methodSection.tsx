@@ -1,5 +1,3 @@
-import Link from "next/link";
-import { publisherProfilePath } from "../../lib/publisher";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { sharedDecisionLines } from "../../lib/report/boundedDecisionRules";
 import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../../lib/regimeEngine";
@@ -94,12 +92,12 @@ export function MethodSection() {
             <p className="text-sm text-slate-300 leading-relaxed">
               Writing the stopping condition down before the action begins is the whole method. This does not guarantee the action is right. It guarantees the action will not continue past the point where it becomes wrong without a visible signal.
             </p>
+            {/* Where the structure comes from is "Who writes it", further down this
+                page, with the link to that work. This paragraph opened by saying it
+                too, behind a link to the page it sits on (2026-10-09); it keeps the
+                stakes, which are the argument. */}
             <p className="text-sm text-slate-300 leading-relaxed">
-              Whether&apos;s editor first built this structure into{" "}
-              <Link href={publisherProfilePath} className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-                healthcare products
-              </Link>
-              . In clinical workflows, physician financial guidance and contested medical claims, a decision with no stopping condition can mean patient harm, regulatory action or fiduciary breach. The same logic carries over to macro uncertainty: the cost of continuing past the stopping point is higher than the cost of pausing too early.
+              In clinical workflows, physician financial guidance and contested medical claims, a decision with no stopping condition can mean patient harm, regulatory action or fiduciary breach. The same logic carries over to macro uncertainty: the cost of continuing past the stopping point is higher than the cost of pausing too early.
             </p>
             <p className="text-sm text-slate-300 leading-relaxed">
               The pause line makes the decision concrete. The resume line makes the pause temporary. Together they make the decision safe to start.

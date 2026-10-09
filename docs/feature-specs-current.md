@@ -2931,6 +2931,11 @@ is gone. "What the margin has been worth" is the study's first sentence (96%) an
 | `/resources` | each answer row's stamp, the same for every row in an area | one stamp beside the area's name |
 | `/history/compare` | the intro's status word, Period A's conditions on a two-period page | the period headings |
 | `/calibration` | "The record" kicker; the study section's intro restating the page's | the tabs, the page intro |
+| `/pricing` | "Cannot be bought yet. A request records…" on each paid card, and again in a "What a request does" section after the buttons that also restated the free promise | one line in the header for Pro and Team together, before any request button |
+| `/trust` | "The exact arithmetic is below." over the "Show the exact arithmetic" control | the control |
+| `/about` | the structure's healthcare origin in "Who writes it" and again in the folded "Why it works", behind a link to `/about` itself | "Who writes it"; "Why it works" keeps the stakes |
+| `/brief/<week>` | "This record is frozen." in the footer, under the header's "This is a frozen record of one week." | the header line; the footer keeps the corrections rule |
+| `/history/compare` | the borrowing premium's definition under the difference tile and in both columns, the tile also repeating both columns' values | the definition under the tile; each column prints its value |
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

@@ -249,9 +249,11 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           </li>
         </ol>
         {/* No link out for the market terms: each card below says what its own terms
-            mean, so the arithmetic can be read without leaving it. */}
+            mean, so the arithmetic can be read without leaving it. It opened on "The
+            exact arithmetic is below.", over the "Show the exact arithmetic" control
+            directly beneath it (2026-10-09). */}
         <p className="text-xs text-slate-400">
-          The exact arithmetic is below. Each card says what its market terms mean.
+          Each card below says what its market terms mean.
         </p>
       </div>
 

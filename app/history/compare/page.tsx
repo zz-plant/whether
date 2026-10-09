@@ -10,7 +10,7 @@ import { StatTile } from "../../components/ui/statTile";
 import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
 import { ruleMetricLabel, type RuleConditionMetric } from "../../../lib/report/boundedDecisionRules";
 import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
-import { ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
+import { BORROWING_PREMIUM_MEANING, ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
 import { DateSelector, type DateOption } from "./DateSelector";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
 import { describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
@@ -104,10 +104,13 @@ export default async function HistoryComparePage({
     bbbA === null ? `Period A (${reportA.recordDateLabel})` : null,
     bbbB === null ? `Period B (${reportB.recordDateLabel})` : null,
   ].filter((entry): entry is string => entry !== null);
+  /* The term's one definition on the page (2026-10-09): each period's column
+     prints its value alone. The detail used to repeat both values ("1.46% vs
+     1.07%") under a definition each column printed again. */
   const bbbDetail =
     bbbA !== null && bbbB !== null
-      ? `Extra interest mid-grade companies pay over the government: ${bbbA.toFixed(2)}% vs ${bbbB.toFixed(2)}%`
-      : `Extra interest mid-grade companies pay over the government. ${describeMacroNotOnRecord(bbbMissing.join(" or "))}.`;
+      ? BORROWING_PREMIUM_MEANING
+      : `${BORROWING_PREMIUM_MEANING} ${describeMacroNotOnRecord(bbbMissing.join(" or "))}.`;
 
   /* Each score drawn once, period A filled and period B hollow, against the
      lines in force for period A: its pause and resume lines from the rules it

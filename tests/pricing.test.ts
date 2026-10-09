@@ -80,12 +80,15 @@ describe("pricing offer", () => {
       assert.match(html, /reserves your tier rate/);
     } else {
       assert.doesNotMatch(html, /reserves your tier rate|pilot organizations|priority onboarding/i);
-      // Said on each paid card, beside its price (2026-09-30), rather than after the buttons.
-      assert.equal(html.split("Cannot be bought yet").length - 1, 2, "once per paid plan");
-      assert.ok(html.indexOf("Cannot be bought yet") < html.indexOf("Request Pro access"), "before the first request button");
+      // Said once for both paid plans, before the first request button (2026-10-09). It was
+      // on each paid card beside its price (2026-09-30) and again after the buttons.
+      assert.equal(html.split("cannot be bought yet").length - 1, 1, "once, for Pro and Team together");
+      assert.equal(html.split("A request records").length - 1, 1, "what a request does, once");
+      assert.ok(html.indexOf("cannot be bought yet") < html.indexOf("Request Pro access"), "before the first request button");
+      assert.doesNotMatch(html, /What a request does|stay free either way/, "no second section restating it, or the promise above");
       // A plain fact about the offer, in the neutral ink (2026-10-07): in the
       // caution amber it read as a warning about the product.
-      const line = /<p class="([^"]*)">Cannot be bought yet/.exec(html)?.[1] ?? "";
+      const line = /<p class="([^"]*)" data-paid-plans-status="true">/.exec(html)?.[1] ?? "";
       assert.ok(line, "the line renders in its own paragraph");
       assert.doesNotMatch(line, /amber|caution/);
     }

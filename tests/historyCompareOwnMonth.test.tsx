@@ -82,7 +82,9 @@ describe("/history/compare draws each period from its own month", () => {
 
     const notOnRecord = columnB.match(/Not on record for this month/g) ?? [];
     assert.equal(notOnRecord.length, MACRO_IDS.length, "Mar 2020's three macro rows say the record has none");
-    assert.match(columnA, /Corporate borrowing premium Extra interest[^.]*\. \d+\.\d{2}%/, "the current week keeps its own figure");
+    assert.match(columnA, /Corporate borrowing premium \d+\.\d{2}%/, "the current week keeps its own figure");
+    /* Defined once, under the difference tile; each column prints its value alone (2026-10-09). */
+    assert.equal((text.match(/Extra interest mid-grade companies pay over the government/g) ?? []).length, 1);
 
     assert.doesNotMatch(text, /0\.00%/, "a missing side was read as zero");
     assert.match(text, /Not on record for Period B \(Mar 31, 2020\)\./);

@@ -27,6 +27,9 @@ const getCurveSpread = (yields: TreasuryYields | undefined) =>
     ? yields.tenYear - yields.twoYear
     : null;
 
+/** What the corporate borrowing premium is, said once on the page: under the difference tile. */
+export const BORROWING_PREMIUM_MEANING = "Extra interest mid-grade companies pay over the government.";
+
 export const findMacroValue = (series: MacroSeriesReading[] | undefined, id: MacroSeriesId) => {
   const reading = series?.find((entry) => entry.id === id);
   return typeof reading?.value === "number" ? reading.value : null;
@@ -166,9 +169,9 @@ export function ComparePeriodColumn({
               value={scores.baseRate !== undefined ? formatPercent(scores.baseRate) : "N/A"}
             />
             <SignalRow label={`${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`} value={formatPercent(spread)} />
+            {/* The value alone: the difference tile above defines the term once for both columns. */}
             <SignalRow
               label="Corporate borrowing premium"
-              meaning="Extra interest mid-grade companies pay over the government."
               value={formatPercent(findMacroValue(report.macroSeries, "BBB_CREDIT_SPREAD"), 2, macroMissing)}
             />
             <SignalRow

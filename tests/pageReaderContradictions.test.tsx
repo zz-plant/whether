@@ -282,12 +282,18 @@ describe("the site gives one account of what is new and what the scores read", (
     assert.match(html, /href="\/calibration"/);
   });
 
-  it("/about ties the method's origin to someone a reader can look up", () => {
-    const html = renderToStaticMarkup(<MethodSection />);
-    const origin = html.split("<p").find((paragraph) => paragraph.includes("clinical workflows"));
+  /* Said once (2026-10-09): "Who writes it" names the editor and links to the work;
+     the method's folded "Why it works" keeps the stakes and no second origin claim. */
+  it("/about ties the method's origin to someone a reader can look up, once", async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    const html = renderToStaticMarkup(<AboutPage />);
+    const origins = html.split("<p").filter((paragraph) => /comes from[^<]*healthcare|built this structure into/.test(paragraph.replace(/<!-- -->/g, "")));
 
-    assert.ok(origin, "expected the paragraph that says where the method comes from");
-    assert.match(origin, /href="\/about"/, "an origin claim with no one behind it reads as invented");
+    assert.equal(origins.length, 1, "the structure's origin is stated once on /about");
+    assert.match(origins[0], /href="https:\/\/[^"]+"/, "an origin claim needs someone a reader can look up behind it");
+    const stakes = renderToStaticMarkup(<MethodSection />).split("<p").find((paragraph) => paragraph.includes("clinical workflows"));
+    assert.ok(stakes, "the method keeps the stakes that make its argument");
+    assert.doesNotMatch(stakes, /healthcare products|href="\/about"/, "and no second origin claim, linked to the page it sits on");
   });
 
   it("/trust puts operating latitude where it is drawn, and defines confidence the way the label counts it", () => {

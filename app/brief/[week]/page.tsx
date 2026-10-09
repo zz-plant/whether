@@ -423,8 +423,10 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               </a>
             </p>
           ) : null}
+          {/* "This record is frozen." opened this line until 2026-10-09; the header
+              says it to every arrival, so the footer keeps only the corrections rule. */}
           <p className="text-xs text-slate-400">
-            This record is frozen. Corrections are published as a note on this page rather than a silent edit.
+            Corrections are published as a note on this page rather than a silent edit.
           </p>
         </footer>
       </article>
