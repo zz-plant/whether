@@ -2,7 +2,14 @@ import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import { formatRegimeSignalValue, type RegimeSignalKey } from "../reportFormatting";
 import { classifyScoreBand, scoreBandScaleLabel } from "../signalTranslations";
 import { describeInputMovement } from "../inputMovement";
-import { formatPointsToLine, toThresholdDistance, type ActionStripItem, type RuleThresholdDistance } from "../operatingCalls";
+import {
+  formatPointsToLine,
+  resolveLineState,
+  toThresholdDistance,
+  type ActionStripItem,
+  type LineState,
+  type RuleThresholdDistance,
+} from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
 import { isDecisionArea, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
@@ -194,7 +201,7 @@ export const buildHomeQuietDayRead = (
 };
 
 /** One side of an area's rule as a row prints it: the line, the distance in words, and the two facts behind the words. */
-type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean; metric: RuleConditionMetric };
+export type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean; metric: RuleConditionMetric };
 
 export type HomeAreaRow = {
   area: DecisionArea;
@@ -235,11 +242,15 @@ const formatPoints = (points: number) =>
  * crossed", or how far the reading is from it. Undefined for an area whose rule
  * states no pause line.
  */
-export const describeAreaPauseStatus = (row: Pick<HomeAreaRow, "pause">): { text: string; crossed: boolean } | undefined => {
+export const describeAreaPauseStatus = (
+  row: Pick<HomeAreaRow, "pause">,
+): { text: string; crossed: boolean; state: LineState } | undefined => {
   if (!row.pause) return undefined;
-  if (row.pause.met) return { text: "Pause line crossed", crossed: true };
-  if (row.pause.points === 0) return { text: "At its pause line", crossed: false };
-  return { text: `${formatPoints(row.pause.points)} from its pause line`, crossed: false };
+  /* The badge's state, from the same distance the words below describe. */
+  const state = resolveLineState(row.pause.points, "pause", row.pause.met) ?? "clear";
+  if (row.pause.met) return { text: "Pause line crossed", crossed: true, state };
+  if (row.pause.points === 0) return { text: "At its pause line", crossed: false, state };
+  return { text: `${formatPoints(row.pause.points)} from its pause line`, crossed: false, state };
 };
 
 /**

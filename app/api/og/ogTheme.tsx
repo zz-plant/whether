@@ -16,9 +16,10 @@ export {
 import { OG_BORDER_STRONG } from "../../../lib/image/ogTheme";
 
 /**
- * The regime glyph language from app/components/illustrations/RegimeGlyph.tsx
- * as a compact mark: a horizon line with rising strokes, tinted by posture.
- * Sits beside the wordmark/eyebrow so every share card carries the signature.
+ * The share cards' signature: a horizon line with rising strokes, tinted by
+ * the card's accent, beside the wordmark or eyebrow. It is a brand mark and
+ * names no condition; the site's conditions carry weather glyphs
+ * (`REGIME_ICONS`), which these Satori templates do not draw.
  */
 export const GlyphMotif = ({
   tone,

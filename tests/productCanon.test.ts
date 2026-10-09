@@ -157,7 +157,12 @@ describe("product canon: the list itself", () => {
       const start = html.indexOf(`id="${entry.slug}"`);
       const item = html.slice(start, html.indexOf("</li>", start));
       if (entry.reading.kind === "reading") {
-        assert.match(item, new RegExp(`data-regime="${entry.reading.regime}" class="weather-tag weather-tag-regime type-stamp">${entry.reading.conditions}<`), entry.slug);
+        /* The stamp draws its condition's weather glyph beside the word (`Tag regime`). */
+        assert.match(
+          item,
+          new RegExp(`data-regime="${entry.reading.regime}" class="weather-tag weather-tag-regime type-stamp[^"]*"><svg[^>]*data-concept-icon="condition"[\\s\\S]*?</svg>${entry.reading.conditions}<`),
+          entry.slug,
+        );
       } else {
         assert.doesNotMatch(item, /weather-tag-regime/, `${entry.slug} has no conditions to stamp`);
       }

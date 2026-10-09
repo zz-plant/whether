@@ -7,8 +7,11 @@ import {
   HOME_SECTIONS,
   describeAreaPauseStatus,
   describePauseLineCount,
+  type HomeAreaLineSlot,
   type HomeAreaRow,
 } from "../../../lib/report/home/homeSectionModel";
+import { resolveLineState } from "../../../lib/report/operatingCalls";
+import { AreaIcon, AreaLabel, LineStateBadge } from "../ui/conceptIcons";
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
 import { SignalReading } from "../ui/plainLanguage";
@@ -33,19 +36,22 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 /**
  * How far the reading is from a line, as a stamp: a status, so sharp (§XIV).
- * A pause line in force takes the caution ink and a resume line that is met
- * the easing ink, the two inks their columns carry in the area table; a line
- * not yet reached stays neutral.
+ * The state badge carries the pause line's three states and a resume line that
+ * is met, in the inks their columns carry in the area table; a resume line not
+ * yet reached stays a neutral stamp with no glyph, because it is not a pause.
  */
-function LineDistance({ distance, met, kind }: { distance: string; met: boolean; kind: "pause" | "resume" }) {
-  const tone = !met
-    ? "border-[color:var(--border-strong)] text-slate-300"
-    : kind === "pause"
-      ? "border-semantic-caution-border/50 bg-semantic-caution-border/10 text-semantic-caution-fg"
-      : "border-semantic-easing-border/50 bg-semantic-easing-border/10 text-semantic-easing-fg";
+function LineDistance({ slot, kind }: { slot: HomeAreaLineSlot; kind: "pause" | "resume" }) {
+  const state = resolveLineState(slot.points, kind, slot.met);
+  if (state) {
+    return (
+      <LineStateBadge state={state} stamp className="whitespace-nowrap align-middle text-fluid-nano">
+        {slot.distance}
+      </LineStateBadge>
+    );
+  }
   return (
-    <span className={`inline-block whitespace-nowrap rounded-sm border px-1.5 py-px align-baseline text-fluid-nano font-semibold tabular-nums ${tone}`}>
-      {distance}
+    <span className="inline-block whitespace-nowrap rounded-sm border border-[color:var(--border-strong)] px-1.5 py-px align-baseline text-fluid-nano font-semibold tabular-nums text-slate-300">
+      {slot.distance}
     </span>
   );
 }
@@ -96,8 +102,11 @@ export function DecisionPicker({
          were verb phrases ("Raise money", "Approve new spend") that named no
          area, so a reader met two names for each of the five. */
       label: decisionAreaLabel(option.area),
-      sublabel: status?.text,
-      sublabelTone: status?.crossed ? "caution" : undefined,
+      /* 20px: the choice is a card. */
+      icon: <AreaIcon area={option.area} size="card" />,
+      /* The state as glyph and words, so a crossed line and a close one differ
+         in shape as well as ink. */
+      sublabel: status ? <LineStateBadge state={status.state}>{status.text}</LineStateBadge> : undefined,
     };
   });
   const pauseLineCount = describePauseLineCount(options);
@@ -156,7 +165,9 @@ export function DecisionPicker({
             aria-live="polite"
             className="space-y-3 rounded-xl border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] px-4 py-4 sm:px-5"
           >
-            <p className="type-eyebrow">{decisionAreaLabel(active.area)}</p>
+            <p className="type-eyebrow">
+              <AreaLabel area={active.area} />
+            </p>
             <p className="max-w-[56ch] text-fluid-lg font-semibold leading-snug text-white">{active.rule}</p>
             {active.changed ? (
               /* Amber for an area the week moved, slate for one it did not: the
@@ -171,7 +182,7 @@ export function DecisionPicker({
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
                   <dd>
                     <span className="tabular-nums">{active.pause.line}</span>{" "}
-                    <LineDistance distance={active.pause.distance} met={active.pause.met} kind="pause" />
+                    <LineDistance slot={active.pause} kind="pause" />
                   </dd>
                 </>
               ) : null}
@@ -180,7 +191,7 @@ export function DecisionPicker({
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
                   <dd>
                     <span className="tabular-nums">{active.resume.line}</span>{" "}
-                    <LineDistance distance={active.resume.distance} met={active.resume.met} kind="resume" />
+                    <LineDistance slot={active.resume} kind="resume" />
                   </dd>
                 </>
               ) : null}

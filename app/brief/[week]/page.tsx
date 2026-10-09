@@ -43,6 +43,12 @@ import {
   type RuleThresholdDistance,
 } from "../../../lib/report/operatingCalls";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { AreaLabel, LineStateIcon } from "../../components/ui/conceptIcons";
+import { isDecisionArea } from "../../../lib/report/boundedDecisionRules";
+
+/* A frozen record stores its area as a string; a known area prints with its glyph. */
+const BriefAreaName = ({ area }: { area: string }) =>
+  isDecisionArea(area) ? <AreaLabel area={area} /> : <>{labelForArea(area)}</>;
 
 /**
  * The nearest of a decision's lines to the frozen reading, for the distance
@@ -281,6 +287,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                         />
                         <p className="mt-1 grid grid-cols-2 gap-x-3 text-fluid-nano tabular-nums text-slate-400">
                           <span>
+                            {/* The pause and play glyphs the signal bars' keys use. */}
+                            <LineStateIcon state="crossed" className="mr-1 inline align-[-3px]" />
                             {DECISION_CONTRACT_LABELS.threshold.pauseIf} {rail.invert ? "<" : ">"} {rail.guardrail}
                             <span className={`ml-1 ${rail.guardrailTripped ? "text-semantic-caution-fg" : "text-slate-500"}`}>
                               {parenthesizePointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)}
@@ -288,6 +296,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                           </span>
                           {rail.clearsAt !== undefined ? (
                             <span>
+                              <LineStateIcon state="clear" className="mr-1 inline align-[-3px]" />
                               {publicDecisionLabels.reversal} {rail.invert ? ">" : "<"} {rail.clearsAt}
                               <span className={`ml-1 ${rail.clearHolds ? "text-semantic-easing-fg" : "text-slate-500"}`}>
                                 {parenthesizePointsToLine(rail.pointsToClear, "resume", rail.clearHolds)}
@@ -326,7 +335,9 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                   <tbody>
                     {brief.decisions.map((decision) => (
                       <tr key={decision.area} className="border-b border-slate-800/50 align-top">
-                        <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">{labelForArea(decision.area)}</th>
+                        <th scope="row" className="py-2 pr-3 font-semibold text-slate-100">
+                          <BriefAreaName area={decision.area} />
+                        </th>
                         <td className="py-2 pr-3" data-label={DECISION_CONTRACT_LABELS.action.doNow}>{display.sentence(decision.doNow || decision.call)}</td>
                         <td className="py-2 pr-3 text-xs" data-label={DECISION_CONTRACT_LABELS.threshold.pauseIf}>
                           <RuleLines
@@ -355,7 +366,9 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               <ul className="space-y-4">
                 {brief.decisions.map((decision) => (
                   <li key={decision.area} className="space-y-1 border-l-2 border-slate-700/60 pl-4">
-                    <p className="text-sm font-semibold text-slate-100">{labelForArea(decision.area)}</p>
+                    <p className="text-sm font-semibold text-slate-100">
+                      <BriefAreaName area={decision.area} />
+                    </p>
                     <p className="text-sm text-slate-300">{display.sentence(decision.call)}</p>
                     {decision.doNow ? <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.action.doNow}: {display.sentence(decision.doNow)}</p> : null}
                     {/* w31 said "cash availability tightens above 76" here, the

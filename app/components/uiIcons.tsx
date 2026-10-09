@@ -19,8 +19,11 @@ import {
 
 type IconProps = LucideProps & { title?: string };
 
+/** The one stroke weight, shared with the concept icons (`ui/conceptIcons.tsx`). */
+export const ICON_STROKE_WIDTH = 1.8;
+
 const baseProps: LucideProps = {
-  strokeWidth: 1.8,
+  strokeWidth: ICON_STROKE_WIDTH,
   "aria-hidden": true,
 };
 

@@ -1,12 +1,9 @@
 import type { ReactNode } from "react";
-import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { NO_LIVE_READING_CALL } from "../../lib/report/reportCopy";
-import { RegimeGlyph } from "./illustrations/RegimeGlyph";
-import type { RegimeKey } from "../../lib/types";
-import { REGIME_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
+import { REGIME_LABELS, REGIME_WEATHER_RATIONALES, getRegimePublicLabel, isRegimeKey } from "../../lib/regimePresentation";
 import { TrustStrip, type TrustStripProps } from "./trustStrip";
 import { ScreenshotCaption } from "./screenshotCaption";
-import { Sun, Cloud, Zap, Snowflake } from "lucide-react";
+import { ConditionIcon } from "./ui/conceptIcons";
 
 type Props = {
   /** The call, as the page's heading. Absent on a read that produced no live call. */
@@ -61,17 +58,6 @@ type Props = {
   lines?: ReadonlyArray<{ label: string; value: string }>;
 };
 
-const REGIME_GLYPH_KEYS = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const satisfies readonly RegimeKey[];
-const isRegimeKey = (value: string): value is RegimeKey =>
-  REGIME_GLYPH_KEYS.some((key) => key === value);
-
-const weatherIconMap: Record<RegimeKey, typeof Sun> = {
-  EXPANSION: Sun,
-  DEFENSIVE: Cloud,
-  VOLATILE: Zap,
-  SCARCITY: Snowflake,
-};
-
 /**
  * The state tier, and nothing else: the weather word, the call as the page's
  * heading, what the word means for money in one line under it, the call's
@@ -105,7 +91,6 @@ export function DecisionHero({
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
-  const WeatherIcon = regimeKey ? weatherIconMap[regimeKey] : Sun;
   const TitleTag = titleLevel;
   const regimeWeatherLabel = (regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay).toUpperCase();
   const call = weeklyCall ?? NO_LIVE_READING_CALL.currentCall;
@@ -144,13 +129,10 @@ export function DecisionHero({
               backgroundColor: "color-mix(in srgb, var(--regime-accent) 15%, transparent)",
             }}
           >
-            {regimeKey ? (
-              <span className="inline-block w-4 shrink-0" aria-hidden="true">
-                <RegimeGlyph idPrefix="hero-stamp" regime={regimeKey} />
-              </span>
-            ) : (
-              <WeatherIcon size={14} aria-hidden="true" />
-            )}
+            {/* The weather the word names, beside it. An unknown regime prints
+                its word alone: the sun it used to fall back to claimed a
+                condition nobody had read. */}
+            {regimeKey ? <ConditionIcon regime={regimeKey} /> : null}
             <span>{regimeWeatherLabel}</span>
           </span>
 

@@ -533,3 +533,40 @@ and the rest are short and interruptible.
   entering with `ease-out`. An exit is quicker than its entrance.
 - **Every new transition has a reduced-motion end state:** `motion-reduce:transition-none` on the
   element, or a `prefers-reduced-motion` block beside the rule.
+
+## XXIV. Glyphs beside words (the concept icons)
+
+Added 2026-10-09. Three concepts carry a glyph, and only these three: the four conditions, the five
+decision areas, and where an area stands against its pause line. Everything else stays words.
+
+| Concept | Glyphs | The one mapping | The one component |
+| --- | --- | --- | --- |
+| Conditions | Sunny `Sun`, Cloudy `Cloud`, Stormy `CloudLightning`, Freezing `Snowflake` | `REGIME_ICONS` (`lib/regimePresentation.ts`) | `ConditionIcon`, `ConditionLabel`, and `Tag regime` |
+| Areas | Hiring `Users`, Roadmap `Route`, Fundraising `Landmark`, Spending `Wallet`, New bets `Sprout` | `DECISION_AREA_ICONS` (`lib/report/boundedDecisionRules.ts`) | `AreaIcon`, `AreaLabel`, `GovernedAreas` |
+| Line state | crossed `Pause`, close `CircleDashed`, clear or resume met `Play` | `LINE_STATE_ICONS` (`lib/report/operatingCalls.ts`), state from `resolveLineState` | `LineStateBadge`, `LineStateIcon` |
+
+The components live in `app/components/ui/conceptIcons.tsx`.
+
+- MUST: put the glyph beside its words, never in place of them, and mark it `aria-hidden`. The words
+  carry the meaning for a screen reader and for a paste.
+- MUST: draw a concept through its component. A page that imports `Sun` or `Pause` from
+  `lucide-react` for one of these concepts draws the right glyph until the mapping changes and that
+  page does not. `tests/conceptIcons.test.tsx` rejects the import outside the three mappings (the
+  theme toggle's sun in `uiIcons.tsx` is a lamp, not the weather).
+- MUST: one size scale. 16px (`size-4`) inline, 20px (`size-5`) on a card such as the decision
+  picker's choices or the comparison's period headings. Inside a scaled SVG, pass `width` and
+  `height` in the drawing's units so the glyph lands at 16px at the drawing's cap (the conditions
+  chart uses 12.5 units at its 256px cap).
+- MUST: colour from the tokens the words already use, so shape and colour say the same thing. A
+  condition draws in its regime ink (`data-regime` on the glyph resolves `--regime-ink`); a state
+  in the caution ink (crossed, close) or the easing ink (clear); an area in the text colour around
+  it. The shape alone still says it in greyscale, which is what the `/history` band needed: its
+  runs and key told Sunny, Cloudy and Freezing apart by colour alone.
+- "Close" is the margin's own distance: within 5 points (`REGIME_CONFIDENCE_NEAR_THRESHOLD`). A
+  resume line has a state only once it is met; short of it the distance stays plain text.
+- A line in force is a stamp (§XIV): the badge is framed for a pause line crossed and a resume line
+  met, unframed for a distance still to go.
+- NEVER: a glyph in a plain-text artifact. Slack and email pastes, citations, RSS, `llms.txt` and
+  `/brief.md` render words only; the same test holds them to it. The Satori share cards do not
+  draw these glyphs either: lucide's components are client components that read a React context,
+  which Satori cannot render, and a hand-copied vector table would be a second mapping.

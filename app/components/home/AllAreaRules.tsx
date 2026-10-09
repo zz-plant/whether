@@ -3,6 +3,7 @@ import { RunwayAreaNote, RunwayConditionedNotes } from "../RunwayConditionedNote
 import { CommitmentTestDisclosure } from "./CommitmentTest";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import type { HomeAreaRow } from "../../../lib/report/home/homeSectionModel";
+import { resolveLineState } from "../../../lib/report/operatingCalls";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { toRoute, type Route } from "../../../lib/navigation/routeType";
 
@@ -35,13 +36,17 @@ export function AllAreaRules({
     pause: row.pause
       ? {
           line: row.pause.line,
-          distance: row.pauseQualifier ? `${row.pause.distance} · also if ${row.pauseQualifier}` : row.pause.distance,
+          distance: row.pause.distance,
+          state: resolveLineState(row.pause.points, "pause", row.pause.met),
+          qualifier: row.pauseQualifier ? `also if ${row.pauseQualifier}` : undefined,
         }
       : undefined,
     resume: row.resume
       ? {
           line: row.resume.line,
-          distance: row.resumeQualifier ? `${row.resume.distance} · only when ${row.resumeQualifier}` : row.resume.distance,
+          distance: row.resume.distance,
+          state: resolveLineState(row.resume.points, "resume", row.resume.met),
+          qualifier: row.resumeQualifier ? `only when ${row.resumeQualifier}` : undefined,
         }
       : undefined,
     scores: [row.pause?.metric, row.resume?.metric].filter((metric) => metric !== undefined),

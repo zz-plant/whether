@@ -36,6 +36,7 @@ The canonical rules live in `docs/agents/ui-ux-standards.md`. Read it before edi
 | XXI | Spacing ownership |
 | XXII | What the font files draw — no glyph, style or feature the shipped files lack |
 | XXIII | Motion a reader doesn't notice — named properties, no animation on repeated actions, short and interruptible |
+| XXIV | Glyphs beside words — conditions, areas and line states each draw one glyph from one mapping through `ui/conceptIcons.tsx`; 16px inline, 20px on cards |
 
 Sections VIII and XI are the ones most often violated by accident, because they're about *what belongs where* rather than about code. Before adding a card, ask which layer owns that information. If copy fits two layers, it goes on the earliest one and the later one links out.
 

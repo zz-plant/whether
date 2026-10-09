@@ -2806,6 +2806,57 @@ A live review of every route found the same few things said several ways. Each i
   `/history/<period>` says the reading is reconstructed by today's formula and when publication began;
   report-route loading fallbacks ship no sentence in server HTML.
 
+### 1.1.61 Glyphs beside the words: conditions, areas and line states (2026-10-09)
+
+Three concepts carry a glyph, each from one mapping through one component
+(`app/components/ui/conceptIcons.tsx`; the rules are `docs/agents/ui-ux-standards.md` §XXIV). A glyph
+sits beside its words, never in place of them, and is `aria-hidden`.
+
+| Concept | Glyphs | Mapping |
+| --- | --- | --- |
+| Conditions | Sunny `Sun`, Cloudy `Cloud`, Stormy `CloudLightning`, Freezing `Snowflake` | `REGIME_ICONS`, `lib/regimePresentation.ts` |
+| Areas | Hiring `Users`, Roadmap `Route`, Fundraising `Landmark`, Spending `Wallet`, New bets `Sprout` | `DECISION_AREA_ICONS`, `lib/report/boundedDecisionRules.ts` |
+| Pause line crossed / close / clear or resume met | `Pause` / `CircleDashed` / `Play` | `LINE_STATE_ICONS` and `resolveLineState`, `lib/report/operatingCalls.ts` |
+
+- **Conditions.** The hero's stamp (homepage, published weeks, answer pages) draws the weather glyph
+  where `RegimeGlyph`'s abstract strokes were; the component is gone. Also: the conditions chart's
+  four corners (glyphs just outside the frame, beside each word), the homepage conditions legend,
+  `/history`'s key (the glyph is the swatch), its band (each run wide enough for a 16px glyph:
+  8% of the band on a phone, 3% from `sm`), the "Each closed year" chips and the published-week
+  stamps, the year and quarter pages (stamp, split, changes, quarters), `/history/compare`'s period
+  headings, `/concepts`' stamps, and the Guides climate stamp. `Tag regime` draws the glyph itself;
+  the period page's own tone table (Cloudy in sky, Stormy in amber) is gone, and the published-week
+  stamp takes the regime's hue instead of slate.
+- **Line states.** One badge (`LineStateBadge`): "Pause line crossed" with pause, "N pts from its
+  pause line" with the dashed circle when the reading is within 5 points of the line (the margin's
+  `REGIME_CONFIDENCE_NEAR_THRESHOLD`, the same distance the area table tinted as near), and the
+  clear or "already met" text with play. The dashed circle, not the warning triangle: the triangle
+  is the toast's error mark. On the picker's choices and its answer card, the area table (Decide,
+  the brief's folded table, `/share`, the answer pages, which now print the distance under each
+  line), Guides' stamps, the published week's "Guidance by area", and `/history/compare`'s rules.
+  The area table takes the state as data (`AreaRowData.pause.state`) instead of parsing its
+  distance string. The signal bars' keys draw pause beside "Pause NN" and play beside "Resume NN";
+  the change line keeps its tick. The published week's two rails do the same beside "Pause if" and
+  "Resume when".
+- **Areas.** On the picker's choices (20px), Guides' area headings, every area table row, the
+  published week's "Guidance by area", `/history/compare`, and the "Governs:" line under each score
+  on `/` and, new, on `/signals` (it said "Sets the pause and resume lines" without saying whose;
+  its links open the brief on that area's answer). Both read `areasGovernedBy`, the inverse of the
+  table the area rows name their score from (`decisionAreaUsualMetrics`, moved from the area
+  table). The runway note on `/` draws an hourglass, since the wallet is Spending's.
+- **Removed.** The "Governance Pillars" emblem on `/resources` (`GovernancePillarsGlyph`) and
+  `RegimeGlyph`, with its test.
+- **Not drawn.** Plain-text artifacts (Slack and email pastes, citations, RSS, `llms.txt`,
+  `/brief.md`) carry no glyph. Neither do the Satori share cards: lucide's components are client
+  components that read a React context, which Satori cannot render, and a hand-copied vector
+  table would be a second mapping. The report routes' status word and the sticky strips keep the
+  word alone.
+
+`tests/conceptIcons.test.tsx` holds every mapping, the 5-point line, `aria-hidden` and a label
+beside every glyph on the shared components and the routes that render offline, that no page
+imports a concept glyph or reads a mapping outside the shared components, and that the text
+artifacts carry no icon markup.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
