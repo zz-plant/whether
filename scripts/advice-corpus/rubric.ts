@@ -9,7 +9,7 @@
  */
 import { z } from "zod";
 
-import { ADVICE_STANCES } from "../../lib/adviceStance";
+import { ADVICE_STANCE_DEFINITIONS } from "../../lib/adviceStance";
 import { HEAD_WORDS, SNIPPET_WORDS, SNIPPETS } from "./paths";
 
 export const PROMPT_VERSION = "advice-v2";
@@ -144,7 +144,7 @@ export function buildClassifierInput(title: string, text: string): string {
   return parts.join("\n");
 }
 
-const definition = (stance: string) => ADVICE_STANCES.find((entry) => entry.stance === stance)?.definition ?? "";
+const definition = (stance: keyof typeof ADVICE_STANCE_DEFINITIONS) => ADVICE_STANCE_DEFINITIONS[stance].corpusDefinition;
 
 export const SYSTEM_PROMPT = [
   "You label blog posts and essays written by venture investors. Read the post and answer with one JSON object.",

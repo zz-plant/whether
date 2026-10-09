@@ -65,6 +65,7 @@ Typical downstream renderers:
   | The line where conditions change | "the change line" in labels, "the line where conditions change" in prose | `app/components/ui/scoreLadder.tsx` | call-change line, "the line that changes the call", boundary, threshold |
   | How conditions change | `trackRecordCopy.ts` `CALL_CHANGE_RULE`, once per page | `trackRecordCopy.ts` | hysteresis, confirmation gate, dwelt crossing |
   | No live reading | `reportCopy.ts` `NO_LIVE_READING_CALL`: what is missing and what to hold | `reportCopy.ts` | "bounded operating discipline", "policy override" |
+  | Which inputs set the scores | "Scored on the record's inputs." (a reading an earlier engine scored: "Scored on more inputs than the record."); the strip's cell "Scored on"; a left-out input's effect "Not counted: …" | `scoringBasis.ts` | "off the record", "record basis", "gated" in reader text |
 - If a component needs to display `Action`, `Threshold`, `Reversal`, `Pause if`, `Resume when`, or `Conditions change if`, route that phrasing through shared report/export formatting instead of custom string assembly.
 - Keep translation-only layers translation-only. Interpretation layers may change explanatory bullets, but they must not mutate canonical posture, confidence, readiness, or threshold semantics.
 - Keep fallback behavior explicit and non-fatal. Historical or degraded modes must remain renderable with a compact operating implication.

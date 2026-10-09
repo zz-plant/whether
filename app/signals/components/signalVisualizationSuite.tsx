@@ -239,8 +239,11 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
      the summary; a second `<details>` here was a disclosure inside a
      disclosure. */
   return (
+    // One frame per chart and none around the set (2026-10-09): the five panels
+    // sat inside a bordered, filled box inside the disclosure, a frame around
+    // frames that grouped nothing the disclosure did not.
     <div id="visual-diagnostics" className="min-w-0 space-y-4">
-      <div className="rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
+      <div>
 
         {/* This week's four rates, then what the charts are. The line said
             "Latest: Oct 5" over charts whose last point was the Aug 31
@@ -249,7 +252,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             was the raw record field ("Latest: 2026-10-05") where every other
             line on the page reads "Oct 5, 2026"; it is formatted in UTC, as
             the server formats it, so the client renders the same string. */}
-        <div className="mt-3 space-y-1 border-b border-slate-800/80 pb-3 text-xs">
+        <div className="space-y-1 border-b border-slate-800/80 pb-3 text-xs">
           <p className="tabular-nums text-slate-300">
             Latest: {formatDateUTC(treasury.record_date)} · {treasury.isLive ? "Live reading" : "Last saved reading"} · 1M{" "}
             {formatPercent(treasury.yields.oneMonth)} · 3M {formatPercent(treasury.yields.threeMonth ?? null)} · 2Y{" "}

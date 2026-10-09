@@ -273,10 +273,6 @@
      it read as a filled block rather than a ring and swallowed adjacent borders. */
   --focus-halo: 0 0 0 calc(4 * var(--sh)) var(--accent-border-soft);
 
-  /* Accent glows. Spread scales with the same knob so a focus ring or a hover
-     halo keeps its proportion to the shadow it sits inside. */
-  --glow-soft: 0 0 calc(16 * var(--sh)) var(--accent-glow);
-
   /* Legacy aliases. Complete values only — never put these in a color slot. */
   --shadow-light: var(--elev-1);
   --shadow-sm: var(--elev-1);
@@ -290,8 +286,6 @@
   --accent-danger: #f87171;
   --accent-border: rgba(56, 189, 248, 0.35);
   --accent-border-soft: rgba(56, 189, 248, 0.15);
-  --accent-glow: rgba(56, 189, 248, 0.06);
-  --accent-glow-faint: rgba(56, 189, 248, 0.03);
 
   /* Z-index scale */
   --z-dropdown: 10;
@@ -303,9 +297,10 @@
   /* CTA button. The previous stops (#47cce a → #208bc4, stock sky/cyan) put
      .weather-button-primary's text-slate-100 at 1.73:1 against the top of the
      gradient and 3.45:1 against the bottom — both under AA for the app's most
-     prominent control. These stops hold 5.3:1 and 7.3:1 against the same ink,
-     and read as an instrument surface rather than a default cyan button. */
-  --cta-gradient: linear-gradient(180deg, #2b6c8c, #1e5673);
+     prominent control. It was a gradient from #2b6c8c to #1e5673 under a white
+     top highlight until 2026-10-09; it is the top stop, flat, which holds 5.3:1
+     against the same ink. */
+  --cta-fill: #2b6c8c;
   --cta-shadow: 0 6px 12px -10px rgba(6, 22, 32, 0.85);
   --cta-shadow-hover: 0 8px 16px -10px rgba(6, 22, 32, 0.95);
   --cta-border: rgba(125, 174, 200, 0.55);
@@ -530,14 +525,13 @@ html[data-theme="light"] {
   --color-semantic-stormy-fg: #6d28d9;
 
   /* Accent tints and the CTA treatment were dark-only, so the primary button
-     kept a bright cyan gradient and a glow tuned for a near-black page. */
+     kept a bright cyan fill tuned for a near-black page. */
   --accent-border: rgba(3, 105, 161, 0.30);
   --accent-border-soft: rgba(3, 105, 161, 0.14);
-  --accent-glow: rgba(3, 105, 161, 0.05);
-  --accent-glow-faint: rgba(3, 105, 161, 0.025);
-  /* Top stop was #0284c7, which held only 4.10:1 against the white ink the
-     light theme forces on this button (see the rule near the end of this file). */
-  --cta-gradient: linear-gradient(180deg, #0369a1, #075985);
+  /* Flat at what was the gradient's top stop (2026-10-09). An earlier top stop,
+     #0284c7, held only 4.10:1 against the white ink the light theme forces on
+     this button (see the rule near the end of this file); #0369a1 holds 5.9:1. */
+  --cta-fill: #0369a1;
   --cta-border: rgba(3, 105, 161, 0.5);
   --cta-shadow: 0 4px 10px -8px rgba(3, 105, 161, 0.45);
   --cta-shadow-hover: 0 6px 14px -8px rgba(3, 105, 161, 0.55);
@@ -636,18 +630,16 @@ html:not([data-theme="light"]) [class^="text-white/5"], html:not([data-theme="li
 html[data-theme="light"] .weather-input,
 html[data-theme="light"] .weather-control { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
 html[data-theme="light"] .weather-button { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
-/* White, not navy: the light CTA gradient is a saturated blue (see
-   --cta-gradient above), so dark-on-blue would sit near 1.5:1. */
+/* White, not navy: the light CTA fill is a saturated blue (see
+   --cta-fill above), so dark-on-blue would sit near 1.5:1. */
 html[data-theme="light"] .weather-button-primary { color: #ffffff; }
-/* controls.css hardcodes a dark gradient on these; without a light counterpart
-   the pill kept a near-black background while text-slate-100 flipped to dark,
-   so the /evidence header chip rendered dark-on-dark. background-image must be
-   cleared explicitly -- the shorthand alone loses to the later stylesheet. */
+/* controls.css fills these from the dark surface tokens; without a light
+   counterpart the pill kept a near-black background while text-slate-100
+   flipped to dark, so the /evidence header chip rendered dark-on-dark. */
 html[data-theme="light"] .weather-pill {
   color: var(--text-primary);
   border-color: var(--border-strong);
   background-color: var(--bg-panel);
-  background-image: none;
   box-shadow: var(--shadow-light);
 }
 /* The selected pill (controls.css), which the rule above would otherwise

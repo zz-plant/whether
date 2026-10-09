@@ -113,10 +113,11 @@ export function ScenarioDeltas({
           </div>
         )}
 
-        <div className="grid gap-6 md:grid-cols-2">
-          {/* Stop Items */}
-          <div className="weather-surface p-5 space-y-3">
-            <h4 className="type-eyebrow text-rose-300">What to STOP in this scenario</h4>
+        {/* Two plain lists with the colour on their names, like Decide's Stop and
+            Start lists (2026-10-09); each was a card with a capitalised verb. */}
+        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-semantic-tightening-fg">What to stop in this scenario</h4>
             <ul className="list-disc space-y-2 pl-4 text-xs text-slate-300">
               {simulatedPlaybook.stopItems.map((item, idx) => (
                 <li key={idx}>{item}</li>
@@ -124,9 +125,8 @@ export function ScenarioDeltas({
             </ul>
           </div>
 
-          {/* Start Items */}
-          <div className="weather-surface p-5 space-y-3">
-            <h4 className="type-eyebrow text-emerald-300">What to START in this scenario</h4>
+          <div className="space-y-2">
+            <h4 className="text-sm font-semibold text-semantic-easing-fg">What to start in this scenario</h4>
             <ul className="list-disc space-y-2 pl-4 text-xs text-slate-300">
               {simulatedPlaybook.startItems.map((item, idx) => (
                 <li key={idx}>{item}</li>

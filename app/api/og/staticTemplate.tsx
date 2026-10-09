@@ -60,7 +60,7 @@ const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string
   reading: {
     label: "READING LIST",
     title: "Dated against the market",
-    body: "Each essay placed on the conditions of the month it came out.",
+    body: "Each text placed on the conditions of the month it came out.",
   },
   /* /history and its 82 periods. A closed period, so the panel says where the
      current reading lives instead of implying this is it. */

@@ -1,9 +1,10 @@
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
 import { countRecord } from "../../../lib/report/trackRecord";
+import { describeTrackRecordRescore } from "../../../lib/report/trackRecordCopy";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
-import { StatTile } from "../ui/statTile";
+import { Fact, FactList } from "../ui/factList";
 
 /**
  * The page above this calls itself the permanent record cited in board
@@ -12,7 +13,14 @@ import { StatTile } from "../ui/statTile";
  * often calls churned. All of it is recomputed from the same series the replay
  * engine uses — nothing here is authored.
  */
-export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[] }) {
+export function TrackRecordSection({
+  series,
+  recordChanges,
+}: {
+  series: TimeMachineRegimeEntry[];
+  /** Changes in conditions across the whole record, for the line on its last re-score; this section grades a trailing window. */
+  recordChanges?: number;
+}) {
   if (series.length < 2) return null;
 
   const record = buildRegimeTrackRecord(series);
@@ -47,20 +55,22 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatTile
+      {/* Facts in the text's size, above the table they summarise; four tiles
+          with a bold figure each until 2026-10-09. */}
+      <FactList>
+        <Fact
           label="Changes in conditions"
           value={counts?.changes ?? record.transitions.length}
           unit={`in the last ${counts?.readings ?? record.observations} months`}
         />
-        <StatTile label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
-        <StatTile
+        <Fact label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+        <Fact
           label="Median hold"
           value={record.medianHoldMonths ?? "—"}
           unit={record.medianHoldMonths != null ? "mo" : undefined}
         />
-        <StatTile label="Reversed after one month" value={record.whipsawCount} />
-      </div>
+        <Fact label="Reversed after one month" value={record.whipsawCount} />
+      </FactList>
 
       {recentTransitions.length > 0 ? (
         <div className="overflow-x-auto">
@@ -105,6 +115,11 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
         {record.nearBandPts} pts of its line, on either side, before conditions changed. Unsignaled
         changes are listed just the same — that is the point of this table.
       </p>
+      {recordChanges !== undefined ? (
+        <p className="text-fluid-nano leading-relaxed text-slate-400" data-record-rescore>
+          {describeTrackRecordRescore({ changes: recordChanges, signaled: record.signaledCount, graded: record.transitions.length })}
+        </p>
+      ) : null}
     </section>
   );
 }

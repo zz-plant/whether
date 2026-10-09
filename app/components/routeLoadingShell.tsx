@@ -27,7 +27,7 @@ export function RouteLoadingShell({ pageTitle = "Weekly brief" }: RouteLoadingSh
             and the first section's rule, heading and card — so the resolved
             route lands where the placeholder was. This used to print two
             badges and a four-question list no resolved page renders. */}
-        <div className="weather-surface-secondary weather-page-intro px-4 py-3.5 sm:px-5 sm:py-4">
+        <div className="weather-surface-secondary px-4 py-3.5 sm:px-5 sm:py-4">
           <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-10 lg:space-y-0">
             <div className="min-w-0 space-y-2">
               <Skeleton className="h-3 w-20 rounded-sm bg-slate-500/28" />

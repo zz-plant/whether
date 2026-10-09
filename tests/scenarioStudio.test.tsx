@@ -108,7 +108,7 @@ describe("ScenarioStudioSimulator", () => {
 
     // Playbook
     assert.match(html, /What you&#x27;d stop and start in this scenario/);
-    assert.match(html, /What to STOP in this scenario/);
-    assert.match(html, /What to START in this scenario/);
+    assert.match(html, /What to stop in this scenario/);
+    assert.match(html, /What to start in this scenario/);
   });
 });

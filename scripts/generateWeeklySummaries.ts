@@ -16,8 +16,8 @@ const OUTPUT_PATH = (endYear: number) =>
 
 const generateWeeklySummaries = async () => {
   const now = new Date();
-  const { datasets, vixDataset } = await fetchArchiveDatasets();
-  const { entries: output, effectiveEndYear, mode } = buildWeeklyArchive({ datasets, vixDataset, now });
+  const { datasets, vixDataset, chicagoFciDataset } = await fetchArchiveDatasets();
+  const { entries: output, effectiveEndYear, mode } = buildWeeklyArchive({ datasets, vixDataset, chicagoFciDataset, now });
 
   await writeSummaryFile({
     path: OUTPUT_PATH(effectiveEndYear),

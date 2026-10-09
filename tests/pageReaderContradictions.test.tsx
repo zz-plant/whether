@@ -388,6 +388,7 @@ describe("/ and /brief.md agree on whether conditions could change next week", (
           isFallback: homepage.reportShell.showOfflineBadge,
           confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
           assessment: reportData.assessment,
+          scoringBasis: reportData.scoringBasis,
         })}
       />,
     );

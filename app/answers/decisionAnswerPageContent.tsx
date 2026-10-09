@@ -224,6 +224,7 @@ export async function DecisionAnswerPageContent({
             degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
             confidenceLabel: homeBriefModel.confidenceLabel,
             assessment,
+            scoringBasis: reportData.scoringBasis,
           })}
         />
         {dataCurrency ? (

@@ -3,6 +3,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import type { PostureTransitionEvent } from "../storage/postureTransitionEventRepository";
+import type { ShadowRampRecord } from "../research/shadowRamps";
 
 export type OperatingSnapshot = {
   id: string;
@@ -15,6 +16,14 @@ export type OperatingSnapshot = {
    */
   schemaVersion: 2;
   epoch: string;
+  /**
+   * The calibration that scored `assessment` (`ENGINE_VERSION`). Set from
+   * 2026-10-09; a snapshot without it was scored by an earlier engine, whose
+   * published scores counted every market input (`scoringBasisForEngine`).
+   * Snapshots are kept per engine (the input hash includes the version), so an
+   * earlier engine's stays readable under its own key.
+   */
+  engineVersion?: string;
   recordDate: string;
   inputHash: string;
   sourceSnapshotIds: string[];
@@ -37,6 +46,14 @@ export type OperatingSnapshot = {
     macroAgeHours: number;
     status: "fresh" | "stale" | "fallback";
   };
+  /**
+   * The registered candidate rate ramps, scored beside this reading by the weekly
+   * pipeline (docs/research/premise-test-preregistration.md §10). Research only:
+   * the assessment and weekly call above are built before it and never read it.
+   * Absent on snapshots built off the pipeline (an export's cold read) and on
+   * those stored before 2026-10-09.
+   */
+  shadowRamps?: ShadowRampRecord;
 };
 
 export type RefreshOperatingStateOptions = {

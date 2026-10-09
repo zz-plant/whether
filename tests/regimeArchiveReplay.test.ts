@@ -21,7 +21,9 @@ import {
  * bundle does not carry. What the bundle does carry is every observation the
  * archives were scored from: each month-end's yields, the base-rate pair the
  * tightening-speed term chose, the daily VIX tail behind the stress veto, and
- * the yields each weekly, quarterly and yearly entry was read at. Rebuilt into
+ * the weekly Chicago Fed observations around each month-end (on the record
+ * basis since engine-2026-10-09b), and the yields each weekly, quarterly and
+ * yearly entry was read at. Rebuilt into
  * FRED-shaped series, they are enough for the generators' own code
  * (`scripts/regimeArchiveReplay.ts`, the code the scripts run) to reproduce the
  * records. Before 2026-10-06 the replay loop existed four times (the runtime
@@ -45,6 +47,8 @@ const CacheEntrySchema = z.object({
     .object({ compareDate: z.string(), compareValue: z.number(), latestDate: z.string(), latestValue: z.number() })
     .nullable()
     .optional(),
+  chicagoFci: z.number().nullable().optional(),
+  chicagoFciHistory: z.array(HistoryPointSchema).nullable().optional(),
   source: z.string(),
   record_date: z.string(),
   isLive: z.boolean().optional(),
@@ -79,6 +83,7 @@ const buildBundledSeries = () => {
     DGS2: new Map<string, number | null>(),
     DGS10: new Map<string, number | null>(),
     VIXCLS: new Map<string, number | null>(),
+    NFCI: new Map<string, number | null>(),
   };
   const conflicts: string[] = [];
   const put = (map: Map<string, number | null>, date: string, value: number | null | undefined) => {
@@ -101,6 +106,7 @@ const buildBundledSeries = () => {
       put(series.DGS1MO, window.latestDate, window.latestValue);
     }
     for (const point of entry.vixHistory ?? []) put(series.VIXCLS, point.date, point.value);
+    for (const point of entry.chicagoFciHistory ?? []) put(series.NFCI, point.date, point.value);
   }
   for (const entry of archive) {
     if (entry.cadence === "monthly") continue;
@@ -131,11 +137,11 @@ const buildBundledSeries = () => {
     twoYear: toDataset("DGS2"),
     tenYear: toDataset("DGS10"),
   };
-  return { datasets, vixDataset: toDataset("VIXCLS"), conflicts };
+  return { datasets, vixDataset: toDataset("VIXCLS"), chicagoFciDataset: toDataset("NFCI"), conflicts };
 };
 
-// The archives on record were generated on Sep 15, 2026; the weekly range ends at the last Friday before it.
-const NOW = new Date("2026-09-15T02:01:33.000Z");
+// The archives on record were regenerated on Oct 9, 2026 (engine-2026-10-09b); the weekly range ends at the Friday it covers.
+const NOW = new Date("2026-10-09T18:29:43.682Z");
 
 // A partial-run variable in the environment would scope what the builders write.
 const HISTORY_ENV = ["HISTORY_START_YEAR", "HISTORY_END_YEAR", "HISTORY_WEEKS"];
@@ -186,12 +192,14 @@ describe("archive replay from bundled series", () => {
     const { timeMachineEntries } = buildMonthlyArchive({ ...bundled, now: NOW });
     // Everything but the fetch timestamp: yields, VIX close and tail, and the velocity pair.
     const comparable = (entries: readonly z.input<typeof CacheEntrySchema>[]) =>
-      entries.map(({ year, month, vix, vixHistory, baseRateVelocityWindow, source, record_date, yields }) => ({
+      entries.map(({ year, month, vix, vixHistory, baseRateVelocityWindow, chicagoFci, chicagoFciHistory, source, record_date, yields }) => ({
         year,
         month,
         vix,
         vixHistory,
         baseRateVelocityWindow,
+        chicagoFci,
+        chicagoFciHistory,
         source,
         record_date,
         yields,
@@ -259,6 +267,23 @@ describe("archive replay from bundled series", () => {
       });
       assert.deepEqual(diffs, []);
     }
+  });
+
+  /* The regenerated archive (engine-2026-10-09b, the Chicago Fed index backfilled) is a
+     function of the series and the clock: two replays write the same bytes. */
+  it("replays to the same bytes twice from the same series and clock", () => {
+    for (const build of [buildMonthlyArchive, buildWeeklyArchive, buildQuarterlyYearlyArchive]) {
+      assert.equal(JSON.stringify(build({ ...bundled, now: NOW })), JSON.stringify(build({ ...bundled, now: NOW })));
+    }
+  });
+
+  it("carries the Chicago Fed index into every cached month, as a reader had it", () => {
+    const { timeMachineEntries } = buildMonthlyArchive({ ...bundled, now: NOW });
+    assert.deepEqual(timeMachineEntries.filter((entry) => typeof entry.chicagoFci !== "number").map((entry) => entry.record_date), []);
+    /* Mar 31, 2020: the Mar 27 week was published Apr 1, so the month reads Mar 20's 0.175. */
+    const march2020 = timeMachineEntries.find((entry) => entry.record_date === "2020-03-31");
+    assert.equal(march2020?.chicagoFci, 0.175);
+    assert.equal(march2020?.chicagoFciHistory?.some((point) => point.date > "2020-03-26"), false);
   });
 
   it("scores each month the way the runtime walk does", () => {

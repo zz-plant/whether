@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 
-import { ADVICE_STANCES } from "../lib/adviceStance";
+import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCES } from "../lib/adviceStance";
 import { buildClassifierInput, clipQuote, isVerbatim, parseLabel, PROMPT_VERSION, SYSTEM_PROMPT } from "../scripts/advice-corpus/rubric";
 
 /*
@@ -32,7 +32,7 @@ describe("the registered prompt", () => {
   });
 
   it("carries the three stance definitions from the one place they are defined", () => {
-    for (const entry of ADVICE_STANCES) assert.ok(SYSTEM_PROMPT.includes(entry.definition), entry.stance);
+    for (const stance of ADVICE_STANCES) assert.ok(SYSTEM_PROMPT.includes(ADVICE_STANCE_DEFINITIONS[stance].corpusDefinition), stance);
   });
 });
 

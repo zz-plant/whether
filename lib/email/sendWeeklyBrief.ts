@@ -206,6 +206,11 @@ export const sendWeeklyBrief = async (options?: {
   const pauseIf = document.slots.pauseIf;
   const changeLines = weeklyCallChangeLines(document.slots);
   const recordDate = document.recordDateLabel;
+  /* Which inputs set the scores, beside them, and what the inputs left out would
+     do where they would move a line (`ScoringBasis`). */
+  const basisLine = [document.provenance.scoringBasis.sentence, document.provenance.scoringBasis.warning]
+    .filter((part): part is string => Boolean(part))
+    .join(" ");
 
   const tally = await fanOut(
     subscriptions,
@@ -224,6 +229,7 @@ export const sendWeeklyBrief = async (options?: {
         `Whether Weekly Brief — ${recordDate}`,
         `Conditions: ${document.conditions.line}`,
         ...readingsText(readings),
+        basisLine,
         ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
         `${publicDecisionLabels.call}: ${headline.composed}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
@@ -244,6 +250,7 @@ export const sendWeeklyBrief = async (options?: {
         `<p style="font-size:0.85rem;margin:4px 0 0;color:#cbd5e1;">${getRegimeWeatherRationale(regime)}</p>`,
         `</td></tr></table>`,
         readingsHtml(readings),
+        `<p style="font-size:0.8rem;margin:8px 0 0;color:#94a3b8;">${escapeHtml(basisLine)}</p>`,
         ...(weekChange
           ? [`<p style="font-size:0.9rem;margin:12px 0 0;color:#cbd5e1;"><strong style="color:#f1f5f9;">${EXPORT_SECTION_HEADINGS.changed}:</strong> ${escapeHtml(weekChange)}</p>`]
           : []),

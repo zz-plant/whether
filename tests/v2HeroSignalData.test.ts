@@ -48,6 +48,7 @@ describe("v2 hero signal data", () => {
         sourcesLabel: "Live",
         confidenceLabel: "HIGH",
         couldChangeNextWeek: false,
+        basis: { key: "record", value: "The record's inputs", warning: null },
       }),
     );
 

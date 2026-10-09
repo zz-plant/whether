@@ -64,6 +64,7 @@ import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { RegimeRadar } from "./components/home/RegimeRadar";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
+import { describeCitableBriefBasis } from "../lib/report/publishedBriefs";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
@@ -351,6 +352,7 @@ async function PageContent({
     lines: metricLines,
     tightnessPressure,
     tightnessSaturated,
+    scoringBasis: reportData.scoringBasis,
   });
   const decisionMovement = homepage.weeklyDecisionCardModel.decision.decisionMovement;
   const homeAreaRows = buildHomeAreaRows({
@@ -455,6 +457,16 @@ async function PageContent({
     degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 0,
     confidenceLabel: confidenceLabel ?? "HIGH",
     assessment: reportData.assessment,
+    scoringBasis: reportData.scoringBasis,
+    /* The one place the page says why its conditions differ from the published
+       week's, when the record basis is why. A replay is not this week. */
+    basisNote: historicalSelection
+      ? null
+      : describeCitableBriefBasis({
+          currentRecordDate: reportData.treasury.record_date,
+          live: reportData.assessment,
+          thresholds: reportData.assessment.thresholds,
+        }),
   });
 
   return (

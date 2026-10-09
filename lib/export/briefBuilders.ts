@@ -12,6 +12,7 @@ import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { areaLinesFromActionStrip, buildDecisionMovement } from "../report/decisionMovement";
 import { describeBaseRateSource, formatDocumentMargin, formatExportConfidence } from "./exportTerms";
+import { describeNotCountedLine } from "../report/scoringBasis";
 
 /*
  * Every paste reads in the page's order: the call, what changed, what it
@@ -42,6 +43,7 @@ const buildExportStamp = (document: BriefDocument, confidence: string) =>
     sourceLine: document.provenance.sourceUrl,
     timestamp: document.provenance.recordDate,
     confidence,
+    basis: document.provenance.scoringBasis.sentence,
   });
 
 type CallSlot = { label: string; value: string };
@@ -186,7 +188,12 @@ const buildReadingLines = (
     thresholds: RegimeAssessment["thresholds"];
     regime: RegimeAssessment["regime"];
   },
-  options: { actionStripItems?: readonly ActionStripItem[]; previousScores?: PreviousReading | null } = {},
+  options: {
+    actionStripItems?: readonly ActionStripItem[];
+    previousScores?: PreviousReading | null;
+    /** What each score leaves out (`describeNotCountedLine`), after what moved it. */
+    notCountedLine?: string | null;
+  } = {},
 ): string[] => {
   const items = options.actionStripItems ?? [];
   const scores = { tightness: reading.scores.tightness, riskAppetite: reading.scores.riskAppetite };
@@ -205,6 +212,7 @@ const buildReadingLines = (
       previous,
     }),
     ...(movementLine ? [movementLine] : []),
+    ...(options.notCountedLine ? [options.notCountedLine] : []),
   ];
 };
 
@@ -212,7 +220,11 @@ const buildReadingLines = (
 export const briefReadingLines = (document: BriefDocument) =>
   buildReadingLines(
     { scores: document.readings.scores, thresholds: document.readings.thresholds, regime: document.conditions.regime },
-    { actionStripItems: document.areaRows, previousScores: document.readings.previous },
+    {
+      actionStripItems: document.areaRows,
+      previousScores: document.readings.previous,
+      notCountedLine: describeNotCountedLine(document.provenance.scoringBasis),
+    },
   );
 
 /*
@@ -226,10 +238,18 @@ export const briefReadingLines = (document: BriefDocument) =>
  * including a High week twenty points from both lines, and the last line
  * opened "If it is:", a question the reader had not been asked.
  */
+/*
+ * The inputs the record cannot test are a reason the call could be wrong when
+ * they would put a score past a line the published score is not past
+ * (`ScoringBasis.warning`), so the block says what they would do, after the margin.
+ */
 const buildWhyThisCouldBeWrongBlock = (document: BriefDocument) => [
   "",
   "Why this could be wrong:",
   `• ${formatDocumentMargin(document)}`,
+  ...(document.provenance.scoringBasis.warning
+    ? [`• ${document.provenance.scoringBasis.warning} The guidance leaves them out: the record cannot test them.`]
+    : []),
   `• ${document.slots.whyCouldBeWrong}`,
   `• What would show it: "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, and the readings.`,
 ];

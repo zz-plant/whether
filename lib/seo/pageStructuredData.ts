@@ -466,10 +466,11 @@ export const buildCalibrationStudyStructuredData = ({
 };
 
 /**
- * `/concepts`: a `CollectionPage` whose `ItemList` names each essay on the page
+ * `/concepts`: a `CollectionPage` whose `ItemList` names each text on the page
  * as the `CreativeWork` it is — its own author, its own URL, its first
  * publication month. The items are the external works themselves, not anchors
- * on this page, because that is what the list is a list of.
+ * on this page, because that is what the list is a list of. A memo signed by a
+ * firm alone is authored by that firm, as an `Organization`.
  */
 export const buildProductCanonStructuredData = ({
   essays,
@@ -477,13 +478,14 @@ export const buildProductCanonStructuredData = ({
   essays: ReadonlyArray<{
     title: string;
     authors: readonly string[];
+    firm?: string;
     format: "essay" | "book";
     sourceUrl: string;
     published: { year: number; month: number };
   }>;
 }): JsonLdGraph => {
   const url = buildCanonicalUrl("/concepts");
-  const name = "Product writing, against the market it was written in";
+  const name = "Does startup advice follow the market?";
   return graph([
     {
       "@type": "CollectionPage",
@@ -503,7 +505,10 @@ export const buildProductCanonStructuredData = ({
             "@type": essay.format === "book" ? "Book" : "Article",
             name: essay.title,
             url: essay.sourceUrl,
-            author: essay.authors.map((name) => ({ "@type": "Person", name })),
+            author:
+              essay.authors.length > 0 || !essay.firm
+                ? essay.authors.map((name) => ({ "@type": "Person", name }))
+                : [{ "@type": "Organization", name: essay.firm }],
             datePublished: `${essay.published.year}-${String(essay.published.month).padStart(2, "0")}`,
           },
         })),

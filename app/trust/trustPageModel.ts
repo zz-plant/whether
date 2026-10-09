@@ -3,7 +3,6 @@ import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
-import { navigationGroupByKey } from "../../lib/navigation/informationArchitecture";
 import { graph } from "../../lib/seo/pageStructuredData";
 import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import {
@@ -57,6 +56,7 @@ export async function buildTrustPageModel() {
     degradedSourceCount: degradedSourceRows.length,
     confidenceLabel: homeBriefModel.confidenceLabel,
     assessment: reportData.assessment,
+    scoringBasis: reportData.scoringBasis,
   });
   /* Where the two scores sit against their lines, for the ladders that open
      "How the scores are built". The earlier reading comes from `previousScoresFromDynamics`,
@@ -171,15 +171,7 @@ export async function buildTrustPageModel() {
     chrome: {
       sidebarVariant: "full",
     },
-    actions: {
-      // Into Record. Why it changed is a tab above this page now; what a reader
-      // judging the reading needs next is how readings like it held up.
-      nextStep: {
-        href: navigationGroupByKey.record.href,
-        description: navigationGroupByKey.record.description,
-        label: `Open the ${navigationGroupByKey.record.label.toLowerCase()}`,
-      },
-    },
+    // No closing "Open the record" card (2026-10-09): Record is a header tab.
     payloads: {
       structuredData: breadcrumbStructuredData,
     },

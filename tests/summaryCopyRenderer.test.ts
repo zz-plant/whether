@@ -16,7 +16,7 @@ describe("summaryCopyRenderer", () => {
       },
       structured: {
         climate: {
-          label: "✅ Sunny: Money is cheap and available.",
+          label: "Sunny: Money is cheap and available.",
           summary: ["Capital is accessible and risk appetite is healthy."],
         },
         recommendedMoves: ["Prioritize speed and distribution over perfection"],

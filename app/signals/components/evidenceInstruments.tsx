@@ -183,14 +183,13 @@ export const SignalsInstrumentsSection = ({
   const pastMonthsAnswer = regimeSeries.length > 0 ? describeConditionChanges(summarizeConditionRuns(regimeSeries)) : null;
   return (
   /* Ruled off from "What would change this guidance": its last line ran into
-     this eyebrow closer than the gaps inside either section, so the evidence
+     this heading closer than the gaps inside either section, so the evidence
      appendix read as more of the guidance. */
   <section id="instruments" aria-labelledby="instruments-heading" className="space-y-6 border-t border-[var(--border-subtle)] pt-8">
     {/* The same inset as a ReportSection's header (px-5, none on a phone), so
         this title lines up with every section title above it. */}
     <div className="px-5 max-sm:px-0">
-      <p className="type-eyebrow type-eyebrow-section">Deeper evidence</p>
-      <h2 id="instruments-heading" className="mt-1 text-base font-semibold text-slate-100 sm:text-lg">
+      <h2 id="instruments-heading" className="text-base font-semibold text-slate-100 sm:text-lg">
         Charts, past months and checks
       </h2>
     </div>

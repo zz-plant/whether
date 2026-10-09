@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../../lib/report/homePageAssembler";
+import { toScoringBasisPayload } from "../../../lib/report/scoringBasis";
 
 export const runtime = "edge";
 export const revalidate = 300;
@@ -7,6 +8,7 @@ export const revalidate = 300;
 export async function GET() {
   const homepage = await assembleHomePage({});
   const model = homepage.weeklyDecisionCardModel;
+  const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
 
   return NextResponse.json({
     tightness: model.diagnostics.currentScores.tightness,
@@ -26,5 +28,7 @@ export async function GET() {
        the card fills with the week-ending Friday, so the Oct 5, 2026 reading
        answered `recordDate: "Oct 9, 2026"`, four days after it was recorded. */
     recordDate: homepage.reportShell.recordDateLabel,
+    /* Which inputs set these two scores (additive, 2026-10-09). */
+    scoringBasis: toScoringBasisPayload(reportData.scoringBasis),
   });
 }

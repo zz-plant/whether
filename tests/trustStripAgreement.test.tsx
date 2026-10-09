@@ -28,6 +28,8 @@ mockAny.module("next/navigation", () => ({
  * Medium on /trust, "could change: Yes" on /trust and No on the others, and an
  * answer page serving the bundled snapshot said "Live" in green.
  */
+const ON_RECORD = { key: "record" as const, value: "The record's inputs", warning: null };
+
 const assessment = (transitionWatch: boolean, pending = false) => ({
   diagnostics: { transitionWatch },
   regimeTransition: pending ? { pending: true } : undefined,
@@ -35,7 +37,7 @@ const assessment = (transitionWatch: boolean, pending = false) => ({
 
 describe("buildTrustStripProps", () => {
   it("names the four data states with the phrase table /trust uses", () => {
-    const base = { recordDateLabel: "Sep 18, 2026", confidenceLabel: "HIGH" as const, assessment: assessment(false) };
+    const base = { recordDateLabel: "Sep 18, 2026", confidenceLabel: "HIGH" as const, assessment: assessment(false), scoringBasis: ON_RECORD };
     assert.equal(buildTrustStripProps({ ...base, isFallback: false }).sourcesLabel, "All sources live");
     assert.equal(buildTrustStripProps({ ...base, isFallback: false, degradedSourceCount: 2 }).sourcesLabel, "Partly cached");
     assert.equal(buildTrustStripProps({ ...base, isFallback: true }).sourcesLabel, "Cached snapshot");
@@ -45,7 +47,7 @@ describe("buildTrustStripProps", () => {
   });
 
   it("says a change could come next week while one is held for its confirming read", () => {
-    const base = { recordDateLabel: "Sep 18, 2026", confidenceLabel: "MED" as const, isFallback: false };
+    const base = { recordDateLabel: "Sep 18, 2026", confidenceLabel: "MED" as const, isFallback: false, scoringBasis: ON_RECORD };
     assert.equal(buildTrustStripProps({ ...base, assessment: assessment(false) }).couldChangeNextWeek, false);
     assert.equal(buildTrustStripProps({ ...base, assessment: assessment(true) }).couldChangeNextWeek, true);
     assert.equal(buildTrustStripProps({ ...base, assessment: assessment(false, true) }).couldChangeNextWeek, true);
@@ -117,7 +119,10 @@ const WEEK_OF_SEP_22: Array<[SignalKey, SignalFamily, number]> = [
   ["TREASURY_1M", "rates", 4.2],
   ["TREASURY_3M", "rates", 4.15],
   ["TREASURY_2Y", "rates", 3.95],
-  ["TREASURY_10Y", "rates", 4.3],
+  /* 4.3 until 2026-10-09, when the curated startup-market inputs took 11 points off risk
+     appetite; on the record basis they take none, so the curve is 27bp flatter to keep the
+     reading where this test needs it: risk appetite 43, 7 raw points under its line. */
+  ["TREASURY_10Y", "rates", 4.03],
   ["BBB_CREDIT_SPREAD", "spreads", 1.7],
   ["HY_CREDIT_SPREAD", "spreads", 3.2],
   ["UNEMPLOYMENT_RATE", "labor", 4.2],

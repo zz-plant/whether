@@ -13,6 +13,7 @@ import { getRegimePublicLabel, isRegimeKey, REGIME_WEATHER_RATIONALES } from "..
 import { MARGIN_LABEL, formatMargin, formatMarginBand } from "../report/reportFormatting";
 import { resolveNearestLineMargin } from "../report/confidence";
 import type { BriefDocument } from "../report/briefArtifact";
+import { basisClause } from "../report/scoringBasis";
 
 /**
  * The margin band ("Close to the line") from either spelling of the engine's
@@ -101,16 +102,22 @@ const SAVED_COPY_NOTE = "saved copy, not a live reading";
 /**
  * The one provenance footer: the source as a reader names it, the record's
  * date, where it was read, and — when the numbers came off a saved copy — that
- * they did. The investor update, the portfolio note, the slide in every format
- * and the deck files each built their own, and the slide's and the deck's
- * dropped the date and the site.
+ * they did, then which inputs set the scores. The investor update, the
+ * portfolio note, the slide in every format and the deck files each built their
+ * own, and the slide's and the deck's dropped the date and the site.
  */
 export const formatSourceFooter = ({
   sourceLabel,
   recordDate,
   isFallback,
+  scoringBasis,
 }: {
   sourceLabel: string;
   recordDate: string;
   isFallback?: boolean;
-}): string => `Source: ${sourceLabel}, ${recordDate}, via whether.work${isFallback ? ` (${SAVED_COPY_NOTE})` : ""}`;
+  /** The basis sentence (`ScoringBasis.sentence`), printed as the footer's last clause. */
+  scoringBasis?: { sentence: string };
+}): string =>
+  `Source: ${sourceLabel}, ${recordDate}, via whether.work${isFallback ? ` (${SAVED_COPY_NOTE})` : ""}${
+    scoringBasis ? ` · ${basisClause(scoringBasis.sentence)}` : ""
+  }`;

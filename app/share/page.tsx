@@ -374,12 +374,16 @@ export default async function SharePage() {
       <div className="weather-page-stack mx-auto max-w-6xl">
         <section className="weather-panel weather-section-stack p-0" aria-labelledby="share-page-title">
           <div className="max-w-2xl space-y-2">
-            {/* The week, where the kicker read "Current weekly artifact" — the
-                product's internal noun for what a reader calls the brief. */}
-            <p className="type-eyebrow type-eyebrow-section">
-              Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
-            </p>
-            <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
+            {/* The week is part of the heading line (2026-10-09). It was a kicker
+                above it, and before that the kicker read "Current weekly
+                artifact", the product's internal noun for what a reader calls
+                the brief. */}
+            <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">
+              Share this week&apos;s guidance{" "}
+              <span className="whitespace-nowrap font-normal text-slate-400">
+                · Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
+              </span>
+            </h1>
             <p className="text-sm leading-relaxed text-white/60">
               Paste it into Slack, a meeting doc, a ticket or a letter. Every format carries the same
               pause and resume lines and names its source:{" "}

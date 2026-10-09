@@ -1,0 +1,155 @@
+/*
+ * The mapping every palette direction shares: a direction names its values
+ * (--p-*, in <direction>/tokens.css) and this file points the site's own tokens
+ * at them. It matches only while a `data-palette` element is mounted, which
+ * only the mockup pages render, so live routes never see it. Nothing here is a
+ * component style: it is the token layer of app/styles/tokens.css, redirected.
+ *
+ * Specificity does the scoping. `:root:has([data-palette])` outranks both the
+ * `:root` block and `html[data-theme="light"]` in tokens.css; the light-theme
+ * hue remaps there are `!important` literals, so the matching overrides at the
+ * foot of this file are too, at a higher specificity.
+ */
+
+:root:has([data-palette]) {
+  color-scheme: dark;
+
+  /* Ground, surfaces and text roles. */
+  --bg-body: var(--p-ground);
+  --bg-panel: var(--p-panel);
+  --bg-surface: var(--p-surface);
+  --bg-surface-muted: color-mix(in srgb, var(--p-surface) 82%, transparent);
+  --bg-raised: var(--p-raised);
+  --bg-nested: var(--p-nested);
+  --bg-nested-light: color-mix(in srgb, var(--p-text) 5%, transparent);
+  --border-faint: color-mix(in srgb, var(--p-text) 6%, transparent);
+  --border-subtle: color-mix(in srgb, var(--p-text) 10%, transparent);
+  --border-default: color-mix(in srgb, var(--p-text) 14%, transparent);
+  --border-strong: color-mix(in srgb, var(--p-text) 21%, transparent);
+  --app-text: var(--p-text);
+  --app-text-secondary: var(--p-text-2);
+  --app-text-muted: var(--p-text-3);
+  --footer-link: var(--p-text-2);
+  --footer-link-hover: var(--p-text);
+  --footer-legal: var(--p-text-2);
+  --footer-legal-hover: var(--p-text);
+
+  /* Tailwind's own slate steps that the token block leaves at stock values. */
+  --color-slate-600: color-mix(in srgb, var(--p-text) 38%, var(--p-ground));
+  --color-slate-700: color-mix(in srgb, var(--p-text) 24%, var(--p-ground));
+  --color-slate-800: var(--p-raised);
+  --color-slate-900: var(--p-panel);
+  --color-slate-950: var(--p-nested);
+
+  /* Conditions. The four inks are also the semantic families the line states
+     and the radar's corner words read, exactly as tokens.css couples them:
+     Sunny is the easing ink, Cloudy the caution ink. */
+  --color-semantic-easing-fg: var(--p-sunny-ink);
+  --color-semantic-easing-border: var(--p-sunny);
+  --color-semantic-caution-fg: var(--p-cloudy-ink);
+  --color-semantic-caution-border: var(--p-cloudy);
+  --color-semantic-caution-bg: color-mix(in srgb, var(--p-cloudy) 18%, var(--p-ground));
+  --color-semantic-reversal-fg: var(--p-freezing-ink);
+  --color-semantic-stormy-fg: var(--p-stormy-ink);
+  --color-semantic-tightening-fg: var(--p-freezing-ink);
+  --color-semantic-tightening-border: var(--p-freezing);
+  --color-semantic-unchanged-border: var(--p-text-3);
+
+  --phase-expansion: color-mix(in srgb, var(--p-sunny) var(--p-wash), transparent);
+  --phase-defensive: color-mix(in srgb, var(--p-cloudy) var(--p-wash), transparent);
+  --phase-volatile: color-mix(in srgb, var(--p-stormy) var(--p-wash), transparent);
+  --phase-scarcity: color-mix(in srgb, var(--p-freezing) var(--p-wash), transparent);
+  --phase-grid: color-mix(in srgb, var(--p-text) 14%, transparent);
+  --phase-boundary: color-mix(in srgb, var(--p-text) 45%, transparent);
+  --phase-trace: color-mix(in srgb, var(--p-text-2) 80%, transparent);
+
+  /* The action accent: links, buttons, focus. */
+  --accent-action: var(--p-action);
+  --accent-info: var(--p-action);
+  --accent-success: var(--p-sunny-ink);
+  --accent-warning: var(--p-cloudy-ink);
+  --accent-danger: var(--p-freezing-ink);
+  --accent-border: color-mix(in srgb, var(--p-action) 38%, transparent);
+  --accent-border-soft: color-mix(in srgb, var(--p-action) 16%, transparent);
+  --accent-glow: color-mix(in srgb, var(--p-action) 6%, transparent);
+  --accent-glow-faint: color-mix(in srgb, var(--p-action) 3%, transparent);
+  --cta-gradient: linear-gradient(180deg, var(--p-action), var(--p-action));
+  --cta-border: var(--p-action);
+  --cta-shadow: none;
+  --cta-shadow-hover: none;
+
+  /* The hue ramps components name directly, folded onto the same six values:
+     emerald is Sunny, amber Cloudy, violet Stormy, rose Freezing, sky the action. */
+  --color-emerald-100: var(--p-sunny-ink); --color-emerald-200: var(--p-sunny-ink); --color-emerald-300: var(--p-sunny-ink); --color-emerald-400: var(--p-sunny-ink);
+  --color-emerald-500: var(--p-sunny); --color-emerald-600: var(--p-sunny);
+  --color-emerald-900: color-mix(in srgb, var(--p-sunny) 30%, var(--p-ground)); --color-emerald-950: color-mix(in srgb, var(--p-sunny) 18%, var(--p-ground));
+  --color-amber-100: var(--p-cloudy-ink); --color-amber-200: var(--p-cloudy-ink); --color-amber-300: var(--p-cloudy-ink); --color-amber-400: var(--p-cloudy-ink);
+  --color-amber-500: var(--p-cloudy); --color-amber-600: var(--p-cloudy);
+  --color-amber-900: color-mix(in srgb, var(--p-cloudy) 30%, var(--p-ground)); --color-amber-950: color-mix(in srgb, var(--p-cloudy) 18%, var(--p-ground));
+  --color-violet-100: var(--p-stormy-ink); --color-violet-200: var(--p-stormy-ink); --color-violet-300: var(--p-stormy-ink); --color-violet-400: var(--p-stormy-ink);
+  --color-violet-500: var(--p-stormy); --color-violet-600: var(--p-stormy);
+  --color-rose-100: var(--p-freezing-ink); --color-rose-200: var(--p-freezing-ink); --color-rose-300: var(--p-freezing-ink); --color-rose-400: var(--p-freezing-ink);
+  --color-rose-500: var(--p-freezing); --color-rose-600: var(--p-freezing);
+  --color-rose-900: color-mix(in srgb, var(--p-freezing) 30%, var(--p-ground)); --color-rose-950: color-mix(in srgb, var(--p-freezing) 18%, var(--p-ground));
+  --color-red-300: var(--p-freezing-ink); --color-red-400: var(--p-freezing-ink); --color-red-500: var(--p-freezing);
+  --color-sky-100: var(--p-action-ink); --color-sky-200: var(--p-action-ink); --color-sky-300: var(--p-action-ink); --color-sky-400: var(--p-action-ink);
+  --color-sky-500: var(--p-action); --color-sky-600: var(--p-action);
+  --color-sky-700: color-mix(in srgb, var(--p-action-ink) 45%, var(--p-ground));
+  --color-sky-800: color-mix(in srgb, var(--p-action-ink) 30%, var(--p-ground));
+  --color-sky-900: color-mix(in srgb, var(--p-action) 20%, var(--p-ground)); --color-sky-950: color-mix(in srgb, var(--p-action) 12%, var(--p-ground));
+  --color-cyan-200: var(--p-action-ink); --color-cyan-300: var(--p-action-ink);
+
+  /* Type. A direction that keeps a voice leaves its --p-font-* at the live face. */
+  --font-sans: var(--p-font-body);
+  --font-display: var(--p-font-display);
+  --font-mono: var(--p-font-mono);
+  --font-stretch-display: var(--p-stretch-display);
+  --font-stretch-stamp: var(--p-stretch-stamp);
+}
+
+:root[data-theme="light"]:has([data-palette]) {
+  color-scheme: light;
+  --edge-highlight: transparent;
+  --edge-highlight-faint: transparent;
+}
+
+/* The call on the dark theme is `text-white`; point white at the direction's text ink. */
+:root:not([data-theme="light"]):has([data-palette]) {
+  --color-white: var(--p-text);
+}
+
+/* The regime map: the accent is the condition's fill, the ink its text colour.
+   `!important` because the page shell also sets --regime-accent inline. */
+:root:has([data-palette]) [data-regime="EXPANSION"] { --regime-accent: var(--p-sunny) !important; --regime-ink: var(--p-sunny-ink); --regime-atmosphere: color-mix(in srgb, var(--p-sunny) var(--p-atmosphere), transparent); }
+:root:has([data-palette]) [data-regime="DEFENSIVE"] { --regime-accent: var(--p-cloudy) !important; --regime-ink: var(--p-cloudy-ink); --regime-atmosphere: color-mix(in srgb, var(--p-cloudy) var(--p-atmosphere), transparent); }
+:root:has([data-palette]) [data-regime="VOLATILE"] { --regime-accent: var(--p-stormy) !important; --regime-ink: var(--p-stormy-ink); --regime-atmosphere: color-mix(in srgb, var(--p-stormy) var(--p-atmosphere), transparent); }
+:root:has([data-palette]) [data-regime="SCARCITY"] { --regime-accent: var(--p-freezing) !important; --regime-ink: var(--p-freezing-ink); --regime-atmosphere: color-mix(in srgb, var(--p-freezing) var(--p-atmosphere), transparent); }
+
+/* Controls that carry a literal sky in controls.css. */
+:root:has([data-palette]) .weather-pill[aria-current="page"] {
+  border-color: var(--p-action);
+  background-color: color-mix(in srgb, var(--p-action) 14%, transparent);
+}
+:root:has([data-palette]) .weather-button-primary,
+:root:has([data-palette]) .weather-cta-primary {
+  color: var(--p-action-on);
+  box-shadow: none;
+}
+
+/* The light theme's hue remaps in tokens.css are `!important` hex literals, so
+   these answer them the same way, one step more specific. */
+:root[data-theme="light"]:has([data-palette]) :is([class^="text-emerald-"], [class*=" text-emerald-"]) { color: var(--p-sunny-ink) !important; }
+:root[data-theme="light"]:has([data-palette]) :is([class^="text-amber-"], [class*=" text-amber-"]) { color: var(--p-cloudy-ink) !important; }
+:root[data-theme="light"]:has([data-palette]) :is([class^="text-violet-"], [class*=" text-violet-"]) { color: var(--p-stormy-ink) !important; }
+:root[data-theme="light"]:has([data-palette]) :is([class^="text-rose-"], [class*=" text-rose-"]) { color: var(--p-freezing-ink) !important; }
+:root[data-theme="light"]:has([data-palette]) :is([class^="text-sky-"], [class*=" text-sky-"], [class^="text-cyan-"], [class*=" text-cyan-"]) { color: var(--p-action-ink) !important; }
+:root[data-theme="light"]:has([data-palette]) :is([class^="bg-emerald-9"], [class*=" bg-emerald-9"]) { background-color: color-mix(in srgb, var(--p-sunny) 10%, var(--p-panel)) !important; }
+:root[data-theme="light"]:has([data-palette]) :is([class^="bg-amber-9"], [class*=" bg-amber-9"]) { background-color: color-mix(in srgb, var(--p-cloudy) 10%, var(--p-panel)) !important; }
+:root[data-theme="light"]:has([data-palette]) :is([class^="bg-rose-9"], [class*=" bg-rose-9"]) { background-color: color-mix(in srgb, var(--p-freezing) 10%, var(--p-panel)) !important; }
+:root[data-theme="light"]:has([data-palette]) :is([class^="bg-sky-9"], [class*=" bg-sky-9"]) { background-color: color-mix(in srgb, var(--p-action) 8%, var(--p-panel)) !important; }
+:root[data-theme="light"]:has([data-palette]) [class*="outline-sky-"]:focus-visible { outline-color: var(--p-action) !important; }
+:root[data-theme="light"]:has([data-palette]) .weather-pill[aria-current="page"] {
+  border-color: var(--p-action);
+  background-color: color-mix(in srgb, var(--p-action) 10%, transparent);
+}
+:root[data-theme="light"]:has([data-palette]) :is(.weather-button-primary, .weather-cta-primary) { color: var(--p-action-on); }
