@@ -93,6 +93,12 @@ const RISK_GAP_EXAMPLE_POINTS = 6;
  * is the thing itself. It explains the rule; where this week's scores sit is
  * drawn by the two ladders that open the section, the same drawing every
  * other route uses for a score.
+ *
+ * Risk appetite runs across and funding pressure up, the orientation of the
+ * brief's conditions map (`RegimeRadar`) and `/history`'s phase map: Freezing
+ * top left, Sunny bottom right. Until 2026-10-09 this one had the axes the
+ * other way round, so a reader who learned the map on `/` met Sunny in the
+ * corner where Freezing had been.
  */
 function RegimeQuadrant() {
   const t = TIGHTNESS_REGIME_THRESHOLD;
@@ -102,11 +108,12 @@ function RegimeQuadrant() {
   const pad = { l: 34, r: 8, t: 8, b: 44 };
   const x = (v: number) => pad.l + (v / 100) * (W - pad.l - pad.r);
   const y = (v: number) => H - pad.b - (v / 100) * (H - pad.t - pad.b);
+  /* x is risk appetite (its line at r), y is funding pressure (its line at t). */
   const cells: Array<{ key: RegimeKey; x0: number; x1: number; y0: number; y1: number }> = [
-    { key: "EXPANSION", x0: 0, x1: t, y0: r, y1: 100 },
-    { key: "VOLATILE", x0: t, x1: 100, y0: r, y1: 100 },
-    { key: "DEFENSIVE", x0: 0, x1: t, y0: 0, y1: r },
-    { key: "SCARCITY", x0: t, x1: 100, y0: 0, y1: r },
+    { key: "SCARCITY", x0: 0, x1: r, y0: t, y1: 100 },
+    { key: "DEFENSIVE", x0: r, x1: 100, y0: t, y1: 100 },
+    { key: "VOLATILE", x0: 0, x1: r, y0: 0, y1: t },
+    { key: "EXPANSION", x0: r, x1: 100, y0: 0, y1: t },
   ];
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot h-auto w-full max-w-[20rem] text-slate-300" aria-labelledby="regime-quadrant-title">
@@ -129,12 +136,12 @@ function RegimeQuadrant() {
           </text>
         </g>
       ))}
-      <line x1={x(t)} x2={x(t)} y1={y(0)} y2={y(100)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
-      <line x1={x(0)} x2={x(100)} y1={y(r)} y2={y(r)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
-      <text x={x(t)} y={H - 26} textAnchor="middle" fontSize="12" fill="currentColor">{t}</text>
-      <text x={x(0)} y={H - 6} textAnchor="start" fontSize="11" fill="currentColor" opacity="0.7">Funding pressure →</text>
-      <text x={pad.l - 6} y={y(r)} textAnchor="end" dominantBaseline="middle" fontSize="12" fill="currentColor">{r}</text>
-      <text textAnchor="middle" transform={`translate(11 ${(y(100) + y(0)) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">Risk appetite →</text>
+      <line x1={x(r)} x2={x(r)} y1={y(0)} y2={y(100)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
+      <line x1={x(0)} x2={x(100)} y1={y(t)} y2={y(t)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
+      <text x={x(r)} y={H - 26} textAnchor="middle" fontSize="12" fill="currentColor">{r}</text>
+      <text x={x(0)} y={H - 6} textAnchor="start" fontSize="11" fill="currentColor" opacity="0.7">Risk appetite →</text>
+      <text x={pad.l - 6} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize="12" fill="currentColor">{t}</text>
+      <text textAnchor="middle" transform={`translate(11 ${(y(100) + y(0)) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">Funding pressure →</text>
     </svg>
   );
 }
