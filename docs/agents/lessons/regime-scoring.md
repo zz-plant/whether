@@ -105,11 +105,37 @@ of them, which is less obvious.
   window driving the whole classification, a bill-specific dislocation moves the published call.
 
 
+## The call is scored on the record's inputs (2026-10-09)
+
+The record that vouches for the call has to test the score that sets it. The month-end archive
+(`/history`, the track record, `/calibration`'s "96% held") scores interest rates, the curve, the
+pace of rate rises and VIX; the live call also counted the venture funding pace, the tech-layoff
+trend, the high-yield spread and the Chicago Fed index. So four published weeks read Freezing whose
+month-end read Cloudy, and on Oct 7 risk appetite was 49 = 60 on the record's inputs − 11 from two
+curated snapshots with no history at all. A calibration study can only vouch for the inputs it was
+run on.
+
+- **Only `RECORD_BASIS_MARKET_INPUTS` move a published score** (`engine-2026-10-09`). The rest are
+  scored into `scores.offRecord` (the previous engine's numbers, and which inputs moved them) and
+  shown: `ScoringBasis` in `lib/report/scoringBasis.ts` says what they would make each score, and
+  warns when they would cross a line. Add an input to the basis only in the change that puts its
+  month-end history in the archive; `tests/recordBasis.test.ts` checks every cached month carries it.
+- **"Backtestable" is a property of the public series, not of the input's importance.** FRED's
+  high-yield series begins 2023-10-10 (ICE licensing), so it stays off the basis however good a
+  stress read it is. The Chicago Fed index runs from 1971 and can join once the archive has it.
+- **A gated input's effect is never a part of a move.** The breakdown's parts add up to the
+  published move; what the left-out inputs would add is a separate, not-counted line.
+- **Say the basis with the call.** Every surface that prints a call prints "Scored on the record's
+  inputs." (or "more inputs than the record" for a reading an earlier engine scored), and the API
+  carries `scoringBasis`. A frozen week's basis is derived from the engine its record names, so the
+  record is never edited to say it.
+
 ## A delta is a move only if both readings were scored from the same inputs (2026-09-29)
 
 The weekly change on every surface is today's assessment minus the previous Time Machine snapshot scored
 by `evaluateRegime(snapshot, thresholds)`, which is rates alone. Today's assessment also carries the
-rate-speed term and the curated market series. On the Sep 25 read risk appetite fell 13: 2 from the curve
+rate-speed term and the market series (since 2026-10-09 only the record's: the curated ones no longer
+move a published score, above). On the Sep 25 read risk appetite fell 13: 2 from the curve
 and 11 from startup-market inputs the earlier score never had, and the "pause line crossed" it triggered
 (43 against 44) was those inputs, not the market moving. Before printing or acting on a difference between two
 readings, ask whether the readings share their inputs; if they do not, say which part of the difference is
