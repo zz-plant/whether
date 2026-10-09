@@ -222,7 +222,7 @@ export const navigationPages: readonly NavigationPage[] = [
     group: "record",
     href: "/concepts",
     label: "Product writing",
-    description: "Widely read product essays, placed on the record since 2012",
+    description: "Widely read product essays and investor memos, placed on the record since 2012",
     placement: "secondary",
   },
   {

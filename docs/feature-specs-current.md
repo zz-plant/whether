@@ -101,7 +101,7 @@ Supporting surfaces are intentionally subordinate:
 - `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
 - `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/resolve` or `/concepts`
 - `/learn/failure-modes` permanently redirects into the trust workflow (`/trust#revisit-call`) rather than acting as an independently indexable content hub.
-- `/concepts` is a page again (restored 2026-09-23): one list of widely read product-management writing, each entry placed on the month-end record (conditions that month, how long they had held), with the essays' share per set of conditions beside the months' share so no coincidence reads as a cause. Every entry's first-publication month was checked against its source. Sub-paths (the first version's detail, focus, audience and conflicts pages) redirect to `/concepts`. Module: `lib/productCanon.ts`; test: `tests/productCanon.test.ts`.
+- `/concepts` is a page again (restored 2026-09-23): one list of widely read product-management writing and, since 2026-10-09, capital-allocation essays and investor memos, each entry placed on the month-end record (conditions that month, how long they had held, both scores) and tagged Expand, Conserve or Craft, with each kind's share per set of conditions beside the months' share so no coincidence reads as a cause (§1.1.64). Every entry's first-publication month was checked against its source. Sub-paths (the first version's detail, focus, audience and conflicts pages) redirect to `/concepts`. Modules: `lib/productCanon.ts`, `lib/productCanonMeasures.ts`, `lib/adviceStance.ts`; test: `tests/productCanon.test.ts`.
 
 The homepage renders no interpretation layer. A non-default `?view=` still selects one and the home assembly builds it (`buildInterpretationLayer`, called from `lib/report/homePageAssembler.ts`), but nothing reads it: its panel had no call site and was deleted on 2026-08-14, and the exports stopped receiving it on 2026-10-06 (§5.3.1).
 
@@ -2949,6 +2949,58 @@ is gone. "What the margin has been worth" is the study's first sentence (96%) an
 | `/about` | the structure's healthcare origin in "Who writes it" and again in the folded "Why it works", behind a link to `/about` itself | "Who writes it"; "Why it works" keeps the stakes |
 | `/brief/<week>` | "This record is frozen." in the footer, under the header's "This is a frozen record of one week." | the header line; the footer keeps the corrections rule |
 | `/history/compare` | the borrowing premium's definition under the difference tile and in both columns, the tile also repeating both columns' values | the definition under the tile; each column prints its value |
+
+### 1.1.64 `/concepts` tests whether advice moves with the conditions (2026-10-09)
+
+The owner's question: advice presented as timeless often changes with the factors Whether measures.
+The page now tests one form of it, in its H1 ("Does startup advice follow the market?"): advice on
+hiring, raising and spending should track the conditions, and method advice should not. The SEO
+title stays "Product Management Reading List, Dated by Market", the phrase people search.
+
+- **One tag per entry.** `stance` is `expand`, `conserve` or `craft`, defined once in
+  `lib/adviceStance.ts` with a one-line rubric, so a larger corpus classified on another branch can
+  import the same definitions. `stanceBasis` is the line of the argument the tag rests on, quoted
+  (15 words at most) or paraphrased, and each entry prints it. The reader's word is "advice" or the
+  tag's label; "stance" stays out of reader text (`tests/readerVocabulary.test.tsx`).
+- **Eleven capital texts and a second source kind.** `kind: "canon" | "investorMemo"`; a memo meets
+  five criteria written in the module comment (public primary source, dated to the month, from a
+  venture firm or its founders or partners to founders, a capital prescription, shown to have
+  circulated). Memos are described by what they say, with no motive attributed. Added: Graham's
+  "Startup = Growth" and "Default Alive or Default Dead?", Agrawal's "The SaaS Adventure" (T2D3),
+  Gurley's "On the Road to Recap", Hoffman and Yeh's Blitzscaling, Sequoia's "Coronavirus: The
+  Black Swan of 2020" and "Adapting to Endure", Sacks's "The Burn Multiple", Andreessen's "It's Time
+  to Build", Lightspeed's "The Upside of a Downturn" and Meta's "Update on Meta's Year of
+  Efficiency". Left out, with the reason in the module comment: Sequoia's "R.I.P. Good Times" (no
+  primary copy of the slides), YC's 2022 letter (public only as TechCrunch's reproduction), Feld's
+  Rule of 40 post (argues both ways), Gurley's "Investors Beware" (addressed to investors), Graham's
+  "Founder Mode" (not about capital) and Craft's 2022 slides (no dated primary copy).
+- **What the record shows.** The section lead is `describeCanonBaseRate`: the share of Sunny months
+  and of Freezing or Stormy months, then the share of Expand texts in Sunny months, of Conserve
+  texts in Freezing or Stormy months and of Craft texts in each, a verdict that needs a ten-point
+  lean, and how far one text moves a share. On 2026-10-09: Sunny months 59%, Freezing or Stormy
+  37%; Expand 3 of 4 in Sunny months (75%); Conserve 5 of 7 in Freezing or Stormy months (71%);
+  Craft 55% and 40%. The plane (`app/concepts/advicePlane.tsx`) draws every placed text at its
+  scores on /history's plane, with shape for the advice and an sr-only table; the base-rate table
+  has one column per tag.
+- **Lag and which score** (`lib/productCanonMeasures.ts`). Months from the latest change in
+  conditions (median 10.5, range 2–16, 6 of 11 capital texts), from risk appetite's last crossing of
+  50 (median 3, range 2–13, 7 of 11) and from funding pressure's last crossing of 70 (8 months, 1 of
+  11), each saying why the rest are out. Risk appetite alone sits on the advice's side for 7 of 11
+  capital texts and funding pressure alone for 5, printed beside each score's share of all months
+  and flagged as too few to rank the two.
+- **Same decision, opposite advice.** Four pairs, chosen in both directions: two where the
+  conditions differed (T2D3 and Lightspeed on hiring; Blitzscaling and Meta on speed or efficiency)
+  and two where they did not (Graham's two essays, both Sunny; Andreessen and Sacks, both April
+  2020).
+- **What this does not show.** A small, chosen sample; publication is not adoption; memos from the
+  same weeks are not independent; co-occurrence is not cause; nothing before the record; tags are
+  judgment calls, with the rubric printed. "A reading list, not evidence for the guidance" stays in
+  the intro.
+
+The archive's year pages head the section "From the reading list, published in {year}", since a
+memo is not product writing. `tests/productCanon.test.ts` holds the tags and bases, the computed
+shares against an independent count over the record, the copy against the builders' sentences with
+no count typed into the route, the pairs against the list, one H1 and the plane's sr-only table.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
