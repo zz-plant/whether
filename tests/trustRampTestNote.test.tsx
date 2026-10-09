@@ -28,8 +28,10 @@ describe("/trust notes the ramp test once", () => {
 
     const paragraph = html.slice(note, html.indexOf("</p>", note));
     assert.match(paragraph, /none of them sets the guidance/);
-    assert.match(paragraph, /docs\/research\/premise-test-preregistration\.md/);
-    assert.match(paragraph, /docs\/research\/premise-test-results\.md/);
+    /* On this site: the repository is private, so a GitHub link is a 404 for every reader. */
+    assert.match(paragraph, /href="\/research\/premise-test-registration\.md"/);
+    assert.match(paragraph, /href="\/research\/premise-test-results\.md"/);
+    assert.doesNotMatch(paragraph, /github\.com/);
     assert.equal((html.match(/none of them sets the guidance/g) ?? []).length, 1, "the sentence is printed once");
   });
 });
