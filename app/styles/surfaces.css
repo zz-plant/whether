@@ -104,30 +104,6 @@ html[data-theme="light"] .weather-hero-card {
   background-image: linear-gradient(to bottom, var(--regime-atmosphere) 0%, transparent 60%);
 }
 
-/* Report-page intro. The hero card above is the brief's; this is every other
-   route's, and until 2026-09-16 it was plain slate under a status line that
-   named the week — a reader on /operate got no colour cue the hero gives on /.
-   Same treatment as the hero, flat for the same reason (it is what a
-   screenshot of a report route catches): the hue on a solid rule across the
-   top edge, and only a trace of it in the fill and border. Until 2026-10-08
-   it kept the hero's old tinted slab after the hero dropped it, so /signals
-   read rose where / read neutral under the same week. */
-.weather-page-intro {
-  background: color-mix(in srgb, var(--bg-raised) 96%, var(--regime-accent) 4%);
-  border-color: color-mix(in srgb, var(--regime-accent) 12%, var(--border-default));
-  box-shadow:
-    var(--elev-2),
-    inset 0 3px 0 var(--regime-accent);
-}
-
-html[data-theme="light"] .weather-page-intro {
-  background: color-mix(in srgb, var(--bg-raised) 98%, var(--regime-accent) 2%);
-  border-color: color-mix(in srgb, var(--regime-accent) 14%, var(--border-default));
-  box-shadow:
-    var(--elev-2),
-    inset 0 3px 0 var(--regime-accent);
-}
-
 /* New surface system: typographic hierarchy over container hierarchy.
    Sections replace stacked cards — pure spacing + optional top border.
    Labels replace uppercase kickers with sentence case.
@@ -198,12 +174,12 @@ html[data-theme="light"] .weather-page-intro {
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro)
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro) {
+    .weather-surface-secondary) {
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -217,17 +193,17 @@ html[data-theme="light"] .weather-page-intro {
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro)
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro)
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
+    .weather-surface-secondary):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
   background: none;
 }

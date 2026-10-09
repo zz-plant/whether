@@ -1,8 +1,9 @@
+/* The page ground is the body token and nothing over it. It carried a white
+   sheen down the first 22rem and an emerald-sky-amber wash across the width
+   (2026-10-09): three accent hues at under 2% that said nothing about the
+   week. The regime's own atmosphere, which does, is .weather-regime-ground. */
 .weather-shell {
   background-color: var(--bg-body);
-  background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 22rem),
-    linear-gradient(90deg, rgba(52, 211, 153, 0.018), rgba(56, 189, 248, 0.014), rgba(251, 191, 36, 0.012));
 }
 
 /* Tier 2: Secondary surfaces — bands, section bodies */

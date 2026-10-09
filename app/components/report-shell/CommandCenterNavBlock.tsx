@@ -79,9 +79,14 @@ export function CommandCenterNavBlock({
   const stampRowOnPhone = !captionBesideStatus;
   const rightColumnOnPhone = stampRowOnPhone || showActions;
 
+  // No hue on the card itself (2026-10-09). It carried the regime accent in
+  // its fill, its border and a 3px rule across its top edge, under a status
+  // word that already prints in the regime ink: colour stays where the
+  // condition is named, which here is that word. The brief's hero keeps its
+  // rule, because that card is the one people crop and share.
   return (
     <section
-      className="weather-surface-secondary weather-page-intro weather-inset relative min-w-0"
+      className="weather-surface-secondary weather-inset relative min-w-0"
       aria-label="Page introduction"
     >
       {/* Two columns from lg up: the reading block keeps its measure on the

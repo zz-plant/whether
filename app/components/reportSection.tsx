@@ -81,15 +81,7 @@ export function ReportSection({
             {title}
           </HeadingTag>
         ) : (
-        <div className="weather-panel relative overflow-hidden px-5 py-4">
-          {/* The regime's hue, not sky: the rule and the eyebrow are the two
-              marks every section repeats, so they are where a page can say
-              which week it is without a new component. */}
-          <span
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{ backgroundImage: "linear-gradient(to right, transparent, color-mix(in srgb, var(--regime-accent, #7dd3fc) 45%, transparent), transparent)" }}
-            aria-hidden="true"
-          />
+        <div className="weather-panel px-5 py-4">
           {label ? (
             <span className="type-eyebrow type-eyebrow-section">
               {label}
