@@ -67,7 +67,7 @@ describe("a flat operating latitude over a week the guidance changed", () => {
 
     assert.equal(
       buildStandupLine({ regime: "DEFENSIVE", change: summary.guidanceChange, ...source }),
-      "Guidance changed at a pause or resume line; review pace. Conditions change if: Risk appetite falls 4 pts to 50 or below (54 today).",
+      "Guidance changed at a pause or resume line; review pace. Conditions change if: Risk appetite falls 4 pts from 54 to 50 or below.",
     );
     assert.equal(
       buildQuietDayRead({ guidanceChange: summary.guidanceChange, ...source }),
@@ -84,7 +84,7 @@ describe("a flat operating latitude over a week the guidance changed", () => {
     assert.equal(summary.guidanceChange, "conditions");
     assert.equal(
       buildStandupLine({ regime: "DEFENSIVE", change: summary.guidanceChange, ...source }),
-      "Conditions changed to Cloudy; review pace. Conditions change if: Risk appetite falls 4 pts to 50 or below (54 today).",
+      "Conditions changed to Cloudy; review pace. Conditions change if: Risk appetite falls 4 pts from 54 to 50 or below.",
     );
   });
 

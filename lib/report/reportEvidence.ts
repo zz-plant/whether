@@ -4,7 +4,7 @@ import { getPlaybookGuidance } from "../playbook";
 import { buildCanonicalBoundedDecisionRules, isRuleConditionMet, SPENDING_PAYBACK_BAR_MONTHS } from "./boundedDecisionRules";
 import { signalOrder } from "./briefFormatting";
 import { resolveLineDistanceLabel } from "./confidence";
-import { formatBoundaryDistance, formatConfidencePlainLabel } from "./reportFormatting";
+import { formatBoundaryDistance, formatConfidencePlainLabel, formatReadingsNow } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { REGIME_SEVERITY_RANK } from "../regimePresentation";
 import { formatScoreValue, formatThresholdNumber } from "../formatters";
@@ -260,7 +260,19 @@ type CallChangeLine = {
   /** Whole points to the line; 0 when it is already crossed, null without a reading. */
   distance: number | null;
   tripped: boolean;
-  /** The clause as the sentence prints it, capitalized: "Risk appetite rises 9 pts to clear 50 (41 today)". */
+  /**
+   * The clause as the sentence prints it, capitalized: "Risk appetite rises 9 pts
+   * from 41 to clear 50". A crossed line states where the score is instead:
+   * "Funding pressure is above 70".
+   */
+  clause: string;
+  /** A crossed line's reading, which the sentence prints after its clauses. */
+  reading?: { label: string; value: string };
+  /**
+   * The line on its own, for a surface with room for one, without a final stop:
+   * the clause, then a crossed line's reading as its own sentence
+   * ("Funding pressure is above 70. Funding pressure is 75 now").
+   */
   text: string;
 };
 
@@ -289,11 +301,13 @@ export const buildCallChangeLines = (
     const boundary = `${label} ${direction === "riseAbove" ? "above" : "at or below"} ${formatThresholdNumber(threshold)}`;
 
     if (typeof now !== "number" || !Number.isFinite(now)) {
-      return { metric, direction, threshold, boundary, distance: null, tripped: false, text: boundary };
+      return { metric, direction, threshold, boundary, distance: null, tripped: false, clause: boundary, text: boundary };
     }
 
     const tripped = direction === "riseAbove" ? now > threshold : now <= threshold;
     if (tripped) {
+      const clause = `${label} is ${direction === "riseAbove" ? "above" : "at or below"} ${formatThresholdNumber(threshold)}`;
+      const reading = { label, value: formatScoreValue(now) };
       return {
         metric,
         direction,
@@ -301,7 +315,9 @@ export const buildCallChangeLines = (
         boundary,
         distance: 0,
         tripped,
-        text: `${boundary} (already true at ${formatScoreValue(now)})`,
+        clause,
+        reading,
+        text: `${clause}. ${formatReadingsNow([reading]).replace(/\.$/, "")}`,
       };
     }
 
@@ -309,13 +325,15 @@ export const buildCallChangeLines = (
     // and a fraction here would be precision the reader cannot act on. The two
     // directions keep their inequality — reaching 70 flips an "at or below"
     // boundary, reaching 50 does not flip an "above" one, so that side says
-    // "clear".
+    // "clear". Today's reading rides in the move ("from 41"), where it was a
+    // parenthesis after it ("(41 today)") until 2026-10-09.
     const distance = Math.max(1, Math.round(Math.abs(threshold - now)));
     const unit = distance === 1 ? "pt" : "pts";
     const move = direction === "riseAbove"
-      ? `rises ${distance} ${unit} to clear ${formatThresholdNumber(threshold)}`
-      : `falls ${distance} ${unit} to ${formatThresholdNumber(threshold)} or below`;
-    return { metric, direction, threshold, boundary, distance, tripped, text: `${label} ${move} (${formatScoreValue(now)} today)` };
+      ? `rises ${distance} ${unit} from ${formatScoreValue(now)} to clear ${formatThresholdNumber(threshold)}`
+      : `falls ${distance} ${unit} from ${formatScoreValue(now)} to ${formatThresholdNumber(threshold)} or below`;
+    const clause = `${label} ${move}`;
+    return { metric, direction, threshold, boundary, distance, tripped, clause, text: clause };
   };
 
   const tightnessDirection: CallChangeLine["direction"] =
@@ -362,16 +380,19 @@ export const buildCallChangeLines = (
  * frozen brief read "Re-open when: No flip condition is tripped yet." and
  * carried no threshold at all.
  *
- * One sentence now, both boundaries, each with its live reading in parentheses.
- * A boundary already crossed says so in place of the status preamble, and sorts
- * first, because that is the half an operator has to act on.
+ * One sentence now, both boundaries, each with its live reading. A boundary
+ * already crossed says so in place of the status preamble, and sorts first,
+ * because that is the half an operator has to act on: its clause says where the
+ * score is, and its reading follows the sentence ("Funding pressure is 75 now.").
  *
  * The distance leads. "Funding pressure at or below 70 (83 today)" handed the
  * reader a subtraction; the number that changes a plan is how far away the
  * line is, in the units the rail beside it draws, so the sentence opens with
- * it — "Funding pressure falls 13 pts to 70 or below (83 today)" — the way a rain alert
- * opens with the minutes, not the radar. The boundary and the live reading
- * stay, because the archive and the embed cite them.
+ * it — "Funding pressure falls 13 pts from 83 to 70 or below" — the way a rain
+ * alert opens with the minutes, not the radar. The boundary and the live
+ * reading stay, because the archive and the embed cite them. The reading moved
+ * into the clause on 2026-10-09: "(83 today)" after each score put two
+ * parentheses of the same kind in one sentence.
  *
  * The clauses are `buildCallChangeLines`, joined, so a surface that prints one
  * of the two lines reads it from there rather than cutting this sentence.
@@ -380,12 +401,17 @@ export const buildFlipThreshold = (
   assessment: CallChangeInputs,
   /** One score's half alone, for a page about the decisions that score rules. */
   only?: "tightness" | "riskAppetite",
-): string =>
+): string => {
+  const lines = buildCallChangeLines(assessment, only);
   // Signal names are capitalized as labels but sit mid-sentence after "or" here,
-  // matching how the bounded rules already write them in prose.
-  `${buildCallChangeLines(assessment, only)
-    .map((line, index) => (index === 0 ? line.text : line.text.charAt(0).toLowerCase() + line.text.slice(1)))
-    .join(" or ")}.`;
+  // matching how the bounded rules already write them in prose. The comma keeps
+  // "to 70 or below" from running into the "or" that joins the second line.
+  const sentence = `${lines
+    .map((line, index) => (index === 0 ? line.clause : line.clause.charAt(0).toLowerCase() + line.clause.slice(1)))
+    .join(", or ")}.`;
+  const readings = lines.flatMap((line) => (line.reading ? [line.reading] : []));
+  return readings.length === 0 ? sentence : `${sentence} ${formatReadingsNow(readings)}`;
+};
 
 /**
  * What would change the guidance this week (docs/claims-ledger.md): the two lines

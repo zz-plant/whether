@@ -107,7 +107,7 @@ describe("buildWeeklySummary", () => {
 
     const provenance = { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" };
     const changeLine =
-      "Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 13 pts to clear 50 (37 today).";
+      "Conditions change if: Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 13 pts from 37 to clear 50.";
     for (const summary of [
       buildWeeklySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
       buildMonthlySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),

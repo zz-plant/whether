@@ -8,6 +8,7 @@ import {
   formatDecisionReversal,
   formatDecisionThreshold,
   formatDecisionTriplet,
+  formatReadingsNow,
 } from "./reportFormatting";
 import { resolveRunwayBand, runwayBandLabel, type RunwayBand } from "./operatorRunway";
 import { regimeSignalLabel } from "./signalTranslations";
@@ -128,37 +129,54 @@ export const isRuleConditionMet = (condition: RuleCondition, current: number): b
  * falling one "falls below"; a resume line on risk appetite reads "is above"
  * because that side of the rule is a state to hold, not a move to watch.
  *
- * A line the reading already meets says so, the way the change line does
- * ("is above 76 (already true at 90)"). Until 2026-10-07 every line read as a
- * move still to come, so a week at 90 was told to pause "if funding pressure
- * rises above 76" on every surface that prints the rule, beside a table
- * marking the same line crossed.
+ * A line the reading already meets says so: its clause states where the score
+ * is ("is above 76", not "rises above 76"), and the rule's sentence is followed
+ * by the reading ("Funding pressure is 90 now."). Until 2026-10-07 every line
+ * read as a move still to come, so a week at 90 was told to pause "if funding
+ * pressure rises above 76" on every surface that prints the rule, beside a
+ * table marking the same line crossed. Until 2026-10-09 the reading sat inside
+ * the clause as "(already true at 90)", a parenthesis that a template carrying
+ * the clause mid-sentence then had to carry too.
  */
+type DescribedCondition = {
+  clause: string;
+  /** Present only when the reading already meets the line. */
+  reading?: { label: string; value: string };
+};
+
 const describeRuleCondition = (
   condition: RuleCondition,
   side: "pause" | "resume",
   scores?: { tightness: number; riskAppetite: number },
-): string => {
+): DescribedCondition => {
   const metric = ruleMetricLabel[condition.metric].toLowerCase();
   const value = formatThresholdNumber(condition.value);
   const current = scores?.[condition.metric];
   if (current !== undefined && isRuleConditionMet(condition, current)) {
     const state =
       condition.operator === ">" ? "is above" : condition.operator === ">=" ? "is at or above" : condition.operator === "<" ? "is below" : "is at or below";
-    return `${metric} ${state} ${value} (already true at ${formatScoreValue(current)})`;
+    return { clause: `${metric} ${state} ${value}`, reading: { label: ruleMetricLabel[condition.metric], value: formatScoreValue(current) } };
   }
   switch (condition.operator) {
     case ">":
-      return side === "resume" && condition.metric === "riskAppetite"
-        ? `${metric} is above ${value}`
-        : `${metric} rises above ${value}`;
+      return {
+        clause: side === "resume" && condition.metric === "riskAppetite"
+          ? `${metric} is above ${value}`
+          : `${metric} rises above ${value}`,
+      };
     case ">=":
-      return `${metric} is at or above ${value}`;
+      return { clause: `${metric} is at or above ${value}` };
     case "<":
-      return `${metric} falls below ${value}`;
+      return { clause: `${metric} falls below ${value}` };
     case "<=":
-      return `${metric} is at or below ${value}`;
+      return { clause: `${metric} is at or below ${value}` };
   }
+};
+
+/** A rule's sentence, then the readings of the lines it names that are already met. */
+const withReadingsNow = (sentence: string, ...conditions: DescribedCondition[]): string => {
+  const readings = conditions.flatMap((condition) => (condition.reading ? [condition.reading] : []));
+  return readings.length === 0 ? sentence : `${sentence} ${formatReadingsNow(readings)}`;
 };
 
 /** The sentence every surface prints for a clause, derived from its data. */
@@ -167,13 +185,14 @@ const formatRuleClause = (
   side: "pause" | "resume",
   scores?: { tightness: number; riskAppetite: number },
 ): string => {
+  const described = clause.conditions.map((condition) => describeRuleCondition(condition, side, scores));
   const parts = [
-    ...clause.conditions.map((condition) => describeRuleCondition(condition, side, scores)),
+    ...described.map((condition) => condition.clause),
     ...(clause.qualifier ? [clause.qualifier] : []),
   ];
   if (parts.length === 0) return `${clause.verb}.`;
   const connective = side === "pause" ? "if" : "when";
-  return `${clause.verb} ${connective} ${parts.join(` ${clause.join} `)}.`;
+  return withReadingsNow(`${clause.verb} ${connective} ${parts.join(` ${clause.join} `)}.`, ...described);
 };
 
 const withDerivedTriggers = (
@@ -530,10 +549,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't make several permanent hires before one milestone lands.",
         ],
         watchAdjustments: [
-          `Runway trigger: tighten if ${tightnessPauseLine} for 2 readings in a row.`,
+          withReadingsNow(`Runway trigger: tighten if ${tightnessPauseLine.clause} for 2 readings in a row.`, tightnessPauseLine),
         ],
         thresholdEmphasis: "Protect runway first; fund one proof of demand at a time rather than breadth.",
-        reversalTriggerDiscipline: `Reverse the hold only after ${tightnessResumeLine} for two readings in a row and one shipped milestone shows traction.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause} for two readings in a row and one shipped milestone shows traction.`, tightnessResumeLine),
       };
     }
 
@@ -549,7 +568,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't run two expansion programs at once; you won't know which one paid back.",
         ],
         watchAdjustments: [
-          `Payback trigger: revisit the plan if ${riskPauseLine}.`,
+          withReadingsNow(`Payback trigger: revisit the plan if ${riskPauseLine.clause}.`, riskPauseLine),
         ],
         /*
          * The Spending bar, not a stage bar of its own: this said "pay back inside
@@ -557,7 +576,7 @@ export const buildScopedVariantDecisionAdjustment = ({
          * spend only inside six. A stage adds emphasis; it never relaxes that bar.
          */
         thresholdEmphasis: `Payback first: fund the channels that convert repeatably and pay back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
-        reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion holds for two weekly reviews.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${riskResumeLine.clause} and conversion holds for two weekly reviews.`, riskResumeLine),
       };
     }
 
@@ -573,10 +592,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't add fixed cost on the assumption that valuations recover.",
         ],
         watchAdjustments: [
-          `Leverage trigger: hold expansion if ${tightnessPauseLine}.`,
+          withReadingsNow(`Leverage trigger: hold expansion if ${tightnessPauseLine.clause}.`, tightnessPauseLine),
         ],
         thresholdEmphasis: "Efficiency first: show the margin gain before adding headcount.",
-        reversalTriggerDiscipline: `Reverse the hold only when, in the same week, ${tightnessResumeLine} and ${riskResumeLine}.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only when, in the same week, ${tightnessResumeLine.clause} and ${riskResumeLine.clause}.`, tightnessResumeLine, riskResumeLine),
       };
     }
 
@@ -592,10 +611,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't grow revenue faster than support and margin can carry it.",
         ],
         watchAdjustments: [
-          `Growth trigger: re-sequence expansion if ${riskPauseLine}.`,
+          withReadingsNow(`Growth trigger: re-sequence expansion if ${riskPauseLine.clause}.`, riskPauseLine),
         ],
         thresholdEmphasis: "Prove customer acquisition cost payback, retention and support capacity before adding fixed cost.",
-        reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion improves, both for two weekly readings.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${riskResumeLine.clause} and conversion improves, both for two weekly readings.`, riskResumeLine),
       };
     }
 
@@ -611,10 +630,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't fund programs that only meet guidance if the market re-rates.",
         ],
         watchAdjustments: [
-          `Guidance trigger: tighten discretionary spend if ${tightnessPauseLine}.`,
+          withReadingsNow(`Guidance trigger: tighten discretionary spend if ${tightnessPauseLine.clause}.`, tightnessPauseLine),
         ],
         thresholdEmphasis: "Earnings durability first: cash conversion and hitting guidance before growth.",
-        reversalTriggerDiscipline: `Reverse the hold only when ${tightnessResumeLine} and confidence in your earnings guidance improves with it.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only when ${tightnessResumeLine.clause} and confidence in your earnings guidance improves with it.`, tightnessResumeLine),
       };
     }
 
@@ -631,10 +650,10 @@ export const buildScopedVariantDecisionAdjustment = ({
         "Don't start anything that needs outside money to finish.",
       ],
       watchAdjustments: [
-        `Cash trigger: tighten spend if ${tightnessPauseLine} or ${riskPauseLine}.`,
+        withReadingsNow(`Cash trigger: tighten spend if ${tightnessPauseLine.clause} or ${riskPauseLine.clause}.`, tightnessPauseLine, riskPauseLine),
       ],
       thresholdEmphasis: "Cash first: commitments you can reverse, over growth that looks good.",
-      reversalTriggerDiscipline: `Reverse the hold only after ${tightnessResumeLine}, ${riskResumeLine}, and cash payback holds for two weekly readings in a row.`,
+      reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause}, ${riskResumeLine.clause}, and cash payback holds for two weekly readings in a row.`, tightnessResumeLine, riskResumeLine),
     };
   };
 
