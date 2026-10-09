@@ -273,7 +273,7 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
   {
     value: "guardrail",
     term: DECISION_CONTRACT_LABELS.threshold.pauseIf,
-    summary: "The reading at which an area of decisions — hiring, spending, long-term commitments — pauses. Stated as a number agreed in advance.",
+    summary: "The reading at which hiring, spending, long-term commitments or another area of decisions pauses. Stated as a number agreed in advance.",
   },
   {
     value: "resume-line",

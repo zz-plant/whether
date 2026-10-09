@@ -422,7 +422,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       avoidNow: isExpansion
         ? ["Don't wait until you need the money to talk to investors."]
         : ["Don't trade term quality for a faster close."],
-      scope: "When to start a raise, how fast to run it, and the worst terms you would accept.",
+      scope: "When to start a raise, how fast to run it, and where to walk away on terms.",
       pause: { verb: "Pause the raise", join: "or", conditions: [riskPauseLine, tightnessPauseLine] },
       resume: { verb: "Resume the full process", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
       rationale: "Start while conditions are good and you choose the terms; start late and the market does.",

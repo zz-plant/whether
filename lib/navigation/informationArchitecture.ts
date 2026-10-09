@@ -75,7 +75,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     key: "this-week",
     href: "/",
     label: "This week",
-    description: "This week's guidance, why it changed, and how much to trust it.",
+    description: "What this week's guidance says, why it changed and how much to trust it.",
     shortcut: "w",
     memberPrefixes: [],
     crossLinks: [],
@@ -95,7 +95,7 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
     key: "record",
     href: "/history",
     label: "Record",
-    description: "What the guidance said in every past month and week, and how well it held up.",
+    description: "The guidance for every past month and week, scored against what happened next.",
     shortcut: "r",
     memberPrefixes: ["/brief"],
     /* The sources and the score derivation stay on /trust, where they judge this
@@ -147,7 +147,7 @@ export const navigationPages: readonly NavigationPage[] = [
     group: "this-week",
     href: "/signals",
     label: "Why it changed",
-    description: "See what changed, what drove it, and the lines worth watching.",
+    description: "See what changed, what drove it and which lines are worth watching.",
     placement: "tab",
   },
   {
@@ -155,7 +155,7 @@ export const navigationPages: readonly NavigationPage[] = [
     group: "this-week",
     href: "/trust",
     label: "How much to trust this week",
-    description: "Check freshness, the margin, source coverage, and what would change the brief.",
+    description: "Check freshness, the margin, source coverage and the lines that would change the brief.",
     placement: "tab",
   },
   {
@@ -198,7 +198,7 @@ export const navigationPages: readonly NavigationPage[] = [
     group: "record",
     href: "/history",
     label: "Record",
-    description: "See how funding pressure and risk appetite have changed over time, and how the guidance held up.",
+    description: "See how funding pressure and risk appetite have changed over time and how the guidance held up.",
     placement: "tab",
   },
   {
@@ -279,7 +279,7 @@ export const utilityLinks = [
   {
     href: "/pricing",
     label: "Pricing",
-    description: "What is free forever, and what Pro and Team add",
+    description: "What is free forever and what Pro and Team add",
     header: "md",
   },
   {

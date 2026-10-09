@@ -76,8 +76,8 @@ export default async function DecisionsPage() {
         <DecisionRecordDownloads />
         <p className="mt-4 text-sm leading-7 text-slate-300 sm:text-base">
           The CSV is one row per decision, for a spreadsheet. The JSON file is one line per decision, oldest
-          first, and each line carries a hash of the one before it, so the order cannot be rewritten after
-          the fact. Reading the same record from a script is covered on the{" "}
+          first. Each line carries a hash of the one before it, so the order cannot be rewritten after the
+          fact. Reading the same record from a script is covered on the{" "}
           <Link href="/api-docs" className="text-sky-300 underline-offset-2 hover:underline">
             API page
           </Link>

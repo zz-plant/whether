@@ -206,14 +206,14 @@ describe("signal cluster reading", () => {
       buildReportData({ scores: { curveSlope: -0.4 } }),
     );
     assert.match(inverted.caveat ?? "", /inverted/);
-    assert.match(inverted.distanceLabel, /0\.40 percentage points below zero, where long-term rates drop below short-term rates/);
+    assert.match(inverted.distanceLabel, /0\.40 percentage points below the zero level where long-term rates drop below short-term rates/);
 
     const positive = buildSignalClusterReading(
       "yield-curve-flip-watch",
       buildReportData({ scores: { curveSlope: 0.6 } }),
     );
     assert.equal(positive.caveat, null);
-    assert.match(positive.distanceLabel, /0\.60 percentage points above zero/);
+    assert.match(positive.distanceLabel, /0\.60 percentage points above the zero level/);
   });
 
   /*
@@ -316,7 +316,7 @@ describe("signal cluster reading", () => {
     assert.equal(reading.displayValue, "0.47");
     assert.equal(reading.scaleNote, "percentage points: the 10-year rate minus the 2-year rate");
     assert.equal(reading.unit, "percentage points");
-    assert.match(reading.distanceLabel, /^0\.47 percentage points above zero/);
+    assert.match(reading.distanceLabel, /^0\.47 percentage points above the zero level/);
     assert.match(reading.directionLabel, /^\+0\.06 percentage points since last week/);
     assert.deepEqual(reading.inputs.map((input) => input.value), ["4.84%", "5.31%"]);
 

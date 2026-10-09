@@ -453,7 +453,7 @@ export const describeRunwayPlanInYourNumbers = (
     if (netBurn <= 0) {
       burnChange = `${dollars}.`;
     } else if (netBurnAfter <= 0) {
-      burnChange = `${dollars}, which revenue would then cover.`;
+      burnChange = `${dollars}. Revenue would then cover it.`;
     } else {
       burnChange = `${dollars}: runway goes from ${roundTenth(request.runway)} to ${roundTenth(cash / netBurnAfter)} months.`;
     }

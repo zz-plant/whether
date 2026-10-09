@@ -218,7 +218,7 @@
     "updatedAt": "2026-10-06",
     "keyword": "board level capital posture framework",
     "title": "Board-Level Capital Posture Framework",
-    "description": "A matrix that turns market signals and your company's own readiness into what the board approves, defers or stops, with the documents each approval needs and a quarter-by-quarter rollout.",
+    "description": "A matrix that turns market signals and your company's own readiness into what the board approves, defers or stops. It lists the documents each approval needs and a quarter-by-quarter rollout.",
     "h1": "Board Level Capital Posture Framework",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
     "parentTopic": false,
@@ -394,7 +394,7 @@
     "updatedAt": "2026-10-06",
     "keyword": "reversibility as governance",
     "title": "Reversibility as Governance for Board Decisions",
-    "description": "A way to sort decisions by how hard they are to undo, decide who can call a rollback and when, and rehearse it, with a 90-day plan to adopt it.",
+    "description": "A way to sort decisions by how hard they are to undo, decide who can call a rollback and when, and rehearse the rollback. It comes with a 90-day plan to adopt it.",
     "h1": "Reversibility as Governance",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
     "parentTopic": false,
@@ -406,7 +406,7 @@
       {
         "heading": "Why reversibility is a governance function, not an execution detail",
         "paragraphs": [
-          "Reversibility as governance reframes a common blind spot: organizations often discuss reversibility after decisions are approved, when the real governance opportunity was before approval. Boards should treat reversibility classification as a gating input equal to expected upside.",
+          "Reversibility as governance reframes a common blind spot: organizations often discuss reversibility after decisions are approved. The real governance opportunity was before approval. Boards should treat reversibility classification as a gating input equal to expected upside.",
           "A decision that cannot be reversed quickly should face a higher evidence bar and tighter escalation controls. A reversible decision can proceed with lower initial certainty because downside containment is built in. This asymmetry allows companies to preserve learning velocity while limiting terminal risk.",
           "When reversibility is absent from board packets, directors lose visibility into option decay. Capital gets committed faster than it can be reallocated, and portfolio flexibility collapses just as uncertainty rises."
         ],
@@ -431,7 +431,7 @@
         "heading": "Reversibility taxonomy for board decision packets",
         "paragraphs": [
           "Boards need a common taxonomy to compare decisions. A simple three-tier model works well: fully reversible (unwind within 30 days with low collateral impact), conditionally reversible (unwind possible with moderate cost and controlled disruption), and effectively irreversible (unwind cost or trust impact is material).",
-          "Each proposal should declare its category, evidence basis for that claim, and what operational preparations support unwind feasibility. Unsupported reversibility claims should be treated as unresolved risk.",
+          "Each proposal should declare its category, the evidence for that claim, and the operational preparations that make an unwind feasible. Unsupported reversibility claims should be treated as unresolved risk.",
           "Taxonomy use also improves sequencing. Teams can front-load reversible experiments and delay irreversible rollouts until confidence strengthens."
         ],
         "subsections": [
@@ -553,7 +553,7 @@
           "Reversibility as governance should be treated as confidence infrastructure. It allows boards to authorize learning without surrendering control and to intervene quickly without destabilizing execution.",
           "When reversibility is institutionalized, teams become more candid about uncertainty because correction pathways are clear. Candor improves signal quality and keeps capital posture aligned with reality rather than optimism.",
           "The long-term result is not perfect forecasts but resilient governance: fewer surprise failures, faster recovery when assumptions break, and stronger trust between management and board stakeholders.",
-          "Boards that sustain this discipline over multiple cycles usually see better capital efficiency, cleaner communication under pressure, and higher confidence in when to accelerate versus when to hold, reset, or de-risk commitments across functions, portfolios, and board-approved investment horizons over quarterly, annual, and multiyear planning cycles."
+          "Boards that sustain this discipline over multiple cycles usually see better capital efficiency, cleaner communication under pressure, and higher confidence in when to accelerate versus when to hold, reset, or de-risk commitments."
         ]
       }
     ]

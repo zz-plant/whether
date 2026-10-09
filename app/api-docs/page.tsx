@@ -129,7 +129,7 @@ export default function ApiDocsPage() {
               yearly view. The MCP tool of the same name returns the full brief.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_context&amp;regime=DEFENSIVE">
-              How long these conditions have held, the historical average, and what usually comes next. With no
+              How long these conditions have held, how long they have lasted on average, and what usually comes next. With no
               conditions given it uses today&apos;s.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_projection&amp;regime=DEFENSIVE&amp;tightness=74&amp;riskAppetite=32">
@@ -198,7 +198,7 @@ export default function ApiDocsPage() {
               This week&apos;s guidance as a ready-to-send request for TypeSafe&apos;s Jev decision model
               (<code className="font-mono">typesafe/jev</code> on Cloudflare Workers AI). Put a short
               description of your plan in <code className="font-mono">request.state.plan</code> and send
-              the request yourself; Jev answers whether the plan goes against the guidance, which decision it
+              the request yourself. Jev answers whether the plan goes against the guidance, which decision it
               touches, how hard it is to undo, and whether it is safer after conditions change. Whether
               never sees the plan. Check <code className="font-mono">automationReady</code> before you
               act on an answer: it is false when this week&apos;s reading is not live or not current.
@@ -209,8 +209,8 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_scores"
             >
-              The two headline numbers on their own — funding pressure, risk appetite, both deltas, plus
-              distance to the line where conditions change and which score would cross first.
+              The two headline numbers on their own: funding pressure, risk appetite, both deltas, the
+              distance to the line where conditions change, and the score that would cross first.
             </Endpoint>
             <Endpoint
               signature="GET /api/cadence"

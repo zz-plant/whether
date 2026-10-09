@@ -313,7 +313,7 @@ describe("/about says how often the guidance moves, from the record", () => {
     assert.ok(record, "expected the bundled archive to be long enough for a record");
     const text = renderToStaticMarkup(<AboutPage />).replace(/<!-- -->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
-    assert.match(text, /Where it fits, and where it does not/);
+    assert.match(text, /Where it fits and where it does not/);
     assert.ok(text.includes(`changed ${record.regimeChanges} times in ${record.monthsCovered} months`));
     assert.ok(text.includes(`lines in ${record.lineCrossingMonths} of them`));
   });

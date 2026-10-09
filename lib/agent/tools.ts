@@ -60,7 +60,7 @@ const AGENT_TOOLS = [
     name: "get_state",
     title: "Get the current state",
     description:
-      "Start here. The current reading in one small answer (about 3KB): the conditions and the margin from their change lines, the data's freshness (automation.ready says whether it is live and current), each score against its pause, resume and change lines, the moves behind each score since the earlier reading and the areas whose pause or resume lines they crossed, and the guidance.",
+      "Start here. The current reading in one small answer of about 3KB. It holds the conditions and the margin from their change lines, the data's freshness, each score against its pause, resume and change lines, the moves behind each score since the earlier reading, the areas whose pause or resume lines those moves crossed, and the guidance. automation.ready says whether the data is live and current.",
     input: {},
     output: agentStateSchema,
     example: {},
@@ -90,7 +90,7 @@ const AGENT_TOOLS = [
     name: "get_context",
     title: "Get regime context",
     description:
-      "How long a regime has lasted, how long its past runs lasted, and what most often came next, in months of month-end snapshots up to `latestSnapshot` (the record is monthly). Defaults to today's conditions; `inputs` says which values were yours and which were today's.",
+      "How long a regime has lasted, how long its past runs lasted, and what most often came next, in months of month-end snapshots up to `latestSnapshot`. Defaults to today's conditions; `inputs` says which values were yours and which were today's.",
     input: { regime: regimeInput.optional().describe(`${REGIME_ARGUMENT} Defaults to today's conditions.`) },
     example: { regime: "DEFENSIVE" },
     run: async ({ regime }) => {
@@ -112,7 +112,7 @@ const AGENT_TOOLS = [
     name: "get_projection",
     title: "Project weeks to a change in conditions",
     description:
-      "Weeks until the scores, at a given pace, sit on the other side of a line where conditions change, and the regime they would then be in. A score moving away from its line does not cross it. With no arguments it uses today's scores and their pace; give scores to ask what-if, and any pace you leave out is taken as 0. `inputs` says which values were yours, which were today's, and which were assumed.",
+      "Weeks until the scores cross a line where conditions change at a given pace, and the regime they would then be in. A score moving away from its line does not cross it. With no arguments it uses today's scores and their pace; give scores to ask what-if, and any pace you leave out is taken as 0. `inputs` says which values were yours, which were today's, and which were assumed.",
     input: {
       regime: regimeInput.optional().describe(`${REGIME_ARGUMENT} Defaults to today's conditions. The projection runs from where the scores sit; the result says so when they sit in another regime.`),
       tightness: numberInput.optional().describe("Funding pressure, 0 to 100. Defaults to today's."),
