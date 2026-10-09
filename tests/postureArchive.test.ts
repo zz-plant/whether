@@ -182,7 +182,7 @@ describe("/history/[period] says it is reconstructed", () => {
       const text = html.replace(/<[^>]+>/g, " ").replace(/&#x27;/g, "'").replace(/\s+/g, " ");
       assert.match(text, /Reconstructed: this is what today's published formula reads for/, period);
       assert.ok(text.includes(`began publishing weekly briefs in the week of ${firstWeek}`), period);
-      assert.doesNotMatch(text, /Standing guidance:/, `${period}: still reads as guidance of the time`);
+      assert.doesNotMatch(text, /Standing guidance:/, `${period}: still reads like guidance written then`);
       assert.match(text, /Maintained by /, period);
       assert.doesNotMatch(html, /"datePublished"/, `${period}: structured data claims a publication date in the period`);
     }

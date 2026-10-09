@@ -71,7 +71,8 @@ describe("site review copy fixes", () => {
     const page = await import("../app/resources/page");
     const html = renderToStaticMarkup(page.default());
     assert.match(html, /<h1[^>]*>Guides<\/h1>/);
-    assert.equal(String(page.metadata.title ?? "").startsWith("Guides"), true, String(page.metadata.title));
+    const title = page.metadata.title;
+    assert.equal(typeof title === "string" ? title : JSON.stringify(title), "Guides");
     assert.doesNotMatch(html, /Governance Pillars Emblem|Governance resources/i);
     const text = visibleText(html);
     assert.doesNotMatch(text, /confirmation logic|governance artifacts|escalation thresholds|board operating system/i);
