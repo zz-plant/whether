@@ -21,10 +21,12 @@ const slot = (met: boolean, points: number) => ({ line: "Funding pressure > 76",
 
 describe("where each decision stands, before a click", () => {
   it("says a crossed pause line as a state, and an uncrossed one as a distance", () => {
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "Pause line crossed", crossed: true });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "4 pts from its pause line", crossed: false });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "1 pt from its pause line", crossed: false });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 0) }), { text: "At its pause line", crossed: false });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "Pause line crossed", crossed: true, state: "crossed" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "4 pts from its pause line", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "1 pt from its pause line", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 0) }), { text: "At its pause line", crossed: false, state: "near" });
+    /* Past the 5 points the margin calls close, the line is clear of the reading. */
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 6) }), { text: "6 pts from its pause line", crossed: false, state: "clear" });
     assert.equal(describeAreaPauseStatus({}), undefined, "an area with no pause line has nothing to say");
   });
 

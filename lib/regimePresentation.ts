@@ -1,3 +1,4 @@
+import { Cloud, CloudLightning, Snowflake, Sun, type LucideIcon } from "lucide-react";
 import type { RegimeKey } from "./regimeEngine";
 
 export const REGIME_ORDER: readonly RegimeKey[] = [
@@ -12,6 +13,21 @@ export const REGIME_LABELS: Record<RegimeKey, string> = {
   DEFENSIVE: "Cloudy",
   VOLATILE: "Stormy",
   EXPANSION: "Sunny",
+};
+
+/**
+ * The weather word drawn: one glyph per condition, printed beside the word and
+ * never in place of it (`ConditionIcon`, app/components/ui/conceptIcons.tsx).
+ * The word was the only mark, and on `/history` the band and its legend told
+ * Sunny, Cloudy and Freezing apart by colour alone. The abstract strokes of
+ * `RegimeGlyph` drew one condition once, on the hero's stamp; these are the
+ * weather the words already name.
+ */
+export const REGIME_ICONS: Record<RegimeKey, LucideIcon> = {
+  SCARCITY: Snowflake,
+  DEFENSIVE: Cloud,
+  VOLATILE: CloudLightning,
+  EXPANSION: Sun,
 };
 
 // One table. SHORT, LEGEND, WEATHER and PUBLIC were four byte-identical literals

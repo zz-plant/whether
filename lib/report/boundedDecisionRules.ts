@@ -1,3 +1,4 @@
+import { Landmark, Route as RouteIcon, Sprout, Users, Wallet, type LucideIcon } from "lucide-react";
 import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { RegimeKey } from "../regimeEngine";
 import { formatScoreValue, formatThresholdNumber } from "../formatters";
@@ -251,6 +252,40 @@ const areaLabels: Record<DecisionArea, string> = {
 };
 
 export const decisionAreaLabel = (area: DecisionArea) => areaLabels[area];
+
+/*
+ * One glyph per area, beside the name and never in place of it (`AreaIcon`,
+ * app/components/ui/conceptIcons.tsx). A sprout for New bets rather than a
+ * flask: the rule is about starting something and letting it grow on proof, and
+ * a flask reads as a lab experiment the rules never mention.
+ */
+export const DECISION_AREA_ICONS: Record<DecisionArea, LucideIcon> = {
+  hiring: Users,
+  "product-tempo": RouteIcon,
+  "capital-raising": Landmark,
+  "burn-discipline": Wallet,
+  "expansion-bets": Sprout,
+};
+
+/*
+ * The score each area's lines are usually drawn on. The area table names it
+ * under a row whose lines do not say ("Line set by Funding pressure"), and the
+ * signal rows invert it ("Governs: Hiring, Fundraising, Spending"), so the two
+ * cannot disagree about which score rules which area.
+ */
+const usualMetrics: Record<DecisionArea, readonly RuleConditionMetric[]> = {
+  hiring: ["tightness"],
+  "burn-discipline": ["tightness"],
+  "product-tempo": ["riskAppetite"],
+  "expansion-bets": ["riskAppetite"],
+  "capital-raising": ["tightness", "riskAppetite"],
+};
+
+export const decisionAreaUsualMetrics = (area: DecisionArea) => usualMetrics[area];
+
+/** The areas a score governs, in the one area order. */
+export const areasGovernedBy = (metric: RuleConditionMetric): DecisionArea[] =>
+  decisionAreaOrder.filter((area) => usualMetrics[area].includes(metric));
 export const isDecisionArea = (value: string): value is DecisionArea =>
   Object.prototype.hasOwnProperty.call(areaLabels, value);
 export const extractCompactClause = extractCompactClauseFromFormatting;

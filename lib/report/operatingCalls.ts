@@ -10,10 +10,12 @@ import {
   type RuleCondition,
   type RuleConditionMetric,
 } from "./boundedDecisionRules";
+import { CircleDashed, Pause, Play, type LucideIcon } from "lucide-react";
 import { formatDecisionLatencyLine } from "./decisionLatency";
 import { businessAreaLabel, businessAreaOrder, businessAreaOwner, type BusinessAreaKey } from "./decisionKnobs";
 import { joinSentences } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../regimeEngineCore";
 
 /**
  * `avoidNow` renders under an "Avoid now" heading, so its entries stay bare
@@ -348,6 +350,49 @@ export const formatPointsToLine = (
   if (met) return kind === "pause" ? "crossed" : "already met";
   if (points === 0) return "at the line";
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"} away`;
+};
+
+/**
+ * How near counts as close to a line: 5 points. It is the distance the margin
+ * already calls "Close to the line" (`REGIME_CONFIDENCE_NEAR_THRESHOLD`, the
+ * band `resolvePublishedConfidence` grades lowest) and the distance the area
+ * table tinted as near a pause line before the state badge, so "close" is one
+ * distance on every surface rather than a second cutoff.
+ */
+const CLOSE_TO_LINE_POINTS = REGIME_CONFIDENCE_NEAR_THRESHOLD;
+
+/**
+ * Where a reading stands against one side of an area's rule, for the state
+ * badge: a pause line crossed, close to it, or clear of it. A resume line has
+ * a state only once it is met ("clear"); short of it, the distance is plain
+ * text, because a resume line not yet reached is not a pause.
+ */
+export type LineState = "crossed" | "near" | "clear";
+
+export const resolveLineState = (
+  points: number | undefined,
+  kind: "pause" | "resume",
+  met: boolean | undefined,
+): LineState | undefined => {
+  if (kind === "resume") return met ? "clear" : undefined;
+  if (met) return "crossed";
+  if (points === undefined || !Number.isFinite(points)) return undefined;
+  return points <= CLOSE_TO_LINE_POINTS ? "near" : "clear";
+};
+
+/**
+ * One glyph per state, beside the words `formatPointsToLine` and
+ * `describeAreaPauseStatus` print for it, never in place of them. Pause and
+ * play are the two sides of a rule; the dashed circle is a line not yet
+ * closed. The warning triangle was the other candidate for "close", and it is
+ * already the toast's error mark (`AlertTriangleIcon`), so it would say
+ * "something failed" about a line nobody has crossed. The signal-bar keys draw
+ * the pause and resume lines with the same two glyphs.
+ */
+export const LINE_STATE_ICONS: Record<LineState, LucideIcon> = {
+  crossed: Pause,
+  near: CircleDashed,
+  clear: Play,
 };
 
 /**
