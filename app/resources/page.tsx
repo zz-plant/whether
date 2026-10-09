@@ -6,7 +6,6 @@ import { resourceSupportingPages } from "../../lib/resourcesContent";
 import { PageShell } from "../components/pageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
 import { ActionLink } from "../components/ui/actionLink";
-import { GovernancePillarsGlyph } from "../components/illustrations/GovernancePillarsGlyph";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
@@ -113,7 +112,10 @@ export default async function ResourcesHubPage({
       <OperatorWorkflowRouteTracker />
       <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs("/resources"))} />
       <article className="weather-panel space-y-8 px-5 max-sm:px-0 py-5">
-        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        {/* No emblem: the "Governance Pillars" glyph beside the title was
+            decoration from when the page was "Governance resources", and the
+            only image on the page said nothing about guides (2026-10-09). */}
+        <header>
           <div className="space-y-2 max-w-2xl">
             {/* "Guides" (2026-10-09): what the page holds, in the reader's word. The
                 header's label for this page belongs to the navigation and is
@@ -126,7 +128,6 @@ export default async function ResourcesHubPage({
               long-form guides and frameworks behind the weekly operating guidance.
             </p>
           </div>
-          <GovernancePillarsGlyph size={56} className="self-start sm:self-center" />
         </header>
 
         <section id="answers" aria-labelledby="resources-answers-heading" className="space-y-4">
