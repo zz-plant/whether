@@ -41,7 +41,7 @@ export const describeReconstructedPeriod = (periodTitle: string, firstPublishedW
 /*
  * The record's figures as published before its last re-score, kept where the
  * record is discussed so a change of basis is visible rather than silent
- * (docs/feature-specs-current.md §1.1.66). Authored, because the engine that
+ * (docs/feature-specs-current.md §1.1.67). Authored, because the engine that
  * produced them no longer runs: these are the numbers /history and /calibration
  * printed on the day, from the archive engine-2026-10-06 scored. While the
  * re-score leaves them unchanged the line points at the figures beside it

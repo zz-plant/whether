@@ -100,7 +100,7 @@ would block the routine's own push at the pre-push gate. The prompt can only be 
 (the routine was created through the HTTP API, and an agent may edit only routines it created): it
 should run the weekly generator between the monthly and quarterly ones, verify with
 `regimeArchiveReplay.test.ts` too, and commit all seven files. Since 2026-10-09 the generators also
-fetch FRED's `NFCI` (the Chicago Fed index is on the record basis, spec §1.1.66) and fail the run if
+fetch FRED's `NFCI` (the Chicago Fed index is on the record basis, spec §1.1.67) and fail the run if
 it does not arrive, so a refresh never writes an archive on another basis; the host is the
 `fred.stlouisfed.org` it already reaches. `bun run archive:index` regenerates the `/history/[period]`
 index from the archive, and the prompt does not run it either. The claims read-through was first scheduled Monday 15:47 UTC,

@@ -1,0 +1,79 @@
+/*
+ * Instrument: the current dark identity, refined.
+ *
+ * Keeps the ground dark and the type as shipped (Archivo in three widths, Chivo
+ * Mono), and spends the change on colour discipline: the sky action accent
+ * goes, so links, buttons and focus are the text ink, and the four conditions
+ * are the only colour on the page. Their hues stay in the families readers
+ * have learned (green, amber, violet, rose), moved off the stock Tailwind 500s
+ * so that lightness falls with severity and warm alternates with cool. That is
+ * what keeps all four apart for a red-green colourblind reader, which the
+ * current Sunny and Freezing are not (docs/design/palette-directions.md).
+ *
+ * Named values:
+ *   Graphite #0b0c0d  ground        Chalk     #eeeeea  text and action
+ *   Verdigris #54d8b1 Sunny         Brass     #e29936  Cloudy
+ *   Iris      #8264e7 Stormy        Signal    #c4334f  Freezing
+ */
+@import "../paletteBase.css";
+
+:root:has([data-palette="instrument"]) {
+  --p-ground: #0b0c0d;
+  --p-panel: #151719;
+  --p-surface: #1a1c1f;
+  --p-raised: #212427;
+  --p-nested: #0f1012;
+  --p-text: #eeeeea;
+  --p-text-2: #d0d1cc;
+  --p-text-3: #a2a49f;
+
+  --p-sunny: #54d8b1;
+  --p-sunny-ink: #8ae6c8;
+  --p-cloudy: #e29936;
+  --p-cloudy-ink: #f0c470;
+  --p-stormy: #8264e7;
+  --p-stormy-ink: #bcaeff;
+  --p-freezing: #c4334f;
+  --p-freezing-ink: #ff9aa8;
+
+  --p-action: #eeeeea;
+  --p-action-ink: #eeeeea;
+  --p-action-on: #0b0c0d;
+
+  --p-wash: 11%;
+  /* Held low: at 8% a Freezing week dyed the first screen maroon. */
+  --p-atmosphere: 4%;
+
+  --p-font-body: "Archivo", "Archivo Fallback", system-ui, sans-serif;
+  --p-font-display: var(--p-font-body);
+  --p-font-mono: "Chivo Mono", "Archivo", ui-monospace, monospace;
+  --p-stretch-display: 87.5%;
+  --p-stretch-stamp: 125%;
+}
+
+:root[data-theme="light"]:has([data-palette="instrument"]) {
+  --p-ground: #f5f5f2;
+  --p-panel: #ffffff;
+  --p-surface: #fcfcfa;
+  --p-raised: #ffffff;
+  --p-nested: #ebebe6;
+  --p-text: #141517;
+  --p-text-2: #3b3d40;
+  --p-text-3: #55585c;
+
+  --p-sunny: #3ba888;
+  --p-sunny-ink: #0b7358;
+  --p-cloudy: #b77d29;
+  --p-cloudy-ink: #8a5800;
+  --p-stormy: #7e60e2;
+  --p-stormy-ink: #5b36c9;
+  --p-freezing: #c53550;
+  --p-freezing-ink: #a81f3a;
+
+  --p-action: #141517;
+  --p-action-ink: #141517;
+  --p-action-on: #ffffff;
+
+  --p-wash: 10%;
+  --p-atmosphere: 5%;
+}

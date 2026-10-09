@@ -7,40 +7,6 @@
 @import './decision-flow.css';
 @import './mobile-workflows.css';
 
-/* Diagram labels live in HTML so narrow columns and text zoom can reflow them. */
-.weather-operating-loop {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 0.75rem;
-  padding: 0;
-  margin: 0;
-  list-style: none;
-}
-.weather-operating-loop li {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  min-width: 0;
-  color: var(--app-text-secondary);
-  text-align: center;
-}
-.weather-operating-loop li + li::before {
-  content: "→";
-  position: absolute;
-  left: -0.75rem;
-  top: 0;
-  color: var(--app-text-muted);
-}
-.weather-operating-loop strong { display: block; font-size: 0.75rem; font-weight: 600; }
-.weather-operating-loop small { display: block; margin-top: 0.25rem; font-size: 0.75rem; color: var(--app-text-muted); }
-.weather-operating-loop[data-variant="compact"] { max-width: 24rem; }
-.weather-operating-loop[data-variant="detailed"] { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 1.25rem; }
-.weather-operating-loop[data-variant="detailed"] li { align-items: flex-start; border-top: 2px solid var(--border-strong); padding-top: 0.75rem; text-align: left; }
-.weather-operating-loop[data-variant="detailed"] li::before { content: none; }
-.weather-operating-loop[data-variant="detailed"] strong { font-size: 0.875rem; }
-
 /* Scope stroke sizing to plots, never to icons or their internal markers. */
 .weather-data-plot > :is(path, line),
 .weather-data-plot > g > :is(path, line) {

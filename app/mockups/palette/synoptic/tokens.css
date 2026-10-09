@@ -1,0 +1,105 @@
+/*
+ * Synoptic: a daylight weather chart.
+ *
+ * The conditions are coloured by the weather they name, and the four hues are
+ * a coordinate system rather than a set: warm where risk appetite is on (Sunny,
+ * Cloudy), cool where it is off (Stormy, Freezing); light where money is cheap
+ * (Sunny, Stormy), dense where it is dear (Cloudy, Freezing). The chart's two
+ * axes become the two things colour can carry, so a colourblind reader keeps
+ * them apart on temperature and lightness. Light theme first: the call card
+ * travels into white decks and light Slack, where a dark slab is a black box.
+ *
+ * Type is one hyperlegible family for every voice, Atkinson Hyperlegible Next
+ * with its mono for figures: a pasted, shrunken card keeps 6 from 8 and 1 from l.
+ * Neither file draws arrows; they fall to Archivo, as Chivo Mono's do today.
+ *
+ * Named values (light | dark):
+ *   Chart paper #f1f4f3 | Night chart #0f1316   ground
+ *   Ink         #121719 | #edf0ee               text and action
+ *   Sun         #ba9320 | #f2c230               Sunny
+ *   Haze        #997444 | #a3824e               Cloudy
+ *   Lightning   #7f84c6 | #a3abf7               Stormy
+ *   Frost       #3a6fa3 | #3a6ea3               Freezing
+ */
+@import "../paletteBase.css";
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Next";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("../fonts/atkinson-hyperlegible-next.0ac7da1c.woff2") format("woff2");
+}
+
+@font-face {
+  font-family: "Atkinson Hyperlegible Mono";
+  font-style: normal;
+  font-weight: 200 800;
+  font-display: swap;
+  src: url("../fonts/atkinson-hyperlegible-mono.5f6de98d.woff2") format("woff2");
+}
+
+:root:has([data-palette="synoptic"]) {
+  --p-ground: #0f1316;
+  --p-panel: #171c20;
+  --p-surface: #1c2226;
+  --p-raised: #232a2f;
+  --p-nested: #12171a;
+  --p-text: #edf0ee;
+  --p-text-2: #cdd3d1;
+  --p-text-3: #a0a9a7;
+
+  --p-sunny: #f2c230;
+  --p-sunny-ink: #f5cf5a;
+  --p-cloudy: #a3824e;
+  --p-cloudy-ink: #d6b98a;
+  --p-stormy: #a3abf7;
+  --p-stormy-ink: #b9bfff;
+  --p-freezing: #3a6ea3;
+  --p-freezing-ink: #8cc0ec;
+
+  --p-action: #edf0ee;
+  --p-action-ink: #edf0ee;
+  --p-action-on: #0f1316;
+
+  /* The signature is the chart: its quadrant washes carry the field. */
+  --p-wash: 20%;
+  --p-atmosphere: 6%;
+
+  --p-font-body: "Atkinson Hyperlegible Next", "Archivo", system-ui, sans-serif;
+  --p-font-display: var(--p-font-body);
+  --p-font-mono: "Atkinson Hyperlegible Mono", "Archivo", ui-monospace, monospace;
+  --p-stretch-display: 100%;
+  --p-stretch-stamp: 100%;
+}
+
+:root[data-theme="light"]:has([data-palette="synoptic"]) {
+  --p-ground: #f1f4f3;
+  --p-panel: #ffffff;
+  --p-surface: #fbfcfc;
+  --p-raised: #ffffff;
+  --p-nested: #e6ebe9;
+  --p-text: #121719;
+  --p-text-2: #384145;
+  --p-text-3: #525c60;
+
+  --p-sunny: #ba9320;
+  --p-sunny-ink: #7a5800;
+  --p-cloudy: #997444;
+  --p-cloudy-ink: #74552a;
+  --p-stormy: #7f84c6;
+  --p-stormy-ink: #4a4fc0;
+  --p-freezing: #3a6fa3;
+  --p-freezing-ink: #1d5585;
+
+  --p-action: #121719;
+  --p-action-ink: #121719;
+  --p-action-on: #ffffff;
+
+  --p-wash: 16%;
+  --p-atmosphere: 4%;
+}
+
+/* The display voice is the same family at 800: no width axis to narrow it. */
+:root:has([data-palette="synoptic"]) .text-display { font-weight: 800; letter-spacing: -0.02em; }
+:root:has([data-palette="synoptic"]) .type-stamp { letter-spacing: 0.1em; }

@@ -20,7 +20,6 @@ import {
   type SaaSValuationSnapshot,
 } from "../../lib/saasMultiples";
 
-import { ValuationMultiplesGlyph } from "../components/illustrations/ValuationMultiplesGlyph";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -125,27 +124,30 @@ export default async function CompsPage() {
               SaaS companies.
             </p>
           </div>
-          <ValuationMultiplesGlyph size={64} className="self-start sm:self-center" />
         </div>
 
+        {/* One figure leads: the median multiple, the number a valuation
+            conversation starts from. Growth and the basket count were two more
+            tiles of the same size beside it (2026-10-09); they qualify the
+            multiple, so they are the sentence under it, with the read's date. */}
         {comps.status === "ok" ? (
           <div className="space-y-2">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="weather-surface px-4 py-4 space-y-1">
-                <p className="type-eyebrow">Median EV/Revenue</p>
-                <p className="text-2xl font-semibold text-slate-100">{formatMultiple(comps.data.medianEvToRevenue)}</p>
-              </div>
-              <div className="weather-surface px-4 py-4 space-y-1">
-                <p className="type-eyebrow">Median Revenue Growth</p>
-                <p className="text-2xl font-semibold text-slate-100">{formatPercent(comps.data.medianRevenueGrowth)}</p>
-              </div>
-              <div className="weather-surface px-4 py-4 space-y-1">
-                <p className="type-eyebrow">Companies Tracked</p>
-                <p className="text-2xl font-semibold text-slate-100">{comps.data.companyCount}/{SAAS_BASKET.length}</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-500">
-              As of <time dateTime={comps.data.fetchedAt}>{formatDateUTC(comps.data.fetchedAt)}</time>, from{" "}
+            <p className="text-fluid-xl font-semibold text-slate-100">
+              {comps.data.medianEvToRevenue === null ? (
+                "No median multiple in this read."
+              ) : (
+                <>
+                  Median EV/revenue:{" "}
+                  <span className="tabular-nums">{formatMultiple(comps.data.medianEvToRevenue)}</span>
+                </>
+              )}
+            </p>
+            <p className="max-w-2xl text-sm text-slate-300">
+              Median revenue growth {formatPercent(comps.data.medianRevenueGrowth)}, across{" "}
+              {comps.data.companyCount === SAAS_BASKET.length
+                ? `all ${SAAS_BASKET.length} companies in the basket`
+                : `${comps.data.companyCount} of the ${SAAS_BASKET.length} companies in the basket`}
+              . As of <time dateTime={comps.data.fetchedAt}>{formatDateUTC(comps.data.fetchedAt)}</time>, from{" "}
               {MARKET_DATA_PROVIDER_LABELS[comps.data.source]}.
             </p>
           </div>
@@ -160,7 +162,7 @@ export default async function CompsPage() {
 
         <section className="weather-surface space-y-2 px-4 py-4">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h2 className="type-eyebrow text-slate-400">Against this week&apos;s guidance</h2>
+            <h2 className="text-base font-semibold text-slate-100">Against this week&apos;s guidance</h2>
             <p className="text-xs text-slate-500">Data as of {reportData.recordDateLabel}</p>
           </div>
           <dl className="space-y-1.5 text-sm text-slate-200">
@@ -204,7 +206,7 @@ export default async function CompsPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="type-eyebrow">Basket composition</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Basket composition</h2>
           {/* Derived, not retyped: the names and the count came from two places
               and could disagree the moment a ticker was added. */}
           <p className="text-sm text-slate-300">
@@ -216,7 +218,7 @@ export default async function CompsPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="type-eyebrow">Use public multiples in a fundraising discussion</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Use public multiples in a fundraising discussion</h2>
           <p className="text-sm text-slate-300 leading-relaxed">
             Founders, finance teams and board members can use the basket to question valuation assumptions.
             Compare growth, gross margin, retention, scale and the revenue period before choosing a comparable.

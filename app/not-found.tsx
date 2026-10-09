@@ -9,8 +9,7 @@ export default function NotFound() {
   return (
     <ContentPageShell measure="content">
       <SecondaryPageHeader
-        eyebrow="Page not found"
-        title="That page moved."
+        title="Page not found"
         description="That older link no longer works, but the weekly brief and the pages behind it are still here."
         actions={(
           <>

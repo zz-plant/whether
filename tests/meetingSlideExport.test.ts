@@ -98,10 +98,12 @@ describe("Meeting Slide & Notion Exporter", () => {
     const payload = buildExportSlidePayload(snapshot, "seed");
     const html = formatMeetingSlideHtml(payload);
 
-    assert.ok(html.includes("Whether · Weekly Operating Brief"));
-    assert.ok(html.includes("1. Action now"));
-    assert.ok(html.includes("2. Pause if"));
-    assert.ok(html.includes("3. Conditions change if"));
+    assert.ok(html.includes("Whether · Weekly operating guidance"));
+    /* Parallel, not steps: no "1. 2. 3." before the three labels (2026-10-09). */
+    assert.ok(html.includes(">Action now<"));
+    assert.ok(html.includes(">Pause if<"));
+    assert.ok(html.includes(">Conditions change if<"));
+    assert.doesNotMatch(html, /[123]\. (Action now|Pause if|Conditions change if)/);
     assert.ok(html.includes("Resume when"));
     assert.ok(html.includes("Freezing"));
     assert.ok(!html.includes("SCARCITY"));
@@ -118,8 +120,12 @@ describe("Meeting Slide & Notion Exporter", () => {
 
     assert.ok(svg.startsWith("<svg"));
     assert.ok(svg.includes('viewBox="0 0 1200 675"'));
-    assert.ok(svg.includes("WHETHER · WEEKLY OPERATING GUIDANCE"));
-    assert.ok(svg.includes("ACTION NOW"));
+    /* Sentence case, no tracking; flat fills, no accent discs; unnumbered cards (2026-10-09). */
+    assert.ok(svg.includes(">Whether · Weekly operating guidance</text>"));
+    assert.doesNotMatch(svg, /letter-spacing="2"|WEEKLY OPERATING/);
+    assert.doesNotMatch(svg, /Gradient|<circle/);
+    assert.ok(svg.includes(">Action now</text>"));
+    assert.doesNotMatch(svg, />[123]\. /);
     assert.ok(svg.includes("Freezing"));
     assert.ok(!svg.includes("SCARCITY"));
   });
@@ -136,19 +142,19 @@ describe("Meeting Slide & Notion Exporter", () => {
 
   it("wraps a long call onto two lines inside its card", () => {
     const call = "Approve only renewals, work already promised to customers, and hires that bring in revenue.";
-    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), actionNow: call }), "ACTION NOW");
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), actionNow: call }), ">Action now<");
     assert.equal(lines.length, 2);
     assert.equal(lines.join(" "), call);
   });
 
   it("keeps a short call on one line", () => {
-    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), actionNow: "Hold the plan." }), "ACTION NOW");
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), actionNow: "Hold the plan." }), ">Action now<");
     assert.deepEqual(lines, ["Hold the plan."]);
   });
 
   it("cuts text too long for two lines at a word, with an ellipsis", () => {
     const long = Array.from({ length: 60 }, (_, index) => `word${index}`).join(" ");
-    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), pauseIf: long }), "PAUSE IF");
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), pauseIf: long }), ">Pause if<");
     assert.equal(lines.length, 2);
     assert.ok(lines[1]?.endsWith("\u2026"));
     assert.ok(long.startsWith(lines[0] ?? "-"));

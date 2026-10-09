@@ -4,7 +4,7 @@ import { countRecord } from "../../../lib/report/trackRecord";
 import { describeTrackRecordRescore } from "../../../lib/report/trackRecordCopy";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
-import { StatTile } from "../ui/statTile";
+import { Fact, FactList } from "../ui/factList";
 
 /**
  * The page above this calls itself the permanent record cited in board
@@ -55,20 +55,22 @@ export function TrackRecordSection({
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatTile
+      {/* Facts in the text's size, above the table they summarise; four tiles
+          with a bold figure each until 2026-10-09. */}
+      <FactList>
+        <Fact
           label="Changes in conditions"
           value={counts?.changes ?? record.transitions.length}
           unit={`in the last ${counts?.readings ?? record.observations} months`}
         />
-        <StatTile label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
-        <StatTile
+        <Fact label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+        <Fact
           label="Median hold"
           value={record.medianHoldMonths ?? "—"}
           unit={record.medianHoldMonths != null ? "mo" : undefined}
         />
-        <StatTile label="Reversed after one month" value={record.whipsawCount} />
-      </div>
+        <Fact label="Reversed after one month" value={record.whipsawCount} />
+      </FactList>
 
       {recentTransitions.length > 0 ? (
         <div className="overflow-x-auto">

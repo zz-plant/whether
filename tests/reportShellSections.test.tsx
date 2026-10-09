@@ -188,7 +188,9 @@ describe("ReportShell extracted sections", () => {
     assert.doesNotMatch(html, /Review order/);
   });
 
-  it("puts the next-step card at the end of the page, once", () => {
+  /* No closing "Next" card (2026-10-09): every one pointed at a header tab or at
+     /share, which the header and the footer already reach. */
+  it("ends on the page's own last section, with no next-step card", () => {
     const html = renderToStaticMarkup(
       <ReportShell
         model={{
@@ -205,21 +207,14 @@ describe("ReportShell extracted sections", () => {
           trust: {
             trustStatusTone: "stable",
           },
-          actions: {
-            nextStep: { href: "/resolve", description: "Still stuck on one decision? Get a yes or no for it.", label: "Resolve a decision" },
-          },
         }}
       >
         <section>Body</section>
       </ReportShell>,
     );
 
-    assert.equal(html.split('data-testid="next-step-card"').length - 1, 1);
-    assert.ok(html.indexOf("Body") < html.indexOf("next-step-card"));
-    assert.match(html, /href="\/resolve"/);
-    // The button names where it goes; it said "Continue →" on every page.
-    assert.match(html, />Resolve a decision</);
-    assert.doesNotMatch(html, /Continue →/);
+    assert.doesNotMatch(html, /next-step-card|aria-label="Next step"/);
+    assert.match(html, /<section>Body<\/section>/);
   });
 });
 

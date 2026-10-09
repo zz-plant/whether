@@ -20,7 +20,6 @@ import {
   publisherProfilePath,
 } from "../../lib/publisher";
 
-import { OperatingLoopGlyph } from "../components/illustrations/OperatingLoopGlyph";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { describeRecordCadence } from "../../lib/report/trackRecordCopy";
@@ -68,9 +67,6 @@ export default function AboutPage() {
           Each Monday, Whether says what interest rates and credit mean for a startup&apos;s hiring, spend and raise. Each
           week it answers three things: what should change right now, how sure we are, and what would change the guidance.
         </p>
-        <div className="pt-2">
-          <OperatingLoopGlyph variant="detailed" />
-        </div>
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">

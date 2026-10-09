@@ -73,8 +73,9 @@ The header carries four groups, each with a hub, read from one module
   `/answers` goes to `/resources#answers`, `/guides/*` to Guides' More tools.
 - **Sharing has one home.** `/share` holds every format, the slide and card clipboard buttons
   (moved from the brief), the meeting snippet (moved from `/trust`) and the links to API & MCP and
-  RSS. The brief's Do and share, Trust and Decide each carry one "Share or embed this →" link
-  (`app/components/shareOrEmbedLink.tsx`); Decide's Share step is gone. Trust's one-line citation
+  RSS. The brief's Do and share and Trust each carry one "Share or embed this →" link
+  (`app/components/shareOrEmbedLink.tsx`); Decide's Share step is gone, and its closing card to
+  `/share` went in §1.1.65. Trust's one-line citation
   is served by `/share`'s Citation format. A frozen week keeps its date-pinned copy panel.
 - **Discoverability.** The sitemap drops `/resolve` and ranks `/resources` as a hub; `/llms.txt`
   carries a Site section built from the same groups.
@@ -2207,7 +2208,8 @@ strip across a phone's first screen, a footer set louder than the pages above it
 
 - **The report intro on a phone** (`CommandCenterNavBlock`, every `ReportShell` route). Below `sm`
   a route with a trust strip draws three lines: the status word in the regime ink with the
-  screenshot caption beside it, the title, and the strip as one wrapped meta line
+  screenshot caption beside it (the caption left the intro in §1.1.65), the title, and the strip
+  as one wrapped meta line
   (`TrustStrip` `phoneLayout="line"`). The line always carries the record date and "Could change
   next week"; it leaves out "Sources" and "Confidence" while they are routine (every source live,
   confidence not Low) and the strip links to `/trust`, and prints them whenever they are not. On
@@ -3002,7 +3004,44 @@ memo is not product writing. `tests/productCanon.test.ts` holds the tags and bas
 shares against an independent count over the record, the copy against the builders' sentences with
 no count typed into the route, the pairs against the list, one H1 and the plane's sr-only table.
 
-### 1.1.65 The call is scored on the record's inputs (2026-10-09)
+### 1.1.65 Decoration that encodes something: generated-design tropes removed (2026-10-09)
+
+The owner approved ten removals after a design audit. The rule (`docs/agents/ui-ux-standards.md`
+§XXV): structure and decoration encode something true about the content, and the site spends its
+boldness on the conditions chart, the weather glyphs and the line-state glyphs.
+
+| Item | Removed | In its place |
+| --- | --- | --- |
+| Header emblems | `CalibrationCurveGlyph`, `OperatingLoopGlyph`, `EditorialDeskGlyph`, `SearchRadarGlyph`, `DecisionShieldGlyph`, `ToolkitPlaybookGlyph`, `ValuationMultiplesGlyph`, the operating-loop CSS and `SecondaryPageHeader`'s `aside` slot | the heading alone; `TrendGlyph` and `ThresholdLadder` stay |
+| Stat tiles | `/comps`' three tiles; `/history`'s record and grading tiles; the phase map's month tile; the compare premium tile (`StatTile`) | `/comps` leads with the median multiple as one line ("Median EV/revenue: …x") and one sentence for growth, the basket count and the as-of date; elsewhere `FactList` |
+| Emoji | 🎯 ⚠️ ✅ 🔄 in the slide paste; ⚠️ ⚡ 👀 in the alert Slack posts; 📬 in the month-end pulse; ✅ 🔄 📦 in the Slack action replies; ⚠️ ✅ on the weekly paste's climate line | the labels alone |
+| Ambient decoration | the page's white sheen and emerald-sky-amber wash; gradients, specular and sky inner ring on pills, buttons, inputs and the primary CTA (`--cta-gradient`); the hover halo (`--glow-soft`, `--accent-glow*`); the report intro's regime tint and 3px top rule (`.weather-page-intro`); `ReportSection`'s gradient hairline; the slide's gradients, accent discs and tracked capitals | flat fills from `--bg-raised`, `--bg-nested` and `--cta-fill`; the status word keeps the regime ink; the hero keeps its rule |
+| Kickers | "Governance guide", "Operating brief", "For VC firms", "This week's guidance", "Next step", "Governance lexicon", "Team view", "Stage view", "Deeper evidence", "Risk checks", "Whether Legal", "Reading list", "Your decisions" and the unused eyebrow props | facts that were in a kicker move into the heading line: the share page's week, the compare columns' period, "since your last review", Pro as a stamp, "Page not found" |
+| Next card | `NextStepCard` on `/signals`, `/operate` and `/trust` (and `InternalAwareLink`) | nothing: each pointed at a header tab or at `/share` |
+| Decide's trio | tinted Stop, Start and Keep limited boxes with coloured edges | three plain columns, stacked on a phone, colour on the names |
+| Decide's cards | every step a bordered card behind a chevron; the warnings card and the box around each warning | sections under h2s, a rule between; area rules, lists and test open; lines form and finance folded |
+| Slide numbering | "1. 2. 3." on Action now, Pause if, Conditions change if | unnumbered sentence-case labels; `cardBody` wrapping unchanged |
+| Watermark | "Whether · whether.work" in every report intro | the call card keeps it (§1.1.63), on `/` and on a published week's card, which is the same card for a frozen week |
+
+Card-in-card elsewhere: `/trust`'s watch, escalation, warning and checklist cards and the boxes
+inside them are columns under h3s; `/signals` drops the frame around its chart panels; `/history`
+drops the frame around the explorer's timeline. The scenario page's Stop and Start lists follow
+Decide's.
+
+Measured on the local dev server at 390 and 1280px: the deepest chain of framed or filled boxes in
+`<main>`, with colours normalised through a canvas and controls excluded. `/operate` 2 → 1 (the
+page intro; 13 boxes → 2 at 390px), `/trust` 2 → 1, `/history` 2 → 1, `/signals` 3 → 2 (a chart
+panel and the gauge band inside it), `/` unchanged at 2 from 1280px (the call card and its chart).
+`type-eyebrow` went from 150 uses in 65 files to 118 in 55; the rest label table columns, `<dt>`s,
+controls, chart panels and navigation, or are headings set in the label style. Gradient
+declarations went from 26 to 13: 16 to 8 in `app/styles/` (the skeleton shimmer, the regime
+ground, the card sheens and the hub backdrop remain) and 10 to 5 in components and builders (the
+scroll and legibility fades remain). Emoji in builder code went from 17 to 0.
+`tests/conceptIcons.test.tsx` now fails on any emoji in a share format, the slide, the operator
+brief, the investor update, the weekly paste, or the source of any paste, slide, Slack or email
+builder. Golden pins moved for slide entries only.
+
+### 1.1.66 The call is scored on the record's inputs (2026-10-09)
 
 The owner's call, after a review: the live weekly call and the historical record must use the same
 basis. They did not. The month-end archive behind `/history`, the track record and `/calibration`
@@ -3027,7 +3066,7 @@ test, while the calibration study's "96% held" and the track record vouched for 
   (`SAAS_VALUATION_MULTIPLE`, `EARNINGS_REVISION_INDEX`, `AI_COMPUTE_COST_TREND`,
   `REGULATORY_RISK_TRACKER`) move no score and feed only the forecast and context lines. FRED's
   high-yield series (`BAMLH0A0HYM2`) starts on 2023-10-10, so it can never be backfilled across the
-  record; the Chicago Fed index (`NFCI`, from 1971) joined the basis with its backfill (§1.1.66).
+  record; the Chicago Fed index (`NFCI`, from 1971) joined the basis with its backfill (§1.1.67).
   `tests/recordBasis.test.ts` fails if an input on the basis has no value in a cached month.
 - **What is still shown.** Each score the inputs left out would move is `ScoringBasis.notCounted`
   (`lib/report/scoringBasis.ts`): under its row in the homepage's "What changed" and on `/signals`
@@ -3068,9 +3107,9 @@ test, while the calibration study's "96% held" and the track record vouched for 
   archived month, change count or calibration figure changes; the regenerated archive with the
   Chicago Fed index is its own change.
 
-### 1.1.66 The archive scores the Chicago Fed index too (2026-10-09)
+### 1.1.67 The archive scores the Chicago Fed index too (2026-10-09)
 
-The second half of §1.1.65: backfill into the month-end archive every market input the live call
+The second half of §1.1.66: backfill into the month-end archive every market input the live call
 reads that has a long public series, so the record is scored on the same basis as the call
 (`engine-2026-10-09b`, `RECORD_BASIS_MARKET_INPUTS` = VIX and `CHICAGO_FCI`).
 
@@ -3155,14 +3194,15 @@ path plus a highlighted latest point.
 ### 1.3 Plan overview (/operate)
 Planning is the detailed execution page behind the brief (`app/operate/planningPageModel.ts`).
 Since 2026-10-07 (§1.1.46) its steps run: This week's rule for each area, Rules before you commit
-and Test a decision (the three open on arrival), Set this plan's lines (§1.1.31; live weeks only,
-and left out when no rule has a numeric line) and Finance strategy, with Risk checks ("Warnings
-to read before you approve") after them; the Share step left on 2026-10-08 (§1.0a). A deep link opens its step without
-closing the others, and retired section hashes map onto the step that replaced them
+and Test a decision (the three always open, with no toggle), Set this plan's lines (§1.1.31; live
+weeks only, and left out when no rule has a numeric line) and Finance strategy (both folded), with
+"Warnings to read before you approve" after them; the Share step left on 2026-10-08 (§1.0a). Since
+§1.1.65 the steps are sections under h2s with a rule between them, not cards. A deep link opens its
+step without closing the others, and retired section hashes map onto the step that replaced them
 (`hashAliases`).
 
-The page hands off to `/share` in its next-step card ("Share or embed this →"). It no longer
-carries a share step, alert delivery controls, Decision
+The page ends on its warnings; `/share` is the header's "Use it elsewhere" and the footer's (the
+next-step card went in §1.1.65). It no longer carries a share step, alert delivery controls, Decision
 Memory recall (§8.4) or the operator-request list (§1.1.46). The stepper accepts owner and
 approval-state fields, and no step sets them (DD-045). (This paragraph used to describe a
 mixed-literacy translation model on `/operate` — a top-of-page router to decision, evidence, trust
@@ -3308,7 +3348,7 @@ Trust/readiness computation now consumes structured freshness state (`fresh` / `
   (`RECORD_BASIS_MARKET_INPUTS`: VIX with its haircut and veto, and the Chicago Fed NFCI) adjust
   tightness/risk appetite before final classification and trigger multi-weak-read warnings. HY OAS,
   VC funding velocity and the tech layoff trend are scored into `scores.offRecord` and move nothing
-  published, because the archive holds no month-end history for them (§1.1.65, §1.1.66).
+  published, because the archive holds no month-end history for them (§1.1.66, §1.1.67).
 
 ### 3.2 Scores
 - **Tightness score (0–100)**: adds 90 points if base rate > threshold and 25 points if the curve
@@ -3325,7 +3365,7 @@ Policy pilot outputs (`RISK_ON`, `SAFETY_MODE`, `TRANSITION`) are a separate pos
 
 ### 3.4 Outputs
 Adjustment semantics:
-- Macro overlays on the record basis modify tightness/risk-appetite scores before classification, so they can change the resulting regime when signals are near boundaries. Overlays off it change only `scores.offRecord` (§1.1.65).
+- Macro overlays on the record basis modify tightness/risk-appetite scores before classification, so they can change the resulting regime when signals are near boundaries. Overlays off it change only `scores.offRecord` (§1.1.66).
 - Diagnostics (`boundaryContributors`, weak-read warnings, confidence) explain *why* adjustments applied.
 - Recommendations and constraints always derive from the final classified regime.
 

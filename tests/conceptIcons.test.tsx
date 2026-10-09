@@ -40,6 +40,16 @@ import { DecisionHero } from "../app/components/DecisionHero";
 import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { DecisionPicker } from "../app/components/home/DecisionPicker";
 import { buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
+import { formatMeetingSlideHtml, formatMeetingSlideMarkdown, formatMeetingSlideSvg } from "../lib/export/meetingSlideExport";
+import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
+import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
+import { buildInvestorUpdateSnippetParts, formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
+import { BRIEF_FORMATS, formatBriefArtifact } from "../lib/report/briefArtifact";
+import { buildWeeklySummary } from "../lib/summary/weeklySummary";
+import { evaluateRegime } from "../lib/regimeEngine";
+import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
+import { macroSeries } from "../lib/macroSnapshot";
+import { snapshotData } from "../lib/snapshot";
 import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, latestPublishedBrief } from "../lib/report/publishedBriefs";
 import { fixtureBriefDocument } from "./factories/exportFixtures";
 import { GET as getFeed } from "../app/feed.xml/route";
@@ -374,10 +384,48 @@ describe("no page builds its own glyph for these concepts", () => {
 
 describe("text that leaves the site carries no glyph", () => {
   const MARKUP = /<svg|lucide|data-concept-icon|aria-hidden/;
-  /* The emoji a paste could reach for in place of the glyphs. */
-  const PICTOGRAPHS = /[☀☁⛅⛈❄⏸▶⏯\u{1F324}-\u{1F329}\u{1F331}\u{1F465}\u{1F45B}\u{1F3DB}]/u;
+  /*
+   * Any emoji, not only the weather and state ones a paste could reach for in
+   * place of the glyphs (2026-10-09). The slide paste led its four labels with a
+   * target, a warning sign, a tick and a cycle arrow, the regime-change Slack post
+   * with a warning sign, and the weekly paste's climate line with a warning sign
+   * or a tick: pictures restating the words beside them, which this list, written
+   * for weather emoji, could not see. The variation selector is the half of "⚠️"
+   * that makes a plain sign render as an emoji. The copyright and trademark signs
+   * and the two-headed arrow are pictographic by Unicode's table and plain type by
+   * this site's: the face draws them, and the deck's sanitiser keeps ™.
+   */
+  const PICTOGRAPHS = /(?![©®™↔])[\p{Extended_Pictographic}\u{FE0F}]/u;
+  const exportSnapshot = () =>
+    buildOperatingSnapshot({
+      treasury: { ...snapshotData, isLive: true, fallback_at: undefined, fallback_reason: undefined, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
+      macroSeries,
+      now: new Date("2026-08-31T12:00:00.000Z"),
+    });
+  const artifact = {
+    title: "Whether Weekly Brief",
+    recordDateLabel: "2026-09-04",
+    call: "Hold hiring at current headcount.",
+    actionNow: "Stage offers behind the September close.",
+    guardrail: "Funding pressure crosses 72",
+    reversal: "Resume staged approvals when pressure falls below 60",
+    clearsWhen: ["Funding pressure at or below 58"],
+    regimeLabel: "Freezing",
+    tightness: 64,
+    riskAppetite: 55,
+    confidenceLabel: "MED",
+    source: "FRED",
+  };
+  const weeklySummaryFor = (record: Parameters<typeof evaluateRegime>[0]) =>
+    buildWeeklySummary({
+      assessment: evaluateRegime(record),
+      provenance: { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "2d.", statusLabel: "Latest recorded reading" },
+      recordDateLabel: "Oct 5, 2026",
+      record,
+    }).copy;
 
-  const texts: Array<{ name: string; text: () => Promise<string> | string }> = [
+  /* `markup`: the format is itself HTML or SVG, so only a concept glyph's own markup counts. */
+  const texts: Array<{ name: string; text: () => Promise<string> | string; markup?: boolean }> = [
     { name: "Slack brief", text: () => buildSlackBrief(fixtureBriefDocument()) },
     { name: "call citation", text: () => buildCallCitation(fixtureBriefDocument()) },
     { name: "published week (Slack)", text: () => (latestPublishedBrief ? buildPublishedBriefSlackUpdate(latestPublishedBrief) : "") },
@@ -396,14 +444,74 @@ describe("text that leaves the site carries no glyph", () => {
           ),
         ),
     },
+    /* Every format /share copies from the one artifact. */
+    ...BRIEF_FORMATS.map((format) => ({
+      name: `share: ${format.label}`,
+      text: () => formatBriefArtifact(artifact, format.id, "https://whether.work"),
+    })),
+    /* The meeting slide in its three forms, with a stage so the resume line prints. */
+    { name: "slide markdown", text: () => formatMeetingSlideMarkdown(buildExportSlidePayload(exportSnapshot(), "seed")) },
+    { name: "slide HTML", text: () => formatMeetingSlideHtml(buildExportSlidePayload(exportSnapshot(), "seed")), markup: true },
+    { name: "slide SVG", text: () => formatMeetingSlideSvg(buildExportSlidePayload(exportSnapshot(), "seed")), markup: true },
+    { name: "weekly operator brief", text: () => buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(fixtureBriefDocument())) },
+    { name: "investor update", text: () => formatInvestorUpdateSnippet(buildInvestorUpdateSnippetParts(fixtureBriefDocument(), []), "tight") },
+    /* The weekly paste's climate line, on a tight week and an easy one. */
+    {
+      name: "weekly paste (Freezing)",
+      text: () =>
+        weeklySummaryFor({
+          source: "https://example.com/treasury",
+          record_date: "2026-10-05",
+          fetched_at: "2026-10-05T12:00:00.000Z",
+          isLive: true,
+          yields: { oneMonth: 5.4, twoYear: 4.0, tenYear: 4.2 },
+        }),
+    },
+    {
+      name: "weekly paste (Sunny)",
+      text: () =>
+        weeklySummaryFor({
+          source: "https://example.com/treasury",
+          record_date: "2026-10-05",
+          fetched_at: "2026-10-05T12:00:00.000Z",
+          isLive: true,
+          yields: { oneMonth: 1.2, twoYear: 1.5, tenYear: 2.6 },
+        }),
+    },
   ];
 
-  for (const { name, text } of texts) {
+  for (const { name, text, markup } of texts) {
     it(name, async () => {
       const body = await text();
       assert.ok(body.length > 0, `${name} rendered nothing`);
-      assert.doesNotMatch(body, MARKUP, `${name} carries icon markup`);
-      assert.doesNotMatch(body, PICTOGRAPHS, `${name} carries a weather or state emoji`);
+      assert.doesNotMatch(body, markup ? /lucide|data-concept-icon/ : MARKUP, `${name} carries icon markup`);
+      assert.doesNotMatch(body, PICTOGRAPHS, `${name} carries an emoji`);
     });
   }
+
+  /*
+   * Source-level as well, because the Slack alert posts, the Slack action replies
+   * and the month-end pulse send from inside a cron or a webhook and render in no
+   * test: every string in the modules that write a paste, a slide, a Slack post or
+   * an email. Comments are skipped; a comment may quote the emoji it removed.
+   */
+  it("in any module that builds a paste, a slide, a Slack post or an email", () => {
+    const BUILDER_DIRS = ["lib/export", "lib/slack", "lib/email", "lib/alert", "lib/delivery", "lib/summary", "app/api"];
+    const BUILDER_FILES = ["lib/report/briefArtifact.ts", "lib/report/briefDocument.ts", "lib/report/publishedBriefs.ts", "lib/integrationBriefs.ts"];
+    const sources = (dir: string): string[] =>
+      readdirSync(dir).flatMap((name) => {
+        const path = join(dir, name);
+        if (statSync(path).isDirectory()) return sources(path);
+        return /\.(ts|tsx)$/.test(name) ? [path] : [];
+      });
+    const files = [...BUILDER_DIRS.flatMap(sources), ...BUILDER_FILES];
+    assert.ok(files.includes("lib/export/meetingSlideExport.ts") && files.includes("app/api/webhooks/slack/actions/route.ts"), "the scan reads the builders");
+    for (const file of files) {
+      const source = readFileSync(file, "utf8")
+        .replace(/\/\*[\s\S]*?\*\//g, "")
+        .replace(/(^|[^:])\/\/.*$/gm, "$1");
+      const found = PICTOGRAPHS.exec(source);
+      assert.equal(found, null, `${file} carries an emoji: ${found?.[0] ?? ""}`);
+    }
+  });
 });

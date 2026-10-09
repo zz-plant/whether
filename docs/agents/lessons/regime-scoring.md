@@ -124,7 +124,7 @@ run on.
   high-yield series begins 2023-10-10 (ICE licensing), so it stays off the basis however good a
   stress read it is. The Chicago Fed index runs from 1971 and joined with its backfill
   (`engine-2026-10-09b`): it moved two months' funding pressure by two points and no month's
-  conditions, so every record figure held (spec §1.1.66).
+  conditions, so every record figure held (spec §1.1.67).
 - **Backfill what a reader had, not what was true later.** A weekly series published with a lag is
   read as of its publication (the index: five days after the week it measures), and a series that is
   re-estimated (the index again) is backfilled from today's vintage, which the spec says out loud.

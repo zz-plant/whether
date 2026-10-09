@@ -19,9 +19,11 @@ mockAny.module("next/navigation", () => ({
  * Until 2026-10-08 the site offered to share one week in five places: the brief's "Do
  * and share" slide and image buttons, the plan's "Share the brief" step, Trust's "Cite
  * this guidance" and "Meeting snippet", /share itself, and each frozen week's own copy
- * panel. /share holds every format now. The brief, Decide and Trust each carry one
- * "Share or embed this →" link instead; a frozen week keeps its date-pinned panel,
- * because /share carries the current week and cannot copy a past one.
+ * panel. /share holds every format now. The brief and Trust each carry one "Share
+ * or embed this →" link instead; Decide carried it as a closing card until
+ * 2026-10-09 and now reaches /share through the header and the footer, as every
+ * page does. A frozen week keeps its date-pinned panel, because /share carries
+ * the current week and cannot copy a past one.
  */
 
 const LINK_TEXT = "Share or embed this →";
@@ -37,12 +39,12 @@ describe("one way out to /share from each reading page", () => {
     assert.doesNotMatch(source, /CopyMeetingSlideButton|CopyImageCardButton/, "the copy buttons live on /share");
   });
 
-  it("Decide has no share step and hands off to /share in its next-step card", async () => {
+  it("Decide has no share step and no closing share card", async () => {
     const { buildPlanningPageModel } = await import("../app/operate/planningPageModel");
     const { reportShellModel } = await buildPlanningPageModel();
-    assert.deepEqual(reportShellModel.actions?.nextStep && [reportShellModel.actions.nextStep.href, reportShellModel.actions.nextStep.label], ["/share", LINK_TEXT]);
+    assert.equal(reportShellModel.actions, undefined, "no hero action and no next-step card");
     const source = readFileSync("app/operate/planningPageModel.ts", "utf8");
-    assert.doesNotMatch(source, /id: "ops-export-briefs"|BriefIslandPicker/, "the share step is gone");
+    assert.doesNotMatch(source, /id: "ops-export-briefs"|BriefIslandPicker|SHARE_OR_EMBED/, "the share step and card are gone");
   });
 
   it("Trust drops the citation and the meeting snippet for one link to /share", async () => {

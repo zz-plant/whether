@@ -194,7 +194,7 @@ describe("buildWeeklySummary", () => {
     const yearly = buildYearlySummary({ assessment, provenance, periodLabel: "2026", record });
 
     assert.match(weekly.copy, /\nWHETHER · Weekly operating guidance\n/);
-    assert.match(weekly.copy, /\nMARKET CLIMATE\n\n⚠️ Freezing: Money is expensive and hard to raise\.\n/);
+    assert.match(weekly.copy, /\nMARKET CLIMATE\n\nFreezing: Money is expensive and hard to raise\.\n/);
     assert.match(weekly.summary, /The guidance is not changing this week\. Too many inputs are missing to support a change in the guidance\. Keep approvals reversible until the hold lifts\./);
     for (const summary of [weekly, monthly]) {
       assert.ok(summary.summary.includes(SHOCK_CROSSING_CUE), summary.summary);

@@ -6,11 +6,10 @@ type ReportSectionProps = {
   description?: string;
   children: ReactNode;
   variant?: "unified" | "split";
-  label?: string;
   headingLevel?: "h2" | "h3" | "h4";
   /**
    * Hide the visible header when an enclosing surface (e.g. a stepper step) already
-   * states this section's label, title, and description. The heading is still rendered
+   * states this section's title and description. The heading is still rendered
    * for screen readers so `aria-labelledby` and the `id` anchor keep working.
    */
   hideHeader?: boolean;
@@ -54,7 +53,6 @@ export function ReportSection({
   description,
   children,
   variant = "unified",
-  label,
   headingLevel,
   hideHeader = false,
   action,
@@ -81,21 +79,8 @@ export function ReportSection({
             {title}
           </HeadingTag>
         ) : (
-        <div className="weather-panel relative overflow-hidden px-5 py-4">
-          {/* The regime's hue, not sky: the rule and the eyebrow are the two
-              marks every section repeats, so they are where a page can say
-              which week it is without a new component. */}
-          <span
-            className="pointer-events-none absolute inset-x-0 top-0 h-px"
-            style={{ backgroundImage: "linear-gradient(to right, transparent, color-mix(in srgb, var(--regime-accent, #7dd3fc) 45%, transparent), transparent)" }}
-            aria-hidden="true"
-          />
-          {label ? (
-            <span className="type-eyebrow type-eyebrow-section">
-              {label}
-            </span>
-          ) : null}
-          <div className="mt-1 flex items-center gap-1">
+        <div className="weather-panel px-5 py-4">
+          <div className="flex items-center gap-1">
             <HeadingTag id={headingId} className="max-w-2xl text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
               {title}
             </HeadingTag>
@@ -138,12 +123,9 @@ export function ReportSection({
     >
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
-          {/* The unified variant used to drop `label` on the floor — only the split
-              variant rendered it. Every route that needed an eyebrow above its
-              section title therefore hand-rolled the whole section instead of
-              using this component, which is a large part of why it only ever got
-              adopted on /trust. */}
-          {label ? <p className="type-eyebrow type-eyebrow-section mb-1">{label}</p> : null}
+          {/* No kicker over the title (2026-10-09). A `label` eyebrow was
+              accepted here and no route passed one: the title names the
+              section, and a small label above it restated it. */}
           <div className="flex items-center gap-1">
             <HeadingTag id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
               {title}
