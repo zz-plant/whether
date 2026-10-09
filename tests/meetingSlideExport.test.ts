@@ -123,4 +123,34 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(svg.includes("Freezing"));
     assert.ok(!svg.includes("SCARCITY"));
   });
+
+  // The decision cards draw SVG text, which does not wrap: before 2026-10-09 the
+  // 92-character call ran past its card ("…hires that bring in revenu").
+  const cardText = (svg: string, label: string): string[] => {
+    const card = svg.split(label)[1] ?? "";
+    const text = card.slice(card.indexOf("<text"), card.indexOf("</text>", card.indexOf("<text")) + 7);
+    return [...text.matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g)].map((match) => match[1] ?? "");
+  };
+  const slidePayload = () =>
+    buildExportSlidePayload(buildOperatingSnapshot({ treasury: mockTreasury, macroSeries }), "series-b");
+
+  it("wraps a long call onto two lines inside its card", () => {
+    const call = "Approve only renewals, work already promised to customers, and hires that bring in revenue.";
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), actionNow: call }), "ACTION NOW");
+    assert.equal(lines.length, 2);
+    assert.equal(lines.join(" "), call);
+  });
+
+  it("keeps a short call on one line", () => {
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), actionNow: "Hold the plan." }), "ACTION NOW");
+    assert.deepEqual(lines, ["Hold the plan."]);
+  });
+
+  it("cuts text too long for two lines at a word, with an ellipsis", () => {
+    const long = Array.from({ length: 60 }, (_, index) => `word${index}`).join(" ");
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), pauseIf: long }), "PAUSE IF");
+    assert.equal(lines.length, 2);
+    assert.ok(lines[1]?.endsWith("\u2026"));
+    assert.ok(long.startsWith(lines[0] ?? "-"));
+  });
 });
