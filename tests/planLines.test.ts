@@ -208,7 +208,7 @@ describe("delivering plan-line alerts", () => {
       tightness: 74,
       riskAppetite: 50,
       actionNow: "Hold irreversible moves.",
-      callChangesIf: "Risk appetite rises 1 pt to clear 50 (50 today).",
+      callChangesIf: "Risk appetite rises 1 pt from 50 to clear 50.",
       recordDate: "2026-09-29",
       previousScores: { tightness: 70, riskAppetite: 50 },
     };
@@ -233,7 +233,7 @@ describe("delivering plan-line alerts", () => {
         tightness: 74,
         riskAppetite: 50,
         actionNow: "Hold irreversible moves.",
-        callChangesIf: "Funding pressure falls 4 pts to 70 or below (74 today).",
+        callChangesIf: "Funding pressure falls 4 pts from 74 to 70 or below.",
         recordDate: "2026-09-29",
         previousScores: { tightness: 70, riskAppetite: 50 },
       });

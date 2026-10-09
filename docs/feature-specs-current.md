@@ -259,6 +259,33 @@ homepage evidence list, both interpretation views and the evidence rows), and th
 `/share`, `/operate` and the export panel, which pasted the board brief — the whole Slack brief with
 the slide bullets appended — beside the Slack brief and now carry the slide bullets alone.
 
+### 1.1.1c A reading follows the rule; it does not sit in parentheses inside it (2026-10-09)
+The rule-line builders stapled a gloss onto every line that carried a reading: a met pause or
+resume line read "funding pressure is above 76 (already true at 90)", and the change line put
+"(90 today)" after one score and "(49 today)" after the other, two parentheses of one kind in one
+sentence, on every page, paste, email and alert that prints the rule.
+
+- **Pause and resume lines** (`formatRuleClause`, the stage lines in
+  `buildScopedVariantDecisionAdjustment`): a met line states where the score is ("is above 76"),
+  and the reading follows the rule as its own sentence, `formatReadingsNow`
+  (`lib/report/reportFormatting.ts`): "Pause net-new hiring if funding pressure is above 76 or risk
+  appetite falls below 44. Funding pressure is 90 now." Compaction (`extractCompactClause`, behind
+  every "Pause if" slot) keeps that sentence with its rule, so a compact slot still says the line
+  is met. An alert that names the crossing itself drops it (`withoutReadingsNow`).
+- **The change line** (`buildCallChangeLines`, `buildFlipThreshold`): the reading rides in the
+  move, "Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 1 pt from 49
+  to clear 50." A crossed line is stated like a met pause line.
+- **Frozen records** w38 to w41 stored the old forms; `publishedBriefs` restates them at display
+  in the new one, as it already restated retired signal names: same lines, same readings.
+
+`tests/readerClauseShapes.test.tsx` holds it: no rule, stage or change line carries a parenthesis,
+and no frozen record's update prints a stored "(already true at N)" or "(N today)". The same file
+fails reader copy on two clause shapes found in the same pass — a wh-clause stapled onto a list
+("Look up what the guidance said in any past month, and how it held up.") and one gloss printed
+twice in a sentence — across the offline pages, all 74 `/history/[period]` pages, the page
+descriptions, the navigation, every golden paste, the frozen records' updates and `/llms.txt`.
+`docs/editorial-guardrails.md` → Sentence shape has the rules.
+
 ### 1.1.1b Wayfinding and visual weight (2026-09-08)
 Every page buried its one strong graphic under text, and phones had no in-page navigation on
 pages between 2,500 and 8,000px tall. The changes, per surface:
@@ -1098,6 +1125,8 @@ front of it. Six things followed.
   reads "Funding pressure falls 13 pts to 70 or below (83 today) or risk appetite rises 10 pts to
   clear 50 (40 today)" — the inequality survives on each side (reaching 50 does not clear an
   "above 50" line), the boundary and the live reading stay for the archive and the embed.
+  (2026-10-09: the reading moved into the move, "Funding pressure falls 13 pts from 83 to 70 or
+  below, or risk appetite rises 10 pts from 40 to clear 50"; see §1.1.1c.)
 - **One fewer row above the call on a phone.** The meta row wraps instead of stacking, and the
   week title is `text-lg` below `sm`, so the title and the confidence chip share a line at 430px
   (they ran 4px over at `text-xl`); the guide's disclosure sits closer under the standfirst. The
@@ -1536,7 +1565,9 @@ On the Sep 25 read it found Stormy to Freezing at funding pressure 79 and risk a
 to Freezing at 90 and 43. The card now adds `Against this week:` (`describeAgainstToday`): the change it was
 and this week's when they differ, each score then and now with what it means (`signalReadingMeaning`), and
 "One earlier outcome, not a forecast." unless it is the same change with both scores within 5 points.
-(Reworded 2026-10-08: each score reads "was 79 then and is 90 now", not "Then, … ; now they are …".)
+(Reworded 2026-10-08: each score reads "was 79 then and is 90 now", not "Then, … ; now they are …".
+Reworded 2026-10-09: one sentence per score, and a meaning both readings share printed once —
+"Funding pressure was 79 then and is 90 now; at both readings, money is hard to raise.")
 
 **Found, not changed (decided in §1.1.51: the basis is last week's published brief).** The comparison is the previous month-end snapshot (§1.1.26), so every brief in a month
 restates the same crossing: w40 would say what w38 said. A weekly basis for the archive is the previous
@@ -2292,7 +2323,9 @@ contradicted another surface, or the reading itself.
   Every paste now leads with the do-now line, then the stance when it says more
   (`formatGuidance`, `lib/export/briefBuilders.ts`), and no "Do now" line repeats it.
 - **Rule lines.** A line the reading already meets says so — "Pause if funding pressure is above 76
-  (already true at 90)" — where every rule read as a move still to come. An area's resume distance
+  (already true at 90)" — where every rule read as a move still to come. (Since 2026-10-09 the
+  reading follows the rule as its own sentence, "… is above 76 or …. Funding pressure is 90
+  now."; §1.1.1c.) An area's resume distance
   is the line holding it back (`bindingResume`), not the nearest of its AND-ed lines ("6 pts away"
   while funding pressure was 24 away), and "Line set by" names the scores the printed lines are
   drawn on, where it was fixed per area.
@@ -3655,9 +3688,12 @@ surfaces do not reintroduce the old words.
   status ("No flip condition is tripped yet.") plus two that each repeated "flips this call",
   under slot labels that already carry that verb. Because the compaction helpers cut a phrase at
   its first period, the Slack export of a frozen brief read "Re-open when: No flip condition is
-  tripped yet." and carried no threshold at all. It now reads
-  `Funding pressure above 70 (63 today) or risk appetite at or below 50 (56 today).`
-  A boundary already crossed says "(already true at N)" and sorts first.
+  tripped yet." and carried no threshold at all. It read
+  `Funding pressure above 70 (63 today) or risk appetite at or below 50 (56 today).`, and a
+  boundary already crossed said "(already true at N)" and sorted first. Since 2026-10-09 it reads
+  `Funding pressure rises 7 pts from 63 to clear 70, or risk appetite falls 6 pts from 56 to 50 or below.`;
+  a crossed boundary still sorts first, states where the score is, and is followed by its
+  reading ("Funding pressure is 75 now.") — §1.1.1c.
 - **The Evidence page's "Safe again when" shows the resume trigger.** It rendered `flipThreshold`,
   the condition that *breaks* the call, which `/trust` correctly labels "This recommendation
   breaks if" — so the same string appeared under opposite meanings on two pages. It now reads

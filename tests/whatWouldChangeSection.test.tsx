@@ -38,7 +38,7 @@ const html = renderToStaticMarkup(
     flipProximity={[
       { axis: "tightness", sentence: "If the 1-month Treasury bill rate falls 0.15%, conditions turn Stormy." },
     ]}
-    reversalTrigger="Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 3 pts to clear 50 (47 today)."
+    reversalTrigger="Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 3 pts from 47 to clear 50."
     callChangeLines={{ tightness: 70, riskAppetite: 50 }}
     regime="SCARCITY"
   />,
@@ -74,9 +74,9 @@ describe("what would change this guidance: the pause and resume lines", () => {
     <WhatWouldChangeSection
       ladders={[{ metric: "tightness", label: "Funding pressure", value: 90, previous: 63, lines: [{ kind: "callChange", value: 70 }] }]}
       flipProximity={[]}
-      guardrail="Funding pressure is above 76 (already true at 90)"
+      guardrail="Funding pressure is above 76. Funding pressure is 90 now."
       leadResume="Funding pressure falls below 66"
-      reversalTrigger="Funding pressure falls 20 pts to 70 or below (90 today)."
+      reversalTrigger="Funding pressure falls 20 pts from 90 to 70 or below."
       callChangeLines={{ tightness: 70, riskAppetite: 50 }}
       regime="SCARCITY"
     />,

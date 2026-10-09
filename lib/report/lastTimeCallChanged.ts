@@ -103,9 +103,10 @@ const ABOUT_THE_SAME = 5;
 
 /**
  * The month that was found, set against this week: the change it was and the one this
- * week is, then each score with what it meant, then and now. The meaning rides beside
- * every number (`signalReadingMeaning`), so "7" and "43" say "avoiding risk" and
- * "selective about risk" without the reader knowing which end of the scale is which.
+ * week is, then each score with what it meant, then and now. Each score carries its
+ * meaning (`signalReadingMeaning`), once where both readings share it, so "7" and "43"
+ * say "avoiding risk" and "selective about risk" without the reader knowing which end
+ * of the scale is which.
  * `alike` is where the two are the same change with both scores about where they were;
  * anything else says it is one earlier outcome and not a forecast, because that is what
  * a reader who sees "3 months on, the scores stood here" is most likely to take it for.
@@ -117,12 +118,23 @@ export const describeAgainstToday = (record: LastTimeCallChanged): { alike: bool
     samePair
     && Math.abs(today.tightness - record.tightness.atChange) <= ABOUT_THE_SAME
     && Math.abs(today.riskAppetite - record.riskAppetite.atChange) <= ABOUT_THE_SAME;
-  const reading = (key: "tightness" | "riskAppetite", score: number) => `${score} (${signalReadingMeaning(key, score)})`;
+  /* One sentence per score, and a meaning printed once when both readings share
+     it: "Funding pressure was 79 (money is hard to raise) then and is 90 (money is
+     hard to raise) now; risk appetite was …" carried the same gloss twice in a
+     35-word sentence until 2026-10-09. */
+  const scoreSentence = (key: "tightness" | "riskAppetite", label: string, then: number, now: number) => {
+    const meaningThen = signalReadingMeaning(key, then);
+    const meaningNow = signalReadingMeaning(key, now);
+    return meaningThen === meaningNow
+      ? `${label} was ${then} then and is ${now} now; at both readings, ${meaningThen}.`
+      : `${label} was ${then} then (${meaningThen}) and is ${now} now (${meaningNow}).`;
+  };
   const sentences = [
     ...(samePair
       ? []
       : [`That change was ${changedAt.fromLabel} to ${changedAt.toLabel}; this week's is ${getRegimePublicLabel(today.from)} to ${getRegimePublicLabel(today.to)}.`]),
-    `Funding pressure was ${reading("tightness", record.tightness.atChange)} then and is ${reading("tightness", today.tightness)} now; risk appetite was ${reading("riskAppetite", record.riskAppetite.atChange)} and is ${reading("riskAppetite", today.riskAppetite)}.`,
+    scoreSentence("tightness", "Funding pressure", record.tightness.atChange, today.tightness),
+    scoreSentence("riskAppetite", "Risk appetite", record.riskAppetite.atChange, today.riskAppetite),
     ...(alike ? [] : ["One earlier outcome, not a forecast."]),
   ];
   return { alike, text: sentences.join(" ") };

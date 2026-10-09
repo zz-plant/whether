@@ -118,7 +118,7 @@ export async function buildPlanningPageModel(
   const planLinesSummary = `Start from the published pause and resume lines for ${listOf(
     planLineDefaults.map((line) => decisionAreaLabel(line.area)),
     "conjunction",
-  )}, move the ones your plan needs, and get an email the day one is crossed.`;
+  )}, then move the ones your plan needs. You get an email the day one is crossed.`;
   const financeSummary =
     financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
   /* Freshness and confidence, once, under the h1 before anything asks the
@@ -257,7 +257,7 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Rules",
             title: "Rules before you commit",
-            description: "What to stop, what to start, and what to keep limited this week.",
+            description: "The work to stop, start and keep limited this week.",
             hashAliases: ["ops-playbook-panel"],
             // The step header above states this, and PlaybookPanel carries its own header below.
             children: h(ReportSection, { variant: "split",
@@ -299,9 +299,8 @@ export async function buildPlanningPageModel(
                 // Resolve's direct answers live on Guides since 2026-10-08, grouped
                 // by decision area with this week's standing beside each.
                 h("p", { className: "text-xs leading-5 text-slate-400" },
-                  "The most common decisions each have an answer, with where it stands this week, on ",
                   h("a", { href: "/resources#answers", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Guides"),
-                  ".",
+                  " answers the most common decisions and says where each stands this week.",
                 ),
               ),
             }),

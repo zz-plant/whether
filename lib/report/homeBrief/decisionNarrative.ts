@@ -288,7 +288,7 @@ export const buildWhyItMattersLine = ({
   };
 }) => {
   if (weeklyMovement.direction === "unavailable") {
-    return "This week's move is not known — there is no previous reading to compare against — so the approval rules below stand on where the signals sit now, not on a change.";
+    return "This week's move is not known, because there is no previous reading to compare against. The approval rules below stand on where the signals sit now, not on a change.";
   }
 
   if (weeklyMovement.direction === "tightening") {

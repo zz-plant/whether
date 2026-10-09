@@ -55,7 +55,7 @@ describe("investor update snippet", () => {
     const parts = buildInvestorUpdateSnippetParts(documentFor(), history);
     assert.match(parts.conditions, /as of 2026-09-16/);
     assert.match(parts.conditions, /(unchanged since|moved to .* from .* at) the end of Aug 2026/);
-    assert.match(parts.conditions, /Over the month, funding pressure moved to \d+ of 100 \(((\+|-)?\d+ points|unchanged); money is [a-z ]+\)/);
+    assert.match(parts.conditions, /Over the month, funding pressure ((rose|fell) \d+ points? to|held at) \d+ of 100: money is [a-z ]+\. Risk appetite ((rose|fell) \d+ points? to|held at) \d+ of 100: investors [a-z ]+\./);
     // The weather word carries what it means for money, for an investor who has never seen the site.
     assert.match(parts.conditions, /\. Money is [a-z ,]+\. /);
     assert.match(parts.conditions, /Conditions are (well clear of|within reach of|close to) the line where they would change\./);
@@ -83,7 +83,7 @@ describe("investor update snippet", () => {
   it("reports no move when the archive month has no scores, and none at all with no prior month", () => {
     const assessment = evaluateRegime(treasury);
     const scoreless = buildInvestorUpdateSnippetParts(documentFor(), [{ record_date: "2026-08-31", regime: assessment.regime }]);
-    assert.match(scoreless.conditions, /Funding pressure sits at \d+ of 100 \([a-z ]+\) and risk appetite at \d+ of 100 \([a-z ]+\)\./);
+    assert.match(scoreless.conditions, /Funding pressure sits at \d+ of 100: [a-z ]+\. Risk appetite sits at \d+ of 100: [a-z ]+\./);
     assert.doesNotMatch(scoreless.conditions, /over the month/i);
 
     const first = buildInvestorUpdateSnippetParts(documentFor(), []);

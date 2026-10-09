@@ -39,8 +39,8 @@ describe("the last time conditions moved this way, against this week", () => {
     assert.equal(
       versus.text,
       "That change was Stormy to Freezing; this week's is Sunny to Freezing. "
-        + "Funding pressure was 79 (money is hard to raise) then and is 90 (money is hard to raise) now; "
-        + "risk appetite was 7 (investors are avoiding risk) and is 43 (investors are selective about risk). "
+        + "Funding pressure was 79 then and is 90 now; at both readings, money is hard to raise. "
+        + "Risk appetite was 7 then (investors are avoiding risk) and is 43 now (investors are selective about risk). "
         + "One earlier outcome, not a forecast.",
     );
   });
@@ -66,7 +66,7 @@ describe("the last time conditions moved this way, against this week", () => {
     const versus = describeAgainstToday(record);
     assert.equal(versus.alike, true);
     assert.doesNotMatch(versus.text, /That change was|not a forecast/);
-    assert.match(versus.text, /^Funding pressure was 78 \(money is hard to raise\) then and is 80 \(money is hard to raise\) now; risk appetite was 30 \(investors are avoiding risk\) and is 28 \(investors are avoiding risk\)\.$/);
+    assert.match(versus.text, /^Funding pressure was 78 then and is 80 now; at both readings, money is hard to raise\. Risk appetite was 30 then and is 28 now; at both readings, investors are avoiding risk\.$/);
   });
 
   it("says the setups differ when the pair matches and a score is far from where it was", () => {

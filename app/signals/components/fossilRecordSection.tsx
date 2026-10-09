@@ -48,7 +48,7 @@ export function FossilRecordSection({
         <p className="mt-1 max-w-3xl text-fluid-xs leading-relaxed text-slate-400">
           {fossilRecord.description}
           {isTightClimate
-            ? " With money this expensive, worth checking whether any of these still shape your budget."
+            ? " With money this expensive, it is worth checking whether any of these still shape your budget."
             : " A way to check how your company is set up against habits from low-rate and high-rate years."}
         </p>
       </div>

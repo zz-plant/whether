@@ -94,7 +94,7 @@ export const canonEssays: readonly CanonEssay[] = [
     published: { year: 2011, month: 10 },
     sourceUrl: "https://www.mindtheproduct.com/what-exactly-is-a-product-manager/",
     argument:
-      "Product management sits where business, technology and user experience overlap: experienced in one, passionate about all three, fluent with people in each.",
+      "Product management sits where business, technology and user experience overlap, and a product manager should be experienced in one, passionate about all three and fluent with people in each.",
   },
   {
     slug: "how-to-manufacture-desire",
@@ -167,7 +167,7 @@ export const canonEssays: readonly CanonEssay[] = [
     published: { year: 2016, month: 4 },
     sourceUrl: "https://blackboxofpm.substack.com/p/mvpm-minimum-viable-product-manager-e1aeb8dd421",
     argument:
-      "A syllabus of the minimum a generalist product manager needs across technology, design and business, meant to be learned rather than mastered.",
+      "A syllabus of the minimum a generalist product manager needs across technology, design and business. It is meant to be learned rather than mastered.",
   },
   {
     slug: "know-your-customers-jobs-to-be-done",
@@ -187,7 +187,7 @@ export const canonEssays: readonly CanonEssay[] = [
     published: { year: 2017, month: 6 },
     sourceUrl: "https://brianbalfour.com/essays/product-market-fit-isnt-enough",
     argument:
-      "Growing past $100M takes four fits that depend on each other (market and product, product and channel, channel and model, model and market), not product/market fit alone.",
+      "Growing past $100M takes four fits that depend on each other, not product/market fit alone: market and product, product and channel, channel and model, and model and market.",
   },
   {
     slug: "superhuman-product-market-fit-engine",
@@ -197,7 +197,7 @@ export const canonEssays: readonly CanonEssay[] = [
     published: { year: 2018, month: 11 },
     sourceUrl: "https://review.firstround.com/how-superhuman-built-an-engine-to-find-product-market-fit/",
     argument:
-      "Treat product/market fit as a number, the share of users who would be very disappointed without you, and raise it by building for the users who already love the product.",
+      "Treat product/market fit as a number: the share of users who would be very disappointed without you. Raise it by building for the users who already love the product.",
   },
   {
     slug: "the-making-of-a-manager",
@@ -206,7 +206,7 @@ export const canonEssays: readonly CanonEssay[] = [
     authors: ["Julie Zhuo"],
     published: { year: 2019, month: 3 },
     sourceUrl: "https://www.juliezhuo.com/book/manager.html",
-    argument: "A working guide for new managers: purpose, people and process, and how feedback, hiring and meetings serve them.",
+    argument: "A working guide for new managers, built on purpose, people and process. Feedback, hiring and meetings serve those three.",
   },
   {
     slug: "product-led-growth",
@@ -216,7 +216,7 @@ export const canonEssays: readonly CanonEssay[] = [
     published: { year: 2019, month: 5 },
     sourceUrl: "https://www.amazon.com/Product-Led-Growth-Build-Product-Itself/dp/1798434520",
     argument:
-      "A product can carry its own acquisition, conversion and expansion, through free trials or a free tier, instead of leaving them to a sales team.",
+      "Through free trials or a free tier, a product can carry its own acquisition, conversion and expansion instead of leaving them to a sales team.",
   },
   {
     slug: "intercom-product-management-career-ladder",
@@ -226,7 +226,7 @@ export const canonEssays: readonly CanonEssay[] = [
     published: { year: 2019, month: 6 },
     sourceUrl: "https://www.intercom.com/blog/evolving-your-product-management-career-ladder/",
     argument:
-      "Intercom published its product manager career ladder, five skill areas across levels from associate to principal, so expectations and promotion are explicit.",
+      "Intercom published its product manager career ladder so expectations and promotion are explicit. It sets five skill areas across levels from associate to principal.",
   },
   {
     slug: "shape-up",
@@ -257,7 +257,7 @@ export const canonEssays: readonly CanonEssay[] = [
     published: { year: 2020, month: 2 },
     sourceUrl: "https://www.svpg.com/product-strategy-overview/",
     argument:
-      "Product strategy is deciding which problems to solve: focus, insight from data and customers, turning insight into team objectives, and managing the result.",
+      "Product strategy is deciding which problems to solve. It means focusing, drawing insight from data and customers, turning that insight into team objectives and managing the result.",
   },
   {
     slug: "empowered",
@@ -278,7 +278,7 @@ export const canonEssays: readonly CanonEssay[] = [
     publishedNote: "The book. The opportunity solution tree it is built around was first published in 2016.",
     sourceUrl: "https://www.producttalk.org/continuous-discovery-habits/",
     argument:
-      "Talk to customers every week, and map the outcome you want to the opportunities and solutions beneath it, testing assumptions as you go.",
+      "Talk to customers every week. Map the outcome you want to the opportunities and solutions beneath it, and test assumptions as you go.",
   },
   {
     slug: "the-product-momentum-gap",
@@ -425,10 +425,12 @@ export const describeCanonBaseRate = (baseRate: CanonBaseRate): string => {
   if (Math.abs(widest.essayShare - widest.monthShare) < 0.1) {
     return `The essays fall about where the months do: no set of conditions holds a share of this list more than ten points from its share of time. ${tooFew}`;
   }
-  const direction = widest.essayShare >= widest.monthShare ? "more" : "less";
+  /* The gap leads and the two shares follow; "…of these essays, the widest gap in the
+     table: more of this list came out in Stormy months than their share of time
+     would suggest" restated the shares as a sentence (2026-10-09). */
   return (
-    `${widest.conditions} months held ${percent(widest.monthShare)} of the record and ${percent(widest.essayShare)} of these essays, `
-    + `the widest gap in the table: ${direction} of this list came out in ${widest.conditions} months than their share of time alone would suggest. `
+    `The widest gap in the table is ${widest.conditions}: those months held ${percent(widest.monthShare)} of the record `
+    + `and ${percent(widest.essayShare)} of these essays. `
     + tooFew
   );
 };

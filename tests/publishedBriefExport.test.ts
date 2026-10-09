@@ -120,7 +120,7 @@ describe("published brief stored-sentence translation", () => {
     assert.ok(w31);
     assert.equal(
       publishedBriefDisplay(w31).conditionsChangeIf,
-      "Funding pressure above 70 (52 today) or risk appetite at or below 50 (58 today).",
+      "Funding pressure rises from 52 to clear 70, or risk appetite falls from 58 to 50 or below.",
     );
   });
 
@@ -132,7 +132,7 @@ describe("published brief stored-sentence translation", () => {
       flipThreshold:
         "One flip condition is already tripped. Cash availability flips this call if it climbs above 70.0, from 52.0 today. Market risk appetite is already in the flip zone at 48.0 and only has to stay at or below 50.0.",
     }).conditionsChangeIf;
-    assert.equal(crossed, "Risk appetite at or below 50 (already true at 48) or funding pressure above 70 (52 today).");
+    assert.equal(crossed, "Risk appetite is at or below 50 or funding pressure rises from 52 to clear 70. Risk appetite is 48 now.");
     const unparsed = publishedBriefDisplay({ ...w31, flipThreshold: "Cash availability climbs above 70.0." }).conditionsChangeIf;
     assert.equal(unparsed, "Funding pressure climbs above 70.");
   });
@@ -185,7 +185,7 @@ describe("published brief date-pinned exports", () => {
     assert.doesNotMatch(slack, /freeze new commitments and keep spend flexible/, "the stored action is not a second headline");
     assert.match(slack, /This week's decision \(Guidance \/ Conditions change if\):/);
     assert.doesNotMatch(slack, /Over-engineering/);
-    assert.match(slack, /• Conditions change if: Funding pressure above 70 \(52 today\) or risk appetite at or below 50 \(58 today\)\./);
+    assert.match(slack, /• Conditions change if: Funding pressure rises from 52 to clear 70, or risk appetite falls from 58 to 50 or below\./);
     assert.doesNotMatch(slack, /flip|Cash availability|cash availability|Market risk appetite|market risk appetite|\d\.0\b(?!%)/);
 
     // Area-level bounded decisions
@@ -219,7 +219,7 @@ describe("published brief date-pinned exports", () => {
     assert.doesNotMatch(email, /freeze new commitments and keep spend flexible/, "the stored action is not a second headline");
     assert.ok(!email.includes(`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: Over-engineering`), "a stop-item is not a pause line");
     assert.ok(
-      email.includes(`• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: Funding pressure above 70 (52 today) or risk appetite at or below 50 (58 today).`),
+      email.includes(`• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: Funding pressure rises from 52 to clear 70, or risk appetite falls from 58 to 50 or below.`),
     );
 
     // Area decisions

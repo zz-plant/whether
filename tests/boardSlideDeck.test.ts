@@ -16,7 +16,7 @@ const payload: MeetingSlidePayload = {
   stageLabel: "Series A",
   actionNow: "Freeze non-revenue hires & put every commitment behind a second signoff.",
   pauseIf: "Cash gate: hold every new commitment <whatever> the macro corridor says.",
-  callChangesIf: "Funding pressure at or below 70 (83 today) changes conditions.",
+  callChangesIf: "Funding pressure falls 13 pts from 83 to 70 or below.",
   resumeWhen: "Reverse the freeze only after runway extends past nine months → then re-open.",
   tightness: 83,
   riskAppetite: 40,
@@ -90,7 +90,7 @@ describe("board slide PPTX", () => {
     assert.match(slide, /1\. ACTION NOW/);
     assert.match(slide, /2\. PAUSE IF/);
     assert.match(slide, /3\. CONDITIONS CHANGE IF/);
-    assert.match(slide, /Funding pressure at or below 70/);
+    assert.match(slide, /Funding pressure falls 13 pts from 83 to 70 or below/);
     // The stage's resume line sits beside the change line, never in its card.
     assert.match(slide, /Resume when: Reverse the freeze only after runway extends/);
     assert.match(slide, /This week's guidance \(Series A\)/);

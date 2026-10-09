@@ -20,7 +20,7 @@ import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresen
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { formatSourceFooter } from "./exportTerms";
 import { signalReadingMeaning } from "../report/signalTranslations";
-import { formatMonthYearShortFromValue, formatSignedDelta, formatThresholdNumber } from "../formatters";
+import { formatMonthYearShortFromValue, formatThresholdNumber } from "../formatters";
 import type { RunwayBand } from "../report/operatorRunway";
 
 export type InvestorUpdateSnippetParts = {
@@ -79,10 +79,13 @@ const asSentence = (clause: string) => {
   return /[.!?]$/.test(trimmed) ? trimmed : `${trimmed}.`;
 };
 
+/** The month's move as the verb of the score's sentence: "fell 18 points to", "rose 1 point to", "held at". */
 const describeMove = (current: number, previous: number | undefined) => {
   if (typeof previous !== "number") return null;
   const delta = current - previous;
-  return Math.abs(delta) < 0.5 ? "unchanged" : `${formatSignedDelta(delta)} points`;
+  if (Math.abs(delta) < 0.5) return "held at";
+  const size = Number(Math.abs(delta).toFixed(0));
+  return `${delta > 0 ? "rose" : "fell"} ${size} ${size === 1 ? "point" : "points"} to`;
 };
 
 /**
@@ -113,9 +116,13 @@ export const buildInvestorUpdateSnippetParts = (
 
   const tightnessMove = describeMove(tightness, prior?.tightness);
   const riskMove = describeMove(riskAppetite, prior?.riskAppetite);
+  /* One sentence per score, its meaning after a colon. Both scores in one sentence,
+     each with a move and a meaning in parentheses, ran 34 words (2026-10-09). */
   const scoreSentence = tightnessMove && riskMove
-    ? `Over the month, funding pressure moved to ${formatThresholdNumber(tightness)} of 100 (${tightnessMove}; ${signalReadingMeaning("tightness", tightness)}) and risk appetite to ${formatThresholdNumber(riskAppetite)} of 100 (${riskMove}; ${signalReadingMeaning("riskAppetite", riskAppetite)}).`
-    : `Funding pressure sits at ${formatThresholdNumber(tightness)} of 100 (${signalReadingMeaning("tightness", tightness)}) and risk appetite at ${formatThresholdNumber(riskAppetite)} of 100 (${signalReadingMeaning("riskAppetite", riskAppetite)}).`;
+    ? `Over the month, funding pressure ${tightnessMove} ${formatThresholdNumber(tightness)} of 100: ${signalReadingMeaning("tightness", tightness)}. `
+      + `Risk appetite ${riskMove} ${formatThresholdNumber(riskAppetite)} of 100: ${signalReadingMeaning("riskAppetite", riskAppetite)}.`
+    : `Funding pressure sits at ${formatThresholdNumber(tightness)} of 100: ${signalReadingMeaning("tightness", tightness)}. `
+      + `Risk appetite sits at ${formatThresholdNumber(riskAppetite)} of 100: ${signalReadingMeaning("riskAppetite", riskAppetite)}.`;
 
   const conditions = `${regimeSentence} ${meaningSentence} ${scoreSentence} Conditions are ${confidence}.`;
 

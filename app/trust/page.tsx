@@ -191,7 +191,7 @@ export default async function MethodPage({
           summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow select-none"
           summary={
             <>
-              <span>Limits, and what would change the guidance</span>
+              <span>Limits and the lines that change the guidance</span>
               <span aria-hidden="true" className="inline-flex rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-1.5 text-slate-400 transition group-open:rotate-180 motion-reduce:transition-none">
                 <ChevronDownIcon className="h-3.5 w-3.5" />
               </span>
@@ -214,11 +214,10 @@ export default async function MethodPage({
           the last section of the page a reader opens to check this week's reading
           it read as an appendix. One line points to it. */}
       <p className="text-sm text-slate-300">
-        How to use the pause and resume lines, with a worked example and a blank form, is on{" "}
         <Link href="/about#method" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
           About
-        </Link>
-        .
+        </Link>{" "}
+        explains how to use the pause and resume lines, with a worked example and a blank form.
       </p>
     </ReportShell>
   );

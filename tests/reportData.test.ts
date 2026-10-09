@@ -538,20 +538,22 @@ describe("buildFlipThreshold", () => {
     };
     /* The answer pages said "Trigger tighter mode if funding pressure rises
        above 70" on a Freezing week already at 90; the line out is the other way. */
-    assert.equal(buildFlipThreshold(reading, "tightness"), "Funding pressure falls 20 pts to 70 or below (90 today).");
-    assert.equal(buildFlipThreshold(reading, "riskAppetite"), "Risk appetite rises 2 pts to clear 50 (48 today).");
+    assert.equal(buildFlipThreshold(reading, "tightness"), "Funding pressure falls 20 pts from 90 to 70 or below.");
+    assert.equal(buildFlipThreshold(reading, "riskAppetite"), "Risk appetite rises 2 pts from 48 to clear 50.");
     assert.equal(
       buildFlipThreshold(reading),
-      "Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).",
+      "Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 2 pts from 48 to clear 50.",
     );
   });
 
   it("returns a future crossing for scarcity regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("SCARCITY"));
-    // One sentence, both boundaries, each carrying its live reading.
-    assert.match(flip, /^(Funding pressure|Risk appetite) .+ or (funding pressure|risk appetite) .+\.$/);
+    // One sentence, both boundaries, each carrying its live reading: in the
+    // move ("from 45"), or after the sentence for a line already crossed.
+    assert.match(flip, /^(Funding pressure|Risk appetite) .+, or (funding pressure|risk appetite) .+\.$/);
     assert.doesNotMatch(flip, /flip condition is|flips this call/i);
-    assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
+    assert.match(flip, /\bfrom \d+ to |\bis \d+ now\./);
+    assert.doesNotMatch(flip, /\(/, "no reading in parentheses");
   });
 
   it("leads each boundary with the distance to it, in the direction it trips", () => {
@@ -560,31 +562,37 @@ describe("buildFlipThreshold", () => {
     // The reader gets the subtraction done, and the inequality survives: a
     // score *at* 50 does not clear an "above 50" line, so that side says so.
     const flip = buildFlipThreshold(makeAssessment("SCARCITY"));
-    assert.match(flip, /Funding pressure falls 6 pts to 70 or below \(76 today\)/);
-    assert.match(flip, /risk appetite rises 5 pts to clear 50 \(45 today\)/);
+    assert.match(flip, /Funding pressure falls 6 pts from 76 to 70 or below/);
+    assert.match(flip, /risk appetite rises 5 pts from 45 to clear 50/);
   });
 
   it("returns a future crossing for defensive regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("DEFENSIVE"));
-    // One sentence, both boundaries, each carrying its live reading.
-    assert.match(flip, /^(Funding pressure|Risk appetite) .+ or (funding pressure|risk appetite) .+\.$/);
+    // One sentence, both boundaries, each carrying its live reading: in the
+    // move ("from 45"), or after the sentence for a line already crossed.
+    assert.match(flip, /^(Funding pressure|Risk appetite) .+, or (funding pressure|risk appetite) .+\.$/);
     assert.doesNotMatch(flip, /flip condition is|flips this call/i);
-    assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
+    assert.match(flip, /\bfrom \d+ to |\bis \d+ now\./);
+    assert.doesNotMatch(flip, /\(/, "no reading in parentheses");
   });
 
   it("returns a future crossing for volatile regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("VOLATILE"));
-    // One sentence, both boundaries, each carrying its live reading.
-    assert.match(flip, /^(Funding pressure|Risk appetite) .+ or (funding pressure|risk appetite) .+\.$/);
+    // One sentence, both boundaries, each carrying its live reading: in the
+    // move ("from 45"), or after the sentence for a line already crossed.
+    assert.match(flip, /^(Funding pressure|Risk appetite) .+, or (funding pressure|risk appetite) .+\.$/);
     assert.doesNotMatch(flip, /flip condition is|flips this call/i);
-    assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
+    assert.match(flip, /\bfrom \d+ to |\bis \d+ now\./);
+    assert.doesNotMatch(flip, /\(/, "no reading in parentheses");
   });
 
   it("returns a future crossing for expansion regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("EXPANSION"));
-    // One sentence, both boundaries, each carrying its live reading.
-    assert.match(flip, /^(Funding pressure|Risk appetite) .+ or (funding pressure|risk appetite) .+\.$/);
+    // One sentence, both boundaries, each carrying its live reading: in the
+    // move ("from 45"), or after the sentence for a line already crossed.
+    assert.match(flip, /^(Funding pressure|Risk appetite) .+, or (funding pressure|risk appetite) .+\.$/);
     assert.doesNotMatch(flip, /flip condition is|flips this call/i);
-    assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
+    assert.match(flip, /\bfrom \d+ to |\bis \d+ now\./);
+    assert.doesNotMatch(flip, /\(/, "no reading in parentheses");
   });
 });

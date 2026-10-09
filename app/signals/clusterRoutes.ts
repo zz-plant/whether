@@ -22,7 +22,7 @@ const signalClusterDefinitions: SignalClusterDefinition[] = [
     slug: "capital-tightness-watch",
     title: "Funding pressure watch",
     summary: "How hard money is to raise this week, before you commit to anything with a long payback.",
-    evidence: "Short-term Treasury rates, and how far funding pressure sits from the line where conditions change.",
+    evidence: "Short-term Treasury rates and funding pressure's distance from the line where conditions change.",
     evidenceKeys: ["tightness", "baseRate"],
     isIndexable: hasYield(snapshotData.yields.threeMonth) && hasYield(snapshotData.yields.tenYear),
   },

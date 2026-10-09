@@ -129,7 +129,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
     `Conditions change when funding pressure crosses ${thresholds.tightness} or risk appetite crosses ${thresholds.riskAppetite}.`,
     describePhaseGap(gaps.tightness),
     describePhaseGap(gaps.riskAppetite),
-    `The plotted path covers ${model.points.length} months, from ${oldest.monthLabel} to ${current.monthLabel}, and crosses a boundary ${model.changes.length} times.`,
+    `The plotted path covers ${model.points.length} months, from ${oldest.monthLabel} to ${current.monthLabel}, and crosses a change line ${model.changes.length} times.`,
   ].join(" ");
 
   return (
@@ -518,7 +518,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               </ul>
               <p className="mt-2 text-fluid-nano text-slate-500">
                 {model.offQuadrantMonths === 0
-                  ? "The conditions each month published, which here is also the quadrant every dot sits in."
+                  ? "The conditions each month published. Here they also match the quadrant every dot sits in."
                   : `The conditions each month published, not the quadrant its dot sits in: the two differ in ${model.offQuadrantMonths.toLocaleString("en-US")} of these ${model.points.length.toLocaleString("en-US")} months.`}
               </p>
             </div>

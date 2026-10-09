@@ -16,7 +16,7 @@ import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
-import { formatMarginBand, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
+import { formatMarginBand, formatDecisionReversal, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
@@ -225,13 +225,48 @@ const RETIRED_SIGNAL_PHRASES: ReadonlyArray<readonly [RegExp, string]> = [
 /* "70.0" was precision the scores never had (`formatThresholdNumber`). A rate keeps its decimal: "0.0%" is a curve value. */
 const WHOLE_POINT_DECIMAL = /\b(\d+)\.0\b(?!%)/g;
 
-/** A stored rule sentence in today's signal names and whole points. A sentence that needs neither passes through. */
+/*
+ * The readings the records w38 to w41 were frozen with, restated the way the
+ * builders print them since 2026-10-09: same lines, same readings, no
+ * parentheses. A change line's reading moves into its clause ("Funding pressure
+ * falls 20 pts to 70 or below (90 today)" reads "Funding pressure falls 20 pts
+ * from 90 to 70 or below"), and a line the reading already met states where the
+ * score was, with the reading after the sentence ("Funding pressure is above 76
+ * (already true at 90) or …" reads "Funding pressure is above 76 or …. Funding
+ * pressure is 90 now.").
+ */
+const STORED_SCORE = "(funding pressure|risk appetite)";
+const STORED_CHANGE_WITH_DISTANCE = new RegExp(`\\b${STORED_SCORE} (falls|rises) (\\d+) (pts?) (to \\d+ or below|to clear \\d+) \\((\\d+) today\\)`, "gi");
+const STORED_CHANGE_BOUNDARY = new RegExp(`\\b${STORED_SCORE} (above|at or below) (\\d+) \\((\\d+) today\\)`, "gi");
+const STORED_CHANGE_JOIN = new RegExp(` (or below|to clear \\d+) or ${STORED_SCORE}\\b`, "gi");
+const STORED_MET_LINE = new RegExp(`\\b${STORED_SCORE} (is (?:at or )?(?:above|below)|above|at or below) (\\d+) \\(already true at (\\d+)\\)`, "gi");
+
+const restateStoredReadings = (text: string): string => {
+  const readings: Array<{ label: string; value: string }> = [];
+  const restated = text
+    .replace(STORED_CHANGE_WITH_DISTANCE, (_match, score: string, verb: string, distance: string, unit: string, target: string, now: string) =>
+      `${score} ${verb} ${distance} ${unit} from ${now} ${target}`)
+    .replace(STORED_CHANGE_BOUNDARY, (_match, score: string, side: string, line: string, now: string) =>
+      side.toLowerCase() === "above" ? `${score} rises from ${now} to clear ${line}` : `${score} falls from ${now} to ${line} or below`)
+    .replace(STORED_CHANGE_JOIN, (_match, end: string, score: string) => ` ${end}, or ${score}`)
+    .replace(STORED_MET_LINE, (_match, score: string, state: string, line: string, now: string) => {
+      readings.push({ label: score, value: now });
+      return `${score} ${state.startsWith("is ") ? state : `is ${state}`} ${line}`;
+    });
+  if (readings.length === 0) return restated;
+  const sentence = formatReadingsNow(readings);
+  return restated.endsWith(".") ? `${restated} ${sentence}` : `${restated}. ${sentence}`;
+};
+
+/** A stored rule sentence in today's signal names, whole points and reading form. A sentence that needs none of them passes through. */
 const translateStoredSentence = (text: string) =>
-  RETIRED_SIGNAL_PHRASES.reduce(
-    (sentence, [pattern, replacement]) =>
-      sentence.replace(pattern, (match) => (match.charAt(0) === match.charAt(0).toUpperCase() ? upperFirst(replacement) : replacement)),
-    text,
-  ).replace(WHOLE_POINT_DECIMAL, "$1");
+  restateStoredReadings(
+    RETIRED_SIGNAL_PHRASES.reduce(
+      (sentence, [pattern, replacement]) =>
+        sentence.replace(pattern, (match) => (match.charAt(0) === match.charAt(0).toUpperCase() ? upperFirst(replacement) : replacement)),
+      text,
+    ).replace(WHOLE_POINT_DECIMAL, "$1"),
+  );
 
 /*
  * The change line as the first record froze it: a status, then one sentence
@@ -272,6 +307,12 @@ const translateRetiredFlipLine = (text: string): string | null => {
   if (conditions.length === 0) return null;
   const ordered = [...conditions].sort((left, right) => Number(right.tripped) - Number(left.tripped));
   return `${ordered.map((condition, index) => (index === 0 ? upperFirst(condition.text) : lowerFirst(condition.text))).join(" or ")}.`;
+};
+
+/** The first record's change line, in the w38 form and then in today's reading form. */
+const restateRetiredFlipLine = (text: string): string | null => {
+  const restated = translateRetiredFlipLine(text);
+  return restated === null ? null : restateStoredReadings(restated);
 };
 
 /*
@@ -346,7 +387,7 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
        pause slot as though it were a trigger. A pause line is a score against a
        number; with no number in it there is no line, and the slot is left out. */
     pauseIf: /\d/.test(brief.guardrailThreshold) ? translateStoredSentence(brief.guardrailThreshold) : null,
-    conditionsChangeIf: translateRetiredFlipLine(brief.flipThreshold) ?? translateStoredSentence(brief.flipThreshold),
+    conditionsChangeIf: restateRetiredFlipLine(brief.flipThreshold) ?? translateStoredSentence(brief.flipThreshold),
     whatChanged: displayWhatChanged(brief, comparison),
     /** The earlier reading, as `buildScoreReferenceLines` takes it; null where the record can name none. */
     previous: comparison ? { ...comparison.previous, comparedWith: comparison.comparedWith } : null,

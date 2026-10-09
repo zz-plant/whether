@@ -64,9 +64,9 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
       <p className="text-sm text-slate-200">
         Across {totals.months} month-to-month comparisons, conditions were the same the following
         month {totals.held} times, or {percentFormat(baseRate)}. Every band below held more often
-        than the percent published for it, and the two closest bands run in the wrong order — so
-        the margin is a distance, not a probability. It says how much room there is before the line
-        where conditions change; the count beside it says how often that room mattered.
+        than the percent published for it, and the two closest bands run in the wrong order. The
+        margin is therefore a distance, not a probability. It says how much room there is before the
+        line where conditions change; the count beside it says how often that room mattered.
       </p>
 
       <table className="w-full text-sm text-slate-200">
@@ -123,8 +123,8 @@ function RecentYearParagraph() {
   if (drift.status === "stable") {
     return (
       <p className="text-sm text-slate-200">
-        And the finding is current, not just archival: across the most recent twelve month-end
-        readings, every band with a comparison still held more often than the percent said —{" "}
+        The finding holds in the recent year too. Across the most recent twelve month-end readings,
+        every band with a comparison still held more often than the percent said:{" "}
         {listClauses(drift.bands.map(clause))}.
       </p>
     );
@@ -133,7 +133,7 @@ function RecentYearParagraph() {
   return (
     <p className="text-sm text-slate-200">
       The most recent twelve month-end readings break the pattern above:{" "}
-      {listClauses(drift.bands.filter((band) => !band.percentUnderstates).map(clause))} — the
+      {listClauses(drift.bands.filter((band) => !band.percentUnderstates).map(clause))}. The
       finding describes the archive, not this year.
     </p>
   );

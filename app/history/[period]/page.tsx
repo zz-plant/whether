@@ -387,11 +387,11 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
             ))}
           </ul>
           <p className="text-xs text-slate-400">
-            From the{" "}
+            These come from the{" "}
             <Link href="/concepts" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
               product management reading list
             </Link>
-            , where each is placed on the conditions of the month it came out.
+            . It places each title on the conditions of the month it came out.
           </p>
         </section>
       ) : null}

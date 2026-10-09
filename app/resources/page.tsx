@@ -31,7 +31,7 @@ import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRout
 export const metadata: Metadata = buildPageMetadata({
   title: "Guides",
   description:
-    "Long-form guides behind the weekly guidance — capital discipline, board-level capital posture, reversibility as governance — and the most-asked decision guides.",
+    "The most-asked decision guides, and long-form guides on capital discipline, board-level capital posture and reversibility as governance.",
   path: "/resources",
   imageAlt: "Whether guides",
 });
@@ -126,8 +126,8 @@ export default async function ResourcesHubPage({
             {/* No "evergreen" claim: the answers listed here carry this week's
                 standing, so the page is not free of week-to-week change. */}
             <p className="text-sm text-slate-300">
-              Answers to the decisions operators ask about most, each with where it stands this week, and the
-              long-form guides and frameworks behind the weekly operating guidance.
+              Answers to the decisions operators ask about most, each marked with where it stands this week.
+              Below them are the long-form guides and frameworks behind the weekly operating guidance.
             </p>
           </div>
         </header>
