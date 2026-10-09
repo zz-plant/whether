@@ -9,7 +9,7 @@ import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
 import { buildCanonicalBoundedDecisionRules, formatBoundedDecisionTriplet } from "../report/boundedDecisionRules";
 import { getRegimeContext, projectRegimeFromPace } from "../report/regimeContext";
 import { buildUseConstraint } from "../report/useConstraint";
-import { fetchSaaSValuations } from "../saasMultiples";
+import { fetchSaaSValuations, SAAS_BASKET } from "../saasMultiples";
 import { getTimeMachineMonthsByYear } from "../timeMachine/timeMachineCache";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
 import { createAgentToolRegistry, defineTool } from "./registry";
@@ -163,7 +163,7 @@ const AGENT_TOOLS = [
   defineTool({
     name: "get_comps",
     title: "Get SaaS valuation comps",
-    description: "Median SaaS EV/Revenue multiple from 15 public companies, from live quotes. Fails with the source's reason when the quotes are unreachable.",
+    description: `Median SaaS EV/Revenue multiple across ${SAAS_BASKET.length} public companies, from SEC filings and delayed prices, or Yahoo Finance when those are down; the result names its source. Fails with each source's reason when none answers.`,
     openWorld: true,
     input: {},
     example: {},

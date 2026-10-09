@@ -40,20 +40,50 @@ what a month's call was made on.
 
 ## Market data provider
 
-`lib/saasMultiples.ts` computes the SaaS comps median through one seam. Without a key it reads
-Yahoo Finance's unofficial quote endpoint, which rate-limits and blocks without notice. With
-`ALPHA_VANTAGE_API_KEY` it reads Alpha Vantage's documented OVERVIEW endpoint, which reports
-EV/Revenue and revenue growth directly; the snapshot's `source` field says which one answered.
-The per-company detail route keeps Yahoo either way, because OVERVIEW carries no balance sheet.
+`lib/saasMultiples.ts` computes the SaaS comps median (`/comps`, `/api/comps`, the `get_comps` tool)
+from a chain of providers, each behind a small client in `lib/marketData/`. The first to read at
+least half the basket answers, and the snapshot's `source` names it; that is the provider the page's
+"As of [date], from [source]" line credits.
 
-**The keyless path is refused outright, not throttled (checked 2026-10-08).** Yahoo's `quoteSummary`
-answers 429 "Edge: Too Many Requests" to a request with no browser user agent and 401 "Invalid Crumb"
-to one with it: it wants a cookie and crumb pair. So every ticker comes back unavailable,
-`fetchSaaSValuations` throws `QuoteSourceUnavailableError`, `/api/comps` answers its documented 503
-(`{"error":"quote_source_unavailable","detail":"quote source returned 429"}` in production), and
-`/comps` shows the outage notice and no figures. Setting the key is the fix, but not by itself: the
-free tier allows 5 requests a minute and 25 a day (`docs/research/2026-09-03-alternative-data-endpoints.md`),
-and the basket sends 15 at once on every uncached render.
+1. **Alpha Vantage** (`ALPHA_VANTAGE_API_KEY` set). OVERVIEW reports EV/Revenue and growth directly,
+   but the free tier allows 5 requests a minute and 25 a day
+   (`docs/research/2026-09-03-alternative-data-endpoints.md`), so it refuses most of a basket fetched
+   at once and hands over to EDGAR. Unset in production.
+2. **SEC EDGAR filings and Cboe delayed prices** (`sec-cboe`, the default). `secEdgar.ts` reads each
+   company's XBRL company facts (`data.sec.gov/api/xbrl/companyfacts/CIK##########.json`, with a
+   User-Agent naming the site and a contact, as SEC's fair-access policy asks) and derives trailing
+   four-quarter revenue, latest-quarter growth year on year, cash with short-term investments, debt
+   (convertible notes included, leases not) and shares outstanding. A fiscal fourth quarter is the
+   10-K's year less its three quarters; a company whose latest quarter is more than 200 days old has
+   stopped filing and reads as missing. `cboe.ts` prices each company from Cboe's public
+   delayed-quote file (`cdn.cboe.com/api/global/delayed_quotes/quotes/<SYMBOL>.json`), no key.
+   EV/Revenue is (price × shares + debt − cash) / trailing revenue. Checked against Yahoo's own
+   figures on 2026-10-09: revenue, growth and cash matched for all fourteen companies, and the basket
+   median was 8.9x on both.
+3. **Yahoo Finance** (`yahoo.ts`). quoteSummary now answers 429 to a request without a browser user
+   agent and 401 "Invalid Crumb" without a session, so the client mints one — the cookie
+   `fc.yahoo.com` sets, then a crumb from `query2.finance.yahoo.com/v1/test/getcrumb` — caches it in
+   KV for twelve hours, and on a 401 mints one fresh session and retries only the refused symbols.
+   Market cap is Yahoo's `marketCap`, which covers every share class; `sharesOutstanding` counts one,
+   which understated Atlassian by a third.
+
+When no provider answers, `fetchSaaSValuations` throws `QuoteSourceUnavailableError` with each
+provider's reason and `/api/comps` answers its documented 503. A provider that knows none of the
+companies counts as down, not as an empty basket.
+
+**Caches, all in `WHETHER_DURABLE_KV`.** The basket snapshot for an hour (`comps:basket:v1`), so the
+page, the API and the tool share one upstream read; each company's derived filing figures for twelve
+hours (`comps:sec:v1:<cik>`), not the multi-megabyte filing; the Yahoo session for twelve hours.
+A refusal is never cached.
+
+**Why not Yahoo first, and why not Stooq (checked 2026-10-09).** From a remote Worker session on
+Cloudflare's network, EDGAR, Cboe and Yahoo's cookie-and-crumb flow all answered for the whole
+basket; from a residential connection Yahoo refused the crumb itself with 429. Yahoo is unofficial
+and blocks by address without notice, so it is the fallback. Stooq's CSV quote endpoint answers 404
+and its history download now serves a JavaScript proof-of-work page, so it is not a source.
+
+**The basket lost Confluent.** IBM's acquisition closed and Confluent deregistered (Form 15, March
+2026); no provider had a quote for it, and the page was listing a company that no longer trades.
 
 ## Ingest coordinator (trial)
 

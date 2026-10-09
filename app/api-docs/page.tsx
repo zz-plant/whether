@@ -7,6 +7,7 @@ import { describeAgentTools } from "../../lib/agent/tools";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildApiDocsStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildPageMetadata } from "../../lib/seo";
+import { SAAS_BASKET } from "../../lib/saasMultiples";
 
 /* Through the shared builder, for the reason /share records: without its own
    `openGraph` this page previewed as the homepage when its link was shared. */
@@ -136,7 +137,7 @@ export default function ApiDocsPage() {
               Scenario modeling for agents.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_comps">
-              Median SaaS EV/Revenue multiple from 15 public companies.
+              Median SaaS EV/Revenue multiple across {SAAS_BASKET.length} public companies.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_signals">
               Coverage map of which months have signal history available.
@@ -226,8 +227,8 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_comps"
             >
-              SaaS valuation multiples with the company set behind them. Returns 503 when the quote
-              source is unreachable rather than an empty basket.
+              SaaS valuation multiples, with the source that answered. Returns 503 when no market
+              data source answers, rather than an empty basket.
             </Endpoint>
             <Endpoint
               signature="GET /api/regime-alerts"

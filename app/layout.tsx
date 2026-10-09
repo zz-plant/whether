@@ -193,7 +193,6 @@ export default function RootLayout({
             all below the fold; it loads when the stylesheet first asks for it. */}
         <link rel="preload" href="/fonts/archivo-variable.55ade54a.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
-        <link rel="dns-prefetch" href="https://query1.finance.yahoo.com" />
         <link rel="prefetch" href="/operate" />
         <link rel="prefetch" href="/signals" />
         {/* No `hrefLang="x-default"` here. It lived in the layout, so every page

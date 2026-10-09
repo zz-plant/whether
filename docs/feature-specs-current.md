@@ -2588,10 +2588,11 @@ need…", and eleven answers ending in "(Live operator answer)", which no one se
   page with no date gets no marker.
 - **`/comps`** is "SaaS Valuation Multiples, October 2026", the month from the basket's `fetchedAt`.
   The heading carries the same month and the figures an "As of" line with that date and the source
-  that answered (`MARKET_DATA_PROVIDER_LABELS`; the page said "Yahoo Finance" whichever did). With no
-  basket the title is "SaaS Valuation Multiples: Public SaaS EV/Revenue" and no month appears.
-  Production served no basket when checked on 2026-10-08 (see `docs/agents/data-and-platform.md` →
-  Market data provider), so the month shows once a quote source answers.
+  that answered (`MARKET_DATA_PROVIDER_LABELS`; the page said "Yahoo Finance" whichever did): "SEC
+  EDGAR filings and Cboe delayed prices" by default, "Yahoo Finance" when the fallback answered. With
+  no basket the title is "SaaS Valuation Multiples: Public SaaS EV/Revenue" and no month appears.
+  Production served no basket from 2026-10-08, when Yahoo began requiring a cookie and crumb; EDGAR
+  replaced it as the default source (`docs/agents/data-and-platform.md` → Market data provider).
 - **Answers** end in "(updated Oct 2026)", the month of the reading they state
   (`reportData.treasury.record_date`).
 - **Guides** end in "(updated …)" from their own `updatedAt` and print it under the heading, so the
@@ -3288,6 +3289,10 @@ $$
 
 ### 6.1 Data APIs
 - `GET /api/treasury` — normalized Treasury yield data with fallback support.
+- `GET /api/comps` — the SaaS basket's median EV/Revenue and revenue growth, its company count, the
+  read's `fetchedAt` and the `source` that answered (`sec-cboe`, `yahoo` or `alpha-vantage`). Cached
+  in KV for an hour. 503 `quote_source_unavailable`, with every provider's reason in `detail`, when
+  none answers.
 
 ### 6.2 Summary APIs
 - `GET /api/weekly` — weekly summary payload with structured sections, copy text, and provenance.

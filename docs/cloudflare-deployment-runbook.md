@@ -101,7 +101,7 @@ the Slack signing secret gates one webhook route.
 | Secret | Read by | Without it |
 | --- | --- | --- |
 | `FRED_API_KEY` | `lib/fred.ts` (`fetchFredRows`) | FRED reads stay on the chart-export CSV. A vintage request (`asOf`) throws instead of returning today's revision. |
-| `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median stays on Yahoo's unofficial endpoint. |
+| `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median reads SEC EDGAR filings priced with Cboe's delayed quotes, falling back to Yahoo Finance. Neither needs a key. |
 | `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly rather than skipping: the regime-history one at its PR step, the freeze at its first line, before it spends a live read. Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token: contents and pull requests, write, on this repository only. |
 | `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
 | `SLACK_WEBHOOK_URL` | `lib/delivery/slack.ts` (`slackChannel.listTargets`), for the Monday brief, both crons' `check-regime-change` alerts and the month-end pulse | The operator's own channel is not a target. Every post still goes to the channels subscribed through the form (the per-team webhook registry), and the three tripwire alerts — a regime change, a flip window narrowing, and (since 2026-09-17) a flash, an outsized move in the short rate or the curve since the previous read — are still recorded in the step's result and still reach alert subscribers by email through `alert-deliveries`. |
@@ -109,8 +109,9 @@ the Slack signing secret gates one webhook route.
 | `CLOUDFLARE_ANALYTICS_READ_TOKEN` | `lib/telemetry/runHistory.ts` (`loadCronRunHistory`), from `app/trust/trustPageModel.ts` | `/trust` renders no "Scheduled runs" section. With it, the page reads the `cron-step` stream back through the Analytics Engine SQL API and shows runs, failures, and last success per scheduled step for the trailing 30 days, cached 15 minutes per isolate under a 2.5s deadline. Token permission: Account Analytics: Read. |
 | `CLOUDFLARE_BROWSER_RENDERING_TOKEN` | `lib/export/briefScreenshot.ts` (`captureAndStoreBriefScreenshot`), from the Monday cron | The `artifact/brief-screenshot` cron step reports `skipped_unconfigured` and the Slack brief goes out as text blocks. With it, the cron captures the weekly-call block at `/?screenshot=1` through the Browser Rendering screenshot endpoint, stores the PNG in KV under the record date for 60 days, and the Slack post carries it as an image block served from `/api/image/brief-screenshot?date=YYYY-MM-DD`. Token permission: Browser Rendering: Edit. One capture a week sits well inside the free plan's ten minutes of browser time a day. |
 
-The FRED key is free and allows 120 requests a minute; Alpha Vantage's free tier allows 25 a day,
-which the fifteen-symbol basket fits once a day (`next: { revalidate: 86400 }`).
+The FRED key is free and allows 120 requests a minute. Alpha Vantage's free tier allows 25 requests
+a day and 5 a minute: each symbol is fetched at most once a day (`next: { revalidate: 86400 }`), but
+a basket fetched at once still exceeds the per-minute limit, and the comps then fall through to EDGAR.
 
 ## Browser notifications (VAPID keys)
 

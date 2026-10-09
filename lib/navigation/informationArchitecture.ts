@@ -148,7 +148,7 @@ export const utilityLinks = [
   {
     href: "/comps",
     label: "SaaS Multiples",
-    description: "Median EV/Revenue multiples across 15 public SaaS comps",
+    description: "Median EV/Revenue multiple across a basket of public SaaS companies",
   },
   {
     href: "/history/compare",

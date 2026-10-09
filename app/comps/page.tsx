@@ -149,8 +149,8 @@ export default async function CompsPage() {
           </div>
         ) : comps.status === "source-down" ? (
           <p className="text-sm text-slate-400">
-            Yahoo Finance is not serving quotes to us right now, so there are no multiples to show.
-            This is an upstream outage, not a reading of zero — the basket is unchanged.
+            None of our market data sources is answering right now, so there are no multiples to show.
+            The figures are missing, not zero; the basket is unchanged.
           </p>
         ) : (
           <p className="text-sm text-slate-400">Unable to load data. Please try again later.</p>
