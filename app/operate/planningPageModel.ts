@@ -338,28 +338,25 @@ export async function buildPlanningPageModel(
           },
         ],
       }),
-      /* Boxed like the steps above it. It used to carry `weather-panel`, whose
-         padding the report row zeroes for an unboxed section, so its border sat
-         against its own text; and a `weather-surface` slab inside it said "No
-         warning this week" in a box heavier than the section holding it. A week
-         with no warning is one line now, and "Recheck the rules" waits for a
-         warning to recheck them against. */
-      h("section", { id: "ops-failure-patterns", className: "mt-6 space-y-3 rounded-xl border border-[var(--border-subtle)] bg-slate-950/[0.05] p-4 sm:p-5", "aria-labelledby": "ops-failure-patterns-title" },
+      /* Unboxed, like the steps above it, and set apart by the same rule
+         (2026-10-09). It was a bordered card with a "Risk checks" label over a
+         heading that says what the section holds, and each warning was a box of
+         its own with an amber edge inside it: the heading already says they are
+         warnings. A week with no warning is one line, and "Recheck the rules"
+         waits for a warning to recheck them against. */
+      h("section", { id: "ops-failure-patterns", className: "space-y-3 border-t border-[color:var(--border-default)] pt-8", "aria-labelledby": "ops-failure-patterns-title" },
         h("div", { className: "space-y-1" },
-          h("p", { className: "type-eyebrow type-eyebrow-section" }, "Risk checks"),
-          h("h2", { id: "ops-failure-patterns-title", className: "text-lg font-semibold text-slate-100" }, "Warnings to read before you approve"),
+          h("h2", { id: "ops-failure-patterns-title", className: "text-xl font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings to read before you approve"),
           failureModes.length > 0
             ? h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and how to check it.")
             : null,
         ),
         failureModes.length === 0
           ? h("p", { className: "text-sm text-slate-200" }, "No warning this week. Keep the rules above; look again if the data goes stale or a score nears its change line.")
-          /* Rule segments inside the section, like the Stop and Start lists: the
-             data tier, no lift of their own (§XIII, §XIV). */
-          : h("ul", { className: "grid gap-3 lg:grid-cols-2" },
-            failureModes.map((warning) => h("li", { key: warning.id, className: "rounded-md border border-l-4 border-amber-500/25 border-l-amber-400/70 p-4" },
+          : h("ul", { className: "grid gap-x-8 gap-y-4 lg:grid-cols-2" },
+            failureModes.map((warning) => h("li", { key: warning.id },
               h("p", { className: "text-sm font-semibold text-slate-100" }, warning.warning),
-              h("p", { className: "mt-2 text-sm text-slate-300" }, warning.mitigationCheck),
+              h("p", { className: "mt-1 text-sm text-slate-300" }, warning.mitigationCheck),
             )),
           ),
         h("div", { className: "flex flex-wrap gap-2" },

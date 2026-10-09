@@ -102,15 +102,17 @@ describe("/operate opening", () => {
  * The two blocks after the steps. Both carried `weather-panel`, whose padding
  * the report row zeroes for an unboxed section, so each drew a border against
  * its own text; the resources disclosure read "Resource templates and guides"
- * and nothing else.
+ * and nothing else. Since 2026-10-09 the warnings are unboxed, set off from the
+ * steps by the same rule that separates them, with no kicker over the heading.
  */
 describe("/operate tail", () => {
-  it("frames Risk checks with its own padding and draws a quiet week as one line", async () => {
+  it("sets the warnings off with a rule, not a card, and draws a quiet week as one line", async () => {
     const { children } = await buildPlanningPageModel();
     const section = elementsIn(children).find((element) => element.props.id === "ops-failure-patterns");
     assert.ok(section, "the risk checks section renders");
-    assert.doesNotMatch(section.props.className ?? "", /\bweather-panel\b/);
-    assert.match(section.props.className ?? "", /\bp-4\b/);
+    assert.doesNotMatch(section.props.className ?? "", /\bweather-panel\b|\brounded|\bp-4\b/);
+    assert.match(section.props.className ?? "", /\bborder-t\b/);
+    assert.ok(!elementsIn(section.props.children).some((element) => /type-eyebrow/.test(element.props.className ?? "")), "no kicker over the heading");
     const text = textIn(section.props.children);
     if (text.includes("No warning this week")) {
       // Nothing to recheck the rules against, and no slab around the sentence.

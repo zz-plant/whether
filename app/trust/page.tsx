@@ -63,9 +63,11 @@ export default async function MethodPage({
         title="Margin and reliability limits"
         description="How reliable the brief is, what should pause it, and what would force a change."
       >
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">What to watch</p>
+        {/* Two columns under their own headings, not two cards inside the
+            section (2026-10-09); the warnings below are set the same way. */}
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8">
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-slate-100">What to watch</h3>
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
@@ -77,16 +79,16 @@ export default async function MethodPage({
                 <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatDecisionReversal(reportData.actionStripItems[0].reversalCondition)}</li>
               ) : null}
             </ul>
-          </article>
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Escalation rule</p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-slate-100">Escalation rule</h3>
             <p className="text-sm text-slate-200">
               If a warning below is active, check the source dates before going ahead.
             </p>
             {/* No buttons to #source-board and #revisit-call (2026-10-09): the page's
                 index names both sections, and "Check source dates" closes the
                 section below. */}
-          </article>
+          </div>
         </div>
       </ReportSection>
 
@@ -104,34 +106,34 @@ export default async function MethodPage({
       </ReportSection>
 
       <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Active warnings</p>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-8">
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-slate-100">Active warnings</h3>
             {warnings.length === 0 ? (
               <p className="text-sm text-slate-300">No warning is active. Act on the guidance; the pause line still applies.</p>
             ) : (
-              <ul className="space-y-3 text-sm text-slate-200">
+              <ul className="space-y-4 text-sm text-slate-200">
                 {warnings.map((warning) => (
-                  <li key={warning.id} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                  <li key={warning.id}>
                     <p className="font-semibold text-slate-100">{warning.warning}</p>
                     <p className="mt-1 text-slate-300">{warning.mitigationCheck}</p>
                   </li>
                 ))}
               </ul>
             )}
-          </article>
-          <article className="weather-hub-card px-4 py-4">
-            <p className="type-eyebrow">Revisit checklist</p>
-            <ul className="mt-3 space-y-3 text-sm text-slate-200">
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-slate-100">Revisit checklist</h3>
+            <ul className="space-y-4 text-sm text-slate-200">
               {revisitBullets.map((item) => (
-                <li key={item.label} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
-                  <p className="type-eyebrow">{item.label}</p>
+                <li key={item.label}>
+                  <p className="font-semibold text-slate-100">{item.label}</p>
                   {item.detail ? <p className="mt-1">{item.detail}</p> : null}
-                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">{item.linkLabel} →</Link>
+                  <Link href={item.href} className="inline-flex min-h-[44px] items-center text-sm font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">{item.linkLabel} →</Link>
                 </li>
               ))}
             </ul>
-          </article>
+          </div>
         </div>
       </ReportSection>
 
@@ -202,7 +204,10 @@ export default async function MethodPage({
           </div>
         </UrlDetails>
       ) : (
-        secondaryContent
+        /* The same spacing as inside the fold: three sections in one row had
+           none between them, which the cards around their contents used to
+           hide (2026-10-09). */
+        <div className="space-y-10">{secondaryContent}</div>
       )}
 
       {/* The citation and the meeting snippet are /share formats now, with every
