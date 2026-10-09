@@ -4,6 +4,7 @@ import { buildPageMetadata } from "../../../lib/seo";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 
 type DownloadableResourceMetadataConfig = {
   title: string;
@@ -87,11 +88,7 @@ export function DownloadableResourcePage({ config }: { config: DownloadableResou
       data-resource-path={config.metadata.path}
     >
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Guides", href: "/resources" },
-          { label: config.metadata.title },
-        ]}
+        items={toVisibleBreadcrumbs(buildGroupBreadcrumbs("/resources", [{ name: config.metadata.title, path: "/resources" }]))}
       />
       <section
         className={`weather-panel space-y-3 px-6 py-6 ${printModeClassNames.heroPanel}`.trim()}

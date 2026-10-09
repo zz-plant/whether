@@ -17,6 +17,7 @@ import { CopyAnchorButton } from "./copyAnchorButton";
 import { isIndexableResourceArticleSlug, noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { ActionLink } from "../../components/ui/actionLink";
@@ -176,11 +177,9 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
         <div className="space-y-6 print:text-black">
           <Breadcrumbs
             className="print:hidden"
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Guides", href: "/resources" },
-              { label: article.title },
-            ]}
+            items={toVisibleBreadcrumbs(
+              buildGroupBreadcrumbs(`/resources/${article.slug}`, [{ name: article.title, path: `/resources/${article.slug}` }]),
+            )}
           />
           {decisionArtifact ? (
             <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">

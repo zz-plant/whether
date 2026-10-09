@@ -3,81 +3,97 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import {
   contentSections,
-  navigationLayers,
-  navigationLayerByKey,
+  headerUtilityLinks,
+  navigationGroupByKey,
+  navigationGroups,
   navigationLabelByPath,
-  primaryNavigationLayers,
-  reportShellPaths,
+  navigationPages,
+  pagesInGroup,
   utilityLinks,
 } from "../lib/navigation/informationArchitecture";
+import { pathMatchesLink } from "../lib/navigation/pathMatching";
 
-describe("navigation information architecture", () => {
-  it("keeps the weekly brief as the only primary layer", () => {
+/*
+ * The 2026-10-08 regrouping: four groups in the header — This week, Decide,
+ * Record, Guides — each with a hub and its own pages, and the utility links
+ * (Use it elsewhere, Pricing, About) beside them rather than in a More menu.
+ */
+describe("navigation groups", () => {
+  it("puts four groups in the header, in this order, each on its hub", () => {
     assert.deepEqual(
-      primaryNavigationLayers.map((layer) => layer.href),
-      ["/"],
+      navigationGroups.map((group) => [group.label, group.href]),
+      [
+        ["This week", "/"],
+        ["Decide", "/operate"],
+        ["Record", "/history"],
+        ["Guides", "/resources"],
+      ],
     );
   });
 
-  it("keeps demoted hubs reachable as supporting layers", () => {
-    for (const href of ["/operate", "/signals", "/resolve", "/trust", "/history", "/history/compare"]) {
-      const layer = navigationLayers.find((candidate) => candidate.href === href);
-      assert.ok(layer, `${href} stays in the IA layer set`);
-      assert.equal(layer!.tier, "supporting", `${href} is reachable but not primary`);
+  it("gives every group a distinct one-key jump that no other shortcut binds", () => {
+    const keys = navigationGroups.map((group) => group.shortcut);
+    assert.equal(new Set(keys).size, keys.length);
+    // C copies the brief, F toggles focus, J and K move between sections, S (with
+    // shift) opens the share rail, / and ? are search and help.
+    for (const key of keys) {
+      assert.ok(!["c", "f", "j", "k", "s", "/", "?"].includes(key), `${key} is already bound`);
     }
   });
 
-  it("keeps one layer for each IA boundary and route", () => {
-    const hrefs = new Set(navigationLayers.map((layer) => layer.href));
-    const labels = new Set(navigationLayers.map((layer) => layer.label));
-
-    assert.equal(hrefs.size, navigationLayers.length);
-    assert.equal(labels.size, navigationLayers.length);
-
-    assert.equal(navigationLabelByPath["/"], "Weekly Brief");
-    assert.equal(navigationLabelByPath["/signals"], "Evidence");
-    assert.equal(navigationLabelByPath["/operate"], "Plan");
-    assert.equal(navigationLabelByPath["/resolve"], "Resolve");
-    assert.equal(navigationLabelByPath["/trust"], "Trust");
-  });
-
-  it("derives report shell paths from the IA layers", () => {
+  it("keeps each group's pages in order, hub first", () => {
     assert.deepEqual(
-      reportShellPaths,
-      navigationLayers.map((layer) => layer.href),
+      Object.fromEntries(navigationGroups.map((group) => [group.key, pagesInGroup(group.key).map((page) => page.href)])),
+      {
+        "this-week": ["/", "/signals", "/trust"],
+        decide: ["/operate", "/operate/financial", "/operate/scenarios", "/comps"],
+        record: ["/history", "/history/compare", "/calibration", "/concepts"],
+        guides: ["/resources"],
+      },
     );
-  });
-
-  it("nests supporting layers under an existing parent", () => {
-    for (const layer of navigationLayers) {
-      if (layer.tier === "supporting") {
-        assert.ok(layer.parentKey, `${layer.key} must declare a parent`);
-        assert.ok(navigationLayerByKey[layer.parentKey!], `${layer.key} parent must exist`);
-      } else {
-        assert.equal(layer.parentKey, undefined);
-      }
+    for (const group of navigationGroups) {
+      assert.equal(pagesInGroup(group.key)[0]?.href, group.href, `${group.label}'s first page is its hub`);
     }
   });
 
-  it("keeps canonical route transitions for Decide and Method", () => {
-    const resolveLayer = navigationLayers.find((layer) => layer.key === "resolve");
-    const trustLayer = navigationLayers.find((layer) => layer.key === "trust");
-    assert.equal(resolveLayer?.href, "/resolve");
-    assert.equal(trustLayer?.href, "/trust");
-    assert.equal(resolveLayer?.href.startsWith("#"), false);
-    assert.equal(trustLayer?.href.startsWith("#"), false);
+  it("names a group's hub page by the group's name, so one address has one name", () => {
+    for (const group of navigationGroups) {
+      const hub = navigationPages.find((page) => page.href === group.href);
+      assert.equal(hub?.label, group.label, `${group.href} is "${group.label}" in the header and "${hub?.label}" below it`);
+    }
+  });
+
+  it("calls /signals 'Why it changed' and /trust 'How much to trust this week'", () => {
+    assert.equal(navigationLabelByPath["/signals"], "Why it changed");
+    assert.equal(navigationLabelByPath["/trust"], "How much to trust this week");
+  });
+
+  it("files Product writing under Record as a secondary page, not a tab", () => {
+    const concepts = navigationPages.find((page) => page.href === "/concepts");
+    assert.equal(concepts?.group, "record");
+    assert.equal(concepts?.placement, "secondary");
+    assert.ok(!utilityLinks.some((link) => String(link.href) === "/concepts"), "not a utility link");
+  });
+
+  it("files SaaS multiples under Decide", () => {
+    assert.equal(navigationPages.find((page) => page.href === "/comps")?.group, "decide");
+  });
+
+  it("reaches the sources and the score derivation on /trust from Record", () => {
+    assert.deepEqual(
+      navigationGroupByKey.record.crossLinks.map((link) => link.href),
+      ["/trust#source-board", "/trust#formula-reference"],
+    );
   });
 
   /*
-   * One URL, one name. `/history/compare` was "Compare periods" in `navigationLayers`
-   * and "Macro Analogs" in `utilityLinks` — two menus on the same site naming the same
-   * page differently, so a reader could not tell they were the same destination. Every
-   * other assertion in this file checks structure (which layer, which parent, which
-   * alias); none compared the words.
+   * One URL, one name. `/history/compare` was "Compare periods" in the loop and
+   * "Macro Analogs" in the utility row, and later "Compare" and "Compare periods"
+   * side by side in the footer.
    */
   it("gives each route exactly one label across every navigation surface", () => {
     const labelsByPath = new Map<string, Set<string>>();
-    for (const entry of [...navigationLayers, ...utilityLinks]) {
+    for (const entry of [...navigationGroups, ...navigationPages, ...utilityLinks]) {
       const path = entry.href.split(/[#?]/)[0];
       if (!labelsByPath.has(path)) labelsByPath.set(path, new Set());
       labelsByPath.get(path)!.add(entry.label);
@@ -90,20 +106,37 @@ describe("navigation information architecture", () => {
     assert.deepEqual(conflicts, [], `\n${conflicts.join("\n")}\n`);
   });
 
-  it("matches primary route aliases consistently for active nav state", () => {
-    const { pathMatchesLink } = require("../lib/navigation/pathMatching");
+  it("lists no page twice", () => {
+    const hrefs = navigationPages.map((page) => page.href);
+    assert.equal(new Set(hrefs).size, hrefs.length);
+  });
 
-    assert.ok(pathMatchesLink("/signals", "/signals"));
+  it("matches legacy aliases for the active tab", () => {
     assert.ok(pathMatchesLink("/signals", "/evidence"));
     assert.ok(pathMatchesLink("/signals", "/evidence/capital-tightness-watch"));
-
-    assert.ok(pathMatchesLink("/operate", "/operate"));
     assert.ok(pathMatchesLink("/operate", "/planning"));
     assert.ok(pathMatchesLink("/operate", "/planning/financial"));
+    assert.ok(!pathMatchesLink("/resources", "/resolve"), "Resolve is a redirect, not an alias");
+  });
+});
 
-    assert.ok(pathMatchesLink("/resolve", "/resolve"));
-    assert.ok(pathMatchesLink("/resolve", "/resolve"));
-    assert.ok(pathMatchesLink("/resolve", "/answers"));
+describe("utility links", () => {
+  it("draws Use it elsewhere, Pricing and About in the header, not behind a menu", () => {
+    assert.deepEqual(
+      headerUtilityLinks.map((link) => [link.label, link.href]),
+      [
+        ["Use it elsewhere", "/share"],
+        ["Pricing", "/pricing"],
+        ["About", "/about"],
+      ],
+    );
+  });
+
+  it("leaves no page in a utility link that a group already owns", () => {
+    const grouped = new Set<string>(navigationPages.map((page) => page.href));
+    for (const link of utilityLinks) {
+      assert.ok(!grouped.has(link.href), `${link.href} is a grouped page and a utility link`);
+    }
   });
 });
 
@@ -112,35 +145,31 @@ describe("navigation information architecture", () => {
  * drifted, and /pricing — the only page explaining what costs money — ended up
  * in the IA but not in the footer, reachable solely from a header dropdown.
  */
-describe("footer renders the whole utility set", () => {
-  it("links every utilityLink", () => {
-    const layout = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
+describe("footer mirrors the groups and the utility links", () => {
+  const source = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
+  // The footer only: the <head> prefetches /operate and /signals by address, on purpose.
+  const layout = source.slice(source.indexOf("<footer"), source.indexOf("</footer>"));
 
-    assert.match(
-      layout,
-      /utilityLinks\.map\(/,
-      "the footer should render utilityLinks rather than restating them",
-    );
-
-    for (const link of utilityLinks) {
-      assert.doesNotMatch(
-        layout,
-        new RegExp(`href="${link.href}"`),
-        `${link.href} is hard-coded in the footer; render it from utilityLinks instead`,
-      );
+  it("renders the groups and the utility links from the IA rather than restating them", () => {
+    assert.match(layout, /navigationGroups\.map\(/);
+    assert.match(layout, /pagesInGroup\(group\.key\)/);
+    assert.match(layout, /utilityLinks\.map\(/);
+    for (const entry of [...utilityLinks, ...navigationPages]) {
+      if (entry.href === "/") continue;
+      assert.doesNotMatch(layout, new RegExp(`href="${entry.href}"`), `${entry.href} is hard-coded in the footer`);
     }
   });
 
-  it("keeps every indexable utility page in the sitemap", () => {
+  it("keeps every indexable linked page in the sitemap", () => {
     const sitemap = readFileSync(new URL("../app/sitemap.ts", import.meta.url), "utf8");
-    // /search is deliberately noindex, so it is deliberately not in the sitemap.
-    const indexable = utilityLinks.filter((link) => link.href !== "/search");
+    // /search is deliberately noindex, so it is deliberately not in the sitemap. The two
+    // workstreams are submitted from WORKSTREAMS, not as string literals.
+    const indexable = [...utilityLinks, ...navigationPages]
+      .map((entry) => entry.href)
+      .filter((href) => href !== "/search" && href !== "/" && !href.startsWith("/operate/"));
 
-    for (const link of indexable) {
-      assert.ok(
-        sitemap.includes(`"${link.href}"`),
-        `${link.href} is linked in the footer but missing from the sitemap`,
-      );
+    for (const href of indexable) {
+      assert.ok(sitemap.includes(`"${href}"`), `${href} is linked in the navigation but missing from the sitemap`);
     }
   });
 });
@@ -151,18 +180,15 @@ describe("footer renders the whole utility set", () => {
  * citable weekly record. The IA module owns that list now.
  */
 describe("content sections", () => {
-  it("names every routed content family the layers and utilities do not", () => {
+  it("names every routed content family the pages and utilities do not", () => {
     const named = new Set<string>(contentSections.map((section) => section.prefix));
-    for (const prefix of ["/answers", "/brief", "/resources", "/toolkits", "/contact"]) {
+    for (const prefix of ["/answers", "/brief", "/resolve", "/toolkits", "/contact"]) {
       assert.ok(named.has(prefix), `${prefix} must be a named content section`);
     }
   });
 
-  it("does not overlap a navigation layer or a utility link", () => {
-    const claimed = new Set<string>([
-      ...navigationLayers.map((layer) => layer.href),
-      ...utilityLinks.map((link) => link.href),
-    ]);
+  it("does not overlap a page or a utility link", () => {
+    const claimed = new Set<string>([...navigationPages.map((page) => page.href), ...utilityLinks.map((link) => link.href)]);
     for (const section of contentSections) {
       assert.equal(claimed.has(section.prefix), false, `${section.prefix} is claimed twice`);
     }
@@ -174,4 +200,3 @@ describe("content sections", () => {
     assert.match(header, /contentSections/);
   });
 });
-

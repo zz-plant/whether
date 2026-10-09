@@ -35,7 +35,6 @@
 }
 .weather-operating-loop strong { display: block; font-size: 0.75rem; font-weight: 600; }
 .weather-operating-loop small { display: block; margin-top: 0.25rem; font-size: 0.75rem; color: var(--app-text-muted); }
-.weather-operating-loop [aria-current="step"] { color: var(--regime-ink); }
 .weather-operating-loop[data-variant="compact"] { max-width: 24rem; }
 .weather-operating-loop[data-variant="detailed"] { grid-template-columns: repeat(auto-fit, minmax(min(100%, 8rem), 1fr)); gap: 1.25rem; }
 .weather-operating-loop[data-variant="detailed"] li { align-items: flex-start; border-top: 2px solid var(--border-strong); padding-top: 0.75rem; text-align: left; }

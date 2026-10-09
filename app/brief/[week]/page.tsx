@@ -6,6 +6,7 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import {
   buildCanonicalUrl,
   buildPageMetadata,
@@ -158,11 +159,11 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
       <JsonLdScript data={structuredData} />
 
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "History", href: "/history" },
-          { label: `Week of ${publishedBriefWeekLabel(brief)}` },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(buildPublishedBriefPath(brief.slug), [
+            { name: `Week of ${publishedBriefWeekLabel(brief)}`, path: buildPublishedBriefPath(brief.slug) },
+          ]),
+        )}
       />
 
       <article className="flex flex-col gap-6">

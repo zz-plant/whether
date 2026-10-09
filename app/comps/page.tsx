@@ -3,6 +3,7 @@ import Link from "next/link";
 import { cache } from "react";
 import { ActionLink } from "../components/ui/actionLink";
 import { PageShell } from "../components/pageShell";
+import { SectionTabs } from "../components/sectionTabs";
 import { buildPageMetadata, formatTitleMonth } from "../../lib/seo";
 import { formatDateUTC } from "../../lib/formatters";
 import { buildCompsStructuredData } from "../../lib/seo/pageStructuredData";
@@ -112,6 +113,7 @@ export default async function CompsPage() {
       backdropVariant="default"
       structuredData={buildCompsStructuredData({ data: comps.status === "ok" ? comps.data : null, tickers: SAAS_BASKET })}
     >
+      <SectionTabs currentPath="/comps" />
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2 max-w-2xl">

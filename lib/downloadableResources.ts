@@ -47,16 +47,16 @@ export const downloadableResources = {
   },
   "reversal-trigger-checklist": {
     metadata: {
-      title: "Reversal Trigger Checklist",
+      title: "Pause Line Checklist",
       description:
-        "A short checklist to define, monitor, and escalate reversal triggers for board-visible capital decisions.",
+        "A short checklist for the pause line on a capital decision the board will see: its number, how long a breach must last, who acts, and how to roll back.",
       path: "/resources/reversal-trigger-checklist",
-      imageAlt: "Reversal trigger checklist",
-      imageParams: { template: "guides", title: "Reversal Trigger Checklist" },
+      imageAlt: "Pause line checklist",
+      imageParams: { template: "guides", title: "Pause Line Checklist" },
     },
     heroDescription: "Use before approving any RISKY commitment.",
     heroItems: [
-      "Define threshold value and breach duration.",
+      "Set the pause line's value and how long a breach must last.",
       "Name owner + escalation recipient.",
       "Document rollback path and execution window.",
       "Confirm data source quality and update cadence.",

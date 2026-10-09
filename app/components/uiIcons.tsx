@@ -11,8 +11,6 @@ import {
   Share2,
   SlidersHorizontal,
   Sun,
-  Target,
-  TrendingUp,
   TriangleAlert,
   Loader2,
   X,
@@ -32,10 +30,6 @@ export const ArrowRightIcon = ({ className = "h-3.5 w-3.5", title: _title, ...pr
 
 export const ChevronDownIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
   <ChevronDown className={className} {...baseProps} {...props} />
-);
-
-export const CircleTargetIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <Target className={className} {...baseProps} {...props} />
 );
 
 export const CheckIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
@@ -63,10 +57,6 @@ export const ChevronLeftIcon = ({ className = "h-4 w-4", title: _title, ...props
 
 export const ChevronRightIcon = ({ className = "h-4 w-4", title: _title, ...props }: IconProps) => (
   <ChevronRight className={className} {...baseProps} {...props} />
-);
-
-export const TrendUpIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (
-  <TrendingUp className={className} {...baseProps} {...props} />
 );
 
 export const SlidersIcon = ({ className = "h-3.5 w-3.5", title: _title, ...props }: IconProps) => (

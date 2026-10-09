@@ -18,6 +18,7 @@ import { ContentMeasurementTracker } from "../../../components/contentMeasuremen
 import { ReportCta } from "../../../components/reportCta";
 import { ContentPageShell } from "../../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../../lib/navigation/routeType";
 import { compositeSignalScales } from "../../../../lib/report/signalTranslations";
 import { ruleMetricLabel } from "../../../../lib/report/boundedDecisionRules";
@@ -160,12 +161,12 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
     >
       <ContentMeasurementTracker pagePath={pagePath} cluster="authority" intent={contentIntent} />
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Evidence", href: "/signals" },
-          { label: signal.title, href: toRoute(`/signals/${cluster}`) },
-          { label: scenario.title },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(toRoute(`/signals/${cluster}/${scenario.slug}`), [
+            { name: signal.title, path: toRoute(`/signals/${cluster}`) },
+            { name: scenario.title, path: toRoute(`/signals/${cluster}/${scenario.slug}`) },
+          ]),
+        )}
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{signal.title}: {scenario.title}</h1>

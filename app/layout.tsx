@@ -3,7 +3,7 @@ import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GlobalHeader } from "./components/globalHeader";
 import { STORAGE_KEYS } from "../lib/storage/keys";
-import { navigationLayers, utilityLinks } from "../lib/navigation/informationArchitecture";
+import { navigationGroups, pagesInGroup, utilityLinks } from "../lib/navigation/informationArchitecture";
 import { GlobalCommandPalette } from "./components/globalCommandPalette";
 import { GlobalTimeMachine } from "./components/globalTimeMachine";
 import { GlobalShareRail } from "./components/globalShareRail";
@@ -243,77 +243,83 @@ export default function RootLayout({
                 on the second-most-common surface a reader checks for exactly
                 that. The line is `canonicalPositioningLine`, so it cannot drift
                 from the one the metadata already ships. */}
-            <div className="grid gap-8 lg:grid-cols-[minmax(0,18rem)_minmax(0,1fr)] lg:gap-12">
-              <div className="space-y-2">
-                <p className="text-sm font-semibold tracking-[0.08em] text-white">Whether</p>
-                <p className="max-w-[32ch] text-fluid-micro leading-relaxed text-[var(--footer-legal)]">
-                  {canonicalPositioningLine}
-                </p>
-              </div>
-
-              {/* Two labelled columns rather than two centred rows. Centring gave
-                  the five surfaces the product is about the same rank and the same
-                  scan path as Embed and RSS; a heading per group says which is
-                  which before the reader has read a single link.
-                  From `sm` each group is as wide as its links. Two equal grid
-                  halves, each split into two equal columns, spread seventeen
-                  short words across the whole width with ~100px of air between
-                  "Brief" and "Trust". */}
-              <div className="grid gap-5 sm:flex sm:flex-wrap sm:gap-x-12 sm:gap-y-6">
-                <nav aria-labelledby="footer-product-heading" className="space-y-1">
-                  <p id="footer-product-heading" className="type-eyebrow text-slate-400">The weekly loop</p>
-                  {/* Wraps horizontally on mobile, stacks on `sm`. A vertical list
-                      gives every link its own 44px row, which on a phone turned a
-                      ~400px footer into a ~1000px one; the labelled groups are the
-                      part worth keeping, not the column shape at every width.
-                      Two columns from `sm`, like the list beside it: seven links
-                      at 44px each made this the tallest thing in the footer and
-                      set the footer's height on every page. */}
-                  <ul className="flex flex-wrap gap-x-5 sm:block sm:columns-2 sm:gap-x-8">
-                    {navigationLayers.map((layer) => (
-                      <li key={layer.href} className="break-inside-avoid">
-                        <Link
-                          href={layer.href}
-                          className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
-                        >
-                          {layer.navLabel ?? layer.label}
-                        </Link>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-
-                {/* Derived from utilityLinks for the same reason the column beside
-                    it is derived from navigationLayers: the hand-written copy that
-                    used to live here drifted, and /pricing fell out of the footer
+            <div className="grid gap-8 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:gap-12">
+              <div className="space-y-3">
+                <div className="space-y-2">
+                  <p className="text-sm font-semibold tracking-[0.08em] text-white">Whether</p>
+                  <p className="max-w-[32ch] text-fluid-micro leading-relaxed text-[var(--footer-legal)]">
+                    {canonicalPositioningLine}
+                  </p>
+                </div>
+                {/* The product outside the four groups, under its name: Use it
+                    elsewhere, API & MCP, Pricing, About, Search, and RSS.
+                    Derived from utilityLinks: the hand-written copy that used to
+                    live here drifted, and /pricing fell out of the footer
                     entirely. */}
-                <nav aria-labelledby="footer-tools-heading" className="space-y-1">
-                  <p id="footer-tools-heading" className="type-eyebrow text-slate-400">Tools &amp; reference</p>
-                  {/* Same shape as the column beside it: wrapping row on mobile,
-                      stacked list on `sm`, where twelve entries at the 44px touch
-                      target still read as a scannable column rather than a tower. */}
-                  <ul className="flex flex-wrap gap-x-4 sm:block sm:columns-2 sm:gap-x-8">
+                <nav aria-label="About Whether">
+                  <ul className="flex flex-wrap gap-x-4 gap-y-0">
                     {utilityLinks.map((link) => (
-                      <li key={link.href} className="break-inside-avoid">
+                      <li key={link.href}>
                         <Link
                           href={link.href}
-                          className="weather-list-link text-fluid-xs text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
+                          className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
                         >
                           {link.label}
                         </Link>
                       </li>
                     ))}
-                    <li className="break-inside-avoid">
+                    <li>
                       {/* A file, not a page — stays an <a> and outside the link set. */}
                       <a
                         href="/feed.xml"
-                        className="weather-list-link text-fluid-xs text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
+                        className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
                       >
                         RSS
                       </a>
                     </li>
                   </ul>
                 </nav>
+              </div>
+
+              {/* One column per group, as the header names them: the group's
+                  name links its hub, and its other pages follow. Until
+                  2026-10-08 this was a "weekly loop" list of seven layers and a
+                  "Tools & reference" list of nine, which between them listed
+                  /history/compare twice, as "Compare" and "Compare periods". */}
+              <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4">
+                {navigationGroups.map((group) => {
+                  const others = [
+                    ...pagesInGroup(group.key)
+                      .filter((page) => page.href !== group.href)
+                      .map((page) => ({ href: page.href, label: page.label })),
+                    ...group.footerLinks,
+                  ];
+                  return (
+                    <nav key={group.key} aria-labelledby={`footer-${group.key}-heading`} className="space-y-1">
+                      <Link
+                        id={`footer-${group.key}-heading`}
+                        href={group.href}
+                        className="weather-list-link type-eyebrow text-slate-300 no-underline hover:text-white"
+                      >
+                        {group.label}
+                      </Link>
+                      {others.length > 0 ? (
+                        <ul>
+                          {others.map((link) => (
+                            <li key={link.href}>
+                              <Link
+                                href={link.href}
+                                className="weather-list-link text-fluid-xs text-[var(--footer-legal)] no-underline transition-colors hover:text-[var(--footer-legal-hover)]"
+                              >
+                                {link.label}
+                              </Link>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </nav>
+                  );
+                })}
               </div>
             </div>
 

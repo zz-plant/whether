@@ -85,8 +85,8 @@ describe("/operate opening", () => {
       FINANCE_RUNWAY_TARGETS.includes(description("ops-finance-strategy")),
       "the finance step's line is a regime's runway target",
     );
-    // The four formats the step copies.
-    assert.equal(description("ops-export-briefs"), "Copy this week's brief in one of 4 formats, ready to paste: Slack, Slide, Citation or Agenda.");
+    // No share step: /share holds every format, and the page links there once (2026-10-08).
+    assert.ok(!steps.some((step) => step.id === "ops-export-briefs"), "the share step is back");
 
     for (const retired of [
       "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",
@@ -119,13 +119,13 @@ describe("/operate tail", () => {
     }
   });
 
-  it("says in the resources summary what the disclosure holds", async () => {
-    const { children } = await buildPlanningPageModel();
-    const summary = elementsIn(children).find((element) => element.type === "summary");
-    assert.ok(summary, "the resources disclosure renders");
-    assert.match(
-      textIn(summary.props.children),
-      /^Resource templates and guides\d+ operating guides and \d+ templates you can fill in and share\.$/,
-    );
+  /* The "Resource templates and guides" disclosure listed the guides Guides lists, and
+     the Share step offered four of /share's formats. Since 2026-10-08 the page ends on
+     its risk checks and hands off to /share once, in the shell's next-step card. */
+  it("ends on the risk checks and hands sharing to /share once", async () => {
+    const { children, reportShellModel } = await buildPlanningPageModel();
+    assert.ok(!elementsIn(children).some((element) => element.type === "summary"), "no resources disclosure");
+    assert.equal(reportShellModel.actions?.nextStep?.href, "/share");
+    assert.equal(reportShellModel.actions?.nextStep?.label, "Share or embed this →");
   });
 });

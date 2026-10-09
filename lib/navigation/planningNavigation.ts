@@ -1,31 +1,4 @@
-import type { Route } from "./routeType";
 import type { ReportSectionLink } from "../../app/components/reportShellNavigation";
-
-export type OperationsWorkstreamLink = {
-  href: Route;
-  label: string;
-  description: string;
-};
-
-// No decision-memory link: the record the product keeps without asking is the
-// call itself, on /history.
-export const operationsWorkstreamLinks: OperationsWorkstreamLink[] = [
-  {
-    href: "/operate",
-    label: "Weekly plan",
-    description: "Default: review the weekly plan before you change team pace, spend, or priorities.",
-  },
-  {
-    href: "/operate/financial",
-    label: "Runway planner",
-    description: "CFO runway planning, burn adjustments, and budget planning board memo exporter.",
-  },
-  {
-    href: "/operate/scenarios",
-    label: "Scenarios",
-    description: "Interactive counterfactual simulation: test rate cuts, inversions, and stress scenarios.",
-  },
-];
 
 export const operationsSectionLinks: {
   plan: ReportSectionLink[];
@@ -44,7 +17,6 @@ export const operationsSectionLinks: {
     { href: "#ops-decision-shield", label: "Test a decision" },
     { href: "#ops-plan-lines", label: "Set this plan's lines" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
-    { href: "#ops-export-briefs", label: "Share the brief" },
     { href: "#ops-failure-patterns", label: "Risk checks" },
   ],
   financial: [

@@ -4,13 +4,8 @@ import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildBreadcrumbList, organizationId, websiteId } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
-import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { operationsSectionLinks } from "../../lib/navigation/planningNavigation";
-import {
-  canonicalCapitalDisciplinePath,
-  resourcePillarPages,
-  resourceSupportingPages,
-} from "../../lib/resourcesContent";
 import { formatDateUTC } from "../../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
@@ -27,11 +22,8 @@ import { buildAreaRows } from "./areaRows";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { PlanLinesForm } from "./components/planLinesForm";
 import { buildCanonicalBoundedDecisionRules, decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
-import { BRIEF_FORMATS } from "../../lib/report/briefArtifact";
 import { planLinesFromRules } from "../../lib/alert/planLines";
-import { BriefIslandPicker } from "../components/briefIslandPicker";
-import { buildReadingLines } from "../../lib/export/briefBuilders";
-import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
+import { SHARE_OR_EMBED_NEXT_STEP } from "../components/shareOrEmbedLink";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
@@ -85,12 +77,7 @@ export async function buildPlanningPageModel(
       isPartOf: { "@id": websiteId },
       publisher: { "@id": organizationId },
     },
-    buildBreadcrumbList(
-      createBreadcrumbTrail([
-        { path: "/" },
-        { path: "/operate" },
-      ]),
-    ),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/operate")),
   ]);
 
   const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
@@ -115,12 +102,6 @@ export async function buildPlanningPageModel(
   const showAllActionLanes = resolvedSearchParams?.actions === "all";
   const actionStripItems = snapshot.homeBriefModel.actionStripItems;
   const weeklyCall = snapshot.weeklyCall;
-  const operationsResourceLibrary = [
-    resourceSupportingPages.capitalPostureTemplate,
-    resourceSupportingPages.reversalTriggerChecklist,
-    resourceSupportingPages.quarterlyCapitalPostureMemoExample,
-    resourceSupportingPages.decisionShieldOverview,
-  ] as const;
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
   /* What each closed step holds, said on the closed step (§XII: "a summary that
      shows the current values"). Until 2026-10-07 the three read "Move the
@@ -140,11 +121,6 @@ export async function buildPlanningPageModel(
   )}, move the ones your plan needs, and get an email the day one is crossed.`;
   const financeSummary =
     financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
-  const resourcesSummary = `${resourcePillarPages.length} operating guides and ${operationsResourceLibrary.length} templates you can fill in and share.`;
-  const shareSummary = `Copy this week's brief in one of ${BRIEF_FORMATS.length} formats, ready to paste: ${listOf(
-    BRIEF_FORMATS.map((format) => format.label),
-    "disjunction",
-  )}.`;
   /* Freshness and confidence, once, under the h1 before anything asks the
      reader to act. The shell draws it in the intro (DD-040). */
   const trustStrip = {
@@ -168,15 +144,19 @@ export async function buildPlanningPageModel(
         fetchedAtLabel,
       },
       page: {
-        /* "Plan", matching `navigationLayers`, which declares both `label` and
-           `navLabel` as "Plan". The H1 said "Planning" while the tab said "Plan" and
-           the URL said /operate — three names for one section, which is the single
-           most repeated inconsistency in this IA. The <title> keeps its longer
-           descriptive form; only the on-page heading is the section's name. */
-        pageTitle: "Plan",
+        /* "Decide", the group's name in the header (`navigationGroups`). The H1
+           said "Planning" while the tab said "Plan" and the URL said /operate —
+           three names for one section, the single most repeated inconsistency in
+           this IA; on 2026-10-08 the tab became the Decide group and the heading
+           follows it. The <title> keeps its longer descriptive form; only the
+           on-page heading is the section's name. */
+        pageTitle: "Decide",
         pageSummary: "This week's guidance, turned into rules for hiring, spend and the roadmap.",
         sectionLinks: operationsSectionLinks.plan,
-        activeStep: "plan",
+        currentPath: "/operate",
+        tabsQuery: new URLSearchParams(
+          Object.entries(resolvedSearchParams ?? {}).flatMap(([key, value]) => (value ? [[key, value]] : [])),
+        ).toString() || undefined,
       },
       trust: {
         trustStatusTone,
@@ -184,19 +164,13 @@ export async function buildPlanningPageModel(
         strip: trustStrip,
       },
       actions: {
-        // No hero Share. The Share step further down the same page owns
-        // sharing here — on a phone the hero button and the step it opens were
-        // two "Share the brief" actions in one viewport. The header's Brief tab
-        // already covers the route the hero's neighbours used to point at.
-        // The handoff to Resolve, in the shell's one predictable place. It used
-        // to be a "Decision help" section of its own at the tail — a sentence,
-        // this link, and a "Back to sharing options" link to a step on the same
-        // page.
-        nextStep: {
-          href: "/resolve",
-          description: "Still stuck on one decision? Get a yes or no for it.",
-          label: "Resolve a decision",
-        },
+        // No hero Share, and no Share step: until 2026-10-08 this page carried
+        // the brief picker as its last step, one of five places the site
+        // offered to share the same week. Every format, the embed, the
+        // citation and the API live on /share; this is the one link to it, in
+        // the shell's one predictable place. It replaced the handoff to
+        // Resolve, which folded into this page's Test step and into Guides.
+        nextStep: SHARE_OR_EMBED_NEXT_STEP,
       },
       payloads: {
         structuredData,
@@ -320,7 +294,16 @@ export async function buildPlanningPageModel(
               hideHeader: true,
               id: "ops-decision-shield-panel",
               title: "Test a decision",
-              children: h(DecisionShieldPanel, { assessment, recordDate: treasury.record_date }),
+              children: h(Fragment, null,
+                h(DecisionShieldPanel, { assessment, recordDate: treasury.record_date }),
+                // Resolve's direct answers live on Guides since 2026-10-08, grouped
+                // by decision area with this week's standing beside each.
+                h("p", { className: "text-xs leading-5 text-slate-400" },
+                  "The most common decisions each have an answer, with where it stands this week, on ",
+                  h("a", { href: "/resources#answers", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Guides"),
+                  ".",
+                ),
+              ),
             }),
           },
           /* The use the record fits: lines agreed once, and an email the day one is
@@ -360,46 +343,6 @@ export async function buildPlanningPageModel(
               ),
             }),
           },
-          {
-            id: "ops-export-briefs",
-            label: "Share",
-            title: "Share the brief",
-            description: shareSummary,
-            // The two request ids are kept as aliases so an old link still opens this
-            // step. The "Execution asks" section they named was a product backlog
-            // ("expansion requests expected after launch") that listed API access
-            // and historical comparisons as not yet built, though both ship; it
-            // was removed on 2026-10-07.
-            hashAliases: [
-              "ops-export-briefs-panel",
-              "ops-operator-requests",
-              "ops-operator-requests-panel",
-              "regime-alert-log",
-            ],
-            // The step header above already reads Share / Share the brief, and the export
-            // panel names the action in its own header; a third header between them restated both.
-            children: h(ReportSection, { variant: "split",
-              hideHeader: true,
-              id: "ops-export-briefs-panel",
-              title: "Share the brief",
-              children: h(Fragment, null,
-              // The same picker /share and the global rail use, reading the same
-              // island — one artifact pipeline. The eleven-button export panel
-              // that sat here built the brief a second way through its own lib.
-              h(BriefIslandPicker, {
-                scoreReferences: buildReadingLines(reportData.assessment, {
-                  actionStripItems,
-                  previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),
-                }),
-              }),
-              h("p", { className: "text-xs leading-5 text-slate-400" },
-                "Email, meeting pack, role memos, calendar hold and the embed live on ",
-                h("a", { href: "/share", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the share page"),
-                ".",
-              ),
-              ),
-            }),
-          },
         ],
       }),
       /* Boxed like the steps above it. It used to carry `weather-panel`, whose
@@ -431,41 +374,6 @@ export async function buildPlanningPageModel(
             ? h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold" }, "Recheck the rules")
             : null,
           h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
-        ),
-      ),
-      /* The summary says what is behind it (§XII). It read "Resource templates and
-         guides" alone, in sky, on a padding the report row had zeroed — a title
-         in a box. The guide cards inside drew a lifted surface each, inside a
-         frame the depth ladder cannot see; they are plain bordered links now. */
-      h("details", { className: "weather-auto-chevron mt-6 rounded-xl border border-[var(--border-subtle)] bg-slate-950/[0.05] p-4 sm:p-5" },
-        h("summary", { className: "cursor-pointer" },
-          h("span", { className: "min-w-0" },
-            h("span", { className: "block text-sm font-semibold text-slate-100" }, "Resource templates and guides"),
-            h("span", { className: "mt-1 block text-xs text-slate-400" }, resourcesSummary),
-          ),
-        ),
-        h("div", { className: "mt-3 space-y-4" },
-          h("div", { className: "grid gap-3 md:grid-cols-3" },
-            resourcePillarPages.map((pillar) => h(Link, {
-              key: pillar.slug,
-              href: `/resources/${pillar.slug}`,
-              className: "rounded-lg border border-[var(--border-subtle)] px-4 py-3 text-sm text-slate-100 transition-colors hover:border-sky-400/70",
-            },
-              h("span", { className: "block font-semibold text-slate-100" }, pillar.h1),
-              h("span", { className: "mt-1.5 block text-sm text-slate-300" }, pillar.description),
-            )),
-          ),
-          h("div", { className: "flex flex-wrap gap-2 pt-1" },
-            operationsResourceLibrary.map((resource) => h(Link, {
-              key: resource.path,
-              href: resource.path,
-              className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100",
-            }, resource.title)),
-            h(Link, {
-              href: canonicalCapitalDisciplinePath,
-              className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold",
-            }, "Read the full guide"),
-          ),
         ),
       ),
     ),

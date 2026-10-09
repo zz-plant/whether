@@ -10,7 +10,7 @@ import {
 } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
-import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { shouldSplitDecisionConditionRows } from "../../lib/report/reportFormatting";
 import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
 import {
@@ -145,7 +145,7 @@ const buildStructuredData = () =>
       url: siteUrl,
     },
     buildBreadcrumbList(
-      createBreadcrumbTrail([{ path: "/" }, { path: "/signals" }]),
+      buildGroupBreadcrumbs("/signals"),
     ),
   ]);
 

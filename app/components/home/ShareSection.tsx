@@ -1,7 +1,6 @@
 import { HomeSection } from "./HomeSection";
 import { ActionLink } from "../ui/actionLink";
-import { CopyMeetingSlideButton } from "../CopyMeetingSlideButton";
-import { CopyImageCardButton } from "../CopyImageCardButton";
+import { ShareOrEmbedLink } from "../shareOrEmbedLink";
 import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../../../lib/report/publishedBriefs";
 
@@ -56,12 +55,13 @@ function CanonicalWeekPermalink({
 }
 
 /**
- * Share, last on the page (2026-10-09): the slide and image copies and the
- * citable permalink. Copy Brief, DD-005's canonical primary action, sits under
- * the call card in `app/page.tsx`. The alert form that sat here is its own
- * section now, fifth, because hearing the day a line is crossed is how the page
- * is meant to be used; the plan link closes the areas section, where the rules
- * it turns into a plan are.
+ * Share, last on the page (2026-10-09): one link to /share, which holds every
+ * format, the slide and image copies among them (2026-10-08), and the citable
+ * permalink. Copy Brief, DD-005's canonical primary action, sits under the call
+ * card in `app/page.tsx`. The alert form that sat here is its own section now,
+ * fifth, because hearing the day a line is crossed is how the page is meant to
+ * be used; the plan link closes the areas section, where the rules it turns into
+ * a plan are.
  */
 export function ShareSection({
   currentRecordDate,
@@ -73,14 +73,7 @@ export function ShareSection({
   return (
     <HomeSection id={HOME_SECTIONS.share.id} heading={HOME_SECTIONS.share.heading}>
       <div className="flex flex-wrap items-center gap-2">
-        {/* Neither takes a payload: the slide reads the same published
-            artifact the share panel and the presentation frames read, and the
-            image is the brief card `/share` lists, for the reading on screen. */}
-        <CopyMeetingSlideButton />
-        <CopyImageCardButton />
-        <ActionLink href="/share" variant="inline">
-          Every other format →
-        </ActionLink>
+        <ShareOrEmbedLink />
       </div>
       <CanonicalWeekPermalink currentRecordDate={currentRecordDate} currentRecordDateLabel={currentRecordDateLabel} />
     </HomeSection>

@@ -26,12 +26,12 @@ describe("site review copy fixes", () => {
      ("Loading evidence: Checking what changed…") was the first text a crawler
      indexed there. The fallbacks keep their names in attributes. */
   it("streams no loading sentence in a route's server fallback", async () => {
-    const routes = ["", "answers/", "operate/", "resolve/", "signals/", "trust/"];
+    const routes = ["", "answers/", "operate/", "signals/", "trust/"];
     for (const route of routes) {
       const { default: Loading } = await import(`../app/${route}loading`);
       const html = renderToStaticMarkup(<Loading />);
       assert.equal(visibleText(html), "", `/${route}loading renders text: ${visibleText(html)}`);
-      assert.doesNotMatch(html, /Loading|Preparing|Checking/, `/${route}loading still names itself as loading in its markup`);
+      assert.doesNotMatch(html, /Loading|Preparing|Checking/, `/${route}loading still says it is loading, in its markup`);
       assert.match(html, /aria-busy="true"/, `/${route}loading still marks itself busy`);
     }
   });
@@ -70,7 +70,7 @@ describe("site review copy fixes", () => {
      thresholds, and reversible governance artifacts". */
   it("calls /resources Guides, and its framework blurbs say what the reader gets", async () => {
     const page = await import("../app/resources/page");
-    const html = renderToStaticMarkup(page.default());
+    const html = renderToStaticMarkup(await page.default({}));
     assert.match(html, /<h1[^>]*>Guides<\/h1>/);
     const title = page.metadata.title;
     assert.equal(typeof title === "string" ? title : JSON.stringify(title), "Guides");

@@ -33,7 +33,7 @@ import {
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
 import { ActionLink } from "../components/ui/actionLink";
-import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref } from "../resources/components/toolkitLibraryPanels";
 import { SearchTelemetry } from "./searchTelemetry";
 import { resolveSearchCommandHref, SEARCH_JOB_ORDER } from "./searchCommand";
 

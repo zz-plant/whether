@@ -4,6 +4,7 @@ import { describeAgentTools } from "../agent/tools";
 import { MCP_PROTOCOL_VERSIONS } from "../mcp/serverIdentity";
 import { PUBLISH_MAX_RECORD_AGE_DAYS } from "../report/briefPublishGuard";
 import { canonicalPositioningLine } from "../seo";
+import { navigationGroups, pagesInGroup, utilityLinks } from "../navigation/informationArchitecture";
 
 /**
  * `/llms.txt`: what an agent reads before it calls anything.
@@ -28,6 +29,21 @@ export const buildLlmsTxt = (baseUrl: string) => {
       "",
     ];
   });
+
+  /* The site's four groups and their pages, read from the IA the header and the
+     footer render, so an agent reading this file meets the same map a reader
+     does. */
+  const siteLines = [
+    ...navigationGroups.flatMap((group) => [
+      `- ${group.label}: ${baseUrl}${group.href} — ${group.description}`,
+      ...pagesInGroup(group.key)
+        .filter((page) => page.href !== group.href)
+        .map((page) => `  - ${page.label}: ${baseUrl}${page.href}`),
+    ]),
+    ...utilityLinks
+      .filter((link) => link.href !== "/search")
+      .map((link) => `- ${link.label}: ${baseUrl}${link.href} — ${link.description}`),
+  ];
 
   return [
     "# Whether — Agent Interface",
@@ -90,6 +106,10 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "- The homepage (/) includes JSON-LD structured data (schema.org/Report) with decision artifacts",
     "- All endpoints include provenance metadata — preserve it in downstream outputs",
     "- Informational only: not investment, legal, tax or employment advice, and not a forecast",
+    "",
+    "## Site",
+    "",
+    ...siteLines,
     "",
     "## Discovery",
     `- Manifest: ${baseUrl}${WHETHER_AGENT_MANIFEST_PATH}`,

@@ -4,12 +4,12 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { HelpModal } from "./home/HelpModal";
 import { openShareRail } from "./globalShareRail";
-import { shortcutNavigationLayers } from "../../lib/navigation/informationArchitecture";
+import { navigationGroups } from "../../lib/navigation/informationArchitecture";
 
-/* One source: the IA declares each layer's key, the header tabs show it on
+/* One source: the IA declares each group's key, the header tabs show it on
    hover, the palette lists it, and this binds it. */
 const SHORTCUTS: Record<string, string> = Object.fromEntries([
-  ...shortcutNavigationLayers.map((layer) => [layer.shortcut, layer.href]),
+  ...navigationGroups.map((group) => [group.shortcut, group.href]),
   ["/", "/search"],
 ]);
 

@@ -170,6 +170,7 @@ export default async function HistoryComparePage({
           pageTitle: "Compare two periods",
           pageSummary: "Signals and operating guidance for any two past months, side by side.",
           sectionLinks: compareSectionLinks,
+          currentPath: "/history/compare",
         },
         trust: {
           trustStatusTone: snapA.trustStatus.trustStatusTone,

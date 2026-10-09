@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
 import { resolveSearchCommandHref } from "../app/search/searchCommand";
-import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/resolve/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref, resolveToolkitLibraryState } from "../app/resources/components/toolkitLibraryPanels";
 import { searchIndex } from "../lib/search/searchIndex";
 import { buildGuidanceSearchHref } from "../app/components/commandPalette";
 
@@ -21,8 +21,8 @@ describe("search command routing", () => {
 
 describe("toolkit library routing", () => {
   it("builds decide toolkit shortlist URLs", () => {
-    assert.equal(buildToolkitLibraryHref(), "/resolve#toolkit-library");
-    assert.equal(buildToolkitLibraryHref("rollback"), "/resolve?toolkitQuery=rollback#toolkit-library");
+    assert.equal(buildToolkitLibraryHref(), "/resources#toolkit-library");
+    assert.equal(buildToolkitLibraryHref("rollback"), "/resources?toolkitQuery=rollback#toolkit-library");
   });
 
   it("defaults to a routed shortlist and filters when a query is present", () => {

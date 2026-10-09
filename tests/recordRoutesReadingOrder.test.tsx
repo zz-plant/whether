@@ -130,7 +130,9 @@ describe("/trust carries one trust strip", () => {
     const firstSectionHeading = html.indexOf('id="section-formula-reference-heading"');
     assert.ok(strip < firstSectionHeading, "the strip comes before the first explanatory section");
     assert.doesNotMatch(html, /sm:grid-cols-5/, "the five-cell System status strip is gone");
-    assert.doesNotMatch(html, /href="\/trust"/, "on /trust the strip carries no link to itself");
+    // The sub-tab row names /trust as the current page (aria-current); the strip itself must not link here.
+    const withoutTabs = html.replace(/<nav[^>]*data-section-tabs[\s\S]*?<\/nav>/, "");
+    assert.doesNotMatch(withoutTabs, /href="\/trust"/, "on /trust the strip carries no link to itself");
     for (const cell of ["Data as of", "Sources", "Margin", "Could change next week"]) assert.match(html, new RegExp(cell));
   });
 

@@ -176,7 +176,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
-    { path: "/resolve", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     // Deep links, not destinations: the adoption plan's one-screen redraft ruled
     // that trust is an inline line on `/` with the formula reference kept as a
     // deep link, and compare is a disclosure under history. Both stay indexable;
@@ -194,7 +193,10 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       changeFrequency: "weekly",
       priority: 0.7,
     })),
-    { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
+    /* Guides, one of the four header groups since 2026-10-08. It took /resolve's
+       place (a redirect now) and its direct answers, each stamped with this
+       week's standing, so it moves with the read and ranks like a hub. */
+    { path: "/resources", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.82 },
     { path: "/privacy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },

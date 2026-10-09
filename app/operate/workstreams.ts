@@ -8,7 +8,7 @@
  * may only export what Next.js expects, and until 2026-09-15 these two
  * indexable routes were submitted nowhere because nothing else could see them.
  */
-export type Workstream = {
+type Workstream = {
   slug: "financial" | "scenarios";
   title: string;
   description: string;

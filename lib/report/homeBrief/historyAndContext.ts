@@ -416,7 +416,7 @@ export const buildStartRouteDeltaBlock = ({
       id: "posture-shift" as const,
       label: "Conditions changed",
       detail: `Conditions moved from ${REGIME_LABELS[regimeAlert.previousRegime]} to ${REGIME_LABELS[currentRegime]}. Re-check this week's guidance before committing anything you can't undo.`,
-      href: "/resolve" as const,
+      href: "/operate" as const,
     });
   }
 

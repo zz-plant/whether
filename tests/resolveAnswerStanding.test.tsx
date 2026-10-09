@@ -9,6 +9,9 @@ import { answerPages } from "../app/answers/decisionPages";
 import { featuredAnswerPages } from "../app/answers/selectors";
 
 /*
+ * (The list moved from /resolve to Guides, /resources, on 2026-10-08, grouped by
+ * decision area; the stamps came with it.)
+ *
  * /resolve promised "one yes-or-no answer per open decision, under this week's
  * guidance" and listed eleven questions with a sentence of enduring advice each
  * and nothing about the week. Each decision row now carries its lead area's
@@ -62,10 +65,10 @@ describe("an answer's standing this week", () => {
   });
 });
 
-describe("/resolve prints each answer's standing", async () => {
-  const { default: ResolvePage } = await import("../app/resolve/page");
-  const html = renderToStaticMarkup(await ResolvePage({}));
-  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resolve" });
+describe("Guides prints each answer's standing", async () => {
+  const { default: GuidesPage } = await import("../app/resources/page");
+  const html = renderToStaticMarkup(await GuidesPage({}));
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resources" });
   const model = snapshot.weeklyDecisionCardModel;
   /* Fed as app/page.tsx feeds the homepage's picker. */
   const rows = buildHomeAreaRows({
@@ -107,17 +110,18 @@ describe("/resolve prints each answer's standing", async () => {
     assert.ok(html.indexOf(count) < html.indexOf(`href="/answers/${featuredAnswerPages[0].slug}"`), "the count sits over the list");
   });
 
-  it("draws the stamps sharp and the browse disclosure as a row, not a pill-shaped surface", () => {
+  it("draws the stamps sharp and the More tools disclosure as a row, not a pill-shaped surface", () => {
     const stamps = html.match(/<span data-answer-standing="[^"]+" class="[^"]*"/g) ?? [];
     assert.ok(stamps.length >= answerPages.length - 1);
     for (const stamp of stamps) {
       assert.match(stamp, /\brounded-sm\b/);
       assert.doesNotMatch(stamp, /rounded-(full|lg|xl|2xl)/);
     }
-    const disclosure = html.match(/<details id="decide-secondary-paths"[^>]*>/)?.[0] ?? "";
+    const moreTools = html.slice(html.indexOf('id="more-tools"'));
+    const disclosure = moreTools.match(/<details[^>]*>/)?.[0] ?? "";
     assert.match(disclosure, /weather-auto-chevron/);
     assert.doesNotMatch(disclosure, /weather-surface/);
-    const directAnswers = html.slice(html.indexOf('id="direct-answers"'), html.indexOf('id="decide-secondary-paths"'));
+    const directAnswers = html.slice(html.indexOf('id="answers"'), html.indexOf('id="resources-pillars-heading"'));
     assert.doesNotMatch(directAnswers, /weather-hub-chip/, "the context links are links, not floating chips");
   });
 });

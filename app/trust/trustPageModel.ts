@@ -1,18 +1,15 @@
 import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
-import { weeklyHeadline } from "../../lib/report/reportEvidence";
-import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
+import { navigationGroupByKey } from "../../lib/navigation/informationArchitecture";
 import { graph } from "../../lib/seo/pageStructuredData";
-import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import {
   buildCompactTrustSummary,
   buildDecisionReadinessState,
   buildTrustWarnings,
-  buildWeeklyCitationMetaLine,
 } from "../../lib/report/trustStatus";
 import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
 import { buildDegradedSourceRows, buildSourceBoardRows } from "../../lib/report/sourceHealth";
@@ -26,7 +23,7 @@ import { readStoredActivationFunnel } from "../../lib/telemetry/recordActivation
 
 
 export async function buildTrustPageModel() {
-  const breadcrumbStructuredData = graph([buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/trust" }]))]);
+  const breadcrumbStructuredData = graph([buildBreadcrumbList(buildGroupBreadcrumbs("/trust"))]);
   /* Read alongside the brief, not after it: the run history has its own deadline and
      fails soft, so it never lengthens the page past the report path's own bound. The
      funnel is a KV get of a record the Monday cron already wrote, so it costs one read
@@ -84,12 +81,6 @@ export async function buildTrustPageModel() {
     tightness: positionFor("tightness", thresholds.tightnessRegime),
     riskAppetite: positionFor("riskAppetite", thresholds.riskAppetiteRegime),
   };
-  const citationLine = buildWeeklyCitationMetaLine({
-    statusLabel: reportData.statusLabel,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    recordDateLabel: reportData.recordDateLabel,
-    freshnessLabel: reportData.fetchedAtLabel,
-  });
   const warnings = buildTrustWarnings({
     confidenceLabel: homeBriefModel.confidenceLabel,
     transitionWatch: homeBriefModel.transitionWatch,
@@ -99,8 +90,6 @@ export async function buildTrustPageModel() {
     changedSignals: reportData.reportDynamics.changedSignals,
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
-  /* The margin rides in the trust line ("Margin: clear of the line (…)"), so it is stated once. */
-  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nData as of: ${reportData.recordDateLabel}\nChecked: ${reportData.fetchedAtLabel}\nTrust: ${trustSummary}\n${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reportData.flipThreshold}\n${publicDecisionLabels.call}: ${weeklyHeadline(snapshot.weeklyCall).composed}`;
 
   /* The row labels used to be "Trigger", "Impact" and "Recovery" — three nouns
      from the incident-review register, on a page addressed to someone deciding
@@ -158,10 +147,10 @@ export async function buildTrustPageModel() {
     ...(readerReturnsLine ? [{ href: "#reader-returns", label: "Reader returns" }] : []),
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#source-board", label: "Sources" },
-    { href: "#sources-freshness", label: "Cite this guidance" },
+    // "Cite this guidance" and "Meeting snippet" moved to /share on 2026-10-08,
+    // with every other paste of the week.
     { href: "#confidence-limits", label: "Margin & limits" },
     { href: "#revisit-call", label: "Revisit triggers" },
-    { href: "#meeting-snippet", label: "Meeting snippet" },
   ];
 
   const reportShellModel: ReportShellModel = {
@@ -175,7 +164,7 @@ export async function buildTrustPageModel() {
       pageTitle: "How much to trust this week's guidance",
       pageSummary: "Check whether this week's guidance is current enough to act on.",
       sectionLinks,
-      activeStep: "posture",
+      currentPath: "/trust",
     },
     trust: {
       trustStatusTone,
@@ -188,10 +177,12 @@ export async function buildTrustPageModel() {
       sidebarVariant: "full",
     },
     actions: {
+      // Into Record. Why it changed is a tab above this page now; what a reader
+      // judging the reading needs next is how readings like it held up.
       nextStep: {
-        href: "/signals",
-        description: "See which readings moved this week, and by how much.",
-        label: "Open the evidence",
+        href: navigationGroupByKey.record.href,
+        description: navigationGroupByKey.record.description,
+        label: `Open the ${navigationGroupByKey.record.label.toLowerCase()}`,
       },
     },
     payloads: {
@@ -205,9 +196,7 @@ export async function buildTrustPageModel() {
     degradedSourceRows,
     sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),
     trustSummary,
-    citationLine,
     warnings,
-    meetingSnippet,
     revisitBullets,
     trustStrip,
     scorePositions,

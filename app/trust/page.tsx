@@ -6,6 +6,7 @@ import { UrlDetails } from "../components/ui/urlDetails";
 import { ChevronDownIcon } from "../components/uiIcons";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
+import { ShareOrEmbedLink } from "../components/shareOrEmbedLink";
 import {
   DECISION_CONTRACT_LABELS,
   PRIMARY_AUDIENCE_SUMMARY,
@@ -41,9 +42,7 @@ export default async function MethodPage({
     reportData,
     isFallback,
     sourceBoardRows,
-    citationLine,
     warnings,
-    meetingSnippet,
     revisitBullets,
     scorePositions,
     runHistory,
@@ -51,31 +50,14 @@ export default async function MethodPage({
     reportShellModel,
   } = await buildTrustPageModel();
 
-  /* What is folded on a healthy week: the citation, the limits, the warnings
-     and the snippet. The source board used to lead this group; it is open
-     under the derivation now (`SourceBoard`), because it is the evidence the
-     strip's "Sources" verdict was judged from. */
+  /* What is folded on a healthy week: the limits, the confidence record and the
+     warnings. The source board used to lead this group; it is open under the
+     derivation now (`SourceBoard`), because it is the evidence the strip's
+     "Sources" verdict was judged from. The citation and the meeting snippet
+     that bracketed it moved to /share on 2026-10-08 (`ShareOrEmbedLink`
+     below). */
   const secondaryContent = (
     <>
-      <ReportSection
-        id="sources-freshness"
-        title="Cite this guidance"
-        description="The one-line citation for a recap or sourcing note."
-      >
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Meeting citation</p>
-            {/* No "For a recap or sourcing note." under it: the section's own
-                description says that, one line above. */}
-            <p className="text-sm text-slate-200">{citationLine}</p>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <ActionLink href="#trust-snapshot" variant="pill">System status</ActionLink>
-              <ActionLink href="#formula-reference" variant="pill">Formula notes</ActionLink>
-            </div>
-          </article>
-        </div>
-      </ReportSection>
-
       <ReportSection
         id="confidence-limits"
         title="Margin and reliability limits"
@@ -154,11 +136,6 @@ export default async function MethodPage({
         </div>
       </ReportSection>
 
-      <ReportSection id="meeting-snippet" title="Meeting snippet" description="Paste into notes or a meeting agenda.">
-        <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-default)] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200">
-          <code>{meetingSnippet}</code>
-        </pre>
-      </ReportSection>
     </>
   );
 
@@ -214,7 +191,7 @@ export default async function MethodPage({
           summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow select-none"
           summary={
             <>
-              <span>Citation, limits and revisit triggers</span>
+              <span>Limits, and what would change the guidance</span>
               <span aria-hidden="true" className="inline-flex rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-1.5 text-slate-400 transition group-open:rotate-180 motion-reduce:transition-none">
                 <ChevronDownIcon className="h-3.5 w-3.5" />
               </span>
@@ -228,6 +205,10 @@ export default async function MethodPage({
       ) : (
         secondaryContent
       )}
+
+      {/* The citation and the meeting snippet are /share formats now, with every
+          other paste of the week. */}
+      <ShareOrEmbedLink />
 
       {/* The method moved to /about (2026-10-09): it is the product's thesis, and as
           the last section of the page a reader opens to check this week's reading

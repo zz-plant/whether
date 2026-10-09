@@ -1,5 +1,5 @@
 import type { RegimeDiagnostics } from "../regimeEngine";
-import { MARGIN_LABEL, formatMarginBand, type CompactFreshnessMeta } from "./reportFormatting";
+import { MARGIN_LABEL, formatMarginBand, publicDecisionLabels, type CompactFreshnessMeta } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, type PolicyHoldCall } from "./reportCopy";
 import type { RegimeStateTransition } from "../regimeStateMachine";
 
@@ -527,6 +527,47 @@ export const buildWeeklyCitationMetaLine = ({
   freshnessLabel: string;
 }) =>
   `Conditions: ${statusLabel} · ${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} · Data as of ${recordDateLabel} · checked ${normalizeFreshnessLabel(freshnessLabel)}`;
+
+/**
+ * The status block a reader pastes into meeting notes: the conditions, the
+ * reading's dates, how sure it is, what would change it and what to do now.
+ *
+ * Built on /trust until 2026-10-08 and offered there as "Meeting snippet"; it is
+ * one of /share's formats now, beside the brief's other pastes, and is built
+ * here so the two pages could never have printed different blocks.
+ */
+export const buildMeetingSnippet = ({
+  statusLabel,
+  recordDateLabel,
+  freshnessLabel,
+  confidenceLabel,
+  isFallbackSnapshot,
+  isHistoricalSelection,
+  flipThreshold,
+  guidance,
+}: {
+  statusLabel: string;
+  recordDateLabel: string;
+  freshnessLabel: string;
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  isFallbackSnapshot: boolean;
+  isHistoricalSelection: boolean;
+  flipThreshold: string;
+  /** The week's headline action as a paste leads with it (`weeklyHeadline(…).composed`). */
+  guidance: string;
+}) => {
+  /* The margin rides in the trust line ("Margin: clear of the line (…)"), so it is
+     stated once; the two dates say which is which (2026-10-09). */
+  const trustSummary = buildCompactTrustSummary({ confidenceLabel, freshnessLabel, isFallbackSnapshot, isHistoricalSelection });
+  return [
+    `Conditions: ${statusLabel}`,
+    `Data as of: ${recordDateLabel}`,
+    `Checked: ${freshnessLabel}`,
+    `Trust: ${trustSummary}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${flipThreshold}`,
+    `${publicDecisionLabels.call}: ${guidance}`,
+  ].join("\n");
+};
 
 /**
  * The name for `trustStatusAction` where a reader sees it: what the state of

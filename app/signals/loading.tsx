@@ -4,7 +4,7 @@ export default function Loading() {
   return (
     <RouteLoadingShell
       currentPath="/signals"
-      pageTitle="Evidence"
+      pageTitle="Why it changed"
     />
   );
 }

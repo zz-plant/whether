@@ -14,6 +14,7 @@ import { countRecord } from "../../lib/report/trackRecord";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { formatMonthYearShortFromValue } from "../../lib/formatters";
 import { CalibrationCurveGlyph } from "../components/illustrations/CalibrationCurveGlyph";
+import { SectionTabs } from "../components/sectionTabs";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 
 export const runtime = "edge";
@@ -54,6 +55,7 @@ export default function CalibrationPage() {
   return (
     <ContentPageShell measure="wide">
       <JsonLdScript data={buildCalibrationStudyStructuredData({ totals })} />
+      <SectionTabs currentPath="/calibration" />
 
       <SecondaryPageHeader
         eyebrow="The record"

@@ -4,7 +4,7 @@ export default function Loading() {
   return (
     <RouteLoadingShell
       currentPath="/operate"
-      pageTitle="Plan"
+      pageTitle="Decide"
     />
   );
 }

@@ -3,7 +3,7 @@ import { existsSync, readdirSync, readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import type { Metadata } from "next";
 import { buildDecisionAnswerMetadata } from "../app/answers/[slug]/page";
-import { metadata as decideMetadata } from "../app/resolve/page";
+import { metadata as guidesMetadata } from "../app/resources/page";
 import { metadata as operationsMetadata } from "../app/operate/page";
 import { metadata as signalsMetadata } from "../app/signals/page";
 import { buildPageMetadata, buildSocialImageUrl } from "../lib/seo";
@@ -59,7 +59,8 @@ describe("hub route social assets", () => {
     const routeMetadata: Array<{ route: string; metadata: Metadata }> = [
       { route: "/signals", metadata: signalsMetadata },
       { route: "/operate", metadata: operationsMetadata },
-      { route: "/resolve", metadata: decideMetadata },
+      // Guides took /resolve's place among the hubs on 2026-10-08.
+      { route: "/resources", metadata: guidesMetadata },
     ];
 
     for (const { route, metadata } of routeMetadata) {

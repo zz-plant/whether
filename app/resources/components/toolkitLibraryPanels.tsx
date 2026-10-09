@@ -6,12 +6,12 @@ const suggestedToolkitQueries = ["rollback", "roadmap", "pmf", "pricing", "capac
 export function buildToolkitLibraryHref(query?: string) {
   const normalizedQuery = query?.trim();
   if (!normalizedQuery) {
-    return "/resolve#toolkit-library";
+    return "/resources#toolkit-library";
   }
 
   const params = new URLSearchParams();
   params.set("toolkitQuery", normalizedQuery);
-  return `/resolve?${params.toString()}#toolkit-library`;
+  return `/resources?${params.toString()}#toolkit-library`;
 }
 
 export function resolveToolkitLibraryState(query?: string) {
@@ -99,7 +99,7 @@ export function ToolkitLibraryPanels({
         <div className="space-y-3 rounded-md border border-slate-700/70 bg-slate-950/40 px-4 py-4 text-sm text-slate-200">
           <p>No tool matched “{normalizedQuery}”. Try a broader task label, or one of the direct answers above.</p>
           <div className="flex flex-wrap gap-2">
-            <Link href="/resolve#direct-answers" className="weather-hub-chip">Try direct answers</Link>
+            <Link href="/resources#answers" className="weather-hub-chip">Try direct answers</Link>
           </div>
           {closestToolkits.length > 0 ? (
             <div className="flex flex-wrap gap-2">

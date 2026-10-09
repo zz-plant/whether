@@ -1,6 +1,9 @@
 import { sendTelemetry } from "./telemetry/sendTelemetry";
 
-type OperatorWorkflowRoute = "/" | "/signals" | "/operate" | "/resolve";
+/* `/resources` (Guides) took `/resolve`'s place on 2026-10-08, when Resolve's
+   direct answers moved there: the step after the plan is still "answer the one
+   decision left", it lives at a different address. */
+type OperatorWorkflowRoute = "/" | "/signals" | "/operate" | "/resources";
 
 /**
  * One event, because one is what the client sends.
@@ -24,7 +27,7 @@ const OPERATOR_WORKFLOW_TELEMETRY_ENDPOINT = "/api/telemetry/operator-workflow";
 export const operatorWorkflowRouteStorageKey = "whether.operatorWorkflow.lastPath";
 
 export const isOperatorWorkflowRoute = (value: string): value is OperatorWorkflowRoute =>
-  value === "/" || value === "/signals" || value === "/operate" || value === "/resolve";
+  value === "/" || value === "/signals" || value === "/operate" || value === "/resources";
 
 export const isOperatorWorkflowEvent = (input: unknown): input is OperatorWorkflowEvent => {
   if (!input || typeof input !== "object") {

@@ -23,7 +23,7 @@ export function Shell({
        animated for exactly the people who asked it not to. The shapes mirror
        the hero — eyebrow, headline, summary, action row, the stamp column —
        and the two cards under it, so the resolved page lands where the
-       placeholder was (suspenseFallbacks.tsx has the argument). */
+       placeholder was: a fallback of the wrong height is a layout shift. */
     return (
       <div className="flex-1 bg-[var(--bg-body)] text-[var(--app-text)]">
         <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-4 sm:py-5">

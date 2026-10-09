@@ -169,9 +169,9 @@ describe("home route render contract", () => {
     assert.ok(!routeSource.includes("<StageSwitcher"), "the interpretation-layer switch is gone from /");
     assert.ok(!routeSource.includes("<ViewSelector"), "the view selector is gone from /");
 
-    // Demoted hubs stay reachable on demand: the command palette mounts every
-    // IA navigation layer and its own history shortcut.
-    assert.ok(paletteSource.includes("loopNavigationLayers"), "command palette mounts the IA navigation layers");
+    // Every group and page stays reachable on demand: the command palette mounts
+    // the IA's groups and pages and its own history shortcut.
+    assert.ok(paletteSource.includes("navigationGroups") && paletteSource.includes("navigationPages"), "command palette mounts the IA groups and pages");
     assert.ok(paletteSource.includes('navigateTo("/history")'), "command palette keeps the history deep link");
   });
 

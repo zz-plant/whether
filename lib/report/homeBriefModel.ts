@@ -265,7 +265,7 @@ export type StartupVariantPolicy = {
   adjustmentsByMode: Record<StartupVariantMode, ScopedVariantDecisionAdjustment>;
 };
 
-type StartRouteDeltaRoute = "/signals" | "/operate" | "/resolve";
+type StartRouteDeltaRoute = "/signals" | "/operate";
 
 type StartRouteDeltaItem = {
   id: "posture-shift" | "top-driver" | "trigger-risk";

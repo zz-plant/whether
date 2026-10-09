@@ -1,7 +1,7 @@
 import { buildBreadcrumbList, buildCanonicalUrl, organizationId, organizationName, websiteId, websiteName } from "../seo";
 import { siteUrl } from "../siteUrl";
 import { buildAuthorSchema, buildPublisherSchema } from "../publisher";
-import { createBreadcrumbTrail } from "../navigation/breadcrumbs";
+import { buildGroupBreadcrumbs, createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
 import { PRICING_SUMMARY, type PricingPlan } from "../pricing";
@@ -123,7 +123,7 @@ export const buildHistoryStructuredData = ({
         item,
       })),
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/history" }])),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/history")),
   ]);
 };
 
@@ -316,7 +316,10 @@ export const buildToolkitHowTo = (toolkit: {
       })),
     },
     buildBreadcrumbList(
-      createBreadcrumbTrail([{ path: "/" }, { path: "/resolve" }, { path: `/toolkits/${toolkit.slug}`, label: toolkit.title }]),
+      buildGroupBreadcrumbs(`/toolkits/${toolkit.slug}`, [
+        { name: "More tools", path: "/resources#more-tools" },
+        { name: toolkit.title, path: `/toolkits/${toolkit.slug}` },
+      ]),
     ),
   ]);
 };
@@ -392,7 +395,7 @@ export const buildAnswerFaqStructuredData = ({
           })),
       ],
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/resolve" }, { path: `/answers/${slug}`, label: question }])),
+    buildBreadcrumbList(buildGroupBreadcrumbs(`/answers/${slug}`, [{ name: question, path: `/answers/${slug}` }])),
   ]);
 };
 
@@ -457,7 +460,7 @@ export const buildCalibrationStudyStructuredData = ({
         { "@type": "PropertyValue", name: "Readings whose regime held one month later", value: totals.held },
       ],
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/trust" }, { path: "/calibration", label: name }])),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/calibration")),
   ]);
 };
 
@@ -505,6 +508,6 @@ export const buildProductCanonStructuredData = ({
         })),
       },
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/history" }, { path: "/concepts", label: name }])),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/concepts")),
   ]);
 };

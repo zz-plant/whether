@@ -251,7 +251,9 @@ describe("one reading's margin across routes and exports", () => {
     assert.equal(surfaces.signals, published.label, "/signals");
     assert.equal(surfaces.operate, published.label, "/operate");
     assert.equal(surfaces.trust.trustStrip.confidenceLabel, published.label, "/trust strip");
-    assert.match(surfaces.trust.meetingSnippet, new RegExp(`^Trust: Margin: ${BAND[published.label]} \\(`, "m"), "/trust meeting snippet");
+    // The meeting snippet moved from /trust to /share on 2026-10-08; the margin rides in its trust line.
+    const snippet = surfaces.pastes?.find((option) => option.id === "meeting-snippet");
+    assert.match(snippet?.kind === "text" ? snippet.text : "", new RegExp(`^Trust: Margin: ${BAND[published.label]} \\(`, "m"), "/share meeting snippet");
     assert.equal(surfaces.postureState?.currentState.confidenceLabel, published.label, "posture state (/api/weekly, /api/monthly, MCP)");
     assert.equal(surfaces.postureState?.currentState.confidencePercent, published.percent, "posture state percent");
     assert.equal(surfaces.shareArtifact?.confidenceLabel, published.label, "/share copy picker");

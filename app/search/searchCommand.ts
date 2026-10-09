@@ -7,7 +7,7 @@
  * JavaScript, so this genuinely runs in both places.
  */
 import { searchIndex, type SearchEntityJob } from "../../lib/search/searchIndex";
-import { buildToolkitLibraryHref } from "../resolve/components/toolkitLibraryPanels";
+import { buildToolkitLibraryHref } from "../resources/components/toolkitLibraryPanels";
 
 export const SEARCH_JOB_ORDER: SearchEntityJob[] = ["check", "approve", "resolve", "risk", "trust"];
 
@@ -35,7 +35,7 @@ export const resolveSearchCommandHref = (query: string, results: ReturnType<type
   if (commandJob === "resolve") {
     return results.some((entry) => entry.type === "toolkit")
       ? buildToolkitLibraryHref(query)
-      : "/resolve#direct-answers";
+      : "/resources#answers";
   }
 
   if (commandJob === "risk") {

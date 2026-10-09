@@ -67,10 +67,8 @@ describe("every hand-built page graph carries the site node", () => {
     }
   });
 
-  it("on /resolve, the resource pages, a published week and an archive period", async () => {
-    const { default: ResolvePage } = await import("../app/resolve/page");
-    assertCarriesTheSite("/resolve", await render(ResolvePage({})));
-
+  // /resolve was checked here until 2026-10-08, when it became a redirect into Decide and Guides.
+  it("on the resource pages, a published week and an archive period", async () => {
     const resources = await import("../app/resources/[slug]/page");
     for (const slug of ["capital-discipline-venture-backed-companies", "should-we-freeze-hiring-high-interest-rate-environment"]) {
       const nodes = assertCarriesTheSite(`/resources/${slug}`, await render(resources.default(params({ slug }))));
