@@ -1,7 +1,7 @@
 import Link from "next/link";
-import { decisionAreaLabel } from "../../../lib/report/boundedDecisionRules";
 import { HomeSection } from "./HomeSection";
 import { ScoreLadder } from "../ui/scoreLadder";
+import { GovernedAreas } from "../ui/governedAreas";
 import { PlainEnglishScoreNote, SignalScaleNote } from "../ui/plainLanguage";
 import { compositeSignalScales } from "../../../lib/report/signalTranslations";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "../illustrations/TrendGlyph";
@@ -119,20 +119,8 @@ export function WhatChangedSection({
                     >
                       {row.label}
                     </Link>
-                    {row.key === "tightness" ? (
-                      <span className="block text-fluid-nano font-normal text-slate-400">
-                        Governs:{" "}
-                        <a href="#area-hiring" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">{decisionAreaLabel("hiring")}</a>,{" "}
-                        <a href="#area-burn-discipline" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">{decisionAreaLabel("burn-discipline")}</a>,{" "}
-                        <a href="#area-capital-raising" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">{decisionAreaLabel("capital-raising")}</a>
-                      </span>
-                    ) : row.key === "riskAppetite" ? (
-                      <span className="block text-fluid-nano font-normal text-slate-400">
-                        Governs:{" "}
-                        <a href="#area-product-tempo" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">{decisionAreaLabel("product-tempo")}</a>,{" "}
-                        <a href="#area-expansion-bets" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">{decisionAreaLabel("expansion-bets")}</a>,{" "}
-                        <a href="#area-capital-raising" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">{decisionAreaLabel("capital-raising")}</a>
-                      </span>
+                    {row.key === "tightness" || row.key === "riskAppetite" ? (
+                      <GovernedAreas metric={row.key} target="table" />
                     ) : row.key === "baseRate" ? (
                       <span className="block text-fluid-nano font-normal text-slate-400">
                         Feeds into <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>

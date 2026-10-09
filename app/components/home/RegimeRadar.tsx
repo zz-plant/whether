@@ -1,4 +1,5 @@
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { ConditionIcon } from "../ui/conceptIcons";
 
 type RegimeRadarProps = {
   tightness: number;
@@ -33,6 +34,10 @@ const PLOT_Y = 14;
 const PLOT_SIZE = 148;
 const PLOT_RIGHT = PLOT_X + PLOT_SIZE;
 const PLOT_BOTTOM = PLOT_Y + PLOT_SIZE;
+/* The corner glyphs, centred on the cap height of the 10-unit words beside them. */
+const QUADRANT_ICON = 12.5;
+const TOP_ICON_Y = PLOT_Y + 12 - 3.6 - QUADRANT_ICON / 2;
+const BOTTOM_ICON_Y = PLOT_BOTTOM - 6 - 3.6 - QUADRANT_ICON / 2;
 
 const xFor = (riskAppetite: number) =>
   PLOT_X + (Math.max(0, Math.min(100, riskAppetite)) / 100) * PLOT_SIZE;
@@ -175,6 +180,16 @@ export function RegimeRadar({
         >
           Sunny
         </text>
+
+        {/* Each corner's weather glyph, just outside the frame beside its
+            word: left of the two left-hand words, right of the two right-hand
+            ones. Inside, "Freezing" and its glyph would reach the change line
+            at the default risk-appetite line of 50. 12.5 units is 16px at the
+            plot's 256px cap. */}
+        <ConditionIcon regime="SCARCITY" x={PLOT_X - QUADRANT_ICON - 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
+        <ConditionIcon regime="DEFENSIVE" x={PLOT_RIGHT + 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
+        <ConditionIcon regime="VOLATILE" x={PLOT_X - QUADRANT_ICON - 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
+        <ConditionIcon regime="EXPANSION" x={PLOT_RIGHT + 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
 
         {/* Grid and threshold boundary crosshairs */}
         <line

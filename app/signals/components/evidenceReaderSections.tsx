@@ -2,6 +2,7 @@ import Link from "next/link";
 import { ReportSection } from "../../components/reportSection";
 import { ScoreCell } from "../../components/ui/scoreCell";
 import { ScoreLadder } from "../../components/ui/scoreLadder";
+import { GovernedAreas } from "../../components/ui/governedAreas";
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { ActionLink } from "../../components/ui/actionLink";
 import { toRoute } from "../../../lib/navigation/routeType";
@@ -146,20 +147,22 @@ export const SignalsWhatChangedSection = ({
                     row.label
                   )}
                   {row.kindLabel ? <span className="block text-xs font-normal text-slate-500">{row.kindLabel}</span> : null}
-                  {row.key === "baseRate" ? (
+                  {row.key === "tightness" || row.key === "riskAppetite" ? (
+                    /* The areas this score sets the lines for, each opening the
+                       brief on that area's answer. It said "Sets the pause and
+                       resume lines" without saying whose. */
+                    <GovernedAreas metric={row.key} target="brief" className="mt-0.5" />
+                  ) : row.key === "baseRate" ? (
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
                       Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
                     </span>
-                  ) : row.key === "curveSlope" ? (
-                    /* Sets risk appetite outright, and adds to funding pressure only
-                       below zero (`computeRiskAppetiteScore` and the inversion points
-                       in regimeEngineCore). This said funding pressure alone. */
+                  ) : (
+                    /* The curve slope. Sets risk appetite outright, and adds to
+                       funding pressure only below zero (`computeRiskAppetiteScore`
+                       and the inversion points in regimeEngineCore). This said
+                       funding pressure alone. */
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
                       Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted
-                    </span>
-                  ) : (
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Sets the pause and resume lines
                     </span>
                   )}
                 </th>

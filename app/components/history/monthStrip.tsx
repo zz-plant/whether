@@ -1,6 +1,7 @@
 import { REGIME_LABELS, REGIME_SEVERITY_RANK, isRegimeKey } from "../../../lib/regimePresentation";
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
 import { countRecord } from "../../../lib/report/trackRecord";
+import { ConditionIcon } from "../ui/conceptIcons";
 
 /**
  * The record's answer in one band: every month coloured by the call, the
@@ -31,6 +32,22 @@ export const describeCurrentRun = (entries: readonly MonthStripEntry[]) => {
   return { label, held, since: sorted[sorted.length - held].recordDate, latest: latest.recordDate };
 };
 
+/* A run's glyph needs room for 16px and some air: 8% of the band is 28px in a
+   358px phone column; from `sm` the band is at least ~600px, so 3% (18px) fits. */
+const RUN_GLYPH_MIN_SHARE = 0.08;
+const RUN_GLYPH_MIN_SHARE_SM = 0.03;
+
+/** Consecutive months under one condition, as start index and length. */
+const stripRuns = (sorted: readonly MonthStripEntry[]) => {
+  const runs: { regime: string; start: number; length: number }[] = [];
+  sorted.forEach((entry, index) => {
+    const last = runs[runs.length - 1];
+    if (last && last.regime === entry.regime) last.length += 1;
+    else runs.push({ regime: entry.regime, start: index, length: 1 });
+  });
+  return runs;
+};
+
 export function MonthStrip({ entries, className = "" }: MonthStripProps) {
   const sorted = [...entries].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
   const run = describeCurrentRun(sorted);
@@ -52,27 +69,48 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
       <p className="sr-only">
         Conditions by month, {monthLabel(sorted[0].recordDate)} to {monthLabel(run.latest)}: {changes} {changes === 1 ? "change" : "changes"}; {run.label} held {run.held} {run.held === 1 ? "month" : "months"}.
       </p>
-      <div className="flex h-6 w-full overflow-hidden rounded-md" aria-hidden="true">
-        {sorted.map((entry, index) => {
-          const changed = index > 0 && entry.regime !== sorted[index - 1].regime;
-          return (
-            <span
-              key={entry.recordDate}
-              data-regime={regimeDataAttribute(entry.regime)}
-              className={`h-full flex-1 bg-[var(--regime-accent)] ${changed ? "border-l border-[var(--bg-body)]" : ""}`}
-              title={`${monthLabel(entry.recordDate)}: ${isRegimeKey(entry.regime) ? REGIME_LABELS[entry.regime] : entry.regime}`}
+      <div className="relative" aria-hidden="true">
+        <div className="flex h-6 w-full overflow-hidden rounded-md">
+          {sorted.map((entry, index) => {
+            const changed = index > 0 && entry.regime !== sorted[index - 1].regime;
+            return (
+              <span
+                key={entry.recordDate}
+                data-regime={regimeDataAttribute(entry.regime)}
+                className={`h-full flex-1 bg-[var(--regime-accent)] ${changed ? "border-l border-[var(--bg-body)]" : ""}`}
+                title={`${monthLabel(entry.recordDate)}: ${isRegimeKey(entry.regime) ? REGIME_LABELS[entry.regime] : entry.regime}`}
+              />
+            );
+          })}
+        </div>
+        {/* Each long run carries its condition's glyph, so the band reads without
+            colour: Freezing's rose and Stormy's violet are one grey in
+            greyscale, and so are Sunny's green and Cloudy's amber. Dark ink on
+            the 500-level hue in both themes; runs too short for a 16px glyph
+            are named by the key below. */}
+        {stripRuns(sorted).map((run) => {
+          const share = run.length / sorted.length;
+          return isRegimeKey(run.regime) && share >= RUN_GLYPH_MIN_SHARE_SM ? (
+            <ConditionIcon
+              key={run.start}
+              regime={run.regime}
+              data-strip-run-glyph
+              className={`pointer-events-none absolute top-1 -translate-x-1/2 text-black/70 ${share < RUN_GLYPH_MIN_SHARE ? "max-sm:hidden" : ""}`}
+              style={{ left: `${((run.start + run.length / 2) / sorted.length) * 100}%` }}
             />
-          );
+          ) : null;
         })}
       </div>
       <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-slate-300" aria-label="Months under each condition">
         {legend.map(([regime, months]) => (
           <li key={regime} className="flex items-center gap-1.5">
-            <span
-              aria-hidden="true"
-              data-regime={regimeDataAttribute(regime)}
-              className="inline-block h-2.5 w-2.5 rounded-sm bg-[var(--regime-accent)]"
-            />
+            {/* The glyph is the key's swatch: it carries the condition's ink
+                and its shape, so a run in the band is matched by either. */}
+            {isRegimeKey(regime) ? (
+              <ConditionIcon regime={regime} />
+            ) : (
+              <span aria-hidden="true" className="inline-block h-2.5 w-2.5 rounded-sm bg-slate-500" />
+            )}
             {isRegimeKey(regime) ? REGIME_LABELS[regime] : regime}
             <span className="tabular-nums text-slate-500">{months} {months === 1 ? "month" : "months"}</span>
           </li>

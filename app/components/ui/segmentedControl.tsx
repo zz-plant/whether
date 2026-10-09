@@ -1,6 +1,6 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
 import { cn } from "../../../lib/utils";
 
 /**
@@ -45,11 +45,12 @@ export type SegmentedOption<Key extends string> = {
   /**
    * Secondary text. In the "segmented" strip it follows the label above `sm`
    * and hides on a phone; in "choices" it is the option's second line at every
-   * width, because there it carries the answer rather than a gloss.
+   * width, because there it carries the answer rather than a gloss — on the
+   * decision picker, the area's state badge, which brings its own ink.
    */
-  sublabel?: string;
-  /** "caution" prints the second line in the caution ink: a state, not a label (§XVIII). */
-  sublabelTone?: "caution";
+  sublabel?: ReactNode;
+  /** A decorative glyph before the label (`aria-hidden`; the label still names the option). */
+  icon?: ReactNode;
   /** Native tooltip for the option. */
   title?: string;
 };
@@ -143,17 +144,15 @@ export function SegmentedControl<Key extends string>({
           <span className={OPTION[layout]}>
             {layout === "choices" && option.sublabel ? (
               <span className="flex flex-col items-start text-left leading-tight">
-                <span>{option.label}</span>
-                <span
-                  className={`mt-0.5 text-fluid-nano font-normal ${
-                    option.sublabelTone === "caution" ? "text-[color:var(--color-semantic-caution-fg)]" : "text-slate-400"
-                  }`}
-                >
-                  {option.sublabel}
+                <span className="inline-flex items-center gap-1.5">
+                  {option.icon}
+                  {option.label}
                 </span>
+                <span className="mt-0.5 text-fluid-nano font-normal text-slate-400">{option.sublabel}</span>
               </span>
             ) : (
               <>
+                {option.icon ? <span className="mr-1.5 inline-flex">{option.icon}</span> : null}
                 <span>{option.label}</span>
                 {option.sublabel ? (
                   <span className="ml-1 hidden font-normal opacity-60 sm:inline">· {option.sublabel}</span>

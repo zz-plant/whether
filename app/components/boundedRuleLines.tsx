@@ -1,5 +1,6 @@
 import type { RuleCondition } from "../../lib/report/boundedDecisionRules";
-import { formatPointsToLine, type RuleThresholdDistance } from "../../lib/report/operatingCalls";
+import { formatPointsToLine, resolveLineState, type RuleThresholdDistance } from "../../lib/report/operatingCalls";
+import { LineStateBadge } from "./ui/conceptIcons";
 
 /**
  * One side of a bounded rule as its numeric lines, with the distance to the
@@ -37,22 +38,26 @@ export const RuleLines = ({
       ) : null}
       {conditions.map((condition) => {
         const isNearest = nearest && nearest.metric === condition.metric && nearest.value === condition.value;
+        /* The distance as the state badge where the line has a state — a pause
+           line crossed, close or clear, a resume line met — and as muted text
+           for a resume line still to reach. */
+        const state = isNearest ? resolveLineState(nearest.pointsToLine, kind, nearest.satisfied) : undefined;
+        const distance = isNearest ? formatPointsToLine(nearest.pointsToLine, kind, nearest.satisfied) : null;
         return (
           <span key={`${condition.metric}-${condition.operator}-${condition.value}`} className="tabular-nums">
             <span className={kind === "pause" ? "text-amber-100" : "text-sky-100"}>{condition.label}</span>
-            {isNearest ? (
-              <span
-                className={`ml-1.5 ${
-                  nearest.satisfied
-                    ? kind === "pause"
-                      ? "text-semantic-caution-fg"
-                      : "text-semantic-easing-fg"
-                    : "text-slate-500"
-                }`}
-              >
-                {formatPointsToLine(nearest.pointsToLine, kind, nearest.satisfied)}
-              </span>
-            ) : null}
+            {/* A space, not a margin, before the badge: it wraps under the line in
+                a narrow cell, and a margin would indent it there. */}
+            {distance === null ? null : state ? (
+              <>
+                {" "}
+                <LineStateBadge state={state} className="align-middle">
+                  {distance}
+                </LineStateBadge>
+              </>
+            ) : (
+              <span className="ml-1.5 text-slate-500">{distance}</span>
+            )}
           </span>
         );
       })}

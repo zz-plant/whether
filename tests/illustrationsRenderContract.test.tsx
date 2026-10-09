@@ -3,8 +3,6 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { ThresholdLadder } from "../app/components/illustrations/ThresholdLadder";
-import { RegimeGlyph } from "../app/components/illustrations/RegimeGlyph";
-import type { RegimeKey } from "../lib/types";
 
 /** A paint attribute holding a bare custom-property name renders nothing in the browser. */
 const assertTokensWrapped = (html: string) => {
@@ -340,17 +338,3 @@ describe("ThresholdLadder", () => {
     assert.ok(wide.includes('fontSize="12"') || wide.includes('font-size="12"'));
   });
 });
-
-describe("RegimeGlyph", () => {
-  const keys: RegimeKey[] = ["EXPANSION", "DEFENSIVE", "SCARCITY", "VOLATILE"];
-
-  it("renders every regime with the shared horizon and a title", () => {
-    for (const regime of keys) {
-      const html = renderToStaticMarkup(<RegimeGlyph idPrefix={`g-${regime}`} regime={regime} />);
-      assertTokensWrapped(html);
-      assert.match(html, /y1="26"/, `${regime} is missing the shared horizon`);
-      assert.match(html, /<title id="g-[A-Z]+-title">.+<\/title>/, `${regime} has no title`);
-    }
-  });
-});
-

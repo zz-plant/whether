@@ -1,4 +1,4 @@
-import { Wallet } from "lucide-react";
+import { Hourglass } from "lucide-react";
 import { StagePersonaSelector } from "../StagePersonaSelector";
 import { RunwayPersonaSelector } from "../RunwayPersonaSelector";
 import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
@@ -58,7 +58,8 @@ export function CompanyCalibration({
       ) : null}
       {runwayEmphasis ? (
         <p data-testid="runway-emphasis" className="flex items-start gap-1.5 text-xs leading-snug text-amber-200/90">
-          <Wallet size={14} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />
+          {/* An hourglass for runway: the wallet is Spending's glyph. */}
+          <Hourglass size={14} className="mt-0.5 shrink-0 text-amber-300" aria-hidden="true" />
           <span>{runwayEmphasis}</span>
         </p>
       ) : null}

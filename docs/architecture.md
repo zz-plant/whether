@@ -265,7 +265,8 @@ app/
 └── components/                       # Shared UI components
     ├── DecisionHero.tsx              # Primary weekly decision card + shortcuts
     ├── CadenceCallCard.tsx           # Monthly/quarterly lead for the cadence selector
-    ├── illustrations/                # Threshold rails, delta and regime glyphs, trend marks
+    ├── illustrations/                # Threshold rails, delta glyphs, trend marks
+    ├── ui/conceptIcons.tsx           # Condition, area and line-state glyphs (one mapping each)
     ├── commandPalette.tsx            # Cmd+K palette
     └── KeyboardShortcuts.tsx         # Global keyboard handlers
 ```

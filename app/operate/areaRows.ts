@@ -1,5 +1,5 @@
-import type { ActionStripItem } from "../../lib/report/operatingCalls";
-import { formatPointsToLine } from "../../lib/report/operatingCalls";
+import type { ActionStripItem, LineState } from "../../lib/report/operatingCalls";
+import { formatPointsToLine, resolveLineState } from "../../lib/report/operatingCalls";
 import { operatingLeverToDecisionArea } from "../../lib/report/businessAreaMap";
 import type { DecisionArea, RuleCondition, RuleConditionMetric } from "../../lib/report/boundedDecisionRules";
 import type { Route } from "../../lib/navigation/routeType";
@@ -23,8 +23,8 @@ import { findLeadAnswerForArea } from "../answers/decisionPages";
 export type AreaRowText = {
   area: DecisionArea;
   rule: string;
-  pause?: { line: string; distance?: string };
-  resume?: { line: string; distance?: string };
+  pause?: { line: string; distance?: string; state?: LineState };
+  resume?: { line: string; distance?: string; state?: LineState };
   /** The scores the printed lines are drawn on. */
   scores?: RuleConditionMetric[];
   href?: Route;
@@ -51,6 +51,10 @@ const joinConditions = (conditions: readonly RuleCondition[], join: "or" | "and"
 const distanceTo = (nearest: ActionStripItem["nearestPause"], kind: "pause" | "resume") =>
   nearest ? formatPointsToLine(nearest.pointsToLine, kind, nearest.satisfied) : undefined;
 
+/* The badge's state, from the same distance the words above print. */
+const stateOf = (nearest: ActionStripItem["nearestPause"], kind: "pause" | "resume") =>
+  nearest ? resolveLineState(nearest.pointsToLine, kind, nearest.satisfied) : undefined;
+
 export const buildAreaRows = (items: readonly ActionStripItem[]): AreaRowText[] =>
   items.map((item) => {
     const area = operatingLeverToDecisionArea[item.lever];
@@ -62,10 +66,12 @@ export const buildAreaRows = (items: readonly ActionStripItem[]): AreaRowText[] 
       pause: {
         line: pauseConditions.length > 0 ? joinConditions(pauseConditions, "or", item.pauseQualifier) : item.triggerThreshold,
         distance: pauseConditions.length > 0 ? distanceTo(item.nearestPause, "pause") : undefined,
+        state: pauseConditions.length > 0 ? stateOf(item.nearestPause, "pause") : undefined,
       },
       resume: {
         line: resumeConditions.length > 0 ? joinConditions(resumeConditions, "and", item.resumeQualifier) : item.reversalCondition,
         distance: resumeConditions.length > 0 ? distanceTo(item.bindingResume, "resume") : undefined,
+        state: resumeConditions.length > 0 ? stateOf(item.bindingResume, "resume") : undefined,
       },
       scores: [...pauseConditions, ...resumeConditions].map((condition) => condition.metric),
       href: answerHrefForArea(area),

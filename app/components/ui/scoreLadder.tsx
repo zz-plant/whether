@@ -1,5 +1,6 @@
 import type { CSSProperties, ReactNode } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { LineStateIcon } from "./conceptIcons";
 
 /**
  * A score drawn against its lines.
@@ -307,11 +308,17 @@ export function ScoreLadder({
         />
       </div>
       {/* The lines' key, left to right in the order the ticks sit, so a line
-          can be matched by position as well as by colour. */}
+          can be matched by position as well as by colour. The pause and resume
+          lines carry the pause and play glyphs the state badge uses, so the two
+          differ in shape as well as ink; the change line keeps its plain tick. */}
       <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] leading-none text-slate-400" data-ladder-key>
         {narrow.map(({ line }) => (
           <span key={`key-${line.kind}-${line.value}`} className="inline-flex items-center gap-1">
-            <span aria-hidden="true" className={`inline-block h-2 w-0.5 ${LINE_CLASS[line.kind].split(" ")[0]}`} />
+            {line.kind === "callChange" ? (
+              <span aria-hidden="true" className={`inline-block h-2 w-0.5 ${LINE_CLASS[line.kind].split(" ")[0]}`} />
+            ) : (
+              <LineStateIcon state={line.kind === "pause" ? "crossed" : "clear"} />
+            )}
             <span className={LINE_CLASS[line.kind].split(" ")[1]}>{lineName(line)}</span>{" "}
             <span className="tabular-nums">{formatPoints(line.value)}</span>
           </span>
