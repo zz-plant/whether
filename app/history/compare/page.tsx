@@ -186,12 +186,17 @@ export default async function HistoryComparePage({
     >
       <div className="space-y-6">
         <div id="compare-selectors" className="weather-panel grid gap-6 md:grid-cols-2">
+          {/* Each picker shows the month its column draws. Period A without a query
+              is the current week (`searchA` is undefined above), so its picker
+              selects "This week" rather than the newest month-end it used to
+              default to. */}
           <DateSelector
             label="Period A"
             paramPrefix="A"
             options={dateOptions}
-            currentYear={yearA ?? snapshots[snapshots.length - 1].year}
-            currentMonth={monthA ?? snapshots[snapshots.length - 1].month}
+            currentYear={searchA ? yearA : undefined}
+            currentMonth={searchA ? monthA : undefined}
+            currentWeekLabel="This week"
           />
           <DateSelector
             label="Period B"
