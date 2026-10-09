@@ -30,7 +30,7 @@ export function PageShell({
     <main
       id="main-content"
       tabIndex={-1}
-      className={`weather-shell weather-page-enter relative isolate flex-1 overflow-x-clip text-slate-100${className ? ` ${className}` : ""}`}
+      className={`weather-shell weather-page-enter relative isolate flex-1 overflow-x-clip text-slate-100 ${className ?? ""}`}
       data-regime={regimeDataAttribute(regime)}
       style={regimeAccentStyle(regime)}
     >

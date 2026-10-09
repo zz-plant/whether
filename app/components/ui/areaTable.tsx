@@ -183,8 +183,12 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
             <tr
               key={row.area}
               id={`area-${row.area}`}
-              className={`border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-2 max-md:py-3${
-                row.moved ? " bg-amber-500/[0.06]" : ""
+              /* The space before each `${` is load-bearing: Tailwind reads a class
+                 glued to an interpolation ("max-md:py-3${") as one token it cannot
+                 parse and never generates it (tests/tailwindClassBoundaries).
+                 On a phone the moved row's tint is inset from its text. */
+              className={`border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-2 max-md:py-3 ${
+                row.moved ? "bg-amber-500/[0.06] max-md:-mx-2 max-md:rounded-md max-md:px-2" : ""
               }`}
               data-area={row.area}
               data-moved={row.moved ? "true" : undefined}
@@ -231,7 +235,7 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
               </td>
               {showChanged ? (
                 <td
-                  className={`py-2.5 pr-3 max-md:col-span-2 max-md:p-0 ${row.moved ? "font-medium text-amber-200/90" : "text-slate-300"} ${
+                  className={`py-2.5 pr-3 max-md:col-span-2 max-md:p-0 ${row.moved ? "font-medium text-amber-200/90" : "text-slate-400"} ${
                     row.changed ? "" : "max-md:hidden"
                   }`.trim()}
                 >

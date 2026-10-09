@@ -233,7 +233,7 @@ export function DecisionHero({
           />
         ) : null}
         {aside && asideNote && asideNote.length > 0 ? (
-          <p className={`text-fluid-nano text-slate-400 max-md:hidden${trust ? "" : " md:mt-auto"}`} data-aside-note>
+          <p className={`text-fluid-nano text-slate-400 max-md:hidden ${trust ? "" : "md:mt-auto"}`} data-aside-note>
             {asideNote.join(" ")}
           </p>
         ) : null}
