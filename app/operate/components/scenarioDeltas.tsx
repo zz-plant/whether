@@ -113,8 +113,8 @@ export function ScenarioDeltas({
           </div>
         )}
 
-        {/* Two plain lists with the colour on their names, as Decide's Stop and
-            Start are (2026-10-09); each was a card with a capitalised verb. */}
+        {/* Two plain lists with the colour on their names, like Decide's Stop and
+            Start lists (2026-10-09); each was a card with a capitalised verb. */}
         <div className="grid gap-6 md:grid-cols-2 md:gap-8">
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-semantic-tightening-fg">What to stop in this scenario</h4>
