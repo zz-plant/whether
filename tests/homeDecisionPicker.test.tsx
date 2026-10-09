@@ -86,12 +86,13 @@ describe("decision picker", () => {
     const choices = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
     assert.equal((choices.match(/Pause line crossed/g) ?? []).length, 4);
     assert.match(choices, /4 pts from its pause line/);
-    /* The shared state badge: a crossed line in the caution ink with the pause
-       glyph, a close one with the dashed circle, so the two differ in shape. */
+    /* The shared state badge: a crossed line in the line state's own red with
+       the pause glyph, a close one with the dashed circle, so the two differ in
+       shape. */
     assert.match(
       choices,
-      /data-line-state-badge="crossed" class="[^"]*semantic-caution-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>Pause line crossed</,
-      "a crossed line is drawn as a state, in the caution ink",
+      /data-line-state-badge="crossed" class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>Pause line crossed</,
+      "a crossed line is drawn as a state, in the crossed ink",
     );
     assert.match(choices, /data-line-state-badge="near"[^>]*><svg[^>]*lucide-circle-dashed[\s\S]*?<\/svg><span>4 pts from its pause line</);
     /* Each choice is a card, so its area glyph is the 20px size. */
