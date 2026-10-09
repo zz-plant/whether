@@ -16,7 +16,7 @@ import { signalReadingMeaning } from "./signalTranslations";
  * months later. Null when this week's call did not change, or when no earlier
  * change in that direction has three following months on record.
  *
- * Direction, not the exact pair: six changes in fourteen years is too few for
+ * Direction, not the exact pair: seven changes since 2012 is too few for
  * "Sunny to Freezing" to have a precedent most weeks, and the card names the
  * pair it found so a reader can tell the two apart.
  *

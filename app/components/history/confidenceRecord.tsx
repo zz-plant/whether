@@ -13,8 +13,8 @@ import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
  * /trust explains how the number is computed. This says whether it has
  * predicted anything, which until now nothing on the site did — and the
  * honest answer is that it has not, in the sense its name implies. Published as
- * a count of months rather than folded back into the number, because six regime
- * flips in fourteen years cannot support re-fitting it, and a curve fitted to
+ * a count of months rather than folded back into the number, because seven changes
+ * in conditions since 2012 cannot support re-fitting it, and a curve fitted to
  * the base rate would report ~97% for every week and discriminate nothing.
  *
  * Two surfaces draw it. /calibration is the study's own URL and wraps the body

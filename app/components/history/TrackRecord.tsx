@@ -121,9 +121,13 @@ export function TrackRecordTiles({
   }
 
   const yearsCovered = record.monthsCovered / 12;
+  /* Each number carries its window (2026-10-09): the count since the record began,
+     with the yearly rate beside it, where this tile printed "0.5 per year" alone
+     under the same label as the grading section's trailing-window count. */
+  const since = `since ${formatMonthYearShortFromValue(record.firstRecordDate)}`;
   const changeRate = yearsCovered >= 1
-    ? `${(Math.round((record.regimeChanges / yearsCovered) * 10) / 10).toLocaleString("en-US")} per year`
-    : `${record.regimeChanges.toLocaleString("en-US")} total`;
+    ? `${since} · ${(Math.round((record.regimeChanges / yearsCovered) * 10) / 10).toLocaleString("en-US")} a year`
+    : since;
 
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="track-record-heading">
@@ -141,13 +145,13 @@ export function TrackRecordTiles({
       <div className={aside ? "grid gap-6 lg:grid-cols-2" : ""}>
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-2">
-            <StatTile label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} />
+            <StatTile label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} unit={since} />
             <StatTile
               label="Current conditions held"
               value={record.currentHoldMonths.toLocaleString("en-US")}
               unit={record.currentHoldMonths === 1 ? "mo" : "mos"}
             />
-            <StatTile label="Changes in conditions" value={changeRate} />
+            <StatTile label="Changes in conditions" value={record.regimeChanges.toLocaleString("en-US")} unit={changeRate} />
             <StatTile label="Record starts" value={formatDateUTC(record.firstRecordDate)} />
           </div>
 

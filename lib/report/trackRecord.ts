@@ -61,6 +61,52 @@ export type TrackRecord = {
 };
 
 /**
+ * The record's counts, from one place (2026-10-09).
+ *
+ * /history printed "7 changes" for the whole record and "5 in 60 mo" beside it under
+ * the same label; /calibration said "Six changes in conditions in fourteen years",
+ * written at the August close and stale once September's change landed; /about
+ * said "7 times in 177 months" and /calibration "176 month-end readings". Every page
+ * that counts the record reads this, and prints the window beside the number.
+ *
+ * `comparisons` is `readings - 1`: a month counts as held or changed only against
+ * the month after it, so the newest reading has nothing to compare against yet.
+ * That is the 176 beside the 177.
+ */
+type RecordCounts = {
+  firstRecordDate: string;
+  latestRecordDate: string;
+  /** Month-end readings in the window. */
+  readings: number;
+  /** Readings with a following month in the window. */
+  comparisons: number;
+  /** Months whose conditions differ from the month before. */
+  changes: number;
+};
+
+/**
+ * Counts for the whole series, or for its last `lastMonths` readings. Null when the
+ * window holds no reading.
+ */
+export const countRecord = (
+  series: readonly { recordDate: string; regime: string }[],
+  lastMonths?: number,
+): RecordCounts | null => {
+  const ordered = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
+  const window = lastMonths === undefined ? ordered : ordered.slice(-lastMonths);
+  const first = window[0];
+  const latest = window[window.length - 1];
+  if (!first || !latest) return null;
+  return {
+    firstRecordDate: first.recordDate,
+    latestRecordDate: latest.recordDate,
+    readings: window.length,
+    comparisons: window.length - 1,
+    changes: window.filter((entry, index) => index > 0 && entry.regime !== window[index - 1]?.regime).length,
+  };
+};
+
+/**
  * Below this the window is too short for "held for N months" to mean anything,
  * so the surface renders nothing rather than a stat that overstates the record.
  */
@@ -92,15 +138,12 @@ export const buildTrackRecord = (
   const ordered = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
   const latest = ordered[ordered.length - 1];
 
-  let regimeChanges = 0;
+  const counts = countRecord(ordered);
   let lineCrossingMonths = 0;
   let currentHoldMonths = 1;
   let currentHoldStartIndex = ordered.length - 1;
 
   for (let i = 1; i < ordered.length; i += 1) {
-    if (ordered[i].regime !== ordered[i - 1].regime) {
-      regimeChanges += 1;
-    }
     const before = conditionsHeld(ordered[i - 1]);
     if (conditionsHeld(ordered[i]).some((held, index) => held !== before[index])) {
       lineCrossingMonths += 1;
@@ -132,12 +175,12 @@ export const buildTrackRecord = (
   });
 
   return {
-    monthsCovered: ordered.length,
+    monthsCovered: counts?.readings ?? ordered.length,
     firstRecordDate: ordered[0].recordDate,
     latestRecordDate: latest.recordDate,
     currentHoldMonths,
     currentHoldStartDate: ordered[currentHoldStartIndex].recordDate,
-    regimeChanges,
+    regimeChanges: counts?.changes ?? 0,
     lineCrossingMonths,
     currentRegime: latest.regime,
     currentRegimeLabel: getRegimePublicLabel(latest.regime),

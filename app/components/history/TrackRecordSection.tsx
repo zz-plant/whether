@@ -1,5 +1,6 @@
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
+import { countRecord } from "../../../lib/report/trackRecord";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
 import { StatTile } from "../ui/statTile";
@@ -15,6 +16,13 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
   if (series.length < 2) return null;
 
   const record = buildRegimeTrackRecord(series);
+  /* The window, beside the count: this section grades the trailing months the
+     page hands it, and its "Changes in conditions" used to sit under the same
+     label as the whole record's with nothing saying the two windows differed. */
+  const counts = countRecord(series);
+  const windowLabel = counts
+    ? `${formatMonthYearShortFromValue(counts.firstRecordDate)} to ${formatMonthYearShortFromValue(counts.latestRecordDate)}`
+    : null;
   const label = (regime: string) => getRegimePublicLabel(regime);
   const recentTransitions = [...record.transitions].reverse().slice(0, 8);
   const currentSpell = record.spells[record.spells.length - 1];
@@ -34,12 +42,17 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
       <div>
         <h2 id="track-record-grading-heading" className="text-xl font-semibold text-white sm:text-2xl">How the record held up</h2>
         <p className="text-sm text-slate-300">
-          How the readings held up, graded against the same data that produced them.
+          The last {counts?.readings ?? record.observations} month-end readings{windowLabel ? `, ${windowLabel},` : ""} graded
+          against the same data that produced them.
         </p>
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatTile label="Changes in conditions" value={record.transitions.length} unit={`in ${record.observations} mo`} />
+        <StatTile
+          label="Changes in conditions"
+          value={counts?.changes ?? record.transitions.length}
+          unit={`in the last ${counts?.readings ?? record.observations} months`}
+        />
         <StatTile label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
         <StatTile
           label="Median hold"

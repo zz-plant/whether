@@ -10,6 +10,9 @@ import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
 import { ConfidenceRecordSection } from "../components/history/confidenceRecord";
 import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibration";
+import { countRecord } from "../../lib/report/trackRecord";
+import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
+import { formatMonthYearShortFromValue } from "../../lib/formatters";
 import { CalibrationCurveGlyph } from "../components/illustrations/CalibrationCurveGlyph";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 
@@ -43,6 +46,10 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function CalibrationPage() {
   const totals = confidenceCalibrationTotals();
+  /* The record's own counts (`countRecord`), the ones /history and /about print, so
+     this page cannot say "six" while they say seven. */
+  const record = countRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
+  const since = record ? formatMonthYearShortFromValue(record.firstRecordDate) : "2012";
 
   return (
     <ContentPageShell measure="wide">
@@ -65,6 +72,12 @@ export default function CalibrationPage() {
           <li>
             <span className="text-slate-100">Sample.</span> Every month-end reading in the archive
             that has a following month to compare against — {totals.months} of them.
+            {record ? (
+              <>
+                {" "}The record holds {record.readings} readings, {since} to{" "}
+                {formatMonthYearShortFromValue(record.latestRecordDate)}; the newest has no following month yet.
+              </>
+            ) : null}
           </li>
           <li>
             <span className="text-slate-100">Outcome.</span> Whether conditions were the same one month
@@ -85,7 +98,7 @@ export default function CalibrationPage() {
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            Six changes in conditions in fourteen years is not enough to estimate a probability per band. A
+            {record ? `${record.changes} ${record.changes === 1 ? "change" : "changes"} in conditions since ${since}` : "A handful of changes in conditions"} is not enough to estimate a probability per band. A
             curve fitted to that base rate would report about 97% every week and discriminate nothing. That is worse than a number that at least measures something real.
           </li>
           <li>
