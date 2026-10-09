@@ -3189,7 +3189,11 @@ reports the test, and the rule kept the current ramp.
   every month (`tests/candidateRamps.test.ts`); Invariant 12 lists it with the engine modules.
 - **On `/trust`.** One line under "How the scores are built" says the alternatives are being
   tested and set no guidance, linking the registration and the results
-  (`tests/trustRampTestNote.test.tsx`).
+  (`tests/trustRampTestNote.test.tsx`). Both are served from this site as plain text, at
+  `/research/premise-test-registration.md` and `/research/premise-test-results.md`, because the
+  repository is private and its GitHub copies are a 404 for readers. The routes serve
+  `lib/research/premiseTestDocs.ts`, which `scripts/research/publishPremiseTestDocs.ts` builds from
+  `docs/research/`; `tests/premiseTestDocs.test.ts` fails when the two differ.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

@@ -48,9 +48,10 @@ const lowerFirst = (sentence: string) => `${sentence.charAt(0).toLowerCase()}${s
 
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
 /* The premise test: the candidate rate ramps scored beside each reading, and the rule that
-   decides whether one replaces the current ramp, fixed before any result (2026-10-09). */
-const RAMP_TEST_REGISTRATION_URL = "https://github.com/zz-plant/whether/blob/main/docs/research/premise-test-preregistration.md";
-const RAMP_TEST_RESULTS_URL = "https://github.com/zz-plant/whether/blob/main/docs/research/premise-test-results.md";
+   decides whether one replaces the current ramp, fixed before any result (2026-10-09). Served
+   from this site: the repository is private, so its GitHub copies are a 404 for readers. */
+const RAMP_TEST_REGISTRATION_URL = "/research/premise-test-registration.md";
+const RAMP_TEST_RESULTS_URL = "/research/premise-test-results.md";
 
 /** Base rate at which the rate component of tightness saturates. */
 const baseRateSaturation =
@@ -510,16 +511,12 @@ export function FormulaReference({
         week&rsquo;s reading, and none of them sets the guidance.{" "}
         <a
           href={RAMP_TEST_REGISTRATION_URL}
-          target="_blank"
-          rel="noreferrer"
           className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
         >
           The test, registered in advance →
         </a>{" "}
         <a
           href={RAMP_TEST_RESULTS_URL}
-          target="_blank"
-          rel="noreferrer"
           className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
         >
           What it found →
