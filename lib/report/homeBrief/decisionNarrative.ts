@@ -3,7 +3,7 @@ import { isImprovingSignalDelta } from "../reportData";
 import type { Regime, SignalChange } from "../homeBriefModel";
 import type { ReportDynamics } from "../reportDataTypes";
 import type { WeeklyTone } from "../reportEvidence";
-import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
+import { comparisonBasis, type ComparisonBasis, describeGuidanceStands } from "../comparisonBasis";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 
 const regimeShiftTargets = {
@@ -134,7 +134,7 @@ export const buildWeeklyMovementMetric = ({
   return {
     score,
     direction: "stable" as const,
-    summary: movementSentence ?? `Conditions held steady ${window}. Last week's guidance stands.`,
+    summary: movementSentence ?? `Conditions held steady ${window}. ${describeGuidanceStands(basis)}`,
   };
 };
 

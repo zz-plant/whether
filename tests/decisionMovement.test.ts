@@ -86,7 +86,7 @@ describe("buildDecisionMovement", () => {
     assert.equal(result.conditions, null);
     assert.equal(
       result.sentence,
-      "Conditions held steady since Sep 15; no pause or resume line was crossed. Last week's guidance stands.",
+      "Conditions held steady since Sep 15; no pause or resume line was crossed. The guidance stands.",
     );
     /* Each area names the side of its lines it held on: printed alone, "No line crossed" sat
        beside "Pause if Funding pressure > 76 · crossed" and read as the row contradicting itself. */

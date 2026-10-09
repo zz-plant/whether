@@ -1,3 +1,4 @@
+import { comparisonBasis, describeGuidanceStands } from "../comparisonBasis";
 import { getWeeklyPostureHistory } from "../../summary/weeklyPostureHistory";
 import { formatThresholdNumber } from "../../formatters";
 import { REGIME_LABELS } from "../../regimePresentation";
@@ -399,7 +400,7 @@ export const buildStartRouteDeltaBlock = ({
       isReturningUser: true,
       hasMeaningfulDelta: false,
       fallbackCopy:
-        `No change. Last week's guidance stands. ${heldDecision} Re-check when: ${reversalTrigger}`,
+        `No change. ${describeGuidanceStands(comparisonBasis(reportDynamics?.comparedWith))} ${heldDecision} Re-check when: ${reversalTrigger}`,
       items: [],
     };
   }
