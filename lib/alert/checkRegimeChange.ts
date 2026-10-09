@@ -112,7 +112,7 @@ export const checkRegimeChange = async (options?: {
      */
     pushOutcome = await sendRegimeChangePush().catch(() => null);
     await postSlackAlerts(
-      "⚠️ Conditions changed",
+      "Conditions changed",
       `*${getRegimePublicLabel(previousRegime)}* → *${getRegimePublicLabel(currentRegime)}*\nRead this week's guidance before acting on last week's plan.`,
     );
   }
@@ -128,7 +128,7 @@ export const checkRegimeChange = async (options?: {
   for (const move of flashMoves) {
     alerts.push(`FLASH — ${move.headline}`);
     await postSlackAlerts(
-      "⚡ Flash — an unusually large move since the last reading",
+      "Flash — an unusually large move since the last reading",
       `${move.headline}\nThis week's guidance stands until the next reading shows where the scores settle. Until then, hold anything you can't undo.`,
     );
   }
@@ -149,7 +149,7 @@ export const checkRegimeChange = async (options?: {
     if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
       alerts.push(`WATCH — conditions could change soon: ${projection.velocityLabel}`);
       await postSlackAlerts(
-        "👀 Conditions could change soon",
+        "Conditions could change soon",
         `${projection.velocityLabel}\nA score is closing on the line where conditions change. Hold anything you can't undo until it settles.`,
       );
     }

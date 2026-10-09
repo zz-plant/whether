@@ -114,11 +114,13 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
     ...(payload.call && payload.call.trim() !== payload.actionNow.trim()
       ? [`> **GUIDANCE**: ${payload.call}`]
       : []),
-    `> 🎯 **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
-    `> ⚠️ **${SLIDE_LABELS.pause.toUpperCase()}**: ${payload.pauseIf}`,
+    // Labels only (2026-10-09): a target, a warning sign, a tick and a cycle
+    // arrow sat in front of them, four pictures restating four words.
+    `> **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
+    `> **${SLIDE_LABELS.pause.toUpperCase()}**: ${payload.pauseIf}`,
     // The stage's own discipline for lifting its hold, when one is chosen.
-    ...(payload.resumeWhen ? [`> ✅ **${SLIDE_LABELS.resume.toUpperCase()}**: ${payload.resumeWhen}`] : []),
-    `> 🔄 **${SLIDE_LABELS.callChange.toUpperCase()}**: ${payload.callChangesIf}`,
+    ...(payload.resumeWhen ? [`> **${SLIDE_LABELS.resume.toUpperCase()}**: ${payload.resumeWhen}`] : []),
+    `> **${SLIDE_LABELS.callChange.toUpperCase()}**: ${payload.callChangesIf}`,
     // The other things that would change the guidance, under the name the share
     // formats give them. They printed as the resume line here, which on a held
     // week put "why the guidance is held" under "Resume when".
