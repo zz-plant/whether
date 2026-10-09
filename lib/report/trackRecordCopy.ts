@@ -37,3 +37,38 @@ export const describeRecordCadence = (
 export const describeReconstructedPeriod = (periodTitle: string, firstPublishedWeek: string): string =>
   `Reconstructed: this is what today's published formula reads for ${periodTitle}, not guidance published at the time. ` +
   `Whether began publishing weekly briefs in the week of ${firstPublishedWeek}.`;
+
+/*
+ * The record's figures as published before its last re-score, kept where the
+ * record is discussed so a change of basis is visible rather than silent
+ * (docs/feature-specs-current.md §1.1.67). Authored, because the engine that
+ * produced them no longer runs: these are the numbers /history and /calibration
+ * printed on the day, from the archive engine-2026-10-06 scored. While the
+ * re-score leaves them unchanged the line points at the figures beside it
+ * rather than printing them twice (§1.1.63); once they differ it prints them.
+ */
+const LAST_RESCORE = {
+  dateLabel: "Oct 9, 2026",
+  change: "the Chicago Fed financial conditions index joined the inputs the record is scored on, the same inputs that now set the guidance",
+  before: { held: 169, comparisons: 176, changes: 7, signaled: 2, graded: 5 },
+} as const;
+
+const percent = (held: number, of: number) => `${Math.round((held / of) * 100)}%`;
+
+const rescoreLead = () => `Re-scored on ${LAST_RESCORE.dateLabel}, when ${LAST_RESCORE.change}.`;
+
+/** /calibration's line on the last re-score: the study's count before it, where that differs from the count above. */
+export const describeCalibrationRescore = (now: { held: number; comparisons: number }): string => {
+  const { before } = LAST_RESCORE;
+  return now.held === before.held && now.comparisons === before.comparisons
+    ? `${rescoreLead()} No month's conditions changed, so the count above is the one published before it.`
+    : `${rescoreLead()} Before it, ${before.held} of ${before.comparisons} comparisons held (${percent(before.held, before.comparisons)}).`;
+};
+
+/** /history's line on the last re-score: the changes and the advance signals before it, where those differ from the tiles. */
+export const describeTrackRecordRescore = (now: { changes: number; signaled: number; graded: number }): string => {
+  const { before } = LAST_RESCORE;
+  return now.changes === before.changes && now.signaled === before.signaled && now.graded === before.graded
+    ? `${rescoreLead()} No month's conditions changed, so the counts above are the ones published before it.`
+    : `${rescoreLead()} Before it, the record showed ${before.changes} changes in conditions, and ${before.signaled} of the last ${before.graded} signaled in advance.`;
+};

@@ -27,6 +27,11 @@ import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 import { ruleMetricLabel } from "../../lib/report/boundedDecisionRules";
 import { ScoreLadder, type LadderLine } from "../components/ui/scoreLadder";
+import {
+  describeRecordBasisInputs,
+  isCountedMarketInput,
+  type ScoringBasis,
+} from "../../lib/report/scoringBasis";
 
 /** One score against its lines, this week and last, as the ladder draws it. */
 type ScorePosition = {
@@ -55,6 +60,22 @@ const baseRateSaturation =
 const inversionSaturation = TIGHTNESS_INVERSION_POINTS / CURVE_INVERSION_TIGHTNESS_MULTIPLIER;
 
 const adj = MACRO_ADJUSTMENT_CONSTANTS;
+
+const joinAnd = (items: readonly string[]) =>
+  items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+
+const upperFirst = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+
+/**
+ * One sentence after a card's list of market reads, naming the ones the record
+ * basis leaves out ("The spread and the index are shown, not counted."), or
+ * nothing when every read in the list counts. Once per list, not after each.
+ */
+const shownNotCounted = (reads: ReadonlyArray<[Parameters<typeof isCountedMarketInput>[0], string]>) => {
+  const shown = reads.filter(([id]) => !isCountedMarketInput(id)).map(([, name]) => name);
+  if (shown.length === 0) return "";
+  return ` ${upperFirst(joinAnd(shown))} ${shown.length === 1 ? "is" : "are"} shown, not counted.`;
+};
 
 /**
  * What one risk-appetite point is worth in the funding-pressure points that
@@ -191,7 +212,15 @@ function FormulaCard({ title, children }: { title: string; children: ReactNode }
  * with it. Kept outside the healthy-state <details> collapse on /trust so the
  * "Sources and formulas" links from /about and /threshold land on real content.
  */
-export function FormulaReference({ positions }: { positions?: ScorePositions } = {}) {
+export function FormulaReference({
+  positions,
+  scoringBasis,
+}: {
+  positions?: ScorePositions;
+  /** This reading's basis: what the inputs left out would make each score (`ReportData.scoringBasis`). */
+  scoringBasis?: Pick<ScoringBasis, "notCounted">;
+} = {}) {
+  const recordBasis = describeRecordBasisInputs();
   return (
     <ReportSection
       id="formula-reference"
@@ -242,11 +271,38 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
             <span className="text-slate-300">
               For funding pressure, {compositeSignalScales.tightness.directionLabel}. For risk
               appetite, {compositeSignalScales.riskAppetite.directionLabel}. Interest rates set most
-              of each score; market-stress reads adjust it.
+              of each score. Market reads adjust it, and step 3 says which of them count.
             </span>
           </li>
+          {/* The record basis (2026-10-09). Until then every market read moved the
+              scores, and four published weeks read Freezing on inputs the record
+              could not test, while their month-end, scored on the record's, read
+              Cloudy. The lists come from the engine's own set, so a read that
+              joins the archive moves here when it moves there. */}
+          <li id="record-basis">
+            <span className="font-semibold text-slate-100">3. Count only what the record can test.</span>{" "}
+            <span className="text-slate-300">
+              {upperFirst(joinAnd(recordBasis.counted))} move the scores. The record holds each of them
+              at every month-end since 2012, so the history on the Record and the calibration study
+              test the same score that sets the guidance.
+              {recordBasis.shownBecause.length > 0
+                ? ` ${upperFirst(recordBasis.shownBecause.join("; "))}. Each is scored and shown, and moves nothing.`
+                : null}
+            </span>
+            {scoringBasis && scoringBasis.notCounted.length > 0 ? (
+              <span className="mt-1 block text-slate-300" data-not-counted>
+                This week they would put{" "}
+                {joinAnd(
+                  scoringBasis.notCounted.map(
+                    (entry) => `${ruleMetricLabel[entry.metric].toLowerCase()} at ${entry.score}, where the published score is ${entry.published}`,
+                  ),
+                )}
+                .
+              </span>
+            ) : null}
+          </li>
           <li>
-            <span className="font-semibold text-slate-100">3. Turn the pair into conditions.</span>{" "}
+            <span className="font-semibold text-slate-100">4. Turn the pair into conditions.</span>{" "}
             <span className="text-slate-300">
               The quadrant the two scores land in is the environment; the diagram below draws it.
             </span>
@@ -289,12 +345,17 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               </span>
             </li>
             <li>
-              <span className="text-slate-400">Stress reads:</span> high-yield credit spread, Chicago
-              Fed financial conditions index, VIX, venture funding pace, tech layoff index.
+              <span className="text-slate-400">Market reads that count:</span> {joinAnd(recordBasis.countedMarket)}.
               <span className="mt-1 block text-xs text-slate-400">
                 The two score cards below say what each one measures, beside the arithmetic that uses it.
               </span>
             </li>
+            {recordBasis.shown.length > 0 ? (
+              <li>
+                <span className="text-slate-400">Shown, not counted:</span>{" "}
+                {joinAnd(recordBasis.shown)}. The record has no month-end history for them to be tested on.
+              </li>
+            ) : null}
           </ul>
         </FormulaCard>
 
@@ -345,6 +406,10 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; the Chicago Fed
               financial conditions index ≥ {adj.chicagoFciTighteningThreshold} adds up to +
               {adj.chicagoFciTightnessCap}.
+              {shownNotCounted([
+                ["HY_CREDIT_SPREAD", "the spread"],
+                ["CHICAGO_FCI", "the index"],
+              ])}
               <span className="mt-1 block text-xs text-slate-400">
                 The high-yield credit spread is the extra interest riskier companies pay to borrow,
                 over the government&rsquo;s rate. The Chicago Fed index summarises borrowing
@@ -366,6 +431,11 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               subtracts up to {adj.vixRiskAppetiteCap}; venture funding pace ≤{" "}
               {adj.vcVelocitySlowdownThreshold}% subtracts up to {adj.vcVelocityRiskAppetiteCap};
               the tech layoff index ≥ {adj.layoffPressureThreshold} subtracts up to {adj.layoffRiskAppetiteCap}.
+              {shownNotCounted([
+                ["VIX_INDEX", "the VIX"],
+                ["VC_FUNDING_VELOCITY", "the funding pace"],
+                ["TECH_LAYOFF_TREND", "the layoff index"],
+              ])}
               <span className="mt-1 block text-xs text-slate-400">
                 The VIX is the stock market&rsquo;s own forecast of turbulence over the next month;
                 higher means more expected swings. Venture funding pace is the quarter-over-quarter

@@ -134,7 +134,7 @@ const postSlackPulse = async (headline: string, block: string): Promise<number> 
   try {
     const targets = await slackChannel.listTargets();
     if (targets.length === 0) return 0;
-    const tally = await slackChannel.deliver(targets, { blocks: slackAlertBlocks(`📬 ${headline}`, block) });
+    const tally = await slackChannel.deliver(targets, { blocks: slackAlertBlocks(headline, block) });
     return tally.sent;
   } catch {
     return 0;

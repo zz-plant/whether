@@ -73,8 +73,9 @@ The header carries four groups, each with a hub, read from one module
   `/answers` goes to `/resources#answers`, `/guides/*` to Guides' More tools.
 - **Sharing has one home.** `/share` holds every format, the slide and card clipboard buttons
   (moved from the brief), the meeting snippet (moved from `/trust`) and the links to API & MCP and
-  RSS. The brief's Do and share, Trust and Decide each carry one "Share or embed this →" link
-  (`app/components/shareOrEmbedLink.tsx`); Decide's Share step is gone. Trust's one-line citation
+  RSS. The brief's Do and share and Trust each carry one "Share or embed this →" link
+  (`app/components/shareOrEmbedLink.tsx`); Decide's Share step is gone, and its closing card to
+  `/share` went in §1.1.65. Trust's one-line citation
   is served by `/share`'s Citation format. A frozen week keeps its date-pinned copy panel.
 - **Discoverability.** The sitemap drops `/resolve` and ranks `/resources` as a hub; `/llms.txt`
   carries a Site section built from the same groups.
@@ -2207,7 +2208,8 @@ strip across a phone's first screen, a footer set louder than the pages above it
 
 - **The report intro on a phone** (`CommandCenterNavBlock`, every `ReportShell` route). Below `sm`
   a route with a trust strip draws three lines: the status word in the regime ink with the
-  screenshot caption beside it, the title, and the strip as one wrapped meta line
+  screenshot caption beside it (the caption left the intro in §1.1.65), the title, and the strip
+  as one wrapped meta line
   (`TrustStrip` `phoneLayout="line"`). The line always carries the record date and "Could change
   next week"; it leaves out "Sources" and "Confidence" while they are routine (every source live,
   confidence not Low) and the strip links to `/trust`, and prints them whenever they are not. On
@@ -3002,7 +3004,169 @@ memo is not product writing. `tests/productCanon.test.ts` holds the tags and bas
 shares against an independent count over the record, the copy against the builders' sentences with
 no count typed into the route, the pairs against the list, one H1 and the plane's sr-only table.
 
-### 1.1.65 Candidate rate ramps, scored beside each reading and used for nothing (2026-10-09)
+### 1.1.65 Decoration that encodes something: generated-design tropes removed (2026-10-09)
+
+The owner approved ten removals after a design audit. The rule (`docs/agents/ui-ux-standards.md`
+§XXV): structure and decoration encode something true about the content, and the site spends its
+boldness on the conditions chart, the weather glyphs and the line-state glyphs.
+
+| Item | Removed | In its place |
+| --- | --- | --- |
+| Header emblems | `CalibrationCurveGlyph`, `OperatingLoopGlyph`, `EditorialDeskGlyph`, `SearchRadarGlyph`, `DecisionShieldGlyph`, `ToolkitPlaybookGlyph`, `ValuationMultiplesGlyph`, the operating-loop CSS and `SecondaryPageHeader`'s `aside` slot | the heading alone; `TrendGlyph` and `ThresholdLadder` stay |
+| Stat tiles | `/comps`' three tiles; `/history`'s record and grading tiles; the phase map's month tile; the compare premium tile (`StatTile`) | `/comps` leads with the median multiple as one line ("Median EV/revenue: …x") and one sentence for growth, the basket count and the as-of date; elsewhere `FactList` |
+| Emoji | 🎯 ⚠️ ✅ 🔄 in the slide paste; ⚠️ ⚡ 👀 in the alert Slack posts; 📬 in the month-end pulse; ✅ 🔄 📦 in the Slack action replies; ⚠️ ✅ on the weekly paste's climate line | the labels alone |
+| Ambient decoration | the page's white sheen and emerald-sky-amber wash; gradients, specular and sky inner ring on pills, buttons, inputs and the primary CTA (`--cta-gradient`); the hover halo (`--glow-soft`, `--accent-glow*`); the report intro's regime tint and 3px top rule (`.weather-page-intro`); `ReportSection`'s gradient hairline; the slide's gradients, accent discs and tracked capitals | flat fills from `--bg-raised`, `--bg-nested` and `--cta-fill`; the status word keeps the regime ink; the hero keeps its rule |
+| Kickers | "Governance guide", "Operating brief", "For VC firms", "This week's guidance", "Next step", "Governance lexicon", "Team view", "Stage view", "Deeper evidence", "Risk checks", "Whether Legal", "Reading list", "Your decisions" and the unused eyebrow props | facts that were in a kicker move into the heading line: the share page's week, the compare columns' period, "since your last review", Pro as a stamp, "Page not found" |
+| Next card | `NextStepCard` on `/signals`, `/operate` and `/trust` (and `InternalAwareLink`) | nothing: each pointed at a header tab or at `/share` |
+| Decide's trio | tinted Stop, Start and Keep limited boxes with coloured edges | three plain columns, stacked on a phone, colour on the names |
+| Decide's cards | every step a bordered card behind a chevron; the warnings card and the box around each warning | sections under h2s, a rule between; area rules, lists and test open; lines form and finance folded |
+| Slide numbering | "1. 2. 3." on Action now, Pause if, Conditions change if | unnumbered sentence-case labels; `cardBody` wrapping unchanged |
+| Watermark | "Whether · whether.work" in every report intro | the call card keeps it (§1.1.63), on `/` and on a published week's card, which is the same card for a frozen week |
+
+Card-in-card elsewhere: `/trust`'s watch, escalation, warning and checklist cards and the boxes
+inside them are columns under h3s; `/signals` drops the frame around its chart panels; `/history`
+drops the frame around the explorer's timeline. The scenario page's Stop and Start lists follow
+Decide's.
+
+Measured on the local dev server at 390 and 1280px: the deepest chain of framed or filled boxes in
+`<main>`, with colours normalised through a canvas and controls excluded. `/operate` 2 → 1 (the
+page intro; 13 boxes → 2 at 390px), `/trust` 2 → 1, `/history` 2 → 1, `/signals` 3 → 2 (a chart
+panel and the gauge band inside it), `/` unchanged at 2 from 1280px (the call card and its chart).
+`type-eyebrow` went from 150 uses in 65 files to 118 in 55; the rest label table columns, `<dt>`s,
+controls, chart panels and navigation, or are headings set in the label style. Gradient
+declarations went from 26 to 13: 16 to 8 in `app/styles/` (the skeleton shimmer, the regime
+ground, the card sheens and the hub backdrop remain) and 10 to 5 in components and builders (the
+scroll and legibility fades remain). Emoji in builder code went from 17 to 0.
+`tests/conceptIcons.test.tsx` now fails on any emoji in a share format, the slide, the operator
+brief, the investor update, the weekly paste, or the source of any paste, slide, Slack or email
+builder. Golden pins moved for slide entries only.
+
+### 1.1.66 The call is scored on the record's inputs (2026-10-09)
+
+The owner's call, after a review: the live weekly call and the historical record must use the same
+basis. They did not. The month-end archive behind `/history`, the track record and `/calibration`
+scores interest rates, the yield curve, the pace of rate rises and stock-market volatility (its
+cache stores a VIX close, the ten daily closes the veto means and the rate-speed pair for every
+month). The live call also counted four inputs the archive does not hold: the venture funding pace
+and the tech-layoff trend (curated snapshots, `supportsLive: false`), the high-yield spread and the
+Chicago Fed index. On the record's inputs September 2026 closed Cloudy; the weekly briefs w38–w41
+all read Freezing, and on Oct 7 risk appetite read 49 = 60 on the record's inputs − 11 from the
+startup-market inputs. The current Freezing call existed only because of inputs the record cannot
+test, while the calibration study's "96% held" and the track record vouched for the other score.
+
+- **The gate** (`engine-2026-10-09`). Only `RECORD_BASIS_MARKET_INPUTS`
+  (`lib/regimeEngineDiagnostics.ts`, VIX today) adjust the published scores, so the conditions, the
+  machine, the margin, the policy layer's inputs and every area's pause and resume state are
+  judged on the record's inputs. Every other market input is still scored, into
+  `RegimeScores.offRecord` (the scores with everything counted, which are exactly the previous
+  engine's, and which inputs moved them), and moves nothing. `boundaryContributors` and the weak-read
+  count list the record's reads only. The audit of every input the engine reads: the BBB spread,
+  inflation and unemployment feed only the policy layer's composites, never the scores, the
+  conditions or a line, and stay as they were; the four other curated series
+  (`SAAS_VALUATION_MULTIPLE`, `EARNINGS_REVISION_INDEX`, `AI_COMPUTE_COST_TREND`,
+  `REGULATORY_RISK_TRACKER`) move no score and feed only the forecast and context lines. FRED's
+  high-yield series (`BAMLH0A0HYM2`) starts on 2023-10-10, so it can never be backfilled across the
+  record; the Chicago Fed index (`NFCI`, from 1971) joined the basis with its backfill (§1.1.67).
+  `tests/recordBasis.test.ts` fails if an input on the basis has no value in a cached month.
+- **What is still shown.** Each score the inputs left out would move is `ScoringBasis.notCounted`
+  (`lib/report/scoringBasis.ts`): under its row in the homepage's "What changed" and on `/signals`
+  ("Not counted: -11 from startup-market inputs."), whichever reading the week compares with; under
+  "What moved the scores" in the Slack brief; on `/trust`. When they would carry a score past a line
+  the published score is not past, that is the warning, in the status strip's basis cell and in the
+  Slack brief's "Why this could be wrong": "Startup-market inputs would put risk appetite at 49,
+  below its change line." (the Oct 7 reading). The change line is named first, then an area's pause line, then its
+  resume line. The score breakdown no longer counts them as a part of any move: the parts are
+  rates, the pace of rate rises and volatility, and still add up to the move exactly.
+- **The basis label.** One phrase, "Scored on the record's inputs." A reading scored by an earlier
+  engine says "Scored on more inputs than the record." (`scoringBasisForEngine`: `engine-2026-10-06`
+  and records that name no engine). It is the strip's fourth cell ("Scored on · The record's
+  inputs"; routine, so the phone line folds it unless it carries a warning or the extended basis);
+  the published brief's card caption and its two pastes, from the engine its record names, so no
+  frozen field is edited; `/trust`'s "How the scores are built" (step 3, "Count only what the record
+  can test", with what this week's left-out inputs would make the scores, and each formula card
+  naming the reads shown and not counted); every paste's provenance line, the slide and deck
+  footer, the investor update and portfolio note footer, the operator brief, the Slack brief's
+  stamp and the weekly email; and `scoringBasis` in `/api/agent?view=state`, MCP `get_state` and
+  `get_brief`, and `/api/scores`, additive, with `key` (`record` | `extended`), `label`, `warning`
+  and `notCounted`. A stored operating snapshot names its engine (`engineVersion`); one written
+  before has none and reads as the extended basis until the next refresh replaces it.
+- **Timing.** The gate takes effect at the next weekly freeze: w42 is the first published week
+  scored on the record's inputs, and w31–w41 are never edited (`tests/recordBasis.test.ts` pins
+  each byte for byte). The homepage says once, in the strip's basis cell, why its conditions differ
+  from the citable published week's when the basis is why (`describeCitableBriefBasis`): the week's
+  stored inputs, scored by today's engine, land in other conditions only because of the inputs it
+  counted. A conditions-change alert says the same when those inputs would have kept the earlier
+  conditions (`describeChangeTheRecordMade`).
+- **The live call on current data** (the Oct 7 reading): funding pressure 90, risk appetite 60,
+  Cloudy, where the previous engine published Freezing at 49. The machine's state still says
+  Freezing, and the nearer line is 10 points away (its Medium gate band), so the first daily
+  refresh after deploy holds Freezing with the change waiting on a second reading, and the second
+  commits Cloudy. A snapshot is stored per engine (the input hash carries the version), so the
+  previous engine's stays readable under its own key.
+- **The record does not move in this change.** The archive never scored the four inputs, so no
+  archived month, change count or calibration figure changes; the regenerated archive with the
+  Chicago Fed index is its own change.
+
+### 1.1.67 The archive scores the Chicago Fed index too (2026-10-09)
+
+The second half of §1.1.66: backfill into the month-end archive every market input the live call
+reads that has a long public series, so the record is scored on the same basis as the call
+(`engine-2026-10-09b`, `RECORD_BASIS_MARKET_INPUTS` = VIX and `CHICAGO_FCI`).
+
+- **What was backfilled, and from where.** The live engine reads FRED's `NFCI` (weekly, 1971 on;
+  `lib/macroSnapshot.ts`, `lib/ingestion/families.ts`), and so does the archive now:
+  `fetchArchiveDatasets` fetches it through the shared parser (`parseSeries`, every value through
+  `isMissingFredValue`), and `resolveChicagoFciReading` (`scripts/regimeArchiveContext.ts`) gives
+  each period the newest observation a reader had then. An observation is dated the Friday its week
+  ends and published the Wednesday after, so a period takes the last one dated five or more days
+  before it (Mar 31, 2020 reads Mar 20's 0.175, not Mar 27's, published Apr 1); three missed
+  releases is an absence. Each Time Machine cache entry stores the value (`chicagoFci`) and the
+  observations a reader had in the 60 days before (`chicagoFciHistory`), so the weekly, monthly and
+  quarterly archives replay offline from the bundle (`tests/regimeArchiveReplay.test.ts`, which also
+  replays twice to the same bytes), and the runtime walk scores it like the live read. A run that
+  cannot fetch it fails before writing: an archive without it would be on another basis.
+- **Already in the archive before this change**, and verified rather than re-fetched: VIX
+  (`VIXCLS`, the close and ten daily closes for every month since 2012) and the rate-speed term
+  (the `DGS1MO` pair the engine's own search picks, every month).
+- **Not backfillable.** FRED's high-yield series (`BAMLH0A0HYM2`) begins 2023-10-10 under ICE's
+  licensing, 36 of 177 month-ends; it stays off the record basis, scored and shown only. The venture
+  funding pace and the tech-layoff trend are curated snapshots with no history.
+- **Limit.** FRED serves the index's current vintage, and the Chicago Fed re-estimates the whole
+  series each week, so a backfilled value can differ slightly from what was printed at the time.
+  Above zero is the only range that moves a score, and since 2012 the index was above zero only in
+  March to May 2020.
+- **Regenerated.** `generateMonthlySummaries.ts`, `generateWeeklySummaries.ts` and
+  `generateQuarterlyYearlySummaries.ts`, then `bun run archive:index`: the Time Machine cache, the
+  summary archive (all four cadences), the monthly and weekly summary files, the month-rail and
+  memory-rail histories, the confidence-record months and the `/history/[period]` index. Two
+  independent runs matched except for their generation timestamps. Published briefs are untouched
+  (`tests/recordBasis.test.ts` pins w31–w41 byte for byte).
+
+**The diff, honestly.**
+
+| Figure | Before (`engine-2026-10-06` archive) | After (`engine-2026-10-09b`) |
+| --- | --- | --- |
+| Months whose conditions changed | — | none |
+| Months whose scores changed | — | Mar 2020 and Apr 2020: funding pressure 0 → 2 (the index at 0.175 and 0.159); risk appetite unchanged |
+| Changes in conditions since Jan 2012 | 7 | 7 |
+| Calibration: held / comparisons | 169 / 176 (96%) | 169 / 176 (96%); every band unchanged |
+| Signaled in advance (last 60 months) | 2 of 5 | 2 of 5 |
+| September 2026 month-end | Cloudy (90 / 56) | Cloudy (90 / 56) |
+
+The September month-end still disagrees with the published weeks w38–w41, which read Freezing:
+those were scored on more inputs than the record, and frozen weeks are never edited. On the record's
+basis the one of them that stored its inputs, w41, reads Cloudy (90 / 59) and agrees; w38–w40 stored
+no inputs to re-score. Every other line of the archive diff is the regeneration itself: fetch
+timestamps, the engine stamp, the reader copy merged since the last regeneration on 2026-10-07 (the
+margin vocabulary, "Pause line" and "Resume line"), Q3 2026 added to the period index and the OG
+timeline, and the week ending Oct 9, 2026 added to the weekly archive (Cloudy, record date Oct 7).
+
+`/calibration` and `/history`'s "How the record held up" each say when the record was re-scored and
+with what, and point at their figures as the ones published before it while those are unchanged
+(`describeCalibrationRescore`, `describeTrackRecordRescore` in `lib/report/trackRecordCopy.ts`);
+once a figure differs, the line prints the old one.
+
+### 1.1.68 Candidate rate ramps, scored beside each reading and used for nothing (2026-10-09)
 
 The funding-pressure rate component spends its 0–90 points across 3.5% to 4.0% on the one-month
 bill. `docs/research/premise-test-preregistration.md` registered three alternatives and the rule
@@ -3055,14 +3219,15 @@ path plus a highlighted latest point.
 ### 1.3 Plan overview (/operate)
 Planning is the detailed execution page behind the brief (`app/operate/planningPageModel.ts`).
 Since 2026-10-07 (§1.1.46) its steps run: This week's rule for each area, Rules before you commit
-and Test a decision (the three open on arrival), Set this plan's lines (§1.1.31; live weeks only,
-and left out when no rule has a numeric line) and Finance strategy, with Risk checks ("Warnings
-to read before you approve") after them; the Share step left on 2026-10-08 (§1.0a). A deep link opens its step without
-closing the others, and retired section hashes map onto the step that replaced them
+and Test a decision (the three always open, with no toggle), Set this plan's lines (§1.1.31; live
+weeks only, and left out when no rule has a numeric line) and Finance strategy (both folded), with
+"Warnings to read before you approve" after them; the Share step left on 2026-10-08 (§1.0a). Since
+§1.1.65 the steps are sections under h2s with a rule between them, not cards. A deep link opens its
+step without closing the others, and retired section hashes map onto the step that replaced them
 (`hashAliases`).
 
-The page hands off to `/share` in its next-step card ("Share or embed this →"). It no longer
-carries a share step, alert delivery controls, Decision
+The page ends on its warnings; `/share` is the header's "Use it elsewhere" and the footer's (the
+next-step card went in §1.1.65). It no longer carries a share step, alert delivery controls, Decision
 Memory recall (§8.4) or the operator-request list (§1.1.46). The stepper accepts owner and
 approval-state fields, and no step sets them (DD-045). (This paragraph used to describe a
 mixed-literacy translation model on `/operate` — a top-of-page router to decision, evidence, trust
@@ -3204,7 +3369,11 @@ Trust/readiness computation now consumes structured freshness state (`fresh` / `
 ### 3.1 Inputs
 - **Base rate**: 1‑month Treasury yield (fallback to 3‑month if missing).
 - **Curve slope**: 10Y − 2Y yield spread.
-- **Macro overlays (boundary calibration)**: HY OAS, Chicago Fed NFCI, VIX, VC funding velocity, and tech layoff trend adjust tightness/risk appetite before final classification and trigger multi-weak-read warnings.
+- **Macro overlays (boundary calibration)**: the overlays on the record basis
+  (`RECORD_BASIS_MARKET_INPUTS`: VIX with its haircut and veto, and the Chicago Fed NFCI) adjust
+  tightness/risk appetite before final classification and trigger multi-weak-read warnings. HY OAS,
+  VC funding velocity and the tech layoff trend are scored into `scores.offRecord` and move nothing
+  published, because the archive holds no month-end history for them (§1.1.66, §1.1.67).
 
 ### 3.2 Scores
 - **Tightness score (0–100)**: adds 90 points if base rate > threshold and 25 points if the curve
@@ -3221,7 +3390,7 @@ Policy pilot outputs (`RISK_ON`, `SAFETY_MODE`, `TRANSITION`) are a separate pos
 
 ### 3.4 Outputs
 Adjustment semantics:
-- Macro overlays modify tightness/risk-appetite scores before classification, so they can change the resulting regime when signals are near boundaries.
+- Macro overlays on the record basis modify tightness/risk-appetite scores before classification, so they can change the resulting regime when signals are near boundaries. Overlays off it change only `scores.offRecord` (§1.1.66).
 - Diagnostics (`boundaryContributors`, weak-read warnings, confidence) explain *why* adjustments applied.
 - Recommendations and constraints always derive from the final classified regime.
 

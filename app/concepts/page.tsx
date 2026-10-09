@@ -258,7 +258,6 @@ export default function ProductCanonPage() {
       <SectionTabs currentPath="/concepts" />
 
       <SecondaryPageHeader
-        eyebrow="Reading list"
         title="Does startup advice follow the market?"
         description={`${timeline.length} widely read essays, books and investor memos, each placed on the month-end record${recordStart && recordEnd ? ` from ${recordStart} to ${recordEnd}` : ""}. Advice on hiring, raising and spending is tagged Expand or Conserve, and method advice is tagged Craft. The test is whether the capital texts track the conditions while the craft texts do not. A reading list, not evidence for the guidance.`}
       />

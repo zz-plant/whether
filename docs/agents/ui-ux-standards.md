@@ -130,9 +130,8 @@
   regime label) leads, in the regime ink at the reading's own size; the trust headline and record
   date follow in the meta half of the same line; the H1 is secondary below `lg` — the bottom tab
   bar owns the route name on a phone. No kicker: "Weekly brief" above every H1 restated the route
-  the header, the sidebar and the tab bar already name. The operating-loop glyph renders from `lg`
-  up only — below that its four steps are the tab bar's tabs, and under the intro it was a second
-  navigation band.
+  the header, the sidebar and the tab bar already name. No emblem beside it either (§XXV): the
+  operating-loop glyph that sat there, and later on `/about`, is deleted.
 - NEVER: give the hero an action that targets the block directly beneath it, or a button to a route
   the header tab already reaches. Four routes pointed the hero button, an inline "↓" link and the
   first index entry at the same anchor, and every secondary button pointed at `/`. A hero action
@@ -202,7 +201,8 @@ Scope: every element that draws a box — a border, a fill, or a lift — under 
   tints are excluded there by name: a button inside a card is not a nested container.
 - SHOULD: stop at three levels of visible enclosure. Past that the frames stop separating anything —
   a box inside a box inside a box is a list, and spacing and type carry it better. `/operate` sat at
-  five, and the fix was to drop frames rather than to restyle them.
+  five, and the fix was to drop frames rather than to restyle them; since 2026-10-09 its only box is
+  the page intro (§XXV).
 - Measuring this needs the browser, not a grep: computed colours arrive as `oklab()` for any
   Tailwind `/opacity` modifier, so a regex looking for `rgb(` reports a page as clean when it is not.
   Normalise colour through a canvas, and treat "is it positioned" as a question about the ancestor
@@ -264,7 +264,7 @@ take the other's job.
   numerals stay sharp on purpose: they are tag-class labels and figures. Sentence-casing every
   eyebrow was considered for this register and rejected — it stacks near-duplicates (`Plan` over
   `Weekly plan`) across the report shells. Rationing eyebrows is per-surface content work
-  (the 2026-09 UI facelift, Phase 2), not a register change.
+  (the 2026-09 UI facelift, Phase 2), not a register change; §XXV says which ones stay.
 
 ## XV. Encoding a number (figure register, and when to draw the line)
 
@@ -321,10 +321,11 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
   the section eyebrows and rules to read the week, and until 2026-09-15 no report page fed it, so
   every shell rendered slate under a call its own intro line named. `/history/compare` is the one
   deliberate exception: two weeks on one page, and keying it to either would mislead.
-- SHOULD: keep the regime ink for section-level marks — the `ReportSection` eyebrow and rule, and
-  `.type-eyebrow-section` on a hand-rolled section's own eyebrow (`/signals`, `/history`,
-  `/operate` carry these). A card's own eyebrow inside a section is neutral (`.type-eyebrow`
-  alone); `/signals` carried sky card eyebrows beside a rose section eyebrow, two accents for one
+- SHOULD: keep the regime ink for the marks that name the week: the stamp, a report intro's status
+  word, and `.type-eyebrow-section` on the label of a reading (`SignalReadingPanel`). The
+  `ReportSection` eyebrow and its gradient rule, which carried it on every section, are gone
+  (2026-10-09, §XXV). A card's own label inside a section is neutral (`.type-eyebrow` alone);
+  `/signals` carried sky card eyebrows beside a rose section eyebrow, two accents for one
   hierarchy. Sky stays for what it means elsewhere: links, and the cards whose border is already
   sky.
 - MUST: keep the four regime hues off the action accent. Sky is what every link, button and focus
@@ -335,10 +336,11 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
   both shells. The brief's container and the report backdrop each held a regime → tint table of
   their own — the report one had Sunny in teal and never faded, so the ground under every card on
   every report route was lifted to a grey and the depth ladder lost half its separation.
-- MUST: key the report intro (`CommandCenterNavBlock`, `.weather-page-intro`) to the regime like
-  the hero: wash, border and top edge from `--regime-accent`, the status word in `--regime-ink`.
-  It was plain slate under a status line that named the week, so `/` showed a colour and every
-  other route showed none.
+- MUST: print the report intro's status word (`CommandCenterNavBlock`) in `--regime-ink`, and give
+  the intro card no other hue. From 2026-09-16 to 2026-10-09 the card also carried the hero's wash,
+  border tint and 3px top rule (`.weather-page-intro`, now deleted): a second and third drawing of
+  the fact the word states (§XXV). The brief's hero keeps its rule, because it is the card people
+  crop and share.
 - NEVER: print text in `--regime-accent`. At 12–13px on the light ground it sits near 3:1; the
   section eyebrows did this until 2026-09-15.
 - MUST: key a surface's colour to the regime the copy on it states, from the same source. The
@@ -367,8 +369,7 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
 
 ## XVII. Responsive diagrams
 
-- Keep prose labels in HTML for flow diagrams (`OperatingLoopGlyph`), so labels wrap at
-  mobile widths and text zoom. SVG is for the artwork, not a fixed-width page of text.
+- Keep prose labels in HTML for flow diagrams, so labels wrap at mobile widths and text zoom. SVG is for the artwork, not a fixed-width page of text.
 - Bound the coordinate and rendered widths of text-bearing charts. `ThresholdLadder`
   caps its coordinate width at 300 and rendered width at 1.4 times that; wider parent
   rows must not reduce its labels to miniature type on phones or inflate them on desktop.
@@ -576,3 +577,49 @@ The components live in `app/components/ui/conceptIcons.tsx`.
   `/brief.md` render words only; the same test holds them to it. The Satori share cards do not
   draw these glyphs either: lucide's components are client components that read a React context,
   which Satori cannot render, and a hand-copied vector table would be a second mapping.
+
+## XXV. Decoration that encodes something
+
+Added 2026-10-09 with `docs/feature-specs-current.md` §1.1.65, after a design audit of the
+patterns generated interfaces reach for by default. Structure and decoration must encode something
+true about the content. The site spends its boldness in one place, its signature: the conditions
+chart, the weather glyphs and the pause and play line states (§XXIV). Everything else stays quiet.
+
+- NEVER: an emblem beside a page heading. Seven pages drew one (a calibration curve, the operating
+  loop, an editorial desk, a search radar, a decision shield, a toolkit playbook, valuation
+  multiples) and none plotted anything on the page; they are deleted with their components. A
+  drawing earns its place by drawing data: `TrendGlyph`, `ThresholdLadder`, the conditions chart.
+- NEVER: a row of stat tiles, a large figure over a small label in a box. A figure set larger than
+  the sentence beside it claims to be the page's point, and a row of them makes that claim three or
+  five times. A page with one number to lead with sets it as its own line (`/comps` leads with the
+  median multiple); every other figure is a `FactList` (`app/components/ui/factList.tsx`) in the
+  text's size, beside what it qualifies. Its labels are sentence case.
+- NEVER: a small label above a heading as a kicker. A kicker that restates the heading is deleted.
+  One that carries a fact (the week, the period, the plan tier) moves into the heading's line or a
+  stamp. Small labels stay where they label data: table column heads, `<dt>`s, form fields and
+  legends, chart panels and navigation groups.
+- NEVER: a closing "Next" card. A link a header tab, the footer or a sub-tab already carries is
+  not repeated at the foot of the page. An action only that page knows is an inline link in its
+  last section.
+- MUST: headings and whitespace before boxes. A reading page keeps at most one boxed artifact; on
+  `/` it is the call card, the block people crop. A card inside a card is a list: set it as
+  columns under headings. On `/operate` each step is a section under an h2 with a rule between
+  them; the steps a reader acts on this week are open with no toggle, and only secondary content
+  folds (§XII).
+- MUST: draw a fact once (§XVIII). Stop, Start and Keep limited carry their colour on the list's
+  name only, not also in a tinted box and a coloured edge.
+- NEVER: an emoji in text that leaves the site, whether as a label's prefix or anywhere else. The
+  label carries the meaning. `tests/conceptIcons.test.tsx` renders every share format, the meeting
+  slide, the operator brief, the investor update and the weekly paste, and scans the source of every
+  paste, slide, Slack and email builder.
+- MUST: decoration only where it encodes meaning. No wash over the page ground, no gradient or
+  specular on a control (controls fill from `--bg-raised` and `--bg-nested`, the primary from
+  `--cta-fill`), no halo on hover, no coloured stripe across the top of a card, no accent discs on
+  a slide. Condition colour stays where a condition is named: the stamp, a report intro's status
+  word and the chart.
+- What stays, and why. Focus rings: they mark where the keyboard is. The skeleton shimmer: it says
+  something is loading. The backdrop blur on the sticky strip, the phone tab bar and the command
+  palette: it keeps their text legible over a scrolling page. The call card's regime rule and the
+  site's name inside it, on `/` and on a published week: that card is the one people crop and
+  share, the rule names the week in a crop, and every other page's header names the site already.
+

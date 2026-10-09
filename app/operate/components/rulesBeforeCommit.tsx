@@ -60,16 +60,16 @@ export function RulesBeforeCommit({
     }
   };
 
-  /* A coloured left rule and a faint tint per list, so Stop and Start read as
-     opposites before a word of either is read. These were drawn on
-     `.weather-surface` until 2026-09-29, whose border and background are
-     unlayered and beat every utility here, so all three rendered as the same
-     grey card at the surface radius — rounder than the step card holding them.
-     They are rule segments inside a card, which is the data tier (§XIV). */
+  /* Three parallel lists in three columns, stacked on a phone, with the colour
+     on each list's name and nowhere else (2026-10-09): Stop in the tightening
+     ink, Start in the easing ink, Keep limited in the text's own. Until then
+     each list was a box with a tinted fill and a coloured left rule as well as
+     a coloured label, so one fact (which list this is) was drawn three times,
+     and the boxes sat inside the step's own card. */
   const lists = [
-    { key: "stop", label: "Stop", items: visible(stopItems, isExpanded), className: "border-rose-500/30 border-l-rose-400/80 bg-rose-500/8", labelClassName: "text-rose-200" },
-    { key: "start", label: "Start", items: visible(startItems, isExpanded), className: "border-emerald-500/30 border-l-emerald-400/80 bg-emerald-500/8", labelClassName: "text-emerald-200" },
-    { key: "limit", label: "Keep limited", items: visible(fenceItems, isExpanded), className: "border-sky-500/25 border-l-sky-400/70", labelClassName: "text-slate-300" },
+    { key: "stop", label: "Stop", items: visible(stopItems, isExpanded), labelClassName: "text-semantic-tightening-fg" },
+    { key: "start", label: "Start", items: visible(startItems, isExpanded), labelClassName: "text-semantic-easing-fg" },
+    { key: "limit", label: "Keep limited", items: visible(fenceItems, isExpanded), labelClassName: "text-slate-200" },
   ];
 
   return (
@@ -80,11 +80,11 @@ export function RulesBeforeCommit({
       <p className="text-sm text-slate-200">
         {playbook ? playbook.insight : "This week's rules did not load. Hold new commitments until they do."}
       </p>
-      <div id={rulesId} className="grid gap-4 lg:grid-cols-3">
+      <div id={rulesId} className="grid gap-6 md:grid-cols-3 md:gap-8">
         {lists.map((list) => (
-          <div key={list.key} className={`rounded-md border border-l-4 p-4 ${list.className}`}>
-            <p className={`text-xs font-semibold ${list.labelClassName}`}>{list.label}</p>
-            <ul className="mt-3 space-y-2 text-sm text-slate-300">
+          <div key={list.key}>
+            <h3 className={`text-sm font-semibold ${list.labelClassName}`}>{list.label}</h3>
+            <ul className="mt-2 space-y-2 text-sm text-slate-300">
               {list.items.map((item) => (
                 <li key={item} className="break-words">
                   • {item}

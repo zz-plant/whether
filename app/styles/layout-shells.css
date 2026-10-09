@@ -1,8 +1,9 @@
+/* The page ground is the body token and nothing over it. It carried a white
+   sheen down the first 22rem and an emerald-sky-amber wash across the width
+   (2026-10-09): three accent hues at under 2% that said nothing about the
+   week. The regime's own atmosphere, which does, is .weather-regime-ground. */
 .weather-shell {
   background-color: var(--bg-body);
-  background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 22rem),
-    linear-gradient(90deg, rgba(52, 211, 153, 0.018), rgba(56, 189, 248, 0.014), rgba(251, 191, 36, 0.012));
 }
 
 /* Tier 2: Secondary surfaces — bands, section bodies */
@@ -157,14 +158,6 @@ html[data-theme="light"] .weather-hub-backdrop {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(15, 23, 42, 0) 100%);
 }
 
-.weather-hub-section-eyebrow {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--app-text-muted);
-}
-
 /* Ink from the text roles, never a literal white: these shells render on
    both themes, and until 2026-09-15 every title and description here was
    white or slate-200 by value, so the /answers pages — the routes search
@@ -288,22 +281,9 @@ a.weather-hub-link-card:hover {
   padding: 0;
 }
 
-.weather-secondary-header-layout {
-  display: grid;
-  gap: var(--layout-content-gap);
-}
-
 .weather-secondary-heading {
   display: grid;
   gap: 16px;
-}
-
- .weather-secondary-eyebrow {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--app-text-muted);
 }
 
 .weather-secondary-title {
@@ -328,10 +308,6 @@ a.weather-hub-link-card:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-}
-
-.weather-secondary-aside {
-  min-width: 0;
 }
 
 .weather-secondary-section {
@@ -502,14 +478,6 @@ html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba
 @layer components {
   .weather-panel {
     padding: var(--space-lg) var(--space-lg);
-  }
-}
-
-@media (min-width: 1024px) {
-
-  .weather-secondary-header-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
-    align-items: start;
   }
 }
 

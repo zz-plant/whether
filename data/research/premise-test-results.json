@@ -278,7 +278,7 @@
     {
       "quarter": "2020Q1",
       "tight": true,
-      "fundingPressure": 0,
+      "fundingPressure": 2,
       "riskAppetite": 39,
       "forwardValue": 0.439,
       "forwardCount": 0.0796
@@ -618,24 +618,24 @@
   ],
   "p2": {
     "value": {
-      "fundingPressureSkill": 0.0405,
+      "fundingPressureSkill": -0.0015,
       "riskAppetiteSkill": 0.1601,
       "difference": {
-        "value": -0.1196,
-        "low": -0.4917,
-        "high": 0.1432,
-        "discarded": 126
+        "value": -0.1615,
+        "low": -0.5212,
+        "high": 0.0501,
+        "discarded": 16
       },
       "verdict": "no detectable difference"
     },
     "count": {
-      "fundingPressureSkill": 0.3802,
+      "fundingPressureSkill": 0.3556,
       "riskAppetiteSkill": 0.4612,
       "difference": {
-        "value": -0.081,
-        "low": -0.3408,
-        "high": 0.1681,
-        "discarded": 126
+        "value": -0.1056,
+        "low": -0.3491,
+        "high": 0.1045,
+        "discarded": 16
       },
       "verdict": "no detectable difference"
     }
@@ -668,104 +668,104 @@
     {
       "offset": -4,
       "n": 59,
-      "fundingPressureValue": -0.164,
-      "fundingPressureCount": -0.334,
+      "fundingPressureValue": -0.16,
+      "fundingPressureCount": -0.326,
       "riskAppetiteValue": 0.012,
       "riskAppetiteCount": 0.29
     },
     {
       "offset": -3,
       "n": 58,
-      "fundingPressureValue": -0.233,
-      "fundingPressureCount": -0.394,
+      "fundingPressureValue": -0.23,
+      "fundingPressureCount": -0.373,
       "riskAppetiteValue": 0.055,
       "riskAppetiteCount": 0.356
     },
     {
       "offset": -2,
       "n": 57,
-      "fundingPressureValue": -0.241,
-      "fundingPressureCount": -0.461,
+      "fundingPressureValue": -0.257,
+      "fundingPressureCount": -0.445,
       "riskAppetiteValue": 0.239,
       "riskAppetiteCount": 0.46
     },
     {
       "offset": -1,
       "n": 56,
-      "fundingPressureValue": -0.262,
-      "fundingPressureCount": -0.509,
+      "fundingPressureValue": -0.3,
+      "fundingPressureCount": -0.51,
       "riskAppetiteValue": 0.309,
       "riskAppetiteCount": 0.562
     },
     {
       "offset": 0,
       "n": 55,
-      "fundingPressureValue": -0.205,
-      "fundingPressureCount": -0.533,
+      "fundingPressureValue": -0.219,
+      "fundingPressureCount": -0.55,
       "riskAppetiteValue": 0.303,
       "riskAppetiteCount": 0.628
     },
     {
       "offset": 1,
       "n": 54,
-      "fundingPressureValue": -0.182,
-      "fundingPressureCount": -0.511,
+      "fundingPressureValue": -0.191,
+      "fundingPressureCount": -0.543,
       "riskAppetiteValue": 0.356,
       "riskAppetiteCount": 0.624
     },
     {
       "offset": 2,
       "n": 53,
-      "fundingPressureValue": -0.116,
-      "fundingPressureCount": -0.462,
+      "fundingPressureValue": -0.103,
+      "fundingPressureCount": -0.483,
       "riskAppetiteValue": 0.251,
       "riskAppetiteCount": 0.543
     },
     {
       "offset": 3,
       "n": 52,
-      "fundingPressureValue": 0.014,
-      "fundingPressureCount": -0.336,
+      "fundingPressureValue": 0.039,
+      "fundingPressureCount": -0.32,
       "riskAppetiteValue": 0.174,
       "riskAppetiteCount": 0.436
     },
     {
       "offset": 4,
       "n": 51,
-      "fundingPressureValue": 0.036,
-      "fundingPressureCount": -0.264,
+      "fundingPressureValue": 0.091,
+      "fundingPressureCount": -0.211,
       "riskAppetiteValue": 0.037,
       "riskAppetiteCount": 0.274
     },
     {
       "offset": 5,
       "n": 50,
-      "fundingPressureValue": 0.108,
-      "fundingPressureCount": -0.169,
+      "fundingPressureValue": 0.171,
+      "fundingPressureCount": -0.101,
       "riskAppetiteValue": -0.086,
       "riskAppetiteCount": 0.137
     },
     {
       "offset": 6,
       "n": 49,
-      "fundingPressureValue": 0.158,
-      "fundingPressureCount": -0.101,
+      "fundingPressureValue": 0.209,
+      "fundingPressureCount": -0.032,
       "riskAppetiteValue": -0.184,
       "riskAppetiteCount": 0.011
     },
     {
       "offset": 7,
       "n": 48,
-      "fundingPressureValue": 0.157,
-      "fundingPressureCount": -0.08,
+      "fundingPressureValue": 0.217,
+      "fundingPressureCount": -0.009,
       "riskAppetiteValue": -0.25,
       "riskAppetiteCount": -0.081
     },
     {
       "offset": 8,
       "n": 47,
-      "fundingPressureValue": 0.277,
-      "fundingPressureCount": -0.061,
+      "fundingPressureValue": 0.25,
+      "fundingPressureCount": -0.035,
       "riskAppetiteValue": -0.276,
       "riskAppetiteCount": -0.096
     }
@@ -821,24 +821,24 @@
       },
       "p2": {
         "value": {
-          "fundingPressureSkill": -0.0482,
+          "fundingPressureSkill": -0.0497,
           "riskAppetiteSkill": 0.541,
           "difference": {
-            "value": -0.5892,
-            "low": -1.263,
-            "high": 0.0365,
-            "discarded": 19
+            "value": -0.5906,
+            "low": -1.267,
+            "high": 0.0083,
+            "discarded": 0
           },
           "verdict": "no detectable difference"
         },
         "count": {
-          "fundingPressureSkill": 0.4061,
+          "fundingPressureSkill": 0.4078,
           "riskAppetiteSkill": 0.7072,
           "difference": {
-            "value": -0.3011,
-            "low": -0.6642,
-            "high": -0.0234,
-            "discarded": 19
+            "value": -0.2994,
+            "low": -0.6705,
+            "high": -0.0132,
+            "discarded": 0
           },
           "verdict": "risk appetite predicts better"
         }
@@ -892,24 +892,24 @@
       },
       "p2": {
         "value": {
-          "fundingPressureSkill": 0.0405,
+          "fundingPressureSkill": -0.0015,
           "riskAppetiteSkill": 0.1601,
           "difference": {
-            "value": -0.1196,
-            "low": -0.4734,
-            "high": 0.2174,
-            "discarded": 62
+            "value": -0.1615,
+            "low": -0.4921,
+            "high": 0.1369,
+            "discarded": 17
           },
           "verdict": "no detectable difference"
         },
         "count": {
-          "fundingPressureSkill": 0.3802,
+          "fundingPressureSkill": 0.3556,
           "riskAppetiteSkill": 0.4612,
           "difference": {
-            "value": -0.081,
-            "low": -0.3704,
-            "high": 0.2198,
-            "discarded": 62
+            "value": -0.1056,
+            "low": -0.3908,
+            "high": 0.1744,
+            "discarded": 17
           },
           "verdict": "no detectable difference"
         }
@@ -963,24 +963,24 @@
       },
       "p2": {
         "value": {
-          "fundingPressureSkill": 0.0405,
+          "fundingPressureSkill": -0.0015,
           "riskAppetiteSkill": 0.1601,
           "difference": {
-            "value": -0.1196,
-            "low": -0.501,
-            "high": 0.1228,
-            "discarded": 117
+            "value": -0.1615,
+            "low": -0.5337,
+            "high": 0.0159,
+            "discarded": 28
           },
           "verdict": "no detectable difference"
         },
         "count": {
-          "fundingPressureSkill": 0.3802,
+          "fundingPressureSkill": 0.3556,
           "riskAppetiteSkill": 0.4612,
           "difference": {
-            "value": -0.081,
-            "low": -0.358,
-            "high": 0.1718,
-            "discarded": 117
+            "value": -0.1056,
+            "low": -0.3662,
+            "high": 0.1034,
+            "discarded": 28
           },
           "verdict": "no detectable difference"
         }

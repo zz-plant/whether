@@ -24,6 +24,7 @@ import { describeRegimeAssessment } from "./report/regimeDescription";
 export * from "./regimeEngineCore";
 export {
   MACRO_ADJUSTMENT_CONSTANTS,
+  RECORD_BASIS_MARKET_INPUTS,
   deriveRegimeTrend,
 } from "./regimeEngineDiagnostics";
 

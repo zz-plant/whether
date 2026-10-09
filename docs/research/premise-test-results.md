@@ -15,7 +15,7 @@ recomputes it from the committed inputs and fails if a figure moves.
 | **Decision rule** | **No candidate passes. The current ramp stays**, and no switch pull request is opened. |
 
 What the data does show is timing: both scores move most closely with deal count in the same
-quarter, and the relationship roughly halves by four quarters ahead and is gone by six. The
+quarter, and the relationship falls by more than half by four quarters ahead and is gone by six. The
 readings describe fundraising as it happens more than they anticipate it (see "Lead and lag").
 
 ## Data
@@ -143,12 +143,12 @@ The difference shrinks with the horizon and, for deal value, reverses by s+4.
 
 Spearman correlation between the score at the quarter-end and forward growth. Skill is
 `−ρ` for funding pressure and `+ρ` for risk appetite; `D` is funding pressure's skill minus risk
-appetite's. 126 resamples in which a score was constant (no rank correlation exists) were discarded.
+appetite's. 16 resamples in which a score was constant (no rank correlation exists) were discarded.
 
 | Outcome | Funding pressure skill | Risk appetite skill | D | 95% interval | Verdict |
 | --- | --- | --- | --- | --- | --- |
-| Deal value | 0.04 | 0.16 | −0.12 | −0.49 to 0.14 | no detectable difference |
-| Deal count | 0.38 | 0.46 | −0.08 | −0.34 to 0.17 | no detectable difference |
+| Deal value | 0.00 | 0.16 | −0.16 | −0.52 to 0.05 | no detectable difference |
+| Deal count | 0.36 | 0.46 | −0.11 | −0.35 to 0.10 | no detectable difference |
 
 The unbounded pressure (`tightnessPressure`) in place of the published score gives `D` of −0.14
 and −0.09, the same verdicts. The two scores are not independent: risk appetite is the curve
@@ -161,17 +161,17 @@ Spearman `ρ(score at s, growth at s+k)`, all quarters with a mature outcome:
 | k | n | Funding pressure, value | Funding pressure, count | Risk appetite, value | Risk appetite, count |
 | --- | --- | --- | --- | --- | --- |
 | −4 | 59 | −0.16 | −0.33 | 0.01 | 0.29 |
-| −2 | 57 | −0.24 | −0.46 | 0.24 | 0.46 |
-| 0 | 55 | −0.21 | −0.53 | 0.30 | 0.63 |
-| +1 | 54 | −0.18 | −0.51 | 0.36 | 0.62 |
-| +2 | 53 | −0.12 | −0.46 | 0.25 | 0.54 |
-| +3 | 52 | 0.01 | −0.34 | 0.17 | 0.44 |
-| +4 | 51 | 0.04 | −0.26 | 0.04 | 0.27 |
-| +6 | 49 | 0.16 | −0.10 | −0.18 | 0.01 |
-| +8 | 47 | 0.28 | −0.06 | −0.28 | −0.10 |
+| −2 | 57 | −0.26 | −0.45 | 0.24 | 0.46 |
+| 0 | 55 | −0.22 | −0.55 | 0.30 | 0.63 |
+| +1 | 54 | −0.19 | −0.54 | 0.36 | 0.62 |
+| +2 | 53 | −0.10 | −0.48 | 0.25 | 0.54 |
+| +3 | 52 | 0.04 | −0.32 | 0.17 | 0.44 |
+| +4 | 51 | 0.09 | −0.21 | 0.04 | 0.27 |
+| +6 | 49 | 0.21 | −0.03 | −0.18 | 0.01 |
+| +8 | 47 | 0.25 | −0.04 | −0.28 | −0.10 |
 
 Both scores track deal count most closely in the same quarter and the next one; the correlation
-roughly halves by four quarters ahead and is near zero by six. For deal value, funding pressure turns
+falls by more than half by four quarters ahead and is near zero by six. For deal value, funding pressure turns
 positive from three quarters ahead: the 2023–2024 tight readings were followed by the 2025–2026
 rise in deal value. These are point estimates on overlapping, autocorrelated quarters.
 
@@ -197,7 +197,7 @@ Registered in §6.5; none carries a verdict.
 Two variants show a deal-count decline with an interval below zero. Both lean on the same
 2022–2024 quarters, and the first-published variant lost 2,404 of 10,000 resamples to empty groups
 at n = 25, so its interval is less reliable than it looks. Under the first-published vintage, P2's
-deal-count difference also favours risk appetite (`D` −0.30, −0.66 to −0.02).
+deal-count difference also favours risk appetite (`D` −0.30, −0.67 to −0.01).
 
 ## Candidate ramps
 
@@ -261,7 +261,7 @@ No candidate passes all four, so the current ramp stays.
 2. **Release dates.** Recorded as each spreadsheet's internal last-saved timestamp, because the
    file dates on nvca.org were reset by a site migration in July 2024.
 3. **Undefined resamples in P2.** The registration discards resamples with an empty group. A
-   resample in which a score never varies has no rank correlation either; those 126 (P2) were
+   resample in which a score never varies has no rank correlation either; those 16 (P2) were
    discarded the same way and are counted above.
 4. **The registered window is pinned in code.** The analysis and the rate-input validator read the
    177 month-ends through 2026-09-30 only, so the monthly cache refresh cannot move a registered
@@ -270,6 +270,15 @@ No candidate passes all four, so the current ramp stays.
    `qwen3-coder:30b-128k`, the same weights with a longer context, because it was already loaded
    and loading a second copy evicts models other sessions are using. It was a cross-check, not
    the extractor.
+6. **The record gained the Chicago Fed index after the first run.** The archive began scoring
+   the Chicago Fed National Financial Conditions Index the same day (`docs/feature-specs-current.md`
+   §1.1.67), and this test replays the archive's inputs, so it was rerun on the new record. One
+   signal quarter moved: 2020Q1's funding pressure went from 0 to 2. Its tight flag, every
+   condition, P1, the candidate table and the decision rule are unchanged. P2 and the lead-lag
+   table moved: `D` went from −0.12 (−0.49 to 0.14) to −0.16 (−0.52 to 0.05) for deal value and
+   from −0.08 (−0.34 to 0.17) to −0.11 (−0.35 to 0.10) for deal count, both verdicts the same, and
+   the discarded constant-score resamples fell from 126 to 16. The first run's figures are in the
+   commit that added this report.
 
 ## Limits
 
@@ -292,7 +301,7 @@ No candidate passes all four, so the current ramp stays.
 ## What happens next
 
 The candidates are scored beside every weekly reading from now on (`OperatingSnapshot.shadowRamps`,
-`docs/feature-specs-current.md` §1.1.65), the first record in which a candidate's reading exists
+`docs/feature-specs-current.md` §1.1.68), the first record in which a candidate's reading exists
 before its outcome. It is reviewed at eight quarter-ends with first-published outcomes. A
 candidate that failed here can be reconsidered then only through a new registration.
 

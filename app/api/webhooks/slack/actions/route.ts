@@ -94,10 +94,10 @@ export async function POST(request: NextRequest) {
       if (responseUrl) {
         const statusText =
           actionId === "acknowledge_decision"
-            ? "✅ Status acknowledged by"
+            ? "Status acknowledged by"
             : actionId === "revisit_decision"
-              ? "🔄 Queued for team review by"
-              : "📦 Archived by";
+              ? "Queued for team review by"
+              : "Archived by";
 
         await fetchWithTimeout(fetch, responseUrl, {
           method: "POST",

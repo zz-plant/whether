@@ -129,6 +129,7 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
           degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
           confidenceLabel: resolvePublishedConfidence({ assessment: reportData.assessment, record: reportData.treasury }).label,
           assessment: reportData.assessment,
+          scoringBasis: reportData.scoringBasis,
         })}
       />
       {reading ? <SignalReadingPanel reading={reading} recordDateLabel={reportData.recordDateLabel} /> : null}

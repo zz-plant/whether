@@ -9,6 +9,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading } from "../types";
 import type { ActionStripItem } from "./operatingCalls";
 import type { PreviousReading } from "../export/scoreReference";
+import { basisClause, type ScoringBasis } from "./scoringBasis";
 
 /**
  * The week's call as one structured object, so every format the reader can copy
@@ -73,6 +74,8 @@ export type BriefArtifact = {
   stageLabel?: string;
   /** Where the numbers came from, as a reader names the source. */
   sourceLabel?: string;
+  /** Which inputs set the scores, as a sentence: "Scored on the record's inputs." (`ScoringBasis.sentence`). */
+  basis?: string;
 };
 
 type PublishedConfidenceLabel = "HIGH" | "MED" | "LOW";
@@ -121,6 +124,8 @@ export type BriefDocument = BriefArtifact & {
     isFallback: boolean;
     /** The most specific stable URL for the week: the frozen record when there is a current one. */
     permalink: string;
+    /** Which inputs set the scores, and what the inputs left out would do (`resolveScoringBasis`). */
+    scoringBasis: Pick<ScoringBasis, "key" | "sentence" | "warning" | "notCounted">;
   };
   /** The call's slots, from the `WeeklyCallContract`. */
   slots: {
@@ -263,6 +268,7 @@ export const parseBriefArtifact = (raw: string): BriefArtifact | null => {
       : undefined,
     stageLabel: readText(value, "stageLabel"),
     sourceLabel: readText(value, "sourceLabel"),
+    basis: readText(value, "basis"),
   };
 };
 
@@ -358,6 +364,7 @@ const provenanceLine = (artifact: BriefArtifact) =>
     `Source: ${artifact.source}`,
     `data as of ${artifact.recordDateLabel}`,
     artifact.confidenceLabel ? `margin: ${formatMarginBand(artifact.confidenceLabel).toLowerCase()}` : null,
+    artifact.basis ? basisClause(artifact.basis) : null,
     artifact.isFallback ? "cached snapshot, not a live read" : null,
   ]
     .filter(Boolean)
@@ -476,6 +483,7 @@ export const briefArtifactToSlidePayload = (
   ...(artifact.lines ? { lines: artifact.lines } : {}),
   confidence: artifact.confidenceLabel,
   provenance: artifact.sourceLabel ?? artifact.source,
+  ...(artifact.basis ? { basis: artifact.basis } : {}),
   call: artifact.call,
   clearsWhen: artifact.clearsWhen,
   ...(origin ? { url: resolveBriefUrl(artifact, origin) } : {}),

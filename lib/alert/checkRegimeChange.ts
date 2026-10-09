@@ -1,4 +1,5 @@
-import { getRegimePublicLabel } from "../regimePresentation";
+import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
+import { describeChangeTheRecordMade } from "../report/scoringBasis";
 import { getRegimeProjection } from "../report/regimeContext";
 import { getWhetherKv } from "../runtime/kv";
 import type { OperatingSnapshot } from "../operatingState/types";
@@ -99,7 +100,14 @@ export const checkRegimeChange = async (options?: {
 
   /* 1. Regime change — highest priority alert */
   if (previousRegime && previousRegime !== currentRegime) {
-    alerts.push(`Conditions changed from ${getRegimePublicLabel(previousRegime)} to ${getRegimePublicLabel(currentRegime)}. Read the brief before acting on last week's plan.`);
+    /* When the inputs the record cannot test would have held the earlier conditions,
+       the change is the record basis, not the market, and the alert says so. */
+    const recordBasisCause = isRegimeKey(previousRegime)
+      ? describeChangeTheRecordMade({ previousRegime, assessment })
+      : null;
+    alerts.push(
+      `Conditions changed from ${getRegimePublicLabel(previousRegime)} to ${getRegimePublicLabel(currentRegime)}.${recordBasisCause ? ` ${recordBasisCause}` : ""} Read the brief before acting on last week's plan.`,
+    );
     /*
      * Here and nowhere else. A notification that fires on every cron run,
      * whether or not anything happened, is one people turn off — and then the
@@ -112,8 +120,8 @@ export const checkRegimeChange = async (options?: {
      */
     pushOutcome = await sendRegimeChangePush().catch(() => null);
     await postSlackAlerts(
-      "⚠️ Conditions changed",
-      `*${getRegimePublicLabel(previousRegime)}* → *${getRegimePublicLabel(currentRegime)}*\nRead this week's guidance before acting on last week's plan.`,
+      "Conditions changed",
+      `*${getRegimePublicLabel(previousRegime)}* → *${getRegimePublicLabel(currentRegime)}*\n${recordBasisCause ? `${recordBasisCause}\n` : ""}Read this week's guidance before acting on last week's plan.`,
     );
   }
 
@@ -128,7 +136,7 @@ export const checkRegimeChange = async (options?: {
   for (const move of flashMoves) {
     alerts.push(`FLASH — ${move.headline}`);
     await postSlackAlerts(
-      "⚡ Flash — an unusually large move since the last reading",
+      "Flash — an unusually large move since the last reading",
       `${move.headline}\nThis week's guidance stands until the next reading shows where the scores settle. Until then, hold anything you can't undo.`,
     );
   }
@@ -149,7 +157,7 @@ export const checkRegimeChange = async (options?: {
     if (prevWeeks === null || projection.weeksToFlip < prevWeeks) {
       alerts.push(`WATCH — conditions could change soon: ${projection.velocityLabel}`);
       await postSlackAlerts(
-        "👀 Conditions could change soon",
+        "Conditions could change soon",
         `${projection.velocityLabel}\nA score is closing on the line where conditions change. Hold anything you can't undo until it settles.`,
       );
     }

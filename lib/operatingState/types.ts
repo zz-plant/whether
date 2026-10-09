@@ -16,6 +16,14 @@ export type OperatingSnapshot = {
    */
   schemaVersion: 2;
   epoch: string;
+  /**
+   * The calibration that scored `assessment` (`ENGINE_VERSION`). Set from
+   * 2026-10-09; a snapshot without it was scored by an earlier engine, whose
+   * published scores counted every market input (`scoringBasisForEngine`).
+   * Snapshots are kept per engine (the input hash includes the version), so an
+   * earlier engine's stays readable under its own key.
+   */
+  engineVersion?: string;
   recordDate: string;
   inputHash: string;
   sourceSnapshotIds: string[];

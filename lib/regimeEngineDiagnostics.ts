@@ -1,7 +1,8 @@
-import type { MacroSeriesReading } from "./types";
+import type { MacroSeriesId, MacroSeriesReading } from "./types";
 import {
   RISK_APPETITE_REGIME_THRESHOLD,
   clamp,
+  type OffRecordScores,
   type RegimeAssessment,
   type RegimeDiagnostics,
   type RegimeThresholds,
@@ -68,6 +69,29 @@ const VC_VELOCITY_RISK_APPETITE_CAP = 10;
 const LAYOFF_PRESSURE_THRESHOLD = 65;
 const LAYOFF_RISK_APPETITE_MULTIPLIER = 0.6;
 const LAYOFF_RISK_APPETITE_CAP = 12;
+
+/**
+ * The market inputs on the record basis: the ones the archive scores at every
+ * month-end it holds, from the same public series the live read fetches. Only
+ * these adjust the published scores, so the conditions and every area's pause
+ * and resume state are judged on the inputs the record can be tested on, and
+ * the record (`/history`, the track record, `/calibration`) vouches for the
+ * score that sets the guidance.
+ *
+ * Every other market input the engine reads is scored too, into
+ * `RegimeScores.offRecord`, and moves nothing: the venture funding pace and the
+ * tech-layoff trend are curated snapshots with no history to test, and the
+ * high-yield spread's public series starts in October 2023. Until 2026-10-09
+ * all of them adjusted the published scores, and the weekly call read Freezing
+ * on four weeks whose month-end, scored on the record's inputs, read Cloudy.
+ * The Chicago Fed index joined the basis with its month-end history
+ * (`engine-2026-10-09b`).
+ *
+ * Add an input here only in the change that puts its month-end history in the
+ * archive: `tests/recordBasis.test.ts` fails when an input on this list has no
+ * value in a cached month.
+ */
+export const RECORD_BASIS_MARKET_INPUTS: readonly MacroSeriesId[] = ["VIX_INDEX", "CHICAGO_FCI"];
 
 /**
  * Diagnostic bands, all measured in raw score points of distance from the
@@ -151,18 +175,39 @@ const trailingMean = (reading: MacroSeriesReading | undefined, window: number): 
   return spot;
 };
 
-export const applyMacroAdjustments = (
+/** The market input each contributor reads, so a contributor can be placed on or off the record basis. */
+const CONTRIBUTOR_INPUT: Record<MacroContributorCode, MacroSeriesId> = {
+  "high-yield-stress": "HY_CREDIT_SPREAD",
+  "financial-conditions-tightening": "CHICAGO_FCI",
+  "equity-volatility": "VIX_INDEX",
+  "market-stress-veto": "VIX_INDEX",
+  "market-stress-unwind": "VIX_INDEX",
+  "vc-funding-slowdown": "VC_FUNDING_VELOCITY",
+  "tech-layoff-pressure": "TECH_LAYOFF_TREND",
+};
+
+const isRecordBasisInput = (id: MacroSeriesId) => RECORD_BASIS_MARKET_INPUTS.includes(id);
+
+/**
+ * The adjustments, in their fixed order, reading only the inputs `counts`
+ * admits. The order is the arithmetic: the veto caps risk appetite after the
+ * volatility haircut, and the startup-market haircuts land after the veto, so
+ * leaving them out changes nothing that comes before them.
+ */
+const runMacroAdjustments = (
   tightness: number,
   riskAppetite: number,
   macroSeries: MacroSeriesReading[],
+  counts: (id: MacroSeriesId) => boolean,
 ) => {
+  const read = (id: MacroSeriesId) => (counts(id) ? getMacroValue(macroSeries, id) : null);
   let adjustedTightness = tightness;
   let adjustedRiskAppetite = riskAppetite;
   const contributors: MacroContributorCode[] = [];
   let weakReadCount = 0;
   let vetoApplied = false;
 
-  const hySpread = getMacroValue(macroSeries, "HY_CREDIT_SPREAD");
+  const hySpread = read("HY_CREDIT_SPREAD");
   if (typeof hySpread === "number" && hySpread >= HY_SPREAD_STRESS_THRESHOLD) {
     adjustedTightness = clamp(
       adjustedTightness +
@@ -177,7 +222,7 @@ export const applyMacroAdjustments = (
     weakReadCount += 1;
   }
 
-  const chicagoFci = getMacroValue(macroSeries, "CHICAGO_FCI");
+  const chicagoFci = read("CHICAGO_FCI");
   if (typeof chicagoFci === "number" && chicagoFci >= CHICAGO_FCI_TIGHTENING_THRESHOLD) {
     adjustedTightness = clamp(
       adjustedTightness +
@@ -192,7 +237,7 @@ export const applyMacroAdjustments = (
     weakReadCount += 1;
   }
 
-  const vix = getMacroValue(macroSeries, "VIX_INDEX");
+  const vix = read("VIX_INDEX");
   if (typeof vix === "number" && vix >= VIX_SHOCK_THRESHOLD) {
     adjustedRiskAppetite = clamp(
       adjustedRiskAppetite -
@@ -207,7 +252,7 @@ export const applyMacroAdjustments = (
     weakReadCount += 1;
   }
 
-  const vixReading = macroSeries.find((entry) => entry.id === "VIX_INDEX");
+  const vixReading = counts("VIX_INDEX") ? macroSeries.find((entry) => entry.id === "VIX_INDEX") : undefined;
   const vixMean = trailingMean(vixReading, VIX_VETO_MEAN_WINDOW);
   if (vixMean !== null && vixMean >= VIX_MARKET_STRESS_UNWIND_MEAN) {
     const vetoCap = vixMean >= VIX_MARKET_STRESS_VETO_MEAN
@@ -222,7 +267,7 @@ export const applyMacroAdjustments = (
     }
   }
 
-  const vcVelocity = getMacroValue(macroSeries, "VC_FUNDING_VELOCITY");
+  const vcVelocity = read("VC_FUNDING_VELOCITY");
   if (typeof vcVelocity === "number" && vcVelocity <= VC_VELOCITY_SLOWDOWN_THRESHOLD) {
     adjustedRiskAppetite = clamp(
       adjustedRiskAppetite -
@@ -240,7 +285,7 @@ export const applyMacroAdjustments = (
     weakReadCount += 1;
   }
 
-  const layoffs = getMacroValue(macroSeries, "TECH_LAYOFF_TREND");
+  const layoffs = read("TECH_LAYOFF_TREND");
   if (typeof layoffs === "number" && layoffs >= LAYOFF_PRESSURE_THRESHOLD) {
     adjustedRiskAppetite = clamp(
       adjustedRiskAppetite -
@@ -262,6 +307,28 @@ export const applyMacroAdjustments = (
     weakReadCount,
     marketStressVetoApplied: vetoApplied,
   };
+};
+
+/**
+ * The market adjustments on the record basis (`RECORD_BASIS_MARKET_INPUTS`),
+ * which are the published scores, and the scores with every input counted,
+ * which are not. `offRecord` names the inputs outside the record that adjusted
+ * a score, and is null when none did: with every input counted the scores are
+ * the ones the engine published before 2026-10-09.
+ */
+export const applyMacroAdjustments = (
+  tightness: number,
+  riskAppetite: number,
+  macroSeries: MacroSeriesReading[],
+) => {
+  const onRecord = runMacroAdjustments(tightness, riskAppetite, macroSeries, isRecordBasisInput);
+  const everyInput = runMacroAdjustments(tightness, riskAppetite, macroSeries, () => true);
+  const inputs = [...new Set(everyInput.boundaryContributors.map((code) => CONTRIBUTOR_INPUT[code]))].filter(
+    (id) => !isRecordBasisInput(id),
+  );
+  const offRecord: OffRecordScores | null =
+    inputs.length > 0 ? { tightness: everyInput.tightness, riskAppetite: everyInput.riskAppetite, inputs } : null;
+  return { ...onRecord, offRecord };
 };
 
 export const computeDiagnostics = (

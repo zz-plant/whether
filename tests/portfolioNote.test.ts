@@ -59,9 +59,9 @@ describe("portfolio note", () => {
   it("ends where a company sets its own lines, with the source and the dated brief", () => {
     const note = build();
     assert.match(note, /\/operate#ops-plan-lines/);
-    assert.match(note, /^Source: U\.S\. Treasury, 2026-09-29, via whether\.work\.$/m);
+    assert.match(note, /^Source: U\.S\. Treasury, 2026-09-29, via whether\.work · scored on the record's inputs\.$/m);
     assert.match(note, /^Full brief: https?:\/\//m);
-    assert.match(build(true), /\(saved copy, not a live reading\)\.$/m);
+    assert.match(build(true), /\(saved copy, not a live reading\) · scored on the record's inputs\.$/m);
   });
 
   it("uses none of the words a reader-facing paste may not", () => {

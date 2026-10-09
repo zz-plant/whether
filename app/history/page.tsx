@@ -292,7 +292,7 @@ export default async function HistoryPage({
 
       {/* Grades the record above: which regime changes were visible in the near band
           beforehand, and which were not. */}
-      <TrackRecordSection series={statsSeries} />
+      <TrackRecordSection series={statsSeries} recordChanges={trackRecord?.regimeChanges} />
 
       <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         <RegimePhaseMap

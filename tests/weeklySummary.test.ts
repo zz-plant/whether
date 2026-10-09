@@ -103,11 +103,12 @@ describe("buildWeeklySummary", () => {
     assert.equal(assessment.regime, "SCARCITY");
     assert.equal(assessment.policyAssessment.refusal.refused, false);
     assert.equal(assessment.scores.tightness, 90);
-    assert.equal(assessment.scores.riskAppetite, 37);
+    /* On the record basis: the curve's 48, with the startup-market inputs' -11 left out. */
+    assert.equal(assessment.scores.riskAppetite, 48);
 
     const provenance = { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" };
     const changeLine =
-      "Conditions change if: Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 13 pts from 37 to clear 50.";
+      "Conditions change if: Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 2 pts from 48 to clear 50.";
     for (const summary of [
       buildWeeklySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
       buildMonthlySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
@@ -193,7 +194,7 @@ describe("buildWeeklySummary", () => {
     const yearly = buildYearlySummary({ assessment, provenance, periodLabel: "2026", record });
 
     assert.match(weekly.copy, /\nWHETHER · Weekly operating guidance\n/);
-    assert.match(weekly.copy, /\nMARKET CLIMATE\n\n⚠️ Freezing: Money is expensive and hard to raise\.\n/);
+    assert.match(weekly.copy, /\nMARKET CLIMATE\n\nFreezing: Money is expensive and hard to raise\.\n/);
     assert.match(weekly.summary, /The guidance is not changing this week\. Too many inputs are missing to support a change in the guidance\. Keep approvals reversible until the hold lifts\./);
     for (const summary of [weekly, monthly]) {
       assert.ok(summary.summary.includes(SHOCK_CROSSING_CUE), summary.summary);
