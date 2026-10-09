@@ -44,7 +44,7 @@ function LoadingRegion({
 /** Mirrors `OperationsWorkstreamNav`: intro pair, then a 4-up card grid. */
 export function WorkstreamNavFallback() {
   return (
-    <LoadingRegion label="Loading workstream navigation" className={WORKSTREAM_NAV_CLASS}>
+    <LoadingRegion label="Workstream navigation" className={WORKSTREAM_NAV_CLASS}>
       {[0, 1, 2].map((index) => (
         <div key={index} className="inline-flex min-h-11 items-center">
           <Skeleton className="h-4 w-24 rounded-sm bg-slate-500/22" />

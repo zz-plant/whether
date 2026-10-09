@@ -31,6 +31,7 @@ describe("site review copy fixes", () => {
       const { default: Loading } = await import(`../app/${route}loading`);
       const html = renderToStaticMarkup(<Loading />);
       assert.equal(visibleText(html), "", `/${route}loading renders text: ${visibleText(html)}`);
+      assert.doesNotMatch(html, /Loading|Preparing|Checking/, `/${route}loading still names itself as loading in its markup`);
       assert.match(html, /aria-busy="true"/, `/${route}loading still marks itself busy`);
     }
   });

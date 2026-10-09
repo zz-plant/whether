@@ -27,7 +27,7 @@ export function Shell({
     return (
       <div className="flex-1 bg-[var(--bg-body)] text-[var(--app-text)]">
         <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-4 sm:py-5">
-          <output aria-busy="true" aria-label="Loading the weekly brief" className="block">
+          <output aria-busy="true" aria-label="Weekly brief" className="block">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
               <div className="space-y-6 min-w-0">
                 <div className="weather-card">
