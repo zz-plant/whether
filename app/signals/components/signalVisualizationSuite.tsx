@@ -337,7 +337,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             {/* Unnumbered. The titles were "1)" to "5)" to match DOM order, but a
                 numbered list of charts reads as a report template, and nothing
                 on the page refers to a chart by its number. */}
-            <PanelTitle title="Steepness against level" subtitle="Each dot is one month: across is the two-year rate, up is the gap between the ten-year and two-year rates. Monthly whichever period you pick above." />
+            <PanelTitle title="Steepness against level" subtitle="Each dot is one month: across is the two-year rate, up is the gap between the ten-year and two-year rates. The dots stay monthly whichever period you pick above." />
             <svg
               viewBox="-3 -3 106 78"
               className="weather-data-plot mx-auto h-auto w-full max-w-[24rem]"
@@ -414,7 +414,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 X {formatRange(scatterXMin, scatterXMax, "%")} · Y {formatRange(scatterYMin, scatterYMax, "pp")}
               </p>
             ) : null}
-            <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction, not just position.</p>
+            <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction as well as position.</p>
           </FlatPanel>
 
           <FlatPanel className="lg:col-span-8">

@@ -133,11 +133,11 @@ it("watches each stage's published pause line, never today's distance from the c
      line", with today's gap as the number: true the moment it printed. */
   const freezing = { thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 }, scores: { tightness: 90, riskAppetite: 48 } };
   const seed = buildScopedVariantDecisionAdjustment({ mode: "seed", ...freezing });
-  assert.equal(seed.watchAdjustments[0], "Runway trigger: tighten if funding pressure is above 76 (already true at 90) for 2 readings in a row.");
+  assert.equal(seed.watchAdjustments[0], "Runway trigger: tighten if funding pressure is above 76 for 2 readings in a row. Funding pressure is 90 now.");
   const seriesA = buildScopedVariantDecisionAdjustment({ mode: "series-a", ...freezing });
   assert.equal(seriesA.watchAdjustments[0], "Payback trigger: revisit the plan if risk appetite falls below 44.");
   const bootstrapped = buildScopedVariantDecisionAdjustment({ mode: "bootstrapped", ...freezing });
-  assert.match(bootstrapped.watchAdjustments[0] ?? "", /funding pressure is above 76 \(already true at 90\) or risk appetite falls below 44/);
+  assert.match(bootstrapped.watchAdjustments[0] ?? "", /funding pressure is above 76 or risk appetite falls below 44\. Funding pressure is 90 now\./);
   for (const mode of ["seed", "series-a", "series-b", "growth", "public", "bootstrapped"] as const) {
     const line = buildScopedVariantDecisionAdjustment({ mode, ...freezing }).watchAdjustments[0] ?? "";
     assert.doesNotMatch(line, /moves within|comes within|points of (the|its) line/, mode);

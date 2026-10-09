@@ -249,10 +249,9 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           </li>
         </ol>
         {/* No link out for the market terms: each card below says what its own terms
-            mean where they first appear, so the arithmetic can be read without leaving it. */}
+            mean, so the arithmetic can be read without leaving it. */}
         <p className="text-xs text-slate-400">
-          The exact arithmetic is below. Each card says what its market terms mean where they
-          first appear.
+          The exact arithmetic is below. Each card says what its market terms mean.
         </p>
       </div>
 
@@ -274,12 +273,12 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series — DGS1MO
-              (the short-term borrowing rate; falls back to DGS3MO), DGS2, DGS10.
+              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series DGS1MO,
+              DGS2 and DGS10, with DGS3MO standing in when DGS1MO is missing.
               <span className="mt-1 block text-xs text-slate-400">
                 FRED is the St. Louis Fed&rsquo;s free public data service; each code names one
-                published series. DGS1MO is the one-month Treasury bill rate, which the cards
-                below call the short-term borrowing rate. DGS3MO is the three-month bill, DGS2 the
+                published series. DGS1MO is the one-month Treasury bill rate, and the cards below
+                call it the short-term borrowing rate. DGS3MO is the three-month bill, DGS2 the
                 two-year rate and DGS10 the ten-year.
               </span>
             </li>
@@ -287,9 +286,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               <span className="text-slate-400">Stress reads:</span> high-yield credit spread, Chicago
               Fed financial conditions index, VIX, venture funding pace, tech layoff index.
               <span className="mt-1 block text-xs text-slate-400">
-                In order: the extra interest riskier companies pay to borrow, a Fed summary of
-                overall borrowing conditions, expected stock-market turbulence, the pace of venture
-                funding, and the tech layoff trend.
+                The two score cards below say what each one measures, beside the arithmetic that uses it.
               </span>
             </li>
           </ul>
@@ -302,7 +299,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
                 min({TIGHTNESS_BASE_RATE_POINTS}, (short-term borrowing rate − {BASE_RATE_TIGHTNESS_THRESHOLD}) ×{" "}
                 {BASE_RATE_TIGHTNESS_MULTIPLIER})
               </code>{" "}
-              The short-term borrowing rate is the one-month Treasury bill rate, in percent.
+              The short-term borrowing rate is read in percent.
 
               <RampPlot
                 id="ramp-base-rate"
@@ -318,9 +315,8 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
                 + min({TIGHTNESS_INVERSION_POINTS}, inversion depth ×{" "}
                 {CURVE_INVERSION_TIGHTNESS_MULTIPLIER})
               </code>{" "}
-              when the recession warning gauge (10-year minus 2-year rate) is inverted, meaning the
-              ten-year rate is below the two-year. Inversion depth is how far below, in percentage
-              points.
+              when the recession warning gauge (10-year minus 2-year rate) is inverted: the ten-year
+              rate is below the two-year. Inversion depth is how far below, in percentage points.
               <RampPlot
                 id="ramp-inversion"
                 from={0}
@@ -355,7 +351,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         <FormulaCard title="Risk appetite · 0–100 · willingness to fund risk">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              Recession warning gauge (10-year minus 2-year rate), mapped linearly: {RISK_APPETITE_MIN_SLOPE}% → 0,{" "}
+              Recession warning gauge, mapped linearly: {RISK_APPETITE_MIN_SLOPE}% → 0,{" "}
               +{RISK_APPETITE_MAX_SLOPE}% → 100. The further the ten-year rate sits above the
               two-year, the more willing lenders are to wait for a return.
             </li>
@@ -376,8 +372,8 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               {adj.vixMarketStressVetoMean} or more over its last {adj.vixVetoMeanWindow} readings,
               the score is capped at the line where conditions change ({RISK_APPETITE_REGIME_THRESHOLD});
               between {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
-              {adj.vixVetoSoftCap}. An average rather than one day, so a single spike does not cap a
-              week. While the cap holds, extreme market stress sets the ceiling, not the rates.
+              {adj.vixVetoSoftCap}. It uses an average rather than one day, so a single spike does not
+              cap a week. While the cap holds, extreme market stress sets the ceiling, not the rates.
             </li>
           </ul>
         </FormulaCard>
@@ -395,8 +391,8 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               <span className="text-slate-400">{OPERATING_LATITUDE_LABEL}:</span>{" "}
               <code className="text-sky-200">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
               <span className="mt-1 block text-xs text-slate-400">
-                The 0–100 score in the copied and Slack briefs and beside each month on the history
-                page: {OPERATING_LATITUDE_GLOSS}.
+                The 0–100 score beside each month on the history page and in the copied and Slack
+                briefs. It measures {OPERATING_LATITUDE_GLOSS}.
               </span>
             </li>
             <li>

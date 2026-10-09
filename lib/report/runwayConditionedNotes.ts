@@ -129,7 +129,7 @@ export const buildRunwayConditionedNotes = ({
       },
       {
         area: "capital-raising",
-        note: `With ${runway} of runway, a raise process started this quarter is what lands cash before runway ends — waiting compresses that margin.${isExpansion ? " A favorable window argues for starting earlier, not later." : ""}`,
+        note: `With ${runway} of runway, a raise process started this quarter is what lands cash before runway ends. Waiting compresses that margin.${isExpansion ? " A favorable window argues for starting earlier, not later." : ""}`,
       },
       {
         area: "hiring",
@@ -147,7 +147,7 @@ export const buildRunwayConditionedNotes = ({
       },
       {
         area: "hiring",
-        note: `With ${runway} of runway, each net-new role commits fixed cost against months you cannot extend — its payback proof carries that weight.`,
+        note: `With ${runway} of runway, each net-new role commits fixed cost against months you cannot extend, so its payback proof carries that weight.`,
       },
     ];
     if (burn) {
@@ -163,7 +163,7 @@ export const buildRunwayConditionedNotes = ({
     const notes: RunwayConditionedNote[] = [
       {
         area: "burn-discipline",
-        note: `With ${runway} of runway you can act on the printed guidance — no emergency cuts while funding pressure stays this side of the pause line.`,
+        note: `With ${runway} of runway you can act on the printed guidance. No emergency cuts are needed while funding pressure stays this side of the pause line.`,
       },
     ];
     if (isExpansion) {

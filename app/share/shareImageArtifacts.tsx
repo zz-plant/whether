@@ -55,7 +55,7 @@ const IMAGE_ARTIFACTS: readonly ImageArtifact[] = [
        (2026-10-09). */
     title: "Board slide",
     description:
-      "One slide: the guidance, its pause line, what would change it and both scores. All three files draw it for a seed-stage company; change stage= in a file's link to series-a, series-b or growth.",
+      "One slide: the guidance, its pause line, its change lines and both scores. All three files draw it for a seed-stage company; change stage= in a file's link to series-a, series-b or growth.",
     preview: {
       src: "/api/image/slide?stage=seed",
       width: 1200,

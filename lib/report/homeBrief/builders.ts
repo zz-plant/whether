@@ -747,7 +747,7 @@ export const buildHomeBriefModelInternal = (
       reportDynamics,
       transitionWatch,
       pendingFlipDetail: regimeFlipState.pendingCandidate
-        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending — conditions hold where they are while the change waits on confirmation. The line that would change where it lands: ${regimeSignalLabel[regimeFlipState.watch.dimension]} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
+        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending. Conditions hold where they are while the change waits on confirmation. The line that would change where it lands: ${regimeSignalLabel[regimeFlipState.watch.dimension]} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
         : undefined,
     }),
   };

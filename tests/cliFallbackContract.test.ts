@@ -38,7 +38,7 @@ const postureState = {
     transitionWatch: "ON",
   },
   whatFlipsNext: {
-    flipTrigger: "Funding pressure falls 20 pts to 70 or below (90 today).",
+    flipTrigger: "Funding pressure falls 20 pts from 90 to 70 or below.",
     thresholds: ["tightness < 60 for 2 consecutive refreshes"],
   },
 } as any;

@@ -39,7 +39,7 @@ export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
   title: "Margin calibration study",
   description:
-    "Whether's margin, the distance from the line where conditions change, checked against every month-end reading since 2012: how often conditions held at each distance.",
+    "Whether's margin measures distance from the line where conditions change. This study checks it against every month-end reading since 2012.",
   path: "/calibration",
   imageAlt: "Whether margin calibration study",
   imageParams: { template: "method", eyebrow: "The record" },
@@ -70,7 +70,7 @@ export default function CalibrationPage() {
 
       <SecondaryPageSection
         title="How it was measured"
-        description="What was counted, and what counted as a hold."
+        description="The readings counted, the outcome scored and the distance bands."
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
@@ -115,7 +115,7 @@ export default function CalibrationPage() {
           </li>
         </ul>
         <p className="mt-4 text-sm text-slate-300">
-          So the margin keeps measuring distance, which is an honest thing to measure, and this
+          So the margin keeps measuring distance, and distance is an honest thing to measure. This
           record is published beside it rather than folded into it.
         </p>
       </SecondaryPageSection>

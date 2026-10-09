@@ -44,7 +44,7 @@ describe("buildSlackBrief", () => {
 
     assert.match(brief, /^• Pause if: Funding pressure rises above 76$/m);
     // Both resume lines hold at 12 / 68, and the line says so rather than reading as a move to come.
-    assert.match(brief, /^• Resume when: Funding pressure is below 66 \(already true at 12\) and risk appetite is above 54 \(already true at 68\)$/m);
+    assert.match(brief, /^• Resume when: Funding pressure is below 66 and risk appetite is above 54\. Funding pressure is 12 and risk appetite is 68 now\.$/m);
     assert.doesNotMatch(brief, /Pause if: Pause|Resume when: Resume/);
     assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Resume when \/ Conditions change if\):/);
     const order = ["• Guidance:", "• Pause if:", "• Resume when:", "• Conditions change if:"].map((label) => brief.indexOf(label));

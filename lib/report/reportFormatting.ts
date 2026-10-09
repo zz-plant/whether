@@ -250,6 +250,30 @@ const toSentence = (value: string | undefined | null): string => {
 export const joinSentences = (...parts: Array<string | undefined | null>): string =>
   parts.map(toSentence).filter((part) => part.length > 0).join(" ");
 
+/**
+ * The reading a line is already past, as its own sentence after the rule:
+ * "Pause net-new hiring if funding pressure is above 76 or risk appetite falls
+ * below 44. Funding pressure is 90 now." Until 2026-10-09 the reading sat inside
+ * the rule as "(already true at 90)", and the change line carried "(90 today)"
+ * after each score, so one sentence held two glosses of the same kind.
+ */
+export const formatReadingsNow = (readings: ReadonlyArray<{ label: string; value: string }>): string => {
+  if (readings.length === 0) return "";
+  const clauses = readings.map(({ label, value }, index) => {
+    const name = index === 0 ? `${label.charAt(0).toUpperCase()}${label.slice(1)}` : label.toLowerCase();
+    return `${name} is ${value}`;
+  });
+  return `${clauses.join(" and ")} now.`;
+};
+
+/** A sentence `formatReadingsNow` wrote: compaction keeps it with the rule it reports on. */
+const READINGS_NOW_SOURCE = "[A-Z][a-z]*(?: [a-z]+)* is -?\\d+(?:\\.\\d+)?(?: and [a-z]+(?: [a-z]+)* is -?\\d+(?:\\.\\d+)?)* now";
+const READINGS_NOW_SENTENCE = new RegExp(`^${READINGS_NOW_SOURCE}\\.?$`);
+const TRAILING_READINGS_NOW = new RegExp(`\\s+${READINGS_NOW_SOURCE}\\.$`);
+
+/** A rule sentence without its readings, for a surface that states the crossing itself. */
+export const withoutReadingsNow = (text: string): string => text.replace(TRAILING_READINGS_NOW, "");
+
 export const extractCompactClause = (value: string, fallback: string): string => {
   const normalized = value.trim();
   if (!normalized) {
@@ -278,6 +302,13 @@ export const extractCompactClause = (value: string, fallback: string): string =>
   }
 
   const firstClause = boundaryIndex >= 0 ? normalized.slice(0, boundaryIndex) : normalized;
+  /* The cut drops a rule's trailing sentences, except the one giving the reading
+     of a line already met: without it a met line reads as a move still to come.
+     That pair keeps its stops, since the clause is no longer the whole value. */
+  const rest = boundaryIndex >= 0 && normalized[boundaryIndex] === "." ? normalized.slice(boundaryIndex + 1).trim() : "";
+  if (firstClause.trim() && READINGS_NOW_SENTENCE.test(rest)) {
+    return `${firstClause.trim()}. ${rest.replace(/\.?$/, ".")}`;
+  }
   return (firstClause.trim() || fallback).replace(/\.$/, "");
 };
 

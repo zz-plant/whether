@@ -87,12 +87,12 @@ export default function AboutPage() {
           <Link href="/history#track-record" className={inlineLinkClass}>
             track record
           </Link>{" "}
-          scores the archive against what happened next, including where it falls short: changes in conditions that
-          came with no warning, and a margin that the{" "}
+          scores the archive against what happened next. That includes where it falls short. Some changes in
+          conditions came with no warning, and the{" "}
           <Link href="/calibration" className={inlineLinkClass}>
             calibration study
           </Link>{" "}
-          shows measures distance from a line, not probability.
+          shows the margin measures distance from a line, not probability.
         </p>
         <p className="text-sm text-slate-300">
           The inputs are not new. Both scores start from public Treasury rates, by arithmetic short enough to check by
@@ -103,7 +103,7 @@ export default function AboutPage() {
       <MethodSection />
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Where it fits, and where it does not</h2>
+        <h2 className="text-lg font-semibold text-slate-100">Where it fits and where it does not</h2>
         <p className="text-sm text-slate-300">
           {record ? <>{describeRecordCadence(record)} </> : null}
           So the use is to set the lines when a plan is made, and to hear the day one is crossed.
@@ -119,8 +119,8 @@ export default function AboutPage() {
             when a line is crossed, or an agreed floor on runway.
           </li>
           <li>
-            Venture-backed U.S. companies with one to two years of runway, whose next raise depends on what capital
-            costs.
+            Venture-backed U.S. companies with one to two years of runway and a next raise that depends on what
+            capital costs.
           </li>
           <li>
             Investors and accelerators sending one reading to every company they back: the{" "}
@@ -156,9 +156,8 @@ export default function AboutPage() {
         </p>
         <p className="text-sm text-slate-300">{publisherAuthor.bio}</p>
         <p className="text-sm text-slate-300">
-          The pause-and-resume structure comes from {publisherAuthor.name}&apos;s earlier work on healthcare products:
-          clinical workflows, physician financial guidance and contested medical claims, where a decision with no
-          stopping condition can harm a patient. That work is listed at{" "}
+          The pause-and-resume structure comes from {publisherAuthor.name}&apos;s earlier work on healthcare products.
+          That work is listed at{" "}
           <a href={publisherAuthor.sameAs[0]} className={inlineLinkClass}>
             kanav.net
           </a>
@@ -170,14 +169,15 @@ export default function AboutPage() {
         <h2 className="text-lg font-semibold text-slate-100">What it is built from</h2>
         <p className="text-sm text-slate-300">
           Both scores the brief leads with start from U.S. Treasury rates, read from the St. Louis Fed (FRED). Funding
-          pressure comes from the one-month bill rate, the speed of its rise, and an inverted curve (long rates below short ones); risk appetite comes from the gap between the ten-year and two-year rates. Market-stress readings
-          then adjust them: the extra interest riskier companies pay to borrow, the Chicago Fed&apos;s summary of
-          borrowing conditions, and the VIX, the stock market&apos;s forecast of turbulence. Where the pair lands sets
-          the conditions: Sunny, Cloudy, Stormy or Freezing.
+          pressure comes from the one-month bill rate, the speed of its rise, and long rates falling below short ones.
+          Risk appetite comes from the gap between the ten-year and two-year rates. Market-stress readings then adjust
+          them: the extra interest riskier companies pay to borrow, the Chicago Fed&apos;s summary of borrowing
+          conditions, and the VIX index of expected stock-market turbulence. Where the pair lands sets the conditions:
+          Sunny, Cloudy, Stormy or Freezing.
         </p>
         <p className="text-sm text-slate-300">
-          Two startup-market inputs, the pace of venture funding and tech layoffs, lower risk appetite when they
-          weaken. They come from a curated snapshot rather than a live feed, and every surface that uses them says so.
+          Two startup-market inputs lower risk appetite when they weaken: the pace of venture funding and tech layoffs.
+          They come from a curated snapshot rather than a live feed, and every surface that uses them says so.
         </p>
         <p className="text-sm text-slate-300">
           Inflation and unemployment appear on the signals page but enter neither score. Everything that does is

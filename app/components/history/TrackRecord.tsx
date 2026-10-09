@@ -167,7 +167,7 @@ export function TrackRecordTiles({
           </div>
 
           <p className="text-fluid-xs text-slate-400">
-            {CALL_CHANGE_RULE} One noisy month cannot move it, so unchanged conditions are the usual state and a
+            {CALL_CHANGE_RULE} One noisy month cannot move them, so unchanged conditions are the usual state and a
             change is the event worth reading.
           </p>
         </div>
@@ -212,10 +212,10 @@ export function TrackRecordTable({
             equivalent to them: it is a weighted blend, and the month-to-month
             change column is a move in that blend. */}
         <p className="text-sm text-slate-300">
-          Each month&apos;s {OPERATING_LATITUDE_LABEL.toLowerCase()}, newest first: one 0 to 100 score
-          that blends the two scores, {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite and{" "}
-          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% the inverse of funding pressure, so
-          higher means more room to hire, spend and commit.{" "}
+          Each month&apos;s {OPERATING_LATITUDE_LABEL.toLowerCase()}, newest first. It is one 0 to 100 score
+          that blends the two scores: {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite and{" "}
+          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% the inverse of funding pressure. Higher
+          means more room to hire, spend and commit.{" "}
           <Link href="/trust#formula-reference" className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
             How it is computed
           </Link>

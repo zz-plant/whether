@@ -342,7 +342,7 @@ describe("buildHomeBriefModel", () => {
        sentence the brief prints, not the nearest line alone. */
     assert.equal(
       model.reversalTrigger,
-      "Funding pressure rises 30 pts to clear 40 (10 today) or risk appetite falls 6 pts to 50 or below (56 today).",
+      "Funding pressure rises 30 pts from 10 to clear 40, or risk appetite falls 6 pts from 56 to 50 or below.",
     );
     assert.equal(model.flipThreshold, model.reversalTrigger);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");

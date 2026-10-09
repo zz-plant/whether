@@ -169,3 +169,25 @@ inventory of every heading in `app/`:
 - **Counts and states live in a badge, not the heading.** "3 DECISIONS NEED ATTENTION" became
   "Decisions to reconsider" with a count badge beside it, and a zero state never asserts a
   problem.
+
+## Sentence shape (2026-10-09)
+
+From a line-editing pass over every rendered string, run the way it was run on the owner's other
+sites. `tests/readerClauseShapes.test.tsx` holds the first two rules; the rest are for review.
+
+- **A list is one kind of phrase.** All noun phrases or all wh-clauses, or a full sentence. "Look
+  up what the guidance said in any past month, and how it held up." and "This week's guidance, why
+  it changed, and how much to trust it." stapled a wh-clause onto something else. A real question
+  ending in "?" is fine.
+- **A gloss is printed once.** Define a term the first time a page uses it and drop the repeats;
+  "79 (money is hard to raise) then and is 90 (money is hard to raise) now" said it twice. A
+  reading goes after the rule as its own sentence ("… is above 76 or …. Funding pressure is 90
+  now."), not in parentheses inside it.
+- **A clause sits next to its noun.** "Venture-backed U.S. companies with one to two years of
+  runway, whose next raise depends on what capital costs" read the raise onto the runway; it is
+  "… and a next raise that depends on what capital costs". Where moving it reads worse, split it
+  into its own sentence.
+- **One idea per sentence.** A ", which…" or ", where…" aside on the end, a ", meaning…" tail, a
+  dash aside in the middle, or 30+ words carrying two ideas: split it.
+- **Not staccato.** Splitting stops at one idea per sentence; a page of five-word sentences is as
+  hard to read as a page of clauses.
