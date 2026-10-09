@@ -13,7 +13,7 @@ import {
   type RuleConditionMetric,
 } from "./boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
-import { comparisonBasis } from "./comparisonBasis";
+import { comparisonBasis, describeGuidanceStands } from "./comparisonBasis";
 import type { ActionStripItem } from "./operatingCalls";
 import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import type { ComparedWith, ReportDynamics } from "./reportDataTypes";
@@ -293,7 +293,7 @@ export const buildDecisionMovement = ({
     if (moved.length === 0) {
       const nothing = conditions
         ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no pause or resume line was crossed.`
-        : `Conditions held steady ${window}; no pause or resume line was crossed. Last week's guidance stands.`;
+        : `Conditions held steady ${window}; no pause or resume line was crossed. ${describeGuidanceStands(basis)}`;
       return { sentence: nothing, headline: nothing, headlines: [nothing] };
     }
     const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
@@ -333,7 +333,7 @@ export const buildDecisionMovement = ({
  * What the week did to the guidance: `"conditions"` when the conditions changed (the
  * week's `regimeChanged`, or a change the movement names), `"lines"` when an area's pause
  * or resume line was crossed under the same conditions, `"held"` when neither — the week
- * the movement sentence calls "Last week's guidance stands" — and null when nothing was
+ * the movement sentence calls "The guidance stands" — and null when nothing was
  * compared.
  *
  * Not the operating latitude. That number is a blend of the two scores, so it can stay
