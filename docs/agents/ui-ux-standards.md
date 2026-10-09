@@ -416,6 +416,12 @@ Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
 - **Draw each encoding once.** A fact already carried by position and a key does not also need a
   box, a hue and a case. When a block has a border *and* a coloured heading *and* capitals, pick
   one.
+- **Print each fact once per page** (2026-10-09, `docs/feature-specs-current.md` §1.1.62). A fact
+  restated in another element at the same level of detail is clutter: a sentence over the control
+  that shows the same selection, a banner over the section that says it, a score in five places.
+  Keep the richer form (a chart or bar over a sentence, a control over a sentence describing its
+  state) and, when the removed copy was a visual's only text, an sr-only version. A summary over
+  its detail stays. Check both widths first: two elements are duplicates only where both show.
 - **Labels on a chart are laid out for the width they are drawn at.** The server cannot measure
   a track, so compute the layout for each width the component is actually drawn at and let a
   container query choose (`ScoreLadder`); computing for the narrowest width and applying it

@@ -2833,6 +2833,72 @@ beside every glyph on the shared components and the routes that render offline, 
 imports a concept glyph or reads a mapping outside the shared components, and that the text
 artifacts carry no icon markup.
 
+### 1.1.62 One place per fact (2026-10-09)
+
+Each fact prints once per page, in its most useful form: a chart or a bar over a sentence that
+restates it, a control over a sentence describing its state. A summary followed by its detail stays
+("Pause lines crossed in 4 of 5 areas" over the five choices), and so do sr-only text alternatives,
+labels beside glyphs, and the same fact on another page. Two elements are duplicates only at a width
+where both show. `tests/onePlacePerFact.test.tsx` pins the homepage and `/history` decisions.
+
+**Homepage.**
+
+- **The four conditions.** The legend above the week shows below `md` only; from `md` up the card's
+  map defines them, with each change line's value at its end ("70", "50"), an sr-only statement of
+  the four sides, and "How they are set" under it. A share arrival's greeting shows at every width.
+- **Cloudy → Freezing.** Said once, on the card's stamp line ("Was Cloudy on Sep 30") with the line
+  under the call. `SinceLastVisit` renders only when the conditions or the call differ from what
+  this browser last saw, and not when the difference is the earlier conditions the card names
+  (`sinceLastVisitDelta`); it no longer carries what would change the guidance or the
+  lines-crossed sentence. "What changed this week" opens on its table; `buildChangedLead`,
+  `buildQuietDayRead` and `buildHomeQuietDayRead`, which built the lead and the quiet-day line, are
+  deleted.
+- **The two scores.** On the map's header (the card from `md`, "What would change" below it) and the
+  bars in "What changed", at both widths. The picker's "This week's scores" list is gone.
+- **The margin.** One trust-strip cell on every reading route: "Margin · Risk appetite 1 pt from
+  its change line · Could change next week" (or "Not expected to change next week"), where a fourth
+  cell answered "Yes" beside the distance. It always prints on the report intros' phone line. The
+  map's "1 point to the nearest change line" caption is gone (`showDistance`).
+- **Stage and runway.** The sentence over the controls is gone; each control marks its default
+  (`choiceSublabel`, "(default)"), in the tablists from `sm` and the header pills' lists below it.
+- **Dates.** The week stays on the picker and "Data as of" on the strip; the trail's caption sits
+  under the map. The closing line names the published brief by its week, where "The reading above
+  is from Oct 7, 2026. The last frozen record is dated Oct 6, 2026." printed two more dates.
+- **Share.** The "Share" section (a heading over one link) is the page's closing line,
+  `ShareLinks`; Copy Brief stays under the card. The desktop sticky strip waits for the card to
+  leave the screen, as the phone line does.
+- **Kept on purpose.** The "Whether · whether.work" caption inside the card: it is what a cropped
+  phone screenshot of the live page keeps (the Monday Browser Rendering capture uses the live page
+  too, `?screenshot=1`), and the copy-as-image buttons draw their own Satori cards. The "Against
+  this week" sentence in "Has this happened before?": it compares two readings and needs both.
+
+**`/history`.** "Cloudy, held 1 month" stays on the intro's stamp and the "Current conditions held"
+tile: the band's caption is its date range, and the sentence under the tiles ("Through Sep 30,
+2026, month-end conditions had been Cloudy since Sep 30, 2026") is gone. The change count is its
+tile's, the reading count its tile's (the published-briefs line no longer prints "177 month-end
+readings, Jan 2012 to Sep 2026"), and a "Record starts" tile that repeated the count tiles' window
+is gone. "What the margin has been worth" is the study's first sentence (96%) and the link to
+`/calibration`, which owns the band table (`ConfidenceRecordSummary`). The intro no longer prints
+"Fixed historical snapshot" beside "Historical snapshot" (`nextRefreshLabel` removed).
+
+**Elsewhere.**
+
+| Page | Repeated | Kept |
+| --- | --- | --- |
+| `/operate/financial`, `/operate/scenarios` | breadcrumb "Decide / Runway planner" under the sub-tab row | sub-tabs; the trail stays as structured data |
+| `/operate/financial` | "Runway and burn" paragraph restating the intro | the intro |
+| `/operate/scenarios` | "Move either slider…" under the intro that says to move the sliders | the intro |
+| `/operate` | "Rules for this week" and an h3 naming the conditions, inside "Rules before you commit" | the step title and the intro's stamp |
+| `/comps` | how to use the median, beside the section that says it in full | "Use public multiples in a fundraising discussion" |
+| `/signals` | each row's earlier reading under "This week", beside the "56 → 49" chip | the chip |
+| `/trust` | the summary under the title; pills to two sections the index names; a revisit row that only linked back up; a second link to `/about#method` | the title, the index, the closing line |
+| `/brief/<week>` | "Freezing:" in the heading under the stamp; the week in the caption under the heading; "(week of …)" and "Date-pinned record" over the preview | the stamp, the heading, the share heading |
+| `/share` | "PPTX · PDF · SVG" over the three file buttons | the buttons |
+| `/answers/*` | the related links beside the top copy button; "Market guidance as of" under the strip's "Data as of" | "Next for…", the strip |
+| `/resources` | each answer row's stamp, the same for every row in an area | one stamp beside the area's name |
+| `/history/compare` | the intro's status word, Period A's conditions on a two-period page | the period headings |
+| `/calibration` | "The record" kicker; the study section's intro restating the page's | the tabs, the page intro |
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
