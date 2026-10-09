@@ -267,7 +267,7 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(document.provenance.recordDate, recordDate);
         assert.equal(agent.recordDate, recordDate);
         assert.match(markdown, new RegExp(`^# Whether Weekly Brief — ${recordDate}$`, "m"));
-        assert.match(embedText, new RegExp(`As of ${recordDate}`));
+        assert.match(embedText, new RegExp(`Data as of ${recordDate}`));
         assert.equal(record.recordDate, recordDate, "the frozen record");
         assert.match(slack, new RegExp(`^Whether Weekly Brief — ${recordDate}$`, "m"), "the Monday post");
         assert.equal(agent.confidence.label, confidence);

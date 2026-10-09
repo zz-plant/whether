@@ -242,7 +242,7 @@ export const buildBriefEmbedText = (data: BriefEmbedData): string =>
     /* This line read "Regime: Freezing • Confidence: MED": the engine's noun
        and the confidence code, where every other surface prints the weather
        word under "Conditions" and the band as a word. */
-    `Conditions: ${data.regimeLabel} • ${data.confidenceLabel} • As of ${data.recordDate}`,
+    `Conditions: ${data.regimeLabel} • ${data.confidenceLabel} • Data as of ${data.recordDate}`,
     ``,
     /* The guidance as every other paste leads with it (`formatGuidance`): the
        week's headline action, opened by its direction. */
@@ -264,7 +264,7 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
   // `stageLabel` is only ever a stage the brief was actually calibrated for —
   // the route derives it from the parsed stage, not the raw parameter — so the
   // meta line can carry it without claiming a calibration that did not happen.
-  const metaParts = [postureLabel, confidenceLabel, `As of ${recordDate}`, tickerLabel, stageLabel].filter(Boolean);
+  const metaParts = [postureLabel, confidenceLabel, `Data as of ${recordDate}`, tickerLabel, stageLabel].filter(Boolean);
   const doNowHtml = doNowItems
     .map((item) => `<p style="font-size:13px;color:rgba(255,255,255,0.6);margin:2px 0;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">${escapeHtml(item)}</p>`)
     .join("");
