@@ -371,7 +371,7 @@ describe("regime macro overlays", () => {
     },
   };
 
-  it("tightens and lowers risk appetite when stress overlays are weak", () => {
+  it("lowers risk appetite on the record's volatility read, and reports the credit reads it leaves out", () => {
     const baseline = evaluateRegime(treasury);
     const stressed = evaluateRegime(treasury, undefined, [
       {
@@ -415,10 +415,17 @@ describe("regime macro overlays", () => {
       },
     ]);
 
-    assert.ok(stressed.scores.tightness > baseline.scores.tightness);
+    /* VIX is on the record basis; the high-yield spread and the Chicago Fed index are not
+       (`RECORD_BASIS_MARKET_INPUTS`), so they move only the off-record scores. */
+    assert.equal(stressed.scores.tightness, baseline.scores.tightness);
     assert.ok(stressed.scores.riskAppetite < baseline.scores.riskAppetite);
-    assert.equal(stressed.diagnostics.twoWeakReadsWarning, true);
-    assert.ok(stressed.diagnostics.boundaryContributors.length >= 2);
+    assert.deepEqual(stressed.diagnostics.boundaryContributors, ["Stock market volatility is high"]);
+    assert.equal(stressed.diagnostics.twoWeakReadsWarning, false);
+    assert.deepEqual(stressed.scores.offRecord, {
+      tightness: 100,
+      riskAppetite: stressed.scores.riskAppetite,
+      inputs: ["HY_CREDIT_SPREAD", "CHICAGO_FCI"],
+    });
   });
 });
 

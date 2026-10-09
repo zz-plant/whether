@@ -25,6 +25,8 @@ import type { MacroSeriesReading, TreasuryData } from "../lib/types";
  */
 const ENGINE_FINGERPRINTS: Record<string, string> = {
   "engine-2026-10-06": "72ec57668c48d605d6aa342685521018",
+  /* The record basis: market inputs the archive does not score move nothing published. */
+  "engine-2026-10-09": "c3316a6f2f62195f9a6fde9402790708",
 };
 
 const pad = (value: number) => String(value).padStart(2, "0");

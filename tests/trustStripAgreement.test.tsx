@@ -117,7 +117,10 @@ const WEEK_OF_SEP_22: Array<[SignalKey, SignalFamily, number]> = [
   ["TREASURY_1M", "rates", 4.2],
   ["TREASURY_3M", "rates", 4.15],
   ["TREASURY_2Y", "rates", 3.95],
-  ["TREASURY_10Y", "rates", 4.3],
+  /* 4.3 until 2026-10-09, when the curated startup-market inputs took 11 points off risk
+     appetite; on the record basis they take none, so the curve is 27bp flatter to keep the
+     reading where this test needs it: risk appetite 43, 7 raw points under its line. */
+  ["TREASURY_10Y", "rates", 4.03],
   ["BBB_CREDIT_SPREAD", "spreads", 1.7],
   ["HY_CREDIT_SPREAD", "spreads", 3.2],
   ["UNEMPLOYMENT_RATE", "labor", 4.2],
