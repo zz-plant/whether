@@ -162,7 +162,6 @@ export async function buildTrustPageModel() {
     { href: "#confidence-limits", label: "Margin & limits" },
     { href: "#revisit-call", label: "Revisit triggers" },
     { href: "#meeting-snippet", label: "Meeting snippet" },
-    { href: "#framework", label: "Using the thresholds" },
   ];
 
   const reportShellModel: ReportShellModel = {

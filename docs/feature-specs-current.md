@@ -368,6 +368,11 @@ publication, so a past call reads the way it did when it was made.
 A route-set pass against the IA boundary rules found three consolidations worth making, and one
 that looked worth making and was not.
 
+- **The method moved to `/about#method` (2026-10-09)**, beside "What is new here", as "How to use
+  the pause and resume lines", in the screen vocabulary (pause and resume lines, not threshold and
+  reversal). It is the product's thesis, and as the last section of `/trust` it read as an appendix
+  to a page a reader opens to check this week's reading; `/trust` keeps a one-line link.
+  `/threshold` redirects to `/about#method` and `/template` to `/about#template`.
 - **`/threshold` folded into `/trust#framework` (2026-09-08)**, beside the formula its thresholds
   come from; it had no inbound link from any primary surface. Before that,
   **`/template` folded into `/threshold`.** `/threshold` explained the bounded-decision framework —
@@ -2158,11 +2163,11 @@ the rail's second entry, and what the page exists to check — sat folded at the
 - **The rest of the verification stays folded on a healthy week**, under "Citation, limits and
   revisit triggers" (citation, limits, calibration link, warnings, snippet). The `?sources=1` key
   still opens it, so shared links keep working.
-- **"How to use the thresholds" is last.** Its worked example stays open; the three definitions
-  with the essay, and the blank form, are native `<details>`. `#template` is on the form's own
-  `<details>`, so `/template` lands on it and the shell's anchor handler opens it; `/threshold`
-  (`#framework`) opens both.
-- **Rail in page order** (§XI): status, formula, sources, the four folded sections, the method.
+- **The method is on `/about` since 2026-10-09** (`app/about/methodSection.tsx`); `/trust` ends on a
+  one-line link to it. Its worked example stays open; the three definitions with the essay, and the
+  blank form, are native `<details>`. `#template` is on the form's own `<details>`, so `/template`
+  lands on it and the shell's anchor handler opens it.
+- **Rail in page order** (§XI): status, formula, sources, the four folded sections.
 - This opens a source board, which §XII lists among things to collapse. On `/trust` the check is
   the page's job, so the compact board is its content; the detail behind it is what folds.
   Recorded in §XII.

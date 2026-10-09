@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { buildBriefMarkdown } from "../app/brief.md/route";
-import { FrameworkSection } from "../app/trust/frameworkSection";
+import { MethodSection } from "../app/about/methodSection";
 import { TrackRecordTable, TrackRecordTiles } from "../app/components/history/TrackRecord";
 import { RegimePhaseMap } from "../app/components/history/RegimePhaseMap";
 import type { RegimeKey } from "../lib/types";
@@ -40,12 +40,13 @@ describe("/trust says each thing once", () => {
    * same sentence, so a reader met it twice in a row before reaching anything
    * new.
    */
-  it("does not restate its own section description in the body", () => {
-    const html = renderToStaticMarkup(<FrameworkSection />);
-    const sentence = "Each decision here has three parts";
-    const occurrences = html.split(sentence).length - 1;
-
-    assert.equal(occurrences, 1, "the three-parts sentence is rendered more than once");
+  /* The method moved to /about beside "What is new here", which already says what
+     the three parts are, so the section opens on them filled in. */
+  it("does not restate what /about's 'What is new here' already says", async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    const html = renderToStaticMarkup(<AboutPage />);
+    assert.equal((html.match(/an action, a pause line and a resume line/g) ?? []).length, 1);
+    assert.ok(html.indexOf("What is new here") < html.indexOf('id="method"'), "the method follows What is new here");
   });
 });
 
@@ -275,8 +276,8 @@ describe("the site gives one account of what is new and what the scores read", (
     assert.match(html, /href="\/calibration"/);
   });
 
-  it("/trust ties the method's origin to someone a reader can look up", () => {
-    const html = renderToStaticMarkup(<FrameworkSection />);
+  it("/about ties the method's origin to someone a reader can look up", () => {
+    const html = renderToStaticMarkup(<MethodSection />);
     const origin = html.split("<p").find((paragraph) => paragraph.includes("clinical workflows"));
 
     assert.ok(origin, "expected the paragraph that says where the method comes from");

@@ -6,7 +6,7 @@ import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
 
 /*
- * The print and copy controls for /template.
+ * The print and copy controls for the blank form on /about (/template redirects there).
  *
  * They live here rather than in page.tsx because that page exports `metadata`
  * and so has to stay a server component — passing these handlers across that
@@ -15,7 +15,7 @@ import { getClipboardUiState, useClipboardCopy } from "../components/useClipboar
  */
 
 const TEMPLATE_MARKDOWN = [
-  "# Bounded Decision Template",
+  "# Decision with a pause line and a resume line",
   "",
   "## Decision",
   "",
@@ -23,17 +23,17 @@ const TEMPLATE_MARKDOWN = [
   "## Action",
   "",
   "",
-  "## Threshold (pause if)",
+  "## Pause line (pause if)",
   "",
   "",
-  "## Reversal (clears when)",
+  "## Resume line (resume when)",
   "",
   "",
   "## When you will check",
   "",
   "",
   "---",
-  "From whether.work/trust#template",
+  "From whether.work/about#template",
 ].join("\n");
 
 export function TemplateActions() {

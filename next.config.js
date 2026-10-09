@@ -129,8 +129,8 @@ export const iaConsolidationRedirectPairs = [
   ["/this-week", "/"],
   // The bounded-decision framework and its blank form are a section of /trust,
   // beside the formula the thresholds come from. Both old doors keep an anchor.
-  ["/template", "/trust#template"],
-  ["/threshold", "/trust#framework"],
+  ["/template", "/about#template"],
+  ["/threshold", "/about#method"],
   // Orphaned export page — functionality lives in /share
   ["/export/board-packet", "/share"],
   // Empty container — no index page exists

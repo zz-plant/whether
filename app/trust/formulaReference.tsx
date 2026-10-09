@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { MARGIN_LABEL } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
@@ -431,9 +432,9 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           Read the engine source →
         </a>{" "}
         To put the lines to work, see{" "}
-        <a href="#framework" className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-          how to use the thresholds ↓
-        </a>
+        <Link href="/about#method" className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+          how to use the pause and resume lines
+        </Link>
       </p>
     </ReportSection>
   );

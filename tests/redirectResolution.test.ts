@@ -84,7 +84,7 @@ describe("redirect resolution", () => {
       ["/planning/memory", "/history"],
       ["/operate/memory", "/history"],
       ["/history/decisions", "/history"],
-      ["/threshold", "/trust#framework"],
+      ["/threshold", "/about#method"],
       ["/planning/financial", "/operate/financial"],
       // The first version's detail, focus and conflicts pages fold into the one list.
       ["/concepts/escaping-the-build-trap", "/concepts"],

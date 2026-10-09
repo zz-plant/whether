@@ -11,7 +11,7 @@ import {
 import type { ReportData } from "../../../lib/report/reportData";
 import type { WeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryYields } from "../../../lib/types";
-import { DECISION_SLOT_TONE } from "../../trust/frameworkSection";
+import { DECISION_SLOT_TONE } from "../../about/methodSection";
 
 /**
  * One column of the comparison, rendered twice. The two sides used to be ~85

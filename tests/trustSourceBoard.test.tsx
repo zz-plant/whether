@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import { FrameworkSection } from "../app/trust/frameworkSection";
+import { MethodSection } from "../app/about/methodSection";
 
 /*
  * /trust opened on a method essay and a blank five-prompt form, while the
@@ -26,10 +26,12 @@ describe("/trust draws its sources open, under the derivation", () => {
     const html = await renderTrust();
     const formula = html.indexOf('id="formula-reference"');
     const board = html.indexOf('id="source-board"');
-    const framework = html.indexOf('id="framework"');
+    const method = html.indexOf('href="/about#method"');
 
     assert.ok(formula !== -1 && formula < board, "the board follows the score derivation");
-    assert.ok(board < framework, "and comes before the method");
+    assert.ok(board < html.lastIndexOf('href="/about#method"'), "and comes before the one-line link to the method");
+    assert.ok(method !== -1, "/trust links to the method on /about");
+    assert.doesNotMatch(html, /id="framework"/, "the method itself lives on /about");
     assert.equal(insideDetails(html, board), false, "the board is not behind a disclosure");
     assert.equal((html.match(/data-source-row=/g) ?? []).length, 5, "every source has a row");
     for (const source of ["Treasury", "Market stress", "Inflation", "Labor", "Startup/private markets"]) {
@@ -58,9 +60,9 @@ describe("/trust draws its sources open, under the derivation", () => {
   });
 });
 
-describe("/trust folds the method and the blank form", () => {
+describe("/about folds the method's essay and the blank form", () => {
   it("keeps the worked example open and the essay and form behind disclosures", () => {
-    const html = renderToStaticMarkup(<FrameworkSection />);
+    const html = renderToStaticMarkup(<MethodSection />);
 
     assert.equal(insideDetails(html, html.indexOf("In practice")), false, "the worked example is open");
     for (const folded of ["The three parts", "Why it works", "healthcare products", "When you will check", "No signup required"]) {
@@ -71,7 +73,7 @@ describe("/trust folds the method and the blank form", () => {
   });
 
   it("puts the /template anchor on the form's own disclosure, so a link opens it", () => {
-    const html = renderToStaticMarkup(<FrameworkSection />);
+    const html = renderToStaticMarkup(<MethodSection />);
     assert.match(html, /<details[^>]*id="template"/);
   });
 });

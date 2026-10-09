@@ -13,7 +13,6 @@ import {
 import { ReportSection } from "../components/reportSection";
 import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord";
 import { FormulaReference } from "./formulaReference";
-import { FrameworkSection } from "./frameworkSection";
 import { RunHistorySection } from "./runHistorySection";
 import { SourceBoard } from "./sourceBoard";
 import { ReaderReturnsSection } from "./readerReturnsSection";
@@ -230,9 +229,16 @@ export default async function MethodPage({
         secondaryContent
       )}
 
-      {/* Last: how to use the lines is method, not a check on this week's
-          reading (§VIII). Its essay and its blank form are folded inside. */}
-      <FrameworkSection />
+      {/* The method moved to /about (2026-10-09): it is the product's thesis, and as
+          the last section of the page a reader opens to check this week's reading
+          it read as an appendix. One line points to it. */}
+      <p className="text-sm text-slate-300">
+        How to use the pause and resume lines, with a worked example and a blank form, is on{" "}
+        <Link href="/about#method" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+          About
+        </Link>
+        .
+      </p>
     </ReportShell>
   );
 }
