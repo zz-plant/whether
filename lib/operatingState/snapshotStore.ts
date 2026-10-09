@@ -110,6 +110,7 @@ const isOperatingSnapshot = (value: unknown): value is OperatingSnapshot => {
   return typeof value.id === "string"
     && value.schemaVersion === 2
     && typeof value.epoch === "string"
+    && (value.engineVersion === undefined || typeof value.engineVersion === "string")
     && typeof value.recordDate === "string"
     && typeof value.inputHash === "string"
     && isStringArray(value.sourceSnapshotIds)

@@ -65,12 +65,15 @@ export const observedBaseRate = (scores: Pick<RegimeScores, "baseRate" | "baseRa
 type StoredInputs = NonNullable<PublishedBrief["inputs"]>;
 
 /*
- * The market series the two scores read (`applyMacroAdjustments`), and no other.
- * The policy layer also reads the BBB spread, inflation and unemployment with
- * their histories, but nothing it computes reaches the scores or the conditions,
- * and a comparison reads nothing else, so a record does not store them.
+ * The market series the engine scores (`applyMacroAdjustments`), and no other:
+ * the record-basis ones that move the published scores, and the ones outside
+ * the record that move only `scores.offRecord`, which a later engine needs to
+ * say what a stored week counted (`describePublishedWeekBasis`). The policy
+ * layer also reads the BBB spread, inflation and unemployment with their
+ * histories, but nothing it computes reaches the scores or the conditions, and
+ * a comparison reads nothing else, so a record does not store them.
  * tests/weeklyComparison.test.tsx moves every series the engine knows and fails
- * if the set that moves a score stops being this one.
+ * if the set that moves a score, published or not counted, stops being this one.
  */
 const SCORED_MACRO_SERIES = [
   "HY_CREDIT_SPREAD",
@@ -163,6 +166,42 @@ const storedSeries = (
 });
 
 /**
+ * A record's stored inputs scored by the engine passed in, under the
+ * thresholds passed in, with no machine state: the whole assessment, for a
+ * caller that needs more than the comparison reads (what the record's
+ * inputs outside the record would have made its scores).
+ */
+export const scoreStoredInputs = (
+  evaluate: typeof evaluateRegime,
+  thresholds: RegimeThresholds,
+  inputs: StoredInputs,
+  recordDate: string,
+) => {
+  const treasury: TreasuryData = {
+    source: "",
+    record_date: recordDate,
+    fetched_at: recordDate,
+    isLive: false,
+    yields: { ...inputs.yields },
+  };
+  const macroSeries = SCORED_MACRO_SERIES.flatMap((id) => {
+    const value = inputs.macro[id] ?? null;
+    if (id === "VIX_INDEX" && inputs.vixCloses) {
+      return [storedSeries(id, value, recordDate, inputs.vixCloses.map((close) => ({ date: recordDate, value: close })))];
+    }
+    return value === null ? [] : [storedSeries(id, value, recordDate)];
+  });
+  const pair = inputs.baseRateWindow;
+  const baseRateHistory = pair
+    ? [
+        { date: pair.compareDate, value: pair.compareValue },
+        { date: pair.latestDate, value: pair.latestValue },
+      ]
+    : undefined;
+  return evaluate(treasury, thresholds, macroSeries, null, { baseRateHistory });
+};
+
+/**
  * A re-scorer for stored inputs: the engine passed in (the loader's
  * `evaluateRegime`) under the thresholds passed in (the reading's own). The
  * scores are the engine's for those inputs, and the same engine reproduces a
@@ -180,28 +219,7 @@ const storedSeries = (
 export const rescoreStoredInputs =
   (evaluate: typeof evaluateRegime, thresholds: RegimeThresholds): RescoreStoredInputs =>
   (inputs, recordDate) => {
-    const treasury: TreasuryData = {
-      source: "",
-      record_date: recordDate,
-      fetched_at: recordDate,
-      isLive: false,
-      yields: { ...inputs.yields },
-    };
-    const macroSeries = SCORED_MACRO_SERIES.flatMap((id) => {
-      const value = inputs.macro[id] ?? null;
-      if (id === "VIX_INDEX" && inputs.vixCloses) {
-        return [storedSeries(id, value, recordDate, inputs.vixCloses.map((close) => ({ date: recordDate, value: close })))];
-      }
-      return value === null ? [] : [storedSeries(id, value, recordDate)];
-    });
-    const pair = inputs.baseRateWindow;
-    const baseRateHistory = pair
-      ? [
-          { date: pair.compareDate, value: pair.compareValue },
-          { date: pair.latestDate, value: pair.latestValue },
-        ]
-      : undefined;
-    const { regime, scores } = evaluate(treasury, thresholds, macroSeries, null, { baseRateHistory });
+    const { regime, scores } = scoreStoredInputs(evaluate, thresholds, inputs, recordDate);
     return {
       regime,
       scores: {

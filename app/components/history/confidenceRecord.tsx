@@ -5,7 +5,7 @@ import {
 } from "../../../lib/report/confidenceCalibration";
 import { calculateCalibrationDrift } from "../../../lib/report/calibrationDrift";
 import { resolveConfidencePercentFromDistance } from "../../../lib/report/confidence";
-import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
+import { CALL_CHANGE_RULE, describeCalibrationRescore } from "../../../lib/report/trackRecordCopy";
 
 /**
  * What the confidence percent has been worth, against the record.
@@ -121,6 +121,9 @@ function ConfidenceRecordBody() {
         record grows. A held month means conditions did not change.
         {" "}
         {CALL_CHANGE_RULE}
+      </p>
+      <p className="text-fluid-xs text-slate-400" data-record-rescore>
+        {describeCalibrationRescore({ held: totals.held, comparisons: totals.months })}
       </p>
     </div>
   );

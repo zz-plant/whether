@@ -1,6 +1,7 @@
 import { buildFallbackForecastModel } from "../../lib/report/forecastModel";
 import type { ReportData } from "../../lib/report/reportData";
-import type { RegimeAssessment } from "../../lib/regimeEngine";
+import { ENGINE_VERSION, type RegimeAssessment } from "../../lib/regimeEngine";
+import { resolveScoringBasis } from "../../lib/report/scoringBasis";
 import type { TreasuryData } from "../../lib/types";
 
 type AssessmentOverrides = Omit<
@@ -160,6 +161,7 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
 
   const base: ReportData = {
     assessment,
+    scoringBasis: resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment }),
     cacheCoverage: { earliest: "2025-01-01", latest: "2026-03-01" },
     cacheMonthsByYear: {},
     fetchedAtLabel: "Mar 1, 2026 00:00 UTC",

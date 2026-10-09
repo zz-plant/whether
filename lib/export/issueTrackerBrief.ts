@@ -76,6 +76,7 @@ export const buildIssueTrackerMarkdownBrief = (
       sourceLine: provenance.sourceUrl,
       timestamp: provenance.recordDate,
       confidence: `${formatExportConfidenceWord(document.confidence)} (how far the scores sit from the line where conditions change)`,
+      basis: provenance.scoringBasis.sentence,
     }),
   ].join("\n");
 };

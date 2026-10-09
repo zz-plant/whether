@@ -26,6 +26,9 @@ import { buildScoreReferenceLines } from "../export/scoreReference";
 import { buildComparedWith, comparisonBasis } from "./comparisonBasis";
 import { describeWeeklyMovement } from "./home/homeSectionModel";
 import type { ComparedWith } from "./reportDataTypes";
+import { evaluateRegime, type RegimeAssessment, type RegimeThresholds } from "../regimeEngine";
+import { scoreStoredInputs } from "./comparisonReading";
+import { basisClause, describePublishedWeekBasis, describeScoringBasis } from "./scoringBasis";
 
 const PublishedRuleLineSchema = z.object({
   metric: z.enum(["tightness", "riskAppetite"]),
@@ -389,6 +392,13 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
     pauseIf: /\d/.test(brief.guardrailThreshold) ? translateStoredSentence(brief.guardrailThreshold) : null,
     conditionsChangeIf: restateRetiredFlipLine(brief.flipThreshold) ?? translateStoredSentence(brief.flipThreshold),
     whatChanged: displayWhatChanged(brief, comparison),
+    /**
+     * Which inputs set the week's scores, from the engine its record names: "Scored on
+     * more inputs than the record." for every week frozen before 2026-10-09, whose
+     * scores counted the startup-market inputs and the credit reads. Said at render,
+     * from the record, so no frozen field is edited.
+     */
+    basis: describeScoringBasis(brief.scores?.engineVersion),
     /** The earlier reading, as `buildScoreReferenceLines` takes it; null where the record can name none. */
     previous: comparison ? { ...comparison.previous, comparedWith: comparison.comparedWith } : null,
     /** "+5 vs Sep 22": a score's move in whole points, named by the reading it is against. Null with no reading to name, or no move. */
@@ -597,6 +607,32 @@ export const selectCitablePermalinkBrief = (currentRecordDate: string): Publishe
   return brief;
 };
 
+/**
+ * Why the live reading's conditions differ from the citable published week's,
+ * where the record basis is the reason (`describePublishedWeekBasis`): the
+ * week's stored inputs scored by today's engine show its conditions came from
+ * inputs the record cannot test. Null for a week that stored no inputs, and
+ * wherever the basis does not explain the difference. The homepage says it,
+ * once, in its status strip.
+ */
+export const describeCitableBriefBasis = ({
+  currentRecordDate,
+  live,
+  thresholds,
+}: {
+  currentRecordDate: string;
+  live: Pick<RegimeAssessment, "regime">;
+  thresholds: RegimeThresholds;
+}): string | null => {
+  const brief = selectCitablePermalinkBrief(currentRecordDate);
+  if (!brief?.inputs) return null;
+  return describePublishedWeekBasis({
+    live,
+    published: { regime: brief.regime, weekLabel: publishedBriefWeekLabel(brief), engineVersion: brief.scores?.engineVersion },
+    rescored: scoreStoredInputs(evaluateRegime, thresholds, brief.inputs, brief.recordDate),
+  });
+};
+
 export const buildPublishedBriefPath = (slug: string) => `/brief/${slug}` as const;
 
 export const buildPublishedBriefSlug = (year: number, week: number) => formatIsoWeekSlug({ year, week });
@@ -648,7 +684,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
     "",
     "Provenance:",
-    `Record date ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel}`,
+    `Record date ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel} · ${basisClause(display.basis.sentence)}`,
     ...(brief.sourceUrl ? [`Source: ${brief.sourceUrl}`] : []),
     "",
     `Permanent URL: ${permalinkUrl}`,
@@ -697,6 +733,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     `• Record date: ${brief.recordDateLabel}`,
     `• Source: ${display.source}${brief.sourceUrl ? ` (${brief.sourceUrl})` : ""}`,
     `• Freshness: ${brief.freshnessLabel}`,
+    `• ${display.basis.sentence}`,
     "",
     `Permanent URL: ${permalinkUrl}`,
   ].join("\n");

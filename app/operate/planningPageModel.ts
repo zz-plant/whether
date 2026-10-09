@@ -130,6 +130,7 @@ export async function buildPlanningPageModel(
       degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
       confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
       assessment,
+      scoringBasis: reportData.scoringBasis,
     }),
     href: "/trust" as const,
   };

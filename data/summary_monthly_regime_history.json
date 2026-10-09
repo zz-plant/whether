@@ -590,13 +590,13 @@
   {
     "record_date": "2020-03-31",
     "regime": "VOLATILE",
-    "tightness": 0,
+    "tightness": 2,
     "riskAppetite": 39
   },
   {
     "record_date": "2020-04-30",
     "regime": "VOLATILE",
-    "tightness": 0,
+    "tightness": 2,
     "riskAppetite": 38
   },
   {

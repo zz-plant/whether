@@ -59,6 +59,7 @@ describe("screenshot caption", () => {
             sourcesLabel: "All sources live",
             confidenceLabel: "MED",
             couldChangeNextWeek: false,
+            basis: { key: "record", value: "The record's inputs", warning: null },
             href: "/trust",
           }}
         />,

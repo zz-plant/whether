@@ -92,6 +92,7 @@ export async function PaletteSpecimen({ direction }: { direction: DirectionSlug 
     isHistorical: false,
     degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 0,
     confidenceLabel: model.status.confidenceLabel ?? "HIGH",
+    scoringBasis: reportData.scoringBasis,
     assessment: reportData.assessment,
   });
 
