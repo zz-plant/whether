@@ -103,6 +103,21 @@ of them, which is less obvious.
 - **The base rate is the 1-month bill.** `getBaseRate`'s `FED` rung has never fired. The 3.5%
   threshold is described as a policy-rate average but is fed `DGS1MO`, and with only a 50bp
   window driving the whole classification, a bill-specific dislocation moves the published call.
+  Observed, not hypothetical: on 2023-04-20 the bill printed 3.40% with fed funds at 4.83%, which
+  scores 0 rate points where the policy rate implied 90 (`docs/research/premise-test-results.md`).
+
+## Changing the ramp goes through the registered test (2026-10-09)
+
+Three alternative ramps (wide 2.0–5.5%, a trailing ten-year percentile, the current ramp on the
+1M/3M median) were registered with a decision rule before any result
+(`docs/research/premise-test-preregistration.md`), and none passed: the wide ramp cuts saturation
+from 21.5% to 5.1% of month-ends but moves more on dislocations, the median removes the 2023
+debt-ceiling exposure but barely touches saturation, and no ramp changed a single quarter-end's
+tight flag, because in the record risk appetite decides every tight reading. The candidates are
+scored beside every weekly reading (`OperatingSnapshot.shadowRamps`, `lib/research/`) and used for
+nothing. Before proposing a ramp change, read the results; a change outside that rule needs its own
+registration. `lib/research/candidateRamps.ts` mirrors `scoreRegime` with the level ramp swapped,
+and `tests/candidateRamps.test.ts` fails if a scorer change makes the two disagree on any month.
 
 
 ## A delta is a move only if both readings were scored from the same inputs (2026-09-29)
