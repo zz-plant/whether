@@ -280,6 +280,50 @@ const regimeWalkMemo = new Map<string, TimeMachineRegimeEntry[]>();
 const regimeAssessmentMemo = new Map<string, Map<string, RegimeAssessment>>();
 
 /**
+ * What each cached month-end hands a replay: its Treasury reading, its VIX
+ * reading with the stored daily tail, its Chicago Fed index reading, and its
+ * trailing base-rate window. The governed walk below replays these; so does the
+ * candidate-ramp research (`lib/research/shadowRamps.ts`,
+ * `scripts/research/premiseTest.ts`), which is how a candidate's record reads
+ * exactly the inputs the published one did.
+ */
+export const buildTimeMachineReplaySteps = () =>
+  sortedSnapshots.map((snapshot, index) => {
+    const velocityWindow = snapshot.baseRateVelocityWindow;
+    const baseRateHistory = velocityWindow
+      ? [
+          { date: velocityWindow.compareDate, value: velocityWindow.compareValue },
+          { date: velocityWindow.latestDate, value: velocityWindow.latestValue },
+        ]
+      : sortedSnapshots
+          .slice(Math.max(0, index - 5), index + 1)
+          .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
+    const macroSeries = [
+      ...(typeof snapshot.vix === "number"
+        ? [
+            buildReplayVixReading({
+              value: snapshot.vix,
+              recordDate: snapshot.record_date,
+              fetchedAt: snapshot.fetched_at,
+              history: snapshot.vixHistory ?? [],
+            }),
+          ]
+        : []),
+      ...(typeof snapshot.chicagoFci === "number"
+        ? [
+            buildReplayChicagoFciReading({
+              value: snapshot.chicagoFci,
+              recordDate: snapshot.record_date,
+              fetchedAt: snapshot.fetched_at,
+              history: snapshot.chicagoFciHistory ?? [],
+            }),
+          ]
+        : []),
+    ];
+    return { treasury: snapshot, snapshot, macroSeries, baseRateHistory };
+  });
+
+/**
  * The regime series replayed as one threaded walk.
  *
  * Each entry used to be evaluated independently — `evaluateRegime(snapshot)` per
@@ -290,8 +334,9 @@ const regimeAssessmentMemo = new Map<string, Map<string, RegimeAssessment>>();
  * confirm through the gate, shocks commit and get marked) and supplies each
  * entry its trailing base-rate window (the velocity term), its VIX reading
  * with the daily tail stored alongside it (the haircut and the market-stress
- * veto) and its Chicago Fed index reading, when the cache carries them. The threading itself is `replayRegimeWalk`,
- * the same loop the archive generators run.
+ * veto) and its Chicago Fed index reading, when the cache carries them. The
+ * threading itself is `replayRegimeWalk`, the same loop the archive generators
+ * run.
  */
 const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMachineRegimeEntry[] => {
   const walkKey = buildRegimeWalkCacheKey(overrides);
@@ -300,43 +345,7 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
     return memoized;
   }
 
-  const replay = replayRegimeWalk(
-    sortedSnapshots.map((snapshot, index) => {
-      const velocityWindow = snapshot.baseRateVelocityWindow;
-      const baseRateHistory = velocityWindow
-        ? [
-            { date: velocityWindow.compareDate, value: velocityWindow.compareValue },
-            { date: velocityWindow.latestDate, value: velocityWindow.latestValue },
-          ]
-        : sortedSnapshots
-            .slice(Math.max(0, index - 5), index + 1)
-            .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
-      const macroSeries = [
-        ...(typeof snapshot.vix === "number"
-          ? [
-              buildReplayVixReading({
-                value: snapshot.vix,
-                recordDate: snapshot.record_date,
-                fetchedAt: snapshot.fetched_at,
-                history: snapshot.vixHistory ?? [],
-              }),
-            ]
-          : []),
-        ...(typeof snapshot.chicagoFci === "number"
-          ? [
-              buildReplayChicagoFciReading({
-                value: snapshot.chicagoFci,
-                recordDate: snapshot.record_date,
-                fetchedAt: snapshot.fetched_at,
-                history: snapshot.chicagoFciHistory ?? [],
-              }),
-            ]
-          : []),
-      ];
-      return { treasury: snapshot, snapshot, macroSeries, baseRateHistory };
-    }),
-    overrides,
-  );
+  const replay = replayRegimeWalk(buildTimeMachineReplaySteps(), overrides);
 
   const assessments = new Map<string, RegimeAssessment>();
   const walk: TimeMachineRegimeEntry[] = replay.map(({ step: { snapshot }, assessment }) => {

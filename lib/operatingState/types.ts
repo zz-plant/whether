@@ -3,6 +3,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import type { RegimeMachineSnapshot } from "../regimeStateMachine";
 import type { PostureTransitionEvent } from "../storage/postureTransitionEventRepository";
+import type { ShadowRampRecord } from "../research/shadowRamps";
 
 export type OperatingSnapshot = {
   id: string;
@@ -45,6 +46,14 @@ export type OperatingSnapshot = {
     macroAgeHours: number;
     status: "fresh" | "stale" | "fallback";
   };
+  /**
+   * The registered candidate rate ramps, scored beside this reading by the weekly
+   * pipeline (docs/research/premise-test-preregistration.md §10). Research only:
+   * the assessment and weekly call above are built before it and never read it.
+   * Absent on snapshots built off the pipeline (an export's cold read) and on
+   * those stored before 2026-10-09.
+   */
+  shadowRamps?: ShadowRampRecord;
 };
 
 export type RefreshOperatingStateOptions = {

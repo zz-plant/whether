@@ -4,6 +4,7 @@ import { getPostureTransitionEventRepository, buildPostureTransitionEvent } from
 import { refreshMonthlyRegimeHistory } from "../summary/refreshMonthlyRegimeHistory";
 import { revalidateReportDataCaches } from "../report/cacheTags";
 import { writeAnalytics } from "../telemetry/analyticsEngine";
+import { scoreShadowRamps } from "../research/shadowRamps";
 import { buildOperatingSnapshot } from "./snapshot";
 import { getOperatingSnapshotStore } from "./snapshotStore";
 import type { RefreshOperatingStateOptions, RefreshOperatingStateResult } from "./types";
@@ -37,12 +38,20 @@ export const refreshOperatingState = async (
     const snapshotStore = getOperatingSnapshotStore();
     const previousSnapshot = await snapshotStore.readLatest();
 
-    const snapshot = buildOperatingSnapshot({
+    const reading = buildOperatingSnapshot({
       treasury: canonicalInputs.treasury,
       macroSeries: canonicalInputs.macroSeries,
       previousMachineState,
       now,
     });
+    // The candidate ramps under test, scored after the reading is complete and stored beside it.
+    // Nothing that publishes reads `shadowRamps`; a failure there drops the field, not the reading.
+    const shadowRamps = scoreShadowRamps({
+      treasury: canonicalInputs.treasury,
+      macroSeries: canonicalInputs.macroSeries,
+      previous: previousSnapshot?.shadowRamps ?? null,
+    });
+    const snapshot = shadowRamps ? { ...reading, shadowRamps } : reading;
 
     // 1. Persist immutable snapshot
     await snapshotStore.write(snapshot);

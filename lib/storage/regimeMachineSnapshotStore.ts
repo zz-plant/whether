@@ -50,3 +50,9 @@ export const saveRegimeMachineSnapshot = async (snapshot: RegimeMachineSnapshot)
     // non-fatal — in-memory snapshot is still current for this request
   }
 };
+
+/** Test seam: forget the isolate's copy, as a fresh isolate would, so a refresh in one test does not hand its machine state to the next. */
+export const resetRegimeMachineSnapshotCache = () => {
+  inMemorySnapshot = null;
+  lastLoadedAt = 0;
+};

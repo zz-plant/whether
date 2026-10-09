@@ -47,6 +47,10 @@ export type ScorePositions = { tightness: ScorePosition; riskAppetite: ScorePosi
 const lowerFirst = (sentence: string) => `${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}`;
 
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
+/* The premise test: the candidate rate ramps scored beside each reading, and the rule that
+   decides whether one replaces the current ramp, fixed before any result (2026-10-09). */
+const RAMP_TEST_REGISTRATION_URL = "https://github.com/zz-plant/whether/blob/main/docs/research/premise-test-preregistration.md";
+const RAMP_TEST_RESULTS_URL = "https://github.com/zz-plant/whether/blob/main/docs/research/premise-test-results.md";
 
 /** Base rate at which the rate component of tightness saturates. */
 const baseRateSaturation =
@@ -498,6 +502,27 @@ export function FormulaReference({
           className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
         >
           Read the engine source →
+        </a>
+      </p>
+      {/* One line, here and nowhere else: the method note for a change under test. */}
+      <p className="mt-2 text-xs leading-5 text-slate-400" data-ramp-test-note>
+        Three other ways to score the short-term borrowing rate are being tested beside each
+        week&rsquo;s reading, and none of them sets the guidance.{" "}
+        <a
+          href={RAMP_TEST_REGISTRATION_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+        >
+          The test, registered in advance →
+        </a>{" "}
+        <a
+          href={RAMP_TEST_RESULTS_URL}
+          target="_blank"
+          rel="noreferrer"
+          className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+        >
+          What it found →
         </a>
       </p>
     </ReportSection>

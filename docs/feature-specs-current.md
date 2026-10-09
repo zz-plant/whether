@@ -3166,6 +3166,31 @@ with what, and point at their figures as the ones published before it while thos
 (`describeCalibrationRescore`, `describeTrackRecordRescore` in `lib/report/trackRecordCopy.ts`);
 once a figure differs, the line prints the old one.
 
+### 1.1.68 Candidate rate ramps, scored beside each reading and used for nothing (2026-10-09)
+
+The funding-pressure rate component spends its 0–90 points across 3.5% to 4.0% on the one-month
+bill. `docs/research/premise-test-preregistration.md` registered three alternatives and the rule
+that would replace the current ramp with one of them; `docs/research/premise-test-results.md`
+reports the test, and the rule kept the current ramp.
+
+- **Shadow scoring.** `refreshOperatingState` builds the reading, then scores the three candidates
+  (`scoreShadowRamps`, `lib/research/shadowRamps.ts`, on `lib/research/candidateRamps.ts`) and
+  stores them on the snapshot as `shadowRamps`: per candidate, the input it read, its rate points,
+  funding pressure, risk appetite, conditions, the registered tight flag and its own state-machine
+  snapshot, with `usedForGuidance: false` and the registration's path. The assessment and the
+  weekly call are built before it and never read it, so no page, paste, send, export or frozen
+  brief changes. A scoring failure stores the reading without the field. An export's cold-read
+  snapshot (`lib/export/exportSnapshot.ts`) carries none.
+- **Threading.** Each candidate's machine state comes from the previous stored snapshot's record.
+  With none, it is seeded by replaying the candidate over the bundled month-ends from January 2022
+  (the first month whose ten-year percentile window the bundle holds), which reaches the same state
+  as the full 2012 replay (`tests/shadowRamps.test.ts`).
+- **Parity.** With the current ramp, `candidateRamps` reproduces the published month-end record for
+  every month (`tests/candidateRamps.test.ts`); Invariant 12 lists it with the engine modules.
+- **On `/trust`.** One line under "How the scores are built" says the alternatives are being
+  tested and set no guidance, linking the registration and the results
+  (`tests/trustRampTestNote.test.tsx`).
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

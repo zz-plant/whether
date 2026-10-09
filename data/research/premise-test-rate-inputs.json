@@ -1,0 +1,5894 @@
+{
+  "schemaVersion": 1,
+  "registration": "docs/research/premise-test-preregistration.md",
+  "generator": "scripts/research/premiseTestRateInputs.ts",
+  "series": {
+    "DGS1MO": "https://fred.stlouisfed.org/series/DGS1MO",
+    "DGS3MO": "https://fred.stlouisfed.org/series/DGS3MO",
+    "DFF": "https://fred.stlouisfed.org/series/DFF"
+  },
+  "oneMonthBillMonthEnds": [
+    {
+      "month": "2002-01",
+      "date": "2002-01-31",
+      "value": 1.69
+    },
+    {
+      "month": "2002-02",
+      "date": "2002-02-28",
+      "value": 1.76
+    },
+    {
+      "month": "2002-03",
+      "date": "2002-03-28",
+      "value": 1.76
+    },
+    {
+      "month": "2002-04",
+      "date": "2002-04-30",
+      "value": 1.77
+    },
+    {
+      "month": "2002-05",
+      "date": "2002-05-31",
+      "value": 1.72
+    },
+    {
+      "month": "2002-06",
+      "date": "2002-06-28",
+      "value": 1.69
+    },
+    {
+      "month": "2002-07",
+      "date": "2002-07-31",
+      "value": 1.73
+    },
+    {
+      "month": "2002-08",
+      "date": "2002-08-30",
+      "value": 1.7
+    },
+    {
+      "month": "2002-09",
+      "date": "2002-09-30",
+      "value": 1.6
+    },
+    {
+      "month": "2002-10",
+      "date": "2002-10-31",
+      "value": 1.48
+    },
+    {
+      "month": "2002-11",
+      "date": "2002-11-29",
+      "value": 1.25
+    },
+    {
+      "month": "2002-12",
+      "date": "2002-12-31",
+      "value": 1.2
+    },
+    {
+      "month": "2003-01",
+      "date": "2003-01-31",
+      "value": 1.17
+    },
+    {
+      "month": "2003-02",
+      "date": "2003-02-28",
+      "value": 1.21
+    },
+    {
+      "month": "2003-03",
+      "date": "2003-03-31",
+      "value": 1.16
+    },
+    {
+      "month": "2003-04",
+      "date": "2003-04-30",
+      "value": 1.13
+    },
+    {
+      "month": "2003-05",
+      "date": "2003-05-30",
+      "value": 1.16
+    },
+    {
+      "month": "2003-06",
+      "date": "2003-06-30",
+      "value": 0.81
+    },
+    {
+      "month": "2003-07",
+      "date": "2003-07-31",
+      "value": 0.91
+    },
+    {
+      "month": "2003-08",
+      "date": "2003-08-29",
+      "value": 0.98
+    },
+    {
+      "month": "2003-09",
+      "date": "2003-09-30",
+      "value": 0.87
+    },
+    {
+      "month": "2003-10",
+      "date": "2003-10-31",
+      "value": 0.96
+    },
+    {
+      "month": "2003-11",
+      "date": "2003-11-28",
+      "value": 0.96
+    },
+    {
+      "month": "2003-12",
+      "date": "2003-12-31",
+      "value": 0.9
+    },
+    {
+      "month": "2004-01",
+      "date": "2004-01-30",
+      "value": 0.85
+    },
+    {
+      "month": "2004-02",
+      "date": "2004-02-27",
+      "value": 0.95
+    },
+    {
+      "month": "2004-03",
+      "date": "2004-03-31",
+      "value": 0.96
+    },
+    {
+      "month": "2004-04",
+      "date": "2004-04-30",
+      "value": 0.83
+    },
+    {
+      "month": "2004-05",
+      "date": "2004-05-28",
+      "value": 0.94
+    },
+    {
+      "month": "2004-06",
+      "date": "2004-06-30",
+      "value": 1.17
+    },
+    {
+      "month": "2004-07",
+      "date": "2004-07-30",
+      "value": 1.27
+    },
+    {
+      "month": "2004-08",
+      "date": "2004-08-31",
+      "value": 1.45
+    },
+    {
+      "month": "2004-09",
+      "date": "2004-09-30",
+      "value": 1.47
+    },
+    {
+      "month": "2004-10",
+      "date": "2004-10-29",
+      "value": 1.73
+    },
+    {
+      "month": "2004-11",
+      "date": "2004-11-30",
+      "value": 2.07
+    },
+    {
+      "month": "2004-12",
+      "date": "2004-12-31",
+      "value": 1.89
+    },
+    {
+      "month": "2005-01",
+      "date": "2005-01-31",
+      "value": 2.06
+    },
+    {
+      "month": "2005-02",
+      "date": "2005-02-28",
+      "value": 2.51
+    },
+    {
+      "month": "2005-03",
+      "date": "2005-03-31",
+      "value": 2.63
+    },
+    {
+      "month": "2005-04",
+      "date": "2005-04-29",
+      "value": 2.7
+    },
+    {
+      "month": "2005-05",
+      "date": "2005-05-31",
+      "value": 2.8
+    },
+    {
+      "month": "2005-06",
+      "date": "2005-06-30",
+      "value": 2.99
+    },
+    {
+      "month": "2005-07",
+      "date": "2005-07-29",
+      "value": 3.25
+    },
+    {
+      "month": "2005-08",
+      "date": "2005-08-31",
+      "value": 3.41
+    },
+    {
+      "month": "2005-09",
+      "date": "2005-09-30",
+      "value": 3.15
+    },
+    {
+      "month": "2005-10",
+      "date": "2005-10-31",
+      "value": 3.77
+    },
+    {
+      "month": "2005-11",
+      "date": "2005-11-30",
+      "value": 4
+    },
+    {
+      "month": "2005-12",
+      "date": "2005-12-30",
+      "value": 4.01
+    },
+    {
+      "month": "2006-01",
+      "date": "2006-01-31",
+      "value": 4.37
+    },
+    {
+      "month": "2006-02",
+      "date": "2006-02-28",
+      "value": 4.47
+    },
+    {
+      "month": "2006-03",
+      "date": "2006-03-31",
+      "value": 4.65
+    },
+    {
+      "month": "2006-04",
+      "date": "2006-04-28",
+      "value": 4.6
+    },
+    {
+      "month": "2006-05",
+      "date": "2006-05-31",
+      "value": 4.75
+    },
+    {
+      "month": "2006-06",
+      "date": "2006-06-30",
+      "value": 4.54
+    },
+    {
+      "month": "2006-07",
+      "date": "2006-07-31",
+      "value": 5.02
+    },
+    {
+      "month": "2006-08",
+      "date": "2006-08-31",
+      "value": 5.12
+    },
+    {
+      "month": "2006-09",
+      "date": "2006-09-29",
+      "value": 4.6
+    },
+    {
+      "month": "2006-10",
+      "date": "2006-10-31",
+      "value": 5.18
+    },
+    {
+      "month": "2006-11",
+      "date": "2006-11-30",
+      "value": 5.22
+    },
+    {
+      "month": "2006-12",
+      "date": "2006-12-29",
+      "value": 4.75
+    },
+    {
+      "month": "2007-01",
+      "date": "2007-01-31",
+      "value": 5
+    },
+    {
+      "month": "2007-02",
+      "date": "2007-02-28",
+      "value": 5.24
+    },
+    {
+      "month": "2007-03",
+      "date": "2007-03-30",
+      "value": 5.07
+    },
+    {
+      "month": "2007-04",
+      "date": "2007-04-30",
+      "value": 4.8
+    },
+    {
+      "month": "2007-05",
+      "date": "2007-05-31",
+      "value": 4.78
+    },
+    {
+      "month": "2007-06",
+      "date": "2007-06-29",
+      "value": 4.28
+    },
+    {
+      "month": "2007-07",
+      "date": "2007-07-31",
+      "value": 5.13
+    },
+    {
+      "month": "2007-08",
+      "date": "2007-08-31",
+      "value": 4.02
+    },
+    {
+      "month": "2007-09",
+      "date": "2007-09-28",
+      "value": 3.43
+    },
+    {
+      "month": "2007-10",
+      "date": "2007-10-31",
+      "value": 4.01
+    },
+    {
+      "month": "2007-11",
+      "date": "2007-11-30",
+      "value": 3.63
+    },
+    {
+      "month": "2007-12",
+      "date": "2007-12-31",
+      "value": 2.76
+    },
+    {
+      "month": "2008-01",
+      "date": "2008-01-31",
+      "value": 1.64
+    },
+    {
+      "month": "2008-02",
+      "date": "2008-02-29",
+      "value": 2.07
+    },
+    {
+      "month": "2008-03",
+      "date": "2008-03-31",
+      "value": 1.22
+    },
+    {
+      "month": "2008-04",
+      "date": "2008-04-30",
+      "value": 1.17
+    },
+    {
+      "month": "2008-05",
+      "date": "2008-05-30",
+      "value": 1.98
+    },
+    {
+      "month": "2008-06",
+      "date": "2008-06-30",
+      "value": 1.6
+    },
+    {
+      "month": "2008-07",
+      "date": "2008-07-31",
+      "value": 1.55
+    },
+    {
+      "month": "2008-08",
+      "date": "2008-08-29",
+      "value": 1.63
+    },
+    {
+      "month": "2008-09",
+      "date": "2008-09-30",
+      "value": 1.02
+    },
+    {
+      "month": "2008-10",
+      "date": "2008-10-31",
+      "value": 0.12
+    },
+    {
+      "month": "2008-11",
+      "date": "2008-11-28",
+      "value": 0.02
+    },
+    {
+      "month": "2008-12",
+      "date": "2008-12-31",
+      "value": 0.11
+    },
+    {
+      "month": "2009-01",
+      "date": "2009-01-30",
+      "value": 0.15
+    },
+    {
+      "month": "2009-02",
+      "date": "2009-02-27",
+      "value": 0.16
+    },
+    {
+      "month": "2009-03",
+      "date": "2009-03-31",
+      "value": 0.17
+    },
+    {
+      "month": "2009-04",
+      "date": "2009-04-30",
+      "value": 0.04
+    },
+    {
+      "month": "2009-05",
+      "date": "2009-05-29",
+      "value": 0.14
+    },
+    {
+      "month": "2009-06",
+      "date": "2009-06-30",
+      "value": 0.17
+    },
+    {
+      "month": "2009-07",
+      "date": "2009-07-31",
+      "value": 0.14
+    },
+    {
+      "month": "2009-08",
+      "date": "2009-08-31",
+      "value": 0.11
+    },
+    {
+      "month": "2009-09",
+      "date": "2009-09-30",
+      "value": 0.06
+    },
+    {
+      "month": "2009-10",
+      "date": "2009-10-30",
+      "value": 0.01
+    },
+    {
+      "month": "2009-11",
+      "date": "2009-11-30",
+      "value": 0.08
+    },
+    {
+      "month": "2009-12",
+      "date": "2009-12-31",
+      "value": 0.04
+    },
+    {
+      "month": "2010-01",
+      "date": "2010-01-29",
+      "value": 0.02
+    },
+    {
+      "month": "2010-02",
+      "date": "2010-02-26",
+      "value": 0.09
+    },
+    {
+      "month": "2010-03",
+      "date": "2010-03-31",
+      "value": 0.15
+    },
+    {
+      "month": "2010-04",
+      "date": "2010-04-30",
+      "value": 0.14
+    },
+    {
+      "month": "2010-05",
+      "date": "2010-05-28",
+      "value": 0.15
+    },
+    {
+      "month": "2010-06",
+      "date": "2010-06-30",
+      "value": 0.17
+    },
+    {
+      "month": "2010-07",
+      "date": "2010-07-30",
+      "value": 0.14
+    },
+    {
+      "month": "2010-08",
+      "date": "2010-08-31",
+      "value": 0.16
+    },
+    {
+      "month": "2010-09",
+      "date": "2010-09-30",
+      "value": 0.14
+    },
+    {
+      "month": "2010-10",
+      "date": "2010-10-29",
+      "value": 0.14
+    },
+    {
+      "month": "2010-11",
+      "date": "2010-11-30",
+      "value": 0.18
+    },
+    {
+      "month": "2010-12",
+      "date": "2010-12-31",
+      "value": 0.07
+    },
+    {
+      "month": "2011-01",
+      "date": "2011-01-31",
+      "value": 0.15
+    },
+    {
+      "month": "2011-02",
+      "date": "2011-02-28",
+      "value": 0.13
+    },
+    {
+      "month": "2011-03",
+      "date": "2011-03-31",
+      "value": 0.05
+    },
+    {
+      "month": "2011-04",
+      "date": "2011-04-29",
+      "value": 0.02
+    },
+    {
+      "month": "2011-05",
+      "date": "2011-05-31",
+      "value": 0.04
+    },
+    {
+      "month": "2011-06",
+      "date": "2011-06-30",
+      "value": 0.01
+    },
+    {
+      "month": "2011-07",
+      "date": "2011-07-29",
+      "value": 0.16
+    },
+    {
+      "month": "2011-08",
+      "date": "2011-08-31",
+      "value": 0.01
+    },
+    {
+      "month": "2011-09",
+      "date": "2011-09-30",
+      "value": 0.02
+    },
+    {
+      "month": "2011-10",
+      "date": "2011-10-31",
+      "value": 0.02
+    },
+    {
+      "month": "2011-11",
+      "date": "2011-11-30",
+      "value": 0.02
+    },
+    {
+      "month": "2011-12",
+      "date": "2011-12-30",
+      "value": 0.01
+    }
+  ],
+  "dislocationPairs": [
+    {
+      "set": "month-end",
+      "date": "2012-01-31",
+      "reference": "2012-01-13",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.06,
+        "fedFunds": 0.11
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.03,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-02-29",
+      "reference": "2012-02-15",
+      "atDate": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.08,
+        "fedFunds": 0.1
+      },
+      "atReference": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.11,
+        "fedFunds": 0.12
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-03-30",
+      "reference": "2012-03-15",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.07,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.08,
+        "fedFunds": 0.14
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-04-30",
+      "reference": "2012-04-13",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.1,
+        "fedFunds": 0.16
+      },
+      "atReference": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.09,
+        "fedFunds": 0.15
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-05-31",
+      "reference": "2012-05-15",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.07,
+        "fedFunds": 0.16
+      },
+      "atReference": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.09,
+        "fedFunds": 0.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-06-29",
+      "reference": "2012-06-15",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.09,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.09,
+        "fedFunds": 0.18
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-07-31",
+      "reference": "2012-07-13",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.11,
+        "fedFunds": 0.13
+      },
+      "atReference": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.1,
+        "fedFunds": 0.19
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-08-31",
+      "reference": "2012-08-15",
+      "atDate": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.09,
+        "fedFunds": 0.13
+      },
+      "atReference": {
+        "oneMonth": 0.11,
+        "threeMonth": 0.09,
+        "fedFunds": 0.13
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-09-28",
+      "reference": "2012-09-14",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.1,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.11,
+        "fedFunds": 0.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-10-31",
+      "reference": "2012-10-15",
+      "atDate": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.11,
+        "fedFunds": 0.18
+      },
+      "atReference": {
+        "oneMonth": 0.1,
+        "threeMonth": 0.11,
+        "fedFunds": 0.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-11-30",
+      "reference": "2012-11-15",
+      "atDate": {
+        "oneMonth": 0.11,
+        "threeMonth": 0.08,
+        "fedFunds": 0.16
+      },
+      "atReference": {
+        "oneMonth": 0.13,
+        "threeMonth": 0.08,
+        "fedFunds": 0.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2012-12-31",
+      "reference": "2012-12-14",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.05,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.04,
+        "fedFunds": 0.17
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-01-31",
+      "reference": "2013-01-15",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.07,
+        "fedFunds": 0.15
+      },
+      "atReference": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.09,
+        "fedFunds": 0.15
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-02-28",
+      "reference": "2013-02-15",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.11,
+        "fedFunds": 0.14
+      },
+      "atReference": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.1,
+        "fedFunds": 0.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-03-28",
+      "reference": "2013-03-15",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.07,
+        "fedFunds": 0.13
+      },
+      "atReference": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.09,
+        "fedFunds": 0.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-04-30",
+      "reference": "2013-04-15",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.05,
+        "fedFunds": 0.14
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.06,
+        "fedFunds": 0.15
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-05-31",
+      "reference": "2013-05-15",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.04,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.04,
+        "fedFunds": 0.12
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-06-28",
+      "reference": "2013-06-14",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-07-31",
+      "reference": "2013-07-15",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.04,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-08-30",
+      "reference": "2013-08-15",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.03,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-09-30",
+      "reference": "2013-09-13",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-10-31",
+      "reference": "2013-10-15",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.04,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.32,
+        "threeMonth": 0.14,
+        "fedFunds": 0.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-11-29",
+      "reference": "2013-11-15",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.06,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.08,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2013-12-31",
+      "reference": "2013-12-13",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.07,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.07,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-01-31",
+      "reference": "2014-01-15",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.04,
+        "fedFunds": 0.07
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-02-28",
+      "reference": "2014-02-14",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.02,
+        "fedFunds": 0.06
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-03-31",
+      "reference": "2014-03-14",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.05,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-04-30",
+      "reference": "2014-04-15",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.03,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.04,
+        "fedFunds": 0.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-05-30",
+      "reference": "2014-05-15",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.03,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-06-30",
+      "reference": "2014-06-13",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-07-31",
+      "reference": "2014-07-15",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-08-29",
+      "reference": "2014-08-15",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.03,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.03,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-09-30",
+      "reference": "2014-09-15",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-10-31",
+      "reference": "2014-10-15",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-11-28",
+      "reference": "2014-11-14",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2014-12-31",
+      "reference": "2014-12-15",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.04,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.11
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-01-30",
+      "reference": "2015-01-15",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.02,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.03,
+        "fedFunds": 0.12
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-02-27",
+      "reference": "2015-02-13",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.01,
+        "fedFunds": 0.12
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-03-31",
+      "reference": "2015-03-13",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.03,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.03,
+        "fedFunds": 0.11
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-04-30",
+      "reference": "2015-04-15",
+      "atDate": {
+        "oneMonth": 0,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.13
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-05-29",
+      "reference": "2015-05-15",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.13
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-06-30",
+      "reference": "2015-06-15",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0,
+        "threeMonth": 0.02,
+        "fedFunds": 0.13
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-07-31",
+      "reference": "2015-07-15",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.08,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.13
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-08-31",
+      "reference": "2015-08-14",
+      "atDate": {
+        "oneMonth": 0,
+        "threeMonth": 0.08,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.09,
+        "fedFunds": 0.14
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-09-30",
+      "reference": "2015-09-15",
+      "atDate": {
+        "oneMonth": 0,
+        "threeMonth": 0,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0,
+        "threeMonth": 0.07,
+        "fedFunds": 0.14
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-10-30",
+      "reference": "2015-10-15",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.08,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0,
+        "threeMonth": 0.01,
+        "fedFunds": 0.13
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-11-30",
+      "reference": "2015-11-13",
+      "atDate": {
+        "oneMonth": 0.11,
+        "threeMonth": 0.22,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.14,
+        "fedFunds": 0.12
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2015-12-31",
+      "reference": "2015-12-15",
+      "atDate": {
+        "oneMonth": 0.14,
+        "threeMonth": 0.16,
+        "fedFunds": 0.2
+      },
+      "atReference": {
+        "oneMonth": 0.21,
+        "threeMonth": 0.25,
+        "fedFunds": 0.15
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-01-29",
+      "reference": "2016-01-15",
+      "atDate": {
+        "oneMonth": 0.22,
+        "threeMonth": 0.33,
+        "fedFunds": 0.29
+      },
+      "atReference": {
+        "oneMonth": 0.19,
+        "threeMonth": 0.24,
+        "fedFunds": 0.36
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-02-29",
+      "reference": "2016-02-12",
+      "atDate": {
+        "oneMonth": 0.23,
+        "threeMonth": 0.33,
+        "fedFunds": 0.29
+      },
+      "atReference": {
+        "oneMonth": 0.26,
+        "threeMonth": 0.3,
+        "fedFunds": 0.38
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-03-31",
+      "reference": "2016-03-15",
+      "atDate": {
+        "oneMonth": 0.18,
+        "threeMonth": 0.21,
+        "fedFunds": 0.25
+      },
+      "atReference": {
+        "oneMonth": 0.29,
+        "threeMonth": 0.34,
+        "fedFunds": 0.37
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-04-29",
+      "reference": "2016-04-15",
+      "atDate": {
+        "oneMonth": 0.16,
+        "threeMonth": 0.22,
+        "fedFunds": 0.3
+      },
+      "atReference": {
+        "oneMonth": 0.19,
+        "threeMonth": 0.22,
+        "fedFunds": 0.37
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-05-31",
+      "reference": "2016-05-13",
+      "atDate": {
+        "oneMonth": 0.27,
+        "threeMonth": 0.34,
+        "fedFunds": 0.29
+      },
+      "atReference": {
+        "oneMonth": 0.25,
+        "threeMonth": 0.29,
+        "fedFunds": 0.37
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-06-30",
+      "reference": "2016-06-15",
+      "atDate": {
+        "oneMonth": 0.2,
+        "threeMonth": 0.26,
+        "fedFunds": 0.3
+      },
+      "atReference": {
+        "oneMonth": 0.23,
+        "threeMonth": 0.26,
+        "fedFunds": 0.37
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-07-29",
+      "reference": "2016-07-15",
+      "atDate": {
+        "oneMonth": 0.19,
+        "threeMonth": 0.28,
+        "fedFunds": 0.3
+      },
+      "atReference": {
+        "oneMonth": 0.27,
+        "threeMonth": 0.32,
+        "fedFunds": 0.4
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-08-31",
+      "reference": "2016-08-15",
+      "atDate": {
+        "oneMonth": 0.26,
+        "threeMonth": 0.33,
+        "fedFunds": 0.3
+      },
+      "atReference": {
+        "oneMonth": 0.26,
+        "threeMonth": 0.31,
+        "fedFunds": 0.4
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-09-30",
+      "reference": "2016-09-15",
+      "atDate": {
+        "oneMonth": 0.2,
+        "threeMonth": 0.29,
+        "fedFunds": 0.29
+      },
+      "atReference": {
+        "oneMonth": 0.2,
+        "threeMonth": 0.29,
+        "fedFunds": 0.4
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-10-31",
+      "reference": "2016-10-14",
+      "atDate": {
+        "oneMonth": 0.2,
+        "threeMonth": 0.34,
+        "fedFunds": 0.31
+      },
+      "atReference": {
+        "oneMonth": 0.26,
+        "threeMonth": 0.32,
+        "fedFunds": 0.41
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-11-30",
+      "reference": "2016-11-15",
+      "atDate": {
+        "oneMonth": 0.38,
+        "threeMonth": 0.48,
+        "fedFunds": 0.31
+      },
+      "atReference": {
+        "oneMonth": 0.3,
+        "threeMonth": 0.51,
+        "fedFunds": 0.41
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2016-12-30",
+      "reference": "2016-12-15",
+      "atDate": {
+        "oneMonth": 0.44,
+        "threeMonth": 0.51,
+        "fedFunds": 0.55
+      },
+      "atReference": {
+        "oneMonth": 0.48,
+        "threeMonth": 0.51,
+        "fedFunds": 0.66
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-01-31",
+      "reference": "2017-01-13",
+      "atDate": {
+        "oneMonth": 0.5,
+        "threeMonth": 0.52,
+        "fedFunds": 0.56
+      },
+      "atReference": {
+        "oneMonth": 0.52,
+        "threeMonth": 0.53,
+        "fedFunds": 0.66
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-02-28",
+      "reference": "2017-02-15",
+      "atDate": {
+        "oneMonth": 0.4,
+        "threeMonth": 0.53,
+        "fedFunds": 0.57
+      },
+      "atReference": {
+        "oneMonth": 0.53,
+        "threeMonth": 0.54,
+        "fedFunds": 0.66
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-03-31",
+      "reference": "2017-03-15",
+      "atDate": {
+        "oneMonth": 0.74,
+        "threeMonth": 0.76,
+        "fedFunds": 0.82
+      },
+      "atReference": {
+        "oneMonth": 0.71,
+        "threeMonth": 0.73,
+        "fedFunds": 0.66
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-04-28",
+      "reference": "2017-04-13",
+      "atDate": {
+        "oneMonth": 0.68,
+        "threeMonth": 0.8,
+        "fedFunds": 0.83
+      },
+      "atReference": {
+        "oneMonth": 0.76,
+        "threeMonth": 0.81,
+        "fedFunds": 0.91
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-05-31",
+      "reference": "2017-05-15",
+      "atDate": {
+        "oneMonth": 0.86,
+        "threeMonth": 0.98,
+        "fedFunds": 0.83
+      },
+      "atReference": {
+        "oneMonth": 0.73,
+        "threeMonth": 0.9,
+        "fedFunds": 0.91
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-06-30",
+      "reference": "2017-06-15",
+      "atDate": {
+        "oneMonth": 0.84,
+        "threeMonth": 1.03,
+        "fedFunds": 1.06
+      },
+      "atReference": {
+        "oneMonth": 0.86,
+        "threeMonth": 1.02,
+        "fedFunds": 1.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-07-31",
+      "reference": "2017-07-14",
+      "atDate": {
+        "oneMonth": 1,
+        "threeMonth": 1.07,
+        "fedFunds": 1.07
+      },
+      "atReference": {
+        "oneMonth": 0.93,
+        "threeMonth": 1.04,
+        "fedFunds": 1.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-08-31",
+      "reference": "2017-08-15",
+      "atDate": {
+        "oneMonth": 0.95,
+        "threeMonth": 1.01,
+        "fedFunds": 1.07
+      },
+      "atReference": {
+        "oneMonth": 0.97,
+        "threeMonth": 1.04,
+        "fedFunds": 1.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-09-29",
+      "reference": "2017-09-15",
+      "atDate": {
+        "oneMonth": 0.96,
+        "threeMonth": 1.06,
+        "fedFunds": 1.06
+      },
+      "atReference": {
+        "oneMonth": 0.98,
+        "threeMonth": 1.05,
+        "fedFunds": 1.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-10-31",
+      "reference": "2017-10-13",
+      "atDate": {
+        "oneMonth": 0.99,
+        "threeMonth": 1.15,
+        "fedFunds": 1.07
+      },
+      "atReference": {
+        "oneMonth": 0.97,
+        "threeMonth": 1.09,
+        "fedFunds": 1.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-11-30",
+      "reference": "2017-11-15",
+      "atDate": {
+        "oneMonth": 1.14,
+        "threeMonth": 1.27,
+        "fedFunds": 1.07
+      },
+      "atReference": {
+        "oneMonth": 1.08,
+        "threeMonth": 1.25,
+        "fedFunds": 1.16
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2017-12-29",
+      "reference": "2017-12-15",
+      "atDate": {
+        "oneMonth": 1.28,
+        "threeMonth": 1.39,
+        "fedFunds": 1.33
+      },
+      "atReference": {
+        "oneMonth": 1.24,
+        "threeMonth": 1.31,
+        "fedFunds": 1.41
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-01-31",
+      "reference": "2018-01-12",
+      "atDate": {
+        "oneMonth": 1.43,
+        "threeMonth": 1.46,
+        "fedFunds": 1.34
+      },
+      "atReference": {
+        "oneMonth": 1.31,
+        "threeMonth": 1.43,
+        "fedFunds": 1.42
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-02-28",
+      "reference": "2018-02-15",
+      "atDate": {
+        "oneMonth": 1.5,
+        "threeMonth": 1.65,
+        "fedFunds": 1.35
+      },
+      "atReference": {
+        "oneMonth": 1.3,
+        "threeMonth": 1.58,
+        "fedFunds": 1.42
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-03-29",
+      "reference": "2018-03-15",
+      "atDate": {
+        "oneMonth": 1.63,
+        "threeMonth": 1.73,
+        "fedFunds": 1.68
+      },
+      "atReference": {
+        "oneMonth": 1.7,
+        "threeMonth": 1.77,
+        "fedFunds": 1.43
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-04-30",
+      "reference": "2018-04-13",
+      "atDate": {
+        "oneMonth": 1.65,
+        "threeMonth": 1.87,
+        "fedFunds": 1.69
+      },
+      "atReference": {
+        "oneMonth": 1.64,
+        "threeMonth": 1.76,
+        "fedFunds": 1.69
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-05-31",
+      "reference": "2018-05-15",
+      "atDate": {
+        "oneMonth": 1.76,
+        "threeMonth": 1.93,
+        "fedFunds": 1.7
+      },
+      "atReference": {
+        "oneMonth": 1.69,
+        "threeMonth": 1.92,
+        "fedFunds": 1.7
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-06-29",
+      "reference": "2018-06-15",
+      "atDate": {
+        "oneMonth": 1.77,
+        "threeMonth": 1.93,
+        "fedFunds": 1.91
+      },
+      "atReference": {
+        "oneMonth": 1.82,
+        "threeMonth": 1.94,
+        "fedFunds": 1.9
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-07-31",
+      "reference": "2018-07-13",
+      "atDate": {
+        "oneMonth": 1.94,
+        "threeMonth": 2.03,
+        "fedFunds": 1.91
+      },
+      "atReference": {
+        "oneMonth": 1.87,
+        "threeMonth": 1.98,
+        "fedFunds": 1.91
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-08-31",
+      "reference": "2018-08-15",
+      "atDate": {
+        "oneMonth": 1.95,
+        "threeMonth": 2.11,
+        "fedFunds": 1.91
+      },
+      "atReference": {
+        "oneMonth": 1.96,
+        "threeMonth": 2.07,
+        "fedFunds": 1.91
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-09-28",
+      "reference": "2018-09-14",
+      "atDate": {
+        "oneMonth": 2.12,
+        "threeMonth": 2.19,
+        "fedFunds": 2.18
+      },
+      "atReference": {
+        "oneMonth": 2.02,
+        "threeMonth": 2.16,
+        "fedFunds": 1.92
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-10-31",
+      "reference": "2018-10-15",
+      "atDate": {
+        "oneMonth": 2.2,
+        "threeMonth": 2.34,
+        "fedFunds": 2.2
+      },
+      "atReference": {
+        "oneMonth": 2.17,
+        "threeMonth": 2.31,
+        "fedFunds": 2.18
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-11-30",
+      "reference": "2018-11-15",
+      "atDate": {
+        "oneMonth": 2.31,
+        "threeMonth": 2.37,
+        "fedFunds": 2.2
+      },
+      "atReference": {
+        "oneMonth": 2.2,
+        "threeMonth": 2.37,
+        "fedFunds": 2.2
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2018-12-31",
+      "reference": "2018-12-14",
+      "atDate": {
+        "oneMonth": 2.44,
+        "threeMonth": 2.45,
+        "fedFunds": 2.4
+      },
+      "atReference": {
+        "oneMonth": 2.36,
+        "threeMonth": 2.42,
+        "fedFunds": 2.19
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-01-31",
+      "reference": "2019-01-15",
+      "atDate": {
+        "oneMonth": 2.42,
+        "threeMonth": 2.41,
+        "fedFunds": 2.4
+      },
+      "atReference": {
+        "oneMonth": 2.41,
+        "threeMonth": 2.45,
+        "fedFunds": 2.4
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-02-28",
+      "reference": "2019-02-15",
+      "atDate": {
+        "oneMonth": 2.44,
+        "threeMonth": 2.45,
+        "fedFunds": 2.4
+      },
+      "atReference": {
+        "oneMonth": 2.43,
+        "threeMonth": 2.43,
+        "fedFunds": 2.4
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-03-29",
+      "reference": "2019-03-15",
+      "atDate": {
+        "oneMonth": 2.43,
+        "threeMonth": 2.4,
+        "fedFunds": 2.43
+      },
+      "atReference": {
+        "oneMonth": 2.46,
+        "threeMonth": 2.45,
+        "fedFunds": 2.4
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-04-30",
+      "reference": "2019-04-15",
+      "atDate": {
+        "oneMonth": 2.43,
+        "threeMonth": 2.43,
+        "fedFunds": 2.45
+      },
+      "atReference": {
+        "oneMonth": 2.42,
+        "threeMonth": 2.43,
+        "fedFunds": 2.41
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-05-31",
+      "reference": "2019-05-15",
+      "atDate": {
+        "oneMonth": 2.35,
+        "threeMonth": 2.35,
+        "fedFunds": 2.4
+      },
+      "atReference": {
+        "oneMonth": 2.4,
+        "threeMonth": 2.42,
+        "fedFunds": 2.4
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-06-28",
+      "reference": "2019-06-14",
+      "atDate": {
+        "oneMonth": 2.18,
+        "threeMonth": 2.12,
+        "fedFunds": 2.4
+      },
+      "atReference": {
+        "oneMonth": 2.23,
+        "threeMonth": 2.2,
+        "fedFunds": 2.36
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-07-31",
+      "reference": "2019-07-15",
+      "atDate": {
+        "oneMonth": 2.01,
+        "threeMonth": 2.08,
+        "fedFunds": 2.4
+      },
+      "atReference": {
+        "oneMonth": 2.17,
+        "threeMonth": 2.16,
+        "fedFunds": 2.4
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-08-30",
+      "reference": "2019-08-15",
+      "atDate": {
+        "oneMonth": 2.1,
+        "threeMonth": 1.99,
+        "fedFunds": 2.13
+      },
+      "atReference": {
+        "oneMonth": 2.08,
+        "threeMonth": 1.91,
+        "fedFunds": 2.13
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-09-30",
+      "reference": "2019-09-13",
+      "atDate": {
+        "oneMonth": 1.91,
+        "threeMonth": 1.88,
+        "fedFunds": 1.9
+      },
+      "atReference": {
+        "oneMonth": 1.99,
+        "threeMonth": 1.96,
+        "fedFunds": 2.14
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-10-31",
+      "reference": "2019-10-15",
+      "atDate": {
+        "oneMonth": 1.59,
+        "threeMonth": 1.54,
+        "fedFunds": 1.58
+      },
+      "atReference": {
+        "oneMonth": 1.74,
+        "threeMonth": 1.67,
+        "fedFunds": 1.9
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-11-29",
+      "reference": "2019-11-15",
+      "atDate": {
+        "oneMonth": 1.62,
+        "threeMonth": 1.59,
+        "fedFunds": 1.56
+      },
+      "atReference": {
+        "oneMonth": 1.59,
+        "threeMonth": 1.57,
+        "fedFunds": 1.55
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2019-12-31",
+      "reference": "2019-12-13",
+      "atDate": {
+        "oneMonth": 1.48,
+        "threeMonth": 1.55,
+        "fedFunds": 1.55
+      },
+      "atReference": {
+        "oneMonth": 1.55,
+        "threeMonth": 1.57,
+        "fedFunds": 1.55
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-01-31",
+      "reference": "2020-01-15",
+      "atDate": {
+        "oneMonth": 1.56,
+        "threeMonth": 1.55,
+        "fedFunds": 1.59
+      },
+      "atReference": {
+        "oneMonth": 1.53,
+        "threeMonth": 1.57,
+        "fedFunds": 1.54
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-02-28",
+      "reference": "2020-02-14",
+      "atDate": {
+        "oneMonth": 1.45,
+        "threeMonth": 1.27,
+        "fedFunds": 1.58
+      },
+      "atReference": {
+        "oneMonth": 1.6,
+        "threeMonth": 1.58,
+        "fedFunds": 1.58
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-03-31",
+      "reference": "2020-03-13",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.11,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.33,
+        "threeMonth": 0.28,
+        "fedFunds": 1.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-04-30",
+      "reference": "2020-04-15",
+      "atDate": {
+        "oneMonth": 0.1,
+        "threeMonth": 0.09,
+        "fedFunds": 0.05
+      },
+      "atReference": {
+        "oneMonth": 0.14,
+        "threeMonth": 0.14,
+        "fedFunds": 0.05
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-05-29",
+      "reference": "2020-05-15",
+      "atDate": {
+        "oneMonth": 0.13,
+        "threeMonth": 0.14,
+        "fedFunds": 0.05
+      },
+      "atReference": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.12,
+        "fedFunds": 0.05
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-06-30",
+      "reference": "2020-06-15",
+      "atDate": {
+        "oneMonth": 0.13,
+        "threeMonth": 0.16,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.15,
+        "threeMonth": 0.18,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-07-31",
+      "reference": "2020-07-15",
+      "atDate": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.09,
+        "fedFunds": 0.1
+      },
+      "atReference": {
+        "oneMonth": 0.12,
+        "threeMonth": 0.16,
+        "fedFunds": 0.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-08-31",
+      "reference": "2020-08-14",
+      "atDate": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.11,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.1,
+        "fedFunds": 0.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-09-30",
+      "reference": "2020-09-15",
+      "atDate": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.1,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.11,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-10-30",
+      "reference": "2020-10-15",
+      "atDate": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.09,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.1,
+        "threeMonth": 0.11,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-11-30",
+      "reference": "2020-11-13",
+      "atDate": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.08,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.1,
+        "threeMonth": 0.09,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2020-12-31",
+      "reference": "2020-12-15",
+      "atDate": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.09,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.08,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-01-29",
+      "reference": "2021-01-15",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.06,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.09,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-02-26",
+      "reference": "2021-02-12",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.04,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-03-31",
+      "reference": "2021-03-15",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.03,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.07
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-04-30",
+      "reference": "2021-04-15",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.05
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.07
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-05-28",
+      "reference": "2021-05-14",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.05
+      },
+      "atReference": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.06
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-06-30",
+      "reference": "2021-06-15",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.03,
+        "fedFunds": 0.06
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-07-30",
+      "reference": "2021-07-15",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.06,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-08-31",
+      "reference": "2021-08-13",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.04,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.06,
+        "fedFunds": 0.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-09-30",
+      "reference": "2021-09-15",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.04,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-10-29",
+      "reference": "2021-10-15",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-11-30",
+      "reference": "2021-11-15",
+      "atDate": {
+        "oneMonth": 0.11,
+        "threeMonth": 0.05,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2021-12-31",
+      "reference": "2021-12-15",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.06,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-01-31",
+      "reference": "2022-01-14",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.22,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.13,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-02-28",
+      "reference": "2022-02-15",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.35,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.4,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-03-31",
+      "reference": "2022-03-15",
+      "atDate": {
+        "oneMonth": 0.17,
+        "threeMonth": 0.52,
+        "fedFunds": 0.33
+      },
+      "atReference": {
+        "oneMonth": 0.22,
+        "threeMonth": 0.46,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-04-29",
+      "reference": "2022-04-14",
+      "atDate": {
+        "oneMonth": 0.37,
+        "threeMonth": 0.85,
+        "fedFunds": 0.33
+      },
+      "atReference": {
+        "oneMonth": 0.37,
+        "threeMonth": 0.79,
+        "fedFunds": 0.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-05-31",
+      "reference": "2022-05-13",
+      "atDate": {
+        "oneMonth": 0.73,
+        "threeMonth": 1.16,
+        "fedFunds": 0.83
+      },
+      "atReference": {
+        "oneMonth": 0.67,
+        "threeMonth": 1.03,
+        "fedFunds": 0.83
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-06-30",
+      "reference": "2022-06-15",
+      "atDate": {
+        "oneMonth": 1.28,
+        "threeMonth": 1.72,
+        "fedFunds": 1.58
+      },
+      "atReference": {
+        "oneMonth": 1.21,
+        "threeMonth": 1.74,
+        "fedFunds": 0.83
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-07-29",
+      "reference": "2022-07-15",
+      "atDate": {
+        "oneMonth": 2.22,
+        "threeMonth": 2.41,
+        "fedFunds": 2.32
+      },
+      "atReference": {
+        "oneMonth": 1.98,
+        "threeMonth": 2.37,
+        "fedFunds": 1.58
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-08-31",
+      "reference": "2022-08-15",
+      "atDate": {
+        "oneMonth": 2.4,
+        "threeMonth": 2.96,
+        "fedFunds": 2.33
+      },
+      "atReference": {
+        "oneMonth": 2.27,
+        "threeMonth": 2.72,
+        "fedFunds": 2.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-09-30",
+      "reference": "2022-09-15",
+      "atDate": {
+        "oneMonth": 2.79,
+        "threeMonth": 3.33,
+        "fedFunds": 3.08
+      },
+      "atReference": {
+        "oneMonth": 2.76,
+        "threeMonth": 3.22,
+        "fedFunds": 2.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-10-31",
+      "reference": "2022-10-14",
+      "atDate": {
+        "oneMonth": 3.73,
+        "threeMonth": 4.22,
+        "fedFunds": 3.08
+      },
+      "atReference": {
+        "oneMonth": 3.3,
+        "threeMonth": 3.81,
+        "fedFunds": 3.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-11-30",
+      "reference": "2022-11-15",
+      "atDate": {
+        "oneMonth": 4.07,
+        "threeMonth": 4.37,
+        "fedFunds": 3.83
+      },
+      "atReference": {
+        "oneMonth": 3.77,
+        "threeMonth": 4.31,
+        "fedFunds": 3.83
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2022-12-30",
+      "reference": "2022-12-15",
+      "atDate": {
+        "oneMonth": 4.12,
+        "threeMonth": 4.42,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 3.95,
+        "threeMonth": 4.34,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-01-31",
+      "reference": "2023-01-13",
+      "atDate": {
+        "oneMonth": 4.58,
+        "threeMonth": 4.7,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.58,
+        "threeMonth": 4.67,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-02-28",
+      "reference": "2023-02-15",
+      "atDate": {
+        "oneMonth": 4.65,
+        "threeMonth": 4.88,
+        "fedFunds": 4.57
+      },
+      "atReference": {
+        "oneMonth": 4.64,
+        "threeMonth": 4.79,
+        "fedFunds": 4.58
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-03-31",
+      "reference": "2023-03-15",
+      "atDate": {
+        "oneMonth": 4.74,
+        "threeMonth": 4.85,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.23,
+        "threeMonth": 4.75,
+        "fedFunds": 4.58
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-04-28",
+      "reference": "2023-04-14",
+      "atDate": {
+        "oneMonth": 4.35,
+        "threeMonth": 5.1,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.29,
+        "threeMonth": 5.14,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-05-31",
+      "reference": "2023-05-15",
+      "atDate": {
+        "oneMonth": 5.28,
+        "threeMonth": 5.52,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 5.64,
+        "threeMonth": 5.21,
+        "fedFunds": 5.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-06-30",
+      "reference": "2023-06-15",
+      "atDate": {
+        "oneMonth": 5.24,
+        "threeMonth": 5.43,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 5.18,
+        "threeMonth": 5.33,
+        "fedFunds": 5.07
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-07-31",
+      "reference": "2023-07-14",
+      "atDate": {
+        "oneMonth": 5.48,
+        "threeMonth": 5.55,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.37,
+        "threeMonth": 5.49,
+        "fedFunds": 5.08
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-08-31",
+      "reference": "2023-08-15",
+      "atDate": {
+        "oneMonth": 5.52,
+        "threeMonth": 5.56,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.53,
+        "threeMonth": 5.56,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-09-29",
+      "reference": "2023-09-15",
+      "atDate": {
+        "oneMonth": 5.55,
+        "threeMonth": 5.55,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.51,
+        "threeMonth": 5.56,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-10-31",
+      "reference": "2023-10-13",
+      "atDate": {
+        "oneMonth": 5.56,
+        "threeMonth": 5.59,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.6,
+        "threeMonth": 5.62,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-11-30",
+      "reference": "2023-11-15",
+      "atDate": {
+        "oneMonth": 5.56,
+        "threeMonth": 5.45,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.52,
+        "threeMonth": 5.53,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2023-12-29",
+      "reference": "2023-12-15",
+      "atDate": {
+        "oneMonth": 5.6,
+        "threeMonth": 5.4,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.54,
+        "threeMonth": 5.44,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-01-31",
+      "reference": "2024-01-12",
+      "atDate": {
+        "oneMonth": 5.53,
+        "threeMonth": 5.42,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.55,
+        "threeMonth": 5.45,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-02-29",
+      "reference": "2024-02-15",
+      "atDate": {
+        "oneMonth": 5.53,
+        "threeMonth": 5.45,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.49,
+        "threeMonth": 5.43,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-03-28",
+      "reference": "2024-03-15",
+      "atDate": {
+        "oneMonth": 5.49,
+        "threeMonth": 5.46,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.52,
+        "threeMonth": 5.48,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-04-30",
+      "reference": "2024-04-15",
+      "atDate": {
+        "oneMonth": 5.48,
+        "threeMonth": 5.46,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.49,
+        "threeMonth": 5.45,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-05-31",
+      "reference": "2024-05-15",
+      "atDate": {
+        "oneMonth": 5.48,
+        "threeMonth": 5.46,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.49,
+        "threeMonth": 5.45,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-06-28",
+      "reference": "2024-06-14",
+      "atDate": {
+        "oneMonth": 5.47,
+        "threeMonth": 5.48,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.47,
+        "threeMonth": 5.51,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-07-31",
+      "reference": "2024-07-15",
+      "atDate": {
+        "oneMonth": 5.49,
+        "threeMonth": 5.41,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.48,
+        "threeMonth": 5.43,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-08-30",
+      "reference": "2024-08-15",
+      "atDate": {
+        "oneMonth": 5.41,
+        "threeMonth": 5.21,
+        "fedFunds": 5.33
+      },
+      "atReference": {
+        "oneMonth": 5.53,
+        "threeMonth": 5.34,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-09-30",
+      "reference": "2024-09-13",
+      "atDate": {
+        "oneMonth": 4.93,
+        "threeMonth": 4.73,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 5.15,
+        "threeMonth": 4.97,
+        "fedFunds": 5.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-10-31",
+      "reference": "2024-10-15",
+      "atDate": {
+        "oneMonth": 4.76,
+        "threeMonth": 4.64,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.93,
+        "threeMonth": 4.73,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-11-29",
+      "reference": "2024-11-15",
+      "atDate": {
+        "oneMonth": 4.76,
+        "threeMonth": 4.58,
+        "fedFunds": 4.58
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.6,
+        "fedFunds": 4.58
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2024-12-31",
+      "reference": "2024-12-13",
+      "atDate": {
+        "oneMonth": 4.4,
+        "threeMonth": 4.37,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.43,
+        "threeMonth": 4.34,
+        "fedFunds": 4.58
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-01-31",
+      "reference": "2025-01-15",
+      "atDate": {
+        "oneMonth": 4.37,
+        "threeMonth": 4.31,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.4,
+        "threeMonth": 4.35,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-02-28",
+      "reference": "2025-02-14",
+      "atDate": {
+        "oneMonth": 4.38,
+        "threeMonth": 4.32,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.37,
+        "threeMonth": 4.34,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-03-31",
+      "reference": "2025-03-14",
+      "atDate": {
+        "oneMonth": 4.38,
+        "threeMonth": 4.32,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.37,
+        "threeMonth": 4.33,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-04-30",
+      "reference": "2025-04-15",
+      "atDate": {
+        "oneMonth": 4.35,
+        "threeMonth": 4.31,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.35,
+        "threeMonth": 4.33,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-05-30",
+      "reference": "2025-05-15",
+      "atDate": {
+        "oneMonth": 4.33,
+        "threeMonth": 4.36,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.37,
+        "threeMonth": 4.38,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-06-30",
+      "reference": "2025-06-13",
+      "atDate": {
+        "oneMonth": 4.28,
+        "threeMonth": 4.41,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.23,
+        "threeMonth": 4.45,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-07-31",
+      "reference": "2025-07-15",
+      "atDate": {
+        "oneMonth": 4.49,
+        "threeMonth": 4.41,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.36,
+        "threeMonth": 4.42,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-08-29",
+      "reference": "2025-08-15",
+      "atDate": {
+        "oneMonth": 4.41,
+        "threeMonth": 4.23,
+        "fedFunds": 4.33
+      },
+      "atReference": {
+        "oneMonth": 4.48,
+        "threeMonth": 4.3,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-09-30",
+      "reference": "2025-09-15",
+      "atDate": {
+        "oneMonth": 4.2,
+        "threeMonth": 4.02,
+        "fedFunds": 4.09
+      },
+      "atReference": {
+        "oneMonth": 4.22,
+        "threeMonth": 4.06,
+        "fedFunds": 4.33
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-10-31",
+      "reference": "2025-10-15",
+      "atDate": {
+        "oneMonth": 4.06,
+        "threeMonth": 3.89,
+        "fedFunds": 3.86
+      },
+      "atReference": {
+        "oneMonth": 4.2,
+        "threeMonth": 4.03,
+        "fedFunds": 4.1
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-11-28",
+      "reference": "2025-11-14",
+      "atDate": {
+        "oneMonth": 4.05,
+        "threeMonth": 3.88,
+        "fedFunds": 3.89
+      },
+      "atReference": {
+        "oneMonth": 4.04,
+        "threeMonth": 3.95,
+        "fedFunds": 3.88
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2025-12-31",
+      "reference": "2025-12-15",
+      "atDate": {
+        "oneMonth": 3.74,
+        "threeMonth": 3.67,
+        "fedFunds": 3.64
+      },
+      "atReference": {
+        "oneMonth": 3.77,
+        "threeMonth": 3.65,
+        "fedFunds": 3.64
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-01-30",
+      "reference": "2026-01-15",
+      "atDate": {
+        "oneMonth": 3.72,
+        "threeMonth": 3.67,
+        "fedFunds": 3.64
+      },
+      "atReference": {
+        "oneMonth": 3.75,
+        "threeMonth": 3.68,
+        "fedFunds": 3.64
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-02-27",
+      "reference": "2026-02-13",
+      "atDate": {
+        "oneMonth": 3.74,
+        "threeMonth": 3.67,
+        "fedFunds": 3.64
+      },
+      "atReference": {
+        "oneMonth": 3.72,
+        "threeMonth": 3.68,
+        "fedFunds": 3.64
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-03-31",
+      "reference": "2026-03-13",
+      "atDate": {
+        "oneMonth": 3.74,
+        "threeMonth": 3.7,
+        "fedFunds": 3.64
+      },
+      "atReference": {
+        "oneMonth": 3.75,
+        "threeMonth": 3.72,
+        "fedFunds": 3.64
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-04-30",
+      "reference": "2026-04-15",
+      "atDate": {
+        "oneMonth": 3.72,
+        "threeMonth": 3.68,
+        "fedFunds": 3.64
+      },
+      "atReference": {
+        "oneMonth": 3.72,
+        "threeMonth": 3.71,
+        "fedFunds": 3.64
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-05-29",
+      "reference": "2026-05-15",
+      "atDate": {
+        "oneMonth": 3.72,
+        "threeMonth": 3.69,
+        "fedFunds": 3.62
+      },
+      "atReference": {
+        "oneMonth": 3.71,
+        "threeMonth": 3.69,
+        "fedFunds": 3.63
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-06-30",
+      "reference": "2026-06-15",
+      "atDate": {
+        "oneMonth": 3.7,
+        "threeMonth": 3.87,
+        "fedFunds": 3.63
+      },
+      "atReference": {
+        "oneMonth": 3.69,
+        "threeMonth": 3.79,
+        "fedFunds": 3.63
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-07-31",
+      "reference": "2026-07-15",
+      "atDate": {
+        "oneMonth": 3.78,
+        "threeMonth": 3.83,
+        "fedFunds": 3.63
+      },
+      "atReference": {
+        "oneMonth": 3.73,
+        "threeMonth": 3.83,
+        "fedFunds": 3.63
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-08-31",
+      "reference": "2026-08-14",
+      "atDate": {
+        "oneMonth": 3.85,
+        "threeMonth": 3.91,
+        "fedFunds": 3.63
+      },
+      "atReference": {
+        "oneMonth": 3.79,
+        "threeMonth": 3.86,
+        "fedFunds": 3.63
+      }
+    },
+    {
+      "set": "month-end",
+      "date": "2026-09-30",
+      "reference": "2026-09-15",
+      "atDate": {
+        "oneMonth": 4.02,
+        "threeMonth": 4.2,
+        "fedFunds": 3.88
+      },
+      "atReference": {
+        "oneMonth": 3.93,
+        "threeMonth": 4.11,
+        "fedFunds": 3.63
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-04",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-05",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-06",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-09",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-10",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-11",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-12",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-13",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-16",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-17",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-18",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-19",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0,
+        "threeMonth": 0.01,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-20",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.01,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-23",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-24",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-25",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-26",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-27",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-09-30",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-01",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.1,
+        "threeMonth": 0.02,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-02",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.02,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-03",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.12,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-04",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.11,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-07",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.13,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-08",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.27,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-09",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.26,
+        "threeMonth": 0.05,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-10",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.25,
+        "threeMonth": 0.05,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-11",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.25,
+        "threeMonth": 0.08,
+        "fedFunds": 0.1
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-15",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.32,
+        "threeMonth": 0.14,
+        "fedFunds": 0.1
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-16",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.14,
+        "threeMonth": 0.1,
+        "fedFunds": 0.11
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-17",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.05,
+        "fedFunds": 0.1
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-18",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.04,
+        "fedFunds": 0.1
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-21",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.09
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-22",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-23",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-24",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-25",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-28",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-29",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-30",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2013",
+      "date": "2013-10-31",
+      "reference": "2013-09-03",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.04,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.02,
+        "fedFunds": 0.09
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-02",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-03",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-07",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-08",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-09",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-10",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-13",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-14",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-15",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-16",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-17",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-20",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-21",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-22",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-23",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-24",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.03,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-27",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-28",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-29",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-09-30",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.04,
+        "fedFunds": 0.06
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-01",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.08,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-04",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-05",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.1,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-06",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-07",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-08",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-12",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-13",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-14",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-15",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-18",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-19",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-20",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-21",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-22",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-25",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-26",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-27",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-28",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-10-29",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-01",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-02",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-03",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-04",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-05",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-08",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-09",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.04,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-10",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-12",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-15",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-16",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-17",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-18",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.12,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-19",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.11,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-22",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-23",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-24",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.14,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-26",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.11,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-29",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.07,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-11-30",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.11,
+        "threeMonth": 0.05,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-01",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.09,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-02",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-03",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-06",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-07",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.05,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-08",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.07,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-09",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-10",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-13",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-14",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.02,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-15",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-16",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-17",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-20",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.07,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-21",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.07,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-22",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.08,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-23",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.07,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-27",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-28",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.03,
+        "threeMonth": 0.06,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-29",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.01,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-30",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2021",
+      "date": "2021-12-31",
+      "reference": "2021-09-01",
+      "atDate": {
+        "oneMonth": 0.06,
+        "threeMonth": 0.06,
+        "fedFunds": 0.07
+      },
+      "atReference": {
+        "oneMonth": 0.04,
+        "threeMonth": 0.05,
+        "fedFunds": 0.08
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-04",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.66,
+        "threeMonth": 4.88,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-05",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.62,
+        "threeMonth": 4.86,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-06",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.57,
+        "threeMonth": 4.91,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-07",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.56,
+        "threeMonth": 4.95,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-10",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.53,
+        "threeMonth": 5.08,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-11",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.27,
+        "threeMonth": 5.04,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-12",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.27,
+        "threeMonth": 5.02,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-13",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.08,
+        "threeMonth": 5.1,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-14",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.29,
+        "threeMonth": 5.14,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-17",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.09,
+        "threeMonth": 5.21,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-18",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 3.89,
+        "threeMonth": 5.2,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-19",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 3.95,
+        "threeMonth": 5.16,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-20",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 3.4,
+        "threeMonth": 5.12,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-21",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 3.36,
+        "threeMonth": 5.14,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-24",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 3.54,
+        "threeMonth": 5.2,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-25",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.11,
+        "threeMonth": 5.12,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-26",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 3.91,
+        "threeMonth": 5.16,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-27",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.27,
+        "threeMonth": 5.18,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-04-28",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.35,
+        "threeMonth": 5.1,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-01",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.49,
+        "threeMonth": 5.27,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-02",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.56,
+        "threeMonth": 5.24,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-03",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 4.7,
+        "threeMonth": 5.26,
+        "fedFunds": 4.83
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-04",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.76,
+        "threeMonth": 5.26,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-05",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.59,
+        "threeMonth": 5.26,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-08",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.51,
+        "threeMonth": 5.31,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-09",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.56,
+        "threeMonth": 5.29,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-10",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.5,
+        "threeMonth": 5.24,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-11",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.81,
+        "threeMonth": 5.2,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-12",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.79,
+        "threeMonth": 5.25,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-15",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.64,
+        "threeMonth": 5.21,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-16",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.58,
+        "threeMonth": 5.23,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-17",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.5,
+        "threeMonth": 5.26,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-18",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.59,
+        "threeMonth": 5.31,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-19",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.62,
+        "threeMonth": 5.29,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-22",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.69,
+        "threeMonth": 5.4,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-23",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.67,
+        "threeMonth": 5.34,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-24",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.73,
+        "threeMonth": 5.37,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-25",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.95,
+        "threeMonth": 5.38,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-26",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 6.02,
+        "threeMonth": 5.34,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-30",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.31,
+        "threeMonth": 5.55,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-05-31",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.28,
+        "threeMonth": 5.52,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-01",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.3,
+        "threeMonth": 5.5,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-02",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.28,
+        "threeMonth": 5.5,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-05",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.25,
+        "threeMonth": 5.46,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-06",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.15,
+        "threeMonth": 5.44,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-07",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.07,
+        "threeMonth": 5.42,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-08",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.25,
+        "threeMonth": 5.38,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-09",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.25,
+        "threeMonth": 5.37,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-12",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.24,
+        "threeMonth": 5.4,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-13",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.19,
+        "threeMonth": 5.36,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-14",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.18,
+        "threeMonth": 5.36,
+        "fedFunds": 5.08
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    },
+    {
+      "set": "debt-ceiling-2023",
+      "date": "2023-06-15",
+      "reference": "2023-04-03",
+      "atDate": {
+        "oneMonth": 5.18,
+        "threeMonth": 5.33,
+        "fedFunds": 5.07
+      },
+      "atReference": {
+        "oneMonth": 4.7,
+        "threeMonth": 4.9,
+        "fedFunds": 4.83
+      }
+    }
+  ]
+}
