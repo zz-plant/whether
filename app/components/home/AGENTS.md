@@ -20,10 +20,11 @@ Use this guide when editing the home route shell, workspace bands, route handoff
 
 ## Homepage sequencing rules
 
-The homepage should read as:
-1. settle the weekly guidance
-2. turn the guidance into this week's plan
-3. open proof, trust, or deeper tools only if challenged
+The homepage should read as (one order for every reader since 2026-10-09; `HOME_SECTIONS`):
+1. settle the weekly guidance: the verdict, then whose stage and runway its lines are for
+2. turn the guidance into this week's plan: the five areas, what would change them, and the alert
+   the day a line is crossed
+3. open proof, trust, or deeper tools only if challenged: what changed, the record, sharing
 
 Planning is the default next step.
 Evidence, trust, replay, and tools are exception paths.
@@ -49,7 +50,7 @@ Prefer changing these before changing home presentation:
 ## Tests and docs to update
 
 When home orchestration or section order changes, update:
-- `tests/homeRouteDecisionTransmissionContract.test.tsx` (section/cadence placement contract)
+- `tests/homeRouteDecisionTransmissionContract.test.tsx` (section order and cadence placement contract)
 - `tests/homePageHeading.test.tsx`
 - `tests/reportShellSections.test.tsx` if shell behavior changes
 - `docs/feature-specs-current.md`

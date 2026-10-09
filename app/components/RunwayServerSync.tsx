@@ -34,7 +34,7 @@ export function RunwayServerSync() {
       const detail: unknown = event instanceof CustomEvent ? event.detail : undefined;
       // A typed figure has already written the cookie; the server catches up
       // the next time its part of the page is shown (a navigation, or the
-      // first-visit reveal), not mid-keystroke.
+      // next reload), not mid-keystroke.
       if (!isRunwayChangedDetail(detail) || !detail.bandChanged) return;
 
       const params = new URLSearchParams(searchParams?.toString() ?? "");

@@ -68,7 +68,6 @@ const renderSection = (snapshot: ReturnType<typeof snapshotFor>) => {
       reversalTrigger={fields.reversalTriggerLabel}
       resumeWhen={fields.resumeWhenLabel}
       guardrail={fields.guardrailLabel}
-      lastTime={null}
       callChangeLines={{ tightness: 70, riskAppetite: 50 }}
     />,
   );

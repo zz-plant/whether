@@ -390,35 +390,31 @@ describe("Wayfinding shortcuts and deep-links", () => {
     assert.match(html, /Funding pressure/);
   });
 
-  it("provides a direct jump to #subscribe beside the call-change line", () => {
+  /* The alert is its own section now, directly under "What would change this
+     guidance" (2026-10-09), so the link to it that closed that section is gone
+     and the section's heading says what the form is for. */
+  it("puts the alert under the lines it watches, headed by what it does", () => {
+    const { AlertSection } = require("../app/components/home/AlertSection");
+    const html = renderToStaticMarkup(<AlertSection />);
+    assert.match(html, /^<section id="subscribe"/);
+    assert.match(html, /<h2[^>]*>Get an email the day a line is crossed<\/h2>/);
+    assert.match(html, /Every Monday too/, "the Monday email stays one choice away");
+    assert.doesNotMatch(html, /Tell me when the guidance changes/, "the form does not restate the heading");
     const { WhatWouldChangeSection } = require("../app/components/home/WhatWouldChangeSection");
-    const html = renderToStaticMarkup(
-      <WhatWouldChangeSection
-        ladders={[]}
-        flipProximity={[]}
-        reversalTrigger="Risk appetite crossing 50"
-        callChangeLines={{ tightness: 70, riskAppetite: 50 }}
-      />,
+    const watch = renderToStaticMarkup(
+      <WhatWouldChangeSection ladders={[]} flipProximity={[]} reversalTrigger="Risk appetite crossing 50" callChangeLines={{ tightness: 70, riskAppetite: 50 }} />,
     );
-    assert.match(html, /href="#subscribe"/);
-    assert.match(html, /Get an email the day a line is crossed/);
+    assert.doesNotMatch(watch, /href="#subscribe"/);
   });
 
-  /* The plan link was a pill among two copy buttons, four arrow links and a
-     subscribe form at one weight. It is the section's primary button now; the
-     decision record is in the footer ("Your decisions"), with the other three. */
-  it("leads DoAndShareSection with the plan as its one primary action", () => {
-    const { DoAndShareSection } = require("../app/components/home/DoAndShareSection");
-    const html = renderToStaticMarkup(
-      <DoAndShareSection
-        operateHref="/operate"
-        currentRecordDate="2026-09-28"
-        currentRecordDateLabel="Sep 28, 2026"
-      />,
-    );
-    const plan = /<a[^>]*href="\/operate"[^>]*>/.exec(html)?.[0] ?? "";
-    assert.match(plan, /weather-button-primary|weather-cta-primary/, "the plan link is the primary button");
-    assert.doesNotMatch(html, /Track your decision record|Stress-test a plan|Connect an AI assistant/);
+  /* Share is copies only; the plan link closes the areas section, and the decision
+     record is in the footer ("Your decisions"). */
+  it("keeps the share section to copies and the permalink", () => {
+    const { ShareSection } = require("../app/components/home/ShareSection");
+    const html = renderToStaticMarkup(<ShareSection currentRecordDate="2026-09-28" currentRecordDateLabel="Sep 28, 2026" />);
+    assert.match(html, /<h2[^>]*>Share<\/h2>/);
+    assert.doesNotMatch(html, /href="\/operate"/, "the plan link is the areas section's");
+    assert.doesNotMatch(html, /Track your decision record|Stress-test a plan|Connect an AI assistant|Subscribe/);
     const layout = require("node:fs").readFileSync("app/layout.tsx", "utf8");
     assert.match(layout, /href="\/decisions"[^>]*>Your decisions</, "the decision record stays one click away, in the footer");
   });

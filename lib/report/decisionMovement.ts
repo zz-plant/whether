@@ -360,6 +360,20 @@ export const describeGuidanceChange = ({
  * none does (an earlier reading with an unusually long label), the shortest, for the
  * caller's own clamp to finish: it cuts less of a sentence than it would of the full one.
  */
+/**
+ * The week's cause in one line, for the verdict on the homepage: the lines the scores
+ * crossed since the earlier reading ("Risk appetite fell through 54."), or that none
+ * was crossed. The decision consequences are "What changed this week"'s sentence; this
+ * is only the why, short enough to sit under the headline action.
+ */
+export const describeMovementCause = (movement: Pick<DecisionMovement, "groups" | "comparedWith">): string => {
+  const crossings = uniqueLines(movement.groups.flatMap((group) => group.crossed)).map(describeCrossing);
+  if (crossings.length > 0) return `${upperFirst(joinAnd(crossings))}.`;
+  return movement.comparedWith
+    ? `No score crossed a pause or resume line since ${movement.comparedWith}.`
+    : "No score crossed a pause or resume line.";
+};
+
 export const fitMovementHeadline = (movement: Pick<DecisionMovement, "headline" | "headlines">, maxLength: number): string =>
   movement.headlines.find((line) => line.length <= maxLength)
   ?? movement.headlines.reduce((shortest, line) => (line.length < shortest.length ? line : shortest), movement.headline);

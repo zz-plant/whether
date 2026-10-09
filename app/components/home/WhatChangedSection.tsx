@@ -67,7 +67,6 @@ export function WhatChangedSection({
       lead={lead}
       /* In the reader's order: first what moved (the evidence), then what
          that changes (the consequences by area). Keeps DOM and visual order aligned. */
-      className="order-2"
     >
       {/* On phones each signal, movement and ladder gets the full measure.
           An auto-width movement column narrowed the signal's description to

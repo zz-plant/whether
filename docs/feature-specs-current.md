@@ -71,34 +71,52 @@ Evidence beside Search and More, and More opens a sheet with the rest
 
 ### 1.1 Weekly briefing (/) 
 The home page is the weekly brief. It renders in `Shell` (`app/components/Shell.tsx`), not the
-report shell the other reading routes use, and since 2026-09-22 it is five sections in the order a
-reader asks them (`HOME_SECTIONS` in `lib/report/home/homeSectionModel.ts`; `app/page.tsx`):
+report shell the other reading routes use. Since 2026-10-09 (site review) it prints one order for
+every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
+`lib/report/home/homeSectionModel.ts`; `app/page.tsx`; pinned by
+`tests/homeRouteDecisionTransmissionContract.test.tsx`):
 
-1. **The guidance** (`#weekly-call`). `DecisionHero` is the card a reader screenshots: the
-   conditions stamp with the week's direction and, when conditions changed, what they were at the
-   earlier reading; the action as the headline; the trust strip; and from `md` up the conditions
-   map (`RegimeRadar`) with its path of month-ends (§1.1.42, §1.1.44). A monthly or quarterly
-   horizon adds `CadenceCallCard` above it. Under the card sit `SinceLastVisit` and
-   `YourRecordNote` (live briefs only), then Copy Brief (`ShareBriefButton`, DD-005's one primary
-   action) and the Plan horizon control.
-2. **What changed this week** (`WhatChangedSection`): one row per signal, the earlier reading →
+0. **The conditions legend** (`home/ConditionsLegend.tsx`), one line above the week: Sunny, Cloudy,
+   Stormy and Freezing by funding pressure above or below its change line and risk appetite above
+   or below its, linked to the method. It replaced the standfirst and the folded "How to read this
+   page". Dismissible; the layout hides it for a browser that has rendered the brief before. The
+   week picker above the card names the week by its Monday and is a label, not a heading.
+1. **The verdict** (`#weekly-call`). `DecisionHero` is the card a reader screenshots: the conditions
+   stamp with the week's direction and, when conditions changed, what they were; the week's
+   headline action as the `h1` (`weeklyHeadline`, §1.1.60); what the conditions mean; one line on
+   why (`describeMovementCause`: the lines the scores crossed, "Risk appetite fell through 54."); the
+   trust strip ("Data as of", Sources, Margin, Could change next week); and from `md` up the
+   conditions map. A monthly or quarterly horizon adds `CadenceCallCard` above it with the `h1`.
+   Under the card sit `SinceLastVisit` and `YourRecordNote` (live briefs only), then Copy Brief
+   (DD-005's one primary action) and the Plan horizon control.
+2. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
+   only): whose lines these are, in one sentence, with the stage and runway tablists from `sm` up
+   (the header's pills on a phone), a chosen stage's own action as a stage line, and the runway
+   emphasis once a band reshaped a rule. Nothing lower on the page repeats the control.
+3. **The five areas** (`DecisionPicker`, `#what-it-changes`, "What are you deciding?"): each area
+   by its name with its standing against its pause line; a choice opens its rule, lines and the
+   runway test. All five side by side fold under it (`AllAreaRules`: the area table, the runway
+   notes and the commitment test), then the one plan button.
+4. **What would change this guidance** (`WhatWouldChangeSection`): the pause line, the resume line
+   (a chosen stage's, else the lead area's), the line where conditions change, the market move in
+   rate terms (folded), and below `md` the conditions map.
+5. **Get an email the day a line is crossed** (`AlertSection`, `#subscribe`): the one subscribe
+   form, starting on alerts only with the Monday email one choice away, and the push toggle.
+6. **What changed this week** (`WhatChangedSection`): one row per signal, the earlier reading →
    this week's with the comparison dated (§1.1.26), each composite score on its ladder with what
    moved it (§1.1.27), under the movement sentence (§1.1.28).
-3. **What that changes for you** (`WhatItChangesSection`): each decision area's rule with its
-   pause and resume lines and the distance to each (`AreaTable`), the stage and runway calibration
-   (`#company-calibration`), and, on a live brief with a runway figure, the runway-conditioned
-   notes (§1.1.16).
-4. **What would change this guidance** (`WhatWouldChangeSection`): the two score ladders, the
-   market move that would cross each change line, and, on a week the guidance moved, what happened
-   the last time it moved this way.
-5. **Do and share** (`DoAndShareSection`): the plan as the one primary button, the slide and image
-   copies, subscribe and the browser push alert, and the citable permalink.
+7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
+   they moved the same way and where the scores stood three months on; the last turns as links.
+8. **Share** (`ShareSection`): the slide and image copies, a link to every other format, and the
+   citable permalink.
 
-A first visit sees "What are you deciding?" (`DecisionPicker`) under the card, with sections 2 to 5
-folded until "Show the full brief" (§1.1.21, §1.1.42). `StickyCallStrip` carries the guidance from
-`md` up. An archived month drops the trust strip for an archive caption and leaves out
-`SinceLastVisit`, `YourRecordNote` and the runway notes. `/` mounts `ActivationTracker` and
-`OperatorWorkflowRouteTracker`; the workflow stream records route transitions (§1.1.30).
+There is no first-visit fold since 2026-10-09: the order puts the areas, the lines and the alert
+before the evidence for every reader, so the fold (§1.1.21, §1.1.42) and its "Show the full brief"
+button are gone, and the bootstrap no longer marks a first visit. `StickyCallStrip` carries the
+guidance from `md` up, with a "By area" link to section 3. An archived month drops the trust strip
+for an archive caption and leaves out `SinceLastVisit`, `YourRecordNote`, the stage and runway
+section and the runway notes. `/` mounts `ActivationTracker` and `OperatorWorkflowRouteTracker`;
+the workflow stream records route transitions (§1.1.30).
 
 The decision contract's labels come from `DECISION_CONTRACT_LABELS` (`lib/report/reportCopy.ts`):
 `Do now` / `Action now`, `Pause if`, `Resume when`, and `Conditions change if`. The lines are built in
@@ -2679,6 +2697,35 @@ boxed share cards (a frame inside the section's hairline, §XIII).
   moved row's tint is inset from its text, and the other rows' "Changed" cells sit in the muted ink.
 
 `tests/homeDecisionPicker.test.tsx` holds the parameter, its parse and the replace.
+
+### 1.1.60 One vocabulary, one headline, one count (site review, 2026-10-09)
+
+A live review of every route found the same few things said several ways. Each is now said once:
+
+- **Areas, lines, signals.** Areas print as Hiring, Roadmap, Fundraising, Spending and New bets
+  (`decisionAreaLabel`, which the `/operate` levers now read too); lines as the pause line, the
+  resume line and the change line (export noun slots Action / Pause line / Resume line); signals as
+  Funding pressure, Risk appetite and Recession warning gauge, in full on charts. Slugs and JSON
+  fields are unchanged. `tests/readerVocabulary.test.tsx` bans the retired names.
+- **The margin.** What the API calls `confidence` prints as the margin: "Clear of / Within reach of /
+  Close to the line", with the nearer score's points where a surface holds the scores
+  (`resolveNearestLineMargin`; mapping in `docs/developer/api-reference.md`). "Confidence: Low" beside
+  "Freeze new commitments" read as a contradiction; `/calibration` shows the number is a distance.
+- **The headline action.** `weeklyHeadline` (`lib/report/reportEvidence.ts`) is the one source for the
+  homepage `h1`, the frozen brief's lead, answer pages, every paste, the Monday post and email and the
+  share and OG cards. It is the contract's call (`currentCall`; `PublishedBrief.summary` frozen), the
+  more concrete of the two week-level sentences; the action's first sentence (the direction) rides
+  on the stamp or opens a paste, and on a held week the hold's action leads. Per-area "Do now" lines
+  stay area lines. `tests/weeklyHeadline.test.tsx`.
+- **Weeks and dates.** A week is named by its Monday (`formatWeekMondayUTC`); the strip says "Data as
+  of" and the intro "Checked" for the two dates it prints.
+- **The record.** `countRecord` (`lib/report/trackRecord.ts`) counts readings, comparisons
+  (readings − 1) and changes, for the whole record or a trailing window, and every count prints with
+  its window. Seven changes since Jan 2012; `/calibration`'s "six" predated September 2026.
+  `tests/recordCounts.test.tsx` holds the calibration study's own extract to the same counts.
+- **Elsewhere:** `/resources` is "Guides"; the method moved from `/trust` to `/about#method` (§1.1.9);
+  `/history/<period>` says the reading is reconstructed by today's formula and when publication began;
+  report-route loading fallbacks ship no sentence in server HTML.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
-import { areaLinesFromRules, buildDecisionMovement, fitMovementHeadline } from "../lib/report/decisionMovement";
+import { areaLinesFromRules, buildDecisionMovement, describeMovementCause, fitMovementHeadline } from "../lib/report/decisionMovement";
 import type { RegimeKey } from "../lib/regimeEngine";
 import { REGIME_ORDER } from "../lib/regimePresentation";
 
@@ -278,5 +278,24 @@ describe("fitMovementHeadline", () => {
     }
 
     assert.ok(checked > 1000);
+  });
+});
+
+/* The homepage verdict's one line on why (site review, 2026-10-09): the lines the
+   scores crossed, never the consequences, which "What changed this week" states. */
+describe("describeMovementCause", () => {
+  it("names the crossings, and only the crossings", () => {
+    const moved = movement({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
+    assert.ok(moved);
+    const cause = describeMovementCause(moved);
+    assert.match(cause, /^Funding pressure rose through \d+/);
+    assert.match(cause, /risk appetite fell through \d+\.$/);
+    assert.doesNotMatch(cause, /Pause now applies|Resume line/);
+  });
+
+  it("says no line was crossed, dated by the comparison, on a week that held", () => {
+    const held = movement({ from: { tightness: 90, riskAppetite: 43 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
+    assert.ok(held);
+    assert.equal(describeMovementCause(held), "No score crossed a pause or resume line since Aug 31.");
   });
 });

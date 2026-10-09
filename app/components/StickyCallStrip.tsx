@@ -152,10 +152,10 @@ export function StickyCallStrip({ call, direction, weatherWord, marginLabel, sha
             <span className="min-w-0 flex-1 truncate font-medium text-white">{call}</span>
             <span className="shrink-0 text-slate-400">{marginLabel}</span>
             <a
-              href={`#${HOME_SECTIONS.consequences.id}`}
+              href={`#${HOME_SECTIONS.areas.id}`}
               className="weather-focus-ring inline-flex min-h-[44px] shrink-0 items-center text-sky-300 underline decoration-sky-700 underline-offset-4"
             >
-              What it changes
+              By area
             </a>
           </p>
         </div>

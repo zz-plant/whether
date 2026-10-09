@@ -65,14 +65,12 @@ const buildOrientationBootstrapScript = () => `
     const dismissed = window.localStorage.getItem(${JSON.stringify(orientationDismissKey)}) === "1";
 
     root.dataset.homeOrientationDismissed = dismissed ? "true" : "false";
-    // First visit: this browser has never rendered the brief (ActivationTracker
-    // stores the week on every visit) and never dismissed the explainer. The
-    // homepage folds everything below the call behind one question for it.
+    // Whether this browser has rendered the brief before (ActivationTracker stores
+    // the week on every visit); the conditions legend hides for one that has.
     const seenBefore = window.localStorage.getItem(${JSON.stringify(activationLastWeekStorageKey)}) !== null;
-    root.dataset.homeFirstVisit = dismissed || seenBefore ? "false" : "true";
     // Set once per page load and never flipped mid-session: the rule in
-    // home-flow.css hides the explainer on it, and the explainer sits above the
-    // call, so changing it after paint would move the call.
+    // home-flow.css hides the legend on it, and the legend sits above the
+    // verdict, so changing it after paint would move the verdict.
     root.dataset.homeReturning = seenBefore ? "true" : "false";
 
     if (!document.head.querySelector('style[data-weather-ui-bootstrap="orientation"]')) {

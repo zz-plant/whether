@@ -37,6 +37,9 @@ import { buildWeeklyStructured, buildWeeklySummary } from "../lib/summary/weekly
 import { buildYearlySummary } from "../lib/summary/yearlySummary";
 import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { DecisionPicker } from "../app/components/home/DecisionPicker";
+import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
+import { CompanyCalibration } from "../app/components/home/CompanyCalibration";
+import { AlertSection } from "../app/components/home/AlertSection";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 
 const mockAny: any = mock;
@@ -259,8 +262,20 @@ const routeSurfaces: Surface[] = [
             options={decisionAreaOrder.map((area) => ({ area, rule: "Rule", pause: undefined, resume: undefined }))}
             regime="SCARCITY"
             scores={{ tightness: 90, riskAppetite: 49 }}
-            turningPoints={[]}
           />,
+        ),
+      ),
+  },
+  {
+    name: "/ legend, stage and runway, alert",
+    text: () =>
+      visibleText(
+        renderToStaticMarkup(
+          <>
+            <ConditionsLegend thresholds={{ tightnessRegime: 70, riskAppetiteRegime: 50 }} currentRegime="SCARCITY" />
+            <CompanyCalibration stageLabel="Series A" runwayPhrase="12–24 months" chosen={false} activeStage="series-a" />
+            <AlertSection />
+          </>,
         ),
       ),
   },

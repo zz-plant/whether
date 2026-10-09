@@ -1,10 +1,4 @@
 import type { PolicyRefusalCode } from "../regimeEngineCore";
-import { CALL_CHANGE_RULE } from "./trackRecordCopy";
-
-type FirstTimeGuideEntry = {
-  label: string;
-  detail: string;
-};
 
 type TermDefinition = {
   value: string;
@@ -225,54 +219,6 @@ export const describeMacroNotOnRecord = (period = "this month") => `Not on recor
 
 export const PRIMARY_AUDIENCE_SUMMARY =
   "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
-
-/*
- * The newcomer's guide on `/` ("How to read this page"), in the page's own words.
- *
- * Its first version named steps the page did not draw ("Summary", "Proof",
- * "Actions"), sent the reader to "the score details" and "the planning page",
- * and said a stage and runway changed "the notes under the guidance and nothing
- * else" beside a picker that says they set the lines. A guide whose nouns are
- * not on the screen is a second vocabulary to learn. Each step here names the
- * label it points at, and each line names what the reader will see it drawn as.
- */
-export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideEntry[] = [
-  {
-    label: "Read the guidance",
-    detail:
-      "The weather word names this week's conditions; the headline under it says what to do. The strip below shows how fresh the data is and how close a score is to changing conditions.",
-  },
-  {
-    label: "Pick what you're deciding",
-    detail:
-      "Each choice under “What are you deciding?” gives that area's rule this week, the line that pauses it and the line that resumes it.",
-  },
-  {
-    label: "Act on it",
-    detail:
-      "Copy the brief into Slack, build this week's plan from it, or get an email the day a line is crossed.",
-  },
-];
-
-/*
- * The page draws three lines on one 0-100 scale and names two kinds: the change
- * line on the Conditions chart and the score rows, and each area's pause and
- * resume lines in the picker. A first visit meets "2 pts from its line", "Pause
- * line crossed" and "Change line 70" within one screen and has to work out
- * that they are different lines. `CALL_CHANGE_RULE` is said once per page, and
- * `/` did not otherwise say it.
- */
-export const FIRST_TIME_GUIDE_LINES: FirstTimeGuideEntry[] = [
-  {
-    label: DECISION_CONTRACT_LABELS.watch.changeLine,
-    detail: `One per score, drawn dashed across the Conditions chart. ${CALL_CHANGE_RULE}`,
-  },
-  {
-    label: "Pause and resume lines",
-    detail:
-      "Each area has its own pair: its decisions pause past the pause line and re-open past the resume line. Your stage and runway move both.",
-  },
-];
 
 /**
  * Definitions for machine readers, not a page.
