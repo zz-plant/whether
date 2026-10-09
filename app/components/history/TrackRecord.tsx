@@ -1,10 +1,12 @@
 import type { ReactNode } from "react";
+import Link from "next/link";
 import type {
   TrackRecord as TrackRecordModel,
   TrackRecordRow,
 } from "../../../lib/report/trackRecord";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/formatters";
-import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
+import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
+import { OPERATING_LATITUDE_RISK_WEIGHT } from "../../../lib/report/weeklyLeadershipBrief";
 import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
 import { StatTile } from "../ui/statTile";
 import { UrlDetails } from "../ui/urlDetails";
@@ -203,9 +205,19 @@ export function TrackRecordTable({
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
       <div>
         <h2 className="text-xl font-semibold text-white sm:text-2xl" id="monthly-calls-heading">Monthly readings</h2>
+        {/* Defined where it first appears (2026-10-09): the homepage reads two
+            scores and never introduces a third, so a reader met this one cold.
+            It is kept rather than replaced by the two, because it is not
+            equivalent to them: it is a weighted blend, and the month-to-month
+            change column is a move in that blend. */}
         <p className="text-sm text-slate-300">
-          The {OPERATING_LATITUDE_LABEL.toLowerCase()} score behind each reading, newest first. It runs
-          0 to 100: {OPERATING_LATITUDE_GLOSS}.
+          Each month&apos;s {OPERATING_LATITUDE_LABEL.toLowerCase()}, newest first: one 0 to 100 score
+          that blends the two scores, {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite and{" "}
+          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% the inverse of funding pressure, so
+          higher means more room to hire, spend and commit.{" "}
+          <Link href="/trust#formula-reference" className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+            How it is computed
+          </Link>
         </p>
       </div>
 
