@@ -21,6 +21,7 @@ import {
   type RampId,
 } from "../../lib/research/candidateRamps";
 import type { RegimeKey } from "../../lib/regimeEngineCore";
+import { getBundledMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { RATE_INPUTS_PATH, REGISTERED_RECORD_END, RateInputsSchema, type RateInputs } from "./premiseTestRateInputs";
 import { VENTURE_DATASET_PATH, VentureDatasetSchema, quarterIndex, shiftQuarter } from "./ventureFundraising";
 import {
@@ -239,6 +240,22 @@ const runPremiseTest = () => {
       throw new Error(`The current ramp does not reproduce the published record at ${entry.recordDate}.`);
     }
   });
+  // And the walk must be the bundled monthly record before any statistic is computed (§5).
+  const bundled = getBundledMonthlyRegimeHistory().filter((entry) => entry.record_date <= REGISTERED_RECORD_END);
+  if (
+    bundled.length !== published.length ||
+    bundled.some((entry, index) => {
+      const walked = published[index];
+      return (
+        walked.recordDate !== entry.record_date ||
+        walked.regime !== entry.regime ||
+        walked.tightness !== entry.tightness ||
+        walked.riskAppetite !== entry.riskAppetite
+      );
+    })
+  ) {
+    throw new Error("The replayed record differs from data/summary_monthly_regime_history.json.");
+  }
 
   const mature = growthSeries(venture, "mature");
   const firstPublished = growthSeries(venture, "firstPublished");
