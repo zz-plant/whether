@@ -70,7 +70,7 @@ describe("weekly operator brief export adapters", () => {
     assert.deepEqual(payload.boldnessBudget, { score: 42, delta: -3 });
     // Two points above the tightness line: the published band is Low, whatever
     // the fixture's engine code says.
-    assert.equal(payload.confidence, "Low confidence");
+    assert.match(payload.confidence, /^Margin: close to the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/);
     // The paste line adds what the weather means; the contract field stays the modeled label.
     assert.match(payload.conditions, /^Defensive · Late Cycle \(money is [a-z ]+\)$/);
     assert.equal(payload.currentCall, weeklyCall.currentCall);
@@ -95,7 +95,7 @@ describe("weekly operator brief export adapters", () => {
     assert.match(text, /Weekly Operator Brief — 2026-03-04/);
     // The number never travels without what it measures.
     assert.match(text, /Operating latitude: 58\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: \+4 points/);
-    assert.match(text, /^Low confidence$/m);
+    assert.match(text, /^Margin: close to the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/m);
     assert.doesNotMatch(text, /\bLOW\b|Boldness/);
     assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
     assert.match(text, /Conditions:/);

@@ -83,7 +83,7 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(markdown.includes(`CONDITIONS CHANGE IF**: ${payload.callChangesIf}`));
     assert.ok(markdown.includes(`RESUME WHEN**: ${payload.resumeWhen}`));
     assert.ok(!markdown.includes("CHANGE COURSE IF"), "the slide uses the page's name for the change line");
-    assert.ok(/Medium confidence|High confidence|Low confidence/.test(markdown), "confidence reads as a word, not the engine's code");
+    assert.ok(/Margin: (within reach of|clear of|close to) the line/.test(markdown), "the margin reads as words, not the engine's code");
     assert.ok(markdown.includes("Freezing"));
     assert.ok(!markdown.includes("SCARCITY"), "the engine key must not reach a pasted slide");
   });

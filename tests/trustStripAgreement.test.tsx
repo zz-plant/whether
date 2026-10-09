@@ -187,9 +187,10 @@ const propsHandedTo = <P,>(node: ReactNode, component: (props: P) => ReactNode):
    to live in; this runs the same loader with the cache taken out. */
 const uncached: typeof unstable_cache = (load) => load;
 
-const WORD = { HIGH: "High", MED: "Medium", LOW: "Low" } as const;
+/* The display name for the API's `confidence` is the margin (2026-10-09). */
+const BAND = { HIGH: "clear of the line", MED: "within reach of the line", LOW: "close to the line" } as const;
 
-describe("one reading's confidence across routes and exports", () => {
+describe("one reading's margin across routes and exports", () => {
   it("is the published band on /, /signals, /operate, /trust, the API posture state and every /share paste", async () => {
     const [
       { assembleHomePage },
@@ -250,12 +251,12 @@ describe("one reading's confidence across routes and exports", () => {
     assert.equal(surfaces.signals, published.label, "/signals");
     assert.equal(surfaces.operate, published.label, "/operate");
     assert.equal(surfaces.trust.trustStrip.confidenceLabel, published.label, "/trust strip");
-    assert.match(surfaces.trust.meetingSnippet, new RegExp(`^Confidence: ${WORD[published.label]} \\(`, "m"), "/trust meeting snippet");
+    assert.match(surfaces.trust.meetingSnippet, new RegExp(`^Trust: Margin: ${BAND[published.label]} \\(`, "m"), "/trust meeting snippet");
     assert.equal(surfaces.postureState?.currentState.confidenceLabel, published.label, "posture state (/api/weekly, /api/monthly, MCP)");
     assert.equal(surfaces.postureState?.currentState.confidencePercent, published.percent, "posture state percent");
     assert.equal(surfaces.shareArtifact?.confidenceLabel, published.label, "/share copy picker");
 
-    // Every band a /share paste prints, in either of its two phrasings.
+    // Every band a /share paste prints, under its one label.
     const { pastes } = surfaces;
     assert.ok(pastes, "/share hands its pastes to the format picker");
     const textOf = (id: string) => {
@@ -269,11 +270,11 @@ describe("one reading's confidence across routes and exports", () => {
       email: textOf("email"),
     };
     for (const [key, text] of Object.entries(texts)) {
-      const bands = [...text.matchAll(/\b(High|Medium|Low) confidence\b|Confidence: (High|Medium|Low)\b/g)]
-        .map((match) => match[1] ?? match[2]);
-      assert.ok(bands.length > 0, `${key} prints a confidence band`);
-      assert.deepEqual([...new Set(bands)], [WORD[published.label]], `${key} prints one band, the published one`);
-      assert.doesNotMatch(text, /confidence is not high/i, `${key} says confidence is not high on a High week`);
+      const bands = [...text.matchAll(/\bMargin: (clear of the line|within reach of the line|close to the line)\b/gi)]
+        .map((match) => match[1]?.toLowerCase());
+      assert.ok(bands.length > 0, `${key} prints a margin band`);
+      assert.deepEqual([...new Set(bands)], [BAND[published.label]], `${key} prints one band, the published one`);
+      assert.doesNotMatch(text, /\b(High|Medium|Low) confidence\b|Confidence:/, `${key} still prints the retired confidence label`);
     }
     const investor = pastes.find((candidate) => candidate.id === "investor-update");
     assert.ok(investor?.kind === "investor", "/share offers the investor update");

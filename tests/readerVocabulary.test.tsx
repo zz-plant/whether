@@ -126,6 +126,14 @@ const BANNED: { name: string; pattern: RegExp }[] = [
     pattern: /\b(Threshold|Reversal)\s*:|\b(Trigger|Reversal) at \d|\b(boundary|boundaries)\b|\bnear-threshold\b|\bAgainst its threshold\b|\breversal (trigger|condition)s?\b/i,
   },
   { name: "retired signal name", pattern: /\bCapital tightness\b|\bRecession warning watch\b/i },
+  /* The margin (2026-10-09). "Confidence: Low" beside "Freeze new commitments" read
+     as the product doubting its advice; the number is a distance from the change
+     line (/calibration), so it is shown as one. The API field keeps `confidence`. */
+  {
+    name: "confidence as a display label",
+    pattern:
+      /\b(High|Medium|Low|reduced|Guarded|recommendation) confidence\b|\bConfidence\s*[:(]|\bConfidence (High|Medium|Low)\b|\bconfidence (is|was|now|drops?|dropped)\b|\bconfidence (label|number|score|figure|record)\b|\bat (high|medium|low) confidence\b/i,
+  },
   /* The header's names are Brief, Plan, Evidence, Resolve, Trust and History
      (lib/navigation/informationArchitecture.ts). Search results, the answer pages and the 404
      page still said "Decision Tools", and the resource CTAs "Open Planning", until 2026-10-06. */

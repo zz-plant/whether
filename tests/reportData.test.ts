@@ -209,12 +209,12 @@ describe("buildReportEvidenceItems", () => {
       formatConfidencePlainLabel(resolvePublishedConfidence({ assessment }).label),
     );
     // Funding pressure is 20 points past its line: that one is well clear.
-    assert.match(item("tightness").confidenceLabel, /^High \(well clear/);
+    assert.match(item("tightness").confidenceLabel, /^Clear of the line/);
 
     // The other way round: a half-point move used to read Low ("close to the
     // line") whatever the distance. 6.5 points above the risk line is not close.
     const quiet = weekOf({ ...oct5, riskAppetite: 56.5 });
-    assert.match(quiet.item("riskAppetite").confidenceLabel, /^High/);
+    assert.match(quiet.item("riskAppetite").confidenceLabel, /^Clear of the line/);
   });
 
   it("states the recession warning gauge's payback bar as the Spending rule's, with no condition the reading contradicts", () => {

@@ -166,7 +166,7 @@ export const buildMonthlyStructured = ({
   const reversalConditions = [
     transitionWatch
       ? restartWhen
-      : "Re-check the plan if conditions or the confidence behind them weaken.",
+      : "Re-check the plan if conditions weaken or a score nears its change line.",
     "Re-check the plan as soon as any execution constraint starts to bind.",
   ];
   const source = formatSourceLine(provenance);

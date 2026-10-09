@@ -29,7 +29,7 @@ import { createHomePageReportDataLoader } from "../lib/report/homePageData";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { assembleCurrentWeekBrief } from "../lib/report/publishedBriefRecord";
 import { describePolicyHold } from "../lib/report/regimeDescription";
-import { formatConfidenceChipLabel } from "../lib/report/reportFormatting";
+import { formatMarginStamp } from "../lib/report/reportFormatting";
 import {
   anyPauseLineMet,
   buildCallChangeLine,
@@ -252,7 +252,7 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(record.recordDate, recordDate, "the frozen record");
         assert.match(slack, new RegExp(`^Whether Weekly Brief — ${recordDate}$`, "m"), "the Monday post");
         assert.equal(agent.confidence.label, confidence);
-        assert.ok(embedText.includes(formatConfidenceChipLabel(confidence)));
+        assert.ok(embedText.includes(formatMarginStamp(confidence)));
         assert.equal(memo.confidence, confidence, "the /api/decision memo");
         assert.equal(record.confidenceLabel, confidence, "the frozen record");
       });

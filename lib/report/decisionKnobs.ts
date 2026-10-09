@@ -285,7 +285,7 @@ export const buildWeeklyLockCommitment = ({
   freshnessDegraded,
 }: WeeklyLockCommitmentContext): WeeklyLockCommitment => {
   const trustMarkers = [
-    confidenceDegraded ? "Confidence: Guarded" : "",
+    confidenceDegraded ? "Margin: close to the line" : "",
     freshnessDegraded ? "Freshness: Stale" : "",
   ].filter((marker) => marker.length > 0);
 

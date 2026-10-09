@@ -417,7 +417,7 @@ export async function buildPlanningPageModel(
             : null,
         ),
         failureModes.length === 0
-          ? h("p", { className: "text-sm text-slate-200" }, "No warning this week. Keep the rules above; look again if the data goes stale or confidence drops.")
+          ? h("p", { className: "text-sm text-slate-200" }, "No warning this week. Keep the rules above; look again if the data goes stale or a score nears its change line.")
           /* Rule segments inside the section, like the Stop and Start lists: the
              data tier, no lift of their own (§XIII, §XIV). */
           : h("ul", { className: "grid gap-3 lg:grid-cols-2" },

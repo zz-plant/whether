@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { HomeSharePreview } from "../../../lib/report/homeSharePreview";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { formatConfidenceChipLabel } from "../../../lib/report/reportFormatting";
+import { formatMarginStamp } from "../../../lib/report/reportFormatting";
 import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
 import { SANS_EM, DISPLAY_EM, fitLines, wrappedLines } from "../../../lib/image/textFit";
 import {
@@ -133,7 +133,7 @@ const box = (label: string, value: string, valueSize: number, labelColor: string
 export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => {
   const regimeColor = REGIME_HEX_COLORS[preview.regime];
   /* The card travels furthest of anything the site makes; "MED" is the engine's code, not a word. */
-  const confidence = formatConfidenceChipLabel(preview.confidenceLabel);
+  const confidence = formatMarginStamp(preview.confidenceLabel);
   const layout = layoutReportCard(preview);
 
   return (

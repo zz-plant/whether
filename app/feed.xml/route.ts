@@ -1,6 +1,6 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
+import { formatMarginStamp } from "../../lib/report/reportFormatting";
 import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
 import { buildSocialImageUrl, canonicalPositioningLine, escapeXml, organizationName } from "../../lib/seo";
 import { publisherAuthor } from "../../lib/publisher";
@@ -91,7 +91,7 @@ const publishedItems = (): FeedItem[] =>
         `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(brief.actionNow)}</p>`,
         /* Through the display layer: w38 and w39 stored "Pressure increased by +3.0 this week", a figure in no unit against Aug 31. */
         `        <p><strong>What changed:</strong> ${escapeXml(display.whatChanged)}</p>`,
-        `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · ${escapeXml(display.confidence)}</p>`,
+        `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · Margin: ${escapeXml(display.confidence.toLowerCase())}</p>`,
         `        <p><a href="${escapeXml(link)}">Read the published brief →</a></p>`,
       ].join("\n"),
     };
@@ -111,7 +111,7 @@ export async function GET() {
        printed `summary.confidence`, the engine's own label, as a raw code ("MEDIUM")
        while the page said "High confidence". The phrase carries its own noun, so it
        stands alone: under a "Confidence:" label it read "Confidence: Medium confidence." */
-    const confidence = formatConfidenceChipLabel(brief.confidence.label);
+    const confidence = formatMarginStamp(brief.confidence.label);
 
     /*
      * The current week, until it is frozen. Once the archive holds a record for

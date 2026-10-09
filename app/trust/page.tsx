@@ -79,7 +79,7 @@ export default async function MethodPage({
 
       <ReportSection
         id="confidence-limits"
-        title="Confidence and reliability limits"
+        title="Margin and reliability limits"
         description="How reliable the brief is, what should pause it, and what would force a change."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -116,7 +116,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="Confidence measures how far the scores sit from the line where conditions change. Whether readings at that distance actually held is measured separately, over the whole archive."
+        description="The margin is how far the scores sit from the line where conditions change. Whether readings at that distance actually held is measured separately, over the whole archive."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study

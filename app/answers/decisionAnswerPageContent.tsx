@@ -21,7 +21,7 @@ import { AreaTable } from "../components/ui/areaTable";
 import { DecisionHero } from "../components/DecisionHero";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
-import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
+import { formatMarginStamp } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildFlipThreshold, buildWeekCallChangesIf } from "../../lib/report/reportEvidence";
 import { formatThresholdNumber } from "../../lib/formatters";
@@ -141,7 +141,7 @@ export async function DecisionAnswerPageContent({
       },
       {
         question: "How current is this reading?",
-        answer: `Data date ${recordDateLabel}, refreshed ${fetchedAtLabel}, ${formatConfidenceChipLabel(homeBriefModel.confidenceLabel).toLowerCase()}.`,
+        answer: `Data as of ${recordDateLabel}, checked ${fetchedAtLabel}. ${formatMarginStamp(homeBriefModel.confidenceLabel)}.`,
       },
       {
         question: "What is this based on?",

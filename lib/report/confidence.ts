@@ -56,6 +56,29 @@ const resolveLineGaps = ({ scores, thresholds }: ConfidenceInputs) => ({
   riskAppetite: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime) * RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
 });
 
+/**
+ * The margin a reader is shown: the score nearest its change line, chosen the way
+ * the published label chooses it (on the tightness-equivalent scale), and how many
+ * of that score's own points separate it from the line, so the number can be
+ * checked against the score printed beside it. Null when an input was imputed:
+ * a distance from a stand-in value is not a margin.
+ *
+ * The API keeps calling this `confidence`; pages, pastes and email call it the
+ * margin, because a distance is what it is (docs/developer/api-reference.md).
+ */
+export const resolveNearestLineMargin = (
+  inputs: ConfidenceInputs,
+): { signal: "tightness" | "riskAppetite"; points: number } | null => {
+  if (hasImputedInputs(inputs)) return null;
+  const gaps = resolveLineGaps(inputs);
+  const signal = gaps.riskAppetite < gaps.tightness ? "riskAppetite" : "tightness";
+  const raw =
+    signal === "tightness"
+      ? Math.abs(inputs.scores.tightness - inputs.thresholds.tightnessRegime)
+      : Math.abs(inputs.scores.riskAppetite - inputs.thresholds.riskAppetiteRegime);
+  return { signal, points: Math.round(raw) };
+};
+
 /** Points from the nearest regime boundary, on the tightness scale. */
 export const resolveDistanceToFlip = (inputs: ConfidenceInputs): number => {
   const gaps = resolveLineGaps(inputs);

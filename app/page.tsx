@@ -17,7 +17,7 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
-import { CONFIDENCE_WORD } from "./components/trustStrip";
+import { formatStripMargin } from "../lib/report/reportFormatting";
 import { isRoute } from "../lib/navigation/routeType";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
@@ -731,7 +731,7 @@ async function PageContent({
         call={primaryCall}
         direction={signalDirection}
         weatherWord={publicRegimeLabel}
-        confidenceWord={CONFIDENCE_WORD[confidenceLabel ?? "HIGH"]}
+        marginLabel={formatStripMargin(confidenceLabel ?? "HIGH", trustStripProps.margin?.points)}
         shareLines={briefShareLines}
       />
     </Shell>

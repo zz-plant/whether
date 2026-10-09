@@ -173,7 +173,7 @@ describe("published brief date-pinned exports", () => {
     const slack = buildPublishedBriefSlackUpdate(july30Brief);
 
     assert.match(slack, /Whether Weekly Brief — Jul 30, 2026/);
-    assert.match(slack, /Conditions: (Sunny|Cloudy|Stormy|Freezing) \(medium confidence\)/);
+    assert.match(slack, /Conditions: (Sunny|Cloudy|Stormy|Freezing) \(margin: within reach of the line\)/);
     /* The stored sentences, as the display layer restates them (`publishedBriefDisplay`):
        no "+1.2" in no unit, no "flips this call", no stop-item under "Pause if". */
     assert.match(slack, /• What changed: Conditions tightened\. This record does not name the earlier reading it compared with\./);
@@ -208,7 +208,7 @@ describe("published brief date-pinned exports", () => {
 
     assert.match(email, /Whether Leadership Update — Week of Jul 30, 2026/);
     assert.match(email, /Conditions: (Sunny|Cloudy|Stormy|Freezing)\n/);
-    assert.match(email, /Confidence: Medium confidence/);
+    assert.match(email, /^Margin: within reach of the line$/m);
     assert.match(email, /Executive summary: Keep expansion selective/);
     assert.match(email, /What changed this week:\nConditions tightened\. This record does not name the earlier reading it compared with\./);
     assert.match(email, /• Action now: Conditions tightening — freeze new commitments and keep spend flexible\./);

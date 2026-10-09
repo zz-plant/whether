@@ -157,7 +157,7 @@ export const POLICY_OVERRIDE_CALL = {
     callChangesIf:
       "The two scores point the same way for a second reading; until then the guidance is not changing.",
     holdsUntil: "the two scores agree",
-    whyCouldBeWrong: "The two scores disagree, so this week's direction can't be read with confidence.",
+    whyCouldBeWrong: "The two scores disagree, so this week's direction can't be read clearly.",
   },
   /* The spread of the two scores and the two composites behind them, taken at
      one instant: not a move over time, so nothing here says "swung" or "lately". */
@@ -169,7 +169,7 @@ export const POLICY_OVERRIDE_CALL = {
     pauseIf: HELD_PAUSE_IF,
     callChangesIf: "The signals line up on a later reading; until then the guidance is not changing.",
     holdsUntil: "the signals line up",
-    whyCouldBeWrong: "The signals are spread too far apart, so this week's direction can't be read with confidence.",
+    whyCouldBeWrong: "The signals are spread too far apart, so this week's direction can't be read clearly.",
   },
   /* A live read only: a replayed month is judged on the inputs its record
      carries (`RegimeEvaluationContext.inputsNotOnRecord`), so "this week" is true. */
@@ -180,7 +180,7 @@ export const POLICY_OVERRIDE_CALL = {
     pauseIf: HELD_PAUSE_IF,
     callChangesIf: "The missing inputs return in a live reading; until then the guidance is not changing.",
     holdsUntil: "the missing inputs return",
-    whyCouldBeWrong: "Too many inputs are missing, so this week's direction can't be read with confidence.",
+    whyCouldBeWrong: "Too many inputs are missing, so this week's direction can't be read clearly.",
   },
 } as const satisfies Record<PolicyRefusalCode, PolicyHoldCall>;
 
@@ -195,7 +195,7 @@ export const POLICY_OVERRIDE_CALL_UNNAMED = {
   pauseIf: HELD_PAUSE_IF,
   callChangesIf: "The hold lifts on a later reading; until then the guidance is not changing.",
   holdsUntil: "the hold lifts",
-  whyCouldBeWrong: "The guidance is on hold, so this week's direction can't be read with confidence.",
+  whyCouldBeWrong: "The guidance is on hold, so this week's direction can't be read clearly.",
 } as const satisfies PolicyHoldCall;
 
 /**
@@ -341,8 +341,8 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
   },
   {
     value: "confidence",
-    term: "Confidence (High, Medium, Low)",
-    summary: "How far this week's scores sit from the nearest line. Low means a small move would change conditions, so keep commitments reversible.",
+    term: "Margin (close to, within reach of, or clear of the line)",
+    summary: "How far this week's scores sit from the nearest change line, in points. Close means a small move would change conditions, so keep commitments reversible. The API calls it confidence; it is not a probability.",
   },
   {
     value: "fallback-mode",

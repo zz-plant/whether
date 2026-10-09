@@ -125,12 +125,12 @@ describe("buildSlackBrief", () => {
     // scale) is High. The fixture's engine code says MEDIUM, and neither that
     // code nor its band reaches a paste any more.
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /^• High confidence$/m);
+    assert.match(brief, /^• Margin: clear of the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/m);
     assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
-    /* The contract's sentence, which reads the confidence: this High week is
+    /* The contract's sentence, which reads the margin: this clear week is
        not told it sits near a line. */
     assert.doesNotMatch(brief, /The scores sit near a line/);
-    assert.match(brief, /• Even at high confidence, individual signals can reverse/);
+    assert.match(brief, /• The scores are clear of the change lines, but a signal can still reverse/);
   });
 
   it("carries each area's timing line into the per-area rows", () => {
@@ -204,7 +204,7 @@ describe("buildCallCitation", () => {
     const citation = buildCallCitation(fixtureBriefDocument({ weeklyCall: { ...fixtureWeeklyCall(), regimeStage: "Sunny — Late" } }));
 
     assert.match(citation, /^Conditions: Sunny — Late \(money is cheap and available\)$/m);
-    assert.match(citation, /^High confidence \(how far the scores sit/m);
+    assert.match(citation, /^Margin: clear of the line \(how far the scores sit/m);
     assert.match(citation, /^Source note: https:\/\/fred\.stlouisfed\.org$/m);
     assert.match(citation, /^Full brief: https?:\/\//m);
     assert.doesNotMatch(citation, /EXPANSION|refresh cadence|Score-based/, "the citation is for a reader, not the engine");

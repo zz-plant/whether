@@ -60,7 +60,7 @@ const AGENT_TOOLS = [
     name: "get_state",
     title: "Get the current state",
     description:
-      "Start here. The current reading in one small answer (about 3KB): the conditions and the confidence in them, the data's freshness (automation.ready says whether it is live and current), each score against its pause, resume and change lines, the moves behind each score since the earlier reading and the areas whose pause or resume lines they crossed, and the guidance.",
+      "Start here. The current reading in one small answer (about 3KB): the conditions and the margin from their change lines, the data's freshness (automation.ready says whether it is live and current), each score against its pause, resume and change lines, the moves behind each score since the earlier reading and the areas whose pause or resume lines they crossed, and the guidance.",
     input: {},
     output: agentStateSchema,
     example: {},
@@ -74,7 +74,7 @@ const AGENT_TOOLS = [
     aliases: ["get_agent_brief"],
     input: { cadence: cadenceInput.optional().describe("weekly (default), monthly, quarterly or yearly.") },
     example: { cadence: "weekly" },
-    plainGetNote: "Over plain GET it answers a summary instead (regime, action, confidence, record date); get_state is the answer to decide from.",
+    plainGetNote: "Over plain GET it answers a summary instead (regime, action, margin, record date); get_state is the answer to decide from.",
     run: async ({ cadence }) => ({ ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() }),
   }),
   defineTool({

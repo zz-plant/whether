@@ -307,7 +307,7 @@ describe("brief decision card render", () => {
     assert.match(text, /Source: US Treasury and the St\. Louis Fed \(FRED\), plus a curated startup-market snapshot/);
     // Yahoo Finance feeds the SaaS comps only and contributes nothing to either score.
     assert.doesNotMatch(text, /yahoo/i);
-    assert.match(text, /MEDIUM CONFIDENCE/);
+    assert.match(text, /WITHIN REACH OF THE LINE/);
     assert.doesNotMatch(text, /\bMED\b/);
   });
 

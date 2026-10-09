@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { MARGIN_LABEL } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
 import { compositeSignalScales, signalPlainEnglish } from "../../lib/report/signalTranslations";
 import {
@@ -123,11 +124,11 @@ function ConfidenceLadder() {
   const max = med * 2;
   const pct = (v: number) => `${(v / max) * 100}%`;
   return (
-    <div aria-label={`Confidence: under ${near} points from the line is Low, under ${med} is Medium, otherwise High.`}>
+    <div aria-label={`${MARGIN_LABEL}: under ${near} points from the line is close, under ${med} is within reach, otherwise clear.`}>
       <div className="flex h-5 w-full max-w-[20rem] overflow-hidden rounded-sm text-fluid-nano font-semibold">
-        <span className="flex items-center justify-center bg-rose-500/30 text-rose-100" style={{ width: pct(near) }}>Low</span>
-        <span className="flex items-center justify-center bg-amber-500/30 text-amber-100" style={{ width: pct(med - near) }}>Medium</span>
-        <span className="flex items-center justify-center bg-emerald-500/25 text-emerald-100" style={{ width: pct(max - med) }}>High</span>
+        <span className="flex items-center justify-center bg-rose-500/30 text-rose-100" style={{ width: pct(near) }}>Close</span>
+        <span className="flex items-center justify-center bg-amber-500/30 text-amber-100" style={{ width: pct(med - near) }}>Within reach</span>
+        <span className="flex items-center justify-center bg-emerald-500/25 text-emerald-100" style={{ width: pct(max - med) }}>Clear</span>
       </div>
       <div className="relative mt-0.5 h-4 w-full max-w-[20rem] text-fluid-nano tabular-nums text-slate-400">
         <span className="absolute left-0">0</span>
@@ -381,13 +382,13 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           </ul>
         </FormulaCard>
 
-        <FormulaCard title={`Conditions, ${OPERATING_LATITUDE_LABEL.toLowerCase()}, confidence`}>
+        <FormulaCard title={`Conditions, ${OPERATING_LATITUDE_LABEL.toLowerCase()}, margin`}>
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               <span className="text-slate-400">Conditions:</span>
               <RegimeQuadrant />
               <span className="mt-1 block text-xs text-slate-400">
-                At low confidence conditions do not change at all.
+                At the narrowest margin conditions do not change at all.
               </span>
             </li>
             <li>
@@ -399,7 +400,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               </span>
             </li>
             <li>
-              <span className="text-slate-400">Confidence:</span> how far the scores sit from the
+              <span className="text-slate-400">{MARGIN_LABEL}:</span> how far the scores sit from the
               nearest line where conditions would change, counted in funding-pressure points. A
               risk-appetite point is worth {riskPointWorth}, because it stands for a{" "}
               {riskPointWorth}-times larger move in rates: risk appetite {RISK_GAP_EXAMPLE_POINTS} points

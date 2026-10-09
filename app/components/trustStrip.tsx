@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MARGIN_LABEL, formatMarginBand, formatMarginReading } from "../../lib/report/reportFormatting";
 
 /**
  * Freshness and confidence, once, in the same place on every reading route.
@@ -16,10 +17,17 @@ export type TrustStripProps = {
   sourcesLive: boolean;
   /** One phrase for the sources cell, e.g. "All sources live" or "Cached snapshot from Sep 12". */
   sourcesLabel: string;
+  /** The published band (the API's `confidence`); it sets the margin cell's tone. */
   confidenceLabel: "HIGH" | "MED" | "LOW";
+  /**
+   * The margin in the nearer score's own points (`resolveNearestLineMargin`);
+   * null when an input was imputed, which the cell says instead of a distance.
+   * Absent where the caller holds no scores, and the cell prints the band.
+   */
+  margin?: { signal: "tightness" | "riskAppetite"; points: number } | null;
   /** Whether the call could change at the next reading. */
   couldChangeNextWeek: boolean;
-  /** Why it could: "risk appetite is 3 pts from its line". Printed after "Yes". */
+  /** Why it could, when the margin cell does not already say: "a change is waiting on a second reading". */
   changeReason?: string;
   /** Where the full explanation lives. Omit on /trust itself. */
   href?: "/trust";
@@ -32,12 +40,10 @@ export type TrustStripProps = {
   className?: string;
 };
 
-/** The reader's word for the engine's confidence key. Exported so the sticky
- * call strip states it the same way the strip under the call does. */
-export const CONFIDENCE_WORD: Record<TrustStripProps["confidenceLabel"], string> = {
-  HIGH: "High",
-  MED: "Medium",
-  LOW: "Low",
+/** What the margin cell prints: the nearer score and its points, or why there is no distance to print. */
+const describeMarginCell = (margin: TrustStripProps["margin"], confidenceLabel: TrustStripProps["confidenceLabel"]) => {
+  if (margin === null) return "Not measured: an input is missing";
+  return margin ? formatMarginReading(margin) : formatMarginBand(confidenceLabel);
 };
 
 export function TrustStrip({
@@ -45,6 +51,7 @@ export function TrustStrip({
   sourcesLive,
   sourcesLabel,
   confidenceLabel,
+  margin,
   couldChangeNextWeek,
   changeReason,
   href,
@@ -56,24 +63,26 @@ export function TrustStrip({
      the page that states them; an exception (cached sources, Low confidence)
      always prints. */
   const cells: { label: string; value: string; tone?: "caution" | "easing"; routine?: boolean }[] = [
-    { label: "As of", value: recordDateLabel },
+    /* "Data as of": the date the guidance rests on. The report intro's other date
+       is when the sources were last checked, and it says so (2026-10-09). */
+    { label: "Data as of", value: recordDateLabel },
     { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caution", routine: sourcesLive },
+    /* The margin, in points, where "Confidence: Low" stood: the number was always a
+       distance from the change line, never a probability (/calibration). */
     {
-      label: "Confidence",
-      value: CONFIDENCE_WORD[confidenceLabel],
+      label: MARGIN_LABEL,
+      value: describeMarginCell(margin, confidenceLabel),
       tone: confidenceLabel === "LOW" ? "caution" : undefined,
       routine: confidenceLabel !== "LOW",
     },
-    /* "Not expected", not "No". The boolean says nothing is near its line
-     * *this* reading; printed as "No" beside a Medium confidence it read as
-     * a promise about the future the confidence cell had just declined to
-     * make. "Not expected" states the expectation the score distance gives,
-     * and lets the adjacent confidence qualify it. */
+    /* "Not expected", not "No": the boolean says nothing is near its line *this*
+     * reading, which is an expectation, not a promise. The distance itself is the
+     * margin cell's, so "Yes" does not restate it; only a change waiting on its
+     * second reading has a reason of its own. */
     {
       label: "Could change next week",
-      // The reason is the answer: "Risk appetite is 2 pts from its line", not "Yes, risk…".
       value: couldChangeNextWeek
-        ? (changeReason ? `${changeReason.charAt(0).toUpperCase()}${changeReason.slice(1)}` : "Yes")
+        ? (changeReason ? `Yes: ${changeReason}` : "Yes")
         : "Not expected",
       tone: couldChangeNextWeek ? "caution" : undefined,
     },

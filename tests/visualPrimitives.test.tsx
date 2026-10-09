@@ -270,9 +270,32 @@ describe("TrustStrip", () => {
     const html = renderToStaticMarkup(
       <TrustStrip recordDateLabel="Sep 18, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="HIGH" couldChangeNextWeek={false} href="/trust" />,
     );
-    for (const cell of ["As of", "Sources", "Confidence", "Could change next week"]) assert.match(html, new RegExp(cell));
+    for (const cell of ["Data as of", "Sources", "Margin", "Could change next week"]) assert.match(html, new RegExp(cell));
     assert.match(html, /href="\/trust"/);
     assert.doesNotMatch(html, /HIGH|MED|LOW/, "the engine's confidence key must not reach the reader");
+    assert.doesNotMatch(html, /Confidence/, "the margin is not called confidence on a page");
+  });
+
+  /* The margin cell prints the distance in the nearer score's own points, and the
+     could-change cell no longer restates it (2026-10-09). */
+  it("prints the margin in points and does not repeat it beside could-change", () => {
+    const html = renderToStaticMarkup(
+      <TrustStrip
+        recordDateLabel="Oct 5, 2026"
+        sourcesLive
+        sourcesLabel="All sources live"
+        confidenceLabel="LOW"
+        margin={{ signal: "riskAppetite", points: 1 }}
+        couldChangeNextWeek
+      />,
+    );
+    assert.match(html, />Risk appetite 1 pt from its change line</);
+    assert.match(html, />Yes</);
+    assert.equal((html.match(/1 pt/g) ?? []).length, 1, "the distance prints once");
+    const imputed = renderToStaticMarkup(
+      <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="LOW" margin={null} couldChangeNextWeek={false} />,
+    );
+    assert.match(imputed, /Not measured: an input is missing/);
   });
 
   /* The report intro's phone line (ui-ux-standards §XI): the record date and
@@ -281,19 +304,19 @@ describe("TrustStrip", () => {
   it("folds only the routine facts on a phone, and only when it links to /trust", () => {
     const cellClass = (html: string, label: string) =>
       new RegExp(`<div class="([^"]*)"><dt[^>]*>${label}</dt>`).exec(html)?.[1] ?? "";
-    const base = { recordDateLabel: "Oct 5, 2026", sourcesLabel: "All sources live", couldChangeNextWeek: true, changeReason: "risk appetite is 2 pts from its line" };
+    const base = { recordDateLabel: "Oct 5, 2026", sourcesLabel: "All sources live", couldChangeNextWeek: true };
 
     const routine = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" href="/trust" phoneLayout="line" />);
     assert.match(cellClass(routine, "Sources"), /max-sm:hidden/);
-    assert.match(cellClass(routine, "Confidence"), /max-sm:hidden/);
-    assert.doesNotMatch(cellClass(routine, "As of"), /max-sm:hidden/);
+    assert.match(cellClass(routine, "Margin"), /max-sm:hidden/);
+    assert.doesNotMatch(cellClass(routine, "Data as of"), /max-sm:hidden/);
     assert.doesNotMatch(cellClass(routine, "Could change next week"), /max-sm:hidden/);
 
     const exceptions = renderToStaticMarkup(
       <TrustStrip {...base} sourcesLive={false} sourcesLabel="Cached snapshot" confidenceLabel="LOW" href="/trust" phoneLayout="line" />,
     );
     assert.doesNotMatch(cellClass(exceptions, "Sources"), /max-sm:hidden/, "cached sources always print");
-    assert.doesNotMatch(cellClass(exceptions, "Confidence"), /max-sm:hidden/, "Low confidence always prints");
+    assert.doesNotMatch(cellClass(exceptions, "Margin"), /max-sm:hidden/, "a margin close to the line always prints");
 
     /* /trust has no link to fold behind: the strip is its System status. */
     const onTrust = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" phoneLayout="line" />);

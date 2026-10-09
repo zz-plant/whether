@@ -1,5 +1,5 @@
 import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL } from "./reportCopy";
-import { formatConfidenceChipLabel } from "./reportFormatting";
+import { formatMarginBand } from "./reportFormatting";
 import { formatSignalReading } from "./signalTranslations";
 import {
   formatMeetingSlideMarkdown,
@@ -357,7 +357,7 @@ const provenanceLine = (artifact: BriefArtifact) =>
   [
     `Source: ${artifact.source}`,
     `data as of ${artifact.recordDateLabel}`,
-    artifact.confidenceLabel ? formatConfidenceChipLabel(artifact.confidenceLabel).toLowerCase() : null,
+    artifact.confidenceLabel ? `margin: ${formatMarginBand(artifact.confidenceLabel).toLowerCase()}` : null,
     artifact.isFallback ? "cached snapshot, not a live read" : null,
   ]
     .filter(Boolean)

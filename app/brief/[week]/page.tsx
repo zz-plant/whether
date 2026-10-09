@@ -183,7 +183,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
           ]}
           trust={null}
-          captionDetail={`Week of ${brief.recordDateLabel} · ${display.confidence}`}
+          captionDetail={`Week of ${brief.recordDateLabel} · Margin: ${display.confidence.toLowerCase()}`}
         />
 
         <header className="space-y-3">

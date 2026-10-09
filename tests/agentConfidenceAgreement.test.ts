@@ -6,7 +6,7 @@ import { GET as getMcpShim } from "../app/api/mcp/route";
 import { GET as getFeed } from "../app/feed.xml/route";
 import { buildAgentInterfaceFromContext, loadAgentInterfaceContext } from "../lib/agentInterface";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
-import { formatConfidenceChipLabel } from "../lib/report/reportFormatting";
+import { formatMarginStamp } from "../lib/report/reportFormatting";
 import { formatConfidenceSentence } from "../lib/summary/summaryFormatting";
 import { NextRequest } from "next/server";
 
@@ -72,8 +72,8 @@ describe("the agent interface's confidence", () => {
     const feed = await (await getFeed()).text();
 
     assert.ok(
-      feed.includes(`. ${formatConfidenceChipLabel(expected.label)}.</description>`),
-      "the live item carries the published confidence, not the engine's code",
+      feed.includes(`. ${formatMarginStamp(expected.label)}.</description>`),
+      "the live item carries the published margin, not the engine's code",
     );
     assert.doesNotMatch(feed, /Confidence: (LOW|MEDIUM|HIGH)\b/);
     // The phrase names itself; under a label it read "Confidence: Medium confidence."

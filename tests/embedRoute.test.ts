@@ -176,13 +176,13 @@ describe("the embed says what the brief says", () => {
     assert.ok(change >= 0 && resume > change, text);
   });
 
-  it("names the conditions and the confidence in the reader's words, dated by the reading", async () => {
+  it("names the conditions and the margin in the reader's words, dated by the reading", async () => {
     const data = buildBriefEmbedData(await assembleFreezingWeek(), { ticker: "", ref: "embed", companyStage: null });
     const text = buildBriefEmbedText(data);
     const html = buildBriefEmbedHtml(data);
 
-    assert.match(text, /^Conditions: Freezing • (High|Medium|Low) confidence • As of 2026-10-05$/m);
-    assert.match(html, /Freezing · (High|Medium|Low) confidence · As of 2026-10-05/);
+    assert.match(text, /^Conditions: Freezing • Margin: (clear of the line|within reach of the line|close to the line) • As of 2026-10-05$/m);
+    assert.match(html, /Freezing · Margin: (clear of the line|within reach of the line|close to the line) · As of 2026-10-05/);
     for (const output of [text, html, JSON.stringify(data)]) {
       assert.doesNotMatch(output, /\b(HIGH|MED|MEDIUM|LOW)\b/);
       assert.doesNotMatch(output, /Regime:/);

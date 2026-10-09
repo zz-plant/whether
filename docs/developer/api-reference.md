@@ -101,6 +101,20 @@ Check `automation.ready` before acting on it without a person looking. Every `pr
 
 `confidence` at the root of the full response is the published confidence, the one the page and `/api/scores` carry, and `summary.confidence` matches it on this route. `/api/weekly` and `/api/monthly` still return the engine's own label in `summary.confidence`.
 
+#### Field-to-label mapping: `confidence` is shown as "Margin"
+
+Since 2026-10-09 no page, paste or email prints "Confidence". The number measures how far the scores sit from the line where conditions change, not a probability (`/calibration`), so readers see it as the margin. The JSON fields keep their names; only the display text changed.
+
+| Field | Values | What a reader sees |
+| --- | --- | --- |
+| `confidence.label` (also `confidenceLabel`, `posture.confidenceLabel`, `summary.confidence`) | `HIGH` | Clear of the line |
+| | `MED` / `MEDIUM` | Within reach of the line |
+| | `LOW` | Close to the line |
+| `confidence.percent` / `confidencePercent` | 30 to 92 | Not printed on pages; the calibration study's "Published %" column |
+| (derived from `scores` and `thresholds`) | the nearer score, chosen as the band chooses it | "Risk appetite 1 pt from its change line" on the trust strip; "(risk appetite is 1 point from its change line)" in pastes |
+
+The band still steps down a level on a saved copy older than 48 hours, as `confidence.label` always has; the strip's Sources cell names the saved copy. Wording lives in `lib/report/reportFormatting.ts` (`MARGIN_LABEL`, `formatMarginBand`, `formatMargin`); the points come from `resolveNearestLineMargin` in `lib/report/confidence.ts`.
+
 The nested `agentHandoff.payload` now exposes:
 
 - `decision_rules` for bounded operating rules by area

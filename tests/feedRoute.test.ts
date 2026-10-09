@@ -64,7 +64,7 @@ describe("feed.xml", () => {
    * confidence." Its record date is the one its guid names, and its confidence reads
    * as the published items' do.
    */
-  it("dates the live item by its record date and states confidence once", async () => {
+  it("dates the live item by its record date and states the margin once", async () => {
     const xml = await (await GET()).text();
     const live = items(xml).find((block) => tag(block, "link") === `${siteUrl}/`);
     if (!live) return; // the archive already carries this week
@@ -72,8 +72,8 @@ describe("feed.xml", () => {
     const recordDate = tag(live, "guid").replace("whether-brief-live-", "");
     assert.match(recordDate, /^\d{4}-\d{2}-\d{2}$/);
     assert.equal(tag(live, "pubDate"), new Date(recordDate).toUTCString());
-    assert.match(live, new RegExp(`<strong>Record date:</strong> ${formatDateUTC(recordDate)} · (High|Medium|Low) confidence</p>`));
-    assert.doesNotMatch(live, /Confidence:/);
+    assert.match(live, new RegExp(`<strong>Record date:</strong> ${formatDateUTC(recordDate)} · Margin: (clear of the line|within reach of the line|close to the line)</p>`));
+    assert.doesNotMatch(live, /Confidence:|\b(High|Medium|Low) confidence\b/);
   });
 
   it("is announced from the root layout", () => {

@@ -125,8 +125,13 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   transition. "Flip" is the call/decision reversal (bounded decision slot "Reversal");
   "transition" is the forecast-outcome change (stuck forecast indicators). If they
   diverge, flip describes the call reversal, transition describes forecast changes.
-- **Confidence is "Confidence", not "Call certainty"** on screens and gauges. "Certainty"
-  is retired; do not reintroduce it as a user-facing label.
+- **The distance from a change line is the "Margin"** on screens, gauges, pastes and email
+  (2026-10-09): "Clear of the line", "Within reach of the line", "Close to the line", with the
+  nearer score's points where the surface holds them. "Confidence" (and "Call certainty"
+  before it) are retired as reader labels: the number is a distance, not a probability
+  (`/calibration`), and "Confidence: Low" beside "Freeze new commitments" read as the product
+  doubting its own advice. API and JSON fields keep `confidence`; the mapping is in
+  `docs/developer/api-reference.md`.
 
 ## Headings (h1–h4, eyebrows, section labels)
 

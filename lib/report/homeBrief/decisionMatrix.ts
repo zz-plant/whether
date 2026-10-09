@@ -80,7 +80,7 @@ export const buildDecisionMatrixPayload = ({
         },
         delay: {
           text: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
-          detail: rule?.pauseTrigger ?? "Pause if macro confidence degrades or thresholds weaken.",
+          detail: rule?.pauseTrigger ?? "Pause if a score nears its change line.",
           action: compactMatrixText(rule?.avoidNow[0] ?? "", fallbackDelay),
           threshold: rule ? formatBoundedDecisionThreshold(rule) : FALLBACK_PAUSE_THRESHOLD,
           reversal: rule ? formatBoundedDecisionReverse(rule) : "Reverse only after threshold recovery",

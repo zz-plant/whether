@@ -77,8 +77,8 @@ describe("summaryCopyRenderer", () => {
       },
     });
 
-    assert.match(copy, /RECOMMENDATION CONFIDENCE\n\nConfidence: Medium\n/);
-    assert.match(copy, /· Confidence: Medium$/);
+    assert.match(copy, /MARGIN\n\nMargin: within reach of the line\n/);
+    assert.match(copy, /· Margin: within reach of the line$/);
     assert.match(copy, /Updated Oct 5, 2026/);
     assert.doesNotMatch(copy, /Canonical snapshot|high confidence/i);
     assert.doesNotMatch(copy, /GOVERNANCE PARAMETER|EXPLICIT_KILL_CRITERIA|BALANCED|STANDARD/);
@@ -140,7 +140,7 @@ describe("summaryCopyRenderer", () => {
     // The source line once sat under a bare "Source:" heading: "Source:\nSource: …".
     assert.match(copy, /\n\nSource: US Treasury \(https:\/\/example\.com\/source\)\n/);
     assert.doesNotMatch(copy, /Source:\nSource:/);
-    assert.match(copy, /· Confidence: Medium$/);
-    assert.doesNotMatch(copy, /Confidence: Live/);
+    assert.match(copy, /· Margin: within reach of the line$/);
+    assert.doesNotMatch(copy, /Confidence: Live|Margin: live/i);
   });
 });

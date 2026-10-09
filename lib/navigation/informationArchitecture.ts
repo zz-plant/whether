@@ -74,7 +74,7 @@ export const navigationLayers: NavigationLayer[] = [
     href: "/trust",
     label: "Trust",
     navLabel: "Trust",
-    description: "Check freshness, confidence, source coverage, and what would change the brief.",
+    description: "Check freshness, the margin, source coverage, and what would change the brief.",
     boundary: "Use this when you want to sanity-check the brief before a big decision.",
     tier: "supporting",
     parentKey: "weekly-brief",
@@ -177,7 +177,7 @@ export const utilityLinks = [
   {
     href: "/calibration",
     label: "Calibration",
-    description: "How often the confidence label has been right, 2012–2026",
+    description: "How often conditions held at each margin from the line, 2012–2026",
   },
   {
     href: "/concepts",

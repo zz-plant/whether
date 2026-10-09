@@ -23,7 +23,7 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     // The page's order: the guidance, then what moved. The brief reads the same way.
     assert.ok(brief.indexOf("This week's guidance") < brief.indexOf("What changed this week"));
     assert.match(brief, /^- Chicago Fed National Financial Conditions Index: /m);
-    assert.match(brief, /^Source: https:\/\/fred\.stlouisfed\.org · 2026-03-04 · Confidence: /m);
+    assert.match(brief, /^Source: https:\/\/fred\.stlouisfed\.org · 2026-03-04 · Margin: /m);
     // Markdown must not carry wiki markup.
     assert.doesNotMatch(brief, /^h2\. /m);
     assert.doesNotMatch(brief, /\[https:[^\]]*\|/);
@@ -60,20 +60,20 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     assert.match(brief, /\*\*Conditions:\*\* Sunny — Late \(money is cheap and available\)/);
     // A ticket is read by a whole team; the engine key is for the JSON routes.
     assert.doesNotMatch(brief, /Regime:|EXPANSION/);
-    assert.match(brief, /Confidence: High \(how far the scores sit/);
+    assert.match(brief, /Margin: clear of the line \(how far the scores sit/);
   });
 
-  it("stamps the reading's published confidence, not the engine's code", () => {
+  it("stamps the reading's published margin, not the engine's code", () => {
     // The fixture's engine code says MEDIUM; its scores are 58 and 18 points
     // out (81 on the tightness scale), which publishes as High.
     const far = buildIssueTrackerMarkdownBrief(fixtureBriefDocument());
-    assert.match(far, /Confidence: High \(how far the scores sit from the line where conditions change\)/);
+    assert.match(far, /Margin: clear of the line \(how far the scores sit from the line where conditions change\)/);
     assert.doesNotMatch(far, /MEDIUM/);
 
     // Two points under the risk line is nine on the tightness scale: Medium.
     const nearLine = { ...assessment, scores: { ...assessment.scores, riskAppetite: 48 } };
     const near = buildIssueTrackerMarkdownBrief(fixtureBriefDocument({ reading: nearLine }));
-    assert.match(near, /Confidence: Medium \(how far the scores sit/);
+    assert.match(near, /Margin: within reach of the line \(how far the scores sit/);
   });
 
   it("produces identical bytes for Jira and Linear, which both consume markdown", () => {

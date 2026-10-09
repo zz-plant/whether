@@ -10,7 +10,7 @@ import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionR
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { areaLinesFromActionStrip, buildDecisionMovement } from "../report/decisionMovement";
-import { describeBaseRateSource, formatExportConfidence } from "./exportTerms";
+import { describeBaseRateSource, formatDocumentMargin, formatExportConfidence } from "./exportTerms";
 
 /*
  * Every paste reads in the page's order: the call, what changed, what it
@@ -33,7 +33,7 @@ export const EXPORT_SECTION_HEADINGS = {
 
 /** The curve reading's name on first use, per the vocabulary table in `lib/report/AGENTS.md`. */
 export const RECESSION_GAUGE_LABEL = `${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`;
-/** The stamp's confidence note when no label was modeled: what the number measures. */
+/** The stamp's margin note when no label was modeled: what the number measures. */
 const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line where conditions change";
 
 const buildExportStamp = (document: BriefDocument, confidence: string) =>
@@ -228,7 +228,7 @@ export const briefReadingLines = (document: BriefDocument) =>
 const buildWhyThisCouldBeWrongBlock = (document: BriefDocument) => [
   "",
   "Why this could be wrong:",
-  `• ${formatExportConfidence(document.confidence)}`,
+  `• ${formatDocumentMargin(document)}`,
   `• ${document.slots.whyCouldBeWrong}`,
   `• What would show it: "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, and the readings.`,
 ];
@@ -316,7 +316,7 @@ export const buildCallCitation = ({
 }) => [
   `Whether Weekly Brief — ${provenance.recordDate}`,
   `Conditions: ${conditions.line}`,
-  `${formatExportConfidence(confidence)} (how far the scores sit from the line where conditions change)`,
+  `Margin: ${formatExportConfidence(confidence).toLowerCase()} (how far the scores sit from the line where conditions change)`,
   `Source note: ${provenance.sourceUrl}`,
   `Full brief: ${provenance.permalink}`,
 ].join("\n");

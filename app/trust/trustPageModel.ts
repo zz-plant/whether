@@ -12,7 +12,6 @@ import {
   buildTrustWarnings,
   buildWeeklyCitationMetaLine,
 } from "../../lib/report/trustStatus";
-import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
 import { buildDegradedSourceRows, buildSourceBoardRows } from "../../lib/report/sourceHealth";
 import { buildLadderLines } from "../components/ui/scoreLadder";
@@ -49,7 +48,6 @@ export async function buildTrustPageModel() {
     isFallbackSnapshot: isFallback,
     isHistoricalSelection: Boolean(reportData.historicalSelection),
   });
-  const confidenceLabel = formatConfidencePlainLabel(homeBriefModel.confidenceLabel);
   /* The strip under the h1: the four facts a reader checks before acting, in
      the slot every reading route gives them. The sources cell keeps the words
      the five-cell System status strip used for the same three states. */
@@ -99,7 +97,8 @@ export async function buildTrustPageModel() {
     changedSignals: reportData.reportDynamics.changedSignals,
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
-  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nAs of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\n${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
+  /* The margin rides in the trust line ("Margin: clear of the line (…)"), so it is stated once. */
+  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nData as of: ${reportData.recordDateLabel}\nChecked: ${reportData.fetchedAtLabel}\nTrust: ${trustSummary}\n${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
 
   /* The row labels used to be "Trigger", "Impact" and "Recovery" — three nouns
      from the incident-review register, on a page addressed to someone deciding
@@ -124,7 +123,7 @@ export async function buildTrustPageModel() {
       label: "How you'd know it cleared",
       detail: isFallback
         ? "One live refresh has landed from every source."
-        : "Confidence is back to high and conditions have held for a second reading.",
+        : "The scores are clear of the change lines and conditions have held for a second reading.",
       href: "#source-board",
       linkLabel: "Check source dates",
     },
@@ -158,7 +157,7 @@ export async function buildTrustPageModel() {
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#source-board", label: "Sources" },
     { href: "#sources-freshness", label: "Cite this guidance" },
-    { href: "#confidence-limits", label: "Confidence & limits" },
+    { href: "#confidence-limits", label: "Margin & limits" },
     { href: "#revisit-call", label: "Revisit triggers" },
     { href: "#meeting-snippet", label: "Meeting snippet" },
     { href: "#framework", label: "Using the thresholds" },
@@ -204,7 +203,6 @@ export async function buildTrustPageModel() {
     isFallback,
     degradedSourceRows,
     sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),
-    confidenceLabel,
     trustSummary,
     citationLine,
     warnings,

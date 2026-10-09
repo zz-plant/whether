@@ -88,9 +88,12 @@ export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
 /** The conditions as every slide format prints them: the weather word, with what it means for money. */
 export const slideConditions = (payload: MeetingSlidePayload): string => describeConditions(payload.regime);
 
-/** Confidence, then the one provenance footer, as every slide format closes. */
+/** "Margin: close to the line": the band under its display name (the payload field stays `confidence`). */
+const slideMargin = (payload: { confidence: string }) => `Margin: ${formatExportConfidence(payload.confidence).toLowerCase()}`;
+
+/** The margin, then the one provenance footer, as every slide format closes. */
 export const slideFooterLine = (payload: MeetingSlidePayload): string =>
-  `${formatExportConfidence(payload.confidence)} · ${formatSourceFooter({
+  `${slideMargin(payload)} · ${formatSourceFooter({
     sourceLabel: payload.provenance,
     recordDate: payload.recordDateIso ?? payload.recordDate,
     isFallback: payload.isFallback,
@@ -257,7 +260,7 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     <text x="32" y="72" font-family="-apple-system, system-ui, sans-serif" font-size="18" font-weight="500" fill="#cbd5e1">${esc(payload.callChangesIf)}</text>
   </g>
 
-  <!-- Footer: each score against its line, then confidence -->
+  <!-- Footer: each score against its line, then the margin -->
   <g transform="translate(80, 582)">
 ${slideReadingLines(payload)
   .map(
@@ -266,7 +269,7 @@ ${slideReadingLines(payload)
   )
   .join("\n")}
     <text x="0" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
-      <tspan fill="#f1f5f9">${esc(formatExportConfidence(payload.confidence))}</tspan> · ${esc(slideFooterLine(payload).slice(formatExportConfidence(payload.confidence).length + 3))}
+      <tspan fill="#f1f5f9">${esc(slideMargin(payload))}</tspan> · ${esc(slideFooterLine(payload).slice(slideMargin(payload).length + 3))}
     </text>${
       slideResumeLine(payload)
         ? `

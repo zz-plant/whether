@@ -7,5 +7,6 @@ export const buildComplianceStamp = ({
   timestamp: string;
   confidence: string;
 }) => [
-  `Source: ${sourceLine} · ${timestamp} · Confidence: ${confidence}`,
+  /* "Margin", where this said "Confidence": the number is a distance from the change line (2026-10-09). */
+  `Source: ${sourceLine} · ${timestamp} · Margin: ${confidence}`,
 ];

@@ -13,7 +13,7 @@ import { siteUrl } from "../../siteUrl";
 import { createBreadcrumbTrail } from "../../navigation/breadcrumbs";
 import { buildAuthorSchema } from "../../publisher";
 import { homeDecisionFaqItems } from "../decisionTransmissionCopy";
-import { formatConfidenceChipLabel } from "../reportFormatting";
+import { MARGIN_LABEL, formatMarginBand } from "../reportFormatting";
 
 /** A JSON-LD document. Typed loosely on purpose — this is serialized to JSON, and
  *  a consumer (or a test) reads nodes by key rather than by a TS shape. Giving the
@@ -111,7 +111,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         "@id": `${siteUrl}/#dataset`,
         name: "US Treasury yield curve snapshot",
         description:
-          "The weekly US Treasury reading Whether bases its guidance on, with its confidence and what would change it.",
+          "The weekly US Treasury reading Whether bases its guidance on, with its margin from the change lines and what would change it.",
         creator: {
           "@id": organizationId,
         },
@@ -137,7 +137,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
            * reader-facing surfaces were moved to the word form; this one was
            * missed because nothing renders it on screen.
            */
-          { "@type": "PropertyValue", name: "Confidence", value: formatConfidenceChipLabel(brief.confidenceLabel) },
+          { "@type": "PropertyValue", name: MARGIN_LABEL, value: formatMarginBand(brief.confidenceLabel) },
         ],
         isBasedOn: {
           "@type": "CreativeWork",

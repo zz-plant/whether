@@ -14,7 +14,7 @@ import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
-import { formatConfidenceChipLabel, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
+import { formatMarginBand, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
@@ -327,7 +327,7 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
     /* From the engine key, not the stored label: the earliest records stored a
        third vocabulary ("Guarded Expansion — Late") that no stripping recovers. */
     conditions: getRegimePublicLabel(brief.regime),
-    confidence: formatConfidenceChipLabel(brief.confidenceLabel === "MEDIUM" ? "MED" : brief.confidenceLabel),
+    confidence: formatMarginBand(brief.confidenceLabel === "MEDIUM" ? "MED" : brief.confidenceLabel),
     source: /^(Canonical|Archived) snapshot/i.test(brief.sourceLabel)
       ? "Saved copy of the published reading"
       : brief.sourceLabel.replace(/\s*\((high|medium|low)( confidence)?\)$/i, ""),
@@ -572,7 +572,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
-    `Conditions: ${display.conditions} (${display.confidence.toLowerCase()})`,
+    `Conditions: ${display.conditions} (margin: ${display.confidence.toLowerCase()})`,
     "",
     `This week's decision (${slots.map((slot) => slot.label).join(" / ")}):`,
     ...slots.map((slot) => `• ${slot.label}: ${slot.value}`),
@@ -617,7 +617,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     `Whether Leadership Update — Week of ${brief.recordDateLabel}`,
     "",
     `Conditions: ${display.conditions}`,
-    `Confidence: ${display.confidence}`,
+    `Margin: ${display.confidence.toLowerCase()}`,
     `Executive summary: ${brief.summary}`,
     "",
     "This week's guidance:",

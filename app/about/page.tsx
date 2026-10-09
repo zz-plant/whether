@@ -87,7 +87,7 @@ export default function AboutPage() {
             track record
           </Link>{" "}
           scores the archive against what happened next, including where it falls short: changes in conditions that
-          came with no warning, and a confidence figure that the{" "}
+          came with no warning, and a margin that the{" "}
           <Link href="/calibration" className={inlineLinkClass}>
             calibration study
           </Link>{" "}

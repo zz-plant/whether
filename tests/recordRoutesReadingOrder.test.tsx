@@ -40,7 +40,7 @@ describe("/history leads with the record's answer", () => {
 
     const strip = headings.indexOf("Conditions by month");
     const record = headings.indexOf("Track record");
-    const confidence = headings.indexOf("What the confidence number has been worth");
+    const confidence = headings.indexOf("What the margin has been worth");
     const map = headings.indexOf("How the two scores set conditions");
     const table = headings.indexOf("Monthly readings");
     const briefs = headings.indexOf("Published weekly briefs");
@@ -131,7 +131,7 @@ describe("/trust carries one trust strip", () => {
     assert.ok(strip < firstSectionHeading, "the strip comes before the first explanatory section");
     assert.doesNotMatch(html, /sm:grid-cols-5/, "the five-cell System status strip is gone");
     assert.doesNotMatch(html, /href="\/trust"/, "on /trust the strip carries no link to itself");
-    for (const cell of ["As of", "Sources", "Confidence", "Could change next week"]) assert.match(html, new RegExp(cell));
+    for (const cell of ["Data as of", "Sources", "Margin", "Could change next week"]) assert.match(html, new RegExp(cell));
   });
 
   it("draws where the score sits as two ladders at the top of the formula section", async () => {

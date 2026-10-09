@@ -5,7 +5,8 @@ import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weekly
 import { assessSnapshotReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
-import { formatExportConfidenceWord } from "../export/exportTerms";
+import { formatDocumentMargin } from "../export/exportTerms";
+import { MARGIN_LABEL } from "../report/reportFormatting";
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
 import { siteUrl } from "../siteUrl";
 import { fanOut } from "../delivery/fanOut";
@@ -60,7 +61,9 @@ const distanceFromLine = (
    `BriefDocument` is assignable, and a test can build these without asserting
    its way past the fields it does not touch. */
 type WeeklyEmailReadingSource = {
-  readings: Pick<BriefDocument["readings"], "scores" | "vsThreshold">;
+  readings: Pick<BriefDocument["readings"], "scores" | "vsThreshold"> & {
+    thresholds: Pick<BriefDocument["readings"]["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
+  } & Partial<Pick<BriefDocument["readings"], "baseRateUsed" | "curveSlope">>;
   confidence: BriefDocument["confidence"];
 };
 
@@ -85,8 +88,8 @@ export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | un
       distance: distanceFromLine(vsThreshold.riskAppetite, "below"),
     },
     {
-      label: "Confidence",
-      value: formatExportConfidenceWord(document.confidence),
+      label: MARGIN_LABEL,
+      value: formatDocumentMargin(document).replace(/^Margin: /, ""),
       meaning: null,
       distance: null,
     },

@@ -50,6 +50,7 @@ describe("the weekly email labels what it shows", () => {
     readings: {
       scores: { tightness: 79, riskAppetite: 53 },
       vsThreshold: { tightness: diagnostics.tightnessVsThreshold, riskAppetite: diagnostics.riskAppetiteVsThreshold },
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
     },
     confidence: "MED" as const,
   };
@@ -81,7 +82,7 @@ describe("the weekly email labels what it shows", () => {
 
     // The score carries what it means, because an inbox has no page to explain the scale.
     assert.ok(lines.includes("Funding pressure: 79/100, money is hard to raise (9 points above the line where conditions change)"), joined);
-    assert.ok(lines.includes("Confidence: " + buildWeeklyEmailReadings(snapshot)[2].value), joined);
+    assert.ok(lines.includes("Margin: " + buildWeeklyEmailReadings(snapshot)[2].value), joined);
     assert.ok(!/\b(HIGH|MED|MEDIUM|LOW)\b|\bpts\b/.test(joined), `the readings block prints an engine code or an abbreviation: ${joined}`);
     assert.ok(!joined.includes("vs last week"), "the readings block claims a weekly move it cannot compute");
     assert.ok(!/regime line|threshold|delta/i.test(joined), `the readings block speaks the engine's terms: ${joined}`);

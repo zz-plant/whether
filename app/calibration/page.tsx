@@ -33,11 +33,11 @@ export const runtime = "edge";
  * same study would compete with each other.
  */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Confidence score calibration study",
+  title: "Margin calibration study",
   description:
-    "Whether's confidence percent, checked against every month-end reading since 2012: how often conditions held at each distance from the line where they change.",
+    "Whether's margin, the distance from the line where conditions change, checked against every month-end reading since 2012: how often conditions held at each distance.",
   path: "/calibration",
-  imageAlt: "Whether confidence calibration study",
+  imageAlt: "Whether margin calibration study",
   imageParams: { template: "method", eyebrow: "The record" },
 });
 
@@ -50,8 +50,8 @@ export default function CalibrationPage() {
 
       <SecondaryPageHeader
         eyebrow="The record"
-        title="Confidence score calibration study"
-        description={`The published confidence percent, checked against ${totals.months} month-end readings from 2012 to 2026: how often conditions held at each distance from the line where they change.`}
+        title="Margin calibration study"
+        description={`The published margin, checked against ${totals.months} month-to-month comparisons since 2012: how often conditions held at each distance from the line where they change.`}
         aside={<CalibrationCurveGlyph size={64} />}
       />
 
@@ -73,8 +73,8 @@ export default function CalibrationPage() {
           <li>
             <span className="text-slate-100">Bands.</span> Distance to the nearest line where
             conditions change, in points of funding pressure, with a risk-appetite point converted the
-            same way the published confidence converts it. The cut points were chosen before the outcomes
-            were looked at — they are the distances at which the published label changes.
+            same way the published margin converts it. The cut points were chosen before the outcomes
+            were looked at.
           </li>
         </ul>
       </SecondaryPageSection>
@@ -94,11 +94,11 @@ export default function CalibrationPage() {
           </li>
           <li>
             The archive is one model over one country&rsquo;s rates. It is evidence
-            about this number, not about confidence scores generally.
+            about this number, not about forecasting scores generally.
           </li>
         </ul>
         <p className="mt-4 text-sm text-slate-300">
-          So the percent keeps measuring distance, which is an honest thing to measure, and this
+          So the margin keeps measuring distance, which is an honest thing to measure, and this
           record is published beside it rather than folded into it.
         </p>
       </SecondaryPageSection>

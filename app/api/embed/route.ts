@@ -12,7 +12,7 @@ import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
 import { parseOperatorRunwayParam } from "../../../lib/report/operatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { formatConfidenceChipLabel, publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { formatMarginStamp, publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { formatGuidance } from "../../../lib/export/briefBuilders";
 import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
 import { siteUrl } from "../../../lib/siteUrl";
@@ -112,7 +112,7 @@ export const buildBriefEmbedData = (
   /* The published band as a reader says it ("Medium confidence"). This was
      the code itself, so the widget's meta line read "Freezing · MED" and the
      text format "Confidence: MED" inside somebody else's newsletter. */
-  const confidenceLabel = formatConfidenceChipLabel(homepage.weeklyDecisionCardModel.status.confidenceLabel);
+  const confidenceLabel = formatMarginStamp(homepage.weeklyDecisionCardModel.status.confidenceLabel);
   const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const operatingStanceLine = homepage.weeklyDecisionCardModel.decision.operatingStanceLine;

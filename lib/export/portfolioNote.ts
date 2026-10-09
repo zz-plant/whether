@@ -3,7 +3,7 @@ import { decisionAreaLabel, type DecisionArea } from "../report/boundedDecisionR
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { formatDateUTC, formatThresholdNumber } from "../formatters";
 import { signalReadingMeaning } from "../report/signalTranslations";
-import { formatExportConfidenceWord, formatSourceFooter } from "./exportTerms";
+import { formatDocumentMargin, formatSourceFooter } from "./exportTerms";
 import { buildCanonicalUrl } from "../seo";
 
 /**
@@ -53,7 +53,7 @@ const formatArea = ({ area, rule, pause, resume }: PortfolioArea) => {
  */
 export const buildPortfolioNote = (document: BriefDocument, areas: readonly PortfolioArea[]): string => {
   const { tightness, riskAppetite } = document.readings.scores;
-  const confidence = formatExportConfidenceWord(document.confidence);
+  const confidence = formatDocumentMargin(document);
 
   /* Each note opens "With <runway> of runway", which reads once on the brief and
      three times in a row here; the band's label says it once instead. */
@@ -68,7 +68,7 @@ export const buildPortfolioNote = (document: BriefDocument, areas: readonly Port
   return [
     `For the companies we back: this week's funding climate, from Whether (week of ${formatDateUTC(document.provenance.recordDate)}).`,
     "",
-    `Conditions: ${document.conditions.line}. Confidence: ${confidence}.`,
+    `Conditions: ${document.conditions.line}. ${confidence}.`,
     `Funding pressure is ${formatThresholdNumber(tightness)} of 100 (${signalReadingMeaning("tightness", tightness)}); risk appetite is ${formatThresholdNumber(riskAppetite)} of 100 (${signalReadingMeaning("riskAppetite", riskAppetite)}).`,
     "",
     "The rule for each area, with the line that pauses it and the line that resumes it:",
