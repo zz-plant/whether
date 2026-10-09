@@ -85,8 +85,8 @@ describe("/operate opening", () => {
       FINANCE_RUNWAY_TARGETS.includes(description("ops-finance-strategy")),
       "the finance step's line is a regime's runway target",
     );
-    // The four formats the step copies.
-    assert.equal(description("ops-export-briefs"), "Copy this week's brief in one of 4 formats, ready to paste: Slack, Slide, Citation or Agenda.");
+    // No share step: /share holds every format, and the page links there once (2026-10-08).
+    assert.ok(!steps.some((step) => step.id === "ops-export-briefs"), "the share step is back");
 
     for (const retired of [
       "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",

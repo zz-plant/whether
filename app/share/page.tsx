@@ -26,6 +26,8 @@ import { formatSourceFooter } from "../../lib/export/exportTerms";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../../lib/siteUrl";
+import { buildMeetingSnippet } from "../../lib/report/trustStatus";
+import { utilityLinks } from "../../lib/navigation/informationArchitecture";
 
 export const runtime = "edge";
 export const revalidate = 300;
@@ -123,6 +125,18 @@ const buildCurrentShareArtifact = async () => {
     document,
     areaRows.map((row) => ({ area: row.area, rule: row.rule, pause: row.pause?.line, resume: row.resume?.line })),
   );
+  /* The status block /trust offered as "Meeting snippet" until 2026-10-08: the
+     reading's dates and confidence, what would change it and what to do now. */
+  const meetingSnippet = buildMeetingSnippet({
+    statusLabel: reportData.statusLabel,
+    recordDateLabel: reportData.recordDateLabel,
+    freshnessLabel: reportData.fetchedAtLabel,
+    confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+    isFallbackSnapshot: snapshot.isFallback,
+    isHistoricalSelection: Boolean(reportData.historicalSelection),
+    flipThreshold: reportData.flipThreshold,
+    actionNow: reportData.actionNowShort,
+  });
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,
@@ -163,6 +177,7 @@ const buildCurrentShareArtifact = async () => {
       `Full brief: ${document.provenance.permalink}`,
     ].join("\n"),
     standupLine,
+    meetingSnippet,
     meetingPack,
     issueTrackerBrief,
     investorUpdate,
@@ -237,6 +252,16 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       copyLabel: "Copy meeting pack",
       commitment: "copied_meeting",
       offersCalendar: true,
+    },
+    {
+      id: "meeting-snippet",
+      group: "Meetings",
+      label: "Meeting snippet",
+      hint: "Paste into notes or a meeting agenda: the conditions, how fresh and how sure the reading is, what would change it and what to do now.",
+      kind: "text",
+      text: artifact.meetingSnippet,
+      copyLabel: "Copy meeting snippet",
+      commitment: "copied_meeting",
     },
     {
       id: "agenda",
@@ -335,6 +360,8 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
   ];
 };
 
+const apiLink = utilityLinks.find((link) => link.href === "/api-docs");
+
 export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
 
@@ -374,6 +401,25 @@ export default async function SharePage() {
         <section id="embed" className="weather-panel weather-section-stack p-0">
           <EmbedBuilder />
         </section>
+        {/* The rest of "Use it elsewhere": the same reading for an agent, a
+            script or a feed reader. The API page was a header menu item of its
+            own until 2026-10-08. */}
+        <nav aria-labelledby="share-elsewhere-heading" className="weather-panel weather-section-stack p-0">
+          <h2 id="share-elsewhere-heading" className="text-lg font-semibold text-white/90">API, MCP and RSS</h2>
+          <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+            {apiLink ? (
+              <li>
+                <ActionLink href={apiLink.href} variant="inline">{apiLink.label}</ActionLink>
+                <span className="ml-2 text-xs text-white/60">{apiLink.description}</span>
+              </li>
+            ) : null}
+            <li>
+              {/* A file, not a page: the absolute address the feed autodiscovery
+                  link in the layout's <head> names. */}
+              <a href={`${siteUrl}/feed.xml`} className="inline-flex min-h-[44px] items-center text-fluid-xs font-semibold text-sky-300 hover:text-sky-200">RSS</a>
+            </li>
+          </ul>
+        </nav>
         <SubscribeForm />
         <div>
           <ActionLink href="/" variant="pill">

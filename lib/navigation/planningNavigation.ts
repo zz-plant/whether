@@ -44,7 +44,6 @@ export const operationsSectionLinks: {
     { href: "#ops-decision-shield", label: "Test a decision" },
     { href: "#ops-plan-lines", label: "Set this plan's lines" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
-    { href: "#ops-export-briefs", label: "Share the brief" },
     { href: "#ops-failure-patterns", label: "Risk checks" },
   ],
   financial: [

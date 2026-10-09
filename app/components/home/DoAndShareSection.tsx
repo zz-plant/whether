@@ -1,7 +1,6 @@
 import { HomeSection } from "./HomeSection";
 import { ActionLink } from "../ui/actionLink";
-import { CopyMeetingSlideButton } from "../CopyMeetingSlideButton";
-import { CopyImageCardButton } from "../CopyImageCardButton";
+import { ShareOrEmbedLink } from "../shareOrEmbedLink";
 import { SubscribeForm } from "../SubscribeForm";
 import { RegimeAlertToggle } from "../regimeAlertToggle";
 import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
@@ -58,15 +57,15 @@ function CanonicalWeekPermalink({
 }
 
 /**
- * Act and share: the plan, the slide and image copies, the subscribe row and
- * the citable permalink. Copy Brief, DD-005's canonical primary action, sits
+ * Act and share: the plan, the link to every share format, the subscribe row
+ * and the citable permalink. Copy Brief, DD-005's canonical primary action, sits
  * under the call card in `app/page.tsx` since 2026-09-30.
  *
  * One primary action. The plan link was a pill among two copy buttons, four
  * arrow links (stress-test, decision record, answers, AI assistant) and a
  * subscribe form, all at the same weight, so nothing said what to do next. The
- * plan is the primary button; the copies are secondary; the four links are in
- * the footer and the header already.
+ * plan is the primary button; the copies (now on /share, one link away) are
+ * secondary; the four links are in the footer and the header already.
  */
 export function DoAndShareSection({
   operateHref,
@@ -86,11 +85,9 @@ export function DoAndShareSection({
         <ActionLink href={operateHref} variant="primary">
           {planLabel ?? "Build this week’s plan →"}
         </ActionLink>
-        {/* Neither takes a payload: the slide reads the same published
-            artifact the share panel and the presentation frames read, and the
-            image is the brief card `/share` lists, for the reading on screen. */}
-        <CopyMeetingSlideButton />
-        <CopyImageCardButton />
+        {/* One link where the slide and image copy buttons were: /share holds
+            every format, both of those buttons among them (2026-10-08). */}
+        <ShareOrEmbedLink />
       </div>
       {/* The one conversion on the page, beside the actions rather than 3,000px
           below them. The push toggle sits with it: it is the same alert by

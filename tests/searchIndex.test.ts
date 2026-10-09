@@ -67,9 +67,9 @@ describe("search index", () => {
     assert.deepEqual(prefix.map((entry) => entry.id), full.map((entry) => entry.id));
   });
 
-  it("routes governance-artifact queries back into Planning rather than the retired resources hub shell", () => {
+  it("routes governance-artifact queries to /share, which holds every format since the plan's share step went", () => {
     const resourceDoc = buildSearchIndex().find((entity) => entity.id === "doc-resources");
 
-    assert.equal(resourceDoc?.href, "/operate#ops-export-briefs");
+    assert.equal(resourceDoc?.href, "/share");
   });
 });

@@ -1,5 +1,7 @@
 import Image from "next/image";
 import { ActionLink } from "../components/ui/actionLink";
+import { CopyMeetingSlideButton } from "../components/CopyMeetingSlideButton";
+import { CopyImageCardButton } from "../components/CopyImageCardButton";
 
 /**
  * The image and file artifacts, on the page whose job is getting the brief out.
@@ -105,6 +107,14 @@ export function ShareImageArtifacts() {
   return (
     <section id="image-artifacts" className="weather-panel weather-section-stack p-0" aria-labelledby="share-files-heading">
       <h2 id="share-files-heading" className="text-xl font-semibold text-white sm:text-2xl">Files and images for a deck or a thread</h2>
+      {/* The slide and the card straight onto the clipboard. These two buttons
+          sat in the brief's "Do and share" until 2026-10-08, one of five places
+          the site offered the same week; the brief links here instead. Both read
+          the island this page publishes (`BriefArtifactScript`). */}
+      <div className="flex flex-wrap items-center gap-2">
+        <CopyMeetingSlideButton />
+        <CopyImageCardButton />
+      </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {IMAGE_ARTIFACTS.map((artifact) => (
           <article key={artifact.title} className="weather-card flex flex-col gap-3" data-image-artifact={artifact.title}>

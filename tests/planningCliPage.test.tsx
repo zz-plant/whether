@@ -19,7 +19,6 @@ describe("operations navigation", () => {
       "#ops-decision-shield",
       "#ops-plan-lines",
       "#ops-finance-strategy",
-      "#ops-export-briefs",
       "#ops-failure-patterns",
     ]);
   });

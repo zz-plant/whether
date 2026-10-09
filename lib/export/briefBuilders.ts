@@ -179,7 +179,7 @@ export const briefWeekChangeLine = (document: BriefDocument): string | null =>
     document.readings.previous,
   );
 
-export const buildReadingLines = (
+const buildReadingLines = (
   reading: {
     scores: { tightness: number; riskAppetite: number };
     thresholds: RegimeAssessment["thresholds"];

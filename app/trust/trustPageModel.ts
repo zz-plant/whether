@@ -4,13 +4,11 @@ import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
-import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
 import {
   buildCompactTrustSummary,
   buildDecisionReadinessState,
   buildTrustWarnings,
-  buildWeeklyCitationMetaLine,
 } from "../../lib/report/trustStatus";
 import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
@@ -84,12 +82,6 @@ export async function buildTrustPageModel() {
     tightness: positionFor("tightness", thresholds.tightnessRegime),
     riskAppetite: positionFor("riskAppetite", thresholds.riskAppetiteRegime),
   };
-  const citationLine = buildWeeklyCitationMetaLine({
-    statusLabel: reportData.statusLabel,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    recordDateLabel: reportData.recordDateLabel,
-    freshnessLabel: reportData.fetchedAtLabel,
-  });
   const warnings = buildTrustWarnings({
     confidenceLabel: homeBriefModel.confidenceLabel,
     transitionWatch: homeBriefModel.transitionWatch,
@@ -99,7 +91,6 @@ export async function buildTrustPageModel() {
     changedSignals: reportData.reportDynamics.changedSignals,
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
-  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nAs of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\n${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
 
   /* The row labels used to be "Trigger", "Impact" and "Recovery" — three nouns
      from the incident-review register, on a page addressed to someone deciding
@@ -157,10 +148,10 @@ export async function buildTrustPageModel() {
     ...(readerReturnsLine ? [{ href: "#reader-returns", label: "Reader returns" }] : []),
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#source-board", label: "Sources" },
-    { href: "#sources-freshness", label: "Cite this guidance" },
+    // "Cite this guidance" and "Meeting snippet" moved to /share on 2026-10-08,
+    // with every other paste of the week.
     { href: "#confidence-limits", label: "Confidence & limits" },
     { href: "#revisit-call", label: "Revisit triggers" },
-    { href: "#meeting-snippet", label: "Meeting snippet" },
     { href: "#framework", label: "Using the thresholds" },
   ];
 
@@ -206,9 +197,7 @@ export async function buildTrustPageModel() {
     sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),
     confidenceLabel,
     trustSummary,
-    citationLine,
     warnings,
-    meetingSnippet,
     revisitBullets,
     trustStrip,
     scorePositions,

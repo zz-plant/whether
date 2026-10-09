@@ -27,11 +27,8 @@ import { buildAreaRows } from "./areaRows";
 import { DecisionShieldPanel } from "./components/decisionShieldPanel";
 import { PlanLinesForm } from "./components/planLinesForm";
 import { buildCanonicalBoundedDecisionRules, decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
-import { BRIEF_FORMATS } from "../../lib/report/briefArtifact";
 import { planLinesFromRules } from "../../lib/alert/planLines";
-import { BriefIslandPicker } from "../components/briefIslandPicker";
-import { buildReadingLines } from "../../lib/export/briefBuilders";
-import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
+import { SHARE_OR_EMBED_NEXT_STEP } from "../components/shareOrEmbedLink";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
 import { buildBriefArtifactFromSnapshot } from "../../lib/report/homeBrief/briefArtifactBuilder";
 import { OperationsExecutionStepper } from "./components/planningExecutionStepper";
@@ -141,10 +138,6 @@ export async function buildPlanningPageModel(
   const financeSummary =
     financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
   const resourcesSummary = `${resourcePillarPages.length} operating guides and ${operationsResourceLibrary.length} templates you can fill in and share.`;
-  const shareSummary = `Copy this week's brief in one of ${BRIEF_FORMATS.length} formats, ready to paste: ${listOf(
-    BRIEF_FORMATS.map((format) => format.label),
-    "disjunction",
-  )}.`;
   /* Freshness and confidence, once, under the h1 before anything asks the
      reader to act. The shell draws it in the intro (DD-040). */
   const trustStrip = {
@@ -184,19 +177,12 @@ export async function buildPlanningPageModel(
         strip: trustStrip,
       },
       actions: {
-        // No hero Share. The Share step further down the same page owns
-        // sharing here — on a phone the hero button and the step it opens were
-        // two "Share the brief" actions in one viewport. The header's Brief tab
-        // already covers the route the hero's neighbours used to point at.
-        // The handoff to Resolve, in the shell's one predictable place. It used
-        // to be a "Decision help" section of its own at the tail — a sentence,
-        // this link, and a "Back to sharing options" link to a step on the same
-        // page.
-        nextStep: {
-          href: "/resolve",
-          description: "Still stuck on one decision? Get a yes or no for it.",
-          label: "Resolve a decision",
-        },
+        // No hero Share, and no Share step: until 2026-10-08 this page carried
+        // the brief picker as its last step, one of five places the site
+        // offered to share the same week. Every format, the embed, the
+        // citation and the API live on /share; this is the one link to it, in
+        // the shell's one predictable place.
+        nextStep: SHARE_OR_EMBED_NEXT_STEP,
       },
       payloads: {
         structuredData,
@@ -356,46 +342,6 @@ export async function buildPlanningPageModel(
                 "Enter your runway, burn and revenue in ",
                 h("a", { href: "/operate/financial", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the runway planner"),
                 " to size this week's plan against your figures.",
-              ),
-              ),
-            }),
-          },
-          {
-            id: "ops-export-briefs",
-            label: "Share",
-            title: "Share the brief",
-            description: shareSummary,
-            // The two request ids are kept as aliases so an old link still opens this
-            // step. The "Execution asks" section they named was a product backlog
-            // ("expansion requests expected after launch") that listed API access
-            // and historical comparisons as not yet built, though both ship; it
-            // was removed on 2026-10-07.
-            hashAliases: [
-              "ops-export-briefs-panel",
-              "ops-operator-requests",
-              "ops-operator-requests-panel",
-              "regime-alert-log",
-            ],
-            // The step header above already reads Share / Share the brief, and the export
-            // panel names the action in its own header; a third header between them restated both.
-            children: h(ReportSection, { variant: "split",
-              hideHeader: true,
-              id: "ops-export-briefs-panel",
-              title: "Share the brief",
-              children: h(Fragment, null,
-              // The same picker /share and the global rail use, reading the same
-              // island — one artifact pipeline. The eleven-button export panel
-              // that sat here built the brief a second way through its own lib.
-              h(BriefIslandPicker, {
-                scoreReferences: buildReadingLines(reportData.assessment, {
-                  actionStripItems,
-                  previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),
-                }),
-              }),
-              h("p", { className: "text-xs leading-5 text-slate-400" },
-                "Email, meeting pack, role memos, calendar hold and the embed live on ",
-                h("a", { href: "/share", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "the share page"),
-                ".",
               ),
               ),
             }),
