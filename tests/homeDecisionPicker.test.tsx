@@ -6,6 +6,7 @@ import { DecisionPicker, type DecisionPickerOption } from "../app/components/hom
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
 import { findLastTimeCallChanged, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
+import { parseHomeDecision } from "../lib/report/home/homeSectionModel";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import * as nextNavigation from "next/navigation";
 
@@ -182,5 +183,36 @@ describe("the fold is configuration, and defaults to the full brief", () => {
   it("decides first visit from the key the activation tracker writes on every visit", () => {
     assert.match(layout, /activationLastWeekStorageKey/);
     assert.match(layout, /root\.dataset\.homeFirstVisit = dismissed \|\| seenBefore \? "false" : "true"/);
+  });
+});
+
+describe("a link can carry the decision (`/?decision=`)", () => {
+  const render = (initialSelected?: DecisionPickerOption["area"]) =>
+    renderToStaticMarkup(
+      <DecisionPicker
+        options={OPTIONS}
+        regime="SCARCITY"
+        scores={{ tightness: 90, riskAppetite: 44 }}
+        turningPoints={[]}
+        initialSelected={initialSelected}
+      />,
+    );
+
+  it("opens on the decision the URL names, in the first paint", () => {
+    const html = render("product-tempo");
+    assert.match(html, /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "the named area's answer is server-rendered open");
+    assert.match(html, /checked=""[^>]*value="product-tempo"|value="product-tempo"[^>]*checked=""/);
+    assert.doesNotMatch(render(), /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "no answer open without one");
+  });
+
+  it("reads only an area from the parameter, and writes every choice back to it", () => {
+    assert.equal(parseHomeDecision("hiring"), "hiring");
+    assert.equal(parseHomeDecision("payroll"), undefined);
+    assert.equal(parseHomeDecision(undefined), undefined);
+    const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+    assert.match(page, /initialSelected=\{parseHomeDecision\(searchParams\?\.\[HOME_DECISION_PARAM\]\)\}/);
+    const picker = readFileSync(new URL("../app/components/home/DecisionPicker.tsx", import.meta.url), "utf8");
+    assert.match(picker, /url\.searchParams\.set\(HOME_DECISION_PARAM, area\)/);
+    assert.match(picker, /window\.history\.replaceState\(/, "a choice replaces the entry rather than adding one for Back to retrace");
   });
 });

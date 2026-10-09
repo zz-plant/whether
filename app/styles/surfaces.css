@@ -107,23 +107,25 @@ html[data-theme="light"] .weather-hero-card {
 /* Report-page intro. The hero card above is the brief's; this is every other
    route's, and until 2026-09-16 it was plain slate under a status line that
    named the week — a reader on /operate got no colour cue the hero gives on /.
-   Same treatment as the hero at lower weight, flat for the same reason (it is
-   what a screenshot of a report route catches); the border and top edge take
-   the hue at about two thirds of the hero's mix. */
+   Same treatment as the hero, flat for the same reason (it is what a
+   screenshot of a report route catches): the hue on a solid rule across the
+   top edge, and only a trace of it in the fill and border. Until 2026-10-08
+   it kept the hero's old tinted slab after the hero dropped it, so /signals
+   read rose where / read neutral under the same week. */
 .weather-page-intro {
-  background: color-mix(in srgb, var(--bg-raised) 93%, var(--regime-accent) 7%);
-  border-color: color-mix(in srgb, var(--regime-accent) 24%, var(--border-default));
+  background: color-mix(in srgb, var(--bg-raised) 96%, var(--regime-accent) 4%);
+  border-color: color-mix(in srgb, var(--regime-accent) 12%, var(--border-default));
   box-shadow:
     var(--elev-2),
-    inset 0 1px 0 color-mix(in srgb, var(--regime-accent) 16%, var(--edge-highlight-faint));
+    inset 0 3px 0 var(--regime-accent);
 }
 
 html[data-theme="light"] .weather-page-intro {
-  background: color-mix(in srgb, var(--bg-raised) 96%, var(--regime-accent) 4%);
-  border-color: color-mix(in srgb, var(--regime-accent) 22%, var(--border-default));
+  background: color-mix(in srgb, var(--bg-raised) 98%, var(--regime-accent) 2%);
+  border-color: color-mix(in srgb, var(--regime-accent) 14%, var(--border-default));
   box-shadow:
     var(--elev-2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    inset 0 3px 0 var(--regime-accent);
 }
 
 /* New surface system: typographic hierarchy over container hierarchy.

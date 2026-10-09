@@ -70,9 +70,7 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
       {rows.map((row) => (
         <tr
           key={row.recordDate}
-          className={`border-b border-slate-800/40 last:border-0${
-            row.changed ? " bg-slate-900/40" : ""
-          }`}
+          className={`border-b border-slate-800/40 last:border-0 ${row.changed ? "bg-slate-900/40" : ""}`}
         >
           {/* "Jul 31, 2026" wraps onto two lines in a 26% column at phone
               width; the month alone is the fact the row is keyed on. */}

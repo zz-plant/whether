@@ -126,7 +126,7 @@ export function WhatWouldChangeSection({
             trail={conditionsTrail?.points}
             trailCaption={conditionsTrail?.caption}
             caveat={conditionsTrail?.caveat}
-            className={`w-full max-w-[240px] mx-auto md:mx-0 shrink-0${conditionsTrail ? " md:hidden" : ""}`}
+            className={`w-full max-w-[240px] mx-auto md:mx-0 shrink-0 ${conditionsTrail ? "md:hidden" : ""}`}
           />
         ) : null}
         <div className="min-w-0 space-y-4">

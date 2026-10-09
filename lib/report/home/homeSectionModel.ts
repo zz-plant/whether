@@ -4,7 +4,7 @@ import { classifyScoreBand, scoreBandScaleLabel } from "../signalTranslations";
 import { describeInputMovement } from "../inputMovement";
 import { formatPointsToLine, toThresholdDistance, type ActionStripItem, type RuleThresholdDistance } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import type { BoundedDecisionRule, DecisionArea, RuleCondition, RuleConditionMetric } from "../boundedDecisionRules";
+import { isDecisionArea, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -19,6 +19,17 @@ import type { HomePageAssembly } from "./contracts";
  * app/components/home that draws one of them; the route composes them and
  * nothing else on `/` restates a section's content inside another's.
  */
+/**
+ * The query parameter that carries the picker's choice (`/?decision=hiring`), so a
+ * link to the brief can open on the answer its sender meant. Read on the server,
+ * so the answer is in the first paint; written by the picker on every choice.
+ */
+export const HOME_DECISION_PARAM = "decision";
+
+/** The decision a `?decision=` value names, or undefined for anything that is not an area. */
+export const parseHomeDecision = (value: string | undefined): DecisionArea | undefined =>
+  value !== undefined && isDecisionArea(value) ? value : undefined;
+
 export const HOME_SECTIONS = {
   call: { id: "weekly-call" },
   changed: { id: "what-changed", heading: "What changed this week" },
