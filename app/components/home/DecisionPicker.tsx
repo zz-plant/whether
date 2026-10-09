@@ -47,14 +47,6 @@ import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
  * week on every visit, and the bootstrap reads that key.
  */
 
-const QUESTION_BY_AREA: Record<DecisionArea, string> = {
-  hiring: "Hire someone",
-  "product-tempo": "Change the roadmap",
-  "capital-raising": "Raise money",
-  "burn-discipline": "Approve new spend",
-  "expansion-bets": "Start something new",
-};
-
 /**
  * How far the reading is from a line, as a stamp: a status, so sharp (§XIV).
  * A pause line in force takes the caution ink and a resume line that is met
@@ -170,7 +162,10 @@ export function DecisionPicker({
     const status = describeAreaPauseStatus(option);
     return {
       key: option.area,
-      label: QUESTION_BY_AREA[option.area],
+      /* The area's own name, the one every table and paste uses. The choices
+         were verb phrases ("Raise money", "Approve new spend") that named no
+         area, so a reader met two names for each of the five. */
+      label: decisionAreaLabel(option.area),
       sublabel: status?.text,
       sublabelTone: status?.crossed ? "caution" : undefined,
     };

@@ -63,21 +63,21 @@ describe("RegimeRadar", () => {
     const current = renderToStaticMarkup(
       <RegimeRadar {...base} tightness={90} riskAppetite={47} tightnessThreshold={70} riskAppetiteThreshold={50} />,
     );
-    assert.match(current, /3 points to nearest change line/);
+    assert.match(current, /3 points to the nearest change line/);
     assert.doesNotMatch(current, /0 points to/);
 
     const horizontal = renderToStaticMarkup(<RegimeRadar {...base} tightness={62} />);
-    assert.match(horizontal, /2 points to nearest change line/);
+    assert.match(horizontal, /2 points to the nearest change line/);
 
     const onLine = renderToStaticMarkup(<RegimeRadar {...base} riskAppetite={45} />);
-    assert.match(onLine, /0 points to nearest change line/);
+    assert.match(onLine, /0 points to the nearest change line/);
   });
 
   it("carries accessible title tooltips for threshold boundaries and current position", () => {
     const html = renderToStaticMarkup(<RegimeRadar {...base} />);
 
-    assert.match(html, /<title>Funding pressure boundary at 60<\/title>/);
-    assert.match(html, /<title>Risk appetite boundary at 45<\/title>/);
+    assert.match(html, /<title>Funding pressure change line at 60<\/title>/);
+    assert.match(html, /<title>Risk appetite change line at 45<\/title>/);
     assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
   });
 });
@@ -126,7 +126,7 @@ describe("RegimeRadar path", () => {
 
   it("leaves the distance caption to a surface that already states it", () => {
     const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} showDistance={false} />);
-    assert.doesNotMatch(html, /points to nearest change line/);
+    assert.doesNotMatch(html, /to the nearest change line/);
     assert.doesNotMatch(html, /<figcaption/, "no empty caption is drawn");
   });
 });

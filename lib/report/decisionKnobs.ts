@@ -1,5 +1,6 @@
 import type { RegimeKey } from "../regimeEngine";
-import { buildRuleCondition, type RuleCondition } from "./boundedDecisionRules";
+import { buildRuleCondition, decisionAreaLabel, type RuleCondition } from "./boundedDecisionRules";
+import { operatingLeverToDecisionArea } from "./businessAreaMap";
 import { REGIME_LABELS } from "../regimePresentation";
 import type { RegimeStateTransition } from "../regimeStateMachine";
 
@@ -21,12 +22,16 @@ export const businessAreaOrder = [
 
 export type BusinessAreaKey = (typeof businessAreaOrder)[number];
 
+/* Each lever is one of the five decision areas (`operatingLeverToDecisionArea`) and
+   prints that area's name. It kept a second table, so /operate/scenarios headed the
+   spending rule "Investment pace" while every other surface called it Spending. */
+const leverLabel = (lever: BusinessAreaKey) => decisionAreaLabel(operatingLeverToDecisionArea[lever]);
 export const businessAreaLabel: Record<BusinessAreaKey, string> = {
-  "hiring-stance": "Hiring",
-  "investment-pace": "Investment pace",
-  "sales-posture": "Fundraising",
-  "product-priorities": "Product priorities",
-  "risk-tolerance": "Risk tolerance",
+  "hiring-stance": leverLabel("hiring-stance"),
+  "investment-pace": leverLabel("investment-pace"),
+  "sales-posture": leverLabel("sales-posture"),
+  "product-priorities": leverLabel("product-priorities"),
+  "risk-tolerance": leverLabel("risk-tolerance"),
 };
 
 /**

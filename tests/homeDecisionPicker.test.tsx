@@ -79,10 +79,13 @@ describe("first-visit decision picker", () => {
     assert.match(html, /href="#company-calibration"/);
   });
 
-  it("asks one question with an answer for every area", () => {
+  it("asks one question with an answer for every area, each under the area's own name", () => {
     assert.match(html, /What are you deciding\?/);
-    for (const question of ["Hire someone", "Change the roadmap", "Raise money", "Approve new spend", "Start something new"]) {
-      assert.ok(html.includes(question), `missing option: ${question}`);
+    for (const area of ["Hiring", "Roadmap", "Fundraising", "Spending", "New bets"]) {
+      assert.ok(html.includes(area), `missing option: ${area}`);
+    }
+    for (const retired of ["Hire someone", "Change the roadmap", "Raise money", "Approve new spend", "Start something new"]) {
+      assert.ok(!html.includes(retired), `retired verb label: ${retired}`);
     }
   });
 

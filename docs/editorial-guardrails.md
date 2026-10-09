@@ -83,7 +83,7 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   Resume when, and the line where conditions themselves change is Conditions change if. "Change
   course if" and "Re-open when" are retired (2026-09-22): the first read as the guidance changing,
   which it named only on some surfaces, and the second was a third name for the resume line.
-  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports remain Action / Threshold / Reversal. Consume these
+  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports are Action / Pause line / Resume line ("Threshold" and "Reversal" were retired on 2026-10-09, with "boundary" and "trigger" for the same lines). Consume these
   exports instead of hardcoding slot words in components. Per-area bounded rules now render on
   `/operate` ("Rules by area"). The homepage scan ledger was deleted with `ThreeWhethersCard`
   (2026-09-01), and `ACTION_STRIP_DISPLAY_COPY` went with it. Its vocabulary is retired: do not
@@ -112,12 +112,15 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
 - **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
   brief"). "Report" stays internal (function names, keys, docs). User-visible,
   shareable, and metadata surfaces must not print "Whether Report".
-- **Axis names use a two-form rule** (full name / short name) per signal key: Cash
-  availability / Tightness; Risk appetite / Appetite; Yield curve slope / Yield curve.
-  Pick one canonical form per slot (full in the hero, threshold ladder, exports, and SEO;
-  short in inline metrics); never a third spelling. A lone "Tightness" or "Appetite"
-  always expands to its full axis name, and the tightness watch line is always
-  "Funding pressure watch".
+- **Signal names are Funding pressure, Risk appetite and Recession warning gauge**
+  (2026-10-09), in full on charts and in inline metrics alike; "Capital tightness",
+  "Pressure" and "Appetite" alone are retired. The three watch pages keep their slugs
+  (`capital-tightness-watch`, `risk-appetite-watch`, `yield-curve-flip-watch`) and are titled
+  "Funding pressure watch", "Risk appetite watch" and "Recession warning gauge watch".
+- **The five areas are Hiring, Roadmap, Fundraising, Spending and New bets**
+  (`decisionAreaLabel`). Slugs (`product-tempo`, `capital-raising`, `burn-discipline`,
+  `expansion-bets`) are contracts and stay; no surface prints them or a verb-phrase stand-in
+  ("Raise money", "Approve new spend"). `tests/readerVocabulary.test.tsx` bans the retired names.
 - **The call has three bounded-state markers**: certainty (input confidence), flip, and
   transition. "Flip" is the call/decision reversal (bounded decision slot "Reversal");
   "transition" is the forecast-outcome change (stuck forecast indicators). If they

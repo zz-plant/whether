@@ -56,7 +56,7 @@
       "Customer demand, available cash and the next evidence milestone for each bet.",
       "The market change and company result that would justify another review."
     ],
-    "decisionNote": "Review [commitment] after [market change]. Limit exposure to [amount or duration]. Pause if [company threshold] fails; resume after [demand and cash evidence]. Owner: [name]. Review: [date].",
+    "decisionNote": "Review [commitment] after [market change]. Limit exposure to [amount or duration]. Pause if [your pause line] is crossed; resume after [demand and cash evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Compare historical conditions",
@@ -252,7 +252,7 @@
       "Recruiting cost, compensation, ramp duration and sales-cycle length.",
       "Gross margin, collections and cash remaining if the new cohort ramps slowly."
     ],
-    "decisionNote": "Add [number] reps in [segment] within [cost envelope]. Pause the next cohort if [demand or ramp threshold] is missed. Resume after [conversion and cash evidence]. Owner: [name]. Review: [date].",
+    "decisionNote": "Add [number] reps in [segment] within [cost envelope]. Pause the next cohort if [demand or ramp target] is missed. Resume after [conversion and cash evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Set the next growth spending step",
@@ -283,7 +283,7 @@
       "Build, launch and ongoing support costs alongside the opportunity cost to the core product.",
       "Experiment budget, success milestone and the condition for stopping the test."
     ],
-    "decisionNote": "Test [product hypothesis] with [customer group] inside [budget]. Stop if [evidence threshold] is missed. Expand only after [demand proof and funded support]. Owner: [name]. Review: [date].",
+    "decisionNote": "Test [product hypothesis] with [customer group] inside [budget]. Stop if [evidence target] is missed. Expand only after [demand proof and funded support]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Launch gates toolkit",

@@ -35,6 +35,9 @@ import { buildMonthlySummary } from "../lib/summary/monthlySummary";
 import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
 import { buildWeeklyStructured, buildWeeklySummary } from "../lib/summary/weeklySummary";
 import { buildYearlySummary } from "../lib/summary/yearlySummary";
+import { RegimeRadar } from "../app/components/home/RegimeRadar";
+import { DecisionPicker } from "../app/components/home/DecisionPicker";
+import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
@@ -103,6 +106,26 @@ const BANNED: { name: string; pattern: RegExp }[] = [
      only knew the capitalised forms. */
   { name: "retired score name", pattern: /\b(boldness|latitude signal)\b/i },
   { name: "glossary pointer", pattern: /\b(Open the glossary|Full glossary|Look up a term|What these terms mean)\b/ },
+  /* One vocabulary (2026-10-09). The five areas are Hiring, Roadmap, Fundraising,
+     Spending and New bets (`decisionAreaLabel`); the picker offered verb phrases
+     ("Raise money") and /operate/scenarios a second table ("Investment pace"), so a
+     reader met two names for each area. Capitalised forms are the labels; the
+     lower-case coinages never were prose. "Approve new spend only if…" is the
+     spending rule's sentence as frozen briefs before 2026-10-09 recorded it, which
+     is a rule, not a label, and a record is not rewritten. */
+  {
+    name: "retired area name",
+    pattern:
+      /\b(Change the roadmap|Product tempo|Raise money|Capital raising|Approve new spend(?! only)|Burn discipline|Investment pace|Start something new|Expansion bets|Hire someone)\b|\b(product tempo|burn discipline|expansion bets|investment pace)\b/,
+  },
+  /* The three lines are the pause line, the resume line and the change line.
+     "Threshold", "reversal" and "boundary" named the same lines on the chart titles,
+     the brief's ladders ("Trigger at 76. Reversal at 66.") and the export slots. */
+  {
+    name: "retired line word",
+    pattern: /\b(Threshold|Reversal)\s*:|\b(Trigger|Reversal) at \d|\b(boundary|boundaries)\b|\bnear-threshold\b|\bAgainst its threshold\b|\breversal (trigger|condition)s?\b/i,
+  },
+  { name: "retired signal name", pattern: /\bCapital tightness\b|\bRecession warning watch\b/i },
   /* The header's names are Brief, Plan, Evidence, Resolve, Trust and History
      (lib/navigation/informationArchitecture.ts). Search results, the answer pages and the 404
      page still said "Decision Tools", and the resource CTAs "Open Planning", until 2026-10-06. */
@@ -208,6 +231,30 @@ const routeSurfaces: Surface[] = [
   {
     name: "/resources/decision-shield-overview",
     text: async () => visibleText(renderToStaticMarkup((await import("../app/resources/decision-shield-overview/page")).default())),
+  },
+  /* The homepage suspends at its data boundary here, so its components render on their own. */
+  {
+    name: "/ conditions chart",
+    text: () =>
+      visibleText(
+        renderToStaticMarkup(
+          <RegimeRadar tightness={90} riskAppetite={49} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="SCARCITY" />,
+        ),
+      ),
+  },
+  {
+    name: "/ decision picker",
+    text: () =>
+      visibleText(
+        renderToStaticMarkup(
+          <DecisionPicker
+            options={decisionAreaOrder.map((area) => ({ area, rule: "Rule", pause: undefined, resume: undefined }))}
+            regime="SCARCITY"
+            scores={{ tightness: 90, riskAppetite: 49 }}
+            turningPoints={[]}
+          />,
+        ),
+      ),
   },
   /* One query reaching the role-and-stage and toolkit entries, whose title and summary named the old hub. */
   { name: "/search?q=guides toolkits", text: () => visibleText(renderToStaticMarkup(<SearchResults initialQuery="guides toolkits" />)) },

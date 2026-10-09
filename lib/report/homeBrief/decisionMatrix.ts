@@ -2,6 +2,7 @@ import { FALLBACK_PAUSE_THRESHOLD } from "../reportCopy";
 import { buildWeeklyLockCommitment } from "../decisionKnobs";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import {
+  decisionAreaLabel,
   extractCompactClause,
   formatBoundedDecisionAction,
   formatBoundedDecisionReverse,
@@ -21,10 +22,10 @@ const joinFlipConditions = (conditions: string[]) => {
 };
 
 const matrixRowConfig: Array<{ key: DecisionMatrixRowKey; label: string; area: BoundedDecisionRule["area"]; flipConditionIndex: number }> = [
-  { key: "hiring", label: "Hiring", area: "hiring", flipConditionIndex: 0 },
-  { key: "product", label: "Product", area: "product-tempo", flipConditionIndex: 1 },
-  { key: "capital", label: "Capital", area: "capital-raising", flipConditionIndex: 1 },
-  { key: "burn", label: "Burn", area: "burn-discipline", flipConditionIndex: 2 },
+  { key: "hiring", label: decisionAreaLabel("hiring"), area: "hiring", flipConditionIndex: 0 },
+  { key: "product", label: decisionAreaLabel("product-tempo"), area: "product-tempo", flipConditionIndex: 1 },
+  { key: "capital", label: decisionAreaLabel("capital-raising"), area: "capital-raising", flipConditionIndex: 1 },
+  { key: "burn", label: decisionAreaLabel("burn-discipline"), area: "burn-discipline", flipConditionIndex: 2 },
 ];
 
 export const buildDecisionMatrixPayload = ({

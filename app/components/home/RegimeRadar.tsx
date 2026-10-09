@@ -92,7 +92,7 @@ export function RegimeRadar({
       <div className="mb-1.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-nano text-slate-300">
         <span className="font-semibold text-slate-100">Conditions</span>
         <span className="tabular-nums text-slate-400">
-          Pressure {tightness} · Appetite {riskAppetite}
+          Funding pressure {tightness} · Risk appetite {riskAppetite}
         </span>
       </div>
 
@@ -327,7 +327,7 @@ export function RegimeRadar({
           transform={`rotate(-90, ${PLOT_X - 8}, ${PLOT_Y + PLOT_SIZE / 2})`}
           className="fill-slate-400 text-[11px]"
         >
-          Pressure ↑
+          Funding pressure ↑
         </text>
       </svg>
 

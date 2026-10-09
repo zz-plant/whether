@@ -154,8 +154,8 @@ export const buildMonthlyStructured = ({
   const postureSummary = [
     formatConfidenceSentence(confidence),
     transitionWatch
-      ? "Conditions are close to a boundary, so keep reversals cheap."
-      : "Conditions are clear of their boundaries.",
+      ? "Conditions are close to a change line, so keep commitments cheap to undo."
+      : "Conditions are clear of their change lines.",
   ];
   const boundedNextActions = [
     "Approve only work that serves the month's priority; hold the rest for the next read.",

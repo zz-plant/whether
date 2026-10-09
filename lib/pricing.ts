@@ -68,7 +68,7 @@ export const pricingPlans: PricingPlan[] = [
     promise: FREE_FOREVER_PROMISE,
     features: [
       "The weekly operating guidance, scored and dated",
-      "Published scoring, thresholds, and reversal conditions",
+      "Published scoring, with pause and resume lines",
       "Copyable Slack, email, and meeting artifacts",
       "Agent API and MCP endpoint — no key, no rate card",
       "Embeds for a dashboard or wiki",

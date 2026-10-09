@@ -410,7 +410,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
     },
     "burn-discipline": {
       area: "burn-discipline",
-      recommendation: `Approve new spend only if it pays back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
+      recommendation: `Approve spending only if it pays back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
       doNow: [`Put a payback figure on every discretionary line before approving it; ${SPENDING_PAYBACK_BAR_MONTHS} months is the bar.`],
       avoidNow: ["Don't sign a multi-quarter commitment without a payback figure."],
       scope: "Hiring, vendor and marketing spend that commits you for more than one quarter.",

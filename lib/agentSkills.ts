@@ -62,12 +62,12 @@ const BRIEFING_STEPS: readonly BriefingStep[] = [
     skill: {
       id: "flip-watch",
       label: "Flip watch",
-      purpose: "Track flip triggers, reversal conditions, and boundary pressure before irreversible moves.",
+      purpose: "Track the change lines, the pause and resume lines, and how close each score is before irreversible moves.",
       inputs: ["flip_watch", "decision_rules", "signals"],
       outputs: ["flip_watchlist"],
     },
-    briefingAction: "Track flip triggers before making irreversible commitments.",
-    promptAsk: "A flip watchlist with the trigger, reversal conditions, and current boundary pressure.",
+    briefingAction: "Track the change lines before making irreversible commitments.",
+    promptAsk: "A watchlist of the change lines and the pause and resume lines, with how far each score sits from them.",
   },
   {
     skill: {

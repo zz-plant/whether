@@ -36,7 +36,7 @@ const signalClusterDefinitions: SignalClusterDefinition[] = [
   },
   {
     slug: "yield-curve-flip-watch",
-    title: "Recession warning watch",
+    title: "Recession warning gauge watch",
     summary: "How close long-term rates are to dropping below short-term rates, before you commit to anything you cannot undo.",
     evidence: "The 10-year minus 2-year Treasury rate, week by week, from the live Treasury data.",
     evidenceKeys: ["curveSlope"],

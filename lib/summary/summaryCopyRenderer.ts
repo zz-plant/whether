@@ -1,3 +1,4 @@
+import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatExportConfidenceWord } from "../export/exportTerms";
 import { formatSourceLine, type SummaryConfidence } from "./summaryFormatting";
@@ -165,12 +166,12 @@ export const renderMonthlySummaryCopy = ({
     "MONTHLY OPERATING RULES",
     "",
     ...toBullets(structured.operatingRules.flatMap((rule) => [
-      `Action: ${rule.action}`,
-      `Threshold: ${rule.threshold}`,
-      `Reversal: ${rule.reversal}`,
+      `${DECISION_CONTRACT_LABELS.slot.action}: ${rule.action}`,
+      `${DECISION_CONTRACT_LABELS.slot.threshold}: ${rule.threshold}`,
+      `${DECISION_CONTRACT_LABELS.slot.reversal}: ${rule.reversal}`,
     ])),
     "",
-    "TOP REVERSALS",
+    "RESUME LINES",
     "",
     ...toBullets(structured.reversalConditions),
     "",

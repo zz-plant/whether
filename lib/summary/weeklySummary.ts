@@ -103,7 +103,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Running experiments that weaken short-term cash flow",
     ],
     planningQuote:
-      "“Prioritize short-payback, reversible work and stop expansion bets that raise burn or depend on a rebound in risk appetite.”",
+      "“Prioritize short-payback, reversible work and stop new bets that raise burn or depend on a rebound in risk appetite.”",
   },
   DEFENSIVE: {
     climateLabel: climateLabelFor("DEFENSIVE", "⚠️"),

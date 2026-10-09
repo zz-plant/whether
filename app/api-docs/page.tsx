@@ -133,7 +133,7 @@ export default function ApiDocsPage() {
               conditions given it uses today&apos;s.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_projection&amp;regime=DEFENSIVE&amp;tightness=74&amp;riskAppetite=32">
-              Weeks until threshold crossing at a pace you give, or, with no arguments, at today&apos;s scores and pace.
+              Weeks until a score crosses its change line at a pace you give, or, with no arguments, at today&apos;s scores and pace.
               Scenario modeling for agents.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_comps">
@@ -256,7 +256,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_brief_slack"
             >
-              The week&apos;s guidance preformatted for Slack — action, threshold, reversal condition.
+              The week&apos;s guidance preformatted for Slack — action, pause line, resume line.
               Post it to a channel without reformatting.
             </Endpoint>
             <Endpoint

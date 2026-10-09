@@ -62,10 +62,12 @@ export const OPERATING_LATITUDE_LABEL = "Operating latitude";
 export const OPERATING_LATITUDE_GLOSS = "room to hire, spend and commit; higher means more room";
 
 export const DECISION_CONTRACT_LABELS = {
+  /* Noun slots for exports. "Threshold" and "Reversal" were retired on
+     2026-10-09 for the names every screen already used for the same two lines. */
   slot: {
     action: "Action",
-    threshold: "Threshold",
-    reversal: "Reversal",
+    threshold: "Pause line",
+    reversal: "Resume line",
   },
   action: {
     doNow: "Do now",

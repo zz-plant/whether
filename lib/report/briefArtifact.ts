@@ -296,8 +296,8 @@ export const MONDAY_AGENDA_STEPS: readonly {
   prompt: string;
 }[] = [
   { id: "changed", label: "What changed", minutes: 1, prompt: "Read the guidance and what moved since last Monday." },
-  { id: "thresholds", label: "Check the thresholds", minutes: 1, prompt: "Guardrail and reversal trigger, against this week's scores." },
-  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of a threshold?" },
+  { id: "thresholds", label: "Check the lines", minutes: 1, prompt: "The pause line and the resume line, against this week's scores." },
+  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of its pause line?" },
 ];
 
 export const MONDAY_AGENDA_TITLE = "Monday guidance review";
