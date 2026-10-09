@@ -162,7 +162,7 @@ export default async function CompsPage() {
 
         <section className="weather-surface space-y-2 px-4 py-4">
           <div className="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-            <h2 className="type-eyebrow text-slate-400">Against this week&apos;s guidance</h2>
+            <h2 className="text-base font-semibold text-slate-100">Against this week&apos;s guidance</h2>
             <p className="text-xs text-slate-500">Data as of {reportData.recordDateLabel}</p>
           </div>
           <dl className="space-y-1.5 text-sm text-slate-200">
@@ -206,7 +206,7 @@ export default async function CompsPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="type-eyebrow">Basket composition</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Basket composition</h2>
           {/* Derived, not retyped: the names and the count came from two places
               and could disagree the moment a ticker was added. */}
           <p className="text-sm text-slate-300">
@@ -218,7 +218,7 @@ export default async function CompsPage() {
         </section>
 
         <section className="space-y-3">
-          <h2 className="type-eyebrow">Use public multiples in a fundraising discussion</h2>
+          <h2 className="text-lg font-semibold text-slate-100">Use public multiples in a fundraising discussion</h2>
           <p className="text-sm text-slate-300 leading-relaxed">
             Founders, finance teams and board members can use the basket to question valuation assumptions.
             Compare growth, gross margin, retention, scale and the revenue period before choosing a comparable.

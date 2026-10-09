@@ -158,14 +158,6 @@ html[data-theme="light"] .weather-hub-backdrop {
   background: linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(15, 23, 42, 0) 100%);
 }
 
-.weather-hub-section-eyebrow {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--app-text-muted);
-}
-
 /* Ink from the text roles, never a literal white: these shells render on
    both themes, and until 2026-09-15 every title and description here was
    white or slate-200 by value, so the /answers pages — the routes search
@@ -292,14 +284,6 @@ a.weather-hub-link-card:hover {
 .weather-secondary-heading {
   display: grid;
   gap: 16px;
-}
-
- .weather-secondary-eyebrow {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--app-text-muted);
 }
 
 .weather-secondary-title {

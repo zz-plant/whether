@@ -102,14 +102,15 @@ export function ComparePeriodColumn({
   return (
     <div className="space-y-6">
       <div className="weather-panel p-6">
-        <div className="flex items-center justify-between gap-3">
-          <p className="type-eyebrow">{label}</p>
+        {/* The period names the heading's line, not a kicker above it (2026-10-09). */}
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-100">
+            <span className="font-semibold text-slate-400">{label}</span>
+            {isRegimeKey(regime) ? <ConditionIcon regime={regime} size="card" /> : null}
+            <span>{status.postureWithStageLabel || status.postureLabel}</span>
+          </h2>
           <span className="text-xs tabular-nums text-slate-400">{report.recordDateLabel}</span>
         </div>
-        <h2 className="mt-4 flex items-center gap-2 text-xl font-bold text-slate-100">
-          {isRegimeKey(regime) ? <ConditionIcon regime={regime} size="card" /> : null}
-          <span>{status.postureWithStageLabel || status.postureLabel}</span>
-        </h2>
         {/* The latitude's move, about the number: not quoted, since it is no
             longer a sentence about the guidance to cite. */}
         <p className="mt-2 text-sm text-slate-300">{summary.shorthandLine}</p>

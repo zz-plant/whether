@@ -94,10 +94,7 @@ export function GuidedTranslationPanels({
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="space-y-1">
-                <p className="type-eyebrow text-violet-200">Team view</p>
-                <h3 className="text-lg font-semibold text-slate-100">{selectedStakeholder.title}</h3>
-              </div>
+              <h3 className="text-lg font-semibold text-slate-100">{selectedStakeholder.title}</h3>
               <Link
                 href={buildGuidedTranslationHref(selectedStage ? { stage: selectedStage.slug } : undefined)}
                 className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100"
@@ -127,7 +124,7 @@ export function GuidedTranslationPanels({
                     <p className="mt-1">{entry.guidance}</p>
                     <Link
                       href={buildGuidedTranslationHref({ stakeholder: selectedStakeholder.slug, stage: entry.stageSlug })}
-                      className="mt-2 inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                      className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
                     >
                       Open {stage?.title ?? "stage"} view
                     </Link>
@@ -143,10 +140,7 @@ export function GuidedTranslationPanels({
         <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
-              <div className="space-y-1">
-                <p className="type-eyebrow text-violet-200">Stage view</p>
-                <h3 className="text-lg font-semibold text-slate-100">{selectedStage.title}</h3>
-              </div>
+              <h3 className="text-lg font-semibold text-slate-100">{selectedStage.title}</h3>
               <Link
                 href={buildGuidedTranslationHref(selectedStakeholder ? { stakeholder: selectedStakeholder.slug } : undefined)}
                 className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100"

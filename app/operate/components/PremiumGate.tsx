@@ -80,8 +80,10 @@ function EntitlementGate({ source, title, description, children }: PremiumGatePr
       className="space-y-3 rounded-lg border border-slate-800/60 bg-slate-950/30 px-5 py-6 text-center"
       data-premium-intent={source}
     >
-      <p className="type-eyebrow text-sky-300/80">Pro</p>
-      <p className="text-sm font-semibold text-slate-100">{title}</p>
+      {/* The plan is a stamp on the title's line, not a kicker above it. */}
+      <p className="text-sm font-semibold text-slate-100">
+        {title} <span className="type-badge rounded-sm border border-sky-400/40 px-1.5 py-0.5 align-middle text-sky-200">Pro</span>
+      </p>
       <p className="mx-auto max-w-sm text-fluid-xs text-slate-400">{description}</p>
       <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
         <button
