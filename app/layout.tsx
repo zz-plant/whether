@@ -169,8 +169,8 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   themeColor: [
-    { media: "(prefers-color-scheme: dark)", color: "#020617" },
-    { media: "(prefers-color-scheme: light)", color: "#f7fbff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0f1316" },
+    { media: "(prefers-color-scheme: light)", color: "#f1f4f3" },
   ],
 };
 
@@ -182,7 +182,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning className="font-sans">
       <head>
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#0284c7" />
+        <link rel="mask-icon" href="/safari-pinned-tab.svg" color="#121719" />
         {/* Fonts are self-hosted from public/fonts (see app/styles/fonts.css),
             so there is no fonts.googleapis.com stylesheet in the critical path
             and no preconnect to a third-party host. Archivo is one variable file

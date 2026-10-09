@@ -2,8 +2,8 @@
 
 /* Connected causal anchor target highlighting */
 tr:target {
-  background-color: rgba(56, 189, 248, 0.08);
-  outline: 1px solid rgba(56, 189, 248, 0.35);
+  background-color: color-mix(in srgb, var(--accent-action) 8%, transparent);
+  outline: 1px solid var(--accent-border);
   transition: background-color 300ms ease, outline 300ms ease;
 }
 
@@ -25,11 +25,12 @@ summary:focus-visible {
 :where(.weather-panel a, .weather-surface a) {
   text-decoration: underline;
   text-underline-offset: 0.16em;
-  text-decoration-color: rgba(56, 189, 248, 0.46);
+  text-decoration-color: color-mix(in srgb, var(--accent-action) 46%, transparent);
 }
 
+/* The link is the ink, so hover is the underline coming up to full ink. */
 :where(.weather-panel a:hover, .weather-surface a:hover) {
-  text-decoration-color: rgba(125, 211, 252, 0.9);
+  text-decoration-color: var(--accent-action);
 }
 
 /* A card-style link wraps a title and a line explaining it, and underlining
@@ -53,7 +54,7 @@ summary:focus-visible {
 ) {
   text-decoration: underline;
   text-underline-offset: 0.16em;
-  text-decoration-color: rgba(56, 189, 248, 0.46);
+  text-decoration-color: color-mix(in srgb, var(--accent-action) 46%, transparent);
 }
 
 /* The section permalink is a mark, not a phrase, and a lone underlined "#"

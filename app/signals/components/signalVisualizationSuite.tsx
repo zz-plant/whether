@@ -113,12 +113,23 @@ const inDomain = (value: number, min: number, max: number) => value >= min && va
  * black box once the light theme is on.
  */
 const SERIES = {
-  oneMonth: "var(--color-semantic-unchanged-border)",
-  threeMonth: "var(--accent-action)",
-  twoYear: "var(--accent-success)",
-  tenYear: "var(--accent-info)",
   spread10Y2Y: "var(--color-semantic-easing-border)",
   spread2Y3M: "var(--color-semantic-caution-border)",
+} as const;
+
+/**
+ * The four terms, told apart by ink and dash rather than by hue: the short end
+ * in the muted ink, the long end in the full one, and within each a dotted or
+ * dashed line against a solid one. They were sky, green and blue until
+ * 2026-10-09, when the action, success and info accents all became the ink
+ * (Synoptic: colour is for conditions and line states only), and a term is
+ * neither. Ink and dash also survive greyscale, which three hues did not.
+ */
+const RATE_SERIES = {
+  oneMonth: { stroke: "var(--app-text-muted)", dash: "1 4" },
+  threeMonth: { stroke: "var(--app-text-muted)", dash: undefined },
+  twoYear: { stroke: "var(--app-text)", dash: "6 4" },
+  tenYear: { stroke: "var(--app-text)", dash: undefined },
 } as const;
 
 /** Vertical extent as text. A chart with no stated scale cannot be read off. */
@@ -132,10 +143,10 @@ const RIBBON_PERIOD: Record<Cadence, string> = {
 };
 
 const ribbonTone = (value: number | null) => {
-  if (value === null) return "bg-slate-700/70";
+  if (value === null) return "bg-transparent";
   if (value < -0.25) return "bg-rose-500/75";
   if (value <= 0.25) return "bg-amber-500/75";
-  return "bg-emerald-500/75";
+  return "bg-slate-500/40";
 };
 
 const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) => (
@@ -275,7 +286,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               the same gauge as 0.41pp on Aug 31 and 0.47pp this week. The last
               block is a month-end, and the line under it says so. */}
           <FlatPanel className="lg:col-span-12">
-            <PanelTitle title="Recession warning gauge over time" subtitle="Ten-year minus two-year rate, one block per period: green is normal, amber is flattening, red is inverted." />
+            <PanelTitle title="Recession warning gauge over time" subtitle="Ten-year minus two-year rate, one block per period: grey is normal, faint red is flattening, red is inverted." />
             <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
               {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.spread10Y2Y)}`} title={`${point.label}: ${formatSpread(point.spread10Y2Y)}`} />) : <div className="flex-1 bg-slate-700/70" />}
             </div>
@@ -301,16 +312,16 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
               {oneMonthSeries.paths.map((path, index) => (
-                <path key={`1m-${index}`} d={path} fill="none" stroke={SERIES.oneMonth} strokeWidth="2" />
+                <path key={`1m-${index}`} d={path} fill="none" stroke={RATE_SERIES.oneMonth.stroke} strokeDasharray={RATE_SERIES.oneMonth.dash} strokeWidth="2" />
               ))}
               {threeMonthSeries.paths.map((path, index) => (
-                <path key={`3m-${index}`} d={path} fill="none" stroke={SERIES.threeMonth} strokeWidth="2" />
+                <path key={`3m-${index}`} d={path} fill="none" stroke={RATE_SERIES.threeMonth.stroke} strokeDasharray={RATE_SERIES.threeMonth.dash} strokeWidth="2" />
               ))}
               {twoYearSeries.paths.map((path, index) => (
-                <path key={`2y-${index}`} d={path} fill="none" stroke={SERIES.twoYear} strokeWidth="2" />
+                <path key={`2y-${index}`} d={path} fill="none" stroke={RATE_SERIES.twoYear.stroke} strokeDasharray={RATE_SERIES.twoYear.dash} strokeWidth="2" />
               ))}
               {tenYearSeries.paths.map((path, index) => (
-                <path key={`10y-${index}`} d={path} fill="none" stroke={SERIES.tenYear} strokeWidth="2" />
+                <path key={`10y-${index}`} d={path} fill="none" stroke={RATE_SERIES.tenYear.stroke} strokeDasharray={RATE_SERIES.tenYear.dash} strokeWidth="2" />
               ))}
             </svg>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
@@ -320,13 +331,16 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs tabular-nums">
               {([
-                ["1M", latest?.oneMonth, SERIES.oneMonth],
-                ["3M", latest?.threeMonth, SERIES.threeMonth],
-                ["2Y", latest?.twoYear, SERIES.twoYear],
-                ["10Y", latest?.tenYear, SERIES.tenYear],
-              ] as const).map(([label, value, color]) => (
+                ["1M", latest?.oneMonth, RATE_SERIES.oneMonth],
+                ["3M", latest?.threeMonth, RATE_SERIES.threeMonth],
+                ["2Y", latest?.twoYear, RATE_SERIES.twoYear],
+                ["10Y", latest?.tenYear, RATE_SERIES.tenYear],
+              ] as const).map(([label, value, series]) => (
                 <span key={label} className="inline-flex items-center gap-1.5 text-slate-300">
-                  <span className="h-0.5 w-3 shrink-0" style={{ backgroundColor: color }} aria-hidden="true" />
+                  {/* The key draws the line itself, dash and all, so it matches the chart. */}
+                  <svg width="16" height="4" viewBox="0 0 16 4" className="shrink-0" aria-hidden="true">
+                    <line x1="1" y1="2" x2="15" y2="2" stroke={series.stroke} strokeDasharray={series.dash} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
                   {label} {formatPercent(value ?? null)}
                 </span>
               ))}
