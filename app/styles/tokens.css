@@ -643,15 +643,18 @@ html[data-theme="light"] {
 /* The regime map. Attribute values are the RegimeKey names; the inline
    `--regime-accent` that regimeAccentStyle sets on page shells still wins
    where present, and these give any element that names its regime the same
-   accent without a style prop. Ink comes from the semantic families, which
-   already carry a per-theme value, so a stamp is legible on both grounds.
+   accent without a style prop. The accent is the condition's fill, the same
+   hex as REGIME_HEX_COLORS; the ink is the condition's own text colour, which
+   carries a per-theme value, so a stamp is legible on both grounds. Until
+   2026-10-09 the ink came from the line-state families, so Sunny printed in
+   the "clear" ink and Cloudy in the "caution" one.
    Atmosphere is the top-of-page wash both shells paint (.weather-regime-ground),
    resolved here so the brief and the report routes cannot key it differently —
    the report backdrop used to hold its own hue table, with Sunny in teal. */
-[data-regime="EXPANSION"] { --regime-accent: #10b981; --regime-ink: var(--color-semantic-easing-fg); --regime-atmosphere: var(--atmosphere-expansion); }
-[data-regime="SCARCITY"] { --regime-accent: #f43f5e; --regime-ink: var(--color-semantic-reversal-fg); --regime-atmosphere: var(--atmosphere-scarcity); }
-[data-regime="DEFENSIVE"] { --regime-accent: #f59e0b; --regime-ink: var(--color-semantic-caution-fg); --regime-atmosphere: var(--atmosphere-defensive); }
-[data-regime="VOLATILE"] { --regime-accent: #8b5cf6; --regime-ink: var(--color-semantic-stormy-fg); --regime-atmosphere: var(--atmosphere-volatile); }
+[data-regime="EXPANSION"] { --regime-accent: #d9a82c; --regime-ink: var(--color-condition-sunny-ink); --regime-atmosphere: var(--atmosphere-expansion); }
+[data-regime="SCARCITY"] { --regime-accent: #3a6fa3; --regime-ink: var(--color-condition-freezing-ink); --regime-atmosphere: var(--atmosphere-scarcity); }
+[data-regime="DEFENSIVE"] { --regime-accent: #9d7a4a; --regime-ink: var(--color-condition-cloudy-ink); --regime-atmosphere: var(--atmosphere-defensive); }
+[data-regime="VOLATILE"] { --regime-accent: #8f96e0; --regime-ink: var(--color-condition-stormy-ink); --regime-atmosphere: var(--atmosphere-volatile); }
 
 /* Light mode: remap opacity-based v2 styles onto the three text roles.
    154 usages spread across 12 alpha steps used to be mapped one line at a time,
