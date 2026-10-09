@@ -433,8 +433,8 @@ export const buildWeekCallChangesIf = <Assessment extends CallChangeInputs & Pic
 
 /**
  * What would change the guidance, as one labelled clause, for a line with room for
- * one: the /share standup, the homepage's quiet-day line and its lapsed-return
- * panel. On a held week it is the hold's own condition (the contract's
+ * one: the /share standup and its work-item blocks (the homepage's quiet-day line
+ * and lapsed-return panel carried it until 2026-10-09). On a held week it is the hold's own condition (the contract's
  * `callChangesIf`); on any other, the nearer of `buildCallChangeLines` in points, a
  * clause of the contract's sentence.
  *

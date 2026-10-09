@@ -59,18 +59,21 @@ describe("RegimeRadar", () => {
     assert.doesNotMatch(withoutPrevious, /stroke="#94a3b8"/);
   });
 
-  it("measures the nearest plotted call-change line, independently of operating pause rules", () => {
-    const current = renderToStaticMarkup(
+  /* The distance to the nearer line is the trust strip's margin, printed once on the
+     page; the map printed it again as a caption (2026-10-09). What the map states in
+     words is each change line's value, at the line, and the four sides for a screen
+     reader: the definition the one-line legend gives where the map is not drawn. */
+  it("labels each change line with its value and defines the four sides, without restating the margin", () => {
+    const html = renderToStaticMarkup(
       <RegimeRadar {...base} tightness={90} riskAppetite={47} tightnessThreshold={70} riskAppetiteThreshold={50} />,
     );
-    assert.match(current, /3 points to the nearest change line/);
-    assert.doesNotMatch(current, /0 points to/);
-
-    const horizontal = renderToStaticMarkup(<RegimeRadar {...base} tightness={62} />);
-    assert.match(horizontal, /2 points to the nearest change line/);
-
-    const onLine = renderToStaticMarkup(<RegimeRadar {...base} riskAppetite={45} />);
-    assert.match(onLine, /0 points to the nearest change line/);
+    assert.match(html, /data-change-line="tightness"[^>]*>70<\/text>/);
+    assert.match(html, /data-change-line="riskAppetite"[^>]*>50<\/text>/);
+    assert.doesNotMatch(html, /to the nearest change line/);
+    assert.match(
+      html,
+      /<p class="sr-only">Funding pressure above 70 and risk appetite below 50: Freezing\. Above 70 and above 50: Cloudy\. Below 70 and below 50: Stormy\. Below 70 and above 50: Sunny\.<\/p>/,
+    );
   });
 
   it("carries accessible title tooltips for threshold boundaries and current position", () => {
@@ -124,9 +127,10 @@ describe("RegimeRadar path", () => {
     assert.match(html, /built from interest rates alone/);
   });
 
-  it("leaves the distance caption to a surface that already states it", () => {
-    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} showDistance={false} />);
-    assert.doesNotMatch(html, /to the nearest change line/);
+  it("draws no empty caption", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} />);
     assert.doesNotMatch(html, /<figcaption/, "no empty caption is drawn");
+    const withFooter = renderToStaticMarkup(<RegimeRadar {...base} footer={<span>How they are set</span>} />);
+    assert.match(withFooter, /<figcaption[\s\S]*How they are set[\s\S]*<\/figcaption>/, "the footer closes the caption");
   });
 });

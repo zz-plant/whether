@@ -22,7 +22,9 @@ import { insightDatabase } from "../data/recommendations";
  * check and fail this.
  */
 describe("regime public labels", () => {
-  it("renders the public label as the rules heading for every regime", () => {
+  /* The panel no longer heads itself with the conditions (2026-10-09: the page
+     intro stamps them); what it renders must still never be an internal name. */
+  it("renders each regime's rules without an internal name", () => {
     for (const regime of REGIME_ORDER) {
       const playbook = getPlaybookForRegime(regime);
       assert.ok(playbook, `no playbook for ${regime}`);
@@ -37,10 +39,10 @@ describe("regime public labels", () => {
         />,
       );
 
-      assert.ok(
-        html.includes(REGIME_LABELS[regime]),
-        `${regime} panel does not render its public label "${REGIME_LABELS[regime]}"`,
-      );
+      assert.ok(html.includes(playbook.insight.replace(/'/g, "&#x27;")), `${regime} panel renders its insight`);
+      for (const internal of ["Scarcity", "Defensive", "Volatile", "Expansion"]) {
+        assert.ok(!html.includes(internal), `${regime} panel renders the internal name "${internal}"`);
+      }
     }
   });
 

@@ -24,13 +24,12 @@ export function CommandCenterNavBlock({
   statusPrefix,
   trustStatusLabel,
   fetchedAtLabel,
-  resolvedNextRefreshLabel,
   showOfflineBadge,
   offlineBadgeLabel,
   trustStrip,
 }: {
   pageTitle: string;
-  pageSummary: string;
+  pageSummary?: string;
   recordDateLabel: string;
   primaryCta?: ReportCtaProps;
   exportCta?: ExportCtaProps | null;
@@ -38,7 +37,6 @@ export function CommandCenterNavBlock({
   statusPrefix?: string;
   trustStatusLabel: string;
   fetchedAtLabel: string;
-  resolvedNextRefreshLabel?: string;
   showOfflineBadge: boolean;
   offlineBadgeLabel: string;
   /** The route's trust strip. It carries the record date and the sources, so
@@ -62,8 +60,10 @@ export function CommandCenterNavBlock({
     .filter(Boolean)
     .join(" • ");
   // Same rule for the refresh stamp: /history passes no fetch time, and
-  // printed "Updated " with nothing after it.
-  const showStamp = Boolean(fetchedAtLabel) || Boolean(resolvedNextRefreshLabel);
+  // printed "Updated " with nothing after it. There is no second stamp: a
+  // "15m cadence" label and, on /history, "Fixed historical snapshot" beside the
+  // status line's own "Historical snapshot" were removed (the second 2026-10-09).
+  const showStamp = Boolean(fetchedAtLabel);
   const showActions = Boolean(primaryCta) || Boolean(exportCta);
   // A phone gets the week's word, the title and one meta line before the
   // first task block (ui-ux-standards §XI). Until 2026-10-07 the intro on
@@ -76,7 +76,7 @@ export function CommandCenterNavBlock({
   // "sources • as of" line (/resolve, /history) it would wrap under it, so
   // there it stays at the foot of the block.
   const captionBesideStatus = Boolean(statusLabel) && !introMetaRest;
-  const stampRowOnPhone = Boolean(resolvedNextRefreshLabel) || !captionBesideStatus;
+  const stampRowOnPhone = !captionBesideStatus;
   const rightColumnOnPhone = stampRowOnPhone || showActions;
 
   return (
@@ -132,9 +132,11 @@ export function CommandCenterNavBlock({
           {/* On a phone a route with a strip drops the summary: the bottom bar
               already names the page, and the strip is the line a reader
               needs before the first task block. */}
-          <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
-            {pageSummary}
-          </p>
+          {pageSummary ? (
+            <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
+              {pageSummary}
+            </p>
+          ) : null}
           {trustStrip ? <TrustStrip {...trustStrip} phoneLayout="line" className="sm:pt-2" /> : null}
         </div>
 
@@ -156,9 +158,6 @@ export function CommandCenterNavBlock({
                     (2026-10-09; it read "Signals refreshed", which did not say
                     which of the two mattered). */}
                 {fetchedAtLabel ? <span className="max-sm:hidden">Checked {fetchedAtLabel}</span> : null}
-                {resolvedNextRefreshLabel ? (
-                  <span>{resolvedNextRefreshLabel}</span>
-                ) : null}
                 <ScreenshotCaption
                   className={`${showStamp ? "ml-auto lg:ml-0" : ""} ${captionBesideStatus ? "max-sm:hidden" : ""}`.trim() || undefined}
                 />

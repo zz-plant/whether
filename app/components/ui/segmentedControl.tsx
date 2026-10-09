@@ -153,7 +153,9 @@ export function SegmentedControl<Key extends string>({
             ) : (
               <>
                 {option.icon ? <span className="mr-1.5 inline-flex">{option.icon}</span> : null}
-                <span>{option.label}</span>
+                {/* The name stays on one line; the sublabel beside it wraps. "Series A"
+                    broke after "Series" once the default's sublabel said so. */}
+                <span className="whitespace-nowrap">{option.label}</span>
                 {option.sublabel ? (
                   <span className="ml-1 hidden font-normal opacity-60 sm:inline">· {option.sublabel}</span>
                 ) : null}

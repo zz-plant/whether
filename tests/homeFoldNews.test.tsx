@@ -75,19 +75,20 @@ describe("the map in the card", () => {
     assert.equal(describeConditionsTrail([]), null);
   });
 
-  it("draws the aside and its note from md up only, and leaves cards without one unchanged", () => {
+  /* The trail's caption is the map's own (2026-10-09). It sat under the trust row in
+     the left column, a column away from the dots it describes. */
+  it("draws the aside from md up only, and leaves cards without one unchanged", () => {
     const withMap = renderToStaticMarkup(
       <DecisionHero
         weeklyCall="Freeze new commitments and protect runway."
         regime="SCARCITY"
         aside={<figure data-testid="map" />}
-        asideNote={["Trail: month-ends Mar–Aug 2026, then this week."]}
       />,
     );
     assert.match(withMap, /<div class="max-md:hidden"><figure data-testid="map"/);
-    assert.match(withMap, /max-md:hidden[^"]*" data-aside-note="true">Trail: month-ends Mar–Aug 2026, then this week\./);
+    assert.doesNotMatch(withMap, /data-aside-note/);
 
     const plain = renderToStaticMarkup(<DecisionHero weeklyCall="Hold." regime="SCARCITY" />);
-    assert.doesNotMatch(plain, /max-md:hidden|data-aside-note|md:grid/);
+    assert.doesNotMatch(plain, /max-md:hidden|md:grid/);
   });
 });

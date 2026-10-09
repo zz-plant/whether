@@ -122,44 +122,53 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
 `lib/report/home/homeSectionModel.ts`; `app/page.tsx`; pinned by
 `tests/homeRouteDecisionTransmissionContract.test.tsx`):
 
-0. **The conditions legend** (`home/ConditionsLegend.tsx`), one line above the week: Sunny, Cloudy,
-   Stormy and Freezing by funding pressure above or below its change line and risk appetite above
-   or below its, linked to the method. It replaced the standfirst and the folded "How to read this
-   page". Dismissible; the layout hides it for a browser that has rendered the brief before. The
-   week picker above the card names the week by its Monday and is a label, not a heading.
+0. **The conditions legend** (`home/ConditionsLegend.tsx`), one line above the week, below `md`
+   only: Sunny, Cloudy, Stormy and Freezing by funding pressure above or below its change line and
+   risk appetite above or below its, linked to the method. From `md` up the card's conditions map is
+   the definition (each change line's value at its end, "How they are set" under it), so the legend
+   gives way to it (§1.1.63). It replaced the standfirst and the folded "How to read this page".
+   Dismissible; the layout hides it for a browser that has rendered the brief before. The week
+   picker above the card names the week by its Monday and is a label, not a heading.
 1. **The verdict** (`#weekly-call`). `DecisionHero` is the card a reader screenshots: the conditions
    stamp with the week's direction and, when conditions changed, what they were; the week's
    headline action as the `h1` (`weeklyHeadline`, §1.1.60); what the conditions mean; one line on
    why (`describeMovementCause`: the lines the scores crossed, "Risk appetite fell through 54."); the
-   trust strip ("Data as of", Sources, Margin, Could change next week); and from `md` up the
-   conditions map. A monthly or quarterly horizon adds `CadenceCallCard` above it with the `h1`.
-   Under the card sit `SinceLastVisit` and `YourRecordNote` (live briefs only), then Copy Brief
-   (DD-005's one primary action) and the Plan horizon control.
+   trust strip ("Data as of", Sources, and Margin, which says after the points whether the call could
+   change next week); and from `md` up the conditions map with the trail's caption under it. A
+   monthly or quarterly horizon adds `CadenceCallCard` above it with the `h1`. Under the card sit
+   `SinceLastVisit` (only when the conditions or the call differ from what this browser last saw,
+   and not when the difference is the earlier conditions the stamp line names) and `YourRecordNote`
+   (live briefs only), then Copy Brief (DD-005's one primary action) and the Plan horizon control.
 2. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
-   only): whose lines these are, in one sentence, with the stage and runway tablists from `sm` up
-   (the header's pills on a phone), a chosen stage's own action as a stage line, and the runway
-   emphasis once a band reshaped a rule. Nothing lower on the page repeats the control.
+   only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
+   its default choice, a chosen stage's own action as a stage line, and the runway emphasis once a
+   band reshaped a rule. No sentence restates the selection; on a phone the section prints only
+   with a stage line or a runway note. Nothing lower on the page repeats the control.
 3. **The five areas** (`DecisionPicker`, `#what-it-changes`, "What are you deciding?"): each area
    by its name with its standing against its pause line; a choice opens its rule, lines and the
    runway test. All five side by side fold under it (`AllAreaRules`: the area table, the runway
-   notes and the commitment test), then the one plan button.
+   notes and the commitment test), then the one plan button. No "This week's scores" list: the map
+   and the bars in section 6 print the scores at every width.
 4. **What would change this guidance** (`WhatWouldChangeSection`): the pause line, the resume line
    (a chosen stage's, else the lead area's), the line where conditions change, the market move in
-   rate terms (folded), and below `md` the conditions map.
+   rate terms (folded), and below `md` the conditions map (no distance caption: the trust strip's
+   margin states it).
 5. **Get an email the day a line is crossed** (`AlertSection`, `#subscribe`): the one subscribe
    form, starting on alerts only with the Monday email one choice away, and the push toggle.
 6. **What changed this week** (`WhatChangedSection`): one row per signal, the earlier reading →
    this week's with the comparison dated (§1.1.26), each composite score on its ladder with what
-   moved it (§1.1.27), under the movement sentence (§1.1.28).
+   moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
+   each area's row says which of its lines moved. A read with no comparison says so over it.
 7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; the last turns as links.
-8. **Share** (`ShareSection`): one "Share or embed this →" link to `/share`, which holds the slide
-   and image copies and every other format since 2026-10-08, and the citable permalink.
+8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
+   holds the slide and image copies and every other format since 2026-10-08, and the week's
+   published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
 
 There is no first-visit fold since 2026-10-09: the order puts the areas, the lines and the alert
 before the evidence for every reader, so the fold (§1.1.21, §1.1.42) and its "Show the full brief"
 button are gone, and the bootstrap no longer marks a first visit. `StickyCallStrip` carries the
-guidance from `md` up, with a "By area" link to section 3. An archived month drops the trust strip
+guidance from `md` up once the card has left the screen, with a "By area" link to section 3. An archived month drops the trust strip
 for an archive caption and leaves out `SinceLastVisit`, `YourRecordNote`, the stage and runway
 section and the runway notes. `/` mounts `ActivationTracker` and `OperatorWorkflowRouteTracker`;
 the workflow stream records route transitions (§1.1.30).
@@ -2869,6 +2878,77 @@ slide's system sans runs wider than the Archivo faces `textFit` was measured on,
 its own, higher per-character widths (0.56em bold, 0.53em regular). The PPTX deck's text boxes wrap
 natively and are unchanged. `tests/meetingSlideExport.test.ts` pins a two-line call, a one-line
 call and the cut.
+
+### 1.1.63 One place per fact (2026-10-09)
+
+Each fact prints once per page, in its most useful form: a chart or a bar over a sentence that
+restates it, a control over a sentence describing its state. A summary followed by its detail stays
+("Pause lines crossed in 4 of 5 areas" over the five choices), and so do sr-only text alternatives,
+labels beside glyphs, and the same fact on another page. Two elements are duplicates only at a width
+where both show. `tests/onePlacePerFact.test.tsx` pins the homepage and `/history` decisions.
+
+**Homepage.**
+
+- **The four conditions.** The legend above the week shows below `md` only; from `md` up the card's
+  map defines them, with each change line's value at its end ("70", "50"), an sr-only statement of
+  the four sides, and "How they are set" under it. A share arrival's greeting shows at every width.
+- **Cloudy → Freezing.** Said once, on the card's stamp line ("Was Cloudy on Sep 30") with the line
+  under the call. `SinceLastVisit` renders only when the conditions or the call differ from what
+  this browser last saw, and not when the difference is the earlier conditions the card names
+  (`sinceLastVisitDelta`); it no longer carries what would change the guidance or the
+  lines-crossed sentence. "What changed this week" opens on its table; `buildChangedLead`,
+  `buildQuietDayRead` and `buildHomeQuietDayRead`, which built the lead and the quiet-day line, are
+  deleted.
+- **The two scores.** On the map's header (the card from `md`, "What would change" below it) and the
+  bars in "What changed", at both widths. The picker's "This week's scores" list is gone.
+- **The margin.** One trust-strip cell on every reading route: "Margin · Risk appetite 1 pt from
+  its change line · Could change next week" (or "Not expected to change next week"), where a fourth
+  cell answered "Yes" beside the distance. It always prints on the report intros' phone line. The
+  map's "1 point to the nearest change line" caption is gone (`showDistance`).
+- **Stage and runway.** The sentence over the controls is gone; each control marks its default
+  (`choiceSublabel`, "(default)"), in the tablists from `sm` and the header pills' lists below it.
+- **Dates.** The week stays on the picker and "Data as of" on the strip; the trail's caption sits
+  under the map. The closing line names the published brief by its week, where "The reading above
+  is from Oct 7, 2026. The last frozen record is dated Oct 6, 2026." printed two more dates.
+- **Share.** The "Share" section (a heading over one link) is the page's closing line,
+  `ShareLinks`; Copy Brief stays under the card. The desktop sticky strip waits for the card to
+  leave the screen, as the phone line does.
+- **Kept on purpose.** The "Whether · whether.work" caption inside the card: it is what a cropped
+  phone screenshot of the live page keeps (the Monday Browser Rendering capture uses the live page
+  too, `?screenshot=1`), and the copy-as-image buttons draw their own Satori cards. The "Against
+  this week" sentence in "Has this happened before?": it compares two readings and needs both.
+
+**`/history`.** "Cloudy, held 1 month" stays on the intro's stamp and the "Current conditions held"
+tile: the band's caption is its date range, and the sentence under the tiles ("Through Sep 30,
+2026, month-end conditions had been Cloudy since Sep 30, 2026") is gone. The change count is its
+tile's, the reading count its tile's (the published-briefs line no longer prints "177 month-end
+readings, Jan 2012 to Sep 2026"), and a "Record starts" tile that repeated the count tiles' window
+is gone. "What the margin has been worth" is the study's first sentence (96%) and the link to
+`/calibration`, which owns the band table (`ConfidenceRecordSummary`). The intro no longer prints
+"Fixed historical snapshot" beside "Historical snapshot" (`nextRefreshLabel` removed).
+
+**Elsewhere.**
+
+| Page | Repeated | Kept |
+| --- | --- | --- |
+| `/operate/financial`, `/operate/scenarios` | breadcrumb "Decide / Runway planner" under the sub-tab row | sub-tabs; the trail stays as structured data |
+| `/operate/financial` | "Runway and burn" paragraph restating the intro | the intro |
+| `/operate/scenarios` | "Move either slider…" under the intro that says to move the sliders | the intro |
+| `/operate` | "Rules for this week" and an h3 naming the conditions, inside "Rules before you commit" | the step title and the intro's stamp |
+| `/comps` | how to use the median, beside the section that says it in full | "Use public multiples in a fundraising discussion" |
+| `/signals` | each row's earlier reading under "This week", beside the "56 → 49" chip | the chip |
+| `/trust` | the summary under the title; pills to two sections the index names; a revisit row that only linked back up; a second link to `/about#method` | the title, the index, the closing line |
+| `/brief/<week>` | "Freezing:" in the heading under the stamp; the week in the caption under the heading; "(week of …)" and "Date-pinned record" over the preview | the stamp, the heading, the share heading |
+| `/share` | "PPTX · PDF · SVG" over the three file buttons | the buttons |
+| `/answers/*` | the related links beside the top copy button; "Market guidance as of" under the strip's "Data as of" | "Next for…", the strip |
+| `/resources` | each answer row's stamp, the same for every row in an area | one stamp beside the area's name |
+| `/history/compare` | the intro's status word, Period A's conditions on a two-period page | the period headings |
+| `/calibration` | "The record" kicker; the study section's intro restating the page's | the tabs, the page intro |
+| `/pricing` | "Cannot be bought yet. A request records…" on each paid card, and again in a "What a request does" section after the buttons that also restated the free promise | one line in the header for Pro and Team together, before any request button |
+| `/trust` | "The exact arithmetic is below." over the "Show the exact arithmetic" control | the control |
+| `/about` | the structure's healthcare origin in "Who writes it" and again in the folded "Why it works", behind a link to `/about` itself | "Who writes it"; "Why it works" keeps the stakes |
+| `/brief/<week>` | "This record is frozen." in the footer, under the header's "This is a frozen record of one week." | the header line; the footer keeps the corrections rule |
+| `/history/compare` | the borrowing premium's definition under the difference tile and in both columns, the tile also repeating both columns' values | the definition under the tile; each column prints its value |
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

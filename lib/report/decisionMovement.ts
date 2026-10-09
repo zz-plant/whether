@@ -403,49 +403,7 @@ export const buildDecisionMovementForReport = ({
   });
 };
 
-/**
- * The line over "What changed this week". With a comparison it is what the week did to the
- * decisions; on a quiet week (`quietDayLine` is set) it is followed by the quiet-day line,
- * so "nothing changed" arrives with the one thing that would change it. Without a
- * comparison that could be read against the lines it is the direction the scores moved.
- *
- * It appended the nearest market move (`buildFlipProximity`) until 2026-10-07, and fell back
- * to the quiet-day line without a movement, which could not happen: the quiet-day line needs
- * a week whose guidance held, and that needs the movement.
- */
-export const buildChangedLead = ({
-  movement,
-  quietDayLine,
-  fallback,
-}: {
-  movement: Pick<DecisionMovement, "sentence" | "moved"> | null;
-  quietDayLine: string | null;
-  fallback: string;
-}): string => {
-  if (!movement) return fallback;
-  const quiet = quietDayLine !== null && movement.moved.length === 0;
-  return quiet ? `${movement.sentence} ${quietDayLine}` : movement.sentence;
-};
-
 type CallChangeSource = Parameters<typeof buildCallChangeLine>[0];
-
-/**
- * The quiet-day read: on a week whose guidance held against the earlier reading, what would
- * change it (`buildCallChangeLine`), so a returning reader learns both that nothing moved
- * and the one thing that would. Null on any other week: one that moved has its own lead,
- * and one with nothing compared has nothing to call quiet.
- *
- * It read "Conditions unchanged — If the 1-month Treasury bill rate rises 0.15%, conditions
- * turn Cloudy." until 2026-10-07: the nearest market move, in "%" for a move in a rate, and
- * on a held week a rate move standing where the hold's own condition belongs.
- */
-export const buildQuietDayRead = ({
-  guidanceChange,
-  ...source
-}: CallChangeSource & {
-  /** What the week did to the guidance (`describeGuidanceChange`); the read prints only when it held. */
-  guidanceChange: GuidanceChange | null;
-}): string | null => (guidanceChange === "held" ? buildCallChangeLine(source) : null);
 
 /**
  * The standup line: one line for a team's daily or sprint standup, saying whether the

@@ -69,8 +69,13 @@ describe("the record's counts", () => {
     const through = formatMonthYearShortFromValue(counts.latestRecordDate);
 
     const history = textOf(renderToStaticMarkup(await (await import("../app/history/page")).default({ searchParams: Promise.resolve({}) })));
-    assert.ok(history.includes(`${counts.readings} month-end readings, ${since} to ${through}`), "the archive line carries its window");
+    /* Once each (2026-10-09): the reading count is the "Months on record" tile, and the
+       published-briefs line no longer prints "177 month-end readings, Jan 2012 to Sep
+       2026" a second time; the change count is its tile, not also the band's caption. */
+    assert.ok(history.includes(`Months on record ${counts.readings} since ${since}`), "the readings tile carries its window");
+    assert.ok(!history.includes(`${counts.readings} month-end readings`), "the readings are counted once");
     assert.ok(history.includes(`Changes in conditions ${counts.changes} since ${since}`), "the record tile carries its window");
+    assert.ok(!history.includes(`${counts.changes} changes in conditions`), "the band's caption does not repeat the change count");
     assert.ok(history.includes(`Changes in conditions ${recent.changes} in the last ${recent.readings} months`), "the grading tile carries its window");
 
     const calibration = textOf(renderToStaticMarkup((await import("../app/calibration/page")).default()));

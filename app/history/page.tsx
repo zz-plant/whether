@@ -8,15 +8,15 @@ import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
 import { MonthStrip } from "../components/history/monthStrip";
 import { TrackRecordTable, TrackRecordTiles } from "../components/history/TrackRecord";
 import { TrackRecordSection } from "../components/history/TrackRecordSection";
-import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordBody } from "../components/history/confidenceRecord";
+import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordSummary } from "../components/history/confidenceRecord";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
-import { buildTrackRecord, countRecord } from "../../lib/report/trackRecord";
+import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
-import { formatDateUTC, formatMonthYearShortFromValue } from "../../lib/formatters";
+import { formatDateUTC } from "../../lib/formatters";
 import { regimeKeyFromLabel, toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ConditionIcon } from "../components/ui/conceptIcons";
@@ -74,12 +74,6 @@ export default async function HistoryPage({
   const riskAppetiteTrend = regimeSeries.slice(-13).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
   const publishedBriefs = getPublishedBriefs();
   const trackRecord = buildTrackRecord(fullSeries);
-  /* The one count of the record (`countRecord`), with its window; this paragraph
-     said "176 months of monthly readings (2012–2026)", written before September. */
-  const recordCounts = countRecord(fullSeries);
-  const recordSpan = recordCounts
-    ? `${recordCounts.readings} month-end readings, ${formatMonthYearShortFromValue(recordCounts.firstRecordDate)} to ${formatMonthYearShortFromValue(recordCounts.latestRecordDate)}`
-    : "the month-end readings";
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
   /* The month strip ends at the last month-end, and its "held since" line was
@@ -235,11 +229,14 @@ export default async function HistoryPage({
             {/* Say what the archive holds, not what it aspires to. With one entry,
                 "permanent, immutable calls cited in board documents" promised a
                 record the page could not show. The count is the honest claim; the
-                append-only rule is the guarantee worth stating. */}
+                append-only rule is the guarantee worth stating. The readings go
+                unnumbered (2026-10-09): their count and window are the track
+                record's "Months on record" tile, and this line printed them a
+                second time ("177 month-end readings, Jan 2012 to Sep 2026"). */}
             <p className="text-sm text-slate-300">
               {publishedBriefs.length === 1
-                ? `Permanent, append-only weekly brief records paired with ${recordSpan}. Entries are never edited after publication, so past guidance reads the way it was published.`
-                : `${publishedBriefs.length} weekly brief records paired with ${recordSpan}. Entries are never edited after publication, so past guidance reads the way it was published.`}
+                ? `Permanent, append-only weekly brief records paired with the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`
+                : `${publishedBriefs.length} weekly brief records paired with the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`}
             </p>
           </div>
           {/* A link card, not a pill coerced into one: the `pill` variant is a
@@ -264,9 +261,10 @@ export default async function HistoryPage({
         </section>
       ) : null}
 
-      {/* The tiles, with the confidence record beside them: "how often did the
-          call hold" and "how often was the confidence label right" are the same
-          question asked twice, and the second answer used to live on /trust. */}
+      {/* The tiles, with the confidence record's headline beside them: "how often
+          did the call hold" and "how often was the margin right" are the same
+          question asked twice. The study itself, table and all, is /calibration's;
+          this page drew all of it until 2026-10-09. */}
       <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         {/* The export copies the track record, so it sits in that section's
             header. It had a row of its own between the page intro and the
@@ -277,7 +275,7 @@ export default async function HistoryPage({
           aside={
             <div className="space-y-3">
               <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
-              <ConfidenceRecordBody />
+              <ConfidenceRecordSummary />
               <p className="text-fluid-xs text-slate-400">
                 <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Read the calibration study

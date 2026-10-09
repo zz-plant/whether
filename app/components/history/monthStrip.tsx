@@ -116,13 +116,13 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
           </li>
         ))}
       </ul>
-      <figcaption className="flex flex-wrap justify-between gap-x-4 text-xs text-slate-400">
-        <span>
-          {monthLabel(sorted[0].recordDate)} – {monthLabel(run.latest)} · {changes} {changes === 1 ? "change" : "changes"} in conditions
-        </span>
-        <span className="text-slate-200">
-          {run.label}, held {run.held} {run.held === 1 ? "month" : "months"} since {monthLabel(run.since)}
-        </span>
+      {/* The band's domain, and nothing the page states elsewhere (2026-10-09).
+          It also printed "7 changes in conditions" and "Cloudy, held 1 month
+          since Sep 2026", which /history prints in the track record's tiles and
+          the intro's stamp; the sentence above the band keeps both for a screen
+          reader, which has no other text for the picture. */}
+      <figcaption className="text-xs text-slate-400">
+        {monthLabel(sorted[0].recordDate)} – {monthLabel(run.latest)}
       </figcaption>
     </figure>
   );

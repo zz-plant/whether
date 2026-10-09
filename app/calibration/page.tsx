@@ -57,8 +57,10 @@ export default function CalibrationPage() {
       <JsonLdScript data={buildCalibrationStudyStructuredData({ totals })} />
       <SectionTabs currentPath="/calibration" />
 
+      {/* No "The record" kicker (2026-10-09): the header's Record tab and the
+          sub-tab row above already name the group, as the report pages dropped
+          "Weekly brief" over their titles. */}
       <SecondaryPageHeader
-        eyebrow="The record"
         title="Margin calibration study"
         description={`The published margin, checked against ${totals.months} month-to-month comparisons since 2012: how often conditions held at each distance from the line where they change.`}
         aside={<CalibrationCurveGlyph size={64} />}

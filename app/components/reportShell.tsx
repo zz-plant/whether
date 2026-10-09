@@ -55,7 +55,9 @@ export type ReportShellModel = {
   };
   page: {
     pageTitle: string;
-    pageSummary: string;
+    /** The page's job in one sentence. Left out where the title already says it
+     *  (/trust: "How much to trust this week's guidance"). */
+    pageSummary?: string;
     sectionLinks: ReportSectionLink[];
     /** The route's address, for its group's sub-tab row above the intro. Omitted, no row renders. */
     currentPath?: Route;
@@ -81,7 +83,6 @@ export type ReportShellModel = {
     primaryCta?: ReportCtaProps;
     exportCta?: ExportCtaProps | null;
     nextStep?: NextStep;
-    nextRefreshLabel?: string;
   };
   payloads?: {
     structuredData?: unknown;
@@ -112,15 +113,9 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
       primaryCta,
       exportCta = null,
       nextStep,
-      nextRefreshLabel,
     } = {},
     payloads: { structuredData, historicalBanner } = {},
   } = model;
-  // Only a historical selection has a refresh state worth a label. The live
-  // masthead used to add "15m cadence" beside the decision date and the refresh
-  // timestamp — a third time marker, advertising a poll interval on a product
-  // whose whole premise is a Monday call.
-  const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : undefined);
   const contentSections = Children.toArray(children);
   /*
    * A rail with no outline in it is just 13rem of empty column — /history asked
@@ -182,7 +177,6 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             statusPrefix={statusPrefix}
             trustStatusLabel={trustReadiness.headline}
             fetchedAtLabel={fetchedAtLabel}
-            resolvedNextRefreshLabel={resolvedNextRefreshLabel}
             showOfflineBadge={showOfflineBadge}
             offlineBadgeLabel={offlineBadgeLabel}
             trustStrip={trustStrip}

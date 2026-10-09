@@ -65,7 +65,7 @@ describe("/about folds the method's essay and the blank form", () => {
     const html = renderToStaticMarkup(<MethodSection />);
 
     assert.equal(insideDetails(html, html.indexOf("In practice")), false, "the worked example is open");
-    for (const folded of ["The three parts", "Why it works", "healthcare products", "When you will check", "No signup required"]) {
+    for (const folded of ["The three parts", "Why it works", "clinical workflows", "When you will check", "No signup required"]) {
       const at = html.indexOf(folded);
       assert.ok(at !== -1, `${folded} still renders, for find-in-page and the redirects`);
       assert.equal(insideDetails(html, at), true, `${folded} is folded`);

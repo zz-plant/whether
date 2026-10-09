@@ -111,11 +111,17 @@ describe("/history dates what it is showing", () => {
     );
   });
 
-  it("stamps the period the record runs through", () => {
+  /* The period is the page intro's stamp ("Last completed month", "Data as of"),
+     not a sentence under the tiles restating the held tile (2026-10-09). The tiles
+     carry their window, and the held figure prints once. */
+  it("leaves the period to the intro's stamp and prints the held months once", () => {
     const html = renderToStaticMarkup(<TrackRecordTiles record={record} />);
 
-    assert.match(html, /month-end conditions/i);
-    assert.match(html, /Through /);
+    assert.doesNotMatch(html, /Through |month-end conditions had been/i);
+    assert.doesNotMatch(html, /Record starts/, "the start date is the count tiles' window");
+    const text = html.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    assert.equal((text.match(/Current conditions held/g) ?? []).length, 1);
+    assert.match(text, /since Jan 2024/);
   });
 
   /*
@@ -276,12 +282,18 @@ describe("the site gives one account of what is new and what the scores read", (
     assert.match(html, /href="\/calibration"/);
   });
 
-  it("/about ties the method's origin to someone a reader can look up", () => {
-    const html = renderToStaticMarkup(<MethodSection />);
-    const origin = html.split("<p").find((paragraph) => paragraph.includes("clinical workflows"));
+  /* Said once (2026-10-09): "Who writes it" names the editor and links to the work;
+     the method's folded "Why it works" keeps the stakes and no second origin claim. */
+  it("/about ties the method's origin to someone a reader can look up, once", async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    const html = renderToStaticMarkup(<AboutPage />);
+    const origins = html.split("<p").filter((paragraph) => /comes from[^<]*healthcare|built this structure into/.test(paragraph.replace(/<!-- -->/g, "")));
 
-    assert.ok(origin, "expected the paragraph that says where the method comes from");
-    assert.match(origin, /href="\/about"/, "an origin claim with no one behind it reads as invented");
+    assert.equal(origins.length, 1, "the structure's origin is stated once on /about");
+    assert.match(origins[0], /href="https:\/\/[^"]+"/, "an origin claim needs someone a reader can look up behind it");
+    const stakes = renderToStaticMarkup(<MethodSection />).split("<p").find((paragraph) => paragraph.includes("clinical workflows"));
+    assert.ok(stakes, "the method keeps the stakes that make its argument");
+    assert.doesNotMatch(stakes, /healthcare products|href="\/about"/, "and no second origin claim, linked to the page it sits on");
   });
 
   it("/trust puts operating latitude where it is drawn, and defines confidence the way the label counts it", () => {
@@ -380,12 +392,14 @@ describe("/ and /brief.md agree on whether conditions could change next week", (
       />,
     );
     const brief = buildBriefMarkdown(homepage);
-    const stripValue = /<dt[^>]*>Could change next week<\/dt><dd[^>]*>([^<]+)<\/dd>/.exec(strip)?.[1];
+    /* The margin cell's second half (2026-10-09): "Could change next week", with a reason
+       when one applies, or "Not expected to change next week". */
+    const stripValue = /data-next-week[^>]*>([\s\S]*?)<\/span>/.exec(strip)?.[1]?.replace(/<!--[\s\S]*?-->/g, "").replace(/^\s*·\s*/, "").trim();
     const briefTrustLine = brief.split("\n").find((line) => line.startsWith("> **Trust:**"));
     assert.ok(stripValue, "expected the strip to state whether conditions could change next week");
     assert.ok(briefTrustLine, "expected /brief.md to open with its confidence line");
-    // The strip answers with the reason ("Risk appetite is 2 pts from its line") or a bare "Yes"; "Not expected" is the no.
-    return { stripSaysYes: stripValue !== undefined && stripValue !== "Not expected", briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
+    // "Could change next week", with or without a reason, is the yes; "Not expected to change next week" is the no.
+    return { stripSaysYes: stripValue !== undefined && stripValue.startsWith("Could change next week"), briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
   };
 
   it("says not expected on the week of Sep 29, on both", async () => {

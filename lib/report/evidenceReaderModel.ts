@@ -24,8 +24,8 @@ import { resolveNearestLineMargin, type ConfidenceInputs } from "./confidence";
  * previous value, the line and the distance.
  *
  * The earlier reading is last week's published brief, or the previous month-end
- * where there is none (`lib/report/comparisonReading.ts`), and each row names it
- * by date (`previousLabel`, from `comparisonBasis`) instead of calling it last week.
+ * where there is none (`lib/report/comparisonReading.ts`), and each row's move
+ * names it by date (from `comparisonBasis`) instead of calling it last week.
  * A comparison is a fact only when one happened. `buildReportDynamics`
  * records a signal's move in `changedSignals` (or `anomalySignals` when it
  * moved past the sanity bound), and says `directionLabel: "unavailable"` when
@@ -68,8 +68,6 @@ export type SignalReferenceRow = {
   /** Null when the series did not resolve this week. */
   value: number | null;
   previous: number | null;
-  /** What `previous` is: the date of the reading it is from ("Aug 31"), or "Last week" where the week does not date it. */
-  previousLabel: string;
   /** The signed move, when one was recorded. */
   delta: number | null;
   line: { value: number; label: string };
@@ -184,7 +182,6 @@ const rowFor = (
     kindLabel: indicatorKindLabel(key),
     value,
     previous: previousFrom(value, delta),
-    previousLabel: basis.label,
     delta,
     line,
     units,

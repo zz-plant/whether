@@ -5,6 +5,7 @@ import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import {
   DEFAULT_OPERATOR_STAGE,
   OPERATOR_STAGE_OPTIONS,
+  choiceSublabel,
   operatorStageForVariantMode,
   type OperatorStage,
 } from "../../lib/report/operatorStage";
@@ -56,7 +57,10 @@ export function StageDropdownPill({
   return (
     <HeaderChoicePill
       label="Stage"
-      options={OPERATOR_STAGE_OPTIONS}
+      options={OPERATOR_STAGE_OPTIONS.map((option) => ({
+        ...option,
+        sublabel: choiceSublabel(option.sublabel, option.key === DEFAULT_OPERATOR_STAGE),
+      }))}
       value={selectedStageKey}
       onSelect={handleSelectStage}
       className={className}

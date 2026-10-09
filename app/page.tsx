@@ -27,10 +27,8 @@ import {
 import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
-import { buildChangedLead, describeMovementCause } from "../lib/report/decisionMovement";
-import { buildCallChangeLine } from "../lib/report/reportEvidence";
+import { describeMovementCause } from "../lib/report/decisionMovement";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
-import { DEFAULT_RUNWAY_BAND, runwayBandPhrase } from "../lib/report/operatorRunway";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
@@ -51,13 +49,12 @@ import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
 import { ActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
-import { ShareSection } from "./components/home/ShareSection";
+import { ShareLinks } from "./components/home/ShareLinks";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import {
   HOME_DECISION_PARAM,
   parseHomeDecision,
   buildHomeAreaRows,
-  buildHomeQuietDayRead,
   buildSignalChangeRows,
   describeConditionsTrail,
   describeEarlierConditions,
@@ -292,15 +289,6 @@ async function PageContent({
     flipProximity: buildFlipProximity(reportData.assessment),
   };
 
-  /* The quiet-day read: on a live week whose guidance held, what would change
-     it, from the same builder as every paste's "Conditions change if"
-     (`buildCallChangeLine`): the nearer line in points, or a held week's own
-     condition. Never on a week the guidance moved (a crossed pause or resume
-     line, or new conditions: `guidanceChange`, not the latitude's move), and
-     never on an archived week, which the banner above dates. */
-  const quietDayLine = buildHomeQuietDayRead(homepage, { historical: Boolean(historicalSelection) });
-  const callChangeLine = buildCallChangeLine({ weeklyCall: homepage.weeklyCall, assessment: reportData.assessment });
-
   // The first rule is the one whose pause sentence the guardrail slot prints
   // (`reportDataLoader` reads `actionStripItems[0]`), so its lines are the ones
   // the rails may draw — but only when that is in fact the sentence being
@@ -370,14 +358,6 @@ async function PageContent({
     decisionRules: homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
     movement: decisionMovement,
     scores: { tightness, riskAppetite },
-  });
-  /* The section's lead is what the week did to the decisions: which areas' lines
-     were crossed, or that none were. The score-direction sentence is what remains
-     where no lines could be read. */
-  const movementSentence = buildChangedLead({
-    movement: decisionMovement,
-    quietDayLine,
-    fallback: describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }),
   });
   const scoreLadders = [
     {
@@ -595,6 +575,10 @@ async function PageContent({
                 regime={regime}
                 direction={historicalSelection ? undefined : cardCall.directionLabel}
                 earlier={earlierConditions}
+                /* The map from `md` up, where it is the one definition of the four
+                   conditions: each change line's value at its end, the path's
+                   domain as its caption, and the link to how the lines are set.
+                   Below `md` the conditions legend above the week defines them. */
                 aside={
                   <RegimeRadar
                     tightness={tightness}
@@ -605,11 +589,19 @@ async function PageContent({
                     riskAppetiteThreshold={callChangeLines.riskAppetite}
                     currentRegime={regime}
                     trail={conditionsTrail.points}
-                    showDistance={false}
+                    trailCaption={conditionsTrail.caption}
+                    caveat={conditionsTrail.caveat}
+                    footer={
+                      <Link
+                        href="/trust#formula-reference"
+                        className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
+                      >
+                        How they are set
+                      </Link>
+                    }
                     className="ml-auto w-full max-w-[288px]"
                   />
                 }
-                asideNote={[conditionsTrail.caption, conditionsTrail.caveat].flatMap((line) => (line ? [line] : []))}
                 /* An archived week carries no live trust: the banner above says
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
@@ -627,10 +619,10 @@ async function PageContent({
                     regimeLabel: publicRegimeLabel,
                     call: primaryCall,
                   }}
-                  /* On a quiet week the lead below already ends with it. */
-                  callChangeLine={quietDayLine ? undefined : callChangeLine}
+                  /* The earlier conditions the card's stamp line names, so a visit
+                     that last saw them is not told the same change twice. */
+                  cardEarlierRegimeLabel={earlierConditions && previousRegime ? getRegimePublicLabel(previousRegime) : undefined}
                   boardDeckHref={`/api/export/board-slide?format=pptx&stage=${encodeURIComponent(activeStage)}`}
-                  linesCrossedLead={movementSentence}
                 />
               ) : null}
               {/* The reader's own decisions against this week's reading, for a browser
@@ -664,8 +656,6 @@ async function PageContent({
             {!historicalSelection && activeCadence === "weekly" ? (
               <CompanyCalibration
                 stageLabel={stageLabel}
-                runwayPhrase={runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}
-                chosen={calibrationChosen}
                 activeStage={activeStage}
                 activeRunway={activeRunway}
                 runwayEmphasis={runwayEmphasis}
@@ -679,7 +669,6 @@ async function PageContent({
               options={decisionPickerOptions}
               initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM])}
               regime={regime}
-              scores={{ tightness, riskAppetite }}
             >
               <AllAreaRules
                 rows={homeAreaRows}
@@ -714,10 +703,13 @@ async function PageContent({
             <AlertSection />
 
             {/* 6. What changed. One table, every signal, each against the earlier
-                reading and against its own lines. */}
+                reading and against its own lines. It opens on the table: the card
+                says what the week did to the conditions and why, and each area's
+                row says which of its lines moved. Only a read with nothing to
+                compare says so over it. */}
             <WhatChangedSection
               rows={signalChangeRows}
-              lead={movementSentence}
+              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
               comparisonUnavailable={comparisonUnavailable}
               basis={basis}
             />
@@ -725,11 +717,9 @@ async function PageContent({
             {/* 7. Has this happened before? */}
             <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} />
 
-            {/* 8. Share. */}
-            <ShareSection
-              currentRecordDate={reportData.treasury.record_date}
-              currentRecordDateLabel={homepage.reportShell.recordDateLabel}
-            />
+            {/* Last, as a line rather than a section: the way out to every share
+                format, and the week's published brief. */}
+            <ShareLinks currentRecordDate={reportData.treasury.record_date} />
         </div>
       </div>
 

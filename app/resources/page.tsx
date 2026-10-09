@@ -146,62 +146,76 @@ export default async function ResourcesHubPage({
             ) : null}
           </div>
 
-          {areaGroups.map((group) => (
-            <section key={group.area} id={`area-${group.area}`} aria-labelledby={`area-${group.area}-heading`} className="space-y-1">
-              <h3 id={`area-${group.area}-heading`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-200">
-                <AreaIcon area={group.area} />
-                {decisionAreaLabel(group.area)}
-              </h3>
-              <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
-                {group.answers.map((page) => {
-                  const standing = describeAnswerStanding({ page, areaRows, conditionsLabel });
-                  return (
-                    <li key={page.slug}>
-                      {/* The title is the anchor's own first child, not nested in a
-                          wrapper, because that is what the underline rule in
-                          decision-flow.css keys on: `a:has(p)` clears the inherited
-                          underline and `a:has(p) > :first-child` puts it back on the
-                          title alone. The week's standing sits under the title on a
-                          phone and in a column of its own from `sm`. */}
-                      <Link
-                        href={answerPageHref(page.slug)}
-                        className={`${ROW_CLASS} ${standing ? "sm:grid-cols-[minmax(0,1fr)_auto_auto]" : ""}`}
-                      >
-                        <p className="col-start-1 row-start-1 text-sm font-semibold text-slate-100">{page.title}</p>
-                        {standing ? (
-                          <AnswerStandingStamp
-                            standing={standing}
-                            regime={regime}
-                            className="col-start-1 row-start-2 justify-self-start sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:justify-self-end"
-                          />
-                        ) : null}
-                        <span
-                          aria-hidden="true"
-                          className={`col-start-2 row-start-1 shrink-0 text-slate-500 ${
-                            standing ? "row-span-3 sm:col-start-3 sm:row-span-2" : "row-span-2"
-                          }`}
+          {areaGroups.map((group) => {
+            /* The area's standing once, beside its name (2026-10-09). Every decision
+               answer in a group argues that area first, so each of its rows printed
+               the same stamp: "Pause line crossed" three times under Hiring. A row
+               keeps a stamp only when it says something else, the conditions word
+               on a climate answer. */
+            const areaStanding = group.answers
+              .map((page) => describeAnswerStanding({ page, areaRows, conditionsLabel }))
+              .find((standing) => standing?.kind === "area");
+            return (
+              <section key={group.area} id={`area-${group.area}`} aria-labelledby={`area-${group.area}-heading`} className="space-y-1">
+                <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1">
+                  <h3 id={`area-${group.area}-heading`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-200">
+                    <AreaIcon area={group.area} />
+                    {decisionAreaLabel(group.area)}
+                  </h3>
+                  {areaStanding ? <AnswerStandingStamp standing={areaStanding} regime={regime} className="" /> : null}
+                </div>
+                <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
+                  {group.answers.map((page) => {
+                    const answerStanding = describeAnswerStanding({ page, areaRows, conditionsLabel });
+                    const standing = answerStanding?.kind === "conditions" ? answerStanding : undefined;
+                    return (
+                      <li key={page.slug}>
+                        {/* The title is the anchor's own first child, not nested in a
+                            wrapper, because that is what the underline rule in
+                            decision-flow.css keys on: `a:has(p)` clears the inherited
+                            underline and `a:has(p) > :first-child` puts it back on the
+                            title alone. The week's standing sits under the title on a
+                            phone and in a column of its own from `sm`. */}
+                        <Link
+                          href={answerPageHref(page.slug)}
+                          className={`${ROW_CLASS} ${standing ? "sm:grid-cols-[minmax(0,1fr)_auto_auto]" : ""}`}
                         >
-                          ›
-                        </span>
-                        <p className={`col-start-1 text-xs text-slate-400 ${standing ? "row-start-3 sm:row-start-2" : "row-start-2"}`}>
-                          {page.shortAnswer}
-                        </p>
+                          <p className="col-start-1 row-start-1 text-sm font-semibold text-slate-100">{page.title}</p>
+                          {standing ? (
+                            <AnswerStandingStamp
+                              standing={standing}
+                              regime={regime}
+                              className="col-start-1 row-start-2 justify-self-start sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:justify-self-end"
+                            />
+                          ) : null}
+                          <span
+                            aria-hidden="true"
+                            className={`col-start-2 row-start-1 shrink-0 text-slate-500 ${
+                              standing ? "row-span-3 sm:col-start-3 sm:row-span-2" : "row-span-2"
+                            }`}
+                          >
+                            ›
+                          </span>
+                          <p className={`col-start-1 text-xs text-slate-400 ${standing ? "row-start-3 sm:row-start-2" : "row-start-2"}`}>
+                            {page.shortAnswer}
+                          </p>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                  {group.guides.map((entry) => (
+                    <li key={entry.href}>
+                      <Link href={entry.href} className={ROW_CLASS}>
+                        <p className="col-start-1 row-start-1 text-sm font-semibold text-slate-100">{entry.title}</p>
+                        <span aria-hidden="true" className="col-start-2 row-span-2 row-start-1 shrink-0 text-slate-500">›</span>
+                        <p className="col-start-1 row-start-2 text-xs text-slate-400">{entry.description}</p>
                       </Link>
                     </li>
-                  );
-                })}
-                {group.guides.map((entry) => (
-                  <li key={entry.href}>
-                    <Link href={entry.href} className={ROW_CLASS}>
-                      <p className="col-start-1 row-start-1 text-sm font-semibold text-slate-100">{entry.title}</p>
-                      <span aria-hidden="true" className="col-start-2 row-span-2 row-start-1 shrink-0 text-slate-500">›</span>
-                      <p className="col-start-1 row-start-2 text-xs text-slate-400">{entry.description}</p>
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </section>
-          ))}
+                  ))}
+                </ul>
+              </section>
+            );
+          })}
 
           {/* Two references the answers lean on, linked under the list they serve. */}
           <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5">

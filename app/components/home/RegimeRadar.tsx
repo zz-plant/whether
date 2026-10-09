@@ -1,4 +1,6 @@
+import type { ReactNode } from "react";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { formatThresholdNumber } from "../../../lib/formatters";
 import { ConditionIcon } from "../ui/conceptIcons";
 
 type RegimeRadarProps = {
@@ -19,11 +21,8 @@ type RegimeRadarProps = {
   trailCaption?: string | null;
   /** The like-for-like note when the earlier readings were scored from fewer inputs. */
   caveat?: string | null;
-  /**
-   * The distance-to-the-line caption. Off where the surface already states it
-   * beside the map (the hero's trust row says "2 pts from its line").
-   */
-  showDistance?: boolean;
+  /** A last line under the caption: on the brief's card, the link to how the lines are set. */
+  footer?: ReactNode;
   className?: string;
 };
 
@@ -38,6 +37,11 @@ const PLOT_BOTTOM = PLOT_Y + PLOT_SIZE;
 const QUADRANT_ICON = 12.5;
 const TOP_ICON_Y = PLOT_Y + 12 - 3.6 - QUADRANT_ICON / 2;
 const BOTTOM_ICON_Y = PLOT_BOTTOM - 6 - 3.6 - QUADRANT_ICON / 2;
+
+/* Where a change line's value is printed: "70" just outside the right edge at
+   the funding-pressure line, clear of the corner glyphs above and below it. */
+const LINE_LABEL_MIN_Y = TOP_ICON_Y + QUADRANT_ICON + 7;
+const LINE_LABEL_MAX_Y = BOTTOM_ICON_Y - 2;
 
 const xFor = (riskAppetite: number) =>
   PLOT_X + (Math.max(0, Math.min(100, riskAppetite)) / 100) * PLOT_SIZE;
@@ -56,7 +60,7 @@ export function RegimeRadar({
   trail,
   trailCaption,
   caveat,
-  showDistance = true,
+  footer,
   className = "",
 }: RegimeRadarProps) {
   const boundaryX = xFor(riskAppetiteThreshold);
@@ -78,12 +82,11 @@ export function RegimeRadar({
   const prevX = hasPrevious ? xFor(previousRiskAppetite!) : null;
   const prevY = hasPrevious ? yFor(previousTightness!) : null;
 
-  // Determine nearest boundary line distance (horizontal vs vertical)
-  const distY = Math.abs(currentY - boundaryY);
-  const distX = Math.abs(currentX - boundaryX);
-  const nearestIsY = distY <= distX;
-  // The projection reaches a regime boundary, not a company's pause line.
-  const pointsToBoundary = Math.round((Math.min(distX, distY) / PLOT_SIZE) * 100);
+  // Which change line is nearer (horizontal vs vertical), for the projection guide.
+  // The distance in points is the trust strip's margin, printed once beside the map.
+  const nearestIsY = Math.abs(currentY - boundaryY) <= Math.abs(currentX - boundaryX);
+  const tightnessLine = formatThresholdNumber(tightnessThreshold);
+  const riskAppetiteLine = formatThresholdNumber(riskAppetiteThreshold);
 
   // Any string: a known regime maps to its weather word, anything else passes
   // through, so an unmodelled label still reads instead of rendering blank.
@@ -100,6 +103,12 @@ export function RegimeRadar({
           Funding pressure {tightness} · Risk appetite {riskAppetite}
         </span>
       </div>
+      {/* The picture's text alternative: which side of each change line is which
+          condition. On the brief it is the only statement of the four from `md`
+          up, where the one-line conditions legend gives way to this map. */}
+      <p className="sr-only">
+        {`Funding pressure above ${tightnessLine} and risk appetite below ${riskAppetiteLine}: Freezing. Above ${tightnessLine} and above ${riskAppetiteLine}: Cloudy. Below ${tightnessLine} and below ${riskAppetiteLine}: Stormy. Below ${tightnessLine} and above ${riskAppetiteLine}: Sunny.`}
+      </p>
 
       <svg
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
@@ -214,6 +223,25 @@ export function RegimeRadar({
         >
           <title>{`Risk appetite change line at ${riskAppetiteThreshold}`}</title>
         </line>
+        {/* Each change line's value at its end, so the quadrants are defined on
+            the picture: "70" outside the right edge, "50" above the top. */}
+        <text
+          x={PLOT_RIGHT + 3}
+          y={Math.min(LINE_LABEL_MAX_Y, Math.max(LINE_LABEL_MIN_Y, boundaryY)) + 3}
+          className="fill-slate-400 text-[9px] tabular-nums"
+          data-change-line="tightness"
+        >
+          {tightnessLine}
+        </text>
+        <text
+          x={boundaryX}
+          y={PLOT_Y - 3}
+          textAnchor="middle"
+          className="fill-slate-400 text-[9px] tabular-nums"
+          data-change-line="riskAppetite"
+        >
+          {riskAppetiteLine}
+        </text>
 
         {/* Boundary outer frame */}
         <rect
@@ -346,13 +374,11 @@ export function RegimeRadar({
         </text>
       </svg>
 
-      {showDistance || (hasTrail && (trailCaption || caveat)) ? (
+      {(hasTrail && (trailCaption || caveat)) || footer ? (
         <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
-          {showDistance ? (
-            <span className="block">{`${pointsToBoundary} ${pointsToBoundary === 1 ? "point" : "points"} to the nearest change line`}</span>
-          ) : null}
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
+          {footer ? <span className="block pt-1">{footer}</span> : null}
         </figcaption>
       ) : null}
     </figure>

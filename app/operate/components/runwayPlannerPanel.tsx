@@ -235,16 +235,13 @@ export function RunwayPlannerPanel({
   return (
     <section className="weather-panel-static mt-6 space-y-4 p-6" aria-label="Runway planner">
       <div>
-        {/* No heading of its own: the page's h1 is "Runway planner", and this
-            panel is the page's only content, so an h3 restating it gave the
-            outline the same name twice. */}
-        <p className="type-label text-slate-400">Runway and burn</p>
-        <p className="mt-2 text-sm text-slate-300">
-          Check your runway plan against this week&apos;s guidance so burn, fundraising timing, and the lines that pause and resume spending stay aligned.
-        </p>
+        {/* No heading or intro of its own: the page's h1 is "Runway planner", and
+            the intro under it says what the planner sizes against. An h3 gave the
+            outline the same name twice, and a "Runway and burn" paragraph said the
+            intro's sentence again directly under it (2026-10-09). */}
         {/* Native disclosure: the method is evidence for the figures below,
             and its open state is nobody else's business, so no query key. */}
-        <details className="weather-auto-chevron mt-3">
+        <details className="weather-auto-chevron">
           <summary className="text-xs font-semibold text-slate-200">
             How is this calculated?
           </summary>

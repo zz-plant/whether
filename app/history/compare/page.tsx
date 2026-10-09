@@ -10,7 +10,7 @@ import { StatTile } from "../../components/ui/statTile";
 import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
 import { ruleMetricLabel, type RuleConditionMetric } from "../../../lib/report/boundedDecisionRules";
 import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
-import { ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
+import { BORROWING_PREMIUM_MEANING, ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
 import { DateSelector, type DateOption } from "./DateSelector";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
 import { describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
@@ -104,10 +104,13 @@ export default async function HistoryComparePage({
     bbbA === null ? `Period A (${reportA.recordDateLabel})` : null,
     bbbB === null ? `Period B (${reportB.recordDateLabel})` : null,
   ].filter((entry): entry is string => entry !== null);
+  /* The term's one definition on the page (2026-10-09): each period's column
+     prints its value alone. The detail used to repeat both values ("1.46% vs
+     1.07%") under a definition each column printed again. */
   const bbbDetail =
     bbbA !== null && bbbB !== null
-      ? `Extra interest mid-grade companies pay over the government: ${bbbA.toFixed(2)}% vs ${bbbB.toFixed(2)}%`
-      : `Extra interest mid-grade companies pay over the government. ${describeMacroNotOnRecord(bbbMissing.join(" or "))}.`;
+      ? BORROWING_PREMIUM_MEANING
+      : `${BORROWING_PREMIUM_MEANING} ${describeMacroNotOnRecord(bbbMissing.join(" or "))}.`;
 
   /* Each score drawn once, period A filled and period B hollow, against the
      lines in force for period A: its pause and resume lines from the rules it
@@ -162,7 +165,10 @@ export default async function HistoryComparePage({
     <ReportShell
       model={{
         status: {
-          statusLabel: reportA.statusLabel,
+          /* No status word: a page about two periods has no one week's conditions
+             to state, and "Freezing" in the intro restated Period A's heading below
+             it while Period B said something else (2026-10-09). */
+          statusLabel: "",
           recordDateLabel: reportA.recordDateLabel,
           fetchedAtLabel: reportA.fetchedAtLabel,
         },
@@ -180,12 +186,17 @@ export default async function HistoryComparePage({
     >
       <div className="space-y-6">
         <div id="compare-selectors" className="weather-panel grid gap-6 md:grid-cols-2">
+          {/* Each picker shows the month its column draws. Period A without a query
+              is the current week (`searchA` is undefined above), so its picker
+              selects "This week" rather than the newest month-end it used to
+              default to. */}
           <DateSelector
             label="Period A"
             paramPrefix="A"
             options={dateOptions}
-            currentYear={yearA ?? snapshots[snapshots.length - 1].year}
-            currentMonth={monthA ?? snapshots[snapshots.length - 1].month}
+            currentYear={searchA ? yearA : undefined}
+            currentMonth={searchA ? monthA : undefined}
+            currentWeekLabel="This week"
           />
           <DateSelector
             label="Period B"

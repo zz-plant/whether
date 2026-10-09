@@ -74,13 +74,12 @@ export function RulesBeforeCommit({
 
   return (
     <div className="space-y-4">
-      <div>
-        <p className="type-label text-slate-400">Rules for this week</p>
-        <h3 className="type-section text-slate-100">{playbook?.title ?? "Rules for new commitments"}</h3>
-        <p className="mt-2 text-sm text-slate-200">
-          {playbook ? playbook.insight : "This week's rules did not load. Hold new commitments until they do."}
-        </p>
-      </div>
+      {/* The insight alone (2026-10-09). A "Rules for this week" label and an h3
+          naming the conditions sat under the step titled "Rules before you
+          commit", on a page whose intro stamps the conditions. */}
+      <p className="text-sm text-slate-200">
+        {playbook ? playbook.insight : "This week's rules did not load. Hold new commitments until they do."}
+      </p>
       <div id={rulesId} className="grid gap-4 lg:grid-cols-3">
         {lists.map((list) => (
           <div key={list.key} className={`rounded-md border border-l-4 p-4 ${list.className}`}>

@@ -68,14 +68,6 @@ function PlanCard({ plan }: { plan: PricingPlan }) {
       </div>
 
       <p className="text-2xl font-bold text-white">{formatMonthlyPrice(plan)}</p>
-      {/* Beside the price, not under the cards. It sat in a section after all
-          three buttons, so a reader clicked "Request Pro access" before
-          learning there was nothing to buy. In the price's qualifier ink, not
-          the caution amber it had: it is a plain fact about the offer, and
-          amber read it as a warning about the product. */}
-      {!isFree && !PAID_PLANS_ON_SALE ? (
-        <p className="-mt-2 text-fluid-xs text-slate-400">Cannot be bought yet. A request records that you want it.</p>
-      ) : null}
       <p className="text-fluid-xs text-slate-300">{plan.tagline}</p>
 
       <FeatureList features={plan.features.slice(0, FEATURE_PREVIEW)} />
@@ -131,6 +123,19 @@ export default function PricingPage() {
             </Link>
             : every store, cookie and measurement, listed.
           </p>
+          {/* What a request does, once, for both paid plans, and before any request
+              button (2026-10-09). It was said three times: on the Pro card, on the
+              Team card, and in a "What a request does" section after the buttons,
+              which also restated the promise above. Above the cards, not under
+              them, so nobody clicks "Request Pro access" before learning there is
+              nothing to buy; in the qualifier ink, not caution amber, because it is
+              a plain fact about the offer, not a warning about the product. */}
+          {PAID_PLANS_ON_SALE ? null : (
+            <p className="max-w-2xl text-fluid-xs text-slate-400" data-paid-plans-status>
+              Pro and Team cannot be bought yet. A request records that you want one and nothing
+              else, and no card is taken.
+            </p>
+          )}
         </header>
 
         <div className="grid gap-4 md:grid-cols-3">
@@ -139,26 +144,22 @@ export default function PricingPage() {
           ))}
         </div>
 
-        {/* What a request does. While nothing is on sale, the honest sentence is that
-            it records interest and nothing else; the cohort paragraph below claims a
-            reserved rate and an onboarding schedule, which only exist once checkout is
-            wired, so it renders only when the plans are on sale.
+        {/* The cohort paragraph claims a reserved rate and an onboarding schedule,
+            which only exist once checkout is wired, so it renders only when the
+            plans are on sale; until then the header says what a request does.
             Unboxed, so it sits on the page column (ui-ux-standards §XXI): a 20px
             side inset from `sm` put it out of line with the title and the cards. */}
         <section className="weather-panel space-y-3 px-0 py-5">
-          <h2 className="type-eyebrow">{PAID_PLANS_ON_SALE ? "Priority onboarding" : "What a request does"}</h2>
           {PAID_PLANS_ON_SALE ? (
-            <p className="max-w-2xl text-fluid-xs text-slate-300">
-              Pro and Team are onboarding in staged cohorts. Requesting access reserves your tier rate
-              and schedules onboarding for Slack alerts, board exports, and team decision memory. The
-              weekly guidance, the API, and MCP stay free.
-            </p>
-          ) : (
-            <p className="max-w-2xl text-fluid-xs text-slate-300">
-              It records that you want Pro or Team, and nothing else. No card is taken, and the
-              weekly guidance, the API, and embeds stay free either way.
-            </p>
-          )}
+            <>
+              <h2 className="type-eyebrow">Priority onboarding</h2>
+              <p className="max-w-2xl text-fluid-xs text-slate-300">
+                Pro and Team are onboarding in staged cohorts. Requesting access reserves your tier rate
+                and schedules onboarding for Slack alerts, board exports, and team decision memory. The
+                weekly guidance, the API, and MCP stay free.
+              </p>
+            </>
+          ) : null}
           <p className="max-w-2xl text-fluid-xs text-slate-400">
             Buying for several teams, or need something the plans don&apos;t cover?{" "}
             <Link href="/contact" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">

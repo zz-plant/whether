@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
 import { MARGIN_LABEL } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
@@ -250,9 +249,11 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           </li>
         </ol>
         {/* No link out for the market terms: each card below says what its own terms
-            mean, so the arithmetic can be read without leaving it. */}
+            mean, so the arithmetic can be read without leaving it. It opened on "The
+            exact arithmetic is below.", over the "Show the exact arithmetic" control
+            directly beneath it (2026-10-09). */}
         <p className="text-xs text-slate-400">
-          The exact arithmetic is below. Each card says what its market terms mean.
+          Each card below says what its market terms mean.
         </p>
       </div>
 
@@ -411,11 +412,12 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
       </div>
       </details>
 
-      {/* The two links sit inside the sentence, so they are inline with vertical
-          padding rather than 44px inline-flex boxes: padding on an inline box
+      {/* The link sits inside the sentence, so it is inline with vertical
+          padding rather than a 44px inline-flex box: padding on an inline box
           widens what a finger can hit without raising the line it sits on (§II,
-          "expand invisible hitboxes"). As boxes, each one set its own line to
-          44px and the paragraph read with a gap under its first line. */}
+          "expand invisible hitboxes"). A second link here, to how to use the
+          pause and resume lines on /about, went where the line closing /trust
+          already points (2026-10-09). */}
       <p className="mt-3 text-xs leading-5 text-slate-400">
         Every constant above is read from the scoring engine, so a change there changes this
         page.{" "}
@@ -426,11 +428,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
         >
           Read the engine source →
-        </a>{" "}
-        To put the lines to work, see{" "}
-        <Link href="/about#method" className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-          how to use the pause and resume lines
-        </Link>
+        </a>
       </p>
     </ReportSection>
   );

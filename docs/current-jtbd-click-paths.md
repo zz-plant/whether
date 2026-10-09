@@ -13,7 +13,7 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 
 **Clicks**
 1. Open `/` or click `This week` in the header.
-2. Read the verdict card: the conditions word, the week's headline action, one line on why, and the trust strip (`Data as of`, `Sources`, `Margin`, `Could change next week`). The one-line legend above the week says what each of the four conditions means.
+2. Read the verdict card: the conditions word, the week's headline action, one line on why, and the trust strip (`Data as of`, `Sources`, and `Margin`, which ends with whether the call could change next week). The card's conditions map says what each of the four conditions means; below `md`, where the card has no map, the one-line legend above the week says it.
 3. Every visit reads the same order: the stage and runway the lines are set for, `What are you deciding?` (pick an area), `What would change this guidance`, `Get an email the day a line is crossed`, `What changed this week`, `Has this happened before?` and `Share`.
 4. For execution detail, click `Build this week’s plan →` under the areas (the label follows the `Plan horizon` choice), or `Decide` in the header.
 

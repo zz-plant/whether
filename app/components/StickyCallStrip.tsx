@@ -160,7 +160,10 @@ export function StickyCallStrip({ call, direction, weatherWord, marginLabel, sha
           </p>
         </div>
       ) : null}
-      {showStrip ? (
+      {/* Past the scroll offset and with the card off screen: from `md` up the
+          offset alone let the pill rise while the foot of the card, with its
+          weather word and margin, was still in view (2026-10-09). */}
+      {showStrip && heroLeft ? (
         <div
           data-testid="sticky-call-strip"
           className="pointer-events-none fixed inset-x-0 bottom-0 z-40 hidden px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 md:block lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"

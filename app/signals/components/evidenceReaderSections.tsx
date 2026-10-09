@@ -184,13 +184,12 @@ export const SignalsWhatChangedSection = ({
                     /* "This week", not the signal's name: the row header one
                        column over already says it, so every row printed
                        "Funding pressure" twice and on a phone the two sat
-                       two lines apart. It pairs with the earlier reading's date below it. */
+                       two lines apart. No earlier reading under it (2026-10-09):
+                       the chip one column over prints "56 → 49" in the same row. */
                     <ScoreCell
                       label="This week"
                       value={row.value}
                       line={row.line}
-                      previous={row.previous}
-                      previousLabel={row.previousLabel}
                       units={row.units}
                     />
                   )}

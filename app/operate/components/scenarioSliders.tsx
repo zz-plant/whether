@@ -45,9 +45,8 @@ export function ScenarioSliders({
             </h3>
             <Tag tone="amber">Not this week&apos;s data</Tag>
           </div>
-          <p className="mt-1 text-sm text-slate-300">
-            Move either slider. The guidance, the scores, and the rules below update while you move it.
-          </p>
+          {/* No instruction line (2026-10-09): the page intro says to move the two
+              sliders, and the sliders are directly below. */}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ClipboardActionRow

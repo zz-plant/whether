@@ -265,7 +265,7 @@ const routeSurfaces: Surface[] = [
           <DecisionPicker
             options={decisionAreaOrder.map((area) => ({ area, rule: "Rule", pause: undefined, resume: undefined }))}
             regime="SCARCITY"
-            scores={{ tightness: 90, riskAppetite: 49 }}
+           
           />,
         ),
       ),
@@ -277,7 +277,7 @@ const routeSurfaces: Surface[] = [
         renderToStaticMarkup(
           <>
             <ConditionsLegend thresholds={{ tightnessRegime: 70, riskAppetiteRegime: 50 }} currentRegime="SCARCITY" />
-            <CompanyCalibration stageLabel="Series A" runwayPhrase="12–24 months" chosen={false} activeStage="series-a" />
+            <CompanyCalibration stageLabel="Series A" activeStage="series-a" />
             <AlertSection />
           </>,
         ),

@@ -42,7 +42,8 @@ type ArtifactFile = {
 
 type ImageArtifact = {
   title: string;
-  meta: string;
+  /** What the file is, where its buttons do not already say: "PNG · 1200×800". */
+  meta?: string;
   description: string;
   preview: { src: string; width: number; height: number; alt: string };
   files: readonly ArtifactFile[];
@@ -50,8 +51,9 @@ type ImageArtifact = {
 
 const IMAGE_ARTIFACTS: readonly ImageArtifact[] = [
   {
+    /* No format line: "PPTX · PDF · SVG" named the three buttons under it
+       (2026-10-09). */
     title: "Board slide",
-    meta: "PPTX · PDF · SVG",
     description:
       "One slide: the guidance, its pause line, its change lines and both scores. All three files draw it for a seed-stage company; change stage= in a file's link to series-a, series-b or growth.",
     preview: {
@@ -141,7 +143,7 @@ export function ShareImageArtifacts() {
             </div>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-sm font-semibold text-white/90">{artifact.title}</h3>
-              <p className="text-fluid-micro font-medium tracking-[0.04em] text-sky-200">{artifact.meta}</p>
+              {artifact.meta ? <p className="text-fluid-micro font-medium tracking-[0.04em] text-sky-200">{artifact.meta}</p> : null}
             </div>
             <p className="text-xs leading-relaxed text-white/60">{artifact.description}</p>
             <ul className="mt-auto space-y-2">

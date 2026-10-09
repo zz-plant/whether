@@ -76,6 +76,13 @@ const LEGEND_ORDER: readonly RegimeKey[] = ["EXPANSION", "DEFENSIVE", "VOLATILE"
  * below its. It was printed in full only at the foot of /concepts and halfway down
  * /history. Server-rendered; a reader can dismiss it, and the layout hides it for
  * a browser that has rendered the brief before, as it hid the explainer.
+ *
+ * Below `md` only (2026-10-09). From `md` up the card beside the call draws the
+ * conditions map, with each change line's value at its end and the link to how
+ * they are set under it, so the same four definitions sat in two elements one
+ * above the other. Below `md` the card has no room for the map, and this line is
+ * the only definition on the first screen. The share greeting is not a
+ * definition, so it stays at every width.
  */
 export function ConditionsLegend({
   arrival,
@@ -109,36 +116,38 @@ export function ConditionsLegend({
       aria-label="The four conditions"
       data-testid="conditions-legend"
       suppressHydrationWarning
-      className="mb-3 flex items-start justify-between gap-4 border-b border-white/[0.08] pb-3 text-fluid-xs text-slate-300"
+      className={`mb-3 flex items-start justify-between gap-4 border-b border-white/[0.08] pb-3 text-fluid-xs text-slate-300 ${arrival === "share" ? "" : "md:hidden"}`.trim()}
     >
       <p className="min-w-0 leading-relaxed">
         {/* A reader who followed a pasted brief knows who sent it and nothing else. */}
         {arrival === "share" ? <>This is this week&apos;s guidance from Whether. </> : null}
-        {/* The first entry names both scores; the rest keep the same order, so
-            the line stays one line on a desktop. */}
-        {LEGEND_ORDER.flatMap((regime) => getOrderedRegimeLegend().filter((entry) => entry.regime === regime)).map((entry, index, all) => {
-          const sides = SIDES[entry.regime];
-          const pressure = side(sides.pressureAbove, pressureLine);
-          const appetite = side(sides.appetiteAbove, appetiteLine);
-          return (
-            <span key={entry.regime}>
-              {/* Inline, not a flex pair: the legend is one sentence that wraps. */}
-              <ConditionIcon regime={entry.regime} className="mr-1 inline align-[-3px]" />
-              <span className={`font-semibold ${REGIME_STYLE_TOKENS[entry.regime].accent.text}`}>{entry.weather}</span>
-              {index === 0
-                ? `: ${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite}`
-                : `: ${pressure}, ${appetite}`}
-              {entry.regime === currentRegime ? <span className="text-slate-400"> (this week)</span> : null}
-              {index < all.length - 1 ? " · " : ". "}
-            </span>
-          );
-        })}
-        <Link
-          href="/trust#formula-reference"
-          className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
-        >
-          How they are set
-        </Link>
+        <span className="md:hidden" data-conditions-definitions>
+          {/* The first entry names both scores; the rest keep the same order, so
+              the line stays short enough to read as one. */}
+          {LEGEND_ORDER.flatMap((regime) => getOrderedRegimeLegend().filter((entry) => entry.regime === regime)).map((entry, index, all) => {
+            const sides = SIDES[entry.regime];
+            const pressure = side(sides.pressureAbove, pressureLine);
+            const appetite = side(sides.appetiteAbove, appetiteLine);
+            return (
+              <span key={entry.regime}>
+                {/* Inline, not a flex pair: the legend is one sentence that wraps. */}
+                <ConditionIcon regime={entry.regime} className="mr-1 inline align-[-3px]" />
+                <span className={`font-semibold ${REGIME_STYLE_TOKENS[entry.regime].accent.text}`}>{entry.weather}</span>
+                {index === 0
+                  ? `: ${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite}`
+                  : `: ${pressure}, ${appetite}`}
+                {entry.regime === currentRegime ? <span className="text-slate-400"> (this week)</span> : null}
+                {index < all.length - 1 ? " · " : ". "}
+              </span>
+            );
+          })}
+          <Link
+            href="/trust#formula-reference"
+            className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
+          >
+            How they are set
+          </Link>
+        </span>
       </p>
       <button
         type="button"

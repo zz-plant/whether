@@ -82,7 +82,9 @@ describe("/history/compare draws each period from its own month", () => {
 
     const notOnRecord = columnB.match(/Not on record for this month/g) ?? [];
     assert.equal(notOnRecord.length, MACRO_IDS.length, "Mar 2020's three macro rows say the record has none");
-    assert.match(columnA, /Corporate borrowing premium Extra interest[^.]*\. \d+\.\d{2}%/, "the current week keeps its own figure");
+    assert.match(columnA, /Corporate borrowing premium \d+\.\d{2}%/, "the current week keeps its own figure");
+    /* Defined once, under the difference tile; each column prints its value alone (2026-10-09). */
+    assert.equal((text.match(/Extra interest mid-grade companies pay over the government/g) ?? []).length, 1);
 
     assert.doesNotMatch(text, /0\.00%/, "a missing side was read as zero");
     assert.match(text, /Not on record for Period B \(Mar 31, 2020\)\./);
@@ -196,5 +198,43 @@ describe("the period caption on a replayed month", () => {
     }).weeklyLeadershipSummary;
     assert.equal(summary.boldnessDelta, -7);
     assert.equal(summary.shorthandLine, "Operating latitude down since Dec 30, 2011.");
+  });
+});
+
+/*
+ * Each picker shows the month its column draws (2026-10-09). With no query, Period A
+ * drew the current week while its picker defaulted to the newest month-end the
+ * archive holds, so the page read "Sep 2026 · Cloudy" over a column dated Oct 7,
+ * Freezing. Period B offered the same "current week" choice, which cleared its query
+ * and loaded its Mar 2020 default instead.
+ */
+describe("/history/compare: each period's picker names the month its column draws", () => {
+  const renderSelects = async (searchParams: Record<string, string>) => {
+    const page = await import("../app/history/compare/page");
+    const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve(searchParams) }));
+    const selects = [...html.matchAll(/<select[\s\S]*?<\/select>/g)].map((match) => match[0]);
+    assert.equal(selects.length, 2, "one picker per period");
+    const selected = (select: string) => plainText(/<option[^>]*selected=""[^>]*>([^<]*)<\/option>/.exec(select)?.[1] ?? "").trim();
+    const grid = plainText(html.slice(html.indexOf('id="ops-compare-grid"')));
+    return { pickerA: selects[0], pickerB: selects[1], selected, columnA: grid.slice(0, grid.indexOf("Period B")) };
+  };
+
+  it("selects This week for Period A with no query, the week its column draws", async () => {
+    const { pickerA, selected, columnA } = await renderSelects({});
+    const { reportData } = await loadWeeklyBriefSnapshot(undefined, { route: "/history/compare" });
+    assert.equal(selected(pickerA), "This week");
+    assert.ok(columnA.includes(reportData.recordDateLabel), `the column is the current week (${reportData.recordDateLabel})`);
+  });
+
+  it("selects the queried month for Period A, as its column draws it", async () => {
+    const { pickerA, selected, columnA } = await renderSelects({ yearA: "2022", monthA: "9" });
+    assert.match(selected(pickerA), /^Sep 2022 · /);
+    assert.match(columnA, /Sep 30, 2022/);
+  });
+
+  it("offers no current-week choice for Period B, whose blank query means Mar 2020", async () => {
+    const { pickerB, selected } = await renderSelects({});
+    assert.doesNotMatch(pickerB, /<option value="">/);
+    assert.match(selected(pickerB), /^Mar 2020 · /);
   });
 });
