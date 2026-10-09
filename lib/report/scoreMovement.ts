@@ -16,7 +16,8 @@ import type { ScoreMovement, ScoreMovementSource } from "./reportDataTypes";
  * is told only the total takes the second part for the market moving.
  *
  * The parts are the same inputs scored in stages: rates alone, then with the
- * rate-speed term, then as published (which adds stock-market volatility).
+ * rate-speed term, then as published (which adds the Chicago Fed index to
+ * funding pressure and stock-market volatility to risk appetite).
  * Each stage's score is a whole number, so the parts add up to the move
  * exactly. The inputs outside the record (`RegimeScores.offRecord`) are no
  * part of the move, because the published score leaves them out since
@@ -57,10 +58,11 @@ const buildScoreMovement = ({
 
   return {
     tightness: {
-      /* No market input on the record moves funding pressure, so rates and their pace are all of it. */
       parts: partsFrom([
         ["rates", ratesOnly.tightness - previous.tightness],
-        ["rateSpeed", current.tightness - ratesOnly.tightness],
+        ["rateSpeed", withRateSpeed.tightness - ratesOnly.tightness],
+        /* The Chicago Fed index, the one market input on the record that moves funding pressure. */
+        ["financialConditions", current.tightness - withRateSpeed.tightness],
       ]),
     },
     riskAppetite: {
@@ -117,7 +119,8 @@ const SOURCE_LABEL: Record<ScoreMovementMetric, Partial<Record<ScoreMovementSour
   tightness: {
     rates: "interest rates",
     rateSpeed: "the recent pace of rate rises",
-    credit: "credit-market and financial-conditions stress",
+    financialConditions: "financial-conditions stress",
+    credit: "the high-yield credit spread",
   },
   riskAppetite: {
     curve: "the yield curve",

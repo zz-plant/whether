@@ -3027,7 +3027,7 @@ test, while the calibration study's "96% held" and the track record vouched for 
   (`SAAS_VALUATION_MULTIPLE`, `EARNINGS_REVISION_INDEX`, `AI_COMPUTE_COST_TREND`,
   `REGULATORY_RISK_TRACKER`) move no score and feed only the forecast and context lines. FRED's
   high-yield series (`BAMLH0A0HYM2`) starts on 2023-10-10, so it can never be backfilled across the
-  record; the Chicago Fed index (`NFCI`, from 1971) joins the basis when the archive carries it.
+  record; the Chicago Fed index (`NFCI`, from 1971) joined the basis with its backfill (§1.1.66).
   `tests/recordBasis.test.ts` fails if an input on the basis has no value in a cached month.
 - **What is still shown.** Each score the inputs left out would move is `ScoringBasis.notCounted`
   (`lib/report/scoringBasis.ts`): under its row in the homepage's "What changed" and on `/signals`
@@ -3067,6 +3067,65 @@ test, while the calibration study's "96% held" and the track record vouched for 
 - **The record does not move in this change.** The archive never scored the four inputs, so no
   archived month, change count or calibration figure changes; the regenerated archive with the
   Chicago Fed index is its own change.
+
+### 1.1.66 The archive scores the Chicago Fed index too (2026-10-09)
+
+The second half of §1.1.65: backfill into the month-end archive every market input the live call
+reads that has a long public series, so the record is scored on the same basis as the call
+(`engine-2026-10-09b`, `RECORD_BASIS_MARKET_INPUTS` = VIX and `CHICAGO_FCI`).
+
+- **What was backfilled, and from where.** The live engine reads FRED's `NFCI` (weekly, 1971 on;
+  `lib/macroSnapshot.ts`, `lib/ingestion/families.ts`), and so does the archive now:
+  `fetchArchiveDatasets` fetches it through the shared parser (`parseSeries`, every value through
+  `isMissingFredValue`), and `resolveChicagoFciReading` (`scripts/regimeArchiveContext.ts`) gives
+  each period the newest observation a reader had then. An observation is dated the Friday its week
+  ends and published the Wednesday after, so a period takes the last one dated five or more days
+  before it (Mar 31, 2020 reads Mar 20's 0.175, not Mar 27's, published Apr 1); three missed
+  releases is an absence. Each Time Machine cache entry stores the value (`chicagoFci`) and the
+  observations a reader had in the 60 days before (`chicagoFciHistory`), so the weekly, monthly and
+  quarterly archives replay offline from the bundle (`tests/regimeArchiveReplay.test.ts`, which also
+  replays twice to the same bytes), and the runtime walk scores it like the live read. A run that
+  cannot fetch it fails before writing: an archive without it would be on another basis.
+- **Already in the archive before this change**, and verified rather than re-fetched: VIX
+  (`VIXCLS`, the close and ten daily closes for every month since 2012) and the rate-speed term
+  (the `DGS1MO` pair the engine's own search picks, every month).
+- **Not backfillable.** FRED's high-yield series (`BAMLH0A0HYM2`) begins 2023-10-10 under ICE's
+  licensing, 36 of 177 month-ends; it stays off the record basis, scored and shown only. The venture
+  funding pace and the tech-layoff trend are curated snapshots with no history.
+- **Limit.** FRED serves the index's current vintage, and the Chicago Fed re-estimates the whole
+  series each week, so a backfilled value can differ slightly from what was printed at the time.
+  Above zero is the only range that moves a score, and since 2012 the index was above zero only in
+  March to May 2020.
+- **Regenerated.** `generateMonthlySummaries.ts`, `generateWeeklySummaries.ts` and
+  `generateQuarterlyYearlySummaries.ts`, then `bun run archive:index`: the Time Machine cache, the
+  summary archive (all four cadences), the monthly and weekly summary files, the month-rail and
+  memory-rail histories, the confidence-record months and the `/history/[period]` index. Two
+  independent runs matched except for their generation timestamps. Published briefs are untouched
+  (`tests/recordBasis.test.ts` pins w31–w41 byte for byte).
+
+**The diff, honestly.**
+
+| Figure | Before (`engine-2026-10-06` archive) | After (`engine-2026-10-09b`) |
+| --- | --- | --- |
+| Months whose conditions changed | — | none |
+| Months whose scores changed | — | Mar 2020 and Apr 2020: funding pressure 0 → 2 (the index at 0.175 and 0.159); risk appetite unchanged |
+| Changes in conditions since Jan 2012 | 7 | 7 |
+| Calibration: held / comparisons | 169 / 176 (96%) | 169 / 176 (96%); every band unchanged |
+| Signaled in advance (last 60 months) | 2 of 5 | 2 of 5 |
+| September 2026 month-end | Cloudy (90 / 56) | Cloudy (90 / 56) |
+
+The September month-end still disagrees with the published weeks w38–w41, which read Freezing:
+those were scored on more inputs than the record, and frozen weeks are never edited. On the record's
+basis the one of them that stored its inputs, w41, reads Cloudy (90 / 59) and agrees; w38–w40 stored
+no inputs to re-score. Every other line of the archive diff is the regeneration itself: fetch
+timestamps, the engine stamp, the reader copy merged since the last regeneration on 2026-10-07 (the
+margin vocabulary, "Pause line" and "Resume line"), Q3 2026 added to the period index and the OG
+timeline, and the week ending Oct 9, 2026 added to the weekly archive (Cloudy, record date Oct 7).
+
+`/calibration` and `/history`'s "How the record held up" each say when the record was re-scored and
+with what, and point at their figures as the ones published before it while those are unchanged
+(`describeCalibrationRescore`, `describeTrackRecordRescore` in `lib/report/trackRecordCopy.ts`);
+once a figure differs, the line prints the old one.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
@@ -3246,10 +3305,10 @@ Trust/readiness computation now consumes structured freshness state (`fresh` / `
 - **Base rate**: 1‑month Treasury yield (fallback to 3‑month if missing).
 - **Curve slope**: 10Y − 2Y yield spread.
 - **Macro overlays (boundary calibration)**: the overlays on the record basis
-  (`RECORD_BASIS_MARKET_INPUTS`: VIX, its haircut and veto) adjust tightness/risk appetite before
-  final classification and trigger multi-weak-read warnings. HY OAS, Chicago Fed NFCI, VC funding
-  velocity and the tech layoff trend are scored into `scores.offRecord` and move nothing published,
-  because the archive holds no month-end history for them (§1.1.65).
+  (`RECORD_BASIS_MARKET_INPUTS`: VIX with its haircut and veto, and the Chicago Fed NFCI) adjust
+  tightness/risk appetite before final classification and trigger multi-weak-read warnings. HY OAS,
+  VC funding velocity and the tech layoff trend are scored into `scores.offRecord` and move nothing
+  published, because the archive holds no month-end history for them (§1.1.65, §1.1.66).
 
 ### 3.2 Scores
 - **Tightness score (0–100)**: adds 90 points if base rate > threshold and 25 points if the curve

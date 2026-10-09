@@ -90,8 +90,8 @@ describe("the basis on every surface", () => {
     );
     assert.match(html, /id="record-basis"/);
     assert.match(html, /Count only what the record can test\./);
-    assert.match(html, /Interest rates, the yield curve, the pace of rate rises and stock-market volatility \(the VIX\) move the scores\./);
-    assert.match(html, /The Chicago Fed financial conditions index is not in the archive yet; the high-yield credit spread has public history only from October 2023; the venture funding pace and the tech-layoff trend are curated snapshots with no history to test\. Each is scored and shown, and moves nothing\./);
+    assert.match(html, /Interest rates, the yield curve, the pace of rate rises, stock-market volatility \(the VIX\) and the Chicago Fed financial conditions index move the scores\./);
+    assert.match(html, /The high-yield credit spread has public history only from October 2023; the venture funding pace and the tech-layoff trend are curated snapshots with no history to test\. Each is scored and shown, and moves nothing\./);
     assert.match(html, /This week they would put risk appetite at 41, where the published score is 52\./);
   });
 

@@ -80,17 +80,18 @@ const LAYOFF_RISK_APPETITE_CAP = 12;
  *
  * Every other market input the engine reads is scored too, into
  * `RegimeScores.offRecord`, and moves nothing: the venture funding pace and the
- * tech-layoff trend are curated snapshots with no history to test, the
- * high-yield spread's public series starts in October 2023, and the Chicago Fed
- * index is not yet in the archive. Until 2026-10-09 all five adjusted the
- * published scores, and the weekly call read Freezing on four weeks whose
- * month-end, scored on the record's inputs, read Cloudy.
+ * tech-layoff trend are curated snapshots with no history to test, and the
+ * high-yield spread's public series starts in October 2023. Until 2026-10-09
+ * all of them adjusted the published scores, and the weekly call read Freezing
+ * on four weeks whose month-end, scored on the record's inputs, read Cloudy.
+ * The Chicago Fed index joined the basis with its month-end history
+ * (`engine-2026-10-09b`).
  *
  * Add an input here only in the change that puts its month-end history in the
  * archive: `tests/recordBasis.test.ts` fails when an input on this list has no
  * value in a cached month.
  */
-export const RECORD_BASIS_MARKET_INPUTS: readonly MacroSeriesId[] = ["VIX_INDEX"];
+export const RECORD_BASIS_MARKET_INPUTS: readonly MacroSeriesId[] = ["VIX_INDEX", "CHICAGO_FCI"];
 
 /**
  * Diagnostic bands, all measured in raw score points of distance from the

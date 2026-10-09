@@ -8,7 +8,11 @@ import { buildCanonicalBoundedDecisionRules, isRuleConditionMet } from "../lib/r
 import { scoreStoredInputs } from "../lib/report/comparisonReading";
 import { findPublishedBrief } from "../lib/report/publishedBriefs";
 import { describePublishedWeekBasis, resolveScoringBasis, scoringBasisForEngine } from "../lib/report/scoringBasis";
-import { getTimeMachineSnapshots } from "../lib/timeMachine/timeMachineCache";
+import { confidenceCalibrationTotals } from "../lib/report/confidenceCalibration";
+import { countRecord } from "../lib/report/trackRecord";
+import { describeCalibrationRescore, describeTrackRecordRescore } from "../lib/report/trackRecordCopy";
+import { buildRegimeTrackRecord } from "../lib/summary/regimeTrackRecord";
+import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../lib/timeMachine/timeMachineCache";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../lib/types";
 
 /*
@@ -132,6 +136,7 @@ describe("the record basis", () => {
   it("moves only what the archive scores: every record-basis input has a value at every cached month-end", () => {
     const cacheField: Partial<Record<MacroSeriesId, (entry: ReturnType<typeof getTimeMachineSnapshots>[number]) => unknown>> = {
       VIX_INDEX: (entry) => entry.vix,
+      CHICAGO_FCI: (entry) => entry.chicagoFci,
     };
     const snapshots = getTimeMachineSnapshots();
     assert.ok(snapshots.length >= 176);
@@ -211,3 +216,48 @@ describe("weeks published before the record basis", () => {
     }
   });
 });
+
+/*
+ * The archive re-scored with the Chicago Fed index (engine-2026-10-09b). The index
+ * read above zero only from March to May 2020, when funding pressure sat at 0, so
+ * it added two points to March and April 2020 and moved no month's conditions.
+ * The record's figures as published before the re-score are stated beside the
+ * record, and the line says when they still hold.
+ */
+describe("the record re-scored on the record basis", () => {
+  it("says the study's count before the re-score, and that it is unchanged", () => {
+    const totals = confidenceCalibrationTotals();
+    assert.deepEqual(totals, { months: 176, held: 169 });
+    assert.equal(
+      describeCalibrationRescore({ held: totals.held, comparisons: totals.months }),
+      "Re-scored on Oct 9, 2026, when the Chicago Fed financial conditions index joined the inputs the record is scored on, the same inputs that now set the guidance. No month's conditions changed, so the count above is the one published before it.",
+    );
+    assert.match(describeCalibrationRescore({ held: 170, comparisons: 177 }), /Before it, 169 of 176 comparisons held \(96%\)\.$/, "a count that moved prints the old one");
+  });
+
+  it("says the changes and the advance signals before the re-score, and that they are unchanged", () => {
+    const changes = countRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER))?.changes;
+    const graded = buildRegimeTrackRecord(getTimeMachineRegimeSeries(60));
+    assert.equal(changes, 7);
+    assert.equal(graded.signaledCount, 2);
+    assert.equal(graded.transitions.length, 5);
+    assert.match(
+      describeTrackRecordRescore({ changes: 7, signaled: graded.signaledCount, graded: graded.transitions.length }),
+      /No month's conditions changed, so the counts above are the ones published before it\.$/,
+    );
+    assert.match(
+      describeTrackRecordRescore({ changes: 8, signaled: 2, graded: 6 }),
+      /Before it, the record showed 7 changes in conditions, and 2 of the last 5 signaled in advance\.$/,
+    );
+  });
+
+  it("puts the September 2026 month-end at Cloudy, where w41's own inputs on the record's basis put that week", () => {
+    const september = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER).find((entry) => entry.recordDate === "2026-09-30");
+    assert.equal(september?.regime, "DEFENSIVE");
+    const w41 = findPublishedBrief("2026-w41");
+    assert.ok(w41?.inputs);
+    assert.equal(scoreStoredInputs(evaluateRegime, DEFAULT_THRESHOLDS, w41.inputs, w41.recordDate).regime, "DEFENSIVE");
+    assert.equal(w41.regime, "SCARCITY", "as published, on more inputs than the record");
+  });
+});
+

@@ -393,8 +393,10 @@ export const CONFIDENCE_PERCENT_IMPUTED_CEILING = 30;
  * - `engine-2026-10-09`: the record basis. Only the market inputs the archive
  *   scores adjust them (`RECORD_BASIS_MARKET_INPUTS`); the rest are reported in
  *   `RegimeScores.offRecord` and move nothing.
+ * - `engine-2026-10-09b`: the Chicago Fed index joins the record basis, with
+ *   its month-end history backfilled into the archive from FRED's `NFCI`.
  */
-export const ENGINE_VERSION = "engine-2026-10-09";
+export const ENGINE_VERSION = "engine-2026-10-09b";
 
 export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,

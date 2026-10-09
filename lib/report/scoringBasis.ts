@@ -67,7 +67,7 @@ export const describeScoringBasis = (engineVersion: string | undefined) =>
 /*
  * Each input outside the record moves one score, so what a score would gain
  * with them counted is named by that score's source in the breakdown
- * (`lib/report/scoreMovement.ts`): funding pressure's are the credit reads,
+ * (`lib/report/scoreMovement.ts`): funding pressure's is the high-yield spread,
  * risk appetite's the startup-market reads.
  */
 const NOT_COUNTED_SOURCE: Record<RuleConditionMetric, ScoreMovementSource> = {

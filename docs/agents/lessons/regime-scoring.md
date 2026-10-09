@@ -122,7 +122,12 @@ run on.
   month-end history in the archive; `tests/recordBasis.test.ts` checks every cached month carries it.
 - **"Backtestable" is a property of the public series, not of the input's importance.** FRED's
   high-yield series begins 2023-10-10 (ICE licensing), so it stays off the basis however good a
-  stress read it is. The Chicago Fed index runs from 1971 and can join once the archive has it.
+  stress read it is. The Chicago Fed index runs from 1971 and joined with its backfill
+  (`engine-2026-10-09b`): it moved two months' funding pressure by two points and no month's
+  conditions, so every record figure held (spec §1.1.66).
+- **Backfill what a reader had, not what was true later.** A weekly series published with a lag is
+  read as of its publication (the index: five days after the week it measures), and a series that is
+  re-estimated (the index again) is backfilled from today's vintage, which the spec says out loud.
 - **A gated input's effect is never a part of a move.** The breakdown's parts add up to the
   published move; what the left-out inputs would add is a separate, not-counted line.
 - **Say the basis with the call.** Every surface that prints a call prints "Scored on the record's
@@ -184,7 +189,7 @@ The refactor was proven byte-identical by running all three generator scripts be
 against FRED-shaped series rebuilt from the bundle and a frozen clock: every file they write matched.
 
 **The bundle is enough to replay the archives.** Each month-end's yields, the base-rate pair, the daily VIX
-tail and every weekly and pre-2012 quarterly input are on record, and rebuilt into series they reproduce the
+tail, the weekly Chicago Fed observations (since 2026-10-09) and every weekly and pre-2012 quarterly input are on record, and rebuilt into series they reproduce the
 monthly archive's record dates, regimes and both scores for all 176 months, and the Time Machine cache entry
 for entry, apart from the fetch timestamp. `tests/regimeArchiveReplay.test.ts` holds the generators' own code
 to that, so a change that moves an archived month fails offline instead of surfacing at the next

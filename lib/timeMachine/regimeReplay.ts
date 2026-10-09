@@ -85,3 +85,33 @@ export const buildReplayVixReading = ({
   isLive: false,
   history,
 });
+
+/**
+ * A period's Chicago Fed financial conditions reading as the replay feeds it
+ * to the engine: the observation a reader would have had at the period's date,
+ * with the weekly observations around it the archive stores.
+ */
+export const buildReplayChicagoFciReading = ({
+  value,
+  recordDate,
+  fetchedAt,
+  history,
+}: {
+  value: number;
+  recordDate: string;
+  fetchedAt: string;
+  history: SeriesHistoryPoint[];
+}): MacroSeriesReading => ({
+  id: "CHICAGO_FCI",
+  label: "Chicago Fed National Financial Conditions Index",
+  value,
+  unit: "index",
+  explanation: "Composite financial conditions index covering rates, credit spreads, leverage, and risk appetite.",
+  sourceLabel: "FRED",
+  sourceUrl: "https://fred.stlouisfed.org/series/NFCI",
+  formulaUrl: "/formulas#financial-conditions",
+  record_date: recordDate,
+  fetched_at: fetchedAt,
+  isLive: false,
+  history,
+});

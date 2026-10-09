@@ -8,7 +8,7 @@ import { TreasuryDataSchema } from "../treasury/treasurySchema";
 import type { RegimeAssessment, RegimeKey, RegimeThresholds } from "../regimeEngine";
 import rawCache from "../../data/time_machine_cache.json";
 import { snapshotData } from "../snapshot";
-import { buildReplayVixReading, replayRegimeWalk } from "./regimeReplay";
+import { buildReplayChicagoFciReading, buildReplayVixReading, replayRegimeWalk } from "./regimeReplay";
 
 const SeriesHistoryPointSchema = z.object({
   date: z.string(),
@@ -42,6 +42,12 @@ const TimeMachineSnapshotSchema = TreasuryDataSchema.extend({
    *  differently than the archives for the same dates. Absent for caches
    *  written before the field existed. */
   baseRateVelocityWindow: BaseRateVelocityWindowSchema.nullable().optional(),
+  /** The Chicago Fed financial conditions index a reader had at the period's
+   *  date, and the weekly observations a reader had in the 60 days before. On the record
+   *  basis since engine-2026-10-09b, so the walk scores it as the live read
+   *  does. Absent for caches written before the field existed. */
+  chicagoFci: z.number().nullable().optional(),
+  chicagoFciHistory: z.array(SeriesHistoryPointSchema).nullable().optional(),
 });
 
 type TimeMachineSnapshot = z.infer<typeof TimeMachineSnapshotSchema>;
@@ -282,9 +288,9 @@ const regimeAssessmentMemo = new Map<string, Map<string, RegimeAssessment>>();
  * the resulting record showed it: 22 flips over 176 months, 9 of them
  * single-month spells. The walk threads the machine snapshot forward (flips
  * confirm through the gate, shocks commit and get marked) and supplies each
- * entry its trailing base-rate window (the velocity term) plus its VIX reading
+ * entry its trailing base-rate window (the velocity term), its VIX reading
  * with the daily tail stored alongside it (the haircut and the market-stress
- * veto) when the cache carries one. The threading itself is `replayRegimeWalk`,
+ * veto) and its Chicago Fed index reading, when the cache carries them. The threading itself is `replayRegimeWalk`,
  * the same loop the archive generators run.
  */
 const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMachineRegimeEntry[] => {
@@ -305,8 +311,8 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
         : sortedSnapshots
             .slice(Math.max(0, index - 5), index + 1)
             .map((entry) => ({ date: entry.record_date, value: entry.yields.oneMonth ?? null }));
-      const macroSeries =
-        typeof snapshot.vix === "number"
+      const macroSeries = [
+        ...(typeof snapshot.vix === "number"
           ? [
               buildReplayVixReading({
                 value: snapshot.vix,
@@ -315,7 +321,18 @@ const buildThreadedRegimeWalk = (overrides?: Partial<RegimeThresholds>): TimeMac
                 history: snapshot.vixHistory ?? [],
               }),
             ]
-          : [];
+          : []),
+        ...(typeof snapshot.chicagoFci === "number"
+          ? [
+              buildReplayChicagoFciReading({
+                value: snapshot.chicagoFci,
+                recordDate: snapshot.record_date,
+                fetchedAt: snapshot.fetched_at,
+                history: snapshot.chicagoFciHistory ?? [],
+              }),
+            ]
+          : []),
+      ];
       return { treasury: snapshot, snapshot, macroSeries, baseRateHistory };
     }),
     overrides,
