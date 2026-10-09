@@ -37,7 +37,7 @@ describe("home route render contract", () => {
   /*
    * The order (site review, 2026-10-09): the verdict, the stage and runway its
    * lines are scaled to, the five areas, what would change the guidance, the
-   * alert, what changed, the record, and sharing. It was the call, what changed,
+   * alert, what changed, the record, and the closing share line. It was the call, what changed,
    * what it changes by area, what would change it, and do and share, with the
    * stage and runway eighth and the alert last.
    *
@@ -54,7 +54,7 @@ describe("home route render contract", () => {
       "<AlertSection",
       "<WhatChangedSection",
       "<RecordSection",
-      "<ShareSection",
+      "<ShareLinks",
     ];
     for (const section of order) {
       assert.equal(routeSource.split(section).length - 1, 1, `${section} is mounted exactly once`);
@@ -68,7 +68,7 @@ describe("home route render contract", () => {
     }
 
     // CSS must not reorder what the document says: no section carries an order class.
-    for (const file of ["WhatChangedSection", "WhatWouldChangeSection", "DecisionPicker", "AlertSection", "RecordSection", "ShareSection"]) {
+    for (const file of ["WhatChangedSection", "WhatWouldChangeSection", "DecisionPicker", "AlertSection", "RecordSection", "ShareLinks"]) {
       const source = readFileSync(`app/components/home/${file}.tsx`, "utf8");
       assert.doesNotMatch(source, /className="[^"]*\border-\d/, `${file} carries an order class`);
     }
@@ -85,7 +85,7 @@ describe("home route render contract", () => {
   it("gives the section headings in that order, from one table", async () => {
     const { HOME_SECTIONS } = await import("../lib/report/home/homeSectionModel");
     assert.deepEqual(
-      [HOME_SECTIONS.areas, HOME_SECTIONS.watch, HOME_SECTIONS.alert, HOME_SECTIONS.changed, HOME_SECTIONS.record, HOME_SECTIONS.share].map(
+      [HOME_SECTIONS.areas, HOME_SECTIONS.watch, HOME_SECTIONS.alert, HOME_SECTIONS.changed, HOME_SECTIONS.record].map(
         (section) => section.heading,
       ),
       [
@@ -94,7 +94,6 @@ describe("home route render contract", () => {
         "Get an email the day a line is crossed",
         "What changed this week",
         "Has this happened before?",
-        "Share",
       ],
     );
   });
@@ -106,7 +105,7 @@ describe("home route render contract", () => {
     // This used to assert against `ThreeWhethersCard`, which 69221739 stopped rendering and
     // which is now deleted. The DD-005 rule it protected is unchanged, so it moves to the
     // one other body surface that carries a copy control: the non-weekly cadence lead.
-    const actSource = readFileSync("app/components/home/ShareSection.tsx", "utf8");
+    const actSource = readFileSync("app/components/home/ShareLinks.tsx", "utf8");
     const cadenceSource = readFileSync("app/components/CadenceCallCard.tsx", "utf8");
 
     // It sits directly under the call card (2026-09-30): on the first screen,

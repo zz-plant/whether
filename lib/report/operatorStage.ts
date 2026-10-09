@@ -37,6 +37,14 @@ export const OPERATOR_STAGE_OPTIONS: readonly OperatorStageOption[] = [
 /** The brief's untouched default; the hero drops `?stage=` for it. */
 export const DEFAULT_OPERATOR_STAGE: OperatorStage = "series-a";
 
+/**
+ * A stage or runway choice's secondary line in a control, with the default marked.
+ * The controls say which choice is the default themselves (2026-10-09); a sentence
+ * above them on the brief said "(the defaults)" over the same two selections.
+ */
+export const choiceSublabel = (sublabel: string, isDefault: boolean): string =>
+  isDefault ? `${sublabel} (default)` : sublabel;
+
 export const OPERATOR_STAGE_COOKIE = "whether-company-stage";
 const OPERATOR_STAGE_COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
 

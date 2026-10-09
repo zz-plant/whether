@@ -5,6 +5,7 @@ import type { StartupVariantMode } from "../../lib/report/boundedDecisionRules";
 import {
   DEFAULT_OPERATOR_STAGE,
   OPERATOR_STAGE_OPTIONS,
+  choiceSublabel,
   operatorStageForVariantMode,
   type OperatorStage,
 } from "../../lib/report/operatorStage";
@@ -48,7 +49,7 @@ export function StagePersonaSelector({
   const options: readonly SegmentedOption<OperatorStage>[] = OPERATOR_STAGE_OPTIONS.map((option) => ({
     key: option.key,
     label: option.label,
-    sublabel: option.sublabel,
+    sublabel: choiceSublabel(option.sublabel, option.key === DEFAULT_OPERATOR_STAGE),
     title: `Rules for a ${option.label} company (${option.sublabel.toLowerCase()})`,
   }));
 

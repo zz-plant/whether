@@ -46,7 +46,7 @@ const OPTIONS: DecisionPickerOption[] = decisionAreaOrder.map((area, index) => (
 
 describe("decision picker", () => {
   const html = renderToStaticMarkup(
-    <DecisionPicker options={OPTIONS} regime="SCARCITY" scores={{ tightness: 90, riskAppetite: 44 }}>
+    <DecisionPicker options={OPTIONS} regime="SCARCITY">
       <p data-child>Folded table</p>
     </DecisionPicker>,
   );
@@ -75,9 +75,11 @@ describe("decision picker", () => {
     assert.ok(html.indexOf("data-child") > html.indexOf("<fieldset"), "the folded table follows the choices");
   });
 
-  it("says what each score means before any line quotes one", () => {
-    assert.match(html, /Funding pressure 90\/100: money is hard to raise/);
-    assert.match(html, /Risk appetite 44\/100: investors are selective about risk/);
+  /* The scores print on the conditions map and in "What changed" at every width;
+     the picker restated them as a "This week's scores" list (2026-10-09). */
+  it("does not restate the two scores", () => {
+    assert.doesNotMatch(html, /This week(&#x27;|')s scores/);
+    assert.doesNotMatch(html, /\/100: /);
   });
 
   it("puts each area's standing on its choice, so the answers are on the page before a click", () => {
@@ -151,7 +153,7 @@ describe("a link can carry the decision (`/?decision=`)", () => {
       <DecisionPicker
         options={OPTIONS}
         regime="SCARCITY"
-        scores={{ tightness: 90, riskAppetite: 44 }}
+       
         initialSelected={initialSelected}
       />,
     );

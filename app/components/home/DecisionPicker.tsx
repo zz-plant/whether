@@ -14,7 +14,6 @@ import { resolveLineState } from "../../../lib/report/operatingCalls";
 import { AreaIcon, AreaLabel, LineStateBadge } from "../ui/conceptIcons";
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
-import { SignalReading } from "../ui/plainLanguage";
 import { CommitmentTest } from "./CommitmentTest";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
@@ -74,15 +73,12 @@ const recordDecisionInUrl = (area: DecisionArea) => {
 export function DecisionPicker({
   options,
   regime,
-  scores,
   initialSelected,
   children,
 }: {
   options: readonly DecisionPickerOption[];
   /** This week's conditions, which pick the runway note the runway test quotes. */
   regime: RegimeKey;
-  /** This week's two scores, printed with what they mean before any line that quotes them. */
-  scores: { tightness: number; riskAppetite: number };
   /** The decision the URL names (`?decision=`), open on first paint. */
   initialSelected?: DecisionArea;
   /** What follows the choices inside the section: the folded table of all five, and the plan link. */
@@ -146,17 +142,10 @@ export function DecisionPicker({
           layout="choices"
         />
 
-        {/* What the numbers below are measured against. Every line under the
-            choices quotes a score ("Funding pressure > 76", "90 today"), and what
-            100 means was printed only in the folded "What changed" table, so a
-            first visit met numbers it had no way to read. */}
-        <div className="space-y-1">
-          <p id="first-visit-scores-label" className="type-eyebrow">This week&apos;s scores</p>
-          <ul aria-labelledby="first-visit-scores-label" className="space-y-0.5 text-fluid-xs text-slate-400">
-            <li><SignalReading signalKey="tightness" score={scores.tightness} /></li>
-            <li><SignalReading signalKey="riskAppetite" score={scores.riskAppetite} /></li>
-          </ul>
-        </div>
+        {/* No "This week's scores" list here (2026-10-09). It printed both scores
+            and what they mean, which the conditions map's header and the bars in
+            "What changed" print at every width; each line below says how far the
+            reading is from it in points. */}
 
         {active ? (
           /* A card, not a sky rule down its left edge: sky is the colour of a

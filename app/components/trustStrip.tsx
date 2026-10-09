@@ -25,17 +25,18 @@ export type TrustStripProps = {
    * Absent where the caller holds no scores, and the cell prints the band.
    */
   margin?: { signal: "tightness" | "riskAppetite"; points: number } | null;
-  /** Whether the call could change at the next reading. */
+  /** Whether the call could change at the next reading; said in the margin cell, after the distance. */
   couldChangeNextWeek: boolean;
-  /** Why it could, when the margin cell does not already say: "a change is waiting on a second reading". */
+  /** Why it could, when the distance does not already say: "a change is waiting on a second reading". */
   changeReason?: string;
   /** Where the full explanation lives. Omit on /trust itself. */
   href?: "/trust";
   /** How the strip sits below `sm`. "grid" (the default) is the two-column
    *  grid, label over value. "line" runs the pairs as one wrapped line and,
-   *  when the strip links to /trust, leaves out the two facts that are in
-   *  their routine state (every source live, confidence not Low): the report
-   *  intro's job on a phone is to orient, and /trust is one tap away. */
+   *  when the strip links to /trust, leaves out the sources cell while every
+   *  source is live: the report intro's job on a phone is to orient, and
+   *  /trust is one tap away. The margin cell always prints, because it says
+   *  whether the call could change next week. */
   phoneLayout?: "grid" | "line";
   className?: string;
 };
@@ -45,6 +46,13 @@ const describeMarginCell = (margin: TrustStripProps["margin"], confidenceLabel: 
   if (margin === null) return "Not measured: an input is missing";
   return margin ? formatMarginReading(margin) : formatMarginBand(confidenceLabel);
 };
+
+/* "Not expected", not "No": the boolean says nothing is near its line *this*
+   reading, which is an expectation, not a promise. */
+const describeNextWeek = (couldChangeNextWeek: boolean, changeReason: string | undefined) =>
+  couldChangeNextWeek
+    ? (changeReason ? `Could change next week: ${changeReason}` : "Could change next week")
+    : "Not expected to change next week";
 
 export function TrustStrip({
   recordDateLabel,
@@ -62,29 +70,22 @@ export function TrustStrip({
      Only the phone line leaves those out, and only when the strip links to
      the page that states them; an exception (cached sources, Low confidence)
      always prints. */
-  const cells: { label: string; value: string; tone?: "caution" | "easing"; routine?: boolean }[] = [
+  const cells: { label: string; value: string; detail?: string; tone?: "caution" | "easing"; routine?: boolean }[] = [
     /* "Data as of": the date the guidance rests on. The report intro's other date
        is when the sources were last checked, and it says so (2026-10-09). */
     { label: "Data as of", value: recordDateLabel },
     { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caution", routine: sourcesLive },
     /* The margin, in points, where "Confidence: Low" stood: the number was always a
-       distance from the change line, never a probability (/calibration). */
+       distance from the change line, never a probability (/calibration). Whether
+       the call could change next week is the same distance read as a forecast, so
+       it is said in this cell, after the points, rather than as a fourth cell
+       answering "Yes" beside "1 pt from its change line" (2026-10-09). It always
+       prints, because whether the call holds is the fact a phone reader needs. */
     {
       label: MARGIN_LABEL,
       value: describeMarginCell(margin, confidenceLabel),
-      tone: confidenceLabel === "LOW" ? "caution" : undefined,
-      routine: confidenceLabel !== "LOW",
-    },
-    /* "Not expected", not "No": the boolean says nothing is near its line *this*
-     * reading, which is an expectation, not a promise. The distance itself is the
-     * margin cell's, so "Yes" does not restate it; only a change waiting on its
-     * second reading has a reason of its own. */
-    {
-      label: "Could change next week",
-      value: couldChangeNextWeek
-        ? (changeReason ? `Yes: ${changeReason}` : "Yes")
-        : "Not expected",
-      tone: couldChangeNextWeek ? "caution" : undefined,
+      detail: describeNextWeek(couldChangeNextWeek, changeReason),
+      tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caution" : undefined,
     },
   ];
   /* A phone wraps the four pairs, and a label told from a value only by its
@@ -112,7 +113,12 @@ export function TrustStrip({
     <div className={`${layout} ${className}`.trim()} data-trust-strip>
       <dl className="contents">
         {cells.map((cell) => (
-          <div key={cell.label} className={cellLayout(foldRoutine && Boolean(cell.routine))}>
+          /* The margin cell carries two facts, so on the phone grid it takes the
+             row the could-change cell used to share with it. */
+          <div
+            key={cell.label}
+            className={`${cellLayout(foldRoutine && Boolean(cell.routine))}${!line && cell.detail ? " max-sm:col-span-2" : ""}`}
+          >
             {/* On the one-line phone layout the label and value are told apart by shade
                 alone, so "Could change next week Risk appetite is 2 pts" ran together. */}
             <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500`}>{cell.label}</dt>
@@ -131,6 +137,12 @@ export function TrustStrip({
               }${cell.tone ? " before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:align-middle before:content-['']" : ""}`}
             >
               {cell.value}
+              {cell.detail ? (
+                <span className="font-normal text-slate-400" data-next-week>
+                  {" · "}
+                  {cell.detail}
+                </span>
+              ) : null}
             </dd>
           </div>
         ))}

@@ -36,7 +36,10 @@ describe("site review copy fixes", () => {
     }
   });
 
-  it("counts one point in the singular under the conditions chart", () => {
+  /* The chart's distance caption is gone (2026-10-09: the trust strip's margin says
+     it once); the one rule that outlives it is that the chart says "line", not
+     "boundary". */
+  it("names the change lines, not boundaries, under the conditions chart", () => {
     const render = (riskAppetite: number) =>
       visibleText(
         renderToStaticMarkup(
@@ -49,8 +52,6 @@ describe("site review copy fixes", () => {
           />,
         ),
       );
-    assert.match(render(49), /\b1 point to the nearest change line/);
-    assert.match(render(46), /\b4 points to the nearest change line/);
     assert.doesNotMatch(render(49), /boundary/i);
   });
 

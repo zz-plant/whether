@@ -285,19 +285,21 @@ describe("AreaTable moved rows", () => {
 });
 
 describe("TrustStrip", () => {
-  it("is four facts and, off /trust, a link", () => {
+  it("is three facts and, off /trust, a link", () => {
     const html = renderToStaticMarkup(
       <TrustStrip recordDateLabel="Sep 18, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="HIGH" couldChangeNextWeek={false} href="/trust" />,
     );
-    for (const cell of ["Data as of", "Sources", "Margin", "Could change next week"]) assert.match(html, new RegExp(cell));
+    assert.deepEqual([...html.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]), ["Data as of", "Sources", "Margin"]);
+    assert.match(html, /Not expected to change next week/, "the margin cell says whether the call could change");
     assert.match(html, /href="\/trust"/);
     assert.doesNotMatch(html, /HIGH|MED|LOW/, "the engine's confidence key must not reach the reader");
     assert.doesNotMatch(html, /Confidence/, "the margin is not called confidence on a page");
   });
 
-  /* The margin cell prints the distance in the nearer score's own points, and the
-     could-change cell no longer restates it (2026-10-09). */
-  it("prints the margin in points and does not repeat it beside could-change", () => {
+  /* The margin cell prints the distance in the nearer score's own points, then whether
+     the call could change next week: one cell, where a fourth answered "Yes" beside
+     the distance it restated (2026-10-09). */
+  it("prints the margin in points and says in the same cell whether the call could change", () => {
     const html = renderToStaticMarkup(
       <TrustStrip
         recordDateLabel="Oct 5, 2026"
@@ -308,9 +310,14 @@ describe("TrustStrip", () => {
         couldChangeNextWeek
       />,
     );
-    assert.match(html, />Risk appetite 1 pt from its change line</);
-    assert.match(html, />Yes</);
+    assert.match(html, />Risk appetite 1 pt from its change line<span[^>]*data-next-week[^>]*> · Could change next week<\/span>/);
+    assert.doesNotMatch(html, />Yes</);
+    assert.doesNotMatch(html, /<dt[^>]*>Could change next week<\/dt>/, "no fourth cell");
     assert.equal((html.match(/1 pt/g) ?? []).length, 1, "the distance prints once");
+    const waiting = renderToStaticMarkup(
+      <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="MED" margin={{ signal: "tightness", points: 9 }} couldChangeNextWeek changeReason="a change is waiting on a second reading" />,
+    );
+    assert.match(waiting, /Could change next week: a change is waiting on a second reading/);
     const imputed = renderToStaticMarkup(
       <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="LOW" margin={null} couldChangeNextWeek={false} />,
     );
@@ -318,8 +325,8 @@ describe("TrustStrip", () => {
   });
 
   /* The report intro's phone line (ui-ux-standards §XI): the record date and
-     the could-change fact always print; a fact in its routine state folds
-     behind the link to /trust, and an exception never does. */
+     the margin cell, which says whether the call could change, always print;
+     live sources fold behind the link to /trust, and cached ones never do. */
   it("folds only the routine facts on a phone, and only when it links to /trust", () => {
     const cellClass = (html: string, label: string) =>
       new RegExp(`<div class="([^"]*)"><dt[^>]*>${label}</dt>`).exec(html)?.[1] ?? "";
@@ -327,9 +334,8 @@ describe("TrustStrip", () => {
 
     const routine = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" href="/trust" phoneLayout="line" />);
     assert.match(cellClass(routine, "Sources"), /max-sm:hidden/);
-    assert.match(cellClass(routine, "Margin"), /max-sm:hidden/);
+    assert.doesNotMatch(cellClass(routine, "Margin"), /max-sm:hidden/, "whether the call could change always prints");
     assert.doesNotMatch(cellClass(routine, "Data as of"), /max-sm:hidden/);
-    assert.doesNotMatch(cellClass(routine, "Could change next week"), /max-sm:hidden/);
 
     const exceptions = renderToStaticMarkup(
       <TrustStrip {...base} sourcesLive={false} sourcesLabel="Cached snapshot" confidenceLabel="LOW" href="/trust" phoneLayout="line" />,
@@ -429,12 +435,13 @@ describe("Wayfinding shortcuts and deep-links", () => {
     assert.doesNotMatch(watch, /href="#subscribe"/);
   });
 
-  /* Share is copies only; the plan link closes the areas section, and the decision
-     record is in the footer ("Your decisions"). */
-  it("keeps the share section to copies and the permalink", () => {
-    const { ShareSection } = require("../app/components/home/ShareSection");
-    const html = renderToStaticMarkup(<ShareSection currentRecordDate="2026-09-28" currentRecordDateLabel="Sep 28, 2026" />);
-    assert.match(html, /<h2[^>]*>Share<\/h2>/);
+  /* Sharing is the page's last line: the way out to /share and the published brief,
+     with no heading over them (2026-10-09). The plan link closes the areas section,
+     and the decision record is in the footer ("Your decisions"). */
+  it("keeps the closing line to the share link and the published brief", () => {
+    const { ShareLinks } = require("../app/components/home/ShareLinks");
+    const html = renderToStaticMarkup(<ShareLinks currentRecordDate="2026-09-28" />);
+    assert.doesNotMatch(html, /<h2/, "no section heading over two links");
     assert.doesNotMatch(html, /href="\/operate"/, "the plan link is the areas section's");
     assert.doesNotMatch(html, /Track your decision record|Stress-test a plan|Connect an AI assistant|Subscribe/);
     const layout = require("node:fs").readFileSync("app/layout.tsx", "utf8");

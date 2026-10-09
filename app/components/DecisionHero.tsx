@@ -26,12 +26,6 @@ type Props = {
    * must leave the decision picker on the first phone screen.
    */
   aside?: ReactNode;
-  /**
-   * What the aside's marks are, under the trust row from `md` up: the map's
-   * path domain and its like-for-like note. Set here rather than under the map
-   * so the graphic stays compact and the left column carries the words.
-   */
-  asideNote?: ReadonlyArray<string>;
   /** Freshness and confidence, drawn once under the call. Absent on an archived week, which the banner above marks. */
   trust?: Omit<TrustStripProps, "href" | "className"> | null;
   /**
@@ -82,7 +76,6 @@ export function DecisionHero({
   direction,
   earlier,
   aside,
-  asideNote,
   trust,
   titleLevel = "h1",
   captionDetail,
@@ -213,11 +206,6 @@ export function DecisionHero({
             href="/trust"
             className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4 md:mt-auto"
           />
-        ) : null}
-        {aside && asideNote && asideNote.length > 0 ? (
-          <p className={`text-fluid-nano text-slate-400 max-md:hidden ${trust ? "" : "md:mt-auto"}`} data-aside-note>
-            {asideNote.join(" ")}
-          </p>
         ) : null}
         </div>
         {aside ? <div className="max-md:hidden">{aside}</div> : null}

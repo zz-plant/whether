@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildHomeBriefModel } from "../lib/report/homeBriefModel";
-import { buildQuietDayRead, buildStandupLine } from "../lib/report/decisionMovement";
+import { buildStandupLine } from "../lib/report/decisionMovement";
 import { buildFlipThreshold } from "../lib/report/reportEvidence";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../lib/export/weeklyOperatorBrief";
 import { buildBriefDocument } from "../lib/report/briefDocument";
@@ -68,11 +68,6 @@ describe("a flat operating latitude over a week the guidance changed", () => {
     assert.equal(
       buildStandupLine({ regime: "DEFENSIVE", change: summary.guidanceChange, ...source }),
       "Guidance changed at a pause or resume line; review pace. Conditions change if: Risk appetite falls 4 pts to 50 or below (54 today).",
-    );
-    assert.equal(
-      buildQuietDayRead({ guidanceChange: summary.guidanceChange, ...source }),
-      null,
-      "no quiet-day line over a crossed pause line",
     );
   });
 

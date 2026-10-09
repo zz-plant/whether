@@ -380,12 +380,14 @@ describe("/ and /brief.md agree on whether conditions could change next week", (
       />,
     );
     const brief = buildBriefMarkdown(homepage);
-    const stripValue = /<dt[^>]*>Could change next week<\/dt><dd[^>]*>([^<]+)<\/dd>/.exec(strip)?.[1];
+    /* The margin cell's second half (2026-10-09): "Could change next week", with a reason
+       when one applies, or "Not expected to change next week". */
+    const stripValue = /data-next-week[^>]*>([\s\S]*?)<\/span>/.exec(strip)?.[1]?.replace(/<!--[\s\S]*?-->/g, "").replace(/^\s*·\s*/, "").trim();
     const briefTrustLine = brief.split("\n").find((line) => line.startsWith("> **Trust:**"));
     assert.ok(stripValue, "expected the strip to state whether conditions could change next week");
     assert.ok(briefTrustLine, "expected /brief.md to open with its confidence line");
-    // The strip answers with the reason ("Risk appetite is 2 pts from its line") or a bare "Yes"; "Not expected" is the no.
-    return { stripSaysYes: stripValue !== undefined && stripValue !== "Not expected", briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
+    // "Could change next week", with or without a reason, is the yes; "Not expected to change next week" is the no.
+    return { stripSaysYes: stripValue !== undefined && stripValue.startsWith("Could change next week"), briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
   };
 
   it("says not expected on the week of Sep 29, on both", async () => {

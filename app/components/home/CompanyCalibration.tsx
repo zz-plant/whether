@@ -14,22 +14,23 @@ import type { RunwayBand } from "../../../lib/report/operatorRunway";
  * and two compact tablists, and nothing lower on the page repeats them.
  *
  * One control per axis at every width: the tablists show from `sm` up, and on a
- * phone the header's stage and runway pills are the control, so the sentence
- * stands alone there.
+ * phone the header's stage and runway pills are the control.
+ *
+ * No sentence over them (2026-10-09). "Lines set for Series A with 12–24 months
+ * of runway (the defaults)." restated the two selections directly beneath it, and
+ * on a phone the two header pills; each control marks its default choice
+ * instead (`choiceSublabel`). On a phone the section prints only when it has a
+ * stage action or a runway note to show, since its controls live in the header.
  */
 export function CompanyCalibration({
   stageLabel,
-  runwayPhrase,
-  chosen,
   activeStage,
   activeRunway,
   runwayEmphasis,
   stageAction,
 }: {
+  /** The chosen stage's name, for the stage line. */
   stageLabel: string;
-  runwayPhrase: string;
-  /** False while the reader is on the defaults, which the sentence says. */
-  chosen: boolean;
   activeStage: StartupVariantMode;
   activeRunway?: RunwayBand;
   /** Which constraint binds this week — cash or the lines — once a band reshaped the rule. */
@@ -37,16 +38,13 @@ export function CompanyCalibration({
   /** The chosen stage's own action; only for a reader who chose one, as a stage line under the headline. */
   stageAction?: string;
 }) {
+  const hasNote = Boolean(stageAction || runwayEmphasis);
   return (
     <section
       id={HOME_SECTIONS.calibration.id}
       aria-label="Your stage and runway"
-      className="space-y-3 border-t border-slate-800/70 pt-4"
+      className={`space-y-3 border-t border-slate-800/70 pt-4 ${hasNote ? "" : "max-sm:hidden"}`.trim()}
     >
-      <p className="text-fluid-sm text-slate-200" data-calibration-note>
-        Lines set for <span className="font-semibold text-white">{stageLabel}</span> with{" "}
-        <span className="font-semibold text-white">{runwayPhrase}</span> of runway{chosen ? "." : " (the defaults)."}
-      </p>
       <div className="hidden sm:grid sm:gap-3 weather-company-options">
         <StagePersonaSelector activeStage={activeStage} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
         <RunwayPersonaSelector activeRunway={activeRunway} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />

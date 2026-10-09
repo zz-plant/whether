@@ -5,6 +5,7 @@ import {
   RUNWAY_BAND_OPTIONS,
   type RunwayBand,
 } from "../../lib/report/operatorRunway";
+import { choiceSublabel } from "../../lib/report/operatorStage";
 import { persistOperatorRunway, useOperatorRunway } from "./useOperatorRunway";
 import { HeaderChoicePill } from "./HeaderChoicePill";
 
@@ -41,7 +42,10 @@ export function RunwayDropdownPill({
   return (
     <HeaderChoicePill
       label="Cash runway"
-      options={RUNWAY_BAND_OPTIONS}
+      options={RUNWAY_BAND_OPTIONS.map((option) => ({
+        ...option,
+        sublabel: choiceSublabel(option.sublabel, option.key === DEFAULT_RUNWAY_BAND),
+      }))}
       value={selectedRunwayKey}
       onSelect={handleSelectRunway}
       className={className}

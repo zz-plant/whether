@@ -16,8 +16,7 @@ import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { describeScoreMovement } from "../scoreMovement";
-import { buildQuietDayRead, type AreaMovementKind, type DecisionMovement } from "../decisionMovement";
-import type { HomePageAssembly } from "./contracts";
+import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
 
 /**
  * The homepage's sections in the reader's order (`HOME_SECTIONS` below). Each
@@ -39,11 +38,12 @@ export const parseHomeDecision = (value: string | undefined): DecisionArea | und
 /*
  * The homepage's sections, in the order they print (2026-10-09): the verdict, the
  * stage and runway it is scaled to, the five areas, what would change the guidance,
- * the alert, what changed, the record, and sharing. The order follows what a reader
- * does with the week: act on it, check it fits their company, find their decision,
+ * the alert, what changed, and the record. The order follows what a reader does
+ * with the week: act on it, check it fits their company, find their decision,
  * learn what would move it, ask to hear when it does, then the evidence and the
  * record. `areas` keeps the id the old "What that changes for you" section had, so
- * a link to it still lands on the areas.
+ * a link to it still lands on the areas. Sharing is the page's last line, not a
+ * section: a heading over one link (`ShareLinks`).
  */
 export const HOME_SECTIONS = {
   call: { id: "weekly-call" },
@@ -53,7 +53,6 @@ export const HOME_SECTIONS = {
   alert: { id: "subscribe", heading: "Get an email the day a line is crossed" },
   changed: { id: "what-changed", heading: "What changed this week" },
   record: { id: "has-this-happened-before", heading: "Has this happened before?" },
-  share: { id: "do-and-share", heading: "Share" },
 } as const;
 
 /** The three lines a score is drawn against, as the ladder primitive takes them. */
@@ -179,26 +178,6 @@ export const describeWeeklyMovement = ({
     : INPUT_MOVEMENT_SENTENCE[describeInputMovement(tightnessDelta, riskAppetiteDelta)](
         basis.date ? basis.since : "this week",
       );
-
-/**
- * The homepage's quiet-day line for this assembly (`buildQuietDayRead`): what would change
- * the guidance, on a live week whose guidance held against the earlier reading. Nothing on
- * an archived week, which the banner dates, or on one whose conditions or call-change line
- * moved (`regimeAlert`), which leads with that. The page and the claim-parity test both read
- * it here, so the line under test is the one the page prints.
- */
-export const buildHomeQuietDayRead = (
-  homepage: Pick<HomePageAssembly, "reportResult" | "weeklyCall" | "weeklyDecisionCardModel">,
-  { historical }: { historical: boolean },
-): string | null => {
-  const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
-  if (historical || reportData.regimeAlert) return null;
-  return buildQuietDayRead({
-    guidanceChange: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.guidanceChange,
-    weeklyCall: homepage.weeklyCall,
-    assessment: reportData.assessment,
-  });
-};
 
 /** One side of an area's rule as a row prints it: the line, the distance in words, and the two facts behind the words. */
 export type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean; metric: RuleConditionMetric };

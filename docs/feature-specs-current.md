@@ -122,44 +122,53 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
 `lib/report/home/homeSectionModel.ts`; `app/page.tsx`; pinned by
 `tests/homeRouteDecisionTransmissionContract.test.tsx`):
 
-0. **The conditions legend** (`home/ConditionsLegend.tsx`), one line above the week: Sunny, Cloudy,
-   Stormy and Freezing by funding pressure above or below its change line and risk appetite above
-   or below its, linked to the method. It replaced the standfirst and the folded "How to read this
-   page". Dismissible; the layout hides it for a browser that has rendered the brief before. The
-   week picker above the card names the week by its Monday and is a label, not a heading.
+0. **The conditions legend** (`home/ConditionsLegend.tsx`), one line above the week, below `md`
+   only: Sunny, Cloudy, Stormy and Freezing by funding pressure above or below its change line and
+   risk appetite above or below its, linked to the method. From `md` up the card's conditions map is
+   the definition (each change line's value at its end, "How they are set" under it), so the legend
+   gives way to it (§1.1.62). It replaced the standfirst and the folded "How to read this page".
+   Dismissible; the layout hides it for a browser that has rendered the brief before. The week
+   picker above the card names the week by its Monday and is a label, not a heading.
 1. **The verdict** (`#weekly-call`). `DecisionHero` is the card a reader screenshots: the conditions
    stamp with the week's direction and, when conditions changed, what they were; the week's
    headline action as the `h1` (`weeklyHeadline`, §1.1.60); what the conditions mean; one line on
    why (`describeMovementCause`: the lines the scores crossed, "Risk appetite fell through 54."); the
-   trust strip ("Data as of", Sources, Margin, Could change next week); and from `md` up the
-   conditions map. A monthly or quarterly horizon adds `CadenceCallCard` above it with the `h1`.
-   Under the card sit `SinceLastVisit` and `YourRecordNote` (live briefs only), then Copy Brief
-   (DD-005's one primary action) and the Plan horizon control.
+   trust strip ("Data as of", Sources, and Margin, which says after the points whether the call could
+   change next week); and from `md` up the conditions map with the trail's caption under it. A
+   monthly or quarterly horizon adds `CadenceCallCard` above it with the `h1`. Under the card sit
+   `SinceLastVisit` (only when the conditions or the call differ from what this browser last saw,
+   and not when the difference is the earlier conditions the stamp line names) and `YourRecordNote`
+   (live briefs only), then Copy Brief (DD-005's one primary action) and the Plan horizon control.
 2. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
-   only): whose lines these are, in one sentence, with the stage and runway tablists from `sm` up
-   (the header's pills on a phone), a chosen stage's own action as a stage line, and the runway
-   emphasis once a band reshaped a rule. Nothing lower on the page repeats the control.
+   only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
+   its default choice, a chosen stage's own action as a stage line, and the runway emphasis once a
+   band reshaped a rule. No sentence restates the selection; on a phone the section prints only
+   with a stage line or a runway note. Nothing lower on the page repeats the control.
 3. **The five areas** (`DecisionPicker`, `#what-it-changes`, "What are you deciding?"): each area
    by its name with its standing against its pause line; a choice opens its rule, lines and the
    runway test. All five side by side fold under it (`AllAreaRules`: the area table, the runway
-   notes and the commitment test), then the one plan button.
+   notes and the commitment test), then the one plan button. No "This week's scores" list: the map
+   and the bars in section 6 print the scores at every width.
 4. **What would change this guidance** (`WhatWouldChangeSection`): the pause line, the resume line
    (a chosen stage's, else the lead area's), the line where conditions change, the market move in
-   rate terms (folded), and below `md` the conditions map.
+   rate terms (folded), and below `md` the conditions map (no distance caption: the trust strip's
+   margin states it).
 5. **Get an email the day a line is crossed** (`AlertSection`, `#subscribe`): the one subscribe
    form, starting on alerts only with the Monday email one choice away, and the push toggle.
 6. **What changed this week** (`WhatChangedSection`): one row per signal, the earlier reading →
    this week's with the comparison dated (§1.1.26), each composite score on its ladder with what
-   moved it (§1.1.27), under the movement sentence (§1.1.28).
+   moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
+   each area's row says which of its lines moved. A read with no comparison says so over it.
 7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; the last turns as links.
-8. **Share** (`ShareSection`): one "Share or embed this →" link to `/share`, which holds the slide
-   and image copies and every other format since 2026-10-08, and the citable permalink.
+8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
+   holds the slide and image copies and every other format since 2026-10-08, and the week's
+   published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
 
 There is no first-visit fold since 2026-10-09: the order puts the areas, the lines and the alert
 before the evidence for every reader, so the fold (§1.1.21, §1.1.42) and its "Show the full brief"
 button are gone, and the bootstrap no longer marks a first visit. `StickyCallStrip` carries the
-guidance from `md` up, with a "By area" link to section 3. An archived month drops the trust strip
+guidance from `md` up once the card has left the screen, with a "By area" link to section 3. An archived month drops the trust strip
 for an archive caption and leaves out `SinceLastVisit`, `YourRecordNote`, the stage and runway
 section and the runway notes. `/` mounts `ActivationTracker` and `OperatorWorkflowRouteTracker`;
 the workflow stream records route transitions (§1.1.30).

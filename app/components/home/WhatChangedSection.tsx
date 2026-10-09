@@ -12,9 +12,11 @@ import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/compa
  * Movement: one row per signal, each a from → to chip and, for the two
  * composite scores, the score on its ladder. The hero's three readout cells
  * and the Key drivers card both drew these same four readings; this is the one
- * drawing. The sentence over the table is the week's movement in one line,
- * and on a read with no previous week it says so once, instead of four empty
- * chips saying nothing.
+ * drawing. The section opens on the table (2026-10-09): its lead sentence
+ * restated the card ("Since Sep 30, conditions changed from Cloudy to
+ * Freezing"), and the areas' own rows say which lines each move crossed. A read
+ * with no previous week still gets one sentence saying so, instead of four
+ * empty chips saying nothing.
  *
  * Every term defines itself in its row (the scale note, what the score means
  * at its level, the line names on the ladder), so the section no longer ends
@@ -54,8 +56,8 @@ export function WhatChangedSection({
   basis = comparisonBasis(),
 }: {
   rows: readonly SignalChangeRow[];
-  /** The movement sentence, or the quiet-day line on a week the call held. */
-  lead: string;
+  /** Said over the table only when there is no earlier reading to compare with. */
+  lead?: string;
   comparisonUnavailable: boolean;
   /** The earlier reading the rows are compared with; "last week" when the week does not date it. */
   basis?: ComparisonBasis;

@@ -213,7 +213,7 @@ describe("a glyph sits beside its words and is hidden from assistive tech", () =
             pause: { line: "Funding pressure > 76", distance: index === 1 ? "4 pts away" : "crossed", points: index === 1 ? 4 : 0, met: index !== 1, metric: "tightness" },
           }))}
           regime="SCARCITY"
-          scores={{ tightness: 90, riskAppetite: 49 }}
+         
         />
         <AreaTable
           caption="test"

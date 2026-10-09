@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildFlipProximity } from "../lib/report/flipProximity";
-import { buildQuietDayRead, buildStandupLine } from "../lib/report/decisionMovement";
+import { buildStandupLine } from "../lib/report/decisionMovement";
 import { buildCallChangeLine, buildCallChangeLines, buildFlipThreshold, buildWeekCallChangesIf } from "../lib/report/reportEvidence";
 import { describePolicyHold } from "../lib/report/regimeDescription";
 import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
@@ -131,27 +131,6 @@ describe("what would change the guidance, in one line", () => {
   it("is the hold's own condition on a held week", () => {
     const hold = describePolicyHold(held.policyAssessment.refusal);
     assert.equal(buildCallChangeLine({ weeklyCall: callOf(held), assessment: held }), `Conditions change if: ${hold.callChangesIf}`);
-  });
-});
-
-describe("quiet-day read", () => {
-  const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
-  const source = { weeklyCall: callOf(assessment), assessment };
-
-  it("says what would change a week whose guidance held", () => {
-    assert.equal(buildQuietDayRead({ guidanceChange: "held", ...source }), buildCallChangeLine(source));
-  });
-
-  it("renders nothing on a week the guidance moved, or with nothing compared", () => {
-    assert.equal(buildQuietDayRead({ guidanceChange: "conditions", ...source }), null);
-    assert.equal(buildQuietDayRead({ guidanceChange: "lines", ...source }), null);
-    assert.equal(buildQuietDayRead({ guidanceChange: null, ...source }), null);
-  });
-
-  it("carries no market move, percent or flip", () => {
-    const line = buildQuietDayRead({ guidanceChange: "held", ...source });
-    assert.ok(line);
-    assert.doesNotMatch(line, /%|flip|Treasury bill|long rates/i);
   });
 });
 
