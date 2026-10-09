@@ -406,7 +406,7 @@ describe("Wayfinding shortcuts and deep-links", () => {
 
   /* The plan link was a pill among two copy buttons, four arrow links and a
      subscribe form at one weight. It is the section's primary button now; the
-     decision record is in the footer ("Your record"), with the other three. */
+     decision record is in the footer ("Your decisions"), with the other three. */
   it("leads DoAndShareSection with the plan as its one primary action", () => {
     const { DoAndShareSection } = require("../app/components/home/DoAndShareSection");
     const html = renderToStaticMarkup(
@@ -420,7 +420,7 @@ describe("Wayfinding shortcuts and deep-links", () => {
     assert.match(plan, /weather-button-primary|weather-cta-primary/, "the plan link is the primary button");
     assert.doesNotMatch(html, /Track your decision record|Stress-test a plan|Connect an AI assistant/);
     const layout = require("node:fs").readFileSync("app/layout.tsx", "utf8");
-    assert.match(layout, /href="\/decisions"[^>]*>Your record</, "the decision record stays one click away, in the footer");
+    assert.match(layout, /href="\/decisions"[^>]*>Your decisions</, "the decision record stays one click away, in the footer");
   });
 
   it("deep-links AreaTable consequence rows to #ops-monthly-action-summary on /operate", () => {

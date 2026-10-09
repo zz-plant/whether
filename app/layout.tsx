@@ -330,7 +330,7 @@ export default function RootLayout({
                 aria-label="Legal and credits"
                 className="flex flex-wrap items-center gap-x-6 gap-y-0 text-fluid-micro text-[var(--footer-legal)]"
               >
-                <Link href="/decisions" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Your record</Link>
+                <Link href="/decisions" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Your decisions</Link>
                 <Link href="/privacy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Privacy</Link>
                 <Link href="/acceptable-use-policy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Acceptable Use</Link>
                 <Link href="/terms-of-service" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Terms</Link>

@@ -35,7 +35,7 @@ describe("the record note", () => {
     const view = buildDecisionRecordView([entry("moved", { tightness: 10, riskAppetite: 90 }), entry("holds", { tightness: 90, riskAppetite: 10 })], current);
     const html = renderToStaticMarkup(<RecordNote view={view} />);
 
-    assert.match(html, /Your record:/);
+    assert.match(html, /Your decisions:/);
     assert.match(html, /1 decision rests on conditions that have moved since it was recorded\./);
     assert.match(html, /<a[^>]+href="\/decisions"[^>]*>See your decision record<\/a>/);
     assert.match(html, /data-needs-attention="true"/);

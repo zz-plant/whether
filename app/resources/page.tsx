@@ -35,9 +35,10 @@ export default function ResourcesHubPage() {
                 header's label for this page belongs to the navigation and is
                 changed there. */}
             <h1 className="text-fluid-2xl font-semibold text-slate-100">Guides</h1>
+            {/* No "evergreen" claim: the answers listed here carry this week's
+                standing, so the page is not free of week-to-week change. */}
             <p className="text-sm text-slate-300">
               The long-form guides behind the weekly operating guidance, and the decision guides operators ask for most.
-              Evergreen by design: what changes week to week is on the brief, not here.
             </p>
           </div>
           <GovernancePillarsGlyph size={56} className="self-start sm:self-center" />
