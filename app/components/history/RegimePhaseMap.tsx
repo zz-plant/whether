@@ -1,6 +1,6 @@
 import { ActionLink } from "../ui/actionLink";
 import { UrlDetails } from "../ui/urlDetails";
-import { StatTile } from "../ui/statTile";
+import { Fact, FactList } from "../ui/factList";
 import {
   PHASE_SPANS,
   REGIME_HEX_COLORS,
@@ -431,62 +431,65 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                 was calling Freezing. /signals already states the same caveat over
                 the same series; this is that sentence, on the page a reader comes
                 to when they want to check the record. */}
-            <StatTile
-              label="Last completed month"
-              value={
-                <span className="inline-flex items-baseline gap-2">
-                  <span
-                    aria-hidden="true"
-                    className="size-2.5 shrink-0 self-center rounded-full"
-                    style={{ background: REGIME_HEX_COLORS[current.regime] }}
-                  />
-                  {current.regimeLabel}
-                </span>
-              }
-              unit={current.monthLabel}
-              detail={
-                <>
-                  <dl className="mt-1 space-y-1 text-fluid-xs">
-                    {[gaps.tightness, gaps.riskAppetite].map((gap) => (
-                      <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2">
-                        <dt className="text-slate-400">{gap.label}</dt>
-                        {/* Out of 100, and the distance said as a direction: "72 / +2 from
-                            70" asked the reader to know the scale and to read a slash
-                            and a sign as "two above the line". */}
-                        {/* The score and the distance each stay whole, so "from 70" never
-                            splits, but the distance may drop under the score: held on one
-                            line, it ran past the card's edge on a 360px phone. */}
-                        <dd className="ml-auto text-right tabular-nums text-slate-200">
-                          <span className="whitespace-nowrap">
-                            {gap.axis === "tightness" ? current.tightness : current.riskAppetite}/100
-                            <span className="text-slate-500"> ·</span>
-                          </span>{" "}
-                          <span className="whitespace-nowrap text-slate-500">
-                            {gap.side === "on"
-                              ? "on"
-                              : `${gap.distance} ${gap.side}`}{" "}
-                            the line at {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
-                          </span>
-                        </dd>
-                      </div>
-                    ))}
-                  </dl>
-                  <p className="mt-2 border-t border-[color:var(--border-subtle)] pt-2 text-fluid-nano text-slate-400">
-                    {gaps.tightness.distance <= gaps.riskAppetite.distance
-                      ? describePhaseGap(gaps.tightness)
-                      : describePhaseGap(gaps.riskAppetite)}
-                  </p>
-                  <p className="mt-2 text-fluid-nano text-slate-500">
-                    Every point here is a month-end reading, so this is the last completed
-                    month rather than{" "}
-                    <Link href="/" className="text-sky-300">
-                      this week&rsquo;s guidance
-                    </Link>
-                    .
-                  </p>
-                </>
-              }
-            />
+            {/* Unframed (2026-10-09): the reading, then its distances from the
+                two lines. It was a stat tile, a framed box with a bold figure,
+                which set the one month a step above the chart it reads from. */}
+            <div className="space-y-2">
+              <FactList>
+                <Fact
+                  label="Last completed month"
+                  value={
+                    <span className="inline-flex items-baseline gap-2">
+                      <span
+                        aria-hidden="true"
+                        className="size-2.5 shrink-0 self-center rounded-full"
+                        style={{ background: REGIME_HEX_COLORS[current.regime] }}
+                      />
+                      {current.regimeLabel}
+                    </span>
+                  }
+                  unit={current.monthLabel}
+                />
+              </FactList>
+              <dl className="space-y-1 text-fluid-xs">
+                {[gaps.tightness, gaps.riskAppetite].map((gap) => (
+                  <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2">
+                    <dt className="text-slate-400">{gap.label}</dt>
+                    {/* Out of 100, and the distance said as a direction: "72 / +2 from
+                        70" asked the reader to know the scale and to read a slash
+                        and a sign as "two above the line". */}
+                    {/* The score and the distance each stay whole, so "from 70" never
+                        splits, but the distance may drop under the score: held on one
+                        line, it ran past the card's edge on a 360px phone. */}
+                    <dd className="ml-auto text-right tabular-nums text-slate-200">
+                      <span className="whitespace-nowrap">
+                        {gap.axis === "tightness" ? current.tightness : current.riskAppetite}/100
+                        <span className="text-slate-500"> ·</span>
+                      </span>{" "}
+                      <span className="whitespace-nowrap text-slate-500">
+                        {gap.side === "on"
+                          ? "on"
+                          : `${gap.distance} ${gap.side}`}{" "}
+                        the line at {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
+                      </span>
+                    </dd>
+                  </div>
+                ))}
+              </dl>
+              <p className="border-t border-[color:var(--border-subtle)] pt-2 text-fluid-nano text-slate-400">
+                {gaps.tightness.distance <= gaps.riskAppetite.distance
+                  ? describePhaseGap(gaps.tightness)
+                  : describePhaseGap(gaps.riskAppetite)}
+              </p>
+              <p className="text-fluid-nano text-slate-500">
+                Every point here is a month-end reading, so this is the last completed
+                month rather than{" "}
+                <Link href="/" className="text-sky-300">
+                  this week&rsquo;s guidance
+                </Link>
+                .
+              </p>
+            </div>
 
             {/* Published conditions, not dot positions, and headed so. It read
                 "Months in each quadrant" while counting the conditions each month

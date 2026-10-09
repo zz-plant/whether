@@ -126,24 +126,28 @@ export default async function CompsPage() {
           </div>
         </div>
 
+        {/* One figure leads: the median multiple, the number a valuation
+            conversation starts from. Growth and the basket count were two more
+            tiles of the same size beside it (2026-10-09); they qualify the
+            multiple, so they are the sentence under it, with the read's date. */}
         {comps.status === "ok" ? (
           <div className="space-y-2">
-            <div className="grid gap-4 sm:grid-cols-3">
-              <div className="weather-surface px-4 py-4 space-y-1">
-                <p className="type-eyebrow">Median EV/Revenue</p>
-                <p className="text-2xl font-semibold text-slate-100">{formatMultiple(comps.data.medianEvToRevenue)}</p>
-              </div>
-              <div className="weather-surface px-4 py-4 space-y-1">
-                <p className="type-eyebrow">Median Revenue Growth</p>
-                <p className="text-2xl font-semibold text-slate-100">{formatPercent(comps.data.medianRevenueGrowth)}</p>
-              </div>
-              <div className="weather-surface px-4 py-4 space-y-1">
-                <p className="type-eyebrow">Companies Tracked</p>
-                <p className="text-2xl font-semibold text-slate-100">{comps.data.companyCount}/{SAAS_BASKET.length}</p>
-              </div>
-            </div>
-            <p className="text-xs text-slate-500">
-              As of <time dateTime={comps.data.fetchedAt}>{formatDateUTC(comps.data.fetchedAt)}</time>, from{" "}
+            <p className="text-fluid-xl font-semibold text-slate-100">
+              {comps.data.medianEvToRevenue === null ? (
+                "No median multiple in this read."
+              ) : (
+                <>
+                  Median EV/revenue:{" "}
+                  <span className="tabular-nums">{formatMultiple(comps.data.medianEvToRevenue)}</span>
+                </>
+              )}
+            </p>
+            <p className="max-w-2xl text-sm text-slate-300">
+              Median revenue growth {formatPercent(comps.data.medianRevenueGrowth)}, across{" "}
+              {comps.data.companyCount === SAAS_BASKET.length
+                ? `all ${SAAS_BASKET.length} companies in the basket`
+                : `${comps.data.companyCount} of the ${SAAS_BASKET.length} companies in the basket`}
+              . As of <time dateTime={comps.data.fetchedAt}>{formatDateUTC(comps.data.fetchedAt)}</time>, from{" "}
               {MARKET_DATA_PROVIDER_LABELS[comps.data.source]}.
             </p>
           </div>

@@ -6,7 +6,7 @@ import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot
 import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
 import { evaluateRegime } from "../../../lib/regimeEngine";
 import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
-import { StatTile } from "../../components/ui/statTile";
+import { Fact, FactList } from "../../components/ui/factList";
 import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
 import { ruleMetricLabel, type RuleConditionMetric } from "../../../lib/report/boundedDecisionRules";
 import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
@@ -224,11 +224,15 @@ export default async function HistoryComparePage({
             ))}
             {/* Named for what it costs a company, not for the bond index it is read
                 from (Moody's BBB corporate yield over the 10-year Treasury). */}
-            <StatTile
-              label="Corporate borrowing premium, A minus B"
-              value={bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "—"}
-              detail={bbbDetail}
-            />
+            <div className="space-y-1">
+              <FactList>
+                <Fact
+                  label="Corporate borrowing premium, A minus B"
+                  value={bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "—"}
+                />
+              </FactList>
+              <p className="text-xs text-slate-400">{bbbDetail}</p>
+            </div>
           </div>
           <p className="mt-2 text-fluid-xs text-slate-400">
             Period A is the filled dot, period B the hollow one; the lines are the ones in force in period A.

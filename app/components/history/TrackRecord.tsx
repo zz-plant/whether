@@ -8,7 +8,7 @@ import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/forma
 import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
 import { OPERATING_LATITUDE_RISK_WEIGHT } from "../../../lib/report/weeklyLeadershipBrief";
 import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
-import { StatTile } from "../ui/statTile";
+import { Fact, FactList } from "../ui/factList";
 import { UrlDetails } from "../ui/urlDetails";
 
 /**
@@ -104,9 +104,11 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
 );
 
 /**
- * The record's answer: three figures and the rule that makes a change rare, with
+ * The record's answer: three facts and the rule that makes a change rare, with
  * room beside them for the confidence record (`aside`), which grades the same
- * months on the other question a reader asks of a record.
+ * months on the other question a reader asks of a record. The facts are a
+ * definition list in the text's own size, beside the rule they qualify; they
+ * were three bordered tiles with a bold figure each (2026-10-09).
  *
  * Each fact once (2026-10-09). A "Record starts" tile printed the date the two
  * count tiles already carry as their window, and a sentence under the tiles
@@ -150,21 +152,16 @@ export function TrackRecordTiles({
       </div>
 
       <div className={aside ? "grid gap-6 lg:grid-cols-2" : ""}>
-        <div className="space-y-4">
-          <div className="grid grid-cols-2 gap-2">
-            <StatTile label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} unit={since} />
-            <StatTile
+        <div className="space-y-3">
+          <FactList>
+            <Fact label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} unit={since} />
+            <Fact
               label="Current conditions held"
               value={record.currentHoldMonths.toLocaleString("en-US")}
               unit={record.currentHoldMonths === 1 ? "mo" : "mos"}
             />
-            <StatTile
-              className="col-span-2"
-              label="Changes in conditions"
-              value={record.regimeChanges.toLocaleString("en-US")}
-              unit={changeRate}
-            />
-          </div>
+            <Fact label="Changes in conditions" value={record.regimeChanges.toLocaleString("en-US")} unit={changeRate} />
+          </FactList>
 
           <p className="text-fluid-xs text-slate-400">
             {CALL_CHANGE_RULE} One noisy month cannot move them, so unchanged conditions are the usual state and a
