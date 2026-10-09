@@ -93,8 +93,8 @@ const buildCurrentShareArtifact = async () => {
     recordDate: treasury.record_date,
     callChangesIf: document.slots.callChangesIf,
   });
-  /* Whether the guidance moved, and what would change it, through the builder
-     the quiet-day line on / reads (`buildCallChangeLine`). */
+  /* Whether the guidance moved, and what would change it, through the one-line
+     builder for what would change the guidance (`buildCallChangeLine`). */
   const standupLine = buildStandupLine({
     regime: assessment.regime,
     change: snapshot.homeBriefModel.weeklyLeadershipSummary.guidanceChange,
