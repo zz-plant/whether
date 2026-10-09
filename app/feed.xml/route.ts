@@ -1,7 +1,7 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { formatMarginStamp } from "../../lib/report/reportFormatting";
-import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefHeadline } from "../../lib/report/publishedBriefs";
 import { buildSocialImageUrl, canonicalPositioningLine, escapeXml, organizationName } from "../../lib/seo";
 import { publisherAuthor } from "../../lib/publisher";
 import { siteUrl } from "../../lib/siteUrl";
@@ -87,8 +87,9 @@ const publishedItems = (): FeedItem[] =>
       imageUrl: buildPublishedBriefImageUrl(brief),
       html: [
         `        <p><strong>Conditions:</strong> ${escapeXml(display.conditions)}</p>`,
-        `        <p>${escapeXml(brief.summary)}</p>`,
-        `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(brief.actionNow)}</p>`,
+        /* The week's one headline (`publishedBriefHeadline`); the stored action
+           printed under "Action" beside it, a second instruction for the week. */
+        `        <p>${escapeXml(publishedBriefHeadline(brief).composed)}</p>`,
         /* Through the display layer: w38 and w39 stored "Pressure increased by +3.0 this week", a figure in no unit against Aug 31. */
         `        <p><strong>What changed:</strong> ${escapeXml(display.whatChanged)}</p>`,
         `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · Margin: ${escapeXml(display.confidence.toLowerCase())}</p>`,

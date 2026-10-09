@@ -6,7 +6,8 @@ import { assessSnapshotReadiness, resolveOperatingSnapshot } from "../operatingS
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { getRegimePublicLabel, getRegimeWeatherRationale } from "../regimePresentation";
 import { formatDocumentMargin } from "../export/exportTerms";
-import { MARGIN_LABEL } from "../report/reportFormatting";
+import { MARGIN_LABEL, publicDecisionLabels } from "../report/reportFormatting";
+import { weeklyHeadline } from "../report/reportEvidence";
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
 import { siteUrl } from "../siteUrl";
 import { fanOut } from "../delivery/fanOut";
@@ -200,7 +201,8 @@ export const sendWeeklyBrief = async (options?: {
   /* What moved since the earlier reading, named by its date, as every paste opens
      "What changed this week". Absent on a week with nothing compared. */
   const weekChange = briefWeekChangeLine(document);
-  const actionNow = document.slots.actionNow;
+  /* The week's headline action, the one the homepage h1 and every paste lead with. */
+  const headline = weeklyHeadline(document.slots);
   const pauseIf = document.slots.pauseIf;
   const changeLines = weeklyCallChangeLines(document.slots);
   const recordDate = document.recordDateLabel;
@@ -209,7 +211,7 @@ export const sendWeeklyBrief = async (options?: {
     subscriptions,
     async (recipient) => {
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
-        ? `Whether — ${regimeLabel}: ${actionNow}`
+        ? `Whether — ${regimeLabel}: ${headline.action}`
         : `Whether Brief — ${regimeLabel}`;
       const briefUrl = siteUrl;
       /* The lines above are the published ones. The use the record fits is a plan's
@@ -223,7 +225,7 @@ export const sendWeeklyBrief = async (options?: {
         `Conditions: ${document.conditions.line}`,
         ...readingsText(readings),
         ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
-        `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
+        `${publicDecisionLabels.call}: ${headline.composed}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
         ...changeLines.map(({ label, value }) => `${label}: ${value}`),
         `Move these lines for your own plan, and hear the day one is crossed: ${planLinesUrl}`,
@@ -249,8 +251,8 @@ export const sendWeeklyBrief = async (options?: {
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
         `<td style="padding:16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;">`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#38bdf8;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.action.actionNow}</p>`,
-        `<p style="font-size:1.05rem;font-weight:600;margin:0 0 12px;color:#f1f5f9;">${actionNow}</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#38bdf8;margin:0 0 6px;">${publicDecisionLabels.call}</p>`,
+        `<p style="font-size:1.05rem;font-weight:600;margin:0 0 12px;color:#f1f5f9;">${escapeHtml(headline.composed)}</p>`,
         `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#f59e0b;margin:0 0 6px;">${DECISION_CONTRACT_LABELS.threshold.pauseIf}</p>`,
         `<p style="font-size:0.9rem;margin:0 0 12px;color:#cbd5e1;">${pauseIf}</p>`,
         ...changeLines.flatMap(({ label, value }, index) => [

@@ -9,13 +9,14 @@
  *
  * Append the current week with `bun run brief:freeze`.
  */
+import { weeklyHeadline } from "./reportEvidence";
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
 import { formatMarginBand, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
-import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildBoundedConditionRails } from "./operatingCalls";
@@ -405,6 +406,22 @@ const briefBySlug = new Map(briefs.map((brief) => [brief.slug, brief]));
 /** Newest first. */
 export const getPublishedBriefs = () => briefs;
 
+const HELD_CALLS = new Set(
+  [...Object.values(POLICY_OVERRIDE_CALL), POLICY_OVERRIDE_CALL_UNNAMED].map((hold) => hold.currentCall.trim()),
+);
+
+/**
+ * A frozen week's headline action, through the same source as the live brief
+ * (`weeklyHeadline`): the stored call, with the stored action's direction.
+ */
+export const publishedBriefHeadline = (brief: Pick<PublishedBrief, "actionNow" | "summary">) =>
+  weeklyHeadline({
+    actionNow: brief.actionNow,
+    currentCall: brief.summary,
+    /* A record stores no hold flag; a held week stored the hold's own call. */
+    policyOverrideActive: HELD_CALLS.has(brief.summary.trim()),
+  });
+
 /** The page's `<h1>` and `<title>`; the news sitemap must carry the same words. */
 export const buildPublishedBriefTitle = (brief: PublishedBrief) =>
   `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
@@ -562,9 +579,11 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
 
   const evidenceLines = brief.evidence.map((item) => `• ${display.evidenceTitle(item.title)} — ${item.detail}`);
   /* The slots the record can fill: w31 names no pause line (`publishedBriefDisplay`). */
+  /* One headline (`publishedBriefHeadline`). The stored action printed under
+     the do-now slot beside it, and the call again under "Summary", so the paste said
+     the week's instruction three times in two versions. */
   const slots = [
-    { label: publicDecisionLabels.call, value: brief.summary },
-    { label: publicDecisionLabels.action, value: brief.actionNow },
+    { label: publicDecisionLabels.call, value: publishedBriefHeadline(brief).composed },
     ...(display.pauseIf ? [{ label: publicDecisionLabels.threshold, value: display.pauseIf }] : []),
     { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
   ];
@@ -578,9 +597,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     ...slots.map((slot) => `• ${slot.label}: ${slot.value}`),
     ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
     "",
-    "Summary:",
-    `• ${brief.summary}`,
-    `• What changed: ${display.whatChanged}`,
+    `What changed: ${display.whatChanged}`,
     ...(decisions.length > 0 ? ["", "Operating limits by area:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
     ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
@@ -618,10 +635,9 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     "",
     `Conditions: ${display.conditions}`,
     `Margin: ${display.confidence.toLowerCase()}`,
-    `Executive summary: ${brief.summary}`,
     "",
     "This week's guidance:",
-    `• ${DECISION_CONTRACT_LABELS.action.actionNow}: ${brief.actionNow}`,
+    `• ${publicDecisionLabels.call}: ${publishedBriefHeadline(brief).composed}`,
     ...(display.pauseIf ? [`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.pauseIf}`] : []),
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${display.conditionsChangeIf}`,
     "",

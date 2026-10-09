@@ -1,4 +1,5 @@
 import type { RegimeAssessment } from "../regimeEngine";
+import { weeklyHeadline } from "./reportEvidence";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { BriefArtifact, BriefDocument } from "./briefArtifact";
@@ -131,11 +132,12 @@ export const buildBriefDocument = (
     /* The artifact the share rail renders, field for field as /share published it. */
     title: options.title ?? "Whether Weekly Brief",
     recordDateLabel: source.recordDateLabel,
-    /* `actionNow`, not `currentCall`: the homepage artifact leads with the
-       canonical do-now line, and for the bundled fallback snapshot the two
-       differ — so the same Slack button copied two different calls. */
-    call: call.actionNow,
-    actionNow: call.actionNow,
+    /* The week's headline (`weeklyHeadline`), the sentence the homepage leads
+       with. The action went here and the call was dropped, then printed under
+       "Guidance" by other formats, so one week pasted two different headlines;
+       `actionNow` repeats it so no format adds a competing do-now line. */
+    call: weeklyHeadline(call).composed,
+    actionNow: weeklyHeadline(call).composed,
     guardrail: pauseIf,
     reversal: call.callChangesIf,
     resumeWhen: call.resumeWhen,

@@ -25,6 +25,7 @@ import {
   findPublishedBrief,
   labelForArea,
   publishedBriefDisplay,
+  publishedBriefHeadline,
   publishedBriefStaticParams,
   type PublishedBrief,
   type PublishedRuleLine,
@@ -106,6 +107,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   if (!brief) notFound();
 
   const display = publishedBriefDisplay(brief);
+  const headline = publishedBriefHeadline(brief);
   const canonicalUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
   const slackUpdate = buildPublishedBriefSlackUpdate(brief);
@@ -169,16 +171,19 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             cited week looked like nothing the reader had seen on Monday. */}
         <DecisionHero
           question={briefTitle(brief)}
-          weeklyCall={brief.summary}
+          /* The week's headline action, from the one source the live brief uses
+             (`weeklyHeadline`): the stored call, with the stored action's direction
+             on the stamp line. The action itself printed as a do-now line here, a
+             second headline for the same week; the per-area do-now lines below
+             are the area lines. */
+          weeklyCall={headline.action}
+          direction={headline.directionLabel}
           /* A correction rides inside the card, under the lines it corrects: the
              card is the block people crop, and a crop that dropped the note
              would carry the uncorrected line on its own. */
           callDetail={brief.correction ? `Correction: ${brief.correction}` : undefined}
           regime={brief.regime}
           lines={[
-            ...(brief.actionNow.trim() !== brief.summary.trim()
-              ? [{ label: DECISION_CONTRACT_LABELS.action.doNow, value: brief.actionNow }]
-              : []),
             ...(display.pauseIf ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: display.pauseIf }] : []),
             { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
           ]}

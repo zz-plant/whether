@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { formatGuidance } from "../lib/export/briefBuilders";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
 import { buildBriefEmbedData, buildBriefEmbedHtml, buildBriefEmbedText, buildWhetherBriefUrl } from "../app/api/embed/route";
@@ -159,9 +160,11 @@ describe("the embed says what the brief says", () => {
     const data = buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: null });
     const text = buildBriefEmbedText(data);
 
-    /* The do-now line first, then the stance, under "Guidance" — as the Slack
-       post and brief.md print it — not "Operating guidance" / "Decision now". */
-    assert.match(text, new RegExp(`^Guidance: ${data.actionNow.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "m"));
+    /* The week's one headline action under "Guidance", as the Slack post and
+       brief.md print it — not "Operating guidance" / "Decision now". */
+    const guidance = formatGuidance({ actionNow: data.actionNow, currentCall: data.operatingCall, policyOverrideActive: data.policyOverrideActive });
+    assert.ok(text.split("\n").includes(`Guidance: ${guidance}`), text);
+    assert.match(text, /^- Hiring: /m, "the area lines name their areas");
     for (const output of [text, buildBriefEmbedHtml(data)]) {
       assert.doesNotMatch(output, /Operating guidance|Decision now/);
     }

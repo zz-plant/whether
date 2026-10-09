@@ -36,7 +36,8 @@ describe("Meeting Slide & Notion Exporter", () => {
     const hold = POLICY_OVERRIDE_CALL["inputs-missing"];
     const seed = buildExportSlidePayload(held, "seed");
     assert.equal(seed.stageLabel, "Seed");
-    assert.equal(seed.actionNow, hold.actionNow);
+    assert.ok(seed.actionNow.startsWith(hold.actionNow), "the held week's action leads");
+    assert.ok(seed.actionNow.endsWith(hold.currentCall), "and the reason it is held follows");
     assert.equal(seed.pauseIf, hold.pauseIf);
     assert.equal(seed.resumeWhen, undefined, "a held call has one resume line, its change line");
   });

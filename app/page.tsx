@@ -28,7 +28,7 @@ import { formatDateUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { buildChangedLead } from "../lib/report/decisionMovement";
-import { buildCallChangeLine, splitWeeklyCall } from "../lib/report/reportEvidence";
+import { buildCallChangeLine } from "../lib/report/reportEvidence";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { DEFAULT_RUNWAY_BAND, runwayBandPhrase } from "../lib/report/operatorRunway";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
@@ -262,6 +262,7 @@ async function PageContent({
    * fallbacks, and a second copy of that is how two surfaces come to state
    * different thresholds for one week. */
   const {
+    headline,
     primaryCall,
     flipConditionLabels,
     guardrailLabel,
@@ -269,10 +270,11 @@ async function PageContent({
     reversalTriggerLabel,
     resumeWhenLabel,
     briefShareLines,
-  } = deriveBriefCallFields(homepage.weeklyDecisionCardModel);
-  /* The card prints the action; the week's direction rides on the stamp line.
-     Copy Brief, the sticky strip and every paste keep the composed call. */
-  const cardCall = splitWeeklyCall(primaryCall);
+  } = deriveBriefCallFields(homepage.weeklyDecisionCardModel, homepage.weeklyCall);
+  /* The card prints the headline action; the week's direction rides on the
+     stamp line. Copy Brief, the sticky strip and every paste print the two as
+     one sentence pair (`headline.composed`). */
+  const cardCall = { action: headline.action, directionLabel: headline.directionLabel };
 
   /* The change line in the market's units, line by line in the order the
      "Conditions change if" sentence names them; none on a held week, whose

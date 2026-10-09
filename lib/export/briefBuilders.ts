@@ -1,4 +1,5 @@
 import { formatNumberWithUnit } from "../formatters";
+import { weeklyHeadline } from "../report/reportEvidence";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { BriefDocument } from "../report/briefArtifact";
 import { buildComplianceStamp } from "../exportNotices";
@@ -67,19 +68,19 @@ export const briefResumeLine = (document: BriefDocument): string | null => {
 };
 
 /**
- * The guidance as a paste leads with it: the do-now line, which the homepage,
- * the email and the post /share copies all print as the guidance, then the
- * operating stance behind it when it says more.
+ * The guidance as a paste leads with it: the week's headline action
+ * (`weeklyHeadline`), opened by the week's direction when there is one. One
+ * sentence of instruction, the same one the homepage h1, the frozen brief, the
+ * Monday email and the share card lead with.
  *
- * These formats printed the stance under "Guidance" and the do-now line under
- * "Do now", so one week's "Guidance:" read "Approve only renewals…" in the
- * Monday post and "Conditions are tightening. Freeze new commitments…" in the
- * post /share copies, while the homepage's heading was the second.
+ * It printed the action and then the call, so a paste carried two instructions
+ * for one week ("Freeze new commitments and protect runway. Approve only
+ * renewals…"), and the frozen brief printed them the other way round.
  */
-export const formatGuidance = (slots: Pick<BriefDocument["slots"], "actionNow" | "currentCall">): string =>
-  slots.currentCall.trim() === slots.actionNow.trim()
-    ? joinSentences(slots.actionNow)
-    : joinSentences(slots.actionNow, slots.currentCall);
+export const formatGuidance = (
+  slots: Pick<BriefDocument["slots"], "actionNow" | "currentCall"> & { policyOverrideActive?: boolean },
+): string =>
+  joinSentences(weeklyHeadline(slots).composed);
 
 const briefCallSlots = (document: BriefDocument): CallSlot[] => {
   const { slots } = document;

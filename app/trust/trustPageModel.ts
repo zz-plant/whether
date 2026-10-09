@@ -1,4 +1,6 @@
 import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
+import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
@@ -98,7 +100,7 @@ export async function buildTrustPageModel() {
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
   /* The margin rides in the trust line ("Margin: clear of the line (…)"), so it is stated once. */
-  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nData as of: ${reportData.recordDateLabel}\nChecked: ${reportData.fetchedAtLabel}\nTrust: ${trustSummary}\n${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
+  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nData as of: ${reportData.recordDateLabel}\nChecked: ${reportData.fetchedAtLabel}\nTrust: ${trustSummary}\n${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reportData.flipThreshold}\n${publicDecisionLabels.call}: ${weeklyHeadline(snapshot.weeklyCall).composed}`;
 
   /* The row labels used to be "Trigger", "Impact" and "Recovery" — three nouns
      from the incident-review register, on a page addressed to someone deciding

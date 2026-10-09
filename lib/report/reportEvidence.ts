@@ -80,6 +80,47 @@ export const splitWeeklyCall = (call: string): { action: string; directionLabel?
   return { action: call.slice(match[0].length), directionLabel: WEEKLY_DIRECTION_LABEL[tone] };
 };
 
+/* The frozen briefs before 2026-09-29 stored the direction as a fragment hinged on
+   a dash ("Conditions tightening — freeze…"); the tone is read from either shape. */
+const LEGACY_DIRECTION = /^Conditions (tightening|easing|holding)\s+—\s+/;
+
+/**
+ * The week's headline action, from one source (2026-10-09).
+ *
+ * The contract carries two week-level sentences, and surfaces disagreed about
+ * which led: the homepage h1 printed the action ("Freeze new commitments and
+ * protect runway."), the frozen brief led with the call ("Approve only renewals,
+ * work already promised to customers, and hires that bring in revenue.") and then
+ * printed the action as its do-now line, so one week had two headlines. The call is
+ * the headline now, everywhere, because it is the more concrete of the two: a
+ * filter a reader can hold a request against, where "protect runway" names a goal.
+ * It is also the same for every reader (a stage changes the action, never the
+ * call) and already carries a held week's wording.
+ *
+ * The action's first sentence, the week's direction, rides along: the homepage
+ * prints it as a label on the stamp line, and a paste, which has no stamp, opens
+ * with it. The action's own instruction is no longer printed as a second headline;
+ * the per-area do-now lines stay where they are, as area lines.
+ */
+export const weeklyHeadline = (call: { actionNow: string; currentCall: string; policyOverrideActive?: boolean }) => {
+  /* A held week is the exception: its call explains the hold ("The two scores
+     point in different directions, so the guidance is not changing this week.")
+     and its action is the instruction ("Keep last week's plan…"), so the action
+     is the headline and the explanation follows it in a paste. */
+  if (call.policyOverrideActive) {
+    const action = call.actionNow.trim();
+    return { action, composed: `${action} ${call.currentCall.trim()}`.trim() };
+  }
+  const tone = DIRECTION_SENTENCE.exec(call.actionNow)?.[1] ?? LEGACY_DIRECTION.exec(call.actionNow)?.[1];
+  const action = call.currentCall.trim();
+  if (!tone || !isWeeklyTone(tone)) return { action, composed: action };
+  return {
+    action,
+    directionLabel: WEEKLY_DIRECTION_LABEL[tone],
+    composed: `Conditions are ${tone}. ${action}`,
+  };
+};
+
 /* Whether any area's pause line is met by this reading, from the rule data
    itself: the guidance bundle builds its strip items without scores, so their
    `nearestPause` is unset there. */

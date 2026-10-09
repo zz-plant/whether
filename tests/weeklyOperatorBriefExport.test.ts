@@ -99,7 +99,7 @@ describe("weekly operator brief export adapters", () => {
     assert.doesNotMatch(text, /\bLOW\b|Boldness/);
     assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
     assert.match(text, /Conditions:/);
-    assert.match(text, /^Guidance: Pause net-new fixed burn commitments this week\. Stage approvals and protect runway\.$/m);
+    assert.match(text, /^Guidance: Stage approvals and protect runway\.$/m);
     assert.doesNotMatch(text, /^Do now:/m);
     // The pause line under its label carries the condition only, not the rule's own verb.
     assert.match(text, /^Pause if: Funding pressure rises above 76$/m);

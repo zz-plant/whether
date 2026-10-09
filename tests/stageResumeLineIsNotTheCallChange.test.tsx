@@ -60,7 +60,7 @@ const renderedConditions = (html: string) => {
 };
 
 const renderSection = (snapshot: ReturnType<typeof snapshotFor>) => {
-  const fields = deriveBriefCallFields(snapshot.weeklyDecisionCardModel);
+  const fields = deriveBriefCallFields(snapshot.weeklyDecisionCardModel, snapshot.weeklyCall);
   return renderToStaticMarkup(
     <WhatWouldChangeSection
       ladders={[]}
@@ -93,7 +93,7 @@ describe("a stage's resume line is not where the call changes", () => {
 
   it("prints the same split in the copy formats", () => {
     const staged = snapshotFor("seed");
-    const { briefShareLines } = deriveBriefCallFields(staged.weeklyDecisionCardModel);
+    const { briefShareLines } = deriveBriefCallFields(staged.weeklyDecisionCardModel, staged.weeklyCall);
     assert.ok(briefShareLines.includes(`${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${flipTrigger}`));
     assert.ok(briefShareLines.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${seedDiscipline}`));
     assert.deepEqual(weeklyCallChangeLines(staged.weeklyCall), [

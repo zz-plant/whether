@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { weeklyHeadline } from "../lib/report/reportEvidence";
 import { describe, it } from "bun:test";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
@@ -94,13 +95,14 @@ const slot = (text: string, label: string): string | undefined => {
 
 const assertSameCall = (post: string, mail: string, snapshot: OperatingSnapshot) => {
   const { weeklyCall } = snapshot;
-  // The email prints the action under "Action now"; the post's guidance opens on the same sentence.
-  assert.ok(slot(post, "Guidance")?.startsWith(slot(mail, "Action now") ?? "\u0000"), "the post's guidance opens on the email's action");
-  assert.ok(slot(post, "Guidance")?.startsWith(weeklyCall.actionNow));
+  // Both lead with the week's one headline action (`weeklyHeadline`), under "Guidance".
+  assert.equal(slot(post, "Guidance"), slot(mail, "Guidance"), "the post and the email lead with the same headline");
+  assert.equal(slot(post, "Guidance"), weeklyHeadline(weeklyCall).composed);
+  assert.equal(slot(mail, "Action now"), undefined, "the email prints no second headline");
   assert.equal(slot(post, "Pause if"), slot(mail, "Pause if"));
   assert.equal(slot(post, "Conditions change if"), slot(mail, "Conditions change if"));
   assert.equal(slot(post, "Conditions change if"), weeklyCall.callChangesIf);
-  assert.ok(slot(post, "Guidance")?.endsWith(weeklyCall.currentCall), "the stance follows the action in the post's guidance");
+  assert.ok(slot(post, "Guidance")?.includes(weeklyCall.policyOverrideActive ? weeklyCall.actionNow : weeklyCall.currentCall), "the headline is the call, or a held week's action");
 };
 
 describe("the Monday Slack post carries the email's call", () => {

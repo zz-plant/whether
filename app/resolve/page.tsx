@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { ReportSection } from "../components/reportSection";
 import Link from "next/link";
 import type { Route } from "../../lib/navigation/routeType";
@@ -76,7 +77,8 @@ export default async function DecidePage({
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resolve" });
   const { homeBriefModel, weeklyDecisionCardModel } = snapshot;
   const liveCall = {
-    action: reportData.actionNowShort ?? homeBriefModel.operatingStanceLine,
+    /* The week's headline action, from the source the homepage h1 reads. */
+    action: weeklyHeadline(snapshot.weeklyCall).composed,
     guardrail: homeBriefModel.guardrail,
     flip: reportData.flipThreshold ?? homeBriefModel.reversalTrigger,
   };

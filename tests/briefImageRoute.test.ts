@@ -90,6 +90,10 @@ const buildHomepage = ({
         },
       },
     }),
+    weeklyCall: {
+      actionNow: "Conditions are tightening. Freeze new commitments and protect runway.",
+      currentCall: "Approve only renewals, work already promised to customers, and hires that bring in revenue.",
+    },
     reportShell: {
       regime: "SCARCITY",
       recordDateLabel: "Sep 25, 2026",
@@ -112,6 +116,15 @@ const asPasted = (reading: ScoreReadingParts) =>
     .join(" · ");
 
 describe("buildBriefImagePayload", () => {
+  /* The card leads with the week's one headline action (`weeklyHeadline`), the
+     sentence the homepage h1 prints, not the action it used to lead with. */
+  it("leads with the week's headline action", () => {
+    assert.equal(
+      buildBriefImagePayload(buildHomepage()).decision,
+      "Approve only renewals, work already promised to customers, and hires that bring in revenue.",
+    );
+  });
+
   it("prints both scores against the lines that change the call, and the earlier reading under its date", () => {
     const payload = buildBriefImagePayload(buildHomepage());
 

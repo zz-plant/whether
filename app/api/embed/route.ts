@@ -118,7 +118,9 @@ export const buildBriefEmbedData = (
   const operatingStanceLine = homepage.weeklyDecisionCardModel.decision.operatingStanceLine;
   const operatingCall = canonicalDecision?.operatingCall ?? operatingStanceLine;
   const actionNow = homepage.weeklyDecisionCardModel.decision.actionNowShort || homepage.weeklyDecisionCardModel.decision.immediateDecision;
-  const doNowItems = actionItems.map((item) => item.areaActionNow);
+  /* Each area's line under its area's name, so the list reads as area lines
+     under the one headline rather than as five more headlines. */
+  const doNowItems = actionItems.map((item) => `${item.label}: ${item.areaActionNow}`);
   /*
    * Read off the same action strip `doNowItems` comes from.
    *
@@ -147,6 +149,7 @@ export const buildBriefEmbedData = (
   return {
     operatingCall,
     actionNow,
+    policyOverrideActive: homepage.weeklyCall.policyOverrideActive,
     doNowItems,
     flipTrigger,
     ...(resumeWhen ? { resumeWhen } : {}),
@@ -170,6 +173,8 @@ export const buildBriefEmbedData = (
 type BriefEmbedData = {
   operatingCall: string;
   actionNow: string;
+  /** A held week leads with the hold's action (`weeklyHeadline`). */
+  policyOverrideActive?: boolean;
   doNowItems: string[];
   /** Where conditions change: the brief's "Conditions change if" sentence. Null when the call published none. Never filler. */
   flipTrigger: string | null;
@@ -240,9 +245,8 @@ export const buildBriefEmbedText = (data: BriefEmbedData): string =>
     `Conditions: ${data.regimeLabel} • ${data.confidenceLabel} • As of ${data.recordDate}`,
     ``,
     /* The guidance as every other paste leads with it (`formatGuidance`): the
-       do-now line, then the stance. This printed the two under labels of its
-       own, "Operating guidance" and "Decision now", in the other order. */
-    `${publicDecisionLabels.call}: ${formatGuidance({ actionNow: data.actionNow, currentCall: data.operatingCall })}`,
+       week's headline action, opened by its direction. */
+    `${publicDecisionLabels.call}: ${formatGuidance({ actionNow: data.actionNow, currentCall: data.operatingCall, policyOverrideActive: data.policyOverrideActive })}`,
     /* One item per line. Joined with commas, items that carry their own
        ("If you plan to raise, prepare…", "…within a week, each with a review
        date") ran into each other and the list could not be read back. */
@@ -256,7 +260,7 @@ export const buildBriefEmbedText = (data: BriefEmbedData): string =>
   ].join("\n");
 
 export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
-  const { operatingCall, actionNow, doNowItems, postureLabel, confidenceLabel, recordDate, tickerLabel, stageLabel, attributionUrl } = data;
+  const { operatingCall, actionNow, policyOverrideActive, doNowItems, postureLabel, confidenceLabel, recordDate, tickerLabel, stageLabel, attributionUrl } = data;
   // `stageLabel` is only ever a stage the brief was actually calibrated for —
   // the route derives it from the parsed stage, not the raw parameter — so the
   // meta line can carry it without claiming a calibration that did not happen.
@@ -278,7 +282,7 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
   </div>
   <div style="background:rgba(56,189,248,0.08);border-left:3px solid rgba(56,189,248,0.4);padding:12px 14px;border-radius:6px;margin:8px 0;">
     <p style="font-size:11px;font-weight:600;color:rgba(125,211,252,0.9);margin:0 0 4px 0;letter-spacing:0.04em;">${publicDecisionLabels.call}</p>
-    <p style="font-size:16px;font-weight:600;color:rgba(255,255,255,0.9);margin:0;line-height:1.4;">${escapeHtml(formatGuidance({ actionNow, currentCall: operatingCall }))}</p>
+    <p style="font-size:16px;font-weight:600;color:rgba(255,255,255,0.9);margin:0;line-height:1.4;">${escapeHtml(formatGuidance({ actionNow, currentCall: operatingCall, policyOverrideActive }))}</p>
   </div>
   ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.4);margin:0 0 4px 0;">${DECISION_CONTRACT_LABELS.action.doNow}</p>${doNowHtml}</div>` : ""}
   ${changeLinesHtml}

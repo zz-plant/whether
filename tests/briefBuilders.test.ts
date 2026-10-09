@@ -4,6 +4,7 @@ import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../l
 import { regimeSignalLabel } from "../lib/report/signalTranslations";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { joinSentences } from "../lib/report/reportFormatting";
+import { weeklyHeadline } from "../lib/report/reportEvidence";
 
 import { assessment, fixtureBriefDocument, fixtureWeeklyCall } from "./factories/exportFixtures";
 
@@ -18,12 +19,13 @@ describe("buildSlackBrief", () => {
     const weeklyCall = fixtureWeeklyCall();
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall }));
 
-    /* The guidance opens on the do-now line the homepage, the email and the
-       /share post lead with, and the stance follows it. The two used to print
-       under "Guidance" and "Do now", so "Guidance:" meant a different sentence
-       here than in every other paste. */
-    assert.equal(slot(brief, "Guidance"), joinSentences(weeklyCall.actionNow, weeklyCall.currentCall));
-    assert.ok(slot(brief, "Guidance").startsWith(weeklyCall.actionNow));
+    /* The guidance is the week's one headline action (`weeklyHeadline`): the
+       call, which the homepage h1, the email and the /share post lead with too.
+       The action printed first until 2026-10-09, so one paste carried two
+       instructions for the week. */
+    assert.equal(slot(brief, "Guidance"), joinSentences(weeklyHeadline(weeklyCall).composed));
+    assert.ok(slot(brief, "Guidance").endsWith(weeklyCall.currentCall));
+    assert.ok(!slot(brief, "Guidance").includes(weeklyCall.actionNow), "the action is not a second headline");
     assert.equal(slot(brief, "Do now"), "", "no second slot repeats the guidance");
     assert.equal(slot(brief, "Pause if"), weeklyCall.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), weeklyCall.callChangesIf);
@@ -61,7 +63,7 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall: held }));
     const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
 
-    assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall));
+    assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall), "a held week's action leads");
     assert.equal(slot(brief, "Pause if"), hold.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), hold.callChangesIf);
     assert.equal(slot(brief, "Resume when"), "");

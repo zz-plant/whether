@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import {
   answerPages,
@@ -21,7 +22,7 @@ import { AreaTable } from "../components/ui/areaTable";
 import { DecisionHero } from "../components/DecisionHero";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
-import { formatMarginStamp } from "../../lib/report/reportFormatting";
+import { formatMarginStamp, publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildFlipThreshold, buildWeekCallChangesIf } from "../../lib/report/reportEvidence";
 import { formatThresholdNumber } from "../../lib/formatters";
@@ -70,6 +71,15 @@ export async function DecisionAnswerPageContent({
     pageKey: `/answers/${page.slug}`,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
+  /* The week's headline action, from the source the homepage h1 reads, leads the
+     card; the area this page is about follows as an area line. The card opened on
+     the area's rule and then printed a different do-now line, so the answer page had
+     its own headline, and neither was the week's. */
+  const headline = weeklyHeadline(snapshot.weeklyCall);
+  const leadArea = page.mappedDecisionAreas.find((area) => mappedRules.some((rule) => rule.area === area));
+  const areaDoNowLabel = leadArea
+    ? `${decisionAreaLabel(leadArea)} · ${DECISION_CONTRACT_LABELS.action.doNow}`
+    : DECISION_CONTRACT_LABELS.action.doNow;
   const contextSummary = buildDecisionAnswerContextSummary({
     displayLabel: displayRegime.label,
     canonicalRegime: displayRegime.canonicalRegime,
@@ -97,8 +107,8 @@ export async function DecisionAnswerPageContent({
     `Company inputs to check: ${page.companyInputs.join(" ")}`,
     `Decision note to complete: ${page.decisionNote}`,
     `Market guidance as of ${recordDateLabel}`,
-    `Current guidance: ${payload.currentCall}`,
-    `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
+    `${publicDecisionLabels.call}: ${headline.composed}`,
+    `${areaDoNowLabel}: ${payload.immediateAction}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
     `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
     `Citation: ${callCitation}`,
@@ -197,13 +207,12 @@ export async function DecisionAnswerPageContent({
             so a reader arriving from search met explanation before the answer. */}
         <DecisionHero
           question={page.title}
-          weeklyCall={payload.currentCall}
+          weeklyCall={headline.action}
+          direction={headline.directionLabel}
           callDetail={page.shortAnswer}
           regime={assessment.regime}
           lines={[
-            ...(payload.immediateAction.trim() !== payload.currentCall.trim()
-              ? [{ label: DECISION_CONTRACT_LABELS.action.doNow, value: payload.immediateAction }]
-              : []),
+            { label: areaDoNowLabel, value: payload.immediateAction },
             { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: payload.triggerThreshold },
             { label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: payload.reversalCondition },
           ]}
