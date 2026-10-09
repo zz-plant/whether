@@ -26,7 +26,8 @@ describe("sitemap", () => {
 
     assert.equal(urls.size, entries.length);
     assert.ok(urls.has(siteUrl));
-    assert.ok(urls.has(`${siteUrl}/resolve`));
+    // A redirect into Decide and Guides since 2026-10-08, so not submitted.
+    assert.ok(!urls.has(`${siteUrl}/resolve`));
     assert.ok(urls.has(`${siteUrl}/operate`));
     assert.ok(!urls.has(`${siteUrl}/toolkits`));
     assert.ok(!urls.has(`${siteUrl}/answers`));
@@ -111,7 +112,7 @@ describe("sitemap", () => {
     const priorityByUrl = new Map(entries.map((entry) => [entry.url, entry.priority]));
 
     assert.ok(
-      (priorityByUrl.get(`${siteUrl}/resolve`) ?? 0) >
+      (priorityByUrl.get(`${siteUrl}/resources`) ?? 0) >
         (priorityByUrl.get(`${siteUrl}/answers/${indexableAnswerSlugs[0]}`) ?? 1),
     );
     assert.ok(

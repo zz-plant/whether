@@ -14,7 +14,7 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import Link from "next/link";
 import { SecondaryPageSection } from "../components/secondaryPageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
-import { navigationLayerByKey } from "../../lib/navigation/informationArchitecture";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { ActionLink } from "../components/ui/actionLink";
 import { ScoreLadder } from "../components/ui/scoreLadder";
 import { AreaTable } from "../components/ui/areaTable";
@@ -88,7 +88,7 @@ export async function DecisionAnswerPageContent({
      and printed the gate ids once. Whether this page is indexed is not something
      the person reading it can act on; whether the reading is current is. */
   const dataCurrency = buildDataCurrencyNotice(payload.noindexReasons, { recordDateLabel });
-  const pagePath = `/answers/${page.slug}`;
+  const pagePath = `/answers/${page.slug}` as const;
   const measurement = getDecisionPageContentMeasurement(page);
   const copyText = [
     page.title,
@@ -183,13 +183,7 @@ export async function DecisionAnswerPageContent({
       <JsonLdScript data={faqData} />
 
       <div data-content-measurement-root={pagePath} className="weather-page-stack">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: navigationLayerByKey.resolve.label, href: navigationLayerByKey.resolve.href },
-            { label: page.title },
-          ]}
-        />
+        <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs(pagePath, [{ name: page.title, path: pagePath }]))} />
         {/* The answer as the card the brief opens on: the week's stamp, the question,
             this week's answer to it, the lines it holds between, and the trust strip.
             This page used to open on a generic header and a "Short answer" box of
@@ -355,7 +349,7 @@ export async function DecisionAnswerPageContent({
           <div className="flex flex-wrap gap-2">
             <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
             <ActionLink href="/operate" variant="pill">Plan the week</ActionLink>
-            <ActionLink href="/resolve#direct-answers" variant="pill">More direct answers</ActionLink>
+            <ActionLink href="/resources#answers" variant="pill">More direct answers</ActionLink>
             {relatedPages.map((related) => (
               <ActionLink key={related.slug} href={`/answers/${related.slug}`} variant="pill">{related.title}</ActionLink>
             ))}

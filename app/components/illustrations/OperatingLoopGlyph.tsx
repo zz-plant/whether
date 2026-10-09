@@ -1,9 +1,6 @@
 import type { HTMLAttributes } from "react";
 
-export type OperatingLoopStep = "signals" | "posture" | "plan" | "share";
-
 type OperatingLoopGlyphProps = HTMLAttributes<HTMLOListElement> & {
-  activeStep?: OperatingLoopStep;
   variant?: "compact" | "detailed";
 };
 
@@ -14,8 +11,16 @@ const stages = [
   { key: "share", label: "Share", title: "Shared artifact", detail: "Meeting & Slack block", path: "M6 3H18V21H6ZM9 9H15M9 13H15M9 17H13" },
 ] as const;
 
-/** HTML labels reflow independently of the artwork, including at text zoom. */
-export function OperatingLoopGlyph({ activeStep, variant = "compact", className = "", ...props }: OperatingLoopGlyphProps) {
+/**
+ * The product loop. HTML labels reflow independently of the artwork, including
+ * at text zoom.
+ *
+ * Until 2026-10-08 the compact variant also took an active step and sat beside
+ * the intro on /signals, /operate and /trust, where it read as a tab row that
+ * named none of the pages it sat on and linked nowhere. Those pages draw their
+ * group's sub-tabs instead (`SectionTabs`).
+ */
+export function OperatingLoopGlyph({ variant = "compact", className = "", ...props }: OperatingLoopGlyphProps) {
   return (
     <ol
       className={`weather-operating-loop ${className}`}
@@ -24,7 +29,7 @@ export function OperatingLoopGlyph({ activeStep, variant = "compact", className 
       {...props}
     >
       {stages.map((stage) => (
-        <li key={stage.key} aria-current={activeStep === stage.key ? "step" : undefined}>
+        <li key={stage.key}>
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" aria-hidden="true" focusable="false">
             <path d={stage.path} stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
           </svg>

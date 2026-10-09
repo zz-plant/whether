@@ -47,6 +47,7 @@ import { answerPages } from "../../answers/decisionPages";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { ActionLink } from "../../components/ui/actionLink";
 import { JsonLdScript } from "../../components/jsonLdScript";
 
@@ -154,7 +155,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function ResourcePillarPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   if (isRetiredResourceArticleSlug(slug)) {
-    permanentRedirect("/planning#ops-export-briefs");
+    // Guides, where the remaining guides are. This pointed at a share step on
+    // the plan through the legacy /planning name: two hops into a step that
+    // left the plan on 2026-10-08.
+    permanentRedirect("/resources");
   }
   const downloadableResource = findDownloadableResourceBySlug(slug);
   if (downloadableResource) {
@@ -238,11 +242,9 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       />
       <JsonLdScript data={articleSchema} />
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Resources", href: "/resources" },
-          { label: page.h1 },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(`/resources/${page.slug}`, [{ name: page.h1, path: `/resources/${page.slug}` }]),
+        )}
       />
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">

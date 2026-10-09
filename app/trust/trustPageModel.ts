@@ -3,8 +3,9 @@ import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
+import { navigationGroupByKey } from "../../lib/navigation/informationArchitecture";
 import { graph } from "../../lib/seo/pageStructuredData";
-import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import {
   buildCompactTrustSummary,
   buildDecisionReadinessState,
@@ -23,7 +24,7 @@ import { readStoredActivationFunnel } from "../../lib/telemetry/recordActivation
 
 
 export async function buildTrustPageModel() {
-  const breadcrumbStructuredData = graph([buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/trust" }]))]);
+  const breadcrumbStructuredData = graph([buildBreadcrumbList(buildGroupBreadcrumbs("/trust"))]);
   /* Read alongside the brief, not after it: the run history has its own deadline and
      fails soft, so it never lengthens the page past the report path's own bound. The
      funnel is a KV get of a record the Monday cron already wrote, so it costs one read
@@ -166,7 +167,7 @@ export async function buildTrustPageModel() {
       pageTitle: "How much to trust this week's guidance",
       pageSummary: "Check whether this week's guidance is current enough to act on.",
       sectionLinks,
-      activeStep: "posture",
+      currentPath: "/trust",
     },
     trust: {
       trustStatusTone,
@@ -179,10 +180,12 @@ export async function buildTrustPageModel() {
       sidebarVariant: "full",
     },
     actions: {
+      // Into Record. Why it changed is a tab above this page now; what a reader
+      // judging the reading needs next is how readings like it held up.
       nextStep: {
-        href: "/signals",
-        description: "See which readings moved this week, and by how much.",
-        label: "Open the evidence",
+        href: navigationGroupByKey.record.href,
+        description: navigationGroupByKey.record.description,
+        label: `Open the ${navigationGroupByKey.record.label.toLowerCase()}`,
       },
     },
     payloads: {

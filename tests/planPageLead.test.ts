@@ -119,13 +119,13 @@ describe("/operate tail", () => {
     }
   });
 
-  it("says in the resources summary what the disclosure holds", async () => {
-    const { children } = await buildPlanningPageModel();
-    const summary = elementsIn(children).find((element) => element.type === "summary");
-    assert.ok(summary, "the resources disclosure renders");
-    assert.match(
-      textIn(summary.props.children),
-      /^Resource templates and guides\d+ operating guides and \d+ templates you can fill in and share\.$/,
-    );
+  /* The "Resource templates and guides" disclosure listed the guides Guides lists, and
+     the Share step offered four of /share's formats. Since 2026-10-08 the page ends on
+     its risk checks and hands off to /share once, in the shell's next-step card. */
+  it("ends on the risk checks and hands sharing to /share once", async () => {
+    const { children, reportShellModel } = await buildPlanningPageModel();
+    assert.ok(!elementsIn(children).some((element) => element.type === "summary"), "no resources disclosure");
+    assert.equal(reportShellModel.actions?.nextStep?.href, "/share");
+    assert.equal(reportShellModel.actions?.nextStep?.label, "Share or embed this →");
   });
 });

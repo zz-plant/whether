@@ -135,7 +135,6 @@ describe("regime colour contract", () => {
     // does not.
     const callers = [
       "app/signals/page.tsx",
-      "app/resolve/page.tsx",
       "app/operate/planningPageModel.ts",
       "app/operate/[workstream]/page.tsx",
       "app/trust/trustPageModel.ts",

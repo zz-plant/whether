@@ -1,11 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { operationsSectionLinks, operationsWorkstreamLinks } from "../lib/navigation/planningNavigation";
+import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
+import { pagesInGroup } from "../lib/navigation/informationArchitecture";
 
 describe("operations navigation", () => {
-  it("keeps operations focused on the weekly plan route", () => {
+  it("keeps Decide focused on the plan, its two tools and the market multiples", () => {
     // No /operate/memory: the ledger was retired; the record the product keeps is /history.
-    assert.deepEqual(operationsWorkstreamLinks.map((link) => link.href), ["/operate", "/operate/financial", "/operate/scenarios"]);
+    // The planning switcher's three links are the Decide group's tabs since 2026-10-08.
+    assert.deepEqual(pagesInGroup("decide").map((page) => page.href), ["/operate", "/operate/financial", "/operate/scenarios", "/comps"]);
   });
 
   it("indexes the plan page in page order, one entry per section", () => {

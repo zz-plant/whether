@@ -22,6 +22,7 @@ import {
   type CanonReading,
 } from "../../lib/productCanon";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { SectionTabs } from "../components/sectionTabs";
 
 export const runtime = "edge";
 
@@ -198,6 +199,7 @@ export default function ProductCanonPage() {
   return (
     <ContentPageShell measure="wide">
       <JsonLdScript data={buildProductCanonStructuredData({ essays: timeline })} />
+      <SectionTabs currentPath="/concepts" />
 
       <SecondaryPageHeader
         eyebrow="Reading list"

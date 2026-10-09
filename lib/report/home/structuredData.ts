@@ -10,7 +10,6 @@ import {
   websiteName,
 } from "../../seo";
 import { siteUrl } from "../../siteUrl";
-import { createBreadcrumbTrail } from "../../navigation/breadcrumbs";
 import { buildAuthorSchema } from "../../publisher";
 import { homeDecisionFaqItems } from "../decisionTransmissionCopy";
 import { formatConfidenceChipLabel } from "../reportFormatting";
@@ -220,6 +219,6 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         "@id": websiteId,
       },
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }])),
+    buildBreadcrumbList([{ name: "Home", path: "/" }]),
   ],
 });

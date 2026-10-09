@@ -1,15 +1,17 @@
+/*
+ * Legacy spellings that still mark their renamed page active. Every one of them
+ * is a permanent redirect (next.config.js), so a reader only ever renders under
+ * one through a client-side transition the redirect has not caught yet.
+ *
+ * `/resolve` had an entry here, carrying `/answer` and the bare `/answers`. The
+ * Resolve page folded into Decide and Guides on 2026-10-08: the bare paths
+ * redirect, and `/answers/<slug>` belongs to Guides through its member prefixes
+ * (informationArchitecture.ts), not through an alias.
+ */
 const ROUTE_ALIASES: Record<string, string[]> = {
   "/signals": ["/evidence"],
   "/operate": ["/planning"],
-  "/resolve": ["/answer", "/answers"],
 };
-
-// "/answer" is the legacy spelling of this route. "/answers" is also the root
-// of the standalone /answers/[slug] article catalog
-// (see app/answers/[slug]/page.tsx), a distinct page set — not part of the
-// /resolve decision-tools hub. Only the bare path should alias; subpaths must
-// not be swallowed by the report-shell/nav-active logic.
-const EXACT_ONLY_ALIASES = new Set(["/answers"]);
 
 export const pathMatchesLink = (linkHref: string, currentPath: string) => {
   if (linkHref === "/") {
@@ -23,13 +25,5 @@ export const pathMatchesLink = (linkHref: string, currentPath: string) => {
   }
 
   const aliases = ROUTE_ALIASES[linkHref];
-  if (aliases) {
-    return aliases.some((alias) =>
-      EXACT_ONLY_ALIASES.has(alias)
-        ? normalizedCurrent === alias
-        : normalizedCurrent === alias || normalizedCurrent.startsWith(`${alias}/`),
-    );
-  }
-
-  return false;
+  return aliases ? aliases.some((alias) => normalizedCurrent === alias || normalizedCurrent.startsWith(`${alias}/`)) : false;
 };

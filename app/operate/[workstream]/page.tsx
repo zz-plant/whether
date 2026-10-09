@@ -7,10 +7,9 @@ import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot
 import { PremiumGate } from "../components/PremiumGate";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
 import { ScenarioStudioSimulator } from "../components/scenarioStudioSimulator";
-import { CompactWorkstreamSwitcher } from "../components/planningWorkstreamNav";
-import { WorkstreamNavFallback } from "../../components/suspenseFallbacks";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 
 import { WORKSTREAMS, isWorkstream, workstreamSlugs } from "../workstreams";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
@@ -64,6 +63,10 @@ export default async function OperateWorkstreamPage({
           pageTitle: entry.pageTitle,
           pageSummary: entry.pageSummary,
           sectionLinks: operationsSectionLinks[entry.slug] ?? operationsSectionLinks.plan,
+          currentPath,
+          tabsQuery: new URLSearchParams(
+            Object.entries(resolvedSearchParams ?? {}).flatMap(([key, value]) => (value ? [[key, value]] : [])),
+          ).toString() || undefined,
         },
         trust: {
           trustStatusTone,
@@ -72,16 +75,7 @@ export default async function OperateWorkstreamPage({
       }}
     >
       <div className="space-y-6">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Plan", href: "/operate" },
-            { label: entry.pageTitle },
-          ]}
-        />
-        <Suspense fallback={<WorkstreamNavFallback />}>
-          <CompactWorkstreamSwitcher currentPath={currentPath} />
-        </Suspense>
+        <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs(currentPath))} />
         {entry.slug === "financial" ? (
           <div id="ops-runway-planner">
             <PremiumGate

@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal, History, Columns2 } from "lucide-react";
-import { loopNavigationLayers, utilityLinks } from "../../lib/navigation/informationArchitecture";
+import { navigationGroups, navigationPages, utilityLinks } from "../../lib/navigation/informationArchitecture";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { openShareRail } from "./globalShareRail";
 import { openTimeMachine } from "./globalTimeMachine";
@@ -139,7 +139,6 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         description: "Browse past briefs and the month-end record",
         icon: Archive,
         action: () => navigateTo("/history"),
-        shortcut: "H",
       },
       /* Deliberately here and in the footer rather than in the nav: the page is
          noindex and per-browser, so it is something a reader goes looking for
@@ -153,14 +152,28 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       },
     ];
 
-    const navCommands: CommandItem[] = loopNavigationLayers.map((layer) => ({
-      id: `nav-${layer.key}`,
-      label: layer.label,
-      description: layer.description,
-      icon: CornerRightUp,
-      action: () => navigateTo(layer.href),
-      shortcut: layer.shortcut,
-    }));
+    // The four groups with their keys, then every other page in them. A hub
+    // is its group (one name per URL), so it is listed once, as the group.
+    const groupHrefs = new Set<string>(navigationGroups.map((group) => group.href));
+    const navCommands: CommandItem[] = [
+      ...navigationGroups.map((group) => ({
+        id: `nav-${group.key}`,
+        label: group.label,
+        description: group.description,
+        icon: CornerRightUp,
+        action: () => navigateTo(group.href),
+        shortcut: group.shortcut.toUpperCase(),
+      })),
+      ...navigationPages
+        .filter((page) => !groupHrefs.has(page.href))
+        .map((page) => ({
+          id: `nav-${page.key}`,
+          label: page.label,
+          description: page.description,
+          icon: CornerRightUp,
+          action: () => navigateTo(page.href),
+        })),
+    ];
 
     // Every destination in one list: the utility routes used to live only in
     // the footer and the More menu, so the palette could not jump to Pricing.

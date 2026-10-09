@@ -13,6 +13,7 @@ import {
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 
 type Params = { slug: string };
 
@@ -60,11 +61,12 @@ export default async function DecideDetailPage({
     return (
       <ContentPageShell>
         <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Resolve", href: "/resolve" },
-            { label: `For ${role.title}` },
-          ]}
+          items={toVisibleBreadcrumbs(
+            buildGroupBreadcrumbs(`/resolve/${slug}`, [
+              { name: "More tools", path: "/resources#more-tools" },
+              { name: `For ${role.title}`, path: `/resolve/${slug}` },
+            ]),
+          )}
         />
         <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
           <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">For {role.title}</h1>
@@ -100,11 +102,12 @@ export default async function DecideDetailPage({
   return (
     <ContentPageShell>
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Resolve", href: "/resolve" },
-          { label: situationUseCase?.title || titleCase(slug) },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(`/resolve/${slug}`, [
+            { name: "More tools", path: "/resources#more-tools" },
+            { name: situationUseCase?.title || titleCase(slug), path: `/resolve/${slug}` },
+          ]),
+        )}
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{situationUseCase?.title || titleCase(slug)}</h1>

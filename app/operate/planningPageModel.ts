@@ -4,13 +4,8 @@ import { Fragment, createElement as h } from "react";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildBreadcrumbList, organizationId, websiteId } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
-import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { operationsSectionLinks } from "../../lib/navigation/planningNavigation";
-import {
-  canonicalCapitalDisciplinePath,
-  resourcePillarPages,
-  resourceSupportingPages,
-} from "../../lib/resourcesContent";
 import { formatDateUTC } from "../../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
@@ -82,12 +77,7 @@ export async function buildPlanningPageModel(
       isPartOf: { "@id": websiteId },
       publisher: { "@id": organizationId },
     },
-    buildBreadcrumbList(
-      createBreadcrumbTrail([
-        { path: "/" },
-        { path: "/operate" },
-      ]),
-    ),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/operate")),
   ]);
 
   const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });
@@ -112,12 +102,6 @@ export async function buildPlanningPageModel(
   const showAllActionLanes = resolvedSearchParams?.actions === "all";
   const actionStripItems = snapshot.homeBriefModel.actionStripItems;
   const weeklyCall = snapshot.weeklyCall;
-  const operationsResourceLibrary = [
-    resourceSupportingPages.capitalPostureTemplate,
-    resourceSupportingPages.reversalTriggerChecklist,
-    resourceSupportingPages.quarterlyCapitalPostureMemoExample,
-    resourceSupportingPages.decisionShieldOverview,
-  ] as const;
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
   /* What each closed step holds, said on the closed step (§XII: "a summary that
      shows the current values"). Until 2026-10-07 the three read "Move the
@@ -137,7 +121,6 @@ export async function buildPlanningPageModel(
   )}, move the ones your plan needs, and get an email the day one is crossed.`;
   const financeSummary =
     financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
-  const resourcesSummary = `${resourcePillarPages.length} operating guides and ${operationsResourceLibrary.length} templates you can fill in and share.`;
   /* Freshness and confidence, once, under the h1 before anything asks the
      reader to act. The shell draws it in the intro (DD-040). */
   const trustStrip = {
@@ -161,15 +144,19 @@ export async function buildPlanningPageModel(
         fetchedAtLabel,
       },
       page: {
-        /* "Plan", matching `navigationLayers`, which declares both `label` and
-           `navLabel` as "Plan". The H1 said "Planning" while the tab said "Plan" and
-           the URL said /operate — three names for one section, which is the single
-           most repeated inconsistency in this IA. The <title> keeps its longer
-           descriptive form; only the on-page heading is the section's name. */
-        pageTitle: "Plan",
+        /* "Decide", the group's name in the header (`navigationGroups`). The H1
+           said "Planning" while the tab said "Plan" and the URL said /operate —
+           three names for one section, the single most repeated inconsistency in
+           this IA; on 2026-10-08 the tab became the Decide group and the heading
+           follows it. The <title> keeps its longer descriptive form; only the
+           on-page heading is the section's name. */
+        pageTitle: "Decide",
         pageSummary: "This week's guidance, turned into rules for hiring, spend and the roadmap.",
         sectionLinks: operationsSectionLinks.plan,
-        activeStep: "plan",
+        currentPath: "/operate",
+        tabsQuery: new URLSearchParams(
+          Object.entries(resolvedSearchParams ?? {}).flatMap(([key, value]) => (value ? [[key, value]] : [])),
+        ).toString() || undefined,
       },
       trust: {
         trustStatusTone,
@@ -181,7 +168,8 @@ export async function buildPlanningPageModel(
         // the brief picker as its last step, one of five places the site
         // offered to share the same week. Every format, the embed, the
         // citation and the API live on /share; this is the one link to it, in
-        // the shell's one predictable place.
+        // the shell's one predictable place. It replaced the handoff to
+        // Resolve, which folded into this page's Test step and into Guides.
         nextStep: SHARE_OR_EMBED_NEXT_STEP,
       },
       payloads: {
@@ -306,7 +294,16 @@ export async function buildPlanningPageModel(
               hideHeader: true,
               id: "ops-decision-shield-panel",
               title: "Test a decision",
-              children: h(DecisionShieldPanel, { assessment, recordDate: treasury.record_date }),
+              children: h(Fragment, null,
+                h(DecisionShieldPanel, { assessment, recordDate: treasury.record_date }),
+                // Resolve's direct answers live on Guides since 2026-10-08, grouped
+                // by decision area with this week's standing beside each.
+                h("p", { className: "text-xs leading-5 text-slate-400" },
+                  "Common decisions have direct answers on ",
+                  h("a", { href: "/resources#answers", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Guides"),
+                  ".",
+                ),
+              ),
             }),
           },
           /* The use the record fits: lines agreed once, and an email the day one is
@@ -377,41 +374,6 @@ export async function buildPlanningPageModel(
             ? h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold" }, "Recheck the rules")
             : null,
           h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
-        ),
-      ),
-      /* The summary says what is behind it (§XII). It read "Resource templates and
-         guides" alone, in sky, on a padding the report row had zeroed — a title
-         in a box. The guide cards inside drew a lifted surface each, inside a
-         frame the depth ladder cannot see; they are plain bordered links now. */
-      h("details", { className: "weather-auto-chevron mt-6 rounded-xl border border-[var(--border-subtle)] bg-slate-950/[0.05] p-4 sm:p-5" },
-        h("summary", { className: "cursor-pointer" },
-          h("span", { className: "min-w-0" },
-            h("span", { className: "block text-sm font-semibold text-slate-100" }, "Resource templates and guides"),
-            h("span", { className: "mt-1 block text-xs text-slate-400" }, resourcesSummary),
-          ),
-        ),
-        h("div", { className: "mt-3 space-y-4" },
-          h("div", { className: "grid gap-3 md:grid-cols-3" },
-            resourcePillarPages.map((pillar) => h(Link, {
-              key: pillar.slug,
-              href: `/resources/${pillar.slug}`,
-              className: "rounded-lg border border-[var(--border-subtle)] px-4 py-3 text-sm text-slate-100 transition-colors hover:border-sky-400/70",
-            },
-              h("span", { className: "block font-semibold text-slate-100" }, pillar.h1),
-              h("span", { className: "mt-1.5 block text-sm text-slate-300" }, pillar.description),
-            )),
-          ),
-          h("div", { className: "flex flex-wrap gap-2 pt-1" },
-            operationsResourceLibrary.map((resource) => h(Link, {
-              key: resource.path,
-              href: resource.path,
-              className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100",
-            }, resource.title)),
-            h(Link, {
-              href: canonicalCapitalDisciplinePath,
-              className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold",
-            }, "Read the full guide"),
-          ),
         ),
       ),
     ),
