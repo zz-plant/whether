@@ -2857,6 +2857,19 @@ beside every glyph on the shared components and the routes that render offline, 
 imports a concept glyph or reads a mapping outside the shared components, and that the text
 artifacts carry no icon markup.
 
+### 1.1.62 The meeting slide's cards wrap their text (2026-10-09)
+
+The SVG meeting slide (`formatMeetingSlideSvg`, `lib/export/meetingSlideExport.ts`) drew each
+decision card's line as one SVG `<text>`, which does not wrap. After §1.1.60 made the headline the
+week's concrete call, the 92-character call ran past its card ("…hires that bring in revenu"), and
+the rule lines' new reading sentence put "Pause if" near the edge too. Each card's text now wraps
+onto at most two lines with `wrappedLines` from `lib/image/textFit.ts`, steps down one size at a time
+(up to three) before anything is cut, and cuts at a word with an ellipsis as a last resort. The
+slide's system sans runs wider than the Archivo faces `textFit` was measured on, so the slide uses
+its own, higher per-character widths (0.56em bold, 0.53em regular). The PPTX deck's text boxes wrap
+natively and are unchanged. `tests/meetingSlideExport.test.ts` pins a two-line call, a one-line
+call and the cut.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
