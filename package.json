@@ -65,7 +65,15 @@
     "check:dead-exports": "bun run scripts/check-dead-exports.ts",
     "telemetry:streams": "bun run scripts/telemetry-stream-census.ts",
     "audit:jev-copy": "bun run scripts/jev-copy-audit.ts",
-    "check:curated-freshness": "bun run scripts/check-curated-freshness.ts"
+    "check:curated-freshness": "bun run scripts/check-curated-freshness.ts",
+    "advice-corpus:discover": "bun scripts/advice-corpus/discover.ts",
+    "advice-corpus:extract": "bun scripts/advice-corpus/extract.ts",
+    "advice-corpus:prefilter": "bun scripts/advice-corpus/prefilter.ts",
+    "advice-corpus:classify": "bun scripts/advice-corpus/classify.ts",
+    "advice-corpus:validate": "bun scripts/advice-corpus/validate.ts",
+    "advice-corpus:analyze": "bun scripts/advice-corpus/analyze.ts",
+    "advice-corpus:data": "bun scripts/advice-corpus/siteData.ts",
+    "advice-corpus:check": "bun scripts/advice-corpus/siteData.ts --check"
   },
   "engines": {
     "bun": ">=1.3.14",

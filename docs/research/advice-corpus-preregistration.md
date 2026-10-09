@@ -212,7 +212,11 @@ Beyond the limits in §1: extraction may miss text on some pages (counted by E2)
 
 ## 11. Deviations
 
-None at registration.
+None at registration. Each entry below gives its date and whether any label or result existed when it was made.
+
+- **D1 (2026-10-09, before any in-window post was classified).** The H2 interval and the event-window intervals (§6.3) resample posts within each month (2,000 replicates, seed 20261012) instead of using the 12-month block bootstrap of §6.1. Those statistics compare fixed 12- or 6-month windows around one date, and a 12-month block drawn from a 12-month window is the window itself, so the block bootstrap cannot vary them. The within-month resampling measures label noise given the months, not serial dependence. H2's test is still the pseudo-crossing p-value, which is unchanged.
+- **D2 (2026-10-09, before any in-window post was classified).** §6.1 Holm-adjusts "H1–H3 p-values", but H3's registered statistic has an interval and no single p-value. The Holm set is H1's permutation p, H2's pseudo-crossing p and the permutation p of R_FP (that net stance tracks funding pressure at all).
+- **D3 (2026-10-09, before any in-window post was classified; extraction details, not protocol).** Greylock's REST API returned an empty body for every post (its pages are built with a page builder), so each Greylock post's page was fetched for its text; enumeration is unchanged. Sixty Sequoia articles carry their date only in a `<time datetime>` element, which the extractor now reads after JSON-LD and meta tags. Bessemer's 19 investment memos show only the date the page was posted, not the date of the memo, so they stay undated and fall under E1, as do two Atlas posts with no date on the page.
 
 ---
 
