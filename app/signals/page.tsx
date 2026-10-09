@@ -73,13 +73,7 @@ export default async function SignalsPage({
           showOfflineBadge: model.isFallback && !model.historicalSelection,
           strip: { ...model.trustStrip, href: "/trust" },
         },
-        actions: {
-          nextStep: {
-            href: "/operate",
-            description: "Turn this week's guidance into rules for hiring, spend and the roadmap.",
-            label: "Open the plan",
-          },
-        },
+        // No closing "Open the plan" card (2026-10-09): Decide is a header tab.
         payloads: {
           structuredData: model.structuredData,
           historicalBanner: model.historicalSelection ? (

@@ -114,11 +114,13 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
     ...(payload.call && payload.call.trim() !== payload.actionNow.trim()
       ? [`> **GUIDANCE**: ${payload.call}`]
       : []),
-    `> 🎯 **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
-    `> ⚠️ **${SLIDE_LABELS.pause.toUpperCase()}**: ${payload.pauseIf}`,
+    // Labels only (2026-10-09): a target, a warning sign, a tick and a cycle
+    // arrow sat in front of them, four pictures restating four words.
+    `> **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
+    `> **${SLIDE_LABELS.pause.toUpperCase()}**: ${payload.pauseIf}`,
     // The stage's own discipline for lifting its hold, when one is chosen.
-    ...(payload.resumeWhen ? [`> ✅ **${SLIDE_LABELS.resume.toUpperCase()}**: ${payload.resumeWhen}`] : []),
-    `> 🔄 **${SLIDE_LABELS.callChange.toUpperCase()}**: ${payload.callChangesIf}`,
+    ...(payload.resumeWhen ? [`> **${SLIDE_LABELS.resume.toUpperCase()}**: ${payload.resumeWhen}`] : []),
+    `> **${SLIDE_LABELS.callChange.toUpperCase()}**: ${payload.callChangesIf}`,
     // The other things that would change the guidance, under the name the share
     // formats give them. They printed as the resume line here, which on a held
     // week put "why the guidance is held" under "Resume when".
@@ -146,7 +148,7 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #090d16; color: #f1f5f9; padding: 24px; border-radius: 12px; border: 1px solid #1e293b; max-width: 680px;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #1e293b; padding-bottom: 12px;">
     <div>
-      <span style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; color: #94a3b8; font-weight: 700;">Whether · Weekly Operating Brief</span>
+      <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Whether · Weekly operating guidance</span>
       <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's guidance${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
       <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Conditions: ${slideConditions(payload)}</p>
     </div>
@@ -158,26 +160,24 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
 
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
     <tr>
-      <td style="padding: 12px; background: rgba(56, 189, 248, 0.08); border-left: 3px solid #38bdf8; border-radius: 4px 8px 8px 4px; margin-bottom: 8px;">
-        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #38bdf8; letter-spacing: 0.08em;">1. ${SLIDE_LABELS.action}</span>
+      <td style="padding: 8px 0;">
+        <span style="font-size: 12px; font-weight: 700; color: #38bdf8;">${SLIDE_LABELS.action}</span>
         <div style="font-size: 13px; font-weight: 600; color: #ffffff; margin-top: 2px;">${payload.actionNow}</div>
       </td>
     </tr>
-    <tr><td style="height: 8px;"></td></tr>
     <tr>
-      <td style="padding: 12px; background: rgba(245, 158, 11, 0.08); border-left: 3px solid #f59e0b; border-radius: 4px 8px 8px 4px; margin-bottom: 8px;">
-        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #f59e0b; letter-spacing: 0.08em;">2. ${SLIDE_LABELS.pause}</span>
+      <td style="padding: 8px 0;">
+        <span style="font-size: 12px; font-weight: 700; color: #f59e0b;">${SLIDE_LABELS.pause}</span>
         <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.pauseIf}</div>
       </td>
     </tr>
-    <tr><td style="height: 8px;"></td></tr>
     <tr>
-      <td style="padding: 12px; background: rgba(16, 185, 129, 0.08); border-left: 3px solid #10b981; border-radius: 4px 8px 8px 4px;">
-        <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">3. ${SLIDE_LABELS.callChange}</span>
+      <td style="padding: 8px 0;">
+        <span style="font-size: 12px; font-weight: 700; color: #10b981;">${SLIDE_LABELS.callChange}</span>
         <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.callChangesIf}</div>${
           payload.resumeWhen
             ? `
-        <span style="display: block; margin-top: 8px; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #10b981; letter-spacing: 0.08em;">${SLIDE_LABELS.resume}</span>
+        <span style="display: block; margin-top: 8px; font-size: 12px; font-weight: 700; color: #10b981;">${SLIDE_LABELS.resume}</span>
         <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.resumeWhen}</div>`
             : ""
         }
@@ -236,28 +236,19 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     return `<text x="32" y="${firstBaseline}" font-family="-apple-system, system-ui, sans-serif" font-size="${fontSize}" font-weight="${weight}" fill="${fill}">${spans}</text>`;
   };
 
+  /* Flat (2026-10-09): one background fill and one card fill. The slide had a
+     diagonal background gradient, a gradient on every card, and two faint
+     sky and emerald discs behind the header ("Subtle Grid Accent") that a
+     projector shows as smudges. The header reads in sentence case, as the
+     site's category line does, not in letter-spaced capitals. The three
+     cards are parallel, so they carry no numbers, and each card's colour is
+     its label's alone: a coloured bar down its edge drew the same thing twice. */
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-  <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="675" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#090d16"/>
-      <stop offset="100%" stop-color="#0f172a"/>
-    </linearGradient>
-    <linearGradient id="cardGrad" x1="0" y1="0" x2="1" y2="0">
-      <stop offset="0%" stop-color="#1e293b" stop-opacity="0.8"/>
-      <stop offset="100%" stop-color="#0f172a" stop-opacity="0.6"/>
-    </linearGradient>
-  </defs>
+  <rect width="1200" height="675" fill="#090d16"/>
 
-  <!-- Background -->
-  <rect width="1200" height="675" fill="url(#bg)"/>
-  
-  <!-- Subtle Grid Accent -->
-  <circle cx="1100" cy="80" r="220" fill="#38bdf8" opacity="0.04"/>
-  <circle cx="100" cy="600" r="300" fill="#10b981" opacity="0.03"/>
-
-  <!-- Header Container -->
+  <!-- Header -->
   <g transform="translate(80, 70)">
-    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#94a3b8" letter-spacing="2">WHETHER · WEEKLY OPERATING GUIDANCE</text>
+    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="600" fill="#94a3b8">Whether · Weekly operating guidance</text>
     <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">This week's guidance${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
     <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · ${esc(slideConditions(payload))}</text>
     
@@ -268,28 +259,24 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
     </g>
   </g>
 
-  <!-- 3 Decision Cards -->
-  <!-- Card 1: Action Now -->
+  <!-- Action now -->
   <g transform="translate(80, 190)">
-    <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
-    <rect width="6" height="110" rx="3" fill="#38bdf8"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#38bdf8" letter-spacing="1.5">1. ${SLIDE_LABELS.action.toUpperCase()}</text>
+    <rect width="1040" height="110" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#38bdf8">${SLIDE_LABELS.action}</text>
     ${cardBody(payload.actionNow, 20, 700, "#ffffff")}
   </g>
 
-  <!-- Card 2: Pause If -->
+  <!-- Pause if -->
   <g transform="translate(80, 320)">
-    <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
-    <rect width="6" height="110" rx="3" fill="#f59e0b"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#f59e0b" letter-spacing="1.5">2. ${SLIDE_LABELS.pause.toUpperCase()}</text>
+    <rect width="1040" height="110" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#f59e0b">${SLIDE_LABELS.pause}</text>
     ${cardBody(payload.pauseIf, 18, 500, "#cbd5e1")}
   </g>
 
-  <!-- Card 3: Call changes if -->
+  <!-- Conditions change if -->
   <g transform="translate(80, 450)">
-    <rect width="1040" height="110" rx="12" fill="url(#cardGrad)" stroke="#334155" stroke-width="1"/>
-    <rect width="6" height="110" rx="3" fill="#10b981"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="12" font-weight="700" fill="#10b981" letter-spacing="1.5">3. ${SLIDE_LABELS.callChange.toUpperCase()}</text>
+    <rect width="1040" height="110" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#10b981">${SLIDE_LABELS.callChange}</text>
     ${cardBody(payload.callChangesIf, 18, 500, "#cbd5e1")}
   </g>
 

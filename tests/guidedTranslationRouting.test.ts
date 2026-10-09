@@ -52,6 +52,8 @@ describe("guided translation routing", () => {
 
     assert.equal(defaultHtml, "");
     assert.match(selectedHtml, /Selected view details/);
-    assert.match(selectedHtml, /Team view/);
+    /* The team's own name heads its panel; a "Team view" kicker sat over it until 2026-10-09. */
+    assert.match(selectedHtml, /<h3[^>]*>[^<]+<\/h3>/);
+    assert.doesNotMatch(selectedHtml, /Team view/);
   });
 });

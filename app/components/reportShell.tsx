@@ -38,7 +38,6 @@ import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 import { SectionTabs } from "./sectionTabs";
 import type { Route } from "../../lib/navigation/routeType";
-import { NextStepCard, type NextStep } from "./report-shell/NextStepCard";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 import { OfflineNotice } from "./offlineNotice";
 import type { TrustStripProps } from "./trustStrip";
@@ -78,11 +77,14 @@ export type ReportShellModel = {
     sidebarVariant?: "full" | "hidden";
   };
   /** A hero action, for a destination the header and the page index do not
-   *  already reach. No route needs one today; the slot stays for the one that does. */
+   *  already reach. No route needs one today; the slot stays for the one that does.
+   *  There is no closing "Next" card (2026-10-09): on /signals, /operate and
+   *  /trust it pointed at a header tab or at "Use it elsewhere", which the
+   *  header and the footer already carry. A next action that only the page
+   *  knows is a link in its last section. */
   actions?: {
     primaryCta?: ReportCtaProps;
     exportCta?: ExportCtaProps | null;
-    nextStep?: NextStep;
   };
   payloads?: {
     structuredData?: unknown;
@@ -112,7 +114,6 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
     actions: {
       primaryCta,
       exportCta = null,
-      nextStep,
     } = {},
     payloads: { structuredData, historicalBanner } = {},
   } = model;
@@ -229,8 +230,6 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               );
             })}
           </div>
-
-          <NextStepCard nextStep={nextStep} />
         </div>
       </div>
     </PageShell>

@@ -26,7 +26,6 @@ describe("ReportSection", () => {
     const html = renderToStaticMarkup(
       <ReportSection
         id="ops-weekly-plan"
-        label="Start"
         title="Weekly plan"
         description="Review this before changing team pace."
         variant="split"
@@ -39,5 +38,7 @@ describe("ReportSection", () => {
     assert.match(html, /Weekly approval boundary/);
     assert.doesNotMatch(html, /aria-controls=/);
     assert.doesNotMatch(html, /type="button"/);
+    /* The title names the section; no small label sits over it (2026-10-09). */
+    assert.doesNotMatch(html, /type-eyebrow/);
   });
 });

@@ -88,8 +88,9 @@ export function HistoryExplorer({
       </div>
 
       {/* The bar carries its own gesture hints as `title`s; a sentence about how
-          to drag it is not page content. */}
-      <div className="weather-surface space-y-2 p-4">
+          to drag it is not page content. No frame around it (2026-10-09): it
+          sits inside the disclosure that already groups it. */}
+      <div className="space-y-2">
         <p className="type-eyebrow pb-1">Timeline</p>
         <TimelineBar
           currentMonth={selectedMonth || undefined}
