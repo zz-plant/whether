@@ -1,5 +1,4 @@
 import { ReportCta } from "../reportCta";
-import { ScreenshotCaption } from "../screenshotCaption";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
 
@@ -71,13 +70,13 @@ export function CommandCenterNavBlock({
   // stamp and the caption, each on its own row: about 260px of a 932px
   // screen restating what `/` had just shown. Below `sm` the refresh stamp
   // drops (the record date is the date a phone reader needs; /trust lists
-  // each feed's time), the strip runs as one line, and the caption moves up
-  // beside the status word when that row is the word alone. Beside a
-  // "sources • as of" line (/resolve, /history) it would wrap under it, so
-  // there it stays at the foot of the block.
-  const captionBesideStatus = Boolean(statusLabel) && !introMetaRest;
-  const stampRowOnPhone = !captionBesideStatus;
-  const rightColumnOnPhone = stampRowOnPhone || showActions;
+  // each feed's time) and the strip runs as one line.
+  //
+  // No "Whether · whether.work" caption (2026-10-09). It sat inside every
+  // interior intro so a cropped screenshot would still name its source, and
+  // printed the site's name under the header that names it on every route.
+  // The brief's call card keeps it: that card is the block people crop and
+  // share, and #1561 kept it there for that reason.
 
   // No hue on the card itself (2026-10-09). It carried the regime accent in
   // its fill, its border and a 3px rule across its top edge, under a status
@@ -108,23 +107,17 @@ export function CommandCenterNavBlock({
               prints in the regime ink at the reading's own size; the trust
               headline and the record date stay micro under it. */}
           {statusLabel ? (
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
-                {statusPrefix ? (
-                  <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
-                ) : null}
-                {/* The week's word in the stamp's shape, the same placard the
-                    hero's tag and the sticky strip print. */}
-                <span className="type-stamp text-fluid-base text-[color:var(--regime-ink)]">{statusLabel}</span>
-                {introMetaRest ? (
-                  <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
-                ) : null}
-              </p>
-              {/* Phone: the caption shares the status word's row instead of
-                  taking one of its own at the foot of the block. From `sm` it
-                  sits in the stamp row, below. */}
-              {captionBesideStatus ? <ScreenshotCaption className="ml-auto sm:hidden" /> : null}
-            </div>
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
+              {statusPrefix ? (
+                <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
+              ) : null}
+              {/* The week's word in the stamp's shape, the same placard the
+                  hero's tag and the sticky strip print. */}
+              <span className="type-stamp text-fluid-base text-[color:var(--regime-ink)]">{statusLabel}</span>
+              {introMetaRest ? (
+                <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
+              ) : null}
+            </p>
           ) : introMetaRest ? (
             <p className="text-fluid-xs font-medium leading-4 text-slate-400">{introMetaRest}</p>
           ) : null}
@@ -145,28 +138,20 @@ export function CommandCenterNavBlock({
           {trustStrip ? <TrustStrip {...trustStrip} phoneLayout="line" className="sm:pt-2" /> : null}
         </div>
 
-        <div className={`space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0 ${rightColumnOnPhone ? "" : "max-sm:hidden"}`.trim()}>
+        <div className={`space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0 ${showActions ? "" : "max-sm:hidden"}`.trim()}>
             {/* No operating-loop strip here. "Signals · Conditions · Plan ·
                 Share" sat beside the intro on /signals, /operate and /trust:
                 it read as tabs, named none of the pages it sat on and linked
                 nowhere. The group's real tabs sit above the intro now
                 (`SectionTabs`). */}
-            {/* The stamp row also carries the caption: the intro is the block a
-                phone screenshot of a report route catches, and a crop of it
-                should still say whose page it came from. It shares the row
-                rather than adding one, so the first task block does not move.
-                On a phone with a status word the caption is beside it instead. */}
-            <div className={`flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right ${stampRowOnPhone ? "" : "max-sm:hidden"}`.trim()}>
-                {/* Two dates print inside one viewport, so each says what it
-                    is: the strip's "Data as of" is the reading the guidance
-                    rests on, and this is when the sources were last checked
-                    (2026-10-09; it read "Signals refreshed", which did not say
-                    which of the two mattered). */}
-                {fetchedAtLabel ? <span className="max-sm:hidden">Checked {fetchedAtLabel}</span> : null}
-                <ScreenshotCaption
-                  className={`${showStamp ? "ml-auto lg:ml-0" : ""} ${captionBesideStatus ? "max-sm:hidden" : ""}`.trim() || undefined}
-                />
-              </div>
+            {/* Two dates print inside one viewport, so each says what it
+                is: the strip's "Data as of" is the reading the guidance
+                rests on, and this is when the sources were last checked
+                (2026-10-09; it read "Signals refreshed", which did not say
+                which of the two mattered). */}
+            {showStamp ? (
+              <p className="text-fluid-xs text-slate-400 max-sm:hidden lg:text-right">Checked {fetchedAtLabel}</p>
+            ) : null}
 
             {showActions ? (
               <div className="flex flex-wrap items-center gap-2 lg:justify-end">

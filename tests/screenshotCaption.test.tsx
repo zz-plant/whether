@@ -38,53 +38,35 @@ describe("screenshot caption", () => {
     assert.match(captionOf(html), /Archived: Week of Mar 2, 2022/);
   });
 
-  it("sits inside every report intro, including one with no refresh stamp", () => {
-    for (const fetchedAtLabel of ["Sep 29, 2026, 6:33 PM UTC", ""]) {
+  /* Only the call card (2026-10-09). Every interior intro printed "Whether ·
+     whether.work" under a header that names the site on every route; the brief's
+     card is the block people crop and share, and #1561 kept the caption there. */
+  it("is left out of the report intros, which keep only the checked stamp", () => {
+    for (const fetchedAtLabel of ["Oct 7, 2026, 12:19 AM UTC", ""]) {
       const html = renderToStaticMarkup(
         <CommandCenterNavBlock
-          pageTitle="How much to trust this week's guidance"
-          pageSummary="Check whether this week's guidance is current enough to act on."
-          recordDateLabel="Sep 25, 2026"
+          pageTitle="Decide"
+          pageSummary="This week's guidance, turned into rules."
+          recordDateLabel="Oct 5, 2026"
           statusLabel="Freezing"
           trustStatusLabel="All sources live"
           fetchedAtLabel={fetchedAtLabel}
           showOfflineBadge={false}
           offlineBadgeLabel=""
+          trustStrip={{
+            recordDateLabel: "Oct 5, 2026",
+            sourcesLive: true,
+            sourcesLabel: "All sources live",
+            confidenceLabel: "MED",
+            couldChangeNextWeek: false,
+            href: "/trust",
+          }}
         />,
       );
-      assert.ok(captionOf(html).includes(host));
+      assert.doesNotMatch(html, /data-screenshot-caption/);
+      assert.ok(!html.includes(host), "the intro does not print the host");
+      if (fetchedAtLabel) assert.match(html, /<p class="[^"]*max-sm:hidden[^"]*">Checked /, "the checked stamp is a desktop line");
+      else assert.doesNotMatch(html, /Checked /);
     }
-  });
-
-  /* A phone gets the week's word, the title and one meta line before the
-     first task block (ui-ux-standards §XI). The caption stays inside the
-     block, beside the status word, rather than on a row of its own. */
-  it("rides beside the status word on a phone when the strip carries the meta line", () => {
-    const html = renderToStaticMarkup(
-      <CommandCenterNavBlock
-        pageTitle="Plan"
-        pageSummary="This week's guidance, turned into rules."
-        recordDateLabel="Oct 5, 2026"
-        statusLabel="Freezing"
-        trustStatusLabel="All sources live"
-        fetchedAtLabel="Oct 7, 2026, 12:19 AM UTC"
-        showOfflineBadge={false}
-        offlineBadgeLabel=""
-        trustStrip={{
-          recordDateLabel: "Oct 5, 2026",
-          sourcesLive: true,
-          sourcesLabel: "All sources live",
-          confidenceLabel: "MED",
-          couldChangeNextWeek: false,
-          href: "/trust",
-        }}
-      />,
-    );
-    const captions = [...html.matchAll(/data-screenshot-caption="[^"]*" class="([^"]*)"/g)].map(([, cls]) => cls);
-    assert.equal(captions.length, 2, "one for a phone, one for the stamp row from sm");
-    assert.match(captions[0], /(^|\s)sm:hidden(\s|$)/);
-    assert.ok(html.indexOf("data-screenshot-caption") < html.indexOf("<h1"), "the phone caption sits on the status row");
-    assert.match(captions[1], /max-sm:hidden/);
-    assert.match(html, /<span class="max-sm:hidden">Checked /, "the checked stamp is a desktop line");
   });
 });
