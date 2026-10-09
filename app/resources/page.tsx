@@ -19,6 +19,7 @@ import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
 import { AnswerStandingStamp } from "./components/answerStandingStamp";
+import { AreaIcon } from "../components/ui/conceptIcons";
 import {
   buildGuidedTranslationHref,
   GuidedTranslationPanels,
@@ -86,7 +87,8 @@ export default async function ResourcesHubPage({
     scores: { tightness: currentScores.tightness, riskAppetite: currentScores.riskAppetite },
   });
   const pauseLineCount = describePauseLineCount(areaRows);
-  const conditionsLabel = getRegimePublicLabel(reportData.assessment.regime);
+  const regime = reportData.assessment.regime;
+  const conditionsLabel = getRegimePublicLabel(regime);
 
   /* One group per area, in the order every surface lists the five. An answer
      files under the area it argues first (`findLeadAnswerForArea` reads it the
@@ -146,7 +148,8 @@ export default async function ResourcesHubPage({
 
           {areaGroups.map((group) => (
             <section key={group.area} id={`area-${group.area}`} aria-labelledby={`area-${group.area}-heading`} className="space-y-1">
-              <h3 id={`area-${group.area}-heading`} className="text-sm font-semibold text-slate-200">
+              <h3 id={`area-${group.area}-heading`} className="flex items-center gap-1.5 text-sm font-semibold text-slate-200">
+                <AreaIcon area={group.area} />
                 {decisionAreaLabel(group.area)}
               </h3>
               <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
@@ -168,6 +171,7 @@ export default async function ResourcesHubPage({
                         {standing ? (
                           <AnswerStandingStamp
                             standing={standing}
+                            regime={regime}
                             className="col-start-1 row-start-2 justify-self-start sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:justify-self-end"
                           />
                         ) : null}

@@ -12,6 +12,8 @@ import type { ReportData } from "../../../lib/report/reportData";
 import type { WeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryYields } from "../../../lib/types";
 import { DECISION_SLOT_TONE } from "../../about/methodSection";
+import { isRegimeKey } from "../../../lib/regimePresentation";
+import { AreaIcon, ConditionIcon, LineStateBadge } from "../../components/ui/conceptIcons";
 
 /**
  * One column of the comparison, rendered twice. The two sides used to be ~85
@@ -90,8 +92,9 @@ export function ComparePeriodColumn({
   });
   const areaStanding = decisionAreaOrder.map((area) => {
     const row = areaRows.find((candidate) => candidate.area === area);
-    return { area, text: (row ? describeAreaPauseStatus(row)?.text : undefined) ?? "—" };
+    return { area, status: row ? describeAreaPauseStatus(row) : undefined };
   });
+  const regime = report.assessment.regime;
 
   return (
     <div className="space-y-6">
@@ -100,8 +103,9 @@ export function ComparePeriodColumn({
           <p className="type-eyebrow">{label}</p>
           <span className="text-xs tabular-nums text-slate-400">{report.recordDateLabel}</span>
         </div>
-        <h2 className="mt-4 text-xl font-bold text-slate-100">
-          {status.postureWithStageLabel || status.postureLabel}
+        <h2 className="mt-4 flex items-center gap-2 text-xl font-bold text-slate-100">
+          {isRegimeKey(regime) ? <ConditionIcon regime={regime} size="card" /> : null}
+          <span>{status.postureWithStageLabel || status.postureLabel}</span>
         </h2>
         {/* The latitude's move, about the number: not quoted, since it is no
             longer a sentence about the guidance to cite. */}
@@ -112,10 +116,19 @@ export function ComparePeriodColumn({
         {/* The label as given: lowercasing it printed "Rules in period a". */}
         <h3 className="type-eyebrow">Rules in {label}</h3>
         <div className="space-y-2">
-          {areaStanding.map(({ area, text }) => (
-            <p key={area} className="text-sm">
-              <span className="font-medium text-slate-400">{decisionAreaLabel(area)}:</span>{" "}
-              <span className="font-semibold text-slate-100">{text}</span>
+          {areaStanding.map(({ area, status: standing }) => (
+            <p key={area} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+              <span className="inline-flex items-center gap-1.5 font-medium text-slate-400">
+                <AreaIcon area={area} />
+                {decisionAreaLabel(area)}:
+              </span>
+              {standing ? (
+                <LineStateBadge state={standing.state} className="font-semibold">
+                  {standing.text}
+                </LineStateBadge>
+              ) : (
+                <span className="font-semibold text-slate-100">—</span>
+              )}
             </p>
           ))}
         </div>

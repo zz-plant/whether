@@ -254,14 +254,33 @@ describe("AreaTable moved rows", () => {
           {
             area: "hiring",
             rule: "Backfills only.",
-            pause: { line: "Funding pressure > 76", distance: "crossed" },
+            pause: { line: "Funding pressure > 76", distance: "crossed", state: "crossed" },
             resume: { line: "Funding pressure < 66", distance: "24 pts away" },
+          },
+          {
+            area: "product-tempo",
+            rule: "Keep the roadmap.",
+            pause: { line: "Risk appetite < 44", distance: "4 pts away", state: "near" },
+            resume: { line: "Risk appetite > 54", distance: "already met", state: "clear" },
           },
         ]}
       />,
     );
-    assert.match(html, /class="[^"]*rounded-sm border[^"]*text-semantic-caution-fg[^"]*">crossed</);
-    assert.doesNotMatch(html, /class="[^"]*rounded-sm[^"]*">24 pts away</);
+    const badge = (state: string) => new RegExp(`<span data-line-state-badge="${state}" class="([^"]*)">([\\s\\S]*?)</span></span>`);
+    const crossed = badge("crossed").exec(html);
+    assert.ok(crossed, "a crossed pause line is the state badge");
+    assert.match(crossed[1], /rounded-sm border/, "in force, so a stamp");
+    assert.match(crossed[1], /text-semantic-caution-fg/);
+    assert.match(crossed[2], /lucide-pause[\s\S]*<span>crossed$/, "the pause glyph beside the word");
+    const near = badge("near").exec(html);
+    assert.ok(near, "a pause line close to the reading is the state badge");
+    assert.doesNotMatch(near[1], /border/, "a distance still to go is not framed");
+    assert.match(near[2], /lucide-circle-dashed/);
+    const met = badge("clear").exec(html);
+    assert.ok(met, "a resume line met is the state badge");
+    assert.match(met[1], /rounded-sm border[^"]*text-semantic-easing-fg|text-semantic-easing-fg[^"]*rounded-sm border/);
+    assert.match(met[2], /lucide-play/);
+    assert.match(html, /<span class="block text-xs text-slate-400">24 pts away<\/span>/, "a resume line still to reach is plain text, with no glyph");
   });
 });
 
@@ -339,8 +358,11 @@ describe("MonthStrip", () => {
     assert.match(html, /Cloudy, held 3 months since May 2026/);
     const visible = html.replace(/<[^>]+>/g, " ");
     assert.doesNotMatch(visible, /EXPANSION|DEFENSIVE/, "the strip must not print engine keys (the data-regime attribute is how it gets its colour)");
-    /* Five month segments and one legend swatch per condition that appears. */
-    assert.equal((html.match(/data-regime=/g) ?? []).length, 5 + 2);
+    /* Five month segments, one glyph per condition in the key, and one per run
+       long enough to carry it (both runs here), so the band reads in greyscale. */
+    assert.equal((html.match(/data-regime=/g) ?? []).length, 5 + 2 + 2);
+    assert.equal((html.match(/data-strip-run-glyph/g) ?? []).length, 2);
+    assert.match(html, /lucide-sun[\s\S]*lucide-cloud/, "each run draws its own condition's glyph");
     assert.match(visible, /Sunny\s+2 months/, "the legend names each colour and its months");
   });
 });

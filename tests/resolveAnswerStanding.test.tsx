@@ -21,6 +21,9 @@ import { featuredAnswerPages } from "../app/answers/selectors";
  * executives".
  */
 
+/* The glyph each state draws (`LINE_STATE_ICONS`), by Lucide's class name. */
+const GLYPH = { crossed: "pause", near: "circle-dashed", clear: "play" } as const;
+
 const ROWS: Pick<HomeAreaRow, "area" | "pause">[] = [
   { area: "hiring", pause: { line: "Funding pressure > 76", distance: "crossed", points: 14, met: true, metric: "tightness" } },
   { area: "product-tempo", pause: { line: "Risk appetite < 44", distance: "4 pts away", points: 4, met: false, metric: "riskAppetite" } },
@@ -34,7 +37,7 @@ describe("an answer's standing this week", () => {
         areaRows: ROWS,
         conditionsLabel: "Freezing",
       }),
-      { kind: "area", text: "Pause line crossed", crossed: true },
+      { kind: "area", text: "Pause line crossed", crossed: true, state: "crossed" },
     );
     assert.deepEqual(
       describeAnswerStanding({
@@ -42,7 +45,7 @@ describe("an answer's standing this week", () => {
         areaRows: ROWS,
         conditionsLabel: "Freezing",
       }),
-      { kind: "area", text: "4 pts from its pause line", crossed: false },
+      { kind: "area", text: "4 pts from its pause line", crossed: false, state: "near" },
     );
   });
 
@@ -89,14 +92,19 @@ describe("Guides prints each answer's standing", async () => {
       const status = row ? describeAreaPauseStatus(row) : undefined;
       assert.ok(status, `${page.slug} has a standing this week`);
       const markup = rowFor(page.slug);
-      assert.match(markup, new RegExp(`data-answer-standing="${status.crossed ? "crossed" : "distance"}"[^>]*>${status.text}<`), page.slug);
+      /* The shared state badge: its glyph, then the homepage's words. */
+      assert.match(
+        markup,
+        new RegExp(`data-answer-standing="${status.state}"[^>]*><svg[^>]*lucide-${GLYPH[status.state]}[\\s\\S]*?</svg><span>${status.text}<`),
+        page.slug,
+      );
     }
   });
 
   it("a climate row carries the conditions word, and the explanation row no stamp", () => {
     const conditions = getRegimePublicLabel(reportData.assessment.regime);
     for (const page of answerPages.filter((candidate) => candidate.category === "climate")) {
-      assert.match(rowFor(page.slug), new RegExp(`data-answer-standing="conditions"[^>]*>${conditions}<`), page.slug);
+      assert.match(rowFor(page.slug), new RegExp(`data-answer-standing="conditions"[^>]*><svg[^>]*data-concept-icon="condition"[\\s\\S]*?</svg>${conditions}<`), page.slug);
     }
     for (const page of answerPages.filter((candidate) => candidate.category === "explanation")) {
       assert.doesNotMatch(rowFor(page.slug), /data-answer-standing/, page.slug);
@@ -111,7 +119,7 @@ describe("Guides prints each answer's standing", async () => {
   });
 
   it("draws the stamps sharp and the More tools disclosure as a row, not a pill-shaped surface", () => {
-    const stamps = html.match(/<span data-answer-standing="[^"]+" class="[^"]*"/g) ?? [];
+    const stamps = html.match(/<span data-answer-standing="[^"]+"[^>]* class="[^"]*"/g) ?? [];
     assert.ok(stamps.length >= answerPages.length - 1);
     for (const stamp of stamps) {
       assert.match(stamp, /\brounded-sm\b/);

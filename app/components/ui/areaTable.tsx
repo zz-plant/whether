@@ -3,10 +3,13 @@ import type { ReactNode } from "react";
 import {
   decisionAreaLabel,
   decisionAreaOrder,
+  decisionAreaUsualMetrics,
   type DecisionArea,
   type RuleConditionMetric,
 } from "../../../lib/report/boundedDecisionRules";
+import type { LineState } from "../../../lib/report/operatingCalls";
 import type { Route } from "../../../lib/navigation/routeType";
+import { AreaIcon, AreaLabel, LineStateBadge } from "./conceptIcons";
 
 /**
  * The decision area as a stable row.
@@ -18,14 +21,27 @@ import type { Route } from "../../../lib/navigation/routeType";
  * (`decisionAreaOrder`), so the eye learns position. A surface with less to
  * say leaves a slot empty rather than reflowing.
  */
+/**
+ * One side of an area's rule as a cell prints it. `state` (`resolveLineState`)
+ * draws the distance as the state badge; without one the distance is plain
+ * text. `qualifier` is the rule's non-numeric condition, printed after the
+ * badge rather than inside it.
+ */
+type AreaLineValue = {
+  line: ReactNode;
+  distance?: ReactNode;
+  state?: LineState;
+  qualifier?: ReactNode;
+};
+
 export type AreaRowData = {
   area: DecisionArea;
   /** This week's rule for the area, as an imperative. */
   rule: ReactNode;
-  /** The pause line and the distance to it, as the caller formats them. */
-  pause?: { line: ReactNode; distance?: ReactNode };
-  /** The resume line and the distance to it. */
-  resume?: { line: ReactNode; distance?: ReactNode };
+  /** The pause line, the distance to it as the caller formats it, and its state for the badge. */
+  pause?: AreaLineValue;
+  /** The resume line, the distance to it, and its state once it is met. */
+  resume?: AreaLineValue;
   /**
    * The scores the printed lines are drawn on, for the "Line set by" note
    * under the area. Absent on a row whose lines are sentences, which falls back
@@ -72,15 +88,6 @@ type AreaTableProps = {
 
 const orderIndex = (area: DecisionArea) => decisionAreaOrder.indexOf(area);
 
-/* The score an area is usually ruled by, for a row that does not say. */
-const usualScores: Record<DecisionArea, readonly RuleConditionMetric[]> = {
-  hiring: ["tightness"],
-  "burn-discipline": ["tightness"],
-  "product-tempo": ["riskAppetite"],
-  "expansion-bets": ["riskAppetite"],
-  "capital-raising": ["tightness", "riskAppetite"],
-};
-
 /*
  * The scores named under the area are the scores its printed lines are drawn
  * on. They were fixed per area, so on a week New bets paused on funding
@@ -89,7 +96,7 @@ const usualScores: Record<DecisionArea, readonly RuleConditionMetric[]> = {
  * "Line set by Funding pressure".
  */
 const scoresSettingRow = (row: AreaRowData): readonly RuleConditionMetric[] => {
-  const named = row.scores && row.scores.length > 0 ? row.scores : usualScores[row.area];
+  const named = row.scores && row.scores.length > 0 ? row.scores : decisionAreaUsualMetrics(row.area);
   return (["tightness", "riskAppetite"] as const).filter((score) => named.includes(score));
 };
 
@@ -103,44 +110,31 @@ const LineCell = ({
   value,
   kind,
 }: {
-  value?: { line: ReactNode; distance?: ReactNode };
-  kind?: "pause" | "resume";
+  value?: AreaLineValue;
+  kind: "pause" | "resume";
 }) => {
   if (!value) return <span className="text-slate-500">—</span>;
 
-  const distanceText = typeof value.distance === "string" ? value.distance : "";
-  const isCrossed =
-    distanceText.includes("already applies") ||
-    distanceText.includes("at the line") ||
-    distanceText.includes("already met") ||
-    distanceText.includes("crossed");
-  const isNear =
-    !isCrossed &&
-    Boolean(distanceText.match(/\b([0-4](\.\d+)?|5(\.0+)?)\s+pts\b/));
-
-  /* A crossed pause line is a pause in force: caution, the colour of the
-     column it sits in. It was red, the same red a Freezing week paints the
-     page, the stamp and the change line, so "in force" read as "error". Near
-     a line is the quieter tint of the same hue. A line in force is a status,
-     so it is drawn as a stamp (§XIV); a distance still to go stays text. */
-  const inForce = isCrossed && (kind === "pause" || kind === "resume");
-  const distanceClass =
-    kind === "pause" && isCrossed
-      ? "border-semantic-caution-border/50 bg-semantic-caution-border/10 text-semantic-caution-fg font-semibold"
-      : kind === "pause" && isNear
-        ? "text-amber-200/80 font-medium"
-        : kind === "resume" && isCrossed
-          ? "border-semantic-easing-border/50 bg-semantic-easing-border/10 text-semantic-easing-fg font-semibold"
-          : "text-slate-400";
+  /* A line in force is a status, so its badge is a stamp (§XIV): a pause line
+     crossed, or a resume line met. A distance still to go stays unframed. A
+     crossed pause line takes the caution ink, the colour of the column it sits
+     in; it was red, the same red a Freezing week paints the page, so "in
+     force" read as "error". */
+  const inForce = kind === "pause" ? value.state === "crossed" : value.state !== undefined;
 
   return (
     <>
       {value.line}
       {value.distance ? (
-        <span
-          className={`${inForce ? "mt-1 w-fit rounded-sm border px-1.5 py-px" : ""} block text-xs ${distanceClass}`.trim()}
-        >
-          {value.distance}
+        <span className={value.state ? "mt-1 block text-xs" : "block text-xs text-slate-400"}>
+          {value.state ? (
+            <LineStateBadge state={value.state} stamp={inForce}>
+              {value.distance}
+            </LineStateBadge>
+          ) : (
+            value.distance
+          )}
+          {value.qualifier ? <span className="text-slate-400"> · {value.qualifier}</span> : null}
         </span>
       ) : null}
     </>
@@ -195,11 +189,15 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
             >
               <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-md:col-span-2 max-md:p-0">
                 {row.href ? (
-                  <Link href={row.href} className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-white">
+                  <Link
+                    href={row.href}
+                    className="weather-hit inline-flex items-center gap-1.5 underline decoration-slate-600 underline-offset-4 hover:text-white"
+                  >
+                    <AreaIcon area={row.area} />
                     {row.hrefLabel ?? decisionAreaLabel(row.area)}
                   </Link>
                 ) : (
-                  decisionAreaLabel(row.area)
+                  <AreaLabel area={row.area} />
                 )}
                 <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
                   {(() => {

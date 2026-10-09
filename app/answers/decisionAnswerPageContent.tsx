@@ -19,6 +19,8 @@ import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigatio
 import { ActionLink } from "../components/ui/actionLink";
 import { ScoreLadder } from "../components/ui/scoreLadder";
 import { AreaTable } from "../components/ui/areaTable";
+import { buildHomeAreaRows } from "../../lib/report/home/homeSectionModel";
+import { resolveLineState } from "../../lib/report/operatingCalls";
 import { DecisionHero } from "../components/DecisionHero";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
@@ -54,6 +56,11 @@ export async function DecisionAnswerPageContent({
   const { assessment, recordDateLabel, reportDynamics, fetchedAtLabel } = reportData;
   const { homeBriefModel, displayRegime, callCitation } = snapshot;
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
+  const ruleStanding = buildHomeAreaRows({
+    decisionRules: mappedRules,
+    movement: null,
+    scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
+  });
   const payload = buildSeoDecisionPayload({
     assessment,
     mappedRules,
@@ -283,13 +290,26 @@ export async function DecisionAnswerPageContent({
               before rather than a second shape for one thing. */}
           <AreaTable
             caption="What this week's guidance changes for each decision area"
-            rows={mappedRules.map((rule) => ({
-              area: rule.area,
-              rule: rule.doNow[0] ?? rule.recommendation,
-              pause: { line: rule.pauseTrigger },
-              resume: { line: rule.resumeTrigger },
-              scores: [...rule.pause.conditions, ...rule.resume.conditions].map((condition) => condition.metric),
-            }))}
+            rows={mappedRules.map((rule) => {
+              /* Where this week's scores sit against the rule's own lines, in the
+                 words and badge the homepage's area rows print. */
+              const standing = ruleStanding.find((row) => row.area === rule.area);
+              return {
+                area: rule.area,
+                rule: rule.doNow[0] ?? rule.recommendation,
+                pause: {
+                  line: rule.pauseTrigger,
+                  distance: standing?.pause?.distance,
+                  state: standing?.pause ? resolveLineState(standing.pause.points, "pause", standing.pause.met) : undefined,
+                },
+                resume: {
+                  line: rule.resumeTrigger,
+                  distance: standing?.resume?.distance,
+                  state: standing?.resume ? resolveLineState(standing.resume.points, "resume", standing.resume.met) : undefined,
+                },
+                scores: [...rule.pause.conditions, ...rule.resume.conditions].map((condition) => condition.metric),
+              };
+            })}
             signalLinkBase="/"
           />
         </SecondaryPageSection>
