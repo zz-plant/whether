@@ -146,16 +146,8 @@ html[data-focus-mode] [data-home-shell-main] {
   inset: 0;
   z-index: 0;
   border-radius: var(--radius-xl);
-  background:
-    linear-gradient(180deg, rgba(7, 18, 38, 0.40) 0%, rgba(8, 27, 47, 0.12) 100%);
+  background: var(--bg-nested-light);
   pointer-events: none;
-}
-
-/* The hub backdrop is a navy wash tuned for the dark ground. On the light
-   theme a 40% navy over cream is a grey slab, and /pricing sat on one; here
-   it fades to the page. */
-html[data-theme="light"] .weather-hub-backdrop {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(15, 23, 42, 0) 100%);
 }
 
 /* Ink from the text roles, never a literal white: these shells render on
@@ -232,7 +224,7 @@ html[data-theme="light"] .weather-hub-backdrop {
    own, the only control on the site not drawn in --accent-action. */
 a.weather-hub-link-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(56, 189, 248, 0.42);
+  border-color: var(--accent-border);
   box-shadow: var(--elev-4);
 }
 
@@ -260,12 +252,12 @@ a.weather-hub-link-card:hover {
 
 .weather-hub-chip:hover {
   transform: translateY(-1px);
-  border-color: rgba(56, 189, 248, 0.30);
+  border-color: var(--accent-border);
   color: var(--app-text);
 }
 
 .weather-hub-chip:focus-visible {
-  outline: 2px solid rgba(56, 189, 248, 0.85);
+  outline: 2px solid var(--accent-action);
   outline-offset: 2px;
 }
 
@@ -397,7 +389,7 @@ a.weather-hub-link-card:hover {
   justify-content: center;
   width: fit-content;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--border-subtle);
   padding: 0.2rem 0.6rem;
   font-size: 0.62rem;
   font-weight: 600;
@@ -406,45 +398,29 @@ a.weather-hub-link-card:hover {
   touch-action: manipulation;
 }
 
-.weather-tag-sky {
-  border-color: rgba(125, 211, 252, 0.24);
-  background: rgba(14, 165, 233, 0.08);
-  color: rgb(186 230 253);
-}
-
+/* The tones are roles, as the hue ramps are (tokens.css): sky and cyan the
+   action ink, amber and rose the crossed red, emerald the clear ink. Each
+   reads its role token, which carries its own light value, so the published
+   brief's stamps clear AA on both grounds without a per-theme rule. */
+.weather-tag-sky,
 .weather-tag-cyan {
-  border-color: rgba(103, 232, 249, 0.22);
-  background: rgba(6, 182, 212, 0.06);
-  color: rgb(207 250 254);
+  border-color: var(--accent-border-soft);
+  background: color-mix(in srgb, var(--accent-action) 6%, transparent);
+  color: var(--accent-action);
 }
 
-.weather-tag-amber {
-  border-color: rgba(252, 211, 77, 0.24);
-  background: rgba(245, 158, 11, 0.08);
-  color: rgb(254 243 199);
-}
-
+.weather-tag-amber,
 .weather-tag-rose {
-  border-color: rgba(251, 113, 133, 0.22);
-  background: rgba(244, 63, 94, 0.06);
-  color: rgb(255 228 230);
+  border-color: color-mix(in srgb, var(--line-crossed) 30%, transparent);
+  background: color-mix(in srgb, var(--line-crossed) 8%, transparent);
+  color: var(--line-crossed-ink);
 }
 
 .weather-tag-emerald {
-  border-color: rgba(52, 211, 153, 0.22);
-  background: rgba(16, 185, 129, 0.06);
-  color: rgb(209 250 229);
+  border-color: color-mix(in srgb, var(--line-clear) 30%, transparent);
+  background: color-mix(in srgb, var(--line-clear) 6%, transparent);
+  color: var(--line-clear-ink);
 }
-
-/* The tinted tags carry 100-level ink for the dark ground; on the light
-   theme that is pastel on cream, and the posture and confidence stamps at
-   the top of every published brief were unreadable. 700-level here, the
-   same floor the utility remap in tokens.css applies to text-<hue>-*. */
-html[data-theme="light"] .weather-tag-sky { color: #075985; background: rgba(14, 165, 233, 0.10); }
-html[data-theme="light"] .weather-tag-cyan { color: #155e75; background: rgba(6, 182, 212, 0.10); }
-html[data-theme="light"] .weather-tag-amber { color: #92400e; background: rgba(245, 158, 11, 0.12); }
-html[data-theme="light"] .weather-tag-rose { color: #b91c1c; background: rgba(244, 63, 94, 0.09); }
-html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba(16, 185, 129, 0.10); }
 
 .weather-tag-slate {
   border-color: var(--border-strong);

@@ -4,7 +4,7 @@
  * `data-regime`. This used to hold its own hue table at a flat 3% over the
  * whole viewport — Sunny in teal while every other surface drew it emerald,
  * and a wash that never faded, so the ground under every card was lifted
- * from #08090b to a grey and the ladder lost half its separation.
+ * from the body token to a grey and the ladder lost half its separation.
  */
 export const ClimateBackdrop = () => (
   <div

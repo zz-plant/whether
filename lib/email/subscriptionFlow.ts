@@ -138,7 +138,7 @@ const confirmationEmail = (sub: Subscriber, verifyUrl: string | null) => {
     return {
       subject: "Your Whether subscription",
       html: [
-        "<!DOCTYPE html><html><body style='font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px;color:#1e293b;'>",
+        "<!DOCTYPE html><html><body style='font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px;color:#121719;'>",
         `<p style='font-size:0.95rem;'>${escapeHtml(note)}</p>`,
         "</body></html>",
       ].join(""),
@@ -151,11 +151,11 @@ const confirmationEmail = (sub: Subscriber, verifyUrl: string | null) => {
   return {
     subject: confirmation.kind === "subscribe" ? "Confirm your Whether subscription" : "Confirm a change to your Whether emails",
     html: [
-      "<!DOCTYPE html><html><body style='font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px;color:#1e293b;'>",
+      "<!DOCTYPE html><html><body style='font-family:sans-serif;max-width:480px;margin:0 auto;padding:20px;color:#121719;'>",
       `<h1 style='font-size:1.1rem;font-weight:600;'>${confirmation.kind === "subscribe" ? "Confirm your subscription" : "Confirm a change"}</h1>`,
       `<p style='font-size:0.95rem;'>${escapeHtml(lead)}</p>`,
-      `<a href='${escapeHtml(verifyUrl)}' style='display:inline-block;padding:10px 20px;border-radius:6px;background:#0f172a;color:#fff;text-decoration:none;font-weight:600;'>${button}</a>`,
-      `<p style='font-size:0.8rem;color:#64748b;margin-top:20px;'>${expiry} If you didn't request this, ignore this email.</p>`,
+      `<a href='${escapeHtml(verifyUrl)}' style='display:inline-block;padding:10px 20px;border-radius:6px;background:#121719;color:#fff;text-decoration:none;font-weight:600;'>${button}</a>`,
+      `<p style='font-size:0.8rem;color:#525c60;margin-top:20px;'>${expiry} If you didn't request this, ignore this email.</p>`,
       "</body></html>",
     ].join(""),
     text: `${lead}\n\n${button}: ${verifyUrl}\n\n${expiry}`,

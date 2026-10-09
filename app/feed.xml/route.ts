@@ -142,7 +142,7 @@ export async function GET() {
             `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(action)}</p>`,
             `        <p><strong>Record date:</strong> ${escapeXml(recordDateLabel)} · ${escapeXml(confidence)}</p>`,
             `        <p><a href="${siteUrl}/">View the live brief →</a></p>`,
-            `        <p style="font-size:0.85rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
+            `        <p style="font-size:0.85rem;color:#525c60;">Based on public data. Your situation may vary.</p>`,
           ].join("\n"),
         }];
 

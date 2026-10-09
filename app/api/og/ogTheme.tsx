@@ -11,7 +11,8 @@ import type { ReactElement } from "react";
 export { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP } from "../../../lib/image/ogFonts";
 
 export {
-  OG_BG, OG_PANEL, OG_BORDER, OG_TEXT, OG_TEXT_SECONDARY, OG_TEXT_MUTED,
+  OG_BG, OG_PANEL, OG_BORDER, OG_BORDER_STRONG, OG_TEXT, OG_TEXT_SECONDARY, OG_TEXT_MUTED,
+  OG_ACCENT, OG_LINE_CROSSED, OG_LINE_CROSSED_MARK, OG_LINE_CROSSED_BG, OG_CONDITION_INK,
 } from "../../../lib/image/ogTheme";
 import { OG_BORDER_STRONG } from "../../../lib/image/ogTheme";
 
