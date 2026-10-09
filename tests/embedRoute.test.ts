@@ -146,8 +146,8 @@ describe("the embed says what the brief says", () => {
     const text = buildBriefEmbedText(data);
 
     assert.equal(data.flipTrigger, homepage.weeklyCall.callChangesIf);
-    assert.match(data.flipTrigger ?? "", /risk appetite rises 2 pts to clear 50 \(48 today\)/);
-    assert.match(text, /^Conditions change if: Funding pressure falls 20 pts to 70 or below/m);
+    assert.match(data.flipTrigger ?? "", /risk appetite rises 2 pts from 48 to clear 50/);
+    assert.match(text, /^Conditions change if: Funding pressure falls 20 pts from 90 to 70 or below/m);
     assert.match(buildBriefEmbedHtml(data), /Conditions change if:<\/strong> Funding pressure falls 20 pts/);
     for (const output of [text, buildBriefEmbedHtml(data)]) {
       assert.doesNotMatch(output, /Watch:/);

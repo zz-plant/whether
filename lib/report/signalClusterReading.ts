@@ -207,8 +207,8 @@ const describeDistance = (
   return `${amount}${units} ${value > threshold ? "above" : "below"} ${thresholdLabel}.`;
 };
 
-/** Zero is the line itself, so it is named for what crossing it means. */
-const ZERO_LINE_LABEL = "zero, where long-term rates drop below short-term rates";
+/** Zero is the line itself, so it is named for what crossing it means, in the noun phrase rather than a ", where" aside after it. */
+const ZERO_LINE_LABEL = "the zero level where long-term rates drop below short-term rates";
 
 export const buildSignalClusterReading = (
   cluster: SignalClusterSlug,

@@ -91,7 +91,7 @@ describe("the by-area Changed column", () => {
 describe("buildChangedLead", () => {
   const held = week({ from: { tightness: 85, riskAppetite: 39 }, to: { tightness: 85, riskAppetite: 39 }, regime: "SCARCITY" }).movement;
   const crossed = week({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" }).movement;
-  const quietDayLine = "Conditions change if: Risk appetite rises 11 pts to clear 50 (39 today).";
+  const quietDayLine = "Conditions change if: Risk appetite rises 11 pts from 39 to clear 50.";
 
   it("follows a quiet week's sentence with the quiet-day line, and only then", () => {
     assert.equal(

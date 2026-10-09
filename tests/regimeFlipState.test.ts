@@ -30,8 +30,8 @@ describe("buildRegimeFlipState", () => {
     });
 
     assert.equal(state.pendingCandidate, "DEFENSIVE");
-    assert.match(state.text, /already above its 70 boundary/);
-    assert.match(state.text, /conditions have not changed yet/);
+    assert.match(state.text, /Funding pressure is 74, already above its change line at 70\./);
+    assert.match(state.text, /Conditions have not changed yet/);
     assert.match(state.text, /waits on confirmation/);
     assert.match(state.text, /turn Cloudy once it holds/);
     // The watched line is the one that changes the flip target, not the one
@@ -51,7 +51,7 @@ describe("buildRegimeFlipState", () => {
     // The nearest boundary is risk appetite, and crossing it from a willing-risk
     // call names the regime that crossing actually produces — Stormy, the
     // loose-unwilling quadrant — not the call's primary shift target.
-    assert.match(state.text, /Risk appetite falls to or below 50 \(62 today\)\. Conditions then turn Stormy\./);
+    assert.match(state.text, /Risk appetite falls from 62 to 50 or below\. Conditions then turn Stormy\./);
     assert.equal(state.watch.dimension, "riskAppetite");
   });
 

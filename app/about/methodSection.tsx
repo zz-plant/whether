@@ -65,7 +65,7 @@ export function MethodSection() {
           still reach it. */}
       <details className="weather-auto-chevron group">
         <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
-          The three parts, and why a stopping condition works
+          How the three parts work
         </summary>
         <div className="mt-4 space-y-8">
           <section className="space-y-4">
@@ -95,11 +95,11 @@ export function MethodSection() {
               Writing the stopping condition down before the action begins is the whole method. This does not guarantee the action is right. It guarantees the action will not continue past the point where it becomes wrong without a visible signal.
             </p>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Whether&apos;s editor built this structure into{" "}
+              Whether&apos;s editor first built this structure into{" "}
               <Link href={publisherProfilePath} className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
                 healthcare products
-              </Link>{" "}
-              first: clinical workflows, physician financial guidance, and contested medical claims, where a decision with no stopping condition can mean patient harm, regulatory action, or fiduciary breach. It is applied here to macro uncertainty because the same logic applies: the cost of continuing past the stopping point is higher than the cost of pausing too early.
+              </Link>
+              . In clinical workflows, physician financial guidance and contested medical claims, a decision with no stopping condition can mean patient harm, regulatory action or fiduciary breach. The same logic carries over to macro uncertainty: the cost of continuing past the stopping point is higher than the cost of pausing too early.
             </p>
             <p className="text-sm text-slate-300 leading-relaxed">
               The pause line makes the decision concrete. The resume line makes the pause temporary. Together they make the decision safe to start.
@@ -117,7 +117,7 @@ export function MethodSection() {
         </summary>
         <div className="mt-4 space-y-4">
           <p className="text-sm text-slate-300 leading-relaxed">
-            Fill these out before the decision is urgent — that is when the method is most useful.
+            Fill these out before the decision is urgent. That is when the method is most useful.
             Print this section or copy the structure into your planning document.
           </p>
 
@@ -138,7 +138,7 @@ export function MethodSection() {
 
             <div className="space-y-2">
               <p className={slotLabelClass("threshold")}>{DECISION_CONTRACT_LABELS.slot.threshold}</p>
-              <p className="text-xs text-slate-400">What specific, measurable condition would cause you to pause the action. Name the number, date, or event.</p>
+              <p className="text-xs text-slate-400">What specific, measurable condition would cause you to pause the action? Name the number, date, or event.</p>
               <div className="h-12 border-b border-slate-700/50" />
             </div>
 

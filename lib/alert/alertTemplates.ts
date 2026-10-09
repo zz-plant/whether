@@ -192,7 +192,7 @@ export const planLineEmail = (
     body: [
       alertBanner("warning", `<strong>${headline}</strong>`),
       `<div style="margin-top:12px;">`,
-      sectionBlock("What you set, and where the scores are", body),
+      sectionBlock("What you set and where the scores are", body),
       `</div>`,
     ].join("\n"),
     unsubscribeToken,

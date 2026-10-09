@@ -70,7 +70,7 @@ function ReadingLabel({ reading, recordStart }: { reading: CanonReading; recordS
   if (reading.kind === "before-record") {
     return (
       <span className="text-xs text-slate-400">
-        Before the record{recordStart ? `, which starts ${recordStart}` : ""}
+        Before the record{recordStart ? ` starts on ${recordStart}` : ""}
       </span>
     );
   }
@@ -164,7 +164,7 @@ function EssayYearStrip({ timeline, recordStart }: { timeline: readonly Timeline
           </li>
         ))}
         {[
-          beforeRecord ? `Before the record${recordStart ? `, which starts ${recordStart}` : ""}` : null,
+          beforeRecord ? `Before the record${recordStart ? ` starts on ${recordStart}` : ""}` : null,
           afterRecord ? "After the latest month-end on record" : null,
         ].map((label) =>
           label ? (
@@ -204,7 +204,7 @@ export default function ProductCanonPage() {
       <SecondaryPageHeader
         eyebrow="Reading list"
         title="Product writing, against the market it was written in"
-        description={`${timeline.length} widely read product management essays and books, each placed on the month-end record${recordStart && recordEnd ? ` (${recordStart} to ${recordEnd})` : ""}: the conditions the month each came out, and how long they had held. A reading list, not evidence for the guidance.`}
+        description={`${timeline.length} widely read product management essays and books, each placed on the month-end record${recordStart && recordEnd ? ` from ${recordStart} to ${recordEnd}` : ""}. Each shows the conditions in the month it came out and how long they had held. A reading list, not evidence for the guidance.`}
       />
 
       {thisWeek ? (
@@ -340,7 +340,7 @@ export default function ProductCanonPage() {
 
       <SecondaryPageSection
         title="What the four conditions mean"
-        description="The same four words this week's guidance uses, and what each asks of a team today."
+        description="The same four words this week's guidance uses."
       >
         <ul className="space-y-2 text-sm text-slate-300">
           {getOrderedRegimeLegend().map((entry) => (
@@ -361,7 +361,7 @@ export default function ProductCanonPage() {
             , computed by the same method behind this week&rsquo;s guidance. Each essay&rsquo;s date links to that year&rsquo;s page in the archive.
           </li>
           <li>
-            Essays: linked at each title, to the author or original publisher wherever it is still online.
+            Essays: each title links to the author or original publisher, wherever the essay is still online.
           </li>
         </ul>
       </SecondaryPageSection>

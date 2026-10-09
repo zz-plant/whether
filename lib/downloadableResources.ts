@@ -49,7 +49,7 @@ export const downloadableResources = {
     metadata: {
       title: "Pause Line Checklist",
       description:
-        "A short checklist for the pause line on a capital decision the board will see: its number, how long a breach must last, who acts, and how to roll back.",
+        "A short checklist for the pause line on a capital decision the board will see: what number it sits at, how long a breach must last, who acts and how to roll back.",
       path: "/resources/reversal-trigger-checklist",
       imageAlt: "Pause line checklist",
       imageParams: { template: "guides", title: "Pause Line Checklist" },
@@ -100,7 +100,7 @@ export const downloadableResources = {
        here, because a memo with real-looking figures and no such label is a
        live claim that goes stale the week after it ships. */
     heroDescription:
-      "A worked quarter — posture, decisions, triggers and board asks, filled in — so you can see the format carrying real content before you write your own.",
+      "A worked quarter with the posture, decisions, triggers and board asks filled in. It shows the format carrying real content before you write your own.",
     heroItems: [
       "One-sentence guidance with the reading behind it",
       "SAFE / RISKY / DANGEROUS decisions classified by reversibility, not size",

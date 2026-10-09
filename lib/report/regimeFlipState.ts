@@ -78,8 +78,10 @@ const buildBoundaryTriggerText = ({
   direction: BoundaryDirection;
 }) => {
   const dimensionLabel = dimension === "tightness" ? TIGHTNESS_BOUNDARY_LABEL : RISK_BOUNDARY_LABEL;
-  const condition = direction === "riseAbove" ? "rises above" : "falls to or below";
-  return `${dimensionLabel} ${condition} ${formatThresholdNumber(threshold)} (${formatThresholdNumber(current)} today). Conditions then turn ${targetRegimeLabel}.`;
+  const move = direction === "riseAbove"
+    ? `rises from ${formatThresholdNumber(current)} to above ${formatThresholdNumber(threshold)}`
+    : `falls from ${formatThresholdNumber(current)} to ${formatThresholdNumber(threshold)} or below`;
+  return `${dimensionLabel} ${move}. Conditions then turn ${targetRegimeLabel}.`;
 };
 
 /**
@@ -165,27 +167,23 @@ export const buildRegimeFlipState = ({
   const tightnessCause = tightnessBeyond !== requiresTightSide(regime);
   const riskCause = requiresWillingRisk(regime) !== (riskAppetite > thresholds.riskAppetiteRegime);
 
-  const beyondClause = (dimension: BoundaryDimension, lowerCase: boolean): string => {
+  /* One sentence per crossed line, the reading first: "Funding pressure is 74,
+     already above its change line at 70." The reading was a parenthesis inside
+     the subject ("funding pressure (74) is already above…") until 2026-10-09. */
+  const beyondSentence = (dimension: BoundaryDimension): string => {
     if (dimension === "tightness") {
-      const label = lowerCase ? "funding pressure" : TIGHTNESS_BOUNDARY_LABEL;
-      return tightnessBeyond
-        ? `${label} (${formatThresholdNumber(tightness)}) is already above its ${formatThresholdNumber(thresholds.tightnessRegime)} boundary`
-        : `${label} (${formatThresholdNumber(tightness)}) has already eased to or below its ${formatThresholdNumber(thresholds.tightnessRegime)} boundary`;
+      const side = tightnessBeyond ? "above" : "at or below";
+      return `${TIGHTNESS_BOUNDARY_LABEL} is ${formatThresholdNumber(tightness)}, already ${side} its change line at ${formatThresholdNumber(thresholds.tightnessRegime)}.`;
     }
-    const label = lowerCase ? "risk appetite" : RISK_BOUNDARY_LABEL;
-    return riskCollapsed
-      ? `${label} (${formatThresholdNumber(riskAppetite)}) has already fallen to or below its ${formatThresholdNumber(thresholds.riskAppetiteRegime)} line`
-      : `${label} (${formatThresholdNumber(riskAppetite)}) has already risen above its ${formatThresholdNumber(thresholds.riskAppetiteRegime)} line`;
+    const side = riskCollapsed ? "at or below" : "above";
+    return `${RISK_BOUNDARY_LABEL} is ${formatThresholdNumber(riskAppetite)}, already ${side} its change line at ${formatThresholdNumber(thresholds.riskAppetiteRegime)}.`;
   };
 
   const causes: BoundaryDimension[] = [];
   if (tightnessCause) causes.push("tightness");
   if (riskCause) causes.push("riskAppetite");
-  const causeClause = causes
-    .map((dimension, index) => beyondClause(dimension, index > 0))
-    .join("; ");
 
-  let text = `${causeClause}, but conditions have not changed yet. They stay ${getRegimePublicLabel(regime)} while the change waits on confirmation and turn ${candidateLabel} once it holds.`;
+  let text = `${causes.map(beyondSentence).join(" ")} Conditions have not changed yet. They stay ${getRegimePublicLabel(regime)} while the change waits on confirmation and turn ${candidateLabel} once it holds.`;
 
   let watch: RegimeFlipState["watch"];
   if (causes.length === 1) {

@@ -157,7 +157,7 @@ export default async function HistoryPage({
         },
         /* "Record", the group this page is the hub of (`navigationGroups`): the
            header tab, the sub-tab and the breadcrumb all name it so. */
-        page: { pageTitle: "Record", pageSummary: "Look up what the guidance said in any past month, and how it held up.", sectionLinks: historySectionLinks, currentPath: "/history" },
+        page: { pageTitle: "Record", pageSummary: "Look up the guidance for any past month and see how it held up.", sectionLinks: historySectionLinks, currentPath: "/history" },
         trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
         payloads: { structuredData },

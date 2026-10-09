@@ -100,7 +100,7 @@ export const buildHistoryStructuredData = ({
       "@id": `${url}#dataset`,
       name: "Whether monthly regime history",
       description:
-        "Every month-end reading on record: the operating posture, when it changed, and how long each regime held, scored from public US Treasury and macro series.",
+        "Every month-end reading on record, with each change in conditions and the length of each spell, scored from public US Treasury and macro series.",
       url,
       creator: buildPublisherSchema(organizationName),
       license: buildCanonicalUrl("/terms-of-service"),
@@ -415,8 +415,9 @@ export const buildCalibrationStudyStructuredData = ({
   const url = buildCanonicalUrl("/calibration");
   const name = "Margin calibration study";
   const description =
-    `A calibration study of Whether's published margin, the distance from the line where conditions change, against ${totals.months} month-to-month comparisons: `
-    + "every band understates how often conditions held, and distance from a change line does not order the outcome.";
+    `A calibration study of Whether's published margin against ${totals.months} month-to-month comparisons. `
+    + "The margin is the distance from the line where conditions change. "
+    + "Every band understates how often conditions held, and distance from a change line does not order the outcome.";
 
   return graph([
     {

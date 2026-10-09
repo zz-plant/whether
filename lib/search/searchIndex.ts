@@ -25,7 +25,7 @@ const keyDocs: SearchEntity[] = [
     routePriority: 4,
     title: "Check what changed and why",
     href: "/signals",
-    summary: "Review the evidence, the pause lines, and what is behind this week's guidance.",
+    summary: "Review the evidence and the pause lines behind this week's guidance.",
     intentLabel: "Check what changed",
     keywords: ["signals", "evidence", "thresholds", "regime", "macro"],
   },

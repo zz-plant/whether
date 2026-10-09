@@ -276,3 +276,17 @@ the data, but it carried the decision contract's own label for the operating act
 `DATA_CAVEAT_LABEL` now, and on live data it reads "None."
 `tests/pageReaderContradictions.test.tsx` renders `/brief.md` and the strip for three readings, and
 checks that the provenance section uses no operating-action label.
+
+## Clause shapes, counted (2026-10-09)
+
+A line-editing pass found two shapes on nearly every surface that no word list can see: a
+wh-clause stapled onto a list ("Look up what the guidance said in any past month, and how it held
+up."), and a gloss printed twice in one sentence, most of them from one place — the rule-line
+builders, which put "(already true at 90)" inside a met line and "(90 today)" after each score of
+the change line. The builders were fixed once (`formatReadingsNow`, `buildCallChangeLines`), so
+every page, paste, email and alert moved together, and `tests/readerClauseShapes.test.tsx` renders
+the offline pages, all 74 `/history/[period]` pages, the page descriptions, the navigation, every
+golden paste, the frozen records' updates and `/llms.txt`, and fails on either shape. Its
+exceptions are listed at the top of the file. It allows a list whose items are all wh-clauses,
+so a nested one still needs a reader; `docs/editorial-guardrails.md` → Sentence shape has the
+rules it cannot check.

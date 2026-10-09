@@ -48,7 +48,7 @@ const CONDITIONS = {
   tightness: 60,
   riskAppetite: 40,
   actionNow: "Hold irreversible moves until conditions resolve.",
-  callChangesIf: "Funding pressure rises 10 pts to clear 70 (60 today) or risk appetite rises 10 pts to clear 50 (40 today).",
+  callChangesIf: "Funding pressure rises 10 pts from 60 to clear 70, or risk appetite rises 10 pts from 40 to clear 50.",
   recordDate: "2026-08-22",
 };
 

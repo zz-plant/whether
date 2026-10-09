@@ -239,7 +239,7 @@ describe("report route page summaries", () => {
     assert.doesNotMatch(signals, /pageSummary: "What moved/);
 
     const history = await readFile("app/history/page.tsx", "utf8");
-    assert.match(history, /pageSummary: "Look up what the guidance said in any past month, and how it held up."/);
+    assert.match(history, /pageSummary: "Look up the guidance for any past month and see how it held up."/);
     assert.doesNotMatch(history, /Historical conditions and the weekly briefs/);
 
     const plan = await readFile("app/operate/planningPageModel.ts", "utf8");

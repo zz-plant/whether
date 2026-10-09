@@ -1,7 +1,7 @@
 import type { ComparisonBasis } from "./comparisonBasis";
 
 export const decisionTransmissionSearchDescription =
-  "For hiring, fundraising, spending and runway: what to do now, the line that pauses it, and the line that resumes it.";
+  "For hiring, fundraising, spending and runway: the action to take now, the line that pauses it, and the line that resumes it.";
 
 /*
  * One phrase for the revisit slot everywhere the model's `revisitDecisions`
@@ -31,7 +31,7 @@ export const homeDecisionFaqItems = [
   {
     question: "What changed this week?",
     answer:
-      "The weekly brief shows which signals moved enough to shift this week's forecast.",
+      "The weekly brief shows which signals moved enough to shift this week's guidance.",
   },
   {
     question: "What should we do differently right now?",
@@ -41,6 +41,6 @@ export const homeDecisionFaqItems = [
   {
     question: "How sure are we, and what would change our mind?",
     answer:
-      "Confidence and freshness markers show how much to trust this week's forecast, and what would change it.",
+      "The margin and freshness markers show how much to trust this week's guidance and what would change it.",
   },
 ] as const;

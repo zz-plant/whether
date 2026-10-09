@@ -62,7 +62,7 @@ const BRIEFING_STEPS: readonly BriefingStep[] = [
     skill: {
       id: "flip-watch",
       label: "Flip watch",
-      purpose: "Track the change lines, the pause and resume lines, and how close each score is before irreversible moves.",
+      purpose: "Track the change lines, the pause and resume lines, and each score's distance from them before irreversible moves.",
       inputs: ["flip_watch", "decision_rules", "signals"],
       outputs: ["flip_watchlist"],
     },

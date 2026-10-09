@@ -27,7 +27,7 @@ describe("decision transmission copy contract", () => {
     const metadata = await buildHomeMetadata();
     const description = metadata.description ?? "";
 
-    assert.match(description, /what to do now/i);
+    assert.match(description, /the action to take now/i);
     assert.match(description, /the line that pauses it/i);
     assert.match(description, /the line that resumes it/i);
     assert.doesNotMatch(description, /forecast/i);

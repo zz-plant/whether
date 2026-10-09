@@ -118,7 +118,7 @@ describe("the shared email shell, on production", () => {
         `<table role="presentation" style="width:100%;border-collapse:collapse;">`,
         `<tr>`,
         `<td style="padding:16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;">`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 6px;">What you set, and where the scores are</p>`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 6px;">What you set and where the scores are</p>`,
         `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#f1f5f9;">PB</p>`,
         `</td></tr></table>`,
         `</div>`,
