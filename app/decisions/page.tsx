@@ -50,7 +50,7 @@ export default async function DecisionsPage() {
   return (
     <ContentPageShell measure="wide">
       <SecondaryPageHeader
-        eyebrow="Your record"
+        eyebrow="Your decisions"
         title="Your decision record"
         description="Every decision you recorded, checked against this week's reading. A decision is only as good as the conditions it assumed, so this page tells you which of those have moved."
         aside={(

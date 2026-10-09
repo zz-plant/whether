@@ -59,10 +59,10 @@ export const organizationKnowsAbout = [
   "Macroeconomic conditions for startup operating decisions",
   "US Treasury yield curve",
   "Startup hiring decisions",
-  "Capital raising timing",
-  "Burn discipline",
-  "Product tempo",
-  "Expansion bets",
+  "Startup fundraising timing",
+  "Startup spending decisions",
+  "Product roadmap pace",
+  "New bets under tight funding",
 ] as const;
 
 /** The site-level entity ids every page's graph points at. */
@@ -159,7 +159,7 @@ const TEXT_CARD_TEMPLATES: ReadonlySet<string> = new Set([
   "plain",
 ]);
 
-/** A page title minus its section suffix ("Capital tightness | Evidence"). */
+/** A page title minus its section suffix ("Funding pressure watch | Evidence"). */
 const cardTitle = (title: string) => title.split(" | ")[0] ?? title;
 
 /** A subtitle that ends on a word, inside what the card draws. */

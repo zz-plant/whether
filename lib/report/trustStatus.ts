@@ -1,5 +1,5 @@
 import type { RegimeDiagnostics } from "../regimeEngine";
-import { formatConfidenceChipLabel, formatConfidencePlainLabel, type CompactFreshnessMeta } from "./reportFormatting";
+import { MARGIN_LABEL, formatMarginBand, publicDecisionLabels, type CompactFreshnessMeta } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, type PolicyHoldCall } from "./reportCopy";
 import type { RegimeStateTransition } from "../regimeStateMachine";
 
@@ -132,7 +132,7 @@ const buildOutageExitGate = ({
     },
     {
       key: "confidence",
-      label: "Confidence is above low",
+      label: "The scores are clear of a change line",
       met: !confidenceLow,
     },
   ];
@@ -202,7 +202,7 @@ const buildRecoveryPlan = ({
   return {
     owner: "Whoever owns the plan",
     nextCheckpoint: "The next weekly review",
-    exitCondition: "Confidence is above low.",
+    exitCondition: "The scores are clear of a change line.",
   };
 };
 
@@ -320,7 +320,7 @@ export const buildWeeklyTrustCueLine = ({
      is not "not close", only outside the band where the next reading could
      change conditions. */
   const changeWatch = transitionWatch === "ON" ? "Conditions could change next week" : "Conditions not expected to change next week";
-  return `${formatConfidenceChipLabel(confidenceLabel)} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
+  return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
 };
 export const buildCompactTrustSummary = ({
   confidenceLabel,
@@ -344,10 +344,10 @@ export const buildCompactTrustSummary = ({
   }
 
   if (confidenceLabel !== "HIGH") {
-    return `${formatConfidenceChipLabel(confidenceLabel)} (${normalizedFreshness}). Hold anything you can't undo until confidence is back to high.`;
+    return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} (${normalizedFreshness}). Hold anything you can't undo until the scores are clear of the line.`;
   }
 
-  return `${formatConfidenceChipLabel(confidenceLabel)} (${normalizedFreshness}). Fine to act on this week.`;
+  return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} (${normalizedFreshness}). Fine to act on this week.`;
 };
 
 /**
@@ -431,7 +431,7 @@ export const resolveTrustReadinessCopy = ({
   // A live feed under reduced confidence is still live; the qualifier says why the
   // tone is amber without inventing a second data state.
   const headline = status === "live" && tone === "warning"
-    ? `${DATA_STATUS_LABELS.live} · reduced confidence`
+    ? `${DATA_STATUS_LABELS.live} · close to a change line`
     : DATA_STATUS_LABELS[status];
 
   return { tone, headline };
@@ -504,14 +504,14 @@ export const buildDecisionReadinessState = ({
       tone: "warning",
       detail: isFallbackSnapshot
         ? `Cached reading (${normalizedFreshness}). Act on moves you can undo; hold the rest until live data returns.`
-        : `Confidence is medium (${normalizedFreshness}). Act on moves you can undo; hold the rest until it is high.`,
+        : `The scores are within reach of a change line (${normalizedFreshness}). Act on moves you can undo; hold the rest until they are clear of it.`,
     };
   }
 
   return {
     label: "Act",
     tone: "stable",
-    detail: `Live data (${normalizedFreshness}) and high confidence. Nothing here argues for holding back this week.`,
+    detail: `Live data (${normalizedFreshness}), with the scores clear of the change lines. Nothing here argues for holding back this week.`,
   };
 };
 
@@ -526,7 +526,7 @@ export const buildWeeklyCitationMetaLine = ({
   recordDateLabel: string;
   freshnessLabel: string;
 }) =>
-  `Conditions: ${statusLabel} · ${formatConfidenceChipLabel(confidenceLabel)} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
+  `Conditions: ${statusLabel} · ${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} · Data as of ${recordDateLabel} · checked ${normalizeFreshnessLabel(freshnessLabel)}`;
 
 /**
  * The status block a reader pastes into meeting notes: the conditions, the
@@ -544,7 +544,7 @@ export const buildMeetingSnippet = ({
   isFallbackSnapshot,
   isHistoricalSelection,
   flipThreshold,
-  actionNow,
+  guidance,
 }: {
   statusLabel: string;
   recordDateLabel: string;
@@ -553,17 +553,19 @@ export const buildMeetingSnippet = ({
   isFallbackSnapshot: boolean;
   isHistoricalSelection: boolean;
   flipThreshold: string;
-  actionNow: string;
+  /** The week's headline action as a paste leads with it (`weeklyHeadline(…).composed`). */
+  guidance: string;
 }) => {
+  /* The margin rides in the trust line ("Margin: clear of the line (…)"), so it is
+     stated once; the two dates say which is which (2026-10-09). */
   const trustSummary = buildCompactTrustSummary({ confidenceLabel, freshnessLabel, isFallbackSnapshot, isHistoricalSelection });
   return [
     `Conditions: ${statusLabel}`,
-    `As of: ${recordDateLabel}`,
-    `Data refreshed: ${freshnessLabel}`,
-    `Confidence: ${formatConfidencePlainLabel(confidenceLabel)}`,
+    `Data as of: ${recordDateLabel}`,
+    `Checked: ${freshnessLabel}`,
     `Trust: ${trustSummary}`,
     `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${flipThreshold}`,
-    `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
+    `${publicDecisionLabels.call}: ${guidance}`,
   ].join("\n");
 };
 

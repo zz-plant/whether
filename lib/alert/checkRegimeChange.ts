@@ -163,7 +163,7 @@ export const checkRegimeChange = async (options?: {
   const currentConfidence = resolvePublishedConfidence({ assessment, record }).label;
   if (prevConfidence === "HIGH" && currentConfidence !== "HIGH") {
     alerts.push(
-      `Confidence dropped from ${formatExportConfidenceWord(prevConfidence).toLowerCase()} to ${formatExportConfidenceWord(currentConfidence).toLowerCase()}. Read the guidance before acting on it.`,
+      `The margin narrowed from ${formatExportConfidenceWord(prevConfidence)} to ${formatExportConfidenceWord(currentConfidence)}. Read the guidance before acting on it.`,
     );
   }
 

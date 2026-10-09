@@ -1,5 +1,6 @@
 import { REGIME_LABELS, REGIME_SEVERITY_RANK, isRegimeKey } from "../../../lib/regimePresentation";
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
+import { countRecord } from "../../../lib/report/trackRecord";
 
 /**
  * The record's answer in one band: every month coloured by the call, the
@@ -34,7 +35,9 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
   const sorted = [...entries].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
   const run = describeCurrentRun(sorted);
   if (!run) return null;
-  const changes = sorted.filter((entry, index) => index > 0 && entry.regime !== sorted[index - 1].regime).length;
+  /* The one count every page prints (`countRecord`), so this strip, the track
+     record and /calibration cannot disagree about how often conditions changed. */
+  const changes = countRecord(sorted)?.changes ?? 0;
   /* The key. Colour alone named nothing: the month names were tooltips on an
      aria-hidden band, so a sighted reader could not tell which past runs were
      which. Each condition that appears, mildest first, with its month count. */

@@ -31,7 +31,7 @@ export function SignalReadingPanel({
         <h2 id="signal-reading-heading" className="type-eyebrow type-eyebrow-section">
           {reading.measure} · this week
         </h2>
-        <p className="text-xs text-slate-500">As of {recordDateLabel}</p>
+        <p className="text-xs text-slate-500">Data as of {recordDateLabel}</p>
       </div>
 
       {hasValue ? (
@@ -49,7 +49,7 @@ export function SignalReadingPanel({
       <dl className="space-y-1.5 text-sm text-slate-200">
         {hasValue ? (
           <div className="flex flex-wrap gap-x-2">
-            <dt className="shrink-0 font-semibold text-slate-400">Against its threshold</dt>
+            <dt className="shrink-0 font-semibold text-slate-400">Against its change line</dt>
             <dd className="min-w-0">{reading.distanceLabel}</dd>
           </div>
         ) : null}

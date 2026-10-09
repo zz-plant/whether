@@ -4,7 +4,7 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { DecisionPicker, type DecisionPickerOption } from "../app/components/home/DecisionPicker";
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
-import { findLastTimeCallChanged, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { parseHomeDecision } from "../lib/report/home/homeSectionModel";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
@@ -23,14 +23,13 @@ mockAny.module("next/navigation", () => ({
 }));
 
 /**
- * "What are you deciding?" on `/`, for every reader. On a first visit the brief
- * below folds away and the picker carries the alert, the record line and the
- * button that opens the brief; a returning reader gets the question without the
- * fold. It used to be first-visit only, so the page was two products at one URL.
+ * "What are you deciding?" on `/`: the five areas, third on the page after the
+ * verdict and the stage and runway (2026-10-09). It no longer folds the brief on a
+ * first visit or carries the alert, the record and a reveal button: those are
+ * sections of their own in one order for every reader.
  *
  * The homepage itself does not render in this suite (it suspends at the report
- * read path), so the picker is rendered on its own and the fold is checked as
- * the configuration it is — a stylesheet rule and a bootstrap line.
+ * read path), so the picker is rendered on its own.
  */
 
 const OPTIONS: DecisionPickerOption[] = decisionAreaOrder.map((area, index) => ({
@@ -45,59 +44,40 @@ const OPTIONS: DecisionPickerOption[] = decisionAreaOrder.map((area, index) => (
   resume: { line: "Funding pressure < 66", distance: "17 pts away", points: 17, met: false, metric: "tightness" },
 }));
 
-const LAST_TIME = findLastTimeCallChanged({
-  series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
-  currentRegime: "SCARCITY",
-  previousRegime: "EXPANSION",
-  currentScores: { tightness: 90, riskAppetite: 44 },
-});
-const CALL_CHANGE_LINES = { tightness: 70, riskAppetite: 50 };
-
-describe("first-visit decision picker", () => {
+describe("decision picker", () => {
   const html = renderToStaticMarkup(
-    <DecisionPicker
-      options={OPTIONS}
-      regime="SCARCITY"
-      scores={{ tightness: 90, riskAppetite: 44 }}
-      flipCondition="Funding pressure falls to or below 70."
-      lastTime={LAST_TIME ? { record: LAST_TIME, callChangeLines: CALL_CHANGE_LINES } : undefined}
-      turningPoints={[{ label: "Sep 2022, Stormy to Freezing", href: "/?month=9&year=2022" }]}
-      calibration={{ stageLabel: "Series A", runwayPhrase: "12–24 months", chosen: false }}
-    />,
+    <DecisionPicker options={OPTIONS} regime="SCARCITY" scores={{ tightness: 90, riskAppetite: 44 }}>
+      <p data-child>Folded table</p>
+    </DecisionPicker>,
   );
 
-  it("asks every reader, and folds only the first-visit extras", () => {
-    assert.match(html, /^<section data-testid="decision-picker"/);
-    assert.doesNotMatch(html.slice(0, html.indexOf(">")), /data-first-visit-only/, "the question is not first-visit only");
-    const fold = html.indexOf('data-first-visit-only="true"');
-    assert.ok(fold > html.indexOf("What are you deciding?"), "the extras fold after the question");
-    assert.ok(html.indexOf("Show the full brief") > fold, "the reveal button is one of them");
+  it("is the areas section, with the old anchor and an h2", () => {
+    assert.match(html, /^<section id="what-it-changes"/);
+    assert.match(html, /<h2[^>]*>What are you deciding\?<\/h2>/);
+    assert.doesNotMatch(html, /data-first-visit/, "nothing in it is first-visit only");
+    assert.doesNotMatch(html, /Show the full brief/);
   });
 
-  it("says whose lines the answers are scaled to, where the reader first meets them", () => {
-    assert.match(html, /Lines set for Series A with 12–24 months of runway \(the defaults\)\./);
-    assert.match(html, /href="#company-calibration"/);
-  });
-
-  it("asks one question with an answer for every area", () => {
-    assert.match(html, /What are you deciding\?/);
-    for (const question of ["Hire someone", "Change the roadmap", "Raise money", "Approve new spend", "Start something new"]) {
-      assert.ok(html.includes(question), `missing option: ${question}`);
+  it("asks one question with an answer for every area, each under the area's own name", () => {
+    for (const area of ["Hiring", "Roadmap", "Fundraising", "Spending", "New bets"]) {
+      assert.ok(html.includes(area), `missing option: ${area}`);
+    }
+    for (const retired of ["Hire someone", "Change the roadmap", "Raise money", "Approve new spend", "Start something new"]) {
+      assert.ok(!html.includes(retired), `retired verb label: ${retired}`);
     }
   });
 
-  it("offers the one subscribe form, starting on alerts only, beside the condition it watches", () => {
-    assert.match(html, /Tell me when the guidance changes/);
-    assert.match(html, /Next change to watch: Funding pressure falls to or below 70\./);
-    assert.match(html, /No weekly newsletter/);
-    assert.match(html, /Every Monday too/, "the weekly choice is on the same form");
+  it("leaves the alert, the record and the stage and runway to their own sections", () => {
+    assert.doesNotMatch(html, /Tell me when the guidance changes|The last time conditions|Has this happened before|Lines set for/);
+  });
+
+  it("prints what it is handed after the choices", () => {
+    assert.ok(html.indexOf("data-child") > html.indexOf("<fieldset"), "the folded table follows the choices");
   });
 
   it("says what each score means before any line quotes one", () => {
-    const scores = html.indexOf("Funding pressure 90/100: money is hard to raise");
-    assert.ok(scores > 0, "funding pressure printed without its meaning");
+    assert.match(html, /Funding pressure 90\/100: money is hard to raise/);
     assert.match(html, /Risk appetite 44\/100: investors are selective about risk/);
-    assert.ok(scores < html.indexOf("Next change to watch"), "the alert box quotes a score before the page says what it means");
   });
 
   it("puts each area's standing on its choice, so the answers are on the page before a click", () => {
@@ -111,26 +91,6 @@ describe("first-visit decision picker", () => {
     const count = html.indexOf("Pause lines crossed in 4 of 5 areas this week.");
     assert.ok(count > html.indexOf("What are you deciding?"), "the count sits under the question");
     assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");
-  });
-
-  it("answers whether this has happened before on the page, and only when the week has an answer", () => {
-    assert.ok(LAST_TIME, "the record has an earlier tightening to show");
-    assert.match(html, /data-testid="last-time-call-changed"/);
-    assert.match(html, /The last time conditions tightened/);
-    const quietWeek = renderToStaticMarkup(
-      <DecisionPicker
-        options={OPTIONS}
-        regime="SCARCITY"
-        scores={{ tightness: 90, riskAppetite: 44 }}
-        turningPoints={[]}
-      />,
-    );
-    assert.doesNotMatch(quietWeek, /The last time conditions/);
-  });
-
-  it("links the turning points into the time machine and offers the full brief", () => {
-    assert.match(html, /href="\/\?month=9&amp;year=2022"/);
-    assert.match(html, /Show the full brief/);
   });
 
   it("carries no engine vocabulary", () => {
@@ -162,27 +122,16 @@ describe("first-visit helpers", () => {
   });
 });
 
-describe("the fold is configuration, and defaults to the full brief", () => {
-  const css = readFileSync(new URL("../app/styles/home-flow.css", import.meta.url), "utf8");
-  const layout = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
-
-  it("hides the picker unless the bootstrap marked a first visit", () => {
-    assert.match(css, /html:not\(\[data-home-first-visit="true"\]\) \[data-first-visit-only="true"\]\s*\{\s*display: none !important;/);
-    assert.match(css, /html\[data-home-first-visit="true"\] \[data-first-visit-collapsible="true"\]\s*\{\s*display: none !important;/);
-  });
-
-  it("hides the phone header's stage and runway only on a page that offers the fold", () => {
-    const header = readFileSync(new URL("../app/components/globalHeaderRouteGate.tsx", import.meta.url), "utf8");
-    assert.match(
-      css,
-      /html\[data-home-first-visit="true"\]:has\(\[data-first-visit-only="true"\]\) \[data-first-visit-header-choices="true"\]\s*\{\s*display: none !important;/,
-    );
-    assert.match(header, /data-first-visit-header-choices="true"/);
-  });
-
-  it("decides first visit from the key the activation tracker writes on every visit", () => {
-    assert.match(layout, /activationLastWeekStorageKey/);
-    assert.match(layout, /root\.dataset\.homeFirstVisit = dismissed \|\| seenBefore \? "false" : "true"/);
+/* The fold is gone (2026-10-09): one order for every reader, so nothing on the
+   page is keyed to a first visit, and the bootstrap no longer marks one. */
+describe("no first-visit fold", () => {
+  it("leaves nothing for the bootstrap or the stylesheet to fold", () => {
+    const css = readFileSync(new URL("../app/styles/home-flow.css", import.meta.url), "utf8");
+    const layout = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
+    const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
+    assert.doesNotMatch(css, /data-first-visit-(only|collapsible)/);
+    assert.doesNotMatch(layout, /homeFirstVisit/);
+    assert.doesNotMatch(page, /data-first-visit|offersFirstVisitFold/);
   });
 });
 
@@ -193,7 +142,6 @@ describe("a link can carry the decision (`/?decision=`)", () => {
         options={OPTIONS}
         regime="SCARCITY"
         scores={{ tightness: 90, riskAppetite: 44 }}
-        turningPoints={[]}
         initialSelected={initialSelected}
       />,
     );

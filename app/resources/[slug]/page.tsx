@@ -259,7 +259,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           <p className="type-eyebrow">This week</p>
           <p className="text-sm text-slate-200">{postureSummary}</p>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
-            <span>As of {reportData.recordDateLabel}</span>
+            <span>Data as of {reportData.recordDateLabel}</span>
             <ActionLink href="/" variant="inline">Open this week&apos;s brief</ActionLink>
           </p>
         </div>

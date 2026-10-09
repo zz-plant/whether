@@ -1,22 +1,23 @@
 import { Skeleton } from "./skeleton";
 
 type RouteLoadingShellProps = {
-  label?: string;
-  description?: string;
   currentPath?: string;
   pageTitle?: string;
 };
 
-export function RouteLoadingShell({
-  label = "Weekly brief",
-  description = "Macro conditions translated into operating decisions for leadership teams.",
-  pageTitle = "Weekly Brief",
-}: RouteLoadingShellProps) {
+/**
+ * The Suspense fallback every report route streams first. It carries no sentence:
+ * the server streams it before the page, so its text was the first thing a crawler
+ * indexed on those routes ("Loading evidence: Checking what changed…", 2026-10-09).
+ * The region is named by the page's title and marked busy, which is what a screen
+ * reader needs while the page resolves.
+ */
+export function RouteLoadingShell({ pageTitle = "Weekly brief" }: RouteLoadingShellProps) {
   return (
     <div className="weather-shell weather-page-enter relative isolate flex-1 overflow-x-clip text-slate-100">
       <div className="relative z-10 mx-auto w-full max-w-[96rem] px-[var(--weather-shell-pad-inline)] pb-8 pt-[calc(env(safe-area-inset-top)+0.5rem)] sm:pt-4">
         <section
-          aria-label={`Preparing ${pageTitle}`}
+          aria-label={pageTitle}
           aria-live="polite"
           aria-busy="true"
           className="mx-auto w-full max-w-[72rem] space-y-4"
@@ -56,7 +57,6 @@ export function RouteLoadingShell({
             </div>
           </div>
         </div>
-        <p className="sr-only">{label}: {description}</p>
         </section>
       </div>
     </div>

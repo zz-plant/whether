@@ -41,11 +41,14 @@ export function SubscribeForm({
   compact = false,
   defaultFrequency = "weekly",
   condition,
+  showTitle = true,
 }: {
   compact?: boolean;
   defaultFrequency?: EmailFrequency;
   /** The call-change line, printed as the next change to watch when the form offers alerts. */
   condition?: string;
+  /** False where the section's own heading already says what the form is for. */
+  showTitle?: boolean;
 } = {}) {
   const pathname = usePathname() ?? "/";
   const [channel, setChannel] = useState<SubscribeChannel>("email");
@@ -122,13 +125,17 @@ export function SubscribeForm({
           floated in the card's top-right corner with the text squeezed to half. */}
       <div className="space-y-1">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-          <p className="text-fluid-sm font-medium text-white">
-            {channel === "slack"
-              ? "Automate Monday brief delivery directly to Slack"
-              : alertsOnly
-                ? "Tell me when the guidance changes"
-                : "Get the guidance every Monday, and a note the day it changes"}
-          </p>
+          {showTitle ? (
+            <p className="text-fluid-sm font-medium text-white">
+              {channel === "slack"
+                ? "Automate Monday brief delivery directly to Slack"
+                : alertsOnly
+                  ? "Tell me when the guidance changes"
+                  : "Get the guidance every Monday, and a note the day it changes"}
+            </p>
+          ) : (
+            <span />
+          )}
 
           {/* The one segmented control (segmentedControl.tsx): a radio group,
               so arrows move between the two channels and the pair is one tab

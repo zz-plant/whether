@@ -13,6 +13,7 @@ import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
 import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
+import { resolveNearestLineMargin, type ConfidenceInputs } from "./confidence";
 
 /**
  * What the evidence page, the answer pages and the scenario pages draw, in the
@@ -251,28 +252,12 @@ export const buildCallLineLadders = (
   return [forKey("tightness", thresholds.tightnessRegime), forKey("riskAppetite", thresholds.riskAppetiteRegime)];
 };
 
-/* Why the next reading could change conditions. Beside "Confidence: High" a
-   bare "Could change next week: Yes" read as a contradiction; the reason is the
-   nearer line and how far off it is, or a change already waiting on its second
-   reading. Confidence measures something else (how often conditions held at
-   this distance), and the two read together once this one says what it means. */
-const describeChangeReason = (assessment: {
-  regimeTransition?: { pending?: unknown };
-  scores?: { tightness: number; riskAppetite: number };
-  thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
-}): string | undefined => {
-  if (assessment.regimeTransition?.pending) return "a change is waiting on a second reading";
-  const { scores, thresholds } = assessment;
-  if (!scores || !thresholds) return undefined;
-  const nearest = [
-    { key: "tightness" as const, gap: Math.abs(scores.tightness - thresholds.tightnessRegime) },
-    { key: "riskAppetite" as const, gap: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime) },
-  ].sort((left, right) => left.gap - right.gap)[0];
-  if (!nearest) return undefined;
-  const label = regimeSignalLabelByKey[nearest.key].toLowerCase();
-  const points = Math.round(nearest.gap);
-  return points === 0 ? `${label} is at its line` : `${label} is ${points} ${points === 1 ? "pt" : "pts"} from its line`;
-};
+/* Why the next reading could change conditions, when the margin cell beside it
+   does not already say: a change waiting on its second reading. The distance to
+   the nearer line is the margin cell's (`resolveNearestLineMargin`), so the two
+   cells no longer state it twice, or pick different lines to state it from. */
+const describeChangeReason = (assessment: { regimeTransition?: { pending?: unknown } }): string | undefined =>
+  assessment.regimeTransition?.pending ? "a change is waiting on a second reading" : undefined;
 
 /**
  * The four trust facts, the one way every reading route states them.
@@ -305,7 +290,7 @@ export const buildTrustStripProps = ({
   degradedSourceCount?: number;
   confidenceLabel: TrustStripProps["confidenceLabel"];
   assessment: Parameters<typeof couldCallChangeNextWeek>[0] & {
-    scores?: { tightness: number; riskAppetite: number };
+    scores?: ConfidenceInputs["scores"];
     thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
   };
 }): Omit<TrustStripProps, "href" | "className"> => ({
@@ -317,6 +302,9 @@ export const buildTrustStripProps = ({
     degradedSourceCount,
   }),
   confidenceLabel,
+  ...(assessment.scores && assessment.thresholds
+    ? { margin: resolveNearestLineMargin({ scores: assessment.scores, thresholds: assessment.thresholds }) }
+    : {}),
   couldChangeNextWeek: couldCallChangeNextWeek(assessment),
   changeReason: couldCallChangeNextWeek(assessment) ? describeChangeReason(assessment) : undefined,
 });

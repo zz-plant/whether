@@ -92,17 +92,45 @@ export const buildRegimeAlert = (
   };
 };
 
-const confidencePlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
-  LOW: "Low (close to the line where conditions change; stage decisions)",
-  MED: "Medium (some room before conditions change)",
-  HIGH: "High (well clear of the line where conditions change)",
+/*
+ * The margin (2026-10-09). The engine and the API call it `confidence`, and every
+ * page printed "Confidence: Low" — beside "Freeze new commitments", which read as
+ * the product doubting its own advice. /calibration shows what the number is: how
+ * far the scores sit from the line where conditions change, not a probability, and
+ * conditions held in most months at every distance. So a reader is shown the
+ * distance, under its own name. Codes and API fields keep `confidence`.
+ */
+/** The label for what the API calls `confidence`. */
+export const MARGIN_LABEL = "Margin";
+
+const marginBandWords: Record<"LOW" | "MED" | "HIGH", string> = {
+  LOW: "Close to the line",
+  MED: "Within reach of the line",
+  HIGH: "Clear of the line",
 };
 
-/** The engine's codes, as words. Derived so a rename cannot leave the two apart. */
-const confidenceWords: Record<"LOW" | "MED" | "HIGH", string> = {
-  LOW: "Low",
-  MED: "Medium",
-  HIGH: "High",
+const marginPlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
+  LOW: "Close to the line where conditions change (stage decisions)",
+  MED: "Within reach of the line where conditions change",
+  HIGH: "Clear of the line where conditions change",
+};
+
+/** The band under its label, for a meta line that runs facts together: "Margin: close to the line". */
+export const formatMarginStamp = (confidence: string): string =>
+  `${MARGIN_LABEL}: ${formatMarginBand(confidence).toLowerCase()}`;
+
+/** The margin at its shortest, for the sticky strip and a share line: "Margin 1 pt", or the band. */
+export const formatStripMargin = (confidence: string, points?: number | null): string =>
+  points === undefined || points === null
+    ? formatMarginBand(confidence)
+    : `${MARGIN_LABEL} ${points} ${points === 1 ? "pt" : "pts"}`;
+
+/** The margin with the score it is measured on: "Risk appetite 1 pt from its change line". */
+export const formatMarginReading = (margin: { signal: "tightness" | "riskAppetite"; points: number }): string => {
+  const label = regimeSignalLabel[margin.signal];
+  return margin.points === 0
+    ? `${label} at its change line`
+    : `${label} ${margin.points} ${margin.points === 1 ? "pt" : "pts"} from its change line`;
 };
 
 /**
@@ -124,7 +152,7 @@ export const formatBoundaryDistance = ({
 }): string => `${label} is ${points.toFixed(1)} points from its ${formatThresholdNumber(threshold)} line.`;
 
 export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): string =>
-  confidencePlainLabels[confidence];
+  marginPlainLabels[confidence];
 
 /**
  * The confidence reading as a reader meets it, not as the engine stores it.
@@ -140,9 +168,30 @@ export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): 
  * carried the code — the drift this collapses. An unrecognised value passes
  * through rather than being reshaped into a claim nothing produced.
  */
-export const formatConfidenceChipLabel = (confidence: string): string => {
-  const word = confidenceWords[confidence as "LOW" | "MED" | "HIGH"];
-  return word ? `${word} confidence` : confidence;
+const isConfidenceCode = (value: string): value is "LOW" | "MED" | "HIGH" =>
+  value === "LOW" || value === "MED" || value === "HIGH";
+
+export const formatMarginBand = (confidence: string): string =>
+  isConfidenceCode(confidence) ? marginBandWords[confidence] : confidence;
+
+/**
+ * The band with the score it is measured on, when the caller holds it: "Close to
+ * the line (risk appetite is 1 point from its change line)". The points are that
+ * score's own, so a reader can check them against the score printed beside it,
+ * and spelled out, because a paste lands where no page explains "pts".
+ */
+export const formatMargin = (
+  confidence: string,
+  margin?: { signal: "tightness" | "riskAppetite"; points: number } | null,
+): string => {
+  const band = formatMarginBand(confidence);
+  if (!margin) return band;
+  const signal = regimeSignalLabel[margin.signal].toLowerCase();
+  const distance =
+    margin.points === 0
+      ? `${signal} is at its change line`
+      : `${signal} is ${margin.points} ${margin.points === 1 ? "point" : "points"} from its change line`;
+  return `${band} (${distance})`;
 };
 
 /** Status tone for a confidence reading.
@@ -387,7 +436,8 @@ export const buildCompactFreshnessMeta = ({
     : isFallbackSnapshot
       ? "cached"
       : "live";
-  const confidenceCue = confidenceLabel === "HIGH" ? "high-reliability" : confidenceLabel === "MED" ? "mixed-reliability" : "low-reliability";
+  /* The margin, where this said "high-reliability": the band measures distance from a change line, not reliability. */
+  const confidenceCue = formatMarginStamp(confidenceLabel).toLowerCase();
   const fallbackCue = mode === "historical"
     ? "historical"
     : maxAge === "stale"
@@ -438,7 +488,7 @@ export const formatTrustStripDisplay = ({
     : freshness.maxAge === "stale"
       ? "Freshness stale"
       : "Freshness fresh";
-  const confidenceBadge = formatConfidenceChipLabel(confidenceLabel);
+  const confidenceBadge = formatMarginBand(confidenceLabel);
   const safeProvenanceCount = Math.max(0, Math.round(provenanceCount));
   const provenanceBadge = `Sources ${safeProvenanceCount}`;
   const degraded = isFallbackSnapshot || freshness.maxAge === "stale";

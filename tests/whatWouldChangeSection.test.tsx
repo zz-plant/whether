@@ -39,7 +39,6 @@ const html = renderToStaticMarkup(
       { axis: "tightness", sentence: "If the 1-month Treasury bill rate falls 0.15%, conditions turn Stormy." },
     ]}
     reversalTrigger="Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 3 pts to clear 50 (47 today)."
-    lastTime={null}
     callChangeLines={{ tightness: 70, riskAppetite: 50 }}
     regime="SCARCITY"
   />,
@@ -64,5 +63,46 @@ describe("what would change this guidance", () => {
     assert.ok(fold !== -1, "the market move has its own disclosure");
     assert.ok(html.lastIndexOf("<details", fold) !== -1 && html.indexOf("Treasury bill rate") > fold);
     assert.doesNotMatch(html.slice(html.lastIndexOf("<details", fold), fold), /\sopen/, "and it starts closed");
+  });
+});
+
+/* The pause line printed here only on a read that drew no ladders, so a reader met
+   "Conditions change if" and had to find the pause line in the area table (site
+   review, 2026-10-09). The section leads with the pause and resume lines now. */
+describe("what would change this guidance: the pause and resume lines", () => {
+  const lined = renderToStaticMarkup(
+    <WhatWouldChangeSection
+      ladders={[{ metric: "tightness", label: "Funding pressure", value: 90, previous: 63, lines: [{ kind: "callChange", value: 70 }] }]}
+      flipProximity={[]}
+      guardrail="Funding pressure is above 76 (already true at 90)"
+      leadResume="Funding pressure falls below 66"
+      reversalTrigger="Funding pressure falls 20 pts to 70 or below (90 today)."
+      callChangeLines={{ tightness: 70, riskAppetite: 50 }}
+      regime="SCARCITY"
+    />,
+  );
+
+  it("states the pause line, the resume line and the change line, in that order", () => {
+    const pause = lined.indexOf(">Pause if<");
+    const resume = lined.indexOf(">Resume when<");
+    const change = lined.indexOf(">Conditions change if<");
+    assert.ok(pause > 0 && resume > pause && change > resume, "pause, resume, then where conditions change");
+    assert.match(lined.replace(/<[^>]+>/g, ""), /Funding pressure falls below 66/);
+  });
+
+  it("prefers a chosen stage's resume line to the lead area's", () => {
+    const staged = renderToStaticMarkup(
+      <WhatWouldChangeSection
+        ladders={[]}
+        flipProximity={[]}
+        guardrail="Funding pressure is above 76"
+        leadResume="Funding pressure falls below 66"
+        resumeWhen="Resume once two weekly readings hold"
+        callChangeLines={{ tightness: 70, riskAppetite: 50 }}
+      />,
+    );
+    const text = staged.replace(/<[^>]+>/g, "");
+    assert.match(text, /Resume once two weekly readings hold/);
+    assert.doesNotMatch(text, /Funding pressure falls below 66/);
   });
 });

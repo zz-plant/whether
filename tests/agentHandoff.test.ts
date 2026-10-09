@@ -177,7 +177,7 @@ describe("agent handoff contract", () => {
     const prompt = buildAgentPrompt(assessment as any, treasury as any);
 
     assert.match(prompt, /decision delta/i);
-    assert.match(prompt, /flip watchlist/i);
+    assert.match(prompt, /watchlist of the change lines/i);
     assert.match(prompt, /5\) A short list of questions/);
   });
 
@@ -194,7 +194,7 @@ describe("agent handoff contract", () => {
         "Summarize the regime in plain English.",
         "State what changed this week and what decisions should change now.",
         "Call out constraints that block or enable new initiatives.",
-        "Track flip triggers before making irreversible commitments.",
+        "Track the change lines before making irreversible commitments.",
         "List open questions for the product manager.",
       ],
     });
@@ -207,7 +207,7 @@ describe("agent handoff contract", () => {
         "1) A 3-bullet summary of the capital posture.",
         "2) A concise decision delta: what changed this week and what changes now.",
         "3) The top 3 constraints that should shape roadmap decisions.",
-        "4) A flip watchlist with the trigger, reversal conditions, and current boundary pressure.",
+        "4) A watchlist of the change lines and the pause and resume lines, with how far each score sits from them.",
         "5) A short list of questions to confirm with the PM before acting.",
         "",
         `Context: Whether Weekly Brief for ${snapshotData.record_date} (${realAssessment.regime}).`,

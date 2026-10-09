@@ -1,4 +1,7 @@
 import type { RegimeKey } from "../regimeEngine";
+import { weeklyHeadline } from "./reportEvidence";
+import { formatWeekMondayUTC } from "../formatters";
+import { getRegimeWeatherRationale } from "../regimePresentation";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { fitMovementHeadline } from "./decisionMovement";
 import { loadWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
@@ -158,21 +161,25 @@ export const loadHomeSharePreview = async (
 
   const sharePath = buildHomeSharePath(searchParams);
   const imageUrl = buildOgImageUrl(buildImageParams(searchParams));
-  const weekLabel = reportData.weeklyRecordDateLabel;
+  /* The week by its Monday, the name every surface gives it; the card said
+     "Week ending" the Friday after the reading. */
+  const weekLabel = formatWeekMondayUTC(reportData.treasury.record_date);
   const statusLabel = weeklyDecisionCardModel.status.statusLabel;
   const contextLabel = notLiveReadingLabel({
     historicalBanner: reportData.historicalSelection?.banner ?? null,
     monthRequested: Boolean(searchParams?.month || searchParams?.year),
     isFallback,
   });
-  const operatingStanceLine = clampText(weeklyDecisionCardModel.decision.operatingStanceLine, 120);
-  const immediateDecision = clampText(
-    normalizeSentence(weeklyDecisionCardModel.decision.immediateDecision),
-    130,
-  );
+  /* The week's headline action, from the source the homepage h1 reads
+     (`weeklyHeadline`). The card led with the action and printed the call under
+     it, two instructions for one week; the line under the headline is what the
+     conditions mean for money now. */
+  const weekHeadline = weeklyHeadline(snapshot.weeklyCall);
+  const operatingStanceLine = clampText(weekHeadline.action, 120);
+  const immediateDecision = clampText(normalizeSentence(weekHeadline.action), 130);
   const headline = clampText(immediateDecision, 96);
   const whyItMatters = clampText(
-    normalizeSentence(operatingStanceLine),
+    normalizeSentence(getRegimeWeatherRationale(reportData.assessment.regime)),
     140,
   );
   const flipCondition = clampText(

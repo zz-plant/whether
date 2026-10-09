@@ -17,6 +17,8 @@ const answerPageSchema = z.object({
   shortAnswer: z.string().min(1),
   directAnswer: z.string().min(1),
   audience: z.string().min(1),
+  /** The heading over the page's how-to-apply section, written for this question. */
+  applyHeading: z.string().min(1),
   contextHeading: z.string().min(1),
   context: z.string().min(1),
   companyInputs: z.array(z.string().min(1)).min(3).max(4),

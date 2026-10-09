@@ -1,5 +1,5 @@
 import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL } from "./reportCopy";
-import { formatConfidenceChipLabel } from "./reportFormatting";
+import { formatMarginBand } from "./reportFormatting";
 import { formatSignalReading } from "./signalTranslations";
 import {
   formatMeetingSlideMarkdown,
@@ -296,8 +296,8 @@ export const MONDAY_AGENDA_STEPS: readonly {
   prompt: string;
 }[] = [
   { id: "changed", label: "What changed", minutes: 1, prompt: "Read the guidance and what moved since last Monday." },
-  { id: "thresholds", label: "Check the thresholds", minutes: 1, prompt: "Guardrail and reversal trigger, against this week's scores." },
-  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of a threshold?" },
+  { id: "thresholds", label: "Check the lines", minutes: 1, prompt: "The pause line and the resume line, against this week's scores." },
+  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of its pause line?" },
 ];
 
 export const MONDAY_AGENDA_TITLE = "Monday guidance review";
@@ -357,7 +357,7 @@ const provenanceLine = (artifact: BriefArtifact) =>
   [
     `Source: ${artifact.source}`,
     `data as of ${artifact.recordDateLabel}`,
-    artifact.confidenceLabel ? formatConfidenceChipLabel(artifact.confidenceLabel).toLowerCase() : null,
+    artifact.confidenceLabel ? `margin: ${formatMarginBand(artifact.confidenceLabel).toLowerCase()}` : null,
     artifact.isFallback ? "cached snapshot, not a live read" : null,
   ]
     .filter(Boolean)
@@ -386,7 +386,7 @@ export const resolveBriefUrl = (artifact: BriefArtifact, origin: string) =>
  * The `ref` value a pasted brief carries, and the query the homepage reads it
  * back from. A reader who lands on `/` with it arrived from a teammate's
  * paste, not a search or a bookmark, and is greeted as one
- * (`app/components/homeFirstRunOrientation.tsx`).
+ * (`app/components/home/ConditionsLegend.tsx`).
  */
 export const SHARE_REFERRAL_PARAM = "ref";
 export const SHARE_REFERRAL_VALUE = "share";

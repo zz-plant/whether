@@ -14,7 +14,6 @@ import {
 import { ReportSection } from "../components/reportSection";
 import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord";
 import { FormulaReference } from "./formulaReference";
-import { FrameworkSection } from "./frameworkSection";
 import { RunHistorySection } from "./runHistorySection";
 import { SourceBoard } from "./sourceBoard";
 import { ReaderReturnsSection } from "./readerReturnsSection";
@@ -61,7 +60,7 @@ export default async function MethodPage({
     <>
       <ReportSection
         id="confidence-limits"
-        title="Confidence and reliability limits"
+        title="Margin and reliability limits"
         description="How reliable the brief is, what should pause it, and what would force a change."
       >
         <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
@@ -98,7 +97,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="Confidence measures how far the scores sit from the line where conditions change. Whether readings at that distance actually held is measured separately, over the whole archive."
+        description="The margin is how far the scores sit from the line where conditions change. Whether readings at that distance actually held is measured separately, over the whole archive."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study
@@ -192,7 +191,7 @@ export default async function MethodPage({
           summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow select-none"
           summary={
             <>
-              <span>Limits and revisit triggers</span>
+              <span>Limits, and what would change the guidance</span>
               <span aria-hidden="true" className="inline-flex rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-1.5 text-slate-400 transition group-open:rotate-180 motion-reduce:transition-none">
                 <ChevronDownIcon className="h-3.5 w-3.5" />
               </span>
@@ -211,9 +210,16 @@ export default async function MethodPage({
           other paste of the week. */}
       <ShareOrEmbedLink />
 
-      {/* Last: how to use the lines is method, not a check on this week's
-          reading (§VIII). Its essay and its blank form are folded inside. */}
-      <FrameworkSection />
+      {/* The method moved to /about (2026-10-09): it is the product's thesis, and as
+          the last section of the page a reader opens to check this week's reading
+          it read as an appendix. One line points to it. */}
+      <p className="text-sm text-slate-300">
+        How to use the pause and resume lines, with a worked example and a blank form, is on{" "}
+        <Link href="/about#method" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+          About
+        </Link>
+        .
+      </p>
     </ReportShell>
   );
 }

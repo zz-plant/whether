@@ -154,8 +154,8 @@ export const buildMonthlyStructured = ({
   const postureSummary = [
     formatConfidenceSentence(confidence),
     transitionWatch
-      ? "Conditions are close to a boundary, so keep reversals cheap."
-      : "Conditions are clear of their boundaries.",
+      ? "Conditions are close to a change line, so keep commitments cheap to undo."
+      : "Conditions are clear of their change lines.",
   ];
   const boundedNextActions = [
     "Approve only work that serves the month's priority; hold the rest for the next read.",
@@ -166,7 +166,7 @@ export const buildMonthlyStructured = ({
   const reversalConditions = [
     transitionWatch
       ? restartWhen
-      : "Re-check the plan if conditions or the confidence behind them weaken.",
+      : "Re-check the plan if conditions weaken or a score nears its change line.",
     "Re-check the plan as soon as any execution constraint starts to bind.",
   ];
   const source = formatSourceLine(provenance);

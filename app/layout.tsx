@@ -65,14 +65,12 @@ const buildOrientationBootstrapScript = () => `
     const dismissed = window.localStorage.getItem(${JSON.stringify(orientationDismissKey)}) === "1";
 
     root.dataset.homeOrientationDismissed = dismissed ? "true" : "false";
-    // First visit: this browser has never rendered the brief (ActivationTracker
-    // stores the week on every visit) and never dismissed the explainer. The
-    // homepage folds everything below the call behind one question for it.
+    // Whether this browser has rendered the brief before (ActivationTracker stores
+    // the week on every visit); the conditions legend hides for one that has.
     const seenBefore = window.localStorage.getItem(${JSON.stringify(activationLastWeekStorageKey)}) !== null;
-    root.dataset.homeFirstVisit = dismissed || seenBefore ? "false" : "true";
     // Set once per page load and never flipped mid-session: the rule in
-    // home-flow.css hides the explainer on it, and the explainer sits above the
-    // call, so changing it after paint would move the call.
+    // home-flow.css hides the legend on it, and the legend sits above the
+    // verdict, so changing it after paint would move the verdict.
     root.dataset.homeReturning = seenBefore ? "true" : "false";
 
     if (!document.head.querySelector('style[data-weather-ui-bootstrap="orientation"]')) {
@@ -336,7 +334,7 @@ export default function RootLayout({
                 aria-label="Legal and credits"
                 className="flex flex-wrap items-center gap-x-6 gap-y-0 text-fluid-micro text-[var(--footer-legal)]"
               >
-                <Link href="/decisions" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Your record</Link>
+                <Link href="/decisions" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Your decisions</Link>
                 <Link href="/privacy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Privacy</Link>
                 <Link href="/acceptable-use-policy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Acceptable Use</Link>
                 <Link href="/terms-of-service" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Terms</Link>

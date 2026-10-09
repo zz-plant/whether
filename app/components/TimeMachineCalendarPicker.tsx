@@ -82,10 +82,11 @@ export function TimeMachineCalendarPicker({
 
   return (
     <Popover.Root open={open} onOpenChange={(next) => setOpen(next)}>
-      {/* `text-lg` below `sm`: at `text-xl` the week title and the confidence
-          chip beside it ran 4px past a 430px phone's content width, and the
-          chip dropped to a row of its own above the call. */}
-      <h2 className="text-lg font-bold tracking-tight text-white sm:text-2xl">
+      {/* A label, not a heading (2026-10-09): it printed as an h2 above the page's
+          h1, so the outline opened on the week's date rather than its verdict, and
+          at title size it competed with the verdict under it. It names the week
+          the verdict is for, by its Monday. */}
+      <p className="text-fluid-sm font-semibold tracking-tight text-slate-200">
         <Popover.Trigger className="group -ml-2 inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors hover:bg-slate-900/60 hover:text-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400">
           {currentDateLabel}
           <ChevronDownIcon
@@ -94,7 +95,7 @@ export function TimeMachineCalendarPicker({
             }`}
           />
         </Popover.Trigger>
-      </h2>
+      </p>
 
       <Popover.Portal>
         <Popover.Positioner side="bottom" align="start" sideOffset={8} className="z-50">

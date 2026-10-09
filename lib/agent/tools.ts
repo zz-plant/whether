@@ -60,7 +60,7 @@ const AGENT_TOOLS = [
     name: "get_state",
     title: "Get the current state",
     description:
-      "Start here. The current reading in one small answer (about 3KB): the conditions and the confidence in them, the data's freshness (automation.ready says whether it is live and current), each score against its pause, resume and change lines, the moves behind each score since the earlier reading and the areas whose pause or resume lines they crossed, and the guidance.",
+      "Start here. The current reading in one small answer (about 3KB): the conditions and the margin from their change lines, the data's freshness (automation.ready says whether it is live and current), each score against its pause, resume and change lines, the moves behind each score since the earlier reading and the areas whose pause or resume lines they crossed, and the guidance.",
     input: {},
     output: agentStateSchema,
     example: {},
@@ -74,7 +74,7 @@ const AGENT_TOOLS = [
     aliases: ["get_agent_brief"],
     input: { cadence: cadenceInput.optional().describe("weekly (default), monthly, quarterly or yearly.") },
     example: { cadence: "weekly" },
-    plainGetNote: "Over plain GET it answers a summary instead (regime, action, confidence, record date); get_state is the answer to decide from.",
+    plainGetNote: "Over plain GET it answers a summary instead (regime, action, margin, record date); get_state is the answer to decide from.",
     run: async ({ cadence }) => ({ ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() }),
   }),
   defineTool({
@@ -195,7 +195,7 @@ const AGENT_TOOLS = [
     name: "stress_test_plan",
     title: "Stress-test a planned decision against today's conditions",
     description:
-      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the bounded guardrail and the reversal trigger.",
+      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the resume line.",
     input: {
       planText: textInput.describe("The planned decision or initiative in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),
@@ -220,7 +220,7 @@ const AGENT_TOOLS = [
     name: "lint_sprint_goal",
     title: "Lint a sprint goal against today's conditions",
     description:
-      "Takes a sprint goal or story-level plan and says whether it holds, pauses, or needs a reversal guardrail under today's conditions, with the bounded-rule trigger that would fire. A sprint goal is a planned decision at smaller granularity, so this reuses the stress-test engine.",
+      "Takes a sprint goal or story-level plan and says whether it holds, pauses, or needs a written way to undo it under today's conditions, with the pause line that would fire. A sprint goal is a planned decision at smaller granularity, so this reuses the stress-test engine.",
     input: {
       goalText: textInput.describe("The sprint goal or story-level plan in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),

@@ -29,10 +29,10 @@ describe("formula reference visuals", () => {
     assert.ok(html.indexOf("Inputs — all public") > fold, "the cards are inside it");
   });
 
-  it("draws confidence as a three-band ladder, named in words", () => {
-    assert.match(html, />Low</);
-    assert.match(html, />Medium</);
-    assert.match(html, />High</);
+  it("draws the margin as a three-band ladder, named in words", () => {
+    assert.match(html, />Close</);
+    assert.match(html, />Within reach</);
+    assert.match(html, />Clear</);
     assert.doesNotMatch(html, />(LOW|MED|HIGH)</, "the engine's band codes are storage, not copy");
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_NEAR_THRESHOLD}<`));
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_MEDIUM_THRESHOLD}<`));

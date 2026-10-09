@@ -29,13 +29,11 @@ const shareLinksIn = (html: string) =>
   [...html.matchAll(/<a\b[^>]*href="\/share"[^>]*>([\s\S]*?)<\/a>/g)].map((match) => match[1].replace(/<[^>]+>/g, "").trim());
 
 describe("one way out to /share from each reading page", () => {
-  it("the brief's Do and share links to /share instead of copying the slide and the card itself", async () => {
-    const { DoAndShareSection } = await import("../app/components/home/DoAndShareSection");
-    const html = renderToStaticMarkup(
-      <DoAndShareSection operateHref="/operate" currentRecordDate="2026-09-28" currentRecordDateLabel="Sep 28, 2026" />,
-    );
+  it("the brief's Share section links to /share instead of copying the slide and the card itself", async () => {
+    const { ShareSection } = await import("../app/components/home/ShareSection");
+    const html = renderToStaticMarkup(<ShareSection currentRecordDate="2026-09-28" currentRecordDateLabel="Sep 28, 2026" />);
     assert.deepEqual(shareLinksIn(html), [LINK_TEXT]);
-    const source = readFileSync("app/components/home/DoAndShareSection.tsx", "utf8");
+    const source = readFileSync("app/components/home/ShareSection.tsx", "utf8");
     assert.doesNotMatch(source, /CopyMeetingSlideButton|CopyImageCardButton/, "the copy buttons live on /share");
   });
 

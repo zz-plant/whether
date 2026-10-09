@@ -209,7 +209,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
                 </p>
               ) : null}
               <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
-                <span>As of {decisionArtifact.recordDateLabel} · signals refreshed {decisionArtifact.freshnessLabel}</span>
+                <span>Data as of {decisionArtifact.recordDateLabel} · checked {decisionArtifact.freshnessLabel}</span>
                 <ActionLink href="/" variant="inline" className="print:hidden">Open this week&apos;s brief</ActionLink>
               </p>
             </section>

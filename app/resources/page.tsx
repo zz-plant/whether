@@ -10,6 +10,7 @@ import { GovernancePillarsGlyph } from "../components/illustrations/GovernancePi
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import type { Route } from "../../lib/navigation/routeType";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { buildHomeAreaRows, describePauseLineCount } from "../../lib/report/home/homeSectionModel";
 import { describeAnswerStanding } from "../../lib/report/answerStanding";
 import { decisionAreaLabel, decisionAreaOrder } from "../../lib/report/boundedDecisionRules";
@@ -28,11 +29,11 @@ import { ToolkitLibraryPanels } from "./components/toolkitLibraryPanels";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Governance Resources",
+  title: "Guides",
   description:
     "Long-form guides behind the weekly guidance — capital discipline, board-level capital posture, reversibility as governance — and the most-asked decision guides.",
   path: "/resources",
-  imageAlt: "Whether governance resources",
+  imageAlt: "Whether guides",
 });
 
 /** Typed route for a direct-answer page; the dynamic segment is `[slug]`. */
@@ -71,8 +72,9 @@ export default async function ResourcesHubPage({
   ];
 
   const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/resources" });
-  const { homeBriefModel, weeklyDecisionCardModel } = snapshot;
-  const liveAction = reportData.actionNowShort ?? homeBriefModel.operatingStanceLine;
+  const { weeklyDecisionCardModel } = snapshot;
+  /* The week's headline action, from the source the homepage h1 reads. */
+  const liveAction = weeklyHeadline(snapshot.weeklyCall).composed;
   /* Each answer's standing this week, from the area rows the homepage's "What
      are you deciding?" choices print, fed the way app/page.tsx feeds them. No
      reader calibration: the answer page a row opens reads the published lines
@@ -113,10 +115,15 @@ export default async function ResourcesHubPage({
       <article className="weather-panel space-y-8 px-5 max-sm:px-0 py-5">
         <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="space-y-2 max-w-2xl">
-            <h1 className="text-fluid-2xl font-semibold text-slate-100">Governance resources</h1>
+            {/* "Guides" (2026-10-09): what the page holds, in the reader's word. The
+                header's label for this page belongs to the navigation and is
+                changed there. */}
+            <h1 className="text-fluid-2xl font-semibold text-slate-100">Guides</h1>
+            {/* No "evergreen" claim: the answers listed here carry this week's
+                standing, so the page is not free of week-to-week change. */}
             <p className="text-sm text-slate-300">
-              The long-form guides behind the weekly operating guidance, and the decision guides operators ask for most.
-              Evergreen by design: what changes week to week is on the brief, not here.
+              Answers to the decisions operators ask about most, each with where it stands this week, and the
+              long-form guides and frameworks behind the weekly operating guidance.
             </p>
           </div>
           <GovernancePillarsGlyph size={56} className="self-start sm:self-center" />
@@ -124,7 +131,7 @@ export default async function ResourcesHubPage({
 
         <section id="answers" aria-labelledby="resources-answers-heading" className="space-y-4">
           <div className="space-y-1">
-            <h2 id="resources-answers-heading" className="type-eyebrow">Direct answers</h2>
+            <h2 id="resources-answers-heading" className="type-eyebrow">This week&apos;s answers, by area</h2>
             <p className="text-sm text-slate-300">Under this week&apos;s guidance: {liveAction}</p>
             {/* The tally over the list, as the homepage prints it over its five
                 choices: the count a reader would otherwise assemble by opening

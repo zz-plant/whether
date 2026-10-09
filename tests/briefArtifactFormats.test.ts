@@ -274,9 +274,9 @@ describe("brief artifact formats", () => {
       );
     }
 
-    // The bounded conditions are indented under "Check the thresholds", not
+    // The bounded conditions are indented under "Check the lines", not
     // floated above the steps, so a room reads them at the minute they apply.
-    const thresholdsLine = lines.findIndex((line) => line.includes("**Check the thresholds**"));
+    const thresholdsLine = lines.findIndex((line) => line.includes("**Check the lines**"));
     const revisitLine = lines.findIndex((line) => line.includes("**Decide what to revisit**"));
     assert.ok(thresholdsLine > 0 && revisitLine > thresholdsLine);
     const under = lines.slice(thresholdsLine + 1, revisitLine);

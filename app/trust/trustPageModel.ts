@@ -11,7 +11,6 @@ import {
   buildDecisionReadinessState,
   buildTrustWarnings,
 } from "../../lib/report/trustStatus";
-import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
 import { buildDegradedSourceRows, buildSourceBoardRows } from "../../lib/report/sourceHealth";
 import { buildLadderLines } from "../components/ui/scoreLadder";
@@ -48,7 +47,6 @@ export async function buildTrustPageModel() {
     isFallbackSnapshot: isFallback,
     isHistoricalSelection: Boolean(reportData.historicalSelection),
   });
-  const confidenceLabel = formatConfidencePlainLabel(homeBriefModel.confidenceLabel);
   /* The strip under the h1: the four facts a reader checks before acting, in
      the slot every reading route gives them. The sources cell keeps the words
      the five-cell System status strip used for the same three states. */
@@ -116,7 +114,7 @@ export async function buildTrustPageModel() {
       label: "How you'd know it cleared",
       detail: isFallback
         ? "One live refresh has landed from every source."
-        : "Confidence is back to high and conditions have held for a second reading.",
+        : "The scores are clear of the change lines and conditions have held for a second reading.",
       href: "#source-board",
       linkLabel: "Check source dates",
     },
@@ -151,9 +149,8 @@ export async function buildTrustPageModel() {
     { href: "#source-board", label: "Sources" },
     // "Cite this guidance" and "Meeting snippet" moved to /share on 2026-10-08,
     // with every other paste of the week.
-    { href: "#confidence-limits", label: "Confidence & limits" },
+    { href: "#confidence-limits", label: "Margin & limits" },
     { href: "#revisit-call", label: "Revisit triggers" },
-    { href: "#framework", label: "Using the thresholds" },
   ];
 
   const reportShellModel: ReportShellModel = {
@@ -198,7 +195,6 @@ export async function buildTrustPageModel() {
     isFallback,
     degradedSourceRows,
     sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),
-    confidenceLabel,
     trustSummary,
     warnings,
     revisitBullets,

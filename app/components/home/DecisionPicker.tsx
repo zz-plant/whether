@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
+import { useState, type ReactNode } from "react";
 import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import {
   HOME_DECISION_PARAM,
@@ -11,49 +9,27 @@ import {
   describePauseLineCount,
   type HomeAreaRow,
 } from "../../../lib/report/home/homeSectionModel";
-import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
 import { SignalReading } from "../ui/plainLanguage";
-import { SubscribeForm } from "../SubscribeForm";
 import { CommitmentTest } from "./CommitmentTest";
-import { LastTimeCallChangedCard } from "./LastTimeCallChangedCard";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import { RUNWAY_CHANGED_EVENT } from "../useOperatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 
 /**
- * "What are you deciding?": one question under the call, for every reader.
+ * "What are you deciding?": the five areas, third on the page, after the verdict
+ * and the stage and runway the lines are scaled to (2026-10-09).
  *
- * It was first-visit only, so the page was two products at one URL: a first
- * visit got the question and no evidence, and a returning reader got the
- * evidence and lost the question. The question now shows on every live weekly
- * brief. What stays first-visit only is the fold: the alert form, the record
- * line and the button that opens the rest of the brief, which a returning
- * reader already has open below.
+ * Each choice carries the area's name and where it stands against its pause line,
+ * so the five answers are on the page before any is picked; the click opens that
+ * area's rule and lines. The folded table under it (`AllAreaRules`, passed as
+ * children) prints all five side by side, and keeps every rule in the server HTML.
  *
- * A first-time reader meets a call about the market — "freeze new commitments"
- * — and five sections of evidence for it, and nothing that says what it means
- * for the decision they came with. So on a first visit the brief below the
- * call is folded away (`data-first-visit-collapsible`, hidden pre-paint by the
- * layout bootstrap) and this asks the one question the page can answer for
- * anyone: what are you deciding? Each answer is that area's row of the same
- * table the full brief prints, so the two cannot disagree.
- *
- * Everything is server-rendered and the fold is CSS keyed on an attribute the
- * layout sets before paint, so crawlers, readers without scripts and every
- * returning browser get the full brief exactly as before. "First visit" means
- * this browser has never rendered the brief: `ActivationTracker` stores the
- * week on every visit, and the bootstrap reads that key.
+ * It used to fold the rest of the brief away on a first visit and carry the alert,
+ * the record and a "Show the full brief" button for that visit. The order does
+ * that job for every reader now: the areas, what would change them, and the alert
+ * come before the evidence, so nothing is hidden and nothing is printed twice.
  */
-
-const QUESTION_BY_AREA: Record<DecisionArea, string> = {
-  hiring: "Hire someone",
-  "product-tempo": "Change the roadmap",
-  "capital-raising": "Raise money",
-  "burn-discipline": "Approve new spend",
-  "expansion-bets": "Start something new",
-};
 
 /**
  * How far the reading is from a line, as a stamp: a status, so sharp (§XIV).
@@ -79,17 +55,6 @@ export type DecisionPickerOption = HomeAreaRow & {
   answer?: { href: string; title: string };
 };
 
-/* Module-level on purpose, as in `homeFirstRunOrientation.tsx`: the React
-   compiler's immutability rule refuses a write to the document inside a
-   component body. */
-const revealFullBrief = ({ scroll }: { scroll: boolean }) => {
-  document.documentElement.dataset.homeFirstVisit = "false";
-  if (!scroll) return;
-  const target = document.getElementById(HOME_SECTIONS.changed.id);
-  target?.scrollIntoView({ block: "start" });
-  target?.focus({ preventScroll: true });
-};
-
 /* The choice rides in the URL (`/?decision=hiring`), so a link copied after
    picking opens on the same answer, server-rendered. Replace, not push: picking
    another decision is not a step Back should retrace. The router's own state
@@ -100,68 +65,25 @@ const recordDecisionInUrl = (area: DecisionArea) => {
   window.history.replaceState(window.history.state, "", url);
 };
 
-/** A link to a folded section (the sticky strip, a shared `#what-would-change`) unfolds the brief. */
-const hashTargetsFoldedBrief = () => {
-  const id = window.location.hash.slice(1);
-  if (!id) return false;
-  return Boolean(document.getElementById(id)?.closest("[data-first-visit-collapsible]"));
-};
-
 export function DecisionPicker({
   options,
   regime,
   scores,
-  flipCondition,
-  lastTime,
-  turningPoints,
-  calibration,
   initialSelected,
+  children,
 }: {
   options: readonly DecisionPickerOption[];
   /** This week's conditions, which pick the runway note the runway test quotes. */
   regime: RegimeKey;
   /** This week's two scores, printed with what they mean before any line that quotes them. */
   scores: { tightness: number; riskAppetite: number };
-  flipCondition?: string;
-  /**
-   * On a week conditions changed, the last time they moved the same way and the
-   * lines they turn on: drawn as the same card the folded brief carries, so a
-   * first visit sees the two earlier scores rather than reading them in a
-   * paragraph. Absent on every other week.
-   */
-  lastTime?: { record: LastTimeCallChanged; callChangeLines: { tightness: number; riskAppetite: number } };
-  turningPoints: readonly { label: string; href: string }[];
-  /** Who the lines below are scaled for. The controls that set it sit in the brief, under "What that changes for you". */
-  calibration?: { stageLabel: string; runwayPhrase: string; chosen: boolean };
   /** The decision the URL names (`?decision=`), open on first paint. */
   initialSelected?: DecisionArea;
+  /** What follows the choices inside the section: the folded table of all five, and the plan link. */
+  children?: ReactNode;
 }) {
-  const router = useRouter();
   const [selected, setSelected] = useState<DecisionArea | undefined>(initialSelected);
-  // A runway typed into the test below moves the band the folded rules are
-  // scaled to without re-rendering them (that would close this card). The
-  // reveal is when they are next seen, so that is when they catch up.
-  const runwayBandMoved = useRef(false);
-
-  useEffect(() => {
-    const onRunwayChanged = (event: Event) => {
-      if (event instanceof CustomEvent && Reflect.get(Object(event.detail), "bandChanged") === true) {
-        runwayBandMoved.current = true;
-      }
-    };
-    window.addEventListener(RUNWAY_CHANGED_EVENT, onRunwayChanged);
-    return () => window.removeEventListener(RUNWAY_CHANGED_EVENT, onRunwayChanged);
-  }, []);
   const active = options.find((option) => option.area === selected);
-
-  useEffect(() => {
-    const unfoldForHash = () => {
-      if (hashTargetsFoldedBrief()) revealFullBrief({ scroll: false });
-    };
-    unfoldForHash();
-    window.addEventListener("hashchange", unfoldForHash);
-    return () => window.removeEventListener("hashchange", unfoldForHash);
-  }, []);
 
   /* Each choice carries where its area stands against its pause line, so the
      five answers are on the page before any is picked; the click opens the
@@ -170,35 +92,29 @@ export function DecisionPicker({
     const status = describeAreaPauseStatus(option);
     return {
       key: option.area,
-      label: QUESTION_BY_AREA[option.area],
+      /* The area's own name, the one every table and paste uses. The choices
+         were verb phrases ("Raise money", "Approve new spend") that named no
+         area, so a reader met two names for each of the five. */
+      label: decisionAreaLabel(option.area),
       sublabel: status?.text,
       sublabelTone: status?.crossed ? "caution" : undefined,
     };
   });
   const pauseLineCount = describePauseLineCount(options);
 
-  /* Picking a decision is the first deliberate act this block exists to raise.
-     `ActivationTracker` records it as `oriented`, the same as any other control
-     on the page, so nothing here sends it a second time. */
-  const handleReveal = () => {
-    revealFullBrief({ scroll: true });
-    if (runwayBandMoved.current) router.refresh();
-  };
-
   return (
     <section
+      id={HOME_SECTIONS.areas.id}
+      data-page-section={HOME_SECTIONS.areas.id}
       data-testid="decision-picker"
-      aria-labelledby="first-visit-decision-heading"
-      className="order-1 flex flex-col gap-8 border-t border-slate-800/70 pt-5"
+      tabIndex={-1}
+      aria-labelledby={`${HOME_SECTIONS.areas.id}-heading`}
+      className="weather-section-stack weather-home-section border-t border-slate-800/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
     >
-      {/* Three groups, spaced apart more than anything inside them: the decision,
-          the alert, and the record. One even gap through all of it left the score
-          lines between the choices and the alert card belonging to neither, and
-          the record reading as more of the alert's copy. */}
       <div className="space-y-4">
         <div className="space-y-1">
-          <h2 id="first-visit-decision-heading" className="text-fluid-xl font-semibold tracking-[-0.015em] text-slate-100">
-            What are you deciding?
+          <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="text-fluid-xl font-semibold tracking-[-0.015em] text-slate-100">
+            {HOME_SECTIONS.areas.heading}
           </h2>
           {pauseLineCount ? (
             <p data-pause-line-count className="text-fluid-sm font-medium text-slate-200">
@@ -208,21 +124,6 @@ export function DecisionPicker({
           <p className="text-fluid-xs text-slate-400">
             Pick one. Its answer holds until a score crosses one of its lines, and most weeks none does.
           </p>
-          {/* The answers are scaled to a stage and a runway, and the controls
-              that set them sat mid-page under the content they change. This
-              says whose lines these are where the reader first meets them. */}
-          {calibration ? (
-            <p className="text-fluid-xs text-slate-400" data-calibration-note>
-              Lines set for {calibration.stageLabel} with {calibration.runwayPhrase} of runway
-              {calibration.chosen ? "" : " (the defaults)"}.{" "}
-              <a
-                href="#company-calibration"
-                className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200 max-sm:hidden"
-              >
-                Change
-              </a>
-            </p>
-          ) : null}
         </div>
 
         <SegmentedControl
@@ -300,42 +201,7 @@ export function DecisionPicker({
         ) : null}
       </div>
 
-      {/* First visit only: the alert, the record line and the button that opens
-          the brief. A returning reader has all three in the brief below. */}
-      <div data-first-visit-only="true" className="space-y-8">
-        <SubscribeForm compact defaultFrequency="alerts" condition={flipCondition} />
-
-        {/* The answer to "has this happened before", on the page: the last
-            time conditions moved this way, as the card the folded brief draws,
-            and the turning points as links. A sceptical first visit had to
-            leave to check. */}
-        {lastTime ? <LastTimeCallChangedCard record={lastTime.record} callChangeLines={lastTime.callChangeLines} /> : null}
-
-        {turningPoints.length > 0 ? (
-          <div className="space-y-2">
-            <h3 className="type-eyebrow">Has this happened before?</h3>
-            <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">
-              Check it against the record. What the guidance said at the last turns:{" "}
-              {turningPoints.map((point, index) => (
-                <span key={point.href}>
-                  {index > 0 ? " · " : null}
-                  <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-                    {point.label}
-                  </Link>
-                </span>
-              ))}
-            </p>
-          </div>
-        ) : null}
-
-        <button
-          type="button"
-          onClick={handleReveal}
-          className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold"
-        >
-          Show the full brief
-        </button>
-      </div>
+      {children}
     </section>
   );
 }

@@ -9,13 +9,15 @@
  *
  * Append the current week with `bun run brief:freeze`.
  */
+import { formatWeekMondayUTC } from "../formatters";
+import { weeklyHeadline } from "./reportEvidence";
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
-import { formatConfidenceChipLabel, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
-import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { formatMarginBand, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
+import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildBoundedConditionRails } from "./operatingCalls";
@@ -327,7 +329,7 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
     /* From the engine key, not the stored label: the earliest records stored a
        third vocabulary ("Guarded Expansion — Late") that no stripping recovers. */
     conditions: getRegimePublicLabel(brief.regime),
-    confidence: formatConfidenceChipLabel(brief.confidenceLabel === "MEDIUM" ? "MED" : brief.confidenceLabel),
+    confidence: formatMarginBand(brief.confidenceLabel === "MEDIUM" ? "MED" : brief.confidenceLabel),
     source: /^(Canonical|Archived) snapshot/i.test(brief.sourceLabel)
       ? "Saved copy of the published reading"
       : brief.sourceLabel.replace(/\s*\((high|medium|low)( confidence)?\)$/i, ""),
@@ -405,9 +407,28 @@ const briefBySlug = new Map(briefs.map((brief) => [brief.slug, brief]));
 /** Newest first. */
 export const getPublishedBriefs = () => briefs;
 
+const HELD_CALLS = new Set(
+  [...Object.values(POLICY_OVERRIDE_CALL), POLICY_OVERRIDE_CALL_UNNAMED].map((hold) => hold.currentCall.trim()),
+);
+
+/**
+ * A frozen week's headline action, through the same source as the live brief
+ * (`weeklyHeadline`): the stored call, with the stored action's direction.
+ */
+export const publishedBriefHeadline = (brief: Pick<PublishedBrief, "actionNow" | "summary">) =>
+  weeklyHeadline({
+    actionNow: brief.actionNow,
+    currentCall: brief.summary,
+    /* A record stores no hold flag; a held week stored the hold's own call. */
+    policyOverrideActive: HELD_CALLS.has(brief.summary.trim()),
+  });
+
+/** The week's name: its Monday (`formatWeekMondayUTC`), never the record's own weekday. */
+export const publishedBriefWeekLabel = (brief: Pick<PublishedBrief, "recordDate">) => formatWeekMondayUTC(brief.recordDate);
+
 /** The page's `<h1>` and `<title>`; the news sitemap must carry the same words. */
 export const buildPublishedBriefTitle = (brief: PublishedBrief) =>
-  `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
+  `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${publishedBriefWeekLabel(brief)}`;
 
 /* About what a search result shows of a description. */
 const BRIEF_DESCRIPTION_LIMIT = 160;
@@ -436,7 +457,7 @@ const preferredBriefDescription = (brief: PublishedBrief): string | undefined =>
 export const buildPublishedBriefDescription = (brief: PublishedBrief, siblings: readonly PublishedBrief[] = briefs) => {
   const preferred = preferredBriefDescription(brief);
   const shared = siblings.some((other) => other.slug !== brief.slug && preferredBriefDescription(other) === preferred);
-  return preferred !== undefined && !shared ? preferred : `Week of ${brief.recordDateLabel}: ${brief.summary}`;
+  return preferred !== undefined && !shared ? preferred : `Week of ${publishedBriefWeekLabel(brief)}: ${brief.summary}`;
 };
 
 /**
@@ -447,7 +468,7 @@ export const buildPublishedBriefDescription = (brief: PublishedBrief, siblings: 
  */
 export const buildPublishedBriefImageParams = (brief: PublishedBrief) => ({
   template: "brief-chart",
-  week: brief.recordDateLabel,
+  week: publishedBriefWeekLabel(brief),
   posture: publishedBriefDisplay(brief).conditions,
   regime: brief.regime,
 });
@@ -562,9 +583,11 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
 
   const evidenceLines = brief.evidence.map((item) => `• ${display.evidenceTitle(item.title)} — ${item.detail}`);
   /* The slots the record can fill: w31 names no pause line (`publishedBriefDisplay`). */
+  /* One headline (`publishedBriefHeadline`). The stored action printed under
+     the do-now slot beside it, and the call again under "Summary", so the paste said
+     the week's instruction three times in two versions. */
   const slots = [
-    { label: publicDecisionLabels.call, value: brief.summary },
-    { label: publicDecisionLabels.action, value: brief.actionNow },
+    { label: publicDecisionLabels.call, value: publishedBriefHeadline(brief).composed },
     ...(display.pauseIf ? [{ label: publicDecisionLabels.threshold, value: display.pauseIf }] : []),
     { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
   ];
@@ -572,15 +595,13 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
-    `Conditions: ${display.conditions} (${display.confidence.toLowerCase()})`,
+    `Conditions: ${display.conditions} (margin: ${display.confidence.toLowerCase()})`,
     "",
     `This week's decision (${slots.map((slot) => slot.label).join(" / ")}):`,
     ...slots.map((slot) => `• ${slot.label}: ${slot.value}`),
     ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
     "",
-    "Summary:",
-    `• ${brief.summary}`,
-    `• What changed: ${display.whatChanged}`,
+    `What changed: ${display.whatChanged}`,
     ...(decisions.length > 0 ? ["", "Operating limits by area:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
     ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
@@ -614,14 +635,13 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
 
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
-    `Whether Leadership Update — Week of ${brief.recordDateLabel}`,
+    `Whether Leadership Update — Week of ${publishedBriefWeekLabel(brief)}`,
     "",
     `Conditions: ${display.conditions}`,
-    `Confidence: ${display.confidence}`,
-    `Executive summary: ${brief.summary}`,
+    `Margin: ${display.confidence.toLowerCase()}`,
     "",
     "This week's guidance:",
-    `• ${DECISION_CONTRACT_LABELS.action.actionNow}: ${brief.actionNow}`,
+    `• ${publicDecisionLabels.call}: ${publishedBriefHeadline(brief).composed}`,
     ...(display.pauseIf ? [`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.pauseIf}`] : []),
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${display.conditionsChangeIf}`,
     "",

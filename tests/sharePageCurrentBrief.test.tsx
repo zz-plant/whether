@@ -60,8 +60,9 @@ describe("/share current weekly artifact", () => {
 
     assert.match(html, /Week of /);
     assert.match(html, /data-share-format="slack-post"/, "the server renders the format the page opens on");
-    // The short post leads with the week's action, the line a channel acts on.
-    assert.match(html, /Transmit the committed action\./);
+    // The short post leads with the week's one headline action (`weeklyHeadline`), the call.
+    assert.match(html, /Share the persisted call exactly\./);
+    assert.doesNotMatch(html, /Transmit the committed action\./, "the action is not a second headline");
     // The change condition under its own label, not the resume vocabulary.
     assert.match(html, /Conditions change if: Re-open only from the next committed snapshot\./);
     assert.doesNotMatch(html, /Macro signals.*operating posture/);
@@ -77,7 +78,7 @@ describe("/share current weekly artifact", () => {
     assert.match(fullBrief, /Conditions:/);
     assert.match(fullBrief, /^Guidance: /m);
     assert.match(fullBrief, /Pause if/);
-    assert.match(fullBrief, /Transmit the committed action\./);
+    assert.match(fullBrief, /Share the persisted call exactly\./);
     // The meeting pack carries the Slack brief's per-area lines, resume line included.
     assert.match(textOf("meeting-pack"), /Resume when/);
     assert.match(textOf("meeting-pack"), /Share the persisted call exactly\./);

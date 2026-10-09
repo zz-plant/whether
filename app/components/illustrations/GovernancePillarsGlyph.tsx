@@ -22,11 +22,11 @@ export function GovernancePillarsGlyph({
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       className={`shrink-0 ${className}`}
-      aria-label="Governance pillars emblem"
+      /* Decorative beside the page's own heading: it named itself "Governance
+         Pillars Emblem" to screen readers and in its tooltip. */
+      aria-hidden="true"
       {...props}
     >
-      <title>Governance Pillars Emblem</title>
-      <desc>Structural governance frameworks: capital discipline, board posture, and reversibility</desc>
 
       {/* Base plinth */}
       <rect x="6" y="38" width="36" height="4" rx="1" fill="var(--border-strong)" />

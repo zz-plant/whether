@@ -91,7 +91,7 @@ export default function ApiDocsPage() {
             </pre>
           </div>
           <p className="text-xs text-slate-300">
-            Start with <span className="text-sky-200 font-mono">get_state</span>: one small answer with the conditions and the confidence in them, the data's freshness, each score against its lines with the moves behind it, and the guidance. Every tool only reads:{" "}
+            Start with <span className="text-sky-200 font-mono">get_state</span>: one small answer with the conditions and the margin from their change lines, the data's freshness, each score against its lines with the moves behind it, and the guidance. Every tool only reads:{" "}
             {toolNames.map((name, index) => (
               <Fragment key={name}>
                 {index > 0 ? ", " : ""}
@@ -125,7 +125,7 @@ export default function ApiDocsPage() {
               The compact state to decide from: the answer <code className="font-mono">/api/agent?view=state</code> gives.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_brief">
-              A summary: current conditions, action, confidence, record date. Optional weekly, monthly, quarterly or
+              A summary: current conditions, action, margin (the <code className="font-mono">confidence</code> field), record date. Optional weekly, monthly, quarterly or
               yearly view. The MCP tool of the same name returns the full brief.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_context&amp;regime=DEFENSIVE">
@@ -133,7 +133,7 @@ export default function ApiDocsPage() {
               conditions given it uses today&apos;s.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_projection&amp;regime=DEFENSIVE&amp;tightness=74&amp;riskAppetite=32">
-              Weeks until threshold crossing at a pace you give, or, with no arguments, at today&apos;s scores and pace.
+              Weeks until a score crosses its change line at a pace you give, or, with no arguments, at today&apos;s scores and pace.
               Scenario modeling for agents.
             </Endpoint>
             <Endpoint signature="GET /api/mcp?tool=get_comps">
@@ -169,7 +169,7 @@ export default function ApiDocsPage() {
               tryCta="try_posture_current"
             >
               Stable JSON endpoint for the current guidance. Returns the conditions, funding pressure, direction,
-              confidence, week, summary, url, and version. Type contract at lib/types.ts.
+              margin (<code className="font-mono">confidence</code>), week, summary, url, and version. Type contract at lib/types.ts.
             </Endpoint>
             <Endpoint
               signature="GET /api/agent?view=state"
@@ -177,7 +177,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_agent_state"
             >
-              The state to decide from, about a tenth the size of the full brief: the conditions and the confidence in them, the data's freshness (<code className="font-mono">automation.ready</code>), each score against its pause, resume and change lines with the moves behind it, and the guidance. Weekly only. Check{" "}
+              The state to decide from, about a tenth the size of the full brief: the conditions and the margin from their change lines, the data's freshness (<code className="font-mono">automation.ready</code>), each score against its pause, resume and change lines with the moves behind it, and the guidance. Weekly only. Check{" "}
               <code className="font-mono">automation.ready</code> before acting without a person looking.
             </Endpoint>
             <Endpoint
@@ -256,7 +256,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
               tryCta="try_brief_slack"
             >
-              The week&apos;s guidance preformatted for Slack — action, threshold, reversal condition.
+              The week&apos;s guidance preformatted for Slack — action, pause line, resume line.
               Post it to a channel without reformatting.
             </Endpoint>
             <Endpoint

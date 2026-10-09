@@ -11,24 +11,24 @@ import { SinceLastVisit } from "./components/home/SinceLastVisit";
 import { YourRecordNote } from "./components/home/YourRecordNote";
 import { ActivationTracker } from "./components/activationTracker";
 import { OperatorWorkflowRouteTracker } from "./components/operatorWorkflowRouteTracker";
-import { FirstVisitExplainer } from "./components/homeFirstRunOrientation";
+import { ConditionsLegend } from "./components/home/ConditionsLegend";
 import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
-import { CONFIDENCE_WORD } from "./components/trustStrip";
+import { formatDecisionReversal, formatStripMargin } from "../lib/report/reportFormatting";
 import { isRoute } from "../lib/navigation/routeType";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
   buildV2HeroSignalData,
   type SignalDirection,
 } from "./viewModel";
-import { formatDateUTC } from "../lib/formatters";
+import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
-import { buildChangedLead } from "../lib/report/decisionMovement";
-import { buildCallChangeLine, splitWeeklyCall } from "../lib/report/reportEvidence";
+import { buildChangedLead, describeMovementCause } from "../lib/report/decisionMovement";
+import { buildCallChangeLine } from "../lib/report/reportEvidence";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { DEFAULT_RUNWAY_BAND, runwayBandPhrase } from "../lib/report/operatorRunway";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
@@ -45,9 +45,13 @@ import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
-import { WhatItChangesSection } from "./components/home/WhatItChangesSection";
+import { AllAreaRules } from "./components/home/AllAreaRules";
+import { CompanyCalibration } from "./components/home/CompanyCalibration";
+import { AlertSection } from "./components/home/AlertSection";
+import { RecordSection } from "./components/home/RecordSection";
+import { ActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
-import { DoAndShareSection } from "./components/home/DoAndShareSection";
+import { ShareSection } from "./components/home/ShareSection";
 import { ShareBriefButton } from "./components/shareBriefButton";
 import {
   HOME_DECISION_PARAM,
@@ -200,6 +204,9 @@ async function PageContent({
     ? runwayScopedAdjustment.thresholdEmphasis
     : undefined;
 
+  /* The week by its Monday, as the frozen brief and every share name it. The
+     reading's own date (often a Wednesday) is the trust strip's "Data as of". */
+  const weekOfLabel = `Week of ${formatWeekMondayUTC(reportData.treasury.record_date)}`;
   const asOfDate = timeMachineRequest
     ? resolveHistoricalDate(timeMachineRequest.year, timeMachineRequest.month)
     : null;
@@ -262,6 +269,7 @@ async function PageContent({
    * fallbacks, and a second copy of that is how two surfaces come to state
    * different thresholds for one week. */
   const {
+    headline,
     primaryCall,
     flipConditionLabels,
     guardrailLabel,
@@ -269,10 +277,11 @@ async function PageContent({
     reversalTriggerLabel,
     resumeWhenLabel,
     briefShareLines,
-  } = deriveBriefCallFields(homepage.weeklyDecisionCardModel);
-  /* The card prints the action; the week's direction rides on the stamp line.
-     Copy Brief, the sticky strip and every paste keep the composed call. */
-  const cardCall = splitWeeklyCall(primaryCall);
+  } = deriveBriefCallFields(homepage.weeklyDecisionCardModel, homepage.weeklyCall);
+  /* The card prints the headline action; the week's direction rides on the
+     stamp line. Copy Brief, the sticky strip and every paste print the two as
+     one sentence pair (`headline.composed`). */
+  const cardCall = { action: headline.action, directionLabel: headline.directionLabel };
 
   /* The change line in the market's units, line by line in the order the
      "Conditions change if" sentence names them; none on a held week, whose
@@ -402,10 +411,21 @@ async function PageContent({
         previousRegime: previousRegime && isRegimeKey(previousRegime) ? previousRegime : null,
         currentScores: { tightness, riskAppetite },
       });
-  /* The first-visit fold applies to the live weekly brief only. An archived
-     month or a monthly horizon was reached by choosing it, which is not a
-     first-time reader's arrival. */
-  const offersFirstVisitFold = !historicalSelection && activeCadence === "weekly";
+  /* The verdict's one line on why: the lines the scores crossed since the
+     earlier reading ("Risk appetite fell through 54."), or that none was.
+     Nothing on a week with no comparison, which the stamp line already says. */
+  const whyLine = decisionMovement ? describeMovementCause(decisionMovement) : undefined;
+  /* Whose lines these are: the stage and runway the reader chose, or the
+     defaults, said once, at the head of the areas. */
+  const calibrationChosen = Boolean(data.operatorContext.companyStage || data.operatorContext.companyRunway);
+  const stageLabel = operatorStageLabel(operatorStageForVariantMode(activeStage));
+  /* A chosen stage's own action, as a stage line; the headline stays the
+     week's, which is the same for every reader. */
+  const stageAction = calibrationChosen && !homepage.weeklyCall.policyOverrideActive
+    ? homepage.weeklyCall.stageScopedAdjustments?.[activeStage]?.actionNow
+    : undefined;
+  /* The guidance's resume line: the lead area's, as /trust and every paste print it. */
+  const leadResumeCondition = homepage.weeklyDecisionCardModel.decision.actionStripItems?.[0]?.reversalCondition;
   const decisionPickerOptions: DecisionPickerOption[] = decisionAreaOrder.flatMap((area) => {
     const row = homeAreaRows.find((candidate) => candidate.area === area);
     if (!row) return [];
@@ -504,9 +524,10 @@ async function PageContent({
           <PublishedCallWatcher
             rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
           />
-          <FirstVisitExplainer
+          <ConditionsLegend
             arrival={arrivedFromShare ? "share" : undefined}
             currentRegime={historicalSelection ? undefined : regime}
+            thresholds={reportData.assessment.thresholds}
           />
           {/* Browse the week before the call. Horizon and confidence details
               follow the call beside Copy Brief, so wrapping controls cannot
@@ -532,7 +553,7 @@ async function PageContent({
                     filtered chart, not a filtered calendar. Passing the aligned
                     series here removed every period after the archived month. */}
                 <TimeMachineCalendarPicker
-                  currentDateLabel={cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}
+                  currentDateLabel={cadenceTitle ?? weekOfLabel}
                   isHistorical={Boolean(historicalSelection)}
                   history={regimeHistory}
                 />
@@ -565,11 +586,12 @@ async function PageContent({
             {/* Tier 1, and nothing else: the weather word, the call, and the
                 trust strip. Every other question the reader asks is a section
                 of its own below, in the order they ask them. */}
-            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating guidance" className="order-1 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating guidance" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
               {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
               <DecisionHero
                 titleLevel={cadenceCall ? "h2" : "h1"}
                 weeklyCall={cardCall.action}
+                callDetail={historicalSelection ? undefined : whyLine}
                 regime={regime}
                 direction={historicalSelection ? undefined : cardCall.directionLabel}
                 earlier={earlierConditions}
@@ -592,7 +614,7 @@ async function PageContent({
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
                 trust={historicalSelection ? null : trustStripProps}
-                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? "Week of " + homepage.reportShell.recordDateLabel}` : undefined}
+                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? weekOfLabel}` : undefined}
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
                   today; combining it with an archived regime would date the
@@ -624,10 +646,7 @@ async function PageContent({
                   first visit it folds with the brief: on a phone it pushed the
                   decision picker under the tab bar, and that question is the
                   one thing a first visit is asked. */}
-              <div
-                data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined}
-                className="mt-4 flex flex-wrap items-center gap-2"
-              >
+              <div className="mt-4 flex flex-wrap items-center gap-2">
                 <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
                 {/* Labelled: three bare words beside Copy Brief did not say they
                     set the horizon the guidance is stated for. The confidence chip
@@ -639,30 +658,63 @@ async function PageContent({
               </div>
             </div>
 
-            {offersFirstVisitFold ? (
-              <DecisionPicker
-                options={decisionPickerOptions}
-                initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM])}
-                regime={regime}
-                scores={{ tightness, riskAppetite }}
-                flipCondition={reversalTriggerLabel}
-                lastTime={lastTimeCallChanged ? { record: lastTimeCallChanged, callChangeLines } : undefined}
-                turningPoints={turningPoints}
-                calibration={{
-                  stageLabel: operatorStageLabel(operatorStageForVariantMode(activeStage)),
-                  runwayPhrase: runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND),
-                  chosen: Boolean(data.operatorContext.companyStage || data.operatorContext.companyRunway),
-                }}
+            {/* 2. Whose lines these are. Live weekly brief only: the profile holds
+                the reader's company as of today, and an archived week or a longer
+                horizon was reached by choosing it. */}
+            {!historicalSelection && activeCadence === "weekly" ? (
+              <CompanyCalibration
+                stageLabel={stageLabel}
+                runwayPhrase={runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}
+                chosen={calibrationChosen}
+                activeStage={activeStage}
+                activeRunway={activeRunway}
+                runwayEmphasis={runwayEmphasis}
+                stageAction={stageAction}
               />
             ) : null}
 
-            {/* Sections 2 to 5, folded on a first visit behind the picker above.
-                `contents` keeps each section a flex item of the column, so the
-                phone and desktop `order-*` classes below still apply. */}
-            <div data-first-visit-collapsible={offersFirstVisitFold ? "true" : undefined} className="contents">
-            {/* 2. What changed. One table, every signal, each against the earlier
-                reading and against its own lines — the four signals used to be
-                drawn twice on this page, in the hero and again beside the actions. */}
+            {/* 3. The five areas: the picker, all five side by side folded under it,
+                and the one plan link. */}
+            <DecisionPicker
+              options={decisionPickerOptions}
+              initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM])}
+              regime={regime}
+              scores={{ tightness, riskAppetite }}
+            >
+              <AllAreaRules
+                rows={homeAreaRows}
+                regime={regime}
+                planHref={isRoute(operateHref) ? operateHref : "/operate"}
+                isHistorical={Boolean(historicalSelection)}
+              />
+              <div>
+                <ActionLink href={operateHref} variant="primary">
+                  {cadenceCall?.planLabel ?? "Build this week’s plan →"}
+                </ActionLink>
+              </div>
+            </DecisionPicker>
+
+            {/* 4. What would change the guidance: its pause and resume lines, the
+                line where conditions change, and where the reading sits. */}
+            <WhatWouldChangeSection
+              ladders={scoreLadders}
+              flipProximity={v2HeroSignalData.flipProximity}
+              reversalTrigger={reversalTriggerLabel}
+              resumeWhen={resumeWhenLabel}
+              guardrail={guardrailLabel}
+              leadResume={leadResumeCondition ? formatDecisionReversal(leadResumeCondition) : undefined}
+              flipConditions={flipConditionLabels}
+              callChangeLines={callChangeLines}
+              regime={regime}
+              conditionsTrail={conditionsTrail}
+            />
+
+            {/* 5. The alert: hearing the day a line is crossed is how the page is
+                meant to be used, so it follows the lines it watches. */}
+            <AlertSection />
+
+            {/* 6. What changed. One table, every signal, each against the earlier
+                reading and against its own lines. */}
             <WhatChangedSection
               rows={signalChangeRows}
               lead={movementSentence}
@@ -670,43 +722,14 @@ async function PageContent({
               basis={basis}
             />
 
-            {/* 3. What that changes, by area. On a phone this renders before the
-                signals: the Monday reader is checking whether to act, not why. */}
-            <WhatItChangesSection
-              rows={homeAreaRows}
-              regime={regime}
-              activeStage={activeStage}
-              activeRunway={activeRunway}
-              runwayEmphasis={runwayEmphasis}
-              planHref={isRoute(operateHref) ? operateHref : "/operate"}
-              isHistorical={Boolean(historicalSelection)}
-            />
+            {/* 7. Has this happened before? */}
+            <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} />
 
-            {/* 4. What would change the guidance: the two ladders with their three
-                lines and the earlier reading’s dot, each line of "Conditions change
-                if" in interest-rate terms under it, and — only on a week the call
-                moved — what happened the last time it moved this way. */}
-            <WhatWouldChangeSection
-              ladders={scoreLadders}
-              flipProximity={v2HeroSignalData.flipProximity}
-              reversalTrigger={reversalTriggerLabel}
-              resumeWhen={resumeWhenLabel}
-              guardrail={guardrailLabel}
-              flipConditions={flipConditionLabels}
-              lastTime={lastTimeCallChanged}
-              callChangeLines={callChangeLines}
-              regime={regime}
-              conditionsTrail={conditionsTrail}
-            />
-
-            {/* 5. Do and share, including the one conversion on the page. */}
-            <DoAndShareSection
-              operateHref={operateHref}
-              planLabel={cadenceCall?.planLabel}
+            {/* 8. Share. */}
+            <ShareSection
               currentRecordDate={reportData.treasury.record_date}
               currentRecordDateLabel={homepage.reportShell.recordDateLabel}
             />
-            </div>
         </div>
       </div>
 
@@ -731,7 +754,7 @@ async function PageContent({
         call={primaryCall}
         direction={signalDirection}
         weatherWord={publicRegimeLabel}
-        confidenceWord={CONFIDENCE_WORD[confidenceLabel ?? "HIGH"]}
+        marginLabel={formatStripMargin(confidenceLabel ?? "HIGH", trustStripProps.margin?.points)}
         shareLines={briefShareLines}
       />
     </Shell>

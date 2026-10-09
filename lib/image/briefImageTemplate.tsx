@@ -2,7 +2,7 @@ import type { CSSProperties, ReactElement } from "react";
 import type { ScoreReadingParts } from "../export/scoreReference";
 import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
 import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
-import { formatConfidenceChipLabel } from "../report/reportFormatting";
+import { formatMarginBand } from "../report/reportFormatting";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "./ogFonts";
 import { OG_ACCENT, OG_BG, OG_BORDER, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
 import { SANS_EM, DISPLAY_EM, fitLines, wrappedLines } from "./textFit";
@@ -161,7 +161,7 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
      The colour keys off the raw code, which is what the engine stores; only
      the words a reader sees change. */
   const confidenceColour = confidenceColor(props.confidenceLabel);
-  const confidenceBadge = toImageSafeText(formatConfidenceChipLabel(props.confidenceLabel)).toUpperCase();
+  const confidenceBadge = toImageSafeText(formatMarginBand(props.confidenceLabel)).toUpperCase();
   const source = sourceLabel ? `Source: ${fitLines(sourceLabel, 22, SOURCE_WIDTH, SANS_EM, 1)}` : "";
   const context = contextLabel ? fitLines(contextLabel, 22, CONTEXT_WIDTH, SANS_EM, 1) : "";
 

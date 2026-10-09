@@ -1,9 +1,7 @@
 import { HomeSection } from "./HomeSection";
-import { LastTimeCallChangedCard } from "./LastTimeCallChangedCard";
 import { BoundedValue } from "../ui/boundedValue";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/homeSectionModel";
-import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 import { RegimeRadar } from "./RegimeRadar";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
@@ -20,9 +18,14 @@ type HomeScoreLadder = {
 type FlipProximityLine = { axis: "tightness" | "riskAppetite"; sentence: string };
 
 /**
- * Distance to the call changing: both scores as one point among the four
- * conditions, the line that changes them in the same points the ladders use,
- * and — on a week the call changed — the last time it did.
+ * What would change this guidance, fourth on the page (2026-10-09): the pause
+ * line and the resume line the guidance turns on, the line where conditions
+ * themselves change, and both scores as one point among the four conditions.
+ * The pause line printed here only on a read that drew no ladders, so a reader
+ * met "Conditions change if" and the stage's resume line and had to find the
+ * pause line in the area table; it leads now. The last time conditions changed
+ * is "Has this happened before?" further down, and the email link that closed
+ * this section is the alert section directly under it.
  *
  * The two score ladders are not redrawn here. "What changed" draws each score
  * on its ladder with all three lines and the earlier reading's dot, and this
@@ -55,8 +58,8 @@ export function WhatWouldChangeSection({
   reversalTrigger,
   resumeWhen,
   guardrail,
+  leadResume,
   flipConditions,
-  lastTime,
   callChangeLines,
   regime,
   conditionsTrail,
@@ -66,9 +69,11 @@ export function WhatWouldChangeSection({
   reversalTrigger?: string;
   /** The selected stage's discipline for lifting its hold. Beside the call-change line, never in it. */
   resumeWhen?: string;
+  /** The guidance's pause line: the lead area's, as the brief and every paste print it. */
   guardrail?: string;
+  /** The lead area's resume line, where no stage set one of its own. */
+  leadResume?: string;
   flipConditions?: readonly string[];
-  lastTime: LastTimeCallChanged | null;
   callChangeLines: { tightness: number; riskAppetite: number };
   regime?: string;
   /** The month-end path, its domain and its like-for-like note; when passed, the card above draws the quadrant from `md` up. */
@@ -92,19 +97,20 @@ export function WhatWouldChangeSection({
   const marketMoves = ladders.flatMap((ladder) =>
     flipProximity.filter((line) => line.axis === ladder.metric).map((line) => ({ ...line, label: ladder.label })),
   );
-  /* Without ladders (a read that drew none) the pause line and the watch list
-     have nowhere else on the page, so they print here. */
+  /* The pause and resume lines first, then where conditions change. The watch
+     list prints only on a read that drew no ladders, which have nowhere else. */
+  const resumeLine = resumeWhen ?? leadResume;
   const statements = [
-    ...(guardrail && ladders.length === 0 ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: guardrail }] : []),
+    ...(guardrail ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: guardrail }] : []),
+    ...(resumeLine ? [{ label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: resumeLine }] : []),
     ...(reversalTrigger ? [{ label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: reversalTrigger }] : []),
-    ...(resumeWhen ? [{ label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: resumeWhen }] : []),
     ...(flipConditions && flipConditions.length > 0 && ladders.length === 0
       ? [{ label: DECISION_CONTRACT_LABELS.watch.watchThisWeek, value: flipConditions.join(" · ") }]
       : []),
   ];
 
   return (
-    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading} className="order-4">
+    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading}>
       <div
         className={
           ladders.length === 0
@@ -152,16 +158,8 @@ export function WhatWouldChangeSection({
               </ul>
             </details>
           ) : null}
-          <a
-            href="#subscribe"
-            className="weather-hit text-fluid-xs text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
-          >
-            Get an email the day a line is crossed
-          </a>
         </div>
       </div>
-
-      {lastTime ? <LastTimeCallChangedCard record={lastTime} callChangeLines={callChangeLines} /> : null}
     </HomeSection>
   );
 }

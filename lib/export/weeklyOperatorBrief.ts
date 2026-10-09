@@ -1,5 +1,5 @@
 import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../report/reportCopy";
-import { formatExportConfidence, pauseConditionOnly } from "./exportTerms";
+import { formatDocumentMargin, pauseConditionOnly } from "./exportTerms";
 import type { BriefDocument } from "../report/briefArtifact";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import { formatGuidance } from "./briefBuilders";
@@ -77,7 +77,7 @@ export const buildWeeklyOperatorBriefPayload = (
     conditions: document.conditions.line,
     /* The published band, which the document resolved from the reading. This
        took an optional label and fell back to a sentence with no band in it. */
-    confidence: formatExportConfidence(document.confidence),
+    confidence: formatDocumentMargin(document),
     currentCall: slots.currentCall,
     actionNow: slots.actionNow,
     pauseIf: slots.pauseIf,

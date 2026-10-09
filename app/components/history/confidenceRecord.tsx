@@ -13,8 +13,8 @@ import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
  * /trust explains how the number is computed. This says whether it has
  * predicted anything, which until now nothing on the site did — and the
  * honest answer is that it has not, in the sense its name implies. Published as
- * a count of months rather than folded back into the number, because six regime
- * flips in fourteen years cannot support re-fitting it, and a curve fitted to
+ * a count of months rather than folded back into the number, because seven changes
+ * in conditions since 2012 cannot support re-fitting it, and a curve fitted to
  * the base rate would report ~97% for every week and discriminate nothing.
  *
  * Two surfaces draw it. /calibration is the study's own URL and wraps the body
@@ -25,7 +25,8 @@ import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
  * drift into two tables of the same thing.
  */
 
-export const CONFIDENCE_RECORD_TITLE = "What the confidence number has been worth";
+/* The margin is what the API calls `confidence` (2026-10-09); the study grades it under its display name. */
+export const CONFIDENCE_RECORD_TITLE = "What the margin has been worth";
 
 const percentFormat = (value: number) => `${Math.round(value)}%`;
 
@@ -61,11 +62,11 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
   return (
     <div className="space-y-3">
       <p className="text-sm text-slate-200">
-        Across {totals.months} month-end readings, conditions were the same the following month{" "}
-        {totals.held} times, or {percentFormat(baseRate)}. Every band below held more often than the
-        percent those months reported, and the two least-confident bands run in the wrong order —
-        so the number is a distance, not a probability. It says how much room there is before
-        the line where conditions change; the count beside it says how often that room mattered.
+        Across {totals.months} month-to-month comparisons, conditions were the same the following
+        month {totals.held} times, or {percentFormat(baseRate)}. Every band below held more often
+        than the percent published for it, and the two closest bands run in the wrong order — so
+        the margin is a distance, not a probability. It says how much room there is before the line
+        where conditions change; the count beside it says how often that room mattered.
       </p>
 
       <table className="w-full text-sm text-slate-200">
@@ -75,7 +76,7 @@ export function ConfidenceRecordBody({ includeCallChangeRule = false }: { includ
         <thead>
           <tr className="type-eyebrow text-slate-400">
             <th scope="col" className="py-1 text-left font-normal">Points from the line</th>
-            <th scope="col" className="py-1 pl-3 text-right font-normal">Reported</th>
+            <th scope="col" className="py-1 pl-3 text-right font-normal">Published %</th>
             <th scope="col" className="py-1 pl-3 text-right font-normal">Held</th>
             <th scope="col" className="py-1 pl-3 text-right font-normal">Months</th>
           </tr>
@@ -146,7 +147,7 @@ export function ConfidenceRecordSection() {
     <ReportSection
       id="confidence-record"
       title={CONFIDENCE_RECORD_TITLE}
-      description="The percent measures how far the scores sit from the line where conditions change. This is what readings at that distance actually did."
+      description="The margin measures how far the scores sit from the line where conditions change. This is what readings at that distance actually did."
     >
       <ConfidenceRecordBody includeCallChangeRule />
     </ReportSection>

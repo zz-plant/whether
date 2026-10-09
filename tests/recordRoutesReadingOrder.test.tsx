@@ -40,7 +40,7 @@ describe("/history leads with the record's answer", () => {
 
     const strip = headings.indexOf("Conditions by month");
     const record = headings.indexOf("Track record");
-    const confidence = headings.indexOf("What the confidence number has been worth");
+    const confidence = headings.indexOf("What the margin has been worth");
     const map = headings.indexOf("How the two scores set conditions");
     const table = headings.indexOf("Monthly readings");
     const briefs = headings.indexOf("Published weekly briefs");
@@ -133,7 +133,7 @@ describe("/trust carries one trust strip", () => {
     // The sub-tab row names /trust as the current page (aria-current); the strip itself must not link here.
     const withoutTabs = html.replace(/<nav[^>]*data-section-tabs[\s\S]*?<\/nav>/, "");
     assert.doesNotMatch(withoutTabs, /href="\/trust"/, "on /trust the strip carries no link to itself");
-    for (const cell of ["As of", "Sources", "Confidence", "Could change next week"]) assert.match(html, new RegExp(cell));
+    for (const cell of ["Data as of", "Sources", "Margin", "Could change next week"]) assert.match(html, new RegExp(cell));
   });
 
   it("draws where the score sits as two ladders at the top of the formula section", async () => {

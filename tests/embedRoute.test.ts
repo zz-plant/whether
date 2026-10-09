@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { formatGuidance } from "../lib/export/briefBuilders";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
 import { buildBriefEmbedData, buildBriefEmbedHtml, buildBriefEmbedText, buildWhetherBriefUrl } from "../app/api/embed/route";
@@ -159,9 +160,11 @@ describe("the embed says what the brief says", () => {
     const data = buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: null });
     const text = buildBriefEmbedText(data);
 
-    /* The do-now line first, then the stance, under "Guidance" — as the Slack
-       post and brief.md print it — not "Operating guidance" / "Decision now". */
-    assert.match(text, new RegExp(`^Guidance: ${data.actionNow.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`, "m"));
+    /* The week's one headline action under "Guidance", as the Slack post and
+       brief.md print it — not "Operating guidance" / "Decision now". */
+    const guidance = formatGuidance({ actionNow: data.actionNow, currentCall: data.operatingCall, policyOverrideActive: data.policyOverrideActive });
+    assert.ok(text.split("\n").includes(`Guidance: ${guidance}`), text);
+    assert.match(text, /^- Hiring: /m, "the area lines name their areas");
     for (const output of [text, buildBriefEmbedHtml(data)]) {
       assert.doesNotMatch(output, /Operating guidance|Decision now/);
     }
@@ -176,13 +179,13 @@ describe("the embed says what the brief says", () => {
     assert.ok(change >= 0 && resume > change, text);
   });
 
-  it("names the conditions and the confidence in the reader's words, dated by the reading", async () => {
+  it("names the conditions and the margin in the reader's words, dated by the reading", async () => {
     const data = buildBriefEmbedData(await assembleFreezingWeek(), { ticker: "", ref: "embed", companyStage: null });
     const text = buildBriefEmbedText(data);
     const html = buildBriefEmbedHtml(data);
 
-    assert.match(text, /^Conditions: Freezing • (High|Medium|Low) confidence • As of 2026-10-05$/m);
-    assert.match(html, /Freezing · (High|Medium|Low) confidence · As of 2026-10-05/);
+    assert.match(text, /^Conditions: Freezing • Margin: (clear of the line|within reach of the line|close to the line) • Data as of 2026-10-05$/m);
+    assert.match(html, /Freezing · Margin: (clear of the line|within reach of the line|close to the line) · Data as of 2026-10-05/);
     for (const output of [text, html, JSON.stringify(data)]) {
       assert.doesNotMatch(output, /\b(HIGH|MED|MEDIUM|LOW)\b/);
       assert.doesNotMatch(output, /Regime:/);

@@ -136,7 +136,6 @@ describe("the homepage's changed-signals table", () => {
           },
         ]}
         flipProximity={[{ axis: "tightness", sentence: "If the 1-month bill rate falls 0.15%, conditions turn Stormy." }]}
-        lastTime={null}
         callChangeLines={{ tightness: 70, riskAppetite: 50 }}
       />,
     );

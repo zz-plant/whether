@@ -100,4 +100,15 @@ describe("homepage heading contract", () => {
     assert.match(page, /<CadenceCallCard model=\{cadenceCall\} titleLevel="h1" \/>/);
     assert.match(page, /titleLevel=\{cadenceCall \? "h2" : "h1"\}/);
   });
+
+  /* The week picker printed "Week of Oct 7, 2026" as an h2 above the h1 (site review,
+     2026-10-09), so the outline opened on a date. Every heading the route mounts
+     above the sections is the verdict now, and the sections are h2s under it. */
+  it("puts no heading above the verdict: the week picker and the legend are labels", () => {
+    const picker = readFileSync("app/components/TimeMachineCalendarPicker.tsx", "utf8");
+    const legend = readFileSync("app/components/home/ConditionsLegend.tsx", "utf8");
+    assert.doesNotMatch(picker, /<h[1-6]\b/, "the week label is not a heading");
+    assert.doesNotMatch(legend, /<h[1-6]\b|<details/, "the legend is one line, with no heading or fold");
+    assert.match(page, /currentDateLabel=\{cadenceTitle \?\? weekOfLabel\}/, "the week is named by its Monday");
+  });
 });

@@ -4,6 +4,7 @@ import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../l
 import { regimeSignalLabel } from "../lib/report/signalTranslations";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { joinSentences } from "../lib/report/reportFormatting";
+import { weeklyHeadline } from "../lib/report/reportEvidence";
 
 import { assessment, fixtureBriefDocument, fixtureWeeklyCall } from "./factories/exportFixtures";
 
@@ -18,12 +19,13 @@ describe("buildSlackBrief", () => {
     const weeklyCall = fixtureWeeklyCall();
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall }));
 
-    /* The guidance opens on the do-now line the homepage, the email and the
-       /share post lead with, and the stance follows it. The two used to print
-       under "Guidance" and "Do now", so "Guidance:" meant a different sentence
-       here than in every other paste. */
-    assert.equal(slot(brief, "Guidance"), joinSentences(weeklyCall.actionNow, weeklyCall.currentCall));
-    assert.ok(slot(brief, "Guidance").startsWith(weeklyCall.actionNow));
+    /* The guidance is the week's one headline action (`weeklyHeadline`): the
+       call, which the homepage h1, the email and the /share post lead with too.
+       The action printed first until 2026-10-09, so one paste carried two
+       instructions for the week. */
+    assert.equal(slot(brief, "Guidance"), joinSentences(weeklyHeadline(weeklyCall).composed));
+    assert.ok(slot(brief, "Guidance").endsWith(weeklyCall.currentCall));
+    assert.ok(!slot(brief, "Guidance").includes(weeklyCall.actionNow), "the action is not a second headline");
     assert.equal(slot(brief, "Do now"), "", "no second slot repeats the guidance");
     assert.equal(slot(brief, "Pause if"), weeklyCall.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), weeklyCall.callChangesIf);
@@ -61,7 +63,7 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall: held }));
     const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
 
-    assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall));
+    assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall), "a held week's action leads");
     assert.equal(slot(brief, "Pause if"), hold.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), hold.callChangesIf);
     assert.equal(slot(brief, "Resume when"), "");
@@ -125,12 +127,12 @@ describe("buildSlackBrief", () => {
     // scale) is High. The fixture's engine code says MEDIUM, and neither that
     // code nor its band reaches a paste any more.
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /^• High confidence$/m);
+    assert.match(brief, /^• Margin: clear of the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/m);
     assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
-    /* The contract's sentence, which reads the confidence: this High week is
+    /* The contract's sentence, which reads the margin: this clear week is
        not told it sits near a line. */
     assert.doesNotMatch(brief, /The scores sit near a line/);
-    assert.match(brief, /• Even at high confidence, individual signals can reverse/);
+    assert.match(brief, /• The scores are clear of the change lines, but a signal can still reverse/);
   });
 
   it("carries each area's timing line into the per-area rows", () => {
@@ -204,7 +206,7 @@ describe("buildCallCitation", () => {
     const citation = buildCallCitation(fixtureBriefDocument({ weeklyCall: { ...fixtureWeeklyCall(), regimeStage: "Sunny — Late" } }));
 
     assert.match(citation, /^Conditions: Sunny — Late \(money is cheap and available\)$/m);
-    assert.match(citation, /^High confidence \(how far the scores sit/m);
+    assert.match(citation, /^Margin: clear of the line \(how far the scores sit/m);
     assert.match(citation, /^Source note: https:\/\/fred\.stlouisfed\.org$/m);
     assert.match(citation, /^Full brief: https?:\/\//m);
     assert.doesNotMatch(citation, /EXPANSION|refresh cadence|Score-based/, "the citation is for a reader, not the engine");

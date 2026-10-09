@@ -41,7 +41,7 @@ export const isoWeekSlug = (date) => {
  * app/layout.tsx), so the page renders light from the first frame. `returning` seeds the
  * week this browser last saw (`activationLastWeekStorageKey` in lib/activationFunnel.ts) as
  * last week's slug — the gap of a weekly returner — so `/` renders the returning reader's
- * page instead of the first-visit fold.
+ * page, without the conditions legend.
  */
 export const captureStorageSeeds = ({ theme, visitor, now = Date.now() }) => [
   ...(theme === "light" ? [[THEME_STORAGE_KEY, "light"]] : []),

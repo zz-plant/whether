@@ -33,12 +33,12 @@ describe("decision transmission copy contract", () => {
     assert.doesNotMatch(description, /forecast/i);
   });
 
-  it("keeps export briefs explicit about action now, confidence, and change-course conditions", () => {
+  it("keeps export briefs explicit about action now, the margin, and change-course conditions", () => {
     const brief = buildSlackBrief(fixtureBriefDocument({ reading: assessment }));
 
     assert.match(brief, /• Guidance:/);
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /• (High|Medium|Low) confidence/);
+    assert.match(brief, /• Margin: (clear of|within reach of|close to) the line/);
     assert.match(brief, /• What would show it: "Conditions change if" above/);
     assert.match(brief, /• Resume when:/);
     assert.match(brief, /• Conditions change if:/);

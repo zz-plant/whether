@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { formatWeekMondayUTC } from "../../lib/formatters";
 import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
@@ -27,6 +28,7 @@ import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../../lib/siteUrl";
 import { buildMeetingSnippet } from "../../lib/report/trustStatus";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { utilityLinks } from "../../lib/navigation/informationArchitecture";
 
 export const runtime = "edge";
@@ -126,7 +128,7 @@ const buildCurrentShareArtifact = async () => {
     areaRows.map((row) => ({ area: row.area, rule: row.rule, pause: row.pause?.line, resume: row.resume?.line })),
   );
   /* The status block /trust offered as "Meeting snippet" until 2026-10-08: the
-     reading's dates and confidence, what would change it and what to do now. */
+     reading's dates and margin, what would change it and the week's headline. */
   const meetingSnippet = buildMeetingSnippet({
     statusLabel: reportData.statusLabel,
     recordDateLabel: reportData.recordDateLabel,
@@ -135,7 +137,7 @@ const buildCurrentShareArtifact = async () => {
     isFallbackSnapshot: snapshot.isFallback,
     isHistoricalSelection: Boolean(reportData.historicalSelection),
     flipThreshold: reportData.flipThreshold,
-    actionNow: reportData.actionNowShort,
+    guidance: weeklyHeadline(snapshot.weeklyCall).composed,
   });
   const meetingPack = [
     "WEEKLY BRIEF",
@@ -374,7 +376,9 @@ export default async function SharePage() {
           <div className="max-w-2xl space-y-2">
             {/* The week, where the kicker read "Current weekly artifact" — the
                 product's internal noun for what a reader calls the brief. */}
-            <p className="type-eyebrow type-eyebrow-section">Week of {artifact.recordDateLabel}</p>
+            <p className="type-eyebrow type-eyebrow-section">
+              Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
+            </p>
             <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
             <p className="text-sm leading-relaxed text-white/60">
               Paste it into Slack, a meeting doc, a ticket or a letter. Every format carries the same
@@ -405,7 +409,7 @@ export default async function SharePage() {
             script or a feed reader. The API page was a header menu item of its
             own until 2026-10-08. */}
         <nav aria-labelledby="share-elsewhere-heading" className="weather-panel weather-section-stack p-0">
-          <h2 id="share-elsewhere-heading" className="text-lg font-semibold text-white/90">API, MCP and RSS</h2>
+          <h2 id="share-elsewhere-heading" className="text-lg font-semibold text-white/90">For agents, scripts and feed readers</h2>
           <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
             {apiLink ? (
               <li>

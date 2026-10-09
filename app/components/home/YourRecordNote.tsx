@@ -45,7 +45,7 @@ export function RecordNote({ view }: { view: DecisionRecordView }) {
           </span>
         ) : null}
         <span>
-          <span className="font-semibold text-slate-100">Your record:</span> {view.headline}
+          <span className="font-semibold text-slate-100">Your decisions:</span> {view.headline}
         </span>
       </div>
       <Link

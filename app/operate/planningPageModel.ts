@@ -299,7 +299,7 @@ export async function buildPlanningPageModel(
                 // Resolve's direct answers live on Guides since 2026-10-08, grouped
                 // by decision area with this week's standing beside each.
                 h("p", { className: "text-xs leading-5 text-slate-400" },
-                  "Common decisions have direct answers on ",
+                  "The most common decisions each have an answer, with where it stands this week, on ",
                   h("a", { href: "/resources#answers", className: "font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200" }, "Guides"),
                   ".",
                 ),
@@ -360,7 +360,7 @@ export async function buildPlanningPageModel(
             : null,
         ),
         failureModes.length === 0
-          ? h("p", { className: "text-sm text-slate-200" }, "No warning this week. Keep the rules above; look again if the data goes stale or confidence drops.")
+          ? h("p", { className: "text-sm text-slate-200" }, "No warning this week. Keep the rules above; look again if the data goes stale or a score nears its change line.")
           /* Rule segments inside the section, like the Stop and Start lists: the
              data tier, no lift of their own (§XIII, §XIV). */
           : h("ul", { className: "grid gap-3 lg:grid-cols-2" },

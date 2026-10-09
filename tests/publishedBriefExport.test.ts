@@ -173,13 +173,17 @@ describe("published brief date-pinned exports", () => {
     const slack = buildPublishedBriefSlackUpdate(july30Brief);
 
     assert.match(slack, /Whether Weekly Brief — Jul 30, 2026/);
-    assert.match(slack, /Conditions: (Sunny|Cloudy|Stormy|Freezing) \(medium confidence\)/);
+    assert.match(slack, /Conditions: (Sunny|Cloudy|Stormy|Freezing) \(margin: within reach of the line\)/);
     /* The stored sentences, as the display layer restates them (`publishedBriefDisplay`):
        no "+1.2" in no unit, no "flips this call", no stop-item under "Pause if". */
-    assert.match(slack, /• What changed: Conditions tightened\. This record does not name the earlier reading it compared with\./);
-    assert.match(slack, /• Guidance: Keep expansion selective/);
-    assert.match(slack, /• Do now: Conditions tightening — freeze new commitments and keep spend flexible\./);
-    assert.match(slack, /This week's decision \(Guidance \/ Do now \/ Conditions change if\):/);
+    assert.match(slack, /^What changed: Conditions tightened\. This record does not name the earlier reading it compared with\./m);
+    /* One headline (`publishedBriefHeadline`): the stored call, opened by the stored
+       action's direction. The action printed under "Do now" and the call again
+       under "Summary" until 2026-10-09. */
+    assert.match(slack, /^• Guidance: Conditions are tightening\. Keep expansion selective/m);
+    assert.doesNotMatch(slack, /^• Do now:|^Summary:/m);
+    assert.doesNotMatch(slack, /freeze new commitments and keep spend flexible/, "the stored action is not a second headline");
+    assert.match(slack, /This week's decision \(Guidance \/ Conditions change if\):/);
     assert.doesNotMatch(slack, /Over-engineering/);
     assert.match(slack, /• Conditions change if: Funding pressure above 70 \(52 today\) or risk appetite at or below 50 \(58 today\)\./);
     assert.doesNotMatch(slack, /flip|Cash availability|cash availability|Market risk appetite|market risk appetite|\d\.0\b(?!%)/);
@@ -206,12 +210,13 @@ describe("published brief date-pinned exports", () => {
     assert.ok(july30Brief);
     const email = buildPublishedBriefEmailUpdate(july30Brief);
 
-    assert.match(email, /Whether Leadership Update — Week of Jul 30, 2026/);
+    assert.match(email, /Whether Leadership Update — Week of Jul 27, 2026/, "the week by its Monday");
     assert.match(email, /Conditions: (Sunny|Cloudy|Stormy|Freezing)\n/);
-    assert.match(email, /Confidence: Medium confidence/);
-    assert.match(email, /Executive summary: Keep expansion selective/);
+    assert.match(email, /^Margin: within reach of the line$/m);
+    assert.match(email, /^• Guidance: Conditions are tightening\. Keep expansion selective/m);
+    assert.doesNotMatch(email, /Executive summary:|Action now:/);
     assert.match(email, /What changed this week:\nConditions tightened\. This record does not name the earlier reading it compared with\./);
-    assert.match(email, /• Action now: Conditions tightening — freeze new commitments and keep spend flexible\./);
+    assert.doesNotMatch(email, /freeze new commitments and keep spend flexible/, "the stored action is not a second headline");
     assert.ok(!email.includes(`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: Over-engineering`), "a stop-item is not a pause line");
     assert.ok(
       email.includes(`• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: Funding pressure above 70 (52 today) or risk appetite at or below 50 (58 today).`),

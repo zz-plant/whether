@@ -315,9 +315,9 @@ export const resolvePhaseSpan = (raw: string | string[] | undefined) => {
 export const describePhaseGap = (gap: PhaseGap) => {
   const points = `${gap.distance.toLocaleString("en-US")} ${gap.distance === 1 ? "point" : "points"}`;
   if (gap.side === "on") {
-    return `${gap.label} is sitting on its boundary; any move decides between here and ${gap.flipsToLabel}.`;
+    return `${gap.label} is sitting on its change line; any move decides between here and ${gap.flipsToLabel}.`;
   }
   return gap.side === "above"
-    ? `${gap.label} is ${points} above its boundary. Falling back through it alone would read ${gap.flipsToLabel}.`
-    : `${gap.label} is ${points} below its boundary. Rising through it alone would read ${gap.flipsToLabel}.`;
+    ? `${gap.label} is ${points} above its change line. Falling back through it alone would read ${gap.flipsToLabel}.`
+    : `${gap.label} is ${points} below its change line. Rising through it alone would read ${gap.flipsToLabel}.`;
 };

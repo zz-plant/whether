@@ -10,7 +10,8 @@ import {
 import { CopyIcon } from "../../components/uiIcons";
 
 type PublishedBriefCopyControlsProps = {
-  recordDateLabel: string;
+  /** The week as every surface names it, by its Monday. */
+  weekLabel: string;
   slackUpdate: string;
   emailUpdate: string;
   permanentUrl: string;
@@ -19,7 +20,7 @@ type PublishedBriefCopyControlsProps = {
 type ActiveFormat = "slack" | "email";
 
 export function PublishedBriefCopyControls({
-  recordDateLabel,
+  weekLabel,
   slackUpdate,
   emailUpdate,
   permanentUrl,
@@ -49,7 +50,7 @@ export function PublishedBriefCopyControls({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 id="share-brief-title" className="text-lg font-semibold text-slate-100">
-            Share the week of {recordDateLabel}
+            Share the week of {weekLabel}
           </h2>
           <p className="text-xs text-slate-400">
             Copy date-pinned leadership updates into Slack or email.
@@ -115,7 +116,7 @@ export function PublishedBriefCopyControls({
       <div className="space-y-2">
         <div className="flex items-center justify-between text-xs text-slate-400">
           <span>
-            {activeFormat === "slack" ? "Slack preview" : "Email preview"} ({recordDateLabel})
+            {activeFormat === "slack" ? "Slack preview" : "Email preview"} (week of {weekLabel})
           </span>
           <span className="font-mono text-fluid-nano text-slate-500">Date-pinned record</span>
         </div>

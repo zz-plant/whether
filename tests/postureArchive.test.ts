@@ -159,3 +159,32 @@ describe("/history/[period] says what its own split says", () => {
     assert.doesNotMatch(await render("2022-q3"), /for the whole period/);
   });
 });
+
+/*
+ * The year and quarter pages led with "Standing guidance" and "By Kanav Jain" over a
+ * 2012 date, as though written then; the first weekly brief was published in 2026,
+ * and the disclaimer saying so lived only on /history (site review, 2026-10-09).
+ */
+describe("/history/[period] says it is reconstructed", () => {
+  it("states at the top of every year and quarter page that today's formula produced it, and when publication began", async () => {
+    const { postureArchiveStaticParams } = await import("../lib/summary/postureArchive");
+    const { getPublishedBriefs, publishedBriefWeekLabel } = await import("../lib/report/publishedBriefs");
+    const page = await import("../app/history/[period]/page");
+    const oldest = [...getPublishedBriefs()].sort((a, b) => a.recordDate.localeCompare(b.recordDate))[0];
+    assert.ok(oldest, "a published brief exists");
+    const firstWeek = publishedBriefWeekLabel(oldest);
+    for (const { period } of postureArchiveStaticParams) {
+      const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ period }) }));
+      const h1 = html.indexOf("<h1");
+      const notice = html.indexOf("data-reconstructed-notice");
+      assert.ok(h1 !== -1 && notice > h1, `${period}: the notice sits under the title`);
+      assert.ok(notice < html.indexOf("<h2") || html.indexOf("<h2") === -1, `${period}: the notice comes before any section`);
+      const text = html.replace(/<[^>]+>/g, " ").replace(/&#x27;/g, "'").replace(/\s+/g, " ");
+      assert.match(text, /Reconstructed: this is what today's published formula reads for/, period);
+      assert.ok(text.includes(`began publishing weekly briefs in the week of ${firstWeek}`), period);
+      assert.doesNotMatch(text, /Standing guidance:/, `${period}: still reads like guidance written then`);
+      assert.match(text, /Maintained by /, period);
+      assert.doesNotMatch(html, /"datePublished"/, `${period}: structured data claims a publication date in the period`);
+    }
+  });
+});

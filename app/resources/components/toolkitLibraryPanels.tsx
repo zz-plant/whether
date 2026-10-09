@@ -66,7 +66,7 @@ export function ToolkitLibraryPanels({
 
       <div className="flex flex-wrap items-center gap-2 text-xs text-slate-300">
         <span className="rounded-sm border border-slate-700/70 px-3 py-1 font-semibold">
-          {filteredToolkits.length} result{filteredToolkits.length === 1 ? "" : "s"}
+          {`${filteredToolkits.length} ${filteredToolkits.length === 1 ? "result" : "results"}`}
         </span>
         {suggestedToolkitQueries.map((intent) => (
           <Link key={intent} href={buildToolkitLibraryHref(intent)} className="weather-hub-chip">

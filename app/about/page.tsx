@@ -25,6 +25,7 @@ import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCac
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { describeRecordCadence } from "../../lib/report/trackRecordCopy";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { MethodSection } from "./methodSection";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "About Whether",
@@ -87,7 +88,7 @@ export default function AboutPage() {
             track record
           </Link>{" "}
           scores the archive against what happened next, including where it falls short: changes in conditions that
-          came with no warning, and a confidence figure that the{" "}
+          came with no warning, and a margin that the{" "}
           <Link href="/calibration" className={inlineLinkClass}>
             calibration study
           </Link>{" "}
@@ -98,6 +99,8 @@ export default function AboutPage() {
           hand. It is not a macro blog, and not a forecast.
         </p>
       </section>
+
+      <MethodSection />
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Where it fits, and where it does not</h2>

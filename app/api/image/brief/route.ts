@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { weeklyHeadline } from "../../../../lib/report/reportEvidence";
 import { assembleHomePage } from "../../../../lib/report/homePageAssembler";
 import { renderBriefImage, type BriefImageProps } from "../../../../lib/image/briefImageTemplate";
 import { loadOgFonts } from "../../../../lib/image/ogFonts";
@@ -46,6 +47,8 @@ const buildImageContextLabel = (
 
 type BuildBriefImagePayloadInput = {
   weeklyDecisionCardModel: BriefImageHomepage["weeklyDecisionCardModel"];
+  /** The contract the headline is read from (`weeklyHeadline`). */
+  weeklyCall: Pick<BriefImageHomepage["weeklyCall"], "actionNow" | "currentCall">;
   reportShell: Pick<
     BriefImageHomepage["reportShell"],
     "regime" | "recordDateLabel" | "provenance" | "historicalBanner" | "showOfflineBadge"
@@ -65,12 +68,9 @@ export const buildBriefImagePayload = (
   const callChangeLines = model.diagnostics.postureTrajectory?.thresholds;
 
   return {
-    /* The week's action, as the weekly call contract and every paste lead with it
-       (docs/claims-ledger.md). */
-    decision:
-      model.decision.actionNowShort?.trim() ||
-      model.decision.canonicalDecisionCopy?.doNowLines?.[0] ||
-      model.decision.immediateDecision,
+    /* The week's headline action, as the homepage h1 and every paste lead with
+       it (`weeklyHeadline`, docs/claims-ledger.md). */
+    decision: weeklyHeadline(homepage.weeklyCall).action,
     regime: shell.regime,
     /* The derivation `/share` and every paste print: the lines the scores are
        judged against, how far from each, and the earlier reading under its

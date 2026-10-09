@@ -72,7 +72,7 @@ describe("buildWeeklySummary", () => {
     const monthly = buildMonthlySummary({ assessment, provenance, record });
     for (const summary of [weekly, monthly]) {
       assert.equal(summary.confidence, "HIGH");
-      assert.ok(summary.summary.includes("The read is solid"), summary.summary);
+      assert.ok(summary.summary.includes("The scores are clear of the change lines"), summary.summary);
     }
 
     // A fallback reading older than five days drops a step, as on every page
@@ -80,7 +80,7 @@ describe("buildWeeklySummary", () => {
     const staleFallback = { ...record, fallback_at: "2026-09-22T12:00:00.000Z", fallback_reason: "upstream down" };
     const stale = buildWeeklySummary({ assessment, provenance, record: staleFallback });
     assert.equal(stale.confidence, "MEDIUM");
-    assert.ok(stale.summary.includes("The read is workable but not settled"), stale.summary);
+    assert.ok(stale.summary.includes("A score is within reach of its change line"), stale.summary);
   });
 
   /*
@@ -158,7 +158,7 @@ describe("buildWeeklySummary", () => {
     assert.equal(weekly.confidence, "MEDIUM");
     assert.equal(weekly.title, "Weekly action summary — Oct 5, 2026");
     assert.match(weekly.copy, /\nUpdated Oct 5, 2026\n/);
-    assert.match(weekly.copy, /\nConfidence: Medium\n/);
+    assert.match(weekly.copy, /\nMargin: within reach of the line\n/);
     assert.doesNotMatch(weekly.copy, /high confidence|EXPLICIT_KILL_CRITERIA|SLOWER_STRUCTURED|REVERSIBLE_ONLY/);
   });
 

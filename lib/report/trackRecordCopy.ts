@@ -26,3 +26,14 @@ export const describeRecordCadence = (
   `Since ${formatMonthYearShortFromValue(record.firstRecordDate)}, conditions have changed ${record.regimeChanges} ` +
   `${record.regimeChanges === 1 ? "time" : "times"} in ${record.monthsCovered} months, and a month-end reading crossed ` +
   `one of the pause or resume lines in ${record.lineCrossingMonths} of them. Most Mondays, nothing has moved.`;
+
+/**
+ * What a past period's page is, said at its top (2026-10-09). The year and quarter
+ * pages led with "Standing guidance" and "By Kanav Jain" over a 2012 date, which read
+ * as guidance written in 2012; the first weekly brief was published in 2026, and the
+ * disclaimer that said so lived only on /history. `firstPublishedWeek` is the Monday
+ * of the oldest published brief.
+ */
+export const describeReconstructedPeriod = (periodTitle: string, firstPublishedWeek: string): string =>
+  `Reconstructed: this is what today's published formula reads for ${periodTitle}, not guidance published at the time. ` +
+  `Whether began publishing weekly briefs in the week of ${firstPublishedWeek}.`;

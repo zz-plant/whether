@@ -13,9 +13,9 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 
 **Clicks**
 1. Open `/` or click `This week` in the header.
-2. Read the call card: the conditions word, the call, and the trust strip (`As of`, `Sources`, `Confidence`, `Could change next week`).
-3. On a first visit, `How to read this page` above the week title opens the three steps, what each of the four conditions means, and how the change line differs from an area's pause and resume lines. Pick an answer under `What are you deciding?` or click `Show the full brief`. A returning visit opens on the full brief: `What changed this week`, `What that changes for you`, `What would change this guidance`, `Do and share`.
-4. For execution detail, click `Build this week’s plan →` under `Do and share` (the label follows the `Plan horizon` choice), or `Decide` in the header.
+2. Read the verdict card: the conditions word, the week's headline action, one line on why, and the trust strip (`Data as of`, `Sources`, `Margin`, `Could change next week`). The one-line legend above the week says what each of the four conditions means.
+3. Every visit reads the same order: the stage and runway the lines are set for, `What are you deciding?` (pick an area), `What would change this guidance`, `Get an email the day a line is crossed`, `What changed this week`, `Has this happened before?` and `Share`.
+4. For execution detail, click `Build this week’s plan →` under the areas (the label follows the `Plan horizon` choice), or `Decide` in the header.
 
 **Current output**
 - Conditions and the operating call
@@ -28,15 +28,15 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 **JTBD:** When I need to brief leadership or Slack quickly, let me copy a ready-made artifact instead of translating the call myself.
 
 **Clicks**
-1. On `/`, click `Copy Brief` under the call card (on a first visit, after `Show the full brief`). It copies a Slack-formatted brief, or opens the device's share sheet where the browser offers one. The `C` key and `Copy Slack brief` in the command palette press the same button.
-2. Under `Do and share`, click `Share or embed this →`, or `Use it elsewhere` in the header (`/share`).
-3. On `/share`, pick a format from the list (the `Format` select on a phone), then click its copy button: Pick a format from the list (the `Format` select on a phone), then click its copy button:
+1. On `/`, click `Copy Brief` under the verdict card. It copies a Slack-formatted brief, or opens the device's share sheet where the browser offers one. The `C` key and `Copy Slack brief` in the command palette press the same button.
+2. Under `Share`, click `Share or embed this →`, or `Use it elsewhere` in the header (`/share`).
+3. On `/share`, pick a format from the list (the `Format` select on a phone), then click its copy button:
    - Chat: `Copy Slack post`, `Copy full brief`, `Copy standup line`
    - Meetings: `Copy meeting snippet`, `Copy meeting pack`, `Copy agenda`, `Copy slide text`
    - Docs and email: `Copy email`, `Copy investor update`, `Copy portfolio note`, `Copy citation`
    - Tickets and boards: `Copy ticket brief`; `Work-item tags` copies one area at a time (`Copy <area> tag`) and `Pull policies` one policy at a time (`Copy policy`)
    - Team: `Role memos` (`Copy memo`, `Copy checklist`)
-4. On `/share`, the meeting pack and Monday agenda formats add `Add a Monday review to your calendar`. `Files and images for a deck or a thread` copies the slide and the brief card to the clipboard and holds the board slide (`Download PPTX`, `Download PDF`, `Open SVG`) and `Open brief card`. `API, MCP and RSS` links the API page and the feed.
+4. On `/share`, the meeting pack and Monday agenda formats add `Add a Monday review to your calendar`. `Files and images for a deck or a thread` copies the slide and the brief card to the clipboard and holds the board slide (`Download PPTX`, `Download PDF`, `Open SVG`) and `Open brief card`. `For agents, scripts and feed readers` links the API page and the feed.
 5. `Decide` and `/trust` each end on one `Share or embed this →` link to `/share`.
 
 **Current output**
@@ -54,7 +54,7 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 2. Read `What changed` and `What would change this guidance`.
 3. Under `Deeper evidence`, open the question you need, such as `What are interest rates doing?`, `How have the two scores moved this year?` or `What would conditions be with different lines?`.
 4. For provenance, click `How much to trust this week` in the tab row, or `How this is judged` on the call card.
-5. On `/trust`, read `How the scores are built` and `Sources and last update`. In a week with live data and no active warning, `Limits and revisit triggers` folds `Confidence and reliability limits` and `What would make this recommendation wrong?`; in any other week they render open. The citation and the meeting snippet are `/share` formats.
+5. On `/trust`, read `How the scores are built` and `Sources and last update`. In a week with live data and no active warning, `Limits, and what would change the guidance` folds `Margin and reliability limits` and `What would make this recommendation wrong?`; in any other week they render open. The citation and the meeting snippet are `/share` formats.
 
 **Current output**
 - Each signal against its earlier reading and its lines
@@ -152,7 +152,7 @@ The toolkit page's breadcrumb reads `Guides` › `More tools` › the toolkit; `
 **JTBD:** When the base weekly call needs company-specific guardrails or exceptions, carry it into Plan instead of using a separate personalization branch.
 
 **Clicks**
-1. On `/`, set `Stage` and `Cash runway` under `Company calibration` in `What that changes for you`; on a phone, the same two choices sit in the header. The pause and resume lines rescale to them.
+1. On `/`, set `Stage` and `Cash runway` under the verdict, where the page says whose lines these are; on a phone, the same two choices sit in the header. The pause and resume lines rescale to them.
 2. Click `Decide` and enter the company's figures in `Runway planner` (section 6).
 3. On a live week, adjust the lines under `Set this plan's lines` and click `Email me when a line is crossed`.
 4. Copy the result from `/share` (section 2).
@@ -170,8 +170,8 @@ The toolkit page's breadcrumb reads `Guides` › `More tools` › the toolkit; `
 1. Click `Decide` in the header. `Test a decision` is open on arrival. (`/resolve` lands here too.)
 2. Choose `Describe a plan`, `Compare two plans` or `Pick from a list`, then enter the move. The verdict appears once there is a plan to judge.
 3. Read the `Decision verdict`, then click `Copy verdict`, `Copy link` or `Record this decision`.
-4. On `/`, `Test a decision against your runway` under `What that changes for you` tests one commitment in an area against the runway you entered.
-5. For a yes-or-no on a common decision, use `Direct answers` on `Guides` (the step links there).
+4. On `/`, pick an area under `What are you deciding?`, or open `All five areas, side by side`; `Test a decision against your runway` tests one commitment in an area against the runway you entered.
+5. For a yes-or-no on a common decision, use `This week's answers, by area` on `Guides` (the step links there).
 
 **Current output**
 - A verdict on the move and the reasons for it

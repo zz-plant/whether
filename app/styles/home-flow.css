@@ -1,33 +1,16 @@
 
 
-/* The first-visit fold (home/DecisionPicker.tsx). The layout bootstrap
-   sets `data-home-first-visit` before paint from whether this browser has
-   rendered the brief before. Keyed so the default — no attribute, which is a
-   crawler, a reader without scripts, or a failed bootstrap — is the full brief
-   and no picker. */
-html:not([data-home-first-visit="true"]) [data-first-visit-only="true"] {
-  display: none !important;
-}
+/* No first-visit fold since 2026-10-09: the homepage prints one order for every
+   reader (verdict, stage and runway, the areas, what would change them, the alert,
+   the evidence, the record, sharing), so nothing is folded behind a question.
+   The header's `data-first-visit-header-choices` attribute is the navigation's;
+   it is unused here now. */
 
-html[data-home-first-visit="true"] [data-first-visit-collapsible="true"] {
-  display: none !important;
-}
-
-/* The phone header's stage and runway pills (globalHeaderRouteGate.tsx). The
-   header is outside the page, so it cannot carry the page's conditional
-   attribute; `:has` keys it on the picker being on the page, which is the same
-   condition (a live weekly brief). A browser without `:has` keeps the pills. */
-html[data-home-first-visit="true"]:has([data-first-visit-only="true"]) [data-first-visit-header-choices="true"] {
-  display: none !important;
-}
-
-/* The explainer, for a browser that has rendered the brief before. It costs
-   about 150px above the call on every visit, which pushes the card a reader
-   screenshots down the screen; someone returning has read the line. This was
-   phone-only until 2026-09-30, on the view that wider screens could spare the
-   room. The attention pass that day ranked its "How to read this page" row as
-   the most likely click on the desktop homepage for a returning reader, ahead
-   of the call's own controls, so it goes at every width. */
+/* The conditions legend (home/ConditionsLegend.tsx), for a browser that has
+   rendered the brief before: someone returning has read the line, and it sits
+   above the verdict. It hid the longer explainer it replaced for the same
+   reason; the explainer's "How to read this page" row was the most likely click
+   on the desktop homepage for a returning reader (attention pass, 2026-09-30). */
 html[data-home-returning="true"] [data-weather-first-run-orientation="true"] {
   display: none !important;
 }

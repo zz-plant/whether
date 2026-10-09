@@ -13,9 +13,8 @@ import { buildQuietDayRead, type AreaMovementKind, type DecisionMovement } from 
 import type { HomePageAssembly } from "./contracts";
 
 /**
- * The homepage as five sections in the reader's order: the call, what changed,
- * what that changes by area, what would change the call, and what to do and
- * share. Each section is a heading and an id here, and a component under
+ * The homepage's sections in the reader's order (`HOME_SECTIONS` below). Each
+ * section is a heading and an id here, and a component under
  * app/components/home that draws one of them; the route composes them and
  * nothing else on `/` restates a section's content inside another's.
  */
@@ -30,12 +29,24 @@ export const HOME_DECISION_PARAM = "decision";
 export const parseHomeDecision = (value: string | undefined): DecisionArea | undefined =>
   value !== undefined && isDecisionArea(value) ? value : undefined;
 
+/*
+ * The homepage's sections, in the order they print (2026-10-09): the verdict, the
+ * stage and runway it is scaled to, the five areas, what would change the guidance,
+ * the alert, what changed, the record, and sharing. The order follows what a reader
+ * does with the week: act on it, check it fits their company, find their decision,
+ * learn what would move it, ask to hear when it does, then the evidence and the
+ * record. `areas` keeps the id the old "What that changes for you" section had, so
+ * a link to it still lands on the areas.
+ */
 export const HOME_SECTIONS = {
   call: { id: "weekly-call" },
-  changed: { id: "what-changed", heading: "What changed this week" },
-  consequences: { id: "what-it-changes", heading: "What that changes for you" },
+  calibration: { id: "company-calibration" },
+  areas: { id: "what-it-changes", heading: "What are you deciding?" },
   watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
-  act: { id: "do-and-share", heading: "Do and share" },
+  alert: { id: "subscribe", heading: "Get an email the day a line is crossed" },
+  changed: { id: "what-changed", heading: "What changed this week" },
+  record: { id: "has-this-happened-before", heading: "Has this happened before?" },
+  share: { id: "do-and-share", heading: "Share" },
 } as const;
 
 /** The three lines a score is drawn against, as the ladder primitive takes them. */

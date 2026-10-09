@@ -6,7 +6,7 @@ import { AreaTable } from "../app/components/ui/areaTable";
 import * as nextNavigation from "next/navigation";
 import { DecisionHero } from "../app/components/DecisionHero";
 import { ThresholdLadder } from "../app/components/illustrations/ThresholdLadder";
-import { formatConfidenceChipLabel } from "../lib/report/reportFormatting";
+import { formatMarginBand } from "../lib/report/reportFormatting";
 import { parenthesizePointsToLine } from "../lib/report/operatingCalls";
 import { compositeSignalScales } from "../lib/report/signalTranslations";
 
@@ -45,9 +45,9 @@ describe("reader-facing number formatting", () => {
     assert.equal(parenthesizePointsToLine(undefined, "pause", false), "(—)");
   });
 
-  it("states confidence as a word, not an engine code", () => {
-    // Confidence is a cell of the trust strip under the call now, rather than a
-    // chip inside the hero card. The rule is the same: the reader gets the word.
+  it("states the margin in words, not an engine code", () => {
+    // The margin is a cell of the trust strip under the call, where "Confidence"
+    // stood until 2026-10-09. The rule is the same: the reader gets words.
     const html = renderToStaticMarkup(
       <DecisionHero
         regime="DEFENSIVE"
@@ -62,18 +62,18 @@ describe("reader-facing number formatting", () => {
       />,
     );
 
-    assert.ok(html.includes("Medium"), "the strip still prints the raw code");
+    assert.ok(html.includes("Within reach of the line"), "the strip prints the band in words");
     assert.doesNotMatch(html, /\bMED\b/);
   });
 
-  it("passes an unknown confidence value through rather than reshaping it", () => {
+  it("passes an unknown margin value through rather than reshaping it", () => {
     /* The two surfaces that print this hold display strings whose provenance
        the type system has lost. Inventing a word for an unrecognised value
        would be a claim nothing produced. */
-    assert.equal(formatConfidenceChipLabel("MED"), "Medium confidence");
-    assert.equal(formatConfidenceChipLabel("LOW"), "Low confidence");
-    assert.equal(formatConfidenceChipLabel("HIGH"), "High confidence");
-    assert.equal(formatConfidenceChipLabel("Unverified"), "Unverified");
+    assert.equal(formatMarginBand("MED"), "Within reach of the line");
+    assert.equal(formatMarginBand("LOW"), "Close to the line");
+    assert.equal(formatMarginBand("HIGH"), "Clear of the line");
+    assert.equal(formatMarginBand("Unverified"), "Unverified");
   });
 });
 

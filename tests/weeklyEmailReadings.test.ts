@@ -15,18 +15,23 @@ describe("weekly email readings", () => {
     });
     const readings = buildWeeklyEmailReadings(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall));
 
-    assert.deepEqual(readings.map((reading) => reading.label), ["Funding pressure", "Risk appetite", "Confidence"]);
+    assert.deepEqual(readings.map((reading) => reading.label), ["Funding pressure", "Risk appetite", "Margin"]);
     assert.match(readings[0].value, /^\d+\/100$/);
     assert.match(readings[1].value, /^\d+\/100$/);
-    // The band as a word; the engine's code is not for an inbox.
-    assert.match(readings[2].value, /^(High|Medium|Low)$/);
+    // The margin in words and points, under its own label; the engine's code is not for an inbox.
+    assert.equal(readings[2].label, "Margin");
+    assert.match(readings[2].value, /^(clear of|within reach of|close to) the line \((funding pressure|risk appetite) is (\d+ points? from|at) its change line\)$/);
     assert.match(readings[0].meaning ?? "", /^money is /);
     assert.match(readings[1].meaning ?? "", /^investors are /);
   });
 
   it("counts one point as a point", () => {
     const readings = buildWeeklyEmailReadings({
-      readings: { scores: { tightness: 71, riskAppetite: 48 }, vsThreshold: { tightness: 1, riskAppetite: -2 } },
+      readings: {
+        scores: { tightness: 71, riskAppetite: 48 },
+        vsThreshold: { tightness: 1, riskAppetite: -2 },
+        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      },
       confidence: "MED",
     });
 

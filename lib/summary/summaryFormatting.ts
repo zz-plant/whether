@@ -3,10 +3,13 @@ import { resolvePublishedConfidence, type ConfidenceInputs, type ConfidenceRecor
 import { buildWeekCallChangesIf } from "../report/reportEvidence";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 
+/* The margin in a sentence: how far the scores sit from a change line, which is
+   all the band measures (2026-10-09). It read "The read is solid / shaky", a claim
+   about certainty the number never made. */
 const CONFIDENCE_COPY = {
-  HIGH: "The read is solid",
-  MEDIUM: "The read is workable but not settled",
-  LOW: "The read is shaky",
+  HIGH: "The scores are clear of the change lines",
+  MEDIUM: "A score is within reach of its change line",
+  LOW: "A score is close to its change line",
 } as const;
 
 /** The confidence a summary stores and prints, in the archive's LOW / MEDIUM / HIGH spelling. */

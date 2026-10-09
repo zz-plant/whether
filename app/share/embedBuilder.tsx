@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useState } from "react";
-import { locationHashSource, useBrowserSource } from "../components/browserSource";
+import { locationHashSource, useBrowserSource, useHydrated } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
@@ -54,6 +54,7 @@ export function EmbedBuilder() {
      opens for a link that names it — the retired /embed route redirects to
      /share#embed. */
   const openFromLink = useBrowserSource(locationHashSource) === "embed";
+  const hydrated = useHydrated();
 
   return (
     <details className="weather-auto-chevron" open={openFromLink}>
@@ -89,8 +90,10 @@ export function EmbedBuilder() {
             {...(stage ? { "data-whether-stage": stage } : {})}
             style={{ minHeight: "80px" }}
           >
+            {/* Client-side only: the server HTML is what a crawler indexes, and a
+                "Loading…" sentence there is not part of the page. */}
             <div className="px-3 py-3 text-fluid-micro text-slate-400">
-              {`Loading the live brief${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…`}
+              {hydrated ? `Loading the live brief${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…` : null}
             </div>
           </div>
         </div>

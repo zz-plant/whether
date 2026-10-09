@@ -52,18 +52,18 @@ const buildProvenanceBullet = (delta: SummaryDelta["provenance"], rawAgeLabel: s
   const ageLabel = rawAgeLabel.replace(/\.$/, "");
   if (delta.ageDeltaHours === null) {
     const statusSuffix = delta.statusChanged
-      ? `; confidence now ${delta.monthlyStatusLabel}`
+      ? `; data now ${delta.monthlyStatusLabel}`
       : "";
     return `Provenance timestamp ${delta.monthlyTimestampLabel}${statusSuffix}.`;
   }
   if (delta.ageDeltaHours === 0) {
     const statusSuffix = delta.statusChanged
-      ? `; confidence now ${delta.monthlyStatusLabel}`
+      ? `; data now ${delta.monthlyStatusLabel}`
       : "";
     return `Provenance age unchanged at ${ageLabel}${statusSuffix}.`;
   }
   const sign = delta.ageDeltaHours > 0 ? "+" : "";
-  const statusSuffix = delta.statusChanged ? `; confidence now ${delta.monthlyStatusLabel}` : "";
+  const statusSuffix = delta.statusChanged ? `; data now ${delta.monthlyStatusLabel}` : "";
   return `Provenance age ${ageLabel} (Δ ${sign}${delta.ageDeltaHours}h vs weekly)${statusSuffix}.`;
 };
 

@@ -19,7 +19,7 @@ import type { Route } from "./routeType";
 
 export type NavigationGroupKey = "this-week" | "decide" | "record" | "guides";
 
-export type NavigationPageKey =
+type NavigationPageKey =
   | "weekly-brief"
   | "signals"
   | "trust"
@@ -155,7 +155,7 @@ export const navigationPages: readonly NavigationPage[] = [
     group: "this-week",
     href: "/trust",
     label: "How much to trust this week",
-    description: "Check freshness, confidence, source coverage, and what would change the brief.",
+    description: "Check freshness, the margin, source coverage, and what would change the brief.",
     placement: "tab",
   },
   {
@@ -214,7 +214,7 @@ export const navigationPages: readonly NavigationPage[] = [
     group: "record",
     href: "/calibration",
     label: "Calibration",
-    description: "How often the confidence label has been right, 2012–2026",
+    description: "How often conditions held at each margin from the line, 2012–2026",
     placement: "tab",
   },
   {
@@ -234,10 +234,6 @@ export const navigationPages: readonly NavigationPage[] = [
     placement: "tab",
   },
 ];
-
-/** A page by its key, for a surface that names one page (the first-run guide's next steps). */
-export const findNavigationPage = (key: NavigationPageKey): NavigationPage | undefined =>
-  navigationPages.find((page) => page.key === key);
 
 /** A group's pages in nav order, hub first. */
 export const pagesInGroup = (group: NavigationGroupKey): NavigationPage[] =>

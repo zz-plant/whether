@@ -28,8 +28,9 @@ import { buildDecisionMemo, deriveBriefCallFields } from "../lib/report/homeBrie
 import { createHomePageReportDataLoader } from "../lib/report/homePageData";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { assembleCurrentWeekBrief } from "../lib/report/publishedBriefRecord";
+import { publishedBriefHeadline } from "../lib/report/publishedBriefs";
 import { describePolicyHold } from "../lib/report/regimeDescription";
-import { formatConfidenceChipLabel } from "../lib/report/reportFormatting";
+import { formatMarginStamp } from "../lib/report/reportFormatting";
 import {
   anyPauseLineMet,
   buildCallChangeLine,
@@ -38,6 +39,7 @@ import {
   buildWeekCallChangesIf,
   resolveWeeklyTone,
   splitWeeklyCall,
+  weeklyHeadline,
 } from "../lib/report/reportEvidence";
 import { buildWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
@@ -223,21 +225,38 @@ describe("one week, one set of claims, every surface", () => {
         assert.match(email, new RegExp(`^Conditions: ${conditions} `, "m"), "the Monday email");
       });
 
+      /* One headline action per week (2026-10-09): `weeklyHeadline`, the contract's
+         call opened by the week's direction, on the homepage, the frozen record,
+         every paste, the Monday post and email, and the share card. The action the
+         homepage used to lead with no longer prints as a second headline; the API
+         fields that carry it (`guidance.call`, `memo.action`) keep their values. */
       it("gives the same guidance everywhere", async () => {
         const { home, document, markdown, embedText, card, agent, memo, record, slack, email } = await render(week);
         const { actionNow } = home.weeklyCall;
+        const headline = weeklyHeadline(home.weeklyCall);
         const guidance = formatGuidance(home.weeklyCall);
 
+        assert.equal(
+          headline.action,
+          (week.held ? home.weeklyCall.actionNow : home.weeklyCall.currentCall).trim(),
+          "the headline is the contract's call, or a held week's action",
+        );
+        assert.equal(guidance, headline.composed, "a paste leads with the headline");
         assert.equal(formatGuidance(document.slots), guidance, "the brief document every paste renders");
         assert.ok(markdown.includes(guidance), "/brief.md");
         assert.ok(embedText.includes(`Guidance: ${guidance}`), `the embed:\n${embedText}\nexpected: ${guidance}`);
-        assert.equal(deriveBriefCallFields(home.weeklyDecisionCardModel).primaryCall, actionNow, "the homepage card");
-        assert.equal(card.decision, actionNow, "the share card");
-        assert.equal(agent.guidance.call, actionNow, "the agent state");
-        assert.equal(memo.action, actionNow, "the /api/decision memo");
-        assert.equal(record.actionNow, actionNow, "the frozen record");
+        assert.equal(
+          deriveBriefCallFields(home.weeklyDecisionCardModel, home.weeklyCall).primaryCall,
+          guidance,
+          "the homepage card",
+        );
+        assert.equal(card.decision, headline.action, "the share card");
+        assert.equal(publishedBriefHeadline(record).action, headline.action, "the frozen record");
         assert.equal(slot(slack, "Guidance"), guidance, "the Monday post");
-        assert.equal(slot(email, "Action now"), actionNow, "the Monday email");
+        assert.equal(slot(email, "Guidance"), guidance, "the Monday email");
+        assert.ok(!email.includes(`Action now: ${actionNow}`), "the email prints no second headline");
+        assert.equal(agent.guidance.call, actionNow, "the agent state's field keeps its value");
+        assert.equal(memo.action, actionNow, "the /api/decision memo's field keeps its value");
       });
 
       it("dates and grades the reading the same everywhere", async () => {
@@ -248,11 +267,11 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(document.provenance.recordDate, recordDate);
         assert.equal(agent.recordDate, recordDate);
         assert.match(markdown, new RegExp(`^# Whether Weekly Brief — ${recordDate}$`, "m"));
-        assert.match(embedText, new RegExp(`As of ${recordDate}`));
+        assert.match(embedText, new RegExp(`Data as of ${recordDate}`));
         assert.equal(record.recordDate, recordDate, "the frozen record");
         assert.match(slack, new RegExp(`^Whether Weekly Brief — ${recordDate}$`, "m"), "the Monday post");
         assert.equal(agent.confidence.label, confidence);
-        assert.ok(embedText.includes(formatConfidenceChipLabel(confidence)));
+        assert.ok(embedText.includes(formatMarginStamp(confidence)));
         assert.equal(memo.confidence, confidence, "the /api/decision memo");
         assert.equal(record.confidenceLabel, confidence, "the frozen record");
       });
@@ -294,7 +313,7 @@ describe("one week, one set of claims, every surface", () => {
           pauseApplies: anyPauseLineMet(reportData.actionStripItems, assessment.scores),
         });
         assert.ok(tone, "both weeks are compared");
-        const card = splitWeeklyCall(deriveBriefCallFields(home.weeklyDecisionCardModel).primaryCall);
+        const card = splitWeeklyCall(deriveBriefCallFields(home.weeklyDecisionCardModel, home.weeklyCall).primaryCall);
         const status = home.weeklyDecisionCardModel.status;
 
         /* The memo says what the readings did on both weeks; a held week's headline is
@@ -377,7 +396,7 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(slot(email, label), callChangesIf, "the Monday email");
         const decision = home.weeklyDecisionCardModel.decision;
         assert.equal(decision.reversalTrigger, callChangesIf, "the homepage card");
-        assert.ok(deriveBriefCallFields(home.weeklyDecisionCardModel).briefShareLines.includes(`${label}: ${callChangesIf}`), "Copy Brief");
+        assert.ok(deriveBriefCallFields(home.weeklyDecisionCardModel, home.weeklyCall).briefShareLines.includes(`${label}: ${callChangesIf}`), "Copy Brief");
         assert.equal(reportData.flipThreshold, callChangesIf, "/trust, /signals and /resolve");
         assert.equal(record.flipThreshold, callChangesIf, "the frozen record");
         assert.equal(memo.reversalTrigger, callChangesIf, "the /api/decision memo's trigger");

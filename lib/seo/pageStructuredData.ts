@@ -413,10 +413,10 @@ export const buildCalibrationStudyStructuredData = ({
   totals: { months: number; held: number };
 }): JsonLdGraph => {
   const url = buildCanonicalUrl("/calibration");
-  const name = "Confidence score calibration study";
+  const name = "Margin calibration study";
   const description =
-    `A calibration study of Whether's published confidence percent against ${totals.months} month-end readings: `
-    + "every band understates, and distance from a regime boundary does not order the outcome.";
+    `A calibration study of Whether's published margin, the distance from the line where conditions change, against ${totals.months} month-to-month comparisons: `
+    + "every band understates how often conditions held, and distance from a change line does not order the outcome.";
 
   return graph([
     {
@@ -433,7 +433,7 @@ export const buildCalibrationStudyStructuredData = ({
       publisher: buildPublisherSchema(organizationName),
       about: {
         "@type": "Thing",
-        name: "Calibration of a macro regime confidence score",
+        name: "Calibration of a distance-from-the-line margin for macro conditions",
       },
       citation: {
         "@type": "CreativeWork",

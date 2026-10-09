@@ -370,7 +370,7 @@ export const rawDecisionDomainCatalog = {
         },
         {
           phase: "Assign",
-          objective: "Set accountable owner, required contributors, and escalation boundaries.",
+          objective: "Set accountable owner, required contributors, and escalation limits.",
           prompts: [
             "Who owns this call, and whose input is required versus optional?",
             "At what level of risk does this escalate, and to whom?",

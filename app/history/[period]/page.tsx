@@ -31,6 +31,8 @@ import { essaysPublishedIn, formatCanonAuthors, formatCanonPublished } from "../
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
+import { describeReconstructedPeriod } from "../../../lib/report/trackRecordCopy";
+import { getPublishedBriefs, publishedBriefWeekLabel } from "../../../lib/report/publishedBriefs";
 
 type Params = { period: string };
 
@@ -203,6 +205,11 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
      that link, so a year page names the product writing that came out inside it. */
   const essays = essaysPublishedIn({ year: period.year, quarter: period.kind === "quarter" ? period.quarter : undefined });
   const canonicalUrl = buildCanonicalUrl(buildPostureArchivePath(period.slug));
+  const oldestBrief = getPublishedBriefs().reduce<ReturnType<typeof getPublishedBriefs>[number] | undefined>(
+    (oldest, brief) => (!oldest || brief.recordDate < oldest.recordDate ? brief : oldest),
+    undefined,
+  );
+  const firstPublishedWeek = oldestBrief ? publishedBriefWeekLabel(oldestBrief) : "2026";
 
 
   const articleStructuredData = graph([
@@ -210,8 +217,8 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       "@type": "Article",
       headline: `${period.title} conditions — ${headlineConditions(period)}`,
       description: describePeriod(period),
-      datePublished: period.asOf,
-      dateModified: period.asOf,
+      /* No datePublished: the period's own date claimed the page was published
+         then, which is the impression the visible notice above corrects. */
       author: buildAuthorSchema(),
       publisher: buildPublisherSchema(organizationName),
       url: canonicalUrl,
@@ -247,13 +254,18 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           Conditions in {period.title}
         </h1>
+        <p className="rounded-md border border-amber-400/30 bg-amber-500/5 px-3 py-2 text-sm text-amber-100" data-reconstructed-notice>
+          {describeReconstructedPeriod(period.title, firstPublishedWeek)}
+        </p>
         {headlineSentence ? <p className="text-sm font-semibold text-slate-100">{headlineSentence}</p> : null}
         <p className="text-sm text-slate-300">{period.headline}</p>
         <p className="text-sm text-slate-300">
-          <span className="font-semibold text-slate-100">Standing guidance:</span> {period.guidance}
+          <span className="font-semibold text-slate-100">Guidance, by today&apos;s formula:</span> {period.guidance}
         </p>
+        {/* "Maintained by", not "By": the page is kept by its author today; it
+            was not written in the period it describes. */}
         <p className="text-xs text-slate-400">
-          By{" "}
+          Maintained by{" "}
           <a
             href={publisherProfilePath}
             className="text-sky-300 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -261,7 +273,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           >
             {publisherAuthor.name}
           </a>{" "}
-          · <time dateTime={period.asOf}>{period.recordDateLabel}</time>
+          · reading dated <time dateTime={period.asOf}>{period.recordDateLabel}</time>
         </p>
       </section>
 

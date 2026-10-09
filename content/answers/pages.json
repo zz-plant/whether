@@ -7,6 +7,7 @@
     "shortAnswer": "Read startup funding conditions through rates and credit alongside your runway, investor conversations and the milestone a round must fund.",
     "directAnswer": "Use the dated market reading below to review financing assumptions. Keep the company’s cash deadline and investor evidence in the decision; a broad funding score cannot tell you whether a particular round will close.",
     "audience": "Founders, finance leaders and board operators",
+    "applyHeading": "What the reading changes in your financing plan",
     "mappedDecisionAreas": [
       "capital-raising",
       "burn-discipline"
@@ -40,6 +41,7 @@
     "shortAnswer": "Use risk appetite to review how much uncertainty new commitments carry; validate demand and cash capacity before increasing exposure.",
     "directAnswer": "Compare the current risk reading with the commitments you are considering. Better market conditions can support a review of expansion, but each bet still needs customer evidence, a spending limit and a way to stop.",
     "audience": "Leadership teams",
+    "applyHeading": "Which commitments the risk reading should gate",
     "mappedDecisionAreas": [
       "expansion-bets",
       "product-tempo",
@@ -54,7 +56,7 @@
       "Customer demand, available cash and the next evidence milestone for each bet.",
       "The market change and company result that would justify another review."
     ],
-    "decisionNote": "Review [commitment] after [market change]. Limit exposure to [amount or duration]. Pause if [company threshold] fails; resume after [demand and cash evidence]. Owner: [name]. Review: [date].",
+    "decisionNote": "Review [commitment] after [market change]. Limit exposure to [amount or duration]. Pause if [your pause line] is crossed; resume after [demand and cash evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Compare historical conditions",
@@ -74,6 +76,7 @@
     "shortAnswer": "Hire when a specific delivery, reliability or revenue bottleneck justifies the full cost and the downside cash plan can fund the role.",
     "directAnswer": "Name the work an additional engineer unlocks and compare hiring with reducing scope or reassigning capacity. Approve the role only with a funded ramp period and a measurable outcome; a market score cannot establish that need.",
     "audience": "Engineering leaders and founders",
+    "applyHeading": "When one more engineer is worth hiring",
     "mappedDecisionAreas": [
       "hiring",
       "product-tempo",
@@ -104,6 +107,7 @@
     "shortAnswer": "Reduce new scope when it displaces funded customer commitments or exceeds available capacity; protect work with clear delivery or retention value.",
     "directAnswer": "Separate committed delivery from optional expansion. Stage new scope behind customer evidence and a capacity check, then revisit it when the cash plan and team can support the next milestone.",
     "audience": "Product and engineering leadership",
+    "applyHeading": "Which roadmap work to keep and which to stage",
     "mappedDecisionAreas": [
       "product-tempo",
       "expansion-bets",
@@ -134,6 +138,7 @@
     "shortAnswer": "Start fundraising preparation before your downside runway falls inside the time needed to reach investors, close a round and absorb delays.",
     "directAnswer": "Work backward from the date cash would reach your minimum buffer. Include preparation, investor conversations, diligence and a delayed close; do not wait for better market conditions if that leaves the company unable to fund its plan.",
     "audience": "Founders, CEOs and CFOs",
+    "applyHeading": "When to start the raise",
     "mappedDecisionAreas": [
       "capital-raising",
       "burn-discipline"
@@ -167,6 +172,7 @@
     "shortAnswer": "Review burn when your cash plan no longer funds the next milestone with a contingency buffer; tighter funding conditions make that review more urgent.",
     "directAnswer": "Model a slower revenue or fundraising case before approving more recurring spend. Reduce commitments that do not protect delivery, retention or the next milestone, and set a cash buffer for restoring them.",
     "audience": "Founders, CFOs, fractional CFOs and operations leaders",
+    "applyHeading": "Where to cut first",
     "mappedDecisionAreas": [
       "burn-discipline",
       "capital-raising"
@@ -200,6 +206,7 @@
     "shortAnswer": "Use a hiring freeze when the cash plan cannot support new commitments; assess essential backfills and critical roles individually.",
     "directAnswer": "Review open requisitions against cash, customer commitments and existing capacity. Give every exception a named approver, a full cost and a review date, and define the evidence needed to reopen hiring.",
     "audience": "Founders, VP Engineering, CFO",
+    "applyHeading": "Which open roles to keep",
     "mappedDecisionAreas": [
       "hiring",
       "burn-discipline",
@@ -230,6 +237,7 @@
     "shortAnswer": "Add sales capacity when qualified demand exceeds current coverage and the cash plan can fund recruiting, ramp and the sales cycle.",
     "directAnswer": "Check whether the bottleneck is sales capacity or insufficient qualified demand. Add a small cohort of reps only after the existing team demonstrates repeatable conversion and the downside plan funds their ramp.",
     "audience": "CRO, CEO, finance leaders",
+    "applyHeading": "When more sales hires pay off",
     "mappedDecisionAreas": [
       "hiring",
       "expansion-bets",
@@ -244,7 +252,7 @@
       "Recruiting cost, compensation, ramp duration and sales-cycle length.",
       "Gross margin, collections and cash remaining if the new cohort ramps slowly."
     ],
-    "decisionNote": "Add [number] reps in [segment] within [cost envelope]. Pause the next cohort if [demand or ramp threshold] is missed. Resume after [conversion and cash evidence]. Owner: [name]. Review: [date].",
+    "decisionNote": "Add [number] reps in [segment] within [cost envelope]. Pause the next cohort if [demand or ramp target] is missed. Resume after [conversion and cash evidence]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Set the next growth spending step",
@@ -260,6 +268,7 @@
     "shortAnswer": "Delay a new product line when demand is unproven or its build and support costs would put the core business at risk.",
     "directAnswer": "Fund the smallest test that can establish demand before committing to a full product line. Set a customer milestone, a spending limit and an exit condition, including the ongoing support the product would require.",
     "audience": "VP Product, CTO, strategy",
+    "applyHeading": "How to test a new product line first",
     "mappedDecisionAreas": [
       "product-tempo",
       "expansion-bets",
@@ -274,7 +283,7 @@
       "Build, launch and ongoing support costs alongside the opportunity cost to the core product.",
       "Experiment budget, success milestone and the condition for stopping the test."
     ],
-    "decisionNote": "Test [product hypothesis] with [customer group] inside [budget]. Stop if [evidence threshold] is missed. Expand only after [demand proof and funded support]. Owner: [name]. Review: [date].",
+    "decisionNote": "Test [product hypothesis] with [customer group] inside [budget]. Stop if [evidence target] is missed. Expand only after [demand proof and funded support]. Owner: [name]. Review: [date].",
     "supportingLinks": [
       {
         "label": "Launch gates toolkit",
@@ -290,6 +299,7 @@
     "shortAnswer": "Increase go-to-market spend in steps only when retention, conversion and gross-margin-adjusted payback support the added cash commitment.",
     "directAnswer": "Set the next spending increment against a proven customer segment or channel. Pause further increases when conversion, retention or payback misses the agreed range; resume after new cohort evidence supports the cash plan.",
     "audience": "Growth leaders, CROs and finance partners",
+    "applyHeading": "How fast to add go-to-market spend",
     "mappedDecisionAreas": [
       "expansion-bets",
       "burn-discipline",
@@ -324,6 +334,7 @@
     "shortAnswer": "Brief executives on the dated change, the decision it affects, the company evidence and the trigger for revisiting it.",
     "directAnswer": "Keep the briefing to one decision note with a source date and an owner. State what changed externally, whether it changes the company plan, and the business evidence required before acting.",
     "audience": "Chiefs of staff, CFOs, executive teams and VC operating partners",
+    "applyHeading": "What to put in the executive note",
     "mappedDecisionAreas": [
       "burn-discipline",
       "capital-raising",

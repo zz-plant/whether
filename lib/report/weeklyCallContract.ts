@@ -198,8 +198,8 @@ export const buildWeeklyCallContract = ({
   const whyCouldBeWrong = policyOverrideActive
     ? hold.whyCouldBeWrong
     : homeBriefModel.confidenceLabel === "HIGH"
-      ? "Even at high confidence, individual signals can reverse before the next weekly update. Keep approvals staged until the next data refresh confirms the guidance."
-      : "Confidence is not high; near-threshold moves can reverse quickly and invalidate this week’s guidance.";
+      ? "The scores are clear of the change lines, but a signal can still reverse before next week's reading. Keep approvals staged until it confirms the guidance."
+      : "A score is near its change line, so a small move could change conditions before next week's reading.";
 
   return applyStageToWeeklyCall(
     {

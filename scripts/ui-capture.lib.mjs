@@ -72,12 +72,10 @@ const CAPTURE_VISITORS = new Set(["first", "returning"]);
 
 /**
  * `--visitor returning` captures the page a reader sees on their second
- * visit. The layout bootstrap folds the homepage behind the first-visit
- * picker unless this browser has stored a week before
- * (`activationLastWeekStorageKey` in lib/activationFunnel.ts), so without
- * this every capture of `/` was the first-visit fold, and the Monday reader's
- * page — what changed, what it changes, what would change it — was never in
- * the loop. The capture seeds last week's slug, the gap of a weekly returner.
+ * visit. The homepage has one order for every reader since 2026-10-09; the
+ * layout hides only the conditions legend for a browser that has stored a week
+ * (`activationLastWeekStorageKey` in lib/activationFunnel.ts). The capture
+ * seeds last week's slug, the gap of a weekly returner.
  */
 export const parseCaptureVisitor = (args) => {
   const visitor = readArgValue(args, "--visitor", "first");

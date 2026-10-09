@@ -12,11 +12,11 @@ import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordBody } from "../components/his
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
-import { buildTrackRecord } from "../../lib/report/trackRecord";
+import { buildTrackRecord, countRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
-import { formatDateUTC } from "../../lib/formatters";
+import { formatDateUTC, formatMonthYearShortFromValue } from "../../lib/formatters";
 import { toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
@@ -73,6 +73,12 @@ export default async function HistoryPage({
   const riskAppetiteTrend = regimeSeries.slice(-13).map((entry) => ({ date: entry.recordDate, value: entry.riskAppetite }));
   const publishedBriefs = getPublishedBriefs();
   const trackRecord = buildTrackRecord(fullSeries);
+  /* The one count of the record (`countRecord`), with its window; this paragraph
+     said "176 months of monthly readings (2012–2026)", written before September. */
+  const recordCounts = countRecord(fullSeries);
+  const recordSpan = recordCounts
+    ? `${recordCounts.readings} month-end readings, ${formatMonthYearShortFromValue(recordCounts.firstRecordDate)} to ${formatMonthYearShortFromValue(recordCounts.latestRecordDate)}`
+    : "the month-end readings";
   const phaseSpan = resolvePhaseSpan(resolvedSearchParams?.span);
   const phaseSeries = fullSeries.slice(-phaseSpan.months);
   /* The month strip ends at the last month-end, and its "held since" line was
@@ -171,7 +177,7 @@ export default async function HistoryPage({
           <h2 id="call-by-month-heading" className="text-xl font-semibold text-white sm:text-2xl">Conditions by month</h2>
           {weekAfterRecord ? (
             <p className="text-sm text-slate-300">
-              Since the last month-end, the week of {weekAfterRecord.recordDateLabel} was published as{" "}
+              Since the last month-end, the week of {publishedBriefWeekLabel(weekAfterRecord)} was published as{" "}
               <span className="font-semibold text-white">{publishedBriefDisplay(weekAfterRecord).conditions}</span>.{" "}
               <ActionLink href={buildPublishedBriefPath(weekAfterRecord.slug)} variant="inline">
                 Read that week
@@ -225,8 +231,8 @@ export default async function HistoryPage({
                 append-only rule is the guarantee worth stating. */}
             <p className="text-sm text-slate-300">
               {publishedBriefs.length === 1
-                ? "Permanent, append-only weekly brief records paired with 176 months of monthly readings (2012–2026). Entries are never edited after publication, so past guidance reads the way it was published."
-                : `${publishedBriefs.length} weekly brief records paired with 176 months of monthly readings (2012–2026). Entries are never edited after publication, so past guidance reads the way it was published.`}
+                ? `Permanent, append-only weekly brief records paired with ${recordSpan}. Entries are never edited after publication, so past guidance reads the way it was published.`
+                : `${publishedBriefs.length} weekly brief records paired with ${recordSpan}. Entries are never edited after publication, so past guidance reads the way it was published.`}
             </p>
           </div>
           {/* A link card, not a pill coerced into one: the `pill` variant is a
