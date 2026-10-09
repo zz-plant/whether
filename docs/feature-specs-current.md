@@ -3260,6 +3260,33 @@ Left on the old palette: the brand mark (`public/favicon*.svg`, `icon*.svg`, `wh
 `app/brandAssets.ts` and the raster icons), which is its own decision, and
 `scripts/generate-scenes.ts`, which renders marketing scenes and nothing on the site.
 
+### 1.1.70 The record's charts and sentences state what the data shows (2026-10-09)
+
+The first PR of the copy and data-viz plan. Two of its four items had already shipped by the time it
+was built: #1569 gave the slide exports one colour per condition, and #1567 removed the calibration
+curve drawn from four hard-coded points.
+
+- **The margin's reliability chart** (`MarginReliabilityChart`, `app/components/history/confidenceRecord.tsx`).
+  `/calibration` stated its finding ("every band below held more often than the percent published")
+  in prose and a table. The chart draws each band's published percent against how often conditions
+  held, one dot per band sized by its months, on the line where the two are equal, so the finding is
+  every dot above the line. It reads the rows the table prints (`toRows`, one derivation for both),
+  draws nothing without them, and names each dot on hover; the table stays the accessible form.
+  `tests/marginReliabilityChart.test.tsx` holds dots to rows, and fails the day the archive stops
+  bearing out the paragraph's fixed claim.
+- **One orientation for the conditions map.** `/trust`'s quadrant (`RegimeQuadrant`,
+  `app/trust/formulaReference.tsx`) put funding pressure across and risk appetite up, so its Sunny sat
+  where the brief's map has Freezing. It now runs risk appetite across and funding pressure up, as
+  `RegimeRadar` and `/history`'s phase map do; `tests/formulaReferenceVisuals.test.tsx` renders both
+  maps and checks Freezing sits left of and above Sunny in each.
+- **A held week names no week it did not compare.** "Last week's guidance stands." closed every held
+  week, including one compared with a month-end weeks back. `describeGuidanceStands`
+  (`lib/report/comparisonBasis.ts`) says "The guidance stands." after a dated "since Sep 15", and keeps
+  "Last week's guidance stands." where the comparison is undated. It closes the movement sentence
+  (`decisionMovement.ts`), the narrative summary (`decisionNarrative.ts`) and the returning-reader
+  fallback (`historyAndContext.ts`); seven pinned pastes in `briefFormats.golden.json` changed by that
+  sentence alone.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
