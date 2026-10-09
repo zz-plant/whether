@@ -1,4 +1,6 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { formatMarginStamp } from "../../lib/report/reportFormatting";
 import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefHeadline } from "../../lib/report/publishedBriefs";
@@ -105,7 +107,12 @@ export async function GET() {
     const brief = await buildAgentInterfaceResponse("weekly");
     const summary = brief.summary;
     const regime = summary.regimeLabel;
-    const action = summary.guidance;
+    /* The week's headline action, from the source the homepage h1 and every paste
+       read (`weeklyHeadline`). It printed the weekly summary's own sentence, a third
+       wording of the week's instruction. */
+    const action = await loadWeeklyBriefSnapshot(undefined, { route: "/feed.xml" })
+      .then(({ snapshot }) => weeklyHeadline(snapshot.weeklyCall).action)
+      .catch(() => summary.guidance);
     const recordDateIso = brief.agentHandoff.payload.report_date;
     const recordDateLabel = summary.recordDateLabel ?? recordDateIso;
     /* The published confidence, worded as the archive items below word theirs. This
