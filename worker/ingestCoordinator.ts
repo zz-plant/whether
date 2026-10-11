@@ -2,8 +2,9 @@
  * IngestCoordinator — the Durable Object that owns the materialized signal model for one
  * deployment: its snapshots, its refresh lock, and its refresh schedule.
  *
- * Trial scope (docs/agents/data-and-platform.md, "Ingest coordinator"): declared in every
- * environment, used only where WHETHER_INGEST_COORDINATOR=1 (the preview lane). Everything
+ * Production since 2026-10-09 (docs/agents/data-and-platform.md, "Ingest coordinator"):
+ * declared in every environment, switched on where WHETHER_INGEST_COORDINATOR=1. Five
+ * stable weeks on the preview lane preceded the promotion. Everything
  * the object does goes through `DurableStorageIngestionStore`, so the store's tests are the
  * object's tests; this class is the fetch router plus the alarm.
  *

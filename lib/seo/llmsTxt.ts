@@ -113,6 +113,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "",
     "## Discovery",
     `- Manifest: ${baseUrl}${WHETHER_AGENT_MANIFEST_PATH}`,
+    `- WebMCP: ${baseUrl}/.well-known/webmcp.json`,
     `- Homepage: ${baseUrl}/`,
     `- Brief (Markdown): ${endpoints.brief}`,
     `- Agent API: ${endpoints.agent}`,

@@ -39,7 +39,8 @@ const fixtureServer = (root: string, { status = 200 }: { status?: number } = {})
     [
       'import { createServer } from "node:http";',
       "const args = process.argv.slice(2);",
-      'const host = args[args.indexOf("--hostname") + 1];',
+      'const hostIndex = args.indexOf("--host") !== -1 ? args.indexOf("--host") : args.indexOf("--hostname");',
+      'const host = args[hostIndex + 1];',
       'const port = Number(args[args.indexOf("--port") + 1]);',
       `createServer((request, response) => { response.statusCode = ${status}; response.end("fixture"); }).listen(port, host);`,
     ].join("\n"),

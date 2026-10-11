@@ -18,6 +18,8 @@ const ALLOWED_PATHS = [
   "/api/agent",
   "/api/mcp",
   WHETHER_AGENT_MANIFEST_PATH,
+  "/.well-known/webmcp.json",
+  "/.well-known/mcp.json",
   "/llms.txt",
   "/llms-full.txt",
   "/api/posture/current",

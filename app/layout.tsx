@@ -20,6 +20,7 @@ import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
 import { buildSocialImageUrl, canonicalPositioningLine, defaultSiteDescription, websiteName } from "../lib/seo";
 import { publisherAuthor, publisherProfilePath } from "../lib/publisher";
 import { activationLastWeekStorageKey } from "../lib/activationFunnel";
+import { WebMcpBridge } from "./components/webMcpBridge";
 
 const BRIEF_MD_URL = `${siteUrl}/brief.md`;
 const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
@@ -208,6 +209,10 @@ export default function RootLayout({
         <link rel="alternate" type="text/plain" href={LLMS_TXT_URL} title="Whether for LLMs" />
         <link rel="llm" href={LLMS_TXT_URL} />
         <link rel="mcp-manifest" type="application/json" href={WELL_KNOWN_MANIFEST_URL} />
+        <link rel="webmcp" href="/.well-known/webmcp.json" type="application/json" />
+        <link rel="model-context" href="/.well-known/webmcp.json" type="application/json" />
+        <link rel="mcp" href="/.well-known/mcp.json" type="application/json" />
+        <meta name="webmcp:endpoint" content="/api/mcp" />
         <script
           id="whether-theme-bootstrap"
           // eslint-disable-next-line react/no-danger
@@ -220,6 +225,7 @@ export default function RootLayout({
         />
       </head>
       <body className="flex min-h-screen flex-col pb-[calc(3.25rem+env(safe-area-inset-bottom))] md:pb-0">
+        <WebMcpBridge />
         <TooltipProvider>
         <ScrollProgressBar />
         <ToastProviderRoot>
