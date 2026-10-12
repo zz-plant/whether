@@ -146,6 +146,15 @@ Whether holds the **act** step in the [STD-07 Revisable Delegation Record](https
 
 ---
 
+## Environment & API Configuration
+
+| Variable | Scope | Description |
+| :--- | :--- | :--- |
+| `FRED_API_KEY` | Optional | St. Louis Fed FRED API key (`wrangler secret put FRED_API_KEY`). When absent, the application serves bundled static fallback snapshots from `data/fallbacks/` with zero runtime failure. |
+| `WHETHER_INGEST_COORDINATOR` | Edge / Cloudflare | Durable Object coordinator flag for background rate and yield curve sync. |
+
+---
+
 ## Documentation & Links
 
 - **[docs/use-cases/operator-playbooks.md](docs/use-cases/operator-playbooks.md)**: Role-specific operator workflows, playbooks & recipes
@@ -154,3 +163,9 @@ Whether holds the **act** step in the [STD-07 Revisable Delegation Record](https
 - **[docs/one-screen-weekly-brief-spec.md](docs/one-screen-weekly-brief-spec.md)**: Core brief UI/UX specification
 - **[docs/developer/quickstart.md](docs/developer/quickstart.md)**: Integration guide and API reference
 - **[AGENTS.md](AGENTS.md)**: Guidelines for AI pair programming
+
+---
+
+## License
+
+[MIT](LICENSE) © 2026 Whether contributors
