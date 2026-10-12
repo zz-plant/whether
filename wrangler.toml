@@ -18,7 +18,8 @@ head_sampling_rate = 1
 # KV/DO operation, with no code change. This is the evidence the read-deadline and
 # zero-writes invariants lacked in the 2026-08-30 to 2026-09-02 incidents. Export goes to
 # an OTLP destination configured in the dashboard (Observability -> Destinations). Spans
-# are billed from October 2026; head_sampling_rate is the cost knob.
+# move to unified volume pricing on December 1, 2026 (50 GB/mo included, $0.25/GB thereafter);
+# head_sampling_rate remains the cost knob.
 [observability.traces]
 enabled = true
 head_sampling_rate = 1
@@ -114,6 +115,10 @@ crons = ["0 2 * * *", "0 14 * * 1"]
 
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://whether.work"
+WHETHER_INGEST_COORDINATOR = "1"
+WHETHER_HISTORY_WORKFLOW = "1"
+WHETHER_BRIEF_FREEZE_WORKFLOW = "1"
+GITHUB_REPOSITORY = "zz-plant/whether"
 
 [env.preview]
 preview_urls = true

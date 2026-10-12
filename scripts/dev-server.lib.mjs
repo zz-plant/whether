@@ -203,7 +203,7 @@ const startDevServer = async ({ baseUrl, outDir, devScript, logName }) => {
    * finishing its work. A group leader can be signalled as a group, which is what
    * stopDevServer does.
    */
-  const child = spawn("bun", ["run", devScript, "--", "--hostname", host, "--port", port], {
+  const child = spawn("bun", ["run", devScript, "--", "--host", host, "--port", port], {
     cwd: process.cwd(),
     env: process.env,
     stdio: ["ignore", "pipe", "pipe"],

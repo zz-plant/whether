@@ -111,6 +111,9 @@ const buildAgentManifest = (baseUrl = resolveSiteUrl()) => {
   };
 };
 
+export const WEBMCP_MANIFEST_PATH = "/.well-known/webmcp.json";
+export const MCP_WELL_KNOWN_PATH = "/.well-known/mcp.json";
+
 export const agentManifestResponse = () =>
   new Response(JSON.stringify(buildAgentManifest()), {
     headers: {
