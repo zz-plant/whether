@@ -414,8 +414,6 @@ export const resolveTrustReadinessCopy = ({
   trustStatusTone: TrustStatusTone;
   degradedSourceRows?: Array<unknown>;
   isFallbackSnapshot?: boolean;
-  /** @deprecated No longer read. The headline is derived from state, not sniffed from prose. */
-  trustStatusDetail?: string;
 }): { tone: TrustStatusTone; headline: string } => {
   const status = resolveDataStatus({
     isHistoricalSelection: trustStatusTone === "historical",
