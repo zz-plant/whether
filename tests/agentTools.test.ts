@@ -232,6 +232,14 @@ describe("the arguments an agent leaves out", () => {
     });
     assert.match(String(projection.velocityLabel), /Stable/);
   });
+
+  it("get_standup_line returns the standup one-liner for today's conditions", async () => {
+    const result = (await runAgentTool("get_standup_line", {}, "http")) as { standupLine: string; regime: string };
+    assert.ok(result.standupLine && typeof result.standupLine === "string");
+    assert.match(result.standupLine, /Guidance|Conditions/);
+    assert.match(result.standupLine, /Conditions change if/);
+    assert.ok(result.regime);
+  });
 });
 
 describe("the catalogue rows", () => {

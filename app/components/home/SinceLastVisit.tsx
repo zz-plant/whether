@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { createBrowserSource, useBrowserSource } from "../browserSource";
 import { classifyReturnGap, weeksBetweenSlugs } from "../../../lib/activationFunnel";
@@ -98,6 +99,14 @@ export const sinceLastVisitDelta = (
 export const elapsedWeeksSuffix = (previousRecordDate: string, currentRecordDate: string) => {
   const weeks = weeksBetweenRecordDates(previousRecordDate, currentRecordDate);
   return weeks !== null && weeks > 1 ? ` (${weeksAgo.format(-weeks, "week")})` : "";
+};
+
+export const compareHrefForRecordDate = (recordDate: string): string => {
+  const year = recordDate.slice(0, 4);
+  const rawMonth = Number.parseInt(recordDate.slice(5, 7), 10);
+  return /^\d{4}$/.test(year) && !Number.isNaN(rawMonth) && rawMonth >= 1 && rawMonth <= 12
+    ? `/history/compare?yearB=${year}&monthB=${rawMonth}`
+    : "/history/compare";
 };
 
 /**
@@ -220,16 +229,24 @@ export function SinceLastVisit({
       </div>
       {/* The call the reader last saw; the call now is the card's heading. */}
       {callChanged ? <p className="text-fluid-xs leading-5 text-white/60">Then: “{previous.call}”</p> : null}
-      {boardDeckHref ? (
-        <a
-          href={boardDeckHref}
-          target="_blank"
-          rel="noreferrer"
-          className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline"
+      <div className="flex flex-wrap items-center gap-2">
+        {boardDeckHref ? (
+          <a
+            href={boardDeckHref}
+            target="_blank"
+            rel="noreferrer"
+            className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline"
+          >
+            Download this week&apos;s guidance as a slide
+          </a>
+        ) : null}
+        <Link
+          href={compareHrefForRecordDate(previous.recordDate)}
+          className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline text-sky-200 hover:text-white"
         >
-          Download this week&apos;s guidance as a slide
-        </a>
-      ) : null}
+          Compare against your last visit &rarr;
+        </Link>
+      </div>
       <p className="text-fluid-nano text-slate-400">
         Runway is a quarterly question, and this gap is longer.{" "}
         <a

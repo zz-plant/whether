@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { ReportSection } from "../../components/reportSection";
-import { ScoreCell } from "../../components/ui/scoreCell";
+import { ScoreCell, formatPoints } from "../../components/ui/scoreCell";
 import { ScoreLadder } from "../../components/ui/scoreLadder";
 import { GovernedAreas } from "../../components/ui/governedAreas";
 import { BoundedValue } from "../../components/ui/boundedValue";
@@ -28,7 +28,7 @@ import { buildSignalsFocusHref, focusTabs, type FocusTab } from "../evidenceQuer
  */
 
 const formatValue = (row: SignalReferenceRow, value: number) =>
-  `${value % 1 === 0 ? value.toFixed(0) : value.toFixed(row.units.suffix ? 2 : 1)}${row.units.suffix ?? ""}`;
+  `${formatPoints(value, row.units.decimals)}${row.units.suffix ?? ""}`;
 
 const TONE_CLASS: Record<SignalReferenceRow["direction"]["tone"], string> = {
   easing: "text-semantic-easing-fg",

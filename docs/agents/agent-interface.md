@@ -152,6 +152,7 @@ Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 
 - `get_state` — **start here.** The compact state above; publishes an `outputSchema`.
 - `get_brief` — the full brief for a cadence (about 22KB). Alias: `get_agent_brief`.
+- `get_standup_line` — one line for a team's daily standup: whether guidance moved and what would change it.
 - `get_decision_rules` — the bounded rules by regime. Keyed by regime, one key for one regime.
 - `get_context`, `get_projection` — history and projection for a regime; both default to today's reading. `get_context` counts **months** of month-end snapshots (`monthsActive`, `historicalAvgMonths`), through the `latestSnapshot` it names, because the record is monthly; it was `weeksActive` / `historicalAvgWeeks` over the same monthly series, so an agent told "8 weeks" was being told 8 months. A regime newer than the last month-end has `monthsActive` 0 and a `note` saying so.
 - `get_comps`, `get_signals`, `get_recent_history` — SaaS multiples, data coverage, one signal's trailing window.

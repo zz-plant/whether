@@ -44,19 +44,24 @@
     var ticker = el.getAttribute(ATTR_TICKER) || '';
     var stage = el.getAttribute(ATTR_STAGE) || '';
     var ref = el.getAttribute(ATTR_REF) || 'embed-js';
+    var embedType = el.getAttribute(ATTR_EMBED) || 'brief';
+    var isCallStrip = embedType === 'call-strip';
     var format = 'html';
 
     var url = EMBED_API_BASE + '?format=' + format + '&ref=' + encodeURIComponent(ref);
     if (ticker) url += '&ticker=' + encodeURIComponent(ticker);
     if (stage) url += '&stage=' + encodeURIComponent(stage);
+    if (embedType) url += '&mode=' + encodeURIComponent(embedType);
 
     // Set a minimum height to prevent layout shift
     if (!el.style.minHeight) {
-      el.style.minHeight = '120px';
+      el.style.minHeight = isCallStrip ? '38px' : '120px';
     }
 
     // Show a loading state
-    el.innerHTML = '<div style="padding:12px;font-size:12px;color:rgba(237,240,238,0.6);font-family:-apple-system,sans-serif;">Loading weekly brief…</div>';
+    el.innerHTML = isCallStrip
+      ? '<div style="padding:8px 12px;font-size:12px;color:rgba(237,240,238,0.6);font-family:-apple-system,sans-serif;">Loading call strip…</div>'
+      : '<div style="padding:12px;font-size:12px;color:rgba(237,240,238,0.6);font-family:-apple-system,sans-serif;">Loading weekly brief…</div>';
 
     fetch(url)
       .then(function (res) {

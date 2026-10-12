@@ -26,7 +26,13 @@ const TICKER_PRESETS = [
   ...["GOOGL", "MSFT", "DOCU", "COIN", "UBER", "AAPL"].map((ticker) => ({ key: ticker, label: ticker })),
 ] as const;
 
+const EMBED_FORMAT_OPTIONS = [
+  { key: "brief", label: "Full brief" },
+  { key: "call-strip", label: "Board call strip" },
+] as const;
+
 export function EmbedBuilder() {
+  const [embedMode, setEmbedMode] = useState<"brief" | "call-strip">("brief");
   const [ticker, setTicker] = useState("");
   const [stage, setStage] = useState("");
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
@@ -34,13 +40,13 @@ export function EmbedBuilder() {
      hydrates it again. This was a counter bumped from an effect on every change
      to either field — a second render to reach a value both fields already
      determine. The key is those fields. */
-  const previewKey = `${ticker}|${stage}`;
+  const previewKey = `${embedMode}|${ticker}|${stage}`;
 
   /* The origin is resolved, not written in: this snippet is the thing a reader
      copies into somebody else's page, and on the preview lane a literal made it
      advertise production — so the preview of the embed could never be a preview
      of the embed. `app/api-docs/page.tsx` already builds this with `siteUrl`. */
-  const embedCode = `<div data-whether-embed="brief"${
+  const embedCode = `<div data-whether-embed="${embedMode}"${
     ticker ? ` data-whether-ticker="${ticker}"` : ""
   }${stage ? ` data-whether-stage="${stage}"` : ""}></div>
 <script async src="${siteUrl}/embed.js"></script>`;
@@ -70,33 +76,41 @@ export function EmbedBuilder() {
           </p>
         </div>
       </summary>
-      <div className="mt-6 space-y-8">
+      <div className="space-y-4">
+        <div className="max-w-xs">
+          <SegmentedControl
+            options={EMBED_FORMAT_OPTIONS}
+            value={embedMode}
+            onSelect={(val) => setEmbedMode(val as "brief" | "call-strip")}
+            ariaLabel="Embed format"
+          />
+        </div>
 
-      {/* minmax(0,…) and min-w-0: a grid item defaults to min-width:auto, so
-          the embed snippet's <pre> pushed its column to 520px inside a 358px
-          grid and the page scrolled sideways on a phone. */}
-      {/* The default snippet is what nearly everyone pastes. Ticker and stage
-          used to be asked for before any preview appeared; they are a
-          refinement now, after the copy button. */}
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="min-w-0 space-y-3">
-          <p className="text-fluid-micro font-semibold tracking-[0.04em] text-slate-400">
-            Live preview
-          </p>
-          <div
-            key={previewKey}
-            data-whether-embed="brief"
-            {...(ticker ? { "data-whether-ticker": ticker } : {})}
-            {...(stage ? { "data-whether-stage": stage } : {})}
-            style={{ minHeight: "80px" }}
-          >
-            {/* Client-side only: the server HTML is what a crawler indexes, and a
-                "Loading…" sentence there is not part of the page. */}
-            <div className="px-3 py-3 text-fluid-micro text-slate-400">
-              {hydrated ? `Loading the live brief${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…` : null}
+        {/* minmax(0,…) and min-w-0: a grid item defaults to min-width:auto, so
+            the embed snippet's <pre> pushed its column to 520px inside a 358px
+            grid and the page scrolled sideways on a phone. */}
+        {/* The default snippet is what nearly everyone pastes. Ticker and stage
+            used to be asked for before any preview appeared; they are a
+            refinement now, after the copy button. */}
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="min-w-0 space-y-3">
+            <p className="text-fluid-micro font-semibold tracking-[0.04em] text-slate-400">
+              Live preview
+            </p>
+            <div
+              key={previewKey}
+              data-whether-embed={embedMode}
+              {...(ticker ? { "data-whether-ticker": ticker } : {})}
+              {...(stage ? { "data-whether-stage": stage } : {})}
+              style={{ minHeight: embedMode === "call-strip" ? "38px" : "80px" }}
+            >
+              {/* Client-side only: the server HTML is what a crawler indexes, and a
+                  "Loading…" sentence there is not part of the page. */}
+              <div className="px-3 py-3 text-fluid-micro text-slate-400">
+                {hydrated ? `Loading the live ${embedMode === "call-strip" ? "call strip" : "brief"}${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…` : null}
+              </div>
             </div>
           </div>
-        </div>
         <div className="min-w-0 space-y-3">
           <p className="text-fluid-micro font-semibold tracking-[0.04em] text-slate-400">
             Embed code

@@ -12,8 +12,9 @@ import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
 import { parseOperatorRunwayParam } from "../../../lib/report/operatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { formatMarginStamp, publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { formatMarginStamp, formatStripMargin, publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { formatGuidance } from "../../../lib/export/briefBuilders";
+import { buildCallChangeLines } from "../../../lib/report/reportEvidence";
 import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
 import { siteUrl } from "../../../lib/siteUrl";
 import { USE_CONSTRAINT_SUMMARY, buildUseConstraint } from "../../../lib/report/useConstraint";
@@ -27,6 +28,7 @@ export async function GET(request: Request) {
   const tickerParam = url.searchParams.get("ticker")?.trim().toUpperCase() || "";
   const format = url.searchParams.get("format") || "html";
   const ref = url.searchParams.get("ref") || "embed";
+  const mode = url.searchParams.get("mode") || (url.searchParams.get("view") === "call-strip" ? "call-strip" : "brief");
 
   // One parse, used for both the calibration and the label. Splitting them is
   // what let `stage=growth` — a value the picker offered and `isOperatorStage`
@@ -46,6 +48,45 @@ export async function GET(request: Request) {
     });
 
     const briefData = buildBriefEmbedData(homepage, { ticker: tickerParam, ref, companyStage });
+
+    if (mode === "call-strip") {
+      if (format === "json") {
+        return NextResponse.json({
+          mode: "call-strip",
+          regime: briefData.regimeLabel,
+          call: briefData.formattedCall,
+          marginLabel: briefData.marginLabel,
+          flipDistance: briefData.flipDistance,
+          flipTrigger: briefData.flipTrigger,
+          recordDate: briefData.recordDate,
+          use: buildUseConstraint(),
+          attribution: {
+            text: "Macro brief by Whether",
+            url: briefData.attributionUrl,
+          },
+        });
+      }
+
+      if (format === "text") {
+        return new NextResponse(buildCallStripEmbedText(briefData), {
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "X-Whether-Embed-Version": "1",
+            "Cache-Control": "public, max-age=900, s-maxage=900, stale-while-revalidate=1800",
+          },
+        });
+      }
+
+      const html = buildCallStripEmbedHtml(briefData);
+
+      return new NextResponse(html, {
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "X-Whether-Embed-Version": "1",
+          "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        },
+      });
+    }
 
     if (format === "json") {
       return NextResponse.json({
@@ -147,12 +188,30 @@ export const buildBriefEmbedData = (
   const resumeWhen = homepage.weeklyCall.resumeWhen?.trim() || null;
   const reversalCondition = primaryAction?.reversalCondition ?? null;
 
+  const assessment = homepage.reportResult.ok
+    ? homepage.reportResult.data.assessment
+    : homepage.reportResult.fallback.assessment;
+  const [nearest] = [...buildCallChangeLines(assessment)].sort(
+    (left, right) => (left.distance ?? Number.POSITIVE_INFINITY) - (right.distance ?? Number.POSITIVE_INFINITY),
+  );
+  const flipDistance = nearest?.distance ?? null;
+  const rawConfidence = homepage.weeklyDecisionCardModel.status.confidenceLabel ?? "HIGH";
+  const marginLabel = formatStripMargin(rawConfidence, flipDistance);
+  const formattedCall = formatGuidance({
+    actionNow,
+    currentCall: operatingCall,
+    policyOverrideActive: homepage.weeklyCall.policyOverrideActive,
+  });
+
   return {
     operatingCall,
     actionNow,
+    formattedCall,
     policyOverrideActive: homepage.weeklyCall.policyOverrideActive,
     doNowItems,
     flipTrigger,
+    flipDistance,
+    marginLabel,
     ...(resumeWhen ? { resumeWhen } : {}),
     reversalCondition,
     dataFreshness: homepage.reportShell.fetchedAtLabel,
@@ -174,11 +233,16 @@ export const buildBriefEmbedData = (
 type BriefEmbedData = {
   operatingCall: string;
   actionNow: string;
+  formattedCall?: string;
   /** A held week leads with the hold's action (`weeklyHeadline`). */
   policyOverrideActive?: boolean;
   doNowItems: string[];
   /** Where conditions change: the brief's "Conditions change if" sentence. Null when the call published none. Never filler. */
   flipTrigger: string | null;
+  /** Points to nearest change line */
+  flipDistance?: number | null;
+  /** Concise margin / flip distance label for compact views */
+  marginLabel?: string;
   /** Set only when a stage is calibrated: that stage's resume line, printed under its own label. */
   resumeWhen?: string;
   /** Null when the call published no reversal condition. Never filler. */
@@ -296,3 +360,34 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
   </div>
 </div>`;
 };
+
+export const buildCallStripEmbedHtml = (data: BriefEmbedData): string => {
+  const callText = data.formattedCall ?? formatGuidance({
+    actionNow: data.actionNow,
+    currentCall: data.operatingCall,
+    policyOverrideActive: data.policyOverrideActive,
+  });
+  const marginText = data.marginLabel ?? data.confidenceLabel;
+
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:100%;margin:0;padding:8px 12px;background:${OG_BG};border:1px solid ${OG_BORDER};border-radius:8px;color:${OG_TEXT};display:flex;align-items:center;justify-content:space-between;gap:12px;box-sizing:border-box;">
+  <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap;">
+    <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;background:rgba(237,240,238,0.08);color:${OG_TEXT};border:1px solid ${OG_BORDER};">${escapeHtml(data.regimeLabel)}</span>
+    <span style="font-size:13px;font-weight:600;color:${OG_TEXT};line-height:1.4;">${escapeHtml(callText)}</span>
+    <span style="font-size:12px;color:${OG_TEXT_MUTED};white-space:nowrap;">· ${escapeHtml(marginText)}</span>
+  </div>
+  <div style="font-size:10px;color:${OG_TEXT_MUTED};white-space:nowrap;margin-left:auto;">
+    <a href="${escapeAttribute(data.attributionUrl)}" style="color:${OG_TEXT_SECONDARY};text-decoration:none;font-weight:600;" target="_blank" rel="noopener">Whether &rarr;</a>
+  </div>
+</div>`;
+};
+
+export const buildCallStripEmbedText = (data: BriefEmbedData): string => {
+  const callText = data.formattedCall ?? formatGuidance({
+    actionNow: data.actionNow,
+    currentCall: data.operatingCall,
+    policyOverrideActive: data.policyOverrideActive,
+  });
+  const marginText = data.marginLabel ?? data.confidenceLabel;
+  return `Whether [${data.regimeLabel}]: ${callText} · ${marginText} (${data.attributionUrl})`;
+};
+
