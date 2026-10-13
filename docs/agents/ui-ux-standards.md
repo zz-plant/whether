@@ -685,3 +685,11 @@ an instrument: what it is shaped like says how it works. The form is physical, t
   physical. Depth is shadow geometry from the tokens, which flips colour with the theme and keeps
   one height in both.
 - Motion is the press only: 120ms on the transform, and none under reduced motion.
+- MUST: the same parts outside a track. A stepper's ends are `.weather-step-key`s standing in a
+  well around what they step (the week stepper, `app/components/home/WeekStepper.tsx`); the end
+  with nothing beyond it sinks flat and unlit rather than drawing a faded copy of a key. A toggle
+  button whose state is `aria-pressed` is a `.weather-key` (the calendar's months). An option in a
+  picker's list carries the lamp (`.weather-choice-item`), not a check over an action-ink wash.
+- NEVER: a translucent popup with nothing blurred behind it. At 95% the page's text read through
+  the header's pickers and the calendar; a popup is opaque, or it blurs what it covers (§XXV keeps
+  the blur where text must stay legible over a scrolling page).

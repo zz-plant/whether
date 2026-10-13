@@ -501,3 +501,107 @@ details[open] > summary[data-chevron]::after,
     transform: none;
   }
 }
+
+/* A stepper's ends (the week stepper on /): keys standing in the well around the
+   picker. The end with nothing beyond it sinks flat and unlit (§XXVI). */
+.weather-step-key {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-raised);
+  box-shadow: var(--elev-1);
+  color: var(--app-text-muted);
+  transition:
+    transform 120ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    box-shadow 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+
+a.weather-step-key:hover {
+  color: var(--app-text);
+}
+
+a.weather-step-key:active {
+  transform: translateY(1px);
+  background-color: var(--bg-nested);
+  box-shadow: var(--key-pressed);
+}
+
+.weather-step-key[aria-disabled="true"] {
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* An option in a picker's list (the header's stage and runway pickers): the
+   same lamp as a segmented key, lit on the chosen option, in place of a check
+   and an action-ink wash. */
+.weather-choice-item[data-selected] .weather-segment-lamp {
+  background-color: var(--app-text);
+  box-shadow: 0 0 0 2px var(--border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-step-key {
+    transition: none;
+  }
+  a.weather-step-key:active {
+    transform: none;
+  }
+}
+
+/* A key outside a segmented track: a toggle button whose state is `aria-pressed`
+   (the calendar picker's months and known periods). Unchosen keys sit flat with
+   an edge; the chosen one stands proud and lights its lamp, as in a track. */
+.weather-key {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-nested);
+  color: var(--app-text-muted);
+  transition:
+    transform 120ms var(--ease-out),
+    background-color 160ms var(--ease-out),
+    border-color 160ms var(--ease-out),
+    box-shadow 160ms var(--ease-out),
+    color 160ms var(--ease-out);
+}
+
+.weather-key:hover {
+  border-color: var(--border-strong);
+  color: var(--app-text);
+}
+
+.weather-key[aria-pressed="true"] {
+  border-color: var(--border-strong);
+  background-color: var(--bg-raised);
+  box-shadow: var(--elev-1);
+  color: var(--app-text);
+}
+
+.weather-key:active {
+  transform: translateY(1px);
+  background-color: var(--bg-nested);
+  box-shadow: var(--key-pressed);
+}
+
+.weather-key[aria-pressed="true"] .weather-segment-lamp {
+  background-color: var(--app-text);
+  box-shadow: 0 0 0 2px var(--border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-key {
+    transition: none;
+  }
+  .weather-key:active {
+    transform: none;
+  }
+}

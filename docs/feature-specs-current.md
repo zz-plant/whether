@@ -4192,3 +4192,12 @@ a pointer under the chosen one, with Bootstrapped set apart from the funded stag
 controls are four equal keys on one row from `sm` up, each label over its sublabel, where they
 used to break 2 + 2 and wrap each sublabel mid-phrase. No gradient or specular: §XXV stands.
 
+### 1.1.74 The week stepper and the pickers use the same parts (2026-10-13)
+
+The week stepper on `/` is one well: the earlier and later week are keys at either end of the
+calendar picker, and the end with no week beyond it sinks flat instead of drawing a faded box. The
+header's stage and runway pickers mark the chosen option with a lit lamp instead of a check over an
+action-ink wash, and the calendar's months and known periods are keys that stand proud when chosen.
+The three pickers that drew at 95% opacity with nothing blurred behind them are opaque: the page's
+text read through them (`docs/agents/ui-ux-standards.md` §XXVI).
+
