@@ -2,6 +2,25 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildHomePageCacheKey, createHomePageReportDataLoader } from "../lib/report/homePageData";
 import type { LoadReportDataSafeResult } from "../lib/report/reportData";
+import { buildReportDataFixture } from "./fixtures/reportFixtures";
+
+type CacheCallback = Parameters<typeof import("next/cache").unstable_cache>[0];
+
+/* Keys on every argument, as vinext's shim does (`JSON.stringify(args)`), and writes to a store
+   the caller owns, so two loaders can share it the way two deploys share the KV data cache. */
+const createSharedStoreUnstableCache = (store: Map<string, unknown>) => {
+  function unstableCache<T extends CacheCallback>(loader: T): T;
+  function unstableCache(loader: CacheCallback): CacheCallback {
+    return async (...args: unknown[]) => {
+      const key = JSON.stringify(args);
+      if (store.has(key)) return store.get(key);
+      const result: unknown = await loader(...args);
+      store.set(key, result);
+      return result;
+    };
+  }
+  return unstableCache;
+};
 
 const createFakeUnstableCache = () => {
   const cache = new Map<string, unknown>();
@@ -165,4 +184,36 @@ describe("createHomePageReportDataLoader", () => {
     assert.equal(callCount, 3);
   });
 
+  it("does not return an entry written by an earlier deploy", async () => {
+    const store = new Map<string, unknown>();
+    const unstableCache = createSharedStoreUnstableCache(store);
+    const earlierData = buildReportDataFixture();
+    const laterData = buildReportDataFixture();
+
+    const earlierDeploy = createHomePageReportDataLoader({
+      unstableCache,
+      resolveDeployVersion: () => "version-a",
+      loadReportDataSafe: async () => ({ ok: true, data: earlierData }),
+    });
+    let laterLoads = 0;
+    const laterDeploy = createHomePageReportDataLoader({
+      unstableCache,
+      resolveDeployVersion: () => "version-b",
+      loadReportDataSafe: async () => {
+        laterLoads += 1;
+        return { ok: true, data: laterData };
+      },
+    });
+
+    const written = await earlierDeploy();
+    assert.equal(written.ok && written.data, earlierData);
+
+    const read = await laterDeploy();
+    assert.equal(laterLoads, 1);
+    assert.equal(read.ok && read.data, laterData);
+
+    const reread = await laterDeploy();
+    assert.equal(laterLoads, 1, "the later deploy reuses its own entry");
+    assert.equal(reread.ok && reread.data, laterData);
+  });
 });

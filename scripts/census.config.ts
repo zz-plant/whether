@@ -1,15 +1,16 @@
 /**
  * What this repository's two census checks measure, and the ceilings they hold.
  *
- * The mechanisms — `scripts/check-dead-exports.ts` and `scripts/check-suppression-census.ts`
- * — name nothing about this repo. Everything that does lives here: which directories hold
+ * The mechanisms — `scripts/check-dead-exports.ts` and the `suppression-census` package —
+ * name nothing about this repo. Everything that does lives here: which directories hold
  * the code, which names Next.js and the Workers runtime consume by convention, where the
  * product's data sits, and the baselines. Lowering a baseline is an edit to this file, so it
  * lands in the same diff as the work that earned it and is visible in review, instead of
  * being a regenerated artifact nobody reads.
  */
+import type { CensusConfig } from "suppression-census";
+
 import type { DeadExportsConfig } from "./check-dead-exports";
-import type { SuppressionCensusConfig } from "./check-suppression-census";
 
 /**
  * Build output, caches and generated captures. Neither census reads anything under these,
@@ -138,19 +139,21 @@ export const deadExportsConfig: DeadExportsConfig = {
   baseline: 0,
 };
 
-export const suppressionCensusConfig: SuppressionCensusConfig = {
+/** Read by `bun run check:suppressions`, which runs the `suppression-census` CLI on this export. */
+export const suppressionCensusConfig: CensusConfig = {
   /** Roots that hold code a check could be told to ignore. */
-  scanRoots: ["app", "lib", "scripts", "tests", "worker"],
-  scanExtensions: [".ts", ".tsx", ".mts", ".js", ".mjs", ".jsx"],
+  roots: ["app", "lib", "scripts", "tests", "worker"],
+  extensions: [".ts", ".tsx", ".mts", ".js", ".mjs", ".jsx"],
   ignoredDirectories: GENERATED_DIRECTORIES,
-  /**
-   * The census and its test both contain every pattern it counts as literals, so a scan
-   * that included them would count the meter as debt and rise every time the census gained
-   * a category.
+  /*
+   * Nothing is excluded. The census used to skip itself and its test, which spelled every
+   * pattern out as literals; the mechanism now lives in node_modules, and
+   * tests/suppressionCensus.test.ts names no pattern. A file added here is a file whose
+   * suppressions stop counting, so it needs the same reason those two had.
    */
-  selfExcluded: ["scripts/check-suppression-census.ts", "tests/suppressionCensus.test.ts"],
+  exclude: [],
   lintConfig: ".oxlintrc.json",
-  testFileSuffixes: [".test.ts", ".test.tsx"],
+  testFilePattern: /\.test\.tsx?$/,
 
   /**
    * Measured on 2026-09-03. Every entry is a ceiling: lower it when the work earns it, never

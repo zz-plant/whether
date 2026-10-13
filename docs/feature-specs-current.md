@@ -162,7 +162,7 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    each area's row says which of its lines moved. A read with no comparison says so over it.
 7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; on every week, how long
-   these conditions lasted before (§1.1.75); the last turns as links.
+   these conditions lasted before (§1.1.76); the last turns as links.
 8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
    holds the slide and image copies and every other format since 2026-10-08, and the week's
    published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
@@ -3193,7 +3193,7 @@ reports the test, and the rule kept the current ramp.
   (`tests/trustRampTestNote.test.tsx`). Both are served from this site as plain text, at
   `/research/premise-test-registration.md` and `/research/premise-test-results.md`, because the
   repository is private and its GitHub copies are a 404 for readers. The routes serve
-  `lib/research/premiseTestDocs.ts`, which `scripts/research/publishPremiseTestDocs.ts` builds from
+  `lib/research/premiseTestDocs.ts`, which `scripts/research/publishResearchDocs.ts` builds from
   `docs/research/`; `tests/premiseTestDocs.test.ts` fails when the two differ.
 
 ### 1.1.69 The Synoptic palette (2026-10-09)
@@ -3373,7 +3373,53 @@ person who pays is not the person who uses the product, and priced that with a d
 undiscounted. The rules' bars move by six months with runway and conditions, so the planner draws
 the bar.
 
-### 1.1.75 What a market move means at the reader's scale (2026-10-13)
+### 1.1.75 `/concepts` counts every post, not only the famous ones (2026-10-13)
+
+The curated list in §1.1.64 tags texts chosen for being widely read, and its own limits say a
+systematic sample could lean differently. This is that sample: a pre-registered corpus study of
+every dated post in twelve archives from ten venture firms, January 2012 to September 2026, asking
+whether advice to founders moves with funding pressure and risk appetite.
+
+- **Registered first.** `docs/research/advice-corpus-preregistration.md` was the branch's first
+  commit, before any post was fetched for its text: hypotheses H1–H5, sources and exclusions, the
+  rubric (the prompt's SHA-256, which `tests/adviceCorpusRubric.test.ts` holds the code to), the
+  analysis plan, and what would count against each hypothesis. Seven deviations are recorded in its
+  §11, among them the rubric revision the validation forced (D4).
+- **Pipeline** (`scripts/advice-corpus/`, `bun run advice-corpus:*`). robots.txt first, one queue
+  per host at most once a second, a descriptive User-Agent; raw pages and text cached in the
+  gitignored `.cache/advice-corpus/`. A keyword-and-embedding prefilter picks what the local model
+  reads, plus a seeded 10% of the rest to measure what it misses. Labels come from the local model
+  (named in the documents); the hand labels that validate them and the analysis are frontier work.
+- **Data.** `data/advice-corpus/posts.json` holds derived metadata for every classified post (no
+  text; quotes of 15 words at most). `monthly.json` is generated from it alone (firm-weighted shares
+  by month, quarter and funding-pressure era); `tests/adviceCorpusData.test.ts` runs
+  `bun run advice-corpus:check`, so the two cannot drift.
+- **The section** (`app/concepts/adviceCorpusSection.tsx`), after "What the record shows" on `/concepts`: quarterly
+  expand and conserve shares under quarterly funding pressure, two panels on one time axis, the seven
+  changes in conditions as vertical rules named in the caption, an sr-only table of every quarter,
+  and a native tooltip per quarter. Shares come from `monthly.json`; funding pressure and the
+  changes come from the month-end record at render, so the chart cannot disagree with `/history`.
+  The two series are ink and dashed ink, not hues: every hue on the site already names a set of
+  conditions or a line state.
+- **Documents served from the site.** The repository is private, so the pre-registration and the
+  results are served as plain text at `/research/advice-corpus-preregistration.md` and
+  `/research/advice-corpus-results.md`, from `lib/research/adviceCorpusDocs.ts`.
+  `scripts/research/publishResearchDocs.ts` (renamed from `publishPremiseTestDocs.ts`, now one
+  registry for both studies) builds it; `tests/adviceCorpusDocs.test.ts` fails when it and
+  `docs/research/` differ.
+- **One stance vocabulary.** `lib/adviceStance.ts` keeps the reading list's one-liners and adds each
+  stance's registered corpus wording (`corpusDefinition`), so both import one module. The known
+  difference is written there: the one-liner puts "focus" under conserve; the corpus has no word
+  for it.
+- **What it found** (`docs/research/advice-corpus-results.md`). 8,777 posts in the corpus, 2,598
+  classified, 407 capital-relevant and addressed to founders. H1 (less expansion advice when funding
+  pressure is above its line), H2 (more conservation advice after the July 2022 crossing) and H3
+  (stance follows funding pressure more than risk appetite) count against; H4 (craft does not move)
+  is inconclusive; H5 (metrics) shows no shift. Stance labels agree with the reviewer at kappa 0.523,
+  below the registered 0.6, so every verdict is stated as resting on them. The section prints the
+  era shares from `monthly.json` and those limits; the curated list's "A small, chosen sample" limit
+  now points at it.
+### 1.1.76 What a market move means at the reader's scale (2026-10-13)
 
 A reader who hears "the Fed cut rates" or "the curve flattened" has nothing on the page to hold the
 headline against: the change lines are exact and, to most readers, unreadable sizes. Three sentences

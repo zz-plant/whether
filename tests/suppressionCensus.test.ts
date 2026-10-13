@@ -1,47 +1,42 @@
 import { describe, it } from "bun:test";
 import assert from "node:assert/strict";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 
-import { auditLintRules, takeCensus } from "../scripts/check-suppression-census";
+import { censusFromConfig } from "suppression-census";
+
+import { suppressionCensusConfig } from "../scripts/census.config";
+
+const REPO_ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 
 /**
  * The census guards every other ratchet in the gate, so the failure that matters
  * is not a wrong count — it is a scanner that quietly finds nothing and reports
- * a clean repo. A test that only asserted "counts are within baseline" would pass
- * against exactly that bug, so these pin detection against sites known to exist.
+ * a clean repo. The package's own suite pins its detection against fixtures; this
+ * pins this repo's config against sites known to exist, because a config pointing
+ * at the wrong roots reports zero and passes.
  */
 describe("suppression census", () => {
-  it("detects the suppressions that are actually in the tree", () => {
-    const census = takeCensus();
+  const census = censusFromConfig(REPO_ROOT, suppressionCensusConfig);
 
+  it("detects the suppressions that are actually in the tree", () => {
     assert.ok(
-      census.counts.lintSuppressions > 0,
-      "app/layout.tsx and worker/index.ts carry lint suppressions; finding none means the scanner is broken",
+      (census.counts.lintSuppressions ?? 0) > 0,
+      "app/layout.tsx and worker/index.ts carry lint suppressions; finding none means the config is broken",
     );
     assert.ok(
-      census.counts.typeSuppressions > 0,
+      (census.counts.typeSuppressions ?? 0) > 0,
       "scripts/seo-weekly-runbook.ts and tests/seoRefreshQueue.test.ts carry type suppressions",
     );
 
-    const lintFiles = new Set(census.hits.lintSuppressions.map((hit) => hit.file));
+    const lintFiles = new Set((census.hits.lintSuppressions ?? []).map((hit) => hit.file));
     assert.ok(lintFiles.has("app/layout.tsx"), "known suppression site went unseen");
-  });
-
-  it("does not count the census or its own test as debt", () => {
-    const census = takeCensus();
-    const scanned = [
-      ...census.hits.lintSuppressions,
-      ...census.hits.typeSuppressions,
-      ...census.hits.skippedTests,
-    ].map((hit) => hit.file);
-
-    // Both files spell every pattern out as a literal. Counting them would make
-    // the census rise whenever it gained a category.
-    assert.ok(!scanned.includes("scripts/check-suppression-census.ts"));
-    assert.ok(!scanned.includes("tests/suppressionCensus.test.ts"));
+    assert.ok(census.testFiles >= (suppressionCensusConfig.minimumTestFiles ?? 0), "the test-file pattern matched too little");
   });
 
   it("separates a rule that is off everywhere from one an override re-enables", () => {
-    const { disabled, scoped } = auditLintRules();
+    assert.ok(census.lintRules, "the config names .oxlintrc.json, so the rule audit must run");
+    const { disabled, scoped } = census.lintRules;
 
     // Both are "off" at the top level only so an `overrides` block can apply them
     // where they matter — the two file-size budgets and the lib/report/home import
@@ -76,11 +71,12 @@ describe("suppression census", () => {
   });
 
   it("counts no skipped tests, which is the state the baseline pins", () => {
-    assert.equal(takeCensus().counts.skippedTests, 0);
+    assert.equal(census.counts.skippedTests, 0);
   });
 
   it("counts a rule an override turns off, not just one that is off everywhere", () => {
-    const { overrideDisabled, disabled } = auditLintRules();
+    assert.ok(census.lintRules);
+    const { overrideDisabled, disabled } = census.lintRules;
 
     // nextjs/no-html-link-for-pages is enforced repo-wide and off for app/layout.tsx
     // alone, because /feed.xml is a route handler serving a file. That is a

@@ -76,7 +76,7 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   ESLint and `eslint-config-next` are gone, which is also what let TypeScript move to 7:
   typescript-eslint was the only consumer of the compiler API, which TS 7 does not ship until 7.1.
 - **Suppressions are themselves a gated metric.** `bun run check:suppressions`
-  (`scripts/check-suppression-census.ts`) counts inline lint disables, `@ts-*` comments, skipped
+  (the `suppression-census` package, configured in `scripts/census.config.ts`) counts inline lint disables, `@ts-*` comments, skipped
   tests, lint rules disabled globally, and lint rules an `overrides` block turns off, against a
   hand-edited baseline — and fails when any of them rises. It exists because every other ratchet here —
   the rule burn-down, `lint:types`, the suite — can be turned green by suppressing the finding
@@ -91,11 +91,21 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   change and belongs in its own PR with the reason.
 
   **Both census scripts are mechanism only (2026-10-06).** Everything that names this repo — the
-  scanned roots, the framework's convention names, the data directories, the self-exclusions, both
-  baselines and the test-file floor — is in `scripts/census.config.ts`, and both walk the tree
-  through one shared `scripts/walk-files.mjs`, which is also what `scripts/run-tests.mjs` uses for
-  its discovery guards. One walk, because two copies had already drifted: the guarded `statSync`
-  below existed in the dead-export scan and not in this one.
+  scanned roots, the framework's convention names, the data directories, both baselines and the
+  test-file floor — is in `scripts/census.config.ts`. The dead-export scan walks the tree through
+  `scripts/walk-files.mjs`, which is also what `scripts/run-tests.mjs` uses for its discovery
+  guards; the two census walks had already drifted once (the guarded `statSync` below existed in
+  the dead-export scan and not in this one).
+
+  **The suppression mechanism is a package now (2026-10-07).** It moved to
+  [`suppression-census`](https://github.com/zz-plant/suppression-census) with its fixture tests,
+  and its walk carries the same guard: an entry it cannot stat is skipped, not fatal. The CLI reads
+  `suppressionCensusConfig` out of `scripts/census.config.ts` directly. The self-exclusion list is
+  empty as a result: it existed because the script and its test spelled every pattern out as
+  literals, and the script is gone while `tests/suppressionCensus.test.ts` names no pattern. That
+  file now counts toward the test-file floor, which is why the count rose by one. A package change
+  reaches this repo only through a version bump in `package.json`, so rerun `check:suppressions`
+  and `check:dead-exports` on every bump.
 - **An unused export is a gated metric too (2026-09-15).** `bun run check:dead-exports`
   (`scripts/check-dead-exports.ts`) counts exported declarations under `app/`, `lib/` and
   `worker/` that no other scanned file mentions, against a baseline of **zero**. A sweep that
@@ -179,7 +189,10 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   When a check passes everywhere you can look, enumerate what the place you cannot look *has* that
   you do not — credentials first.
 - **The suite runs offline.** `bunfig.toml` preloads `scripts/test-network-guard.ts` for every
-  `bun test`, and an outbound fetch throws instead of leaving the box; loopback stays open, because
+  `bun test` (the guard itself is the
+  [`bun-test-network-guard`](https://github.com/zz-plant/bun-test-network-guard) package since
+  2026-10-07; the preload keeps this repo's allow variable, hint and ingestion directory), and an
+  outbound fetch throws instead of leaving the box; loopback stays open, because
   `tests/whetherCli.test.ts` starts its own server. This is the same argument as the stripped API
   keys one line up, taken to its end: a result that depends on what the environment happens to
   allow is not a result about the code. Measured 2026-09-03, it took the suite from **49.3s to
