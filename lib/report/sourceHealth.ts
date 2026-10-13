@@ -67,9 +67,10 @@ type SourceGroupDefinition = {
 };
 
 /*
- * Treasury is ingested once a day, by the 02:00 UTC cron, so its window is the ingest's
- * window. A 6h SLA here read every healthy day as stale from 08:00 UTC on, which /api/health
- * started reporting as "degraded" on 2026-10-13.
+ * Treasury is ingested once a day (the 02:00 UTC cron in wrangler.toml), so a 6h SLA
+ * marked it stale by 08:00 UTC every weekday and /api/health read "degraded" all
+ * afternoon on a healthy fetch. Take the window the ingest cadence already holds it to:
+ * one missed run, not one ordinary afternoon, is what makes it stale.
  */
 const TREASURY_SOURCE_SLA_HOURS = SIGNAL_CADENCE.TREASURY_10Y.staleAfterMs / 3_600_000;
 const MARKET_SOURCE_SLA_HOURS = 24;

@@ -4,6 +4,7 @@
  */
 import { readFile, writeFile } from "node:fs/promises";
 import type { MonthlySummary } from "../lib/summary/monthlySummary";
+import { carryUnchangedEntries } from "./carryUnchangedEntries";
 import { extractCalibrationMonths } from "../lib/report/confidenceCalibration";
 import type { QuarterlySummary } from "../lib/summary/quarterlySummary";
 import type { WeeklySummary } from "../lib/summary/weeklySummary";
@@ -106,9 +107,19 @@ const readExistingArchive = async () => {
   }
 };
 
+// Periods ending on the same day keep one order whichever generator ran last.
+const CADENCE_ORDER: Record<SummaryArchiveEntry["cadence"], number> = {
+  monthly: 0,
+  weekly: 1,
+  quarterly: 2,
+  yearly: 3,
+};
+
 const sortArchive = (entries: SummaryArchiveEntry[]) => {
   return [...entries].sort(
-    (a, b) => new Date(a.asOf).getTime() - new Date(b.asOf).getTime()
+    (a, b) =>
+      new Date(a.asOf).getTime() - new Date(b.asOf).getTime() ||
+      CADENCE_ORDER[a.cadence] - CADENCE_ORDER[b.cadence]
   );
 };
 
@@ -239,7 +250,9 @@ export const writeSummaryArchive = async ({
         : [...nextEntries, ...normalized];
   }
 
-  const sorted = sortArchive(nextEntries);
+  const sorted = sortArchive(
+    carryUnchangedEntries(existing, nextEntries, (entry) => `${entry.cadence}:${getArchiveKey(entry)}`),
+  );
   await writeFile(ARCHIVE_PATH, `${JSON.stringify(sorted, null, 2)}\n`, "utf8");
   // The confidence record reads a five-field extract of this file so its pages
   // do not bundle 5MB (lib/report/confidenceCalibration.ts). Written here, with
