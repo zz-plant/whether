@@ -1,4 +1,5 @@
 import { formatAgeSpan, formatTimestampUTC } from "../formatters";
+import { SIGNAL_CADENCE } from "../ingestion/cadence";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
@@ -65,7 +66,13 @@ type SourceGroupDefinition = {
   useBusinessDays?: boolean;
 };
 
-const TREASURY_SOURCE_SLA_HOURS = 6;
+/*
+ * Treasury is ingested once a day (the 02:00 UTC cron in wrangler.toml), so a 6h SLA
+ * marked it stale by 08:00 UTC every weekday and /api/health read "degraded" all
+ * afternoon on a healthy fetch. Take the window the ingest cadence already holds it to:
+ * one missed run, not one ordinary afternoon, is what makes it stale.
+ */
+const TREASURY_SOURCE_SLA_HOURS = SIGNAL_CADENCE.TREASURY_10Y.staleAfterMs / 3_600_000;
 const MARKET_SOURCE_SLA_HOURS = 24;
 const MONTHLY_RELEASE_SLA_HOURS = 45 * 24;
 const CURATED_SNAPSHOT_SLA_HOURS = 45 * 24;
@@ -389,7 +396,7 @@ export const buildSourceHealthRows = ({
   return [
     {
       sourceName: "Treasury",
-      cadenceLabel: "Intraday rates",
+      cadenceLabel: "Daily rates",
       freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now, true),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,
