@@ -133,9 +133,9 @@ describe("buildSourceHealthRows", () => {
     const summary = summarizeSourceHealthCoverage([
       {
         sourceName: "Treasury",
-        cadenceLabel: "Intraday rates",
+        cadenceLabel: "Daily rates",
         freshnessStatus: "fresh",
-        freshnessSlaHours: 6,
+        freshnessSlaHours: 26,
         lastSuccessfulFetchAt: "2026-03-10T00:00:00.000Z",
         ageLabel: "1d",
         activeFallbackReason: null,
@@ -331,12 +331,28 @@ describe("the /trust source board", () => {
   });
 });
 
+describe("Treasury freshness follows the daily ingest", () => {
+  // Production on 2026-10-13: fetched by the 02:00 UTC cron, read at 20:16 UTC, reported stale.
+  const fetchedAt = "2026-10-13T02:01:46.905Z";
+  const treasuryRow = (now: string) =>
+    buildSourceHealthRows({ treasury: buildTreasury({ fetched_at: fetchedAt }), macroSeries: [], now: new Date(now) })[0];
+
+  it("is fresh for the whole day between cron runs", () => {
+    assert.equal(treasuryRow("2026-10-13T20:16:47.989Z")?.freshnessStatus, "fresh");
+    assert.equal(treasuryRow("2026-10-14T02:00:00.000Z")?.freshnessStatus, "fresh");
+  });
+
+  it("is stale once a cron run is missed", () => {
+    assert.equal(treasuryRow("2026-10-14T06:00:00.000Z")?.freshnessStatus, "stale");
+  });
+});
+
 describe("listStaleLiveSources", () => {
   const row = (overrides: Partial<SourceHealthRow>): SourceHealthRow => ({
     sourceName: "Treasury",
-    cadenceLabel: "Intraday rates",
+    cadenceLabel: "Daily rates",
     freshnessStatus: "fresh",
-    freshnessSlaHours: 6,
+    freshnessSlaHours: 26,
     lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
     ageLabel: "14h",
     activeFallbackReason: null,

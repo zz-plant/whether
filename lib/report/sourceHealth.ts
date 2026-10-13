@@ -1,4 +1,5 @@
 import { formatAgeSpan, formatTimestampUTC } from "../formatters";
+import { SIGNAL_CADENCE } from "../ingestion/cadence";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
@@ -65,7 +66,12 @@ type SourceGroupDefinition = {
   useBusinessDays?: boolean;
 };
 
-const TREASURY_SOURCE_SLA_HOURS = 6;
+/*
+ * Treasury is ingested once a day, by the 02:00 UTC cron, so its window is the ingest's
+ * window. A 6h SLA here read every healthy day as stale from 08:00 UTC on, which /api/health
+ * started reporting as "degraded" on 2026-10-13.
+ */
+const TREASURY_SOURCE_SLA_HOURS = SIGNAL_CADENCE.TREASURY_10Y.staleAfterMs / 3_600_000;
 const MARKET_SOURCE_SLA_HOURS = 24;
 const MONTHLY_RELEASE_SLA_HOURS = 45 * 24;
 const CURATED_SNAPSHOT_SLA_HOURS = 45 * 24;
@@ -389,7 +395,7 @@ export const buildSourceHealthRows = ({
   return [
     {
       sourceName: "Treasury",
-      cadenceLabel: "Intraday rates",
+      cadenceLabel: "Daily rates",
       freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now, true),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,
