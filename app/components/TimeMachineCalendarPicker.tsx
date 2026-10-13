@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Popover } from "@base-ui/react/popover";
-import { CheckIcon, ChevronDownIcon } from "./uiIcons";
+import { ChevronDownIcon } from "./uiIcons";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 
 /**
@@ -87,10 +87,10 @@ export function TimeMachineCalendarPicker({
           at title size it competed with the verdict under it. It names the week
           the verdict is for, by its Monday. */}
       <p className="text-fluid-sm font-semibold tracking-tight text-slate-200">
-        <Popover.Trigger className="group -ml-2 inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-lg px-2 py-1 text-left transition-colors hover:bg-slate-900/60 hover:text-sky-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400">
+        <Popover.Trigger className="group inline-flex min-h-[44px] cursor-pointer items-center gap-2 rounded-md px-2 py-1 text-left transition-colors hover:text-[color:var(--app-text)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400">
           {currentDateLabel}
           <ChevronDownIcon
-            className={`h-[18px] w-[18px] text-slate-400 transition-transform duration-200 group-hover:text-sky-300 ${
+            className={`h-[18px] w-[18px] text-slate-400 transition-transform duration-200 group-hover:text-[color:var(--app-text)] ${
               open ? "rotate-180 text-sky-400" : ""
             }`}
           />
@@ -101,7 +101,7 @@ export function TimeMachineCalendarPicker({
         <Popover.Positioner side="bottom" align="start" sideOffset={8} className="z-50">
           <Popover.Popup
             aria-label="Select brief period"
-            className="max-h-96 w-80 overflow-y-auto overscroll-contain rounded-xl border border-slate-800 bg-slate-950/95 p-3 shadow-2xl"
+            className="max-h-96 w-80 overflow-y-auto overscroll-contain rounded-xl border border-slate-800 bg-slate-950 p-3 shadow-2xl"
           >
             <div className="mb-2 flex items-center justify-between border-b border-white/[0.08] pb-2">
               <span className="text-xs font-semibold text-white">Past weeks</span>
@@ -133,15 +133,11 @@ export function TimeMachineCalendarPicker({
                       type="button"
                       aria-pressed={isSelected}
                       onClick={() => handleSelect(periodDate.toISOString())}
-                      className={`flex min-h-[44px] flex-col items-start rounded-lg border px-2.5 py-1.5 text-left text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
-                        isSelected
-                          ? "border-sky-500/50 bg-sky-500/15 text-white"
-                          : "border-white/[0.06] bg-slate-900/50 text-slate-300 hover:border-slate-700 hover:bg-slate-900"
-                      }`}
+                      className="weather-key flex min-h-[44px] flex-col items-start px-2.5 py-1.5 text-left text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                     >
                       <span className="flex w-full items-center justify-between gap-1">
                         <span className="font-semibold tabular-nums">{MONTH_YEAR_LABEL.format(periodDate)}</span>
-                        {isSelected && <CheckIcon className="h-3 w-3 text-sky-400" />}
+                        <span className="weather-segment-lamp" aria-hidden="true" />
                       </span>
                       <span className="w-full truncate text-fluid-nano text-slate-400">
                         {period.label}
@@ -173,15 +169,11 @@ export function TimeMachineCalendarPicker({
                             type="button"
                             aria-pressed={isSelected}
                             onClick={() => handleSelect(entry.record_date)}
-                            className={`flex min-h-[44px] flex-col items-start rounded-lg border p-2 text-left text-xs transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400 ${
-                              isSelected
-                                ? "border-sky-500/50 bg-sky-500/15 text-white"
-                                : "border-white/[0.04] bg-slate-900/40 text-slate-300 hover:border-slate-700 hover:bg-slate-900"
-                            }`}
+                            className="weather-key flex min-h-[44px] flex-col items-start p-2 text-left text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                           >
                             <span className="flex w-full items-center justify-between">
                               <span className="font-semibold">{monthName}</span>
-                              {isSelected && <CheckIcon className="h-3 w-3 text-sky-400" />}
+                              <span className="weather-segment-lamp" aria-hidden="true" />
                             </span>
                             <span className="w-full truncate text-fluid-nano text-slate-400">
                               {publicLabel}
