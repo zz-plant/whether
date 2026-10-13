@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import {
   buildSharedRunwayPlanQuery,
+  plannerEditStands,
   readSharedRunwayPlan,
   resolveSharedRunwayProfile,
 } from "../app/operate/components/runwayPlanLink";
@@ -145,10 +146,56 @@ describe("shared runway plan link", () => {
     assert.equal(readSharedRunwayPlan(new URLSearchParams(query)).profile.cashUsd, 2_100_000);
   });
 
+  /*
+   * The planner's projects travel with the plan, one `project` per row. A
+   * figure outside its limits is dropped like any other, and the row stays.
+   */
+  it("carries the engineer-week cost and each project row, blank rows included", () => {
+    const query = buildSharedRunwayPlanQuery(
+      {
+        ...EMPTY_OPERATOR_PROFILE,
+        engineerWeekCostUsd: 4500,
+        paybackProjects: [{ name: "Importer_v2", weeksToShip: 6, engineers: 2, hoursSavedPerMonth: 160, hourlyCostUsd: 80 }, {}],
+      },
+      null,
+    );
+    const read = readSharedRunwayPlan(new URLSearchParams(query));
+    assert.equal(read.profile.engineerWeekCostUsd, 4500);
+    assert.deepEqual(read.profile.paybackProjects, [
+      { name: "Importer_v2", weeksToShip: 6, engineers: 2, hoursSavedPerMonth: 160, hourlyCostUsd: 80 },
+      {},
+    ]);
+    assert.match(query, /project=6_2_160_80__Importer_v2&project=_____/, "the link reads as typed, with no escaped separators");
+    assert.equal(readSharedRunwayPlan(new URLSearchParams("engWeek=4.5k")).profile.engineerWeekCostUsd, 4500);
+  });
+
+  it("drops a project's out-of-range or malformed figure and keeps the rest of the row", () => {
+    const read = readSharedRunwayPlan(new URLSearchParams("project=6_500_12abc_80__Importer"));
+    assert.deepEqual(read.profile.paybackProjects, [{ name: "Importer", weeksToShip: 6, hourlyCostUsd: 80 }]);
+    const many = new URLSearchParams(Array.from({ length: 6 }, (_, index) => ["project", `${index + 1}_1____`]));
+    assert.equal(readSharedRunwayPlan(many).profile.paybackProjects?.length, 4);
+  });
+
+  /*
+   * `router.replace` lands a server round trip after an edit. Read back as "the
+   * link wins", the link before it was the base the next edit was built on, so a
+   * second field typed inside that trip wrote the first back to its old value.
+   */
+  it("keeps an edit over the address bar until the bar shows the edit's own address", () => {
+    const queries = ["runway=11", "runway=11&engWeek=4500", "runway=11&engWeek=4500&project=4_____"];
+    assert.equal(plannerEditStands(queries, "runway=11"), true, "nothing has landed yet");
+    assert.equal(plannerEditStands(queries, "runway=11&engWeek=4500"), true, "an earlier write landed; the last has not");
+    assert.equal(plannerEditStands(queries, "runway=11&engWeek=4500&project=4_____"), false, "caught up: the link says the same");
+    assert.equal(plannerEditStands(queries, "runway=20"), false, "someone else's link, which wins");
+  });
+
   it("resolves precedence in render rather than racing effects", async () => {
     const panel = await readFile("app/operate/components/runwayPlannerPanel.tsx", "utf8");
-    assert.match(panel, /const profile = useMemo\(\(\) => resolveSharedRunwayProfile\(storedProfile, shared\.profile\)/);
-    assert.match(panel, /const stage = shared\.stage \?\? storedStage;/);
+    assert.match(panel, /const linkedProfile = useMemo\(\(\) => resolveSharedRunwayProfile\(storedProfile, shared\.profile\)/);
+    /* An edit made here stands until the address bar catches up with it: the
+       link it replaced is not a base for the next edit (2026-10-13). */
+    assert.match(panel, /const profile = ownEdit\?\.profile \?\? linkedProfile;/);
+    assert.match(panel, /const stage = ownEdit \? ownEdit\.stage : shared\.stage \?\? storedStage;/);
     /* replace, not push: a history entry per keystroke in a number field turns
        the back button into a rubout key. */
     assert.match(panel, /router\.replace\(/);

@@ -3323,7 +3323,54 @@ mostly flagged rows for different areas that rightly share a line.
   hover title then reads "Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56".
 
 `tests/chartIntegrityContract.test.tsx` and `tests/visualPrimitives.test.tsx` hold them.
-||||||| a0b5077b
+
+### 1.1.73 Engineering work against the payback bar, in the runway planner (2026-10-13)
+
+The runway planner (`/operate/financial`) checks the reader's own engineering projects against the
+payback bar the published rules already set. It does not add a bar of its own
+(`lib/report/projectPayback.ts`):
+
+- **The bar.**
+  - Under six months of runway, the cash gate holds every new commitment.
+  - With 6–12 months, every commitment needs a payback inside `TIGHT_RUNWAY_PAYBACK_BAR_MONTHS` (6).
+  - Otherwise, outside Sunny, the Product tempo rule slows work that pays back in more than a year
+    (`ROADMAP_PAYBACK_BAR_MONTHS`, 12; `tests/projectPayback.test.tsx` holds the number to the rule's
+    sentence).
+  - In Sunny, with a year or more of runway, there is no bar on roadmap work.
+- **A project.**
+  - Cost: weeks to ship × engineers × what an engineer-week costs.
+  - Saving: hours it saves a month × what one of those hours costs, plus bills it cuts.
+  - Each row prints a sentence: the break-even month, the bar it clears or misses, and what lifts
+    that bar. Work that saves no cash is told it has no payback to check and has to be argued on
+    revenue or retention.
+  - Once the work ships, the saving lowers net burn. The sentence says how much runway that adds, at
+    today's net burn with revenue flat. When the added runway moves the reader into a band with a
+    different bar, it says that too.
+  - Engineer time counts toward the payback but not the runway, because the engineers are paid
+    either way.
+- **The chart.**
+  - One strip per project on one month scale: building, paying back, and a dot at the break-even,
+    filled when it clears the bar (`app/operate/components/projectPaybackChart.tsx`).
+  - The bar and the cash-out month cross every strip.
+  - HTML positioned by percent, like the planner's `RangeBar`, so the labels stay page text at
+    phone width.
+- **Where it lives.**
+  - The engineer-week cost and up to four project rows are in the operator profile.
+  - They travel with the plan link as `engWeek` and one `project=weeks_engineers_hours_hourly_other_name`
+    per row (`app/operate/components/runwayPlanLink.ts`).
+  - The bar sentence and each project's sentence go into the copy block and the budget memo.
+- **Edits stand until the address bar catches up.**
+  - The panel reads its plan back from the link, and `router.replace` lands a server round trip
+    after each edit. A second field typed inside that trip was built on the older link and wrote
+    the first field back to its old value.
+  - The panel now keeps its own last edit until the bar shows that edit's address
+    (`plannerEditStands`). An address it never wrote is someone else's link, which wins as before.
+
+Why: a set of essays argued that "product craft" has to be justified as cost removed once the
+person who pays is not the person who uses the product, and priced that with a discount rate. At a
+22% hurdle, a project that breaks even inside two years does so about a month later than
+undiscounted. The rules' bars move by six months with runway and conditions, so the planner draws
+the bar.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
