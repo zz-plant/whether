@@ -169,10 +169,60 @@ const FAILURE_MARKED_LINES = 20;
 
 const formatDuration = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
+/** CHECK_VERBOSE=1 prints every passing task's output in full, as this runner used to. */
+const VERBOSE = process.env.CHECK_VERBOSE === "1";
+/** How many closing lines of a passing task stand in for the rest: bun test closes with its seed and counts. */
+const PASSING_SUMMARY_LINES = 4;
+/** A line printed more often than this is noise; it is printed once with its count. */
+const REPEAT_LIMIT = 3;
+
+/*
+ * A passing task's output is its verdict and nothing a reader acts on, so it is reduced to
+ * the lines it closes with (`3072 pass`, `Found 0 warnings`). On 2026-10-13 the passing
+ * suite alone was ~1,900 lines, ~700 of them one fallback warning repeated, and the log
+ * window cut off before the step that mattered.
+ */
+const summarizePassing = (output) => {
+  const lines = output.trim().split("\n").filter((line) => line.trim());
+  const shown = lines.slice(-PASSING_SUMMARY_LINES);
+  const hidden = lines.length - shown.length;
+  return { shown, hidden };
+};
+
+/** Keeps a failing task's output whole, except that a line repeated past the limit is printed once, with its count. */
+const collapseRepeats = (output) => {
+  const lines = output.trim().split("\n");
+  const counts = new Map();
+  for (const line of lines) counts.set(line, (counts.get(line) ?? 0) + 1);
+
+  const printed = new Set();
+  const kept = [];
+  for (const line of lines) {
+    const count = counts.get(line);
+    if (count <= REPEAT_LIMIT || !line.trim()) {
+      kept.push(line);
+      continue;
+    }
+    if (printed.has(line)) continue;
+    printed.add(line);
+    kept.push(`${line}  [×${count}, later repeats hidden]`);
+  }
+  return kept.join("\n");
+};
+
 const report = ({ task, ok, output, ms }) => {
   process.stdout.write(`\n${ok ? "✅" : "❌"} ${task.name} (${formatDuration(ms)})\n`);
   const trimmed = output.trim();
-  if (trimmed) process.stdout.write(`${trimmed}\n`);
+  if (!trimmed) return;
+
+  if (ok && !VERBOSE) {
+    const { shown, hidden } = summarizePassing(trimmed);
+    process.stdout.write(`${shown.join("\n")}\n`);
+    if (hidden > 0) process.stdout.write(`[run-checks] ${hidden} earlier line(s) hidden; CHECK_VERBOSE=1 prints them.\n`);
+    return;
+  }
+
+  process.stdout.write(`${collapseRepeats(trimmed)}\n`);
 };
 
 /** One stage: every task in it, then the summary and the failure repeat. Resolves to whether all passed. */
@@ -229,7 +279,7 @@ const runStage = async (selected) => {
     process.stdout.write(`\n[run-checks] ran on bun ${Bun.version}${engineMismatch() ?? ""}\n`);
 
     for (const result of failed) {
-      const lines = result.output.trimEnd().split("\n");
+      const lines = collapseRepeats(result.output).split("\n");
       const tail = lines.slice(-FAILURE_TAIL_LINES);
       process.stdout.write(`\n───── ${result.task.name} failed (\`bun run ${result.task.script}\`) ─────\n`);
 

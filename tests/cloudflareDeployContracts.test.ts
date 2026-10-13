@@ -117,7 +117,8 @@ describe("Cloudflare deploy contracts", () => {
 
   it("streams the deploy rather than buffering it, so the slowest step stays visible", () => {
     assert.match(source, /stdio: \["inherit", "pipe", "pipe"\]/);
-    assert.match(source, /sink\.write\(chunk\)/);
+    // Each chunk goes to the module-table filter as it arrives, which prints whole lines at once.
+    assert.match(source, /filter\.write\(String\(chunk\)\)/);
   });
 
   it("does not run a deploy when imported", () => {
