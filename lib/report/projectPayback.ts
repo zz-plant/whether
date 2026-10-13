@@ -63,6 +63,56 @@ export const describePaybackBar = (bar: PaybackBar, regime: RegimeKey): string =
   return `In ${getRegimePublicLabel(regime)} conditions, the roadmap rule slows anything that pays back in more than a year.`;
 };
 
+const isSunny = (scores: { tightness: number; riskAppetite: number }, lines: { tightness: number; riskAppetite: number }) =>
+  scores.tightness <= lines.tightness && scores.riskAppetite > lines.riskAppetite;
+
+/**
+ * Whether the market can move this bar, and what it would take.
+ *
+ * A reader hears "rates are falling" and asks what it changes for their work.
+ * For the bar, the answer is often nothing: under a year of runway the bar is
+ * set by cash, and no market move lifts it. Outside that, the bar is the roadmap
+ * rule's, and the only market move that changes it is conditions crossing into
+ * or out of Sunny. This says which case the reader is in, in the change lines'
+ * own numbers, and how many of their sized projects the move would change.
+ */
+export const describeWhatMovesPaybackBar = ({
+  bar,
+  scores,
+  lines,
+  paybacks,
+}: {
+  bar: PaybackBar;
+  /** This week's two scores. */
+  scores: { tightness: number; riskAppetite: number };
+  /** The change lines the four conditions are split at. */
+  lines: { tightness: number; riskAppetite: number };
+  paybacks: readonly ProjectPayback[];
+}): string => {
+  const today = `(${scores.tightness} and ${scores.riskAppetite} today)`;
+  if (bar.kind === "cash-gate") {
+    return "Your cash sets this, not the market: no rate move or headline lifts it. A round, revenue or a lower burn does.";
+  }
+  if (bar.kind === "months" && bar.basis === "tight-runway") {
+    return "Your runway sets this bar, not the market: no rate move or headline lifts it. Runway past 12 months does, by a round, revenue or a lower burn.";
+  }
+  const sized = paybacks.filter((project): project is SizedProjectPayback => project.status === "sized" && project.breakEvenMonth !== null);
+  if (bar.kind === "months") {
+    const lifted = sized.filter((project) => project.verdict === "misses").length;
+    const missing = [
+      ...(scores.tightness > lines.tightness ? [`funding pressure falls to ${lines.tightness} or below`] : []),
+      ...(scores.riskAppetite <= lines.riskAppetite ? [`risk appetite rises above ${lines.riskAppetite}`] : []),
+    ];
+    const needs = missing.length > 0 ? missing.join(" and ") : "the scores hold where they are";
+    const effect = lifted > 0 ? ` That would stop slowing ${lifted} of your projects that miss it.` : "";
+    return `The market sets this bar. It lifts if conditions turn ${getRegimePublicLabel("EXPANSION")}: ${needs} ${today}.${effect}`;
+  }
+  if (!isSunny(scores, lines)) return "";
+  const missed = sized.filter((project) => (project.breakEvenMonth ?? 0) > ROADMAP_PAYBACK_BAR_MONTHS).length;
+  const effect = missed > 0 ? `, and ${missed} of your projects would miss it` : "";
+  return `The market sets whether there is a bar. If funding pressure rises above ${lines.tightness} or risk appetite falls to ${lines.riskAppetite} or below ${today}, a ${ROADMAP_PAYBACK_BAR_MONTHS}-month bar returns${effect}.`;
+};
+
 export type ProjectPaybackContext = {
   regime: RegimeKey;
   runwayMonths: number;

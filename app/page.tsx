@@ -27,6 +27,7 @@ import {
 import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
+import { describeMarketMoveScale } from "../lib/report/marketMoveScale";
 import { describeMovementCause } from "../lib/report/decisionMovement";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
@@ -65,13 +66,13 @@ import { RegimeRadar } from "./components/home/RegimeRadar";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
 import { describeCitableBriefBasis } from "../lib/report/publishedBriefs";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
-import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
+import { getTimeMachineRegimeSeries, getTimeMachineYieldCurveSeries } from "../lib/timeMachine/timeMachineCache";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 import { JsonLdScript } from "./components/jsonLdScript";
 import { PublishedCallWatcher } from "./components/publishedCallWatcher";
 import { OfflineNotice } from "./components/offlineNotice";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
-import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
 import { findLeadAnswerForArea } from "./answers/decisionPages";
@@ -286,7 +287,17 @@ async function PageContent({
      interest-rate terms" fold under that sentence prints them. */
   const v2HeroSignalData = {
     ...buildV2HeroSignalData(reportData),
-    flipProximity: buildFlipProximity(reportData.assessment),
+    flipProximity: buildFlipProximity(reportData.assessment).map((line) => ({
+      ...line,
+      /* Each move against a Fed step and the record's own months, so a reader
+         can hold a headline against the line (`marketMoveScale.ts`). */
+      scale: describeMarketMoveScale({
+        input: line.input,
+        move: line.inputMove,
+        baseRateUsed: reportData.assessment.scores.baseRateUsed,
+        series: getTimeMachineYieldCurveSeries(Number.MAX_SAFE_INTEGER),
+      }),
+    })),
   };
 
   // The first rule is the one whose pause sentence the guardrail slot prints
@@ -413,6 +424,15 @@ async function PageContent({
     const answer = findLeadAnswerForArea(area);
     return [{ ...row, answer: answer ? { href: `/answers/${answer.slug}`, title: answer.title } : undefined }];
   });
+  /* How long these conditions lasted before, against the reader's chosen band.
+     Left out of an archived view, whose record would have to end at its month. */
+  const spellLengths = historicalSelection || !isRegimeKey(regime)
+    ? null
+    : describeSpellLengths({
+        series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+        currentRegime: regime,
+        runwayBand: data.operatorContext.companyRunway ?? null,
+      });
   const turningPoints = findRecentCallChanges(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER), 4).map((change) => ({
     label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
     href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
@@ -694,7 +714,7 @@ async function PageContent({
             />
 
             {/* 7. Has this happened before? */}
-            <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} />
+            <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} spellLengths={spellLengths} />
 
             {/* Last, as a line rather than a section: the way out to every share
                 format, and the week's published brief. */}
