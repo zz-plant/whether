@@ -106,6 +106,7 @@ export function parseCsv(source: string): Record<string, string>[] {
     rows.push(row);
   }
   const [header, ...body] = rows;
+  if (!header) return [];
   return body.filter((cells) => cells.some(Boolean)).map((cells) => Object.fromEntries(header.map((name, index) => [name, cells[index] ?? ""])));
 }
 

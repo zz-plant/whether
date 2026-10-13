@@ -117,6 +117,7 @@ export function loadCorpus(): { posts: ExtractedPost[]; counts: CorpusCounts; by
   const result = applyExclusions(all);
   for (const source of SOURCES) {
     const counts = bySource[source.id];
+    if (!counts) continue;
     counts.corpus = result.kept.filter((post) => post.source === source.id).length;
     counts.e4Duplicate = counts.extracted - counts.e2Short - counts.e3Announcement - counts.corpus;
   }

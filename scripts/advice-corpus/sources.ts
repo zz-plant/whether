@@ -67,7 +67,7 @@ const ok = async (url: string) => {
 /** Every `<loc>` in a sitemap or sitemap index, following nested indexes. */
 async function sitemapLocations(url: string): Promise<string[]> {
   const body = await ok(url);
-  const locations = [...body.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map((match) => decodeEntities(match[1]));
+  const locations = [...body.matchAll(/<loc>\s*([^<\s]+)\s*<\/loc>/g)].map((match) => decodeEntities(match[1] ?? ""));
   if (/<sitemapindex/i.test(body)) {
     const nested: string[] = [];
     for (const location of locations) nested.push(...(await sitemapLocations(location)));
@@ -152,7 +152,7 @@ async function discoverYcBlog() {
     const body = await ok(`https://www.ycombinator.com/blog?page=${page}`);
     const match = /data-page="([^"]*)"/.exec(body);
     if (!match) throw new Error(`no listing data on YC blog page ${page}`);
-    const parsed = YcPageSchema.parse(JSON.parse(decodeEntities(match[1])));
+    const parsed = YcPageSchema.parse(JSON.parse(decodeEntities(match[1] ?? "")));
     for (const post of parsed.props.posts) {
       entries.push(
         entry(`https://www.ycombinator.com/blog/${post.slug}`, {
@@ -174,7 +174,7 @@ async function discoverPaulGraham() {
   const links = [...body.matchAll(/<a href="([a-z0-9]+\.html)">([^<]+)<\/a>/gi)];
   const seen = new Set<string>();
   const entries: IndexEntry[] = [];
-  for (const [, href, title] of links) {
+  for (const [, href = "", title = ""] of links) {
     if (href === "index.html" || href === "articles.html" || seen.has(href)) continue;
     seen.add(href);
     entries.push(entry(`https://paulgraham.com/${href}`, { title: decodeEntities(title).trim() }));
@@ -194,7 +194,7 @@ async function discoverTunguz() {
       ...response.body.matchAll(/<h2 class="post-title">\s*<a href="([^"]+)">([\s\S]*?)<\/a>[\s\S]*?<time datetime="([^"]+)"/g),
     ];
     if (posts.length === 0) break;
-    for (const [, href, title, published] of posts) {
+    for (const [, href = "", title = "", published = ""] of posts) {
       const absolute = new URL(href, "https://tomtunguz.com").toString();
       entries.push(entry(absolute, { published, title: decodeEntities(title.replace(/<[^>]+>/g, "")).trim() }));
     }
@@ -212,7 +212,7 @@ function nfxBody(html: string): string | null {
   const payload = /<script id="__NEXT_DATA__"[^>]*>([\s\S]*?)<\/script>/.exec(html);
   if (!payload) return null;
   try {
-    const parsed = NfxPageSchema.safeParse(JSON.parse(payload[1]));
+    const parsed = NfxPageSchema.safeParse(JSON.parse(payload[1] ?? ""));
     return parsed.success ? inlineText(parsed.data.props.pageProps.post.content.rendered) : null;
   } catch {
     return null;
@@ -231,7 +231,7 @@ export const SOURCES: readonly Source[] = [
     trimFrom: /\nAbout the Contributors?\n|Expert News by a16z|The views expressed here are those of the individual AH Capital Management/,
     discover: async () => {
       const index = await ok("https://a16z.com/sitemap_index.xml");
-      const postSitemaps = [...index.matchAll(/<loc>\s*(https:\/\/a16z\.com\/post-sitemap\d*\.xml)\s*<\/loc>/g)].map((match) => match[1]);
+      const postSitemaps = [...index.matchAll(/<loc>\s*(https:\/\/a16z\.com\/post-sitemap\d*\.xml)\s*<\/loc>/g)].flatMap((match) => (match[1] ? [match[1]] : []));
       const entries: IndexEntry[] = [];
       for (const sitemap of postSitemaps) entries.push(...(await discoverFromSitemap(sitemap, /^https:\/\/a16z\.com\/[^?#]+\/$/)));
       return entries;

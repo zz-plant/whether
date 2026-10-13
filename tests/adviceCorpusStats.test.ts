@@ -76,9 +76,9 @@ describe("resampling and permutation", () => {
   });
 
   it("draws whole blocks of consecutive periods, trimmed to the series length", () => {
-    const [replicate] = blockBootstrapIndices(30, 12, 1, seededRandom(1));
+    const [replicate = []] = blockBootstrapIndices(30, 12, 1, seededRandom(1));
     assert.equal(replicate.length, 30);
-    assert.equal(replicate[1] - replicate[0], 1);
+    assert.equal((replicate[1] ?? 0) - (replicate[0] ?? 0), 1);
     assert.ok(replicate.every((index) => index >= 0 && index < 30));
   });
 

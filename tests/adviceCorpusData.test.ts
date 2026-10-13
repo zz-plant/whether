@@ -45,7 +45,7 @@ describe("the advice corpus data", () => {
 
   it("covers the registered window, one row per month and per quarter", () => {
     const monthly = buildMonthlyFile(readPostsFile());
-    assert.equal(monthly.months[0].period, "2012-01");
+    assert.equal(monthly.months[0]?.period, "2012-01");
     assert.equal(monthly.months.at(-1)?.period, "2026-09");
     assert.equal(monthly.months.length, 177);
     assert.equal(monthly.quarters.length, 59);

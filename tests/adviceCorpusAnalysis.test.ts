@@ -57,19 +57,19 @@ describe("period shares", () => {
   it("weight each firm present equally, and leave an empty period empty", () => {
     const posts = [post("2015-01", "A", "expand"), post("2015-01", "A", "expand"), post("2015-01", "A", "expand"), post("2015-02", "B", "conserve"), post("2015-01", "B", "conserve")];
     const [january, february, march] = periodShares(posts, ["2015-01", "2015-02", "2015-03"], (month) => month);
-    assert.equal(january.shares.expand, 0.5);
-    assert.equal(january.firms, 2);
-    assert.equal(february.shares.conserve, 1);
-    assert.equal(march.n, 0);
-    assert.ok(Number.isNaN(march.shares.expand));
+    assert.equal(january?.shares.expand, 0.5);
+    assert.equal(january?.firms, 2);
+    assert.equal(february?.shares.conserve, 1);
+    assert.equal(march?.n, 0);
+    assert.ok(Number.isNaN(march?.shares.expand));
     const pooled = periodShares(posts, ["2015-01"], (month) => month, true);
-    assert.equal(pooled[0].shares.expand, 0.75);
+    assert.equal(pooled[0]?.shares.expand, 0.75);
   });
 
   it("give net stance only for months with at least three posts", () => {
     const posts = [post("2015-01", "A", "expand"), post("2015-01", "B", "expand"), post("2015-01", "C", "conserve"), post("2015-02", "A", "expand")];
     const [january, february] = netSeries(posts, ["2015-01", "2015-02"]);
-    assert.ok(january !== null && Math.abs(january - (2 / 3 - 1 / 3)) < 1e-9);
+    assert.ok(typeof january === "number" && Math.abs(january - (2 / 3 - 1 / 3)) < 1e-9);
     assert.equal(february, null);
   });
 });
@@ -85,7 +85,7 @@ describe("the lag scan", () => {
     const scan = scanLags(groupByMonth(posts), crossing, [0, 1, 2, 3, 4, 5, 6], "conserve");
     assert.equal(scan.bestLag, 3);
     assert.equal(scan.best, 1);
-    assert.ok(scan.lags[0].difference < 1);
+    assert.ok((scan.lags[0]?.difference ?? 1) < 1);
   });
 });
 

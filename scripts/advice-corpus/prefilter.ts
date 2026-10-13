@@ -40,7 +40,7 @@ export function selectForClassification(scored: readonly { id: string; kw: numbe
   const kwRanks = percentileRanks(scored.map((post) => post.kw));
   const embRanks = percentileRanks(scored.map((post) => post.emb));
   const ranked = scored
-    .map((post, index) => ({ ...post, score: (kwRanks[index] + embRanks[index]) / 2 }))
+    .map((post, index) => ({ ...post, score: ((kwRanks[index] ?? 0) + (embRanks[index] ?? 0)) / 2 }))
     .sort((a, b) => b.score - a.score || a.id.localeCompare(b.id));
   const k = candidateCount(ranked.length);
   const candidates = ranked.slice(0, k);
@@ -55,9 +55,11 @@ const cosine = (a: readonly number[], b: readonly number[]) => {
   let na = 0;
   let nb = 0;
   for (let index = 0; index < a.length; index += 1) {
-    dot += a[index] * b[index];
-    na += a[index] ** 2;
-    nb += b[index] ** 2;
+    const x = a[index] ?? 0;
+    const y = b[index] ?? 0;
+    dot += x * y;
+    na += x ** 2;
+    nb += y ** 2;
   }
   return na === 0 || nb === 0 ? 0 : dot / Math.sqrt(na * nb);
 };
@@ -94,8 +96,10 @@ async function main() {
     const batch = missing.slice(start, start + 16);
     const vectors = await embed(batch.map((post) => documentInput(post.title, post.text)));
     batch.forEach((post, index) => {
-      cached.set(post.id, vectors[index]);
-      appendFileSync(CACHE.embeddings, `${JSON.stringify({ id: post.id, vector: vectors[index] })}\n`);
+      const vector = vectors[index];
+      if (!vector) return;
+      cached.set(post.id, vector);
+      appendFileSync(CACHE.embeddings, `${JSON.stringify({ id: post.id, vector })}\n`);
     });
     if ((start / 16) % 50 === 0) console.log(`[prefilter] embedded ${Math.min(start + 16, missing.length)}/${missing.length}`);
   }

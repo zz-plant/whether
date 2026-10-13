@@ -156,7 +156,7 @@ async function main() {
         .split("\n")
         .filter(Boolean)
         .map((line) => {
-          const [source, id] = line.trim().split("/");
+          const [source = "", id = ""] = line.trim().split("/");
           return { source, id };
         })
     : SelectionSchema.parse(JSON.parse(readFileSync(CACHE.prefilter, "utf8"))).selected;

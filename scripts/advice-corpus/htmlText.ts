@@ -93,7 +93,7 @@ const metaContent = (html: string, attribute: "property" | "name", key: string):
   const forward = new RegExp(`<meta[^>]*${attribute}=["']${escaped}["'][^>]*content=["']([^"']*)["']`, "i");
   const backward = new RegExp(`<meta[^>]*content=["']([^"']*)["'][^>]*${attribute}=["']${escaped}["']`, "i");
   const match = forward.exec(html) ?? backward.exec(html);
-  return match ? decodeEntities(match[1]).trim() || null : null;
+  return match ? decodeEntities(match[1] ?? "").trim() || null : null;
 };
 
 const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value !== null && !Array.isArray(value);
@@ -127,7 +127,7 @@ export function extractMeta(html: string): PageMeta {
   const objects: Record<string, unknown>[] = [];
   for (const match of html.matchAll(/<script[^>]*type=["']application\/ld\+json["'][^>]*>([\s\S]*?)<\/script>/gi)) {
     try {
-      objects.push(...ldObjects(JSON.parse(match[1].trim())));
+      objects.push(...ldObjects(JSON.parse((match[1] ?? "").trim())));
     } catch {
       // A malformed block is skipped; the meta tags below are the fallback.
     }
@@ -155,7 +155,7 @@ export function extractMeta(html: string): PageMeta {
   author ??= metaContent(html, "name", "author");
   if (!title) {
     const titleTag = /<title[^>]*>([\s\S]*?)<\/title>/i.exec(html);
-    title = titleTag ? decodeEntities(titleTag[1]).trim() || null : null;
+    title = titleTag ? decodeEntities(titleTag[1] ?? "").trim() || null : null;
   }
   return { title, published, author };
 }
@@ -166,6 +166,6 @@ const MONTHS = ["january", "february", "march", "april", "may", "june", "july", 
 export function firstMonthYear(text: string): string | null {
   const match = new RegExp(`\\b(${MONTHS.join("|")})\\s+((?:19|20)\\d\\d)\\b`, "i").exec(text);
   if (!match) return null;
-  const month = MONTHS.indexOf(match[1].toLowerCase()) + 1;
+  const month = MONTHS.indexOf((match[1] ?? "").toLowerCase()) + 1;
   return `${match[2]}-${String(month).padStart(2, "0")}`;
 }

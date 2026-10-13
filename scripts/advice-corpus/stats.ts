@@ -23,7 +23,11 @@ export function shuffled<T>(items: readonly T[], random: () => number): T[] {
   const copy = [...items];
   for (let index = copy.length - 1; index > 0; index -= 1) {
     const swap = Math.floor(random() * (index + 1));
-    [copy[index], copy[swap]] = [copy[swap], copy[index]];
+    const here = copy[index];
+    const there = copy[swap];
+    if (here === undefined || there === undefined) continue;
+    copy[index] = there;
+    copy[swap] = here;
   }
   return copy;
 }
@@ -35,10 +39,11 @@ export function percentileRanks(values: readonly number[]): number[] {
   let start = 0;
   while (start < order.length) {
     let end = start;
-    while (end + 1 < order.length && order[end + 1].value === order[start].value) end += 1;
+    while (end + 1 < order.length && order[end + 1]?.value === order[start]?.value) end += 1;
     const meanRank = (start + end) / 2;
     for (let position = start; position <= end; position += 1) {
-      ranks[order[position].index] = order.length > 1 ? meanRank / (order.length - 1) : 0.5;
+      const item = order[position];
+      if (item) ranks[item.index] = order.length > 1 ? meanRank / (order.length - 1) : 0.5;
     }
     start = end + 1;
   }
@@ -53,7 +58,7 @@ export function pearson(xs: readonly (number | null)[], ys: readonly (number | n
   for (let index = 0; index < Math.min(xs.length, ys.length); index += 1) {
     const x = xs[index];
     const y = ys[index];
-    if (x !== null && y !== null && Number.isFinite(x) && Number.isFinite(y)) pairs.push([x, y]);
+    if (typeof x === "number" && typeof y === "number" && Number.isFinite(x) && Number.isFinite(y)) pairs.push([x, y]);
   }
   if (pairs.length < 3) return Number.NaN;
   const mx = mean(pairs.map(([x]) => x));
@@ -151,7 +156,9 @@ export function percentileInterval(values: readonly number[], level = 0.95): [nu
     const position = q * (sorted.length - 1);
     const low = Math.floor(position);
     const high = Math.ceil(position);
-    return sorted[low] + (sorted[high] - sorted[low]) * (position - low);
+    const below = sorted[low] ?? Number.NaN;
+    const above = sorted[high] ?? Number.NaN;
+    return below + (above - below) * (position - low);
   };
   const tail = (1 - level) / 2;
   return [at(tail), at(1 - tail)];
@@ -167,7 +174,9 @@ export function circularShifts(length: number, minShift: number): number[] {
 /** Rotate a series by `shift` periods (index t takes the value from t − shift, wrapping). */
 export function rotate<T>(series: readonly T[], shift: number): T[] {
   const length = series.length;
-  return series.map((_, index) => series[(((index - shift) % length) + length) % length]);
+  if (length === 0) return [];
+  const offset = ((shift % length) + length) % length;
+  return [...series.slice(length - offset), ...series.slice(0, length - offset)];
 }
 
 /**
@@ -200,11 +209,13 @@ export function cohensKappa<T extends string>(a: readonly T[], b: readonly T[]):
 /** Rows: the first rater (reference); columns: the second. */
 export function confusionMatrix<T extends string>(reference: readonly T[], predicted: readonly T[], categories: readonly T[]): number[][] {
   const matrix = categories.map(() => categories.map(() => 0));
-  for (let index = 0; index < Math.min(reference.length, predicted.length); index += 1) {
-    const row = categories.indexOf(reference[index]);
-    const column = categories.indexOf(predicted[index]);
-    if (row >= 0 && column >= 0) matrix[row][column] += 1;
-  }
+  reference.forEach((value, index) => {
+    const other = predicted[index];
+    if (other === undefined) return;
+    const cells = matrix[categories.indexOf(value)];
+    const column = categories.indexOf(other);
+    if (cells && column >= 0) cells[column] = (cells[column] ?? 0) + 1;
+  });
   return matrix;
 }
 

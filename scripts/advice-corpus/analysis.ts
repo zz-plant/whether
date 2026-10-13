@@ -43,7 +43,7 @@ export const RA_LINE = 50;
 export const MIN_POSTS_PER_MONTH = 3;
 
 export const monthIndex = (month: string) => {
-  const [year, value] = month.split("-").map(Number);
+  const [year = 0, value = 1] = month.split("-").map(Number);
   return year * 12 + (value - 1);
 };
 export const monthFromIndex = (index: number) => `${Math.floor(index / 12)}-${String((index % 12) + 1).padStart(2, "0")}`;
@@ -127,7 +127,11 @@ const itemsIn = (
   indices: readonly number[],
   pick: (index: number) => boolean,
   labelOf?: (post: CorpusPost) => string,
-) => indices.flatMap((index) => (pick(index) ? (byMonth.get(months[index]) ?? []).map((post) => asLabelled(post, labelOf)) : []));
+) =>
+  indices.flatMap((index) => {
+    const month = months[index];
+    return month !== undefined && pick(index) ? (byMonth.get(month) ?? []).map((post) => asLabelled(post, labelOf)) : [];
+  });
 
 export const groupByMonth = (posts: readonly CorpusPost[]) => {
   const byMonth = new Map<string, CorpusPost[]>();
@@ -153,8 +157,8 @@ export function highLowDifference(
   const byMonth = groupByMonth(posts);
   const all = months.map((_, index) => index);
   const statistic = (high: readonly boolean[], indices: readonly number[]) => {
-    const a = itemsIn(byMonth, months, indices, (index) => high[index], options.labelOf);
-    const b = itemsIn(byMonth, months, indices, (index) => !high[index], options.labelOf);
+    const a = itemsIn(byMonth, months, indices, (index) => high[index] === true, options.labelOf);
+    const b = itemsIn(byMonth, months, indices, (index) => high[index] === false, options.labelOf);
     if (options.pooled) return { difference: pooledShare(a, target) - pooledShare(b, target), firms: Number.NaN };
     return firmMatchedDifference(a, b, target);
   };
@@ -189,7 +193,10 @@ function resampleWithinMonths(byMonth: Map<string, CorpusPost[]>, random: () => 
   for (const [month, posts] of byMonth) {
     resampled.set(
       month,
-      posts.map(() => posts[Math.floor(random() * posts.length)]),
+      posts.flatMap(() => {
+        const pick = posts[Math.floor(random() * posts.length)];
+        return pick ? [pick] : [];
+      }),
     );
   }
   return resampled;
@@ -272,9 +279,11 @@ export function compareDrivers(
       const pairsDriver: (number | null)[] = [];
       const ts = indices ?? outcome.map((_, index) => index);
       for (const t of ts) {
-        if (t - lag < 0) continue;
-        pairsOutcome.push(outcome[t]);
-        pairsDriver.push(driver[t - lag]);
+        const value = outcome[t];
+        const earlier = driver[t - lag];
+        if (value === undefined || earlier === undefined) continue;
+        pairsOutcome.push(value);
+        pairsDriver.push(earlier);
       }
       const r = sign * pearson(pairsOutcome, pairsDriver);
       if (Number.isFinite(r) && r > top.r) top = { lag, r };
@@ -303,7 +312,9 @@ export function compareDrivers(
 export function standardisedCoefficients(y: readonly (number | null)[], a: readonly number[], b: readonly number[]) {
   const rows: [number, number, number][] = [];
   y.forEach((value, index) => {
-    if (value !== null && Number.isFinite(value)) rows.push([value, a[index], b[index]]);
+    const first = a[index];
+    const second = b[index];
+    if (value !== null && Number.isFinite(value) && first !== undefined && second !== undefined) rows.push([value, first, second]);
   });
   const z = (values: number[]) => {
     const m = mean(values);
@@ -315,9 +326,9 @@ export function standardisedCoefficients(y: readonly (number | null)[], a: reado
   const zb = z(rows.map((row) => row[2]));
   const raa = mean(za.map((value) => value * value));
   const rbb = mean(zb.map((value) => value * value));
-  const rab = mean(za.map((value, index) => value * zb[index]));
-  const rya = mean(ys.map((value, index) => value * za[index]));
-  const ryb = mean(ys.map((value, index) => value * zb[index]));
+  const rab = mean(za.map((value, index) => value * (zb[index] ?? 0)));
+  const rya = mean(ys.map((value, index) => value * (za[index] ?? 0)));
+  const ryb = mean(ys.map((value, index) => value * (zb[index] ?? 0)));
   const determinant = raa * rbb - rab * rab;
   if (determinant === 0) return { fp: Number.NaN, ra: Number.NaN, n: rows.length };
   return { fp: (rya * rbb - ryb * rab) / determinant, ra: (ryb * raa - rya * rab) / determinant, n: rows.length };
@@ -339,7 +350,8 @@ export function eraShares(posts: readonly CorpusPost[]) {
   return FUNDING_ERAS.map((era) => {
     const inEra = posts.filter((post) => post.month >= era.from && post.month <= era.to);
     const [row] = periodShares(inEra, [era.from], () => era.from);
-    return { ...era, posts: inEra.length, firms: row.firms, ...row.shares };
+    const empty = { expand: Number.NaN, conserve: Number.NaN, craft: Number.NaN, none: Number.NaN };
+    return { ...era, posts: inEra.length, firms: row?.firms ?? 0, ...(row?.shares ?? empty) };
   });
 }
 

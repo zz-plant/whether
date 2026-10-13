@@ -119,10 +119,11 @@ function buildFinding() {
 export function AdviceCorpusSection() {
   const { quarters, changes } = buildModel();
   const finding = buildFinding();
-  if (quarters.length < 2) return null;
+  const firstQuarter = quarters[0];
+  if (!firstQuarter || quarters.length < 2) return null;
   const step = (PLOT_RIGHT - PLOT_LEFT) / (quarters.length - 1);
   const xOf = (index: number) => PLOT_LEFT + index * step;
-  const firstYear = Number(quarters[0].period.slice(0, 4));
+  const firstYear = Number(firstQuarter.period.slice(0, 4));
   /* A change is drawn at its month, inside its quarter, so two changes in one year stay apart. */
   const xOfMonth = (month: string) => {
     const offset = (Number(month.slice(0, 4)) - firstYear) * 4 + (Number(month.slice(5, 7)) - 1) / 3;
@@ -146,7 +147,7 @@ export function AdviceCorpusSection() {
       <figure className="space-y-3" data-advice-corpus-chart>
         {/* The chart is for sighted readers; the sentence and the table below carry the same values. */}
         <p className="sr-only">
-          {`Share of posts prescribing expansion and conservation each quarter, ${quarterLabel(quarters[0].period)} to ${quarterLabel(quarters.at(-1)?.period ?? "")}, with funding pressure on the same dates. The table below has every value.`}
+          {`Share of posts prescribing expansion and conservation each quarter, ${quarterLabel(firstQuarter.period)} to ${quarterLabel(quarters.at(-1)?.period ?? "")}, with funding pressure on the same dates. The table below has every value.`}
         </p>
         <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="block h-auto w-full max-w-3xl" aria-hidden="true">
           <text x={PLOT_LEFT} y={TOP_Y - 6} fontSize="11" fill="var(--app-text-muted)">
