@@ -3287,6 +3287,31 @@ curve drawn from four hard-coded points.
   fallback (`historyAndContext.ts`); seven pinned pastes in `briefFormats.golden.json` changed by that
   sentence alone.
 
+### 1.1.71 Generated sentences say each thing once, in order of weight (2026-10-12)
+
+The second PR of the copy and data-viz plan.
+
+- **Held areas share one sentence.** `buildDecisionMovement` returns `heldGroups`: the areas that
+  held, grouped by the side of their lines they held on, each group one sentence ("Pause still
+  applies to Hiring, Fundraising, Spending and New bets: no line crossed since Sep 30."). The folded
+  "All five areas" table (`AllAreaRules`) prints a group of two or more once over the table and drops
+  it from those rows, so the area the week moved is the one "Changed" cell left. The picker, which
+  shows one area at a time, keeps each area's own sentence. Closes DD-039's open item.
+- **A score's move reads largest part first** (`clausesFor`, `lib/report/scoreMovement.ts`): "-11
+  from startup-market inputs and -2 from the yield curve", not the scoring stages' order. The net
+  move is the delta chip beside the row, so the sentence does not repeat it.
+- **Drift and a dead field.** `whyItMattersLine` was computed on every card model and rendered
+  nowhere; it is deleted with `buildWhyItMattersLine`. The share preview's fallback no longer says
+  "posture", and `docs/editorial-guardrails.md` names `REGIME_LABELS`, the one label table, instead
+  of an alias that no longer exists.
+
+The planned sentence-quality gate is not added: `tests/onePlacePerFact.test.tsx` and
+`tests/readerClauseShapes.test.tsx` (2026-10-09) already hold the repetition and clause shapes it
+would have checked, and a prototype over the pinned pastes found its "same sentence twice" rule
+mostly flagged rows for different areas that rightly share a line.
+
+`tests/decisionMovement.test.ts` and `tests/allAreaRulesHeldGroups.test.tsx` hold the grouping.
+
 ### 1.1.72 /history's charts say where the line is (2026-10-12)
 
 - **The trend charts draw the change line.** `HistoricalTrendChart` takes `changeLine`: the chart
@@ -3298,6 +3323,7 @@ curve drawn from four hard-coded points.
   hover title then reads "Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56".
 
 `tests/chartIntegrityContract.test.tsx` and `tests/visualPrimitives.test.tsx` hold them.
+||||||| a0b5077b
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

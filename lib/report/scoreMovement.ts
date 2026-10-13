@@ -146,8 +146,13 @@ const signed = (points: number) => `${points > 0 ? "+" : "-"}${Math.abs(points)}
 const joinClauses = (clauses: string[]) =>
   clauses.length <= 1 ? clauses.join("") : `${clauses.slice(0, -1).join(", ")} and ${clauses[clauses.length - 1]}`;
 
+/* Largest part first, so the input that drove the move is read first: "-11 from
+   startup-market inputs and +4 from the yield curve", not the scoring stages' order
+   (2026-10-12). The net move is the delta beside the row, so it is not repeated here. */
 const clausesFor = (metric: ScoreMovementMetric, movement: ScoreMovement) =>
-  movement.parts.map((part) => `${signed(part.points)} from ${scoreSourceLabel(metric, part.source)}`);
+  [...movement.parts]
+    .sort((left, right) => Math.abs(right.points) - Math.abs(left.points))
+    .map((part) => `${signed(part.points)} from ${scoreSourceLabel(metric, part.source)}`);
 
 const earlierScore = (basis: ComparisonBasis, plural: boolean) =>
   `${basis.date ? `The ${basis.date}` : "The earlier"} ${plural ? "scores were" : "score was"} built from interest rates alone.`;

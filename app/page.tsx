@@ -684,6 +684,7 @@ async function PageContent({
             >
               <AllAreaRules
                 rows={homeAreaRows}
+                heldGroups={decisionMovement?.heldGroups}
                 regime={regime}
                 planHref={isRoute(operateHref) ? operateHref : "/operate"}
                 isHistorical={Boolean(historicalSelection)}

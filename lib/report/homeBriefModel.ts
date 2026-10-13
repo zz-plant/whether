@@ -393,7 +393,6 @@ export type WeeklyDecisionCardViewModel = {
     decisionMovement: DecisionMovement | null;
   };
   presentation?: {
-    whyItMattersLine?: string;
     readThisCardItems?: Array<{
       label: string;
       detail: string;
