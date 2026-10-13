@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
 import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
@@ -11,6 +11,7 @@ import { isPlannerSector, resolveProfileRunway, setOperatorProfileField } from "
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   buildSharedRunwayPlanQuery,
+  plannerEditStands,
   readSharedRunwayPlan,
   resolveSharedRunwayProfile,
 } from "./runwayPlanLink";
@@ -32,6 +33,9 @@ import {
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import type { ReportData } from "../../../lib/report/reportData";
 import { ScoreCell } from "../../components/ui/scoreCell";
+import { buildEngineeringPaybackLines, buildProjectPaybacks, resolvePaybackBar } from "../../../lib/report/projectPayback";
+import { runwayBandForMonths } from "../../../lib/report/operatorRunway";
+import { ProjectPaybackSection } from "./projectPaybackSection";
 
 const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
   { value: "b2b-saas", label: "B2B SaaS" },
@@ -154,17 +158,43 @@ export function RunwayPlannerPanel({
    * shows their figures without overwriting yours.
    */
   const shared = useMemo(() => readSharedRunwayPlan(searchParams), [searchParams]);
-  const profile = useMemo(() => resolveSharedRunwayProfile(storedProfile, shared.profile), [storedProfile, shared.profile]);
-  const stage = shared.stage ?? storedStage;
+  const linkedProfile = useMemo(() => resolveSharedRunwayProfile(storedProfile, shared.profile), [storedProfile, shared.profile]);
+
+  /*
+   * The plan as last edited here, until the address bar catches up with it.
+   * `router.replace` lands a server round trip after the edit, and until then
+   * the link still holds the plan before it. Read back as "the link wins", that
+   * older link was the base the next edit was built on, so a second field typed
+   * inside the round trip wrote the first one back to its old value — in the
+   * stored profile's place, permanently, because the link wins (2026-10-13,
+   * found when a project row's fields went missing one after another).
+   *
+   * `plannerEditStands` says when the address bar has caught up, or been
+   * replaced by someone else's link.
+   */
+  const currentQuery = searchParams?.toString() ?? "";
+  const [ownEdit, setOwnEdit] = useState<{
+    profile: typeof linkedProfile;
+    stage: typeof storedStage;
+    queries: readonly string[];
+  } | null>(null);
+  if (ownEdit && !plannerEditStands(ownEdit.queries, currentQuery)) setOwnEdit(null);
+  const profile = ownEdit?.profile ?? linkedProfile;
+  const stage = ownEdit ? ownEdit.stage : shared.stage ?? storedStage;
 
   /* Every edit writes both, so the address bar is always the plan on screen and
      "copy link" needs no separate button to keep in sync. */
   const syncPlanLink = useCallback(
     (nextProfile: typeof profile, nextStage: typeof stage) => {
       const query = buildSharedRunwayPlanQuery(nextProfile, nextStage);
+      setOwnEdit((previous) => ({
+        profile: nextProfile,
+        stage: nextStage,
+        queries: [...(previous?.queries ?? [currentQuery]), query],
+      }));
       router.replace(toRoute(query ? `${pathname}?${query}` : pathname), { scroll: false });
     },
-    [pathname, router],
+    [currentQuery, pathname, router, setOwnEdit],
   );
 
   const commitProfileField = useCallback(
@@ -207,7 +237,26 @@ export function RunwayPlannerPanel({
     [output, resolution, hydrated, profile.raiseAtRunwayMonths, profile.hiringPauseAtRunwayMonths],
   );
 
-  const shareBlock = useMemo(() => (output ? formatRunwayPlanCompactBlock(output, inYourNumbers) : ""), [output, inYourNumbers]);
+  /* The planner's projects against the bar the published rules set for this
+     week's conditions and this runway. Net burn is spend less revenue, the
+     figure the runway itself is counted in. */
+  const projectPayback = useMemo(() => {
+    if (!resolution.ready) return null;
+    const { runway, burn, revenue } = resolution.request;
+    const bar = resolvePaybackBar(assessment.regime, runwayBandForMonths(runway));
+    const paybacks = buildProjectPaybacks(profile.paybackProjects ?? [], {
+      regime: assessment.regime,
+      runwayMonths: runway,
+      netMonthlyBurnUsd: burn - revenue,
+      engineerWeekCostUsd: profile.engineerWeekCostUsd,
+    });
+    return { bar, paybacks, lines: buildEngineeringPaybackLines(paybacks, bar, assessment.regime) };
+  }, [assessment.regime, profile.engineerWeekCostUsd, profile.paybackProjects, resolution]);
+
+  const shareBlock = useMemo(
+    () => (output ? formatRunwayPlanCompactBlock(output, inYourNumbers, projectPayback?.lines) : ""),
+    [output, inYourNumbers, projectPayback],
+  );
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const clipboardState = getClipboardUiState("runway-plan", { status, error, activeTarget, copiedTarget });
   const memoClipboardState = getClipboardUiState("budget-memo", { status, error, activeTarget, copiedTarget });
@@ -229,8 +278,9 @@ export function RunwayPlannerPanel({
       stageLabel: stage ? operatorStageLabel(stage) : "Series A (default)",
       sectorLabel: sectorOptions.find((option) => option.value === request.sector)?.label ?? request.sector,
       inYourNumbers,
+      engineering: projectPayback?.lines ?? null,
     });
-  }, [assessment, sensors, macroSeries, recordDateLabel, output, paybackStrictnessLevel, paybackStrictnessState.label, resolution, stage, inYourNumbers]);
+  }, [assessment, sensors, macroSeries, recordDateLabel, output, paybackStrictnessLevel, paybackStrictnessState.label, resolution, stage, inYourNumbers, projectPayback]);
 
   return (
     <section className="weather-panel-static mt-6 space-y-4 p-6" aria-label="Runway planner">
@@ -513,6 +563,19 @@ export function RunwayPlannerPanel({
               </ul>
             ) : null}
           </section>
+
+          {projectPayback ? (
+            <ProjectPaybackSection
+              regime={assessment.regime}
+              bar={projectPayback.bar}
+              runwayMonths={resolution.request.runway}
+              engineerWeekCostUsd={profile.engineerWeekCostUsd}
+              entries={profile.paybackProjects ?? []}
+              paybacks={projectPayback.paybacks}
+              onEngineerWeekCostChange={(value) => commitProfileField("engineerWeekCostUsd", value)}
+              onEntriesChange={(next) => commitProfileField("paybackProjects", next)}
+            />
+          ) : null}
 
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold text-slate-400">The rules this sets</p>

@@ -10,8 +10,7 @@ import {
 } from "../../lib/operatorProfile";
 import { parseMoneyInput } from "../../lib/planCommitment";
 
-type ProfileNumberFieldProps = {
-  field: OperatorProfileNumberKey;
+type NumberFieldProps = {
   label: string;
   /** Shown under the label; says the unit and what a blank means. */
   hint?: string;
@@ -23,19 +22,24 @@ type ProfileNumberFieldProps = {
   labelClassName?: string;
 };
 
+type ProfileNumberFieldProps = NumberFieldProps & { field: OperatorProfileNumberKey };
+
+/** Money where zero is a real answer (revenue, a saving), which `parseMoneyInput` rejects for a burn box. */
+export const parseMoneyOrZeroInput = (raw: string): number | null => {
+  const text = raw.trim();
+  return /^\$?\s*0+(?:\.0+)?$/.test(text) ? 0 : parseMoneyInput(text);
+};
+
 const PARSERS: Record<OperatorProfileNumberKey, (raw: string) => number | null> = {
   cashUsd: parseMoneyInput,
   runwayMonths: parsePlainNumberInput,
   monthlyBurnUsd: parseMoneyInput,
-  monthlyRevenueUsd: (raw) => {
-    // Revenue may legitimately be zero, which parseMoneyInput rejects for a burn box.
-    const text = raw.trim();
-    return /^\$?\s*0+(?:\.0+)?$/.test(text) ? 0 : parseMoneyInput(text);
-  },
+  monthlyRevenueUsd: parseMoneyOrZeroInput,
   monthlyGrowthPct: parsePlainNumberInput,
   grossMarginPct: parsePlainNumberInput,
   raiseAtRunwayMonths: parsePlainNumberInput,
   hiringPauseAtRunwayMonths: parsePlainNumberInput,
+  engineerWeekCostUsd: parseMoneyInput,
 };
 
 const UNIT_HINTS: Record<OperatorProfileNumberKey, string> = {
@@ -47,6 +51,7 @@ const UNIT_HINTS: Record<OperatorProfileNumberKey, string> = {
   grossMarginPct: "Enter a percentage, like 75.",
   raiseAtRunwayMonths: "Enter months of runway, like 12.",
   hiringPauseAtRunwayMonths: "Enter months of runway, like 9.",
+  engineerWeekCostUsd: "Enter dollars, like $4,500.",
 };
 
 const withinLimits = (field: OperatorProfileNumberKey, value: number) =>
@@ -61,8 +66,25 @@ const withinLimits = (field: OperatorProfileNumberKey, value: number) =>
  * which is the whole point: blank means "not given", and the engines say so
  * rather than dividing by zero.
  */
-export function OperatorProfileNumberField({
-  field,
+export function OperatorProfileNumberField({ field, ...props }: ProfileNumberFieldProps) {
+  return (
+    <NumberDraftField
+      {...props}
+      parse={PARSERS[field]}
+      allows={(value) => withinLimits(field, value)}
+      format={(value) => formatOperatorProfileValue(field, value)}
+      settle={(draft, value) => profileFieldTextOnBlur(field, draft, value)}
+      unitHint={UNIT_HINTS[field]}
+    />
+  );
+}
+
+/**
+ * The draft-and-commit behaviour behind every number box the operator types
+ * into, whatever stores the number: the profile, or a row of the runway
+ * planner's project list (`app/operate/components/projectPaybackSection.tsx`).
+ */
+export function NumberDraftField({
   label,
   hint,
   placeholder,
@@ -71,9 +93,22 @@ export function OperatorProfileNumberField({
   optional = false,
   className = "",
   labelClassName = "block text-fluid-nano text-slate-400",
-}: ProfileNumberFieldProps) {
+  parse,
+  allows,
+  format,
+  settle,
+  unitHint,
+}: NumberFieldProps & {
+  parse: (raw: string) => number | null;
+  allows: (value: number) => boolean;
+  format: (value: number | undefined) => string;
+  /** The text to show on blur when there is nothing new to check, or null to validate the draft. */
+  settle: (draft: string, value: number | undefined) => string | null;
+  /** The error a draft that will not parse gets. */
+  unitHint: string;
+}) {
   const id = useId();
-  const [draft, setDraft] = useState(() => formatOperatorProfileValue(field, value));
+  const [draft, setDraft] = useState(() => format(value));
   const [error, setError] = useState<string | null>(null);
   const lastCommitted = useRef<number | undefined>(value);
 
@@ -83,9 +118,9 @@ export function OperatorProfileNumberField({
   useEffect(() => {
     if (Object.is(value, lastCommitted.current)) return;
     lastCommitted.current = value;
-    setDraft(formatOperatorProfileValue(field, value));
+    setDraft(format(value));
     setError(null);
-  }, [field, value]);
+  }, [format, value]);
 
   const commit = (next: number | undefined) => {
     lastCommitted.current = next;
@@ -99,24 +134,24 @@ export function OperatorProfileNumberField({
       commit(undefined);
       return;
     }
-    const parsed = PARSERS[field](raw);
-    if (parsed !== null && withinLimits(field, parsed)) commit(parsed);
+    const parsed = parse(raw);
+    if (parsed !== null && allows(parsed)) commit(parsed);
   };
 
   const handleBlur = () => {
     // Emptied over a value the profile still works out, or showing one: nothing typed to check.
-    const settled = profileFieldTextOnBlur(field, draft, value);
+    const settled = settle(draft, value);
     if (settled !== null) {
       lastCommitted.current = value;
       setDraft(settled);
       return;
     }
-    const parsed = PARSERS[field](draft);
-    if (parsed === null || !withinLimits(field, parsed)) {
-      setError(UNIT_HINTS[field]);
+    const parsed = parse(draft);
+    if (parsed === null || !allows(parsed)) {
+      setError(unitHint);
       return;
     }
-    setDraft(formatOperatorProfileValue(field, parsed));
+    setDraft(format(parsed));
   };
 
   const describedBy = [hint ? `${id}-hint` : null, error ? `${id}-error` : null]

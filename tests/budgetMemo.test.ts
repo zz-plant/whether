@@ -83,4 +83,23 @@ describe("runway planner budget memo", () => {
     assert.match(memo, /\*\*Conditions\*\*: Sunny · Pace:/);
     assert.doesNotMatch(memo, /EXPANSION|SCARCITY|DEFENSIVE|VOLATILE/);
   });
+
+  it("adds the engineering projects as their own section, before the sources", () => {
+    const memo = buildBudgetMemoMarkdown({
+      assessment,
+      sensors,
+      macroSeries,
+      recordDateLabel: "Mar 4, 2026",
+      output,
+      request,
+      growthAssumedFlat: false,
+      paybackStrictness: { level: 1, label: "Cautious" },
+      stageLabel: "Series A",
+      sectorLabel: "B2B SaaS",
+      engineering: { bar: "The bar sentence.", projects: ["Importer: breaks even in month 6."] },
+    });
+    assert.match(memo, /## 4\. Engineering work against the payback bar\nThe bar sentence\.\n- Importer: breaks even in month 6\.\n\n## 5\. Sources/);
+    assert.match(memoFor({ sensors, macroSeries }), /## 4\. Sources/);
+    assert.doesNotMatch(memoFor({ sensors, macroSeries }), /Engineering work/);
+  });
 });
