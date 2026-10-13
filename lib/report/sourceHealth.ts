@@ -1,4 +1,5 @@
 import { formatAgeSpan, formatTimestampUTC } from "../formatters";
+import { SIGNAL_CADENCE } from "../ingestion/cadence";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
@@ -66,15 +67,18 @@ type SourceGroupDefinition = {
 };
 
 /*
- * Treasury is refreshed by the ingest coordinator's hourly alarm (worker/ingestCoordinator.ts;
- * rates are due every 2h in lib/ingestion/cadence.ts), not only by the 02:00 UTC cron. A
- * Treasury fetch that is a day old means the alarm has stopped, which is what this window is
- * here to catch. It was widened to 26h on 2026-10-13 (#1587) on the reading that the cron was
- * the only ingest, and that hid the alarm still not refreshing anything after #1575.
- * Measured in calendar hours, not business hours: the alarm runs on weekends too, so a
- * weekend without a fetch is a weekend of outage, not a pause.
+ * The Treasury row is the reading readers are served: the stored OperatingSnapshot, which only
+ * the scheduled cron writes (02:00 UTC daily). The coordinator's hourly alarm refreshes the
+ * materialized model behind it, but nothing republishes the snapshot from that, so this row can
+ * be no fresher than the last cron run. A 6h window here read every healthy afternoon as stale.
+ * Whether the hourly alarm is still refreshing is a separate check: /api/health's
+ * `ingestModel`, against INGEST_MODEL_STALE_AFTER_MS.
+ *
+ * Measured in calendar hours, not business hours: the cron runs every day, weekends included.
+ * Counting business hours, a Friday 02:01 fetch was still "fresh" at Monday 03:00 with the
+ * Saturday, Sunday and Monday runs all missed.
  */
-const TREASURY_SOURCE_SLA_HOURS = 6;
+const TREASURY_SOURCE_SLA_HOURS = SIGNAL_CADENCE.TREASURY_10Y.staleAfterMs / 3_600_000;
 const MARKET_SOURCE_SLA_HOURS = 24;
 const MONTHLY_RELEASE_SLA_HOURS = 45 * 24;
 const CURATED_SNAPSHOT_SLA_HOURS = 45 * 24;
@@ -420,7 +424,7 @@ export const buildSourceHealthRows = ({
   return [
     {
       sourceName: "Treasury",
-      cadenceLabel: "Intraday rates",
+      cadenceLabel: "Daily rates",
       freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,

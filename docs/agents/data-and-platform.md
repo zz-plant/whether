@@ -97,11 +97,16 @@ inside its window). `staleSources` is the `stale` subset. Any entry makes the ov
 report loaded. `bun run smoke:prod` fails on `"degraded"` and names the feeds, and
 `whether doctor` reports it as a warning.
 
-**Treasury's window is 6 calendar hours.** The coordinator below re-fetches the rates family
-hourly once it is two hours old, so a healthy read is at most about three hours old; 6h is two
-missed refreshes. A 26h window (the 02:00 cron's) was tried on 2026-10-13 on the belief that the
-cron was the only fetch, and that night `/api/health` said "ok" with every feed 20h old. Calendar
-hours, because the alarm runs on weekends too.
+**Two freshness checks, because readers and the alarm see different data (2026-10-13).** The
+source rows follow the stored `OperatingSnapshot`, which only the scheduled cron writes (02:00
+UTC daily), so Treasury's window is the ingest cadence's 26h: a 6h window called every healthy
+afternoon stale. The coordinator's hourly alarm refreshes the materialized model behind the
+snapshot, and nothing republishes the snapshot from it, so the source rows cannot see a stopped
+alarm. `dependencies.ingestModel` (`ok` / `stale` / `unknown`, with `ingestModelAsOf`) judges the
+model's `asOf` against `INGEST_MODEL_STALE_AFTER_MS` (6h, `lib/ingestion/cadence.ts`); stale is
+also `"degraded"`. #1587 and #1586 each fixed one of these by breaking the other. Treasury's 26h
+is calendar hours, not business hours: the cron runs every day, and counting business hours let a
+Friday fetch read "fresh" on Monday with three runs missed.
 
 **It installs its env (2026-10-13).** The object is an entry point like the fetch and scheduled
 handlers, and may run in an isolate neither has primed. Its constructor ignored `env` until

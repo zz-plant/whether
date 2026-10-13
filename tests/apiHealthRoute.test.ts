@@ -21,7 +21,16 @@ describe("/api/health", () => {
     const dependencies = body.dependencies;
     assert.ok(dependencies && typeof dependencies === "object" && "dataFreshness" in dependencies);
     const degraded = Array.isArray(body.degradedSources) && body.degradedSources.length > 0;
-    if (body.status !== "down") assert.equal(body.status, degraded ? "degraded" : "ok");
+    const modelStale = Reflect.get(dependencies, "ingestModel") === "stale";
+    if (body.status !== "down") assert.equal(body.status, degraded || modelStale ? "degraded" : "ok");
+  });
+
+  it("reports the ingest model's freshness apart from the sources", async () => {
+    const body: Record<string, unknown> = await (await getHealthRoute()).json();
+    const dependencies = body.dependencies;
+    assert.ok(dependencies && typeof dependencies === "object");
+    assert.ok(["ok", "stale", "unknown"].includes(String(Reflect.get(dependencies, "ingestModel"))));
+    assert.ok("ingestModelAsOf" in body);
   });
 
   it("reports null for deployedVersion when the Cloudflare binding is absent", async () => {

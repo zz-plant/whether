@@ -233,15 +233,19 @@ const run = async () => {
     fail("/api/health missing dependencies.reportData");
   }
 
-  /* A live feed that is stale, unconfirmed or cached is the failure /api/health exists to
-     surface (2026-10-13: Treasury sat 14h stale behind an "ok"). Fail the run and name the feeds. */
+  /* A live feed that is stale, unconfirmed or cached, or an ingest model the alarm stopped
+     refreshing, is the failure /api/health exists to surface (2026-10-13: Treasury sat 14h stale
+     behind an "ok"). Fail the run and name what degraded it. */
   if (healthPayload.status === "degraded") {
     const degraded = Array.isArray(healthPayload.degradedSources)
       ? healthPayload.degradedSources
           .map((row) => `${row.source} ${row.state}${row.age ? ` (${row.age} old)` : ""}`)
           .join(", ")
       : "unnamed";
-    fail(`/api/health is degraded: live sources not answering live: ${degraded}`);
+    const model = healthPayload.dependencies?.ingestModel === "stale"
+      ? `; ingest model last refreshed ${healthPayload.ingestModelAsOf ?? "never"}`
+      : "";
+    fail(`/api/health is degraded: live sources not answering live: ${degraded || "none"}${model}`);
   }
   console.log(`✅ /api/health checks passed (commit ${healthPayload.commit ?? "unknown"})`);
   console.log("✅ synthetic smoke completed successfully");
