@@ -14,9 +14,24 @@ describe("/api/health", () => {
     assert.ok(typeof body.generatedAt === "string");
   });
 
+  it("names its stale live sources, and says degraded rather than ok when there are any", async () => {
+    const body: Record<string, unknown> = await (await getHealthRoute()).json();
+    assert.ok(Array.isArray(body.staleSources), "the stale sources are listed, empty or not");
+    const dependencies = body.dependencies;
+    assert.ok(dependencies && typeof dependencies === "object" && "dataFreshness" in dependencies);
+    const stale = Array.isArray(body.staleSources) && body.staleSources.length > 0;
+    if (body.status !== "down") assert.equal(body.status, stale ? "degraded" : "ok");
+  });
+
   it("reports null for deployedVersion when the Cloudflare binding is absent", async () => {
     const body: Record<string, unknown> = await (await getHealthRoute()).json();
     assert.equal(body.deployedVersion, null);
+  });
+
+  it("reports the commit only when the build compiled one in, which bun test never does", async () => {
+    const body: Record<string, unknown> = await (await getHealthRoute()).json();
+    assert.ok("commit" in body);
+    assert.equal(body.commit, null);
   });
 
   it("names the running Worker build when the binding is installed", async () => {

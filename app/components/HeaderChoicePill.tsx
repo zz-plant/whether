@@ -1,7 +1,7 @@
 "use client";
 
 import { Select } from "@base-ui/react/select";
-import { CheckIcon, ChevronDownIcon } from "./uiIcons";
+import { ChevronDownIcon } from "./uiIcons";
 
 type HeaderChoiceOption<Key extends string> = {
   key: Key;
@@ -79,21 +79,22 @@ export function HeaderChoicePill<Key extends string>({
       </Select.Trigger>
       <Select.Portal>
         <Select.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
-          <Select.Popup className="w-52 rounded-xl border border-slate-800/90 bg-slate-950/95 p-1.5 shadow-2xl">
+          <Select.Popup className="w-52 rounded-xl border border-slate-800/90 bg-slate-950 p-1.5 shadow-2xl">
             <Select.List>
               {options.map((option) => (
                 <Select.Item
                   key={option.key}
                   value={option.key}
-                  className="grid min-h-[44px] cursor-pointer grid-cols-[1fr_auto] items-center gap-2 rounded-lg px-2.5 py-2 text-left text-xs text-slate-300 data-[highlighted]:bg-slate-900 data-[highlighted]:text-white data-[selected]:bg-sky-500/15 data-[selected]:font-semibold data-[selected]:text-sky-300"
+                  /* The same lamp as a segmented key (ui-ux-standards §XXVI): lit on the
+                     chosen option. A check in the action ink over a 15% wash of it was a
+                     second way of marking the same choice. */
+                  className="weather-choice-item grid min-h-[44px] cursor-pointer grid-cols-[auto_1fr] items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-xs text-slate-300 data-[highlighted]:bg-slate-900 data-[highlighted]:text-white data-[selected]:font-semibold data-[selected]:text-[color:var(--app-text)]"
                 >
+                  <span className="weather-segment-lamp" aria-hidden="true" />
                   <div>
                     <Select.ItemText>{option.label}</Select.ItemText>
                     <div className="text-fluid-nano font-normal text-slate-400">{option.sublabel}</div>
                   </div>
-                  <Select.ItemIndicator>
-                    <CheckIcon className="h-3.5 w-3.5 text-sky-400" />
-                  </Select.ItemIndicator>
                 </Select.Item>
               ))}
             </Select.List>

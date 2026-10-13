@@ -16,6 +16,7 @@ import { COORDINATOR_ROUTES, type CoordinatorStatus, type RefreshResponse } from
 import { DurableStorageIngestionStore, type CoordinatorStorage } from "../lib/ingestion/durableStorageStore";
 import { ingestCanonicalSignals, resolveSignalFamiliesToRefresh } from "../lib/ingestion/materialized";
 import type { MaterializedSignalReadModel, SignalEntitySnapshot } from "../lib/ingestion/types";
+import { installBindings } from "./bindings";
 
 /**
  * How often the object checks for due families. Each check ingests only what
@@ -58,15 +59,20 @@ export class IngestCoordinator {
   private readonly fetcher: typeof fetch;
 
   /**
-   * The runtime constructs a Durable Object as `(state, env)`. The env is unused here (the
-   * object reads nothing from bindings), but the slot must stay so a test-only option never
-   * lands where the runtime puts the environment.
+   * The runtime constructs a Durable Object as `(state, env)`, and the object may run in an
+   * isolate no fetch or scheduled handler has primed. The ingest it runs reads its settings
+   * from globalThis (`readSetting`: FRED_API_KEY above all), so the env is installed here,
+   * as every entry point does (`worker/bindings.ts`). Until 2026-10-13 it was ignored: the
+   * hourly alarm refreshed without the FRED key, and in production, where the object has
+   * owned the model since 2026-10-09, every feed sat at the 02:00 cron's fetch all day
+   * ("Treasury · Stale · 14h old" on /trust).
    */
   constructor(
     private readonly state: CoordinatorState,
-    _env?: unknown,
+    env?: unknown,
     options: CoordinatorOptions = {},
   ) {
+    if (typeof env === "object" && env !== null) installBindings(env);
     this.fetcher = options.fetcher ?? fetch;
     this.store = new DurableStorageIngestionStore(state.storage, options.now);
   }

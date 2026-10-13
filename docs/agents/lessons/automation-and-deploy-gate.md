@@ -291,6 +291,17 @@ passing tests and `exited with code 1`; the `❌` line and the assertion had scr
 Whatever that window keeps, it keeps the end, so the end now carries enough to act on.
 `CHECK_FAILURE_TAIL_LINES` (default 40) sizes it.
 
+A fourth, 2026-10-13: **a passing step prints its verdict, not its output.** The repeat above only
+helps a failing gate. A *passing* gate still filled the window: `bun` 1.3.14 prints a line per
+passing test whenever stdout is not a terminal (the "silent on a pass" below holds only on a TTY),
+fallback warnings like `FRED circuit breaker open` repeated ~700 times, and the deploy step added
+Vite's chunk tables and Wrangler's 600-row module table. The deploy's own result fell out of the log
+and a working build read as a failed one. Now `run-checks` reduces a passing task to its last four
+lines (`CHECK_VERBOSE=1` restores the rest); a failing task keeps its output, with any line repeated
+more than three times printed once with its count; the gate runs `bun test --only-failures`;
+`cloudflare-run.mjs` sets Vite to `warn` when `WORKERS_CI=1` and prints Wrangler's module table as a
+count. A passing build is now ~45 lines and its deploy ~200. `tests/buildLogNoise.test.ts` holds it.
+
 That block also names **the `bun` it ran on**, and says so when that is older than `engines.bun`.
 Nothing enforces the declared range, so a build image shipping its own `bun` runs this gate on
 whatever it has — and the container above was on 1.1.x while `packageManager` pinned 1.3.14. The

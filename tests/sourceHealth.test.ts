@@ -8,6 +8,8 @@ import {
   buildDegradedSourceRows,
   formatSourceFreshnessLabel,
   formatSourceModeLabel,
+  listStaleLiveSources,
+  type SourceHealthRow,
 } from "../lib/report/sourceHealth";
 
 const buildTreasury = (overrides: Partial<TreasuryData> = {}): TreasuryData => ({
@@ -131,9 +133,9 @@ describe("buildSourceHealthRows", () => {
     const summary = summarizeSourceHealthCoverage([
       {
         sourceName: "Treasury",
-        cadenceLabel: "Intraday rates",
+        cadenceLabel: "Daily rates",
         freshnessStatus: "fresh",
-        freshnessSlaHours: 6,
+        freshnessSlaHours: 26,
         lastSuccessfulFetchAt: "2026-03-10T00:00:00.000Z",
         ageLabel: "1d",
         activeFallbackReason: null,
@@ -242,6 +244,13 @@ describe("degraded sources", () => {
       assert.equal(buildDegradedSourceRows([treasury]).length, 1);
     }
   });
+  it("holds Treasury to the daily ingest, not an intraday window", () => {
+    // 2026-10-13: the 02:01 UTC fetch landed, and by 08:00 UTC /api/health read "degraded" until the next day.
+    const treasuryAt = (now: string) =>
+      buildSourceHealthRows({ treasury: buildTreasury({ fetched_at: "2026-10-13T02:01:46.905Z" }), macroSeries: [], now: new Date(now) })[0];
+    assert.equal(treasuryAt("2026-10-13T22:30:00Z").freshnessStatus, "fresh");
+    assert.equal(treasuryAt("2026-10-14T06:00:00Z").freshnessStatus, "stale", "a missed 02:00 run is still caught");
+  });
   /*
    * "Startup/private markets" is a curated snapshot by design and is never
    * live. Counting it as degraded put "Partly cached" on every page, on every
@@ -326,5 +335,36 @@ describe("the /trust source board", () => {
     assert.equal(treasury?.stateLabel, "Not confirmed");
     assert.equal(treasury?.updatedLabel, "No update on record");
     assert.equal(treasury?.asIntended, false);
+  });
+});
+
+describe("listStaleLiveSources", () => {
+  const row = (overrides: Partial<SourceHealthRow>): SourceHealthRow => ({
+    sourceName: "Treasury",
+    cadenceLabel: "Daily rates",
+    freshnessStatus: "fresh",
+    freshnessSlaHours: 26,
+    lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
+    ageLabel: "14h",
+    activeFallbackReason: null,
+    mode: "live",
+    expectsLive: true,
+    ...overrides,
+  });
+
+  it("names a live source past its window, which /api/health reports as degraded", () => {
+    assert.deepEqual(listStaleLiveSources([row({ freshnessStatus: "stale" })]), [
+      { source: "Treasury", age: "14h", lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z" },
+    ]);
+  });
+
+  it("leaves out fresh sources and curated snapshots, which are current by design", () => {
+    assert.deepEqual(
+      listStaleLiveSources([
+        row({}),
+        row({ sourceName: "Startup/private markets", freshnessStatus: "stale", expectsLive: false, mode: "snapshot" }),
+      ]),
+      [],
+    );
   });
 });

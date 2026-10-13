@@ -660,3 +660,36 @@ chart, the weather glyphs and the pause and play line states (§XXIV). Everythin
   site's name inside it, on `/` and on a published week: that card is the one people crop and
   share, the rule names the week in a crop, and every other page's header names the site already.
 
+
+## XXVI. Controls as instrument parts
+
+Added 2026-10-13 with `docs/feature-specs-current.md` §1.1.73. A control is drawn as a part of
+an instrument: what it is shaped like says how it works. The form is physical, the paint is not —
+§XXV's ban on gradients and specular on a control stands.
+
+- MUST: a segmented control is a well with keys in it. The track is recessed (`--bg-nested`,
+  `--well-inset`); the chosen key stands proud of it (`--bg-raised`, `--elev-1`, a strong border);
+  a key sinks while pressed (`translateY(1px)`, `--key-pressed`). All of it lives on
+  `.weather-segment-track` and `.weather-segment-option` in `app/styles/controls.css`, driven by
+  the native radio's `:checked`, `:hover` and `:active`; `ui/segmentedControl.tsx` only lays the
+  parts out. A tint was the whole selected state until now, and at 15% of the ink it barely
+  separated from the track.
+- MUST: every key carries a lamp, unlit until chosen. The choice then reads by form and by a mark
+  as well as by fill, which is what a reader with low contrast sensitivity or a washed-out screen
+  needs. It is a dot, so it is round (§XIV).
+- MUST: options that are points on one ordered scale (runway bands, the funded stages) pass
+  `ordinal`: a rule along the foot of the well with a tick under each key and a pointer under the
+  chosen one. An option off that scale passes `apart` and stands after a divider with no tick:
+  Bootstrapped is not a stage after Series B+.
+- NEVER: a gradient, a specular edge, a texture or a coloured glow to make a control look
+  physical. Depth is shadow geometry from the tokens, which flips colour with the theme and keeps
+  one height in both.
+- Motion is the press only: 120ms on the transform, and none under reduced motion.
+- MUST: the same parts outside a track. A stepper's ends are `.weather-step-key`s standing in a
+  well around what they step (the week stepper, `app/components/home/WeekStepper.tsx`); the end
+  with nothing beyond it sinks flat and unlit rather than drawing a faded copy of a key. A toggle
+  button whose state is `aria-pressed` is a `.weather-key` (the calendar's months). An option in a
+  picker's list carries the lamp (`.weather-choice-item`), not a check over an action-ink wash.
+- NEVER: a translucent popup with nothing blurred behind it. At 95% the page's text read through
+  the header's pickers and the calendar; a popup is opaque, or it blurs what it covers (§XXV keeps
+  the blur where text must stay legible over a scrolling page).

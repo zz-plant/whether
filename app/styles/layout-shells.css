@@ -75,12 +75,14 @@
   }
 }
 
-/* Four company choices form equal cells instead of wrapping three then one.
-   Native radio inputs and their existing focus treatment stay in place. */
+/* The four company choices are equal keys on one row from sm up (2026-10-13). They used
+   to break 2 + 2 below 1280px, which split the runway scale across two rows, and to wrap
+   each sublabel mid-phrase beside its label. Labels now stack over their sublabels
+   (`stackSublabel`), which is narrow enough for four across. */
 @media (min-width: 640px) {
   .weather-company-options fieldset {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     min-width: 0;
   }
   .weather-company-options label {
@@ -89,12 +91,8 @@
   }
   .weather-company-options .weather-segment-option {
     width: 100%;
-    text-align: center;
-  }
-}
-@media (min-width: 1280px) {
-  .weather-company-options fieldset {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    flex: 1;
+    justify-content: flex-start;
   }
 }
 

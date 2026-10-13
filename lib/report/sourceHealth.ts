@@ -1,4 +1,5 @@
 import { formatAgeSpan, formatTimestampUTC } from "../formatters";
+import { SIGNAL_CADENCE } from "../ingestion/cadence";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
@@ -65,7 +66,13 @@ type SourceGroupDefinition = {
   useBusinessDays?: boolean;
 };
 
-const TREASURY_SOURCE_SLA_HOURS = 6;
+/*
+ * Treasury is ingested once a day (the 02:00 UTC cron in wrangler.toml), so a 6h SLA
+ * marked it stale by 08:00 UTC every weekday and /api/health read "degraded" all
+ * afternoon on a healthy fetch. Take the window the ingest cadence already holds it to:
+ * one missed run, not one ordinary afternoon, is what makes it stale.
+ */
+const TREASURY_SOURCE_SLA_HOURS = SIGNAL_CADENCE.TREASURY_10Y.staleAfterMs / 3_600_000;
 const MARKET_SOURCE_SLA_HOURS = 24;
 const MONTHLY_RELEASE_SLA_HOURS = 45 * 24;
 const CURATED_SNAPSHOT_SLA_HOURS = 45 * 24;
@@ -283,6 +290,17 @@ const buildGroupedRow = ({
 const isDegradedSource = (row: SourceHealthRow) =>
   row.freshnessStatus !== "fresh" || (row.expectsLive && row.mode !== "live");
 
+/**
+ * The sources that are meant to answer live and have gone past their freshness window: what
+ * a monitor should be told. A curated snapshot is current by design and never listed. On
+ * 2026-10-13 /trust printed "Treasury · Stale · 14h old" while /api/health said "ok" — the
+ * health check asked only whether a report loaded, and a report built from stale inputs loads.
+ */
+export const listStaleLiveSources = (rows: readonly SourceHealthRow[]) =>
+  rows
+    .filter((row) => row.expectsLive && row.freshnessStatus === "stale")
+    .map((row) => ({ source: row.sourceName, age: row.ageLabel, lastSuccessfulFetchAt: row.lastSuccessfulFetchAt }));
+
 export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
   rows
     .filter(isDegradedSource)
@@ -378,7 +396,7 @@ export const buildSourceHealthRows = ({
   return [
     {
       sourceName: "Treasury",
-      cadenceLabel: "Intraday rates",
+      cadenceLabel: "Daily rates",
       freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now, true),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,

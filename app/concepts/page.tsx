@@ -35,6 +35,7 @@ import {
 import { ContentPageShell } from "../components/ui/contentPageShell";
 import { SectionTabs } from "../components/sectionTabs";
 import { AdvicePlane, type AdvicePlanePoint } from "./advicePlane";
+import { AdviceCorpusSection } from "./adviceCorpusSection";
 
 export const runtime = "edge";
 
@@ -336,6 +337,8 @@ export default function ProductCanonPage() {
         </div>
       </SecondaryPageSection>
 
+      <AdviceCorpusSection />
+
       {pairs.length > 0 ? (
         <SecondaryPageSection
           title="Same decision, opposite advice"
@@ -459,8 +462,8 @@ export default function ProductCanonPage() {
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
             <span className="text-slate-100">A small, chosen sample.</span> These texts were picked for being widely
-            read, by the people who built this page. A systematic sample of every post from a set of firms could lean
-            differently.
+            read, by the people who built this page. Every post in the archives counted above is the check on
+            that choice.
           </li>
           <li>
             <span className="text-slate-100">Publication, not adoption.</span> Each date is when a text came out. Advice

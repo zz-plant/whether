@@ -161,7 +161,8 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
    each area's row says which of its lines moved. A read with no comparison says so over it.
 7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
-   they moved the same way and where the scores stood three months on; the last turns as links.
+   they moved the same way and where the scores stood three months on; on every week, how long
+   these conditions lasted before (§1.1.76); the last turns as links.
 8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
    holds the slide and image copies and every other format since 2026-10-08, and the week's
    published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
@@ -3192,7 +3193,7 @@ reports the test, and the rule kept the current ramp.
   (`tests/trustRampTestNote.test.tsx`). Both are served from this site as plain text, at
   `/research/premise-test-registration.md` and `/research/premise-test-results.md`, because the
   repository is private and its GitHub copies are a 404 for readers. The routes serve
-  `lib/research/premiseTestDocs.ts`, which `scripts/research/publishPremiseTestDocs.ts` builds from
+  `lib/research/premiseTestDocs.ts`, which `scripts/research/publishResearchDocs.ts` builds from
   `docs/research/`; `tests/premiseTestDocs.test.ts` fails when the two differ.
 
 ### 1.1.69 The Synoptic palette (2026-10-09)
@@ -3323,7 +3324,131 @@ mostly flagged rows for different areas that rightly share a line.
   hover title then reads "Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56".
 
 `tests/chartIntegrityContract.test.tsx` and `tests/visualPrimitives.test.tsx` hold them.
-||||||| a0b5077b
+
+### 1.1.73 Engineering work against the payback bar, in the runway planner (2026-10-13)
+
+The runway planner (`/operate/financial`) checks the reader's own engineering projects against the
+payback bar the published rules already set. It does not add a bar of its own
+(`lib/report/projectPayback.ts`):
+
+- **The bar.**
+  - Under six months of runway, the cash gate holds every new commitment.
+  - With 6–12 months, every commitment needs a payback inside `TIGHT_RUNWAY_PAYBACK_BAR_MONTHS` (6).
+  - Otherwise, outside Sunny, the Product tempo rule slows work that pays back in more than a year
+    (`ROADMAP_PAYBACK_BAR_MONTHS`, 12; `tests/projectPayback.test.tsx` holds the number to the rule's
+    sentence).
+  - In Sunny, with a year or more of runway, there is no bar on roadmap work.
+- **A project.**
+  - Cost: weeks to ship × engineers × what an engineer-week costs.
+  - Saving: hours it saves a month × what one of those hours costs, plus bills it cuts.
+  - Each row prints a sentence: the break-even month, the bar it clears or misses, and what lifts
+    that bar. Work that saves no cash is told it has no payback to check and has to be argued on
+    revenue or retention.
+  - Once the work ships, the saving lowers net burn. The sentence says how much runway that adds, at
+    today's net burn with revenue flat. When the added runway moves the reader into a band with a
+    different bar, it says that too.
+  - Engineer time counts toward the payback but not the runway, because the engineers are paid
+    either way.
+- **The chart.**
+  - One strip per project on one month scale: building, paying back, and a dot at the break-even,
+    filled when it clears the bar (`app/operate/components/projectPaybackChart.tsx`).
+  - The bar and the cash-out month cross every strip.
+  - HTML positioned by percent, like the planner's `RangeBar`, so the labels stay page text at
+    phone width.
+- **Where it lives.**
+  - The engineer-week cost and up to four project rows are in the operator profile.
+  - They travel with the plan link as `engWeek` and one `project=weeks_engineers_hours_hourly_other_name`
+    per row (`app/operate/components/runwayPlanLink.ts`).
+  - The bar sentence and each project's sentence go into the copy block and the budget memo.
+- **Edits stand until the address bar catches up.**
+  - The panel reads its plan back from the link, and `router.replace` lands a server round trip
+    after each edit. A second field typed inside that trip was built on the older link and wrote
+    the first field back to its old value.
+  - The panel now keeps its own last edit until the bar shows that edit's address
+    (`plannerEditStands`). An address it never wrote is someone else's link, which wins as before.
+
+Why: a set of essays argued that "product craft" has to be justified as cost removed once the
+person who pays is not the person who uses the product, and priced that with a discount rate. At a
+22% hurdle, a project that breaks even inside two years does so about a month later than
+undiscounted. The rules' bars move by six months with runway and conditions, so the planner draws
+the bar.
+
+### 1.1.75 `/concepts` counts every post, not only the famous ones (2026-10-13)
+
+The curated list in §1.1.64 tags texts chosen for being widely read, and its own limits say a
+systematic sample could lean differently. This is that sample: a pre-registered corpus study of
+every dated post in twelve archives from ten venture firms, January 2012 to September 2026, asking
+whether advice to founders moves with funding pressure and risk appetite.
+
+- **Registered first.** `docs/research/advice-corpus-preregistration.md` was the branch's first
+  commit, before any post was fetched for its text: hypotheses H1–H5, sources and exclusions, the
+  rubric (the prompt's SHA-256, which `tests/adviceCorpusRubric.test.ts` holds the code to), the
+  analysis plan, and what would count against each hypothesis. Seven deviations are recorded in its
+  §11, among them the rubric revision the validation forced (D4).
+- **Pipeline** (`scripts/advice-corpus/`, `bun run advice-corpus:*`). robots.txt first, one queue
+  per host at most once a second, a descriptive User-Agent; raw pages and text cached in the
+  gitignored `.cache/advice-corpus/`. A keyword-and-embedding prefilter picks what the local model
+  reads, plus a seeded 10% of the rest to measure what it misses. Labels come from the local model
+  (named in the documents); the hand labels that validate them and the analysis are frontier work.
+- **Data.** `data/advice-corpus/posts.json` holds derived metadata for every classified post (no
+  text; quotes of 15 words at most). `monthly.json` is generated from it alone (firm-weighted shares
+  by month, quarter and funding-pressure era); `tests/adviceCorpusData.test.ts` runs
+  `bun run advice-corpus:check`, so the two cannot drift.
+- **The section** (`app/concepts/adviceCorpusSection.tsx`), after "What the record shows" on `/concepts`: quarterly
+  expand and conserve shares under quarterly funding pressure, two panels on one time axis, the seven
+  changes in conditions as vertical rules named in the caption, an sr-only table of every quarter,
+  and a native tooltip per quarter. Shares come from `monthly.json`; funding pressure and the
+  changes come from the month-end record at render, so the chart cannot disagree with `/history`.
+  The two series are ink and dashed ink, not hues: every hue on the site already names a set of
+  conditions or a line state.
+- **Documents served from the site.** The repository is private, so the pre-registration and the
+  results are served as plain text at `/research/advice-corpus-preregistration.md` and
+  `/research/advice-corpus-results.md`, from `lib/research/adviceCorpusDocs.ts`.
+  `scripts/research/publishResearchDocs.ts` (renamed from `publishPremiseTestDocs.ts`, now one
+  registry for both studies) builds it; `tests/adviceCorpusDocs.test.ts` fails when it and
+  `docs/research/` differ.
+- **One stance vocabulary.** `lib/adviceStance.ts` keeps the reading list's one-liners and adds each
+  stance's registered corpus wording (`corpusDefinition`), so both import one module. The known
+  difference is written there: the one-liner puts "focus" under conserve; the corpus has no word
+  for it.
+- **What it found** (`docs/research/advice-corpus-results.md`). 8,777 posts in the corpus, 2,598
+  classified, 407 capital-relevant and addressed to founders. H1 (less expansion advice when funding
+  pressure is above its line), H2 (more conservation advice after the July 2022 crossing) and H3
+  (stance follows funding pressure more than risk appetite) count against; H4 (craft does not move)
+  is inconclusive; H5 (metrics) shows no shift. Stance labels agree with the reviewer at kappa 0.523,
+  below the registered 0.6, so every verdict is stated as resting on them. The section prints the
+  era shares from `monthly.json` and those limits; the curated list's "A small, chosen sample" limit
+  now points at it.
+### 1.1.76 What a market move means at the reader's scale (2026-10-13)
+
+A reader who hears "the Fed cut rates" or "the curve flattened" has nothing on the page to hold the
+headline against: the change lines are exact and, to most readers, unreadable sizes. Three sentences
+answer the questions that headline raises in the reader's own terms. None adds a vocabulary, a
+popover or a forecast.
+
+- **How big the move is** (`lib/report/marketMoveScale.ts`). Each market move in the "In
+  interest-rate terms" fold gets a second line: for the short rate, how it compares with a
+  quarter-point Fed move ("Less than one quarter-point Fed move."), and for both inputs, how many of
+  the month-to-month changes since 2012 moved that far ("The rate moved that far in one month in 18
+  of the 176 months on record."). A count, not a median: the bill sat at zero from 2012 to 2015 and
+  moves in Fed steps since, so its median month was 0.03 and every distance read as many months.
+  The federal funds rate has no month-end series and gets the Fed comparison alone; the curve, which
+  the Fed does not set, gets the count alone.
+- **How long these conditions lasted before** (`describeSpellLengths`, `lib/report/lastTimeCallChanged.ts`),
+  under "Has this happened before?" on every live week. The earlier spells of this week's conditions
+  and their length in month-ends ("The one earlier Freezing spell on record ran 32 month-ends, Sep
+  2022 to Apr 2025."), the shortest spell of any conditions, and, with a chosen runway band whose
+  top every earlier spell outlasted, that it did. The spell the record ends in is left out while it
+  is still running. The record has seven spells, so it counts them and says it is not a forecast.
+- **Whether the market can move the payback bar** (`describeWhatMovesPaybackBar`,
+  `lib/report/projectPayback.ts`), under the bar's sentence in the runway planner. Under a year of
+  runway the bar is cash's, and the sentence says no rate move or headline lifts it. Otherwise it is
+  the roadmap rule's, and the sentence names the score moves still needed for Sunny in the change
+  lines' numbers, with today's scores, and how many of the reader's projects that would stop slowing.
+  In Sunny it says what would bring the 12-month bar back and how many projects would then miss it.
+
+`tests/marketMoveScale.test.ts`, `tests/spellLengths.test.ts` and `tests/projectPayback.test.tsx`
+hold them.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
@@ -4181,3 +4306,23 @@ surfaces do not reintroduce the old words.
 
 Archived briefs in `data/published_briefs.json` keep the wording they were published with; the
 archive is append-only and its exports are expected to read as they did on the day.
+
+### 1.1.73 Controls read as instrument parts (2026-10-13)
+
+Every segmented control — plan horizon, stage, cash runway, the decision picker, and the ones on
+/signals, /operate, /share and the subscribe form — is a recessed well with keys in it
+(`docs/agents/ui-ux-standards.md` §XXVI). The chosen key stands proud and lights its lamp, and a
+pressed key sinks. Stage and cash runway are ordered scales: a rule with a tick under each key and
+a pointer under the chosen one, with Bootstrapped set apart from the funded stages. The company
+controls are four equal keys on one row from `sm` up, each label over its sublabel, where they
+used to break 2 + 2 and wrap each sublabel mid-phrase. No gradient or specular: §XXV stands.
+
+### 1.1.74 The week stepper and the pickers use the same parts (2026-10-13)
+
+The week stepper on `/` is one well: the earlier and later week are keys at either end of the
+calendar picker, and the end with no week beyond it sinks flat instead of drawing a faded box. The
+header's stage and runway pickers mark the chosen option with a lit lamp instead of a check over an
+action-ink wash, and the calendar's months and known periods are keys that stand proud when chosen.
+The three pickers that drew at 95% opacity with nothing blurred behind them are opaque: the page's
+text read through them (`docs/agents/ui-ux-standards.md` §XXVI).
+

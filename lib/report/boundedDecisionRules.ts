@@ -378,7 +378,15 @@ export const SPENDING_PAYBACK_BAR_MONTHS = 6;
  * printed on the same page at six. A tight runway extends the Spending bar to
  * everything; it does not relax it anywhere.
  */
-const TIGHT_RUNWAY_PAYBACK_BAR_MONTHS = SPENDING_PAYBACK_BAR_MONTHS;
+export const TIGHT_RUNWAY_PAYBACK_BAR_MONTHS = SPENDING_PAYBACK_BAR_MONTHS;
+
+/**
+ * The Product tempo rule's bar outside Sunny: it slows roadmap work "that pays
+ * back in more than a year". The rule's sentences say "a year"; the runway
+ * planner's project chart draws the same bar from this number, and
+ * `tests/projectPayback.test.ts` holds the two together.
+ */
+export const ROADMAP_PAYBACK_BAR_MONTHS = 12;
 
 /**
  * The four lines every area's pause and resume conditions are drawn from, set

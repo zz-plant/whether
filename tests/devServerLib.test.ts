@@ -48,6 +48,11 @@ const fixtureServer = (root: string, { status = 200 }: { status?: number } = {})
   return file;
 };
 
+/* Every call names a lock file in its own workspace. The default is this checkout's
+   `.vinext/dev/lock.json`, and a dev server left running here would otherwise be
+   reused by every test below instead of the fixture each one starts. */
+const noLock = (root: string) => join(root, "no-dev-lock.json");
+
 const exitingServer = (root: string) => {
   const file = join(root, "exits.mjs");
   writeFileSync(file, "process.exit(3);\n");
@@ -117,6 +122,7 @@ describe("withDevServer", () => {
       const result = await withDevServer({
         baseUrl,
         outDir: workspace(),
+        lockfilePath: noLock(workspace()),
         probe: probeOnce,
         onStatus: (message: string) => statuses.push(message),
         body: async (url: string, started?: unknown) => ({ url, started, text: await (await fetch(url)).text() }),
@@ -125,6 +131,33 @@ describe("withDevServer", () => {
       assert.deepEqual(result, { url: baseUrl, started: undefined, text: "already up" });
       assert.match(statuses.join("\n"), /Reusing the server already listening/);
       assert.equal(await (await fetch(baseUrl)).text(), "already up", "a server it did not start must survive");
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
+  });
+
+  it("reuses this checkout's dev server from vinext's lock file, wherever it listens", async () => {
+    const server = createHttpServer((request, response) => response.end("checkout server"));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    const appUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const root = workspace();
+    const lockfilePath = join(root, "lock.json");
+    writeFileSync(lockfilePath, JSON.stringify({ pid: process.pid, port: 0, hostname: "127.0.0.1", appUrl, startedAt: 0, cwd: root }));
+
+    const statuses: string[] = [];
+    try {
+      const result = await withDevServer({
+        baseUrl: `http://127.0.0.1:${await freePort()}`,
+        outDir: root,
+        lockfilePath,
+        probe: probeOnce,
+        onStatus: (message: string) => statuses.push(message),
+        body: async (url: string, started?: unknown) => ({ url, started }),
+      });
+
+      assert.deepEqual(result, { url: appUrl, started: undefined });
+      assert.match(statuses.join("\n"), /Reusing this checkout's dev server/);
     } finally {
       await new Promise((resolve) => server.close(resolve));
     }
@@ -139,6 +172,7 @@ describe("withDevServer", () => {
     const text = await withDevServer({
       baseUrl,
       outDir: root,
+      lockfilePath: noLock(root),
       devScript: fixtureServer(root),
       logName: "fixture.log",
       timeoutMs: 15000,
@@ -174,6 +208,7 @@ describe("withDevServer", () => {
       withDevServer({
         baseUrl: `http://127.0.0.1:${await freePort()}`,
         outDir: root,
+        lockfilePath: noLock(root),
         devScript: fixtureServer(root),
         timeoutMs: 15000,
         probe: patientProbe(10000),
@@ -201,6 +236,7 @@ describe("withDevServer", () => {
     const usedUrl = await withDevServer({
       baseUrl: `http://127.0.0.1:${heldPort}`,
       outDir: root,
+      lockfilePath: noLock(root),
       devScript: fixtureServer(root),
       timeoutMs: 15000,
       probe: patientProbe(10000),
@@ -221,6 +257,7 @@ describe("withDevServer", () => {
       withDevServer({
         baseUrl: `http://127.0.0.1:${await freePort()}`,
         outDir: root,
+        lockfilePath: noLock(root),
         devScript: exitingServer(root),
         timeoutMs: 60000,
         probe: patientProbe(300),
@@ -243,6 +280,7 @@ describe("withDevServer", () => {
       withDevServer({
         baseUrl: `http://127.0.0.1:${await freePort()}`,
         outDir: root,
+        lockfilePath: noLock(root),
         devScript: killedServer(root),
         timeoutMs: 60000,
         probe: patientProbe(300),
@@ -262,6 +300,7 @@ describe("withDevServer", () => {
       withDevServer({
         baseUrl: `http://127.0.0.1:${await freePort()}`,
         outDir: root,
+        lockfilePath: noLock(root),
         devScript: fixtureServer(root, { status: 503 }),
         timeoutMs: 200,
         probe: async (baseUrl: string) => {

@@ -79,6 +79,15 @@ pipeline is the point: a pipeline that lies about shipping cannot also be the th
 what shipped. Off Cloudflare the binding is absent and callers report the absence rather than
 inventing a version.
 
+The home page's data cache is the second reader (`lib/report/homePageData.ts`). The cache is
+KV-backed (`VINEXT_KV_CACHE`), so its entries outlive the deploy that wrote them. After #1563 added
+a required `ReportData.scoringBasis`, an entry saved before the merge crashed the trust strip for
+up to the revalidate window. The version id is now an argument to the cached function, which puts
+it in the key; keyParts are fixed when the function is created and cannot carry it. This reader
+does need a value off Cloudflare, so locally it keys on `ENGINE_VERSION` plus the build commit
+instead. A shape change that is not yet committed still needs the dev cache cleared. Any new
+`unstable_cache` call over a typed payload should pass the same version.
+
 ## Background work (`backgroundWork.ts`)
 
 The worker entry installs the active request's `ctx.waitUntil` on `globalThis` so library code can
