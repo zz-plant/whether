@@ -5,11 +5,22 @@
  */
 
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
-import { getRegimePublicLabel } from "../regimePresentation";
+import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { buildScoreReferenceLines } from "./scoreReference";
 import { describeConditions, formatExportConfidence, formatSourceFooter } from "./exportTerms";
 import { fitLines, wrappedLines } from "../image/textFit";
+import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
+import {
+  OG_BG,
+  OG_CONDITION_INK,
+  OG_LINE_CROSSED,
+  OG_PANEL,
+  OG_RULE,
+  OG_TEXT,
+  OG_TEXT_MUTED,
+  OG_TEXT_SECONDARY,
+} from "../image/ogTheme";
 
 /*
  * The slide's three slot labels are the page's. `callChangesIf` carries the
@@ -91,6 +102,17 @@ export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
 /** The conditions as every slide format prints them: the weather word, with what it means for money. */
 export const slideConditions = (payload: MeetingSlidePayload): string => describeConditions(payload.regime);
 
+/**
+ * The condition badge's colours: its edge in the condition's fill, its word in
+ * the condition's ink, as every other surface draws a condition. The badge was
+ * red for Cloudy and Freezing and green for the other two until 2026-10-09, so
+ * a Stormy slide carried a Sunny badge. The board deck draws the same badge.
+ */
+export const slideConditionColors = (payload: MeetingSlidePayload): { edge: string; ink: string } =>
+  isRegimeKey(payload.regime)
+    ? { edge: REGIME_HEX_COLORS[payload.regime], ink: OG_CONDITION_INK[payload.regime] }
+    : { edge: OG_RULE, ink: OG_TEXT };
+
 /** "Margin: close to the line": the band under its display name (the payload field stays `confidence`). */
 const slideMargin = (payload: { confidence: string }) => `Margin: ${formatExportConfidence(payload.confidence).toLowerCase()}`;
 
@@ -144,51 +166,50 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
  * Generates Rich HTML for clipboard paste into Google Slides, Keynote, Notion, Docs
  */
 export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
-  const isDefensive = payload.regime === "DEFENSIVE" || payload.regime === "SCARCITY";
-  const badgeBg = isDefensive ? "#ef4444" : "#10b981";
+  const { edge: badgeEdge, ink: badgeInk } = slideConditionColors(payload);
 
   return `
-<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #090d16; color: #f1f5f9; padding: 24px; border-radius: 12px; border: 1px solid #1e293b; max-width: 680px;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid #1e293b; padding-bottom: 12px;">
+<div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: ${OG_BG}; color: ${OG_TEXT}; padding: 24px; border-radius: 12px; border: 1px solid ${OG_RULE}; max-width: 680px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid ${OG_RULE}; padding-bottom: 12px;">
     <div>
-      <span style="font-size: 12px; color: #94a3b8; font-weight: 600;">Whether · Weekly operating guidance</span>
-      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: #ffffff;">This week's guidance${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
-      <p style="margin: 4px 0 0 0; font-size: 12px; color: #94a3b8;">Conditions: ${slideConditions(payload)}</p>
+      <span style="font-size: 12px; color: ${OG_TEXT_MUTED}; font-weight: 600;">Whether · Weekly operating guidance</span>
+      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: ${OG_TEXT};">This week's guidance${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: ${OG_TEXT_MUTED};">Conditions: ${slideConditions(payload)}</p>
     </div>
     <div style="text-align: right;">
-      <span style="background: ${badgeBg}; color: white; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${getRegimePublicLabel(payload.regime)}</span>
-      <p style="margin: 4px 0 0 0; font-size: 11px; color: #64748b;">${payload.recordDate}</p>
+      <span style="border: 1px solid ${badgeEdge}; color: ${badgeInk}; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${getRegimePublicLabel(payload.regime)}</span>
+      <p style="margin: 4px 0 0 0; font-size: 11px; color: ${OG_TEXT_MUTED};">${payload.recordDate}</p>
     </div>
   </div>
 
   <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
     <tr>
       <td style="padding: 8px 0;">
-        <span style="font-size: 12px; font-weight: 700; color: #38bdf8;">${SLIDE_LABELS.action}</span>
-        <div style="font-size: 13px; font-weight: 600; color: #ffffff; margin-top: 2px;">${payload.actionNow}</div>
+        <span style="font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${SLIDE_LABELS.action}</span>
+        <div style="font-size: 13px; font-weight: 600; color: ${OG_TEXT}; margin-top: 2px;">${payload.actionNow}</div>
       </td>
     </tr>
     <tr>
       <td style="padding: 8px 0;">
-        <span style="font-size: 12px; font-weight: 700; color: #f59e0b;">${SLIDE_LABELS.pause}</span>
-        <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.pauseIf}</div>
+        <span style="font-size: 12px; font-weight: 700; color: ${OG_LINE_CROSSED};">${SLIDE_LABELS.pause}</span>
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${payload.pauseIf}</div>
       </td>
     </tr>
     <tr>
       <td style="padding: 8px 0;">
-        <span style="font-size: 12px; font-weight: 700; color: #10b981;">${SLIDE_LABELS.callChange}</span>
-        <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.callChangesIf}</div>${
+        <span style="font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${SLIDE_LABELS.callChange}</span>
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${payload.callChangesIf}</div>${
           payload.resumeWhen
             ? `
-        <span style="display: block; margin-top: 8px; font-size: 12px; font-weight: 700; color: #10b981;">${SLIDE_LABELS.resume}</span>
-        <div style="font-size: 13px; color: #e2e8f0; margin-top: 2px;">${payload.resumeWhen}</div>`
+        <span style="display: block; margin-top: 8px; font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${SLIDE_LABELS.resume}</span>
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${payload.resumeWhen}</div>`
             : ""
         }
       </td>
     </tr>
   </table>
 
-  <div style="display: flex; justify-content: space-between; gap: 16px; font-size: 10px; color: #64748b; padding-top: 8px;">
+  <div style="display: flex; justify-content: space-between; gap: 16px; font-size: 10px; color: ${OG_TEXT_MUTED}; padding-top: 8px;">
     <span style="display: flex; flex-direction: column; gap: 2px;">${slideReadingLines(payload).map((line) => `<span>${line}</span>`).join("")}</span>
     <span>${slideFooterLine(payload)}</span>
   </div>
@@ -211,8 +232,7 @@ const SLIDE_TEXT_EM = 0.53;
  * Generates a standalone 16:9 1200x675 SVG presentation slide
  */
 export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
-  const isDefensive = payload.regime === "DEFENSIVE" || payload.regime === "SCARCITY";
-  const badgeColor = isDefensive ? "#f43f5e" : "#10b981";
+  const { edge: badgeColor, ink: badgeInk } = slideConditionColors(payload);
 
   // Escape XML entities
   const esc = (text: string) =>
@@ -245,42 +265,44 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
      projector shows as smudges. The header reads in sentence case, as the
      site's category line does, not in letter-spaced capitals. The three
      cards are parallel, so they carry no numbers, and each card's colour is
-     its label's alone: a coloured bar down its edge drew the same thing twice. */
+     its label's alone: a coloured bar down its edge drew the same thing twice.
+     Labels are the ink except the pause label, which is the front red the site
+     prints a pause line in; the condition badge is the condition's own colour. */
   return `<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675">
-  <rect width="1200" height="675" fill="#090d16"/>
+  <rect width="1200" height="675" fill="${OG_BG}"/>
 
   <!-- Header -->
   <g transform="translate(80, 70)">
-    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="600" fill="#94a3b8">Whether · Weekly operating guidance</text>
-    <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="#ffffff">This week's guidance${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
-    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="#64748b">${esc(payload.recordDate)} · ${esc(slideConditions(payload))}</text>
+    <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="600" fill="${OG_TEXT_MUTED}">Whether · Weekly operating guidance</text>
+    <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="${OG_TEXT}">This week's guidance${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
+    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="${OG_TEXT_MUTED}">${esc(payload.recordDate)} · ${esc(slideConditions(payload))}</text>
     
     <!-- Regime Badge -->
     <g transform="translate(880, 10)">
       <rect x="0" y="0" width="160" height="42" rx="21" fill="${badgeColor}" fill-opacity="0.15" stroke="${badgeColor}" stroke-width="1.5"/>
-      <text x="80" y="26" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="800" fill="${badgeColor}" text-anchor="middle" letter-spacing="1">${esc(getRegimePublicLabel(payload.regime))}</text>
+      <text x="80" y="26" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="800" fill="${badgeInk}" text-anchor="middle" letter-spacing="1">${esc(getRegimePublicLabel(payload.regime))}</text>
     </g>
   </g>
 
   <!-- Action now -->
   <g transform="translate(80, 190)">
-    <rect width="1040" height="110" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#38bdf8">${SLIDE_LABELS.action}</text>
-    ${cardBody(payload.actionNow, 20, 700, "#ffffff")}
+    <rect width="1040" height="110" rx="12" fill="${OG_PANEL}" stroke="${OG_RULE}" stroke-width="1"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="${OG_TEXT}">${SLIDE_LABELS.action}</text>
+    ${cardBody(payload.actionNow, 20, 700, OG_TEXT)}
   </g>
 
   <!-- Pause if -->
   <g transform="translate(80, 320)">
-    <rect width="1040" height="110" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#f59e0b">${SLIDE_LABELS.pause}</text>
-    ${cardBody(payload.pauseIf, 18, 500, "#cbd5e1")}
+    <rect width="1040" height="110" rx="12" fill="${OG_PANEL}" stroke="${OG_RULE}" stroke-width="1"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="${OG_LINE_CROSSED}">${SLIDE_LABELS.pause}</text>
+    ${cardBody(payload.pauseIf, 18, 500, OG_TEXT_SECONDARY)}
   </g>
 
   <!-- Conditions change if -->
   <g transform="translate(80, 450)">
-    <rect width="1040" height="110" rx="12" fill="#0f172a" stroke="#334155" stroke-width="1"/>
-    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="#10b981">${SLIDE_LABELS.callChange}</text>
-    ${cardBody(payload.callChangesIf, 18, 500, "#cbd5e1")}
+    <rect width="1040" height="110" rx="12" fill="${OG_PANEL}" stroke="${OG_RULE}" stroke-width="1"/>
+    <text x="32" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="14" font-weight="700" fill="${OG_TEXT}">${SLIDE_LABELS.callChange}</text>
+    ${cardBody(payload.callChangesIf, 18, 500, OG_TEXT_SECONDARY)}
   </g>
 
   <!-- Footer: each score against its line, then the margin -->
@@ -288,15 +310,15 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
 ${slideReadingLines(payload)
   .map(
     (line, index) =>
-      `    <text x="0" y="${index * 18}" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">${esc(line)}</text>`,
+      `    <text x="0" y="${index * 18}" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="${OG_TEXT_SECONDARY}">${esc(line)}</text>`,
   )
   .join("\n")}
-    <text x="0" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#64748b">
-      <tspan fill="#f1f5f9">${esc(slideMargin(payload))}</tspan> · ${esc(slideFooterLine(payload).slice(slideMargin(payload).length + 3))}
+    <text x="0" y="36" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="${OG_TEXT_MUTED}">
+      <tspan fill="${OG_TEXT}">${esc(slideMargin(payload))}</tspan> · ${esc(slideFooterLine(payload).slice(slideMargin(payload).length + 3))}
     </text>${
       slideResumeLine(payload)
         ? `
-    <text x="0" y="54" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="#cbd5e1">${esc(slideResumeLine(payload) ?? "")}</text>`
+    <text x="0" y="54" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="600" fill="${OG_TEXT_SECONDARY}">${esc(slideResumeLine(payload) ?? "")}</text>`
         : ""
     }
   </g>

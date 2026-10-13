@@ -52,11 +52,12 @@ describe("RegimeRadar", () => {
     const withoutPrevious = renderToStaticMarkup(<RegimeRadar {...base} />);
 
     // The trail dot is the only circle at r=2.5 and the trail line is the only
-    // stroke in plain gray.
+    // dashed stroke in the muted ink.
+    const previousTrail = /stroke="var\(--app-text-muted\)" stroke-width="1\.2" stroke-dasharray="2 2"/;
     assert.match(withPrevious, /r="2\.5"/);
-    assert.match(withPrevious, /stroke="#94a3b8"/);
+    assert.match(withPrevious, previousTrail);
     assert.doesNotMatch(withoutPrevious, /r="2\.5"/);
-    assert.doesNotMatch(withoutPrevious, /stroke="#94a3b8"/);
+    assert.doesNotMatch(withoutPrevious, previousTrail);
   });
 
   /* The distance to the nearer line is the trust strip's margin, printed once on the

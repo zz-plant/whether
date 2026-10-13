@@ -75,8 +75,8 @@ assuming the cache.
 `[observability.traces]` with `head_sampling_rate = 1`. The runtime emits spans for every handler
 invocation, external fetch, and KV or Durable Object operation, with no code change. Export goes
 to an OTLP destination configured in the dashboard (Observability → Destinations); Honeycomb,
-Grafana Cloud, Axiom, and Sentry all accept it. Spans are billed from October 2026, and
-`head_sampling_rate` is the cost knob — the invariant-level questions (how long did FRED take
+Grafana Cloud, Axiom, and Sentry all accept it. Spans move to unified volume pricing on December 1,
+2026 (50 GB/mo included, $0.25/GB thereafter), and `head_sampling_rate` is the cost knob — the invariant-level questions (how long did FRED take
 against the 10s read deadline, what wrote to KV on a read) need a fraction of traffic.
 
 ## Source maps

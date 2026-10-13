@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { withDeadline } from "../../../lib/withDeadline";
-import { getDeployedVersion } from "../../../lib/runtime/versionMetadata";
+import { getBuildCommit, getDeployedVersion } from "../../../lib/runtime/versionMetadata";
+import { listStaleLiveSources } from "../../../lib/report/sourceHealth";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -17,22 +18,30 @@ const DEPENDENCY_PROBE_TIMEOUT_MS = 3_000;
 
 type DependencyState = "ok" | "degraded" | "timeout";
 
-const probeReportData = async (): Promise<DependencyState> => {
+type Probe = { reportData: DependencyState; staleSources: ReturnType<typeof listStaleLiveSources> };
+
+const probeReportData = async (): Promise<Probe> => {
   try {
     const reportResult = await withDeadline(
       loadReportDataSafe(undefined, { route: "/api/health" }),
       DEPENDENCY_PROBE_TIMEOUT_MS,
       "health-report-data",
     );
-    return reportResult.ok ? "ok" : "degraded";
+    return reportResult.ok
+      ? { reportData: "ok", staleSources: listStaleLiveSources(reportResult.data.sourceHealth) }
+      : { reportData: "degraded", staleSources: [] };
   } catch {
-    return "timeout";
+    return { reportData: "timeout", staleSources: [] };
   }
 };
 
 export async function GET() {
   const now = new Date();
-  const reportData = await probeReportData();
+  const { reportData, staleSources } = await probeReportData();
+  /* Stale live inputs are "degraded", not "down": the page still serves a reading, but
+     one a reader would act on as current. A 200, so the site is not routed around, with
+     the sources named so a monitor can say which feed stopped. */
+  const status = reportData !== "ok" ? "down" : staleSources.length > 0 ? "degraded" : "ok";
   /* `version` is this endpoint's schema version and says nothing about what is running.
      `deployedVersion` is the Worker actually serving the request, so "is production
      current?" can be answered without trusting the pipeline that claims to have shipped
@@ -41,14 +50,17 @@ export async function GET() {
 
   return NextResponse.json(
     {
-      status: reportData === "ok" ? "ok" : "down",
+      status,
       service: "whether",
       generatedAt: now.toISOString(),
       version: "v1",
       deployedVersion,
+      commit: getBuildCommit(),
       dependencies: {
         reportData,
+        dataFreshness: staleSources.length > 0 ? "stale" : "ok",
       },
+      staleSources,
     },
     { status: reportData === "ok" ? 200 : 503 },
   );

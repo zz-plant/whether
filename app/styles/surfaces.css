@@ -67,7 +67,7 @@
 /* Hero card. The one surface whose colour is allowed to say something: its
    fill, border and top-edge light all come from --regime-accent, which the
    hero sets on itself from the week's regime (data-regime), so the card is
-   emerald in a Sunny week, rose in a Freezing one, and cannot disagree with
+   gold in a Sunny week, frost blue in a Freezing one, and cannot disagree with
    the stamp inside it. Before this it was fixed teal — the stripe's colour
    for Sunny — under every call. No outer glow, since a box
    that glows lifts off its page, and the depth ladder below already gives
@@ -129,9 +129,10 @@ html[data-theme="light"] .weather-hero-card {
   @apply inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs font-semibold;
 }
 
+/* Live data is the clear state: the ink, framed. */
 .weather-data-mode-dynamic {
-  border-color: rgba(16, 185, 129, 0.30);
-  background-color: rgba(16, 185, 129, 0.08);
+  border-color: color-mix(in srgb, var(--line-clear) 30%, transparent);
+  background-color: color-mix(in srgb, var(--line-clear) 8%, transparent);
   color: var(--color-semantic-easing-fg);
 }
 
@@ -308,9 +309,12 @@ button .weather-chip:active,
 
 /* Print & PDF optimization --------------------------------------------- */
 @media print {
+  /* Print commits to paper, so these are the light theme's values as
+     literals: Synoptic's ink (#121719), muted ink (#525c60), the ink at 21%
+     on white for a border, and the light front red for a crossed line. */
   body {
     background: #ffffff !important;
-    color: #0f172a !important;
+    color: #121719 !important;
     font-size: 11pt !important;
   }
 
@@ -329,11 +333,11 @@ button .weather-chip:active,
   .weather-card,
   .weather-panel {
     background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
+    border: 1px solid #cfd1d1 !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    color: #0f172a !important;
+    color: #121719 !important;
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -341,33 +345,20 @@ button .weather-chip:active,
   .type-eyebrow,
   .type-data,
   h1, h2, h3, h4, p, span, dt, dd {
-    color: #0f172a !important;
+    color: #121719 !important;
   }
 
   .text-slate-400,
   .text-slate-500,
   .text-slate-300 {
-    color: #475569 !important;
-  }
-
-  .text-sky-200,
-  .text-sky-400 {
-    color: #0369a1 !important;
-  }
-
-  .text-emerald-300,
-  .text-emerald-400 {
-    color: #047857 !important;
+    color: #525c60 !important;
   }
 
   .text-amber-300,
-  .text-amber-400 {
-    color: #b45309 !important;
-  }
-
+  .text-amber-400,
   .text-rose-300,
   .text-rose-400 {
-    color: #b91c1c !important;
+    color: #b4232a !important;
   }
 }
 
@@ -408,7 +399,7 @@ button .weather-chip:active,
     font-size: var(--fs-xs);
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: var(--app-text-muted, #94a3b8);
+    color: var(--app-text-muted);
   }
 }
 

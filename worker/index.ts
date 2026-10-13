@@ -13,13 +13,18 @@ import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
 import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
-import { agentManifestResponse } from "../lib/agentManifest";
+import {
+  agentManifestResponse,
+  WEBMCP_MANIFEST_PATH,
+  MCP_WELL_KNOWN_PATH,
+} from "../lib/agentManifest";
 import { installBindings } from "./bindings";
 
-/* Durable Object and Workflow classes must be exported from the Worker entry to exist. All
-   are trial infrastructure: declared everywhere, used only where the preview lane's vars
-   switch them on (WHETHER_INGEST_COORDINATOR, WHETHER_HISTORY_WORKFLOW,
-   WHETHER_BRIEF_FREEZE_WORKFLOW). */
+/* Durable Object and Workflow classes must be exported from the Worker entry to exist.
+   Declared in every environment so one migration list serves all of them, switched on per
+   environment by their vars: the ingest coordinator and both workflows are in production
+   (WHETHER_INGEST_COORDINATOR, WHETHER_HISTORY_WORKFLOW, WHETHER_BRIEF_FREEZE_WORKFLOW);
+   the design-scratch flags remain preview-only. */
 export { IngestCoordinator } from "./ingestCoordinator";
 export { RegimeHistoryRefreshWorkflow } from "./workflows/regimeHistoryRefresh";
 export { WeeklyBriefFreezeWorkflow } from "./workflows/weeklyBriefFreeze";
@@ -252,8 +257,12 @@ export default {
        is never registered and the request falls through to the app shell, which answers
        with the HTML page rather than the manifest.
        See lib/agentManifest.ts. installBindings must run first — the manifest reads
-       SITE_URL through resolveSiteUrl. */
-    if (url.pathname === WHETHER_AGENT_MANIFEST_PATH) {
+       SITE_URL through resolveSiteUrl. Supports standard agent, WebMCP, and MCP paths. */
+    if (
+      url.pathname === WHETHER_AGENT_MANIFEST_PATH ||
+      url.pathname === WEBMCP_MANIFEST_PATH ||
+      url.pathname === MCP_WELL_KNOWN_PATH
+    ) {
       return agentManifestResponse();
     }
 

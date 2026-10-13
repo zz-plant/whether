@@ -2,6 +2,7 @@ import { REGIME_LABELS, REGIME_SEVERITY_RANK, isRegimeKey } from "../../../lib/r
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
 import { countRecord } from "../../../lib/report/trackRecord";
 import { ConditionIcon } from "../ui/conceptIcons";
+import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 
 /**
  * The record's answer in one band: every month coloured by the call, the
@@ -12,7 +13,15 @@ import { ConditionIcon } from "../ui/conceptIcons";
  * Each segment carries `data-regime`, so its colour comes from the same
  * token the page shells use (`--regime-accent`), never a per-component table.
  */
-type MonthStripEntry = { recordDate: string; regime: string };
+/** The two scores are optional: a caller with them gets them in each month's hover title. */
+type MonthStripEntry = { recordDate: string; regime: string; tightness?: number; riskAppetite?: number };
+
+const monthTitle = (entry: MonthStripEntry) => {
+  const conditions = `${monthLabel(entry.recordDate)}: ${isRegimeKey(entry.regime) ? REGIME_LABELS[entry.regime] : entry.regime}`;
+  return typeof entry.tightness === "number" && typeof entry.riskAppetite === "number"
+    ? `${conditions} · ${regimeSignalLabel.tightness} ${entry.tightness}, ${regimeSignalLabel.riskAppetite} ${entry.riskAppetite}`
+    : conditions;
+};
 
 type MonthStripProps = {
   entries: readonly MonthStripEntry[];
@@ -78,16 +87,17 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
                 key={entry.recordDate}
                 data-regime={regimeDataAttribute(entry.regime)}
                 className={`h-full flex-1 bg-[var(--regime-accent)] ${changed ? "border-l border-[var(--bg-body)]" : ""}`}
-                title={`${monthLabel(entry.recordDate)}: ${isRegimeKey(entry.regime) ? REGIME_LABELS[entry.regime] : entry.regime}`}
+                title={monthTitle(entry)}
               />
             );
           })}
         </div>
         {/* Each long run carries its condition's glyph, so the band reads without
-            colour: Freezing's rose and Stormy's violet are one grey in
-            greyscale, and so are Sunny's green and Cloudy's amber. Dark ink on
-            the 500-level hue in both themes; runs too short for a 16px glyph
-            are named by the key below. */}
+            colour. Under the old hues Freezing and Stormy were one grey in
+            greyscale; the Synoptic fills differ in lightness, but Sunny and
+            Stormy still sit close in grey. Dark ink on the condition's fill in
+            both themes (3.1:1 on Freezing, the lowest); runs too short for a
+            16px glyph are named by the key below. */}
         {stripRuns(sorted).map((run) => {
           const share = run.length / sorted.length;
           return isRegimeKey(run.regime) && share >= RUN_GLYPH_MIN_SHARE_SM ? (

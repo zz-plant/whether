@@ -270,7 +270,8 @@ describe("AreaTable moved rows", () => {
     const crossed = badge("crossed").exec(html);
     assert.ok(crossed, "a crossed pause line is the state badge");
     assert.match(crossed[1], /rounded-sm border/, "in force, so a stamp");
-    assert.match(crossed[1], /text-semantic-caution-fg/);
+    /* The line states' own tokens, not a condition's (2026-10-09). */
+    assert.match(crossed[1], /text-line-crossed-fg/);
     assert.match(crossed[2], /lucide-pause[\s\S]*<span>crossed$/, "the pause glyph beside the word");
     const near = badge("near").exec(html);
     assert.ok(near, "a pause line close to the reading is the state badge");
@@ -278,7 +279,7 @@ describe("AreaTable moved rows", () => {
     assert.match(near[2], /lucide-circle-dashed/);
     const met = badge("clear").exec(html);
     assert.ok(met, "a resume line met is the state badge");
-    assert.match(met[1], /rounded-sm border[^"]*text-semantic-easing-fg|text-semantic-easing-fg[^"]*rounded-sm border/);
+    assert.match(met[1], /rounded-sm border[^"]*text-line-clear-fg|text-line-clear-fg[^"]*rounded-sm border/);
     assert.match(met[2], /lucide-play/);
     assert.match(html, /<span class="block text-xs text-slate-400">24 pts away<\/span>/, "a resume line still to reach is plain text, with no glyph");
   });
@@ -394,6 +395,20 @@ describe("TrustStrip", () => {
 });
 
 describe("MonthStrip", () => {
+  it("names both scores in a month's hover title when it has them", () => {
+    const html = renderToStaticMarkup(
+      <MonthStrip
+        entries={[
+          { recordDate: "2026-08-31", regime: "EXPANSION", tightness: 63, riskAppetite: 56 },
+          { recordDate: "2026-09-30", regime: "DEFENSIVE", tightness: 90, riskAppetite: 56 },
+        ]}
+      />,
+    );
+    assert.match(html, /title="Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56"/);
+    const bare = renderToStaticMarkup(<MonthStrip entries={[{ recordDate: "2026-09-30", regime: "DEFENSIVE" }]} />);
+    assert.match(bare, /title="Sep 2026: Cloudy"/);
+  });
+
   const entries = [
     { recordDate: "2026-03-31", regime: "EXPANSION" },
     { recordDate: "2026-04-30", regime: "EXPANSION" },

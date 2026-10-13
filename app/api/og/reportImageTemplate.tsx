@@ -11,6 +11,9 @@ import {
   OG_FONT_BODY,
   OG_FONT_DISPLAY,
   OG_FONT_STAMP,
+  OG_BORDER_STRONG,
+  OG_CONDITION_INK,
+  OG_LINE_CROSSED,
   OG_PANEL,
   OG_TEXT,
   OG_TEXT_MUTED,
@@ -109,8 +112,9 @@ export const layoutReportCard = (
   return { headlineSize, whyItMatters, boxValueSize, changeSummary, flipCondition };
 };
 
-/* Only when the card is not this week's live reading, and why. */
-const contextTone = (preview: HomeSharePreview) => (preview.isHistorical ? "#f59e0b" : "#fb7185");
+/* Only when the card is not this week's live reading, and why: a caution, so
+   the front red, whether the card is an archived week or a saved copy. */
+const contextTone = OG_LINE_CROSSED;
 
 const box = (label: string, value: string, valueSize: number, labelColor: string, background: string, border: string) => (
   <div
@@ -160,7 +164,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
             padding: "8px 16px",
             borderRadius: 4,
             border: `2px solid ${regimeColor}`,
-            color: regimeColor,
+            color: OG_CONDITION_INK[preview.regime],
             fontSize: 26,
             fontWeight: 700,
             fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,
@@ -170,7 +174,7 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
           {preview.statusLabel.toUpperCase()}
         </div>
         {preview.contextLabel ? (
-          <div style={{ display: "flex", fontSize: 22, fontWeight: 600, color: contextTone(preview) }}>
+          <div style={{ display: "flex", fontSize: 22, fontWeight: 600, color: contextTone }}>
             {preview.contextLabel}
           </div>
         ) : null}
@@ -197,7 +201,10 @@ export const renderReportOgImage = (preview: HomeSharePreview): ReactElement => 
 
       <div style={{ display: "flex", gap: 16, marginTop: BOX_ROW_GAP }}>
         {box("What changed", layout.changeSummary, layout.boxValueSize, OG_TEXT_MUTED, OG_PANEL, `1px solid ${OG_BORDER}`)}
-        {box(DECISION_CONTRACT_LABELS.watch.postureFlips, layout.flipCondition, layout.boxValueSize, "#fcd34d", "#3b2d0b", "1px solid #f59e0b55")}
+        {/* Neutral, as the site prints it: the line where the call changes is
+            not a line crossed, so it takes the ink and a stronger edge rather
+            than the front red (it was amber until 2026-10-09). */}
+        {box(DECISION_CONTRACT_LABELS.watch.postureFlips, layout.flipCondition, layout.boxValueSize, OG_TEXT, OG_PANEL, `1px solid ${OG_BORDER_STRONG}`)}
       </div>
 
       {/* Single expression on purpose: satori rejects a div holding mixed text

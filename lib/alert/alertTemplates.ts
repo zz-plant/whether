@@ -13,6 +13,7 @@ import { regimeSignalLabel } from "../report/signalTranslations";
 import { emailTextFooter, renderEmailShell } from "../email/emailShell";
 import { siteUrl } from "../siteUrl";
 import { formatPointsMove, formatScoreValue } from "../formatters";
+import { OG_LINE_CROSSED, OG_LINE_CROSSED_BG, OG_LINE_CROSSED_MARK, OG_PANEL, OG_RULE, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "../image/ogTheme";
 
 /** What a flash asks of the reader, in the mail's text and HTML alike. */
 const FLASH_GUIDANCE =
@@ -24,21 +25,23 @@ type EmailContent = {
   text: string;
 };
 
-const sectionBlock = (label: string, value: string, labelColor = "#94a3b8", valueColor = "#f1f5f9"): string =>
+const sectionBlock = (label: string, value: string, labelColor = OG_TEXT_MUTED, valueColor = OG_TEXT): string =>
   [
     `<table role="presentation" style="width:100%;border-collapse:collapse;">`,
     `<tr>`,
-    `<td style="padding:16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;">`,
+    `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,
     `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${labelColor};margin:0 0 6px;">${label}</p>`,
     `<p style="font-size:1.1rem;font-weight:600;margin:0;color:${valueColor};">${value}</p>`,
     `</td></tr></table>`,
   ].join("\n");
 
 const alertBanner = (severity: "warning" | "critical" | "info", message: string): string => {
-  const colors: Record<string, { bg: string; border: string; text: string; accent: string }> = {
-    critical: { bg: "rgba(239,68,68,0.08)", border: "rgba(239,68,68,0.25)", text: "#fca5a5", accent: "#ef4444" },
-    warning: { bg: "rgba(251,191,36,0.08)", border: "rgba(251,191,36,0.25)", text: "#fde68a", accent: "#fbbf24" },
-    info: { bg: "rgba(56,189,248,0.08)", border: "rgba(56,189,248,0.25)", text: "#bae6fd", accent: "#38bdf8" },
+  /* A warning or a critical alert is a line crossed, so the front red; news that
+     is neither is the ink in a plain box. */
+  const colors: Record<string, { bg: string; border: string; text: string }> = {
+    critical: { bg: OG_LINE_CROSSED_BG, border: OG_LINE_CROSSED_MARK, text: OG_LINE_CROSSED },
+    warning: { bg: OG_LINE_CROSSED_BG, border: OG_RULE, text: OG_LINE_CROSSED },
+    info: { bg: OG_PANEL, border: OG_RULE, text: OG_TEXT_SECONDARY },
   };
   const c = colors[severity] ?? colors.info;
   return [
@@ -89,7 +92,7 @@ export const decisionVerdictEmail = ({
       sectionBlock(DECISION_CONTRACT_LABELS.action.actionNow, actionNow),
       `</div>`,
       `<div style="margin-top:12px;">`,
-      sectionBlock(DECISION_CONTRACT_LABELS.watch.postureFlips, reversal, "#94a3b8", "#f1f5f9"),
+      sectionBlock(DECISION_CONTRACT_LABELS.watch.postureFlips, reversal),
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
@@ -161,7 +164,7 @@ export const thresholdCrossingEmail = (
         `<strong>${metricLabel}</strong> is <strong>${score}</strong>; ${lineName} is <strong>${line.value}</strong>. ${whatToDo}`,
       ),
       `<div style="margin-top:12px;">`,
-      sectionBlock(metricLabel, `${score} / ${line.value}`, "#fbbf24", "#fde68a"),
+      sectionBlock(metricLabel, `${score} / ${line.value}`, severity === "info" ? OG_TEXT_MUTED : OG_LINE_CROSSED, OG_TEXT),
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
@@ -227,7 +230,7 @@ export const flashMoveEmail = (
     body: [
       alertBanner("critical", `<strong>${move.headline}</strong>`),
       `<div style="margin-top:12px;">`,
-      sectionBlock(move.label, `${move.from.toFixed(2)}% → ${move.to.toFixed(2)}% (${direction === "rose" ? "up" : "down"} ${size})`, "#fbbf24", "#fde68a"),
+      sectionBlock(move.label, `${move.from.toFixed(2)}% → ${move.to.toFixed(2)}% (${direction === "rose" ? "up" : "down"} ${size})`, OG_LINE_CROSSED, OG_TEXT),
       `</div>`,
       `<div style="margin-top:12px;">`,
       sectionBlock(

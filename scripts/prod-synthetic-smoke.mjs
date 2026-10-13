@@ -7,7 +7,7 @@ const pageChecks = [
   { path: "/", required: ["weekly brief", "share-ready-artifact", "build this week's plan"] },
   // "Why it changed" is the page's tab and header name since 2026-10-08; the tab
   // that read "Evidence" is gone, so the word is no longer a safe marker.
-  { path: "/evidence", required: ["why it changed", "what this means now"] },
+  { path: "/evidence", required: ["why it changed", "what would change this guidance"] },
   /* "decision help" was asked of /planning here until 2026-10-01; the page stopped
      rendering it on 2026-09-15, so every run since failed on a page that was up.
      The plan-lines step is what /pricing, the Monday email and the homepage picker
@@ -233,7 +233,15 @@ const run = async () => {
     fail("/api/health missing dependencies.reportData");
   }
 
-  console.log("✅ /api/health checks passed");
+  /* A live feed past its freshness window is the failure /api/health exists to surface
+     (2026-10-13: Treasury sat 14h stale behind an "ok"). Fail the run and name the feeds. */
+  if (healthPayload.status === "degraded") {
+    const stale = Array.isArray(healthPayload.staleSources)
+      ? healthPayload.staleSources.map((row) => `${row.source}${row.age ? ` (${row.age} old)` : ""}`).join(", ")
+      : "unnamed";
+    fail(`/api/health is degraded: stale live sources: ${stale}`);
+  }
+  console.log(`✅ /api/health checks passed (commit ${healthPayload.commit ?? "unknown"})`);
   console.log("✅ synthetic smoke completed successfully");
 };
 

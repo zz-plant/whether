@@ -4,7 +4,7 @@ import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
 import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
 import { formatMarginBand } from "../report/reportFormatting";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "./ogFonts";
-import { OG_ACCENT, OG_BG, OG_BORDER, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
+import { OG_ACCENT, OG_BG, OG_BORDER, OG_CONDITION_INK, OG_LINE_CROSSED, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
 import { SANS_EM, DISPLAY_EM, fitLines, wrappedLines } from "./textFit";
 
 export type BriefImageProps = {
@@ -58,8 +58,9 @@ const SOURCE_WIDTH = CONTENT_WIDTH - 90;
 /* The weather stamp takes about 190px of its row; the scope beside it gets the rest, on one line. */
 const CONTEXT_WIDTH = CONTENT_WIDTH - 230;
 
-const confidenceColor = (label: string) =>
-  label === "HIGH" ? "#34d399" : label === "MED" ? "#fbbf24" : "#f87171";
+/* A wide margin is the clear state (the ink); a medium or narrow one is close
+   to a line, the crossed state's red, as the site prints it. */
+const confidenceColor = (label: string) => (label === "HIGH" ? OG_TEXT : OG_LINE_CROSSED);
 
 const frameStyle: CSSProperties = {
   display: "flex",
@@ -183,7 +184,7 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
             padding: "8px 16px",
             borderRadius: 4,
             border: `2px solid ${regimeColor}`,
-            color: regimeColor,
+            color: isRegimeKey(props.regime) ? OG_CONDITION_INK[props.regime] : OG_TEXT,
             fontSize: 26,
             fontWeight: 700,
             fontFamily: `${OG_FONT_STAMP}, ui-sans-serif, system-ui, sans-serif`,

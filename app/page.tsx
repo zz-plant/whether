@@ -12,7 +12,7 @@ import { YourRecordNote } from "./components/home/YourRecordNote";
 import { ActivationTracker } from "./components/activationTracker";
 import { OperatorWorkflowRouteTracker } from "./components/operatorWorkflowRouteTracker";
 import { ConditionsLegend } from "./components/home/ConditionsLegend";
-import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
+import { WeekStepper } from "./components/home/WeekStepper";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
@@ -41,7 +41,6 @@ import {
 import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { AllAreaRules } from "./components/home/AllAreaRules";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
@@ -525,46 +524,13 @@ async function PageContent({
               follow the call beside Copy Brief, so wrapping controls cannot
               push the reading below the first phone viewport. */}
           <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
-            <div>
-              <div className="flex items-center gap-2">
-                {prevWeekHref ? (
-                  <Link
-                    href={prevWeekHref}
-                    aria-label="Previous week"
-                    className="weather-hit-box flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
-                  >
-                    <ChevronLeft size={16} />
-                  </Link>
-                ) : (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/40 bg-slate-900/30 text-slate-600 cursor-not-allowed">
-                    <ChevronLeft size={16} />
-                  </span>
-                )}
-
-                {/* Navigation coverage stays unfiltered: an archived month is a
-                    filtered chart, not a filtered calendar. Passing the aligned
-                    series here removed every period after the archived month. */}
-                <TimeMachineCalendarPicker
-                  currentDateLabel={cadenceTitle ?? weekOfLabel}
-                  isHistorical={Boolean(historicalSelection)}
-                  history={regimeHistory}
-                />
-
-                {nextWeekHref ? (
-                  <Link
-                    href={nextWeekHref}
-                    aria-label="Next week"
-                    className="weather-hit-box flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
-                  >
-                    <ChevronRight size={16} />
-                  </Link>
-                ) : (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/40 bg-slate-900/30 text-slate-600 cursor-not-allowed">
-                    <ChevronRight size={16} />
-                  </span>
-                )}
-              </div>
-            </div>
+            <WeekStepper
+              previousHref={prevWeekHref}
+              nextHref={nextWeekHref}
+              currentDateLabel={cadenceTitle ?? weekOfLabel}
+              isHistorical={Boolean(historicalSelection)}
+              history={regimeHistory}
+            />
           </div>
           {/* No timeline scrubber above the call any more. The meta row's chevrons
               and calendar picker are the period controls; the regime stripe
@@ -684,6 +650,7 @@ async function PageContent({
             >
               <AllAreaRules
                 rows={homeAreaRows}
+                heldGroups={decisionMovement?.heldGroups}
                 regime={regime}
                 planHref={isRoute(operateHref) ? operateHref : "/operate"}
                 isHistorical={Boolean(historicalSelection)}

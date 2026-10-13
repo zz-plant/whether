@@ -2,8 +2,8 @@ import type { CSSProperties } from "react";
 import { REGIME_HEX_COLORS } from "./regimePhaseSpace";
 import type { RegimeKey } from "./types";
 
-/** What eyebrows and section rules fall back to with no regime: slate-400. */
-const NEUTRAL_ACCENT = "#94a3b8";
+/** What eyebrows and section rules fall back to with no regime: a neutral grey, as in tokens.css. */
+const NEUTRAL_ACCENT = "#939c9a";
 
 const isRegimeKey = (value: string): value is RegimeKey => value in REGIME_HEX_COLORS;
 
@@ -13,8 +13,8 @@ const isRegimeKey = (value: string): value is RegimeKey => value in REGIME_HEX_C
  * Every page carried the regime only in the hero glow and the timeline; the
  * section eyebrows, section rules and the mobile outline all drew in the same
  * slate and sky whatever the week said. `--regime-accent` lets those tokens
- * read "this week is Sunny" without a new component: emerald, rose, amber or
- * sky from `REGIME_HEX_COLORS`, slate when no regime is known.
+ * read "this week is Sunny" without a new component: the condition's fill
+ * from `REGIME_HEX_COLORS`, a neutral grey when no regime is known.
  */
 type RegimeAccentStyle = CSSProperties & { "--regime-accent": string };
 

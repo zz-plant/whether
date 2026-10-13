@@ -13,7 +13,7 @@ import {
   type RuleConditionMetric,
 } from "./boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
-import { comparisonBasis } from "./comparisonBasis";
+import { comparisonBasis, describeGuidanceStands } from "./comparisonBasis";
 import type { ActionStripItem } from "./operatingCalls";
 import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import type { ComparedWith, ReportDynamics } from "./reportDataTypes";
@@ -110,6 +110,13 @@ export type DecisionMovement = {
   moved: AreaMovement[];
   /** `moved`, grouped by how it moved: the clauses of the sentence, for a surface that wants them as data. */
   groups: MovementGroup[];
+  /**
+   * The areas that held, grouped by the side of their lines they held on, each group as
+   * one sentence ("Pause still applies to Hiring, Fundraising and Spending: no line
+   * crossed since Sep 30."). A table that prints every area prints a group of two or
+   * more once instead of once per row; a surface showing one area keeps `areas[].text`.
+   */
+  heldGroups: HeldGroup[];
   /** The one sentence: what changed for decisions, and which lines did it. */
   sentence: string;
   /** `sentence` without the lines that did it, for a surface with room for the consequence and not the evidence (a link preview, a card). */
@@ -181,6 +188,16 @@ const describeHeld = (state: AreaState, window: string) => {
   const prefix = HELD_STATE_TEXT[state];
   return prefix ? `${prefix}: no line crossed ${window}.` : `No line crossed ${window}.`;
 };
+
+type HeldGroup = { state: AreaState; areas: DecisionArea[]; text: string };
+
+const HELD_GROUP_TEXT: Record<AreaState, (areas: string, window: string) => string> = {
+  pause: (areas, window) => `Pause still applies to ${areas}: no line crossed ${window}.`,
+  resume: (areas, window) => `Resume line still met for ${areas}: no line crossed ${window}.`,
+  hold: (areas, window) => `No line crossed ${window} for ${areas}.`,
+};
+
+const HELD_STATE_ORDER: readonly AreaState[] = ["pause", "resume", "hold"];
 
 const GROUP_CLAUSE: Record<Exclude<AreaMovementKind, "held">, (areas: string) => string> = {
   paused: (areas) => `the pause now applies to ${areas}`,
@@ -293,7 +310,7 @@ export const buildDecisionMovement = ({
     if (moved.length === 0) {
       const nothing = conditions
         ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no pause or resume line was crossed.`
-        : `Conditions held steady ${window}; no pause or resume line was crossed. Last week's guidance stands.`;
+        : `Conditions held steady ${window}; no pause or resume line was crossed. ${describeGuidanceStands(basis)}`;
       return { sentence: nothing, headline: nothing, headlines: [nothing] };
     }
     const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
@@ -326,14 +343,22 @@ export const buildDecisionMovement = ({
     };
   })();
 
-  return { comparedWith: basis.date, conditions, areas: movements, moved, groups, sentence, headline, headlines };
+  const held = movements.filter((entry) => entry.kind === "held");
+  const heldGroups: HeldGroup[] = HELD_STATE_ORDER.flatMap((state) => {
+    const inGroup = held.filter((entry) => entry.state === state).map((entry) => entry.area);
+    return inGroup.length > 0
+      ? [{ state, areas: inGroup, text: HELD_GROUP_TEXT[state](listAreas(inGroup, movements.length), window) }]
+      : [];
+  });
+
+  return { comparedWith: basis.date, conditions, areas: movements, moved, groups, heldGroups, sentence, headline, headlines };
 };
 
 /**
  * What the week did to the guidance: `"conditions"` when the conditions changed (the
  * week's `regimeChanged`, or a change the movement names), `"lines"` when an area's pause
  * or resume line was crossed under the same conditions, `"held"` when neither — the week
- * the movement sentence calls "Last week's guidance stands" — and null when nothing was
+ * the movement sentence calls "The guidance stands" — and null when nothing was
  * compared.
  *
  * Not the operating latitude. That number is a blend of the two scores, so it can stay

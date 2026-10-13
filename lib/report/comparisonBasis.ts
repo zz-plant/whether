@@ -53,6 +53,17 @@ export const comparisonBasis = (comparedWith?: Pick<ComparedWith, "label"> | nul
       }
     : LAST_WEEK;
 
+/**
+ * The closing sentence of a week that crossed no line. It said "Last week's
+ * guidance stands." whatever the earlier reading was, so a week compared with a
+ * month-end weeks back named a week nobody compared it with. With a dated basis
+ * the sentence before it already says "since Sep 15", so this one names no
+ * week at all rather than a second date; an undated one keeps "last week", as
+ * every unnamed comparison does.
+ */
+export const describeGuidanceStands = (basis: ComparisonBasis) =>
+  basis.date ? "The guidance stands." : "Last week's guidance stands.";
+
 const MONTH_DAY = new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" });
 const MONTH_DAY_YEAR = new Intl.DateTimeFormat("en-US", {
   month: "short",

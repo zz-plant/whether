@@ -7,6 +7,8 @@ import { DecisionHero } from "../app/components/DecisionHero";
 import { Sparkline } from "../app/components/ui/sparkline";
 import { REGIME_HEX_COLORS } from "../lib/regimePhaseSpace";
 import { regimeDataAttribute } from "../lib/regimeAccent";
+import { OG_CONDITION_INK } from "../lib/image/ogTheme";
+import type { RegimeKey } from "../lib/types";
 import * as nextNavigation from "next/navigation";
 
 const mockAny: any = mock;
@@ -80,6 +82,38 @@ describe("regime colour contract", () => {
       const rule = new RegExp(`\\[data-regime="${regime}"\\]\\s*\\{[^}]*--regime-accent:\\s*${hex}[^}]*--regime-ink:\\s*var\\(--color-`);
       assert.match(tokens, rule, `${regime} maps to its plane hue and a themed ink token`);
     }
+  });
+
+  it("holds the condition utilities and the artifact inks to the same values as the map", () => {
+    // Synoptic (2026-10-09). One fill per condition in three places: the
+    // table every canvas and artifact reads, the data-regime map, and the
+    // `bg-condition-*` utilities that name a condition without the attribute.
+    // The artifacts that cannot read CSS (OG cards, slide, deck, email) print
+    // the condition word in the dark theme's ink, so that copy is pinned too.
+    const tokens = readRepoFile("app/styles/tokens.css");
+    const names: ReadonlyArray<[RegimeKey, string]> = [
+      ["EXPANSION", "sunny"],
+      ["DEFENSIVE", "cloudy"],
+      ["VOLATILE", "stormy"],
+      ["SCARCITY", "freezing"],
+    ];
+    for (const [regime, name] of names) {
+      assert.match(tokens, new RegExp(`--color-condition-${name}:\\s*${REGIME_HEX_COLORS[regime]};`), `${regime}'s utility fill is its plane hue`);
+      assert.match(tokens, new RegExp(`--color-condition-${name}-ink:\\s*${OG_CONDITION_INK[regime]};`), `${regime}'s artifact ink is the dark theme's ink`);
+    }
+  });
+
+  it("gives the line states tokens of their own, apart from the conditions", () => {
+    // A cleared line printed in Sunny's ink and a crossed one in Cloudy's until
+    // 2026-10-09; on Synoptic's light theme those two are one brown. The badge
+    // reads the line-state utilities, and the map reads the condition inks.
+    const icons = readRepoFile("app/components/ui/conceptIcons.tsx");
+    const inks = icons.slice(icons.indexOf("const LINE_STATE_INK"), icons.indexOf("/** The state's glyph alone"));
+    assert.match(inks, /crossed: "text-line-crossed-fg"/);
+    assert.match(inks, /clear: "text-line-clear-fg"/);
+    assert.doesNotMatch(inks, /condition|semantic-(easing|caution)/, "a line state borrows no condition's ink");
+    const tokens = readRepoFile("app/styles/tokens.css");
+    assert.doesNotMatch(tokens, /\[data-regime="[A-Z]+"\][^}]*--regime-ink:\s*var\(--color-semantic-/, "no condition reads a line-state family");
   });
 
   it("keeps the regime hues off the action accent", () => {

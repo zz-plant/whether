@@ -3195,6 +3195,183 @@ reports the test, and the rule kept the current ramp.
   `lib/research/premiseTestDocs.ts`, which `scripts/research/publishPremiseTestDocs.ts` builds from
   `docs/research/`; `tests/premiseTestDocs.test.ts` fails when the two differ.
 
+### 1.1.69 The Synoptic palette (2026-10-09)
+
+The owner chose Synoptic from the three directions in `docs/design/palette-directions.md` (PR
+#1566). This applies its colours and keeps the shipped type (Archivo, Chivo Mono). The rules are in
+`docs/agents/ui-ux-standards.md` §XVI; the values live in `app/styles/tokens.css`.
+
+**What colour means.** Two things and nothing else: the four conditions, and where a line stands.
+Everything else is ink, including links, buttons and focus rings (links keep their underline).
+
+| Role | Dark (default) | Light |
+| --- | --- | --- |
+| Ground / panel | night chart `#0f1316` / `#171c20` | chart paper `#f1f4f3` / `#ffffff` |
+| Ink / secondary / muted | `#edf0ee` / `#cdd3d1` / `#a0a9a7` | `#121719` / `#384145` / `#525c60` |
+| Line crossed or close: text / mark | `#f2685c` / `#e5484d` | `#b4232a` / `#d13b37` |
+| Line clear | the ink | the ink |
+| Condition fill (both themes) | Sunny `#d9a82c`, Cloudy `#9d7a4a`, Stormy `#8f96e0`, Freezing `#3a6fa3` | the same |
+| Condition ink | `#f5cf5a`, `#d6b98a`, `#b9bfff`, `#8cc0ec` | `#7a5800`, `#74552a`, `#4a4fc0`, `#1d5585` |
+
+**Conditions.** Warm is risk appetite on (Sunny, Cloudy) and cool is off (Stormy, Freezing); light
+is cheap money (Sunny, Stormy) and dense is dear (Cloudy, Freezing). One set of four fills serves
+both themes: `REGIME_HEX_COLORS`, the data-regime map and the `bg-condition-*` utilities, which
+`tests/regimeColourContract.test.tsx` holds together. Each fill sits midway between the direction's
+light and dark values. Sunny and Freezing, the best and worst conditions, were emerald and rose,
+5.6 apart for a deuteranope (OKLab ×100, Machado 2009 at full severity); they are 34.6 apart now,
+and the closest pair under either red-green deficiency is Stormy–Freezing at 16.8 and 15.4.
+
+**Line states are their own tokens** (`--line-*`, `text-line-crossed-fg`, `text-line-clear-fg`). A
+cleared line printed in Sunny's green and a crossed one in Cloudy's amber, so a state read as a
+condition. The caution, tightening and easing families now alias the line states, so every consumer
+of them moved at once: Stop and a pause line are the front red, Start and a resume line the ink,
+Keep limited the secondary ink. The radar's corner words read the condition inks.
+
+**The stock hue ramps are folded onto roles.** About 630 class names say emerald, amber, rose, sky or
+cyan, and none meant the hue. In `tokens.css` emerald is the clear ink, amber and rose the front red
+(amber at half strength as a fill, so a two-step scale keeps two steps), and sky and cyan the action
+ink. Conditions never draw from these. The light theme's per-hue `!important` patches are gone,
+because the roles carry their own light values.
+
+**Hard-coded surfaces.** The OG cards, the image card, the meeting slide (SVG and HTML), the board
+deck, the weekly email, the alert and month-end emails, the embed and its loader read
+`lib/image/ogTheme.ts`, which mirrors the dark theme and adds the line-state reds and the condition
+inks (`OG_CONDITION_INK`). The slide's and the deck's condition badge was rose for Cloudy and
+Freezing and green otherwise, so a Stormy slide wore Sunny's badge; it is the condition's own
+colour now. The static OG templates' six category hues are the ink. The rates chart on `/signals`
+tells its four terms apart by ink and dash. Print rules take the light theme's values.
+
+**Default theme.** Unchanged: dark, as the direction's recommendation says for the first
+application. The bootstrap reads only the stored preference (no system preference is consulted), and
+the toggle is unchanged. Making light the default is one line in `buildThemeBootstrapScript`.
+
+**Measured.** Every text role, condition ink and line-state ink clears 4.5:1 on its ground and panel
+in both themes; the lowest is the light muted ink at 6.2:1. The band's glyph (black at 70%) clears
+3:1 on every fill, Freezing lowest at 3.1. As marks on the light ground, Sunny's fill is 2.0:1 and
+Stormy's 2.5:1, as Sunny's (2.4) and Cloudy's (2.0) were before: no condition fill carries meaning
+alone, since each sits beside its glyph and its word. The golden pins moved for the slide HTML, the
+slide SVG and the deck's hash only.
+
+Before and after, at 390 and 1280px, in both themes and in greyscale, with the OG card, the slide
+and the weekly email: `docs/assets/palette-directions/applied-*.jpg`. The week differs between the
+two captures because §1.1.66 re-scored it in between (Freezing before, Cloudy after).
+
+Left on the old palette: the brand mark (`public/favicon*.svg`, `icon*.svg`, `whether-logo.svg`,
+`app/brandAssets.ts` and the raster icons), which is its own decision, and
+`scripts/generate-scenes.ts`, which renders marketing scenes and nothing on the site.
+
+### 1.1.70 The record's charts and sentences state what the data shows (2026-10-09)
+
+The first PR of the copy and data-viz plan. Two of its four items had already shipped by the time it
+was built: #1569 gave the slide exports one colour per condition, and #1567 removed the calibration
+curve drawn from four hard-coded points.
+
+- **The margin's reliability chart** (`MarginReliabilityChart`, `app/components/history/confidenceRecord.tsx`).
+  `/calibration` stated its finding ("every band below held more often than the percent published")
+  in prose and a table. The chart draws each band's published percent against how often conditions
+  held, one dot per band sized by its months, on the line where the two are equal, so the finding is
+  every dot above the line. It reads the rows the table prints (`toRows`, one derivation for both),
+  draws nothing without them, and names each dot on hover; the table stays the accessible form.
+  `tests/marginReliabilityChart.test.tsx` holds dots to rows, and fails the day the archive stops
+  bearing out the paragraph's fixed claim.
+- **One orientation for the conditions map.** `/trust`'s quadrant (`RegimeQuadrant`,
+  `app/trust/formulaReference.tsx`) put funding pressure across and risk appetite up, so its Sunny sat
+  where the brief's map has Freezing. It now runs risk appetite across and funding pressure up, as
+  `RegimeRadar` and `/history`'s phase map do; `tests/formulaReferenceVisuals.test.tsx` renders both
+  maps and checks Freezing sits left of and above Sunny in each.
+- **A held week names no week it did not compare.** "Last week's guidance stands." closed every held
+  week, including one compared with a month-end weeks back. `describeGuidanceStands`
+  (`lib/report/comparisonBasis.ts`) says "The guidance stands." after a dated "since Sep 15", and keeps
+  "Last week's guidance stands." where the comparison is undated. It closes the movement sentence
+  (`decisionMovement.ts`), the narrative summary (`decisionNarrative.ts`) and the returning-reader
+  fallback (`historyAndContext.ts`); seven pinned pastes in `briefFormats.golden.json` changed by that
+  sentence alone.
+
+### 1.1.71 Generated sentences say each thing once, in order of weight (2026-10-12)
+
+The second PR of the copy and data-viz plan.
+
+- **Held areas share one sentence.** `buildDecisionMovement` returns `heldGroups`: the areas that
+  held, grouped by the side of their lines they held on, each group one sentence ("Pause still
+  applies to Hiring, Fundraising, Spending and New bets: no line crossed since Sep 30."). The folded
+  "All five areas" table (`AllAreaRules`) prints a group of two or more once over the table and drops
+  it from those rows, so the area the week moved is the one "Changed" cell left. The picker, which
+  shows one area at a time, keeps each area's own sentence. Closes DD-039's open item.
+- **A score's move reads largest part first** (`clausesFor`, `lib/report/scoreMovement.ts`): "-11
+  from startup-market inputs and -2 from the yield curve", not the scoring stages' order. The net
+  move is the delta chip beside the row, so the sentence does not repeat it.
+- **Drift and a dead field.** `whyItMattersLine` was computed on every card model and rendered
+  nowhere; it is deleted with `buildWhyItMattersLine`. The share preview's fallback no longer says
+  "posture", and `docs/editorial-guardrails.md` names `REGIME_LABELS`, the one label table, instead
+  of an alias that no longer exists.
+
+The planned sentence-quality gate is not added: `tests/onePlacePerFact.test.tsx` and
+`tests/readerClauseShapes.test.tsx` (2026-10-09) already hold the repetition and clause shapes it
+would have checked, and a prototype over the pinned pastes found its "same sentence twice" rule
+mostly flagged rows for different areas that rightly share a line.
+
+`tests/decisionMovement.test.ts` and `tests/allAreaRulesHeldGroups.test.tsx` hold the grouping.
+
+### 1.1.72 /history's charts say where the line is (2026-10-12)
+
+- **The trend charts draw the change line.** `HistoricalTrendChart` takes `changeLine`: the chart
+  then draws on the score's own 0–100 scale with the line dashed across it, 80px tall instead of
+  32px. Autoscaled, a 4-point wobble near the line and a 40-point swing far from it filled the same
+  height, so the shape could not say how close a score had come to changing conditions. Without
+  `changeLine` the chart autoscales as before.
+- **The month stripe names both scores.** `MonthStrip` entries may carry the two scores; a month's
+  hover title then reads "Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56".
+
+`tests/chartIntegrityContract.test.tsx` and `tests/visualPrimitives.test.tsx` hold them.
+
+### 1.1.73 Engineering work against the payback bar, in the runway planner (2026-10-13)
+
+The runway planner (`/operate/financial`) checks the reader's own engineering projects against the
+payback bar the published rules already set. It does not add a bar of its own
+(`lib/report/projectPayback.ts`):
+
+- **The bar.**
+  - Under six months of runway, the cash gate holds every new commitment.
+  - With 6–12 months, every commitment needs a payback inside `TIGHT_RUNWAY_PAYBACK_BAR_MONTHS` (6).
+  - Otherwise, outside Sunny, the Product tempo rule slows work that pays back in more than a year
+    (`ROADMAP_PAYBACK_BAR_MONTHS`, 12; `tests/projectPayback.test.tsx` holds the number to the rule's
+    sentence).
+  - In Sunny, with a year or more of runway, there is no bar on roadmap work.
+- **A project.**
+  - Cost: weeks to ship × engineers × what an engineer-week costs.
+  - Saving: hours it saves a month × what one of those hours costs, plus bills it cuts.
+  - Each row prints a sentence: the break-even month, the bar it clears or misses, and what lifts
+    that bar. Work that saves no cash is told it has no payback to check and has to be argued on
+    revenue or retention.
+  - Once the work ships, the saving lowers net burn. The sentence says how much runway that adds, at
+    today's net burn with revenue flat. When the added runway moves the reader into a band with a
+    different bar, it says that too.
+  - Engineer time counts toward the payback but not the runway, because the engineers are paid
+    either way.
+- **The chart.**
+  - One strip per project on one month scale: building, paying back, and a dot at the break-even,
+    filled when it clears the bar (`app/operate/components/projectPaybackChart.tsx`).
+  - The bar and the cash-out month cross every strip.
+  - HTML positioned by percent, like the planner's `RangeBar`, so the labels stay page text at
+    phone width.
+- **Where it lives.**
+  - The engineer-week cost and up to four project rows are in the operator profile.
+  - They travel with the plan link as `engWeek` and one `project=weeks_engineers_hours_hourly_other_name`
+    per row (`app/operate/components/runwayPlanLink.ts`).
+  - The bar sentence and each project's sentence go into the copy block and the budget memo.
+- **Edits stand until the address bar catches up.**
+  - The panel reads its plan back from the link, and `router.replace` lands a server round trip
+    after each edit. A second field typed inside that trip was built on the older link and wrote
+    the first field back to its old value.
+  - The panel now keeps its own last edit until the bar shows that edit's address
+    (`plannerEditStands`). An address it never wrote is someone else's link, which wins as before.
+
+Why: a set of essays argued that "product craft" has to be justified as cost removed once the
+person who pays is not the person who uses the product, and priced that with a discount rate. At a
+22% hurdle, a project that breaks even inside two years does so about a month later than
+undiscounted. The rules' bars move by six months with runway and conditions, so the planner draws
+the bar.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
@@ -4051,3 +4228,23 @@ surfaces do not reintroduce the old words.
 
 Archived briefs in `data/published_briefs.json` keep the wording they were published with; the
 archive is append-only and its exports are expected to read as they did on the day.
+
+### 1.1.73 Controls read as instrument parts (2026-10-13)
+
+Every segmented control — plan horizon, stage, cash runway, the decision picker, and the ones on
+/signals, /operate, /share and the subscribe form — is a recessed well with keys in it
+(`docs/agents/ui-ux-standards.md` §XXVI). The chosen key stands proud and lights its lamp, and a
+pressed key sinks. Stage and cash runway are ordered scales: a rule with a tick under each key and
+a pointer under the chosen one, with Bootstrapped set apart from the funded stages. The company
+controls are four equal keys on one row from `sm` up, each label over its sublabel, where they
+used to break 2 + 2 and wrap each sublabel mid-phrase. No gradient or specular: §XXV stands.
+
+### 1.1.74 The week stepper and the pickers use the same parts (2026-10-13)
+
+The week stepper on `/` is one well: the earlier and later week are keys at either end of the
+calendar picker, and the end with no week beyond it sinks flat instead of drawing a faded box. The
+header's stage and runway pickers mark the chosen option with a lit lamp instead of a check over an
+action-ink wash, and the calendar's months and known periods are keys that stand proud when chosen.
+The three pickers that drew at 95% opacity with nothing blurred behind them are opaque: the page's
+text read through them (`docs/agents/ui-ux-standards.md` §XXVI).
+

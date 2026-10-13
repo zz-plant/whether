@@ -100,10 +100,13 @@ describe("board slide PPTX", () => {
     assert.match(slide, /hold every new commitment &lt;whatever&gt; the macro corridor/);
     assert.match(slide, /saved copy, not a live reading/);
     assert.doesNotMatch(slide, /<whatever>/);
-    // A defensive regime wears the rose badge; an easing one the emerald.
-    assert.match(slide, /F43F5E/);
+    // Each condition wears its own colour (REGIME_HEX_COLORS): the badge's edge
+    // is Freezing's frost blue here and Sunny's gold on an easing week. It was
+    // rose for Cloudy and Freezing and green for the rest, so Stormy wore Sunny's.
+    assert.match(slide, /<a:srgbClr val="3A6FA3"\/>/);
     const easing = readStoredZip(buildBoardSlidePptx({ ...payload, regime: "EXPANSION" })).get("ppt/slides/slide1.xml")?.content ?? "";
-    assert.doesNotMatch(easing, /F43F5E/);
+    assert.match(easing, /<a:srgbClr val="D9A82C"\/>/);
+    assert.doesNotMatch(easing, /3A6FA3/);
   });
 
   it("is byte-identical for the same week", () => {

@@ -1,8 +1,8 @@
 /**
  * RegimeHistoryRefreshWorkflow — records the month in progress into the repository.
  *
- * Trial scope: the binding exists in every environment, but the Monday cron only starts an
- * instance where WHETHER_HISTORY_WORKFLOW=1 (the preview lane). Each step is retried and
+ * Production scope: the binding exists in every environment, but the Monday cron only starts an
+ * instance where WHETHER_HISTORY_WORKFLOW=1 (production and the preview lane). Each step is retried and
  * observable in the Workflows dashboard, which is the property the scheduled routine lacked:
  * it failed at its PR step while reporting success. A run that cannot open its PR fails here.
  *

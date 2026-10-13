@@ -24,6 +24,8 @@ const NOT_CONTAINERS = new Set([
   "weather-chip", "weather-hub-chip",
   // A keycap: chip-sized, sits inside controls and rows, never encloses anything.
   "weather-kbd",
+  // Keys a reader presses (ui-ux-standards §XXVI): a toggle key and a stepper's ends.
+  "weather-key", "weather-step-key",
 ]);
 
 const isPrefixedNonContainer = (name: string) =>

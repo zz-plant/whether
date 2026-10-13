@@ -12,8 +12,11 @@ import {
   GlyphMotif,
   OG_BG,
   OG_BORDER,
+  OG_BORDER_STRONG,
+  OG_CONDITION_INK,
   OG_FONT_BODY,
   OG_FONT_DISPLAY,
+  OG_LINE_CROSSED,
   OG_PANEL,
   OG_TEXT,
   OG_TEXT_MUTED,
@@ -121,7 +124,7 @@ export const renderCompareOgImage = ({
           overflow: "hidden",
         }}
       >
-        <div style={{ display: "flex", position: "absolute", top: 0, left: 0, right: 0, height: 6, background: "#a78bfa" }} />
+        <div style={{ display: "flex", position: "absolute", top: 0, left: 0, right: 0, height: 6, background: OG_BORDER_STRONG }} />
         <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
           <GlyphMotif tone={accentB} size={28} />
           <div style={{ display: "flex", fontSize: 15, fontWeight: 600, letterSpacing: "0.12em", textTransform: "uppercase", color: OG_TEXT_MUTED }}>
@@ -149,7 +152,7 @@ export const renderCompareOgImage = ({
             </div>
           </div>
         </div>
-        <div style={{ display: "flex", fontSize: 18, color: "#64748b", padding: "0 0 22px" }}>
+        <div style={{ display: "flex", fontSize: 18, color: OG_TEXT_MUTED, padding: "0 0 22px" }}>
           Whether — weekly operating guidance
         </div>
       </div>
@@ -161,7 +164,7 @@ const EpochBlock = ({ label, accent, epoch }: { label: string; accent: string; e
   <div style={{ ...blockStyle, border: `1px solid ${accent}66` }}>
     <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
       <span style={{ display: "flex", width: 8, height: 8, borderRadius: 8, background: accent }} />
-      <span style={{ display: "flex", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: accent }}>{label}</span>
+      <span style={{ display: "flex", fontSize: 13, fontWeight: 700, letterSpacing: "0.1em", textTransform: "uppercase", color: OG_CONDITION_INK[epoch.regime] }}>{label}</span>
       <span style={{ display: "flex", flex: 1 }} />
       <span style={{ display: "flex", fontSize: 13, color: OG_TEXT_MUTED }}>{epoch.label}</span>
     </div>
@@ -192,7 +195,7 @@ const LatitudeDelta = ({ epochA, epochB }: { epochA: CompareEpoch; epochB: Compa
     return <span style={metricValueStyle}>n/a</span>;
   }
   const delta = a - b;
-  const tone = delta === 0 ? OG_TEXT : delta > 0 ? "#34d399" : "#fb7185";
+  const tone = delta < 0 ? OG_LINE_CROSSED : OG_TEXT;
   return (
     <span style={{ ...metricValueStyle, color: tone }}>
       {delta > 0 ? "+" : ""}{delta.toFixed(0)} points
@@ -207,7 +210,7 @@ const CurveDelta = ({ epochA, epochB }: { epochA: CompareEpoch; epochB: CompareE
     return <span style={metricValueStyle}>n/a</span>;
   }
   const delta = a - b;
-  const tone = delta === 0 ? OG_TEXT : delta > 0 ? "#34d399" : "#fb7185";
+  const tone = delta < 0 ? OG_LINE_CROSSED : OG_TEXT;
   return (
     <span style={{ ...metricValueStyle, color: tone }}>
       {delta > 0 ? "+" : ""}{delta.toFixed(2)} percentage points

@@ -56,7 +56,7 @@
     }
 
     // Show a loading state
-    el.innerHTML = '<div style="padding:12px;font-size:12px;color:rgba(255,255,255,0.4);font-family:-apple-system,sans-serif;">Loading weekly brief…</div>';
+    el.innerHTML = '<div style="padding:12px;font-size:12px;color:rgba(237,240,238,0.6);font-family:-apple-system,sans-serif;">Loading weekly brief…</div>';
 
     fetch(url)
       .then(function (res) {
@@ -75,7 +75,7 @@
         el.style.minHeight = '';
       })
       .catch(function (err) {
-        el.innerHTML = '<div style="padding:12px;font-size:12px;color:rgba(255,255,255,0.5);font-family:-apple-system,sans-serif;border:1px solid rgba(255,255,255,0.06);border-radius:8px;background:rgba(255,255,255,0.02);">Brief unavailable. <a href="' + origin + '" style="color:#38bdf8;text-decoration:underline;">View on Whether →</a></div>';
+        el.innerHTML = '<div style="padding:12px;font-size:12px;color:rgba(237,240,238,0.7);font-family:-apple-system,sans-serif;border:1px solid rgba(237,240,238,0.10);border-radius:8px;background:#0f1316;">Brief unavailable. <a href="' + origin + '" style="color:#edf0ee;text-decoration:underline;">View on Whether →</a></div>';
         console.warn('[Whether embed]', err.message);
       });
   });

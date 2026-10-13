@@ -40,6 +40,81 @@ const listClauses = (clauses: string[]) => {
   return `${clauses.slice(0, -1).join(", ")}, and ${clauses.at(-1) ?? ""}`;
 };
 
+/** One band as the table prints it and the chart draws it: one derivation for both (§XV). */
+type BandRow = { from: number; label: string; published: number; held: number; months: number };
+
+const toRows = (bands: ReturnType<typeof confidenceCalibration>): BandRow[] =>
+  bands.map((band) => ({
+    from: band.from,
+    label: bandLabel(band.from, band.to),
+    published: resolveConfidencePercentFromDistance(band.from, false),
+    held: (band.held / band.months) * 100,
+    months: band.months,
+  }));
+
+/**
+ * The study's finding, drawn: each band's published percent against how often
+ * conditions held, one dot per band sized by its months, on the line where the
+ * two would be equal. "Every band held more often than the percent published"
+ * is every dot above that line, and "the two closest bands run in the wrong
+ * order" is the second dot sitting below the first. The paragraph said both and
+ * only the table could show them, one number at a time.
+ *
+ * It replaces a curve drawn from four hard-coded points, removed on 2026-10-09;
+ * this one reads the rows the table prints and draws nothing without them. The
+ * dots carry no labels: the table under it names each band, and a dot's title
+ * names it on hover.
+ */
+function MarginReliabilityChart({ rows }: { rows: readonly BandRow[] }) {
+  const W = 300;
+  const H = 220;
+  const pad = { l: 52, r: 14, t: 14, b: 40 };
+  /* Room inside the frame for the largest dot, so a band at 100% sits inside it (§XVII). */
+  const inset = 12;
+  const lowest = Math.min(...rows.flatMap((row) => [row.published, row.held]));
+  const lo = Math.min(50, Math.floor(lowest / 10) * 10);
+  const x = (value: number) => pad.l + inset + ((value - lo) / (100 - lo)) * (W - pad.l - pad.r - 2 * inset);
+  const y = (value: number) => H - pad.b - inset - ((value - lo) / (100 - lo)) * (H - pad.t - pad.b - 2 * inset);
+  const ticks = [lo, (lo + 100) / 2, 100];
+  const radius = (months: number) => 3 + Math.sqrt(months) * 0.9;
+  return (
+    <figure className="m-0 space-y-2" data-margin-reliability>
+      <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot block h-auto w-full max-w-[24rem] text-slate-200" aria-hidden="true">
+        <rect x={pad.l} y={pad.t} width={W - pad.l - pad.r} height={H - pad.t - pad.b} fill="none" stroke="currentColor" strokeOpacity="0.18" />
+        {ticks.map((tick) => (
+          <g key={tick}>
+            <text x={x(tick)} y={H - pad.b + 16} textAnchor="middle" fontSize="11" fill="currentColor" opacity="0.7">{`${tick}%`}</text>
+            <text x={pad.l - 6} y={y(tick)} textAnchor="end" dominantBaseline="middle" fontSize="11" fill="currentColor" opacity="0.7">{`${tick}%`}</text>
+          </g>
+        ))}
+        <line x1={x(lo)} y1={y(lo)} x2={x(100)} y2={y(100)} stroke="currentColor" strokeOpacity="0.5" strokeDasharray="4 4" />
+        {rows.map((row) => (
+          <circle
+            key={row.from}
+            cx={x(row.published)}
+            cy={y(row.held)}
+            r={radius(row.months)}
+            fill="currentColor"
+            fillOpacity="0.85"
+            stroke="var(--bg-body)"
+            strokeWidth="2"
+            data-published={Math.round(row.published)}
+            data-held={Math.round(row.held)}
+          >
+            <title>{`${row.label} points from the line: published ${percentFormat(row.published)}, held ${percentFormat(row.held)} across ${row.months} months`}</title>
+          </circle>
+        ))}
+        <text x={pad.l} y={H - 6} fontSize="11" fill="currentColor" opacity="0.7">Published % →</text>
+        <text textAnchor="middle" transform={`translate(10 ${(pad.t + H - pad.b) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">Held % →</text>
+      </svg>
+      <figcaption className="max-w-[36rem] text-fluid-xs text-slate-400">
+        Each dot is a band of the table below, sized by its months. Above the dashed line, the band held more
+        often than its published percent; below it, less often.
+      </figcaption>
+    </figure>
+  );
+}
+
 /** The bands and the base rate, or null when the archive holds nothing to grade. */
 const loadRecord = () => {
   const bands = confidenceCalibration().filter((band) => band.months > 0);
@@ -76,6 +151,7 @@ function ConfidenceRecordBody() {
   const record = loadRecord();
   if (!record) return null;
   const { bands, totals, baseRate } = record;
+  const rows = toRows(bands);
 
   return (
     <div className="space-y-3">
@@ -85,6 +161,8 @@ function ConfidenceRecordBody() {
         margin is therefore a distance, not a probability. It says how much room there is before the
         line where conditions change; the count beside it says how often that room mattered.
       </p>
+
+      <MarginReliabilityChart rows={rows} />
 
       <table className="w-full text-sm text-slate-200">
         <caption className="sr-only">
@@ -99,16 +177,12 @@ function ConfidenceRecordBody() {
           </tr>
         </thead>
         <tbody>
-          {bands.map((band) => (
-            <tr key={band.from} className="border-t border-slate-800/80">
-              <th scope="row" className="py-1.5 text-left font-normal">{bandLabel(band.from, band.to)}</th>
-              <td className="py-1.5 pl-3 text-right tabular-nums text-slate-400">
-                {percentFormat(resolveConfidencePercentFromDistance(band.from, false))}
-              </td>
-              <td className="py-1.5 pl-3 text-right tabular-nums">
-                {percentFormat((band.held / band.months) * 100)}
-              </td>
-              <td className="py-1.5 pl-3 text-right tabular-nums text-slate-400">{band.months}</td>
+          {rows.map((row) => (
+            <tr key={row.from} className="border-t border-slate-800/80">
+              <th scope="row" className="py-1.5 text-left font-normal">{row.label}</th>
+              <td className="py-1.5 pl-3 text-right tabular-nums text-slate-400">{percentFormat(row.published)}</td>
+              <td className="py-1.5 pl-3 text-right tabular-nums">{percentFormat(row.held)}</td>
+              <td className="py-1.5 pl-3 text-right tabular-nums text-slate-400">{row.months}</td>
             </tr>
           ))}
         </tbody>

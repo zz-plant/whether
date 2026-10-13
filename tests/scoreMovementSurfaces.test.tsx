@@ -46,7 +46,7 @@ const withoutMovement: ReportDynamics = { ...week, movement: undefined };
 
 const FUNDING_ROW = "All from interest rates.";
 const RISK_ROW =
-  "-2 from the yield curve and -11 from startup-market inputs. The Aug 31 score was built from interest rates alone.";
+  "-11 from startup-market inputs and -2 from the yield curve. The Aug 31 score was built from interest rates alone.";
 
 describe("the homepage's changed-signals table", () => {
   const indicator = (key: RegimeSignalIndicator["key"], rawValue: number): RegimeSignalIndicator => ({
@@ -83,7 +83,7 @@ describe("the homepage's changed-signals table", () => {
     const text = (markup: string) => markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
     assert.match(text(funding), /What moved it: All from interest rates\./);
-    assert.match(text(risk), /What moved it: -2 from the yield curve and -11 from startup-market inputs\./);
+    assert.match(text(risk), /What moved it: -11 from startup-market inputs and -2 from the yield curve\./);
     assert.match(text(risk), /The Aug 31 score was built from interest rates alone\./);
     assert.equal((html.match(/data-movement=/g) ?? []).length, 2, "the two scores, not the market input");
 
@@ -149,7 +149,7 @@ describe("the pastes", () => {
     assert.deepEqual(previousScores?.movement, week.movement);
     assert.equal(
       buildScoreMovementLine(previousScores),
-      "What moved the scores since Aug 31: funding pressure +27 (all from interest rates); risk appetite -13 (-2 from the yield curve and -11 from startup-market inputs). The Aug 31 scores were built from interest rates alone.",
+      "What moved the scores since Aug 31: funding pressure +27 (all from interest rates); risk appetite -13 (-11 from startup-market inputs and -2 from the yield curve). The Aug 31 scores were built from interest rates alone.",
     );
 
     const brief = buildSlackBrief(fixtureBriefDocument({ previousScores }));

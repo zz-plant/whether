@@ -34,6 +34,7 @@ import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { fanOut } from "../delivery/fanOut";
 import { resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { getRegimePublicLabel } from "../regimePresentation";
+import { OG_TEXT_SECONDARY } from "../image/ogTheme";
 
 const LAST_PULSED_KEY = "month-end:last-pulsed";
 
@@ -158,7 +159,7 @@ const sendEmailPulse = async (headline: string, block: string): Promise<number> 
            escaped `<` alone, and an `&` or a quote in a stamp went out raw. */
         html: renderEmailShell({
           title: headline,
-          body: `<div style="white-space:pre-wrap;color:#cbd5e1;font-size:0.9rem;line-height:1.6;">${escapeHtml(block).replace(/\n/g, "<br/>")}</div>`,
+          body: `<div style="white-space:pre-wrap;color:${OG_TEXT_SECONDARY};font-size:0.9rem;line-height:1.6;">${escapeHtml(block).replace(/\n/g, "<br/>")}</div>`,
           unsubscribeToken: subscriber.token,
         }),
       });

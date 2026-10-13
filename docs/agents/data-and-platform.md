@@ -85,17 +85,31 @@ and its history download now serves a JavaScript proof-of-work page, so it is no
 **The basket lost Confluent.** IBM's acquisition closed and Confluent deregistered (Form 15, March
 2026); no provider had a quote for it, and the page was listing a company that no longer trades.
 
-## Ingest coordinator (trial)
+## Ingest coordinator
+
+**`/api/health` reports stale feeds (2026-10-13).** It used to ask only whether a report
+loaded, and a report built from stale inputs loads: it said "ok" while `/trust` read
+"Treasury · Stale · 14h old". It now lists every live source past its freshness window
+(`listStaleLiveSources`, `lib/report/sourceHealth.ts`, the rows `/trust` prints) under
+`staleSources`, with `dependencies.dataFreshness` and an overall `"degraded"` (HTTP 200).
+`bun run smoke:prod` fails on `"degraded"` and names the feeds.
+
+**It installs its env (2026-10-13).** The object is an entry point like the fetch and scheduled
+handlers, and may run in an isolate neither has primed. Its constructor ignored `env` until
+2026-10-13, so the hourly alarm's ingest read no `FRED_API_KEY` through `readSetting`; in
+production every feed sat at the 02:00 cron's fetch all day ("Treasury · Stale · 14h old" on
+`/trust`). It calls `installBindings(env)` now, and `tests/ingestCoordinator.test.ts` holds it.
+Any new Durable Object or Workflow that calls into `lib/` does the same.
 
 `worker/ingestCoordinator.ts` is a SQLite-backed Durable Object that owns the materialized
 model, the refresh lock, and an hourly alarm that ingests due families. It replaces KV's
 best-effort lock (two isolates can win the same expired lock) with real mutual exclusion and
-moves refresh off the request path entirely. It is on for the preview lane only
+moves refresh off the request path entirely. Promoted to production
 (`WHETHER_INGEST_COORDINATOR=1`); `lib/ingestion/durableStorageStore.ts` is the store the object
 runs against and `lib/ingestion/coordinatorStore.ts` the Worker-side client. Invariants 1, 1b,
 and 1c describe the behavior it must keep.
 
-## Regime history Workflow (trial)
+## Regime history Workflow
 
 `worker/workflows/regimeHistoryRefresh.ts` records the KV month in progress into
 `data/summary_monthly_regime_history.json` behind a pull request, in retried steps that fail
@@ -103,9 +117,9 @@ visibly instead of reporting success without a PR. It merges over the file on th
 it stands at run time, never the series bundled into the running deployment, so a preview built
 from an older commit cannot undo months that reached `main` after it was built. It adds only what the Worker observed: no
 backfill, no regenerated history — the canonical series is still the generator scripts' job.
-On for the preview lane only (`WHETHER_HISTORY_WORKFLOW=1`); needs `GITHUB_TOKEN`.
+Promoted to production (`WHETHER_HISTORY_WORKFLOW=1`); needs `GITHUB_TOKEN`.
 
-## Brief freeze Workflow (trial)
+## Brief freeze Workflow
 
 `worker/workflows/weeklyBriefFreeze.ts` appends this week's brief to `data/published_briefs.json`
 behind a pull request, from inside Cloudflare. The routine it stands in for ran in a sandbox whose
@@ -113,8 +127,8 @@ egress proxy denies FRED, so every run failed before it had a week to write. The
 `lib/report/publishedBriefRecord.ts`, which `scripts/freezeWeeklyBrief.ts` also uses, and passes
 `assessPublishReadiness` before anything is built; a week that is not publishable makes the first
 step throw, and the platform retries it hourly up to five times. The archive is append-only at the
-merge: a slug the base branch already carries is left exactly as it is. On for the preview lane
-only (`WHETHER_BRIEF_FREEZE_WORKFLOW=1`); needs `GITHUB_TOKEN`, which it checks before the live
+merge: a slug the base branch already carries is left exactly as it is. Promoted to production
+(`WHETHER_BRIEF_FREEZE_WORKFLOW=1`); needs `GITHUB_TOKEN`, which it checks before the live
 read rather than after it, so the flag and the secret can be set in either order when the lane is
 promoted. Checklist: `docs/cloudflare-deployment-runbook.md`, "Promoting the brief freeze to
 production".

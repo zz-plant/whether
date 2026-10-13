@@ -2,7 +2,7 @@
  * WeeklyBriefFreezeWorkflow — records this week's brief into the citable archive.
  *
  * The binding exists in every environment; the Monday cron starts an instance wherever
- * WHETHER_BRIEF_FREEZE_WORKFLOW=1, today the preview lane. It replaces the scheduled routine
+ * WHETHER_BRIEF_FREEZE_WORKFLOW=1 (production and the preview lane). It replaces the scheduled routine
  * that ran `scripts/freezeWeeklyBrief.ts` in a sandbox whose egress proxy denies FRED: every
  * one of those runs failed before it had a week to write, and the archive that is meant to
  * prove weekly cadence stayed at one entry. Nothing here merges anything — the output is a

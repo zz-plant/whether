@@ -41,7 +41,8 @@ describe("weekly retrospective recording", () => {
 describe("period picker coverage", () => {
   it("receives the unfiltered regime history, not the aligned chart series", () => {
     const page = stripComments(read("app/page.tsx"));
-    const pickerCall = page.slice(page.indexOf("<TimeMachineCalendarPicker"));
+    // The picker is mounted through the week stepper, which passes these props straight on.
+    const pickerCall = page.slice(page.indexOf("<WeekStepper"));
     assert.match(pickerCall, /history=\{regimeHistory\}/);
     assert.doesNotMatch(pickerCall, /history=\{alignedRegimeHistory\}/);
   });

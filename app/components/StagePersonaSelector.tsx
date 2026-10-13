@@ -51,6 +51,8 @@ export function StagePersonaSelector({
     label: option.label,
     sublabel: choiceSublabel(option.sublabel, option.key === DEFAULT_OPERATOR_STAGE),
     title: `Rules for a ${option.label} company (${option.sublabel.toLowerCase()})`,
+    // Funded stages run in order; bootstrapping is another road, not a stage after B+.
+    apart: option.key === "bootstrapped",
   }));
 
   const handleSelectStage = (stage: OperatorStage) => {
@@ -78,6 +80,8 @@ export function StagePersonaSelector({
         value={selected}
         onSelect={handleSelectStage}
         ariaLabel="Company stage"
+        ordinal
+        stackSublabel
       />
     </div>
   );

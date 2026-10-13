@@ -573,7 +573,7 @@ export function TimelineBar({
             const absoluteIndex = viewWindow.start + offset;
             const isEntryPreviewed = previewIndex === absoluteIndex;
             const isEntryActive = handleIndex === absoluteIndex;
-            const hexColor = REGIME_HEX_COLORS[entry.regime] ?? "#64748b";
+            const hexColor = REGIME_HEX_COLORS[entry.regime] ?? "var(--regime-accent)";
 
             return (
               <div

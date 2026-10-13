@@ -193,7 +193,7 @@ Scope: every element that draws a box — a border, a fill, or a lift — under 
   `weather-*` class; it cannot reach one written as Tailwind utilities, so that case is on the
   author.
 - An offset shadow is elevation. A zero-offset coloured halo is emphasis, and is fine at depth —
-  `DecisionHero`'s reconsideration panel tints one amber or emerald by state, which carries meaning
+  `DecisionHero`'s reconsideration panel tints one by line state (the front red or the clear ink), which carries meaning
   rather than lifting the box.
 - MUST: add a new `weather-*` container class to the `:is(...)` lists in that ladder.
   `tests/surfaceDepthLadder.test.ts` derives the set from the stylesheets and fails when one is
@@ -309,13 +309,44 @@ Scope: any surface that states a reading, a threshold, or the distance between t
 
 ## XVI. Colour that means something (the regime accent)
 
-Scope: every surface that tints, rules, or labels itself by the week's regime.
+Scope: every surface that tints, rules, or labels itself by the week's regime, and every colour on
+the site, since 2026-10-09.
 
+The palette is Synoptic (`docs/design/palette-directions.md`, applied in
+`docs/feature-specs-current.md` §1.1.69). Colour carries two things and nothing else: the four
+conditions, and where a line stands. Everything else is ink.
+
+| Role | Token | Dark | Light |
+| --- | --- | --- | --- |
+| Ground (night chart / chart paper) | `--bg-body` | `#0f1316` | `#f1f4f3` |
+| Panel | `--bg-panel` | `#171c20` | `#ffffff` |
+| Ink, which is also the action colour | `--app-text`, `--accent-action` | `#edf0ee` | `#121719` |
+| Secondary ink | `--app-text-secondary` | `#cdd3d1` | `#384145` |
+| Muted ink | `--app-text-muted` | `#a0a9a7` | `#525c60` |
+| A line crossed or close (front red) | `--line-crossed-ink` / `--line-crossed` | `#f2685c` / `#e5484d` | `#b4232a` / `#d13b37` |
+| A line clear | `--line-clear-ink` | the ink | the ink |
+| Sunny (Sun) | `--color-condition-sunny` / `-ink` | `#d9a82c` / `#f5cf5a` | `#d9a82c` / `#7a5800` |
+| Cloudy (Haze) | `--color-condition-cloudy` / `-ink` | `#9d7a4a` / `#d6b98a` | `#9d7a4a` / `#74552a` |
+| Stormy (Lightning) | `--color-condition-stormy` / `-ink` | `#8f96e0` / `#b9bfff` | `#8f96e0` / `#4a4fc0` |
+| Freezing (Frost) | `--color-condition-freezing` / `-ink` | `#3a6fa3` / `#8cc0ec` | `#3a6fa3` / `#1d5585` |
+
+- MUST: draw a condition from the condition tokens and a line state from the line-state tokens,
+  never one from the other. Warm is risk appetite on (Sunny, Cloudy), cool is off (Stormy,
+  Freezing); light is cheap money (Sunny, Stormy), dense is dear (Cloudy, Freezing), so the four
+  differ in lightness as well as hue and a red-green colourblind reader keeps them apart. A cleared
+  line printed in Sunny's green and a crossed one in Cloudy's amber until 2026-10-09; on the light
+  theme those two would have been one brown. `tests/regimeColourContract.test.tsx` holds the badge
+  to the line-state utilities and the data-regime map to the condition inks.
+- MUST: name the role, not the hue, in new code: `text-line-crossed-fg`, `border-line-clear-border`,
+  `bg-condition-sunny`, `text-condition-freezing-ink`, the `--accent-*` and text tokens. The stock
+  ramps components already name are folded onto the roles in `tokens.css` (emerald is the clear
+  ink, amber and rose the front red, with amber at half strength as a fill, sky and cyan the
+  action ink); they are kept so 630 class names did not move, not as a vocabulary.
 - MUST: take the regime's colour from the two tokens, never from a hue picked at the call site.
-  `--regime-accent` is the 500-level hue the regime plane and the posture stripe draw in
-  (`REGIME_HEX_COLORS`), for tints, rules and washes through `color-mix`. `--regime-ink` is the
-  same hue as text — the pastel that reads on the dark surfaces, the 700-level that clears 4.5:1
-  on the light ground. Both resolve from a `data-regime` attribute (`tokens.css`), which the page
+  `--regime-accent` is the condition's fill, the one hex the regime plane and the band draw in
+  (`REGIME_HEX_COLORS`, the same in both themes), for tints, rules and washes through `color-mix`.
+  `--regime-ink` is the condition as text: the light ink on the dark ground, the dark one that
+  clears 4.5:1 on the light ground. Both resolve from a `data-regime` attribute (`tokens.css`), which the page
   shells and `DecisionHero` carry via `regimeDataAttribute` (`lib/regimeAccent.ts`). Every
   `ReportShell` caller passes `regime` from its report data — `regimeAccentStyle` was written for
   the section eyebrows and rules to read the week, and until 2026-09-15 no report page fed it, so
@@ -326,12 +357,18 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
   `ReportSection` eyebrow and its gradient rule, which carried it on every section, are gone
   (2026-10-09, §XXV). A card's own label inside a section is neutral (`.type-eyebrow` alone);
   `/signals` carried sky card eyebrows beside a rose section eyebrow, two accents for one
-  hierarchy. Sky stays for what it means elsewhere: links, and the cards whose border is already
-  sky.
-- MUST: keep the four regime hues off the action accent. Sky is what every link, button and focus
-  ring is drawn in, and until 2026-09-16 Stormy was sky-500 — under that call the regime and the
-  controls were one colour. Stormy is violet (`#8b5cf6`, ink `--color-semantic-stormy-fg`);
-  `tests/regimeColourContract.test.tsx` fails if a regime lands back on the sky ramp.
+  hierarchy.
+- MUST: keep the four condition colours off the action colour. Links, buttons and focus rings
+  draw in the ink (`--accent-action`), and links keep their underline; the primary button is the
+  ink as a fill with the ground as its label (`--cta-fill`, `--cta-ink`). A fifth hue that meant
+  "click" (sky, until 2026-10-09) was what forced Stormy off blue in the first place, and under a
+  Stormy call it made the regime and the controls one colour.
+  `tests/regimeColourContract.test.tsx` fails if a condition lands on the action colour.
+- MUST: keep a focus ring visible in both themes. It is the ink, 16:1 on the dark ground and 18:1
+  on the light one, with the soft halo (`--focus-halo`) behind it.
+- MUST: tell data series apart by ink and dash, not by a hue, when they are neither a condition
+  nor a line state. The rates chart on `/signals` draws its four terms as muted dotted, muted
+  solid, ink dashed and ink solid, and its key draws the same lines.
 - MUST: paint the page atmosphere from `--regime-atmosphere`, via `.weather-regime-ground`, on
   both shells. The brief's container and the report backdrop each held a regime → tint table of
   their own — the report one had Sunny in teal and never faded, so the ground under every card on
@@ -566,7 +603,7 @@ The components live in `app/components/ui/conceptIcons.tsx`.
   chart uses 12.5 units at its 256px cap).
 - MUST: colour from the tokens the words already use, so shape and colour say the same thing. A
   condition draws in its regime ink (`data-regime` on the glyph resolves `--regime-ink`); a state
-  in the caution ink (crossed, close) or the easing ink (clear); an area in the text colour around
+  in the line-state ink (the front red for crossed or close, the neutral ink for clear); an area in the text colour around
   it. The shape alone still says it in greyscale, which is what the `/history` band needed: its
   runs and key told Sunny, Cloudy and Freezing apart by colour alone.
 - "Close" is the margin's own distance: within 5 points (`REGIME_CONFIDENCE_NEAR_THRESHOLD`). A
@@ -623,3 +660,36 @@ chart, the weather glyphs and the pause and play line states (§XXIV). Everythin
   site's name inside it, on `/` and on a published week: that card is the one people crop and
   share, the rule names the week in a crop, and every other page's header names the site already.
 
+
+## XXVI. Controls as instrument parts
+
+Added 2026-10-13 with `docs/feature-specs-current.md` §1.1.73. A control is drawn as a part of
+an instrument: what it is shaped like says how it works. The form is physical, the paint is not —
+§XXV's ban on gradients and specular on a control stands.
+
+- MUST: a segmented control is a well with keys in it. The track is recessed (`--bg-nested`,
+  `--well-inset`); the chosen key stands proud of it (`--bg-raised`, `--elev-1`, a strong border);
+  a key sinks while pressed (`translateY(1px)`, `--key-pressed`). All of it lives on
+  `.weather-segment-track` and `.weather-segment-option` in `app/styles/controls.css`, driven by
+  the native radio's `:checked`, `:hover` and `:active`; `ui/segmentedControl.tsx` only lays the
+  parts out. A tint was the whole selected state until now, and at 15% of the ink it barely
+  separated from the track.
+- MUST: every key carries a lamp, unlit until chosen. The choice then reads by form and by a mark
+  as well as by fill, which is what a reader with low contrast sensitivity or a washed-out screen
+  needs. It is a dot, so it is round (§XIV).
+- MUST: options that are points on one ordered scale (runway bands, the funded stages) pass
+  `ordinal`: a rule along the foot of the well with a tick under each key and a pointer under the
+  chosen one. An option off that scale passes `apart` and stands after a divider with no tick:
+  Bootstrapped is not a stage after Series B+.
+- NEVER: a gradient, a specular edge, a texture or a coloured glow to make a control look
+  physical. Depth is shadow geometry from the tokens, which flips colour with the theme and keeps
+  one height in both.
+- Motion is the press only: 120ms on the transform, and none under reduced motion.
+- MUST: the same parts outside a track. A stepper's ends are `.weather-step-key`s standing in a
+  well around what they step (the week stepper, `app/components/home/WeekStepper.tsx`); the end
+  with nothing beyond it sinks flat and unlit rather than drawing a faded copy of a key. A toggle
+  button whose state is `aria-pressed` is a `.weather-key` (the calendar's months). An option in a
+  picker's list carries the lamp (`.weather-choice-item`), not a check over an action-ink wash.
+- NEVER: a translucent popup with nothing blurred behind it. At 95% the page's text read through
+  the header's pickers and the calendar; a popup is opaque, or it blurs what it covers (§XXV keeps
+  the blur where text must stay legible over a scrolling page).
