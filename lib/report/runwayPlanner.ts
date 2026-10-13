@@ -4,6 +4,7 @@ import { formatMonthAfter } from "../timeMachine/monthFormatting";
 import type { RegimeKey } from "../regimeEngine";
 import { buildCanonicalBoundedDecisionRules } from "./boundedDecisionRules";
 import { deriveDecisionKnobs } from "./decisionKnobs";
+import type { EngineeringPaybackLines } from "./projectPayback";
 
 export type PlannerSector = "b2b-saas" | "consumer" | "infrastructure";
 export type PlannerStage = "seed" | "series-a" | "growth" | "public";
@@ -481,7 +482,11 @@ export const describeRunwayPlanInYourNumbers = (
   return { runsOut, raiseWindow, burnChange, floorGap, ownLines };
 };
 
-export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput, inYourNumbers?: RunwayPlanInYourNumbers | null) =>
+export const formatRunwayPlanCompactBlock = (
+  plan: RunwayPlannerOutput,
+  inYourNumbers?: RunwayPlanInYourNumbers | null,
+  engineering?: EngineeringPaybackLines | null,
+) =>
   [
     "Financial implications:",
     `• Runway risk: ${plan.runwayRisk.level} at ${plan.runwayRisk.score}/100, rising to ${plan.runwayRisk.macroRiskDownsideFlip}/100 on a downside flip.`,
@@ -500,5 +505,8 @@ export const formatRunwayPlanCompactBlock = (plan: RunwayPlannerOutput, inYourNu
             ? ["Our own runway lines:", ...inYourNumbers.ownLines.map((line) => `• ${line}`)]
             : []),
         ]
+      : []),
+    ...(engineering
+      ? ["Engineering work against the payback bar:", `• ${engineering.bar}`, ...engineering.projects.map((line) => `• ${line}`)]
       : []),
   ].join("\n");
