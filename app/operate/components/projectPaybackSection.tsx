@@ -12,7 +12,7 @@ import {
 } from "../../../lib/operatorProfile";
 import { parseMoneyInput } from "../../../lib/planCommitment";
 import { SPENDING_PAYBACK_BAR_MONTHS } from "../../../lib/report/boundedDecisionRules";
-import { describePaybackBar, paybackChartMonths, type PaybackBar, type ProjectPayback } from "../../../lib/report/projectPayback";
+import { describePaybackBar, describeWhatMovesPaybackBar, paybackChartMonths, type PaybackBar, type ProjectPayback } from "../../../lib/report/projectPayback";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { ProjectPaybackChart } from "./projectPaybackChart";
 
@@ -176,10 +176,15 @@ export function ProjectPaybackSection({
   engineerWeekCostUsd,
   entries,
   paybacks,
+  scores,
+  changeLines,
   onEngineerWeekCostChange,
   onEntriesChange,
 }: {
   regime: RegimeKey;
+  /** This week's two scores and the change lines, for whether the market can move the bar. */
+  scores: { tightness: number; riskAppetite: number };
+  changeLines: { tightness: number; riskAppetite: number };
   bar: PaybackBar;
   runwayMonths: number;
   engineerWeekCostUsd: number | undefined;
@@ -191,6 +196,7 @@ export function ProjectPaybackSection({
   const rows = entries.length > 0 ? entries : [{}];
   const commitRows = (next: readonly PaybackProjectEntry[]) => onEntriesChange(next.length > 0 ? next : undefined);
   const months = paybackChartMonths(paybacks, bar, runwayMonths);
+  const whatMovesBar = describeWhatMovesPaybackBar({ bar, scores, lines: changeLines, paybacks });
 
   return (
     <section id="ops-project-payback" aria-labelledby="ops-project-payback-heading" className="weather-surface space-y-3 p-4">
@@ -199,6 +205,7 @@ export function ProjectPaybackSection({
           Engineering work against the payback bar
         </p>
         <p className="mt-1 text-sm text-slate-100">{describePaybackBar(bar, regime)}</p>
+        {whatMovesBar ? <p className="mt-1 text-fluid-xs text-slate-300">{whatMovesBar}</p> : null}
         <p className="mt-1 text-fluid-xs text-slate-400">
           Price each piece of work by what it saves: hours someone no longer spends, and bills it cuts.
         </p>

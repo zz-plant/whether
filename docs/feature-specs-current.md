@@ -161,7 +161,8 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
    each area's row says which of its lines moved. A read with no comparison says so over it.
 7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
-   they moved the same way and where the scores stood three months on; the last turns as links.
+   they moved the same way and where the scores stood three months on; on every week, how long
+   these conditions lasted before (§1.1.75); the last turns as links.
 8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
    holds the slide and image copies and every other format since 2026-10-08, and the week's
    published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
@@ -3371,6 +3372,37 @@ person who pays is not the person who uses the product, and priced that with a d
 22% hurdle, a project that breaks even inside two years does so about a month later than
 undiscounted. The rules' bars move by six months with runway and conditions, so the planner draws
 the bar.
+
+### 1.1.75 What a market move means at the reader's scale (2026-10-13)
+
+A reader who hears "the Fed cut rates" or "the curve flattened" has nothing on the page to hold the
+headline against: the change lines are exact and, to most readers, unreadable sizes. Three sentences
+answer the questions that headline raises in the reader's own terms. None adds a vocabulary, a
+popover or a forecast.
+
+- **How big the move is** (`lib/report/marketMoveScale.ts`). Each market move in the "In
+  interest-rate terms" fold gets a second line: for the short rate, how it compares with a
+  quarter-point Fed move ("Less than one quarter-point Fed move."), and for both inputs, how many of
+  the month-to-month changes since 2012 moved that far ("The rate moved that far in one month in 18
+  of the 176 months on record."). A count, not a median: the bill sat at zero from 2012 to 2015 and
+  moves in Fed steps since, so its median month was 0.03 and every distance read as many months.
+  The federal funds rate has no month-end series and gets the Fed comparison alone; the curve, which
+  the Fed does not set, gets the count alone.
+- **How long these conditions lasted before** (`describeSpellLengths`, `lib/report/lastTimeCallChanged.ts`),
+  under "Has this happened before?" on every live week. The earlier spells of this week's conditions
+  and their length in month-ends ("The one earlier Freezing spell on record ran 32 month-ends, Sep
+  2022 to Apr 2025."), the shortest spell of any conditions, and, with a chosen runway band whose
+  top every earlier spell outlasted, that it did. The spell the record ends in is left out while it
+  is still running. The record has seven spells, so it counts them and says it is not a forecast.
+- **Whether the market can move the payback bar** (`describeWhatMovesPaybackBar`,
+  `lib/report/projectPayback.ts`), under the bar's sentence in the runway planner. Under a year of
+  runway the bar is cash's, and the sentence says no rate move or headline lifts it. Otherwise it is
+  the roadmap rule's, and the sentence names the score moves still needed for Sunny in the change
+  lines' numbers, with today's scores, and how many of the reader's projects that would stop slowing.
+  In Sunny it says what would bring the 12-month bar back and how many projects would then miss it.
+
+`tests/marketMoveScale.test.ts`, `tests/spellLengths.test.ts` and `tests/projectPayback.test.tsx`
+hold them.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

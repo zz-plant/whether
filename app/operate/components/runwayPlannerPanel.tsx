@@ -572,6 +572,8 @@ export function RunwayPlannerPanel({
               engineerWeekCostUsd={profile.engineerWeekCostUsd}
               entries={profile.paybackProjects ?? []}
               paybacks={projectPayback.paybacks}
+              scores={{ tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite }}
+              changeLines={{ tightness: assessment.thresholds.tightnessRegime, riskAppetite: assessment.thresholds.riskAppetiteRegime }}
               onEngineerWeekCostChange={(value) => commitProfileField("engineerWeekCostUsd", value)}
               onEntriesChange={(next) => commitProfileField("paybackProjects", next)}
             />

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { ProjectPaybackChart } from "../app/operate/components/projectPaybackChart";
+import { ProjectPaybackSection } from "../app/operate/components/projectPaybackSection";
 import {
   buildCanonicalBoundedDecisionRules,
   ROADMAP_PAYBACK_BAR_MONTHS,
@@ -12,6 +13,7 @@ import {
   buildProjectPayback,
   buildProjectPaybacks,
   describePaybackBar,
+  describeWhatMovesPaybackBar,
   paybackChartMonths,
   resolvePaybackBar,
   type ProjectPaybackContext,
@@ -219,5 +221,63 @@ describe("what the planner copies and draws", () => {
     assert.match(html, /12-month bar, the roadmap rule/);
     assert.match(html, /cash runs out, month 18/);
     assert.equal(renderToStaticMarkup(<ProjectPaybackChart projects={[]} bar={bar} runwayMonths={18} months={18} />), "");
+  });
+});
+
+describe("whether the market can move the bar", () => {
+  const lines = { tightness: 70, riskAppetite: 50 };
+  const rewrite = { name: "Billing rewrite", weeksToShip: 20, engineers: 3, hoursSavedPerMonth: 40, hourlyCostUsd: 80 };
+  const freezing = { tightness: 90, riskAppetite: 49 };
+
+  it("says cash, not the market, sets the bar under a year of runway", () => {
+    for (const runwayMonths of [4, 9]) {
+      const bar = resolvePaybackBar("SCARCITY", runwayMonths < 6 ? "critical" : "tight");
+      const paybacks = buildProjectPaybacks([importer, rewrite], context({ regime: "SCARCITY", runwayMonths }));
+      assert.match(describeWhatMovesPaybackBar({ bar, scores: freezing, lines, paybacks }), /not the market: no rate move or headline lifts it/);
+    }
+  });
+
+  it("names the moves still needed for Sunny, in the change lines' numbers, and the projects it would stop slowing", () => {
+    const bar = resolvePaybackBar("SCARCITY", "balanced");
+    const paybacks = buildProjectPaybacks([importer, rewrite], context({ regime: "SCARCITY" }));
+    assert.equal(
+      describeWhatMovesPaybackBar({ bar, scores: freezing, lines, paybacks }),
+      "The market sets this bar. It lifts if conditions turn Sunny: funding pressure falls to 70 or below and risk appetite rises above 50 (90 and 49 today). That would stop slowing 1 of your projects that miss it.",
+    );
+  });
+
+  it("names only the score still on the wrong side of its line", () => {
+    const bar = resolvePaybackBar("VOLATILE", "balanced");
+    const sentence = describeWhatMovesPaybackBar({ bar, scores: { tightness: 60, riskAppetite: 45 }, lines, paybacks: [] });
+    assert.match(sentence, /turn Sunny: risk appetite rises above 50 \(60 and 45 today\)\.$/);
+  });
+
+  it("in Sunny, says what would bring the year-long bar back and which projects would miss it", () => {
+    const bar = resolvePaybackBar("EXPANSION", "balanced");
+    const paybacks = buildProjectPaybacks([importer, rewrite], context({ regime: "EXPANSION" }));
+    assert.equal(
+      describeWhatMovesPaybackBar({ bar, scores: { tightness: 40, riskAppetite: 61 }, lines, paybacks }),
+      "The market sets whether there is a bar. If funding pressure rises above 70 or risk appetite falls to 50 or below (40 and 61 today), a 12-month bar returns, and 1 of your projects would miss it.",
+    );
+  });
+
+  it("prints under the bar's sentence in the planner", () => {
+    const bar = resolvePaybackBar("SCARCITY", "balanced");
+    const paybacks = buildProjectPaybacks([importer, rewrite], context({ regime: "SCARCITY" }));
+    const html = renderToStaticMarkup(
+      <ProjectPaybackSection
+        regime="SCARCITY"
+        bar={bar}
+        runwayMonths={18}
+        engineerWeekCostUsd={4_500}
+        entries={[importer, rewrite]}
+        paybacks={paybacks}
+        scores={freezing}
+        changeLines={lines}
+        onEngineerWeekCostChange={() => {}}
+        onEntriesChange={() => {}}
+      />,
+    );
+    assert.match(html, /The market sets this bar\. It lifts if conditions turn Sunny/);
   });
 });
