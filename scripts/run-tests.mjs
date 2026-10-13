@@ -137,7 +137,11 @@ const randomize = inDeployGate || process.env.BUN_TEST_RANDOMIZE === '1';
 const seed = process.env.BUN_TEST_SEED;
 const orderArgs = seed ? ['--randomize', `--seed=${seed}`] : randomize ? ['--randomize'] : [];
 
-const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...concurrencyArgs, ...orderArgs, ...targetArgs], {
+// The gate prints failures only: a line per passing test is ~3,000 lines a build log
+// window drops the failure behind. BUN_TEST_ONLY_FAILURES=1 asks for the same anywhere.
+const quietArgs = inDeployGate || process.env.BUN_TEST_ONLY_FAILURES === '1' ? ['--only-failures'] : [];
+
+const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...concurrencyArgs, ...orderArgs, ...quietArgs, ...targetArgs], {
   stdio: 'inherit',
   env: childEnv,
 });
