@@ -67,7 +67,7 @@ mockAny.module("next/navigation", () => ({
  *   a mechanism name, a fixture company's figures, a UI implementation detail.
  * - Ratcheted: a word that has a place on some surface but was doing a plain sentence's work
  *   on all of them. The count may fall and may not rise,
- *   the way scripts/check-suppression-census.ts holds its numbers. Lower the baseline when
+ *   the way scripts/census.config.ts holds the suppression census's. Lower the baseline when
  *   work earns it; raising one is a decision and belongs in its own PR with the reason.
  *
  * Routes behind the report read path stay out (they suspend at their data boundary offline;
