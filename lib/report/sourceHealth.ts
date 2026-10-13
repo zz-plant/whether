@@ -1,5 +1,4 @@
 import { formatAgeSpan, formatTimestampUTC } from "../formatters";
-import { SIGNAL_CADENCE } from "../ingestion/cadence";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
@@ -67,15 +66,15 @@ type SourceGroupDefinition = {
 };
 
 /*
- * Treasury is refreshed through the day, not once: the ingest coordinator's hourly alarm
- * (worker/ingestCoordinator.ts) re-fetches the rates family once it is a poll window old,
- * so a healthy read is never more than about three hours old. Three poll windows is two
- * missed refreshes. On 2026-10-13 a 26h window (the 02:00 cron's) was tried on the belief
- * that the cron was the only fetch; that night /api/health said "ok" with every feed 20h
- * old, because nothing had refreshed them since that cron. Measured in calendar hours:
- * the alarm runs on weekends too, so a weekend without a fetch is a weekend of outage.
+ * Treasury is refreshed by the ingest coordinator's hourly alarm (worker/ingestCoordinator.ts;
+ * rates are due every 2h in lib/ingestion/cadence.ts), not only by the 02:00 UTC cron. A
+ * Treasury fetch that is a day old means the alarm has stopped, which is what this window is
+ * here to catch. It was widened to 26h on 2026-10-13 (#1587) on the reading that the cron was
+ * the only ingest, and that hid the alarm still not refreshing anything after #1575.
+ * Measured in calendar hours, not business hours: the alarm runs on weekends too, so a
+ * weekend without a fetch is a weekend of outage, not a pause.
  */
-const TREASURY_SOURCE_SLA_HOURS = (3 * SIGNAL_CADENCE.TREASURY_10Y.pollWindowMs) / 3_600_000;
+const TREASURY_SOURCE_SLA_HOURS = 6;
 const MARKET_SOURCE_SLA_HOURS = 24;
 const MONTHLY_RELEASE_SLA_HOURS = 45 * 24;
 const CURATED_SNAPSHOT_SLA_HOURS = 45 * 24;
@@ -421,7 +420,7 @@ export const buildSourceHealthRows = ({
   return [
     {
       sourceName: "Treasury",
-      cadenceLabel: "Daily rates",
+      cadenceLabel: "Intraday rates",
       freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,

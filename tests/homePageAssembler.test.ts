@@ -27,7 +27,7 @@ describe("assembleHomePage streaming contract", () => {
   it("uses the same degradation rules in the shell and audit workspace", async () => {
     const data = buildReportDataFixture({
       sourceHealth: [
-        { sourceName: "Treasury", cadenceLabel: "Daily rates", freshnessStatus: "stale", freshnessSlaHours: 26, lastSuccessfulFetchAt: "2026-09-22T13:07:00Z", ageLabel: "2d", activeFallbackReason: null, mode: "live", expectsLive: true },
+        { sourceName: "Treasury", cadenceLabel: "Intraday rates", freshnessStatus: "stale", freshnessSlaHours: 6, lastSuccessfulFetchAt: "2026-09-22T13:07:00Z", ageLabel: "2d", activeFallbackReason: null, mode: "live", expectsLive: true },
         { sourceName: "Startup/private markets", cadenceLabel: "Curated snapshot", freshnessStatus: "fresh", freshnessSlaHours: 1080, lastSuccessfulFetchAt: "2026-09-01T00:00:00Z", ageLabel: "23d", activeFallbackReason: null, mode: "snapshot", expectsLive: false },
       ],
     });

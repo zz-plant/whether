@@ -134,9 +134,9 @@ describe("buildSourceHealthRows", () => {
     const summary = summarizeSourceHealthCoverage([
       {
         sourceName: "Treasury",
-        cadenceLabel: "Daily rates",
+        cadenceLabel: "Intraday rates",
         freshnessStatus: "fresh",
-        freshnessSlaHours: 26,
+        freshnessSlaHours: 6,
         lastSuccessfulFetchAt: "2026-03-10T00:00:00.000Z",
         ageLabel: "1d",
         activeFallbackReason: null,
@@ -245,18 +245,6 @@ describe("degraded sources", () => {
       assert.equal(buildDegradedSourceRows([treasury]).length, 1);
     }
   });
-  /*
-   * The ingest coordinator re-fetches rates hourly once they are two hours old, so a fetch
-   * from 02:01 UTC that is still the latest at 22:30 UTC is twenty missed refreshes. On
-   * 2026-10-13 a 26h window called exactly that "fresh", and /api/health said "ok".
-   */
-  it("holds Treasury to the coordinator's intraday refresh, not the once-a-day cron", () => {
-    const treasuryAt = (fetched_at: string, now: string) =>
-      buildSourceHealthRows({ treasury: buildTreasury({ fetched_at }), macroSeries: [], now: new Date(now) })[0];
-    assert.equal(treasuryAt("2026-10-13T02:01:46.905Z", "2026-10-13T05:00:00Z").freshnessStatus, "fresh");
-    assert.equal(treasuryAt("2026-10-13T02:01:46.905Z", "2026-10-13T22:30:00Z").freshnessStatus, "stale");
-  });
-
   /* Saturday noon to Sunday noon is weekend in every timezone a test runs in, so business-day
      accounting would count none of it and call a full day without a fetch "fresh". */
   it("counts a weekend day without a Treasury fetch as stale: the coordinator runs every day", () => {
@@ -354,10 +342,26 @@ describe("the /trust source board", () => {
   });
 });
 
+describe("Treasury freshness catches a stopped hourly refresh", () => {
+  // Production on 2026-10-13: the coordinator's alarm had not refreshed Treasury since the
+  // 02:01 UTC cron fetch, and a 26h window read that as healthy at 20:16 UTC.
+  const fetchedAt = "2026-10-13T02:01:46.905Z";
+  const treasuryRow = (now: string) =>
+    buildSourceHealthRows({ treasury: buildTreasury({ fetched_at: fetchedAt }), macroSeries: [], now: new Date(now) })[0];
+
+  it("is fresh while the hourly alarm has a few runs in hand", () => {
+    assert.equal(treasuryRow("2026-10-13T06:00:00.000Z")?.freshnessStatus, "fresh");
+  });
+
+  it("is stale once the alarm has missed most of a working day", () => {
+    assert.equal(treasuryRow("2026-10-13T20:16:47.989Z")?.freshnessStatus, "stale");
+  });
+});
+
 describe("listDegradedLiveSources", () => {
   const row = (overrides: Partial<SourceHealthRow>): SourceHealthRow => ({
     sourceName: "Treasury",
-    cadenceLabel: "Daily rates",
+    cadenceLabel: "Intraday rates",
     freshnessStatus: "fresh",
     freshnessSlaHours: 6,
     lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
@@ -421,7 +425,7 @@ describe("judgeDataFreshness", () => {
   const stale = listDegradedLiveSources([
     {
       sourceName: "Treasury",
-      cadenceLabel: "Daily rates",
+      cadenceLabel: "Intraday rates",
       freshnessStatus: "stale",
       freshnessSlaHours: 6,
       lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
