@@ -60,12 +60,22 @@ async function residentContext(): Promise<number | null> {
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-/** Wait until the model is resident with a context every input fits in; never load it. */
+let lastSeen: { context: number; at: number } | null = null;
+
+/**
+ * Wait until the model is resident with a context every input fits in; never load it.
+ * `/api/ps` sometimes lists nothing for a moment while the model is serving, so a copy seen
+ * in the last minute still counts, and an empty answer is re-asked every few seconds.
+ */
 async function waitForResidentContext(): Promise<number> {
   for (;;) {
     const context = await residentContext();
-    if (context !== null && context >= MIN_CONTEXT) return context;
-    await sleep(30_000);
+    if (context !== null && context >= MIN_CONTEXT) {
+      lastSeen = { context, at: Date.now() };
+      return context;
+    }
+    if (context === null && lastSeen && Date.now() - lastSeen.at < 60_000) return lastSeen.context;
+    await sleep(5_000);
   }
 }
 
@@ -98,7 +108,8 @@ async function ask(input: string, temperature: number): Promise<{ content: strin
         { role: "user", content: input },
       ],
     }),
-    signal: AbortSignal.timeout(300_000),
+    // Long: a request can wait in the queue behind another session's long generations.
+    signal: AbortSignal.timeout(1_200_000),
   });
   if (!response.ok) throw new Error(`ollama ${response.status}: ${(await response.text()).slice(0, 200)}`);
   const parsed = ChatResponseSchema.parse(await response.json());
