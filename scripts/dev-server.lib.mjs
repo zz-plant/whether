@@ -9,7 +9,7 @@
  * whose assets have not settled, so it passes its own asset-integrity probe;
  * the landmark audit only needs the server to answer, so it passes a plain one.
  */
-import { createWriteStream } from "node:fs";
+import { createWriteStream, readFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
@@ -217,6 +217,24 @@ const startDevServer = async ({ baseUrl, outDir, devScript, logName }) => {
 };
 
 /**
+ * The dev server vinext says is already running in this checkout, from the lock file it
+ * writes on start (`.vinext/dev/lock.json`). vinext refuses a second dev server in the same
+ * directory, so before 2026-10-13 a preview server left up on another port made the
+ * landmark audit, and so the pre-push hook, fail with "the dev server exited before it
+ * became ready". A server in this directory serves this tree, so it is safe to reuse.
+ */
+const readCheckoutDevServer = (lockfilePath) => {
+  try {
+    const lock = JSON.parse(readFileSync(lockfilePath, "utf8"));
+    if (!Number.isInteger(lock.pid) || lock.pid <= 0 || typeof lock.appUrl !== "string") return null;
+    process.kill(lock.pid, 0);
+    return lock.appUrl;
+  } catch {
+    return null;
+  }
+};
+
+/**
  * Runs `body(baseUrl)` against a ready server, reusing one already listening at
  * `baseUrl` and otherwise starting one. Only a server this call started is
  * stopped afterwards — a dev server the user is running survives the check.
@@ -230,12 +248,19 @@ export const withDevServer = async ({
   probe,
   onStatus = () => {},
   body,
+  lockfilePath = path.join(process.cwd(), ".vinext", "dev", "lock.json"),
 }) => {
   const initialProbe = await probe(baseUrl);
 
   if (initialProbe.ok) {
     onStatus(`Reusing the server already listening at ${baseUrl}`);
     return body(baseUrl);
+  }
+
+  const checkoutServer = readCheckoutDevServer(lockfilePath);
+  if (checkoutServer && (await probe(checkoutServer)).ok) {
+    onStatus(`Reusing this checkout's dev server at ${checkoutServer}`);
+    return body(checkoutServer);
   }
 
   const target = await resolveAutoStartBaseUrl({ baseUrl, initialProbe });

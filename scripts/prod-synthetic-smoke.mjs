@@ -241,7 +241,7 @@ const run = async () => {
       : "unnamed";
     fail(`/api/health is degraded: stale live sources: ${stale}`);
   }
-  console.log("✅ /api/health checks passed");
+  console.log(`✅ /api/health checks passed (commit ${healthPayload.commit ?? "unknown"})`);
   console.log("✅ synthetic smoke completed successfully");
 };
 
