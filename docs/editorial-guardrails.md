@@ -53,8 +53,7 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
 
 ## Decision vocabulary (single source)
 - **Regime names render as weather everywhere visible**: Freezing / Cloudy / Stormy / Sunny.
-  Source is `lib/regimePresentation.ts` (`REGIME_WEATHER_LABELS`, aliased by
-  `REGIME_PUBLIC_LABELS`). Concept keys (SCARCITY/DEFENSIVE/VOLATILE/EXPANSION) stay
+  Source is `lib/regimePresentation.ts` (`REGIME_LABELS`, the one label table). Concept keys (SCARCITY/DEFENSIVE/VOLATILE/EXPANSION) stay
   internal — they are engine terms, not display copy. Compass quadrant axes are the one
   defined exception (axis labels).
 - **There is no separate posture-description layer.** `getRegimeDisplayLabel` used to return

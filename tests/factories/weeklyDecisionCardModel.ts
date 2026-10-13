@@ -258,7 +258,6 @@ export const buildWeeklyDecisionCardModel = (
     ...overrides.decision,
   },
   presentation: {
-    whyItMattersLine: "External conditions shape how aggressively teams hire, spend, and approve long-payback work this week.",
     readThisCardItems: [
       { label: "What changed", detail: "Pressure rose compared to last week." },
       { label: "What action it changes", detail: "Revise hiring and roadmap calls now." },

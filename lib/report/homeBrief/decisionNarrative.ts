@@ -280,28 +280,6 @@ export const buildWeeklyMemoLines = ({
 export const appendCallChangesIf = (headline: string, callChangesIf: string) =>
   `${headline} ${CALL_CHANGES_IF}: ${callChangesIf}`;
 
-export const buildWhyItMattersLine = ({
-  weeklyMovement,
-}: {
-  weeklyMovement: {
-    direction: "tightening" | "easing" | "stable" | "unavailable";
-  };
-}) => {
-  if (weeklyMovement.direction === "unavailable") {
-    return "This week's move is not known, because there is no previous reading to compare against. The approval rules below stand on where the signals sit now, not on a change.";
-  }
-
-  if (weeklyMovement.direction === "tightening") {
-    return "Fixed-cost mistakes are getting more expensive, so long-payback bets now need harder proof and tighter approval discipline.";
-  }
-
-  if (weeklyMovement.direction === "easing") {
-    return "Speed is getting safer, so teams can press proven demand lanes faster without dropping payback discipline.";
-  }
-
-  return "Nothing moved enough this week to change pace, so last week's approval rules still hold until a significant signal shifts the forecast.";
-};
-
 export const buildReadThisCardItems = ({
   decisionShiftSummary,
   immediateDecision,
