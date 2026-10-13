@@ -239,7 +239,10 @@ const run = async () => {
     const stale = Array.isArray(healthPayload.staleSources)
       ? healthPayload.staleSources.map((row) => `${row.source}${row.age ? ` (${row.age} old)` : ""}`).join(", ")
       : "unnamed";
-    fail(`/api/health is degraded: stale live sources: ${stale}`);
+    const model = healthPayload.dependencies?.ingestModel === "stale"
+      ? `; ingest model last refreshed ${healthPayload.ingestModelAsOf ?? "never"}`
+      : "";
+    fail(`/api/health is degraded: stale live sources: ${stale || "none"}${model}`);
   }
   console.log(`✅ /api/health checks passed (commit ${healthPayload.commit ?? "unknown"})`);
   console.log("✅ synthetic smoke completed successfully");

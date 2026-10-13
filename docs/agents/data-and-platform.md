@@ -94,6 +94,15 @@ loaded, and a report built from stale inputs loads: it said "ok" while `/trust` 
 `staleSources`, with `dependencies.dataFreshness` and an overall `"degraded"` (HTTP 200).
 `bun run smoke:prod` fails on `"degraded"` and names the feeds.
 
+**Two freshness checks, because readers and the alarm see different data (2026-10-13).** The
+source rows follow the stored `OperatingSnapshot`, which only the scheduled cron writes (02:00
+UTC daily), so Treasury's window is the ingest cadence's 26h: a 6h window called every healthy
+afternoon stale. The coordinator's hourly alarm refreshes the materialized model behind the
+snapshot, and nothing republishes the snapshot from it, so the source rows cannot see a stopped
+alarm. `dependencies.ingestModel` (`ok` / `stale` / `unknown`, with `ingestModelAsOf`) judges the
+model's `asOf` against `INGEST_MODEL_STALE_AFTER_MS` (6h, `lib/ingestion/cadence.ts`); stale is
+also `"degraded"`. #1587 and #1586 each fixed one of these by breaking the other.
+
 **It installs its env (2026-10-13).** The object is an entry point like the fetch and scheduled
 handlers, and may run in an isolate neither has primed. Its constructor ignored `env` until
 2026-10-13, so the hourly alarm's ingest read no `FRED_API_KEY` through `readSetting`; in
