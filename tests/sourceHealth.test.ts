@@ -8,6 +8,8 @@ import {
   buildDegradedSourceRows,
   formatSourceFreshnessLabel,
   formatSourceModeLabel,
+  listStaleLiveSources,
+  type SourceHealthRow,
 } from "../lib/report/sourceHealth";
 
 const buildTreasury = (overrides: Partial<TreasuryData> = {}): TreasuryData => ({
@@ -326,5 +328,36 @@ describe("the /trust source board", () => {
     assert.equal(treasury?.stateLabel, "Not confirmed");
     assert.equal(treasury?.updatedLabel, "No update on record");
     assert.equal(treasury?.asIntended, false);
+  });
+});
+
+describe("listStaleLiveSources", () => {
+  const row = (overrides: Partial<SourceHealthRow>): SourceHealthRow => ({
+    sourceName: "Treasury",
+    cadenceLabel: "Intraday rates",
+    freshnessStatus: "fresh",
+    freshnessSlaHours: 6,
+    lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
+    ageLabel: "14h",
+    activeFallbackReason: null,
+    mode: "live",
+    expectsLive: true,
+    ...overrides,
+  });
+
+  it("names a live source past its window, which /api/health reports as degraded", () => {
+    assert.deepEqual(listStaleLiveSources([row({ freshnessStatus: "stale" })]), [
+      { source: "Treasury", age: "14h", lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z" },
+    ]);
+  });
+
+  it("leaves out fresh sources and curated snapshots, which are current by design", () => {
+    assert.deepEqual(
+      listStaleLiveSources([
+        row({}),
+        row({ sourceName: "Startup/private markets", freshnessStatus: "stale", expectsLive: false, mode: "snapshot" }),
+      ]),
+      [],
+    );
   });
 });
