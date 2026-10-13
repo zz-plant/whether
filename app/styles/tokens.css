@@ -299,6 +299,14 @@
   --elev-4: 0 calc(4 * var(--sh)) calc(9 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-soft),
             0 calc(24 * var(--sh)) calc(48 * var(--sh)) calc(-24 * var(--sh)) var(--shadow-color-mid);
 
+  /* Control depth (2026-10-13, ui-ux-standards §XXVI). A control is drawn as a part of an
+     instrument: a recessed well (--well-inset) that keys sit in, and a key that sinks when
+     pressed (--key-pressed). Shadow geometry only, no gradient and no specular (§XXV); like
+     the --elev-* ladder, only the shadow colours flip between themes. */
+  --well-inset: inset 0 calc(1 * var(--sh)) calc(3 * var(--sh)) var(--shadow-color-mid),
+                inset 0 0 0 1px var(--border-subtle);
+  --key-pressed: inset 0 calc(1 * var(--sh)) calc(2 * var(--sh)) var(--shadow-color-soft);
+
   /* Top-edge specular. Dark theme only — on the light theme the surfaces are
      already near-white, so a white inset just muddies the border. */
   --edge-highlight: rgba(255, 255, 255, 0.07);
