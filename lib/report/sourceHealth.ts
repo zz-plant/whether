@@ -67,12 +67,15 @@ type SourceGroupDefinition = {
 };
 
 /*
- * Treasury is ingested once a day (the 02:00 UTC cron in wrangler.toml), so a 6h SLA
- * marked it stale by 08:00 UTC every weekday and /api/health read "degraded" all
- * afternoon on a healthy fetch. Take the window the ingest cadence already holds it to:
- * one missed run, not one ordinary afternoon, is what makes it stale.
+ * Treasury is refreshed through the day, not once: the ingest coordinator's hourly alarm
+ * (worker/ingestCoordinator.ts) re-fetches the rates family once it is a poll window old,
+ * so a healthy read is never more than about three hours old. Three poll windows is two
+ * missed refreshes. On 2026-10-13 a 26h window (the 02:00 cron's) was tried on the belief
+ * that the cron was the only fetch; that night /api/health said "ok" with every feed 20h
+ * old, because nothing had refreshed them since that cron. Measured in calendar hours:
+ * the alarm runs on weekends too, so a weekend without a fetch is a weekend of outage.
  */
-const TREASURY_SOURCE_SLA_HOURS = SIGNAL_CADENCE.TREASURY_10Y.staleAfterMs / 3_600_000;
+const TREASURY_SOURCE_SLA_HOURS = (3 * SIGNAL_CADENCE.TREASURY_10Y.pollWindowMs) / 3_600_000;
 const MARKET_SOURCE_SLA_HOURS = 24;
 const MONTHLY_RELEASE_SLA_HOURS = 45 * 24;
 const CURATED_SNAPSHOT_SLA_HOURS = 45 * 24;
@@ -290,16 +293,38 @@ const buildGroupedRow = ({
 const isDegradedSource = (row: SourceHealthRow) =>
   row.freshnessStatus !== "fresh" || (row.expectsLive && row.mode !== "live");
 
+/** Why a live source is degraded, in the order `sourceBoardState` checks: age and absence first. */
+const degradedLiveState = (row: SourceHealthRow) =>
+  row.freshnessStatus === "stale" ? "stale" : row.freshnessStatus === "unknown" ? "unconfirmed" : "cached";
+
 /**
- * The sources that are meant to answer live and have gone past their freshness window: what
- * a monitor should be told. A curated snapshot is current by design and never listed. On
- * 2026-10-13 /trust printed "Treasury · Stale · 14h old" while /api/health said "ok" — the
- * health check asked only whether a report loaded, and a report built from stale inputs loads.
+ * The sources that are meant to answer live and are not doing so: what a monitor should be
+ * told. The test is `isDegradedSource`, the one `/trust` counts, so the health check cannot
+ * say "ok" about a feed the trust page calls degraded: past its window (`stale`), with no
+ * fetch on record (`unconfirmed`), or answering from a fallback inside its window (`cached`).
+ * A curated snapshot is current by design and never listed. On 2026-10-13 /trust printed
+ * "Treasury · Stale · 14h old" while /api/health said "ok" — the health check asked only
+ * whether a report loaded, and a report built from stale inputs loads.
  */
-export const listStaleLiveSources = (rows: readonly SourceHealthRow[]) =>
+export const listDegradedLiveSources = (rows: readonly SourceHealthRow[]) =>
   rows
-    .filter((row) => row.expectsLive && row.freshnessStatus === "stale")
-    .map((row) => ({ source: row.sourceName, age: row.ageLabel, lastSuccessfulFetchAt: row.lastSuccessfulFetchAt }));
+    .filter((row) => row.expectsLive && isDegradedSource(row))
+    .map((row) => ({
+      source: row.sourceName,
+      state: degradedLiveState(row),
+      age: row.ageLabel,
+      lastSuccessfulFetchAt: row.lastSuccessfulFetchAt,
+    }));
+
+/**
+ * `/api/health`'s `dependencies.dataFreshness`. Freshness is judged from a report; when none
+ * loaded there is nothing to judge, and "ok" beside a failed probe would report a freshness
+ * success nobody measured.
+ */
+export const judgeDataFreshness = (
+  reportLoaded: boolean,
+  degradedSources: ReturnType<typeof listDegradedLiveSources>,
+) => (!reportLoaded ? "unknown" : degradedSources.some((source) => source.state === "stale") ? "stale" : "ok");
 
 export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
   rows
@@ -397,7 +422,7 @@ export const buildSourceHealthRows = ({
     {
       sourceName: "Treasury",
       cadenceLabel: "Daily rates",
-      freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now, true),
+      freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,
       ageLabel: formatAgeSpan(treasuryLastSuccessfulFetchAt, now),

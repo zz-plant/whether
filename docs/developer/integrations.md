@@ -33,8 +33,8 @@ Recommended pull sequence:
 
 ### Health gate
 
-- `GET /api/health` emits `ok`, `degraded`, or `down`.
-- Treasury freshness drives status via `checks.treasuryData.ageHours` and `staleAfterHours`.
+- `GET /api/health` emits `ok`, `degraded` (HTTP 200), or `down` (HTTP 503).
+- `degradedSources` names each live source that is not answering live, with its `state` (`stale`, `unconfirmed`, `cached`) and age.
 
 ### Consistency gate
 

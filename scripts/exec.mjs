@@ -65,3 +65,17 @@ export function worktreeDrift(cwd = process.cwd()) {
     return null;
   }
 }
+
+/**
+ * The commit a build should say it is, for `/api/health` (`vite.config.ts`). Workers Builds
+ * names it in `WORKERS_CI_COMMIT_SHA`; a local build reads the checkout. A checkout holding
+ * anything no commit has, tracked or untracked, is not HEAD: `bun run deploy:cloudflare`
+ * builds whatever is on disk, and naming HEAD would answer "is my merge live?" about code
+ * that is not running. That build, like one with no readable checkout, says "".
+ */
+export function buildCommit({ env = process.env, cwd = process.cwd() } = {}) {
+  if (env.WORKERS_CI_COMMIT_SHA) return env.WORKERS_CI_COMMIT_SHA;
+  const drift = worktreeDrift(cwd);
+  if (!drift || drift.tracked.length > 0 || drift.untracked.length > 0) return "";
+  return drift.commit;
+}

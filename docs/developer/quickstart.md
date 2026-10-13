@@ -49,8 +49,9 @@ curl -i -s "$BASE_URL/api/health"
 ```
 
 Interpretation:
-- HTTP `200` + `status: "ok"` → treasury freshness is within threshold.
-- HTTP `503` (`degraded`/`down`) → hold outbound sends and inspect `checks.treasuryData`.
+- HTTP `200` + `status: "ok"` → every live source is answering live and inside its freshness window.
+- HTTP `200` + `status: "degraded"` → a live source is stale, unconfirmed or cached; hold outbound sends and read `degradedSources`.
+- HTTP `503` + `status: "down"` → the report did not load.
 
 ## 5) Enable agent discovery
 

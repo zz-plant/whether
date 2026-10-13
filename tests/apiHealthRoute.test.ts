@@ -14,13 +14,14 @@ describe("/api/health", () => {
     assert.ok(typeof body.generatedAt === "string");
   });
 
-  it("names its stale live sources, and says degraded rather than ok when there are any", async () => {
+  it("names its degraded live sources, and says degraded rather than ok when there are any", async () => {
     const body: Record<string, unknown> = await (await getHealthRoute()).json();
-    assert.ok(Array.isArray(body.staleSources), "the stale sources are listed, empty or not");
+    assert.ok(Array.isArray(body.degradedSources), "the degraded sources are listed, empty or not");
+    assert.ok(Array.isArray(body.staleSources), "the stale subset keeps its name");
     const dependencies = body.dependencies;
     assert.ok(dependencies && typeof dependencies === "object" && "dataFreshness" in dependencies);
-    const stale = Array.isArray(body.staleSources) && body.staleSources.length > 0;
-    if (body.status !== "down") assert.equal(body.status, stale ? "degraded" : "ok");
+    const degraded = Array.isArray(body.degradedSources) && body.degradedSources.length > 0;
+    if (body.status !== "down") assert.equal(body.status, degraded ? "degraded" : "ok");
   });
 
   it("reports null for deployedVersion when the Cloudflare binding is absent", async () => {

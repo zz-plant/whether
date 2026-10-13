@@ -8,7 +8,8 @@ import {
   buildDegradedSourceRows,
   formatSourceFreshnessLabel,
   formatSourceModeLabel,
-  listStaleLiveSources,
+  judgeDataFreshness,
+  listDegradedLiveSources,
   type SourceHealthRow,
 } from "../lib/report/sourceHealth";
 
@@ -244,12 +245,27 @@ describe("degraded sources", () => {
       assert.equal(buildDegradedSourceRows([treasury]).length, 1);
     }
   });
-  it("holds Treasury to the daily ingest, not an intraday window", () => {
-    // 2026-10-13: the 02:01 UTC fetch landed, and by 08:00 UTC /api/health read "degraded" until the next day.
-    const treasuryAt = (now: string) =>
-      buildSourceHealthRows({ treasury: buildTreasury({ fetched_at: "2026-10-13T02:01:46.905Z" }), macroSeries: [], now: new Date(now) })[0];
-    assert.equal(treasuryAt("2026-10-13T22:30:00Z").freshnessStatus, "fresh");
-    assert.equal(treasuryAt("2026-10-14T06:00:00Z").freshnessStatus, "stale", "a missed 02:00 run is still caught");
+  /*
+   * The ingest coordinator re-fetches rates hourly once they are two hours old, so a fetch
+   * from 02:01 UTC that is still the latest at 22:30 UTC is twenty missed refreshes. On
+   * 2026-10-13 a 26h window called exactly that "fresh", and /api/health said "ok".
+   */
+  it("holds Treasury to the coordinator's intraday refresh, not the once-a-day cron", () => {
+    const treasuryAt = (fetched_at: string, now: string) =>
+      buildSourceHealthRows({ treasury: buildTreasury({ fetched_at }), macroSeries: [], now: new Date(now) })[0];
+    assert.equal(treasuryAt("2026-10-13T02:01:46.905Z", "2026-10-13T05:00:00Z").freshnessStatus, "fresh");
+    assert.equal(treasuryAt("2026-10-13T02:01:46.905Z", "2026-10-13T22:30:00Z").freshnessStatus, "stale");
+  });
+
+  /* Saturday noon to Sunday noon is weekend in every timezone a test runs in, so business-day
+     accounting would count none of it and call a full day without a fetch "fresh". */
+  it("counts a weekend day without a Treasury fetch as stale: the coordinator runs every day", () => {
+    const treasury = buildSourceHealthRows({
+      treasury: buildTreasury({ fetched_at: "2026-10-10T12:00:00Z" }),
+      macroSeries: [],
+      now: new Date("2026-10-11T12:00:00Z"),
+    })[0];
+    assert.equal(treasury.freshnessStatus, "stale");
   });
   /*
    * "Startup/private markets" is a curated snapshot by design and is never
@@ -338,12 +354,12 @@ describe("the /trust source board", () => {
   });
 });
 
-describe("listStaleLiveSources", () => {
+describe("listDegradedLiveSources", () => {
   const row = (overrides: Partial<SourceHealthRow>): SourceHealthRow => ({
     sourceName: "Treasury",
     cadenceLabel: "Daily rates",
     freshnessStatus: "fresh",
-    freshnessSlaHours: 26,
+    freshnessSlaHours: 6,
     lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
     ageLabel: "14h",
     activeFallbackReason: null,
@@ -353,18 +369,76 @@ describe("listStaleLiveSources", () => {
   });
 
   it("names a live source past its window, which /api/health reports as degraded", () => {
-    assert.deepEqual(listStaleLiveSources([row({ freshnessStatus: "stale" })]), [
-      { source: "Treasury", age: "14h", lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z" },
+    assert.deepEqual(listDegradedLiveSources([row({ freshnessStatus: "stale" })]), [
+      { source: "Treasury", state: "stale", age: "14h", lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z" },
     ]);
+  });
+
+  /* /trust counts both as degraded; a health check that skipped them said "ok" during a missing or cached feed. */
+  it("names a live source with no fetch on record, and one answering from a fallback inside its window", () => {
+    const listed = listDegradedLiveSources([
+      row({ freshnessStatus: "unknown", lastSuccessfulFetchAt: null, ageLabel: null }),
+      row({ sourceName: "Market stress", mode: "fallback", activeFallbackReason: "cached: VIX" }),
+    ]);
+    assert.deepEqual(
+      listed.map(({ source, state }) => ({ source, state })),
+      [
+        { source: "Treasury", state: "unconfirmed" },
+        { source: "Market stress", state: "cached" },
+      ],
+    );
+  });
+
+  it("lists exactly the live rows the /trust board marks as not as intended", () => {
+    const rows = buildSourceHealthRows({
+      treasury: buildTreasury({ fetched_at: "2026-03-10T00:00:00.000Z" }),
+      macroSeries: [buildMacroSeriesReading({ id: "VIX_INDEX", isLive: false })],
+      now: new Date("2026-03-10T20:00:00.000Z"),
+    });
+    const board = buildSourceBoardRows(rows);
+    const notAsIntended = rows
+      .filter((entry, index) => entry.expectsLive && board[index]?.asIntended === false)
+      .map((entry) => entry.sourceName);
+    assert.ok(notAsIntended.length > 0, "the fixture degrades at least one live source");
+    assert.deepEqual(
+      listDegradedLiveSources(rows).map((entry) => entry.source),
+      notAsIntended,
+    );
   });
 
   it("leaves out fresh sources and curated snapshots, which are current by design", () => {
     assert.deepEqual(
-      listStaleLiveSources([
+      listDegradedLiveSources([
         row({}),
         row({ sourceName: "Startup/private markets", freshnessStatus: "stale", expectsLive: false, mode: "snapshot" }),
       ]),
       [],
     );
+  });
+});
+
+describe("judgeDataFreshness", () => {
+  const stale = listDegradedLiveSources([
+    {
+      sourceName: "Treasury",
+      cadenceLabel: "Daily rates",
+      freshnessStatus: "stale",
+      freshnessSlaHours: 6,
+      lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
+      ageLabel: "20h",
+      activeFallbackReason: null,
+      mode: "live",
+      expectsLive: true,
+    },
+  ]);
+
+  it("says unknown when no report loaded, rather than a freshness success nobody measured", () => {
+    assert.equal(judgeDataFreshness(false, []), "unknown");
+    assert.equal(judgeDataFreshness(false, stale), "unknown");
+  });
+
+  it("says stale when a live source is past its window, and ok otherwise", () => {
+    assert.equal(judgeDataFreshness(true, stale), "stale");
+    assert.equal(judgeDataFreshness(true, []), "ok");
   });
 });

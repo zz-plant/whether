@@ -89,6 +89,24 @@ describe("run-checks output", () => {
     assert.match(stdout, /earlier line\(s\) hidden; CHECK_VERBOSE=1 prints them/);
   });
 
+  /* A warn-only check passes on purpose: curated-freshness can print six stale series and a
+     remedy, and the four closing lines alone would cut the heading and most of the series. */
+  it("keeps a passing task's warning block, from its first ⚠ line to the end", () => {
+    const { status, stdout } = runTask([
+      "for (let i = 1; i <= 50; i++) console.log(`checked ${i}`);",
+      'console.warn("⚠ Curated macro series past freshness SLA (warning only; run with --strict to fail):");',
+      'for (const id of ["VC_FUNDING_VELOCITY", "TECH_LAYOFF_TREND", "SAAS_VALUATION_MULTIPLE", "EARNINGS_REVISION_INDEX", "AI_COMPUTE_COST_TREND", "REGULATORY_RISK_TRACKER"]) console.warn(`  ${id}: record 2026-03-01, 200d old (SLA 45d)`);',
+      'console.warn("  Hand-refresh data/macro_snapshot.json with sourced values, then flip the gate to strict.");',
+      "process.exit(0);",
+    ]);
+    assert.equal(status, 0);
+    assert.match(stdout, /⚠ Curated macro series past freshness SLA/);
+    assert.match(stdout, /VC_FUNDING_VELOCITY/, "the first series, eight lines from the end, survives");
+    assert.match(stdout, /Hand-refresh data\/macro_snapshot\.json/);
+    assert.doesNotMatch(stdout, /checked 25\b/, "what came before the warning is still hidden");
+    assert.match(stdout, /earlier line\(s\) hidden/);
+  });
+
   it("prints a passing task whole under CHECK_VERBOSE=1", () => {
     const { stdout } = runTask(PASSING, { CHECK_VERBOSE: "1" });
     assert.match(stdout, /filler 100\b/);

@@ -138,7 +138,7 @@ const main = () => {
       console.error(message);
       process.exit(1);
     }
-    console.warn(message);
+    console.warn(`⚠ ${message}`);
     return;
   }
   const stale = findStaleCuratedSeries(parsed);

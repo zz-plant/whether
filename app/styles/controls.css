@@ -387,16 +387,13 @@ details[open] > summary[data-chevron]::after,
   padding: 3px;
 }
 
+/* Motion is the press only (§XXVI): the selected paint, the lamp and the scale's
+   pointer change at once, so the chosen key reads as chosen the moment it is. */
 .weather-segment-option {
   border: 1px solid transparent;
   border-radius: var(--radius-md);
   color: var(--app-text-muted);
-  transition:
-    transform 120ms var(--ease-out),
-    background-color 160ms var(--ease-out),
-    border-color 160ms var(--ease-out),
-    box-shadow 160ms var(--ease-out),
-    color 160ms var(--ease-out);
+  transition: transform 120ms var(--ease-out);
 }
 
 /* Choices stand on their own rather than in a track, so each is a key with
@@ -433,7 +430,6 @@ details[open] > summary[data-chevron]::after,
   height: 6px;
   border-radius: var(--radius-full);
   background-color: var(--border-strong);
-  transition: background-color 160ms var(--ease-out), box-shadow 160ms var(--ease-out);
 }
 
 .peer:checked + .weather-segment-option .weather-segment-lamp {
@@ -469,7 +465,6 @@ details[open] > summary[data-chevron]::after,
   height: 5px;
   background-color: var(--app-text-muted);
   opacity: 0.6;
-  transition: height 160ms var(--ease-out), background-color 160ms var(--ease-out), opacity 160ms var(--ease-out);
 }
 
 .peer:checked ~ .weather-segment-scale::after {
@@ -492,9 +487,7 @@ details[open] > summary[data-chevron]::after,
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .weather-segment-option,
-  .weather-segment-lamp,
-  .weather-segment-scale::after {
+  .weather-segment-option {
     transition: none;
   }
   .peer:active + .weather-segment-option {
@@ -516,11 +509,7 @@ details[open] > summary[data-chevron]::after,
   background-color: var(--bg-raised);
   box-shadow: var(--elev-1);
   color: var(--app-text-muted);
-  transition:
-    transform 120ms var(--ease-out),
-    background-color 160ms var(--ease-out),
-    box-shadow 160ms var(--ease-out),
-    color 160ms var(--ease-out);
+  transition: transform 120ms var(--ease-out);
 }
 
 a.weather-step-key:hover {
@@ -566,12 +555,7 @@ a.weather-step-key:active {
   border-radius: var(--radius-lg);
   background-color: var(--bg-nested);
   color: var(--app-text-muted);
-  transition:
-    transform 120ms var(--ease-out),
-    background-color 160ms var(--ease-out),
-    border-color 160ms var(--ease-out),
-    box-shadow 160ms var(--ease-out),
-    color 160ms var(--ease-out);
+  transition: transform 120ms var(--ease-out);
 }
 
 .weather-key:hover {

@@ -87,12 +87,21 @@ and its history download now serves a JavaScript proof-of-work page, so it is no
 
 ## Ingest coordinator
 
-**`/api/health` reports stale feeds (2026-10-13).** It used to ask only whether a report
+**`/api/health` reports degraded feeds (2026-10-13).** It used to ask only whether a report
 loaded, and a report built from stale inputs loads: it said "ok" while `/trust` read
-"Treasury · Stale · 14h old". It now lists every live source past its freshness window
-(`listStaleLiveSources`, `lib/report/sourceHealth.ts`, the rows `/trust` prints) under
-`staleSources`, with `dependencies.dataFreshness` and an overall `"degraded"` (HTTP 200).
-`bun run smoke:prod` fails on `"degraded"` and names the feeds.
+"Treasury · Stale · 14h old". It now lists every live source `/trust` counts as degraded
+(`listDegradedLiveSources`, `lib/report/sourceHealth.ts`) under `degradedSources`, each with a
+`state`: `stale` (past its window), `unconfirmed` (no fetch on record) or `cached` (a fallback
+inside its window). `staleSources` is the `stale` subset. Any entry makes the overall status
+`"degraded"` (HTTP 200). `dependencies.dataFreshness` is `stale`, `ok`, or `unknown` when no
+report loaded. `bun run smoke:prod` fails on `"degraded"` and names the feeds, and
+`whether doctor` reports it as a warning.
+
+**Treasury's window is 6 calendar hours.** The coordinator below re-fetches the rates family
+hourly once it is two hours old, so a healthy read is at most about three hours old; 6h is two
+missed refreshes. A 26h window (the 02:00 cron's) was tried on 2026-10-13 on the belief that the
+cron was the only fetch, and that night `/api/health` said "ok" with every feed 20h old. Calendar
+hours, because the alarm runs on weekends too.
 
 **It installs its env (2026-10-13).** The object is an entry point like the fetch and scheduled
 handlers, and may run in an isolate neither has primed. Its constructor ignored `env` until

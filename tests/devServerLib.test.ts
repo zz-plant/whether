@@ -163,6 +163,38 @@ describe("withDevServer", () => {
     }
   });
 
+  /* The landmark and capture commands take a remote --base-url to audit a preview or staging
+     deployment; a local server answering in its place would pass local code off as that deployment. */
+  it("refuses an unreachable remote target rather than run the work against this checkout's server", async () => {
+    const server = createHttpServer((request, response) => response.end("checkout server"));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    const appUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const root = workspace();
+    const lockfilePath = join(root, "lock.json");
+    writeFileSync(lockfilePath, JSON.stringify({ pid: process.pid, port: 0, hostname: "127.0.0.1", appUrl, startedAt: 0, cwd: root }));
+
+    let ranAgainst: string | null = null;
+    try {
+      await assert.rejects(
+        withDevServer({
+          baseUrl: "https://preview.whether.example",
+          outDir: root,
+          lockfilePath,
+          probe: async (url: string): Promise<Probe> =>
+            url.startsWith("https://preview.") ? { ok: false, error: "getaddrinfo ENOTFOUND" } : probeOnce(url),
+          body: async (url: string) => {
+            ranAgainst = url;
+          },
+        }),
+        /not a local address/,
+      );
+      assert.equal(ranAgainst, null, "the work never ran");
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
+  });
+
   it("starts a server, waits for it, hands it to the work, and stops it afterwards", async () => {
     const root = workspace();
     const baseUrl = `http://127.0.0.1:${await freePort()}`;

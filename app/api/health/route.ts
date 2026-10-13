@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { withDeadline } from "../../../lib/withDeadline";
 import { getBuildCommit, getDeployedVersion } from "../../../lib/runtime/versionMetadata";
-import { listStaleLiveSources } from "../../../lib/report/sourceHealth";
+import { judgeDataFreshness, listDegradedLiveSources } from "../../../lib/report/sourceHealth";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -18,7 +18,7 @@ const DEPENDENCY_PROBE_TIMEOUT_MS = 3_000;
 
 type DependencyState = "ok" | "degraded" | "timeout";
 
-type Probe = { reportData: DependencyState; staleSources: ReturnType<typeof listStaleLiveSources> };
+type Probe = { reportData: DependencyState; degradedSources: ReturnType<typeof listDegradedLiveSources> };
 
 const probeReportData = async (): Promise<Probe> => {
   try {
@@ -28,20 +28,22 @@ const probeReportData = async (): Promise<Probe> => {
       "health-report-data",
     );
     return reportResult.ok
-      ? { reportData: "ok", staleSources: listStaleLiveSources(reportResult.data.sourceHealth) }
-      : { reportData: "degraded", staleSources: [] };
+      ? { reportData: "ok", degradedSources: listDegradedLiveSources(reportResult.data.sourceHealth) }
+      : { reportData: "degraded", degradedSources: [] };
   } catch {
-    return { reportData: "timeout", staleSources: [] };
+    return { reportData: "timeout", degradedSources: [] };
   }
 };
 
 export async function GET() {
   const now = new Date();
-  const { reportData, staleSources } = await probeReportData();
-  /* Stale live inputs are "degraded", not "down": the page still serves a reading, but
+  const { reportData, degradedSources } = await probeReportData();
+  /* The past-their-window subset, under the name monitors have read it by since it shipped. */
+  const staleSources = degradedSources.filter((source) => source.state === "stale");
+  /* A degraded live input is "degraded", not "down": the page still serves a reading, but
      one a reader would act on as current. A 200, so the site is not routed around, with
      the sources named so a monitor can say which feed stopped. */
-  const status = reportData !== "ok" ? "down" : staleSources.length > 0 ? "degraded" : "ok";
+  const status = reportData !== "ok" ? "down" : degradedSources.length > 0 ? "degraded" : "ok";
   /* `version` is this endpoint's schema version and says nothing about what is running.
      `deployedVersion` is the Worker actually serving the request, so "is production
      current?" can be answered without trusting the pipeline that claims to have shipped
@@ -58,8 +60,9 @@ export async function GET() {
       commit: getBuildCommit(),
       dependencies: {
         reportData,
-        dataFreshness: staleSources.length > 0 ? "stale" : "ok",
+        dataFreshness: judgeDataFreshness(reportData === "ok", degradedSources),
       },
+      degradedSources,
       staleSources,
     },
     { status: reportData === "ok" ? 200 : 503 },

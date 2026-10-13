@@ -4,7 +4,7 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { worktreeDrift } from "../scripts/exec.mjs";
+import { buildCommit, worktreeDrift } from "../scripts/exec.mjs";
 
 /*
  * The deploy gate refuses a tree that is not its commit. A build container once ran the
@@ -69,6 +69,32 @@ describe("deploy gate worktree check", () => {
       assert.equal(worktreeDrift(directory), null);
     } finally {
       rmSync(directory, { recursive: true, force: true });
+    }
+  });
+
+  /* /api/health names this commit so "is my merge live?" is one request; a dirty local deploy is not HEAD. */
+  it("names HEAD as the build commit only for a checkout that holds nothing HEAD does not", () => {
+    const { repository, git } = gitRepository();
+    const env = { WORKERS_CI_COMMIT_SHA: "" };
+
+    try {
+      const head = git("rev-parse", "HEAD").stdout.trim();
+      assert.equal(buildCommit({ env, cwd: repository }), head);
+
+      writeFileSync(join(repository, "tracked.txt"), "edited, not committed\n");
+      assert.equal(buildCommit({ env, cwd: repository }), "", "a modified tracked file is not HEAD");
+
+      git("checkout", "--quiet", "--", "tracked.txt");
+      writeFileSync(join(repository, "new-module.ts"), "export {};\n");
+      assert.equal(buildCommit({ env, cwd: repository }), "", "an untracked file the build may import is not HEAD");
+
+      assert.equal(
+        buildCommit({ env: { WORKERS_CI_COMMIT_SHA: "abc1234" }, cwd: repository }),
+        "abc1234",
+        "Workers Builds names its own commit",
+      );
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
     }
   });
 

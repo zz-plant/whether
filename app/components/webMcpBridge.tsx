@@ -2,6 +2,20 @@
 
 import { useEffect } from "react";
 
+/** The request `callTool` sends to `/api/mcp`. */
+export const buildWebMcpToolCall = (name: string, args: Record<string, unknown>): RequestInit => ({
+  method: "POST",
+  // The streamable-HTTP transport answers 406 unless Accept names both, and a browser fetch
+  // sends a wildcard by default. The server replies in JSON (enableJsonResponse).
+  headers: { "Content-Type": "application/json", Accept: "application/json, text/event-stream" },
+  body: JSON.stringify({
+    jsonrpc: "2.0",
+    id: Date.now(),
+    method: "tools/call",
+    params: { name, arguments: args },
+  }),
+});
+
 /**
  * Exposes WebMCP (Web Model Context Protocol) on `document.modelContext` and `window.modelContext`
  * so browser-based AI agents (such as Cloudflare Kitesurf or WebMCP-compliant browser agents)
@@ -19,16 +33,7 @@ export const WebMcpBridge = () => {
         mcpEndpoint: "/api/mcp",
         stateEndpoint: "/api/agent?view=state",
         async callTool(name: string, args: Record<string, unknown> = {}) {
-          const response = await fetch("/api/mcp", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              jsonrpc: "2.0",
-              id: Date.now(),
-              method: "tools/call",
-              params: { name, arguments: args },
-            }),
-          });
+          const response = await fetch("/api/mcp", buildWebMcpToolCall(name, args));
           return response.json();
         },
       };

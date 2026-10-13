@@ -672,28 +672,34 @@ describe("whether cli", () => {
     assert.match(result.stderr, /auth: Authentication failed \(missing key\)\./);
   });
 
-  it("doctor classifies degraded health as warning", async () => {
-    const server = http.createServer((req, res) => {
-      if ((req.url ?? "").startsWith("/api/health")) {
-        res.writeHead(503, { "content-type": "application/json" });
-        res.end(JSON.stringify({ status: "degraded" }));
-        return;
-      }
-      res.writeHead(404);
-      res.end();
+  /* /api/health answers a stale live feed with a 200 "degraded" (the site still serves), so
+     doctor reads the body, not only a 503, or it reports "ok" beside health: "degraded". */
+  for (const httpStatus of [503, 200]) {
+    it(`doctor warns on degraded health sent with HTTP ${httpStatus}`, async () => {
+      const server = http.createServer((req, res) => {
+        if ((req.url ?? "").startsWith("/api/health")) {
+          res.writeHead(httpStatus, { "content-type": "application/json" });
+          res.end(JSON.stringify({ status: "degraded" }));
+          return;
+        }
+        res.writeHead(404);
+        res.end();
+      });
+
+      await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+      const address = server.address();
+      const port = typeof address === "object" && address ? address.port : 0;
+      const result = await runCli(["doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
+      await new Promise<void>((resolve) => server.close(() => resolve()));
+
+      assert.equal(result.status, 0);
+      const parsed = JSON.parse(result.stdout);
+      assert.equal(parsed[0]?.name, "api/health");
+      assert.equal(parsed[0]?.status, "warning");
+      assert.equal(parsed[0]?.health, "degraded");
+      assert.match(parsed[0]?.message, /reachable but degraded/i);
     });
-
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const { port } = server.address() as { port: number };
-    const result = await runCli(["doctor", "--api-base-url", `http://127.0.0.1:${port}`, "--json"]);
-    await new Promise<void>((resolve) => server.close(() => resolve()));
-
-    assert.equal(result.status, 0);
-    const parsed = JSON.parse(result.stdout);
-    assert.equal(parsed[0]?.name, "api/health");
-    assert.equal(parsed[0]?.status, "warning");
-    assert.match(parsed[0]?.message, /reachable but degraded/i);
-  });
+  }
 
   it("doctor keeps non-degraded health failures as error", async () => {
     const server = http.createServer((req, res) => {
