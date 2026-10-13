@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
 import { withDeadline } from "../../../lib/withDeadline";
-import { getDeployedVersion } from "../../../lib/runtime/versionMetadata";
+import { getBuildCommit, getDeployedVersion } from "../../../lib/runtime/versionMetadata";
 import { listStaleLiveSources } from "../../../lib/report/sourceHealth";
 
 export const runtime = "edge";
@@ -55,6 +55,7 @@ export async function GET() {
       generatedAt: now.toISOString(),
       version: "v1",
       deployedVersion,
+      commit: getBuildCommit(),
       dependencies: {
         reportData,
         dataFreshness: staleSources.length > 0 ? "stale" : "ok",

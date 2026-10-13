@@ -28,6 +28,12 @@ describe("/api/health", () => {
     assert.equal(body.deployedVersion, null);
   });
 
+  it("reports the commit only when the build compiled one in, which bun test never does", async () => {
+    const body: Record<string, unknown> = await (await getHealthRoute()).json();
+    assert.ok("commit" in body);
+    assert.equal(body.commit, null);
+  });
+
   it("names the running Worker build when the binding is installed", async () => {
     const binding = { id: "fd5d5e6f-6b25-4ddd-8fde-90f58fc8425e", tag: "", timestamp: "2026-09-01T20:12:02.047Z" };
     Reflect.set(globalThis, "CF_VERSION_METADATA", binding);

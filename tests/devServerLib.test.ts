@@ -130,6 +130,33 @@ describe("withDevServer", () => {
     }
   });
 
+  it("reuses this checkout's dev server from vinext's lock file, wherever it listens", async () => {
+    const server = createHttpServer((request, response) => response.end("checkout server"));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    const address = server.address();
+    const appUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const root = workspace();
+    const lockfilePath = join(root, "lock.json");
+    writeFileSync(lockfilePath, JSON.stringify({ pid: process.pid, port: 0, hostname: "127.0.0.1", appUrl, startedAt: 0, cwd: root }));
+
+    const statuses: string[] = [];
+    try {
+      const result = await withDevServer({
+        baseUrl: `http://127.0.0.1:${await freePort()}`,
+        outDir: root,
+        lockfilePath,
+        probe: probeOnce,
+        onStatus: (message: string) => statuses.push(message),
+        body: async (url: string, started?: unknown) => ({ url, started }),
+      });
+
+      assert.deepEqual(result, { url: appUrl, started: undefined });
+      assert.match(statuses.join("\n"), /Reusing this checkout's dev server/);
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
+    }
+  });
+
   it("starts a server, waits for it, hands it to the work, and stops it afterwards", async () => {
     const root = workspace();
     const baseUrl = `http://127.0.0.1:${await freePort()}`;
