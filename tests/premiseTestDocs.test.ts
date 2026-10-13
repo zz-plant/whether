@@ -10,7 +10,7 @@ import { PREMISE_TEST_DOCS } from "../lib/research/premiseTestDocs";
  * the old version.
  */
 
-const FIX = "Run bun scripts/research/publishPremiseTestDocs.ts.";
+const FIX = "Run bun scripts/research/publishResearchDocs.ts.";
 
 describe("the premise test documents served on the site", () => {
   it("match docs/research/ exactly", () => {
