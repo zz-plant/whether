@@ -2,6 +2,7 @@ import { REGIME_LABELS, REGIME_SEVERITY_RANK, isRegimeKey } from "../../../lib/r
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
 import { countRecord } from "../../../lib/report/trackRecord";
 import { ConditionIcon } from "../ui/conceptIcons";
+import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 
 /**
  * The record's answer in one band: every month coloured by the call, the
@@ -12,7 +13,15 @@ import { ConditionIcon } from "../ui/conceptIcons";
  * Each segment carries `data-regime`, so its colour comes from the same
  * token the page shells use (`--regime-accent`), never a per-component table.
  */
-type MonthStripEntry = { recordDate: string; regime: string };
+/** The two scores are optional: a caller with them gets them in each month's hover title. */
+type MonthStripEntry = { recordDate: string; regime: string; tightness?: number; riskAppetite?: number };
+
+const monthTitle = (entry: MonthStripEntry) => {
+  const conditions = `${monthLabel(entry.recordDate)}: ${isRegimeKey(entry.regime) ? REGIME_LABELS[entry.regime] : entry.regime}`;
+  return typeof entry.tightness === "number" && typeof entry.riskAppetite === "number"
+    ? `${conditions} · ${regimeSignalLabel.tightness} ${entry.tightness}, ${regimeSignalLabel.riskAppetite} ${entry.riskAppetite}`
+    : conditions;
+};
 
 type MonthStripProps = {
   entries: readonly MonthStripEntry[];
@@ -78,7 +87,7 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
                 key={entry.recordDate}
                 data-regime={regimeDataAttribute(entry.regime)}
                 className={`h-full flex-1 bg-[var(--regime-accent)] ${changed ? "border-l border-[var(--bg-body)]" : ""}`}
-                title={`${monthLabel(entry.recordDate)}: ${isRegimeKey(entry.regime) ? REGIME_LABELS[entry.regime] : entry.regime}`}
+                title={monthTitle(entry)}
               />
             );
           })}

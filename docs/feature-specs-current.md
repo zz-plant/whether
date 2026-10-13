@@ -3287,6 +3287,18 @@ curve drawn from four hard-coded points.
   fallback (`historyAndContext.ts`); seven pinned pastes in `briefFormats.golden.json` changed by that
   sentence alone.
 
+### 1.1.72 /history's charts say where the line is (2026-10-12)
+
+- **The trend charts draw the change line.** `HistoricalTrendChart` takes `changeLine`: the chart
+  then draws on the score's own 0–100 scale with the line dashed across it, 80px tall instead of
+  32px. Autoscaled, a 4-point wobble near the line and a 40-point swing far from it filled the same
+  height, so the shape could not say how close a score had come to changing conditions. Without
+  `changeLine` the chart autoscales as before.
+- **The month stripe names both scores.** `MonthStrip` entries may carry the two scores; a month's
+  hover title then reads "Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56".
+
+`tests/chartIntegrityContract.test.tsx` and `tests/visualPrimitives.test.tsx` hold them.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

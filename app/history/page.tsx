@@ -25,6 +25,7 @@ import { HistoryExplorer } from "./historyExplorer";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { regimeSignalLabel } from "../../lib/report/signalTranslations";
+import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../../lib/regimeEngine";
 
 /*
  * /history had no `metadata` export at all, so it inherited the root layout's
@@ -330,8 +331,8 @@ export default async function HistoryPage({
             regimeSeries={fullSeries}
           />
           <div className="grid gap-6 sm:grid-cols-2">
-            <HistoricalTrendChart label={regimeSignalLabel.tightness} color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
-            <HistoricalTrendChart label={regimeSignalLabel.riskAppetite} color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />
+            <HistoricalTrendChart label={regimeSignalLabel.tightness} color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" changeLine={TIGHTNESS_REGIME_THRESHOLD} />
+            <HistoricalTrendChart label={regimeSignalLabel.riskAppetite} color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" changeLine={RISK_APPETITE_REGIME_THRESHOLD} />
           </div>
         </div>
       </UrlDetails>
