@@ -36,17 +36,14 @@ const canBindPort = async ({ host, port }) =>
   });
 
 /**
- * Where to actually start the server. A remote or already-serving base URL is
- * used as-is; a local one whose port is taken walks up to five ports forward, so
- * a dev server someone left running does not fail the run.
+ * Where to actually start the server, for a local base URL that did not answer
+ * (`withDevServer` handles a serving or remote one first). One whose port is taken
+ * walks up to five ports forward, so a dev server someone left running does not
+ * fail the run.
  */
 const resolveAutoStartBaseUrl = async ({ baseUrl, initialProbe }) => {
   const parsedBaseUrl = new URL(baseUrl);
   const hostname = normalizeHostname(parsedBaseUrl.hostname);
-
-  if (initialProbe.ok || !isLocalHostname(hostname)) {
-    return { baseUrl, reusedRequestedPort: true, reason: null };
-  }
 
   const defaultPort = parsedBaseUrl.protocol === "https:" ? 443 : 80;
   const requestedPort = Number.parseInt(parsedBaseUrl.port || String(defaultPort), 10);
@@ -255,6 +252,14 @@ export const withDevServer = async ({
   if (initialProbe.ok) {
     onStatus(`Reusing the server already listening at ${baseUrl}`);
     return body(baseUrl);
+  }
+
+  /* A remote target (a preview or staging deployment) is the thing under test. Swapping in
+     this checkout's dev server, or starting one, would report local code as that deployment. */
+  if (!isLocalHostname(new URL(baseUrl).hostname)) {
+    throw new Error(
+      `${baseUrl} did not answer (${initialProbe.error ?? "not ready"}). It is not a local address, so no local server stands in for it.`,
+    );
   }
 
   const checkoutServer = readCheckoutDevServer(lockfilePath);

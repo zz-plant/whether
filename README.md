@@ -74,17 +74,19 @@ bun run mcp:whether
 
 ## Operating Model
 
-Whether converts public macroeconomic and capital-market feeds (Treasury yields, credit spreads, inflation, labor) into concrete weekly operating guidance:
+Whether converts Treasury yields and capital-market feeds into concrete weekly operating guidance. Inflation and labor readings are tracked beside them as evidence; they do not move the scores.
 
 - **Conditions & Latitude (0–100):** Conditions (`Sunny`, `Cloudy`, `Stormy`, `Freezing`) track funding pressure and risk appetite. Operating latitude balances risk appetite with funding relief (`0.7 × risk appetite + 0.3 × (100 − funding pressure)`).
 - **Bounded Decisions:** Replaces generic advice with explicit operational thresholds — an **Action now**, the line that pauses it, and the line that resumes it.
 - **Meeting-Ready Artifacts:** Every brief generates copy-ready permalinks, Slack briefs (`whether brief slack`), board slides (PPTX/PDF), and monthly investor updates.
 
+Three rows from the brief for the week of Sep 29, 2026, in Freezing conditions. The actions change with conditions, and the live brief at `/` fits them to a company's stage and cash runway:
+
 | Area | Action now | Pause if | Resume when |
 | :--- | :--- | :--- | :--- |
-| **Hiring** | Limit hiring to backfills and mission-critical delivery roles | Funding pressure &gt; 76 | Risk appetite &gt; 54 |
-| **Spending** | Enforce payback timeline on all discretionary commitments | Funding pressure &gt; 76 | Funding pressure &lt; 66 |
-| **Fundraising** | Prepare materials in advance to retain timing control | Risk appetite &lt; 44 | Risk appetite &gt; 54 |
+| **Hiring** | Limit hiring to backfills and mission-critical roles tied to delivery risk | Funding pressure &gt; 76 | Risk appetite &gt; 54 |
+| **Spending** | Put a payback figure on every discretionary line before approving it | Funding pressure &gt; 76 | Funding pressure &lt; 66 |
+| **Fundraising** | If you plan to raise, prepare the materials now so the timing stays yours | Risk appetite &lt; 44 | Risk appetite &gt; 54 |
 
 ---
 

@@ -73,6 +73,10 @@ type SourceGroupDefinition = {
  * be no fresher than the last cron run. A 6h window here read every healthy afternoon as stale.
  * Whether the hourly alarm is still refreshing is a separate check: /api/health's
  * `ingestModel`, against INGEST_MODEL_STALE_AFTER_MS.
+ *
+ * Measured in calendar hours, not business hours: the cron runs every day, weekends included.
+ * Counting business hours, a Friday 02:01 fetch was still "fresh" at Monday 03:00 with the
+ * Saturday, Sunday and Monday runs all missed.
  */
 const TREASURY_SOURCE_SLA_HOURS = SIGNAL_CADENCE.TREASURY_10Y.staleAfterMs / 3_600_000;
 const MARKET_SOURCE_SLA_HOURS = 24;
@@ -292,16 +296,38 @@ const buildGroupedRow = ({
 const isDegradedSource = (row: SourceHealthRow) =>
   row.freshnessStatus !== "fresh" || (row.expectsLive && row.mode !== "live");
 
+/** Why a live source is degraded, in the order `sourceBoardState` checks: age and absence first. */
+const degradedLiveState = (row: SourceHealthRow) =>
+  row.freshnessStatus === "stale" ? "stale" : row.freshnessStatus === "unknown" ? "unconfirmed" : "cached";
+
 /**
- * The sources that are meant to answer live and have gone past their freshness window: what
- * a monitor should be told. A curated snapshot is current by design and never listed. On
- * 2026-10-13 /trust printed "Treasury · Stale · 14h old" while /api/health said "ok" — the
- * health check asked only whether a report loaded, and a report built from stale inputs loads.
+ * The sources that are meant to answer live and are not doing so: what a monitor should be
+ * told. The test is `isDegradedSource`, the one `/trust` counts, so the health check cannot
+ * say "ok" about a feed the trust page calls degraded: past its window (`stale`), with no
+ * fetch on record (`unconfirmed`), or answering from a fallback inside its window (`cached`).
+ * A curated snapshot is current by design and never listed. On 2026-10-13 /trust printed
+ * "Treasury · Stale · 14h old" while /api/health said "ok" — the health check asked only
+ * whether a report loaded, and a report built from stale inputs loads.
  */
-export const listStaleLiveSources = (rows: readonly SourceHealthRow[]) =>
+export const listDegradedLiveSources = (rows: readonly SourceHealthRow[]) =>
   rows
-    .filter((row) => row.expectsLive && row.freshnessStatus === "stale")
-    .map((row) => ({ source: row.sourceName, age: row.ageLabel, lastSuccessfulFetchAt: row.lastSuccessfulFetchAt }));
+    .filter((row) => row.expectsLive && isDegradedSource(row))
+    .map((row) => ({
+      source: row.sourceName,
+      state: degradedLiveState(row),
+      age: row.ageLabel,
+      lastSuccessfulFetchAt: row.lastSuccessfulFetchAt,
+    }));
+
+/**
+ * `/api/health`'s `dependencies.dataFreshness`. Freshness is judged from a report; when none
+ * loaded there is nothing to judge, and "ok" beside a failed probe would report a freshness
+ * success nobody measured.
+ */
+export const judgeDataFreshness = (
+  reportLoaded: boolean,
+  degradedSources: ReturnType<typeof listDegradedLiveSources>,
+) => (!reportLoaded ? "unknown" : degradedSources.some((source) => source.state === "stale") ? "stale" : "ok");
 
 export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
   rows
@@ -399,7 +425,7 @@ export const buildSourceHealthRows = ({
     {
       sourceName: "Treasury",
       cadenceLabel: "Daily rates",
-      freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now, true),
+      freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,
       ageLabel: formatAgeSpan(treasuryLastSuccessfulFetchAt, now),

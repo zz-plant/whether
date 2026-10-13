@@ -1394,7 +1394,8 @@ const cmdDoctor = async (settings) => {
   try {
     const { response, baseUrl } = await fetchApiResponse(settings, endpoint);
     const parsedBody = await parseJsonBody(response);
-    if (!response.ok && response.status === 503 && parsedBody?.status === "degraded") {
+    /* Degraded arrives as a 200 (a stale live feed: the site still serves) or a 503. */
+    if (parsedBody?.status === "degraded" && (response.ok || response.status === 503)) {
       checks.push({
         name: "api/health",
         status: "warning",

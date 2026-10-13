@@ -176,17 +176,23 @@ const PASSING_SUMMARY_LINES = 4;
 /** A line printed more often than this is noise; it is printed once with its count. */
 const REPEAT_LIMIT = 3;
 
+/** The mark a passing task prints over a warning it means a reader to act on (`⚠ WARNINGS:`). */
+const WARNING_MARK = "⚠";
+
 /*
- * A passing task's output is its verdict and nothing a reader acts on, so it is reduced to
- * the lines it closes with (`3072 pass`, `Found 0 warnings`). On 2026-10-13 the passing
- * suite alone was ~1,900 lines, ~700 of them one fallback warning repeated, and the log
- * window cut off before the step that mattered.
+ * A passing task's output is usually its verdict and nothing a reader acts on, so it is
+ * reduced to the lines it closes with (`3072 pass`, `Found 0 warnings`). On 2026-10-13 the
+ * passing suite alone was ~1,900 lines, ~700 of them one fallback warning repeated, and the
+ * log window cut off before the step that mattered. A warn-only check is the exception: it
+ * passes on purpose and prints what to fix (curated-freshness lists each stale series under a
+ * `⚠` heading, then the remedy), so everything from its first `⚠` line on is kept.
  */
 const summarizePassing = (output) => {
   const lines = output.trim().split("\n").filter((line) => line.trim());
-  const shown = lines.slice(-PASSING_SUMMARY_LINES);
-  const hidden = lines.length - shown.length;
-  return { shown, hidden };
+  const summaryStart = Math.max(0, lines.length - PASSING_SUMMARY_LINES);
+  const firstWarning = lines.findIndex((line) => line.includes(WARNING_MARK));
+  const keepFrom = firstWarning === -1 ? summaryStart : Math.min(firstWarning, summaryStart);
+  return { shown: lines.slice(keepFrom), hidden: keepFrom };
 };
 
 /** Keeps a failing task's output whole, except that a line repeated past the limit is printed once, with its count. */
@@ -217,7 +223,7 @@ const report = ({ task, ok, output, ms }) => {
 
   if (ok && !VERBOSE) {
     const { shown, hidden } = summarizePassing(trimmed);
-    process.stdout.write(`${shown.join("\n")}\n`);
+    process.stdout.write(`${collapseRepeats(shown.join("\n"))}\n`);
     if (hidden > 0) process.stdout.write(`[run-checks] ${hidden} earlier line(s) hidden; CHECK_VERBOSE=1 prints them.\n`);
     return;
   }
