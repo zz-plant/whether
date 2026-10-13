@@ -233,6 +233,14 @@ const run = async () => {
     fail("/api/health missing dependencies.reportData");
   }
 
+  /* A live feed past its freshness window is the failure /api/health exists to surface
+     (2026-10-13: Treasury sat 14h stale behind an "ok"). Fail the run and name the feeds. */
+  if (healthPayload.status === "degraded") {
+    const stale = Array.isArray(healthPayload.staleSources)
+      ? healthPayload.staleSources.map((row) => `${row.source}${row.age ? ` (${row.age} old)` : ""}`).join(", ")
+      : "unnamed";
+    fail(`/api/health is degraded: stale live sources: ${stale}`);
+  }
   console.log("✅ /api/health checks passed");
   console.log("✅ synthetic smoke completed successfully");
 };

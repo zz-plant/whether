@@ -87,6 +87,13 @@ and its history download now serves a JavaScript proof-of-work page, so it is no
 
 ## Ingest coordinator
 
+**`/api/health` reports stale feeds (2026-10-13).** It used to ask only whether a report
+loaded, and a report built from stale inputs loads: it said "ok" while `/trust` read
+"Treasury · Stale · 14h old". It now lists every live source past its freshness window
+(`listStaleLiveSources`, `lib/report/sourceHealth.ts`, the rows `/trust` prints) under
+`staleSources`, with `dependencies.dataFreshness` and an overall `"degraded"` (HTTP 200).
+`bun run smoke:prod` fails on `"degraded"` and names the feeds.
+
 **It installs its env (2026-10-13).** The object is an entry point like the fetch and scheduled
 handlers, and may run in an isolate neither has primed. Its constructor ignored `env` until
 2026-10-13, so the hourly alarm's ingest read no `FRED_API_KEY` through `readSetting`; in

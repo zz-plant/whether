@@ -283,6 +283,17 @@ const buildGroupedRow = ({
 const isDegradedSource = (row: SourceHealthRow) =>
   row.freshnessStatus !== "fresh" || (row.expectsLive && row.mode !== "live");
 
+/**
+ * The sources that are meant to answer live and have gone past their freshness window: what
+ * a monitor should be told. A curated snapshot is current by design and never listed. On
+ * 2026-10-13 /trust printed "Treasury · Stale · 14h old" while /api/health said "ok" — the
+ * health check asked only whether a report loaded, and a report built from stale inputs loads.
+ */
+export const listStaleLiveSources = (rows: readonly SourceHealthRow[]) =>
+  rows
+    .filter((row) => row.expectsLive && row.freshnessStatus === "stale")
+    .map((row) => ({ source: row.sourceName, age: row.ageLabel, lastSuccessfulFetchAt: row.lastSuccessfulFetchAt }));
+
 export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
   rows
     .filter(isDegradedSource)
