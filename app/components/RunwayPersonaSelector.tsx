@@ -57,6 +57,8 @@ export function RunwayPersonaSelector({
         value={selected}
         onSelect={handleSelectRunway}
         ariaLabel="Cash runway band"
+        ordinal
+        stackSublabel
       />
     </div>
   );

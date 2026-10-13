@@ -4181,3 +4181,14 @@ surfaces do not reintroduce the old words.
 
 Archived briefs in `data/published_briefs.json` keep the wording they were published with; the
 archive is append-only and its exports are expected to read as they did on the day.
+
+### 1.1.73 Controls read as instrument parts (2026-10-13)
+
+Every segmented control — plan horizon, stage, cash runway, the decision picker, and the ones on
+/signals, /operate, /share and the subscribe form — is a recessed well with keys in it
+(`docs/agents/ui-ux-standards.md` §XXVI). The chosen key stands proud and lights its lamp, and a
+pressed key sinks. Stage and cash runway are ordered scales: a rule with a tick under each key and
+a pointer under the chosen one, with Bootstrapped set apart from the funded stages. The company
+controls are four equal keys on one row from `sm` up, each label over its sublabel, where they
+used to break 2 + 2 and wrap each sublabel mid-phrase. No gradient or specular: §XXV stands.
+
