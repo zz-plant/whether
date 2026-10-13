@@ -87,6 +87,13 @@ and its history download now serves a JavaScript proof-of-work page, so it is no
 
 ## Ingest coordinator
 
+**It installs its env (2026-10-13).** The object is an entry point like the fetch and scheduled
+handlers, and may run in an isolate neither has primed. Its constructor ignored `env` until
+2026-10-13, so the hourly alarm's ingest read no `FRED_API_KEY` through `readSetting`; in
+production every feed sat at the 02:00 cron's fetch all day ("Treasury · Stale · 14h old" on
+`/trust`). It calls `installBindings(env)` now, and `tests/ingestCoordinator.test.ts` holds it.
+Any new Durable Object or Workflow that calls into `lib/` does the same.
+
 `worker/ingestCoordinator.ts` is a SQLite-backed Durable Object that owns the materialized
 model, the refresh lock, and an hourly alarm that ingests due families. It replaces KV's
 best-effort lock (two isolates can win the same expired lock) with real mutual exclusion and
