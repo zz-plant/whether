@@ -163,6 +163,17 @@ describe("HistoricalTrendChart", () => {
     assert.doesNotMatch(text, /3 months/, "the point count is not the span");
   });
 
+  it("draws on the score's 0–100 scale with its change line when given one", () => {
+    const html = renderToStaticMarkup(
+      <HistoricalTrendChart label="Funding pressure" color="red" points={points} periodLabel="months" changeLine={70} />,
+    );
+    assert.match(html, /data-change-line/);
+    assert.match(html, /aria-label="Funding pressure over 2 months, on its 0–100 scale with the change line at 70\./);
+    assert.doesNotMatch(html, /ranging 40–60/, "a fixed scale states the scale, not the data's range");
+    const plain = renderToStaticMarkup(<HistoricalTrendChart label="Tightness" color="red" points={points} />);
+    assert.doesNotMatch(plain, /data-change-line/, "no line without one");
+  });
+
   it("shares its projection with the inline sparkline instead of a second implementation", () => {
     const values = points.map((p) => p.value);
     const domain = sparklineDomain(values);

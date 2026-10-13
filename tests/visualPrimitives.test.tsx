@@ -395,6 +395,20 @@ describe("TrustStrip", () => {
 });
 
 describe("MonthStrip", () => {
+  it("names both scores in a month's hover title when it has them", () => {
+    const html = renderToStaticMarkup(
+      <MonthStrip
+        entries={[
+          { recordDate: "2026-08-31", regime: "EXPANSION", tightness: 63, riskAppetite: 56 },
+          { recordDate: "2026-09-30", regime: "DEFENSIVE", tightness: 90, riskAppetite: 56 },
+        ]}
+      />,
+    );
+    assert.match(html, /title="Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56"/);
+    const bare = renderToStaticMarkup(<MonthStrip entries={[{ recordDate: "2026-09-30", regime: "DEFENSIVE" }]} />);
+    assert.match(bare, /title="Sep 2026: Cloudy"/);
+  });
+
   const entries = [
     { recordDate: "2026-03-31", regime: "EXPANSION" },
     { recordDate: "2026-04-30", regime: "EXPANSION" },
