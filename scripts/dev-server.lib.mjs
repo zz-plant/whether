@@ -245,6 +245,8 @@ export const withDevServer = async ({
   probe,
   onStatus = () => {},
   body,
+  /** Fresh starts to try before readiness counts as failed. */
+  startAttempts = 1,
   lockfilePath = path.join(process.cwd(), ".vinext", "dev", "lock.json"),
 }) => {
   const initialProbe = await probe(baseUrl);
@@ -278,23 +280,51 @@ export const withDevServer = async ({
     onStatus(`Starting dev server with \`bun run ${devScript}\` for ${target.baseUrl}`);
   }
 
-  const started = await startDevServer({
-    baseUrl: target.baseUrl,
-    outDir,
-    devScript,
-    logName,
-  });
-
-  try {
-    await waitForBaseUrl({
+  /* Only readiness is retried, never the work. The deploy gate's landmark audit failed
+     production builds on 2026-10-14 (550d400, e267ede) when the dev server did not answer
+     in 180s on a cold Workers Builds container, with builds either side passing; its log
+     sat in the container where nobody could read it. Each failed start now prints the
+     log's tail, and a caller can ask for a second, fresh start before giving up. */
+  for (let attempt = 1; ; attempt += 1) {
+    const started = await startDevServer({
       baseUrl: target.baseUrl,
-      timeoutMs,
-      child: started.child,
-      logPath: started.logPath,
-      probe,
+      outDir,
+      devScript,
+      logName,
     });
-    return await body(target.baseUrl, started);
-  } finally {
-    await stopDevServer(started.child);
+
+    try {
+      await waitForBaseUrl({
+        baseUrl: target.baseUrl,
+        timeoutMs,
+        child: started.child,
+        logPath: started.logPath,
+        probe,
+      });
+    } catch (error) {
+      await stopDevServer(started.child);
+      const message = `${error instanceof Error ? error.message : String(error)}${formatLogTail(started.logPath)}`;
+      if (attempt < startAttempts) {
+        onStatus(`${message}\nStarting a fresh dev server (attempt ${attempt + 1} of ${startAttempts}).`);
+        continue;
+      }
+      throw new Error(message, { cause: error });
+    }
+
+    try {
+      return await body(target.baseUrl, started);
+    } finally {
+      await stopDevServer(started.child);
+    }
+  }
+};
+
+/** The last lines of a dev-server log, for an error that would otherwise only name the file. */
+const formatLogTail = (logPath, lines = 30) => {
+  try {
+    const tail = readFileSync(logPath, "utf8").trimEnd().split("\n").slice(-lines).join("\n");
+    return tail ? `\n--- last ${lines} lines of ${logPath} ---\n${tail}` : `\n(${logPath} is empty)`;
+  } catch {
+    return "";
   }
 };

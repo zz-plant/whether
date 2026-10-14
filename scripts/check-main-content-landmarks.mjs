@@ -165,6 +165,9 @@ const run = async () => {
     outDir: "artifacts/landmarks",
     logName: "check-main-content-landmarks.dev.log",
     timeoutMs,
+    // A second, fresh start in the deploy gate only: a cold container's first start is the
+    // one that has missed its deadline (dev-server.lib.mjs). Locally a failure is real.
+    startAttempts: inDeployGate ? 2 : 1,
     probe,
     onStatus: (message) => console.log(message),
     body: audit,
