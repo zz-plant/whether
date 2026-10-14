@@ -7,6 +7,7 @@ import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 
 /*
  * The two artifacts that leave the building.
@@ -38,7 +39,7 @@ const liveSnapshot = (recordDate = "2026-08-28") =>
       record_date: recordDate,
       fetched_at: `${recordDate}T12:00:00.000Z`,
     },
-    macroSeries,
+    macroSeries: liveMacroSeries,
     now: FRESH_NOW,
   });
 

@@ -202,6 +202,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
       isFallback: isSavedCopy(treasury),
       isLive: treasury.isLive,
       fallbackReason: treasury.fallback_reason,
+      macroSeries,
       recordDate: treasury.record_date ?? treasury.fetched_at,
       now,
     }),

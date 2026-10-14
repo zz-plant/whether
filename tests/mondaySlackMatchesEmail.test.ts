@@ -7,7 +7,7 @@ import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import type { OperatingSnapshot } from "../lib/operatingState/types";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
-import { macroSeries } from "../lib/macroSnapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { snapshotData } from "../lib/snapshot";
 import { macros, treasury as fixtureTreasury } from "./factories/exportFixtures";
 
@@ -36,7 +36,7 @@ const overrideSnapshot = () =>
 const ordinarySnapshot = () =>
   buildOperatingSnapshot({
     treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-    macroSeries,
+    macroSeries: liveMacroSeries,
     now: new Date("2026-08-31T12:00:00.000Z"),
   });
 

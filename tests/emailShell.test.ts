@@ -7,7 +7,7 @@ import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { escapeHtml } from "../lib/email/emailShell";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
-import { macroSeries } from "../lib/macroSnapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import type { KvNamespace } from "../lib/runtime/kv";
 import { siteUrl } from "../lib/siteUrl";
@@ -150,7 +150,7 @@ describe("the shared email shell, on production", () => {
     const now = new Date("2026-08-31T12:00:00.000Z");
     const snapshot = buildOperatingSnapshot({
       treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-      macroSeries,
+      macroSeries: liveMacroSeries,
       now,
     });
 
