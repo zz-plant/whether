@@ -5,6 +5,8 @@
  * instance where WHETHER_HISTORY_WORKFLOW=1 (production and the preview lane). Each step is retried and
  * observable in the Workflows dashboard, which is the property the scheduled routine lacked:
  * it failed at its PR step while reporting success. A run that cannot open its PR fails here.
+ * Where WHETHER_AUTOMERGE_DATA_PRS=1 it also merges the PR once its branch build is green
+ * (./landDataPullRequest.ts), and a PR it may not merge fails the run instead.
  *
  * The work itself is in lib/summary/regimeHistoryPullRequest.ts, where bun tests can reach it;
  * this class only sequences it into durable steps.
@@ -19,13 +21,16 @@ import {
   buildRegimeHistoryUpdateAgainstBase,
   openRegimeHistoryPullRequest,
   readStoredMonthlyRegimeHistory,
+  REGIME_HISTORY_FILE_PATH,
   type OpenRegimeHistoryPullRequestResult,
 } from "../../lib/summary/regimeHistoryPullRequest";
+import { isDataPullRequestAutoMergeOn, landDataPullRequest } from "./landDataPullRequest";
 
 type RegimeHistoryWorkflowEnv = {
   WHETHER_DURABLE_KV: Pick<KvNamespace, "get">;
   GITHUB_TOKEN?: string;
   GITHUB_REPOSITORY?: string;
+  WHETHER_AUTOMERGE_DATA_PRS?: string;
 };
 
 type RegimeHistoryWorkflowParams = {
@@ -87,6 +92,16 @@ export class RegimeHistoryRefreshWorkflow extends WorkflowEntrypoint<RegimeHisto
       return { opened: false, reason: `${base} already carries every month KV has` };
     }
 
-    return step.do("open the pull request", retries, () => openRegimeHistoryPullRequest({ client, update, base }));
+    const opened = await step.do("open the pull request", retries, () => openRegimeHistoryPullRequest({ client, update, base }));
+    if (opened.opened && isDataPullRequestAutoMergeOn(this.env)) {
+      await landDataPullRequest({
+        step,
+        client,
+        number: opened.pullRequest.number,
+        paths: [REGIME_HISTORY_FILE_PATH],
+        title: `chore: record the month in progress in the regime history (#${opened.pullRequest.number})`,
+      });
+    }
+    return opened;
   }
 }

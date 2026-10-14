@@ -67,7 +67,11 @@ The argument for not waiting on a longer preview trial: the archive is deliberat
 backfilled, so every week spent proving this is a week the record can never honestly claim, and the
 failure modes are bounded — a bad run throws, opens no pull request, and writes a failing row;
 `assembleCurrentWeekBrief` refuses degraded and fallback data outright; and nothing merges the pull
-request without a person.
+request without a person. (Superseded 2026-10-14: the Workflows now merge their own data pull request
+once Cloudflare's branch build of it is green and it changes only its data file. A person merged w38
+through w41 by hand, and judging that a green gate ran on a one-file data change is mechanical. The
+branch build is the gate a freeze that moves a pinned test fails, before it reaches `main` and blocks
+every deploy. Details: the runbook's "Data pull requests merge themselves".)
 
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
