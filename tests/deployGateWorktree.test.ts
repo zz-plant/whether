@@ -1,10 +1,10 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { buildCommit, worktreeDrift } from "../scripts/exec.mjs";
+import { buildCommit, restoreTrackedFromHead, worktreeDrift } from "../scripts/exec.mjs";
 
 /*
  * The deploy gate refuses a tree that is not its commit. A build container once ran the
@@ -28,14 +28,15 @@ const gitRepository = () => {
 const gitFreeEnv = () => {
   const env = { ...process.env };
   for (const key of Object.keys(env)) if (key.startsWith("GIT_")) delete env[key];
+  delete env.WORKERS_CI;
   return env;
 };
 
-const runGate = (cwd: string) =>
+const runGate = (cwd: string, extraEnv: Record<string, string> = {}) =>
   spawnSync("bun", [join(process.cwd(), "scripts", "run-checks.mjs"), "lint"], {
     cwd,
     encoding: "utf8",
-    env: { ...gitFreeEnv(), WHETHER_DEPLOY_GATE: "1" },
+    env: { ...gitFreeEnv(), WHETHER_DEPLOY_GATE: "1", ...extraEnv },
   });
 
 describe("deploy gate worktree check", () => {
@@ -98,18 +99,55 @@ describe("deploy gate worktree check", () => {
     }
   });
 
-  it("refuses to run the deploy gate against a tree that is not its commit, and names the files", () => {
+  it("refuses a local tree that is not its commit, names the files, and leaves the edit alone", () => {
     const { repository } = gitRepository();
 
     try {
-      writeFileSync(join(repository, "tracked.txt"), "what a stale cache restored\n");
+      writeFileSync(join(repository, "tracked.txt"), "an edit nobody has committed\n");
       const result = runGate(repository);
       const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
 
       assert.equal(result.status, 1, `expected a refusal, got ${result.status}:\n${output}`);
       assert.match(output, /working tree is not the commit/);
       assert.match(output, /tracked\.txt/, "a refusal that does not name the file is the log we already had");
-      assert.match(output, /build cache/, "the build container is where this fires, so say what to do there");
+      assert.equal(readFileSync(join(repository, "tracked.txt"), "utf8"), "an edit nobody has committed\n");
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
+  });
+
+  /* Workers Builds restores its build output cache over the clone; git there still holds the
+     commit, so the gate puts the file back instead of asking someone to clear the cache. */
+  it("restores a stale tracked file from HEAD inside Workers Builds, names it, and carries on", () => {
+    const { repository } = gitRepository();
+
+    try {
+      writeFileSync(join(repository, "tracked.txt"), "what a stale cache restored\n");
+      writeFileSync(join(repository, "leftover.txt"), "an untracked file from the cache\n");
+      const output = `${runGate(repository, { WORKERS_CI: "1" }).stdout ?? ""}`;
+
+      assert.match(output, /resetting them to the commit/);
+      assert.match(output, /tracked\.txt/);
+      assert.doesNotMatch(output, /working tree is not the commit/);
+      assert.equal(readFileSync(join(repository, "tracked.txt"), "utf8"), "committed\n");
+      assert.equal(readFileSync(join(repository, "leftover.txt"), "utf8"), "an untracked file from the cache\n");
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
+  });
+
+  it("puts deleted and modified tracked files back and reports nothing left over", () => {
+    const { repository, git } = gitRepository();
+
+    try {
+      writeFileSync(join(repository, "second.txt"), "second\n");
+      git("add", "second.txt");
+      git("commit", "--quiet", "-m", "second");
+      writeFileSync(join(repository, "tracked.txt"), "stale\n");
+      rmSync(join(repository, "second.txt"));
+
+      assert.deepEqual(restoreTrackedFromHead(repository)?.tracked, []);
+      assert.equal(readFileSync(join(repository, "second.txt"), "utf8"), "second\n");
     } finally {
       rmSync(repository, { recursive: true, force: true });
     }

@@ -267,9 +267,14 @@ content wrong. (The marker had this answer the whole time and threw it away: its
 returned `""` for a dirty tree and its doc comment asserted the container "checks out clean".
 Believing that sentence cost a day and three wrong public hypotheses.)
 
-Clearing the project's build cache in the Cloudflare dashboard is the remedy, and it is a dashboard
-action: no push from here can fix a stale cache, and deleting the two assertions would have made
-`main` green while hiding the fact that stale static assets were the thing about to deploy.
+Clearing the project's build cache in the Cloudflare dashboard was the remedy until 2026-10-14, by
+hand, every time the cache went stale. That paragraph said no push from here could fix a stale cache,
+which was wrong: the gate runs inside the container, and git there holds the commit. Under
+`WORKERS_CI=1` the gate now runs `restoreTrackedFromHead` (`scripts/exec.mjs`, a `git reset --hard
+HEAD`), names every file it reset, and refuses only if drift survives the reset. Deleting the two
+assertions would still have been wrong: they are what showed that stale static assets were about to
+deploy. The reset is limited to the build container because on a laptop the same drift is
+uncommitted work.
 
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
