@@ -140,13 +140,19 @@ const buildReversalCondition = (
   const nearestRiskGap = Math.abs(assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime);
   const useTightness = nearestTightnessGap <= nearestRiskGap;
 
+  /* The crossing still ahead, read from the side the score is on now, with the
+     engine's sides (above the line is tight, or risk-on). Choosing it from the
+     tilt alone printed "rises above 70" at a funding pressure of 73: a
+     condition already met the week it was published. */
   if (useTightness) {
-    const direction = actionBias === "loosen" ? "rises above" : "falls to or below";
-    return `Drop the sector tilt if funding pressure ${direction} ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`;
+    const line = assessment.thresholds.tightnessRegime;
+    const direction = assessment.scores.tightness > line ? "falls to or below" : "rises above";
+    return `Drop the sector tilt if funding pressure ${direction} ${formatThresholdNumber(line)}.`;
   }
 
-  const direction = actionBias === "loosen" ? "falls to or below" : "rises above";
-  return `Drop the sector tilt if risk appetite ${direction} ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)}.`;
+  const line = assessment.thresholds.riskAppetiteRegime;
+  const direction = assessment.scores.riskAppetite > line ? "falls to or below" : "rises above";
+  return `Drop the sector tilt if risk appetite ${direction} ${formatThresholdNumber(line)}.`;
 };
 
 export const deriveSectorAdjustedPosture = (

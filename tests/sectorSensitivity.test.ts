@@ -92,6 +92,39 @@ describe("deriveSectorAdjustedPosture", () => {
     assert.equal(first.actionBias, "hold");
     assert.equal(second.actionBias, "hold");
   });
+  it("phrases the reversal as a crossing still ahead, from either side of the line", () => {
+    const thresholds = { tightnessRegime: 70, riskAppetiteRegime: 50 };
+    // Loosening tilt above the funding line: this read "rises above 70" at 73.
+    const aboveLine = deriveSectorAdjustedPosture(
+      { regime: "DEFENSIVE", scores: { tightness: 73, riskAppetite: 45 }, thresholds },
+      "b2b-saas",
+    );
+    assert.equal(aboveLine.actionBias, "loosen");
+    assert.equal(aboveLine.reversalCondition, "Drop the sector tilt if funding pressure falls to or below 70.");
+
+    const belowLine = deriveSectorAdjustedPosture(
+      { regime: "EXPANSION", scores: { tightness: 60, riskAppetite: 80 }, thresholds },
+      "infrastructure",
+    );
+    assert.equal(belowLine.actionBias, "tighten");
+    assert.equal(belowLine.reversalCondition, "Drop the sector tilt if funding pressure rises above 70.");
+
+    // Risk appetite nearer its line, on each side.
+    const riskAbove = deriveSectorAdjustedPosture(
+      { regime: "EXPANSION", scores: { tightness: 50, riskAppetite: 60 }, thresholds },
+      "infrastructure",
+    );
+    assert.equal(riskAbove.actionBias, "tighten");
+    assert.equal(riskAbove.reversalCondition, "Drop the sector tilt if risk appetite falls to or below 50.");
+
+    const riskBelow = deriveSectorAdjustedPosture(
+      { regime: "SCARCITY", scores: { tightness: 95, riskAppetite: 42 }, thresholds },
+      "b2b-saas",
+    );
+    assert.equal(riskBelow.actionBias, "loosen");
+    assert.equal(riskBelow.reversalCondition, "Drop the sector tilt if risk appetite rises above 50.");
+  });
+
   it("keeps neutral sector in hold mode at thresholds", () => {
     const output = deriveSectorAdjustedPosture(
       {

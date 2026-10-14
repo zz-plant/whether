@@ -213,7 +213,9 @@ describe("interpretation layer", () => {
     assert.match(sectorText, /Sector view/);
     assert.match(sectorText, /Action: Cloudy\+\. Run this sector a step ahead of the base guidance\./);
     assert.ok(sectorText.includes(`${DECISION_CONTRACT_LABELS.slot.threshold}: Hold irreversible hiring.`));
-    assert.match(sectorText, /Reverse: Drop the sector tilt if funding pressure rises above 70\./);
+    // Funding pressure is 74 here, so the crossing ahead is downward; this pinned
+    // "rises above 70", a condition already met.
+    assert.match(sectorText, /Reverse: Drop the sector tilt if funding pressure falls to or below 70\./);
     assert.match(financialText, /Financial view/);
     assert.match(financialText, /Runway risk/);
     assert.ok(financialText.includes(`${DECISION_CONTRACT_LABELS.slot.threshold}: Open the raise between month`));
