@@ -10,6 +10,11 @@ import { loadReportData } from "../lib/report/reportData";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import type { MacroSeriesId, TreasuryData } from "../lib/types";
+import {
+  findTimeMachineGovernedAssessment,
+  getPreviousTimeMachineSnapshot,
+  getTimeMachineSnapshots,
+} from "../lib/timeMachine/timeMachineCache";
 
 const mockAny: any = mock;
 
@@ -71,6 +76,53 @@ describe("a replayed month carries its own macro readings, or none", () => {
       assert.ok(
         reading.value === null || reading.record_date <= asOf,
         `${reading.id} carries ${reading.value} from ${reading.record_date}, after the month it is printed under (${asOf})`,
+      );
+    }
+  });
+});
+
+/*
+ * A replay is the governed record, and so is what it is compared with. The month-end
+ * before it and the one a year back were point reads, which disagree with the record's
+ * conditions in 24 of the 177 month-ends on file (2026-10-14). December 2024 reads
+ * DEFENSIVE alone where the record says SCARCITY, so the January 2025 replay announced
+ * a move to Freezing; February 2020 reads EXPANSION where the record says VOLATILE.
+ */
+describe("a replayed month is compared with the record, not a point read", () => {
+  it("reports no change of conditions into January 2025, which the record holds at Freezing", async () => {
+    const january = await loadReportData({ month: "1", year: "2025" });
+    const monthEnd = getPreviousTimeMachineSnapshot(january.treasury.record_date);
+    assert.ok(monthEnd);
+    assert.equal(evaluateRegime(monthEnd).regime, "DEFENSIVE");
+    assert.equal(findTimeMachineGovernedAssessment(monthEnd.record_date)?.regime, "SCARCITY");
+
+    assert.equal(january.assessment.regime, "SCARCITY");
+    assert.equal(january.regimeAlert, null);
+    assert.equal(january.reportDynamics.regimeChanged, false);
+  });
+
+  it("compares March 2020 with February's record and the year-earlier record", async () => {
+    const march = await loadReportData({ month: "3", year: "2020" });
+    const lastYear = march.lastYearComparison;
+    assert.ok(lastYear);
+
+    assert.equal(march.regimeAlert, null, "February 2020's record is already Stormy");
+    assert.equal(lastYear.prior.regime, findTimeMachineGovernedAssessment(lastYear.prior.recordDate)?.regime);
+  });
+
+  // The split's first stage is measured from the rates-alone read of the month-end. Where
+  // the record's scores differ from it, that gap would print as a move in rates.
+  it("splits a month-end move only when the record scores the month-end as the rates alone do", async () => {
+    for (const { year, month } of getTimeMachineSnapshots().slice(-24)) {
+      const replay = await loadReportData({ month: String(month), year: String(year) });
+      const monthEnd = getPreviousTimeMachineSnapshot(replay.treasury.record_date);
+      if (!monthEnd || !replay.monthEndComparison?.movement) continue;
+      const point = evaluateRegime(monthEnd, replay.thresholds).scores;
+      const record = findTimeMachineGovernedAssessment(monthEnd.record_date, replay.thresholds)?.scores ?? point;
+      assert.deepEqual(
+        { tightness: record.tightness, riskAppetite: record.riskAppetite },
+        { tightness: point.tightness, riskAppetite: point.riskAppetite },
+        `${year}-${month} split a move from a month-end the record scores differently`,
       );
     }
   });
