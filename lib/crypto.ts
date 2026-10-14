@@ -1,7 +1,7 @@
 /**
- * The WebCrypto steps the signing code shares. Slack signatures, ledger client tokens, Stripe
- * webhook signatures and entitlement tokens each imported an HMAC key and hex-encoded a digest
- * by hand; the comparison half is `constantTimeCompare`.
+ * The WebCrypto steps the signing code shares. Slack signatures and ledger client tokens each
+ * imported an HMAC key and hex-encoded a digest by hand; the comparison half is
+ * `constantTimeCompare`.
  */
 const encoder = new TextEncoder();
 

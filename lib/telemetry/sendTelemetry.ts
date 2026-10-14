@@ -3,12 +3,12 @@ import { STORAGE_KEYS } from "../storage/keys";
 /**
  * How a browser sends a measurement, and the one place it can be told not to.
  *
- * Six emitters (activation, route moves, web vitals, search, content, checkout)
- * each carried their own copy of the beacon-then-fetch send. That was harmless
- * until there was a reason to stop sending: on 2026-09-30 the homepage's 85
- * arrival-tagged visits were 81 returning browsers reloading the page and four
- * first visits, so the owner's own checks were most of what the funnel counted.
- * An opt-out honoured in six places is an opt-out the seventh emitter forgets.
+ * Each emitter (activation, route moves, web vitals, search, content) carried
+ * its own copy of the beacon-then-fetch send. That was harmless until there was
+ * a reason to stop sending: on 2026-09-30 the homepage's 85 arrival-tagged
+ * visits were 81 returning browsers reloading the page and four first visits,
+ * so the owner's own checks were most of what the funnel counted. An opt-out
+ * honoured in every emitter is an opt-out the next emitter forgets.
  *
  * The opt-out is a key in this browser's storage. Nothing is sent to say it was
  * set, and `/privacy` section 5 is where a reader sets or clears it.

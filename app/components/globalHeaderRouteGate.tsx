@@ -33,7 +33,7 @@ type GlobalHeaderRouteGateProps = {
  *
  * What still varies by route is small. The sublabel under the wordmark is the
  * route name: shown at every width where no group tab marks the route
- * (`/pricing`, `/about`, `/share`, the legal pages), and below `md` everywhere
+ * (`/about`, `/share`, the legal pages), and below `md` everywhere
  * else, because the bottom bar names the group rather than the page. The home
  * brief carries the phone-only stage pill and the present-mode toggle; the
  * cadence control that used to sit here belongs to the brief and renders

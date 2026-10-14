@@ -62,7 +62,7 @@ export const getBreadcrumbLabel = (path: string, fallbackLabel?: string) => {
 
 /**
  * An explicit trail, for the pages outside the four groups (About, Contact,
- * Pricing, API & MCP) whose trail is Home and the page. A grouped page reads
+ * API & MCP) whose trail is Home and the page. A grouped page reads
  * its trail from `buildGroupBreadcrumbs`, so a renamed group renames it.
  */
 export const createBreadcrumbTrail = (items: Array<{ path: string; label?: string }>) =>

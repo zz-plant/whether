@@ -70,7 +70,7 @@ describe("global header navigation helpers", () => {
     assert.equal(groupOf("/answers/should-startups-raise-capital-now"), "guides");
     assert.equal(groupOf("/resolve/ceo"), "guides");
     assert.equal(groupOf("/toolkits/focus"), "guides");
-    for (const ungrouped of ["/share", "/pricing", "/about", "/api-docs", "/search", "/privacy", "/decisions"]) {
+    for (const ungrouped of ["/share", "/about", "/api-docs", "/search", "/privacy", "/decisions"]) {
       assert.equal(groupOf(ungrouped), null, `${ungrouped} belongs to no group`);
     }
   });
@@ -82,7 +82,7 @@ describe("global header navigation helpers", () => {
     assert.deepEqual(active("/operate/financial"), ["Decide"]);
     assert.deepEqual(active("/brief/2026-w31"), ["Record"]);
     assert.deepEqual(active("/answers/should-startups-raise-capital-now"), ["Guides"]);
-    assert.deepEqual(active("/pricing"), []);
+    assert.deepEqual(active("/about"), []);
   });
 });
 
@@ -125,6 +125,6 @@ describe("sub-tabs", () => {
 
   it("draws none for a one-page group or a route outside the groups", () => {
     assert.equal(resolveSectionTabs("/resources"), null);
-    assert.equal(resolveSectionTabs("/pricing"), null);
+    assert.equal(resolveSectionTabs("/about"), null);
   });
 });

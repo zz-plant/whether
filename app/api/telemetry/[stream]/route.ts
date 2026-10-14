@@ -18,10 +18,10 @@ export const runtime = "edge";
  * written straight through. Two of those five (`ingest-pipeline`, `cron-step`)
  * are authored by the Worker and by nothing else, and `cron-step` is read back
  * and rendered on `/trust` as "Scheduled runs": anyone could have posted a run
- * that never happened onto the page whose job is to be trustworthy. A third,
- * `premium-funnel`, has its own route with a body cap and a validator, which
- * shadows this one for that path anyway, so its entry here was a weaker door
- * that Next never opened. The last two were written by nothing at all.
+ * that never happened onto the page whose job is to be trustworthy. A third
+ * had a dedicated route of its own, which shadowed this one for that path
+ * anyway, so its entry here was a weaker door that Next never opened. The last
+ * two were written by nothing at all.
  *
  * Deriving the set from the validators makes the missing-validator case
  * unreachable rather than merely noticed: a stream with no entry cannot be

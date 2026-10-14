@@ -49,8 +49,6 @@ const GenericSharePresets = ({
   <button
     type="button"
     onClick={onCopyPlain}
-    data-premium-intent="export_brief"
-    data-premium-cta="share_rail_copy_plain"
     className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
   >
     {copiedTarget === "plain" ? "Copied!" : "Plain text"}
@@ -58,8 +56,6 @@ const GenericSharePresets = ({
   <button
     type="button"
     onClick={onCopySlack}
-    data-premium-intent="export_brief"
-    data-premium-cta="share_rail_copy_slack"
     className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
   >
     {copiedTarget === "slack" ? "Copied!" : "Slack format"}

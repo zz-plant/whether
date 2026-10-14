@@ -26,11 +26,10 @@ type EndpointProps = {
   children: React.ReactNode;
   tryHref?: string;
   tryLabel?: string;
-  tryCta?: string;
   tryAriaLabel?: string;
 };
 
-function Endpoint({ signature, children, tryHref, tryLabel, tryCta, tryAriaLabel }: EndpointProps) {
+function Endpoint({ signature, children, tryHref, tryLabel, tryAriaLabel }: EndpointProps) {
   return (
     <div className="weather-surface px-4 py-3 space-y-1">
       <code className="block text-fluid-xs font-semibold text-sky-200">{signature}</code>
@@ -38,8 +37,6 @@ function Endpoint({ signature, children, tryHref, tryLabel, tryCta, tryAriaLabel
       {tryHref ? (
         <a
           href={tryHref}
-          data-premium-intent="api_access"
-          data-premium-cta={tryCta}
           aria-label={tryAriaLabel}
           className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600"
         >
@@ -70,7 +67,7 @@ export default function ApiDocsPage() {
         <h1 className="text-fluid-xl font-semibold text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
           Read this week's guidance from an AI agent, a script, or a dashboard. Whether serves the guidance, the two
-          scores behind it, and the pause and resume lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Free forever, no API key required.
+          scores behind it, and the pause and resume lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Whether is free, and the API needs no key.
         </p>
 
         <section className="space-y-4">
@@ -117,7 +114,6 @@ export default function ApiDocsPage() {
               signature="GET /api/mcp?tool=get_actions"
               tryHref="/api/mcp?tool=get_actions"
               tryLabel="Try it"
-              tryCta="try_mcp_get_actions"
             >
               Discovery. Lists every available tool with its parameters.
             </Endpoint>
@@ -156,7 +152,6 @@ export default function ApiDocsPage() {
               signature={`GET ${WHETHER_AGENT_MANIFEST_PATH}`}
               tryHref={WHETHER_AGENT_MANIFEST_PATH}
               tryLabel="Try it"
-              tryCta="try_agent_manifest"
             >
               Discovery manifest. Every endpoint on this page, the supported cadences, and the
               revisable-delegation conformance level with the third-party verifier that can check
@@ -166,7 +161,6 @@ export default function ApiDocsPage() {
               signature="GET /api/posture/current"
               tryHref="/api/posture/current"
               tryLabel="Try it"
-              tryCta="try_posture_current"
             >
               Stable JSON endpoint for the current guidance. Returns the conditions, funding pressure, direction,
               margin (<code className="font-mono">confidence</code>), week, summary, url, and version. Type contract at lib/types.ts.
@@ -175,7 +169,6 @@ export default function ApiDocsPage() {
               signature="GET /api/agent?view=state"
               tryHref="/api/agent?view=state"
               tryLabel="Try it"
-              tryCta="try_agent_state"
             >
               The state to decide from, about a tenth the size of the full brief: the conditions and the margin from their change lines, the data's freshness (<code className="font-mono">automation.ready</code>), each score against its pause, resume and change lines with the moves behind it, and the guidance. Weekly only. Check{" "}
               <code className="font-mono">automation.ready</code> before acting without a person looking.
@@ -184,7 +177,6 @@ export default function ApiDocsPage() {
               signature="GET /api/agent?cadence=weekly"
               tryHref="/api/agent?cadence=weekly"
               tryLabel="Try it"
-              tryCta="try_agent_brief"
             >
               The full structured brief, with the block an agent hands on. Supports weekly, monthly, quarterly,
               yearly.
@@ -193,7 +185,6 @@ export default function ApiDocsPage() {
               signature="GET /api/agent?format=jev"
               tryHref="/api/agent?format=jev"
               tryLabel="Try it"
-              tryCta="try_agent_jev"
             >
               This week&apos;s guidance as a ready-to-send request for TypeSafe&apos;s Jev decision model
               (<code className="font-mono">typesafe/jev</code> on Cloudflare Workers AI). Put a short
@@ -207,7 +198,6 @@ export default function ApiDocsPage() {
               signature="GET /api/scores"
               tryHref="/api/scores"
               tryLabel="Try it"
-              tryCta="try_scores"
             >
               The two headline numbers on their own: funding pressure, risk appetite, both deltas, the
               distance to the line where conditions change, and the score that would cross first.
@@ -216,7 +206,6 @@ export default function ApiDocsPage() {
               signature="GET /api/cadence"
               tryHref="/api/cadence"
               tryLabel="Try it"
-              tryCta="try_cadence"
             >
               Weekly and monthly summaries side by side, with an alignment status naming any
               constraints where the two cadences disagree.
@@ -225,7 +214,6 @@ export default function ApiDocsPage() {
               signature="GET /api/comps"
               tryHref="/api/comps"
               tryLabel="Try it"
-              tryCta="try_comps"
             >
               SaaS valuation multiples, with the source that answered. Returns 503 when no market
               data source answers, rather than an empty basket.
@@ -234,7 +222,6 @@ export default function ApiDocsPage() {
               signature="GET /api/regime-alerts"
               tryHref="/api/regime-alerts"
               tryLabel="Try it"
-              tryCta="try_regime_alerts"
             >
               Paginated history of alerts sent when conditions changed. Read access is open; only the Monday run writes.
             </Endpoint>
@@ -254,7 +241,6 @@ export default function ApiDocsPage() {
               signature="GET /api/brief/slack"
               tryHref="/api/brief/slack"
               tryLabel="Try it"
-              tryCta="try_brief_slack"
             >
               The week&apos;s guidance preformatted for Slack — action, pause line, resume line.
               Post it to a channel without reformatting.
@@ -263,7 +249,6 @@ export default function ApiDocsPage() {
               signature="GET /api/image/brief"
               tryHref="/api/image/brief"
               tryLabel="View image"
-              tryCta="try_image_brief"
               tryAriaLabel="View the brief as an image"
             >
               The brief as a 1200×800 PNG for decks and threads. Accepts view and company-context
@@ -273,7 +258,6 @@ export default function ApiDocsPage() {
               signature="GET /api/image/slide?stage=seed"
               tryHref="/api/image/slide?stage=seed"
               tryLabel="View slide"
-              tryCta="try_image_slide"
               tryAriaLabel="View the brief as a meeting slide"
             >
               The guidance as a widescreen meeting slide — hand-written SVG, so it stays sharp at projector
@@ -284,7 +268,6 @@ export default function ApiDocsPage() {
               signature="GET /api/export/board-slide?format=pptx|pdf&stage=seed"
               tryHref="/api/export/board-slide?format=pptx&stage=seed"
               tryLabel="Download PPTX"
-              tryCta="try_export_board_slide"
               tryAriaLabel="Download the board slide as a PowerPoint file"
             >
               The same slide as a file: a one-slide native PPTX with every box editable, or a
@@ -295,7 +278,6 @@ export default function ApiDocsPage() {
               signature="GET /api/embed?format=text|json|html"
               tryHref="/api/embed?format=text"
               tryLabel="Try it"
-              tryCta="try_embed_api"
             >
               The brief as a snippet a newsletter build step can insert at send time, in plain
               text, JSON, or ready-to-paste HTML. Takes ticker and stage, so the guidance is calibrated
@@ -305,7 +287,6 @@ export default function ApiDocsPage() {
               signature="GET /brief.md"
               tryHref="/brief.md"
               tryLabel="View brief.md"
-              tryCta="view_brief_md"
               tryAriaLabel="View Markdown brief"
             >
               The current brief in Markdown format. Instant, structured, cacheable.
@@ -314,7 +295,6 @@ export default function ApiDocsPage() {
               signature="GET /llms.txt"
               tryHref="/llms.txt"
               tryLabel="View llms.txt"
-              tryCta="view_llms_txt"
               tryAriaLabel="View LLMs discovery document"
             >
               Agent discovery document. Linked from &lt;link rel=&quot;llm&quot;&gt; in the page head.
@@ -323,7 +303,6 @@ export default function ApiDocsPage() {
               signature="GET /feed.xml"
               tryHref="/feed.xml"
               tryLabel="View feed.xml"
-              tryCta="view_feed_xml"
               tryAriaLabel="View RSS feed"
             >
               RSS feed for the weekly brief. Subscribe in any RSS reader.
@@ -341,8 +320,6 @@ export default function ApiDocsPage() {
             </pre>
             <Link
               href="/share#embed"
-              data-premium-intent="api_access"
-              data-premium-cta="open_embed_builder"
               className="inline-flex text-fluid-micro text-sky-200 underline decoration-sky-600"
             >
               Configure it with a live preview →

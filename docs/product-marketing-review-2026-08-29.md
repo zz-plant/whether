@@ -134,28 +134,14 @@ narrative that requires a buyer nobody has met yet.
 
 ### 5. There is a billing substrate but no offer
 
-`lib/billingStripe.ts` supports `pro` and `team` plans, `POST /api/billing/checkout` works, and
-`lib/premiumFunnel.ts` measures intent across `export_brief`, `runway_planner`, `integrations`,
-`api_access`, `team_workflow`. There is no pricing page, no price, no packaging statement, and
-`CHECKOUT_RETURN_PATH` now points at `/operate`.
+The review found Stripe checkout and intent capture with no stated price, and recommended a
+`/pricing` page with real prices as a demand test, with this reversal condition: if a priced page
+produced intent within noise of the ungated signal, the paywall should not ship.
 
-`docs/premium-launch-readiness.md` states the pre-reveal intent deliberately — that is a sound
-sequencing choice. But the measurement it produces is weaker than it looks: **clicks on ungated features
-measure curiosity, not willingness to pay.** Intent counted against no price and no gate cannot
-distinguish "I want this" from "I would pay for this," which is precisely the go/no-go question.
-
-**Recommendation.** Ship a `/pricing` page *before* any paywall, as a positioning asset:
-- State what is **free forever** (the weekly call, the API, MCP, embeds — this is the brand promise and
-  the HN credibility; saying so explicitly protects it from looking like a bait-and-switch later).
-- State the paid tiers with real prices and a "not yet available — tell us if you want it" capture.
-  A price is the cheapest, most honest demand test available, and it converts the funnel telemetry from
-  curiosity into qualified intent.
-- Anchor packaging on the segments already instrumented. Based on where the value concentrates:
-  free = the call + API; paid = **continuity and team ritual** (history/archive, alerting, Slack
-  delivery, exports with your framing) rather than paid = more data.
-
-**Reversal condition.** If a priced page produces intent volume within noise of the current ungated
-signal, the demand hypothesis is not confirmed and the paywall should not ship.
+**Outcome (2026-10-14).** The reversal condition held. `/pricing` shipped on 2026-08-28, and the
+intent capture recorded two events from one visitor between 2026-08-21 and 2026-10-14, none from
+`/pricing`. The paid plans, the billing code and the intent capture were removed, and Whether is
+free (`docs/feature-specs-current.md` §1.1.78).
 
 ---
 
@@ -252,7 +238,7 @@ recommendation was changed by contact with the code:
 | 2 | `lib/report/trackRecord.ts` + a Track record panel on `/history`, linked from the first-run explainer |
 | 3 | `canonicalPositioningLine` in `lib/seo.ts` is now the enforced single source; two guardrail rows added |
 | 4 | Sales pack states the validated seed–Series B ICP first and marks the enterprise rows aspirational |
-| 5 | `/pricing` ships with real prices and unwired checkout; free tier is a tested promise |
+| 5 | `/pricing` ships with real prices and unwired checkout; withdrawn on 2026-10-14 (see #5), and Whether is free |
 | 6 | `lib/activationFunnel.ts` defines visited → oriented → committed → returned and instruments it |
 | 7 | `buildBriefPermalinkLine` on every copyable artifact; copy and subscribe emit `committed` |
 | 8 | SEO scoped to decision-query answer pages in the ops runbook; the rest folded into the share loop |

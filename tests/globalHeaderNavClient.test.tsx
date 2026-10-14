@@ -32,7 +32,7 @@ describe("GlobalHeaderNavClient", () => {
     for (const retired of ["Brief", "Plan", "Evidence", "Resolve", "Trust", "History"]) {
       assert.ok(!bar.includes(`<span>${retired}</span>`), `the bar no longer carries ${retired}`);
     }
-    for (const href of ["/share", "/pricing", "/about"]) {
+    for (const href of ["/share", "/about"]) {
       assert.ok(utility.includes(`href="${href}"`), `the utility row links ${href}`);
     }
     assert.ok(!html.includes("<details"), "no More menu");
@@ -58,7 +58,7 @@ describe("GlobalHeaderNavClient", () => {
     const html = renderToStaticMarkup(
       <MobileNavContent navigationLinks={navigationLinks} currentPathname="/" onClose={() => {}} />,
     );
-    for (const label of ["This week", "Why it changed", "Decide", "Runway planner", "Record", "Compare periods", "Calibration", "Product writing", "Guides", "Use it elsewhere", "API &amp; MCP", "Pricing", "About"]) {
+    for (const label of ["This week", "Why it changed", "Decide", "Runway planner", "Record", "Compare periods", "Calibration", "Product writing", "Guides", "Use it elsewhere", "API &amp; MCP", "About"]) {
       assert.ok(html.includes(label), `the sheet lists ${label}`);
     }
     assert.ok(html.includes("Search or jump to a page"), "the sheet opens search");

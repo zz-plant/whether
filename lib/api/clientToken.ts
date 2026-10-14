@@ -11,8 +11,8 @@ import { readSetting } from "../runtime/settings";
  * typed into a curl. `requireClientOwner` compared the header against the body —
  * both supplied by the same caller — which authenticates nothing.
  *
- * A signed token closes that without an account, which matters: `/pricing`
- * promises "No signup, no key, no trackers", and a login would be a larger
+ * A signed token closes that without an account, which matters: `/privacy`
+ * promises that nothing needs an account or a key, and a login would be a larger
  * change to the product than to the threat. The server signs an id it has seen;
  * presenting the signature proves the id came from here.
  *

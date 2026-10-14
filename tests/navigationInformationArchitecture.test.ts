@@ -16,7 +16,7 @@ import { pathMatchesLink } from "../lib/navigation/pathMatching";
 /*
  * The 2026-10-08 regrouping: four groups in the header — This week, Decide,
  * Record, Guides — each with a hub and its own pages, and the utility links
- * (Use it elsewhere, Pricing, About) beside them rather than in a More menu.
+ * (Use it elsewhere, About) beside them rather than in a More menu.
  */
 describe("navigation groups", () => {
   it("puts four groups in the header, in this order, each on its hub", () => {
@@ -121,12 +121,11 @@ describe("navigation groups", () => {
 });
 
 describe("utility links", () => {
-  it("draws Use it elsewhere, Pricing and About in the header, not behind a menu", () => {
+  it("draws Use it elsewhere and About in the header, not behind a menu", () => {
     assert.deepEqual(
       headerUtilityLinks.map((link) => [link.label, link.href]),
       [
         ["Use it elsewhere", "/share"],
-        ["Pricing", "/pricing"],
         ["About", "/about"],
       ],
     );
@@ -142,8 +141,8 @@ describe("utility links", () => {
 
 /*
  * The footer used to hand-list its own copy of the utility row. The copies
- * drifted, and /pricing — the only page explaining what costs money — ended up
- * in the IA but not in the footer, reachable solely from a header dropdown.
+ * drifted, and a utility page ended up in the IA but not in the footer,
+ * reachable solely from a header dropdown.
  */
 describe("footer mirrors the groups and the utility links", () => {
   const source = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");

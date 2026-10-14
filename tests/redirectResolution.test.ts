@@ -85,6 +85,8 @@ describe("redirect resolution", () => {
       ["/operate/memory", "/history"],
       ["/history/decisions", "/history"],
       ["/threshold", "/about#method"],
+      // The paid tier was removed on 2026-10-14; Whether is free.
+      ["/pricing", "/about"],
       ["/planning/financial", "/operate/financial"],
       // The first version's detail, focus and conflicts pages fold into the one list.
       ["/concepts/escaping-the-build-trap", "/concepts"],

@@ -38,10 +38,10 @@ describe("page metrics from telemetry", () => {
    * "not measurable", which is the true answer and which the queue skips.
    */
   it("reports an unmeasurable conversion rate as null rather than zero", () => {
-    const metrics = buildPageMetrics([conversion("/pricing")]);
+    const metrics = buildPageMetrics([conversion("/about")]);
 
-    assert.equal(metrics.byUrl["/pricing"]?.ctaConversions30d, 1);
-    assert.equal(metrics.byUrl["/pricing"]?.ctaConversionRate, null);
+    assert.equal(metrics.byUrl["/about"]?.ctaConversions30d, 1);
+    assert.equal(metrics.byUrl["/about"]?.ctaConversionRate, null);
   });
 
   /*
