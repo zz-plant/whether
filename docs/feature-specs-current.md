@@ -135,11 +135,19 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    headline action as the `h1` (`weeklyHeadline`, §1.1.60); what the conditions mean; one line on
    why (`describeMovementCause`: the lines the scores crossed, "Risk appetite fell through 54."); the
    trust strip ("Data as of", Sources, and Margin, which says after the points whether the call could
-   change next week); and from `md` up the conditions map with the trail's caption under it. A
-   monthly or quarterly horizon adds `CadenceCallCard` above it with the `h1`. Under the card sit
+   change next week, by `couldCallChangeNextWeek`, §1.1.31a); and from `md` up the conditions map
+   with the trail's caption under it. A monthly or quarterly horizon adds `CadenceCallCard` above it
+   with the `h1`. Under the card sit
    `SinceLastVisit` (only when the conditions or the call differ from what this browser last saw,
    and not when the difference is the earlier conditions the stamp line names) and `YourRecordNote`
    (live briefs only), then Copy Brief (DD-005's one primary action) and the Plan horizon control.
+   `CadenceCallCard` states the horizon's guidance and its Pause if / Resume when pair, and under the
+   pair draws one `ThresholdLadder` for funding pressure and one for risk appetite
+   (`cadenceCallModel.boundedBands`, built by `buildHorizonSignalBands` in
+   `lib/summary/horizonOperatingRules.ts` from the thresholds the pair's sentences use): the score,
+   its move since the comparison reading, and how far it sits from the pause line and the resume
+   line. When the guidance is held the card prints neither the pair nor the ladders; the weekly card
+   below states the hold's lines.
 2. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
    only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
    its default choice, a chosen stage's own action as a stage line, and the runway emphasis once a
@@ -428,7 +436,10 @@ assumptions optimistic in three ways, and this pass fixed each:
   turn RISKY into SAFE). Both now start empty and say what to enter; runway, burn, revenue, and
   growth live in one browser-held profile (`lib/operatorProfile.ts`, `whether.operatorProfile`)
   that the planner and both stress tests share through `OperatorProfileNumberField`, which
-  validates on blur, commits on parse, and treats blank as "not given".
+  validates on blur, commits on parse, and treats blank as "not given". Gross margin came back on
+  2026-09-26 as a figure the operator enters, not a default: `grossMarginPct` (0–100) is on the same
+  profile, asked for only when the Decision Shield's Model is Bootstrapped, and able to turn RISKY
+  into SAFE from there (§5.7).
 - **Dead capture paths removed.** `useCrossDeviceSync` (no call sites), `useDecisionHistory` +
   the history page's "Decision archive" (nothing ever wrote the key it read),
   `lib/report/companyMetrics.ts` and `lib/sensitivityCoefficient.ts` (no product callers), and the
@@ -1687,6 +1698,30 @@ true.
 - `/privacy` 2.1 lists the lines among what a subscription stores. `/pricing` moves the
   line-crossing alert from Pro to Free: it was promised free on the homepage already, and a
   plan nobody can buy would have made plan lines unreachable.
+
+### 1.1.31a One rule for "could change next week" (2026-10-01)
+
+On the week of Sep 29, 2026 the homepage trust strip said "Not expected" and `/brief.md` said
+"Conditions could change next week" about the same reading. The strip read the engine; the brief
+read a second flag on the home model (8 points on the one-scale distance, or any change since the
+month-end comparison), which stayed on for a month after a change that had already passed its
+confirming reading.
+
+- **The rule.** `couldCallChangeNextWeek` (`lib/report/trustStatus.ts`) is yes when a score sits
+  inside the engine's 5-point near band (`diagnostics.transitionWatch`) or the engine is holding a
+  change for its confirming reading (`regimeTransition.pending`), and no otherwise.
+- **Its readers.** The trust strip reads it (`buildTrustStripProps`, with the reason beside it).
+  The home model's `transitionWatch` is computed from it (`lib/report/homeBrief/builders.ts`), so
+  `/brief.md`'s trust line, the memo lines, the change-watch row and the exports that read the
+  model print the strip's answer. No surface keeps a rule of its own.
+- **Data caveat.** `/brief.md`'s provenance line about the state of the data was labelled
+  "Action", the decision contract's word for the operating action, so a week whose guidance was to
+  freeze new commitments printed "Action: Safe to use for near-term planning; proceed with normal
+  approval flow". It is labelled "Data caveat" (`DATA_CAVEAT_LABEL`) and reads "None." on live data;
+  an archived, cached or held reading prints what that state asks of the reader.
+- Tests: `tests/homeBriefModel.test.ts`, `tests/pageReaderContradictions.test.tsx`,
+  `tests/trustStatusTones.test.ts`. The lesson: docs/agents/lessons/tests-and-copy-rules.md
+  ("Two flags for one claim").
 
 ### 1.1.32 Consent for changes, and paid plans that sell what free does not (2026-10-01)
 
@@ -4063,6 +4098,17 @@ $$
   so the artifact could contradict the verdict beside it. The compare-mode verdict badges also
   split UNSAFE (rose) from RISKY (amber); both used to render amber
   (`tests/decisionShield.test.ts`).
+- Bootstrapped mode reads the operator's own gross margin (2026-09-26). With the Decision Shield's
+  Model set to Bootstrapped (`?model=BOOTSTRAPPED`), the plan stress test shows a "Gross margin (%)"
+  field bound to the profile's `grossMarginPct` (optional, 0–100; blank is "not given" and changes
+  nothing). At 70% or more a RISKY verdict becomes SAFE and the line beside the verdict
+  (`financialImpactSummary`) reads "Bootstrapped with N% gross margin, so tighter funding matters
+  less."; under 50% the fragile assumptions add "Gross margin (N%) provides limited buffer if
+  customer demand slows." The under-12-months runway rule in Cloudy and Freezing conditions is
+  checked first and outranks the margin. Bootstrapped mode also drops the two assumptions about
+  outside capital (capital and refinancing staying cheap under elevated funding pressure, investors
+  funding fast burn under low risk appetite) (`stressTestDecisionPlan`, `lib/decisionShield.ts`;
+  `tests/decisionShield.test.ts`).
 
 ## 6) APIs (server routes)
 

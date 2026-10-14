@@ -40,7 +40,8 @@ curl -s "$BASE_URL/api/cadence" | jq '{alignmentStatus, mismatchedConstraints, g
 ```
 
 Ship/publish rule:
-- publish only when `alignmentStatus` is healthy and `mismatchedConstraints` is empty.
+- publish only when `alignmentStatus` is `aligned`, which also means `mismatchedConstraints` is empty.
+- hold on `watch` (same regime, but the weekly and monthly constraint themes differ; `mismatchedConstraints` names them) and on `mismatch` (the weekly and monthly regimes differ).
 
 ## 4) Enforce operational health gate
 
@@ -75,7 +76,7 @@ curl -s "$BASE_URL/api/agent?cadence=weekly" | jq '{recordDateLabel, summaryHash
 
 Recommended policy:
 1. Abort if health is not `ok`.
-2. Abort if cadence alignment is not healthy.
+2. Abort if `alignmentStatus` is not `aligned`.
 3. Only then fetch and distribute the weekly brief.
 
 ---
