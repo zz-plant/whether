@@ -415,6 +415,20 @@ html, body {
   scrollbar-color: var(--border-strong) transparent;
 }
 
+/* Large displays (2026-10-14). Nothing grew past 1536px: the shell stops at
+   96rem, so a 2560-wide monitor left ~40% of the width as margin and set the
+   brief at laptop size. Every container, gap and type step is rem-based, so
+   one root step scales the page as a whole, like browser zoom, without a
+   second set of widths. Percentages keep a reader's own default size; media
+   queries resolve rem against the initial size, so breakpoints do not move.
+   Screenshot mode pins 16px below, which keeps the shared image identical. */
+@media (min-width: 1800px) {
+  html { font-size: 106.25%; }
+}
+@media (min-width: 2400px) {
+  html { font-size: 118.75%; }
+}
+
 /* Screenshot mode — clean, self-contained view for sharing */
 html[data-screenshot="true"] body > header,
 html[data-screenshot="true"] aside,

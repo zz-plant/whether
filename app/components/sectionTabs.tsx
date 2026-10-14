@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { resolveSectionTabs } from "../../lib/navigation/globalHeader";
 import { toRoute, type Route } from "../../lib/navigation/routeType";
+import { SectionTabsActiveInView } from "./sectionTabsActiveInView";
 
 /**
  * The group's pages as a row of text tabs, under the header on every page of a
@@ -28,13 +29,20 @@ export function SectionTabs({ currentPath, query }: { currentPath: Route; query?
   const withQuery = (href: Route) => (query && !href.includes("#") ? toRoute(`${href}?${query}`) : href);
 
   return (
-    <nav aria-label={`${resolved.group.label} pages`} data-section-tabs={resolved.group.key} className="flex flex-wrap items-end gap-x-5 gap-y-1">
+    /* One line below sm (2026-10-14): wrapping put Decide's fourth tab on a row
+       of its own, ~48px of a phone's first screen spent on one link. The row
+       scrolls sideways instead, like the section chips under the intro. */
+    <nav
+      aria-label={`${resolved.group.label} pages`}
+      data-section-tabs={resolved.group.key}
+      className="flex items-end gap-x-4 gap-y-1 max-sm:-mx-4 max-sm:overflow-x-auto max-sm:overscroll-x-contain max-sm:px-4 max-sm:[scrollbar-width:none] sm:flex-wrap sm:gap-x-5"
+    >
       {tabs.map((link) => (
         <Link
           key={link.href}
           href={withQuery(link.href)}
           aria-current={link.isActive ? "page" : undefined}
-          className={`inline-flex min-h-11 items-center border-b-2 text-sm font-medium no-underline transition-colors ${
+          className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 text-sm font-medium no-underline transition-colors ${
             link.isActive
               ? "border-[var(--regime-accent)] text-slate-100"
               : "border-transparent text-slate-400 hover:border-slate-600 hover:text-slate-200"
@@ -44,13 +52,13 @@ export function SectionTabs({ currentPath, query }: { currentPath: Route; query?
         </Link>
       ))}
       {extras.length > 0 ? (
-        <span className="flex flex-wrap items-end gap-x-4 gap-y-1 sm:border-l sm:border-[color:var(--border-default)] sm:pl-5">
+        <span className="flex shrink-0 items-end gap-x-4 gap-y-1 border-l border-[color:var(--border-default)] pl-4 sm:flex-wrap sm:pl-5">
           {extras.map((link) => (
             <Link
               key={link.href}
               href={link.href}
               aria-current={link.isActive ? "page" : undefined}
-              className={`inline-flex min-h-11 items-center border-b-2 text-fluid-xs no-underline transition-colors ${
+              className={`inline-flex min-h-11 shrink-0 items-center whitespace-nowrap border-b-2 text-fluid-xs no-underline transition-colors ${
                 link.isActive
                   ? "border-[var(--regime-accent)] font-medium text-slate-100"
                   : "border-transparent text-slate-500 hover:border-slate-600 hover:text-slate-300"
@@ -61,6 +69,7 @@ export function SectionTabs({ currentPath, query }: { currentPath: Route; query?
           ))}
         </span>
       ) : null}
+      <SectionTabsActiveInView />
     </nav>
   );
 }
