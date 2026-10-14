@@ -287,6 +287,26 @@ describe("DecisionShieldPanel markup", () => {
       assert.ok(markup.includes("Decision verdict"));
     });
 
+    it("offers Record for a described plan but not for a comparison of two", () => {
+      mockSearchParams = new URLSearchParams({
+        planMode: "natural_language",
+        plan: "Hire 2 staff engineers at $250k salary",
+      });
+      assert.ok(renderPanel().includes("Record this decision"));
+
+      /* In compare mode Record filed the hidden list mode's selection — a
+         verdict neither plan on screen had. */
+      mockSearchParams = new URLSearchParams({
+        planMode: "compare",
+        plan: "Prepay annual SaaS vendor for $60k upfront to lock in 25% discount",
+        planB: "Pay SaaS vendor $6k monthly on flexible rolling terms",
+      });
+      const compare = renderPanel();
+      assert.ok(compare.includes("Copy verdict"), "the comparison is still copyable");
+      assert.ok(compare.includes("Copy link"));
+      assert.ok(!compare.includes("Record this decision"));
+    });
+
     it("opens a dropdown link in dropdown mode rather than the plan box", () => {
       mockSearchParams = new URLSearchParams({ planMode: "dropdown" });
 

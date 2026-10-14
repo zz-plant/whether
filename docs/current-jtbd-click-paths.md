@@ -169,7 +169,7 @@ The toolkit page's breadcrumb reads `Guides` › `More tools` › the toolkit; `
 **Clicks**
 1. Click `Decide` in the header. `Test a decision` is open on arrival. (`/resolve` lands here too.)
 2. Choose `Describe a plan`, `Compare two plans` or `Pick from a list`, then enter the move. The verdict appears once there is a plan to judge.
-3. Read the `Decision verdict`, then click `Copy verdict`, `Copy link` or `Record this decision`.
+3. Read the `Decision verdict`, then click `Copy verdict`, `Copy link` or `Record this decision` (not offered when comparing two plans: record one by describing it on its own).
 4. On `/`, pick an area under `What are you deciding?`, or open `All five areas, side by side`; `Test a decision against your runway` tests one commitment in an area against the runway you entered.
 5. For a yes-or-no on a common decision, use `This week's answers, by area` on `Guides` (the step links there).
 
