@@ -20,7 +20,7 @@ import { availableParallelism } from "node:os";
 
 import { resolveCheckPlan } from "./check-tasks.mjs";
 import { withDeployGate } from "./deploy-gate.mjs";
-import { worktreeDrift } from "./exec.mjs";
+import { restoreTrackedFromHead, worktreeDrift } from "./exec.mjs";
 
 let plan;
 try {
@@ -32,11 +32,22 @@ try {
 
 /*
  * Gate-only: a run that claims to test the commit it will deploy must be running against
- * that commit. A tracked file that differs from HEAD is refused and named; untracked files
- * are reported and allowed. A dirty tree is the normal state of a local `bun run check`.
+ * that commit. Untracked files are reported and allowed. A tracked file that differs from
+ * HEAD is restored from HEAD inside Workers Builds, where it can only have come from the
+ * build output cache, and refused and named anywhere else: a dirty tree is the normal state
+ * of a local `bun run check`, and those edits are someone's work.
  */
 const refuseDriftedTree = () => {
-  const drift = worktreeDrift();
+  let drift = worktreeDrift();
+
+  if (drift && drift.tracked.length > 0 && process.env.WORKERS_CI === "1") {
+    process.stdout.write(
+      `[run-checks] ${drift.tracked.length} tracked file(s) differ from HEAD after checkout, ` +
+        `most likely restored by the build output cache; resetting them to the commit:\n` +
+        `${drift.tracked.map(({ code, path }) => `  ${code.padEnd(2)} ${path}`).join("\n")}\n`,
+    );
+    drift = restoreTrackedFromHead();
+  }
 
   if (!drift) {
     process.stdout.write("[run-checks] no readable git checkout here; the checks below run against whatever is on disk.\n");
@@ -61,8 +72,8 @@ const refuseDriftedTree = () => {
         `Every check in this gate judges what is on disk, and so does the build that follows it,\n` +
         `so a run against this tree would score — and deploy — something other than ${drift.commit.slice(0, 8)}.\n` +
         `Refusing rather than reporting a result about a tree nobody pushed.\n\n` +
-        `In a build container this means the checkout was written over after it was made. The build\n` +
-        `output cache restore is the usual candidate: clear this project's build cache and re-run.\n` +
+        `In a build container the gate has already tried resetting these to HEAD and they still differ,\n` +
+        `so something is rewriting them mid-build; clearing the build cache will not help.\n` +
         `Locally, commit or stash the files above, or unset the deploy-gate signal and use \`bun run check\`.\n`,
     );
     process.exit(1);

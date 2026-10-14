@@ -63,11 +63,16 @@ example and the pre-fix `embed.js` — over an otherwise fresh clone, which the 
 `Restoring from build output cache` step explains. Two tests failed on content their own commit had
 replaced, everything else passed, and it read as a flaky suite for a day.
 
-**Fix it in the dashboard, not the repo:** clear the project's build cache in Workers Builds
-(Settings → Build → clear build cache) and re-run the build. Nothing pushed to this repository can
-refresh a stale cache, and deleting the assertions that noticed would leave the stale assets
-deploying silently. The message names every drifted path, so check them against the commit before
-assuming the cache.
+**The gate repairs it now (2026-10-14).** Inside Workers Builds (`WORKERS_CI=1`) the gate resets
+every drifted tracked file to HEAD with `git reset --hard`, lists the files it reset under
+`[run-checks] … resetting them to the commit`, and carries on. Git in the container holds the commit,
+so the cache can no longer decide what gets checked or deployed, and nobody has to clear it by hand.
+Untracked leftovers are still only reported. Outside a build container the gate still refuses and
+touches nothing, because there a drifted file is someone's uncommitted work.
+
+If the refusal still appears in a build log, the reset ran and the files differ again, so something
+is rewriting them during the build; clearing the cache will not fix that. Before 2026-10-14 the
+remedy was clearing the build cache in the dashboard (Settings → Build → clear build cache).
 
 ## Tracing
 
