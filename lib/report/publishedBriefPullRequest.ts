@@ -6,7 +6,8 @@
  * in a sandbox whose egress proxy denies FRED, so every run failed before it had a week to
  * write and the archive stayed at one entry (docs/agents/lessons/automation-and-deploy-gate.md, "Scheduled automation"). This module
  * lands the record from inside Cloudflare, where the data is reachable, behind a pull request
- * so a person still confirms the snapshot before it becomes permanent.
+ * whose branch build must pass before it merges — by the Workflow itself where
+ * WHETHER_AUTOMERGE_DATA_PRS=1 (lib/github/dataPullRequestMerge.ts), by a person otherwise.
  *
  * Append-only is enforced here, not only by convention: a slug the base branch already
  * carries is left exactly as it is, and the update reports no change. Rewriting a published

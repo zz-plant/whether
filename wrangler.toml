@@ -118,6 +118,10 @@ NEXT_PUBLIC_SITE_URL = "https://whether.work"
 WHETHER_INGEST_COORDINATOR = "1"
 WHETHER_HISTORY_WORKFLOW = "1"
 WHETHER_BRIEF_FREEZE_WORKFLOW = "1"
+# Both data Workflows merge their own pull request once Cloudflare's branch build of it is green
+# and it changes only their data file (lib/github/dataPullRequestMerge.ts). "0" hands the merge
+# back to a person without a code change.
+WHETHER_AUTOMERGE_DATA_PRS = "1"
 GITHUB_REPOSITORY = "zz-plant/whether"
 
 [env.preview]

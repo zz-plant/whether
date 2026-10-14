@@ -110,7 +110,7 @@ the Slack signing secret gates one webhook route.
 | --- | --- | --- |
 | `FRED_API_KEY` | `lib/fred.ts` (`fetchFredRows`) | FRED reads stay on the chart-export CSV. A vintage request (`asOf`) throws instead of returning today's revision. |
 | `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median reads SEC EDGAR filings priced with Cboe's delayed quotes, falling back to Yahoo Finance. Neither needs a key. |
-| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly rather than skipping: the regime-history one at its PR step, the freeze at its first line, before it spends a live read. Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token: contents and pull requests, write, on this repository only. |
+| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly rather than skipping: the regime-history one at its PR step, the freeze at its first line, before it spends a live read. Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token on this repository only: contents and pull requests, write; checks, read. The checks permission is what lets a Workflow read its branch build before merging (`WHETHER_AUTOMERGE_DATA_PRS`); without it the merge step fails with HTTP 403 and leaves the pull request open. |
 | `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
 | `SLACK_WEBHOOK_URL` | `lib/delivery/slack.ts` (`slackChannel.listTargets`), for the Monday brief, both crons' `check-regime-change` alerts and the month-end pulse | The operator's own channel is not a target. Every post still goes to the channels subscribed through the form (the per-team webhook registry), and the three tripwire alerts — a regime change, a flip window narrowing, and (since 2026-09-17) a flash, an outsized move in the short rate or the curve since the previous read — are still recorded in the step's result and still reach alert subscribers by email through `alert-deliveries`. |
 | `CLOUDFLARE_ACCOUNT_ID` | `lib/telemetry/runHistory.ts`, `lib/export/briefScreenshot.ts` | Both readers below report themselves unconfigured. The account id is not a secret, but it is set the same way so the two tokens cannot be present without it. |
@@ -205,7 +205,15 @@ secret refuses in seconds and names the secret in its `brief-freeze` row rather 
    repository should say which one rather than inherit it from a constant two modules away.
 
 Then watch `/trust` → Scheduled runs for a `Brief freeze outcome` row on the next Monday, and
-`automation/weekly-brief-freeze-<slug>` for the pull request. Nothing merges it without a person.
+`automation/weekly-brief-freeze-<slug>` for the pull request.
+
+### Data pull requests merge themselves (2026-10-14)
+
+With `WHETHER_AUTOMERGE_DATA_PRS = "1"` in the top-level `[vars]`, both data Workflows merge the pull request they opened (`worker/workflows/landDataPullRequest.ts`). Each waits five minutes for Cloudflare's branch build to start, checks it every five minutes for up to 45 more, then squash-merges only if `lib/github/dataPullRequestMerge.ts` allows it: the pull request is open, it changes exactly the Workflow's one data file, and every Workers Builds check run on its head commit concluded `success`. The merge is pinned to that commit, so GitHub refuses it if anyone pushed after the check.
+
+The branch build is a real gate only because its deploy command became `bun run deploy:cloudflare:branch-check` on 2026-10-14 ("Branch builds" below). Under `npx wrangler preview`, every branch build failed after the gate passed, so a Workflow would never have merged anything. If that command changes again, check that a green branch build still means the deploy gate passed.
+
+A pull request the Workflow may not merge stays open, and the run fails with the reason. That puts it on `/trust` as a failing outcome row and, where `WHETHER_OPS_EMAIL` is set, in the owner's failure email. Set the var to `"0"` to hand merging back to a person.
 
 Why not wait for a longer preview trial: `data/published_briefs.json` is deliberately never
 backfilled, so every week spent proving this is a week the record can never honestly claim. The
