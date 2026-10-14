@@ -8,14 +8,10 @@
 
 /* Tier 2: Secondary surfaces — bands, section bodies */
 .weather-surface-secondary {
-  @apply rounded-lg border backdrop-blur-sm;
+  @apply rounded-lg border;
   border-color: var(--border-default);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.008)),
-    var(--bg-raised);
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 var(--edge-highlight-faint);
+  background: var(--bg-raised);
+  box-shadow: var(--elev-1);
 }
 
 .weather-panel-static {

@@ -24,14 +24,8 @@
 .weather-surface {
   @apply rounded-2xl border;
   border-color: var(--border-strong);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
-    var(--bg-surface);
-  backdrop-filter: blur(calc(16px * var(--shadow-scale)));
-  -webkit-backdrop-filter: blur(calc(16px * var(--shadow-scale)));
-  box-shadow:
-    var(--elev-3),
-    inset 0 1px 0 var(--edge-highlight);
+  background: var(--bg-surface);
+  box-shadow: var(--elev-2);
   transition: border-color 250ms ease, box-shadow 250ms ease;
   container-type: inline-size;
 }
@@ -50,14 +44,8 @@
   @apply rounded-xl border px-4 py-3.5 sm:px-5 sm:py-4;
   border-color: var(--border-default);
   transition: border-color 250ms ease, box-shadow 250ms ease;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)),
-    color-mix(in srgb, var(--bg-body) 38%, transparent);
-  backdrop-filter: blur(calc(12px * var(--shadow-scale)));
-  -webkit-backdrop-filter: blur(calc(12px * var(--shadow-scale)));
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 var(--edge-highlight-faint);
+  background: var(--bg-panel);
+  box-shadow: var(--elev-1);
 }
 
 /* No hover on a container. A stat card that lifts and glows under the pointer
@@ -74,25 +62,15 @@
    the hero the only elevation on the brief. */
 .weather-hero-card {
   position: relative;
-  /* A flat fill, not a wash. This card is the block people screenshot, and
-     every channel it lands in re-encodes the image: a soft gradient on a dark
-     ground comes back as visible bands. The hue carries on a solid 3px rule
-     across the top edge, which survives any encoder and any crop that keeps
-     the card; the fill and border hold only a trace of it, so the call, not
-     the box, is what reads first. */
-  background: color-mix(in srgb, var(--bg-panel) 95%, var(--regime-accent) 5%);
-  border-color: color-mix(in srgb, var(--regime-accent) 12%, var(--border-strong));
-  box-shadow:
-    var(--elev-3),
-    inset 0 3px 0 var(--regime-accent);
+  background: var(--bg-panel);
+  border-color: color-mix(in srgb, var(--regime-accent) 20%, var(--border-strong));
+  box-shadow: var(--elev-2);
 }
 
 html[data-theme="light"] .weather-hero-card {
-  background: color-mix(in srgb, var(--bg-panel, #ffffff) 97%, var(--regime-accent) 3%);
-  border-color: color-mix(in srgb, var(--regime-accent) 14%, var(--border-strong));
-  box-shadow:
-    var(--elev-2),
-    inset 0 3px 0 var(--regime-accent);
+  background: var(--bg-panel, #ffffff);
+  border-color: color-mix(in srgb, var(--regime-accent) 18%, var(--border-strong));
+  box-shadow: var(--elev-1);
 }
 
 /* The regime's atmosphere. One wash for both shells: the brief's container
