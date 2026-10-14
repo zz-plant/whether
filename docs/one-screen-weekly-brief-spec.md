@@ -235,6 +235,7 @@ Implementation guardrails:
 - When every bounded rule clears on the same conditions, state that corridor once above the ledger (`sharedFlipCorridor`). The per-lane `Pause if` / `Clears when` logic stays — it is non-negotiable top-fold content — but the shared corridor tells the operator these lanes flip together, which no single row can. Suppress the line when the rules genuinely diverge.
 - The weekly call and the score that grades it must share the first viewport at 375px. The hero orders call → score → supporting detail when stacked, and restores the two-column grid at `sm` and above.
 - Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move trajectory, continuity, and longer explanation into disclosure content below the primary scan path.
+- "Could change next week" is one flag, `couldCallChangeNextWeek` (`lib/report/trustStatus.ts`): a score inside the engine's near band, or a change held for its confirming reading. The trust strip reads it, and the home model's `transitionWatch` is computed from it for `/brief.md`'s trust line, the memo lines, the change-watch row and the exports. No surface derives its own (`docs/feature-specs-current.md` §1.1.31a).
 - Trust on `/` should remain compact: keep one inline verdict in the action lane and avoid duplicating trust as a separate summary card.
 - On `/`, the first scan should read as one dominant weekly decision card. Detailed per-area rules should stay available, but behind a closed-by-default disclosure instead of an always-open matrix.
 - On `/`, the share rail should default to one recommended artifact path first. Alternate artifact modes, shorter variants, and heavier packaging should live behind secondary disclosure UI.
@@ -508,6 +509,8 @@ same thing, the earlier one keeps it.
 ### Home cadence placement (2026-09-12)
 
 The weekly call precedes horizon selection on mobile and desktop. As of 2026-10-03, Weekly / Monthly / Quarterly sits directly under the call beside Copy Brief and confidence details, before the evidence sections. This keeps the selector adjacent to the card it changes without letting wrapped controls push the call down on a phone. Direct `/?cadence=monthly` and `/?cadence=quarterly` links still render their selected call; API cadence semantics are unchanged. No cadence rail belongs above the call or in the global header.
+
+The selected horizon's card (`CadenceCallCard`) carries the weekly card's contract at its horizon: the guidance, `Pause if` and `Resume when`, and under that pair one `ThresholdLadder` per score from `cadenceCallModel.boundedBands`, drawn from the same thresholds as the pair's sentences, with the score, its move since the comparison reading and its distance to each line. A held call drops the pair and the ladders; the weekly card below states the hold's lines.
 
 ### Responsive readability (2026-10-03)
 
