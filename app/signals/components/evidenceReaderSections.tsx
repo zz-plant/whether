@@ -154,7 +154,7 @@ export const SignalsWhatChangedSection = ({
                     <GovernedAreas metric={row.key} target="brief" className="mt-0.5" />
                   ) : row.key === "baseRate" ? (
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
+                      Feeds into <a href="#call-lines" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
                     </span>
                   ) : (
                     /* The curve slope. Sets risk appetite outright, and adds to
@@ -162,7 +162,7 @@ export const SignalsWhatChangedSection = ({
                        and the inversion points in regimeEngineCore). This said
                        funding pressure alone. */
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted
+                      Feeds into <a href="#call-lines" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted
                     </span>
                   )}
                 </th>
