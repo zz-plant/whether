@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { ActionLink } from "./ui/actionLink";
 import { ArrowRightIcon } from "./uiIcons";
 import { formatMonthLongLabel } from "../../lib/timeMachine/monthFormatting";
@@ -30,6 +31,13 @@ type HistoricalBannerProps = {
   /** Record date the snapshot actually resolves to, e.g. "Aug 31, 2026". */
   asOfLabel?: string;
   liveHref?: string;
+  /**
+   * The briefs published during this month, where they read different
+   * conditions from the month-end on screen: the archive is re-scored on
+   * today's formula, so the same weeks can carry two answers. Said here, with
+   * a link to what was published, rather than left for /history to contradict.
+   */
+  published?: { text: string; href: string };
 };
 
 export const HistoricalBanner = ({
@@ -37,6 +45,7 @@ export const HistoricalBanner = ({
   month,
   asOfLabel,
   liveHref,
+  published,
 }: HistoricalBannerProps) => {
   const monthLabel = formatMonthLongLabel(year, month);
 
@@ -57,6 +66,14 @@ export const HistoricalBanner = ({
           <span className="font-normal text-[var(--app-text-muted)]"> · data as of {asOfLabel}</span>
         ) : null}
       </p>
+      {published ? (
+        <p className="basis-full text-sm text-[var(--app-text-secondary)]" data-published-differs>
+          {published.text}{" "}
+          <Link href={published.href} className="weather-hit underline decoration-slate-600 underline-offset-4">
+            Read what was published
+          </Link>
+        </p>
+      ) : null}
       {/* Escape first and filled: it is the only action here. */}
       {liveHref ? (
         <ActionLink href={liveHref} variant="primary" className="ml-auto gap-1.5">

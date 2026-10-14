@@ -64,7 +64,7 @@ import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { RegimeRadar } from "./components/home/RegimeRadar";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
-import { describeCitableBriefBasis } from "../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, describeCitableBriefBasis, getPublishedBriefs, publishedBriefWeekLabel, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import { getTimeMachineRegimeSeries, getTimeMachineYieldCurveSeries } from "../lib/timeMachine/timeMachineCache";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
@@ -209,6 +209,13 @@ async function PageContent({
   /* The week by its Monday, as the frozen brief and every share name it. The
      reading's own date (often a Wednesday) is the trust strip's "Data as of". */
   const weekOfLabel = `Week of ${formatWeekMondayUTC(reportData.treasury.record_date)}`;
+  /* The archive is month-end readings, so an archived view is named by its
+     month-end, not by a Monday (2026-10-14). It said "Week of Sep 28" under a
+     banner reading "Viewing September 2026", and the arrows said "week" while
+     stepping a month at a time. */
+  const periodLabel = historicalSelection
+    ? `Month-end ${formatDateUTC(historicalSelection.asOf)}`
+    : weekOfLabel;
   const asOfDate = timeMachineRequest
     ? resolveHistoricalDate(timeMachineRequest.year, timeMachineRequest.month)
     : null;
@@ -492,6 +499,35 @@ async function PageContent({
         }),
   });
 
+  /* This week's published brief, where it reads different conditions from the
+     card (2026-10-14). The note sat in the trust strip's small print, so a
+     reader who opened /history saw the same week under another answer and no
+     reason on the card. It now heads the card's caveats with a link to what
+     was published, and the strip stops repeating it. */
+  const citableBrief = historicalSelection ? undefined : selectCitablePermalinkBrief(reportData.treasury.record_date);
+  const basisNote = trustStripProps.basis.note ?? null;
+  const publishedNotice = citableBrief && basisNote
+    ? {
+        text: basisNote,
+        href: buildPublishedBriefPath(citableBrief.slug),
+      }
+    : undefined;
+  /* An archived month whose published weeks read other conditions: the archive
+     is the month-end re-scored on today's formula, the briefs are what went out. */
+  const monthPrefix = historicalSelection
+    ? `${historicalSelection.year}-${String(historicalSelection.month).padStart(2, "0")}-`
+    : null;
+  const differingBrief = monthPrefix
+    ? getPublishedBriefs().find((brief) => brief.recordDate.startsWith(monthPrefix) && brief.regime !== reportData.assessment.regime)
+    : undefined;
+  const archivedPublishedNotice = differingBrief
+    ? {
+        text: `The brief published for the week of ${publishedBriefWeekLabel(differingBrief)} read ${getRegimePublicLabel(differingBrief.regime)}. This view is the month-end, scored with today's formula.`,
+        href: buildPublishedBriefPath(differingBrief.slug),
+      }
+    : undefined;
+  const heroTrust = publishedNotice ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null } } : trustStripProps;
+
   return (
     <Shell regime={regime}>
       <BriefArtifactScript artifact={briefArtifact} />
@@ -515,6 +551,7 @@ async function PageContent({
             month={historicalSelection.month}
             asOfLabel={formatDateUTC(historicalSelection.asOf)}
             liveHref="/"
+            published={archivedPublishedNotice}
           />
         </div>
       ) : null}
@@ -551,7 +588,9 @@ async function PageContent({
             <WeekStepper
               previousHref={prevWeekHref}
               nextHref={nextWeekHref}
-              currentDateLabel={cadenceTitle ?? weekOfLabel}
+              previousLabel="Previous month-end"
+              nextLabel={nextHistoricalRequest ? "Next month-end" : "This week"}
+              currentDateLabel={cadenceTitle ?? periodLabel}
               isHistorical={Boolean(historicalSelection)}
               history={regimeHistory}
             />
@@ -607,8 +646,9 @@ async function PageContent({
                 /* An archived week carries no live trust: the banner above says
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
-                trust={historicalSelection ? null : trustStripProps}
-                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? weekOfLabel}` : undefined}
+                trust={historicalSelection ? null : heroTrust}
+                published={publishedNotice}
+                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
                   today; combining it with an archived regime would date the

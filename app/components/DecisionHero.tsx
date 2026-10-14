@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { NO_LIVE_READING_CALL } from "../../lib/report/reportCopy";
 import { REGIME_LABELS, REGIME_WEATHER_RATIONALES, getRegimePublicLabel, isRegimeKey } from "../../lib/regimePresentation";
@@ -48,6 +49,12 @@ type Props = {
    * opens on, so a search visitor meets the artifact before any explanation.
    */
   question?: string;
+  /**
+   * The week's published brief, where it read different conditions from this
+   * card: a caveat under the call, with the brief it links to. Without it a
+   * reader comparing the card with /history found two answers for one week.
+   */
+  published?: { text: string; href: string };
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
 };
@@ -81,6 +88,7 @@ export function DecisionHero({
   captionDetail,
   question,
   lines,
+  published,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
@@ -176,6 +184,15 @@ export function DecisionHero({
         {regimeKey ? (
           <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
             {REGIME_WEATHER_RATIONALES[regimeKey]}
+          </p>
+        ) : null}
+
+        {published ? (
+          <p className="weather-caveat-mark max-w-xl text-sm leading-relaxed text-caveat-fg" data-published-differs>
+            {published.text}{" "}
+            <Link href={published.href} className="weather-hit underline decoration-slate-600 underline-offset-4">
+              Read the published brief
+            </Link>
           </p>
         ) : null}
 

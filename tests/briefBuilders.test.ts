@@ -74,8 +74,8 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(fixtureBriefDocument());
 
     // Each score carries what it means beside the number: a paste has no page to explain the scale.
-    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts below · resume line 66 \(already met\)$/m);
-    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts above · resume line 54 \(already met\)$/m);
+    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts away · resume line 66 \(already met\)$/m);
+    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts away · resume line 54 \(already met\)$/m);
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.

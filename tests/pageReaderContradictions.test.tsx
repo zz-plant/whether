@@ -445,7 +445,7 @@ describe("an area row prints the line that explains its state", () => {
     const row = (area: string) => rows.find((candidate) => candidate.area === area);
 
     assert.equal(row("capital-raising")?.pause?.line, "Funding pressure > 76");
-    assert.equal(row("capital-raising")?.pause?.distance, "crossed");
+    assert.equal(row("capital-raising")?.pause?.distance, "past the line");
     assert.equal(row("hiring")?.resume?.line, "Funding pressure < 66");
     assert.equal(row("hiring")?.resume?.distance, "24 pts away");
   });

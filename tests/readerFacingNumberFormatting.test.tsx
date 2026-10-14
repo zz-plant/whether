@@ -40,7 +40,7 @@ describe("reader-facing number formatting", () => {
 
   it("brackets every distance, including the ones that read as words", () => {
     assert.equal(parenthesizePointsToLine(11, "resume", false), "(11 pts away)");
-    assert.equal(parenthesizePointsToLine(0, "pause", true), "(crossed)");
+    assert.equal(parenthesizePointsToLine(0, "pause", true), "(past the line)");
     assert.equal(parenthesizePointsToLine(0, "pause", false), "(at the line)");
     assert.equal(parenthesizePointsToLine(undefined, "pause", false), "(—)");
   });
