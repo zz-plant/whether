@@ -3,6 +3,8 @@ import assert from "node:assert/strict";
 import { createHmac } from "node:crypto";
 import { afterEach, describe, it, mock, spyOn } from "bun:test";
 import { POST as postBillingWebhookRoute } from "../app/api/billing/webhook/route";
+import type { KvNamespace } from "../lib/runtime/kv";
+import { listPremiumFunnelEvents, summarizePremiumFunnelEvents } from "../lib/storage/premiumFunnelEventRepository";
 
 const ORIGINAL_ENV = { ...process.env };
 
@@ -127,6 +129,55 @@ describe("/api/billing/webhook", () => {
     assert.equal(body.type, "premium_checkout_complete");
     assert.equal(body.source, "export_brief");
     assert.equal(body.planCandidate, "team");
+  });
+
+  // Stripe redelivers `checkout.session.completed` until it gets a 2xx. Every event row has a
+  // fresh key, so each delivery of one purchase used to count as another completion.
+  it("counts a redelivered checkout completion once", async () => {
+    process.env.STRIPE_WEBHOOK_SECRET = "whsec_test";
+    delete process.env.PREMIUM_FUNNEL_WEBHOOK_URL;
+
+    const entries = new Map<string, string>();
+    const kv: KvNamespace = {
+      get: async (key: string) => entries.get(key) ?? null,
+      put: async (key: string, value: string) => {
+        entries.set(key, value);
+      },
+      list: async (options?: { prefix?: string }) => ({
+        keys: [...entries.keys()].filter((name) => name.startsWith(options?.prefix ?? "")).map((name) => ({ name })),
+        list_complete: true,
+      }),
+    };
+    Object.assign(globalThis, { WHETHER_DURABLE_KV: kv });
+
+    const payload = JSON.stringify({
+      type: "checkout.session.completed",
+      data: { object: { id: "cs_test_retry", metadata: { source: "export_brief", plan: "pro" } } },
+    });
+    const deliver = () =>
+      postBillingWebhookRoute(
+        new Request("http://localhost/api/billing/webhook", {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            "stripe-signature": buildStripeSignature(payload, "whsec_test", String(Math.floor(Date.now() / 1000))),
+          },
+          body: payload,
+        }),
+      );
+
+    try {
+      assert.equal((await deliver()).status, 200);
+      const retry = await deliver();
+      assert.equal(retry.status, 200, "a redelivery is acknowledged, so Stripe stops retrying");
+
+      const summary = await summarizePremiumFunnelEvents();
+      assert.equal(summary.byType.premium_checkout_complete, 1);
+      const { events } = await listPremiumFunnelEvents();
+      assert.deepEqual(events.map((event) => event.ctaId), ["cs_test_retry"]);
+    } finally {
+      Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
+    }
   });
 
   it("ignores events without valid premium source attribution", async () => {

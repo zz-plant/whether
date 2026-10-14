@@ -114,7 +114,7 @@ Source of truth: `lib/premiumFunnel.ts`.
 ### 3b) Stripe webhook conversion capture
 - `POST /api/billing/webhook`
 - Verifies Stripe signatures with `STRIPE_WEBHOOK_SECRET`.
-- On `checkout.session.completed`, emits `premium_checkout_complete` when metadata includes valid `source` attribution.
+- On `checkout.session.completed`, emits `premium_checkout_complete` when metadata includes valid `source` attribution, once per Checkout session: a Stripe redelivery of a session already recorded is acknowledged and emits nothing (a `premium-funnel-complete:<session id>` marker, kept as long as the events).
 - Carries optional `planCandidate` and `seatBand` metadata through conversion telemetry.
 
 ### 4) Premium-intent instrumentation on high-value surfaces

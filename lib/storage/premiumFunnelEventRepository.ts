@@ -1,4 +1,5 @@
 import { getWhetherKv, readKvValues, type KvNamespace } from "../runtime/kv";
+import { sentMarkers } from "../delivery/onceFor";
 import { isValidPremiumFunnelEvent } from "../premiumFunnel";
 import type { PremiumFunnelEvent, PremiumIntentSource, PremiumFunnelEventType } from "../premiumFunnel";
 
@@ -66,6 +67,24 @@ const buildKey = (receivedAtMs: number): string => {
     : `${receivedAtMs}-${Math.random().toString(36).slice(2, 12)}`;
   return `${KEY_PREFIX}${inverted}:${unique}`;
 };
+
+/** Outside `KEY_PREFIX` (a hyphen, not a colon), so listing events never reads a marker. */
+const CHECKOUT_COMPLETE_PREFIX = "premium-funnel-complete:";
+
+/**
+ * The Checkout sessions whose `premium_checkout_complete` is already recorded, keyed on the
+ * session id. Stripe redelivers `checkout.session.completed` until it gets a 2xx, and every
+ * event row has a fresh key, so each redelivery counted the same purchase again in
+ * `byType.premium_checkout_complete`. A marker lives as long as the rows it guards. The
+ * check and the write are two KV calls: two deliveries of one session inside KV's
+ * propagation window can both pass, which Stripe's retries, minutes apart, do not.
+ */
+export const checkoutCompletionMarkers = () =>
+  sentMarkers({
+    kv: getWhetherKv(),
+    keyFor: (sessionId) => `${CHECKOUT_COMPLETE_PREFIX}${sessionId}`,
+    ttlSeconds: RETENTION_SECONDS,
+  });
 
 /* Newest-first, mirroring the KV key order so both backends read identically. */
 const memoryEvents: StoredPremiumFunnelEvent[] = [];
