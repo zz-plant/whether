@@ -601,7 +601,7 @@ async function PageContent({
                         How they are set
                       </Link>
                     }
-                    className="ml-auto w-full max-w-[288px]"
+                    className="ml-auto w-full max-w-[18rem]"
                   />
                 }
                 /* An archived week carries no live trust: the banner above says

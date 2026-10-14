@@ -112,10 +112,12 @@ export function RegimeRadar({
 
       <svg
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
-        /* 256px at most: the plot is the card's one picture, and at 200px its
-           month-end trail bunched into a knot beside the current point. The
-           viewBox text scales with it, to about 13px at the cap (§XVII). */
-        className="block h-auto w-full max-w-[256px]"
+        /* 16rem (256px) at most: the plot is the card's one picture, and at
+           200px its month-end trail bunched into a knot beside the current
+           point. The viewBox text scales with it, to about 13px at the cap
+           (§XVII). Rem, not px (2026-10-14), so the map grows with the large-
+           display root step instead of shrinking against the text beside it. */
+        className="block h-auto w-full max-w-[16rem]"
         aria-hidden="true"
       >
         <title>{`Funding pressure ${tightness} vs risk appetite ${riskAppetite} (${weatherLabel})`}</title>
@@ -196,7 +198,7 @@ export function RegimeRadar({
             word: left of the two left-hand words, right of the two right-hand
             ones. Inside, "Freezing" and its glyph would reach the change line
             at the default risk-appetite line of 50. 12.5 units is 16px at the
-            plot's 256px cap. */}
+            plot's 16rem (256px) cap. */}
         <ConditionIcon regime="SCARCITY" x={PLOT_X - QUADRANT_ICON - 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
         <ConditionIcon regime="DEFENSIVE" x={PLOT_RIGHT + 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
         <ConditionIcon regime="VOLATILE" x={PLOT_X - QUADRANT_ICON - 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
