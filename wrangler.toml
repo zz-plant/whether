@@ -111,7 +111,10 @@ class_name = "WeeklyBriefFreezeWorkflow"
 name = "EMAIL"
 
 [triggers]
-crons = ["0 2 * * *", "0 14 * * 1"]
+# Daily 02:00 UTC ingest, and the weekly send at 14:00 UTC Monday. Weekdays are written as names:
+# Cloudflare counts 1 = Sunday, so the "0 14 * * 1" this replaced sent the Monday brief on Sundays
+# from May to October 2026. tests/cronSchedule.test.ts rejects a numeric weekday.
+crons = ["0 2 * * *", "0 14 * * MON"]
 
 [vars]
 NEXT_PUBLIC_SITE_URL = "https://whether.work"

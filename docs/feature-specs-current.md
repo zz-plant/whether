@@ -4207,6 +4207,12 @@ previous snapshot and this one, which is measured against the previous read rath
 alert state. The brief email remains weekly-only — the cadence promise is weekly; only rule
 firings break cadence.
 
+The weekly run is `0 14 * * MON` (14:00 UTC Monday). Until 2026-10-14 it was `0 14 * * 1`, which
+Cloudflare reads as Sunday; `tests/cronSchedule.test.ts` now refuses a numeric weekday.
+
+A run with any failed step mails one summary to the owner at `WHETHER_OPS_EMAIL`
+(`lib/delivery/opsNotice.ts`), and each Workflow does the same when it fails. A clean run sends nothing.
+
 ### 6.9 One state, one tool registry (2026-09-29)
 Agents met the product through four surfaces that disagreed about what Whether says and how to ask.
 Changes, all additive except where noted:

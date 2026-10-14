@@ -23,6 +23,7 @@ import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloud
 import { installBindings } from "../bindings";
 import { writeAnalytics } from "../../lib/telemetry/analyticsEngine";
 import { GitHubRepoClient } from "../../lib/github/repoClient";
+import { sendOpsFailureNotice } from "../../lib/delivery/opsNotice";
 import { assembleCurrentWeekBrief } from "../../lib/report/publishedBriefRecord";
 import {
   buildPublishedBriefUpdateAgainstBase,
@@ -77,6 +78,12 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
         { step: "brief-freeze", ok: false, error: error instanceof Error ? error.message : "Unknown error", durationMs },
         { doubles: [0, durationMs] },
       );
+      /* The freeze fails hours after the cron that started it, so the cron's own notice has
+         already gone out green; this is the only message that says the week was not frozen. */
+      await sendOpsFailureNotice({
+        run: "Weekly brief freeze",
+        failures: [{ step: "brief-freeze", error: error instanceof Error ? error.message : "Unknown error" }],
+      });
       throw error;
     }
   }
