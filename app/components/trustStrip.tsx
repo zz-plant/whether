@@ -87,13 +87,14 @@ export function TrustStrip({
     detail?: string;
     /** Which fact the detail is, for a reader of the markup: the next-week forecast, or the basis's warning. */
     detailKind?: "next-week" | "basis";
-    tone?: "caution" | "easing";
+    /** `caveat`: read this reading with care (a hollow ring); `easing`: in the state it should be (a filled dot). Never the crossed red, which is for lines. */
+    tone?: "caveat" | "easing";
     routine?: boolean;
   }[] = [
     /* "Data as of": the date the guidance rests on. The report intro's other date
        is when the sources were last checked, and it says so (2026-10-09). */
     { label: "Data as of", value: recordDateLabel },
-    { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caution", routine: sourcesLive },
+    { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caveat", routine: sourcesLive },
     /* The margin, in points, where "Confidence: Low" stood: the number was always a
        distance from the change line, never a probability (/calibration). Whether
        the call could change next week is the same distance read as a forecast, so
@@ -105,7 +106,7 @@ export function TrustStrip({
       value: describeMarginCell(margin, confidenceLabel),
       detail: describeNextWeek(couldChangeNextWeek, changeReason),
       detailKind: "next-week",
-      tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caution" : undefined,
+      tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caveat" : undefined,
     },
     /* Which inputs set the scores, on every call (2026-10-09). Routine on the
        record's own inputs with nothing left out that would move a line: the
@@ -116,7 +117,7 @@ export function TrustStrip({
       label: SCORING_BASIS_LABEL,
       value: basis.value,
       ...(basisDetail ? { detail: basisDetail, detailKind: "basis" as const } : {}),
-      tone: basisDetail || basis.key === "extended" ? "caution" : undefined,
+      tone: basisDetail || basis.key === "extended" ? "caveat" : undefined,
       routine: !basisDetail && basis.key === "record",
     },
   ];
@@ -163,12 +164,12 @@ export function TrustStrip({
                 pseudo-element, so the cell's text is still only its value. */}
             <dd
               className={`${termLayout}${
-                cell.tone === "caution"
-                  ? "font-medium text-semantic-caution-fg"
+                cell.tone === "caveat"
+                  ? "font-medium text-caveat-fg before:border before:border-current before:bg-transparent"
                   : cell.tone === "easing"
-                    ? "font-medium text-semantic-easing-fg"
+                    ? "font-medium text-semantic-easing-fg before:bg-current"
                     : "font-medium text-slate-200"
-              }${cell.tone ? " before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:align-middle before:content-['']" : ""}`}
+              }${cell.tone ? " before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:align-middle before:content-['']" : ""}`}
             >
               {cell.value}
               {cell.detail ? (

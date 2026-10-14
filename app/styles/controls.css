@@ -412,7 +412,7 @@ details[open] > summary[data-chevron]::after,
 .peer:checked + .weather-segment-option {
   color: var(--app-text);
   background-color: var(--bg-raised);
-  border-color: var(--border-strong);
+  border-color: color-mix(in srgb, var(--accent-action) 45%, var(--border-strong));
   box-shadow: var(--elev-1);
 }
 
@@ -422,7 +422,8 @@ details[open] > summary[data-chevron]::after,
   box-shadow: var(--key-pressed);
 }
 
-/* The lamp: unlit on every key, lit on the chosen one. A dot, so round. */
+/* The lamp: unlit on every key, lit on the chosen one in the action colour,
+   which is the week's condition under a regime shell. A dot, so round. */
 .weather-segment-lamp {
   display: inline-block;
   flex: none;
@@ -433,8 +434,8 @@ details[open] > summary[data-chevron]::after,
 }
 
 .peer:checked + .weather-segment-option .weather-segment-lamp {
-  background-color: var(--app-text);
-  box-shadow: 0 0 0 2px var(--border-subtle);
+  background-color: var(--accent-action);
+  box-shadow: 0 0 0 2px var(--accent-border-soft);
 }
 
 /* An ordered scale (runway bands, the funded stages): a rule engraved along the
@@ -471,7 +472,7 @@ details[open] > summary[data-chevron]::after,
   height: 7px;
   width: 2px;
   margin-left: -0.5px;
-  background-color: var(--app-text);
+  background-color: var(--accent-action);
   opacity: 1;
 }
 
@@ -534,8 +535,8 @@ a.weather-step-key:active {
    same lamp as a segmented key, lit on the chosen option, in place of a check
    and an action-ink wash. */
 .weather-choice-item[data-selected] .weather-segment-lamp {
-  background-color: var(--app-text);
-  box-shadow: 0 0 0 2px var(--border-subtle);
+  background-color: var(--accent-action);
+  box-shadow: 0 0 0 2px var(--accent-border-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -577,8 +578,8 @@ a.weather-step-key:active {
 }
 
 .weather-key[aria-pressed="true"] .weather-segment-lamp {
-  background-color: var(--app-text);
-  box-shadow: 0 0 0 2px var(--border-subtle);
+  background-color: var(--accent-action);
+  box-shadow: 0 0 0 2px var(--accent-border-soft);
 }
 
 @media (prefers-reduced-motion: reduce) {
