@@ -48,7 +48,14 @@ const CRON_STEP_LABELS: Record<string, string> = {
      the workflow itself and is the one that knows whether the week was frozen. */
   "brief-freeze-start": "Brief freeze started",
   "brief-freeze": "Brief freeze outcome",
+  /* Written by the regime-history Workflow itself, for the same reason as `brief-freeze`. */
+  "regime-history": "Regime history outcome",
+  /* Whether the owner was told about the run's failures (lib/delivery/opsNotice.ts). */
+  "ops-notice": "Failure notice",
 };
+
+/** The operator-facing name for a step label; an unknown step keeps its raw label. */
+export const cronStepLabel = (step: string): string => CRON_STEP_LABELS[step] ?? step;
 
 type CronStepSummary = {
   step: string;
@@ -120,7 +127,7 @@ export const summarizeCronSteps = (
 
     const summary = summaries.get(event.step) ?? {
       step: event.step,
-      label: CRON_STEP_LABELS[event.step] ?? event.step,
+      label: cronStepLabel(event.step),
       runs: 0,
       failures: 0,
       lastRunAt: at,

@@ -87,6 +87,23 @@ so the repo saw what looked like quiet weeks. The regime history refresh moved f
 Tuesday 12:00 UTC on 2026-10-06 for this reason. Schedule a routine early in the usage week, and read
 the run log before the code when its pull request does not appear.
 
+**The "Monday" cron ran on Sundays for five months (found 2026-10-14).** `wrangler.toml` said
+`0 14 * * 1`, and Cloudflare counts weekdays from 1 = Sunday, so from the trigger's creation on
+2026-05-18 the weekly email, the Slack brief and both Workflow hand-offs ran at 14:00 UTC on
+Sunday. No `cron-step` row could show it: a step knows whether it worked, never which day it was
+meant to run. It surfaced only because every 14:00 row in the telemetry carried a Sunday date. The
+trigger is `0 14 * * MON` now, and `tests/cronSchedule.test.ts` refuses a numeric weekday. Since the
+once-per-week send markers key on the ISO week of the send, a Sunday send (the end of one ISO week)
+followed by a Monday send (the start of the next) is two sends, not a duplicate the markers catch.
+
+**Failures now reach the owner, not only `/trust` (2026-10-14).** Nothing pushed a failed step
+anywhere, and `/trust` reads the run history only where `CLOUDFLARE_ANALYTICS_READ_TOKEN` is set,
+which production has never had. So unattended meant unobserved. The scheduled handler collects
+every failed step and, at the end of the run, `sendOpsFailureNotice` (`lib/delivery/opsNotice.ts`)
+mails one summary to `WHETHER_OPS_EMAIL`; both Workflows send their own when they fail, because
+they end hours after the cron's notice has gone. A clean run sends nothing. Without the address,
+each failing run writes an `ops-notice` row saying so instead of skipping quietly.
+
 **The refresh committed three of the five files it writes (2026-10-07).** `generateMonthlySummaries.ts`
 also writes `data/time_machine_cache.json` and `data/confidence_record_months.json`, and the routine's
 prompt said "Commit only those three data files". The cache is what the live week compares with when
