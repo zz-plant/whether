@@ -22,6 +22,8 @@ export function withDevServer<T>(options: {
   probe: (baseUrl: string) => Promise<DevServerProbe>;
   onStatus?: (message: string) => void;
   body: (baseUrl: string, started?: StartedDevServer) => Promise<T> | T;
+  /** Fresh starts to try before readiness counts as failed; the work itself is never retried. */
+  startAttempts?: number;
   /** vinext's lock file for this checkout; a live server named there is reused. */
   lockfilePath?: string;
 }): Promise<T>;

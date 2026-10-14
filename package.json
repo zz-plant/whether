@@ -24,6 +24,7 @@
     "deploy:cloudflare:dry-run": "node scripts/cloudflare-run.mjs deploy --dry-run",
     "deploy:cloudflare:preview": "node scripts/cloudflare-run.mjs deploy --env preview",
     "deploy:cloudflare:preview:dry-run": "node scripts/cloudflare-run.mjs deploy --env preview --dry-run",
+    "deploy:cloudflare:branch-check": "node scripts/cloudflare-run.mjs build --env preview && node scripts/cloudflare-run.mjs deploy --env preview --dry-run --skip-build",
     "smoke:prod": "bun scripts/prod-synthetic-smoke.mjs https://whether.work",
     "review:comment-trends": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200",
     "review:comment-trends:update": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md",

@@ -59,6 +59,33 @@ const exitingServer = (root: string) => {
   return file;
 };
 
+/** Prints a line, then exits: the log tail a failed start reports. */
+const noisyExitingServer = (root: string) => {
+  const file = join(root, "noisy-exits.mjs");
+  writeFileSync(file, 'console.error("bind failed: port in use"); process.exit(3);\n');
+  return file;
+};
+
+/** Exits on its first run and serves on the second, as a cold first start does. */
+const secondStartServer = (root: string) => {
+  const marker = join(root, "started-once");
+  const file = join(root, "second-start.mjs");
+  writeFileSync(
+    file,
+    [
+      'import { createServer } from "node:http";',
+      'import { existsSync, writeFileSync } from "node:fs";',
+      `const marker = ${JSON.stringify(marker)};`,
+      "if (!existsSync(marker)) { writeFileSync(marker, \"1\"); process.exit(3); }",
+      "const args = process.argv.slice(2);",
+      'const host = args[args.indexOf("--host") + 1];',
+      'const port = Number(args[args.indexOf("--port") + 1]);',
+      'createServer((request, response) => { response.end("fixture"); }).listen(port, host);',
+    ].join("\n"),
+  );
+  return file;
+};
+
 /** Dies by a signal, so `exitCode` stays null and only `signalCode` says it is gone. */
 const killedServer = (root: string) => {
   const file = join(root, "killed.mjs");
@@ -342,6 +369,65 @@ describe("withDevServer", () => {
         body: async () => assert.fail("the work must not run against a server that never became ready"),
       }),
       /Timed out after 200ms waiting for .* \(status 503\)/,
+    );
+  });
+
+  it("prints the end of the server's log when it fails to start", async () => {
+    const root = workspace();
+
+    await assert.rejects(
+      withDevServer({
+        baseUrl: `http://127.0.0.1:${await freePort()}`,
+        outDir: root,
+        lockfilePath: noLock(root),
+        devScript: noisyExitingServer(root),
+        timeoutMs: 60000,
+        probe: patientProbe(300),
+        body: async () => assert.fail("the work must not run against a server that never came up"),
+      }),
+      /exited before .* became ready[\s\S]*bind failed: port in use/,
+    );
+  });
+
+  it("tries a fresh start when asked, and runs the work once the second start answers", async () => {
+    const root = workspace();
+    const statuses: string[] = [];
+    let runs = 0;
+
+    const result = await withDevServer({
+      baseUrl: `http://127.0.0.1:${await freePort()}`,
+      outDir: root,
+      lockfilePath: noLock(root),
+      devScript: secondStartServer(root),
+      timeoutMs: 60000,
+      startAttempts: 2,
+      probe: patientProbe(5000),
+      onStatus: (message) => statuses.push(message),
+      body: async () => {
+        runs += 1;
+        return "served";
+      },
+    });
+
+    assert.equal(result, "served");
+    assert.equal(runs, 1);
+    assert.ok(statuses.some((message) => message.includes("attempt 2 of 2")));
+  });
+
+  it("does not retry the start by default", async () => {
+    const root = workspace();
+
+    await assert.rejects(
+      withDevServer({
+        baseUrl: `http://127.0.0.1:${await freePort()}`,
+        outDir: root,
+        lockfilePath: noLock(root),
+        devScript: secondStartServer(root),
+        timeoutMs: 60000,
+        probe: patientProbe(300),
+        body: async () => assert.fail("one start was allowed, and it exited"),
+      }),
+      /exited before .* became ready/,
     );
   });
 });

@@ -38,7 +38,10 @@ turns a slow route into one that "never answered".
 `WHETHER_DEPLOY_GATE=1` (read in one place, `scripts/deploy-gate.mjs`) makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
 with a 120s ceiling, and skip `tests/tools/` (it shells out to `python3`, which the build image does
 not guarantee), and gives the landmark audit's dev-server readiness and per-route bounds room for a
-cold start. It did once also drop to "2 workers"; `--max-concurrency` never bounded workers and the
+cold start. A start that still misses its 180s deadline gets one fresh start before the audit fails
+(2026-10-14: two `main` builds that day failed on a dev server that never answered, between builds
+that passed), and every failed start prints the last 30 lines of the dev server's log into the build
+log, which used to name a file inside the container and nothing else. It did once also drop to "2 workers"; `--max-concurrency` never bounded workers and the
 knob is gone. `audit` needs the network and `hotspot-preflight` needs git history, so both stay
 on `bun run check` and pre-push rather than the deploy path. It runs on every push, `main` included,
 so a red gate is a blocked deploy — read the build log in the dashboard, where `run-checks.mjs` names the failing
@@ -260,7 +263,15 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 
 The dry-run commands run both validation layers, because neither sees what the other does. They first build the selected environment, then run the adapter's own `--dry-run --skip-build`, which checks the adapter contract — router mode, ISR wiring, and the data and image adapters the routes require — and finally run the repo-local `wrangler deploy --dry-run`, which packages the Worker and validates bindings and upload limits without publishing. A successful dry run therefore provides deploy-package evidence rather than only a scaffold check, and an adapter-contract break reports itself as an adapter error instead of a later packaging failure.
 
-This dry run is now a manual check: `bun run deploy:cloudflare:dry-run`. The workflow that used to run it on every pull request is dispatch-only, because the account stopped paying for Actions minutes on this private repo. Packaging is still exercised on every push by Cloudflare Workers Builds, which builds the Worker and fails the deploy on the same errors the dry run would surface — the difference is that it finds them after the merge rather than before it, so run the dry run by hand on anything that touches bindings, the adapter, or bundle size.
+Locally the production dry run is a manual check: `bun run deploy:cloudflare:dry-run`. The GitHub workflow that ran it on every pull request is dispatch-only, because the account stopped paying for Actions minutes on this private repo.
+
+### Branch builds (Workers Builds Previews)
+
+Every pushed branch gets its own Workers Builds run from the Worker's Previews base config: the same build command (`bun run check:vinext`), then the base config's deploy command. That command is `bun run deploy:cloudflare:branch-check` (set 2026-10-14): it builds against `env.preview` and runs both dry-run layers, the adapter contract and `wrangler deploy --dry-run`, and uploads nothing. So packaging, binding and bundle-size failures show on the pull request's check before the merge.
+
+It used to be `npx wrangler preview`, which every branch failed: it ran Wrangler against the raw sources, without the vinext build, and could not resolve `@opentelemetry/api` or `virtual:vinext-image-adapters`. A permanently red check on every pull request is the signal that hides a real failure (see the removed `Deploy` workflow above). Making it upload is not the fix either. A preview built from the top-level config binds production `WHETHER_DURABLE_KV` and `VINEXT_KV_CACHE`, and the read path writes to KV in the background, so branch code would write production data. Real preview URLs need a Preview whose bindings are the `env.preview` ones; until that is proven, branch builds validate and stop.
+
+The base config lives in Cloudflare, not in this repo. Read it with `cf builds workers get <script tag>` (`cf workers list` gives the tag as `id`).
 
 ### Current toolchain notes
 
