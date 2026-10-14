@@ -17,6 +17,9 @@ import { getRegimePublicLabel } from "../regimePresentation";
 import { sentMarkers } from "../delivery/onceFor";
 import { describeConditions } from "../export/exportTerms";
 import { buildBriefDocumentFromReport } from "../report/briefDocument";
+import { getRegimeAlertRepository } from "../storage/regimeAlertRepository";
+import { buildLineage } from "../storage/lineage";
+import { sha256Hex } from "../crypto";
 
 const ALERT_STATE_KEY = "alert:state";
 const ALERT_DELIVERED_PREFIX = "alert:delivered:";
@@ -159,11 +162,35 @@ const sendPlanLineEmail = async (
   }
 };
 
+/**
+ * A successful send leaves two records: the marker that keeps the same alert out of this
+ * inbox for a week, and a row in the delivery log that `GET /api/alert-deliveries` lists and
+ * `/api/weekly-digest` counts. Only the marker was written once the unauthenticated route
+ * that appended rows was removed, so both read zero however many alerts went out. The row
+ * names the recipient by the address's hash, as the weekly send markers do, not the address.
+ */
 const trackAlertDelivery = async (
   email: string,
   alertType: string,
+  summary: string,
 ): Promise<void> => {
   await recordDelivery(email, alertType);
+  try {
+    const lineage = buildLineage("request-received-at");
+    await getRegimeAlertRepository().appendDelivery({
+      ...lineage,
+      canonicalTimestampSource: "request-received-at",
+      id: lineage.eventId,
+      clientId: await sha256Hex(email.trim()),
+      alertId: alertType,
+      channel: "email",
+      deliveredAt: new Date().toISOString(),
+      status: "sent",
+      summary,
+    });
+  } catch {
+    /* The mail went out; a missing log row must not count it as a failed send. */
+  }
 };
 
 /**
@@ -280,7 +307,7 @@ export const deliverAlerts = async (
       );
       if (ok) {
         sent++;
-        await trackAlertDelivery(sub.email, alertDeliveryKey(alert));
+        await trackAlertDelivery(sub.email, alertDeliveryKey(alert), alert.headline);
       } else {
         errors++;
       }
@@ -293,14 +320,11 @@ export const deliverAlerts = async (
         skipped++;
         continue;
       }
-      const ok = await sendPlanLineEmail(
-        sub,
-        describePlanLineCrossing(crossing, current, { regime: conditions.regime, runway: sub.planRunway }),
-        adapter,
-      );
+      const described = describePlanLineCrossing(crossing, current, { regime: conditions.regime, runway: sub.planRunway });
+      const ok = await sendPlanLineEmail(sub, described, adapter);
       if (ok) {
         sent++;
-        await trackAlertDelivery(sub.email, key);
+        await trackAlertDelivery(sub.email, key, described.headline);
       } else {
         errors++;
       }

@@ -96,8 +96,6 @@ export const publishedScoreLines = (
   ];
 };
 
-const LINE_WEIGHT: Record<PublishedLine["kind"], number> = { pause: 3, change: 2, resume: 1 };
-
 /* Internal only: the regime flip test for evaluateAlert. The cron's own regime-change
    check is lib/alert/checkRegimeChange.ts, a different function with the same name. */
 const checkRegimeChange = (
@@ -105,20 +103,21 @@ const checkRegimeChange = (
   lastRegime: string,
 ): boolean => currentRegime !== lastRegime;
 
-const checkThresholdCrossing = (
-  currentScore: number,
-  threshold: number,
-  lastScore?: number,
-): boolean => {
-  if (lastScore === undefined) {
-    return false;
-  }
-  const crossedAbove =
-    lastScore <= threshold && currentScore > threshold;
-  const crossedBelow =
-    lastScore >= threshold && currentScore < threshold;
-  return crossedAbove || crossedBelow;
-};
+/**
+ * Which side of a line a score is on. A score exactly on a line is on the side where the
+ * line does not hold: a pause or resume line holds strictly beyond its number, as the area
+ * rules state it ("> 76", "< 66"), and the change line is crossed only above it, the way
+ * `classifyRegime` reads a score equal to the threshold. Comparing `>=` on one side and
+ * `<=` on the other made a score landing on a line miss the crossing, and a score leaving
+ * the line for the side it was already on fire one.
+ */
+export const sideOfLine = (line: PublishedLine, score: number): "above" | "below" =>
+  line.holdsWhen === "below"
+    ? score < line.value ? "below" : "above"
+    : score > line.value ? "above" : "below";
+
+const crossedLine = (line: PublishedLine, current: number, last: number): boolean =>
+  sideOfLine(line, current) !== sideOfLine(line, last);
 
 const buildRegimeDecision = (regime: string): AlertDecision => ({
   type: "regime_change",
@@ -146,13 +145,18 @@ const buildThresholdDecision = (line: PublishedLine, score: number): AlertDecisi
 /**
  * The one line per score worth a letter. A score that jumps from 63 to 90 passes
  * 66, 70 and 76 in one move; three emails about one move would be the noise this
- * stream promises not to make, so the letter names the line that matters most,
- * pause before change before resume.
+ * stream promises not to make, so the letter names the last line the move
+ * crossed, which is the one whose state now holds: the pause line on that rise,
+ * the resume line on a fall from 80 to 60. Ranking pause before change before
+ * resume whatever the direction named the pause line on the fall too, so the
+ * letter said held work resumes "once each area's resume line is met" with the
+ * score already past it, and the resume letter never came, since delivery sends
+ * one threshold alert per score.
  */
-const mostSignificantCrossing = (lines: PublishedLine[], current: number, last: number): PublishedLine | null =>
+const lineReached = (lines: PublishedLine[], current: number, last: number): PublishedLine | null =>
   lines
-    .filter((line) => checkThresholdCrossing(current, line.value, last))
-    .sort((a, b) => LINE_WEIGHT[b.kind] - LINE_WEIGHT[a.kind])[0] ?? null;
+    .filter((line) => crossedLine(line, current, last))
+    .sort((a, b) => Math.abs(current - a.value) - Math.abs(current - b.value))[0] ?? null;
 
 /*
  * A flash is an emergency-sized move in a raw input, so it goes to the CFO like
@@ -209,7 +213,7 @@ export const evaluateAlert = (
   if (lastKnown) {
     const lines = publishedScoreLines(readiness.thresholds);
     for (const metric of ["tightness", "riskAppetite"] as const) {
-      const crossed = mostSignificantCrossing(
+      const crossed = lineReached(
         lines.filter((line) => line.metric === metric),
         readiness[metric],
         lastKnown[metric],
