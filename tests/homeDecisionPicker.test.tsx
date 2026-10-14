@@ -84,14 +84,14 @@ describe("decision picker", () => {
 
   it("puts each area's standing on its choice, so the answers are on the page before a click", () => {
     const choices = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
-    assert.equal((choices.match(/Pause line crossed/g) ?? []).length, 4);
+    assert.equal((choices.match(/Past its pause line/g) ?? []).length, 4);
     assert.match(choices, /4 pts from its pause line/);
     /* The shared state badge: a crossed line in the line state's own red with
        the pause glyph, a close one with the dashed circle, so the two differ in
        shape. */
     assert.match(
       choices,
-      /data-line-state-badge="crossed" class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>Pause line crossed</,
+      /data-line-state-badge="crossed" class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>Past its pause line</,
       "a crossed line is drawn as a state, in the crossed ink",
     );
     assert.match(choices, /data-line-state-badge="near"[^>]*><svg[^>]*lucide-circle-dashed[\s\S]*?<\/svg><span>4 pts from its pause line</);
@@ -101,7 +101,7 @@ describe("decision picker", () => {
   });
 
   it("counts the crossed pause lines once, over the choices", () => {
-    const count = html.indexOf("Pause lines crossed in 4 of 5 areas this week.");
+    const count = html.indexOf("4 of 5 areas are past their pause line.");
     assert.ok(count > html.indexOf("What are you deciding?"), "the count sits under the question");
     assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");
   });

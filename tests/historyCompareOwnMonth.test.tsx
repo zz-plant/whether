@@ -185,10 +185,10 @@ describe("/history/compare draws each period from its own month", () => {
     for (const area of decisionAreaOrder) {
       const item = reportData.actionStripItems.find((candidate) => operatingLeverToDecisionArea[candidate.lever] === area);
       const crossed = (item?.pauseConditions ?? []).some((line) => isRuleConditionMet(line, scores[line.metric]));
-      const row = new RegExp(`${decisionAreaLabel(area)}\\s*:\\s*Pause line crossed`);
+      const row = new RegExp(`${decisionAreaLabel(area)}\\s*:\\s*Past its pause line`);
       assert.equal(row.test(columnA), crossed, `${decisionAreaLabel(area)} agrees with its pause line at ${scores.tightness}/${scores.riskAppetite}`);
     }
-    assert.match(columnA, /New bets\s*:\s*Pause line crossed/, "new commitments are paused, as the guidance says");
+    assert.match(columnA, /New bets\s*:\s*Past its pause line/, "new commitments are paused, as the guidance says");
   });
 });
 

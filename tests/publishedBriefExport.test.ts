@@ -41,8 +41,8 @@ describe("published brief readings block", () => {
        four parts `formatScoreReference` prints wherever a score appears, so the
        archive reads the way the page does. The earlier reading carries its date. */
     assert.deepEqual(buildPublishedBriefReadingLines(brief), [
-      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · pause line 76 · 44 pts below · was 40 on Jun 30 · resume line 66 (already met)",
-      "Risk appetite 52 of 100 (investors are selective about risk) · pause line 44 · 8 pts above · was 59 on Jun 30 · resume line 54 (2 pts away)",
+      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · pause line 76 · 44 pts away · was 40 on Jun 30 · resume line 66 (already met)",
+      "Risk appetite 52 of 100 (investors are selective about risk) · pause line 44 · 8 pts away · was 59 on Jun 30 · resume line 54 (2 pts away)",
     ]);
     assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure 32 of 100/);
     assert.deepEqual(buildPublishedBriefReadingLines(base), [], "a record frozen without scores prints no readings block");

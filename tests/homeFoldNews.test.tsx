@@ -21,7 +21,7 @@ const slot = (met: boolean, points: number) => ({ line: "Funding pressure > 76",
 
 describe("where each decision stands, before a click", () => {
   it("says a crossed pause line as a state, and an uncrossed one as a distance", () => {
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "Pause line crossed", crossed: true, state: "crossed" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "Past its pause line", crossed: true, state: "crossed" });
     assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "4 pts from its pause line", crossed: false, state: "near" });
     assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "1 pt from its pause line", crossed: false, state: "near" });
     assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 0) }), { text: "At its pause line", crossed: false, state: "near" });
@@ -33,10 +33,10 @@ describe("where each decision stands, before a click", () => {
   it("counts the crossed lines over the areas that have one", () => {
     assert.equal(
       describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(true, 2) }, { pause: slot(false, 4) }, {}]),
-      "Pause lines crossed in 2 of 3 areas this week.",
+      "2 of 3 areas are past their pause line.",
     );
-    assert.equal(describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(false, 4) }]), "Pause line crossed in 1 of 2 areas this week.");
-    assert.equal(describePauseLineCount([{ pause: slot(false, 3) }]), "No area's pause line is crossed this week.");
+    assert.equal(describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(false, 4) }]), "1 of 2 areas is past its pause line.");
+    assert.equal(describePauseLineCount([{ pause: slot(false, 3) }]), "No area is past its pause line.");
     assert.equal(describePauseLineCount([{}]), null);
   });
 });

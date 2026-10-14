@@ -1,4 +1,8 @@
+"use client";
+
 import Image from "next/image";
+import { DEFAULT_OPERATOR_STAGE, operatorStageLabel, type OperatorStage } from "../../lib/report/operatorStage";
+import { useOperatorStage } from "../components/useOperatorStage";
 import { ActionLink } from "../components/ui/actionLink";
 import { CopyMeetingSlideButton } from "../components/CopyMeetingSlideButton";
 import { CopyImageCardButton } from "../components/CopyImageCardButton";
@@ -49,34 +53,37 @@ type ImageArtifact = {
   files: readonly ArtifactFile[];
 };
 
-const IMAGE_ARTIFACTS: readonly ImageArtifact[] = [
+/* The slide files follow the stage the reader chose on the brief (2026-10-14).
+   They were fixed to seed, and the card told the reader to edit `stage=` in
+   the link by hand. The page is cached, so the stage is read in the browser. */
+const buildImageArtifacts = (stage: OperatorStage): readonly ImageArtifact[] => [
   {
     /* No format line: "PPTX · PDF · SVG" named the three buttons under it
        (2026-10-09). */
     title: "Board slide",
     description:
-      "One slide: the guidance, its pause line, its change lines and both scores. All three files draw it for a seed-stage company; change stage= in a file's link to series-a, series-b or growth.",
+      `One slide: the guidance, its pause line, its change lines and both scores, drawn for a ${operatorStageLabel(stage)} company, the stage set on the brief.`,
     preview: {
-      src: "/api/image/slide?stage=seed",
+      src: `/api/image/slide?stage=${stage}`,
       width: 1200,
       height: 675,
       alt: "This week's board slide: the guidance, its pause line and what would change it, with both scores under them.",
     },
     files: [
       {
-        href: "/api/export/board-slide?format=pptx&stage=seed",
+        href: `/api/export/board-slide?format=pptx&stage=${stage}`,
         label: "Download PPTX",
         use: "Drops into the board pack as a native slide with every box still editable.",
         download: true,
       },
       {
-        href: "/api/export/board-slide?format=pdf&stage=seed",
+        href: `/api/export/board-slide?format=pdf&stage=${stage}`,
         label: "Download PDF",
         use: "The slide as a page, for a pre-read that goes out by email or gets opened on a phone.",
         download: true,
       },
       {
-        href: "/api/image/slide?stage=seed",
+        href: `/api/image/slide?stage=${stage}`,
         label: "Open SVG",
         use: "Vector, so it stays sharp at projector size and every label is still editable text in Figma or Keynote.",
         download: false,
@@ -106,6 +113,8 @@ const IMAGE_ARTIFACTS: readonly ImageArtifact[] = [
 ];
 
 export function ShareImageArtifacts() {
+  const { stage } = useOperatorStage();
+  const artifacts = buildImageArtifacts(stage ?? DEFAULT_OPERATOR_STAGE);
   return (
     <section id="image-artifacts" className="weather-panel weather-section-stack p-0" aria-labelledby="share-files-heading">
       <h2 id="share-files-heading" className="text-xl font-semibold text-white sm:text-2xl">Files and images for a deck or a thread</h2>
@@ -118,7 +127,7 @@ export function ShareImageArtifacts() {
         <CopyImageCardButton />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
-        {IMAGE_ARTIFACTS.map((artifact) => (
+        {artifacts.map((artifact) => (
           <article key={artifact.title} className="weather-card flex flex-col gap-3" data-image-artifact={artifact.title}>
             {/* The picture the files draw. Not a link: the actions below open
                 it, and a second tab stop to the same URL says nothing new. */}

@@ -136,7 +136,7 @@ describe("buildSharedCorridorRails", () => {
     );
     assert.equal(formatPointsToLine(rails[0].pointsToGuardrail, "pause", rails[0].guardrailTripped), "44 pts away");
     assert.equal(formatPointsToLine(rails[0].pointsToClear, "resume", rails[0].clearHolds), "already met");
-    assert.equal(formatPointsToLine(0, "pause", true), "crossed");
+    assert.equal(formatPointsToLine(0, "pause", true), "past the line");
     assert.equal(formatPointsToLine(2.5, "resume", false), "2.5 pts away");
   });
 

@@ -3524,6 +3524,26 @@ devices, lines a team shares) would have needed accounts, which Whether does not
   about a reader; the terms drop "paid plans" from section 7.
 - `lib/activationFunnel.ts` stays: it measures whether a reader comes back, not whether one pays.
 
+### 1.1.79 Ease-of-use pass: one answer per week, units that match, settings folded (2026-10-14)
+
+- **A week with two answers says so on the card.** Where this week's published brief read other
+  conditions, the basis note (`describeCitableBriefBasis`) is a caveat under the call with a link
+  to the brief, and the trust strip stops repeating it. An archived month whose published briefs
+  read other conditions says so in its banner.
+- **The archive's unit is named.** The stepper's ends are "Previous month-end" and "Next month-end"
+  (or "This week"), and an archived view is "Month-end Sep 30, 2026", not "Week of Sep 28".
+- **Line positions are states.** "Pause line crossed" read as this week's event under "No score
+  crossed a pause or resume line since …". It is "Past its pause line"; the count is "4 of 5 areas
+  are past their pause line"; table cells say "past the line". Pastes state a pause-line distance as
+  "past the line" or "N pts away", where "14 pts above" meant opposite things for the two scores.
+- **The three lines are defined once**, at the head of "What would change this guidance".
+- **Settings fold.** On desktop, stage and runway are one line ("Rules for a Series A company with
+  12–24 months of runway · Change"). On a live week the phone legend defines this week's condition
+  only, with a link to all four.
+- **Smaller fixes.** `/decide`, `/record` and `/plan` redirect to the pages the header names;
+  `/operate` is titled "Decide"; the board slide files follow the brief's stage; the signals
+  table's "Feeds into" links carry the shared tap area.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
