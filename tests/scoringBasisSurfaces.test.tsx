@@ -19,7 +19,7 @@ import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, findPub
 import { resolveScoringBasis } from "../lib/report/scoringBasis";
 import { formatMeetingSlideMarkdown } from "../lib/export/meetingSlideExport";
 import { snapshotData } from "../lib/snapshot";
-import { buildReportDataFixture } from "./fixtures/reportFixtures";
+import { buildReportDataFixture, liveMacroSeries } from "./fixtures/reportFixtures";
 
 /*
  * Every call states its basis (2026-10-09): the status strip, the published
@@ -34,7 +34,7 @@ const WARNING = "Startup-market inputs would put risk appetite at 41, below its 
 const liveSnapshot = () =>
   buildOperatingSnapshot({
     treasury: { ...snapshotData, isLive: true, fallback_at: undefined, fallback_reason: undefined, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-    macroSeries,
+    macroSeries: liveMacroSeries,
     now: new Date("2026-08-31T12:00:00.000Z"),
   });
 

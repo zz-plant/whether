@@ -75,7 +75,7 @@ import {
   buildLastYearComparison,
 } from "./reportHistory";
 import { withDeadline } from "../withDeadline";
-import { primeMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
+import { primeMonthlyRegimeHistoryForRead } from "../summary/monthlyRegimeHistory";
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 export type {
   ConfidenceTrendFraming,
@@ -301,10 +301,6 @@ const loadReportDataMemoized = cache(async (cacheKey: string) => {
   return loadReportDataUncached(normalizedSearchParams, normalizedOptions);
 });
 
-/** Bound on the history prime. It is one KV read, cached per isolate for hours, and the
- *  bundled snapshot covers a miss — so it is never worth making a page wait on it. */
-const MONTHLY_HISTORY_PRIME_DEADLINE_MS = 1_000;
-
 export const loadReportData = async (
   searchParams?: ReportSearchParams,
   options?: ReportDataLoadOptions,
@@ -313,15 +309,7 @@ export const loadReportData = async (
   // synchronously through the forecast model, so priming later would leave the first
   // request of every isolate building its brief from the bundled snapshot while later
   // requests used KV.
-  try {
-    await withDeadline(
-      primeMonthlyRegimeHistory(),
-      MONTHLY_HISTORY_PRIME_DEADLINE_MS,
-      "monthly-regime-history-prime",
-    );
-  } catch {
-    /* The bundled floor stands; freshness is the only thing lost. */
-  }
+  await primeMonthlyRegimeHistoryForRead();
 
   const cacheKey = buildReportDataMemoizationKey(searchParams, options);
   return loadReportDataMemoized(cacheKey);

@@ -238,6 +238,7 @@ export const buildAgentState = (
     isFallback,
     isLive: treasury.isLive,
     fallbackReason: treasury.fallback_reason,
+    macroSeries: reportData.macroSeries,
     recordDate,
     now,
   });
