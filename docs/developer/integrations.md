@@ -38,14 +38,14 @@ Recommended pull sequence:
 
 ### Consistency gate
 
-- `GET /api/cadence` verifies weekly/monthly alignment.
+- `GET /api/cadence` verifies weekly/monthly alignment: `alignmentStatus` is `aligned`, `watch` (constraint themes differ) or `mismatch` (regimes differ).
 - `GET /api/summary-delta` explains mismatches when they occur.
 
 ### Suggested outbound policy
 
 Before posting to Slack/email/webhooks:
 1. Require `health.status === "ok"`.
-2. Require healthy cadence alignment/no mismatched constraints.
+2. Require `alignmentStatus === "aligned"` (no mismatched constraints).
 3. Include `recordDateLabel`, `generatedAt`, and provenance in the outgoing payload.
 
 ## 4) Exemplary TypeScript Integration Client

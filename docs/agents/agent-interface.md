@@ -76,7 +76,8 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
   that could hold the query, and that everything but recorded decisions stays in the browser. A
   server-side Jev call on that text would make both statements false, and a third-party model reading it
   would need its own section there. The site's use of Jev stays where it is: the handoff format above,
-  where the caller sends their own plan, and `audit:jev-copy`, which reads only the site's own copy.
+  where the caller sends their own plan, and `audit:jev-copy`, which reads only the site's own copy
+  (with Jev, or Cloudflare's Jev-compatible Clef models via `--model`).
 
 Machine-discovery routes:
 

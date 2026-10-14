@@ -63,6 +63,18 @@ export const canonicalSurfaceRedirectPairs = [
   ["/learn", "/trust"],
   ["/learn/failure-modes", "/trust#revisit-call"],
   ["/learn/failure-modes/:slug", "/trust#revisit-call"],
+  // Learn's concepts index and the hub's other names: /library and /reference are
+  // what the same pages were called between February and March 2026. The table
+  // that forwarded them went in d0ddedd6 (2026-03-16) with nothing in its place,
+  // so their deep links 404'd. Concept essays land on the one list, failure modes
+  // on the revisit triggers, the hubs where /learn does.
+  ["/learn/concepts/:path*", "/concepts"],
+  ["/library", "/trust"],
+  ["/library/canon/:path*", "/concepts"],
+  ["/library/failure-modes/:path*", "/trust#revisit-call"],
+  ["/reference", "/trust"],
+  ["/reference/concepts/:path*", "/concepts"],
+  ["/reference/failure-modes/:path*", "/trust#revisit-call"],
   // /concepts itself is a page again (restored 2026-09-23). The first version's
   // detail, focus, audience and conflicts pages are not: one page carries the
   // list now, with an anchor per essay. The old `/concepts` -> `/trust` rule was a

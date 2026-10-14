@@ -5,7 +5,7 @@ import { POST as postSendWeekly } from "../app/api/email/send-weekly/route";
 import { POST as postSlackDeliver } from "../app/api/brief/slack/deliver/route";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
-import { macroSeries } from "../lib/macroSnapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
 import type { KvNamespace } from "../lib/runtime/kv";
@@ -58,7 +58,7 @@ class FakeKv implements KvNamespace {
 const liveSnapshot = (recordDate: string, now: Date) =>
   buildOperatingSnapshot({
     treasury: { ...snapshotData, isLive: true, record_date: recordDate, fetched_at: `${recordDate}T12:00:00.000Z` },
-    macroSeries,
+    macroSeries: liveMacroSeries,
     now,
   });
 

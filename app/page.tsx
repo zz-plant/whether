@@ -31,7 +31,7 @@ import { describeMarketMoveScale } from "../lib/report/marketMoveScale";
 import { describeMovementCause } from "../lib/report/decisionMovement";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
-import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
+import { getMonthlyRegimeHistory, primeMonthlyRegimeHistoryForRead } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
 import {
   buildTimeMachineHref,
@@ -96,6 +96,10 @@ export default async function Page({
   searchParams?: Promise<HomePageSearchParams>;
 }) {
   const resolved = searchParams ? await searchParams : undefined;
+  /* Primed here, not left to the report read: that primes inside the home
+     page's cached loader, which a cache hit skips, so a new isolate served
+     from the cache drew the conditions trail from the bundled months alone. */
+  await primeMonthlyRegimeHistoryForRead();
   const regimeHistory = getMonthlyRegimeHistory();
 
   /* PageContent mounts the Shell itself so the page's atmosphere is keyed to

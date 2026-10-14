@@ -217,6 +217,7 @@ export const assembleCurrentWeekBrief = async ({
     isFallback: snapshot.isFallback,
     isLive: reportData.treasury.isLive,
     fallbackReason: reportData.treasury.fallback_reason,
+    macroSeries: reportData.macroSeries,
     recordDate,
     now,
   });

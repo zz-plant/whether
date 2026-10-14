@@ -25,7 +25,7 @@
  */
 import type { OperatingSnapshot } from "./types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
-import type { TreasuryData } from "../types";
+import type { MacroSeriesReading, TreasuryData } from "../types";
 import { getOperatingSnapshotStore } from "./snapshotStore";
 import { assessPublishReadiness } from "../report/briefPublishGuard";
 import { loadReportDataSafe, type ReportData } from "../report/reportData";
@@ -92,10 +92,17 @@ type ReadinessTreasury = Pick<TreasuryData, "isLive" | "fallback_at" | "fallback
 const readinessOf = (
   {
     treasury,
+    macroSeries,
     degraded,
     isFallback,
     isLive,
-  }: { treasury: ReadinessTreasury; degraded: boolean; isFallback: boolean; isLive: boolean },
+  }: {
+    treasury: ReadinessTreasury;
+    macroSeries: readonly MacroSeriesReading[];
+    degraded: boolean;
+    isFallback: boolean;
+    isLive: boolean;
+  },
   now: Date,
 ) =>
   assessPublishReadiness({
@@ -106,6 +113,7 @@ const readinessOf = (
     isFallback: isFallback || isSavedCopy(treasury),
     isLive,
     fallbackReason: treasury.fallback_reason,
+    macroSeries,
     recordDate: treasury.record_date,
     now,
   });
@@ -116,12 +124,13 @@ const readinessOf = (
  * weekly email and the weekly Slack post both make.
  */
 export const assessSnapshotReadiness = (
-  snapshot: Pick<OperatingSnapshot, "treasury" | "freshness" | "provenance">,
+  snapshot: Pick<OperatingSnapshot, "treasury" | "macroSeries" | "freshness" | "provenance">,
   now: Date,
 ) =>
   readinessOf(
     {
       treasury: snapshot.treasury,
+      macroSeries: snapshot.macroSeries,
       degraded: false,
       isFallback: snapshot.freshness.status === "fallback",
       isLive: snapshot.provenance.isLive,
@@ -135,6 +144,7 @@ export const assessReadingReadiness = (reading: OperatingReading, now: Date) =>
     ? readinessOf(
         {
           treasury: reading.report.treasury,
+          macroSeries: reading.report.macroSeries,
           degraded: reading.degraded,
           isFallback: false,
           isLive: reading.report.treasury.isLive,

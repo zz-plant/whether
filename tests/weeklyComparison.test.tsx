@@ -33,7 +33,7 @@ import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { snapshotData } from "../lib/snapshot";
 import { selectWeekComparison } from "../lib/report/weekComparison";
 import type { TreasuryData } from "../lib/types";
-import { buildAssessmentFixture } from "./fixtures/reportFixtures";
+import { buildAssessmentFixture, liveMacroSeries } from "./fixtures/reportFixtures";
 
 /*
  * "What changed this week" compares the reading with last week's published
@@ -464,7 +464,7 @@ describe("the assembled homepage on Oct 5, 2026", () => {
             { date: "2026-10-05", value: snapshotData.yields.oneMonth },
           ],
         },
-        macroSeries,
+        macroSeries: liveMacroSeries,
         now: new Date("2026-10-05T12:00:00.000Z"),
       }),
     );

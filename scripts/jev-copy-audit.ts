@@ -22,17 +22,23 @@
  * toss. Every Jev call that fails is counted, and any failure exits non-zero,
  * so a run that judged nothing cannot read as a clean one.
  *
+ * `--model` picks the decision model (`jev`, the default, `clef` or `clef-flash`;
+ * see `lib/jev/jevClient.ts`). Two or more, comma-separated, judge every sentence
+ * once per model and list the sentences they disagree on: that list, not the
+ * agreement rate, is what says whether the cheaper model can stand in for Jev.
+ *
  * Needs CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (Workers AI: Read/Edit).
  *
  * Usage:
  *   bun run dev   # in another shell
  *   bun run audit:jev-copy
  *   bun run audit:jev-copy -- --routes /,/trust --threshold 0.7
+ *   bun run audit:jev-copy -- --model jev,clef-flash
  *   bun run brief:weekly:artifact && bun run audit:jev-copy -- --mode brief
  */
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import path from "node:path";
-import { runJev, type JevQuestion, type JevResult } from "../lib/jev/jevClient";
+import { isDecisionModel, runJev, type DecisionModel, type JevQuestion, type JevResult } from "../lib/jev/jevClient";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 
 const DEFAULT_ROUTES = ["/", "/trust", "/history", "/signals", "/pricing", "/share", "/operate", "/resources"];
@@ -133,6 +139,40 @@ export const flaggedQuestions = (result: JevResult, threshold: number): Record<s
   return flags;
 };
 
+export type Disagreement = { route: string; sentence: string; question: string; flaggedBy: string[]; clearedBy: string[] };
+
+/**
+ * Every sentence and question one model flagged and another cleared. A sentence
+ * any model failed to judge is left out: its empty flags would read as a clear.
+ */
+export const findDisagreements = (
+  items: { route: string; sentence: string }[],
+  resultsByModel: Record<string, JevResult[]>,
+  threshold: number,
+): Disagreement[] => {
+  const runs = Object.entries(resultsByModel);
+  return items.flatMap((item, index) => {
+    const judged: { model: string; flags: Record<string, number> }[] = [];
+    for (const [model, results] of runs) {
+      const result = results[index];
+      if (!result?.ok) return [];
+      judged.push({ model, flags: flaggedQuestions(result, threshold) });
+    }
+    return Object.keys(COPY_QUESTIONS).flatMap((question) => {
+      const flaggedBy = judged.filter(({ flags }) => question in flags).map(({ model }) => model);
+      if (flaggedBy.length === 0 || flaggedBy.length === judged.length) return [];
+      const clearedBy = judged.map(({ model }) => model).filter((model) => !flaggedBy.includes(model));
+      return [{ ...item, question, flaggedBy, clearedBy }];
+    });
+  });
+};
+
+const parseModels = (value: string | undefined): DecisionModel[] | null => {
+  const names = [...new Set((value ?? "jev").split(",").map((name) => name.trim()).filter(Boolean))];
+  const models = names.filter(isDecisionModel);
+  return models.length === names.length && models.length > 0 ? models : null;
+};
+
 const parseArgs = (argv: string[]) => {
   const read = (name: string) => {
     const index = argv.indexOf(`--${name}`);
@@ -144,8 +184,12 @@ const parseArgs = (argv: string[]) => {
     baseUrl: read("base-url") ?? "http://localhost:3000",
     routes: read("routes")?.split(",").map((route) => route.trim()).filter(Boolean) ?? DEFAULT_ROUTES,
     threshold,
+    models: parseModels(read("model")),
   };
 };
+
+type Args = ReturnType<typeof parseArgs> & { models: DecisionModel[] };
+type Credentials = { accountId: string; apiToken: string };
 
 const pool = async <T, R>(items: T[], worker: (item: T) => Promise<R>): Promise<R[]> => {
   const results: R[] = Array.from({ length: items.length });
@@ -168,7 +212,7 @@ const writeReport = (name: string, report: unknown) => {
   return file;
 };
 
-const runCopyAudit = async (args: ReturnType<typeof parseArgs>, credentials: { accountId: string; apiToken: string }) => {
+const runCopyAudit = async (args: Args, credentials: Credentials) => {
   const seen = new Set<string>();
   const items: { route: string; sentence: string }[] = [];
   for (const route of args.routes) {
@@ -186,30 +230,41 @@ const runCopyAudit = async (args: ReturnType<typeof parseArgs>, credentials: { a
     }
   }
 
-  console.log(`jev-copy-audit: judging ${items.length} sentences from ${args.routes.length} routes`);
-  const results = await pool(items, (item) =>
-    runJev({ state: { context: COPY_CONTEXT, sentence: item.sentence }, questions: COPY_QUESTIONS }, credentials));
+  console.log(`jev-copy-audit: judging ${items.length} sentences from ${args.routes.length} routes with ${args.models.join(", ")}`);
+  const resultsByModel: Record<string, JevResult[]> = {};
+  const byModel: Record<string, { served: string[]; failed: number; findings: CopyFinding[] }> = {};
+  let failed = 0;
+  for (const model of args.models) {
+    const results = await pool(items, (item) =>
+      runJev({ state: { context: COPY_CONTEXT, sentence: item.sentence }, questions: COPY_QUESTIONS }, { ...credentials, model }));
+    resultsByModel[model] = results;
+    const failures = results.flatMap((result) => (result.ok ? [] : [result.reason]));
+    const findings: CopyFinding[] = items
+      .map((item, index) => ({ ...item, flags: flaggedQuestions(results[index], args.threshold) }))
+      .filter((finding) => Object.keys(finding.flags).length > 0);
+    const served = [...new Set(results.flatMap((result) => (result.ok ? [result.model] : [])))];
+    byModel[model] = { served, failed: failures.length, findings };
+    failed += failures.length;
 
-  const failures = results.flatMap((result) => (result.ok ? [] : [result.reason]));
-  const findings: CopyFinding[] = items
-    .map((item, index) => ({ ...item, flags: flaggedQuestions(results[index], args.threshold) }))
-    .filter((finding) => Object.keys(finding.flags).length > 0);
-  const models = [...new Set(results.flatMap((result) => (result.ok ? [result.model] : [])))];
+    for (const finding of findings) {
+      const flags = Object.entries(finding.flags).map(([key, p]) => `${key} ${p.toFixed(2)}`).join(", ");
+      console.log(`  ${model}  ${finding.route}  [${flags}]\n    ${finding.sentence}`);
+    }
+    console.log(`jev-copy-audit: ${model} flagged ${findings.length} of ${items.length} at ≥${args.threshold} (served by ${served.join(", ") || "none"})`);
+    if (failures.length > 0) console.error(`jev-copy-audit: ${model}: ${failures.length} call(s) failed, first: ${failures[0]}`);
+  }
 
-  const file = writeReport("copy-audit.json", { threshold: args.threshold, models, judged: items.length, failed: failures.length, findings });
-  for (const finding of findings) {
-    const flags = Object.entries(finding.flags).map(([key, p]) => `${key} ${p.toFixed(2)}`).join(", ");
-    console.log(`  ${finding.route}  [${flags}]\n    ${finding.sentence}`);
+  const disagreements = args.models.length > 1 ? findDisagreements(items, resultsByModel, args.threshold) : [];
+  for (const entry of disagreements) {
+    console.log(`  disagree  ${entry.route}  ${entry.question}: flagged by ${entry.flaggedBy.join(", ")}, cleared by ${entry.clearedBy.join(", ")}\n    ${entry.sentence}`);
   }
-  console.log(`jev-copy-audit: ${findings.length} flagged of ${items.length} at ≥${args.threshold} (model ${models.join(", ") || "none"}); report ${file}`);
-  if (failures.length > 0) {
-    console.error(`jev-copy-audit: ${failures.length} Jev call(s) failed, first: ${failures[0]}`);
-    return 1;
-  }
-  return 0;
+  const file = writeReport("copy-audit.json", { threshold: args.threshold, judged: items.length, byModel, disagreements });
+  if (args.models.length > 1) console.log(`jev-copy-audit: ${disagreements.length} disagreement(s) across ${args.models.join(", ")}`);
+  console.log(`jev-copy-audit: report ${file}`);
+  return failed > 0 ? 1 : 0;
 };
 
-const runBriefAudit = async (args: ReturnType<typeof parseArgs>, credentials: { accountId: string; apiToken: string }) => {
+const runBriefAudit = async (args: Args, credentials: Credentials) => {
   const archive: unknown = JSON.parse(readFileSync("data/published_briefs.json", "utf8"));
   const latest = Array.isArray(archive) ? archive.at(-1) : null;
   /* Generated, never a committed copy: the committed one fell back here while it sat three weeks
@@ -227,22 +282,27 @@ const runBriefAudit = async (args: ReturnType<typeof parseArgs>, credentials: { 
     latest as Record<string, unknown>;
   const publishedCall = { slug, recordDate, postureLabel, confidenceLabel, summary, actionNow, guardrailThreshold, flipThreshold };
 
-  const result = await runJev(
-    { state: { publishedCall, briefText: readFileSync(briefPath, "utf8") }, questions: BRIEF_QUESTIONS },
-    credentials,
-  );
-  if (!result.ok) {
-    console.error(`jev-copy-audit: Jev call failed: ${result.reason}`);
-    return 1;
+  const briefText = readFileSync(briefPath, "utf8");
+  const reports: Record<string, unknown> = {};
+  let failed = 0;
+  for (const model of args.models) {
+    const result = await runJev({ state: { publishedCall, briefText }, questions: BRIEF_QUESTIONS }, { ...credentials, model });
+    if (!result.ok) {
+      console.error(`jev-copy-audit: ${model} call failed: ${result.reason}`);
+      failed += 1;
+      continue;
+    }
+    reports[model] = { served: result.model, answers: result.answers };
+    const contradicts = result.answers.contradicts_call;
+    const area = result.answers.conflict_area;
+    const p = contradicts?.type === "noul" ? contradicts.noul : 0;
+    console.log(`jev-copy-audit: ${model} — ${briefPath} vs published ${String(slug)}: contradicts ${p.toFixed(2)}`
+      + `${area?.type === "choice" ? `, area ${area.choice}` : ""} (served by ${result.model})`);
+    if (p >= args.threshold) console.log("  flagged: read the brief against the published call before it is sent.");
   }
-  const file = writeReport("brief-audit.json", { publishedCall, briefPath, threshold: args.threshold, model: result.model, answers: result.answers });
-  const contradicts = result.answers.contradicts_call;
-  const area = result.answers.conflict_area;
-  const p = contradicts?.type === "noul" ? contradicts.noul : 0;
-  console.log(`jev-copy-audit: ${briefPath} vs published ${String(slug)} — contradicts ${p.toFixed(2)}`
-    + `${area?.type === "choice" ? `, area ${area.choice}` : ""} (model ${result.model}); report ${file}`);
-  if (p >= args.threshold) console.log("  flagged: read the brief against the published call before it is sent.");
-  return 0;
+  const file = writeReport("brief-audit.json", { publishedCall, briefPath, threshold: args.threshold, byModel: reports });
+  console.log(`jev-copy-audit: report ${file}`);
+  return failed > 0 ? 1 : 0;
 };
 
 if (import.meta.main) {
@@ -261,6 +321,11 @@ if (import.meta.main) {
     console.error("jev-copy-audit: --mode must be copy or brief.");
     process.exit(2);
   }
+  const { models } = args;
+  if (!models) {
+    console.error("jev-copy-audit: --model takes jev, clef or clef-flash, comma-separated.");
+    process.exit(2);
+  }
   const run = args.mode === "brief" ? runBriefAudit : runCopyAudit;
-  process.exit(await run(args, { accountId, apiToken }));
+  process.exit(await run({ ...args, models }, { accountId, apiToken }));
 }

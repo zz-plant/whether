@@ -94,14 +94,14 @@ Supporting surfaces are intentionally subordinate:
 - `/resources` and `/resources/*`, `/answers/[slug]`, and `/concepts` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 - SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
 - Secondary pages such as `/toolkits/[slug]`, `/search`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
-- `/guides` is a compatibility redirect into query-selected translation states on `/resolve` (`/guides/[stakeholder]` to `?stakeholder=`, `/guides/stage/[stage]` to `?stage=`), so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
-- `/toolkits` permanently redirects to `/` (`next.config.js`). Toolkit search and browse state (`?toolkitQuery=`) live inside the Browse disclosure on `/resolve`, and each toolkit keeps its own `/toolkits/[slug]` page.
+- `/guides` is a compatibility redirect to Guides (`/resources`), and its sub-paths go to query-selected states of Guides' More tools (`/guides/[stakeholder]` to `?stakeholder=`, `/guides/stage/[stage]` to `?stage=`, `/guides/stage` to `?library=stages`, each at `#more-tools`), so role and stage translation live on Guides rather than on a parallel library page.
+- `/toolkits` permanently redirects to `/` (`next.config.js`). Toolkit search state (`?toolkitQuery=`) lives in the toolkit library under Guides' More tools (`/resources#toolkit-library`), and each toolkit keeps its own `/toolkits/[slug]` page.
 - `/posture` and `/startup-macro-posture` redirect back to the Weekly Brief (`/startup-macro-posture/index` to `/trust#formula-reference`), and `/solutions/*` redirects into `/resolve` or a toolkit page. Live posture reference no longer ships as a standalone workflow.
 - `/search` renders its results on the server (`app/search/page.tsx`); the hub the top match belongs to is offered as the first action rather than redirected to.
 - `/resources` is a hub page (`app/resources/page.tsx`) listing the governance frameworks and the decision guides; deeper governance material lives on focused `/resources/[slug]` detail pages.
 - `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
-- `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/resolve` or `/concepts`
-- `/learn/failure-modes` permanently redirects into the trust workflow (`/trust#revisit-call`) rather than acting as an independently indexable content hub.
+- `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/resources` or `/concepts`
+- `/learn/failure-modes` permanently redirects into the trust workflow (`/trust#revisit-call`) rather than acting as an independently indexable content hub. The hub's earlier names follow it: `/library` and `/reference` go to `/trust`, their failure-mode paths to `/trust#revisit-call`, and the concept paths under all three (`/learn/concepts/*`, `/library/canon/*`, `/reference/concepts/*`) to `/concepts`.
 - `/concepts` is a page again (restored 2026-09-23): one list of widely read product-management writing and, since 2026-10-09, capital-allocation essays and investor memos, each entry placed on the month-end record (conditions that month, how long they had held, both scores) and tagged Expand, Conserve or Craft, with each kind's share per set of conditions beside the months' share so no coincidence reads as a cause (§1.1.64). Every entry's first-publication month was checked against its source. Sub-paths (the first version's detail, focus, audience and conflicts pages) redirect to `/concepts`. Modules: `lib/productCanon.ts`, `lib/productCanonMeasures.ts`, `lib/adviceStance.ts`; test: `tests/productCanon.test.ts`.
 
 The homepage renders no interpretation layer. A non-default `?view=` still selects one and the home assembly builds it (`buildInterpretationLayer`, called from `lib/report/homePageAssembler.ts`), but nothing reads it: its panel had no call site and was deleted on 2026-08-14, and the exports stopped receiving it on 2026-10-06 (§5.3.1).
@@ -135,11 +135,19 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    headline action as the `h1` (`weeklyHeadline`, §1.1.60); what the conditions mean; one line on
    why (`describeMovementCause`: the lines the scores crossed, "Risk appetite fell through 54."); the
    trust strip ("Data as of", Sources, and Margin, which says after the points whether the call could
-   change next week); and from `md` up the conditions map with the trail's caption under it. A
-   monthly or quarterly horizon adds `CadenceCallCard` above it with the `h1`. Under the card sit
+   change next week, by `couldCallChangeNextWeek`, §1.1.31a); and from `md` up the conditions map
+   with the trail's caption under it. A monthly or quarterly horizon adds `CadenceCallCard` above it
+   with the `h1`. Under the card sit
    `SinceLastVisit` (only when the conditions or the call differ from what this browser last saw,
    and not when the difference is the earlier conditions the stamp line names) and `YourRecordNote`
    (live briefs only), then Copy Brief (DD-005's one primary action) and the Plan horizon control.
+   `CadenceCallCard` states the horizon's guidance and its Pause if / Resume when pair, and under the
+   pair draws one `ThresholdLadder` for funding pressure and one for risk appetite
+   (`cadenceCallModel.boundedBands`, built by `buildHorizonSignalBands` in
+   `lib/summary/horizonOperatingRules.ts` from the thresholds the pair's sentences use): the score,
+   its move since the comparison reading, and how far it sits from the pause line and the resume
+   line. When the guidance is held the card prints neither the pair nor the ladders; the weekly card
+   below states the hold's lines.
 2. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
    only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
    its default choice, a chosen stage's own action as a stage line, and the runway emphasis once a
@@ -428,7 +436,10 @@ assumptions optimistic in three ways, and this pass fixed each:
   turn RISKY into SAFE). Both now start empty and say what to enter; runway, burn, revenue, and
   growth live in one browser-held profile (`lib/operatorProfile.ts`, `whether.operatorProfile`)
   that the planner and both stress tests share through `OperatorProfileNumberField`, which
-  validates on blur, commits on parse, and treats blank as "not given".
+  validates on blur, commits on parse, and treats blank as "not given". Gross margin came back on
+  2026-09-26 as a figure the operator enters, not a default: `grossMarginPct` (0–100) is on the same
+  profile, asked for only when the Decision Shield's Model is Bootstrapped, and able to turn RISKY
+  into SAFE from there (§5.7).
 - **Dead capture paths removed.** `useCrossDeviceSync` (no call sites), `useDecisionHistory` +
   the history page's "Decision archive" (nothing ever wrote the key it read),
   `lib/report/companyMetrics.ts` and `lib/sensitivityCoefficient.ts` (no product callers), and the
@@ -1687,6 +1698,30 @@ true.
 - `/privacy` 2.1 lists the lines among what a subscription stores. `/pricing` moves the
   line-crossing alert from Pro to Free: it was promised free on the homepage already, and a
   plan nobody can buy would have made plan lines unreachable.
+
+### 1.1.31a One rule for "could change next week" (2026-10-01)
+
+On the week of Sep 29, 2026 the homepage trust strip said "Not expected" and `/brief.md` said
+"Conditions could change next week" about the same reading. The strip read the engine; the brief
+read a second flag on the home model (8 points on the one-scale distance, or any change since the
+month-end comparison), which stayed on for a month after a change that had already passed its
+confirming reading.
+
+- **The rule.** `couldCallChangeNextWeek` (`lib/report/trustStatus.ts`) is yes when a score sits
+  inside the engine's 5-point near band (`diagnostics.transitionWatch`) or the engine is holding a
+  change for its confirming reading (`regimeTransition.pending`), and no otherwise.
+- **Its readers.** The trust strip reads it (`buildTrustStripProps`, with the reason beside it).
+  The home model's `transitionWatch` is computed from it (`lib/report/homeBrief/builders.ts`), so
+  `/brief.md`'s trust line, the memo lines, the change-watch row and the exports that read the
+  model print the strip's answer. No surface keeps a rule of its own.
+- **Data caveat.** `/brief.md`'s provenance line about the state of the data was labelled
+  "Action", the decision contract's word for the operating action, so a week whose guidance was to
+  freeze new commitments printed "Action: Safe to use for near-term planning; proceed with normal
+  approval flow". It is labelled "Data caveat" (`DATA_CAVEAT_LABEL`) and reads "None." on live data;
+  an archived, cached or held reading prints what that state asks of the reader.
+- Tests: `tests/homeBriefModel.test.ts`, `tests/pageReaderContradictions.test.tsx`,
+  `tests/trustStatusTones.test.ts`. The lesson: docs/agents/lessons/tests-and-copy-rules.md
+  ("Two flags for one claim").
 
 ### 1.1.32 Consent for changes, and paid plans that sell what free does not (2026-10-01)
 
@@ -3556,12 +3591,12 @@ under `public/social/` were deleted on 2026-09-10, because social unfurlers refu
 
 `/resources` is the one secondary hub with a page of its own, listing the governance frameworks and
 the decision guides. `/guides` and `/toolkits` redirect (§1.0), and `/answers`
-redirects to the direct answers on `/resolve` (`/resolve#direct-answers`) instead of maintaining a
+redirects to the direct answers on Guides (`/resources#answers`) instead of maintaining a
 separate hub shell.
-`/resolve` owns the stakeholder and stage states behind query-selected panels (`?stakeholder=`, `?stage=`, `?library=`), and supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
+Guides' More tools owns the stakeholder and stage states behind query-selected panels (`?stakeholder=`, `?stage=`, `?library=`), and supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
 `/search` is product-accessible and noindex. It renders the matches on the server and offers the hub the top match belongs to as the first action, rather than forwarding the query there.
 `/resolve/team-context` no longer operates as a standalone personalization branch; it redirects into Planning (`/operate#ops-monthly-action-summary`). `/resolve` itself is described in §4.1.
-The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect to `/resolve#direct-answers`. The active resource-article set is likewise reduced to a focused practical subset: retired long-form briefs redirect to Planning's Share step (`/planning#ops-export-briefs`, which lands on `/operate`), and the remaining guides are listed on `/resources`.
+The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect to `/resources#answers`. The active resource-article set is likewise reduced to a focused practical subset: retired long-form briefs redirect to `/resources`, where the remaining guides are listed.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 
@@ -4063,6 +4098,17 @@ $$
   so the artifact could contradict the verdict beside it. The compare-mode verdict badges also
   split UNSAFE (rose) from RISKY (amber); both used to render amber
   (`tests/decisionShield.test.ts`).
+- Bootstrapped mode reads the operator's own gross margin (2026-09-26). With the Decision Shield's
+  Model set to Bootstrapped (`?model=BOOTSTRAPPED`), the plan stress test shows a "Gross margin (%)"
+  field bound to the profile's `grossMarginPct` (optional, 0–100; blank is "not given" and changes
+  nothing). At 70% or more a RISKY verdict becomes SAFE and the line beside the verdict
+  (`financialImpactSummary`) reads "Bootstrapped with N% gross margin, so tighter funding matters
+  less."; under 50% the fragile assumptions add "Gross margin (N%) provides limited buffer if
+  customer demand slows." The under-12-months runway rule in Cloudy and Freezing conditions is
+  checked first and outranks the margin. Bootstrapped mode also drops the two assumptions about
+  outside capital (capital and refinancing staying cheap under elevated funding pressure, investors
+  funding fast burn under low risk appetite) (`stressTestDecisionPlan`, `lib/decisionShield.ts`;
+  `tests/decisionShield.test.ts`).
 
 ## 6) APIs (server routes)
 

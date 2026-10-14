@@ -122,6 +122,23 @@ const macroSourceGroups: SourceGroupDefinition[] = [
   },
 ];
 
+/**
+ * The fetch-backed macro series a reading carries from the bundled snapshot instead of a live
+ * read. The curated snapshot series are never listed, since they are not meant to be live.
+ * Labels, so a refusal can name them.
+ *
+ * `loadMacroSeries` keeps the snapshot value for any series whose fetch failed, and the engine
+ * scores it like any other input, so a reading with a live Treasury can still carry stale macro
+ * inputs into its scores. Anything that publishes or records a reading asks this as well as
+ * whether the Treasury is live.
+ */
+export const listCachedLiveMacroSeries = (
+  macroSeries: readonly Pick<MacroSeriesReading, "id" | "label" | "isLive">[],
+): string[] => {
+  const fetchBacked = new Set(macroSourceGroups.filter((group) => group.supportsLive).flatMap((group) => group.ids));
+  return macroSeries.filter((series) => fetchBacked.has(series.id) && !series.isLive).map((series) => series.label);
+};
+
 const getBusinessDayElapsedHours = (timestamp: string, now: Date): number => {
   const then = Date.parse(timestamp);
   if (Number.isNaN(then)) return Infinity;

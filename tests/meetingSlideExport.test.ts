@@ -109,6 +109,31 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(!html.includes("SCARCITY"));
   });
 
+  it("puts the guidance, the watch line and the link in the rich paste, as the Markdown does", () => {
+    // The HTML is the half Slides and Notion paste; it dropped all three.
+    const payload = {
+      ...buildExportSlidePayload(buildOperatingSnapshot({ treasury: mockTreasury, macroSeries }), "seed"),
+      call: "Hold hiring to revenue roles.",
+      clearsWhen: ["Funding pressure < 66", "Risk appetite > 54"],
+      url: "https://whether.test/?stage=seed",
+      isFallback: true,
+    };
+    const markdown = formatMeetingSlideMarkdown(payload);
+    const html = formatMeetingSlideHtml(payload);
+
+    assert.ok(markdown.includes("**GUIDANCE**: Hold hiring to revenue roles."));
+    assert.ok(html.includes(">Guidance<"));
+    assert.ok(html.includes(">Hold hiring to revenue roles.<"));
+    assert.ok(html.includes(">Watch this week<"));
+    assert.ok(html.includes("Funding pressure &lt; 66; Risk appetite &gt; 54"), "comparisons are escaped, not read as tags");
+    assert.ok(html.includes('<a href="https://whether.test/?stage=seed"'));
+    assert.ok(html.includes("saved copy, not a live reading"));
+
+    // No guidance row when the call is the action, as in the Markdown.
+    const same = formatMeetingSlideHtml({ ...payload, call: payload.actionNow });
+    assert.ok(!same.includes(">Guidance<"));
+  });
+
   it("generates valid 16:9 standalone SVG slide", () => {
     const snapshot = buildOperatingSnapshot({
       treasury: mockTreasury,
