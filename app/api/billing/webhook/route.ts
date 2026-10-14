@@ -6,6 +6,7 @@ import {
   isPremiumSeatBand,
 } from "../../../../lib/premiumFunnel";
 import { cancelEntitlementByCustomerId, saveEntitlement } from "../../../../lib/billing/entitlements";
+import { checkoutCompletionMarkers } from "../../../../lib/storage/premiumFunnelEventRepository";
 import { constantTimeCompare } from "../../../../lib/constantTimeCompare";
 import { hmacSha256, toHex } from "../../../../lib/crypto";
 
@@ -180,6 +181,12 @@ export async function POST(request: Request) {
 
   const planCandidate = metadata?.planCandidate;
   const seatBand = metadata?.seatBand;
+  /* One purchase, one completion: a redelivery of a session already recorded sends nothing. */
+  const completions = checkoutCompletionMarkers();
+
+  if (checkout.id && (await completions.wasSent(checkout.id))) {
+    return NextResponse.json({ ok: true, duplicate: true }, { status: 200 });
+  }
 
   try {
     await dispatchPremiumFunnelEvent({
@@ -191,6 +198,7 @@ export async function POST(request: Request) {
       seatBand: seatBand && isPremiumSeatBand(seatBand) ? seatBand : undefined,
       occurredAt: new Date().toISOString(),
     });
+    if (checkout.id) await completions.markSent(checkout.id);
   } catch {
     // Keep Stripe webhook processing non-blocking if telemetry forwarding fails.
   }
