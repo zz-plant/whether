@@ -33,20 +33,20 @@ describe("a score at the top of its scale", () => {
   it("says a clipped score cannot show a move, instead of showing nothing", () => {
     const html = render([row({ saturatedPressure: 148 })]);
 
-    assert.match(html, /Pinned at the top of its scale, so it can’t show a move\./);
-    assert.match(html, /It would read 148/, "the raw pressure stays visible beside it");
+    assert.match(html, /At 100, the top of its scale\. It would read 148 if the scale went higher, so a further rise can’t show here\./);
+    assert.match(html, /would read 148/, "the raw pressure stays visible beside it");
     assert.doesNotMatch(html, /\bclipped\b|\bceiling\b|100-point/i, "said in the reader's terms, not the scoring code's");
   });
 
   it("stays silent when the score is simply flat and not clipped", () => {
     const html = render([row({ value: 64, valueLabel: "64", delta: 0 })]);
 
-    assert.ok(!html.includes("Pinned at the top of its scale"), "a flat week is not a clipped one");
+    assert.ok(!html.includes("the top of its scale"), "a flat week is not a clipped one");
   });
 
   it("stays silent when there is a move", () => {
     const html = render([row({ value: 64, valueLabel: "64", delta: 3, previous: 61, previousLabel: "61" })]);
 
-    assert.ok(!html.includes("Pinned at the top of its scale"));
+    assert.ok(!html.includes("the top of its scale"));
   });
 });

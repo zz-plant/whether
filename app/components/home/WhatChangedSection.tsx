@@ -191,8 +191,8 @@ export function WhatChangedSection({
                            moment conditions are most extreme. Say it, under the
                            ladder that has the width for a sentence: in the chip
                            column it wrapped to four lines and stretched the row. */
-                        <p className="max-w-[48ch] text-xs text-amber-300/80">
-                          Pinned at the top of its scale, so it can&rsquo;t show a move. It would read {row.saturatedPressure.toFixed(0)}.
+                        <p className="weather-caveat-mark max-w-[48ch] text-xs text-caveat-fg">
+                          At 100, the top of its scale. It would read {row.saturatedPressure.toFixed(0)} if the scale went higher, so a further rise can&rsquo;t show here.
                         </p>
                       ) : null}
                     </div>
