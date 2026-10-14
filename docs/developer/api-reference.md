@@ -7,6 +7,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 - **Lifecycle:** developer preview for internal integrations; contracts may evolve while v1 stabilizes.
 - **Format:** JSON.
 - **Runtime:** edge handlers.
+- **Cost:** Whether is free.
 - **Auth:** currently none. Protect public deployments with your own auth/reverse proxy as needed.
 - **Automation headers:** send `Accept: application/json`; include `Authorization: Bearer <token>` when your deployment is access-controlled.
 - **Rate limiting:** platform-default protections apply; explicit per-endpoint quotas are not yet published.
@@ -52,15 +53,6 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/slack/unsubscribe` | POST | Remove a Slack delivery subscription by its `token`. |
 | `/api/decision-events` | GET | Retrieve regime transition decision events with cursor pagination and optional replay support (`replay=1&initialState=<REGIME>`). |
 | `/api/integrations/weekly-mandate?target=<slack|email|...>` | GET | Destination-specific weekly mandate payload. |
-
-### D2) Premium billing readiness
-
-This is backend substrate for the pre-reveal premium flow. It supports checkout and webhook plumbing, but it is not a first-class public pricing surface.
-
-| Endpoint | Method(s) | Purpose |
-| --- | --- | --- |
-| `/api/billing/checkout` | POST | Creates Stripe Checkout sessions for premium plans (`pro`, `team`) as pre-reveal backend plumbing; requires an attributed premium `source` and supports `Idempotency-Key`. |
-| `/api/billing/webhook` | POST | Stripe webhook receiver for `checkout.session.completed`; verifies `stripe-signature` via `STRIPE_WEBHOOK_SECRET` (accepts any matching `v1=` signature and enforces Stripe's 5-minute timestamp tolerance) and emits `premium_checkout_complete` telemetry when attribution metadata is valid. |
 
 ### E) Discover capabilities for tools/agents
 

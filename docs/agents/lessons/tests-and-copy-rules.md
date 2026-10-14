@@ -144,11 +144,12 @@ a failing test or a dead export, and the suite was green through all of them.
   each label to share a word with its heading and failed on "Revisit triggers" → "What would make
   this recommendation wrong?", which is a good short name. A test that fails on a correct label is
   answering a different question from the one in its name.
-- **`/pricing` told a reader their recorded decisions stay in their browser.** `/privacy` 2.4 says
+- **`/pricing` told a reader their recorded decisions stay in their browser.** `/privacy` 2.3 says
   they are held in Cloudflare KV against the browser identifier, which is the truth; the pricing
   bullet bundled them with week close-outs, which *are* local, and called both "saved in this
   browser". Understating where a reader's data goes is the direction that costs trust, and these two
-  pages are read by the same person for the same reason.
+  pages are read by the same person for the same reason. (`/pricing` and this test went with the
+  paid tier on 2026-10-14.)
 - **The mockup's copy button handed over an unmarked sample.** `/mockups/*` is gated off production
   by `app/mockups/layout.tsx` and only runs on the preview lane, which the audit initially missed —
   the route is not the problem. What left it was: the copied text was branded "Whether" and carried

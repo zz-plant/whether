@@ -7,8 +7,8 @@ import type { Route } from "./routeType";
  * Resolve, Trust, History — and a nine-item More menu. Evidence had three names
  * (the tab, `/signals`, and "Why the weekly brief changed"), Plan and Resolve
  * both answered "what do I do about one decision", the track record sat on four
- * pages under three tabs, and Guides, Pricing and About were reachable only from
- * a dropdown or another page. The four groups are the four questions a reader
+ * pages under three tabs, and Guides and About were reachable only from a
+ * dropdown or another page. The four groups are the four questions a reader
  * brings: what is true this week, what do I decide, how has it held up, and
  * where is the longer answer.
  *
@@ -250,13 +250,13 @@ export const navigationLabelByPath = navigationPages.reduce<Record<string, strin
  * header's utility row, the footer, the mobile sheet and the palette.
  *
  * "Single source" is load-bearing: the footer used to hand-list its own copy of
- * this row, and the copies drifted. /pricing was in here and not in the footer,
- * so the one page that explains what costs money was reachable only from a
- * header dropdown. Render this array; do not restate it.
+ * this row, and the copies drifted, so a page in here was missing from the
+ * footer and reachable only from a header dropdown. Render this array; do not
+ * restate it.
  *
  * `header`: the width from which the header draws it as a text link (every
- * one is in the mobile sheet and the footer). Pricing and About sat in the More
- * menu until 2026-10-08, which is where a reader stops looking; Use it
+ * one is in the mobile sheet and the footer). About sat in the More menu until
+ * 2026-10-08, which is where a reader stops looking; Use it
  * elsewhere waits for `lg`, because at a tablet's width the three ran into the
  * search field. API & MCP is reached from /share, which hosts every way to use
  * the guidance elsewhere; Search is the ⌘K field.
@@ -275,12 +275,6 @@ export const utilityLinks = [
     label: "API & MCP",
     description: "MCP server, REST endpoints, CLI, widget",
     header: null,
-  },
-  {
-    href: "/pricing",
-    label: "Pricing",
-    description: "What is free forever and what Pro and Team add",
-    header: "md",
   },
   {
     href: "/about",

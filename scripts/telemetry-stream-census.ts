@@ -38,7 +38,6 @@ const DECLARED_STREAMS = TELEMETRY_STREAMS;
 const READERS: Record<string, string> = {
   "cron-step": "lib/telemetry/runHistory.ts → /trust",
   "content-measurement": "scripts/seo-page-metrics.ts → SEO refresh queue",
-  "premium-funnel": "KV, not Analytics Engine (GET /api/telemetry/premium-funnel)",
   search: "this census only",
 };
 

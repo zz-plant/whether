@@ -113,7 +113,8 @@ type GlobalHeaderNavClientProps = {
  * There is no More menu. It held nine links until 2026-10-08 — SaaS Multiples,
  * Compare periods, Share, API & MCP, Pricing, Calibration, Product writing,
  * Search and About — and where a page lives in the groups now, it is a sub-tab
- * of its group; Pricing and About are text links here; Search is the ⌘K field.
+ * of its group; About is a text link here, and /pricing redirects to it (the
+ * paid tier was removed on 2026-10-14); Search is the ⌘K field.
  */
 export function GlobalHeaderNavClient({ pathname }: GlobalHeaderNavClientProps) {
   const currentPathname = usePathname() ?? "/";

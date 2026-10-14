@@ -4,7 +4,6 @@ import { buildAuthorSchema, buildPublisherSchema } from "../publisher";
 import { buildGroupBreadcrumbs, createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
-import { PRICING_SUMMARY, type PricingPlan } from "../pricing";
 import { MARKET_DATA_PROVIDER_LABELS, type SaaSValuationSnapshot } from "../saasMultiples";
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
 
@@ -124,69 +123,6 @@ export const buildHistoryStructuredData = ({
       })),
     },
     buildBreadcrumbList(buildGroupBreadcrumbs("/history")),
-  ]);
-};
-
-/**
- * `/pricing`: one `Product` with an `Offer` per plan. The paid plans are not on
- * sale yet, so their availability is `PreOrder` rather than `InStock`; the page
- * says so in prose and the markup must not say otherwise.
- */
-export const buildPricingStructuredData = ({
-  plans,
-  paidPlansOnSale,
-}: {
-  plans: readonly PricingPlan[];
-  paidPlansOnSale: boolean;
-}): JsonLdGraph => {
-  const url = buildCanonicalUrl("/pricing");
-  return graph([
-    {
-      "@type": "WebPage",
-      "@id": `${url}#webpage`,
-      url,
-      name: "Pricing",
-      inLanguage: "en",
-      isPartOf: isPartOfSite,
-      mainEntity: { "@id": `${url}#product` },
-    },
-    {
-      "@type": "Product",
-      "@id": `${url}#product`,
-      name: "Whether Weekly Brief",
-      description: PRICING_SUMMARY,
-      /* Inlined, not referenced. An `@id` only resolves against nodes on the
-         same page (see the header), and this graph carries no Organization —
-         the reference dangled, which is the unresolvable entity these builders
-         exist to avoid. `buildPublisherSchema` carries the same `@id`, so the
-         two still describe one entity. */
-      brand: buildPublisherSchema(organizationName),
-      offers: plans.map((plan) => ({
-        "@type": "Offer",
-        name: plan.name,
-        description: plan.tagline,
-        price: plan.monthlyPriceUsd ?? 0,
-        priceCurrency: "USD",
-        ...(plan.monthlyPriceUsd === null
-          ? {}
-          : {
-              priceSpecification: {
-                "@type": "UnitPriceSpecification",
-                price: plan.monthlyPriceUsd,
-                priceCurrency: "USD",
-                billingDuration: 1,
-                billingIncrement: 1,
-                unitCode: "MON",
-              },
-            }),
-        availability:
-          plan.monthlyPriceUsd === null || paidPlansOnSale
-            ? "https://schema.org/InStock"
-            : "https://schema.org/PreOrder",
-        url: plan.monthlyPriceUsd === null ? siteUrl : buildCanonicalUrl(`/contact?plan=${plan.id}`),
-      })),
-    },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/pricing" }])),
   ]);
 };
 

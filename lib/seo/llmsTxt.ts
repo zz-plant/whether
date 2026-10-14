@@ -49,6 +49,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "# Whether — Agent Interface",
     "",
     `Whether is weekly operating guidance for startup leaders. ${canonicalPositioningLine}`,
+    "Whether is free, and nothing below needs a key or an account.",
     "",
     "## Start here",
     "",

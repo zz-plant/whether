@@ -236,8 +236,8 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   unexamined. Two of those five are Worker-authored (`ingest-pipeline`, `cron-step`) and one of
   those two is read back and rendered on `/trust` as "Scheduled runs" — anyone could have posted a
   run that never happened onto the page whose job is to be trustworthy. A third, `premium-funnel`,
-  has its own route with a body cap and a validator, which shadows the dynamic one anyway, so its
-  entry there was a weaker door Next never opened. The accepted set is now the keys of
+  had its own route with a body cap and a validator, which shadowed the dynamic one anyway, so its
+  entry there was a weaker door Next never opened (that route went with the paid tier on 2026-10-14). The accepted set is now the keys of
   `STREAM_VALIDATORS`: a stream with no validator cannot be posted, and adding one without a
   validator does not typecheck. The declared list lives once, in `TELEMETRY_STREAMS`, with the union
   derived from it and the census script reading it.
@@ -267,10 +267,10 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   drive interpreters the build image does not guarantee (today: none; it held a Python analytics
   script until 2026-09-16), so the deploy gate leaves the directory out and says so only when it
   excluded something, while every local run and pre-push still runs it. The stripped environment
-  (see the two entries above on API keys and Cloudflare credentials) also drops `SLACK_WEBHOOK_URL`
-  and `PREMIUM_FUNNEL_WEBHOOK_URL`, for a sharper reason than rerouting a fixture: a webhook URL *is*
-  the credential, secret and all, in the path, and `lib/premiumFunnel.ts` hands one straight to the
-  global `fetch`, so with one exported a test could post to a real Slack channel. The network guard
+  (see the two entries above on API keys and Cloudflare credentials) also drops `SLACK_WEBHOOK_URL`,
+  for a sharper reason than rerouting a fixture: a webhook URL *is* the credential, secret and all,
+  in the path, and `lib/delivery/slack.ts` posts to it through the global `fetch`, so with one
+  exported a test could post to a real Slack channel. The network guard
   would catch and name it by origin only, but the suite should not be holding the secret at all.
 
 - **The landmark audit's smaller rules (moved here from its headers, 2026-10-07).**

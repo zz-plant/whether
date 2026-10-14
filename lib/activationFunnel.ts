@@ -1,9 +1,8 @@
 /**
  * The activation funnel, and the definition of activation itself.
  *
- * Two telemetry systems already exist — `premiumFunnel.ts` for upgrade intent and
- * `operatorWorkflowTelemetry.ts` for route and panel usage — and neither answers
- * whether the product *works*. For a weekly-ritual product there is exactly one
+ * `operatorWorkflowTelemetry.ts` already measures route and panel usage, and it
+ * does not answer whether the product *works*. For a weekly-ritual product there is exactly one
  * answer to that, and it is not pageviews, HN traffic, or copy clicks: it is
  * whether the same browser came back the following week. A visitor who reads one
  * brief and never returns did not adopt a weekly ritual; they read an article.
@@ -53,7 +52,7 @@ type ActivationReturnGap = "same_week" | "next_week" | "within_month" | "lapsed"
 /**
  * Where a visit arrived from, as one of seven words. Never the referring URL,
  * its path, or a query string: the hostname is read in the browser, matched
- * against the lists below, and discarded. `/privacy` 2.6 promises exactly this
+ * against the lists below, and discarded. `/privacy` 2.5 promises exactly this
  * bucket, and for a while it promised it with nothing behind it.
  */
 type ActivationArrival = "direct" | "search" | "social" | "chat" | "shared-link" | "internal" | "other";

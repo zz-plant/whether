@@ -178,6 +178,9 @@ export const iaConsolidationRedirectPairs = [
   // now carries its meaning where it appears, and the method terms that only a
   // formula needs are defined on the formula cards, which is where this lands.
   ["/glossary", "/trust#formula-reference"],
+  // Whether is free. The paid plans /pricing offered were never on sale and were
+  // removed on 2026-10-14; /about is the page that says what Whether is.
+  ["/pricing", "/about"],
 ];
 
 /*

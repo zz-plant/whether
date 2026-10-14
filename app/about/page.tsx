@@ -66,6 +66,7 @@ export default function AboutPage() {
         <p className="text-sm text-slate-300">
           Each Monday, Whether says what interest rates and credit mean for a startup&apos;s hiring, spend and raise. Each
           week it answers three things: what should change right now, how sure we are, and what would change the guidance.
+          Whether is free.
         </p>
       </section>
 

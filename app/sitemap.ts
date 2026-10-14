@@ -50,7 +50,7 @@ const resolveLastModified = (...candidates: string[]): Date => {
 /*
  * No `lastmod` for a page nothing dates. This was one constant, 2026-02-01,
  * submitted for fifteen pages — twelve of which did not exist yet on that date
- * (/privacy was written 2026-09-17, /pricing 2026-08-28) — and for five that
+ * (/privacy, for one, was written 2026-09-17) — and for five that
  * change every week (/history, /operate, /history/compare and the answer pages)
  * beside `changefreq: weekly`. Google reads `lastmod` only from a sitemap whose
  * dates it finds consistently accurate, so a wrong date on a static page costs
@@ -205,7 +205,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/history", lastModified: historyLastModified, changeFrequency: "weekly", priority: 0.7 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history/compare", lastModified: historyLastModified, changeFrequency: "weekly", priority: 0.4 },
-    { path: "/pricing", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.5 },
     { path: "/contact", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.45 },
     { path: "/share", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },

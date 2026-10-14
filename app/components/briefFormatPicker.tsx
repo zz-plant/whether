@@ -78,8 +78,6 @@ export const BriefFormatPicker = ({
     <button
       type="button"
       onClick={onCopy}
-      data-premium-intent="export_brief"
-      data-premium-cta="share_rail_copy_brief"
       data-testid="share-rail-copy-brief"
       className="weather-button mt-2 inline-flex w-full min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold @xl:w-auto @xl:px-5"
     >

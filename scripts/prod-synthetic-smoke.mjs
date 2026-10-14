@@ -10,8 +10,8 @@ const pageChecks = [
   { path: "/evidence", required: ["why it changed", "what would change this guidance"] },
   /* "decision help" was asked of /planning here until 2026-10-01; the page stopped
      rendering it on 2026-09-15, so every run since failed on a page that was up.
-     The plan-lines step is what /pricing, the Monday email and the homepage picker
-     all link to. */
+     The plan-lines step is what the Monday email and the homepage picker both link
+     to. */
   // "weekly plan" was the planning switcher's first tab; the Decide group's tabs
   // replaced it on 2026-10-08.
   { path: "/operate", required: ["decide", "set this plan's lines"] },

@@ -5,7 +5,6 @@ import { buildBreadcrumbList, buildPageMetadata } from "../../../lib/seo";
 import { graph } from "../../../lib/seo/pageStructuredData";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
-import { PremiumGate } from "../components/PremiumGate";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
 import { ScenarioStudioSimulator } from "../components/scenarioStudioSimulator";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
@@ -81,13 +80,7 @@ export default async function OperateWorkstreamPage({
       <div className="space-y-6">
         {entry.slug === "financial" ? (
           <div id="ops-runway-planner">
-            <PremiumGate
-              source="runway_planner"
-              title="Runway planner"
-              description="Enter cash in the bank, monthly spend and monthly revenue to see how far your runway goes in this week's conditions."
-            >
-              <RunwayPlannerPanel assessment={assessment} sensors={sensors} macroSeries={macroSeries} recordDateLabel={recordDateLabel} />
-            </PremiumGate>
+            <RunwayPlannerPanel assessment={assessment} sensors={sensors} macroSeries={macroSeries} recordDateLabel={recordDateLabel} />
           </div>
         ) : (
           <Suspense fallback={null}>

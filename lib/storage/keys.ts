@@ -15,13 +15,12 @@ export const STORAGE_KEYS = {
   /* The per-browser identifier every owned record is scoped by. It had a reader
      and a writer in `app/components/clientIdentity.ts` and was not in this
      registry, so the one key the privacy census most needs to see was the one
-     it could not: /privacy 2.3 describes it, and nothing failed if that stopped
+     it could not: /privacy 2.2 describes it, and nothing failed if that stopped
      being true. */
   clientId: "whether-client-id",
   homeOrientationDismissed: "whether.home.orientation.dismissed",
   reviewedRecordDates: "whether_reviewed",
   operatorProfile: OPERATOR_PROFILE_STORAGE_KEY,
-  entitlementToken: "whether.billing.entitlementToken",
   operatorWorkflowLastPath: "whether.operatorWorkflow.lastPath",
   /** The call this browser last saw — written on every visit, read on the next. */
   lastSeenCall: "whether.lastSeenCall",

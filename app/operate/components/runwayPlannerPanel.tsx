@@ -620,10 +620,6 @@ export function RunwayPlannerPanel({
               onClick={() => {
                 void copyToClipboard(shareBlock, "runway-plan");
               }}
-              buttonProps={{
-                "data-premium-intent": "runway_planner",
-                "data-premium-cta": "copy_financial_block",
-              }}
               compact
             />
           </div>

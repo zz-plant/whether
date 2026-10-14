@@ -76,9 +76,9 @@ export const resolveGlobalHeaderNavigationLinks = (pathname: string): GlobalHead
  * Whether the header's group tabs will visibly mark the current route.
  *
  * The header drops the route label beside the wordmark from `md` only where a
- * tab marks the route. Every grouped page and route family does; `/pricing`,
- * `/about`, `/share` and the legal pages sit outside the groups, so the label
- * comes back for those. Callers render the label when this returns false.
+ * tab marks the route. Every grouped page and route family does; `/about`,
+ * `/share` and the legal pages sit outside the groups, so the label comes back
+ * for those. Callers render the label when this returns false.
  */
 export const hasVisibleActiveNavLink = (pathname: string) => Boolean(findActiveGroup(pathname));
 

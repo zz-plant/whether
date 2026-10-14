@@ -96,7 +96,7 @@ is unmeasured.**
   `docs/feature-specs-current.md` recorded it as "stays, tested, with no client". Unauthenticated
   POST, caller-chosen id and secret, 24KB into KV with no rate limit and no TTL, for two key names
   (`whether-company-metrics`, `whether-decision-log`) naming a module deleted the same day and a key
-  nothing has ever written. `/privacy` 2.4 promises everything but recorded decisions "stays in your
+  nothing has ever written. `/privacy` 2.3 promises everything but recorded decisions "stays in your
   browser and is never sent", which was true only because nothing called it — and
   `tests/privacyPolicy.test.tsx` enumerates `STORAGE_KEYS` and `TELEMETRY_STREAMS`, neither of which
   a server-side write path appears in. A tested endpoint with no client is not a dormant feature.
@@ -155,12 +155,13 @@ verification tokens, the email Stripe reports for a paying customer, a per-brows
 server reads back (`x-whether-client-id`) to scope saved decisions, one cookie, nine browser storage
 keys and eight telemetry streams.
 
-The gap was worse than a missing document, because `/pricing` publishes **"No signup, no key, no
+The gap was worse than a missing document, because `/pricing` published **"No signup, no key, no
 trackers"** and the code is genuinely built to honour it: the search payload has no field that could
 hold the query text, the acquisition bucket drops the referring URL, the intake refuses an
 unexpected key, and the fonts are self-hosted. A claim a reader cannot check is worth less than the
-work behind making it true, and there is real work behind this one — so `/pricing` links to the page
-from the promise itself.
+work behind making it true, and there is real work behind this one — so `/pricing` linked to the page
+from the promise itself. (`/pricing` went with the paid tier on 2026-10-14; `/privacy` section 1
+states each part of the promise now.)
 
 **The page is an inventory, and `tests/privacyPolicy.test.tsx` keeps it one.** Every `STORAGE_KEYS`
 entry and every `TELEMETRY_STREAMS` entry is claimed there by the section that accounts for it, so

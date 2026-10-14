@@ -116,13 +116,12 @@ const concurrency = process.env.BUN_TEST_CONCURRENCY;
 const concurrencyArgs = concurrency ? [`--max-concurrency=${concurrency}`] : [];
 // `bun test` defaults NODE_ENV only when it is unset; a build container often sets production.
 const childEnv = { ...process.env, NODE_ENV: process.env.WHETHER_TEST_NODE_ENV ?? 'test' };
-// The suite serves its own upstreams. Webhook URLs are credentials in their entirety; the
+// The suite serves its own upstreams. A webhook URL is a credential in its entirety; the
 // Cloudflare four are always present in the build container and nowhere else.
 for (const key of [
   'FRED_API_KEY',
   'ALPHA_VANTAGE_API_KEY',
   'SLACK_WEBHOOK_URL',
-  'PREMIUM_FUNNEL_WEBHOOK_URL',
   'CLOUDFLARE_ACCOUNT_ID',
   'CLOUDFLARE_API_TOKEN',
   'CLOUDFLARE_ANALYTICS_READ_TOKEN',

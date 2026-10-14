@@ -68,7 +68,6 @@ export const TELEMETRY_STREAMS = [
   "operator-workflow",
   "activation",
   "content-measurement",
-  "premium-funnel",
   /** Worker-authored: the ingest pipeline's own success, failure and duration. */
   "ingest-pipeline",
   /** Worker-authored, and read back on `/trust` as "Scheduled runs". */
