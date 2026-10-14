@@ -7,7 +7,6 @@ import { graph } from "../../lib/seo/pageStructuredData";
 import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import {
   buildCompactTrustSummary,
-  buildDecisionReadinessState,
   buildTrustWarnings,
 } from "../../lib/report/trustStatus";
 import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
@@ -113,17 +112,10 @@ export async function buildTrustPageModel() {
       linkLabel: "Check source dates",
     },
   ];
-  const decisionReadiness = buildDecisionReadinessState({
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    freshnessLabel: reportData.fetchedAtLabel,
-    isFallbackSnapshot: isFallback,
-    isHistoricalSelection: Boolean(reportData.historicalSelection),
-  });
-  const trustStatusTone = decisionReadiness.tone === "historical"
-    ? "historical"
-    : decisionReadiness.tone === "warning"
-      ? "warning"
-      : "stable";
+  /* The home model's verdict, which /brief.md prints. This page built a second
+     one from the freshness label alone and without the hold, so a held week
+     clear of the lines was Act here and Act with caution in the home model. */
+  const trustStatusTone = homeBriefModel.decisionReadiness.tone;
   /* Each label is the section's own title. Two had drifted: "Snapshot" for a
      section headed "System status", and "Sources & freshness" for one headed
      "Cite this call" (now "Cite this guidance") — so the rail offered "Sources" and "Sources & freshness"

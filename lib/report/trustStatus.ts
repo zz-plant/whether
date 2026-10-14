@@ -46,6 +46,14 @@ export type DecisionReadinessState = {
   detail: string;
 };
 
+/**
+ * The name for `DecisionReadinessState` where a reader sees it: whether this
+ * reading can carry this week's decisions. It is not `DATA_CAVEAT_LABEL`,
+ * which says what the state of the data adds; on a live week close to a line
+ * the caveat is "None." and this verdict is the Hold.
+ */
+export const DECISION_READINESS_LABEL = "Decision readiness";
+
 type SourceFreshnessState = Pick<
   CompactFreshnessMeta,
   "updatedAtLabel" | "freshnessStatus" | "mode" | "timestamp" | "ageHours"
@@ -459,7 +467,6 @@ export const buildDecisionReadinessState = ({
     isFallbackSnapshot,
     isHistoricalSelection,
   });
-  const normalizedFreshness = resolvedFreshness.updatedAtLabel;
   const freshnessWeak =
     resolvedFreshness.freshnessStatus === "stale" || resolvedFreshness.freshnessStatus === "unknown";
 
@@ -498,20 +505,26 @@ export const buildDecisionReadinessState = ({
     };
   }
 
+  /* No check time in the detail: /brief.md prints the detail between two lines
+     that state it, and "(Mar 1, 2026 00:00 UTC)" after "within reach of a
+     change line" read as the line's date. */
   if (isFallbackSnapshot || confidenceLabel === "MED") {
     return {
       label: "Act with caution",
       tone: "warning",
       detail: isFallbackSnapshot
-        ? `Cached reading (${normalizedFreshness}). Act on moves you can undo; hold the rest until live data returns.`
-        : `The scores are within reach of a change line (${normalizedFreshness}). Act on moves you can undo; hold the rest until they are clear of it.`,
+        ? "Cached reading. Act on moves you can undo; hold the rest until live data returns."
+        : "The scores are within reach of a change line. Act on moves you can undo; hold the rest until they are clear of it.",
     };
   }
 
+  /* Points back to the guidance rather than past it: "Nothing here argues for
+     holding back this week" read as this week's action under guidance to
+     freeze new commitments, the reason `buildTrustStatus`'s detail lost it. */
   return {
     label: "Act",
     tone: "stable",
-    detail: `Live data (${normalizedFreshness}), with the scores clear of the change lines. Nothing here argues for holding back this week.`,
+    detail: "Live data, with the scores clear of the change lines. This week's guidance and its pause lines apply as written.",
   };
 };
 
