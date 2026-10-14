@@ -33,6 +33,14 @@ import type { ScoreMovementSource } from "./reportDataTypes";
  */
 export type ScoringBasisKey = "record" | "extended";
 
+/**
+ * Why the inputs a warning names are left out, in a reader's words (2026-10-14).
+ * "The record cannot test them" only reads to someone who knows the record is
+ * the month-ends since 2012 and that these inputs are not held for them. Said
+ * after the warning on the status strip and in the Monday post.
+ */
+export const NOT_COUNTED_REASON = "They are left out because past months can't be checked with them.";
+
 /** The strip's label for the basis cell; the value is the basis's `value`. */
 export const SCORING_BASIS_LABEL = "Scored on";
 
@@ -292,7 +300,7 @@ export const describeChangeTheRecordMade = ({
   const inputs = (["tightness", "riskAppetite"] as const)
     .filter((metric) => offRecord[metric] !== assessment.scores[metric])
     .map((metric) => scoreSourceLabel(metric, NOT_COUNTED_SOURCE[metric]));
-  return `${upperFirst(joinAnd(inputs))}, which the guidance leaves out because the record cannot test them, would have kept conditions ${getRegimePublicLabel(previousRegime)}.`;
+  return `${upperFirst(joinAnd(inputs))}, which the guidance leaves out because past months can't be checked with them, would have kept conditions ${getRegimePublicLabel(previousRegime)}.`;
 };
 
 /**
@@ -342,5 +350,5 @@ export const describePublishedWeekBasis = ({
   const inputs = (["tightness", "riskAppetite"] as const)
     .filter((metric) => rescored.scores.offRecord?.[metric] !== rescored.scores[metric])
     .map((metric) => scoreSourceLabel(metric, NOT_COUNTED_SOURCE[metric]));
-  return `The brief published for the week of ${published.weekLabel} read ${getRegimePublicLabel(published.regime)} only because it counted ${joinAnd(inputs)}, which the record cannot test.`;
+  return `The brief published for the week of ${published.weekLabel} read ${getRegimePublicLabel(published.regime)} only because it counted ${joinAnd(inputs)}, which past months can't be checked with.`;
 };

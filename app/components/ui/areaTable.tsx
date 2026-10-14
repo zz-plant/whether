@@ -7,7 +7,7 @@ import {
   type DecisionArea,
   type RuleConditionMetric,
 } from "../../../lib/report/boundedDecisionRules";
-import type { LineState } from "../../../lib/report/operatingCalls";
+import { NOTHING_TO_RESUME, type LineState } from "../../../lib/report/operatingCalls";
 import type { Route } from "../../../lib/navigation/routeType";
 import { AreaIcon, AreaLabel, LineStateBadge } from "./conceptIcons";
 
@@ -229,7 +229,18 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
               </td>
               <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
                 <CellLabel className="text-semantic-easing-fg">Resume line</CellLabel>
-                <LineCell value={row.resume} kind="resume" />
+                {/* A met resume line on an area that is not on hold stamped "already
+                    met" beside "14 pts away" from its pause line, which read as a
+                    restart (2026-10-14). With the pause line not crossed there is
+                    nothing to resume, and the cell says that instead. */}
+                <LineCell
+                  value={
+                    row.pause && row.pause.state !== "crossed" && row.resume?.state
+                      ? { line: row.resume.line, distance: NOTHING_TO_RESUME }
+                      : row.resume
+                  }
+                  kind="resume"
+                />
               </td>
               {showChanged ? (
                 <td

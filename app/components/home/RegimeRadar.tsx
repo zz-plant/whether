@@ -378,13 +378,16 @@ export function RegimeRadar({
         </text>
       </svg>
 
-      {(hasTrail && (trailCaption || caveat)) || footer ? (
-        <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
+      {/* Always captioned with which corner is which (2026-10-14). The four
+          words read as a severity scale and are not one: Sunny is easy on both
+          axes and Freezing hard on both, while Cloudy and Stormy are each hard
+          on one. The chart is where that shows, so it says so. */}
+      <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
+          <span className="block text-slate-300" data-radar-orientation>Easiest bottom right (Sunny), hardest top left (Freezing).</span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
           {footer ? <span className="block pt-1">{footer}</span> : null}
-        </figcaption>
-      ) : null}
+      </figcaption>
     </figure>
   );
 }

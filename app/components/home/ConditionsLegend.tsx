@@ -138,9 +138,14 @@ export function ConditionsLegend({
                 <ConditionIcon regime={entry.regime} className="mr-1 inline align-[-3px]" />
                 <span className={`font-semibold ${REGIME_STYLE_TOKENS[entry.regime].accent.text}`}>{entry.weather}</span>
                 {all.length === 1 ? " this week" : null}
-                {index === 0
-                  ? `: ${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite}`
-                  : `: ${pressure}, ${appetite}`}
+                {/* A live week's one condition says what it means before its numbers:
+                    the four words do not order themselves (Stormy is not worse than
+                    Cloudy, each is hard on one side), so the meaning is the help. */}
+                {all.length === 1
+                  ? `: ${sides.pressureAbove ? "pricey money" : "cheap money"}, ${sides.appetiteAbove ? "willing investors" : "wary investors"} (${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite})`
+                  : index === 0
+                    ? `: ${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite}`
+                    : `: ${pressure}, ${appetite}`}
                 {entry.regime === currentRegime && all.length > 1 ? <span className="text-slate-400"> (this week)</span> : null}
                 {index < all.length - 1 ? " · " : ". "}
               </span>

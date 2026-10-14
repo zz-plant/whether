@@ -60,7 +60,7 @@ describe("conditions legend", () => {
     // The four ran to four lines on a phone above the call (2026-10-14); a live
     // week defines its own and links to the rest.
     const live = text(render({ currentRegime: "SCARCITY" }));
-    assert.match(live, /^Freezing this week: funding pressure above 70, risk appetite below 50\. The four conditions and how they are set/);
+    assert.match(live, /^Freezing this week: pricey money, wary investors \(funding pressure above 70, risk appetite below 50\)\. The four conditions and how they are set/);
     assert.doesNotMatch(live, /Sunny|Cloudy|Stormy/);
     assert.doesNotMatch(text(render()), /this week/);
     assert.match(text(render()), /Sunny:.*Cloudy:.*Stormy:.*Freezing:/);

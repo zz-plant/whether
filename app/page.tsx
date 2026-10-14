@@ -58,7 +58,9 @@ import {
   buildSignalChangeRows,
   describeConditionsTrail,
   describeEarlierConditions,
+  describeHeldAreasForCard,
   describeWeeklyMovement,
+  HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
@@ -526,6 +528,10 @@ async function PageContent({
         href: buildPublishedBriefPath(differingBrief.slug),
       }
     : undefined;
+  const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(publicRegimeLabel, decisionPickerOptions);
+  const heroAreas = heldAreasLine
+    ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
+    : undefined;
   const heroTrust = publishedNotice ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null } } : trustStripProps;
 
   return (
@@ -648,6 +654,7 @@ async function PageContent({
                    call would date it to today. */
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
+                areas={heroAreas}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
