@@ -13,6 +13,9 @@ import { buildLlmsTxt } from "../lib/seo/llmsTxt";
 import { buildLlmsFullCorpus } from "../lib/seo/llmsFullCorpus";
 import { postureArchiveStaticParams } from "../lib/summary/postureArchive";
 import { REGIME_ORDER } from "../lib/regimePresentation";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /* /history's explorer reads the router; spread the real module, as every stub here does. */
 const mockAny: any = mock;

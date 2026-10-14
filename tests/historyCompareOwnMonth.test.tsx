@@ -15,6 +15,9 @@ import {
   getPreviousTimeMachineSnapshot,
   getTimeMachineSnapshots,
 } from "../lib/timeMachine/timeMachineCache";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 

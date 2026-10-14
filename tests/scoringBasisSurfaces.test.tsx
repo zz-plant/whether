@@ -20,6 +20,9 @@ import { resolveScoringBasis } from "../lib/report/scoringBasis";
 import { formatMeetingSlideMarkdown } from "../lib/export/meetingSlideExport";
 import { snapshotData } from "../lib/snapshot";
 import { buildReportDataFixture, liveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * Every call states its basis (2026-10-09): the status strip, the published

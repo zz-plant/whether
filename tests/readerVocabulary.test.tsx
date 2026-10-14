@@ -41,6 +41,9 @@ import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
 import { CompanyCalibration } from "../app/components/home/CompanyCalibration";
 import { AlertSection } from "../app/components/home/AlertSection";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({

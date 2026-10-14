@@ -12,6 +12,9 @@ import { describeAgentTools, listAgentTools } from "../lib/agent/tools";
 import { agentManifestResponse } from "../lib/agentManifest";
 import { handleMcpRequest } from "../lib/mcp/httpMcpServer";
 import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INSTRUCTIONS } from "../lib/mcp/serverIdentity";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * A tool that is served and not listed is one an agent never learns to call, and a tool that is

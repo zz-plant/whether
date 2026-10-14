@@ -3,6 +3,9 @@ import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { renderToStaticMarkup } from "react-dom/server";
 import DecisionsPage, { metadata } from "../app/decisions/page";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /**
  * The page renders here because it reads through a loader that degrades: with

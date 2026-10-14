@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { listAgentTools } from "../lib/agent/tools";
 import { handleMcpRequest } from "../lib/mcp/httpMcpServer";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("mcpCommitmentLinter and stress-testing tools", () => {
   it("lists the new AI capability tools", () => {

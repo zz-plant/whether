@@ -5,6 +5,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { formatWeekMondayUTC } from "../lib/formatters";
 import { buildPublishedBriefTitle, findPublishedBrief } from "../lib/report/publishedBriefs";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * Findings from the live site review on 2026-10-09, each held where it was found.

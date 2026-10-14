@@ -8,6 +8,9 @@ import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscribe
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
 import { liveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The two artifacts that leave the building.

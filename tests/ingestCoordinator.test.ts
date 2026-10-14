@@ -206,13 +206,16 @@ describe("IngestCoordinator", () => {
     /* No bindings that other suites read: the env is installed on globalThis, which is
        process-wide, so a stub KV here would reach every later test. */
     const runtimeEnv = { WHETHER_TEST_COORDINATOR_MARKER: "1" };
-    const object = new IngestCoordinator({ storage }, runtimeEnv);
-    const client = new IngestCoordinatorStore({ fetch: (request) => object.fetch(request) });
-    await client.writeLatestMaterialized(fullModel(new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()));
-
+    /* Served before construction: the object takes the global fetch when it is built, so
+       assigning it afterwards sent every family's refresh to the real upstream, and the
+       refresh swallowed each failure. */
     const originalFetch = globalThis.fetch;
     globalThis.fetch = fixtureFetch;
     try {
+      const object = new IngestCoordinator({ storage }, runtimeEnv);
+      const client = new IngestCoordinatorStore({ fetch: (request) => object.fetch(request) });
+      await client.writeLatestMaterialized(fullModel(new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()));
+
       const response = await object.fetch(new Request(`${COORDINATOR_ORIGIN}${COORDINATOR_ROUTES.refresh}`, { method: "POST" }));
       assert.equal(response.status, 200, "the refresh used the global fetch, not the env object");
       const body: unknown = await response.json();
