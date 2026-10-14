@@ -34,6 +34,7 @@ export const retiredSitemapPaths = [
   "/export",
   "/export/board-packet",
   "/glossary",
+  "/pricing",
 ] as const;
 
 const retiredPathSet = new Set<string>(retiredSitemapPaths);

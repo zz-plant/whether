@@ -170,7 +170,7 @@ export function MobileTabBar() {
               type="button"
               onClick={() => setShowMore(true)}
               aria-expanded={showMore}
-              aria-label="More: search, every page, pricing and about"
+              aria-label="More: search, every page and about"
               className={`relative ${TAB_CLASS} text-slate-400 hover:text-slate-200`}
             >
               <MoreHorizontal aria-hidden="true" size={20} strokeWidth={1.8} />

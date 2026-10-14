@@ -234,7 +234,6 @@ const routeSurfaces: Surface[] = [
       return visibleText(renderToStaticMarkup(await page.default({ params })));
     },
   })),
-  { name: "/pricing", text: async () => visibleText(renderToStaticMarkup((await import("../app/pricing/page")).default())) },
   { name: "/about", text: async () => visibleText(renderToStaticMarkup((await import("../app/about/page")).default())) },
   { name: "/contact", text: async () => visibleText(renderToStaticMarkup((await import("../app/contact/page")).default())) },
   { name: "/privacy", text: async () => visibleText(renderToStaticMarkup((await import("../app/privacy/page")).default())) },

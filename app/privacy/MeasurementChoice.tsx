@@ -12,7 +12,7 @@ const measurementOffSource = createBrowserSource<boolean>({
 });
 
 /**
- * The one control for section 2.6: stop this browser sending usage measurement,
+ * The one control for section 2.5: stop this browser sending usage measurement,
  * or start it again. Every emitter goes through `sendTelemetry`, which checks
  * the same key, so this covers all of them.
  */
@@ -28,8 +28,8 @@ export function MeasurementChoice() {
     <span className="flex flex-wrap items-center gap-x-3 gap-y-1">
       <span>
         {off
-          ? "Usage measurement (2.6) is off in this browser."
-          : "Turn off usage measurement (2.6) in this browser. It stays off until you turn it back on here or clear site data."}
+          ? "Usage measurement (2.5) is off in this browser."
+          : "Turn off usage measurement (2.5) in this browser. It stays off until you turn it back on here or clear site data."}
       </span>
       <button
         type="button"

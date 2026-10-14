@@ -7,7 +7,7 @@
 <h3 align="center">Weekly operating guidance for startup leaders</h3>
 
 <p align="center">
-  The interest-rate and credit lines that pause or resume your hiring, spend and raise. Checked every Monday, with an email the day one is crossed.
+  The interest-rate and credit lines that pause or resume your hiring, spend and raise. Checked every Monday, with an email the day one is crossed. Whether is free.
 </p>
 
 <p align="center">

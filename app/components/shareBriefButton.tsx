@@ -78,8 +78,6 @@ export function ShareBriefButton({
       buttonProps={{
         title: `${label} — copies to the clipboard, or shares if the browser offers it`,
         "aria-label": label,
-        "data-premium-intent": "export_brief",
-        "data-premium-cta": "share_brief_button",
         // The `C` shortcut and the command palette target this id. It moved here
         // when the separate Slack copy button was retired; this button produces
         // the same Slack block.

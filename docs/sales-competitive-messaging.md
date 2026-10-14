@@ -26,7 +26,8 @@ confirm from memory in one sentence.
 The enterprise macro/strategy buyer for the terminal, research-subscription, FP&A, and research-
 workflow rows below. These are real segments and the differentiation arguments hold, but no such
 buyer has been sold, and the product has no seat model, no admin surface, no procurement story, and
-no paid tier. Treat those rows as preparation for a motion that does not exist yet.
+nothing to sell: Whether is free. Treat those rows as positioning research, not preparation for a
+sales motion.
 
 Two consequences, both binding:
 

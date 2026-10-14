@@ -41,7 +41,7 @@ import path from "node:path";
 import { isDecisionModel, runJev, type DecisionModel, type JevQuestion, type JevResult } from "../lib/jev/jevClient";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 
-const DEFAULT_ROUTES = ["/", "/trust", "/history", "/signals", "/pricing", "/share", "/operate", "/resources"];
+const DEFAULT_ROUTES = ["/", "/trust", "/history", "/signals", "/share", "/operate", "/resources"];
 const DEFAULT_THRESHOLD = 0.8;
 const CONCURRENCY = 4;
 const REPORT_DIR = "artifacts/jev";
