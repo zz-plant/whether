@@ -1682,8 +1682,13 @@ true.
   50 and 75 on both scores, which no rule uses, and the email called 75 "the pause line". It now
   reads `publishedScoreLines(thresholds)`: pause and resume at 76 / 66 on funding pressure and
   44 / 54 on risk appetite (`sharedDecisionLines`), and the change lines at 70 and 50. A move
-  that passes several lines sends one letter per score, naming the most significant (pause,
-  then change, then resume), and the dedupe key is per score (`threshold:<metric>`), so a
+  that passes several lines sends one letter per score, naming the last line it crossed, the one
+  whose state now holds: the pause line on a rise from 63 to 90, the 66 resume line on a fall from
+  80 to 60. Until 2026-10-14 it ranked pause, then change, then resume whatever the direction, so
+  that fall named the pause line and the resume letter never came. A score exactly on a line sits
+  on the side where the line does not hold (`sideOfLine`): on a change line it counts as below, as
+  `classifyRegime` reads it, and on a pause or resume line it counts as not met, because the rules
+  state those strictly (`> 76`, `< 66`). The dedupe key is per score (`threshold:<metric>`), so a
   funding-pressure crossing no longer silences a risk-appetite one in the same week.
 - **A plan's own lines.** `/operate` has a step, "Set this plan's lines" (`ops-plan-lines`,
   after the rules, live weeks only), that starts from the published rules
@@ -2039,7 +2044,12 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
   email judged a snapshot's own flags (`freshness.status`, `provenance.isLive`) and the Slack post
   the treasury's fallback stamp, so a reading marked one way and not the other was sent by one and
   refused by the other. Both read both now, and the email's refusal names the fallback reason when
-  there is one.
+  there is one. Since 2026-10-14 the check underneath them (`assessPublishReadiness`, which the
+  freeze and agent state also call) refuses a reading that scored any of the six FRED macro series
+  (the two credit spreads, the Chicago Fed index, VIX, inflation, unemployment) from the bundled
+  snapshot, and the refusal names them (`listCachedLiveMacroSeries`, `lib/report/sourceHealth.ts`).
+  A live Treasury used to carry a failed macro fetch's snapshot value out as this week's reading.
+  The curated startup-market series are snapshots by design and do not count.
 - **The weekly sends go out once a week per recipient** (`lib/delivery/onceFor.ts`). Repeat
   protection came in four schemes — per-inbox markers for alert mail (`alert:delivered:*`, a
   seven-day window), one key per month for the month-end pulse (`month-end:last-pulsed`), the
