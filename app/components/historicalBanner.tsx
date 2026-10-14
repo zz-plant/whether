@@ -48,7 +48,7 @@ export const HistoricalBanner = ({
       {/* Not `.type-label`: it applies a hardcoded `text-slate-400` that outranks a
           Tailwind color utility here, so the eyebrow rendered grey in both themes
           and the band lost the one word that names the state. */}
-      <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-caveat-fg">
+      <p className="text-fluid-xs font-semibold uppercase tracking-[0.12em] text-caveat-fg weather-caveat-mark">
         Archived view
       </p>
       <p className="min-w-0 text-sm font-semibold text-[var(--app-text)]">
