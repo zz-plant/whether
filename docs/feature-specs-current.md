@@ -1723,7 +1723,8 @@ confirming reading.
   "Action", the decision contract's word for the operating action, so a week whose guidance was to
   freeze new commitments printed "Action: Safe to use for near-term planning; proceed with normal
   approval flow". It is labelled "Data caveat" (`DATA_CAVEAT_LABEL`) and reads "None." on live data;
-  an archived, cached or held reading prints what that state asks of the reader.
+  an archived, cached or held reading prints what that state asks of the reader. A live reading
+  close to a line gets its Hold from the decision readiness line, not from the caveat (§1.1.77).
 - Tests: `tests/homeBriefModel.test.ts`, `tests/pageReaderContradictions.test.tsx`,
   `tests/trustStatusTones.test.ts`. The lesson: docs/agents/lessons/tests-and-copy-rules.md
   ("Two flags for one claim").
@@ -3494,6 +3495,30 @@ popover or a forecast.
 
 `tests/marketMoveScale.test.ts`, `tests/spellLengths.test.ts` and `tests/projectPayback.test.tsx`
 hold them.
+
+### 1.1.77 `/brief.md` states the decision readiness verdict (2026-10-14)
+
+On a live week with the scores close to a line, the home model's readiness verdict is Hold. `/brief.md`
+printed "Margin: close to the line" in its trust line and "Data caveat: None." in its provenance, and
+never the verdict (review of #1481).
+
+- **The line.** `> **Decision readiness:** <Act | Act with caution | Hold>. <detail>`, directly under
+  the trust line (`DECISION_READINESS_LABEL`, `lib/report/trustStatus.ts`). It prints
+  `homeBriefModel.decisionReadiness` as the home model resolved it, with the hold and the structured
+  freshness.
+- **The data caveat keeps its meaning.** It says what the state of the data adds (§1.1.31a), and live
+  data adds nothing, so a week close to a line prints a Hold verdict above a caveat of "None.".
+- **One verdict.** `buildDecisionReadinessState` runs once, in the home brief builder. `/trust` built
+  a second from the freshness label alone and without the hold, so a held week clear of the lines
+  was Act there and Act with caution in the home model; it reads the home model's verdict now. On
+  `/trust` the verdict sets only the shell's tone, and the trust strip replaces the headline that
+  tone colours (§1.1.34), so `/brief.md` is the one surface that prints it. The homepage card does
+  not draw it either, although `docs/one-screen-weekly-brief-spec.md` asks for it there.
+- **Its wording, now that a reader sees it.** The Act detail ended "Nothing here argues for holding
+  back this week", which read as this week's action under guidance to freeze new commitments. It
+  ends "This week's guidance and its pause lines apply as written." The cached and within-reach
+  details dropped the check time in parentheses, which the lines on either side already state.
+- Tests: `tests/briefMarkdownRoute.test.ts` (a Hold week, an Act week, and the one builder).
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
