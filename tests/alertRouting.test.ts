@@ -78,6 +78,77 @@ describe("alert routing", () => {
   });
 });
 
+describe("which line a move names", () => {
+  const crossing = (metric: "tightness" | "riskAppetite", from: number, to: number) => {
+    const other = metric === "tightness" ? { riskAppetite: 60 } : { tightness: 60 };
+    return evaluateAlert(
+      conditions({ [metric]: to, ...other }),
+      lastKnown({ [metric]: from, ...other }),
+    ).find((d) => d.type === "threshold");
+  };
+
+  // A rise from 63 to 90 passes 66, 70 and 76; the pause line is where it stopped.
+  it("names the pause line on a rise through all three funding-pressure lines", () => {
+    assert.deepEqual(crossing("tightness", 63, 90)?.line, publishedScoreLines()[0]);
+  });
+
+  // The same three lines the other way. Ranked pause first whatever the direction, this
+  // named 76 and the email said held work resumes "once each area's resume line is met"
+  // with the score already under 66, and no resume alert followed: one per score.
+  it("names the resume line on a fall through all three funding-pressure lines", () => {
+    const decision = crossing("tightness", 80, 60);
+    const line = decision?.line;
+    assert.ok(line, "the fall crossed a line");
+    assert.equal(line.kind, "resume");
+    assert.equal(line.value, 66);
+    assert.equal(decision?.severity, "info");
+
+    const mail = thresholdCrossingEmail(line, 60, null);
+    assert.match(mail.text, /It crossed below that line since the last alert\. Work held on this line can resume/);
+    assert.doesNotMatch(mail.text, /pause on this line no longer holds/);
+  });
+
+  it("names the line a partial move stopped past", () => {
+    assert.equal(crossing("tightness", 80, 68)?.line?.kind, "change");
+    assert.equal(crossing("tightness", 80, 72)?.line?.kind, "pause");
+    assert.equal(crossing("riskAppetite", 40, 60)?.line?.kind, "resume");
+    assert.equal(crossing("riskAppetite", 60, 40)?.line?.kind, "pause");
+  });
+});
+
+/*
+ * A score exactly on a line is on the side where the line does not hold: past the change
+ * line only above it, as `classifyRegime` reads equality, and past a pause or resume line
+ * only strictly beyond it, as the rules state them ("> 76", "< 66"). Comparing `>=` and
+ * `<=` missed a score landing on the line and fired on one leaving it for the same side.
+ */
+describe("a score on the line", () => {
+  const thresholdFor = (from: number, to: number) =>
+    evaluateAlert(conditions({ tightness: to, riskAppetite: 60 }), lastKnown({ tightness: from, riskAppetite: 60 })).find(
+      (d) => d.type === "threshold",
+    );
+
+  it("crosses the change line by landing on it from above", () => {
+    assert.equal(thresholdFor(73, 70)?.line?.kind, "change");
+  });
+
+  it("does not cross it again by leaving it downward", () => {
+    assert.equal(thresholdFor(70, 68), undefined);
+  });
+
+  it("does not cross the change line by rising onto it", () => {
+    assert.equal(thresholdFor(68, 70), undefined);
+  });
+
+  it("leaves the resume line unmet at its own number, as the rule reads it", () => {
+    const line = thresholdFor(64, 66)?.line;
+    assert.ok(line, "landing on 66 from below crossed a line");
+    assert.equal(line.kind, "resume");
+    const mail = thresholdCrossingEmail(line, 66, null);
+    assert.match(mail.text, /It crossed above that line since the last alert\. This resume line is no longer met/);
+  });
+});
+
 describe("alert email copy", () => {
   it("names the metrics the way every other surface does", () => {
     const [tightnessPause, , , , riskChange] = publishedScoreLines();

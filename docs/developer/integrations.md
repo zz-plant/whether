@@ -26,7 +26,7 @@ Recommended pull sequence:
 
 - Configure destination toggles per consumer/profile: `POST /api/alert-preferences`.
 - Trigger delivery runs: `POST /api/alert-deliveries`.
-- Inspect run history: `GET /api/alert-deliveries?clientId=<id>`.
+- Inspect run history: `GET /api/alert-deliveries` (cron secret). Each alert email that sent is one row; `?clientId=<SHA-256 hex of the address>` narrows it to one subscriber.
 - Operator audit trail for saved Decision Shield runs: `GET /api/decision-memory?clientId=<id>` or `GET /api/decision-memory?clientId=<id>&format=csv`.
 
 ## 3) Reliability and publish gates
