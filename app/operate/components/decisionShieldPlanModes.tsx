@@ -262,7 +262,7 @@ const COMPARISON_TEMPLATES = [
   },
   {
     label: "Full-Time Hire vs. Contractor",
-    planA: "Hire 2 full-time senior engineers at $200k",
+    planA: "Hire 2 full-time senior engineers at $200k each",
     planB: "Engage 1 specialized contractor for 3 months at $15k/mo",
   },
   {
