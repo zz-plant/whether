@@ -27,8 +27,7 @@ describe("runway notes on the homepage", () => {
        above is the only one now. */
     const html = renderToStaticMarkup(<RunwayConditionedNotes regime="DEFENSIVE" />);
     assert.match(html, /What this guidance means at your runway/);
-    assert.match(html, /Pick your cash runway above/);
-    assert.match(html, /Until you choose, it shows 12–24 mo/, "the default is named as a default");
+    assert.match(html, /Showing 12–24 mo until you pick your cash runway above/, "the default is named as a default");
     assert.doesNotMatch(html, /<input|<fieldset|role="radio/, "no second runway control");
     assert.ok(!html.includes("<li"), "no note may render before a runway is chosen");
   });

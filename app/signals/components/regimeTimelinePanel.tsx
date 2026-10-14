@@ -3,7 +3,7 @@ import type { RegimeKey } from "../../../lib/regimeEngine";
 import { REGIME_LABELS, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
 import { formatMonthLabel, formatMonthShortLabel } from "../../../lib/timeMachine/monthFormatting";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
-import { describeConditionChanges, summarizeConditionRuns } from "../../../lib/report/evidenceInstrumentSummaries";
+import { summarizeConditionRuns } from "../../../lib/report/evidenceInstrumentSummaries";
 
 
 type RegimeRun = {
@@ -74,9 +74,9 @@ export const RegimeTimelinePanel = ({
 }: RegimeTimelinePanelProps) => {
   const currentLabel = formatMonthLabel(selectedYear, selectedMonth);
   const preservedParams = collectPreservedParams(searchParams);
-  /* The runs and the change count through the function the closed summary
-     over this panel reads, so "3 changes across the last 24 months" is one
-     derivation in both places. */
+  /* The runs through the function the disclosure summary over this panel reads.
+     That summary already prints "3 changes across the last 24 months", so this
+     panel no longer repeats it in a card of its own (2026-10-14). */
   const conditionRuns = summarizeConditionRuns(series);
   const { runs, longestRun } = conditionRuns;
   const selectedIndex = getSelectedMonthIndex(series, selectedYear, selectedMonth);
@@ -170,13 +170,7 @@ export const RegimeTimelinePanel = ({
               })}
             </div>
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Changes in conditions</p>
-              <p className="mt-2 text-sm text-slate-200">
-                {describeConditionChanges(conditionRuns)}.
-              </p>
-            </div>
+          <div className="mt-4" aria-live="polite">
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Longest held</p>
               <p className="mt-2 text-sm text-slate-200">

@@ -98,7 +98,7 @@ const IMAGE_ARTIFACTS: readonly ImageArtifact[] = [
       {
         href: "/api/image/brief",
         label: "Open brief card",
-        use: "Opens in a new tab. Save it, or drag it straight into the thread.",
+        use: "Opens in a new tab.",
         download: false,
       },
     ],
