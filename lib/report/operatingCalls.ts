@@ -355,6 +355,9 @@ export const formatPointsToLine = (
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"} away`;
 };
 
+/** A resume line met on an area that is not on hold: there is no hold to lift, so not "already met". */
+export const NOTHING_TO_RESUME = "nothing to resume";
+
 /**
  * How near counts as close to a line: 5 points. It is the distance the margin
  * already calls "Close to the line" (`REGIME_CONFIDENCE_NEAR_THRESHOLD`, the

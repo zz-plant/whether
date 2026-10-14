@@ -7,10 +7,14 @@ import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 
 type CadenceKey = "weekly" | "monthly" | "quarterly";
 
+/* Each longer horizon says what it adds (2026-10-14): "Monthly" and
+   "Quarterly" beside "Plan horizon" did not say whether they change the rules,
+   the wording or only the paste. They put that horizon's call, with its past
+   months or quarters, above this week's. */
 const CADENCES: readonly SegmentedOption<CadenceKey>[] = [
   { key: "weekly", label: "Weekly" },
-  { key: "monthly", label: "Monthly" },
-  { key: "quarterly", label: "Quarterly" },
+  { key: "monthly", label: "Monthly", sublabel: "adds the month's call" },
+  { key: "quarterly", label: "Quarterly", sublabel: "adds the quarter's call" },
 ];
 
 const DEFAULT_CADENCE: CadenceKey = "weekly";

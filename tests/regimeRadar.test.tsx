@@ -128,9 +128,11 @@ describe("RegimeRadar path", () => {
     assert.match(html, /built from interest rates alone/);
   });
 
-  it("draws no empty caption", () => {
+  it("always says which corner is easiest and which hardest", () => {
+    // The four words are not a severity scale (2026-10-14), so the caption
+    // always carries the orientation, and is never empty.
     const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} />);
-    assert.doesNotMatch(html, /<figcaption/, "no empty caption is drawn");
+    assert.match(html, /<figcaption[\s\S]*Easiest bottom right \(Sunny\), hardest top left \(Freezing\)\.[\s\S]*<\/figcaption>/);
     const withFooter = renderToStaticMarkup(<RegimeRadar {...base} footer={<span>How they are set</span>} />);
     assert.match(withFooter, /<figcaption[\s\S]*How they are set[\s\S]*<\/figcaption>/, "the footer closes the caption");
   });

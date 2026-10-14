@@ -1,3 +1,5 @@
+import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
+import { OPERATING_LATITUDE_RISK_WEIGHT } from "./weeklyLeadershipBrief";
 import { formatMonthYearShortFromValue } from "../formatters";
 import type { TrackRecord } from "./trackRecord";
 
@@ -71,4 +73,24 @@ export const describeTrackRecordRescore = (now: { changes: number; signaled: num
   return now.changes === before.changes && now.signaled === before.signaled && now.graded === before.graded
     ? `${rescoreLead()} No month's conditions changed, so the counts above are the ones published before it.`
     : `${rescoreLead()} Before it, the record showed ${before.changes} changes in conditions, and ${before.signaled} of the last ${before.graded} signaled in advance.`;
+};
+
+/**
+ * Where operating latitude sits against the four conditions (2026-10-14).
+ * /history introduced it as a third score after the page had taught two, and
+ * nothing said how it relates to the weather words. It is a blend of the same
+ * two scores, so the two change lines fix one value of it that no reading in
+ * Sunny's quadrant falls below and none in Freezing's rises above; Cloudy and
+ * Stormy, each hard on one score, can land either side. On the record through
+ * Sep 2026, Sunny months read 50-100, Freezing 0-42, Cloudy 42-49, Stormy 21-69.
+ */
+export const describeLatitudeAgainstConditions = (
+  thresholds: { tightnessRegime: number; riskAppetiteRegime: number } = DEFAULT_THRESHOLDS,
+) => {
+  const boundary = Math.round(
+    OPERATING_LATITUDE_RISK_WEIGHT * thresholds.riskAppetiteRegime + (1 - OPERATING_LATITUDE_RISK_WEIGHT) * (100 - thresholds.tightnessRegime),
+  );
+  /* Said of the quadrants, not the months: conditions change only after a second
+     reading, so a month can carry its old word for one reading past a line. */
+  return `It is not a fifth condition. A reading in Sunny's quadrant is always ${boundary} or higher and one in Freezing's ${boundary} or lower; Cloudy and Stormy, each hard on one score, can land either side.`;
 };

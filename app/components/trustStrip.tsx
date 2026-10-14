@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MARGIN_LABEL, formatMarginBand, formatMarginReading } from "../../lib/report/reportFormatting";
-import { SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
+import { NOT_COUNTED_REASON, SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
 
 /**
  * Freshness and confidence, once, in the same place on every reading route.
@@ -76,7 +76,11 @@ export function TrustStrip({
   phoneLayout = "grid",
   className = "",
 }: TrustStripProps) {
-  const basisDetail = [basis.warning, basis.note].filter((part): part is string => Boolean(part)).join(" ");
+  /* The warning carries its reason: which inputs were left out is not useful
+     without why (2026-10-14). */
+  const basisDetail = [basis.warning, basis.warning ? NOT_COUNTED_REASON : null, basis.note]
+    .filter((part): part is string => Boolean(part))
+    .join(" ");
   /* `routine`: the fact is in the state a reader does not need to act on.
      Only the phone line leaves those out, and only when the strip links to
      the page that states them; an exception (cached sources, Low confidence)

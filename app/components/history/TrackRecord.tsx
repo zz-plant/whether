@@ -7,7 +7,7 @@ import type {
 import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/formatters";
 import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
 import { OPERATING_LATITUDE_RISK_WEIGHT } from "../../../lib/report/weeklyLeadershipBrief";
-import { CALL_CHANGE_RULE } from "../../../lib/report/trackRecordCopy";
+import { CALL_CHANGE_RULE, describeLatitudeAgainstConditions } from "../../../lib/report/trackRecordCopy";
 import { Fact, FactList } from "../ui/factList";
 import { UrlDetails } from "../ui/urlDetails";
 
@@ -212,7 +212,7 @@ export function TrackRecordTable({
           Each month&apos;s {OPERATING_LATITUDE_LABEL.toLowerCase()}, newest first. It is one 0 to 100 score
           that blends the two scores: {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite and{" "}
           {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% the inverse of funding pressure. Higher
-          means more room to hire, spend and commit.{" "}
+          means more room to hire, spend and commit. {describeLatitudeAgainstConditions()}{" "}
           <Link href="/trust#formula-reference" className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
             How it is computed
           </Link>

@@ -55,6 +55,12 @@ type Props = {
    * reader comparing the card with /history found two answers for one week.
    */
   published?: { text: string; href: string };
+  /**
+   * The condition tied to the areas: which are on hold, and where each one's
+   * concrete answer is. The call is a sentence about every decision at once;
+   * this is the line that says which decisions it binds.
+   */
+  areas?: { text: string; href: string; action: string };
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
 };
@@ -89,6 +95,7 @@ export function DecisionHero({
   question,
   lines,
   published,
+  areas,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
@@ -184,6 +191,15 @@ export function DecisionHero({
         {regimeKey ? (
           <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
             {REGIME_WEATHER_RATIONALES[regimeKey]}
+          </p>
+        ) : null}
+
+        {areas ? (
+          <p className="max-w-xl text-fluid-sm font-medium leading-snug text-slate-100" data-held-areas>
+            {areas.text}{" "}
+            <Link href={areas.href} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
+              {areas.action}
+            </Link>
           </p>
         ) : null}
 
