@@ -24,6 +24,16 @@ const one = (graph: { "@graph": Node[] }, type: string) => {
 };
 
 describe("site entities", () => {
+  it("identifies the website preview in homepage and page graphs", () => {
+    const home = buildHomeStructuredData({
+      headline: "h", description: "d", datePublishedIso: "2026-09-10",
+      dateModifiedIso: "2026-09-15T12:00:00.000Z", postureLabel: "p", regimeLabel: "r", confidenceLabel: "c",
+    });
+    for (const graph of [home, buildApiDocsStructuredData(), buildCompsStructuredData({ data: null, tickers: ["SNOW"] })]) {
+      assert.equal(one(graph, "WebSite").image, "https://whether.work/api/og?template=report");
+    }
+  });
+
   it("anchors the organization to its public profiles on the homepage and in every publisher node", () => {
     const home = buildHomeStructuredData({
       headline: "h",
