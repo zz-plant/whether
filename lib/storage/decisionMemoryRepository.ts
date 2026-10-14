@@ -18,10 +18,7 @@ export class InMemoryDecisionMemoryRepository implements DecisionMemoryRepositor
   async append(entry: DecisionMemoryEntry): Promise<void> {
     const clientId = entry.context.clientId;
     const current = this.entriesByClient.get(clientId) ?? [];
-    const cloned: DecisionMemoryEntry = typeof structuredClone === "function"
-      ? structuredClone(entry)
-      : JSON.parse(JSON.stringify(entry));
-    current.push(cloned);
+    current.push(structuredClone(entry));
     this.entriesByClient.set(clientId, current);
   }
 

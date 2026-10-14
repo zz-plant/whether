@@ -168,8 +168,8 @@ const timeMachineMonthsByYear = (() => {
       monthsByYear[snapshot.year].push(snapshot.month);
     }
   });
-  Object.keys(monthsByYear).forEach((year) => {
-    monthsByYear[Number(year)].sort((a, b) => a - b);
+  Object.values(monthsByYear).forEach((months) => {
+    months.sort((a, b) => a - b);
   });
   return monthsByYear;
 })();

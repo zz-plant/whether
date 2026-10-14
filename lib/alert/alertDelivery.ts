@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { getJson, getWhetherKv, type KvNamespace as KvNamespaceLike } from "../runtime/kv";
+import { getJson, getWhetherKv } from "../runtime/kv";
 import type { AlertDecision, AlertConditions, LastAlertState } from "./alertEvaluator";
 import { alertDeliveryKey, evaluateAlert } from "./alertEvaluator";
 import { decisionVerdictEmail, flashMoveEmail, planLineEmail, thresholdCrossingEmail } from "./alertTemplates";
@@ -24,8 +24,6 @@ import { sha256Hex } from "../crypto";
 const ALERT_STATE_KEY = "alert:state";
 const ALERT_DELIVERED_PREFIX = "alert:delivered:";
 
-const getKv = (): KvNamespaceLike | null => getWhetherKv();
-
 /* What `writeAlertState` stores. A record that does not match reads as no state, as an unparseable one always did. */
 const lastAlertStateSchema: z.ZodType<LastAlertState> = z.object({
   regime: z.string(),
@@ -35,7 +33,7 @@ const lastAlertStateSchema: z.ZodType<LastAlertState> = z.object({
 });
 
 const readAlertState = async (): Promise<LastAlertState | null> => {
-  const kv = getKv();
+  const kv = getWhetherKv();
   if (!kv) return null;
   try {
     return await getJson(kv, ALERT_STATE_KEY, lastAlertStateSchema);
@@ -45,7 +43,7 @@ const readAlertState = async (): Promise<LastAlertState | null> => {
 };
 
 const writeAlertState = async (state: LastAlertState): Promise<void> => {
-  const kv = getKv();
+  const kv = getWhetherKv();
   if (!kv) return;
   try {
     await kv.put(ALERT_STATE_KEY, JSON.stringify(state));
@@ -79,7 +77,7 @@ const ALERT_REDELIVERY_WINDOW_MS = 7 * 24 * 60 * 60 * 1000;
    window instead of a period, under the keys these markers have always had. */
 const deliveredMarkers = () =>
   sentMarkers({
-    kv: getKv(),
+    kv: getWhetherKv(),
     keyFor: (key) => `${ALERT_DELIVERED_PREFIX}${key}`,
     withinMs: ALERT_REDELIVERY_WINDOW_MS,
   });
