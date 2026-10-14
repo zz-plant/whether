@@ -1,4 +1,4 @@
-import { buildBreadcrumbList, buildCanonicalUrl, organizationId, organizationName, websiteId, websiteName } from "../seo";
+import { buildBreadcrumbList, buildCanonicalUrl, buildOgImageUrl, organizationId, organizationName, websiteId, websiteName } from "../seo";
 import { siteUrl } from "../siteUrl";
 import { buildAuthorSchema, buildPublisherSchema } from "../publisher";
 import { buildGroupBreadcrumbs, createBreadcrumbTrail } from "../navigation/breadcrumbs";
@@ -27,6 +27,7 @@ const websiteNode = () => ({
   "@id": websiteId,
   name: websiteName,
   url: siteUrl,
+  image: buildOgImageUrl({ template: "report" }),
 });
 
 const isPartOfSite = { "@id": websiteId } as const;

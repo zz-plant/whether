@@ -80,6 +80,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       "@id": websiteId,
       name: websiteName,
       url: siteUrl,
+      image: buildOgImageUrl({ template: "report" }),
       description: defaultSiteDescription,
       inLanguage: "en",
       mainEntityOfPage: `${siteUrl}/`,
