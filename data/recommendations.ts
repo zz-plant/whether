@@ -6,8 +6,6 @@ export const insightDatabase = {
   fossilRecord: {
     title: "The Fossil Record",
     subtitle: "What a product's shape says about the money it was built with",
-    description:
-      "Habits a product and an org pick up from the money climate they were built in.",
     columns: {
       domain: "Area",
       lowRateArtifact: "Built when money was cheap",

@@ -116,7 +116,6 @@ export function MethodSection() {
         <div className="mt-4 space-y-4">
           <p className="text-sm text-slate-300 leading-relaxed">
             Fill these out before the decision is urgent. That is when the method is most useful.
-            Print this section or copy the structure into your planning document.
           </p>
 
           <div className="border border-dashed border-slate-600 rounded-xl p-6 space-y-6 print:border-black print:border-solid">

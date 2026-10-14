@@ -113,8 +113,7 @@ export function CommitmentTest({
         </div>
       ) : (
         <p className="text-fluid-nano text-slate-500">
-          Enter your cash, spend and the decision&apos;s monthly cost to see where your runway lands. Leave
-          revenue blank if there is none yet. Your figures stay in this browser.
+          Leave revenue blank if there is none yet. Your figures stay in this browser.
         </p>
       )}
     </div>

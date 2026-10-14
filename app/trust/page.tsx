@@ -61,7 +61,6 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-limits"
         title="Margin and reliability limits"
-        description="How reliable the brief is, what should pause it, and what would force a change."
       >
         {/* Two columns under their own headings, not two cards inside the
             section (2026-10-09); the warnings below are set the same way. */}

@@ -308,7 +308,7 @@ export function RunwayPlannerPanel({
         <OperatorProfileNumberField
           field="cashUsd"
           label="Cash in the bank ($)"
-          hint="Your balance today. Runway is worked out from it."
+          hint="Runway is worked out from it."
           placeholder="e.g. $2.1M"
           value={profile.cashUsd}
           onCommit={(value) => commitProfileField("cashUsd", value)}
@@ -415,7 +415,7 @@ export function RunwayPlannerPanel({
                 : describeMissingRunwayInputs(resolution.missing)}
           </p>
           <p className="mt-1 text-fluid-xs text-slate-400">
-            Your figures stay in this browser and are shared with the plan stress test. Nothing is sized until you enter them.
+            Your figures stay in this browser and are shared with the plan stress test.
           </p>
         </div>
       ) : (
