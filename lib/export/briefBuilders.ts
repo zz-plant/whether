@@ -12,7 +12,7 @@ import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { areaLinesFromActionStrip, buildDecisionMovement } from "../report/decisionMovement";
 import { describeBaseRateSource, formatDocumentMargin, formatExportConfidence } from "./exportTerms";
-import { describeNotCountedLine } from "../report/scoringBasis";
+import { describeNotCountedLine, NOT_COUNTED_REASON } from "../report/scoringBasis";
 
 /*
  * Every paste reads in the page's order: the call, what changed, what it
@@ -248,7 +248,7 @@ const buildWhyThisCouldBeWrongBlock = (document: BriefDocument) => [
   "Why this could be wrong:",
   `• ${formatDocumentMargin(document)}`,
   ...(document.provenance.scoringBasis.warning
-    ? [`• ${document.provenance.scoringBasis.warning} The guidance leaves them out: the record cannot test them.`]
+    ? [`• ${document.provenance.scoringBasis.warning} ${NOT_COUNTED_REASON}`]
     : []),
   `• ${document.slots.whyCouldBeWrong}`,
   `• What would show it: "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, and the readings.`,

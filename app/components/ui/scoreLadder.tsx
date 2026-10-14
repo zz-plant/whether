@@ -209,6 +209,20 @@ export const describeLadderPosition = (value: number, lines: readonly LadderLine
   return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} ${nearest.distance === 1 ? "pt" : "pts"} ${side} the ${phrase}`;
 };
 
+/**
+ * Which end of the scale is worse, read off the ladder's own lines: a pause
+ * line above the resume line means a rising score is the bad direction
+ * (funding pressure); below it, a falling one (risk appetite). Null without
+ * both lines, where the ladder cannot say (2026-10-14: the two scores point
+ * opposite ways, and nothing on a ladder said which).
+ */
+const ladderWorseDirection = (lines: readonly LadderLine[]): "higher" | "lower" | null => {
+  const pause = lines.find((line) => line.kind === "pause");
+  const resume = lines.find((line) => line.kind === "resume");
+  if (!pause || !resume || pause.value === resume.value) return null;
+  return pause.value > resume.value ? "higher" : "lower";
+};
+
 export function ScoreLadder({
   label,
   value,
@@ -219,6 +233,7 @@ export function ScoreLadder({
   className = "",
 }: ScoreLadderProps) {
   const caption = describeLadderPosition(value, lines);
+  const worse = ladderWorseDirection(lines);
   /* Rows for each width the ladder is drawn at; the container query on the
      track picks one. Positions go through custom properties so one element
      serves both layouts. */
@@ -246,7 +261,14 @@ export function ScoreLadder({
   return (
     <figure className={`@container space-y-1.5 ${className}`.trim()} data-score-ladder>
       <figcaption className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs">
-        <span className="font-medium text-slate-200">{label}</span>
+        <span className="font-medium text-slate-200">
+          {label}
+          {worse ? (
+            <span className="ml-1.5 font-normal text-slate-400" data-ladder-direction={worse}>
+              {worse === "higher" ? "higher is worse" : "higher is better"}
+            </span>
+          ) : null}
+        </span>
         <span className="tabular-nums text-slate-400">{caption}</span>
       </figcaption>
       <div
