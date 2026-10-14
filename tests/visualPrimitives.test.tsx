@@ -228,6 +228,17 @@ describe("AreaTable", () => {
     }
     assert.doesNotMatch(html, /class="[^"]*(?<![:\w-])min-w-\[/, "no minimum width outside sm, or the table scrolls sideways on a phone");
   });
+
+  it("prefixes score links with signalLinkBase so tables off the homepage link back to it", () => {
+    const html = renderToStaticMarkup(
+      <AreaTable
+        caption="test"
+        signalLinkBase="/"
+        rows={[{ area: "hiring", rule: "Backfills only." }]}
+      />,
+    );
+    assert.match(html, /href="\/#signal-funding-pressure"/);
+  });
 });
 
 describe("AreaTable moved rows", () => {

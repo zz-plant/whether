@@ -170,13 +170,6 @@ export const buildReportDataFixture = (overrides: ReportDataOverrides = {}): Rep
     historicalComparison: null,
     historicalSelection: null,
     historicalAnalogs: [],
-    internalProvenance: {
-      sourceLabel: "Whether curated playbook catalog",
-      recordDateLabel: "Static",
-      timestampLabel: "Static catalog",
-      ageLabel: "Static.",
-      statusLabel: "Curated catalog (static)",
-    },
     invalidHistoricalSelection: false,
     lastYearComparison: null,
     liveAssessment: null,

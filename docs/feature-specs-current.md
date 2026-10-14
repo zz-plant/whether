@@ -2188,13 +2188,11 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   built, though both ship. It is removed with its panel (`app/components/appendix/ReferencePanels.tsx`);
   its two ids stay as aliases of the Share step. That left `DataProvenanceStrip` with no caller —
   every caller had passed `showProvenance: false`, so it had rendered nowhere — and it is deleted
-  with its test and the two status icons only it drew. Still open: `reportData.internalProvenance`
-  (`lib/report/reportDataLoader.ts`) is now computed and drawn nowhere.
+  with its test and the two status icons only it drew. `reportData.internalProvenance`
+  (`lib/report/reportDataLoader.ts`) was removed on 2026-10-14.
 - **The lead table's "Line set by" links leave for the brief.** `AreaTable` takes
-  `signalLinkBase`; `/operate` passes "/", so "Funding pressure" and "Risk appetite" open
-  `/#signal-funding-pressure` and `/#signal-risk-appetite` rather than in-page anchors this page
-  never draws. `/share` and the answer pages carry the same dead in-page links and are not changed
-  here.
+  `signalLinkBase`; `/operate`, `/share` and the answer pages pass "/", so "Funding pressure" and "Risk appetite" open
+  `/#signal-funding-pressure` and `/#signal-risk-appetite` rather than dead in-page anchors.
 - **Rules before you commit opens on the rules.** "Show all rules" and its count follow the three
   lists they change instead of sitting above the heading, and the count says what it counts ("The
   top 3 of each list." — since 2026-10-08 "Showing the top 3 of each list." — where it said "per area"). Risk checks and the resources disclosure take the
