@@ -104,7 +104,7 @@ describe("a degraded state says what is missing", () => {
     for (const [slot, sentence] of Object.entries(NO_LIVE_READING_CALL)) {
       assertDegradedSentence(sentence, `NO_LIVE_READING_CALL.${slot}`);
     }
-    assert.equal(NO_LIVE_READING_CALL.currentCall, "No live reading this week. Keep last week's plan.");
+    assert.equal(NO_LIVE_READING_CALL.currentCall, "No live reading this week. Keep your current plan.");
   });
 
   it("renders the absent-reading call as the h1 when the hero is handed no call", () => {

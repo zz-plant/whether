@@ -201,7 +201,7 @@ const scoreHeadline = (score: AgentState["scores"]["tightness"]) => {
  * On a held week what would change the guidance is the hold's condition, the
  * brief's "Conditions change if" (`whatFlipsNext.flipTrigger`). This listed the two
  * score lines there too, "Funding pressure above 70" and "Risk appetite at or below
- * 50", beside a call that said to keep last week's plan until the scores agree.
+ * 50", beside a call that said to keep your current plan until the scores agree.
  */
 export const buildAgentGuidance = ({
   reportData,

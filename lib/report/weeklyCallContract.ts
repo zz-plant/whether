@@ -198,7 +198,7 @@ export const buildWeeklyCallContract = ({
   const whyCouldBeWrong = policyOverrideActive
     ? hold.whyCouldBeWrong
     : homeBriefModel.confidenceLabel === "HIGH"
-      ? "The scores are clear of the change lines, but a signal can still reverse before next week's reading. Keep approvals staged until it confirms the guidance."
+      ? "The scores are clear of the change lines, but a signal can still reverse before next week's reading. Keep new commitments staged until it confirms the guidance."
       : "A score is near its change line, so a small move could change conditions before next week's reading.";
 
   return applyStageToWeeklyCall(

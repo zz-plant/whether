@@ -345,7 +345,7 @@ export const buildFlipRiskMeterState = (
     return {
       progressPercent,
       urgencyLabel: "Medium",
-      detailLabel: "Conditions could change within weeks. Keep approvals reversible and review weekly.",
+      detailLabel: "Conditions could change within weeks. Keep new commitments reversible and review weekly.",
       triggerLabel,
     };
   }

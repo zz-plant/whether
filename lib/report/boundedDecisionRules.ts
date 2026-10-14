@@ -310,7 +310,7 @@ export const isDecisionArea = (value: string): value is DecisionArea =>
 export const extractCompactClause = extractCompactClauseFromFormatting;
 
 export const formatBoundedDecisionAction = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation">) =>
-  formatDecisionAction(rule.doNow[0] ?? rule.recommendation, "Keep last week's plan");
+  formatDecisionAction(rule.doNow[0] ?? rule.recommendation, "Keep your current plan");
 
 export const formatBoundedDecisionThreshold = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) =>
   formatDecisionThreshold(rule.pauseTrigger, FALLBACK_PAUSE_THRESHOLD);
@@ -324,7 +324,7 @@ export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "do
     threshold: rule.pauseTrigger,
     reversal: rule.resumeTrigger,
     fallbacks: {
-      action: "Keep last week's plan",
+      action: "Keep your current plan",
       threshold: FALLBACK_PAUSE_THRESHOLD,
       reversal: "Resume only after the reading recovers",
     },
