@@ -114,7 +114,9 @@ const inDomain = (value: number, min: number, max: number) => value >= min && va
  */
 const SERIES = {
   spread10Y2Y: "var(--color-semantic-easing-border)",
-  spread2Y3M: "var(--color-semantic-caution-border)",
+  /* Muted and dashed, not the crossed red: a spread is a series, not a line
+     that has been crossed (2026-10-14). */
+  spread2Y3M: "var(--app-text-muted)",
 } as const;
 
 /**
@@ -445,7 +447,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 <path key={`spread-10-2-${index}`} d={path} fill="none" stroke={SERIES.spread10Y2Y} strokeWidth="2" />
               ))}
               {spread2Y3MSeries.paths.map((path, index) => (
-                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeWidth="2" />
+                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeDasharray="4 3" strokeWidth="2" />
               ))}
             </svg>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">

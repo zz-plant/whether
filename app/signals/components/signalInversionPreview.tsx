@@ -145,7 +145,7 @@ export function SignalInversionPreview({
               <path key={`10-2-${index}`} d={path} fill="none" stroke="var(--color-semantic-easing-border)" strokeWidth="2" />
             ))}
             {spread2Y3MSeries.paths.map((path, index) => (
-              <path key={`2-3-${index}`} d={path} fill="none" stroke="var(--color-semantic-caution-border)" strokeWidth="2" />
+              <path key={`2-3-${index}`} d={path} fill="none" stroke="var(--app-text-muted)" strokeDasharray="4 3" strokeWidth="2" />
             ))}
             {/* Endpoint dots, no in-plot text. The series labels that sat here were
                 anchored to each line's last point at the right edge — exactly where
@@ -158,7 +158,7 @@ export function SignalInversionPreview({
               <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-easing-border)" />
             ) : null}
             {spread2Y3MSeries.lastPoint ? (
-              <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
+              <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--app-text-muted)" />
             ) : null}
           </svg>
           {/* One caption carries the legend. It was four uppercase chips under
@@ -177,11 +177,11 @@ export function SignalInversionPreview({
           </div>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
+              <span className="w-3 border-t-2 border-[var(--color-semantic-easing-border)]" aria-hidden="true" />
               <span>10Y−2Y <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread10Y2Y ?? null)}</strong></span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" />
+              <span className="w-3 border-t-2 border-dashed border-[var(--app-text-muted)]" aria-hidden="true" />
               <span>2Y−3M <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread2Y3M ?? null)}</strong></span>
             </span>
             <span>{monthlyPoints[0]?.label} → {latest?.label}</span>

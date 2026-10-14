@@ -217,3 +217,19 @@ directions. The band's black glyph clears 3:1 on every fill in every direction. 
   or a second sans"). Neither is recommended for now.
 - Dropping sky as the action accent leaves `tests/regimeColourContract.test.tsx`'s rule standing
   (no regime on the sky ramp), with nothing on the sky ramp at all.
+
+## Addendum, 2026-10-14: colour roles after the first week live
+
+The owner found the applied palette too monochrome, and the colour roles muddled. Two changes:
+
+- **Action is the week's ink.** Under a shell that knows its regime (`[data-regime]`), links,
+  buttons, the selected segment's lamp and pointer, and focus rings draw in `--regime-ink`, not
+  the text ink. This adds no fifth hue, because the action colour is whichever condition the
+  page already states. With no regime, `:root`'s ink holds. The atmosphere wash rose from 6% to
+  11% (4% to 7% on light).
+- **Red is for lines only.** The crossed red had also carried trust caveats (cached sources, the
+  scoring note, the archived-week banner, guidance held back) and one chart series (2Y−3M). A
+  caveat now has its own role (`--color-caveat-*`), drawn in ink with a hollow ring marker. It is
+  told apart by shape, not hue, because every hue not already used by a condition or the red
+  lands on a condition for a deuteranope. The spread series is muted ink and dashed.
+  `tests/regimeColourContract.test.tsx` holds both rules.

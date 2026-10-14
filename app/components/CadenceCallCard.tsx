@@ -118,7 +118,7 @@ export function CadenceCallCard({
             Zero-offset tint, not a lift: §XIII reserves elevation for the outermost
             container and allows emphasis at depth. */}
         {model.overrideReason ? (
-          <p className="rounded-md border border-amber-500/25 bg-amber-500/[0.07] px-3 py-2 text-fluid-nano text-semantic-caution-fg">
+          <p className="rounded-md border border-l-2 border-caveat-border bg-caveat-bg px-3 py-2 text-fluid-nano text-caveat-fg">
             <span className="font-semibold">Guidance held:</span> {model.overrideReason}
           </p>
         ) : null}
