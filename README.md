@@ -204,7 +204,20 @@ bun run mcp:whether
 
 ---
 
-## Development & Testing
+## Quickstart
+
+### 1. Install & Run Locally
+
+```bash
+git clone https://github.com/zz-plant/whether.git
+cd whether
+bun install
+bun run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to view the live weekly operating brief with hot reloading.
+
+### 2. Verification & Testing
 
 | Task | Command | Description |
 | :--- | :--- | :--- |
