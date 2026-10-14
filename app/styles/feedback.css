@@ -43,3 +43,22 @@
     animation: none;
   }
 }
+
+/* The caveat mark: an outlined diamond, the shape of a warning sign, before
+   anything that says "read this reading with care" (cached sources, a
+   scoring note, an archived week, guidance held back). Its own shape because
+   each round mark already means something: a filled dot is lit (a chosen
+   key, live sources), a hollow ring is where a reading was, a dashed ring is
+   a score close to its line (§XIV, §XXIV). Inherits the text colour, so it is
+   ink like the caveat it marks, never the crossed red. */
+.weather-caveat-mark::before {
+  content: "";
+  display: inline-block;
+  flex: none;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin-right: 0.5rem;
+  border: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  vertical-align: 0.0625rem;
+}
