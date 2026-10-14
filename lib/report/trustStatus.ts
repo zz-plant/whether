@@ -167,7 +167,7 @@ const ALLOWED_DETAILS: Record<TrustStatusTone, [string, string, string]> = {
     "Anything you can't undo, until one live refresh lands.",
   ],
   stable: [
-    "This week's normal approvals under the current guidance.",
+    "This week's usual decisions, under the current guidance.",
     "Nothing extra.",
     "Nothing.",
   ],
@@ -271,7 +271,7 @@ export const buildTrustWarnings = ({
     warnings.push({
       id: "stale-cached",
       warning: "No live reading: this is a cached snapshot.",
-      mitigationCheck: "Wait for the next live update before approving anything you can't undo.",
+      mitigationCheck: "Wait for the next live update before committing to anything you can't undo.",
     });
   }
 
@@ -387,7 +387,7 @@ type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
 const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
   live: "All sources live and current.",
   partlyCached: "Some sources are cached. Hold anything you can't undo until every source is current.",
-  cachedSnapshot: "Live data is late. Keep last week's plan; hold new hires, spend and vendor contracts until it returns.",
+  cachedSnapshot: "Live data is late. Keep your current plan; hold new hires, spend and vendor contracts until it returns.",
   historical: "Historical snapshot. Compare against the live read before changing current plans.",
 };
 
@@ -482,7 +482,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Hold",
       tone: "warning",
-      detail: "Live data is late. Keep last week's plan; anything you can't undo can wait for it.",
+      detail: "Live data is late. Keep your current plan; anything you can't undo can wait for it.",
     };
   }
 
@@ -493,7 +493,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Hold",
       tone: "warning",
-      detail: `${policyHold ? policyHold.currentCall : "Conditions sit close to a line."} Keep last week's plan; anything you can't undo can wait for a clearer reading.`,
+      detail: `${policyHold ? policyHold.currentCall : "Conditions sit close to a line."} Keep your current plan; anything you can't undo can wait for a clearer reading.`,
     };
   }
 
@@ -501,7 +501,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Act with caution",
       tone: "warning",
-      detail: `${policyHold.currentCall} Keep approvals reversible.`,
+      detail: `${policyHold.currentCall} Keep new commitments reversible.`,
     };
   }
 
@@ -646,9 +646,9 @@ export const buildTrustStatus = ({
   const detail = historicalSelection
     ? `A past week, not this one — not for live decisions.${historicalMacroCoverageDetail}`
     : isFallback
-      ? `Live data is late; this is a cached reading. Keep last week's plan and hold anything you can't undo until it returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
+      ? `Live data is late; this is a cached reading. Keep your current plan and hold anything you can't undo until it returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
       : policyHold
-        ? `${policyHold.currentCall} Hold approvals.`
+        ? `${policyHold.currentCall} Hold new commitments.`
       /* About the data, not the decision: "nothing here argues for holding
          back" read as this week's action in a week whose guidance was to
          freeze new commitments. */
@@ -659,7 +659,7 @@ export const buildTrustStatus = ({
     : isFallback
       ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source.`
       : policyHold
-        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${policyHold.holdsUntil}.`
+        ? `Keep new commitments reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${policyHold.holdsUntil}.`
       : stableAction;
 
   const tone: TrustStatusTone = historicalSelection
@@ -675,12 +675,12 @@ export const buildTrustStatus = ({
   });
 
   const outageWindow = historicalSelection
-    ? "A past week. Not for live approvals."
+    ? "A past week. Not for this week's decisions."
     : isFallback
       ? "Only moves you can undo, until a live update lands."
       : policyHold
         ? `Only moves you can undo, until ${policyHold.holdsUntil}.`
-      : "Use this live reading for this week's approvals; the pause lines in this week's guidance apply.";
+      : "Use this live reading for this week's decisions; the pause lines in this week's guidance apply.";
 
   const outageExitGate = buildOutageExitGate({
     isFallback,

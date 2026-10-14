@@ -88,7 +88,7 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
   rules.find((rule) => rule.area === area);
 
 const OPERATING_LEVER_FALLBACK = {
-  areaActionNow: "Keep last week's plan for this area.",
+  areaActionNow: "Keep your current plan for this area.",
   triggerThreshold: "Pause if funding pressure exceeds 60 or risk appetite falls below 40.",
   reversalCondition: "Resume expansion when funding pressure drops below 50 and risk appetite is above 50.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;

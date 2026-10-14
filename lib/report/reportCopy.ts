@@ -146,7 +146,7 @@ const HELD_PAUSE_IF = "The decision can't be undone while the guidance is held."
 export const POLICY_OVERRIDE_CALL = {
   "signals-disagree": {
     currentCall: "The two scores point in different directions, so the guidance is not changing this week.",
-    actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
+    actionNow: "Keep your current plan, and hold anything you can't undo until the scores agree.",
     pauseIf: HELD_PAUSE_IF,
     callChangesIf:
       "The two scores point the same way for a second reading; until then the guidance is not changing.",
@@ -159,7 +159,7 @@ export const POLICY_OVERRIDE_CALL = {
     currentCall:
       "The signals are spread too far apart to agree on a direction, so the guidance is not changing this week.",
     actionNow:
-      "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the signals line up.",
+      "Keep your current plan, and hold anything you can't undo until the signals line up.",
     pauseIf: HELD_PAUSE_IF,
     callChangesIf: "The signals line up on a later reading; until then the guidance is not changing.",
     holdsUntil: "the signals line up",
@@ -170,7 +170,7 @@ export const POLICY_OVERRIDE_CALL = {
   "inputs-missing": {
     currentCall: "Too many inputs are missing this week, so the guidance is not changing.",
     actionNow:
-      "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the missing inputs return.",
+      "Keep your current plan, and hold anything you can't undo until the missing inputs return.",
     pauseIf: HELD_PAUSE_IF,
     callChangesIf: "The missing inputs return in a live reading; until then the guidance is not changing.",
     holdsUntil: "the missing inputs return",
@@ -185,7 +185,7 @@ export const POLICY_OVERRIDE_CALL = {
  */
 export const POLICY_OVERRIDE_CALL_UNNAMED = {
   currentCall: "The guidance is on hold, so it is not changing this week.",
-  actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the hold lifts.",
+  actionNow: "Keep your current plan, and hold anything you can't undo until the hold lifts.",
   pauseIf: HELD_PAUSE_IF,
   callChangesIf: "The hold lifts on a later reading; until then the guidance is not changing.",
   holdsUntil: "the hold lifts",
@@ -202,7 +202,7 @@ export const POLICY_OVERRIDE_CALL_UNNAMED = {
  * builder both read these so the two cannot drift.
  */
 export const NO_LIVE_READING_CALL = {
-  currentCall: "No live reading this week. Keep last week's plan.",
+  currentCall: "No live reading this week. Keep your current plan.",
   pauseIf: "No pause line this week. Hold anything you can't undo; the rest can go ahead.",
   callChangesIf: "A live reading lands; until then the guidance is not changing.",
 } as const;

@@ -362,7 +362,7 @@ export const buildWeeklyDecisionCardModel = (
     flipRiskMeter: {
       progressPercent: 50,
       urgencyLabel: "Medium",
-      detailLabel: "The call could change within weeks. Keep approvals reversible and review weekly.",
+      detailLabel: "The call could change within weeks. Keep new commitments reversible and review weekly.",
       triggerLabel: "Tightness above 70.0.",
     },
     regimeVelocity: { status: "insufficient_history", from: "Expansion", to: "Mixed", sampleSize: 1, displayLabel: "Expansion→Mixed: insufficient history" },

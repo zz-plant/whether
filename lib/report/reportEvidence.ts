@@ -105,7 +105,7 @@ const LEGACY_DIRECTION = /^Conditions (tightening|easing|holding)\s+—\s+/;
 export const weeklyHeadline = (call: { actionNow: string; currentCall: string; policyOverrideActive?: boolean }) => {
   /* A held week is the exception: its call explains the hold ("The two scores
      point in different directions, so the guidance is not changing this week.")
-     and its action is the instruction ("Keep last week's plan…"), so the action
+     and its action is the instruction ("Keep your current plan…"), so the action
      is the headline and the explanation follows it in a paste. */
   if (call.policyOverrideActive) {
     const action = call.actionNow.trim();
