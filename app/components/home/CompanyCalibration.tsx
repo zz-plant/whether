@@ -3,7 +3,7 @@ import { StagePersonaSelector } from "../StagePersonaSelector";
 import { RunwayPersonaSelector } from "../RunwayPersonaSelector";
 import { HOME_SECTIONS } from "../../../lib/report/home/homeSectionModel";
 import type { StartupVariantMode } from "../../../lib/report/boundedDecisionRules";
-import type { RunwayBand } from "../../../lib/report/operatorRunway";
+import { DEFAULT_RUNWAY_BAND, runwayBandPhrase, type RunwayBand } from "../../../lib/report/operatorRunway";
 
 /**
  * Whose lines these are, under the verdict (2026-10-09).
@@ -16,11 +16,13 @@ import type { RunwayBand } from "../../../lib/report/operatorRunway";
  * One control per axis at every width: the tablists show from `sm` up, and on a
  * phone the header's stage and runway pills are the control.
  *
- * No sentence over them (2026-10-09). "Lines set for Series A with 12–24 months
- * of runway (the defaults)." restated the two selections directly beneath it, and
- * on a phone the two header pills; each control marks its default choice
- * instead (`choiceSublabel`). On a phone the section prints only when it has a
- * stage action or a runway note to show, since its controls live in the header.
+ * Since 2026-10-14 the two tablists fold under one sentence, "Rules for a
+ * Series A company with 12–24 months of runway · Change". The 2026-10-09 rule
+ * against a sentence over them held while both were always open, because the
+ * sentence restated what sat directly beneath it; folded, the sentence is the
+ * only statement of whose rules these are. On a phone the section prints only
+ * when it has a stage action or a runway note to show, since its controls live
+ * in the header.
  */
 export function CompanyCalibration({
   stageLabel,
@@ -45,10 +47,26 @@ export function CompanyCalibration({
       aria-label="Your stage and runway"
       className={`space-y-3 border-t border-slate-800/70 pt-4 ${hasNote ? "" : "max-sm:hidden"}`.trim()}
     >
-      <div className="hidden sm:grid sm:gap-3 weather-company-options">
-        <StagePersonaSelector activeStage={activeStage} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
-        <RunwayPersonaSelector activeRunway={activeRunway} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
-      </div>
+      {/* Folded to one line (2026-10-14). The two four-key rows stood between
+          the call and "What are you deciding?", so the first thing asked of a
+          reader was to configure the page. The line says whose rules these are,
+          which is the part every reader needs; the keys are one click away. */}
+      <details className="group hidden sm:block" data-company-calibration>
+        <summary className="weather-hit cursor-pointer list-none text-fluid-xs text-slate-300 [&::-webkit-details-marker]:hidden">
+          {/* One span: the site's summary rule lays its children out as a flex row, which spread the sentence's words across the line. */}
+          <span>
+            Rules for a <span className="font-semibold text-slate-100">{stageLabel}</span> company with{" "}
+            <span className="font-semibold text-slate-100">{runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}</span> of runway
+            <span aria-hidden="true"> · </span>
+            <span className="text-[var(--accent-action)] underline underline-offset-4 group-open:hidden">Change</span>
+            <span className="hidden text-[var(--accent-action)] underline underline-offset-4 group-open:inline">Done</span>
+          </span>
+        </summary>
+        <div className="mt-3 grid gap-3 weather-company-options">
+          <StagePersonaSelector activeStage={activeStage} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
+          <RunwayPersonaSelector activeRunway={activeRunway} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
+        </div>
+      </details>
       {stageAction ? (
         <p className="text-fluid-xs text-slate-300" data-stage-action>
           <span className="font-semibold text-slate-100">At {stageLabel}:</span> {stageAction}

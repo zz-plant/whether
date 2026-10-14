@@ -56,10 +56,14 @@ describe("conditions legend", () => {
     }
   });
 
-  it("marks this week's condition, and none on an archived week", () => {
-    assert.match(text(render({ currentRegime: "SCARCITY" })), /Freezing: above 70, below 50 \(this week\)\./);
-    assert.equal((text(render({ currentRegime: "SCARCITY" })).match(/\(this week\)/g) ?? []).length, 1);
+  it("defines only this week's condition on a live week, and all four on an archived one", () => {
+    // The four ran to four lines on a phone above the call (2026-10-14); a live
+    // week defines its own and links to the rest.
+    const live = text(render({ currentRegime: "SCARCITY" }));
+    assert.match(live, /^Freezing this week: funding pressure above 70, risk appetite below 50\. The four conditions and how they are set/);
+    assert.doesNotMatch(live, /Sunny|Cloudy|Stormy/);
     assert.doesNotMatch(text(render()), /this week/);
+    assert.match(text(render()), /Sunny:.*Cloudy:.*Stormy:.*Freezing:/);
   });
 
   it("reads the change lines it is handed", () => {
