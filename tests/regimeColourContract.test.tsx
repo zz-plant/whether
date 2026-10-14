@@ -154,6 +154,12 @@ describe("regime colour contract", () => {
       assert.doesNotMatch(source, /semantic-caution|line-crossed/, `${path} prints no caveat in the crossed red`);
       assert.match(source, /caveat-/, `${path} uses the caveat role`);
     }
+    // And its own shape: the hollow ring already means "where a reading was" on
+    // the score ladder, so a caveat is the diamond, not a ring (2026-10-14).
+    for (const path of ["app/components/trustStrip.tsx", "app/components/historicalBanner.tsx", "app/components/CadenceCallCard.tsx", "app/signals/components/signalReadingPanel.tsx"]) {
+      assert.match(readRepoFile(path), /weather-caveat-mark/, `${path} marks its caveat with the diamond`);
+    }
+    assert.match(readRepoFile("app/styles/feedback.css"), /\.weather-caveat-mark::before\s*\{[^}]*rotate\(45deg\)/, "the caveat mark is a diamond");
   });
 
   it("paints one atmosphere from the token on both shells", () => {

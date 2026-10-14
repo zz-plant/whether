@@ -87,7 +87,7 @@ export function TrustStrip({
     detail?: string;
     /** Which fact the detail is, for a reader of the markup: the next-week forecast, or the basis's warning. */
     detailKind?: "next-week" | "basis";
-    /** `caveat`: read this reading with care (a hollow ring); `easing`: in the state it should be (a filled dot). Never the crossed red, which is for lines. */
+    /** `caveat`: read this reading with care (the caveat diamond); `easing`: in the state it should be (a filled dot, lit). Never the crossed red, which is for lines. */
     tone?: "caveat" | "easing";
     routine?: boolean;
   }[] = [
@@ -158,18 +158,20 @@ export function TrustStrip({
                 broke onto two lines and read as two labels. */}
             <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>{cell.label}</dt>
             {line ? " " : null}
-            {/* A state carries a dot as well as its ink, so "Partly cached" and
+            {/* A state carries a mark as well as its ink (a lit dot when live, the
+                caveat diamond when not), so "Partly cached" and
                 "2 pts from its line" read as flags at a glance and survive a
-                greyscale screenshot. Round, because it is a marker (§XIV); a
-                pseudo-element, so the cell's text is still only its value. */}
+                greyscale screenshot. Each shape has one meaning across the site
+                (§XIV's mark vocabulary); a pseudo-element, so the cell's text is
+                still only its value. */}
             <dd
               className={`${termLayout}${
                 cell.tone === "caveat"
-                  ? "font-medium text-caveat-fg before:border before:border-current before:bg-transparent"
+                  ? "weather-caveat-mark font-medium text-caveat-fg"
                   : cell.tone === "easing"
-                    ? "font-medium text-semantic-easing-fg before:bg-current"
+                    ? "font-medium text-semantic-easing-fg before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:align-middle before:content-['']"
                     : "font-medium text-slate-200"
-              }${cell.tone ? " before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:align-middle before:content-['']" : ""}`}
+              }`}
             >
               {cell.value}
               {cell.detail ? (

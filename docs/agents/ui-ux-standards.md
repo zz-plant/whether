@@ -232,6 +232,21 @@ take the other's job.
   | Surface | `--radius-2xl` (16px) | `rounded-2xl`, `.weather-surface`, dialog and drawer popups | the outermost container, sheets, the identicon tile |
   | Round | `--radius-full` | `rounded-full` | dots, markers, spinners, switches, progress bars, icon wells, seals |
 
+- MUST: one meaning per mark. Small marks are a vocabulary, and a shape that means two things on
+  one page means neither (added 2026-10-14, when the trust strip's caveat ring sat one section
+  above the score ladder's past-reading ring).
+
+  | Mark | Means | Where |
+  | --- | --- | --- |
+  | Filled dot | lit: chosen, or as it should be | segment lamps, live sources, a series' current point |
+  | Hollow ring | a past reading singled out | the ladder's last reading, the months a call changed and where a trace starts on `/history` |
+  | Dashed ring (`CircleDashed`) | a score close to its line | the line-state "close" glyph (§XXIV) |
+  | Pause and play | a pause line crossed; clear of it, or a resume line met | the line states (§XXIV) |
+  | Outlined diamond (`.weather-caveat-mark`) | read this reading with care | cached sources, a scoring note, an archived week, guidance held back |
+
+  The diamond is the one mark that is not round: it is a warning sign's shape, not a data marker,
+  and its colour is the caveat ink, never the crossed red. A new kind of mark gets a row here
+  before it ships.
 - NEVER: `rounded-full` on a text-bearing element. A pill beside a 2px chip is two badge shapes
   for one class of information, and until 2026-09-02 it put the softest shape on the page around
   the most assertive content (`3 NEED ATTENTION`, `HOLD`, `Q4 2018 analog`). Verdicts are

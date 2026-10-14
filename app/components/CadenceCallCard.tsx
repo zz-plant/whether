@@ -119,7 +119,7 @@ export function CadenceCallCard({
             container and allows emphasis at depth. */}
         {model.overrideReason ? (
           <p className="rounded-md border border-l-2 border-caveat-border bg-caveat-bg px-3 py-2 text-fluid-nano text-caveat-fg">
-            <span className="font-semibold">Guidance held:</span> {model.overrideReason}
+            <span className="weather-caveat-mark font-semibold">Guidance held:</span> {model.overrideReason}
           </p>
         ) : null}
         <p className="max-w-2xl text-fluid-sm leading-relaxed text-slate-300">{model.description}</p>
