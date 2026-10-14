@@ -320,7 +320,11 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   }
 
   const lower = text.toLowerCase();
-  if (/\b(hire|hiring|headcount|recruiting|poach|principal|architect|lead|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
+  /* No bare "lead", "principal" or "architect": each is a role only beside a
+     hiring verb, and that verb already matches here ("Hire 1 principal
+     architect"). Alone they claimed "sales lead time" and "loan principal" as
+     hires before the pricing or roadmap checks below could run. */
+  if (/\b(hire|hiring|headcount|recruiting|poach|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
     return { category: "HIRING", action: "HIRE", confidence: "MATCHED" };
   }
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
@@ -422,7 +426,7 @@ export const stressTestDecisionPlan = (
     }
   }
 
-  const isExplicitlyReversible = /\b(contract-to-hire|contract to hire|milestone|monthly rolling|on-demand|convertible|short-term|reversible)\b/i.test(request.planText);
+  const isExplicitlyReversible = /\b(contract-to-hire|contract to hire|milestone|(?:monthly|flexible) rolling|month-to-month|on-demand|convertible|short-term|reversible)\b/i.test(request.planText);
   if (isExplicitlyReversible && verdict === "RISKY") {
     verdict = "SAFE";
     verdictDriver = "REVERSIBILITY";
@@ -497,8 +501,14 @@ export const stressTestDecisionPlan = (
     );
   }
   if (fragileAssumptions.length === 0) {
+    /* Only a bootstrapped profile reaches this with funding tight: the two
+       funding warnings above skip it, because it is not raising. Calling
+       funding loose there contradicted the scores on the same screen. */
+    const fundingLoose = tightness <= 60 && riskAppetite >= 50;
     fragileAssumptions.push(
-      `Funding is loose now; watch for the short-term borrowing rate moving above ${baseRate.toFixed(2)}%.`
+      fundingLoose
+        ? `Funding is loose now; watch for the short-term borrowing rate moving above ${baseRate.toFixed(2)}%.`
+        : "Assumes customer revenue keeps paying for this: funding is tight now, so a shortfall would be costly to raise."
     );
   }
 

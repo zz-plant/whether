@@ -81,6 +81,15 @@ const PER_UNIT_MARKER = /(@|\beach\b|\bapiece\b|\bper\s+(?:head|hire|person|seat
 const MONTHLY_MARKER = /(\bper\s+month\b|\/\s?mo\b|\bmonthly\b|\ba\s+month\b|\bpcm\b)/i;
 const ANNUAL_MARKER = /(\bper\s+year\b|\/\s?yr\b|\bannual(?:ly)?\b|\ba\s+year\b|\bper\s+annum\b|\bp\.?a\.?\b)/i;
 
+/*
+ * A stated term caps how many months a monthly amount runs: "a contractor for 3
+ * months at $15k/mo" is $45k, and annualising it read $180k. Only a term under a
+ * year changes anything, since the figure is a first-year cost either way. A
+ * term reads "for/over N months" or "an N-month …"; "9 months of runway" is
+ * neither, so a runway aside cannot shrink the cost.
+ */
+const TERM_MONTHS = /\b(?:(?:for|over)\s+(\d{1,2})\s+months?|(\d{1,2})[- ]month)\b/i;
+
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
   currency: "USD",
@@ -134,6 +143,13 @@ const readHeadcount = (text: string): number | null => {
   return Number.isFinite(count) && count > 0 ? count : null;
 };
 
+/** Months a monthly amount runs in the first year: the stated term, or 12. */
+const readMonthsInFirstYear = (text: string): number => {
+  const match = TERM_MONTHS.exec(text);
+  const term = Number.parseInt(match?.[1] ?? match?.[2] ?? "", 10);
+  return Number.isFinite(term) && term > 0 && term < 12 ? term : 12;
+};
+
 const readCadence = (text: string): CommitmentCadence => {
   if (MONTHLY_MARKER.test(text)) return "MONTHLY";
   if (ANNUAL_MARKER.test(text)) return "ANNUAL";
@@ -145,16 +161,18 @@ const describeBasis = (
   headcount: number | null,
   multiplied: boolean,
   cadence: CommitmentCadence,
+  months: number,
   annualUsd: number,
 ): string => {
   const unit = formatCommitmentUsd(unitAmountUsd);
   const total = formatCommitmentUsd(annualUsd);
+  const term = months < 12 ? ` for ${months} month${months === 1 ? "" : "s"}` : "";
 
   if (multiplied && headcount !== null) {
-    const perUnit = cadence === "MONTHLY" ? `${unit} a month each` : `${unit} each`;
+    const perUnit = cadence === "MONTHLY" ? `${unit} a month each${term}` : `${unit} each`;
     return `${headcount} × ${perUnit} → ${total} in the first year`;
   }
-  if (cadence === "MONTHLY") return `${unit} a month → ${total} in the first year`;
+  if (cadence === "MONTHLY") return `${unit} a month${term} → ${total} in the first year`;
   if (cadence === "ANNUAL") return `${unit} a year`;
   return `${unit}, read as a first-year cost`;
 };
@@ -181,14 +199,15 @@ export const parsePlanCommitment = (planText: string): ParsedCommitment => {
   const unitAmountUsd = Math.max(...tokens);
   const multiplied = headcount !== null && headcount > 1 && PER_UNIT_MARKER.test(text);
   const total = multiplied ? unitAmountUsd * headcount! : unitAmountUsd;
-  const annualUsd = cadence === "MONTHLY" ? total * 12 : total;
+  const months = cadence === "MONTHLY" ? readMonthsInFirstYear(text) : 12;
+  const annualUsd = cadence === "MONTHLY" ? total * months : total;
 
   return {
     headcount,
     unitAmountUsd,
     cadence,
     annualUsd,
-    basis: describeBasis(unitAmountUsd, headcount, multiplied, cadence, annualUsd),
+    basis: describeBasis(unitAmountUsd, headcount, multiplied, cadence, months, annualUsd),
   };
 };
 
