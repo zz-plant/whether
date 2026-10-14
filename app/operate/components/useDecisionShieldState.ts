@@ -94,7 +94,10 @@ export const useDecisionShieldState = ({
 
   /* A copied plan link (`copyLink` below) opens on the plan it was copied
      from: mode, both plans and the business model come off the address once,
-     at mount, and are the reader's to edit from there. */
+     at mount, and are the reader's to edit from there. The sender's runway,
+     spend and margin do not travel — a link pasted into a channel should not
+     carry a company's cash — so the opener's own figures grade it, and the
+     copy toast says so. */
   const [planMode, setPlanMode] = useState<PlanMode>(
     () => parsePlanMode(searchParams.get("planMode")) ?? (searchParams.get("planB") ? "compare" : "natural_language"),
   );
@@ -246,7 +249,8 @@ export const useDecisionShieldState = ({
       if (copiedTarget === "link") {
         add({
           title: "Plan link copied",
-          description: "It opens this plan with these settings, graded against the week it is opened.",
+          description:
+            "It opens this plan with these settings. Your runway, spend and margin stay out of the link, so it is graded on the opener's own figures and the week it is opened.",
           type: "success",
         });
       }
