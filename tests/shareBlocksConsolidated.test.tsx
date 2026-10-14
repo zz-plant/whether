@@ -4,6 +4,9 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { isValidElement } from "react";
 import * as nextNavigation from "next/navigation";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /* The share page's format picker and the brief's subscribe form read the router. Spread,
    so the next file still gets the real module's other exports. */

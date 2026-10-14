@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import SignalsClusterPage from "../app/signals/[cluster]/page";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The signal watch pages opened on a bare heading, with the week's call in a

@@ -2,10 +2,15 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import path from "node:path";
 import { createGuardedFetch } from "bun-test-network-guard";
 import { getDefaultIngestionStore } from "../lib/ingestion/store";
 import { suiteNetworkGuard } from "../scripts/test-network-guard";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /**
  * The suite runs offline by default.
@@ -25,9 +30,10 @@ import { suiteNetworkGuard } from "../scripts/test-network-guard";
  *
  * The guard itself — what counts as loopback, the origin-only error, the one-time
  * explanation — is the `bun-test-network-guard` package and is tested there. What stays
- * here is this suite's wiring. Nothing asserts on the live `globalThis.fetch`: Bun runs
- * every file in one process and the gate shuffles their order, so a test that did would
- * be asserting on whatever the previously-run file left behind.
+ * here is this suite's wiring, and the fixture its files use to declare an upstream
+ * unreachable. The only live `globalThis.fetch` asserted on is the one this file installs
+ * at the top: Bun runs every file in one process and the gate shuffles their order, so
+ * anything else would be whatever the previously-run file left behind.
  */
 describe("test network guard", () => {
   it("is preloaded for every bun test, including one that bypasses the runner", async () => {
@@ -79,6 +85,34 @@ describe("test ingestion directory", () => {
     } finally {
       if (previous === null) rmSync(file, { force: true });
       else writeFileSync(file, previous, "utf8");
+    }
+  });
+});
+
+/*
+ * The 48 files that assert on the fallback call `serveUnreachableUpstreams()`, which
+ * answers for the upstream instead of leaving the refusal to the guard. This file calls it
+ * too, at the top, so its fetch is the one these cases see.
+ */
+describe("an upstream the test declares unreachable", () => {
+  it("rejects as an unreachable host does, naming only the origin", async () => {
+    await assert.rejects(
+      () => fetch("https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10&api_key=secret"),
+      (error: unknown) =>
+        error instanceof TypeError &&
+        error.message === "fetch failed: https://fred.stlouisfed.org is unreachable in this test",
+    );
+  });
+
+  it("still reaches a server the test started", async () => {
+    const server = createServer((_request, response) => response.end("served"));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    try {
+      const address: AddressInfo | string | null = server.address();
+      assert.ok(address && typeof address === "object", "the server is listening on a port");
+      assert.equal(await (await fetch(`http://127.0.0.1:${address.port}/`)).text(), "served");
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
     }
   });
 });

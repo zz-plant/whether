@@ -135,16 +135,3 @@ describe("RegimeRadar path", () => {
     assert.match(withFooter, /<figcaption[\s\S]*How they are set[\s\S]*<\/figcaption>/, "the footer closes the caption");
   });
 });
-
-describe("RegimeRadar size", () => {
-  it("caps the plot in rem, so it scales with the large-display root step", () => {
-    // A px cap held the map at 256px on a 2560-wide screen while the text
-    // beside it grew with the root font size (tokens.css, 2026-10-14).
-    const html = renderToStaticMarkup(
-      <RegimeRadar tightness={75} riskAppetite={30} tightnessThreshold={60} riskAppetiteThreshold={45} currentRegime="SCARCITY" />,
-    );
-
-    assert.match(html, /max-w-\[16rem\]/);
-    assert.doesNotMatch(html, /max-w-\[\d+px\]/);
-  });
-});

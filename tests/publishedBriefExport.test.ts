@@ -9,6 +9,9 @@ import {
 } from "../lib/report/publishedBriefs";
 import { buildCanonicalUrl } from "../lib/seo";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("published brief readings block", () => {
   it("prints a reading line per signal when the record carries scores and lines", async () => {

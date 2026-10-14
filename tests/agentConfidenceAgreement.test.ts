@@ -9,6 +9,9 @@ import { resolvePublishedConfidence } from "../lib/report/confidence";
 import { formatMarginStamp } from "../lib/report/reportFormatting";
 import { formatConfidenceSentence } from "../lib/summary/summaryFormatting";
 import { NextRequest } from "next/server";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * An agent gating on confidence asks whichever endpoint it happens to know, so

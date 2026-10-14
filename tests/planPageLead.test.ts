@@ -6,6 +6,9 @@ import { AreaTable } from "../app/components/ui/areaTable";
 import { buildPlanningPageModel } from "../app/operate/planningPageModel";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 import { insightDatabase } from "../data/recommendations";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const FINANCE_RUNWAY_TARGETS: string[] = insightDatabase.financeStrategyMode.regimes.map((entry) => entry.runwayPosture);
 

@@ -34,6 +34,9 @@ import { snapshotData } from "../lib/snapshot";
 import { selectWeekComparison } from "../lib/report/weekComparison";
 import type { TreasuryData } from "../lib/types";
 import { buildAssessmentFixture, liveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * "What changed this week" compares the reading with last week's published

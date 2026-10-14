@@ -58,6 +58,9 @@ import { GET as getLlmsFull } from "../app/llms-full.txt/route";
 import { buildBriefMarkdown } from "../app/brief.md/route";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { buildReportDataFixture } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({

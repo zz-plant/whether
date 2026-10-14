@@ -6,6 +6,9 @@ import { renderOgElement } from "../app/api/og/renderOgElement";
 import { layoutReportCard } from "../app/api/og/reportImageTemplate";
 import { generateMetadata as periodMetadata } from "../app/history/[period]/page";
 import { buildSignalDecisionScenarioMetadata } from "../app/signals/[cluster]/[decision-scenario]/page";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * What a card says, read the way a feed shows it.

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { GET as getHealthRoute } from "../app/api/health/route";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("/api/health", () => {
   it("returns a minimal status payload", async () => {

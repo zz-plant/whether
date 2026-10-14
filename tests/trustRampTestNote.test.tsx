@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The candidate rate ramps under test are noted once, as a method note under

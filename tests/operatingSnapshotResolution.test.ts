@@ -11,6 +11,9 @@ import {
 } from "../lib/operatingState/resolveSnapshot";
 import { snapshotData } from "../lib/snapshot";
 import { liveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * "The current snapshot", asked one way.

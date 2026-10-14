@@ -6,6 +6,9 @@ import ResourceRoutePage, {
 } from "../app/resources/[slug]/page";
 import { findResourceArticleBySlug } from "../lib/resourceArticles";
 import { formatMonthYearShortFromValue } from "../lib/formatters";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("resource article slug route", () => {
   it("includes article slugs in static params for pre-rendering", () => {

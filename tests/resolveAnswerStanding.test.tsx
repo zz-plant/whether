@@ -7,6 +7,9 @@ import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { answerPages } from "../app/answers/decisionPages";
 import { featuredAnswerPages } from "../app/answers/selectors";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * (The list moved from /resolve to Guides, /resources, on 2026-10-08, grouped by

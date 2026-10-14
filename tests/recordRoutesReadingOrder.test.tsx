@@ -3,6 +3,9 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 import { CALL_CHANGE_RULE } from "../lib/report/trackRecordCopy";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 

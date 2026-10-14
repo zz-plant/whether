@@ -6,6 +6,9 @@ import { agentStateSchema, buildAgentState } from "../lib/agentState";
 import { buildCliStatusContract } from "../lib/cli/contracts";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
 import { asLiveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The state is what an agent decides from, so it has to hold up against the page's own

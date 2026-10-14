@@ -3,6 +3,9 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactElement } from "react";
 import { organizationId, websiteId } from "../lib/seo";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * Eleven pages wrote their JSON-LD by hand ("@context" and all), and nine of them carried no

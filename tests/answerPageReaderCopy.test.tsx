@@ -4,6 +4,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 import { answerPages } from "../app/answers/decisionPages";
 import { compositeSignalScales } from "../lib/report/signalTranslations";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 

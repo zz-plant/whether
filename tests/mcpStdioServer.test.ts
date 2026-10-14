@@ -7,6 +7,9 @@ import { z } from "zod";
 import { listAgentTools } from "../lib/agent/tools";
 import { MCP_SERVER_INFO } from "../lib/mcp/serverIdentity";
 import { createWhetherMcpServer } from "../lib/mcp/server";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The local server (`bun run mcp:whether`) and the remote one (`/api/mcp`) read one registry,
