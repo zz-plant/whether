@@ -37,7 +37,7 @@ const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasi
   if (row.saturatedPressure !== undefined && row.delta === 0) {
     return (
       <span className="weather-caveat-mark inline-flex items-center rounded-sm border border-current/30 px-1.5 py-0.5 tabular-nums text-caveat-fg" data-delta-capped>
-        <span className="sr-only">{`${row.label} has been as high as it can read ${basis.since}, so a rise cannot show.`}</span>
+        <span className="sr-only">{`${row.label} has been at the highest it can read ${basis.since}, so a rise cannot show.`}</span>
         <span aria-hidden="true">Can&rsquo;t rise further</span>
       </span>
     );
@@ -203,7 +203,7 @@ export function WhatChangedSection({
                            ladder that has the width for a sentence: in the chip
                            column it wrapped to four lines and stretched the row. */
                         <p className="weather-caveat-mark max-w-[48ch] text-xs text-caveat-fg">
-                          As high as this score can read. Without that limit it would read {row.saturatedPressure.toFixed(0)}, so a further rise can&rsquo;t show here.
+                          The highest this score can read. Without that limit it would read {row.saturatedPressure.toFixed(0)}, so a further rise can&rsquo;t show here.
                         </p>
                       ) : null}
                     </div>

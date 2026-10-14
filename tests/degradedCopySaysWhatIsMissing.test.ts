@@ -199,7 +199,7 @@ describe("a degraded state says what is missing", () => {
       ),
     );
 
-    const sentence = html.match(/As high as this score can read\.[^<]*/)?.[0] ?? "";
+    const sentence = html.match(/The highest this score can read\.[^<]*/)?.[0] ?? "";
     assertDegradedSentence(sentence, "saturated score line");
     assert.doesNotMatch(html, /\bclipped\b|\bceiling\b|100-point/i, "the scoring code's words stay in the code");
   });
