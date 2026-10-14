@@ -57,6 +57,11 @@ export const canonicalSurfaceRedirectPairs = [
   // Nav-label aliases: legacy names that links and habits still carry. /answer
   // was Resolve's directory before /resolve; both land where Resolve went.
   ["/evidence", "/signals"],
+  // The header's own words as addresses (2026-10-14): a reader who reads
+  // "Decide" or "Record" in the nav and types it got a 404.
+  ["/decide", "/operate"],
+  ["/record", "/history"],
+  ["/plan", "/operate"],
   ["/answer", "/operate#ops-decision-shield"],
   ["/planning", "/operate"],
   // Learn root + failure modes → Trust hub
