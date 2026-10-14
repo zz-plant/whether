@@ -18,6 +18,24 @@ import { z } from "zod";
  */
 export const JEV_MODEL = "typesafe/jev";
 
+/**
+ * Decision models that answer Jev's question schema. Cloudflare's Clef family
+ * (released 2026-10) takes the same `state` and `questions` and returns the
+ * same answers, at a fraction of Jev's price: Clef-flash is $0.038 per million
+ * input tokens, with a 24K context that a single sentence never approaches.
+ * Jev stays the default; the others exist so an audit can be run on two models
+ * and the disagreements read, before anyone trusts the cheaper one alone.
+ */
+const DECISION_MODELS = {
+  jev: JEV_MODEL,
+  clef: "@cf/cloudflare/clef",
+  "clef-flash": "@cf/cloudflare/clef-flash",
+} as const;
+
+export type DecisionModel = keyof typeof DECISION_MODELS;
+
+export const isDecisionModel = (value: string): value is DecisionModel => Object.hasOwn(DECISION_MODELS, value);
+
 export type JevQuestion =
   | { type: "noul"; instructions: string; criteria: { true: string; false: string } }
   | { type: "choice"; instructions: string; criteria: Record<string, string> }
@@ -82,7 +100,15 @@ type RunJevOptions = {
   apiToken: string;
   fetchImpl?: typeof fetch;
   timeoutMs?: number;
+  model?: DecisionModel;
 };
+
+/* Jev is reached through the generic run endpoint with the request wrapped in
+   `input`; Cloudflare documents Clef on its own model path with a bare body. */
+const decisionModelCall = (model: DecisionModel, request: JevRequest) =>
+  model === "jev"
+    ? { path: "", body: { model: JEV_MODEL, input: request } }
+    : { path: `/${DECISION_MODELS[model]}`, body: request };
 
 /**
  * One Jev call over the Workers AI REST endpoint. Never throws: a timeout, a
@@ -92,14 +118,15 @@ type RunJevOptions = {
  */
 export const runJev = async (
   request: JevRequest,
-  { accountId, apiToken, fetchImpl = fetch, timeoutMs = 10_000 }: RunJevOptions,
+  { accountId, apiToken, fetchImpl = fetch, timeoutMs = 10_000, model = "jev" }: RunJevOptions,
 ): Promise<JevResult> => {
-  const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/ai/run`;
+  const call = decisionModelCall(model, request);
+  const url = `https://api.cloudflare.com/client/v4/accounts/${encodeURIComponent(accountId)}/ai/run${call.path}`;
   try {
     const response = await fetchImpl(url, {
       method: "POST",
       headers: { authorization: `Bearer ${apiToken}`, "content-type": "application/json" },
-      body: JSON.stringify({ model: JEV_MODEL, input: request }),
+      body: JSON.stringify(call.body),
       signal: AbortSignal.timeout(timeoutMs),
     });
     if (!response.ok) {

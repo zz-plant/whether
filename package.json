@@ -66,6 +66,7 @@
     "check:dead-exports": "bun run scripts/check-dead-exports.ts",
     "telemetry:streams": "bun run scripts/telemetry-stream-census.ts",
     "audit:jev-copy": "bun run scripts/jev-copy-audit.ts",
+    "audit:near-duplicates": "bun run scripts/near-duplicates.ts",
     "check:curated-freshness": "bun run scripts/check-curated-freshness.ts",
     "advice-corpus:discover": "bun scripts/advice-corpus/discover.ts",
     "advice-corpus:extract": "bun scripts/advice-corpus/extract.ts",
