@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildHomeMetadata } from "../lib/report/homeMetadata";
 import { buildHomeSharePath, notLiveReadingLabel, readerSourceLabel } from "../lib/report/homeSharePreview";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("buildHomeSharePath", () => {
   it("preserves defined home report search params in a stable query string", () => {

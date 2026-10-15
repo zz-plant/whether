@@ -164,7 +164,7 @@ describe("what a row and a paste say about the move", () => {
   it("gives each part its sign, and says the earlier score never had an input that is not rates", () => {
     assert.equal(
       describeScoreMovement("riskAppetite", riskRow, aug31),
-      "-2 from the yield curve and -11 from stock-market volatility. The Aug 31 score was built from interest rates alone.",
+      "-11 from stock-market volatility and -2 from the yield curve. The Aug 31 score was built from interest rates alone.",
     );
     assert.match(
       describeScoreMovement(
@@ -191,7 +191,7 @@ describe("what a row and a paste say about the move", () => {
   it("puts both scores in one line for a paste, carrying the same caveat", () => {
     assert.equal(
       describeScoreMovementLine({ tightness: fundingRow, riskAppetite: riskRow }, aug31),
-      "What moved the scores since Aug 31: funding pressure +27 (all from interest rates); risk appetite -13 (-2 from the yield curve and -11 from stock-market volatility). The Aug 31 scores were built from interest rates alone.",
+      "What moved the scores since Aug 31: funding pressure +27 (all from interest rates); risk appetite -13 (-11 from stock-market volatility and -2 from the yield curve). The Aug 31 scores were built from interest rates alone.",
     );
     // Rates alone need no caveat.
     assert.equal(

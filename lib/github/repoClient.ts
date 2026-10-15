@@ -1,14 +1,18 @@
 /**
  * The little of GitHub's REST API a Workflow needs to land one data file behind a pull
- * request: read a branch head, create a branch, read and write one file, open a PR. Fetch
- * is injected so the whole client runs against an in-memory fake under bun tests.
+ * request: read a branch head, create a branch, read and write one file, open a PR, and —
+ * where the lane merges its own data pull requests — read the PR, its files and its checks,
+ * and merge it. Fetch is injected so the whole client runs against an in-memory fake under
+ * bun tests.
  *
  * The token travels only in the Authorization header, never in a URL, so no error message
  * built from a URL or a status can carry it.
  */
 
+import { z } from "zod";
+
 type GitHubRepoClientOptions = {
-  /** Fine-grained token with contents:write and pull-requests:write on the one repository. */
+  /** Fine-grained token with contents:write, pull-requests:write and checks:read on the one repository. */
   token: string;
   /** "owner/repo". */
   repository: string;
@@ -19,6 +23,29 @@ type GitHubRepoClientOptions = {
 
 type GitHubFile = { sha: string; content: string };
 export type GitHubPullRequest = { number: number; html_url: string };
+
+const pullRequestDetailSchema = z.object({
+  number: z.number(),
+  html_url: z.string(),
+  state: z.string(),
+  merged: z.boolean(),
+  head: z.object({ sha: z.string() }),
+});
+export type GitHubPullRequestDetail = { number: number; html_url: string; open: boolean; merged: boolean; headSha: string };
+
+const pullRequestFilesSchema = z.array(z.object({ filename: z.string() }));
+
+const checkRunsSchema = z.object({
+  check_runs: z.array(
+    z.object({
+      name: z.string(),
+      status: z.string(),
+      conclusion: z.string().nullable(),
+      app: z.object({ slug: z.string() }).nullable(),
+    }),
+  ),
+});
+export type GitHubCheckRun = { name: string; status: string; conclusion: string | null; appSlug: string | null };
 
 export class GitHubApiError extends Error {
   readonly status: number;
@@ -140,6 +167,42 @@ export class GitHubRepoClient {
     const first: unknown = body[0];
     if (!isRecord(first) || typeof first.number !== "number" || typeof first.html_url !== "string") return null;
     return { number: first.number, html_url: first.html_url };
+  }
+
+  async getPullRequest(number: number): Promise<GitHubPullRequestDetail> {
+    const response = await this.request("read pull request", `/pulls/${number}`);
+    const parsed = pullRequestDetailSchema.safeParse(await response.json());
+    if (!parsed.success) throw new GitHubApiError("read pull request", response.status, "unexpected pull request payload");
+    const { html_url, state, merged, head } = parsed.data;
+    return { number, html_url, open: state === "open", merged, headSha: head.sha };
+  }
+
+  /** Paths the pull request changes. One page of 100: a data pull request changes one file, and more is already a refusal. */
+  async listPullRequestFiles(number: number): Promise<string[]> {
+    const response = await this.request("list pull request files", `/pulls/${number}/files?per_page=100`);
+    const parsed = pullRequestFilesSchema.safeParse(await response.json());
+    if (!parsed.success) throw new GitHubApiError("list pull request files", response.status, "unexpected files payload");
+    return parsed.data.map((file) => file.filename);
+  }
+
+  async listCheckRuns(ref: string): Promise<GitHubCheckRun[]> {
+    const response = await this.request("list check runs", `/commits/${encodeURIComponent(ref)}/check-runs?per_page=100`);
+    const parsed = checkRunsSchema.safeParse(await response.json());
+    if (!parsed.success) throw new GitHubApiError("list check runs", response.status, "unexpected check runs payload");
+    return parsed.data.check_runs.map((run) => ({
+      name: run.name,
+      status: run.status,
+      conclusion: run.conclusion,
+      appSlug: run.app?.slug ?? null,
+    }));
+  }
+
+  /** Squash-merges at exactly `sha`: GitHub refuses (409) if the head moved after it was judged. */
+  async mergePullRequest(number: number, input: { sha: string; title: string }): Promise<void> {
+    await this.request("merge pull request", `/pulls/${number}/merge`, {
+      method: "PUT",
+      body: JSON.stringify({ sha: input.sha, merge_method: "squash", commit_title: input.title }),
+    });
   }
 
   async openPullRequest(input: { title: string; head: string; base: string; body: string }): Promise<GitHubPullRequest> {

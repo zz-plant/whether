@@ -8,6 +8,9 @@ import { callAgentTool, describeAgentTools, listAgentTools, runAgentTool } from 
 import { loadAgentInterfaceContext } from "../lib/agentInterface";
 import { buildAgentState } from "../lib/agentState";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The registry is what every transport and every catalogue reads, so what an agent is told

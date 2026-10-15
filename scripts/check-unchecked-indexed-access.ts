@@ -81,7 +81,33 @@ export const countUncheckedIndexedAccess = (root = process.cwd()): TscDiagnostic
     CONFIG_PATH,
   ], { cwd: root, encoding: "utf8" });
 
-  return parseTscErrorLines(`${result.stdout ?? ""}${result.stderr ?? ""}`);
+  return readCensusRun(result);
+};
+
+/**
+ * The diagnostics a compiler run found, or a throw when the run cannot be trusted to have
+ * found them. A compiler that is missing, killed, or stopped by a config error prints no
+ * file-scoped diagnostic, and parsing that as zero would turn the ratchet green on a run that
+ * never type-checked. So a spawn error, a signal, a global `error TS…` line (no file), or a
+ * failing exit with nothing parsed is a failed run.
+ */
+export const readCensusRun = (result: {
+  status: number | null;
+  error?: Error;
+  stdout?: string | null;
+  stderr?: string | null;
+}): TscDiagnostic[] => {
+  if (result.error) throw new Error(`[unchecked-access] tsc did not run: ${result.error.message}`);
+  const output = `${result.stdout ?? ""}${result.stderr ?? ""}`;
+  const diagnostics = parseTscErrorLines(output);
+  const globalError = output.split("\n").find((line) => /^error TS\d+:/.test(line));
+  const failedEmpty = result.status !== 0 && diagnostics.length === 0;
+  if (result.status === null || globalError || failedEmpty) {
+    throw new Error(
+      `[unchecked-access] tsc failed (exit ${result.status ?? "signal"}) without a count to trust:\n${output.trim().slice(0, 2000)}`,
+    );
+  }
+  return diagnostics;
 };
 
 const main = () => {

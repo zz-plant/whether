@@ -34,6 +34,7 @@ import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { applyStageToWeeklyCall } from "../lib/report/weeklyCallContract";
 import type { RunwayBand } from "../lib/report/operatorRunway";
 import { macroSeries } from "../lib/macroSnapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { snapshotData } from "../lib/snapshot";
 import { macros, treasury as exportTreasury } from "./factories/exportFixtures";
 
@@ -76,7 +77,7 @@ const fixtures: Fixture[] = [
     snapshot: () =>
       buildOperatingSnapshot({
         treasury: { ...snapshotData, isLive: true, fallback_at: undefined, fallback_reason: undefined, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-        macroSeries,
+        macroSeries: liveMacroSeries,
         now: new Date("2026-08-31T12:00:00.000Z"),
       }),
     now: new Date("2026-08-31T12:00:00.000Z"),
@@ -105,7 +106,7 @@ const fixtures: Fixture[] = [
     snapshot: () =>
       buildOperatingSnapshot({
         treasury: { ...snapshotData, isLive: true, fallback_at: undefined, fallback_reason: undefined, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-        macroSeries,
+        macroSeries: liveMacroSeries,
         now: new Date("2026-08-31T12:00:00.000Z"),
       }),
     now: new Date("2026-08-31T12:00:00.000Z"),

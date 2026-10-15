@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { listAgentTools } from "../lib/agent/tools";
 import { handleMcpRequest, isMcpStreamOpenRequest } from "../lib/mcp/httpMcpServer";
 import { MCP_PROTOCOL_VERSIONS } from "../lib/mcp/serverIdentity";
+import { buildWebMcpToolCall } from "../app/components/webMcpBridge";
 
 const postMcp = (body: unknown) =>
   handleMcpRequest(
@@ -83,6 +84,16 @@ describe("MCP streamable HTTP transport", () => {
     }
     assert.deepEqual(names, listAgentTools("http").map((tool) => tool.name));
     assert.ok(!names.includes("pull_recent_site_info"), "the local-only tool is not offered over HTTP");
+  });
+
+  /* The WebMCP bridge shipped sending only Content-Type; the browser's default Accept drew a 406 on every call. */
+  it("answers the WebMCP bridge's own tools/call request", async () => {
+    const response = await handleMcpRequest(
+      new Request("https://whether.work/api/mcp", buildWebMcpToolCall("get_decision_rules", {})),
+    );
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.ok(payload.result, "the call returns a result, not a transport error");
   });
 
   it("executes an offline tool via tools/call with structuredContent", async () => {

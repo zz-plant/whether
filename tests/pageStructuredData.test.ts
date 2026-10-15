@@ -5,13 +5,11 @@ import {
   buildApiDocsStructuredData,
   buildCompsStructuredData,
   buildHistoryStructuredData,
-  buildPricingStructuredData,
   buildToolkitHowTo,
 } from "../lib/seo/pageStructuredData";
 import { buildHomeStructuredData } from "../lib/report/home/structuredData";
 import { buildPublisherSchema } from "../lib/publisher";
 import { organizationId, organizationSameAs, websiteId } from "../lib/seo";
-import { pricingPlans } from "../lib/pricing";
 import { findToolkitDefinition } from "../lib/decisionDomainCatalog";
 import { getPostureArchivePeriods } from "../lib/summary/postureArchive";
 import { getPublishedBriefs } from "../lib/report/publishedBriefs";
@@ -26,6 +24,16 @@ const one = (graph: { "@graph": Node[] }, type: string) => {
 };
 
 describe("site entities", () => {
+  it("identifies the website preview in homepage and page graphs", () => {
+    const home = buildHomeStructuredData({
+      headline: "h", description: "d", datePublishedIso: "2026-09-10",
+      dateModifiedIso: "2026-09-15T12:00:00.000Z", postureLabel: "p", regimeLabel: "r", confidenceLabel: "c",
+    });
+    for (const graph of [home, buildApiDocsStructuredData(), buildCompsStructuredData({ data: null, tickers: ["SNOW"] })]) {
+      assert.equal(one(graph, "WebSite").image, "https://whether.work/api/og?template=report");
+    }
+  });
+
   it("anchors the organization to its public profiles on the homepage and in every publisher node", () => {
     const home = buildHomeStructuredData({
       headline: "h",
@@ -48,7 +56,6 @@ describe("site entities", () => {
   it("joins every page graph to the site entity by id", () => {
     for (const graph of [
       buildApiDocsStructuredData(),
-      buildPricingStructuredData({ plans: pricingPlans, paidPlansOnSale: false }),
       buildCompsStructuredData({ data: null, tickers: ["SNOW"] }),
     ]) {
       const website = one(graph, "WebSite");
@@ -76,41 +83,6 @@ describe("/history", () => {
   it("omits coverage when the record is empty rather than inventing a range", () => {
     const graph = buildHistoryStructuredData({ periods: [], publishedBriefs: [], coverage: null });
     assert.equal("temporalCoverage" in one(graph, "Dataset"), false);
-  });
-});
-
-describe("/pricing", () => {
-  it("marks paid plans PreOrder while they are not on sale, and the free plan in stock", () => {
-    const graph = buildPricingStructuredData({ plans: pricingPlans, paidPlansOnSale: false });
-    const product = one(graph, "Product");
-    const offers = product.offers as Array<Record<string, unknown>>;
-    assert.equal(offers.length, pricingPlans.length);
-
-    const free = offers.find((offer) => offer.price === 0);
-    assert.equal(free?.availability, "https://schema.org/InStock");
-    for (const offer of offers.filter((entry) => entry.price !== 0)) {
-      assert.equal(offer.availability, "https://schema.org/PreOrder");
-      assert.equal(offer.priceCurrency, "USD");
-    }
-  });
-
-  /* The markup said "Paid plans add delivery, alerts and team ritual" after the
-     page stopped selling either, and a search result prints the markup. */
-  it("describes the offer in the page's own words, selling nothing the free plan has", async () => {
-    const { metadata } = await import("../app/pricing/page");
-    const product = one(buildPricingStructuredData({ plans: pricingPlans, paidPlansOnSale: false }), "Product");
-    assert.equal(product.description, metadata.description);
-
-    const description = typeof product.description === "string" ? product.description : "";
-    const added = /Pro and Team add ([^.]+)\./.exec(description)?.[1];
-    assert.ok(added, `no "Pro and Team add …" clause in: ${description}`);
-    assert.doesNotMatch(added, /deliver|alert|monday|inbox|slack|board|investor/i);
-  });
-
-  it("flips to InStock when the plans go on sale", () => {
-    const graph = buildPricingStructuredData({ plans: pricingPlans, paidPlansOnSale: true });
-    const offers = one(graph, "Product").offers as Array<Record<string, unknown>>;
-    assert.ok(offers.every((offer) => offer.availability === "https://schema.org/InStock"));
   });
 });
 

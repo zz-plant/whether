@@ -16,6 +16,9 @@ import {
 } from "../lib/timeMachine/timeMachineCache";
 import { buildReplayContext, replayRegimeWalk } from "../lib/timeMachine/regimeReplay";
 import type { MacroSeriesReading, TreasuryData } from "../lib/types";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * Two defects, one decision: a replayed month is judged on the inputs its

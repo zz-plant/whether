@@ -186,7 +186,7 @@ export const loadHomeSharePreview = async (
     normalizeSentence(
       weeklyDecisionCardModel.decision.flipThreshold
       ?? weeklyDecisionCardModel.decision.reversalTrigger
-      ?? "Re-check the next threshold move before changing posture",
+      ?? "Re-check where the scores sit against their lines before acting",
     ),
     130,
   );

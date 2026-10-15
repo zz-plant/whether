@@ -88,7 +88,7 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
   rules.find((rule) => rule.area === area);
 
 const OPERATING_LEVER_FALLBACK = {
-  areaActionNow: "Keep last week's plan for this area.",
+  areaActionNow: "Keep your current plan for this area.",
   triggerThreshold: "Pause if funding pressure exceeds 60 or risk appetite falls below 40.",
   reversalCondition: "Resume expansion when funding pressure drops below 50 and risk appetite is above 50.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
@@ -331,7 +331,7 @@ export const buildSharedCorridorRails = (
 };
 
 /**
- * "44 pts away", "at the line", "crossed" or "already met" — a distance, not a
+ * "44 pts away", "at the line", "past the line" or "already met" — a distance, not a
  * sentence. `met` is the operator's verdict; a strict line at zero distance is
  * "at the line", which is not the same claim as tripped.
  *
@@ -347,10 +347,16 @@ export const formatPointsToLine = (
   met: boolean | undefined,
 ): string => {
   if (points === undefined || !Number.isFinite(points)) return "—";
-  if (met) return kind === "pause" ? "crossed" : "already met";
+  /* "Past the line", not "crossed": a state, not an event. Beside "No score
+     crossed a pause or resume line since Sep 30", "crossed" read as this
+     week's news (2026-10-14). */
+  if (met) return kind === "pause" ? "past the line" : "already met";
   if (points === 0) return "at the line";
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"} away`;
 };
+
+/** A resume line met on an area that is not on hold: there is no hold to lift, so not "already met". */
+export const NOTHING_TO_RESUME = "nothing to resume";
 
 /**
  * How near counts as close to a line: 5 points. It is the distance the margin

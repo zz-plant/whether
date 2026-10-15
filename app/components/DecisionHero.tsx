@@ -1,3 +1,4 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
 import { NO_LIVE_READING_CALL } from "../../lib/report/reportCopy";
 import { REGIME_LABELS, REGIME_WEATHER_RATIONALES, getRegimePublicLabel, isRegimeKey } from "../../lib/regimePresentation";
@@ -48,6 +49,18 @@ type Props = {
    * opens on, so a search visitor meets the artifact before any explanation.
    */
   question?: string;
+  /**
+   * The week's published brief, where it read different conditions from this
+   * card: a caveat under the call, with the brief it links to. Without it a
+   * reader comparing the card with /history found two answers for one week.
+   */
+  published?: { text: string; href: string };
+  /**
+   * The condition tied to the areas: which are on hold, and where each one's
+   * concrete answer is. The call is a sentence about every decision at once;
+   * this is the line that says which decisions it binds.
+   */
+  areas?: { text: string; href: string; action: string };
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
 };
@@ -81,6 +94,8 @@ export function DecisionHero({
   captionDetail,
   question,
   lines,
+  published,
+  areas,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
@@ -176,6 +191,24 @@ export function DecisionHero({
         {regimeKey ? (
           <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
             {REGIME_WEATHER_RATIONALES[regimeKey]}
+          </p>
+        ) : null}
+
+        {areas ? (
+          <p className="max-w-xl text-fluid-sm font-medium leading-snug text-slate-100" data-held-areas>
+            {areas.text}{" "}
+            <Link href={areas.href} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
+              {areas.action}
+            </Link>
+          </p>
+        ) : null}
+
+        {published ? (
+          <p className="weather-caveat-mark max-w-xl text-sm leading-relaxed text-caveat-fg" data-published-differs>
+            {published.text}{" "}
+            <Link href={published.href} className="weather-hit underline decoration-slate-600 underline-offset-4">
+              Read the published brief
+            </Link>
           </p>
         ) : null}
 

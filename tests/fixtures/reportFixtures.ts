@@ -1,8 +1,20 @@
+import { macroSeries as snapshotMacroSeries } from "../../lib/macroSnapshot";
 import { buildFallbackForecastModel } from "../../lib/report/forecastModel";
 import type { ReportData } from "../../lib/report/reportData";
 import { ENGINE_VERSION, type RegimeAssessment } from "../../lib/regimeEngine";
 import { resolveScoringBasis } from "../../lib/report/scoringBasis";
-import type { TreasuryData } from "../../lib/types";
+import type { MacroSeriesReading, TreasuryData } from "../../lib/types";
+
+/**
+ * Macro series as a healthy run reads them: every FRED series live, the curated snapshot
+ * series as they always are. The bundled `macroSeries` is the fallback, with every flag false,
+ * and the publish guard refuses a reading scored on it (`listCachedLiveMacroSeries`).
+ */
+export const asLiveMacroSeries = <Series extends Pick<MacroSeriesReading, "sourceLabel" | "isLive">>(
+  series: readonly Series[],
+): Series[] => series.map((reading) => (reading.sourceLabel === "FRED" ? { ...reading, isLive: true } : reading));
+
+export const liveMacroSeries = asLiveMacroSeries(snapshotMacroSeries);
 
 type AssessmentOverrides = Omit<
   Partial<RegimeAssessment>,

@@ -13,7 +13,6 @@ import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
 import { ServiceWorkerRegistrar } from "./components/serviceWorkerRegistrar";
 import { ToastProviderRoot } from "./components/toastProviderRoot";
-import { PremiumFunnelTracker } from "./components/premiumFunnelTracker";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
@@ -239,7 +238,6 @@ export default function RootLayout({
           <GlobalShareRail />
           <MobileTabBar />
           <ScreenshotDetector />
-          <PremiumFunnelTracker />
           {children}
         </ToastProviderRoot>
         <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-8 sm:py-10">
@@ -258,10 +256,9 @@ export default function RootLayout({
                   </p>
                 </div>
                 {/* The product outside the four groups, under its name: Use it
-                    elsewhere, API & MCP, Pricing, About, Search, and RSS.
-                    Derived from utilityLinks: the hand-written copy that used to
-                    live here drifted, and /pricing fell out of the footer
-                    entirely. */}
+                    elsewhere, API & MCP, About, Search, and RSS. Derived from
+                    utilityLinks: the hand-written copy that used to live here
+                    drifted, and a page fell out of the footer entirely. */}
                 <nav aria-label="About Whether">
                   <ul className="flex flex-wrap gap-x-4 gap-y-0">
                     {utilityLinks.map((link) => (

@@ -37,6 +37,7 @@ const run = async () => {
     isFallback: isSavedCopy(treasury),
     isLive: treasury.isLive,
     fallbackReason: treasury.fallback_reason,
+    macroSeries: reportData.macroSeries,
     recordDate: treasury.record_date ?? treasury.fetched_at,
     now: new Date(),
   });

@@ -335,7 +335,7 @@ export async function DecisionAnswerPageContent({
             <h3 className="text-sm font-semibold text-slate-100">Decision note to complete</h3>
             <p className="text-sm text-slate-200">{page.decisionNote}</p>
             <p className="text-sm text-slate-200">
-              Copy this template with the dated market guidance and citation. Fill in the company inputs before using it as an approval.
+              Fill in the company inputs before using it as an approval.
             </p>
             <ReportCta
               href={pagePath}

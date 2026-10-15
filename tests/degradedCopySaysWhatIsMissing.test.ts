@@ -104,7 +104,7 @@ describe("a degraded state says what is missing", () => {
     for (const [slot, sentence] of Object.entries(NO_LIVE_READING_CALL)) {
       assertDegradedSentence(sentence, `NO_LIVE_READING_CALL.${slot}`);
     }
-    assert.equal(NO_LIVE_READING_CALL.currentCall, "No live reading this week. Keep last week's plan.");
+    assert.equal(NO_LIVE_READING_CALL.currentCall, "No live reading this week. Keep your current plan.");
   });
 
   it("renders the absent-reading call as the h1 when the hero is handed no call", () => {
@@ -199,7 +199,7 @@ describe("a degraded state says what is missing", () => {
       ),
     );
 
-    const sentence = html.match(/Pinned at the top of its scale,[^<]*/)?.[0] ?? "";
+    const sentence = html.match(/The highest this score can read\.[^<]*/)?.[0] ?? "";
     assertDegradedSentence(sentence, "saturated score line");
     assert.doesNotMatch(html, /\bclipped\b|\bceiling\b|100-point/i, "the scoring code's words stay in the code");
   });

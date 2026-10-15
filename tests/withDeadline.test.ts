@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { DeadlineExceededError, withDeadline } from "../lib/withDeadline";
 import { loadReportDataSafe } from "../lib/report/reportData";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("withDeadline", () => {
   it("passes through a value that resolves in time", async () => {

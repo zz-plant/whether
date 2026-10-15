@@ -1,4 +1,5 @@
 import { readFile, writeFile } from "node:fs/promises";
+import { carryUnchangedEntries } from "./carryUnchangedEntries";
 
 type SummaryFileMode = "replace" | "merge";
 
@@ -33,13 +34,13 @@ export const writeSummaryFile = async <T extends { asOf: string }>({
   mode?: SummaryFileMode;
   getKey: (entry: T) => string;
 }) => {
-  let nextEntries = entries;
+  const existing = await readExistingEntries<T>(path);
+  let nextEntries = carryUnchangedEntries(existing, entries, getKey);
 
   if (mode === "merge") {
-    const existing = await readExistingEntries<T>(path);
     const incomingKeys = new Set(entries.map(getKey));
     const merged = existing.filter((entry) => !incomingKeys.has(getKey(entry)));
-    nextEntries = [...merged, ...entries];
+    nextEntries = [...merged, ...nextEntries];
   }
 
   const sorted = sortByAsOf(nextEntries);

@@ -109,6 +109,9 @@ describe("homepage heading contract", () => {
     const legend = readFileSync("app/components/home/ConditionsLegend.tsx", "utf8");
     assert.doesNotMatch(picker, /<h[1-6]\b/, "the week label is not a heading");
     assert.doesNotMatch(legend, /<h[1-6]\b|<details/, "the legend is one line, with no heading or fold");
-    assert.match(page, /currentDateLabel=\{cadenceTitle \?\? weekOfLabel\}/, "the week is named by its Monday");
+    // A live week is named by its Monday; an archived view by its month-end,
+    // since the archive steps a month at a time (2026-10-14).
+    assert.match(page, /currentDateLabel=\{cadenceTitle \?\? periodLabel\}/, "the stepper names the period on screen");
+    assert.match(page, /const periodLabel = historicalSelection\s*\?\s*`Month-end \$\{formatDateUTC\(historicalSelection\.asOf\)\}`\s*:\s*weekOfLabel/, "a live week is named by its Monday, an archived one by its month-end");
   });
 });

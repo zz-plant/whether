@@ -3,7 +3,7 @@ import type { SourceBoardRow } from "../../lib/report/sourceHealth";
 
 const stateTone = (row: SourceBoardRow) =>
   !row.asIntended
-    ? "text-semantic-caution-fg"
+    ? "text-caveat-fg font-semibold"
     : row.live
       ? "text-semantic-easing-fg"
       : "text-slate-300";

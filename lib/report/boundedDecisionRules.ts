@@ -310,7 +310,7 @@ export const isDecisionArea = (value: string): value is DecisionArea =>
 export const extractCompactClause = extractCompactClauseFromFormatting;
 
 export const formatBoundedDecisionAction = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation">) =>
-  formatDecisionAction(rule.doNow[0] ?? rule.recommendation, "Keep last week's plan");
+  formatDecisionAction(rule.doNow[0] ?? rule.recommendation, "Keep your current plan");
 
 export const formatBoundedDecisionThreshold = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) =>
   formatDecisionThreshold(rule.pauseTrigger, FALLBACK_PAUSE_THRESHOLD);
@@ -324,7 +324,7 @@ export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "do
     threshold: rule.pauseTrigger,
     reversal: rule.resumeTrigger,
     fallbacks: {
-      action: "Keep last week's plan",
+      action: "Keep your current plan",
       threshold: FALLBACK_PAUSE_THRESHOLD,
       reversal: "Resume only after the reading recovers",
     },
@@ -378,7 +378,15 @@ export const SPENDING_PAYBACK_BAR_MONTHS = 6;
  * printed on the same page at six. A tight runway extends the Spending bar to
  * everything; it does not relax it anywhere.
  */
-const TIGHT_RUNWAY_PAYBACK_BAR_MONTHS = SPENDING_PAYBACK_BAR_MONTHS;
+export const TIGHT_RUNWAY_PAYBACK_BAR_MONTHS = SPENDING_PAYBACK_BAR_MONTHS;
+
+/**
+ * The Product tempo rule's bar outside Sunny: it slows roadmap work "that pays
+ * back in more than a year". The rule's sentences say "a year"; the runway
+ * planner's project chart draws the same bar from this number, and
+ * `tests/projectPayback.test.ts` holds the two together.
+ */
+export const ROADMAP_PAYBACK_BAR_MONTHS = 12;
 
 /**
  * The four lines every area's pause and resume conditions are drawn from, set

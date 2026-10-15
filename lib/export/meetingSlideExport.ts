@@ -11,6 +11,7 @@ import { buildScoreReferenceLines } from "./scoreReference";
 import { describeConditions, formatExportConfidence, formatSourceFooter } from "./exportTerms";
 import { fitLines, wrappedLines } from "../image/textFit";
 import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
+import { escapeHtml } from "../email/emailShell";
 import {
   OG_BG,
   OG_CONDITION_INK,
@@ -113,6 +114,22 @@ export const slideConditionColors = (payload: MeetingSlidePayload): { edge: stri
     ? { edge: REGIME_HEX_COLORS[payload.regime], ink: OG_CONDITION_INK[payload.regime] }
     : { edge: OG_RULE, ink: OG_TEXT };
 
+/*
+ * The stance the week is called at, above the action it implies; null when the
+ * two are the same sentence, which is what the model returns on a week with no
+ * stage-scoped action.
+ */
+const slideGuidance = (payload: MeetingSlidePayload): string | null =>
+  payload.call && payload.call.trim() !== payload.actionNow.trim() ? payload.call : null;
+
+/*
+ * The other things that would change the guidance, under the name the share
+ * formats give them. They printed as the resume line once, which on a held week
+ * put "why the guidance is held" under "Resume when".
+ */
+const slideWatchLine = (payload: MeetingSlidePayload): string | null =>
+  payload.clearsWhen && payload.clearsWhen.length > 0 ? payload.clearsWhen.join("; ") : null;
+
 /** "Margin: close to the line": the band under its display name (the payload field stays `confidence`). */
 const slideMargin = (payload: { confidence: string }) => `Margin: ${formatExportConfidence(payload.confidence).toLowerCase()}`;
 
@@ -129,16 +146,13 @@ export const slideFooterLine = (payload: MeetingSlidePayload): string =>
  * Generates formatted Markdown / Notion Callout Block
  */
 export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string {
+  const guidance = slideGuidance(payload);
+  const watch = slideWatchLine(payload);
   return [
     `> **Whether: this week's guidance** — *${payload.recordDate}*`,
     `> **Conditions**: ${slideConditions(payload)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
     `>`,
-    // The stance the week is called at, above the action it implies. Omitted
-    // when the two are the same sentence, which is what the model returns on a
-    // week with no stage-scoped action.
-    ...(payload.call && payload.call.trim() !== payload.actionNow.trim()
-      ? [`> **GUIDANCE**: ${payload.call}`]
-      : []),
+    ...(guidance ? [`> **GUIDANCE**: ${guidance}`] : []),
     // Labels only (2026-10-09): a target, a warning sign, a tick and a cycle
     // arrow sat in front of them, four pictures restating four words.
     `> **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
@@ -146,12 +160,7 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
     // The stage's own discipline for lifting its hold, when one is chosen.
     ...(payload.resumeWhen ? [`> **${SLIDE_LABELS.resume.toUpperCase()}**: ${payload.resumeWhen}`] : []),
     `> **${SLIDE_LABELS.callChange.toUpperCase()}**: ${payload.callChangesIf}`,
-    // The other things that would change the guidance, under the name the share
-    // formats give them. They printed as the resume line here, which on a held
-    // week put "why the guidance is held" under "Resume when".
-    ...(payload.clearsWhen && payload.clearsWhen.length > 0
-      ? [`> **${DECISION_CONTRACT_LABELS.watch.watchThisWeek.toUpperCase()}**: ${payload.clearsWhen.join("; ")}`]
-      : []),
+    ...(watch ? [`> **${DECISION_CONTRACT_LABELS.watch.watchThisWeek.toUpperCase()}**: ${watch}`] : []),
     `>`,
     // The snapshot marker travels with the numbers. A slide pasted into a deck
     // during an upstream outage has to say so on the slide, not on the page it
@@ -164,55 +173,88 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
 
 /**
  * Generates Rich HTML for clipboard paste into Google Slides, Keynote, Notion, Docs
+ *
+ * The rich half of the same clipboard write as the Markdown above, and the half
+ * Slides and Notion paste, so it carries every line the Markdown does: it left
+ * out the guidance, the watch line and the link. Text is escaped, since the
+ * watch line holds comparisons ("Funding pressure < 66").
  */
 export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
   const { edge: badgeEdge, ink: badgeInk } = slideConditionColors(payload);
+  const guidance = slideGuidance(payload);
+  const watch = slideWatchLine(payload);
+  const esc = escapeHtml;
 
   return `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: ${OG_BG}; color: ${OG_TEXT}; padding: 24px; border-radius: 12px; border: 1px solid ${OG_RULE}; max-width: 680px;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; border-bottom: 1px solid ${OG_RULE}; padding-bottom: 12px;">
     <div>
       <span style="font-size: 12px; color: ${OG_TEXT_MUTED}; font-weight: 600;">Whether · Weekly operating guidance</span>
-      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: ${OG_TEXT};">This week's guidance${payload.stageLabel ? ` — ${payload.stageLabel}` : ""}</h2>
-      <p style="margin: 4px 0 0 0; font-size: 12px; color: ${OG_TEXT_MUTED};">Conditions: ${slideConditions(payload)}</p>
+      <h2 style="margin: 4px 0 0 0; font-size: 18px; color: ${OG_TEXT};">This week's guidance${payload.stageLabel ? ` — ${esc(payload.stageLabel)}` : ""}</h2>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: ${OG_TEXT_MUTED};">Conditions: ${esc(slideConditions(payload))}</p>
     </div>
     <div style="text-align: right;">
-      <span style="border: 1px solid ${badgeEdge}; color: ${badgeInk}; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${getRegimePublicLabel(payload.regime)}</span>
-      <p style="margin: 4px 0 0 0; font-size: 11px; color: ${OG_TEXT_MUTED};">${payload.recordDate}</p>
+      <span style="border: 1px solid ${badgeEdge}; color: ${badgeInk}; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${esc(getRegimePublicLabel(payload.regime))}</span>
+      <p style="margin: 4px 0 0 0; font-size: 11px; color: ${OG_TEXT_MUTED};">${esc(payload.recordDate)}</p>
     </div>
   </div>
 
-  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">
+  <table style="width: 100%; border-collapse: collapse; margin-bottom: 16px;">${
+    guidance
+      ? `
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="font-size: 12px; font-weight: 700; color: ${OG_TEXT};">Guidance</span>
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${esc(guidance)}</div>
+      </td>
+    </tr>`
+      : ""
+  }
     <tr>
       <td style="padding: 8px 0;">
         <span style="font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${SLIDE_LABELS.action}</span>
-        <div style="font-size: 13px; font-weight: 600; color: ${OG_TEXT}; margin-top: 2px;">${payload.actionNow}</div>
+        <div style="font-size: 13px; font-weight: 600; color: ${OG_TEXT}; margin-top: 2px;">${esc(payload.actionNow)}</div>
       </td>
     </tr>
     <tr>
       <td style="padding: 8px 0;">
         <span style="font-size: 12px; font-weight: 700; color: ${OG_LINE_CROSSED};">${SLIDE_LABELS.pause}</span>
-        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${payload.pauseIf}</div>
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${esc(payload.pauseIf)}</div>
       </td>
     </tr>
     <tr>
       <td style="padding: 8px 0;">
         <span style="font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${SLIDE_LABELS.callChange}</span>
-        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${payload.callChangesIf}</div>${
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${esc(payload.callChangesIf)}</div>${
           payload.resumeWhen
             ? `
         <span style="display: block; margin-top: 8px; font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${SLIDE_LABELS.resume}</span>
-        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${payload.resumeWhen}</div>`
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${esc(payload.resumeWhen)}</div>`
             : ""
         }
       </td>
-    </tr>
+    </tr>${
+      watch
+        ? `
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${DECISION_CONTRACT_LABELS.watch.watchThisWeek}</span>
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">${esc(watch)}</div>
+      </td>
+    </tr>`
+        : ""
+    }
   </table>
 
   <div style="display: flex; justify-content: space-between; gap: 16px; font-size: 10px; color: ${OG_TEXT_MUTED}; padding-top: 8px;">
-    <span style="display: flex; flex-direction: column; gap: 2px;">${slideReadingLines(payload).map((line) => `<span>${line}</span>`).join("")}</span>
-    <span>${slideFooterLine(payload)}</span>
-  </div>
+    <span style="display: flex; flex-direction: column; gap: 2px;">${slideReadingLines(payload).map((line) => `<span>${esc(line)}</span>`).join("")}</span>
+    <span>${esc(slideFooterLine(payload))}</span>
+  </div>${
+    payload.url
+      ? `
+  <p style="margin: 8px 0 0 0; font-size: 10px;"><a href="${esc(payload.url)}" style="color: ${OG_TEXT_MUTED};">${esc(payload.url)}</a></p>`
+      : ""
+  }
 </div>
 `.trim();
 }

@@ -22,7 +22,14 @@
  * So readiness is judged on the flags that do move: whether the data is
  * fallback, and whether the record date is recent enough that the week derived
  * from it is actually the week being published.
+ *
+ * Fallback covers the macro inputs too. Until 2026-10-14 only the Treasury was
+ * asked, so a run where Treasury loaded live and a FRED macro fetch failed
+ * passed: the failed series kept its snapshot value, the engine scored it, and
+ * the reading went out as this week's.
  */
+import type { MacroSeriesReading } from "../types";
+import { listCachedLiveMacroSeries } from "./sourceHealth";
 
 /**
  * How stale a record date may be and still name the right week to freeze.
@@ -55,6 +62,8 @@ type PublishReadinessInput = {
   /** Explicit liveness flag when the provider sets one. */
   isLive?: boolean | null;
   fallbackReason?: string | null;
+  /** The macro series the reading was scored with; every fetch-backed one must be live. */
+  macroSeries: readonly Pick<MacroSeriesReading, "id" | "label" | "isLive">[];
   /** The record date the published week would be dated by. */
   recordDate: string;
   now: Date;
@@ -69,6 +78,7 @@ export const assessPublishReadiness = ({
   isFallback,
   isLive,
   fallbackReason,
+  macroSeries,
   recordDate,
   now,
 }: PublishReadinessInput): PublishReadiness => {
@@ -82,6 +92,15 @@ export const assessPublishReadiness = ({
       reason: `Data is a fallback snapshot, not a live reading${
         fallbackReason ? ` (${fallbackReason})` : ""
       }. Publishing it would stamp a stale reading with the current week.`,
+    };
+  }
+
+  const cachedMacro = listCachedLiveMacroSeries(macroSeries);
+
+  if (cachedMacro.length > 0) {
+    return {
+      ok: false,
+      reason: `Macro inputs are snapshot values, not live readings (${cachedMacro.join(", ")}). Publishing them would stamp stale inputs with the current week.`,
     };
   }
 

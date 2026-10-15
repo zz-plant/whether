@@ -5,8 +5,9 @@
  * WHETHER_BRIEF_FREEZE_WORKFLOW=1 (production and the preview lane). It replaces the scheduled routine
  * that ran `scripts/freezeWeeklyBrief.ts` in a sandbox whose egress proxy denies FRED: every
  * one of those runs failed before it had a week to write, and the archive that is meant to
- * prove weekly cadence stayed at one entry. Nothing here merges anything — the output is a
- * pull request a person reads.
+ * prove weekly cadence stayed at one entry. The output is a pull request; where
+ * WHETHER_AUTOMERGE_DATA_PRS=1 the Workflow merges it once Cloudflare's branch build of it is
+ * green (worker/workflows/landDataPullRequest.ts), and otherwise a person does.
  *
  * Written to be promoted without a sequencing rule. Production reaches this code the moment
  * the flag is set, and GITHUB_TOKEN is a secret set separately, so the two can arrive in
@@ -23,18 +24,24 @@ import { WorkflowEntrypoint, type WorkflowEvent, type WorkflowStep } from "cloud
 import { installBindings } from "../bindings";
 import { writeAnalytics } from "../../lib/telemetry/analyticsEngine";
 import { GitHubRepoClient } from "../../lib/github/repoClient";
+import { sendOpsFailureNotice } from "../../lib/delivery/opsNotice";
 import { assembleCurrentWeekBrief } from "../../lib/report/publishedBriefRecord";
 import {
   buildPublishedBriefUpdateAgainstBase,
   openPublishedBriefPullRequest,
+  PUBLISHED_BRIEFS_FILE_PATH,
   type OpenPublishedBriefPullRequestResult,
 } from "../../lib/report/publishedBriefPullRequest";
+import { isDataPullRequestAutoMergeOn, landDataPullRequest } from "./landDataPullRequest";
 import { DEFAULT_GITHUB_REPOSITORY } from "./regimeHistoryRefresh";
 
 type WeeklyBriefFreezeWorkflowEnv = Record<string, unknown> & {
   GITHUB_TOKEN?: string;
   GITHUB_REPOSITORY?: string;
+  WHETHER_AUTOMERGE_DATA_PRS?: string;
 };
+
+type WeeklyBriefFreezeResult = OpenPublishedBriefPullRequestResult & { merged?: boolean };
 
 type WeeklyBriefFreezeWorkflowParams = {
   /** Base branch for the pull request. Defaults to main. */
@@ -48,7 +55,7 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
   async run(
     event: WorkflowEvent<WeeklyBriefFreezeWorkflowParams>,
     step: WorkflowStep,
-  ): Promise<OpenPublishedBriefPullRequestResult> {
+  ): Promise<WeeklyBriefFreezeResult> {
     /* The report path reads KV and provider keys off globalThis; a Workflow instance may be
        the first thing to run in its isolate, so nothing has installed them yet. */
     installBindings(this.env);
@@ -66,7 +73,12 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
        */
       writeAnalytics(
         "cron-step",
-        { step: "brief-freeze", ok: true, detail: result.opened ? "pull request opened" : result.reason, durationMs: Date.now() - startedAt },
+        {
+          step: "brief-freeze",
+          ok: true,
+          detail: result.merged ? "pull request merged" : result.opened ? "pull request opened" : result.reason,
+          durationMs: Date.now() - startedAt,
+        },
         { doubles: [1, Date.now() - startedAt] },
       );
       return result;
@@ -77,6 +89,12 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
         { step: "brief-freeze", ok: false, error: error instanceof Error ? error.message : "Unknown error", durationMs },
         { doubles: [0, durationMs] },
       );
+      /* The freeze fails hours after the cron that started it, so the cron's own notice has
+         already gone out green; this is the only message that says the week was not frozen. */
+      await sendOpsFailureNotice({
+        run: "Weekly brief freeze",
+        failures: [{ step: "brief-freeze", error: error instanceof Error ? error.message : "Unknown error" }],
+      });
       throw error;
     }
   }
@@ -98,7 +116,7 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
   private async freeze(
     event: WorkflowEvent<WeeklyBriefFreezeWorkflowParams>,
     step: WorkflowStep,
-  ): Promise<OpenPublishedBriefPullRequestResult> {
+  ): Promise<WeeklyBriefFreezeResult> {
     /*
      * Checked before any work, not between the read and the pull request.
      *
@@ -136,6 +154,16 @@ export class WeeklyBriefFreezeWorkflow extends WorkflowEntrypoint<WeeklyBriefFre
       return { opened: false, reason: `${base} already carries week ${assembled.slug}` };
     }
 
-    return step.do("open the pull request", retries, () => openPublishedBriefPullRequest({ client, update, base }));
+    const opened = await step.do("open the pull request", retries, () => openPublishedBriefPullRequest({ client, update, base }));
+    if (!opened.opened || !isDataPullRequestAutoMergeOn(this.env)) return opened;
+
+    await landDataPullRequest({
+      step,
+      client,
+      number: opened.pullRequest.number,
+      paths: [PUBLISHED_BRIEFS_FILE_PATH],
+      title: `chore: freeze the ${assembled.slug} brief (#${opened.pullRequest.number})`,
+    });
+    return { ...opened, merged: true };
   }
 }

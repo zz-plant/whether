@@ -65,14 +65,13 @@ const liveRoutes = [
   // Guides took Resolve's direct answers on 2026-10-08; /resolve redirects.
   { slug: "guides", label: "Guides", path: "/resources" },
   { slug: "trust", label: "How much to trust this week", path: "/trust" },
-  // Added 2026-08-29. These four were never captured, so the UI facelift that
-  // reviewed the five above could not have seen them — and three are now on the
-  // path a launch visitor actually walks: /brief is where every shared artifact
-  // links, /history carries the track record that answers "is this a horoscope",
-  // and /pricing states the offer. /share is where the artifacts are copied.
+  // Added 2026-08-29. These were never captured, so the UI facelift that reviewed
+  // the five above could not have seen them, and two are on the path a launch
+  // visitor actually walks: /brief is where every shared artifact links, and
+  // /history carries the track record that answers "is this a horoscope". /share
+  // is where the artifacts are copied.
   { slug: "history", label: "Record", path: "/history" },
   { slug: "brief", label: "Published brief", path: "/brief/2026-w31" },
-  { slug: "pricing", label: "Pricing", path: "/pricing" },
   { slug: "share", label: "Share", path: "/share" },
   // Restored 2026-09-23: product writing placed on the month-end record.
   { slug: "concepts", label: "Product writing", path: "/concepts" },

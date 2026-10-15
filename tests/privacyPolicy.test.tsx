@@ -11,10 +11,9 @@ import { TELEMETRY_STREAMS } from "../lib/telemetry/analyticsEngine";
  *
  * There was no privacy page at all: the footer carried Terms and an Acceptable
  * Use Policy, and every use of the word "data" in both means *market* data —
- * while the product stores subscriber addresses with verification tokens, the
- * email Stripe reports for a paying customer, a per-browser identifier the
- * server reads back, two cookies, nine browser storage keys, and eight telemetry
- * streams. A reader had nowhere to check any of it.
+ * while the product stores subscriber addresses with verification tokens, a
+ * per-browser identifier the server reads back, two cookies, nine browser
+ * storage keys, and eight telemetry streams. A reader had nowhere to check any of it.
  *
  * Prose goes stale silently, which is the failure this guards. Each storage key
  * and each stream is claimed below by the section that accounts for it, so
@@ -25,27 +24,25 @@ import { TELEMETRY_STREAMS } from "../lib/telemetry/analyticsEngine";
 
 /** Every `STORAGE_KEYS` entry, against the section of /privacy that covers it. */
 const STORAGE_KEY_SECTIONS: Record<keyof typeof STORAGE_KEYS, string> = {
-  theme: "2.4 — stays in the browser, never sent",
-  clientId: "2.3 — the random identifier this browser is known by",
-  homeOrientationDismissed: "2.4 — stays in the browser, never sent",
-  reviewedRecordDates: "2.4 — stays in the browser, never sent",
-  operatorProfile: "2.4 — stays in the browser, never sent",
-  operatorWorkflowLastPath: "2.4 — stays in the browser, never sent",
-  lastSeenCall: "2.4 — stays in the browser, never sent",
-  decisionShieldPresets: "2.4 — stays in the browser, never sent",
-  entitlementToken: "2.2 — the token that tells this browser its plan is active",
-  decisionMemory: "2.3 and 2.4 — keyed to the browser identifier, and stored server-side",
-  measurementOff: "5 — the reader's choice to send no 2.6 measurement from this browser",
+  theme: "2.3 — stays in the browser, never sent",
+  clientId: "2.2 — the random identifier this browser is known by",
+  homeOrientationDismissed: "2.3 — stays in the browser, never sent",
+  reviewedRecordDates: "2.3 — stays in the browser, never sent",
+  operatorProfile: "2.3 — stays in the browser, never sent",
+  operatorWorkflowLastPath: "2.3 — stays in the browser, never sent",
+  lastSeenCall: "2.3 — stays in the browser, never sent",
+  decisionShieldPresets: "2.3 — stays in the browser, never sent",
+  decisionMemory: "2.2 and 2.3 — keyed to the browser identifier, and stored server-side",
+  measurementOff: "5 — the reader's choice to send no 2.5 measurement from this browser",
 };
 
 /** Every `TELEMETRY_STREAMS` entry, against the section of /privacy that covers it. */
 const TELEMETRY_STREAM_SECTIONS: Record<(typeof TELEMETRY_STREAMS)[number], string> = {
-  "web-vitals": "2.6 — how fast a page loaded",
-  "operator-workflow": "2.6 — which route was moved to from which",
-  activation: "2.6 — funnel steps",
-  "content-measurement": "2.6 — coarse acquisition bucket",
-  "premium-funnel": "2.6 — checkout funnel steps",
-  search: "2.6 — the shape of a search, never its text",
+  "web-vitals": "2.5 — how fast a page loaded",
+  "operator-workflow": "2.5 — which route was moved to from which",
+  activation: "2.5 — funnel steps",
+  "content-measurement": "2.5 — coarse acquisition bucket",
+  search: "2.5 — the shape of a search, never its text",
   /* Worker-authored. No browser writes these and no reader appears in them, but
      they are listed so the census covers the whole union rather than the part
      that happens to be browser-facing. */
@@ -79,10 +76,11 @@ describe("privacy policy", () => {
     // a reader can see it without reading the code.
     assert.match(html, /No third-party analytics/i);
     assert.match(html, /unsubscribe/i);
-    assert.match(html, /Stripe/);
     assert.match(html, /Cloudflare/);
     assert.match(html, /no IP address/i);
     assert.match(html, /never sent/i);
+    // Whether sells nothing, so no payment record exists to describe.
+    assert.doesNotMatch(html, /Stripe|payment/i);
   });
 
   /*
@@ -119,7 +117,7 @@ describe("privacy policy", () => {
 
   it("carries its own effective date, not the one the first two legal pages shipped with", () => {
     const html = renderPrivacyPage();
-    assert.match(html, /Effective Date: 9\/30\/2026/);
+    assert.match(html, /Effective Date: 10\/14\/2026/);
     assert.doesNotMatch(html, /Effective Date: 2\/23\/2026/);
   });
 

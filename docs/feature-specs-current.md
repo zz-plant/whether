@@ -50,7 +50,7 @@ The header carries four groups, each with a hub, read from one module
   and on `/history` "Record". `/signals` keeps its URL; it is "Why it changed" in the tabs, the
   breadcrumb and the header sublabel.
 - **Header.** From `md`: the wordmark, the four group tabs (one-key jumps `w`, `d`, `r`, `g`), then
-  the utility links Use it elsewhere (`/share`), Pricing and About in lighter type, then search
+  the utility links Use it elsewhere (`/share`) and About in lighter type, then search
   (⌘K) and theme. There is no More menu. Below `md` the bottom bar carries the four groups and
   More; More opens a sheet with Search, every group's pages and the utility links
   (`app/components/MobileTabBar.tsx`, `app/components/globalHeaderNavClient.tsx`).
@@ -62,8 +62,8 @@ The header carries four groups, each with a hub, read from one module
   the page when it is not the hub, then the caller's crumbs — "This week › Why it changed",
   "Decide › Runway planner", "Record › Week of …", "Guides › <question>",
   "Guides › More tools › For CEO". A hub alone gets Home first.
-- **Footer.** The brand column carries the utility links (Use it elsewhere, API & MCP, Pricing,
-  About, Search, RSS); then one column per group, headed by the group's name linking its hub.
+- **Footer.** The brand column carries the utility links (Use it elsewhere, API & MCP, About,
+  Search, RSS); then one column per group, headed by the group's name linking its hub.
 - **Resolve folded in.** `/resolve` 308s to `/operate#ops-decision-shield` (Test a decision); with
   a `stakeholder`, `stage`, `library` or `toolkitQuery` selection it goes to
   `/resources#more-tools`, where those views render (`resolveSelectionRedirects`, `next.config.js`).
@@ -94,14 +94,14 @@ Supporting surfaces are intentionally subordinate:
 - `/resources` and `/resources/*`, `/answers/[slug]`, and `/concepts` remain secondary discovery or distribution surfaces rather than primary workflow hubs
 - SEO concentration now favors a smaller authority set: the five primary workflow hubs, a curated subset of high-intent answer pages, and a curated subset of authority resource pages.
 - Secondary pages such as `/toolkits/[slug]`, `/search`, most resource utilities, and most answer/detail bridge pages remain available in-product but default to noindex.
-- `/guides` is a compatibility redirect into query-selected translation states on `/resolve` (`/guides/[stakeholder]` to `?stakeholder=`, `/guides/stage/[stage]` to `?stage=`), so role and stage translation live inside the canonical Resolve workflow rather than on a parallel library page.
-- `/toolkits` permanently redirects to `/` (`next.config.js`). Toolkit search and browse state (`?toolkitQuery=`) live inside the Browse disclosure on `/resolve`, and each toolkit keeps its own `/toolkits/[slug]` page.
+- `/guides` is a compatibility redirect to Guides (`/resources`), and its sub-paths go to query-selected states of Guides' More tools (`/guides/[stakeholder]` to `?stakeholder=`, `/guides/stage/[stage]` to `?stage=`, `/guides/stage` to `?library=stages`, each at `#more-tools`), so role and stage translation live on Guides rather than on a parallel library page.
+- `/toolkits` permanently redirects to `/` (`next.config.js`). Toolkit search state (`?toolkitQuery=`) lives in the toolkit library under Guides' More tools (`/resources#toolkit-library`), and each toolkit keeps its own `/toolkits/[slug]` page.
 - `/posture` and `/startup-macro-posture` redirect back to the Weekly Brief (`/startup-macro-posture/index` to `/trust#formula-reference`), and `/solutions/*` redirects into `/resolve` or a toolkit page. Live posture reference no longer ships as a standalone workflow.
 - `/search` renders its results on the server (`app/search/page.tsx`); the hub the top match belongs to is offered as the first action rather than redirected to.
 - `/resources` is a hub page (`app/resources/page.tsx`) listing the governance frameworks and the decision guides; deeper governance material lives on focused `/resources/[slug]` detail pages.
 - `/answers`, `/sources`, and `/confidence` no longer ship standalone page implementations; those URLs now permanently redirect to their canonical parent workflow states
-- `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/resolve` or `/concepts`
-- `/learn/failure-modes` permanently redirects into the trust workflow (`/trust#revisit-call`) rather than acting as an independently indexable content hub.
+- `/guides/stage`, `/guides/[stakeholder]`, `/guides/stage/[stage]`, `/concepts/conflicts`, `/concepts/focus/[focus]`, and `/concepts/audience/[audience]` are retired as standalone implementations and now permanently redirect into canonical hub-selected states on `/resources` or `/concepts`
+- `/learn/failure-modes` permanently redirects into the trust workflow (`/trust#revisit-call`) rather than acting as an independently indexable content hub. The hub's earlier names follow it: `/library` and `/reference` go to `/trust`, their failure-mode paths to `/trust#revisit-call`, and the concept paths under all three (`/learn/concepts/*`, `/library/canon/*`, `/reference/concepts/*`) to `/concepts`.
 - `/concepts` is a page again (restored 2026-09-23): one list of widely read product-management writing and, since 2026-10-09, capital-allocation essays and investor memos, each entry placed on the month-end record (conditions that month, how long they had held, both scores) and tagged Expand, Conserve or Craft, with each kind's share per set of conditions beside the months' share so no coincidence reads as a cause (§1.1.64). Every entry's first-publication month was checked against its source. Sub-paths (the first version's detail, focus, audience and conflicts pages) redirect to `/concepts`. Modules: `lib/productCanon.ts`, `lib/productCanonMeasures.ts`, `lib/adviceStance.ts`; test: `tests/productCanon.test.ts`.
 
 The homepage renders no interpretation layer. A non-default `?view=` still selects one and the home assembly builds it (`buildInterpretationLayer`, called from `lib/report/homePageAssembler.ts`), but nothing reads it: its panel had no call site and was deleted on 2026-08-14, and the exports stopped receiving it on 2026-10-06 (§5.3.1).
@@ -135,11 +135,19 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    headline action as the `h1` (`weeklyHeadline`, §1.1.60); what the conditions mean; one line on
    why (`describeMovementCause`: the lines the scores crossed, "Risk appetite fell through 54."); the
    trust strip ("Data as of", Sources, and Margin, which says after the points whether the call could
-   change next week); and from `md` up the conditions map with the trail's caption under it. A
-   monthly or quarterly horizon adds `CadenceCallCard` above it with the `h1`. Under the card sit
+   change next week, by `couldCallChangeNextWeek`, §1.1.31a); and from `md` up the conditions map
+   with the trail's caption under it. A monthly or quarterly horizon adds `CadenceCallCard` above it
+   with the `h1`. Under the card sit
    `SinceLastVisit` (only when the conditions or the call differ from what this browser last saw,
    and not when the difference is the earlier conditions the stamp line names) and `YourRecordNote`
    (live briefs only), then Copy Brief (DD-005's one primary action) and the Plan horizon control.
+   `CadenceCallCard` states the horizon's guidance and its Pause if / Resume when pair, and under the
+   pair draws one `ThresholdLadder` for funding pressure and one for risk appetite
+   (`cadenceCallModel.boundedBands`, built by `buildHorizonSignalBands` in
+   `lib/summary/horizonOperatingRules.ts` from the thresholds the pair's sentences use): the score,
+   its move since the comparison reading, and how far it sits from the pause line and the resume
+   line. When the guidance is held the card prints neither the pair nor the ladders; the weekly card
+   below states the hold's lines.
 2. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
    only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
    its default choice, a chosen stage's own action as a stage line, and the runway emphasis once a
@@ -161,7 +169,8 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
    each area's row says which of its lines moved. A read with no comparison says so over it.
 7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
-   they moved the same way and where the scores stood three months on; the last turns as links.
+   they moved the same way and where the scores stood three months on; on every week, how long
+   these conditions lasted before (§1.1.76); the last turns as links.
 8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
    holds the slide and image copies and every other format since 2026-10-08, and the week's
    published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
@@ -427,7 +436,10 @@ assumptions optimistic in three ways, and this pass fixed each:
   turn RISKY into SAFE). Both now start empty and say what to enter; runway, burn, revenue, and
   growth live in one browser-held profile (`lib/operatorProfile.ts`, `whether.operatorProfile`)
   that the planner and both stress tests share through `OperatorProfileNumberField`, which
-  validates on blur, commits on parse, and treats blank as "not given".
+  validates on blur, commits on parse, and treats blank as "not given". Gross margin came back on
+  2026-09-26 as a figure the operator enters, not a default: `grossMarginPct` (0–100) is on the same
+  profile, asked for only when the Decision Shield's Model is Bootstrapped, and able to turn RISKY
+  into SAFE from there (§5.7).
 - **Dead capture paths removed.** `useCrossDeviceSync` (no call sites), `useDecisionHistory` +
   the history page's "Decision archive" (nothing ever wrote the key it read),
   `lib/report/companyMetrics.ts` and `lib/sensitivityCoefficient.ts` (no product callers), and the
@@ -437,7 +449,7 @@ assumptions optimistic in three ways, and this pass fixed each:
   accepted an unauthenticated POST, scoped by a caller-chosen id and a caller-chosen secret, and
   wrote 24KB of reader state into KV with no rate limit and no TTL. Its two permitted keys
   (`whether-company-metrics`, `whether-decision-log`) named the module deleted in the line above and
-  a key nothing has ever written. `/privacy` 2.4 says everything other than recorded decisions
+  a key nothing has ever written. `/privacy` 2.3 says everything other than recorded decisions
   "stays in your browser and is never sent", which was true only because nothing called it.
 - **Subscribe no longer succeeds without mail.** Without an EMAIL binding the adapter stubbed
   `ok: true`, so production told subscribers to check their inbox for mail that never left. In
@@ -1223,7 +1235,7 @@ brief and the picker is hidden, so indexing and returning readers are unchanged.
 live weekly view only; an archived month or a monthly horizon is reached by choosing it. Picking a
 decision records the `oriented` activation step, and the `visited` step now carries a coarse arrival
 bucket (direct, search, social, chat, shared-link, internal, other; never the URL) and a first-visit
-flag. `/privacy` 2.6 had promised that bucket with no code behind it. The activation intake now
+flag. `/privacy` 2.5 had promised that bucket with no code behind it. The activation intake now
 refuses any field a step does not carry, which `/privacy` also promised and the validator did not
 enforce. Conversion cannot be attributed to a source, by design: no event carries an identity to
 join on. Pinned by `tests/firstVisitFrontDoor.test.tsx` and `tests/subscriberWeeklyFlag.test.ts`.
@@ -1567,7 +1579,7 @@ on an archived week. Nearly every browser on `/` has an id (the alert toggle min
 the server only when the browser remembers having recorded something: `whether.decisionMemory:<id>` (a key
 the registry already accounted for and nothing used) holds the count, kept by `fetchDecisionLedger` and
 `logDecisionToLedger`. A browser that recorded before this shipped sees the note after it next opens
-`/decisions`. `/privacy` 2.4 says so.
+`/decisions`. `/privacy` 2.3 says so.
 
 **The analogue says how it differed.** "The last time conditions moved this way" printed Sep 2022 and where the
 scores stood three months on, which reads as a forecast to anyone who is not told where that month started.
@@ -1607,9 +1619,6 @@ changes. What shipped:
   (DD-005's one primary action) moved from *Do and share* to directly under the call card, outside the
   screenshot; on a first visit it folds with the brief, because on a phone it pushed the decision picker under
   the tab bar.
-- **`/pricing`.** "Cannot be bought yet" sits under each paid price instead of after the buttons; the free list
-  shows four items and folds the rest, which brings every plan button above a 900px fold. The closing section
-  says what a request does.
 - **`/history`** names the newest published week above the month strip when it is newer than the strip, so the
   month-end "Sunny, held 9 months" no longer reads as a contradiction of the week's call.
 - **`/trust`** folds the four formula cards behind "Show the exact arithmetic"; the ladders and the plain steps
@@ -1617,7 +1626,7 @@ changes. What shipped:
 - **`/signals`** hides the unfiltered focus pills on phones; a filtered link still shows them.
 - **Touch targets.** `.weather-hit` (and `.weather-hit-box`) grow an inline link's hit area to 44px with a
   pseudo-element: "How this is judged", area names in the rules table, the turning-point links, the week
-  chevrons, and small inline links on `/pricing` and `/history`. The explainer's Dismiss is 44px.
+  chevrons, and small inline links on `/history`. The explainer's Dismiss is 44px.
 
 Not changed, on purpose: the `/operate` done counter (its heat is the model's bias toward digits, and it was
 enlarged deliberately), the `/operate` workstream tabs (a different axis from the section rail, not a second
@@ -1641,7 +1650,7 @@ leaving was the measurement and the owner's own checks:
 - **A browser can turn measurement off** from `/privacy` section 5. Every browser emitter goes through
   `lib/telemetry/sendTelemetry.ts`, which sends nothing while `whether.measurement.off` holds "1";
   `tests/sendTelemetry.test.ts` fails if anything in `app/` or `lib/` queues a beacon around it.
-  `/privacy` 2.6 now also lists what a visit to the brief reports about itself.
+  `/privacy` 2.5 now also lists what a visit to the brief reports about itself.
 - **The first-visit fold takes two more rows off a phone.** The horizon switcher and the confidence
   chip fold with the brief (the call card's trust line already carries confidence), and the phone
   header's stage and runway pills hide on a first visit to a page that offers the fold
@@ -1670,8 +1679,13 @@ true.
   50 and 75 on both scores, which no rule uses, and the email called 75 "the pause line". It now
   reads `publishedScoreLines(thresholds)`: pause and resume at 76 / 66 on funding pressure and
   44 / 54 on risk appetite (`sharedDecisionLines`), and the change lines at 70 and 50. A move
-  that passes several lines sends one letter per score, naming the most significant (pause,
-  then change, then resume), and the dedupe key is per score (`threshold:<metric>`), so a
+  that passes several lines sends one letter per score, naming the last line it crossed, the one
+  whose state now holds: the pause line on a rise from 63 to 90, the 66 resume line on a fall from
+  80 to 60. Until 2026-10-14 it ranked pause, then change, then resume whatever the direction, so
+  that fall named the pause line and the resume letter never came. A score exactly on a line sits
+  on the side where the line does not hold (`sideOfLine`): on a change line it counts as below, as
+  `classifyRegime` reads it, and on a pause or resume line it counts as not met, because the rules
+  state those strictly (`> 76`, `< 66`). The dedupe key is per score (`threshold:<metric>`), so a
   funding-pressure crossing no longer silences a risk-appetite one in the same week.
 - **A plan's own lines.** `/operate` has a step, "Set this plan's lines" (`ops-plan-lines`,
   after the rules, live weeks only), that starts from the published rules
@@ -1683,11 +1697,34 @@ true.
   reading (`evaluatePlanLineCrossings` over `previousSnapshot`), so it runs on a day no
   published alert fired; a pause fires on any of its conditions, a resume on all of them, and
   each area and side mails at most once a week (`plan:<area>:<side>`).
-- `/privacy` 2.1 lists the lines among what a subscription stores. `/pricing` moves the
-  line-crossing alert from Pro to Free: it was promised free on the homepage already, and a
-  plan nobody can buy would have made plan lines unreachable.
+- `/privacy` 2.1 lists the lines among what a subscription stores.
 
-### 1.1.32 Consent for changes, and paid plans that sell what free does not (2026-10-01)
+### 1.1.31a One rule for "could change next week" (2026-10-01)
+
+On the week of Sep 29, 2026 the homepage trust strip said "Not expected" and `/brief.md` said
+"Conditions could change next week" about the same reading. The strip read the engine; the brief
+read a second flag on the home model (8 points on the one-scale distance, or any change since the
+month-end comparison), which stayed on for a month after a change that had already passed its
+confirming reading.
+
+- **The rule.** `couldCallChangeNextWeek` (`lib/report/trustStatus.ts`) is yes when a score sits
+  inside the engine's 5-point near band (`diagnostics.transitionWatch`) or the engine is holding a
+  change for its confirming reading (`regimeTransition.pending`), and no otherwise.
+- **Its readers.** The trust strip reads it (`buildTrustStripProps`, with the reason beside it).
+  The home model's `transitionWatch` is computed from it (`lib/report/homeBrief/builders.ts`), so
+  `/brief.md`'s trust line, the memo lines, the change-watch row and the exports that read the
+  model print the strip's answer. No surface keeps a rule of its own.
+- **Data caveat.** `/brief.md`'s provenance line about the state of the data was labelled
+  "Action", the decision contract's word for the operating action, so a week whose guidance was to
+  freeze new commitments printed "Action: Safe to use for near-term planning; proceed with normal
+  approval flow". It is labelled "Data caveat" (`DATA_CAVEAT_LABEL`) and reads "None." on live data;
+  an archived, cached or held reading prints what that state asks of the reader. A live reading
+  close to a line gets its Hold from the decision readiness line, not from the caveat (§1.1.77).
+- Tests: `tests/homeBriefModel.test.ts`, `tests/pageReaderContradictions.test.tsx`,
+  `tests/trustStatusTones.test.ts`. The lesson: docs/agents/lessons/tests-and-copy-rules.md
+  ("Two flags for one claim").
+
+### 1.1.32 Consent for changes (2026-10-01)
 
 - **A confirmed address changes only when its inbox says so.** `subscribe()` used to apply
   `alerts`, `weekly` and reactivation on the request, and `/api/email/subscribe` takes any address,
@@ -1726,12 +1763,6 @@ true.
   back to `siteUrl`. Tests: `tests/emailUnsubscribeRoute.test.ts`, "how much confirmation mail one
   address gets" in `tests/subscriberWeeklyFlag.test.ts`, and the host cases in
   `tests/subscriptionAndCronSecurity.test.ts`. `/privacy` 2.1 says so.
-- **Paid plans list only what the free plan lacks.** Pro sold "Monday delivery to your inbox" and
-  Team a Slack channel feed and briefs for boards and investors; the free subscribe form and `/share`
-  deliver all three, so the demand test priced free things. Pro now offers more than one set of plan
-  lines and cross-device decision memory; Team, plan lines a team shares and a shared decision log.
-  The free plan lists the Monday email and Slack feed. `tests/pricing.test.ts` holds paid features
-  off delivery words.
 - **The picker points at plan lines.** Under a picked area's published lines, "Move these lines for
   your plan →" opens `/operate#ops-plan-lines`. The alert form names everything it sends: the
   guidance changing, a score crossing one of its lines, an outsized move in a market input.
@@ -1835,7 +1866,7 @@ own lines — were closed, two and three sections down.
 - **The area step keeps the table only.** The rails and the restated call lines are gone; they are
   on the brief one click away. `BoundedCorridorRails` had no caller left and was deleted.
 - **No checklist.** The Done boxes, the weekly count and the browser record behind them
-  (`app/operate/weekChecklist.ts`, `STORAGE_KEYS.weekChecklist`) are removed, and `/privacy` 2.4
+  (`app/operate/weekChecklist.ts`, `STORAGE_KEYS.weekChecklist`) are removed, and `/privacy` 2.3
   no longer lists them.
 - **Test a decision is a body, not a second page.** `DecisionShieldPanel` drops its own header
   (the step asks the question), drops the provenance block (the page's trust line states it), and
@@ -1927,7 +1958,7 @@ conditions were.
 ### 1.1.41 Two page frames: report and reading (2026-10-06)
 
 Report routes (`/signals`, `/trust`, `/operate`, `/resolve`, `/history`) use `ReportShell`, which builds
-on `PageShell`; the utility pages (`/share`, `/pricing`, `/search`, the API docs, the legal pages) use
+on `PageShell`; the utility pages (`/share`, `/search`, the API docs, the legal pages) use
 `PageShell` directly, without the status-led intro. Every page that is read rather than operated uses
 `ContentPageShell` (`app/components/ui/contentPageShell.tsx`) with one of three measures: `prose`
 (48rem), `content` (56rem) or `wide` (72rem, new).
@@ -2003,7 +2034,12 @@ pulse and the regime-change push — now goes through `lib/delivery/`.
   email judged a snapshot's own flags (`freshness.status`, `provenance.isLive`) and the Slack post
   the treasury's fallback stamp, so a reading marked one way and not the other was sent by one and
   refused by the other. Both read both now, and the email's refusal names the fallback reason when
-  there is one.
+  there is one. Since 2026-10-14 the check underneath them (`assessPublishReadiness`, which the
+  freeze and agent state also call) refuses a reading that scored any of the six FRED macro series
+  (the two credit spreads, the Chicago Fed index, VIX, inflation, unemployment) from the bundled
+  snapshot, and the refusal names them (`listCachedLiveMacroSeries`, `lib/report/sourceHealth.ts`).
+  A live Treasury used to carry a failed macro fetch's snapshot value out as this week's reading.
+  The curated startup-market series are snapshots by design and do not count.
 - **The weekly sends go out once a week per recipient** (`lib/delivery/onceFor.ts`). Repeat
   protection came in four schemes — per-inbox markers for alert mail (`alert:delivered:*`, a
   seven-day window), one key per month for the month-end pulse (`month-end:last-pulsed`), the
@@ -2198,11 +2234,11 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   top 3 of each list." — since 2026-10-08 "Showing the top 3 of each list." — where it said "per area"). Risk checks and the resources disclosure take the
   closed steps' fill, so the page's frames read as one set in the light theme too.
 
-### 1.1.47 Shared chrome: the report intro on a phone, the footer, /pricing and /concepts (2026-10-07)
+### 1.1.47 Shared chrome: the report intro on a phone, the footer and /concepts (2026-10-07)
 
 A screenshot review of the shared chrome found the report intro restating the homepage's trust
-strip across a phone's first screen, a footer set louder than the pages above it, a plain fact on
-`/pricing` drawn in the warning ink, and `/concepts` as about 6,000px of one small-text column.
+strip across a phone's first screen, a footer set louder than the pages above it, and `/concepts`
+as about 6,000px of one small-text column.
 
 - **The report intro on a phone** (`CommandCenterNavBlock`, every `ReportShell` route). Below `sm`
   a route with a trust strip draws three lines: the status word in the regime ink with the
@@ -2226,12 +2262,6 @@ strip across a phone's first screen, a footer set louder than the pages above it
   group is as wide as its links, 48px from the next. The Shortcuts button is hidden on a screen
   with no hover, where it listed keys for a keyboard the phone does not have. Measured with a
   mouse at 1280px: 439 → 359px tall; on a 430px touch phone 679 → 587px, the rows keeping 44px.
-- **`/pricing`.** "Cannot be bought yet. A request records that you want it." prints in the price's
-  qualifier ink (`text-slate-400`), not the caution amber: it is a plain fact about the offer, and
-  amber read it as a warning about the product. The "What a request does" section lost its 20px
-  side inset from `sm`, which set it out of line with the title and the cards (§XXI: an unboxed
-  section sits on the page column), and "What that means in practice" takes `.weather-hit`, the
-  44px target every inline link in a sentence has. `tests/pricing.test.ts` holds the ink.
 - **`/concepts` (Product writing).** Each entry's conditions were 14px grey text after "Conditions
   that month:", the smallest thing in the entry and the one fact the page adds. They are the
   regime's stamp now: `Tag` takes a `regime` and draws `.weather-tag-regime` with `.type-stamp`,
@@ -2944,7 +2974,6 @@ is gone. "What the margin has been worth" is the study's first sentence (96%) an
 | `/resources` | each answer row's stamp, the same for every row in an area | one stamp beside the area's name |
 | `/history/compare` | the intro's status word, Period A's conditions on a two-period page | the period headings |
 | `/calibration` | "The record" kicker; the study section's intro restating the page's | the tabs, the page intro |
-| `/pricing` | "Cannot be bought yet. A request records…" on each paid card, and again in a "What a request does" section after the buttons that also restated the free promise | one line in the header for Pro and Team together, before any request button |
 | `/trust` | "The exact arithmetic is below." over the "Show the exact arithmetic" control | the control |
 | `/about` | the structure's healthcare origin in "Who writes it" and again in the folded "Why it works", behind a link to `/about` itself | "Who writes it"; "Why it works" keeps the stakes |
 | `/brief/<week>` | "This record is frozen." in the footer, under the header's "This is a frozen record of one week." | the header line; the footer keeps the corrections rule |
@@ -3190,7 +3219,7 @@ reports the test, and the rule kept the current ramp.
   (`tests/trustRampTestNote.test.tsx`). Both are served from this site as plain text, at
   `/research/premise-test-registration.md` and `/research/premise-test-results.md`, because the
   repository is private and its GitHub copies are a 404 for readers. The routes serve
-  `lib/research/premiseTestDocs.ts`, which `scripts/research/publishPremiseTestDocs.ts` builds from
+  `lib/research/premiseTestDocs.ts`, which `scripts/research/publishResearchDocs.ts` builds from
   `docs/research/`; `tests/premiseTestDocs.test.ts` fails when the two differ.
 
 ### 1.1.69 The Synoptic palette (2026-10-09)
@@ -3284,6 +3313,234 @@ curve drawn from four hard-coded points.
   (`decisionMovement.ts`), the narrative summary (`decisionNarrative.ts`) and the returning-reader
   fallback (`historyAndContext.ts`); seven pinned pastes in `briefFormats.golden.json` changed by that
   sentence alone.
+
+### 1.1.71 Generated sentences say each thing once, in order of weight (2026-10-12)
+
+The second PR of the copy and data-viz plan.
+
+- **Held areas share one sentence.** `buildDecisionMovement` returns `heldGroups`: the areas that
+  held, grouped by the side of their lines they held on, each group one sentence ("Pause still
+  applies to Hiring, Fundraising, Spending and New bets: no line crossed since Sep 30."). The folded
+  "All five areas" table (`AllAreaRules`) prints a group of two or more once over the table and drops
+  it from those rows, so the area the week moved is the one "Changed" cell left. The picker, which
+  shows one area at a time, keeps each area's own sentence. Closes DD-039's open item.
+- **A score's move reads largest part first** (`clausesFor`, `lib/report/scoreMovement.ts`): "-11
+  from startup-market inputs and -2 from the yield curve", not the scoring stages' order. The net
+  move is the delta chip beside the row, so the sentence does not repeat it.
+- **Drift and a dead field.** `whyItMattersLine` was computed on every card model and rendered
+  nowhere; it is deleted with `buildWhyItMattersLine`. The share preview's fallback no longer says
+  "posture", and `docs/editorial-guardrails.md` names `REGIME_LABELS`, the one label table, instead
+  of an alias that no longer exists.
+
+The planned sentence-quality gate is not added: `tests/onePlacePerFact.test.tsx` and
+`tests/readerClauseShapes.test.tsx` (2026-10-09) already hold the repetition and clause shapes it
+would have checked, and a prototype over the pinned pastes found its "same sentence twice" rule
+mostly flagged rows for different areas that rightly share a line.
+
+`tests/decisionMovement.test.ts` and `tests/allAreaRulesHeldGroups.test.tsx` hold the grouping.
+
+### 1.1.72 /history's charts say where the line is (2026-10-12)
+
+- **The trend charts draw the change line.** `HistoricalTrendChart` takes `changeLine`: the chart
+  then draws on the score's own 0–100 scale with the line dashed across it, 80px tall instead of
+  32px. Autoscaled, a 4-point wobble near the line and a 40-point swing far from it filled the same
+  height, so the shape could not say how close a score had come to changing conditions. Without
+  `changeLine` the chart autoscales as before.
+- **The month stripe names both scores.** `MonthStrip` entries may carry the two scores; a month's
+  hover title then reads "Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56".
+
+`tests/chartIntegrityContract.test.tsx` and `tests/visualPrimitives.test.tsx` hold them.
+
+### 1.1.73 Engineering work against the payback bar, in the runway planner (2026-10-13)
+
+The runway planner (`/operate/financial`) checks the reader's own engineering projects against the
+payback bar the published rules already set. It does not add a bar of its own
+(`lib/report/projectPayback.ts`):
+
+- **The bar.**
+  - Under six months of runway, the cash gate holds every new commitment.
+  - With 6–12 months, every commitment needs a payback inside `TIGHT_RUNWAY_PAYBACK_BAR_MONTHS` (6).
+  - Otherwise, outside Sunny, the Product tempo rule slows work that pays back in more than a year
+    (`ROADMAP_PAYBACK_BAR_MONTHS`, 12; `tests/projectPayback.test.tsx` holds the number to the rule's
+    sentence).
+  - In Sunny, with a year or more of runway, there is no bar on roadmap work.
+- **A project.**
+  - Cost: weeks to ship × engineers × what an engineer-week costs.
+  - Saving: hours it saves a month × what one of those hours costs, plus bills it cuts.
+  - Each row prints a sentence: the break-even month, the bar it clears or misses, and what lifts
+    that bar. Work that saves no cash is told it has no payback to check and has to be argued on
+    revenue or retention.
+  - Once the work ships, the saving lowers net burn. The sentence says how much runway that adds, at
+    today's net burn with revenue flat. When the added runway moves the reader into a band with a
+    different bar, it says that too.
+  - Engineer time counts toward the payback but not the runway, because the engineers are paid
+    either way.
+- **The chart.**
+  - One strip per project on one month scale: building, paying back, and a dot at the break-even,
+    filled when it clears the bar (`app/operate/components/projectPaybackChart.tsx`).
+  - The bar and the cash-out month cross every strip.
+  - HTML positioned by percent, like the planner's `RangeBar`, so the labels stay page text at
+    phone width.
+- **Where it lives.**
+  - The engineer-week cost and up to four project rows are in the operator profile.
+  - They travel with the plan link as `engWeek` and one `project=weeks_engineers_hours_hourly_other_name`
+    per row (`app/operate/components/runwayPlanLink.ts`).
+  - The bar sentence and each project's sentence go into the copy block and the budget memo.
+- **Edits stand until the address bar catches up.**
+  - The panel reads its plan back from the link, and `router.replace` lands a server round trip
+    after each edit. A second field typed inside that trip was built on the older link and wrote
+    the first field back to its old value.
+  - The panel now keeps its own last edit until the bar shows that edit's address
+    (`plannerEditStands`). An address it never wrote is someone else's link, which wins as before.
+
+Why: a set of essays argued that "product craft" has to be justified as cost removed once the
+person who pays is not the person who uses the product, and priced that with a discount rate. At a
+22% hurdle, a project that breaks even inside two years does so about a month later than
+undiscounted. The rules' bars move by six months with runway and conditions, so the planner draws
+the bar.
+
+### 1.1.75 `/concepts` counts every post, not only the famous ones (2026-10-13)
+
+The curated list in §1.1.64 tags texts chosen for being widely read, and its own limits say a
+systematic sample could lean differently. This is that sample: a pre-registered corpus study of
+every dated post in twelve archives from ten venture firms, January 2012 to September 2026, asking
+whether advice to founders moves with funding pressure and risk appetite.
+
+- **Registered first.** `docs/research/advice-corpus-preregistration.md` was the branch's first
+  commit, before any post was fetched for its text: hypotheses H1–H5, sources and exclusions, the
+  rubric (the prompt's SHA-256, which `tests/adviceCorpusRubric.test.ts` holds the code to), the
+  analysis plan, and what would count against each hypothesis. Seven deviations are recorded in its
+  §11, among them the rubric revision the validation forced (D4).
+- **Pipeline** (`scripts/advice-corpus/`, `bun run advice-corpus:*`). robots.txt first, one queue
+  per host at most once a second, a descriptive User-Agent; raw pages and text cached in the
+  gitignored `.cache/advice-corpus/`. A keyword-and-embedding prefilter picks what the local model
+  reads, plus a seeded 10% of the rest to measure what it misses. Labels come from the local model
+  (named in the documents); the hand labels that validate them and the analysis are frontier work.
+- **Data.** `data/advice-corpus/posts.json` holds derived metadata for every classified post (no
+  text; quotes of 15 words at most). `monthly.json` is generated from it alone (firm-weighted shares
+  by month, quarter and funding-pressure era); `tests/adviceCorpusData.test.ts` runs
+  `bun run advice-corpus:check`, so the two cannot drift.
+- **The section** (`app/concepts/adviceCorpusSection.tsx`), after "What the record shows" on `/concepts`: quarterly
+  expand and conserve shares under quarterly funding pressure, two panels on one time axis, the seven
+  changes in conditions as vertical rules named in the caption, an sr-only table of every quarter,
+  and a native tooltip per quarter. Shares come from `monthly.json`; funding pressure and the
+  changes come from the month-end record at render, so the chart cannot disagree with `/history`.
+  The two series are ink and dashed ink, not hues: every hue on the site already names a set of
+  conditions or a line state.
+- **Documents served from the site.** The repository is private, so the pre-registration and the
+  results are served as plain text at `/research/advice-corpus-preregistration.md` and
+  `/research/advice-corpus-results.md`, from `lib/research/adviceCorpusDocs.ts`.
+  `scripts/research/publishResearchDocs.ts` (renamed from `publishPremiseTestDocs.ts`, now one
+  registry for both studies) builds it; `tests/adviceCorpusDocs.test.ts` fails when it and
+  `docs/research/` differ.
+- **One stance vocabulary.** `lib/adviceStance.ts` keeps the reading list's one-liners and adds each
+  stance's registered corpus wording (`corpusDefinition`), so both import one module. The known
+  difference is written there: the one-liner puts "focus" under conserve; the corpus has no word
+  for it.
+- **What it found** (`docs/research/advice-corpus-results.md`). 8,777 posts in the corpus, 2,598
+  classified, 407 capital-relevant and addressed to founders. H1 (less expansion advice when funding
+  pressure is above its line), H2 (more conservation advice after the July 2022 crossing) and H3
+  (stance follows funding pressure more than risk appetite) count against; H4 (craft does not move)
+  is inconclusive; H5 (metrics) shows no shift. Stance labels agree with the reviewer at kappa 0.523,
+  below the registered 0.6, so every verdict is stated as resting on them. The section prints the
+  era shares from `monthly.json` and those limits; the curated list's "A small, chosen sample" limit
+  now points at it.
+### 1.1.76 What a market move means at the reader's scale (2026-10-13)
+
+A reader who hears "the Fed cut rates" or "the curve flattened" has nothing on the page to hold the
+headline against: the change lines are exact and, to most readers, unreadable sizes. Three sentences
+answer the questions that headline raises in the reader's own terms. None adds a vocabulary, a
+popover or a forecast.
+
+- **How big the move is** (`lib/report/marketMoveScale.ts`). Each market move in the "In
+  interest-rate terms" fold gets a second line: for the short rate, how it compares with a
+  quarter-point Fed move ("Less than one quarter-point Fed move."), and for both inputs, how many of
+  the month-to-month changes since 2012 moved that far ("The rate moved that far in one month in 18
+  of the 176 months on record."). A count, not a median: the bill sat at zero from 2012 to 2015 and
+  moves in Fed steps since, so its median month was 0.03 and every distance read as many months.
+  The federal funds rate has no month-end series and gets the Fed comparison alone; the curve, which
+  the Fed does not set, gets the count alone.
+- **How long these conditions lasted before** (`describeSpellLengths`, `lib/report/lastTimeCallChanged.ts`),
+  under "Has this happened before?" on every live week. The earlier spells of this week's conditions
+  and their length in month-ends ("The one earlier Freezing spell on record ran 32 month-ends, Sep
+  2022 to Apr 2025."), the shortest spell of any conditions, and, with a chosen runway band whose
+  top every earlier spell outlasted, that it did. The spell the record ends in is left out while it
+  is still running. The record has seven spells, so it counts them and says it is not a forecast.
+- **Whether the market can move the payback bar** (`describeWhatMovesPaybackBar`,
+  `lib/report/projectPayback.ts`), under the bar's sentence in the runway planner. Under a year of
+  runway the bar is cash's, and the sentence says no rate move or headline lifts it. Otherwise it is
+  the roadmap rule's, and the sentence names the score moves still needed for Sunny in the change
+  lines' numbers, with today's scores, and how many of the reader's projects that would stop slowing.
+  In Sunny it says what would bring the 12-month bar back and how many projects would then miss it.
+
+`tests/marketMoveScale.test.ts`, `tests/spellLengths.test.ts` and `tests/projectPayback.test.tsx`
+hold them.
+
+### 1.1.77 `/brief.md` states the decision readiness verdict (2026-10-14)
+
+On a live week with the scores close to a line, the home model's readiness verdict is Hold. `/brief.md`
+printed "Margin: close to the line" in its trust line and "Data caveat: None." in its provenance, and
+never the verdict (review of #1481).
+
+- **The line.** `> **Decision readiness:** <Act | Act with caution | Hold>. <detail>`, directly under
+  the trust line (`DECISION_READINESS_LABEL`, `lib/report/trustStatus.ts`). It prints
+  `homeBriefModel.decisionReadiness` as the home model resolved it, with the hold and the structured
+  freshness.
+- **The data caveat keeps its meaning.** It says what the state of the data adds (§1.1.31a), and live
+  data adds nothing, so a week close to a line prints a Hold verdict above a caveat of "None.".
+- **One verdict.** `buildDecisionReadinessState` runs once, in the home brief builder. `/trust` built
+  a second from the freshness label alone and without the hold, so a held week clear of the lines
+  was Act there and Act with caution in the home model; it reads the home model's verdict now. On
+  `/trust` the verdict sets only the shell's tone, and the trust strip replaces the headline that
+  tone colours (§1.1.34), so `/brief.md` is the one surface that prints it. The homepage card does
+  not draw it either, although `docs/one-screen-weekly-brief-spec.md` asks for it there.
+- **Its wording, now that a reader sees it.** The Act detail ended "Nothing here argues for holding
+  back this week", which read as this week's action under guidance to freeze new commitments. It
+  ends "This week's guidance and its pause lines apply as written." The cached and within-reach
+  details dropped the check time in parentheses, which the lines on either side already state.
+- Tests: `tests/briefMarkdownRoute.test.ts` (a Hold week, an Act week, and the one builder).
+
+### 1.1.78 Whether is free (2026-10-14)
+
+The paid tier is gone. Pro and Team were never on sale (`PAID_PLANS_ON_SALE` was false), nothing
+under `app/` called checkout, the gate in front of the runway planner passed everything through,
+and the intent capture recorded two events from one visitor between 2026-08-21 and 2026-10-14, none
+from `/pricing`. What the paid plans offered (several sets of plan lines, decision memory across
+devices, lines a team shares) would have needed accounts, which Whether does not have.
+
+- **Removed:** `/pricing` and its `Product` markup, the four `/api/billing/*` routes, the Stripe
+  client, the entitlement store and token, the gate and its hook, and the premium-intent capture
+  (`/api/telemetry/premium-funnel`, its KV log, the click tracker in the root layout, and the
+  `data-premium-*` tags on the share and export controls). `/operate/financial` renders the runway
+  planner directly.
+- **Redirect:** `/pricing` 308s to `/about` (`next.config.js`, `tests/redirectResolution.test.ts`)
+  and is a retired sitemap path. The header, footer, mobile sheet, palette and `/llms.txt` read the
+  utility links, so dropping Pricing there removes it from all of them.
+- **What the product says about cost:** "Whether is free." on `/about`, in the README, on
+  `/api-docs`, in `/llms.txt` and in the API reference. `/privacy` drops the payment section
+  (2.3–2.7 renumber to 2.2–2.6) and names Cloudflare as the only service that receives anything
+  about a reader; the terms drop "paid plans" from section 7.
+- `lib/activationFunnel.ts` stays: it measures whether a reader comes back, not whether one pays.
+
+### 1.1.79 Ease-of-use pass: one answer per week, units that match, settings folded (2026-10-14)
+
+- **A week with two answers says so on the card.** Where this week's published brief read other
+  conditions, the basis note (`describeCitableBriefBasis`) is a caveat under the call with a link
+  to the brief, and the trust strip stops repeating it. An archived month whose published briefs
+  read other conditions says so in its banner.
+- **The archive's unit is named.** The stepper's ends are "Previous month-end" and "Next month-end"
+  (or "This week"), and an archived view is "Month-end Sep 30, 2026", not "Week of Sep 28".
+- **Line positions are states.** "Pause line crossed" read as this week's event under "No score
+  crossed a pause or resume line since …". It is "Past its pause line"; the count is "4 of 5 areas
+  are past their pause line"; table cells say "past the line". Pastes state a pause-line distance as
+  "past the line" or "N pts away", where "14 pts above" meant opposite things for the two scores.
+- **The three lines are defined once**, at the head of "What would change this guidance".
+- **Settings fold.** On desktop, stage and runway are one line ("Rules for a Series A company with
+  12–24 months of runway · Change"). On a live week the phone legend defines this week's condition
+  only, with a link to all four.
+- **Smaller fixes.** `/decide`, `/record` and `/plan` redirect to the pages the header names;
+  `/operate` is titled "Decide"; the board slide files follow the brief's stage; the signals
+  table's "Feeds into" links carry the shared tap area.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
@@ -3391,12 +3648,12 @@ under `public/social/` were deleted on 2026-09-10, because social unfurlers refu
 
 `/resources` is the one secondary hub with a page of its own, listing the governance frameworks and
 the decision guides. `/guides` and `/toolkits` redirect (§1.0), and `/answers`
-redirects to the direct answers on `/resolve` (`/resolve#direct-answers`) instead of maintaining a
+redirects to the direct answers on Guides (`/resources#answers`) instead of maintaining a
 separate hub shell.
-`/resolve` owns the stakeholder and stage states behind query-selected panels (`?stakeholder=`, `?stage=`, `?library=`), and supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
+Guides' More tools owns the stakeholder and stage states behind query-selected panels (`?stakeholder=`, `?stage=`, `?library=`), and supporting libraries are no longer assumed to be indexable by default. Programmatic SEO scope now stays intentionally narrower than the total content footprint: curated answer pages remain indexable only when they map directly to a current operator decision and pass freshness/provenance gates, while supporting utilities, template downloads, and library index pages remain product-accessible but default to noindex and stay out of the sitemap.
 `/search` is product-accessible and noindex. It renders the matches on the server and offers the hub the top match belongs to as the first action, rather than forwarding the query there.
 `/resolve/team-context` no longer operates as a standalone personalization branch; it redirects into Planning (`/operate#ops-monthly-action-summary`). `/resolve` itself is described in §4.1.
-The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect to `/resolve#direct-answers`. The active resource-article set is likewise reduced to a focused practical subset: retired long-form briefs redirect to Planning's Share step (`/planning#ops-export-briefs`, which lands on `/operate`), and the remaining guides are listed on `/resources`.
+The active answer catalog is now intentionally narrower and keeps only the highest-signal decision-closing pages; retired long-tail slugs redirect to `/resources#answers`. The active resource-article set is likewise reduced to a focused practical subset: retired long-form briefs redirect to `/resources`, where the remaining guides are listed.
 
 The homepage remains on live `/api/og` generation so the weekly brief preview can stay tied to current data.
 
@@ -3898,6 +4155,17 @@ $$
   so the artifact could contradict the verdict beside it. The compare-mode verdict badges also
   split UNSAFE (rose) from RISKY (amber); both used to render amber
   (`tests/decisionShield.test.ts`).
+- Bootstrapped mode reads the operator's own gross margin (2026-09-26). With the Decision Shield's
+  Model set to Bootstrapped (`?model=BOOTSTRAPPED`), the plan stress test shows a "Gross margin (%)"
+  field bound to the profile's `grossMarginPct` (optional, 0–100; blank is "not given" and changes
+  nothing). At 70% or more a RISKY verdict becomes SAFE and the line beside the verdict
+  (`financialImpactSummary`) reads "Bootstrapped with N% gross margin, so tighter funding matters
+  less."; under 50% the fragile assumptions add "Gross margin (N%) provides limited buffer if
+  customer demand slows." The under-12-months runway rule in Cloudy and Freezing conditions is
+  checked first and outranks the margin. Bootstrapped mode also drops the two assumptions about
+  outside capital (capital and refinancing staying cheap under elevated funding pressure, investors
+  funding fast burn under low risk appetite) (`stressTestDecisionPlan`, `lib/decisionShield.ts`;
+  `tests/decisionShield.test.ts`).
 
 ## 6) APIs (server routes)
 
@@ -3956,6 +4224,12 @@ also judge a flash (§1.1.18): an outsized move in the short rate or the curve b
 previous snapshot and this one, which is measured against the previous read rather than the
 alert state. The brief email remains weekly-only — the cadence promise is weekly; only rule
 firings break cadence.
+
+The weekly run is `0 14 * * MON` (14:00 UTC Monday). Until 2026-10-14 it was `0 14 * * 1`, which
+Cloudflare reads as Sunday; `tests/cronSchedule.test.ts` now refuses a numeric weekday.
+
+A run with any failed step mails one summary to the owner at `WHETHER_OPS_EMAIL`
+(`lib/delivery/opsNotice.ts`), and each Workflow does the same when it fails. A clean run sends nothing.
 
 ### 6.9 One state, one tool registry (2026-09-29)
 Agents met the product through four surfaces that disagreed about what Whether says and how to ask.
@@ -4141,3 +4415,23 @@ surfaces do not reintroduce the old words.
 
 Archived briefs in `data/published_briefs.json` keep the wording they were published with; the
 archive is append-only and its exports are expected to read as they did on the day.
+
+### 1.1.73 Controls read as instrument parts (2026-10-13)
+
+Every segmented control — plan horizon, stage, cash runway, the decision picker, and the ones on
+/signals, /operate, /share and the subscribe form — is a recessed well with keys in it
+(`docs/agents/ui-ux-standards.md` §XXVI). The chosen key stands proud and lights its lamp, and a
+pressed key sinks. Stage and cash runway are ordered scales: a rule with a tick under each key and
+a pointer under the chosen one, with Bootstrapped set apart from the funded stages. The company
+controls are four equal keys on one row from `sm` up, each label over its sublabel, where they
+used to break 2 + 2 and wrap each sublabel mid-phrase. No gradient or specular: §XXV stands.
+
+### 1.1.74 The week stepper and the pickers use the same parts (2026-10-13)
+
+The week stepper on `/` is one well: the earlier and later week are keys at either end of the
+calendar picker, and the end with no week beyond it sinks flat instead of drawing a faded box. The
+header's stage and runway pickers mark the chosen option with a lit lamp instead of a check over an
+action-ink wash, and the calendar's months and known periods are keys that stand proud when chosen.
+The three pickers that drew at 95% opacity with nothing blurred behind them are opaque: the page's
+text read through them (`docs/agents/ui-ux-standards.md` §XXVI).
+

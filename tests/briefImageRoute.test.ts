@@ -129,8 +129,8 @@ describe("buildBriefImagePayload", () => {
     const payload = buildBriefImagePayload(buildHomepage());
 
     assert.deepEqual(payload.readings.map(asPasted), [
-      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · 14 pts above · was 63 on Aug 31 · resume line 66 (24 pts away)",
-      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · 1 pt below · was 56 on Aug 31 · resume line 54 (11 pts away)",
+      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · past the line · was 63 on Aug 31 · resume line 66 (24 pts away)",
+      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · past the line · was 56 on Aug 31 · resume line 54 (11 pts away)",
     ]);
   });
 

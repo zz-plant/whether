@@ -274,6 +274,12 @@ describe("AreaTable moved rows", () => {
             pause: { line: "Risk appetite < 44", distance: "4 pts away", state: "near" },
             resume: { line: "Risk appetite > 54", distance: "already met", state: "clear" },
           },
+          {
+            area: "burn-discipline",
+            rule: "Payback on every line.",
+            pause: { line: "Funding pressure > 76", distance: "crossed", state: "crossed" },
+            resume: { line: "Funding pressure < 66", distance: "already met", state: "clear" },
+          },
         ]}
       />,
     );
@@ -292,6 +298,9 @@ describe("AreaTable moved rows", () => {
     assert.ok(met, "a resume line met is the state badge");
     assert.match(met[1], /rounded-sm border[^"]*text-line-clear-fg|text-line-clear-fg[^"]*rounded-sm border/);
     assert.match(met[2], /lucide-play/);
+    // An area that is not on hold has no hold to lift: its met resume line is
+    // not a restart (2026-10-14).
+    assert.match(html, /Risk appetite &gt; 54<span class="block text-xs text-slate-400">nothing to resume<\/span>/);
     assert.match(html, /<span class="block text-xs text-slate-400">24 pts away<\/span>/, "a resume line still to reach is plain text, with no glyph");
   });
 });
@@ -400,12 +409,26 @@ describe("TrustStrip", () => {
     );
     assert.match(
       html,
-      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
+      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They are left out because past months can(&#x27;|')t be checked with them\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
     );
   });
 });
 
 describe("MonthStrip", () => {
+  it("names both scores in a month's hover title when it has them", () => {
+    const html = renderToStaticMarkup(
+      <MonthStrip
+        entries={[
+          { recordDate: "2026-08-31", regime: "EXPANSION", tightness: 63, riskAppetite: 56 },
+          { recordDate: "2026-09-30", regime: "DEFENSIVE", tightness: 90, riskAppetite: 56 },
+        ]}
+      />,
+    );
+    assert.match(html, /title="Sep 2026: Cloudy · Funding pressure 90, Risk appetite 56"/);
+    const bare = renderToStaticMarkup(<MonthStrip entries={[{ recordDate: "2026-09-30", regime: "DEFENSIVE" }]} />);
+    assert.match(bare, /title="Sep 2026: Cloudy"/);
+  });
+
   const entries = [
     { recordDate: "2026-03-31", regime: "EXPANSION" },
     { recordDate: "2026-04-30", regime: "EXPANSION" },

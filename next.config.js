@@ -57,12 +57,29 @@ export const canonicalSurfaceRedirectPairs = [
   // Nav-label aliases: legacy names that links and habits still carry. /answer
   // was Resolve's directory before /resolve; both land where Resolve went.
   ["/evidence", "/signals"],
+  // The header's own words as addresses (2026-10-14): a reader who reads
+  // "Decide" or "Record" in the nav and types it got a 404.
+  ["/decide", "/operate"],
+  ["/record", "/history"],
+  ["/plan", "/operate"],
   ["/answer", "/operate#ops-decision-shield"],
   ["/planning", "/operate"],
   // Learn root + failure modes → Trust hub
   ["/learn", "/trust"],
   ["/learn/failure-modes", "/trust#revisit-call"],
   ["/learn/failure-modes/:slug", "/trust#revisit-call"],
+  // Learn's concepts index and the hub's other names: /library and /reference are
+  // what the same pages were called between February and March 2026. The table
+  // that forwarded them went in d0ddedd6 (2026-03-16) with nothing in its place,
+  // so their deep links 404'd. Concept essays land on the one list, failure modes
+  // on the revisit triggers, the hubs where /learn does.
+  ["/learn/concepts/:path*", "/concepts"],
+  ["/library", "/trust"],
+  ["/library/canon/:path*", "/concepts"],
+  ["/library/failure-modes/:path*", "/trust#revisit-call"],
+  ["/reference", "/trust"],
+  ["/reference/concepts/:path*", "/concepts"],
+  ["/reference/failure-modes/:path*", "/trust#revisit-call"],
   // /concepts itself is a page again (restored 2026-09-23). The first version's
   // detail, focus, audience and conflicts pages are not: one page carries the
   // list now, with an anchor per essay. The old `/concepts` -> `/trust` rule was a
@@ -166,6 +183,9 @@ export const iaConsolidationRedirectPairs = [
   // now carries its meaning where it appears, and the method terms that only a
   // formula needs are defined on the formula cards, which is where this lands.
   ["/glossary", "/trust#formula-reference"],
+  // Whether is free. The paid plans /pricing offered were never on sale and were
+  // removed on 2026-10-14; /about is the page that says what Whether is.
+  ["/pricing", "/about"],
 ];
 
 /*

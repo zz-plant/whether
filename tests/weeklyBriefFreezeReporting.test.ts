@@ -130,6 +130,8 @@ const publishedBriefFixture: PublishedBrief = PublishedBriefSchema.parse({
 
 afterEach(() => {
   Reflect.deleteProperty(globalThis, "ANALYTICS");
+  Reflect.deleteProperty(globalThis, "EMAIL");
+  Reflect.deleteProperty(globalThis, "WHETHER_OPS_EMAIL");
 });
 
 describe("weekly brief freeze reporting", () => {
@@ -173,5 +175,25 @@ describe("weekly brief freeze reporting", () => {
     const outcome = cronSteps(rows).find((step) => step.step === "brief-freeze");
     assert.equal(outcome?.ok, false);
     assert.match(outcome?.error ?? "", /GITHUB_TOKEN/);
+  });
+
+  /* The freeze ends hours after the cron that started it, whose own notice has already gone
+     out, so a week that was not frozen reaches the owner only through this one. */
+  it("mails the owner when the week could not be frozen", async () => {
+    installAnalyticsCapture();
+    const mail: Array<{ to: string; subject: string; text: string }> = [];
+    const workflow = await freezeWorkflow(
+      {
+        WHETHER_OPS_EMAIL: "owner@example.com",
+        EMAIL: { send: async (message: { to: string; subject: string; text: string }) => mail.push(message) },
+      },
+      async () => ({ ok: true, slug: "2026-w38", recordDate: "2026-09-14", record: publishedBriefFixture }),
+    );
+
+    await assert.rejects(() => runFreeze(workflow));
+
+    assert.equal(mail.length, 1);
+    assert.equal(mail[0].to, "owner@example.com");
+    assert.match(mail[0].text, /Brief freeze outcome: GITHUB_TOKEN is not configured/);
   });
 });

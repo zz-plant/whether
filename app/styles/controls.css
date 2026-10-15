@@ -372,3 +372,221 @@ details[open] > summary[data-chevron]::after,
     min-height: 1.75rem;
   }
 }
+
+/* Segmented controls as instrument parts (2026-10-13, ui-ux-standards §XXVI).
+   The track is a well recessed into the card; each option is a key in it. The
+   selected key stands proud of the well (a raised fill and the first rung of
+   the elevation ladder) and its lamp is lit, so the choice reads by form and by
+   a mark, not only by a tint: until now the selection was the action ink at
+   15%, a grey that barely separated from the track. A key sinks while pressed.
+   No gradient and no specular (§XXV): depth comes from the shadow tokens. */
+.weather-segment-track {
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-nested);
+  box-shadow: var(--well-inset);
+  padding: 3px;
+}
+
+/* Motion is the press only (§XXVI): the selected paint, the lamp and the scale's
+   pointer change at once, so the chosen key reads as chosen the moment it is. */
+.weather-segment-option {
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  color: var(--app-text-muted);
+  transition: transform 120ms var(--ease-out);
+}
+
+/* Choices stand on their own rather than in a track, so each is a key with
+   its own edge before anything is chosen. */
+.weather-segment-option[data-layout="choices"] {
+  border-color: var(--border-default);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-nested);
+}
+
+.peer:hover + .weather-segment-option {
+  color: var(--app-text);
+  border-color: var(--border-subtle);
+}
+
+.peer:checked + .weather-segment-option {
+  color: var(--app-text);
+  background-color: var(--bg-raised);
+  border-color: color-mix(in srgb, var(--accent-action) 45%, var(--border-strong));
+  box-shadow: var(--elev-1);
+}
+
+.peer:active + .weather-segment-option {
+  transform: translateY(1px);
+  background-color: var(--bg-nested);
+  box-shadow: var(--key-pressed);
+}
+
+/* The lamp: unlit on every key, lit on the chosen one in the action colour,
+   which is the week's condition under a regime shell. A dot, so round. */
+.weather-segment-lamp {
+  display: inline-block;
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-full);
+  background-color: var(--border-strong);
+}
+
+.peer:checked + .weather-segment-option .weather-segment-lamp {
+  background-color: var(--accent-action);
+  box-shadow: 0 0 0 2px var(--accent-border-soft);
+}
+
+/* An ordered scale (runway bands, the funded stages): a rule engraved along the
+   foot of the well with a tick under each key and a pointer under the chosen
+   one, so the options read as points on one scale rather than four unrelated
+   buttons. An option off the scale (`apart`) has no tick and stands after a gap. */
+.weather-segment-scale {
+  position: relative;
+  display: block;
+  height: 7px;
+  margin-top: 2px;
+}
+
+.weather-segment-scale::before {
+  content: "";
+  position: absolute;
+  inset-inline: 0;
+  top: 0;
+  border-top: 1px solid var(--border-default);
+}
+
+.weather-segment-scale::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 1px;
+  height: 5px;
+  background-color: var(--app-text-muted);
+  opacity: 0.6;
+}
+
+.peer:checked ~ .weather-segment-scale::after {
+  height: 7px;
+  width: 2px;
+  margin-left: -0.5px;
+  background-color: var(--accent-action);
+  opacity: 1;
+}
+
+/* The rule runs on into the next key's, so the scale reads as one line. */
+.weather-segment-track[data-ordinal] {
+  column-gap: 0;
+}
+
+.weather-segment-apart {
+  margin-inline-start: 0.5rem;
+  padding-inline-start: 0.5rem;
+  border-inline-start: 1px solid var(--border-default);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-segment-option {
+    transition: none;
+  }
+  .peer:active + .weather-segment-option {
+    transform: none;
+  }
+}
+
+/* A stepper's ends (the week stepper on /): keys standing in the well around the
+   picker. The end with nothing beyond it sinks flat and unlit (§XXVI). */
+.weather-step-key {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius-md);
+  background-color: var(--bg-raised);
+  box-shadow: var(--elev-1);
+  color: var(--app-text-muted);
+  transition: transform 120ms var(--ease-out);
+}
+
+a.weather-step-key:hover {
+  color: var(--app-text);
+}
+
+a.weather-step-key:active {
+  transform: translateY(1px);
+  background-color: var(--bg-nested);
+  box-shadow: var(--key-pressed);
+}
+
+.weather-step-key[aria-disabled="true"] {
+  border-color: transparent;
+  background-color: transparent;
+  box-shadow: none;
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+/* An option in a picker's list (the header's stage and runway pickers): the
+   same lamp as a segmented key, lit on the chosen option, in place of a check
+   and an action-ink wash. */
+.weather-choice-item[data-selected] .weather-segment-lamp {
+  background-color: var(--accent-action);
+  box-shadow: 0 0 0 2px var(--accent-border-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-step-key {
+    transition: none;
+  }
+  a.weather-step-key:active {
+    transform: none;
+  }
+}
+
+/* A key outside a segmented track: a toggle button whose state is `aria-pressed`
+   (the calendar picker's months and known periods). Unchosen keys sit flat with
+   an edge; the chosen one stands proud and lights its lamp, as in a track. */
+.weather-key {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background-color: var(--bg-nested);
+  color: var(--app-text-muted);
+  transition: transform 120ms var(--ease-out);
+}
+
+.weather-key:hover {
+  border-color: var(--border-strong);
+  color: var(--app-text);
+}
+
+.weather-key[aria-pressed="true"] {
+  border-color: var(--border-strong);
+  background-color: var(--bg-raised);
+  box-shadow: var(--elev-1);
+  color: var(--app-text);
+}
+
+.weather-key:active {
+  transform: translateY(1px);
+  background-color: var(--bg-nested);
+  box-shadow: var(--key-pressed);
+}
+
+.weather-key[aria-pressed="true"] .weather-segment-lamp {
+  background-color: var(--accent-action);
+  box-shadow: 0 0 0 2px var(--accent-border-soft);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-key {
+    transition: none;
+  }
+  .weather-key:active {
+    transform: none;
+  }
+}

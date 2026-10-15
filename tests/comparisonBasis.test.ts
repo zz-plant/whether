@@ -6,6 +6,9 @@ import { findSignalDelta } from "../lib/report/evidenceReaderModel";
 import { loadReportDataSafe } from "../lib/report/reportData";
 import { buildReportDynamics } from "../lib/report/reportEvidence";
 import { getPreviousTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * Every "last week" the product printed for a score was the change since the

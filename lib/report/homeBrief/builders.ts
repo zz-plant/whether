@@ -56,7 +56,6 @@ import {
   buildWeeklyMemoLines,
   describeWeeklyMemoLead,
   buildWeeklyMovementMetric,
-  buildWhyItMattersLine,
   resolvePrimaryShiftRegimeKey,
 } from "./decisionNarrative";
 import {
@@ -788,9 +787,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     ?? (homeBriefModel.revisitDecisions
       ? "Revise hiring and roadmap plans now."
       : "Hold last week's operating rules.");
-  const whyItMattersLine = buildWhyItMattersLine({
-    weeklyMovement: homeBriefModel.weeklyMovement,
-  });
   const readThisCardItems = buildReadThisCardItems({
     decisionShiftSummary: homeBriefModel.decisionShiftHeadline,
     immediateDecision,
@@ -861,7 +857,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       decisionMovement: homeBriefModel.decisionMovement,
     },
     presentation: {
-      whyItMattersLine,
       readThisCardItems,
     },
     diagnostics: {

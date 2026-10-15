@@ -127,7 +127,6 @@ export default async function ResourcesHubPage({
                 standing, so the page is not free of week-to-week change. */}
             <p className="text-sm text-slate-300">
               Answers to the decisions operators ask about most, each marked with where it stands this week.
-              Below them are the long-form guides and frameworks behind the weekly operating guidance.
             </p>
           </div>
         </header>

@@ -26,26 +26,26 @@ Recommended pull sequence:
 
 - Configure destination toggles per consumer/profile: `POST /api/alert-preferences`.
 - Trigger delivery runs: `POST /api/alert-deliveries`.
-- Inspect run history: `GET /api/alert-deliveries?clientId=<id>`.
+- Inspect run history: `GET /api/alert-deliveries` (cron secret). Each alert email that sent is one row; `?clientId=<SHA-256 hex of the address>` narrows it to one subscriber.
 - Operator audit trail for saved Decision Shield runs: `GET /api/decision-memory?clientId=<id>` or `GET /api/decision-memory?clientId=<id>&format=csv`.
 
 ## 3) Reliability and publish gates
 
 ### Health gate
 
-- `GET /api/health` emits `ok`, `degraded`, or `down`.
-- Treasury freshness drives status via `checks.treasuryData.ageHours` and `staleAfterHours`.
+- `GET /api/health` emits `ok`, `degraded` (HTTP 200), or `down` (HTTP 503).
+- `degradedSources` names each live source that is not answering live, with its `state` (`stale`, `unconfirmed`, `cached`) and age.
 
 ### Consistency gate
 
-- `GET /api/cadence` verifies weekly/monthly alignment.
+- `GET /api/cadence` verifies weekly/monthly alignment: `alignmentStatus` is `aligned`, `watch` (constraint themes differ) or `mismatch` (regimes differ).
 - `GET /api/summary-delta` explains mismatches when they occur.
 
 ### Suggested outbound policy
 
 Before posting to Slack/email/webhooks:
 1. Require `health.status === "ok"`.
-2. Require healthy cadence alignment/no mismatched constraints.
+2. Require `alignmentStatus === "aligned"` (no mismatched constraints).
 3. Include `recordDateLabel`, `generatedAt`, and provenance in the outgoing payload.
 
 ## 4) Exemplary TypeScript Integration Client

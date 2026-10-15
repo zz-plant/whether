@@ -14,7 +14,7 @@ import { formatConditionsChangeLine } from "../lib/summary/summaryFormatting";
 import { formatGuidance } from "../lib/export/briefBuilders";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
-import { macroSeries } from "../lib/macroSnapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
 import type { OperatingSnapshot } from "../lib/operatingState/types";
@@ -86,7 +86,7 @@ const thisWeek = {
 };
 
 const weeks: Array<{ name: string; treasury: TreasuryData; macroSeries: MacroSeriesReading[]; held: boolean }> = [
-  { name: "an ordinary week", treasury: { ...snapshotData, ...thisWeek }, macroSeries, held: false },
+  { name: "an ordinary week", treasury: { ...snapshotData, ...thisWeek }, macroSeries: liveMacroSeries, held: false },
   /* The export fixture's reading: its two scores disagree, so the policy layer holds it. */
   { name: "a held week", treasury: { ...fixtureTreasury, ...thisWeek }, macroSeries: macros, held: true },
 ];

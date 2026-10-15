@@ -10,6 +10,10 @@ import {
   resolveOperatingSnapshot,
 } from "../lib/operatingState/resolveSnapshot";
 import { snapshotData } from "../lib/snapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * "The current snapshot", asked one way.
@@ -28,7 +32,7 @@ const NOW = new Date("2026-08-31T12:00:00.000Z");
 const liveSnapshot = (recordDate = "2026-08-28") =>
   buildOperatingSnapshot({
     treasury: { ...snapshotData, isLive: true, record_date: recordDate, fetched_at: `${recordDate}T12:00:00.000Z` },
-    macroSeries,
+    macroSeries: liveMacroSeries,
     now: NOW,
   });
 
@@ -100,6 +104,21 @@ describe("assessSnapshotReadiness", () => {
 
     assert.equal(readiness.ok, false, "the email used to send this; the Slack post refused it");
     assert.match(readiness.ok ? "" : readiness.reason, /fallback snapshot, not a live reading \(Partial treasury data\)/);
+  });
+
+  it("refuses a live Treasury reading scored on a macro series the snapshot filled in", () => {
+    const snapshot = liveSnapshot();
+    const partial = {
+      ...snapshot,
+      macroSeries: snapshot.macroSeries.map((series) =>
+        series.id === "HY_CREDIT_SPREAD" ? { ...series, isLive: false } : series,
+      ),
+    };
+
+    const readiness = assessSnapshotReadiness(partial, NOW);
+
+    assert.equal(readiness.ok, false);
+    assert.match(readiness.ok ? "" : readiness.reason, /Macro inputs are snapshot values/);
   });
 
   it("refuses the bundled snapshot, which is what an outage serves", () => {

@@ -1,6 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { GET as getHealthRoute } from "../app/api/health/route";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("/api/health", () => {
   it("returns a minimal status payload", async () => {
@@ -14,9 +17,34 @@ describe("/api/health", () => {
     assert.ok(typeof body.generatedAt === "string");
   });
 
+  it("names its degraded live sources, and says degraded rather than ok when there are any", async () => {
+    const body: Record<string, unknown> = await (await getHealthRoute()).json();
+    assert.ok(Array.isArray(body.degradedSources), "the degraded sources are listed, empty or not");
+    assert.ok(Array.isArray(body.staleSources), "the stale subset keeps its name");
+    const dependencies = body.dependencies;
+    assert.ok(dependencies && typeof dependencies === "object" && "dataFreshness" in dependencies);
+    const degraded = Array.isArray(body.degradedSources) && body.degradedSources.length > 0;
+    const modelStale = Reflect.get(dependencies, "ingestModel") === "stale";
+    if (body.status !== "down") assert.equal(body.status, degraded || modelStale ? "degraded" : "ok");
+  });
+
+  it("reports the ingest model's freshness apart from the sources", async () => {
+    const body: Record<string, unknown> = await (await getHealthRoute()).json();
+    const dependencies = body.dependencies;
+    assert.ok(dependencies && typeof dependencies === "object");
+    assert.ok(["ok", "stale", "unknown"].includes(String(Reflect.get(dependencies, "ingestModel"))));
+    assert.ok("ingestModelAsOf" in body);
+  });
+
   it("reports null for deployedVersion when the Cloudflare binding is absent", async () => {
     const body: Record<string, unknown> = await (await getHealthRoute()).json();
     assert.equal(body.deployedVersion, null);
+  });
+
+  it("reports the commit only when the build compiled one in, which bun test never does", async () => {
+    const body: Record<string, unknown> = await (await getHealthRoute()).json();
+    assert.ok("commit" in body);
+    assert.equal(body.commit, null);
   });
 
   it("names the running Worker build when the binding is installed", async () => {

@@ -8,6 +8,9 @@ import { siteUrl } from "../lib/siteUrl";
 import { escapeXml } from "../lib/seo";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { weeklyHeadline } from "../lib/report/reportEvidence";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const items = (xml: string) => [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((match) => match[1]);
 const tag = (block: string, name: string) => block.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`))?.[1] ?? "";

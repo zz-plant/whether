@@ -11,7 +11,7 @@ import {
   type RuleThresholdDistance,
 } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import { isDecisionArea, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
+import { decisionAreaLabel, isDecisionArea, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -226,8 +226,8 @@ const formatPoints = (points: number) =>
 
 /**
  * Where an area stands against its pause line, short enough to sit under the
- * decision's name in the picker: the answer before the click. "Pause line
- * crossed", or how far the reading is from it. Undefined for an area whose rule
+ * decision's name in the picker: the answer before the click. "Past its
+ * pause line", or how far the reading is from it. Undefined for an area whose rule
  * states no pause line.
  */
 export const describeAreaPauseStatus = (
@@ -236,7 +236,7 @@ export const describeAreaPauseStatus = (
   if (!row.pause) return undefined;
   /* The badge's state, from the same distance the words below describe. */
   const state = resolveLineState(row.pause.points, "pause", row.pause.met) ?? "clear";
-  if (row.pause.met) return { text: "Pause line crossed", crossed: true, state };
+  if (row.pause.met) return { text: "Past its pause line", crossed: true, state };
   if (row.pause.points === 0) return { text: "At its pause line", crossed: false, state };
   return { text: `${formatPoints(row.pause.points)} from its pause line`, crossed: false, state };
 };
@@ -249,8 +249,35 @@ export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
   const crossed = ruled.filter((row) => row.pause?.met).length;
-  if (crossed === 0) return "No area's pause line is crossed this week.";
-  return `Pause ${crossed === 1 ? "line" : "lines"} crossed in ${crossed} of ${ruled.length} areas this week.`;
+  /* A standing state, said as one: "crossed ... this week" sat under "No score
+     crossed a pause or resume line since Sep 30" and read as a contradiction. */
+  if (crossed === 0) return "No area is past its pause line.";
+  return crossed === 1
+    ? `1 of ${ruled.length} areas is past its pause line.`
+    : `${crossed} of ${ruled.length} areas are past their pause line.`;
+};
+
+/**
+ * The card's bridge from the weather word to the five areas (2026-10-14).
+ *
+ * The condition comes from the change lines and the area answers from the
+ * pause and resume lines, so a card could say "Cloudy: money is available"
+ * over a picker where four areas were held, and nothing tied the two. This
+ * names the held areas on the card, in the reader's terms, so the call has a
+ * concrete half before the click: "Cloudy overall. On hold: Hiring,
+ * Fundraising, Spending and New bets."
+ */
+export const describeHeldAreasForCard = (
+  regimeLabel: string,
+  rows: readonly Pick<HomeAreaRow, "area" | "pause">[],
+): string | null => {
+  const ruled = rows.filter((row) => row.pause);
+  if (ruled.length === 0) return null;
+  const held = ruled.filter((row) => row.pause?.met).map((row) => decisionAreaLabel(row.area));
+  if (held.length === 0) return `${regimeLabel} overall. No area is on hold.`;
+  if (held.length === ruled.length) return `${regimeLabel} overall. Every area is on hold.`;
+  const list = held.length === 1 ? held[0] : `${held.slice(0, -1).join(", ")} and ${held.at(-1)}`;
+  return `${regimeLabel} overall. On hold: ${list}.`;
 };
 
 /**

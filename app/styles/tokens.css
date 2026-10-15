@@ -35,6 +35,17 @@
   --color-semantic-caution-bg: var(--line-crossed-bg);
   --color-semantic-easing-fg: var(--line-clear-ink);
   --color-semantic-easing-border: var(--line-clear);
+  /* Caveats (2026-10-14): a fact about the reading rather than the
+     decision. Cached sources, a scoring note, an archived week, guidance
+     held back. They borrowed the crossed red until now, so "read this with
+     care" and "a pause line was crossed" were one colour, and a cached
+     source looked like a stop. A caveat is ink with a hollow ring marker:
+     shape rather than hue, because every hue left free of the four
+     conditions and the red lands on one of them for a deuteranope. Red now
+     means a line and nothing else. */
+  --color-caveat-fg: var(--app-text);
+  --color-caveat-border: var(--app-text-muted);
+  --color-caveat-bg: var(--bg-raised);
   /* "Resume when": a resume line, so the clear ink. */
   --color-semantic-reversal-fg: var(--line-clear-ink);
   --color-semantic-unchanged-border: var(--app-text-muted);
@@ -225,11 +236,14 @@
      Must stay theme-aware: a fixed dark tint washes out the light surface.
      Held low (2026-10-08): at 0.30 a Freezing week dyed the whole first screen,
      so the hero's own rule, stamp and map point had nothing to stand out from.
-     The regime reads as a signal on the card, not as the colour of the room. */
-  --atmosphere-expansion: rgba(217, 168, 44, 0.06);
-  --atmosphere-defensive: rgba(157, 122, 74, 0.06);
-  --atmosphere-scarcity: rgba(58, 111, 163, 0.06);
-  --atmosphere-volatile: rgba(143, 150, 224, 0.06);
+     The regime reads as a signal on the card, not as the colour of the room.
+     Raised to 0.11 (light 0.07) on 2026-10-14, when the page read as
+     monochrome: enough to tint the first screen, still a third of the wash
+     that drowned the card. */
+  --atmosphere-expansion: rgba(217, 168, 44, 0.11);
+  --atmosphere-defensive: rgba(157, 122, 74, 0.11);
+  --atmosphere-scarcity: rgba(58, 111, 163, 0.11);
+  --atmosphere-volatile: rgba(143, 150, 224, 0.11);
   /* Resolved by the data-regime map below; transparent under no regime, so a
      page with no call to make sits on --bg-body itself rather than under the
      flat 3% sky wash the interior backdrop used to paint over every route.
@@ -298,6 +312,14 @@
             0 calc(16 * var(--sh)) calc(32 * var(--sh)) calc(-16 * var(--sh)) var(--shadow-color-mid);
   --elev-4: 0 calc(4 * var(--sh)) calc(9 * var(--sh)) calc(-4 * var(--sh)) var(--shadow-color-soft),
             0 calc(24 * var(--sh)) calc(48 * var(--sh)) calc(-24 * var(--sh)) var(--shadow-color-mid);
+
+  /* Control depth (2026-10-13, ui-ux-standards §XXVI). A control is drawn as a part of an
+     instrument: a recessed well (--well-inset) that keys sit in, and a key that sinks when
+     pressed (--key-pressed). Shadow geometry only, no gradient and no specular (§XXV); like
+     the --elev-* ladder, only the shadow colours flip between themes. */
+  --well-inset: inset 0 calc(1 * var(--sh)) calc(3 * var(--sh)) var(--shadow-color-mid),
+                inset 0 0 0 1px var(--border-subtle);
+  --key-pressed: inset 0 calc(1 * var(--sh)) calc(2 * var(--sh)) var(--shadow-color-soft);
 
   /* Top-edge specular. Dark theme only — on the light theme the surfaces are
      already near-white, so a white inset just muddies the border. */
@@ -405,6 +427,20 @@ body {
 html, body {
   scrollbar-width: thin;
   scrollbar-color: var(--border-strong) transparent;
+}
+
+/* Large displays (2026-10-14). Nothing grew past 1536px: the shell stops at
+   96rem, so a 2560-wide monitor left ~40% of the width as margin and set the
+   brief at laptop size. Every container, gap and type step is rem-based, so
+   one root step scales the page as a whole, like browser zoom, without a
+   second set of widths. Percentages keep a reader's own default size; media
+   queries resolve rem against the initial size, so breakpoints do not move.
+   Screenshot mode pins 16px below, which keeps the shared image identical. */
+@media (min-width: 1800px) {
+  html { font-size: 106.25%; }
+}
+@media (min-width: 2400px) {
+  html { font-size: 118.75%; }
 }
 
 /* Screenshot mode — clean, self-contained view for sharing */
@@ -521,19 +557,6 @@ html[data-screenshot="true"] body {
   --color-rose-400: var(--line-crossed-ink);
   --color-rose-500: var(--line-crossed);
   --color-rose-600: var(--line-crossed);
-  --color-sky-50: var(--accent-action);
-  --color-sky-100: var(--accent-action);
-  --color-sky-200: var(--accent-action);
-  --color-sky-300: var(--accent-action);
-  --color-sky-400: var(--accent-action);
-  --color-sky-500: var(--accent-action);
-  --color-sky-600: var(--accent-action);
-  --color-sky-700: color-mix(in srgb, var(--accent-action) 45%, var(--bg-body));
-  --color-sky-950: color-mix(in srgb, var(--accent-action) 12%, var(--bg-body));
-  --color-cyan-100: var(--accent-action);
-  --color-cyan-200: var(--accent-action);
-  --color-cyan-300: var(--accent-action);
-  --color-cyan-400: var(--accent-action);
   /* The dark end of slate, which the @theme inline block leaves at stock
      blue-grey: folded onto the night chart's own greys. */
   --color-slate-600: #636768;
@@ -588,10 +611,10 @@ html[data-theme="light"] {
   --color-slate-700: #525c60;
 
   /* Light-surface posture tint: the condition fills, held to a wash so text keeps contrast. */
-  --atmosphere-expansion: rgba(217, 168, 44, 0.04);
-  --atmosphere-defensive: rgba(157, 122, 74, 0.04);
-  --atmosphere-scarcity: rgba(58, 111, 163, 0.04);
-  --atmosphere-volatile: rgba(143, 150, 224, 0.04);
+  --atmosphere-expansion: rgba(217, 168, 44, 0.07);
+  --atmosphere-defensive: rgba(157, 122, 74, 0.07);
+  --atmosphere-scarcity: rgba(58, 111, 163, 0.07);
+  --atmosphere-volatile: rgba(143, 150, 224, 0.07);
 
   /* Phase-map quadrants and furniture, re-mixed for a white plot ground: the
      washes a touch lighter than on the dark chart, and the grid and trace
@@ -655,6 +678,44 @@ html[data-theme="light"] {
 [data-regime="SCARCITY"] { --regime-accent: #3a6fa3; --regime-ink: var(--color-condition-freezing-ink); --regime-atmosphere: var(--atmosphere-scarcity); }
 [data-regime="DEFENSIVE"] { --regime-accent: #9d7a4a; --regime-ink: var(--color-condition-cloudy-ink); --regime-atmosphere: var(--atmosphere-defensive); }
 [data-regime="VOLATILE"] { --regime-accent: #8f96e0; --regime-ink: var(--color-condition-stormy-ink); --regime-atmosphere: var(--atmosphere-volatile); }
+
+/* The week's colour is the action colour (2026-10-14). Under a shell that
+   knows its regime, links, buttons, the selected pill and focus rings draw in
+   --regime-ink rather than the text ink, so a Sunny week's controls are gold
+   and a Freezing week's are frost. This is still no fifth hue: the action
+   colour is whichever condition the page is already stating. With no regime
+   the attribute is absent and :root's ink holds.
+
+   Everything here derives from --accent-action, and a custom property that
+   reads another is resolved where it is declared, so the derived tokens and
+   the sky/cyan aliases are declared again on [data-regime] to pick the
+   week's value up. --regime-ink clears 4.5:1 on ground and panel in both
+   themes, which is what lets it carry link text. */
+:root, [data-regime] {
+  --color-sky-50: var(--accent-action);
+  --color-sky-100: var(--accent-action);
+  --color-sky-200: var(--accent-action);
+  --color-sky-300: var(--accent-action);
+  --color-sky-400: var(--accent-action);
+  --color-sky-500: var(--accent-action);
+  --color-sky-600: var(--accent-action);
+  --color-sky-700: color-mix(in srgb, var(--accent-action) 45%, var(--bg-body));
+  --color-sky-950: color-mix(in srgb, var(--accent-action) 12%, var(--bg-body));
+  --color-cyan-100: var(--accent-action);
+  --color-cyan-200: var(--accent-action);
+  --color-cyan-300: var(--accent-action);
+  --color-cyan-400: var(--accent-action);
+}
+
+[data-regime] {
+  --accent-action: var(--regime-ink);
+  --accent-info: var(--accent-action);
+  --accent-border: color-mix(in srgb, var(--regime-ink) 42%, transparent);
+  --accent-border-soft: color-mix(in srgb, var(--regime-ink) 20%, transparent);
+  --focus-halo: 0 0 0 calc(4 * var(--sh)) var(--accent-border-soft);
+  --cta-fill: var(--accent-action);
+  --cta-border: var(--accent-action);
+}
 
 /* Light mode: remap opacity-based v2 styles onto the three text roles.
    154 usages spread across 12 alpha steps used to be mapped one line at a time,

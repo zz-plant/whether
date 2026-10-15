@@ -10,6 +10,9 @@ import { ToolkitLibraryPanels } from "../app/resources/components/toolkitLibrary
 import { resolveSearchCommandHref, SEARCH_JOB_ORDER } from "../app/search/searchCommand";
 import { navigationGroups } from "../lib/navigation/informationArchitecture";
 import { resourcePillarPages } from "../lib/resourcesContent";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /* The answer page's copy button reads the router. Spread, so the next file still gets the real module's other exports. */
 const mockAny: any = mock;

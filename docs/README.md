@@ -84,7 +84,6 @@ Use these when shaping follow-on work, not as sole implementation truth:
 - `design-debt-prioritized.md` — the one UI/UX and IA design-debt tracker: shipped rows and open ones
 - `implementation-status.md` — implementation status and milestone tracker
 - `roadmap-prioritized-spec.md` — prioritized, detailed specs for open roadmap items
-- `premium-launch-readiness.md` — launch readiness for pricing/billing
 - `product-marketing-review-2026-08-29.md` — PMM review and launch checks
 - `launch/show-hn.md` — Show HN launch kit: title options, post text and prepared answers; not yet posted
 - `sales-competitive-messaging.md` — ICP, competitor battlecards and objection handling for internal sales prep; only the primary ICP is validated

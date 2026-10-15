@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { afterEach, beforeEach, describe, it } from "bun:test";
 import {
   getBundledMonthlyRegimeHistory,
@@ -7,11 +8,13 @@ import {
   MONTHLY_REGIME_HISTORY_KV_KEY,
   parseMonthlyRegimeHistory,
   primeMonthlyRegimeHistory,
+  primeMonthlyRegimeHistoryForRead,
   resetPrimedMonthlyRegimeHistory,
   type MonthlyRegimeHistoryEntry,
 } from "../lib/summary/monthlyRegimeHistory";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 import type { KvNamespace } from "../lib/runtime/kv";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 
 class FakeKv implements KvNamespace {
   readonly entries = new Map<string, string>();
@@ -44,6 +47,7 @@ const entry = (
 const liveReport = (record_date: string, regime: MonthlyRegimeHistoryEntry["regime"]) => async () => ({
   assessment: { regime, scores: { tightness: 61, riskAppetite: 42 } },
   treasury: { record_date, isLive: true },
+  macroSeries: liveMacroSeries,
 });
 
 let kv: FakeKv;
@@ -137,6 +141,31 @@ describe("monthly regime history read path", () => {
     assert.deepEqual(getMonthlyRegimeHistory(), getBundledMonthlyRegimeHistory());
   });
 
+  it("primes for a read under a bound, and leaves the floor when KV fails", async () => {
+    const future = entry("2099-01-29", "SCARCITY");
+    await kv.put(MONTHLY_REGIME_HISTORY_KV_KEY, JSON.stringify([future]));
+    kv.failReads = true;
+
+    await primeMonthlyRegimeHistoryForRead();
+    assert.deepEqual(getMonthlyRegimeHistory(), getBundledMonthlyRegimeHistory());
+
+    kv.failReads = false;
+    await primeMonthlyRegimeHistoryForRead();
+    assert.deepEqual(getMonthlyRegimeHistory().at(-1), future);
+  });
+
+  // Source-level, because app/page.tsx suspends at the report read in this suite and does not
+  // render. Its history read sits outside the cached report loader, which is where the report
+  // path primes, so on a cache hit nothing else has primed the module before the page reads it.
+  it("is primed by the homepage before the page reads it", async () => {
+    const page = await readFile("app/page.tsx", "utf8");
+    const prime = page.indexOf("await primeMonthlyRegimeHistoryForRead()");
+    const read = page.indexOf("getMonthlyRegimeHistory()");
+
+    assert.ok(prime > -1, "app/page.tsx no longer primes the history");
+    assert.ok(prime < read, "app/page.tsx reads the history before priming it");
+  });
+
   it("keeps the floor when there is no KV binding at all", async () => {
     Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
 
@@ -173,6 +202,7 @@ describe("refreshMonthlyRegimeHistory", () => {
       loadReport: async () => ({
         assessment: { regime: "DEFENSIVE" as const, scores: { tightness: 70, riskAppetite: 30 } },
         treasury: { record_date: "2099-03-31", isLive: false },
+        macroSeries: liveMacroSeries,
       }),
     });
 
@@ -182,11 +212,60 @@ describe("refreshMonthlyRegimeHistory", () => {
     assert.equal(kv.entries.has(MONTHLY_REGIME_HISTORY_KV_KEY), false);
   });
 
+  // Treasury live, one FRED macro fetch failed: the loader keeps that series' snapshot value
+  // and the engine scores it, so the month's regime rests on an input no live source backs.
+  it("refuses a read whose Treasury is live but a fetch-backed macro series is not", async () => {
+    const result = await refreshMonthlyRegimeHistory({
+      loadReport: async () => ({
+        assessment: { regime: "DEFENSIVE" as const, scores: { tightness: 70, riskAppetite: 30 } },
+        treasury: { record_date: "2099-03-31", isLive: true },
+        macroSeries: liveMacroSeries.map((series) =>
+          series.id === "VIX_INDEX" ? { ...series, isLive: false } : series,
+        ),
+      }),
+    });
+
+    assert.equal(result.wrote, false);
+    assert.equal(result.error, "degraded read");
+    assert.equal(kv.entries.has(MONTHLY_REGIME_HISTORY_KV_KEY), false);
+  });
+
+  // A failed read is not an empty history. Writing [entry] over it would delete every month the
+  // cron recorded since the last deploy, even though the outage may be over by the put.
+  it("writes nothing when the stored history cannot be read", async () => {
+    const prior = JSON.stringify([entry("2099-01-29", "SCARCITY")]);
+    await kv.put(MONTHLY_REGIME_HISTORY_KV_KEY, prior);
+    kv.failReads = true;
+
+    const failedGet = await refreshMonthlyRegimeHistory({ loadReport: liveReport("2099-02-26", "VOLATILE") });
+    assert.equal(failedGet.ok, false);
+    assert.equal(failedGet.wrote, false);
+    assert.equal(kv.entries.get(MONTHLY_REGIME_HISTORY_KV_KEY), prior);
+
+    kv.failReads = false;
+    for (const unreadable of ["not json", JSON.stringify([{ record_date: 5 }]), JSON.stringify({})]) {
+      await kv.put(MONTHLY_REGIME_HISTORY_KV_KEY, unreadable);
+      const result = await refreshMonthlyRegimeHistory({ loadReport: liveReport("2099-02-26", "VOLATILE") });
+      assert.deepEqual(result, { ok: false, wrote: false, month: "2099-02", error: "stored history unreadable" });
+      assert.equal(kv.entries.get(MONTHLY_REGIME_HISTORY_KV_KEY), unreadable);
+    }
+  });
+
+  it("starts the history when the stored value is an empty list", async () => {
+    await kv.put(MONTHLY_REGIME_HISTORY_KV_KEY, "[]");
+
+    const result = await refreshMonthlyRegimeHistory({ loadReport: liveReport("2099-02-26", "VOLATILE") });
+
+    assert.equal(result.wrote, true);
+    assert.equal(storedEntries().length, 1);
+  });
+
   it("reports a failure when there is no record date to file the month under", async () => {
     const result = await refreshMonthlyRegimeHistory({
       loadReport: async () => ({
         assessment: { regime: "EXPANSION" as const, scores: { tightness: 40, riskAppetite: 60 } },
         treasury: { isLive: true },
+        macroSeries: liveMacroSeries,
       }),
     });
 

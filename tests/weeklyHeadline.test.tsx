@@ -9,6 +9,9 @@ import { formatGuidance } from "../lib/export/briefBuilders";
 import { getPublishedBriefs, publishedBriefHeadline } from "../lib/report/publishedBriefs";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({

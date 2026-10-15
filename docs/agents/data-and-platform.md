@@ -87,6 +87,34 @@ and its history download now serves a JavaScript proof-of-work page, so it is no
 
 ## Ingest coordinator
 
+**`/api/health` reports degraded feeds (2026-10-13).** It used to ask only whether a report
+loaded, and a report built from stale inputs loads: it said "ok" while `/trust` read
+"Treasury · Stale · 14h old". It now lists every live source `/trust` counts as degraded
+(`listDegradedLiveSources`, `lib/report/sourceHealth.ts`) under `degradedSources`, each with a
+`state`: `stale` (past its window), `unconfirmed` (no fetch on record) or `cached` (a fallback
+inside its window). `staleSources` is the `stale` subset. Any entry makes the overall status
+`"degraded"` (HTTP 200). `dependencies.dataFreshness` is `stale`, `ok`, or `unknown` when no
+report loaded. `bun run smoke:prod` fails on `"degraded"` and names the feeds, and
+`whether doctor` reports it as a warning.
+
+**Two freshness checks, because readers and the alarm see different data (2026-10-13).** The
+source rows follow the stored `OperatingSnapshot`, which only the scheduled cron writes (02:00
+UTC daily), so Treasury's window is the ingest cadence's 26h: a 6h window called every healthy
+afternoon stale. The coordinator's hourly alarm refreshes the materialized model behind the
+snapshot, and nothing republishes the snapshot from it, so the source rows cannot see a stopped
+alarm. `dependencies.ingestModel` (`ok` / `stale` / `unknown`, with `ingestModelAsOf`) judges the
+model's `asOf` against `INGEST_MODEL_STALE_AFTER_MS` (6h, `lib/ingestion/cadence.ts`); stale is
+also `"degraded"`. #1587 and #1586 each fixed one of these by breaking the other. Treasury's 26h
+is calendar hours, not business hours: the cron runs every day, and counting business hours let a
+Friday fetch read "fresh" on Monday with three runs missed.
+
+**It installs its env (2026-10-13).** The object is an entry point like the fetch and scheduled
+handlers, and may run in an isolate neither has primed. Its constructor ignored `env` until
+2026-10-13, so the hourly alarm's ingest read no `FRED_API_KEY` through `readSetting`; in
+production every feed sat at the 02:00 cron's fetch all day ("Treasury · Stale · 14h old" on
+`/trust`). It calls `installBindings(env)` now, and `tests/ingestCoordinator.test.ts` holds it.
+Any new Durable Object or Workflow that calls into `lib/` does the same.
+
 `worker/ingestCoordinator.ts` is a SQLite-backed Durable Object that owns the materialized
 model, the refresh lock, and an hourly alarm that ingests due families. It replaces KV's
 best-effort lock (two isolates can win the same expired lock) with real mutual exclusion and

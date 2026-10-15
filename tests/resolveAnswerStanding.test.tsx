@@ -7,6 +7,9 @@ import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { answerPages } from "../app/answers/decisionPages";
 import { featuredAnswerPages } from "../app/answers/selectors";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * (The list moved from /resolve to Guides, /resources, on 2026-10-08, grouped by
@@ -37,7 +40,7 @@ describe("an answer's standing this week", () => {
         areaRows: ROWS,
         conditionsLabel: "Freezing",
       }),
-      { kind: "area", text: "Pause line crossed", crossed: true, state: "crossed" },
+      { kind: "area", text: "Past its pause line", crossed: true, state: "crossed" },
     );
     assert.deepEqual(
       describeAnswerStanding({

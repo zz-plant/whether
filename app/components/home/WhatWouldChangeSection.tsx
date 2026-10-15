@@ -15,7 +15,12 @@ type HomeScoreLadder = {
   lines: HomeLadderLine[];
 };
 
-type FlipProximityLine = { axis: "tightness" | "riskAppetite"; sentence: string };
+type FlipProximityLine = {
+  axis: "tightness" | "riskAppetite";
+  sentence: string;
+  /** How big the move is against a Fed step and the record's months (`describeMarketMoveScale`). */
+  scale?: string | null;
+};
 
 /**
  * What would change this guidance, fourth on the page (2026-10-09): the pause
@@ -111,6 +116,15 @@ export function WhatWouldChangeSection({
 
   return (
     <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading}>
+      {/* The three lines, once, before the sentences that use them (2026-10-14).
+          Each score carries a pause, a resume and a change line, and nowhere on
+          the page said what each one does; a first reader met all three in the
+          card's trust strip and the ladders before any definition. */}
+      <p className="mb-4 max-w-2xl text-fluid-xs leading-relaxed text-slate-400" data-line-key>
+        Each score has three lines. Past its <span className="font-semibold text-slate-200">pause line</span>, hold back the areas it governs.
+        Back past its <span className="font-semibold text-slate-200">resume line</span>, start them again. Across its{" "}
+        <span className="font-semibold text-slate-200">change line</span>, the week&rsquo;s conditions change.
+      </p>
       <div
         className={
           ladders.length === 0
@@ -153,6 +167,7 @@ export function WhatWouldChangeSection({
                 {marketMoves.map((line) => (
                   <li key={line.sentence} data-flip-axis={line.axis}>
                     <span className="text-slate-400">{line.label}:</span> {line.sentence}
+                    {line.scale ? <span className="block text-slate-400">{line.scale}</span> : null}
                   </li>
                 ))}
               </ul>

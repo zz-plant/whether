@@ -76,7 +76,7 @@ export function SignalReadingPanel({
       </dl>
 
       {reading.caveat ? (
-        <p className="border-l-2 border-semantic-caution-border pl-3 text-sm text-slate-300">
+        <p className="weather-caveat-mark border-l-2 border-caveat-border pl-3 text-sm text-slate-300">
           {reading.caveat}
         </p>
       ) : null}

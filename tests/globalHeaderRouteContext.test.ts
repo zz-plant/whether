@@ -6,7 +6,7 @@ import { hasVisibleActiveNavLink, resolveGlobalHeaderRouteLabel } from "../lib/n
 /**
  * The header may drop the route label beside the wordmark only where a group
  * tab marks the route. Every grouped page and route family does; utility and
- * legal routes — `/pricing`, `/about`, `/share` — sit outside the groups, so the
+ * legal routes — `/about`, `/share`, `/api-docs` — sit outside the groups, so the
  * label comes back for those.
  */
 
@@ -18,7 +18,7 @@ describe("route context in the global header", () => {
   });
 
   it("reports none for utility and unlisted routes, which then keep their label", () => {
-    for (const pathname of ["/pricing", "/about", "/share"]) {
+    for (const pathname of ["/about", "/share", "/api-docs"]) {
       assert.equal(hasVisibleActiveNavLink(pathname), false, pathname);
       // Whatever the header falls back to must actually name something.
       const label = resolveGlobalHeaderRouteLabel(pathname);

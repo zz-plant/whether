@@ -6,6 +6,9 @@ import { isValidElement, type ReactNode } from "react";
 import { renderOgElement } from "../app/api/og/renderOgElement";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP } from "../lib/image/ogFonts";
 import { collectPageShareCards } from "./fixtures/pageShareCards";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * What every sitemap page previews as when its link is shared.

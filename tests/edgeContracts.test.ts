@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { GET as getWeeklyRoute, runtime as weeklyRuntime } from "../app/api/weekly/route";
 import { runtime as homeRuntime } from "../app/page";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("edge runtime contracts", () => {
   it("keeps critical routes/pages on edge runtime", () => {

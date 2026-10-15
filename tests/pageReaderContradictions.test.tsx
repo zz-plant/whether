@@ -15,7 +15,6 @@ import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import { TRACK_RECORD_MIN_MONTHS, buildTrackRecord } from "../lib/report/trackRecord";
 import type { TimeMachineRegimeEntry } from "../lib/timeMachine/timeMachineCache";
-import { pricingPlans } from "../lib/pricing";
 import { FormulaReference } from "../app/trust/formulaReference";
 import { RISK_GAP_TO_TIGHTNESS_EQUIVALENT } from "../lib/regimeEngine";
 import { buildLlmsTxt } from "../lib/seo/llmsTxt";
@@ -200,30 +199,6 @@ describe("/history dates what it is showing", () => {
       source.includes("last completed"),
       "the phase map no longer says which period its latest point covers",
     );
-  });
-});
-
-describe("/pricing agrees with /privacy about where a reader's data goes", () => {
-  /*
-   * /privacy 2.4 tells a reader that recorded decisions are held in Cloudflare
-   * KV against their browser identifier, and everything else stays local. The
-   * free tier's bullet said decision memory was "saved in this browser", which
-   * understates where it goes — the direction that costs trust.
-   */
-  const freePlan = pricingPlans.find((plan) => plan.id === "free");
-
-  it("does not claim recorded decisions stay in the browser", () => {
-    assert.ok(freePlan, "expected a free plan");
-    const decisionBullets = freePlan.features.filter((feature) => /decision/i.test(feature));
-
-    assert.ok(decisionBullets.length > 0, "expected the free tier to describe decision memory");
-    for (const bullet of decisionBullets) {
-      assert.doesNotMatch(
-        bullet,
-        /saved in this browser/i,
-        `"${bullet}" contradicts /privacy 2.4, which puts recorded decisions in KV`,
-      );
-    }
   });
 });
 
@@ -470,7 +445,7 @@ describe("an area row prints the line that explains its state", () => {
     const row = (area: string) => rows.find((candidate) => candidate.area === area);
 
     assert.equal(row("capital-raising")?.pause?.line, "Funding pressure > 76");
-    assert.equal(row("capital-raising")?.pause?.distance, "crossed");
+    assert.equal(row("capital-raising")?.pause?.distance, "past the line");
     assert.equal(row("hiring")?.resume?.line, "Funding pressure < 66");
     assert.equal(row("hiring")?.resume?.distance, "24 pts away");
   });

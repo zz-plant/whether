@@ -76,7 +76,7 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   ESLint and `eslint-config-next` are gone, which is also what let TypeScript move to 7:
   typescript-eslint was the only consumer of the compiler API, which TS 7 does not ship until 7.1.
 - **Suppressions are themselves a gated metric.** `bun run check:suppressions`
-  (`scripts/check-suppression-census.ts`) counts inline lint disables, `@ts-*` comments, skipped
+  (the `suppression-census` package, configured in `scripts/census.config.ts`) counts inline lint disables, `@ts-*` comments, skipped
   tests, lint rules disabled globally, and lint rules an `overrides` block turns off, against a
   hand-edited baseline — and fails when any of them rises. It exists because every other ratchet here —
   the rule burn-down, `lint:types`, the suite — can be turned green by suppressing the finding
@@ -91,11 +91,21 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   change and belongs in its own PR with the reason.
 
   **Both census scripts are mechanism only (2026-10-06).** Everything that names this repo — the
-  scanned roots, the framework's convention names, the data directories, the self-exclusions, both
-  baselines and the test-file floor — is in `scripts/census.config.ts`, and both walk the tree
-  through one shared `scripts/walk-files.mjs`, which is also what `scripts/run-tests.mjs` uses for
-  its discovery guards. One walk, because two copies had already drifted: the guarded `statSync`
-  below existed in the dead-export scan and not in this one.
+  scanned roots, the framework's convention names, the data directories, both baselines and the
+  test-file floor — is in `scripts/census.config.ts`. The dead-export scan walks the tree through
+  `scripts/walk-files.mjs`, which is also what `scripts/run-tests.mjs` uses for its discovery
+  guards; the two census walks had already drifted once (the guarded `statSync` below existed in
+  the dead-export scan and not in this one).
+
+  **The suppression mechanism is a package now (2026-10-07).** It moved to
+  [`suppression-census`](https://github.com/zz-plant/suppression-census) with its fixture tests,
+  and its walk carries the same guard: an entry it cannot stat is skipped, not fatal. The CLI reads
+  `suppressionCensusConfig` out of `scripts/census.config.ts` directly. The self-exclusion list is
+  empty as a result: it existed because the script and its test spelled every pattern out as
+  literals, and the script is gone while `tests/suppressionCensus.test.ts` names no pattern. That
+  file now counts toward the test-file floor, which is why the count rose by one. A package change
+  reaches this repo only through a version bump in `package.json`, so rerun `check:suppressions`
+  and `check:dead-exports` on every bump.
 - **An unused export is a gated metric too (2026-09-15).** `bun run check:dead-exports`
   (`scripts/check-dead-exports.ts`) counts exported declarations under `app/`, `lib/` and
   `worker/` that no other scanned file mentions, against a baseline of **zero**. A sweep that
@@ -179,7 +189,10 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   When a check passes everywhere you can look, enumerate what the place you cannot look *has* that
   you do not — credentials first.
 - **The suite runs offline.** `bunfig.toml` preloads `scripts/test-network-guard.ts` for every
-  `bun test`, and an outbound fetch throws instead of leaving the box; loopback stays open, because
+  `bun test` (the guard itself is the
+  [`bun-test-network-guard`](https://github.com/zz-plant/bun-test-network-guard) package since
+  2026-10-07; the preload keeps this repo's allow variable, hint and ingestion directory), and an
+  outbound fetch throws instead of leaving the box; loopback stays open, because
   `tests/whetherCli.test.ts` starts its own server. This is the same argument as the stripped API
   keys one line up, taken to its end: a result that depends on what the environment happens to
   allow is not a result about the code. Measured 2026-09-03, it took the suite from **49.3s to
@@ -223,8 +236,8 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   unexamined. Two of those five are Worker-authored (`ingest-pipeline`, `cron-step`) and one of
   those two is read back and rendered on `/trust` as "Scheduled runs" — anyone could have posted a
   run that never happened onto the page whose job is to be trustworthy. A third, `premium-funnel`,
-  has its own route with a body cap and a validator, which shadows the dynamic one anyway, so its
-  entry there was a weaker door Next never opened. The accepted set is now the keys of
+  had its own route with a body cap and a validator, which shadowed the dynamic one anyway, so its
+  entry there was a weaker door Next never opened (that route went with the paid tier on 2026-10-14). The accepted set is now the keys of
   `STREAM_VALIDATORS`: a stream with no validator cannot be posted, and adding one without a
   validator does not typecheck. The declared list lives once, in `TELEMETRY_STREAMS`, with the union
   derived from it and the census script reading it.
@@ -254,10 +267,10 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   drive interpreters the build image does not guarantee (today: none; it held a Python analytics
   script until 2026-09-16), so the deploy gate leaves the directory out and says so only when it
   excluded something, while every local run and pre-push still runs it. The stripped environment
-  (see the two entries above on API keys and Cloudflare credentials) also drops `SLACK_WEBHOOK_URL`
-  and `PREMIUM_FUNNEL_WEBHOOK_URL`, for a sharper reason than rerouting a fixture: a webhook URL *is*
-  the credential, secret and all, in the path, and `lib/premiumFunnel.ts` hands one straight to the
-  global `fetch`, so with one exported a test could post to a real Slack channel. The network guard
+  (see the two entries above on API keys and Cloudflare credentials) also drops `SLACK_WEBHOOK_URL`,
+  for a sharper reason than rerouting a fixture: a webhook URL *is* the credential, secret and all,
+  in the path, and `lib/delivery/slack.ts` posts to it through the global `fetch`, so with one
+  exported a test could post to a real Slack channel. The network guard
   would catch and name it by origin only, but the suite should not be holding the secret at all.
 
 - **The landmark audit's smaller rules (moved here from its headers, 2026-10-07).**

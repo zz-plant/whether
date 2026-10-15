@@ -12,7 +12,7 @@ import { YourRecordNote } from "./components/home/YourRecordNote";
 import { ActivationTracker } from "./components/activationTracker";
 import { OperatorWorkflowRouteTracker } from "./components/operatorWorkflowRouteTracker";
 import { ConditionsLegend } from "./components/home/ConditionsLegend";
-import { TimeMachineCalendarPicker } from "./components/TimeMachineCalendarPicker";
+import { WeekStepper } from "./components/home/WeekStepper";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
@@ -27,10 +27,11 @@ import {
 import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
+import { describeMarketMoveScale } from "../lib/report/marketMoveScale";
 import { describeMovementCause } from "../lib/report/decisionMovement";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
-import { getMonthlyRegimeHistory } from "../lib/summary/monthlyRegimeHistory";
+import { getMonthlyRegimeHistory, primeMonthlyRegimeHistoryForRead } from "../lib/summary/monthlyRegimeHistory";
 import { HomeBriefLoadError } from "./components/home/HomeBriefLoadError";
 import {
   buildTimeMachineHref,
@@ -41,7 +42,6 @@ import {
 import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
-import { ChevronLeft, ChevronRight } from "lucide-react";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { AllAreaRules } from "./components/home/AllAreaRules";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
@@ -58,21 +58,23 @@ import {
   buildSignalChangeRows,
   describeConditionsTrail,
   describeEarlierConditions,
+  describeHeldAreasForCard,
   describeWeeklyMovement,
+  HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { RegimeRadar } from "./components/home/RegimeRadar";
 import { buildTrustStripProps } from "../lib/report/evidenceReaderModel";
-import { describeCitableBriefBasis } from "../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, describeCitableBriefBasis, getPublishedBriefs, publishedBriefWeekLabel, selectCitablePermalinkBrief } from "../lib/report/publishedBriefs";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
-import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
+import { getTimeMachineRegimeSeries, getTimeMachineYieldCurveSeries } from "../lib/timeMachine/timeMachineCache";
 import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCache";
 import { JsonLdScript } from "./components/jsonLdScript";
 import { PublishedCallWatcher } from "./components/publishedCallWatcher";
 import { OfflineNotice } from "./components/offlineNotice";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
-import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
 import { findLeadAnswerForArea } from "./answers/decisionPages";
@@ -96,6 +98,10 @@ export default async function Page({
   searchParams?: Promise<HomePageSearchParams>;
 }) {
   const resolved = searchParams ? await searchParams : undefined;
+  /* Primed here, not left to the report read: that primes inside the home
+     page's cached loader, which a cache hit skips, so a new isolate served
+     from the cache drew the conditions trail from the bundled months alone. */
+  await primeMonthlyRegimeHistoryForRead();
   const regimeHistory = getMonthlyRegimeHistory();
 
   /* PageContent mounts the Shell itself so the page's atmosphere is keyed to
@@ -205,6 +211,13 @@ async function PageContent({
   /* The week by its Monday, as the frozen brief and every share name it. The
      reading's own date (often a Wednesday) is the trust strip's "Data as of". */
   const weekOfLabel = `Week of ${formatWeekMondayUTC(reportData.treasury.record_date)}`;
+  /* The archive is month-end readings, so an archived view is named by its
+     month-end, not by a Monday (2026-10-14). It said "Week of Sep 28" under a
+     banner reading "Viewing September 2026", and the arrows said "week" while
+     stepping a month at a time. */
+  const periodLabel = historicalSelection
+    ? `Month-end ${formatDateUTC(historicalSelection.asOf)}`
+    : weekOfLabel;
   const asOfDate = timeMachineRequest
     ? resolveHistoricalDate(timeMachineRequest.year, timeMachineRequest.month)
     : null;
@@ -287,7 +300,17 @@ async function PageContent({
      interest-rate terms" fold under that sentence prints them. */
   const v2HeroSignalData = {
     ...buildV2HeroSignalData(reportData),
-    flipProximity: buildFlipProximity(reportData.assessment),
+    flipProximity: buildFlipProximity(reportData.assessment).map((line) => ({
+      ...line,
+      /* Each move against a Fed step and the record's own months, so a reader
+         can hold a headline against the line (`marketMoveScale.ts`). */
+      scale: describeMarketMoveScale({
+        input: line.input,
+        move: line.inputMove,
+        baseRateUsed: reportData.assessment.scores.baseRateUsed,
+        series: getTimeMachineYieldCurveSeries(Number.MAX_SAFE_INTEGER),
+      }),
+    })),
   };
 
   // The first rule is the one whose pause sentence the guardrail slot prints
@@ -414,6 +437,15 @@ async function PageContent({
     const answer = findLeadAnswerForArea(area);
     return [{ ...row, answer: answer ? { href: `/answers/${answer.slug}`, title: answer.title } : undefined }];
   });
+  /* How long these conditions lasted before, against the reader's chosen band.
+     Left out of an archived view, whose record would have to end at its month. */
+  const spellLengths = historicalSelection || !isRegimeKey(regime)
+    ? null
+    : describeSpellLengths({
+        series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+        currentRegime: regime,
+        runwayBand: data.operatorContext.companyRunway ?? null,
+      });
   const turningPoints = findRecentCallChanges(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER), 4).map((change) => ({
     label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
     href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
@@ -469,6 +501,39 @@ async function PageContent({
         }),
   });
 
+  /* This week's published brief, where it reads different conditions from the
+     card (2026-10-14). The note sat in the trust strip's small print, so a
+     reader who opened /history saw the same week under another answer and no
+     reason on the card. It now heads the card's caveats with a link to what
+     was published, and the strip stops repeating it. */
+  const citableBrief = historicalSelection ? undefined : selectCitablePermalinkBrief(reportData.treasury.record_date);
+  const basisNote = trustStripProps.basis.note ?? null;
+  const publishedNotice = citableBrief && basisNote
+    ? {
+        text: basisNote,
+        href: buildPublishedBriefPath(citableBrief.slug),
+      }
+    : undefined;
+  /* An archived month whose published weeks read other conditions: the archive
+     is the month-end re-scored on today's formula, the briefs are what went out. */
+  const monthPrefix = historicalSelection
+    ? `${historicalSelection.year}-${String(historicalSelection.month).padStart(2, "0")}-`
+    : null;
+  const differingBrief = monthPrefix
+    ? getPublishedBriefs().find((brief) => brief.recordDate.startsWith(monthPrefix) && brief.regime !== reportData.assessment.regime)
+    : undefined;
+  const archivedPublishedNotice = differingBrief
+    ? {
+        text: `The brief published for the week of ${publishedBriefWeekLabel(differingBrief)} read ${getRegimePublicLabel(differingBrief.regime)}. This view is the month-end, scored with today's formula.`,
+        href: buildPublishedBriefPath(differingBrief.slug),
+      }
+    : undefined;
+  const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(publicRegimeLabel, decisionPickerOptions);
+  const heroAreas = heldAreasLine
+    ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
+    : undefined;
+  const heroTrust = publishedNotice ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null } } : trustStripProps;
+
   return (
     <Shell regime={regime}>
       <BriefArtifactScript artifact={briefArtifact} />
@@ -492,6 +557,7 @@ async function PageContent({
             month={historicalSelection.month}
             asOfLabel={formatDateUTC(historicalSelection.asOf)}
             liveHref="/"
+            published={archivedPublishedNotice}
           />
         </div>
       ) : null}
@@ -525,46 +591,15 @@ async function PageContent({
               follow the call beside Copy Brief, so wrapping controls cannot
               push the reading below the first phone viewport. */}
           <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
-            <div>
-              <div className="flex items-center gap-2">
-                {prevWeekHref ? (
-                  <Link
-                    href={prevWeekHref}
-                    aria-label="Previous week"
-                    className="weather-hit-box flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
-                  >
-                    <ChevronLeft size={16} />
-                  </Link>
-                ) : (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/40 bg-slate-900/30 text-slate-600 cursor-not-allowed">
-                    <ChevronLeft size={16} />
-                  </span>
-                )}
-
-                {/* Navigation coverage stays unfiltered: an archived month is a
-                    filtered chart, not a filtered calendar. Passing the aligned
-                    series here removed every period after the archived month. */}
-                <TimeMachineCalendarPicker
-                  currentDateLabel={cadenceTitle ?? weekOfLabel}
-                  isHistorical={Boolean(historicalSelection)}
-                  history={regimeHistory}
-                />
-
-                {nextWeekHref ? (
-                  <Link
-                    href={nextWeekHref}
-                    aria-label="Next week"
-                    className="weather-hit-box flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800 bg-slate-900/90 text-slate-400 hover:text-white hover:border-slate-700 transition-colors no-underline"
-                  >
-                    <ChevronRight size={16} />
-                  </Link>
-                ) : (
-                  <span className="flex h-7 w-7 items-center justify-center rounded-lg border border-slate-800/40 bg-slate-900/30 text-slate-600 cursor-not-allowed">
-                    <ChevronRight size={16} />
-                  </span>
-                )}
-              </div>
-            </div>
+            <WeekStepper
+              previousHref={prevWeekHref}
+              nextHref={nextWeekHref}
+              previousLabel="Previous month-end"
+              nextLabel={nextHistoricalRequest ? "Next month-end" : "This week"}
+              currentDateLabel={cadenceTitle ?? periodLabel}
+              isHistorical={Boolean(historicalSelection)}
+              history={regimeHistory}
+            />
           </div>
           {/* No timeline scrubber above the call any more. The meta row's chevrons
               and calendar picker are the period controls; the regime stripe
@@ -611,14 +646,16 @@ async function PageContent({
                         How they are set
                       </Link>
                     }
-                    className="ml-auto w-full max-w-[288px]"
+                    className="ml-auto w-full max-w-[18rem]"
                   />
                 }
                 /* An archived week carries no live trust: the banner above says
                    which week is on screen, and a freshness strip under a past
                    call would date it to today. */
-                trust={historicalSelection ? null : trustStripProps}
-                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? weekOfLabel}` : undefined}
+                trust={historicalSelection ? null : heroTrust}
+                published={publishedNotice}
+                areas={heroAreas}
+                captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
                   today; combining it with an archived regime would date the
@@ -684,6 +721,7 @@ async function PageContent({
             >
               <AllAreaRules
                 rows={homeAreaRows}
+                heldGroups={decisionMovement?.heldGroups}
                 regime={regime}
                 planHref={isRoute(operateHref) ? operateHref : "/operate"}
                 isHistorical={Boolean(historicalSelection)}
@@ -727,7 +765,7 @@ async function PageContent({
             />
 
             {/* 7. Has this happened before? */}
-            <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} />
+            <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} spellLengths={spellLengths} />
 
             {/* Last, as a line rather than a section: the way out to every share
                 format, and the week's published brief. */}

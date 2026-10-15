@@ -258,7 +258,6 @@ export const buildWeeklyDecisionCardModel = (
     ...overrides.decision,
   },
   presentation: {
-    whyItMattersLine: "External conditions shape how aggressively teams hire, spend, and approve long-payback work this week.",
     readThisCardItems: [
       { label: "What changed", detail: "Pressure rose compared to last week." },
       { label: "What action it changes", detail: "Revise hiring and roadmap calls now." },
@@ -363,7 +362,7 @@ export const buildWeeklyDecisionCardModel = (
     flipRiskMeter: {
       progressPercent: 50,
       urgencyLabel: "Medium",
-      detailLabel: "The call could change within weeks. Keep approvals reversible and review weekly.",
+      detailLabel: "The call could change within weeks. Keep new commitments reversible and review weekly.",
       triggerLabel: "Tightness above 70.0.",
     },
     regimeVelocity: { status: "insufficient_history", from: "Expansion", to: "Mixed", sampleSize: 1, displayLabel: "Expansion→Mixed: insufficient history" },

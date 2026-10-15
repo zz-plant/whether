@@ -67,7 +67,11 @@ The argument for not waiting on a longer preview trial: the archive is deliberat
 backfilled, so every week spent proving this is a week the record can never honestly claim, and the
 failure modes are bounded — a bad run throws, opens no pull request, and writes a failing row;
 `assembleCurrentWeekBrief` refuses degraded and fallback data outright; and nothing merges the pull
-request without a person.
+request without a person. (Superseded 2026-10-14: the Workflows now merge their own data pull request
+once Cloudflare's branch build of it is green and it changes only its data file. A person merged w38
+through w41 by hand, and judging that a green gate ran on a one-file data change is mechanical. The
+branch build is the gate a freeze that moves a pinned test fails, before it reaches `main` and blocks
+every deploy. Details: the runbook's "Data pull requests merge themselves".)
 
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
@@ -86,6 +90,23 @@ only in the routine's run log (`RemoteTrigger` `list_runs` / `get_run_log`, or t
 so the repo saw what looked like quiet weeks. The regime history refresh moved from Monday to
 Tuesday 12:00 UTC on 2026-10-06 for this reason. Schedule a routine early in the usage week, and read
 the run log before the code when its pull request does not appear.
+
+**The "Monday" cron ran on Sundays for five months (found 2026-10-14).** `wrangler.toml` said
+`0 14 * * 1`, and Cloudflare counts weekdays from 1 = Sunday, so from the trigger's creation on
+2026-05-18 the weekly email, the Slack brief and both Workflow hand-offs ran at 14:00 UTC on
+Sunday. No `cron-step` row could show it: a step knows whether it worked, never which day it was
+meant to run. It surfaced only because every 14:00 row in the telemetry carried a Sunday date. The
+trigger is `0 14 * * MON` now, and `tests/cronSchedule.test.ts` refuses a numeric weekday. Since the
+once-per-week send markers key on the ISO week of the send, a Sunday send (the end of one ISO week)
+followed by a Monday send (the start of the next) is two sends, not a duplicate the markers catch.
+
+**Failures now reach the owner, not only `/trust` (2026-10-14).** Nothing pushed a failed step
+anywhere, and `/trust` reads the run history only where `CLOUDFLARE_ANALYTICS_READ_TOKEN` is set,
+which production has never had. So unattended meant unobserved. The scheduled handler collects
+every failed step and, at the end of the run, `sendOpsFailureNotice` (`lib/delivery/opsNotice.ts`)
+mails one summary to `WHETHER_OPS_EMAIL`; both Workflows send their own when they fail, because
+they end hours after the cron's notice has gone. A clean run sends nothing. Without the address,
+each failing run writes an `ops-notice` row saying so instead of skipping quietly.
 
 **The refresh committed three of the five files it writes (2026-10-07).** `generateMonthlySummaries.ts`
 also writes `data/time_machine_cache.json` and `data/confidence_record_months.json`, and the routine's
@@ -267,9 +288,14 @@ content wrong. (The marker had this answer the whole time and threw it away: its
 returned `""` for a dirty tree and its doc comment asserted the container "checks out clean".
 Believing that sentence cost a day and three wrong public hypotheses.)
 
-Clearing the project's build cache in the Cloudflare dashboard is the remedy, and it is a dashboard
-action: no push from here can fix a stale cache, and deleting the two assertions would have made
-`main` green while hiding the fact that stale static assets were the thing about to deploy.
+Clearing the project's build cache in the Cloudflare dashboard was the remedy until 2026-10-14, by
+hand, every time the cache went stale. That paragraph said no push from here could fix a stale cache,
+which was wrong: the gate runs inside the container, and git there holds the commit. Under
+`WORKERS_CI=1` the gate now runs `restoreTrackedFromHead` (`scripts/exec.mjs`, a `git reset --hard
+HEAD`), names every file it reset, and refuses only if drift survives the reset. Deleting the two
+assertions would still have been wrong: they are what showed that stale static assets were about to
+deploy. The reset is limited to the build container because on a laptop the same drift is
+uncommitted work.
 
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
@@ -290,6 +316,17 @@ window. A branch that failed the build five times running showed nothing in any 
 passing tests and `exited with code 1`; the `❌` line and the assertion had scrolled out of reach.
 Whatever that window keeps, it keeps the end, so the end now carries enough to act on.
 `CHECK_FAILURE_TAIL_LINES` (default 40) sizes it.
+
+A fourth, 2026-10-13: **a passing step prints its verdict, not its output.** The repeat above only
+helps a failing gate. A *passing* gate still filled the window: `bun` 1.3.14 prints a line per
+passing test whenever stdout is not a terminal (the "silent on a pass" below holds only on a TTY),
+fallback warnings like `FRED circuit breaker open` repeated ~700 times, and the deploy step added
+Vite's chunk tables and Wrangler's 600-row module table. The deploy's own result fell out of the log
+and a working build read as a failed one. Now `run-checks` reduces a passing task to its last four
+lines (`CHECK_VERBOSE=1` restores the rest); a failing task keeps its output, with any line repeated
+more than three times printed once with its count; the gate runs `bun test --only-failures`;
+`cloudflare-run.mjs` sets Vite to `warn` when `WORKERS_CI=1` and prints Wrangler's module table as a
+count. A passing build is now ~45 lines and its deploy ~200. `tests/buildLogNoise.test.ts` holds it.
 
 That block also names **the `bun` it ran on**, and says so when that is older than `engines.bun`.
 Nothing enforces the declared range, so a build image shipping its own `bun` runs this gate on

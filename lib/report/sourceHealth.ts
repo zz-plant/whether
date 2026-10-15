@@ -1,4 +1,5 @@
 import { formatAgeSpan, formatTimestampUTC } from "../formatters";
+import { SIGNAL_CADENCE } from "../ingestion/cadence";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryData } from "../types";
 
 export type SourceFreshnessStatus = "fresh" | "stale" | "unknown";
@@ -65,7 +66,19 @@ type SourceGroupDefinition = {
   useBusinessDays?: boolean;
 };
 
-const TREASURY_SOURCE_SLA_HOURS = 6;
+/*
+ * The Treasury row is the reading readers are served: the stored OperatingSnapshot, which only
+ * the scheduled cron writes (02:00 UTC daily). The coordinator's hourly alarm refreshes the
+ * materialized model behind it, but nothing republishes the snapshot from that, so this row can
+ * be no fresher than the last cron run. A 6h window here read every healthy afternoon as stale.
+ * Whether the hourly alarm is still refreshing is a separate check: /api/health's
+ * `ingestModel`, against INGEST_MODEL_STALE_AFTER_MS.
+ *
+ * Measured in calendar hours, not business hours: the cron runs every day, weekends included.
+ * Counting business hours, a Friday 02:01 fetch was still "fresh" at Monday 03:00 with the
+ * Saturday, Sunday and Monday runs all missed.
+ */
+const TREASURY_SOURCE_SLA_HOURS = SIGNAL_CADENCE.TREASURY_10Y.staleAfterMs / 3_600_000;
 const MARKET_SOURCE_SLA_HOURS = 24;
 const MONTHLY_RELEASE_SLA_HOURS = 45 * 24;
 const CURATED_SNAPSHOT_SLA_HOURS = 45 * 24;
@@ -108,6 +121,23 @@ const macroSourceGroups: SourceGroupDefinition[] = [
     supportsLive: false,
   },
 ];
+
+/**
+ * The fetch-backed macro series a reading carries from the bundled snapshot instead of a live
+ * read. The curated snapshot series are never listed, since they are not meant to be live.
+ * Labels, so a refusal can name them.
+ *
+ * `loadMacroSeries` keeps the snapshot value for any series whose fetch failed, and the engine
+ * scores it like any other input, so a reading with a live Treasury can still carry stale macro
+ * inputs into its scores. Anything that publishes or records a reading asks this as well as
+ * whether the Treasury is live.
+ */
+export const listCachedLiveMacroSeries = (
+  macroSeries: readonly Pick<MacroSeriesReading, "id" | "label" | "isLive">[],
+): string[] => {
+  const fetchBacked = new Set(macroSourceGroups.filter((group) => group.supportsLive).flatMap((group) => group.ids));
+  return macroSeries.filter((series) => fetchBacked.has(series.id) && !series.isLive).map((series) => series.label);
+};
 
 const getBusinessDayElapsedHours = (timestamp: string, now: Date): number => {
   const then = Date.parse(timestamp);
@@ -283,6 +313,39 @@ const buildGroupedRow = ({
 const isDegradedSource = (row: SourceHealthRow) =>
   row.freshnessStatus !== "fresh" || (row.expectsLive && row.mode !== "live");
 
+/** Why a live source is degraded, in the order `sourceBoardState` checks: age and absence first. */
+const degradedLiveState = (row: SourceHealthRow) =>
+  row.freshnessStatus === "stale" ? "stale" : row.freshnessStatus === "unknown" ? "unconfirmed" : "cached";
+
+/**
+ * The sources that are meant to answer live and are not doing so: what a monitor should be
+ * told. The test is `isDegradedSource`, the one `/trust` counts, so the health check cannot
+ * say "ok" about a feed the trust page calls degraded: past its window (`stale`), with no
+ * fetch on record (`unconfirmed`), or answering from a fallback inside its window (`cached`).
+ * A curated snapshot is current by design and never listed. On 2026-10-13 /trust printed
+ * "Treasury · Stale · 14h old" while /api/health said "ok" — the health check asked only
+ * whether a report loaded, and a report built from stale inputs loads.
+ */
+export const listDegradedLiveSources = (rows: readonly SourceHealthRow[]) =>
+  rows
+    .filter((row) => row.expectsLive && isDegradedSource(row))
+    .map((row) => ({
+      source: row.sourceName,
+      state: degradedLiveState(row),
+      age: row.ageLabel,
+      lastSuccessfulFetchAt: row.lastSuccessfulFetchAt,
+    }));
+
+/**
+ * `/api/health`'s `dependencies.dataFreshness`. Freshness is judged from a report; when none
+ * loaded there is nothing to judge, and "ok" beside a failed probe would report a freshness
+ * success nobody measured.
+ */
+export const judgeDataFreshness = (
+  reportLoaded: boolean,
+  degradedSources: ReturnType<typeof listDegradedLiveSources>,
+) => (!reportLoaded ? "unknown" : degradedSources.some((source) => source.state === "stale") ? "stale" : "ok");
+
 export const buildDegradedSourceRows = (rows: SourceHealthRow[]) =>
   rows
     .filter(isDegradedSource)
@@ -378,8 +441,8 @@ export const buildSourceHealthRows = ({
   return [
     {
       sourceName: "Treasury",
-      cadenceLabel: "Intraday rates",
-      freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now, true),
+      cadenceLabel: "Daily rates",
+      freshnessStatus: classifyFreshness(treasuryLastSuccessfulFetchAt, TREASURY_SOURCE_SLA_HOURS, now),
       freshnessSlaHours: TREASURY_SOURCE_SLA_HOURS,
       lastSuccessfulFetchAt: treasuryLastSuccessfulFetchAt,
       ageLabel: formatAgeSpan(treasuryLastSuccessfulFetchAt, now),

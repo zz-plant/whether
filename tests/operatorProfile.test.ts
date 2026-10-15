@@ -229,4 +229,22 @@ describe("runway planner inputs: missing means missing", () => {
     assert.equal(resolution.request.sector, "infrastructure");
     assert.equal(resolution.growthAssumedFlat, false);
   });
+
+  it("keeps up to four project rows, dropping a bad figure without dropping the row", () => {
+    const profile = parseOperatorProfile({
+      version: 1,
+      engineerWeekCostUsd: 4500,
+      paybackProjects: [
+        { name: "  Importer  ", weeksToShip: 6, engineers: -1, hoursSavedPerMonth: "160" },
+        {},
+        "not a row",
+        { otherMonthlySavingsUsd: 0 },
+        { weeksToShip: 1 },
+        { weeksToShip: 2 },
+      ],
+    });
+    assert.equal(profile.engineerWeekCostUsd, 4500);
+    assert.deepEqual(profile.paybackProjects, [{ name: "Importer", weeksToShip: 6 }, {}, { otherMonthlySavingsUsd: 0 }]);
+    assert.equal(parseOperatorProfile({ version: 1, paybackProjects: [] }).paybackProjects, undefined);
+  });
 });

@@ -312,17 +312,15 @@ export function FormulaReference({
           <li>
             <span className="font-semibold text-slate-100">4. Turn the pair into conditions.</span>{" "}
             <span className="text-slate-300">
-              The quadrant the two scores land in is the environment; the diagram below draws it.
+              The quadrant the two scores land in sets the conditions.
             </span>
           </li>
         </ol>
         {/* No link out for the market terms: each card below says what its own terms
-            mean, so the arithmetic can be read without leaving it. It opened on "The
-            exact arithmetic is below.", over the "Show the exact arithmetic" control
-            directly beneath it (2026-10-09). */}
-        <p className="text-xs text-slate-400">
-          Each card below says what its market terms mean.
-        </p>
+            mean, so the arithmetic can be read without leaving it. No sentence
+            announcing that either (2026-10-14): it opened on "The exact arithmetic is
+            below.", over the control directly beneath it, and then on "Each card below
+            says what its market terms mean." — both described the page to its reader. */}
       </div>
 
       {/* Wider gutters than a framed grid needs. The depth ladder in
@@ -354,9 +352,6 @@ export function FormulaReference({
             </li>
             <li>
               <span className="text-slate-400">Market reads that count:</span> {joinAnd(recordBasis.countedMarket)}.
-              <span className="mt-1 block text-xs text-slate-400">
-                The two score cards below say what each one measures, beside the arithmetic that uses it.
-              </span>
             </li>
             {recordBasis.shown.length > 0 ? (
               <li>

@@ -3,6 +3,9 @@ import { afterEach, describe, it } from "bun:test";
 import { GET as getMcp, OPTIONS as optionsMcp, POST as postMcp } from "../app/api/mcp/route";
 import { describeAgentTools } from "../lib/agent/tools";
 import { agentStateSchema } from "../lib/agentState";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The plain-GET tool shim on `/api/mcp`, which `/llms.txt` advertises as the way for an

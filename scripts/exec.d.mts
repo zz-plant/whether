@@ -17,3 +17,11 @@ export type WorktreeChange = { code: string; path: string };
 export function worktreeDrift(
   cwd?: string,
 ): { commit: string; tracked: WorktreeChange[]; untracked: string[] } | null;
+
+/** Resets tracked files to HEAD (build containers only) and returns the drift that remains. */
+export function restoreTrackedFromHead(
+  cwd?: string,
+): { commit: string; tracked: WorktreeChange[]; untracked: string[] } | null;
+
+/** The commit a build should report: CI's, else a clean checkout's HEAD, else "". */
+export function buildCommit(options?: { env?: Record<string, string | undefined>; cwd?: string }): string;

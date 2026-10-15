@@ -20,7 +20,7 @@ import { availableParallelism } from "node:os";
 
 import { resolveCheckPlan } from "./check-tasks.mjs";
 import { withDeployGate } from "./deploy-gate.mjs";
-import { worktreeDrift } from "./exec.mjs";
+import { restoreTrackedFromHead, worktreeDrift } from "./exec.mjs";
 
 let plan;
 try {
@@ -32,11 +32,22 @@ try {
 
 /*
  * Gate-only: a run that claims to test the commit it will deploy must be running against
- * that commit. A tracked file that differs from HEAD is refused and named; untracked files
- * are reported and allowed. A dirty tree is the normal state of a local `bun run check`.
+ * that commit. Untracked files are reported and allowed. A tracked file that differs from
+ * HEAD is restored from HEAD inside Workers Builds, where it can only have come from the
+ * build output cache, and refused and named anywhere else: a dirty tree is the normal state
+ * of a local `bun run check`, and those edits are someone's work.
  */
 const refuseDriftedTree = () => {
-  const drift = worktreeDrift();
+  let drift = worktreeDrift();
+
+  if (drift && drift.tracked.length > 0 && process.env.WORKERS_CI === "1") {
+    process.stdout.write(
+      `[run-checks] ${drift.tracked.length} tracked file(s) differ from HEAD after checkout, ` +
+        `most likely restored by the build output cache; resetting them to the commit:\n` +
+        `${drift.tracked.map(({ code, path }) => `  ${code.padEnd(2)} ${path}`).join("\n")}\n`,
+    );
+    drift = restoreTrackedFromHead();
+  }
 
   if (!drift) {
     process.stdout.write("[run-checks] no readable git checkout here; the checks below run against whatever is on disk.\n");
@@ -61,8 +72,8 @@ const refuseDriftedTree = () => {
         `Every check in this gate judges what is on disk, and so does the build that follows it,\n` +
         `so a run against this tree would score — and deploy — something other than ${drift.commit.slice(0, 8)}.\n` +
         `Refusing rather than reporting a result about a tree nobody pushed.\n\n` +
-        `In a build container this means the checkout was written over after it was made. The build\n` +
-        `output cache restore is the usual candidate: clear this project's build cache and re-run.\n` +
+        `In a build container the gate has already tried resetting these to HEAD and they still differ,\n` +
+        `so something is rewriting them mid-build; clearing the build cache will not help.\n` +
         `Locally, commit or stash the files above, or unset the deploy-gate signal and use \`bun run check\`.\n`,
     );
     process.exit(1);
@@ -169,10 +180,66 @@ const FAILURE_MARKED_LINES = 20;
 
 const formatDuration = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
+/** CHECK_VERBOSE=1 prints every passing task's output in full, as this runner used to. */
+const VERBOSE = process.env.CHECK_VERBOSE === "1";
+/** How many closing lines of a passing task stand in for the rest: bun test closes with its seed and counts. */
+const PASSING_SUMMARY_LINES = 4;
+/** A line printed more often than this is noise; it is printed once with its count. */
+const REPEAT_LIMIT = 3;
+
+/** The mark a passing task prints over a warning it means a reader to act on (`⚠ WARNINGS:`). */
+const WARNING_MARK = "⚠";
+
+/*
+ * A passing task's output is usually its verdict and nothing a reader acts on, so it is
+ * reduced to the lines it closes with (`3072 pass`, `Found 0 warnings`). On 2026-10-13 the
+ * passing suite alone was ~1,900 lines, ~700 of them one fallback warning repeated, and the
+ * log window cut off before the step that mattered. A warn-only check is the exception: it
+ * passes on purpose and prints what to fix (curated-freshness lists each stale series under a
+ * `⚠` heading, then the remedy), so everything from its first `⚠` line on is kept.
+ */
+const summarizePassing = (output) => {
+  const lines = output.trim().split("\n").filter((line) => line.trim());
+  const summaryStart = Math.max(0, lines.length - PASSING_SUMMARY_LINES);
+  const firstWarning = lines.findIndex((line) => line.includes(WARNING_MARK));
+  const keepFrom = firstWarning === -1 ? summaryStart : Math.min(firstWarning, summaryStart);
+  return { shown: lines.slice(keepFrom), hidden: keepFrom };
+};
+
+/** Keeps a failing task's output whole, except that a line repeated past the limit is printed once, with its count. */
+const collapseRepeats = (output) => {
+  const lines = output.trim().split("\n");
+  const counts = new Map();
+  for (const line of lines) counts.set(line, (counts.get(line) ?? 0) + 1);
+
+  const printed = new Set();
+  const kept = [];
+  for (const line of lines) {
+    const count = counts.get(line);
+    if (count <= REPEAT_LIMIT || !line.trim()) {
+      kept.push(line);
+      continue;
+    }
+    if (printed.has(line)) continue;
+    printed.add(line);
+    kept.push(`${line}  [×${count}, later repeats hidden]`);
+  }
+  return kept.join("\n");
+};
+
 const report = ({ task, ok, output, ms }) => {
   process.stdout.write(`\n${ok ? "✅" : "❌"} ${task.name} (${formatDuration(ms)})\n`);
   const trimmed = output.trim();
-  if (trimmed) process.stdout.write(`${trimmed}\n`);
+  if (!trimmed) return;
+
+  if (ok && !VERBOSE) {
+    const { shown, hidden } = summarizePassing(trimmed);
+    process.stdout.write(`${collapseRepeats(shown.join("\n"))}\n`);
+    if (hidden > 0) process.stdout.write(`[run-checks] ${hidden} earlier line(s) hidden; CHECK_VERBOSE=1 prints them.\n`);
+    return;
+  }
+
+  process.stdout.write(`${collapseRepeats(trimmed)}\n`);
 };
 
 /** One stage: every task in it, then the summary and the failure repeat. Resolves to whether all passed. */
@@ -229,7 +296,7 @@ const runStage = async (selected) => {
     process.stdout.write(`\n[run-checks] ran on bun ${Bun.version}${engineMismatch() ?? ""}\n`);
 
     for (const result of failed) {
-      const lines = result.output.trimEnd().split("\n");
+      const lines = collapseRepeats(result.output).split("\n");
       const tail = lines.slice(-FAILURE_TAIL_LINES);
       process.stdout.write(`\n───── ${result.task.name} failed (\`bun run ${result.task.script}\`) ─────\n`);
 

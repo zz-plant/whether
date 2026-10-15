@@ -12,6 +12,9 @@ import { buildMaterializedReadModel } from "../lib/ingestion/materialized";
 import type { SignalEntitySnapshot, SignalFamily, SignalKey } from "../lib/ingestion/types";
 import { buildLineage } from "../lib/storage/lineage";
 import type { KvNamespace } from "../lib/runtime/kv";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 

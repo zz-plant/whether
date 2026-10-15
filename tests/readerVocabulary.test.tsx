@@ -41,6 +41,9 @@ import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
 import { CompanyCalibration } from "../app/components/home/CompanyCalibration";
 import { AlertSection } from "../app/components/home/AlertSection";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
@@ -67,7 +70,7 @@ mockAny.module("next/navigation", () => ({
  *   a mechanism name, a fixture company's figures, a UI implementation detail.
  * - Ratcheted: a word that has a place on some surface but was doing a plain sentence's work
  *   on all of them. The count may fall and may not rise,
- *   the way scripts/check-suppression-census.ts holds its numbers. Lower the baseline when
+ *   the way scripts/census.config.ts holds the suppression census's. Lower the baseline when
  *   work earns it; raising one is a decision and belongs in its own PR with the reason.
  *
  * Routes behind the report read path stay out (they suspend at their data boundary offline;
@@ -234,7 +237,6 @@ const routeSurfaces: Surface[] = [
       return visibleText(renderToStaticMarkup(await page.default({ params })));
     },
   })),
-  { name: "/pricing", text: async () => visibleText(renderToStaticMarkup((await import("../app/pricing/page")).default())) },
   { name: "/about", text: async () => visibleText(renderToStaticMarkup((await import("../app/about/page")).default())) },
   { name: "/contact", text: async () => visibleText(renderToStaticMarkup((await import("../app/contact/page")).default())) },
   { name: "/privacy", text: async () => visibleText(renderToStaticMarkup((await import("../app/privacy/page")).default())) },

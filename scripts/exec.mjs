@@ -65,3 +65,30 @@ export function worktreeDrift(cwd = process.cwd()) {
     return null;
   }
 }
+
+/**
+ * Puts every tracked file back to HEAD, for a build container only. Workers Builds restores
+ * its build output cache over a fresh clone, so a tracked file can hold the previous build's
+ * bytes (`public/` did on 2026-09-17), and git in that container still has the commit's own.
+ * Untracked files are left alone. Returns the drift that remains, which is empty when the
+ * restore worked, or `null` when git cannot answer. Never call it on a developer's tree:
+ * it discards uncommitted edits, which is the point in a container and data loss anywhere else.
+ */
+export function restoreTrackedFromHead(cwd = process.cwd()) {
+  spawnSync("git", ["reset", "--hard", "--quiet", "HEAD"], { cwd, encoding: "utf8" });
+  return worktreeDrift(cwd);
+}
+
+/**
+ * The commit a build should say it is, for `/api/health` (`vite.config.ts`). Workers Builds
+ * names it in `WORKERS_CI_COMMIT_SHA`; a local build reads the checkout. A checkout holding
+ * anything no commit has, tracked or untracked, is not HEAD: `bun run deploy:cloudflare`
+ * builds whatever is on disk, and naming HEAD would answer "is my merge live?" about code
+ * that is not running. That build, like one with no readable checkout, says "".
+ */
+export function buildCommit({ env = process.env, cwd = process.cwd() } = {}) {
+  if (env.WORKERS_CI_COMMIT_SHA) return env.WORKERS_CI_COMMIT_SHA;
+  const drift = worktreeDrift(cwd);
+  if (!drift || drift.tracked.length > 0 || drift.untracked.length > 0) return "";
+  return drift.commit;
+}

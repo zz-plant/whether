@@ -9,7 +9,7 @@
  * whose assets have not settled, so it passes its own asset-integrity probe;
  * the landmark audit only needs the server to answer, so it passes a plain one.
  */
-import { createWriteStream } from "node:fs";
+import { createWriteStream, readFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
@@ -36,17 +36,14 @@ const canBindPort = async ({ host, port }) =>
   });
 
 /**
- * Where to actually start the server. A remote or already-serving base URL is
- * used as-is; a local one whose port is taken walks up to five ports forward, so
- * a dev server someone left running does not fail the run.
+ * Where to actually start the server, for a local base URL that did not answer
+ * (`withDevServer` handles a serving or remote one first). One whose port is taken
+ * walks up to five ports forward, so a dev server someone left running does not
+ * fail the run.
  */
 const resolveAutoStartBaseUrl = async ({ baseUrl, initialProbe }) => {
   const parsedBaseUrl = new URL(baseUrl);
   const hostname = normalizeHostname(parsedBaseUrl.hostname);
-
-  if (initialProbe.ok || !isLocalHostname(hostname)) {
-    return { baseUrl, reusedRequestedPort: true, reason: null };
-  }
 
   const defaultPort = parsedBaseUrl.protocol === "https:" ? 443 : 80;
   const requestedPort = Number.parseInt(parsedBaseUrl.port || String(defaultPort), 10);
@@ -217,6 +214,24 @@ const startDevServer = async ({ baseUrl, outDir, devScript, logName }) => {
 };
 
 /**
+ * The dev server vinext says is already running in this checkout, from the lock file it
+ * writes on start (`.vinext/dev/lock.json`). vinext refuses a second dev server in the same
+ * directory, so before 2026-10-13 a preview server left up on another port made the
+ * landmark audit, and so the pre-push hook, fail with "the dev server exited before it
+ * became ready". A server in this directory serves this tree, so it is safe to reuse.
+ */
+const readCheckoutDevServer = (lockfilePath) => {
+  try {
+    const lock = JSON.parse(readFileSync(lockfilePath, "utf8"));
+    if (!Number.isInteger(lock.pid) || lock.pid <= 0 || typeof lock.appUrl !== "string") return null;
+    process.kill(lock.pid, 0);
+    return lock.appUrl;
+  } catch {
+    return null;
+  }
+};
+
+/**
  * Runs `body(baseUrl)` against a ready server, reusing one already listening at
  * `baseUrl` and otherwise starting one. Only a server this call started is
  * stopped afterwards — a dev server the user is running survives the check.
@@ -230,12 +245,29 @@ export const withDevServer = async ({
   probe,
   onStatus = () => {},
   body,
+  /** Fresh starts to try before readiness counts as failed. */
+  startAttempts = 1,
+  lockfilePath = path.join(process.cwd(), ".vinext", "dev", "lock.json"),
 }) => {
   const initialProbe = await probe(baseUrl);
 
   if (initialProbe.ok) {
     onStatus(`Reusing the server already listening at ${baseUrl}`);
     return body(baseUrl);
+  }
+
+  /* A remote target (a preview or staging deployment) is the thing under test. Swapping in
+     this checkout's dev server, or starting one, would report local code as that deployment. */
+  if (!isLocalHostname(new URL(baseUrl).hostname)) {
+    throw new Error(
+      `${baseUrl} did not answer (${initialProbe.error ?? "not ready"}). It is not a local address, so no local server stands in for it.`,
+    );
+  }
+
+  const checkoutServer = readCheckoutDevServer(lockfilePath);
+  if (checkoutServer && (await probe(checkoutServer)).ok) {
+    onStatus(`Reusing this checkout's dev server at ${checkoutServer}`);
+    return body(checkoutServer);
   }
 
   const target = await resolveAutoStartBaseUrl({ baseUrl, initialProbe });
@@ -248,23 +280,51 @@ export const withDevServer = async ({
     onStatus(`Starting dev server with \`bun run ${devScript}\` for ${target.baseUrl}`);
   }
 
-  const started = await startDevServer({
-    baseUrl: target.baseUrl,
-    outDir,
-    devScript,
-    logName,
-  });
-
-  try {
-    await waitForBaseUrl({
+  /* Only readiness is retried, never the work. The deploy gate's landmark audit failed
+     production builds on 2026-10-14 (550d400, e267ede) when the dev server did not answer
+     in 180s on a cold Workers Builds container, with builds either side passing; its log
+     sat in the container where nobody could read it. Each failed start now prints the
+     log's tail, and a caller can ask for a second, fresh start before giving up. */
+  for (let attempt = 1; ; attempt += 1) {
+    const started = await startDevServer({
       baseUrl: target.baseUrl,
-      timeoutMs,
-      child: started.child,
-      logPath: started.logPath,
-      probe,
+      outDir,
+      devScript,
+      logName,
     });
-    return await body(target.baseUrl, started);
-  } finally {
-    await stopDevServer(started.child);
+
+    try {
+      await waitForBaseUrl({
+        baseUrl: target.baseUrl,
+        timeoutMs,
+        child: started.child,
+        logPath: started.logPath,
+        probe,
+      });
+    } catch (error) {
+      await stopDevServer(started.child);
+      const message = `${error instanceof Error ? error.message : String(error)}${formatLogTail(started.logPath)}`;
+      if (attempt < startAttempts) {
+        onStatus(`${message}\nStarting a fresh dev server (attempt ${attempt + 1} of ${startAttempts}).`);
+        continue;
+      }
+      throw new Error(message, { cause: error });
+    }
+
+    try {
+      return await body(target.baseUrl, started);
+    } finally {
+      await stopDevServer(started.child);
+    }
+  }
+};
+
+/** The last lines of a dev-server log, for an error that would otherwise only name the file. */
+const formatLogTail = (logPath, lines = 30) => {
+  try {
+    const tail = readFileSync(logPath, "utf8").trimEnd().split("\n").slice(-lines).join("\n");
+    return tail ? `\n--- last ${lines} lines of ${logPath} ---\n${tail}` : `\n(${logPath} is empty)`;
+  } catch {
+    return "";
   }
 };

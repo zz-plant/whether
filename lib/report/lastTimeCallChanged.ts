@@ -2,6 +2,8 @@ import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import { REGIME_SEVERITY_RANK, getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeKey } from "../regimeEngine";
 import { signalReadingMeaning } from "./signalTranslations";
+import { formatMonthLabel } from "../timeMachine/monthFormatting";
+import { RUNWAY_BAND_OPTIONS, type RunwayBand } from "./operatorRunway";
 
 /**
  * The last time the call moved the way it moved this week, and what the two
@@ -173,4 +175,84 @@ export const findRecentCallChanges = (
     });
   }
   return changes;
+};
+
+type Spell = { regime: RegimeKey; start: MonthRef; end: MonthRef; months: number };
+
+const spellsOf = (series: readonly TimeMachineRegimeEntry[]): Spell[] => {
+  const ordered = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
+  const spells: Spell[] = [];
+  for (const entry of ordered) {
+    const last = spells.at(-1);
+    if (last && last.regime === entry.regime) {
+      last.end = monthRef(entry);
+      last.months += 1;
+    } else {
+      spells.push({ regime: entry.regime, start: monthRef(entry), end: monthRef(entry), months: 1 });
+    }
+  }
+  return spells;
+};
+
+const monthEnds = (count: number) => (count === 1 ? "1 month-end" : `${count} month-ends`);
+const spellRange = (spell: Spell) =>
+  `${formatMonthLabel(spell.start.year, spell.start.month)} to ${formatMonthLabel(spell.end.year, spell.end.month)}`;
+
+/**
+ * How long conditions like this week's lasted before, from the month-end walk.
+ *
+ * A headline says money is tight; what a plan needs to know is for how long,
+ * and the record answers that without a forecast: the earlier spells of these
+ * conditions and their length in month-ends. The record is short (seven spells
+ * since 2012, one of them Freezing), so the sentence counts the spells it
+ * found rather than averaging them, and says once that a count is not a
+ * forecast.
+ *
+ * The spell the record ends in is left out of the earlier ones when it is this
+ * week's conditions, since it has not ended. With a chosen runway band whose
+ * top is shorter than every earlier spell, the sentence says so: that is the
+ * comparison a reader with 12–24 months of cash is making in their head.
+ */
+export const describeSpellLengths = ({
+  series,
+  currentRegime,
+  runwayBand,
+}: {
+  series: readonly TimeMachineRegimeEntry[];
+  currentRegime: RegimeKey;
+  /** The reader's own band; null when they have not chosen one. */
+  runwayBand: RunwayBand | null;
+}): string | null => {
+  const spells = spellsOf(series);
+  const firstYear = spells.at(0)?.start.year;
+  if (spells.length < 2 || firstYear === undefined) return null;
+  const ongoing = spells.at(-1)?.regime === currentRegime;
+  const earlier = spells.filter((spell, index) => spell.regime === currentRegime && !(ongoing && index === spells.length - 1));
+  const label = getRegimePublicLabel(currentRegime);
+  const completed = spells.slice(0, -1);
+  const shortest = completed.length > 0 ? Math.min(...completed.map((spell) => spell.months)) : null;
+
+  const parts: string[] = [];
+  if (earlier.length === 0) {
+    parts.push(`The record since ${firstYear} has no earlier ${label} spell.`);
+  } else if (earlier.length === 1) {
+    const only = earlier.at(0);
+    if (only) parts.push(`The one earlier ${label} spell on record ran ${monthEnds(only.months)}, ${spellRange(only)}.`);
+  } else {
+    const lengths = earlier.map((spell) => spell.months);
+    parts.push(
+      `The record has ${earlier.length} earlier ${label} spells: ${lengths.slice(0, -1).join(", ")} and ${monthEnds(lengths.at(-1) ?? 0)} long.`,
+    );
+  }
+  if (shortest !== null) parts.push(`No conditions since ${firstYear} lasted under ${monthEnds(shortest)}.`);
+
+  const band = runwayBand ? RUNWAY_BAND_OPTIONS.find((option) => option.key === runwayBand) : undefined;
+  const bandTop = band?.maxMonths ?? null;
+  if (band && bandTop !== null && earlier.length > 0 && earlier.every((spell) => spell.months > bandTop)) {
+    parts.push(
+      `${earlier.length === 1 ? "That spell" : "Each"} outlasted ${band.phrase} of runway, the band you chose.`,
+    );
+  }
+  parts.push("A count from the record, not a forecast.");
+  return parts.join(" ");
 };

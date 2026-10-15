@@ -98,8 +98,8 @@ describe("/share current weekly artifact", () => {
     const html = renderToStaticMarkup(await SharePage());
     const { options } = await shareOptions();
 
-    assert.match(html, /href="\/api\/export\/board-slide\?format=pptx&amp;stage=seed"/);
-    assert.match(html, /href="\/api\/export\/board-slide\?format=pdf&amp;stage=seed"/);
+    assert.match(html, /href="\/api\/export\/board-slide\?format=pptx&amp;stage=series-a"/);
+    assert.match(html, /href="\/api\/export\/board-slide\?format=pdf&amp;stage=series-a"/);
     assert.match(html, /Download PPTX/);
     assert.match(html, /Download PDF/);
     // Every format is named in the picker the server renders, and each copy action says what it copies.
@@ -172,7 +172,7 @@ describe("/share current weekly artifact", () => {
 
     assert.equal(images.length, 2, "one picture per distinct image");
     for (const tag of images) {
-      assert.match(tag, /src="\/api\/image\/(slide\?stage=seed|brief)"/);
+      assert.match(tag, /src="\/api\/image\/(slide\?stage=series-a|brief)"/);
       assert.match(tag, /width="1200"/);
       assert.match(tag, /height="(675|800)"/);
       assert.match(tag, /loading="lazy"/);

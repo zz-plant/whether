@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { runAgentTool } from "../lib/agent/tools";
 import { projectRegimeFromPace } from "../lib/report/regimeContext";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * `get_projection` with no arguments asks the question an agent asks most: "if the current trend

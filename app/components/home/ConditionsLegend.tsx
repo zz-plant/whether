@@ -124,7 +124,11 @@ export function ConditionsLegend({
         <span className="md:hidden" data-conditions-definitions>
           {/* The first entry names both scores; the rest keep the same order, so
               the line stays short enough to read as one. */}
-          {LEGEND_ORDER.flatMap((regime) => getOrderedRegimeLegend().filter((entry) => entry.regime === regime)).map((entry, index, all) => {
+          {/* On a live week, this week's condition only (2026-10-14): the four
+              ran to four lines on a phone, above the week and the call. The
+              link names the other three. An archived week, with no condition
+              marked, keeps the four. */}
+          {LEGEND_ORDER.filter((regime) => !currentRegime || regime === currentRegime).flatMap((regime) => getOrderedRegimeLegend().filter((entry) => entry.regime === regime)).map((entry, index, all) => {
             const sides = SIDES[entry.regime];
             const pressure = side(sides.pressureAbove, pressureLine);
             const appetite = side(sides.appetiteAbove, appetiteLine);
@@ -133,10 +137,16 @@ export function ConditionsLegend({
                 {/* Inline, not a flex pair: the legend is one sentence that wraps. */}
                 <ConditionIcon regime={entry.regime} className="mr-1 inline align-[-3px]" />
                 <span className={`font-semibold ${REGIME_STYLE_TOKENS[entry.regime].accent.text}`}>{entry.weather}</span>
-                {index === 0
-                  ? `: ${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite}`
-                  : `: ${pressure}, ${appetite}`}
-                {entry.regime === currentRegime ? <span className="text-slate-400"> (this week)</span> : null}
+                {all.length === 1 ? " this week" : null}
+                {/* A live week's one condition says what it means before its numbers:
+                    the four words do not order themselves (Stormy is not worse than
+                    Cloudy, each is hard on one side), so the meaning is the help. */}
+                {all.length === 1
+                  ? `: ${sides.pressureAbove ? "pricey money" : "cheap money"}, ${sides.appetiteAbove ? "willing investors" : "wary investors"} (${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite})`
+                  : index === 0
+                    ? `: ${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite}`
+                    : `: ${pressure}, ${appetite}`}
+                {entry.regime === currentRegime && all.length > 1 ? <span className="text-slate-400"> (this week)</span> : null}
                 {index < all.length - 1 ? " · " : ". "}
               </span>
             );
@@ -145,7 +155,7 @@ export function ConditionsLegend({
             href="/trust#formula-reference"
             className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
           >
-            How they are set
+            {currentRegime ? "The four conditions and how they are set" : "How they are set"}
           </Link>
         </span>
       </p>

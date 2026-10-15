@@ -12,7 +12,7 @@ export const metadata: Metadata = buildPageMetadata({
 
 export default function TermsOfServicePage() {
   return (
-    <LegalPageShell title="Terms of Service">
+    <LegalPageShell title="Terms of Service" effectiveDate="10/14/2026">
 
         <section className="space-y-4 text-sm leading-7 text-slate-200 sm:text-base">
           <p>
@@ -81,8 +81,8 @@ export default function TermsOfServicePage() {
         <section className="space-y-4">
           <h2 className="text-xl font-semibold text-slate-50">7. Fees and Payment</h2>
           <p className="text-sm leading-7 text-slate-200 sm:text-base">
-            If your use is subject to paid plans or a commercial agreement, you agree to pay applicable
-            fees according to the governing order form, invoice terms, or master agreement.
+            Whether is free. If your use is subject to a separate commercial agreement, you agree to pay
+            applicable fees according to the governing order form, invoice terms, or master agreement.
           </p>
         </section>
 

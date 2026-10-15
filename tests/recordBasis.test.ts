@@ -172,7 +172,7 @@ describe("the published week the live reading differs from", () => {
 
     assert.equal(
       describePublishedWeekBasis({ live: { regime: "DEFENSIVE" }, published, rescored }),
-      "The brief published for the week of Oct 5, 2026 read Freezing only because it counted startup-market inputs, which the record cannot test.",
+      "The brief published for the week of Oct 5, 2026 read Freezing only because it counted startup-market inputs, which past months can't be checked with.",
     );
     assert.equal(describePublishedWeekBasis({ live: { regime: "SCARCITY" }, published, rescored }), null, "while the live call still agrees");
   });

@@ -281,7 +281,7 @@ export const buildWeeklySummary = ({
         "The guidance is not changing this week",
         assessment.policyAssessment.refusal.reasons[0]
           ?? "The signals disagree, or too many inputs are missing",
-        "Keep approvals reversible until the hold lifts",
+        "Keep new commitments reversible until the hold lifts",
       )
     : "";
   const stagedRegimeLabel = stageLabel ? `${regimeLabel} — ${stageLabel}` : regimeLabel;

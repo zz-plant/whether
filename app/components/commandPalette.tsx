@@ -176,7 +176,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
     ];
 
     // Every destination in one list: the utility routes used to live only in
-    // the footer and the More menu, so the palette could not jump to Pricing.
+    // the footer and the More menu, so the palette could not jump to About.
     const utilityCommands: CommandItem[] = utilityLinks
       .filter((link) => link.href !== "/search")
       .map((link) => ({

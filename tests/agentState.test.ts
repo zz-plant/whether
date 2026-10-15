@@ -5,6 +5,10 @@ import { loadAgentInterfaceContext, type AgentInterfaceContext } from "../lib/ag
 import { agentStateSchema, buildAgentState } from "../lib/agentState";
 import { buildCliStatusContract } from "../lib/cli/contracts";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
+import { asLiveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The state is what an agent decides from, so it has to hold up against the page's own
@@ -38,6 +42,7 @@ const asLiveReading = (context: AgentInterfaceContext, recordDate: string): Agen
       fallback_reason: null,
       record_date: recordDate,
     },
+    macroSeries: asLiveMacroSeries(context.reportData.macroSeries),
   },
 });
 
@@ -198,6 +203,21 @@ describe("the agent state", () => {
     assert.equal(stale.automation.ready, false);
     assert.match(stale.automation.refusal ?? "", /25 days old/);
     assert.equal(stale.freshness.recordAgeDays, 25);
+
+    const cachedMacro = buildAgentState(
+      {
+        ...live,
+        reportData: {
+          ...live.reportData,
+          macroSeries: live.reportData.macroSeries.map((series) =>
+            series.id === "VIX_INDEX" ? { ...series, isLive: false } : series,
+          ),
+        },
+      },
+      now,
+    );
+    assert.equal(cachedMacro.automation.ready, false);
+    assert.match(cachedMacro.automation.refusal ?? "", /Macro inputs are snapshot values/);
 
     const degraded = buildAgentState({ ...live, degraded: true }, now);
     assert.equal(degraded.automation.ready, false);

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { MARGIN_LABEL, formatMarginBand, formatMarginReading } from "../../lib/report/reportFormatting";
-import { SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
+import { NOT_COUNTED_REASON, SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
 
 /**
  * Freshness and confidence, once, in the same place on every reading route.
@@ -76,7 +76,11 @@ export function TrustStrip({
   phoneLayout = "grid",
   className = "",
 }: TrustStripProps) {
-  const basisDetail = [basis.warning, basis.note].filter((part): part is string => Boolean(part)).join(" ");
+  /* The warning carries its reason: which inputs were left out is not useful
+     without why (2026-10-14). */
+  const basisDetail = [basis.warning, basis.warning ? NOT_COUNTED_REASON : null, basis.note]
+    .filter((part): part is string => Boolean(part))
+    .join(" ");
   /* `routine`: the fact is in the state a reader does not need to act on.
      Only the phone line leaves those out, and only when the strip links to
      the page that states them; an exception (cached sources, Low confidence)
@@ -87,13 +91,14 @@ export function TrustStrip({
     detail?: string;
     /** Which fact the detail is, for a reader of the markup: the next-week forecast, or the basis's warning. */
     detailKind?: "next-week" | "basis";
-    tone?: "caution" | "easing";
+    /** `caveat`: read this reading with care (the caveat diamond); `easing`: in the state it should be (a filled dot, lit). Never the crossed red, which is for lines. */
+    tone?: "caveat" | "easing";
     routine?: boolean;
   }[] = [
     /* "Data as of": the date the guidance rests on. The report intro's other date
        is when the sources were last checked, and it says so (2026-10-09). */
     { label: "Data as of", value: recordDateLabel },
-    { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caution", routine: sourcesLive },
+    { label: "Sources", value: sourcesLabel, tone: sourcesLive ? "easing" : "caveat", routine: sourcesLive },
     /* The margin, in points, where "Confidence: Low" stood: the number was always a
        distance from the change line, never a probability (/calibration). Whether
        the call could change next week is the same distance read as a forecast, so
@@ -105,7 +110,7 @@ export function TrustStrip({
       value: describeMarginCell(margin, confidenceLabel),
       detail: describeNextWeek(couldChangeNextWeek, changeReason),
       detailKind: "next-week",
-      tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caution" : undefined,
+      tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caveat" : undefined,
     },
     /* Which inputs set the scores, on every call (2026-10-09). Routine on the
        record's own inputs with nothing left out that would move a line: the
@@ -116,7 +121,7 @@ export function TrustStrip({
       label: SCORING_BASIS_LABEL,
       value: basis.value,
       ...(basisDetail ? { detail: basisDetail, detailKind: "basis" as const } : {}),
-      tone: basisDetail || basis.key === "extended" ? "caution" : undefined,
+      tone: basisDetail || basis.key === "extended" ? "caveat" : undefined,
       routine: !basisDetail && basis.key === "record",
     },
   ];
@@ -157,18 +162,20 @@ export function TrustStrip({
                 broke onto two lines and read as two labels. */}
             <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>{cell.label}</dt>
             {line ? " " : null}
-            {/* A state carries a dot as well as its ink, so "Partly cached" and
+            {/* A state carries a mark as well as its ink (a lit dot when live, the
+                caveat diamond when not), so "Partly cached" and
                 "2 pts from its line" read as flags at a glance and survive a
-                greyscale screenshot. Round, because it is a marker (§XIV); a
-                pseudo-element, so the cell's text is still only its value. */}
+                greyscale screenshot. Each shape has one meaning across the site
+                (§XIV's mark vocabulary); a pseudo-element, so the cell's text is
+                still only its value. */}
             <dd
               className={`${termLayout}${
-                cell.tone === "caution"
-                  ? "font-medium text-semantic-caution-fg"
+                cell.tone === "caveat"
+                  ? "weather-caveat-mark font-medium text-caveat-fg"
                   : cell.tone === "easing"
-                    ? "font-medium text-semantic-easing-fg"
+                    ? "font-medium text-semantic-easing-fg before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:align-middle before:content-['']"
                     : "font-medium text-slate-200"
-              }${cell.tone ? " before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:align-middle before:content-['']" : ""}`}
+              }`}
             >
               {cell.value}
               {cell.detail ? (

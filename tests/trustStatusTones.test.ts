@@ -30,7 +30,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(result.outageExitGate.metCount, 2);
     assert.equal(
       result.decisionImpactWindow,
-      "Use this live reading for this week's approvals; the pause lines in this week's guidance apply.",
+      "Use this live reading for this week's decisions; the pause lines in this week's guidance apply.",
     );
   });
 
@@ -88,7 +88,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(disagree.trustStatusTone, "warning");
     assert.equal(disagree.trustStatusLabel, "Live data, but guidance held");
     assert.match(disagree.trustStatusDetail, /The two scores point in different directions, so the guidance is not changing this week/);
-    assert.match(disagree.trustStatusAction, /Keep approvals reversible\./);
+    assert.match(disagree.trustStatusAction, /Keep new commitments reversible\./);
     assert.ok(disagree.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores agree.`));
     assert.equal(disagree.decisionImpactWindow, "Only moves you can undo, until the two scores agree.");
 
@@ -192,7 +192,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(caution.label, "Act with caution");
-    assert.equal(caution.detail, `${POLICY_OVERRIDE_CALL["signals-dispersed"].currentCall} Keep approvals reversible.`);
+    assert.equal(caution.detail, `${POLICY_OVERRIDE_CALL["signals-dispersed"].currentCall} Keep new commitments reversible.`);
     assert.doesNotMatch(caution.detail, /policy override|posture|two scores/i);
   });
 

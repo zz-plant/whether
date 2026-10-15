@@ -207,7 +207,7 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Areas",
             title: "This week's rule for each area",
-            description: "Each area's rule this week, with the line that pauses it and the line that resumes it.",
+            description: "Each rule pauses at one line and resumes at another, set apart so one noisy week cannot flip it.",
             hashAliases: ["ops-monthly-action-summary-panel"],
             // The step header directly above already states this label, title, and description.
             children: h(ReportSection, {

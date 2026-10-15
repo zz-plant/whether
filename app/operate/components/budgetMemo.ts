@@ -11,6 +11,7 @@ import { formatNumberWithUnit } from "../../../lib/formatters";
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { paceLabel } from "../../../lib/report/paceLabels";
+import type { EngineeringPaybackLines } from "../../../lib/report/projectPayback";
 import type { buildRunwayPlan, describeRunwayPlanInYourNumbers, RunwayPlannerRequest } from "../../../lib/report/runwayPlanner";
 import type { MacroSeriesReading, SensorReading } from "../../../lib/types";
 
@@ -31,6 +32,7 @@ export const buildBudgetMemoMarkdown = ({
   stageLabel,
   sectorLabel,
   inYourNumbers = null,
+  engineering = null,
 }: {
   assessment: RegimeAssessment;
   sensors?: readonly SensorReading[];
@@ -44,6 +46,8 @@ export const buildBudgetMemoMarkdown = ({
   sectorLabel: string;
   /** The plan in calendar months and dollars, once the browser can date it. */
   inYourNumbers?: ReturnType<typeof describeRunwayPlanInYourNumbers> | null;
+  /** The planner's projects against the payback bar, once one is sized. */
+  engineering?: EngineeringPaybackLines | null;
 }) => {
   const datedLines = inYourNumbers
     ? [
@@ -53,6 +57,14 @@ export const buildBudgetMemoMarkdown = ({
         ...inYourNumbers.ownLines.map((line) => `- **Our line**: ${line}`),
       ].filter((line): line is string => line !== null).join("\n") + "\n"
     : "";
+  const engineeringSection = engineering
+    ? `
+## 4. Engineering work against the payback bar
+${engineering.bar}
+${engineering.projects.map((line) => `- ${line}`).join("\n")}
+`
+    : "";
+  const sourcesNumber = engineering ? 5 : 4;
   const sensor = (id: SensorReading["id"]) => readingValue(sensors.find((reading) => reading.id === id));
   const macro = (id: MacroSeriesReading["id"]) => readingValue(macroSeries.find((reading) => reading.id === id));
   const conditions = getRegimePublicLabel(assessment.regime);
@@ -82,8 +94,8 @@ ${datedLines}
 ## 3. The rules this sets
 - **Fundraising**: ${output.boundedRules.capitalRaising}
 - **Spending**: ${output.boundedRules.burnDiscipline}
-
-## 4. Sources
+${engineeringSection}
+## ${sourcesNumber}. Sources
 - **Short-term borrowing rate**: ${sensor("BASE_RATE")} (Source: US Treasury)
 - **Recession warning gauge (10-year minus 2-year)**: ${sensor("CURVE_SLOPE")} (Source: US Treasury)
 - **Corporate borrowing premium**: ${macro("BBB_CREDIT_SPREAD")}, the extra interest mid-grade companies pay over the government (Source: St. Louis Fed, Moody's BBB corporate bond yield minus the 10-year Treasury)

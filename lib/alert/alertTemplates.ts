@@ -8,7 +8,7 @@
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import type { FlashMove } from "./flashMoves";
-import type { PublishedLine } from "./alertEvaluator";
+import { sideOfLine, type PublishedLine } from "./alertEvaluator";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { emailTextFooter, renderEmailShell } from "../email/emailShell";
 import { siteUrl } from "../siteUrl";
@@ -113,7 +113,7 @@ const LINE_NAME: Record<PublishedLine["kind"], string> = {
  * pause needs to know it no longer applies.
  */
 const describeLineCrossing = (line: PublishedLine, value: number): string => {
-  const side = value > line.value ? "above" : "below";
+  const side = sideOfLine(line, value);
   if (line.kind === "change") {
     return "Conditions change if it is still there at the next reading. Read this week's guidance before acting on last week's plan.";
   }
@@ -145,7 +145,7 @@ export const thresholdCrossingEmail = (
      decimal the scores are never published with, beside a line printed without one. */
   const score = formatScoreValue(value);
   const reading = `${metricLabel} is ${score}; ${lineName} is ${line.value}.`;
-  const whatToDo = `It crossed ${value > line.value ? "above" : "below"} that line since the last alert. ${describeLineCrossing(line, value)}`;
+  const whatToDo = `It crossed ${sideOfLine(line, value)} that line since the last alert. ${describeLineCrossing(line, value)}`;
   const subject = `Whether Alert — ${metricLabel} crossed ${lineName} (${line.value})`;
   const text = [
     `Whether Threshold Alert`,

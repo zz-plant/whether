@@ -19,7 +19,10 @@ import { buildPublishedBriefEmailUpdate, buildPublishedBriefSlackUpdate, findPub
 import { resolveScoringBasis } from "../lib/report/scoringBasis";
 import { formatMeetingSlideMarkdown } from "../lib/export/meetingSlideExport";
 import { snapshotData } from "../lib/snapshot";
-import { buildReportDataFixture } from "./fixtures/reportFixtures";
+import { buildReportDataFixture, liveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * Every call states its basis (2026-10-09): the status strip, the published
@@ -34,7 +37,7 @@ const WARNING = "Startup-market inputs would put risk appetite at 41, below its 
 const liveSnapshot = () =>
   buildOperatingSnapshot({
     treasury: { ...snapshotData, isLive: true, fallback_at: undefined, fallback_reason: undefined, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-    macroSeries,
+    macroSeries: liveMacroSeries,
     now: new Date("2026-08-31T12:00:00.000Z"),
   });
 
@@ -108,7 +111,7 @@ describe("the basis on every surface", () => {
 
     const slack = buildSlackBrief(document);
     assert.match(slack, /Margin: [^\n]* · Scored on the record's inputs$/m, "the Monday post's stamp");
-    assert.match(slack, new RegExp(`^• ${WARNING.replace(/[.()]/g, "\\$&")} The guidance leaves them out: the record cannot test them\\.$`, "m"), "and why it could be wrong");
+    assert.match(slack, new RegExp(`^• ${WARNING.replace(/[.()]/g, "\\$&")} They are left out because past months can't be checked with them\\.$`, "m"), "and why it could be wrong");
     assert.match(slack, /^Not counted: risk appetite -11 from startup-market inputs\.$/m, "under what moved the scores");
 
     assert.match(buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(document)), /^Scored on the record's inputs\.$/m, "the operator brief");

@@ -31,6 +31,17 @@ const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasi
   if (row.previous === null || row.delta === null) {
     return <span className="text-slate-500">—</span>;
   }
+  /* A score held at the top of its scale is not "unchanged": it cannot show a
+     rise (2026-10-14). The flat chip said "no move" a row before the note that
+     said the move was hidden, at the moment conditions were most extreme. */
+  if (row.saturatedPressure !== undefined && row.delta === 0) {
+    return (
+      <span className="weather-caveat-mark inline-flex items-center rounded-sm border border-current/30 px-1.5 py-0.5 tabular-nums text-caveat-fg" data-delta-capped>
+        <span className="sr-only">{`${row.label} has been at the highest it can read ${basis.since}, so a rise cannot show.`}</span>
+        <span aria-hidden="true">Can&rsquo;t rise further</span>
+      </span>
+    );
+  }
   const direction = trendDirectionFromDelta(row.delta);
   const tone = trendToneClass(direction, row.increaseIsPositive);
   return (
@@ -191,8 +202,8 @@ export function WhatChangedSection({
                            moment conditions are most extreme. Say it, under the
                            ladder that has the width for a sentence: in the chip
                            column it wrapped to four lines and stretched the row. */
-                        <p className="max-w-[48ch] text-xs text-amber-300/80">
-                          Pinned at the top of its scale, so it can&rsquo;t show a move. It would read {row.saturatedPressure.toFixed(0)}.
+                        <p className="weather-caveat-mark max-w-[48ch] text-xs text-caveat-fg">
+                          The highest this score can read. Without that limit it would read {row.saturatedPressure.toFixed(0)}, so a further rise can&rsquo;t show here.
                         </p>
                       ) : null}
                     </div>

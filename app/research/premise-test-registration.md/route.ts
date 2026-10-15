@@ -4,7 +4,7 @@ export const runtime = "edge";
 
 /**
  * Transport only: the text is docs/research/, bundled by
- * scripts/research/publishPremiseTestDocs.ts. Plain text rather than
+ * scripts/research/publishResearchDocs.ts. Plain text rather than
  * text/markdown, because some browsers download a Markdown response instead of
  * showing it, and this is linked for reading from /trust.
  */

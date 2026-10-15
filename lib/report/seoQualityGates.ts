@@ -193,7 +193,7 @@ const buildDecisionTransmissionGate = (input: EvaluateSeoQualityGatesInput): Seo
 const buildTrustGate = (input: EvaluateSeoQualityGatesInput): SeoQualityGateStatus => {
   const reasons: string[] = [];
 
-  if ((input.provenanceLinks ?? []).filter((link) => hasValue(link)).length === 0) {
+  if (!(input.provenanceLinks ?? []).some((link) => hasValue(link))) {
     reasons.push("provenance-links-missing");
   }
 

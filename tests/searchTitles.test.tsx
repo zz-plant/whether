@@ -11,6 +11,9 @@ import { resourceArticles } from "../lib/resourceArticles";
 import { formatMonthYearShortFromValue } from "../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import type { buildSeoDecisionPayload } from "../lib/report/seoDecisionPayload";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The titles a search result shows, in the words people search, dated by the
