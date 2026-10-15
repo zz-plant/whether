@@ -41,17 +41,9 @@ export const PROVENANCE_FALLBACK_STATUS = {
   unavailable: "Unavailable (fallback)",
 } as const;
 
-/**
- * The playbook catalog is written, not read from a feed, so no tier applies.
- * It used to borrow "Simulated (low)", which on a strip reads as a replayed
- * market reading of low quality.
- */
-export const PROVENANCE_CATALOG_STATUS = "Curated catalog (static)";
-
 type ProvenanceStripStatus =
   | ProvenanceStatusLabel
-  | (typeof PROVENANCE_FALLBACK_STATUS)[keyof typeof PROVENANCE_FALLBACK_STATUS]
-  | typeof PROVENANCE_CATALOG_STATUS;
+  | (typeof PROVENANCE_FALLBACK_STATUS)[keyof typeof PROVENANCE_FALLBACK_STATUS];
 
 /**
  * A replay reports what its coverage supports and stops there — it never claims

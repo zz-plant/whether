@@ -235,6 +235,15 @@ describe("the arguments an agent leaves out", () => {
     });
     assert.match(String(projection.velocityLabel), /Stable/);
   });
+
+  it("get_standup_line returns the standup one-liner for today's conditions", async () => {
+    const result = await runAgentTool("get_standup_line", {}, "http");
+    const standupLine = result.standupLine;
+    assert.ok(typeof standupLine === "string");
+    assert.match(standupLine, /Guidance|Conditions/);
+    assert.match(standupLine, /Conditions change if/);
+    assert.ok(result.regime);
+  });
 });
 
 describe("the catalogue rows", () => {

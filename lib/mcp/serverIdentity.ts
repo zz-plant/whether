@@ -33,6 +33,7 @@ export const MCP_SERVER_INSTRUCTIONS =
   "(automation.ready; when it is false, say so and stop), where each score sits against its pause, resume and change lines, " +
   "what moved each score, and the guidance. " +
   "get_brief is the full weekly brief (about 22KB), for its wording, provenance and the other cadences. " +
+  "get_standup_line is the daily standup line with guidance movement and flip conditions. " +
   "get_decision_rules gives the bounded rules behind the guidance. " +
   "get_context and get_projection place today's conditions in history and estimate how soon they change; both default to today's reading. " +
   "get_recent_history gives one signal's trailing window, get_comps the SaaS valuation multiples, and " +

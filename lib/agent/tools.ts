@@ -11,6 +11,8 @@ import { getRegimeContext, projectRegimeFromPace } from "../report/regimeContext
 import { buildUseConstraint } from "../report/useConstraint";
 import { fetchSaaSValuations, SAAS_BASKET } from "../saasMultiples";
 import { getTimeMachineMonthsByYear } from "../timeMachine/timeMachineCache";
+import { buildStandupLine } from "../report/decisionMovement";
+import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
 import { createAgentToolRegistry, defineTool } from "./registry";
 
@@ -76,6 +78,29 @@ const AGENT_TOOLS = [
     example: { cadence: "weekly" },
     plainGetNote: "Over plain GET it answers a summary instead (regime, action, margin, record date); get_state is the answer to decide from.",
     run: async ({ cadence }) => ({ ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() }),
+  }),
+  defineTool({
+    name: "get_standup_line",
+    title: "Get the daily standup line",
+    description:
+      "Returns the daily standup one-liner stating guidance movement this week and the conditions that would change it.",
+    input: {},
+    example: {},
+    run: async () => {
+      const { reportData, snapshot } = await loadWeeklyBriefSnapshot();
+      const line = buildStandupLine({
+        regime: reportData.assessment.regime,
+        change: snapshot.homeBriefModel.weeklyLeadershipSummary.guidanceChange,
+        weeklyCall: snapshot.weeklyCall,
+        assessment: reportData.assessment,
+      });
+      return {
+        standupLine: line,
+        regime: reportData.assessment.regime,
+        guidanceChange: snapshot.homeBriefModel.weeklyLeadershipSummary.guidanceChange,
+        recordDate: reportData.treasury.record_date,
+      };
+    },
   }),
   defineTool({
     name: "get_decision_rules",

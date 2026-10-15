@@ -2,7 +2,14 @@ import assert from "node:assert/strict";
 import { formatGuidance } from "../lib/export/briefBuilders";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
-import { buildBriefEmbedData, buildBriefEmbedHtml, buildBriefEmbedText, buildWhetherBriefUrl } from "../app/api/embed/route";
+import {
+  buildBriefEmbedData,
+  buildBriefEmbedHtml,
+  buildBriefEmbedText,
+  buildCallStripEmbedHtml,
+  buildCallStripEmbedText,
+  buildWhetherBriefUrl,
+} from "../app/api/embed/route";
 import { OPERATOR_STAGE_OPTIONS, parseOperatorStageParam } from "../lib/report/operatorStage";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { buildFlipThreshold } from "../lib/report/reportEvidence";
@@ -93,6 +100,8 @@ describe("embed route helpers", () => {
     assert.match(script, /document\.currentScript/);
     assert.match(script, /var EMBED_API_BASE = origin \+ ["']\/api\/embed["']/);
     assert.match(script, /var PRODUCTION_ORIGIN = ["']https:\/\/whether\.work["']/);
+    assert.match(script, /isCallStrip/);
+    assert.match(script, /&mode=/);
   });
 
   it("escapes embed HTML text and href interpolations", () => {
@@ -105,6 +114,30 @@ describe("embed route helpers", () => {
     assert.match(html, /&quot;&gt;&lt;script&gt;alert\(&quot;ticker&quot;\)&lt;\/script&gt;/);
     assert.match(html, /&lt;img src=x onerror=alert\(1\)&gt;/);
     assert.match(html, /https:\/\/whether\.work\/\?ref=%22%3E%3Cscript%3Ealert%28%22ref%22%29%3C%2Fscript%3E/);
+  });
+
+  it("escapes call-strip HTML and renders compact strip with regime, call, and margin", () => {
+    const stripHtml = buildCallStripEmbedHtml({
+      ...briefData,
+      formattedCall: `Tighten <script>alert("call")</script> approvals`,
+      marginLabel: "Margin 2 pts",
+    });
+
+    assert.doesNotMatch(stripHtml, /<script/i);
+    assert.match(stripHtml, /&lt;script&gt;alert\(&quot;call&quot;\)&lt;\/script&gt;/);
+    assert.match(stripHtml, />Tight</);
+    assert.match(stripHtml, /Margin 2 pts/);
+    assert.match(stripHtml, /Whether &rarr;/);
+
+    const stripText = buildCallStripEmbedText({
+      ...briefData,
+      formattedCall: "Tighten spend approvals",
+      marginLabel: "Margin 2 pts",
+    });
+    assert.equal(
+      stripText,
+      `Whether [Tight]: Tighten spend approvals · Margin 2 pts (${briefData.attributionUrl})`,
+    );
   });
 
   it("renders the calibrated stage in the meta line, and nothing when there is none", () => {
@@ -203,6 +236,20 @@ describe("the embed says what the brief says", () => {
       data.doNowItems.map((item) => `- ${item}`),
     );
     assert.ok(lines.includes("Do now:"));
+  });
+
+  it("derives flip distance and compact margin label for call-strip embeds", async () => {
+    const homepage = await assembleFreezingWeek();
+    const data = buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: null });
+
+    assert.equal(typeof data.flipDistance, "number");
+    assert.equal(data.flipDistance, 2);
+    assert.match(data.marginLabel ?? "", /Margin 2 pts/);
+    assert.ok(data.formattedCall && data.formattedCall.length > 0);
+
+    const stripHtml = buildCallStripEmbedHtml(data);
+    assert.match(stripHtml, />Freezing</);
+    assert.match(stripHtml, /Margin 2 pts/);
   });
 });
 

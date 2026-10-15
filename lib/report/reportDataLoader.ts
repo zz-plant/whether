@@ -2,7 +2,6 @@ import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import { ENGINE_VERSION, type RegimeAssessment, type RegimeThresholds } from "../regimeEngine";
 import {
   FRED_SOURCE_LABEL,
-  PROVENANCE_CATALOG_STATUS,
   PROVENANCE_FALLBACK_STATUS,
   PROVENANCE_STATUS,
   historicalMacroStatus,
@@ -497,13 +496,6 @@ export const loadReportDataUncachedInternal = async ({
       isLive: macroSeries.some(hasLiveFlag),
     }),
   };
-  const internalProvenance: ReportProvenance = {
-    sourceLabel: "Whether curated playbook catalog",
-    recordDateLabel: "Static",
-    timestampLabel: "Static catalog",
-    ageLabel: "Static.",
-    statusLabel: PROVENANCE_CATALOG_STATUS,
-  };
   const statusLabel = deps.formatRegimeLabel(assessment.regime);
   const historicalComparison =
     shouldLoadHistoricalLiveComparison && liveAssessment
@@ -667,7 +659,6 @@ export const loadReportDataUncachedInternal = async ({
     historicalComparison,
     historicalSelection,
     historicalAnalogs,
-    internalProvenance,
     invalidHistoricalSelection,
     lastYearComparison,
     liveAssessment,
@@ -805,13 +796,6 @@ export const buildFallbackReportDataInternal = ({
     historicalComparison: null,
     historicalSelection,
     historicalAnalogs: [],
-    internalProvenance: {
-      sourceLabel: "Whether curated playbook catalog",
-      recordDateLabel: "Static",
-      timestampLabel: "Static catalog",
-      ageLabel: "Static.",
-      statusLabel: PROVENANCE_CATALOG_STATUS,
-    },
     invalidHistoricalSelection,
     lastYearComparison: null,
     liveAssessment,

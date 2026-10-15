@@ -2,7 +2,11 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { createElement } from "react";
 import { renderToStaticMarkup } from "react-dom/server";
-import { SinceLastVisit, elapsedWeeksSuffix } from "../app/components/home/SinceLastVisit";
+import {
+  SinceLastVisit,
+  elapsedWeeksSuffix,
+  compareHrefForRecordDate,
+} from "../app/components/home/SinceLastVisit";
 
 /*
  * The comparison itself renders only after hydration, from localStorage, and
@@ -39,5 +43,17 @@ describe("SinceLastVisit", () => {
 
   it("prints nothing for a date it cannot place", () => {
     assert.equal(elapsedWeeksSuffix("not a date", current.recordDate), "");
+  });
+
+  it("builds compare target for a valid past date and falls back safely", () => {
+    assert.equal(
+      compareHrefForRecordDate("2026-06-15"),
+      "/history/compare?yearB=2026&monthB=6",
+    );
+    assert.equal(
+      compareHrefForRecordDate("2024-11-01"),
+      "/history/compare?yearB=2024&monthB=11",
+    );
+    assert.equal(compareHrefForRecordDate("invalid-date"), "/history/compare");
   });
 });

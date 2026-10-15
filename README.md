@@ -29,6 +29,8 @@
 ### 1. Run locally
 
 ```bash
+git clone https://github.com/zz-plant/whether.git
+cd whether
 bun install
 bun run dev
 ```
