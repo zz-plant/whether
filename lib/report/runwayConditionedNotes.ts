@@ -133,7 +133,7 @@ export const buildRunwayConditionedNotes = ({
       },
       {
         area: "hiring",
-        note: `With ${runway} of runway, the hiring pause is what protects the runway every other rule assumes. Reversing it is what spends that runway.`,
+        note: `With ${runway} of runway, the hiring pause is what protects the runway every other rule assumes. Reversing it spends that runway.`,
       },
     ];
     return notes;
