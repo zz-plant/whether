@@ -53,24 +53,29 @@
    (controls.css, layout-shells.css). */
 
 /* Hero card. The one surface whose colour is allowed to say something: its
-   fill, border and top-edge light all come from --regime-accent, which the
-   hero sets on itself from the week's regime (data-regime), so the card is
-   gold in a Sunny week, frost blue in a Freezing one, and cannot disagree with
-   the stamp inside it. Before this it was fixed teal — the stripe's colour
-   for Sunny — under every call. No outer glow, since a box
-   that glows lifts off its page, and the depth ladder below already gives
-   the hero the only elevation on the brief. */
+   top-edge rule and border come from --regime-accent, which the hero sets on
+   itself from the week's regime (data-regime), so the card is gold in a Sunny
+   week, frost blue in a Freezing one, and cannot disagree with the stamp
+   inside it. The rule is a status mark, not a side-tab stripe: it carries the
+   week's condition through a crop or a re-encode, which a wash does not. The
+   fill stays the flat panel, so the call, not the box, is what reads first,
+   and there is no outer glow — the depth ladder already gives the hero the
+   brief's only elevation. */
 .weather-hero-card {
   position: relative;
   background: var(--bg-panel);
   border-color: color-mix(in srgb, var(--regime-accent) 20%, var(--border-strong));
-  box-shadow: var(--elev-2);
+  box-shadow:
+    var(--elev-2),
+    inset 0 3px 0 var(--regime-accent);
 }
 
 html[data-theme="light"] .weather-hero-card {
   background: var(--bg-panel, #ffffff);
   border-color: color-mix(in srgb, var(--regime-accent) 18%, var(--border-strong));
-  box-shadow: var(--elev-1);
+  box-shadow:
+    var(--elev-1),
+    inset 0 3px 0 var(--regime-accent);
 }
 
 /* The regime's atmosphere. One wash for both shells: the brief's container
