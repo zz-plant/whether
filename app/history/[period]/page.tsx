@@ -250,7 +250,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
           Conditions in {period.title}
         </h1>
-        <p className="rounded-md border border-amber-400/30 bg-amber-500/5 px-3 py-2 text-sm text-amber-100" data-reconstructed-notice>
+        <p className="weather-caveat-mark text-sm text-caveat-fg" data-reconstructed-notice>
           {describeReconstructedPeriod(period.title, firstPublishedWeek)}
         </p>
         {headlineSentence ? <p className="text-sm font-semibold text-slate-100">{headlineSentence}</p> : null}

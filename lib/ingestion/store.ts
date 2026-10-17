@@ -314,7 +314,7 @@ export const getDefaultIngestionStore = () => {
     return defaultStore.store;
   }
   const store = coordinator
-    ? new IngestCoordinatorStore(coordinatorStubFor(coordinator))
+    ? new IngestCoordinatorStore(() => coordinatorStubFor(coordinator))
     : kvBinding
       ? new KvIngestionStore(kvBinding)
       : new FileIngestionStore();

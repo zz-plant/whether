@@ -237,6 +237,7 @@ export function DecisionHero({
           <TrustStrip
             {...trust}
             href="/trust"
+            phoneLayout="line"
             className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4 md:mt-auto"
           />
         ) : null}

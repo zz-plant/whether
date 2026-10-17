@@ -269,4 +269,31 @@ describe("getDefaultIngestionStore backend selection", () => {
       Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
     }
   });
+
+  it("acquires a fresh Durable Object stub per operation instead of reusing a request-bound stub across requests", async () => {
+    const { object } = coordinatorPair();
+    let getCalls = 0;
+    const singleUseNamespace: CoordinatorNamespace = {
+      idFromName: (name: string) => name,
+      get: () => {
+        getCalls += 1;
+        let used = false;
+        return {
+          fetch: (request: Request) => {
+            if (used) {
+              throw new Error("Cannot perform I/O on behalf of a different request");
+            }
+            used = true;
+            return object.fetch(request);
+          },
+        };
+      },
+    };
+    Object.assign(globalThis, { WHETHER_INGEST_COORDINATOR: "1", INGEST_COORDINATOR: singleUseNamespace });
+
+    const store = getDefaultIngestionStore();
+    assert.equal(await store.readLatestMaterialized(), null);
+    assert.equal(await store.readLatestMaterialized(), null);
+    assert.equal(getCalls, 2, "each operation resolves a fresh stub in its own request context");
+  });
 });

@@ -58,7 +58,7 @@ export function CommitmentTest({
   );
 
   return (
-    <div data-testid="commitment-test" className="space-y-2 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-3 py-3">
+    <div data-testid="commitment-test" className="space-y-2 border-t border-[color:var(--border-faint)] pt-3">
       {showTitle ? <p className="text-fluid-xs font-medium text-slate-200">Test it against your runway</p> : null}
       <div className="grid gap-2 sm:grid-cols-2">
         <OperatorProfileNumberField

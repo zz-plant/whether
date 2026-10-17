@@ -532,7 +532,9 @@ async function PageContent({
   const heroAreas = heldAreasLine
     ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
     : undefined;
-  const heroTrust = publishedNotice ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null } } : trustStripProps;
+  const heroTrust = publishedNotice
+    ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null, omitReason: true } }
+    : trustStripProps;
 
   return (
     <Shell regime={regime}>
@@ -687,7 +689,7 @@ async function PageContent({
                   first visit it folds with the brief: on a phone it pushed the
                   decision picker under the tab bar, and that question is the
                   one thing a first visit is asked. */}
-              <div className="mt-4 flex flex-wrap items-center gap-2">
+              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
                 <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
                 {/* Labelled: three bare words beside Copy Brief did not say they
                     set the horizon the guidance is stated for. The confidence chip

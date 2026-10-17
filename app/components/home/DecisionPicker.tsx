@@ -185,18 +185,20 @@ export function DecisionPicker({
                 </>
               ) : null}
             </dl>
+            <CommitmentTest regime={regime} area={active.area} />
             {/* The lines above are the published ones. A plan that needs its own —
                 a hiring plan released at 60 rather than 66 — sets them once on the
                 planning page and hears the day one is crossed. */}
-            <ActionLink href="/operate#ops-plan-lines" variant="inline">
-              Move these lines for your plan →
-            </ActionLink>
-            <CommitmentTest regime={regime} area={active.area} />
-            {active.answer ? (
-              <ActionLink href={active.answer.href} variant="inline">
-                {active.answer.title} →
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-3">
+              <ActionLink href="/operate#ops-plan-lines" variant="inline">
+                Move these lines for your plan →
               </ActionLink>
-            ) : null}
+              {active.answer ? (
+                <ActionLink href={active.answer.href} variant="inline">
+                  {active.answer.title} →
+                </ActionLink>
+              ) : null}
+            </div>
           </div>
         ) : null}
       </div>

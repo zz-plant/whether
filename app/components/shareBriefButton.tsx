@@ -62,6 +62,7 @@ export function ShareBriefButton({
   return (
     <ClipboardActionRow
       compact
+      buttonVariant="primary"
       className={className}
       label={showLabel ? label : <span className="sr-only">{label}</span>}
       state={status}
