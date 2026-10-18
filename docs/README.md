@@ -29,6 +29,7 @@ Use this file to find the current source of truth without reading the whole `doc
 - `developer/quickstart.md` for first integration
 - `developer/api-reference.md` for endpoint contracts
 - `developer/integrations.md` for webhook & SDK recipes
+- `developer/decision-models.md` for caller-owned text/audio/video checks and advisory brief, screenshot, evidence and model evaluations
 
 ## Document types
 

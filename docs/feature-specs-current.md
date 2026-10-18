@@ -9,6 +9,21 @@ Dynamic decision copy follows the same bounded contract across weekly, evidence,
 
 ## 1) Product surfaces (UI routes)
 
+### Caller-owned decision checks and advisory artifact audits (2026-10-17)
+
+`GET /api/agent?format=jev` supports optional Jev/Clef/Flash/Omni model selection;
+audio/video templates require Omni. Eight typed questions separate missing action and
+reversibility evidence from the plan judgments. The caller adds the text or clip and
+calls its own provider; Whether receives neither. `automationReady` remains the existing
+publish-readiness judgment. No model runs on the report read path or determines the guidance.
+
+The existing `audit:jev-copy` contributor command also reviews a generated brief against
+its paired canonical document, checks an actual local screenshot, ranks supplied evidence
+with a separate support test, and runs labeled model comparisons. These remain advisory,
+outside automated delivery and the offline deploy gate. The generator writes the exact
+document identity beside its text so audits refuse mismatched readings before inference.
+Contract, commands and evaluation limits: [decision models](developer/decision-models.md).
+
 ### Current reading and disclosure behavior (2026-09-24)
 
 - The weekly brief reads in the same visual and document order on phones and desktop:

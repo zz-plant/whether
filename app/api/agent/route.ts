@@ -8,6 +8,7 @@ import {
 import { agentApiCorsHeaders } from "../../../lib/agentApiCors";
 import { buildAgentStateResponse } from "../../../lib/agentState";
 import { buildJevHandoff } from "../../../lib/jev/jevHandoff";
+import { DECISION_MODELS, isDecisionModel } from "../../../lib/jev/jevClient";
 import { buildUseConstraint } from "../../../lib/report/useConstraint";
 
 export const runtime = "edge";
@@ -18,6 +19,8 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const requestedCadence = searchParams.get("cadence") ?? "weekly";
   const format = searchParams.get("format");
+  const model = searchParams.get("model") ?? "jev";
+  const input = searchParams.get("input") ?? "text";
   // The views are the manifest's (`lib/agent/discovery.ts`), so it cannot list one this refuses.
   const view = searchParams.get("view") ?? DEFAULT_AGENT_VIEW;
 
@@ -26,6 +29,10 @@ export async function GET(request: Request) {
       { error: "Invalid format.", allowedFormats: ["jev"] },
       { status: 400, headers: agentApiCorsHeaders },
     );
+  }
+
+  if (format === "jev" && (!isDecisionModel(model) || !["text", "audio", "video"].includes(input) || (input !== "text" && model !== "clef-omni"))) {
+    return NextResponse.json({ error: "Invalid decision model or input. Audio/video require clef-omni.", allowedModels: Object.keys(DECISION_MODELS), allowedInputs: ["text", "audio", "video"] }, { status: 400, headers: agentApiCorsHeaders });
   }
 
   if (!AGENT_VIEWS.some((allowed) => allowed === view)) {
@@ -71,11 +78,13 @@ export async function GET(request: Request) {
     route: "/api/agent",
   });
 
-  if (format === "jev") {
+  if (format === "jev" && isDecisionModel(model) && (input === "text" || input === "audio" || input === "video")) {
     const handoff = buildJevHandoff({
       payload: payload.agentHandoff.payload,
       publishReadiness: payload.publishReadiness,
       recordDateLabel: payload.recordDateLabel,
+      model,
+      input,
     });
     return NextResponse.json({ ...handoff, cadence: payload.cadence, use: buildUseConstraint() }, {
       headers: agentApiCorsHeaders,

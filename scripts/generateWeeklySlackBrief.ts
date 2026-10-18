@@ -20,6 +20,8 @@ import { loadReportData } from "../lib/report/reportData";
 import { assessPublishReadiness } from "../lib/report/briefPublishGuard";
 import { buildBriefDocumentFromReport } from "../lib/report/briefDocument";
 import { isSavedCopy } from "../lib/report/provenanceStatus";
+import { ENGINE_VERSION } from "../lib/regimeEngine";
+import { buildBriefAuditBundle } from "./jev-artifact-audit";
 
 const run = async () => {
   const { values } = parseArgs({
@@ -51,7 +53,8 @@ const run = async () => {
   /* The Monday post's text, under the call every page serves. With no options this
      printed stand-ins: "Keep last week's approvals as they are; start nothing new."
      as the action, and the assessment's description as the guidance. */
-  const brief = buildSlackBrief(await buildBriefDocumentFromReport(reportData, { degraded: false }));
+  const document = await buildBriefDocumentFromReport(reportData, { degraded: false });
+  const brief = buildSlackBrief(document);
   const fallbackNotice = readiness.ok
     ? null
     : `NOT LIVE DATA — ${readiness.reason}`;
@@ -64,6 +67,8 @@ const run = async () => {
   }
 
   await writeFile(outPath, output, "utf8");
+  const engineVersion = reportData.operatingSnapshot ? reportData.operatingSnapshot.engineVersion ?? "unrecorded" : ENGINE_VERSION;
+  await writeFile(`${outPath}.audit.json`, `${JSON.stringify(buildBriefAuditBundle(document, engineVersion, output), null, 2)}\n`, "utf8");
   console.log(`Wrote weekly Slack brief to ${outPath}`);
 };
 
