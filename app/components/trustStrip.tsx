@@ -37,7 +37,7 @@ export type TrustStripProps = {
    * change line"). `note` is the one place a page says why its conditions
    * differ from the published week's, where the basis is the reason.
    */
-  basis: { key: ScoringBasisKey; value: string; warning: string | null; note?: string | null };
+  basis: { key: ScoringBasisKey; value: string; warning: string | null; note?: string | null; omitReason?: boolean };
   /** Where the full explanation lives. Omit on /trust itself. */
   href?: "/trust";
   /** How the strip sits below `sm`. "grid" (the default) is the two-column
@@ -77,8 +77,9 @@ export function TrustStrip({
   className = "",
 }: TrustStripProps) {
   /* The warning carries its reason: which inputs were left out is not useful
-     without why (2026-10-14). */
-  const basisDetail = [basis.warning, basis.warning ? NOT_COUNTED_REASON : null, basis.note]
+     without why (2026-10-14). When omitReason is true (e.g. hero when publishedNotice already explains it),
+     we keep warning but avoid duplicate repetition. */
+  const basisDetail = [basis.warning, basis.warning && !basis.omitReason ? NOT_COUNTED_REASON : null, basis.note]
     .filter((part): part is string => Boolean(part))
     .join(" ");
   /* `routine`: the fact is in the state a reader does not need to act on.

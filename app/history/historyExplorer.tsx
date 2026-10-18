@@ -123,7 +123,7 @@ export function HistoryExplorer({
           <select
             value={selectedYear}
             onChange={(event) => { setSelectedYear(Number(event.target.value)); setSelectedMonth(0); }}
-            className="min-h-[44px] rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs font-medium text-[var(--app-text)]"
+            className="weather-control min-h-[44px] px-3 py-1.5 text-xs font-medium"
             style={{ colorScheme: "light dark" }}
             aria-label="Select year"
           >

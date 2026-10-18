@@ -61,10 +61,14 @@ const parseRefreshLockResponse = (body: unknown): RefreshLockResponse["acquired"
 };
 
 export class IngestCoordinatorStore implements IngestionStore {
-  constructor(private readonly stub: CoordinatorStub) {}
+  constructor(private readonly stub: CoordinatorStub | (() => CoordinatorStub)) {}
+
+  private resolveStub(): CoordinatorStub {
+    return typeof this.stub === "function" ? this.stub() : this.stub;
+  }
 
   private async send(path: string, init?: RequestInit): Promise<Response> {
-    const response = await this.stub.fetch(new Request(`${COORDINATOR_ORIGIN}${path}`, init));
+    const response = await this.resolveStub().fetch(new Request(`${COORDINATOR_ORIGIN}${path}`, init));
     if (!response.ok) {
       throw new Error(`ingest coordinator ${init?.method ?? "GET"} ${path} failed (HTTP ${response.status})`);
     }
