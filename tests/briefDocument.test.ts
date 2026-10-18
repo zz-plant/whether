@@ -8,6 +8,7 @@ import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
 import { macros, treasury as exportTreasury } from "./factories/exportFixtures";
+import { buildBriefAuditBundle } from "../scripts/jev-artifact-audit";
 
 const NOW = new Date("2026-08-31T12:00:00.000Z");
 
@@ -26,6 +27,17 @@ const savedCopy = () =>
   });
 
 describe("the brief document", () => {
+  it("pairs an audit artifact with the exact document and changes identity when that document changes", () => {
+    const snapshot = ordinary();
+    const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall);
+    assert.ok(snapshot.engineVersion);
+    const bundle = buildBriefAuditBundle(document, snapshot.engineVersion, "Rendered text");
+    assert.equal(bundle.canonical.readingId, bundle.artifact.readingId);
+    assert.equal(bundle.canonical.guidance, document.call);
+    assert.equal(bundle.canonical.pauseLine, document.slots.pauseIf);
+    assert.deepEqual(bundle.canonical.context, document);
+    assert.notEqual(buildBriefAuditBundle({ ...document, confidenceLabel: "LOW" }, snapshot.engineVersion, "Rendered text").canonical.readingId, bundle.canonical.readingId);
+  });
   it("takes every call slot from the weekly call contract", () => {
     const snapshot = ordinary();
     const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall);

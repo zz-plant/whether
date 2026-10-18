@@ -67,9 +67,15 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
   (`lib/report/briefPublishGuard.ts`). `degraded` is not a freshness signal; this is.
 - `?format=jev` returns the week as a ready-to-send request for TypeSafe's Jev decision model
   (`typesafe/jev`, `lib/jev/jevHandoff.ts`): the agent payload's call as typed state with an empty
-  `plan` slot, and four questions about a plan against the call. The caller fills the plan and calls
-  Jev; Whether never receives it, which is why this is a format and not an endpoint that takes a
+  `plan` slot, and eight questions about a plan against the call. The caller fills the plan and calls
+  the model; Whether never receives it, which is why this is a format and not an endpoint that takes a
   plan. `automationReady` carries `publishReadiness`. Any other `format` is a 400.
+
+  Optional `model=jev|clef|clef-flash|clef-omni` selects the request template (Jev remains
+  the default). `input=audio|video` requires Omni and returns an empty media array for the
+  caller to fill and send directly to Cloudflare; text is the default. See
+  [decision models and advisory audits](../developer/decision-models.md) for transport,
+  missing-evidence handling, media limits, and the brief/screenshot/evidence/evaluation commands.
 
   **Reader text is never sent to Jev (decided 2026-09-23).** Routing `/search` queries or recorded
   decisions through Jev was considered and declined. `/privacy` says the search payload has no field
@@ -77,7 +83,8 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
   server-side Jev call on that text would make both statements false, and a third-party model reading it
   would need its own section there. The site's use of Jev stays where it is: the handoff format above,
   where the caller sends their own plan, and `audit:jev-copy`, which reads only the site's own copy
-  (with Jev, or Cloudflare's Jev-compatible Clef models via `--model`).
+  (with Jev, or Cloudflare's Jev-compatible Clef models via `--model`). The audit's file
+  modes are explicit local contributor workflows; they do not change this reader-data policy.
 
 Machine-discovery routes:
 
