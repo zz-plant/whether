@@ -86,6 +86,9 @@ The header carries four groups, each with a hub, read from one module
   decision area; Help by role, Help by situation, the role and stage guides and the toolkit library
   are Guides' More tools. `/resolve/<slug>` and `/toolkits/<slug>` keep their addresses.
   `/answers` goes to `/resources#answers`, `/guides/*` to Guides' More tools.
+  Role and stage selections land on `#guided-translation-results`, above the browse
+  disclosure; clearing the last valid selection returns to `#guided-translation`
+  inside the browse controls. Invalid selections must not target an absent result.
 - **Sharing has one home.** `/share` holds every format, the slide and card clipboard buttons
   (moved from the brief), the meeting snippet (moved from `/trust`) and the links to API & MCP and
   RSS. The brief's Do and share and Trust each carry one "Share or embed this →" link

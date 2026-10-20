@@ -29,10 +29,19 @@ describe("expansion controls rendering", () => {
     assert.match(top3, /Stop 3/);
     assert.doesNotMatch(top3, /Stop 4/, "the fourth item needs the expansion control");
     assert.match(top3, /aria-expanded="false"/);
+    assert.match(top3, /Showing the top 3 of each list\./);
+    const controlsId = top3.match(/aria-controls="([^"]+)"/)?.[1];
+    assert.ok(controlsId && top3.includes(`id="${controlsId}"`), "expansion control names its rule lists");
+    for (const name of ["Stop", "Start", "Fence"]) {
+      assert.ok(top3.includes(`${name} 3`));
+      assert.ok(!top3.includes(`${name} 4`));
+    }
 
     const all = renderToStaticMarkup(require("react").createElement(RulesBeforeCommit, { ...props, showAll: true }));
     assert.match(all, /Stop 4/);
     assert.match(all, /aria-expanded="true"/);
+    assert.match(all, /Showing every rule\./);
+    for (const name of ["Stop", "Start", "Fence"]) assert.ok(all.includes(`${name} 4`));
   });
 
   it("tabulates each area's lines with a distance instead of reprinting the corridor per area", () => {

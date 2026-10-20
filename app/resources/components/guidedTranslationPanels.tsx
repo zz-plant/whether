@@ -27,7 +27,13 @@ export function buildGuidedTranslationHref(params?: GuidedTranslationSearchParam
   }
 
   const search = query.toString();
-  return search ? `/resources?${search}#guided-translation` : "/resources#guided-translation";
+  const { selectedStakeholder, selectedStage, showStageLibrary } = resolveGuidedTranslationState(params);
+  // Results sit before the browse disclosure. A selection should land on its
+  // guidance; clearing the last valid selection returns to the browse controls.
+  const anchor = selectedStakeholder || selectedStage || showStageLibrary
+    ? "guided-translation-results"
+    : "guided-translation";
+  return `/resources${search ? `?${search}` : ""}#${anchor}`;
 }
 
 export function resolveGuidedTranslationState(params?: GuidedTranslationSearchParams) {
