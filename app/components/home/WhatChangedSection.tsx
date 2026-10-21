@@ -187,7 +187,7 @@ export function WhatChangedSection({
                 {/* With nothing to compare, the lead over the table already says so; on a
                     phone the column has no header, so its dash printed as a lone "—"
                     line in every row. */}
-                <td className={`whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0${comparisonUnavailable ? " max-md:hidden" : ""}`}>
+                <td className={`whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0 ${comparisonUnavailable ? "max-md:hidden" : ""}`}>
                   {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
                 </td>
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">

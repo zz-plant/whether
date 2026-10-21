@@ -49,7 +49,7 @@ describe("ReportShell extracted sections", () => {
     // The status word is the route's stamp: it prints first, as the week's
     // placard; the trust headline and the record date follow it in the meta
     // half of the same line.
-    assert.match(html, /class="type-stamp weather-stamp-placard[^"]*">DEFENSIVE<\/span>/);
+    assert.match(html, /class="type-stamp weather-tag-placard[^"]*">DEFENSIVE<\/span>/);
     assert.match(html, /HIGH • Data as of Mar 5/);
     assert.match(html, /Decision summary/);
     // The refresh stamp is labelled for what it is — the pipeline's fetch,

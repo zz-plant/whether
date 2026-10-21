@@ -435,7 +435,7 @@ a.weather-hub-link-card:hover {
    and the report intro's status word (§XXV keeps condition colour to where a
    condition is named). Lists of past weeks keep the tinted .weather-tag-regime,
    so the placard stays the one solid block of colour on a page. */
-.weather-stamp-placard {
+.weather-tag-placard {
   border-color: var(--regime-accent);
   background: var(--regime-accent);
   color: var(--regime-on-accent);

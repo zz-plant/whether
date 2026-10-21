@@ -113,7 +113,7 @@ export function CommandCenterNavBlock({
               ) : null}
               {/* The week's word in the stamp's shape, the same placard the
                   hero's tag and the sticky strip print. */}
-              <span className="type-stamp weather-stamp-placard self-center rounded-sm border px-2 py-0.5 text-fluid-xs font-semibold">{statusLabel}</span>
+              <span className="type-stamp weather-tag-placard self-center rounded-sm border px-2 py-0.5 text-fluid-xs font-semibold">{statusLabel}</span>
               {introMetaRest ? (
                 <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
               ) : null}
