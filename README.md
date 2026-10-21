@@ -11,9 +11,16 @@
 </p>
 
 <p align="center">
+  <a href="https://whether.work"><img src="https://img.shields.io/website?url=https%3A%2F%2Fwhether.work&label=whether.work&up_message=live" alt="whether.work is live" /></a>
+  <a href="#connect-an-agent"><img src="https://img.shields.io/badge/MCP-no%20key%20needed-4b5563" alt="MCP server, no key needed" /></a>
+  <a href="LICENSE"><img src="https://img.shields.io/github/license/zz-plant/whether" alt="MIT license" /></a>
+  <a href="https://github.com/zz-plant/whether/commits/main"><img src="https://img.shields.io/github/last-commit/zz-plant/whether" alt="Last commit" /></a>
+</p>
+
+<p align="center">
   <a href="https://whether.work"><strong>This week's brief</strong></a> ·
-  <a href="#quick-start">Quick start</a> ·
-  <a href="docs/use-cases/operator-playbooks.md">Operator playbooks</a> ·
+  <a href="https://whether.work/share#subscribe-email">Monday email</a> ·
+  <a href="#try-it-without-installing">Try it in one command</a> ·
   <a href="#connect-an-agent">MCP &amp; agent API</a> ·
   <a href="docs/README.md">Documentation</a>
 </p>
@@ -65,6 +72,20 @@ Captured from whether.work on Oct 21, 2026. [docs/assets/README.md](docs/assets/
 
 ## Quick start
 
+### Try it without installing
+
+Every endpoint is public and needs no key or account:
+
+```bash
+curl https://whether.work/brief.md
+```
+
+That prints this week's brief as Markdown: the conditions, the guidance, and each decision with its pause and resume lines. For the same reading as about 3KB of JSON, with each score against its lines:
+
+```bash
+curl "https://whether.work/api/agent?view=state"
+```
+
 ### Run locally
 
 ```bash
@@ -88,7 +109,15 @@ bun run cli:whether -- watch --changes-only
 
 ### Connect an agent
 
-Add Whether to an MCP client:
+In Claude Code:
+
+```bash
+claude mcp add --transport http whether https://whether.work/api/mcp
+```
+
+In Cursor or VS Code, one click: [Add to Cursor](https://cursor.com/install-mcp?name=whether&config=eyJ1cmwiOiJodHRwczovL3doZXRoZXIud29yay9hcGkvbWNwIn0%3D) · [Add to VS Code](https://vscode.dev/redirect/mcp/install?name=whether&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fwhether.work%2Fapi%2Fmcp%22%7D)
+
+Any other MCP client takes the same URL:
 
 ```json
 {
@@ -101,6 +130,27 @@ Add Whether to an MCP client:
 ```
 
 Or run the server locally over stdio with `bun run mcp:whether`. Agents should call `get_state` first. The tools, the manifest at [`/.well-known/whether-agent.json`](https://whether.work/.well-known/whether-agent.json) and [`/llms.txt`](https://whether.work/llms.txt) are all generated from `lib/agent/tools.ts`; [docs/agents/agent-interface.md](docs/agents/agent-interface.md) covers the rest.
+
+### Embed this week's call
+
+Paste two lines into any page, such as a team wiki, an investor portal or an internal dashboard:
+
+```html
+<div data-whether-embed="brief"></div>
+<script async src="https://whether.work/embed.js"></script>
+```
+
+`brief` draws the guidance and each area's action; `call-strip` draws a single line. The block updates when the brief does and links back to the full reading. The builder at [whether.work/share](https://whether.work/share) adds a company stage and previews the result.
+
+---
+
+## Under the hood
+
+- **One registry, every agent surface.** Each tool is defined once in `lib/agent/tools.ts`. The HTTP and stdio MCP servers, the plain-GET shim, the manifest and `/llms.txt` all read from it, and `tests/agentDiscoveryParity.test.ts` fails if any of them drifts.
+- **An engine that reads no data and writes no words.** `lib/regimeEngineScoring.ts` turns inputs into codes. Every sentence a reader sees comes from `lib/report/`, and an architecture test rejects any engine import of copy, React or data files. A change to scoring bumps `ENGINE_VERSION`.
+- **Fallback that says so.** If a feed fails or goes stale, the brief draws from the snapshots in `data/` and labels the reading with its date and the reason.
+- **A record you can audit.** Conditions are scored at every month-end since 2012 by the same engine the live brief runs, so a past call can be checked against what followed.
+- **Fast, strict gates.** The 2,500+ tests run in about 14 seconds on Bun. The pre-push gate rejects new `as` casts, new lint suppressions and exports with no caller.
 
 ---
 
@@ -163,4 +213,5 @@ Whether holds the **act** step in the [STD-07 Revisable Delegation Record](https
 - [docs/editorial-guardrails.md](docs/editorial-guardrails.md): vocabulary, decision contracts and tone
 - [docs/one-screen-weekly-brief-spec.md](docs/one-screen-weekly-brief-spec.md): the weekly brief's specification
 - [docs/developer/quickstart.md](docs/developer/quickstart.md): integrating with the API
+- [ROADMAP.md](ROADMAP.md): what has shipped and what is next
 - [CONTRIBUTING.md](CONTRIBUTING.md) and [AGENTS.md](AGENTS.md): how changes are made here
