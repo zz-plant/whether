@@ -23,4 +23,10 @@ describe("live data fallback alert", () => {
     assert.doesNotMatch(html, /https?:\/\//);
     assert.doesNotMatch(html, /\d{4}-\d{2}-\d{2}T/);
   });
+
+  it("draws as a caveat, not in the crossed-line red the amber and rose ramps resolve to", () => {
+    assert.match(html, /weather-caveat-mark/);
+    assert.match(html, /border-caveat-border/);
+    assert.doesNotMatch(html, /\b(?:amber|rose)-\d/);
+  });
 });

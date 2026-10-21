@@ -184,9 +184,9 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           </div>
         </dl>
         {dataCurrency ? (
-          <p className="rounded-md border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
+          <p className="weather-caveat-mark rounded-md border border-l-4 border-caveat-border bg-caveat-bg px-4 py-3 text-xs text-caveat-fg">
             {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
-            <Link href={DATA_CURRENCY_ACTION_HREF} className="underline decoration-amber-300/60 underline-offset-4">
+            <Link href={DATA_CURRENCY_ACTION_HREF} className="underline decoration-slate-600 underline-offset-4">
               Source dates
             </Link>
           </p>
