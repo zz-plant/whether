@@ -3,6 +3,7 @@ import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/home
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
 import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
+import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -439,14 +440,15 @@ async function PageContent({
   });
   /* How long these conditions lasted before, against the reader's chosen band.
      Left out of an archived view, whose record would have to end at its month. */
+  const recordSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
   const spellLengths = historicalSelection || !isRegimeKey(regime)
     ? null
     : describeSpellLengths({
-        series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+        series: recordSeries,
         currentRegime: regime,
         runwayBand: data.operatorContext.companyRunway ?? null,
       });
-  const turningPoints = findRecentCallChanges(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER), 4).map((change) => ({
+  const turningPoints = findRecentCallChanges(recordSeries, 4).map((change) => ({
     label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
     href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
   }));
@@ -588,6 +590,7 @@ async function PageContent({
           />
           <ConditionsLegend
             arrival={arrivedFromShare ? "share" : undefined}
+            orientation={historicalSelection ? undefined : homeOrientationLine}
             currentRegime={historicalSelection ? undefined : regime}
             thresholds={reportData.assessment.thresholds}
           />
@@ -769,7 +772,13 @@ async function PageContent({
             />
 
             {/* 7. Has this happened before? */}
-            <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} spellLengths={spellLengths} />
+            <RecordSection
+              lastTime={lastTimeCallChanged}
+              callChangeLines={callChangeLines}
+              turningPoints={turningPoints}
+              spellLengths={spellLengths}
+              record={historicalSelection ? undefined : recordSeries}
+            />
 
             {/* Last, as a line rather than a section: the way out to every share
                 format, and the week's published brief. */}

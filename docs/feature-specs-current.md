@@ -147,7 +147,12 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    the definition (each change line's value at its end, "How they are set" under it), so the legend
    gives way to it (§1.1.63). It replaced the standfirst and the folded "How to read this page".
    Dismissible; the layout hides it for a browser that has rendered the brief before. The week
-   picker above the card names the week by its Monday and is a label, not a heading.
+   picker above the card names the week by its Monday and is a label, not a heading. Since
+   2026-10-21 a live week's legend opens with whom the site is for and what it does, at every width
+   (`homeOrientationLine` in `lib/seo.ts`: "For startup leaders:" and the category line), because
+   the card opens on the week's guidance and never says what Whether is. The conditions map's
+   caption says what its two directions mean ("Up is pricey money, right is willing investors"),
+   from the same `CONDITION_SIDE_MEANINGS` the legend builds each condition's meaning from.
 1. **The verdict** (`#weekly-call`). `DecisionHero` is the card a reader screenshots: the conditions
    stamp with the week's direction and, when conditions changed, what they were; the week's
    headline action as the `h1` (`weeklyHeadline`, §1.1.60); what the conditions mean; one line on
@@ -188,7 +193,9 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    each area's row says which of its lines moved. A read with no comparison says so over it.
 7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; on every week, how long
-   these conditions lasted before (§1.1.76); the last turns as links.
+   these conditions lasted before (§1.1.76); the last turns as links. On a live week the record is
+   drawn above those sentences as `/history`'s month strip (every month-end since 2012 in its
+   weather, 2026-10-21), so how long spells last and how rarely conditions change read at a glance.
 8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
    holds the slide and image copies and every other format since 2026-10-08, and the week's
    published brief named by its week ("Published brief for the week of Oct 5, 2026 →").

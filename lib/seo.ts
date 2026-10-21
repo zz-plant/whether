@@ -24,6 +24,14 @@ export const websiteName = "Whether — Weekly Operating Guidance for Startup Le
  */
 export const canonicalPositioningLine =
   "The interest-rate and credit lines that pause or resume your hiring, spend and raise. Checked every Monday, with an email the day one is crossed.";
+/*
+ * The category line as the homepage's first-visit orientation: whom it is for,
+ * then the line itself. The page opens on the week's guidance, which says what
+ * to do and never what the site is; a first-time reader met "Cloudy" and a
+ * headline with no subject.
+ */
+export const homeOrientationLine =
+  `For startup leaders: ${canonicalPositioningLine.charAt(0).toLowerCase()}${canonicalPositioningLine.slice(1)}`;
 export const defaultSiteDescription =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 
