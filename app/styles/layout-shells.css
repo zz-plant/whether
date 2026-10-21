@@ -429,6 +429,18 @@ a.weather-hub-link-card:hover {
   font-size: var(--text-fluid-nano);
 }
 
+/* The week's word as a placard (2026-10-21): the condition's solid fill with
+   its on-accent ink, as a weather service prints a warning level. Only the
+   two places that state this week's condition wear it, the call card's stamp
+   and the report intro's status word (§XXV keeps condition colour to where a
+   condition is named). Lists of past weeks keep the tinted .weather-tag-regime,
+   so the placard stays the one solid block of colour on a page. */
+.weather-tag-placard {
+  border-color: var(--regime-accent);
+  background: var(--regime-accent);
+  color: var(--regime-on-accent);
+}
+
 .weather-panel,
 .weather-panel-static,
 .weather-secondary-header,

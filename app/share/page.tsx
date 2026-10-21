@@ -378,10 +378,14 @@ export default async function SharePage() {
                 above it, and before that the kicker read "Current weekly
                 artifact", the product's internal noun for what a reader calls
                 the brief. */}
+            {/* Its own line since 2026-10-21: run on after the title in a 42rem
+                column, the unbreakable "· Week of …" wrapped whole and opened the
+                second line on a stray dot at desktop widths. */}
             <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">
-              Share this week&apos;s guidance{" "}
-              <span className="whitespace-nowrap font-normal text-slate-400">
-                · Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
+              Share this week&apos;s guidance
+              <span className="sr-only">, </span>
+              <span className="mt-1 block text-fluid-lg font-normal text-slate-400">
+                Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
               </span>
             </h1>
             <p className="text-sm leading-relaxed text-white/60">

@@ -27,6 +27,7 @@ import {
   labelForArea,
   publishedBriefDisplay,
   publishedBriefHeadline,
+  correctionBody,
   publishedBriefWeekLabel,
   publishedBriefStaticParams,
   type PublishedBrief,
@@ -194,7 +195,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           /* A correction rides inside the card, under the lines it corrects: the
              card is the block people crop, and a crop that dropped the note
              would carry the uncorrected line on its own. */
-          callDetail={brief.correction ? `Correction: ${brief.correction}` : undefined}
+          callDetail={brief.correction ? `Correction: ${correctionBody(brief.correction)}` : undefined}
           regime={brief.regime}
           lines={[
             ...(display.pauseIf ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: display.pauseIf }] : []),

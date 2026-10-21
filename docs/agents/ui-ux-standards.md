@@ -676,6 +676,11 @@ chart, the weather glyphs and the pause and play line states (§XXIV). Everythin
   palette: it keeps their text legible over a scrolling page. The call card's regime rule and the
   site's name inside it, on `/` and on a published week: that card is the one people crop and
   share, the rule names the week in a crop, and every other page's header names the site already.
+- The week's word as a placard (2026-10-21). The call card's stamp and the report intro's status
+  word print in the condition's solid fill with `--regime-on-accent` ink (`.weather-tag-placard`),
+  so the week's condition is the one solid block of colour on a page. Lists of past weeks keep the
+  tinted `.weather-tag-regime`. The conditions chart lights the week's quadrant and dims the other
+  three, so its colour field says which weather it is before the eye finds the dot.
 
 
 ## XXVI. Controls as instrument parts

@@ -35,6 +35,20 @@ describe("RegimeRadar", () => {
     assert.match(html, /\(something_else\)/);
   });
 
+  it("lights the week's quadrant and dims the other three", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} />);
+
+    assert.equal(html.match(/data-active=""/g)?.length, 1);
+    assert.match(html, /opacity="1" data-quadrant="SCARCITY" data-active=""/);
+    assert.equal(html.match(/opacity="0.45"/g)?.length, 3);
+  });
+
+  it("dims nothing for an unmodelled regime", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} currentRegime="SOMETHING_ELSE" />);
+
+    assert.doesNotMatch(html, /data-active|opacity="0.45"/);
+  });
+
   it("keeps the marker inside the frame when a score is outside 0–100", () => {
     // y runs from 14 (top, tightness 100) to 162 (bottom, tightness 0). A
     // reading beyond the range must clamp to the frame, not draw past it.
