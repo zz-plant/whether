@@ -141,7 +141,8 @@ export const isRuleConditionMet = (condition: RuleCondition, current: number): b
  */
 type DescribedCondition = {
   clause: string;
-  /** Present only when the reading already meets the line. */
+  met: boolean;
+  /** Present whenever the score has a reading, met or not. */
   reading?: { label: string; value: string };
 };
 
@@ -153,10 +154,11 @@ const describeRuleCondition = (
   const metric = ruleMetricLabel[condition.metric].toLowerCase();
   const value = formatThresholdNumber(condition.value);
   const current = scores?.[condition.metric];
+  const reading = current === undefined ? undefined : { label: ruleMetricLabel[condition.metric], value: formatScoreValue(current) };
   if (current !== undefined && isRuleConditionMet(condition, current)) {
     const state =
       condition.operator === ">" ? "is above" : condition.operator === ">=" ? "is at or above" : condition.operator === "<" ? "is below" : "is at or below";
-    return { clause: `${metric} ${state} ${value}`, reading: { label: ruleMetricLabel[condition.metric], value: formatScoreValue(current) } };
+    return { clause: `${metric} ${state} ${value}`, met: true, reading };
   }
   switch (condition.operator) {
     case ">":
@@ -164,19 +166,33 @@ const describeRuleCondition = (
         clause: side === "resume" && condition.metric === "riskAppetite"
           ? `${metric} is above ${value}`
           : `${metric} rises above ${value}`,
+        met: false,
+        reading,
       };
     case ">=":
-      return { clause: `${metric} is at or above ${value}` };
+      return { clause: `${metric} is at or above ${value}`, met: false, reading };
     case "<":
-      return { clause: `${metric} falls below ${value}` };
+      return { clause: `${metric} falls below ${value}`, met: false, reading };
     case "<=":
-      return { clause: `${metric} is at or below ${value}` };
+      return { clause: `${metric} is at or below ${value}`, met: false, reading };
   }
 };
 
-/** A rule's sentence, then the readings of the lines it names that are already met. */
-const withReadingsNow = (sentence: string, ...conditions: DescribedCondition[]): string => {
-  const readings = conditions.flatMap((condition) => (condition.reading ? [condition.reading] : []));
+/**
+ * A rule's sentence, then the readings once any line it names is met.
+ *
+ * An "or" rule prints the met readings: one is enough to fire it. An "and" rule
+ * prints every reading, because a met half alone reads as nearly there. Until
+ * 2026-10-21 a week at funding pressure 90 and risk appetite 55 was told to
+ * "Resume when funding pressure falls below 66 and risk appetite is above 54.
+ * Risk appetite is 55 now." — one point from the resume line by every number
+ * the sentence gave, and 24 from it by the one it left out.
+ */
+const withReadingsNow = (sentence: string, join: BoundedRuleClause["join"], conditions: DescribedCondition[]): string => {
+  if (!conditions.some((condition) => condition.met)) return sentence;
+  const readings = conditions.flatMap((condition) =>
+    condition.reading && (join === "and" || condition.met) ? [condition.reading] : [],
+  );
   return readings.length === 0 ? sentence : `${sentence} ${formatReadingsNow(readings)}`;
 };
 
@@ -193,7 +209,7 @@ const formatRuleClause = (
   ];
   if (parts.length === 0) return `${clause.verb}.`;
   const connective = side === "pause" ? "if" : "when";
-  return withReadingsNow(`${clause.verb} ${connective} ${parts.join(` ${clause.join} `)}.`, ...described);
+  return withReadingsNow(`${clause.verb} ${connective} ${parts.join(` ${clause.join} `)}.`, clause.join, described);
 };
 
 const withDerivedTriggers = (
@@ -592,10 +608,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't make several permanent hires before one milestone lands.",
         ],
         watchAdjustments: [
-          withReadingsNow(`Runway trigger: tighten if ${tightnessPauseLine.clause} for 2 readings in a row.`, tightnessPauseLine),
+          withReadingsNow(`Runway trigger: tighten if ${tightnessPauseLine.clause} for 2 readings in a row.`, "or", [tightnessPauseLine]),
         ],
         thresholdEmphasis: "Protect runway first; fund one proof of demand at a time rather than breadth.",
-        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause} for two readings in a row and one shipped milestone shows traction.`, tightnessResumeLine),
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause} for two readings in a row and one shipped milestone shows traction.`, "or", [tightnessResumeLine]),
       };
     }
 
@@ -611,7 +627,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't run two expansion programs at once; you won't know which one paid back.",
         ],
         watchAdjustments: [
-          withReadingsNow(`Payback trigger: revisit the plan if ${riskPauseLine.clause}.`, riskPauseLine),
+          withReadingsNow(`Payback trigger: revisit the plan if ${riskPauseLine.clause}.`, "or", [riskPauseLine]),
         ],
         /*
          * The Spending bar, not a stage bar of its own: this said "pay back inside
@@ -619,7 +635,7 @@ export const buildScopedVariantDecisionAdjustment = ({
          * spend only inside six. A stage adds emphasis; it never relaxes that bar.
          */
         thresholdEmphasis: `Payback first: fund the channels that convert repeatably and pay back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
-        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${riskResumeLine.clause} and conversion holds for two weekly reviews.`, riskResumeLine),
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${riskResumeLine.clause} and conversion holds for two weekly reviews.`, "or", [riskResumeLine]),
       };
     }
 
@@ -635,10 +651,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't add fixed cost on the assumption that valuations recover.",
         ],
         watchAdjustments: [
-          withReadingsNow(`Leverage trigger: hold expansion if ${tightnessPauseLine.clause}.`, tightnessPauseLine),
+          withReadingsNow(`Leverage trigger: hold expansion if ${tightnessPauseLine.clause}.`, "or", [tightnessPauseLine]),
         ],
         thresholdEmphasis: "Efficiency first: show the margin gain before adding headcount.",
-        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only when, in the same week, ${tightnessResumeLine.clause} and ${riskResumeLine.clause}.`, tightnessResumeLine, riskResumeLine),
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only when, in the same week, ${tightnessResumeLine.clause} and ${riskResumeLine.clause}.`, "and", [tightnessResumeLine, riskResumeLine]),
       };
     }
 
@@ -654,10 +670,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't grow revenue faster than support and margin can carry it.",
         ],
         watchAdjustments: [
-          withReadingsNow(`Growth trigger: re-sequence expansion if ${riskPauseLine.clause}.`, riskPauseLine),
+          withReadingsNow(`Growth trigger: re-sequence expansion if ${riskPauseLine.clause}.`, "or", [riskPauseLine]),
         ],
         thresholdEmphasis: "Prove customer acquisition cost payback, retention and support capacity before adding fixed cost.",
-        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${riskResumeLine.clause} and conversion improves, both for two weekly readings.`, riskResumeLine),
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${riskResumeLine.clause} and conversion improves, both for two weekly readings.`, "or", [riskResumeLine]),
       };
     }
 
@@ -673,10 +689,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't fund programs that only meet guidance if the market re-rates.",
         ],
         watchAdjustments: [
-          withReadingsNow(`Guidance trigger: tighten discretionary spend if ${tightnessPauseLine.clause}.`, tightnessPauseLine),
+          withReadingsNow(`Guidance trigger: tighten discretionary spend if ${tightnessPauseLine.clause}.`, "or", [tightnessPauseLine]),
         ],
         thresholdEmphasis: "Earnings durability first: cash conversion and hitting guidance before growth.",
-        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only when ${tightnessResumeLine.clause} and confidence in your earnings guidance improves with it.`, tightnessResumeLine),
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only when ${tightnessResumeLine.clause} and confidence in your earnings guidance improves with it.`, "or", [tightnessResumeLine]),
       };
     }
 
@@ -693,10 +709,10 @@ export const buildScopedVariantDecisionAdjustment = ({
         "Don't start anything that needs outside money to finish.",
       ],
       watchAdjustments: [
-        withReadingsNow(`Cash trigger: tighten spend if ${tightnessPauseLine.clause} or ${riskPauseLine.clause}.`, tightnessPauseLine, riskPauseLine),
+        withReadingsNow(`Cash trigger: tighten spend if ${tightnessPauseLine.clause} or ${riskPauseLine.clause}.`, "or", [tightnessPauseLine, riskPauseLine]),
       ],
       thresholdEmphasis: "Cash first: commitments you can reverse, over growth that looks good.",
-      reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause}, ${riskResumeLine.clause}, and cash payback holds for two weekly readings in a row.`, tightnessResumeLine, riskResumeLine),
+      reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause}, ${riskResumeLine.clause}, and cash payback holds for two weekly readings in a row.`, "and", [tightnessResumeLine, riskResumeLine]),
     };
   };
 

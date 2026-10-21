@@ -3560,6 +3560,31 @@ devices, lines a team shares) would have needed accounts, which Whether does not
   `/operate` is titled "Decide"; the board slide files follow the brief's stage; the signals
   table's "Feeds into" links carry the shared tap area.
 
+### 1.1.80 Distances the reader can act on (2026-10-21)
+
+Read against the week of Oct 19 (funding pressure 90, pinned at its ceiling with 110 of pressure;
+risk appetite 55), four sentences told a reader something the numbers did not support.
+
+- **A half-met resume line gives both readings.** "Resume when funding pressure falls below 66
+  and risk appetite is above 54. Risk appetite is 55 now." quoted the half already met, so the
+  resume read as one point away; funding pressure was 24 points from it. An "and" rule now prints
+  every reading once any of its lines is met ("Funding pressure is 90 and risk appetite is 55
+  now."); an "or" rule still prints only the met ones, since one fires it
+  (`withReadingsNow`, `lib/report/boundedDecisionRules.ts`).
+- **The margin counts what the ceiling hides.** A pinned score sheds its pressure above the cap
+  before the published number moves, so its gap to the change line is the published gap plus that
+  headroom (`resolveTightnessGap`, `lib/report/confidence.ts`). The margin named funding pressure
+  "20 pts from its change line"; the line the week could cross next was risk appetite's, 5 points
+  away, and the margin names it now. The brief document carries the pressure, so every paste
+  agrees with the page.
+- **"Watch this week" lists lines still to cross.** It was every rule's resume lines, met or not:
+  "Risk appetite > 54" at 55, and on a Sunny week with nothing held, two lines already true and
+  none that could hold anything. A held area now lists the resume lines it has not met, an open
+  area its pause lines (`linesStillToCross`, `lib/report/homeBrief/builders.ts`).
+- **A held week's pause line names the decisions that wait.** "The decision can't be undone while
+  the guidance is held." read as a warning that nothing could be reversed. It is "A decision can't
+  be undone; reversible ones go ahead while the guidance is held." (`HELD_PAUSE_IF`).
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

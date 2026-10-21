@@ -65,8 +65,9 @@ describe("buildBoundedConditionRails", () => {
     });
 
     assert.equal(hiring.pauseTrigger, "Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44.");
-    /* A line the reading already meets says so, beside the one still to come. */
-    assert.equal(hiring.resumeTrigger, "Resume the held roles when funding pressure is below 66 and risk appetite is above 54. Funding pressure is 32 now.");
+    /* A line the reading already meets says so, beside the one still to come, and
+       an "and" rule gives both readings so the met half does not read as nearly there. */
+    assert.equal(hiring.resumeTrigger, "Resume the held roles when funding pressure is below 66 and risk appetite is above 54. Funding pressure is 32 and risk appetite is 52 now.");
     assert.deepEqual(rails.map((rail) => [rail.guardrail, rail.clearsAt]), [[76, 66], [44, 54]]);
   });
 
