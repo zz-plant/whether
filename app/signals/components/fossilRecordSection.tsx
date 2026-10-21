@@ -65,14 +65,14 @@ export function FossilRecordSection({
                 {fossilRecord.columns.domain}
               </th>
               <th scope="col" className="py-2.5 pr-3 font-medium">
-                <span className="inline-flex items-center gap-1.5 text-amber-300/90">
-                  <span className="h-1.5 w-1.5 rounded-full bg-amber-400" aria-hidden="true" />
+                <span className="inline-flex items-center gap-1.5 text-slate-400">
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-500" aria-hidden="true" />
                   {fossilRecord.columns.lowRateArtifact}
                 </span>
               </th>
               <th scope="col" className="py-2.5 pr-3 font-medium">
-                <span className="inline-flex items-center gap-1.5 text-sky-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-sky-400" aria-hidden="true" />
+                <span className="inline-flex items-center gap-1.5 text-slate-100">
+                  <span className="h-1.5 w-1.5 rounded-full bg-slate-200" aria-hidden="true" />
                   {fossilRecord.columns.highRateArtifact}
                 </span>
               </th>
@@ -85,7 +85,7 @@ export function FossilRecordSection({
             {fossilRecord.rows.map((row) => (
               <tr
                 key={row.domain}
-                className="border-b border-slate-800/40 last:border-0 hover:bg-slate-900/30 transition-colors"
+                className="border-b border-slate-800/40 last:border-0"
               >
                 <td className="py-3 pr-3 font-semibold text-slate-200 align-top">
                   {row.domain}

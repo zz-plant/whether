@@ -306,7 +306,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
           aria-label="Command palette"
         >
           <div className="flex items-center gap-3 border-b border-[color:var(--border-default)] px-4 py-3.5 bg-[color:var(--bg-raised)]/40">
-            <Search className="text-sky-400 shrink-0" size={18} aria-hidden="true" />
+            <Search className="text-slate-400 shrink-0" size={18} aria-hidden="true" />
             <input
               ref={searchInputRef}
               type="text"

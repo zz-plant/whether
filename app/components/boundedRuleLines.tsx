@@ -45,7 +45,7 @@ export const RuleLines = ({
         const distance = isNearest ? formatPointsToLine(nearest.pointsToLine, kind, nearest.satisfied) : null;
         return (
           <span key={`${condition.metric}-${condition.operator}-${condition.value}`} className="tabular-nums">
-            <span className={kind === "pause" ? "text-amber-100" : "text-sky-100"}>{condition.label}</span>
+            <span className={kind === "pause" ? "text-line-crossed-fg" : "text-line-clear-fg"}>{condition.label}</span>
             {/* A space, not a margin, before the badge: it wraps under the line in
                 a narrow cell, and a margin would indent it there. */}
             {distance === null ? null : state ? (

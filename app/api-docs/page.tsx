@@ -32,7 +32,7 @@ type EndpointProps = {
 function Endpoint({ signature, children, tryHref, tryLabel, tryAriaLabel }: EndpointProps) {
   return (
     <div className="weather-surface px-4 py-3 space-y-1">
-      <code className="block text-fluid-xs font-semibold text-sky-200">{signature}</code>
+      <code className="block text-fluid-xs font-semibold text-slate-100">{signature}</code>
       <p className="text-xs text-slate-300">{children}</p>
       {tryHref ? (
         <a
@@ -88,14 +88,14 @@ export default function ApiDocsPage() {
             </pre>
           </div>
           <p className="text-xs text-slate-300">
-            Start with <span className="text-sky-200 font-mono">get_state</span>: one small answer with the conditions and the margin from their change lines, the data's freshness, each score against its lines with the moves behind it, and the guidance. Every tool only reads:{" "}
+            Start with <span className="font-mono text-slate-100">get_state</span>: one small answer with the conditions and the margin from their change lines, the data's freshness, each score against its lines with the moves behind it, and the guidance. Every tool only reads:{" "}
             {toolNames.map((name, index) => (
               <Fragment key={name}>
                 {index > 0 ? ", " : ""}
-                <span className="text-sky-200 font-mono">{name}</span>
+                <span className="font-mono text-slate-100">{name}</span>
               </Fragment>
             ))}
-            . For local agents or CI pipelines, <span className="text-sky-200 font-mono">bun run mcp:whether</span>{" "}
+            . For local agents or CI pipelines, <span className="font-mono text-slate-100">bun run mcp:whether</span>{" "}
             starts the same tools over stdio.
           </p>
           <p className="text-xs text-slate-300">
@@ -228,7 +228,7 @@ export default function ApiDocsPage() {
             <Endpoint signature="GET /api/decision-memory?format=records">
               Past guidance in NDJSON, shaped by the Revisable Delegation record schema — one
               belief record per week of published guidance. Scoped to the caller: it reads your own decision
-              memory, so it needs an <span className="text-sky-200">x-whether-client-id</span> header
+              memory, so it needs an <span className="font-mono text-slate-100">x-whether-client-id</span> header
               and answers 401 without one. No &quot;Try it&quot; link for that reason.
             </Endpoint>
           </div>
@@ -309,11 +309,11 @@ export default function ApiDocsPage() {
             </Endpoint>
           </div>
           <div className="weather-surface px-4 py-3 space-y-2">
-            <p className="text-fluid-xs font-semibold text-sky-200">Embeddable widget</p>
+            <p className="text-fluid-xs font-semibold text-slate-100">Embeddable widget</p>
             <p className="text-xs text-slate-300">
               Drop the current guidance into an internal dashboard or wiki. It updates itself each week.
-              Add <span className="text-sky-200">data-whether-ticker</span> or{" "}
-              <span className="text-sky-200">data-whether-stage</span> to tailor it to one company.
+              Add <span className="font-mono text-slate-100">data-whether-ticker</span> or{" "}
+              <span className="font-mono text-slate-100">data-whether-stage</span> to tailor it to one company.
             </p>
             <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
               {embedSnippet}
@@ -330,13 +330,13 @@ export default function ApiDocsPage() {
         <section className="space-y-4">
           <h2 className="type-eyebrow">Command line</h2>
           <p className="text-xs text-slate-300">
-            The <span className="text-sky-200">whether</span> CLI is an operator terminal for the
+            The <span className="font-mono text-slate-100">whether</span> CLI is an operator terminal for the
             same data: the conditions, the guidance, this week's changes and the lines that would change the guidance.
           </p>
           <div className="space-y-3">
             <Endpoint signature="whether status">
               This week&apos;s guidance and the numbers behind it. Add{" "}
-              <span className="text-sky-200">--as-of 2026-03</span> to read any past month.
+              <span className="font-mono text-slate-100">--as-of 2026-03</span> to read any past month.
             </Endpoint>
             <Endpoint signature="whether state --json">
               The state an agent decides from, in JSON: the answer{" "}
@@ -359,11 +359,11 @@ export default function ApiDocsPage() {
             </Endpoint>
           </div>
           <p className="text-xs text-slate-300">
-            Also available: <span className="text-sky-200">diagnostics</span>,{" "}
-            <span className="text-sky-200">history compare</span>,{" "}
-            <span className="text-sky-200">company</span>,{" "}
-            <span className="text-sky-200">share</span>,{" "}
-            <span className="text-sky-200">doctor</span>, and shell completions.
+            Also available: <span className="font-mono text-slate-100">diagnostics</span>,{" "}
+            <span className="font-mono text-slate-100">history compare</span>,{" "}
+            <span className="font-mono text-slate-100">company</span>,{" "}
+            <span className="font-mono text-slate-100">share</span>,{" "}
+            <span className="font-mono text-slate-100">doctor</span>, and shell completions.
           </p>
         </section>
 

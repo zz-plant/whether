@@ -152,7 +152,7 @@ export function ShareImageArtifacts() {
             </div>
             <div className="flex flex-wrap items-baseline justify-between gap-2">
               <h3 className="text-sm font-semibold text-white/90">{artifact.title}</h3>
-              {artifact.meta ? <p className="text-fluid-micro font-medium tracking-[0.04em] text-sky-200">{artifact.meta}</p> : null}
+              {artifact.meta ? <p className="text-fluid-micro font-medium tracking-[0.04em] text-slate-300">{artifact.meta}</p> : null}
             </div>
             <p className="text-xs leading-relaxed text-white/60">{artifact.description}</p>
             <ul className="mt-auto space-y-2">
