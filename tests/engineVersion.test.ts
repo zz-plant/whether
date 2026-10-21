@@ -29,6 +29,8 @@ const ENGINE_FINGERPRINTS: Record<string, string> = {
   "engine-2026-10-09": "c3316a6f2f62195f9a6fde9402790708",
   /* The Chicago Fed index joins the record basis, with its month-end history in the archive. */
   "engine-2026-10-09b": "ca529e0c34cc6e6af89eaf09fb71f69c",
+  /* The saturation flag means the score has stopped responding to the base rate, not pressure past 100. */
+  "engine-2026-10-21": "2f410e7a99bd4af8235a57d4fafb0d47",
 };
 
 const pad = (value: number) => String(value).padStart(2, "0");

@@ -407,11 +407,15 @@ export const ROADMAP_PAYBACK_BAR_MONTHS = 12;
 /**
  * The four lines every area's pause and resume conditions are drawn from, set
  * apart from the change lines so a score must travel past a line, not touch it,
- * before a rule moves. One source for the rules below and for the track record's
- * count of months a line was crossed.
+ * before a rule moves. One source for the rules below, the monthly summary's
+ * bands and the track record's count of months a line was crossed.
+ *
+ * Every line is held to the 0-100 scale the scores are on. The tightness pause
+ * line was the one that was not, so a regime line of 95 or more (the advanced
+ * threshold controls go to 100) printed "Funding pressure > 101".
  */
 export const sharedDecisionLines = (thresholds: RuleContext["thresholds"]) => ({
-  tightnessPause: thresholds.tightnessRegime + 6,
+  tightnessPause: Math.min(thresholds.tightnessRegime + 6, 100),
   tightnessResume: Math.max(thresholds.tightnessRegime - 4, 0),
   riskPause: Math.max(thresholds.riskAppetiteRegime - 6, 0),
   riskResume: Math.min(thresholds.riskAppetiteRegime + 4, 100),

@@ -12,13 +12,13 @@
 import type { MacroSeriesReading, TreasuryData } from "./types";
 import {
   MISSING_SLOPE_FALLBACK,
-  TIGHTNESS_CAP,
   computeBaseRateVelocityPoints,
   computeCurveSlope,
   computeRiskAppetiteScore,
   computeTightnessPressure,
   computeTightnessScore,
   getBaseRate,
+  isTightnessSaturated,
   resolveThresholds,
   type RegimeEvaluationContext,
   type RegimeKey,
@@ -148,7 +148,7 @@ export const scoreRegime = (
     scores: {
       tightness,
       tightnessPressure,
-      tightnessSaturated: tightnessPressure > TIGHTNESS_CAP,
+      tightnessSaturated: isTightnessSaturated(baseRateForScore, thresholds.baseRateTightness, tightness),
       riskAppetite,
       baseRateUsed: baseRate.used,
       baseRate: baseRate.value,
