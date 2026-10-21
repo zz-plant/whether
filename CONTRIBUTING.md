@@ -8,8 +8,8 @@ For AI/agent operating rules, use `AGENTS.md` and `docs/agents/*`.
 ## 1) Environment and bootstrap
 
 ### Required toolchain
-- Node.js 20+ (see `.nvmrc`)
-- Bun 1.3.x (pinned via `packageManager` in `package.json`)
+- Node.js 22+ (`.nvmrc`, `mise.toml`)
+- Bun 1.3.14+ (pinned via `packageManager` in `package.json`; `mise install` sets up both)
 
 ### First run
 1. Install dependencies: `bun install`
@@ -21,13 +21,18 @@ For AI/agent operating rules, use `AGENTS.md` and `docs/agents/*`.
 | Goal | Command |
 | --- | --- |
 | Development server | `bun run dev` |
-| Development server (Turbopack) | `bun run dev:turbo` |
 | Production build pipeline | `bun run build` |
 | Lint | `bun run lint` |
 | Type-check | `bun run typecheck` |
-| Tests | `bun test` |
+| One test file | `bun run test <path>` |
+| Tests | `bun run test` |
 | Tests in watch mode | `bun run test:watch` |
 | Full pre-PR checks | `bun run check` |
+
+Run tests through `bun run test`, not bare `bun test`: the runner in `scripts/run-tests.mjs` pins
+`NODE_ENV` and strips credentials from the environment, so a result does not depend on your shell.
+`bun run check` also runs on `git push` (`.husky/pre-push`); it is the only check gate, because the
+GitHub workflows run by hand.
 
 ## 3) Contribution workflow
 
@@ -39,7 +44,7 @@ For AI/agent operating rules, use `AGENTS.md` and `docs/agents/*`.
    - Avoid drive-by cleanup unless required for correctness.
 3. **Validate by risk**
    - Docs-only: verify links/commands/references.
-   - Typical app/logic changes: `bun run lint && bun test`.
+   - Typical app/logic changes: `bun run lint && bun run typecheck && bun run test`.
    - Broad/high-risk changes: `bun run check`.
 4. **Ship with docs/tests**
    - If behavior, interfaces, commands, or contributor workflows change, update relevant docs in the same PR.
