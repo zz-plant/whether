@@ -129,14 +129,7 @@ export function DecisionHero({
             ran four facts together ("hard to raise · Tightening this week ·
             Was Cloudy on Sep 30") ahead of the call they lead into. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <span
-            className="type-stamp inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs"
-            style={{
-              color: "var(--regime-ink)",
-              borderColor: "color-mix(in srgb, var(--regime-accent) 45%, transparent)",
-              backgroundColor: "color-mix(in srgb, var(--regime-accent) 15%, transparent)",
-            }}
-          >
+          <span className="type-stamp weather-stamp-placard inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-semibold">
             {/* The weather the word names, beside it. An unknown regime prints
                 its word alone: the sun it used to fall back to claimed a
                 condition nobody had read. */}

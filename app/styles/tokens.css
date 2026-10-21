@@ -261,6 +261,11 @@
      uses for Sunny. The neutral fallback is a grey, the same as regimeAccent.ts. */
   --regime-accent: #939c9a;
   --regime-ink: var(--app-text-secondary);
+  /* Text on a solid --regime-accent fill (the placard stamp, layout-shells.css).
+     Dark ink on Sunny 8.3:1, Stormy 6.5:1, Cloudy 4.6:1 and the neutral grey;
+     white on Freezing 5.3:1, where the dark ink fell to 3.4:1. The fills are
+     the same in both themes, so this needs no light override. */
+  --regime-on-accent: #121719;
 
   /* Regime phase map (the conditions chart and RegimePhaseMap) -----------
      Quadrant washes for the plane the classifier actually cuts. This chart is
@@ -674,10 +679,10 @@ html[data-theme="light"] {
    Atmosphere is the top-of-page wash both shells paint (.weather-regime-ground),
    resolved here so the brief and the report routes cannot key it differently —
    the report backdrop used to hold its own hue table, with Sunny in teal. */
-[data-regime="EXPANSION"] { --regime-accent: #d9a82c; --regime-ink: var(--color-condition-sunny-ink); --regime-atmosphere: var(--atmosphere-expansion); }
-[data-regime="SCARCITY"] { --regime-accent: #3a6fa3; --regime-ink: var(--color-condition-freezing-ink); --regime-atmosphere: var(--atmosphere-scarcity); }
-[data-regime="DEFENSIVE"] { --regime-accent: #9d7a4a; --regime-ink: var(--color-condition-cloudy-ink); --regime-atmosphere: var(--atmosphere-defensive); }
-[data-regime="VOLATILE"] { --regime-accent: #8f96e0; --regime-ink: var(--color-condition-stormy-ink); --regime-atmosphere: var(--atmosphere-volatile); }
+[data-regime="EXPANSION"] { --regime-accent: #d9a82c; --regime-ink: var(--color-condition-sunny-ink); --regime-atmosphere: var(--atmosphere-expansion); --regime-on-accent: #121719; }
+[data-regime="SCARCITY"] { --regime-accent: #3a6fa3; --regime-ink: var(--color-condition-freezing-ink); --regime-atmosphere: var(--atmosphere-scarcity); --regime-on-accent: #ffffff; }
+[data-regime="DEFENSIVE"] { --regime-accent: #9d7a4a; --regime-ink: var(--color-condition-cloudy-ink); --regime-atmosphere: var(--atmosphere-defensive); --regime-on-accent: #121719; }
+[data-regime="VOLATILE"] { --regime-accent: #8f96e0; --regime-ink: var(--color-condition-stormy-ink); --regime-atmosphere: var(--atmosphere-volatile); --regime-on-accent: #121719; }
 
 /* The week's colour is the action colour (2026-10-14). Under a shell that
    knows its regime, links, buttons, the selected pill and focus rings draw in
