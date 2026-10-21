@@ -120,7 +120,7 @@ export function WhatChangedSection({
                         ? "signal-base-rate"
                         : "signal-curve-slope"
                 }
-                className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
+                className="border-b border-slate-800/50 align-top last:border-b-0 max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
                 data-signal={row.key}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-md:p-0">
@@ -184,7 +184,10 @@ export function WhatChangedSection({
                     ) : null}
                   </div>
                 </th>
-                <td className="whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0">
+                {/* With nothing to compare, the lead over the table already says so; on a
+                    phone the column has no header, so its dash printed as a lone "—"
+                    line in every row. */}
+                <td className={`whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0${comparisonUnavailable ? " max-md:hidden" : ""}`}>
                   {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
                 </td>
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">
