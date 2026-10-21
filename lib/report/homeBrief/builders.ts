@@ -5,6 +5,7 @@ import {
   formatBoundedDecisionAction,
   formatBoundedDecisionReverse,
   formatSharedFlipCorridor,
+  isRuleConditionMet,
 } from "../boundedDecisionRules";
 import {
   buildActionStripItems,
@@ -506,8 +507,19 @@ export const buildHomeBriefModelInternal = (
       ? startupVariantPolicy.adjustmentsByMode[startupVariantMode]?.doNowAdjustments[0]?.trim()
         || actionNowShort?.trim()
       : actionNowShort?.trim();
+  /* The lines still to cross, per area: a held area's resume lines it has not
+     met, an open area's pause lines. Until 2026-10-21 this was every resume
+     line, met or not, so the week of Oct 19 (risk appetite 55) listed "Risk
+     appetite > 54" under "Other things that would change this guidance", and a
+     Sunny week with nothing held listed two lines already true and none that
+     could hold anything. */
+  const linesStillToCross = (rule: (typeof decisionRules)[number]) => {
+    const held = rule.pause.conditions.some((condition) => isRuleConditionMet(condition, currentScores[condition.metric]));
+    return (held ? rule.resume.conditions : rule.pause.conditions)
+      .filter((condition) => !isRuleConditionMet(condition, currentScores[condition.metric]));
+  };
   const canonicalFlipConditions: CanonicalFlipCondition[] = decisionRules.flatMap((rule) =>
-    rule.flipConditions.map((condition) => ({
+    linesStillToCross(rule).map((condition) => ({
       area: rule.area,
       metric: condition.metric,
       operator: condition.operator,

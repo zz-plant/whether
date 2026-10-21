@@ -124,8 +124,11 @@ export type PolicyHoldCall = {
 /* Printed after "Pause if", so it is a condition. It was "Hold anything you
    can't undo while the two scores disagree.", an instruction that repeated the
    action above it and read "Pause if: Hold anything…" in every format. It names
-   the hold, not one reason for it, so every reason shares it. */
-const HELD_PAUSE_IF = "The decision can't be undone while the guidance is held.";
+   the hold, not one reason for it, so every reason shares it. Until 2026-10-21
+   it read "The decision can't be undone while the guidance is held.", which
+   names no decision and reads as a warning that nothing can be reversed; it now
+   says which decisions wait, and that the rest go ahead. */
+const HELD_PAUSE_IF = "A decision can't be undone; reversible ones go ahead while the guidance is held.";
 
 /**
  * The guidance when the policy engine refuses to support a change, one entry
