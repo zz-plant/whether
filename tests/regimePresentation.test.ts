@@ -71,10 +71,26 @@ describe("regime presentation labels", () => {
     assert.equal(legend[3]?.weather, "Sunny");
   });
 
+  it("says the money side of each condition's quadrant in its meaning line", () => {
+    /* Stormy read "Conditions are changing week to week" until 2026-10-21: the
+       engine key's name (VOLATILE), not its quadrant, which is below both change
+       lines — cheap money, wary investors — as the legend under it said. */
+    const pressureAbove: Record<"SCARCITY" | "DEFENSIVE" | "VOLATILE" | "EXPANSION", boolean> = {
+      SCARCITY: true,
+      DEFENSIVE: true,
+      VOLATILE: false,
+      EXPANSION: false,
+    };
+    for (const [regime, above] of Object.entries(pressureAbove) as [keyof typeof pressureAbove, boolean][]) {
+      assert.match(getRegimeWeatherRationale(regime), above ? /pricey|expensive/i : /cheap/i, regime);
+    }
+    assert.match(getRegimeWeatherRationale("VOLATILE"), /wary/i);
+  });
+
   it("gives each weather word one fact about money — the condition, never the instruction", () => {
     assert.match(getRegimeWeatherRationale("SCARCITY"), /expensive and hard to raise/i);
     assert.match(getRegimeWeatherRationale("DEFENSIVE"), /available but pricey/i);
-    assert.match(getRegimeWeatherRationale("VOLATILE"), /changing week to week/i);
+    assert.match(getRegimeWeatherRationale("VOLATILE"), /cheap but investors are wary/i);
     assert.match(getRegimeWeatherRationale("EXPANSION"), /cheap and available/i);
     // The instruction half ("Move faster", "Conserve cash") moved to the call
     // alone: beside a cautionary call it read as two recommendations

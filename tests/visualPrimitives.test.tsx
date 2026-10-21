@@ -6,6 +6,7 @@ import { ScoreCell, formatScoreReference } from "../app/components/ui/scoreCell"
 import { AreaTable } from "../app/components/ui/areaTable";
 import { TrustStrip } from "../app/components/trustStrip";
 import { MonthStrip, describeCurrentRun } from "../app/components/history/monthStrip";
+import { RecordSection } from "../app/components/home/RecordSection";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 
 /*
@@ -550,5 +551,28 @@ describe("Wayfinding shortcuts and deep-links", () => {
       />,
     );
     assert.match(html, /href="\/operate#ops-monthly-action-summary"/);
+  });
+});
+
+describe("RecordSection", () => {
+  const record = [
+    { recordDate: "2026-07-31", regime: "EXPANSION" },
+    { recordDate: "2026-08-31", regime: "EXPANSION" },
+    { recordDate: "2026-09-30", regime: "DEFENSIVE" },
+  ];
+  const lines = { tightness: 70, riskAppetite: 50 };
+  it("draws the record as the month strip above the sentences that count it", () => {
+    /* "Has this happened before?" answered in sentences only until 2026-10-21. */
+    const html = renderToStaticMarkup(
+      <RecordSection lastTime={null} callChangeLines={lines} turningPoints={[]} spellLengths="A spell sentence." record={record} />,
+    );
+    assert.match(html, /data-month-strip[\s\S]*A spell sentence\./);
+  });
+
+  it("leaves the band out of an archived view, which passes no record", () => {
+    const html = renderToStaticMarkup(
+      <RecordSection lastTime={null} callChangeLines={lines} turningPoints={[{ label: "Sep 2026, Sunny to Cloudy", href: "/?month=9&year=2026" }]} />,
+    );
+    assert.doesNotMatch(html, /data-month-strip/);
   });
 });

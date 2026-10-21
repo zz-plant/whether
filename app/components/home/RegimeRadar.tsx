@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatThresholdNumber } from "../../../lib/formatters";
 import { ConditionIcon } from "../ui/conceptIcons";
 
@@ -386,7 +386,13 @@ export function RegimeRadar({
           axes and Freezing hard on both, while Cloudy and Stormy are each hard
           on one. The chart is where that shows, so it says so. */}
       <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
-          <span className="block text-slate-300" data-radar-orientation>Easiest bottom right (Sunny), hardest top left (Freezing).</span>
+          {/* What the two directions mean before which corner is which
+              (2026-10-21): the axes name two scores a first visit has not met,
+              and the legend that decodes them in money terms is hidden from `md`
+              up, where this chart replaces it. */}
+          <span className="block text-slate-300" data-radar-orientation>
+            Up is {CONDITION_SIDE_MEANINGS.pressureAbove}, right is {CONDITION_SIDE_MEANINGS.appetiteAbove}. Easiest bottom right (Sunny), hardest top left (Freezing).
+          </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
           {footer ? <span className="block pt-1">{footer}</span> : null}
