@@ -392,16 +392,11 @@ a.weather-hub-link-card:hover {
   touch-action: manipulation;
 }
 
-/* The tones are roles, as the hue ramps are (tokens.css): sky and cyan the
-   action ink, amber and rose the crossed red, emerald the clear ink. Each
-   reads its role token, which carries its own light value, so the published
-   brief's stamps clear AA on both grounds without a per-theme rule. */
-.weather-tag-sky,
-.weather-tag-cyan {
-  border-color: var(--accent-border-soft);
-  background: color-mix(in srgb, var(--accent-action) 6%, transparent);
-  color: var(--accent-action);
-}
+/* The tones are roles, as the hue ramps are (tokens.css): amber and rose the
+   crossed red, emerald the clear ink. Each reads its role token, which carries
+   its own light value, so the published brief's stamps clear AA on both
+   grounds without a per-theme rule. There is no action-colour tone: a tag is a
+   display (ui-ux-standards §XXVII). */
 
 .weather-tag-amber,
 .weather-tag-rose {

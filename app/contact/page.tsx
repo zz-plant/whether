@@ -65,7 +65,7 @@ export default function ContactPage() {
         <h2 className="text-lg font-semibold text-slate-100">What to send</h2>
         <ul className="space-y-2 text-sm text-slate-300">
           <li className="flex gap-2">
-            <span aria-hidden="true" className="text-sky-300">
+            <span aria-hidden="true" className="text-slate-500">
               •
             </span>
             <span>
@@ -74,7 +74,7 @@ export default function ContactPage() {
             </span>
           </li>
           <li className="flex gap-2">
-            <span aria-hidden="true" className="text-sky-300">
+            <span aria-hidden="true" className="text-slate-500">
               •
             </span>
             <span>
@@ -83,7 +83,7 @@ export default function ContactPage() {
             </span>
           </li>
           <li className="flex gap-2">
-            <span aria-hidden="true" className="text-sky-300">
+            <span aria-hidden="true" className="text-slate-500">
               •
             </span>
             <span>

@@ -57,7 +57,7 @@ export default function Page() {
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Board-forwardable artifact block</h2>
-        <div className="rounded-lg border border-sky-400/35 bg-sky-500/10 p-4 text-sm text-slate-100">
+        <div className="rounded-lg border border-slate-700/70 bg-slate-900/40 p-4 text-sm text-slate-100">
           <p>Portfolio recommendation: keep one governance vocabulary for two quarters before changing any threshold.</p>
           <p className="mt-2">Control rule: any breach lasting two checkpoints requires a board addendum with owner, action, and rollback timeline.</p>
           <p className="mt-2">Capital discipline effect: tranche release is conditioned on comparable evidence packets across all portfolio companies.</p>

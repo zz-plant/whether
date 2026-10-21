@@ -2,7 +2,10 @@ import type { HTMLAttributes, ReactNode } from "react";
 import type { RegimeKey } from "../../../lib/types";
 import { ConditionIcon } from "./conceptIcons";
 
-type TagTone = "sky" | "cyan" | "amber" | "rose" | "emerald" | "slate";
+/* No action-colour tone: a tag is a display, and the action colour is for
+   controls (ui-ux-standards §XXVII). A condition is `regime`, a line state
+   amber/rose or emerald, anything else slate. */
+type TagTone = "amber" | "rose" | "emerald" | "slate";
 
 type TagProps = HTMLAttributes<HTMLSpanElement> & {
   children: ReactNode;
@@ -14,8 +17,6 @@ type TagProps = HTMLAttributes<HTMLSpanElement> & {
 };
 
 const toneClassNames: Record<TagTone, string> = {
-  sky: "weather-tag-sky",
-  cyan: "weather-tag-cyan",
   amber: "weather-tag-amber",
   rose: "weather-tag-rose",
   emerald: "weather-tag-emerald",

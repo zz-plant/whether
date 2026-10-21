@@ -59,7 +59,7 @@ export function ChatPreview({ label, text }: { label: string; text: string }) {
     <figure className="overflow-hidden rounded-md border border-slate-800/80 bg-slate-950/80">
       <figcaption className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 border-b border-slate-800/60 bg-slate-900/60 px-3 py-1.5 text-fluid-nano text-slate-400">
         <span className="flex items-center gap-1.5 font-medium text-slate-300">
-          <span className="inline-block h-1.5 w-1.5 rounded-full bg-sky-400/80" aria-hidden="true" />
+          <span className="inline-block h-1.5 w-1.5 rounded-full bg-slate-300" aria-hidden="true" />
           {label} · how it reads in Slack
         </span>
         <span className="text-slate-500 tabular-nums">Ready to paste</span>

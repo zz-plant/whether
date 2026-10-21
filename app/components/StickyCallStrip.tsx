@@ -46,9 +46,9 @@ type Props = {
  * a screen reader to announce as "upwards arrow".
  */
 const DIRECTION_BADGE: Record<SignalDirection, { glyph: TrendDirection; tone: string }> = {
-  tighten: { glyph: "up", tone: "bg-rose-500/20 text-rose-300 border border-rose-500/30" },
-  ease: { glyph: "down", tone: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" },
-  hold: { glyph: "flat", tone: "bg-sky-500/20 text-sky-300 border border-sky-500/30" },
+  tighten: { glyph: "up", tone: "text-rose-300" },
+  ease: { glyph: "down", tone: "text-emerald-300" },
+  hold: { glyph: "flat", tone: "text-slate-300" },
 };
 
 /** The hero, which both variants watch: the strip has a job only once it is gone. */
@@ -173,9 +173,9 @@ export function StickyCallStrip({ call, direction, weatherWord, marginLabel, sha
           <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 shadow-[var(--elev-4)] backdrop-blur-xl lg:max-w-md">
             <span className="flex min-w-0 flex-1 items-center gap-2 text-fluid-xs font-semibold leading-tight text-slate-100">
               {direction ? (
-                <span
-                  className={`inline-flex size-7 items-center justify-center rounded-lg text-sm font-bold ${DIRECTION_BADGE[direction].tone}`}
-                >
+                /* A glyph, unframed: in a 6px box it was the download button's
+                   shape, three items to its right (ui-ux-standards §XXVII). */
+                <span className={`inline-flex shrink-0 items-center ${DIRECTION_BADGE[direction].tone}`}>
                   <TrendGlyph direction={DIRECTION_BADGE[direction].glyph} className="h-4 w-4" />
                   <span className="sr-only">{`${DIRECTION_LABEL[direction]} this week.`}</span>
                 </span>

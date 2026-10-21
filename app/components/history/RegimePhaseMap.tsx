@@ -555,7 +555,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                     <th scope="row" className="px-2.5 py-1 font-normal text-slate-400">{point.monthLabel}</th>
                     <td className="px-2.5 py-1">
                       {point.regimeLabel}
-                      {point.changed ? <span className="ml-1.5 text-sky-300">changed</span> : null}
+                      {point.changed ? <span className="ml-1.5 text-slate-100">changed</span> : null}
                     </td>
                     <td className="px-2.5 py-1 text-right">
                       {point.tightness}

@@ -9,7 +9,7 @@
  */
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ReactNode } from "react";
 import Link from "next/link";
 import { usePersistentClientId } from "../components/clientIdentity";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
@@ -32,6 +32,21 @@ const VERDICT_STYLES: Record<DecisionRecordRow["verdict"], string> = {
   WATCH: "border-amber-400/40 bg-amber-400/10 text-amber-200",
   RECONSIDER: "border-rose-400/40 bg-rose-400/10 text-rose-200",
 };
+
+/* A filter is a key, not a verdict stamp: it used to wear VERDICT_STYLES' colours
+   in the stamp's 2px frame, so the row of filters read as a row of verdicts
+   (ui-ux-standards §XXVI, §XXVII). */
+const FilterKey = ({ pressed, onPress, children }: { pressed: boolean; onPress: () => void; children: ReactNode }) => (
+  <button
+    type="button"
+    onClick={onPress}
+    aria-pressed={pressed}
+    className="weather-key weather-focus-ring inline-flex min-h-11 items-center gap-1.5 px-2.5 py-2 text-xs font-semibold"
+  >
+    <span className="weather-segment-lamp" aria-hidden="true" />
+    {children}
+  </button>
+);
 
 const RecordRow = ({ row }: { row: DecisionRecordRow }) => (
   <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-5">
@@ -109,59 +124,23 @@ export const DecisionLedgerView = ({ view }: { view: DecisionRecordView }) => {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <p className="text-sm leading-6 text-slate-200">{view.headline}</p>
         <fieldset className="flex flex-wrap items-center gap-1.5" aria-label="Filter decisions by status">
-          <button
-            type="button"
-            onClick={() => setFilter("all")}
-            aria-pressed={filter === "all"}
-            className={`weather-focus-ring min-h-11 rounded-sm px-2.5 py-2 text-xs font-semibold border transition-colors ${
-              filter === "all"
-                ? "border-sky-400/40 bg-sky-400/10 text-sky-200"
-                : "border-slate-800 bg-slate-900/60 text-slate-400 hover:text-slate-200"
-            }`}
-          >
+          <FilterKey pressed={filter === "all"} onPress={() => setFilter("all")}>
             All ({view.rows.length})
-          </button>
+          </FilterKey>
           {view.counts.reconsider > 0 ? (
-            <button
-              type="button"
-              onClick={() => setFilter("RECONSIDER")}
-              aria-pressed={filter === "RECONSIDER"}
-              className={`weather-focus-ring min-h-11 rounded-sm px-2.5 py-2 text-xs font-semibold border transition-colors ${
-                filter === "RECONSIDER"
-                  ? "border-rose-400/50 bg-rose-400/20 text-rose-200"
-                  : "border-rose-400/30 bg-rose-400/10 text-rose-300 hover:bg-rose-400/15"
-              }`}
-            >
+            <FilterKey pressed={filter === "RECONSIDER"} onPress={() => setFilter("RECONSIDER")}>
               Reconsider ({view.counts.reconsider})
-            </button>
+            </FilterKey>
           ) : null}
           {view.counts.watch > 0 ? (
-            <button
-              type="button"
-              onClick={() => setFilter("WATCH")}
-              aria-pressed={filter === "WATCH"}
-              className={`weather-focus-ring min-h-11 rounded-sm px-2.5 py-2 text-xs font-semibold border transition-colors ${
-                filter === "WATCH"
-                  ? "border-amber-400/50 bg-amber-400/20 text-amber-200"
-                  : "border-amber-400/30 bg-amber-400/10 text-amber-300 hover:bg-amber-400/15"
-              }`}
-            >
+            <FilterKey pressed={filter === "WATCH"} onPress={() => setFilter("WATCH")}>
               Watch ({view.counts.watch})
-            </button>
+            </FilterKey>
           ) : null}
           {view.counts.stand > 0 ? (
-            <button
-              type="button"
-              onClick={() => setFilter("STAND")}
-              aria-pressed={filter === "STAND"}
-              className={`weather-focus-ring min-h-11 rounded-sm px-2.5 py-2 text-xs font-semibold border transition-colors ${
-                filter === "STAND"
-                  ? "border-emerald-400/50 bg-emerald-400/20 text-emerald-200"
-                  : "border-emerald-400/30 bg-emerald-400/10 text-emerald-300 hover:bg-emerald-400/15"
-              }`}
-            >
+            <FilterKey pressed={filter === "STAND"} onPress={() => setFilter("STAND")}>
               Stand ({view.counts.stand})
-            </button>
+            </FilterKey>
           ) : null}
         </fieldset>
       </div>

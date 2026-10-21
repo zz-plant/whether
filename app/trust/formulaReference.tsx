@@ -194,7 +194,7 @@ function RampPlot({ id, from, to, points, unit, label }: { id: string; from: num
       <polyline
         points={`${x(x0)},${y(0)} ${x(from)},${y(0)} ${x(to)},${y(points)} ${x(x1)},${y(points)}`}
         fill="none"
-        stroke="var(--accent-action)"
+        stroke="currentColor"
         strokeWidth="2"
       />
       <text x={x(from)} y={H - 6} textAnchor="middle" fontSize="11" fill="currentColor">{fmt(from)}</text>
@@ -365,7 +365,7 @@ export function FormulaReference({
         <FormulaCard title="Funding pressure · 0–100 · cost of money">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <code className="text-sky-200">
+              <code className="text-slate-100">
                 min({TIGHTNESS_BASE_RATE_POINTS}, (short-term borrowing rate − {BASE_RATE_TIGHTNESS_THRESHOLD}) ×{" "}
                 {BASE_RATE_TIGHTNESS_MULTIPLIER})
               </code>{" "}
@@ -381,7 +381,7 @@ export function FormulaReference({
               />
             </li>
             <li>
-              <code className="text-sky-200">
+              <code className="text-slate-100">
                 + min({TIGHTNESS_INVERSION_POINTS}, inversion depth ×{" "}
                 {CURVE_INVERSION_TIGHTNESS_MULTIPLIER})
               </code>{" "}
@@ -397,7 +397,7 @@ export function FormulaReference({
               />
             </li>
             <li>
-              <code className="text-sky-200">
+              <code className="text-slate-100">
                 + min({BASE_RATE_VELOCITY_POINTS}, ({BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day rise in the
                 short-term borrowing rate − {BASE_RATE_VELOCITY_THRESHOLD}) × {BASE_RATE_VELOCITY_MULTIPLIER})
               </code>{" "}
@@ -468,7 +468,7 @@ export function FormulaReference({
             </li>
             <li>
               <span className="text-slate-400">{OPERATING_LATITUDE_LABEL}:</span>{" "}
-              <code className="text-sky-200">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
+              <code className="text-slate-100">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
               <span className="mt-1 block text-xs text-slate-400">
                 The 0–100 score beside each month on the history page and in the copied and Slack
                 briefs. It measures {OPERATING_LATITUDE_GLOSS}.

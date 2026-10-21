@@ -75,21 +75,21 @@ export const PublishedCallWatcher = ({ rendered }: { rendered: PublishedCallStat
   return (
     <output
       aria-live="polite"
-      className="flex w-full flex-wrap items-center justify-between gap-3 rounded-xl border border-sky-500/30 bg-sky-500/10 px-4 py-3"
+      className="flex w-full flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-700/70 bg-slate-900/40 px-4 py-3"
     >
-      <p className="text-sm leading-6 text-sky-100">{change.message}</p>
+      <p className="text-sm leading-6 text-slate-100">{change.message}</p>
       <div className="flex items-center gap-2">
         <button
           type="button"
           onClick={() => window.location.reload()}
-          className="rounded-sm border border-sky-400/40 bg-sky-500/20 px-3 py-1 text-xs font-semibold text-sky-50 transition hover:bg-sky-500/30"
+          className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-3 text-xs font-semibold"
         >
           {publishedCallNoticeCopy.action}
         </button>
         <button
           type="button"
           onClick={() => setDismissed(true)}
-          className="rounded-sm px-2 py-1 text-xs text-sky-200/80 transition hover:text-sky-100"
+          className="weather-focus-ring inline-flex min-h-[44px] items-center px-2 text-xs text-sky-300 transition-colors hover:text-sky-200"
         >
           Not now
         </button>
