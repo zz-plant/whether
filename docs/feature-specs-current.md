@@ -3303,7 +3303,9 @@ two captures because §1.1.66 re-scored it in between (Freezing before, Cloudy a
 
 Left on the old palette: the brand mark (`public/favicon*.svg`, `icon*.svg`, `whether-logo.svg`,
 `app/brandAssets.ts` and the raster icons), which is its own decision, and
-`scripts/generate-scenes.ts`, which renders marketing scenes and nothing on the site.
+`scripts/generate-scenes.ts`, which renders marketing scenes and nothing on the site. (The scenes moved
+to the Synoptic ground and Archivo on 2026-10-21, still drawing the header mark as it is;
+`docs/assets/README.md`.)
 
 ### 1.1.70 The record's charts and sentences state what the data shows (2026-10-09)
 
