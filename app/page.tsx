@@ -544,13 +544,15 @@ async function PageContent({
           it, so a move from the brief to `/signals`, `/operate` or `/resolve`
           went unrecorded and read the same as closing the tab. */}
       <OperatorWorkflowRouteTracker />
+      {/* A caveat, drawn like the archived-week banner below: the amber it
+          used is the crossed-line red, so late data read as a crossed line. */}
       {isDegraded ? (
-        <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
+        <p className="weather-caveat-mark mb-4 rounded-lg border border-l-4 border-caveat-border bg-caveat-bg px-4 py-2.5 text-fluid-micro text-caveat-fg">
           {resolveDataStatusGuidance({
             isFallbackSnapshot: homepage.reportShell.showOfflineBadge,
             degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 1,
           })}
-        </div>
+        </p>
       ) : null}
       {historicalSelection ? (
         <div className="mx-auto max-w-[64rem]">
