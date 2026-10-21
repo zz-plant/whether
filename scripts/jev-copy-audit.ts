@@ -41,7 +41,7 @@ import { isDecisionModel, runJev, type DecisionModel, type JevQuestion, type Jev
 import { getRegimePublicLabel } from "../lib/regimePresentation";
 import { runArtifactAudit } from "./jev-artifact-audit";
 
-const DEFAULT_ROUTES = ["/", "/trust", "/history", "/signals", "/share", "/operate", "/resources"];
+export const DEFAULT_ROUTES = ["/", "/trust", "/history", "/signals", "/share", "/operate", "/resources"];
 const DEFAULT_THRESHOLD = 0.8;
 const CONCURRENCY = 4;
 const REPORT_DIR = "artifacts/jev";
