@@ -20,8 +20,13 @@ export interface RegimeScores {
    * while hand-built fixtures that only pin the classification inputs need not.
    */
   tightnessPressure?: number;
-  /** Whether `tightness` is pinned at its ceiling, so a flat score is the clip
-   *  rather than a flat reading. */
+  /**
+   * Whether `tightness` is pinned at its ceiling, so a flat score is the clip
+   * rather than a flat reading: a higher base rate would not raise it. Either
+   * the rate component is at its own ceiling (`TIGHTNESS_BASE_RATE_POINTS`,
+   * reached at a 4.0% base rate) or the published score is at `TIGHTNESS_CAP`,
+   * whichever component or add-on put it there (`isTightnessSaturated`).
+   */
   tightnessSaturated?: boolean;
   riskAppetite: number;
   baseRateUsed: "FED" | "1M" | "3M" | "MISSING";
@@ -395,8 +400,11 @@ export const CONFIDENCE_PERCENT_IMPUTED_CEILING = 30;
  *   `RegimeScores.offRecord` and move nothing.
  * - `engine-2026-10-09b`: the Chicago Fed index joins the record basis, with
  *   its month-end history backfilled into the archive from FRED's `NFCI`.
+ * - `engine-2026-10-21`: `tightnessSaturated` means the score has stopped
+ *   responding to the base rate (`isTightnessSaturated`), not that pressure
+ *   passed 100. Only the flag moved: no score, regime or diagnostic did.
  */
-export const ENGINE_VERSION = "engine-2026-10-09b";
+export const ENGINE_VERSION = "engine-2026-10-21";
 
 export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,
@@ -595,6 +603,22 @@ export const computeTightnessPressure = (
       : SCORE_MIN;
   return baseRatePoints + inversionPoints + baseRateVelocityPoints;
 };
+
+/**
+ * Whether a published tightness score has stopped responding to the base rate.
+ *
+ * Two ceilings pin it: the rate component's own (90 points, at a 4.0% base rate
+ * on the default threshold), which leaves the score flat at 90 on a positive
+ * curve, and the score's (`TIGHTNESS_CAP`), which inversion, tightening speed or
+ * the Chicago Fed add-on can reach first. Until `engine-2026-10-21` this was
+ * `pressure > TIGHTNESS_CAP`, which set the flag on a 0% bill with a deep
+ * inversion (pressure 101, tightness 25, the inversion clip) and left it unset
+ * from 4.00% to 4.05% on a flat curve, where the score was already flat at 90.
+ * Pressure leaves the add-on out, so it could not see that ceiling either.
+ */
+export const isTightnessSaturated = (baseRate: number, baseRateThreshold: number, tightness: number) =>
+  tightness >= TIGHTNESS_CAP ||
+  Math.round((baseRate - baseRateThreshold) * BASE_RATE_TIGHTNESS_MULTIPLIER) >= TIGHTNESS_BASE_RATE_POINTS;
 
 export const computeTightnessScore = (
   baseRate: number,

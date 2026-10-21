@@ -9,6 +9,7 @@
  */
 import type { RegimeAssessment } from "../regimeEngine";
 import { formatThresholdNumber } from "../formatters";
+import { sharedDecisionLines } from "../report/boundedDecisionRules";
 import { deltaLabelBySignal } from "../report/briefFormatting";
 import { compositeSignalScales } from "../report/signalTranslations";
 
@@ -63,14 +64,10 @@ export type HorizonSignalBand = {
 };
 
 /** Pause above / resume below for funding pressure, pause below / resume above for risk
- *  appetite. The gap between the pause and resume band is deliberate: a rule that reopens
- *  at the same number it closed at flips on noise. */
-export const buildHorizonThresholdBands = (assessment: RegimeAssessment) => ({
-  tightnessPause: assessment.thresholds.tightnessRegime + 6,
-  tightnessResume: Math.max(assessment.thresholds.tightnessRegime - 4, 0),
-  riskPause: Math.max(assessment.thresholds.riskAppetiteRegime - 6, 0),
-  riskResume: Math.min(assessment.thresholds.riskAppetiteRegime + 4, 100),
-});
+ *  appetite: the rules' shared lines, so a summary band and a rule never disagree. The gap
+ *  between the pause and resume band is deliberate: a rule that reopens at the same number
+ *  it closed at flips on noise. */
+export const buildHorizonThresholdBands = (assessment: RegimeAssessment) => sharedDecisionLines(assessment.thresholds);
 
 const buildBand = ({
   key,

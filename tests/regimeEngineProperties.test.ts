@@ -48,12 +48,6 @@ import { parseSeries } from "../scripts/regimeArchiveContext";
  * Deterministic by default. `WHETHER_PROPERTY_SEED=<n>` explores another seed
  * and `WHETHER_PROPERTY_RUNS=<n>` changes how many cases each property draws;
  * a failure prints the seed it ran under.
- *
- * A property the engine does not satisfy today is a `finding`, not a fix: the
- * engine is not changed from a test file. A finding passes while the search
- * still finds a counterexample and the documented one still violates the
- * property, and fails once the engine satisfies it, which is the moment to
- * turn it into a property.
  */
 
 // ---------------------------------------------------------------------------
@@ -230,17 +224,6 @@ const property = <T>(name: string, generate: Generate<T>, check: Check<T>, runs?
           `Shrunk counterexample: ${JSON.stringify(failure.value)}\n${failure.message}`,
       );
     }
-  });
-
-/**
- * A property the engine violates today. `counterexample` is the shrunk case the
- * search printed when the finding was recorded.
- */
-const finding = <T>(name: string, generate: Generate<T>, check: Check<T>, counterexample: T) =>
-  it(`finding: ${name}`, () => {
-    assert.throws(() => check(counterexample), "The recorded counterexample now satisfies the property.");
-    const failure = findCounterexample(name, generate, check);
-    assert.ok(failure, `No counterexample in ${RUNS} cases: if the engine now satisfies this, make it a property.`);
   });
 
 // ---------------------------------------------------------------------------
@@ -662,69 +645,63 @@ describe("regime engine properties: scoreRegime", () => {
   );
 
   /*
-   * `RegimeScores.tightnessSaturated` documents itself as "whether `tightness`
-   * is pinned at its ceiling, so a flat score is the clip rather than a flat
-   * reading", and the hero prints the ceiling tag from it. It is computed as
-   * `tightnessPressure > TIGHTNESS_CAP`, but the rate component has its own
-   * ceiling at 90 (`TIGHTNESS_BASE_RATE_POINTS`), reached at a 4.0% base rate.
-   * The inversion component has its own at 25. On a positive curve with no
-   * tightening speed the score plateaus at 90, so from 4.06% the flag is set
-   * while the score reads 90, not 100, and from 4.01% to 4.05% the score is
-   * already flat at the clip with the flag unset. The Chicago Fed add-on is
-   * not in pressure at all, so it can pin the score at 100 with the flag unset.
+   * `RegimeScores.tightnessSaturated` says the published score has stopped
+   * responding to the base rate, so a flat score is the clip rather than a flat
+   * reading, and the hero prints the ceiling tag from it. Two ceilings pin it:
+   * the rate component's own at 90 (`TIGHTNESS_BASE_RATE_POINTS`, a 4.0% base
+   * rate) and the score's at 100, which inversion, tightening speed or the
+   * Chicago Fed add-on can reach first.
    *
-   * Not hypothetical: on the bundled month-ends' rate inputs, 15 of 177 set
-   * the flag at 90 (every month Jan-Oct 2025 among them), and Nov 2025 and
-   * Sep 2026 sat flat at 90 without it. The shrunk case below is the inversion
-   * clip: a 2.02-point inversion at a 0% bill is 101 points of pressure and
-   * 25 of tightness.
+   * Until engine-2026-10-21 the flag was `tightnessPressure > TIGHTNESS_CAP`.
+   * That set it at tightness 25 on a 0% bill with a 2.02-point inversion (101
+   * points of pressure, all but 25 of them the inversion clip), left it unset
+   * from 4.00% to 4.05% on a flat curve with the score already flat at 90, and
+   * could not see the add-on, which pressure leaves out. On the bundled
+   * month-ends two readings changed, both flat at 90 and now flagged: Nov 2025
+   * (bill 4.05%, pressure 99) and Sep 2026 (bill 4.02%, pressure 94).
    */
-  finding(
-    "tightnessSaturated is set only when tightness is at its ceiling",
-    (draw) => drawReading(draw, { complete: true }),
-    (spec) => {
-      const { scores } = score(spec);
-      if (scores.tightnessSaturated) assert.equal(scores.tightness, TIGHTNESS_CAP, `saturated at ${scores.tightness}`);
-    },
-    {
-      oneMonth: 0,
-      threeMonth: null,
-      twoYear: 2.02,
-      tenYear: 0,
-      vix: null,
-      vixTail: null,
-      chicagoFci: null,
-      offRecord: { highYield: null, vcVelocity: null, layoffs: null },
-      rateTrail: null,
-    },
-  );
+  const drawRateRise = (draw: Draw) => ({ spec: drawReading(draw, { complete: true }), rise: draw.decimal(0.01, 7) });
+  const scoreRateRise = ({ spec, rise }: { spec: ReadingSpec; rise: number }) => ({
+    before: score({ ...spec, threeMonth: null }),
+    after: score({ ...spec, threeMonth: null, oneMonth: round2((spec.oneMonth ?? 0) + rise) }),
+  });
 
-  finding(
-    "a score that has stopped responding to a rate rise says it is saturated",
-    (draw) => ({ spec: drawReading(draw, { complete: true }), rise: draw.decimal(0.01, 1) }),
-    ({ spec, rise }) => {
-      const before = score({ ...spec, threeMonth: null });
-      const after = score({ ...spec, threeMonth: null, oneMonth: round2((spec.oneMonth ?? 0) + rise) });
-      const pressureMoved = (after.scores.tightnessPressure ?? 0) > (before.scores.tightnessPressure ?? 0);
-      if (pressureMoved && after.scores.tightness === before.scores.tightness) {
-        assert.ok(before.scores.tightnessSaturated, `flat at ${before.scores.tightness} with the flag unset`);
-      }
-    },
-    {
-      spec: {
-        oneMonth: 4,
+  property("a score flagged as saturated does not respond to a rate rise", drawRateRise, (input) => {
+    const { before, after } = scoreRateRise(input);
+    if (before.scores.tightnessSaturated) {
+      assert.equal(after.scores.tightness, before.scores.tightness, `flagged at ${before.scores.tightness}, then moved`);
+    }
+  });
+
+  property("a score that has stopped responding to a rate rise says it is saturated", drawRateRise, (input) => {
+    const { before, after } = scoreRateRise(input);
+    const pressureMoved = (after.scores.tightnessPressure ?? 0) > (before.scores.tightnessPressure ?? 0);
+    if (pressureMoved && after.scores.tightness === before.scores.tightness) {
+      assert.ok(before.scores.tightnessSaturated, `flat at ${before.scores.tightness} with the flag unset`);
+    }
+  });
+
+  it("flags the ceilings the pressure test misread", () => {
+    const reading = (yields: Pick<ReadingSpec, "oneMonth" | "twoYear" | "tenYear">, chicagoFci: number | null = null) =>
+      score({
+        ...yields,
         threeMonth: null,
-        twoYear: 0,
-        tenYear: 0,
         vix: null,
         vixTail: null,
-        chicagoFci: null,
+        chicagoFci,
         offRecord: { highYield: null, vcVelocity: null, layoffs: null },
         rateTrail: null,
-      },
-      rise: 0.01,
-    },
-  );
+      }).scores;
+    // The inversion clip: 101 points of pressure, a score of 25 that a rate rise still moves.
+    const inverted = reading({ oneMonth: 0, twoYear: 2.02, tenYear: 0 });
+    assert.deepEqual([inverted.tightness, inverted.tightnessPressure, inverted.tightnessSaturated], [25, 101, false]);
+    // The rate component's own ceiling: flat at 90 from a 4.0% bill.
+    const atRateCeiling = reading({ oneMonth: 4, twoYear: 0, tenYear: 0 });
+    assert.deepEqual([atRateCeiling.tightness, atRateCeiling.tightnessPressure, atRateCeiling.tightnessSaturated], [90, 90, true]);
+    // The Chicago Fed add-on pins the score at 100 on 91 points of pressure.
+    const pinnedByIndex = reading({ oneMonth: 3.95, twoYear: 1.2, tenYear: 1 }, 1);
+    assert.deepEqual([pinnedByIndex.tightness, pinnedByIndex.tightnessPressure, pinnedByIndex.tightnessSaturated], [TIGHTNESS_CAP, 91, true]);
+  });
 });
 
 const withYield = (spec: ReadingSpec, field: "oneMonth" | "twoYear" | "tenYear", value: number | null): ReadingSpec => {
@@ -992,22 +969,16 @@ describe("regime engine properties: pause and resume lines", () => {
   );
 
   /*
-   * Three of the four shared lines are clamped to the 0-100 scale; the
-   * tightness pause line, `tightnessRegime + 6`, is not. A regime line set at
-   * 95 or above (the advanced threshold controls allow up to 100) publishes a
-   * pause line of 101-106, which no score can cross and which the rules print
-   * as "Funding pressure > 101".
+   * Until 2026-10-21 the tightness pause line, `tightnessRegime + 6`, was the
+   * one shared line not clamped to the 0-100 scale, so a regime line of 95 or
+   * more (the advanced threshold controls allow up to 100) printed
+   * "Funding pressure > 101".
    */
-  finding(
-    "every shared pause and resume line sits on the 0-100 scale",
-    drawThresholds,
-    (thresholds) => {
-      for (const [name, value] of Object.entries(sharedDecisionLines(thresholds))) {
-        assert.ok(value >= 0 && value <= 100, `${name} at ${value}`);
-      }
-    },
-    { tightnessRegime: 95, riskAppetiteRegime: 0 },
-  );
+  property("every shared pause and resume line sits on the 0-100 scale", drawThresholds, (thresholds) => {
+    for (const [name, value] of Object.entries(sharedDecisionLines(thresholds))) {
+      assert.ok(value >= 0 && value <= 100, `${name} at ${value}`);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------

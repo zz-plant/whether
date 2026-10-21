@@ -3587,6 +3587,32 @@ risk appetite 55), four sentences told a reader something the numbers did not su
   the guidance is held." read as a warning that nothing could be reversed. It is "A decision can't
   be undone; reversible ones go ahead while the guidance is held." (`HELD_PAUSE_IF`).
 
+### 1.1.81 The ceiling tag means the ceiling; the pause line stays on the scale (2026-10-21)
+
+Two defects the regime engine's property tests found (`tests/regimeEngineProperties.test.ts`):
+
+- **`scores.tightnessSaturated` is set when a higher base rate would not raise the score**
+  (`isTightnessSaturated`, `engine-2026-10-21`): the rate component at its 90-point ceiling (a
+  4.0% bill on the default line), or the score at 100, whatever reached it, the Chicago Fed
+  add-on included. It was `tightnessPressure > 100`, which flagged a 0% bill under a 2.02-point
+  inversion at a score of 25, and left 4.00%-4.05% on a flat curve unflagged while the score sat
+  flat at 90. The hero's ceiling tag, the signal panel's caveat, the margin and the
+  saturated-financing tempo all read the flag. On the bundled month-ends two readings change, both
+  Defensive, so no archived sentence moves:
+
+  | Month-end | Bill | Funding pressure | Pressure (uncapped) | Flag before | Flag after |
+  | --- | --- | --- | --- | --- | --- |
+  | 2025-11-28 | 4.05% | 90 | 99 | no | yes |
+  | 2026-09-30 | 4.02% | 90 | 94 | no | yes |
+
+  The other 175 keep theirs, among them 22 flagged at 100 and the 15 flagged at 90 from Aug 2024
+  to Oct 2025, whose rate component was already at its ceiling. Neither changed month's margin
+  moves: its pressure is under 100, so the ceiling hides no points from it.
+- **The funding-pressure pause line is held to 100**, like the other three shared lines
+  (`sharedDecisionLines`). A regime line of 95 or more on the threshold controls printed
+  "Funding pressure > 101". The monthly summary's bands read the same function now, rather than a
+  copy of its arithmetic.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

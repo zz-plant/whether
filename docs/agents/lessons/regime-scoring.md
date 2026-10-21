@@ -7,10 +7,18 @@ of them, which is less obvious.
 
 - **`tightness` saturates, on purpose, and the hero now says when it has.** The rate component
   spans 0-90 across a 50bp window (3.5% to 4.0% base rate) and the components over-subscribe the
-  cap, so above ~4% the published score is a constant 100 and its week-over-week delta is zero.
+  cap, so above ~4% the published score is a constant (90 on a positive curve, 100 once inversion,
+  speed or the Chicago Fed add-on tops it up) and its week-over-week delta is zero.
   Read `scores.tightnessPressure` for magnitude — same points, no ceiling anywhere — and
   `scores.tightnessSaturated` to tell a clipped score from a flat reading. Classification still
   uses the bounded score, so no published regime moved when pressure was added.
+
+  The flag means "a higher base rate would not raise this score" (`isTightnessSaturated`): the
+  rate component at its 90-point ceiling, or the score at 100. Until `engine-2026-10-21` it was
+  `pressure > 100`, which is a different question, because pressure also uncaps the inversion
+  term and leaves the add-on out: it flagged a 0% bill with a deep inversion at 25, and missed
+  Nov 2025 and Sep 2026, flat at 90 on 99 and 94 points of pressure.
+  `tests/regimeEngineProperties.test.ts` holds the flag to that meaning in both directions.
 
   The delta row used to render only when the delta was non-zero, so at the ceiling it vanished:
   100/100, no direction, and the reader left to infer from the ceiling tag that the silence meant
