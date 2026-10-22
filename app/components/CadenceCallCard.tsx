@@ -161,7 +161,7 @@ export function CadenceCallCard({
       ) : null}
 
       {model.history.length > 0 ? (
-        <div className="space-y-1.5 border-t border-white/[0.06] pt-3">
+        <div className="space-y-1.5 border-t border-[color:var(--border-faint)] pt-3">
           <p className="type-eyebrow text-white/60">{model.historyLabel}</p>
           <ol className="flex flex-wrap items-center gap-1.5">
             {model.history.map((point) => (
@@ -188,7 +188,7 @@ export function CadenceCallCard({
       {/* One plan CTA per page: the horizon-labelled "Build this …'s plan" lives in the
           weekly block below, where it always has. Two links to /operate under different
           labels would give the reader nothing to choose between. */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-3">
         <p className="text-fluid-nano text-slate-400">{model.weeklyBridge} ↓</p>
         <ShareBriefButton
           title={model.shareTitle}

@@ -766,7 +766,6 @@ html:not([data-theme="light"]) [class^="text-white/5"], html:not([data-theme="li
 [data-theme="light"] [class*="border-white/"] { border-color: var(--border-default); }
 [data-theme="light"] [class*="divide-white/"] > * + * { border-color: var(--border-default); }
 
-[data-theme="light"] .border-white\/\[0\.06\] { border-color: var(--border-faint) !important; }
 [data-theme="light"] .border-white\/\[0\.08\] { border-color: var(--border-subtle) !important; }
 
 html[data-theme="light"] .weather-input,

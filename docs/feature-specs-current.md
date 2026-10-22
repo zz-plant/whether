@@ -3668,6 +3668,29 @@ no `claude_desktop_config.json` — had nothing to run.
 - `/share`'s "For agents, scripts and feed readers" remains the entry point that
   links here; no new page.
 
+### 1.1.85 DD-043's ratchet holds; the first raw family migrates (2026-10-21)
+
+The light theme's patch layer lost its worst part on 2026-10-09 (the per-hue
+tables); what remains are floors that remap five raw Tailwind families for
+`[data-theme="light"]`. Two facts this pass established before touching anything:
+
+- **`text-slate-*` is not debt.** `@theme inline` in `tokens.css` binds the slate
+  text scale to the theme text roles (1,392 call sites already semantic).
+- **The floors rescue ~319 call sites across five families** — text-white (79),
+  bg-slate-800/900/950 (94), border-slate-700/800/900 (130), border-white (15),
+  divide-white (1) — counted by the new `tests/themeRawPaletteRatchet.test.ts`,
+  whose baselines may only fall. New raw classes in these families fail the suite
+  with the token to name instead.
+
+- **First slice: `border-white/[0.06]` → `border-[color:var(--border-faint)]`**
+  (RegimePhaseMap, CadenceCallCard ×2) — the one raw value whose token is
+  pixel-identical in dark (0.06 alpha of near-white), so the migration changes no
+  rendered pixel in either theme. Its specific floor rule in `tokens.css` is
+  deleted; the catch-all floors stay until their family reaches zero.
+
+The remaining families migrate file by file against the ratchet; alphas without
+an exact token twin need a visual pass (`ui:iterate`, both themes) to move.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

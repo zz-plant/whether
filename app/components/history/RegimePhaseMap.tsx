@@ -535,7 +535,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
           <summary className="text-fluid-nano text-slate-400">
             Plotted months, as a table
           </summary>
-          <div className="mt-2 max-h-64 overflow-auto overscroll-contain rounded-md border border-white/[0.06]">
+          <div className="mt-2 max-h-64 overflow-auto overscroll-contain rounded-md border border-[color:var(--border-faint)]">
             <table className="w-full text-left text-fluid-nano tabular-nums">
               <caption className="sr-only">
                 Every month drawn on the phase map, newest first, with its coordinates and the conditions it
