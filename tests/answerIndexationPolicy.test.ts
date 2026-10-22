@@ -28,6 +28,12 @@ describe("answer indexation policy", () => {
     }
   });
 
+  it("indexes the whole published set — the allowlist and the content agree", () => {
+    /* Every page ships indexable; a page added to the content without this
+       allowlist would publish unlisted, so the two are held equal here. */
+    assert.equal(indexableAnswerSlugs.length, answerPageContent.length);
+  });
+
   it("gives every page a distinct interpretation within its category", () => {
     /* The property the gate actually tests, asserted directly against the
        content rather than through a live report read — this runs offline and
