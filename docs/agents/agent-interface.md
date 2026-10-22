@@ -18,7 +18,7 @@ as the full brief:
 | --- | --- |
 | `headline` | The state in one sentence, for an agent that only quotes. |
 | `automation` | `{ ready, refusal }`: whether the data is live and current. **Check `ready` before acting without a person looking.** False for a saved copy, a record older than 10 days, or failed assembly; `refusal` says which. It says nothing about what the guidance is. This is `publishReadiness`, not `degraded`. |
-| `freshness` | `fetchedAt`, `recordAgeDays`, `live`, `fallback`. |
+| `freshness` | `fetchedAt`, `recordAgeDays`, `live`, `fallback`, `nextCallDue` (the next Monday 14:00 UTC publication; the call is current until then). |
 | `conditions` / `confidence` | The weather word and its stable `key`; the published confidence (`HIGH`/`MED`/`LOW`, percent) — the same one the page, `/api/scores` and the CLI carry. Pages print it as the margin ("Clear of / Within reach of / Close to the line"); see the field-to-label table in `docs/developer/api-reference.md`. |
 | `scores.tightness` / `scores.riskAppetite` | `value`, `meaning`, and against each line: `pause`, `resume` (each `{ line, distance, side, met }`; `met` on the pause line means the pause applies) and `change` (where the conditions themselves change). Then `previous`, `delta`, `perWeek` (the pace to hand a projection) and `moved` (what the delta is made of, signed, adding up to it). |
 | `change` | `direction`, `regimeChanged`, `comparedWith` (the earlier reading, dated: the previous month-end snapshot, **not last week**), `days` and a `note` where part of `moved` is an input the earlier score never had. |

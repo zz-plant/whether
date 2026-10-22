@@ -4,6 +4,7 @@ import { describeAgentTools } from "../agent/tools";
 import { MCP_PROTOCOL_VERSIONS } from "../mcp/serverIdentity";
 import { PUBLISH_MAX_RECORD_AGE_DAYS } from "../report/briefPublishGuard";
 import { canonicalPositioningLine } from "../seo";
+import { answerPages } from "../../app/answers/decisionPages";
 import { navigationGroups, pagesInGroup, utilityLinks } from "../navigation/informationArchitecture";
 
 /**
@@ -45,6 +46,13 @@ export const buildLlmsTxt = (baseUrl: string) => {
       .map((link) => `- ${link.label}: ${baseUrl}${link.href} — ${link.description}`),
   ];
 
+  /* The question-to-URL router: each decision and climate answer is a page that opens with the
+     current posture, so an agent with a user's question can fetch the page that matches it
+     instead of the whole brief. Read from the same list the answer routes serve. */
+  const questionLines = answerPages
+    .filter((page) => page.category === "decision" || page.category === "climate")
+    .map((page) => `- ${page.title}: ${baseUrl}/answers/${page.slug}`);
+
   return [
     "# Whether — Agent Interface",
     "",
@@ -61,6 +69,16 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "  - `bun run mcp:whether` runs the same tools over stdio from a checkout of the repository.",
     `- Read rather than decide: ${start.markdown} (Markdown).`,
     `- CLI, from a checkout: \`${start.cli}\``,
+    "",
+    "## If the user asks a question",
+    "",
+    "Each page opens with this week's posture and what it means for the decision, with the date of the reading. Cite the page and its date.",
+    ...questionLines,
+    "",
+    "## How current it is",
+    "",
+    "- The reading refreshes daily at 02:00 UTC, and the weekly call is published Mondays at 14:00 UTC. Treat a reading as current until `freshness.nextCallDue` in the state, and quote `recordDate`.",
+    "- A specific week has a permalink at /brief/<week>; cite that rather than the homepage when the date matters.",
     "",
     "## MCP tools",
     "",
