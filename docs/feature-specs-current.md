@@ -3620,6 +3620,26 @@ Two defects the regime engine's property tests found (`tests/regimeEnginePropert
   "Funding pressure > 101". The monthly summary's bands read the same function now, rather than a
   copy of its arithmetic.
 
+### 1.1.82 The plain-language derivation folds on a stable week (2026-10-21)
+
+Measured at 430×932 against the dev build: `#formula-reference` was 37% of `/trust`
+(1,294px of 3,508px), and its "In plain language" tier alone was 667px — the method
+ahead of the source board a scanner comes to check, DD-040's open item since
+2026-10-05.
+
+- **The ladders stay open.** They are the reading, not the method: the two scores
+  against their lines, in the one drawing every other route uses.
+- **The tier folds on a stable week** (`!isFallback && warnings.length === 0`, the
+  same condition that folds "Limits" below it) behind `UrlDetails queryKey="derivation"`
+  in the same chevron register as "Show the exact arithmetic"; `?derivation=1` opens
+  it (§XII). A degraded week renders it open — a reader distrusting the data meets the
+  derivation unprompted. The summary names what is behind it: "In plain language —
+  what each score reads, and how the pair sets the conditions".
+- **Still server-rendered inside `<details>`**, so a search engine and find-in-page
+  both reach it. `#formula-reference` and every link into the section are unchanged;
+  the tier has no inbound anchors of its own.
+- Test: `tests/formulaReferenceFold.test.tsx`.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

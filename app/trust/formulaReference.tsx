@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { MARGIN_LABEL } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
+import { UrlDetails } from "../components/ui/urlDetails";
 import { compositeSignalScales, signalPlainEnglish } from "../../lib/report/signalTranslations";
 import {
   BASE_RATE_TIGHTNESS_MULTIPLIER,
@@ -223,12 +224,85 @@ function FormulaCard({ title, children }: { title: string; children: ReactNode }
 export function FormulaReference({
   positions,
   scoringBasis,
+  plainLanguageFolded = false,
+  plainLanguageOpen = false,
 }: {
   positions?: ScorePositions;
   /** This reading's basis: what the inputs left out would make each score (`ReportData.scoringBasis`). */
   scoringBasis?: Pick<ScoringBasis, "notCounted">;
+  /** Fold the plain-language derivation behind `?derivation` on a stable week (the page decides; see the call site). */
+  plainLanguageFolded?: boolean;
+  /** The server-resolved open state for that fold (`?derivation=1`). */
+  plainLanguageOpen?: boolean;
 } = {}) {
   const recordBasis = describeRecordBasisInputs();
+  /* The plain-language tier, lifted out so it can render open or folded from
+   * one definition. */
+  const plainLanguageTier = (
+        <div className="weather-surface mb-3 space-y-3 px-4 py-4">
+          <p className="type-eyebrow">In plain language</p>
+          <ol className="space-y-2 text-sm text-slate-200">
+            <li>
+              <span className="font-semibold text-slate-100">1. Read two things off public U.S.
+              market data.</span>{" "}
+              {/* "Funding pressure is how hard…", one sentence each. With an em dash
+                  the definition's own capital ("Funding pressure — How hard…")
+                  read as a new sentence starting mid-line. */}
+              <span className="text-slate-300">
+                {signalPlainEnglish.tightness.plainLabel} is {lowerFirst(signalPlainEnglish.tightness.whatItMeasures)}{" "}
+                {signalPlainEnglish.riskAppetite.plainLabel} is {lowerFirst(signalPlainEnglish.riskAppetite.whatItMeasures)}
+              </span>
+            </li>
+            <li>
+              <span className="font-semibold text-slate-100">2. Score each one 0&ndash;100.</span>{" "}
+              <span className="text-slate-300">
+                For funding pressure, {compositeSignalScales.tightness.directionLabel}. For risk
+                appetite, {compositeSignalScales.riskAppetite.directionLabel}. Interest rates set most
+                of each score. Market reads adjust it, and step 3 says which of them count.
+              </span>
+            </li>
+            {/* The record basis (2026-10-09). Until then every market read moved the
+                scores, and four published weeks read Freezing on inputs the record
+                could not test, while their month-end, scored on the record's, read
+                Cloudy. The lists come from the engine's own set, so a read that
+                joins the archive moves here when it moves there. */}
+            <li id="record-basis">
+              <span className="font-semibold text-slate-100">3. Count only what the record can test.</span>{" "}
+              <span className="text-slate-300">
+                {upperFirst(joinAnd(recordBasis.counted))} move the scores. The record holds each of them
+                at every month-end since 2012, so the history on the Record and the calibration study
+                test the same score that sets the guidance.
+                {recordBasis.shownBecause.length > 0
+                  ? ` ${upperFirst(recordBasis.shownBecause.join("; "))}. Each is scored and shown, and moves nothing.`
+                  : null}
+              </span>
+              {scoringBasis && scoringBasis.notCounted.length > 0 ? (
+                <span className="mt-1 block text-slate-300" data-not-counted>
+                  This week they would put{" "}
+                  {joinAnd(
+                    scoringBasis.notCounted.map(
+                      (entry) => `${ruleMetricLabel[entry.metric].toLowerCase()} at ${entry.score}, where the published score is ${entry.published}`,
+                    ),
+                  )}
+                  .
+                </span>
+              ) : null}
+            </li>
+            <li>
+              <span className="font-semibold text-slate-100">4. Turn the pair into conditions.</span>{" "}
+              <span className="text-slate-300">
+                The quadrant the two scores land in sets the conditions.
+              </span>
+            </li>
+          </ol>
+          {/* No link out for the market terms: each card below says what its own terms
+              mean, so the arithmetic can be read without leaving it. No sentence
+              announcing that either (2026-10-14): it opened on "The exact arithmetic is
+              below.", over the control directly beneath it, and then on "Each card below
+              says what its market terms mean." — both described the page to its reader. */}
+        </div>
+  );
+
   return (
     <ReportSection
       id="formula-reference"
@@ -260,68 +334,30 @@ export function FormulaReference({
       {/* A reader who does not already know what a Treasury series or a credit
           spread is cannot start at the formulas. This tier says what the score
           does in words first; the grid below it stays exact. */}
-      <div className="weather-surface mb-3 space-y-3 px-4 py-4">
-        <p className="type-eyebrow">In plain language</p>
-        <ol className="space-y-2 text-sm text-slate-200">
-          <li>
-            <span className="font-semibold text-slate-100">1. Read two things off public U.S.
-            market data.</span>{" "}
-            {/* "Funding pressure is how hard…", one sentence each. With an em dash
-                the definition's own capital ("Funding pressure — How hard…")
-                read as a new sentence starting mid-line. */}
-            <span className="text-slate-300">
-              {signalPlainEnglish.tightness.plainLabel} is {lowerFirst(signalPlainEnglish.tightness.whatItMeasures)}{" "}
-              {signalPlainEnglish.riskAppetite.plainLabel} is {lowerFirst(signalPlainEnglish.riskAppetite.whatItMeasures)}
-            </span>
-          </li>
-          <li>
-            <span className="font-semibold text-slate-100">2. Score each one 0&ndash;100.</span>{" "}
-            <span className="text-slate-300">
-              For funding pressure, {compositeSignalScales.tightness.directionLabel}. For risk
-              appetite, {compositeSignalScales.riskAppetite.directionLabel}. Interest rates set most
-              of each score. Market reads adjust it, and step 3 says which of them count.
-            </span>
-          </li>
-          {/* The record basis (2026-10-09). Until then every market read moved the
-              scores, and four published weeks read Freezing on inputs the record
-              could not test, while their month-end, scored on the record's, read
-              Cloudy. The lists come from the engine's own set, so a read that
-              joins the archive moves here when it moves there. */}
-          <li id="record-basis">
-            <span className="font-semibold text-slate-100">3. Count only what the record can test.</span>{" "}
-            <span className="text-slate-300">
-              {upperFirst(joinAnd(recordBasis.counted))} move the scores. The record holds each of them
-              at every month-end since 2012, so the history on the Record and the calibration study
-              test the same score that sets the guidance.
-              {recordBasis.shownBecause.length > 0
-                ? ` ${upperFirst(recordBasis.shownBecause.join("; "))}. Each is scored and shown, and moves nothing.`
-                : null}
-            </span>
-            {scoringBasis && scoringBasis.notCounted.length > 0 ? (
-              <span className="mt-1 block text-slate-300" data-not-counted>
-                This week they would put{" "}
-                {joinAnd(
-                  scoringBasis.notCounted.map(
-                    (entry) => `${ruleMetricLabel[entry.metric].toLowerCase()} at ${entry.score}, where the published score is ${entry.published}`,
-                  ),
-                )}
-                .
-              </span>
-            ) : null}
-          </li>
-          <li>
-            <span className="font-semibold text-slate-100">4. Turn the pair into conditions.</span>{" "}
-            <span className="text-slate-300">
-              The quadrant the two scores land in sets the conditions.
-            </span>
-          </li>
-        </ol>
-        {/* No link out for the market terms: each card below says what its own terms
-            mean, so the arithmetic can be read without leaving it. No sentence
-            announcing that either (2026-10-14): it opened on "The exact arithmetic is
-            below.", over the control directly beneath it, and then on "Each card below
-            says what its market terms mean." — both described the page to its reader. */}
-      </div>
+      {/* A reader who does not already know what a Treasury series or a credit
+          spread is cannot start at the formulas. This tier says what the score
+          does in words first; the grid below it stays exact.
+
+          On a stable week (no warnings, live sources) the tier folds behind the
+          same chevron register as the arithmetic below it — DD-040's open item:
+          the method held the page on a quiet week, ahead of the source board a
+          scanner comes here to check. The ladders above stay open (they are the
+          reading), and a degraded week renders it open: a reader distrusting the
+          data meets the derivation unprompted. `?derivation=1` opens it from a
+          link (§XII); the summary names what is behind it. */}
+      {plainLanguageFolded ? (
+        <UrlDetails
+          queryKey="derivation"
+          initialOpen={plainLanguageOpen}
+          className="weather-auto-chevron group mb-3"
+          summaryClassName="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100"
+          summary="In plain language — what each score reads, and how the pair sets the conditions"
+        >
+          <div className="mt-4">{plainLanguageTier}</div>
+        </UrlDetails>
+      ) : (
+        plainLanguageTier
+      )}
 
       {/* Wider gutters than a framed grid needs. The depth ladder in
           surfaces.css drops the enclosure on these cards — they sit third
