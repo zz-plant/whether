@@ -802,8 +802,8 @@ export const describeCanonBaseRate = (baseRate: CanonBaseRate): string => {
   const larger = Math.max(expand.of, conserve.of);
   const swing =
     smaller === larger
-      ? `one text more or less moves a share by ${Math.round(100 / larger)} points`
-      : `one text more or less moves a share by ${Math.round(100 / larger)} to ${Math.round(100 / smaller)} points`;
+      ? `adding or removing one text moves a share by ${Math.round(100 / larger)} points`
+      : `adding or removing one text moves a share by ${Math.round(100 / larger)} to ${Math.round(100 / smaller)} points`;
   const verdict =
     expandLeans && conserveLeans && craftTracks
       ? "On this sample, capital advice leans with the conditions and craft advice does not."
