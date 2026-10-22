@@ -92,14 +92,20 @@ export function MonthStrip({ entries, markers, markersLegend, className = "" }: 
   /*
    * Placed against the month-end each event was recorded against — the last
    * month-end at or before its date, or the band's first when the event
-   * predates the record. Several in one month stack upward, so the band stays
-   * one row tall.
+   * predates the record. Several in one slot stack upward, so the band stays
+   * one row tall. Stacking counts the computed slot, not the exact date:
+   * decisions recorded on different days of the same month land on one
+   * month-end, and identical dates are only the special case.
    */
-  const placedMarkers = (markers ?? []).map((marker, index, all) => {
-    let slot = sorted.findIndex((entry) => entry.recordDate.localeCompare(marker.recordDate) >= 0);
+  const slotFor = (recordDate: string): number => {
+    let slot = sorted.findIndex((entry) => entry.recordDate.localeCompare(recordDate) >= 0);
     if (slot === -1) slot = sorted.length - 1;
-    if (sorted[slot].recordDate.localeCompare(marker.recordDate) > 0 && slot > 0) slot -= 1;
-    const sameSlotBefore = all.slice(0, index).filter((other) => other.recordDate === marker.recordDate).length;
+    if (sorted[slot].recordDate.localeCompare(recordDate) > 0 && slot > 0) slot -= 1;
+    return slot;
+  };
+  const placedMarkers = (markers ?? []).map((marker, index, all) => {
+    const slot = slotFor(marker.recordDate);
+    const sameSlotBefore = all.slice(0, index).filter((other) => slotFor(other.recordDate) === slot).length;
     return {
       ...marker,
       left: ((slot + 0.5) / sorted.length) * 100,
