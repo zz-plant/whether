@@ -12,6 +12,7 @@
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { availableParallelism } from 'node:os';
+import { statSync } from 'node:fs';
 
 import { isDeployGate } from './deploy-gate.mjs';
 import { walkFiles } from './walk-files.mjs';
@@ -207,11 +208,32 @@ const runSharded = async () => {
   const flagArgs = targetArgs.filter((arg) => arg.startsWith('-'));
   console.log(`[test-runner] sharding ${files.length} file(s) across ${effectiveShards} processes (seed base ${seedBase}; override with BUN_TEST_SHARDS).`);
 
-  const chunkSize = Math.ceil(files.length / effectiveShards);
+  /* Size-balanced assignment, not sequential chunks (2026-10-22). The CLI test
+     alone is 68KB and takes 12s — four times the next file — because it spawns
+     62 Node child processes. Sequential chunks put it in one shard with its
+     neighbours, making that shard the wall-clock bottleneck while the others
+     finish early. Sorting by file size descending and assigning each file to
+     the currently-lightest shard distributes the heavy files across shards, so
+     the slowest shard approaches the average rather than the maximum. */
+  const filesWithSize = files.map((file) => {
+    let size = 0;
+    try { size = statSync(path.resolve(file)).size; } catch { size = 0; }
+    return { file, size };
+  });
+  filesWithSize.sort((a, b) => b.size - a.size);
+  const shardFiles = [];
+  for (let i = 0; i < effectiveShards; i++) shardFiles.push([]);
+  const shardLoad = [];
+  for (let i = 0; i < effectiveShards; i++) shardLoad.push(0);
+  for (const { file, size } of filesWithSize) {
+    const lightest = shardLoad.indexOf(Math.min(...shardLoad));
+    shardFiles[lightest].push(file);
+    shardLoad[lightest] += size;
+  }
+
   const shards = [];
   for (let index = 0; index < effectiveShards; index += 1) {
-    const chunk = files.slice(index * chunkSize, (index + 1) * chunkSize);
-    const child = spawnShard(String(seedBase + index), [...flagArgs, ...chunk]);
+    const child = spawnShard(String(seedBase + index), [...flagArgs, ...shardFiles[index]]);
     shards.push(child);
   }
 
