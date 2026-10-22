@@ -557,7 +557,7 @@ async function PageContent({
         </p>
       ) : null}
       {historicalSelection ? (
-        <div className="mx-auto max-w-[64rem]">
+        <div className="mx-auto weather-brief-measure">
           <HistoricalBanner
             year={historicalSelection.year}
             month={historicalSelection.month}
@@ -567,7 +567,7 @@ async function PageContent({
           />
         </div>
       ) : null}
-      <div className="mx-auto max-w-[64rem] space-y-4 sm:space-y-8">
+      <div className="mx-auto weather-brief-measure space-y-4 sm:space-y-8">
         <div className="weather-brief-flow">
           {/* Above the brief, not after it. This is the orientation line for a
               first-time visitor, and it sat below the hero, all three operating

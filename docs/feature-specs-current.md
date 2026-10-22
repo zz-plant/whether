@@ -3640,6 +3640,20 @@ ahead of the source board a scanner comes to check, DD-040's open item since
   the tier has no inbound anchors of its own.
 - Test: `tests/formulaReferenceFold.test.tsx`.
 
+### 1.1.83 The brief's column joins the page-measure registry (2026-10-21)
+
+DD-046's open half: `/` hand-typed `max-w-[64rem]` twice while every other page read
+a registered measure, and the report shell hand-typed the same 72rem the registry
+already names.
+
+- **`.weather-brief-measure` (64rem)** is added beside `weather-page-shell-standard`
+  (72rem) and `-wide` (84rem) in `app/styles/layout-shells.css`; the brief's two inner
+  columns use it, and the focus mode that narrows only the brief narrows to the same
+  64rem it names. No width changed anywhere — the literal became a name.
+- **The report shell's content column** (`reportShell.tsx`, no-sidebar routes) reads
+  `weather-page-shell-standard` instead of its own `max-w-[72rem]`.
+- `/pricing`, the other page this debt item named, no longer exists (§1.1.78).
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

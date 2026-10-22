@@ -155,7 +155,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             task block, not separation. Desktop stops at 32px: at 48px, on top
             of the first section's own padding, ~90px of empty ground sat
             between the intro and the page's first heading. */}
-        <div className={`weather-page-stack order-1 min-w-0 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+        <div className={`weather-page-stack order-1 min-w-0 ${sidebarEnabled ? "" : "mx-auto w-full weather-page-shell-standard"}`}>
           {/* Every page built on this shell renders a reading, and the service
               worker serves the last copy of any of them when the network is
               gone. `/` carried this notice alone, so /trust — the page the IA
