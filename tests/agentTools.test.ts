@@ -244,6 +244,14 @@ describe("the arguments an agent leaves out", () => {
     assert.match(standupLine, /Conditions change if/);
     assert.ok(result.regime);
   });
+
+  it("audit_sprint_retro audits commitments against today's pause lines", async () => {
+    const report = await runAgentTool("audit_sprint_retro", { planText: "Hire 4 engineers with 8 months cash" }, "http");
+    assert.ok(report.regime);
+    assert.ok(typeof report.headline === "string");
+    assert.ok(Array.isArray(report.activePauseTriggers));
+    assert.ok(typeof report.markdown === "string");
+  });
 });
 
 describe("the catalogue rows", () => {

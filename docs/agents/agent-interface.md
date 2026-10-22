@@ -164,7 +164,7 @@ Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 - `get_decision_rules` — the bounded rules by regime. Keyed by regime, one key for one regime.
 - `get_context`, `get_projection` — history and projection for a regime; both default to today's reading. `get_context` counts **months** of month-end snapshots (`monthsActive`, `historicalAvgMonths`), through the `latestSnapshot` it names, because the record is monthly; it was `weeksActive` / `historicalAvgWeeks` over the same monthly series, so an agent told "8 weeks" was being told 8 months. A regime newer than the last month-end has `monthsActive` 0 and a `note` saying so.
 - `get_comps`, `get_signals`, `get_recent_history` — SaaS multiples, data coverage, one signal's trailing window.
-- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `get_analog_playbook` — a plan checked against today's conditions.
+- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `audit_sprint_retro`, `get_analog_playbook` — a plan or sprint retro checked against today's conditions.
 - `list_agent_skills` — the skill contract.
 
 Client config (shape):

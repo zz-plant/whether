@@ -12,6 +12,7 @@ import { buildUseConstraint } from "../report/useConstraint";
 import { fetchSaaSValuations, SAAS_BASKET } from "../saasMultiples";
 import { getTimeMachineMonthsByYear } from "../timeMachine/timeMachineCache";
 import { buildStandupLine } from "../report/decisionMovement";
+import { auditSprintDecisions, type SprintDecisionCandidate } from "../report/sprintRetro";
 import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
 import { createAgentToolRegistry, defineTool } from "./registry";
@@ -268,6 +269,55 @@ const AGENT_TOOLS = [
         reversalTrigger: plan.reversalTrigger,
         fragileAssumptions: plan.fragileAssumptions,
         sizingNote: plan.sizingNote,
+      };
+    },
+  }),
+  defineTool({
+    name: "audit_sprint_retro",
+    title: "Audit sprint decisions for regime pause violations",
+    description:
+      "Audits a sprint's recorded commitments against today's bounded pause triggers to surface retro violations (e.g. net-new hiring or platform rewrites committed while pause lines are active).",
+    input: {
+      planText: textInput.optional().describe("A planned decision or commitment to evaluate against pause lines."),
+      lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),
+    },
+    example: { planText: "Hired 2 senior engineers during defensive regime" },
+    run: async ({ planText, lifecycle }) => {
+      const assessment = await todayAssessment();
+      if (!planText) {
+        const report = auditSprintDecisions({
+          decisions: [],
+          regime: assessment.regime,
+          scores: assessment.scores,
+          thresholds: assessment.thresholds,
+        });
+        return {
+          headline: report.headline,
+          regime: report.regime,
+          activePauseTriggers: report.activePauseTriggers,
+          markdown: report.markdown,
+        };
+      }
+      const plan = stressTestDecisionPlan(assessment, { planText, lifecycle: lifecycle ?? "GROWTH" });
+      const candidate: SprintDecisionCandidate = {
+        title: planText,
+        category: plan.detectedCategory,
+        action: plan.detectedAction,
+        verdict: plan.verdict,
+      };
+      const report = auditSprintDecisions({
+        decisions: [candidate],
+        regime: assessment.regime,
+        scores: assessment.scores,
+        thresholds: assessment.thresholds,
+      });
+      return {
+        headline: report.headline,
+        regime: report.regime,
+        violationCount: report.violationCount,
+        violations: report.violations,
+        activePauseTriggers: report.activePauseTriggers,
+        markdown: report.markdown,
       };
     },
   }),

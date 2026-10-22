@@ -199,6 +199,8 @@ daily cron + `flipProximity.ts` and puts the call at the top of the most frequen
 
 ### T3.2 Sprint-posture recap + retro violation report
 
+**Status (2026-10-22): Shipped** — `lib/report/sprintRetro.ts` audits logged decisions or candidate commitments against `boundedDecisionRules.ts` pause lines; exposed via MCP tool `audit_sprint_retro`; verified in `tests/sprintRetro.test.ts` and `tests/mcpCommitmentLinter.test.ts`.
+
 **Why**: `lib/events/decisionEventStore.ts` logs decisions. Comparing the sprint's decisions against
 the regime's bounded rules surfaces violations ("committed to a speculative build in a DEFENSIVE
 regime").
