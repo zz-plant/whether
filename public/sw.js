@@ -109,7 +109,7 @@ self.addEventListener("fetch", (event) => {
   if (isDocumentRequest(request)) {
     /* Any Whether document opened clears the app badge: the badge means "a
        reading you haven't seen", and this is the reading being seen. */
-    if (self.navigator.clearAppBadge) self.navigator.clearAppBadge();
+    if (self.navigator.clearAppBadge) void self.navigator.clearAppBadge();
     event.respondWith(documentStrategy(request));
   }
 });
