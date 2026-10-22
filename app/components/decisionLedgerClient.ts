@@ -175,10 +175,14 @@ const requestBackgroundRetry = (): void => {
     if (!sw?.controller) return;
     void sw.ready
       .then((registration) => {
-        if (!("sync" in registration)) return;
-        return (
-          registration as ServiceWorkerRegistration & { sync: { register: (tag: string) => Promise<void> } }
-        ).sync.register("decision-ledger-retry");
+        /* Background Sync is not in the DOM typings; read it off the
+           registration through an unknown and narrow by shape, so a browser
+           that lacks it skips the registration without a cast. */
+        const sync: unknown = Reflect.get(registration, "sync");
+        if (sync && typeof sync === "object" && "register" in sync && typeof sync.register === "function") {
+          return sync.register("decision-ledger-retry");
+        }
+        return undefined;
       })
       .catch(() => {
         // No sync support, or the registration was refused: the reader was
