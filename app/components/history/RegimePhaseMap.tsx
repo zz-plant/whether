@@ -551,7 +551,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               </thead>
               <tbody className="text-slate-300">
                 {[...model.points].reverse().map((point) => (
-                  <tr key={point.recordDate} className="border-t border-white/[0.04]">
+                  <tr key={point.recordDate} className="border-t border-[color:var(--border-faint)]">
                     <th scope="row" className="px-2.5 py-1 font-normal text-slate-400">{point.monthLabel}</th>
                     <td className="px-2.5 py-1">
                       {point.regimeLabel}

@@ -125,7 +125,7 @@ export function ConditionsLegend({
       aria-label="The four conditions"
       data-testid="conditions-legend"
       suppressHydrationWarning
-      className={`mb-3 flex items-start justify-between gap-4 border-b border-white/[0.08] pb-3 text-fluid-xs text-slate-300 ${arrival === "share" || orientation ? "" : "md:hidden"}`.trim()}
+      className={`mb-3 flex items-start justify-between gap-4 border-b border-[color:var(--border-subtle)] pb-3 text-fluid-xs text-slate-300 ${arrival === "share" || orientation ? "" : "md:hidden"}`.trim()}
     >
       <p className="min-w-0 leading-relaxed">
         {/* A reader who followed a pasted brief knows who sent it and nothing else. */}

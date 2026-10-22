@@ -149,7 +149,7 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
                   </ol>
                 )}
                 {artifact.noChangeAreas && artifact.noChangeAreas.length > 0 ? (
-                  <p className="border-t border-white/[0.08] pt-4 text-fluid-sm text-white/45">
+                  <p className="border-t border-[color:var(--border-subtle)] pt-4 text-fluid-sm text-white/45">
                     Unchanged: {artifact.noChangeAreas.join(" · ")}
                   </p>
                 ) : null}
