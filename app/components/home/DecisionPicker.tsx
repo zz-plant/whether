@@ -152,7 +152,7 @@ export function DecisionPicker({
              link, and the rule read as a quote rather than as the answer. */
           <div
             aria-live="polite"
-            className="space-y-3 rounded-xl border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] px-4 py-4 sm:px-5"
+            className="space-y-3 rounded-xl border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] px-4 py-4 sm:px-5 animate-in fade-in-50 duration-200 motion-reduce:animate-none"
           >
             <p className="type-eyebrow">
               <AreaLabel area={active.area} />

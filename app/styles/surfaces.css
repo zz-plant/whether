@@ -63,7 +63,9 @@
    brief's only elevation. */
 .weather-hero-card {
   position: relative;
-  background: var(--bg-panel);
+  background:
+    radial-gradient(ellipse 80% 45% at 50% -5%, color-mix(in srgb, var(--regime-accent) 12%, transparent), transparent 75%),
+    var(--bg-panel);
   border-color: color-mix(in srgb, var(--regime-accent) 20%, var(--border-strong));
   box-shadow:
     var(--elev-2),
@@ -71,7 +73,9 @@
 }
 
 html[data-theme="light"] .weather-hero-card {
-  background: var(--bg-panel, #ffffff);
+  background:
+    radial-gradient(ellipse 80% 45% at 50% -5%, color-mix(in srgb, var(--regime-accent) 8%, transparent), transparent 75%),
+    var(--bg-panel, #ffffff);
   border-color: color-mix(in srgb, var(--regime-accent) 18%, var(--border-strong));
   box-shadow:
     var(--elev-1),

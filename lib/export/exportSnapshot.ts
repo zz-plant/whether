@@ -1,6 +1,6 @@
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { loadCanonicalReportInputs } from "../ingestion/materialized";
-import { loadMacroSeries } from "../macroSnapshot";
+import { macroSeries as snapshotMacroSeries } from "../macroSnapshot";
 import { buildOperatingSnapshot } from "../operatingState/snapshot";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
@@ -24,7 +24,7 @@ export const loadExportSnapshot = async (): Promise<OperatingSnapshot | null> =>
   if (inputs) {
     return buildOperatingSnapshot({ treasury: inputs.treasury, macroSeries: inputs.macroSeries });
   }
-  return buildOperatingSnapshot({ treasury: snapshotData, macroSeries: await loadMacroSeries() });
+  return buildOperatingSnapshot({ treasury: snapshotData, macroSeries: snapshotMacroSeries });
 };
 
 /**
