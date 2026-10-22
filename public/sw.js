@@ -210,7 +210,8 @@ self.addEventListener("notificationclick", (event) => {
  * service worker, which is why the stash is IndexedDB — and why these two
  * small functions mirror that file's instead of importing them: this file is
  * served as-is from /public. The keying convention is shared: one entry per
- * client id, deleted when its replay succeeds.
+ * stashed write under a unique key (two offline decisions are two records),
+ * deleted when its replay succeeds, or dropped on a 4xx refusal.
  */
 const RETRY_DB_NAME = "whether-ledger-retry";
 const RETRY_STORE = "posts";
@@ -235,8 +236,21 @@ const readStashedPosts = async () => {
   if (!db) return [];
   const posts = await new Promise((resolve) => {
     try {
-      const request = db.transaction(RETRY_STORE, "readonly").objectStore(RETRY_STORE).getAll();
-      request.onsuccess = () => resolve(request.result ?? []);
+      /* A cursor rather than getAll: the entry's key is what a successful
+         replay deletes, and entries stashed before the key was stored inside
+         the value key by their IndexedDB key instead. */
+      const request = db.transaction(RETRY_STORE, "readonly").objectStore(RETRY_STORE).openCursor();
+      const entries = [];
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) {
+          resolve(entries);
+          return;
+        }
+        const value = cursor.value ?? {};
+        entries.push({ key: typeof value.key === "string" ? value.key : cursor.key, clientId: value.clientId, payload: value.payload });
+        cursor.continue();
+      };
       request.onerror = () => resolve([]);
     } catch {
       resolve([]);
@@ -246,13 +260,13 @@ const readStashedPosts = async () => {
   return posts;
 };
 
-const deleteStashedPost = async (clientId) => {
+const deleteStashedPost = async (key) => {
   const db = await openRetryDb();
   if (!db) return;
   await new Promise((resolve) => {
     try {
       const tx = db.transaction(RETRY_STORE, "readwrite");
-      tx.objectStore(RETRY_STORE).delete(clientId);
+      tx.objectStore(RETRY_STORE).delete(key);
       tx.oncomplete = () => resolve();
       tx.onerror = () => resolve();
     } catch {
@@ -263,19 +277,36 @@ const deleteStashedPost = async (clientId) => {
 };
 
 const replayStashedPosts = async () => {
-  for (const post of await readStashedPosts()) {
+  const posts = await readStashedPosts();
+  let retryable = false;
+  for (const post of posts) {
     try {
       const response = await fetch(LEDGER_ENDPOINT, {
         method: "POST",
         headers: { [CLIENT_ID_HEADER]: post.clientId, "content-type": "application/json" },
         body: JSON.stringify({ ...post.payload, clientId: post.clientId }),
       });
-      if (response.ok) await deleteStashedPost(post.clientId);
+      if (response.ok) {
+        await deleteStashedPost(post.key);
+      } else if (response.status >= 500) {
+        /* The server answered but failed: the entry stays queued for the retry. */
+        retryable = true;
+      } else {
+        /* A 4xx is a refusal, not a network failure. The decision was reported
+           as not recorded at write time, and replaying it would fail the same
+           way every time, so it is dropped the way a failed live post is. */
+        await deleteStashedPost(post.key);
+      }
     } catch {
       /* Still offline: the entry stays queued, and the sync event fires again
          when the platform next judges connectivity returned. */
+      retryable = true;
     }
   }
+  /* The Background Sync spec schedules the next retry from a rejected
+     waitUntil promise; resolving here would drop the one-off registration and
+     strand whatever remains queued in IndexedDB. */
+  if (retryable) throw new Error("decision-ledger-retry: entries remain queued");
 };
 
 self.addEventListener("sync", (event) => {

@@ -134,13 +134,41 @@ const openRetryDb = (): Promise<IDBDatabase | null> =>
     }
   });
 
+/* One entry per stashed write, keyed uniquely: two decisions recorded offline
+   are two records, not one overwriting the other. The key rides inside the
+   stored value because the service worker replays with getAll, which returns
+   values without keys — public/sw.js mirrors this convention. */
+const stashValue = (clientId: string, payload: DecisionMemoryPayload) => {
+  let key = `${clientId}:${Date.now()}:${Math.random()}`;
+  try {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      key = `${clientId}:${crypto.randomUUID()}`;
+    }
+  } catch {
+    // The timestamp-and-random fallback above is unique enough for a queue.
+  }
+  return { key, clientId, payload };
+};
+
+/** What a stashed entry looks like when read back; `key` is absent on entries stashed before it was stored. */
+const stashEntryFields = (value: unknown) => {
+  if (typeof value !== "object" || value === null) return null;
+  const record = value as { key?: unknown; clientId?: unknown; payload?: unknown };
+  return {
+    key: typeof record.key === "string" ? record.key : null,
+    clientId: typeof record.clientId === "string" ? record.clientId : null,
+    payload: record.payload,
+  };
+};
+
 const stashFailedPost = async (clientId: string, payload: DecisionMemoryPayload): Promise<void> => {
   const db = await openRetryDb();
   if (!db) return;
+  const entry = stashValue(clientId, payload);
   await new Promise<void>((resolve) => {
     try {
       const tx = db.transaction(RETRY_STORE, "readwrite");
-      tx.objectStore(RETRY_STORE).put({ clientId, payload }, clientId);
+      tx.objectStore(RETRY_STORE).put(entry, entry.key);
       tx.oncomplete = () => resolve();
       tx.onerror = () => resolve();
     } catch {
@@ -150,13 +178,27 @@ const stashFailedPost = async (clientId: string, payload: DecisionMemoryPayload)
   db.close();
 };
 
-const clearStashedPost = async (clientId: string): Promise<void> => {
+const clearStashedPost = async (clientId: string, payload: DecisionMemoryPayload): Promise<void> => {
   const db = await openRetryDb();
   if (!db) return;
+  /* A successful post clears only the stashed copy of the same decision — the
+     re-tap after "that decision was not recorded". Decisions recorded offline
+     that differ from this one are separate records and stay queued for the
+     service worker's replay. */
+  const postedBody = JSON.stringify(payload);
   await new Promise<void>((resolve) => {
     try {
       const tx = db.transaction(RETRY_STORE, "readwrite");
-      tx.objectStore(RETRY_STORE).delete(clientId);
+      const cursorRequest = tx.objectStore(RETRY_STORE).openCursor();
+      cursorRequest.onsuccess = () => {
+        const cursor = cursorRequest.result;
+        if (!cursor) return;
+        const entry = stashEntryFields(cursor.value);
+        if (entry && entry.clientId === clientId && entry.payload && JSON.stringify(entry.payload) === postedBody) {
+          cursor.delete();
+        }
+        cursor.continue();
+      };
       tx.oncomplete = () => resolve();
       tx.onerror = () => resolve();
     } catch {
@@ -216,7 +258,7 @@ export const logDecisionToLedger = async (
       }
 
       rememberLedgerSize(clientId, readKnownLedgerSize(clientId, storage) + 1, storage);
-      await clearStashedPost(clientId);
+      await clearStashedPost(clientId, payload);
       return { ok: true };
     } catch {
       /* A network failure is worth one automatic retry: the payload is stashed

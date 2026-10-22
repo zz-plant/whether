@@ -114,6 +114,122 @@ describe("decision ledger client", () => {
     assert.equal((await downloadDecisionLedger("browser-1", "csv", failing)).ok, false);
   });
 
+  /* A minimal IndexedDB fake for the offline stash: one object store with put
+     and a cursor walk. Results arrive on the microtask queue and transaction
+     completion on the macrotask queue after it, which is the order the client
+     awaits them in. The map is exposed so a test can assert on what the queue
+     actually holds rather than on whether the calls resolved. */
+  const fakeIndexedDB = () => {
+    const entries = new Map<string, { key: string; value: unknown }>();
+    const micro = (fn: () => void) => queueMicrotask(fn);
+
+    const store = {
+      put(value: unknown, key: string) {
+        micro(() => entries.set(key, { key, value }));
+      },
+      openCursor() {
+        type FakeCursor = { key: string; value: unknown; delete: () => void; continue: () => void };
+        const request: { result: FakeCursor | null; onsuccess: (() => void) | null; onerror: (() => void) | null } = {
+          result: null,
+          onsuccess: null,
+          onerror: null,
+        };
+        let index = 0;
+        const fire = () =>
+          micro(() => {
+            const keys = [...entries.keys()].sort();
+            if (index >= keys.length) {
+              request.result = null;
+            } else {
+              const key = keys[index];
+              index += 1;
+              request.result = {
+                key,
+                value: entries.get(key)?.value,
+                delete: () => entries.delete(key),
+                continue: () => fire(),
+              };
+            }
+            request.onsuccess?.();
+          });
+        fire();
+        return request;
+      },
+    };
+
+    const db = {
+      close: () => {},
+      transaction: () => {
+        const tx = { objectStore: () => store, oncomplete: null as (() => void) | null, onerror: null as (() => void) | null };
+        setTimeout(() => tx.oncomplete?.(), 0);
+        return tx;
+      },
+    };
+
+    const open = () => {
+      const request: { result: unknown; onsuccess: (() => void) | null; onerror: (() => void) | null } = {
+        result: null,
+        onsuccess: null,
+        onerror: null,
+      };
+      micro(() => {
+        request.result = db;
+        request.onsuccess?.();
+      });
+      return request;
+    };
+
+    return { open, entries };
+  };
+
+  const withIndexedDB = async <T>(fake: { open: unknown }, run: () => Promise<T>): Promise<T> => {
+    (globalThis as { indexedDB?: unknown }).indexedDB = fake;
+    try {
+      return await run();
+    } finally {
+      delete (globalThis as { indexedDB?: unknown }).indexedDB;
+    }
+  };
+
+  const offlineFetch = (() => Promise.reject(new Error("offline"))) as unknown as typeof globalThis.fetch;
+
+  it("queues two offline decisions as two records, not one overwriting the other", async () => {
+    const fake = fakeIndexedDB();
+    const other = { ...payload, decision: { ...payload.decision, action: "RESTRUCTURE" as const } };
+    await withIndexedDB(fake, async () => {
+      await logDecisionToLedger("browser-1", payload, offlineFetch);
+      await logDecisionToLedger("browser-1", other, offlineFetch);
+    });
+
+    assert.equal(fake.entries.size, 2, "the second stashed write must not replace the first");
+    const payloads = [...fake.entries.values()].map((entry) => (entry.value as { payload: unknown }).payload);
+    assert.deepEqual(
+      payloads.map((stashed) => (stashed as typeof payload).decision.action).sort(),
+      ["HIRE", "RESTRUCTURE"],
+    );
+    const keys = [...fake.entries.keys()];
+    assert.ok(keys.every((key) => key.startsWith("browser-1:")), "entries stay grouped under the client that stashed them");
+    assert.ok(new Set(keys).size === keys.length, "keys are unique per stashed write");
+  });
+
+  it("clears only the stashed copy of the decision that just posted, leaving other offline decisions queued", async () => {
+    const fake = fakeIndexedDB();
+    const other = { ...payload, decision: { ...payload.decision, action: "RESTRUCTURE" as const } };
+    await withIndexedDB(fake, async () => {
+      // Both decisions are recorded offline and stashed.
+      await logDecisionToLedger("browser-1", payload, offlineFetch);
+      await logDecisionToLedger("browser-1", other, offlineFetch);
+      // Back online, the reader taps the first one again and it posts.
+      const { fetchImpl } = capture({ ok: true }, 201);
+      await logDecisionToLedger("browser-1", payload, fetchImpl);
+    });
+
+    assert.equal(fake.entries.size, 1, "the re-tap clears its own stashed copy and nothing else");
+    const remaining = fake.entries.values().next().value;
+    assert.ok(remaining, "one entry remains queued");
+    assert.equal((remaining.value as { payload: typeof other }).payload.decision.action, "RESTRUCTURE");
+  });
+
   it("posts the decision under the same owner it claims", async () => {
     const { calls, fetchImpl } = capture({ ok: true }, 201);
     await logDecisionToLedger("browser-1", payload, fetchImpl);
