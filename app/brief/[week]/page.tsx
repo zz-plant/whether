@@ -259,7 +259,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             <dl className="grid gap-4 sm:grid-cols-2">
               {readings.map((reading) => {
                 const rail = rails.find((candidate) => candidate.metric === reading.key);
-                const deltaUp = reading.change?.startsWith("+");
+                const deltaUp = reading.change ? reading.change.delta > 0 : undefined;
                 const deltaTone = reading.change
                   ? deltaUp === reading.worseWhenUp
                     ? "text-semantic-caution-fg"
@@ -271,7 +271,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                     <dd className="mt-0.5 flex items-baseline gap-2 tabular-nums">
                       <span className="text-2xl font-semibold text-slate-100">{reading.value}</span>
                       <span className="text-sm text-slate-500">/100</span>
-                      {reading.change ? <span className={`text-sm ${deltaTone}`}>{reading.change}</span> : null}
+                      {reading.change ? <span className={`text-sm ${deltaTone}`}>{reading.change.label}</span> : null}
                     </dd>
                     {/* What the number meant that week, so a cited record does not
                         need the reader to know which end of the scale is bad. */}

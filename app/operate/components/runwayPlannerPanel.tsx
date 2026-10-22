@@ -261,7 +261,8 @@ export function RunwayPlannerPanel({
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const clipboardState = getClipboardUiState("runway-plan", { status, error, activeTarget, copiedTarget });
   const memoClipboardState = getClipboardUiState("budget-memo", { status, error, activeTarget, copiedTarget });
-  const paybackStrictnessLevel = output ? Number.parseInt(output.decisionKnobs.paybackStrictnessLabel, 10) || 0 : 0;
+  /* The level comes through as a number; the label is display copy, never something to parse back. */
+  const paybackStrictnessLevel = output ? output.decisionKnobs.paybackStrictnessLevel : 0;
   const paybackStrictnessState = strictnessLabel(paybackStrictnessLevel);
 
   const memoMarkdown = useMemo(() => {

@@ -66,7 +66,7 @@ export function CopyImageCardButton({
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
-      const dateTag = artifact?.recordDateLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-") ?? "weekly";
+      const dateTag = artifact?.recordDate ?? "weekly";
       link.download = `whether-brief-${dateTag}.png`;
       document.body.appendChild(link);
       link.click();
@@ -82,7 +82,7 @@ export function CopyImageCardButton({
     const shareImage = async (blob: Blob) => {
       try {
         if (typeof navigator === "undefined" || !navigator.share || !navigator.canShare) return false;
-        const dateTag = artifact?.recordDateLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-") ?? "weekly";
+        const dateTag = artifact?.recordDate ?? "weekly";
         const file = new File([blob], `whether-brief-${dateTag}.png`, { type: "image/png" });
         if (!navigator.canShare({ files: [file] })) return false;
         await navigator.share({ files: [file], title: "This week's guidance" });

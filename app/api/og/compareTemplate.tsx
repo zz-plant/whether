@@ -3,6 +3,7 @@ import type { RegimeKey } from "../../../lib/regimeEngine";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
 import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
+import { joinConditionsHeadline } from "../../../lib/report/reportFormatting";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 
 /* The card is shared cold, so it uses the page's names: never "Boldness" or
@@ -43,10 +44,7 @@ const regimeAccent = REGIME_HEX_COLORS;
 
 /* "Sunny for 9 months" already names the conditions; "Freezing" alone would print
    "Freezing — Freezing" under a naive join. */
-const epochTitle = (epoch: CompareEpoch) => {
-  const conditions = getRegimePublicLabel(epoch.regime);
-  return epoch.postureLabel.startsWith(conditions) ? epoch.postureLabel : `${conditions} — ${epoch.postureLabel}`;
-};
+const epochTitle = (epoch: CompareEpoch) => joinConditionsHeadline(getRegimePublicLabel(epoch.regime), epoch.postureLabel);
 
 const formatPercent = (value: number | null, decimals = 2) =>
   value === null || !Number.isFinite(value) ? "n/a" : `${value.toFixed(decimals)}%`;
