@@ -37,7 +37,19 @@ export function RecordSection({
   return (
     <HomeSection id={HOME_SECTIONS.record.id} heading={HOME_SECTIONS.record.heading}>
       {lastTime ? <LastTimeCallChangedCard record={lastTime} callChangeLines={callChangeLines} /> : null}
-      {record && record.length > 0 ? <MonthStrip entries={record} /> : null}
+      {record && record.length > 0 ? (
+        <>
+          <MonthStrip entries={record} />
+          {/* Two sampling conventions on one page: the headline is this week's
+              reading, the record behind this band is month-end readings. Said
+              once, under the band, because a reader comparing the two would
+              otherwise read the difference as a data gap (2026-10-22). */}
+          <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400" data-record-sampling>
+            The record is month-end readings; the guidance above is this week&rsquo;s. A week that moved the
+            guidance appears here at the month-end it belongs to.
+          </p>
+        </>
+      ) : null}
       {spellLengths ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{spellLengths}</p> : null}
       {turningPoints.length > 0 ? (
         <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">

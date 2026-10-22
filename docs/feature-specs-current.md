@@ -171,32 +171,41 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    its move since the comparison reading, and how far it sits from the pause line and the resume
    line. When the guidance is held the card prints neither the pair nor the ladders; the weekly card
    below states the hold's lines.
-2. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
+2. **The five areas** (`DecisionPicker`, `#what-it-changes`, "Your decisions this week"): each
+   area by its name with its standing against its pause line; a choice opens its rule, lines and
+   the runway test. All five side by side fold under it (`AllAreaRules`: the area table, the runway
+   notes and the commitment test), then the one plan button. No "This week's scores" list: the map
+   and the bars in section 5 print the scores at every width.
+3. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
    only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
    its default choice, a chosen stage's own action as a stage line, and the runway emphasis once a
    band reshaped a rule. No sentence restates the selection; on a phone the section prints only
-   with a stage line or a runway note. Nothing lower on the page repeats the control.
-3. **The five areas** (`DecisionPicker`, `#what-it-changes`, "What are you deciding?"): each area
-   by its name with its standing against its pause line; a choice opens its rule, lines and the
-   runway test. All five side by side fold under it (`AllAreaRules`: the area table, the runway
-   notes and the commitment test), then the one plan button. No "This week's scores" list: the map
-   and the bars in section 6 print the scores at every width.
-4. **What would change this guidance** (`WhatWouldChangeSection`): the pause line, the resume line
-   (a chosen stage's, else the lead area's), the line where conditions change, the market move in
-   rate terms (folded), and below `md` the conditions map (no distance caption: the trust strip's
-   margin states it).
-5. **Get an email the day a line is crossed** (`AlertSection`, `#subscribe`): the one subscribe
-   form, starting on alerts only with the Monday email one choice away, and the push toggle.
-6. **What changed this week** (`WhatChangedSection`): one row per signal, the earlier reading →
+   with a stage line or a runway note. It follows the areas because the table above already names
+   the company the lines are scaled to; this is where the reader changes that.
+4. **Why conditions are {weather}** (`home/WhyConditionsSection.tsx`, `#why-conditions`): the two
+   readings with what each means (`signalReadingMeaning`, the brief card's phrase), the change line
+   each sits against, and the two qualifications that decide whether the classification survives
+   inspection — inputs outside the record (counted, they would move a score across its change line;
+   the counted weather word is printed) and a capped score's real distance (90 against a 70 line
+   reads as 20 points; the uncapped pressure is 40). Both were methodology notes before (2026-10-22).
+5. **What changed since {reading}** (`WhatChangedSection`): one row per signal, the earlier reading →
    this week's with the comparison dated (§1.1.26), each composite score on its ladder with what
    moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
    each area's row says which of its lines moved. A read with no comparison says so over it.
-7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
+6. **What would change this guidance** (`WhatWouldChangeSection`): two questions, named apart —
+   when conditions change (the change line, in points, with the market move folded under it) and
+   when a paused decision may resume (the pause line and the resume line, a chosen stage's else the
+   lead area's). A sentence says a change in conditions is not permission to resume. Below `md` the
+   conditions map draws here (no distance caption: the trust strip's margin states it).
+7. **How unusual is this?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; on every week, how long
    these conditions lasted before (§1.1.76); the last turns as links. On a live week the record is
    drawn above those sentences as `/history`'s month strip (every month-end since 2012 in its
-   weather, 2026-10-21), so how long spells last and how rarely conditions change read at a glance.
-8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
+   weather, 2026-10-21), with one line separating the sampling conventions — the record is
+   month-end readings, the guidance above is this week's.
+8. **Get notified when something changes** (`AlertSection`, `#subscribe`): the one subscribe form,
+   starting on alerts only with the Monday email one choice away, and the push toggle.
+9. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
    holds the slide and image copies and every other format since 2026-10-08, and the week's
    published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
 

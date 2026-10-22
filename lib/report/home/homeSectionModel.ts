@@ -37,23 +37,25 @@ export const parseHomeDecision = (value: string | undefined): DecisionArea | und
   value !== undefined && isDecisionArea(value) ? value : undefined;
 
 /*
- * The homepage's sections, in the order they print (2026-10-09): the verdict, the
- * stage and runway it is scaled to, the five areas, what would change the guidance,
- * the alert, what changed, and the record. The order follows what a reader does
- * with the week: act on it, check it fits their company, find their decision,
- * learn what would move it, ask to hear when it does, then the evidence and the
- * record. `areas` keeps the id the old "What that changes for you" section had, so
- * a link to it still lands on the areas. Sharing is the page's last line, not a
- * section: a heading over one link (`ShareLinks`).
+ * The homepage's sections, in the order they print (2026-10-22): the verdict, the
+ * five areas, whose lines they are, what the conditions are made of, what changed,
+ * what would change the guidance, how unusual this is, and the alert. The order
+ * follows the four questions a reader arrives with — what is happening, what do I
+ * do, what would change it, how far can I trust it — and keeps the plan before
+ * the evidence. `areas` keeps the id the old "What that changes for you" section
+ * had, so a link to it still lands on the areas. The diagnosis heading carries
+ * the week's weather word, so it is passed by the route, not stored here. Sharing
+ * is the page's last line, not a section: a heading over one link (`ShareLinks`).
  */
 export const HOME_SECTIONS = {
   call: { id: "weekly-call" },
+  areas: { id: "what-it-changes", heading: "Your decisions this week" },
   calibration: { id: "company-calibration" },
-  areas: { id: "what-it-changes", heading: "What are you deciding?" },
-  watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
-  alert: { id: "subscribe", heading: "Get an email the day a line is crossed" },
+  diagnosis: { id: "why-conditions" },
   changed: { id: "what-changed", heading: "What changed this week" },
-  record: { id: "has-this-happened-before", heading: "Has this happened before?" },
+  watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
+  record: { id: "has-this-happened-before", heading: "How unusual is this?" },
+  alert: { id: "subscribe", heading: "Get notified when something changes" },
 } as const;
 
 /** The three lines a score is drawn against, as the ladder primitive takes them. */

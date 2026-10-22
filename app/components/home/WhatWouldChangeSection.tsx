@@ -102,17 +102,9 @@ export function WhatWouldChangeSection({
   const marketMoves = ladders.flatMap((ladder) =>
     flipProximity.filter((line) => line.axis === ladder.metric).map((line) => ({ ...line, label: ladder.label })),
   );
-  /* The pause and resume lines first, then where conditions change. The watch
-     list prints only on a read that drew no ladders, which have nowhere else. */
+  /* The pause and resume lines answer one question; the change line answers the
+     other. Both are printed under their own heading (2026-10-22). */
   const resumeLine = resumeWhen ?? leadResume;
-  const statements = [
-    ...(guardrail ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: guardrail }] : []),
-    ...(resumeLine ? [{ label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: resumeLine }] : []),
-    ...(reversalTrigger ? [{ label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: reversalTrigger }] : []),
-    ...(flipConditions && flipConditions.length > 0 && ladders.length === 0
-      ? [{ label: DECISION_CONTRACT_LABELS.watch.watchThisWeek, value: flipConditions.join(" · ") }]
-      : []),
-  ];
 
   return (
     <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading}>
@@ -150,28 +142,66 @@ export function WhatWouldChangeSection({
           />
         ) : null}
         <div className="min-w-0 space-y-4">
-          {statements.length > 0 ? (
-            <dl className="space-y-3 text-fluid-xs">
-              {statements.map((statement) => (
-                <div key={statement.label} className="space-y-0.5">
-                  <dt className="font-semibold text-slate-200">{statement.label}</dt>
-                  <dd className="text-slate-300"><BoundedValue>{statement.value}</BoundedValue></dd>
-                </div>
-              ))}
-            </dl>
+          {/* Two different questions, named as two (2026-10-22): a change in
+              conditions is not permission to resume, and the old flat list read
+              as one question with three answers. The conditions question comes
+              first because it is the one the weather word answers. */}
+          {reversalTrigger || marketMoves.length > 0 ? (
+            <div className="space-y-2">
+              <h3 className="text-fluid-sm font-semibold text-slate-100">When would conditions change?</h3>
+              {reversalTrigger ? (
+                <dl className="text-fluid-xs">
+                  <div className="space-y-0.5">
+                    <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.watch.postureFlips}</dt>
+                    <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
+                  </div>
+                </dl>
+              ) : null}
+              {marketMoves.length > 0 ? (
+                <details className="weather-auto-chevron text-fluid-xs">
+                  <summary className="cursor-pointer select-none font-medium text-slate-300">In interest-rate terms</summary>
+                  <ul className="space-y-1.5 text-slate-300">
+                    {marketMoves.map((line) => (
+                      <li key={line.sentence} data-flip-axis={line.axis}>
+                        <span className="text-slate-400">{line.label}:</span> {line.sentence}
+                        {line.scale ? <span className="block text-slate-400">{line.scale}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : null}
+            </div>
           ) : null}
-          {marketMoves.length > 0 ? (
-            <details className="weather-auto-chevron text-fluid-xs">
-              <summary className="cursor-pointer select-none font-medium text-slate-300">In interest-rate terms</summary>
-              <ul className="space-y-1.5 text-slate-300">
-                {marketMoves.map((line) => (
-                  <li key={line.sentence} data-flip-axis={line.axis}>
-                    <span className="text-slate-400">{line.label}:</span> {line.sentence}
-                    {line.scale ? <span className="block text-slate-400">{line.scale}</span> : null}
-                  </li>
-                ))}
-              </ul>
-            </details>
+
+          {guardrail || resumeLine ? (
+            <div className="space-y-2">
+              <h3 className="text-fluid-sm font-semibold text-slate-100">When can paused decisions resume?</h3>
+              <dl className="space-y-3 text-fluid-xs">
+                {guardrail ? (
+                  <div className="space-y-0.5">
+                    <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
+                    <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
+                  </div>
+                ) : null}
+                {resumeLine ? (
+                  <div className="space-y-0.5">
+                    <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
+                    <dd className="text-slate-300"><BoundedValue>{resumeLine}</BoundedValue></dd>
+                  </div>
+                ) : null}
+              </dl>
+              <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
+                A change in conditions is not permission to resume. The resume line is the test, and the
+                weather word alone does not cross it.
+              </p>
+            </div>
+          ) : null}
+
+          {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (
+            <div className="space-y-0.5 text-fluid-xs">
+              <p className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
+              <p className="text-slate-300">{flipConditions.join(" · ")}</p>
+            </div>
           ) : null}
         </div>
       </div>

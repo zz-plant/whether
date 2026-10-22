@@ -541,7 +541,7 @@ describe("Wayfinding shortcuts and deep-links", () => {
     const { AlertSection } = require("../app/components/home/AlertSection");
     const html = renderToStaticMarkup(<AlertSection />);
     assert.match(html, /^<section id="subscribe"/);
-    assert.match(html, /<h2[^>]*>Get an email the day a line is crossed<\/h2>/);
+    assert.match(html, /<h2[^>]*>Get notified when something changes<\/h2>/);
     assert.match(html, /Every Monday too/, "the Monday email stays one choice away");
     assert.doesNotMatch(html, /Tell me when the guidance changes/, "the form does not restate the heading");
     const { WhatWouldChangeSection } = require("../app/components/home/WhatWouldChangeSection");

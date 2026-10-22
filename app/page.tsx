@@ -44,6 +44,7 @@ import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
+import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
 import { AllAreaRules } from "./components/home/AllAreaRules";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { AlertSection } from "./components/home/AlertSection";
@@ -706,20 +707,7 @@ async function PageContent({
               </div>
             </div>
 
-            {/* 2. Whose lines these are. Live weekly brief only: the profile holds
-                the reader's company as of today, and an archived week or a longer
-                horizon was reached by choosing it. */}
-            {!historicalSelection && activeCadence === "weekly" ? (
-              <CompanyCalibration
-                stageLabel={stageLabel}
-                activeStage={activeStage}
-                activeRunway={activeRunway}
-                runwayEmphasis={runwayEmphasis}
-                stageAction={stageAction}
-              />
-            ) : null}
-
-            {/* 3. The five areas: the picker, all five side by side folded under it,
+            {/* 2. The five areas: the picker, all five side by side folded under it,
                 and the one plan link. */}
             <DecisionPicker
               options={decisionPickerOptions}
@@ -740,7 +728,48 @@ async function PageContent({
               </div>
             </DecisionPicker>
 
-            {/* 4. What would change the guidance: its pause and resume lines, the
+            {/* 3. Whose lines these are. Live weekly brief only: the profile holds
+                the reader's company as of today, and an archived week or a longer
+                horizon was reached by choosing it. Sits after the areas because the
+                table above already names the company it is scaled to; this is where
+                the reader changes that. */}
+            {!historicalSelection && activeCadence === "weekly" ? (
+              <CompanyCalibration
+                stageLabel={stageLabel}
+                activeStage={activeStage}
+                activeRunway={activeRunway}
+                runwayEmphasis={runwayEmphasis}
+                stageAction={stageAction}
+              />
+            ) : null}
+
+            {/* 4. What the conditions are made of, and what the reading leaves out:
+                the two scores with their meanings, the excluded inputs that would
+                change the classification, and the capped score's real distance. */}
+            <WhyConditionsSection
+              regime={regime}
+              tightness={tightness}
+              riskAppetite={riskAppetite}
+              changeLines={callChangeLines}
+              saturatedPressure={tightnessSaturated ? tightnessPressure : undefined}
+              notCounted={reportData.scoringBasis.notCounted}
+              warning={reportData.scoringBasis.warning}
+            />
+
+            {/* 5. What changed. One table, every signal, each against the earlier
+                reading and against its own lines. It opens on the table: the card
+                says what the week did to the conditions and why, and each area's
+                row says which of its lines moved. Only a read with nothing to
+                compare says so over it. */}
+            <WhatChangedSection
+              heading={`What changed ${basis.since}`}
+              rows={signalChangeRows}
+              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
+              comparisonUnavailable={comparisonUnavailable}
+              basis={basis}
+            />
+
+            {/* 6. What would change the guidance: its pause and resume lines, the
                 line where conditions change, and where the reading sits. */}
             <WhatWouldChangeSection
               ladders={scoreLadders}
@@ -755,23 +784,7 @@ async function PageContent({
               conditionsTrail={conditionsTrail}
             />
 
-            {/* 5. The alert: hearing the day a line is crossed is how the page is
-                meant to be used, so it follows the lines it watches. */}
-            <AlertSection />
-
-            {/* 6. What changed. One table, every signal, each against the earlier
-                reading and against its own lines. It opens on the table: the card
-                says what the week did to the conditions and why, and each area's
-                row says which of its lines moved. Only a read with nothing to
-                compare says so over it. */}
-            <WhatChangedSection
-              rows={signalChangeRows}
-              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
-              comparisonUnavailable={comparisonUnavailable}
-              basis={basis}
-            />
-
-            {/* 7. Has this happened before? */}
+            {/* 7. How unusual is this? */}
             <RecordSection
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
@@ -779,6 +792,10 @@ async function PageContent({
               spellLengths={spellLengths}
               record={historicalSelection ? undefined : recordSeries}
             />
+
+            {/* 8. The alert: hearing the day a line is crossed is how the page is
+                meant to be used, so it follows everything it watches. */}
+            <AlertSection />
 
             {/* Last, as a line rather than a section: the way out to every share
                 format, and the week's published brief. */}

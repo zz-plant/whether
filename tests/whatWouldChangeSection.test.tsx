@@ -82,12 +82,18 @@ describe("what would change this guidance: the pause and resume lines", () => {
     />,
   );
 
-  it("states the pause line, the resume line and the change line, in that order", () => {
+  it("states the three lines, grouped by the question each answers", () => {
+    /* Two questions, in the reader's order (2026-10-22): when conditions change,
+       then when a paused decision may resume. A change in conditions is not
+       permission to resume, so the two groups are named apart. */
+    const change = lined.indexOf(">Conditions change if<");
     const pause = lined.indexOf(">Pause if<");
     const resume = lined.indexOf(">Resume when<");
-    const change = lined.indexOf(">Conditions change if<");
-    assert.ok(pause > 0 && resume > pause && change > resume, "pause, resume, then where conditions change");
+    assert.ok(change > 0 && pause > change && resume > pause, "conditions change, then the pause and resume lines");
+    assert.match(lined, /When would conditions change\?/);
+    assert.match(lined, /When can paused decisions resume\?/);
     assert.match(lined.replace(/<[^>]+>/g, ""), /Funding pressure falls below 66/);
+    assert.match(lined.replace(/<[^>]+>/g, ""), /not permission to resume/);
   });
 
   it("prefers a chosen stage's resume line to the lead area's", () => {
