@@ -33,7 +33,21 @@
  *
  * Exit codes: 0 pass (or allowed skip) · 1 comprehension findings · 2 setup.
  */
+import { z } from "zod";
 import { agentStateSchema } from "../../lib/agentState";
+
+const ChatResponseSchema = z.object({
+  message: z.object({
+    content: z.string(),
+    /** Thinking models spend tokens reasoning before the answer; useful with --verbose. */
+    thinking: z.string().optional(),
+  }),
+  prompt_eval_count: z.number().nullable().optional(),
+});
+
+const ResidentModelsSchema = z.object({
+  models: z.array(z.object({ name: z.string(), context_length: z.number().optional() })),
+});
 
 const args = process.argv.slice(2);
 const flag = (name: string) => {
@@ -54,7 +68,7 @@ const CANDIDATE_BASE_URLS = ["http://localhost:5173", "http://localhost:3000"];
 type Surface = {
   path: string;
   label: string;
-  questions: { id: string; ask: string; check: (answer: string, state: AgentState, pageText: string) => string | null }[];
+  questions: { id: string; ask: string; check: (answer: string, state: z.infer<typeof agentStateSchema>, pageText: string) => string | null }[];
 };
 
 /** The state's ISO date, in the words the page prints it in ("Oct 20, 2026"). */
@@ -98,10 +112,7 @@ const findServer = async (): Promise<string | null> => {
   return null;
 };
 
-type ChatResponse = {
-  message: { content: string };
-  prompt_eval_count?: number | null;
-};
+
 
 /**
  * Ask the resident model once. `format` is a JSON schema, so the answer is
@@ -133,7 +144,7 @@ const askResident = async (model: string, numCtx: number, system: string, user: 
     signal: AbortSignal.timeout(300_000),
   });
   if (!response.ok) throw new Error(`ollama ${response.status}: ${(await response.text()).slice(0, 200)}`);
-  return (await response.json()) as ChatResponse;
+  return ChatResponseSchema.parse(await response.json());
 };
 
 /** One finding per failed question, with what was expected and what came back. */
@@ -169,7 +180,7 @@ async function main() {
   // The model: what is already resident. Never trigger a load — that would
   // evict whatever else this machine is running (the labeling pipeline's rule).
   const ps = await fetch(`${OLLAMA_URL}/api/ps`, { signal: AbortSignal.timeout(10_000) })
-    .then((response) => response.json() as Promise<{ models: { name: string; context_length: number }[] }>)
+    .then(async (response) => ResidentModelsSchema.parse(await response.json()))
     .catch(() => null);
   const resident = ps?.models ?? [];
   const chosen = modelArg ? resident.find((entry) => entry.name === modelArg) : resident[0];
@@ -303,12 +314,11 @@ async function main() {
     const response = await askResident(chosen.name, chosen.context_length ?? 32_768, COLD_READER_SYSTEM, `Page text:\n\n${text}\n\nQuestions:\n${asked}`, format);
     const raw = response.message.content;
     if (args.includes("--verbose")) {
-      const thinking = (response as { message?: { thinking?: string } }).message?.thinking;
-      if (thinking) console.log(`[thinking] ${surface.label}: ${thinking.slice(0, 400)}`);
+      if (response.message.thinking) console.log(`[thinking] ${surface.label}: ${response.message.thinking.slice(0, 400)}`);
     }
     let answers: Record<string, string>;
     try {
-      const parsed = JSON.parse(raw) as Record<string, unknown>;
+      const parsed = z.record(z.string(), z.unknown()).parse(JSON.parse(raw));
       answers = Object.fromEntries(Object.entries(parsed).map(([key, value]) => [key, String(value)]));
     } catch {
       for (const question of surface.questions) {
