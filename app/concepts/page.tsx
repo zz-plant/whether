@@ -408,7 +408,14 @@ export default function ProductCanonPage() {
               <li
                 key={essay.slug}
                 id={essay.slug}
-                className="grid gap-x-8 gap-y-2 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0 sm:grid-cols-[10rem_minmax(0,1fr)]"
+                /* Off-screen entries skip their rendering until approached
+                   (2026-10-22): this list is the longest surface on the site
+                   and every entry was fully laid out on load. The intrinsic
+                   size is the estimate the scrollbar uses before an entry
+                   renders; `auto` remembers the real one after. Anchor links
+                   from "this week" above still land: the browser renders a
+                   targeted entry even while it is skipped. */
+                className="grid gap-x-8 gap-y-2 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0 [content-visibility:auto] [contain-intrinsic-size:auto_260px] sm:grid-cols-[10rem_minmax(0,1fr)]"
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 sm:flex-col sm:items-start">
                   <p className="type-eyebrow">

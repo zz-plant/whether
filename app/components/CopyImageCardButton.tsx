@@ -11,7 +11,7 @@ interface CopyImageCardButtonProps {
   className?: string;
 }
 
-type Outcome = "copied" | "saved";
+type Outcome = "copied" | "shared" | "saved";
 
 /**
  * The brief card (`/api/image/brief`, the PNG `/share` lists) onto the clipboard,
@@ -74,9 +74,29 @@ export function CopyImageCardButton({
       URL.revokeObjectURL(url);
     };
 
+    /* Hand the card to the operating system's share sheet where the platform
+       supports sharing files (2026-10-22): the same PNG goes to Slack, iMessage
+       or the Files app without a clipboard detour. Transient activation can
+       expire while the image renders, and a share that is refused falls through
+       to the download, so the click always produces the card. */
+    const shareImage = async (blob: Blob) => {
+      try {
+        if (typeof navigator === "undefined" || !navigator.share || !navigator.canShare) return false;
+        const dateTag = artifact?.recordDateLabel.toLowerCase().replace(/[^a-z0-9]+/g, "-") ?? "weekly";
+        const file = new File([blob], `whether-brief-${dateTag}.png`, { type: "image/png" });
+        if (!navigator.canShare({ files: [file] })) return false;
+        await navigator.share({ files: [file], title: "This week's guidance" });
+        return true;
+      } catch {
+        return false;
+      }
+    };
+
     try {
       if (await writeImage()) {
         setOutcome("copied");
+      } else if (await shareImage(await render)) {
+        setOutcome("shared");
       } else {
         saveImage(await render);
         setOutcome("saved");
@@ -106,7 +126,7 @@ export function CopyImageCardButton({
         copying: <span className="text-slate-300">Rendering…</span>,
         copied: (
           <span className="text-emerald-300">
-            {outcome === "saved" ? "Saved the image" : "Copied the image"}
+            {outcome === "saved" ? "Saved the image" : outcome === "shared" ? "Shared the image" : "Copied the image"}
           </span>
         ),
         error: <span className="text-rose-400">Copy failed</span>,
