@@ -35,11 +35,12 @@ describe("home route render contract", () => {
   });
 
   /*
-   * The order (site review, 2026-10-09): the verdict, the stage and runway its
-   * lines are scaled to, the five areas, what would change the guidance, the
-   * alert, what changed, the record, and the closing share line. It was the call, what changed,
-   * what it changes by area, what would change it, and do and share, with the
-   * stage and runway eighth and the alert last.
+   * The order (2026-10-22): the verdict, the five areas, whose lines they are,
+   * what the conditions are made of, what changed, what would change the
+   * guidance, how unusual this is, the alert, and the closing share line. It
+   * follows the four questions a reader arrives with — what is happening, what
+   * do I do, what would change it, how far can I trust it — and keeps the plan
+   * before the evidence.
    *
    * A source read, and it has to be: the claim is about which file mounts what, in
    * what order, and this page suspends at its data boundary in this suite.
@@ -48,12 +49,13 @@ describe("home route render contract", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
     const order = [
       "<DecisionHero",
-      "<CompanyCalibration",
       "<DecisionPicker",
-      "<WhatWouldChangeSection",
-      "<AlertSection",
+      "<CompanyCalibration",
+      "<WhyConditionsSection",
       "<WhatChangedSection",
+      "<WhatWouldChangeSection",
       "<RecordSection",
+      "<AlertSection",
       "<ShareLinks",
     ];
     for (const section of order) {
@@ -85,15 +87,15 @@ describe("home route render contract", () => {
   it("gives the section headings in that order, from one table", async () => {
     const { HOME_SECTIONS } = await import("../lib/report/home/homeSectionModel");
     assert.deepEqual(
-      [HOME_SECTIONS.areas, HOME_SECTIONS.watch, HOME_SECTIONS.alert, HOME_SECTIONS.changed, HOME_SECTIONS.record].map(
+      [HOME_SECTIONS.areas, HOME_SECTIONS.watch, HOME_SECTIONS.changed, HOME_SECTIONS.record, HOME_SECTIONS.alert].map(
         (section) => section.heading,
       ),
       [
-        "What are you deciding?",
+        "Your decisions this week",
         "What would change this guidance",
-        "Get an email the day a line is crossed",
         "What changed this week",
-        "Has this happened before?",
+        "How unusual is this?",
+        "Get notified when something changes",
       ],
     );
   });

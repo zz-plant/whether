@@ -65,6 +65,7 @@ export function WhatChangedSection({
   lead,
   comparisonUnavailable,
   basis = comparisonBasis(),
+  heading = HOME_SECTIONS.changed.heading,
 }: {
   rows: readonly SignalChangeRow[];
   /** Said over the table only when there is no earlier reading to compare with. */
@@ -72,11 +73,13 @@ export function WhatChangedSection({
   comparisonUnavailable: boolean;
   /** The earlier reading the rows are compared with; "last week" when the week does not date it. */
   basis?: ComparisonBasis;
+  /** "What changed since Aug 31": the heading names the reading the move is measured from. */
+  heading?: string;
 }) {
   return (
     <HomeSection
       id={HOME_SECTIONS.changed.id}
-      heading={HOME_SECTIONS.changed.heading}
+      heading={heading}
       lead={lead}
       /* In the reader's order: first what moved (the evidence), then what
          that changes (the consequences by area). Keeps DOM and visual order aligned. */

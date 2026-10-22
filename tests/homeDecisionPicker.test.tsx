@@ -53,7 +53,7 @@ describe("decision picker", () => {
 
   it("is the areas section, with the old anchor and an h2", () => {
     assert.match(html, /^<section id="what-it-changes"/);
-    assert.match(html, /<h2[^>]*>What are you deciding\?<\/h2>/);
+    assert.match(html, /<h2[^>]*>Your decisions this week<\/h2>/);
     assert.doesNotMatch(html, /data-first-visit/, "nothing in it is first-visit only");
     assert.doesNotMatch(html, /Show the full brief/);
   });
@@ -102,7 +102,7 @@ describe("decision picker", () => {
 
   it("counts the crossed pause lines once, over the choices", () => {
     const count = html.indexOf("4 of 5 areas are past their pause line.");
-    assert.ok(count > html.indexOf("What are you deciding?"), "the count sits under the question");
+    assert.ok(count > html.indexOf("Your decisions this week"), "the count sits under the heading");
     assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");
   });
 
