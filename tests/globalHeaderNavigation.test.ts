@@ -94,7 +94,7 @@ describe("sub-tabs", () => {
       record?.links.map((link) => [link.label, link.placement, link.isActive]),
       [
         ["Record", "tab", false],
-        ["Compare periods", "tab", true],
+        ["Compare periods", "secondary", true],
         ["Calibration", "tab", false],
         ["Product writing", "secondary", false],
         ["Sources", "cross", false],
