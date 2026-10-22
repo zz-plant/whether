@@ -12,8 +12,8 @@ import { FormulaReference } from "../app/trust/formulaReference";
  * it, and the URL can open it (`?derivation=1` → the `open` attribute on first
  * paint). Unfolded — a degraded week — nothing changes.
  */
-const render = (props: Record<string, unknown> = {}) =>
-  renderToStaticMarkup(<FormulaReference {...(props as never)} />);
+const render = (props: Partial<Parameters<typeof FormulaReference>[0]> = {}) =>
+  renderToStaticMarkup(<FormulaReference {...props} />);
 
 describe("the plain-language derivation fold", () => {
   it("folds behind a summary that names what is behind it, content still server-rendered", () => {
