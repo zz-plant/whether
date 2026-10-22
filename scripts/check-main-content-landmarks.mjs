@@ -6,6 +6,13 @@
  * is fetched; every route is audited, and a new dynamic page with no sample URL throws.
  * Bounds and their history: docs/agents/lessons/automation-and-deploy-gate.md.
  *
+ * The server is the production worker under `wrangler dev` (the `serve:worker` script),
+ * not `vite dev`: workerd bundles the worker once and then every route renders from that
+ * bundle, where vite compiled each route on first fetch — the difference between a
+ * ~5s audit and a ~20s one locally, and a cold-container worst case of minutes. It is
+ * also the code that actually ships. `WHETHER_ENABLE_MOCKUPS=1` keeps the gated design
+ * routes renderable so their coverage does not silently drop out of the audit.
+ *
  * Usage:
  *   node scripts/check-main-content-landmarks.mjs
  *   node scripts/check-main-content-landmarks.mjs --base-url http://127.0.0.1:3000
@@ -164,6 +171,7 @@ const run = async () => {
     baseUrl,
     outDir: "artifacts/landmarks",
     logName: "check-main-content-landmarks.dev.log",
+    devScript: "serve:worker",
     timeoutMs,
     // A second, fresh start in the deploy gate only: a cold container's first start is the
     // one that has missed its deadline (dev-server.lib.mjs). Locally a failure is real.

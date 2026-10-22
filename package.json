@@ -10,6 +10,7 @@
     "build:cloudflare": "node scripts/cloudflare-run.mjs build",
     "build:cloudflare:preview": "node scripts/cloudflare-run.mjs build --env preview",
     "start": "node scripts/vinext-run.mjs start",
+    "serve:worker": "wrangler dev --var WHETHER_ENABLE_MOCKUPS:1",
     "clean": "bun scripts/clean-build-artifacts.mjs",
     "clean:build": "bun scripts/clean-build-artifacts.mjs",
     "lint": "oxlint --deny-warnings",
