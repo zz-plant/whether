@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
+import { z } from "zod";
 import { SPECULATION_RULES, withSpeculationRules } from "../lib/runtime/speculationRules";
 
 /**
@@ -17,17 +18,31 @@ const htmlResponse = () =>
     headers: { "content-type": "text/html; charset=utf-8" },
   });
 
+/* The header parsed with a schema, not a cast: a malformed rule fails with a
+   zod path here instead of a TypeError deep inside an assertion. The fields
+   the assertions read are required, so a rule that loses one fails at parse. */
+const rulesSchema = z.object({
+  prefetch: z.array(
+    z.object({
+      source: z.string(),
+      eagerness: z.string(),
+      where: z.object({ and: z.array(z.record(z.string(), z.unknown())) }),
+    }),
+  ),
+});
+
 describe("speculation rules", () => {
   it("rides document responses as the Speculation-Rules header", () => {
     const response = withSpeculationRules(htmlResponse());
     const header = response.headers.get("Speculation-Rules");
     assert.ok(header, "an HTML response must carry the rules");
-    const rules = JSON.parse(header) as { prefetch?: Array<Record<string, unknown>> };
-    assert.ok(Array.isArray(rules.prefetch) && rules.prefetch.length === 1);
-    const rule = rules.prefetch[0] as { source?: string; where?: { and?: Array<Record<string, unknown>> }; eagerness?: string };
+    const rules = rulesSchema.parse(JSON.parse(header));
+    assert.equal(rules.prefetch.length, 1, "one prefetch rule");
+    const [rule] = rules.prefetch;
+    assert.ok(rule, "the prefetch rule is present");
     assert.equal(rule.source, "document");
     assert.equal(rule.eagerness, "moderate", "moderate is hover-driven: one request per hovered link, nothing executed");
-    assert.ok(rule.where?.and?.some((clause) => JSON.stringify(clause).includes("/api/**")), "endpoints are not pages a reader navigates to");
+    assert.ok(rule.where.and.some((clause) => JSON.stringify(clause).includes("/api/**")), "endpoints are not pages a reader navigates to");
   });
 
   it("parses as the same JSON the constant holds", () => {

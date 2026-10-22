@@ -20,6 +20,12 @@ import type { DecisionMemoryPayload } from "../lib/decisionMemory";
  * a rename cannot pass here and fail in a browser.
  */
 
+/* What the client stashes for an offline post: the shape `stashValue` builds,
+   keyed uniquely, replayed by the service worker. Typing the fake's store with
+   it lets the assertions below read real fields instead of asserting their way
+   into an unknown. */
+type StashedEntry = { key: string; clientId: string; payload: DecisionMemoryPayload };
+
 const payload: DecisionMemoryPayload = {
   recordDate: "2026-09-14",
   decision: { lifecycle: "GROWTH", category: "HIRING", action: "HIRE" },
@@ -120,15 +126,15 @@ describe("decision ledger client", () => {
      awaits them in. The map is exposed so a test can assert on what the queue
      actually holds rather than on whether the calls resolved. */
   const fakeIndexedDB = () => {
-    const entries = new Map<string, { key: string; value: unknown }>();
+    const entries = new Map<string, { key: string; value: StashedEntry }>();
     const micro = (fn: () => void) => queueMicrotask(fn);
 
     const store = {
-      put(value: unknown, key: string) {
+      put(value: StashedEntry, key: string) {
         micro(() => entries.set(key, { key, value }));
       },
       openCursor() {
-        type FakeCursor = { key: string; value: unknown; delete: () => void; continue: () => void };
+        type FakeCursor = { key: string; value: StashedEntry | undefined; delete: () => void; continue: () => void };
         const request: { result: FakeCursor | null; onsuccess: (() => void) | null; onerror: (() => void) | null } = {
           result: null,
           onsuccess: null,
@@ -163,7 +169,11 @@ describe("decision ledger client", () => {
     const db = {
       close: () => {},
       transaction: () => {
-        const tx = { objectStore: () => store, oncomplete: null as (() => void) | null, onerror: null as (() => void) | null };
+        const tx: { objectStore: () => typeof store; oncomplete: (() => void) | null; onerror: (() => void) | null } = {
+          objectStore: () => store,
+          oncomplete: null,
+          onerror: null,
+        };
         setTimeout(() => tx.oncomplete?.(), 0);
         return tx;
       },
@@ -186,15 +196,17 @@ describe("decision ledger client", () => {
   };
 
   const withIndexedDB = async <T>(fake: { open: unknown }, run: () => Promise<T>): Promise<T> => {
-    (globalThis as { indexedDB?: unknown }).indexedDB = fake;
+    /* The stub rides on globalThis, outside the DOM typing; Reflect is how a
+       dynamic global is set and cleared without asserting a shape onto it. */
+    Reflect.set(globalThis, "indexedDB", fake);
     try {
       return await run();
     } finally {
-      delete (globalThis as { indexedDB?: unknown }).indexedDB;
+      Reflect.deleteProperty(globalThis, "indexedDB");
     }
   };
 
-  const offlineFetch = (() => Promise.reject(new Error("offline"))) as unknown as typeof globalThis.fetch;
+  const offlineFetch: typeof globalThis.fetch = () => Promise.reject(new Error("offline"));
 
   it("queues two offline decisions as two records, not one overwriting the other", async () => {
     const fake = fakeIndexedDB();
@@ -205,9 +217,9 @@ describe("decision ledger client", () => {
     });
 
     assert.equal(fake.entries.size, 2, "the second stashed write must not replace the first");
-    const payloads = [...fake.entries.values()].map((entry) => (entry.value as { payload: unknown }).payload);
+    const payloads = [...fake.entries.values()].map((entry) => entry.value.payload);
     assert.deepEqual(
-      payloads.map((stashed) => (stashed as typeof payload).decision.action).sort(),
+      payloads.map((stashed) => stashed.decision.action).sort(),
       ["HIRE", "RESTRUCTURE"],
     );
     const keys = [...fake.entries.keys()];
@@ -230,7 +242,7 @@ describe("decision ledger client", () => {
     assert.equal(fake.entries.size, 1, "the re-tap clears its own stashed copy and nothing else");
     const remaining = fake.entries.values().next().value;
     assert.ok(remaining, "one entry remains queued");
-    assert.equal((remaining.value as { payload: typeof other }).payload.decision.action, "RESTRUCTURE");
+    assert.equal(remaining.value.payload.decision.action, "RESTRUCTURE");
   });
 
   it("posts the decision under the same owner it claims", async () => {

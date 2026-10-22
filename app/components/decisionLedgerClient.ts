@@ -153,11 +153,10 @@ const stashValue = (clientId: string, payload: DecisionMemoryPayload) => {
 /** What a stashed entry looks like when read back; `key` is absent on entries stashed before it was stored. */
 const stashEntryFields = (value: unknown) => {
   if (typeof value !== "object" || value === null) return null;
-  const record = value as { key?: unknown; clientId?: unknown; payload?: unknown };
   return {
-    key: typeof record.key === "string" ? record.key : null,
-    clientId: typeof record.clientId === "string" ? record.clientId : null,
-    payload: record.payload,
+    key: "key" in value && typeof value.key === "string" ? value.key : null,
+    clientId: "clientId" in value && typeof value.clientId === "string" ? value.clientId : null,
+    payload: "payload" in value ? value.payload : undefined,
   };
 };
 
