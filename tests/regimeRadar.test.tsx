@@ -98,6 +98,27 @@ describe("RegimeRadar", () => {
     assert.match(html, /<title>Risk appetite change line at 45<\/title>/);
     assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
   });
+
+  /* The scenario studio draws this map with a hypothetical as the filled dot
+     and this week's reading as the hollow one — the same filled/hollow pair
+     its ladders use. The two points must be named, or a reader of the markup
+     (and a tooltip user) cannot tell which is which (2026-10-22). */
+  it("names both points when a surface passes labels for them", () => {
+    const html = renderToStaticMarkup(
+      <RegimeRadar {...base} previousTightness={55} previousRiskAppetite={35} primaryLabel="Simulated reading" previousLabel="This week" />,
+    );
+
+    assert.match(html, /<title>Simulated reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
+    assert.match(html, /<title>This week: Funding pressure 55, Risk appetite 35<\/title>/);
+  });
+
+  it("keeps the default point name when no label is passed", () => {
+    const html = renderToStaticMarkup(
+      <RegimeRadar {...base} previousTightness={55} previousRiskAppetite={35} />,
+    );
+
+    assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
+  });
 });
 
 /**

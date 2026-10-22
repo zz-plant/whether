@@ -360,5 +360,108 @@
         "href": "/share"
       }
     ]
+  },
+  {
+    "slug": "how-much-runway-should-we-have-before-we-raise",
+    "keyword": "how much runway do we need",
+    "title": "How much runway should we have before we raise?",
+    "category": "decision",
+    "shortAnswer": "Size cash to the safe band for the current conditions — 9 to 18 months of runway in Sunny conditions, 15 to 24 in Cloudy, 18 to 30 in Freezing — and open the raise while you are still above the band's floor.",
+    "directAnswer": "Enter cash, monthly spend and revenue in the runway planner, compare the result to the band your current conditions imply, and set the raise window the planner gives: months 4 through 8 with comfortable coverage, 2 through 5 when coverage is thin, immediately when it is critical.",
+    "audience": "Founders, CFOs and board members",
+    "applyHeading": "Compare your runway to the band",
+    "mappedDecisionAreas": [
+      "capital-raising",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both",
+    "contextHeading": "Why the band moves with conditions",
+    "context": "The band is the runway planner's model: it widens in Freezing conditions because closes take longer and rounds are fewer, and narrows in Sunny ones because capital is easier to reach. Stage widens it further — seed adds three months, Series A adds two. The band is a planning default, not a forecast: the record shows how conditions changed after each line, not what a particular round will fetch.",
+    "companyInputs": [
+      "Cash in the bank and monthly spend, net of revenue.",
+      "The months a raise consumes: preparation, partner meetings, diligence and a delayed close.",
+      "Stage: the band widens by three months for seed and two for Series A."
+    ],
+    "decisionNote": "Runway today: [months]. Safe band: [min] to [max] months. Raise opens: [month]. If runway falls below [min], cut burn by [amount] by [date]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "href": "/operate/financial",
+        "label": "The runway planner: your numbers against the band"
+      },
+      {
+        "href": "/resources/capital-discipline-venture-backed-companies",
+        "label": "Capital discipline for venture-backed companies"
+      }
+    ]
+  },
+  {
+    "slug": "what-should-startups-do-before-a-downturn",
+    "keyword": "prepare for a downturn",
+    "title": "What should startups do before a downturn?",
+    "category": "decision",
+    "shortAnswer": "Decide now what each pause line would mean for your company — the stopping conditions are already written, so preparation is knowing your runway, burn and demand against them rather than predicting the turn.",
+    "directAnswer": "Put cash, burn and demand numbers next to the pause lines for hiring, roadmap and spend, and write down for each what you would cut, defer or stop if it trips — so a change of conditions triggers a decision you already made.",
+    "audience": "Founders, COOs and CFOs",
+    "applyHeading": "Decide now what a tripped line means",
+    "mappedDecisionAreas": [
+      "hiring",
+      "product-tempo",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both",
+    "contextHeading": "Why the lines are written in advance",
+    "context": "Each pause line sits six points past the line where conditions change, and each resume line four points inside it, so one noisy reading cannot reverse a decision and restart it. The margin study found the published margin measures distance from that line, not probability. What the record cannot tell you is your own demand: the company inputs below are yours to fill in.",
+    "companyInputs": [
+      "Runway in months against the safe band for the current conditions.",
+      "Which commitments stop, defer or survive a pause in each area.",
+      "The approver and evidence required to execute each cut."
+    ],
+    "decisionNote": "If [score] crosses [line], we will [action] in [area] within [timeframe]. Approver: [name]. Evidence to reopen: [criteria]. Review: [date].",
+    "supportingLinks": [
+      {
+        "href": "/calibration",
+        "label": "The margin study: what distance from the line is worth"
+      },
+      {
+        "href": "/history/compare",
+        "label": "This week's scores against past downturns: 2001, 2008 and 2022"
+      },
+      {
+        "href": "/resources/board-level-capital-posture-framework",
+        "label": "Board-level capital posture framework"
+      }
+    ]
+  },
+  {
+    "slug": "should-we-hire-our-first-salesperson-now",
+    "keyword": "first salesperson",
+    "title": "Should we hire our first salesperson now?",
+    "category": "decision",
+    "shortAnswer": "Treat the first sales hire as an expansion bet: fund it one stage at a time with the stage gates written down, and size it against the risk appetite line like every other new bet.",
+    "directAnswer": "Make the hire when founder-led sales shows repeatable evidence — the same segment, the same pitch, closed deals — and the fully loaded cost is in the cash plan with a written stop condition attached.",
+    "audience": "Founders, CEOs and heads of sales",
+    "applyHeading": "Gate the hire like a bet",
+    "mappedDecisionAreas": [
+      "expansion-bets"
+    ],
+    "thresholdFocus": "risk",
+    "contextHeading": "What the record can and cannot tell you",
+    "context": "The risk appetite score says how willing markets are to fund risk and faster expansion; it does not say whether your deals convert. The hire is a bet on your own evidence, gated by the same line the other new bets use: when risk appetite falls below its pause line, new commitments stop — and a first salesperson who arrives just before that line is a bet made on the edge.",
+    "companyInputs": [
+      "Closed deals from founder-led sales: count, segment and cycle length.",
+      "The fully loaded cost of the rep and the cash plan that carries it.",
+      "The stage gate in writing: the evidence that promotes the bet and the condition that stops it."
+    ],
+    "decisionNote": "Hire [role] when [deal evidence] holds. If [stop condition] by [date], return to [founder-led sales]. Approver: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "href": "/resources/capital-discipline-venture-backed-companies",
+        "label": "Capital discipline for venture-backed companies"
+      },
+      {
+        "href": "/operate",
+        "label": "Test the hire against this week's lines"
+      }
+    ]
   }
 ]

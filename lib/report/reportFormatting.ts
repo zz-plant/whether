@@ -38,6 +38,15 @@ const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = regimeSignalLabel;
 
 /**
+ * "Sunny — hold the pace" without saying "Sunny" twice: a headline that already
+ * leads with the conditions label stands alone. The feed and the OG images each
+ * used to carry their own prefix check for this, so a change to one was a silent
+ * "Freezing — Freezing" in the other.
+ */
+export const joinConditionsHeadline = (conditions: string, headline: string): string =>
+  headline.startsWith(conditions) ? headline : `${conditions} — ${headline}`;
+
+/**
  * A change of conditions, or a crossed call-change line, between the earlier
  * reading and this one. The earlier reading needs only its conditions and its
  * two scores, so a published brief serves as well as a full assessment; both

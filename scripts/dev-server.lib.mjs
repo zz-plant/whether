@@ -23,7 +23,7 @@ const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 const normalizeHostname = (hostname) =>
   hostname.startsWith("[") && hostname.endsWith("]") ? hostname.slice(1, -1) : hostname;
 
-const isLocalHostname = (hostname) => LOCAL_HOSTNAMES.has(normalizeHostname(hostname));
+export const isLocalHostname = (hostname) => LOCAL_HOSTNAMES.has(normalizeHostname(hostname));
 
 const canBindPort = async ({ host, port }) =>
   new Promise((resolve) => {

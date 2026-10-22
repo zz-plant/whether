@@ -31,6 +31,9 @@ export const indexableAnswerSlugs = [
   "should-we-delay-new-product-lines",
   "how-fast-should-we-scale-go-to-market",
   "how-to-brief-executives-on-market-conditions",
+  "how-much-runway-should-we-have-before-we-raise",
+  "what-should-startups-do-before-a-downturn",
+  "should-we-hire-our-first-salesperson-now",
 ] as const;
 
 const indexableAnswerSlugSet = new Set<string>(indexableAnswerSlugs);

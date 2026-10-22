@@ -127,7 +127,8 @@ export function ConditionsLegend({
       suppressHydrationWarning
       className={`mb-3 flex items-start justify-between gap-4 border-b border-[color:var(--border-subtle)] pb-3 text-fluid-xs text-slate-300 ${arrival === "share" || orientation ? "" : "md:hidden"}`.trim()}
     >
-      <p className="min-w-0 leading-relaxed">
+      <div className="min-w-0 flex-1">
+        <p className="min-w-0 leading-relaxed">
         {/* A reader who followed a pasted brief knows who sent it and nothing else. */}
         {arrival === "share" ? <>This is this week&apos;s guidance from Whether. </> : null}
         {/* A block for the eye, a space for a copy or a screen reader, which would
@@ -171,6 +172,65 @@ export function ConditionsLegend({
           </Link>
         </span>
       </p>
+        {/*
+          * The card, taught on the card (2026-10-21). A first visit reads the
+          * condition, the guidance and the margin as three unrelated blocks; a
+          * miniature of the card below, with the three numbered where they sit,
+          * is the reading order. Deliberately md+ only — on a phone the band is
+          * the one definition of the conditions and must stay one screen — and
+          * deliberately inside this band, so the same dismissal hides it and a
+          * reader who has seen it never sees it again. Wireframe, not art: grey
+          * regions, numbered, no colour and no weather word, because a fake
+          * reading in the orientation band would be this week's call with the
+          * wrong text.
+          */}
+        {orientation ? (
+          <div className="mt-4 hidden w-full items-start gap-6 md:flex" data-first-run-card-schematic>
+            <svg viewBox="0 0 150 96" className="h-auto w-[150px] shrink-0" aria-hidden="true">
+              {/* The card's outline. */}
+              <rect x="0.5" y="0.5" width="149" height="95" rx="8" className="fill-slate-900/40 stroke-slate-600" />
+              {/* 1: the condition stamp. */}
+              <rect x="8" y="10" width="48" height="14" rx="3" className="fill-slate-800/60 stroke-slate-500" />
+              <text x="32" y="20" textAnchor="middle" fontSize="5.5" letterSpacing="0.5" className="fill-slate-300">
+                CONDITION
+              </text>
+              <circle cx="64" cy="17" r="8" className="fill-slate-900 stroke-slate-400" />
+              <text x="64" y="20" textAnchor="middle" fontSize="8" className="fill-slate-200">1</text>
+              {/* 2: the guidance, and its longer sentence. */}
+              <rect x="8" y="36" width="118" height="10" rx="2" className="fill-slate-700/70" />
+              <rect x="8" y="51" width="88" height="10" rx="2" className="fill-slate-700/70" />
+              <circle cx="136" cy="41" r="8" className="fill-slate-900 stroke-slate-400" />
+              <text x="136" y="44" textAnchor="middle" fontSize="8" className="fill-slate-200">2</text>
+              {/* The trust strip under the call. */}
+              <line x1="8" y1="68" x2="142" y2="68" className="stroke-slate-700" strokeDasharray="2 2" />
+              {/* 3: the margin row. */}
+              <rect x="8" y="74" width="134" height="16" rx="4" className="fill-slate-800/40 stroke-slate-600" />
+              <text x="16" y="84.5" fontSize="5.5" letterSpacing="0.5" className="fill-slate-400">
+                MARGIN
+              </text>
+              <circle cx="134" cy="82" r="8" className="fill-slate-900 stroke-slate-400" />
+              <text x="134" y="85" textAnchor="middle" fontSize="8" className="fill-slate-200">3</text>
+            </svg>
+            <ol className="space-y-2 text-xs leading-5 text-slate-300">
+              {[
+                <>The condition &mdash; one word for the readings</>,
+                <>This week&rsquo;s guidance &mdash; what to do</>,
+                <>Margin &mdash; how far from the line where conditions change</>,
+              ].map((label, index) => (
+                <li key={index} className="flex items-start gap-2">
+                  <span
+                    aria-hidden="true"
+                    className="mt-0.5 inline-flex h-4 w-4 shrink-0 items-center justify-center rounded-full border border-slate-400 text-[10px] font-semibold leading-none text-slate-200"
+                  >
+                    {index + 1}
+                  </span>
+                  <span>{label}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        ) : null}
+      </div>
       <button
         type="button"
         onClick={handleDismiss}

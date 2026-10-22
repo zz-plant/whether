@@ -37,6 +37,17 @@ export async function GET(request: NextRequest) {
 
   let payload: MeetingSlidePayload;
   if (rawWeek) {
+    // A frozen week's slide is the brief as published. A stage would calibrate
+    // the archived call, pause and resume lines into guidance the record never
+    // contained — the live path derives them from the engine; the archive only
+    // has what was frozen. Rejected rather than half-applied (a bare stage key
+    // in the title over uncalibrated lines).
+    if (stage) {
+      return new NextResponse(
+        "A stage cannot calibrate a frozen week's brief; stage applies to the live week only.",
+        { status: 400 },
+      );
+    }
     const brief = findPublishedBrief(rawWeek.toLowerCase());
     if (!brief) {
       return new NextResponse(`Published brief not found for week ${rawWeek}`, { status: 404 });

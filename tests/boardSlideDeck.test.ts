@@ -162,4 +162,25 @@ describe("board slide route handler", () => {
     const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=1999-w01&format=pptx"));
     assert.equal(res.status, 404);
   });
+
+  it("rejects a stage with a frozen week: the archive has no calibrated guidance to apply it to", async () => {
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=2026-w41&stage=seed&format=pptx"));
+    assert.equal(res.status, 400);
+    assert.match(await res.text(), /stage applies to the live week only/);
+  });
+
+  it("prints no scores for a brief archived before scores were stored, instead of inventing 50/50", async () => {
+    // 2026-w31 is the archive's real scoreless record: its slide must carry the
+    // honest line and none of the fabricated "50 of 100" readings.
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=2026-w31&format=pptx"));
+    assert.equal(res.status, 200);
+    const slide = readStoredZip(new Uint8Array(await res.arrayBuffer())).get("ppt/slides/slide1.xml")?.content ?? "";
+    assert.match(slide, /No scores were published with this brief\./);
+    assert.doesNotMatch(slide, /Funding pressure 50 of 100/);
+    assert.doesNotMatch(slide, /Risk appetite 50 of 100/);
+  });
 });

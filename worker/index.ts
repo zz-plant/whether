@@ -14,6 +14,7 @@ import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegime
 import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
 import { sendOpsFailureNotice, type FailedStep } from "../lib/delivery/opsNotice";
 import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
+import { withSpeculationRules } from "../lib/runtime/speculationRules";
 import {
   agentManifestResponse,
   WEBMCP_MANIFEST_PATH,
@@ -291,7 +292,7 @@ export default {
       return agentManifestResponse();
     }
 
-    const response = await handler.fetch(request, env, ctx);
+    const response = withSpeculationRules(await handler.fetch(request, env, ctx));
 
     const cookieHeader = request.headers.get("cookie");
     if (cookieHeader && /whether-(company-stage|company-runway|rate-sensitivity|ticker)=/.test(cookieHeader)) {

@@ -401,11 +401,12 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
     basis: describeScoringBasis(brief.scores?.engineVersion),
     /** The earlier reading, as `buildScoreReferenceLines` takes it; null where the record can name none. */
     previous: comparison ? { ...comparison.previous, comparedWith: comparison.comparedWith } : null,
-    /** "+5 vs Sep 22": a score's move in whole points, named by the reading it is against. Null with no reading to name, or no move. */
+    /** A score's move in whole points, as the number and the rendered form ("+5 vs Sep 22") — the sign lives in `delta`, not in something a renderer parses out of the string. Null with no reading to name, or no move. */
     scoreChange: (metric: ScoreMetric) => {
       if (!comparison || !brief.scores) return null;
-      const delta = formatSignedDeltaOrNull(Math.round(brief.scores[metric] - comparison.previous[metric]), 0);
-      return delta ? `${delta} ${comparisonBasis(comparison.comparedWith).versus}` : null;
+      const delta = Math.round(brief.scores[metric] - comparison.previous[metric]);
+      const formatted = formatSignedDeltaOrNull(delta, 0);
+      return formatted ? { delta, label: `${formatted} ${comparisonBasis(comparison.comparedWith).versus}` } : null;
     },
   };
 };

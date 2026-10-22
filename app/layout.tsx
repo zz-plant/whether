@@ -191,6 +191,21 @@ export default function RootLayout({
             all below the fold; it loads when the stylesheet first asks for it. */}
         <link rel="preload" href="/fonts/archivo-variable.55ade54a.woff2" as="font" type="font/woff2" crossOrigin="" />
         <link rel="dns-prefetch" href="https://fred.stlouisfed.org" />
+        {/* The two routes a reader is most likely to walk next are prefetched by
+            address, unconditionally, as they were before (a cached /operate is
+            the reason "Build this week's plan →" feels instant). Everything else
+            is prefetched on hover by the Speculation Rules API — document rules
+            cover every same-origin link, except /api (its GET endpoints are
+            reads, but a crawler's click on "Try it" is not a page a reader is
+            navigating to). Moderate eagerness: one request per hovered link,
+            deduplicated by URL, and nothing executed — these are prefetches, not
+            prerenders, so no speculative page load fires telemetry. The rules
+            are delivered by the worker's Speculation-Rules response header
+            (worker/index.ts): the HTML standard requires type=speculationrules
+            scripts to be inline and fires an error on one with a src, and this
+            layout is where the repo's one dangerouslySetInnerHTML exemption is
+            NOT (app/components/jsonLdScript.tsx owns it), so a src= script here
+            prefetched nothing (2026-10-22). */}
         <link rel="prefetch" href="/operate" />
         <link rel="prefetch" href="/signals" />
         {/* No `hrefLang="x-default"` here. It lived in the layout, so every page

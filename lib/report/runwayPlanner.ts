@@ -62,7 +62,10 @@ type RunwayPlannerOutput = {
     capitalRaising: string;
   };
   decisionKnobs: {
+    /** The knob's level as the number the plan was sized on — the label repeats it, the level is the fact. */
+    paybackStrictnessLevel: number;
     paybackStrictnessLabel: string;
+    approvalVelocityLevel: number;
     approvalVelocityLabel: string;
   };
 };
@@ -132,11 +135,6 @@ const strictnessLabel = (level: number) => {
   return "Maximum strictness";
 };
 
-const parseKnobLevelLabel = (value: string): number => {
-  const parsed = Number.parseInt(value, 10);
-  return Number.isFinite(parsed) ? parsed : 0;
-};
-
 const growthToDecimal = (growthRate: number) => growthRate / 100;
 
 const GROWTH_HIGH_THRESHOLD = 20;
@@ -204,11 +202,12 @@ const projectRunwayTrajectory = (input: RunwayPlannerInput) => {
   };
 };
 
+/** The knob's level and its display label, read off the numeric value the engine already holds. */
 const getKnobLevel = (
   input: RunwayPlannerInput,
   runwayGap: number,
   key: "approvalVelocity" | "payback",
-) => {
+): { level: number; label: string } => {
   const knobs = deriveDecisionKnobs({
     committedState: input.regime,
     transition: {
@@ -224,9 +223,9 @@ const getKnobLevel = (
   });
   const knob = knobs.find((item) => item.key === key);
   if (!knob) {
-    return key === "approvalVelocity" ? "1 · Slow" : "1 · Cautious";
+    return key === "approvalVelocity" ? { level: 1, label: "1 · Slow" } : { level: 1, label: "1 · Cautious" };
   }
-  return knob.levelLabels[knob.value] ?? knob.levelLabels[1];
+  return { level: knob.value, label: knob.levelLabels[knob.value] ?? knob.levelLabels[1] };
 };
 
 const deriveRaiseWindow = (
@@ -330,7 +329,6 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
   });
   const approvalVelocity = getKnobLevel(input, runwayGap, "approvalVelocity");
   const paybackStrictness = getKnobLevel(input, runwayGap, "payback");
-  const paybackStrictnessLevel = parseKnobLevelLabel(paybackStrictness);
   const downsidePosture = deriveDownsidePosture(input.posture);
 
   return {
@@ -349,17 +347,19 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
     raiseTimingWindow: {
       ...raiseWindow,
       timeToSafeRunwayTargetMonths,
-      summary: `Open the raise between month ${raiseWindow.startMonth} and ${raiseWindow.endMonth}. Safe runway is ${timeToSafeRunwayTargetMonths} months out, with approvals moving at a ${knobLevelWords(approvalVelocity)} pace.`,
+      summary: `Open the raise between month ${raiseWindow.startMonth} and ${raiseWindow.endMonth}. Safe runway is ${timeToSafeRunwayTargetMonths} months out, with approvals moving at a ${knobLevelWords(approvalVelocity.label)} pace.`,
     },
     burnAdjustmentRange: {
       recommendedDeltaPercent,
       floorPercent: burnMinPercent,
       ceilingPercent: burnMaxPercent,
-      summary: `Move burn by ${recommendedDeltaPercent}%, anywhere between ${burnMinPercent}% and ${burnMaxPercent}%, holding payback ${strictnessLabel(paybackStrictnessLevel).toLowerCase()}. Reverse once two weekly reads hold steady and runway clears ${round(safeBand.minMonths)} months.`,
+      summary: `Move burn by ${recommendedDeltaPercent}%, anywhere between ${burnMinPercent}% and ${burnMaxPercent}%, holding payback ${strictnessLabel(paybackStrictness.level).toLowerCase()}. Reverse once two weekly reads hold steady and runway clears ${round(safeBand.minMonths)} months.`,
     },
     decisionKnobs: {
-      paybackStrictnessLabel: paybackStrictness,
-      approvalVelocityLabel: approvalVelocity,
+      paybackStrictnessLevel: paybackStrictness.level,
+      paybackStrictnessLabel: paybackStrictness.label,
+      approvalVelocityLevel: approvalVelocity.level,
+      approvalVelocityLabel: approvalVelocity.label,
     },
     boundedRules: {
       burnDiscipline: burnRule

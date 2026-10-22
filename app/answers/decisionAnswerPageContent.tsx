@@ -169,7 +169,7 @@ export async function DecisionAnswerPageContent({
   });
 
   /*
-   * All eleven pages shipped the same six section headings, so the outline a
+   * The first eleven pages shipped the same six section headings, so the outline a
    * reader skims said nothing about which answer they were reading. Four of the
    * six are built from this page's audience, decision areas and threshold
    * focus; "Copy this answer" and "Citation" label a button and a provenance

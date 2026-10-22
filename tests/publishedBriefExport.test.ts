@@ -70,8 +70,9 @@ describe("published brief comparisons", () => {
     assert.ok(w40?.scores);
     assert.equal(w40.scores.comparedWith, undefined, "the fixture is a record frozen before the date was stored");
     const display = publishedBriefDisplay(w40);
-    assert.equal(display.scoreChange("tightness"), "+5 vs Sep 22");
-    assert.equal(display.scoreChange("riskAppetite"), "+5 vs Sep 22");
+    assert.equal(display.scoreChange("tightness")?.label, "+5 vs Sep 22");
+    assert.equal(display.scoreChange("tightness")?.delta, 5, "the move as a number, so a renderer never parses the sign out of the string");
+    assert.equal(display.scoreChange("riskAppetite")?.label, "+5 vs Sep 22");
     const slack = buildPublishedBriefSlackUpdate(w40);
     assert.match(slack, /Funding pressure 90 of 100 .* · was 85 on Sep 22 ·/);
     assert.doesNotMatch(slack, /last week 63|vs prior week/);
@@ -93,7 +94,7 @@ describe("published brief comparisons", () => {
       ...w40,
       scores: { ...w40.scores, comparedWith: { recordDate: "2026-08-31", label: "Aug 31" } },
     };
-    assert.equal(publishedBriefDisplay(dated).scoreChange("tightness"), "+27 vs Aug 31", "whole points, named by the reading");
+    assert.equal(publishedBriefDisplay(dated).scoreChange("tightness")?.label, "+27 vs Aug 31", "whole points, named by the reading");
   });
 
   it("replaces the retired movement sentence with the move the record can name", () => {

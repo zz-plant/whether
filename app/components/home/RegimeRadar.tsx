@@ -23,6 +23,16 @@ type RegimeRadarProps = {
   caveat?: string | null;
   /** A last line under the caption: on the brief's card, the link to how the lines are set. */
   footer?: ReactNode;
+  /**
+   * What the filled marker is. The brief's map reads "Current reading"; a
+   * surface that plots a hypothetical (the scenario studio's map: the
+   * simulated reading as the dot, this week's as the hollow one, the same
+   * filled/hollow pair its ladders draw) names the marker so the two surfaces
+   * cannot disagree about which point is which.
+   */
+  primaryLabel?: string;
+  /** What the hollow marker is, on a surface whose two points both need names ("This week"). */
+  previousLabel?: string | null;
   className?: string;
 };
 
@@ -61,6 +71,8 @@ export function RegimeRadar({
   trailCaption,
   caveat,
   footer,
+  primaryLabel,
+  previousLabel,
   className = "",
 }: RegimeRadarProps) {
   const boundaryX = xFor(riskAppetiteThreshold);
@@ -319,9 +331,15 @@ export function RegimeRadar({
           </g>
         ) : null}
 
-        {/* Previous reading with dashed trail */}
+        {/* Previous reading with dashed trail. Named when a surface passes a
+            label for it: the scenario studio's hollow dot is this week's
+            reading, and an unlabeled hollow dot would leave the two points
+            identified only by which one has the filled center. */}
         {hasPrevious && prevX !== null && prevY !== null ? (
           <g>
+            {previousLabel ? (
+              <title>{`${previousLabel}: Funding pressure ${previousTightness}, Risk appetite ${previousRiskAppetite}`}</title>
+            ) : null}
             <line
               x1={prevX}
               y1={prevY}
@@ -346,7 +364,7 @@ export function RegimeRadar({
 
         {/* Current reading marker */}
         <g>
-          <title>{`Current reading: Funding pressure ${tightness}, Risk appetite ${riskAppetite} (${weatherLabel})`}</title>
+          <title>{`${primaryLabel ?? "Current reading"}: Funding pressure ${tightness}, Risk appetite ${riskAppetite} (${weatherLabel})`}</title>
           <circle
             cx={currentX}
             cy={currentY}

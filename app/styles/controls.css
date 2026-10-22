@@ -591,3 +591,16 @@ a.weather-step-key:active {
     transform: none;
   }
 }
+
+/*
+ * Textareas size to their content (2026-10-22): the decision shield's notes and
+ * plan-line fields grew a scrollbar from their first keystroke, and the JS
+ * auto-growers this replaces re-measured on every input. The floor keeps an
+ * empty field from collapsing below its intended two rows before the first
+ * keystroke; where the platform doesn't support it, the rows attribute still
+ * sizes the box.
+ */
+textarea {
+  field-sizing: content;
+  min-height: 3.6em;
+}

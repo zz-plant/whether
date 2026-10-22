@@ -2,7 +2,7 @@ import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { formatMarginStamp } from "../../lib/report/reportFormatting";
+import { formatMarginStamp, joinConditionsHeadline } from "../../lib/report/reportFormatting";
 import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefHeadline } from "../../lib/report/publishedBriefs";
 import { buildSocialImageUrl, canonicalPositioningLine, escapeXml, organizationName } from "../../lib/seo";
 import { publisherAuthor } from "../../lib/publisher";
@@ -80,7 +80,7 @@ const publishedItems = (): FeedItem[] =>
     const display = publishedBriefDisplay(brief);
     const link = `${siteUrl}${buildPublishedBriefPath(brief.slug)}`;
     return {
-      title: `Week ${brief.slug}: ${display.headline.startsWith(display.conditions) ? display.headline : `${display.conditions} — ${display.headline}`}`,
+      title: `Week ${brief.slug}: ${joinConditionsHeadline(display.conditions, display.headline)}`,
       link,
       guid: link,
       isPermaLink: true,

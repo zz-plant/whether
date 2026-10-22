@@ -456,6 +456,37 @@ describe("MonthStrip", () => {
     assert.match(html, /lucide-sun[\s\S]*lucide-cloud/, "each run draws its own condition's glyph");
     assert.match(visible, /Sunny\s+2 months/, "the legend names each colour and its months");
   });
+
+  it("stacks markers by their computed month slot, so same-month decisions do not overlap", () => {
+    /* Two decisions recorded on different days of the same month both land on
+       the June month-end: stacking by exact date would give both stack 0 and
+       the diamonds would draw on top of each other. */
+    const html = renderToStaticMarkup(
+      <MonthStrip
+        entries={entries}
+        markers={[
+          { recordDate: "2026-06-03", label: "First decision", fillClassName: "bg-sky-600" },
+          { recordDate: "2026-06-24", label: "Second decision", fillClassName: "bg-amber-500" },
+        ]}
+      />,
+    );
+    const tops = [...html.matchAll(/top:\s*(-?\d+(?:\.\d+)?)px/g)].map((match) => Number(match[1]));
+    assert.equal(tops.length, 2);
+    assert.equal(tops[0], -11, "the first marker in a slot sits on the band");
+    assert.equal(tops[1], -22, "the second marker in the same slot stacks above it");
+    // Different months still don't stack with each other.
+    const separate = renderToStaticMarkup(
+      <MonthStrip
+        entries={entries}
+        markers={[
+          { recordDate: "2026-05-02", label: "May decision", fillClassName: "bg-sky-600" },
+          { recordDate: "2026-06-24", label: "June decision", fillClassName: "bg-amber-500" },
+        ]}
+      />,
+    );
+    const separateTops = [...separate.matchAll(/top:\s*(-?\d+(?:\.\d+)?)px/g)].map((match) => Number(match[1]));
+    assert.deepEqual(separateTops, [-11, -11], "markers in different slots sit on the band");
+  });
 });
 
 describe("BriefFormatPicker preview framing", () => {

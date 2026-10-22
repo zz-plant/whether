@@ -110,25 +110,170 @@ export const fetchDecisionLedger = async (
   }
 };
 
+/*
+ * A failed post is stashed and replayed by the service worker's background
+ * sync event (public/sw.js, `decision-ledger-retry`), so a decision recorded
+ * on a train survives the tunnel. The stash lives in IndexedDB because the
+ * service worker has no localStorage. Mirrored in plain JS over there — two
+ * small functions, one keying convention, and a comment on each side pointing
+ * at the other.
+ */
+const RETRY_DB_NAME = "whether-ledger-retry";
+const RETRY_STORE = "posts";
+
+const openRetryDb = (): Promise<IDBDatabase | null> =>
+  new Promise((resolve) => {
+    try {
+      if (typeof indexedDB === "undefined") return resolve(null);
+      const request = indexedDB.open(RETRY_DB_NAME, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore(RETRY_STORE);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+
+/* One entry per stashed write, keyed uniquely: two decisions recorded offline
+   are two records, not one overwriting the other. The key rides inside the
+   stored value because the service worker replays with getAll, which returns
+   values without keys — public/sw.js mirrors this convention. */
+const stashValue = (clientId: string, payload: DecisionMemoryPayload) => {
+  let key = `${clientId}:${Date.now()}:${Math.random()}`;
+  try {
+    if (typeof crypto !== "undefined" && typeof crypto.randomUUID === "function") {
+      key = `${clientId}:${crypto.randomUUID()}`;
+    }
+  } catch {
+    // The timestamp-and-random fallback above is unique enough for a queue.
+  }
+  return { key, clientId, payload };
+};
+
+/** What a stashed entry looks like when read back; `key` is absent on entries stashed before it was stored. */
+const stashEntryFields = (value: unknown) => {
+  if (typeof value !== "object" || value === null) return null;
+  return {
+    key: "key" in value && typeof value.key === "string" ? value.key : null,
+    clientId: "clientId" in value && typeof value.clientId === "string" ? value.clientId : null,
+    payload: "payload" in value ? value.payload : undefined,
+  };
+};
+
+const stashFailedPost = async (clientId: string, payload: DecisionMemoryPayload): Promise<void> => {
+  const db = await openRetryDb();
+  if (!db) return;
+  const entry = stashValue(clientId, payload);
+  await new Promise<void>((resolve) => {
+    try {
+      const tx = db.transaction(RETRY_STORE, "readwrite");
+      tx.objectStore(RETRY_STORE).put(entry, entry.key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    } catch {
+      resolve();
+    }
+  });
+  db.close();
+};
+
+const clearStashedPost = async (clientId: string, payload: DecisionMemoryPayload): Promise<void> => {
+  const db = await openRetryDb();
+  if (!db) return;
+  /* A successful post clears only the stashed copy of the same decision — the
+     re-tap after "that decision was not recorded". Decisions recorded offline
+     that differ from this one are separate records and stay queued for the
+     service worker's replay. */
+  const postedBody = JSON.stringify(payload);
+  await new Promise<void>((resolve) => {
+    try {
+      const tx = db.transaction(RETRY_STORE, "readwrite");
+      const cursorRequest = tx.objectStore(RETRY_STORE).openCursor();
+      cursorRequest.onsuccess = () => {
+        const cursor = cursorRequest.result;
+        if (!cursor) return;
+        const entry = stashEntryFields(cursor.value);
+        if (entry && entry.clientId === clientId && entry.payload && JSON.stringify(entry.payload) === postedBody) {
+          cursor.delete();
+        }
+        cursor.continue();
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    } catch {
+      resolve();
+    }
+  });
+  db.close();
+};
+
+/** Register the service worker's sync event for the stashed post, where the platform supports it. */
+const requestBackgroundRetry = (): void => {
+  try {
+    /* A controller means an active service worker owns this page; without one,
+       `ready` would wait on a registration that may never come. */
+    const sw = typeof navigator !== "undefined" ? navigator.serviceWorker : undefined;
+    if (!sw?.controller) return;
+    void sw.ready
+      .then((registration) => {
+        /* Background Sync is not in the DOM typings; read it off the
+           registration through an unknown and narrow by shape, so a browser
+           that lacks it skips the registration without a cast. */
+        const sync: unknown = Reflect.get(registration, "sync");
+        if (sync && typeof sync === "object" && "register" in sync && typeof sync.register === "function") {
+          return sync.register("decision-ledger-retry");
+        }
+        return undefined;
+      })
+      .catch(() => {
+        // No sync support, or the registration was refused: the reader was
+        // told the record did not happen and can tap again.
+      });
+  } catch {
+    // Same story, for a browser that throws on the lookup.
+  }
+};
+
 export const logDecisionToLedger = async (
   clientId: string,
   payload: DecisionMemoryPayload,
   fetchImpl: FetchLike = globalThis.fetch,
   storage: LedgerStorage | null = browserStorage(),
 ): Promise<LedgerWriteResult> => {
-  try {
-    const response = await fetchImpl(LEDGER_ENDPOINT, {
-      method: "POST",
-      headers: { [CLIENT_ID_HEADER]: clientId, "content-type": "application/json" },
-      body: JSON.stringify({ ...payload, clientId }),
-    });
+  /* One write at a time per browser, held with the Web Locks API: two tabs on
+     the same record could otherwise both post a decision, and the ledger is
+     append-only (2026-10-22). Browsers without locks skip the guard — the
+     button already disables itself while a write is in flight. */
+  const post = async (): Promise<LedgerWriteResult> => {
+    try {
+      const response = await fetchImpl(LEDGER_ENDPOINT, {
+        method: "POST",
+        headers: { [CLIENT_ID_HEADER]: clientId, "content-type": "application/json" },
+        body: JSON.stringify({ ...payload, clientId }),
+      });
 
-    if (!response.ok) {
+      if (!response.ok) {
+        return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
+      }
+
+      rememberLedgerSize(clientId, readKnownLedgerSize(clientId, storage) + 1, storage);
+      await clearStashedPost(clientId, payload);
+      return { ok: true };
+    } catch {
+      /* A network failure is worth one automatic retry: the payload is stashed
+         and the service worker's sync event replays it when connectivity
+         returns. An HTTP error is not — the server answered, and repeating it
+         would just fail again. */
+      await stashFailedPost(clientId, payload);
+      requestBackgroundRetry();
       return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
     }
+  };
 
-    rememberLedgerSize(clientId, readKnownLedgerSize(clientId, storage) + 1, storage);
-    return { ok: true };
+  const locks = typeof navigator !== "undefined" ? navigator.locks : undefined;
+  if (!locks?.request) return post();
+  try {
+    return await locks.request(`whether-decision-ledger:${clientId}`, post);
   } catch {
     return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
   }

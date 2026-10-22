@@ -16,6 +16,18 @@ import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 /** The two scores are optional: a caller with them gets them in each month's hover title. */
 type MonthStripEntry = { recordDate: string; regime: string; tightness?: number; riskAppetite?: number };
 
+/**
+ * An event placed on the band, against the month-end it was recorded against.
+ * The strip doesn't know what the event is — the caller supplies the shape's
+ * fill and the tooltip, so the band carries no second vocabulary (2026-10-21).
+ */
+type MonthStripMarker = {
+  recordDate: string;
+  label: string;
+  /** Fill class for the diamond; the caller's meaning owns the colour. */
+  fillClassName: string;
+};
+
 const monthTitle = (entry: MonthStripEntry) => {
   const conditions = `${monthLabel(entry.recordDate)}: ${isRegimeKey(entry.regime) ? REGIME_LABELS[entry.regime] : entry.regime}`;
   return typeof entry.tightness === "number" && typeof entry.riskAppetite === "number"
@@ -25,6 +37,10 @@ const monthTitle = (entry: MonthStripEntry) => {
 
 type MonthStripProps = {
   entries: readonly MonthStripEntry[];
+  /** Events placed on the band, one diamond per event, stacked where a month holds several. */
+  markers?: readonly MonthStripMarker[];
+  /** What a diamond is, printed under the band when there are any. The caller's words; the strip has none. */
+  markersLegend?: string | null;
   className?: string;
 };
 
@@ -57,7 +73,7 @@ const stripRuns = (sorted: readonly MonthStripEntry[]) => {
   return runs;
 };
 
-export function MonthStrip({ entries, className = "" }: MonthStripProps) {
+export function MonthStrip({ entries, markers, markersLegend, className = "" }: MonthStripProps) {
   const sorted = [...entries].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
   const run = describeCurrentRun(sorted);
   if (!run) return null;
@@ -73,12 +89,51 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
     ([left], [right]) =>
       (isRegimeKey(left) ? REGIME_SEVERITY_RANK[left] : 99) - (isRegimeKey(right) ? REGIME_SEVERITY_RANK[right] : 99),
   );
+  /*
+   * Placed against the month-end each event was recorded against — the last
+   * month-end at or before its date, or the band's first when the event
+   * predates the record. Several in one slot stack upward, so the band stays
+   * one row tall. Stacking counts the computed slot, not the exact date:
+   * decisions recorded on different days of the same month land on one
+   * month-end, and identical dates are only the special case.
+   */
+  const slotFor = (recordDate: string): number => {
+    let slot = sorted.findIndex((entry) => entry.recordDate.localeCompare(recordDate) >= 0);
+    if (slot === -1) slot = sorted.length - 1;
+    if (sorted[slot].recordDate.localeCompare(recordDate) > 0 && slot > 0) slot -= 1;
+    return slot;
+  };
+  const placedMarkers = (markers ?? []).map((marker, index, all) => {
+    const slot = slotFor(marker.recordDate);
+    const sameSlotBefore = all.slice(0, index).filter((other) => slotFor(other.recordDate) === slot).length;
+    return {
+      ...marker,
+      left: ((slot + 0.5) / sorted.length) * 100,
+      stack: sameSlotBefore,
+    };
+  });
   return (
-    <figure className={`space-y-2 ${className}`.trim()} data-month-strip>
+    <figure className={`space-y-2 ${markers?.length ? "mt-7 " : ""}${className}`.trim()} data-month-strip>
       <p className="sr-only">
-        Conditions by month, {monthLabel(sorted[0].recordDate)} to {monthLabel(run.latest)}: {changes} {changes === 1 ? "change" : "changes"}; {run.label} held {run.held} {run.held === 1 ? "month" : "months"}.
+        Conditions by month, {monthLabel(sorted[0].recordDate)} to {monthLabel(run.latest)}: {changes}{" "}
+        {changes === 1 ? "change" : "changes"}; {run.label} held {run.held} {run.held === 1 ? "month" : "months"}.
+        {placedMarkers.length > 0
+          ? ` ${placedMarkers.length} ${placedMarkers.length === 1 ? "event is" : "events are"} marked against the months they were recorded in.`
+          : null}
       </p>
       <div className="relative" aria-hidden="true">
+        {placedMarkers.map((marker, index) => (
+          <span
+            key={`${marker.recordDate}-${index}`}
+            data-month-strip-marker
+            title={marker.label}
+            className={`absolute h-2.5 w-2.5 rotate-45 rounded-[2px] ring-1 ring-[color:var(--bg-body)] ${marker.fillClassName}`}
+            style={{
+              left: `calc(${marker.left}% - 5px)`,
+              top: `${-11 - marker.stack * 11}px`,
+            }}
+          />
+        ))}
         <div className="flex h-6 w-full overflow-hidden rounded-md">
           {sorted.map((entry, index) => {
             const changed = index > 0 && entry.regime !== sorted[index - 1].regime;
@@ -132,7 +187,12 @@ export function MonthStrip({ entries, className = "" }: MonthStripProps) {
           the intro's stamp; the sentence above the band keeps both for a screen
           reader, which has no other text for the picture. */}
       <figcaption className="text-xs text-slate-400">
-        {monthLabel(sorted[0].recordDate)} – {monthLabel(run.latest)}
+        {monthLabel(sorted[0].recordDate)} &ndash; {monthLabel(run.latest)}
+        {markersLegend && placedMarkers.length > 0 ? (
+          <span className="block" data-month-strip-marker-legend>
+            {markersLegend}
+          </span>
+        ) : null}
       </figcaption>
     </figure>
   );

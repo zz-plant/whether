@@ -6,6 +6,7 @@ import {
   SecondaryPageSection,
 } from "../components/secondaryPageShell";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { DecisionRecordPanel } from "./decisionRecordPanel";
 import { DecisionRecordDownloads } from "./decisionRecordDownloads";
 import { ContentPageShell } from "../components/ui/contentPageShell";
@@ -46,6 +47,10 @@ export const metadata: Metadata = {
 export default async function DecisionsPage() {
   const { reportData } = await loadWeeklyBriefSnapshot(undefined, { route: "/decisions" });
   const scores = reportData.assessment.scores;
+  /* The record drawn, the same full month-end series the home brief's band
+     uses: a decision is stored against one of these readings, so the band can
+     place each one against the conditions it was made in (2026-10-21). */
+  const recordSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
   return (
     <ContentPageShell measure="wide">
       {/* No kicker and no emblem card (2026-10-09). "Your decisions" restated the
@@ -59,7 +64,10 @@ export default async function DecisionsPage() {
         title="Recorded from this browser"
         description="Stored against a random identifier in this browser and never joined to an email address. Clearing site data removes it."
       >
-        <DecisionRecordPanel current={{ tightness: scores.tightness, riskAppetite: scores.riskAppetite }} />
+        <DecisionRecordPanel
+          current={{ tightness: scores.tightness, riskAppetite: scores.riskAppetite }}
+          record={recordSeries}
+        />
       </SecondaryPageSection>
       <SecondaryPageSection
         title="Take it with you"

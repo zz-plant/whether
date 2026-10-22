@@ -28,6 +28,8 @@ export type DecisionRecordRow = {
   id: string;
   /** "Sep 14, 2026" — the reading the decision was made against, not when it was typed. */
   recordedOn: string;
+  /** The same reading as an ISO date, for anything that places the decision on the record's timeline. */
+  recordDate: string;
   /** What was decided, in the reader's words. */
   title: string;
   verdict: StalenessVerdict;
@@ -113,6 +115,7 @@ const buildDecisionRecordRow = (
   return {
     id: entry.id,
     recordedOn: formatRecordedOn(entry.context.recordDate),
+    recordDate: entry.context.recordDate,
     title: buildTitle(entry),
     verdict: health.verdict,
     verdictSentence: VERDICT_SENTENCES[health.verdict],

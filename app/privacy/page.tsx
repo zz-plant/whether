@@ -199,7 +199,7 @@ export default function PrivacyPage() {
               inside Cloudflare&apos;s rate limiter; this site does not store it.
             </p>
             <p className={paragraph}>
-              This site runs on Cloudflare, so Cloudflare processes every request in order to serve
+              This site runs on Cloudflare, so Cloudflare processes every request to serve
               it, and request-level logging and tracing are enabled for debugging. Cloudflare acts as
               our infrastructure provider and handles that data under its own terms.
             </p>

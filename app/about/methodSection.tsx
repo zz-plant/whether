@@ -1,6 +1,7 @@
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { sharedDecisionLines } from "../../lib/report/boundedDecisionRules";
 import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../../lib/regimeEngine";
+import { CorridorStrip } from "./corridorStrip";
 import { TemplateActions } from "./templateActions";
 
 /* The worked example quotes the published lines, so a reader who checks it
@@ -55,6 +56,14 @@ export function MethodSection() {
           <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses {EXAMPLE_LINES.tightnessPause}.</p>
           <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>
         </div>
+        {/* The example's three lines, drawn on the axis they share: the pause
+            line past the change line, the resume line inside it, and the hold
+            between them that makes a pause temporary (2026-10-21). */}
+        <CorridorStrip
+          changeLine={TIGHTNESS_REGIME_THRESHOLD}
+          pauseLine={EXAMPLE_LINES.tightnessPause}
+          resumeLine={EXAMPLE_LINES.tightnessResume}
+        />
       </section>
 
       {/* Folded: the definitions and the essay explain a method (§XII: the
