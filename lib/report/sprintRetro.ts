@@ -81,31 +81,32 @@ const isCapitalCommitmentAction = (category: DecisionCategory, action: DecisionA
   return false;
 };
 
+const isDecisionMemoryEntry = (item: DecisionMemoryEntry | SprintDecisionCandidate): item is DecisionMemoryEntry =>
+  "context" in item && typeof item.context === "object" && item.context !== null && "decision" in item && "outcome" in item;
+
 const normalizeCandidate = (item: DecisionMemoryEntry | SprintDecisionCandidate, index: number): SprintDecisionCandidate => {
-  if ("context" in item && typeof item.context === "object" && item.context !== null && "decision" in item) {
-    const memory = item as DecisionMemoryEntry;
-    const dec = memory.decision;
+  if (isDecisionMemoryEntry(item)) {
+    const dec = item.decision;
     return {
-      id: memory.id,
-      title: memory.outcome.summary || `Decision ${index + 1}`,
+      id: item.id,
+      title: item.outcome.summary || `Decision ${index + 1}`,
       category: dec?.category ?? "HIRING",
       action: dec?.action ?? "HIRE",
       context: dec?.context,
-      department: memory.department,
-      owner: memory.owner,
-      verdict: memory.outcome.verdict,
+      department: item.department,
+      owner: item.owner,
+      verdict: item.outcome.verdict,
     };
   }
-  const candidate = item as SprintDecisionCandidate;
   return {
-    id: candidate.id ?? `candidate-${index + 1}`,
-    title: candidate.title ?? `${candidate.action.toLowerCase()} in ${candidate.category.toLowerCase()}`,
-    category: candidate.category,
-    action: candidate.action,
-    context: candidate.context,
-    department: candidate.department,
-    owner: candidate.owner,
-    verdict: candidate.verdict,
+    id: item.id ?? `candidate-${index + 1}`,
+    title: item.title ?? `${item.action.toLowerCase()} in ${item.category.toLowerCase()}`,
+    category: item.category,
+    action: item.action,
+    context: item.context,
+    department: item.department,
+    owner: item.owner,
+    verdict: item.verdict,
   };
 };
 

@@ -68,12 +68,12 @@ describe("the agent tool registry", () => {
   });
 
   it("returns a frozen published brief when requested by week, and posture archive when requested by period", async () => {
-    const w41 = (await runAgentTool("get_brief", { week: "2026-w41" }, "http")) as Record<string, unknown>;
+    const w41 = await runAgentTool("get_brief", { week: "2026-w41" }, "http");
     assert.equal(w41.type, "published_brief");
     assert.equal(w41.slug, "2026-w41");
     assert.ok(w41.headline);
 
-    const period = (await runAgentTool("get_brief", { period: "2024-q1" }, "http")) as Record<string, unknown>;
+    const period = await runAgentTool("get_brief", { period: "2024-q1" }, "http");
     assert.equal(period.type, "posture_archive_period");
     assert.equal(period.slug, "2024-q1");
     assert.equal(period.kind, "quarter");
