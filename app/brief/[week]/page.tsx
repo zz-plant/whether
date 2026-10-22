@@ -10,10 +10,9 @@ import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/naviga
 import {
   buildCanonicalUrl,
   buildPageMetadata,
-  organizationName,
 } from "../../../lib/seo";
-import { buildAuthorSchema, buildPublisherSchema, publisherAuthor } from "../../../lib/publisher";
-import { graph } from "../../../lib/seo/pageStructuredData";
+import { publisherAuthor } from "../../../lib/publisher";
+import { buildPublishedBriefStructuredData } from "../../../lib/seo/pageStructuredData";
 import {
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefImageParams,
@@ -22,6 +21,7 @@ import {
   buildPublishedBriefPath,
   buildPublishedBriefTitle,
   buildPublishedBriefSlackUpdate,
+  buildPublishedBriefBoardUpdate,
   findAdjacentPublishedBriefs,
   findPublishedBrief,
   labelForArea,
@@ -94,6 +94,15 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 
   metadata.authors = [{ name: publisherAuthor.name, url: buildCanonicalUrl("/about") }];
+  metadata.keywords = [
+    "startup operating guidance",
+    "startup hiring guidance",
+    "venture funding macro",
+    "burn rate discipline",
+    `week of ${publishedBriefWeekLabel(brief)}`,
+    brief.slug,
+    brief.regime,
+  ];
   metadata.openGraph = {
     ...metadata.openGraph,
     type: "article",
@@ -121,6 +130,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
   const slackUpdate = buildPublishedBriefSlackUpdate(brief);
   const emailUpdate = buildPublishedBriefEmailUpdate(brief);
+  const boardUpdate = buildPublishedBriefBoardUpdate(brief);
 
   // The record's readings and corridor, drawn. Records frozen before the lines
   // were data carry neither and fall back to the sentences below.
@@ -144,22 +154,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const frozenScores = brief.scores;
   const tabulateDecisions = frozenScores !== undefined && brief.decisions.some((decision) => (decision.pause?.length ?? 0) > 0);
 
-  const structuredData = graph([
-    {
-      "@type": "Article",
-      headline: briefTitle(brief),
-      description: buildPublishedBriefDescription(brief),
-      datePublished: brief.publishedAt,
-      dateModified: brief.publishedAt,
-      author: buildAuthorSchema(),
-      publisher: buildPublisherSchema(organizationName),
-      image: [buildPublishedBriefImageUrl(brief)],
-      url: canonicalUrl,
-      mainEntityOfPage: canonicalUrl,
-      isAccessibleForFree: true,
-    },
-    // The trail is described by <Breadcrumbs> below, from the trail it draws.
-  ]);
+  const structuredData = buildPublishedBriefStructuredData({
+    brief,
+    canonicalUrl,
+    imageUrl: buildPublishedBriefImageUrl(brief),
+    headline: briefTitle(brief),
+    description: buildPublishedBriefDescription(brief),
+  });
 
   return (
     <ContentPageShell measure="prose">
@@ -247,7 +248,9 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           weekLabel={publishedBriefWeekLabel(brief)}
           slackUpdate={slackUpdate}
           emailUpdate={emailUpdate}
+          boardUpdate={boardUpdate}
           permanentUrl={canonicalUrl}
+          slidePptxUrl={`/api/export/board-slide?week=${brief.slug}&format=pptx`}
         />
 
         {readings.length > 0 ? (

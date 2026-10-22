@@ -401,7 +401,7 @@ describe("withDevServer", () => {
       devScript: secondStartServer(root),
       timeoutMs: 60000,
       startAttempts: 2,
-      probe: patientProbe(5000),
+      probe: patientProbe(2000),
       onStatus: (message) => statuses.push(message),
       body: async () => {
         runs += 1;

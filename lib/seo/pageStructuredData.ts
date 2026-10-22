@@ -454,3 +454,52 @@ export const buildProductCanonStructuredData = ({
     buildBreadcrumbList(buildGroupBreadcrumbs("/concepts")),
   ]);
 };
+
+/**
+ * `/brief/[week]`: structured data for a frozen weekly brief.
+ * Declares Article schema with explicit temporalCoverage, variableMeasured,
+ * and semantic topics.
+ */
+export const buildPublishedBriefStructuredData = ({
+  brief,
+  canonicalUrl,
+  imageUrl,
+  headline,
+  description,
+}: {
+  brief: PublishedBrief;
+  canonicalUrl: string;
+  imageUrl: string;
+  headline: string;
+  description: string;
+}): JsonLdGraph =>
+  graph([
+    {
+      "@type": "Article",
+      "@id": `${canonicalUrl}#article`,
+      headline,
+      description,
+      datePublished: brief.publishedAt,
+      dateModified: brief.publishedAt,
+      temporalCoverage: `${brief.recordDate}/${brief.recordDate}`,
+      author: buildAuthorSchema(),
+      publisher: buildPublisherSchema(organizationName),
+      image: [imageUrl],
+      url: canonicalUrl,
+      mainEntityOfPage: canonicalUrl,
+      isAccessibleForFree: true,
+      keywords: [
+        "startup operating guidance",
+        "venture capital macro",
+        "startup hiring guidance",
+        "burn rate discipline",
+        `week of ${brief.recordDateLabel}`,
+        brief.regime,
+      ],
+      about: [
+        { "@type": "Thing", name: "Startup Operating Guidance" },
+        { "@type": "Thing", name: "Venture Capital Macro Climate" },
+      ],
+    },
+  ]);
+

@@ -14,6 +14,19 @@ import { getTimeMachineMonthsByYear } from "../timeMachine/timeMachineCache";
 import { buildStandupLine } from "../report/decisionMovement";
 import { auditSprintDecisions, type SprintDecisionCandidate } from "../report/sprintRetro";
 import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
+import {
+  findPublishedBrief,
+  getPublishedBriefs,
+  publishedBriefDisplay,
+  publishedBriefHeadline,
+  buildPublishedBriefPath,
+} from "../report/publishedBriefs";
+import {
+  findPostureArchivePeriod,
+  getPostureArchivePeriods,
+  buildPostureArchivePath,
+} from "../summary/postureArchive";
+import { buildCanonicalUrl } from "../seo";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
 import { createAgentToolRegistry, defineTool } from "./registry";
 
@@ -73,12 +86,60 @@ const AGENT_TOOLS = [
     name: "get_brief",
     title: "Get the full weekly brief",
     description:
-      "The full brief (about 22KB): summary prose, decision delta, flip watch, provenance and the agent handoff, for a cadence. Use get_state when you only need to decide; use this for the wording, the record, or a cadence other than weekly.",
+      "The full brief (about 22KB): summary prose, decision delta, flip watch, provenance and the agent handoff, for a cadence. Use get_state when you only need to decide; use week (e.g. '2026-w41') or period (e.g. '2024-q1') to retrieve frozen historical records.",
     aliases: ["get_agent_brief"],
-    input: { cadence: cadenceInput.optional().describe("weekly (default), monthly, quarterly or yearly.") },
+    input: {
+      cadence: cadenceInput.optional().describe("weekly (default), monthly, quarterly or yearly."),
+      week: textInput.optional().describe("A specific published week slug (e.g. '2026-w41') to fetch that frozen record."),
+      period: textInput.optional().describe("A specific archive period slug (e.g. '2024-q1' or '2023') to fetch that frozen posture record."),
+    },
     example: { cadence: "weekly" },
     plainGetNote: "Over plain GET it answers a summary instead (regime, action, margin, record date); get_state is the answer to decide from.",
-    run: async ({ cadence }) => ({ ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() }),
+    run: async ({ cadence, week, period }) => {
+      if (week) {
+        const brief = findPublishedBrief(week.toLowerCase());
+        if (!brief) {
+          throw new Error(`Published brief '${week}' not found. Available weeks: ${getPublishedBriefs().map((b) => b.slug).join(", ")}`);
+        }
+        const display = publishedBriefDisplay(brief);
+        return {
+          type: "published_brief",
+          slug: brief.slug,
+          year: brief.year,
+          week: brief.week,
+          publishedAt: brief.publishedAt,
+          recordDate: brief.recordDate,
+          recordDateLabel: brief.recordDateLabel,
+          headline: publishedBriefHeadline(brief).composed,
+          actionNow: brief.actionNow,
+          regime: brief.regime,
+          conditions: display.conditions,
+          confidence: { label: brief.confidenceLabel },
+          scores: brief.scores ?? null,
+          whatChanged: display.whatChanged,
+          pauseIf: display.pauseIf,
+          conditionsChangeIf: display.conditionsChangeIf,
+          decisions: brief.decisions,
+          evidence: brief.evidence,
+          sourceLabel: brief.sourceLabel,
+          permalink: buildCanonicalUrl(buildPublishedBriefPath(brief.slug)),
+          use: buildUseConstraint(),
+        };
+      }
+      if (period) {
+        const archivePeriod = findPostureArchivePeriod(period.toLowerCase());
+        if (!archivePeriod) {
+          throw new Error(`Archive period '${period}' not found. Available periods: ${getPostureArchivePeriods().map((p) => p.slug).join(", ")}`);
+        }
+        return {
+          type: "posture_archive_period",
+          ...archivePeriod,
+          permalink: buildCanonicalUrl(buildPostureArchivePath(archivePeriod.slug)),
+          use: buildUseConstraint(),
+        };
+      }
+      return { ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() };
+    },
   }),
   defineTool({
     name: "get_standup_line",
@@ -123,8 +184,17 @@ const AGENT_TOOLS = [
       const resolved = regime ?? (await todayState()).conditions.key;
       const context = getRegimeContext(resolved);
       const { latestSnapshot } = context;
+      const recentTransitions = getPostureArchivePeriods().find((p) => p.transitions.length > 0)?.transitions.slice(0, 5) ?? [];
+      const recentBriefs = getPublishedBriefs().slice(0, 5).map((b) => ({
+        week: b.slug,
+        publishedAt: b.publishedAt,
+        regime: b.regime,
+        action: b.actionNow,
+      }));
       return {
         ...context,
+        recentTransitions,
+        recentBriefs,
         /* Zero months is a fact about the record, and it reads like a finding: today's conditions
            can be newer than the last month-end, which is exactly when an agent asks. */
         ...(context.monthsActive === 0 && latestSnapshot

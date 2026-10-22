@@ -107,6 +107,8 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "### JSON agent API",
     `- GET ${endpoints.agent}?cadence=<weekly|monthly|quarterly|yearly>`,
     "- Default cadence: weekly",
+    `- Query frozen past weeks: GET ${endpoints.agent}?week=<slug> (e.g. 2026-w41)`,
+    `- Query historical archive periods: GET ${endpoints.agent}?period=<slug> (e.g. 2024-q1 or 2023)`,
     "- Response: JSON with summary, posture, decision delta, flip watch, agent handoff payload + prompt, provenance",
     "- `&view=state` answers the compact state instead (weekly only); the default view is the whole brief",
     "- Invalid cadence or view: HTTP 400 with the values allowed",

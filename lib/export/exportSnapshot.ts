@@ -6,6 +6,13 @@ import type { OperatingSnapshot } from "../operatingState/types";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
 import { briefArtifactToSlidePayload } from "../report/briefArtifact";
 import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
+import {
+  publishedBriefDisplay,
+  publishedBriefHeadline,
+  buildPublishedBriefPath,
+  type PublishedBrief,
+} from "../report/publishedBriefs";
+import { buildCanonicalUrl } from "../seo";
 import { snapshotData } from "../snapshot";
 import type { MeetingSlidePayload } from "./meetingSlideExport";
 
@@ -42,3 +49,32 @@ export const buildExportSlidePayload = (
   stage: StartupVariantMode | null,
 ): MeetingSlidePayload =>
   briefArtifactToSlidePayload(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall, { stage }));
+
+/**
+ * Builds a meeting slide payload from a frozen PublishedBrief.
+ */
+export const publishedBriefToSlidePayload = (
+  brief: PublishedBrief,
+  stage: StartupVariantMode | null,
+): MeetingSlidePayload => {
+  const display = publishedBriefDisplay(brief);
+  const headline = publishedBriefHeadline(brief);
+  return {
+    recordDate: brief.recordDateLabel,
+    recordDateIso: brief.recordDate,
+    regime: brief.regime,
+    stageLabel: stage ?? "",
+    actionNow: headline.action,
+    pauseIf: display.pauseIf ?? "No pause line was published with this brief.",
+    callChangesIf: display.conditionsChangeIf,
+    tightness: brief.scores?.tightness ?? 50,
+    riskAppetite: brief.scores?.riskAppetite ?? 50,
+    confidence: brief.confidenceLabel,
+    provenance: brief.sourceLabel,
+    basis: display.basis.sentence,
+    call: headline.composed,
+    clearsWhen: [display.conditionsChangeIf],
+    url: buildCanonicalUrl(buildPublishedBriefPath(brief.slug)),
+    isFallback: false,
+  };
+};

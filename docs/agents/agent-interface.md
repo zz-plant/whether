@@ -59,6 +59,8 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 - Returns summary copy, provenance, and `agentHandoff` (`payload` + `prompt`).
 - The payload now includes `decision_rules`, `decision_delta`, and `flip_watch` so agents can explain what changed, what should change now, and what would flip the call without reconstructing their own regime logic.
 - Returns HTTP 400 for invalid cadence values, and for an unknown `view` (`allowedViews`).
+- `?week=<slug>` (e.g. `2026-w41`) answers that specific frozen week's published brief with its decisions, scores, and provenance. Returns HTTP 404 with `availableWeeks` if unknown.
+- `?period=<slug>` (e.g. `2024-q1` or `2023`) answers that specific posture archive period. Returns HTTP 404 if unknown.
 - `?view=state` answers the compact state above instead of the full brief (default view: `full`).
 - The payload's `confidence` is the published confidence; `decision_delta.compared_with` names the reading the changes are measured against.
 - Includes read-only CORS headers for browser-based tool clients.

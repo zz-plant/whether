@@ -145,3 +145,21 @@ describe("board slide route helpers", () => {
     assert.equal(isBoardSlideFormat(null), false);
   });
 });
+
+describe("board slide route handler", () => {
+  it("serves a board slide attachment for a specific published week", async () => {
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=2026-w41&format=pptx"));
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("Content-Type"), "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+    assert.match(res.headers.get("Content-Disposition") ?? "", /whether-board-slide-2026-10-06\.pptx/);
+  });
+
+  it("returns 404 for an unknown published week", async () => {
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=1999-w01&format=pptx"));
+    assert.equal(res.status, 404);
+  });
+});
