@@ -3654,6 +3654,20 @@ already names.
   `weather-page-shell-standard` instead of its own `max-w-[72rem]`.
 - `/pricing`, the other page this debt item named, no longer exists (§1.1.78).
 
+### 1.1.84 Connecting an agent covers the CLI, not only the config file (2026-10-21)
+
+The API page's connect section served the desktop-config era: one `mcpServers` JSON
+block for Claude Desktop and Cursor's settings UI. A Claude Code user — a terminal,
+no `claude_desktop_config.json` — had nothing to run.
+
+- **A one-line `claude mcp add --transport http whether <url>`** now sits above the
+  JSON block, which stays for the desktop clients.
+- **A line points URL-reading agents at `/llms.txt`**: it lists every answer page
+  against the question it answers and states how current the reading is (§ the
+  llms.txt question router, `lib/seo/llmsTxt.ts`).
+- `/share`'s "For agents, scripts and feed readers" remains the entry point that
+  links here; no new page.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

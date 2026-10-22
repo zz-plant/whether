@@ -81,6 +81,14 @@ export default function ApiDocsPage() {
           </p>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-fluid-micro text-slate-400">
+              <span>Claude Code, one line from any directory:</span>
+            </div>
+            <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+              claude mcp add --transport http whether {siteUrl}/api/mcp
+            </pre>
+          </div>
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between text-fluid-micro text-slate-400">
               <span>Claude Desktop (<code className="font-mono text-slate-300">claude_desktop_config.json</code>) or Cursor Settings → MCP:</span>
             </div>
             <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
@@ -101,6 +109,13 @@ export default function ApiDocsPage() {
           <p className="text-xs text-slate-300">
             A weather word works wherever a tool takes conditions: Freezing, Cloudy, Stormy or Sunny, in any case. A
             wrong argument is refused with the values that would have worked.
+          </p>
+          <p className="text-xs text-slate-300">
+            An agent that reads URLs can start at{" "}
+            <Link href="/llms.txt" className="text-sky-200 underline decoration-sky-600 underline-offset-2">
+              /llms.txt
+            </Link>
+            : it lists every answer page against the question it answers and states how current the reading is.
           </p>
         </section>
 
