@@ -147,6 +147,9 @@ export function RegimeRadar({
               width={quadrant.width}
               height={quadrant.height}
               fill={quadrant.fill}
+              stroke={active ? "var(--regime-accent)" : "none"}
+              strokeWidth={active ? "1" : "0"}
+              strokeOpacity={active ? "0.4" : "0"}
               opacity={hasActive && !active ? 0.45 : 1}
               data-quadrant={quadrant.key}
               data-active={active ? "" : undefined}
@@ -347,11 +350,21 @@ export function RegimeRadar({
           <circle
             cx={currentX}
             cy={currentY}
+            r="9"
+            fill="none"
+            stroke="var(--regime-accent)"
+            strokeWidth="1"
+            className="animate-ping motion-reduce:animate-none opacity-25"
+            style={{ animationDuration: "3s" }}
+          />
+          <circle
+            cx={currentX}
+            cy={currentY}
             r="6.5"
             fill="none"
             stroke="var(--regime-accent)"
             strokeWidth="1.5"
-            strokeOpacity="0.6"
+            strokeOpacity="0.8"
           />
           <circle
             cx={currentX}
