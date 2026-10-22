@@ -138,10 +138,13 @@ describe("decision ledger client", () => {
         const fire = () =>
           micro(() => {
             const keys = [...entries.keys()].sort();
-            if (index >= keys.length) {
+            /* The undefined check is the bounds check: a sorted snapshot has no
+               element at an index past its end, so this only fires when the
+               walk is done — and it narrows `key` for the two reads below. */
+            const key = keys[index];
+            if (key === undefined) {
               request.result = null;
             } else {
-              const key = keys[index];
               index += 1;
               request.result = {
                 key,
