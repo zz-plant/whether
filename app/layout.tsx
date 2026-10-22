@@ -200,16 +200,14 @@ export default function RootLayout({
             navigating to). Moderate eagerness: one request per hovered link,
             deduplicated by URL, and nothing executed — these are prefetches, not
             prerenders, so no speculative page load fires telemetry. The rules
-            live in a static file rather than an inline script: this layout is
-            where the repo's one dangerouslySetInnerHTML exemption is NOT
-            (app/components/jsonLdScript.tsx owns it), and the API supports
-            loading rules from a URL (2026-10-22). */}
+            are delivered by the worker's Speculation-Rules response header
+            (worker/index.ts): the HTML standard requires type=speculationrules
+            scripts to be inline and fires an error on one with a src, and this
+            layout is where the repo's one dangerouslySetInnerHTML exemption is
+            NOT (app/components/jsonLdScript.tsx owns it), so a src= script here
+            prefetched nothing (2026-10-22). */}
         <link rel="prefetch" href="/operate" />
         <link rel="prefetch" href="/signals" />
-        {/* Not executable — type=speculationrules is data the browser reads —
-            but async satisfies the no-blocking-scripts rule honestly: the file
-            loads off the critical path either way. */}
-        <script async type="speculationrules" src="/speculation-rules.json" />
         {/* No `hrefLang="x-default"` here. It lived in the layout, so every page
             declared the homepage as its x-default target — the same inherited-
             pointer problem as the canonical above. x-default names the fallback
