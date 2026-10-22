@@ -47,7 +47,7 @@ describe("navigation groups", () => {
       {
         "this-week": ["/", "/signals", "/trust"],
         decide: ["/operate", "/operate/financial", "/operate/scenarios", "/comps"],
-        record: ["/history", "/history/compare", "/calibration", "/concepts"],
+        record: ["/history", "/calibration", "/history/compare", "/concepts"],
         guides: ["/resources"],
       },
     );

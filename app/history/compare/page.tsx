@@ -1,19 +1,9 @@
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../../lib/seo";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
-import { getTimeMachineRegimeSeries, getTimeMachineSnapshots } from "../../../lib/timeMachine/timeMachineCache";
-import { evaluateRegime } from "../../../lib/regimeEngine";
-import { formatMonthLabel } from "../../../lib/timeMachine/monthFormatting";
-import { Fact, FactList } from "../../components/ui/factList";
-import { ScoreLadder, buildLadderLines } from "../../components/ui/scoreLadder";
-import { ruleMetricLabel, type RuleConditionMetric } from "../../../lib/report/boundedDecisionRules";
-import { buildSharedCorridorRails } from "../../../lib/report/operatingCalls";
-import { BORROWING_PREMIUM_MEANING, ComparePeriodColumn, findMacroValue } from "./comparePeriodColumn";
-import { DateSelector, type DateOption } from "./DateSelector";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
-import { describeMacroNotOnRecord } from "../../../lib/report/reportCopy";
+import { ComparePanel } from "./ComparePanel";
 
 export const runtime = "edge";
 
@@ -24,48 +14,16 @@ type CompareSearchParams = {
   monthB?: string;
 };
 
-/*
- * The URL shape, which the homepage's "last time the call changed" card links
- * to: `/history/compare?yearA=2024&monthA=3&yearB=2024&monthB=2`. Period A is
- * the month under examination and period B the one it is compared against;
- * months are 1–12, unpadded, and each pair must name a month-end the archive
- * holds (`hasTimeMachineEntry`). A missing pair A means the current week, and
- * a missing pair B defaults below.
- */
-const toImageParam = (value: string | undefined) =>
-  value && /^\d+$/.test(value) ? value : undefined;
-
-const buildCompareImageParams = (searchParams?: Partial<CompareSearchParams>) => {
-  const params: Record<string, string> = { template: "compare" };
-  const yearA = toImageParam(searchParams?.yearA);
-  const monthA = toImageParam(searchParams?.monthA);
-  if (yearA && monthA) {
-    params.yearA = yearA;
-    params.monthA = monthA;
-  }
-  const yearB = toImageParam(searchParams?.yearB);
-  const monthB = toImageParam(searchParams?.monthB);
-  if (yearB && monthB) {
-    params.yearB = yearB;
-    params.monthB = monthB;
-  }
-  return params;
-};
-
 export async function generateMetadata({
-  searchParams,
+  searchParams: _searchParams,
 }: {
   searchParams?: Promise<Partial<CompareSearchParams>>;
 }): Promise<Metadata> {
-  const resolved = searchParams ? await searchParams : undefined;
-  const imageParams = buildCompareImageParams(resolved);
-
   return buildPageMetadata({
     title: "Compare periods — two months side by side",
     description: "Two past months side by side: the conditions, the operating latitude, and the rules in force.",
     path: "/history/compare",
     imageAlt: "Whether comparison of two past periods",
-    imageParams,
   });
 }
 
@@ -75,175 +33,40 @@ export default async function HistoryComparePage({
   searchParams?: Promise<Partial<CompareSearchParams>>;
 }) {
   const resolvedSearchParams = searchParams ? await searchParams : undefined;
-
-  const yearA = resolvedSearchParams?.yearA ? Number(resolvedSearchParams.yearA) : undefined;
-  const monthA = resolvedSearchParams?.monthA ? Number(resolvedSearchParams.monthA) : undefined;
-
-  const yearB = resolvedSearchParams?.yearB ? Number(resolvedSearchParams.yearB) : 2020;
-  const monthB = resolvedSearchParams?.monthB ? Number(resolvedSearchParams.monthB) : 3;
-
-  const searchA = yearA && monthA ? { year: String(yearA), month: String(monthA) } : undefined;
-  const searchB = { year: String(yearB), month: String(monthB) };
-
-  const snapshotResultA = await loadWeeklyBriefSnapshot(searchA, { route: "/history/compare" });
-  const snapshotResultB = await loadWeeklyBriefSnapshot(searchB, { route: "/history/compare" });
-
-  const { snapshot: snapA } = snapshotResultA;
-  const { snapshot: snapB } = snapshotResultB;
-
-  const reportA = snapA.reportData;
-  const reportB = snapB.reportData;
-
-  const bbbA = findMacroValue(reportA.macroSeries, "BBB_CREDIT_SPREAD");
-  const bbbB = findMacroValue(reportB.macroSeries, "BBB_CREDIT_SPREAD");
-  /* A period with no premium on record is named, never read as zero. The detail
-     filled a missing side with `?? 0` and printed "0.00%" beside a real figure;
-     and while the report carried this week's macro series for every month, both
-     sides were today's, so it read "0.00% … 1.46% vs 1.46%" for Mar 2020. */
-  const bbbMissing = [
-    bbbA === null ? `Period A (${reportA.recordDateLabel})` : null,
-    bbbB === null ? `Period B (${reportB.recordDateLabel})` : null,
-  ].filter((entry): entry is string => entry !== null);
-  /* The term's one definition on the page (2026-10-09): each period's column
-     prints its value alone. The detail used to repeat both values ("1.46% vs
-     1.07%") under a definition each column printed again. */
-  const bbbDetail =
-    bbbA !== null && bbbB !== null
-      ? BORROWING_PREMIUM_MEANING
-      : `${BORROWING_PREMIUM_MEANING} ${describeMacroNotOnRecord(bbbMissing.join(" or "))}.`;
-
-  /* Each score drawn once, period A filled and period B hollow, against the
-     lines in force for period A: its pause and resume lines from the rules it
-     published, and the line where the call changes from its thresholds. The
-     delta tiles this replaces printed a signed number with no line, and the
-     operating-latitude one at that — a composite of these two. */
-  const scoresA = reportA.assessment.scores;
-  const railsA = buildSharedCorridorRails(reportA.actionStripItems ?? [], scoresA);
-  const ladderFor = (metric: RuleConditionMetric, callChange: number) => {
-    const rail = railsA.find((candidate) => candidate.metric === metric);
-    return {
-      label: ruleMetricLabel[metric],
-      value: scoresA[metric],
-      previous: reportB.assessment.scores[metric],
-      lines: buildLadderLines({ pause: rail?.guardrail, resume: rail?.clearsAt, callChange }),
-    };
-  };
-  const ladders = [
-    ladderFor("tightness", reportA.assessment.thresholds.tightnessRegime),
-    ladderFor("riskAppetite", reportA.assessment.thresholds.riskAppetiteRegime),
-  ];
-
-  // Build options list from cache. Regime labels come off the same threaded walk
-  // /history serves — a point evaluation here would label a tightening month by
-  // what an instant quadrant read says, disagreeing with the record the reader
-  // can cross-check one page away.
-  const governedRegimes = new Map(
-    getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER).map((entry) => [entry.recordDate, entry.regime]),
+  const snapshotResultA = await loadWeeklyBriefSnapshot(
+    resolvedSearchParams?.yearA && resolvedSearchParams?.monthA
+      ? { year: resolvedSearchParams.yearA, month: resolvedSearchParams.monthA }
+      : undefined,
+    { route: "/history/compare" },
   );
-  const snapshots = getTimeMachineSnapshots();
-  const dateOptions: DateOption[] = snapshots
-    .map((s) => {
-      const regime = governedRegimes.get(s.record_date) ?? evaluateRegime(s).regime;
-      return {
-        year: s.year,
-        month: s.month,
-        label: `${formatMonthLabel(s.year, s.month)} · ${getRegimePublicLabel(regime)}`,
-      };
-    })
-    .reverse();
-
-  // Combine actions for the shell
-  const isFallback = isSavedCopy(reportA.treasury);
-
-  const compareSectionLinks = [
-    { href: "#compare-selectors", label: "Period selection" },
-    { href: "#compare-key-deltas", label: "What changed" },
-    { href: "#ops-compare-grid", label: "Side-by-side rules" },
-  ];
+  const isFallback = isSavedCopy(snapshotResultA.snapshot.reportData.treasury);
+  const compareContent = await ComparePanel({ searchParams: resolvedSearchParams });
 
   return (
     <ReportShell
       model={{
         status: {
-          /* No status word: a page about two periods has no one week's conditions
-             to state, and "Freezing" in the intro restated Period A's heading below
-             it while Period B said something else (2026-10-09). */
           statusLabel: "",
-          recordDateLabel: reportA.recordDateLabel,
-          fetchedAtLabel: reportA.fetchedAtLabel,
+          recordDateLabel: snapshotResultA.snapshot.reportData.recordDateLabel,
+          fetchedAtLabel: snapshotResultA.snapshot.reportData.fetchedAtLabel,
         },
         page: {
           pageTitle: "Compare two periods",
           pageSummary: "Signals and operating guidance for any two past months, side by side.",
-          sectionLinks: compareSectionLinks,
+          sectionLinks: [
+            { href: "#compare-selectors", label: "Period selection" },
+            { href: "#compare-key-deltas", label: "What changed" },
+            { href: "#ops-compare-grid", label: "Side-by-side rules" },
+          ],
           currentPath: "/history/compare",
         },
         trust: {
-          trustStatusTone: snapA.trustStatus.trustStatusTone,
-          showOfflineBadge: isFallback && !reportA.historicalSelection,
+          trustStatusTone: snapshotResultA.snapshot.trustStatus.trustStatusTone,
+          showOfflineBadge: isFallback && !snapshotResultA.snapshot.reportData.historicalSelection,
         },
       }}
     >
-      <div className="space-y-6">
-        <div id="compare-selectors" className="weather-panel grid gap-6 md:grid-cols-2">
-          {/* Each picker shows the month its column draws. Period A without a query
-              is the current week (`searchA` is undefined above), so its picker
-              selects "This week" rather than the newest month-end it used to
-              default to. */}
-          <DateSelector
-            label="Period A"
-            paramPrefix="A"
-            options={dateOptions}
-            currentYear={searchA ? yearA : undefined}
-            currentMonth={searchA ? monthA : undefined}
-            currentWeekLabel="This week"
-          />
-          <DateSelector
-            label="Period B"
-            paramPrefix="B"
-            options={dateOptions}
-            currentYear={yearB}
-            currentMonth={monthB}
-          />
-        </div>
-
-        <section id="compare-key-deltas" className="weather-panel p-6">
-          <p className="type-label text-slate-400">Difference</p>
-          <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
-
-          <div className="mt-4 grid gap-x-8 gap-y-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_14rem]">
-            {ladders.map((ladder) => (
-              <ScoreLadder
-                key={ladder.label}
-                label={ladder.label}
-                value={ladder.value}
-                previous={ladder.previous}
-                previousLabel="Period B"
-                lines={ladder.lines}
-              />
-            ))}
-            {/* Named for what it costs a company, not for the bond index it is read
-                from (Moody's BBB corporate yield over the 10-year Treasury). */}
-            <div className="space-y-1">
-              <FactList>
-                <Fact
-                  label="Corporate borrowing premium, A minus B"
-                  value={bbbA !== null && bbbB !== null ? `${(bbbA - bbbB).toFixed(2)}%` : "—"}
-                />
-              </FactList>
-              <p className="text-xs text-slate-400">{bbbDetail}</p>
-            </div>
-          </div>
-          <p className="mt-2 text-fluid-xs text-slate-400">
-            Period A is the filled dot, period B the hollow one; the lines are the ones in force in period A.
-          </p>
-        </section>
-
-        <div id="ops-compare-grid" className="grid gap-6 lg:grid-cols-2">
-          <ComparePeriodColumn snapshot={snapA} report={reportA} label="Period A" />
-          <ComparePeriodColumn snapshot={snapB} report={reportB} label="Period B" />
-        </div>
-      </div>
+      {compareContent}
     </ReportShell>
   );
 }
