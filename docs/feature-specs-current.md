@@ -3691,6 +3691,29 @@ tables); what remains are floors that remap five raw Tailwind families for
 The remaining families migrate file by file against the ratchet; alphas without
 an exact token twin need a visual pass (`ui:iterate`, both themes) to move.
 
+### 1.1.86 Crossing sentences read as American English (2026-10-21)
+
+A copy pass over the rendered surfaces (`/`, `/signals`, `/trust`, `/operate`, an
+answer page, `/share`) found the prose in good shape except one family of
+sentences that read as translated English, in the one line a reader meets first:
+the verdict's cause line.
+
+- **"rose/fell through N"** ("Risk appetite fell through 54.") — "fall through"
+  is what a deal does. Crossing is going past a line, so the preposition now
+  follows the direction: **rose above N, fell below N** (`describeCrossing`,
+  `lib/report/decisionMovement.ts` — the verdict cause, the areas' Changed
+  cells, the group clauses, and every paste that carries them).
+- **"past months can't be checked with them"** (`NOT_COUNTED_REASON` and its two
+  siblings, `lib/report/scoringBasis.ts`) — a stranded preposition with no agent.
+  Now **"they can't be scored against past month-ends"**: the same fact, still in
+  a reader's words, with the verb the method page already owns. The doc comment
+  records why "the record cannot test them" stays out (insider noun).
+- **"no month-end history for them to be tested on"** (`formulaReference.tsx`) →
+  **"no month-end history to score them against"**, matching the sentence above.
+
+Pins updated in 14 test files; `briefFormats.golden.json` regenerated with the
+suite's own UPDATE mode, and its diff checked to contain only these sentences.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

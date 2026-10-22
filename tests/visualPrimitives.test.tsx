@@ -249,7 +249,7 @@ describe("AreaTable moved rows", () => {
         caption="test"
         rows={[
           { area: "hiring", rule: "Backfills only.", changed: "Pause still applies: no line crossed since Sep 30." },
-          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Resume line no longer met: risk appetite fell through 54.", moved: true },
+          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Resume line no longer met: risk appetite fell below 54.", moved: true },
         ]}
       />,
     );
@@ -410,7 +410,7 @@ describe("TrustStrip", () => {
     );
     assert.match(
       html,
-      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They are left out because past months can(&#x27;|')t be checked with them\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
+      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They are left out because they can(&#x27;|')t be scored against past month-ends\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
     );
   });
 });

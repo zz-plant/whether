@@ -142,7 +142,7 @@ describe("buildHomeBriefModel", () => {
        crosses the pause line at 56, so four of the five areas pause. */
     assert.equal(
       dated.weeklyMovement.summary,
-      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose through 56.",
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose above 56.",
     );
     assert.equal(dated.decisionMovement?.comparedWith, "Aug 31");
     assert.doesNotMatch(dated.weeklyMovement.summary, /Pressure increased|Slow new commitments/);
@@ -153,7 +153,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(undated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs last week");
     assert.equal(undated.weeklyLeadershipSummary.comparedWith, undefined);
     assert.equal(undated.weeklyLeadershipSummary.shorthandLine, "Operating latitude unchanged since last week.");
-    assert.match(undated.weeklyMovement.summary, /^This week, the pause now applies to .*, because funding pressure rose through 56\.$/);
+    assert.match(undated.weeklyMovement.summary, /^This week, the pause now applies to .*, because funding pressure rose above 56\.$/);
   });
 
   /*
@@ -185,7 +185,7 @@ describe("buildHomeBriefModel", () => {
 
     assert.equal(
       model.weeklyMovement.summary,
-      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose through 76 and risk appetite fell through 44.",
+      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose above 76 and risk appetite fell below 44.",
     );
     assert.equal(model.decisionShiftHeadline, model.weeklyMovement.summary);
     assert.equal(model.decisionMovement?.moved.length, 5);

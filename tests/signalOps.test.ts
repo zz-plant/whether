@@ -243,7 +243,7 @@ describe("signalOps", () => {
     assert.equal(
       deltas.some((delta) => delta.decisionArea === "hiring"),
       false,
-      "risk appetite fell through 50, not through Hiring's pause line at 44",
+      "risk appetite fell below 50, not through Hiring's pause line at 44",
     );
 
     const change = deltas.find((delta) => delta.code === "regime-change");

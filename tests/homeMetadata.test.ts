@@ -97,7 +97,7 @@ describe("buildHomeMetadata", () => {
 
 /*
  * A link preview has 210 characters and the card's change box 140. The sentence that says which lines a
- * week crossed ran past both and was cut in the middle of them ("...funding pressure rose through 76
+ * week crossed ran past both and was cut in the middle of them ("...funding pressure rose above 76
  * and risk…"), so those two surfaces carry the consequence without the evidence.
  */
 describe("what the share preview says changed", () => {

@@ -392,7 +392,7 @@ export function FormulaReference({
             {recordBasis.shown.length > 0 ? (
               <li>
                 <span className="text-slate-400">Shown, not counted:</span>{" "}
-                {joinAnd(recordBasis.shown)}. The record has no month-end history for them to be tested on.
+                {joinAnd(recordBasis.shown)}. The record has no month-end history to score them against.
               </li>
             ) : null}
           </ul>
