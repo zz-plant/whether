@@ -26,9 +26,11 @@ import {
   getPostureArchivePeriods,
   buildPostureArchivePath,
 } from "../summary/postureArchive";
+import { answerPages, matchDecisionPage } from "../../app/answers/decisionPages";
+import { getRegimePublicLabel } from "../regimePresentation";
 import { buildCanonicalUrl } from "../seo";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
-import { createAgentToolRegistry, defineTool } from "./registry";
+import { AgentInputError, createAgentToolRegistry, defineTool } from "./registry";
 
 /**
  * Every tool an agent can call, defined once.
@@ -49,6 +51,36 @@ const REGIME_ARGUMENT =
   "A regime by key (SCARCITY, DEFENSIVE, VOLATILE, EXPANSION) or by the word the site prints (Freezing, Cloudy, Stormy, Sunny), in any case.";
 
 const cadenceInput = z.preprocess(lowerCasedInput, z.enum(supportedAgentCadences));
+
+/** What `get_answer` returns: one answer page's guidance with this week's standing and rules. */
+export const decisionAnswerOutputSchema = z.looseObject({
+  type: z.literal("decision_answer"),
+  slug: z.string(),
+  title: z.string(),
+  permalink: z.string(),
+  category: z.enum(["climate", "decision", "explanation"]),
+  shortAnswer: z.string(),
+  directAnswer: z.string(),
+  audience: z.string(),
+  currentStanding: z.object({
+    recordDate: z.string(),
+    conditions: z.string(),
+    scores: z.looseObject({ tightness: z.number(), riskAppetite: z.number() }),
+  }),
+  rulesInForce: z.array(
+    z.object({
+      area: z.string(),
+      actionNow: z.string(),
+      pauseIf: z.string(),
+      resumeWhen: z.string(),
+    }),
+  ),
+  companyInputs: z.array(z.string()),
+  decisionNoteTemplate: z.string(),
+  citation: z.string(),
+  attributionSnippet: z.string(),
+  use: z.object({ summary: z.string(), humanReview: z.string(), policy: z.string() }),
+});
 
 /** Where an input came from, so an answer computed from today's reading says so instead of passing as the caller's own. */
 const used = <Value extends string | number>(value: Value, from: "given" | "today" | "assumed") => ({ value, from });
@@ -139,6 +171,61 @@ const AGENT_TOOLS = [
         };
       }
       return { ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() };
+    },
+  }),
+  defineTool({
+    name: "get_answer",
+    title: "Get decision answer",
+    description:
+      "Get Whether's curated operating guidance, current standing, and bounded rules for one of its decision answers — hiring, roadmap expansion, raising capital, burn, sales headcount, product lines, go-to-market, briefing executives, or this week's funding climate and risk-on/risk-off posture.",
+    input: {
+      question: textInput.describe("A question, topic, or answer slug (e.g. 'should-we-freeze-or-selectively-hire', 'should we freeze hiring', 'cut burn')."),
+    },
+    example: { question: "should-we-freeze-or-selectively-hire" },
+    output: decisionAnswerOutputSchema,
+    run: async ({ question }) => {
+      const page = matchDecisionPage(question);
+      if (!page) {
+        const availableTopics = answerPages.map((candidate) => candidate.slug);
+        const message = `No answer found matching ${JSON.stringify(question)}. Available decision topics: ${availableTopics.join(", ")}.`;
+        throw new AgentInputError(message, "invalid_arguments", [
+          { argument: "question", message: `Unknown decision topic ${JSON.stringify(question)}.`, allowed: availableTopics },
+        ]);
+      }
+      const { reportData, snapshot } = await loadWeeklyBriefSnapshot();
+      const mappedRules = snapshot.homeBriefModel.decisionRules.filter((rule) =>
+        page.mappedDecisionAreas.includes(rule.area),
+      );
+      const permalink = buildCanonicalUrl(`/answers/${page.slug}`);
+      const recordDate = reportData.recordDateLabel;
+      const conditions = getRegimePublicLabel(reportData.assessment.regime);
+
+      return {
+        type: "decision_answer",
+        slug: page.slug,
+        title: page.title,
+        permalink,
+        category: page.category,
+        shortAnswer: page.shortAnswer,
+        directAnswer: page.directAnswer,
+        audience: page.audience,
+        currentStanding: {
+          recordDate,
+          conditions,
+          scores: reportData.assessment.scores,
+        },
+        rulesInForce: mappedRules.map((rule) => ({
+          area: rule.area,
+          actionNow: rule.doNow[0] ?? rule.recommendation,
+          pauseIf: rule.pauseTrigger,
+          resumeWhen: rule.resumeTrigger,
+        })),
+        companyInputs: page.companyInputs,
+        decisionNoteTemplate: page.decisionNote,
+        citation: `Whether Weekly Brief (Week of ${recordDate}): "${page.title}" — ${permalink}`,
+        attributionSnippet: `According to Whether's weekly guidance for startup leaders (Week of ${recordDate}, ${permalink}): "${page.shortAnswer}"`,
+        use: buildUseConstraint(),
+      };
     },
   }),
   defineTool({

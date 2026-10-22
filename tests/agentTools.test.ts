@@ -4,7 +4,7 @@ import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv
 import { REGIME_KEYS } from "../lib/agent/inputs";
 import { z } from "zod";
 import { AgentInputError, createAgentToolRegistry, defineTool, describeToolParams, labelChoices } from "../lib/agent/registry";
-import { callAgentTool, describeAgentTools, listAgentTools, runAgentTool } from "../lib/agent/tools";
+import { callAgentTool, decisionAnswerOutputSchema, describeAgentTools, listAgentTools, runAgentTool } from "../lib/agent/tools";
 import { loadAgentInterfaceContext } from "../lib/agentInterface";
 import { buildAgentState } from "../lib/agentState";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
@@ -77,6 +77,36 @@ describe("the agent tool registry", () => {
     assert.equal(period.type, "posture_archive_period");
     assert.equal(period.slug, "2024-q1");
     assert.equal(period.kind, "quarter");
+  });
+
+  it("answers a decision question through get_answer with structured guidance and citeable quote", async () => {
+    const bySlug = decisionAnswerOutputSchema.parse(
+      await runAgentTool("get_answer", { question: "should-startups-raise-capital-now" }, "http"),
+    );
+    assert.equal(bySlug.type, "decision_answer");
+    assert.equal(bySlug.slug, "should-startups-raise-capital-now");
+    assert.ok(bySlug.shortAnswer.length > 0);
+    assert.ok(bySlug.directAnswer.length > 0);
+    assert.ok(bySlug.currentStanding.recordDate.length > 0);
+    assert.ok(bySlug.citation.includes("https://whether.work/answers/should-startups-raise-capital-now"));
+    assert.ok(bySlug.attributionSnippet.includes("According to Whether's weekly guidance"));
+
+    // A natural-language question resolves through the page's own keyword and title.
+    const byQuestion = decisionAnswerOutputSchema.parse(
+      await runAgentTool("get_answer", { question: "should we freeze hiring" }, "http"),
+    );
+    assert.equal(byQuestion.slug, "should-we-freeze-or-selectively-hire");
+
+    // A slug fragment resolves through the hyphenated form.
+    const byFragment = decisionAnswerOutputSchema.parse(
+      await runAgentTool("get_answer", { question: "cut burn" }, "http"),
+    );
+    assert.equal(byFragment.slug, "when-should-startups-cut-burn");
+
+    // A topic the answers don't cover is refused with the list of what does exist.
+    const unknown = await refusal(runAgentTool("get_answer", { question: "bridge round" }, "http"));
+    assert.match(unknown.message, /Available decision topics/);
+    assert.ok(unknown.problems.some((problem) => problem.allowed?.includes("should-startups-raise-capital-now")));
   });
 
   it("refuses a tool that does not exist, and lists the ones that do", async () => {

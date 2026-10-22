@@ -85,6 +85,41 @@ const answerPageBySlug = new Map(answerPages.map((page) => [page.slug, page]));
 export const findDecisionPage = (slug: string) => answerPageBySlug.get(slug);
 
 /**
+ * Finds the decision page matching an exact slug, a partial slug, or a natural language query.
+ * Used by agent tool calling and API endpoints so callers can look up guidance by question or topic.
+ */
+export const matchDecisionPage = (query: string): DecisionPageDefinition | undefined => {
+  const normalized = query.trim().toLowerCase();
+  if (!normalized) return undefined;
+
+  const direct = answerPageBySlug.get(normalized);
+  if (direct) return direct;
+
+  /* A natural-language phrase matches a slug fragment once spaces read as hyphens
+     ("cut burn" → "when-should-startups-cut-burn"); the keyword and title checks below
+     handle the rest of the natural language. */
+  const hyphenated = normalized.replace(/\s+/g, "-");
+  const slugMatch = answerPages.find((page) => page.slug === hyphenated || page.slug.includes(hyphenated));
+  if (slugMatch) return slugMatch;
+
+  const keywordMatch = answerPages.find((page) => page.keyword.toLowerCase().includes(normalized));
+  if (keywordMatch) return keywordMatch;
+
+  const titleMatch = answerPages.find((page) => page.title.toLowerCase().includes(normalized));
+  if (titleMatch) return titleMatch;
+
+  const tokens = normalized.split(/\s+/).filter((word) => word.length >= 3);
+  if (tokens.length > 0) {
+    return answerPages.find((page) => {
+      const pageText = `${page.slug} ${page.keyword} ${page.title}`.toLowerCase();
+      return tokens.every((token) => pageText.includes(token));
+    });
+  }
+
+  return undefined;
+};
+
+/**
  * The decision answer that leads with this area, for a surface that offers one
  * answer per area (the homepage's first-visit picker). A page counts only when
  * the area is the first it maps: every page lists spending among its areas, and
