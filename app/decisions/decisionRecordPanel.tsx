@@ -15,6 +15,7 @@ import { usePersistentClientId } from "../components/clientIdentity";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { useHydrated } from "../components/browserSource";
 import { fetchDecisionLedger } from "../components/decisionLedgerClient";
+import { MonthStrip } from "../components/history/monthStrip";
 import {
   buildDecisionRecordView,
   type CurrentConditions,
@@ -31,6 +32,17 @@ const VERDICT_STYLES: Record<DecisionRecordRow["verdict"], string> = {
   STAND: "border-emerald-400/40 bg-emerald-400/10 text-emerald-200",
   WATCH: "border-amber-400/40 bg-amber-400/10 text-amber-200",
   RECONSIDER: "border-rose-400/40 bg-rose-400/10 text-rose-200",
+};
+
+/*
+ * The marker diamonds take the same verdict hues the badges on this page
+ * wear, so a diamond and its row match without a second key: this page has
+ * one verdict vocabulary, and the strip borrows it (2026-10-21).
+ */
+const VERDICT_MARKER_FILL: Record<DecisionRecordRow["verdict"], string> = {
+  STAND: "bg-emerald-400/80",
+  WATCH: "bg-amber-400/80",
+  RECONSIDER: "bg-rose-400/80",
 };
 
 /* A filter is a key, not a verdict stamp: it used to wear VERDICT_STYLES' colours
@@ -108,7 +120,13 @@ const EmptyState = () => (
   </div>
 );
 
-export const DecisionLedgerView = ({ view }: { view: DecisionRecordView }) => {
+export const DecisionLedgerView = ({
+  view,
+  record,
+}: {
+  view: DecisionRecordView;
+  record?: readonly { recordDate: string; regime: string; tightness?: number; riskAppetite?: number }[];
+}) => {
   const [filter, setFilter] = useState<"all" | "RECONSIDER" | "WATCH" | "STAND">("all");
 
   if (view.rows.length === 0) {
@@ -144,6 +162,21 @@ export const DecisionLedgerView = ({ view }: { view: DecisionRecordView }) => {
           ) : null}
         </fieldset>
       </div>
+      {/* The decisions on the record's timeline: one diamond per decision,
+          against the month whose reading it was made in, in the verdict the
+          badges below carry. What it encodes is the thing the tags can't show
+          at a glance — decided in Sunny, reconsidered now (2026-10-21). */}
+      {record && record.length > 0 ? (
+        <MonthStrip
+          entries={record}
+          markers={view.rows.map((row) => ({
+            recordDate: row.recordDate,
+            label: `${row.title} — recorded against the ${row.recordedOn} reading — ${row.verdict}: ${row.verdictSentence}`,
+            fillClassName: VERDICT_MARKER_FILL[row.verdict],
+          }))}
+          markersLegend="A diamond marks a decision recorded from this browser, against the month whose reading it assumed."
+        />
+      ) : null}
       <ul className="space-y-3">
         {filteredRows.map((row) => (
           <RecordRow key={row.id} row={row} />
@@ -153,7 +186,13 @@ export const DecisionLedgerView = ({ view }: { view: DecisionRecordView }) => {
   );
 };
 
-export const DecisionRecordPanel = ({ current }: { current: CurrentConditions }) => {
+export const DecisionRecordPanel = ({
+  current,
+  record,
+}: {
+  current: CurrentConditions;
+  record?: readonly { recordDate: string; regime: string; tightness?: number; riskAppetite?: number }[];
+}) => {
   const clientId = usePersistentClientId();
   const hydrated = useHydrated();
   const [state, setState] = useState<PanelState>({ status: "reading" });
@@ -206,5 +245,5 @@ export const DecisionRecordPanel = ({ current }: { current: CurrentConditions })
     return <p className="text-sm leading-6 text-amber-200">{state.reason}</p>;
   }
 
-  return <DecisionLedgerView view={state.view} />;
+  return <DecisionLedgerView view={state.view} record={record} />;
 };
