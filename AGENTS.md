@@ -37,7 +37,7 @@ If guidance conflicts, obey the higher-priority source and note the conflict in 
 - Build: `bun run build`
 - Full checks: `bun run check`
 - Lint: `bun run lint`
-- Tests: `bun run test` (full suite, ~14s — it runs offline; see docs/agents/lessons/toolchain-and-gates.md)
+- Tests: `bun run test` (full suite, ~20s sharded — it runs offline; see docs/agents/lessons/toolchain-and-gates.md)
 - CI: `.github/workflows/ci.yml` is manual-only (`workflow_dispatch`). The gates that run are `.husky/pre-push` and Cloudflare Workers Builds; see "Local gate enforced, remote gate on every push" below.
 
 Use targeted tests when possible before running full checks:

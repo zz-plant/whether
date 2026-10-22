@@ -11,6 +11,7 @@
  */
 import path from 'node:path';
 import { spawn } from 'node:child_process';
+import { availableParallelism } from 'node:os';
 
 import { isDeployGate } from './deploy-gate.mjs';
 import { walkFiles } from './walk-files.mjs';
@@ -130,26 +131,103 @@ for (const key of [
   delete childEnv[key];
 }
 
-// One process runs every file, so module state leaks between them; the gate shuffles and
-// bun prints the seed, which BUN_TEST_SEED replays.
+// One process runs every file of a shard, so module state still leaks within it; the gate
+// shuffles and bun prints the seed, which BUN_TEST_SEED replays (shard i gets base seed + i).
 const randomize = inDeployGate || process.env.BUN_TEST_RANDOMIZE === '1';
 const seed = process.env.BUN_TEST_SEED;
-const orderArgs = seed ? ['--randomize', `--seed=${seed}`] : randomize ? ['--randomize'] : [];
+const buildOrderArgs = (seed) => (seed ? ['--randomize', `--seed=${seed}`] : randomize ? ['--randomize'] : []);
 
 // The gate prints failures only: a line per passing test is ~3,000 lines a build log
 // window drops the failure behind. BUN_TEST_ONLY_FAILURES=1 asks for the same anywhere.
 const quietArgs = inDeployGate || process.env.BUN_TEST_ONLY_FAILURES === '1' ? ['--only-failures'] : [];
 
-const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...concurrencyArgs, ...orderArgs, ...quietArgs, ...targetArgs], {
-  stdio: 'inherit',
-  env: childEnv,
-});
+/*
+ * Shards: bun runs test files sequentially in one process, and the suite is CPU-bound
+ * (26.9s of testcase time; half of it two infrastructure suites that spawn dev servers
+ * and CLI child processes). Sharding the same file list across N bun processes cuts the
+ * wall clock roughly by N on a box with the cores to give, with no change to what runs:
+ * every file still runs exactly once, shuffled within its shard, under the same preload
+ * and timeout. Each shard is one process, so the module-state property above is unchanged
+ * per shard; seed replay is shard i = base seed + i.
+ *
+ * Default: one shard per available core, capped at 3 — fixture suites spawn children
+ * (the CLI suite alone spawns 62), and the cap keeps the total bounded. Override with
+ * BUN_TEST_SHARDS; a run with a path filter stays one process, since the caller named
+ * what they want.
+ */
+const children = [];
 
-child.on('exit', (code, signal) => {
-  if (signal) {
-    process.kill(process.pid, signal);
+const spawnShard = (shardSeed, files) => {
+  const orderArgs = buildOrderArgs(shardSeed);
+  const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...concurrencyArgs, ...orderArgs, ...quietArgs, ...files], {
+    stdio: 'inherit',
+    env: childEnv,
+  });
+  children.push(child);
+  return child;
+};
+
+const runSingleProcess = (shardSeed, args) => {
+  const child = spawnShard(shardSeed, args);
+  child.on('exit', (code, signal) => {
+    if (signal) {
+      process.kill(process.pid, signal);
+      return;
+    }
+
+    process.exit(code ?? 1);
+  });
+};
+
+const shardEnv = Number.parseInt(process.env.BUN_TEST_SHARDS ?? '', 10);
+const defaultShards = Math.min(3, Math.max(1, availableParallelism()));
+const requestedShards = Number.isFinite(shardEnv) && shardEnv > 0 ? shardEnv : defaultShards;
+const shardCount = hasPathFilter(extraArgs) ? 1 : requestedShards;
+
+// Top-level await is available in an .mjs script; the sharded path waits for every shard.
+const runSharded = async () => {
+  const baseSeed = seed !== undefined ? Number.parseInt(seed, 10) : undefined;
+  if (seed !== undefined && !Number.isFinite(baseSeed)) {
+    console.error(`[test-runner] sharding requires a numeric BUN_TEST_SEED for replay (got "${seed}"); running one process.`);
+  }
+
+  const effectiveShards = seed === undefined || Number.isFinite(baseSeed) ? shardCount : 1;
+  if (effectiveShards <= 1) {
+    runSingleProcess(seed, targetArgs);
     return;
   }
 
-  process.exit(code ?? 1);
-});
+  // Sharding needs individual file paths: bun runs a directory argument wholesale, so
+  // every shard would run the whole suite. The gate's defaultTargets are already files;
+  // a local run expands them here, exactly as collectTestFiles found them.
+  const files = inDeployGate
+    ? defaultTargets
+    : collectTestFiles().map((file) => path.relative(process.cwd(), file));
+  const seedBase = baseSeed ?? Math.floor(Math.random() * 2147483647);
+  const flagArgs = targetArgs.filter((arg) => arg.startsWith('-'));
+  console.log(`[test-runner] sharding ${files.length} file(s) across ${effectiveShards} processes (seed base ${seedBase}; override with BUN_TEST_SHARDS).`);
+
+  const chunkSize = Math.ceil(files.length / effectiveShards);
+  const shards = [];
+  for (let index = 0; index < effectiveShards; index += 1) {
+    const chunk = files.slice(index * chunkSize, (index + 1) * chunkSize);
+    const child = spawnShard(String(seedBase + index), [...flagArgs, ...chunk]);
+    shards.push(child);
+  }
+
+  const results = await Promise.all(
+    shards.map((child) => new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal })))),
+  );
+  const signaled = results.find((result) => result.signal);
+  if (signaled) {
+    for (const child of children) child.kill(signaled.signal);
+    process.kill(process.pid, signaled.signal);
+    return;
+  }
+
+  const failed = results.filter((result) => (result.code ?? 1) !== 0).length;
+  console.log(`[test-runner] ${effectiveShards} shard(s) finished, ${failed} failed.`);
+  process.exit(failed > 0 ? 1 : 0);
+};
+
+await runSharded();
