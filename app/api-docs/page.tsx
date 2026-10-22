@@ -280,14 +280,15 @@ export default function ApiDocsPage() {
               series-a, series-b, or growth.
             </Endpoint>
             <Endpoint
-              signature="GET /api/export/board-slide?format=pptx|pdf&stage=seed"
+              signature="GET /api/export/board-slide?format=pptx|pdf&stage=seed&week=2026-w41"
               tryHref="/api/export/board-slide?format=pptx&stage=seed"
               tryLabel="Download PPTX"
               tryAriaLabel="Download the board slide as a PowerPoint file"
             >
               The same slide as a file: a one-slide native PPTX with every box editable, or a
               one-page widescreen PDF for a pre-read. Served as an attachment. Takes the same stage
-              values as the SVG.
+              values as the SVG. With `week`, the slide is the frozen brief as published — no
+              stage, and a brief from before scores were stored prints no scores.
             </Endpoint>
             <Endpoint
               signature="GET /api/embed?format=text|json|html"

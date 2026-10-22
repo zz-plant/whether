@@ -67,8 +67,12 @@ export const publishedBriefToSlidePayload = (
     actionNow: headline.action,
     pauseIf: display.pauseIf ?? "No pause line was published with this brief.",
     callChangesIf: display.conditionsChangeIf,
-    tightness: brief.scores?.tightness ?? 50,
-    riskAppetite: brief.scores?.riskAppetite ?? 50,
+    // A brief archived before scores were stored prints no scores at all: the
+    // reading section says so (`slideReadingLines`) rather than rendering
+    // invented 50/50 as the record's readings.
+    ...(brief.scores
+      ? { tightness: brief.scores.tightness, riskAppetite: brief.scores.riskAppetite }
+      : {}),
     confidence: brief.confidenceLabel,
     provenance: brief.sourceLabel,
     basis: display.basis.sentence,
