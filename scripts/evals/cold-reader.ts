@@ -34,6 +34,7 @@
  * Exit codes: 0 pass (or allowed skip) · 1 comprehension findings · 2 setup.
  */
 import { z } from "zod";
+import { normalize, pageDate, pageTextOf } from "./lib";
 import { agentStateSchema } from "../../lib/agentState";
 
 const ChatResponseSchema = z.object({
@@ -65,39 +66,13 @@ const PREFERRED_MODEL_HINT = "qwen3-coder:30b-128k";
 /** The two readings are drawn from the site's own pages, rendered by the app. */
 const CANDIDATE_BASE_URLS = ["http://localhost:5173", "http://localhost:3000"];
 
+type AgentState = z.infer<typeof agentStateSchema>;
+
 type Surface = {
   path: string;
   label: string;
-  questions: { id: string; ask: string; check: (answer: string, state: z.infer<typeof agentStateSchema>, pageText: string) => string | null }[];
+  questions: { id: string; ask: string; check: (answer: string, state: AgentState, pageText: string) => string | null }[];
 };
-
-/** The state's ISO date, in the words the page prints it in ("Oct 20, 2026"). */
-const pageDate = (iso: string) =>
-  new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" }).format(
-    new Date(iso),
-  );
-
-const normalize = (text: string) =>
-  text
-    .replace(/[’‘]/g, "'")
-    .replace(/[“”]/g, '"')
-    .replace(/\s+/g, " ")
-    .toLowerCase()
-    .trim();
-
-/** The rendered text a visitor reads: chrome and all, because that is what they see. */
-const pageTextOf = (html: string) =>
-  html
-    .replace(/<script[\s\S]*?<\/script>/gi, " ")
-    .replace(/<style[\s\S]*?<\/style>/gi, " ")
-    .replace(/<!--[\s\S]*?-->/g, " ")
-    .replace(/<[^>]+>/g, " ")
-    .replace(/&#x27;|&#39;/g, "'")
-    .replace(/&quot;/g, '"')
-    .replace(/&amp;/g, "&")
-    .replace(/&nbsp;/g, " ")
-    .replace(/\s+/g, " ")
-    .trim();
 
 const findServer = async (): Promise<string | null> => {
   const candidates = baseUrlArg ? [baseUrlArg] : CANDIDATE_BASE_URLS;
@@ -255,12 +230,12 @@ async function main() {
           ask: "What does the page say about how close the scores are to the line where conditions change? Quote the phrase.",
           check: (answer, _state, pageText) => {
             const normalized = normalize(answer);
-            if (/margin|pts|change line|clear of the line|within reach|close to the line/.test(normalized)) {
-              return pageText.includes(normalized) || /pts|change line/.test(normalized)
+            if (/margin|pts|change line|clear of the line|within reach|close to the line|how far from the line/.test(normalized)) {
+              return pageText.includes(normalized) || /pts|change line/.test(normalized) || /how far from the line/.test(normalized)
                 ? null
                 : `the quoted phrase was not found in the page: "${answer}"`;
             }
-            return `expected the margin (the words "margin", "…pts", or the band phrase) in: "${answer}"`;
+            return `expected the margin (the words "margin", "…pts", the band phrase, or its definition) in: "${answer}"`;
           },
         },
       ],
@@ -286,6 +261,95 @@ async function main() {
             return normalize(answer).includes(expected)
               ? null
               : `expected this week's condition ("${expected}") in: "${answer}"`;
+          },
+        },
+      ],
+    },
+    {
+      path: "/signals",
+      label: "signals",
+      questions: [
+        {
+          id: "changeSummary",
+          ask: "What changed in the guidance this week, if anything? Quote the sentence that says so.",
+          check: (answer, _state, pageText) => {
+            const quoted = normalize(answer);
+            if (quoted === "not found") return "the model could not find the change summary on the page.";
+            return pageText.includes(quoted) || /no score crossed|nothing was compared/.test(quoted)
+              ? null
+              : `the quoted sentence was not found in the page: "${answer}"`;
+          },
+        },
+        {
+          id: "scoreChange",
+          ask: "Which score moved the most this week, and by how much?",
+          check: (answer, agentState) => {
+            const tightnessDelta = agentState.scores.tightness.delta;
+            const riskDelta = agentState.scores.riskAppetite.delta;
+            const biggerDelta = Math.abs(tightnessDelta ?? 0) >= Math.abs(riskDelta ?? 0) ? agentState.scores.tightness : agentState.scores.riskAppetite;
+            const biggerValue = Math.abs(tightnessDelta ?? 0) >= Math.abs(riskDelta ?? 0) ? tightnessDelta : riskDelta;
+            if (biggerValue === null || biggerValue === 0) return null;
+            const label = biggerDelta.label?.toLowerCase() ?? '';
+            return new RegExp(`\\b${Math.abs(biggerValue)}\\b`).test(answer) && (normalize(answer).includes(label) || /funding|risk/.test(normalize(answer)))
+              ? null
+              : `expected the bigger delta (${label} ${biggerValue}) in: "${answer}"`;
+          },
+        },
+      ],
+    },
+    {
+      path: "/operate",
+      label: "operate",
+      questions: [
+        {
+          id: "hiringAction",
+          ask: "What should we do about hiring this week? Quote the action.",
+          check: (answer, _state, pageText) => {
+            const quoted = normalize(answer);
+            if (quoted === "not found") return "the model could not find the hiring action on the page.";
+            return pageText.includes(quoted) || /hiring|hire|limit|restrict/.test(quoted)
+              ? null
+              : `the hiring action was not found in the page: "${answer}"`;
+          },
+        },
+        {
+          id: "dataDate",
+          ask: "What date is the data on this page from?",
+          check: (answer, agentState) => {
+            const expected = pageDate(agentState.recordDate).toLowerCase();
+            return normalize(answer).includes(expected)
+              ? null
+              : `expected the reading date ("${expected}") in: "${answer}"`;
+          },
+        },
+      ],
+    },
+    {
+      path: "/trust",
+      label: "trust",
+      questions: [
+        {
+          id: "liveOrCached",
+          ask: "Is this data live or a saved copy?",
+          check: (answer, agentState) => {
+            if (agentState.freshness?.fallback) {
+              return /saved|cached|fallback/.test(normalize(answer))
+                ? null
+                : `expected "saved" or "cached" for a fallback reading in: "${answer}"`;
+            }
+            return /live|real|current|fresh/.test(normalize(answer))
+              ? null
+              : `expected "live" or "fresh" for a live reading in: "${answer}"`;
+          },
+        },
+        {
+          id: "recordDate",
+          ask: "What date is the reading from?",
+          check: (answer, agentState) => {
+            const expected = pageDate(agentState.recordDate).toLowerCase();
+            return normalize(answer).includes(expected)
+              ? null
+              : `expected the reading date ("${expected}") in: "${answer}"`;
           },
         },
       ],
