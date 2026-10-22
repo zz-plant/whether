@@ -46,11 +46,11 @@ export const buildLlmsTxt = (baseUrl: string) => {
       .map((link) => `- ${link.label}: ${baseUrl}${link.href} — ${link.description}`),
   ];
 
-  /* The question-to-URL router: each decision and climate answer is a page that opens with the
-     current posture, so an agent with a user's question can fetch the page that matches it
-     instead of the whole brief. Read from the same list the answer routes serve. */
+  /* The question-to-URL router: each answer is a page that opens with the
+     current posture, so an agent with a user's question can fetch the page that
+     matches it instead of the whole brief. Read from the same list the answer
+     routes serve; every answer is a question, including the explanations. */
   const questionLines = answerPages
-    .filter((page) => page.category === "decision" || page.category === "climate")
     .map((page) => `- ${page.title}: ${baseUrl}/answers/${page.slug}`);
 
   return [
