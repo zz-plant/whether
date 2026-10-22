@@ -59,6 +59,8 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 - Returns summary copy, provenance, and `agentHandoff` (`payload` + `prompt`).
 - The payload now includes `decision_rules`, `decision_delta`, and `flip_watch` so agents can explain what changed, what should change now, and what would flip the call without reconstructing their own regime logic.
 - Returns HTTP 400 for invalid cadence values, and for an unknown `view` (`allowedViews`).
+- `?week=<slug>` (e.g. `2026-w41`) answers that specific frozen week's published brief with its decisions, scores, and provenance. Returns HTTP 404 with `availableWeeks` if unknown.
+- `?period=<slug>` (e.g. `2024-q1` or `2023`) answers that specific posture archive period. Returns HTTP 404 if unknown.
 - `?view=state` answers the compact state above instead of the full brief (default view: `full`).
 - The payload's `confidence` is the published confidence; `decision_delta.compared_with` names the reading the changes are measured against.
 - Includes read-only CORS headers for browser-based tool clients.
@@ -164,7 +166,7 @@ Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 - `get_decision_rules` — the bounded rules by regime. Keyed by regime, one key for one regime.
 - `get_context`, `get_projection` — history and projection for a regime; both default to today's reading. `get_context` counts **months** of month-end snapshots (`monthsActive`, `historicalAvgMonths`), through the `latestSnapshot` it names, because the record is monthly; it was `weeksActive` / `historicalAvgWeeks` over the same monthly series, so an agent told "8 weeks" was being told 8 months. A regime newer than the last month-end has `monthsActive` 0 and a `note` saying so.
 - `get_comps`, `get_signals`, `get_recent_history` — SaaS multiples, data coverage, one signal's trailing window.
-- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `get_analog_playbook` — a plan checked against today's conditions.
+- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `audit_sprint_retro`, `get_analog_playbook` — a plan or sprint retro checked against today's conditions.
 - `list_agent_skills` — the skill contract.
 
 Client config (shape):

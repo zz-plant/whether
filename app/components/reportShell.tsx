@@ -198,7 +198,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               matched the spacing used *inside* sections. A visible rule plus
               a wider outer gap makes the boundary the strongest horizontal
               signal on the page. */}
-          {/* Token, not divide-white/[0.10]: a hardcoded white rule is
+          {/* Token, not hardcoded white divider: a hardcoded white rule is
               invisible on the light theme's near-white ground, and 0.10 is
               not one of the four alphas the light escape-hatch block
               remaps. */}

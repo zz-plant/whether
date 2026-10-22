@@ -304,7 +304,11 @@ export const headerUtilityLinks = utilityLinks.flatMap((link) => (link.header ? 
 export const contentSections = [
   { prefix: "/answers", label: "Answer" },
   { prefix: "/brief", label: "Published brief" },
+  { prefix: "/decisions", label: "Your decisions" },
   { prefix: "/resolve", label: "More tools" },
   { prefix: "/toolkits", label: "Toolkit" },
   { prefix: "/contact", label: "Contact" },
+  { prefix: "/privacy", label: "Privacy" },
+  { prefix: "/acceptable-use-policy", label: "Acceptable Use" },
+  { prefix: "/terms-of-service", label: "Terms" },
 ] as const;

@@ -83,7 +83,7 @@ export default function ApiDocsPage() {
             <div className="flex items-center justify-between text-fluid-micro text-slate-400">
               <span>Claude Code, one line from any directory:</span>
             </div>
-            <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
               claude mcp add --transport http whether {siteUrl}/api/mcp
             </pre>
           </div>
@@ -91,7 +91,7 @@ export default function ApiDocsPage() {
             <div className="flex items-center justify-between text-fluid-micro text-slate-400">
               <span>Claude Desktop (<code className="font-mono text-slate-300">claude_desktop_config.json</code>) or Cursor Settings → MCP:</span>
             </div>
-            <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
               {mcpClientConfig}
             </pre>
           </div>
@@ -330,7 +330,7 @@ export default function ApiDocsPage() {
               Add <span className="font-mono text-slate-100">data-whether-ticker</span> or{" "}
               <span className="font-mono text-slate-100">data-whether-stage</span> to tailor it to one company.
             </p>
-            <pre className="overflow-x-auto rounded-lg border border-white/[0.10] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
               {embedSnippet}
             </pre>
             <Link

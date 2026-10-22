@@ -67,6 +67,18 @@ describe("the agent tool registry", () => {
     assert.ok(!listAgentTools("stdio").some((tool) => tool.name === "get_agent_brief"), "an alias is not listed twice");
   });
 
+  it("returns a frozen published brief when requested by week, and posture archive when requested by period", async () => {
+    const w41 = await runAgentTool("get_brief", { week: "2026-w41" }, "http");
+    assert.equal(w41.type, "published_brief");
+    assert.equal(w41.slug, "2026-w41");
+    assert.ok(w41.headline);
+
+    const period = await runAgentTool("get_brief", { period: "2024-q1" }, "http");
+    assert.equal(period.type, "posture_archive_period");
+    assert.equal(period.slug, "2024-q1");
+    assert.equal(period.kind, "quarter");
+  });
+
   it("refuses a tool that does not exist, and lists the ones that do", async () => {
     const error = await refusal(runAgentTool("get_weather", {}, "http"));
 
@@ -244,6 +256,14 @@ describe("the arguments an agent leaves out", () => {
     assert.match(standupLine, /Conditions change if/);
     assert.ok(result.regime);
   });
+
+  it("audit_sprint_retro audits commitments against today's pause lines", async () => {
+    const report = await runAgentTool("audit_sprint_retro", { planText: "Hire 4 engineers with 8 months cash" }, "http");
+    assert.ok(report.regime);
+    assert.ok(typeof report.headline === "string");
+    assert.ok(Array.isArray(report.activePauseTriggers));
+    assert.ok(typeof report.markdown === "string");
+  });
 });
 
 describe("the catalogue rows", () => {
@@ -255,7 +275,10 @@ describe("the catalogue rows", () => {
 
     assert.ok(projection && brief && history);
     assert.equal(describeToolParams(rows.find((row) => row.name === "get_state")?.arguments ?? []), "none");
-    assert.equal(describeToolParams(brief.arguments), "cadence (optional: weekly/monthly/quarterly/yearly)");
+    assert.equal(
+      describeToolParams(brief.arguments),
+      "cadence (optional: weekly/monthly/quarterly/yearly), week (optional), period (optional)",
+    );
     assert.match(describeToolParams(history.arguments), /^signal_key \(required: TREASURY_1M\/TREASURY_3M/);
     assert.match(describeToolParams(projection.arguments), /tightness \(optional number\), riskAppetite \(optional number\)/);
     assert.deepEqual(brief.aliases, ["get_agent_brief"]);

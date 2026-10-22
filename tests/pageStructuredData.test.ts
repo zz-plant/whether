@@ -5,6 +5,7 @@ import {
   buildApiDocsStructuredData,
   buildCompsStructuredData,
   buildHistoryStructuredData,
+  buildPublishedBriefStructuredData,
   buildToolkitHowTo,
 } from "../lib/seo/pageStructuredData";
 import { buildHomeStructuredData } from "../lib/report/home/structuredData";
@@ -155,5 +156,25 @@ describe("/answers/[slug]", () => {
     const questions = faq.mainEntity as Array<{ name: string }>;
     assert.equal(questions.length, 2);
     assert.equal(questions[1].name, "What would change this answer?");
+  });
+});
+
+describe("/brief/[week]", () => {
+  it("declares Article schema with temporalCoverage and keywords for frozen brief", () => {
+    const briefs = getPublishedBriefs();
+    const brief = briefs[0];
+    assert.ok(brief);
+    const graph = buildPublishedBriefStructuredData({
+      brief,
+      canonicalUrl: `https://whether.work/brief/${brief.slug}`,
+      imageUrl: `https://whether.work/brief/${brief.slug}/opengraph-image`,
+      headline: "Test headline",
+      description: "Test description",
+    });
+    const article = one(graph, "Article");
+    assert.equal(article.headline, "Test headline");
+    assert.equal(article.datePublished, brief.publishedAt);
+    assert.equal(article.temporalCoverage, `${brief.recordDate}/${brief.recordDate}`);
+    assert.ok(Array.isArray(article.keywords));
   });
 });

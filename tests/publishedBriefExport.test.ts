@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
+  buildPublishedBriefBoardUpdate,
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefSlackUpdate,
   findPublishedBrief,
@@ -242,12 +243,26 @@ describe("published brief date-pinned exports", () => {
     assert.match(email, new RegExp(`Permanent URL: ${expectedUrl}`));
   });
 
+  it("builds Board memo strictly from PublishedBrief with permanent URL and operating limits", () => {
+    assert.ok(july30Brief);
+    const board = buildPublishedBriefBoardUpdate(july30Brief);
+
+    assert.match(board, /^Whether Board Memo — Week of/m);
+    assert.match(board, /^Macro Posture: (Sunny|Cloudy|Stormy|Freezing) \(Margin: .+\)$/m);
+    assert.match(board, /^Executive Guidance: .+/m);
+    assert.match(board, /^Posture Flips If: .+/m);
+    assert.match(board, /Operating Limits by Area:/);
+    assert.match(board, /• Hiring: .+ \(Action: .+\)/);
+    assert.match(board, new RegExp(`Permanent Record: ${buildCanonicalUrl("/brief/2026-w31")}`));
+  });
+
   it("proves July 30 brief exports never read or change with live report data", async () => {
     assert.ok(july30Brief);
 
     // Capture baseline exports from PublishedBrief
     const baselineSlack = buildPublishedBriefSlackUpdate(july30Brief);
     const baselineEmail = buildPublishedBriefEmailUpdate(july30Brief);
+    const baselineBoard = buildPublishedBriefBoardUpdate(july30Brief);
 
     // Even if we import live report modules and inspect reportData, PublishedBrief remains pure
     const { loadReportData } = await import("../lib/report/reportData");
@@ -259,9 +274,11 @@ describe("published brief date-pinned exports", () => {
     // Re-evaluate exports for July 30 brief
     const afterSlack = buildPublishedBriefSlackUpdate(july30Brief);
     const afterEmail = buildPublishedBriefEmailUpdate(july30Brief);
+    const afterBoard = buildPublishedBriefBoardUpdate(july30Brief);
 
     assert.equal(baselineSlack, afterSlack, "Slack brief changed after live data module load!");
     assert.equal(baselineEmail, afterEmail, "Email brief changed after live data module load!");
+    assert.equal(baselineBoard, afterBoard, "Board memo changed after live data module load!");
     assert.ok(!baselineSlack.includes(liveReport.treasury.record_date), "Live record date leaked into frozen Slack brief");
   });
 

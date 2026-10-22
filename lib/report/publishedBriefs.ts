@@ -747,3 +747,30 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
   ].join("\n");
 };
 
+/**
+ * Generates a date-pinned executive board / investor update constructed strictly from PublishedBrief.
+ * Never fetches live report data or external endpoints.
+ */
+export const buildPublishedBriefBoardUpdate = (brief: PublishedBrief): string => {
+  const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
+  const readingLines = buildPublishedBriefReadingLines(brief);
+  const display = publishedBriefDisplay(brief);
+  const decisions = decisionsInAreaOrder(brief).map((decision) =>
+    `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)} (${DECISION_CONTRACT_LABELS.slot.action}: ${display.sentence(decision.doNow)})`,
+  );
+
+  return [
+    `Whether Board Memo — Week of ${publishedBriefWeekLabel(brief)}`,
+    `Macro Posture: ${display.conditions} (Margin: ${display.confidence.toLowerCase()})`,
+    "",
+    `Executive Guidance: ${publishedBriefHeadline(brief).composed}`,
+    ...(display.pauseIf ? [`Operating Threshold: ${display.pauseIf}`] : []),
+    `Posture Flips If: ${display.conditionsChangeIf}`,
+    ...(readingLines.length > 0 ? ["", "Macro Readings:", ...readingLines] : []),
+    ...(decisions.length > 0 ? ["", "Operating Limits by Area:", ...decisions] : []),
+    "",
+    `Permanent Record: ${permalinkUrl} · Captured ${brief.freshnessLabel}`,
+  ].join("\n");
+};
+
+

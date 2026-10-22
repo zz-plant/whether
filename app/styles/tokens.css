@@ -757,16 +757,6 @@ html:not([data-theme="light"]) [class^="text-white/5"], html:not([data-theme="li
 
 /* Slate text is bound to theme text roles via @theme inline in this file */
 [data-theme="light"] .bg-white\/\[0\.04\] { background: var(--bg-nested-light) !important; }
-/* Catch-all first: a white border is invisible on this theme's near-white
-   ground, and the hand-maintained list below had drifted badly from actual
-   usage — it covers four alphas while the app uses eleven, leaving 24 of 41
-   call sites (border-white/[0.10] alone accounts for ten) painting white on
-   white. This floor guarantees any border-white/* stays visible; the specific
-   rules under it still win, via !important, wherever the exact step matters. */
-[data-theme="light"] [class*="border-white/"] { border-color: var(--border-default); }
-[data-theme="light"] [class*="divide-white/"] > * + * { border-color: var(--border-default); }
-
-[data-theme="light"] .border-white\/\[0\.08\] { border-color: var(--border-subtle) !important; }
 
 html[data-theme="light"] .weather-input,
 html[data-theme="light"] .weather-control { color: var(--text-primary); border-color: var(--border-strong); background: var(--bg-panel); }
