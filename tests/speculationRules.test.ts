@@ -17,17 +17,33 @@ const htmlResponse = () =>
     headers: { "content-type": "text/html; charset=utf-8" },
   });
 
+/** The rule's parts, narrowed from JSON at runtime — a header is data, not a type. */
+const ruleParts = (header: string | null) => {
+  if (header === null) return null;
+  const parsed: unknown = JSON.parse(header);
+  if (typeof parsed !== "object" || parsed === null) return null;
+  const prefetch: unknown = Reflect.get(parsed, "prefetch");
+  if (!Array.isArray(prefetch) || prefetch.length !== 1) return null;
+  const rule: unknown = prefetch[0];
+  if (typeof rule !== "object" || rule === null) return null;
+  const source: unknown = Reflect.get(rule, "source");
+  const eagerness: unknown = Reflect.get(rule, "eagerness");
+  const where: unknown = Reflect.get(rule, "where");
+  return {
+    source: typeof source === "string" ? source : null,
+    eagerness: typeof eagerness === "string" ? eagerness : null,
+    where: JSON.stringify(where),
+  };
+};
+
 describe("speculation rules", () => {
   it("rides document responses as the Speculation-Rules header", () => {
     const response = withSpeculationRules(htmlResponse());
-    const header = response.headers.get("Speculation-Rules");
-    assert.ok(header, "an HTML response must carry the rules");
-    const rules = JSON.parse(header) as { prefetch?: Array<Record<string, unknown>> };
-    assert.ok(Array.isArray(rules.prefetch) && rules.prefetch.length === 1);
-    const rule = rules.prefetch[0] as { source?: string; where?: { and?: Array<Record<string, unknown>> }; eagerness?: string };
+    const rule = ruleParts(response.headers.get("Speculation-Rules"));
+    assert.ok(rule, "an HTML response must carry exactly one prefetch rule");
     assert.equal(rule.source, "document");
     assert.equal(rule.eagerness, "moderate", "moderate is hover-driven: one request per hovered link, nothing executed");
-    assert.ok(rule.where?.and?.some((clause) => JSON.stringify(clause).includes("/api/**")), "endpoints are not pages a reader navigates to");
+    assert.ok(rule.where.includes("/api/**"), "endpoints are not pages a reader navigates to");
   });
 
   it("parses as the same JSON the constant holds", () => {

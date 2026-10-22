@@ -163,7 +163,11 @@ describe("decision ledger client", () => {
     const db = {
       close: () => {},
       transaction: () => {
-        const tx = { objectStore: () => store, oncomplete: null as (() => void) | null, onerror: null as (() => void) | null };
+        const tx: { objectStore: () => typeof store; oncomplete: (() => void) | null; onerror: (() => void) | null } = {
+          objectStore: () => store,
+          oncomplete: null,
+          onerror: null,
+        };
         setTimeout(() => tx.oncomplete?.(), 0);
         return tx;
       },
@@ -186,15 +190,26 @@ describe("decision ledger client", () => {
   };
 
   const withIndexedDB = async <T>(fake: { open: unknown }, run: () => Promise<T>): Promise<T> => {
-    (globalThis as { indexedDB?: unknown }).indexedDB = fake;
+    Reflect.set(globalThis, "indexedDB", fake);
     try {
       return await run();
     } finally {
-      delete (globalThis as { indexedDB?: unknown }).indexedDB;
+      Reflect.deleteProperty(globalThis, "indexedDB");
     }
   };
 
-  const offlineFetch = (() => Promise.reject(new Error("offline"))) as unknown as typeof globalThis.fetch;
+  const offlineFetch: typeof globalThis.fetch = () => Promise.reject(new Error("offline"));
+
+  /** The action a stashed entry's payload names, narrowed from IndexedDB at runtime. */
+  const stashedAction = (value: unknown): string | null => {
+    if (typeof value !== "object" || value === null) return null;
+    const entryPayload: unknown = Reflect.get(value, "payload");
+    if (typeof entryPayload !== "object" || entryPayload === null) return null;
+    const decision: unknown = Reflect.get(entryPayload, "decision");
+    if (typeof decision !== "object" || decision === null) return null;
+    const action: unknown = Reflect.get(decision, "action");
+    return typeof action === "string" ? action : null;
+  };
 
   it("queues two offline decisions as two records, not one overwriting the other", async () => {
     const fake = fakeIndexedDB();
@@ -205,11 +220,8 @@ describe("decision ledger client", () => {
     });
 
     assert.equal(fake.entries.size, 2, "the second stashed write must not replace the first");
-    const payloads = [...fake.entries.values()].map((entry) => (entry.value as { payload: unknown }).payload);
-    assert.deepEqual(
-      payloads.map((stashed) => (stashed as typeof payload).decision.action).sort(),
-      ["HIRE", "RESTRUCTURE"],
-    );
+    const actions = [...fake.entries.values()].map((entry) => stashedAction(entry.value) ?? "");
+    assert.deepEqual(actions.sort(), ["HIRE", "RESTRUCTURE"]);
     const keys = [...fake.entries.keys()];
     assert.ok(keys.every((key) => key.startsWith("browser-1:")), "entries stay grouped under the client that stashed them");
     assert.ok(new Set(keys).size === keys.length, "keys are unique per stashed write");
@@ -230,7 +242,7 @@ describe("decision ledger client", () => {
     assert.equal(fake.entries.size, 1, "the re-tap clears its own stashed copy and nothing else");
     const remaining = fake.entries.values().next().value;
     assert.ok(remaining, "one entry remains queued");
-    assert.equal((remaining.value as { payload: typeof other }).payload.decision.action, "RESTRUCTURE");
+    assert.equal(stashedAction(remaining.value), "RESTRUCTURE");
   });
 
   it("posts the decision under the same owner it claims", async () => {
