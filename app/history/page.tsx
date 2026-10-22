@@ -22,6 +22,7 @@ import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { ConditionIcon } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { HistoryExplorer } from "./historyExplorer";
+import { ComparePanel } from "../history/compare/ComparePanel";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { regimeSignalLabel } from "../../lib/report/signalTranslations";
@@ -42,7 +43,7 @@ export const metadata: Metadata = buildPageMetadata({
   imageParams: { template: "record", eyebrow: "History" },
 });
 
-type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string };
+type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string; compare?: string; yearA?: string; monthA?: string; yearB?: string; monthB?: string };
 
 /** The phase map's window rides in the URL, so its links have to preserve the
  *  other params on the page — a reader who has the raw-conditions disclosure open
@@ -108,6 +109,9 @@ export default async function HistoryPage({
    * ItemList naming the 82 archive periods and every published week that hang
    * off it. Until now the largest cluster in the sitemap had no declared parent.
    */
+  const compareOpen = Boolean(resolvedSearchParams?.yearA || resolvedSearchParams?.monthA || resolvedSearchParams?.compare === "1");
+  const compareContent = compareOpen ? await ComparePanel({ searchParams: resolvedSearchParams }) : null;
+
   const structuredData = buildHistoryStructuredData({
     /* The year strip below is what this page links; the quarters are reachable
        from their parent year. Declaring them here would name URLs the rendered
@@ -312,6 +316,18 @@ export default async function HistoryPage({
           allMonthsOpen={isDisclosureOpenInParams(resolvedSearchParams, "months")}
         />
       </div>
+
+      <UrlDetails
+        queryKey="compare"
+        initialOpen={Boolean(resolvedSearchParams?.yearA || resolvedSearchParams?.monthA || resolvedSearchParams?.compare === "1")}
+        className="weather-auto-chevron weather-panel px-5 py-4"
+        summaryClassName="cursor-pointer select-none text-fluid-xs font-medium text-white/70"
+        summary={<span>Compare two periods side by side</span>}
+      >
+        <div className="mt-4">
+          {compareOpen ? compareContent : <ActionLink href="/history/compare" variant="inline">Open the full comparison</ActionLink>}
+        </div>
+      </UrlDetails>
 
       <UrlDetails
         queryKey="explore"

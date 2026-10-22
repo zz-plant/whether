@@ -3,6 +3,7 @@ import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/home
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
 import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
+import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -439,14 +440,15 @@ async function PageContent({
   });
   /* How long these conditions lasted before, against the reader's chosen band.
      Left out of an archived view, whose record would have to end at its month. */
+  const recordSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
   const spellLengths = historicalSelection || !isRegimeKey(regime)
     ? null
     : describeSpellLengths({
-        series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+        series: recordSeries,
         currentRegime: regime,
         runwayBand: data.operatorContext.companyRunway ?? null,
       });
-  const turningPoints = findRecentCallChanges(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER), 4).map((change) => ({
+  const turningPoints = findRecentCallChanges(recordSeries, 4).map((change) => ({
     label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
     href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
   }));
@@ -544,16 +546,18 @@ async function PageContent({
           it, so a move from the brief to `/signals`, `/operate` or `/resolve`
           went unrecorded and read the same as closing the tab. */}
       <OperatorWorkflowRouteTracker />
+      {/* A caveat, drawn like the archived-week banner below: the amber it
+          used is the crossed-line red, so late data read as a crossed line. */}
       {isDegraded ? (
-        <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
+        <p className="weather-caveat-mark mb-4 rounded-lg border border-l-4 border-caveat-border bg-caveat-bg px-4 py-2.5 text-fluid-micro text-caveat-fg">
           {resolveDataStatusGuidance({
             isFallbackSnapshot: homepage.reportShell.showOfflineBadge,
             degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 1,
           })}
-        </div>
+        </p>
       ) : null}
       {historicalSelection ? (
-        <div className="mx-auto max-w-[64rem]">
+        <div className="mx-auto weather-brief-measure">
           <HistoricalBanner
             year={historicalSelection.year}
             month={historicalSelection.month}
@@ -563,7 +567,7 @@ async function PageContent({
           />
         </div>
       ) : null}
-      <div className="mx-auto max-w-[64rem] space-y-4 sm:space-y-8">
+      <div className="mx-auto weather-brief-measure space-y-4 sm:space-y-8">
         <div className="weather-brief-flow">
           {/* Above the brief, not after it. This is the orientation line for a
               first-time visitor, and it sat below the hero, all three operating
@@ -586,6 +590,7 @@ async function PageContent({
           />
           <ConditionsLegend
             arrival={arrivedFromShare ? "share" : undefined}
+            orientation={historicalSelection ? undefined : homeOrientationLine}
             currentRegime={historicalSelection ? undefined : regime}
             thresholds={reportData.assessment.thresholds}
           />
@@ -767,7 +772,13 @@ async function PageContent({
             />
 
             {/* 7. Has this happened before? */}
-            <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} spellLengths={spellLengths} />
+            <RecordSection
+              lastTime={lastTimeCallChanged}
+              callChangeLines={callChangeLines}
+              turningPoints={turningPoints}
+              spellLengths={spellLengths}
+              record={historicalSelection ? undefined : recordSeries}
+            />
 
             {/* Last, as a line rather than a section: the way out to every share
                 format, and the week's published brief. */}

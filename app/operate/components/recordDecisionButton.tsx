@@ -46,7 +46,7 @@ export const RecordDecisionButton = ({ buildPayload }: { buildPayload: () => Dec
         type="button"
         onClick={() => void record()}
         disabled={!clientId || state === "saving"}
-        className="inline-flex items-center rounded-sm border border-slate-700 bg-slate-900 px-3 py-1 text-xs font-medium text-slate-100 transition hover:border-sky-500/60 hover:text-sky-200 disabled:cursor-not-allowed disabled:opacity-50"
+        className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-3 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
       >
         {state === "saving" ? "Recording…" : state === "saved" ? "Recorded" : "Record this decision"}
       </button>

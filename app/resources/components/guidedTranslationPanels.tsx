@@ -27,7 +27,13 @@ export function buildGuidedTranslationHref(params?: GuidedTranslationSearchParam
   }
 
   const search = query.toString();
-  return search ? `/resources?${search}#guided-translation` : "/resources#guided-translation";
+  const { selectedStakeholder, selectedStage, showStageLibrary } = resolveGuidedTranslationState(params);
+  // Results sit before the browse disclosure. A selection should land on its
+  // guidance; clearing the last valid selection returns to the browse controls.
+  const anchor = selectedStakeholder || selectedStage || showStageLibrary
+    ? "guided-translation-results"
+    : "guided-translation";
+  return `/resources${search ? `?${search}` : ""}#${anchor}`;
 }
 
 export function resolveGuidedTranslationState(params?: GuidedTranslationSearchParams) {
@@ -106,7 +112,7 @@ export function GuidedTranslationPanels({
             <ul className="space-y-2 text-sm text-slate-200">
               {selectedStakeholder.bullets.map((bullet) => (
                 <li key={bullet} className="flex gap-3">
-                  <span aria-hidden="true" className="text-sky-300">•</span>
+                  <span aria-hidden="true" className="text-slate-500">•</span>
                   <span>{bullet}</span>
                 </li>
               ))}
@@ -154,7 +160,7 @@ export function GuidedTranslationPanels({
             <ul className="space-y-2 text-sm text-slate-200">
               {selectedStage.whoBenefitsMost.map((entry) => (
                 <li key={entry} className="flex gap-3">
-                  <span aria-hidden="true" className="text-sky-300">•</span>
+                  <span aria-hidden="true" className="text-slate-500">•</span>
                   <span>{entry}</span>
                 </li>
               ))}

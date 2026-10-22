@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { extractUnits, nearestPairs, type CodeUnit } from "../scripts/near-duplicates";
+import { extractUnits, nearestPairs, sentenceTemplate, sentenceUnits, type CodeUnit } from "../scripts/near-duplicates";
 
 const source = [
   'import { z } from "zod";',
@@ -65,5 +65,39 @@ describe("near-duplicate audit", () => {
     const [closest] = pairs;
     assert.ok(closest && closest.score > 0.99 && closest.score <= 1);
     assert.equal(nearestPairs(embedded, 0.9, 1).length, 1);
+  });
+
+  it("makes one unit of a sentence printed on several routes, and drops one printed on all", () => {
+    const units = sentenceUnits([
+      { route: "/", sentences: ["Pause if funding pressure is above 76.", "Read the method on the trust page."] },
+      { route: "/trust", sentences: ["Read the method on the trust page.", "• Pause if: funding pressure is above 76"] },
+      { route: "/share", sentences: ["Read the method on the trust page.", "Subscribe for the Monday brief."] },
+    ]);
+    assert.deepEqual(units.map(({ file, line, text }) => ({ file, line, text })), [
+      { file: "/, /trust", line: 1, text: "Pause if funding pressure is above 76." },
+      { file: "/share", line: 2, text: "Subscribe for the Monday brief." },
+    ]);
+  });
+
+  it("keeps same-route sentence pairs when asked, and skips what the caller rules out", () => {
+    const unit = (file: string, text: string): CodeUnit => ({ file, name: text, line: 1, text });
+    const embedded = [
+      { unit: unit("/operate", "Resume line A and B"), vector: [1, 0] },
+      { unit: unit("/operate", "Resume line B and A"), vector: [1, 0.05] },
+      { unit: unit("/history", "Freezing week of Sep 29"), vector: [0, 1] },
+      { unit: unit("/history", "Freezing week of Sep 22"), vector: [0.02, 1] },
+    ];
+    const skip = (a: CodeUnit, b: CodeUnit) => sentenceTemplate(a.text) === sentenceTemplate(b.text);
+
+    assert.equal(nearestPairs(embedded, 0.9, 10).length, 0);
+    assert.deepEqual(
+      nearestPairs(embedded, 0.9, 10, { sameFile: true, skip }).map(({ a, b }) => `${a.name}~${b.name}`),
+      ["Resume line A and B~Resume line B and A"],
+    );
+  });
+
+  it("reads table rows filled from one template as the same sentence", () => {
+    assert.equal(sentenceTemplate("Mar 2022 · 2Y +84 bp · 10Y +49 bp."), sentenceTemplate("Sep 2026 · 2Y +54 bp · 10Y +54 bp."));
+    assert.notEqual(sentenceTemplate("Inflation Live Monthly release"), sentenceTemplate("Labor Live Monthly release"));
   });
 });

@@ -1,0 +1,34 @@
+name: Feature request
+description: A decision Whether should help with, or a place it should reach.
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: decision
+    attributes:
+      label: The decision you are making
+      description: What call are you trying to make, and how often? For example, "whether to open two engineering roles this quarter".
+    validations:
+      required: true
+  - type: textarea
+    id: gap
+    attributes:
+      label: What is missing today
+      description: What you do instead, and where Whether stops short.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What would help
+      description: A rule, a signal, an export format, a tool or an integration. Rough is fine.
+  - type: dropdown
+    id: role
+    attributes:
+      label: Your role
+      options:
+        - Founder or CEO
+        - Finance or operations
+        - Product or engineering lead
+        - Investor
+        - Building an agent or integration
+        - Other

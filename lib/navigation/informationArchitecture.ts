@@ -156,7 +156,7 @@ export const navigationPages: readonly NavigationPage[] = [
     href: "/trust",
     label: "How much to trust this week",
     description: "Check freshness, the margin, source coverage and the lines that would change the brief.",
-    placement: "tab",
+    placement: "secondary",
   },
   {
     key: "planning",
@@ -202,20 +202,20 @@ export const navigationPages: readonly NavigationPage[] = [
     placement: "tab",
   },
   {
-    key: "compare",
-    group: "record",
-    href: "/history/compare",
-    label: "Compare periods",
-    description: "This week's scores against past downturns: 2001, 2008 and 2022",
-    placement: "tab",
-  },
-  {
     key: "calibration",
     group: "record",
     href: "/calibration",
     label: "Calibration",
     description: "How often conditions held at each margin from the line, 2012–2026",
     placement: "tab",
+  },
+  {
+    key: "compare",
+    group: "record",
+    href: "/history/compare",
+    label: "Compare periods",
+    description: "This week's scores against past downturns: 2001, 2008 and 2022",
+    placement: "secondary",
   },
   {
     key: "concepts",

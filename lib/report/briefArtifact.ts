@@ -145,6 +145,9 @@ export type BriefDocument = BriefArtifact & {
   };
   readings: {
     scores: { tightness: number; riskAppetite: number };
+    /** Funding pressure above its ceiling, when pinned there; the margin counts it (`resolveNearestLineMargin`). */
+    tightnessPressure?: number;
+    tightnessSaturated?: boolean;
     thresholds: RegimeAssessment["thresholds"];
     /** How far each score sits from its change line, with the side folded in by the reader. */
     vsThreshold: { tightness: number; riskAppetite: number };

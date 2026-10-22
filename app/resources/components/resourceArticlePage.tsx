@@ -189,7 +189,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
               <div className="grid gap-3 sm:grid-cols-2">
                 {decisionArtifact.mappedRules.map((rule) => (
                   <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
-                    <p className="type-eyebrow text-sky-200">This week&apos;s rule · {decisionAreaLabel(rule.area)}</p>
+                    <p className="type-eyebrow">This week&apos;s rule · {decisionAreaLabel(rule.area)}</p>
                     <p className="font-semibold text-slate-100">{rule.recommendation}</p>
                     <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
                     <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>

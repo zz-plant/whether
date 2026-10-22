@@ -95,7 +95,7 @@ describe("runJev", () => {
     assert.equal(call?.url, "https://api.cloudflare.com/client/v4/accounts/acct/ai/run/@cf/cloudflare/clef-flash");
     const body = call.init?.body;
     assert.ok(typeof body === "string");
-    assert.deepEqual(JSON.parse(body), request);
+    assert.deepEqual(JSON.parse(body), { ...request, model: "clef-flash" });
   });
 
   it("returns a reason rather than throwing on an error status or a dead network", async () => {
@@ -143,9 +143,13 @@ describe("/api/agent?format=jev", () => {
     assert.deepEqual(jev.request.state.whether.regime, agent.agentHandoff.payload.regime);
     assert.deepEqual(jev.request.state.whether.decision_rules, agent.agentHandoff.payload.decision_rules);
     assert.deepEqual(Object.keys(jev.request.questions).sort(), [
+      "adds_fixed_cost",
       "conflicts_with_call",
       "decision_area",
+      "pause_line_stated",
+      "plan_action_stated",
       "reversibility",
+      "reversibility_stated",
       "wait_for_flip",
     ]);
     assert.deepEqual(Object.keys(jev.request.questions.decision_area.criteria), [
@@ -168,6 +172,21 @@ describe("/api/agent?format=jev", () => {
     assert.equal(body.automationReady, false);
     assert.equal(typeof body.automationRefusal, "string");
     assert.ok(body.automationRefusal.length > 0);
+  });
+
+  it("offers caller-owned audio/video handoffs only for Omni, without taking reader media", async () => {
+    const response = await getAgentRoute(new Request("https://whether.work/api/agent?format=jev&model=clef-omni&input=audio"));
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.model, "@cf/cloudflare/clef-omni");
+    assert.equal(body.request.model, "clef-omni");
+    assert.deepEqual(body.request.audio, []);
+    assert.equal(body.request.state.plan, null);
+    assert.match(body.request.questions.conflicts_with_call.instructions, /audio/);
+    assert.equal(body.automationReady, false);
+    for (const query of ["model=jev&input=audio", "model=clef-flash&input=video", "model=unknown", "input=other"]) {
+      assert.equal((await getAgentRoute(new Request(`https://whether.work/api/agent?format=jev&${query}`))).status, 400);
+    }
   });
 
   it("rejects an unknown format with 400 rather than serving the default shape", async () => {

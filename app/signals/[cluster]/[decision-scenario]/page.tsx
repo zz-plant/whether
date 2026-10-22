@@ -184,9 +184,9 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
           </div>
         </dl>
         {dataCurrency ? (
-          <p className="rounded-md border border-amber-400/35 bg-amber-500/10 px-4 py-3 text-xs text-amber-100">
+          <p className="weather-caveat-mark rounded-md border border-l-4 border-caveat-border bg-caveat-bg px-4 py-3 text-xs text-caveat-fg">
             {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
-            <Link href={DATA_CURRENCY_ACTION_HREF} className="underline decoration-amber-300/60 underline-offset-4">
+            <Link href={DATA_CURRENCY_ACTION_HREF} className="underline decoration-slate-600 underline-offset-4">
               Source dates
             </Link>
           </p>
@@ -219,7 +219,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         <div className="grid gap-3 sm:grid-cols-3">
           {payload.evidence.map((item) => (
             <article key={item.title} className="rounded-lg border border-slate-700/70 bg-slate-950/50 px-4 py-4">
-              <p className="type-eyebrow text-sky-200">{item.confidenceLabel}</p>
+              <p className="type-eyebrow">{item.confidenceLabel}</p>
               <p className="mt-2 text-sm font-semibold text-slate-100">{item.title}</p>
               <p className="mt-2 text-sm text-slate-300">{item.summary}</p>
             </article>

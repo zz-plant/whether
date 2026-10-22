@@ -197,7 +197,7 @@ export function SinceLastVisit({
   const compact = (
     <div
       data-testid="since-last-visit"
-      className="flex items-center justify-between gap-3 rounded-lg border border-sky-500/20 bg-sky-500/[0.05] px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
+      className="flex items-center justify-between gap-3 rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
     >
       <div>
         <span className="font-semibold text-white">Since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
@@ -217,7 +217,7 @@ export function SinceLastVisit({
   /* A lapsed return is at a planning cadence, so lead with the delta and put
      the one-slide summary one click away — the QAU conversion surface. */
   return (
-    <div data-testid="lapsed-return" className="rounded-lg border border-sky-500/20 bg-sky-500/[0.05] px-4 py-3 space-y-2">
+    <div data-testid="lapsed-return" className="rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
         <p className="text-fluid-xs leading-5 text-slate-200">
           <span className="font-semibold text-white">Since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}

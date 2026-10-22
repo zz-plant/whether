@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatThresholdNumber } from "../../../lib/formatters";
 import { ConditionIcon } from "../ui/conceptIcons";
 
@@ -92,6 +92,19 @@ export function RegimeRadar({
   // through, so an unmodelled label still reads instead of rendering blank.
   const weatherLabel = getRegimePublicLabel(currentRegime).toLowerCase();
 
+  /* The week's quadrant lit, the other three dimmed (2026-10-21). At one
+     strength each, the four washes read as a legend and the map said nothing
+     before the eye found the dot; now the week's weather is the one colour
+     field on the plot. An unmodelled regime lights nothing and dims nothing. */
+  const quadrants = [
+    { key: "SCARCITY", x: PLOT_X, y: PLOT_Y, width: boundaryX - PLOT_X, height: boundaryY - PLOT_Y, fill: "var(--phase-scarcity)" },
+    { key: "DEFENSIVE", x: boundaryX, y: PLOT_Y, width: PLOT_RIGHT - boundaryX, height: boundaryY - PLOT_Y, fill: "var(--phase-defensive)" },
+    { key: "VOLATILE", x: PLOT_X, y: boundaryY, width: boundaryX - PLOT_X, height: PLOT_BOTTOM - boundaryY, fill: "var(--phase-volatile)" },
+    { key: "EXPANSION", x: boundaryX, y: boundaryY, width: PLOT_RIGHT - boundaryX, height: PLOT_BOTTOM - boundaryY, fill: "var(--phase-expansion)" },
+  ];
+  const activeKey = currentRegime.toUpperCase();
+  const hasActive = quadrants.some((quadrant) => quadrant.key === activeKey);
+
   return (
     <figure
       className={`relative m-0 flex flex-col items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/50 p-3 ${className}`.trim()}
@@ -122,39 +135,32 @@ export function RegimeRadar({
       >
         <title>{`Funding pressure ${tightness} vs risk appetite ${riskAppetite} (${weatherLabel})`}</title>
 
-        {/* 4 Weather Quadrants */}
-        {/* Top-Left: Freezing (Scarcity) */}
-        <rect
-          x={PLOT_X}
-          y={PLOT_Y}
-          width={boundaryX - PLOT_X}
-          height={boundaryY - PLOT_Y}
-          fill="var(--phase-scarcity)"
-        />
-        {/* Top-Right: Cloudy (Defensive) */}
-        <rect
-          x={boundaryX}
-          y={PLOT_Y}
-          width={PLOT_RIGHT - boundaryX}
-          height={boundaryY - PLOT_Y}
-          fill="var(--phase-defensive)"
-        />
-        {/* Bottom-Left: Stormy (Volatile) */}
-        <rect
-          x={PLOT_X}
-          y={boundaryY}
-          width={boundaryX - PLOT_X}
-          height={PLOT_BOTTOM - boundaryY}
-          fill="var(--phase-volatile)"
-        />
-        {/* Bottom-Right: Sunny (Expansion) */}
-        <rect
-          x={boundaryX}
-          y={boundaryY}
-          width={PLOT_RIGHT - boundaryX}
-          height={PLOT_BOTTOM - boundaryY}
-          fill="var(--phase-expansion)"
-        />
+        {/* The four conditions: Freezing top left, Cloudy top right, Stormy
+            bottom left, Sunny bottom right. The week's is drawn twice over. */}
+        {quadrants.map((quadrant) => {
+          const active = quadrant.key === activeKey;
+          return (
+            <rect
+              key={quadrant.key}
+              x={quadrant.x}
+              y={quadrant.y}
+              width={quadrant.width}
+              height={quadrant.height}
+              fill={quadrant.fill}
+              stroke={active ? "var(--regime-accent)" : "none"}
+              strokeWidth={active ? "1" : "0"}
+              strokeOpacity={active ? "0.4" : "0"}
+              opacity={hasActive && !active ? 0.45 : 1}
+              data-quadrant={quadrant.key}
+              data-active={active ? "" : undefined}
+            />
+          );
+        })}
+        {quadrants
+          .filter((quadrant) => quadrant.key === activeKey)
+          .map((quadrant) => (
+            <rect key={`${quadrant.key}-lit`} x={quadrant.x} y={quadrant.y} width={quadrant.width} height={quadrant.height} fill={quadrant.fill} />
+          ))}
 
         {/* Quadrant corner labels, each in its condition's ink. These read the
             line-state families until 2026-10-09 (Sunny in the clear ink,
@@ -344,11 +350,21 @@ export function RegimeRadar({
           <circle
             cx={currentX}
             cy={currentY}
+            r="9"
+            fill="none"
+            stroke="var(--regime-accent)"
+            strokeWidth="1"
+            className="animate-ping motion-reduce:animate-none opacity-25"
+            style={{ animationDuration: "3s" }}
+          />
+          <circle
+            cx={currentX}
+            cy={currentY}
             r="6.5"
             fill="none"
             stroke="var(--regime-accent)"
             strokeWidth="1.5"
-            strokeOpacity="0.6"
+            strokeOpacity="0.8"
           />
           <circle
             cx={currentX}
@@ -383,7 +399,13 @@ export function RegimeRadar({
           axes and Freezing hard on both, while Cloudy and Stormy are each hard
           on one. The chart is where that shows, so it says so. */}
       <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
-          <span className="block text-slate-300" data-radar-orientation>Easiest bottom right (Sunny), hardest top left (Freezing).</span>
+          {/* What the two directions mean before which corner is which
+              (2026-10-21): the axes name two scores a first visit has not met,
+              and the legend that decodes them in money terms is hidden from `md`
+              up, where this chart replaces it. */}
+          <span className="block text-slate-300" data-radar-orientation>
+            Up is {CONDITION_SIDE_MEANINGS.pressureAbove}, right is {CONDITION_SIDE_MEANINGS.appetiteAbove}. Easiest bottom right (Sunny), hardest top left (Freezing).
+          </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
           {footer ? <span className="block pt-1">{footer}</span> : null}

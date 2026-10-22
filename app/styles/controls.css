@@ -407,6 +407,7 @@ details[open] > summary[data-chevron]::after,
 .peer:hover + .weather-segment-option {
   color: var(--app-text);
   border-color: var(--border-subtle);
+  background-color: color-mix(in srgb, var(--bg-raised) 40%, var(--bg-nested));
 }
 
 .peer:checked + .weather-segment-option {
@@ -435,7 +436,7 @@ details[open] > summary[data-chevron]::after,
 
 .peer:checked + .weather-segment-option .weather-segment-lamp {
   background-color: var(--accent-action);
-  box-shadow: 0 0 0 2px var(--accent-border-soft);
+  box-shadow: 0 0 0 2px var(--accent-border-soft), 0 0 6px var(--accent-action);
 }
 
 /* An ordered scale (runway bands, the funded stages): a rule engraved along the

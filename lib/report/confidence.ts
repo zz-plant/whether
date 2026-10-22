@@ -6,6 +6,7 @@ import {
   CONFIDENCE_PERCENT_IMPUTED_CEILING,
   RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
   REGIME_CONFIDENCE_NEAR_THRESHOLD,
+  TIGHTNESS_CAP,
   REGIME_CONFIDENCE_MEDIUM_THRESHOLD,
 } from "../regimeEngineCore";
 import { isSavedCopy } from "./provenanceStatus";
@@ -22,6 +23,9 @@ export type ConfidenceInputs = {
      */
     baseRateUsed?: "FED" | "1M" | "3M" | "MISSING";
     curveSlope?: number | null;
+    /* Optional for the same reason: set on every live assessment, never stored. */
+    tightnessPressure?: number;
+    tightnessSaturated?: boolean;
   };
   thresholds: {
     tightnessRegime: number;
@@ -52,9 +56,28 @@ const hasImputedInputs = ({ scores }: ConfidenceInputs): boolean =>
  * the move the underlying rate or slope would have to make.
  */
 const resolveLineGaps = ({ scores, thresholds }: ConfidenceInputs) => ({
-  tightness: Math.abs(scores.tightness - thresholds.tightnessRegime),
+  tightness: resolveTightnessGap({ scores, thresholds }),
   riskAppetite: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime) * RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
 });
+
+/**
+ * Funding pressure's distance from its line, counting the points the ceiling hides.
+ *
+ * A pinned score has to shed its pressure above the cap before the published
+ * number moves at all, so the distance from the line is the gap the reader sees
+ * plus that headroom. Until 2026-10-21 the week of Oct 19 (published 90, pressure
+ * 110, risk appetite 55) told every surface it sat "20 pts from its change line"
+ * on funding pressure, the far side of the week: the line it could actually
+ * cross next was risk appetite's, 5 points away.
+ */
+const resolveTightnessGap = ({ scores, thresholds }: ConfidenceInputs): number => {
+  const gap = Math.abs(scores.tightness - thresholds.tightnessRegime);
+  const hidden =
+    scores.tightnessSaturated === true && typeof scores.tightnessPressure === "number" && scores.tightness > thresholds.tightnessRegime
+      ? Math.max(0, scores.tightnessPressure - TIGHTNESS_CAP)
+      : 0;
+  return gap + hidden;
+};
 
 /**
  * The margin a reader is shown: the score nearest its change line, chosen the way
@@ -74,7 +97,7 @@ export const resolveNearestLineMargin = (
   const signal = gaps.riskAppetite < gaps.tightness ? "riskAppetite" : "tightness";
   const raw =
     signal === "tightness"
-      ? Math.abs(inputs.scores.tightness - inputs.thresholds.tightnessRegime)
+      ? gaps.tightness
       : Math.abs(inputs.scores.riskAppetite - inputs.thresholds.riskAppetiteRegime);
   return { signal, points: Math.round(raw) };
 };

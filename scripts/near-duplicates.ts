@@ -15,19 +15,32 @@
  * 270M text-only tag shares its embedding space for code at a third of the memory; the
  * cache is keyed by model name, so switching tags re-embeds rather than mixing vectors.
  *
+ * `--copy` asks the same question of reader copy: it reads the reader routes from a running
+ * server, splits them into sentences the way `audit:jev-copy` does, and lists pairs of
+ * sentences that say the same thing, on one page or across two. Repeating a sentence is the
+ * one copy rule nothing else checks: `audit:jev-copy` judges each sentence alone, and drops
+ * exact repeats before it does. A sentence on every route read is page chrome, not repetition,
+ * and is left out.
+ *
  * Usage:
  *   bun run audit:near-duplicates
  *   bun run audit:near-duplicates -- --threshold 0.9 --limit 40 --model embeddinggemma-2:270m
+ *   bun run dev   # in another shell, then:
+ *   bun run audit:near-duplicates -- --copy [--base-url http://localhost:3000] [--routes /,/trust]
  */
 import { createHash } from "node:crypto";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import { deadExportsConfig } from "./census.config";
+import { DEFAULT_ROUTES as READER_ROUTES, extractSentences } from "./jev-copy-audit";
 import { walkFiles } from "./walk-files.mjs";
 
 const DEFAULT_MODEL = "embeddinggemma-2:740m";
 const DEFAULT_THRESHOLD = 0.93;
+/* Sentences, unlike functions, share a site's whole vocabulary; see the calibration note at
+   `run` for what scores above and below this. */
+const DEFAULT_COPY_THRESHOLD = 0.95;
 const DEFAULT_LIMIT = 25;
 const MIN_LINES = 6;
 /* Route handlers are thin by design: every one parses a request and hands it on, so they
@@ -76,16 +89,23 @@ const locate = ({ file, name, line }: CodeUnit) => ({ file, name, line });
 export type NearPair = { score: number; a: Omit<CodeUnit, "text">; b: Omit<CodeUnit, "text"> };
 
 /**
- * Pairs at or above `threshold`, closest first. Two declarations in one file are left out:
- * a file's own helpers sharing vocabulary is the normal case, and the question this asks
- * is whether one module re-implements another's.
+ * Pairs at or above `threshold`, closest first. Two declarations in one file are left out
+ * by default: a file's own helpers sharing vocabulary is the normal case, and the question
+ * is whether one module re-implements another's. Copy passes `sameFile`, because a page
+ * saying one thing twice is the commonest repetition there is.
  */
-export const nearestPairs = (embedded: { unit: CodeUnit; vector: number[] }[], threshold: number, limit: number): NearPair[] => {
+export const nearestPairs = (
+  embedded: { unit: CodeUnit; vector: number[] }[],
+  threshold: number,
+  limit: number,
+  { sameFile = false, skip }: { sameFile?: boolean; skip?: (a: CodeUnit, b: CodeUnit) => boolean } = {},
+): NearPair[] => {
   const normed = embedded.map(({ unit, vector }) => ({ unit, vector: normalize(vector) }));
   const pairs: NearPair[] = [];
   for (const [index, a] of normed.entries()) {
     for (const b of normed.slice(index + 1)) {
-      if (a.unit.file === b.unit.file) continue;
+      if (!sameFile && a.unit.file === b.unit.file) continue;
+      if (skip?.(a.unit, b.unit)) continue;
       let score = 0;
       for (const [k, value] of a.vector.entries()) score += value * (b.vector[k] ?? 0);
       if (score >= threshold) pairs.push({ score, a: locate(a.unit), b: locate(b.unit) });
@@ -97,6 +117,45 @@ export const nearestPairs = (embedded: { unit: CodeUnit; vector: number[] }[], t
 /* EmbeddingGemma 2's document prefix for code; queries would take `task: code retrieval | query:`.
    Both sides of a pair are documents here, so both get this one. */
 const documentPrompt = (unit: CodeUnit) => `title: ${unit.file} | text: ${unit.text}`;
+/* The model card's prompt for comparing two passages with each other. */
+const sentencePrompt = (unit: CodeUnit) => `task: sentence similarity | query: ${unit.text}`;
+
+/** Case, punctuation and list markers aside, the words of a sentence. */
+const sentenceKey = (sentence: string) => sentence.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+
+const MONTHS = /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b/g;
+
+/**
+ * The words a sentence keeps when its numbers and months are taken out. Two rows of one
+ * table ("Freezing — week of Sep 29" and "… Sep 22", or one yield reading per month)
+ * share it: they are one template filled twice, which a reader expects of a table, and
+ * they would otherwise fill the report.
+ */
+export const sentenceTemplate = (sentence: string) =>
+  sentenceKey(sentence).replace(MONTHS, " ").replace(/\d+/g, " ").replace(/\s+/g, " ").trim();
+
+/**
+ * One unit per distinct sentence. `file` lists the routes it appears on and `line` is its
+ * place on the first of them. A sentence printed word for word on several routes is one
+ * component rendered more than once, so it is one unit: the pairs that remain are two
+ * sentences worded differently, which is the repetition a reader notices and a grep cannot
+ * find. A sentence on every route read is page chrome and is left out entirely.
+ */
+export const sentenceUnits = (pages: { route: string; sentences: string[] }[]): CodeUnit[] => {
+  const byKey = new Map<string, { routes: string[]; line: number; text: string }>();
+  for (const { route, sentences } of pages) {
+    for (const [index, sentence] of sentences.entries()) {
+      const key = sentenceKey(sentence);
+      const seen = byKey.get(key);
+      if (!seen) byKey.set(key, { routes: [route], line: index + 1, text: sentence });
+      else if (!seen.routes.includes(route)) seen.routes.push(route);
+    }
+  }
+  return [...byKey.values()].flatMap(({ routes, line, text }) =>
+    pages.length > 1 && routes.length === pages.length
+      ? []
+      : [{ file: routes.join(", "), name: text.length > 80 ? `${text.slice(0, 77)}...` : text, line, text }]);
+};
 
 const embedResponse = z.object({ embeddings: z.array(z.array(z.number())) });
 const cacheSchema = z.record(z.string(), z.array(z.number()));
@@ -119,11 +178,15 @@ const parseArgs = (argv: string[]) => {
     const index = argv.indexOf(`--${name}`);
     return index >= 0 ? argv[index + 1] : undefined;
   };
+  const copy = argv.includes("--copy");
   return {
+    copy,
     model: read("model") ?? DEFAULT_MODEL,
     host: read("host") ?? process.env.OLLAMA_HOST ?? "http://localhost:11434",
-    threshold: Number(read("threshold") ?? DEFAULT_THRESHOLD),
+    threshold: Number(read("threshold") ?? (copy ? DEFAULT_COPY_THRESHOLD : DEFAULT_THRESHOLD)),
     limit: Number(read("limit") ?? DEFAULT_LIMIT),
+    baseUrl: read("base-url") ?? "http://localhost:3000",
+    routes: read("routes")?.split(",").map((route) => route.trim()).filter(Boolean) ?? READER_ROUTES,
   };
 };
 
@@ -135,18 +198,31 @@ const collectUnits = (): CodeUnit[] => {
       .flatMap((file: string) => extractUnits(readFileSync(file, "utf8"), file)));
 };
 
+const collectSentences = async (baseUrl: string, routes: readonly string[]): Promise<CodeUnit[]> => {
+  const pages = [];
+  for (const route of routes) {
+    const url = new URL(route, baseUrl);
+    const response = await fetch(url, { signal: AbortSignal.timeout(120_000) });
+    if (!response.ok) throw new Error(`could not read ${url.href} (HTTP ${response.status})`);
+    pages.push({ route, sentences: extractSentences(await response.text()) });
+  }
+  return sentenceUnits(pages);
+};
+
 const run = async (args: ReturnType<typeof parseArgs>) => {
-  const units = collectUnits();
-  const cacheFile = path.join(REPORT_DIR, `cache.${args.model.replace(/[^\w.-]+/g, "_")}.json`);
+  const units = args.copy ? await collectSentences(args.baseUrl, args.routes) : collectUnits();
+  const prompt = args.copy ? sentencePrompt : documentPrompt;
+  const kind = args.copy ? "sentences" : "functions";
+  const cacheFile = path.join(REPORT_DIR, `cache.${args.copy ? "copy." : ""}${args.model.replace(/[^\w.-]+/g, "_")}.json`);
   const cache = existsSync(cacheFile) ? cacheSchema.parse(JSON.parse(readFileSync(cacheFile, "utf8"))) : {};
-  const keyed = units.map((unit) => ({ unit, key: createHash("sha256").update(documentPrompt(unit)).digest("hex") }));
+  const keyed = units.map((unit) => ({ unit, key: createHash("sha256").update(prompt(unit)).digest("hex") }));
   const missing = keyed.filter(({ key }) => !cache[key]);
 
-  console.log(`near-duplicates: ${units.length} functions, ${missing.length} to embed with ${args.model}`);
+  console.log(`near-duplicates: ${units.length} ${kind}, ${missing.length} to embed with ${args.model}`);
   mkdirSync(REPORT_DIR, { recursive: true });
   for (let start = 0; start < missing.length; start += BATCH) {
     const batch = missing.slice(start, start + BATCH);
-    const vectors = await embed(batch.map(({ unit }) => documentPrompt(unit)), args.model, args.host);
+    const vectors = await embed(batch.map(({ unit }) => prompt(unit)), args.model, args.host);
     for (const [index, { key }] of batch.entries()) {
       const vector = vectors[index];
       if (vector) cache[key] = vector;
@@ -160,12 +236,14 @@ const run = async (args: ReturnType<typeof parseArgs>) => {
     const vector = cache[key];
     return vector ? [{ unit, vector }] : [];
   });
-  const pairs = nearestPairs(embedded, args.threshold, args.limit);
+  const pairs = nearestPairs(embedded, args.threshold, args.limit, args.copy
+    ? { sameFile: true, skip: (a, b) => sentenceTemplate(a.text) === sentenceTemplate(b.text) }
+    : {});
   for (const { score, a, b } of pairs) {
     console.log(`  ${score.toFixed(3)}  ${a.file}:${a.line} ${a.name}\n         ${b.file}:${b.line} ${b.name}`);
   }
-  const report = path.join(REPORT_DIR, "report.json");
-  writeFileSync(report, `${JSON.stringify({ model: args.model, threshold: args.threshold, functions: units.length, pairs }, null, 2)}\n`);
+  const report = path.join(REPORT_DIR, args.copy ? "report.copy.json" : "report.json");
+  writeFileSync(report, `${JSON.stringify({ model: args.model, threshold: args.threshold, [kind]: units.length, pairs }, null, 2)}\n`);
   console.log(`near-duplicates: ${pairs.length} pair(s) at ≥${args.threshold}; report ${report}`);
   return 0;
 };

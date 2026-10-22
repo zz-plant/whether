@@ -429,7 +429,7 @@ describe("an area row prints the line that explains its state", () => {
   /*
    * Week of Sep 29, 2026: funding pressure 90, risk appetite 44. Each row took
    * its nearest line, so fundraising's pause read "Risk appetite < 44 · at the
-   * line" beside "Pause now applies: funding pressure rose through 76", and
+   * line" beside "Pause now applies: funding pressure rose above 76", and
    * hiring's resume read "Risk appetite > 54 · 10 pts away" while funding
    * pressure, 24 points from its resume line, was what kept hiring paused.
    */

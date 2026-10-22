@@ -475,6 +475,14 @@ export const publishedBriefHeadline = (brief: Pick<PublishedBrief, "actionNow" |
   });
 
 /** The week's name: its Monday (`formatWeekMondayUTC`), never the record's own weekday. */
+/**
+ * A stored correction opens with its own verb ("Corrected Sep 30, 2026. …"), and every
+ * surface prints it after a "Correction" label, so until 2026-10-21 the page and both
+ * paste formats read "Correction: Corrected Sep 30, 2026." The record stays as stored;
+ * only the doubled verb is dropped when it is printed.
+ */
+export const correctionBody = (correction: string) => correction.replace(/^Corrected\s+/i, "");
+
 export const publishedBriefWeekLabel = (brief: Pick<PublishedBrief, "recordDate">) => formatWeekMondayUTC(brief.recordDate);
 
 /** The page's `<h1>` and `<title>`; the news sitemap must carry the same words. */
@@ -681,7 +689,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     `What changed: ${display.whatChanged}`,
     ...(decisions.length > 0 ? ["", "Operating limits by area:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
-    ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
+    ...(brief.correction ? ["", `Correction: ${correctionBody(brief.correction)}`] : []),
     "",
     "Provenance:",
     `Record date ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel} · ${basisClause(display.basis.sentence)}`,
@@ -727,7 +735,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     ...readingLines,
     ...(decisions.length > 0 ? ["", "Area decisions:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
-    ...(brief.correction ? ["", `Correction note: ${brief.correction}`] : []),
+    ...(brief.correction ? ["", `Correction note: ${correctionBody(brief.correction)}`] : []),
     "",
     "Provenance & citations:",
     `• Record date: ${brief.recordDateLabel}`,

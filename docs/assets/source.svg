@@ -1,10 +1,8 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 200" role="img" aria-labelledby="title">
-  <title id="title">whether design source</title>
-  <rect width="400" height="200" fill="#0d1b2a"/>
-  <path d="M80 160 L200 20 L320 160" fill="none" stroke="#38bdf8" stroke-width="2"/>
-  <circle cx="200" cy="90" r="6" fill="#38bdf8"/>
-  <line x1="200" y1="96" x2="200" y2="160" stroke="#38bdf8" stroke-width="1" stroke-dasharray="4 4"/>
-  <rect x="130" y="115" width="140" height="24" rx="12" fill="none" stroke="rgba(56,189,248,0.4)" stroke-width="1"/>
-  <rect x="130" y="115" width="84" height="24" rx="12" fill="rgba(56,189,248,0.12)"/>
-  <text x="200" y="114" text-anchor="middle" fill="#7dd3fc" font-family="system-ui, sans-serif" font-size="11">whether — structured decision analysis, impact-weighted reasoning</text>
+<svg role="img" aria-label="Whether" xmlns="http://www.w3.org/2000/svg" width="400" height="200" viewBox="0 0 400 200">
+  <rect width="100%" height="100%" fill="#0f1316"/>
+  <g transform="translate(20 55.72) scale(3.4499999999999997)" fill="none" stroke="#38bdf8" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M2 14c3-5 6-5 9 0s6 5 9 0"/>
+    <circle cx="5" cy="11" r="1.5" fill="#38bdf8"/>
+    <circle cx="19" cy="11" r="1.5" fill="#38bdf8"/>
+  </g><text x="124.39999999999999" y="125.92" font-family="Archivo" font-weight="700" font-stretch="semi-condensed" font-size="72" fill="#edf0ee" text-anchor="start" letter-spacing="-0.72">Whether</text>
 </svg>

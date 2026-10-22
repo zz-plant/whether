@@ -12,7 +12,8 @@ const LAST_READ_SNAPSHOT_STORAGE_KEY = "whether.lastReadSnapshot";
 /**
  * Impact tone for a signed weekly move.
  *
- * Size sets the impact band; direction sets the colour. Colouring by magnitude
+ * Size sets the impact band; direction sets the colour, which is the text ink
+ * only: the tag it colours is a link, so its frame is the control's (§XXVII). Colouring by magnitude
  * alone painted every large move rose, so a 2-point tightness *drop* — good
  * news — arrived looking like an alarm.
  */
@@ -28,7 +29,7 @@ export const getImpactTone = (
       label: "Unchanged",
       impactLabel: "Unchanged",
       directionLabel: "unchanged",
-      className: "border-slate-400/70 bg-slate-500/15 text-slate-100",
+      className: "text-slate-100",
     };
   }
 
@@ -40,8 +41,8 @@ export const getImpactTone = (
     impactLabel,
     directionLabel: rose ? "rose" : "fell",
     className: improved
-      ? "border-emerald-300/80 bg-emerald-500/15 text-emerald-100"
-      : "border-amber-300/80 bg-amber-500/15 text-amber-100",
+      ? "text-emerald-200"
+      : "text-amber-200",
   };
 };
 

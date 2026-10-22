@@ -1,0 +1,24 @@
+cff-version: 1.2.0
+message: "If you cite Whether's scores, conditions or historical record, please cite it as below."
+title: "Whether: weekly operating guidance from interest-rate and credit conditions"
+type: software
+authors:
+  - family-names: Jain
+    given-names: Kanav
+license: MIT
+url: "https://whether.work"
+repository-code: "https://github.com/zz-plant/whether"
+abstract: >-
+  Whether scores U.S. funding pressure and risk appetite from public market data
+  (Treasury yields, the yield curve, volatility and financial conditions) every
+  Monday, places the week in one of four conditions, and sets an action, a pause
+  line and a resume line for hiring, spending, fundraising and other operating
+  decisions. Conditions are scored at every month-end since 2012 by the same
+  engine the live brief runs.
+keywords:
+  - macroeconomics
+  - interest rates
+  - yield curve
+  - startups
+  - operating decisions
+  - model context protocol

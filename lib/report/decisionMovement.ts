@@ -162,8 +162,10 @@ const upperFirst = (value: string) => `${value.charAt(0).toUpperCase()}${value.s
 const joinAnd = (items: readonly string[]) =>
   items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 
+/* "through N" read as the deal falling through: crossing a line is going past it,
+   so the preposition follows the direction — rose above 76, fell below 54. */
 const describeCrossing = (line: CrossedLine) =>
-  `${lowerFirst(line.label)} ${line.direction} through ${formatThresholdNumber(line.value)}`;
+  `${lowerFirst(line.label)} ${line.direction} ${line.direction === "rose" ? "above" : "below"} ${formatThresholdNumber(line.value)}`;
 
 const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
   paused: "Pause now applies",

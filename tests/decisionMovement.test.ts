@@ -51,7 +51,7 @@ describe("buildDecisionMovement", () => {
     ]);
     assert.equal(
       result.sentence,
-      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose through 76 and risk appetite fell through 44.",
+      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose above 76 and risk appetite fell below 44.",
     );
     // A link preview and a card have room for the consequence and not the evidence.
     assert.equal(result.headline, "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area.");
@@ -78,11 +78,11 @@ describe("buildDecisionMovement", () => {
     const byArea = new Map(result.areas.map((entry) => [entry.area, entry]));
 
     // Spending pauses on funding pressure alone; the roadmap on risk appetite alone.
-    assert.equal(byArea.get("burn-discipline")?.text, "Pause now applies: funding pressure rose through 76.");
-    assert.equal(byArea.get("product-tempo")?.text, "Pause now applies: risk appetite fell through 44.");
+    assert.equal(byArea.get("burn-discipline")?.text, "Pause now applies: funding pressure rose above 76.");
+    assert.equal(byArea.get("product-tempo")?.text, "Pause now applies: risk appetite fell below 44.");
     assert.equal(
       byArea.get("hiring")?.text,
-      "Pause now applies: funding pressure rose through 76 and risk appetite fell through 44.",
+      "Pause now applies: funding pressure rose above 76 and risk appetite fell below 44.",
     );
   });
 
@@ -126,7 +126,7 @@ describe("buildDecisionMovement", () => {
     assert.deepEqual(result.moved.map((entry) => entry.area), ["hiring", "capital-raising", "burn-discipline", "expansion-bets"]);
     assert.equal(
       result.sentence,
-      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose through 76.",
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose above 76.",
     );
     // A reading that only touches the line has not crossed it.
     const touching = movement({ from: { tightness: 70, riskAppetite: 60 }, to: { tightness: 76, riskAppetite: 60 }, regime: "DEFENSIVE" });
@@ -151,11 +151,11 @@ describe("buildDecisionMovement", () => {
     assert.ok(recovered.moved.every((entry) => entry.kind === "resumable"));
     assert.equal(
       recovered.areas.find((entry) => entry.area === "hiring")?.text,
-      "Pause lifted, resume line met: funding pressure fell through 66 and risk appetite rose through 54.",
+      "Pause lifted, resume line met: funding pressure fell below 66 and risk appetite rose above 54.",
     );
     assert.equal(
       recovered.sentence,
-      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell through 66 and risk appetite rose through 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
     );
 
     // Back out of the pause but not to the resume line: 80 to 72 is through 76 and no further.
@@ -167,7 +167,7 @@ describe("buildDecisionMovement", () => {
       ["burn-discipline", "lifted"],
       ["expansion-bets", "lifted"],
     ]);
-    assert.equal(lifted.areas.find((entry) => entry.area === "burn-discipline")?.text, "Pause lifted: funding pressure fell through 76.");
+    assert.equal(lifted.areas.find((entry) => entry.area === "burn-discipline")?.text, "Pause lifted: funding pressure fell below 76.");
   });
 
   it("says when a resume line stops holding, and leaves the areas it does not touch out", () => {
@@ -181,7 +181,7 @@ describe("buildDecisionMovement", () => {
     assert.equal(result.areas.find((entry) => entry.area === "burn-discipline")?.kind, "held");
     assert.equal(
       result.sentence,
-      "Since Aug 31, the resume line is no longer met for Hiring, Roadmap, Fundraising and New bets, because risk appetite fell through 54.",
+      "Since Aug 31, the resume line is no longer met for Hiring, Roadmap, Fundraising and New bets, because risk appetite fell below 54.",
     );
   });
 
@@ -303,8 +303,8 @@ describe("describeMovementCause", () => {
     const moved = movement({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
     assert.ok(moved);
     const cause = describeMovementCause(moved);
-    assert.match(cause, /^Funding pressure rose through \d+/);
-    assert.match(cause, /risk appetite fell through \d+\.$/);
+    assert.match(cause, /^Funding pressure rose above \d+/);
+    assert.match(cause, /risk appetite fell below \d+\.$/);
     assert.doesNotMatch(cause, /Pause now applies|Resume line/);
   });
 

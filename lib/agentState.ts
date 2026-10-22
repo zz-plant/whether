@@ -33,6 +33,14 @@ import { isSavedCopy } from "./report/provenanceStatus";
  * `riskAppetite`); each carries the name a reader sees beside it (`label`).
  */
 
+/** The Monday 14:00 UTC publication that follows `now` (strictly after it). */
+export const nextWeeklyCallDue = (now: Date): string => {
+  const due = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 14));
+  due.setUTCDate(due.getUTCDate() + ((8 - due.getUTCDay()) % 7));
+  if (due.getTime() <= now.getTime()) due.setUTCDate(due.getUTCDate() + 7);
+  return due.toISOString();
+};
+
 const sideSchema = z.enum(["above", "below", "at"]);
 
 const lineSchema = z.object({
@@ -95,6 +103,9 @@ export const agentStateSchema = z.object({
     recordAgeDays: z.number(),
     live: z.boolean().describe("True when the reading came from a live fetch."),
     fallback: z.boolean().describe("True when it is a saved copy, not a live reading."),
+    nextCallDue: z
+      .string()
+      .describe("ISO time of the next weekly publication (Mondays 14:00 UTC, the cron in wrangler.toml). The call is current until then; after it, re-read before quoting."),
   }),
   automation: z
     .object({
@@ -287,6 +298,7 @@ export const buildAgentState = (
       recordAgeDays,
       live: treasury.isLive === true,
       fallback: isFallback,
+      nextCallDue: nextWeeklyCallDue(now),
     },
     automation: { ready: readiness.ok, refusal: readiness.ok ? null : readiness.reason },
     conditions: { key: assessment.regime, label, meaning: conditionsMeaning },

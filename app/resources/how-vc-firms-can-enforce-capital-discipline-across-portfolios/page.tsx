@@ -3,6 +3,8 @@ import Link from "next/link";
 import { buildPageMetadata } from "../../../lib/seo";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
+import { ActionLink } from "../../components/ui/actionLink";
+import { loadPostureLine } from "../postureLine";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "How VC firms can enforce capital discipline across portfolios",
@@ -16,8 +18,14 @@ export const metadata: Metadata = buildPageMetadata({
   },
 });
 
-export default function Page() {
+export const revalidate = 21600;
+
+export default async function Page() {
   const pagePath = "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios";
+  /* The week the reader is in, from the same helper the pillars and articles
+     use: an authority page arrived at from search must meet the current
+     posture before the essay (AGENTS.md, "Thin SEO page"). */
+  const { reportData, postureSummary } = await loadPostureLine(pagePath);
 
   return (
     <ContentPageShell
@@ -34,6 +42,14 @@ export default function Page() {
           Portfolio governance breaks when each company uses different threshold language, board packet formats, and escalation clocks.
           This guide gives VC firms one set of words, thresholds and formats to use across every portfolio company.
         </p>
+        <div className="space-y-1 border-l-2 border-[var(--border-subtle)] pl-3">
+          <p className="type-eyebrow">This week</p>
+          <p className="text-sm text-slate-200">{postureSummary}</p>
+          <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
+            <span>Data as of {reportData.recordDateLabel}</span>
+            <ActionLink href="/" variant="inline">Open this week&apos;s brief</ActionLink>
+          </p>
+        </div>
       </section>
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
@@ -57,7 +73,7 @@ export default function Page() {
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Board-forwardable artifact block</h2>
-        <div className="rounded-lg border border-sky-400/35 bg-sky-500/10 p-4 text-sm text-slate-100">
+        <div className="rounded-lg border border-slate-700/70 bg-slate-900/40 p-4 text-sm text-slate-100">
           <p>Portfolio recommendation: keep one governance vocabulary for two quarters before changing any threshold.</p>
           <p className="mt-2">Control rule: any breach lasting two checkpoints requires a board addendum with owner, action, and rollback timeline.</p>
           <p className="mt-2">Capital discipline effect: tranche release is conditioned on comparable evidence packets across all portfolio companies.</p>

@@ -265,6 +265,13 @@ diff** — here, `git archive` into a scratch directory with `node_modules` hard
 `--base-url` pointed at an unused port so the audit starts its own cold server instead of reusing a
 warm one. The bound is still a bound: a route that never answers fails the gate.
 
+**The cold-compile cost is gone; the bounds stay (2026-10-21).** The audit now serves the
+production worker under `wrangler dev` (`serve:worker`), which bundles once and renders every
+route from the bundle — no per-route cold compile, and it is the code that ships rather than a
+dev transform of it. Locally the stage went 20.3s → 6.9s. The 120s per-route bound and the 180s
+readiness bound remain: they are bounds, not targets, and a cold container still has to bundle
+602 modules once. The bounded history above is why they must not shrink.
+
 **The build container's checkout is not necessarily the commit (2026-09-17), and the gate refuses
 one that is not.** After `fa1cc6e` merged, every build failed on two assertions — the memo example
 still reading as the blank form, and `public/embed.js` still holding the hardcoded origin — while

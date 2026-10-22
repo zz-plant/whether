@@ -52,9 +52,9 @@ export const OfflineNotice = ({ recordDateLabel }: { recordDateLabel: string }) 
   return (
     <output
       aria-live="polite"
-      className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 text-sm leading-6 text-amber-100"
+      className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-l-4 border-caveat-border bg-caveat-bg px-4 py-3 text-sm leading-6 text-caveat-fg"
     >
-      <span className="font-medium">You are offline.</span>
+      <span className="weather-caveat-mark font-medium">You are offline.</span>
       <span>
         This is the reading recorded {recordDateLabel}, saved the last time this browser loaded the page.
         Reconnect to see whether the guidance has changed.

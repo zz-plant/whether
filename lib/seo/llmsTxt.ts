@@ -4,6 +4,7 @@ import { describeAgentTools } from "../agent/tools";
 import { MCP_PROTOCOL_VERSIONS } from "../mcp/serverIdentity";
 import { PUBLISH_MAX_RECORD_AGE_DAYS } from "../report/briefPublishGuard";
 import { canonicalPositioningLine } from "../seo";
+import { answerPages } from "../../app/answers/decisionPages";
 import { navigationGroups, pagesInGroup, utilityLinks } from "../navigation/informationArchitecture";
 
 /**
@@ -45,6 +46,13 @@ export const buildLlmsTxt = (baseUrl: string) => {
       .map((link) => `- ${link.label}: ${baseUrl}${link.href} — ${link.description}`),
   ];
 
+  /* The question-to-URL router: each answer is a page that opens with the
+     current posture, so an agent with a user's question can fetch the page that
+     matches it instead of the whole brief. Read from the same list the answer
+     routes serve; every answer is a question, including the explanations. */
+  const questionLines = answerPages
+    .map((page) => `- ${page.title}: ${baseUrl}/answers/${page.slug}`);
+
   return [
     "# Whether — Agent Interface",
     "",
@@ -61,6 +69,16 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "  - `bun run mcp:whether` runs the same tools over stdio from a checkout of the repository.",
     `- Read rather than decide: ${start.markdown} (Markdown).`,
     `- CLI, from a checkout: \`${start.cli}\``,
+    "",
+    "## If the user asks a question",
+    "",
+    "Each page opens with this week's posture and what it means for the decision, with the date of the reading. Cite the page and its date.",
+    ...questionLines,
+    "",
+    "## How current it is",
+    "",
+    "- The reading refreshes daily at 02:00 UTC, and the weekly call is published Mondays at 14:00 UTC. Treat a reading as current until `freshness.nextCallDue` in the state, and quote `recordDate`.",
+    "- A specific week has a permalink at /brief/<week>; cite that rather than the homepage when the date matters.",
     "",
     "## MCP tools",
     "",
@@ -95,8 +113,10 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "",
     "### Jev decision request",
     `- GET ${endpoints.agent}?format=jev`,
-    "- Returns: this week's guidance as a ready-to-send request for TypeSafe's Jev decision model (typesafe/jev): typed state with a `plan` slot, plus four questions: whether the plan conflicts with the guidance, which decision area it touches, how reversible it is, and whether it is safer after conditions change",
-    "- Fill `request.state.plan` and send `request` to Jev yourself; Whether never receives the plan",
+    "- Returns: this week's guidance as a ready-to-send decision request: typed state with a `plan` slot, plus eight questions about conflict, decision area, reversibility, conditional permission after conditions change, recurring fixed cost, explicit pause terms, reversibility evidence, and an explicit proposed action",
+    "- Optional `&model=jev|clef|clef-flash|clef-omni` selects the caller's model; Jev remains the default",
+    "- Fill `request.state.plan` and send `request` to your selected model yourself; Whether never receives the plan",
+    "- `&model=clef-omni&input=audio|video` supplies an empty media array for your own clip; send it directly to Cloudflare, never back to Whether",
     "- Check `automationReady` first: false means the reading is not live or not current",
     "",
     "## Guidance for agents",
@@ -111,6 +131,11 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "## Site",
     "",
     ...siteLines,
+    "",
+    "## Source",
+    "",
+    "- The code, MIT licensed: https://github.com/zz-plant/whether",
+    "- The score formulas: https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts",
     "",
     "## Discovery",
     `- Manifest: ${baseUrl}${WHETHER_AGENT_MANIFEST_PATH}`,

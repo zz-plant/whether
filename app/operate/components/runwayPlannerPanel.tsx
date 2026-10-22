@@ -45,7 +45,7 @@ const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
 
 const strictnessLabel = (value: number) => {
   if (value <= 0) return { label: "Relaxed", tone: "border-emerald-400/40 bg-emerald-500/10 text-emerald-100" };
-  if (value === 1) return { label: "Cautious", tone: "border-sky-400/40 bg-sky-500/10 text-sky-100" };
+  if (value === 1) return { label: "Cautious", tone: "border-slate-600/60 bg-slate-800/40 text-slate-100" };
   if (value === 2) return { label: "Strict", tone: "border-amber-400/40 bg-amber-500/10 text-amber-100" };
   return { label: "Maximum strictness", tone: "border-rose-400/40 bg-rose-500/10 text-rose-100" };
 };
@@ -65,7 +65,7 @@ const RangeBar = ({
   point,
   marker,
   unit = "",
-  tone = "sky",
+  tone = "ink",
   label,
 }: {
   min: number;
@@ -77,13 +77,14 @@ const RangeBar = ({
   /** A second value to compare against, e.g. the operator's own runway. */
   marker?: { value: number; label: string };
   unit?: string;
-  tone?: "sky" | "emerald" | "amber" | "rose";
+  /** "ink" for a neutral figure: the action colour is for controls (ui-ux-standards §XXVII). */
+  tone?: "ink" | "emerald" | "amber" | "rose";
   label: string;
 }) => {
   const span = max - min || 1;
   const pct = (value: number) => `${Math.min(100, Math.max(0, ((value - min) / span) * 100))}%`;
-  const bandColor = { sky: "bg-sky-400/25", emerald: "bg-emerald-400/25", amber: "bg-amber-400/25", rose: "bg-rose-400/25" }[tone];
-  const pointColor = { sky: "bg-sky-300", emerald: "bg-emerald-300", amber: "bg-amber-300", rose: "bg-rose-300" }[tone];
+  const bandColor = { ink: "bg-slate-300/25", emerald: "bg-emerald-400/25", amber: "bg-amber-400/25", rose: "bg-rose-400/25" }[tone];
+  const pointColor = { ink: "bg-slate-300", emerald: "bg-emerald-300", amber: "bg-amber-300", rose: "bg-rose-300" }[tone];
   const fmt = (value: number) => `${Number.isInteger(value) ? value : value.toFixed(1)}${unit}`;
   return (
     <div className="mt-3" aria-label={label}>
@@ -484,7 +485,7 @@ export function RunwayPlannerPanel({
                 marker={{ value: resolution.request.runway, label: "runway ends" }}
                 point={output.raiseTimingWindow.timeToSafeRunwayTargetMonths}
                 unit="mo"
-                tone="sky"
+                tone="ink"
                 label="Raise window against runway"
               />
               {inYourNumbers ? (
@@ -513,7 +514,7 @@ export function RunwayPlannerPanel({
                 point={output.burnAdjustmentRange.recommendedDeltaPercent}
                 marker={{ value: 0, label: "hold" }}
                 unit="%"
-                tone={output.burnAdjustmentRange.recommendedDeltaPercent < 0 ? "amber" : "sky"}
+                tone={output.burnAdjustmentRange.recommendedDeltaPercent < 0 ? "amber" : "ink"}
                 label="Recommended burn change inside its range"
               />
               {inYourNumbers?.burnChange ? (

@@ -29,6 +29,7 @@ Use this file to find the current source of truth without reading the whole `doc
 - `developer/quickstart.md` for first integration
 - `developer/api-reference.md` for endpoint contracts
 - `developer/integrations.md` for webhook & SDK recipes
+- `developer/decision-models.md` for caller-owned text/audio/video checks and advisory brief, screenshot, evidence and model evaluations
 
 ## Document types
 
@@ -50,6 +51,8 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 - `feature-specs-current.md` — current product surface intent
 - `current-jtbd-click-paths.md` — current jobs-to-be-done inventory with click-level fulfillment paths
 - `editorial-guardrails.md` — copy, claims, and long-form guardrails
+- `claims-ledger.md` — each claim a week makes, the one function that builds it, and the surfaces that print it
+- `design/palette-directions.md` — the October 2026 palette and type decision (Synoptic), with the options it rejected
 
 ### Engineering workflow
 
@@ -58,6 +61,9 @@ If a document is not obviously canonical, confirm it against the relevant canoni
 - `stack-compatibility-matrix.md` — runtime and platform constraints
 - `domain-and-deployment.md` — deployment topology and domain model
 - `cloudflare-deployment-runbook.md` — deploy expectations and evidence capture
+- `vinext-cloudflare-evaluation.md` — the Vinext build lane on Workers and the route counts it was judged on
+- `ui-iteration-workflow.md` — the `/mockups` routes and the screenshot loop for visual work
+- `assets/README.md` — the README screens and the generated brand kit, and how to remake each
 
 ### Developer integrations
 
@@ -109,6 +115,9 @@ These documents describe earlier architectures, retired routes, or proposals tha
 
 Use these to explain why a decision was made or to support a new proposal:
 
+- `research/premise-test-preregistration.md` and `research/premise-test-results.md` — whether tight readings predict lower U.S. venture deal volume; registered before the data was paired, and not supported
+- `research/advice-corpus-preregistration.md` and `research/advice-corpus-results.md` — whether published investor advice moves with the two scores; the predictions counted against
+- `research/advice-predictions-preregistration.md` — whether investors' dated market predictions come true; registered 2026-10-13, no results yet
 - [Responsive page design review](evidence/responsive-page-design-2026-10-04.md) — local mobile/desktop screenshots and verification for the spacing, reading-width and control refinements.
 - `seo/missed-opportunities-audit-2026-09-10.md` — indexation, structured-data and query-matching audit; every finding closed by 2026-09-15
 - `research/2026-09-03-alternative-data-endpoints.md` — sourcing research: which of the five upstream data hosts to replace

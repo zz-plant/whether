@@ -382,14 +382,14 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   markerHeight="4"
                   orient="auto-start-reverse"
                 >
-                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--accent-action)" strokeOpacity="0.55" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--app-text)" strokeOpacity="0.55" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                 </marker>
               </defs>
               {scatterPath ? (
                 <path
                   d={scatterPath}
                   fill="none"
-                  stroke="var(--accent-action)"
+                  stroke="var(--app-text)"
                   strokeOpacity="0.28"
                   strokeWidth="0.8"
                   markerMid="url(#scatter-direction-arrow)"
@@ -407,7 +407,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                     cx={x}
                     cy={y}
                     r={isLatestPoint ? "2.3" : "1.8"}
-                    fill="var(--accent-action)"
+                    fill="var(--app-text)"
                     fillOpacity={opacity.toFixed(2)}
                     stroke={isLatestPoint ? "var(--app-text)" : undefined}
                     strokeWidth={isLatestPoint ? "0.5" : undefined}
