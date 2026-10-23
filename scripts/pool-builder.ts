@@ -76,7 +76,7 @@ const queryPrompt = (query: string) => `task: sentence similarity | query: ${que
 const readCanonical = (file: string) => {
   const parsed: unknown = JSON.parse(readFileSync(file, "utf8"));
   if (typeof parsed === "object" && parsed !== null && "canonical" in parsed) {
-    return poolCanonicalSchema.parse((parsed as { canonical: unknown }).canonical);
+    return poolCanonicalSchema.parse(parsed.canonical);
   }
   return poolCanonicalSchema.parse(parsed);
 };
@@ -158,7 +158,7 @@ const main = async () => {
 
   mkdirSync(path.dirname(outPath), { recursive: true });
   writeFileSync(outPath, `${JSON.stringify(input, null, 2)}\n`);
-  console.log(`evidence:pool: ${selection.supporting.length} supporting + ${selection.challenging.length} challenging of ${pool.passages.length} passages (${selection.excluded} excluded as below floor or outside top ${top}) — wrote ${outPath}`);
+  console.log(`evidence:pool: ${selection.supporting.length} supporting + ${selection.challenging.length} challenging of ${pool.passages.length} passages (${selection.excluded} left out — below floor or outside top ${top}) — wrote ${outPath}`);
   console.log("evidence:pool: the side tags are retrieval hypotheses; judge them with bun run audit:jev-copy -- --mode counterevidence --input <out>");
   for (const candidate of candidates) {
     console.log(`  ${candidate.side} ${candidate.passage.id}  (support ${candidate.supportSimilarity.toFixed(3)}, challenge ${candidate.challengeSimilarity.toFixed(3)})`);

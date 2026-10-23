@@ -343,7 +343,9 @@ describe("decision ledger client", () => {
     assert.equal(result.ok, true);
     assert.equal(headerOf(calls[0]?.init), "browser-1");
     assert.equal(calls[0]?.init?.method, "POST");
-    const sent = Object(JSON.parse(String(calls[0]?.init?.body)));
+    const body = calls[0]?.init?.body;
+    assert.equal(typeof body, "string", "the request body is JSON text, not a stream");
+    const sent = Object(JSON.parse(typeof body === "string" ? body : "{}"));
     assert.equal(sent.clientId, "browser-1");
     assert.equal(sent.kind, "posture-snapshot");
     assert.equal(sent.primaryCall, "Hold net-new hiring.");

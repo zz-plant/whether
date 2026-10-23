@@ -9,7 +9,6 @@ import {
 } from "../lib/decisionFollowUp";
 import { type DecisionMemoryPayload } from "../lib/decisionMemory";
 import { resetDecisionMemoryRepository } from "../lib/storage/decisionMemoryRepository";
-import type { RegimeAssessment } from "../lib/regimeEngine";
 
 /**
  * The review response the loop's second half records: what the operator did
@@ -26,10 +25,10 @@ const decisionPayload: DecisionMemoryPayload = {
   outcome: { verdict: "SAFE", summary: "Hire the two open roles.", guardrail: "Pause above 85.", reversalTrigger: "Re-open below 65." },
   assessment: {
     regime: "EXPANSION",
-    scores: { tightness: 40, riskAppetite: 60, baseRate: 3.2, baseRateUsed: "1M", curveSlope: 0.4 },
+    scores: { tightness: 40, tightnessPressure: 40, tightnessSaturated: false, riskAppetite: 60, baseRate: 3.2, baseRateUsed: "1M", curveSlope: 0.4 },
     thresholds: { baseRateTightness: 3.5, tightnessRegime: 70, riskAppetiteRegime: 50 },
     inputs: [],
-  } as Pick<RegimeAssessment, "regime" | "scores" | "thresholds" | "inputs">,
+  },
 };
 
 const followUpPayload = (overrides: Partial<DecisionFollowUpPayload> = {}): DecisionFollowUpPayload => ({
@@ -57,7 +56,7 @@ describe("decision follow-up record", () => {
   });
 
   it("refuses a response outside the vocabulary", () => {
-    const record = buildDecisionFollowUpRecord({ ...followUpPayload(), clientId: "browser-1", response: "kept" } as unknown as DecisionFollowUpPayload);
+    const record = { ...buildDecisionFollowUpRecord({ ...followUpPayload(), clientId: "browser-1" }), response: "kept" };
     assert.equal(parseDecisionFollowUpRecord(record), null);
   });
 

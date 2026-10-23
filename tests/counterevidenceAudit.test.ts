@@ -27,24 +27,25 @@ const input = {
   ],
 };
 
-const answers = (overrides: Partial<Record<string, unknown>> = {}) => ({
-  relevance_0: { type: "score" as const, score: 2, confidence: 1, probabilities: { 0: 0, 1: 0, 2: 1 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } },
-  supported_0: { type: "noul" as const, noul: 0.99 },
-  challenges_0: { type: "noul" as const, noul: 0.1 },
-  relevance_1: { type: "score" as const, score: 2, confidence: 1, probabilities: { 0: 0, 1: 0, 2: 1 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } },
-  supported_1: { type: "noul" as const, noul: 0.98 },
-  challenges_1: { type: "noul" as const, noul: 0.95 },
-  relevance_2: { type: "score" as const, score: 0, confidence: 1, probabilities: { 0: 1, 1: 0, 2: 0 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } },
-  supported_2: { type: "noul" as const, noul: 0.99 },
-  challenges_2: { type: "noul" as const, noul: 0.2 },
+type NoulAnswer = { type: "noul"; noul: number };
+type ScoreAnswer = { type: "score"; score: number; confidence: number; probabilities: Record<string, number>; legend: Record<string, string> };
+type FixtureAnswer = NoulAnswer | ScoreAnswer;
+
+const answers = (overrides: Partial<Record<string, FixtureAnswer>> = {}): Record<string, FixtureAnswer> => ({
+  relevance_0: { type: "score", score: 2, confidence: 1, probabilities: { 0: 0, 1: 0, 2: 1 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } },
+  supported_0: { type: "noul", noul: 0.99 },
+  challenges_0: { type: "noul", noul: 0.1 },
+  relevance_1: { type: "score", score: 2, confidence: 1, probabilities: { 0: 0, 1: 0, 2: 1 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } },
+  supported_1: { type: "noul", noul: 0.98 },
+  challenges_1: { type: "noul", noul: 0.95 },
+  relevance_2: { type: "score", score: 0, confidence: 1, probabilities: { 0: 1, 1: 0, 2: 0 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } },
+  supported_2: { type: "noul", noul: 0.99 },
+  challenges_2: { type: "noul", noul: 0.2 },
   ...overrides,
 });
 
-type NoulAnswer = { type: "noul"; noul: number };
-type ScoreAnswer = { type: "score"; score: number; confidence: number; probabilities: Record<string, number>; legend: Record<string, string> };
-
-const result = (overrides: Partial<Record<string, NoulAnswer | ScoreAnswer>> = {}): JevResult => ({
-  ok: true, model: "fixture", answers: answers(overrides) as Record<string, NoulAnswer | ScoreAnswer>,
+const result = (overrides: Partial<Record<string, FixtureAnswer>> = {}): JevResult => ({
+  ok: true, model: "fixture", answers: answers(overrides),
 });
 
 describe("counterevidence review request", () => {

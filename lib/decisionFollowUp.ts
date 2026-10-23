@@ -56,7 +56,7 @@ export type DecisionFollowUpPayload = {
   conditions: DecisionFollowUpConditions;
 };
 
-const FOLLOW_UP_RESPONSES = new Set<DecisionFollowUpResponse>([
+const FOLLOW_UP_RESPONSES: ReadonlySet<string> = new Set([
   "continued",
   "changed",
   "deferred",
@@ -92,7 +92,7 @@ const isDecisionFollowUpRecord = (value: unknown): value is DecisionFollowUpReco
     && typeof value.context.recordDate === "string"
     && typeof value.entryId === "string"
     && typeof value.response === "string"
-    && FOLLOW_UP_RESPONSES.has(value.response as DecisionFollowUpResponse)
+    && FOLLOW_UP_RESPONSES.has(value.response)
     && (value.note === undefined
       || (typeof value.note === "string" && value.note.length <= FOLLOW_UP_NOTE_MAX_LENGTH))
     && isConditions(value.conditions);
@@ -109,7 +109,7 @@ const isDecisionFollowUpPayload = (value: unknown): value is DecisionFollowUpPay
     && typeof value.recordDate === "string"
     && typeof value.entryId === "string"
     && typeof value.response === "string"
-    && FOLLOW_UP_RESPONSES.has(value.response as DecisionFollowUpResponse)
+    && FOLLOW_UP_RESPONSES.has(value.response)
     && (value.note === undefined
       || (typeof value.note === "string" && value.note.length <= FOLLOW_UP_NOTE_MAX_LENGTH))
     && isConditions(value.conditions);
