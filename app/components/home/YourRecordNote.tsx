@@ -21,9 +21,15 @@ import type { DecisionRecordView } from "../../../lib/report/decisionRecordView"
  * recorded a decision, so it asks the server only when this browser remembers having done
  * so (`loadRecordNoteView`), and an addition to the brief never puts an error under the call.
  */
-export function RecordNote({ view }: { view: DecisionRecordView }) {
+export function RecordNote({ view, recordDate }: { view: DecisionRecordView; recordDate?: string }) {
   if (view.rows.length === 0) return null;
   const needsAttention = view.counts.watch + view.counts.reconsider > 0;
+  /* A decision that needs attention but has no follow-up against this week's
+     reading is the actionable gap: the note says how many, rather than leaving
+     "conditions moved" as the whole story. */
+  const awaitingReview = recordDate
+    ? view.rows.filter((row) => row.verdict !== "STAND" && row.followUp?.recordDate !== recordDate).length
+    : 0;
   return (
     <div
       data-testid="your-record-note"
@@ -46,6 +52,9 @@ export function RecordNote({ view }: { view: DecisionRecordView }) {
         ) : null}
         <span>
           <span className="font-semibold text-slate-100">Your decisions:</span> {view.headline}
+          {awaitingReview > 0 ? (
+            <span className="text-amber-200">{" "}· {awaitingReview} await{awaitingReview === 1 ? "s" : ""} this week's review</span>
+          ) : null}
         </span>
       </div>
       <Link
@@ -58,7 +67,7 @@ export function RecordNote({ view }: { view: DecisionRecordView }) {
   );
 }
 
-export function YourRecordNote({ tightness, riskAppetite }: { tightness: number; riskAppetite: number }) {
+export function YourRecordNote({ tightness, riskAppetite, recordDate }: { tightness: number; riskAppetite: number; recordDate?: string }) {
   const clientId = usePersistentClientId();
   const [view, setView] = useState<DecisionRecordView | null>(null);
 
@@ -74,5 +83,5 @@ export function YourRecordNote({ tightness, riskAppetite }: { tightness: number;
     };
   }, [clientId, tightness, riskAppetite]);
 
-  return view ? <RecordNote view={view} /> : null;
+  return view ? <RecordNote view={view} recordDate={recordDate} /> : null;
 }

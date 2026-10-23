@@ -4,12 +4,14 @@ import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { z } from "zod";
 import { artifactAuditSchema, buildArtifactAudit, buildScreenshotAudit, buildEvidenceAudit, selectEvidence, summarizeEvaluation } from "../lib/jev/auditRequests";
+import { buildCounterevidenceAudit, buildCounterevidencePacket, counterevidenceInputSchema, summarizeCounterevidencePacket } from "../lib/jev/counterevidence";
 import { runJev, type DecisionModel, type JevRequest, type JevResult } from "../lib/jev/jevClient";
 import { validateDecisionMedia } from "../lib/jev/jevMedia";
 import type { BriefDocument } from "../lib/report/briefArtifact";
 
 const digest = (value: string | Uint8Array) => createHash("sha256").update(value).digest("hex");
 const QUESTION_VERSION = "whether-decision-audit-v1";
+const COUNTEREVIDENCE_QUESTION_VERSION = "whether-counterevidence-v1";
 const DEFAULT_INPUT = "artifacts/weekly-slack-brief.txt.audit.json";
 const readJson = (file: string): unknown => JSON.parse(readFileSync(file, "utf8"));
 
@@ -24,13 +26,24 @@ export const buildBriefAuditBundle = (document: BriefDocument, engineVersion: st
   });
 };
 
-type Mode = "brief" | "screenshot" | "evidence" | "eval";
+type Mode = "brief" | "screenshot" | "evidence" | "counterevidence" | "eval";
 type AuditArgs = { mode: Mode; inputPath?: string; imagePath?: string; reportDir?: string; threshold: number; models: DecisionModel[] };
 type Credentials = { accountId: string; apiToken: string; fetchImpl?: typeof fetch };
-const evaluationSchema = z.object({ cases: z.array(z.object({
-  id: z.string().min(1), input: artifactAuditSchema,
-  expected: z.record(z.string(), z.boolean()).refine((values) => Object.keys(values).length > 0),
-})).min(1).max(200).refine((cases) => new Set(cases.map((item) => item.id)).size === cases.length, "case IDs must be unique") });
+
+const expectedLabels = z.record(z.string(), z.boolean()).refine((values) => Object.keys(values).length > 0);
+/* `kind` defaults to artifact so the seeded smoke suite keeps its shape; an
+   input that does not match its declared kind is refused. */
+const evaluationCaseSchema = z.object({
+  kind: z.enum(["artifact", "counterevidence"]).default("artifact"),
+  id: z.string().min(1),
+  input: z.union([artifactAuditSchema, counterevidenceInputSchema]),
+  expected: expectedLabels,
+}).refine((item) => item.kind === "counterevidence"
+  ? counterevidenceInputSchema.safeParse(item.input).success
+  : artifactAuditSchema.safeParse(item.input).success,
+"the input does not match the case kind");
+const evaluationSchema = z.object({ cases: z.array(evaluationCaseSchema).min(1).max(200)
+  .refine((cases) => new Set(cases.map((item) => item.id)).size === cases.length, "case IDs must be unique") });
 
 const imageInput = (file: string) => {
   const extension = path.extname(file).toLowerCase();
@@ -69,7 +82,9 @@ export const runArtifactAudit = async (args: AuditArgs, credentials: Credentials
     if (args.mode === "eval") {
       const suite = evaluationSchema.parse(input);
       const cases = suite.cases.map((item) => {
-        const request = buildArtifactAudit(item.input);
+        const request = item.kind === "counterevidence"
+          ? buildCounterevidenceAudit(item.input)
+          : buildArtifactAudit(item.input);
         for (const key of Object.keys(item.expected)) {
           if (request.questions[key]?.type !== "noul") throw new Error(`unknown binary evaluation label: ${key}`);
         }
@@ -88,7 +103,9 @@ export const runArtifactAudit = async (args: AuditArgs, credentials: Credentials
         }
         byModel[model] = { summary: summarizeEvaluation(samples, args.threshold), cases: runs };
       }
-      write({ ...base, questionVersion: QUESTION_VERSION, status: failed ? "incomplete" : "completed", inputPath, inputDigest, byModel });
+      write({ ...base, questionVersion: QUESTION_VERSION,
+        questionVersions: [...new Set(cases.map((item) => item.kind === "counterevidence" ? COUNTEREVIDENCE_QUESTION_VERSION : QUESTION_VERSION))],
+        status: failed ? "incomplete" : "completed", inputPath, inputDigest, byModel });
       console.log(`jev-copy-audit: ${reportPath} (${failed} failed calls; inspect labeled errors before choosing a model)`);
       return failed ? 1 : 0;
     }
@@ -100,6 +117,7 @@ export const runArtifactAudit = async (args: AuditArgs, credentials: Credentials
     const image = args.mode === "screenshot" && args.imagePath ? imageInput(args.imagePath) : null;
     if (args.mode === "screenshot" && !image) throw new Error("screenshot mode requires --image with the actual captured brief");
     const request = args.mode === "evidence" ? buildEvidenceAudit(input)
+      : args.mode === "counterevidence" ? buildCounterevidenceAudit(input)
       : image ? buildScreenshotAudit(input, image.url) : buildArtifactAudit(input);
     for (const model of args.models) {
       const error = validateDecisionMedia(request, model);
@@ -114,10 +132,22 @@ export const runArtifactAudit = async (args: AuditArgs, credentials: Credentials
         .filter(([, answer]) => answer.type === "noul" && answer.noul >= args.threshold).map(([key]) => key) : null;
       const unresolved = run.result.ok ? Object.entries(run.result.answers)
         .filter(([, answer]) => answer.type === "noul" && answer.noul > 1 - args.threshold && answer.noul < args.threshold).map(([key]) => key) : null;
-      byModel[model] = { ...run, ...(args.mode === "evidence" ? { selection: selectEvidence(input, run.result, args.threshold) } : { flags, unresolved }) };
+      const placed = args.mode === "evidence" ? { selection: selectEvidence(input, run.result, args.threshold) }
+        : args.mode === "counterevidence" ? { packet: buildCounterevidencePacket(input, run.result, args.threshold) }
+        : { flags, unresolved };
+      byModel[model] = { ...run, ...placed };
+      if (args.mode === "counterevidence" && run.result.ok) {
+        const packet = buildCounterevidencePacket(input, run.result, args.threshold);
+        console.log(`jev-copy-audit: ${model} ${summarizeCounterevidencePacket(packet)} (${packet.supporting.length} supporting, ${packet.review.length} for review)`);
+        for (const challenge of packet.challenges) {
+          console.log(`  challenge ${challenge.id} (${challenge.challenge.toFixed(2)}, relevance ${challenge.relevance})  ${challenge.claim}`);
+        }
+      }
     }
     const retrieval = args.mode === "evidence" ? z.object({ retrieval: z.record(z.string(), z.unknown()).optional() }).parse(input).retrieval : undefined;
-    write({ ...base, ...requestRecord(request), status: failed ? "incomplete" : "completed", inputPath, inputDigest,
+    write({ ...base, ...requestRecord(request),
+      questionVersion: args.mode === "counterevidence" ? COUNTEREVIDENCE_QUESTION_VERSION : QUESTION_VERSION,
+      status: failed ? "incomplete" : "completed", inputPath, inputDigest,
       ...(retrieval ? { retrieval } : {}), media: image?.metadata ?? null, byModel });
     console.log(`jev-copy-audit: ${reportPath} (${failed} failed calls; findings are advisory)`);
     return failed ? 1 : 0;

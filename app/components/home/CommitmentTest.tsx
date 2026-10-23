@@ -4,6 +4,7 @@ import { useId, useMemo, useState } from "react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
 import { buildCommitmentImpact, describeProfileRunway } from "../../../lib/report/runwayConditionedNotes";
+import { RUNWAY_BAND_OPTIONS } from "../../../lib/report/operatorRunway";
 import { parseMoneyInput } from "../../../lib/planCommitment";
 import { netMonthlyBurnUsd, resolveProfileRunway } from "../../../lib/operatorProfile";
 import { OperatorProfileNumberField } from "../operatorProfileFields";
@@ -28,6 +29,15 @@ import { useOperatorProfile } from "../useOperatorProfile";
  * /operate still counts until cash replaces it. The decision's cost is not
  * stored; it belongs to one question.
  */
+/**
+ * The runway chart's scale ends at 36 months; the band boundaries are the
+ * canonical ones (6 / 12 / 24), not a local 12/18 mapping, so a reader sees the
+ * same bands the guidance and `buildCommitmentImpact` use.
+ */
+const RUNWAY_BAND_CEILINGS = RUNWAY_BAND_OPTIONS
+  .map((option) => option.maxMonths)
+  .filter((months): months is number => months !== null);
+
 export function CommitmentTest({
   regime,
   area,
@@ -143,39 +153,37 @@ export function CommitmentTest({
                 </span>
               </div>
               <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-800">
-                {/* 12-month critical pause line marker at 12/36 = 33.3% */}
-                <div
-                  className="absolute bottom-0 top-0 z-10 w-0.5 bg-rose-500/60"
-                  style={{ left: "33.3%" }}
-                  title="12-month pause line"
-                />
-                {/* 18-month caution line marker at 18/36 = 50% */}
-                <div
-                  className="absolute bottom-0 top-0 z-10 w-0.5 bg-amber-500/60"
-                  style={{ left: "50%" }}
-                  title="18-month watch line"
-                />
+                {/* Canonical band boundaries (6 / 12 / 24 mo), drawn as light rules. */}
+                {RUNWAY_BAND_CEILINGS.map((months) => (
+                  <div
+                    key={months}
+                    className="absolute bottom-0 top-0 z-10 w-0.5 bg-slate-500/40"
+                    style={{ left: `${(months / 36) * 100}%` }}
+                    title={`${months}-month runway band boundary`}
+                  />
+                ))}
                 {/* Previous runway bar */}
                 <div
                   className="absolute bottom-0 top-0 rounded-full bg-slate-600/40 transition-[width] duration-300 motion-reduce:transition-none"
                   style={{ width: `${Math.min(100, Math.max(0, (impact.runwayBefore / 36) * 100))}%` }}
                 />
-                {/* New runway bar */}
+                {/* New runway bar, colored by the canonical band the runway lands in: critical, tight, or balanced-and-up. */}
                 <div
                   className={`absolute bottom-0 top-0 rounded-full transition-[width] duration-300 motion-reduce:transition-none ${
-                    impact.runwayAfter <= 12
+                    impact.runwayAfter < 6
                       ? "bg-rose-500"
-                      : impact.runwayAfter <= 18
-                      ? "bg-amber-400"
-                      : "bg-emerald-400"
+                      : impact.runwayAfter < 12
+                        ? "bg-amber-400"
+                        : "bg-emerald-400"
                   }`}
                   style={{ width: `${Math.min(100, Math.max(0, (impact.runwayAfter / 36) * 100))}%` }}
                 />
               </div>
               <div className="flex justify-between text-[10px] tabular-nums text-slate-500">
                 <span>0 mo</span>
-                <span className="text-rose-400/80">12 mo (pause)</span>
-                <span className="text-amber-400/80">18 mo (watch)</span>
+                <span className="text-rose-400/80">6 mo</span>
+                <span className="text-amber-400/80">12 mo</span>
+                <span className="text-emerald-400/80">24 mo</span>
                 <span>36+ mo</span>
               </div>
             </div>
