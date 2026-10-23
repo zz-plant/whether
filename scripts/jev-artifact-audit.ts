@@ -65,6 +65,7 @@ export const runArtifactAudit = async (args: AuditArgs, credentials: Credentials
     if (!args.models.length) throw new Error("at least one model is required");
     const inputPath = args.inputPath ?? DEFAULT_INPUT;
     const input = readJson(inputPath);
+    const inputDigest = digest(JSON.stringify(input));
     if (args.mode === "eval") {
       const suite = evaluationSchema.parse(input);
       const cases = suite.cases.map((item) => {
@@ -87,7 +88,7 @@ export const runArtifactAudit = async (args: AuditArgs, credentials: Credentials
         }
         byModel[model] = { summary: summarizeEvaluation(samples, args.threshold), cases: runs };
       }
-      write({ ...base, questionVersion: QUESTION_VERSION, status: failed ? "incomplete" : "completed", inputPath, byModel });
+      write({ ...base, questionVersion: QUESTION_VERSION, status: failed ? "incomplete" : "completed", inputPath, inputDigest, byModel });
       console.log(`jev-copy-audit: ${reportPath} (${failed} failed calls; inspect labeled errors before choosing a model)`);
       return failed ? 1 : 0;
     }
@@ -115,7 +116,9 @@ export const runArtifactAudit = async (args: AuditArgs, credentials: Credentials
         .filter(([, answer]) => answer.type === "noul" && answer.noul > 1 - args.threshold && answer.noul < args.threshold).map(([key]) => key) : null;
       byModel[model] = { ...run, ...(args.mode === "evidence" ? { selection: selectEvidence(input, run.result, args.threshold) } : { flags, unresolved }) };
     }
-    write({ ...base, ...requestRecord(request), status: failed ? "incomplete" : "completed", inputPath, media: image?.metadata ?? null, byModel });
+    const retrieval = args.mode === "evidence" ? z.object({ retrieval: z.record(z.string(), z.unknown()).optional() }).parse(input).retrieval : undefined;
+    write({ ...base, ...requestRecord(request), status: failed ? "incomplete" : "completed", inputPath, inputDigest,
+      ...(retrieval ? { retrieval } : {}), media: image?.metadata ?? null, byModel });
     console.log(`jev-copy-audit: ${reportPath} (${failed} failed calls; findings are advisory)`);
     return failed ? 1 : 0;
   } catch (error) {

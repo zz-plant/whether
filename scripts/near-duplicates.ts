@@ -35,6 +35,7 @@ import { z } from "zod";
 import { deadExportsConfig } from "./census.config";
 import { DEFAULT_ROUTES as READER_ROUTES, extractSentences } from "./jev-copy-audit";
 import { walkFiles } from "./walk-files.mjs";
+import { embedTexts } from "./local-embeddings";
 
 const DEFAULT_MODEL = "embeddinggemma-2:740m";
 const DEFAULT_THRESHOLD = 0.93;
@@ -157,21 +158,7 @@ export const sentenceUnits = (pages: { route: string; sentences: string[] }[]): 
       : [{ file: routes.join(", "), name: text.length > 80 ? `${text.slice(0, 77)}...` : text, line, text }]);
 };
 
-const embedResponse = z.object({ embeddings: z.array(z.array(z.number())) });
 const cacheSchema = z.record(z.string(), z.array(z.number()));
-
-const embed = async (inputs: string[], model: string, host: string): Promise<number[][]> => {
-  const response = await fetch(new URL("/api/embed", host), {
-    method: "POST",
-    headers: { "content-type": "application/json" },
-    body: JSON.stringify({ model, input: inputs, keep_alive: "5m" }),
-    signal: AbortSignal.timeout(300_000),
-  });
-  if (!response.ok) throw new Error(`Ollama ${response.status}: ${(await response.text()).slice(0, 200)}`);
-  const parsed = embedResponse.parse(await response.json());
-  if (parsed.embeddings.length !== inputs.length) throw new Error(`Ollama returned ${parsed.embeddings.length} vectors for ${inputs.length} inputs`);
-  return parsed.embeddings;
-};
 
 const parseArgs = (argv: string[]) => {
   const read = (name: string) => {
@@ -222,7 +209,7 @@ const run = async (args: ReturnType<typeof parseArgs>) => {
   mkdirSync(REPORT_DIR, { recursive: true });
   for (let start = 0; start < missing.length; start += BATCH) {
     const batch = missing.slice(start, start + BATCH);
-    const vectors = await embed(batch.map(({ unit }) => prompt(unit)), args.model, args.host);
+    const vectors = await embedTexts(batch.map(({ unit }) => prompt(unit)), { model: args.model, host: args.host });
     for (const [index, { key }] of batch.entries()) {
       const vector = vectors[index];
       if (vector) cache[key] = vector;
