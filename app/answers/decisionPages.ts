@@ -89,7 +89,10 @@ export const findDecisionPage = (slug: string) => answerPageBySlug.get(slug);
  * Used by agent tool calling and API endpoints so callers can look up guidance by question or topic.
  */
 export const matchDecisionPage = (query: string): DecisionPageDefinition | undefined => {
-  const normalized = query.trim().toLowerCase();
+  /* Strip punctuation so a caller's natural-language question ("should we freeze
+     hiring?") matches the same as its words would: the trailing "?" otherwise
+     survives into "hiring?" and misses every slug, keyword, title and token. */
+  const normalized = query.toLowerCase().replace(/[^\p{L}\p{N}\s-]+/gu, " ").replace(/\s+/g, " ").trim();
   if (!normalized) return undefined;
 
   const direct = answerPageBySlug.get(normalized);

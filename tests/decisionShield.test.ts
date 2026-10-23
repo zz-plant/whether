@@ -512,6 +512,26 @@ describe("stress test — detection confidence", () => {
     assert.equal(starter.detectionConfidence, "MATCHED");
   });
 
+  it("reads recruit and numbered add/open as hiring, without claiming a bare office", () => {
+    // The role-noun removal dropped "recruit", which is unambiguous; "add"/"open"
+    // need a number, so "open a London office" stays an office, not a hire.
+    const recruit = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Recruit 1 principal architect to rebuild our architecture",
+    });
+    assert.equal(recruit.detectedCategory, "HIRING");
+    assert.equal(recruit.detectionConfidence, "MATCHED");
+
+    const add = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Add 3 engineers to the platform team",
+    });
+    assert.equal(add.detectedCategory, "HIRING");
+
+    const open = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "open a London office",
+    });
+    assert.notEqual(open.detectedCategory, "HIRING");
+  });
+
   it("treats an explicit category override as matched, not assumed", () => {
     const result = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "asdf qwerty",
@@ -540,6 +560,16 @@ describe("stress test — runway prose matches the rule it applies", () => {
 
     assert.equal(result.verdict, "DANGEROUS");
     assert.match(result.financialImpactSummary ?? "", /Runway of 9 months is under the 12-month line/);
+  });
+
+  it("does not shrink a monthly commitment by a hyphenated runway aside", () => {
+    // "9-month" here modifies runway, not the commitment: the $10k/mo runs a
+    // full year, not 9 months.
+    const result = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Pay $10k/mo while maintaining a 9-month runway",
+      companyProfile: cashProfile,
+    });
+    assert.equal(result.commitment.annualUsd, 120_000);
   });
 });
 

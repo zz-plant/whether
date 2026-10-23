@@ -2,15 +2,16 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { z } from "zod";
-import { SPECULATION_RULES, withSpeculationRules } from "../lib/runtime/speculationRules";
+import { SPECULATION_RULES_PATH, withSpeculationRules } from "../lib/runtime/speculationRules";
 
 /**
  * Hover prefetch rules, delivered by the worker's Speculation-Rules response
- * header. The delivery mechanism is the whole point: the HTML standard
- * requires type=speculationrules scripts to be inline and fires an error on
- * one with a src, so the layout's old external-file script prefetched nothing
- * while reading as if it did. The layout must never regain a
- * speculationrules script element — the header is the mechanism.
+ * header. The header is a Structured Fields list of URLs whose resources carry
+ * the rules JSON — not the JSON itself, which the HTML standard refuses — so
+ * the header points at `/speculation-rules.json` and that file holds the
+ * rules. The layout must never regain a speculationrules script element: a
+ * script with a `src` is ignored by the standard, so the header is the
+ * mechanism.
  */
 
 const htmlResponse = () =>
@@ -18,9 +19,8 @@ const htmlResponse = () =>
     headers: { "content-type": "text/html; charset=utf-8" },
   });
 
-/* The header parsed with a schema, not a cast: a malformed rule fails with a
-   zod path here instead of a TypeError deep inside an assertion. The fields
-   the assertions read are required, so a rule that loses one fails at parse. */
+/* The rules parsed with a schema, not a cast: a malformed rule fails with a
+   zod path here instead of a TypeError deep inside an assertion. */
 const rulesSchema = z.object({
   prefetch: z.array(
     z.object({
@@ -32,21 +32,20 @@ const rulesSchema = z.object({
 });
 
 describe("speculation rules", () => {
-  it("rides document responses as the Speculation-Rules header", () => {
+  it("rides document responses as a URL the browser can fetch", () => {
     const response = withSpeculationRules(htmlResponse());
     const header = response.headers.get("Speculation-Rules");
-    assert.ok(header, "an HTML response must carry the rules");
-    const rules = rulesSchema.parse(JSON.parse(header));
+    assert.equal(header, `"${SPECULATION_RULES_PATH}"`, "the header names the rules resource, not the JSON inline");
+  });
+
+  it("serves the rules document that URL points at", async () => {
+    const rules = rulesSchema.parse(JSON.parse(await readFile("public/speculation-rules.json", "utf8")));
     assert.equal(rules.prefetch.length, 1, "one prefetch rule");
     const [rule] = rules.prefetch;
     assert.ok(rule, "the prefetch rule is present");
     assert.equal(rule.source, "document");
     assert.equal(rule.eagerness, "moderate", "moderate is hover-driven: one request per hovered link, nothing executed");
     assert.ok(rule.where.and.some((clause) => JSON.stringify(clause).includes("/api/**")), "endpoints are not pages a reader navigates to");
-  });
-
-  it("parses as the same JSON the constant holds", () => {
-    assert.equal(withSpeculationRules(htmlResponse()).headers.get("Speculation-Rules"), SPECULATION_RULES);
   });
 
   it("leaves non-document responses untouched", () => {
