@@ -15,9 +15,10 @@ export const artifactAuditSchema = z.object({
   canonical: canonicalAuditSchema,
   artifact: z.object({ recordDate: date, engineVersion: text, readingId: text, text: z.string().min(1).max(32_000) }),
 });
+export const evidenceCandidateSchema = z.object({ id: z.string().min(1).max(100), claim: text, excerpt: text, sourceUrl, observedAt: date });
 const evidenceSchema = z.object({
   canonical: canonicalAuditSchema,
-  candidates: z.array(z.object({ id: z.string().min(1).max(100), claim: text, excerpt: text, sourceUrl, observedAt: date })).min(1).max(16)
+  candidates: z.array(evidenceCandidateSchema).min(1).max(16)
     .refine((items) => new Set(items.map((item) => item.id)).size === items.length, "candidate IDs must be unique"),
 });
 

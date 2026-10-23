@@ -10,6 +10,27 @@ const input = { canonical, artifact: { recordDate: canonical.recordDate, engineV
 const credentials = { accountId: "account", apiToken: "test-token" };
 
 describe("decision audit CLI workflows", () => {
+  it("retains discovery lineage in evidence reports without sending it to the decision model", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "whether-evidence-lineage-"));
+    try {
+      const inputPath = path.join(dir, "retrieved.json");
+      const retrieval = { model: "embeddinggemma-2:740m", modelDigest: "a".repeat(64), inputDigest: "b".repeat(64), ranking: [{ id: "source", similarity: 0.8 }] };
+      writeFileSync(inputPath, JSON.stringify({ canonical, candidates: [{ id: "source", claim: "Hold hiring.", excerpt: "A quoted passage.", sourceUrl: "https://example.com/source", observedAt: "2026-10-14" }], retrieval }));
+      assert.equal(await runArtifactAudit({ mode: "evidence", inputPath, reportDir: dir, threshold: 0.8, models: ["clef-flash"] }, {
+        ...credentials, fetchImpl: async (_, init) => {
+          const body = init?.body;
+          assert.ok(typeof body === "string");
+          assert.equal(JSON.parse(body).state.retrieval, undefined);
+          return new Response("offline", { status: 503 });
+        },
+      }), 1);
+      const report = JSON.parse(readFileSync(path.join(dir, "evidence-audit.json"), "utf8"));
+      assert.match(report.inputDigest, /^[a-f0-9]{64}$/);
+      assert.deepEqual(report.retrieval, retrieval);
+      assert.equal(report.status, "incomplete");
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
   it("records exact inputs, version, digest, timing and each model's failures", async () => {
     const dir = mkdtempSync(path.join(tmpdir(), "whether-audit-"));
     try {

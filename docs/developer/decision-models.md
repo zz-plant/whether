@@ -233,6 +233,78 @@ reviewed cases become held-out evidence for routing, prompts and retrieval setti
 registry is committed and not rewritten; a labeled case is superseded, never deleted.
 Independent outcome checks matter more than agreement between models.
 
+## Retrieve candidates locally with EmbeddingGemma 2
+
+Use a larger pool of source passages before the sixteen-candidate support check:
+
+```sh
+bun run brief:weekly:artifact
+bun run evidence:retrieve -- --input source-pool.json \
+  --brief artifacts/weekly-slack-brief.txt.audit.json \
+  --out artifacts/evidence-candidates.json --limit 8
+bun run audit:jev-copy -- --mode evidence --model clef-flash \
+  --input artifacts/evidence-candidates.json
+```
+
+`source-pool.json` contains `{ "candidates": [...] }`, using the candidate fields above
+with up to 10,000 unique IDs. Supply passages you have collected and checked; this tool
+does not fetch sources or generate claims. `--brief` takes canonical guidance from the
+paired weekly artifact and validates its date, reading ID and engine identity. A pool
+with a conflicting canonical record fails before inference. Alternatively, omit `--brief`
+and include `canonical` in the pool for a standalone review. A fallback brief remains a
+fallback review; retrieval cannot establish readiness.
+
+The default model is `embeddinggemma-2:740m`, served by the installed Ollama-compatible
+runtime at `http://127.0.0.1:11434`. `--host` or `OLLAMA_HOST` can select another HTTP
+loopback address; remote hosts and redirects are refused. This is an explicit local
+developer command. The subsequent Clef command sends the selected passages to Cloudflare
+using the caller's credentials. Neither command runs during a reader request, scheduled
+brief delivery, or the deploy gate.
+
+The query combines guidance and supplied action/pause/resume/change lines. Passages use
+`title: <claim> | text: <excerpt>`; the query uses `task: search result | query: <query>`,
+following [Google's model card](https://huggingface.co/google/embeddinggemma-2).
+[Ollama embedding requests](https://docs.ollama.com/api/embed) set `truncate: false`,
+so an oversized passage fails rather than silently losing its ending. Inputs are batched
+in groups of sixteen. Returned vectors must have a nonzero norm, finite values, and the
+same dimension; cosine ranking uses normalized vectors and breaks ties by candidate ID.
+
+Code excludes observations after the canonical record date and collapses duplicate
+claim/excerpt pairs, keeping the first supplied citation. Different claims about the same
+excerpt remain separate for the support check. Original wording, dates, IDs and URLs
+survive selection. This date filter only checks supplied metadata: later-trained weights
+and undated source knowledge make it unsuitable for proving historical foresight.
+
+`--limit` accepts 1–16 (default 8). Similarity has no acceptance threshold and is neither
+support probability nor confidence: irrelevant or contradictory passages can still enter
+the shortlist. Clef's independent support question and human source review remain necessary.
+Use concise excerpts or a smaller limit to fit the selected Clef model's input budget.
+
+The local cache (`--cache`, default `artifacts/evidence-retrieval/cache.json`) is keyed by
+full prompted content, prompt version and installed model digest. Replaced weights
+invalidate the cache; a digest change during retrieval fails the run. Reports retain the
+full pool/reading input digest, model digest, dimension, cache counts, exclusions, timing
+and ranked cosine scores. The evidence audit preserves this retrieval metadata and an
+input digest in its report, while sending only canonical guidance and passages to Clef.
+Failed retrieval replaces an old output with a failure record containing no candidates,
+so it cannot be mistaken for a fresh shortlist. Corrupt cache files fail explicitly;
+remove the cache and rerun to rebuild it.
+
+Run the opt-in local smoke evaluation with:
+
+```sh
+bun run eval:evidence-retrieval
+```
+
+It retrieves against twenty authored hypothetical passages for hiring, fundraising and
+vendor decisions, records recall at three against the supplied relevance labels, and
+writes `artifacts/evidence-retrieval/evaluation.json`. These examples and placeholder URLs
+are not market evidence, a production benchmark, or a support-quality evaluation. Add
+reviewed real passages and hard negatives before tuning retrieval policy. The offline
+suite separately covers cache invalidation, malformed vectors, dates, duplicate claims,
+canonical handoff, and service failures. The registered advice-corpus prefilter continues
+to use Nomic; changing its embedding model would require a separate research revision.
+
 ## Evaluate before selecting a model
 
 ```sh
