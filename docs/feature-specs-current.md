@@ -22,7 +22,18 @@ its paired canonical document, checks an actual local screenshot, ranks supplied
 with a separate support test, and runs labeled model comparisons. These remain advisory,
 outside automated delivery and the offline deploy gate. The generator writes the exact
 document identity beside its text so audits refuse mismatched readings before inference.
-Contract, commands and evaluation limits: [decision models](developer/decision-models.md).
+
+Since 2026-10-23 a `counterevidence` mode asks the third question per candidate — whether
+a supplied passage's claim, if it holds, would weaken the call's operating implication —
+and assembles the review packet deterministically (what could weaken the call, what backs
+it, and the printed change line as the reconsideration line; nothing is generated). Human
+labels on packet findings are kept in the committed reviewed-case registry
+(`data/reviewed-cases/cases.json`, `bun run reviewed-cases:add`) and exported as
+evaluation cases that `--mode eval` scores, so reviewed cases become held-out evidence for
+routing and retrieval decisions. The source pool itself is built by `bun run evidence:pool`
+(EmbeddingGemma 2, local Ollama): a recurring passage file is embedded against the call and
+its change conditions, and the pool's side tags are retrieval hypotheses that the
+counterevidence mode verifies. Contract, commands and evaluation limits: [decision models](developer/decision-models.md).
 
 ### Current reading and disclosure behavior (2026-09-24)
 
@@ -4321,6 +4332,17 @@ $$
   (`app/components/decisionLedgerClient.ts`); a failed write says so and names the reason.
   `DecisionMemoryButton` and the local mirror (`app/components/decisionMemoryLocalCache.ts`) went
   on 2026-09-08.
+- **Review responses** (`lib/decisionFollowUp.ts`, 2026-10-23). A WATCH or RECONSIDER row on
+  `/decisions` offers "Record your review": the operator records whether they **continued**,
+  **changed**, or **deferred** the commitment, with an optional note, against the reading being
+  reviewed. Each response is its own per-client, append-only record (`df:` keyspace beside the
+  ledger's `dm:`) carrying the current scores at response time, so the review trail is a time
+  series of its own — decision conditions, response conditions, the next check. The row shows the
+  newest response ("Reviewed against the {date} reading") and re-offers the form until the
+  commitment is reviewed against the current reading. A follow-up must name one of the browser's
+  own entries or the route refuses it (`unknown-entry`), so an orphan review can never render
+  invisibly. The response vocabulary (Continued / Changed / Deferred, with plain sentences) is
+  defined once in `decisionRecordView.ts` (`RESPONSE_OPTIONS` / `RESPONSE_SENTENCES`).
 - The plan stress test's "Track in Memory" posted `{ kind: "plan-evaluation", … }`, a shape
   `/api/decision-memory` has never accepted, until 2026-09-06, when it moved to a `decision` entry
   built by `buildPlanStressTestMemoryPayload` (`lib/decisionMemory.ts`). The control went on
@@ -4331,7 +4353,10 @@ $$
   mode the share artifact is the plan stress test (plan text, model, verdict, sizing, fragile
   assumptions, guardrail, reversal trigger — bootstrapped mode prints the profile's gross margin)
   and the memory entry records the plan's detected category and action with the stress-test
-  outcome; in compare mode it exports both plans, both verdicts, and the recommendation. Both
+  outcome; in compare mode it exports both plans, both verdicts, and the recommendation, and
+  `Record this decision` is suppressed there — two plans are not one decision, and the ledger
+  payload would have been the hidden list mode's verdict, so a plan is recorded by testing it
+  on its own (`decisionShieldPanel.tsx`). Both
   previously exported the dropdown-mode reading even when the operator had just graded a plan,
   so the artifact could contradict the verdict beside it. The compare-mode verdict badges also
   split UNSAFE (rose) from RISKY (amber); both used to render amber
@@ -4376,6 +4401,11 @@ $$
 - `GET /api/decision-memory` / `POST /api/decision-memory` — append-only Decision Shield audit entries, filterable by `clientId`, with CSV export support.
 - Entries carry an `assumptions` snapshot (conditions that had to hold at decision time) so the
   decision-staleness engine can compare current conditions against the recorded range.
+- `POST` also accepts a **review response** (`lib/decisionFollowUp.ts`): `entryId`, `response`
+  (`continued` | `changed` | `deferred`), optional `note`, and the `conditions` at response time.
+  The route refuses a response that names no entry on the caller's own record (`unknown-entry`).
+  `GET` returns the review trail as `followUps` beside `entries`; the CSV and the revisable
+  delegation records stay decision-only, so the record schema is unchanged.
 
 ### 6.5 Integration APIs
 - `GET /api/integrations/weekly-mandate?target=slack|notion|linear` — target-specific weekly
@@ -4490,14 +4520,17 @@ as a bar chart in the lower home band. Removed from home; the engine
 surfaces.
 
 ### 8.4 Decision records (canonical: decision memory)
-**Location**: `lib/decisionMemory.ts`, `/api/decision-memory`, `app/decisions/page.tsx`,
+**Location**: `lib/decisionMemory.ts`, `lib/decisionFollowUp.ts`,
+`/api/decision-memory`, `app/decisions/page.tsx`,
 `app/operate/components/recordDecisionButton.tsx`, `app/components/home/YourRecordNote.tsx`.
 
 The one system of record for "what did we decide and when": server-backed entries keyed by
 client id, recorded from the Decision Shield on `/operate`, and listed with their staleness
 verdicts on `/decisions` (§5.7). The brief says how many of a browser's decisions rest on conditions
 that moved (`YourRecordNote`, §1.1.28). `/operate/memory` redirects to `/history`
-(`next.config.js`).
+(`next.config.js`). Since 2026-10-23 each row on `/decisions` can carry a review response —
+continued, changed, or deferred — recorded against the reading being reviewed (§5.7); the
+review trail is stored beside the ledger and never appears as a decision row in the exports.
 
 Removed Aug 2026: `VisitorContext` (this section's previous subject) was deleted earlier without
 a spec update, and with it the only writer of the `whether_decision_history` localStorage key.

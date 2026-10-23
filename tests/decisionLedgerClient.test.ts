@@ -4,11 +4,14 @@ import {
   downloadDecisionLedger,
   fetchDecisionLedger,
   loadRecordNoteView,
+  logDecisionFollowUp,
+  logDecisionSnapshotToLedger,
   logDecisionToLedger,
 } from "../app/components/decisionLedgerClient";
 import { CLIENT_ID_HEADER } from "../lib/api/clientIdHeader";
 import { requireClientOwner } from "../lib/api/clientOwnership";
-import type { DecisionMemoryPayload } from "../lib/decisionMemory";
+import type { DecisionFollowUpPayload } from "../lib/decisionFollowUp";
+import type { DecisionMemoryPayload, DecisionMemorySnapshotPayload } from "../lib/decisionMemory";
 
 /**
  * The two ends of an owned request, which have to agree on one header.
@@ -268,6 +271,83 @@ describe("decision ledger client", () => {
 
     assert.equal(headerOf(calls[0]?.init), "browser-1");
     assert.match(calls[0]?.url ?? "", /format=records/);
+  });
+
+  const followUpPayload: DecisionFollowUpPayload = {
+    recordDate: "2026-09-21",
+    entryId: "decision-1",
+    response: "deferred",
+    conditions: { tightness: 60, riskAppetite: 40 },
+  };
+
+  it("records a review under the same owner it claims", async () => {
+    const { calls, fetchImpl } = capture({ ok: true }, 201);
+    const result = await logDecisionFollowUp("browser-1", followUpPayload, fetchImpl);
+
+    assert.equal(result.ok, true);
+    assert.equal(headerOf(calls[0]?.init), "browser-1");
+    assert.equal(calls[0]?.init?.method, "POST");
+    const body = calls[0]?.init?.body;
+    assert.equal(typeof body, "string", "the request body is JSON text, not a stream");
+    const sentBody: unknown = JSON.parse(typeof body === "string" ? body : "{}");
+    assert.ok(sentBody && typeof sentBody === "object");
+    const sent = Object(sentBody);
+    assert.equal(sent.clientId, "browser-1", "the body's owner and the header's owner must match or the guard 403s");
+    assert.equal(sent.entryId, "decision-1");
+    assert.equal(sent.response, "deferred");
+    assert.equal(sent.conditions.tightness, 60);
+  });
+
+  it("says so, without stashing, when a review cannot be posted", async () => {
+    const result = await logDecisionFollowUp("browser-1", followUpPayload, () => Promise.reject(new Error("offline")));
+    assert.equal(result.ok, false);
+    assert.doesNotMatch(result.ok ? "" : result.reason, /fetch|offline/i, "a network failure reads as what a reader can do, not what broke");
+  });
+
+  it("reads the review trail beside the record, dropping a malformed one", async () => {
+    const { fetchImpl } = capture({
+      entries: [],
+      followUps: [
+        { not: "a follow-up" },
+        {
+          id: "fu-1",
+          createdAt: "2026-09-21T00:00:00.000Z",
+          context: { clientId: "browser-1", recordDate: "2026-09-21" },
+          entryId: "decision-1",
+          response: "continued",
+          conditions: { tightness: 60, riskAppetite: 40 },
+        },
+      ],
+    });
+
+    const result = await fetchDecisionLedger("browser-1", fetchImpl);
+    assert.equal(result.ok, true);
+    const followUps = result.ok ? result.followUps : [];
+    assert.equal(followUps.length, 1, "one malformed review must not fail the read of the rest");
+    assert.equal(followUps[0]?.response, "continued");
+  });
+
+  const snapshotPayload: DecisionMemorySnapshotPayload = {
+    kind: "posture-snapshot",
+    recordDate: "2026-10-20",
+    regime: "DEFENSIVE",
+    primaryCall: "Hold net-new hiring.",
+    tightness: 90,
+    riskAppetite: 53,
+  };
+
+  it("records this week's standing call under the same owner it claims", async () => {
+    const { calls, fetchImpl } = capture({ ok: true }, 201);
+    const result = await logDecisionSnapshotToLedger("browser-1", snapshotPayload, fetchImpl);
+
+    assert.equal(result.ok, true);
+    assert.equal(headerOf(calls[0]?.init), "browser-1");
+    assert.equal(calls[0]?.init?.method, "POST");
+    const sent = Object(JSON.parse(String(calls[0]?.init?.body)));
+    assert.equal(sent.clientId, "browser-1");
+    assert.equal(sent.kind, "posture-snapshot");
+    assert.equal(sent.primaryCall, "Hold net-new hiring.");
+    assert.equal(sent.regime, "DEFENSIVE");
   });
 });
 

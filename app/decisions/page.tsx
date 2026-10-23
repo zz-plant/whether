@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   robots: { index: false, follow: true },
 };
 export default async function DecisionsPage() {
-  const { reportData } = await loadWeeklyBriefSnapshot(undefined, { route: "/decisions" });
+  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "/decisions" });
   const scores = reportData.assessment.scores;
   /* The record drawn, the same full month-end series the home brief's band
      uses: a decision is stored against one of these readings, so the band can
@@ -66,6 +66,9 @@ export default async function DecisionsPage() {
       >
         <DecisionRecordPanel
           current={{ tightness: scores.tightness, riskAppetite: scores.riskAppetite }}
+          recordDate={reportData.treasury.record_date}
+          regime={reportData.assessment.regime}
+          primaryCall={snapshot.weeklyCall.currentCall}
           record={recordSeries}
         />
       </SecondaryPageSection>

@@ -11,14 +11,19 @@
  * without the network, which the preloaded guard forbids anyway.
  */
 import { CLIENT_ID_HEADER } from "../../lib/api/clientIdHeader";
-import { parseDecisionMemoryEntry, type DecisionMemoryEntry, type DecisionMemoryPayload } from "../../lib/decisionMemory";
+import { parseDecisionMemoryEntry, type DecisionMemoryEntry, type DecisionMemoryPayload, type DecisionMemorySnapshotPayload } from "../../lib/decisionMemory";
+import {
+  parseDecisionFollowUpRecord,
+  type DecisionFollowUpPayload,
+  type DecisionFollowUpRecord,
+} from "../../lib/decisionFollowUp";
 import { buildDecisionRecordView, type CurrentConditions, type DecisionRecordView } from "../../lib/report/decisionRecordView";
 import { STORAGE_KEYS } from "../../lib/storage/keys";
 
 const LEDGER_ENDPOINT = "/api/decision-memory";
 
 type LedgerFetchResult =
-  | { ok: true; entries: DecisionMemoryEntry[] }
+  | { ok: true; entries: DecisionMemoryEntry[]; followUps: DecisionFollowUpRecord[] }
   /** `reason` is for the reader, so it names what they can do, not what broke. */
   | { ok: false; reason: string };
 
@@ -87,6 +92,21 @@ const parseEntries = (value: unknown): DecisionMemoryEntry[] => {
   return entries;
 };
 
+/* The same per-row drop for follow-ups: one record an older writer left in a
+   shape this build does not parse must not fail the whole read. */
+const parseFollowUps = (value: unknown): DecisionFollowUpRecord[] => {
+  if (!value || typeof value !== "object") return [];
+  const listed = Reflect.get(value, "followUps");
+  if (!Array.isArray(listed)) return [];
+
+  const followUps: DecisionFollowUpRecord[] = [];
+  for (const candidate of listed) {
+    const parsed = parseDecisionFollowUpRecord(candidate);
+    if (parsed) followUps.push(parsed);
+  }
+  return followUps;
+};
+
 export const fetchDecisionLedger = async (
   clientId: string,
   fetchImpl: FetchLike = globalThis.fetch,
@@ -102,9 +122,11 @@ export const fetchDecisionLedger = async (
       return { ok: false, reason: "The record could not be read just now. Try again in a moment." };
     }
 
-    const entries = parseEntries(await response.json());
+    const body = await response.json();
+    const entries = parseEntries(body);
+    const followUps = parseFollowUps(body);
     rememberLedgerSize(clientId, entries.length, storage);
-    return { ok: true, entries };
+    return { ok: true, entries, followUps };
   } catch {
     return { ok: false, reason: "The record could not be read just now. Try again in a moment." };
   }
@@ -234,16 +256,102 @@ const requestBackgroundRetry = (): void => {
   }
 };
 
+/**
+ * One write at a time per browser, held with the Web Locks API: two tabs on
+ * the same record could otherwise both post, and the ledger is append-only
+ * (2026-10-22). Browsers without locks skip the guard — the buttons already
+ * disable themselves while a write is in flight.
+ */
+const withLedgerWriteLock = async (
+  clientId: string,
+  run: () => Promise<LedgerWriteResult>,
+  failReason: string,
+): Promise<LedgerWriteResult> => {
+  const locks = typeof navigator !== "undefined" ? navigator.locks : undefined;
+  if (!locks?.request) return run();
+  try {
+    return await locks.request(`whether-decision-ledger:${clientId}`, run);
+  } catch {
+    return { ok: false, reason: failReason };
+  }
+};
+
+/**
+ * A stable id for one decision, so a retried tap and the service worker's
+ * replay both POST the same id and the server dedupes instead of appending the
+ * same decision twice. Content-addressed from the decision's own fields, so the
+ * same decision re-tapped produces the same id without any per-tap storage.
+ */
+const decisionWriteId = async (payload: DecisionMemoryPayload): Promise<string> => {
+  const text = JSON.stringify({
+    recordDate: payload.recordDate,
+    decision: payload.decision,
+    outcome: payload.outcome,
+    assessment: payload.assessment,
+  });
+  const subtle = typeof crypto !== "undefined" ? crypto.subtle : undefined;
+  if (subtle) {
+    const digest = await subtle.digest("SHA-256", new TextEncoder().encode(text));
+    return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
+  }
+  // No SubtleCrypto (rare test/runtime): a deterministic FNV-1a is stable enough to dedup a retry.
+  let hash = 2166136261;
+  for (let index = 0; index < text.length; index += 1) {
+    hash ^= text.charCodeAt(index);
+    hash = Math.imul(hash, 16777619);
+  }
+  return `fnv-${(hash >>> 0).toString(16)}`;
+};
+
 export const logDecisionToLedger = async (
   clientId: string,
   payload: DecisionMemoryPayload,
   fetchImpl: FetchLike = globalThis.fetch,
   storage: LedgerStorage | null = browserStorage(),
 ): Promise<LedgerWriteResult> => {
-  /* One write at a time per browser, held with the Web Locks API: two tabs on
-     the same record could otherwise both post a decision, and the ledger is
-     append-only (2026-10-22). Browsers without locks skip the guard — the
-     button already disables itself while a write is in flight. */
+  const enriched = { ...payload, writeId: await decisionWriteId(payload) };
+  const post = async (): Promise<LedgerWriteResult> => {
+    try {
+      const response = await fetchImpl(LEDGER_ENDPOINT, {
+        method: "POST",
+        headers: { [CLIENT_ID_HEADER]: clientId, "content-type": "application/json" },
+        body: JSON.stringify({ ...enriched, clientId }),
+      });
+
+      if (!response.ok) {
+        return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
+      }
+
+      rememberLedgerSize(clientId, readKnownLedgerSize(clientId, storage) + 1, storage);
+      await clearStashedPost(clientId, enriched);
+      return { ok: true };
+    } catch {
+      /* A network failure is worth one automatic retry: the payload is stashed
+         and the service worker's sync event replays it when connectivity
+         returns. An HTTP error is not — the server answered, and repeating it
+         would just fail again. */
+      await stashFailedPost(clientId, enriched);
+      requestBackgroundRetry();
+      return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
+    }
+  };
+
+  return withLedgerWriteLock(clientId, post, "That decision was not recorded. Try again in a moment.");
+};
+
+/**
+ * Record a review response against one of this browser's ledger entries.
+ *
+ * Deliberately without the offline stash the decision write keeps: the review
+ * trail is append-only and the response matters against the reading it names,
+ * and a response that lands later than intended is worse than none. A failed
+ * write says so and the row keeps its review control.
+ */
+export const logDecisionFollowUp = async (
+  clientId: string,
+  payload: DecisionFollowUpPayload,
+  fetchImpl: FetchLike = globalThis.fetch,
+): Promise<LedgerWriteResult> => {
   const post = async (): Promise<LedgerWriteResult> => {
     try {
       const response = await fetchImpl(LEDGER_ENDPOINT, {
@@ -253,30 +361,48 @@ export const logDecisionToLedger = async (
       });
 
       if (!response.ok) {
-        return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
+        return { ok: false, reason: "That review was not recorded. Try again in a moment." };
       }
 
-      rememberLedgerSize(clientId, readKnownLedgerSize(clientId, storage) + 1, storage);
-      await clearStashedPost(clientId, payload);
       return { ok: true };
     } catch {
-      /* A network failure is worth one automatic retry: the payload is stashed
-         and the service worker's sync event replays it when connectivity
-         returns. An HTTP error is not — the server answered, and repeating it
-         would just fail again. */
-      await stashFailedPost(clientId, payload);
-      requestBackgroundRetry();
-      return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
+      return { ok: false, reason: "That review was not recorded. Try again in a moment." };
     }
   };
 
-  const locks = typeof navigator !== "undefined" ? navigator.locks : undefined;
-  if (!locks?.request) return post();
-  try {
-    return await locks.request(`whether-decision-ledger:${clientId}`, post);
-  } catch {
-    return { ok: false, reason: "That decision was not recorded. Try again in a moment." };
-  }
+  return withLedgerWriteLock(clientId, post, "That review was not recorded. Try again in a moment.");
+};
+
+/**
+ * Record this week's standing call (the company-agnostic posture) as the first
+ * entry in an empty ledger, so a reader who never runs the Decision Shield still
+ * gets a follow-up trail next week. No offline stash: a posture snapshot is a
+ * deliberate one-tap action, not a decision that must survive a train tunnel.
+ */
+export const logDecisionSnapshotToLedger = async (
+  clientId: string,
+  payload: DecisionMemorySnapshotPayload,
+  fetchImpl: FetchLike = globalThis.fetch,
+): Promise<LedgerWriteResult> => {
+  const post = async (): Promise<LedgerWriteResult> => {
+    try {
+      const response = await fetchImpl(LEDGER_ENDPOINT, {
+        method: "POST",
+        headers: { [CLIENT_ID_HEADER]: clientId, "content-type": "application/json" },
+        body: JSON.stringify({ ...payload, clientId }),
+      });
+
+      if (!response.ok) {
+        return { ok: false, reason: "That call was not recorded. Try again in a moment." };
+      }
+
+      return { ok: true };
+    } catch {
+      return { ok: false, reason: "That call was not recorded. Try again in a moment." };
+    }
+  };
+
+  return withLedgerWriteLock(clientId, post, "That call was not recorded. Try again in a moment.");
 };
 
 /**
@@ -296,7 +422,7 @@ export const loadRecordNoteView = async (
   if (readKnownLedgerSize(clientId, storage) === 0) return null;
   const result = await fetchDecisionLedger(clientId, fetchImpl, storage);
   if (!result.ok) return null;
-  const view = buildDecisionRecordView(result.entries, current);
+  const view = buildDecisionRecordView(result.entries, current, result.followUps);
   return view.rows.length > 0 ? view : null;
 };
 

@@ -22,7 +22,24 @@ import {
   evaluateDecisionAssumptionHealth,
   type DecisionMemoryEntry,
 } from "../decisionMemory";
+import type { DecisionFollowUpRecord, DecisionFollowUpResponse } from "../decisionFollowUp";
 import type { MovedAssumption, StalenessVerdict } from "./decisionStaleness";
+
+/**
+ * The latest recorded review response on a row, joined by entry id. Carries
+ * both the ISO `recordDate` (so a surface can tell whether this commitment was
+ * reviewed against this week's reading) and the formatted `respondedOn`.
+ */
+type DecisionFollowUpRow = {
+  response: DecisionFollowUpResponse;
+  /** The plain-language half of the response, in the row's own vocabulary. */
+  responseSentence: string;
+  /** The ISO reading date the response was made against. */
+  recordDate: string;
+  /** "Sep 21, 2026" — the reading the response was made against. */
+  respondedOn: string;
+  note: string | null;
+};
 
 export type DecisionRecordRow = {
   id: string;
@@ -39,6 +56,8 @@ export type DecisionRecordRow = {
   moved: MovedAssumption[];
   guardrail: string | null;
   reversalTrigger: string | null;
+  /** The latest review response recorded against this row, when one exists. */
+  followUp?: DecisionFollowUpRow;
   /** A weekly posture logged from the brief, rather than a decision run through the shield. */
   isPostureSnapshot: boolean;
 };
@@ -66,6 +85,24 @@ const VERDICT_SENTENCES: Record<StalenessVerdict, string> = {
   WATCH: "One condition this rested on has moved.",
   RECONSIDER: "Both conditions this rested on have moved.",
 };
+
+/*
+ * The response vocabulary, beside the badge the way VERDICT_SENTENCES sits
+ * beside the verdict word. The reader records what they did about a commitment
+ * whose conditions moved; the sentence is the half that a reader can act on.
+ */
+const RESPONSE_SENTENCES: Record<DecisionFollowUpResponse, string> = {
+  continued: "You kept the commitment as recorded.",
+  changed: "You changed the terms.",
+  deferred: "You put the decision off.",
+};
+
+/** The choice labels, in the order a reader reads them. */
+export const RESPONSE_OPTIONS: Array<{ value: DecisionFollowUpResponse; label: string }> = [
+  { value: "continued", label: "Continued" },
+  { value: "changed", label: "Changed" },
+  { value: "deferred", label: "Deferred" },
+];
 
 /** Deliberately not `new Date(recordDate)`: an ISO date is parsed as UTC and a
     browser west of Greenwich renders the day before. */
@@ -128,6 +165,21 @@ const buildDecisionRecordRow = (
 };
 
 /**
+ * The latest review response per entry, so a row whose commitment was reviewed
+ * against an earlier reading still shows it, and a newer response wins.
+ */
+const latestFollowUpByEntry = (followUps: DecisionFollowUpRecord[]): Map<string, DecisionFollowUpRecord> => {
+  const latest = new Map<string, DecisionFollowUpRecord>();
+  const newestFirst = [...followUps].sort(
+    (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
+  );
+  for (const followUp of newestFirst) {
+    if (!latest.has(followUp.entryId)) latest.set(followUp.entryId, followUp);
+  }
+  return latest;
+};
+
+/**
  * The headline states what is actionable, and says nothing when nothing is.
  *
  * An empty ledger gets no headline at all — the page's empty state is the
@@ -159,8 +211,23 @@ const VERDICT_ORDER: Record<StalenessVerdict, number> = { RECONSIDER: 0, WATCH: 
 export const buildDecisionRecordView = (
   entries: DecisionMemoryEntry[],
   current: CurrentConditions,
+  followUps: DecisionFollowUpRecord[] = [],
 ): DecisionRecordView => {
-  const rows = entries.map((entry) => buildDecisionRecordRow(entry, current));
+  const latestByEntry = latestFollowUpByEntry(followUps);
+  const rows = entries.map((entry) => {
+    const row = buildDecisionRecordRow(entry, current);
+    const latest = latestByEntry.get(entry.id);
+    if (latest) {
+      row.followUp = {
+        response: latest.response,
+        responseSentence: RESPONSE_SENTENCES[latest.response],
+        recordDate: latest.context.recordDate,
+        respondedOn: formatRecordedOn(latest.context.recordDate),
+        note: nonEmpty(latest.note),
+      };
+    }
+    return row;
+  });
 
   const counts = { stand: 0, watch: 0, reconsider: 0 };
   for (const row of rows) {

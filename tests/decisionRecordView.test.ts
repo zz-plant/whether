@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildDecisionRecordView } from "../lib/report/decisionRecordView";
+import type { DecisionFollowUpRecord, DecisionFollowUpResponse } from "../lib/decisionFollowUp";
 import type { DecisionMemoryEntry } from "../lib/decisionMemory";
 
 /**
@@ -121,5 +122,60 @@ describe("decision record view", () => {
     assert.equal(view.rows[0]?.title, "Cloudy — hold the line.");
     assert.equal(view.rows[0]?.isPostureSnapshot, true);
     assert.equal(view.rows[0]?.guardrail, null, "an empty guardrail renders nothing rather than an empty label");
+  });
+});
+
+const followUp = (
+  entryId: string,
+  createdAt: string,
+  recordDate: string,
+  response: DecisionFollowUpResponse,
+  note?: string,
+): DecisionFollowUpRecord => ({
+  id: `fu-${createdAt}`,
+  createdAt,
+  context: { clientId: "client", recordDate },
+  entryId,
+  response,
+  note,
+  conditions: { tightness: 60, riskAppetite: 40 },
+});
+
+describe("decision record view joins the review trail", () => {
+  it("carries the newest review response against a row", () => {
+    const view = buildDecisionRecordView(
+      [entry("a", { tightness: 10, riskAppetite: 90 })],
+      { tightness: 60, riskAppetite: 40 },
+      [
+        followUp("a", "2026-09-21T00:00:00.000Z", "2026-09-21", "deferred"),
+        followUp("a", "2026-09-28T00:00:00.000Z", "2026-09-28", "continued", "Back on track."),
+      ],
+    );
+
+    assert.equal(view.rows[0]?.followUp?.response, "continued", "the latest response wins over an earlier one");
+    assert.equal(view.rows[0]?.followUp?.responseSentence, "You kept the commitment as recorded.");
+    assert.equal(view.rows[0]?.followUp?.recordDate, "2026-09-28", "the ISO reading is kept so a surface can tell whether this week reviewed it");
+    assert.equal(view.rows[0]?.followUp?.respondedOn, "Sep 28, 2026");
+    assert.equal(view.rows[0]?.followUp?.note, "Back on track.");
+  });
+
+  it("ignores a follow-up that names no entry on the record", () => {
+    const view = buildDecisionRecordView(
+      [entry("a", { tightness: 90, riskAppetite: 10 })],
+      { tightness: 60, riskAppetite: 40 },
+      [followUp("missing", "2026-09-21T00:00:00.000Z", "2026-09-21", "changed")],
+    );
+
+    assert.equal(view.rows[0]?.followUp, undefined, "an orphan review must not invent a response for a row it does not name");
+  });
+
+  it("leaves rows untouched when nothing was reviewed", () => {
+    const view = buildDecisionRecordView(
+      [entry("a", { tightness: 90, riskAppetite: 10 })],
+      { tightness: 60, riskAppetite: 40 },
+      [],
+    );
+    assert.equal(view.rows[0]?.followUp, undefined);
+    assert.equal(view.headline, "The one decision on this browser still rests on conditions that hold.");
   });
 });

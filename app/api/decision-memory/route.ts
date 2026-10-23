@@ -6,6 +6,10 @@ import {
   type DecisionMemorySnapshotPayload,
   toDecisionMemoryCsv,
 } from "../../../lib/decisionMemory";
+import {
+  buildDecisionFollowUpRecord,
+  parseDecisionFollowUpPayload,
+} from "../../../lib/decisionFollowUp";
 import { getDecisionMemoryRepository } from "../../../lib/storage/decisionMemoryRepository";
 import { requireClientOwner } from "../../../lib/api/clientOwnership";
 import {
@@ -66,6 +70,7 @@ export async function GET(request: Request) {
   if (owner.error) return owner.error;
   const repository = getDecisionMemoryRepository();
   const listed = await repository.list({ limit: 64, clientId: owner.ownerId! });
+  const followUps = await repository.listFollowUps({ clientId: owner.ownerId! });
   const degraded = repository.backendStatus() === "local-fallback";
 
   if (format === "csv") {
@@ -95,6 +100,7 @@ export async function GET(request: Request) {
 
   return NextResponse.json({
     entries: listed.entries,
+    followUps: followUps.followUps,
     count: listed.entries.length,
     degraded,
     backend: repository.backendStatus(),
@@ -112,20 +118,57 @@ export async function POST(request: Request) {
     return NextResponse.json({ entries: [], count: 0, error: "invalid-json", degraded, backend: repository.backendStatus() }, { status: 400 });
   }
 
-  const snapshot = asSnapshotPayload(payload);
-  const parsed = snapshot ? null : asDecisionPayload(payload);
-  if (!snapshot && !parsed) {
+  const followUp = parseDecisionFollowUpPayload(payload);
+  const snapshot = followUp ? null : asSnapshotPayload(payload);
+  const parsed = followUp || snapshot ? null : asDecisionPayload(payload);
+  if (!followUp && !snapshot && !parsed) {
     return NextResponse.json({ entries: [], count: 0, error: "invalid-payload", degraded, backend: repository.backendStatus() }, { status: 400 });
   }
-  const claimedClientId = snapshot?.clientId ?? parsed?.clientId;
+  const claimedClientId = followUp?.clientId ?? snapshot?.clientId ?? parsed?.clientId;
   const owner = await requireClientOwner(request, claimedClientId);
   if (owner.error) return owner.error;
+  if (followUp) followUp.clientId = owner.ownerId!;
   if (snapshot) snapshot.clientId = owner.ownerId!;
   if (parsed) parsed.clientId = owner.ownerId!;
+
+  if (followUp) {
+    /* A follow-up attaches to one of this browser's own entries; one aimed at
+       a record that is not on the record must not silently become invisible
+       junk that never renders (the view joins by entry id). */
+    const listed = await repository.list({ limit: 64, clientId: owner.ownerId! });
+    if (!listed.entries.some((entry) => entry.id === followUp.entryId)) {
+      return NextResponse.json({ created: false, error: "unknown-entry", degraded, backend: repository.backendStatus() }, { status: 400 });
+    }
+    const record = buildDecisionFollowUpRecord(followUp);
+    await repository.appendFollowUp(record);
+    return NextResponse.json({
+      created: true,
+      followUp: record,
+      degraded,
+      backend: repository.backendStatus(),
+    });
+  }
 
   const entry = snapshot
     ? buildDecisionMemorySnapshotEntry(snapshot)
     : buildDecisionMemoryEntry(parsed as DecisionMemoryPayload);
+
+  /* An idempotency key means a retried or replayed write of the same decision:
+     the server may have already appended it before the response was lost. Serve
+     the existing entry instead of appending a second, duplicate row. */
+  if (!snapshot && entry.writeId) {
+    const existing = await repository.findByWriteId(entry.context.clientId, entry.writeId);
+    if (existing) {
+      return NextResponse.json({
+        created: false,
+        duplicate: true,
+        entry: existing,
+        count: (await repository.list({ limit: 64, clientId: entry.context.clientId })).entries.length,
+        degraded,
+        backend: repository.backendStatus(),
+      });
+    }
+  }
 
   /* The route is the only place that knows whether the request was vouched for,
      so it is the only place that may promote an owner claim to a verified one.

@@ -14,10 +14,14 @@ import Link from "next/link";
 import { usePersistentClientId } from "../components/clientIdentity";
 import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { useHydrated } from "../components/browserSource";
-import { fetchDecisionLedger } from "../components/decisionLedgerClient";
+import { fetchDecisionLedger, logDecisionFollowUp, logDecisionSnapshotToLedger } from "../components/decisionLedgerClient";
 import { MonthStrip } from "../components/history/monthStrip";
+import type { DecisionFollowUpResponse } from "../../lib/decisionFollowUp";
+import { FOLLOW_UP_NOTE_MAX_LENGTH } from "../../lib/decisionFollowUp";
+import type { DecisionMemorySnapshotPayload } from "../../lib/decisionMemory";
 import {
   buildDecisionRecordView,
+  RESPONSE_OPTIONS,
   type CurrentConditions,
   type DecisionRecordRow,
   type DecisionRecordView,
@@ -60,7 +64,108 @@ const FilterKey = ({ pressed, onPress, children }: { pressed: boolean; onPress: 
   </button>
 );
 
-const RecordRow = ({ row }: { row: DecisionRecordRow }) => (
+/**
+ * What a row's review control needs. Optional on `DecisionLedgerView` so a
+ * server render (or a test) that has no browser identity renders the record
+ * without the review form.
+ */
+type ReviewContext = {
+  clientId: string;
+  current: CurrentConditions;
+  /** The reading being reviewed against; a row already reviewed against it shows its response instead of the form. */
+  recordDate: string;
+  /** Called after a review is recorded, so the panel re-reads the record. */
+  onRecorded: () => void;
+};
+
+const FollowUpForm = ({ row, review }: { row: DecisionRecordRow; review: ReviewContext }) => {
+  const [response, setResponse] = useState<DecisionFollowUpResponse | null>(null);
+  const [note, setNote] = useState("");
+  const [state, setState] = useState<"idle" | "saving" | "failed">("idle");
+  const [error, setError] = useState<string | null>(null);
+  const [needsChoice, setNeedsChoice] = useState(false);
+
+  const submit = async () => {
+    if (!response) {
+      setNeedsChoice(true);
+      return;
+    }
+    setState("saving");
+    setError(null);
+    const result = await logDecisionFollowUp(review.clientId, {
+      recordDate: review.recordDate,
+      entryId: row.id,
+      response,
+      note: note.trim() || undefined,
+      conditions: { tightness: review.current.tightness, riskAppetite: review.current.riskAppetite },
+    });
+    if (!result.ok) {
+      setState("failed");
+      setError(result.reason);
+      return;
+    }
+    review.onRecorded();
+  };
+
+  return (
+    <form
+      className="mt-4 rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 sm:p-4"
+      onSubmit={(event) => {
+        event.preventDefault();
+        void submit();
+      }}
+    >
+      <fieldset>
+        <legend className="type-eyebrow text-slate-200">Record your review</legend>
+        <div className="mt-2 flex flex-wrap gap-1.5">
+          {RESPONSE_OPTIONS.map((option) => (
+            <button
+              key={option.value}
+              type="button"
+              onClick={() => {
+                setResponse(option.value);
+                setNeedsChoice(false);
+              }}
+              aria-pressed={response === option.value}
+              className="weather-key weather-focus-ring inline-flex min-h-11 items-center gap-1.5 px-2.5 py-2 text-xs font-semibold"
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+        {needsChoice ? (
+          <p className="mt-2 text-xs leading-5 text-amber-200">Choose Continued, Changed, or Deferred.</p>
+        ) : null}
+        <label className="mt-3 block">
+          <span className="type-eyebrow text-slate-300">Note (optional)</span>
+          <input
+            type="text"
+            value={note}
+            onChange={(event) => setNote(event.target.value)}
+            placeholder="What changed, or when to revisit"
+            maxLength={FOLLOW_UP_NOTE_MAX_LENGTH}
+            className="weather-input weather-focus-ring mt-1 w-full px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500"
+          />
+        </label>
+        <div className="mt-3 flex flex-wrap items-center gap-3">
+          <button
+            type="submit"
+            disabled={state === "saving"}
+            className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-11 items-center px-3 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {state === "saving" ? "Recording…" : "Record review"}
+          </button>
+          {state === "failed" && error ? <p className="type-label text-amber-200">{error}</p> : null}
+        </div>
+      </fieldset>
+      <output className="sr-only" aria-live="polite">
+        {state === "saving" ? "Recording your review." : state === "failed" && error ? error : ""}
+      </output>
+    </form>
+  );
+};
+
+const RecordRow = ({ row, review }: { row: DecisionRecordRow; review?: ReviewContext }) => (
   <li className="rounded-xl border border-slate-800 bg-slate-950/60 p-4 sm:p-5">
     <div className="flex flex-wrap items-start justify-between gap-3">
       <div className="min-w-0">
@@ -103,10 +208,75 @@ const RecordRow = ({ row }: { row: DecisionRecordRow }) => (
         ) : null}
       </dl>
     ) : null}
+
+    {row.followUp ? (
+      <div className="mt-4 rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] px-3 py-2 text-sm leading-6">
+        <p className="text-slate-200">
+          <span className="font-semibold text-slate-100">
+            Reviewed against the {row.followUp.respondedOn} reading:
+          </span>{" "}
+          {row.followUp.responseSentence}
+        </p>
+        {row.followUp.note ? <p className="mt-1 text-slate-400">{row.followUp.note}</p> : null}
+      </div>
+    ) : null}
+
+    {review && row.verdict !== "STAND" && row.followUp?.recordDate !== review.recordDate ? (
+      <FollowUpForm row={row} review={review} />
+    ) : null}
   </li>
 );
 
-const EmptyState = () => (
+type SnapshotContext = {
+  clientId: string;
+  current: CurrentConditions;
+  recordDate: string;
+  regime: string;
+  /** The week's standing call, company-agnostic — the posture the ledger records. */
+  primaryCall: string;
+  onRecorded: () => void;
+};
+
+const RecordSnapshotControl = ({ snapshot }: { snapshot: SnapshotContext }) => {
+  const [state, setState] = useState<"idle" | "saving" | "failed">("idle");
+  const [error, setError] = useState<string | null>(null);
+
+  const record = async () => {
+    setState("saving");
+    setError(null);
+    const payload: DecisionMemorySnapshotPayload = {
+      kind: "posture-snapshot",
+      recordDate: snapshot.recordDate,
+      regime: snapshot.regime,
+      primaryCall: snapshot.primaryCall,
+      tightness: snapshot.current.tightness,
+      riskAppetite: snapshot.current.riskAppetite,
+    };
+    const result = await logDecisionSnapshotToLedger(snapshot.clientId, payload);
+    if (!result.ok) {
+      setState("failed");
+      setError(result.reason);
+      return;
+    }
+    snapshot.onRecorded();
+  };
+
+  return (
+    <div className="mt-4 flex flex-wrap items-center gap-3">
+      <button
+        type="button"
+        onClick={() => void record()}
+        disabled={state === "saving"}
+        className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-11 items-center px-3 text-xs font-medium disabled:cursor-not-allowed disabled:opacity-50"
+      >
+        {state === "saving" ? "Recording…" : "Record this week's call"}
+      </button>
+      {state === "failed" && error ? <p className="type-label text-amber-200">{error}</p> : null}
+    </div>
+  );
+};
+
+const EmptyState = ({ snapshot }: { snapshot?: SnapshotContext }) => (
   <div className="space-y-2 rounded-xl border border-dashed border-slate-700 bg-slate-950/40 p-6 text-sm leading-6 text-slate-300">
     <p className="font-semibold text-slate-100">Nothing recorded from this browser yet.</p>
     <p>
@@ -117,20 +287,32 @@ const EmptyState = () => (
       and record it. Each one is stored with the reading it was made against, so a later week can tell you
       whether the conditions it relied on still hold.
     </p>
+    {snapshot ? (
+      <>
+        <p>
+          Or record this week's standing call — the company-agnostic posture — and next week's reading checks it.
+        </p>
+        <RecordSnapshotControl snapshot={snapshot} />
+      </>
+    ) : null}
   </div>
 );
 
 export const DecisionLedgerView = ({
   view,
   record,
+  review,
+  snapshot,
 }: {
   view: DecisionRecordView;
   record?: readonly { recordDate: string; regime: string; tightness?: number; riskAppetite?: number }[];
+  review?: ReviewContext;
+  snapshot?: SnapshotContext;
 }) => {
   const [filter, setFilter] = useState<"all" | "RECONSIDER" | "WATCH" | "STAND">("all");
 
   if (view.rows.length === 0) {
-    return <EmptyState />;
+    return <EmptyState snapshot={snapshot} />;
   }
 
   const filteredRows = view.rows.filter(
@@ -179,7 +361,7 @@ export const DecisionLedgerView = ({
       ) : null}
       <ul className="space-y-3">
         {filteredRows.map((row) => (
-          <RecordRow key={row.id} row={row} />
+          <RecordRow key={row.id} row={row} review={review} />
         ))}
       </ul>
     </div>
@@ -189,9 +371,17 @@ export const DecisionLedgerView = ({
 export const DecisionRecordPanel = ({
   current,
   record,
+  recordDate,
+  regime,
+  primaryCall,
 }: {
   current: CurrentConditions;
   record?: readonly { recordDate: string; regime: string; tightness?: number; riskAppetite?: number }[];
+  /** The reading being reviewed against; passed through so a review names it. */
+  recordDate: string;
+  /** The regime key and standing call, for recording this week's posture in an empty ledger. */
+  regime?: string;
+  primaryCall?: string;
 }) => {
   const clientId = usePersistentClientId();
   const hydrated = useHydrated();
@@ -201,7 +391,7 @@ export const DecisionRecordPanel = ({
     async (id: string): Promise<PanelState> => {
       const result = await fetchDecisionLedger(id);
       if (!result.ok) return { status: "failed", reason: result.reason };
-      return { status: "ready", view: buildDecisionRecordView(result.entries, current) };
+      return { status: "ready", view: buildDecisionRecordView(result.entries, current, result.followUps) };
     },
     [current],
   );
@@ -245,5 +435,14 @@ export const DecisionRecordPanel = ({
     return <p className="text-sm leading-6 text-amber-200">{state.reason}</p>;
   }
 
-  return <DecisionLedgerView view={state.view} record={record} />;
+  return (
+    <DecisionLedgerView
+      view={state.view}
+      record={record}
+      review={clientId ? { clientId, current, recordDate, onRecorded: () => void read(clientId).then(setState) } : undefined}
+      snapshot={clientId && regime && primaryCall
+        ? { clientId, current, recordDate, regime, primaryCall, onRecorded: () => void read(clientId).then(setState) }
+        : undefined}
+    />
+  );
 };

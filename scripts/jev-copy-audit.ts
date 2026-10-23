@@ -246,7 +246,7 @@ const runCopyAudit = async (args: Args, credentials: Credentials) => {
 
 if (import.meta.main) {
   if (process.argv.includes("--help")) {
-    console.log("Usage: bun run audit:jev-copy -- --mode copy|brief|screenshot|evidence|eval --model jev,clef,clef-flash,clef-omni\nFile modes: --input <json> --image <png|jpg|webp> --out-dir <directory> --threshold <0.5..1>\nDefault brief input: artifacts/weekly-slack-brief.txt.audit.json; regenerate with bun run brief:weekly:artifact.\nAll model calls are advisory; review raw probabilities and labeled errors.");
+    console.log("Usage: bun run audit:jev-copy -- --mode copy|brief|screenshot|evidence|counterevidence|eval --model jev,clef,clef-flash,clef-omni\nFile modes: --input <json> --image <png|jpg|webp> --out-dir <directory> --threshold <0.5..1>\nDefault brief input: artifacts/weekly-slack-brief.txt.audit.json; regenerate with bun run brief:weekly:artifact.\nCounterevidence input: { canonical, candidates:[{id,claim,excerpt,sourceUrl,observedAt,side?}] }; labeled review cases feed `bun run reviewed-cases:add`.\nAll model calls are advisory; review raw probabilities and labeled errors.");
     process.exit(0);
   }
   const args = parseArgs(process.argv.slice(2));
@@ -260,8 +260,8 @@ if (import.meta.main) {
     console.error("jev-copy-audit: --threshold must be in (0, 1].");
     process.exit(2);
   }
-  if (args.mode !== "copy" && args.mode !== "brief" && args.mode !== "screenshot" && args.mode !== "evidence" && args.mode !== "eval") {
-    console.error("jev-copy-audit: --mode must be copy, brief, screenshot, evidence or eval.");
+  if (args.mode !== "copy" && args.mode !== "brief" && args.mode !== "screenshot" && args.mode !== "evidence" && args.mode !== "counterevidence" && args.mode !== "eval") {
+    console.error("jev-copy-audit: --mode must be copy, brief, screenshot, evidence, counterevidence or eval.");
     process.exit(2);
   }
   const { models } = args;

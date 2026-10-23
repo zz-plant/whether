@@ -78,7 +78,11 @@
     "advice-corpus:validate": "bun scripts/advice-corpus/validate.ts",
     "advice-corpus:analyze": "bun scripts/advice-corpus/analyze.ts",
     "advice-corpus:data": "bun scripts/advice-corpus/siteData.ts",
-    "advice-corpus:check": "bun scripts/advice-corpus/siteData.ts --check"
+    "advice-corpus:check": "bun scripts/advice-corpus/siteData.ts --check",
+    "reviewed-cases:add": "bun scripts/reviewed-cases.ts add",
+    "reviewed-cases:export-eval": "bun scripts/reviewed-cases.ts export-eval",
+    "reviewed-cases:list": "bun scripts/reviewed-cases.ts list",
+    "evidence:pool": "bun scripts/pool-builder.ts"
   },
   "engines": {
     "bun": ">=1.3.14",
