@@ -16,9 +16,16 @@ export function GlobalHeaderScrollWrapper({ children }: GlobalHeaderScrollWrappe
   const atTop = !isPastThreshold;
   const hidden = isPastThreshold && direction === "down";
 
+  /* The bare `transition` utility, not `transition-transform`: the shadow below
+     toggled at the threshold in one frame while the slide eased over 300ms, so
+     the header popped a shadow on the way out. The named list covers both what
+     moves here — transform and box-shadow — and nothing else changes on the
+     element (§XXIII: name what moves; the every-property utility is banned and
+     tested against). `motion-reduce:transition-none` is the standard's required
+     reduced-motion end state: the header shows and hides instantly. */
   return (
     <header
-      className={`mx-auto sticky top-0 z-50 w-full max-w-[96rem] px-4 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`mx-auto sticky top-0 z-50 w-full max-w-[96rem] px-4 transition motion-reduce:transition-none duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${atTop ? "" : "shadow-[0_4px_12px_-8px_rgba(0,0,0,0.4)]"}`}
     >

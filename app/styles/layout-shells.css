@@ -247,10 +247,14 @@ a.weather-hub-link-card:hover {
   color: var(--app-text-secondary);
   cursor: pointer;
   touch-action: manipulation;
+  /* Token pair, not a literal: the chip is a secondary control, and the
+     duration and curve are --transition-fast/--ease-out as .weather-chip
+     (surfaces.css) and the controls in controls.css already set them.
+     Reduced-motion end state is the block at the foot of this file. */
   transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease;
+    transform var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out);
 }
 
 .weather-hub-chip:hover {
