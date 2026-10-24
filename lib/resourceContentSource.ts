@@ -93,6 +93,8 @@ const resourceArticleEmbedSchema = z.object({
 
 const resourceArticleSectionSchema = z.object({
   heading: z.string().min(1),
+  // Keep public section links stable when the heading is edited.
+  anchor: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/).optional(),
   paragraphs: z.array(z.string().min(1)).min(1),
   embeds: z.array(resourceArticleEmbedSchema).optional(),
 });
@@ -115,7 +117,6 @@ const resourceArticleSchema = z.object({
   format: z.enum(["guide", "case-example"]),
   boardSummary: z.array(z.string().min(1)).min(1),
   sections: z.array(resourceArticleSectionSchema).min(1),
-  includeSharedDeepDive: z.boolean().optional(),
   faqs: z.array(
     z.object({
       question: z.string().min(1),
@@ -131,7 +132,6 @@ const resourceArticleSchema = z.object({
 export type GovernanceLexiconTermData = z.infer<typeof governanceLexiconTermSchema>;
 export type ResourcePillarPageData = z.infer<typeof resourcePillarPageSchema>;
 export type ResourceArticleEmbedData = z.infer<typeof resourceArticleEmbedSchema>;
-export type ResourceArticleSectionData = z.infer<typeof resourceArticleSectionSchema>;
 export type ResourceArticleData = z.infer<typeof resourceArticleSchema>;
 
 export const resourceMetaContent = resourceMetaSchema.parse(resourceMetaData);

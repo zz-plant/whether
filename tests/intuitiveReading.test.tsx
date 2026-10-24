@@ -25,10 +25,10 @@ describe("the card ties the weather word to the areas", () => {
       { area: "product-tempo" as const, pause: slot(false) },
       { area: "capital-raising" as const, pause: slot(true) },
     ];
-    assert.equal(describeHeldAreasForCard("Cloudy", rows), "Cloudy overall. On hold: Hiring and Fundraising.");
-    assert.equal(describeHeldAreasForCard("Sunny", rows.map((row) => ({ ...row, pause: slot(false) }))), "Sunny overall. No area is on hold.");
-    assert.equal(describeHeldAreasForCard("Freezing", rows.map((row) => ({ ...row, pause: slot(true) }))), "Freezing overall. Every area is on hold.");
-    assert.equal(describeHeldAreasForCard("Cloudy", []), null);
+    assert.equal(describeHeldAreasForCard(rows), "On hold: Hiring and Fundraising.");
+    assert.equal(describeHeldAreasForCard(rows.map((row) => ({ ...row, pause: slot(false) }))), "No area is on hold.");
+    assert.equal(describeHeldAreasForCard(rows.map((row) => ({ ...row, pause: slot(true) }))), "Every area is on hold.");
+    assert.equal(describeHeldAreasForCard([]), null);
   });
 
   it("puts the line on the card with a link to the areas' answers", () => {
@@ -36,10 +36,10 @@ describe("the card ties the weather word to the areas", () => {
       <DecisionHero
         weeklyCall="Hold approvals steady."
         regime="DEFENSIVE"
-        areas={{ text: "Cloudy overall. On hold: Hiring.", href: "#what-it-changes", action: "What to do in each area" }}
+        areas={{ text: "On hold: Hiring.", href: "#what-it-changes", action: "What to do in each area" }}
       />,
     );
-    assert.match(html, /data-held-areas[^>]*>Cloudy overall\. On hold: Hiring\. <a[^>]*href="#what-it-changes"[^>]*>What to do in each area<\/a>/);
+    assert.match(html, /data-held-areas[^>]*>On hold: Hiring\. <a[^>]*href="#what-it-changes"[^>]*>What to do in each area<\/a>/);
   });
 });
 

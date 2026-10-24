@@ -31,16 +31,16 @@ export const homeDecisionFaqItems = [
   {
     question: "What changed this week?",
     answer:
-      "The weekly brief shows which signals moved enough to shift this week's guidance.",
+      "Compare the current signals with the previous reading to see whether the guidance changed.",
   },
   {
     question: "What should we do differently right now?",
     answer:
-      "The brief shows what to do now, what to watch for, and when the conditions change.",
+      "Use the action, pause line and resume line for your decision area, adjusted to your stage and runway.",
   },
   {
-    question: "How sure are we, and what would change our mind?",
+    question: "How close is the guidance to changing?",
     answer:
-      "The margin and freshness markers show how much to trust this week's guidance and what would change it.",
+      "Margin measures the distance to the nearest change line in points. Check the data date before acting; margin is not a probability.",
   },
 ] as const;
