@@ -155,7 +155,7 @@ describe("links into Plan and Resolve use the names the header prints", () => {
     const surfaces: Array<{ name: string; html: string }> = [
       { name: "/404", html: renderToStaticMarkup(<NotFound />) },
       { name: `/answers/${answerPages[0].slug}`, html: await renderAnswer() },
-      { name: "/resources/decision-shield-overview", html: renderToStaticMarkup(<DecisionShieldOverview />) },
+      { name: "/resources/decision-shield-overview", html: renderToStaticMarkup(await DecisionShieldOverview()) },
       { name: "/resources/capital-posture-template", html: await renderResource("capital-posture-template") },
       { name: `/resources/${resourcePillarPages[0].slug}`, html: await renderResource(resourcePillarPages[0].slug) },
     ];

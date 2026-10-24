@@ -92,6 +92,31 @@ Specs for the open items will go into `docs/roadmap-prioritized-spec.md` as they
 carries the company-agnostic bounded call); retrieval stance-separation (measured to be an
 embedding-similarity limit — Clef classifies stance).
 
+## Surface health (2026-10-23): redesign vs rewrite audit
+
+The design-debt sweep (DD-001–DD-063, `docs/design-debt-prioritized.md`) left the core surfaces
+clean — `/`, `/signals`, `/operate`, `/trust`, `/resolve`, `/share`, `/history`, `/brief/[week]`
+and the answer pages all delegate to the shared shells and follow the design register. A
+screenshot pass of both themes and both widths (2026-10-23) confirmed this: no page is broken.
+
+### Redesign — one page, plus the design system
+
+- ~~**`/concepts`**~~ — Shipped (2026-10-23): row dividers migrated to the semantic
+  `--border-subtle` token (DD-065).
+- **DD-042 — shared primitives.** No `ActionButton` to match `ActionLink`; six tone-chip maps,
+  ten container classes against the three documented tiers, four overlay call sites. A pixel-safe
+  swap needs a design pass first. *In progress.*
+- **DD-043 — light theme is a patch layer.** Remaining raw-palette floors: `text-white` (79),
+  `bg-slate` (94), `border-slate` (130), `border-white` (1). Held by
+  `tests/themeRawPaletteRatchet.test.ts`. *In progress.* It surfaces as low-contrast subtext on
+  `/` and near-invisible table borders on `/signals` (both light theme).
+
+### Rewrite — one thin page
+
+- ~~**`/resources/decision-shield-overview`**~~ — Shipped (2026-10-23): rewritten decision-first —
+  the page leads with this week's posture, states the three verdicts, the guardrail and the
+  reversal, and links to the plan and the decision record (DD-064).
+
 ## Immediate priority backlog (live-gap focused)
 
 ### Shipped baseline (2026-08-29)

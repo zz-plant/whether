@@ -247,7 +247,7 @@ const routeSurfaces: Surface[] = [
   { name: "/404", text: async () => visibleText(renderToStaticMarkup((await import("../app/not-found")).default())) },
   {
     name: "/resources/decision-shield-overview",
-    text: async () => visibleText(renderToStaticMarkup((await import("../app/resources/decision-shield-overview/page")).default())),
+    text: async () => visibleText(renderToStaticMarkup(await (await import("../app/resources/decision-shield-overview/page")).default())),
   },
   /* The homepage suspends at its data boundary here, so its components render on their own. */
   {

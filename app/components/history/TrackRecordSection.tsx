@@ -76,7 +76,7 @@ export function TrackRecordSection({
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-slate-700/60 text-left type-eyebrow">
+              <tr className="border-b border-[color:var(--border-subtle)] text-left type-eyebrow">
                 <th className="pb-2 pr-4">When</th>
                 <th className="pb-2 pr-4">Change</th>
                 <th className="pb-2">Advance signal</th>
@@ -84,7 +84,7 @@ export function TrackRecordSection({
             </thead>
             <tbody>
               {recentTransitions.map((transition) => (
-                <tr key={transition.atDate} className="border-b border-slate-800/40">
+                <tr key={transition.atDate} className="border-b border-[color:var(--border-subtle)]">
                   <td className="py-2.5 pr-4 whitespace-nowrap text-slate-400">
                     {formatMonthYearShortFromValue(transition.atDate)}
                   </td>
@@ -93,10 +93,10 @@ export function TrackRecordSection({
                   </td>
                   <td className={`py-2.5 ${transition.signaled ? "text-emerald-300/90" : "text-amber-300/90"}`}>
                     {transition.signaled
-                      ? `within ${record.nearBandPts} points of its line ${transition.leadMonths} mo before`
+                      ? `within ${record.nearBandPts} pts of its line ${transition.leadMonths} mo before`
                       : shockByDate.get(transition.atDate)
-                        ? `no advance signal — the score crossed its line from more than ${record.nearBandPts} points away in one month`
-                        : "no advance signal"}
+                        ? `none — the score crossed its line from ${record.nearBandPts}+ pts away in one month`
+                        : "none"}
                   </td>
                 </tr>
               ))}
