@@ -140,9 +140,11 @@ const BANNED: { name: string; pattern: RegExp }[] = [
     pattern:
       /\b(High|Medium|Low|reduced|Guarded|recommendation) confidence\b|\bConfidence\s*[:(]|\bConfidence (High|Medium|Low)\b|\bconfidence (is|was|now|drops?|dropped)\b|\bconfidence (label|number|score|figure|record)\b|\bat (high|medium|low) confidence\b/i,
   },
-  /* The header's names are Brief, Plan, Evidence, Resolve, Trust and History
+  /* The header's names are This week, Decide, Record and Guides
      (lib/navigation/informationArchitecture.ts). Search results, the answer pages and the 404
-     page still said "Decision Tools", and the resource CTAs "Open Planning", until 2026-10-06. */
+     page still said "Decision Tools", and the resource CTAs "Open Planning", until 2026-10-06.
+     A link's label for a route is held to that route's one name by
+     tests/navigationTargets.test.tsx, which can see the href a label points at. */
   { name: "retired nav name", pattern: /\bDecision Tools\b|\b(Open|in) Planning\b/ },
 ];
 

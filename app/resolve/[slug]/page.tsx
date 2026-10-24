@@ -14,6 +14,7 @@ import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
+import { navigationLabelByPath } from "../../../lib/navigation/informationArchitecture";
 
 type Params = { slug: string };
 
@@ -134,7 +135,9 @@ export default async function DecideDetailPage({
         <h2 className="text-lg font-semibold text-slate-100">Still unsure?</h2>
         <div className="flex gap-3">
           <ActionLink href="/trust#revisit-call" variant="pill">Revisit triggers</ActionLink>
-          <ActionLink href="/trust" variant="pill">Trust</ActionLink>
+          {/* The page's one name, from the IA, not the retired "Trust" the
+             regroup of 2026-10-08 left behind on this handoff. */}
+          <ActionLink href="/trust" variant="pill">{navigationLabelByPath["/trust"]}</ActionLink>
         </div>
       </section>
     </ContentPageShell>

@@ -81,15 +81,25 @@ The header carries four groups, each with a hub, read from one module
   More; More opens a sheet with Search, every group's pages and the utility links
   (`app/components/MobileTabBar.tsx`, `app/components/globalHeaderNavClient.tsx`).
 - **Sub-tabs.** `SectionTabs` (`app/components/sectionTabs.tsx`) draws the group's pages above the
-  intro on every page of a group with more than one (the report shell takes `page.currentPath`;
+  intro on every grouped working page (the report shell takes `page.currentPath`;
   `/comps`, `/calibration` and `/concepts` render it themselves). It replaced the planning
-  switcher and the "Signals · Conditions · Plan · Share" loop strip beside the intro.
+  switcher and the "Signals · Conditions · Plan · Share" loop strip beside the intro. Three routes
+  deliberately keep the breadcrumb trail instead of the row (verified 2026-10-23): `/`, whose
+  first screen is the one-screen brief and whose siblings it reaches by its own links (each changed
+  signal links `Why it changed`; the trust strip links `How much to trust this week`); and the
+  frozen archive reads `/brief/<week>` and `/history/<period>`, which are shareable artifacts and
+  closed records, not group workspaces.
 - **Breadcrumbs** come from `buildGroupBreadcrumbs` (`lib/navigation/breadcrumbs.ts`): the group,
   the page when it is not the hub, then the caller's crumbs — "This week › Why it changed",
   "Decide › Runway planner", "Record › Week of …", "Guides › <question>",
   "Guides › More tools › For CEO". A hub alone gets Home first.
 - **Footer.** The brand column carries the utility links (Use it elsewhere, API & MCP, About,
-  Search, RSS); then one column per group, headed by the group's name linking its hub.
+  Contact, Search, RSS); then one column per group, headed by the group's name linking its hub.
+  Contact is a utility link since 2026-10-23: until then no page, nav, footer or palette linked
+  `/contact` — only the sitemap named it — so the corrections policy pointed at an editor a
+  reader could not reach. As a utility link it reaches the footer, the phone's More sheet, the
+  palette and `/llms.txt` from the one array; the header's text row still leaves it out
+  (`header: null`), beside About.
 - **Resolve folded in.** `/resolve` 308s to `/operate#ops-decision-shield` (Test a decision); with
   a `stakeholder`, `stage`, `library` or `toolkitQuery` selection it goes to
   `/resources#more-tools`, where those views render (`resolveSelectionRedirects`, `next.config.js`).
