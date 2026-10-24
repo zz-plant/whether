@@ -182,6 +182,11 @@ sites. `tests/readerClauseShapes.test.tsx` holds the first two rules; the rest a
   "79 (money is hard to raise) then and is 90 (money is hard to raise) now" said it twice. A
   reading goes after the rule as its own sentence ("… is above 76 or …. Funding pressure is 90
   now."), not in parentheses inside it.
+- **Each block adds information.** An area summary below a condition stamp names the held areas
+  without repeating the weather label. A guide's body develops its summary with examples or
+  instructions; do not append generic essays or a second forwardable summary. A template asks
+  for the reader's inputs without repeating the definitions above it. When shortening a resource
+  article heading, keep its old section link in the content's optional `anchor` field.
 - **A clause sits next to its noun.** "Venture-backed U.S. companies with one to two years of
   runway, whose next raise depends on what capital costs" read the raise onto the runway; it is
   "… and a next raise that depends on what capital costs". Where moving it reads worse, split it

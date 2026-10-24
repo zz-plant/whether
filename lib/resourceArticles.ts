@@ -3,7 +3,6 @@ import type { DecisionArea } from "./report/boundedDecisionRules";
 import type {
   ResourceArticleData,
   ResourceArticleEmbedData,
-  ResourceArticleSectionData,
 } from "./resourceContentSource";
 import { resourceArticleContent } from "./resourceContentSource";
 
@@ -12,7 +11,6 @@ export type ResourceArticle = Omit<ResourceArticleData, "toolLink"> & {
 };
 
 export type ResourceArticleEmbed = ResourceArticleEmbedData;
-export type ResourceArticleSection = ResourceArticleSectionData;
 
 const activeResourceArticleSlugs = [
   "should-we-freeze-hiring-high-interest-rate-environment",

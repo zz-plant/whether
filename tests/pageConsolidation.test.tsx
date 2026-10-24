@@ -13,12 +13,12 @@ describe("the method and its form: a section of /about", () => {
     const html = renderToStaticMarkup(<MethodSection />);
 
     // From the framework half.
-    assert.match(html, /The three parts/);
-    assert.match(html, /Why it works/);
+    assert.match(html, /How the three parts work/);
+    assert.match(html, /Agree on the lines in advance/);
     // From the form half, which used to be /template.
-    assert.match(html, /Fill one in/);
+    assert.match(html, /Decision template to print or copy/);
     assert.match(html, /When you will check/);
-    assert.match(html, /No signup required/);
+    assert.match(html, /No signup or data collection/);
   });
 
   it("anchors the form so an external /template link lands on it", () => {

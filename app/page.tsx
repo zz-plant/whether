@@ -531,7 +531,7 @@ async function PageContent({
         href: buildPublishedBriefPath(differingBrief.slug),
       }
     : undefined;
-  const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(publicRegimeLabel, decisionPickerOptions);
+  const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(decisionPickerOptions);
   const heroAreas = heldAreasLine
     ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
     : undefined;
