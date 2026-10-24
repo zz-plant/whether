@@ -44,7 +44,13 @@ export function ContentPageShell({
       {...mainProps}
       id="main-content"
       tabIndex={-1}
-      className={`mx-auto flex w-full ${measureClassNames[measure]} flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10`}
+      /* The same entrance every other shell carries (Shell, PageShell,
+         RouteLoadingShell): a 220ms fade-and-rise on the page's own ground,
+         so crossing from the brief to a reading page keeps one motion.
+         §IX allows transform + opacity only, which is what this class
+         animates; its reduced-motion end state is the block beside it in
+         surfaces.css. */
+      className={`weather-page-enter mx-auto flex w-full ${measureClassNames[measure]} flex-col gap-6 px-4 py-8 sm:px-6 sm:py-10`}
     >
       {children}
     </main>
