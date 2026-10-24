@@ -32,6 +32,7 @@ import {
   searchJobLabels,
   type SearchEntityJob,
 } from "../../lib/search/searchIndex";
+import { navigationGroups } from "../../lib/navigation/informationArchitecture";
 import { ActionLink } from "../components/ui/actionLink";
 import { buildToolkitLibraryHref } from "../resources/components/toolkitLibraryPanels";
 import { SearchTelemetry } from "./searchTelemetry";
@@ -53,6 +54,12 @@ const StartFromAJob = () => (
   </section>
 );
 
+/* The empty state is the site's last-chance handoff: a reader with a failed
+   query gets the four groups, by the names the header prints. Until 2026-10-23
+   it hand-listed "Evidence", "Plan", "Toolkit library" and "Trust" — the
+   2026-10-08 regroup renamed the first two and folded the third, and the 404
+   page had been swept for exactly this while /search escaped. Read from the IA
+   array so a renamed group renames this too. */
 const NothingMatched = ({ query }: { query: string }) => (
   <section aria-labelledby="search-empty-heading" className="space-y-3">
     <h2 id="search-empty-heading" className="type-eyebrow">Nothing matched “{query}”</h2>
@@ -61,10 +68,11 @@ const NothingMatched = ({ query }: { query: string }) => (
       runway, rollback, pricing — or start from one of these.
     </p>
     <div className="flex flex-wrap gap-2">
-      <ActionLink href="/signals" variant="pill">Evidence</ActionLink>
-      <ActionLink href="/operate" variant="pill">Plan</ActionLink>
-      <ActionLink href={buildToolkitLibraryHref()} variant="pill">Toolkit library</ActionLink>
-      <ActionLink href="/trust" variant="pill">Trust</ActionLink>
+      {navigationGroups.map((group) => (
+        <ActionLink key={group.key} href={group.href} variant="pill">
+          {group.label}
+        </ActionLink>
+      ))}
     </div>
   </section>
 );

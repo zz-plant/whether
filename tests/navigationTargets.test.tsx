@@ -144,20 +144,39 @@ describe("links into Guides, Decide and /trust land on a section the page draws"
 });
 
 describe("links into Plan and Resolve use the names the header prints", () => {
+  /* Substring bans would catch task phrases ("Build this week's plan") that
+     legitimately use a common noun, so these match the whole label. */
   const RETIRED: Array<{ path: string; name: RegExp }> = [
     { path: "/operate", name: /\bPlanning\b/ },
+    { path: "/operate", name: /^Plan$/ },
     { path: "/resolve", name: /\bDecision Tools\b/ },
+    { path: "/signals", name: /^Evidence$/ },
+    { path: "/trust", name: /^Trust$/ },
   ];
 
-  it("on the 404 page, an answer page, and the resource pages that hand off to the plan", async () => {
+  const renderResolve = async (slug: string) => {
+    const ResolvePage = (await import("../app/resolve/[slug]/page")).default;
+    return renderToStaticMarkup(await ResolvePage({ params: Promise.resolve({ slug }) }));
+  };
+
+  it("on the 404 page, an answer page, the resource pages, the search dead end and the role guides", async () => {
     const NotFound = (await import("../app/not-found")).default;
     const DecisionShieldOverview = (await import("../app/resources/decision-shield-overview/page")).default;
+    const { decideStaticParams } = await import("../lib/decisionDomainCatalog");
+    const { SearchResults } = await import("../app/search/searchResults");
+    const resolveSlug = decideStaticParams.at(0)?.slug;
+    assert.ok(resolveSlug, "the decision catalog carries at least one resolve slug");
     const surfaces: Array<{ name: string; html: string }> = [
       { name: "/404", html: renderToStaticMarkup(<NotFound />) },
       { name: `/answers/${answerPages[0].slug}`, html: await renderAnswer() },
       { name: "/resources/decision-shield-overview", html: renderToStaticMarkup(await DecisionShieldOverview()) },
       { name: "/resources/capital-posture-template", html: await renderResource("capital-posture-template") },
       { name: `/resources/${resourcePillarPages[0].slug}`, html: await renderResource(resourcePillarPages[0].slug) },
+      /* The empty state hand-listed "Evidence", "Plan", "Toolkit library" and
+         "Trust" until 2026-10-23 — the recovery surface is the one place a
+         reader cannot afford a name the header no longer prints. */
+      { name: "/search (nothing matched)", html: renderToStaticMarkup(<SearchResults initialQuery="zzqx-no-such-entry" />) },
+      { name: `/resolve/${resolveSlug}`, html: await renderResolve(resolveSlug) },
     ];
 
     const stale = surfaces.flatMap(({ name, html }) =>

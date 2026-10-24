@@ -58,7 +58,7 @@ describe("GlobalHeaderNavClient", () => {
     const html = renderToStaticMarkup(
       <MobileNavContent navigationLinks={navigationLinks} currentPathname="/" onClose={() => {}} />,
     );
-    for (const label of ["This week", "Why it changed", "Decide", "Runway planner", "Record", "Compare periods", "Calibration", "Product writing", "Guides", "Use it elsewhere", "API &amp; MCP", "About"]) {
+    for (const label of ["This week", "Why it changed", "Decide", "Runway planner", "Record", "Compare periods", "Calibration", "Product writing", "Guides", "Use it elsewhere", "API &amp; MCP", "About", "Contact"]) {
       assert.ok(html.includes(label), `the sheet lists ${label}`);
     }
     assert.ok(html.includes("Search or jump to a page"), "the sheet opens search");
