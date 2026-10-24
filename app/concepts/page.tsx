@@ -284,7 +284,7 @@ export default function ProductCanonPage() {
                 </thead>
                 <tbody>
                   {baseRate.rows.map((row) => (
-                    <tr key={row.regime} className="border-t border-slate-800">
+                    <tr key={row.regime} className="border-t border-[color:var(--border-subtle)]">
                       <th scope="row" className="py-2 pr-3 font-normal text-slate-100 sm:pr-4">{row.conditions}</th>
                       <td className="py-2 pr-3 tabular-nums sm:pr-4">
                         {row.months} ({formatCanonShare(row.monthShare)})
@@ -296,7 +296,7 @@ export default function ProductCanonPage() {
                       ))}
                     </tr>
                   ))}
-                  <tr className="border-t border-slate-700 text-slate-400">
+                  <tr className="border-t border-[color:var(--border-subtle)] text-slate-400">
                     <th scope="row" className="py-2 pr-3 font-normal sm:pr-4">On the record</th>
                     <td className="py-2 pr-3 tabular-nums sm:pr-4">{baseRate.monthsOnRecord}</td>
                     {ADVICE_STANCES.map((stance) => (
@@ -346,7 +346,7 @@ export default function ProductCanonPage() {
         >
           <ul className="space-y-5">
             {pairs.map((pair) => (
-              <li key={pair.decision} className="space-y-3 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0">
+              <li key={pair.decision} className="space-y-3 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0">
                 <h3 className="text-base font-semibold text-slate-100">{pair.decision}</h3>
                 <PairSide essay={pair.expand} />
                 <PairSide essay={pair.conserve} />
@@ -415,7 +415,7 @@ export default function ProductCanonPage() {
                    renders; `auto` remembers the real one after. Anchor links
                    from "this week" above still land: the browser renders a
                    targeted entry even while it is skipped. */
-                className="grid gap-x-8 gap-y-2 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0 [content-visibility:auto] [contain-intrinsic-size:auto_260px] sm:grid-cols-[10rem_minmax(0,1fr)]"
+                className="grid gap-x-8 gap-y-2 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0 [content-visibility:auto] [contain-intrinsic-size:auto_260px] sm:grid-cols-[10rem_minmax(0,1fr)]"
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 sm:flex-col sm:items-start">
                   <p className="type-eyebrow">
