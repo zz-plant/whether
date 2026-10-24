@@ -65,6 +65,8 @@
     "check:unchecked-access": "bun scripts/check-unchecked-indexed-access.ts",
     "audit": "bun audit --audit-level=critical",
     "assets:generate": "bun run scripts/generate-scenes.ts",
+    "assets:visuals": "bun scripts/generate-visual-assets.tsx",
+    "assets:video": "bun scripts/generate-brief-video.ts",
     "lint:types": "oxlint --type-aware --deny-warnings",
     "check:suppressions": "bun --bun suppression-census --config scripts/census.config.ts --export suppressionCensusConfig",
     "check:dead-exports": "bun run scripts/check-dead-exports.ts",

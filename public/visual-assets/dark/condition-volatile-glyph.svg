@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="128" viewBox="0 0 360 128" role="img" aria-labelledby="dark-condition-volatile-glyph-title dark-condition-volatile-glyph-desc">
+<title id="dark-condition-volatile-glyph-title">Stormy glyph</title>
+<desc id="dark-condition-volatile-glyph-desc">Stormy condition reference: the canonical weather glyph beside its name. Money is cheap but investors are wary.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#b9bfff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cloud-lightning shrink-0 text-[color:var(--regime-ink)]" data-regime="VOLATILE" data-concept-icon="condition" aria-hidden="true" focusable="false" x="24" y="40"><path d="M6 16.326A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 .5 8.973"></path><path d="m13 12-3 5h4l-3 5"></path></svg><text x="94" y="76" font-size="32" font-weight="600" fill="#b9bfff" text-anchor="start">Stormy</text>
+</g>
+</svg>

@@ -122,6 +122,21 @@ export const locationHashSource = createBrowserSource({
 });
 
 /**
+ * The URL query without its "?". Empty on the server and through hydration.
+ * Back and Forward arrive as `popstate`; a writer that changes the query with
+ * `pushState`/`replaceState` (which fire no event) calls `refresh()` so every
+ * reader moves with it.
+ */
+export const locationSearchSource = createBrowserSource({
+  read: () => window.location.search.replace(/^\?/, ""),
+  serverValue: "",
+  watch: (onChange) => {
+    window.addEventListener("popstate", onChange);
+    return () => window.removeEventListener("popstate", onChange);
+  },
+});
+
+/**
  * One source per storage key, for slots whose key is itself a browser value.
  *
  * The decision-shield presets are stored under the persistent client id, which

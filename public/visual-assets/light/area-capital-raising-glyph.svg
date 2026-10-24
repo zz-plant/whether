@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="128" viewBox="0 0 400 128" role="img" aria-labelledby="light-area-capital-raising-glyph-title light-area-capital-raising-glyph-desc">
+<title id="light-area-capital-raising-glyph-title">Fundraising glyph</title>
+<desc id="light-area-capital-raising-glyph-desc">Fundraising operating area reference: the canonical area glyph beside its public label, in neutral ink.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#121719" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-landmark shrink-0" data-concept-icon="area" aria-hidden="true" focusable="false" x="24" y="40"><path d="M10 18v-7"></path><path d="M11.119 2.205a2 2 0 0 1 1.762 0l7.84 3.846A.5.5 0 0 1 20.5 7h-17a.5.5 0 0 1-.22-.949z"></path><path d="M14 18v-7"></path><path d="M18 18v-7"></path><path d="M3 22h18"></path><path d="M6 18v-7"></path></svg><text x="94" y="76" font-size="32" font-weight="600" fill="#121719" text-anchor="start">Fundraising</text>
+</g>
+</svg>

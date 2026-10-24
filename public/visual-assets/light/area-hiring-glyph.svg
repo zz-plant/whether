@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="400" height="128" viewBox="0 0 400 128" role="img" aria-labelledby="light-area-hiring-glyph-title light-area-hiring-glyph-desc">
+<title id="light-area-hiring-glyph-title">Hiring glyph</title>
+<desc id="light-area-hiring-glyph-desc">Hiring operating area reference: the canonical area glyph beside its public label, in neutral ink.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#121719" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users shrink-0" data-concept-icon="area" aria-hidden="true" focusable="false" x="24" y="40"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><text x="94" y="76" font-size="32" font-weight="600" fill="#121719" text-anchor="start">Hiring</text>
+</g>
+</svg>

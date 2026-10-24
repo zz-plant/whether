@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="128" viewBox="0 0 360 128" role="img" aria-labelledby="dark-condition-scarcity-glyph-title dark-condition-scarcity-glyph-desc">
+<title id="dark-condition-scarcity-glyph-title">Freezing glyph</title>
+<desc id="dark-condition-scarcity-glyph-desc">Freezing condition reference: the canonical weather glyph beside its name. Money is expensive and hard to raise.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#8cc0ec" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-snowflake shrink-0 text-[color:var(--regime-ink)]" data-regime="SCARCITY" data-concept-icon="condition" aria-hidden="true" focusable="false" x="24" y="40"><path d="m10 20-1.25-2.5L6 18"></path><path d="M10 4 8.75 6.5 6 6"></path><path d="m14 20 1.25-2.5L18 18"></path><path d="m14 4 1.25 2.5L18 6"></path><path d="m17 21-3-6h-4"></path><path d="m17 3-3 6 1.5 3"></path><path d="M2 12h6.5L10 9"></path><path d="m20 10-1.5 2 1.5 2"></path><path d="M22 12h-6.5L14 15"></path><path d="m4 10 1.5 2L4 14"></path><path d="m7 21 3-6-1.5-3"></path><path d="m7 3 3 6h4"></path></svg><text x="94" y="76" font-size="32" font-weight="600" fill="#8cc0ec" text-anchor="start">Freezing</text>
+</g>
+</svg>
