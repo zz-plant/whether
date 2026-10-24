@@ -172,7 +172,7 @@ describe("/share current weekly artifact", () => {
 
     assert.equal(images.length, 2, "one picture per distinct image");
     for (const tag of images) {
-      assert.match(tag, /src="\/api\/image\/(slide\?stage=series-a|brief)"/);
+      assert.match(tag, /src="\/api\/image\/(slide|brief)\?stage=series-a"/);
       assert.match(tag, /width="1200"/);
       assert.match(tag, /height="(675|800)"/);
       assert.match(tag, /loading="lazy"/);

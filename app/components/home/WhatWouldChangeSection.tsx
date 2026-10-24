@@ -5,6 +5,7 @@ import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/hom
 import { RegimeRadar } from "./RegimeRadar";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
+import { DecisionLineKey } from "../illustrations/DecisionLineKey";
 
 type HomeScoreLadder = {
   metric: "tightness" | "riskAppetite";
@@ -112,11 +113,7 @@ export function WhatWouldChangeSection({
           Each score carries a pause, a resume and a change line, and nowhere on
           the page said what each one does; a first reader met all three in the
           card's trust strip and the ladders before any definition. */}
-      <p className="mb-4 max-w-2xl text-fluid-xs leading-relaxed text-slate-400" data-line-key>
-        Each score has three lines. Past its <span className="font-semibold text-slate-200">pause line</span>, hold back the areas it governs.
-        Back past its <span className="font-semibold text-slate-200">resume line</span>, start them again. Across its{" "}
-        <span className="font-semibold text-slate-200">change line</span>, the week&rsquo;s conditions change.
-      </p>
+      <DecisionLineKey className="mb-5 max-w-3xl" />
       <div
         className={
           ladders.length === 0

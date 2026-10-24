@@ -4,6 +4,9 @@ import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
 import { GuardrailTagControls } from "./guardrailTagControls";
+import { ReusableVisuals } from "./reusableVisuals";
+import { findBriefVideo } from "../../lib/export/briefVideo";
+import { latestPublishedBrief, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { PullPolicyControls } from "./pullPolicyControls";
 import { SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
@@ -366,6 +369,7 @@ const apiLink = utilityLinks.find((link) => link.href === "/api-docs");
 
 export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
+  const video = latestPublishedBrief ? await findBriefVideo(latestPublishedBrief) : undefined;
 
   return (
     <PageShell backdropVariant="default">
@@ -408,6 +412,7 @@ export default async function SharePage() {
 
         {/* Text formats first, then the same call as a picture or a file. */}
         <ShareImageArtifacts />
+        <ReusableVisuals video={video} weekLabel={latestPublishedBrief ? publishedBriefWeekLabel(latestPublishedBrief) : undefined} />
 
         {/* Anchored so the retired /embed route lands on it. */}
         <section id="embed" className="weather-panel weather-section-stack p-0">

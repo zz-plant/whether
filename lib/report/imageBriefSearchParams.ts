@@ -107,7 +107,8 @@ const normalizeView = (value: string | undefined) => {
   return normalized && VALID_INTERPRETATION_VIEWS.has(normalized) ? normalized : undefined;
 };
 
-const buildSupportedImageBriefSearchParams = (source: SearchParamReader) => {
+/** The brief context the card and route share: only the supported keys, normalized. */
+export const buildSupportedImageBriefSearchParams = (source: SearchParamReader) => {
   const params = new URLSearchParams();
   const month = normalizeMonth(readTrimmed(source, "month"));
   const year = normalizeYear(readTrimmed(source, "year"));
