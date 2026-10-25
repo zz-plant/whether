@@ -37,7 +37,7 @@ export function RecordNote({ view, recordDate }: { view: DecisionRecordView; rec
       className={`mt-3 flex flex-wrap items-center justify-between gap-2.5 rounded-lg border px-3.5 py-2 text-fluid-xs leading-5 ${
         needsAttention
           ? "border-amber-500/30 bg-amber-500/10 text-amber-200"
-          : "border-slate-800 bg-slate-900/40 text-slate-300"
+          : "border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] text-slate-300"
       }`}
     >
       <div className="flex flex-wrap items-center gap-2">

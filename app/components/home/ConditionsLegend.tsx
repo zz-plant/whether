@@ -188,28 +188,28 @@ export function ConditionsLegend({
           <div className="mt-4 hidden w-full items-start gap-6 md:flex" data-first-run-card-schematic>
             <svg viewBox="0 0 150 96" className="h-auto w-[150px] shrink-0" aria-hidden="true">
               {/* The card's outline. */}
-              <rect x="0.5" y="0.5" width="149" height="95" rx="8" className="fill-slate-900/40 stroke-slate-600" />
+              <rect x="0.5" y="0.5" width="149" height="95" rx="8" fill="var(--bg-nested)" stroke="var(--border-strong)" />
               {/* 1: the condition stamp. */}
-              <rect x="8" y="10" width="48" height="14" rx="3" className="fill-slate-800/60 stroke-slate-500" />
-              <text x="32" y="20" textAnchor="middle" fontSize="5.5" letterSpacing="0.5" className="fill-slate-300">
+              <rect x="8" y="10" width="48" height="14" rx="3" fill="var(--bg-raised)" stroke="var(--border-strong)" />
+              <text x="32" y="20" textAnchor="middle" fontSize="5.5" letterSpacing="0.5" className="fill-slate-300 font-semibold">
                 CONDITION
               </text>
-              <circle cx="64" cy="17" r="8" className="fill-slate-900 stroke-slate-400" />
-              <text x="64" y="20" textAnchor="middle" fontSize="8" className="fill-slate-200">1</text>
+              <circle cx="64" cy="17" r="8" fill="var(--bg-panel)" stroke="var(--app-text-muted)" />
+              <text x="64" y="20" textAnchor="middle" fontSize="8" className="fill-slate-100 font-semibold">1</text>
               {/* 2: the guidance, and its longer sentence. */}
-              <rect x="8" y="36" width="118" height="10" rx="2" className="fill-slate-700/70" />
-              <rect x="8" y="51" width="88" height="10" rx="2" className="fill-slate-700/70" />
-              <circle cx="136" cy="41" r="8" className="fill-slate-900 stroke-slate-400" />
-              <text x="136" y="44" textAnchor="middle" fontSize="8" className="fill-slate-200">2</text>
+              <rect x="8" y="36" width="118" height="10" rx="2" fill="var(--border-strong)" />
+              <rect x="8" y="51" width="88" height="10" rx="2" fill="var(--border-default)" />
+              <circle cx="136" cy="41" r="8" fill="var(--bg-panel)" stroke="var(--app-text-muted)" />
+              <text x="136" y="44" textAnchor="middle" fontSize="8" className="fill-slate-100 font-semibold">2</text>
               {/* The trust strip under the call. */}
-              <line x1="8" y1="68" x2="142" y2="68" className="stroke-slate-700" strokeDasharray="2 2" />
+              <line x1="8" y1="68" x2="142" y2="68" stroke="var(--border-default)" strokeDasharray="2 2" />
               {/* 3: the margin row. */}
-              <rect x="8" y="74" width="134" height="16" rx="4" className="fill-slate-800/40 stroke-slate-600" />
-              <text x="16" y="84.5" fontSize="5.5" letterSpacing="0.5" className="fill-slate-400">
+              <rect x="8" y="74" width="134" height="16" rx="4" fill="var(--bg-raised)" stroke="var(--border-strong)" />
+              <text x="16" y="84.5" fontSize="5.5" letterSpacing="0.5" className="fill-slate-400 font-semibold">
                 MARGIN
               </text>
-              <circle cx="134" cy="82" r="8" className="fill-slate-900 stroke-slate-400" />
-              <text x="134" y="85" textAnchor="middle" fontSize="8" className="fill-slate-200">3</text>
+              <circle cx="134" cy="82" r="8" fill="var(--bg-panel)" stroke="var(--app-text-muted)" />
+              <text x="134" y="85" textAnchor="middle" fontSize="8" className="fill-slate-100 font-semibold">3</text>
             </svg>
             <ol className="space-y-2 text-xs leading-5 text-slate-300">
               {[
@@ -235,7 +235,7 @@ export function ConditionsLegend({
         type="button"
         onClick={handleDismiss}
         aria-label={orientation ? "Dismiss this introduction" : "Dismiss the conditions legend"}
-        className="shrink-0 -mr-2 -mt-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+        className="shrink-0 -mr-2 -mt-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-slate-100 hover:bg-[color:var(--bg-raised)] transition-colors"
       >
         <X size={16} aria-hidden="true" />
       </button>

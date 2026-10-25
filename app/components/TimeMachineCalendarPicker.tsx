@@ -101,10 +101,10 @@ export function TimeMachineCalendarPicker({
         <Popover.Positioner side="bottom" align="start" sideOffset={8} className="z-50">
           <Popover.Popup
             aria-label="Select brief period"
-            className="max-h-96 w-80 overflow-y-auto overscroll-contain rounded-xl border border-slate-800 bg-slate-950 p-3 shadow-2xl"
+            className="max-h-96 w-80 overflow-y-auto overscroll-contain rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)] p-3 shadow-2xl"
           >
             <div className="mb-2 flex items-center justify-between border-b border-[color:var(--border-subtle)] pb-2">
-              <span className="text-xs font-semibold text-white">Past weeks</span>
+              <span className="text-xs font-semibold text-slate-50">Past weeks</span>
               {isHistorical && (
                 <button
                   type="button"

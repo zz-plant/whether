@@ -159,7 +159,7 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
       <table className="w-full border-collapse text-left text-sm max-md:block md:min-w-[36rem]">
         <caption className="sr-only">{caption}</caption>
         <thead className="max-md:hidden">
-          <tr className="border-b border-slate-800/80 text-xs text-slate-400">
+          <tr className="border-b border-[color:var(--border-subtle)] text-xs text-slate-400">
             <th scope="col" className="py-2 pr-3 font-medium">Area</th>
             <th scope="col" className="py-2 pr-3 font-medium">This week</th>
             <th scope="col" className="py-2 pr-3 font-medium text-semantic-caution-fg">Pause line</th>
@@ -181,7 +181,7 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
                  glued to an interpolation ("max-md:py-3${") as one token it cannot
                  parse and never generates it (tests/tailwindClassBoundaries).
                  On a phone the moved row's tint is inset from its text. */
-              className={`border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-2 max-md:py-3 ${
+              className={`border-b border-[color:var(--border-faint)] align-top max-md:grid max-md:grid-cols-2 max-md:gap-x-4 max-md:gap-y-2 max-md:py-3 ${
                 row.moved ? "bg-amber-500/[0.06] max-md:-mx-2 max-md:rounded-md max-md:px-2" : ""
               }`}
               data-area={row.area}
@@ -191,7 +191,7 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
                 {row.href ? (
                   <Link
                     href={row.href}
-                    className="weather-hit inline-flex items-center gap-1.5 underline decoration-slate-600 underline-offset-4 hover:text-white"
+                    className="weather-hit inline-flex items-center gap-1.5 underline decoration-slate-600 underline-offset-4 hover:text-slate-50"
                   >
                     <AreaIcon area={row.area} />
                     {row.hrefLabel ?? decisionAreaLabel(row.area)}

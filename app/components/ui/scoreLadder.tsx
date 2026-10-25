@@ -276,7 +276,7 @@ export function ScoreLadder({
         style={trackStyle}
         aria-hidden="true"
       >
-        <div className="absolute inset-x-0 top-3 h-1.5 overflow-hidden rounded-full bg-slate-800">
+        <div className="absolute inset-x-0 top-3 h-1.5 overflow-hidden rounded-full bg-[color:var(--bg-raised)]">
           {zones.map((zone) => (
             <span
               key={zone.kind}

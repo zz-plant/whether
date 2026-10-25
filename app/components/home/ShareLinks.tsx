@@ -25,7 +25,7 @@ export function ShareLinks({ currentRecordDate }: { currentRecordDate: string })
   const brief = selectCitablePermalinkBrief(currentRecordDate);
   return (
     <p
-      className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-slate-800/70 pt-4 text-fluid-xs"
+      className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-[color:var(--border-subtle)] pt-4 text-fluid-xs"
       data-share-links
     >
       <ShareOrEmbedLink />

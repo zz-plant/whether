@@ -197,15 +197,15 @@ export function SinceLastVisit({
   const compact = (
     <div
       data-testid="since-last-visit"
-      className="flex items-center justify-between gap-3 rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
+      className="flex items-center justify-between gap-3 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
     >
       <div>
-        <span className="font-semibold text-white">Since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
+        <span className="font-semibold text-slate-50">Since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
         {regimeChanged
           ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
           : `still ${current.regimeLabel}, but the guidance changed.`}
         {callChanged ? (
-          <span className="block text-white/60">Then: “{previous.call}”</span>
+          <span className="block text-slate-400">Then: “{previous.call}”</span>
         ) : null}
       </div>
       {dismissButton}
@@ -217,10 +217,10 @@ export function SinceLastVisit({
   /* A lapsed return is at a planning cadence, so lead with the delta and put
      the one-slide summary one click away — the QAU conversion surface. */
   return (
-    <div data-testid="lapsed-return" className="rounded-lg border border-slate-700/70 bg-slate-900/40 px-4 py-3 space-y-2">
+    <div data-testid="lapsed-return" className="rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
         <p className="text-fluid-xs leading-5 text-slate-200">
-          <span className="font-semibold text-white">Since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
+          <span className="font-semibold text-slate-50">Since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
           {regimeChanged
             ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
             : `still ${current.regimeLabel}, but the guidance changed.`}
@@ -228,7 +228,7 @@ export function SinceLastVisit({
         {dismissButton}
       </div>
       {/* The call the reader last saw; the call now is the card's heading. */}
-      {callChanged ? <p className="text-fluid-xs leading-5 text-white/60">Then: “{previous.call}”</p> : null}
+      {callChanged ? <p className="text-fluid-xs leading-5 text-slate-400">Then: “{previous.call}”</p> : null}
       <div className="flex flex-wrap items-center gap-2">
         {boardDeckHref ? (
           <a
@@ -242,7 +242,7 @@ export function SinceLastVisit({
         ) : null}
         <Link
           href={compareHrefForRecordDate(previous.recordDate)}
-          className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline text-sky-200 hover:text-white"
+          className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline text-sky-200 hover:text-slate-50"
         >
           Compare against your last visit &rarr;
         </Link>
@@ -251,7 +251,7 @@ export function SinceLastVisit({
         Runway is a quarterly question, and this gap is longer.{" "}
         <a
           href="#runway-notes"
-          className="text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-white"
+          className="text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-50"
         >
           Re-check your runway band
         </a>
