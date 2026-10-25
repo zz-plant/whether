@@ -140,6 +140,31 @@ describe("RegimeRadar path", () => {
     { tightness: 63, riskAppetite: 56 },
   ];
 
+  it("keeps close month-end hover targets from covering one another", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={[
+      { tightness: 40, riskAppetite: 61, label: "April 2026" },
+      { tightness: 40, riskAppetite: 59, label: "May 2026" },
+    ]} />);
+    const targets = [...html.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="transparent"/g)];
+    assert.equal(targets.length, 2);
+    const [a, b] = targets;
+    assert.ok(a && b);
+    const distance = Math.hypot(Number(a[1]) - Number(b[1]), Number(a[2]) - Number(b[2]));
+    assert.ok(Number(a[3]) + Number(b[3]) <= distance + 0.00001, "neither target may mask its neighbor's date");
+  });
+
+  it("offers the dated readings in HTML for touch, keyboard and screen-reader users", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={[
+      { tightness: 40, riskAppetite: 61, label: "April 2026" },
+      { tightness: 40, riskAppetite: 59, label: "May 2026" },
+    ]} />);
+    const caption = /<figcaption[\s\S]*<\/figcaption>/.exec(html)?.[0] ?? "";
+    assert.match(caption, /<summary[^>]*>Readings on this chart<\/summary>/);
+    assert.match(caption, /April 2026: Funding pressure 40, Risk appetite 61/);
+    assert.match(caption, /May 2026: Funding pressure 40, Risk appetite 59/);
+    assert.match(caption, /Current reading: Funding pressure 90, Risk appetite 48/);
+  });
+
   it("joins every month-end to the current point, and drops the single earlier dot", () => {
     const html = renderToStaticMarkup(
       <RegimeRadar {...base} previousTightness={63} previousRiskAppetite={56} trail={trail} />,

@@ -55,7 +55,13 @@ const REPORT_DIR = "artifacts/near-duplicates";
 
 export type CodeUnit = { file: string; name: string; line: number; text: string };
 
-const TOP_LEVEL = /^(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function\*?\s+([A-Za-z_$][\w$]*)|const\s+([A-Za-z_$][\w$]*)\s*(?::[^=]+)?=)/;
+/* A unit's end is the next top-level declaration of any form, not just another
+   function or const. A class, type, interface, enum, let, var, import or
+   re-export after a function is separate code with its own name; a unit that
+   swallowed it embeds unrelated code under the function's name and can pair it
+   against things it has nothing to do with. */
+const TOP_LEVEL = /^(?:import\b|export\s*(?:\{|default\b|\*)?|(?:(?:async\s+)?function\b|class\b|const\b|let\b|var\b|type\b|interface\b|enum\b))/;
+const TOP_LEVEL_NAME = /(?:function\*?\s+|class\s+|const\s+|let\s+|var\s+|type\s+|interface\s+|enum\s+)([A-Za-z_$][\w$]*)/;
 
 /**
  * Top-level functions in one file: each runs from its declaration line to the line before
@@ -66,18 +72,32 @@ const TOP_LEVEL = /^(?:export\s+)?(?:default\s+)?(?:async\s+)?(?:function\*?\s+(
 export const extractUnits = (source: string, file: string): CodeUnit[] => {
   const lines = source.split("\n");
   const starts = lines.flatMap((line, index) => {
-    const match = TOP_LEVEL.exec(line);
-    return match ? [{ index, line, name: match[1] ?? match[2] ?? "" }] : [];
+    if (!TOP_LEVEL.test(line)) return [];
+    const match = TOP_LEVEL_NAME.exec(line);
+    return [{ index, line, name: match?.[1] ?? "" }];
   });
   return starts.flatMap(({ index, line, name }, position) => {
-    const end = starts[position + 1]?.index ?? lines.length;
-    const body = lines.slice(index, end);
+    const next = starts[position + 1];
+    const body = lines.slice(index, next?.index ?? lines.length);
     while (body.length > 0 && !body.at(-1)?.trim()) body.pop();
+    /* Comment lines at the tail sit between this declaration and whatever
+       follows it: they document what follows, so they leave with the blank
+       lines around them. */
+    while (body.length > 0 && isCommentLine(body.at(-1) ?? "")) {
+      body.pop();
+      while (body.length > 0 && !body.at(-1)?.trim()) body.pop();
+    }
     const text = body.join("\n");
     const isFunction = /^(?:export\s+)?(?:default\s+)?(?:async\s+)?function/.test(line) || /=>|\bfunction\b/.test(body.slice(0, 3).join(" "));
     if (!name || HTTP_METHODS.has(name) || !isFunction || body.length < MIN_LINES) return [];
     return [{ file, name, line: index + 1, text: text.slice(0, MAX_CHARS) }];
   });
+};
+
+/** A line that is only a comment, in the shapes a block or line comment takes. */
+const isCommentLine = (line: string) => {
+  const trimmed = line.trimStart();
+  return trimmed.startsWith("//") || trimmed.startsWith("/*") || trimmed.startsWith("*");
 };
 
 const normalize = (vector: number[]): number[] => {
@@ -121,8 +141,15 @@ const documentPrompt = (unit: CodeUnit) => `title: ${unit.file} | text: ${unit.t
 /* The model card's prompt for comparing two passages with each other. */
 const sentencePrompt = (unit: CodeUnit) => `task: sentence similarity | query: ${unit.text}`;
 
-/** Case, punctuation and list markers aside, the words of a sentence. */
-const sentenceKey = (sentence: string) => sentence.toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+/**
+ * Case, punctuation and list markers aside, the words of a sentence — with the
+ * comparators kept. `Pause hiring when runway is < 12 months.` and the same
+ * sentence with `>` are opposite instructions, and `+25` / `-25` basis points
+ * are opposite moves: the key a repeat is recognized by must distinguish them,
+ * or the merge attributes one route's sentence to the other.
+ */
+const sentenceKey = (sentence: string) =>
+  sentence.toLowerCase().replace(/(<=|>=|[<>+-])/g, " $1 ").replace(/[^a-z0-9<>=+-]+/g, " ").replace(/\s+/g, " ").trim();
 
 const MONTHS = /\b(?:jan|feb|mar|apr|may|jun|jul|aug|sep|sept|oct|nov|dec)[a-z]*\b/g;
 
@@ -185,19 +212,28 @@ const collectUnits = (): CodeUnit[] => {
       .flatMap((file: string) => extractUnits(readFileSync(file, "utf8"), file)));
 };
 
-const collectSentences = async (baseUrl: string, routes: readonly string[]): Promise<CodeUnit[]> => {
+const collectSentences = async (baseUrl: string, routes: readonly string[]) => {
   const pages = [];
+  /* Sentences read out of a table, kept by text so the skip can tell a table
+     row from prose that happens to share its template. */
+  const tableSentences = new Set<string>();
   for (const route of routes) {
     const url = new URL(route, baseUrl);
     const response = await fetch(url, { signal: AbortSignal.timeout(120_000) });
     if (!response.ok) throw new Error(`could not read ${url.href} (HTTP ${response.status})`);
-    pages.push({ route, sentences: extractSentences(await response.text()) });
+    const html = await response.text();
+    for (const table of html.matchAll(/<table\b[\s\S]*?<\/table>/gi)) {
+      for (const sentence of extractSentences(table[0])) tableSentences.add(sentence);
+    }
+    pages.push({ route, sentences: extractSentences(html) });
   }
-  return sentenceUnits(pages);
+  return { units: sentenceUnits(pages), tableSentences };
 };
 
 const run = async (args: ReturnType<typeof parseArgs>) => {
-  const units = args.copy ? await collectSentences(args.baseUrl, args.routes) : collectUnits();
+  const { units, tableSentences } = args.copy
+    ? await collectSentences(args.baseUrl, args.routes)
+    : { units: collectUnits(), tableSentences: new Set<string>() };
   const prompt = args.copy ? sentencePrompt : documentPrompt;
   const kind = args.copy ? "sentences" : "functions";
   const cacheFile = path.join(REPORT_DIR, `cache.${args.copy ? "copy." : ""}${args.model.replace(/[^\w.-]+/g, "_")}.json`);
@@ -223,8 +259,19 @@ const run = async (args: ReturnType<typeof parseArgs>) => {
     const vector = cache[key];
     return vector ? [{ unit, vector }] : [];
   });
+  /* Table rows filled from one template are one sentence to a reader and are
+     not paired; the suppression is scoped to sentences that actually came out
+     of a table, because two prose sentences differing only by a number or a
+     month can carry materially different decisions (a threshold moved, a
+     deadline changed) and hiding that contradiction is the failure mode the
+     audit exists to surface. */
   const pairs = nearestPairs(embedded, args.threshold, args.limit, args.copy
-    ? { sameFile: true, skip: (a, b) => sentenceTemplate(a.text) === sentenceTemplate(b.text) }
+    ? {
+      sameFile: true,
+      skip: (a, b) =>
+        tableSentences.has(a.text) && tableSentences.has(b.text)
+        && sentenceTemplate(a.text) === sentenceTemplate(b.text),
+    }
     : {});
   for (const { score, a, b } of pairs) {
     console.log(`  ${score.toFixed(3)}  ${a.file}:${a.line} ${a.name}\n         ${b.file}:${b.line} ${b.name}`);

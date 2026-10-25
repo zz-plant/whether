@@ -14,7 +14,7 @@ describe("live data fallback alert", () => {
   });
 
   it("prints readable dates and points at the source board", () => {
-    assert.match(html, /Last live reading Mar 10, 2026, 8:00 PM UTC\./);
+    assert.match(html, /Last checked Mar 10, 2026, 8:00 PM UTC\./);
     assert.match(html, /Rates are as of Mar 7, 2026\./);
     assert.match(html, /href="\/trust#source-board"/);
   });

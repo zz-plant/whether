@@ -26,5 +26,11 @@ for (const item of suite.cases) {
 const reportPath = "artifacts/evidence-retrieval/evaluation.json";
 mkdirSync(path.dirname(reportPath), { recursive: true });
 writeFileSync(reportPath, `${JSON.stringify({ generatedAt: new Date().toISOString(), description: suite.description, cases }, null, 2)}\n`);
-console.log(JSON.stringify({ reportPath, cases: cases.map((item) => ({ id: item.id, recallAtK: item.recallAtK })) }, null, 2));
-process.exitCode = cases.some((item) => item.recallAtK === null) ? 1 : 0;
+/* A case the model failed is a failed evaluation: recall below 1 means the
+   fixture's stated relevance labels were not all retrieved at the configured
+   top K, and a null recall means retrieval itself could not run. The report
+   above carries every case and its full diagnostics either way, so the failure
+   can be read without rerunning the model. */
+const failed = cases.some((item) => item.recallAtK === null || item.recallAtK < 1);
+console.log(JSON.stringify({ reportPath, failed, cases: cases.map((item) => ({ id: item.id, recallAtK: item.recallAtK })) }, null, 2));
+process.exitCode = failed ? 1 : 0;

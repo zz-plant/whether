@@ -15,6 +15,11 @@ type LiveDataFallbackAlertProps = {
  * the same state another way. The headline is now the shared data-status
  * sentence, the dates read as dates, and which feed is late is one link away
  * on the source board rather than spelled out in infrastructure words.
+ *
+ * The timestamp is the report's last check, not a live reading: when the
+ * materialized Treasury model is missing signals, the canonical build fills
+ * the gaps from the snapshot and still stamps the refresh time, so calling
+ * that a live reading claimed data the displayed rates never had (2026-10-24).
  */
 export function LiveDataFallbackAlert({
   lastCachedTimestamp,
@@ -36,7 +41,7 @@ export function LiveDataFallbackAlert({
     >
       <p className="weather-caveat-mark font-semibold">{resolveDataStatusGuidance({ isFallbackSnapshot: true })}</p>
       <p className="mt-1">
-        Last live reading {formatTimestampUTC(lastCachedTimestamp)}.{recordLine}
+        Last checked {formatTimestampUTC(lastCachedTimestamp)}.{recordLine}
       </p>
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         {/* The one place this control's scope matches its effect: the whole brief

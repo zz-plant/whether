@@ -86,6 +86,22 @@ export function RegimeRadar({
     /* A dated dot names its reading on hover, in the words the current marker uses. */
     title: point.label ? `${point.label}: Funding pressure ${point.tightness}, Risk appetite ${point.riskAppetite}` : undefined,
   }));
+  /* A 2.4-unit dot is a 3px target at the card's size; the transparent ring is
+     what the pointer has to find. Month-end readings can sit a couple of units
+     apart, and full-size rings would let the later one swallow the earlier
+     one's hover (SVG hit-testing is painter's order, so the last ring drawn
+     wins), so each ring is capped at half the gap to its nearest dated
+     neighbour: the rings meet at the midpoint and neither masks the other's
+     date. */
+  const hitRadii = trailPoints.map((point, index) => {
+    if (!point.title) return 0;
+    let nearest = Infinity;
+    for (const [otherIndex, other] of trailPoints.entries()) {
+      if (otherIndex === index || !other.title) continue;
+      nearest = Math.min(nearest, Math.hypot(other.x - point.x, other.y - point.y));
+    }
+    return nearest === Infinity ? 7 : Math.min(7, nearest / 2);
+  });
   const hasTrail = trailPoints.length > 0;
   const hasPrevious =
     !hasTrail &&
@@ -93,6 +109,17 @@ export function RegimeRadar({
     typeof previousRiskAppetite === "number";
   const prevX = hasPrevious ? xFor(previousRiskAppetite!) : null;
   const prevY = hasPrevious ? yFor(previousTightness!) : null;
+  /* The dated readings, again in HTML: the SVG titles on the dots are
+     pointer-only, so touch, keyboard and screen-reader users read the same
+     values here. */
+  const readableReadings = [
+    ...trailPoints.flatMap((point, index) =>
+      point.title ? [{ key: `trail-${index}`, text: point.title }] : []),
+    ...(hasPrevious && previousLabel
+      ? [{ key: "previous", text: `${previousLabel}: Funding pressure ${previousTightness}, Risk appetite ${previousRiskAppetite}` }]
+      : []),
+    { key: "current", text: `${primaryLabel ?? "Current reading"}: Funding pressure ${tightness}, Risk appetite ${riskAppetite}` },
+  ];
 
   // Which change line is nearer (horizontal vs vertical), for the projection guide.
   // The distance in points is the trust strip's margin, printed once beside the map.
@@ -323,9 +350,9 @@ export function RegimeRadar({
                   fill="var(--app-text-muted)"
                   fillOpacity={0.3 + (0.6 * (index + 1)) / trailPoints.length}
                 />
-                {/* A 2.4-unit dot is a 3px target at the card's size; this
-                    transparent ring is what the pointer has to find. */}
-                {point.title ? <circle cx={point.x} cy={point.y} r="7" fill="transparent" /> : null}
+                {/* The ring is the pointer's target; its radius keeps it from
+                    covering a neighbour's date (see hitRadii). */}
+                {point.title ? <circle cx={point.x} cy={point.y} r={hitRadii[index]} fill="transparent" /> : null}
               </g>
             ))}
           </g>
@@ -365,6 +392,10 @@ export function RegimeRadar({
         {/* Current reading marker */}
         <g>
           <title>{`${primaryLabel ?? "Current reading"}: Funding pressure ${tightness}, Risk appetite ${riskAppetite} (${weatherLabel})`}</title>
+          {/* Non-root SVG geometry scales from an origin of 0 0 unless told
+              otherwise, so the ring would travel toward the bottom-right as it
+              expanded; fill-box re-anchors each frame to this circle's own
+              center and the pulse expands around the reading it marks. */}
           <circle
             cx={currentX}
             cy={currentY}
@@ -373,7 +404,7 @@ export function RegimeRadar({
             stroke="var(--regime-accent)"
             strokeWidth="1"
             className="animate-ping motion-reduce:animate-none opacity-25"
-            style={{ animationDuration: "3s" }}
+            style={{ animationDuration: "3s", transformBox: "fill-box", transformOrigin: "center" }}
           />
           <circle
             cx={currentX}
@@ -426,6 +457,16 @@ export function RegimeRadar({
           </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
+          {readableReadings.length > 1 ? (
+            <details className="mx-auto max-w-md text-left">
+              <summary className="cursor-pointer">Readings on this chart</summary>
+              <ul className="list-disc pl-4">
+                {readableReadings.map((reading) => (
+                  <li key={reading.key}>{reading.text}</li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
           {footer ? <span className="block pt-1">{footer}</span> : null}
       </figcaption>
     </figure>
