@@ -2032,6 +2032,10 @@ because its streamed-route fallback found the 404 boundary's `<main>` in every f
 - Resource articles lose the "Start from Weekly Brief" and "Return to Planning" pills that rendered
   above their `<main>`. The link back to the brief is in the live-guidance block, under a dated line
   ("As of Oct 2, 2026 · signals refreshed …") that replaces the paste-ready citation and its URLs.
+- Resource articles render one forwardable summary, followed by their own sections. The shared
+  deep-dive appendices are removed. Edited headings keep their public links through the optional
+  section `anchor` in `content/resources/articles.json`; the former second-summary anchor points
+  to the remaining summary.
 - `tests/readingFrameRoutes.test.tsx` renders each reading route and holds it to one
   `<main id="main-content">`, and the article to nothing before it.
 

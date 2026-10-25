@@ -29,7 +29,7 @@ import { MethodSection } from "./methodSection";
 export const metadata: Metadata = buildPageMetadata({
   title: "About Whether",
   description:
-    "What is new in the Whether Weekly Brief, who writes it, and what it is built from.",
+    "How Whether sets pause and resume lines for startup decisions, who writes it, and where its data comes from.",
   path: publisherProfilePath,
   imageAlt: "About Whether",
 });
@@ -64,36 +64,28 @@ export default function AboutPage() {
       <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 sm:px-6 sm:py-6">
         <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>
         <p className="text-sm text-slate-300">
-          Each Monday, Whether says what interest rates and credit mean for a startup&apos;s hiring, spend and raise. Each
-          week it answers three things: what should change right now, how sure we are, and what would change the guidance.
-          Whether is free.
+          Whether publishes free weekly operating guidance for startup leaders, based on interest rates and credit conditions.
         </p>
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What is new here</h2>
+        <h2 className="text-lg font-semibold text-slate-100">How it works</h2>
         <p className="text-sm text-slate-300">
-          <span className="font-semibold text-slate-100">Lines decided before they are needed.</span> Hiring, spending,
-          fundraising, the roadmap and new bets each get an action, a pause line and a resume line, written down before
-          either is reached. The pause and resume lines sit apart, so one noisy week does not stop a decision and
-          restart it, and nobody re-argues the reasoning on Monday.
+          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a pause line and a resume line.
+          Set the lines when you make a plan. The gap between pause and resume lines keeps a small move back across
+          the pause line from restarting a decision.
         </p>
         <p className="text-sm text-slate-300">
-          <span className="font-semibold text-slate-100">A record that grades itself.</span> Every week&apos;s guidance
-          stays published unedited, and the{" "}
+          Each published brief stays on record. The{" "}
           <Link href="/history#track-record" className={inlineLinkClass}>
             track record
           </Link>{" "}
-          scores the archive against what happened next. That includes where it falls short. Some changes in
+          compares past guidance with what happened next, including where it fell short. Some changes in
           conditions came with no warning, and the{" "}
           <Link href="/calibration" className={inlineLinkClass}>
             calibration study
           </Link>{" "}
           shows the margin measures distance from a line, not probability.
-        </p>
-        <p className="text-sm text-slate-300">
-          The inputs are not new. Both scores start from public Treasury rates, by arithmetic short enough to check by
-          hand. It is not a macro blog, and not a forecast.
         </p>
       </section>
 
@@ -103,7 +95,7 @@ export default function AboutPage() {
         <h2 className="text-lg font-semibold text-slate-100">Where it fits and where it does not</h2>
         <p className="text-sm text-slate-300">
           {record ? <>{describeRecordCadence(record)} </> : null}
-          So the use is to set the lines when a plan is made, and to hear the day one is crossed.
+          Use the brief to set your plan&apos;s lines and get an email when one is crossed.
         </p>
         <p className="text-sm font-semibold text-slate-100">It fits</p>
         <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">

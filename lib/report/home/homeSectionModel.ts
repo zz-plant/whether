@@ -265,21 +265,19 @@ export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">
  * The condition comes from the change lines and the area answers from the
  * pause and resume lines, so a card could say "Cloudy: money is available"
  * over a picker where four areas were held, and nothing tied the two. This
- * names the held areas on the card, in the reader's terms, so the call has a
- * concrete half before the click: "Cloudy overall. On hold: Hiring,
- * Fundraising, Spending and New bets."
+ * names the held areas on the card without repeating its condition stamp:
+ * "On hold: Hiring, Fundraising, Spending and New bets."
  */
 export const describeHeldAreasForCard = (
-  regimeLabel: string,
   rows: readonly Pick<HomeAreaRow, "area" | "pause">[],
 ): string | null => {
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
   const held = ruled.filter((row) => row.pause?.met).map((row) => decisionAreaLabel(row.area));
-  if (held.length === 0) return `${regimeLabel} overall. No area is on hold.`;
-  if (held.length === ruled.length) return `${regimeLabel} overall. Every area is on hold.`;
+  if (held.length === 0) return "No area is on hold.";
+  if (held.length === ruled.length) return "Every area is on hold.";
   const list = held.length === 1 ? held[0] : `${held.slice(0, -1).join(", ")} and ${held.at(-1)}`;
-  return `${regimeLabel} overall. On hold: ${list}.`;
+  return `On hold: ${list}.`;
 };
 
 /**
