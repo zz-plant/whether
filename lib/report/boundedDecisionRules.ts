@@ -407,7 +407,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
     whyLineMatters:
       "Payroll is a startup's largest irreversible commitment. Pausing net-new hiring before crossing the line prevents sudden emergency cuts later.",
     ruleOfThumb:
-      "In Sunny conditions, hire ahead of demand. In Cloudy or Freezing, approve backfills and direct revenue roles only.",
+      "In Sunny conditions, open revenue-linked and reliability roles one at a time. In Cloudy or Freezing, approve backfills and delivery-critical roles only.",
   },
   "product-tempo": {
     transmission:
@@ -415,7 +415,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
     whyLineMatters:
       "Long-horizon roadmap bets consume cash without rapid validation. Prioritizing near-term deliverables keeps your cash optionality open.",
     ruleOfThumb:
-      "In Sunny conditions, fund long-horizon platform bets. In Stormy or Freezing, prioritize milestones paying back within 12 months.",
+      "In Sunny conditions, prioritize features driving activation and retention. In Stormy or Freezing, fund only milestones paying back within the year.",
   },
   "capital-raising": {
     transmission:
@@ -423,7 +423,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
     whyLineMatters:
       "Founders who wait until cash is low lose all negotiating leverage. Starting early while conditions are receptive protects your cap table.",
     ruleOfThumb:
-      "In Sunny conditions, raise opportunistic growth rounds. In Freezing or Stormy, start 9–12 months before you need the wire.",
+      "In Sunny conditions, raise while terms are receptive. In Freezing or Stormy, start early and prioritize structural terms over closing speed.",
   },
   "burn-discipline": {
     transmission:
@@ -431,7 +431,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
     whyLineMatters:
       "A 6-month payback bar ensures cash outflows convert back into runway before macroeconomic conditions can worsen.",
     ruleOfThumb:
-      "In Sunny conditions, invest in growth tooling. In Cloudy or Freezing, lock down discretionary spend that lacks proof of payback.",
+      "In Sunny conditions, approve spend with clear 6-month payback. In Cloudy or Freezing, lock down discretionary spend that lacks proof of payback.",
   },
   "expansion-bets": {
     transmission:
@@ -439,7 +439,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
     whyLineMatters:
       "Staging new bets in small milestones ensures you can halt an unproven initiative in a week without lingering commitments.",
     ruleOfThumb:
-      "In Sunny conditions, run multiple parallel bets. In Stormy or Freezing, fund single-stage bets with written stop triggers.",
+      "In Sunny conditions, fund new bets one stage at a time with written stop conditions. In Stormy or Freezing, run only experiments you can halt within a week.",
   },
 };
 
