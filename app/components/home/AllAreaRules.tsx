@@ -83,7 +83,7 @@ export function AllAreaRules({
           </div>
         ) : null}
         <p className="text-fluid-xs text-slate-300">
-          Set these pause lines in calm conditions so course corrections are automatic, not emergency debates.
+          Agree on these lines in calm weather so course corrections are automatic, not emergency debates.
         </p>
         <AreaTable
           rows={tableRows}
