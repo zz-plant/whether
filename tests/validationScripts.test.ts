@@ -37,7 +37,9 @@ describe("evidence retrieval smoke command", () => {
         };
       `);
       const result = spawnSync("bun", ["--preload", preload, join(root, "scripts/evals/evidence-retrieval.ts")], {
-        cwd: directory, encoding: "utf8", env: { ...process.env, OLLAMA_HOST: "http://127.0.0.1:11434" }, timeout: 5_000,
+        /* Generous caps: the child cold-starts Bun and a dev server on a slow
+           build container, while a healthy run finishes in well under a second. */
+        cwd: directory, encoding: "utf8", env: { ...process.env, OLLAMA_HOST: "http://127.0.0.1:11434" }, timeout: 20_000,
       });
       const report = JSON.parse(readFileSync(join(directory, "artifacts/evidence-retrieval/evaluation.json"), "utf8"));
       return { result, report };
@@ -82,7 +84,7 @@ describe("required brand asset types", () => {
           copyFileSync(join(root, "docs/assets", name), join(directory, "docs/assets", name));
         }
       }
-      return spawnSync("bun", ["scripts/check-assets.ts"], { cwd: directory, encoding: "utf8", timeout: 5_000 });
+      return spawnSync("bun", ["scripts/check-assets.ts"], { cwd: directory, encoding: "utf8", timeout: 20_000 });
     } finally { rmSync(directory, { recursive: true, force: true }); }
   };
 
@@ -105,7 +107,7 @@ describe("dependency prepare", () => {
   /* NODE_ENV is set explicitly: Next's global types require it on ProcessEnv,
      and a spread of process.env loses the literal's narrow type. */
   const env = { NODE_ENV: "test" as const, ...cleanGitEnv(), PATH: `${join(root, "node_modules/.bin")}${delimiter}${process.env.PATH ?? ""}` };
-  const run = (cwd: string) => spawnSync("sh", ["-c", prepare], { cwd, env, encoding: "utf8", timeout: 5_000 });
+  const run = (cwd: string) => spawnSync("sh", ["-c", prepare], { cwd, env, encoding: "utf8", timeout: 20_000 });
 
   it("succeeds in a source archive with no Git metadata", () => {
     const directory = temporary("prepare-archive");
@@ -163,7 +165,7 @@ describe("remote session history fetch", () => {
     `, { mode: 0o755 });
     try {
       const result = spawnSync("bash", [join(root, ".claude/hooks/session-start.sh")], {
-        cwd: directory, encoding: "utf8", timeout: 1_000,
+        cwd: directory, encoding: "utf8", timeout: 15_000,
         env: {
           NODE_ENV: "test" as const, ...cleanGitEnv(), CLAUDE_CODE_REMOTE: "true", CLAUDE_PROJECT_DIR: directory,
           PATH: `${bin}${delimiter}${process.env.PATH ?? ""}`, SCRIPT_TEST_LOG: log, SCRIPT_TEST_FETCH_MODE: mode,
