@@ -290,7 +290,7 @@ const EmptyState = ({ snapshot }: { snapshot?: SnapshotContext }) => (
     {snapshot ? (
       <>
         <p>
-          Or record this week's standing call — the company-agnostic posture — and next week's reading checks it.
+          Or record this week's standing guidance, and next week's reading checks it.
         </p>
         <RecordSnapshotControl snapshot={snapshot} />
       </>

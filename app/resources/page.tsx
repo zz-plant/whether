@@ -31,7 +31,7 @@ import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRout
 export const metadata: Metadata = buildPageMetadata({
   title: "Guides",
   description:
-    "The most-asked decision guides, and long-form guides on capital discipline, board-level capital posture and reversibility as governance.",
+    "The most-asked decision guides, and long-form guides on capital planning, board governance, and reversibility.",
   path: "/resources",
   imageAlt: "Whether guides",
 });

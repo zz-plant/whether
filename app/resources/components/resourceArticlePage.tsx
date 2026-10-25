@@ -201,7 +201,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
             <div className="flex flex-wrap gap-2 text-sm">
               <Link href="/resources/decision-shield-overview" className="text-sky-200 underline underline-offset-4">Decision Shield</Link>
               <span className="text-slate-400">•</span>
-              <Link href="/resources/capital-posture-template" className="text-sky-200 underline underline-offset-4">Capital Posture Template</Link>
+              <Link href="/resources/capital-posture-template" className="text-sky-200 underline underline-offset-4">Capital Planning Template</Link>
             </div>
           </section>
 

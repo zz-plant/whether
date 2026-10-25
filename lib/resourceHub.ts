@@ -61,7 +61,7 @@ export const buildResourceHubEntries = (): ResourceHubEntry[] => [
     href: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
     title: "How VC firms can enforce capital discipline across portfolios",
     description:
-      "A portfolio-level operating standard: one posture read, one set of pause and resume lines, applied across every company a firm backs.",
+      "A portfolio-level operating standard: one guidance reading, one set of pause and resume lines, applied across every company a firm backs.",
     kind: "standalone",
   },
 ];

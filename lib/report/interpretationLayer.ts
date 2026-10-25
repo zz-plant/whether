@@ -212,7 +212,7 @@ export const buildInterpretationLayer = ({
         view,
         label: "Company view",
         summary:
-          "Company-specific rules are unavailable this week; use canonical bounded decisions until profile rules return.",
+          "Company-specific rules are unavailable this week; use the weekly guidance until company rules return.",
         bullets: formatBullets(canonicalBullets),
       };
     }
@@ -221,7 +221,7 @@ export const buildInterpretationLayer = ({
       view,
       label: "Company view",
       summary: hasCompanyProfile(companyProfile)
-        ? "Translate the weekly guidance into company-specific bounded rules without changing the base posture."
+        ? "Translate the weekly guidance into company-specific rules without changing the underlying conditions."
         : "Illustrative: these rules assume a Series B company with $1–10M ARR and 12–18 months of runway. Whether does not take your company's figures here; use the runway planner on Planning for yours.",
       bullets: formatBullets(
         adjustedRules

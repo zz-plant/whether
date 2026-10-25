@@ -200,10 +200,10 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   const isParentGuide = `/resources/${page.slug}` === canonicalCapitalDisciplinePath;
   const relatedPages = [
     { href: canonicalCapitalDisciplinePath, label: "Capital discipline for venture-backed companies" },
-    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital posture framework" },
+    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital framework" },
     { href: "/resources/reversibility-as-governance", label: "Reversibility as governance" },
     { href: resourceSupportingPages.decisionShieldOverview.path, label: "Decision Shield overview" },
-    { href: resourceSupportingPages.capitalPostureTemplate.path, label: "Capital Posture Template" },
+    { href: resourceSupportingPages.capitalPostureTemplate.path, label: "Capital Planning Template" },
   ].filter((link) => link.href !== `/resources/${page.slug}`);
   const linkClass = "text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100";
   const lexiconByIndex = ["capital-regime", "escalation-thresholds", "reversibility", "30-day-confirmation-logic"] as const;
@@ -338,7 +338,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         body="Ask for a walkthrough of the board pack."
         keyword={page.keyword}
         sourceSlug={page.slug}
-        downloadLabel="Download Capital Posture Template"
+        downloadLabel="Download Capital Planning Template"
       />
     </ContentPageShell>
   );

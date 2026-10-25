@@ -158,11 +158,10 @@ const RATCHET: { name: string; pattern: RegExp; baseline: number }[] = [
      the merged copy work (posture 4, regime 0, bounded 0, stance 0). The
      homepage and its components are not rendered here, so a wording fix there
      does not move these numbers — only work on the counted surfaces does. */
-  /* 2026-10-08: posture 4 → 6 and board 10 → 11 without a word added to the site. Guides
-     (/resources, counted here) took the four templates from the plan page and the "Help by
-     role" chips from /resolve, neither of which this file renders: two template titles carry
-     "Posture" and one role chip reads "Board". Lower these when that copy moves. */
-  { name: "posture", pattern: /\bposture\b/gi, baseline: 6 },
+  /* 2026-10-08: posture 4 → 6 and board 10 → 11 without a word added to the site.
+     2026-10-25: posture lowered 6 → 1 after cleaning up template titles, link labels
+     and descriptions across /resources and /answers. */
+  { name: "posture", pattern: /\bposture\b/gi, baseline: 1 },
   { name: "regime", pattern: /\bregime\b/gi, baseline: 0 },
   { name: "corridor", pattern: /\bcorridor\b/gi, baseline: 0 },
   { name: "cadence", pattern: /\bcadence\b/gi, baseline: 0 },

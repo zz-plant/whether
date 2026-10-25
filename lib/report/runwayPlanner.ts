@@ -337,7 +337,7 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
       level: riskLevel,
       macroRiskBase: round(macroRiskBase),
       macroRiskDownsideFlip: round(macroRiskDownsideFlip),
-      summary: `Runway risk is ${riskLevel} at ${round(macroRiskBase)}/100, and would climb to ${round(macroRiskDownsideFlip)}/100 if the posture slipped to ${POSTURE_LABELS[downsidePosture]}.`,
+      summary: `Runway risk is ${riskLevel} at ${round(macroRiskBase)}/100, and would climb to ${round(macroRiskDownsideFlip)}/100 if conditions slipped to ${POSTURE_LABELS[downsidePosture]}.`,
     },
     safeRunwayBand: {
       minMonths: round(safeBand.minMonths),
