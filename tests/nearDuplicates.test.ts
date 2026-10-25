@@ -167,8 +167,13 @@ describe("near-duplicate audit", () => {
       assert.equal(report.sentences, 2);
       assert.equal(report.pairs.length, 1);
     } finally {
-      server.closeAllConnections();
-      await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+      /* The audit has exited, so nothing holds the port, and a plain close
+         reclaims it. Close errors are teardown noise, never the test's finding:
+         bun 1.3.14 reports ERR_SERVER_NOT_RUNNING for a close after
+         closeAllConnections() (and every runtime says it for an already-stopped
+         server), so letting close reject here would replace whatever the body
+         actually found with a message about nothing. */
+      await new Promise<void>((resolve) => server.close(() => resolve()));
       rmSync(reportRoot, { recursive: true, force: true });
     }
   });
