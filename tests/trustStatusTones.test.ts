@@ -9,6 +9,21 @@ import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, type PolicyHoldCall } from "../lib/report/reportCopy";
 
 describe("buildTrustStatus trust tones", () => {
+  it("holds irreversible commitments near a change line even when live sources answered", () => {
+    const result = buildTrustStatus({
+      historicalSelection: false,
+      isFallback: false,
+      confidenceLabel: "LOW",
+      freshnessLabel: "Updated 1h ago",
+      historicalAction: "unused",
+      fallbackAction: "unused",
+      stableAction: "None.",
+    });
+    assert.equal(result.trustStatusTone, "warning");
+    assert.match(result.trustStatusAction, /Hold irreversible commitments/);
+    assert.match(result.decisionImpactWindow, /close to a change line/);
+    assert.notEqual(result.trustStatusAction, "None.");
+  });
   /* Live data adds nothing to the guidance, so the stable copy says so and no
      more: an approval instruction here read as the week's action under
      guidance to freeze (tests/pageReaderContradictions.test.tsx). */

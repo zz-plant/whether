@@ -1,5 +1,12 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { execFile } from "node:child_process";
+import { mkdtempSync, readFileSync, rmSync } from "node:fs";
+import { createServer } from "node:http";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { fileURLToPath } from "node:url";
+import { promisify } from "node:util";
 import { extractUnits, nearestPairs, sentenceTemplate, sentenceUnits, type CodeUnit } from "../scripts/near-duplicates";
 
 const source = [
@@ -50,6 +57,49 @@ describe("near-duplicate audit", () => {
     assert.ok(clamp.text.endsWith("};"));
   });
 
+  it("ends a function before following declarations and their comments", () => {
+    const functionSource = [
+      "export const normalizeEmail = (value: string) => {",
+      "  const trimmed = value.trim();",
+      "  if (!trimmed) return null;",
+      "  const normalized = trimmed.toLowerCase();",
+      "  return normalized;",
+      "};",
+    ].join("\n");
+    const followingDeclarations = [
+      "export class Customer {\n  email = '';\n}",
+      "export type Customer = {\n  email: string;\n};",
+      "export interface Customer {\n  email: string;\n}",
+      "let lastEmail: string | undefined;",
+      "var emailCount = 0;",
+      "export enum Status {\n  Active,\n}",
+      'import { Customer } from "./customer";',
+      'export { Customer } from "./customer";',
+      "",
+    ];
+
+    for (const following of followingDeclarations) {
+      const fixture = `${functionSource}\n\n/** Documentation for what follows.\n * It does not describe normalizeEmail.\n */\n// Another unrelated comment.\n${following}`;
+      const units = extractUnits(fixture, "lib/customers.ts");
+      assert.equal(units.length, 1, following);
+      assert.equal(units[0]?.text, functionSource, following);
+    }
+  });
+
+  it("does not make a tiny function eligible by appending the following class", () => {
+    const units = extractUnits([
+      "export const normalizeEmail = (value: string) => value.trim().toLowerCase();",
+      "",
+      "export class Customer {",
+      "  email = '';",
+      "  name = '';",
+      "  active = true;",
+      "}",
+    ].join("\n"), "lib/customers.ts");
+
+    assert.deepEqual(units, []);
+  });
+
   it("ranks cross-file pairs by cosine, closest first, and skips same-file pairs", () => {
     const unit = (file: string, name: string): CodeUnit => ({ file, name, line: 1, text: "" });
     /* Unnormalized on purpose: a truncated or raw vector must still score as a cosine. */
@@ -77,6 +127,50 @@ describe("near-duplicate audit", () => {
       { file: "/, /trust", line: 1, text: "Pause if funding pressure is above 76." },
       { file: "/share", line: 2, text: "Subscribe for the Monday brief." },
     ]);
+  });
+
+  it("keeps signs and comparison operators distinct when deduplicating sentences", () => {
+    const signed = ["The yield changed by +25 basis points.", "The yield changed by -25 basis points."];
+    const comparisons = ["<", ">", "<=", ">="].map((operator) => `Pause hiring when runway is ${operator} 12 months.`);
+    const sentences = [...signed, ...comparisons];
+    assert.deepEqual(sentenceUnits([{ route: "/", sentences }]).map(({ text }) => text), sentences);
+  });
+
+  it("does not classify opposite comparisons on separate routes as shared chrome", () => {
+    const units = sentenceUnits([
+      { route: "/", sentences: ["Pause hiring when runway is < 12 months."] },
+      { route: "/operate", sentences: ["Pause hiring when runway is > 12 months."] },
+    ]);
+    assert.equal(units.length, 2);
+  });
+
+  it("reports similar decision sentences with different thresholds in copy mode", async () => {
+    const server = createServer((request, response) => {
+      if (request.url === "/api/embed") {
+        response.setHeader("content-type", "application/json");
+        response.end(JSON.stringify({ model: "fixture", embeddings: [[1, 0], [1, 0]] }));
+      } else {
+        response.end("<p>Pause hiring when cash runway falls below 12 months.</p><p>Pause hiring when cash runway falls below 18 months.</p>");
+      }
+    });
+    const reportRoot = mkdtempSync(join(tmpdir(), "whether-near-duplicates-"));
+    try {
+      await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+      const address = server.address();
+      assert.ok(address && typeof address === "object");
+      const baseUrl = `http://127.0.0.1:${address.port}`;
+      await promisify(execFile)("bun", [
+        fileURLToPath(new URL("../scripts/near-duplicates.ts", import.meta.url)),
+        "--copy", "--base-url", baseUrl, "--routes", "/", "--host", baseUrl, "--model", "fixture",
+      ], { cwd: reportRoot, timeout: 10_000 });
+      const report = JSON.parse(readFileSync(join(reportRoot, "artifacts/near-duplicates/report.copy.json"), "utf8"));
+      assert.equal(report.sentences, 2);
+      assert.equal(report.pairs.length, 1);
+    } finally {
+      server.closeAllConnections();
+      await new Promise<void>((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
+      rmSync(reportRoot, { recursive: true, force: true });
+    }
   });
 
   it("keeps same-route sentence pairs when asked, and skips what the caller rules out", () => {
