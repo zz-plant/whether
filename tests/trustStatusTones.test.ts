@@ -9,7 +9,12 @@ import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, type PolicyHoldCall } from "../lib/report/reportCopy";
 
 describe("buildTrustStatus trust tones", () => {
-  it("holds irreversible commitments near a change line even when live sources answered", () => {
+  /* A live week near a change line is not a data caveat: #1604 (2026-10-14)
+     split the two — the readiness verdict carries the hold, and the caveat
+     stays about the data. The PR 1481 review asked for the hold inside this
+     action before that split existed; "None." here is now the deliberate
+     agreement with canonical readiness, which says Hold on its own line. */
+  it("keeps a low-confidence live week's data caveat about the data", () => {
     const result = buildTrustStatus({
       historicalSelection: false,
       isFallback: false,
@@ -19,10 +24,17 @@ describe("buildTrustStatus trust tones", () => {
       fallbackAction: "unused",
       stableAction: "None.",
     });
-    assert.equal(result.trustStatusTone, "warning");
-    assert.match(result.trustStatusAction, /Hold irreversible commitments/);
-    assert.match(result.decisionImpactWindow, /close to a change line/);
-    assert.notEqual(result.trustStatusAction, "None.");
+    assert.equal(result.trustStatusTone, "stable");
+    assert.equal(result.trustStatusAction, "None.");
+    assert.match(result.trustStatusDetail, /Every source answered/);
+    /* The hold the PR 1481 finding asked for lives on the readiness verdict. */
+    const hold = buildDecisionReadinessState({
+      confidenceLabel: "LOW",
+      freshnessLabel: "Updated 1h ago",
+      isFallbackSnapshot: false,
+    });
+    assert.equal(hold.label, "Hold");
+    assert.match(hold.detail, /close to a line/);
   });
   /* Live data adds nothing to the guidance, so the stable copy says so and no
      more: an approval instruction here read as the week's action under

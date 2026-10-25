@@ -8,7 +8,9 @@ import { describe, it } from "bun:test";
 const root = new URL("../", import.meta.url).pathname;
 const temporary = (name: string) => mkdtempSync(join(tmpdir(), `whether-${name}-`));
 const cleanGitEnv = () => Object.fromEntries(Object.entries(process.env).filter(([key]) => !key.startsWith("GIT_")));
-const output = (result: ReturnType<typeof spawnSync>) => `${result.stdout ?? ""}${result.stderr ?? ""}`;
+/* Typed to the encoded spawn result the suites use, since `ReturnType<typeof
+   spawnSync>` is a union whose Buffer branch can't take a template slot. */
+const output = (result: { stdout?: string | null; stderr?: string | null }) => `${result.stdout ?? ""}${result.stderr ?? ""}`;
 
 describe("evidence retrieval smoke command", () => {
   const candidate = (id: string) => ({ id, claim: `Claim ${id}`, excerpt: `Passage ${id}`, observedAt: "2026-10-14", sourceUrl: `https://example.com/${id}` });
@@ -100,7 +102,9 @@ describe("required brand asset types", () => {
 
 describe("dependency prepare", () => {
   const prepare: string = JSON.parse(readFileSync(join(root, "package.json"), "utf8")).scripts.prepare;
-  const env = { ...cleanGitEnv(), PATH: `${join(root, "node_modules/.bin")}${delimiter}${process.env.PATH ?? ""}` };
+  /* NODE_ENV is set explicitly: Next's global types require it on ProcessEnv,
+     and a spread of process.env loses the literal's narrow type. */
+  const env = { NODE_ENV: "test" as const, ...cleanGitEnv(), PATH: `${join(root, "node_modules/.bin")}${delimiter}${process.env.PATH ?? ""}` };
   const run = (cwd: string) => spawnSync("sh", ["-c", prepare], { cwd, env, encoding: "utf8", timeout: 5_000 });
 
   it("succeeds in a source archive with no Git metadata", () => {
@@ -161,7 +165,7 @@ describe("remote session history fetch", () => {
       const result = spawnSync("bash", [join(root, ".claude/hooks/session-start.sh")], {
         cwd: directory, encoding: "utf8", timeout: 1_000,
         env: {
-          ...cleanGitEnv(), CLAUDE_CODE_REMOTE: "true", CLAUDE_PROJECT_DIR: directory,
+          NODE_ENV: "test" as const, ...cleanGitEnv(), CLAUDE_CODE_REMOTE: "true", CLAUDE_PROJECT_DIR: directory,
           PATH: `${bin}${delimiter}${process.env.PATH ?? ""}`, SCRIPT_TEST_LOG: log, SCRIPT_TEST_FETCH_MODE: mode,
         },
       });

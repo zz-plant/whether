@@ -57,7 +57,7 @@
     "cli:whether": "node scripts/whether-cli.mjs",
     "data:refresh-fallbacks": "bun scripts/refreshFallbackSnapshots.ts",
     "check:vinext": "bun scripts/run-checks.mjs --preset deploy",
-    "prepare": "husky && git config core.hooksPath .husky",
+    "prepare": "husky && (git rev-parse --git-dir >/dev/null 2>&1 && git config core.hooksPath .husky || echo \"[prepare] not a git repository; hooks left unconfigured\")",
     "check:production-edge": "bash scripts/check_production_edge.sh",
     "check:production-assets": "node scripts/verify-prd-assets.mjs https://whether.work",
     "setup": "mise trust && bun install",

@@ -121,8 +121,11 @@ function main() {
 
   const expectedTypes = Object.keys(SPECS);
   const missing = expectedTypes.filter(t => !found.has(t));
+  /* A missing type is a failed check, not a note: the README promises that
+     `bun run check` catches an incomplete brand kit, and a warning that still
+     exits green would let a deleted asset through unnoticed. */
   if (missing.length > 0) {
-    console.log(`\n  ⚠  Missing types: ${missing.join(', ')}`);
+    errors.push(`Missing types: ${missing.join(', ')}`);
   }
 
   if (warnings.length > 0) {

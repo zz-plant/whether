@@ -6,7 +6,6 @@ import {
   CONFIDENCE_PERCENT_IMPUTED_CEILING,
   RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
   REGIME_CONFIDENCE_NEAR_THRESHOLD,
-  TIGHTNESS_CAP,
   REGIME_CONFIDENCE_MEDIUM_THRESHOLD,
 } from "../regimeEngineCore";
 import { isSavedCopy } from "./provenanceStatus";
@@ -61,20 +60,27 @@ const resolveLineGaps = ({ scores, thresholds }: ConfidenceInputs) => ({
 });
 
 /**
- * Funding pressure's distance from its line, counting the points the ceiling hides.
+ * Funding pressure's distance from its line, counting the points the published
+ * score hides.
  *
- * A pinned score has to shed its pressure above the cap before the published
- * number moves at all, so the distance from the line is the gap the reader sees
- * plus that headroom. Until 2026-10-21 the week of Oct 19 (published 90, pressure
- * 110, risk appetite 55) told every surface it sat "20 pts from its change line"
- * on funding pressure, the far side of the week: the line it could actually
- * cross next was risk appetite's, 5 points away.
+ * The published score is the pressure's clamped form, so a pinned score has to
+ * shed its pressure above that clamp before the published number moves at all,
+ * and the distance from the line is the gap the reader sees plus that headroom.
+ * The headroom is `pressure - score` itself, not `pressure - TIGHTNESS_CAP`:
+ * the base-rate component caps at 90 points, so on the week of Oct 19, 2026
+ * (published 90, pressure 110) the score shed 20 hidden points before it moved
+ * and only then the 20 more to reach the line — 40, not the 30 subtracting the
+ * global cap reported, and nothing at all for pressure 91 through 100, where the
+ * saturation flag stays off. The same holds whenever any clamp binds: an
+ * inversion capped at 25 hides its excess the same way. An unpinned score has
+ * pressure equal to score, so the headroom is zero, and a caller without the
+ * pressure still gets the published gap alone.
  */
 const resolveTightnessGap = ({ scores, thresholds }: ConfidenceInputs): number => {
   const gap = Math.abs(scores.tightness - thresholds.tightnessRegime);
   const hidden =
-    scores.tightnessSaturated === true && typeof scores.tightnessPressure === "number" && scores.tightness > thresholds.tightnessRegime
-      ? Math.max(0, scores.tightnessPressure - TIGHTNESS_CAP)
+    typeof scores.tightnessPressure === "number" && scores.tightness > thresholds.tightnessRegime
+      ? Math.max(0, scores.tightnessPressure - scores.tightness)
       : 0;
   return gap + hidden;
 };
