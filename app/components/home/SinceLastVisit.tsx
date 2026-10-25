@@ -200,7 +200,7 @@ export function SinceLastVisit({
       className="flex items-center justify-between gap-3 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
     >
       <div>
-        <span className="font-semibold text-slate-50">Since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
+        <span className="font-semibold text-slate-50">Monday check &mdash; since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
         {regimeChanged
           ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
           : `still ${current.regimeLabel}, but the guidance changed.`}
@@ -220,7 +220,7 @@ export function SinceLastVisit({
     <div data-testid="lapsed-return" className="rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
         <p className="text-fluid-xs leading-5 text-slate-200">
-          <span className="font-semibold text-slate-50">Since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
+          <span className="font-semibold text-slate-50">Monday check &mdash; since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
           {regimeChanged
             ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
             : `still ${current.regimeLabel}, but the guidance changed.`}

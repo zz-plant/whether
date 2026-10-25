@@ -455,6 +455,9 @@ export function RegimeRadar({
           <span className="block text-slate-300" data-radar-orientation>
             Up is {CONDITION_SIDE_MEANINGS.pressureAbove}, right is {CONDITION_SIDE_MEANINGS.appetiteAbove}. Easiest bottom right (Sunny), hardest top left (Freezing).
           </span>
+          <span className="block text-slate-400" data-radar-ritual>
+            A Monday operating ritual: set your lines before the weather turns.
+          </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
           {readableReadings.length > 1 ? (
