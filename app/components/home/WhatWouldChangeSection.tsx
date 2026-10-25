@@ -109,11 +109,17 @@ export function WhatWouldChangeSection({
 
   return (
     <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading}>
-      {/* The three lines, once, before the sentences that use them (2026-10-14).
-          Each score carries a pause, a resume and a change line, and nowhere on
-          the page said what each one does; a first reader met all three in the
-          card's trust strip and the ladders before any definition. */}
-      <DecisionLineKey className="mb-5 max-w-3xl" />
+      {/* The three lines key folded by default to preserve scan speed (2026-10-25).
+          Available with one click for readers who want line definitions without
+          interrupting the primary flip triggers and pause conditions. */}
+      <details className="weather-auto-chevron mb-5 max-w-3xl text-fluid-xs text-slate-300">
+        <summary className="cursor-pointer select-none font-medium text-slate-400 hover:text-slate-200">
+          What the three lines do (pause, resume, change)
+        </summary>
+        <div className="mt-3">
+          <DecisionLineKey />
+        </div>
+      </details>
       <div
         className={
           ladders.length === 0

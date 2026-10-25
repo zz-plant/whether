@@ -209,7 +209,14 @@ export function DecisionPicker({
                 </p>
               </div>
             ) : null}
-            <CommitmentTest regime={regime} area={active.area} />
+            <details className="weather-auto-chevron border-t border-[color:var(--border-faint)] pt-3" data-commitment-disclosure>
+              <summary className="cursor-pointer select-none text-fluid-xs font-medium text-slate-300 hover:text-slate-100">
+                Test against your cash and runway (optional)
+              </summary>
+              <div className="pt-2">
+                <CommitmentTest regime={regime} area={active.area} showTitle={false} />
+              </div>
+            </details>
             {/* The lines above are the published ones. A plan that needs its own —
                 a hiring plan released at 60 rather than 66 — sets them once on the
                 planning page and hears the day one is crossed. */}
