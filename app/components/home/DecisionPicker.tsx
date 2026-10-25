@@ -1,7 +1,12 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import {
+  decisionAreaCorporateTransmission,
+  decisionAreaLabel,
+  type DecisionArea,
+  type DecisionAreaCorporateTransmission,
+} from "../../../lib/report/boundedDecisionRules";
 import {
   HOME_DECISION_PARAM,
   HOME_SECTIONS,
@@ -86,6 +91,9 @@ export function DecisionPicker({
 }) {
   const [selected, setSelected] = useState<DecisionArea | undefined>(initialSelected);
   const active = options.find((option) => option.area === selected);
+  const activeTransmission: DecisionAreaCorporateTransmission | undefined = active
+    ? decisionAreaCorporateTransmission[active.area]
+    : undefined;
 
   /* Each choice carries where its area stands against its pause line, so the
      five answers are on the page before any is picked; the click opens the
@@ -185,6 +193,22 @@ export function DecisionPicker({
                 </>
               ) : null}
             </dl>
+            {activeTransmission ? (
+              <div
+                data-transmission-note
+                className="space-y-1.5 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 text-fluid-xs"
+              >
+                <p className="font-semibold text-slate-100">
+                  Why this line governs {decisionAreaLabel(active.area).toLowerCase()}:
+                </p>
+                <p className="leading-relaxed text-slate-300">
+                  {activeTransmission.transmission} {activeTransmission.whyLineMatters}
+                </p>
+                <p className="text-fluid-nano text-slate-400">
+                  <span className="font-medium text-slate-200">Shared rule of thumb:</span> {activeTransmission.ruleOfThumb}
+                </p>
+              </div>
+            ) : null}
             <CommitmentTest regime={regime} area={active.area} />
             {/* The lines above are the published ones. A plan that needs its own —
                 a hiring plan released at 60 rather than 66 — sets them once on the

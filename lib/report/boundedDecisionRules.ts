@@ -387,6 +387,63 @@ const fmt = formatThresholdNumber;
 export const SPENDING_PAYBACK_BAR_MONTHS = 6;
 
 /**
+ * How macro conditions translate into corporate balance sheets and operations for
+ * each area, giving non-economist founders intuitive mechanics and a shared
+ * operating lexicon without requiring manual inputs.
+ */
+export type DecisionAreaCorporateTransmission = {
+  /** How macroeconomic conditions transmit to this corporate decision area. */
+  transmission: string;
+  /** Why agreeing on this line ahead of time protects the business. */
+  whyLineMatters: string;
+  /** Shared rule of thumb for team rituals and Monday planning. */
+  ruleOfThumb: string;
+};
+
+export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAreaCorporateTransmission> = {
+  hiring: {
+    transmission:
+      "When money costs more, venture multiples compress. Each dollar of fixed payroll requires more revenue to justify at your next round.",
+    whyLineMatters:
+      "Payroll is a startup's largest irreversible commitment. Pausing net-new hiring before crossing the line prevents sudden emergency cuts later.",
+    ruleOfThumb:
+      "In Sunny conditions, open revenue-linked and reliability roles one at a time. In Cloudy or Freezing, approve backfills and delivery-critical roles only.",
+  },
+  "product-tempo": {
+    transmission:
+      "When market risk appetite drops, investors and customers prioritize immediate payback over multi-year vision.",
+    whyLineMatters:
+      "Long-horizon roadmap bets consume cash without rapid validation. Prioritizing near-term deliverables keeps your cash optionality open.",
+    ruleOfThumb:
+      "In Sunny conditions, prioritize features driving activation and retention. In Stormy or Freezing, fund only milestones paying back within the year.",
+  },
+  "capital-raising": {
+    transmission:
+      "When investor risk appetite cools, diligence timelines double and term sheets become conservative on valuation and structure.",
+    whyLineMatters:
+      "Founders who wait until cash is low lose all negotiating leverage. Starting early while conditions are receptive protects your cap table.",
+    ruleOfThumb:
+      "In Sunny conditions, raise while terms are receptive. In Freezing or Stormy, start early and prioritize structural terms over closing speed.",
+  },
+  "burn-discipline": {
+    transmission:
+      "Discretionary software, vendor contracts, and agency retainers compound fixed burn non-linearly while top-line revenue growth slows.",
+    whyLineMatters:
+      "A 6-month payback bar ensures cash outflows convert back into runway before macroeconomic conditions can worsen.",
+    ruleOfThumb:
+      "In Sunny conditions, approve spend with clear 6-month payback. In Cloudy or Freezing, lock down discretionary spend that lacks proof of payback.",
+  },
+  "expansion-bets": {
+    transmission:
+      "New product lines and geographic expansions depend on follow-on capital that quickly vanishes when market conditions tighten.",
+    whyLineMatters:
+      "Staging new bets in small milestones ensures you can halt an unproven initiative in a week without lingering commitments.",
+    ruleOfThumb:
+      "In Sunny conditions, fund new bets one stage at a time with written stop conditions. In Stormy or Freezing, run only experiments you can halt within a week.",
+  },
+};
+
+/**
  * The payback bar a tight runway (6–12 months of cash) puts in front of every
  * stage rule, hires and growth campaigns included. Derived from the Spending
  * bar so it can never be looser: it said "a nine-month payback" and "six to
