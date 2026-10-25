@@ -32,8 +32,8 @@ describe("hand-typed touch-target chains (DD-042 ratchet)", () => {
     // the current count for the next baseline after a migration.
     if (process.env.RATCHET_REPORT === "1") console.log(`min-h-[44px]: ${count}`);
     assert.ok(
-      count <= 98,
-      `${count} hand-typed min-h-[44px] chains (baseline 98). Use ActionLink (pill/ghost/primary/inline) or the weather-* controls, which carry the 44px floor themselves.`,
+      count <= 97,
+      `${count} hand-typed min-h-[44px] chains (baseline 97). Use ActionLink (pill/ghost/primary/inline) or the weather-* controls, which carry the 44px floor themselves.`,
     );
   });
 });

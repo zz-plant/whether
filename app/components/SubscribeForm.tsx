@@ -90,15 +90,15 @@ export function SubscribeForm({
         <span className="inline-flex items-center justify-center rounded-full bg-emerald-500/10 p-2 text-emerald-400">
           <Check className="size-5" aria-hidden="true" />
         </span>
-        <p className="text-fluid-xs font-semibold text-white">
+        <p className="text-fluid-xs font-semibold text-slate-50">
           {channel === "slack" ? "Slack Channel Connected!" : "Subscribed!"}
         </p>
-        <p className="text-fluid-micro text-white/60">
+        <p className="text-fluid-micro text-slate-300">
           {message}
           {alertsOnly ? " After that, you hear from us only when something moves." : null}
         </p>
         {channel === "slack" ? (
-          <p className="text-fluid-nano text-white/40">
+          <p className="text-fluid-nano text-slate-400">
             To stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.
           </p>
         ) : null}
@@ -126,7 +126,7 @@ export function SubscribeForm({
       <div className="space-y-1">
         <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
           {showTitle ? (
-            <p className="text-fluid-sm font-medium text-white">
+            <p className="text-fluid-sm font-medium text-slate-50">
               {channel === "slack"
                 ? "Automate Monday brief delivery directly to Slack"
                 : alertsOnly

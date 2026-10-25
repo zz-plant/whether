@@ -149,11 +149,11 @@ export function StickyCallStrip({ call, direction, weatherWord, marginLabel, sha
             <span className="type-stamp shrink-0" style={{ color: "var(--regime-ink)" }}>
               {weatherWord}
             </span>
-            <span className="min-w-0 flex-1 truncate font-medium text-white">{call}</span>
+            <span className="min-w-0 flex-1 truncate font-medium text-slate-50">{call}</span>
             <span className="shrink-0 text-slate-400">{marginLabel}</span>
             <a
               href={`#${HOME_SECTIONS.areas.id}`}
-              className="weather-focus-ring inline-flex min-h-[44px] shrink-0 items-center text-sky-300 underline decoration-sky-700 underline-offset-4"
+              className="weather-focus-ring weather-hit inline-flex shrink-0 items-center text-sky-300 underline decoration-sky-700 underline-offset-4"
             >
               By area
             </a>
@@ -187,7 +187,7 @@ export function StickyCallStrip({ call, direction, weatherWord, marginLabel, sha
               <span className="type-stamp shrink-0 text-xs" style={{ color: "var(--regime-ink)" }}>
                 {weatherWord}
               </span>
-              <span className="min-w-0 truncate font-medium text-white">{call}</span>
+              <span className="min-w-0 truncate font-medium text-slate-50">{call}</span>
             </span>
             <span className="flex-shrink-0 text-fluid-xs text-slate-400">{marginLabel}</span>
             {/* Both actions are the shared ghost button; a plain `<a>` with its own

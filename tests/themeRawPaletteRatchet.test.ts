@@ -19,9 +19,9 @@ import { describe, it } from "bun:test";
 
 /** Each family: a regex over class strings, and the count it must not exceed. */
 const FAMILIES: ReadonlyArray<{ name: string; pattern: RegExp; baseline: number }> = [
-  { name: "text-white (any alpha)", pattern: /\btext-white(\/[\d.[\]]+)?(?![\w-])/g, baseline: 79 },
-  { name: "bg-slate-800/900/950 (any alpha)", pattern: /\bbg-slate-(?:800|900|950)(\/[\d.[\]]+)?(?![\w-])/g, baseline: 94 },
-  { name: "border-slate-700/800/900", pattern: /\bborder-slate-(?:700|800|900)(?![\w-])/g, baseline: 130 },
+  { name: "text-white (any alpha)", pattern: /\btext-white(\/[\d.[\]]+)?(?![\w-])/g, baseline: 57 },
+  { name: "bg-slate-800/900/950 (any alpha)", pattern: /\bbg-slate-(?:800|900|950)(\/[\d.[\]]+)?(?![\w-])/g, baseline: 84 },
+  { name: "border-slate-700/800/900", pattern: /\bborder-slate-(?:700|800|900)(?![\w-])/g, baseline: 107 },
   { name: "border-white (any alpha)", pattern: /\bborder-white(\/[\d.[\]]+)?(?![\w-])/g, baseline: 1 },
   { name: "divide-white (any alpha)", pattern: /\bdivide-white(\/[\d.[\]]+)?(?![\w-])/g, baseline: 0 },
 ];

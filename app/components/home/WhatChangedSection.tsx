@@ -104,7 +104,7 @@ export function WhatChangedSection({
             {`Each signal this week against ${basis.reference} and against its lines`}
           </caption>
           <thead className="max-md:hidden">
-            <tr className="border-b border-slate-800/80 text-xs text-slate-400">
+            <tr className="border-b border-[color:var(--border-subtle)] text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
               <th scope="col" className="py-2 pr-3 font-medium">{`${basis.label} → this week`}</th>
               <th scope="col" className="py-2 font-medium">Against its lines</th>
@@ -123,14 +123,14 @@ export function WhatChangedSection({
                         ? "signal-base-rate"
                         : "signal-curve-slope"
                 }
-                className="border-b border-slate-800/50 align-top last:border-b-0 max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
+                className="border-b border-[color:var(--border-faint)] align-top last:border-b-0 max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
                 data-signal={row.key}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-md:p-0">
                   <div className="space-y-1">
                     <Link
                       href={`/signals#${row.key}`}
-                      className="weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 underline-offset-2 transition-colors"
+                      className="weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-600 hover:decoration-sky-400 underline-offset-2 transition-colors"
                       title={`View ${row.label} evidence and historical charts`}
                     >
                       {row.label}

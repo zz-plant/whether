@@ -114,7 +114,7 @@ export function DecisionPicker({
       data-testid="decision-picker"
       tabIndex={-1}
       aria-labelledby={`${HOME_SECTIONS.areas.id}-heading`}
-      className="weather-section-stack weather-home-section border-t border-slate-800/70 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+      className="weather-section-stack weather-home-section border-t border-[color:var(--border-subtle)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
     >
       <div className="space-y-4">
         <div className="space-y-1">
@@ -157,7 +157,7 @@ export function DecisionPicker({
             <p className="type-eyebrow">
               <AreaLabel area={active.area} />
             </p>
-            <p className="max-w-[56ch] text-fluid-lg font-semibold leading-snug text-white">{active.rule}</p>
+            <p className="max-w-[56ch] text-fluid-lg font-semibold leading-snug text-slate-50">{active.rule}</p>
             {active.changed ? (
               /* Amber for an area the week moved, slate for one it did not: the
                  same table cell says "No line crossed" for both. */

@@ -119,7 +119,7 @@ export function CommitmentTest({
                 key={preset.value}
                 type="button"
                 onClick={() => setCostDraft(preset.value)}
-                className="weather-hit rounded-md border border-slate-700/80 bg-slate-800/60 px-2 py-0.5 text-[11px] font-medium text-slate-300 transition-colors hover:border-slate-500 hover:bg-slate-700/80 hover:text-white"
+                className="weather-hit rounded-md border border-[color:var(--border-default)] bg-[color:var(--bg-raised)] px-2 py-0.5 text-[11px] font-medium text-slate-300 transition-colors hover:border-[color:var(--border-strong)] hover:text-slate-50"
               >
                 {preset.label}
               </button>
@@ -137,7 +137,7 @@ export function CommitmentTest({
       {impact ? (
         <div aria-live="polite" className="space-y-2 text-fluid-xs">
           {typeof impact.runwayBefore === "number" && typeof impact.runwayAfter === "number" ? (
-            <div className="space-y-1.5 rounded-lg border border-slate-800 bg-slate-900/60 p-2.5">
+            <div className="space-y-1.5 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-2.5">
               <div className="flex items-center justify-between text-fluid-nano text-slate-300">
                 <span className="font-medium text-slate-400">Runway projection</span>
                 <span className="tabular-nums font-semibold">
@@ -152,7 +152,7 @@ export function CommitmentTest({
                   </span>
                 </span>
               </div>
-              <div className="relative h-2 w-full overflow-hidden rounded-full bg-slate-800">
+              <div className="relative h-2 w-full overflow-hidden rounded-full bg-[color:var(--bg-raised)]">
                 {/* Canonical band boundaries (6 / 12 / 24 mo), drawn as light rules. */}
                 {RUNWAY_BAND_CEILINGS.map((months) => (
                   <div
