@@ -306,7 +306,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 options={CADENCE_OPTIONS}
                 value={cadence}
                 onSelect={setCadence}
-                ariaLabel="Chart cadence"
+                ariaLabel="View by month or year"
               />
             </div>
             <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="One-month, three-month, two-year and ten-year Treasury rates">

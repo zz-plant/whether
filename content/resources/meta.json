@@ -33,7 +33,7 @@
     },
     "capitalPostureTemplate": {
       "path": "/resources/capital-posture-template",
-      "title": "Capital Posture Template"
+      "title": "Capital Planning Template"
     },
     "reversalTriggerChecklist": {
       "path": "/resources/reversal-trigger-checklist",
@@ -41,7 +41,7 @@
     },
     "quarterlyCapitalPostureMemoExample": {
       "path": "/resources/quarterly-capital-posture-memo-example",
-      "title": "Quarterly Capital Posture Memo Example"
+      "title": "Quarterly Capital Planning Memo Example"
     }
   }
 }

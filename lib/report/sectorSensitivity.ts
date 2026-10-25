@@ -32,7 +32,7 @@ export const SECTOR_TAXONOMY: Record<SectorKey, SectorSensitivityConfig> = {
     tightnessMultiplier: 1,
     riskAppetiteMultiplier: 1,
     biasOffset: 0,
-    rationale: "Tracks canonical posture with minimal structural tilt.",
+    rationale: "Tracks base market conditions with minimal structural tilt.",
   },
   infrastructure: {
     label: "Infrastructure",
@@ -53,7 +53,7 @@ export const SECTOR_TAXONOMY: Record<SectorKey, SectorSensitivityConfig> = {
     tightnessMultiplier: 1.12,
     riskAppetiteMultiplier: 0.84,
     biasOffset: -0.02,
-    rationale: "Procurement and reimbursement cycles smooth upside and downside, producing conservative posture translation.",
+    rationale: "Procurement and reimbursement cycles smooth upside and downside, dampening market swings.",
   },
   "ai-platforms": {
     label: "AI Platforms",

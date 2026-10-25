@@ -31,7 +31,7 @@ export const publicDecisionLabels = {
 const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
   action: "Stage approvals",
   threshold: FALLBACK_PAUSE_THRESHOLD,
-  reversal: "Reverse only after threshold recovery",
+  reversal: "Resume only after conditions recover",
 };
 
 /** The one table, re-exported under the name this module's callers already use. */
@@ -86,7 +86,7 @@ export const buildRegimeAlert = (
     reasons.push(
       `Funding pressure moved ${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)} ` +
         `and risk appetite moved ${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}, ` +
-        "carrying the posture across a boundary."
+        "carrying conditions across a change line."
     );
   }
 
@@ -97,7 +97,7 @@ export const buildRegimeAlert = (
     currentRecordDate,
     previousRecordDate,
     reasons,
-    summary: `The operating stance moved from ${REGIME_LABELS[previous.regime]} to ${REGIME_LABELS[current.regime]}.`,
+    summary: `Conditions moved from ${REGIME_LABELS[previous.regime]} to ${REGIME_LABELS[current.regime]}.`,
   };
 };
 

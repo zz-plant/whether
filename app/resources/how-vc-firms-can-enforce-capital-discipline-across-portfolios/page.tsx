@@ -85,10 +85,10 @@ export default async function Page() {
         <h2 className="text-lg font-semibold text-slate-100">Supporting links</h2>
         <ul className="space-y-2 text-sm text-slate-200">
           <li><Link href="/resources/capital-discipline-venture-backed-companies" className="text-sky-200 underline underline-offset-4">Capital discipline for venture-backed companies</Link></li>
-          <li><Link href="/resources/board-level-capital-posture-framework" className="text-sky-200 underline underline-offset-4">Board-level capital posture framework</Link></li>
+          <li><Link href="/resources/board-level-capital-posture-framework" className="text-sky-200 underline underline-offset-4">Board-level capital framework</Link></li>
         </ul>
         <div className="flex flex-wrap gap-3 pt-2">
-          <Link href="/resources/capital-posture-template" className="weather-button inline-flex items-center justify-center" data-conversion-event="download">Download the Capital Posture Template</Link>
+          <Link href="/resources/capital-posture-template" className="weather-button inline-flex items-center justify-center" data-conversion-event="download">Download the Capital Planning Template</Link>
           <Link href="/operate#ops-export-briefs" className="weather-pill inline-flex min-h-[44px] items-center px-4 py-2 text-sm font-semibold text-slate-100" data-conversion-event="request">Open board-pack exports</Link>
         </div>
       </section>

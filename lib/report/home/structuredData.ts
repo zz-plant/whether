@@ -127,8 +127,8 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
          * equivalent that parses.
          */
         variableMeasured: [
-          { "@type": "PropertyValue", name: "Operating posture", value: brief.postureLabel },
-          { "@type": "PropertyValue", name: "Regime", value: brief.regimeLabel },
+          { "@type": "PropertyValue", name: "Weekly guidance", value: brief.postureLabel },
+          { "@type": "PropertyValue", name: "Market conditions", value: brief.regimeLabel },
           /*
            * The word, not the engine's code. This shipped `"MED"` — the value
            * `RegimeConfidenceLabel` stores — into the one payload on the site
