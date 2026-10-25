@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type ReactNode } from "react";
+import { useCallback, useState, type ReactNode } from "react";
 import {
   decisionAreaCorporateTransmission,
   decisionAreaLabel,
@@ -22,6 +22,8 @@ import { ActionLink } from "../ui/actionLink";
 import { CommitmentTest } from "./CommitmentTest";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { useClipboardCopy } from "../useClipboardCopy";
+import { CheckIcon, ShareIcon } from "../uiIcons";
 
 /**
  * "What are you deciding?": the five areas, third on the page, after the verdict
@@ -94,6 +96,22 @@ export function DecisionPicker({
   const activeTransmission: DecisionAreaCorporateTransmission | undefined = active
     ? decisionAreaCorporateTransmission[active.area]
     : undefined;
+
+  const { status: copyStatus, copyToClipboard } = useClipboardCopy({ commitment: "copied_slack" });
+
+  const handleCopySlackTakeaway = useCallback(() => {
+    if (!active) return;
+    const label = decisionAreaLabel(active.area);
+    const bullets: string[] = [];
+    if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
+    if (active.pause?.line) bullets.push(`• *Pause if:* ${active.pause.line}`);
+    if (active.resume?.line) bullets.push(`• *Resume when:* ${active.resume.line}`);
+    if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
+    if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
+
+    const message = `*Whether: ${label} Takeaway*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
+    void copyToClipboard(message, `slack-takeaway-${active.area}`);
+  }, [active, activeTransmission, copyToClipboard]);
 
   /* Each choice carries where its area stands against its pause line, so the
      five answers are on the page before any is picked; the click opens the
@@ -207,6 +225,11 @@ export function DecisionPicker({
                 <p className="text-fluid-nano text-slate-400">
                   <span className="font-medium text-slate-200">Shared rule of thumb:</span> {activeTransmission.ruleOfThumb}
                 </p>
+                {activeTransmission.startupMath ? (
+                  <p className="text-fluid-nano text-slate-400">
+                    <span className="font-medium text-slate-200">Startup math:</span> {activeTransmission.startupMath}
+                  </p>
+                ) : null}
               </div>
             ) : null}
             <details className="weather-auto-chevron border-t border-[color:var(--border-faint)] pt-3" data-commitment-disclosure>
@@ -221,9 +244,31 @@ export function DecisionPicker({
                 a hiring plan released at 60 rather than 66 — sets them once on the
                 planning page and hears the day one is crossed. */}
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-3">
-              <ActionLink href="/operate#ops-plan-lines" variant="inline">
-                Move these lines for your plan →
-              </ActionLink>
+              <div className="flex flex-wrap items-center gap-4">
+                <ActionLink href="/operate#ops-plan-lines" variant="inline">
+                  Move these lines for your plan →
+                </ActionLink>
+                <button
+                  type="button"
+                  onClick={handleCopySlackTakeaway}
+                  data-testid="copy-slack-takeaway"
+                  className="inline-flex items-center gap-1.5 text-fluid-xs font-medium text-slate-300 hover:text-slate-100 transition-colors"
+                  title="Copy a summary of this decision to paste into Slack or a meeting note"
+                >
+                  {copyStatus === "copied" ? (
+                    <CheckIcon className="size-3.5 text-emerald-400" />
+                  ) : (
+                    <ShareIcon className="size-3.5 text-slate-400" />
+                  )}
+                  <span>
+                    {copyStatus === "copied"
+                      ? "Copied takeaway for Slack"
+                      : copyStatus === "copying"
+                        ? "Copying…"
+                        : "Copy takeaway for Slack"}
+                  </span>
+                </button>
+              </div>
               {active.answer ? (
                 <ActionLink href={active.answer.href} variant="inline">
                   {active.answer.title} →
