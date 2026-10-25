@@ -104,8 +104,8 @@ export function DecisionPicker({
     const label = decisionAreaLabel(active.area);
     const bullets: string[] = [];
     if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
-    if (active.pause?.line) bullets.push(`• *Pause if:* ${active.pause.line}`);
-    if (active.resume?.line) bullets.push(`• *Resume when:* ${active.resume.line}`);
+    if (active.pause?.line) bullets.push(`• *Pause if:* ${active.pause.line}${active.pause.distance ? ` (${active.pause.distance})` : ""}`);
+    if (active.resume?.line) bullets.push(`• *Resume when:* ${active.resume.line}${active.resume.distance ? ` (${active.resume.distance})` : ""}`);
     if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
     if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
 

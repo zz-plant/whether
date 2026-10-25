@@ -119,6 +119,14 @@ describe("the plain-English layer beside the week's readings", () => {
     const html = render({ value: 100, valueLabel: "100", delta: 0, saturatedPressure: 114 });
     assert.match(html, /would read 114/);
   });
+
+  it("provides historical era context and leadership team prompt", () => {
+    const html = render();
+    assert.ok(html.includes("Historical context:"));
+    assert.ok(html.includes(signalPlainEnglish.tightness.historicalContext));
+    assert.ok(html.includes("Ask your team:"));
+    assert.ok(html.includes(signalPlainEnglish.tightness.operatorPrompt));
+  });
 });
 
 describe("curve chart shorthand", () => {
