@@ -403,43 +403,43 @@ export type DecisionAreaCorporateTransmission = {
 export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAreaCorporateTransmission> = {
   hiring: {
     transmission:
-      "When money costs more, venture multiples compress. Each dollar of fixed payroll requires more revenue to justify at your next round.",
+      "When capital gets expensive, investors value companies on revenue, not headcount. Every new hire adds fixed monthly spend you can't easily undo if growth slows.",
     whyLineMatters:
-      "Payroll is a startup's largest irreversible commitment. Pausing net-new hiring before crossing the line prevents sudden emergency cuts later.",
+      "Setting your pause line ahead of time protects the team you already have—so you never find yourself forced into emergency layoffs.",
     ruleOfThumb:
-      "In Sunny conditions, open revenue-linked and reliability roles one at a time. In Cloudy or Freezing, approve backfills and delivery-critical roles only.",
+      "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, stick strictly to backfills and mission-critical roles.",
   },
   "product-tempo": {
     transmission:
-      "When market risk appetite drops, investors and customers prioritize immediate payback over multi-year vision.",
+      "When the market gets nervous, customers and investors care about what ships and pays off this quarter, not a 3-year vision.",
     whyLineMatters:
-      "Long-horizon roadmap bets consume cash without rapid validation. Prioritizing near-term deliverables keeps your cash optionality open.",
+      "Shorter release cycles give you real user proof faster—and let you pivot before burning months of engineering time.",
     ruleOfThumb:
-      "In Sunny conditions, prioritize features driving activation and retention. In Stormy or Freezing, fund only milestones paying back within the year.",
+      "In Sunny weather, ship what drives activation and retention. In Stormy or Freezing, back only projects that pay for themselves within 12 months.",
   },
   "capital-raising": {
     transmission:
-      "When investor risk appetite cools, diligence timelines double and term sheets become conservative on valuation and structure.",
+      "When investors get cautious, term sheets take twice as long and come with tougher terms. If you wait until runway is tight, you lose all your leverage.",
     whyLineMatters:
-      "Founders who wait until cash is low lose all negotiating leverage. Starting early while conditions are receptive protects your cap table.",
+      "Starting early while conditions are open keeps timing and terms on your side rather than the market's.",
     ruleOfThumb:
-      "In Sunny conditions, raise while terms are receptive. In Freezing or Stormy, start early and prioritize structural terms over closing speed.",
+      "In Sunny weather, raise opportunistically while terms are warm. In Freezing or Stormy, start early and protect your cap table over closing fast.",
   },
   "burn-discipline": {
     transmission:
-      "Discretionary software, vendor contracts, and agency retainers compound fixed burn non-linearly while top-line revenue growth slows.",
+      "SaaS tools, agencies, and extra vendor seats quietly pile up fixed monthly costs that linger long after top-line growth cools.",
     whyLineMatters:
-      "A 6-month payback bar ensures cash outflows convert back into runway before macroeconomic conditions can worsen.",
+      "Requiring a clear 6-month payback keeps money in the bank—which is the best insurance policy when the climate shifts.",
     ruleOfThumb:
-      "In Sunny conditions, approve spend with clear 6-month payback. In Cloudy or Freezing, lock down discretionary spend that lacks proof of payback.",
+      "In Sunny weather, invest in growth tooling with clear payback. In Cloudy or Freezing, pause discretionary spend that doesn't quickly pay for itself.",
   },
   "expansion-bets": {
     transmission:
-      "New product lines and geographic expansions depend on follow-on capital that quickly vanishes when market conditions tighten.",
+      "Big new product lines or expansion bets rely on cheap follow-on money that dries up fast when markets tighten.",
     whyLineMatters:
-      "Staging new bets in small milestones ensures you can halt an unproven initiative in a week without lingering commitments.",
+      "Funding new experiments in bite-sized stages means you can wind one down in a week without dragging down the core business.",
     ruleOfThumb:
-      "In Sunny conditions, fund new bets one stage at a time with written stop conditions. In Stormy or Freezing, run only experiments you can halt within a week.",
+      "In Sunny weather, fund new bets stage-by-stage with written stop triggers. In Stormy or Freezing, run only experiments you can pause on short notice.",
   },
 };
 
