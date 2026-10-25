@@ -76,7 +76,7 @@ export const buildHistoryStructuredData = ({
   const periodItems = periods.map((period) => ({
     "@type": "WebPage",
     url: buildCanonicalUrl(`/history/${period.slug}`),
-    name: `${period.title} operating posture`,
+    name: `${period.title} market conditions`,
   }));
   const briefItems = publishedBriefs.map((brief) => ({
     "@type": "Article",
@@ -115,7 +115,7 @@ export const buildHistoryStructuredData = ({
     {
       "@type": "ItemList",
       "@id": `${url}#periods`,
-      name: "Operating posture by period",
+      name: "Market conditions by period",
       numberOfItems: periodItems.length + briefItems.length,
       itemListElement: [...periodItems, ...briefItems].map((item, index) => ({
         "@type": "ListItem",
