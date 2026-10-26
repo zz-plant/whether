@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { scaleLinear } from "d3-scale";
 import type { TreasuryData } from "../../../lib/types";
 import { SegmentedControl } from "../../components/ui/segmentedControl";
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
@@ -99,11 +100,13 @@ const linePath = (
   height: number,
   min: number,
   max: number,
-) => buildSegmentedLineSeries({ values, width, height, min, max });
+) => buildSegmentedLineSeries({ values, width, height, min, max, curve: "monotone" });
 
-const toChartX = (value: number, min: number, max: number, width: number) => ((value - min) / (max - min || 1)) * width;
+const toChartX = (value: number, min: number, max: number, width: number) =>
+  scaleLinear().domain([min, max]).range([0, width])(value);
 
-const toChartY = (value: number, min: number, max: number, height: number) => height - ((value - min) / (max - min || 1)) * height;
+const toChartY = (value: number, min: number, max: number, height: number) =>
+  scaleLinear().domain([min, max]).range([height, 0])(value);
 
 const inDomain = (value: number, min: number, max: number) => value >= min && value <= max;
 
@@ -217,7 +220,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const hasSpreadGaps =
     spread10Y2YSeries.missingColumns.length > 0
     || spread2Y3MSeries.missingColumns.length > 0;
-  const zeroLineY = 36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36;
+  const zeroLineY = scaleLinear().domain([spreadMin, spreadMax]).range([36, 0])(0);
 
   /* The in-plot series labels that sat here are gone. They were anchored to each
      series' last point at the right edge — exactly where the lines terminate — so

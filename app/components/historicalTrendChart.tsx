@@ -1,3 +1,4 @@
+import { scaleLinear } from "d3-scale";
 import { buildSparklinePath, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 
@@ -58,11 +59,11 @@ export function HistoricalTrendChart({
   // Same projection the inline sparkline uses, so the two never drift apart.
   const domain: readonly [number, number] = typeof changeLine === "number" ? [0, 100] : sparklineDomain(values);
   const [min, max] = domain;
-  const span = max - min || 1;
   const pathD = buildSparklinePath(values, domain, W, H, PAD_Y);
 
   const currentVal = points[points.length - 1].value;
-  const yFor = (value: number) => H - PAD_Y - ((value - min) / span) * (H - PAD_Y * 2);
+  const yScale = scaleLinear().domain([min, max]).range([H - PAD_Y, PAD_Y]);
+  const yFor = (value: number) => yScale(value);
   const dotY = yFor(currentVal);
   const asOf = formatAsOf(points[points.length - 1].date);
   /* The move is first point to last, so it spans the gaps between points, one
