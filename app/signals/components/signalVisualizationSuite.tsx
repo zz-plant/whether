@@ -100,7 +100,8 @@ const linePath = (
   height: number,
   min: number,
   max: number,
-) => buildSegmentedLineSeries({ values, width, height, min, max, curve: "monotone" });
+  baselineY?: number,
+) => buildSegmentedLineSeries({ values, width, height, min, max, curve: "monotone", baselineY });
 
 const toChartX = (value: number, min: number, max: number, width: number) =>
   scaleLinear().domain([min, max]).range([0, width])(value);
@@ -210,7 +211,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const threeMonthSeries = linePath(points.map((point) => point.threeMonth), 100, 36, rateMin, rateMax);
   const twoYearSeries = linePath(points.map((point) => point.twoYear), 100, 36, rateMin, rateMax);
   const tenYearSeries = linePath(points.map((point) => point.tenYear), 100, 36, rateMin, rateMax);
-  const spread10Y2YSeries = linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax);
+  const zeroLineY = scaleLinear().domain([spreadMin, spreadMax]).range([36, 0])(0);
+  const spread10Y2YSeries = linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax, zeroLineY);
   const spread2Y3MSeries = linePath(points.map((point) => point.spread2Y3M), 100, 36, spreadMin, spreadMax);
   const hasRateGaps =
     oneMonthSeries.missingColumns.length > 0
@@ -220,7 +222,6 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const hasSpreadGaps =
     spread10Y2YSeries.missingColumns.length > 0
     || spread2Y3MSeries.missingColumns.length > 0;
-  const zeroLineY = scaleLinear().domain([spreadMin, spreadMax]).range([36, 0])(0);
 
   /* The in-plot series labels that sat here are gone. They were anchored to each
      series' last point at the right edge — exactly where the lines terminate — so
@@ -446,6 +447,9 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
               <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
+              {spread10Y2YSeries.areaPaths.map((areaPath, index) => (
+                <path key={`spread-10-2-area-${index}`} d={areaPath} fill={SERIES.spread10Y2Y} fillOpacity="0.08" />
+              ))}
               {spread10Y2YSeries.paths.map((path, index) => (
                 <path key={`spread-10-2-${index}`} d={path} fill="none" stroke={SERIES.spread10Y2Y} strokeWidth="2" />
               ))}
