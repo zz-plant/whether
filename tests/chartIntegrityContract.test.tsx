@@ -59,6 +59,22 @@ describe("segmented line series", () => {
     assert.equal(ys[0], ys[2], "first and last share a value, so they share a height");
     assert.ok(ys[1] > ys[0], "the smaller value sits lower on the canvas");
   });
+
+  it("generates smooth monotonic spline paths with d3-shape", () => {
+    const series = buildSegmentedLineSeries({
+      values: [1, 5, 2, 8, 4],
+      width: 100,
+      height: 40,
+      min: 0,
+      max: 10,
+      curve: "monotone",
+    });
+
+    assert.equal(series.paths.length, 1);
+    const firstPath = series.paths[0] ?? "";
+    assert.match(firstPath, /^M/, "starts with M");
+    assert.match(firstPath, /C/, "contains cubic bezier curves from d3-shape");
+  });
 });
 
 describe("sparkline", () => {

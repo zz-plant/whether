@@ -1,3 +1,5 @@
+import { scaleLinear } from "d3-scale";
+
 /**
  * Word-sized inline trend graphic.
  *
@@ -63,12 +65,17 @@ export function buildSparklinePath(
   padY = PAD_Y,
 ): string {
   const [min, max] = domain;
-  const span = max - min || 1;
-  const usable = height - padY * 2;
+  const xScale = scaleLinear()
+    .domain([0, Math.max(values.length - 1, 1)])
+    .range([0, width]);
+  const yScale = scaleLinear()
+    .domain([min, max])
+    .range([height - padY, padY]);
+
   return values
     .map((value, i) => {
-      const x = (i / Math.max(values.length - 1, 1)) * width;
-      const y = height - padY - ((value - min) / span) * usable;
+      const x = xScale(i);
+      const y = yScale(value);
       return `${i === 0 ? "M" : "L"}${x.toFixed(2)},${y.toFixed(2)}`;
     })
     .join(" ");
