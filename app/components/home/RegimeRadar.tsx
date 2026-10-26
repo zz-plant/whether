@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { scaleLinear } from "d3-scale";
 import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatThresholdNumber } from "../../../lib/formatters";
 import { ConditionIcon } from "../ui/conceptIcons";
@@ -53,11 +54,11 @@ const BOTTOM_ICON_Y = PLOT_BOTTOM - 6 - 3.6 - QUADRANT_ICON / 2;
 const LINE_LABEL_MIN_Y = TOP_ICON_Y + QUADRANT_ICON + 7;
 const LINE_LABEL_MAX_Y = BOTTOM_ICON_Y - 2;
 
-const xFor = (riskAppetite: number) =>
-  PLOT_X + (Math.max(0, Math.min(100, riskAppetite)) / 100) * PLOT_SIZE;
+const xScale = scaleLinear().domain([0, 100]).range([PLOT_X, PLOT_RIGHT]).clamp(true);
+const yScale = scaleLinear().domain([0, 100]).range([PLOT_BOTTOM, PLOT_Y]).clamp(true);
 
-const yFor = (tightness: number) =>
-  PLOT_Y + (1 - Math.max(0, Math.min(100, tightness)) / 100) * PLOT_SIZE;
+const xFor = (riskAppetite: number) => xScale(riskAppetite);
+const yFor = (tightness: number) => yScale(tightness);
 
 export function RegimeRadar({
   tightness,

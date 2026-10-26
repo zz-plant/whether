@@ -75,6 +75,23 @@ describe("segmented line series", () => {
     assert.match(firstPath, /^M/, "starts with M");
     assert.match(firstPath, /C/, "contains cubic bezier curves from d3-shape");
   });
+
+  it("generates closed area paths when baselineY is provided", () => {
+    const series = buildSegmentedLineSeries({
+      values: [1, 5, 2, 8, 4],
+      width: 100,
+      height: 40,
+      min: 0,
+      max: 10,
+      curve: "monotone",
+      baselineY: 20,
+    });
+
+    assert.equal(series.areaPaths.length, 1);
+    const firstArea = series.areaPaths[0] ?? "";
+    assert.match(firstArea, /^M/, "starts with M");
+    assert.match(firstArea, /Z$/, "closed path ending with Z");
+  });
 });
 
 describe("sparkline", () => {

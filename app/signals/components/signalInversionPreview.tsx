@@ -91,6 +91,7 @@ export function SignalInversionPreview({
     min: spreadMin,
     max: spreadMax,
     curve: "monotone",
+    baselineY: zeroLineY,
   });
   const spread2Y3MSeries = buildSegmentedLineSeries({
     values: monthlyPoints.map((point) => point.spread2Y3M),
@@ -144,6 +145,9 @@ export function SignalInversionPreview({
               />
             ))}
             <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
+            {spread10Y2YSeries.areaPaths.map((areaPath, index) => (
+              <path key={`10-2-area-${index}`} d={areaPath} fill="var(--color-semantic-easing-border)" fillOpacity="0.08" />
+            ))}
 
             {spread10Y2YSeries.paths.map((path, index) => (
               <path key={`10-2-${index}`} d={path} fill="none" stroke="var(--color-semantic-easing-border)" strokeWidth="2" />

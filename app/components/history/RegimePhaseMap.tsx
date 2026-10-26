@@ -1,3 +1,4 @@
+import { scaleLinear } from "d3-scale";
 import { ActionLink } from "../ui/actionLink";
 import { UrlDetails } from "../ui/urlDetails";
 import { Fact, FactList } from "../ui/factList";
@@ -50,8 +51,11 @@ const PLOT_BOTTOM = PLOT_Y + PLOT_SIZE;
 
 const TICKS = [0, 25, 50, 75, 100] as const;
 
-const xFor = (riskAppetite: number) => PLOT_X + (riskAppetite / 100) * PLOT_SIZE;
-const yFor = (tightness: number) => PLOT_Y + (1 - tightness / 100) * PLOT_SIZE;
+const xScale = scaleLinear().domain([0, 100]).range([PLOT_X, PLOT_RIGHT]).clamp(true);
+const yScale = scaleLinear().domain([0, 100]).range([PLOT_BOTTOM, PLOT_Y]).clamp(true);
+
+const xFor = (riskAppetite: number) => xScale(riskAppetite);
+const yFor = (tightness: number) => yScale(tightness);
 
 const toPath = (points: PhasePoint[]) =>
   points
