@@ -28,6 +28,8 @@ type SignalPlainEnglish = {
   jargonTerm: string;
   /** What to ask yourself when you see this number change. */
   operatorPrompt: string;
+  /** Historical context anchoring this indicator in recognizable startup eras. */
+  historicalContext: string;
 };
 
 export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
@@ -43,6 +45,8 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
       "Money is balanced — invest with milestones and keep options open.",
     jargonTerm: "Funding pressure",
     operatorPrompt: "If I needed to raise or borrow money this month, how hard would it be?",
+    historicalContext:
+      "During the 2020–2021 funding boom, this read 20–35. In the 2022–2023 reset, it peaked above 80. Above 70 means money is scarce and rounds take longer.",
   },
   riskAppetite: {
     plainLabel: "Risk appetite",
@@ -56,6 +60,8 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
       "Markets are selectively open — prove traction before scaling; get customer evidence before making large commitments.",
     jargonTerm: "Risk appetite",
     operatorPrompt: "Would a new product launch or expansion hire get funded or questioned?",
+    historicalContext:
+      "During bull markets, this reads 70–85+. In major pullbacks, it falls below 30. Below 45 means investors demand proof of retention and profitability over pure growth.",
   },
   baseRate: {
     /*
@@ -77,6 +83,8 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
       "Rates are moderate — plan as if rates stay here; hedge floating-rate exposure if you carry debt.",
     jargonTerm: "Base rate",
     operatorPrompt: "Does my company carry debt or rely on outside capital? If yes, this number matters.",
+    historicalContext:
+      "Near 0% from 2008–2021, climbing above 5% in 2023. Above 4.5% keeps venture debt expensive and raises investor return hurdles.",
   },
   curveSlope: {
     plainLabel: "Recession warning gauge",
@@ -90,6 +98,8 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
       "Curve is neutral/flat — don't rely on this signal alone; also check funding pressure and risk appetite.",
     jargonTerm: "Yield curve slope",
     operatorPrompt: "If I'm planning a 12+ month project, does this signal support that timeline?",
+    historicalContext:
+      "Normally positive (+0.5% to +1.5%). When it dips below 0% (an inverted yield curve), it has preceded every modern U.S. recession.",
   },
 };
 

@@ -164,6 +164,8 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     assert.match(html, /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "the named area's answer is server-rendered open");
     assert.match(html, /Why this line governs roadmap:/i, "renders zero-input corporate transmission intuition");
     assert.match(html, /Shared rule of thumb:/i, "renders team ritual rule of thumb");
+    assert.match(html, /Startup math:/i, "renders concrete unit economics math");
+    assert.match(html, /Copy takeaway for Slack/i, "renders 1-click Slack takeaway action");
     assert.match(html, /checked=""[^>]*value="product-tempo"|value="product-tempo"[^>]*checked=""/);
     assert.doesNotMatch(render(), /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "no answer open without one");
   });

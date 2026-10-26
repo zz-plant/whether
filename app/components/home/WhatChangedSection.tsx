@@ -2,8 +2,7 @@ import Link from "next/link";
 import { HomeSection } from "./HomeSection";
 import { ScoreLadder } from "../ui/scoreLadder";
 import { GovernedAreas } from "../ui/governedAreas";
-import { PlainEnglishScoreNote, SignalScaleNote } from "../ui/plainLanguage";
-import { compositeSignalScales } from "../../../lib/report/signalTranslations";
+import { SignalContextDetails } from "../ui/plainLanguage";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
@@ -56,9 +55,6 @@ const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasi
     </span>
   );
 };
-
-const isCompositeSignalKey = (key: SignalChangeRow["key"]): key is keyof typeof compositeSignalScales =>
-  Object.prototype.hasOwnProperty.call(compositeSignalScales, key);
 
 export function WhatChangedSection({
   rows,
@@ -158,33 +154,14 @@ export function WhatChangedSection({
                         {row.movement}
                       </p>
                     ) : null}
-                    {/* The scale and what the score means at its level, one click
-                        away. They were four more stacked lines in every row, at
-                        the same small size as the name and the move, so a row
-                        had six layers and no first thing to read. */}
-                    {row.scaleLabel || isCompositeSignalKey(row.key) ? (
-                      <details className="weather-auto-chevron text-fluid-nano font-normal text-slate-400">
-                        <summary className="cursor-pointer select-none">What the score means</summary>
-                        <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-x-1.5">
-                            {row.scaleLabel ? <span className="capitalize">{row.scaleLabel}</span> : null}
-                            {row.scaleLabel && isCompositeSignalKey(row.key) ? (
-                              <span aria-hidden="true" className="text-slate-600">·</span>
-                            ) : null}
-                            {isCompositeSignalKey(row.key) ? (
-                              <SignalScaleNote signalKey={row.key} as="span" className="inline font-normal text-slate-400" />
-                            ) : null}
-                          </div>
-                          {isCompositeSignalKey(row.key) && typeof row.value === "number" ? (
-                            <PlainEnglishScoreNote
-                              signalKey={row.key}
-                              score={row.value}
-                              className="whitespace-normal font-normal text-slate-300/80"
-                            />
-                          ) : null}
-                        </div>
-                      </details>
-                    ) : null}
+                    {/* Plain-English meaning, scale anchors, historical startup era
+                        context, and team reflection prompt. Folded in a 1-click disclosure
+                        to maintain clean table scanning. */}
+                    <SignalContextDetails
+                      signalKey={row.key}
+                      score={typeof row.value === "number" ? row.value : undefined}
+                      scaleLabel={row.scaleLabel}
+                    />
                   </div>
                 </th>
                 {/* With nothing to compare, the lead over the table already says so; on a

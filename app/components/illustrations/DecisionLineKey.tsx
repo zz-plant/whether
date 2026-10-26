@@ -9,34 +9,38 @@ import { LineStateIcon } from "../ui/conceptIcons";
  */
 export function DecisionLineKey({ className = "" }: { className?: string }) {
   return (
-    <dl
-      aria-label="What each score line does"
-      className={`grid gap-x-6 gap-y-3 text-fluid-xs leading-relaxed sm:grid-cols-3 ${className}`.trim()}
-      data-line-key
-    >
-      <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
-        <dt className="flex items-center gap-1.5 font-semibold text-line-crossed-fg">
-          <LineStateIcon state="crossed" />
-          <span>Pause line</span>
-        </dt>
-        <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Past it, hold back the areas it governs.</dd>
-      </div>
-      <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
-        <dt className="flex items-center gap-1.5 font-semibold text-line-clear-fg">
-          <LineStateIcon state="clear" />
-          <span>Resume line</span>
-        </dt>
-        <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Back past it, start those areas again.</dd>
-      </div>
-      <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
-        <dt className="flex items-center gap-1.5 font-semibold text-slate-200">
-          <span aria-hidden="true" className="flex size-4 shrink-0 items-center justify-center">
-            <span className="h-3 w-0.5 bg-current" />
-          </span>
-          <span>{DECISION_CONTRACT_LABELS.watch.changeLine}</span>
-        </dt>
-        <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Across it, the week&rsquo;s conditions change.</dd>
-      </div>
-    </dl>
+    <div className={`space-y-3 ${className}`.trim()} data-line-key>
+      <dl
+        aria-label="What each score line does"
+        className="grid gap-x-6 gap-y-3 text-fluid-xs leading-relaxed sm:grid-cols-3"
+      >
+        <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
+          <dt className="flex items-center gap-1.5 font-semibold text-line-crossed-fg">
+            <LineStateIcon state="crossed" />
+            <span>Pause line</span>
+          </dt>
+          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Past it, hold back the areas it governs.</dd>
+        </div>
+        <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
+          <dt className="flex items-center gap-1.5 font-semibold text-line-clear-fg">
+            <LineStateIcon state="clear" />
+            <span>Resume line</span>
+          </dt>
+          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Back past it, start those areas again.</dd>
+        </div>
+        <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
+          <dt className="flex items-center gap-1.5 font-semibold text-slate-200">
+            <span aria-hidden="true" className="flex size-4 shrink-0 items-center justify-center">
+              <span className="h-3 w-0.5 bg-current" />
+            </span>
+            <span>{DECISION_CONTRACT_LABELS.watch.changeLine}</span>
+          </dt>
+          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Across it, the week&rsquo;s conditions change.</dd>
+        </div>
+      </dl>
+      <p className="rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-2.5 text-fluid-nano text-slate-300">
+        <span className="font-semibold text-slate-200">Why pause and resume lines differ:</span> Think of the gap like a thermostat. A buffer between pausing and resuming stops your team from thrashing between sudden freezes and restarts week to week.
+      </p>
+    </div>
   );
 }

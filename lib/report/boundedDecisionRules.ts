@@ -398,6 +398,8 @@ export type DecisionAreaCorporateTransmission = {
   whyLineMatters: string;
   /** Shared rule of thumb for team rituals and Monday planning. */
   ruleOfThumb: string;
+  /** Startup unit math grounding the macro condition in operating reality. */
+  startupMath?: string;
 };
 
 export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAreaCorporateTransmission> = {
@@ -408,6 +410,8 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
       "Setting your pause line ahead of time protects the team you already have—so you never find yourself forced into emergency layoffs.",
     ruleOfThumb:
       "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, stick strictly to backfills and mission-critical roles.",
+    startupMath:
+      "A $180k hire adds ~$15k/mo in fixed payroll. In tight markets, that single hire requires $300k+ in fresh net ARR to justify at your next round.",
   },
   "product-tempo": {
     transmission:
@@ -416,6 +420,8 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
       "Shorter release cycles give you real user proof faster—and let you pivot before burning months of engineering time.",
     ruleOfThumb:
       "In Sunny weather, ship what drives activation and retention. In Stormy or Freezing, back only projects that pay for themselves within 12 months.",
+    startupMath:
+      "A 3-month engineering detour costs ~$75k+ in burn. Focus on features that save current customer renewals this quarter.",
   },
   "capital-raising": {
     transmission:
@@ -424,6 +430,8 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
       "Starting early while conditions are open keeps timing and terms on your side rather than the market's.",
     ruleOfThumb:
       "In Sunny weather, raise opportunistically while terms are warm. In Freezing or Stormy, start early and protect your cap table over closing fast.",
+    startupMath:
+      "Term sheet diligence stretches from 4 weeks in Sunny weather to 12+ weeks in Cloudy or Freezing. Start 6 months before your runway line.",
   },
   "burn-discipline": {
     transmission:
@@ -432,6 +440,8 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
       "Requiring a clear 6-month payback keeps money in the bank—which is the best insurance policy when the climate shifts.",
     ruleOfThumb:
       "In Sunny weather, invest in growth tooling with clear payback. In Cloudy or Freezing, pause discretionary spend that doesn't quickly pay for itself.",
+    startupMath:
+      "Trimming unused software seats and agency retainers every 90 days routinely extends company runway by 1–2 months.",
   },
   "expansion-bets": {
     transmission:
@@ -440,6 +450,8 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
       "Funding new experiments in bite-sized stages means you can wind one down in a week without dragging down the core business.",
     ruleOfThumb:
       "In Sunny weather, fund new bets stage-by-stage with written stop triggers. In Stormy or Freezing, run only experiments you can pause on short notice.",
+    startupMath:
+      "Cap experiment risk to under 5% of monthly burn, requiring measurable customer demand before committing dedicated engineering time.",
   },
 };
 
