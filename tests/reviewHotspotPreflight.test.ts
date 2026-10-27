@@ -67,6 +67,19 @@ describe("blockCommentLines", () => {
     assert.ok(!inside.has(6) && !inside.has(8));
   });
 
+  it("covers JSX comments, single-line and opening a block", () => {
+    const source = [
+      "{/* Two different questions, named as two */}", // 1
+      "{/* A note that runs on, named as two", //          2
+      "   more of it */}", //                              3
+      "<Section as={tag} />", //                           4
+    ].join("\n");
+    const inside = blockCommentLines(source);
+
+    assert.ok(inside.has(1) && inside.has(2) && inside.has(3));
+    assert.ok(!inside.has(4), "JSX code is code");
+  });
+
   it("does not excuse a line that carries code before the comment opener", () => {
     const source = ["const x = value as Foo; /* trailing note", " * continues here", " */"].join("\n");
     const inside = blockCommentLines(source);

@@ -13,6 +13,10 @@ export function execOutput(command, args, cwd) {
     cwd,
     encoding: "utf8",
     stdio: ["ignore", "pipe", "pipe"],
+    /* The default is 1 MiB. A push that brings a branch up to date with main hands the
+       hotspot preflight a patch of every commit since (161 on 2026-10-27, past 1 MiB), and
+       ENOBUFS failed the pre-push gate on a tree identical to main. */
+    maxBuffer: 256 * 1024 * 1024,
   });
 }
 
