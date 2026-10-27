@@ -416,7 +416,7 @@ a move of one point through it changes what four areas should do. Direction and 
 
 ## Inputs that outlived their readers (2026-10-27)
 
-Four things went, each kept alive by a half that survived its other half.
+Five things went, each kept alive by a half that survived its other half.
 
 - **A builder kept as "the live half" after its panel was deleted.** `lib/report/interpretationLayer.ts`
   built a layer for every `?view=` on `/`, and its test called it live because the assembler consumed it.
@@ -429,8 +429,13 @@ Four things went, each kept alive by a half that survived its other half.
   grepping its key's readers in the same commit.
 - **A parameter whose only effect is an undrawn field.** The audit called `?sector=` on `/` ignored; it
   chose the sector row of `history.macroOverlay`, which nothing has drawn since 2026-08-06. The parameter
-  went from `/` and the share preview. The field and the overlay behind it remain (spec §3.4.1).
+  went from `/` and the share preview, and the field and the overlay behind it followed (spec §3.4.1).
 - **A token route whose token no reader sees.** `/api/slack/subscribe` minted a token, returned it in JSON
   and indexed it in KV for `/api/slack/unsubscribe`, and no screen showed it. A route whose required input
   only the server holds has no client, however well it is tested. Stored records still carry the field and
   still parse.
+- **An export only its test calls, in a module something ships.** `buildDecisionTransmission` arrived on
+  2026-04-02 with its test, its types in `reportData.ts` and a rule builder in `operatingCalls.ts`, and nothing
+  else ever called it; a 2026-09-22 copy pass reworded its placeholders anyway. The dead-export census judges
+  test-only callers per module, so one export in a live module passes, and so does each helper only it calls.
+  Before rewording a builder's strings, find its caller outside `tests/`.

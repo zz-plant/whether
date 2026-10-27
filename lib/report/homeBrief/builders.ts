@@ -63,7 +63,6 @@ import {
   buildFlipRiskMeterState as buildFlipRiskMeterStateInternal,
   buildHistoricalTimeline,
   formatRegimeWithDuration,
-  buildMacroOverlay,
   buildMemoryRail,
   buildStartRouteDeltaBlock,
   buildWhyThisCall,
@@ -82,7 +81,6 @@ import type {
   StartupVariantPolicy,
   WeeklyDecisionCardViewModel,
 } from "../homeBriefModel";
-import type { SectorKey } from "../sectorSensitivity";
 import type { WeeklyCallContract } from "../weeklyCallContract";
 import { regimeSignalLabel } from "../signalTranslations";
 import { isSavedCopy } from "../provenanceStatus";
@@ -226,7 +224,6 @@ const buildLeadershipShorthandLine = (
 export const buildHomeBriefModelInternal = (
   data: HomeReportData,
   options?: {
-    overlaySector?: SectorKey;
     startupVariantMode?: StartupVariantPolicy["selectedMode"];
     runwayBand?: RunwayBand;
     runwayMonths?: number;
@@ -251,7 +248,6 @@ export const buildHomeBriefModelInternal = (
     flipThreshold,
     postureState,
   } = data;
-  const overlaySector = options?.overlaySector ?? "b2b-saas";
   // The selected mode drives the pill highlight and defaults to series-a for
   // display. Stage-scoped copy is applied only when the operator explicitly
   // picked a stage, so an untouched brief keeps its canonical action line.
@@ -727,7 +723,6 @@ export const buildHomeBriefModelInternal = (
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline,
     lastYearComparison: data.lastYearComparison ?? null,
-    macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),
     evidenceItems: data.reportEvidenceItems ?? [],
     netConstraintSummary,
     postureDeltaLabel,
@@ -888,7 +883,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       historicalTimeline: homeBriefModel.historicalTimeline,
       historicalAnalogs: homeBriefModel.historicalAnalogs,
       lastYearComparison: homeBriefModel.lastYearComparison,
-      macroOverlay: homeBriefModel.macroOverlay,
     },
     sinceLastReview: homeBriefModel.sinceLastReview,
     artifact: {
