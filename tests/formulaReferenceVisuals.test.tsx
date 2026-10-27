@@ -14,7 +14,7 @@ describe("formula reference visuals", () => {
   const html = renderToStaticMarkup(<FormulaReference />);
 
   it("draws the regime rule as a quadrant carrying both thresholds", () => {
-    assert.match(html, /Four conditions: funding pressure above/);
+    assert.match(html, /Four conditions, picked by whether funding pressure is above/);
     assert.ok(html.includes(`>${TIGHTNESS_REGIME_THRESHOLD}<`), "tightness threshold labelled on the axis");
     assert.ok(html.includes(`>${RISK_APPETITE_REGIME_THRESHOLD}<`), "risk appetite threshold labelled on the axis");
     assert.doesNotMatch(html, /quadrant of funding pressure vs/, "the prose form is gone");
@@ -27,7 +27,7 @@ describe("formula reference visuals", () => {
       const tag = new RegExp(`<text([^>]*)>${word}</text>`).exec(svg)?.[1] ?? "";
       return { x: Number(/\bx="([\d.]+)"/.exec(tag)?.[1]), y: Number(/\by="([\d.]+)"/.exec(tag)?.[1]) };
     };
-    const quadrant = html.slice(html.indexOf("<svg", html.indexOf("Four conditions: funding pressure above") - 400));
+    const quadrant = html.slice(html.indexOf("<svg", html.indexOf("Four conditions, picked by whether funding pressure is above") - 400));
     const radar = renderToStaticMarkup(
       <RegimeRadar tightness={90} riskAppetite={48} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="SCARCITY" />,
     );
@@ -75,7 +75,7 @@ describe("formula reference visuals", () => {
     assert.equal((withPositions.match(/data-score-ladder/g) ?? []).length, 2);
     assert.match(withPositions, /Last week: 68/);
     assert.ok(
-      withPositions.indexOf("data-score-ladder") < withPositions.indexOf("Four conditions: funding pressure above"),
+      withPositions.indexOf("data-score-ladder") < withPositions.indexOf("Four conditions, picked by whether funding pressure is above"),
       "the ladders draw the reading before the quadrant explains the rule",
     );
   });

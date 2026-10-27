@@ -176,6 +176,6 @@ describe("decision record view joins the review trail", () => {
       [],
     );
     assert.equal(view.rows[0]?.followUp, undefined);
-    assert.equal(view.headline, "The one decision on this browser still rests on conditions that hold.");
+    assert.equal(view.headline, "The decision you recorded in this browser still rests on conditions that hold.");
   });
 });

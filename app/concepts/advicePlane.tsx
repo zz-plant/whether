@@ -228,7 +228,7 @@ export function AdvicePlane({
       </div>
 
       <figcaption className="max-w-prose text-fluid-nano text-slate-400">
-        {`Each mark is one text, at the scores of the month-end it came out. Marks at the same reading are stacked upward so each one shows.`}
+        {`Each mark is one text, plotted at the scores for the month it came out. Marks at the same reading are stacked upward so each one shows.`}
         {offCorner > 0
           ? ` ${offCorner === 1 ? "One sits" : `${offCorner} sit`} in a different corner from the conditions published that month. ${CALL_CHANGE_RULE}`
           : null}

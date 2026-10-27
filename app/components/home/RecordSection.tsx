@@ -53,7 +53,7 @@ export function RecordSection({
       {spellLengths ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{spellLengths}</p> : null}
       {turningPoints.length > 0 ? (
         <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">
-          What the guidance said at the last turns:{" "}
+          What the guidance said the last few times conditions changed:{" "}
           {turningPoints.map((point, index) => (
             <span key={point.href}>
               {index > 0 ? " · " : null}

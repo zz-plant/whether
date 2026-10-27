@@ -102,7 +102,7 @@ export const buildShareImageArtifacts = (
          (2026-10-09). */
       title: "Board slide",
       description:
-        `One slide: the guidance, its pause line, its change lines and both scores, drawn for a ${operatorStageLabel(stage)} company, the stage set on the brief.`,
+        `One slide: the guidance, its pause line, its change lines and both scores, drawn for a ${operatorStageLabel(stage)} company (the stage you picked on the brief).`,
       preview: {
         src: `/api/image/slide?stage=${stage}`,
         width: 1200,

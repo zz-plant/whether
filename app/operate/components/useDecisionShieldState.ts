@@ -250,7 +250,7 @@ export const useDecisionShieldState = ({
         add({
           title: "Plan link copied",
           description:
-            "It opens this plan with these settings. Your runway, spend and margin stay out of the link, so it is graded on the opener's own figures and the week it is opened.",
+            "It opens this plan with these settings. Your runway, spend and margin stay out of the link, so whoever opens it sees it graded on their own numbers and the week they open it.",
           type: "success",
         });
       }

@@ -91,10 +91,10 @@ const resolvePrimaryPathDetail = (slug: string) => {
   }
 
   if (slug === "avoid-premature-scaling") {
-    return "Use the most concrete downside path first before widening into broader browse.";
+    return "Start with the most concrete downside path, then browse more widely.";
   }
 
-  return "Use the most concrete operating path first before widening into broader browse.";
+  return "Start with the most concrete operating path, then browse more widely.";
 };
 
 // ReportDataFallback["sourceHealth"] is the same type; naming both said otherwise.

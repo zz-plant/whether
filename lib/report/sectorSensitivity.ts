@@ -39,7 +39,7 @@ export const SECTOR_TAXONOMY: Record<SectorKey, SectorSensitivityConfig> = {
     tightnessMultiplier: 1.28,
     riskAppetiteMultiplier: 0.72,
     biasOffset: -0.18,
-    rationale: "Feels financing stress earlier and rewards risk appetite later due to reliability and migration burdens.",
+    rationale: "Feels funding stress sooner and benefits from risk appetite later, because reliability and migration work slow it down.",
   },
   fintech: {
     label: "Fintech",

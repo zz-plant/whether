@@ -84,7 +84,7 @@ describe("buildSlackBrief", () => {
 
   it("resolves its change-course cross-reference to a label it actually prints", () => {
     const brief = buildSlackBrief(fixtureBriefDocument());
-    const referenced = brief.match(/What would show it: "([^"]+)"/)?.[1];
+    const referenced = brief.match(/How you'd know: watch "([^"]+)"/)?.[1];
     assert.ok(referenced, "no change-course cross-reference found");
     assert.ok(brief.includes(`• ${referenced}:`), `cross-reference points at "${referenced}", which the brief never prints`);
   });

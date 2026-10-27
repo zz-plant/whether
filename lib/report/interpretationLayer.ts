@@ -320,7 +320,7 @@ export const buildInterpretationLayer = ({
       summary:
         "How likely conditions are to change if this week's direction holds.",
       bullets: formatBullets([
-        boundedLine(DECISION_CONTRACT_LABELS.slot.action, `Operate for ${topRegime[0]} conditions while they hold. They carry ${topRegime[1]}% of the next-90-day weight.`),
+        boundedLine(DECISION_CONTRACT_LABELS.slot.action, `Operate for ${topRegime[0]} conditions while they hold. They get ${topRegime[1]}% of the weight over the next 90 days.`),
         boundedLine(
           DECISION_CONTRACT_LABELS.slot.threshold,
           `${formatBoundaryDistance({ label: closestDimension, points: forecast.boundaryPressure.distance, threshold: closestThreshold })} Crossing risk: ${crossingRiskLabel[forecast.boundaryPressure.crossingRisk].toLowerCase()}.`,

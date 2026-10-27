@@ -37,7 +37,7 @@ export const describeRecordCadence = (
  * of the oldest published brief.
  */
 export const describeReconstructedPeriod = (periodTitle: string, firstPublishedWeek: string): string =>
-  `Reconstructed: this is what today's published formula reads for ${periodTitle}, not guidance published at the time. ` +
+  `This is a reconstruction: what today's published formula says about ${periodTitle}, not guidance we published at the time. ` +
   `Whether began publishing weekly briefs in the week of ${firstPublishedWeek}.`;
 
 /*
@@ -92,5 +92,5 @@ export const describeLatitudeAgainstConditions = (
   );
   /* Said of the quadrants, not the months: conditions change only after a second
      reading, so a month can carry its old word for one reading past a line. */
-  return `It is not a fifth condition. A reading in Sunny's quadrant is always ${boundary} or higher and one in Freezing's ${boundary} or lower; Cloudy and Stormy, each hard on one score, can land either side.`;
+  return `It is not a fifth condition. Sunny readings are always ${boundary} or higher and Freezing readings ${boundary} or lower. Cloudy and Stormy can land on either side, since each is hard on only one score.`;
 };

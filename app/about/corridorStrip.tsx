@@ -132,8 +132,8 @@ export function CorridorStrip({
       <figcaption className="text-fluid-nano leading-relaxed text-slate-400">
         The worked example on the funding-pressure score, zoomed to {min}&ndash;{max}: the{" "}
         {DECISION_CONTRACT_LABELS.slot.reversal.toLowerCase()} at {resumeLine}, the change line at {changeLine}, the{" "}
-        {DECISION_CONTRACT_LABELS.slot.threshold.toLowerCase()} at {pauseLine}. Between the outer two, a reading changes
-        nothing: the action keeps running, or the pause stays.
+        {DECISION_CONTRACT_LABELS.slot.threshold.toLowerCase()} at {pauseLine}. A reading between the outer two changes
+        nothing: whatever&apos;s running keeps running, and whatever&apos;s paused stays paused.
       </figcaption>
     </figure>
   );

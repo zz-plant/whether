@@ -535,8 +535,8 @@ export function RunwayPlannerPanel({
             <div>
               <p id="ops-runway-lines-heading" className="text-xs font-semibold text-slate-400">Your own runway lines</p>
               <p className="mt-1 text-fluid-xs text-slate-400">
-                Agree them now, while nothing is urgent. Each gets the month it arrives at today&apos;s net burn, and
-                travels with the link and the memo.
+                Agree them now, while nothing is urgent. Each one shows the month you&apos;d hit it at
+                today&apos;s net burn, and goes out with the link and the memo.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">

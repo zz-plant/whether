@@ -196,8 +196,8 @@ export function WhatChangedSection({
                        which funding pressure judges against a line. */
                     <span className="text-xs text-slate-500">
                       {row.key === "baseRate"
-                        ? "Judged through funding pressure's lines."
-                        : "Judged through the lines of both scores."}
+                        ? "Feeds into funding pressure, so it's judged against that score's lines."
+                        : "Feeds into both scores, so it's judged against their lines."}
                     </span>
                   )}
                 </td>

@@ -257,9 +257,9 @@ export function ProjectPaybackSection({
       </ul>
       <p className="text-fluid-xs text-slate-400">
         The payback counts engineer time at what a week costs; the runway does not, because the engineers are paid either
-        way. The saving starts in full the week the work ships, and the runway it adds holds revenue flat. A contractor
-        paid for the work is new spend, which answers to the Spending rule&apos;s {SPENDING_PAYBACK_BAR_MONTHS}-month bar
-        instead.
+        way. The saving starts in full the week the work ships, and the runway it adds assumes revenue stays flat. Paying a
+        contractor for the work is new spend, so it falls under the Spending rule&apos;s{" "}
+        {SPENDING_PAYBACK_BAR_MONTHS}-month bar instead.
       </p>
     </section>
   );

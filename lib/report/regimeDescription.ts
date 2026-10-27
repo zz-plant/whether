@@ -52,7 +52,7 @@ const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: str
     constraints: [
       "Shorten payback windows and preserve cash.",
       "Delay speculative hiring or large platform rewrites.",
-      "Route roadmap bets through revenue certainty.",
+      "Only back roadmap bets with clear revenue behind them.",
     ],
   },
   DEFENSIVE: {

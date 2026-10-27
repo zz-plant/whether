@@ -388,7 +388,7 @@ export default function ProductCanonPage() {
 
       <SecondaryPageSection
         title="The list, oldest first"
-        description="The date is first publication. Where an essay became a book, the note says which one the date is."
+        description="The date is first publication. If an essay later became a book, the note says which version the date refers to."
       >
         <EssayYearStrip timeline={timeline} recordStart={recordStart} />
         {/* From `sm` each entry has a rail: when it came out and the conditions
@@ -468,9 +468,9 @@ export default function ProductCanonPage() {
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            <span className="text-slate-100">A small, chosen sample.</span> These texts were picked for being widely
-            read, by the people who built this page. Every post in the archives counted above is the check on
-            that choice.
+            <span className="text-slate-100">A small, chosen sample.</span> The people who built this page picked these
+            texts because they were widely read. Counting every post in the archives above is how we check that
+            choice.
           </li>
           <li>
             <span className="text-slate-100">Publication, not adoption.</span> Each date is when a text came out. Advice
@@ -485,8 +485,8 @@ export default function ProductCanonPage() {
             out in. It cannot show why its author wrote it.
           </li>
           <li>
-            <span className="text-slate-100">Nothing before the record.</span> Texts published before it stay on the list
-            and out of every share.
+            <span className="text-slate-100">Nothing before the record.</span> Texts published before the record starts stay
+            on the list but aren&apos;t counted in any share.
           </li>
           <li>
             <span className="text-slate-100">Tags are judgment calls.</span> Each entry prints the line its tag rests on.

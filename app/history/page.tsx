@@ -240,7 +240,7 @@ export default async function HistoryPage({
                 second time ("177 month-end readings, Jan 2012 to Sep 2026"). */}
             <p className="text-sm text-slate-300">
               {publishedBriefs.length === 1
-                ? `Permanent, append-only weekly brief records paired with the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`
+                ? `We keep every weekly brief permanently, next to the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`
                 : `${publishedBriefs.length} weekly brief records paired with the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`}
             </p>
           </div>

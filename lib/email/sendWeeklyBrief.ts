@@ -236,7 +236,7 @@ export const sendWeeklyBrief = async (options?: {
         `${publicDecisionLabels.call}: ${headline.composed}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
         ...changeLines.map(({ label, value }) => `${label}: ${value}`),
-        `Move these lines for your own plan, and hear the day one is crossed: ${planLinesUrl}`,
+        `Set these lines for your own plan and we'll email you the day one is crossed: ${planLinesUrl}`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
         ...emailTextFooter(recipient.token),
@@ -268,7 +268,7 @@ export const sendWeeklyBrief = async (options?: {
           `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT};margin:${index === 0 ? "0" : "12px"} 0 6px;">${label}</p>`,
           `<p style="font-size:0.9rem;margin:0;color:${OG_TEXT_SECONDARY};">${value}</p>`,
         ]),
-        `<p style="font-size:0.8rem;margin:16px 0 0;color:${OG_TEXT_MUTED};"><a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;">Move these lines for your own plan</a>, and hear the day one is crossed.</p>`,
+        `<p style="font-size:0.8rem;margin:16px 0 0;color:${OG_TEXT_MUTED};"><a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;">Set these lines for your own plan</a> and we'll email you the day one is crossed.</p>`,
         `</td></tr></table>`
       );
 
