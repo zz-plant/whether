@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Fragment } from "react";
 import { buildPageMetadata } from "../../lib/seo";
 import { buildResourceHubEntries } from "../../lib/resourceHub";
 import { resourceSupportingPages } from "../../lib/resourcesContent";
@@ -14,7 +15,7 @@ import { buildHomeAreaRows, describePauseLineCount } from "../../lib/report/home
 import { describeAnswerStanding } from "../../lib/report/answerStanding";
 import { decisionAreaLabel, decisionAreaOrder } from "../../lib/report/boundedDecisionRules";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
-import { situationUseCaseDefinitions, useCaseRoles } from "../../lib/decisionDomainCatalog";
+import { situationUseCaseDefinitions, toolkitDefinitions, useCaseRoles } from "../../lib/decisionDomainCatalog";
 import { featuredAnswerPages } from "../answers/selectors";
 import { stakeholderGuides } from "../guides/stakeholderGuides";
 import { stageGuides } from "../guides/stageGuides";
@@ -256,6 +257,20 @@ export default async function ResourcesHubPage({
             keep their addresses. Open when a link arrives with a selection. */}
         <section id="more-tools" aria-labelledby="resources-more-tools-heading" className="space-y-3">
           <h2 id="resources-more-tools-heading" className="type-eyebrow">More tools</h2>
+          {/* The worksheets by name, outside the fold (2026-10-27). They were
+              listed only inside the closed disclosure below, so a reader who
+              did not open it never learned the site had them. */}
+          <p className="text-sm text-slate-300">
+            One-decision worksheets:{" "}
+            {toolkitDefinitions.map((toolkit, index) => (
+              <Fragment key={toolkit.slug}>
+                {index > 0 ? <span aria-hidden="true"> · </span> : null}
+                <Link href={`/toolkits/${toolkit.slug}`} className="text-[var(--accent-action)] underline underline-offset-4">
+                  {toolkit.title.replace(/ Toolkit$/, "")}
+                </Link>
+              </Fragment>
+            ))}
+          </p>
           <GuidedTranslationPanels searchParams={resolvedSearchParams} />
           <details className="weather-auto-chevron weather-panel" open={hasToolSelection}>
             <summary className="select-none text-base font-semibold text-slate-100">

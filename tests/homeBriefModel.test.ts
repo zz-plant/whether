@@ -37,7 +37,7 @@ describe("buildHomeBriefModel", () => {
         changedSignals: [{ key: "tightness", delta: 2 }],
         anomalySignals: [],
       },
-    }, { overlaySector: "consumer" });
+    });
 
     assert.match(model.confidenceLabel, /LOW|MED|HIGH/);
     assert.equal(model.postureWithStageLabel, "Cloudy");
@@ -93,8 +93,6 @@ describe("buildHomeBriefModel", () => {
     assert.ok(model.historicalTimeline.length > 0);
     assert.equal(model.historicalAnalogs.length, 0);
     assert.equal(model.lastYearComparison, null);
-    assert.equal(model.macroOverlay.length, 5);
-    assert.ok(model.macroOverlay.some((item) => item.label.includes("Sector sensitivity (Consumer)")));
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(Array.isArray(model.evidenceItems));
     assert.match(model.whyThisCall[0].detail, /points from its .* line/i);
@@ -244,7 +242,6 @@ describe("buildHomeBriefModel", () => {
     assert.ok(model.historicalTimeline.length > 0);
     assert.equal(model.historicalAnalogs.length, 0);
     assert.equal(model.lastYearComparison, null);
-    assert.equal(model.macroOverlay.length, 5);
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(Array.isArray(model.evidenceItems));
     assert.match(model.whyThisCall[0].detail, /points from its .* line/i);
@@ -347,28 +344,6 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.flipThreshold, model.reversalTrigger);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
     assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");
-  });
-
-  it("renders selected homepage overlay sector in macro overlay label", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "EXPANSION",
-        diagnostics: { transitionWatch: false },
-        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
-        scores: { tightness: 40, riskAppetite: 64 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
-    }, { overlaySector: "infrastructure" });
-
-    const overlayRow = model.macroOverlay.find((item) => item.label.includes("Sector sensitivity"));
-    assert.ok(overlayRow);
-    assert.match(overlayRow?.label ?? "", /Infrastructure/);
   });
 
   it("builds ordered historical timeline entries from regime series", () => {

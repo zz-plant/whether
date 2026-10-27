@@ -133,7 +133,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Popup className="weather-slide-panel fixed z-50 bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share brief">
+        <Dialog.Popup className="weather-slide-panel fixed z-50 bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share this page">
         <div className="flex items-center justify-between gap-3">
           <h2 className="type-eyebrow text-slate-300">Share</h2>
           <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close share panel">

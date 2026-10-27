@@ -51,7 +51,7 @@ import { getPublishedBriefs } from "./publishedBriefs";
 import { buildFallbackForecastModel, buildForecastModel } from "./forecastModel";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { logReportDependencyFailure } from "./reportError";
-import { buildSourceHealthRows, getLatestParseableTimestamp, type SourceFreshnessStatus } from "./sourceHealth";
+import { buildSourceHealthRows, getLatestParseableTimestamp } from "./sourceHealth";
 import { loadCanonicalReportInputs } from "../ingestion/materialized";
 import { cache } from "react";
 import type { TreasuryData } from "../types";
@@ -108,32 +108,6 @@ export type ReportSearchParams = {
 
 export type ReportDataLoadOptions = {
   includeHistoricalLiveComparison?: boolean;
-};
-
-type DecisionTransmissionConfidenceLabel = "high" | "medium" | "low" | "unknown";
-
-export type DecisionTransmissionBoundedRule = {
-  action: string;
-  triggerThreshold: string;
-  reversalCondition: string;
-  manualReviewRequired: boolean;
-};
-
-export type DecisionTransmission = {
-  whatChanged: string;
-  postureNow: string;
-  boundedRules: DecisionTransmissionBoundedRule[];
-  flipConditions: string[];
-  freshness: {
-    timestamp: string;
-    freshnessStatus: SourceFreshnessStatus;
-  };
-  confidence: DecisionTransmissionConfidenceLabel;
-  provenance: Array<{
-    sourceLabel: string;
-    reference: string;
-    isFallback: boolean;
-  }>;
 };
 
 const loadCanonicalReportInputsIfAvailable = async (options: { fetcher?: typeof fetch }) => {

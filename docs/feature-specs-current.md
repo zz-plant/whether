@@ -143,7 +143,7 @@ Supporting surfaces are intentionally subordinate:
 - `/learn/failure-modes` permanently redirects into the trust workflow (`/trust#revisit-call`) rather than acting as an independently indexable content hub. The hub's earlier names follow it: `/library` and `/reference` go to `/trust`, their failure-mode paths to `/trust#revisit-call`, and the concept paths under all three (`/learn/concepts/*`, `/library/canon/*`, `/reference/concepts/*`) to `/concepts`.
 - `/concepts` is a page again (restored 2026-09-23): one list of widely read product-management writing and, since 2026-10-09, capital-allocation essays and investor memos, each entry placed on the month-end record (conditions that month, how long they had held, both scores) and tagged Expand, Conserve or Craft, with each kind's share per set of conditions beside the months' share so no coincidence reads as a cause (§1.1.64). Every entry's first-publication month was checked against its source. Sub-paths (the first version's detail, focus, audience and conflicts pages) redirect to `/concepts`. Modules: `lib/productCanon.ts`, `lib/productCanonMeasures.ts`, `lib/adviceStance.ts`; test: `tests/productCanon.test.ts`.
 
-`/` reads no `?view=` and no `?sector=` (2026-10-27). A non-default `?view=` selected an interpretation layer that the home assembly built and nothing drew: its panel was deleted on 2026-08-14 and the exports stopped receiving it on 2026-10-06 (§5.3.1). `?sector=` chose the sector row of the brief model's `history.macroOverlay`, which no surface has drawn since its panel went on 2026-08-06. `lib/report/interpretationLayer.ts` went with them, and so did `lib/report/companyProfile.ts`, the one module only it imported. `/api/image/brief` dropped `?view=` too and keeps `?sector=` for its context label.
+`/` reads no `?view=` and no `?sector=` (2026-10-27). A non-default `?view=` selected an interpretation layer that the home assembly built and nothing drew: its panel was deleted on 2026-08-14 and the exports stopped receiving it on 2026-10-06 (§5.3.1). `?sector=` chose the sector row of the brief model's `history.macroOverlay`, which no surface had drawn since its panel went on 2026-08-06; the overlay went the same day (§3.4.1). `lib/report/interpretationLayer.ts` went with them, and so did `lib/report/companyProfile.ts`, the one module only it imported. `/api/image/brief` dropped `?view=` too and keeps `?sector=` for its context label.
 
 Primary workflow pages now expose a top-of-page scroll path that explains the down-page sequence and highlights the current checkpoint as the operator moves through long surfaces.
 Report-shell routes (`/signals`, `/operate`, `/resolve`, `/trust` and nested report paths) use a reduced global header mode with one intro block before page-specific content; the homepage now suppresses report-shell header chrome so the weekly card remains the first dominant surface, compact report-shell intros now merge route purpose, trust state, and the first CTA into one priority card, and do not inject a default export CTA on non-home routes.
@@ -3872,6 +3872,31 @@ attention over position (`docs/agents/ui-ux-standards.md` §XXVIII, "Frames wort
 - **`bun run ui:frames` reports focal points at preview size** (`hasThumbnailFocal`), advisory. Phone
   frames of `/` with one went from 1 of 7 to 6 of 8; the strict checks still pass on every route.
 
+### 1.1.89 Doors to what was already built (2026-10-27)
+
+A discoverability audit listed what a reader could use but had no visible way to reach. These are the
+reader-side fixes; the API, robots and tooling ones are separate changes.
+
+- **The runway note links to the control.** Before a band is chosen, the area rules' runway note said
+  "pick your cash runway above", but the calibration section follows the area rules on a wide screen.
+  It now links `#company-calibration`, which `AnchorFeedback` opens at every width.
+- **The calendar feed sits beside RSS.** `/calendar.ics` was offered only under the Meeting pack and
+  Monday agenda formats on `/share`, two of fifteen. It is now also in `/share`'s feed list (Apple or
+  Outlook, and Google) and in the footer as Calendar, a `webcal:` link.
+- **The share rail has a door.** It opened only from ⇧S and the palette after the report shell's nav
+  block and the header's Export entry went. The header's actions group carries a Share cell on every
+  route (the first cell below `md`, where Search hides), and the phone's More sheet a Share this page
+  row beside a labelled theme toggle, the brief's only theme control below `sm`.
+- **The toolkits are named outside the fold.** The seven one-decision worksheets were listed only
+  inside the closed "Browse by role, company stage, situation or toolkit" disclosure on `/resources`;
+  More tools now names each one above it.
+- **Shortcuts say where they work.** C presses Copy Brief and F narrows the brief's `Shell` main, so
+  the help list prefixes both "On the brief", and the palette offers those two actions only when the
+  page has the control. They used to close the palette and do nothing. ⇧S and the palette entry read
+  "Share this page", because the rail serves every route.
+- **Not changed: quarter pages.** They are reached from each year page's "Quarter by quarter", two
+  clicks from `/history`. Fifty-six quarter links on `/history` would cost more than the click saves.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
@@ -4084,28 +4109,14 @@ The regime assessment includes:
 
 
 
-### 3.4.1 Sector sensitivity overlay (decision translation layer)
-- Sector overlays are **secondary interpretations only** and do not mutate base regime classification.
-- Canonical sector taxonomy:
-  - `b2b-saas` → higher upside sensitivity (`Expansion+`, `Mixed+` when warranted)
-  - `consumer` → neutral calibration (`Expansion (neutral)`, `Mixed (neutral)`, etc.)
-  - `infrastructure` → higher downside sensitivity (`Mixed-`, `Defensive-` when warranted)
-  - `fintech` → mixed calibration with tighter downside checks and selective upside (`Mixed (neutral)|Mixed-` in boundary weeks)
-  - `healthcare` → conservative calibration favoring hold/tighten near thresholds (`Defensive (neutral)|Defensive-` as warranted)
-  - `ai-platforms` → aggressive upside calibration (`Expansion+`, `Mixed+` with stronger loosen bias when warranted)
-- Overlay output contract (`deriveSectorAdjustedPosture`):
-  - `basePostureLabel`
-  - `adjustedPostureLabel` (`+`, `-`, or `(neutral)` variant formatting)
-  - `postureVariant` (`plus|neutral|minus`)
-  - `adjustmentStrength` (`none|light|moderate|strong`)
-  - `adjustmentDelta` (signed scalar, damped near regime boundaries)
-  - `actionBias` (`tighten|hold|loosen`) and `reversalCondition` for bounded decision translation
-- Calculation semantics: normalize tightness and risk-appetite distance from thresholds, apply sector multipliers + offset, then damp the resulting delta by nearest-threshold distance so overlays do not oscillate during boundary weeks.
-- Boundary rule: overlays are damped as scores approach regime thresholds so route-to-route language remains stable during transition weeks.
-- Reach (2026-10-27): the overlay's one output is the sector row of the brief model's `history.macroOverlay`, which no surface draws, and since `/` and the share preview stopped reading `?sector=` only tests choose a sector other than `b2b-saas`.
+### 3.4.1 Sector sensitivity overlay (deleted 2026-10-27)
+- What it was: `deriveSectorAdjustedPosture` tilted the base posture for one of six sectors (sector multipliers on the tightness and risk-appetite distances from their lines, plus an offset, damped near the lines) and never changed the regime. Its one output was the last row of the brief model's `history.macroOverlay`, after four macro rows (VC funding, startup layoffs, VIX, SaaS multiples).
+- Why it went: no surface has drawn `history.macroOverlay` since its panel was deleted on 2026-08-06, and once `/` and the share preview stopped reading `?sector=` (2026-10-27) nothing chose a sector other than `b2b-saas` either. The overlay, the field, the `overlaySector` option on `buildHomeBriefModel` and `loadWeeklyBriefSnapshot`, and `resolveSectorKey` went together.
+- What stays: `lib/report/sectorSensitivity.ts` keeps the six sector keys and their labels, which `/api/image/brief` prints as its `?sector=` context label (§3.4.2).
+- Sector overlays for readers are still open in `ROADMAP.md` Milestone 13. A new one starts from the surface that draws it.
 
 ### 3.4.2 Trust and fallback behavior for missing sector/company context
-- Sector query: `/` reads no `?sector=` (2026-10-27). `/api/image/brief` accepts one of the six keys for its context label and ignores anything else; the brief model's overlay defaults to `b2b-saas`.
+- Sector query: `/` reads no `?sector=` (2026-10-27). `/api/image/brief` accepts one of the six keys for its context label and ignores anything else.
 - Trust posture: these fallbacks are translation-layer only and never mutate base regime classification, canonical confidence label, or trigger thresholds.
 
 ### 3.5 Policy-spec pilot layer (new)

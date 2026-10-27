@@ -118,14 +118,24 @@ const CalendarLink = ({ title, details }: { title: string; details: string }) =>
 
 /* The subscribed feed (`/calendar.ics`): every Monday carries its own week's
    guidance. webcal:// opens Apple Calendar and Outlook; Google takes the same
-   address through its add-by-URL page. */
-const CalendarSubscribeLinks = ({ feedUrl }: { feedUrl: string }) => {
+   address through its add-by-URL page. Offered beside the meeting formats and,
+   since 2026-10-27, beside RSS on the page's feed list too: shown only under
+   two of fifteen formats, the feed was reachable by a reader who had already
+   picked a meeting pack and by no one else. */
+export const CalendarSubscribeLinks = ({
+  feedUrl,
+  lead = "Subscribe to each week's guidance",
+}: {
+  feedUrl: string;
+  /** The words before the two links. */
+  lead?: string;
+}) => {
   const webcal = feedUrl.replace(/^https?:/, "webcal:");
   const linkClass =
     "weather-hit text-fluid-xs text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200";
   return (
     <span className="text-fluid-xs text-slate-400">
-      Subscribe to each week&apos;s guidance:{" "}
+      {lead}:{" "}
       <a href={webcal} className={linkClass}>
         Apple or Outlook
       </a>{" "}
