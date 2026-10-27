@@ -88,7 +88,7 @@ The `whether` CLI reads these; each is public, so a script can call them without
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
 | `/api/cli/status?asOf=<YYYY-MM>&view=expanded` | GET | What `whether status` prints. `view=expanded` adds what would change the guidance and up to three signal moves. |
-| `/api/cli/history?asOf=<YYYY-MM>` | GET | The conditions at the last 12 month-ends, newest first. Its `weeks` parameter counts month-end entries, not weeks. |
+| `/api/cli/history?asOf=<YYYY-MM>&weeks=<n>` | GET | One row per month-end, newest first, going back `weeks` weeks (1 to 52, default 52: twelve month-ends). A row's margin (`confidenceLabel`) and `trend` are what `asOf` that month reports; `trend` is the move from the month-end before. |
 | `/api/cli/scenario?tightness=<n>&risk-appetite=<n>` | GET | The conditions the given scores would read as, against this week's. |
 | `/api/cli/changes`, `/call`, `/regime`, `/diagnostics` | GET | What the commands of the same name print. Each takes `asOf`. |
 
