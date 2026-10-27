@@ -117,8 +117,8 @@ export function WhyConditionsSection({
           <p className="text-fluid-xs font-semibold text-caveat-fg">What the headline reading leaves out</p>
           <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
             {warning
-              ? `${warning}${countedRegimeLabel !== regimeLabel ? ` Counted, conditions would read ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
-              : `Counted, the reading would be ${notCounted
+              ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
+              : `If we counted them, we'd have ${notCounted
                   .map((entry) => `${entry.metric === "tightness" ? "funding pressure" : "risk appetite"} at ${entry.score}`)
                   .join(" and ")}.`}{" "}
             {NOT_COUNTED_REASON}

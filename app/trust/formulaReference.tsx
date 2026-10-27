@@ -119,7 +119,7 @@ function RegimeQuadrant() {
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot h-auto w-full max-w-[20rem] text-slate-300" aria-labelledby="regime-quadrant-title">
       <title id="regime-quadrant-title">
-        {`Four conditions: funding pressure above ${t} and risk appetite below ${r} pick the weather.`}
+        {`Four conditions, picked by whether funding pressure is above ${t} and whether risk appetite is below ${r}.`}
       </title>
       {cells.map((cell) => (
         <g key={cell.key}>
@@ -273,7 +273,7 @@ export function FormulaReference({
                 at every month-end since 2012, so the history on the Record and the calibration study
                 test the same score that sets the guidance.
                 {recordBasis.shownBecause.length > 0
-                  ? ` ${upperFirst(recordBasis.shownBecause.join("; "))}. Each is scored and shown, and moves nothing.`
+                  ? ` ${upperFirst(recordBasis.shownBecause.join("; "))}. We score and show each of them, but none of them moves the scores.`
                   : null}
               </span>
               {scoringBasis && scoringBasis.notCounted.length > 0 ? (

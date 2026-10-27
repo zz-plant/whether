@@ -193,7 +193,7 @@ const buildHeadline = (counts: DecisionRecordView["counts"], total: number): str
   const needsAttention = counts.watch + counts.reconsider;
   if (needsAttention === 0) {
     return total === 1
-      ? "The one decision on this browser still rests on conditions that hold."
+      ? "The decision you recorded in this browser still rests on conditions that hold."
       : `All ${total} decisions on this browser still rest on conditions that hold.`;
   }
 

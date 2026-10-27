@@ -63,10 +63,10 @@ const sectorAdjustment: Record<CompanySector, Partial<Record<DecisionArea, strin
   },
   "b2b-saas": {
     hiring: "Bias hiring toward quota-carrying and reliability roles with payback visibility.",
-    "capital-raising": "Anchor process on pipeline durability and churn resilience proof.",
+    "capital-raising": "Build the raise around proof that your pipeline holds up and churn stays low.",
   },
   infrastructure: {
-    "burn-discipline": "Gate capacity and compute commitments by contracted usage ramps.",
+    "burn-discipline": "Only commit to more capacity and compute once customers have signed for the usage.",
     "capital-raising": "Prioritize financing durability for longer infrastructure sales cycles.",
   },
 };

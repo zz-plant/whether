@@ -68,7 +68,7 @@ export default function CalibrationPage() {
 
       <SecondaryPageSection
         title="How it was measured"
-        description="The readings counted, the outcome scored and the distance bands."
+        description="Which readings we counted, how we scored the outcome, and how the distance bands work."
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>

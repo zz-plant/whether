@@ -67,7 +67,7 @@ describe("the changed-signals table", () => {
     const curveRow = html.slice(html.indexOf('data-signal="curveSlope"'));
     assert.ok(tightnessRow.includes(compositeSignalScales.tightness.directionLabel));
     assert.ok(!curveRow.includes(compositeSignalScales.tightness.directionLabel));
-    assert.match(curveRow, /Judged through the lines of both scores\./, "an input that feeds the scores says so");
+    assert.match(curveRow, /Feeds into both scores, so it(?:&#x27;|')s judged against their lines\./, "an input that feeds the scores says so");
   });
 
   it("explains its terms in the rows rather than sending a stranger to a glossary", () => {

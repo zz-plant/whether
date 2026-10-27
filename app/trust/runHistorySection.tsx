@@ -51,7 +51,7 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
     <ReportSection
       id="run-history"
       title={`Scheduled runs, last ${windowDays} days`}
-      description="One row per job that keeps this brief current, from the record each run leaves behind."
+      description="One row for each job that keeps this brief up to date, taken from the log each run writes."
     >
       {runHistory.status === "unavailable" ? (
         <p className="text-sm text-slate-300">

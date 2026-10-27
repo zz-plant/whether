@@ -784,7 +784,7 @@ export const buildScopedVariantDecisionAdjustment = ({
       watchAdjustments: [
         withReadingsNow(`Cash trigger: tighten spend if ${tightnessPauseLine.clause} or ${riskPauseLine.clause}.`, "or", [tightnessPauseLine, riskPauseLine]),
       ],
-      thresholdEmphasis: "Cash first: commitments you can reverse, over growth that looks good.",
+      thresholdEmphasis: "Cash first: pick commitments you can reverse over growth that just looks good.",
       reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause}, ${riskResumeLine.clause}, and cash payback holds for two weekly readings in a row.`, "and", [tightnessResumeLine, riskResumeLine]),
     };
   };

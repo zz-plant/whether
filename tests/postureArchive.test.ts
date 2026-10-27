@@ -180,7 +180,7 @@ describe("/history/[period] says it is reconstructed", () => {
       assert.ok(h1 !== -1 && notice > h1, `${period}: the notice sits under the title`);
       assert.ok(notice < html.indexOf("<h2") || html.indexOf("<h2") === -1, `${period}: the notice comes before any section`);
       const text = html.replace(/<[^>]+>/g, " ").replace(/&#x27;/g, "'").replace(/\s+/g, " ");
-      assert.match(text, /Reconstructed: this is what today's published formula reads for/, period);
+      assert.match(text, /This is a reconstruction: what today's published formula says about/, period);
       assert.ok(text.includes(`began publishing weekly briefs in the week of ${firstWeek}`), period);
       assert.doesNotMatch(text, /Standing guidance:/, `${period}: still reads like guidance written then`);
       assert.match(text, /Maintained by /, period);

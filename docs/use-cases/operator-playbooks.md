@@ -106,8 +106,8 @@ month, and what comes in.
    the raise, the burn adjustment as dollars a month and the runway it buys, and, below the safe
    band, how much more cash or what net burn closes the gap.
 3. Agree your own runway lines while nothing is urgent: under **Your own runway lines**, the months of
-   runway at which you start raising and pause hiring. Each gets the month it arrives at today's
-   net burn.
+   runway at which you start raising and pause hiring. Each one shows the month you'd hit it at
+   today's net burn.
 4. Before a hire or a contract, test it against the same figures. **Test a decision against your
    runway** (under the area table in "What it changes" on `/`, or "What are you deciding?" on a
    first visit) takes the decision's monthly cost and gives the runway after it, with the note this

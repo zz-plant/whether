@@ -187,7 +187,7 @@ describe("/history dates what it is showing", () => {
 
     assert.doesNotMatch(text, /Months in each quadrant/);
     assert.match(text, /Months under each set of conditions/);
-    assert.match(text, /not the quadrant its dot sits in: the two differ in 2 of these 4 months/);
+    assert.match(text, /not the quadrant each dot sits in: the two differ in 2 of these 4 months/);
   });
 
   it("keeps the phase map's panel and caveat on the same fact", () => {

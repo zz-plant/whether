@@ -53,7 +53,7 @@ export const resolvePaybackBar = (regime: RegimeKey, band: RunwayBand | null): P
 
 /** The rule that sets the bar, in one sentence, for the top of the section and the copied lines. */
 export const describePaybackBar = (bar: PaybackBar, regime: RegimeKey): string => {
-  if (bar.kind === "cash-gate") return "Under six months of cash, the rules hold every new commitment, whatever it pays back.";
+  if (bar.kind === "cash-gate") return "With under six months of cash, the rules pause every new commitment, however fast it pays back.";
   if (bar.kind === "none") {
     return `In ${getRegimePublicLabel(regime)} conditions, with a year or more of runway, the rules set no payback bar on roadmap work: your runway is the limit.`;
   }
@@ -91,10 +91,10 @@ export const describeWhatMovesPaybackBar = ({
 }): string => {
   const today = `(${scores.tightness} and ${scores.riskAppetite} today)`;
   if (bar.kind === "cash-gate") {
-    return "Your cash sets this, not the market: no rate move or headline lifts it. A round, revenue or a lower burn does.";
+    return "Your cash sets this, not the market, so no rate move or headline changes it. A round, more revenue or a lower burn will.";
   }
   if (bar.kind === "months" && bar.basis === "tight-runway") {
-    return "Your runway sets this bar, not the market: no rate move or headline lifts it. Runway past 12 months does, by a round, revenue or a lower burn.";
+    return "Your runway sets this bar, not the market, so no rate move or headline changes it. Getting past 12 months of runway will, whether that's from a round, more revenue or a lower burn.";
   }
   const sized = paybacks.filter((project): project is SizedProjectPayback => project.status === "sized" && project.breakEvenMonth !== null);
   if (bar.kind === "months") {

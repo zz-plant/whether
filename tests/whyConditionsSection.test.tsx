@@ -47,7 +47,7 @@ describe("why conditions", () => {
     assert.match(html, /What the headline reading leaves out/);
     assert.match(html, /would put risk appetite at 44/);
     // 90 tightness with risk appetite at 44 is Freezing, not the Cloudy headline.
-    assert.match(html, /conditions would read Freezing, not Cloudy/);
+    assert.match(html, /conditions would be Freezing, not Cloudy/);
     assert.match(html, /be scored against past month-ends/);
   });
 

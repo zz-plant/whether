@@ -69,7 +69,7 @@ describe("the conditions map says which corner is which", () => {
 
 describe("operating latitude against the four conditions", () => {
   it("states the value the two change lines fix, from the lines", () => {
-    assert.match(describeLatitudeAgainstConditions({ tightnessRegime: 70, riskAppetiteRegime: 50 }), /Sunny's quadrant is always 44 or higher and one in Freezing's 44 or lower/);
+    assert.match(describeLatitudeAgainstConditions({ tightnessRegime: 70, riskAppetiteRegime: 50 }), /A reading in Sunny's quadrant is always 44 or higher, and one in Freezing's quadrant is 44 or lower/);
     assert.match(describeLatitudeAgainstConditions({ tightnessRegime: 60, riskAppetiteRegime: 40 }), /always 40 or higher/);
   });
 });

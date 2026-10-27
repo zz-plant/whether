@@ -525,8 +525,8 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               </ul>
               <p className="mt-2 text-fluid-nano text-slate-500">
                 {model.offQuadrantMonths === 0
-                  ? "The conditions each month published. Here they also match the quadrant every dot sits in."
-                  : `The conditions each month published, not the quadrant its dot sits in: the two differ in ${model.offQuadrantMonths.toLocaleString("en-US")} of these ${model.points.length.toLocaleString("en-US")} months.`}
+                  ? "These are the conditions we published each month. Here they also match the quadrant every dot sits in."
+                  : `These are the conditions we published each month, not the quadrant each dot sits in: the two differ in ${model.offQuadrantMonths.toLocaleString("en-US")} of these ${model.points.length.toLocaleString("en-US")} months.`}
               </p>
             </div>
           </div>

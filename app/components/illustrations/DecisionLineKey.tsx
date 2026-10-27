@@ -19,14 +19,14 @@ export function DecisionLineKey({ className = "" }: { className?: string }) {
             <LineStateIcon state="crossed" />
             <span>Pause line</span>
           </dt>
-          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Past it, hold back the areas it governs.</dd>
+          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">If a score crosses it, hold off on the areas it covers.</dd>
         </div>
         <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
           <dt className="flex items-center gap-1.5 font-semibold text-line-clear-fg">
             <LineStateIcon state="clear" />
             <span>Resume line</span>
           </dt>
-          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Back past it, start those areas again.</dd>
+          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Once a score is back past it, restart those areas.</dd>
         </div>
         <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
           <dt className="flex items-center gap-1.5 font-semibold text-slate-200">
@@ -35,7 +35,7 @@ export function DecisionLineKey({ className = "" }: { className?: string }) {
             </span>
             <span>{DECISION_CONTRACT_LABELS.watch.changeLine}</span>
           </dt>
-          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Across it, the week&rsquo;s conditions change.</dd>
+          <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">If a score crosses it, the week&rsquo;s conditions change.</dd>
         </div>
       </dl>
       <p className="rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-2.5 text-fluid-nano text-slate-300">

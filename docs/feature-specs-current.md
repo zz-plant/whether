@@ -3529,7 +3529,7 @@ popover or a forecast.
   is still running. The record has seven spells, so it counts them and says it is not a forecast.
 - **Whether the market can move the payback bar** (`describeWhatMovesPaybackBar`,
   `lib/report/projectPayback.ts`), under the bar's sentence in the runway planner. Under a year of
-  runway the bar is cash's, and the sentence says no rate move or headline lifts it. Otherwise it is
+  runway the bar is cash's, and the sentence says no rate move or headline changes it. Otherwise it is
   the roadmap rule's, and the sentence names the score moves still needed for Sunny in the change
   lines' numbers, with today's scores, and how many of the reader's projects that would stop slowing.
   In Sunny it says what would bring the 12-month bar back and how many projects would then miss it.

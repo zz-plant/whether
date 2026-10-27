@@ -74,7 +74,7 @@ export default async function DecisionsPage() {
       </SecondaryPageSection>
       <SecondaryPageSection
         title="Take it with you"
-        description="The record is yours and leaves in a shape something else can read."
+        description="It's your record. Download it in a format other tools can read."
       >
         <DecisionRecordDownloads />
         <p className="mt-4 text-sm leading-7 text-slate-300 sm:text-base">

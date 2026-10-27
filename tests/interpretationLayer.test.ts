@@ -182,7 +182,7 @@ describe("interpretation layer", () => {
   it("names the forecast's likeliest outcome by its weather word", () => {
     const layer = buildInterpretationLayer({ view: "forecast", homeBriefModel, assessment, forecast, decisionRules });
     // Scarcity carries 38 of the fixture's weight; the reader knows it as Freezing.
-    assert.match(layer.bullets[0], /Action: Operate for Freezing conditions while they hold\. They carry 38%/);
+    assert.match(layer.bullets[0], /Action: Operate for Freezing conditions while they hold\. They get 38%/);
     assert.doesNotMatch(layer.bullets.join(" "), /\b(Scarcity|Expansion|Defensive|Mixed)\b|[Mm]omentum|\bflip\b/);
   });
 
@@ -200,7 +200,7 @@ describe("interpretation layer", () => {
       decisionRules,
     });
 
-    assert.match(layer.bullets[0], /Action: Operate for Cloudy conditions while they hold\. They carry 0% of the next-90-day weight\./);
+    assert.match(layer.bullets[0], /Action: Operate for Cloudy conditions while they hold\. They get 0% of the weight over the next 90 days\./);
   });
 
   it("swaps interpretation content between sector and financial views", () => {
