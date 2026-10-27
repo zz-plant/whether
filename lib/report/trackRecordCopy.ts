@@ -92,5 +92,5 @@ export const describeLatitudeAgainstConditions = (
   );
   /* Said of the quadrants, not the months: conditions change only after a second
      reading, so a month can carry its old word for one reading past a line. */
-  return `It is not a fifth condition. Sunny readings are always ${boundary} or higher and Freezing readings ${boundary} or lower. Cloudy and Stormy can land on either side, since each is hard on only one score.`;
+  return `It is not a fifth condition. A reading in Sunny's quadrant is always ${boundary} or higher, and one in Freezing's quadrant is ${boundary} or lower. Readings in Cloudy's or Stormy's quadrant can land on either side, since each is hard on only one score.`;
 };
