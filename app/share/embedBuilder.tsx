@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useState } from "react";
 import { locationHashSource, useBrowserSource, useHydrated } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
@@ -50,6 +51,13 @@ export function EmbedBuilder() {
     ticker ? ` data-whether-ticker="${ticker}"` : ""
   }${stage ? ` data-whether-stage="${stage}"` : ""}></div>
 <script async src="${siteUrl}/embed.js"></script>`;
+
+  /* The same widget as a whole page, for an editor that embeds by URL (a
+     Notion /embed block, Coda, Confluence's iframe macro). */
+  const frameParams = new URLSearchParams({ format: "page", ...(embedMode === "call-strip" ? { mode: "call-strip" } : {}), ...(ticker ? { ticker } : {}), ...(stage ? { stage } : {}) });
+  const frameUrl = `${siteUrl}/api/embed?${frameParams.toString()}`;
+  /* The conditions as a status badge, for a README, a data room, or an investor page. */
+  const badgeMarkdown = `[![Startup conditions this week, from Whether](${siteUrl}/api/badge)](${siteUrl}/)`;
 
   const handleCopy = useCallback(() => {
     void copyToClipboard(embedCode, "embed");
@@ -133,6 +141,44 @@ export function EmbedBuilder() {
             week with no API key, and carries a small &ldquo;Macro brief by Whether&rdquo; footer
             linking back here.
           </p>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="min-w-0 space-y-2">
+          <p className="text-fluid-xs font-semibold text-slate-200">Notion, Coda, or a wiki</p>
+          <p className="text-fluid-micro leading-relaxed text-slate-400">
+            Where scripts are not allowed, paste this address into an embed block. It shows the same widget, with your
+            choices above.
+          </p>
+          <pre className="overflow-x-auto rounded-md border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs text-slate-200">
+            <code>{frameUrl}</code>
+          </pre>
+          <ClipboardActionRow
+            label="Copy embed address"
+            state={getClipboardUiState("embed-frame", { status, error, activeTarget, copiedTarget })}
+            onClick={() => void copyToClipboard(frameUrl, "embed-frame")}
+            buttonLabels={{ error: "Copy failed" }}
+          />
+        </div>
+        <div className="min-w-0 space-y-2">
+          <p className="text-fluid-xs font-semibold text-slate-200">Status badge</p>
+          <p className="text-fluid-micro leading-relaxed text-slate-400">
+            This week&apos;s conditions in one word, for a README, a data room, or an investor page. It changes when
+            the conditions do.
+          </p>
+          {/* The badge as the reader will paste it: the route's own SVG, so
+              `unoptimized` (the worker's optimizer reads static assets only). */}
+          <Image src="/api/badge" alt="Startup conditions this week, from Whether" width={180} height={20} unoptimized className="h-5 w-auto" />
+          <pre className="overflow-x-auto rounded-md border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs text-slate-200">
+            <code>{badgeMarkdown}</code>
+          </pre>
+          <ClipboardActionRow
+            label="Copy badge Markdown"
+            state={getClipboardUiState("embed-badge", { status, error, activeTarget, copiedTarget })}
+            onClick={() => void copyToClipboard(badgeMarkdown, "embed-badge")}
+            buttonLabels={{ error: "Copy failed" }}
+          />
         </div>
       </div>
 

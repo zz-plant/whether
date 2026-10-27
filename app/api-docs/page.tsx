@@ -55,6 +55,20 @@ const mcpClientConfig = `{
   }
 }`;
 
+/*
+ * One click from this page to a connected client. Each editor publishes an
+ * install link that opens it with the server filled in and asks the reader to
+ * confirm; Claude Code takes one command. The config is the same address the
+ * JSON above names, so a reader who prefers to paste loses nothing.
+ */
+const mcpUrl = `${siteUrl}/api/mcp`;
+const cursorInstallHref = `cursor://anysphere.cursor-deeplink/mcp/install?${new URLSearchParams({
+  name: "whether",
+  config: btoa(JSON.stringify({ url: mcpUrl })),
+}).toString()}`;
+const vscodeInstallHref = `vscode:mcp/install?${encodeURIComponent(JSON.stringify({ name: "whether", type: "http", url: mcpUrl }))}`;
+const claudeCodeCommand = `claude mcp add --transport http whether ${mcpUrl}`;
+
 const embedSnippet = `<div data-whether-embed="brief"></div>
 <script async src="${siteUrl}/embed.js"></script>`;
 
@@ -79,6 +93,23 @@ export default function ApiDocsPage() {
             <span className="font-semibold text-slate-100">{siteUrl}/api/mcp</span> is a production-grade
             streamable-HTTP Model Context Protocol server. Connect Claude Desktop, Cursor, Copilot, or an autonomous agent, and the model can read this week's guidance, each score's distance from its line, and a scenario's result while it reasons.
           </p>
+          <div className="flex flex-wrap items-center gap-2" aria-label="Install the MCP server">
+            <a href={cursorInstallHref} className="weather-button inline-flex items-center text-fluid-xs">
+              Add to Cursor
+            </a>
+            <a href={vscodeInstallHref} className="weather-button inline-flex items-center text-fluid-xs">
+              Add to VS Code
+            </a>
+          </div>
+          <div className="space-y-1.5">
+            <p className="text-fluid-micro text-slate-400">Claude Code:</p>
+            <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs leading-relaxed text-slate-300">
+              {claudeCodeCommand}
+            </pre>
+            <p className="text-fluid-micro text-slate-400">
+              Claude or ChatGPT on the web: add a custom connector with the address above.
+            </p>
+          </div>
           <div className="space-y-1.5">
             <div className="flex items-center justify-between text-fluid-micro text-slate-400">
               <span>Claude Code, one line from any directory:</span>

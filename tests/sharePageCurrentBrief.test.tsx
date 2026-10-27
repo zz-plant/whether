@@ -168,8 +168,13 @@ describe("/share current weekly artifact", () => {
      draw one slide, so they are one card with one picture; the brief card has its own. */
   it("shows each picture once, sized before it loads", async () => {
     const html = renderToStaticMarkup(await SharePage());
-    const images = [...html.matchAll(/<img [^>]*>/g)].map(([tag]) => tag);
+    const tags = [...html.matchAll(/<img [^>]*>/g)].map(([tag]) => tag);
+    /* The embed section's status badge is its own picture, a line tall; the cards are the rest. */
+    const badges = tags.filter((tag) => tag.includes('src="/api/badge"'));
+    const images = tags.filter((tag) => !badges.includes(tag));
 
+    assert.equal(badges.length, 1, "the badge is shown once");
+    assert.match(badges[0] ?? "", /height="20"/);
     assert.equal(images.length, 2, "one picture per distinct image");
     for (const tag of images) {
       assert.match(tag, /src="\/api\/image\/(slide|brief)\?stage=series-a"/);
