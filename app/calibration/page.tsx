@@ -82,8 +82,8 @@ export default function CalibrationPage() {
             ) : null}
           </li>
           <li>
-            <span className="text-slate-100">Outcome.</span> Whether conditions were the same one month
-            later. No other outcome is scored, and none is weighted.
+            <span className="text-slate-100">Outcome.</span> Did conditions stay the same one month
+            later? No other outcome is scored, and none is weighted.
           </li>
           <li>
             <span className="text-slate-100">Bands.</span> Distance to the nearest line where

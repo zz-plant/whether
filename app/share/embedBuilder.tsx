@@ -28,7 +28,7 @@ const TICKER_PRESETS = [
 
 const EMBED_FORMAT_OPTIONS = [
   { key: "brief", label: "Full brief" },
-  { key: "call-strip", label: "Board call strip" },
+  { key: "call-strip", label: "One-line strip" },
 ] as const;
 
 export function EmbedBuilder() {

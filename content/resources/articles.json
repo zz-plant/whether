@@ -27,9 +27,9 @@
       {
         "heading": "Which roles to approve or pause",
         "paragraphs": [
-          "SAFE roles protect current operations or revenue: production reliability, renewals support and finance controls for cash visibility. Keep them open with constrained approval.",
-          "RISKY roles support initiatives that have not shown repeatable demand. Approve one hire, set a 30-day evidence target and review the result before approving another.",
-          "DANGEROUS roles lack a clear owner, a validated market or measurable milestones. Pause them until the business case and resume conditions are explicit."
+          "Safe roles protect current operations or revenue: production reliability, renewals support and finance controls for cash visibility. Keep them open with constrained approval.",
+          "Risky roles support initiatives that have not shown repeatable demand. Approve one hire, set a 30-day evidence target and review the result before approving another.",
+          "Dangerous roles lack a clear owner, a validated market or measurable milestones. Pause them until the business case and resume conditions are explicit."
         ],
         "anchor": "safe-risky-dangerous-framework-for-hiring-decisions"
       },
@@ -38,14 +38,14 @@
         "paragraphs": [
           "Set resume conditions using burn multiple, pipeline conversion and cash remaining after committed spend. Review demand and delivery weekly; use monthly readings to decide whether to reopen hiring.",
           "An example requires three conditions: stable win rates and churn for 30 days, shorter delivery cycles with fewer emergency escalations, and financing access that no longer requires immediate cuts.",
-          "When all three hold, reopen one or two SAFE hiring groups first. Keep RISKY hires tied to milestones and DANGEROUS roles paused until two monthly confirmations pass."
+          "When all three hold, reopen safe roles first, a few at a time. Keep risky hires tied to milestones and dangerous roles paused until two monthly confirmations pass."
         ],
         "anchor": "reversal-trigger-logic-how-to-unfreeze-without-overcorrecting"
       },
       {
         "heading": "Build the role list",
         "paragraphs": [
-          "List each open role and planned backfill with its purpose, cost if unfilled, evidence window and time to reverse. Classify it as SAFE, RISKY or DANGEROUS.",
+          "List each open role and planned backfill with its purpose, cost if unfilled, evidence window and time to reverse. Classify it as safe, risky or dangerous.",
           "Review the list with finance and hiring managers. Record one measurable indicator per approval, the pause and resume lines, and an owner and review date for each exception. Include the list in the weekly memo."
         ],
         "anchor": "what-operators-should-do-first"
@@ -97,9 +97,9 @@
       {
         "heading": "Runway bands",
         "paragraphs": [
-          "SAFE band: 20–24 months when financing is uncertain and a large share of costs is hard to reverse.",
-          "RISKY band: 15–19 months with mixed demand. Review burn multiple monthly, set stop conditions for each investment and hold irreversible expansion.",
-          "DANGEROUS band: below 15 months with limited financing options or high fixed costs. Inventory commitments, sequence cash-preservation actions and freeze non-core spending.",
+          "Safe band: 20–24 months when financing is uncertain and a large share of costs is hard to reverse.",
+          "Risky band: 15–19 months with mixed demand. Review burn multiple monthly, set stop conditions for each investment and hold irreversible expansion.",
+          "Dangerous band: below 15 months with limited financing options or high fixed costs. Inventory commitments, sequence cash-preservation actions and freeze non-core spending.",
           "These are planning defaults. Adjust them for revenue concentration, collection risk and the time your company needs to cut costs."
         ],
         "anchor": "safe-risky-dangerous-runway-bands"
