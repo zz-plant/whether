@@ -180,9 +180,15 @@ export default async function HistoryPage({
             <p className="text-sm text-slate-300">
               Since the last month-end, the week of {publishedBriefWeekLabel(weekAfterRecord)} was published as{" "}
               <span className="font-semibold text-white">{publishedBriefDisplay(weekAfterRecord).conditions}</span>.{" "}
-              <ActionLink href={buildPublishedBriefPath(weekAfterRecord.slug)} variant="inline">
+              {/* Inline with vertical padding, not the 44px inline-flex box: on a
+                  phone the box wrapped onto its own line and opened the paragraph
+                  to twice its leading. */}
+              <Link
+                href={buildPublishedBriefPath(weekAfterRecord.slug)}
+                className="weather-hit py-3 font-semibold text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
+              >
                 Read that week
-              </ActionLink>
+              </Link>
             </p>
           ) : null}
           <MonthStrip entries={fullSeries} />
@@ -191,12 +197,14 @@ export default async function HistoryPage({
               screens from the strip that draws the same months. */}
           <div className="space-y-2">
             <h3 className="type-eyebrow">Each closed year</h3>
-            <ul className="flex flex-wrap gap-2">
+            {/* Two even columns on a phone: fourteen chips of three widths
+                wrapped into a ragged stack. From `sm` they flow. */}
+            <ul className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
               {postureArchiveYears.map((year) => {
                 const yearRegime = regimeKeyFromLabel(year.operatorLabel);
                 return (
                   <li key={year.slug}>
-                    <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill">
+                    <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill" className="max-sm:w-full">
                       {year.title}
                       <span className="ml-2 inline-flex items-center gap-1 text-slate-400">
                         {yearRegime ? <ConditionIcon regime={yearRegime} /> : null}
@@ -208,13 +216,12 @@ export default async function HistoryPage({
               })}
             </ul>
           </div>
-          <p className="text-sm text-slate-300">
-            For founders, finance teams and boards comparing funding environments: use the monthly record
-            to examine how the model reads past conditions. Historical readings are not evidence that a
-            forecast was published at the time, or that a company would have achieved a particular result.
-            Use the dated published briefs below when citing what Whether actually recorded.
+          <p className="max-w-prose text-sm text-slate-300">
+            The monthly record shows how the model reads past conditions. It is not evidence that a
+            forecast was published at the time, or of what a company would have done. To cite what
+            Whether actually recorded, use the dated published briefs below.
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
             <ActionLink href="/history/compare" variant="inline">Compare funding conditions across periods</ActionLink>
             <ActionLink href="/answers/how-to-brief-executives-on-market-conditions" variant="inline">Prepare a board decision note</ActionLink>
             <ActionLink href="/" variant="inline">Read the current weekly brief</ActionLink>

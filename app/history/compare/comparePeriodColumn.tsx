@@ -28,7 +28,7 @@ const getCurveSpread = (yields: TreasuryYields | undefined) =>
     : null;
 
 /** What the corporate borrowing premium is, said once on the page: under the difference tile. */
-export const BORROWING_PREMIUM_MEANING = "Extra interest mid-grade companies pay over the government.";
+export const BORROWING_PREMIUM_MEANING = "The extra interest mid-grade companies pay to borrow, over the government's rate.";
 
 export const findMacroValue = (series: MacroSeriesReading[] | undefined, id: MacroSeriesId) => {
   const reading = series?.find((entry) => entry.id === id);
@@ -38,13 +38,15 @@ export const findMacroValue = (series: MacroSeriesReading[] | undefined, id: Mac
 const formatPercent = (value: number | null, digits = 2, missing = "N/A") =>
   value === null ? missing : `${value.toFixed(digits)}%`;
 
-const SignalRow = ({ label, value, meaning }: { label: string; value: string; meaning?: string }) => (
+/* A value that is not there is set in the muted ink, not the bold the readings
+   get: "Not on record for this month" in bold read as the loudest cell. */
+const SignalRow = ({ label, value, meaning, missing = false }: { label: string; value: string; meaning?: string; missing?: boolean }) => (
   <tr className="border-b border-slate-800/50 last:border-0">
     <td className="py-2.5 font-medium text-slate-400">
       {label}
       {meaning ? <span className="mt-0.5 block text-fluid-xs font-normal text-slate-500">{meaning}</span> : null}
     </td>
-    <td className="py-2.5 text-right font-semibold tabular-nums text-slate-200">{value}</td>
+    <td className={`py-2.5 text-right tabular-nums ${missing ? "text-slate-500" : "font-semibold text-slate-200"}`}>{value}</td>
   </tr>
 );
 
@@ -77,6 +79,7 @@ export function ComparePeriodColumn({
   /* The macro series go back about three months; a replayed month further back
      has no value of its own, and says so rather than borrowing this week's. */
   const macroMissing = report.historicalSelection ? describeMacroNotOnRecord() : "N/A";
+  const isMissing = (text: string) => text === "N/A" || text === macroMissing;
   /*
    * Each area against its own pause line, in the site's one area order, from the
    * rows and words the homepage and /resolve print. These rows were "Hiring
@@ -165,24 +168,16 @@ export function ComparePeriodColumn({
           <tbody>
             <ScoreRow signalKey="tightness" score={scores.tightness} />
             <ScoreRow signalKey="riskAppetite" score={scores.riskAppetite} />
-            <SignalRow
-              label={regimeSignalLabel.baseRate}
-              value={scores.baseRate !== undefined ? formatPercent(scores.baseRate) : "N/A"}
-            />
-            <SignalRow label={`${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`} value={formatPercent(spread)} />
-            {/* The value alone: the difference tile above defines the term once for both columns. */}
-            <SignalRow
-              label="Corporate borrowing premium"
-              value={formatPercent(findMacroValue(report.macroSeries, "BBB_CREDIT_SPREAD"), 2, macroMissing)}
-            />
-            <SignalRow
-              label="Inflation, year over year"
-              value={formatPercent(findMacroValue(report.macroSeries, "CPI_YOY"), 2, macroMissing)}
-            />
-            <SignalRow
-              label="Unemployment rate"
-              value={formatPercent(findMacroValue(report.macroSeries, "UNEMPLOYMENT_RATE"), 1, macroMissing)}
-            />
+            {[
+              { label: regimeSignalLabel.baseRate, value: scores.baseRate !== undefined ? formatPercent(scores.baseRate) : "N/A" },
+              { label: `${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`, value: formatPercent(spread) },
+              /* The value alone: the difference tile above defines the term once for both columns. */
+              { label: "Corporate borrowing premium", value: formatPercent(findMacroValue(report.macroSeries, "BBB_CREDIT_SPREAD"), 2, macroMissing) },
+              { label: "Inflation, year over year", value: formatPercent(findMacroValue(report.macroSeries, "CPI_YOY"), 2, macroMissing) },
+              { label: "Unemployment rate", value: formatPercent(findMacroValue(report.macroSeries, "UNEMPLOYMENT_RATE"), 1, macroMissing) },
+            ].map((row) => (
+              <SignalRow key={row.label} label={row.label} value={row.value} missing={isMissing(row.value)} />
+            ))}
           </tbody>
         </table>
       </div>
