@@ -80,7 +80,20 @@ export function WhyConditionsSection({
       : null;
 
   return (
-    <HomeSection id={HOME_SECTIONS.diagnosis.id} heading={`Why conditions are ${regimeLabel}`}>
+    /* The rule that turns two numbers into a weather word leads (2026-10-27): it is
+       the answer to the heading, and it sat under the table that is its evidence. */
+    <HomeSection
+      id={HOME_SECTIONS.diagnosis.id}
+      heading={`Why conditions are ${regimeLabel}`}
+      lead={(
+        <>
+          Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
+          line, and risk appetite is {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its{" "}
+          {changeLines.riskAppetite} change line. Together they put conditions in{" "}
+          <span className="font-semibold">{regimeLabel}</span>.
+        </>
+      )}
+    >
       {/* The readings beside what they leave out, from xl (2026-10-27): stacked, the
           note and the capped-score line sat under a 64rem table with the right half of
           a laptop screen empty, and a frame cut the section in two. */}
@@ -108,14 +121,7 @@ export function WhyConditionsSection({
             </tbody>
           </table>
 
-          {/* The rule that turns two numbers into a weather word, said once and in
-              the reader's terms: each reading sits above or below its change line. */}
-          <p className="mt-3 max-w-3xl text-fluid-sm leading-relaxed text-slate-300">
-            Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
-            line, and risk appetite is {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its{" "}
-            {changeLines.riskAppetite} change line. Together they put conditions in{" "}
-            <span className="font-semibold text-slate-100">{regimeLabel}</span>.
-          </p>
+    
         </div>
         <div className="min-w-0">
           {notCounted.length > 0 ? (

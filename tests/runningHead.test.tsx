@@ -51,6 +51,8 @@ describe("running head facts", () => {
       condition: "Freezing",
       date: "Week of Oct 19, 2026",
       title: "This week",
+      tension: "3 pts from Cloudy",
+      tensionNear: true,
       call: "Freeze new commitments.",
       jump: { href: "#what-it-changes", label: "By area" },
     });
@@ -59,9 +61,16 @@ describe("running head facts", () => {
       condition: "Freezing",
       date: "Week of Oct 19, 2026",
       title: "This week",
+      tension: "3 pts from Cloudy",
+      tensionNear: true,
       call: "Freeze new commitments.",
       jump: { href: "#what-it-changes", label: "By area" },
     });
+    assert.equal(
+      readFrameFacts({ dataset: datasetOf(frameFactsAttributes({ tensionNear: true })) }, null).tensionNear,
+      false,
+      "nearness without a tension to colour is nothing",
+    );
     assert.deepEqual(frameFactsAttributes({ regime: "NEUTRAL", title: "About" }), {
       "data-frame-facts": "",
       "data-frame-title": "About",
@@ -74,9 +83,29 @@ describe("running head facts", () => {
       condition: null,
       date: null,
       title: "Product writing",
+      tension: null,
+      tensionNear: false,
       call: null,
       jump: null,
     });
+  });
+
+  it("marks a report intro with the nearest change, by what it changes to, when its strip has a margin", () => {
+    const facts = attributesIn(
+      intro({
+        trustStrip: {
+          recordDateLabel: "Oct 23, 2026",
+          sourcesLive: true,
+          sourcesLabel: "All sources live",
+          confidenceLabel: "LOW",
+          margin: { signal: "riskAppetite", points: 2 },
+          couldChangeNextWeek: true,
+          basis: { key: "record", value: "The record's inputs", warning: null },
+        },
+      }),
+    );
+    assert.equal(facts["data-frame-tension"], "2 pts from Freezing");
+    assert.equal(facts["data-frame-tension-near"], "");
   });
 
   it("marks a report intro with its conditions, date and title", () => {

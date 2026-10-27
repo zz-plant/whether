@@ -35,6 +35,19 @@ const FACT_PRESENT = { site: (frame) => frame.site, date: (frame) => frame.dated
 export const frameGaps = (frame, requires = ["site", "date", "conditions"]) =>
   requires.filter((fact) => !FACT_PRESENT[fact](frame));
 
+/**
+ * What a frame keeps at the size a channel first shows it. Slack previews an image at
+ * about 360px tall, so a 900px laptop frame shrinks to 0.4 and an 844px phone frame to
+ * about 0.43. A frame has a focal point there if its largest type is still about 9px,
+ * or a figure is still 100px tall: the thing a reader sees before deciding to open it.
+ * Reported, not failed: not every frame of a page can lead with large type.
+ */
+export const PREVIEW_HEIGHT_PX = 360;
+export const hasThumbnailFocal = (frame, viewportHeight) => {
+  const scale = PREVIEW_HEIGHT_PX / viewportHeight;
+  return (frame.largestTextPx ?? 0) * scale >= 9 || (frame.largestGraphicPx ?? 0) * scale >= 100;
+};
+
 /** The checks a route fails, empty when every frame stands alone and every block fits one. */
 export const routeFailures = ({ frames, tall, requires }) => [
   ...frames

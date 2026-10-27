@@ -3839,6 +3839,33 @@ every frame passes on every route, at both sizes (`docs/agents/ui-ux-standards.m
 - Invariant 11 (`tests/architectureInvariants.test.ts`) now counts an attribute builder in `lib/` as
   a producer, since the running head's facts are spread rather than written in JSX.
 
+### 1.1.88 Frames worth opening: the open question, drawn, answer first (2026-10-27)
+
+§1.1.87 made every frame name its source. This makes them worth opening, by what is known of images
+people engage with: a small specific gap provokes curiosity where a state does not, a frame is judged
+at the size a channel previews it, a reader keeps the claim of a frame's title, and change holds
+attention over position (`docs/agents/ui-ux-standards.md` §XXVIII, "Frames worth opening").
+
+- **The margin names what is across the line.** On screens the trust strip's margin reads "Risk
+  appetite 2 pts from Freezing" rather than "… from its change line" (`formatMarginReading` with the
+  regime; `regimeAcrossLine` in `lib/regimePhaseSpace.ts`). Pastes are unchanged.
+- **The running head carries the tension.** "◇ 2 pts from Freezing" after the condition word, in the
+  caveat ink when the call could change next week (`formatNearestChange`, from the margin the page
+  already prints); the page's address in place of the bare host (`whether.work/signals`); and, under a
+  reading, a 2px rule in the week's colour. It now appears once the intro's top has gone under the
+  header, since the brief's card is taller than a phone screen.
+- **The phone card draws its tension.** Below `md` the brief's card draws the nearer score's
+  `ScoreLadder` (this week's dot, last week's, the lines) above the trust strip; from `md` the map
+  beside the call already does.
+- **Answers lead.** `HomeSection`'s `lead` is the section's finding at `text-fluid-lg`. "How unusual is
+  this?" leads with this spell beside the earlier ones ("This Cloudy spell has run 1 month-end so far.
+  The one earlier ran 7 month-ends, May 2025 to Nov 2025."), over the band; `describeSpellLengths` now
+  returns `{ lead, rest }`. "Why conditions are …" leads with the rule that answers it, over the table.
+- **Section headings on the brief are 22px on a phone** (from 20): Slack previews a phone screenshot at
+  about 0.43, where 20px lands under the 9px a reader can make out.
+- **`bun run ui:frames` reports focal points at preview size** (`hasThumbnailFocal`), advisory. Phone
+  frames of `/` with one went from 1 of 7 to 6 of 8; the strict checks still pass on every route.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

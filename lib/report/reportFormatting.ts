@@ -2,7 +2,8 @@ import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { SourceFreshnessStatus } from "./sourceHealth";
 import { formatScoreValue, formatThresholdNumber } from "../formatters";
-import { REGIME_LABELS } from "../regimePresentation";
+import { REGIME_LABELS, getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
+import { regimeAcrossLine } from "../regimePhaseSpace";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 /* Value import against a type-only back-edge: `signalTranslations` imports
    `RegimeSignalKey` from this module with `import type`, which erases, so this
@@ -134,12 +135,36 @@ export const formatStripMargin = (confidence: string, points?: number | null): s
     ? formatMarginBand(confidence)
     : `${MARGIN_LABEL} ${points} ${points === 1 ? "pt" : "pts"}`;
 
-/** The margin with the score it is measured on: "Risk appetite 1 pt from its change line". */
-export const formatMarginReading = (margin: { signal: "tightness" | "riskAppetite"; points: number }): string => {
+const pointsWord = (points: number) => `${points} ${points === 1 ? "pt" : "pts"}`;
+
+/**
+ * The margin with the score it is measured on: "Risk appetite 1 pt from Freezing".
+ * With the regime, the line is named by what is on its other side (2026-10-27): "from
+ * its change line" left a reader of a screenshot asking what the line changes to, and
+ * the answer is the one word that makes the distance matter. Without it, as before.
+ * Screens only; the pastes keep `formatMargin`'s band-and-points sentence.
+ */
+export const formatMarginReading = (
+  margin: { signal: "tightness" | "riskAppetite"; points: number },
+  regime?: string,
+): string => {
   const label = regimeSignalLabel[margin.signal];
-  return margin.points === 0
-    ? `${label} at its change line`
-    : `${label} ${margin.points} ${margin.points === 1 ? "pt" : "pts"} from its change line`;
+  const across = regime && isRegimeKey(regime) ? getRegimePublicLabel(regimeAcrossLine(regime, margin.signal)) : null;
+  if (margin.points === 0) return across ? `${label} at its line to ${across}` : `${label} at its change line`;
+  return across ? `${label} ${pointsWord(margin.points)} from ${across}` : `${label} ${pointsWord(margin.points)} from its change line`;
+};
+
+/**
+ * The nearest change in four words, for the running head: "2 pts from Freezing". The
+ * margin's own number, so it matches the trust strip on the same page.
+ */
+export const formatNearestChange = (
+  margin: { signal: "tightness" | "riskAppetite"; points: number } | null | undefined,
+  regime: string | undefined,
+): string | null => {
+  if (!margin || !regime || !isRegimeKey(regime)) return null;
+  const across = getRegimePublicLabel(regimeAcrossLine(regime, margin.signal));
+  return margin.points === 0 ? `At the line to ${across}` : `${pointsWord(margin.points)} from ${across}`;
 };
 
 /**

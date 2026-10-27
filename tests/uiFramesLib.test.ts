@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readdirSync, readFileSync, statSync } from "node:fs";
 import path from "node:path";
-import { frameGaps, frameOffsets, routeFailures, tallBlocks } from "../scripts/ui-frames.lib.mjs";
+import { frameGaps, frameOffsets, hasThumbnailFocal, routeFailures, tallBlocks } from "../scripts/ui-frames.lib.mjs";
 import { frameAuditRoutes } from "../scripts/ui-capture.config.mjs";
 
 /*
@@ -26,6 +26,16 @@ describe("frame audit", () => {
     const byPath = new Map(frameAuditRoutes.map((route) => [route.path, route.requires]));
     assert.deepEqual(byPath.get("/signals"), ["site", "date", "conditions"]);
     assert.deepEqual(byPath.get("/about"), ["site"]);
+  });
+
+  /* Slack previews an image about 360px tall: a 900px laptop frame shrinks to 0.4 and
+     an 844px phone frame to about 0.43. A frame keeps a focal point there if its
+     largest type is still about 9px or a figure still 100px tall. */
+  it("finds a focal point at preview size in large type or a tall figure, not in body text", () => {
+    assert.equal(hasThumbnailFocal({ largestTextPx: 22, largestGraphicPx: 0 }, 844), true, "a 22px phone heading");
+    assert.equal(hasThumbnailFocal({ largestTextPx: 20, largestGraphicPx: 0 }, 844), false, "a 20px one lands under 9px");
+    assert.equal(hasThumbnailFocal({ largestTextPx: 15, largestGraphicPx: 260 }, 900), true, "a chart");
+    assert.equal(hasThumbnailFocal({ largestTextPx: 15, largestGraphicPx: 120 }, 900), false);
   });
 
   it("fails a route on any frame that lacks a fact and any block taller than a frame", () => {

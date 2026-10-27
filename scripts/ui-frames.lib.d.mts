@@ -17,4 +17,6 @@ export function routeFailures(route: {
   tall: Array<FrameBlock & { usableHeight: number }>;
   requires?: FrameFact[];
 }): string[];
+export const PREVIEW_HEIGHT_PX: number;
+export function hasThumbnailFocal(frame: { largestTextPx?: number; largestGraphicPx?: number }, viewportHeight: number): boolean;
 export function buildFramesGalleryHtml(options: { baseUrl: string; routes: unknown[]; generatedAt: string }): string;

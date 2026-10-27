@@ -63,6 +63,15 @@ type Props = {
   areas?: { text: string; href: string; action: string };
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
+  /**
+   * The nearer score on its ladder, drawn on a phone only, above the trust strip
+   * (2026-10-27). From `md` the conditions map beside the call draws where the
+   * reading sits; below it the map is hidden, and a phone screenshot of the card
+   * was text alone, with the week's one tension, how near the line it is, stated
+   * in 13px type in the strip. The site's rule is to draw a threshold claim where
+   * it is made (ui-ux-standards §XV); this is that drawing.
+   */
+  phoneFigure?: ReactNode;
 };
 
 /**
@@ -96,6 +105,7 @@ export function DecisionHero({
   lines,
   published,
   areas,
+  phoneFigure,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
@@ -226,9 +236,11 @@ export function DecisionHero({
             directly under the call. The chip-and-popover in the meta row and the
             trust line at the foot of the card both said this; neither said it
             where a reader deciding whether to act would look first. */}
+        {phoneFigure ? <div className="md:hidden" data-hero-phone-figure>{phoneFigure}</div> : null}
         {trust ? (
           <TrustStrip
             {...trust}
+            regime={regime}
             href="/trust"
             phoneLayout="line"
             className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4 md:mt-auto"

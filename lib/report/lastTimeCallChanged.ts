@@ -222,7 +222,7 @@ export const describeSpellLengths = ({
   currentRegime: RegimeKey;
   /** The reader's own band; null when they have not chosen one. */
   runwayBand: RunwayBand | null;
-}): string | null => {
+}): { lead: string; rest: string } | null => {
   const spells = spellsOf(series);
   const firstYear = spells.at(0)?.start.year;
   if (spells.length < 2 || firstYear === undefined) return null;
@@ -232,18 +232,35 @@ export const describeSpellLengths = ({
   const completed = spells.slice(0, -1);
   const shortest = completed.length > 0 ? Math.min(...completed.map((spell) => spell.months)) : null;
 
-  const parts: string[] = [];
+  /*
+   * The lead sets this spell beside the earlier ones (2026-10-27): "how long will it
+   * last" is the question the section exists for, and the earlier lengths alone left
+   * a reader to work out how far into this one the record is. Only while the latest
+   * month-end is still in these conditions; a spell that began this week has no
+   * month-end yet, and the lead then names the earlier spells alone.
+   */
+  const current = ongoing ? spells.at(-1)?.months ?? null : null;
+  const soFar = current !== null ? `This ${label} spell has run ${monthEnds(current)} so far. ` : "";
+  let lead = "";
   if (earlier.length === 0) {
-    parts.push(`The record since ${firstYear} has no earlier ${label} spell.`);
+    lead = current !== null
+      ? `This is the first ${label} spell since ${firstYear}, ${monthEnds(current)} so far.`
+      : `The record since ${firstYear} has no earlier ${label} spell.`;
   } else if (earlier.length === 1) {
     const only = earlier.at(0);
-    if (only) parts.push(`The one earlier ${label} spell on record ran ${monthEnds(only.months)}, ${spellRange(only)}.`);
+    if (only) {
+      lead = current !== null
+        ? `${soFar}The one earlier ran ${monthEnds(only.months)}, ${spellRange(only)}.`
+        : `The one earlier ${label} spell on record ran ${monthEnds(only.months)}, ${spellRange(only)}.`;
+    }
   } else {
     const lengths = earlier.map((spell) => spell.months);
-    parts.push(
-      `The record has ${earlier.length} earlier ${label} spells: ${lengths.slice(0, -1).join(", ")} and ${monthEnds(lengths.at(-1) ?? 0)} long.`,
-    );
+    const listed = `${lengths.slice(0, -1).join(", ")} and ${monthEnds(lengths.at(-1) ?? 0)}`;
+    lead = current !== null
+      ? `${soFar}The ${earlier.length} earlier ran ${listed}.`
+      : `The record has ${earlier.length} earlier ${label} spells: ${listed} long.`;
   }
+  const parts: string[] = [];
   if (shortest !== null) parts.push(`No conditions since ${firstYear} lasted under ${monthEnds(shortest)}.`);
 
   const band = runwayBand ? RUNWAY_BAND_OPTIONS.find((option) => option.key === runwayBand) : undefined;
@@ -254,5 +271,5 @@ export const describeSpellLengths = ({
     );
   }
   parts.push("A count from the record, not a forecast.");
-  return parts.join(" ");
+  return { lead, rest: parts.join(" ") };
 };
