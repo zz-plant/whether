@@ -1,6 +1,5 @@
 import type { ReportData } from "../reportData";
 import type { buildTrustStatus } from "../trustStatus";
-import type { InterpretationLayer } from "../interpretationLayer";
 import type { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "../homeBriefModel";
 import type { loadHomePageReportData } from "../homePageData";
 import type { WeeklyCallContract } from "../weeklyCallContract";
@@ -158,8 +157,6 @@ export type HomePageAssembly = {
   weeklyDecisionCardModel: ReturnType<typeof buildWeeklyDecisionCardViewModel>;
   diagnosticsLanePromise: Promise<HomePageDiagnosticsLane>;
   workspaceModelPromise: Promise<HomePageWorkspaceModel>;
-  interpretationLayer: InterpretationLayer;
-  interpretationSearchParams?: Record<string, string | undefined>;
   fallbackActive: boolean;
   fallbackAlert: {
     lastCachedTimestamp: string;

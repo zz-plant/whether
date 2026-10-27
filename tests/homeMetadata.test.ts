@@ -9,8 +9,8 @@ serveUnreachableUpstreams();
 describe("buildHomeSharePath", () => {
   it("preserves defined home report search params in a stable query string", () => {
     assert.equal(
-      buildHomeSharePath({ year: "2026", month: "3", view: "forecast", sector: "consumer" }),
-      "/?month=3&sector=consumer&view=forecast&year=2026",
+      buildHomeSharePath({ year: "2026", month: "3", stage: "seed", cadence: "monthly" }),
+      "/?cadence=monthly&month=3&stage=seed&year=2026",
     );
   });
 

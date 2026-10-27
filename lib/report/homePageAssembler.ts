@@ -5,13 +5,7 @@ import {
 import { type ReportData, type ReportDataFallback } from "./reportData";
 import { buildTrustMarker, buildTrustStatus } from "./trustStatus";
 import { buildDegradedSourceRows } from "./sourceHealth";
-import {
-  buildInterpretationLayer,
-  isInterpretationView,
-  type InterpretationView,
-} from "./interpretationLayer";
 import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "./homeBriefModel";
-import { resolveSectorKey } from "./sectorSensitivity";
 import { buildPostureState } from "./postureStateSource";
 import { homeSectionSequence } from "./homeSections";
 import type { HomePageSearchParams } from "./homeMetadata";
@@ -43,8 +37,6 @@ type DeferredHomeSupportModels = {
   diagnosticsLane: HomePageDiagnosticsLane;
   workspaceModel: HomePageWorkspaceModel;
 };
-
-const resolveHomepageOverlaySector = (value: string | undefined) => resolveSectorKey(value);
 
 const defaultHomePageAssemblerDependencies: HomePageAssemblerDependencies = {
   loadHomePageReportData,
@@ -134,7 +126,6 @@ export const assembleHomePage = async ({
     ...defaultHomePageAssemblerDependencies,
     ...dependencies,
   } satisfies HomePageAssemblerDependencies;
-  const homepageOverlaySector = resolveHomepageOverlaySector(searchParams?.sector);
   // Only pass a stage when the operator explicitly selected one — in the URL
   // for this view, or in the stage cookie the hero selector and the settings
   // panel both write. An untouched brief keeps its canonical (stage-agnostic)
@@ -146,9 +137,6 @@ export const assembleHomePage = async ({
   const runwayBand = (searchParams?.runway
     ? parseOperatorRunwayParam(searchParams.runway)
     : operatorContext?.companyRunway) ?? undefined;
-  const interpretationView: InterpretationView = isInterpretationView(searchParams?.view)
-    ? searchParams.view
-    : "default";
   const sectionLinks = homeSectionSequence.map((section) => ({ href: section.href, label: section.label }));
 
   const reportResult = await resolvedDependencies.loadHomePageReportData(searchParams);
@@ -159,7 +147,6 @@ export const assembleHomePage = async ({
     historicalSelection,
     recordDateLabel,
     reportDynamics,
-    forecast,
     statusLabel,
     treasury,
     treasuryProvenance,
@@ -175,7 +162,6 @@ export const assembleHomePage = async ({
   const baseSnapshot = buildWeeklyBriefSnapshot({
     reportData,
     degraded: !reportResult.ok,
-    overlaySector: homepageOverlaySector,
     startupVariantMode,
     runwayBand,
   });
@@ -198,24 +184,6 @@ export const assembleHomePage = async ({
     isFallbackSnapshot: isFallback && !historicalSelection,
     isHistoricalSelection: Boolean(historicalSelection),
   });
-  const interpretationLayer = buildInterpretationLayer({
-    view: interpretationView,
-    homeBriefModel,
-    assessment,
-    forecast,
-    decisionRules: homeBriefModel.decisionRules,
-    sector: homepageOverlaySector,
-    isFallback,
-  });
-  const interpretationSearchParams = searchParams
-    ? Object.entries(searchParams).reduce<Record<string, string | undefined>>((result, [key, value]) => {
-        if (typeof value === "string") {
-          result[key] = value;
-        }
-
-        return result;
-      }, {})
-    : undefined;
 
   // Lazy, and memoised on first access.
   //
@@ -246,7 +214,6 @@ export const assembleHomePage = async ({
       const enrichedSnapshot = buildWeeklyBriefSnapshot({
         reportData,
         degraded: !reportResult.ok,
-        overlaySector: homepageOverlaySector,
         postureState,
         startupVariantMode,
         runwayBand,
@@ -289,8 +256,6 @@ export const assembleHomePage = async ({
     weeklyDecisionCardModel,
     fallbackActive: !historicalSelection && isFallback,
     fallbackAlert,
-    interpretationLayer,
-    interpretationSearchParams,
     get diagnosticsLanePromise() {
       return enrichedHomePageModel().then(({ homeBriefModel: enrichedHomeBriefModel, weeklyDecisionCardModel: enrichedWeeklyDecisionCardModel }) => {
         deferredSupportModelsMemo ??= buildDeferredHomeSupportModels({
