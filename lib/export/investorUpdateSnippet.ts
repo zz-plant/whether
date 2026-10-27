@@ -13,6 +13,7 @@
  * the one paragraph that depends on the reader's company. The page builds the
  * reading; the client composes the block with whichever band the browser holds.
  */
+import { weeklyHeadline } from "../report/reportEvidence";
 import type { BriefDocument } from "../report/briefArtifact";
 import type { MonthlyRegimeHistoryEntry } from "../summary/monthlyRegimeHistory";
 import { monthKeyFor } from "../summary/monthlyRegimeHistory";
@@ -130,7 +131,10 @@ export const buildInvestorUpdateSnippetParts = (
      same three lines under the same words. "Guardrail" and "change our
      course" were two more names for them. */
   const response = [
-    `Our operating response this month: ${asSentence(slots.actionNow)}`,
+    /* The headline's action (`weeklyHeadline`), the instruction every other format
+       leads with. This printed `slots.actionNow`, which the headline stopped leading
+       with on 2026-10-09, so the snippet gave investors a second instruction. */
+    `Our operating response this month: ${asSentence(weeklyHeadline(slots).action)}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${asSentence(slots.pauseIf)}`,
     `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${asSentence(slots.callChangesIf)}`,
     ...(slots.resumeWhen

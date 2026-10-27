@@ -13,20 +13,29 @@ import {
   buildCliStatusExpandedContract,
   buildScenarioContract,
 } from "../lib/cli/contracts";
+import { buildPostureState } from "../lib/report/postureStateSource";
+import { buildReportDataFixture } from "./fixtures/reportFixtures";
 
+/* Over a whole report: the guidance is the week's call, which reads the full reading
+   (`resolveWeekGuidance`), so a hand-built partial one cannot produce it. */
+const fixture = buildReportDataFixture();
 const reportData = {
+  ...fixture,
   treasury: {
+    ...fixture.treasury,
     fetched_at: "2026-03-12T12:00:00.000Z",
     fed_funds: 5.25,
     yield_curve_spread: -0.4,
   },
   assessment: {
+    ...fixture.assessment,
     regime: "EXPANSION",
     scores: { tightness: 62, riskAppetite: 45, baseRate: 5.25, curveSlope: -0.4 },
     diagnostics: { confidence: "HIGH", nearestThresholdDelta: 9 },
     policyAssessment: { refusal: { refused: false, reasons: [] } },
   },
   reportDynamics: {
+    ...fixture.reportDynamics,
     directionLabel: "deteriorating",
     changedSignals: [
       { key: "tightness", delta: -6 },
@@ -40,14 +49,22 @@ const reportData = {
   stopItems: ["Broad headcount expansion"],
 } as any;
 
+const realPosture = await buildPostureState({
+  record: reportData.treasury,
+  assessment: reportData.assessment,
+  reportDynamics: reportData.reportDynamics,
+});
 const postureState = {
+  ...realPosture,
   currentState: {
+    ...realPosture.currentState,
     postureLabel: "Guarded Expansion",
     confidenceLabel: "HIGH",
     confidencePercent: 92,
     transitionWatch: "ON",
   },
   whatFlipsNext: {
+    ...realPosture.whatFlipsNext,
     thresholds: ["tightness < 60 for 2 consecutive refreshes"],
   },
 } as any;
@@ -61,7 +78,7 @@ describe("cli contracts", () => {
     assert.equal(status.call.do[0], "Selective hiring for revenue-linked roles");
 
     const call = buildCliCallContract({ reportData, postureState, degraded: false });
-    assert.match(call.call, /Stage decisions/);
+    assert.equal(call.call, status.call.summary, "`whether call` and the status print one guidance");
     assert.match(call.freshness.line, /Updated/);
 
     const changes = buildCliChangesContract({ reportData, postureState, degraded: false });

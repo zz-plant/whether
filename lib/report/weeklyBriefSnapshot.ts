@@ -1,4 +1,4 @@
-import { buildCallCitation } from "../export/briefBuilders";
+import { buildCallCitation, formatGuidance } from "../export/briefBuilders";
 import { buildBriefPermalinkUrl } from "../export/briefPermalink";
 import { describeConditions } from "../export/exportTerms";
 import { buildPostureState } from "./postureStateSource";
@@ -186,6 +186,21 @@ export const buildWeeklyBriefSnapshot = ({
     callCitation,
   };
 };
+
+/**
+ * The week's guidance as every paste and Monday send prints it (`formatGuidance`), for a
+ * surface that has the report and its posture state but not the homepage model: the agent
+ * state, the CLI and the agent handoff. They printed the loader's `actionNowShort`, the
+ * action the headline stopped leading with on 2026-10-09, so on the Oct 26 reading an
+ * agent was told "Freeze new commitments and keep spend flexible." under a page and a
+ * Slack post that said "Commit to what protects income you have; new bets wait for
+ * cheaper money." The snapshot is built for its call alone; `degraded` changes nothing
+ * the call reads.
+ */
+export const resolveWeekGuidance = (
+  reportData: ReportData | ReportDataFallback,
+  postureState: PostureStateContract,
+): string => formatGuidance(buildWeeklyBriefSnapshot({ reportData, degraded: false, postureState }).weeklyCall);
 
 export const loadWeeklyBriefSnapshot = async (
   searchParams?: ReportSearchParams,

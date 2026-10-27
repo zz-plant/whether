@@ -100,7 +100,7 @@ describe("agent handoff contract", () => {
           directionLabel: "deteriorating",
           regimeChanged: false,
         },
-        actionNowShort: "Tighten approvals now; keep new spend reversible.",
+        guidance: "Tighten approvals now; keep new spend reversible.",
         startItems: ["Review discretionary spend approvals"],
         stopItems: ["Broad hiring expansion"],
         postureState: {
@@ -151,7 +151,7 @@ describe("agent handoff contract", () => {
             regimeChanged: false,
             ...(comparedWith ? { comparedWith } : {}),
           },
-          actionNowShort: "Tighten approvals now.",
+          guidance: "Tighten approvals now.",
           startItems: [],
           stopItems: [],
           postureState: buildPostureStateContract({
@@ -303,7 +303,7 @@ describe("flip watch under a held call", () => {
   };
   const decisionSupport: NonNullable<NonNullable<Parameters<typeof buildAgentPayload>[4]>["decisionSupport"]> = {
     reportDynamics: { changedSignals: [], directionLabel: "deteriorating", regimeChanged: false },
-    actionNowShort: "Stage anything new.",
+    guidance: "Stage anything new.",
     startItems: [],
     stopItems: [],
     postureState: {

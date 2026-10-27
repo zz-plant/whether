@@ -15,7 +15,7 @@ import { parseOperatorRunwayParam } from "../../../lib/report/operatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { formatMarginStamp, formatStripMargin, publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { formatGuidance } from "../../../lib/export/briefBuilders";
-import { buildCallChangeLines } from "../../../lib/report/reportEvidence";
+import { buildCallChangeLines, weeklyHeadline } from "../../../lib/report/reportEvidence";
 import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
 import { siteUrl } from "../../../lib/siteUrl";
 import { USE_CONSTRAINT_SUMMARY, buildUseConstraint } from "../../../lib/report/useConstraint";
@@ -92,6 +92,14 @@ export async function GET(request: Request) {
     if (format === "json") {
       return NextResponse.json({
         ...briefData,
+        /* The headline's action. `briefData.actionNow` is the contract's, which the
+           headline stopped leading with on 2026-10-09 and which the formats read
+           only for the week's direction; `formattedCall` is the whole guidance. */
+        actionNow: weeklyHeadline({
+          actionNow: briefData.actionNow,
+          currentCall: briefData.operatingCall,
+          policyOverrideActive: briefData.policyOverrideActive,
+        }).action,
         /* Attribution was already here. What was missing is the constraint:
            the embed is the one surface that renders inside somebody else's
            page, where their framing replaces ours — which is exactly the

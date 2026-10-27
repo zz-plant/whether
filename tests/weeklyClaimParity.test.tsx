@@ -7,6 +7,7 @@ import { buildBriefImagePayload } from "../app/api/image/brief/route";
 import { buildBriefMarkdown } from "../app/brief.md/route";
 import SharePage from "../app/share/page";
 import { SharePageFormats } from "../app/share/sharePageFormats";
+import { formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import { buildAgentState } from "../lib/agentState";
 import { loadAgentInterfaceContext } from "../lib/agentInterface";
 import { buildCliStatusExpandedContract } from "../lib/cli/contracts";
@@ -184,6 +185,7 @@ const renderWeek = async (treasury: TreasuryData, readings: MacroSeriesReading[]
     })()),
     memo: buildDecisionMemo(home),
     standup: share.options.flatMap((option) => (option.id === "standup" && option.kind === "text" ? [option.text] : []))[0] ?? "",
+    investorUpdate: share.options.flatMap((option) => (option.kind === "investor" ? [formatInvestorUpdateSnippet(option.parts, null)] : []))[0] ?? "",
     record: frozen.record,
     slack: await postedText(snapshot),
     email: await mailedText(snapshot),
@@ -225,10 +227,13 @@ describe("one week, one set of claims, every surface", () => {
       /* One headline action per week (2026-10-09): `weeklyHeadline`, the contract's
          call opened by the week's direction, on the homepage, the frozen record,
          every paste, the Monday post and email, and the share card. The action the
-         homepage used to lead with no longer prints as a second headline; the API
-         fields that carry it (`guidance.call`, `memo.action`) keep their values. */
+         homepage used to lead with no longer prints as a second headline anywhere:
+         the agent state, the CLI, the /api/decision memo and the investor update
+         kept printing it until 2026-10-27, so on the Oct 26 reading an agent was told
+         to "Freeze new commitments and keep spend flexible" under a page and a Slack
+         post that said "Commit to what protects income you have". */
       it("gives the same guidance everywhere", async () => {
-        const { home, document, markdown, embedText, card, agent, memo, record, slack, email } = await render(week);
+        const { home, document, markdown, embedText, card, agent, cli, memo, investorUpdate, record, slack, email } = await render(week);
         const { actionNow } = home.weeklyCall;
         const headline = weeklyHeadline(home.weeklyCall);
         const guidance = formatGuidance(home.weeklyCall);
@@ -252,8 +257,21 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(slot(slack, "Guidance"), guidance, "the Monday post");
         assert.equal(slot(email, "Guidance"), guidance, "the Monday email");
         assert.ok(!email.includes(`Action now: ${actionNow}`), "the email prints no second headline");
-        assert.equal(agent.guidance.call, actionNow, "the agent state's field keeps its value");
-        assert.equal(memo.action, actionNow, "the /api/decision memo's field keeps its value");
+        assert.equal(agent.guidance.call, guidance, "the agent state");
+        assert.equal(cli.call.summary, guidance, "the CLI status");
+        assert.equal(memo.action, guidance, "the /api/decision memo");
+        assert.ok(
+          investorUpdate.includes(`Our operating response this month: ${headline.action}`),
+          `the investor update:\n${investorUpdate}`,
+        );
+        /* The action's own instruction, after its direction sentence. */
+        const secondAction = actionNow.replace(/^Conditions are \w+\. /, "");
+        if (!week.held) {
+          assert.notEqual(secondAction, headline.action, "this week has a second action to leak");
+          assert.ok(!JSON.stringify(agent).includes(secondAction), "the agent state prints no second action");
+          assert.ok(!JSON.stringify(memo).includes(secondAction), "the /api/decision memo prints no second action");
+          assert.ok(!investorUpdate.includes(secondAction), "the investor update prints no second action");
+        }
       });
 
       it("dates and grades the reading the same everywhere", async () => {
@@ -459,7 +477,7 @@ describe("one week, one set of claims, every surface", () => {
         assert.ok(slack.includes(hold.currentCall), "the Monday post");
         assert.equal(slot(email, "Pause if"), hold.pauseIf, "the Monday email");
         assert.equal(card.decision, hold.actionNow, "the share card");
-        assert.equal(agent.guidance.call, hold.actionNow, "the agent state");
+        assert.ok(agent.guidance.call.startsWith(hold.actionNow), "the agent state");
         assert.equal(memo.guardrail, hold.pauseIf, "the /api/decision memo");
         assert.equal(record.summary, hold.currentCall, "the frozen record");
         assert.ok(standup.startsWith("Guidance on hold this week; no pace change."), `the /share standup line: ${standup}`);

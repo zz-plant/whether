@@ -16,6 +16,7 @@ import { signalReadingMeaning } from "./report/signalTranslations";
 import { buildUseConstraint } from "./report/useConstraint";
 import { siteUrl } from "./siteUrl";
 import { isSavedCopy } from "./report/provenanceStatus";
+import { resolveWeekGuidance } from "./report/weeklyBriefSnapshot";
 
 /**
  * The compact state an agent decides from.
@@ -213,15 +214,17 @@ const scoreHeadline = (score: AgentState["scores"]["tightness"]) => {
  * brief's "Conditions change if" (`whatFlipsNext.flipTrigger`). This listed the two
  * score lines there too, "Funding pressure above 70" and "Risk appetite at or below
  * 50", beside a call that said to keep your current plan until the scores agree.
+ *
+ * `call` is the guidance every paste and Monday send prints (`resolveWeekGuidance`).
  */
 export const buildAgentGuidance = ({
   reportData,
   postureState,
 }: {
-  reportData: Pick<AgentInterfaceContext["reportData"], "actionNowShort" | "startItems" | "stopItems" | "assessment">;
-  postureState: Pick<AgentInterfaceContext["postureState"], "whatFlipsNext">;
+  reportData: AgentInterfaceContext["reportData"];
+  postureState: AgentInterfaceContext["postureState"];
 }): AgentState["guidance"] => ({
-  call: reportData.actionNowShort,
+  call: resolveWeekGuidance(reportData, postureState),
   doNow: reportData.startItems,
   avoidNow: reportData.stopItems,
   flipConditions: reportData.assessment.policyAssessment.refusal.refused
