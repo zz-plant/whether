@@ -131,7 +131,7 @@ function StepPanel({
               expand/collapse, which §IV says is a button. Deep links arrive
               through the section id, and they open a step without closing
               the others. A step that is always open is a plain heading. */}
-          <h2 className="max-w-2xl text-xl font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl">
+          <h2 className="max-w-2xl text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl">
             {foldable ? (
               <button
                 type="button"

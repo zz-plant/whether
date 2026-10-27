@@ -141,7 +141,9 @@ export function WhatWouldChangeSection({
             trail={conditionsTrail?.points}
             trailCaption={conditionsTrail?.caption}
             caveat={conditionsTrail?.caveat}
-            className={`w-full max-w-[240px] mx-auto md:mx-0 shrink-0 ${conditionsTrail ? "md:hidden" : ""}`}
+            /* 320px on a phone (2026-10-27): at 240 in a 358px column its quadrant names
+               and line numbers drew at 8–10px with empty ground either side. */
+            className={`w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[240px] shrink-0 ${conditionsTrail ? "md:hidden" : ""}`}
           />
         ) : null}
         {/* Side by side from xl (2026-10-27): stacked in a 64rem column they left the
@@ -156,7 +158,7 @@ export function WhatWouldChangeSection({
             <div className="space-y-2">
               <h3 className="text-fluid-sm font-semibold text-slate-100">When would conditions change?</h3>
               {reversalTrigger ? (
-                <dl className="text-fluid-xs">
+                <dl className="text-fluid-sm">
                   <div className="space-y-0.5">
                     <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.watch.postureFlips}</dt>
                     <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
@@ -182,7 +184,7 @@ export function WhatWouldChangeSection({
           {guardrail || resumeLine ? (
             <div className="space-y-2">
               <h3 className="text-fluid-sm font-semibold text-slate-100">When can paused decisions resume?</h3>
-              <dl className="space-y-3 text-fluid-xs">
+              <dl className="space-y-3 text-fluid-sm">
                 {guardrail ? (
                   <div className="space-y-0.5">
                     <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>

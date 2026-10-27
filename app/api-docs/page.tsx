@@ -78,7 +78,7 @@ export default function ApiDocsPage() {
   return (
     <PageShell backdropVariant="default" structuredData={buildApiDocsStructuredData()}>
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5 max-w-3xl">
-        <h1 className="text-fluid-xl font-semibold text-slate-100">API and agent tools</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
           Read this week's guidance from an AI agent, a script, or a dashboard. Whether serves the guidance, the two
           scores behind it, and the pause and resume lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Whether is free, and the API needs no key.

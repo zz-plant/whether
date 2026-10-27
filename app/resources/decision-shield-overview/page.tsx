@@ -26,7 +26,7 @@ export default async function DecisionShieldOverviewPage() {
   return (
     <ContentPageShell measure="prose">
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Decision Shield</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">Decision Shield</h1>
         <p className="text-sm text-slate-200">
           Decision Shield checks a plan against this week&apos;s guidance and returns one verdict —
           Safe, Risky or Dangerous — with the guardrail to hold and the reversal that would change

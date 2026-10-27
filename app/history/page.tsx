@@ -175,7 +175,7 @@ export default async function HistoryPage({
           aria-labelledby="call-by-month-heading"
           className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
-          <h2 id="call-by-month-heading" className="text-xl font-semibold text-white sm:text-2xl">Conditions by month</h2>
+          <h2 id="call-by-month-heading" className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">Conditions by month</h2>
           {weekAfterRecord ? (
             <p className="text-sm text-slate-300">
               Since the last month-end, the week of {publishedBriefWeekLabel(weekAfterRecord)} was published as{" "}
@@ -238,7 +238,7 @@ export default async function HistoryPage({
           className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
           <div>
-            <h2 id="published-briefs-heading" className="text-xl font-semibold text-white sm:text-2xl">Published weekly briefs</h2>
+            <h2 id="published-briefs-heading" className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">Published weekly briefs</h2>
             {/* Say what the archive holds, not what it aspires to. With one entry,
                 "permanent, immutable calls cited in board documents" promised a
                 record the page could not show. The count is the honest claim; the

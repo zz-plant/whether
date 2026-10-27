@@ -37,7 +37,15 @@ export type TrustStripProps = {
    * change line"). `note` is the one place a page says why its conditions
    * differ from the published week's, where the basis is the reason.
    */
-  basis: { key: ScoringBasisKey; value: string; warning: string | null; note?: string | null; omitReason?: boolean };
+  basis: {
+    key: ScoringBasisKey;
+    value: string;
+    warning: string | null;
+    /** The warning in four words, for the phone line (`ScoringBasis.warningShort`). */
+    warningShort?: string | null;
+    note?: string | null;
+    omitReason?: boolean;
+  };
   /** Where the full explanation lives. Omit on /trust itself. */
   href?: "/trust";
   /** How the strip sits below `sm`. "grid" (the default) is the two-column
@@ -89,6 +97,11 @@ export function TrustStrip({
   const basisDetail = [basis.warning, basis.warning && !basis.omitReason ? NOT_COUNTED_REASON : null, basis.note]
     .filter((part): part is string => Boolean(part))
     .join(" ");
+  /* On the phone line, with /trust a tap away and no note to carry, the warning's short
+     form: the full sentence and its reason ran four lines of a report intro under a
+     15px title (2026-10-27), so the intro was mostly caveat. The diamond stays on it. */
+  const basisShort =
+    phoneLayout === "line" && href && basis.warningShort && !basis.note ? basis.warningShort : null;
   /* `routine`: the fact is in the state a reader does not need to act on.
      Only the phone line leaves those out, and only when the strip links to
      the page that states them; an exception (cached sources, Low confidence)
@@ -196,7 +209,16 @@ export function TrustStrip({
                   data-basis-warning={cell.detailKind === "basis" ? "" : undefined}
                 >
                   {" · "}
-                  {cell.detail}
+                  {cell.detailKind === "basis" && basisShort ? (
+                    <>
+                      <span className="sm:hidden" data-basis-short>
+                        {basisShort}
+                      </span>
+                      <span className="max-sm:hidden">{cell.detail}</span>
+                    </>
+                  ) : (
+                    cell.detail
+                  )}
                 </span>
               ) : null}
             </dd>

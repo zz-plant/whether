@@ -58,6 +58,24 @@ describe("the basis on every surface", () => {
       />,
     );
     assert.match(html, /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning/);
+
+    /* A phone's one-line strip prints the warning's four-word form, with the full
+       sentence from sm (2026-10-27): it ran four lines of every phone intro. */
+    assert.equal(reportData.scoringBasis.warningShort, "startup-market inputs left out");
+    const line = renderToStaticMarkup(
+      <TrustStrip
+        {...buildTrustStripProps({
+          recordDateLabel: reportData.recordDateLabel,
+          isFallback: false,
+          confidenceLabel: "MED",
+          assessment,
+          scoringBasis: reportData.scoringBasis,
+        })}
+        phoneLayout="line"
+        href="/trust"
+      />,
+    );
+    assert.match(line, /<span class="sm:hidden" data-basis-short="true">startup-market inputs left out<\/span><span class="max-sm:hidden">Startup-market inputs would put risk appetite at 41/);
     assert.match(html, /Startup-market inputs would put risk appetite at 41, below its change line\./);
 
     for (const path of [

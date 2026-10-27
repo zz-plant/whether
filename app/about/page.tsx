@@ -62,14 +62,14 @@ export default function AboutPage() {
       <JsonLdScript data={structuredData} />
 
       <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 sm:px-6 sm:py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">About Whether</h1>
         <p className="text-sm text-slate-300">
           Whether publishes free weekly operating guidance for startup leaders, based on interest rates and credit conditions.
         </p>
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">How it works</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">How it works</h2>
         <p className="text-sm text-slate-300">
           Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a pause line and a resume line.
           Set the lines when you make a plan. The gap between pause and resume lines keeps a small move back across
@@ -92,7 +92,7 @@ export default function AboutPage() {
       <MethodSection />
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Where it fits and where it does not</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Where it fits and where it does not</h2>
         <p className="text-sm text-slate-300">
           {record ? <>{describeRecordCadence(record)} </> : null}
           Use the brief to set your plan&apos;s lines and get an email when one is crossed.
@@ -145,7 +145,7 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Who writes it</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Who writes it</h2>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">{publisherAuthor.name}</span> — {publisherAuthor.role}
         </p>
@@ -161,7 +161,7 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What it is built from</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">What it is built from</h2>
         <p className="text-sm text-slate-300">
           Both scores the brief leads with start from U.S. Treasury rates, read from the St. Louis Fed (FRED). Funding
           pressure comes from the one-month bill rate, the speed of its rise, and long rates falling below short ones.
@@ -189,7 +189,7 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Corrections and questions</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Corrections and questions</h2>
         <p className="text-sm text-slate-300">
           Whether publishes dated records that do not change after the fact. If a published brief is wrong, say so
           and it gets a correction note rather than a silent edit.

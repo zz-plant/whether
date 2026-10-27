@@ -3866,6 +3866,41 @@ attention over position (`docs/agents/ui-ux-standards.md` §XXVIII, "Frames wort
 - **`bun run ui:frames` reports focal points at preview size** (`hasThumbnailFocal`), advisory. Phone
   frames of `/` with one went from 1 of 7 to 6 of 8; the strict checks still pass on every route.
 
+### 1.1.89 One size per role, and nothing on a phone under 12px (2026-10-27)
+
+A size audit of eleven routes at 390px and 1440px (painted text, SVG text as rendered, headings,
+tap targets) found:
+- on four report pages on a phone, the page title (15px) was smaller than its section headings (20px);
+- page titles ran at five sizes from 15px to 48px, and section headings from 13px to 26px;
+- 215 pieces of phone text were under 12px, 29 of them under 10px (the `/concepts` corpus chart's
+  labels at 5px, the conditions map's at 8–10px);
+- the brief's decision lists were 13px;
+- the trust strip's basis warning took about four lines of every phone intro.
+
+After the changes below, 38 pieces of phone text are under 12px and 5 under 10px; page titles are
+one size per width (24.6px and 34px); section headings are 22px on a phone. Rules in
+`docs/agents/ui-ux-standards.md` §XXVIII, "Sizes that hold at every width".
+
+- **Page titles** use `text-fluid-2xl` on every shell (report intro, `.weather-secondary-title`, nine
+  reading pages' h1s, `/api-docs`).
+- **Section headings** are 22px on a phone and 24px from `sm`, across report sections, `/share`,
+  `/history`, `/about`, `/resources` (whose h2s were 13px eyebrows), `/operate` and the reading pages'
+  `.weather-secondary-section-title`. The brief's "Your decisions this week" joins its other sections
+  at 22px.
+- **The `/concepts` corpus chart** draws a 360-unit version below `sm`, at about 1:1, with 11px labels
+  and a year every four years; the wide drawing is unchanged.
+- **The conditions map** in "What would change this guidance" is 320px wide on a phone (from 240).
+- **Small type:** `text-fluid-nano` has a 12px floor, the ladder's line numbers are 12px, the
+  `/about` corridor diagram's labels render at about 11px, and "Since Sep 30" on `/signals` rows is
+  in the readable ink.
+- **The brief's decision lists** ("Conditions change if", "Pause if", "Resume when", and the chosen
+  area's answer) are `text-fluid-sm`.
+- **Trust strip on a phone:** the basis warning prints its short form, "startup-market inputs left
+  out" (`ScoringBasis.warningShort`), with the caveat diamond and the link to /trust; the full sentence
+  from `sm`, and always when a note explains a different published week.
+- **"Readings on this chart"** gets the shared 44px hit area. The other small links the audit found
+  (the governed areas, the week keys, `/share`'s summaries) already had it.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

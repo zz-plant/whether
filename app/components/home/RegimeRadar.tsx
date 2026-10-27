@@ -463,7 +463,8 @@ export function RegimeRadar({
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
           {readableReadings.length > 1 ? (
             <details className="mx-auto max-w-md text-left">
-              <summary className="cursor-pointer">Readings on this chart</summary>
+              {/* `weather-hit`: a 17px line is a 45px target with it, as the other summaries are. */}
+              <summary className="weather-hit w-fit cursor-pointer">Readings on this chart</summary>
               <ul className="list-disc pl-4">
                 {readableReadings.map((reading) => (
                   <li key={reading.key}>{reading.text}</li>

@@ -142,7 +142,7 @@ export function CommandCenterNavBlock({
           ) : null}
           <h1
             style={{ viewTransitionName: "page-title" }}
-            className="max-w-3xl font-semibold text-slate-100 text-fluid-base lg:text-fluid-2xl"
+            className="max-w-3xl font-semibold leading-tight text-slate-100 text-fluid-2xl"
           >
             {pageTitle}
           </h1>

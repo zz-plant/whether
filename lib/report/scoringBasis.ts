@@ -114,6 +114,12 @@ export type ScoringBasis = {
   notCounted: NotCountedScore[];
   /** The scores among `notCounted` that would cross a line, as one sentence; null when none would. */
   warning: string | null;
+  /**
+   * The same warning in four words, for a phone's one-line strip, where the sentence ran
+   * four lines under a page title: "startup-market inputs left out" (2026-10-27). The
+   * strip links to /trust, which says the rest. Null when there is no warning.
+   */
+  warningShort?: string | null;
 };
 
 /*
@@ -247,6 +253,7 @@ export const resolveScoringBasis = ({
     ...BASIS_COPY[key],
     notCounted,
     warning: crossing.length > 0 ? `${crossing.map(describeCrossing).join("; ")}.` : null,
+    warningShort: crossing.length > 0 ? `${[...new Set(crossing.map((entry) => entry.label))].join(" and ")} left out` : null,
   };
 };
 

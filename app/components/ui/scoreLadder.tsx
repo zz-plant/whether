@@ -304,7 +304,7 @@ export function ScoreLadder({
             key={`label-${line.kind}-${line.value}`}
             data-ladder-row={row}
             data-ladder-row-wide={wideRow}
-            className={`absolute top-[calc(26px+var(--row)*13px)] -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-[var(--bg-body)] px-0.5 text-[11px] leading-none tabular-nums @[28rem]:top-[calc(26px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[1]}`}
+            className={`absolute top-[calc(26px+var(--row)*13px)] -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-[var(--bg-body)] px-0.5 text-[12px] leading-none tabular-nums @[28rem]:top-[calc(26px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[1]}`}
             style={markStyle(clampPercent(line.value, max), row, wideRow)}
           >
             {tickText(line)}

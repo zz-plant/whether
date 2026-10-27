@@ -223,7 +223,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       />
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.h1}</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">{page.h1}</h1>
         <p className="text-sm text-slate-200">{page.description}</p>
         <p className="text-sm text-slate-300">{page.boardPackContext}</p>
         {/* The week the guide is being read in. Two pill buttons ("Start from
