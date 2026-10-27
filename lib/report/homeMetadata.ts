@@ -52,8 +52,10 @@ export const buildHomeMetadata = async (
     alternates: {
       canonical: "/",
       /* oEmbed discovery: an editor that reads it (Notion, Ghost, Iframely)
-         turns a pasted link to the brief into the live widget. */
-      types: { "application/json+oembed": buildOEmbedDiscoveryUrl("/") },
+         turns a pasted link to the brief into the live widget. Not on an
+         archived reading: the widget draws only the live week, so it would
+         replace the month the link names with this one. */
+      ...(hasTimeMachineParams ? {} : { types: { "application/json+oembed": buildOEmbedDiscoveryUrl("/") } }),
     },
     openGraph: {
       type: "website",

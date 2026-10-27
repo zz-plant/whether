@@ -8,8 +8,11 @@ export function GET(request: Request) {
   const format = searchParams.get("format") ?? "json";
   if (format !== "json") return new Response("Only format=json is served.", { status: 501 });
 
-  const maxWidth = Number(searchParams.get("maxwidth"));
-  const body = buildOEmbed(searchParams.get("url"), maxWidth);
+  const limit = (name: string) => {
+    const raw = searchParams.get(name);
+    return raw === null ? undefined : Number(raw);
+  };
+  const body = buildOEmbed(searchParams.get("url"), { maxWidth: limit("maxwidth"), maxHeight: limit("maxheight") });
   if (!body) return new Response("Not an embeddable whether.work address.", { status: 404 });
 
   return Response.json(body, {

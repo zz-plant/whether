@@ -1164,8 +1164,9 @@ the brief; these reach people who have not, and each carries the link back.
 - *Frames and oEmbed.* `/api/embed?format=page` wraps the widget in a whole document for a Notion
   embed block or any iframe, and `next.config.js` lifts `X-Frame-Options: DENY` for `/api/embed`
   alone (`frame-ancestors *`). `GET /api/oembed` (`lib/export/oembed.ts`) answers for `/` and
-  `/share` only, since a live widget under a dated record's address would print another week; the
-  homepage names it in its `<head>`.
+  `/share` only, live readings only, since a live widget under a dated record's or an archived
+  month's address would print another week; it keeps the frame within the consumer's `maxwidth`
+  and `maxheight`. The homepage names it in its `<head>`, except on an archived reading.
 - *Status badge.* `GET /api/badge` (`lib/export/statusBadge.ts`): the conditions' weather word as a
   shields-style SVG for a README, data room, or investor page, in the conditions' color, saying
   "(saved copy)" on a fallback read. Markdown to copy sits in the embed section.

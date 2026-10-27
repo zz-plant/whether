@@ -27,12 +27,25 @@ describe("oEmbed", () => {
   });
 
   it("keeps a reader's stage and caps the width at what the consumer allows", () => {
-    const body = buildOEmbed(`${siteUrl}/?stage=seed`, 320);
+    const body = buildOEmbed(`${siteUrl}/?stage=seed`, { maxWidth: 320 });
     assert.equal(body?.width, 320);
     assert.ok(body?.html.includes("stage=seed"));
   });
 
-  for (const url of [`${siteUrl}/brief/2026-w40`, "https://example.com/", "not a url", null]) {
+  it("keeps the frame within both of the consumer's limits, however small", () => {
+    const body = buildOEmbed(`${siteUrl}/`, { maxWidth: 200, maxHeight: 300 });
+    assert.equal(body?.width, 200);
+    assert.equal(body?.height, 300);
+    assert.match(body?.html ?? "", /width="200" height="300"/);
+  });
+
+  it("ignores a limit that is not a positive number", () => {
+    const body = buildOEmbed(`${siteUrl}/`, { maxWidth: Number.NaN, maxHeight: 0 });
+    assert.equal(body?.width, 560);
+    assert.equal(body?.height, 520);
+  });
+
+  for (const url of [`${siteUrl}/brief/2026-w40`, `${siteUrl}/?month=3&year=2020`, "https://example.com/", "not a url", null]) {
     it(`declines ${String(url)}`, () => {
       assert.equal(buildOEmbed(url), null);
     });
@@ -49,6 +62,18 @@ describe("oEmbed", () => {
   it("is discoverable from the homepage's head", async () => {
     const metadata = await buildHomeMetadata();
     assert.deepEqual(metadata.alternates?.types, { "application/json+oembed": buildOEmbedDiscoveryUrl("/") });
+  });
+
+  it("is not offered on an archived reading, which the live widget would replace", async () => {
+    const metadata = await buildHomeMetadata(Promise.resolve({ month: "3", year: "2020" }));
+    assert.equal(metadata.alternates?.types, undefined);
+  });
+
+  it("passes maxheight through the route", async () => {
+    const response = GET(new Request(`${siteUrl}/api/oembed?url=${encodeURIComponent(`${siteUrl}/`)}&maxwidth=240&maxheight=180`));
+    const body = await response.json();
+    assert.equal(body.width, 240);
+    assert.equal(body.height, 180);
   });
 
   it("lifts the frame DENY for the embed alone", async () => {
