@@ -23,11 +23,13 @@ mockAny.module("next/navigation", () => ({
 describe("runway notes on the homepage", () => {
   it("invites a choice without offering a second control for it", () => {
     /* This panel carried its own four-band picker under the header's and the
-       section's, with different bands and separate storage. The band control
-       above is the only one now. */
+       section's, with different bands and separate storage. The calibration
+       section's control is the only one now, and the note links to it: it
+       follows these notes on a wide screen, so "above" sent a reader the wrong way. */
     const html = renderToStaticMarkup(<RunwayConditionedNotes regime="DEFENSIVE" />);
     assert.match(html, /What this guidance means at your runway/);
-    assert.match(html, /Showing 12–24 mo until you pick your cash runway above/, "the default is named as a default");
+    assert.match(html, /Showing 12–24 mo until you <a href="#company-calibration"[^>]*>pick your cash runway<\/a>\./, "the default is named as a default, with a way to the control");
+    assert.doesNotMatch(html, /pick your cash runway above/, "no direction the layout does not keep");
     assert.doesNotMatch(html, /<input|<fieldset|role="radio/, "no second runway control");
     assert.ok(!html.includes("<li"), "no note may render before a runway is chosen");
   });

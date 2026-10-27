@@ -13,10 +13,12 @@ type HelpModalProps = {
   onClose: () => void;
 };
 
+/* C and F press controls only the brief renders (Copy Brief, and the main focus
+   mode narrows), so they say where they work; the list opens on every route. */
 const SHORTCUTS: Array<[string, string]> = [
-  ["C", "Copy Slack brief"],
-  ["⇧S", "Share brief"],
-  ["F", "Toggle presentation / focus mode"],
+  ["C", "On the brief: copy the Slack brief"],
+  ["⇧S", "Share this page"],
+  ["F", "On the brief: presentation / focus mode"],
   ["J", "Next section"],
   ["K", "Previous section"],
   ...navigationGroups.map((group): [string, string] => [group.shortcut.toUpperCase(), `${group.label}: ${group.description}`]),

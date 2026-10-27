@@ -17,6 +17,7 @@ import { ToastProviderRoot } from "./components/toastProviderRoot";
 import { TooltipProvider } from "./components/ui/tooltip";
 import { siteUrl } from "../lib/siteUrl";
 import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
+import { CALENDAR_FEED_PATH } from "../lib/export/calendarFeed";
 import { buildSocialImageUrl, canonicalPositioningLine, defaultSiteDescription, websiteName } from "../lib/seo";
 import { publisherAuthor, publisherProfilePath } from "../lib/publisher";
 import { activationLastWeekStorageKey } from "../lib/activationFunnel";
@@ -27,6 +28,7 @@ const AGENT_API_URL = `${siteUrl}/api/agent?cadence=weekly`;
 const LLMS_TXT_URL = `${siteUrl}/llms.txt`;
 const WELL_KNOWN_MANIFEST_URL = `${siteUrl}${WHETHER_AGENT_MANIFEST_PATH}`;
 const FEED_URL = `${siteUrl}/feed.xml`;
+const CALENDAR_WEBCAL_URL = `${siteUrl}${CALENDAR_FEED_PATH}`.replace(/^https?:/, "webcal:");
 
 const siteName = websiteName;
 const siteDescription = defaultSiteDescription;
@@ -273,7 +275,7 @@ export default function RootLayout({
                   </p>
                 </div>
                 {/* The product outside the four groups, under its name: Use it
-                    elsewhere, API & MCP, About, Search, and RSS. Derived from
+                    elsewhere, API & MCP, About, Search, RSS and Calendar. Derived from
                     utilityLinks: the hand-written copy that used to live here
                     drifted, and a page fell out of the footer entirely. */}
                 <nav aria-label="About Whether">
@@ -295,6 +297,17 @@ export default function RootLayout({
                         className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
                       >
                         RSS
+                      </a>
+                    </li>
+                    <li>
+                      {/* The other feed: each Monday's guidance as a calendar
+                          event. webcal:// hands it to the reader's calendar app;
+                          /share also offers Google's add-by-URL page. */}
+                      <a
+                        href={CALENDAR_WEBCAL_URL}
+                        className="weather-list-link text-fluid-xs text-[var(--footer-link)] no-underline transition-colors hover:text-[var(--footer-link-hover)]"
+                      >
+                        Calendar
                       </a>
                     </li>
                   </ul>

@@ -3872,6 +3872,31 @@ attention over position (`docs/agents/ui-ux-standards.md` §XXVIII, "Frames wort
 - **`bun run ui:frames` reports focal points at preview size** (`hasThumbnailFocal`), advisory. Phone
   frames of `/` with one went from 1 of 7 to 6 of 8; the strict checks still pass on every route.
 
+### 1.1.89 Doors to what was already built (2026-10-27)
+
+A discoverability audit listed what a reader could use but had no visible way to reach. These are the
+reader-side fixes; the API, robots and tooling ones are separate changes.
+
+- **The runway note links to the control.** Before a band is chosen, the area rules' runway note said
+  "pick your cash runway above", but the calibration section follows the area rules on a wide screen.
+  It now links `#company-calibration`, which `AnchorFeedback` opens at every width.
+- **The calendar feed sits beside RSS.** `/calendar.ics` was offered only under the Meeting pack and
+  Monday agenda formats on `/share`, two of fifteen. It is now also in `/share`'s feed list (Apple or
+  Outlook, and Google) and in the footer as Calendar, a `webcal:` link.
+- **The share rail has a door.** It opened only from ⇧S and the palette after the report shell's nav
+  block and the header's Export entry went. The header's actions group carries a Share cell on every
+  route (the first cell below `md`, where Search hides), and the phone's More sheet a Share this page
+  row beside a labelled theme toggle, the brief's only theme control below `sm`.
+- **The toolkits are named outside the fold.** The seven one-decision worksheets were listed only
+  inside the closed "Browse by role, company stage, situation or toolkit" disclosure on `/resources`;
+  More tools now names each one above it.
+- **Shortcuts say where they work.** C presses Copy Brief and F narrows the brief's `Shell` main, so
+  the help list prefixes both "On the brief", and the palette offers those two actions only when the
+  page has the control. They used to close the palette and do nothing. ⇧S and the palette entry read
+  "Share this page", because the rail serves every route.
+- **Not changed: quarter pages.** They are reached from each year page's "Quarter by quarter", two
+  clicks from `/history`. Fifty-six quarter links on `/history` would cost more than the click saves.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:
