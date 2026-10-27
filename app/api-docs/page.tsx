@@ -474,11 +474,12 @@ export default function ApiDocsPage() {
               guidance and the signals that moved.
             </Endpoint>
             <Endpoint
-              signature="GET /api/cli/history?asOf=2026-03"
+              signature="GET /api/cli/history?asOf=2026-03&weeks=26"
               tryHref="/api/cli/history"
               tryLabel="Try it"
             >
-              The conditions at the last 12 month-ends, newest first.
+              One row per month-end, newest first, going back <code className="font-mono">weeks</code> weeks (at
+              most 52, the default). Each row carries that month-end&apos;s own margin and trend.
             </Endpoint>
             <Endpoint
               signature="GET /api/cli/scenario?tightness=74&risk-appetite=32"
