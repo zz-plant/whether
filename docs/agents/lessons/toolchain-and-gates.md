@@ -1,6 +1,6 @@
 # Toolchain notes and the check gates
 
-Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runner, suppressions, dead-export census, telemetry streams or the gate. Dated entries are the reasoning behind each rule; the commands live in [CLAUDE.md](../../../CLAUDE.md).
+Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runner, suppressions, dead-export census, telemetry streams, an env flag or the gate. Dated entries are the reasoning behind each rule; the commands live in [CLAUDE.md](../../../CLAUDE.md).
 
 ## Toolchain notes (2026-09-02)
 
@@ -308,3 +308,20 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   - *A dynamic route needs a sample URL per renderer.* `collectMainContentRouteSamples` throws when
     a new dynamic page has no representative URL pinned, and `/resources/[slug]` pins one pillar and
     one article so a shared route file cannot hide a regression in either branch.
+
+## Environment flags the code reads (2026-10-27)
+
+Each of these was findable only by reading the file that reads it. Leave them unset for the default.
+
+| Flag | Read by | Effect |
+| --- | --- | --- |
+| `CHECK_SERIAL=1` | `scripts/check-tasks.mjs` | Same as `--serial`: a `bun run check` stage runs fail-fast, one task at a time. |
+| `BUN_TEST_ONLY_FAILURES=1` | `scripts/run-tests.mjs` | Prints failing tests only, as the deploy gate always does. |
+| `BUN_TEST_TIMEOUT_MS=<ms>` | `scripts/run-tests.mjs` | Per-test ceiling; defaults to 60000, or 120000 in the deploy gate. |
+| `RATCHET_REPORT=1` | `tests/uiPrimitiveRatchet.test.ts`, `tests/themeRawPaletteRatchet.test.ts` | Prints the current counts, so a migration that lowers one knows the baseline to write. |
+| `WHETHER_VOCABULARY_REPORT=1` | `tests/readerVocabulary.test.tsx` | Prints each ratcheted word's count per surface. |
+| `LANDMARKS_BASE_URL=<url>` | `scripts/check-main-content-landmarks.mjs` | Audits that server instead of `http://127.0.0.1:3000`; `--base-url` overrides it. |
+| `UI_CAPTURE_BASE_URL=<url>` | `scripts/ui-capture.lib.mjs` | Default server for `ui:shots`, `ui:iterate`, `ui:frames` and `ci:screenshot-smoke`; `--base-url` overrides it. |
+| `UI_CAPTURE_OUT_DIR=<dir>` | `scripts/ci-screenshot-smoke.mjs` | Where the smoke check writes its PNGs (default `artifacts/ui`). The other capture scripts take `--out-dir`. |
+| `WHETHER_CHROMIUM_PATH=<path>` | `scripts/ui-capture.lib.mjs` | A Chromium to launch when Playwright's pinned build is missing; tried only after the default launch fails. |
+| `WHETHER_SMOKE_STRICT_HTML=1` | `scripts/prod-synthetic-smoke.mjs` | `smoke:prod` fails a page answering 403 instead of skipping its HTML checks. |

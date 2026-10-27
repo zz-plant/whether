@@ -282,6 +282,13 @@ rather than what the metadata code intends, found gaps none of the SEO suites co
   `content/resources/*.json` has to move with its copy — it is the sitemap date and `dateModified`.
 - **Five lookalike Organization nodes** (a name, sometimes a URL, no `@id`) are the site entity by
   id now, and the RSS feed moved out of `sitemap.xml` into a second `Sitemap:` line in robots.txt.
+- **The allow list was checked against one of three documents (2026-10-27).** robots.txt opens
+  `/api/` paths by name, and `tests/robotsRoute.test.ts` held that list to `/llms.txt` alone. The
+  agent manifest and `/api-docs` advertise API paths too, so seven manifest endpoints and most of
+  `/api-docs` (scores, comps, the images, the slide file, the embed) were advertised and disallowed
+  at once. The test reads all three now. An endpoint that should stay closed leaves the document
+  instead (`/api/health` left the manifest), and an open path opens every path it is a prefix of,
+  so a closed neighbour (`/api/weekly-digest` beside `/api/weekly`) needs a Disallow line of its own.
 
 ## A warning that is always on (2026-09-23)
 
@@ -406,3 +413,29 @@ a move of one point through it changes what four areas should do. Direction and 
   forecast unless the card says the change it matched was a different one (Stormy to Freezing, not Sunny to
   Freezing) from very different scores (risk appetite 7, not 43).
 
+
+## Inputs that outlived their readers (2026-10-27)
+
+Five things went, each kept alive by a half that survived its other half.
+
+- **A builder kept as "the live half" after its panel was deleted.** `lib/report/interpretationLayer.ts`
+  built a layer for every `?view=` on `/`, and its test called it live because the assembler consumed it.
+  The assembler only stored it on a model field nothing read; the panel had gone on 2026-08-14 and the
+  exports on 2026-10-06, and copy passes kept rewording its sentences after both. It took
+  `companyProfile.ts`, `forecastWeatherLabel`, `buildRunwayPlanFromRequest` and the image card's `?view=`
+  with it. Storing a value is not reading it: follow the field to where something prints it.
+- **A cookie read that nothing writes.** `whether-ticker` was parsed on every request to `/` after its one
+  writer, `/api/config`, was deleted on 2026-09-06, and `/` never used the result. Deleting a writer means
+  grepping its key's readers in the same commit.
+- **A parameter whose only effect is an undrawn field.** The audit called `?sector=` on `/` ignored; it
+  chose the sector row of `history.macroOverlay`, which nothing has drawn since 2026-08-06. The parameter
+  went from `/` and the share preview, and the field and the overlay behind it followed (spec §3.4.1).
+- **A token route whose token no reader sees.** `/api/slack/subscribe` minted a token, returned it in JSON
+  and indexed it in KV for `/api/slack/unsubscribe`, and no screen showed it. A route whose required input
+  only the server holds has no client, however well it is tested. Stored records still carry the field and
+  still parse.
+- **An export only its test calls, in a module something ships.** `buildDecisionTransmission` arrived on
+  2026-04-02 with its test, its types in `reportData.ts` and a rule builder in `operatingCalls.ts`, and nothing
+  else ever called it; a 2026-09-22 copy pass reworded its placeholders anyway. The dead-export census judges
+  test-only callers per module, so one export in a live module passes, and so does each helper only it calls.
+  Before rewording a builder's strings, find its caller outside `tests/`.

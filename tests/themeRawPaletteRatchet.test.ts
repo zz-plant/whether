@@ -49,19 +49,21 @@ describe("raw palette classes the light theme must rescue (DD-043 ratchet)", () 
       return { name: family.name, count, baseline: family.baseline };
     });
 
+    // The current state, printed so a migration that ratchets a family down
+    // knows the next baseline to write here. Before the assertion, so a failing
+    // run prints it too.
+    if (process.env.RATCHET_REPORT === "1") {
+      for (const family of counts) console.log(`${family.name}: ${family.count} (baseline ${family.baseline})`);
+    }
+
     const grown = counts.filter((family) => family.count > family.baseline);
     assert.deepEqual(
       grown.map((family) => `${family.name}: ${family.count} > ${family.baseline}`),
       [],
       `A raw palette class the light theme renders only via a tokens.css floor was added.\n` +
         `Name the token instead: text roles, border-[color:var(--border-…)], bg via --bg-…\n` +
-        `(${counts.map((family) => `${family.name}: ${family.count}/${family.baseline}`).join(" · ")})`,
+        `(${counts.map((family) => `${family.name}: ${family.count}/${family.baseline}`).join(" · ")})\n` +
+        `After a migration, RATCHET_REPORT=1 bun run test tests/themeRawPaletteRatchet.test.ts prints each family's count for its new baseline.`,
     );
-
-    // The current state, printed so a migration that ratchets a family down
-    // knows the next baseline to write here.
-    if (process.env.RATCHET_REPORT === "1") {
-      for (const family of counts) console.log(`${family.name}: ${family.count} (baseline ${family.baseline})`);
-    }
   });
 });

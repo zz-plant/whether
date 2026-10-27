@@ -42,6 +42,15 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   const queryRef = useRef("");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  /* Two actions press controls only the brief renders: Copy Brief's button and
+     the `Shell` main that focus mode narrows. Elsewhere they closed the palette
+     and did nothing, so they are offered where the page has them. Read once:
+     the palette mounts on open, after the page has. */
+  const [briefControls] = useState(() => ({
+    copy: Boolean(document.querySelector('[data-testid="copy-slack-brief-button"]')),
+    focus: Boolean(document.querySelector("[data-home-shell-main]")),
+  }));
+
   const toggleFocusMode = useCallback(() => {
     document.dispatchEvent(new CustomEvent("whether:toggle-focus-mode"));
     onClose();
@@ -53,7 +62,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   }, [router, onClose]);
 
   const commands: CommandItem[] = useMemo(() => {
-    const actionCommands: CommandItem[] = [
+    const allActionCommands: CommandItem[] = [
       {
         id: "copy-slack",
         label: "Copy Slack brief",
@@ -124,8 +133,8 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       },
       {
         id: "export",
-        label: "Share brief",
-        description: "Open share panel with presets",
+        label: "Share this page",
+        description: "Copy the page link, or the brief for a CEO, finance lead or team",
         icon: Download,
         action: () => {
           onClose();
@@ -151,6 +160,10 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         action: () => navigateTo("/decisions"),
       },
     ];
+    const actionCommands = allActionCommands.filter(
+      (command) =>
+        (command.id !== "copy-slack" || briefControls.copy) && (command.id !== "focus" || briefControls.focus),
+    );
 
     // The four groups with their keys, then every other page in them. A hub
     // is its group (one name per URL), so it is listed once, as the group.
@@ -188,7 +201,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       }));
 
     return [...actionCommands, ...navCommands, ...utilityCommands];
-  }, [navigateTo, toggleFocusMode, onClose]);
+  }, [navigateTo, toggleFocusMode, onClose, briefControls]);
 
   /*
    * A typed query always offers guidance search, not only the fixed command list.

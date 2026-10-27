@@ -131,6 +131,8 @@ Any other MCP client takes the same URL:
 
 Or run the server locally over stdio with `bun run mcp:whether`. Agents should call `get_state` first. The tools, the manifest at [`/.well-known/whether-agent.json`](https://whether.work/.well-known/whether-agent.json) and [`/llms.txt`](https://whether.work/llms.txt) are all generated from `lib/agent/tools.ts`; [docs/agents/agent-interface.md](docs/agents/agent-interface.md) covers the rest.
 
+The REST endpoints, their parameters and the ones that need a header are in [docs/developer/api-reference.md](docs/developer/api-reference.md); [whether.work/api-docs](https://whether.work/api-docs) is the public version.
+
 ### Embed this week's call
 
 Paste two lines into any page, such as a team wiki, an investor portal or an internal dashboard:

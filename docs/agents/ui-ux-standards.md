@@ -830,7 +830,7 @@ and shows them where to look. What the research on images people engage with say
   (`whether.work/signals`), short enough to type from a screenshot, and a 2px rule in the week's
   colour, which still says which weather it is when the words are too small to read.
 
-### Sizes that hold at every width (2026-10-27, §1.1.89)
+### Sizes that hold at every width (2026-10-27, §1.1.90)
 
 A size audit of eleven routes at 390px and 1440px found the page title the smallest heading on
 four report pages on a phone (15px under 20px sections), page titles at five sizes from 15px to

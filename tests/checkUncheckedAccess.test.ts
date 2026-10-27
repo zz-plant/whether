@@ -49,7 +49,8 @@ describe("unchecked indexed access census", () => {
 
     assert.ok(
       errors.length <= UNCHECKED_ACCESS_BASELINE,
-      `expected at most ${UNCHECKED_ACCESS_BASELINE} indexing errors, found ${errors.length}`,
+      `expected at most ${UNCHECKED_ACCESS_BASELINE} indexing errors, found ${errors.length}. ` +
+        "`bun run check:unchecked-access` lists the files with the most.",
     );
   });
 });

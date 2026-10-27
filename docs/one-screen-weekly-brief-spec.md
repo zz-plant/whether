@@ -102,7 +102,6 @@ nowhere rather than invented.
 **States:**
 - `YES — Regime shift detected.`
 - `NO — Hold posture.`
-- Detail panel includes a sector-sensitivity overlay (`?sector=b2b-saas|consumer|infrastructure|fintech|healthcare|ai-platforms`) to show `base posture + sector sensitivity` without altering the canonical weekly posture call; fallback is `b2b-saas`.
 
 **Rules:**
 - Exactly two states: YES / NO.
@@ -163,35 +162,18 @@ nowhere rather than invented.
 ---
 
 
-### Interpretation-layer contract (optional, URL-driven)
-Interpretation layers change explanatory copy without changing the canonical weekly posture call.
-As of the 2026-09 removal audit, no on-page render site reads these layers on `/`; they surface in
-the export artifacts built from the homepage assembly (board summary, call citation) and in the
-share-preview URL param. On-page company conditioning is the profile-driven runway notes panel
-below, not `?view=company`.
+### Company-conditioned notes (translation-only)
+The runway-conditioned notes panel (`RunwayConditionedNotes`, under the weekly call) changes
+explanatory copy without changing the canonical weekly call. It keys on the browser-held operator
+profile, renders nothing until the operator has given a runway figure, never restates a threshold
+number, and never mutates canonical call, lane, or threshold semantics. Its sentences state
+consequences of the corridor, not directives and not alternate actions or re-open conditions. It
+renders on live briefs only: under a Time Machine selection it is omitted, since the profile is
+present-day and an archived regime must not borrow it.
 
-- Query param: `?view=default|sector|company|financial|forecast`
-- Default behavior: missing/invalid `view` resolves to `default`.
-- Layer scope: interpretation layers change only explanatory bullets and do **not** change regime classification, confidence labels, or bounded-rule thresholds.
-- Profile-driven variant: the runway-conditioned notes panel (`RunwayConditionedNotes`, under the
-  weekly call) follows the same translation-only contract but keys on the browser-held operator
-  profile instead of a query param. It renders nothing until the operator has given a runway figure,
-  never restates a threshold number, and never mutates canonical call, lane, or threshold semantics.
-  Its sentences state consequences of the corridor, not directives and not alternate actions or
-  re-open conditions. It renders on live briefs only — under a Time Machine selection it is omitted,
-  since the profile is present-day and an archived regime must not borrow it.
-- Expected layer semantics (screenshot-safe bullets; bounded action framing):
-  - `default`: `Action` (decision delta) + `Trigger` (guardrail) + `Reverse` (reversal condition)
-  - `sector`: one sector-adjusted action line plus explicit tighten/reverse conditions; still translation-only
-  - `company`: top-priority bounded operator rules (max 3 bullets, input-order precedence), each compressed as `Action` + `Trigger` + `Reverse`
-  - `financial`: bounded runway translation as `Action` (risk now), `Trigger` (raise window), `Reverse` (burn delta range)
-  - `forecast`: `Action` (most likely scenario), `Trigger` (distance + crossing risk), `Reverse` (momentum condition)
-- Trust/fallback semantics:
-  - Unknown/missing `view` falls back to `default` without altering canonical weekly-card semantics.
-  - Missing sector/company enrichment falls back to available baseline bullets (or available top rules) without blocking render.
-  - Interpretation panels never mutate posture classification, confidence labels, or top-fold instruction semantics.
-  - Bullets are compact, screenshot-safe directives (short bounded clauses; no long-form methodology text).
-  - Export/citation outputs include interpretation context only when the selected view is non-default, always with translation-only trust language.
+`/` takes no `?view=`. The URL-selected interpretation layers (`default`, `sector`, `company`,
+`financial`, `forecast`) were built by the home assembly and drawn by nothing after their panel
+went on 2026-08-14, and were removed on 2026-10-27 (`docs/feature-specs-current.md` §1.0).
 
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:

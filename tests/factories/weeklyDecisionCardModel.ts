@@ -399,7 +399,6 @@ export const buildWeeklyDecisionCardModel = (
         curveSlope: -0.2,
       },
     },
-    macroOverlay: [{ label: "VC funding", detail: "-4.5 · ↑ improving" }],
     ...overrides.history,
   },
   sinceLastReview: {

@@ -4,11 +4,27 @@ export type TaskProfile = {
   rationale: string;
   docs: string[];
   targets: string[];
+  /** Repo-local skill names under `.claude/skills/`. */
+  skills: string[];
   checks: string[];
   matchedKeywords?: string[];
   score?: number;
   task?: string;
   source?: string;
+};
+
+/** A command from `TOOL_HINTS` that the task's words matched. */
+export type ToolHint = {
+  id: string;
+  command: string;
+  why: string;
+};
+
+/** A routed task: its profile, plus what the task matched outside it. */
+export type TaskRoute = TaskProfile & {
+  /** Files CLAUDE.md's "Read before you touch" table links for the task's topics. */
+  lessons: string[];
+  tools: ToolHint[];
 };
 
 export type RepoIndex = {
@@ -30,6 +46,7 @@ export type RepoIndex = {
       coreSurfaces: string[];
     };
     taskProfiles: TaskProfile[];
+    toolHints: Array<ToolHint & { keywords: string[] }>;
   };
   skillsMap: {
     generatedAt: string;
@@ -66,7 +83,7 @@ export function buildDoctorReport(args?: {
   }>;
   changedFileCount: number;
   relevantAgentFiles: string[];
-  route: TaskProfile;
+  route: TaskRoute;
 };
 
 export function buildHandoffPacket(args?: {
@@ -82,7 +99,7 @@ export function buildHandoffPacket(args?: {
   verification?: string[];
   skill?: string;
 }): {
-  route: TaskProfile;
+  route: TaskRoute;
   skill: string;
   packet: {
     job: string;
@@ -108,4 +125,4 @@ export function writeRepoIndex(args?: {
   index: RepoIndex;
 };
 
-export function classifyTask(task: string): TaskProfile;
+export function classifyTask(task: string, options?: { repoRoot?: string }): TaskRoute;

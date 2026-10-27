@@ -70,7 +70,6 @@ export async function POST(request: Request) {
       ok: true,
       message: `Connected successfully${channelName ? ` to ${channelName}` : ""}. A test ping has been delivered.`,
       channelName: subscription.channelName,
-      token: subscription.token,
     });
   } catch (error) {
     if (error instanceof RateLimitedError) {

@@ -11,7 +11,7 @@ import { ReusableVisuals } from "./reusableVisuals";
 import { findBriefVideo } from "../../lib/export/briefVideo";
 import { latestPublishedBrief, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { PullPolicyControls } from "./pullPolicyControls";
-import { SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
+import { CalendarSubscribeLinks, SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
@@ -520,6 +520,9 @@ export default async function SharePage() {
               {/* A file, not a page: the absolute address the feed autodiscovery
                   link in the layout's <head> names. */}
               <a href={`${siteUrl}/feed.xml`} className="inline-flex min-h-[44px] items-center text-fluid-xs font-semibold text-sky-300 hover:text-sky-200">RSS</a>
+            </li>
+            <li className="flex items-center">
+              <CalendarSubscribeLinks feedUrl={`${siteUrl}${CALENDAR_FEED_PATH}`} lead="Each Monday's guidance in your calendar" />
             </li>
           </ul>
         </nav>

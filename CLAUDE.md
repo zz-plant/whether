@@ -10,18 +10,22 @@ This file only covers mechanics: commands, costs, and where things live.
 | --- | --- | --- |
 | `bun run test <path>` | ~0.2s | Default loop. Runs only that file. |
 | `bun run test -t "<name>"` | ~1s | Filter by test name across the suite. |
-| `bun run test` | ~14s | 2,500+ tests / 360+ files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
+| `bun run test` | ~20s | 3,400+ tests / 460+ files across 3 shards. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
 | `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). In `check` and pre-push since 2026-09-16; not in the deploy gate. |
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
+| `bun run check <task…>` | varies | Only the named tasks, e.g. `bun run check lint typecheck`. Task names are in `scripts/check-tasks.mjs`. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 | `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
+| `bun run check:unchecked-access` | ~6s | Indexing `noUncheckedIndexedAccess` would reject, against a baseline that only falls (888). `tests/checkUncheckedAccess.test.ts` holds it in every gate; when that fails, this lists the worst files. |
+| `bun run check:production-edge` | ~3s | Production `/` and `/api/health`: names a Cloudflare challenge, a 403 or a DNS failure. `check:production-assets` probes every static asset and OG route. |
 | `bun run skills:sync` | <1s | After editing `.claude/skills/` or `.codex/skills-overlay/`: regenerates the `.codex/skills/` mirror. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
-reports every failure in one pass; add `--serial` for fail-fast sequencing when debugging it.
+reports every failure in one pass; add `--serial` (or set `CHECK_SERIAL=1`) for fail-fast sequencing
+when debugging it.
 
 `check` also runs automatically on `git push` via `.husky/pre-push`, and since 2026-08-22 that hook
 is the check gate rather than a mirror of one: the GitHub workflows are manual-only, because this
@@ -49,7 +53,7 @@ open the one that matches the task instead of reading them all.
 
 | Touching… | Read |
 | --- | --- |
-| lint, suppressions, dead-export census, suite runner, telemetry streams, a red gate | [toolchain-and-gates](docs/agents/lessons/toolchain-and-gates.md) |
+| lint, suppressions, dead-export census, suite runner, telemetry streams, a red gate, an env flag | [toolchain-and-gates](docs/agents/lessons/toolchain-and-gates.md) |
 | a routine, brief freeze, email/Slack send, Cloudflare build, "green here, red there" | [automation-and-deploy-gate](docs/agents/lessons/automation-and-deploy-gate.md) |
 | reader-facing strings, source-reading tests, page-vs-page claims | [tests-and-copy-rules](docs/agents/lessons/tests-and-copy-rules.md) |
 | a new module, an API field, share/OG/SEO metadata, a cache, a warning banner, runway | [dead-features-and-honesty](docs/agents/lessons/dead-features-and-honesty.md) |
@@ -82,7 +86,7 @@ open the one that matches the task instead of reading them all.
 ### Session hygiene
 
 - The SessionStart hook unshallows a shallow clone, so `git log` / `git blame` see real history.
-- `bun run agent:route -- "<task>"` before broad searching: it names docs, first files and minimum checks.
+- `bun run agent:route -- "<task>"` before broad searching; the agent-workflow table below says what it names.
 - When a fix changes documented behaviour, update the matching doc in the same commit
   (`docs/feature-specs-current.md` drifts fastest).
 
@@ -91,7 +95,7 @@ open the one that matches the task instead of reading them all.
 | Command | What it does |
 | --- | --- |
 | `bun run agent:doctor` | Preflight: branch, dirty-worktree, relevant `AGENTS.md`, task-profile check. |
-| `bun run agent:route -- "<task>"` | Recommends docs, first files, and minimum checks for a task. |
+| `bun run agent:route -- "<task>"` | Recommends docs, first files, skills, lessons, specialised tools and minimum checks for a task. Lessons come from the "Read before you touch" table above; tools from `TOOL_HINTS` in `scripts/agent-workflow.config.mjs`. |
 | `bun run agent:handoff -- --job "<job>"` | Generates a canonical subagent handoff packet with repo defaults. |
 | `bun run agent:index` | Refreshes the repo cache under `artifacts/agent/`. |
 
