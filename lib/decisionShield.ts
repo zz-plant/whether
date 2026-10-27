@@ -323,8 +323,14 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
   /* No bare "lead", "principal" or "architect": each is a role only beside a
      hiring verb, and that verb already matches here ("Hire 1 principal
      architect"). Alone they claimed "sales lead time" and "loan principal" as
-     hires before the pricing or roadmap checks below could run. */
-  if (/\b(hire|hiring|headcount|recruiting|poach|engineer|engineers|sdr|developer|team member)\b/.test(lower)) {
+     hires before the pricing or roadmap checks below could run. "recruit"
+     joins the bare list; "add" and "open" are hiring only with a number
+     ("add 3 engineers", "open 2 roles"), matching the parse layer's
+     HEADCOUNT_AFTER_VERB, so "open a London office" still reads as an office. */
+  if (
+    /\b(hire|hiring|headcount|recruit|recruiting|poach|engineer|engineers|sdr|developer|team member)\b/.test(lower)
+    || /\b(?:add|adding|open)\s+\d{1,4}\b/.test(lower)
+  ) {
     return { category: "HIRING", action: "HIRE", confidence: "MATCHED" };
   }
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {

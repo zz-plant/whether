@@ -18,6 +18,7 @@ import {
 import { ScenarioDeltas } from "./scenarioDeltas";
 import { ScenarioPresets } from "./scenarioPresets";
 import { ScenarioSliders } from "./scenarioSliders";
+import { RegimeRadar } from "../../components/home/RegimeRadar";
 
 export function ScenarioStudioSimulator({
   liveTreasury,
@@ -131,6 +132,32 @@ export function ScenarioStudioSimulator({
         briefClipboardState={getClipboardUiState("simulated-brief", clipboard)}
         onCopyShareableLink={handleCopyShareableLink}
         onCopySimulatedBrief={handleCopySimulatedBrief}
+      />
+      {/*
+        * The sliders, drawn where the map is: the scenario's reading as the
+        * filled dot, this week's as the hollow one — the same filled/hollow
+        * pair the two ladders below draw, so one screen does not use opposite
+        * encodings for its two points (2026-10-21). At the live baseline there
+        * is one point, so the hollow marker and its legend drop out.
+        */}
+      <RegimeRadar
+        tightness={simulatedAssessment.scores.tightness}
+        riskAppetite={simulatedAssessment.scores.riskAppetite}
+        previousTightness={isAtLiveBaseline ? null : liveAssessment.scores.tightness}
+        previousRiskAppetite={isAtLiveBaseline ? null : liveAssessment.scores.riskAppetite}
+        previousLabel={isAtLiveBaseline ? null : "This week"}
+        primaryLabel="Simulated reading"
+        tightnessThreshold={liveAssessment.thresholds.tightnessRegime}
+        riskAppetiteThreshold={liveAssessment.thresholds.riskAppetiteRegime}
+        currentRegime={simulatedAssessment.regime}
+        footer={
+          isAtLiveBaseline ? null : (
+            <span>
+              Filled dot: the simulated reading. Hollow: this week&apos;s reading, before the sliders.
+            </span>
+          )
+        }
+        className="mx-auto w-full max-w-[18rem]"
       />
       <ScenarioDeltas
         liveAssessment={liveAssessment}

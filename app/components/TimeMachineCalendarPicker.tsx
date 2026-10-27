@@ -101,10 +101,10 @@ export function TimeMachineCalendarPicker({
         <Popover.Positioner side="bottom" align="start" sideOffset={8} className="z-50">
           <Popover.Popup
             aria-label="Select brief period"
-            className="max-h-96 w-80 overflow-y-auto overscroll-contain rounded-xl border border-slate-800 bg-slate-950 p-3 shadow-2xl"
+            className="max-h-96 w-80 overflow-y-auto overscroll-contain rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)] p-3 shadow-2xl"
           >
-            <div className="mb-2 flex items-center justify-between border-b border-white/[0.08] pb-2">
-              <span className="text-xs font-semibold text-white">Past weeks</span>
+            <div className="mb-2 flex items-center justify-between border-b border-[color:var(--border-subtle)] pb-2">
+              <span className="text-xs font-semibold text-slate-50">Past weeks</span>
               {isHistorical && (
                 <button
                   type="button"
@@ -116,7 +116,7 @@ export function TimeMachineCalendarPicker({
               )}
             </div>
 
-            <div className="mb-2 space-y-1.5 border-b border-white/[0.08] pb-2.5">
+            <div className="mb-2 space-y-1.5 border-b border-[color:var(--border-subtle)] pb-2.5">
               <span className="type-eyebrow block px-1">Replay a known period</span>
               <div className="grid grid-cols-2 gap-1.5">
                 {KNOWN_PERIODS.map((period) => {

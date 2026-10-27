@@ -31,11 +31,20 @@ export const publicDecisionLabels = {
 const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
   action: "Stage approvals",
   threshold: FALLBACK_PAUSE_THRESHOLD,
-  reversal: "Reverse only after threshold recovery",
+  reversal: "Resume only after conditions recover",
 };
 
 /** The one table, re-exported under the name this module's callers already use. */
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = regimeSignalLabel;
+
+/**
+ * "Sunny — hold the pace" without saying "Sunny" twice: a headline that already
+ * leads with the conditions label stands alone. The feed and the OG images each
+ * used to carry their own prefix check for this, so a change to one was a silent
+ * "Freezing — Freezing" in the other.
+ */
+export const joinConditionsHeadline = (conditions: string, headline: string): string =>
+  headline.startsWith(conditions) ? headline : `${conditions} — ${headline}`;
 
 /**
  * A change of conditions, or a crossed call-change line, between the earlier
@@ -77,7 +86,7 @@ export const buildRegimeAlert = (
     reasons.push(
       `Funding pressure moved ${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)} ` +
         `and risk appetite moved ${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}, ` +
-        "carrying the posture across a boundary."
+        "carrying conditions across a change line."
     );
   }
 
@@ -88,7 +97,7 @@ export const buildRegimeAlert = (
     currentRecordDate,
     previousRecordDate,
     reasons,
-    summary: `The operating stance moved from ${REGIME_LABELS[previous.regime]} to ${REGIME_LABELS[current.regime]}.`,
+    summary: `Conditions moved from ${REGIME_LABELS[previous.regime]} to ${REGIME_LABELS[current.regime]}.`,
   };
 };
 

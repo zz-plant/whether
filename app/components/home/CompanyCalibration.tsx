@@ -45,7 +45,7 @@ export function CompanyCalibration({
     <section
       id={HOME_SECTIONS.calibration.id}
       aria-label="Your stage and runway"
-      className={`space-y-3 border-t border-slate-800/70 pt-4 ${hasNote ? "" : "max-sm:hidden"}`.trim()}
+      className={`space-y-3 border-t border-[color:var(--border-subtle)] pt-4 ${hasNote ? "" : "max-sm:hidden"}`.trim()}
     >
       {/* Folded to one line (2026-10-14). The two four-key rows stood between
           the call and "What are you deciding?", so the first thing asked of a

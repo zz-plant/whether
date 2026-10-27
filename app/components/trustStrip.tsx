@@ -172,7 +172,10 @@ export function TrustStrip({
             <dd
               className={`${termLayout}${
                 cell.tone === "caveat"
-                  ? "weather-caveat-mark font-medium text-caveat-fg"
+                  /* The diamond is a 7px square turned 45°, so it overhangs its box by
+                     about 1.5px each side; inline on the phone line that ate the space
+                     after the label and printed "Sources:◇". */
+                  ? `weather-caveat-mark font-medium text-caveat-fg ${line ? "max-sm:before:ml-0.5" : ""}`
                   : cell.tone === "easing"
                     ? "font-medium text-semantic-easing-fg before:mr-1.5 before:inline-block before:h-1.5 before:w-1.5 before:rounded-full before:bg-current before:align-middle before:content-['']"
                     : "font-medium text-slate-200"

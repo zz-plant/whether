@@ -251,7 +251,7 @@ const buildWhyThisCouldBeWrongBlock = (document: BriefDocument) => [
     ? [`• ${document.provenance.scoringBasis.warning} ${NOT_COUNTED_REASON}`]
     : []),
   `• ${document.slots.whyCouldBeWrong}`,
-  `• What would show it: "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, and the readings.`,
+  `• How you'd know: watch "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, and the readings.`,
 ];
 
 const buildCitationLines = (document: BriefDocument) => [

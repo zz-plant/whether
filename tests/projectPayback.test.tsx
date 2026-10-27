@@ -80,7 +80,7 @@ describe("the payback bar is the published rules' bar", () => {
       describePaybackBar(resolvePaybackBar(cloudy, "tight"), cloudy),
       "With 6–12 months of runway, every new commitment needs a payback inside 6 months.",
     );
-    assert.match(describePaybackBar({ kind: "cash-gate" }, cloudy), /hold every new commitment/);
+    assert.match(describePaybackBar({ kind: "cash-gate" }, cloudy), /pause every new commitment/);
     assert.match(describePaybackBar({ kind: "none" }, "EXPANSION"), /set no payback bar on roadmap work/);
   });
 });
@@ -233,7 +233,7 @@ describe("whether the market can move the bar", () => {
     for (const runwayMonths of [4, 9]) {
       const bar = resolvePaybackBar("SCARCITY", runwayMonths < 6 ? "critical" : "tight");
       const paybacks = buildProjectPaybacks([importer, rewrite], context({ regime: "SCARCITY", runwayMonths }));
-      assert.match(describeWhatMovesPaybackBar({ bar, scores: freezing, lines, paybacks }), /not the market: no rate move or headline lifts it/);
+      assert.match(describeWhatMovesPaybackBar({ bar, scores: freezing, lines, paybacks }), /not the market, so no rate move or headline changes it/);
     }
   });
 

@@ -3,6 +3,7 @@ import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/home
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
 import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
+import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
 import { DecisionHero } from "./components/DecisionHero";
@@ -43,6 +44,7 @@ import { HistoricalBanner } from "./components/historicalBanner";
 import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
+import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
 import { AllAreaRules } from "./components/home/AllAreaRules";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { AlertSection } from "./components/home/AlertSection";
@@ -439,14 +441,15 @@ async function PageContent({
   });
   /* How long these conditions lasted before, against the reader's chosen band.
      Left out of an archived view, whose record would have to end at its month. */
+  const recordSeries = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
   const spellLengths = historicalSelection || !isRegimeKey(regime)
     ? null
     : describeSpellLengths({
-        series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+        series: recordSeries,
         currentRegime: regime,
         runwayBand: data.operatorContext.companyRunway ?? null,
       });
-  const turningPoints = findRecentCallChanges(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER), 4).map((change) => ({
+  const turningPoints = findRecentCallChanges(recordSeries, 4).map((change) => ({
     label: `${formatMonthLabel(change.year, change.month)}, ${change.fromLabel} to ${change.toLabel}`,
     href: buildTimeMachineHref("/", { month: change.month, year: change.year }),
   }));
@@ -528,7 +531,7 @@ async function PageContent({
         href: buildPublishedBriefPath(differingBrief.slug),
       }
     : undefined;
-  const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(publicRegimeLabel, decisionPickerOptions);
+  const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(decisionPickerOptions);
   const heroAreas = heldAreasLine
     ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
     : undefined;
@@ -544,16 +547,18 @@ async function PageContent({
           it, so a move from the brief to `/signals`, `/operate` or `/resolve`
           went unrecorded and read the same as closing the tab. */}
       <OperatorWorkflowRouteTracker />
+      {/* A caveat, drawn like the archived-week banner below: the amber it
+          used is the crossed-line red, so late data read as a crossed line. */}
       {isDegraded ? (
-        <div className="mb-4 rounded-lg border border-amber-500/20 bg-amber-500/5 px-4 py-2.5 text-fluid-micro text-amber-300/70">
+        <p className="weather-caveat-mark mb-4 rounded-lg border border-l-4 border-caveat-border bg-caveat-bg px-4 py-2.5 text-fluid-micro text-caveat-fg">
           {resolveDataStatusGuidance({
             isFallbackSnapshot: homepage.reportShell.showOfflineBadge,
             degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 1,
           })}
-        </div>
+        </p>
       ) : null}
       {historicalSelection ? (
-        <div className="mx-auto max-w-[64rem]">
+        <div className="mx-auto weather-brief-measure">
           <HistoricalBanner
             year={historicalSelection.year}
             month={historicalSelection.month}
@@ -563,7 +568,7 @@ async function PageContent({
           />
         </div>
       ) : null}
-      <div className="mx-auto max-w-[64rem] space-y-4 sm:space-y-8">
+      <div className="mx-auto weather-brief-measure space-y-4 sm:space-y-8">
         <div className="weather-brief-flow">
           {/* Above the brief, not after it. This is the orientation line for a
               first-time visitor, and it sat below the hero, all three operating
@@ -586,6 +591,7 @@ async function PageContent({
           />
           <ConditionsLegend
             arrival={arrivedFromShare ? "share" : undefined}
+            orientation={historicalSelection ? undefined : homeOrientationLine}
             currentRegime={historicalSelection ? undefined : regime}
             thresholds={reportData.assessment.thresholds}
           />
@@ -678,7 +684,7 @@ async function PageContent({
               ) : null}
               {/* The reader's own decisions against this week's reading, for a browser
                   that has recorded some: one line, and nothing at all for the rest. */}
-              {!historicalSelection ? <YourRecordNote tightness={tightness} riskAppetite={riskAppetite} /> : null}
+              {!historicalSelection ? <YourRecordNote tightness={tightness} riskAppetite={riskAppetite} recordDate={reportData.treasury.record_date} /> : null}
               {/* The one Copy Brief (DD-005), under the card and its two reader
                   notes (which render nothing for most visits) rather than in it:
                   the card is what people screenshot, so a button inside it would
@@ -701,20 +707,7 @@ async function PageContent({
               </div>
             </div>
 
-            {/* 2. Whose lines these are. Live weekly brief only: the profile holds
-                the reader's company as of today, and an archived week or a longer
-                horizon was reached by choosing it. */}
-            {!historicalSelection && activeCadence === "weekly" ? (
-              <CompanyCalibration
-                stageLabel={stageLabel}
-                activeStage={activeStage}
-                activeRunway={activeRunway}
-                runwayEmphasis={runwayEmphasis}
-                stageAction={stageAction}
-              />
-            ) : null}
-
-            {/* 3. The five areas: the picker, all five side by side folded under it,
+            {/* 2. The five areas: the picker, all five side by side folded under it,
                 and the one plan link. */}
             <DecisionPicker
               options={decisionPickerOptions}
@@ -735,7 +728,48 @@ async function PageContent({
               </div>
             </DecisionPicker>
 
-            {/* 4. What would change the guidance: its pause and resume lines, the
+            {/* 3. Whose lines these are. Live weekly brief only: the profile holds
+                the reader's company as of today, and an archived week or a longer
+                horizon was reached by choosing it. Sits after the areas because the
+                table above already names the company it is scaled to; this is where
+                the reader changes that. */}
+            {!historicalSelection && activeCadence === "weekly" ? (
+              <CompanyCalibration
+                stageLabel={stageLabel}
+                activeStage={activeStage}
+                activeRunway={activeRunway}
+                runwayEmphasis={runwayEmphasis}
+                stageAction={stageAction}
+              />
+            ) : null}
+
+            {/* 4. What the conditions are made of, and what the reading leaves out:
+                the two scores with their meanings, the excluded inputs that would
+                change the classification, and the capped score's real distance. */}
+            <WhyConditionsSection
+              regime={regime}
+              tightness={tightness}
+              riskAppetite={riskAppetite}
+              changeLines={callChangeLines}
+              saturatedPressure={tightnessSaturated ? tightnessPressure : undefined}
+              notCounted={reportData.scoringBasis.notCounted}
+              warning={reportData.scoringBasis.warning}
+            />
+
+            {/* 5. What changed. One table, every signal, each against the earlier
+                reading and against its own lines. It opens on the table: the card
+                says what the week did to the conditions and why, and each area's
+                row says which of its lines moved. Only a read with nothing to
+                compare says so over it. */}
+            <WhatChangedSection
+              heading={`What changed ${basis.since}`}
+              rows={signalChangeRows}
+              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
+              comparisonUnavailable={comparisonUnavailable}
+              basis={basis}
+            />
+
+            {/* 6. What would change the guidance: its pause and resume lines, the
                 line where conditions change, and where the reading sits. */}
             <WhatWouldChangeSection
               ladders={scoreLadders}
@@ -750,24 +784,18 @@ async function PageContent({
               conditionsTrail={conditionsTrail}
             />
 
-            {/* 5. The alert: hearing the day a line is crossed is how the page is
-                meant to be used, so it follows the lines it watches. */}
-            <AlertSection />
-
-            {/* 6. What changed. One table, every signal, each against the earlier
-                reading and against its own lines. It opens on the table: the card
-                says what the week did to the conditions and why, and each area's
-                row says which of its lines moved. Only a read with nothing to
-                compare says so over it. */}
-            <WhatChangedSection
-              rows={signalChangeRows}
-              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
-              comparisonUnavailable={comparisonUnavailable}
-              basis={basis}
+            {/* 7. How unusual is this? */}
+            <RecordSection
+              lastTime={lastTimeCallChanged}
+              callChangeLines={callChangeLines}
+              turningPoints={turningPoints}
+              spellLengths={spellLengths}
+              record={historicalSelection ? undefined : recordSeries}
             />
 
-            {/* 7. Has this happened before? */}
-            <RecordSection lastTime={lastTimeCallChanged} callChangeLines={callChangeLines} turningPoints={turningPoints} spellLengths={spellLengths} />
+            {/* 8. The alert: hearing the day a line is crossed is how the page is
+                meant to be used, so it follows everything it watches. */}
+            <AlertSection />
 
             {/* Last, as a line rather than a section: the way out to every share
                 format, and the week's published brief. */}

@@ -174,9 +174,19 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   did not and could not be reproduced. Promote it into the gate after a week of identical runs.
 - **The gate shuffles test order.** `scripts/run-tests.mjs` passes `--randomize` under
   `WHETHER_DEPLOY_GATE=1`; bun prints `--seed=<n>` at the end of every run, and
-  `BUN_TEST_SEED=<n> bun run test` replays the container's order locally. The runner also strips
+  `BUN_TEST_SEED=<n> bun run test` replays the container's order locally (with shards, each
+  shard's seed is base + its index). The runner also strips
   `FRED_API_KEY` and `ALPHA_VANTAGE_API_KEY` from the suite's environment, so a key in a shell
   cannot route a fixture-driven test to a real upstream.
+- **The suite shards across a few processes (2026-10-21).** The runner was one bun process
+  for 441 files while the suite is CPU-bound — half its time in two infrastructure suites
+  (dev-server fixtures, the CLI suite's 62 child processes). It now splits the same file list
+  across up to 3 concurrent bun processes (default: one per core, `BUN_TEST_SHARDS` overrides,
+  a run with a path filter stays single). What runs is unchanged — every file once, shuffled
+  within its shard, same preload, timeout and stripped env; each shard is still one process,
+  so module-state coupling within a shard is unchanged and seed replay is per shard.
+  Measured locally: 29s → ~20s at 3 shards, peak RSS comparable to the single process
+  (~2 GB, dominated by fixture children either way).
 - **The build container always has Cloudflare credentials, and the suite must not see them
   (2026-09-15).** Workers Builds exports `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` so
   wrangler can deploy. `resolveAnalyticsReadConfig` reads both — it accepts `CLOUDFLARE_API_TOKEN`

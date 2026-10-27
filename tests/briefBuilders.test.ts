@@ -84,7 +84,7 @@ describe("buildSlackBrief", () => {
 
   it("resolves its change-course cross-reference to a label it actually prints", () => {
     const brief = buildSlackBrief(fixtureBriefDocument());
-    const referenced = brief.match(/What would show it: "([^"]+)"/)?.[1];
+    const referenced = brief.match(/How you'd know: watch "([^"]+)"/)?.[1];
     assert.ok(referenced, "no change-course cross-reference found");
     assert.ok(brief.includes(`• ${referenced}:`), `cross-reference points at "${referenced}", which the brief never prints`);
   });
@@ -166,7 +166,7 @@ describe("buildSlackBrief", () => {
     // Recovery from the Sep 25 reading: the sentence comes before the readings that are its evidence.
     assert.equal(
       lines[changed + 1],
-      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell through 66 and risk appetite rose through 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
     );
     assert.match(lines[changed + 2] ?? "", /^Funding pressure 12 of 100 /);
 

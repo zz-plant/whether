@@ -284,7 +284,7 @@ export default function ProductCanonPage() {
                 </thead>
                 <tbody>
                   {baseRate.rows.map((row) => (
-                    <tr key={row.regime} className="border-t border-slate-800">
+                    <tr key={row.regime} className="border-t border-[color:var(--border-subtle)]">
                       <th scope="row" className="py-2 pr-3 font-normal text-slate-100 sm:pr-4">{row.conditions}</th>
                       <td className="py-2 pr-3 tabular-nums sm:pr-4">
                         {row.months} ({formatCanonShare(row.monthShare)})
@@ -296,7 +296,7 @@ export default function ProductCanonPage() {
                       ))}
                     </tr>
                   ))}
-                  <tr className="border-t border-slate-700 text-slate-400">
+                  <tr className="border-t border-[color:var(--border-subtle)] text-slate-400">
                     <th scope="row" className="py-2 pr-3 font-normal sm:pr-4">On the record</th>
                     <td className="py-2 pr-3 tabular-nums sm:pr-4">{baseRate.monthsOnRecord}</td>
                     {ADVICE_STANCES.map((stance) => (
@@ -346,7 +346,7 @@ export default function ProductCanonPage() {
         >
           <ul className="space-y-5">
             {pairs.map((pair) => (
-              <li key={pair.decision} className="space-y-3 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0">
+              <li key={pair.decision} className="space-y-3 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0">
                 <h3 className="text-base font-semibold text-slate-100">{pair.decision}</h3>
                 <PairSide essay={pair.expand} />
                 <PairSide essay={pair.conserve} />
@@ -388,7 +388,7 @@ export default function ProductCanonPage() {
 
       <SecondaryPageSection
         title="The list, oldest first"
-        description="The date is first publication. Where an essay became a book, the note says which one the date is."
+        description="The date is first publication. If an essay later became a book, the note says which version the date refers to."
       >
         <EssayYearStrip timeline={timeline} recordStart={recordStart} />
         {/* From `sm` each entry has a rail: when it came out and the conditions
@@ -408,7 +408,14 @@ export default function ProductCanonPage() {
               <li
                 key={essay.slug}
                 id={essay.slug}
-                className="grid gap-x-8 gap-y-2 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0 sm:grid-cols-[10rem_minmax(0,1fr)]"
+                /* Off-screen entries skip their rendering until approached
+                   (2026-10-22): this list is the longest surface on the site
+                   and every entry was fully laid out on load. The intrinsic
+                   size is the estimate the scrollbar uses before an entry
+                   renders; `auto` remembers the real one after. Anchor links
+                   from "this week" above still land: the browser renders a
+                   targeted entry even while it is skipped. */
+                className="grid gap-x-8 gap-y-2 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0 [content-visibility:auto] [contain-intrinsic-size:auto_260px] sm:grid-cols-[10rem_minmax(0,1fr)]"
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 sm:flex-col sm:items-start">
                   <p className="type-eyebrow">
@@ -461,9 +468,9 @@ export default function ProductCanonPage() {
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            <span className="text-slate-100">A small, chosen sample.</span> These texts were picked for being widely
-            read, by the people who built this page. Every post in the archives counted above is the check on
-            that choice.
+            <span className="text-slate-100">A small, chosen sample.</span> The people who built this page picked these
+            texts because they were widely read. Counting every post in the archives above is how we check that
+            choice.
           </li>
           <li>
             <span className="text-slate-100">Publication, not adoption.</span> Each date is when a text came out. Advice
@@ -478,8 +485,8 @@ export default function ProductCanonPage() {
             out in. It cannot show why its author wrote it.
           </li>
           <li>
-            <span className="text-slate-100">Nothing before the record.</span> Texts published before it stay on the list
-            and out of every share.
+            <span className="text-slate-100">Nothing before the record.</span> Texts published before the record starts stay
+            on the list but aren&apos;t counted in any share.
           </li>
           <li>
             <span className="text-slate-100">Tags are judgment calls.</span> Each entry prints the line its tag rests on.

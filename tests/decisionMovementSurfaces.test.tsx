@@ -47,13 +47,13 @@ describe("the by-area Changed column", () => {
     const { rows } = week({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
     const byArea = new Map(rows.map((row) => [row.area, row]));
 
-    assert.equal(byArea.get("burn-discipline")?.changed, "Pause now applies: funding pressure rose through 76.");
-    assert.equal(byArea.get("product-tempo")?.changed, "Pause now applies: risk appetite fell through 44.");
+    assert.equal(byArea.get("burn-discipline")?.changed, "Pause now applies: funding pressure rose above 76.");
+    assert.equal(byArea.get("product-tempo")?.changed, "Pause now applies: risk appetite fell below 44.");
     assert.ok(rows.every((row) => row.changedKind === "paused"));
 
     const html = renderTable(rows);
     assert.match(html, /<th[^>]*>Changed<\/th>/);
-    assert.match(html, /Pause now applies: funding pressure rose through 76\./);
+    assert.match(html, /Pause now applies: funding pressure rose above 76\./);
     assert.doesNotMatch(html, /Re-check|Look at the roadmap again/, "the fixed re-check sentences are gone");
   });
 

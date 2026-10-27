@@ -128,8 +128,8 @@ const listenOnPreferredLocalPort = async (server: http.Server, preferredPorts = 
 };
 
 describe("whether cli", () => {
-  it("prints expanded help", () => {
-    const result = spawnSync(NODE_BIN, [CLI_PATH, "--help"], { encoding: "utf8" });
+  it("prints expanded help", async () => {
+    const result = await runCli(["--help"]);
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Whether CLI/);
     assert.match(result.stdout, /status/);
@@ -140,9 +140,9 @@ describe("whether cli", () => {
 
 
 
-  it("install fails in non-interactive shells without --yes/--ci", () => {
+  it("install fails in non-interactive shells without --yes/--ci", async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const result = spawnSync(NODE_BIN, [CLI_PATH, "install"], { encoding: "utf8", env: buildIsolatedEnv({ HOME: homeDir }) });
+    const result = await runCli(["install"], { env: buildIsolatedEnv({ HOME: homeDir }) });
     fs.rmSync(homeDir, { recursive: true, force: true });
 
     assert.equal(result.status, 1);
@@ -150,17 +150,15 @@ describe("whether cli", () => {
     assert.match(result.stderr, /--yes/);
   });
 
-  it("install supports --ci and writes config for automation", () => {
+  it("install supports --ci and writes config for automation", async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const install = spawnSync(NODE_BIN, [CLI_PATH, "install", "--ci", "--api-base-url", "http://127.0.0.1:4321", "--token", "ci-token"], {
-      encoding: "utf8",
+    const install = await runCli(["install", "--ci", "--api-base-url", "http://127.0.0.1:4321", "--token", "ci-token"], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
     assert.equal(install.status, 0);
 
-    const readConfig = spawnSync(NODE_BIN, [CLI_PATH, "config", "--json"], {
-      encoding: "utf8",
+    const readConfig = await runCli(["config", "--json"], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
@@ -172,16 +170,18 @@ describe("whether cli", () => {
     assert.equal(parsed.token, "ci-token");
   });
 
-  it("prints semantic version with --version", () => {
-    const result = spawnSync(NODE_BIN, [CLI_PATH, "--version"], { encoding: "utf8" });
+  it("prints semantic version with --version", async () => {
+    const result = await runCli(["--version"]);
     assert.equal(result.status, 0);
     assert.match(result.stdout.trim(), /^\d+\.\d+\.\d+$/);
     assert.equal(result.stderr, "");
   });
 
-  it("prints installable completion scripts for bash and zsh", () => {
-    const bash = spawnSync(NODE_BIN, [CLI_PATH, "completion", "--shell", "bash"], { encoding: "utf8" });
-    const zsh = spawnSync(NODE_BIN, [CLI_PATH, "completion", "--shell", "zsh"], { encoding: "utf8" });
+  it("prints installable completion scripts for bash and zsh", async () => {
+    const [bash, zsh] = await Promise.all([
+      runCli(["completion", "--shell", "bash"]),
+      runCli(["completion", "--shell", "zsh"]),
+    ]);
 
     assert.equal(bash.status, 0);
     assert.match(bash.stdout, /complete -F _whether_completion whether/);
@@ -385,20 +385,20 @@ describe("whether cli", () => {
     assert.match(result.stdout, /Give me the weekly operator summary\./);
   });
 
-  it("agent rejects unsupported cadence values with a clear error", () => {
-    const result = spawnSync(NODE_BIN, [CLI_PATH, "agent", "daily"], { encoding: "utf8" });
+  it("agent rejects unsupported cadence values with a clear error", async () => {
+    const result = await runCli(["agent", "daily"]);
     assert.equal(result.status, 1);
     assert.match(result.stderr, /Invalid cadence "daily"/);
     assert.match(result.stderr, /weekly, monthly, quarterly, yearly/);
   });
 
-  it("returns exit code 5 for invalid scenario input", () => {
-    const result = spawnSync(NODE_BIN, [CLI_PATH, "scenario", "--tightness", "oops"], { encoding: "utf8" });
+  it("returns exit code 5 for invalid scenario input", async () => {
+    const result = await runCli(["scenario", "--tightness", "oops"]);
     assert.equal(result.status, 5);
   });
 
-  it("prints subcommand help", () => {
-    const result = spawnSync(NODE_BIN, [CLI_PATH, "call", "--help"], { encoding: "utf8" });
+  it("prints subcommand help", async () => {
+    const result = await runCli(["call", "--help"]);
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Usage: whether call/);
   });
@@ -636,12 +636,8 @@ describe("whether cli", () => {
     assert.match(result.stderr, /Cause: HTTP 503 for \/api\/cli\/status/);
   });
 
-  it("maps network category with remediation and preserves original fetch cause", () => {
-    const result = spawnSync(
-      "node",
-      [CLI_PATH, "status", "--api-base-url", "http://127.0.0.1:1"],
-      { encoding: "utf8" },
-    );
+  it("maps network category with remediation and preserves original fetch cause", async () => {
+    const result = await runCli(["status", "--api-base-url", "http://127.0.0.1:1"]);
 
     assert.equal(result.status, 6);
     assert.match(result.stderr, /network: Unable to reach Whether API\./);
@@ -824,15 +820,13 @@ describe("whether cli", () => {
     assert.match(invalid.stderr, /Token is invalid\./);
   });
 
-  it("auth login accepts WHETHER_API_KEY in env when --token is omitted", () => {
+  it("auth login accepts WHETHER_API_KEY in env when --token is omitted", async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const login = spawnSync(NODE_BIN, [CLI_PATH, "auth", "login"], {
-      encoding: "utf8",
+    const login = await runCli(["auth", "login"], {
       env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "env-api-key" },
     });
 
-    const status = spawnSync(NODE_BIN, [CLI_PATH, "auth", "status", "--json"], {
-      encoding: "utf8",
+    const status = await runCli(["auth", "status", "--json"], {
       env: buildIsolatedEnv({ HOME: homeDir }),
     });
 
@@ -845,17 +839,12 @@ describe("whether cli", () => {
     assert.equal(parsed.source, "config");
   });
 
-  it("auth status returns machine-readable output and clear exit codes", () => {
+  it("auth status returns machine-readable output and clear exit codes", async () => {
     const homeDir = fs.mkdtempSync(path.join(os.tmpdir(), "whether-cli-home-"));
-    const missing = spawnSync(NODE_BIN, [CLI_PATH, "auth", "status", "--json"], {
-      encoding: "utf8",
-      env: buildIsolatedEnv({ HOME: homeDir }),
-    });
-
-    const withEnv = spawnSync(NODE_BIN, [CLI_PATH, "auth", "status", "--json"], {
-      encoding: "utf8",
-      env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "present" },
-    });
+    const [missing, withEnv] = await Promise.all([
+      runCli(["auth", "status", "--json"], { env: buildIsolatedEnv({ HOME: homeDir }) }),
+      runCli(["auth", "status", "--json"], { env: { ...buildIsolatedEnv({ HOME: homeDir }), WHETHER_API_KEY: "present" } }),
+    ]);
 
     fs.rmSync(homeDir, { recursive: true, force: true });
 
@@ -1114,8 +1103,8 @@ describe("whether cli", () => {
     assert.match(invalid.stderr, /auth: Authentication failed \(invalid key\)\./);
   });
 
-  it("ping maps network failures to network exit semantics", () => {
-    const result = spawnSync(NODE_BIN, [CLI_PATH, "ping", "--api-base-url", "http://127.0.0.1:1"], { encoding: "utf8" });
+  it("ping maps network failures to network exit semantics", async () => {
+    const result = await runCli(["ping", "--api-base-url", "http://127.0.0.1:1"]);
 
     assert.equal(result.status, 6);
     assert.match(result.stderr, /network: Unable to reach Whether API\./);
@@ -1350,8 +1339,8 @@ describe("whether cli", () => {
   });
 
   // Guard test: kebab-case CLI flags are not silently dropped by Commander's camelCase conversion.
-  it("--help mentions all critical flags to prevent Commander camelCase regressions", () => {
-    const result = spawnSync(NODE_BIN, [CLI_PATH, "--help"], { encoding: "utf8" });
+  it("--help mentions all critical flags to prevent Commander camelCase regressions", async () => {
+    const result = await runCli(["--help"]);
     assert.equal(result.status, 0);
     for (const flag of ["--no-local-discovery", "--api-base-url", "--as-of", "--payload-only", "--prompt-only", "--skills-only", "--verbose"]) {
       assert.match(result.stdout, new RegExp(flag.replace(/[-/\\^$*+?.()|[\]{}]/g, "\\$&")));
@@ -1360,7 +1349,7 @@ describe("whether cli", () => {
 
   it("--no-local-discovery flag prevents auto-discovery when URL source is default (verifies Commander kebab-case routing)", async () => {
     // Verify the flag is parseable by Commander and reachable in help output
-    const help = spawnSync(NODE_BIN, [CLI_PATH, "--help"], { encoding: "utf8" });
+    const help = await runCli(["--help"]);
     assert.match(help.stdout, /no-local-discovery/);
     // Verify --api-base-url flag routes correctly (the previously broken path)
     const server = http.createServer((_req, res) => {
@@ -1383,14 +1372,14 @@ describe("whether cli", () => {
    * Commander's default command, and the default swallowed the unknown word. Now a word that
    * is no command is said to be none, with the nearest command and the list.
    */
-  it("says an unknown command is unknown, and names the command it may have meant", () => {
-    const typo = spawnSync(NODE_BIN, [CLI_PATH, "stat", "--no-local-discovery"], { encoding: "utf8" });
+  it("says an unknown command is unknown, and names the command it may have meant", async () => {
+    const typo = await runCli(["stat", "--no-local-discovery"]);
     assert.equal(typo.status, 1);
     assert.match(typo.stderr, /error: unknown command 'stat' \(did you mean 'status'\?\)/);
     assert.match(typo.stderr, /Commands: ping, status, state, agent,/);
     assert.equal(typo.stdout, "");
 
-    const nonsense = spawnSync(NODE_BIN, [CLI_PATH, "frobnicate", "--no-local-discovery"], { encoding: "utf8" });
+    const nonsense = await runCli(["frobnicate", "--no-local-discovery"]);
     assert.equal(nonsense.status, 1);
     assert.match(nonsense.stderr, /error: unknown command 'frobnicate'\n/);
     assert.doesNotMatch(nonsense.stderr, /did you mean/);
@@ -1423,11 +1412,13 @@ describe("whether cli", () => {
     assert.ok(requests.every((url) => url.startsWith("/api/cli/status")), "the status route, and nothing else");
   });
 
-  it("lists every command in its completion scripts, from the commands it has", () => {
-    const help = spawnSync(NODE_BIN, [CLI_PATH, "--help"], { encoding: "utf8" });
+  it("lists every command in its completion scripts, from the commands it has", async () => {
+    const help = await runCli(["--help"]);
     const listed = [...help.stdout.matchAll(/^ {2}([a-z]+)(?:\s|\|)/gm)].map((match) => match[1]).filter((name) => name !== "help");
-    const bash = spawnSync(NODE_BIN, [CLI_PATH, "completion", "--shell", "bash"], { encoding: "utf8" });
-    const zsh = spawnSync(NODE_BIN, [CLI_PATH, "completion", "--shell", "zsh"], { encoding: "utf8" });
+    const [bash, zsh] = await Promise.all([
+      runCli(["completion", "--shell", "bash"]),
+      runCli(["completion", "--shell", "zsh"]),
+    ]);
 
     assert.ok(listed.includes("state") && listed.includes("agent"), "the commands an agent reaches for are commands");
     for (const name of listed) {

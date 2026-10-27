@@ -1,0 +1,1243 @@
+{
+  "version": 1,
+  "generator": "bun scripts/generate-visual-assets.tsx",
+  "gallery": "index.html",
+  "font": {
+    "family": "Archivo",
+    "editableSvg": true,
+    "svgFallback": "Arial, sans-serif",
+    "rasterFontSource": "public/fonts/og",
+    "note": "SVG text stays editable. Install Archivo for an exact match in another application. PNGs use the bundled font instances."
+  },
+  "usage": "References define concepts. Templates are visibly illustrative and contain no current readings or advice. Replace placeholder material with a cited, dated reading before using it as a decision artifact. Keep glyphs paired with their words.",
+  "sourceOfTruth": [
+    "lib/regimePresentation.ts",
+    "lib/regimePhaseSpace.ts",
+    "lib/report/boundedDecisionRules.ts",
+    "lib/report/operatingCalls.ts",
+    "lib/report/trustStatus.ts",
+    "lib/image/ogTheme.ts",
+    "app/styles/tokens.css"
+  ],
+  "themes": [
+    "dark",
+    "light"
+  ],
+  "groups": [
+    "conditions",
+    "areas",
+    "lines",
+    "status",
+    "charts",
+    "diagrams",
+    "frames",
+    "motion"
+  ],
+  "assetCount": 86,
+  "svgCount": 86,
+  "pngCount": 62,
+  "contactSheets": [
+    {
+      "theme": "dark",
+      "svg": "contact-sheet-dark.svg",
+      "png": "contact-sheet-dark.png"
+    },
+    {
+      "theme": "light",
+      "svg": "contact-sheet-light.svg",
+      "png": "contact-sheet-light.png"
+    }
+  ],
+  "motionExamples": [
+    {
+      "theme": "dark",
+      "html": "dark/motion-example.html"
+    },
+    {
+      "theme": "light",
+      "html": "light/motion-example.html"
+    }
+  ],
+  "assets": [
+    {
+      "id": "condition-scarcity-glyph",
+      "theme": "dark",
+      "group": "conditions",
+      "title": "Freezing glyph",
+      "alt": "Freezing condition reference: the canonical weather glyph beside its name. Money is expensive and hard to raise.",
+      "width": 360,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/condition-scarcity-glyph.svg"
+      }
+    },
+    {
+      "id": "condition-scarcity-tile",
+      "theme": "dark",
+      "group": "conditions",
+      "title": "Freezing condition tile",
+      "alt": "Freezing condition reference tile. Money is expensive and hard to raise. This is a definition, not a current reading.",
+      "width": 560,
+      "height": 320,
+      "example": false,
+      "files": {
+        "svg": "dark/condition-scarcity-tile.svg",
+        "png": "dark/condition-scarcity-tile.png"
+      }
+    },
+    {
+      "id": "condition-defensive-glyph",
+      "theme": "dark",
+      "group": "conditions",
+      "title": "Cloudy glyph",
+      "alt": "Cloudy condition reference: the canonical weather glyph beside its name. Money is available but pricey.",
+      "width": 360,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/condition-defensive-glyph.svg"
+      }
+    },
+    {
+      "id": "condition-defensive-tile",
+      "theme": "dark",
+      "group": "conditions",
+      "title": "Cloudy condition tile",
+      "alt": "Cloudy condition reference tile. Money is available but pricey. This is a definition, not a current reading.",
+      "width": 560,
+      "height": 320,
+      "example": false,
+      "files": {
+        "svg": "dark/condition-defensive-tile.svg",
+        "png": "dark/condition-defensive-tile.png"
+      }
+    },
+    {
+      "id": "condition-volatile-glyph",
+      "theme": "dark",
+      "group": "conditions",
+      "title": "Stormy glyph",
+      "alt": "Stormy condition reference: the canonical weather glyph beside its name. Money is cheap but investors are wary.",
+      "width": 360,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/condition-volatile-glyph.svg"
+      }
+    },
+    {
+      "id": "condition-volatile-tile",
+      "theme": "dark",
+      "group": "conditions",
+      "title": "Stormy condition tile",
+      "alt": "Stormy condition reference tile. Money is cheap but investors are wary. This is a definition, not a current reading.",
+      "width": 560,
+      "height": 320,
+      "example": false,
+      "files": {
+        "svg": "dark/condition-volatile-tile.svg",
+        "png": "dark/condition-volatile-tile.png"
+      }
+    },
+    {
+      "id": "condition-expansion-glyph",
+      "theme": "dark",
+      "group": "conditions",
+      "title": "Sunny glyph",
+      "alt": "Sunny condition reference: the canonical weather glyph beside its name. Money is cheap and available.",
+      "width": 360,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/condition-expansion-glyph.svg"
+      }
+    },
+    {
+      "id": "condition-expansion-tile",
+      "theme": "dark",
+      "group": "conditions",
+      "title": "Sunny condition tile",
+      "alt": "Sunny condition reference tile. Money is cheap and available. This is a definition, not a current reading.",
+      "width": 560,
+      "height": 320,
+      "example": false,
+      "files": {
+        "svg": "dark/condition-expansion-tile.svg",
+        "png": "dark/condition-expansion-tile.png"
+      }
+    },
+    {
+      "id": "area-hiring-glyph",
+      "theme": "dark",
+      "group": "areas",
+      "title": "Hiring glyph",
+      "alt": "Hiring operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/area-hiring-glyph.svg"
+      }
+    },
+    {
+      "id": "area-hiring-tile",
+      "theme": "dark",
+      "group": "areas",
+      "title": "Hiring area tile",
+      "alt": "Hiring reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "dark/area-hiring-tile.svg",
+        "png": "dark/area-hiring-tile.png"
+      }
+    },
+    {
+      "id": "area-product-tempo-glyph",
+      "theme": "dark",
+      "group": "areas",
+      "title": "Roadmap glyph",
+      "alt": "Roadmap operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/area-product-tempo-glyph.svg"
+      }
+    },
+    {
+      "id": "area-product-tempo-tile",
+      "theme": "dark",
+      "group": "areas",
+      "title": "Roadmap area tile",
+      "alt": "Roadmap reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "dark/area-product-tempo-tile.svg",
+        "png": "dark/area-product-tempo-tile.png"
+      }
+    },
+    {
+      "id": "area-capital-raising-glyph",
+      "theme": "dark",
+      "group": "areas",
+      "title": "Fundraising glyph",
+      "alt": "Fundraising operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/area-capital-raising-glyph.svg"
+      }
+    },
+    {
+      "id": "area-capital-raising-tile",
+      "theme": "dark",
+      "group": "areas",
+      "title": "Fundraising area tile",
+      "alt": "Fundraising reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "dark/area-capital-raising-tile.svg",
+        "png": "dark/area-capital-raising-tile.png"
+      }
+    },
+    {
+      "id": "area-burn-discipline-glyph",
+      "theme": "dark",
+      "group": "areas",
+      "title": "Spending glyph",
+      "alt": "Spending operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/area-burn-discipline-glyph.svg"
+      }
+    },
+    {
+      "id": "area-burn-discipline-tile",
+      "theme": "dark",
+      "group": "areas",
+      "title": "Spending area tile",
+      "alt": "Spending reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "dark/area-burn-discipline-tile.svg",
+        "png": "dark/area-burn-discipline-tile.png"
+      }
+    },
+    {
+      "id": "area-expansion-bets-glyph",
+      "theme": "dark",
+      "group": "areas",
+      "title": "New bets glyph",
+      "alt": "New bets operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/area-expansion-bets-glyph.svg"
+      }
+    },
+    {
+      "id": "area-expansion-bets-tile",
+      "theme": "dark",
+      "group": "areas",
+      "title": "New bets area tile",
+      "alt": "New bets reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "dark/area-expansion-bets-tile.svg",
+        "png": "dark/area-expansion-bets-tile.png"
+      }
+    },
+    {
+      "id": "line-crossed-glyph",
+      "theme": "dark",
+      "group": "lines",
+      "title": "Pause line crossed glyph",
+      "alt": "Pause line crossed reference, pairing the canonical line state glyph with explicit words.",
+      "width": 500,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/line-crossed-glyph.svg"
+      }
+    },
+    {
+      "id": "line-crossed-stamp",
+      "theme": "dark",
+      "group": "lines",
+      "title": "Pause line crossed stamp",
+      "alt": "Pause line crossed reusable line state template. Crossed and near use the line ink; clear uses neutral ink.",
+      "width": 560,
+      "height": 160,
+      "example": true,
+      "files": {
+        "svg": "dark/line-crossed-stamp.svg",
+        "png": "dark/line-crossed-stamp.png"
+      }
+    },
+    {
+      "id": "line-near-glyph",
+      "theme": "dark",
+      "group": "lines",
+      "title": "Near pause line glyph",
+      "alt": "Near pause line reference, pairing the canonical line state glyph with explicit words.",
+      "width": 500,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/line-near-glyph.svg"
+      }
+    },
+    {
+      "id": "line-near-stamp",
+      "theme": "dark",
+      "group": "lines",
+      "title": "Near pause line stamp",
+      "alt": "Near pause line reusable line state template. Crossed and near use the line ink; clear uses neutral ink.",
+      "width": 560,
+      "height": 160,
+      "example": true,
+      "files": {
+        "svg": "dark/line-near-stamp.svg",
+        "png": "dark/line-near-stamp.png"
+      }
+    },
+    {
+      "id": "line-clear-glyph",
+      "theme": "dark",
+      "group": "lines",
+      "title": "Pause line clear glyph",
+      "alt": "Pause line clear reference, pairing the canonical line state glyph with explicit words.",
+      "width": 500,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "dark/line-clear-glyph.svg"
+      }
+    },
+    {
+      "id": "line-clear-stamp",
+      "theme": "dark",
+      "group": "lines",
+      "title": "Pause line clear stamp",
+      "alt": "Pause line clear reusable line state template. Crossed and near use the line ink; clear uses neutral ink.",
+      "width": 560,
+      "height": 160,
+      "example": true,
+      "files": {
+        "svg": "dark/line-clear-stamp.svg",
+        "png": "dark/line-clear-stamp.png"
+      }
+    },
+    {
+      "id": "status-live",
+      "theme": "dark",
+      "group": "status",
+      "title": "All sources live label",
+      "alt": "All sources live status label template, shown in neutral ink. The caveat diamond qualifies cached and historical states; no current source health is asserted.",
+      "width": 560,
+      "height": 144,
+      "example": true,
+      "files": {
+        "svg": "dark/status-live.svg",
+        "png": "dark/status-live.png"
+      }
+    },
+    {
+      "id": "status-partly-cached",
+      "theme": "dark",
+      "group": "status",
+      "title": "Partly cached label",
+      "alt": "Partly cached status label template, shown in neutral ink. The caveat diamond qualifies cached and historical states; no current source health is asserted.",
+      "width": 560,
+      "height": 144,
+      "example": true,
+      "files": {
+        "svg": "dark/status-partly-cached.svg",
+        "png": "dark/status-partly-cached.png"
+      }
+    },
+    {
+      "id": "status-cached",
+      "theme": "dark",
+      "group": "status",
+      "title": "Cached snapshot label",
+      "alt": "Cached snapshot status label template, shown in neutral ink. The caveat diamond qualifies cached and historical states; no current source health is asserted.",
+      "width": 560,
+      "height": 144,
+      "example": true,
+      "files": {
+        "svg": "dark/status-cached.svg",
+        "png": "dark/status-cached.png"
+      }
+    },
+    {
+      "id": "status-historical",
+      "theme": "dark",
+      "group": "status",
+      "title": "Historical snapshot label",
+      "alt": "Historical snapshot status label template, shown in neutral ink. The caveat diamond qualifies cached and historical states; no current source health is asserted.",
+      "width": 560,
+      "height": 144,
+      "example": true,
+      "files": {
+        "svg": "dark/status-historical.svg",
+        "png": "dark/status-historical.png"
+      }
+    },
+    {
+      "id": "conditions-plane",
+      "theme": "dark",
+      "group": "charts",
+      "title": "Four condition plane",
+      "alt": "Condition reference template. Funding pressure increases to the right and risk appetite increases upward. Sunny is cheap money with willing investors; Cloudy is pricey money with willing investors; Stormy is cheap money with wary investors; Freezing is pricey money with wary investors. No current reading is plotted.",
+      "width": 1400,
+      "height": 1040,
+      "example": true,
+      "files": {
+        "svg": "dark/conditions-plane.svg",
+        "png": "dark/conditions-plane.png"
+      }
+    },
+    {
+      "id": "conditions-key",
+      "theme": "dark",
+      "group": "charts",
+      "title": "Condition definition key",
+      "alt": "Reference template listing all four canonical conditions beside their weather glyphs and definitions; it states no current condition.",
+      "width": 1400,
+      "height": 840,
+      "example": true,
+      "files": {
+        "svg": "dark/conditions-key.svg",
+        "png": "dark/conditions-key.png"
+      }
+    },
+    {
+      "id": "threshold-ladder",
+      "theme": "dark",
+      "group": "charts",
+      "title": "Pause and resume ladder",
+      "alt": "Illustrative threshold template on a 0–100 score scale. Example funding pressure is 72; pause above 70 and resume below 60. These values demonstrate layout and are not current guidance.",
+      "width": 1200,
+      "height": 700,
+      "example": true,
+      "files": {
+        "svg": "dark/threshold-ladder.svg",
+        "png": "dark/threshold-ladder.png"
+      }
+    },
+    {
+      "id": "paired-thresholds",
+      "theme": "dark",
+      "group": "charts",
+      "title": "Two thresholds with the same orientation",
+      "alt": "Illustrative paired threshold template on 0–100 scales. Funding pressure rises toward trouble: example 72, pause above 70, resume below 60. Risk appetite falls toward trouble: example 50, pause below 35, resume above 45. The lower scale is visibly reversed, so trouble sits on the right in both rows.",
+      "width": 1200,
+      "height": 1000,
+      "example": true,
+      "files": {
+        "svg": "dark/paired-thresholds.svg",
+        "png": "dark/paired-thresholds.png"
+      }
+    },
+    {
+      "id": "condition-timeline",
+      "theme": "dark",
+      "group": "charts",
+      "title": "Condition timeline template",
+      "alt": "Illustrative timeline template with six fictional equal-width weeks: Freezing, Cloudy, Cloudy, Stormy, Sunny and Sunny. Weather glyphs and words accompany every color. It is not an archive or a current forecast.",
+      "width": 1400,
+      "height": 675,
+      "example": true,
+      "files": {
+        "svg": "dark/condition-timeline.svg",
+        "png": "dark/condition-timeline.png"
+      }
+    },
+    {
+      "id": "signal-trend",
+      "theme": "dark",
+      "group": "charts",
+      "title": "Signal trend with threshold",
+      "alt": "Illustrative trend template on a labeled 0–100 score domain with six fictional readings: 22, 31, 28, 49, 61 and 75. A dashed pause line sits at 70. This is not a measured time series or current guidance.",
+      "width": 1200,
+      "height": 875,
+      "example": true,
+      "files": {
+        "svg": "dark/signal-trend.svg",
+        "png": "dark/signal-trend.png"
+      }
+    },
+    {
+      "id": "decision-path",
+      "theme": "dark",
+      "group": "diagrams",
+      "title": "Signals to decision path",
+      "alt": "Process template: read dated signals, name the conditions using the weekly call, choose an action calibrated to company constraints, set pause and resume lines, and share the cited artifact. It contains no current recommendation.",
+      "width": 1600,
+      "height": 720,
+      "example": true,
+      "files": {
+        "svg": "dark/decision-path.svg",
+        "png": "dark/decision-path.png"
+      }
+    },
+    {
+      "id": "pause-resume-path",
+      "theme": "dark",
+      "group": "diagrams",
+      "title": "Pause and resume decision path",
+      "alt": "Blank bounded decision template with separate branches for the agreed pause condition and the resume condition. Pause uses the canonical pause glyph and line ink; resume uses the canonical play glyph and neutral ink. Placeholders contain no current guidance.",
+      "width": 1200,
+      "height": 850,
+      "example": true,
+      "files": {
+        "svg": "dark/pause-resume-path.svg",
+        "png": "dark/pause-resume-path.png"
+      }
+    },
+    {
+      "id": "operating-rules",
+      "theme": "dark",
+      "group": "frames",
+      "title": "Five area operating rules",
+      "alt": "Blank operating rule template covering the five canonical areas: Hiring, Roadmap, Fundraising, Spending and New bets. Each row has placeholders for action, pause line and resume line. No advice or current reading is prefilled.",
+      "width": 1500,
+      "height": 1040,
+      "example": true,
+      "files": {
+        "svg": "dark/operating-rules.svg",
+        "png": "dark/operating-rules.png"
+      }
+    },
+    {
+      "id": "decision-delta",
+      "theme": "dark",
+      "group": "frames",
+      "title": "Decision change comparison",
+      "alt": "Blank decision delta template comparing a previous action and this week's action, with explicit placeholders for the reason and the reversal condition. It contains no current facts.",
+      "width": 1200,
+      "height": 850,
+      "example": true,
+      "files": {
+        "svg": "dark/decision-delta.svg",
+        "png": "dark/decision-delta.png"
+      }
+    },
+    {
+      "id": "source-note",
+      "theme": "dark",
+      "group": "frames",
+      "title": "Citable source note",
+      "alt": "Blank compact provenance template with placeholders for the reading, record date, retrieval time, source and readiness caveat. It asserts no actual source health or current values.",
+      "width": 1200,
+      "height": 750,
+      "example": true,
+      "files": {
+        "svg": "dark/source-note.svg",
+        "png": "dark/source-note.png"
+      }
+    },
+    {
+      "id": "share-frame-square",
+      "theme": "dark",
+      "group": "frames",
+      "title": "Square share frame",
+      "alt": "Blank square share template with editable placeholders for the weekly call, decision delta, action, pause condition, resume condition and source note. It contains no current recommendation.",
+      "width": 1080,
+      "height": 1080,
+      "example": true,
+      "files": {
+        "svg": "dark/share-frame-square.svg",
+        "png": "dark/share-frame-square.png"
+      }
+    },
+    {
+      "id": "share-frame-landscape",
+      "theme": "dark",
+      "group": "frames",
+      "title": "Landscape share frame",
+      "alt": "Blank landscape share template with editable placeholders for the weekly call, decision delta, action, pause condition, resume condition and source note. It contains no current recommendation.",
+      "width": 1600,
+      "height": 900,
+      "example": true,
+      "files": {
+        "svg": "dark/share-frame-landscape.svg",
+        "png": "dark/share-frame-landscape.png"
+      }
+    },
+    {
+      "id": "share-frame-portrait",
+      "theme": "dark",
+      "group": "frames",
+      "title": "Portrait share frame",
+      "alt": "Blank portrait share template with editable placeholders for the weekly call, decision delta, action, pause condition, resume condition and source note. It contains no current recommendation.",
+      "width": 1080,
+      "height": 1350,
+      "example": true,
+      "files": {
+        "svg": "dark/share-frame-portrait.svg",
+        "png": "dark/share-frame-portrait.png"
+      }
+    },
+    {
+      "id": "decision-reveal",
+      "theme": "dark",
+      "group": "motion",
+      "title": "Decision reveal end state",
+      "alt": "Static end state for the motion template, with placeholders for a bounded action and its reversal. The standalone HTML applies one short entrance, skipped entirely when reduced motion is requested.",
+      "width": 1200,
+      "height": 675,
+      "example": true,
+      "files": {
+        "svg": "dark/decision-reveal.svg",
+        "png": "dark/decision-reveal.png"
+      }
+    },
+    {
+      "id": "condition-scarcity-glyph",
+      "theme": "light",
+      "group": "conditions",
+      "title": "Freezing glyph",
+      "alt": "Freezing condition reference: the canonical weather glyph beside its name. Money is expensive and hard to raise.",
+      "width": 360,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/condition-scarcity-glyph.svg"
+      }
+    },
+    {
+      "id": "condition-scarcity-tile",
+      "theme": "light",
+      "group": "conditions",
+      "title": "Freezing condition tile",
+      "alt": "Freezing condition reference tile. Money is expensive and hard to raise. This is a definition, not a current reading.",
+      "width": 560,
+      "height": 320,
+      "example": false,
+      "files": {
+        "svg": "light/condition-scarcity-tile.svg",
+        "png": "light/condition-scarcity-tile.png"
+      }
+    },
+    {
+      "id": "condition-defensive-glyph",
+      "theme": "light",
+      "group": "conditions",
+      "title": "Cloudy glyph",
+      "alt": "Cloudy condition reference: the canonical weather glyph beside its name. Money is available but pricey.",
+      "width": 360,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/condition-defensive-glyph.svg"
+      }
+    },
+    {
+      "id": "condition-defensive-tile",
+      "theme": "light",
+      "group": "conditions",
+      "title": "Cloudy condition tile",
+      "alt": "Cloudy condition reference tile. Money is available but pricey. This is a definition, not a current reading.",
+      "width": 560,
+      "height": 320,
+      "example": false,
+      "files": {
+        "svg": "light/condition-defensive-tile.svg",
+        "png": "light/condition-defensive-tile.png"
+      }
+    },
+    {
+      "id": "condition-volatile-glyph",
+      "theme": "light",
+      "group": "conditions",
+      "title": "Stormy glyph",
+      "alt": "Stormy condition reference: the canonical weather glyph beside its name. Money is cheap but investors are wary.",
+      "width": 360,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/condition-volatile-glyph.svg"
+      }
+    },
+    {
+      "id": "condition-volatile-tile",
+      "theme": "light",
+      "group": "conditions",
+      "title": "Stormy condition tile",
+      "alt": "Stormy condition reference tile. Money is cheap but investors are wary. This is a definition, not a current reading.",
+      "width": 560,
+      "height": 320,
+      "example": false,
+      "files": {
+        "svg": "light/condition-volatile-tile.svg",
+        "png": "light/condition-volatile-tile.png"
+      }
+    },
+    {
+      "id": "condition-expansion-glyph",
+      "theme": "light",
+      "group": "conditions",
+      "title": "Sunny glyph",
+      "alt": "Sunny condition reference: the canonical weather glyph beside its name. Money is cheap and available.",
+      "width": 360,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/condition-expansion-glyph.svg"
+      }
+    },
+    {
+      "id": "condition-expansion-tile",
+      "theme": "light",
+      "group": "conditions",
+      "title": "Sunny condition tile",
+      "alt": "Sunny condition reference tile. Money is cheap and available. This is a definition, not a current reading.",
+      "width": 560,
+      "height": 320,
+      "example": false,
+      "files": {
+        "svg": "light/condition-expansion-tile.svg",
+        "png": "light/condition-expansion-tile.png"
+      }
+    },
+    {
+      "id": "area-hiring-glyph",
+      "theme": "light",
+      "group": "areas",
+      "title": "Hiring glyph",
+      "alt": "Hiring operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/area-hiring-glyph.svg"
+      }
+    },
+    {
+      "id": "area-hiring-tile",
+      "theme": "light",
+      "group": "areas",
+      "title": "Hiring area tile",
+      "alt": "Hiring reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "light/area-hiring-tile.svg",
+        "png": "light/area-hiring-tile.png"
+      }
+    },
+    {
+      "id": "area-product-tempo-glyph",
+      "theme": "light",
+      "group": "areas",
+      "title": "Roadmap glyph",
+      "alt": "Roadmap operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/area-product-tempo-glyph.svg"
+      }
+    },
+    {
+      "id": "area-product-tempo-tile",
+      "theme": "light",
+      "group": "areas",
+      "title": "Roadmap area tile",
+      "alt": "Roadmap reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "light/area-product-tempo-tile.svg",
+        "png": "light/area-product-tempo-tile.png"
+      }
+    },
+    {
+      "id": "area-capital-raising-glyph",
+      "theme": "light",
+      "group": "areas",
+      "title": "Fundraising glyph",
+      "alt": "Fundraising operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/area-capital-raising-glyph.svg"
+      }
+    },
+    {
+      "id": "area-capital-raising-tile",
+      "theme": "light",
+      "group": "areas",
+      "title": "Fundraising area tile",
+      "alt": "Fundraising reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "light/area-capital-raising-tile.svg",
+        "png": "light/area-capital-raising-tile.png"
+      }
+    },
+    {
+      "id": "area-burn-discipline-glyph",
+      "theme": "light",
+      "group": "areas",
+      "title": "Spending glyph",
+      "alt": "Spending operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/area-burn-discipline-glyph.svg"
+      }
+    },
+    {
+      "id": "area-burn-discipline-tile",
+      "theme": "light",
+      "group": "areas",
+      "title": "Spending area tile",
+      "alt": "Spending reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "light/area-burn-discipline-tile.svg",
+        "png": "light/area-burn-discipline-tile.png"
+      }
+    },
+    {
+      "id": "area-expansion-bets-glyph",
+      "theme": "light",
+      "group": "areas",
+      "title": "New bets glyph",
+      "alt": "New bets operating area reference: the canonical area glyph beside its public label, in neutral ink.",
+      "width": 400,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/area-expansion-bets-glyph.svg"
+      }
+    },
+    {
+      "id": "area-expansion-bets-tile",
+      "theme": "light",
+      "group": "areas",
+      "title": "New bets area tile",
+      "alt": "New bets reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.",
+      "width": 560,
+      "height": 260,
+      "example": false,
+      "files": {
+        "svg": "light/area-expansion-bets-tile.svg",
+        "png": "light/area-expansion-bets-tile.png"
+      }
+    },
+    {
+      "id": "line-crossed-glyph",
+      "theme": "light",
+      "group": "lines",
+      "title": "Pause line crossed glyph",
+      "alt": "Pause line crossed reference, pairing the canonical line state glyph with explicit words.",
+      "width": 500,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/line-crossed-glyph.svg"
+      }
+    },
+    {
+      "id": "line-crossed-stamp",
+      "theme": "light",
+      "group": "lines",
+      "title": "Pause line crossed stamp",
+      "alt": "Pause line crossed reusable line state template. Crossed and near use the line ink; clear uses neutral ink.",
+      "width": 560,
+      "height": 160,
+      "example": true,
+      "files": {
+        "svg": "light/line-crossed-stamp.svg",
+        "png": "light/line-crossed-stamp.png"
+      }
+    },
+    {
+      "id": "line-near-glyph",
+      "theme": "light",
+      "group": "lines",
+      "title": "Near pause line glyph",
+      "alt": "Near pause line reference, pairing the canonical line state glyph with explicit words.",
+      "width": 500,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/line-near-glyph.svg"
+      }
+    },
+    {
+      "id": "line-near-stamp",
+      "theme": "light",
+      "group": "lines",
+      "title": "Near pause line stamp",
+      "alt": "Near pause line reusable line state template. Crossed and near use the line ink; clear uses neutral ink.",
+      "width": 560,
+      "height": 160,
+      "example": true,
+      "files": {
+        "svg": "light/line-near-stamp.svg",
+        "png": "light/line-near-stamp.png"
+      }
+    },
+    {
+      "id": "line-clear-glyph",
+      "theme": "light",
+      "group": "lines",
+      "title": "Pause line clear glyph",
+      "alt": "Pause line clear reference, pairing the canonical line state glyph with explicit words.",
+      "width": 500,
+      "height": 128,
+      "example": false,
+      "files": {
+        "svg": "light/line-clear-glyph.svg"
+      }
+    },
+    {
+      "id": "line-clear-stamp",
+      "theme": "light",
+      "group": "lines",
+      "title": "Pause line clear stamp",
+      "alt": "Pause line clear reusable line state template. Crossed and near use the line ink; clear uses neutral ink.",
+      "width": 560,
+      "height": 160,
+      "example": true,
+      "files": {
+        "svg": "light/line-clear-stamp.svg",
+        "png": "light/line-clear-stamp.png"
+      }
+    },
+    {
+      "id": "status-live",
+      "theme": "light",
+      "group": "status",
+      "title": "All sources live label",
+      "alt": "All sources live status label template, shown in neutral ink. The caveat diamond qualifies cached and historical states; no current source health is asserted.",
+      "width": 560,
+      "height": 144,
+      "example": true,
+      "files": {
+        "svg": "light/status-live.svg",
+        "png": "light/status-live.png"
+      }
+    },
+    {
+      "id": "status-partly-cached",
+      "theme": "light",
+      "group": "status",
+      "title": "Partly cached label",
+      "alt": "Partly cached status label template, shown in neutral ink. The caveat diamond qualifies cached and historical states; no current source health is asserted.",
+      "width": 560,
+      "height": 144,
+      "example": true,
+      "files": {
+        "svg": "light/status-partly-cached.svg",
+        "png": "light/status-partly-cached.png"
+      }
+    },
+    {
+      "id": "status-cached",
+      "theme": "light",
+      "group": "status",
+      "title": "Cached snapshot label",
+      "alt": "Cached snapshot status label template, shown in neutral ink. The caveat diamond qualifies cached and historical states; no current source health is asserted.",
+      "width": 560,
+      "height": 144,
+      "example": true,
+      "files": {
+        "svg": "light/status-cached.svg",
+        "png": "light/status-cached.png"
+      }
+    },
+    {
+      "id": "status-historical",
+      "theme": "light",
+      "group": "status",
+      "title": "Historical snapshot label",
+      "alt": "Historical snapshot status label template, shown in neutral ink. The caveat diamond qualifies cached and historical states; no current source health is asserted.",
+      "width": 560,
+      "height": 144,
+      "example": true,
+      "files": {
+        "svg": "light/status-historical.svg",
+        "png": "light/status-historical.png"
+      }
+    },
+    {
+      "id": "conditions-plane",
+      "theme": "light",
+      "group": "charts",
+      "title": "Four condition plane",
+      "alt": "Condition reference template. Funding pressure increases to the right and risk appetite increases upward. Sunny is cheap money with willing investors; Cloudy is pricey money with willing investors; Stormy is cheap money with wary investors; Freezing is pricey money with wary investors. No current reading is plotted.",
+      "width": 1400,
+      "height": 1040,
+      "example": true,
+      "files": {
+        "svg": "light/conditions-plane.svg",
+        "png": "light/conditions-plane.png"
+      }
+    },
+    {
+      "id": "conditions-key",
+      "theme": "light",
+      "group": "charts",
+      "title": "Condition definition key",
+      "alt": "Reference template listing all four canonical conditions beside their weather glyphs and definitions; it states no current condition.",
+      "width": 1400,
+      "height": 840,
+      "example": true,
+      "files": {
+        "svg": "light/conditions-key.svg",
+        "png": "light/conditions-key.png"
+      }
+    },
+    {
+      "id": "threshold-ladder",
+      "theme": "light",
+      "group": "charts",
+      "title": "Pause and resume ladder",
+      "alt": "Illustrative threshold template on a 0–100 score scale. Example funding pressure is 72; pause above 70 and resume below 60. These values demonstrate layout and are not current guidance.",
+      "width": 1200,
+      "height": 700,
+      "example": true,
+      "files": {
+        "svg": "light/threshold-ladder.svg",
+        "png": "light/threshold-ladder.png"
+      }
+    },
+    {
+      "id": "paired-thresholds",
+      "theme": "light",
+      "group": "charts",
+      "title": "Two thresholds with the same orientation",
+      "alt": "Illustrative paired threshold template on 0–100 scales. Funding pressure rises toward trouble: example 72, pause above 70, resume below 60. Risk appetite falls toward trouble: example 50, pause below 35, resume above 45. The lower scale is visibly reversed, so trouble sits on the right in both rows.",
+      "width": 1200,
+      "height": 1000,
+      "example": true,
+      "files": {
+        "svg": "light/paired-thresholds.svg",
+        "png": "light/paired-thresholds.png"
+      }
+    },
+    {
+      "id": "condition-timeline",
+      "theme": "light",
+      "group": "charts",
+      "title": "Condition timeline template",
+      "alt": "Illustrative timeline template with six fictional equal-width weeks: Freezing, Cloudy, Cloudy, Stormy, Sunny and Sunny. Weather glyphs and words accompany every color. It is not an archive or a current forecast.",
+      "width": 1400,
+      "height": 675,
+      "example": true,
+      "files": {
+        "svg": "light/condition-timeline.svg",
+        "png": "light/condition-timeline.png"
+      }
+    },
+    {
+      "id": "signal-trend",
+      "theme": "light",
+      "group": "charts",
+      "title": "Signal trend with threshold",
+      "alt": "Illustrative trend template on a labeled 0–100 score domain with six fictional readings: 22, 31, 28, 49, 61 and 75. A dashed pause line sits at 70. This is not a measured time series or current guidance.",
+      "width": 1200,
+      "height": 875,
+      "example": true,
+      "files": {
+        "svg": "light/signal-trend.svg",
+        "png": "light/signal-trend.png"
+      }
+    },
+    {
+      "id": "decision-path",
+      "theme": "light",
+      "group": "diagrams",
+      "title": "Signals to decision path",
+      "alt": "Process template: read dated signals, name the conditions using the weekly call, choose an action calibrated to company constraints, set pause and resume lines, and share the cited artifact. It contains no current recommendation.",
+      "width": 1600,
+      "height": 720,
+      "example": true,
+      "files": {
+        "svg": "light/decision-path.svg",
+        "png": "light/decision-path.png"
+      }
+    },
+    {
+      "id": "pause-resume-path",
+      "theme": "light",
+      "group": "diagrams",
+      "title": "Pause and resume decision path",
+      "alt": "Blank bounded decision template with separate branches for the agreed pause condition and the resume condition. Pause uses the canonical pause glyph and line ink; resume uses the canonical play glyph and neutral ink. Placeholders contain no current guidance.",
+      "width": 1200,
+      "height": 850,
+      "example": true,
+      "files": {
+        "svg": "light/pause-resume-path.svg",
+        "png": "light/pause-resume-path.png"
+      }
+    },
+    {
+      "id": "operating-rules",
+      "theme": "light",
+      "group": "frames",
+      "title": "Five area operating rules",
+      "alt": "Blank operating rule template covering the five canonical areas: Hiring, Roadmap, Fundraising, Spending and New bets. Each row has placeholders for action, pause line and resume line. No advice or current reading is prefilled.",
+      "width": 1500,
+      "height": 1040,
+      "example": true,
+      "files": {
+        "svg": "light/operating-rules.svg",
+        "png": "light/operating-rules.png"
+      }
+    },
+    {
+      "id": "decision-delta",
+      "theme": "light",
+      "group": "frames",
+      "title": "Decision change comparison",
+      "alt": "Blank decision delta template comparing a previous action and this week's action, with explicit placeholders for the reason and the reversal condition. It contains no current facts.",
+      "width": 1200,
+      "height": 850,
+      "example": true,
+      "files": {
+        "svg": "light/decision-delta.svg",
+        "png": "light/decision-delta.png"
+      }
+    },
+    {
+      "id": "source-note",
+      "theme": "light",
+      "group": "frames",
+      "title": "Citable source note",
+      "alt": "Blank compact provenance template with placeholders for the reading, record date, retrieval time, source and readiness caveat. It asserts no actual source health or current values.",
+      "width": 1200,
+      "height": 750,
+      "example": true,
+      "files": {
+        "svg": "light/source-note.svg",
+        "png": "light/source-note.png"
+      }
+    },
+    {
+      "id": "share-frame-square",
+      "theme": "light",
+      "group": "frames",
+      "title": "Square share frame",
+      "alt": "Blank square share template with editable placeholders for the weekly call, decision delta, action, pause condition, resume condition and source note. It contains no current recommendation.",
+      "width": 1080,
+      "height": 1080,
+      "example": true,
+      "files": {
+        "svg": "light/share-frame-square.svg",
+        "png": "light/share-frame-square.png"
+      }
+    },
+    {
+      "id": "share-frame-landscape",
+      "theme": "light",
+      "group": "frames",
+      "title": "Landscape share frame",
+      "alt": "Blank landscape share template with editable placeholders for the weekly call, decision delta, action, pause condition, resume condition and source note. It contains no current recommendation.",
+      "width": 1600,
+      "height": 900,
+      "example": true,
+      "files": {
+        "svg": "light/share-frame-landscape.svg",
+        "png": "light/share-frame-landscape.png"
+      }
+    },
+    {
+      "id": "share-frame-portrait",
+      "theme": "light",
+      "group": "frames",
+      "title": "Portrait share frame",
+      "alt": "Blank portrait share template with editable placeholders for the weekly call, decision delta, action, pause condition, resume condition and source note. It contains no current recommendation.",
+      "width": 1080,
+      "height": 1350,
+      "example": true,
+      "files": {
+        "svg": "light/share-frame-portrait.svg",
+        "png": "light/share-frame-portrait.png"
+      }
+    },
+    {
+      "id": "decision-reveal",
+      "theme": "light",
+      "group": "motion",
+      "title": "Decision reveal end state",
+      "alt": "Static end state for the motion template, with placeholders for a bounded action and its reversal. The standalone HTML applies one short entrance, skipped entirely when reduced motion is requested.",
+      "width": 1200,
+      "height": 675,
+      "example": true,
+      "files": {
+        "svg": "light/decision-reveal.svg",
+        "png": "light/decision-reveal.png"
+      }
+    }
+  ]
+}

@@ -18,7 +18,7 @@ as the full brief:
 | --- | --- |
 | `headline` | The state in one sentence, for an agent that only quotes. |
 | `automation` | `{ ready, refusal }`: whether the data is live and current. **Check `ready` before acting without a person looking.** False for a saved copy, a record older than 10 days, or failed assembly; `refusal` says which. It says nothing about what the guidance is. This is `publishReadiness`, not `degraded`. |
-| `freshness` | `fetchedAt`, `recordAgeDays`, `live`, `fallback`. |
+| `freshness` | `fetchedAt`, `recordAgeDays`, `live`, `fallback`, `nextCallDue` (the next Monday 14:00 UTC publication; the call is current until then). |
 | `conditions` / `confidence` | The weather word and its stable `key`; the published confidence (`HIGH`/`MED`/`LOW`, percent) — the same one the page, `/api/scores` and the CLI carry. Pages print it as the margin ("Clear of / Within reach of / Close to the line"); see the field-to-label table in `docs/developer/api-reference.md`. |
 | `scores.tightness` / `scores.riskAppetite` | `value`, `meaning`, and against each line: `pause`, `resume` (each `{ line, distance, side, met }`; `met` on the pause line means the pause applies) and `change` (where the conditions themselves change). Then `previous`, `delta`, `perWeek` (the pace to hand a projection) and `moved` (what the delta is made of, signed, adding up to it). |
 | `change` | `direction`, `regimeChanged`, `comparedWith` (the earlier reading, dated: the previous month-end snapshot, **not last week**), `days` and a `note` where part of `moved` is an input the earlier score never had. |
@@ -59,6 +59,8 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 - Returns summary copy, provenance, and `agentHandoff` (`payload` + `prompt`).
 - The payload now includes `decision_rules`, `decision_delta`, and `flip_watch` so agents can explain what changed, what should change now, and what would flip the call without reconstructing their own regime logic.
 - Returns HTTP 400 for invalid cadence values, and for an unknown `view` (`allowedViews`).
+- `?week=<slug>` (e.g. `2026-w41`) answers that specific frozen week's published brief with its decisions, scores, and provenance. Returns HTTP 404 with `availableWeeks` if unknown.
+- `?period=<slug>` (e.g. `2024-q1` or `2023`) answers that specific posture archive period. Returns HTTP 404 if unknown.
 - `?view=state` answers the compact state above instead of the full brief (default view: `full`).
 - The payload's `confidence` is the published confidence; `decision_delta.compared_with` names the reading the changes are measured against.
 - Includes read-only CORS headers for browser-based tool clients.
@@ -162,9 +164,10 @@ Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 - `get_brief` — the full brief for a cadence (about 22KB). Alias: `get_agent_brief`.
 - `get_standup_line` — one line for a team's daily standup: whether guidance moved and what would change it.
 - `get_decision_rules` — the bounded rules by regime. Keyed by regime, one key for one regime.
+- `get_answer` — one decision answer's guidance, current standing and rules in force, by slug or natural-language question ("should we freeze hiring"); the answer pages are the same ones `/llms.txt` routes questions to.
 - `get_context`, `get_projection` — history and projection for a regime; both default to today's reading. `get_context` counts **months** of month-end snapshots (`monthsActive`, `historicalAvgMonths`), through the `latestSnapshot` it names, because the record is monthly; it was `weeksActive` / `historicalAvgWeeks` over the same monthly series, so an agent told "8 weeks" was being told 8 months. A regime newer than the last month-end has `monthsActive` 0 and a `note` saying so.
 - `get_comps`, `get_signals`, `get_recent_history` — SaaS multiples, data coverage, one signal's trailing window.
-- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `get_analog_playbook` — a plan checked against today's conditions.
+- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `audit_sprint_retro`, `get_analog_playbook` — a plan or sprint retro checked against today's conditions.
 - `list_agent_skills` — the skill contract.
 
 Client config (shape):

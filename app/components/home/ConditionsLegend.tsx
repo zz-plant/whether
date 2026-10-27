@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { X } from "lucide-react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import { getOrderedRegimeLegend, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
+import { CONDITION_SIDE_MEANINGS, getOrderedRegimeLegend, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
 import { ConditionIcon } from "../ui/conceptIcons";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
@@ -83,13 +83,22 @@ const LEGEND_ORDER: readonly RegimeKey[] = ["EXPANSION", "DEFENSIVE", "VOLATILE"
  * above the other. Below `md` the card has no room for the map, and this line is
  * the only definition on the first screen. The share greeting is not a
  * definition, so it stays at every width.
+ *
+ * Whom the site is for, and what it does, at every width (2026-10-21). The card
+ * under this opens on the week's guidance, which says what to do and never what
+ * Whether is, so a first visit met a weather word and a headline with no subject.
+ * One sentence, the category line, in the slot that already shows only to a first
+ * visit; returning readers and a dismissal hide it with the legend.
  */
 export function ConditionsLegend({
   arrival,
+  orientation,
   currentRegime,
   thresholds,
 }: {
   arrival?: "share";
+  /** Whom Whether is for and what it does (`homeOrientationLine`), shown at every width. */
+  orientation?: string;
   /** This week's conditions, marked in the legend. Left out for an archived week. */
   currentRegime?: RegimeKey;
   /** The two change lines the conditions are cut at (the assessment's thresholds). */
@@ -116,11 +125,15 @@ export function ConditionsLegend({
       aria-label="The four conditions"
       data-testid="conditions-legend"
       suppressHydrationWarning
-      className={`mb-3 flex items-start justify-between gap-4 border-b border-white/[0.08] pb-3 text-fluid-xs text-slate-300 ${arrival === "share" ? "" : "md:hidden"}`.trim()}
+      className={`mb-3 flex items-start justify-between gap-4 border-b border-[color:var(--border-subtle)] pb-3 text-fluid-xs text-slate-300 ${arrival === "share" || orientation ? "" : "md:hidden"}`.trim()}
     >
-      <p className="min-w-0 leading-relaxed">
+      <div className="min-w-0 flex-1">
+        <p className="min-w-0 leading-relaxed">
         {/* A reader who followed a pasted brief knows who sent it and nothing else. */}
         {arrival === "share" ? <>This is this week&apos;s guidance from Whether. </> : null}
+        {/* A block for the eye, a space for a copy or a screen reader, which would
+            otherwise read "…and raise.Cloudy this week". */}
+        {orientation ? <><span className="block text-slate-100 md:text-fluid-sm" data-orientation-line>{orientation}</span>{" "}</> : null}
         <span className="md:hidden" data-conditions-definitions>
           {/* The first entry names both scores; the rest keep the same order, so
               the line stays short enough to read as one. */}
@@ -142,7 +155,7 @@ export function ConditionsLegend({
                     the four words do not order themselves (Stormy is not worse than
                     Cloudy, each is hard on one side), so the meaning is the help. */}
                 {all.length === 1
-                  ? `: ${sides.pressureAbove ? "pricey money" : "cheap money"}, ${sides.appetiteAbove ? "willing investors" : "wary investors"} (${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite})`
+                  ? `: ${sides.pressureAbove ? CONDITION_SIDE_MEANINGS.pressureAbove : CONDITION_SIDE_MEANINGS.pressureBelow}, ${sides.appetiteAbove ? CONDITION_SIDE_MEANINGS.appetiteAbove : CONDITION_SIDE_MEANINGS.appetiteBelow} (${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite})`
                   : index === 0
                     ? `: ${regimeSignalLabel.tightness.toLowerCase()} ${pressure}, ${regimeSignalLabel.riskAppetite.toLowerCase()} ${appetite}`
                     : `: ${pressure}, ${appetite}`}
@@ -159,11 +172,12 @@ export function ConditionsLegend({
           </Link>
         </span>
       </p>
+      </div>
       <button
         type="button"
         onClick={handleDismiss}
-        aria-label="Dismiss the conditions legend"
-        className="shrink-0 -mr-2 -mt-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-white hover:bg-slate-800/60 transition-colors"
+        aria-label={orientation ? "Dismiss this introduction" : "Dismiss the conditions legend"}
+        className="shrink-0 -mr-2 -mt-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-lg px-2 text-xs font-medium text-slate-400 hover:text-slate-100 hover:bg-[color:var(--bg-raised)] transition-colors"
       >
         <X size={16} aria-hidden="true" />
       </button>

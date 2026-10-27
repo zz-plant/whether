@@ -91,18 +91,24 @@ describe("regime scoring", () => {
 
   it("counts the pressure a pinned score hides before the published number can fall", () => {
     // The week of Oct 19, 2026: funding pressure published 90 with 110 of
-    // pressure under the 100 ceiling, risk appetite 55. The published gap is 20,
-    // but the score sheds 10 hidden points before it moves, so the line it is
+    // pressure behind the component ceiling, risk appetite 55. The published gap is 20,
+    // but the score sheds 20 hidden points before it moves, so the line it is
     // nearest is risk appetite's, 5 points (22.5 scaled) away.
     const thresholds = DEFAULT_THRESHOLDS;
     const pinned = { tightness: 90, tightnessPressure: 110, tightnessSaturated: true, riskAppetite: 55 };
     assert.deepEqual(resolveNearestLineMargin({ scores: pinned, thresholds }), { signal: "riskAppetite", points: 5 });
-    assert.equal(resolveDistanceToFlip({ scores: { ...pinned, riskAppetite: 80 }, thresholds }), 30);
+    assert.equal(resolveDistanceToFlip({ scores: { ...pinned, riskAppetite: 80 }, thresholds }), 40);
     // Unpinned, the same published scores keep the published gap.
     assert.deepEqual(
       resolveNearestLineMargin({ scores: { tightness: 90, riskAppetite: 55 }, thresholds }),
       { signal: "tightness", points: 20 },
     );
+  });
+
+  it("counts pressure hidden by a component cap before the global saturation flag turns on", () => {
+    const scores = { tightness: 90, tightnessPressure: 95, tightnessSaturated: false, riskAppetite: 80 };
+    assert.equal(resolveDistanceToFlip({ scores, thresholds: DEFAULT_THRESHOLDS }), 25);
+    assert.deepEqual(resolveNearestLineMargin({ scores, thresholds: DEFAULT_THRESHOLDS }), { signal: "tightness", points: 25 });
   });
 });
 

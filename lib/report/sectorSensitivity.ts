@@ -32,14 +32,14 @@ export const SECTOR_TAXONOMY: Record<SectorKey, SectorSensitivityConfig> = {
     tightnessMultiplier: 1,
     riskAppetiteMultiplier: 1,
     biasOffset: 0,
-    rationale: "Tracks canonical posture with minimal structural tilt.",
+    rationale: "Tracks base market conditions with minimal structural tilt.",
   },
   infrastructure: {
     label: "Infrastructure",
     tightnessMultiplier: 1.28,
     riskAppetiteMultiplier: 0.72,
     biasOffset: -0.18,
-    rationale: "Feels financing stress earlier and rewards risk appetite later due to reliability and migration burdens.",
+    rationale: "Feels funding stress sooner and benefits from risk appetite later, because reliability and migration work slow it down.",
   },
   fintech: {
     label: "Fintech",
@@ -53,7 +53,7 @@ export const SECTOR_TAXONOMY: Record<SectorKey, SectorSensitivityConfig> = {
     tightnessMultiplier: 1.12,
     riskAppetiteMultiplier: 0.84,
     biasOffset: -0.02,
-    rationale: "Procurement and reimbursement cycles smooth upside and downside, producing conservative posture translation.",
+    rationale: "Procurement and reimbursement cycles smooth upside and downside, dampening market swings.",
   },
   "ai-platforms": {
     label: "AI Platforms",

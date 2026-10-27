@@ -147,7 +147,7 @@ describe("product canon: base rate by kind of advice", () => {
     assert.match(sentence, /Of the 2 texts tagged Expand, 2 came out in a Sunny month \(100%\)\./);
     assert.match(sentence, /Of the 2 tagged Conserve, 2 came out in a Freezing or Stormy month \(100%\)\./);
     assert.match(sentence, /capital advice leans with the conditions/);
-    assert.match(sentence, /one text more or less moves a share by 50 points/);
+    assert.match(sentence, /adding or removing one text moves a share by 50 points/);
     assert.doesNotMatch(sentence, /\bbecause\b|\bcaused?\b|\bdrove\b|\bdriven\b/i);
   });
 

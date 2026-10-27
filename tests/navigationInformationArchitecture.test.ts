@@ -47,7 +47,7 @@ describe("navigation groups", () => {
       {
         "this-week": ["/", "/signals", "/trust"],
         decide: ["/operate", "/operate/financial", "/operate/scenarios", "/comps"],
-        record: ["/history", "/history/compare", "/calibration", "/concepts"],
+        record: ["/history", "/calibration", "/history/compare", "/concepts"],
         guides: ["/resources"],
       },
     );
@@ -131,6 +131,15 @@ describe("utility links", () => {
     );
   });
 
+  /* Until 2026-10-23 no page, nav or palette linked /contact — only the sitemap
+     named it. The footer brand row, the phone's More sheet and the palette all
+     render this array, so membership is reachability. */
+  it("keeps Contact reachable from the footer, the sheet and the palette", () => {
+    const contact = utilityLinks.find((link) => link.href === "/contact");
+    assert.ok(contact, "/contact is in the utility links");
+    assert.equal(contact.header, null, "the header's text row does not carry it");
+  });
+
   it("leaves no page in a utility link that a group already owns", () => {
     const grouped = new Set<string>(navigationPages.map((page) => page.href));
     for (const link of utilityLinks) {
@@ -181,9 +190,13 @@ describe("footer mirrors the groups and the utility links", () => {
 describe("content sections", () => {
   it("names every routed content family the pages and utilities do not", () => {
     const named = new Set<string>(contentSections.map((section) => section.prefix));
-    for (const prefix of ["/answers", "/brief", "/resolve", "/toolkits", "/contact"]) {
+    for (const prefix of ["/answers", "/brief", "/resolve", "/toolkits"]) {
       assert.ok(named.has(prefix), `${prefix} must be a named content section`);
     }
+    // Contact is a utility link since 2026-10-23, so it reaches the footer, the
+    // phone sheet and the palette from the one array instead of being named
+    // only in the header's sublabel.
+    assert.ok(!named.has("/contact"), "/contact is a utility link, not a content section");
   });
 
   it("does not overlap a page or a utility link", () => {

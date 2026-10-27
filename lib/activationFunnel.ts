@@ -27,7 +27,7 @@
  * advertises no trackers, and this measurement is built to keep that true rather
  * than to be maximally informative.
  */
-import { formatIsoWeekSlug, getIsoWeekInfo } from "./isoWeek";
+import { formatIsoWeekSlug, getIsoWeekInfo, isoWeekMonday, isoWeeksInYear, parseIsoWeekSlug } from "./isoWeek";
 import { sendTelemetry } from "./telemetry/sendTelemetry";
 
 const ACTIVATION_TELEMETRY_ENDPOINT = "/api/telemetry/activation";
@@ -167,19 +167,26 @@ export const isActivationEvent = (input: unknown): input is ActivationEvent => {
   return true;
 };
 
-/** ISO weeks between two week slugs, or null when either is unreadable. */
+/**
+ * ISO weeks between two week slugs, or null when either is unreadable — which
+ * includes a week number the year does not have: 2025 ends at w52, so
+ * "2025-w53" names nothing, while 2026 (a Thursday-starting year) really has a
+ * w53. The span crosses year boundaries by the calendar, not by an assumed 52,
+ * so the extra week of a 53-week year counts.
+ */
 export const weeksBetweenSlugs = (fromSlug: string, toSlug: string) => {
-  const from = /^(\d{4})-w(\d{2})$/.exec(fromSlug);
-  const to = /^(\d{4})-w(\d{2})$/.exec(toSlug);
+  const from = parseIsoWeekSlug(fromSlug);
+  const to = parseIsoWeekSlug(toSlug);
 
-  if (!from || !to) {
+  if (!from || !to || from.week > isoWeeksInYear(from.year) || to.week > isoWeeksInYear(to.year)) {
     return null;
   }
 
-  const fromWeeks = Number(from[1]) * 52 + Number(from[2]);
-  const toWeeks = Number(to[1]) * 52 + Number(to[2]);
+  const DAY_MS = 86_400_000;
+  const fromMonday = isoWeekMonday(from).getTime();
+  const toMonday = isoWeekMonday(to).getTime();
 
-  return toWeeks - fromWeeks;
+  return Math.round((toMonday - fromMonday) / (7 * DAY_MS));
 };
 
 export const classifyReturnGap = (weeks: number): ActivationReturnGap => {

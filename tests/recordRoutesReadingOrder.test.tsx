@@ -146,7 +146,7 @@ describe("/trust carries one trust strip", () => {
     const ladders = [...html.matchAll(/data-score-ladder/g)].map((match) => match.index ?? -1);
     assert.equal(ladders.length, 2);
     assert.ok(ladders.every((index) => index > formula), "both ladders sit inside the formula section");
-    assert.ok(ladders[1] < html.indexOf("Four conditions: funding pressure above"), "the quadrant stays, as the rule's explanation, beneath them");
+    assert.ok(ladders[1] < html.indexOf("Four conditions, picked by whether funding pressure is above"), "the quadrant stays, as the rule's explanation, beneath them");
   });
 });
 

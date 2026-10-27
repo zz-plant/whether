@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { scaleLinear } from "d3-scale";
 import type { TreasuryData } from "../../../lib/types";
 import { SegmentedControl } from "../../components/ui/segmentedControl";
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
@@ -99,11 +100,14 @@ const linePath = (
   height: number,
   min: number,
   max: number,
-) => buildSegmentedLineSeries({ values, width, height, min, max });
+  baselineY?: number,
+) => buildSegmentedLineSeries({ values, width, height, min, max, curve: "monotone", baselineY });
 
-const toChartX = (value: number, min: number, max: number, width: number) => ((value - min) / (max - min || 1)) * width;
+const toChartX = (value: number, min: number, max: number, width: number) =>
+  scaleLinear().domain([min, max]).range([0, width])(value);
 
-const toChartY = (value: number, min: number, max: number, height: number) => height - ((value - min) / (max - min || 1)) * height;
+const toChartY = (value: number, min: number, max: number, height: number) =>
+  scaleLinear().domain([min, max]).range([height, 0])(value);
 
 const inDomain = (value: number, min: number, max: number) => value >= min && value <= max;
 
@@ -207,7 +211,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const threeMonthSeries = linePath(points.map((point) => point.threeMonth), 100, 36, rateMin, rateMax);
   const twoYearSeries = linePath(points.map((point) => point.twoYear), 100, 36, rateMin, rateMax);
   const tenYearSeries = linePath(points.map((point) => point.tenYear), 100, 36, rateMin, rateMax);
-  const spread10Y2YSeries = linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax);
+  const zeroLineY = scaleLinear().domain([spreadMin, spreadMax]).range([36, 0])(0);
+  const spread10Y2YSeries = linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax, zeroLineY);
   const spread2Y3MSeries = linePath(points.map((point) => point.spread2Y3M), 100, 36, spreadMin, spreadMax);
   const hasRateGaps =
     oneMonthSeries.missingColumns.length > 0
@@ -217,7 +222,6 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const hasSpreadGaps =
     spread10Y2YSeries.missingColumns.length > 0
     || spread2Y3MSeries.missingColumns.length > 0;
-  const zeroLineY = 36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36;
 
   /* The in-plot series labels that sat here are gone. They were anchored to each
      series' last point at the right edge — exactly where the lines terminate — so
@@ -306,7 +310,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 options={CADENCE_OPTIONS}
                 value={cadence}
                 onSelect={setCadence}
-                ariaLabel="Chart cadence"
+                ariaLabel="View by month or year"
               />
             </div>
             <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="One-month, three-month, two-year and ten-year Treasury rates">
@@ -382,14 +386,14 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   markerHeight="4"
                   orient="auto-start-reverse"
                 >
-                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--accent-action)" strokeOpacity="0.55" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--app-text)" strokeOpacity="0.55" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                 </marker>
               </defs>
               {scatterPath ? (
                 <path
                   d={scatterPath}
                   fill="none"
-                  stroke="var(--accent-action)"
+                  stroke="var(--app-text)"
                   strokeOpacity="0.28"
                   strokeWidth="0.8"
                   markerMid="url(#scatter-direction-arrow)"
@@ -407,7 +411,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                     cx={x}
                     cy={y}
                     r={isLatestPoint ? "2.3" : "1.8"}
-                    fill="var(--accent-action)"
+                    fill="var(--app-text)"
                     fillOpacity={opacity.toFixed(2)}
                     stroke={isLatestPoint ? "var(--app-text)" : undefined}
                     strokeWidth={isLatestPoint ? "0.5" : undefined}
@@ -443,6 +447,9 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
               <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
+              {spread10Y2YSeries.areaPaths.map((areaPath, index) => (
+                <path key={`spread-10-2-area-${index}`} d={areaPath} fill={SERIES.spread10Y2Y} fillOpacity="0.08" />
+              ))}
               {spread10Y2YSeries.paths.map((path, index) => (
                 <path key={`spread-10-2-${index}`} d={path} fill="none" stroke={SERIES.spread10Y2Y} strokeWidth="2" />
               ))}

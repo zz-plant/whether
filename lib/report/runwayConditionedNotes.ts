@@ -169,7 +169,7 @@ export const buildRunwayConditionedNotes = ({
     if (isExpansion) {
       notes.push({
         area: "expansion-bets",
-        note: "With runway above a year, spare runway goes furthest into the reversible bets the guidance allows.",
+        note: "With over a year of runway, the spare goes furthest in the reversible bets the guidance allows.",
       });
     }
     return notes;

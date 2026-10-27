@@ -97,7 +97,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="The margin is how far the scores sit from the line where conditions change. Whether readings at that distance actually held is measured separately, over the whole archive."
+        description="The margin is how far the scores sit from the line where conditions change. We check separately, across the whole archive, how often readings at that distance actually held."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study
@@ -168,7 +168,16 @@ export default async function MethodPage({
 
       {readerReturns ? <ReaderReturnsSection line={readerReturns.line} generatedAt={readerReturns.generatedAt} /> : null}
 
-      <FormulaReference positions={scorePositions} scoringBasis={reportData.scoringBasis} />
+      {/* The derivation folds only on a stable week — the same condition that
+          folds "Limits" below — and opens from `?derivation=1`. On a week with
+          warnings or a cached reading it renders open, where the reader who
+          needs to distrust it finds it unprompted (DD-040). */}
+      <FormulaReference
+        positions={scorePositions}
+        scoringBasis={reportData.scoringBasis}
+        plainLanguageFolded={!isFallback && warnings.length === 0}
+        plainLanguageOpen={isDisclosureOpenInParams(resolvedSearchParams, "derivation")}
+      />
 
       {/* Open, under the derivation: the page's question is whether the
           reading is current enough to act on, and this is where that is

@@ -134,8 +134,8 @@ describe("the weekly email refuses what it cannot stand behind", () => {
 
     const [message] = sent;
     assert.ok(message, "the one subscriber was mailed");
-    assert.match(message.text, /Move these lines for your own plan, and hear the day one is crossed: \S+\/operate#ops-plan-lines/);
-    assert.match(message.html, /<a href="[^"]+\/operate#ops-plan-lines"[^>]*>Move these lines for your own plan<\/a>/);
+    assert.match(message.text, /Set these lines for your own plan and we'll email you the day one is crossed: \S+\/operate#ops-plan-lines/);
+    assert.match(message.html, /<a href="[^"]+\/operate#ops-plan-lines"[^>]*>Set these lines for your own plan<\/a>/);
   });
 
   it("still reports no subscribers as the non-event it is", async () => {

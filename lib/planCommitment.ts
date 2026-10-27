@@ -85,10 +85,13 @@ const ANNUAL_MARKER = /(\bper\s+year\b|\/\s?yr\b|\bannual(?:ly)?\b|\ba\s+year\b|
  * A stated term caps how many months a monthly amount runs: "a contractor for 3
  * months at $15k/mo" is $45k, and annualising it read $180k. Only a term under a
  * year changes anything, since the figure is a first-year cost either way. A
- * term reads "for/over N months" or "an N-month …"; "9 months of runway" is
- * neither, so a runway aside cannot shrink the cost.
+ * term reads "for/over N months" or "an N-month <thing>"; "9 months of runway"
+ * is neither. The hyphenated form is a term only when it modifies a commitment,
+ * not runway: "maintaining a 9-month runway" is an aside about runway and must
+ * not shrink the cost ("$10k/mo while maintaining a 9-month runway" is $120k a
+ * year, not $90k).
  */
-const TERM_MONTHS = /\b(?:(?:for|over)\s+(\d{1,2})\s+months?|(\d{1,2})[- ]month)\b/i;
+const TERM_MONTHS = /\b(?:(?:for|over)\s+(\d{1,2})\s+months?|(\d{1,2})[- ]month\b(?!\s*(?:of\s+)?(?:runway|buffer|reserve)\b))/i;
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",

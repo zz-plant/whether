@@ -23,7 +23,7 @@ import { resolveLineState } from "../../lib/report/operatingCalls";
 import { DecisionHero } from "../components/DecisionHero";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
-import { formatMarginStamp, publicDecisionLabels } from "../../lib/report/reportFormatting";
+import { formatDecisionReversal, formatDecisionThreshold, formatMarginStamp, publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildFlipThreshold, buildWeekCallChangesIf } from "../../lib/report/reportEvidence";
 import { formatThresholdNumber } from "../../lib/formatters";
@@ -115,8 +115,8 @@ export async function DecisionAnswerPageContent({
     `Market guidance as of ${recordDateLabel}`,
     `${publicDecisionLabels.call}: ${headline.composed}`,
     `${areaDoNowLabel}: ${payload.immediateAction}`,
-    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
-    `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
+    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(payload.triggerThreshold)}`,
+    `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(payload.reversalCondition)}`,
     `Citation: ${callCitation}`,
     `Freshness: ${fetchedAtLabel}`,
     ...(dataCurrency ? [`Data status: ${dataCurrency.summary}`] : []),
@@ -169,7 +169,7 @@ export async function DecisionAnswerPageContent({
   });
 
   /*
-   * All eleven pages shipped the same six section headings, so the outline a
+   * The first eleven pages shipped the same six section headings, so the outline a
    * reader skims said nothing about which answer they were reading. Four of the
    * six are built from this page's audience, decision areas and threshold
    * focus; "Copy this answer" and "Citation" label a button and a provenance
@@ -213,8 +213,8 @@ export async function DecisionAnswerPageContent({
           regime={assessment.regime}
           lines={[
             { label: areaDoNowLabel, value: payload.immediateAction },
-            { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: payload.triggerThreshold },
-            { label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: payload.reversalCondition },
+            { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: formatDecisionThreshold(payload.triggerThreshold) },
+            { label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: formatDecisionReversal(payload.reversalCondition) },
           ]}
           trust={buildTrustStripProps({
             recordDateLabel,
@@ -228,7 +228,7 @@ export async function DecisionAnswerPageContent({
           })}
         />
         {dataCurrency ? (
-          <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+          <p className="weather-caveat-mark rounded-md border border-l-4 border-caveat-border bg-caveat-bg px-3 py-2 text-xs text-caveat-fg">
             {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
             <ActionLink href={DATA_CURRENCY_ACTION_HREF} variant="inline">Source dates</ActionLink>
           </p>

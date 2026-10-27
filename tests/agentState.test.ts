@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { GET as getAgent } from "../app/api/agent/route";
 import { loadAgentInterfaceContext, type AgentInterfaceContext } from "../lib/agentInterface";
-import { agentStateSchema, buildAgentState } from "../lib/agentState";
+import { agentStateSchema, buildAgentState, nextWeeklyCallDue } from "../lib/agentState";
 import { buildCliStatusContract } from "../lib/cli/contracts";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
 import { asLiveMacroSeries } from "./fixtures/reportFixtures";
@@ -180,6 +180,12 @@ describe("the agent state", () => {
     });
   });
 
+  it("names the next Monday 14:00 UTC publication, strictly after now", () => {
+    assert.equal(nextWeeklyCallDue(new Date("2026-10-19T13:59:00Z")), "2026-10-19T14:00:00.000Z");
+    assert.equal(nextWeeklyCallDue(new Date("2026-10-19T14:00:00Z")), "2026-10-26T14:00:00.000Z");
+    assert.equal(nextWeeklyCallDue(new Date("2026-10-25T23:00:00Z")), "2026-10-26T14:00:00.000Z");
+  });
+
   it("says the data is live and current only for a live reading that is recent", async () => {
     const context = await loadAgentInterfaceContext("test");
     const now = new Date("2026-09-29T12:00:00Z");
@@ -187,7 +193,7 @@ describe("the agent state", () => {
 
     const ready = buildAgentState(live, now);
     assert.deepEqual(ready.automation, { ready: true, refusal: null });
-    assert.deepEqual(ready.freshness, { fetchedAt: live.reportData.treasury.fetched_at, recordAgeDays: 4, live: true, fallback: false });
+    assert.deepEqual(ready.freshness, { fetchedAt: live.reportData.treasury.fetched_at, recordAgeDays: 4, live: true, fallback: false, nextCallDue: "2026-10-05T14:00:00.000Z" });
     assert.match(ready.headline, /The data is live and current\.$/);
 
     const savedCopy = buildAgentState(

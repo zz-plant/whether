@@ -10,7 +10,7 @@ import { CheckIcon, ShareIcon, SpinnerIcon } from "../components/uiIcons";
 import { useBriefArtifact } from "../components/useBriefArtifact";
 
 /**
- * The portrait card (`/api/image/brief?size=portrait`) handed to the system
+ * The portrait card (`/api/image/brief?layout=portrait`) handed to the system
  * share sheet as a file, so it posts straight into the LinkedIn, Instagram,
  * WhatsApp, or Messages app with the brief's link beside it. Copying an image
  * works on a desktop; on a phone the share sheet is how a picture reaches an app.
@@ -43,7 +43,7 @@ export function SharePortraitCardButton() {
     if (!supported) return;
     let cancelled = false;
     const path = buildImageBriefApiPath(new URLSearchParams(window.location.search));
-    const portrait = `${path}${path.includes("?") ? "&" : "?"}size=portrait`;
+    const portrait = `${path}${path.includes("?") ? "&" : "?"}layout=portrait`;
     fetch(portrait)
       .then(async (response) => {
         if (!response.ok) throw new Error(`Portrait card answered HTTP ${response.status}`);

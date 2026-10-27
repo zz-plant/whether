@@ -1,3 +1,4 @@
+import { scaleLinear } from "d3-scale";
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 import { CurveTermsKey, formatSpread } from "./curveTermsKey";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
@@ -81,13 +82,16 @@ export function SignalInversionPreview({
   const numericSpreads = spreadValues.filter((value): value is number => typeof value === "number");
   const spreadMin = numericSpreads.length ? Math.min(...numericSpreads, 0) - 0.1 : -0.5;
   const spreadMax = numericSpreads.length ? Math.max(...numericSpreads, 0) + 0.1 : 0.5;
-  const zeroLineY = CHART_HEIGHT - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * CHART_HEIGHT;
+  const yScale = scaleLinear().domain([spreadMin, spreadMax]).range([CHART_HEIGHT, 0]);
+  const zeroLineY = Number(yScale(0).toFixed(2));
   const spread10Y2YSeries = buildSegmentedLineSeries({
     values: monthlyPoints.map((point) => point.spread10Y2Y),
     width: CHART_WIDTH,
     height: CHART_HEIGHT,
     min: spreadMin,
     max: spreadMax,
+    curve: "monotone",
+    baselineY: zeroLineY,
   });
   const spread2Y3MSeries = buildSegmentedLineSeries({
     values: monthlyPoints.map((point) => point.spread2Y3M),
@@ -95,6 +99,7 @@ export function SignalInversionPreview({
     height: CHART_HEIGHT,
     min: spreadMin,
     max: spreadMax,
+    curve: "monotone",
   });
   const midPoint = monthlyPoints[Math.floor((monthlyPoints.length - 1) / 2)] ?? latest;
   const monthsInverted10Y2Y = countMonthsBelowZero(monthlyPoints.map((point) => point.spread10Y2Y));
@@ -140,6 +145,9 @@ export function SignalInversionPreview({
               />
             ))}
             <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
+            {spread10Y2YSeries.areaPaths.map((areaPath, index) => (
+              <path key={`10-2-area-${index}`} d={areaPath} fill="var(--color-semantic-easing-border)" fillOpacity="0.08" />
+            ))}
 
             {spread10Y2YSeries.paths.map((path, index) => (
               <path key={`10-2-${index}`} d={path} fill="none" stroke="var(--color-semantic-easing-border)" strokeWidth="2" />

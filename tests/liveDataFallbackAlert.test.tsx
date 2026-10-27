@@ -2,20 +2,31 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { LiveDataFallbackAlert } from "../app/components/liveDataFallbackAlert";
+import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 
 describe("live data fallback alert", () => {
-  it("renders source, effective date, and fallback reason when provided", () => {
-    const html = renderToStaticMarkup(
-      <LiveDataFallbackAlert
-        lastCachedTimestamp="2026-03-10T00:00:00Z"
-        sourceLabel="https://api.fiscaldata.treasury.gov"
-        effectiveRecordDate="2026-03-07"
-        fallbackReason="FRED Treasury fetch error: 500"
-      />
-    );
+  const html = renderToStaticMarkup(
+    <LiveDataFallbackAlert lastCachedTimestamp="2026-03-10T20:00:00Z" effectiveRecordDate="2026-03-07" />
+  );
 
-    assert.match(html, /Source: https:\/\/api\.fiscaldata\.treasury\.gov\./);
-    assert.match(html, /Effective: 2026-03-07\./);
-    assert.match(html, /Reason: FRED Treasury fetch error: 500/);
+  it("opens on the same data-status sentence the homepage banner prints", () => {
+    assert.ok(html.includes(resolveDataStatusGuidance({ isFallbackSnapshot: true }).replace(/'/g, "&#x27;")));
+  });
+
+  it("prints readable dates and points at the source board", () => {
+    assert.match(html, /Last checked Mar 10, 2026, 8:00 PM UTC\./);
+    assert.match(html, /Rates are as of Mar 7, 2026\./);
+    assert.match(html, /href="\/trust#source-board"/);
+  });
+
+  it("prints no feed URL or raw ISO timestamp", () => {
+    assert.doesNotMatch(html, /https?:\/\//);
+    assert.doesNotMatch(html, /\d{4}-\d{2}-\d{2}T/);
+  });
+
+  it("draws as a caveat, not in the crossed-line red the amber and rose ramps resolve to", () => {
+    assert.match(html, /weather-caveat-mark/);
+    assert.match(html, /border-caveat-border/);
+    assert.doesNotMatch(html, /\b(?:amber|rose)-\d/);
   });
 });

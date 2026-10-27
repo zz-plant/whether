@@ -5,7 +5,7 @@ import { ImageResponse } from "next/og";
 import { isValidElement, type ReactNode } from "react";
 import { buildBriefImagePayload } from "../app/api/image/brief/route";
 import { buildScoreReadings, buildScoreReferenceLines, type ScoreReadingParts } from "../lib/export/scoreReference";
-import { BRIEF_IMAGE_LAYOUTS, renderBriefImage, type BriefImageProps } from "../lib/image/briefImageTemplate";
+import { renderBriefImage, type BriefImageProps } from "../lib/image/briefImageTemplate";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "../lib/image/ogFonts";
 import { DISPLAY_EM, SANS_EM, wrappedLines } from "../lib/image/textFit";
 import { buildRuleCondition } from "../lib/report/boundedDecisionRules";
@@ -398,19 +398,6 @@ describe("brief decision card render", () => {
 
       assert.ok(body.byteLength > 1000, `expected a rendered PNG, got ${body.byteLength} bytes`);
       assert.deepEqual([...new Uint8Array(body.slice(0, 4))], [0x89, 0x50, 0x4e, 0x47]);
-    }
-  });
-
-  it("draws the 4:5 portrait card at its own size, for a LinkedIn or Instagram feed", async () => {
-    const layout = BRIEF_IMAGE_LAYOUTS.portrait;
-    for (const props of [briefImageProps, fullCardProps]) {
-      const element = renderBriefImage(props, layout);
-      assert.ok(isValidElement<{ style?: { width?: number; height?: number } }>(element));
-      assert.equal(element.props.style?.width, 1080);
-      assert.equal(element.props.style?.height, 1350);
-      const image = new ImageResponse(element, { width: layout.width, height: layout.height, fonts: ogFontFaces });
-      const body = await image.arrayBuffer();
-      assert.ok(body.byteLength > 1000, `expected a rendered PNG, got ${body.byteLength} bytes`);
     }
   });
 });

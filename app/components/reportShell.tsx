@@ -155,7 +155,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             task block, not separation. Desktop stops at 32px: at 48px, on top
             of the first section's own padding, ~90px of empty ground sat
             between the intro and the page's first heading. */}
-        <div className={`weather-page-stack order-1 min-w-0 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+        <div className={`weather-page-stack order-1 min-w-0 ${sidebarEnabled ? "" : "mx-auto w-full weather-page-shell-standard"}`}>
           {/* Every page built on this shell renders a reading, and the service
               worker serves the last copy of any of them when the network is
               gone. `/` carried this notice alone, so /trust — the page the IA
@@ -198,7 +198,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               matched the spacing used *inside* sections. A visible rule plus
               a wider outer gap makes the boundary the strongest horizontal
               signal on the page. */}
-          {/* Token, not divide-white/[0.10]: a hardcoded white rule is
+          {/* Token, not hardcoded white divider: a hardcoded white rule is
               invisible on the light theme's near-white ground, and 0.10 is
               not one of the four alphas the light escape-hatch block
               remaps. */}

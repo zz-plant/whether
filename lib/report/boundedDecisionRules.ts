@@ -387,6 +387,75 @@ const fmt = formatThresholdNumber;
 export const SPENDING_PAYBACK_BAR_MONTHS = 6;
 
 /**
+ * How macro conditions translate into corporate balance sheets and operations for
+ * each area, giving non-economist founders intuitive mechanics and a shared
+ * operating lexicon without requiring manual inputs.
+ */
+export type DecisionAreaCorporateTransmission = {
+  /** How macroeconomic conditions transmit to this corporate decision area. */
+  transmission: string;
+  /** Why agreeing on this line ahead of time protects the business. */
+  whyLineMatters: string;
+  /** Shared rule of thumb for team rituals and Monday planning. */
+  ruleOfThumb: string;
+  /** Startup unit math grounding the macro condition in operating reality. */
+  startupMath?: string;
+};
+
+export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAreaCorporateTransmission> = {
+  hiring: {
+    transmission:
+      "When capital gets expensive, investors value companies on revenue, not headcount. Every new hire adds fixed monthly spend you can't easily undo if growth slows.",
+    whyLineMatters:
+      "Setting your pause line ahead of time protects the team you already have—so you never find yourself forced into emergency layoffs.",
+    ruleOfThumb:
+      "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, stick strictly to backfills and mission-critical roles.",
+    startupMath:
+      "A $180k hire adds ~$15k/mo in fixed payroll. In tight markets, that single hire requires $300k+ in fresh net ARR to justify at your next round.",
+  },
+  "product-tempo": {
+    transmission:
+      "When the market gets nervous, customers and investors care about what ships and pays off this quarter, not a 3-year vision.",
+    whyLineMatters:
+      "Shorter release cycles give you real user proof faster—and let you pivot before burning months of engineering time.",
+    ruleOfThumb:
+      "In Sunny weather, ship what drives activation and retention. In Stormy or Freezing, back only projects that pay for themselves within 12 months.",
+    startupMath:
+      "A 3-month engineering detour costs ~$75k+ in burn. Focus on features that save current customer renewals this quarter.",
+  },
+  "capital-raising": {
+    transmission:
+      "When investors get cautious, term sheets take twice as long and come with tougher terms. If you wait until runway is tight, you lose all your leverage.",
+    whyLineMatters:
+      "Starting early while conditions are open keeps timing and terms on your side rather than the market's.",
+    ruleOfThumb:
+      "In Sunny weather, raise opportunistically while terms are warm. In Freezing or Stormy, start early and protect your cap table over closing fast.",
+    startupMath:
+      "Term sheet diligence stretches from 4 weeks in Sunny weather to 12+ weeks in Cloudy or Freezing. Start 6 months before your runway line.",
+  },
+  "burn-discipline": {
+    transmission:
+      "SaaS tools, agencies, and extra vendor seats quietly pile up fixed monthly costs that linger long after top-line growth cools.",
+    whyLineMatters:
+      "Requiring a clear 6-month payback keeps money in the bank—which is the best insurance policy when the climate shifts.",
+    ruleOfThumb:
+      "In Sunny weather, invest in growth tooling with clear payback. In Cloudy or Freezing, pause discretionary spend that doesn't quickly pay for itself.",
+    startupMath:
+      "Trimming unused software seats and agency retainers every 90 days routinely extends company runway by 1–2 months.",
+  },
+  "expansion-bets": {
+    transmission:
+      "Big new product lines or expansion bets rely on cheap follow-on money that dries up fast when markets tighten.",
+    whyLineMatters:
+      "Funding new experiments in bite-sized stages means you can wind one down in a week without dragging down the core business.",
+    ruleOfThumb:
+      "In Sunny weather, fund new bets stage-by-stage with written stop triggers. In Stormy or Freezing, run only experiments you can pause on short notice.",
+    startupMath:
+      "Cap experiment risk to under 5% of monthly burn, requiring measurable customer demand before committing dedicated engineering time.",
+  },
+};
+
+/**
  * The payback bar a tight runway (6–12 months of cash) puts in front of every
  * stage rule, hires and growth campaigns included. Derived from the Spending
  * bar so it can never be looser: it said "a nine-month payback" and "six to
@@ -407,11 +476,15 @@ export const ROADMAP_PAYBACK_BAR_MONTHS = 12;
 /**
  * The four lines every area's pause and resume conditions are drawn from, set
  * apart from the change lines so a score must travel past a line, not touch it,
- * before a rule moves. One source for the rules below and for the track record's
- * count of months a line was crossed.
+ * before a rule moves. One source for the rules below, the monthly summary's
+ * bands and the track record's count of months a line was crossed.
+ *
+ * Every line is held to the 0-100 scale the scores are on. The tightness pause
+ * line was the one that was not, so a regime line of 95 or more (the advanced
+ * threshold controls go to 100) printed "Funding pressure > 101".
  */
 export const sharedDecisionLines = (thresholds: RuleContext["thresholds"]) => ({
-  tightnessPause: thresholds.tightnessRegime + 6,
+  tightnessPause: Math.min(thresholds.tightnessRegime + 6, 100),
   tightnessResume: Math.max(thresholds.tightnessRegime - 4, 0),
   riskPause: Math.max(thresholds.riskAppetiteRegime - 6, 0),
   riskResume: Math.min(thresholds.riskAppetiteRegime + 4, 100),
@@ -711,7 +784,7 @@ export const buildScopedVariantDecisionAdjustment = ({
       watchAdjustments: [
         withReadingsNow(`Cash trigger: tighten spend if ${tightnessPauseLine.clause} or ${riskPauseLine.clause}.`, "or", [tightnessPauseLine, riskPauseLine]),
       ],
-      thresholdEmphasis: "Cash first: commitments you can reverse, over growth that looks good.",
+      thresholdEmphasis: "Cash first: pick commitments you can reverse over growth that just looks good.",
       reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause}, ${riskResumeLine.clause}, and cash payback holds for two weekly readings in a row.`, "and", [tightnessResumeLine, riskResumeLine]),
     };
   };

@@ -126,4 +126,43 @@ describe("/api/agent under a live-data outage", () => {
     assert.equal(response.status, 400);
     assert.deepEqual(body.allowedCadences, [...supportedAgentCadences]);
   });
+
+  it("serves a frozen published brief when queried by week, and 404s for an unknown week", async () => {
+    const response = await getAgentRoute(
+      new Request("https://whether.work/api/agent?week=2026-w41"),
+    );
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.type, "published_brief");
+    assert.equal(body.slug, "2026-w41");
+    assert.ok(body.headline);
+    assert.ok(body.actionNow);
+    assert.ok(body.decisions.length > 0);
+
+    const notFound = await getAgentRoute(
+      new Request("https://whether.work/api/agent?week=1999-w01"),
+    );
+    assert.equal(notFound.status, 404);
+    const notFoundBody = await notFound.json();
+    assert.match(notFoundBody.error, /not found/i);
+    assert.ok(Array.isArray(notFoundBody.availableWeeks));
+  });
+
+  it("serves an archive period when queried by period, and 404s for an unknown period", async () => {
+    const response = await getAgentRoute(
+      new Request("https://whether.work/api/agent?period=2024-q1"),
+    );
+    const body = await response.json();
+
+    assert.equal(response.status, 200);
+    assert.equal(body.type, "posture_archive_period");
+    assert.equal(body.slug, "2024-q1");
+    assert.equal(body.kind, "quarter");
+
+    const notFound = await getAgentRoute(
+      new Request("https://whether.work/api/agent?period=invalid-period"),
+    );
+    assert.equal(notFound.status, 404);
+  });
 });

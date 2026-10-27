@@ -31,7 +31,7 @@ import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRout
 export const metadata: Metadata = buildPageMetadata({
   title: "Guides",
   description:
-    "The most-asked decision guides, and long-form guides on capital discipline, board-level capital posture and reversibility as governance.",
+    "The most-asked decision guides, and long-form guides on capital planning, board governance, and reversibility.",
   path: "/resources",
   imageAlt: "Whether guides",
 });
@@ -47,7 +47,7 @@ const ROW_CLASS = "grid min-h-[44px] grid-cols-[minmax(0,1fr)_auto] items-center
  * Guides: the answers and the long-form guides for each decision area, the
  * frameworks behind them, and the tools that sit outside the five areas.
  *
- * Until 2026-10-08 these were three places. The eleven direct answers were the
+ * Until 2026-10-08 these were three places. The eleven direct answers (fourteen since the runway, downturn-prep and first-sales pages joined) were the
  * body of /resolve, the guides were this page, and neither had a header tab —
  * both were reachable only from Plan or Resolve. The answers keep this week's
  * standing beside each question, as /resolve printed it, so the page states the

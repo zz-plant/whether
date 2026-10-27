@@ -102,4 +102,18 @@ describe("service worker", () => {
     assert.match(notice, /addEventListener\("offline"/);
     assert.match(notice, /removeEventListener\("offline"/);
   });
+
+  /*
+   * The ledger's replay. The Background Sync spec schedules its retries from a
+   * rejected waitUntil promise: a replay that swallows a failure resolves, the
+   * one-off registration is removed, and whatever is still stashed in IndexedDB
+   * strands until some later event happens to re-register the tag.
+   */
+  it("rejects the sync when entries remain queued, so the browser schedules the retry", async () => {
+    const source = await readWorker();
+    assert.match(source, /if \(retryable\) throw new Error\("decision-ledger-retry/);
+    // A retryable failure (network error or 5xx) leaves the entry; a 4xx refusal drops it.
+    assert.match(source, /response\.status >= 500/);
+    assert.match(source, /await deleteStashedPost\(post\.key\)/, "deletion is per entry, by the key stored in its value");
+  });
 });

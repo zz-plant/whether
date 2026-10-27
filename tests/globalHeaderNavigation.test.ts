@@ -48,6 +48,10 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/resolve/ceo"), "More tools");
     assert.equal(resolveGlobalHeaderRouteLabel("/toolkits/focus"), "Toolkit");
     assert.equal(resolveGlobalHeaderRouteLabel("/contact"), "Contact");
+    assert.equal(resolveGlobalHeaderRouteLabel("/decisions"), "Your decisions");
+    assert.equal(resolveGlobalHeaderRouteLabel("/privacy"), "Privacy");
+    assert.equal(resolveGlobalHeaderRouteLabel("/acceptable-use-policy"), "Acceptable Use");
+    assert.equal(resolveGlobalHeaderRouteLabel("/terms-of-service"), "Terms");
   });
 
   it("puts every route in the group that owns it", () => {
@@ -94,8 +98,8 @@ describe("sub-tabs", () => {
       record?.links.map((link) => [link.label, link.placement, link.isActive]),
       [
         ["Record", "tab", false],
-        ["Compare periods", "tab", true],
         ["Calibration", "tab", false],
+        ["Compare periods", "secondary", true],
         ["Product writing", "secondary", false],
         ["Sources", "cross", false],
         ["How the scores are built", "cross", false],

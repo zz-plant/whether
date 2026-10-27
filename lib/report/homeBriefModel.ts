@@ -512,7 +512,7 @@ export const buildDecisionTransmission = (
     postureNow:
       homeBriefModel.actionNowShort?.trim() ||
       homeBriefModel.operatingStanceLine ||
-      "Hold current operating posture until fresh signal confirmation.",
+      "Hold current guidance until conditions move.",
     boundedRules,
     flipConditions:
       homeBriefModel.compactFlipConditionLabels && homeBriefModel.compactFlipConditionLabels.length > 0

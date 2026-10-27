@@ -100,3 +100,37 @@
   }
 }
 
+
+/*
+ * The scroll progress bar (2026-10-22): a scroll-driven animation, not a
+ * scroll listener. The width tracks the document's scrollable range and the
+ * bar fades in over its first 120px — the threshold the rAF listener used to
+ * poll — so no script runs while the reader scrolls and the bar keeps up even
+ * while the main thread is busy. The motion mirrors the reader's own scroll
+ * one to one, so there is nothing for prefers-reduced-motion to soften. On
+ * browsers without the feature the bar stays hidden: a decorative indicator is
+ * something a reader can lose without losing information.
+ */
+[data-scroll-progress] {
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  opacity: 0;
+}
+
+@supports (animation-timeline: scroll()) {
+  [data-scroll-progress] {
+    animation: scroll-progress-grow linear both, scroll-progress-appear linear both;
+    animation-timeline: scroll(root), scroll(root);
+    animation-range: 0 100%, 0 120px;
+  }
+}
+
+@keyframes scroll-progress-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes scroll-progress-appear {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}

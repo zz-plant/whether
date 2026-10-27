@@ -22,7 +22,18 @@ its paired canonical document, checks an actual local screenshot, ranks supplied
 with a separate support test, and runs labeled model comparisons. These remain advisory,
 outside automated delivery and the offline deploy gate. The generator writes the exact
 document identity beside its text so audits refuse mismatched readings before inference.
-Contract, commands and evaluation limits: [decision models](developer/decision-models.md).
+
+Since 2026-10-23 a `counterevidence` mode asks the third question per candidate — whether
+a supplied passage's claim, if it holds, would weaken the call's operating implication —
+and assembles the review packet deterministically (what could weaken the call, what backs
+it, and the printed change line as the reconsideration line; nothing is generated). Human
+labels on packet findings are kept in the committed reviewed-case registry
+(`data/reviewed-cases/cases.json`, `bun run reviewed-cases:add`) and exported as
+evaluation cases that `--mode eval` scores, so reviewed cases become held-out evidence for
+routing and retrieval decisions. The source pool itself is built by `bun run evidence:pool`
+(EmbeddingGemma 2, local Ollama): a recurring passage file is embedded against the call and
+its change conditions, and the pool's side tags are retrieval hypotheses that the
+counterevidence mode verifies. Contract, commands and evaluation limits: [decision models](developer/decision-models.md).
 
 ### Current reading and disclosure behavior (2026-09-24)
 
@@ -70,15 +81,25 @@ The header carries four groups, each with a hub, read from one module
   More; More opens a sheet with Search, every group's pages and the utility links
   (`app/components/MobileTabBar.tsx`, `app/components/globalHeaderNavClient.tsx`).
 - **Sub-tabs.** `SectionTabs` (`app/components/sectionTabs.tsx`) draws the group's pages above the
-  intro on every page of a group with more than one (the report shell takes `page.currentPath`;
+  intro on every grouped working page (the report shell takes `page.currentPath`;
   `/comps`, `/calibration` and `/concepts` render it themselves). It replaced the planning
-  switcher and the "Signals · Conditions · Plan · Share" loop strip beside the intro.
+  switcher and the "Signals · Conditions · Plan · Share" loop strip beside the intro. Three routes
+  deliberately keep the breadcrumb trail instead of the row (verified 2026-10-23): `/`, whose
+  first screen is the one-screen brief and whose siblings it reaches by its own links (each changed
+  signal links `Why it changed`; the trust strip links `How much to trust this week`); and the
+  frozen archive reads `/brief/<week>` and `/history/<period>`, which are shareable artifacts and
+  closed records, not group workspaces.
 - **Breadcrumbs** come from `buildGroupBreadcrumbs` (`lib/navigation/breadcrumbs.ts`): the group,
   the page when it is not the hub, then the caller's crumbs — "This week › Why it changed",
   "Decide › Runway planner", "Record › Week of …", "Guides › <question>",
   "Guides › More tools › For CEO". A hub alone gets Home first.
 - **Footer.** The brand column carries the utility links (Use it elsewhere, API & MCP, About,
-  Search, RSS); then one column per group, headed by the group's name linking its hub.
+  Contact, Search, RSS); then one column per group, headed by the group's name linking its hub.
+  Contact is a utility link since 2026-10-23: until then no page, nav, footer or palette linked
+  `/contact` — only the sitemap named it — so the corrections policy pointed at an editor a
+  reader could not reach. As a utility link it reaches the footer, the phone's More sheet, the
+  palette and `/llms.txt` from the one array; the header's text row still leaves it out
+  (`header: null`), beside About.
 - **Resolve folded in.** `/resolve` 308s to `/operate#ops-decision-shield` (Test a decision); with
   a `stakeholder`, `stage`, `library` or `toolkitQuery` selection it goes to
   `/resources#more-tools`, where those views render (`resolveSelectionRedirects`, `next.config.js`).
@@ -147,7 +168,12 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    the definition (each change line's value at its end, "How they are set" under it), so the legend
    gives way to it (§1.1.63). It replaced the standfirst and the folded "How to read this page".
    Dismissible; the layout hides it for a browser that has rendered the brief before. The week
-   picker above the card names the week by its Monday and is a label, not a heading.
+   picker above the card names the week by its Monday and is a label, not a heading. Since
+   2026-10-21 a live week's legend opens with whom the site is for and what it does, at every width
+   (`homeOrientationLine` in `lib/seo.ts`: "For startup leaders:" and the category line), because
+   the card opens on the week's guidance and never says what Whether is. The conditions map's
+   caption says what its two directions mean ("Up is pricey money, right is willing investors"),
+   from the same `CONDITION_SIDE_MEANINGS` the legend builds each condition's meaning from.
 1. **The verdict** (`#weekly-call`). `DecisionHero` is the card a reader screenshots: the conditions
    stamp with the week's direction and, when conditions changed, what they were; the week's
    headline action as the `h1` (`weeklyHeadline`, §1.1.60); what the conditions mean; one line on
@@ -166,30 +192,41 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    its move since the comparison reading, and how far it sits from the pause line and the resume
    line. When the guidance is held the card prints neither the pair nor the ladders; the weekly card
    below states the hold's lines.
-2. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
+2. **The five areas** (`DecisionPicker`, `#what-it-changes`, "Your decisions this week"): each
+   area by its name with its standing against its pause line; a choice opens its rule, lines and
+   the runway test. All five side by side fold under it (`AllAreaRules`: the area table, the runway
+   notes and the commitment test), then the one plan button. No "This week's scores" list: the map
+   and the bars in section 5 print the scores at every width.
+3. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
    only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
    its default choice, a chosen stage's own action as a stage line, and the runway emphasis once a
    band reshaped a rule. No sentence restates the selection; on a phone the section prints only
-   with a stage line or a runway note. Nothing lower on the page repeats the control.
-3. **The five areas** (`DecisionPicker`, `#what-it-changes`, "What are you deciding?"): each area
-   by its name with its standing against its pause line; a choice opens its rule, lines and the
-   runway test. All five side by side fold under it (`AllAreaRules`: the area table, the runway
-   notes and the commitment test), then the one plan button. No "This week's scores" list: the map
-   and the bars in section 6 print the scores at every width.
-4. **What would change this guidance** (`WhatWouldChangeSection`): the pause line, the resume line
-   (a chosen stage's, else the lead area's), the line where conditions change, the market move in
-   rate terms (folded), and below `md` the conditions map (no distance caption: the trust strip's
-   margin states it).
-5. **Get an email the day a line is crossed** (`AlertSection`, `#subscribe`): the one subscribe
-   form, starting on alerts only with the Monday email one choice away, and the push toggle.
-6. **What changed this week** (`WhatChangedSection`): one row per signal, the earlier reading →
+   with a stage line or a runway note. It follows the areas because the table above already names
+   the company the lines are scaled to; this is where the reader changes that.
+4. **Why conditions are {weather}** (`home/WhyConditionsSection.tsx`, `#why-conditions`): the two
+   readings with what each means (`signalReadingMeaning`, the brief card's phrase), the change line
+   each sits against, and the two qualifications that decide whether the classification survives
+   inspection — inputs outside the record (counted, they would move a score across its change line;
+   the counted weather word is printed) and a capped score's real distance (90 against a 70 line
+   reads as 20 points; the uncapped pressure is 40). Both were methodology notes before (2026-10-22).
+5. **What changed since {reading}** (`WhatChangedSection`): one row per signal, the earlier reading →
    this week's with the comparison dated (§1.1.26), each composite score on its ladder with what
    moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
    each area's row says which of its lines moved. A read with no comparison says so over it.
-7. **Has this happened before?** (`RecordSection`): on a week conditions changed, the last time
+6. **What would change this guidance** (`WhatWouldChangeSection`): two questions, named apart —
+   when conditions change (the change line, in points, with the market move folded under it) and
+   when a paused decision may resume (the pause line and the resume line, a chosen stage's else the
+   lead area's). A sentence says a change in conditions is not permission to resume. Below `md` the
+   conditions map draws here (no distance caption: the trust strip's margin states it).
+7. **How unusual is this?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; on every week, how long
-   these conditions lasted before (§1.1.76); the last turns as links.
-8. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
+   these conditions lasted before (§1.1.76); the last turns as links. On a live week the record is
+   drawn above those sentences as `/history`'s month strip (every month-end since 2012 in its
+   weather, 2026-10-21), with one line separating the sampling conventions — the record is
+   month-end readings, the guidance above is this week's.
+8. **Get notified when something changes** (`AlertSection`, `#subscribe`): the one subscribe form,
+   starting on alerts only with the Monday email one choice away, and the push toggle.
+9. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
    holds the slide and image copies and every other format since 2026-10-08, and the week's
    published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
 
@@ -1132,9 +1169,9 @@ the brief; these reach people who have not, and each carries the link back.
 - *Status badge.* `GET /api/badge` (`lib/export/statusBadge.ts`): the conditions' weather word as a
   shields-style SVG for a README, data room, or investor page, in the conditions' color, saying
   "(saved copy)" on a fallback read. Markdown to copy sits in the embed section.
-- *Portrait card.* `/api/image/brief?size=portrait` draws the brief card at 1080×1350, the shape a
-  LinkedIn or Instagram feed shows largest, with the call centered. "Share the portrait card"
-  hands it to the system share sheet as a file where the browser supports that; the card is
+- *Portrait card to an app.* "Share the portrait card" hands the brief card's portrait layout
+  (`/api/image/brief?layout=portrait`, 1080×1350, the shape a LinkedIn or Instagram feed shows
+  largest) to the system share sheet as a file, where the browser supports that. The card is
   fetched when the button mounts because Safari ends the tap's permission at an awaited render.
 - *Assistants.* `/share` links Claude, ChatGPT, and Perplexity with a prompt that names the
   permalink and asks for the reader's stage, burn, and runway before applying the guidance
@@ -1824,7 +1861,7 @@ confirming reading.
 ### 1.1.32a Visual relationship and causal navigation across weekly brief sections (2026-10-02)
 
 Visual navigation upgrades across the five homepage sections to sharpen decision transmission without adding framework bloat or novel taxonomies:
-1. **2D Regime Climate Radar (`RegimeRadar.tsx`) in Section 4 (`WhatWouldChangeSection.tsx`):** A lightweight, pure-SVG 2D coordinate plane mapping the macro environment across the 4 weather quadrants (Freezing, Cloudy, Stormy, Sunny) defined by Funding pressure and Risk appetite relative to the call-change boundary lines supplied by the active thresholds. Renders the current reading $(R, T)$, previous reading with trailing vector, and a dashed projection guide to the nearest boundary. The caption measures the score distance to that plotted call-change line; company-specific pause-line distances stay in the section heading and ladders. Radar labels use theme-aware semantic ink.
+1. **2D Regime Climate Radar (`RegimeRadar.tsx`) in Section 4 (`WhatWouldChangeSection.tsx`):** A lightweight, pure-SVG 2D coordinate plane mapping the macro environment across the 4 weather quadrants (Freezing, Cloudy, Stormy, Sunny) defined by Funding pressure and Risk appetite relative to the call-change boundary lines supplied by the active thresholds. Lights the week's quadrant and dims the other three (2026-10-21). Renders the current reading $(R, T)$, previous reading with trailing vector, and a dashed projection guide to the nearest boundary. The caption measures the score distance to that plotted call-change line; company-specific pause-line distances stay in the section heading and ladders. Radar labels use theme-aware semantic ink.
 2. **Visual Bounded Rails & Proximity Highlights in Section 3 (`WhatItChangesSection.tsx`):** Integrated `BoundedCorridorRails.tsx` directly above the operating rules table, rendering visual stop/caution/resume rails (removed from the homepage on 2026-10-05, §1.1.33, and from `/operate` on 2026-10-06, §1.1.36). Upgraded `AreaTable.tsx` with distance-aware visual cues: crossed lines display in rose (`text-rose-300 font-medium`), near-threshold lines (≤5 pts) display in amber (`text-amber-300 font-medium`), and clear distances display in muted slate.
 3. **High-Contrast Monday Delta & Decision Staleness Badges:** Upgraded `SinceLastVisit.tsx` to surface `linesCrossedLead` (`movementSentence`) for returning operators. Upgraded `YourRecordNote.tsx` with high-visibility badges (`Reconsider` in rose, `Watch` in amber) when an operator's active assumptions in `/decisions` have had their macro conditions breached.
 4. **Interlinked Causal Navigation & Target Highlighting:** Added anchor targets (`#signal-funding-pressure`, `#signal-risk-appetite`) and direct links from each signal to the operating areas it governs in Section 2 (`WhatChangedSection.tsx`). Added row IDs (`id="area-${row.area}"`) and reverse citation anchor links in `AreaTable.tsx`. Added CSS `:target` styling (`tr:target`) to illuminate rows when jumped to via anchor links.
@@ -2026,6 +2063,10 @@ because its streamed-route fallback found the 404 boundary's `<main>` in every f
 - Resource articles lose the "Start from Weekly Brief" and "Return to Planning" pills that rendered
   above their `<main>`. The link back to the brief is in the live-guidance block, under a dated line
   ("As of Oct 2, 2026 · signals refreshed …") that replaces the paste-ready citation and its URLs.
+- Resource articles render one forwardable summary, followed by their own sections. The shared
+  deep-dive appendices are removed. Edited headings keep their public links through the optional
+  section `anchor` in `content/resources/articles.json`; the former second-summary anchor points
+  to the remaining summary.
 - `tests/readingFrameRoutes.test.tsx` renders each reading route and holds it to one
   `<main id="main-content">`, and the article to nothing before it.
 
@@ -3019,13 +3060,13 @@ is gone. "What the margin has been worth" is the study's first sentence (96%) an
 | `/trust` | the summary under the title; pills to two sections the index names; a revisit row that only linked back up; a second link to `/about#method` | the title, the index, the closing line |
 | `/brief/<week>` | "Freezing:" in the heading under the stamp; the week in the caption under the heading; "(week of …)" and "Date-pinned record" over the preview | the stamp, the heading, the share heading |
 | `/share` | "PPTX · PDF · SVG" over the three file buttons | the buttons |
-| `/answers/*` | the related links beside the top copy button; "Market guidance as of" under the strip's "Data as of" | "Next for…", the strip |
+| `/answers/*` | the related links beside the top copy button; "Market guidance as of" under the strip's "Data as of" | "Related pages" (was "Next for…"), the strip |
 | `/resources` | each answer row's stamp, the same for every row in an area | one stamp beside the area's name |
 | `/history/compare` | the intro's status word, Period A's conditions on a two-period page | the period headings |
 | `/calibration` | "The record" kicker; the study section's intro restating the page's | the tabs, the page intro |
 | `/trust` | "The exact arithmetic is below." over the "Show the exact arithmetic" control | the control |
 | `/about` | the structure's healthcare origin in "Who writes it" and again in the folded "Why it works", behind a link to `/about` itself | "Who writes it"; "Why it works" keeps the stakes |
-| `/brief/<week>` | "This record is frozen." in the footer, under the header's "This is a frozen record of one week." | the header line; the footer keeps the corrections rule |
+| `/brief/<week>` | "This record is frozen." in the footer, under the header's "This is a frozen record of one week." | the header line (since 2026-10-27 "This page keeps one week's guidance, unchanged since it was published.", because "frozen" beside a week called Freezing read as the conditions); the footer keeps the corrections rule |
 | `/history/compare` | the borrowing premium's definition under the difference tile and in both columns, the tile also repeating both columns' values | the definition under the tile; each column prints its value |
 
 ### 1.1.64 `/concepts` tests whether advice moves with the conditions (2026-10-09)
@@ -3334,7 +3375,9 @@ two captures because §1.1.66 re-scored it in between (Freezing before, Cloudy a
 
 Left on the old palette: the brand mark (`public/favicon*.svg`, `icon*.svg`, `whether-logo.svg`,
 `app/brandAssets.ts` and the raster icons), which is its own decision, and
-`scripts/generate-scenes.ts`, which renders marketing scenes and nothing on the site.
+`scripts/generate-scenes.ts`, which renders marketing scenes and nothing on the site. (The scenes moved
+to the Synoptic ground and Archivo on 2026-10-21, still drawing the header mark as it is;
+`docs/assets/README.md`.)
 
 ### 1.1.70 The record's charts and sentences state what the data shows (2026-10-09)
 
@@ -3517,7 +3560,7 @@ popover or a forecast.
   is still running. The record has seven spells, so it counts them and says it is not a forecast.
 - **Whether the market can move the payback bar** (`describeWhatMovesPaybackBar`,
   `lib/report/projectPayback.ts`), under the bar's sentence in the runway planner. Under a year of
-  runway the bar is cash's, and the sentence says no rate move or headline lifts it. Otherwise it is
+  runway the bar is cash's, and the sentence says no rate move or headline changes it. Otherwise it is
   the roadmap rule's, and the sentence names the score moves still needed for Sunny in the change
   lines' numbers, with today's scores, and how many of the reader's projects that would stop slowing.
   In Sunny it says what would bring the 12-month bar back and how many projects would then miss it.
@@ -3615,6 +3658,126 @@ risk appetite 55), four sentences told a reader something the numbers did not su
 - **A held week's pause line names the decisions that wait.** "The decision can't be undone while
   the guidance is held." read as a warning that nothing could be reversed. It is "A decision can't
   be undone; reversible ones go ahead while the guidance is held." (`HELD_PAUSE_IF`).
+
+### 1.1.81 The ceiling tag means the ceiling; the pause line stays on the scale (2026-10-21)
+
+Two defects the regime engine's property tests found (`tests/regimeEngineProperties.test.ts`):
+
+- **`scores.tightnessSaturated` is set when a higher base rate would not raise the score**
+  (`isTightnessSaturated`, `engine-2026-10-21`): the rate component at its 90-point ceiling (a
+  4.0% bill on the default line), or the score at 100, whatever reached it, the Chicago Fed
+  add-on included. It was `tightnessPressure > 100`, which flagged a 0% bill under a 2.02-point
+  inversion at a score of 25, and left 4.00%-4.05% on a flat curve unflagged while the score sat
+  flat at 90. The hero's ceiling tag, the signal panel's caveat, the margin and the
+  saturated-financing tempo all read the flag. On the bundled month-ends two readings change, both
+  Defensive, so no archived sentence moves:
+
+  | Month-end | Bill | Funding pressure | Pressure (uncapped) | Flag before | Flag after |
+  | --- | --- | --- | --- | --- | --- |
+  | 2025-11-28 | 4.05% | 90 | 99 | no | yes |
+  | 2026-09-30 | 4.02% | 90 | 94 | no | yes |
+
+  The other 175 keep theirs, among them 22 flagged at 100 and the 15 flagged at 90 from Aug 2024
+  to Oct 2025, whose rate component was already at its ceiling. Neither changed month's margin
+  moves: its pressure is under 100, so the ceiling hides no points from it.
+- **The funding-pressure pause line is held to 100**, like the other three shared lines
+  (`sharedDecisionLines`). A regime line of 95 or more on the threshold controls printed
+  "Funding pressure > 101". The monthly summary's bands read the same function now, rather than a
+  copy of its arithmetic.
+
+### 1.1.82 The plain-language derivation folds on a stable week (2026-10-21)
+
+Measured at 430×932 against the dev build: `#formula-reference` was 37% of `/trust`
+(1,294px of 3,508px), and its "In plain language" tier alone was 667px — the method
+ahead of the source board a scanner comes to check, DD-040's open item since
+2026-10-05.
+
+- **The ladders stay open.** They are the reading, not the method: the two scores
+  against their lines, in the one drawing every other route uses.
+- **The tier folds on a stable week** (`!isFallback && warnings.length === 0`, the
+  same condition that folds "Limits" below it) behind `UrlDetails queryKey="derivation"`
+  in the same chevron register as "Show the exact arithmetic"; `?derivation=1` opens
+  it (§XII). A degraded week renders it open — a reader distrusting the data meets the
+  derivation unprompted. The summary names what is behind it: "In plain language —
+  what each score reads, and how the pair sets the conditions".
+- **Still server-rendered inside `<details>`**, so a search engine and find-in-page
+  both reach it. `#formula-reference` and every link into the section are unchanged;
+  the tier has no inbound anchors of its own.
+- Test: `tests/formulaReferenceFold.test.tsx`.
+
+### 1.1.83 The brief's column joins the page-measure registry (2026-10-21)
+
+DD-046's open half: `/` hand-typed `max-w-[64rem]` twice while every other page read
+a registered measure, and the report shell hand-typed the same 72rem the registry
+already names.
+
+- **`.weather-brief-measure` (64rem)** is added beside `weather-page-shell-standard`
+  (72rem) and `-wide` (84rem) in `app/styles/layout-shells.css`; the brief's two inner
+  columns use it, and the focus mode that narrows only the brief narrows to the same
+  64rem it names. No width changed anywhere — the literal became a name.
+- **The report shell's content column** (`reportShell.tsx`, no-sidebar routes) reads
+  `weather-page-shell-standard` instead of its own `max-w-[72rem]`.
+- `/pricing`, the other page this debt item named, no longer exists (§1.1.78).
+
+### 1.1.84 Connecting an agent covers the CLI, not only the config file (2026-10-21)
+
+The API page's connect section served the desktop-config era: one `mcpServers` JSON
+block for Claude Desktop and Cursor's settings UI. A Claude Code user — a terminal,
+no `claude_desktop_config.json` — had nothing to run.
+
+- **A one-line `claude mcp add --transport http whether <url>`** now sits above the
+  JSON block, which stays for the desktop clients.
+- **A line points URL-reading agents at `/llms.txt`**: it lists every answer page
+  against the question it answers and states how current the reading is (§ the
+  llms.txt question router, `lib/seo/llmsTxt.ts`).
+- `/share`'s "For agents, scripts and feed readers" remains the entry point that
+  links here; no new page.
+
+### 1.1.85 DD-043's ratchet holds; the first raw family migrates (2026-10-21)
+
+The light theme's patch layer lost its worst part on 2026-10-09 (the per-hue
+tables); what remains are floors that remap five raw Tailwind families for
+`[data-theme="light"]`. Two facts this pass established before touching anything:
+
+- **`text-slate-*` is not debt.** `@theme inline` in `tokens.css` binds the slate
+  text scale to the theme text roles (1,392 call sites already semantic).
+- **The floors rescue ~319 call sites across five families** — text-white (79),
+  bg-slate-800/900/950 (94), border-slate-700/800/900 (130), border-white (15),
+  divide-white (1) — counted by the new `tests/themeRawPaletteRatchet.test.ts`,
+  whose baselines may only fall. New raw classes in these families fail the suite
+  with the token to name instead.
+
+- **First slice: `border-white/[0.06]` → `border-[color:var(--border-faint)]`**
+  (RegimePhaseMap, CadenceCallCard ×2) — the one raw value whose token is
+  pixel-identical in dark (0.06 alpha of near-white), so the migration changes no
+  rendered pixel in either theme. Its specific floor rule in `tokens.css` is
+  deleted; the catch-all floors stay until their family reaches zero.
+
+The remaining families migrate file by file against the ratchet; alphas without
+an exact token twin need a visual pass (`ui:iterate`, both themes) to move.
+
+### 1.1.86 Crossing sentences read as American English (2026-10-21)
+
+A copy pass over the rendered surfaces (`/`, `/signals`, `/trust`, `/operate`, an
+answer page, `/share`) found the prose in good shape except one family of
+sentences that read as translated English, in the one line a reader meets first:
+the verdict's cause line.
+
+- **"rose/fell through N"** ("Risk appetite fell through 54.") — "fall through"
+  is what a deal does. Crossing is going past a line, so the preposition now
+  follows the direction: **rose above N, fell below N** (`describeCrossing`,
+  `lib/report/decisionMovement.ts` — the verdict cause, the areas' Changed
+  cells, the group clauses, and every paste that carries them).
+- **"past months can't be checked with them"** (`NOT_COUNTED_REASON` and its two
+  siblings, `lib/report/scoringBasis.ts`) — a stranded preposition with no agent.
+  Now **"they can't be scored against past month-ends"**: the same fact, still in
+  a reader's words, with the verb the method page already owns. The doc comment
+  records why "the record cannot test them" stays out (insider noun).
+- **"no month-end history for them to be tested on"** (`formulaReference.tsx`) →
+  **"no month-end history to score them against"**, matching the sentence above.
+
+Pins updated in 14 test files; `briefFormats.golden.json` regenerated with the
+suite's own UPDATE mode, and its diff checked to contain only these sentences.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
@@ -4214,6 +4377,17 @@ $$
   (`app/components/decisionLedgerClient.ts`); a failed write says so and names the reason.
   `DecisionMemoryButton` and the local mirror (`app/components/decisionMemoryLocalCache.ts`) went
   on 2026-09-08.
+- **Review responses** (`lib/decisionFollowUp.ts`, 2026-10-23). A WATCH or RECONSIDER row on
+  `/decisions` offers "Record your review": the operator records whether they **continued**,
+  **changed**, or **deferred** the commitment, with an optional note, against the reading being
+  reviewed. Each response is its own per-client, append-only record (`df:` keyspace beside the
+  ledger's `dm:`) carrying the current scores at response time, so the review trail is a time
+  series of its own — decision conditions, response conditions, the next check. The row shows the
+  newest response ("Reviewed against the {date} reading") and re-offers the form until the
+  commitment is reviewed against the current reading. A follow-up must name one of the browser's
+  own entries or the route refuses it (`unknown-entry`), so an orphan review can never render
+  invisibly. The response vocabulary (Continued / Changed / Deferred, with plain sentences) is
+  defined once in `decisionRecordView.ts` (`RESPONSE_OPTIONS` / `RESPONSE_SENTENCES`).
 - The plan stress test's "Track in Memory" posted `{ kind: "plan-evaluation", … }`, a shape
   `/api/decision-memory` has never accepted, until 2026-09-06, when it moved to a `decision` entry
   built by `buildPlanStressTestMemoryPayload` (`lib/decisionMemory.ts`). The control went on
@@ -4224,7 +4398,10 @@ $$
   mode the share artifact is the plan stress test (plan text, model, verdict, sizing, fragile
   assumptions, guardrail, reversal trigger — bootstrapped mode prints the profile's gross margin)
   and the memory entry records the plan's detected category and action with the stress-test
-  outcome; in compare mode it exports both plans, both verdicts, and the recommendation. Both
+  outcome; in compare mode it exports both plans, both verdicts, and the recommendation, and
+  `Record this decision` is suppressed there — two plans are not one decision, and the ledger
+  payload would have been the hidden list mode's verdict, so a plan is recorded by testing it
+  on its own (`decisionShieldPanel.tsx`). Both
   previously exported the dropdown-mode reading even when the operator had just graded a plan,
   so the artifact could contradict the verdict beside it. The compare-mode verdict badges also
   split UNSAFE (rose) from RISKY (amber); both used to render amber
@@ -4269,6 +4446,11 @@ $$
 - `GET /api/decision-memory` / `POST /api/decision-memory` — append-only Decision Shield audit entries, filterable by `clientId`, with CSV export support.
 - Entries carry an `assumptions` snapshot (conditions that had to hold at decision time) so the
   decision-staleness engine can compare current conditions against the recorded range.
+- `POST` also accepts a **review response** (`lib/decisionFollowUp.ts`): `entryId`, `response`
+  (`continued` | `changed` | `deferred`), optional `note`, and the `conditions` at response time.
+  The route refuses a response that names no entry on the caller's own record (`unknown-entry`).
+  `GET` returns the review trail as `followUps` beside `entries`; the CSV and the revisable
+  delegation records stay decision-only, so the record schema is unchanged.
 
 ### 6.5 Integration APIs
 - `GET /api/integrations/weekly-mandate?target=slack|notion|linear` — target-specific weekly
@@ -4383,14 +4565,17 @@ as a bar chart in the lower home band. Removed from home; the engine
 surfaces.
 
 ### 8.4 Decision records (canonical: decision memory)
-**Location**: `lib/decisionMemory.ts`, `/api/decision-memory`, `app/decisions/page.tsx`,
+**Location**: `lib/decisionMemory.ts`, `lib/decisionFollowUp.ts`,
+`/api/decision-memory`, `app/decisions/page.tsx`,
 `app/operate/components/recordDecisionButton.tsx`, `app/components/home/YourRecordNote.tsx`.
 
 The one system of record for "what did we decide and when": server-backed entries keyed by
 client id, recorded from the Decision Shield on `/operate`, and listed with their staleness
 verdicts on `/decisions` (§5.7). The brief says how many of a browser's decisions rest on conditions
 that moved (`YourRecordNote`, §1.1.28). `/operate/memory` redirects to `/history`
-(`next.config.js`).
+(`next.config.js`). Since 2026-10-23 each row on `/decisions` can carry a review response —
+continued, changed, or deferred — recorded against the reading being reviewed (§5.7); the
+review trail is stored beside the ledger and never appears as a decision row in the exports.
 
 Removed Aug 2026: `VisitorContext` (this section's previous subject) was deleted earlier without
 a spec update, and with it the only writer of the `whether_decision_history` localStorage key.

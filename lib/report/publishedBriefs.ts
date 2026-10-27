@@ -16,7 +16,7 @@ import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
-import { formatMarginBand, formatDecisionReversal, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
+import { formatMarginBand, formatDecisionReversal, formatDecisionThreshold, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
@@ -401,11 +401,12 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
     basis: describeScoringBasis(brief.scores?.engineVersion),
     /** The earlier reading, as `buildScoreReferenceLines` takes it; null where the record can name none. */
     previous: comparison ? { ...comparison.previous, comparedWith: comparison.comparedWith } : null,
-    /** "+5 vs Sep 22": a score's move in whole points, named by the reading it is against. Null with no reading to name, or no move. */
+    /** A score's move in whole points, as the number and the rendered form ("+5 vs Sep 22") — the sign lives in `delta`, not in something a renderer parses out of the string. Null with no reading to name, or no move. */
     scoreChange: (metric: ScoreMetric) => {
       if (!comparison || !brief.scores) return null;
-      const delta = formatSignedDeltaOrNull(Math.round(brief.scores[metric] - comparison.previous[metric]), 0);
-      return delta ? `${delta} ${comparisonBasis(comparison.comparedWith).versus}` : null;
+      const delta = Math.round(brief.scores[metric] - comparison.previous[metric]);
+      const formatted = formatSignedDeltaOrNull(delta, 0);
+      return formatted ? { delta, label: `${formatted} ${comparisonBasis(comparison.comparedWith).versus}` } : null;
     },
   };
 };
@@ -475,6 +476,14 @@ export const publishedBriefHeadline = (brief: Pick<PublishedBrief, "actionNow" |
   });
 
 /** The week's name: its Monday (`formatWeekMondayUTC`), never the record's own weekday. */
+/**
+ * A stored correction opens with its own verb ("Corrected Sep 30, 2026. …"), and every
+ * surface prints it after a "Correction" label, so until 2026-10-21 the page and both
+ * paste formats read "Correction: Corrected Sep 30, 2026." The record stays as stored;
+ * only the doubled verb is dropped when it is printed.
+ */
+export const correctionBody = (correction: string) => correction.replace(/^Corrected\s+/i, "");
+
 export const publishedBriefWeekLabel = (brief: Pick<PublishedBrief, "recordDate">) => formatWeekMondayUTC(brief.recordDate);
 
 /** The page's `<h1>` and `<title>`; the news sitemap must carry the same words. */
@@ -653,7 +662,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     [
       `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)}`,
       `  ${publicDecisionLabels.action}: ${display.sentence(decision.doNow)}`,
-      `  ${publicDecisionLabels.threshold}: ${display.sentence(decision.pauseTrigger)}`,
+      `  ${publicDecisionLabels.threshold}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`,
       `  ${publicDecisionLabels.reversal}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`,
     ].join("\n"),
   );
@@ -681,7 +690,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     `What changed: ${display.whatChanged}`,
     ...(decisions.length > 0 ? ["", "Operating limits by area:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
-    ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
+    ...(brief.correction ? ["", `Correction: ${correctionBody(brief.correction)}`] : []),
     "",
     "Provenance:",
     `Record date ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel} · ${basisClause(display.basis.sentence)}`,
@@ -703,7 +712,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     [
       `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)}`,
       `  - ${DECISION_CONTRACT_LABELS.slot.action}: ${display.sentence(decision.doNow)}`,
-      `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.sentence(decision.pauseTrigger)}`,
+      `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`,
       `  - ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`,
     ].join("\n"),
   );
@@ -727,7 +736,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     ...readingLines,
     ...(decisions.length > 0 ? ["", "Area decisions:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
-    ...(brief.correction ? ["", `Correction note: ${brief.correction}`] : []),
+    ...(brief.correction ? ["", `Correction note: ${correctionBody(brief.correction)}`] : []),
     "",
     "Provenance & citations:",
     `• Record date: ${brief.recordDateLabel}`,
@@ -738,4 +747,31 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     `Permanent URL: ${permalinkUrl}`,
   ].join("\n");
 };
+
+/**
+ * Generates a date-pinned executive board / investor update constructed strictly from PublishedBrief.
+ * Never fetches live report data or external endpoints.
+ */
+export const buildPublishedBriefBoardUpdate = (brief: PublishedBrief): string => {
+  const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
+  const readingLines = buildPublishedBriefReadingLines(brief);
+  const display = publishedBriefDisplay(brief);
+  const decisions = decisionsInAreaOrder(brief).map((decision) =>
+    `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)} (${DECISION_CONTRACT_LABELS.slot.action}: ${display.sentence(decision.doNow)})`,
+  );
+
+  return [
+    `Whether Board Memo — Week of ${publishedBriefWeekLabel(brief)}`,
+    `Macro Posture: ${display.conditions} (Margin: ${display.confidence.toLowerCase()})`,
+    "",
+    `Executive Guidance: ${publishedBriefHeadline(brief).composed}`,
+    ...(display.pauseIf ? [`Operating Threshold: ${display.pauseIf}`] : []),
+    `Posture Flips If: ${display.conditionsChangeIf}`,
+    ...(readingLines.length > 0 ? ["", "Macro Readings:", ...readingLines] : []),
+    ...(decisions.length > 0 ? ["", "Operating Limits by Area:", ...decisions] : []),
+    "",
+    `Permanent Record: ${permalinkUrl} · Captured ${brief.freshnessLabel}`,
+  ].join("\n");
+};
+
 

@@ -39,13 +39,14 @@ describe("/trust says each thing once", () => {
    * same sentence, so a reader met it twice in a row before reaching anything
    * new.
    */
-  /* The method moved to /about beside "What is new here", which already says what
+  /* The method moved to /about beside "How it works", which already says what
      the three parts are, so the section opens on them filled in. */
-  it("does not restate what /about's 'What is new here' already says", async () => {
+  it("does not restate what /about's 'How it works' already says", async () => {
     const { default: AboutPage } = await import("../app/about/page");
     const html = renderToStaticMarkup(<AboutPage />);
     assert.equal((html.match(/an action, a pause line and a resume line/g) ?? []).length, 1);
-    assert.ok(html.indexOf("What is new here") < html.indexOf('id="method"'), "the method follows What is new here");
+    const explanation = html.indexOf("How it works");
+    assert.ok(explanation !== -1 && explanation < html.indexOf('id="method"'), "the method follows How it works");
   });
 });
 
@@ -186,7 +187,7 @@ describe("/history dates what it is showing", () => {
 
     assert.doesNotMatch(text, /Months in each quadrant/);
     assert.match(text, /Months under each set of conditions/);
-    assert.match(text, /not the quadrant its dot sits in: the two differ in 2 of these 4 months/);
+    assert.match(text, /not the quadrant each dot sits in: the two differ in 2 of these 4 months/);
   });
 
   it("keeps the phase map's panel and caveat on the same fact", () => {
@@ -248,17 +249,17 @@ describe("the site gives one account of what is new and what the scores read", (
     assert.match(builtFrom, /Inflation and unemployment[^.]*neither score/, "the page should say what it reads but does not score");
   });
 
-  it("/about says what is new, and links the record that backs the second claim", async () => {
+  it("/about explains the method and links the record that grades it", async () => {
     const { default: AboutPage } = await import("../app/about/page");
     const html = renderToStaticMarkup(<AboutPage />);
 
-    assert.match(html, /What is new here/);
+    assert.match(html, /How it works/);
     assert.match(html, /href="\/history#track-record"/);
     assert.match(html, /href="\/calibration"/);
   });
 
-  /* Said once (2026-10-09): "Who writes it" names the editor and links to the work;
-     the method's folded "Why it works" keeps the stakes and no second origin claim. */
+  /* "Who writes it" names the editor and links to the work once; the method
+     explains the review process without making a second origin claim. */
   it("/about ties the method's origin to someone a reader can look up, once", async () => {
     const { default: AboutPage } = await import("../app/about/page");
     const html = renderToStaticMarkup(<AboutPage />);
@@ -266,9 +267,9 @@ describe("the site gives one account of what is new and what the scores read", (
 
     assert.equal(origins.length, 1, "the structure's origin is stated once on /about");
     assert.match(origins[0], /href="https:\/\/[^"]+"/, "an origin claim needs someone a reader can look up behind it");
-    const stakes = renderToStaticMarkup(<MethodSection />).split("<p").find((paragraph) => paragraph.includes("clinical workflows"));
-    assert.ok(stakes, "the method keeps the stakes that make its argument");
-    assert.doesNotMatch(stakes, /healthcare products|href="\/about"/, "and no second origin claim, linked to the page it sits on");
+    const method = renderToStaticMarkup(<MethodSection />);
+    assert.match(method, /check your cash position/);
+    assert.doesNotMatch(method, /clinical workflows|healthcare products|href="\/about"/, "the method needs no second origin claim or clinical analogy");
   });
 
   it("/trust puts operating latitude where it is drawn, and defines confidence the way the label counts it", () => {
@@ -429,7 +430,7 @@ describe("an area row prints the line that explains its state", () => {
   /*
    * Week of Sep 29, 2026: funding pressure 90, risk appetite 44. Each row took
    * its nearest line, so fundraising's pause read "Risk appetite < 44 · at the
-   * line" beside "Pause now applies: funding pressure rose through 76", and
+   * line" beside "Pause now applies: funding pressure rose above 76", and
    * hiring's resume read "Risk appetite > 54 · 10 pts away" while funding
    * pressure, 24 points from its resume line, was what kept hiring paused.
    */

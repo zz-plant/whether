@@ -25,7 +25,7 @@ const text = (html: string) =>
     .replace(/\s+/g, " ")
     .trim();
 
-const render = (props: { currentRegime?: RegimeKey; arrival?: "share" } = {}) =>
+const render = (props: { currentRegime?: RegimeKey; arrival?: "share"; orientation?: string } = {}) =>
   renderToStaticMarkup(<ConditionsLegend thresholds={THRESHOLDS} {...props} />);
 
 describe("conditions legend", () => {
@@ -75,6 +75,19 @@ describe("conditions legend", () => {
     const shared = text(render({ arrival: "share" }));
     assert.match(shared, /^This is this week's guidance from Whether\. Sunny:/);
     assert.doesNotMatch(text(render()), /This is this week/);
+  });
+
+  it("says whom the site is for before the conditions, at every width", () => {
+    /* The card opens on the week's guidance, which never says what Whether is
+       (2026-10-21). The orientation leads the line and, unlike the definitions,
+       is not hidden from `md` up, where the conditions chart defines the four. */
+    const orientation = "For startup leaders: the interest-rate and credit lines that pause or resume your hiring, spend and raise.";
+    const html = render({ currentRegime: "DEFENSIVE", orientation });
+    assert.match(text(html), /^For startup leaders: the interest-rate and credit lines .* Cloudy this week: pricey money, willing investors/);
+    assert.doesNotMatch(html.match(/<section[^>]*>/)?.[0] ?? "", /md:hidden/, "the section shows from md up");
+    assert.match(html, /<span class="md:hidden" data-conditions-definitions/, "the definitions still give way to the chart");
+    assert.match(html, /aria-label="Dismiss this introduction"/);
+    assert.match(render().match(/<section[^>]*>/)?.[0] ?? "", /md:hidden/, "without it, the legend stays phone-only");
   });
 
   it("keeps the dismiss control and the attribute the layout hides it by", () => {

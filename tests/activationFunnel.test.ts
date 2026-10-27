@@ -41,6 +41,14 @@ describe("return detection", () => {
     assert.equal(weeksBetweenSlugs("nonsense", "2026-w01"), null);
   });
 
+  it("counts the extra ISO week in a 53-week year", () => {
+    assert.equal(weeksBetweenSlugs("2026-w52", "2027-w02"), 3);
+    assert.equal(weeksBetweenSlugs("2026-w53", "2027-w01"), 1);
+    assert.equal(weeksBetweenSlugs("2027-w02", "2026-w52"), -3);
+    assert.equal(weeksBetweenSlugs("2025-w53", "2026-w01"), null);
+    assert.equal(weeksBetweenSlugs("2026-w00", "2026-w01"), null);
+  });
+
   it("does not count a first visit as a return", () => {
     const { gap, nextStoredSlug } = resolveReturnVisit(null, new Date("2026-08-03T12:00:00Z"));
     assert.equal(gap, null);

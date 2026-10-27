@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="160" viewBox="0 0 560 160" role="img" aria-labelledby="light-line-crossed-stamp-title light-line-crossed-stamp-desc">
+<title id="light-line-crossed-stamp-title">Pause line crossed stamp</title>
+<desc id="light-line-crossed-stamp-desc">Pause line crossed reusable line state template. Crossed and near use the line ink; clear uses neutral ink.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+<rect width="100%" height="100%" fill="#f1f4f3"/>
+<rect x="1" y="1" width="558" height="158" rx="2" fill="#ffffff" stroke="#d13b37" stroke-width="2"/><svg xmlns="http://www.w3.org/2000/svg" width="42" height="42" viewBox="0 0 24 24" fill="none" stroke="#b4232a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-pause shrink-0 text-line-crossed-fg" data-concept-icon="line-state" data-line-state="crossed" aria-hidden="true" focusable="false" x="28" y="33"><rect x="14" y="3" width="5" height="18" rx="1"></rect><rect x="5" y="3" width="5" height="18" rx="1"></rect></svg><text x="92" y="65" font-size="30" font-weight="600" fill="#b4232a" text-anchor="start">Pause line crossed</text><text x="28" y="127" font-size="20" font-weight="400" fill="#525c60" text-anchor="start">Status label template</text>
+</g>
+</svg>

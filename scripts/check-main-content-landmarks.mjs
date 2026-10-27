@@ -6,6 +6,22 @@
  * is fetched; every route is audited, and a new dynamic page with no sample URL throws.
  * Bounds and their history: docs/agents/lessons/automation-and-deploy-gate.md.
  *
+ * The server is the production worker under `wrangler dev` (the `serve:worker` script),
+ * not `vite dev`: workerd bundles the worker once and then every route renders from that
+ * bundle, where vite compiled each route on first fetch — the difference between a
+ * ~5s audit and a ~20s one locally, and a cold-container worst case of minutes. It is
+ * also the code that actually ships. `WHETHER_ENABLE_MOCKUPS=1` keeps the gated design
+ * routes renderable so their coverage does not silently drop out of the audit.
+ *
+ * `wrangler dev` reads the root `wrangler.toml` only until the build has written its
+ * redirect (`.wrangler/deploy/config.json` -> `dist/server/wrangler.json`), which carries
+ * the real `assets.directory` — without it, wrangler refuses to start ("The `assets`
+ * property ... is missing the required `directory` property"), which is what failed every
+ * Workers Builds run after 30a126e0: the deploy gate runs before any build, so a fresh
+ * container had no redirect to read. The audit therefore builds first when the bundle is
+ * missing, and also when any bundled source is newer than it — a stale bundle would audit
+ * the last build instead of the tree being checked, which `vite dev` could never do.
+ *
  * Usage:
  *   node scripts/check-main-content-landmarks.mjs
  *   node scripts/check-main-content-landmarks.mjs --base-url http://127.0.0.1:3000
@@ -13,6 +29,8 @@
  */
 import process from "node:process";
 import { availableParallelism } from "node:os";
+import { existsSync } from "node:fs";
+import { spawnSync } from "node:child_process";
 
 import {
   auditMainContentRoutes,
@@ -20,9 +38,50 @@ import {
   collectUnresolvedAnchors,
 } from "./main-content-landmarks.mjs";
 import { isDeployGate } from "./deploy-gate.mjs";
-import { withDevServer } from "./dev-server.lib.mjs";
+import { isLocalHostname, withDevServer } from "./dev-server.lib.mjs";
 
 const args = process.argv.slice(2);
+
+/* The worker bundle the audit serves. The marker is what wrangler's redirect points at;
+   the redirect itself is what makes `wrangler dev` leave the root wrangler.toml (whose
+   [assets] intentionally has no directory) and read the built configuration instead. */
+const WORKER_BUNDLE_MARKER = "dist/server/wrangler.json";
+const WORKER_BUNDLE_REDIRECT = ".wrangler/deploy/config.json";
+// Everything the bundle is compiled from. A source newer than the marker means dist/ was
+// built before an edit; auditing it would report on the last build, not this tree.
+const WORKER_BUNDLE_SOURCES = [
+  "app",
+  "worker",
+  "lib",
+  "public",
+  "content",
+  "data",
+  "vite.config.ts",
+  "wrangler.toml",
+  "package.json",
+  "bun.lock",
+];
+
+const isWorkerBundleCurrent = () => {
+  if (!existsSync(WORKER_BUNDLE_MARKER) || !existsSync(WORKER_BUNDLE_REDIRECT)) return false;
+  // Metadata-only walk; no content hashing. A find error means "not provably current",
+  // so the caller rebuilds — a wasted build is cheaper than an audit of stale code.
+  const newer = spawnSync(
+    "find",
+    [...WORKER_BUNDLE_SOURCES.filter((entry) => existsSync(entry)), "-newer", WORKER_BUNDLE_MARKER],
+    { encoding: "utf8" },
+  );
+  return newer.status === 0 && newer.stdout.trim() === "";
+};
+
+const ensureWorkerBundle = () => {
+  if (isWorkerBundleCurrent()) return;
+  console.log("The worker bundle is missing or older than the sources; building it first.");
+  const build = spawnSync(process.execPath, ["scripts/cloudflare-run.mjs", "build"], { stdio: "inherit" });
+  if (build.status !== 0) {
+    throw new Error("Building the worker bundle for the landmark audit failed; nothing current to serve.");
+  }
+};
 
 const hasFlag = (flag) => args.includes(flag);
 
@@ -160,10 +219,17 @@ const run = async () => {
     return reportResults(await audit(baseUrl));
   }
 
+  // Only the local-start path depends on the bundle: a server someone already runs, or a
+  // non-local target the audit must not stand in for, is audited exactly as it answers.
+  if (isLocalHostname(new URL(baseUrl).hostname) && !(await probe(baseUrl)).ok) {
+    ensureWorkerBundle();
+  }
+
   return withDevServer({
     baseUrl,
     outDir: "artifacts/landmarks",
     logName: "check-main-content-landmarks.dev.log",
+    devScript: "serve:worker",
     timeoutMs,
     // A second, fresh start in the deploy gate only: a cold container's first start is the
     // one that has missed its deadline (dev-server.lib.mjs). Locally a failure is real.

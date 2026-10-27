@@ -19,7 +19,19 @@ cd "${CLAUDE_PROJECT_DIR:-$(pwd)}"
 # failure is harmless (offline, or already complete), so it never blocks the session.
 if [ "$(git rev-parse --is-shallow-repository 2>/dev/null)" = "true" ]; then
   echo "[session-start] Unshallowing clone for full history..."
-  git fetch --unshallow --quiet 2>/dev/null || echo "[session-start] unshallow skipped"
+  # GIT_TERMINAL_PROMPT=0 keeps an unreachable remote from stalling on a
+  # credential prompt no one can answer in a hook.
+  # The fetch runs under a watchdog: a connection that neither answers nor
+  # fails would hold the session start for the container's full network
+  # timeout, so after ten seconds it is killed and the session proceeds
+  # without the deeper history.
+  GIT_TERMINAL_PROMPT=0 git fetch --unshallow --quiet 2>/dev/null &
+  fetch_pid=$!
+  ( sleep 10; kill -9 "$fetch_pid" 2>/dev/null ) &
+  watchdog_pid=$!
+  wait "$fetch_pid" 2>/dev/null || echo "[session-start] unshallow skipped"
+  kill "$watchdog_pid" 2>/dev/null || true
+  wait "$watchdog_pid" 2>/dev/null || true
 fi
 
 # Idempotent and cache-friendly: `bun install` is a near no-op once node_modules

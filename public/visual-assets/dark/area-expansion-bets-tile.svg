@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="260" viewBox="0 0 560 260" role="img" aria-labelledby="dark-area-expansion-bets-tile-title dark-area-expansion-bets-tile-desc">
+<title id="dark-area-expansion-bets-tile-title">New bets area tile</title>
+<desc id="dark-area-expansion-bets-tile-desc">New bets reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+<rect width="100%" height="100%" fill="#0f1316"/>
+<rect x="1" y="1" width="558" height="258" rx="10" fill="#171c20" stroke="rgba(237, 240, 238, 0.10)" stroke-width="2"/><text x="32" y="44" font-size="18" font-weight="400" fill="#a0a9a7" text-anchor="start">Operating area</text><svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#edf0ee" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sprout shrink-0" data-concept-icon="area" aria-hidden="true" focusable="false" x="32" y="83"><path d="M14 9.536V7a4 4 0 0 1 4-4h1.5a.5.5 0 0 1 .5.5V5a4 4 0 0 1-4 4 4 4 0 0 0-4 4c0 2 1 3 1 5a5 5 0 0 1-1 3"></path><path d="M4 9a5 5 0 0 1 8 4 5 5 0 0 1-8-4"></path><path d="M5 21h14"></path></svg><text x="112" y="127" font-size="44" font-weight="700" fill="#edf0ee" text-anchor="start">New bets</text><text x="32" y="210" font-size="24" font-weight="400" fill="#cdd3d1" text-anchor="start">Action · pause line · resume line</text>
+</g>
+</svg>

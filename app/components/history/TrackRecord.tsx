@@ -85,7 +85,7 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
               {row.regimeLabel}
             </span>
             {row.changed ? (
-              <span className="ml-2 type-badge text-fluid-micro rounded-sm bg-sky-500/15 px-1.5 py-0.5 text-sky-200">
+              <span className="ml-2 type-badge text-fluid-micro rounded-sm border border-slate-600/60 px-1.5 py-0.5 text-slate-100">
                 changed
               </span>
             ) : null}

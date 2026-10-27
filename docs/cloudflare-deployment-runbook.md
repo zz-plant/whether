@@ -31,9 +31,12 @@ bun scripts/run-checks.mjs --preset deploy
 The `deploy` preset (`scripts/check-tasks.mjs`, where the pre-push hook's preset is declared too)
 is two stages: lint, typecheck, test, assets, suppressions and dead-exports together, then the
 landmark audit on its own once they pass, under `WHETHER_DEPLOY_GATE=1` for the run and every task
-it spawns. The landmark audit runs second and alone: it spawns a dev server and compiles every
-route against it, and a server sharing a small container's cores with lint, tsc, and the suite
-turns a slow route into one that "never answered".
+it spawns. The landmark audit runs second and alone: it starts the production worker under
+`wrangler dev` (the `serve:worker` script), which bundles the worker once and renders every route
+from that bundle, and a workerd container sharing a small box's cores with lint, tsc and the
+suite still turns a cold start into a timeout — the reason it is a stage of its own. (Until
+2026-10-21 it served `vite dev` instead, which compiled each route on first fetch; the audit
+against the worker is not only faster, it is the code that ships.)
 
 `WHETHER_DEPLOY_GATE=1` (read in one place, `scripts/deploy-gate.mjs`) makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
 with a 120s ceiling, and skip `tests/tools/` (it shells out to `python3`, which the build image does

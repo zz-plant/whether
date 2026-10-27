@@ -10,10 +10,9 @@ import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/naviga
 import {
   buildCanonicalUrl,
   buildPageMetadata,
-  organizationName,
 } from "../../../lib/seo";
-import { buildAuthorSchema, buildPublisherSchema, publisherAuthor } from "../../../lib/publisher";
-import { graph } from "../../../lib/seo/pageStructuredData";
+import { publisherAuthor } from "../../../lib/publisher";
+import { buildPublishedBriefStructuredData } from "../../../lib/seo/pageStructuredData";
 import {
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefImageParams,
@@ -22,11 +21,13 @@ import {
   buildPublishedBriefPath,
   buildPublishedBriefTitle,
   buildPublishedBriefSlackUpdate,
+  buildPublishedBriefBoardUpdate,
   findAdjacentPublishedBriefs,
   findPublishedBrief,
   labelForArea,
   publishedBriefDisplay,
   publishedBriefHeadline,
+  correctionBody,
   publishedBriefWeekLabel,
   publishedBriefStaticParams,
   type PublishedBrief,
@@ -45,6 +46,8 @@ import {
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { AreaLabel, LineStateIcon } from "../../components/ui/conceptIcons";
 import { isDecisionArea } from "../../../lib/report/boundedDecisionRules";
+import { briefVideoOpenGraph, findBriefVideo } from "../../../lib/export/briefVideo";
+import { BriefVideoPreview } from "../../components/briefVideoPreview";
 
 /* A frozen record stores its area as a string; a known area prints with its glyph. */
 const BriefAreaName = ({ area }: { area: string }) =>
@@ -84,6 +87,8 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   if (!brief) return {};
 
+  const video = await findBriefVideo(brief);
+
   const metadata = buildPageMetadata({
     title: briefTitle(brief),
     description: buildPublishedBriefDescription(brief),
@@ -93,12 +98,30 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
   });
 
   metadata.authors = [{ name: publisherAuthor.name, url: buildCanonicalUrl("/about") }];
+  metadata.keywords = [
+    "startup operating guidance",
+    "startup hiring guidance",
+    "venture funding macro",
+    "burn rate discipline",
+    `week of ${publishedBriefWeekLabel(brief)}`,
+    brief.slug,
+    brief.regime,
+  ];
   metadata.openGraph = {
     ...metadata.openGraph,
     type: "article",
     publishedTime: brief.publishedAt,
     modifiedTime: brief.publishedAt,
     authors: [buildCanonicalUrl("/about")],
+    ...(video ? {
+      videos: [briefVideoOpenGraph(video)],
+      images: [{
+        url: buildCanonicalUrl(video.poster),
+        width: video.width,
+        height: video.height,
+        alt: `The published weekly guidance for ${publishedBriefWeekLabel(brief)}`,
+      }],
+    } : {}),
   };
 
   return metadata;
@@ -114,12 +137,19 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
   if (!brief) notFound();
 
+  const video = await findBriefVideo(brief);
+  /* The metadata shim emits og:video with its width and height but leaves out
+     the type and the secure URL the OpenGraph video spec carries, so the page
+     renders those two itself; React hoists meta tags into the document head
+     during server rendering. */
+  const videoOpenGraph = video ? briefVideoOpenGraph(video) : undefined;
   const display = publishedBriefDisplay(brief);
   const headline = publishedBriefHeadline(brief);
   const canonicalUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
   const slackUpdate = buildPublishedBriefSlackUpdate(brief);
   const emailUpdate = buildPublishedBriefEmailUpdate(brief);
+  const boardUpdate = buildPublishedBriefBoardUpdate(brief);
 
   // The record's readings and corridor, drawn. Records frozen before the lines
   // were data carry neither and fall back to the sentences below.
@@ -143,22 +173,13 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const frozenScores = brief.scores;
   const tabulateDecisions = frozenScores !== undefined && brief.decisions.some((decision) => (decision.pause?.length ?? 0) > 0);
 
-  const structuredData = graph([
-    {
-      "@type": "Article",
-      headline: briefTitle(brief),
-      description: buildPublishedBriefDescription(brief),
-      datePublished: brief.publishedAt,
-      dateModified: brief.publishedAt,
-      author: buildAuthorSchema(),
-      publisher: buildPublisherSchema(organizationName),
-      image: [buildPublishedBriefImageUrl(brief)],
-      url: canonicalUrl,
-      mainEntityOfPage: canonicalUrl,
-      isAccessibleForFree: true,
-    },
-    // The trail is described by <Breadcrumbs> below, from the trail it draws.
-  ]);
+  const structuredData = buildPublishedBriefStructuredData({
+    brief,
+    canonicalUrl,
+    imageUrl: buildPublishedBriefImageUrl(brief),
+    headline: briefTitle(brief),
+    description: buildPublishedBriefDescription(brief),
+  });
 
   return (
     <ContentPageShell measure="prose">
@@ -194,7 +215,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           /* A correction rides inside the card, under the lines it corrects: the
              card is the block people crop, and a crop that dropped the note
              would carry the uncorrected line on its own. */
-          callDetail={brief.correction ? `Correction: ${brief.correction}` : undefined}
+          callDetail={brief.correction ? `Correction: ${correctionBody(brief.correction)}` : undefined}
           regime={brief.regime}
           lines={[
             ...(display.pauseIf ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: display.pauseIf }] : []),
@@ -224,7 +245,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               only at the foot of the page, past the full brief. A visitor should
               not have to scroll a dated record to find out it is dated. */}
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
-            <span>This is a frozen record of one week.</span>
+            <span>This page keeps one week&apos;s guidance, unchanged since it was published.</span>
             <ActionLink href="/" variant="inline">
               Read this week&apos;s guidance
             </ActionLink>
@@ -246,8 +267,23 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           weekLabel={publishedBriefWeekLabel(brief)}
           slackUpdate={slackUpdate}
           emailUpdate={emailUpdate}
+          boardUpdate={boardUpdate}
           permanentUrl={canonicalUrl}
+          slidePptxUrl={`/api/export/board-slide?week=${brief.slug}&format=pptx`}
         />
+
+        {video && videoOpenGraph ? (
+          <>
+            <meta property="og:video:type" content={videoOpenGraph.type} />
+            <meta property="og:video:secure_url" content={videoOpenGraph.secureUrl} />
+            <details className="weather-panel space-y-4 px-6 py-6 max-sm:px-0">
+              <summary className="weather-hit w-fit cursor-pointer text-fluid-sm font-semibold text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">
+                Watch or download this brief
+              </summary>
+              <BriefVideoPreview asset={video} label={`Published guidance for the week of ${publishedBriefWeekLabel(brief)}`} />
+            </details>
+          </>
+        ) : null}
 
         {readings.length > 0 ? (
           <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6" aria-labelledby="published-readings">
@@ -255,7 +291,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
             <dl className="grid gap-4 sm:grid-cols-2">
               {readings.map((reading) => {
                 const rail = rails.find((candidate) => candidate.metric === reading.key);
-                const deltaUp = reading.change?.startsWith("+");
+                const deltaUp = reading.change ? reading.change.delta > 0 : undefined;
                 const deltaTone = reading.change
                   ? deltaUp === reading.worseWhenUp
                     ? "text-semantic-caution-fg"
@@ -267,7 +303,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                     <dd className="mt-0.5 flex items-baseline gap-2 tabular-nums">
                       <span className="text-2xl font-semibold text-slate-100">{reading.value}</span>
                       <span className="text-sm text-slate-500">/100</span>
-                      {reading.change ? <span className={`text-sm ${deltaTone}`}>{reading.change}</span> : null}
+                      {reading.change ? <span className={`text-sm ${deltaTone}`}>{reading.change.label}</span> : null}
                     </dd>
                     {/* What the number meant that week, so a cited record does not
                         need the reader to know which end of the scale is bad. */}

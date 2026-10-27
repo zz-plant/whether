@@ -22,7 +22,7 @@ describe("all five areas, side by side", () => {
     <AllAreaRules
       rows={[
         row("hiring", held, "held"),
-        row("product-tempo", "Resume line no longer met: risk appetite fell through 54.", "resumeLost"),
+        row("product-tempo", "Resume line no longer met: risk appetite fell below 54.", "resumeLost"),
         row("capital-raising", held, "held"),
         row("burn-discipline", held, "held"),
         row("expansion-bets", held, "held"),
@@ -46,7 +46,7 @@ describe("all five areas, side by side", () => {
   });
 
   it("keeps the moved area's note in its row", () => {
-    assert.match(html, /Resume line no longer met: risk appetite fell through 54\./);
+    assert.match(html, /Resume line no longer met: risk appetite fell below 54\./);
     assert.match(html, /data-moved="true"/);
   });
 });

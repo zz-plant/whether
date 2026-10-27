@@ -46,10 +46,10 @@ describe("ReportShell extracted sections", () => {
     // No kicker. "Weekly brief" above every H1 restated the route the header
     // tab and the bottom bar already name; the status word leads instead.
     assert.doesNotMatch(html, />Weekly brief</);
-    // The status word is the route's stamp: it prints first, in the regime
-    // ink, at the reading's own size; the trust headline and the record date
-    // follow it in the meta half of the same line.
-    assert.match(html, /text-\[color:var\(--regime-ink\)\]">DEFENSIVE<\/span>/);
+    // The status word is the route's stamp: it prints first, as the week's
+    // placard; the trust headline and the record date follow it in the meta
+    // half of the same line.
+    assert.match(html, /class="type-stamp weather-tag-placard[^"]*">DEFENSIVE<\/span>/);
     assert.match(html, /HIGH • Data as of Mar 5/);
     assert.match(html, /Decision summary/);
     // The refresh stamp is labelled for what it is — the pipeline's fetch,

@@ -112,7 +112,7 @@ export function GuidedTranslationPanels({
             <ul className="space-y-2 text-sm text-slate-200">
               {selectedStakeholder.bullets.map((bullet) => (
                 <li key={bullet} className="flex gap-3">
-                  <span aria-hidden="true" className="text-sky-300">•</span>
+                  <span aria-hidden="true" className="text-slate-500">•</span>
                   <span>{bullet}</span>
                 </li>
               ))}
@@ -160,7 +160,7 @@ export function GuidedTranslationPanels({
             <ul className="space-y-2 text-sm text-slate-200">
               {selectedStage.whoBenefitsMost.map((entry) => (
                 <li key={entry} className="flex gap-3">
-                  <span aria-hidden="true" className="text-sky-300">•</span>
+                  <span aria-hidden="true" className="text-slate-500">•</span>
                   <span>{entry}</span>
                 </li>
               ))}

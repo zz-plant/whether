@@ -1,11 +1,18 @@
 import { getOperatingSnapshotStore } from "../operatingState/snapshotStore";
 import { loadCanonicalReportInputs } from "../ingestion/materialized";
-import { loadMacroSeries } from "../macroSnapshot";
+import { macroSeries as snapshotMacroSeries } from "../macroSnapshot";
 import { buildOperatingSnapshot } from "../operatingState/snapshot";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { StartupVariantMode } from "../report/boundedDecisionRules";
 import { briefArtifactToSlidePayload } from "../report/briefArtifact";
 import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
+import {
+  publishedBriefDisplay,
+  publishedBriefHeadline,
+  buildPublishedBriefPath,
+  type PublishedBrief,
+} from "../report/publishedBriefs";
+import { buildCanonicalUrl } from "../seo";
 import { snapshotData } from "../snapshot";
 import type { MeetingSlidePayload } from "./meetingSlideExport";
 
@@ -24,7 +31,7 @@ export const loadExportSnapshot = async (): Promise<OperatingSnapshot | null> =>
   if (inputs) {
     return buildOperatingSnapshot({ treasury: inputs.treasury, macroSeries: inputs.macroSeries });
   }
-  return buildOperatingSnapshot({ treasury: snapshotData, macroSeries: await loadMacroSeries() });
+  return buildOperatingSnapshot({ treasury: snapshotData, macroSeries: snapshotMacroSeries });
 };
 
 /**
@@ -42,3 +49,36 @@ export const buildExportSlidePayload = (
   stage: StartupVariantMode | null,
 ): MeetingSlidePayload =>
   briefArtifactToSlidePayload(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall, { stage }));
+
+/**
+ * Builds a meeting slide payload from a frozen PublishedBrief.
+ */
+export const publishedBriefToSlidePayload = (
+  brief: PublishedBrief,
+  stage: StartupVariantMode | null,
+): MeetingSlidePayload => {
+  const display = publishedBriefDisplay(brief);
+  const headline = publishedBriefHeadline(brief);
+  return {
+    recordDate: brief.recordDateLabel,
+    recordDateIso: brief.recordDate,
+    regime: brief.regime,
+    stageLabel: stage ?? "",
+    actionNow: headline.action,
+    pauseIf: display.pauseIf ?? "No pause line was published with this brief.",
+    callChangesIf: display.conditionsChangeIf,
+    // A brief archived before scores were stored prints no scores at all: the
+    // reading section says so (`slideReadingLines`) rather than rendering
+    // invented 50/50 as the record's readings.
+    ...(brief.scores
+      ? { tightness: brief.scores.tightness, riskAppetite: brief.scores.riskAppetite }
+      : {}),
+    confidence: brief.confidenceLabel,
+    provenance: brief.sourceLabel,
+    basis: display.basis.sentence,
+    call: headline.composed,
+    clearsWhen: [display.conditionsChangeIf],
+    url: buildCanonicalUrl(buildPublishedBriefPath(brief.slug)),
+    isFallback: false,
+  };
+};

@@ -105,7 +105,9 @@ describe("the hiring-freeze pair", () => {
 
     const html = renderToStaticMarkup(await resourceRoute.default(params({ slug: FREEZE_GUIDE })));
     assert.ok(html.includes(`href="/answers/${FREEZE_ANSWER}"`), "the guide links back to the answer");
-    assert.ok(html.includes("This week&#x27;s guidance:"));
+    /* The links are the week's answers, under a heading that already says
+       "This week's guidance"; they were labelled that again. */
+    assert.ok(html.includes("Questions answered this week:"));
   });
 });
 

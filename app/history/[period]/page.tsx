@@ -279,7 +279,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           <ul className="space-y-2 text-sm text-slate-300">
             {period.constraints.map((constraint) => (
               <li key={constraint} className="flex gap-2">
-                <span aria-hidden="true" className="text-sky-300">
+                <span aria-hidden="true" className="text-slate-500">
                   •
                 </span>
                 <span>{constraint}</span>

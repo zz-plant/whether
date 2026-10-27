@@ -50,9 +50,27 @@ const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
   SCARCITY: "Money is expensive and hard to raise.",
   DEFENSIVE: "Money is available but pricey.",
-  VOLATILE: "Conditions are changing week to week.",
+  /* Stormy is cheap money and wary investors (below both change lines). It read
+     "Conditions are changing week to week" until 2026-10-21, a leftover of the
+     engine key's name that described neither score; every other surface said
+     what the quadrant measures. */
+  VOLATILE: "Money is cheap but investors are wary.",
   EXPANSION: "Money is cheap and available.",
 };
+
+/**
+ * What each side of the two change lines means in money terms, for a reader who
+ * has not learned the scores: above the funding-pressure line money is pricey,
+ * above the risk-appetite line investors are willing. The conditions legend
+ * builds each condition's meaning from these, and the conditions chart labels
+ * its axes with them, so the two cannot drift apart.
+ */
+export const CONDITION_SIDE_MEANINGS = {
+  pressureAbove: "pricey money",
+  pressureBelow: "cheap money",
+  appetiteAbove: "willing investors",
+  appetiteBelow: "wary investors",
+} as const;
 
 /* The same sentence, led by the weather word, for the legend's screen-reader label. */
 const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {

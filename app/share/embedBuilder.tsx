@@ -29,7 +29,7 @@ const TICKER_PRESETS = [
 
 const EMBED_FORMAT_OPTIONS = [
   { key: "brief", label: "Full brief" },
-  { key: "call-strip", label: "Board call strip" },
+  { key: "call-strip", label: "One-line strip" },
 ] as const;
 
 export function EmbedBuilder() {
@@ -151,7 +151,7 @@ export function EmbedBuilder() {
             Where scripts are not allowed, paste this address into an embed block. It shows the same widget, with your
             choices above.
           </p>
-          <pre className="overflow-x-auto rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-fluid-xs text-slate-200">
+          <pre className="overflow-x-auto rounded-md border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs text-slate-200">
             <code>{frameUrl}</code>
           </pre>
           <ClipboardActionRow
@@ -170,7 +170,7 @@ export function EmbedBuilder() {
           {/* The badge as the reader will paste it: the route's own SVG, so
               `unoptimized` (the worker's optimizer reads static assets only). */}
           <Image src="/api/badge" alt="Startup conditions this week, from Whether" width={180} height={20} unoptimized className="h-5 w-auto" />
-          <pre className="overflow-x-auto rounded-md border border-slate-800/80 bg-slate-950/80 p-3 text-fluid-xs text-slate-200">
+          <pre className="overflow-x-auto rounded-md border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs text-slate-200">
             <code>{badgeMarkdown}</code>
           </pre>
           <ClipboardActionRow

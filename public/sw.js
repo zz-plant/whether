@@ -107,6 +107,9 @@ self.addEventListener("fetch", (event) => {
   }
 
   if (isDocumentRequest(request)) {
+    /* Any Whether document opened clears the app badge: the badge means "a
+       reading you haven't seen", and this is the reading being seen. */
+    if (self.navigator.clearAppBadge) void self.navigator.clearAppBadge();
     event.respondWith(documentStrategy(request));
   }
 });
@@ -153,18 +156,37 @@ self.addEventListener("push", (event) => {
         renotify: false,
         icon: "/icon-192.png",
         badge: "/icon-192.png",
+        /* Notification actions render where the platform shows them (Android,
+           desktop) and are ignored where they don't; the notification itself
+           still opens the brief everywhere (2026-10-22). */
+        actions: [
+          { action: "open-plan", title: "Open the plan" },
+          { action: "open-share", title: "Share formats" },
+        ],
         data: { url: "/" },
       });
+      /* The app badge says "a reading you haven't seen", so it is set when the
+         notification is shown and cleared when any Whether document is next
+         opened (the navigation branch of the fetch handler). */
+      if (self.navigator.setAppBadge) await self.navigator.setAppBadge(1);
     })(),
   );
 });
 
+/* Where each notification action lands. The default click (no action) opens
+   the brief, which is what the notification itself promises. */
+const NOTIFICATION_TARGETS = {
+  "open-plan": "/operate",
+  "open-share": "/share",
+};
+
 self.addEventListener("notificationclick", (event) => {
   event.notification.close();
-  const target = event.notification.data?.url ?? "/";
+  const target = NOTIFICATION_TARGETS[event.action] ?? event.notification.data?.url ?? "/";
 
   event.waitUntil(
     (async () => {
+      if (self.navigator.clearAppBadge) await self.navigator.clearAppBadge();
       /* Focus a tab that is already here instead of opening a third one. */
       const windows = await self.clients.matchAll({ type: "window", includeUncontrolled: true });
       for (const client of windows) {
@@ -177,4 +199,117 @@ self.addEventListener("notificationclick", (event) => {
       await self.clients.openWindow(target);
     })(),
   );
+});
+
+/*
+ * A failed decision-record post, replayed when connectivity returns.
+ *
+ * The stashing side is app/components/decisionLedgerClient.ts: a post that
+ * threw (a network failure, not an HTTP error) is written to IndexedDB here
+ * and a sync event is registered for it. localStorage is not available to a
+ * service worker, which is why the stash is IndexedDB — and why these two
+ * small functions mirror that file's instead of importing them: this file is
+ * served as-is from /public. The keying convention is shared: one entry per
+ * stashed write under a unique key (two offline decisions are two records),
+ * deleted when its replay succeeds, or dropped on a 4xx refusal.
+ */
+const RETRY_DB_NAME = "whether-ledger-retry";
+const RETRY_STORE = "posts";
+const LEDGER_ENDPOINT = "/api/decision-memory";
+const CLIENT_ID_HEADER = "x-whether-client-id"; // lib/api/clientIdHeader.ts
+
+const openRetryDb = () =>
+  new Promise((resolve) => {
+    try {
+      if (typeof indexedDB === "undefined") return resolve(null);
+      const request = indexedDB.open(RETRY_DB_NAME, 1);
+      request.onupgradeneeded = () => request.result.createObjectStore(RETRY_STORE);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => resolve(null);
+    } catch {
+      resolve(null);
+    }
+  });
+
+const readStashedPosts = async () => {
+  const db = await openRetryDb();
+  if (!db) return [];
+  const posts = await new Promise((resolve) => {
+    try {
+      /* A cursor rather than getAll: the entry's key is what a successful
+         replay deletes, and entries stashed before the key was stored inside
+         the value key by their IndexedDB key instead. */
+      const request = db.transaction(RETRY_STORE, "readonly").objectStore(RETRY_STORE).openCursor();
+      const entries = [];
+      request.onsuccess = () => {
+        const cursor = request.result;
+        if (!cursor) {
+          resolve(entries);
+          return;
+        }
+        const value = cursor.value ?? {};
+        entries.push({ key: typeof value.key === "string" ? value.key : cursor.key, clientId: value.clientId, payload: value.payload });
+        cursor.continue();
+      };
+      request.onerror = () => resolve([]);
+    } catch {
+      resolve([]);
+    }
+  });
+  db.close();
+  return posts;
+};
+
+const deleteStashedPost = async (key) => {
+  const db = await openRetryDb();
+  if (!db) return;
+  await new Promise((resolve) => {
+    try {
+      const tx = db.transaction(RETRY_STORE, "readwrite");
+      tx.objectStore(RETRY_STORE).delete(key);
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => resolve();
+    } catch {
+      resolve();
+    }
+  });
+  db.close();
+};
+
+const replayStashedPosts = async () => {
+  const posts = await readStashedPosts();
+  let retryable = false;
+  for (const post of posts) {
+    try {
+      const response = await fetch(LEDGER_ENDPOINT, {
+        method: "POST",
+        headers: { [CLIENT_ID_HEADER]: post.clientId, "content-type": "application/json" },
+        body: JSON.stringify({ ...post.payload, clientId: post.clientId }),
+      });
+      if (response.ok) {
+        await deleteStashedPost(post.key);
+      } else if (response.status >= 500) {
+        /* The server answered but failed: the entry stays queued for the retry. */
+        retryable = true;
+      } else {
+        /* A 4xx is a refusal, not a network failure. The decision was reported
+           as not recorded at write time, and replaying it would fail the same
+           way every time, so it is dropped the way a failed live post is. */
+        await deleteStashedPost(post.key);
+      }
+    } catch {
+      /* Still offline: the entry stays queued, and the sync event fires again
+         when the platform next judges connectivity returned. */
+      retryable = true;
+    }
+  }
+  /* The Background Sync spec schedules the next retry from a rejected
+     waitUntil promise; resolving here would drop the one-off registration and
+     strand whatever remains queued in IndexedDB. */
+  if (retryable) throw new Error("decision-ledger-retry: entries remain queued");
+};
+
+self.addEventListener("sync", (event) => {
+  if (event.tag !== "decision-ledger-retry") return;
+  event.waitUntil(replayStashedPosts());
 });

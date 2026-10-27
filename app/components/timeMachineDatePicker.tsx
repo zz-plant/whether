@@ -58,10 +58,10 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
           </div>
 
           {isActive ? (
-            <div className="mt-3 rounded-md border border-amber-500/25 bg-amber-500/8 px-3 py-2 text-xs text-amber-200">
+            <div className="mt-3 rounded-md border border-l-4 border-caveat-border bg-caveat-bg px-3 py-2 text-xs text-caveat-fg">
               <div className="flex items-center justify-between gap-2">
-                <span>Viewing {currentMonth}/{currentYear}</span>
-                <button type="button" onClick={clearDate} className="underline decoration-amber-500/40 hover:decoration-amber-300">Return to current</button>
+                <span className="weather-caveat-mark">Viewing {currentMonth}/{currentYear}</span>
+                <button type="button" onClick={clearDate} className="underline decoration-slate-600 underline-offset-4 hover:decoration-current">Return to current</button>
               </div>
               {adjacentPrev || adjacentNext ? (
                 <div className="mt-2 flex items-center gap-2">

@@ -6,6 +6,7 @@ import { ScoreCell, formatScoreReference } from "../app/components/ui/scoreCell"
 import { AreaTable } from "../app/components/ui/areaTable";
 import { TrustStrip } from "../app/components/trustStrip";
 import { MonthStrip, describeCurrentRun } from "../app/components/history/monthStrip";
+import { RecordSection } from "../app/components/home/RecordSection";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 
 /*
@@ -248,7 +249,7 @@ describe("AreaTable moved rows", () => {
         caption="test"
         rows={[
           { area: "hiring", rule: "Backfills only.", changed: "Pause still applies: no line crossed since Sep 30." },
-          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Resume line no longer met: risk appetite fell through 54.", moved: true },
+          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Resume line no longer met: risk appetite fell below 54.", moved: true },
         ]}
       />,
     );
@@ -409,7 +410,7 @@ describe("TrustStrip", () => {
     );
     assert.match(
       html,
-      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They are left out because past months can(&#x27;|')t be checked with them\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
+      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They are left out because they can(&#x27;|')t be scored against past month-ends\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
     );
   });
 });
@@ -454,6 +455,37 @@ describe("MonthStrip", () => {
     assert.equal((html.match(/data-strip-run-glyph/g) ?? []).length, 2);
     assert.match(html, /lucide-sun[\s\S]*lucide-cloud/, "each run draws its own condition's glyph");
     assert.match(visible, /Sunny\s+2 months/, "the legend names each colour and its months");
+  });
+
+  it("stacks markers by their computed month slot, so same-month decisions do not overlap", () => {
+    /* Two decisions recorded on different days of the same month both land on
+       the June month-end: stacking by exact date would give both stack 0 and
+       the diamonds would draw on top of each other. */
+    const html = renderToStaticMarkup(
+      <MonthStrip
+        entries={entries}
+        markers={[
+          { recordDate: "2026-06-03", label: "First decision", fillClassName: "bg-sky-600" },
+          { recordDate: "2026-06-24", label: "Second decision", fillClassName: "bg-amber-500" },
+        ]}
+      />,
+    );
+    const tops = [...html.matchAll(/top:\s*(-?\d+(?:\.\d+)?)px/g)].map((match) => Number(match[1]));
+    assert.equal(tops.length, 2);
+    assert.equal(tops[0], -11, "the first marker in a slot sits on the band");
+    assert.equal(tops[1], -22, "the second marker in the same slot stacks above it");
+    // Different months still don't stack with each other.
+    const separate = renderToStaticMarkup(
+      <MonthStrip
+        entries={entries}
+        markers={[
+          { recordDate: "2026-05-02", label: "May decision", fillClassName: "bg-sky-600" },
+          { recordDate: "2026-06-24", label: "June decision", fillClassName: "bg-amber-500" },
+        ]}
+      />,
+    );
+    const separateTops = [...separate.matchAll(/top:\s*(-?\d+(?:\.\d+)?)px/g)].map((match) => Number(match[1]));
+    assert.deepEqual(separateTops, [-11, -11], "markers in different slots sit on the band");
   });
 });
 
@@ -509,7 +541,7 @@ describe("Wayfinding shortcuts and deep-links", () => {
     const { AlertSection } = require("../app/components/home/AlertSection");
     const html = renderToStaticMarkup(<AlertSection />);
     assert.match(html, /^<section id="subscribe"/);
-    assert.match(html, /<h2[^>]*>Get an email the day a line is crossed<\/h2>/);
+    assert.match(html, /<h2[^>]*>Get notified when something changes<\/h2>/);
     assert.match(html, /Every Monday too/, "the Monday email stays one choice away");
     assert.doesNotMatch(html, /Tell me when the guidance changes/, "the form does not restate the heading");
     const { WhatWouldChangeSection } = require("../app/components/home/WhatWouldChangeSection");
@@ -550,5 +582,28 @@ describe("Wayfinding shortcuts and deep-links", () => {
       />,
     );
     assert.match(html, /href="\/operate#ops-monthly-action-summary"/);
+  });
+});
+
+describe("RecordSection", () => {
+  const record = [
+    { recordDate: "2026-07-31", regime: "EXPANSION" },
+    { recordDate: "2026-08-31", regime: "EXPANSION" },
+    { recordDate: "2026-09-30", regime: "DEFENSIVE" },
+  ];
+  const lines = { tightness: 70, riskAppetite: 50 };
+  it("draws the record as the month strip above the sentences that count it", () => {
+    /* "Has this happened before?" answered in sentences only until 2026-10-21. */
+    const html = renderToStaticMarkup(
+      <RecordSection lastTime={null} callChangeLines={lines} turningPoints={[]} spellLengths="A spell sentence." record={record} />,
+    );
+    assert.match(html, /data-month-strip[\s\S]*A spell sentence\./);
+  });
+
+  it("leaves the band out of an archived view, which passes no record", () => {
+    const html = renderToStaticMarkup(
+      <RecordSection lastTime={null} callChangeLines={lines} turningPoints={[{ label: "Sep 2026, Sunny to Cloudy", href: "/?month=9&year=2026" }]} />,
+    );
+    assert.doesNotMatch(html, /data-month-strip/);
   });
 });

@@ -146,7 +146,7 @@ describe("cli contracts", () => {
 
     assert.equal(
       buildCliChangesContract({ reportData: crossing, postureState, degraded: false }).decision,
-      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose through 76 and risk appetite fell through 44.",
+      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose above 76 and risk appetite fell below 44.",
     );
     assert.equal(
       buildCliChangesContract({ reportData: { ...crossing, reportDynamics: { ...crossing.reportDynamics, directionLabel: "unavailable", changedSignals: [] } }, postureState, degraded: false }).decision,

@@ -177,13 +177,13 @@ describe("/share current weekly artifact", () => {
     assert.match(badges[0] ?? "", /height="20"/);
     assert.equal(images.length, 2, "one picture per distinct image");
     for (const tag of images) {
-      assert.match(tag, /src="\/api\/image\/(slide\?stage=series-a|brief)"/);
+      assert.match(tag, /src="\/api\/image\/(slide|brief)\?stage=series-a"/);
       assert.match(tag, /width="1200"/);
       assert.match(tag, /height="(675|800)"/);
       assert.match(tag, /loading="lazy"/);
       assert.match(tag, /alt="[^"]{20,}"/, "the alt says what the picture shows");
     }
-    for (const label of ["Download PPTX", "Download PDF", "Open SVG", "Open brief card", "Open portrait card"]) assert.match(html, new RegExp(label));
+    for (const label of ["Download PPTX", "Download PDF", "Open SVG", "Open brief card"]) assert.match(html, new RegExp(label));
   });
 
   /* DD-041: the formats were stacked sections, about 5,700px on desktop with the Slack text drawn

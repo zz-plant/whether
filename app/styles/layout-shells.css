@@ -116,6 +116,15 @@ html[data-focus-mode] [data-home-shell-main] {
   padding-block: 3rem;
 }
 
+/* The weekly brief's own column, named beside the other page measures: the
+   one-screen brief's two inner columns use it (app/page.tsx), and the focus
+   mode above narrows the shell to the same 64rem. Until 2026-10-21 the
+   measure was a hand-typed `max-w-[64rem]` literal twice over, beside a
+   registry it never joined (DD-046). */
+.weather-brief-measure {
+  max-width: 64rem;
+}
+
 .weather-page-shell-standard {
   max-width: 72rem;
 }
@@ -238,10 +247,14 @@ a.weather-hub-link-card:hover {
   color: var(--app-text-secondary);
   cursor: pointer;
   touch-action: manipulation;
+  /* Token pair, not a literal: the chip is a secondary control, and the
+     duration and curve are --transition-fast/--ease-out as .weather-chip
+     (surfaces.css) and the controls in controls.css already set them.
+     Reduced-motion end state is the block at the foot of this file. */
   transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease;
+    transform var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out);
 }
 
 .weather-hub-chip:hover {
@@ -392,16 +405,11 @@ a.weather-hub-link-card:hover {
   touch-action: manipulation;
 }
 
-/* The tones are roles, as the hue ramps are (tokens.css): sky and cyan the
-   action ink, amber and rose the crossed red, emerald the clear ink. Each
-   reads its role token, which carries its own light value, so the published
-   brief's stamps clear AA on both grounds without a per-theme rule. */
-.weather-tag-sky,
-.weather-tag-cyan {
-  border-color: var(--accent-border-soft);
-  background: color-mix(in srgb, var(--accent-action) 6%, transparent);
-  color: var(--accent-action);
-}
+/* The tones are roles, as the hue ramps are (tokens.css): amber and rose the
+   crossed red, emerald the clear ink. Each reads its role token, which carries
+   its own light value, so the published brief's stamps clear AA on both
+   grounds without a per-theme rule. There is no action-colour tone: a tag is a
+   display (ui-ux-standards §XXVII). */
 
 .weather-tag-amber,
 .weather-tag-rose {
@@ -432,6 +440,18 @@ a.weather-hub-link-card:hover {
   background: color-mix(in srgb, var(--regime-accent) 14%, transparent);
   color: var(--regime-ink);
   font-size: var(--text-fluid-nano);
+}
+
+/* The week's word as a placard (2026-10-21): the condition's solid fill with
+   its on-accent ink, as a weather service prints a warning level. Only the
+   two places that state this week's condition wear it, the call card's stamp
+   and the report intro's status word (§XXV keeps condition colour to where a
+   condition is named). Lists of past weeks keep the tinted .weather-tag-regime,
+   so the placard stays the one solid block of colour on a page. */
+.weather-tag-placard {
+  border-color: var(--regime-accent);
+  background: var(--regime-accent);
+  color: var(--regime-on-accent);
 }
 
 .weather-panel,

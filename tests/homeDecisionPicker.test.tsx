@@ -53,7 +53,7 @@ describe("decision picker", () => {
 
   it("is the areas section, with the old anchor and an h2", () => {
     assert.match(html, /^<section id="what-it-changes"/);
-    assert.match(html, /<h2[^>]*>What are you deciding\?<\/h2>/);
+    assert.match(html, /<h2[^>]*>Your decisions this week<\/h2>/);
     assert.doesNotMatch(html, /data-first-visit/, "nothing in it is first-visit only");
     assert.doesNotMatch(html, /Show the full brief/);
   });
@@ -102,7 +102,7 @@ describe("decision picker", () => {
 
   it("counts the crossed pause lines once, over the choices", () => {
     const count = html.indexOf("4 of 5 areas are past their pause line.");
-    assert.ok(count > html.indexOf("What are you deciding?"), "the count sits under the question");
+    assert.ok(count > html.indexOf("Your decisions this week"), "the count sits under the heading");
     assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");
   });
 
@@ -162,6 +162,10 @@ describe("a link can carry the decision (`/?decision=`)", () => {
   it("opens on the decision the URL names, in the first paint", () => {
     const html = render("product-tempo");
     assert.match(html, /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "the named area's answer is server-rendered open");
+    assert.match(html, /Why this line governs roadmap:/i, "renders zero-input corporate transmission intuition");
+    assert.match(html, /Shared rule of thumb:/i, "renders team ritual rule of thumb");
+    assert.match(html, /Startup math:/i, "renders concrete unit economics math");
+    assert.match(html, /Copy takeaway for Slack/i, "renders 1-click Slack takeaway action");
     assert.match(html, /checked=""[^>]*value="product-tempo"|value="product-tempo"[^>]*checked=""/);
     assert.doesNotMatch(render(), /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "no answer open without one");
   });

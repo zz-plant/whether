@@ -12,9 +12,25 @@ import { buildUseConstraint } from "../report/useConstraint";
 import { fetchSaaSValuations, SAAS_BASKET } from "../saasMultiples";
 import { getTimeMachineMonthsByYear } from "../timeMachine/timeMachineCache";
 import { buildStandupLine } from "../report/decisionMovement";
+import { auditSprintDecisions, type SprintDecisionCandidate } from "../report/sprintRetro";
 import { loadWeeklyBriefSnapshot } from "../report/weeklyBriefSnapshot";
+import {
+  findPublishedBrief,
+  getPublishedBriefs,
+  publishedBriefDisplay,
+  publishedBriefHeadline,
+  buildPublishedBriefPath,
+} from "../report/publishedBriefs";
+import {
+  findPostureArchivePeriod,
+  getPostureArchivePeriods,
+  buildPostureArchivePath,
+} from "../summary/postureArchive";
+import { answerPages, matchDecisionPage } from "../../app/answers/decisionPages";
+import { getRegimePublicLabel } from "../regimePresentation";
+import { buildCanonicalUrl } from "../seo";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
-import { createAgentToolRegistry, defineTool } from "./registry";
+import { AgentInputError, createAgentToolRegistry, defineTool } from "./registry";
 
 /**
  * Every tool an agent can call, defined once.
@@ -35,6 +51,36 @@ const REGIME_ARGUMENT =
   "A regime by key (SCARCITY, DEFENSIVE, VOLATILE, EXPANSION) or by the word the site prints (Freezing, Cloudy, Stormy, Sunny), in any case.";
 
 const cadenceInput = z.preprocess(lowerCasedInput, z.enum(supportedAgentCadences));
+
+/** What `get_answer` returns: one answer page's guidance with this week's standing and rules. */
+export const decisionAnswerOutputSchema = z.looseObject({
+  type: z.literal("decision_answer"),
+  slug: z.string(),
+  title: z.string(),
+  permalink: z.string(),
+  category: z.enum(["climate", "decision", "explanation"]),
+  shortAnswer: z.string(),
+  directAnswer: z.string(),
+  audience: z.string(),
+  currentStanding: z.object({
+    recordDate: z.string(),
+    conditions: z.string(),
+    scores: z.looseObject({ tightness: z.number(), riskAppetite: z.number() }),
+  }),
+  rulesInForce: z.array(
+    z.object({
+      area: z.string(),
+      actionNow: z.string(),
+      pauseIf: z.string(),
+      resumeWhen: z.string(),
+    }),
+  ),
+  companyInputs: z.array(z.string()),
+  decisionNoteTemplate: z.string(),
+  citation: z.string(),
+  attributionSnippet: z.string(),
+  use: z.object({ summary: z.string(), humanReview: z.string(), policy: z.string() }),
+});
 
 /** Where an input came from, so an answer computed from today's reading says so instead of passing as the caller's own. */
 const used = <Value extends string | number>(value: Value, from: "given" | "today" | "assumed") => ({ value, from });
@@ -72,12 +118,115 @@ const AGENT_TOOLS = [
     name: "get_brief",
     title: "Get the full weekly brief",
     description:
-      "The full brief (about 22KB): summary prose, decision delta, flip watch, provenance and the agent handoff, for a cadence. Use get_state when you only need to decide; use this for the wording, the record, or a cadence other than weekly.",
+      "The full brief (about 22KB): summary prose, decision delta, flip watch, provenance and the agent handoff, for a cadence. Use get_state when you only need to decide; use week (e.g. '2026-w41') or period (e.g. '2024-q1') to retrieve frozen historical records.",
     aliases: ["get_agent_brief"],
-    input: { cadence: cadenceInput.optional().describe("weekly (default), monthly, quarterly or yearly.") },
+    input: {
+      cadence: cadenceInput.optional().describe("weekly (default), monthly, quarterly or yearly."),
+      week: textInput.optional().describe("A specific published week slug (e.g. '2026-w41') to fetch that frozen record."),
+      period: textInput.optional().describe("A specific archive period slug (e.g. '2024-q1' or '2023') to fetch that frozen posture record."),
+    },
     example: { cadence: "weekly" },
     plainGetNote: "Over plain GET it answers a summary instead (regime, action, margin, record date); get_state is the answer to decide from.",
-    run: async ({ cadence }) => ({ ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() }),
+    run: async ({ cadence, week, period }) => {
+      if (week) {
+        const brief = findPublishedBrief(week.toLowerCase());
+        if (!brief) {
+          throw new Error(`Published brief '${week}' not found. Available weeks: ${getPublishedBriefs().map((b) => b.slug).join(", ")}`);
+        }
+        const display = publishedBriefDisplay(brief);
+        return {
+          type: "published_brief",
+          slug: brief.slug,
+          year: brief.year,
+          week: brief.week,
+          publishedAt: brief.publishedAt,
+          recordDate: brief.recordDate,
+          recordDateLabel: brief.recordDateLabel,
+          headline: publishedBriefHeadline(brief).composed,
+          actionNow: brief.actionNow,
+          regime: brief.regime,
+          conditions: display.conditions,
+          confidence: { label: brief.confidenceLabel },
+          scores: brief.scores ?? null,
+          whatChanged: display.whatChanged,
+          pauseIf: display.pauseIf,
+          conditionsChangeIf: display.conditionsChangeIf,
+          decisions: brief.decisions,
+          evidence: brief.evidence,
+          sourceLabel: brief.sourceLabel,
+          permalink: buildCanonicalUrl(buildPublishedBriefPath(brief.slug)),
+          use: buildUseConstraint(),
+        };
+      }
+      if (period) {
+        const archivePeriod = findPostureArchivePeriod(period.toLowerCase());
+        if (!archivePeriod) {
+          throw new Error(`Archive period '${period}' not found. Available periods: ${getPostureArchivePeriods().map((p) => p.slug).join(", ")}`);
+        }
+        return {
+          type: "posture_archive_period",
+          ...archivePeriod,
+          permalink: buildCanonicalUrl(buildPostureArchivePath(archivePeriod.slug)),
+          use: buildUseConstraint(),
+        };
+      }
+      return { ...(await buildAgentInterfaceResponse(cadence ?? "weekly", { route: "/api/mcp" })), use: buildUseConstraint() };
+    },
+  }),
+  defineTool({
+    name: "get_answer",
+    title: "Get decision answer",
+    description:
+      "Get Whether's curated operating guidance, current standing, and bounded rules for one of its decision answers — hiring, roadmap expansion, raising capital, burn, sales headcount, product lines, go-to-market, briefing executives, or this week's funding climate and risk-on/risk-off posture.",
+    input: {
+      question: textInput.describe("A question, topic, or answer slug (e.g. 'should-we-freeze-or-selectively-hire', 'should we freeze hiring', 'cut burn')."),
+    },
+    example: { question: "should-we-freeze-or-selectively-hire" },
+    output: decisionAnswerOutputSchema,
+    run: async ({ question }) => {
+      const page = matchDecisionPage(question);
+      if (!page) {
+        const availableTopics = answerPages.map((candidate) => candidate.slug);
+        const message = `No answer found matching ${JSON.stringify(question)}. Available decision topics: ${availableTopics.join(", ")}.`;
+        throw new AgentInputError(message, "invalid_arguments", [
+          { argument: "question", message: `Unknown decision topic ${JSON.stringify(question)}.`, allowed: availableTopics },
+        ]);
+      }
+      const { reportData, snapshot } = await loadWeeklyBriefSnapshot();
+      const mappedRules = snapshot.homeBriefModel.decisionRules.filter((rule) =>
+        page.mappedDecisionAreas.includes(rule.area),
+      );
+      const permalink = buildCanonicalUrl(`/answers/${page.slug}`);
+      const recordDate = reportData.recordDateLabel;
+      const conditions = getRegimePublicLabel(reportData.assessment.regime);
+
+      return {
+        type: "decision_answer",
+        slug: page.slug,
+        title: page.title,
+        permalink,
+        category: page.category,
+        shortAnswer: page.shortAnswer,
+        directAnswer: page.directAnswer,
+        audience: page.audience,
+        currentStanding: {
+          recordDate,
+          conditions,
+          scores: reportData.assessment.scores,
+        },
+        rulesInForce: mappedRules.map((rule) => ({
+          area: rule.area,
+          actionNow: rule.doNow[0] ?? rule.recommendation,
+          pauseIf: rule.pauseTrigger,
+          resumeWhen: rule.resumeTrigger,
+        })),
+        companyInputs: page.companyInputs,
+        decisionNoteTemplate: page.decisionNote,
+        citation: `Whether Weekly Brief (Week of ${recordDate}): "${page.title}" — ${permalink}`,
+        attributionSnippet: `According to Whether's weekly guidance for startup leaders (Week of ${recordDate}, ${permalink}): "${page.shortAnswer}"`,
+        use: buildUseConstraint(),
+      };
+    },
   }),
   defineTool({
     name: "get_standup_line",
@@ -122,8 +271,17 @@ const AGENT_TOOLS = [
       const resolved = regime ?? (await todayState()).conditions.key;
       const context = getRegimeContext(resolved);
       const { latestSnapshot } = context;
+      const recentTransitions = getPostureArchivePeriods().find((p) => p.transitions.length > 0)?.transitions.slice(0, 5) ?? [];
+      const recentBriefs = getPublishedBriefs().slice(0, 5).map((b) => ({
+        week: b.slug,
+        publishedAt: b.publishedAt,
+        regime: b.regime,
+        action: b.actionNow,
+      }));
       return {
         ...context,
+        recentTransitions,
+        recentBriefs,
         /* Zero months is a fact about the record, and it reads like a finding: today's conditions
            can be newer than the last month-end, which is exactly when an agent asks. */
         ...(context.monthsActive === 0 && latestSnapshot
@@ -268,6 +426,55 @@ const AGENT_TOOLS = [
         reversalTrigger: plan.reversalTrigger,
         fragileAssumptions: plan.fragileAssumptions,
         sizingNote: plan.sizingNote,
+      };
+    },
+  }),
+  defineTool({
+    name: "audit_sprint_retro",
+    title: "Audit sprint decisions for regime pause violations",
+    description:
+      "Audits a sprint's recorded commitments against today's bounded pause triggers to surface retro violations (e.g. net-new hiring or platform rewrites committed while pause lines are active).",
+    input: {
+      planText: textInput.optional().describe("A planned decision or commitment to evaluate against pause lines."),
+      lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),
+    },
+    example: { planText: "Hired 2 senior engineers during defensive regime" },
+    run: async ({ planText, lifecycle }) => {
+      const assessment = await todayAssessment();
+      if (!planText) {
+        const report = auditSprintDecisions({
+          decisions: [],
+          regime: assessment.regime,
+          scores: assessment.scores,
+          thresholds: assessment.thresholds,
+        });
+        return {
+          headline: report.headline,
+          regime: report.regime,
+          activePauseTriggers: report.activePauseTriggers,
+          markdown: report.markdown,
+        };
+      }
+      const plan = stressTestDecisionPlan(assessment, { planText, lifecycle: lifecycle ?? "GROWTH" });
+      const candidate: SprintDecisionCandidate = {
+        title: planText,
+        category: plan.detectedCategory,
+        action: plan.detectedAction,
+        verdict: plan.verdict,
+      };
+      const report = auditSprintDecisions({
+        decisions: [candidate],
+        regime: assessment.regime,
+        scores: assessment.scores,
+        thresholds: assessment.thresholds,
+      });
+      return {
+        headline: report.headline,
+        regime: report.regime,
+        violationCount: report.violationCount,
+        violations: report.violations,
+        activePauseTriggers: report.activePauseTriggers,
+        markdown: report.markdown,
       };
     },
   }),

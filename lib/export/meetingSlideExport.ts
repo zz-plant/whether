@@ -51,8 +51,15 @@ export interface MeetingSlidePayload {
   callChangesIf: string;
   /** A stage's discipline for lifting its hold. Present only when a stage is chosen. */
   resumeWhen?: string;
-  tightness: number;
-  riskAppetite: number;
+  /**
+   * The two composite readings. Optional because a frozen brief may have none:
+   * records archived before scores were stored carry no scores, and inventing
+   * 50/50 for them printed fabricated readings as historical fact in a
+   * date-pinned deck. The reading section then says no scores were published
+   * (`slideReadingLines`), and nothing renders a number the record never had.
+   */
+  tightness?: number;
+  riskAppetite?: number;
   /**
    * The lines the two scores are judged against — where the call itself
    * changes (`assessment.thresholds`). Absent from an artifact-derived slide,
@@ -87,14 +94,21 @@ export interface MeetingSlidePayload {
  * The two scores against the call-change lines, as the slide, the deck files
  * and the pasted block all print them. A snapshot has no previous week, so
  * none is printed.
+ *
+ * A payload with no scores — a frozen brief archived before scores were stored
+ * — prints one honest line instead of readings for numbers it never had.
  */
-export const slideReadingLines = (payload: MeetingSlidePayload): string[] =>
-  buildScoreReferenceLines({
+export const slideReadingLines = (payload: MeetingSlidePayload): string[] => {
+  if (typeof payload.tightness !== "number" || typeof payload.riskAppetite !== "number") {
+    return ["No scores were published with this brief."];
+  }
+  return buildScoreReferenceLines({
     scores: { tightness: payload.tightness, riskAppetite: payload.riskAppetite },
     thresholds: payload.lines
       ? { tightnessRegime: payload.lines.tightness, riskAppetiteRegime: payload.lines.riskAppetite }
       : DEFAULT_THRESHOLDS,
   });
+};
 
 /** The stage's resume line as every slide format prints it, or null without a stage. */
 export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>

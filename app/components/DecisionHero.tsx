@@ -129,14 +129,7 @@ export function DecisionHero({
             ran four facts together ("hard to raise · Tightening this week ·
             Was Cloudy on Sep 30") ahead of the call they lead into. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
-          <span
-            className="type-stamp inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs"
-            style={{
-              color: "var(--regime-ink)",
-              borderColor: "color-mix(in srgb, var(--regime-accent) 45%, transparent)",
-              backgroundColor: "color-mix(in srgb, var(--regime-accent) 15%, transparent)",
-            }}
-          >
+          <span className="type-stamp weather-tag-placard inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-semibold">
             {/* The weather the word names, beside it. An unknown regime prints
                 its word alone: the sun it used to fall back to claimed a
                 condition nobody had read. */}
@@ -172,7 +165,7 @@ export function DecisionHero({
             >
               {question}
             </TitleTag>
-            <p className="max-w-2xl text-pretty text-display font-bold leading-[1.05] tracking-[-0.015em] text-white">
+            <p className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50">
               {call}
             </p>
           </>
@@ -180,7 +173,7 @@ export function DecisionHero({
           <TitleTag
             id="weekly-call-title"
             style={{ viewTransitionName: "page-title" }}
-            className="max-w-2xl text-pretty text-display font-bold leading-[1.05] tracking-[-0.015em] text-white"
+            className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50"
           >
             {call}
           </TitleTag>
@@ -224,7 +217,7 @@ export function DecisionHero({
         ) : null}
 
         {detail ? (
-          <div className="max-w-xl border-l-2 border-slate-700/80 pl-3 py-0.5">
+          <div className="max-w-xl border-l-2 border-[color:var(--border-strong)] pl-3 py-0.5">
             <p className="text-sm leading-relaxed text-slate-300">{detail}</p>
           </div>
         ) : null}

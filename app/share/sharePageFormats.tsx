@@ -10,6 +10,7 @@ import { BriefPreview } from "../components/briefFormatPicker";
 import { ChatPreview } from "./chatPreview";
 import { locationHashSource, useBrowserSource, useHydrated } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
+import { ActionLink } from "../components/ui/actionLink";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
 import { useOperatorRunway } from "../components/useOperatorRunway";
 
@@ -286,14 +287,9 @@ export function SharePageFormats({
                   buttonLabels={{ error: "Copy failed" }}
                 />
                 {selected.kind === "text" && selected.compose ? (
-                  <a
-                    href={selected.compose.href}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="weather-hit inline-flex min-h-[44px] items-center text-fluid-xs font-semibold text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200"
-                  >
+                  <ActionLink href={selected.compose.href} variant="inline" target="_blank" rel="noreferrer">
                     {selected.compose.label}
-                  </a>
+                  </ActionLink>
                 ) : null}
                 {selected.kind === "text" && selected.offersCalendar ? (
                   <>

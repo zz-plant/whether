@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" role="img" aria-labelledby="light-condition-expansion-tile-title light-condition-expansion-tile-desc">
+<title id="light-condition-expansion-tile-title">Sunny condition tile</title>
+<desc id="light-condition-expansion-tile-desc">Sunny condition reference tile. Money is cheap and available. This is a definition, not a current reading.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+<rect width="100%" height="100%" fill="#f1f4f3"/>
+<rect x="1" y="1" width="558" height="318" rx="10" fill="#ffffff" stroke="rgba(18, 23, 25, 0.10)" stroke-width="2"/><text x="32" y="44" font-size="18" font-weight="400" fill="#525c60" text-anchor="start">Condition reference</text><svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#7a5800" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun shrink-0 text-[color:var(--regime-ink)]" data-regime="EXPANSION" data-concept-icon="condition" aria-hidden="true" focusable="false" x="32" y="78"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg><text x="108" y="123" font-size="48" font-weight="700" fill="#7a5800" text-anchor="start">Sunny</text><text x="32" y="191" font-size="27" font-weight="400" fill="#384145" text-anchor="start">Money is cheap and available.</text><line x1="32" y1="282" x2="528" y2="282" stroke="#d9a82c" stroke-width="4"/>
+</g>
+</svg>

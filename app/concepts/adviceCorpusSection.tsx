@@ -236,7 +236,7 @@ export function AdviceCorpusSection() {
           </li>
         </ul>
         <figcaption className="max-w-prose text-fluid-nano text-slate-400">
-          {`Quarters with fewer than ${MIN_POSTS} posts draw no point. Changes in conditions: ${changes.map((change) => `${formatMonth(change.month)}, ${change.from} to ${change.to}`).join("; ")}.`}
+          {`Quarters with fewer than ${MIN_POSTS} posts aren't plotted. Changes in conditions: ${changes.map((change) => `${formatMonth(change.month)}, ${change.from} to ${change.to}`).join("; ")}.`}
         </figcaption>
         <table className="sr-only">
           <caption>Share of posts prescribing expansion and conservation each quarter, with funding pressure</caption>

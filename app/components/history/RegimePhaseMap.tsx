@@ -1,3 +1,4 @@
+import { scaleLinear } from "d3-scale";
 import { ActionLink } from "../ui/actionLink";
 import { UrlDetails } from "../ui/urlDetails";
 import { Fact, FactList } from "../ui/factList";
@@ -50,8 +51,11 @@ const PLOT_BOTTOM = PLOT_Y + PLOT_SIZE;
 
 const TICKS = [0, 25, 50, 75, 100] as const;
 
-const xFor = (riskAppetite: number) => PLOT_X + (riskAppetite / 100) * PLOT_SIZE;
-const yFor = (tightness: number) => PLOT_Y + (1 - tightness / 100) * PLOT_SIZE;
+const xScale = scaleLinear().domain([0, 100]).range([PLOT_X, PLOT_RIGHT]).clamp(true);
+const yScale = scaleLinear().domain([0, 100]).range([PLOT_BOTTOM, PLOT_Y]).clamp(true);
+
+const xFor = (riskAppetite: number) => xScale(riskAppetite);
+const yFor = (tightness: number) => yScale(tightness);
 
 const toPath = (points: PhasePoint[]) =>
   points
@@ -521,8 +525,8 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               </ul>
               <p className="mt-2 text-fluid-nano text-slate-500">
                 {model.offQuadrantMonths === 0
-                  ? "The conditions each month published. Here they also match the quadrant every dot sits in."
-                  : `The conditions each month published, not the quadrant its dot sits in: the two differ in ${model.offQuadrantMonths.toLocaleString("en-US")} of these ${model.points.length.toLocaleString("en-US")} months.`}
+                  ? "These are the conditions we published each month. Here they also match the quadrant every dot sits in."
+                  : `These are the conditions we published each month, not the quadrant each dot sits in: the two differ in ${model.offQuadrantMonths.toLocaleString("en-US")} of these ${model.points.length.toLocaleString("en-US")} months.`}
               </p>
             </div>
           </div>
@@ -535,7 +539,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
           <summary className="text-fluid-nano text-slate-400">
             Plotted months, as a table
           </summary>
-          <div className="mt-2 max-h-64 overflow-auto overscroll-contain rounded-md border border-white/[0.06]">
+          <div className="mt-2 max-h-64 overflow-auto overscroll-contain rounded-md border border-[color:var(--border-faint)]">
             <table className="w-full text-left text-fluid-nano tabular-nums">
               <caption className="sr-only">
                 Every month drawn on the phase map, newest first, with its coordinates and the conditions it
@@ -551,11 +555,11 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               </thead>
               <tbody className="text-slate-300">
                 {[...model.points].reverse().map((point) => (
-                  <tr key={point.recordDate} className="border-t border-white/[0.04]">
+                  <tr key={point.recordDate} className="border-t border-[color:var(--border-faint)]">
                     <th scope="row" className="px-2.5 py-1 font-normal text-slate-400">{point.monthLabel}</th>
                     <td className="px-2.5 py-1">
                       {point.regimeLabel}
-                      {point.changed ? <span className="ml-1.5 text-sky-300">changed</span> : null}
+                      {point.changed ? <span className="ml-1.5 text-slate-100">changed</span> : null}
                     </td>
                     <td className="px-2.5 py-1 text-right">
                       {point.tightness}

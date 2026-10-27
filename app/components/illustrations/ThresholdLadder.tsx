@@ -1,3 +1,4 @@
+import { scaleLinear } from "d3-scale";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 type ThresholdLadderProps = {
   idPrefix: string;
@@ -87,10 +88,13 @@ export function ThresholdLadder({
   const RAIL_START = RAIL_INSET;
   const RAIL_END = viewBoxWidth - RAIL_INSET;
 
+  const scale = scaleLinear()
+    .domain(invert ? [max, min] : [min, max])
+    .range([RAIL_START, RAIL_END])
+    .clamp(true);
+
   const clamp = (v: number) => (Number.isFinite(v) ? Math.min(Math.max(v, min), max) : min);
-  const fraction = (v: number) => (clamp(v) - min) / (max - min);
-  const xFor = (v: number) =>
-    RAIL_START + (invert ? 1 - fraction(v) : fraction(v)) * (RAIL_END - RAIL_START);
+  const xFor = (v: number) => scale(Number.isFinite(v) ? v : min);
 
   const currentValue = clamp(current);
   const triggerValue = clamp(trigger);

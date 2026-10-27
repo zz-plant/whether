@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import {
+  buildPublishedBriefBoardUpdate,
   buildPublishedBriefEmailUpdate,
   buildPublishedBriefSlackUpdate,
   findPublishedBrief,
@@ -69,8 +70,9 @@ describe("published brief comparisons", () => {
     assert.ok(w40?.scores);
     assert.equal(w40.scores.comparedWith, undefined, "the fixture is a record frozen before the date was stored");
     const display = publishedBriefDisplay(w40);
-    assert.equal(display.scoreChange("tightness"), "+5 vs Sep 22");
-    assert.equal(display.scoreChange("riskAppetite"), "+5 vs Sep 22");
+    assert.equal(display.scoreChange("tightness")?.label, "+5 vs Sep 22");
+    assert.equal(display.scoreChange("tightness")?.delta, 5, "the move as a number, so a renderer never parses the sign out of the string");
+    assert.equal(display.scoreChange("riskAppetite")?.label, "+5 vs Sep 22");
     const slack = buildPublishedBriefSlackUpdate(w40);
     assert.match(slack, /Funding pressure 90 of 100 .* · was 85 on Sep 22 ·/);
     assert.doesNotMatch(slack, /last week 63|vs prior week/);
@@ -92,7 +94,7 @@ describe("published brief comparisons", () => {
       ...w40,
       scores: { ...w40.scores, comparedWith: { recordDate: "2026-08-31", label: "Aug 31" } },
     };
-    assert.equal(publishedBriefDisplay(dated).scoreChange("tightness"), "+27 vs Aug 31", "whole points, named by the reading");
+    assert.equal(publishedBriefDisplay(dated).scoreChange("tightness")?.label, "+27 vs Aug 31", "whole points, named by the reading");
   });
 
   it("replaces the retired movement sentence with the move the record can name", () => {
@@ -194,8 +196,9 @@ describe("published brief date-pinned exports", () => {
     // Area-level bounded decisions
     assert.match(slack, /• Hiring: Selective hiring for revenue-linked and reliability roles\./);
     assert.match(slack, /Do now: Prioritize revenue-linked and reliability roles/);
-    assert.match(slack, /Pause if: Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44\./);
-    // The rule's own verb is dropped, so the label is not said twice.
+    // The rule's own verb is dropped on both lines, so neither label is said twice.
+    assert.match(slack, /Pause if: Funding pressure rises above 76 or risk appetite falls below 44/);
+    assert.doesNotMatch(slack, /Pause if: Pause/);
     assert.match(slack, /Resume when: Funding pressure falls below 66 and risk appetite is above 54/);
     assert.doesNotMatch(slack, /Resume when: Resume/);
 
@@ -228,7 +231,8 @@ describe("published brief date-pinned exports", () => {
     // Area decisions
     assert.match(email, /• Roadmap: Speed up product work tied to activation and retention goals\./);
     assert.match(email, /- Action: Speed up on product bets/);
-    assert.match(email, /- Pause if: Pause long-payback bets if risk appetite falls below 44/);
+    assert.match(email, /- Pause if: Risk appetite falls below 44/);
+    assert.doesNotMatch(email, /Pause if: Pause/);
     assert.match(email, /- Resume when: Risk appetite is above 54/);
     assert.doesNotMatch(email, /Resume when: Resume/);
 
@@ -242,12 +246,26 @@ describe("published brief date-pinned exports", () => {
     assert.match(email, new RegExp(`Permanent URL: ${expectedUrl}`));
   });
 
+  it("builds Board memo strictly from PublishedBrief with permanent URL and operating limits", () => {
+    assert.ok(july30Brief);
+    const board = buildPublishedBriefBoardUpdate(july30Brief);
+
+    assert.match(board, /^Whether Board Memo — Week of/m);
+    assert.match(board, /^Macro Posture: (Sunny|Cloudy|Stormy|Freezing) \(Margin: .+\)$/m);
+    assert.match(board, /^Executive Guidance: .+/m);
+    assert.match(board, /^Posture Flips If: .+/m);
+    assert.match(board, /Operating Limits by Area:/);
+    assert.match(board, /• Hiring: .+ \(Action: .+\)/);
+    assert.match(board, new RegExp(`Permanent Record: ${buildCanonicalUrl("/brief/2026-w31")}`));
+  });
+
   it("proves July 30 brief exports never read or change with live report data", async () => {
     assert.ok(july30Brief);
 
     // Capture baseline exports from PublishedBrief
     const baselineSlack = buildPublishedBriefSlackUpdate(july30Brief);
     const baselineEmail = buildPublishedBriefEmailUpdate(july30Brief);
+    const baselineBoard = buildPublishedBriefBoardUpdate(july30Brief);
 
     // Even if we import live report modules and inspect reportData, PublishedBrief remains pure
     const { loadReportData } = await import("../lib/report/reportData");
@@ -259,9 +277,11 @@ describe("published brief date-pinned exports", () => {
     // Re-evaluate exports for July 30 brief
     const afterSlack = buildPublishedBriefSlackUpdate(july30Brief);
     const afterEmail = buildPublishedBriefEmailUpdate(july30Brief);
+    const afterBoard = buildPublishedBriefBoardUpdate(july30Brief);
 
     assert.equal(baselineSlack, afterSlack, "Slack brief changed after live data module load!");
     assert.equal(baselineEmail, afterEmail, "Email brief changed after live data module load!");
+    assert.equal(baselineBoard, afterBoard, "Board memo changed after live data module load!");
     assert.ok(!baselineSlack.includes(liveReport.treasury.record_date), "Live record date leaked into frozen Slack brief");
   });
 

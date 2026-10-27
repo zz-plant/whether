@@ -94,7 +94,7 @@ describe("the basis on every surface", () => {
     assert.match(html, /id="record-basis"/);
     assert.match(html, /Count only what the record can test\./);
     assert.match(html, /Interest rates, the yield curve, the pace of rate rises, stock-market volatility \(the VIX\) and the Chicago Fed financial conditions index move the scores\./);
-    assert.match(html, /The high-yield credit spread has public history only from October 2023; the venture funding pace and the tech-layoff trend are curated snapshots with no history to test\. Each is scored and shown, and moves nothing\./);
+    assert.match(html, /The high-yield credit spread has public history only from October 2023; the venture funding pace and the tech-layoff trend are curated snapshots with no history to test\. We score and show each of them, but none of them moves the scores\./);
     assert.match(html, /This week they would put risk appetite at 41, where the published score is 52\./);
   });
 
@@ -111,7 +111,7 @@ describe("the basis on every surface", () => {
 
     const slack = buildSlackBrief(document);
     assert.match(slack, /Margin: [^\n]* · Scored on the record's inputs$/m, "the Monday post's stamp");
-    assert.match(slack, new RegExp(`^• ${WARNING.replace(/[.()]/g, "\\$&")} They are left out because past months can't be checked with them\\.$`, "m"), "and why it could be wrong");
+    assert.match(slack, new RegExp(`^• ${WARNING.replace(/[.()]/g, "\\$&")} They are left out because they can't be scored against past month-ends\\.$`, "m"), "and why it could be wrong");
     assert.match(slack, /^Not counted: risk appetite -11 from startup-market inputs\.$/m, "under what moved the scores");
 
     assert.match(buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(document)), /^Scored on the record's inputs\.$/m, "the operator brief");

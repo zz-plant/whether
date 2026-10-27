@@ -60,7 +60,7 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
       {/* Every route has the header, so the runway band's one re-render
           listener lives here rather than beside any one control. */}
       <RunwayServerSync />
-      <div className="rounded-b-md border-b border-white/[0.10] bg-[var(--bg-body)]">
+      <div className="rounded-b-md border-b border-[color:var(--border-subtle)] bg-[var(--bg-body)]">
         <div className="flex items-center justify-between gap-2 px-3 py-2 max-[360px]:flex-wrap sm:gap-3">
           <Link href="/" className="flex min-w-0 shrink-0 items-center gap-2.5 no-underline">
             <svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="text-sky-400 shrink-0">

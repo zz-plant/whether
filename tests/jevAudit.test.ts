@@ -58,6 +58,19 @@ describe("advisory audit requests", () => {
     assert.deepEqual(selectEvidence(input, { ok: false, reason: "offline" }, 0.8).ranked, []);
   });
 
+  it("excludes an explicitly unrelated candidate even when confident and supported", () => {
+    const input = { canonical, candidates };
+    const result: JevResult = { ok: true, model: "fixture", answers: {
+      relevance_0: { type: "score", score: 0, confidence: 1, probabilities: { 0: 1, 1: 0, 2: 0 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } },
+      supported_0: { type: "noul", noul: 0.99 },
+      relevance_1: { type: "score", score: 2, confidence: 1, probabilities: { 0: 0, 1: 0, 2: 1 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } },
+      supported_1: { type: "noul", noul: 0.9 },
+    } };
+    const selection = selectEvidence(input, result, 0.8);
+    assert.deepEqual(selection.ranked.map((item) => item.id), ["unrelated"], "score 0 means unrelated, so it is not ranked despite support");
+    assert.deepEqual(selection.review, ["rates"], "the unrelated-but-supported candidate is the one a person should see");
+  });
+
   it("counts failures and ambiguity explicitly rather than calling them clean negatives", () => {
     const samples = [
       { expected: true, key: "bad", result: { ok: true as const, model: "fixture", answers: { bad: { type: "noul" as const, noul: 0.9 } } } },

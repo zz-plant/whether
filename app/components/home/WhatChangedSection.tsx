@@ -2,8 +2,7 @@ import Link from "next/link";
 import { HomeSection } from "./HomeSection";
 import { ScoreLadder } from "../ui/scoreLadder";
 import { GovernedAreas } from "../ui/governedAreas";
-import { PlainEnglishScoreNote, SignalScaleNote } from "../ui/plainLanguage";
-import { compositeSignalScales } from "../../../lib/report/signalTranslations";
+import { SignalContextDetails } from "../ui/plainLanguage";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
@@ -57,14 +56,12 @@ const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasi
   );
 };
 
-const isCompositeSignalKey = (key: SignalChangeRow["key"]): key is keyof typeof compositeSignalScales =>
-  Object.prototype.hasOwnProperty.call(compositeSignalScales, key);
-
 export function WhatChangedSection({
   rows,
   lead,
   comparisonUnavailable,
   basis = comparisonBasis(),
+  heading = HOME_SECTIONS.changed.heading,
 }: {
   rows: readonly SignalChangeRow[];
   /** Said over the table only when there is no earlier reading to compare with. */
@@ -72,11 +69,13 @@ export function WhatChangedSection({
   comparisonUnavailable: boolean;
   /** The earlier reading the rows are compared with; "last week" when the week does not date it. */
   basis?: ComparisonBasis;
+  /** "What changed since Aug 31": the heading names the reading the move is measured from. */
+  heading?: string;
 }) {
   return (
     <HomeSection
       id={HOME_SECTIONS.changed.id}
-      heading={HOME_SECTIONS.changed.heading}
+      heading={heading}
       lead={lead}
       /* In the reader's order: first what moved (the evidence), then what
          that changes (the consequences by area). Keeps DOM and visual order aligned. */
@@ -101,7 +100,7 @@ export function WhatChangedSection({
             {`Each signal this week against ${basis.reference} and against its lines`}
           </caption>
           <thead className="max-md:hidden">
-            <tr className="border-b border-slate-800/80 text-xs text-slate-400">
+            <tr className="border-b border-[color:var(--border-subtle)] text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
               <th scope="col" className="py-2 pr-3 font-medium">{`${basis.label} → this week`}</th>
               <th scope="col" className="py-2 font-medium">Against its lines</th>
@@ -120,14 +119,14 @@ export function WhatChangedSection({
                         ? "signal-base-rate"
                         : "signal-curve-slope"
                 }
-                className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
+                className="border-b border-[color:var(--border-faint)] align-top last:border-b-0 max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
                 data-signal={row.key}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-md:p-0">
                   <div className="space-y-1">
                     <Link
                       href={`/signals#${row.key}`}
-                      className="weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 underline-offset-2 transition-colors"
+                      className="weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-600 hover:decoration-sky-400 underline-offset-2 transition-colors"
                       title={`View ${row.label} evidence and historical charts`}
                     >
                       {row.label}
@@ -155,36 +154,20 @@ export function WhatChangedSection({
                         {row.movement}
                       </p>
                     ) : null}
-                    {/* The scale and what the score means at its level, one click
-                        away. They were four more stacked lines in every row, at
-                        the same small size as the name and the move, so a row
-                        had six layers and no first thing to read. */}
-                    {row.scaleLabel || isCompositeSignalKey(row.key) ? (
-                      <details className="weather-auto-chevron text-fluid-nano font-normal text-slate-400">
-                        <summary className="cursor-pointer select-none">What the score means</summary>
-                        <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-x-1.5">
-                            {row.scaleLabel ? <span className="capitalize">{row.scaleLabel}</span> : null}
-                            {row.scaleLabel && isCompositeSignalKey(row.key) ? (
-                              <span aria-hidden="true" className="text-slate-600">·</span>
-                            ) : null}
-                            {isCompositeSignalKey(row.key) ? (
-                              <SignalScaleNote signalKey={row.key} as="span" className="inline font-normal text-slate-400" />
-                            ) : null}
-                          </div>
-                          {isCompositeSignalKey(row.key) && typeof row.value === "number" ? (
-                            <PlainEnglishScoreNote
-                              signalKey={row.key}
-                              score={row.value}
-                              className="whitespace-normal font-normal text-slate-300/80"
-                            />
-                          ) : null}
-                        </div>
-                      </details>
-                    ) : null}
+                    {/* Plain-English meaning, scale anchors, historical startup era
+                        context, and team reflection prompt. Folded in a 1-click disclosure
+                        to maintain clean table scanning. */}
+                    <SignalContextDetails
+                      signalKey={row.key}
+                      score={typeof row.value === "number" ? row.value : undefined}
+                      scaleLabel={row.scaleLabel}
+                    />
                   </div>
                 </th>
-                <td className="whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0">
+                {/* With nothing to compare, the lead over the table already says so; on a
+                    phone the column has no header, so its dash printed as a lone "—"
+                    line in every row. */}
+                <td className={`whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0 ${comparisonUnavailable ? "max-md:hidden" : ""}`}>
                   {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
                 </td>
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">
@@ -213,8 +196,8 @@ export function WhatChangedSection({
                        which funding pressure judges against a line. */
                     <span className="text-xs text-slate-500">
                       {row.key === "baseRate"
-                        ? "Judged through funding pressure's lines."
-                        : "Judged through the lines of both scores."}
+                        ? "Feeds into funding pressure, so it's judged against that score's lines."
+                        : "Feeds into both scores, so it's judged against their lines."}
                     </span>
                   )}
                 </td>

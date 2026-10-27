@@ -5,6 +5,9 @@ import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
 import { GuardrailTagControls } from "./guardrailTagControls";
+import { ReusableVisuals } from "./reusableVisuals";
+import { findBriefVideo } from "../../lib/export/briefVideo";
+import { latestPublishedBrief, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { PullPolicyControls } from "./pullPolicyControls";
 import { SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
@@ -426,6 +429,7 @@ const apiLink = utilityLinks.find((link) => link.href === "/api-docs");
 
 export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
+  const video = latestPublishedBrief ? await findBriefVideo(latestPublishedBrief) : undefined;
 
   return (
     <PageShell backdropVariant="default">
@@ -438,10 +442,14 @@ export default async function SharePage() {
                 above it, and before that the kicker read "Current weekly
                 artifact", the product's internal noun for what a reader calls
                 the brief. */}
+            {/* Its own line since 2026-10-21: run on after the title in a 42rem
+                column, the unbreakable "· Week of …" wrapped whole and opened the
+                second line on a stray dot at desktop widths. */}
             <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">
-              Share this week&apos;s guidance{" "}
-              <span className="whitespace-nowrap font-normal text-slate-400">
-                · Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
+              Share this week&apos;s guidance
+              <span className="sr-only">, </span>
+              <span className="mt-1 block text-fluid-lg font-normal text-slate-400">
+                Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
               </span>
             </h1>
             <p className="text-sm leading-relaxed text-white/60">
@@ -468,6 +476,7 @@ export default async function SharePage() {
 
         {/* Text formats first, then the same call as a picture or a file. */}
         <ShareImageArtifacts />
+        <ReusableVisuals video={video} weekLabel={latestPublishedBrief ? publishedBriefWeekLabel(latestPublishedBrief) : undefined} />
 
         {/* Anchored so the retired /embed route lands on it. */}
         <section id="embed" className="weather-panel weather-section-stack p-0">
@@ -478,19 +487,14 @@ export default async function SharePage() {
             own until 2026-10-08. */}
         <nav aria-labelledby="share-elsewhere-heading" className="weather-panel weather-section-stack p-0">
           <h2 id="share-elsewhere-heading" className="text-lg font-semibold text-white/90">For agents, scripts and feed readers</h2>
-          <p className="text-sm text-white/70">
+          <p className="text-sm text-slate-300">
             Ask an assistant what this week means for your company:{" "}
             {artifact.assistantLinks.map((link, index) => (
               <Fragment key={link.name}>
                 {index > 0 ? " · " : null}
-                <a
-                  href={link.href}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="inline-flex min-h-[44px] items-center font-semibold text-sky-300 hover:text-sky-200"
-                >
+                <ActionLink href={link.href} variant="inline" target="_blank" rel="noreferrer">
                   {link.name}
-                </a>
+                </ActionLink>
               </Fragment>
             ))}
           </p>

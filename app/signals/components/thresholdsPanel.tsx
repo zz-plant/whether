@@ -471,7 +471,7 @@ export const ThresholdsPanel = ({
                     for risk appetite — the "Sooner warnings" preset raises that line. */}
                 <ul className="list-disc space-y-1 pl-4">
                   <li>A lower funding pressure line, or a higher risk appetite line, makes conditions change sooner.</li>
-                  <li>Moving either the other way waits for a bigger move.</li>
+                  <li>Moving either one the other way means it takes a bigger move to change conditions.</li>
                 </ul>
               </div>
             </details>

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" role="img" aria-labelledby="light-condition-defensive-tile-title light-condition-defensive-tile-desc">
+<title id="light-condition-defensive-tile-title">Cloudy condition tile</title>
+<desc id="light-condition-defensive-tile-desc">Cloudy condition reference tile. Money is available but pricey. This is a definition, not a current reading.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+<rect width="100%" height="100%" fill="#f1f4f3"/>
+<rect x="1" y="1" width="558" height="318" rx="10" fill="#ffffff" stroke="rgba(18, 23, 25, 0.10)" stroke-width="2"/><text x="32" y="44" font-size="18" font-weight="400" fill="#525c60" text-anchor="start">Condition reference</text><svg xmlns="http://www.w3.org/2000/svg" width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="#74552a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-cloud shrink-0 text-[color:var(--regime-ink)]" data-regime="DEFENSIVE" data-concept-icon="condition" aria-hidden="true" focusable="false" x="32" y="78"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg><text x="108" y="123" font-size="48" font-weight="700" fill="#74552a" text-anchor="start">Cloudy</text><text x="32" y="191" font-size="27" font-weight="400" fill="#384145" text-anchor="start">Money is available but pricey.</text><line x1="32" y1="282" x2="528" y2="282" stroke="#9d7a4a" stroke-width="4"/>
+</g>
+</svg>

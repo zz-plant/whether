@@ -82,6 +82,9 @@ export function AllAreaRules({
             ))}
           </div>
         ) : null}
+        <p className="text-fluid-xs text-slate-300">
+          Agree on these lines in calm weather so course corrections are automatic, not emergency debates.
+        </p>
         <AreaTable
           rows={tableRows}
           caption={`${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf} and ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}, by area`}

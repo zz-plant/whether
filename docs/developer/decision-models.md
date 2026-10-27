@@ -153,6 +153,158 @@ excerpts, not the authenticity, freshness or completeness of a fetched source. I
 fetches arbitrary sources nor changes the homepage's selection, mandatory warnings,
 engine inputs, or guidance. Numeric deltas remain computed in code.
 
+## Review the counterevidence packet (evidence for and against the call)
+
+```sh
+bun run audit:jev-copy -- --mode counterevidence --model clef-flash,clef-omni --input counterevidence.json
+```
+
+The input is the evidence shape with an optional `side` per candidate (`"support"` or
+`"challenge"`), the side the source pool retrieved the passage for. Clef asks a third
+question per candidate — whether the claim, if it holds, would *weaken* the operating
+implication of `canonical.guidance` — independently of the pool's side, so retrieval and
+judgment can disagree and the disagreement is visible in the report.
+
+The report's `packet` is assembled deterministically, with no generated claims:
+
+- `challenges` — what could weaken this call. A candidate is only listed when the excerpt
+  supports its claim and the model judged it challenging at the threshold; otherwise it is
+  noise and goes to `review`.
+- `supporting` — what backs the call: supported, relevant, and not judged challenging.
+- `reconsideration` — `canonical.changeLine`, the engine's printed line where conditions
+  change. Never invented by a model; when the canonical document has no change line the
+  field is null and the packet says nothing instead of guessing.
+- `review` — every candidate a person should look at: failed calls, judgments near the
+  threshold, unsupported challenges, and passages the pool sent that were not relevant.
+
+A challenge keeps the candidate's own wording and citation, so the packet is a review
+artifact, not a summary to be trusted on faith. Label each finding as useful or a false
+alarm with `bun run reviewed-cases:add` (below); those labels become evaluation cases.
+
+## Build the source pool with EmbeddingGemma
+
+```sh
+bun run evidence:pool -- --passages data/evidence-pool/passages.json \
+  --canonical artifacts/weekly-slack-brief.txt.audit.json \
+  --out artifacts/evidence-pool/counterevidence-input.json
+bun run audit:jev-copy -- --mode counterevidence --input artifacts/evidence-pool/counterevidence-input.json
+```
+
+The passage file is the recurring evidence set: `[{ "id", "title"?, "text", "sourceUrl", "publishedAt" }]`
+(text at most 12,000 characters, ids unique). On a machine with the advice-corpus cache, posts
+can be chunked into passages; the tool itself is collection-agnostic. The canonical comes from
+the paired brief audit bundle (or any file holding the canonical object alone).
+
+EmbeddingGemma 2 (local Ollama, `embeddinggemma-2:740m`) embeds every passage and two query
+frames: the call as printed (guidance, action, pause and resume lines), and the opposite
+stance — money is cheaper again, the freeze lifts, companies resume hiring and the new bets
+they postponed — stated without the call's metric vocabulary. That separation is a measured
+finding, not an assumption (2026-10-23): a challenge frame that restated the call's change
+line embedded ~0.9-similar to the support frame, and no passage cleared a margin; embedding
+similarity is topic similarity, not stance. `lib/evidencePool.ts` therefore selects the pool
+by relevance to the call's frame (top-k) and tags each passage with the frame it resembles
+more. A passage that argues the opposite stance with the call's own vocabulary is still
+retrieved and tagged by the closer frame, so the interesting disagreements stay in the pool.
+Embeddings cache by content hash under `.cache/evidence-pool/`.
+
+The `side` tags are retrieval hypotheses, not verdicts — `--mode counterevidence` judges each
+candidate independently, and the packet carries both the pool's side and the model's judgment,
+so retrieval and judgment can be compared and the thresholds calibrated against the reviewed
+cases. A passage that argues against the call can still be retrieved for the support side when
+it shares the call's vocabulary — the packet's challenge list comes from the model's judgment,
+and that side-vs-judgment mismatch is exactly the retrieval-quality signal the reviewed-case
+registry measures. The selection defaults (`--top 6 --min-similarity 0.3`) are starting points
+for that calibration, not accuracy claims.
+
+## Keep reviewed cases as evaluation evidence
+
+```sh
+bun run reviewed-cases:add -- --input counterevidence.json --candidate <id> --label useful|false-alarm --side challenge|support
+bun run reviewed-cases:export-eval -- --out artifacts/reviewed-cases/eval-suite.json
+bun run audit:jev-copy -- --mode eval --input artifacts/reviewed-cases/eval-suite.json
+```
+
+`data/reviewed-cases/cases.json` is a committed, append-only registry of human labels on
+advisory findings: the exact input, the candidate, and the expected labels the verdict
+implies. A useful challenge records that the model was right and the excerpt carried it
+(`challenges_*: true, supported_*: true`); a false alarm records an over-flag
+(`challenges_*: false`). `export-eval` turns the registry into the eval input shape, so
+reviewed cases become held-out evidence for routing, prompts and retrieval settings. The
+registry is committed and not rewritten; a labeled case is superseded, never deleted.
+Independent outcome checks matter more than agreement between models.
+
+## Retrieve candidates locally with EmbeddingGemma 2
+
+Use a larger pool of source passages before the sixteen-candidate support check:
+
+```sh
+bun run brief:weekly:artifact
+bun run evidence:retrieve -- --input source-pool.json \
+  --brief artifacts/weekly-slack-brief.txt.audit.json \
+  --out artifacts/evidence-candidates.json --limit 8
+bun run audit:jev-copy -- --mode evidence --model clef-flash \
+  --input artifacts/evidence-candidates.json
+```
+
+`source-pool.json` contains `{ "candidates": [...] }`, using the candidate fields above
+with up to 10,000 unique IDs. Supply passages you have collected and checked; this tool
+does not fetch sources or generate claims. `--brief` takes canonical guidance from the
+paired weekly artifact and validates its date, reading ID and engine identity. A pool
+with a conflicting canonical record fails before inference. Alternatively, omit `--brief`
+and include `canonical` in the pool for a standalone review. A fallback brief remains a
+fallback review; retrieval cannot establish readiness.
+
+The default model is `embeddinggemma-2:740m`, served by the installed Ollama-compatible
+runtime at `http://127.0.0.1:11434`. `--host` or `OLLAMA_HOST` can select another HTTP
+loopback address; remote hosts and redirects are refused. This is an explicit local
+developer command. The subsequent Clef command sends the selected passages to Cloudflare
+using the caller's credentials. Neither command runs during a reader request, scheduled
+brief delivery, or the deploy gate.
+
+The query combines guidance and supplied action/pause/resume/change lines. Passages use
+`title: <claim> | text: <excerpt>`; the query uses `task: search result | query: <query>`,
+following [Google's model card](https://huggingface.co/google/embeddinggemma-2).
+[Ollama embedding requests](https://docs.ollama.com/api/embed) set `truncate: false`,
+so an oversized passage fails rather than silently losing its ending. Inputs are batched
+in groups of sixteen. Returned vectors must have a nonzero norm, finite values, and the
+same dimension; cosine ranking uses normalized vectors and breaks ties by candidate ID.
+
+Code excludes observations after the canonical record date and collapses duplicate
+claim/excerpt pairs, keeping the first supplied citation. Different claims about the same
+excerpt remain separate for the support check. Original wording, dates, IDs and URLs
+survive selection. This date filter only checks supplied metadata: later-trained weights
+and undated source knowledge make it unsuitable for proving historical foresight.
+
+`--limit` accepts 1–16 (default 8). Similarity has no acceptance threshold and is neither
+support probability nor confidence: irrelevant or contradictory passages can still enter
+the shortlist. Clef's independent support question and human source review remain necessary.
+Use concise excerpts or a smaller limit to fit the selected Clef model's input budget.
+
+The local cache (`--cache`, default `artifacts/evidence-retrieval/cache.json`) is keyed by
+full prompted content, prompt version and installed model digest. Replaced weights
+invalidate the cache; a digest change during retrieval fails the run. Reports retain the
+full pool/reading input digest, model digest, dimension, cache counts, exclusions, timing
+and ranked cosine scores. The evidence audit preserves this retrieval metadata and an
+input digest in its report, while sending only canonical guidance and passages to Clef.
+Failed retrieval replaces an old output with a failure record containing no candidates,
+so it cannot be mistaken for a fresh shortlist. Corrupt cache files fail explicitly;
+remove the cache and rerun to rebuild it.
+
+Run the opt-in local smoke evaluation with:
+
+```sh
+bun run eval:evidence-retrieval
+```
+
+It retrieves against twenty authored hypothetical passages for hiring, fundraising and
+vendor decisions, records recall at three against the supplied relevance labels, and
+writes `artifacts/evidence-retrieval/evaluation.json`. These examples and placeholder URLs
+are not market evidence, a production benchmark, or a support-quality evaluation. Add
+reviewed real passages and hard negatives before tuning retrieval policy. The offline
+suite separately covers cache invalidation, malformed vectors, dates, duplicate claims,
+canonical handoff, and service failures. The registered advice-corpus prefilter continues
+to use Nomic; changing its embedding model would require a separate research revision.
+
 ## Evaluate before selecting a model
 
 ```sh

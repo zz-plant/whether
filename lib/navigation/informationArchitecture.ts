@@ -156,7 +156,7 @@ export const navigationPages: readonly NavigationPage[] = [
     href: "/trust",
     label: "How much to trust this week",
     description: "Check freshness, the margin, source coverage and the lines that would change the brief.",
-    placement: "tab",
+    placement: "secondary",
   },
   {
     key: "planning",
@@ -202,20 +202,20 @@ export const navigationPages: readonly NavigationPage[] = [
     placement: "tab",
   },
   {
-    key: "compare",
-    group: "record",
-    href: "/history/compare",
-    label: "Compare periods",
-    description: "This week's scores against past downturns: 2001, 2008 and 2022",
-    placement: "tab",
-  },
-  {
     key: "calibration",
     group: "record",
     href: "/calibration",
     label: "Calibration",
     description: "How often conditions held at each margin from the line, 2012–2026",
     placement: "tab",
+  },
+  {
+    key: "compare",
+    group: "record",
+    href: "/history/compare",
+    label: "Compare periods",
+    description: "This week's scores against past downturns: 2001, 2008 and 2022",
+    placement: "secondary",
   },
   {
     key: "concepts",
@@ -282,6 +282,17 @@ export const utilityLinks = [
     description: "Product philosophy & team",
     header: "md",
   },
+  /* Reached from the footer, the phone's More sheet and the palette, not the
+     header: it sits beside About wherever About leads. Until 2026-10-23 no page,
+     nav or palette linked it at all — only the sitemap named it — so a reader
+     who wanted to reach the editor (the corrections policy points at one) had
+     to guess the address. */
+  {
+    href: "/contact",
+    label: "Contact",
+    description: "Reach the editor for corrections, questions, or coverage requests",
+    header: null,
+  },
   {
     href: "/search",
     label: "Search",
@@ -294,7 +305,7 @@ export const headerUtilityLinks = utilityLinks.flatMap((link) => (link.header ? 
 
 /**
  * Route families that are neither a grouped page nor a utility link: the
- * programmatic corpus, the citable archive, and contact. They name the route
+ * programmatic corpus and the citable archive. They name the route
  * in the header's sublabel.
  *
  * They were a private fallback list inside `globalHeader.ts`, which is how the
@@ -304,7 +315,10 @@ export const headerUtilityLinks = utilityLinks.flatMap((link) => (link.header ? 
 export const contentSections = [
   { prefix: "/answers", label: "Answer" },
   { prefix: "/brief", label: "Published brief" },
+  { prefix: "/decisions", label: "Your decisions" },
   { prefix: "/resolve", label: "More tools" },
   { prefix: "/toolkits", label: "Toolkit" },
-  { prefix: "/contact", label: "Contact" },
+  { prefix: "/privacy", label: "Privacy" },
+  { prefix: "/acceptable-use-policy", label: "Acceptable Use" },
+  { prefix: "/terms-of-service", label: "Terms" },
 ] as const;

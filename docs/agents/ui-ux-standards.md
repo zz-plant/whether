@@ -247,6 +247,12 @@ take the other's job.
   The diamond is the one mark that is not round: it is a warning sign's shape, not a data marker,
   and its colour is the caveat ink, never the crossed red. A new kind of mark gets a row here
   before it ships.
+- MUST: a caveat that takes a whole band (cached or late data, an archived month, offline) is
+  `border border-l-4 border-caveat-border bg-caveat-bg text-caveat-fg` with the diamond on its
+  first line, as `HistoricalBanner` draws it. The heavy rule and the mark set it apart from an
+  ordinary band. Never the `amber-*` or `rose-*` utilities: both resolve to the crossed red, and
+  until 2026-10-21 the homepage's late-data line and `/operate`'s cached-data alert drew in them,
+  so late data read as a crossed line.
 - NEVER: `rounded-full` on a text-bearing element. A pill beside a 2px chip is two badge shapes
   for one class of information, and until 2026-09-02 it put the softest shape on the page around
   the most assertive content (`3 NEED ATTENTION`, `HOLD`, `Q4 2018 analog`). Verdicts are
@@ -335,7 +341,7 @@ conditions, and where a line stands. Everything else is ink.
 | --- | --- | --- | --- |
 | Ground (night chart / chart paper) | `--bg-body` | `#0f1316` | `#f1f4f3` |
 | Panel | `--bg-panel` | `#171c20` | `#ffffff` |
-| Ink, which is also the action colour | `--app-text`, `--accent-action` | `#edf0ee` | `#121719` |
+| Ink, and the action colour with no regime (§XXVII) | `--app-text`, `--accent-action` | `#edf0ee` | `#121719` |
 | Secondary ink | `--app-text-secondary` | `#cdd3d1` | `#384145` |
 | Muted ink | `--app-text-muted` | `#a0a9a7` | `#525c60` |
 | A line crossed or close (front red) | `--line-crossed-ink` / `--line-crossed` | `#f2685c` / `#e5484d` | `#b4232a` / `#d13b37` |
@@ -373,12 +379,14 @@ conditions, and where a line stands. Everything else is ink.
   (2026-10-09, §XXV). A card's own label inside a section is neutral (`.type-eyebrow` alone);
   `/signals` carried sky card eyebrows beside a rose section eyebrow, two accents for one
   hierarchy.
-- MUST: keep the four condition colours off the action colour. Links, buttons and focus rings
-  draw in the ink (`--accent-action`), and links keep their underline; the primary button is the
-  ink as a fill with the ground as its label (`--cta-fill`, `--cta-ink`). A fifth hue that meant
-  "click" (sky, until 2026-10-09) was what forced Stormy off blue in the first place, and under a
-  Stormy call it made the regime and the controls one colour.
-  `tests/regimeColourContract.test.tsx` fails if a condition lands on the action colour.
+- MUST: keep a fixed fifth hue off the action colour. With no regime, links, buttons and focus
+  rings draw in the ink (`--accent-action`); under a shell that knows its regime they draw in the
+  week's ink (`--accent-action: var(--regime-ink)`, 2026-10-14). Either way there is no hue that
+  means "click": sky meant that until 2026-10-09, forced Stormy off blue, and under a Stormy call
+  made the regime and the controls one colour. Because the action colour can now be the
+  condition's own ink, hue no longer tells a control from the condition stamp; form does (§XXVII).
+  Links keep their underline; the primary button is the action colour as a fill with the ground
+  as its label (`--cta-fill`, `--cta-ink`). `tests/regimeColourContract.test.tsx` holds both.
 - MUST: keep a focus ring visible in both themes. It is the ink, 16:1 on the dark ground and 18:1
   on the light one, with the soft halo (`--focus-halo`) behind it.
 - MUST: tell data series apart by ink and dash, not by a hue, when they are neither a condition
@@ -674,6 +682,11 @@ chart, the weather glyphs and the pause and play line states (§XXIV). Everythin
   palette: it keeps their text legible over a scrolling page. The call card's regime rule and the
   site's name inside it, on `/` and on a published week: that card is the one people crop and
   share, the rule names the week in a crop, and every other page's header names the site already.
+- The week's word as a placard (2026-10-21). The call card's stamp and the report intro's status
+  word print in the condition's solid fill with `--regime-on-accent` ink (`.weather-tag-placard`),
+  so the week's condition is the one solid block of colour on a page. Lists of past weeks keep the
+  tinted `.weather-tag-regime`. The conditions chart lights the week's quadrant and dims the other
+  three, so its colour field says which weather it is before the eye finds the dot.
 
 
 ## XXVI. Controls as instrument parts
@@ -708,3 +721,44 @@ an instrument: what it is shaped like says how it works. The form is physical, t
 - NEVER: a translucent popup with nothing blurred behind it. At 95% the page's text read through
   the header's pickers and the calendar; a popup is opaque, or it blurs what it covers (§XXV keeps
   the blur where text must stay legible over a scrolling page).
+
+## XXVII. Display or control
+
+Added 2026-10-21. A **control** changes what the page shows or takes the reader somewhere: a
+link, a button, a disclosure, a picker, a segment, a key, a field. A **display** states a fact and
+does nothing when pressed: a stamp, a delta, a figure, a mark, a label, a callout, a chart. Each
+cue below belongs to one side, and a reader learns the split from the first page they use. Since
+2026-10-14 the action colour is the week's ink under a regime shell (§XVI), the same hue as the
+condition stamp, so these cues are the only way left to tell a control from a display.
+
+| Cue | Belongs to | Notes |
+| --- | --- | --- |
+| The action colour: `--accent-action`, and the `sky-*` / `cyan-*` utilities folded onto it | controls | A display that names the condition takes `--regime-ink` from its own token (the stamp, the intro's status word, `.type-eyebrow-section`), never through the action aliases |
+| An underline | links | A term with a definition is a link to it, or plain text with the gloss beside it |
+| The control radius (`--radius-lg`) with a frame | controls | §XIV: a framed display is a stamp at `--radius-sm`, a data tile at `--radius-md`, or unframed |
+| A lift (`--elev-1`) or a press (`translateY`) | controls | |
+| A chevron | disclosures and pickers | §XII |
+| `cursor: pointer`, or any `hover:` change | controls | A row or a run that brightens under the pointer promises a click it does not answer |
+| A lamp (a filled dot in a key) | controls, for the chosen option | A filled dot outside a key is a data mark (§XIV's mark table), drawn in ink or its condition's ink |
+| The stamp frame (`.weather-tag`, `type-stamp`, `rounded-sm border`) | displays | A link drawn as a stamp reads as a label; give it the `pill` or `inline` variant (§X) |
+| The line-state glyphs, the caveat diamond, the condition glyphs | displays | §XIV, §XXIV |
+
+- MUST: draw a display in the ink roles (`--app-text`, `-secondary`, `-muted`, the `slate-*`
+  utilities folded onto them), a condition ink, a line-state ink or the caveat ink. A callout
+  that wants to stand apart takes a neutral frame (`border-slate-700/70` on a `slate-900/40`
+  fill), not a tint of the action colour: under a Cloudy week a sky-tinted note drew as a tan box
+  beside the tan stamp and the tan Copy button, three different jobs in one hue.
+- MUST: draw a data series, a marker line or a progress bar in ink (§XVI's ink-and-dash rule).
+  A scatter in the action colour reads as a selection.
+- A control's own state marks take the action colour: the current tab's rule, a picker's chosen
+  item, a segment's lit lamp, a focused field's ring. They sit inside the control, and the guard
+  reads them as part of it.
+- NEVER: a display set in a control's box. The sticky strip's direction badge was a 28px icon in
+  a 6px frame, the same shape as the download button three items to its right; it is a glyph now,
+  unframed, beside the words it qualifies.
+- NEVER: a control class on a display. `.weather-hub-chip` lifts on hover and sets a pointer; the
+  toolkit cards wrapped one around the word "Tool", inside a card that was itself the link, so it
+  read as a second button. A label inside a link card is a `Tag`.
+- `tests/displayControlCues.test.ts` reads every component under `app/` and fails when an element
+  outside any link, button, label or picker part carries the action colour, a `hover:` change or
+  a control class, or when a link or button carries the stamp frame.

@@ -9,9 +9,6 @@ import {
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import { graph } from "../../../lib/seo/pageStructuredData";
-import { revisitDecisionPhrase } from "../../../lib/report/decisionTransmissionCopy";
-import { comparisonBasis } from "../../../lib/report/comparisonBasis";
-import { describeScoresMovement } from "../../../lib/report/evidenceReaderModel";
 import {
   canonicalCapitalDisciplinePath,
   findResourcePillarBySlug,
@@ -35,7 +32,7 @@ import {
   downloadableResources,
 } from "../../../lib/downloadableResources";
 import { resourceArticles } from "../../../lib/resourceArticles";
-import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
+import { loadPostureLine } from "../postureLine";
 import {
   isIndexableAnswerSlug,
   isIndexableResourceArticleSlug,
@@ -78,28 +75,6 @@ const buildSectionAnchor = (heading: string) =>
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-");
-
-/* This week's conditions and direction in one sentence, for a page that is not
-   the brief: the articles' live-guidance block and the pillars' header both
-   print it, so a reader arriving from search meets the current posture before
-   the essay (AGENTS.md, "Thin SEO page"). */
-const loadPostureLine = async (route: string) => {
-  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
-  const { homeBriefModel, displayRegime } = snapshot;
-  /* The answer pages' direction and basis (app/answers/decisionAnswerCopy.ts):
-     this printed the engine's `directionLabel` "this week", which on Oct 5 was
-     "and mixed this week; revisit last week's decisions" for two scores that
-     had both worsened since Aug 31. */
-  const movement = describeScoresMovement(reportData.reportDynamics);
-  const basis = comparisonBasis(reportData.reportDynamics.comparedWith);
-  const direction =
-    movement === null ? ", with no comparison to last week available" : ` and ${movement} ${basis.since}`;
-  return {
-    reportData,
-    snapshot,
-    postureSummary: `Conditions are ${displayRegime.label}${direction}; ${revisitDecisionPhrase(homeBriefModel.revisitDecisions, basis)}.`,
-  };
-};
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
@@ -225,10 +200,10 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   const isParentGuide = `/resources/${page.slug}` === canonicalCapitalDisciplinePath;
   const relatedPages = [
     { href: canonicalCapitalDisciplinePath, label: "Capital discipline for venture-backed companies" },
-    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital posture framework" },
+    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital framework" },
     { href: "/resources/reversibility-as-governance", label: "Reversibility as governance" },
     { href: resourceSupportingPages.decisionShieldOverview.path, label: "Decision Shield overview" },
-    { href: resourceSupportingPages.capitalPostureTemplate.path, label: "Capital Posture Template" },
+    { href: resourceSupportingPages.capitalPostureTemplate.path, label: "Capital Planning Template" },
   ].filter((link) => link.href !== `/resources/${page.slug}`);
   const linkClass = "text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100";
   const lexiconByIndex = ["capital-regime", "escalation-thresholds", "reversibility", "30-day-confirmation-logic"] as const;
@@ -363,7 +338,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         body="Ask for a walkthrough of the board pack."
         keyword={page.keyword}
         sourceSlug={page.slug}
-        downloadLabel="Download Capital Posture Template"
+        downloadLabel="Download Capital Planning Template"
       />
     </ContentPageShell>
   );

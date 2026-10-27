@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { getRegimePublicLabel } from "../../../lib/regimePresentation";
+import { scaleLinear } from "d3-scale";
+import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatThresholdNumber } from "../../../lib/formatters";
 import { ConditionIcon } from "../ui/conceptIcons";
 
@@ -23,6 +24,16 @@ type RegimeRadarProps = {
   caveat?: string | null;
   /** A last line under the caption: on the brief's card, the link to how the lines are set. */
   footer?: ReactNode;
+  /**
+   * What the filled marker is. The brief's map reads "Current reading"; a
+   * surface that plots a hypothetical (the scenario studio's map: the
+   * simulated reading as the dot, this week's as the hollow one, the same
+   * filled/hollow pair its ladders draw) names the marker so the two surfaces
+   * cannot disagree about which point is which.
+   */
+  primaryLabel?: string;
+  /** What the hollow marker is, on a surface whose two points both need names ("This week"). */
+  previousLabel?: string | null;
   className?: string;
 };
 
@@ -43,11 +54,11 @@ const BOTTOM_ICON_Y = PLOT_BOTTOM - 6 - 3.6 - QUADRANT_ICON / 2;
 const LINE_LABEL_MIN_Y = TOP_ICON_Y + QUADRANT_ICON + 7;
 const LINE_LABEL_MAX_Y = BOTTOM_ICON_Y - 2;
 
-const xFor = (riskAppetite: number) =>
-  PLOT_X + (Math.max(0, Math.min(100, riskAppetite)) / 100) * PLOT_SIZE;
+const xScale = scaleLinear().domain([0, 100]).range([PLOT_X, PLOT_RIGHT]).clamp(true);
+const yScale = scaleLinear().domain([0, 100]).range([PLOT_BOTTOM, PLOT_Y]).clamp(true);
 
-const yFor = (tightness: number) =>
-  PLOT_Y + (1 - Math.max(0, Math.min(100, tightness)) / 100) * PLOT_SIZE;
+const xFor = (riskAppetite: number) => xScale(riskAppetite);
+const yFor = (tightness: number) => yScale(tightness);
 
 export function RegimeRadar({
   tightness,
@@ -61,6 +72,8 @@ export function RegimeRadar({
   trailCaption,
   caveat,
   footer,
+  primaryLabel,
+  previousLabel,
   className = "",
 }: RegimeRadarProps) {
   const boundaryX = xFor(riskAppetiteThreshold);
@@ -74,6 +87,22 @@ export function RegimeRadar({
     /* A dated dot names its reading on hover, in the words the current marker uses. */
     title: point.label ? `${point.label}: Funding pressure ${point.tightness}, Risk appetite ${point.riskAppetite}` : undefined,
   }));
+  /* A 2.4-unit dot is a 3px target at the card's size; the transparent ring is
+     what the pointer has to find. Month-end readings can sit a couple of units
+     apart, and full-size rings would let the later one swallow the earlier
+     one's hover (SVG hit-testing is painter's order, so the last ring drawn
+     wins), so each ring is capped at half the gap to its nearest dated
+     neighbour: the rings meet at the midpoint and neither masks the other's
+     date. */
+  const hitRadii = trailPoints.map((point, index) => {
+    if (!point.title) return 0;
+    let nearest = Infinity;
+    for (const [otherIndex, other] of trailPoints.entries()) {
+      if (otherIndex === index || !other.title) continue;
+      nearest = Math.min(nearest, Math.hypot(other.x - point.x, other.y - point.y));
+    }
+    return nearest === Infinity ? 7 : Math.min(7, nearest / 2);
+  });
   const hasTrail = trailPoints.length > 0;
   const hasPrevious =
     !hasTrail &&
@@ -81,6 +110,17 @@ export function RegimeRadar({
     typeof previousRiskAppetite === "number";
   const prevX = hasPrevious ? xFor(previousRiskAppetite!) : null;
   const prevY = hasPrevious ? yFor(previousTightness!) : null;
+  /* The dated readings, again in HTML: the SVG titles on the dots are
+     pointer-only, so touch, keyboard and screen-reader users read the same
+     values here. */
+  const readableReadings = [
+    ...trailPoints.flatMap((point, index) =>
+      point.title ? [{ key: `trail-${index}`, text: point.title }] : []),
+    ...(hasPrevious && previousLabel
+      ? [{ key: "previous", text: `${previousLabel}: Funding pressure ${previousTightness}, Risk appetite ${previousRiskAppetite}` }]
+      : []),
+    { key: "current", text: `${primaryLabel ?? "Current reading"}: Funding pressure ${tightness}, Risk appetite ${riskAppetite}` },
+  ];
 
   // Which change line is nearer (horizontal vs vertical), for the projection guide.
   // The distance in points is the trust strip's margin, printed once beside the map.
@@ -92,9 +132,22 @@ export function RegimeRadar({
   // through, so an unmodelled label still reads instead of rendering blank.
   const weatherLabel = getRegimePublicLabel(currentRegime).toLowerCase();
 
+  /* The week's quadrant lit, the other three dimmed (2026-10-21). At one
+     strength each, the four washes read as a legend and the map said nothing
+     before the eye found the dot; now the week's weather is the one colour
+     field on the plot. An unmodelled regime lights nothing and dims nothing. */
+  const quadrants = [
+    { key: "SCARCITY", x: PLOT_X, y: PLOT_Y, width: boundaryX - PLOT_X, height: boundaryY - PLOT_Y, fill: "var(--phase-scarcity)" },
+    { key: "DEFENSIVE", x: boundaryX, y: PLOT_Y, width: PLOT_RIGHT - boundaryX, height: boundaryY - PLOT_Y, fill: "var(--phase-defensive)" },
+    { key: "VOLATILE", x: PLOT_X, y: boundaryY, width: boundaryX - PLOT_X, height: PLOT_BOTTOM - boundaryY, fill: "var(--phase-volatile)" },
+    { key: "EXPANSION", x: boundaryX, y: boundaryY, width: PLOT_RIGHT - boundaryX, height: PLOT_BOTTOM - boundaryY, fill: "var(--phase-expansion)" },
+  ];
+  const activeKey = currentRegime.toUpperCase();
+  const hasActive = quadrants.some((quadrant) => quadrant.key === activeKey);
+
   return (
     <figure
-      className={`relative m-0 flex flex-col items-center justify-center rounded-lg border border-slate-800/80 bg-slate-900/50 p-3 ${className}`.trim()}
+      className={`relative m-0 flex flex-col items-center justify-center rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 ${className}`.trim()}
       aria-label={`Conditions radar: ${weatherLabel}, funding pressure ${tightness}, risk appetite ${riskAppetite}`}
     >
       <div className="mb-1.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-nano text-slate-300">
@@ -122,39 +175,32 @@ export function RegimeRadar({
       >
         <title>{`Funding pressure ${tightness} vs risk appetite ${riskAppetite} (${weatherLabel})`}</title>
 
-        {/* 4 Weather Quadrants */}
-        {/* Top-Left: Freezing (Scarcity) */}
-        <rect
-          x={PLOT_X}
-          y={PLOT_Y}
-          width={boundaryX - PLOT_X}
-          height={boundaryY - PLOT_Y}
-          fill="var(--phase-scarcity)"
-        />
-        {/* Top-Right: Cloudy (Defensive) */}
-        <rect
-          x={boundaryX}
-          y={PLOT_Y}
-          width={PLOT_RIGHT - boundaryX}
-          height={boundaryY - PLOT_Y}
-          fill="var(--phase-defensive)"
-        />
-        {/* Bottom-Left: Stormy (Volatile) */}
-        <rect
-          x={PLOT_X}
-          y={boundaryY}
-          width={boundaryX - PLOT_X}
-          height={PLOT_BOTTOM - boundaryY}
-          fill="var(--phase-volatile)"
-        />
-        {/* Bottom-Right: Sunny (Expansion) */}
-        <rect
-          x={boundaryX}
-          y={boundaryY}
-          width={PLOT_RIGHT - boundaryX}
-          height={PLOT_BOTTOM - boundaryY}
-          fill="var(--phase-expansion)"
-        />
+        {/* The four conditions: Freezing top left, Cloudy top right, Stormy
+            bottom left, Sunny bottom right. The week's is drawn twice over. */}
+        {quadrants.map((quadrant) => {
+          const active = quadrant.key === activeKey;
+          return (
+            <rect
+              key={quadrant.key}
+              x={quadrant.x}
+              y={quadrant.y}
+              width={quadrant.width}
+              height={quadrant.height}
+              fill={quadrant.fill}
+              stroke={active ? "var(--regime-accent)" : "none"}
+              strokeWidth={active ? "1" : "0"}
+              strokeOpacity={active ? "0.4" : "0"}
+              opacity={hasActive && !active ? 0.45 : 1}
+              data-quadrant={quadrant.key}
+              data-active={active ? "" : undefined}
+            />
+          );
+        })}
+        {quadrants
+          .filter((quadrant) => quadrant.key === activeKey)
+          .map((quadrant) => (
+            <rect key={`${quadrant.key}-lit`} x={quadrant.x} y={quadrant.y} width={quadrant.width} height={quadrant.height} fill={quadrant.fill} />
+          ))}
 
         {/* Quadrant corner labels, each in its condition's ink. These read the
             line-state families until 2026-10-09 (Sunny in the clear ink,
@@ -305,17 +351,23 @@ export function RegimeRadar({
                   fill="var(--app-text-muted)"
                   fillOpacity={0.3 + (0.6 * (index + 1)) / trailPoints.length}
                 />
-                {/* A 2.4-unit dot is a 3px target at the card's size; this
-                    transparent ring is what the pointer has to find. */}
-                {point.title ? <circle cx={point.x} cy={point.y} r="7" fill="transparent" /> : null}
+                {/* The ring is the pointer's target; its radius keeps it from
+                    covering a neighbour's date (see hitRadii). */}
+                {point.title ? <circle cx={point.x} cy={point.y} r={hitRadii[index]} fill="transparent" /> : null}
               </g>
             ))}
           </g>
         ) : null}
 
-        {/* Previous reading with dashed trail */}
+        {/* Previous reading with dashed trail. Named when a surface passes a
+            label for it: the scenario studio's hollow dot is this week's
+            reading, and an unlabeled hollow dot would leave the two points
+            identified only by which one has the filled center. */}
         {hasPrevious && prevX !== null && prevY !== null ? (
           <g>
+            {previousLabel ? (
+              <title>{`${previousLabel}: Funding pressure ${previousTightness}, Risk appetite ${previousRiskAppetite}`}</title>
+            ) : null}
             <line
               x1={prevX}
               y1={prevY}
@@ -340,7 +392,21 @@ export function RegimeRadar({
 
         {/* Current reading marker */}
         <g>
-          <title>{`Current reading: Funding pressure ${tightness}, Risk appetite ${riskAppetite} (${weatherLabel})`}</title>
+          <title>{`${primaryLabel ?? "Current reading"}: Funding pressure ${tightness}, Risk appetite ${riskAppetite} (${weatherLabel})`}</title>
+          {/* Non-root SVG geometry scales from an origin of 0 0 unless told
+              otherwise, so the ring would travel toward the bottom-right as it
+              expanded; fill-box re-anchors each frame to this circle's own
+              center and the pulse expands around the reading it marks. */}
+          <circle
+            cx={currentX}
+            cy={currentY}
+            r="9"
+            fill="none"
+            stroke="var(--regime-accent)"
+            strokeWidth="1"
+            className="animate-ping motion-reduce:animate-none opacity-25"
+            style={{ animationDuration: "3s", transformBox: "fill-box", transformOrigin: "center" }}
+          />
           <circle
             cx={currentX}
             cy={currentY}
@@ -348,7 +414,7 @@ export function RegimeRadar({
             fill="none"
             stroke="var(--regime-accent)"
             strokeWidth="1.5"
-            strokeOpacity="0.6"
+            strokeOpacity="0.8"
           />
           <circle
             cx={currentX}
@@ -383,9 +449,28 @@ export function RegimeRadar({
           axes and Freezing hard on both, while Cloudy and Stormy are each hard
           on one. The chart is where that shows, so it says so. */}
       <figcaption className="mt-1 space-y-0.5 text-center text-fluid-nano text-slate-400">
-          <span className="block text-slate-300" data-radar-orientation>Easiest bottom right (Sunny), hardest top left (Freezing).</span>
+          {/* What the two directions mean before which corner is which
+              (2026-10-21): the axes name two scores a first visit has not met,
+              and the legend that decodes them in money terms is hidden from `md`
+              up, where this chart replaces it. */}
+          <span className="block text-slate-300" data-radar-orientation>
+            Up is {CONDITION_SIDE_MEANINGS.pressureAbove}, right is {CONDITION_SIDE_MEANINGS.appetiteAbove}. Easiest bottom right (Sunny), hardest top left (Freezing).
+          </span>
+          <span className="block text-slate-400" data-radar-ritual>
+            A Monday operating ritual: set your lines before the weather turns.
+          </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
+          {readableReadings.length > 1 ? (
+            <details className="mx-auto max-w-md text-left">
+              <summary className="cursor-pointer">Readings on this chart</summary>
+              <ul className="list-disc pl-4">
+                {readableReadings.map((reading) => (
+                  <li key={reading.key}>{reading.text}</li>
+                ))}
+              </ul>
+            </details>
+          ) : null}
           {footer ? <span className="block pt-1">{footer}</span> : null}
       </figcaption>
     </figure>
