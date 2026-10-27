@@ -401,6 +401,10 @@ export const resolveBriefUrl = (artifact: BriefArtifact, origin: string) =>
 export const SHARE_REFERRAL_PARAM = "ref";
 export const SHARE_REFERRAL_VALUE = "share";
 
+/** True for a query string (`location.search`) a pasted brief's link carries; any other `ref` is somebody else's tag. */
+export const isSharedArrivalQuery = (search: string) =>
+  new URLSearchParams(search).get(SHARE_REFERRAL_PARAM) === SHARE_REFERRAL_VALUE;
+
 /**
  * The brief URL as it is pasted into a channel: the same address, marked as a
  * share. The citation format keeps `resolveBriefUrl` — a citation names the
