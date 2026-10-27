@@ -30,7 +30,6 @@ const joinClauses = (...parts: Array<string | undefined | null | false>) => {
   return clauses.length > 0 ? `${clauses.join("; ")}.` : "";
 };
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
-import type { DecisionTransmissionBoundedRule } from "./reportData";
 
 /**
  * Loop stage owner: decision.
@@ -92,69 +91,6 @@ const OPERATING_LEVER_FALLBACK = {
   triggerThreshold: "Pause if funding pressure exceeds 60 or risk appetite falls below 40.",
   reversalCondition: "Resume expansion when funding pressure drops below 50 and risk appetite is above 50.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
-
-/* Said as what is missing. The reader cannot "review thresholds manually"; the
-   rule table did not supply a line this week, and that is the fact to carry. */
-const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "No pause line this week — check the guidance before acting.";
-const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "No resume line this week — check the guidance before acting.";
-
-const hasText = (value: string | undefined | null): value is string => typeof value === "string" && value.trim().length > 0;
-
-const toDecisionTransmissionRule = ({
-  action,
-  triggerThreshold,
-  reversalCondition,
-}: {
-  action?: string;
-  triggerThreshold?: string;
-  reversalCondition?: string;
-}): DecisionTransmissionBoundedRule => {
-  const missingThreshold = !hasText(triggerThreshold);
-  const missingReversal = !hasText(reversalCondition);
-
-  return {
-    action: hasText(action) ? action.trim() : OPERATING_LEVER_FALLBACK.areaActionNow,
-    triggerThreshold: missingThreshold ? MANUAL_REVIEW_THRESHOLD_PLACEHOLDER : triggerThreshold.trim(),
-    reversalCondition: missingReversal ? MANUAL_REVIEW_REVERSAL_PLACEHOLDER : reversalCondition.trim(),
-    manualReviewRequired: missingThreshold || missingReversal,
-  };
-};
-
-export const buildDecisionTransmissionBoundedRules = ({
-  rules,
-  actionStripItems,
-}: {
-  rules?: BoundedDecisionRule[];
-  actionStripItems?: ActionStripItem[];
-}): DecisionTransmissionBoundedRule[] => {
-  if (Array.isArray(actionStripItems) && actionStripItems.length > 0) {
-    return actionStripItems.map((item) =>
-      toDecisionTransmissionRule({
-        action: item.areaActionNow,
-        triggerThreshold: item.triggerThreshold,
-        reversalCondition: item.reversalCondition,
-      }),
-    );
-  }
-
-  if (Array.isArray(rules) && rules.length > 0) {
-    return rules.map((rule) =>
-      toDecisionTransmissionRule({
-        action: formatBoundedDecisionAction(rule),
-        triggerThreshold: formatActionStripThresholdText(rule),
-        reversalCondition: formatActionStripReversalText(rule),
-      }),
-    );
-  }
-
-  return [
-    toDecisionTransmissionRule({
-      action: OPERATING_LEVER_FALLBACK.areaActionNow,
-      triggerThreshold: undefined,
-      reversalCondition: undefined,
-    }),
-  ];
-};
 
 type CurrentScores = {
   tightness: number;

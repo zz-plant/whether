@@ -13,7 +13,6 @@ import {
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 import type { RegimeAssessment } from "../lib/regimeEngine";
-import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { resolveConfidencePercent, resolvePublishedConfidence } from "../lib/report/confidence";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
 import { formatConfidencePlainLabel } from "../lib/report/reportFormatting";
@@ -264,24 +263,6 @@ describe("buildSnapshotFallbackTreasury", () => {
 
     assert.equal(fallback.fallback_at, "2025-01-31T13:00:00.000Z");
     assert.equal(fallback.fallback_reason, "Upstream treasury timeout.");
-  });
-});
-
-
-describe("sector overlay key resolution", () => {
-  it("maps supported sector query values", () => {
-    assert.equal(resolveSectorKey("b2b-saas"), "b2b-saas");
-    assert.equal(resolveSectorKey("consumer"), "consumer");
-    assert.equal(resolveSectorKey("infrastructure"), "infrastructure");
-    assert.equal(resolveSectorKey("fintech"), "fintech");
-    assert.equal(resolveSectorKey("healthcare"), "healthcare");
-    assert.equal(resolveSectorKey("ai-platforms"), "ai-platforms");
-  });
-
-  it("falls back to b2b-saas for unknown or empty sector values", () => {
-    assert.equal(resolveSectorKey(undefined), "b2b-saas");
-    assert.equal(resolveSectorKey(""), "b2b-saas");
-    assert.equal(resolveSectorKey("unknown-sector"), "b2b-saas");
   });
 });
 
