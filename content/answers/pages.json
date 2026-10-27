@@ -307,8 +307,8 @@
     ],
     "thresholdFocus": "both",
     "featuredOrder": 5,
-    "contextHeading": "Connect CAC payback to available runway",
-    "context": "CAC payback estimates how long customer gross profit takes to recover acquisition cost. A blended average can hide an expensive channel or weak cohort. Compare incremental acquisition cost, cash collection timing and retention before treating efficient past growth as evidence for a larger budget.",
+    "contextHeading": "Connect acquisition-cost payback to available runway",
+    "context": "Customer acquisition cost (CAC) payback estimates how long customer gross profit takes to recover what it cost to win the customer. A blended average can hide an expensive channel or weak cohort. Compare incremental acquisition cost, cash collection timing and retention before treating efficient past growth as evidence for a larger budget.",
     "companyInputs": [
       "Acquisition cost and gross-margin-adjusted payback by channel and customer cohort.",
       "Retention, conversion and cash collection timing for the customers being added.",

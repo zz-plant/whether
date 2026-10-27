@@ -16,7 +16,7 @@ import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
-import { formatMarginBand, formatDecisionReversal, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
+import { formatMarginBand, formatDecisionReversal, formatDecisionThreshold, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
@@ -662,7 +662,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     [
       `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)}`,
       `  ${publicDecisionLabels.action}: ${display.sentence(decision.doNow)}`,
-      `  ${publicDecisionLabels.threshold}: ${display.sentence(decision.pauseTrigger)}`,
+      `  ${publicDecisionLabels.threshold}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`,
       `  ${publicDecisionLabels.reversal}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`,
     ].join("\n"),
   );
@@ -712,7 +712,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     [
       `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)}`,
       `  - ${DECISION_CONTRACT_LABELS.slot.action}: ${display.sentence(decision.doNow)}`,
-      `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.sentence(decision.pauseTrigger)}`,
+      `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`,
       `  - ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`,
     ].join("\n"),
   );
