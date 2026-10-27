@@ -406,3 +406,24 @@ a move of one point through it changes what four areas should do. Direction and 
   forecast unless the card says the change it matched was a different one (Stormy to Freezing, not Sunny to
   Freezing) from very different scores (risk appetite 7, not 43).
 
+
+## Inputs that outlived their readers (2026-10-27)
+
+Four things went, each kept alive by a half that survived its other half.
+
+- **A builder kept as "the live half" after its panel was deleted.** `lib/report/interpretationLayer.ts`
+  built a layer for every `?view=` on `/`, and its test called it live because the assembler consumed it.
+  The assembler only stored it on a model field nothing read; the panel had gone on 2026-08-14 and the
+  exports on 2026-10-06, and copy passes kept rewording its sentences after both. It took
+  `companyProfile.ts`, `forecastWeatherLabel`, `buildRunwayPlanFromRequest` and the image card's `?view=`
+  with it. Storing a value is not reading it: follow the field to where something prints it.
+- **A cookie read that nothing writes.** `whether-ticker` was parsed on every request to `/` after its one
+  writer, `/api/config`, was deleted on 2026-09-06, and `/` never used the result. Deleting a writer means
+  grepping its key's readers in the same commit.
+- **A parameter whose only effect is an undrawn field.** The audit called `?sector=` on `/` ignored; it
+  chose the sector row of `history.macroOverlay`, which nothing has drawn since 2026-08-06. The parameter
+  went from `/` and the share preview. The field and the overlay behind it remain (spec §3.4.1).
+- **A token route whose token no reader sees.** `/api/slack/subscribe` minted a token, returned it in JSON
+  and indexed it in KV for `/api/slack/unsubscribe`, and no screen showed it. A route whose required input
+  only the server holds has no client, however well it is tested. Stored records still carry the field and
+  still parse.

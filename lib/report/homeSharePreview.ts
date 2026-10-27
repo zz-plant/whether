@@ -155,7 +155,6 @@ export const loadHomeSharePreview = async (
   const { reportData, snapshot } = await resolvedDependencies.loadWeeklyBriefSnapshot(
     searchParams,
     { route: "/" },
-    { overlaySector: searchParams?.sector },
   );
   const { isFallback, weeklyDecisionCardModel } = snapshot;
 

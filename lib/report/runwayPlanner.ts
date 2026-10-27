@@ -372,19 +372,6 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
   };
 };
 
-export const buildRunwayPlanFromRequest = (
-  request: RunwayPlannerRequest,
-  context: { regime: RegimeKey; posture: PlannerPosture },
-): RunwayPlannerActionOutput => {
-  const plan = buildRunwayPlan({ ...request, ...context });
-
-  return {
-    runwayRisk: plan.runwayRisk,
-    raiseTimingRecommendation: plan.raiseTimingWindow,
-    burnAdjustment: plan.burnAdjustmentRange,
-  };
-};
-
 type RunwayPlanInYourNumbers = {
   /** "Cash runs out around Dec 2027 at today's net burn." Null when nothing is being spent down. */
   runsOut: string | null;

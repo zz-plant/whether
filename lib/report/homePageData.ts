@@ -17,10 +17,10 @@ type HomePageDataDependencies = {
 type HomePageFallbackState = Extract<HomePageReportResult, { ok: false }>;
 
 const HOMEPAGE_REPORT_REVALIDATE_SECONDS = 300;
-// Only historical selection changes the canonical report inputs. Sector and
-// interpretation view are presentation overlays applied by homePageAssembler;
-// including them here fragments the shared five-minute data cache without
-// changing the value it stores.
+// Only historical selection changes the canonical report inputs. Every other
+// key (stage and runway in homePageAssembler, cadence on the page) applies after
+// the read; including one here fragments the shared five-minute data cache
+// without changing the value it stores.
 const HOMEPAGE_DATA_PARAM_KEYS = new Set(["month", "year"]);
 
 /**

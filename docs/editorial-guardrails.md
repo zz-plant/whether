@@ -61,8 +61,9 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   now (`lib/regimePresentation.ts`).
 - **Forecast outcomes render as weather names too** (2026-09-22). `ForecastRegimeLabel`
   (Expansion / Mixed / Scarcity / Defensive, `lib/report/forecastModel.ts`) stays a typed
-  internal layer; `forecastWeatherLabel` is what reaches a reader. Four names for four states
-  was the second vocabulary a reader had to look up.
+  internal layer. Four names for four states was the second vocabulary a reader had to look up.
+  Nothing prints an outcome since the interpretation layer went (2026-10-27), and with it
+  `forecastWeatherLabel`; a surface that prints one again maps it to the weather name.
 - **The stance object is the guidance** (2026-09-23): "this week's guidance", with "weekly
   operating guidance" on first mention in cold surfaces (shares, metadata, answer pages).
   "Guidance" is uncountable: never "a guidance"; rewrite. "The call" is retired, because it

@@ -11,10 +11,11 @@ describe("image brief search params", () => {
       month: "03",
       year: "2026",
       sector: "consumer",
-      view: "sector",
       cadence: "monthly",
       stage: "series-a",
       rateSensitivity: "high",
+      // `view` picked an interpretation layer the card never drew; removed 2026-10-27.
+      view: "sector",
       ticker: "msft",
       utm_source: "ignore-me",
       ref: "ignore-me-too",
@@ -22,7 +23,7 @@ describe("image brief search params", () => {
 
     assert.equal(
       buildImageBriefApiPath(source),
-      "/api/image/brief?month=3&year=2026&sector=consumer&view=sector&cadence=monthly&stage=series-a&ticker=MSFT",
+      "/api/image/brief?month=3&year=2026&sector=consumer&cadence=monthly&stage=series-a&ticker=MSFT",
     );
   });
 
