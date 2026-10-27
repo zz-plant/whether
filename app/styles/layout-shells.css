@@ -289,8 +289,10 @@ a.weather-hub-link-card:hover {
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
   font-weight: 600;
-  font-size: clamp(1.95rem, 1.65rem + 1.35vw, 3rem);
-  line-height: 0.98;
+  /* The page-title step every shell uses (2026-10-27): 24px on a phone, 34px at the
+     widest. It ran 31px to 48px here, while a report page's title was 15px. */
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.1;
   letter-spacing: 0;
   color: var(--app-text);
   text-wrap: balance;
@@ -338,7 +340,9 @@ a.weather-hub-link-card:hover {
 .weather-secondary-section-title {
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
-  font-size: 1.2rem;
+  /* The section-heading step: 22px on a phone, 24px from sm, as every report section. */
+  font-size: 1.375rem;
+  line-height: 1.2;
   font-weight: 600;
   letter-spacing: 0;
   color: var(--app-text);
@@ -484,5 +488,11 @@ a.weather-hub-link-card:hover {
   .weather-hub-link-card,
   .weather-hub-chip {
     transition: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .weather-secondary-section-title {
+    font-size: 1.5rem;
   }
 }

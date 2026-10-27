@@ -45,7 +45,7 @@ export default function ContactPage() {
         {/* No emblem beside the heading (2026-10-09): an editorial-desk drawing
             said nothing the heading and the address do not. */}
         <div className="space-y-2 max-w-xl">
-          <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">Contact</h1>
+          <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">Contact</h1>
           <p className="text-sm text-slate-300">
             Whether is written and maintained by {publisherAuthor.name} — {publisherAuthor.role}.
           </p>

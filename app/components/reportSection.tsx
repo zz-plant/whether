@@ -127,7 +127,7 @@ export function ReportSection({
               accepted here and no route passed one: the title names the
               section, and a small label above it restated it. */}
           <div className="flex items-center gap-1">
-            <HeadingTag id={headingId} className="text-xl font-semibold text-white sm:text-2xl">
+            <HeadingTag id={headingId} className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">
               {title}
             </HeadingTag>
             <SectionAnchor id={id} title={title} />

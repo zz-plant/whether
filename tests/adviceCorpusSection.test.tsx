@@ -24,7 +24,11 @@ describe("the advice corpus section", () => {
   });
 
   it("marks the seven changes in conditions from the record, and names them in the caption", () => {
-    assert.equal((html.match(/data-change="/g) ?? []).length, 7);
+    /* Two drawings of the chart, a phone's and the wide one (2026-10-27), each with every change. */
+    const drawings = html.split("<svg viewBox=").slice(1).filter((svg) => svg.includes("data-change"));
+    assert.equal(drawings.length, 2);
+    for (const drawing of drawings) assert.equal((drawing.match(/data-change="/g) ?? []).length, 7);
+    assert.match(html, /<svg viewBox="0 0 360 [^"]+" class="block h-auto w-full sm:hidden"/, "the phone drawing is 360 units wide");
     for (const change of ["Dec 2018, Sunny to Stormy", "Sep 2022, Stormy to Freezing", "Sep 2026, Sunny to Cloudy"]) assert.ok(html.includes(change), change);
   });
 

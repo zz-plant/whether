@@ -171,7 +171,7 @@ export const SignalsWhatChangedSection = ({
                 <td className="py-2.5 pr-3 max-md:p-0">
                   {/* The column head, on the row itself where the head is hidden: a phone
                       frame of one row read "4.02 → 4.11" with nothing saying since when. */}
-                  <span className="mb-1 block text-fluid-nano text-slate-500 md:hidden">{`Since ${basis.reference}`}</span>
+                  <span className="mb-1 block text-fluid-nano text-slate-400 md:hidden">{`Since ${basis.reference}`}</span>
                   <DeltaChip row={row} />
                   {/* What the score's move is made of. The chip says how far it
                       went; this says which inputs took it there, and that the

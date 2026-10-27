@@ -169,7 +169,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         )}
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{signal.title}: {scenario.title}</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">{signal.title}: {scenario.title}</h1>
         <p className="text-sm text-slate-300">{signal.summary}</p>
         {/* Facts about the reading, not controls: they were two pill buttons,
             the shape every clickable chip on the site uses, and did nothing. */}

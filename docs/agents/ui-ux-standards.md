@@ -829,3 +829,27 @@ and shows them where to look. What the research on images people engage with say
 - SHOULD: point a frame at where the rest is. The running head prints the page's address
   (`whether.work/signals`), short enough to type from a screenshot, and a 2px rule in the week's
   colour, which still says which weather it is when the words are too small to read.
+
+### Sizes that hold at every width (2026-10-27, §1.1.90)
+
+A size audit of eleven routes at 390px and 1440px found the page title the smallest heading on
+four report pages on a phone (15px under 20px sections), page titles at five sizes from 15px to
+48px, section headings at 13px to 26px, 215 pieces of phone text under 12px (29 under 10px, the
+`/concepts` chart's labels at 5px), and the brief's decision lists at 13px. One step per role now:
+
+- MUST: set a page title in `text-fluid-2xl` (24px on a phone, 34px wide) on every shell: the
+  report intro (`CommandCenterNavBlock`), `.weather-secondary-title`, and the reading pages' h1s.
+  The brief's call is the one exception, as its card's headline.
+- MUST: set a section heading at 22px on a phone and 24px from `sm`
+  (`text-[1.375rem] leading-tight sm:text-2xl`; `.weather-secondary-section-title` matches). The
+  brief's own sections step to `text-fluid-xl` from `sm`. A heading styled as a small label
+  (`type-eyebrow` on an h2) is a section heading at the wrong size.
+- MUST: draw nothing on a phone under 12px. `text-fluid-nano` has a 12px floor; the ladder's line
+  numbers are 12px. A chart whose coordinate box is wider than a phone draws a phone version
+  rather than scaling its labels down (`adviceCorpusSection.tsx` draws a 360-unit drawing below
+  `sm`); a fixed-size diagram sets its labels so they render at 10px or more.
+- MUST: set the lines a reader acts on at `text-fluid-sm`, not caption size: the brief's "Conditions
+  change if", "Pause if", "Resume when" and the chosen area's answer.
+- MUST: keep the trust strip's phone line to one short phrase per cell. The basis warning prints
+  its four-word form there (`ScoringBasis.warningShort`, "startup-market inputs left out"); the full
+  sentence from `sm`, and always when a note explains a different published week.

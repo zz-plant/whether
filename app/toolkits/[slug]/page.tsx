@@ -60,7 +60,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       />
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div className="space-y-2 max-w-2xl">
-          <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{toolkit.title}</h1>
+          <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">{toolkit.title}</h1>
           <p className="text-sm text-slate-300">{toolkit.whenToUse}</p>
           {/* How long and who, stated plainly under the title. They were two
               capitalised badges above it, the time in the monospace face, and

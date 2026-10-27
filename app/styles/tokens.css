@@ -8,7 +8,9 @@
   --color-slate-950: #12171a;
   /* The text-fluid-* utilities. --fs-* in :root carries the same values for
      plain CSS rules (.type-label, .type-badge); keep the two in step. */
-  --text-fluid-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
+  /* 12px at the floor (2026-10-27): at 11px the captions, hints and "Governs:" lines
+     were the smallest text a phone drew, in the dimmest ink, under the controls they explain. */
+  --text-fluid-nano: clamp(0.75rem, 0.66rem + 0.15vw, 0.8125rem);
   --text-fluid-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
   --text-fluid-xs: clamp(0.8125rem, 0.7rem + 0.4vw, 0.875rem);
   --text-fluid-sm: clamp(0.875rem, 0.75rem + 0.45vw, 0.9375rem);
@@ -150,7 +152,7 @@
      and the page had no small-text hierarchy at all. The top of the scale is
      widened because lg/xl/2xl previously spanned only 16-20px, which left
      headings reading as body copy. */
-  --fs-nano: clamp(0.6875rem, 0.6rem + 0.15vw, 0.75rem);
+  --fs-nano: clamp(0.75rem, 0.66rem + 0.15vw, 0.8125rem);
   --fs-micro: clamp(0.75rem, 0.65rem + 0.3vw, 0.8125rem);
   --fs-xs: clamp(0.8125rem, 0.7rem + 0.4vw, 0.875rem);
   --fs-sm: clamp(0.875rem, 0.75rem + 0.45vw, 0.9375rem);

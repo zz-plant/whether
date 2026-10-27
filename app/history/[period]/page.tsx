@@ -247,7 +247,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
               link colour) and Stormy in amber (Cloudy's hue). */}
           <Tag regime={period.regime}>{headlineConditions(period)}</Tag>
         </div>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">
           Conditions in {period.title}
         </h1>
         <p className="weather-caveat-mark text-sm text-caveat-fg" data-reconstructed-notice>

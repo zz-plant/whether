@@ -101,25 +101,25 @@ export function CorridorStrip({
 
         {/* Name labels above, each anchored away from its mark and from the
             band, so the three clear one another at the strip's narrowest. */}
-        <text x={resumeX - 6} y={BAR_Y - 13} textAnchor="end" fontSize="10" fill="var(--line-clear-ink)">
+        <text x={resumeX - 6} y={BAR_Y - 13} textAnchor="end" fontSize="11" fill="var(--line-clear-ink)">
           {DECISION_CONTRACT_LABELS.slot.reversal}
         </text>
-        <text x={changeX} y={BAR_Y - 13} textAnchor="middle" fontSize="10" className="fill-slate-300">
+        <text x={changeX} y={BAR_Y - 13} textAnchor="middle" fontSize="11" className="fill-slate-300">
           {DECISION_CONTRACT_LABELS.watch.changeLine}
         </text>
-        <text x={pauseX + 6} y={BAR_Y - 13} textAnchor="start" fontSize="10" fill="var(--line-crossed-ink)">
+        <text x={pauseX + 6} y={BAR_Y - 13} textAnchor="start" fontSize="11" fill="var(--line-crossed-ink)">
           {DECISION_CONTRACT_LABELS.slot.threshold}
         </text>
 
         {/* Values under the marks, and the zoom window's ends, so the domain
             reads on the drawing and not only in the caption. */}
-        <text x={resumeX} y={BAR_Y + BAR_H + 22} textAnchor="middle" fontSize="9.5" className="fill-slate-400 tabular-nums">
+        <text x={resumeX} y={BAR_Y + BAR_H + 22} textAnchor="middle" fontSize="11" className="fill-slate-400 tabular-nums">
           {resumeLine}
         </text>
-        <text x={changeX} y={BAR_Y + BAR_H + 22} textAnchor="middle" fontSize="9.5" className="fill-slate-400 tabular-nums">
+        <text x={changeX} y={BAR_Y + BAR_H + 22} textAnchor="middle" fontSize="11" className="fill-slate-400 tabular-nums">
           {changeLine}
         </text>
-        <text x={pauseX} y={BAR_Y + BAR_H + 22} textAnchor="middle" fontSize="9.5" className="fill-slate-400 tabular-nums">
+        <text x={pauseX} y={BAR_Y + BAR_H + 22} textAnchor="middle" fontSize="11" className="fill-slate-400 tabular-nums">
           {pauseLine}
         </text>
         <text x={PAD} y={BAR_Y + BAR_H + 22} textAnchor="middle" fontSize="9" className="fill-slate-600 tabular-nums">

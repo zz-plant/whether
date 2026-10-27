@@ -345,7 +345,7 @@ export async function buildPlanningPageModel(
          waits for a warning to recheck them against. */
       h("section", { id: "ops-failure-patterns", className: "space-y-3 border-t border-[color:var(--border-default)] pt-8", "aria-labelledby": "ops-failure-patterns-title" },
         h("div", { className: "space-y-1" },
-          h("h2", { id: "ops-failure-patterns-title", className: "text-xl font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings to read before you approve"),
+          h("h2", { id: "ops-failure-patterns-title", className: "text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings to read before you approve"),
           failureModes.length > 0
             ? h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and how to check it.")
             : null,

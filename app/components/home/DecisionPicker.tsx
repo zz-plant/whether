@@ -144,7 +144,7 @@ export function DecisionPicker({
     >
       <div className="space-y-4">
         <div className="space-y-1">
-          <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="text-fluid-xl font-semibold tracking-[-0.015em] text-slate-100">
+          <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="text-[1.375rem] font-semibold leading-tight tracking-[-0.015em] text-slate-100 sm:text-fluid-xl">
             {HOME_SECTIONS.areas.heading}
           </h2>
           {pauseLineCount ? (
@@ -191,7 +191,7 @@ export function DecisionPicker({
                 {active.changed}
               </p>
             ) : null}
-            <dl className="grid max-w-[64ch] gap-x-4 gap-y-2 text-fluid-xs text-slate-200 sm:grid-cols-[auto_1fr] sm:items-baseline">
+            <dl className="grid max-w-[64ch] gap-x-4 gap-y-2 text-fluid-sm text-slate-200 sm:grid-cols-[auto_1fr] sm:items-baseline">
               {active.pause ? (
                 <>
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>

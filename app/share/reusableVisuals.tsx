@@ -5,7 +5,7 @@ import { ActionLink } from "../components/ui/actionLink";
 export function ReusableVisuals({ video, weekLabel }: { video?: BriefVideoAsset; weekLabel?: string }) {
   return (
     <section id="reusable-visuals" className="weather-panel weather-section-stack p-0" aria-labelledby="reusable-visuals-heading">
-      <h2 id="reusable-visuals-heading" className="text-xl font-semibold text-slate-100 sm:text-2xl">Visuals for your next brief</h2>
+      <h2 id="reusable-visuals-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Visuals for your next brief</h2>
       {video && weekLabel ? (
         <details className="border-b border-[color:var(--border-subtle)] pb-4">
           <summary className="weather-hit w-fit cursor-pointer text-fluid-sm font-semibold text-slate-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4">

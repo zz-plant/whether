@@ -203,7 +203,7 @@ export function SharePageFormats({
 
   return (
     <section id="formats" className="weather-panel weather-section-stack p-0" aria-labelledby="copy-call-heading">
-      <h2 id="copy-call-heading" className="text-xl font-semibold text-white sm:text-2xl">Copy this week&apos;s guidance</h2>
+      <h2 id="copy-call-heading" className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">Copy this week&apos;s guidance</h2>
       {/* Labelled and ruled at the left, so the lines read as the readings
           behind every format rather than the opening of the text below. At the
           explanatory floor (§VI, text-fluid-xs) and a reading measure: at 12px

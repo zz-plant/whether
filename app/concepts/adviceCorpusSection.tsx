@@ -67,9 +67,15 @@ function buildModel() {
   return { quarters, changes };
 }
 
-const VIEW_W = 680;
-const PLOT_LEFT = 40;
-const PLOT_RIGHT = 600;
+/*
+ * Two drawings of one chart (2026-10-27). In one 680-unit drawing a phone scaled the
+ * labels to about 5px; no single font size reads at both widths, because SVG text scales
+ * with its box. The phone drawing is 360 units wide, drawn at about 1:1, with 11px labels
+ * and a year every four years; from `sm` the wide one, as before.
+ */
+type ChartLayout = { viewW: number; plotLeft: number; plotRight: number; label: number; tick: number; yearEvery: number };
+const WIDE: ChartLayout = { viewW: 680, plotLeft: 40, plotRight: 600, label: 11, tick: 10, yearEvery: 2 };
+const NARROW: ChartLayout = { viewW: 360, plotLeft: 40, plotRight: 298, label: 11, tick: 11, yearEvery: 4 };
 const TOP_Y = 18;
 const TOP_H = 64;
 const BOTTOM_Y = 112;
@@ -117,26 +123,114 @@ function buildFinding() {
   ];
 }
 
+function CorpusChart({
+  layout,
+  quarters,
+  changes,
+  className,
+}: {
+  layout: ChartLayout;
+  quarters: ReturnType<typeof buildModel>["quarters"];
+  changes: ReturnType<typeof buildModel>["changes"];
+  className: string;
+}) {
+  const firstQuarter = quarters.at(0);
+  if (!firstQuarter) return null;
+  const step = (layout.plotRight - layout.plotLeft) / (quarters.length - 1);
+  const xOf = (index: number) => layout.plotLeft + index * step;
+  const firstYear = Number(firstQuarter.period.slice(0, 4));
+  /* A change is drawn at its month, inside its quarter, so two changes in one year stay apart. */
+  const xOfMonth = (month: string) => {
+    const offset = (Number(month.slice(0, 4)) - firstYear) * 4 + (Number(month.slice(5, 7)) - 1) / 3;
+    return layout.plotLeft + offset * step;
+  };
+  const shareY = (share: number) => BOTTOM_Y + BOTTOM_H - share * BOTTOM_H;
+  const pressureY = (value: number) => TOP_Y + TOP_H - (value / 100) * TOP_H;
+  const pressure = quarters.map((quarter) => quarter.fundingPressure);
+  const pressureArea = `${linePath(pressure, xOf, pressureY)}L${xOf(quarters.length - 1)} ${TOP_Y + TOP_H}L${layout.plotLeft} ${TOP_Y + TOP_H}Z`;
+  const years = quarters.flatMap((quarter, index) => (quarter.period.endsWith("Q1") && Number(quarter.period.slice(0, 4)) % layout.yearEvery === 0 ? [{ year: quarter.period.slice(0, 4), x: xOf(index) }] : []));
+  const lastExpand = [...quarters].reverse().find((quarter) => quarter.expand !== null);
+  const lastIndex = lastExpand ? quarters.indexOf(lastExpand) : -1;
+  const expandLabel = ADVICE_STANCE_DEFINITIONS.expand.label;
+  const conserveLabel = ADVICE_STANCE_DEFINITIONS.conserve.label;
+  return (
+    <svg viewBox={`0 0 ${layout.viewW} ${VIEW_H}`} className={className} aria-hidden="true">
+      <text x={layout.plotLeft} y={TOP_Y - 6} fontSize={layout.label} fill="var(--app-text-muted)">
+        Funding pressure (0–100), quarter average
+      </text>
+      <path d={pressureArea} fill="var(--phase-trace)" opacity="0.28" />
+      <path d={linePath(pressure, xOf, pressureY)} fill="none" stroke="var(--phase-trace)" strokeWidth="1.5" />
+      <line x1={layout.plotLeft} x2={layout.plotRight} y1={pressureY(FUNDING_LINE)} y2={pressureY(FUNDING_LINE)} stroke="var(--phase-boundary)" strokeDasharray="3 3" />
+      <text x={layout.plotRight + 4} y={pressureY(FUNDING_LINE) + 4} fontSize={layout.tick} fill="var(--app-text-muted)">
+        {FUNDING_LINE}
+      </text>
+
+      <text x={layout.plotLeft} y={BOTTOM_Y - 8} fontSize={layout.label} fill="var(--app-text-muted)">
+        Share of posts, firms weighted equally
+      </text>
+      {[0, 0.25, 0.5, 0.75, 1].map((tick) => (
+        <g key={tick}>
+          <line x1={layout.plotLeft} x2={layout.plotRight} y1={shareY(tick)} y2={shareY(tick)} stroke="var(--phase-grid)" />
+          <text x={layout.plotLeft - 6} y={shareY(tick) + 3.5} textAnchor="end" fontSize={layout.tick} fill="var(--app-text-muted)">
+            {`${tick * 100}%`}
+          </text>
+        </g>
+      ))}
+      {changes.map((change) => (
+        <line
+          key={change.month}
+          data-change={change.month}
+          x1={xOfMonth(change.month)}
+          x2={xOfMonth(change.month)}
+          y1={TOP_Y}
+          y2={AXIS_Y}
+          stroke="var(--phase-boundary)"
+          strokeWidth="1"
+        />
+      ))}
+      {/* Ink and dash, not hue: every hue on this site already names a set of conditions or a
+          line state, and the two series are neither. */}
+      <path d={linePath(quarters.map((quarter) => quarter.expand), xOf, shareY)} fill="none" stroke="var(--app-text)" strokeWidth="2" strokeLinejoin="round" />
+      <path
+        d={linePath(quarters.map((quarter) => quarter.conserve), xOf, shareY)}
+        fill="none"
+        stroke="var(--app-text-secondary)"
+        strokeWidth="2"
+        strokeDasharray="5 3"
+        strokeLinejoin="round"
+      />
+      {lastExpand && lastIndex >= 0 ? (
+        <g fontSize={layout.label} fontWeight="600" fill="var(--app-text-secondary)">
+          <text x={xOf(lastIndex) + 6} y={shareY(lastExpand.expand ?? 0) + 4}>
+            {expandLabel}
+          </text>
+          <text x={xOf(lastIndex) + 6} y={shareY(lastExpand.conserve ?? 0) + 4}>
+            {conserveLabel}
+          </text>
+        </g>
+      ) : null}
+      {years.map((tick) => (
+        <text key={tick.year} x={tick.x} y={AXIS_Y + 16} textAnchor="middle" fontSize={layout.tick} fill="var(--app-text-muted)">
+          {tick.year}
+        </text>
+      ))}
+      {/* Hover: one band per quarter, its values in the native tooltip. */}
+      {quarters.map((quarter, index) => (
+        <rect key={quarter.period} x={xOf(index) - step / 2} y={TOP_Y} width={step} height={AXIS_Y - TOP_Y} fill="transparent">
+          <title>
+            {`${quarterLabel(quarter.period)}: ${expandLabel.toLowerCase()} ${percent(quarter.expand)}, ${conserveLabel.toLowerCase()} ${percent(quarter.conserve)} of ${quarter.posts} posts from ${quarter.firms} firms; funding pressure ${quarter.fundingPressure ?? "–"}`}
+          </title>
+        </rect>
+      ))}
+    </svg>
+  );
+}
+
 export function AdviceCorpusSection() {
   const { quarters, changes } = buildModel();
   const finding = buildFinding();
   const firstQuarter = quarters[0];
   if (!firstQuarter || quarters.length < 2) return null;
-  const step = (PLOT_RIGHT - PLOT_LEFT) / (quarters.length - 1);
-  const xOf = (index: number) => PLOT_LEFT + index * step;
-  const firstYear = Number(firstQuarter.period.slice(0, 4));
-  /* A change is drawn at its month, inside its quarter, so two changes in one year stay apart. */
-  const xOfMonth = (month: string) => {
-    const offset = (Number(month.slice(0, 4)) - firstYear) * 4 + (Number(month.slice(5, 7)) - 1) / 3;
-    return PLOT_LEFT + offset * step;
-  };
-  const shareY = (share: number) => BOTTOM_Y + BOTTOM_H - share * BOTTOM_H;
-  const pressureY = (value: number) => TOP_Y + TOP_H - (value / 100) * TOP_H;
-  const pressure = quarters.map((quarter) => quarter.fundingPressure);
-  const pressureArea = `${linePath(pressure, xOf, pressureY)}L${xOf(quarters.length - 1)} ${TOP_Y + TOP_H}L${PLOT_LEFT} ${TOP_Y + TOP_H}Z`;
-  const years = quarters.flatMap((quarter, index) => (quarter.period.endsWith("Q1") && Number(quarter.period.slice(0, 4)) % 2 === 0 ? [{ year: quarter.period.slice(0, 4), x: xOf(index) }] : []));
-  const lastExpand = [...quarters].reverse().find((quarter) => quarter.expand !== null);
-  const lastIndex = lastExpand ? quarters.indexOf(lastExpand) : -1;
   const expandLabel = ADVICE_STANCE_DEFINITIONS.expand.label;
   const conserveLabel = ADVICE_STANCE_DEFINITIONS.conserve.label;
 
@@ -150,75 +244,8 @@ export function AdviceCorpusSection() {
         <p className="sr-only">
           {`Share of posts prescribing expansion and conservation each quarter, ${quarterLabel(firstQuarter.period)} to ${quarterLabel(quarters.at(-1)?.period ?? "")}, with funding pressure on the same dates. The table below has every value.`}
         </p>
-        <svg viewBox={`0 0 ${VIEW_W} ${VIEW_H}`} className="block h-auto w-full max-w-3xl" aria-hidden="true">
-          <text x={PLOT_LEFT} y={TOP_Y - 6} fontSize="11" fill="var(--app-text-muted)">
-            Funding pressure (0–100), quarter average
-          </text>
-          <path d={pressureArea} fill="var(--phase-trace)" opacity="0.28" />
-          <path d={linePath(pressure, xOf, pressureY)} fill="none" stroke="var(--phase-trace)" strokeWidth="1.5" />
-          <line x1={PLOT_LEFT} x2={PLOT_RIGHT} y1={pressureY(FUNDING_LINE)} y2={pressureY(FUNDING_LINE)} stroke="var(--phase-boundary)" strokeDasharray="3 3" />
-          <text x={PLOT_RIGHT + 4} y={pressureY(FUNDING_LINE) + 4} fontSize="10" fill="var(--app-text-muted)">
-            {FUNDING_LINE}
-          </text>
-
-          <text x={PLOT_LEFT} y={BOTTOM_Y - 8} fontSize="11" fill="var(--app-text-muted)">
-            Share of posts, firms weighted equally
-          </text>
-          {[0, 0.25, 0.5, 0.75, 1].map((tick) => (
-            <g key={tick}>
-              <line x1={PLOT_LEFT} x2={PLOT_RIGHT} y1={shareY(tick)} y2={shareY(tick)} stroke="var(--phase-grid)" />
-              <text x={PLOT_LEFT - 6} y={shareY(tick) + 3.5} textAnchor="end" fontSize="10" fill="var(--app-text-muted)">
-                {`${tick * 100}%`}
-              </text>
-            </g>
-          ))}
-          {changes.map((change) => (
-            <line
-              key={change.month}
-              data-change={change.month}
-              x1={xOfMonth(change.month)}
-              x2={xOfMonth(change.month)}
-              y1={TOP_Y}
-              y2={AXIS_Y}
-              stroke="var(--phase-boundary)"
-              strokeWidth="1"
-            />
-          ))}
-          {/* Ink and dash, not hue: every hue on this site already names a set of conditions or a
-              line state, and the two series are neither. */}
-          <path d={linePath(quarters.map((quarter) => quarter.expand), xOf, shareY)} fill="none" stroke="var(--app-text)" strokeWidth="2" strokeLinejoin="round" />
-          <path
-            d={linePath(quarters.map((quarter) => quarter.conserve), xOf, shareY)}
-            fill="none"
-            stroke="var(--app-text-secondary)"
-            strokeWidth="2"
-            strokeDasharray="5 3"
-            strokeLinejoin="round"
-          />
-          {lastExpand && lastIndex >= 0 ? (
-            <g fontSize="11" fontWeight="600" fill="var(--app-text-secondary)">
-              <text x={xOf(lastIndex) + 6} y={shareY(lastExpand.expand ?? 0) + 4}>
-                {expandLabel}
-              </text>
-              <text x={xOf(lastIndex) + 6} y={shareY(lastExpand.conserve ?? 0) + 4}>
-                {conserveLabel}
-              </text>
-            </g>
-          ) : null}
-          {years.map((tick) => (
-            <text key={tick.year} x={tick.x} y={AXIS_Y + 16} textAnchor="middle" fontSize="10" fill="var(--app-text-muted)">
-              {tick.year}
-            </text>
-          ))}
-          {/* Hover: one band per quarter, its values in the native tooltip. */}
-          {quarters.map((quarter, index) => (
-            <rect key={quarter.period} x={xOf(index) - step / 2} y={TOP_Y} width={step} height={AXIS_Y - TOP_Y} fill="transparent">
-              <title>
-                {`${quarterLabel(quarter.period)}: ${expandLabel.toLowerCase()} ${percent(quarter.expand)}, ${conserveLabel.toLowerCase()} ${percent(quarter.conserve)} of ${quarter.posts} posts from ${quarter.firms} firms; funding pressure ${quarter.fundingPressure ?? "–"}`}
-              </title>
-            </rect>
-          ))}
-        </svg>
+        <CorpusChart layout={NARROW} quarters={quarters} changes={changes} className="block h-auto w-full sm:hidden" />
+        <CorpusChart layout={WIDE} quarters={quarters} changes={changes} className="block h-auto w-full max-w-3xl max-sm:hidden" />
         <ul aria-hidden="true" className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-300">
           <li className="flex items-center gap-1.5">
             <svg aria-hidden="true" width="18" height="4" className="shrink-0">

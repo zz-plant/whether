@@ -142,7 +142,7 @@ export function TrackRecordTiles({
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="track-record-heading">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div>
-          <h2 className="text-xl font-semibold text-white sm:text-2xl" id="track-record-heading">Track record</h2>
+          <h2 className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl" id="track-record-heading">Track record</h2>
           <p className="max-w-prose text-sm text-slate-300">
             Every month-end reading Whether has made, scored with the same published formula, so
             you can check each one against what happened next.
@@ -202,7 +202,7 @@ export function TrackRecordTable({
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
       <div>
-        <h2 className="text-xl font-semibold text-white sm:text-2xl" id="monthly-calls-heading">Monthly readings</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl" id="monthly-calls-heading">Monthly readings</h2>
         {/* Defined where it first appears (2026-10-09): the homepage reads two
             scores and never introduces a third, so a reader met this one cold.
             It is kept rather than replaced by the two, because it is not
