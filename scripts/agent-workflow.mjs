@@ -3,35 +3,24 @@
 import {
   buildDoctorReport,
   buildHandoffPacket,
-  buildPrewarmReport,
   classifyTask,
-  classifyTaskWithLocalModel,
   formatDoctorReport,
   formatHandoffPacket,
   formatIndexReport,
-  formatPrewarmReport,
   formatRouteReport,
   writeRepoIndex,
 } from "./agent-workflow-lib.mjs";
 
-const BOOLEAN_FLAGS = new Set([
-  "--help",
-  "-h",
-  "--json",
-  "--local",
-  "--refresh-index",
-  "--skip-index",
-]);
+const BOOLEAN_FLAGS = new Set(["--help", "-h", "--json"]);
 
 function printHelp() {
   console.log(`Whether agent workflow helper
 
 Usage:
   node scripts/agent-workflow.mjs doctor [--task "<task>"] [--path <file>]... [--json]
-  node scripts/agent-workflow.mjs route [--task "<task>" | <task words...>] [--local] [--refresh-index] [--local-base-url <url>] [--local-model <model>] [--local-timeout-ms <ms>] [--json]
+  node scripts/agent-workflow.mjs route [--task "<task>" | <task words...>] [--json]
   node scripts/agent-workflow.mjs handoff --job "<job>" [--task "<task>"] [--why-now "..."] [--done-when "..."] [--skill <name>] [--write-scope <path>]... [--read-anchor <path>]... [--constraint "..."]... [--verify "<command>"]... [--out-of-scope "..."]... [--json]
   node scripts/agent-workflow.mjs index [--out-dir <dir>] [--json]
-  node scripts/agent-workflow.mjs prewarm [--model-role <role>] [--out-dir <dir>] [--skip-index] [--json]
 `);
 }
 
@@ -87,7 +76,7 @@ function fail(message) {
   process.exit(1);
 }
 
-async function main() {
+function main() {
   const parsed = parseArgs(process.argv);
 
   if (!parsed.command || parsed.command === "--help" || parsed.command === "-h" || parsed.command === "help") {
@@ -98,23 +87,8 @@ async function main() {
   const wantsJson = parsed.has("--json");
 
   if (parsed.command === "route") {
-    const task = parsed.get("--task", parsed.positionals.join(" "));
-    const routeResult = parsed.has("--local")
-      ? await classifyTaskWithLocalModel({
-        task,
-        repoRoot: process.cwd(),
-        baseUrl: parsed.get("--local-base-url", process.env.LMSTUDIO_BASE_URL || "http://localhost:1234/v1"),
-        model: parsed.get("--local-model", process.env.LMSTUDIO_FAST_MODEL || "qwen3.5-9b"),
-        timeoutMs: Number(parsed.get("--local-timeout-ms", process.env.LMSTUDIO_ROUTE_TIMEOUT_MS || "4000")),
-        refreshIndex: parsed.has("--refresh-index"),
-      })
-      : { route: classifyTask(task), mode: "keyword-router" };
-
-    console.log(
-      wantsJson
-        ? JSON.stringify(routeResult, null, 2)
-        : formatRouteReport(routeResult.route, routeResult),
-    );
+    const route = classifyTask(parsed.get("--task", parsed.positionals.join(" ")));
+    console.log(wantsJson ? JSON.stringify({ route }, null, 2) : formatRouteReport(route));
     return;
   }
 
@@ -160,21 +134,12 @@ async function main() {
     return;
   }
 
-  if (parsed.command === "prewarm") {
-    const report = buildPrewarmReport({
-      repoRoot: process.cwd(),
-      outDir: parsed.get("--out-dir", ""),
-      skipIndex: parsed.has("--skip-index"),
-      modelRole: parsed.get("--model-role", "fast"),
-    });
-    console.log(wantsJson ? JSON.stringify(report, null, 2) : formatPrewarmReport(report));
-    return;
-  }
-
   fail(`Unknown command: ${parsed.command}`);
 }
 
-main().catch((error) => {
+try {
+  main();
+} catch (error) {
   console.error(error instanceof Error ? error.message : error);
   process.exitCode = 1;
-});
+}

@@ -1,3 +1,4 @@
+import { scaleLinear } from "d3-scale";
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 import { CurveTermsKey, formatSpread } from "./curveTermsKey";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
@@ -81,13 +82,16 @@ export function SignalInversionPreview({
   const numericSpreads = spreadValues.filter((value): value is number => typeof value === "number");
   const spreadMin = numericSpreads.length ? Math.min(...numericSpreads, 0) - 0.1 : -0.5;
   const spreadMax = numericSpreads.length ? Math.max(...numericSpreads, 0) + 0.1 : 0.5;
-  const zeroLineY = CHART_HEIGHT - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * CHART_HEIGHT;
+  const yScale = scaleLinear().domain([spreadMin, spreadMax]).range([CHART_HEIGHT, 0]);
+  const zeroLineY = Number(yScale(0).toFixed(2));
   const spread10Y2YSeries = buildSegmentedLineSeries({
     values: monthlyPoints.map((point) => point.spread10Y2Y),
     width: CHART_WIDTH,
     height: CHART_HEIGHT,
     min: spreadMin,
     max: spreadMax,
+    curve: "monotone",
+    baselineY: zeroLineY,
   });
   const spread2Y3MSeries = buildSegmentedLineSeries({
     values: monthlyPoints.map((point) => point.spread2Y3M),
@@ -95,6 +99,7 @@ export function SignalInversionPreview({
     height: CHART_HEIGHT,
     min: spreadMin,
     max: spreadMax,
+    curve: "monotone",
   });
   const midPoint = monthlyPoints[Math.floor((monthlyPoints.length - 1) / 2)] ?? latest;
   const monthsInverted10Y2Y = countMonthsBelowZero(monthlyPoints.map((point) => point.spread10Y2Y));
@@ -140,12 +145,15 @@ export function SignalInversionPreview({
               />
             ))}
             <line x1="0" y1={zeroLineY} x2={CHART_WIDTH} y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
+            {spread10Y2YSeries.areaPaths.map((areaPath, index) => (
+              <path key={`10-2-area-${index}`} d={areaPath} fill="var(--color-semantic-easing-border)" fillOpacity="0.08" />
+            ))}
 
             {spread10Y2YSeries.paths.map((path, index) => (
               <path key={`10-2-${index}`} d={path} fill="none" stroke="var(--color-semantic-easing-border)" strokeWidth="2" />
             ))}
             {spread2Y3MSeries.paths.map((path, index) => (
-              <path key={`2-3-${index}`} d={path} fill="none" stroke="var(--color-semantic-caution-border)" strokeWidth="2" />
+              <path key={`2-3-${index}`} d={path} fill="none" stroke="var(--app-text-muted)" strokeDasharray="4 3" strokeWidth="2" />
             ))}
             {/* Endpoint dots, no in-plot text. The series labels that sat here were
                 anchored to each line's last point at the right edge — exactly where
@@ -158,7 +166,7 @@ export function SignalInversionPreview({
               <circle cx={spread10Y2YSeries.lastPoint.x} cy={spread10Y2YSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-easing-border)" />
             ) : null}
             {spread2Y3MSeries.lastPoint ? (
-              <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--color-semantic-caution-border)" />
+              <circle cx={spread2Y3MSeries.lastPoint.x} cy={spread2Y3MSeries.lastPoint.y} r="1.8" fill="var(--app-text-muted)" />
             ) : null}
           </svg>
           {/* One caption carries the legend. It was four uppercase chips under
@@ -177,11 +185,11 @@ export function SignalInversionPreview({
           </div>
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-emerald-400" aria-hidden="true" />
+              <span className="w-3 border-t-2 border-[var(--color-semantic-easing-border)]" aria-hidden="true" />
               <span>10Y−2Y <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread10Y2Y ?? null)}</strong></span>
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2 w-2 rounded-full bg-amber-400" aria-hidden="true" />
+              <span className="w-3 border-t-2 border-dashed border-[var(--app-text-muted)]" aria-hidden="true" />
               <span>2Y−3M <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread2Y3M ?? null)}</strong></span>
             </span>
             <span>{monthlyPoints[0]?.label} → {latest?.label}</span>

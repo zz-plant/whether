@@ -13,6 +13,7 @@ import { buildWeeklySummary } from "./summary/weeklySummary";
 import { buildYearlySummary, getYearLabel } from "./summary/yearlySummary";
 import { resolveSiteUrl } from "./siteUrl";
 import { isSavedCopy } from "./report/provenanceStatus";
+import { toScoringBasisPayload } from "./report/scoringBasis";
 
 export const supportedAgentCadences = ["weekly", "monthly", "quarterly", "yearly"] as const;
 
@@ -190,6 +191,8 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
     summary,
     /** The published confidence: the same word and percent the page, `/api/scores` and the CLI carry. */
     confidence,
+    /** Which inputs set the scores, as `get_state` carries it (`toScoringBasisPayload`). */
+    scoringBasis: toScoringBasisPayload(reportData.scoringBasis),
     copy: summary.copy,
     provenance: summary.provenance,
     recordDateLabel: summary.recordDateLabel,
@@ -199,6 +202,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
       isFallback: isSavedCopy(treasury),
       isLive: treasury.isLive,
       fallbackReason: treasury.fallback_reason,
+      macroSeries,
       recordDate: treasury.record_date ?? treasury.fetched_at,
       now,
     }),

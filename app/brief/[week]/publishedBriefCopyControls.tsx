@@ -10,28 +10,52 @@ import {
 import { CopyIcon } from "../../components/uiIcons";
 
 type PublishedBriefCopyControlsProps = {
-  recordDateLabel: string;
+  /** The week as every surface names it, by its Monday. */
+  weekLabel: string;
   slackUpdate: string;
   emailUpdate: string;
+  boardUpdate: string;
   permanentUrl: string;
+  slidePptxUrl?: string;
 };
 
-type ActiveFormat = "slack" | "email";
+type ActiveFormat = "slack" | "email" | "board";
 
 export function PublishedBriefCopyControls({
-  recordDateLabel,
+  weekLabel,
   slackUpdate,
   emailUpdate,
+  boardUpdate,
   permanentUrl,
+  slidePptxUrl,
 }: PublishedBriefCopyControlsProps) {
   const [activeFormat, setActiveFormat] = useState<ActiveFormat>("slack");
   /* The preview opens at a few lines: the copy button is the action, the
      preview is a check on what it copies. At full height it filled the first
      screen of the page every shared link lands on. */
   const [previewOpen, setPreviewOpen] = useState(false);
-  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: (target) => (target === "Slack update" ? "copied_slack" : target === "Email update" ? "copied_email" : "copied_brief") });
+  const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({
+    commitment: (target) =>
+      target === "Slack update"
+        ? "copied_slack"
+        : target === "Email update"
+          ? "copied_email"
+          : "copied_brief",
+  });
 
-  const activeText = activeFormat === "slack" ? slackUpdate : emailUpdate;
+  const activeText =
+    activeFormat === "slack"
+      ? slackUpdate
+      : activeFormat === "email"
+        ? emailUpdate
+        : boardUpdate;
+
+  const formatLabel =
+    activeFormat === "slack"
+      ? "Slack update"
+      : activeFormat === "email"
+        ? "Email update"
+        : "Board memo";
 
   const clipboardState = (target: string) =>
     getClipboardUiState(target, { status, error, activeTarget, copiedTarget });
@@ -49,10 +73,10 @@ export function PublishedBriefCopyControls({
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div>
           <h2 id="share-brief-title" className="text-lg font-semibold text-slate-100">
-            Share the week of {recordDateLabel}
+            Share the week of {weekLabel}
           </h2>
           <p className="text-xs text-slate-400">
-            Copy date-pinned leadership updates into Slack or email.
+            Copy date-pinned leadership updates into Slack, email, or your board deck.
           </p>
         </div>
         <div className="flex gap-2">
@@ -80,6 +104,18 @@ export function PublishedBriefCopyControls({
           >
             Email
           </button>
+          <button
+            type="button"
+            onClick={() => setActiveFormat("board")}
+            aria-pressed={activeFormat === "board"}
+            className={`inline-flex min-h-11 items-center rounded px-3 text-xs font-semibold transition-colors ${
+              activeFormat === "board"
+                ? "bg-purple-500/20 text-purple-300 border border-purple-500/40"
+                : "text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            Board memo
+          </button>
         </div>
       </div>
 
@@ -88,14 +124,12 @@ export function PublishedBriefCopyControls({
           label={
             <span className="inline-flex items-center gap-1.5">
               <CopyIcon className="h-3.5 w-3.5" aria-hidden="true" />
-              Copy {activeFormat === "slack" ? "Slack update" : "Email update"}
+              Copy {formatLabel}
             </span>
           }
-          state={clipboardState(activeFormat === "slack" ? "Slack update" : "Email update")}
-          disabled={isCopyDisabled(activeFormat === "slack" ? "Slack update" : "Email update")}
-          onClick={() =>
-            void handleCopy(activeText, activeFormat === "slack" ? "Slack update" : "Email update")
-          }
+          state={clipboardState(formatLabel)}
+          disabled={isCopyDisabled(formatLabel)}
+          onClick={() => void handleCopy(activeText, formatLabel)}
           buttonVariant="primary"
         />
         <ClipboardActionRow
@@ -110,15 +144,23 @@ export function PublishedBriefCopyControls({
           onClick={() => void handleCopy(permanentUrl, "Permanent link")}
           buttonVariant="pill"
         />
+        {slidePptxUrl ? (
+          <a
+            href={slidePptxUrl}
+            className="weather-button-pill inline-flex min-h-11 items-center gap-1.5 rounded px-3 text-xs font-semibold text-slate-300 hover:text-slate-100"
+            download
+          >
+            Download board slide (.pptx)
+          </a>
+        ) : null}
       </div>
 
       <div className="space-y-2">
-        <div className="flex items-center justify-between text-xs text-slate-400">
-          <span>
-            {activeFormat === "slack" ? "Slack preview" : "Email preview"} ({recordDateLabel})
-          </span>
-          <span className="font-mono text-fluid-nano text-slate-500">Date-pinned record</span>
-        </div>
+        {/* The format alone (2026-10-09): the heading above names the week and
+            the line under it says the copies are date-pinned. */}
+        <p className="text-xs text-slate-400">
+          {activeFormat === "slack" ? "Slack preview" : "Email preview"}
+        </p>
         {/* The clip needs to read as "there is more", not as a rendering fault.
             max-h-64 cuts horizontally through a line of glyphs, and macOS
             overlay scrollbars stay hidden until you scroll, so the block just

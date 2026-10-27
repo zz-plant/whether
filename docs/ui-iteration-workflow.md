@@ -49,9 +49,10 @@ beside the dark one it is compared against instead of overwriting it. The defaul
 Review both before calling a visual change done — the harness could only capture dark until
 2026-09-15, and the light theme accumulated defects nobody had seen.
 
-`--visitor returning` captures the homepage a reader sees after their first visit. The layout
-bootstrap folds `/` behind the first-visit picker unless the browser has stored a week before,
-so a plain capture is always the first-visit fold. This flag seeds last week's slug and writes
+`--visitor returning` captures the homepage a reader sees after their first visit. Since
+2026-10-09 the page has one order for every reader; the only difference is the one-line
+conditions legend above the week, which the layout hides for a browser that has stored a week
+before. This flag seeds last week's slug and writes
 `<id>-returning.png` (and `<id>-returning-light.png` with `--theme light`) with its own gallery
 and manifest. Until 2026-10-05 no capture had shown the returning reader's page, and it drew the
 same two score ladders three times. Other routes render the same either way.

@@ -53,8 +53,7 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
 
 ## Decision vocabulary (single source)
 - **Regime names render as weather everywhere visible**: Freezing / Cloudy / Stormy / Sunny.
-  Source is `lib/regimePresentation.ts` (`REGIME_WEATHER_LABELS`, aliased by
-  `REGIME_PUBLIC_LABELS`). Concept keys (SCARCITY/DEFENSIVE/VOLATILE/EXPANSION) stay
+  Source is `lib/regimePresentation.ts` (`REGIME_LABELS`, the one label table). Concept keys (SCARCITY/DEFENSIVE/VOLATILE/EXPANSION) stay
   internal — they are engine terms, not display copy. Compass quadrant axes are the one
   defined exception (axis labels).
 - **There is no separate posture-description layer.** `getRegimeDisplayLabel` used to return
@@ -62,8 +61,9 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   now (`lib/regimePresentation.ts`).
 - **Forecast outcomes render as weather names too** (2026-09-22). `ForecastRegimeLabel`
   (Expansion / Mixed / Scarcity / Defensive, `lib/report/forecastModel.ts`) stays a typed
-  internal layer; `forecastWeatherLabel` is what reaches a reader. Four names for four states
-  was the second vocabulary a reader had to look up.
+  internal layer. Four names for four states was the second vocabulary a reader had to look up.
+  Nothing prints an outcome since the interpretation layer went (2026-10-27), and with it
+  `forecastWeatherLabel`; a surface that prints one again maps it to the weather name.
 - **The stance object is the guidance** (2026-09-23): "this week's guidance", with "weekly
   operating guidance" on first mention in cold surfaces (shares, metadata, answer pages).
   "Guidance" is uncountable: never "a guidance"; rewrite. "The call" is retired, because it
@@ -83,7 +83,7 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   Resume when, and the line where conditions themselves change is Conditions change if. "Change
   course if" and "Re-open when" are retired (2026-09-22): the first read as the guidance changing,
   which it named only on some surfaces, and the second was a third name for the resume line.
-  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports remain Action / Threshold / Reversal. Consume these
+  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports are Action / Pause line / Resume line ("Threshold" and "Reversal" were retired on 2026-10-09, with "boundary" and "trigger" for the same lines). Consume these
   exports instead of hardcoding slot words in components. Per-area bounded rules now render on
   `/operate` ("Rules by area"). The homepage scan ledger was deleted with `ThreeWhethersCard`
   (2026-09-01), and `ACTION_STRIP_DISPLAY_COPY` went with it. Its vocabulary is retired: do not
@@ -112,18 +112,26 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
 - **The product noun is "Whether Weekly Brief"** (short "Weekly Brief", casual "the
   brief"). "Report" stays internal (function names, keys, docs). User-visible,
   shareable, and metadata surfaces must not print "Whether Report".
-- **Axis names use a two-form rule** (full name / short name) per signal key: Cash
-  availability / Tightness; Risk appetite / Appetite; Yield curve slope / Yield curve.
-  Pick one canonical form per slot (full in the hero, threshold ladder, exports, and SEO;
-  short in inline metrics); never a third spelling. A lone "Tightness" or "Appetite"
-  always expands to its full axis name, and the tightness watch line is always
-  "Funding pressure watch".
+- **Signal names are Funding pressure, Risk appetite and Recession warning gauge**
+  (2026-10-09), in full on charts and in inline metrics alike; "Capital tightness",
+  "Pressure" and "Appetite" alone are retired. The three watch pages keep their slugs
+  (`capital-tightness-watch`, `risk-appetite-watch`, `yield-curve-flip-watch`) and are titled
+  "Funding pressure watch", "Risk appetite watch" and "Recession warning gauge watch".
+- **The five areas are Hiring, Roadmap, Fundraising, Spending and New bets**
+  (`decisionAreaLabel`). Slugs (`product-tempo`, `capital-raising`, `burn-discipline`,
+  `expansion-bets`) are contracts and stay; no surface prints them or a verb-phrase stand-in
+  ("Raise money", "Approve new spend"). `tests/readerVocabulary.test.tsx` bans the retired names.
 - **The call has three bounded-state markers**: certainty (input confidence), flip, and
   transition. "Flip" is the call/decision reversal (bounded decision slot "Reversal");
   "transition" is the forecast-outcome change (stuck forecast indicators). If they
   diverge, flip describes the call reversal, transition describes forecast changes.
-- **Confidence is "Confidence", not "Call certainty"** on screens and gauges. "Certainty"
-  is retired; do not reintroduce it as a user-facing label.
+- **The distance from a change line is the "Margin"** on screens, gauges, pastes and email
+  (2026-10-09): "Clear of the line", "Within reach of the line", "Close to the line", with the
+  nearer score's points where the surface holds them. "Confidence" (and "Call certainty"
+  before it) are retired as reader labels: the number is a distance, not a probability
+  (`/calibration`), and "Confidence: Low" beside "Freeze new commitments" read as the product
+  doubting its own advice. API and JSON fields keep `confidence`; the mapping is in
+  `docs/developer/api-reference.md`.
 
 ## Headings (h1–h4, eyebrows, section labels)
 
@@ -161,3 +169,30 @@ inventory of every heading in `app/`:
 - **Counts and states live in a badge, not the heading.** "3 DECISIONS NEED ATTENTION" became
   "Decisions to reconsider" with a count badge beside it, and a zero state never asserts a
   problem.
+
+## Sentence shape (2026-10-09)
+
+From a line-editing pass over every rendered string, run the way it was run on the owner's other
+sites. `tests/readerClauseShapes.test.tsx` holds the first two rules; the rest are for review.
+
+- **A list is one kind of phrase.** All noun phrases or all wh-clauses, or a full sentence. "Look
+  up what the guidance said in any past month, and how it held up." and "This week's guidance, why
+  it changed, and how much to trust it." stapled a wh-clause onto something else. A real question
+  ending in "?" is fine.
+- **A gloss is printed once.** Define a term the first time a page uses it and drop the repeats;
+  "79 (money is hard to raise) then and is 90 (money is hard to raise) now" said it twice. A
+  reading goes after the rule as its own sentence ("… is above 76 or …. Funding pressure is 90
+  now."), not in parentheses inside it.
+- **Each block adds information.** An area summary below a condition stamp names the held areas
+  without repeating the weather label. A guide's body develops its summary with examples or
+  instructions; do not append generic essays or a second forwardable summary. A template asks
+  for the reader's inputs without repeating the definitions above it. When shortening a resource
+  article heading, keep its old section link in the content's optional `anchor` field.
+- **A clause sits next to its noun.** "Venture-backed U.S. companies with one to two years of
+  runway, whose next raise depends on what capital costs" read the raise onto the runway; it is
+  "… and a next raise that depends on what capital costs". Where moving it reads worse, split it
+  into its own sentence.
+- **One idea per sentence.** A ", which…" or ", where…" aside on the end, a ", meaning…" tail, a
+  dash aside in the middle, or 30+ words carrying two ideas: split it.
+- **Not staccato.** Splitting stops at one idea per sentence; a page of five-word sentences is as
+  hard to read as a page of clauses.

@@ -17,14 +17,14 @@
   overflow: hidden;
   isolation: isolate;
   background:
-    linear-gradient(180deg, rgba(71, 85, 105, 0.28), rgba(30, 41, 59, 0.22));
+    linear-gradient(180deg, color-mix(in srgb, var(--app-text-muted) 22%, transparent), color-mix(in srgb, var(--app-text-muted) 14%, transparent));
 }
 
 .weather-skeleton__shimmer {
   position: absolute;
   inset: -40% -20%;
   background:
-    linear-gradient(90deg, transparent 0%, rgba(191, 219, 254, 0.08) 25%, rgba(191, 219, 254, 0.14) 37%, rgba(191, 219, 254, 0.08) 50%, transparent 75%);
+    linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--app-text) 6%, transparent) 25%, color-mix(in srgb, var(--app-text) 11%, transparent) 37%, color-mix(in srgb, var(--app-text) 6%, transparent) 50%, transparent 75%);
   background-size: 200% 100%;
   animation: weather-shimmer 1.8s ease-in-out infinite;
   will-change: background-position;
@@ -42,4 +42,23 @@
   .weather-skeleton__shimmer {
     animation: none;
   }
+}
+
+/* The caveat mark: an outlined diamond, the shape of a warning sign, before
+   anything that says "read this reading with care" (cached sources, a
+   scoring note, an archived week, guidance held back). Its own shape because
+   each round mark already means something: a filled dot is lit (a chosen
+   key, live sources), a hollow ring is where a reading was, a dashed ring is
+   a score close to its line (§XIV, §XXIV). Inherits the text colour, so it is
+   ink like the caveat it marks, never the crossed red. */
+.weather-caveat-mark::before {
+  content: "";
+  display: inline-block;
+  flex: none;
+  width: 0.4375rem;
+  height: 0.4375rem;
+  margin-right: 0.5rem;
+  border: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  vertical-align: 0.0625rem;
 }

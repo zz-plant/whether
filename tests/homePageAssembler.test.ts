@@ -27,7 +27,7 @@ describe("assembleHomePage streaming contract", () => {
   it("uses the same degradation rules in the shell and audit workspace", async () => {
     const data = buildReportDataFixture({
       sourceHealth: [
-        { sourceName: "Treasury", cadenceLabel: "Intraday rates", freshnessStatus: "stale", freshnessSlaHours: 6, lastSuccessfulFetchAt: "2026-09-22T13:07:00Z", ageLabel: "2d", activeFallbackReason: null, mode: "live", expectsLive: true },
+        { sourceName: "Treasury", cadenceLabel: "Daily rates", freshnessStatus: "stale", freshnessSlaHours: 26, lastSuccessfulFetchAt: "2026-09-22T13:07:00Z", ageLabel: "2d", activeFallbackReason: null, mode: "live", expectsLive: true },
         { sourceName: "Startup/private markets", cadenceLabel: "Curated snapshot", freshnessStatus: "fresh", freshnessSlaHours: 1080, lastSuccessfulFetchAt: "2026-09-01T00:00:00Z", ageLabel: "23d", activeFallbackReason: null, mode: "snapshot", expectsLive: false },
       ],
     });
@@ -96,7 +96,7 @@ describe("assembleHomePage streaming contract", () => {
     assert.equal(workspaceModel.workspaceActions.auditHref, "#audit-this-call");
     assert.equal(workspaceModel.operations.continueHref, "/operate#ops-monthly-action-summary");
     assert.match(workspaceModel.translate.primaryPath.href, /^\/resolve\//);
-    assert.equal(workspaceModel.translate.fallbackUtility.href, "/resolve#direct-answers");
+    assert.equal(workspaceModel.translate.fallbackUtility.href, "/resources#answers");
     assert.ok(workspaceModel.translate.toolkitShortcuts.length > 0);
   });
 
@@ -142,22 +142,6 @@ describe("assembleHomePage streaming contract", () => {
     assert.ok(diagnosticsLane.immediateDecision.length > 0);
     assert.ok(workspaceModel.workspaceActions.auditHref);
     assert.equal(postureStateCalls, 1, "enrichment ran more than once");
-  });
-
-  it("parses interpretation view from search params without changing the canonical weekly call", async () => {
-    const homepage = await assembleHomePage(
-      { searchParams: { view: "forecast", month: "3", year: "2026" } },
-      {
-        loadHomePageReportData: async () => buildReportResult(),
-        buildPostureState: async () => postureState,
-      },
-    );
-
-    assert.equal(homepage.interpretationLayer.view, "forecast");
-    assert.equal(homepage.interpretationSearchParams?.view, "forecast");
-    assert.equal(homepage.interpretationSearchParams?.month, "3");
-    assert.match(homepage.interpretationLayer.summary, /how likely conditions are to change/i);
-    assert.match(homepage.weeklyDecisionCardModel.decision.immediateDecision, /stage|revise|hold/i);
   });
 
   it("calibrates the brief to the stage cookie when the URL names none, and lets the URL win", async () => {

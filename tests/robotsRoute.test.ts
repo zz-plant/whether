@@ -1,40 +1,90 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { renderToStaticMarkup } from "react-dom/server";
 import robots from "../app/robots";
+import ApiDocsPage from "../app/api-docs/page";
 import { GET as llmsTxt } from "../app/llms.txt/route";
+import { GET as llmsFullTxt } from "../app/llms-full.txt/route";
+import { agentManifestResponse } from "../lib/agentManifest";
+import { siteUrl } from "../lib/siteUrl";
 
 /*
- * robots.txt closes `/api/` and opens named paths. llms.txt is the document
- * that tells agents which API paths to call. The two drifted: llms.txt led with
- * `/api/mcp` while robots.txt disallowed it. This holds them together.
+ * robots.txt closes `/api/` and opens named paths. Three documents tell agents and developers
+ * which API paths to call: `/llms.txt`, the agent manifest and `/api-docs`. The allow list was
+ * checked against llms.txt alone, so the manifest's own endpoints and half of `/api-docs` were
+ * advertised and disallowed at once. This holds every one of them to the rules each crawler
+ * group is given.
  */
-describe("robots.txt against llms.txt", () => {
+describe("robots.txt against every document that advertises an API path", () => {
   const rule = robots().rules;
-  const rules = Array.isArray(rule) ? rule : [rule];
-  const prefixes = (value: string | string[] | undefined) =>
-    (Array.isArray(value) ? value : value ? [value] : []);
-  const allow = rules.flatMap((entry) => prefixes(entry.allow));
-  const disallow = rules.flatMap((entry) => prefixes(entry.disallow));
+  const groups = Array.isArray(rule) ? rule : [rule];
+  const prefixes = (value: string | string[] | undefined) => (Array.isArray(value) ? value : value ? [value] : []);
 
   /* Robots semantics: the most specific matching rule wins, allow or disallow. */
   const longestMatch = (path: string, candidates: string[]) =>
     candidates.filter((prefix) => path.startsWith(prefix)).reduce((best, prefix) => Math.max(best, prefix.length), 0);
-  const isAllowed = (path: string) => longestMatch(path, allow) > longestMatch(path, disallow);
+  const isAllowed = (path: string) =>
+    groups.every((group) => longestMatch(path, prefixes(group.allow)) > longestMatch(path, prefixes(group.disallow)));
 
-  it("allows every /api path that llms.txt advertises", async () => {
-    const body = await (await llmsTxt()).text();
-    const advertised = new Set(
-      [...body.matchAll(/(?:https?:\/\/[^/\s]+)?(\/api\/[a-z0-9/_-]+)/gi)].map((match) => match[1]),
+  /* This site's paths, relative or under its origin; another site's `/api/` is its own robots.txt's. */
+  const apiPathsIn = (text: string) =>
+    new Set(
+      [...text.matchAll(/(https?:\/\/[^/\s"]+)?(\/api\/[a-z0-9/_-]+)/gi)].flatMap(([, origin, path]) =>
+        path !== undefined && (origin === undefined || origin === siteUrl) ? [path] : [],
+      ),
     );
 
-    assert.ok(advertised.has("/api/mcp"), "llms.txt still advertises /api/mcp");
-    for (const path of advertised) {
-      assert.ok(isAllowed(path), `${path} is advertised in llms.txt but disallowed by robots.txt`);
+  const assertAllAllowed = (paths: Set<string>, source: string) => {
+    for (const path of paths) {
+      assert.ok(isAllowed(path), `${path} is advertised in ${source} but disallowed by robots.txt`);
     }
+  };
+
+  it("allows every /api path that llms.txt and llms-full.txt advertise", async () => {
+    const llms = apiPathsIn(await (await llmsTxt()).text());
+    assert.ok(llms.has("/api/mcp"), "llms.txt still advertises /api/mcp");
+    assert.ok(llms.has("/api/cli/status"), "llms.txt advertises the CLI's status endpoint");
+    assertAllAllowed(llms, "llms.txt");
+    assertAllAllowed(apiPathsIn(await (await llmsFullTxt()).text()), "llms-full.txt");
   });
 
-  it("keeps the rest of /api closed", () => {
-    assert.ok(!isAllowed("/api/telemetry/web-vitals"));
-    assert.ok(!isAllowed("/api/health"));
+  it("allows every endpoint and every other /api URL the agent manifest names", async () => {
+    const manifest = await agentManifestResponse().json();
+    const endpoints = Object.values<string>(manifest.endpoints).map((url) => new URL(url).pathname);
+    assert.ok(endpoints.includes("/api/weekly") && endpoints.includes("/api/treasury"));
+    for (const path of endpoints) {
+      assert.ok(isAllowed(path), `the manifest's endpoint ${path} is disallowed by robots.txt`);
+    }
+    assertAllAllowed(apiPathsIn(JSON.stringify(manifest)), "the agent manifest");
+  });
+
+  it("allows every /api path /api-docs documents or links", () => {
+    const paths = apiPathsIn(renderToStaticMarkup(ApiDocsPage()));
+    for (const expected of ["/api/cli/status", "/api/embed", "/api/image/brief-screenshot", "/api/badge", "/api/decision"]) {
+      assert.ok(paths.has(expected), `/api-docs documents ${expected}`);
+    }
+    assertAllAllowed(paths, "/api-docs");
+  });
+
+  it("keeps the monitor, telemetry and every cron or admin route closed", async () => {
+    const manifest = await agentManifestResponse().json();
+    assert.ok(!("health" in manifest.endpoints), "the manifest does not advertise the monitor's probe");
+
+    for (const path of [
+      "/api/health",
+      "/api/telemetry/web-vitals",
+      "/api/check-regime-change",
+      "/api/ingest",
+      "/api/email/send-weekly",
+      "/api/brief/slack/deliver",
+      "/api/decision-events",
+      "/api/alert-deliveries",
+      "/api/month-end-pulse",
+      "/api/push",
+      "/api/webhooks/slack/actions",
+      "/api/weekly-digest",
+    ]) {
+      assert.ok(!isAllowed(path), `${path} stays closed`);
+    }
   });
 });

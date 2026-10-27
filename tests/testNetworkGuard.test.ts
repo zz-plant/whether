@@ -1,12 +1,16 @@
-import { requestUrl } from "./fixtures/requestTarget";
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { readFile } from "node:fs/promises";
 import { existsSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { createServer } from "node:http";
+import type { AddressInfo } from "node:net";
 import path from "node:path";
+import { createGuardedFetch } from "bun-test-network-guard";
 import { getDefaultIngestionStore } from "../lib/ingestion/store";
-import { createGuardedFetch, isLocalTarget, redactTarget, targetUrl } from "../scripts/network-guard.lib";
 import { suiteNetworkGuard } from "../scripts/test-network-guard";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /**
  * The suite runs offline by default.
@@ -24,123 +28,34 @@ import { suiteNetworkGuard } from "../scripts/test-network-guard";
  * "a test about writes has to serve its own upstreams" — and the guard makes it the
  * default rather than something each test has to remember.
  *
- * These cases test the guard's own logic rather than the live `globalThis.fetch`. Bun
- * runs every file in one process and the gate shuffles their order, so a test that
- * asserted on the global would be asserting on whatever the previously-run file left
- * behind.
+ * The guard itself — what counts as loopback, the origin-only error, the one-time
+ * explanation — is the `bun-test-network-guard` package and is tested there. What stays
+ * here is this suite's wiring, and the fixture its files use to declare an upstream
+ * unreachable. The only live `globalThis.fetch` asserted on is the one this file installs
+ * at the top: Bun runs every file in one process and the gate shuffles their order, so
+ * anything else would be whatever the previously-run file left behind.
  */
 describe("test network guard", () => {
-  const alwaysLocal: typeof fetch = async () => new Response("local");
-
-  const guarded = (passThrough: typeof fetch = alwaysLocal) => {
-    const explained: string[] = [];
-    return { fetch: createGuardedFetch(passThrough, (text) => explained.push(text), suiteNetworkGuard), explained };
-  };
-
-  it("blocks an outbound host and names it", async () => {
-    const { fetch: guardedFetch } = guarded();
-
-    await assert.rejects(
-      () => guardedFetch("https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"),
-      /blocked outbound fetch to https:\/\/fred\.stlouisfed\.org/,
-    );
-  });
-
-  /*
-   * The message reaches test output and, in the deploy gate, a build log. Several URLs
-   * here are credentials outright: SLACK_WEBHOOK_URL and PREMIUM_FUNNEL_WEBHOOK_URL carry
-   * their secret in the path, and lib/premiumFunnel.ts hands one straight to the global
-   * fetch this guard wraps. So the message names the origin and drops everything after it
-   * — right by construction, where a path-scrubbing heuristic would have to keep being
-   * right about every shape of secret added later.
-   */
-  it("names a blocked upstream without repeating its credentials", async () => {
-    const slackWebhook = "https://hooks.slack.com/services/T00000000/B00000000/xoxbSuperSecretToken";
-    const { fetch: guardedFetch } = guarded();
-
-    const error = await guardedFetch(slackWebhook).then(
-      () => null,
-      (reason: unknown) => (reason instanceof Error ? reason.message : String(reason)),
-    );
-
-    assert.ok(error, "a webhook URL must still be blocked");
-    assert.match(error, /https:\/\/hooks\.slack\.com/, "the origin is what makes the message actionable");
-    for (const secret of ["xoxbSuperSecretToken", "T00000000", "B00000000", "/services/"]) {
-      assert.ok(!error.includes(secret), `the message leaked ${secret}`);
-    }
-  });
-
-  it("keeps the origin and drops path, query, fragment and userinfo", () => {
-    assert.equal(redactTarget("https://hooks.slack.com/services/T0/B0/secret"), "https://hooks.slack.com");
-    assert.equal(redactTarget("https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"), "https://fred.stlouisfed.org");
-    assert.equal(redactTarget("https://example.com/x#tok=abc"), "https://example.com");
-    assert.equal(redactTarget("https://user:pa55word@example.com/x"), "https://example.com");
-    // A non-default port distinguishes two upstreams on one host, so it is part of the origin.
-    assert.equal(redactTarget("https://example.com:8443/x"), "https://example.com:8443");
-    // Never fall back to echoing something unparseable.
-    assert.equal(redactTarget("::: not a url :::"), "an unparseable URL");
-  });
-
-  it("explains how to serve the upstream once, not on every call", async () => {
-    const { fetch: guardedFetch, explained } = guarded();
-
-    for (let attempt = 0; attempt < 3; attempt += 1) {
-      await guardedFetch("https://home.treasury.gov/resource-center").catch(() => {});
-    }
-
-    assert.equal(explained.length, 1, "a caught-and-logged error must not reprint the guidance");
-    assert.match(explained[0] ?? "", /fixtureFetch/);
-    assert.match(explained[0] ?? "", /WHETHER_TEST_ALLOW_NETWORK=1/);
-  });
-
-  // tests/whetherCli.test.ts starts a server and points the CLI at it. That is the
-  // suite serving its own upstream, which is the thing the guard exists to encourage.
-  it("lets a test reach a server the suite itself started", async () => {
-    const seen: string[] = [];
-    const recordingFetch: typeof fetch = async (input) => {
-      seen.push(requestUrl(input));
-      return new Response("local");
-    };
-    const { fetch: guardedFetch } = guarded(recordingFetch);
-
-    for (const url of ["http://127.0.0.1:4321/api/ping", "http://localhost:3000/api/health", "/api/relative"]) {
-      assert.equal((await guardedFetch(url)).status, 200);
-    }
-
-    assert.equal(seen.length, 3);
-  });
-
-  it("judges loopback by host, not by substring", () => {
-    for (const local of ["http://127.0.0.1:80/x", "http://127.9.9.9/x", "http://localhost/x", "http://[::1]/x"]) {
-      assert.equal(isLocalTarget(local), true, local);
-    }
-    // The ones a looser check would wave through: a real host that merely mentions
-    // loopback, or carries it somewhere other than the host.
-    for (const remote of [
-      "https://localhost.fred.stlouisfed.org/x",
-      "https://example.com/proxy?to=127.0.0.1",
-      "https://127.0.0.1.example.com/x",
-    ]) {
-      assert.equal(isLocalTarget(remote), false, remote);
-    }
-  });
-
-  it("reads the target out of every shape fetch accepts", () => {
-    assert.equal(targetUrl("https://example.com/a"), "https://example.com/a");
-    assert.equal(targetUrl(new URL("https://example.com/b")), "https://example.com/b");
-    assert.equal(targetUrl(new Request("https://example.com/c")), "https://example.com/c");
-  });
-
   it("is preloaded for every bun test, including one that bypasses the runner", async () => {
     const bunfig = await readFile("bunfig.toml", "utf8");
     assert.match(bunfig, /\[test\]/);
     assert.match(bunfig, /preload\s*=\s*\[".\/scripts\/test-network-guard\.ts"\]/);
   });
 
-  it("keeps an escape hatch for deliberately exercising a real upstream", async () => {
-    const guard = await readFile("scripts/test-network-guard.ts", "utf8");
-    assert.match(guard, /process\.env\.WHETHER_TEST_ALLOW_NETWORK === "1"/);
-    assert.match(guard, /if \(!ALLOW_NETWORK\)/);
+  it("tells a blocked test where this suite keeps its fixtures and how to open the network", async () => {
+    const explained: string[] = [];
+    const guardedFetch = createGuardedFetch(
+      async () => new Response("local"),
+      (text) => explained.push(text),
+      suiteNetworkGuard,
+    );
+
+    await assert.rejects(
+      () => guardedFetch("https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10"),
+      /blocked outbound fetch to https:\/\/fred\.stlouisfed\.org$/,
+    );
+    assert.match(explained[0] ?? "", /fixtureFetch/);
+    assert.match(explained[0] ?? "", /WHETHER_TEST_ALLOW_NETWORK=1/);
   });
 });
 
@@ -170,6 +85,34 @@ describe("test ingestion directory", () => {
     } finally {
       if (previous === null) rmSync(file, { force: true });
       else writeFileSync(file, previous, "utf8");
+    }
+  });
+});
+
+/*
+ * The 48 files that assert on the fallback call `serveUnreachableUpstreams()`, which
+ * answers for the upstream instead of leaving the refusal to the guard. This file calls it
+ * too, at the top, so its fetch is the one these cases see.
+ */
+describe("an upstream the test declares unreachable", () => {
+  it("rejects as an unreachable host does, naming only the origin", async () => {
+    await assert.rejects(
+      () => fetch("https://fred.stlouisfed.org/graph/fredgraph.csv?id=DGS10&api_key=secret"),
+      (error: unknown) =>
+        error instanceof TypeError &&
+        error.message === "fetch failed: https://fred.stlouisfed.org is unreachable in this test",
+    );
+  });
+
+  it("still reaches a server the test started", async () => {
+    const server = createServer((_request, response) => response.end("served"));
+    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
+    try {
+      const address: AddressInfo | string | null = server.address();
+      assert.ok(address && typeof address === "object", "the server is listening on a port");
+      assert.equal(await (await fetch(`http://127.0.0.1:${address.port}/`)).text(), "served");
+    } finally {
+      await new Promise((resolve) => server.close(resolve));
     }
   });
 });

@@ -5,7 +5,7 @@ import { AreaTable } from "../app/components/ui/areaTable";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
 import type { RegimeKey } from "../lib/regimeEngine";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
-import { areaLinesFromRules, buildChangedLead, buildDecisionMovement } from "../lib/report/decisionMovement";
+import { areaLinesFromRules, buildDecisionMovement, describeMovementCause } from "../lib/report/decisionMovement";
 import { buildHomeAreaRows } from "../lib/report/home/homeSectionModel";
 
 /*
@@ -47,13 +47,13 @@ describe("the by-area Changed column", () => {
     const { rows } = week({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
     const byArea = new Map(rows.map((row) => [row.area, row]));
 
-    assert.equal(byArea.get("burn-discipline")?.changed, "Pause now applies: funding pressure rose through 76.");
-    assert.equal(byArea.get("product-tempo")?.changed, "Pause now applies: risk appetite fell through 44.");
+    assert.equal(byArea.get("burn-discipline")?.changed, "Pause now applies: funding pressure rose above 76.");
+    assert.equal(byArea.get("product-tempo")?.changed, "Pause now applies: risk appetite fell below 44.");
     assert.ok(rows.every((row) => row.changedKind === "paused"));
 
     const html = renderTable(rows);
     assert.match(html, /<th[^>]*>Changed<\/th>/);
-    assert.match(html, /Pause now applies: funding pressure rose through 76\./);
+    assert.match(html, /Pause now applies: funding pressure rose above 76\./);
     assert.doesNotMatch(html, /Re-check|Look at the roadmap again/, "the fixed re-check sentences are gone");
   });
 
@@ -62,21 +62,22 @@ describe("the by-area Changed column", () => {
     const { rows } = week({ from: { tightness: 60, riskAppetite: 60 }, to: { tightness: 80, riskAppetite: 60 }, regime: "DEFENSIVE" });
     const byArea = new Map(rows.map((row) => [row.area, row]));
 
-    assert.equal(byArea.get("product-tempo")?.changed, "No line crossed since Aug 31.");
+    // The roadmap held past its resume line, and says so.
+    assert.equal(byArea.get("product-tempo")?.changed, "Resume line still met: no line crossed since Aug 31.");
     assert.equal(byArea.get("product-tempo")?.changedKind, "held");
     assert.equal(byArea.get("hiring")?.changedKind, "paused");
-    assert.match(renderTable(rows), /No line crossed since Aug 31\./);
+    assert.match(renderTable(rows), /Resume line still met: no line crossed since Aug 31\./);
   });
 
-  it("draws no column on a week nothing crossed a line: the lead says it once", () => {
+  /* On a week no line was crossed the card's line under the call says so once
+     (`describeMovementCause`), so no row repeats it. */
+  it("draws no column on a week nothing crossed a line", () => {
     const { rows, movement } = week({ from: { tightness: 77, riskAppetite: 42 }, to: { tightness: 85, riskAppetite: 39 }, regime: "SCARCITY" });
 
     assert.ok(rows.every((row) => row.changed === undefined && row.changedKind === undefined));
     assert.doesNotMatch(renderTable(rows), /<th[^>]*>Changed<\/th>/);
-    assert.equal(
-      buildChangedLead({ movement, quietDayLine: null, fallback: "unused" }),
-      "Conditions held steady since Aug 31; no pause or resume line was crossed. Last week's guidance stands.",
-    );
+    assert.ok(movement);
+    assert.equal(describeMovementCause(movement), "No score crossed a pause or resume line since Aug 31.");
   });
 
   it("carries no claim where nothing was compared", () => {
@@ -84,30 +85,5 @@ describe("the by-area Changed column", () => {
     const rows = buildHomeAreaRows({ decisionRules, movement: null, scores: { tightness: 90, riskAppetite: 43 } });
 
     assert.ok(rows.every((row) => row.changed === undefined));
-  });
-});
-
-describe("buildChangedLead", () => {
-  const held = week({ from: { tightness: 85, riskAppetite: 39 }, to: { tightness: 85, riskAppetite: 39 }, regime: "SCARCITY" }).movement;
-  const crossed = week({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" }).movement;
-  const quietDayLine = "Conditions change if: Risk appetite rises 11 pts to clear 50 (39 today).";
-
-  it("follows a quiet week's sentence with the quiet-day line, and only then", () => {
-    assert.equal(
-      buildChangedLead({ movement: held, quietDayLine, fallback: "unused" }),
-      `Conditions held steady since Aug 31; no pause or resume line was crossed. Last week's guidance stands. ${quietDayLine}`,
-    );
-    // Not a quiet week, or a week a line was crossed: the sentence stands alone.
-    assert.equal(
-      buildChangedLead({ movement: held, quietDayLine: null, fallback: "unused" }),
-      "Conditions held steady since Aug 31; no pause or resume line was crossed. Last week's guidance stands.",
-    );
-    assert.equal(buildChangedLead({ movement: crossed, quietDayLine, fallback: "unused" }), crossed?.sentence);
-  });
-
-  /* It fell back to the quiet-day line first, which needs a week whose guidance held
-     and so a movement: that branch could not be reached. */
-  it("falls back to the direction the scores moved where no lines could be read", () => {
-    assert.equal(buildChangedLead({ movement: null, quietDayLine: null, fallback: "direction" }), "direction");
   });
 });

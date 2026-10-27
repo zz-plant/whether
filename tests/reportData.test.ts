@@ -13,7 +13,6 @@ import {
 } from "../lib/report/reportData";
 import type { TreasuryData } from "../lib/types";
 import type { RegimeAssessment } from "../lib/regimeEngine";
-import { resolveSectorKey } from "../lib/report/sectorSensitivity";
 import { resolveConfidencePercent, resolvePublishedConfidence } from "../lib/report/confidence";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
 import { formatConfidencePlainLabel } from "../lib/report/reportFormatting";
@@ -209,12 +208,12 @@ describe("buildReportEvidenceItems", () => {
       formatConfidencePlainLabel(resolvePublishedConfidence({ assessment }).label),
     );
     // Funding pressure is 20 points past its line: that one is well clear.
-    assert.match(item("tightness").confidenceLabel, /^High \(well clear/);
+    assert.match(item("tightness").confidenceLabel, /^Clear of the line/);
 
     // The other way round: a half-point move used to read Low ("close to the
     // line") whatever the distance. 6.5 points above the risk line is not close.
     const quiet = weekOf({ ...oct5, riskAppetite: 56.5 });
-    assert.match(quiet.item("riskAppetite").confidenceLabel, /^High/);
+    assert.match(quiet.item("riskAppetite").confidenceLabel, /^Clear of the line/);
   });
 
   it("states the recession warning gauge's payback bar as the Spending rule's, with no condition the reading contradicts", () => {
@@ -264,24 +263,6 @@ describe("buildSnapshotFallbackTreasury", () => {
 
     assert.equal(fallback.fallback_at, "2025-01-31T13:00:00.000Z");
     assert.equal(fallback.fallback_reason, "Upstream treasury timeout.");
-  });
-});
-
-
-describe("sector overlay key resolution", () => {
-  it("maps supported sector query values", () => {
-    assert.equal(resolveSectorKey("b2b-saas"), "b2b-saas");
-    assert.equal(resolveSectorKey("consumer"), "consumer");
-    assert.equal(resolveSectorKey("infrastructure"), "infrastructure");
-    assert.equal(resolveSectorKey("fintech"), "fintech");
-    assert.equal(resolveSectorKey("healthcare"), "healthcare");
-    assert.equal(resolveSectorKey("ai-platforms"), "ai-platforms");
-  });
-
-  it("falls back to b2b-saas for unknown or empty sector values", () => {
-    assert.equal(resolveSectorKey(undefined), "b2b-saas");
-    assert.equal(resolveSectorKey(""), "b2b-saas");
-    assert.equal(resolveSectorKey("unknown-sector"), "b2b-saas");
   });
 });
 
@@ -538,20 +519,22 @@ describe("buildFlipThreshold", () => {
     };
     /* The answer pages said "Trigger tighter mode if funding pressure rises
        above 70" on a Freezing week already at 90; the line out is the other way. */
-    assert.equal(buildFlipThreshold(reading, "tightness"), "Funding pressure falls 20 pts to 70 or below (90 today).");
-    assert.equal(buildFlipThreshold(reading, "riskAppetite"), "Risk appetite rises 2 pts to clear 50 (48 today).");
+    assert.equal(buildFlipThreshold(reading, "tightness"), "Funding pressure falls 20 pts from 90 to 70 or below.");
+    assert.equal(buildFlipThreshold(reading, "riskAppetite"), "Risk appetite rises 2 pts from 48 to clear 50.");
     assert.equal(
       buildFlipThreshold(reading),
-      "Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).",
+      "Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 2 pts from 48 to clear 50.",
     );
   });
 
   it("returns a future crossing for scarcity regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("SCARCITY"));
-    // One sentence, both boundaries, each carrying its live reading.
-    assert.match(flip, /^(Funding pressure|Risk appetite) .+ or (funding pressure|risk appetite) .+\.$/);
+    // One sentence, both boundaries, each carrying its live reading: in the
+    // move ("from 45"), or after the sentence for a line already crossed.
+    assert.match(flip, /^(Funding pressure|Risk appetite) .+, or (funding pressure|risk appetite) .+\.$/);
     assert.doesNotMatch(flip, /flip condition is|flips this call/i);
-    assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
+    assert.match(flip, /\bfrom \d+ to |\bis \d+ now\./);
+    assert.doesNotMatch(flip, /\(/, "no reading in parentheses");
   });
 
   it("leads each boundary with the distance to it, in the direction it trips", () => {
@@ -560,31 +543,37 @@ describe("buildFlipThreshold", () => {
     // The reader gets the subtraction done, and the inequality survives: a
     // score *at* 50 does not clear an "above 50" line, so that side says so.
     const flip = buildFlipThreshold(makeAssessment("SCARCITY"));
-    assert.match(flip, /Funding pressure falls 6 pts to 70 or below \(76 today\)/);
-    assert.match(flip, /risk appetite rises 5 pts to clear 50 \(45 today\)/);
+    assert.match(flip, /Funding pressure falls 6 pts from 76 to 70 or below/);
+    assert.match(flip, /risk appetite rises 5 pts from 45 to clear 50/);
   });
 
   it("returns a future crossing for defensive regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("DEFENSIVE"));
-    // One sentence, both boundaries, each carrying its live reading.
-    assert.match(flip, /^(Funding pressure|Risk appetite) .+ or (funding pressure|risk appetite) .+\.$/);
+    // One sentence, both boundaries, each carrying its live reading: in the
+    // move ("from 45"), or after the sentence for a line already crossed.
+    assert.match(flip, /^(Funding pressure|Risk appetite) .+, or (funding pressure|risk appetite) .+\.$/);
     assert.doesNotMatch(flip, /flip condition is|flips this call/i);
-    assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
+    assert.match(flip, /\bfrom \d+ to |\bis \d+ now\./);
+    assert.doesNotMatch(flip, /\(/, "no reading in parentheses");
   });
 
   it("returns a future crossing for volatile regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("VOLATILE"));
-    // One sentence, both boundaries, each carrying its live reading.
-    assert.match(flip, /^(Funding pressure|Risk appetite) .+ or (funding pressure|risk appetite) .+\.$/);
+    // One sentence, both boundaries, each carrying its live reading: in the
+    // move ("from 45"), or after the sentence for a line already crossed.
+    assert.match(flip, /^(Funding pressure|Risk appetite) .+, or (funding pressure|risk appetite) .+\.$/);
     assert.doesNotMatch(flip, /flip condition is|flips this call/i);
-    assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
+    assert.match(flip, /\bfrom \d+ to |\bis \d+ now\./);
+    assert.doesNotMatch(flip, /\(/, "no reading in parentheses");
   });
 
   it("returns a future crossing for expansion regimes", () => {
     const flip = buildFlipThreshold(makeAssessment("EXPANSION"));
-    // One sentence, both boundaries, each carrying its live reading.
-    assert.match(flip, /^(Funding pressure|Risk appetite) .+ or (funding pressure|risk appetite) .+\.$/);
+    // One sentence, both boundaries, each carrying its live reading: in the
+    // move ("from 45"), or after the sentence for a line already crossed.
+    assert.match(flip, /^(Funding pressure|Risk appetite) .+, or (funding pressure|risk appetite) .+\.$/);
     assert.doesNotMatch(flip, /flip condition is|flips this call/i);
-    assert.match(flip, /\((?:already true at )?\d+(?: today)?\)/);
+    assert.match(flip, /\bfrom \d+ to |\bis \d+ now\./);
+    assert.doesNotMatch(flip, /\(/, "no reading in parentheses");
   });
 });

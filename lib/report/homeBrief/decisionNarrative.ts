@@ -3,7 +3,7 @@ import { isImprovingSignalDelta } from "../reportData";
 import type { Regime, SignalChange } from "../homeBriefModel";
 import type { ReportDynamics } from "../reportDataTypes";
 import type { WeeklyTone } from "../reportEvidence";
-import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
+import { comparisonBasis, type ComparisonBasis, describeGuidanceStands } from "../comparisonBasis";
 import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 
 const regimeShiftTargets = {
@@ -134,7 +134,7 @@ export const buildWeeklyMovementMetric = ({
   return {
     score,
     direction: "stable" as const,
-    summary: movementSentence ?? `Conditions held steady ${window}. Last week's guidance stands.`,
+    summary: movementSentence ?? `Conditions held steady ${window}. ${describeGuidanceStands(basis)}`,
   };
 };
 
@@ -169,7 +169,7 @@ export const buildSignalConfidenceReason = ({
       ? "Treat it as provisional until another read confirms it."
       : confidenceLabel === "MED"
         ? "Plan against it, but hold anything irreversible."
-        : "It is stable enough for this week's approvals.";
+        : "It is stable enough to decide on this week.";
 
   return `${boundaryClause} ${signalClause}. ${verdict}`;
 };
@@ -183,38 +183,50 @@ export const buildOperatingStanceLine = ({
   directionLabel: ReportDynamics["directionLabel"] | undefined;
   currentRegime: Regime;
 }) => {
-  // Plain instructions: who gets approved, what waits. These read "Tighten to
+  // Plain instructions: what to commit to, and what waits. These read "Tighten to
   // survival mode:", "Operate for proof:" and "Press proven growth lanes" — a
   // label, a colon and a list of three, with "lanes" standing in for whatever
   // the reader actually sells. The share formats print this line as the
   // guidance, so it is the sentence most often pasted into someone's channel.
+  //
+  // Since 2026-10-14 each is a rule for any commitment, true on a first visit:
+  // - No relative verbs. "Tighten approvals" and "Hold approvals steady" were
+  //   changes from a bar the reader was assumed to have set last week; the
+  //   kicker ("Tightening this week") already says the direction.
+  // - No approval process assumed. A seed founder decides rather than approves;
+  //   "commit to" covers a hire, a contract, a launch or a spend.
+  // - No business model assumed. "Retention", "renewals" and "releases that can
+  //   be rolled back" were a software company's words; "income you already
+  //   have", "customers" and "can be undone" hold for any.
+  // The worse-week and steady-week sentences now differ only where the advice
+  // does: a worsening Sunny week names the stop condition.
   if (severityDelta > 0 || directionLabel === "deteriorating") {
     if (currentRegime === "SCARCITY") {
-      return "Approve only renewals, work already promised to customers, and hires that bring in revenue.";
+      return "Commit only to what brings in cash or keeps a promise to a customer.";
     }
     if (currentRegime === "DEFENSIVE") {
-      return "Tighten approvals to work that protects retention, margin or revenue.";
+      return "Commit to what protects income you have; new bets wait for cheaper money.";
     }
     if (currentRegime === "VOLATILE") {
-      return "Ship fixes and releases that pay back quickly; hold anything you could not reverse.";
+      return "Favour commitments that pay off soon and can be undone; hold anything you could not reverse.";
     }
-    return "Keep growing, but add people only where demand is already proven, and write down when you would stop.";
+    return "Keep growing where demand is already proven, and decide now what would make you stop.";
   }
 
   if ((severityDelta < 0 || directionLabel === "improving") && currentRegime === "EXPANSION") {
-    return "Put more behind what is already selling, and hire where demand is already converting.";
+    return "Put more behind what is already working, and grow where demand is already proven.";
   }
 
   if (currentRegime === "SCARCITY") {
-    return "Spend only on renewals, work already promised to customers, and hires that bring in revenue.";
+    return "Commit only to what brings in cash or keeps a promise to a customer.";
   }
   if (currentRegime === "DEFENSIVE") {
-    return "Hold approvals steady for work that protects retention, margin or revenue.";
+    return "Commit to what protects income you have; new bets wait for cheaper money.";
   }
   if (currentRegime === "VOLATILE") {
-    return "Favour releases that pay back quickly and can be rolled back.";
+    return "Favour commitments that pay off soon and can be undone; hold anything you could not reverse.";
   }
-  return "Put more behind what is already selling, and hire where demand is already converting.";
+  return "Put more behind what is already working, and grow where demand is already proven.";
 };
 
 const trendMemoLines: Record<string, string> = {
@@ -279,28 +291,6 @@ export const buildWeeklyMemoLines = ({
  */
 export const appendCallChangesIf = (headline: string, callChangesIf: string) =>
   `${headline} ${CALL_CHANGES_IF}: ${callChangesIf}`;
-
-export const buildWhyItMattersLine = ({
-  weeklyMovement,
-}: {
-  weeklyMovement: {
-    direction: "tightening" | "easing" | "stable" | "unavailable";
-  };
-}) => {
-  if (weeklyMovement.direction === "unavailable") {
-    return "This week's move is not known — there is no previous reading to compare against — so the approval rules below stand on where the signals sit now, not on a change.";
-  }
-
-  if (weeklyMovement.direction === "tightening") {
-    return "Fixed-cost mistakes are getting more expensive, so long-payback bets now need harder proof and tighter approval discipline.";
-  }
-
-  if (weeklyMovement.direction === "easing") {
-    return "Speed is getting safer, so teams can press proven demand lanes faster without dropping payback discipline.";
-  }
-
-  return "Nothing moved enough this week to change pace, so last week's approval rules still hold until a significant signal shifts the forecast.";
-};
 
 export const buildReadThisCardItems = ({
   decisionShiftSummary,

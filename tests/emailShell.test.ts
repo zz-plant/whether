@@ -7,7 +7,7 @@ import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { escapeHtml } from "../lib/email/emailShell";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
-import { macroSeries } from "../lib/macroSnapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import type { KvNamespace } from "../lib/runtime/kv";
 import { siteUrl } from "../lib/siteUrl";
@@ -71,26 +71,27 @@ const captureMail = () => {
 };
 
 /* The shell's closing lines exactly as production mailed them before the shell
-   was shared, with the unsubscribe token as `TOKEN`. */
+   was shared, with the unsubscribe token as `TOKEN`, in the colours of the
+   Synoptic palette (2026-10-09, lib/image/ogTheme.ts). */
 const PRODUCTION_SHELL_FOOTER = [
   `<div style="margin-top:24px;">`,
-  `<a href="https://whether.work" style="display:inline-block;padding:12px 24px;border-radius:8px;background:linear-gradient(135deg,rgba(56,189,248,0.9),rgba(14,116,144,0.85));color:white;text-decoration:none;font-weight:600;font-size:0.9rem;">View full brief →</a>`,
+  `<a href="https://whether.work" style="display:inline-block;padding:12px 24px;border-radius:8px;background:#edf0ee;color:#0f1316;text-decoration:none;font-weight:600;font-size:0.9rem;">View full brief →</a>`,
   `</div>`,
-  `<p style="margin-top:32px;font-size:0.75rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
-  `<hr style="border:none;border-top:1px solid rgba(148,163,184,0.15);margin-top:24px;" />`,
+  `<p style="margin-top:32px;font-size:0.75rem;color:#a0a9a7;">Based on public data. Your situation may vary.</p>`,
+  `<hr style="border:none;border-top:1px solid #393e41;margin-top:24px;" />`,
   `<table role="presentation" style="width:100%;border-collapse:collapse;"><tr>`,
-  `<td style="font-size:0.7rem;color:#64748b;padding-top:12px;">`,
-  `<a href="https://whether.work/trust" style="color:#64748b;text-decoration:underline;">Methodology</a>`,
+  `<td style="font-size:0.7rem;color:#a0a9a7;padding-top:12px;">`,
+  `<a href="https://whether.work/trust" style="color:#a0a9a7;text-decoration:underline;">Methodology</a>`,
   ` · `,
-  `<a href="https://whether.work/share" style="color:#64748b;text-decoration:underline;">Share</a>`,
+  `<a href="https://whether.work/share" style="color:#a0a9a7;text-decoration:underline;">Share</a>`,
   ` · `,
-  `<a href="https://whether.work" style="color:#64748b;text-decoration:underline;">whether.work</a>`,
-  ` · <a href="https://whether.work/api/email/unsubscribe?token=TOKEN" style="color:#64748b;text-decoration:underline;">Unsubscribe</a>`,
+  `<a href="https://whether.work" style="color:#a0a9a7;text-decoration:underline;">whether.work</a>`,
+  ` · <a href="https://whether.work/api/email/unsubscribe?token=TOKEN" style="color:#a0a9a7;text-decoration:underline;">Unsubscribe</a>`,
   `</td></tr></table>`,
   `</body></html>`,
 ];
 
-const PRODUCTION_SHELL_HEAD = `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0a0a0a;color:#e2e8f0;">`;
+const PRODUCTION_SHELL_HEAD = `<!DOCTYPE html><html><body style="font-family:sans-serif;max-width:600px;margin:0 auto;padding:20px;background:#0f1316;color:#cdd3d1;">`;
 
 afterEach(() => {
   Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
@@ -108,18 +109,18 @@ describe("the shared email shell, on production", () => {
       html,
       [
         PRODUCTION_SHELL_HEAD,
-        `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#f1f5f9;">Whether Plan Alert</h1>`,
+        `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#edf0ee;">Whether Plan Alert</h1>`,
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;">`,
         `<tr>`,
-        `<td style="padding:12px 16px;border:1px solid rgba(251,191,36,0.25);border-radius:8px;background:rgba(251,191,36,0.08);">`,
-        `<p style="font-size:0.85rem;color:#fde68a;margin:0;"><strong>PH</strong></p>`,
+        `<td style="padding:12px 16px;border:1px solid #393e41;border-radius:8px;background:#2d1a1e;">`,
+        `<p style="font-size:0.85rem;color:#f2685c;margin:0;"><strong>PH</strong></p>`,
         `</td></tr></table>`,
         `<div style="margin-top:12px;">`,
         `<table role="presentation" style="width:100%;border-collapse:collapse;">`,
         `<tr>`,
-        `<td style="padding:16px;border:1px solid rgba(148,163,184,0.15);border-radius:8px;background:#1a1a1a;">`,
-        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#94a3b8;margin:0 0 6px;">What you set, and where the scores are</p>`,
-        `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#f1f5f9;">PB</p>`,
+        `<td style="padding:16px;border:1px solid #393e41;border-radius:8px;background:#171c20;">`,
+        `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:#a0a9a7;margin:0 0 6px;">What you set and where the scores are</p>`,
+        `<p style="font-size:1.1rem;font-weight:600;margin:0;color:#edf0ee;">PB</p>`,
         `</td></tr></table>`,
         `</div>`,
         ...PRODUCTION_SHELL_FOOTER.map((line) => line.replace("TOKEN", "tok")),
@@ -149,7 +150,7 @@ describe("the shared email shell, on production", () => {
     const now = new Date("2026-08-31T12:00:00.000Z");
     const snapshot = buildOperatingSnapshot({
       treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
-      macroSeries,
+      macroSeries: liveMacroSeries,
       now,
     });
 
@@ -164,7 +165,7 @@ describe("the shared email shell, on production", () => {
     assert.ok(message, "the subscriber was mailed");
     const lines = message.html.split("\n");
     assert.equal(lines[0], PRODUCTION_SHELL_HEAD);
-    assert.equal(lines[1], `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#f1f5f9;">Whether Weekly Brief</h1>`);
+    assert.equal(lines[1], `<h1 style="font-size:1.25rem;font-weight:600;margin:0 0 4px;color:#edf0ee;">Whether Weekly Brief</h1>`);
     assert.deepEqual(
       lines.slice(-PRODUCTION_SHELL_FOOTER.length),
       PRODUCTION_SHELL_FOOTER.map((line) => line.replace("TOKEN", encodeURIComponent(subscriber.token))),

@@ -71,7 +71,7 @@ describe("flash alerts in the evaluator and the mail", () => {
     tightness: 78,
     riskAppetite: 42,
     actionNow: "Stage approvals",
-    callChangesIf: "Funding pressure falls 8 pts to 70 or below (78 today).",
+    callChangesIf: "Funding pressure falls 8 pts from 78 to 70 or below.",
     recordDate: "2026-09-16",
     ...over,
   });

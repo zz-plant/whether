@@ -4,15 +4,11 @@ import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
-import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import {
   buildCompactTrustSummary,
-  buildDecisionReadinessState,
   buildTrustWarnings,
-  buildWeeklyCitationMetaLine,
 } from "../../lib/report/trustStatus";
-import { formatConfidencePlainLabel } from "../../lib/report/reportFormatting";
 import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
 import { buildDegradedSourceRows, buildSourceBoardRows } from "../../lib/report/sourceHealth";
 import { buildLadderLines } from "../components/ui/scoreLadder";
@@ -25,7 +21,7 @@ import { readStoredActivationFunnel } from "../../lib/telemetry/recordActivation
 
 
 export async function buildTrustPageModel() {
-  const breadcrumbStructuredData = graph([buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/trust" }]))]);
+  const breadcrumbStructuredData = graph([buildBreadcrumbList(buildGroupBreadcrumbs("/trust"))]);
   /* Read alongside the brief, not after it: the run history has its own deadline and
      fails soft, so it never lengthens the page past the report path's own bound. The
      funnel is a KV get of a record the Monday cron already wrote, so it costs one read
@@ -49,7 +45,6 @@ export async function buildTrustPageModel() {
     isFallbackSnapshot: isFallback,
     isHistoricalSelection: Boolean(reportData.historicalSelection),
   });
-  const confidenceLabel = formatConfidencePlainLabel(homeBriefModel.confidenceLabel);
   /* The strip under the h1: the four facts a reader checks before acting, in
      the slot every reading route gives them. The sources cell keeps the words
      the five-cell System status strip used for the same three states. */
@@ -60,6 +55,7 @@ export async function buildTrustPageModel() {
     degradedSourceCount: degradedSourceRows.length,
     confidenceLabel: homeBriefModel.confidenceLabel,
     assessment: reportData.assessment,
+    scoringBasis: reportData.scoringBasis,
   });
   /* Where the two scores sit against their lines, for the ladders that open
      "How the scores are built". The earlier reading comes from `previousScoresFromDynamics`,
@@ -84,12 +80,6 @@ export async function buildTrustPageModel() {
     tightness: positionFor("tightness", thresholds.tightnessRegime),
     riskAppetite: positionFor("riskAppetite", thresholds.riskAppetiteRegime),
   };
-  const citationLine = buildWeeklyCitationMetaLine({
-    statusLabel: reportData.statusLabel,
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    recordDateLabel: reportData.recordDateLabel,
-    freshnessLabel: reportData.fetchedAtLabel,
-  });
   const warnings = buildTrustWarnings({
     confidenceLabel: homeBriefModel.confidenceLabel,
     transitionWatch: homeBriefModel.transitionWatch,
@@ -99,21 +89,14 @@ export async function buildTrustPageModel() {
     changedSignals: reportData.reportDynamics.changedSignals,
     anomalySignals: reportData.reportDynamics.anomalySignals,
   });
-  const meetingSnippet = `Conditions: ${reportData.statusLabel}\nAs of: ${reportData.recordDateLabel}\nData refreshed: ${reportData.fetchedAtLabel}\nConfidence: ${confidenceLabel}\nTrust: ${trustSummary}\n${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reportData.flipThreshold}\n${DECISION_CONTRACT_LABELS.action.actionNow}: ${reportData.actionNowShort}`;
 
   /* The row labels used to be "Trigger", "Impact" and "Recovery" — three nouns
      from the incident-review register, on a page addressed to someone deciding
      whether to act this week. Each is now the question the row answers. */
+  /* A "What would go wrong" row led these until 2026-10-09: no detail, because
+     #confidence-limits above prints the condition, and only a link back to that
+     section. */
   const revisitBullets: Array<{ label: string; detail?: string; href: string; linkLabel: string }> = [
-    {
-      // No detail: this row's own link points at #confidence-limits, and that
-      // section already prints reportData.flipThreshold under "Call changes
-      // if". Carrying the sentence here too put the same
-      // long condition on screen twice within one section.
-      label: "What would go wrong",
-      href: "#confidence-limits",
-      linkLabel: "Check the limits",
-    },
     {
       label: "What it would change",
       detail: reportData.actionNowShort,
@@ -124,22 +107,15 @@ export async function buildTrustPageModel() {
       label: "How you'd know it cleared",
       detail: isFallback
         ? "One live refresh has landed from every source."
-        : "Confidence is back to high and conditions have held for a second reading.",
+        : "The scores are clear of the change lines and conditions have held for a second reading.",
       href: "#source-board",
       linkLabel: "Check source dates",
     },
   ];
-  const decisionReadiness = buildDecisionReadinessState({
-    confidenceLabel: homeBriefModel.confidenceLabel,
-    freshnessLabel: reportData.fetchedAtLabel,
-    isFallbackSnapshot: isFallback,
-    isHistoricalSelection: Boolean(reportData.historicalSelection),
-  });
-  const trustStatusTone = decisionReadiness.tone === "historical"
-    ? "historical"
-    : decisionReadiness.tone === "warning"
-      ? "warning"
-      : "stable";
+  /* The home model's verdict, which /brief.md prints. This page built a second
+     one from the freshness label alone and without the hold, so a held week
+     clear of the lines was Act here and Act with caution in the home model. */
+  const trustStatusTone = homeBriefModel.decisionReadiness.tone;
   /* Each label is the section's own title. Two had drifted: "Snapshot" for a
      section headed "System status", and "Sources & freshness" for one headed
      "Cite this call" (now "Cite this guidance") — so the rail offered "Sources" and "Sources & freshness"
@@ -157,11 +133,10 @@ export async function buildTrustPageModel() {
     ...(readerReturnsLine ? [{ href: "#reader-returns", label: "Reader returns" }] : []),
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#source-board", label: "Sources" },
-    { href: "#sources-freshness", label: "Cite this guidance" },
-    { href: "#confidence-limits", label: "Confidence & limits" },
+    // "Cite this guidance" and "Meeting snippet" moved to /share on 2026-10-08,
+    // with every other paste of the week.
+    { href: "#confidence-limits", label: "Margin & limits" },
     { href: "#revisit-call", label: "Revisit triggers" },
-    { href: "#meeting-snippet", label: "Meeting snippet" },
-    { href: "#framework", label: "Using the thresholds" },
   ];
 
   const reportShellModel: ReportShellModel = {
@@ -172,10 +147,11 @@ export async function buildTrustPageModel() {
       fetchedAtLabel: reportData.fetchedAtLabel,
     },
     page: {
+      /* No summary (2026-10-09): "Check whether this week's guidance is current
+         enough to act on." said the title again under it. */
       pageTitle: "How much to trust this week's guidance",
-      pageSummary: "Check whether this week's guidance is current enough to act on.",
       sectionLinks,
-      activeStep: "posture",
+      currentPath: "/trust",
     },
     trust: {
       trustStatusTone,
@@ -187,13 +163,7 @@ export async function buildTrustPageModel() {
     chrome: {
       sidebarVariant: "full",
     },
-    actions: {
-      nextStep: {
-        href: "/signals",
-        description: "See which readings moved this week, and by how much.",
-        label: "Open the evidence",
-      },
-    },
+    // No closing "Open the record" card (2026-10-09): Record is a header tab.
     payloads: {
       structuredData: breadcrumbStructuredData,
     },
@@ -204,11 +174,8 @@ export async function buildTrustPageModel() {
     isFallback,
     degradedSourceRows,
     sourceBoardRows: buildSourceBoardRows(reportData.sourceHealth),
-    confidenceLabel,
     trustSummary,
-    citationLine,
     warnings,
-    meetingSnippet,
     revisitBullets,
     trustStrip,
     scorePositions,

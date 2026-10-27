@@ -118,8 +118,8 @@ export function CadenceCallCard({
             Zero-offset tint, not a lift: §XIII reserves elevation for the outermost
             container and allows emphasis at depth. */}
         {model.overrideReason ? (
-          <p className="rounded-md border border-amber-500/25 bg-amber-500/[0.07] px-3 py-2 text-fluid-nano text-semantic-caution-fg">
-            <span className="font-semibold">Guidance held:</span> {model.overrideReason}
+          <p className="rounded-md border border-l-2 border-caveat-border bg-caveat-bg px-3 py-2 text-fluid-nano text-caveat-fg">
+            <span className="weather-caveat-mark font-semibold">Guidance held:</span> {model.overrideReason}
           </p>
         ) : null}
         <p className="max-w-2xl text-fluid-sm leading-relaxed text-slate-300">{model.description}</p>
@@ -161,7 +161,7 @@ export function CadenceCallCard({
       ) : null}
 
       {model.history.length > 0 ? (
-        <div className="space-y-1.5 border-t border-white/[0.06] pt-3">
+        <div className="space-y-1.5 border-t border-[color:var(--border-faint)] pt-3">
           <p className="type-eyebrow text-white/60">{model.historyLabel}</p>
           <ol className="flex flex-wrap items-center gap-1.5">
             {model.history.map((point) => (
@@ -188,7 +188,7 @@ export function CadenceCallCard({
       {/* One plan CTA per page: the horizon-labelled "Build this …'s plan" lives in the
           weekly block below, where it always has. Two links to /operate under different
           labels would give the reader nothing to choose between. */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/[0.06] pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-3">
         <p className="text-fluid-nano text-slate-400">{model.weeklyBridge} ↓</p>
         <ShareBriefButton
           title={model.shareTitle}

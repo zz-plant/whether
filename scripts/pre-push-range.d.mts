@@ -1,7 +1,6 @@
 /**
- * The commit range a `git push` is about to send, parsed from the pre-push
- * hook's stdin plan ("<local ref> <local sha> <remote ref> <remote sha>" per
- * line). Returns null when no line qualifies — a new branch, a deletion, or no
- * input — which is the hook's signal to keep the preflight's default range.
+ * The commit range of the first ref update in a pre-push hook's stdin plan
+ * ("<local ref> <local sha> <remote ref> <remote sha>" per line): the remote sha as `base`
+ * and the local sha as `head`. Null when no line qualifies (a new branch, a deletion, no input).
  */
 export function parsePrePushRange(text: string): { base: string; head: string } | null;

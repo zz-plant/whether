@@ -6,6 +6,9 @@ import { isValidElement, type ReactNode } from "react";
 import { renderCompareOgImage, type CompareOgImageProps } from "../app/api/og/compareTemplate";
 import { loadComparePreview } from "../lib/image/compareImagePayload";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "../lib/image/ogFonts";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const collectText = (node: ReactNode): string => {
   if (node === null || node === undefined || typeof node === "boolean") return "";

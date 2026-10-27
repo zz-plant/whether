@@ -4,10 +4,13 @@ import { AjvJsonSchemaValidator } from "@modelcontextprotocol/sdk/validation/ajv
 import { REGIME_KEYS } from "../lib/agent/inputs";
 import { z } from "zod";
 import { AgentInputError, createAgentToolRegistry, defineTool, describeToolParams, labelChoices } from "../lib/agent/registry";
-import { callAgentTool, describeAgentTools, listAgentTools, runAgentTool } from "../lib/agent/tools";
+import { callAgentTool, decisionAnswerOutputSchema, describeAgentTools, listAgentTools, runAgentTool } from "../lib/agent/tools";
 import { loadAgentInterfaceContext } from "../lib/agentInterface";
 import { buildAgentState } from "../lib/agentState";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The registry is what every transport and every catalogue reads, so what an agent is told
@@ -62,6 +65,48 @@ describe("the agent tool registry", () => {
     assert.equal(byAlias.cadence, "monthly");
     assert.deepEqual(Object.keys(byAlias).sort(), Object.keys(byName).sort());
     assert.ok(!listAgentTools("stdio").some((tool) => tool.name === "get_agent_brief"), "an alias is not listed twice");
+  });
+
+  it("returns a frozen published brief when requested by week, and posture archive when requested by period", async () => {
+    const w41 = await runAgentTool("get_brief", { week: "2026-w41" }, "http");
+    assert.equal(w41.type, "published_brief");
+    assert.equal(w41.slug, "2026-w41");
+    assert.ok(w41.headline);
+
+    const period = await runAgentTool("get_brief", { period: "2024-q1" }, "http");
+    assert.equal(period.type, "posture_archive_period");
+    assert.equal(period.slug, "2024-q1");
+    assert.equal(period.kind, "quarter");
+  });
+
+  it("answers a decision question through get_answer with structured guidance and citeable quote", async () => {
+    const bySlug = decisionAnswerOutputSchema.parse(
+      await runAgentTool("get_answer", { question: "should-startups-raise-capital-now" }, "http"),
+    );
+    assert.equal(bySlug.type, "decision_answer");
+    assert.equal(bySlug.slug, "should-startups-raise-capital-now");
+    assert.ok(bySlug.shortAnswer.length > 0);
+    assert.ok(bySlug.directAnswer.length > 0);
+    assert.ok(bySlug.currentStanding.recordDate.length > 0);
+    assert.ok(bySlug.citation.includes("https://whether.work/answers/should-startups-raise-capital-now"));
+    assert.ok(bySlug.attributionSnippet.includes("According to Whether's weekly guidance"));
+
+    // A natural-language question resolves through the page's own keyword and title.
+    const byQuestion = decisionAnswerOutputSchema.parse(
+      await runAgentTool("get_answer", { question: "should we freeze hiring" }, "http"),
+    );
+    assert.equal(byQuestion.slug, "should-we-freeze-or-selectively-hire");
+
+    // A slug fragment resolves through the hyphenated form.
+    const byFragment = decisionAnswerOutputSchema.parse(
+      await runAgentTool("get_answer", { question: "cut burn" }, "http"),
+    );
+    assert.equal(byFragment.slug, "when-should-startups-cut-burn");
+
+    // A topic the answers don't cover is refused with the list of what does exist.
+    const unknown = await refusal(runAgentTool("get_answer", { question: "bridge round" }, "http"));
+    assert.match(unknown.message, /Available decision topics/);
+    assert.ok(unknown.problems.some((problem) => problem.allowed?.includes("should-startups-raise-capital-now")));
   });
 
   it("refuses a tool that does not exist, and lists the ones that do", async () => {
@@ -232,6 +277,23 @@ describe("the arguments an agent leaves out", () => {
     });
     assert.match(String(projection.velocityLabel), /Stable/);
   });
+
+  it("get_standup_line returns the standup one-liner for today's conditions", async () => {
+    const result = await runAgentTool("get_standup_line", {}, "http");
+    const standupLine = result.standupLine;
+    assert.ok(typeof standupLine === "string");
+    assert.match(standupLine, /Guidance|Conditions/);
+    assert.match(standupLine, /Conditions change if/);
+    assert.ok(result.regime);
+  });
+
+  it("audit_sprint_retro audits commitments against today's pause lines", async () => {
+    const report = await runAgentTool("audit_sprint_retro", { planText: "Hire 4 engineers with 8 months cash" }, "http");
+    assert.ok(report.regime);
+    assert.ok(typeof report.headline === "string");
+    assert.ok(Array.isArray(report.activePauseTriggers));
+    assert.ok(typeof report.markdown === "string");
+  });
 });
 
 describe("the catalogue rows", () => {
@@ -243,7 +305,10 @@ describe("the catalogue rows", () => {
 
     assert.ok(projection && brief && history);
     assert.equal(describeToolParams(rows.find((row) => row.name === "get_state")?.arguments ?? []), "none");
-    assert.equal(describeToolParams(brief.arguments), "cadence (optional: weekly/monthly/quarterly/yearly)");
+    assert.equal(
+      describeToolParams(brief.arguments),
+      "cadence (optional: weekly/monthly/quarterly/yearly), week (optional), period (optional)",
+    );
     assert.match(describeToolParams(history.arguments), /^signal_key \(required: TREASURY_1M\/TREASURY_3M/);
     assert.match(describeToolParams(projection.arguments), /tightness \(optional number\), riskAppetite \(optional number\)/);
     assert.deepEqual(brief.aliases, ["get_agent_brief"]);

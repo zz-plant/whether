@@ -4,11 +4,14 @@ import {
   downloadDecisionLedger,
   fetchDecisionLedger,
   loadRecordNoteView,
+  logDecisionFollowUp,
+  logDecisionSnapshotToLedger,
   logDecisionToLedger,
 } from "../app/components/decisionLedgerClient";
 import { CLIENT_ID_HEADER } from "../lib/api/clientIdHeader";
 import { requireClientOwner } from "../lib/api/clientOwnership";
-import type { DecisionMemoryPayload } from "../lib/decisionMemory";
+import type { DecisionFollowUpPayload } from "../lib/decisionFollowUp";
+import type { DecisionMemoryPayload, DecisionMemorySnapshotPayload } from "../lib/decisionMemory";
 
 /**
  * The two ends of an owned request, which have to agree on one header.
@@ -19,6 +22,12 @@ import type { DecisionMemoryPayload } from "../lib/decisionMemory";
  * asserted against the guard that enforces it rather than against a literal, so
  * a rename cannot pass here and fail in a browser.
  */
+
+/* What the client stashes for an offline post: the shape `stashValue` builds,
+   keyed uniquely, replayed by the service worker. Typing the fake's store with
+   it lets the assertions below read real fields instead of asserting their way
+   into an unknown. */
+type StashedEntry = { key: string; clientId: string; payload: DecisionMemoryPayload };
 
 const payload: DecisionMemoryPayload = {
   recordDate: "2026-09-14",
@@ -114,6 +123,131 @@ describe("decision ledger client", () => {
     assert.equal((await downloadDecisionLedger("browser-1", "csv", failing)).ok, false);
   });
 
+  /* A minimal IndexedDB fake for the offline stash: one object store with put
+     and a cursor walk. Results arrive on the microtask queue and transaction
+     completion on the macrotask queue after it, which is the order the client
+     awaits them in. The map is exposed so a test can assert on what the queue
+     actually holds rather than on whether the calls resolved. */
+  const fakeIndexedDB = () => {
+    const entries = new Map<string, { key: string; value: StashedEntry }>();
+    const micro = (fn: () => void) => queueMicrotask(fn);
+
+    const store = {
+      put(value: StashedEntry, key: string) {
+        micro(() => entries.set(key, { key, value }));
+      },
+      openCursor() {
+        type FakeCursor = { key: string; value: StashedEntry | undefined; delete: () => void; continue: () => void };
+        const request: { result: FakeCursor | null; onsuccess: (() => void) | null; onerror: (() => void) | null } = {
+          result: null,
+          onsuccess: null,
+          onerror: null,
+        };
+        let index = 0;
+        const fire = () =>
+          micro(() => {
+            const keys = [...entries.keys()].sort();
+            /* The undefined check is the bounds check: a sorted snapshot has no
+               element at an index past its end, so this only fires when the
+               walk is done — and it narrows `key` for the two reads below. */
+            const key = keys[index];
+            if (key === undefined) {
+              request.result = null;
+            } else {
+              index += 1;
+              request.result = {
+                key,
+                value: entries.get(key)?.value,
+                delete: () => entries.delete(key),
+                continue: () => fire(),
+              };
+            }
+            request.onsuccess?.();
+          });
+        fire();
+        return request;
+      },
+    };
+
+    const db = {
+      close: () => {},
+      transaction: () => {
+        const tx: { objectStore: () => typeof store; oncomplete: (() => void) | null; onerror: (() => void) | null } = {
+          objectStore: () => store,
+          oncomplete: null,
+          onerror: null,
+        };
+        setTimeout(() => tx.oncomplete?.(), 0);
+        return tx;
+      },
+    };
+
+    const open = () => {
+      const request: { result: unknown; onsuccess: (() => void) | null; onerror: (() => void) | null } = {
+        result: null,
+        onsuccess: null,
+        onerror: null,
+      };
+      micro(() => {
+        request.result = db;
+        request.onsuccess?.();
+      });
+      return request;
+    };
+
+    return { open, entries };
+  };
+
+  const withIndexedDB = async <T>(fake: { open: unknown }, run: () => Promise<T>): Promise<T> => {
+    /* The stub rides on globalThis, outside the DOM typing; Reflect is how a
+       dynamic global is set and cleared without asserting a shape onto it. */
+    Reflect.set(globalThis, "indexedDB", fake);
+    try {
+      return await run();
+    } finally {
+      Reflect.deleteProperty(globalThis, "indexedDB");
+    }
+  };
+
+  const offlineFetch: typeof globalThis.fetch = () => Promise.reject(new Error("offline"));
+
+  it("queues two offline decisions as two records, not one overwriting the other", async () => {
+    const fake = fakeIndexedDB();
+    const other = { ...payload, decision: { ...payload.decision, action: "RESTRUCTURE" as const } };
+    await withIndexedDB(fake, async () => {
+      await logDecisionToLedger("browser-1", payload, offlineFetch);
+      await logDecisionToLedger("browser-1", other, offlineFetch);
+    });
+
+    assert.equal(fake.entries.size, 2, "the second stashed write must not replace the first");
+    const payloads = [...fake.entries.values()].map((entry) => entry.value.payload);
+    assert.deepEqual(
+      payloads.map((stashed) => stashed.decision.action).sort(),
+      ["HIRE", "RESTRUCTURE"],
+    );
+    const keys = [...fake.entries.keys()];
+    assert.ok(keys.every((key) => key.startsWith("browser-1:")), "entries stay grouped under the client that stashed them");
+    assert.ok(new Set(keys).size === keys.length, "keys are unique per stashed write");
+  });
+
+  it("clears only the stashed copy of the decision that just posted, leaving other offline decisions queued", async () => {
+    const fake = fakeIndexedDB();
+    const other = { ...payload, decision: { ...payload.decision, action: "RESTRUCTURE" as const } };
+    await withIndexedDB(fake, async () => {
+      // Both decisions are recorded offline and stashed.
+      await logDecisionToLedger("browser-1", payload, offlineFetch);
+      await logDecisionToLedger("browser-1", other, offlineFetch);
+      // Back online, the reader taps the first one again and it posts.
+      const { fetchImpl } = capture({ ok: true }, 201);
+      await logDecisionToLedger("browser-1", payload, fetchImpl);
+    });
+
+    assert.equal(fake.entries.size, 1, "the re-tap clears its own stashed copy and nothing else");
+    const remaining = fake.entries.values().next().value;
+    assert.ok(remaining, "one entry remains queued");
+    assert.equal(remaining.value.payload.decision.action, "RESTRUCTURE");
+  });
+
   it("posts the decision under the same owner it claims", async () => {
     const { calls, fetchImpl } = capture({ ok: true }, 201);
     await logDecisionToLedger("browser-1", payload, fetchImpl);
@@ -137,6 +271,85 @@ describe("decision ledger client", () => {
 
     assert.equal(headerOf(calls[0]?.init), "browser-1");
     assert.match(calls[0]?.url ?? "", /format=records/);
+  });
+
+  const followUpPayload: DecisionFollowUpPayload = {
+    recordDate: "2026-09-21",
+    entryId: "decision-1",
+    response: "deferred",
+    conditions: { tightness: 60, riskAppetite: 40 },
+  };
+
+  it("records a review under the same owner it claims", async () => {
+    const { calls, fetchImpl } = capture({ ok: true }, 201);
+    const result = await logDecisionFollowUp("browser-1", followUpPayload, fetchImpl);
+
+    assert.equal(result.ok, true);
+    assert.equal(headerOf(calls[0]?.init), "browser-1");
+    assert.equal(calls[0]?.init?.method, "POST");
+    const body = calls[0]?.init?.body;
+    assert.equal(typeof body, "string", "the request body is JSON text, not a stream");
+    const sentBody: unknown = JSON.parse(typeof body === "string" ? body : "{}");
+    assert.ok(sentBody && typeof sentBody === "object");
+    const sent = Object(sentBody);
+    assert.equal(sent.clientId, "browser-1", "the body's owner and the header's owner must match or the guard 403s");
+    assert.equal(sent.entryId, "decision-1");
+    assert.equal(sent.response, "deferred");
+    assert.equal(sent.conditions.tightness, 60);
+  });
+
+  it("says so, without stashing, when a review cannot be posted", async () => {
+    const result = await logDecisionFollowUp("browser-1", followUpPayload, () => Promise.reject(new Error("offline")));
+    assert.equal(result.ok, false);
+    assert.doesNotMatch(result.ok ? "" : result.reason, /fetch|offline/i, "a network failure reads as what a reader can do, not what broke");
+  });
+
+  it("reads the review trail beside the record, dropping a malformed one", async () => {
+    const { fetchImpl } = capture({
+      entries: [],
+      followUps: [
+        { not: "a follow-up" },
+        {
+          id: "fu-1",
+          createdAt: "2026-09-21T00:00:00.000Z",
+          context: { clientId: "browser-1", recordDate: "2026-09-21" },
+          entryId: "decision-1",
+          response: "continued",
+          conditions: { tightness: 60, riskAppetite: 40 },
+        },
+      ],
+    });
+
+    const result = await fetchDecisionLedger("browser-1", fetchImpl);
+    assert.equal(result.ok, true);
+    const followUps = result.ok ? result.followUps : [];
+    assert.equal(followUps.length, 1, "one malformed review must not fail the read of the rest");
+    assert.equal(followUps[0]?.response, "continued");
+  });
+
+  const snapshotPayload: DecisionMemorySnapshotPayload = {
+    kind: "posture-snapshot",
+    recordDate: "2026-10-20",
+    regime: "DEFENSIVE",
+    primaryCall: "Hold net-new hiring.",
+    tightness: 90,
+    riskAppetite: 53,
+  };
+
+  it("records this week's standing call under the same owner it claims", async () => {
+    const { calls, fetchImpl } = capture({ ok: true }, 201);
+    const result = await logDecisionSnapshotToLedger("browser-1", snapshotPayload, fetchImpl);
+
+    assert.equal(result.ok, true);
+    assert.equal(headerOf(calls[0]?.init), "browser-1");
+    assert.equal(calls[0]?.init?.method, "POST");
+    const body = calls[0]?.init?.body;
+    assert.equal(typeof body, "string", "the request body is JSON text, not a stream");
+    const sent = Object(JSON.parse(typeof body === "string" ? body : "{}"));
+    assert.equal(sent.clientId, "browser-1");
+    assert.equal(sent.kind, "posture-snapshot");
+    assert.equal(sent.primaryCall, "Hold net-new hiring.");
+    assert.equal(sent.regime, "DEFENSIVE");
   });
 });
 

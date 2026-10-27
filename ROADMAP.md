@@ -5,6 +5,118 @@ Each milestone is tied to the core loop: ingest Treasury data → compute regime
 plain‑English operational constraints with traceable sources.
 Prioritized specs for the open items below live in `docs/roadmap-prioritized-spec.md`.
 
+## Active focus (2026-10-23): the decision-intelligence loop
+
+The brief's own guidance is now measured, not just published: recorded decisions get followed
+up week to week, and each week's call can be stress-tested against evidence for and against
+it. This is the loop that feeds the brief back into itself — prioritized by the product rule
+(one-screen brief → bounded decisions → transmission → trust), each item with its measure.
+Specs for the open items will go into `docs/roadmap-prioritized-spec.md` as they start.
+
+### Shipped (2026-10-23)
+- [x] **Decision follow-up records** — `lib/decisionFollowUp.ts`, `/api/decision-memory`,
+  `app/decisions/decisionRecordPanel.tsx`: a WATCH/RECONSIDER row on `/decisions` offers
+  Continued / Changed / Deferred with an optional note, stored per-browser (`df:` keyspace)
+  against the reading being reviewed, joined newest-first into the record view; the form
+  re-offers until the commitment is reviewed against the current reading. Staleness detection
+  existed; the operator's response was the missing half.
+- [x] **Counterevidence review packet** — `bun run audit:jev-copy -- --mode counterevidence`
+  (`lib/jev/counterevidence.ts`): Clef judges relevance, whether the excerpt supports the
+  claim, and the challenge direction per candidate. The packet lists what could weaken the
+  call (source-supported challenges only), what backs it, the printed change line as the
+  reconsideration line, and a review list. No generated claims — every finding carries its own
+  wording and citation.
+- [x] **Reviewed-case registry** — `data/reviewed-cases/cases.json` +
+  `bun run reviewed-cases:add|export-eval|list`: human labels on findings (useful /
+  false-alarm) become versioned eval cases; `--mode eval` scores them (artifact and
+  counterevidence kinds) with precision/recall/Brier and per-case question versions.
+- [x] **Source-pool builder** — `bun run evidence:pool` (`lib/evidencePool.ts`,
+  `scripts/pool-builder.ts`): EmbeddingGemma 2 (local Ollama) embeds a recurring passage file
+  against the weekly call and writes the counterevidence input. Side tags are retrieval
+  hypotheses, not verdicts — measured 2026-10-23: embedding similarity is topic similarity,
+  not stance, so Clef classifies stance and the packet's challenge list comes from the model's
+  judgment.
+
+### Prioritized next work (build order)
+
+**P1 — wire the measurement into the weekly ritual** (each independently shippable)
+1. **Cold-reader as the publish gate** (one-time visitor lens) — the comprehension eval runs
+   on the frozen brief; a first-time visitor must find the action, pause line and reversal
+   within 60 seconds, or the week ships flagged for a fix. *Measure: comprehension pass/fail
+   per published week.*
+2. **Weekly packet into the brief data** — the counterevidence packet is generated with the
+   weekly freeze so the trust and share surfaces can render it. *Measure: packet present per
+   week; challenges found vs review noise.*
+3. **Review trail on the agent/export surface** — an MCP tool and a follow-up export so the
+   review trail rides the ledger. *Measure: trail reads.*
+
+**P2 — sharper decisions** (needs the draft+verify module, which unlocks 4–7)
+4. **Frontier-drafting module** (keystone) — local-model structured draft + Clef fidelity
+   check, the pattern in `scripts/advice-corpus/classify.ts` and `scripts/evals/cold-reader.ts`
+   lifted into `lib/`. *Measure: draft fidelity against the canonical document.*
+5. **Advice corpus → conditional operating rules** into `lib/playbook.ts` (proposal loop 3) —
+   cluster the 2,598 classified posts by mechanism (EmbeddingGemma), extract action /
+   circumstances / pause / reversal / exceptions, Clef checks each field against its passage,
+   a reviewer promotes to the playbooks. Highest product value: bounded decisions. *Measure:
+   source-supported rules recovered; important exceptions missed.*
+6. **Revisit explanations on the follow-up record** (loop 1's model half) — "this assumption
+   moved; here's the reversal line; here's why it matters", drafted and fidelity-checked.
+   *Measure: accepted revisit suggestions; unnecessary interruptions.*
+7. **Plan repair under company constraints** (loop 4) — frontier proposes two alternative
+   commitment sizes/timings, existing `scenarioStudio.ts` arithmetic evaluates cost/runway,
+   Clef checks the objective survives. *Measure: constraint violations resolved; adoptions.*
+
+**P3 — trust and transmission**
+8. **"What could weaken this call" on the public surface** — the packet rendered compactly on
+   the trust page, and one line in the card/Slack artifact with its source. *Measure:
+   share/click events on the artifact.*
+9. **Social-ready posts** (X / Bluesky / LinkedIn) from the weekly document — canonical copy,
+   one-click copy; the card/OG image carries the flip line so the image stands alone in a
+   feed. *Measure: copy events per surface.*
+10. **Complete answer pages** — every `/answers/` page carries the short answer, this week's
+    condition, pause/resume lines, "what would change this", and a link back to the brief; no
+    thin pages. *Measure: cold-reader pass on answer pages.*
+
+**P4 — compounding loops**
+11. **Cold-reader → targeted revision → retest** (loop 5) — group recurring misunderstandings,
+    draft a focused fix, retest. *Measure: 60-second findability trend.*
+12. **Reviewed-case sampling of accepted outputs** + duplicate detection (the near-duplicates
+    pattern) → Flash/Omni routing tuning (loop 6). *Measure: precision, missed issues,
+    abstentions, cost per useful result.*
+13. **Meeting material → decision records** (loop 8) — Clef Omni media adapters, draft record,
+    operator confirmation, follow-up. *Measure: correction burden; follow-through.*
+14. **Forecast tournament** (loop 7, shadow research) — frozen inputs, competing predictions,
+    resolution scoring. *Measure: Brier / calibration.*
+
+**Deliberately not prioritized:** per-company share cards on public social (the public artifact
+carries the company-agnostic bounded call); retrieval stance-separation (measured to be an
+embedding-similarity limit — Clef classifies stance).
+
+## Surface health (2026-10-23): redesign vs rewrite audit
+
+The design-debt sweep (DD-001–DD-063, `docs/design-debt-prioritized.md`) left the core surfaces
+clean — `/`, `/signals`, `/operate`, `/trust`, `/resolve`, `/share`, `/history`, `/brief/[week]`
+and the answer pages all delegate to the shared shells and follow the design register. A
+screenshot pass of both themes and both widths (2026-10-23) confirmed this: no page is broken.
+
+### Redesign — one page, plus the design system
+
+- ~~**`/concepts`**~~ — Shipped (2026-10-23): row dividers migrated to the semantic
+  `--border-subtle` token (DD-065).
+- **DD-042 — shared primitives.** No `ActionButton` to match `ActionLink`; six tone-chip maps,
+  ten container classes against the three documented tiers, four overlay call sites. A pixel-safe
+  swap needs a design pass first. *In progress.*
+- **DD-043 — light theme is a patch layer.** Remaining raw-palette floors: `text-white` (79),
+  `bg-slate` (94), `border-slate` (130), `border-white` (1). Held by
+  `tests/themeRawPaletteRatchet.test.ts`. *In progress.* It surfaces as low-contrast subtext on
+  `/` and near-invisible table borders on `/signals` (both light theme).
+
+### Rewrite — one thin page
+
+- ~~**`/resources/decision-shield-overview`**~~ — Shipped (2026-10-23): rewritten decision-first —
+  the page leads with this week's posture, states the three verdicts, the guardrail and the
+  reversal, and links to the plan and the decision record (DD-064).
+
 ## Immediate priority backlog (live-gap focused)
 
 ### Shipped baseline (2026-08-29)
@@ -217,6 +329,10 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - As a sprint lead, I paste this sprint's goal and see whether it holds, pauses, or needs a reversal guardrail under the current regime. (Sprint ceremonies)
 - As an engineering manager, I paste a per-epic guardrail label into Linear without storing any token. (Sprint ceremonies)
 - As a kanban team, I see the current call and flip distance on a persistent board embed, and the regime sets our WIP cap and pull-policy pauses. (Kanban)
+- As an operator, I record what I did about a decision whose conditions moved (kept / changed / deferred), and next week's record shows the trail. (Decision-intelligence loop, shipped.)
+- As a leader, I see what could weaken this week's call, with the source, before I share it — the call comes with its strongest objection. (Decision-intelligence loop, P3.)
+- As a first-time visitor, I can find what to do, when to pause, and what would reverse it within a minute — and the published week was tested for exactly that. (Decision-intelligence loop, P1.)
+- As a strategy lead, I adopt a bounded operating rule the archive surfaced — action, circumstances, pause and reversal — or reject it with a reason that banks an eval case. (Decision-intelligence loop, P2.)
 
 ### Success criteria
 - Every output is traceable to a public source and includes timestamps.
@@ -224,6 +340,7 @@ The product's own activation model (`lib/activationFunnel.ts`) declares weekly r
 - Ritual transmission works without requiring the user to open a browser tab every Monday.
 - Offline mode is explicit and safe.
 - WAU and QAU each have a working return loop; DAU spikes are event-driven only, never cadence-synced.
+- Every published week passes the first-visitor comprehension test: action, pause line and reversal are findable in under 60 seconds.
 
 ---
 

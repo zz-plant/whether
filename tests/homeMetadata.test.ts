@@ -2,12 +2,15 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildHomeMetadata } from "../lib/report/homeMetadata";
 import { buildHomeSharePath, notLiveReadingLabel, readerSourceLabel } from "../lib/report/homeSharePreview";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("buildHomeSharePath", () => {
   it("preserves defined home report search params in a stable query string", () => {
     assert.equal(
-      buildHomeSharePath({ year: "2026", month: "3", view: "forecast", sector: "consumer" }),
-      "/?month=3&sector=consumer&view=forecast&year=2026",
+      buildHomeSharePath({ year: "2026", month: "3", stage: "seed", cadence: "monthly" }),
+      "/?cadence=monthly&month=3&stage=seed&year=2026",
     );
   });
 
@@ -94,7 +97,7 @@ describe("buildHomeMetadata", () => {
 
 /*
  * A link preview has 210 characters and the card's change box 140. The sentence that says which lines a
- * week crossed ran past both and was cut in the middle of them ("...funding pressure rose through 76
+ * week crossed ran past both and was cut in the middle of them ("...funding pressure rose above 76
  * and risk…"), so those two surfaces carry the consequence without the evidence.
  */
 describe("what the share preview says changed", () => {

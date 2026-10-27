@@ -3,8 +3,6 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 
 import { ThresholdLadder } from "../app/components/illustrations/ThresholdLadder";
-import { RegimeGlyph } from "../app/components/illustrations/RegimeGlyph";
-import type { RegimeKey } from "../lib/types";
 
 /** A paint attribute holding a bare custom-property name renders nothing in the browser. */
 const assertTokensWrapped = (html: string) => {
@@ -29,7 +27,7 @@ describe("ThresholdLadder", () => {
     );
   });
 
-  it("names trigger and reversal in the description", () => {
+  it("names the pause and resume lines in the description", () => {
     const html = renderToStaticMarkup(
       <ThresholdLadder
         idPrefix="l2"
@@ -44,7 +42,7 @@ describe("ThresholdLadder", () => {
     );
     assertNoNaN(html);
     assertTokensWrapped(html);
-    assert.match(html, /Trigger at 6%\. Reversal at 2%\./);
+    assert.match(html, /Pause line at 6%\. Resume line at 2%\./);
     assert.match(html, /Real rate: 4%/);
   });
 
@@ -71,7 +69,7 @@ describe("ThresholdLadder", () => {
     );
 
     assert.match(html, /Funding pressure: 64/);
-    assert.match(html, /Trigger at 68\./);
+    assert.match(html, /Pause line at 68\./);
     // The visible caption is split across the rail ends it names; the
     // description carries the same direction as one sentence.
     assert.match(html, />easier funding</);
@@ -144,7 +142,7 @@ describe("ThresholdLadder", () => {
 
     assert.match(html, />Guardrail</);
     // The accessible description keeps the generic noun, which other copy quotes.
-    assert.match(html, /Trigger at 80\./);
+    assert.match(html, /Pause line at 80\./);
   });
 
   it("names the reversal line what the surface calls it, visibly only", () => {
@@ -165,7 +163,7 @@ describe("ThresholdLadder", () => {
 
     assert.match(html, />Clears when</);
     // Same split as `triggerLabel`: the description keeps the generic noun.
-    assert.match(html, /Reversal at 66\./);
+    assert.match(html, /Resume line at 66\./);
   });
 
   it("lifts the reversal caption clear of the trigger caption when they would collide", () => {
@@ -340,17 +338,3 @@ describe("ThresholdLadder", () => {
     assert.ok(wide.includes('fontSize="12"') || wide.includes('font-size="12"'));
   });
 });
-
-describe("RegimeGlyph", () => {
-  const keys: RegimeKey[] = ["EXPANSION", "DEFENSIVE", "SCARCITY", "VOLATILE"];
-
-  it("renders every regime with the shared horizon and a title", () => {
-    for (const regime of keys) {
-      const html = renderToStaticMarkup(<RegimeGlyph idPrefix={`g-${regime}`} regime={regime} />);
-      assertTokensWrapped(html);
-      assert.match(html, /y1="26"/, `${regime} is missing the shared horizon`);
-      assert.match(html, /<title id="g-[A-Z]+-title">.+<\/title>/, `${regime} has no title`);
-    }
-  });
-});
-

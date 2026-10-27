@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { renderToStaticMarkup } from "react-dom/server";
 import { buildBriefMarkdown } from "../app/brief.md/route";
-import { FrameworkSection } from "../app/trust/frameworkSection";
+import { MethodSection } from "../app/about/methodSection";
 import { TrackRecordTable, TrackRecordTiles } from "../app/components/history/TrackRecord";
 import { RegimePhaseMap } from "../app/components/history/RegimePhaseMap";
 import type { RegimeKey } from "../lib/types";
@@ -15,7 +15,6 @@ import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { DECISION_CONTRACT_LABELS } from "../lib/report/reportCopy";
 import { TRACK_RECORD_MIN_MONTHS, buildTrackRecord } from "../lib/report/trackRecord";
 import type { TimeMachineRegimeEntry } from "../lib/timeMachine/timeMachineCache";
-import { pricingPlans } from "../lib/pricing";
 import { FormulaReference } from "../app/trust/formulaReference";
 import { RISK_GAP_TO_TIGHTNESS_EQUIVALENT } from "../lib/regimeEngine";
 import { buildLlmsTxt } from "../lib/seo/llmsTxt";
@@ -40,12 +39,14 @@ describe("/trust says each thing once", () => {
    * same sentence, so a reader met it twice in a row before reaching anything
    * new.
    */
-  it("does not restate its own section description in the body", () => {
-    const html = renderToStaticMarkup(<FrameworkSection />);
-    const sentence = "Each decision here has three parts";
-    const occurrences = html.split(sentence).length - 1;
-
-    assert.equal(occurrences, 1, "the three-parts sentence is rendered more than once");
+  /* The method moved to /about beside "How it works", which already says what
+     the three parts are, so the section opens on them filled in. */
+  it("does not restate what /about's 'How it works' already says", async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    const html = renderToStaticMarkup(<AboutPage />);
+    assert.equal((html.match(/an action, a pause line and a resume line/g) ?? []).length, 1);
+    const explanation = html.indexOf("How it works");
+    assert.ok(explanation !== -1 && explanation < html.indexOf('id="method"'), "the method follows How it works");
   });
 });
 
@@ -110,11 +111,17 @@ describe("/history dates what it is showing", () => {
     );
   });
 
-  it("stamps the period the record runs through", () => {
+  /* The period is the page intro's stamp ("Last completed month", "Data as of"),
+     not a sentence under the tiles restating the held tile (2026-10-09). The tiles
+     carry their window, and the held figure prints once. */
+  it("leaves the period to the intro's stamp and prints the held months once", () => {
     const html = renderToStaticMarkup(<TrackRecordTiles record={record} />);
 
-    assert.match(html, /month-end conditions/i);
-    assert.match(html, /Through /);
+    assert.doesNotMatch(html, /Through |month-end conditions had been/i);
+    assert.doesNotMatch(html, /Record starts/, "the start date is the count tiles' window");
+    const text = html.replace(/<!--[\s\S]*?-->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
+    assert.equal((text.match(/Current conditions held/g) ?? []).length, 1);
+    assert.match(text, /since Jan 2024/);
   });
 
   /*
@@ -180,7 +187,7 @@ describe("/history dates what it is showing", () => {
 
     assert.doesNotMatch(text, /Months in each quadrant/);
     assert.match(text, /Months under each set of conditions/);
-    assert.match(text, /not the quadrant its dot sits in: the two differ in 2 of these 4 months/);
+    assert.match(text, /not the quadrant each dot sits in: the two differ in 2 of these 4 months/);
   });
 
   it("keeps the phase map's panel and caveat on the same fact", () => {
@@ -193,30 +200,6 @@ describe("/history dates what it is showing", () => {
       source.includes("last completed"),
       "the phase map no longer says which period its latest point covers",
     );
-  });
-});
-
-describe("/pricing agrees with /privacy about where a reader's data goes", () => {
-  /*
-   * /privacy 2.4 tells a reader that recorded decisions are held in Cloudflare
-   * KV against their browser identifier, and everything else stays local. The
-   * free tier's bullet said decision memory was "saved in this browser", which
-   * understates where it goes — the direction that costs trust.
-   */
-  const freePlan = pricingPlans.find((plan) => plan.id === "free");
-
-  it("does not claim recorded decisions stay in the browser", () => {
-    assert.ok(freePlan, "expected a free plan");
-    const decisionBullets = freePlan.features.filter((feature) => /decision/i.test(feature));
-
-    assert.ok(decisionBullets.length > 0, "expected the free tier to describe decision memory");
-    for (const bullet of decisionBullets) {
-      assert.doesNotMatch(
-        bullet,
-        /saved in this browser/i,
-        `"${bullet}" contradicts /privacy 2.4, which puts recorded decisions in KV`,
-      );
-    }
   });
 });
 
@@ -266,21 +249,27 @@ describe("the site gives one account of what is new and what the scores read", (
     assert.match(builtFrom, /Inflation and unemployment[^.]*neither score/, "the page should say what it reads but does not score");
   });
 
-  it("/about says what is new, and links the record that backs the second claim", async () => {
+  it("/about explains the method and links the record that grades it", async () => {
     const { default: AboutPage } = await import("../app/about/page");
     const html = renderToStaticMarkup(<AboutPage />);
 
-    assert.match(html, /What is new here/);
+    assert.match(html, /How it works/);
     assert.match(html, /href="\/history#track-record"/);
     assert.match(html, /href="\/calibration"/);
   });
 
-  it("/trust ties the method's origin to someone a reader can look up", () => {
-    const html = renderToStaticMarkup(<FrameworkSection />);
-    const origin = html.split("<p").find((paragraph) => paragraph.includes("clinical workflows"));
+  /* "Who writes it" names the editor and links to the work once; the method
+     explains the review process without making a second origin claim. */
+  it("/about ties the method's origin to someone a reader can look up, once", async () => {
+    const { default: AboutPage } = await import("../app/about/page");
+    const html = renderToStaticMarkup(<AboutPage />);
+    const origins = html.split("<p").filter((paragraph) => /comes from[^<]*healthcare|built this structure into/.test(paragraph.replace(/<!-- -->/g, "")));
 
-    assert.ok(origin, "expected the paragraph that says where the method comes from");
-    assert.match(origin, /href="\/about"/, "an origin claim with no one behind it reads as invented");
+    assert.equal(origins.length, 1, "the structure's origin is stated once on /about");
+    assert.match(origins[0], /href="https:\/\/[^"]+"/, "an origin claim needs someone a reader can look up behind it");
+    const method = renderToStaticMarkup(<MethodSection />);
+    assert.match(method, /check your cash position/);
+    assert.doesNotMatch(method, /clinical workflows|healthcare products|href="\/about"/, "the method needs no second origin claim or clinical analogy");
   });
 
   it("/trust puts operating latitude where it is drawn, and defines confidence the way the label counts it", () => {
@@ -312,7 +301,7 @@ describe("/about says how often the guidance moves, from the record", () => {
     assert.ok(record, "expected the bundled archive to be long enough for a record");
     const text = renderToStaticMarkup(<AboutPage />).replace(/<!-- -->/g, "").replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
-    assert.match(text, /Where it fits, and where it does not/);
+    assert.match(text, /Where it fits and where it does not/);
     assert.ok(text.includes(`changed ${record.regimeChanges} times in ${record.monthsCovered} months`));
     assert.ok(text.includes(`lines in ${record.lineCrossingMonths} of them`));
   });
@@ -375,15 +364,19 @@ describe("/ and /brief.md agree on whether conditions could change next week", (
           isFallback: homepage.reportShell.showOfflineBadge,
           confidenceLabel: homepage.weeklyDecisionCardModel.status.confidenceLabel,
           assessment: reportData.assessment,
+          scoringBasis: reportData.scoringBasis,
         })}
       />,
     );
     const brief = buildBriefMarkdown(homepage);
-    const stripValue = /<dt[^>]*>Could change next week<\/dt><dd[^>]*>([^<]+)<\/dd>/.exec(strip)?.[1];
-    const briefTrustLine = brief.split("\n").find((line) => line.startsWith("> **Confidence:**"));
+    /* The margin cell's second half (2026-10-09): "Could change next week", with a reason
+       when one applies, or "Not expected to change next week". */
+    const stripValue = /data-next-week[^>]*>([\s\S]*?)<\/span>/.exec(strip)?.[1]?.replace(/<!--[\s\S]*?-->/g, "").replace(/^\s*·\s*/, "").trim();
+    const briefTrustLine = brief.split("\n").find((line) => line.startsWith("> **Trust:**"));
     assert.ok(stripValue, "expected the strip to state whether conditions could change next week");
     assert.ok(briefTrustLine, "expected /brief.md to open with its confidence line");
-    return { stripSaysYes: stripValue?.startsWith("Yes") ?? false, briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
+    // "Could change next week", with or without a reason, is the yes; "Not expected to change next week" is the no.
+    return { stripSaysYes: stripValue !== undefined && stripValue.startsWith("Could change next week"), briefSaysYes: /could change next week/i.test(briefTrustLine), stripValue, briefTrustLine, brief };
   };
 
   it("says not expected on the week of Sep 29, on both", async () => {
@@ -437,7 +430,7 @@ describe("an area row prints the line that explains its state", () => {
   /*
    * Week of Sep 29, 2026: funding pressure 90, risk appetite 44. Each row took
    * its nearest line, so fundraising's pause read "Risk appetite < 44 · at the
-   * line" beside "Pause now applies: funding pressure rose through 76", and
+   * line" beside "Pause now applies: funding pressure rose above 76", and
    * hiring's resume read "Risk appetite > 54 · 10 pts away" while funding
    * pressure, 24 points from its resume line, was what kept hiring paused.
    */
@@ -453,7 +446,7 @@ describe("an area row prints the line that explains its state", () => {
     const row = (area: string) => rows.find((candidate) => candidate.area === area);
 
     assert.equal(row("capital-raising")?.pause?.line, "Funding pressure > 76");
-    assert.equal(row("capital-raising")?.pause?.distance, "crossed");
+    assert.equal(row("capital-raising")?.pause?.distance, "past the line");
     assert.equal(row("hiring")?.resume?.line, "Funding pressure < 66");
     assert.equal(row("hiring")?.resume?.distance, "24 pts away");
   });

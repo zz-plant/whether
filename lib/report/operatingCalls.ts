@@ -10,10 +10,12 @@ import {
   type RuleCondition,
   type RuleConditionMetric,
 } from "./boundedDecisionRules";
+import { CircleDashed, Pause, Play, type LucideIcon } from "lucide-react";
 import { formatDecisionLatencyLine } from "./decisionLatency";
 import { businessAreaLabel, businessAreaOrder, businessAreaOwner, type BusinessAreaKey } from "./decisionKnobs";
 import { joinSentences } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../regimeEngineCore";
 
 /**
  * `avoidNow` renders under an "Avoid now" heading, so its entries stay bare
@@ -28,7 +30,6 @@ const joinClauses = (...parts: Array<string | undefined | null | false>) => {
   return clauses.length > 0 ? `${clauses.join("; ")}.` : "";
 };
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
-import type { DecisionTransmissionBoundedRule } from "./reportData";
 
 /**
  * Loop stage owner: decision.
@@ -86,73 +87,10 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
   rules.find((rule) => rule.area === area);
 
 const OPERATING_LEVER_FALLBACK = {
-  areaActionNow: "Keep last week's plan for this area.",
+  areaActionNow: "Keep your current plan for this area.",
   triggerThreshold: "Pause if funding pressure exceeds 60 or risk appetite falls below 40.",
   reversalCondition: "Resume expansion when funding pressure drops below 50 and risk appetite is above 50.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
-
-/* Said as what is missing. The reader cannot "review thresholds manually"; the
-   rule table did not supply a line this week, and that is the fact to carry. */
-const MANUAL_REVIEW_THRESHOLD_PLACEHOLDER = "No pause line this week — check the guidance before acting.";
-const MANUAL_REVIEW_REVERSAL_PLACEHOLDER = "No resume line this week — check the guidance before acting.";
-
-const hasText = (value: string | undefined | null): value is string => typeof value === "string" && value.trim().length > 0;
-
-const toDecisionTransmissionRule = ({
-  action,
-  triggerThreshold,
-  reversalCondition,
-}: {
-  action?: string;
-  triggerThreshold?: string;
-  reversalCondition?: string;
-}): DecisionTransmissionBoundedRule => {
-  const missingThreshold = !hasText(triggerThreshold);
-  const missingReversal = !hasText(reversalCondition);
-
-  return {
-    action: hasText(action) ? action.trim() : OPERATING_LEVER_FALLBACK.areaActionNow,
-    triggerThreshold: missingThreshold ? MANUAL_REVIEW_THRESHOLD_PLACEHOLDER : triggerThreshold.trim(),
-    reversalCondition: missingReversal ? MANUAL_REVIEW_REVERSAL_PLACEHOLDER : reversalCondition.trim(),
-    manualReviewRequired: missingThreshold || missingReversal,
-  };
-};
-
-export const buildDecisionTransmissionBoundedRules = ({
-  rules,
-  actionStripItems,
-}: {
-  rules?: BoundedDecisionRule[];
-  actionStripItems?: ActionStripItem[];
-}): DecisionTransmissionBoundedRule[] => {
-  if (Array.isArray(actionStripItems) && actionStripItems.length > 0) {
-    return actionStripItems.map((item) =>
-      toDecisionTransmissionRule({
-        action: item.areaActionNow,
-        triggerThreshold: item.triggerThreshold,
-        reversalCondition: item.reversalCondition,
-      }),
-    );
-  }
-
-  if (Array.isArray(rules) && rules.length > 0) {
-    return rules.map((rule) =>
-      toDecisionTransmissionRule({
-        action: formatBoundedDecisionAction(rule),
-        triggerThreshold: formatActionStripThresholdText(rule),
-        reversalCondition: formatActionStripReversalText(rule),
-      }),
-    );
-  }
-
-  return [
-    toDecisionTransmissionRule({
-      action: OPERATING_LEVER_FALLBACK.areaActionNow,
-      triggerThreshold: undefined,
-      reversalCondition: undefined,
-    }),
-  ];
-};
 
 type CurrentScores = {
   tightness: number;
@@ -329,7 +267,7 @@ export const buildSharedCorridorRails = (
 };
 
 /**
- * "44 pts away", "at the line", "crossed" or "already met" — a distance, not a
+ * "44 pts away", "at the line", "past the line" or "already met" — a distance, not a
  * sentence. `met` is the operator's verdict; a strict line at zero distance is
  * "at the line", which is not the same claim as tripped.
  *
@@ -345,9 +283,58 @@ export const formatPointsToLine = (
   met: boolean | undefined,
 ): string => {
   if (points === undefined || !Number.isFinite(points)) return "—";
-  if (met) return kind === "pause" ? "crossed" : "already met";
+  /* "Past the line", not "crossed": a state, not an event. Beside "No score
+     crossed a pause or resume line since Sep 30", "crossed" read as this
+     week's news (2026-10-14). */
+  if (met) return kind === "pause" ? "past the line" : "already met";
   if (points === 0) return "at the line";
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"} away`;
+};
+
+/** A resume line met on an area that is not on hold: there is no hold to lift, so not "already met". */
+export const NOTHING_TO_RESUME = "nothing to resume";
+
+/**
+ * How near counts as close to a line: 5 points. It is the distance the margin
+ * already calls "Close to the line" (`REGIME_CONFIDENCE_NEAR_THRESHOLD`, the
+ * band `resolvePublishedConfidence` grades lowest) and the distance the area
+ * table tinted as near a pause line before the state badge, so "close" is one
+ * distance on every surface rather than a second cutoff.
+ */
+const CLOSE_TO_LINE_POINTS = REGIME_CONFIDENCE_NEAR_THRESHOLD;
+
+/**
+ * Where a reading stands against one side of an area's rule, for the state
+ * badge: a pause line crossed, close to it, or clear of it. A resume line has
+ * a state only once it is met ("clear"); short of it, the distance is plain
+ * text, because a resume line not yet reached is not a pause.
+ */
+export type LineState = "crossed" | "near" | "clear";
+
+export const resolveLineState = (
+  points: number | undefined,
+  kind: "pause" | "resume",
+  met: boolean | undefined,
+): LineState | undefined => {
+  if (kind === "resume") return met ? "clear" : undefined;
+  if (met) return "crossed";
+  if (points === undefined || !Number.isFinite(points)) return undefined;
+  return points <= CLOSE_TO_LINE_POINTS ? "near" : "clear";
+};
+
+/**
+ * One glyph per state, beside the words `formatPointsToLine` and
+ * `describeAreaPauseStatus` print for it, never in place of them. Pause and
+ * play are the two sides of a rule; the dashed circle is a line not yet
+ * closed. The warning triangle was the other candidate for "close", and it is
+ * already the toast's error mark (`AlertTriangleIcon`), so it would say
+ * "something failed" about a line nobody has crossed. The signal-bar keys draw
+ * the pause and resume lines with the same two glyphs.
+ */
+export const LINE_STATE_ICONS: Record<LineState, LucideIcon> = {
+  crossed: Pause,
+  near: CircleDashed,
+  clear: Play,
 };
 
 /**

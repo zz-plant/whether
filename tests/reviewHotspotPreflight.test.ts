@@ -1,54 +1,42 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
+import { spawnSync } from "node:child_process";
+import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import {
   blockCommentLines,
-  describeDiffRange,
   isUnsafeAssertion,
-  resolveDefaultDiffRange,
+  resolveDiffBase,
 } from "../scripts/review-hotspot-preflight.mjs";
 
 /*
- * The default range, and the one shape it used to get wrong.
- *
- * `HEAD~1` is the first parent. On a merge commit that is the pre-merge branch
- * tip, so the scan read everything the *base* brought in as newly added by this
- * change: merging `main` into a branch on 2026-09-17 flagged an `as` cast that
- * had been on `main` for a day, and the merge resolving that PR's conflict could
- * only be pushed with SKIP_PREPUSH=1. Checked against that commit, the first
- * parent surfaces seven lines of the base's own code and `HEAD^2...HEAD`
- * surfaces none.
+ * One comparison: the working tree against a base. The base is the merge-base with main
+ * so a branch is judged on what it changes, and a merge commit does not read the base's
+ * own lines as new (docs/agents/lessons/tests-and-copy-rules.md).
  */
-describe("the default diff range", () => {
-  it("compares against the last commit on an ordinary commit", () => {
-    assert.deepEqual(resolveDefaultDiffRange({ hasHeadParent: true, parentCount: 1 }), ["HEAD~1"]);
+describe("the diff base", () => {
+  const MERGE_BASE = "2222222222222222222222222222222222222222";
+  const HEAD = "1111111111111111111111111111111111111111";
+
+  it("takes an explicit base first, which is how the pre-push hook scopes a push", () => {
+    assert.equal(resolveDiffBase({ explicit: "abc123", mergeBase: MERGE_BASE, head: HEAD, hasParent: true }), "abc123");
   });
 
-  it("compares against the merged-in base on a merge commit, not the first parent", () => {
-    assert.deepEqual(resolveDefaultDiffRange({ hasHeadParent: true, parentCount: 2 }), ["HEAD^2...HEAD", "HEAD"]);
-    assert.deepEqual(resolveDefaultDiffRange({ hasHeadParent: true, parentCount: 3 }), ["HEAD^2...HEAD", "HEAD"]);
+  it("compares a branch against where it left main", () => {
+    assert.equal(resolveDiffBase({ mergeBase: MERGE_BASE, head: HEAD, hasParent: true }), MERGE_BASE);
   });
 
-  /*
-   * The second range is the point. A three-dot range ignores the working tree,
-   * and every branch cut from this repo's main starts at a merge commit — so a
-   * merge range alone would have made a fresh branch's uncommitted edits
-   * invisible until its first commit, which is a worse failure than the one the
-   * merge case fixes.
-   */
-  it("keeps uncommitted work in scope on a merge commit", () => {
-    assert.ok(resolveDefaultDiffRange({ hasHeadParent: true, parentCount: 2 }).includes("HEAD"));
+  it("compares against the last commit on main itself, where the merge-base is HEAD", () => {
+    assert.equal(resolveDiffBase({ mergeBase: HEAD, head: HEAD, hasParent: true }), "HEAD~1");
   });
 
-  it("falls back to the working tree in a repository with no parent commit", () => {
-    assert.deepEqual(resolveDefaultDiffRange({ hasHeadParent: false, parentCount: 0 }), ["HEAD"]);
+  it("falls back to the last commit when there is no main to compare with", () => {
+    assert.equal(resolveDiffBase({ mergeBase: "", head: HEAD, hasParent: true }), "HEAD~1");
   });
 
-  it("says which ranges it used", () => {
-    assert.match(describeDiffRange("HEAD~1"), /the last commit plus any uncommitted changes/);
-    assert.match(describeDiffRange("HEAD"), /uncommitted changes only/);
-    assert.match(describeDiffRange(["HEAD~1"]), /the last commit plus any uncommitted changes/);
-    assert.match(describeDiffRange(["HEAD^2...HEAD", "HEAD"]), /merge commit/);
-    assert.match(describeDiffRange(["HEAD^2...HEAD", "HEAD"]), /plus any uncommitted changes/);
+  it("falls back to the working tree in a repository with one commit", () => {
+    assert.equal(resolveDiffBase({ mergeBase: "", head: HEAD, hasParent: false }), "HEAD");
   });
 });
 
@@ -127,5 +115,74 @@ describe("prose inside an edited doc comment", () => {
 
     assert.equal(isUnsafeAssertion(editedLine), true, "the line alone is indistinguishable");
     assert.ok(blockCommentLines(file).has(2), "but the file says line 2 is a comment");
+  });
+});
+
+/*
+ * With a named head the diff's new side is that commit, so comment context has to come
+ * from the same commit: a line that is a comment on disk must not excuse an assertion the
+ * pushed commit carries. Run against a real repository, because the branch under test is
+ * `git show <head>:<file>`.
+ */
+describe("comment context with a named head", () => {
+  const SCRIPT = join(process.cwd(), "scripts", "review-hotspot-preflight.mjs");
+
+  /* Git hands a hook GIT_DIR and friends, and every git below would run against the
+     pushing repository instead of this scaffold (CLAUDE.md, the pre-push hook). */
+  const gitFreeEnv = () => {
+    const env = { ...process.env };
+    for (const key of Object.keys(env)) if (key.startsWith("GIT_")) delete env[key];
+    return env;
+  };
+
+  const scaffold = () => {
+    const repository = mkdtempSync(join(tmpdir(), "hotspot-head-"));
+    const env = gitFreeEnv();
+    const git = (...args: string[]) => {
+      const run = spawnSync("git", args, { cwd: repository, encoding: "utf8", env });
+      assert.equal(run.status, 0, `git ${args.join(" ")}: ${run.stderr}`);
+      return run.stdout.trim();
+    };
+    git("init", "--quiet");
+    git("config", "user.email", "test@example.com");
+    git("config", "user.name", "test");
+    writeFileSync(join(repository, "lib.ts"), "const a = 1;\n");
+    git("add", "lib.ts");
+    git("commit", "--quiet", "-m", "base");
+    const base = git("rev-parse", "HEAD");
+    writeFileSync(join(repository, "lib.ts"), "const v = input as Foo;\n");
+    git("commit", "--quiet", "-am", "head");
+    const head = git("rev-parse", "HEAD");
+    // On disk, line 1 is a comment; in the head commit, line 1 is the assertion.
+    writeFileSync(join(repository, "lib.ts"), "// line one is a comment on disk\n");
+    const preflight = (...args: string[]) =>
+      spawnSync(process.execPath, [SCRIPT, ...args], { cwd: repository, encoding: "utf8", env });
+    return { repository, base, head, preflight };
+  };
+
+  it("reads comment lines from the head commit, so a pushed assertion is not excused by the disk", () => {
+    const { repository, base, head, preflight } = scaffold();
+    try {
+      const run = preflight("--base", base, "--head", head);
+      const output = `${run.stdout}${run.stderr}`;
+      assert.equal(run.status, 1, output);
+      assert.match(output, /Unsafe assertion additions: 1/);
+      assert.ok(output.includes("lib.ts: const v = input as Foo;"), output);
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
+  });
+
+  it("still reads the working tree when no head is named", () => {
+    const { repository, base, preflight } = scaffold();
+    try {
+      const run = preflight("--base", base);
+      const output = `${run.stdout}${run.stderr}`;
+      assert.equal(run.status, 0, output);
+      assert.match(output, /working tree against/);
+      assert.match(output, /Unsafe assertion additions: 0/);
+    } finally {
+      rmSync(repository, { recursive: true, force: true });
+    }
   });
 });

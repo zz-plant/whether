@@ -4,6 +4,7 @@ import { buildBoardSlideBullets, buildCallCitation, buildSlackBrief } from "../l
 import { regimeSignalLabel } from "../lib/report/signalTranslations";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { joinSentences } from "../lib/report/reportFormatting";
+import { weeklyHeadline } from "../lib/report/reportEvidence";
 
 import { assessment, fixtureBriefDocument, fixtureWeeklyCall } from "./factories/exportFixtures";
 
@@ -18,12 +19,13 @@ describe("buildSlackBrief", () => {
     const weeklyCall = fixtureWeeklyCall();
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall }));
 
-    /* The guidance opens on the do-now line the homepage, the email and the
-       /share post lead with, and the stance follows it. The two used to print
-       under "Guidance" and "Do now", so "Guidance:" meant a different sentence
-       here than in every other paste. */
-    assert.equal(slot(brief, "Guidance"), joinSentences(weeklyCall.actionNow, weeklyCall.currentCall));
-    assert.ok(slot(brief, "Guidance").startsWith(weeklyCall.actionNow));
+    /* The guidance is the week's one headline action (`weeklyHeadline`): the
+       call, which the homepage h1, the email and the /share post lead with too.
+       The action printed first until 2026-10-09, so one paste carried two
+       instructions for the week. */
+    assert.equal(slot(brief, "Guidance"), joinSentences(weeklyHeadline(weeklyCall).composed));
+    assert.ok(slot(brief, "Guidance").endsWith(weeklyCall.currentCall));
+    assert.ok(!slot(brief, "Guidance").includes(weeklyCall.actionNow), "the action is not a second headline");
     assert.equal(slot(brief, "Do now"), "", "no second slot repeats the guidance");
     assert.equal(slot(brief, "Pause if"), weeklyCall.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), weeklyCall.callChangesIf);
@@ -42,7 +44,7 @@ describe("buildSlackBrief", () => {
 
     assert.match(brief, /^• Pause if: Funding pressure rises above 76$/m);
     // Both resume lines hold at 12 / 68, and the line says so rather than reading as a move to come.
-    assert.match(brief, /^• Resume when: Funding pressure is below 66 \(already true at 12\) and risk appetite is above 54 \(already true at 68\)$/m);
+    assert.match(brief, /^• Resume when: Funding pressure is below 66 and risk appetite is above 54\. Funding pressure is 12 and risk appetite is 68 now\.$/m);
     assert.doesNotMatch(brief, /Pause if: Pause|Resume when: Resume/);
     assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Resume when \/ Conditions change if\):/);
     const order = ["• Guidance:", "• Pause if:", "• Resume when:", "• Conditions change if:"].map((label) => brief.indexOf(label));
@@ -61,7 +63,7 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(fixtureBriefDocument({ weeklyCall: held }));
     const hold = POLICY_OVERRIDE_CALL["signals-disagree"];
 
-    assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall));
+    assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall), "a held week's action leads");
     assert.equal(slot(brief, "Pause if"), hold.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), hold.callChangesIf);
     assert.equal(slot(brief, "Resume when"), "");
@@ -72,8 +74,8 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(fixtureBriefDocument());
 
     // Each score carries what it means beside the number: a paste has no page to explain the scale.
-    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts below · resume line 66 \(already met\)$/m);
-    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts above · resume line 54 \(already met\)$/m);
+    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts away · resume line 66 \(already met\)$/m);
+    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts away · resume line 54 \(already met\)$/m);
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.
@@ -82,7 +84,7 @@ describe("buildSlackBrief", () => {
 
   it("resolves its change-course cross-reference to a label it actually prints", () => {
     const brief = buildSlackBrief(fixtureBriefDocument());
-    const referenced = brief.match(/What would show it: "([^"]+)"/)?.[1];
+    const referenced = brief.match(/How you'd know: watch "([^"]+)"/)?.[1];
     assert.ok(referenced, "no change-course cross-reference found");
     assert.ok(brief.includes(`• ${referenced}:`), `cross-reference points at "${referenced}", which the brief never prints`);
   });
@@ -125,12 +127,12 @@ describe("buildSlackBrief", () => {
     // scale) is High. The fixture's engine code says MEDIUM, and neither that
     // code nor its band reaches a paste any more.
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /^• High confidence$/m);
+    assert.match(brief, /^• Margin: clear of the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/m);
     assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
-    /* The contract's sentence, which reads the confidence: this High week is
+    /* The contract's sentence, which reads the margin: this clear week is
        not told it sits near a line. */
     assert.doesNotMatch(brief, /The scores sit near a line/);
-    assert.match(brief, /• Even at high confidence, individual signals can reverse/);
+    assert.match(brief, /• The scores are clear of the change lines, but a signal can still reverse/);
   });
 
   it("carries each area's timing line into the per-area rows", () => {
@@ -164,7 +166,7 @@ describe("buildSlackBrief", () => {
     // Recovery from the Sep 25 reading: the sentence comes before the readings that are its evidence.
     assert.equal(
       lines[changed + 1],
-      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell through 66 and risk appetite rose through 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
     );
     assert.match(lines[changed + 2] ?? "", /^Funding pressure 12 of 100 /);
 
@@ -204,7 +206,7 @@ describe("buildCallCitation", () => {
     const citation = buildCallCitation(fixtureBriefDocument({ weeklyCall: { ...fixtureWeeklyCall(), regimeStage: "Sunny — Late" } }));
 
     assert.match(citation, /^Conditions: Sunny — Late \(money is cheap and available\)$/m);
-    assert.match(citation, /^High confidence \(how far the scores sit/m);
+    assert.match(citation, /^Margin: clear of the line \(how far the scores sit/m);
     assert.match(citation, /^Source note: https:\/\/fred\.stlouisfed\.org$/m);
     assert.match(citation, /^Full brief: https?:\/\//m);
     assert.doesNotMatch(citation, /EXPANSION|refresh cadence|Score-based/, "the citation is for a reader, not the engine");

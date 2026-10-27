@@ -40,23 +40,90 @@ what a month's call was made on.
 
 ## Market data provider
 
-`lib/saasMultiples.ts` computes the SaaS comps median through one seam. Without a key it reads
-Yahoo Finance's unofficial quote endpoint, which rate-limits and blocks without notice. With
-`ALPHA_VANTAGE_API_KEY` it reads Alpha Vantage's documented OVERVIEW endpoint, which reports
-EV/Revenue and revenue growth directly; the snapshot's `source` field says which one answered.
-The per-company detail route keeps Yahoo either way, because OVERVIEW carries no balance sheet.
+`lib/saasMultiples.ts` computes the SaaS comps median (`/comps`, `/api/comps`, the `get_comps` tool)
+from a chain of providers, each behind a small client in `lib/marketData/`. The first to read at
+least half the basket answers, and the snapshot's `source` names it; that is the provider the page's
+"As of [date], from [source]" line credits.
 
-## Ingest coordinator (trial)
+1. **Alpha Vantage** (`ALPHA_VANTAGE_API_KEY` set). OVERVIEW reports EV/Revenue and growth directly,
+   but the free tier allows 5 requests a minute and 25 a day
+   (`docs/research/2026-09-03-alternative-data-endpoints.md`), so it refuses most of a basket fetched
+   at once and hands over to EDGAR. Unset in production.
+2. **SEC EDGAR filings and Cboe delayed prices** (`sec-cboe`, the default). `secEdgar.ts` reads each
+   company's XBRL company facts (`data.sec.gov/api/xbrl/companyfacts/CIK##########.json`, with a
+   User-Agent naming the site and a contact, as SEC's fair-access policy asks) and derives trailing
+   four-quarter revenue, latest-quarter growth year on year, cash with short-term investments, debt
+   (convertible notes included, leases not) and shares outstanding. A fiscal fourth quarter is the
+   10-K's year less its three quarters; a company whose latest quarter is more than 200 days old has
+   stopped filing and reads as missing. `cboe.ts` prices each company from Cboe's public
+   delayed-quote file (`cdn.cboe.com/api/global/delayed_quotes/quotes/<SYMBOL>.json`), no key.
+   EV/Revenue is (price × shares + debt − cash) / trailing revenue. Checked against Yahoo's own
+   figures on 2026-10-09: revenue, growth and cash matched for all fourteen companies, and the basket
+   median was 8.9x on both.
+3. **Yahoo Finance** (`yahoo.ts`). quoteSummary now answers 429 to a request without a browser user
+   agent and 401 "Invalid Crumb" without a session, so the client mints one — the cookie
+   `fc.yahoo.com` sets, then a crumb from `query2.finance.yahoo.com/v1/test/getcrumb` — caches it in
+   KV for twelve hours, and on a 401 mints one fresh session and retries only the refused symbols.
+   Market cap is Yahoo's `marketCap`, which covers every share class; `sharesOutstanding` counts one,
+   which understated Atlassian by a third.
+
+When no provider answers, `fetchSaaSValuations` throws `QuoteSourceUnavailableError` with each
+provider's reason and `/api/comps` answers its documented 503. A provider that knows none of the
+companies counts as down, not as an empty basket.
+
+**Caches, all in `WHETHER_DURABLE_KV`.** The basket snapshot for an hour (`comps:basket:v1`), so the
+page, the API and the tool share one upstream read; each company's derived filing figures for twelve
+hours (`comps:sec:v1:<cik>`), not the multi-megabyte filing; the Yahoo session for twelve hours.
+A refusal is never cached.
+
+**Why not Yahoo first, and why not Stooq (checked 2026-10-09).** From a remote Worker session on
+Cloudflare's network, EDGAR, Cboe and Yahoo's cookie-and-crumb flow all answered for the whole
+basket; from a residential connection Yahoo refused the crumb itself with 429. Yahoo is unofficial
+and blocks by address without notice, so it is the fallback. Stooq's CSV quote endpoint answers 404
+and its history download now serves a JavaScript proof-of-work page, so it is not a source.
+
+**The basket lost Confluent.** IBM's acquisition closed and Confluent deregistered (Form 15, March
+2026); no provider had a quote for it, and the page was listing a company that no longer trades.
+
+## Ingest coordinator
+
+**`/api/health` reports degraded feeds (2026-10-13).** It used to ask only whether a report
+loaded, and a report built from stale inputs loads: it said "ok" while `/trust` read
+"Treasury · Stale · 14h old". It now lists every live source `/trust` counts as degraded
+(`listDegradedLiveSources`, `lib/report/sourceHealth.ts`) under `degradedSources`, each with a
+`state`: `stale` (past its window), `unconfirmed` (no fetch on record) or `cached` (a fallback
+inside its window). `staleSources` is the `stale` subset. Any entry makes the overall status
+`"degraded"` (HTTP 200). `dependencies.dataFreshness` is `stale`, `ok`, or `unknown` when no
+report loaded. `bun run smoke:prod` fails on `"degraded"` and names the feeds, and
+`whether doctor` reports it as a warning.
+
+**Two freshness checks, because readers and the alarm see different data (2026-10-13).** The
+source rows follow the stored `OperatingSnapshot`, which only the scheduled cron writes (02:00
+UTC daily), so Treasury's window is the ingest cadence's 26h: a 6h window called every healthy
+afternoon stale. The coordinator's hourly alarm refreshes the materialized model behind the
+snapshot, and nothing republishes the snapshot from it, so the source rows cannot see a stopped
+alarm. `dependencies.ingestModel` (`ok` / `stale` / `unknown`, with `ingestModelAsOf`) judges the
+model's `asOf` against `INGEST_MODEL_STALE_AFTER_MS` (6h, `lib/ingestion/cadence.ts`); stale is
+also `"degraded"`. #1587 and #1586 each fixed one of these by breaking the other. Treasury's 26h
+is calendar hours, not business hours: the cron runs every day, and counting business hours let a
+Friday fetch read "fresh" on Monday with three runs missed.
+
+**It installs its env (2026-10-13).** The object is an entry point like the fetch and scheduled
+handlers, and may run in an isolate neither has primed. Its constructor ignored `env` until
+2026-10-13, so the hourly alarm's ingest read no `FRED_API_KEY` through `readSetting`; in
+production every feed sat at the 02:00 cron's fetch all day ("Treasury · Stale · 14h old" on
+`/trust`). It calls `installBindings(env)` now, and `tests/ingestCoordinator.test.ts` holds it.
+Any new Durable Object or Workflow that calls into `lib/` does the same.
 
 `worker/ingestCoordinator.ts` is a SQLite-backed Durable Object that owns the materialized
 model, the refresh lock, and an hourly alarm that ingests due families. It replaces KV's
 best-effort lock (two isolates can win the same expired lock) with real mutual exclusion and
-moves refresh off the request path entirely. It is on for the preview lane only
+moves refresh off the request path entirely. Promoted to production
 (`WHETHER_INGEST_COORDINATOR=1`); `lib/ingestion/durableStorageStore.ts` is the store the object
 runs against and `lib/ingestion/coordinatorStore.ts` the Worker-side client. Invariants 1, 1b,
 and 1c describe the behavior it must keep.
 
-## Regime history Workflow (trial)
+## Regime history Workflow
 
 `worker/workflows/regimeHistoryRefresh.ts` records the KV month in progress into
 `data/summary_monthly_regime_history.json` behind a pull request, in retried steps that fail
@@ -64,9 +131,9 @@ visibly instead of reporting success without a PR. It merges over the file on th
 it stands at run time, never the series bundled into the running deployment, so a preview built
 from an older commit cannot undo months that reached `main` after it was built. It adds only what the Worker observed: no
 backfill, no regenerated history — the canonical series is still the generator scripts' job.
-On for the preview lane only (`WHETHER_HISTORY_WORKFLOW=1`); needs `GITHUB_TOKEN`.
+Promoted to production (`WHETHER_HISTORY_WORKFLOW=1`); needs `GITHUB_TOKEN`.
 
-## Brief freeze Workflow (trial)
+## Brief freeze Workflow
 
 `worker/workflows/weeklyBriefFreeze.ts` appends this week's brief to `data/published_briefs.json`
 behind a pull request, from inside Cloudflare. The routine it stands in for ran in a sandbox whose
@@ -74,8 +141,8 @@ egress proxy denies FRED, so every run failed before it had a week to write. The
 `lib/report/publishedBriefRecord.ts`, which `scripts/freezeWeeklyBrief.ts` also uses, and passes
 `assessPublishReadiness` before anything is built; a week that is not publishable makes the first
 step throw, and the platform retries it hourly up to five times. The archive is append-only at the
-merge: a slug the base branch already carries is left exactly as it is. On for the preview lane
-only (`WHETHER_BRIEF_FREEZE_WORKFLOW=1`); needs `GITHUB_TOKEN`, which it checks before the live
+merge: a slug the base branch already carries is left exactly as it is. Promoted to production
+(`WHETHER_BRIEF_FREEZE_WORKFLOW=1`); needs `GITHUB_TOKEN`, which it checks before the live
 read rather than after it, so the flag and the secret can be set in either order when the lane is
 promoted. Checklist: `docs/cloudflare-deployment-runbook.md`, "Promoting the brief freeze to
 production".

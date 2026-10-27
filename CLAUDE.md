@@ -10,18 +10,22 @@ This file only covers mechanics: commands, costs, and where things live.
 | --- | --- | --- |
 | `bun run test <path>` | ~0.2s | Default loop. Runs only that file. |
 | `bun run test -t "<name>"` | ~1s | Filter by test name across the suite. |
-| `bun run test` | ~14s | 2,500+ tests / 360+ files. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
+| `bun run test` | ~20s | 3,400+ tests / 460+ files across 3 shards. Before commit, not per-edit. `BUN_TEST_RANDOMIZE=1` shuffles like the gate; `BUN_TEST_SEED=<n>` replays a gate failure. |
 | `bun run typecheck` | ~5s | TypeScript 7 (native). Run after any type-surface change. |
 | `bun run lint` | ~1s | oxlint, syntactic. The gate. Config in `.oxlintrc.json`. |
 | `bun run lint:types` | ~5s | oxlint type-aware (tsgolint). In `check` and pre-push since 2026-09-16; not in the deploy gate. |
 | `bun run check` | ~50s | lint + typecheck + test + assets + audit + preflight + landmarks, concurrently. Pre-merge only. The landmark audit is now the long pole. |
+| `bun run check <task…>` | varies | Only the named tasks, e.g. `bun run check lint typecheck`. Task names are in `scripts/check-tasks.mjs`. |
 | `bun run audit` | ~2s | `bun audit --audit-level=critical`. Highs are dev-only transitives; see `run-checks.mjs`. |
 | `bun run check:dead-exports` | ~0.4s | Exports nothing references, against a baseline of zero. In `check`, pre-push, and the deploy gate. |
+| `bun run check:unchecked-access` | ~6s | Indexing `noUncheckedIndexedAccess` would reject, against a baseline that only falls (888). `tests/checkUncheckedAccess.test.ts` holds it in every gate; when that fails, this lists the worst files. |
+| `bun run check:production-edge` | ~3s | Production `/` and `/api/health`: names a Cloudflare challenge, a 403 or a DNS failure. `check:production-assets` probes every static asset and OG route. |
 | `bun run skills:sync` | <1s | After editing `.claude/skills/` or `.codex/skills-overlay/`: regenerates the `.codex/skills/` mirror. |
 
 Package manager is `bun`. Dev server: `bun run dev`. Prefer the targeted test + `typecheck`
 pair while iterating; save `bun run check` for pre-merge. `check` runs its tasks concurrently and
-reports every failure in one pass; add `--serial` for fail-fast sequencing when debugging it.
+reports every failure in one pass; add `--serial` (or set `CHECK_SERIAL=1`) for fail-fast sequencing
+when debugging it.
 
 `check` also runs automatically on `git push` via `.husky/pre-push`, and since 2026-08-22 that hook
 is the check gate rather than a mirror of one: the GitHub workflows are manual-only, because this
@@ -31,10 +35,10 @@ means pushing unverified. Skip it with `SKIP_PREPUSH=1 git push` or `git push --
 **The hook clears git's exported environment before running the gate, and must keep doing so.**
 Git hands every hook `GIT_DIR`, `GIT_INDEX_FILE`, and friends, and every `git` the gate shells out
 to inherits them — which silently redirects those calls at the pushing repository.
-`tests/checkGateMarker.test.ts` builds a throwaway repo with `git init` and gets this one instead;
-`review:hotspot-preflight` resolves `HEAD~1` against the wrong index. Both pass standalone and fail
+`tests/deployGateWorktree.test.ts` builds a throwaway repo with `git init` and gets this one instead;
+`review:hotspot-preflight` resolves its base against the wrong index. Both pass standalone and fail
 only under the hook, so the symptom reads as flakiness. Reproduce it with
-`GIT_DIR=$PWD/.git bun run test tests/checkGateMarker.test.ts`. Note that
+`GIT_DIR=$PWD/.git bun run test tests/deployGateWorktree.test.ts`. Note that
 this worktree is often shared with other sessions, so a pre-push failure may be someone else's
 in-flight edit rather than yours — check `git status` first. The hook runs `run-checks.mjs --preset
 pre-push` (lint, lint:types, typecheck, test, assets, suppressions, dead-exports, hotspot-preflight,
@@ -49,11 +53,12 @@ open the one that matches the task instead of reading them all.
 
 | Touching… | Read |
 | --- | --- |
-| lint, suppressions, dead-export census, suite runner, telemetry streams, a red gate | [toolchain-and-gates](docs/agents/lessons/toolchain-and-gates.md) |
+| lint, suppressions, dead-export census, suite runner, telemetry streams, a red gate, an env flag | [toolchain-and-gates](docs/agents/lessons/toolchain-and-gates.md) |
 | a routine, brief freeze, email/Slack send, Cloudflare build, "green here, red there" | [automation-and-deploy-gate](docs/agents/lessons/automation-and-deploy-gate.md) |
 | reader-facing strings, source-reading tests, page-vs-page claims | [tests-and-copy-rules](docs/agents/lessons/tests-and-copy-rules.md) |
 | a new module, an API field, share/OG/SEO metadata, a cache, a warning banner, runway | [dead-features-and-honesty](docs/agents/lessons/dead-features-and-honesty.md) |
 | `lib/regimeEngineCore.ts`, confidence, anything printing a score or delta | [regime-scoring](docs/agents/lessons/regime-scoring.md) |
+| `lib/runtime/`, a binding, KV, a store singleton, a retry | [runtime-helpers](docs/agents/lessons/runtime-helpers.md) |
 | choosing a first file | [hot-files](docs/agents/hot-files.md) |
 
 ### Rules that catch changes here (one line each; the lesson files hold the why)
@@ -81,7 +86,7 @@ open the one that matches the task instead of reading them all.
 ### Session hygiene
 
 - The SessionStart hook unshallows a shallow clone, so `git log` / `git blame` see real history.
-- `bun run agent:route -- "<task>"` before broad searching: it names docs, first files and minimum checks.
+- `bun run agent:route -- "<task>"` before broad searching; the agent-workflow table below says what it names.
 - When a fix changes documented behaviour, update the matching doc in the same commit
   (`docs/feature-specs-current.md` drifts fastest).
 
@@ -90,10 +95,9 @@ open the one that matches the task instead of reading them all.
 | Command | What it does |
 | --- | --- |
 | `bun run agent:doctor` | Preflight: branch, dirty-worktree, relevant `AGENTS.md`, task-profile check. |
-| `bun run agent:route -- "<task>"` | Recommends docs, first files, and minimum checks for a task. |
+| `bun run agent:route -- "<task>"` | Recommends docs, first files, skills, lessons, specialised tools and minimum checks for a task. Lessons come from the "Read before you touch" table above; tools from `TOOL_HINTS` in `scripts/agent-workflow.config.mjs`. |
 | `bun run agent:handoff -- --job "<job>"` | Generates a canonical subagent handoff packet with repo defaults. |
 | `bun run agent:index` | Refreshes the repo cache under `artifacts/agent/`. |
-| `bun run agent:prewarm` | Checks LM Studio, warms the fast local model role, refreshes the repo cache. |
 
 Details: [docs/agents/mcp-and-skills-playbook.md](docs/agents/mcp-and-skills-playbook.md).
 
@@ -103,6 +107,7 @@ Details: [docs/agents/mcp-and-skills-playbook.md](docs/agents/mcp-and-skills-pla
 | --- | --- |
 | `bun run ui:iterate` | Screenshot-driven UI loop — starts dev server if needed, captures targets, writes a gallery to `artifacts/ui/`. Use with `-- --only <targets>` to narrow. |
 | `bun run ui:iterate:list` | Lists available capture targets. |
+| `bun run ui:frames` | Frame audit: every screen-height frame of each live route at a laptop and a phone, checked for the site, date and conditions and for blocks taller than a frame, with an advisory count of frames that keep a focal point at Slack's preview size. Writes `artifacts/ui/frames/`; `-- --strict` exits 1 on a failure. ui-ux-standards §XXVIII. |
 | `bun run ui:shots` | Raw capture only (skips dev-server management) — use if you already have one running. |
 | `bun run ui:mockups` | Prints mockup URLs for local exploration. |
 
@@ -113,8 +118,11 @@ recapture correctly.
 
 | Command | What it does |
 | --- | --- |
-| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags high-risk files needing extra review. Default range is the last commit **plus** uncommitted changes; `--base <sha>` is commit-to-commit and sees no dirty tree; `--working-tree` is uncommitted only. The printed range says which. On pre-push, `.husky/pre-push` scopes it to the commits the push actually sends (`scripts/pre-push-range.mjs` reads git's stdin plan), so it neither judges other sessions' uncommitted work nor misses commits 2..n of a multi-commit push. |
-| `bun run audit:jev-copy` | Advisory, needs a running server and Workers AI credentials: asks Jev (`typesafe/jev`) the 2026-09-22 copy audit's four questions of every sentence on the reader routes; `-- --mode brief` asks whether the generated brief contradicts the latest published call. Exits non-zero if any Jev call failed. Not in the gate — the suite is offline and a model's answer is not a check. Jev is never used for the call itself. |
+| `bun run review:hotspot-preflight` | Runs as part of `bun run check`; flags decision-logic files changed without tests and added `as` casts. One comparison: the working tree against a base, which is the merge-base with `main` (so a branch is judged on everything it changes), `HEAD~1` on `main` itself, or `--base <ref>`. `--head <ref>` names a commit instead of the working tree. On pre-push the hook sets both from git's stdin plan (`scripts/pre-push-range.mjs`), so a push is judged on exactly the commits it sends, whichever ref is checked out. |
+| `bun run audit:jev-copy` | Advisory, needs a running server and Workers AI credentials: asks Jev (`typesafe/jev`) the 2026-09-22 copy audit's four questions of every sentence on the reader routes; `-- --mode brief` asks whether the generated brief contradicts the latest published call. `-- --model jev,clef-flash` runs Cloudflare's Jev-compatible Clef models alongside and lists the sentences they disagree on. `-- --mode evidence` ranks source-backed candidates for the call; `-- --mode counterevidence` asks the third question — whether a claim would weaken the call — and builds the review packet; `-- --mode eval` scores labeled cases, including counterevidence cases from `bun run reviewed-cases:add`. Exits non-zero if any model call failed. Not in the gate — the suite is offline and a model's answer is not a check. No decision model is ever used for the call itself. |
+
+| `bun run evidence:pool` | Advisory, needs a local Ollama with `embeddinggemma-2:740m`: embeds a recurring passage file and the weekly call's canonical document, and writes the exact input `--mode counterevidence` judges — passages retrieved for the call (side `support`) and for the conditions that would change it (side `challenge`). The sides are retrieval hypotheses Clef verifies; embeddings cache by content hash in `.cache/evidence-pool/`. |
+| `bun run audit:near-duplicates` | Advisory, needs a local Ollama with `embeddinggemma-2:740m`: embeds every top-level function under `app/`, `lib/`, `worker/` and lists cross-file pairs at cosine ≥0.93, the helper rewritten under a new name that `rg` and the dead-export census miss. Cached by content hash in `artifacts/near-duplicates/`. A pair is a prompt to read both, not a finding. `-- --copy` (needs a running server too) does the same for reader-route sentences at ≥0.95: the same point said twice in different words, on one page or two. |
 | `bun run telemetry:streams` | Rows per Analytics Engine stream over a window, with each stream's consumer. A stream at zero is dead code or a broken emitter. |
 | `bun run review:comment-trends` | Summarizes recurring PR review comment patterns from GitHub. |
 | `bun run mcp:whether` | Starts a stdio MCP server (`get_agent_brief`, `list_agent_skills`, `pull_recent_site_info`) — see [docs/agents/agent-interface.md](docs/agents/agent-interface.md). |

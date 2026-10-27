@@ -22,7 +22,9 @@ export const solutionRedirectPairs = [
   ["/solutions/career-paths/director-of-product", "/resolve/product"],
   ["/solutions/career-paths/vp-product", "/resolve/ceo"],
   ["/solutions/career-paths/product-strategy-chief-of-staff", "/resolve/ops-risk"],
-  ["/solutions/:path*", "/resolve"],
+  // /resolve stopped being a page on 2026-10-08; the role and situation pages it
+  // listed are Guides' "More tools", which is where a retired solution belongs.
+  ["/solutions/:path*", "/resources#more-tools"],
 ];
 
 export const canonicalSurfaceRedirectPairs = [
@@ -38,19 +40,46 @@ export const canonicalSurfaceRedirectPairs = [
   // Consolidated under Trust hub
   ["/sources", "/trust#source-board"],
   ["/confidence", "/trust#confidence-limits"],
-  // Decision answer root → Decide hub
-  ["/answers", "/resolve#direct-answers"],
-  // Nav-label aliases. The header, the page title and the IA all said "Resolve"
-  // while the directory said /answer — one letter from the unrelated /answers
-  // corpus. /resolve is the filesystem route now, so this pair inverts: the old
-  // path is the legacy name that links and habits still carry.
+  // Decision answer root → the answers on Guides, grouped by decision area
+  ["/answers", "/resources#answers"],
+  /*
+   * Resolve folded into Decide and Guides on 2026-10-08. Its page answered "one
+   * open decision": Decide's "Test a decision" step does that for the reader's
+   * own move, so the bare path lands there; its eleven direct answers are on
+   * Guides, grouped by decision area, and the browse-by-role, stage, situation
+   * and toolkit paths are Guides' "More tools". A link that carries one of those
+   * selections (`?stakeholder=` and friends, which the `/guides/*` rules below
+   * used to produce and browsers have cached as 308s) is sent to More tools by
+   * `resolveSelectionRedirects`, ahead of this rule. /resolve/<slug> pages keep
+   * their addresses.
+   */
+  ["/resolve", "/operate#ops-decision-shield"],
+  // Nav-label aliases: legacy names that links and habits still carry. /answer
+  // was Resolve's directory before /resolve; both land where Resolve went.
   ["/evidence", "/signals"],
-  ["/answer", "/resolve"],
+  // The header's own words as addresses (2026-10-14): a reader who reads
+  // "Decide" or "Record" in the nav and types it got a 404.
+  ["/decide", "/operate"],
+  ["/record", "/history"],
+  ["/plan", "/operate"],
+  ["/answer", "/operate#ops-decision-shield"],
   ["/planning", "/operate"],
   // Learn root + failure modes → Trust hub
   ["/learn", "/trust"],
   ["/learn/failure-modes", "/trust#revisit-call"],
   ["/learn/failure-modes/:slug", "/trust#revisit-call"],
+  // Learn's concepts index and the hub's other names: /library and /reference are
+  // what the same pages were called between February and March 2026. The table
+  // that forwarded them went in d0ddedd6 (2026-03-16) with nothing in its place,
+  // so their deep links 404'd. Concept essays land on the one list, failure modes
+  // on the revisit triggers, the hubs where /learn does.
+  ["/learn/concepts/:path*", "/concepts"],
+  ["/library", "/trust"],
+  ["/library/canon/:path*", "/concepts"],
+  ["/library/failure-modes/:path*", "/trust#revisit-call"],
+  ["/reference", "/trust"],
+  ["/reference/concepts/:path*", "/concepts"],
+  ["/reference/failure-modes/:path*", "/trust#revisit-call"],
   // /concepts itself is a page again (restored 2026-09-23). The first version's
   // detail, focus, audience and conflicts pages are not: one page carries the
   // list now, with an anchor per essay. The old `/concepts` -> `/trust` rule was a
@@ -98,18 +127,19 @@ export const canonicalSurfaceRedirectPairs = [
   // Guides staging redirects. These pointed at `/guides`, which stopped existing in
   // 14258b64 — so every one of them was a 308 into a 404, which is worse than a plain
   // 404 because a permanent redirect gets cached and followed. The content itself moved
-  // rather than being retired: `/resolve` reads the same `stakeholder`, `stage` and
-  // `library` params (GuidedTranslationSearchParams) and still imports the guides data
-  // from `app/guides/`, so this is a base swap that preserves every parameter.
+  // rather than being retired. Since 2026-10-08 Guides is the `/resources` page, which
+  // reads the same `stakeholder`, `stage` and `library` params
+  // (GuidedTranslationSearchParams) under "More tools" and still imports the guides
+  // data from `app/guides/`, so this is a base swap that preserves every parameter.
   // `/guides` and `/guides/stage` stay ahead of `/guides/:stakeholder`, which would
   // otherwise capture "stage" as a stakeholder slug.
-  ["/guides", "/resolve"],
-  ["/guides/stage/:stage", "/resolve?stage=:stage"],
-  ["/guides/stage", "/resolve?library=stages"],
-  ["/guides/:stakeholder", "/resolve?stakeholder=:stakeholder"],
+  ["/guides", "/resources"],
+  ["/guides/stage/:stage", "/resources?stage=:stage#more-tools"],
+  ["/guides/stage", "/resources?library=stages#more-tools"],
+  ["/guides/:stakeholder", "/resources?stakeholder=:stakeholder#more-tools"],
   // Retrofit redirects (links that soft-404)
   ["/settings", "/"],
-  ["/decision-tools", "/resolve"],
+  ["/decision-tools", "/operate#ops-decision-shield"],
   ["/toolkits", "/"],
 ];
 
@@ -129,8 +159,8 @@ export const iaConsolidationRedirectPairs = [
   ["/this-week", "/"],
   // The bounded-decision framework and its blank form are a section of /trust,
   // beside the formula the thresholds come from. Both old doors keep an anchor.
-  ["/template", "/trust#template"],
-  ["/threshold", "/trust#framework"],
+  ["/template", "/about#template"],
+  ["/threshold", "/about#method"],
   // Orphaned export page — functionality lives in /share
   ["/export/board-packet", "/share"],
   // Empty container — no index page exists
@@ -141,7 +171,7 @@ export const iaConsolidationRedirectPairs = [
   ["/operate/memory", "/history"],
   ["/history/decisions", "/history"],
   // The ship checklist's one useful question is a direct answer now.
-  ["/resolve/ship-checklist", "/resolve#direct-answers"],
+  ["/resolve/ship-checklist", "/resources#answers"],
   // /state ran the brief's own pipeline and rendered a subset of the hero under
   // its own H1 — a view of `/` that read as a second, independently derived
   // answer, and competed with `/` and `/brief/[week]` for the same query.
@@ -153,9 +183,27 @@ export const iaConsolidationRedirectPairs = [
   // now carries its meaning where it appears, and the method terms that only a
   // formula needs are defined on the formula cards, which is where this lands.
   ["/glossary", "/trust#formula-reference"],
+  // Whether is free. The paid plans /pricing offered were never on sale and were
+  // removed on 2026-10-14; /about is the page that says what Whether is.
+  ["/pricing", "/about"],
 ];
 
+/*
+ * `/resolve` with a selection on it: the role, stage, library and toolkit views
+ * that page drew from its query string are Guides' "More tools" now. The query
+ * survives a redirect, so `/resolve?stakeholder=founders-ceos` lands on
+ * `/resources?stakeholder=founders-ceos#more-tools` with the same view open.
+ * Listed before the pairs: the bare `/resolve` rule would otherwise claim them.
+ */
+export const resolveSelectionRedirects = ["stakeholder", "stage", "library", "toolkitQuery"].map((key) => ({
+  source: "/resolve",
+  has: [{ type: "query", key }],
+  destination: "/resources#more-tools",
+  permanent: true,
+}));
+
 export const redirectEntries = [
+  ...resolveSelectionRedirects,
   ...buildPermanentRedirects(solutionRedirectPairs),
   ...buildPermanentRedirects(canonicalSurfaceRedirectPairs),
   ...buildPermanentRedirects(iaConsolidationRedirectPairs),
@@ -198,6 +246,9 @@ const securityHeaders = [
  */
 export const htmlLimitedBots = [
   String.raw`[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight`,
+  /* Notion, Ghost and most editors unfurl a pasted link through Iframely, which reads the oEmbed
+     discovery link from <head> without running JavaScript. */
+  "Iframely",
   "Googlebot",
   "OAI-SearchBot|ChatGPT-User|GPTBot",
   "PerplexityBot|Perplexity-User",
@@ -214,6 +265,21 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      /*
+       * The embed is the one response meant to sit inside another site's page:
+       * Notion's embed block and every oEmbed consumer frame `/api/embed`. A
+       * later rule's singular header replaces an earlier one's, so this lifts
+       * the DENY for that path alone; `frame-ancestors` is what browsers obey
+       * when both are present. The embed only reads and links out, so there is
+       * nothing in it to click-jack.
+       */
+      {
+        source: "/api/embed",
+        headers: [
+          { key: "X-Frame-Options", value: "ALLOWALL" },
+          { key: "Content-Security-Policy", value: "frame-ancestors *" },
+        ],
       },
     ];
   },

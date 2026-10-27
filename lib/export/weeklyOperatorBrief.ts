@@ -1,5 +1,5 @@
 import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../report/reportCopy";
-import { formatExportConfidence, pauseConditionOnly } from "./exportTerms";
+import { formatDocumentMargin, pauseConditionOnly } from "./exportTerms";
 import type { BriefDocument } from "../report/briefArtifact";
 import { publicDecisionLabels } from "../report/reportFormatting";
 import { formatGuidance } from "./briefBuilders";
@@ -20,6 +20,8 @@ type WeeklyOperatorBriefPayload = {
   /** `regimeStage` with what the weather means for money, as the paste prints it. */
   conditions: string;
   confidence: string;
+  /** Which inputs set the scores, as a sentence: "Scored on the record's inputs." */
+  basis: string;
   currentCall: string;
   actionNow: string;
   pauseIf: string;
@@ -77,7 +79,8 @@ export const buildWeeklyOperatorBriefPayload = (
     conditions: document.conditions.line,
     /* The published band, which the document resolved from the reading. This
        took an optional label and fell back to a sentence with no band in it. */
-    confidence: formatExportConfidence(document.confidence),
+    confidence: formatDocumentMargin(document),
+    basis: document.provenance.scoringBasis.sentence,
     currentCall: slots.currentCall,
     actionNow: slots.actionNow,
     pauseIf: slots.pauseIf,
@@ -116,6 +119,7 @@ export const buildWeeklyOperatorBriefPlainText = (payload: WeeklyOperatorBriefPa
       : null,
     `Conditions: ${payload.conditions}`,
     payload.confidence,
+    payload.basis,
     payload.customTeamNote ? `\nTeam context: ${payload.customTeamNote}` : null,
     "",
     `${publicDecisionLabels.call}: ${formatGuidance(payload)}`,

@@ -1,8 +1,10 @@
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 import { buildRegimeTrackRecord } from "../../../lib/summary/regimeTrackRecord";
+import { countRecord } from "../../../lib/report/trackRecord";
+import { describeTrackRecordRescore } from "../../../lib/report/trackRecordCopy";
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
-import { StatTile } from "../ui/statTile";
+import { Fact, FactList } from "../ui/factList";
 
 /**
  * The page above this calls itself the permanent record cited in board
@@ -11,10 +13,24 @@ import { StatTile } from "../ui/statTile";
  * often calls churned. All of it is recomputed from the same series the replay
  * engine uses — nothing here is authored.
  */
-export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[] }) {
+export function TrackRecordSection({
+  series,
+  recordChanges,
+}: {
+  series: TimeMachineRegimeEntry[];
+  /** Changes in conditions across the whole record, for the line on its last re-score; this section grades a trailing window. */
+  recordChanges?: number;
+}) {
   if (series.length < 2) return null;
 
   const record = buildRegimeTrackRecord(series);
+  /* The window, beside the count: this section grades the trailing months the
+     page hands it, and its "Changes in conditions" used to sit under the same
+     label as the whole record's with nothing saying the two windows differed. */
+  const counts = countRecord(series);
+  const windowLabel = counts
+    ? `${formatMonthYearShortFromValue(counts.firstRecordDate)} to ${formatMonthYearShortFromValue(counts.latestRecordDate)}`
+    : null;
   const label = (regime: string) => getRegimePublicLabel(regime);
   const recentTransitions = [...record.transitions].reverse().slice(0, 8);
   const currentSpell = record.spells[record.spells.length - 1];
@@ -32,28 +48,35 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
       aria-labelledby="track-record-grading-heading"
     >
       <div>
-        <h2 id="track-record-grading-heading" className="text-xl font-semibold text-white sm:text-2xl">How the record held up</h2>
-        <p className="text-sm text-slate-300">
-          How the readings held up, graded against the same data that produced them.
+        <h2 id="track-record-grading-heading" className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">How the record held up</h2>
+        <p className="max-w-prose text-sm text-slate-300">
+          The last {counts?.readings ?? record.observations} month-end readings{windowLabel ? `, ${windowLabel},` : ""} graded
+          against the same data that produced them.
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
-        <StatTile label="Changes in conditions" value={record.transitions.length} unit={`in ${record.observations} mo`} />
-        <StatTile label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
-        <StatTile
+      {/* Facts in the text's size, above the table they summarise; four tiles
+          with a bold figure each until 2026-10-09. */}
+      <FactList>
+        <Fact
+          label="Changes in conditions"
+          value={counts?.changes ?? record.transitions.length}
+          unit={`in the last ${counts?.readings ?? record.observations} months`}
+        />
+        <Fact label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+        <Fact
           label="Median hold"
           value={record.medianHoldMonths ?? "—"}
           unit={record.medianHoldMonths != null ? "mo" : undefined}
         />
-        <StatTile label="Reversed after one month" value={record.whipsawCount} />
-      </div>
+        <Fact label="Reversed after one month" value={record.whipsawCount} />
+      </FactList>
 
       {recentTransitions.length > 0 ? (
         <div className="overflow-x-auto">
           <table className="w-full text-xs">
             <thead>
-              <tr className="border-b border-slate-700/60 text-left type-eyebrow">
+              <tr className="border-b border-[color:var(--border-subtle)] text-left type-eyebrow">
                 <th className="pb-2 pr-4">When</th>
                 <th className="pb-2 pr-4">Change</th>
                 <th className="pb-2">Advance signal</th>
@@ -61,7 +84,7 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
             </thead>
             <tbody>
               {recentTransitions.map((transition) => (
-                <tr key={transition.atDate} className="border-b border-slate-800/40">
+                <tr key={transition.atDate} className="border-b border-[color:var(--border-subtle)]">
                   <td className="py-2.5 pr-4 whitespace-nowrap text-slate-400">
                     {formatMonthYearShortFromValue(transition.atDate)}
                   </td>
@@ -70,10 +93,10 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
                   </td>
                   <td className={`py-2.5 ${transition.signaled ? "text-emerald-300/90" : "text-amber-300/90"}`}>
                     {transition.signaled
-                      ? `within ${record.nearBandPts} points of its line ${transition.leadMonths} mo before`
+                      ? `within ${record.nearBandPts} pts of its line ${transition.leadMonths} mo before`
                       : shockByDate.get(transition.atDate)
-                        ? `no advance signal — the score crossed its line from more than ${record.nearBandPts} points away in one month`
-                        : "no advance signal"}
+                        ? `none: it crossed from ${record.nearBandPts}+ pts away in one month`
+                        : "none"}
                   </td>
                 </tr>
               ))}
@@ -87,11 +110,16 @@ export function TrackRecordSection({ series }: { series: TimeMachineRegimeEntry[
         </p>
       ) : null}
 
-      <p className="text-fluid-nano leading-relaxed text-slate-400">
-        Signaled = the score that crossed had spent at least a month within{" "}
+      <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400">
+        Signaled means the score that crossed had spent at least a month within{" "}
         {record.nearBandPts} pts of its line, on either side, before conditions changed. Unsignaled
-        changes are listed just the same — that is the point of this table.
+        changes are listed just the same; that is the point of the table.
       </p>
+      {recordChanges !== undefined ? (
+        <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400" data-record-rescore>
+          {describeTrackRecordRescore({ changes: recordChanges, signaled: record.signaledCount, graded: record.transitions.length })}
+        </p>
+      ) : null}
     </section>
   );
 }

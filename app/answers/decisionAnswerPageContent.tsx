@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import {
   answerPages,
@@ -11,17 +12,18 @@ import { buildAnswerFaqStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildAnswerSectionHeadings } from "../../lib/seo/answerSectionHeadings";
 import { isIndexableAnswerSlug } from "../../lib/seo/indexationPolicy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
-import Link from "next/link";
 import { SecondaryPageSection } from "../components/secondaryPageShell";
 import { Breadcrumbs } from "../components/ui/breadcrumbs";
-import { navigationLayerByKey } from "../../lib/navigation/informationArchitecture";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { ActionLink } from "../components/ui/actionLink";
 import { ScoreLadder } from "../components/ui/scoreLadder";
 import { AreaTable } from "../components/ui/areaTable";
+import { buildHomeAreaRows } from "../../lib/report/home/homeSectionModel";
+import { resolveLineState } from "../../lib/report/operatingCalls";
 import { DecisionHero } from "../components/DecisionHero";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
-import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
+import { formatDecisionReversal, formatDecisionThreshold, formatMarginStamp, publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildFlipThreshold, buildWeekCallChangesIf } from "../../lib/report/reportEvidence";
 import { formatThresholdNumber } from "../../lib/formatters";
@@ -53,6 +55,11 @@ export async function DecisionAnswerPageContent({
   const { assessment, recordDateLabel, reportDynamics, fetchedAtLabel } = reportData;
   const { homeBriefModel, displayRegime, callCitation } = snapshot;
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
+  const ruleStanding = buildHomeAreaRows({
+    decisionRules: mappedRules,
+    movement: null,
+    scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
+  });
   const payload = buildSeoDecisionPayload({
     assessment,
     mappedRules,
@@ -70,6 +77,15 @@ export async function DecisionAnswerPageContent({
     pageKey: `/answers/${page.slug}`,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
+  /* The week's headline action, from the source the homepage h1 reads, leads the
+     card; the area this page is about follows as an area line. The card opened on
+     the area's rule and then printed a different do-now line, so the answer page had
+     its own headline, and neither was the week's. */
+  const headline = weeklyHeadline(snapshot.weeklyCall);
+  const leadArea = page.mappedDecisionAreas.find((area) => mappedRules.some((rule) => rule.area === area));
+  const areaDoNowLabel = leadArea
+    ? `${decisionAreaLabel(leadArea)} · ${DECISION_CONTRACT_LABELS.action.doNow}`
+    : DECISION_CONTRACT_LABELS.action.doNow;
   const contextSummary = buildDecisionAnswerContextSummary({
     displayLabel: displayRegime.label,
     canonicalRegime: displayRegime.canonicalRegime,
@@ -88,7 +104,7 @@ export async function DecisionAnswerPageContent({
      and printed the gate ids once. Whether this page is indexed is not something
      the person reading it can act on; whether the reading is current is. */
   const dataCurrency = buildDataCurrencyNotice(payload.noindexReasons, { recordDateLabel });
-  const pagePath = `/answers/${page.slug}`;
+  const pagePath = `/answers/${page.slug}` as const;
   const measurement = getDecisionPageContentMeasurement(page);
   const copyText = [
     page.title,
@@ -97,10 +113,10 @@ export async function DecisionAnswerPageContent({
     `Company inputs to check: ${page.companyInputs.join(" ")}`,
     `Decision note to complete: ${page.decisionNote}`,
     `Market guidance as of ${recordDateLabel}`,
-    `Current guidance: ${payload.currentCall}`,
-    `${DECISION_CONTRACT_LABELS.action.actionNow}: ${payload.immediateAction}`,
-    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${payload.triggerThreshold}`,
-    `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.reversalCondition}`,
+    `${publicDecisionLabels.call}: ${headline.composed}`,
+    `${areaDoNowLabel}: ${payload.immediateAction}`,
+    `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(payload.triggerThreshold)}`,
+    `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(payload.reversalCondition)}`,
     `Citation: ${callCitation}`,
     `Freshness: ${fetchedAtLabel}`,
     ...(dataCurrency ? [`Data status: ${dataCurrency.summary}`] : []),
@@ -141,7 +157,7 @@ export async function DecisionAnswerPageContent({
       },
       {
         question: "How current is this reading?",
-        answer: `Data date ${recordDateLabel}, refreshed ${fetchedAtLabel}, ${formatConfidenceChipLabel(homeBriefModel.confidenceLabel).toLowerCase()}.`,
+        answer: `Data as of ${recordDateLabel}, checked ${fetchedAtLabel}. ${formatMarginStamp(homeBriefModel.confidenceLabel)}.`,
       },
       {
         question: "What is this based on?",
@@ -153,7 +169,7 @@ export async function DecisionAnswerPageContent({
   });
 
   /*
-   * All eleven pages shipped the same six section headings, so the outline a
+   * The first eleven pages shipped the same six section headings, so the outline a
    * reader skims said nothing about which answer they were reading. Four of the
    * six are built from this page's audience, decision areas and threshold
    * focus; "Copy this answer" and "Citation" label a button and a provenance
@@ -183,13 +199,7 @@ export async function DecisionAnswerPageContent({
       <JsonLdScript data={faqData} />
 
       <div data-content-measurement-root={pagePath} className="weather-page-stack">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: navigationLayerByKey.resolve.label, href: navigationLayerByKey.resolve.href },
-            { label: page.title },
-          ]}
-        />
+        <Breadcrumbs items={toVisibleBreadcrumbs(buildGroupBreadcrumbs(pagePath, [{ name: page.title, path: pagePath }]))} />
         {/* The answer as the card the brief opens on: the week's stamp, the question,
             this week's answer to it, the lines it holds between, and the trust strip.
             This page used to open on a generic header and a "Short answer" box of
@@ -197,15 +207,14 @@ export async function DecisionAnswerPageContent({
             so a reader arriving from search met explanation before the answer. */}
         <DecisionHero
           question={page.title}
-          weeklyCall={payload.currentCall}
+          weeklyCall={headline.action}
+          direction={headline.directionLabel}
           callDetail={page.shortAnswer}
           regime={assessment.regime}
           lines={[
-            ...(payload.immediateAction.trim() !== payload.currentCall.trim()
-              ? [{ label: DECISION_CONTRACT_LABELS.action.doNow, value: payload.immediateAction }]
-              : []),
-            { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: payload.triggerThreshold },
-            { label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: payload.reversalCondition },
+            { label: areaDoNowLabel, value: payload.immediateAction },
+            { label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: formatDecisionThreshold(payload.triggerThreshold) },
+            { label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: formatDecisionReversal(payload.reversalCondition) },
           ]}
           trust={buildTrustStripProps({
             recordDateLabel,
@@ -215,15 +224,19 @@ export async function DecisionAnswerPageContent({
             degradedSourceCount: buildDegradedSourceRows(reportData.sourceHealth).length,
             confidenceLabel: homeBriefModel.confidenceLabel,
             assessment,
+            scoringBasis: reportData.scoringBasis,
           })}
         />
         {dataCurrency ? (
-          <p className="rounded-md border border-amber-400/40 bg-amber-500/10 px-3 py-2 text-xs text-amber-100">
+          <p className="weather-caveat-mark rounded-md border border-l-4 border-caveat-border bg-caveat-bg px-3 py-2 text-xs text-caveat-fg">
             {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
             <ActionLink href={DATA_CURRENCY_ACTION_HREF} variant="inline">Source dates</ActionLink>
           </p>
         ) : null}
 
+        {/* The quick copy for a reader who knows what they want (§XX). The related
+            questions that sat beside it are the "Next" section's, which lists
+            the same ones and more (2026-10-09). */}
         <div className="flex flex-wrap items-center gap-2">
           <ReportCta
             href={pagePath}
@@ -238,26 +251,12 @@ export async function DecisionAnswerPageContent({
             }}
             className="weather-button-primary inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold"
           />
-          {relatedPages.length > 0 ? (
-            <nav aria-label="Related operator questions" className="flex flex-wrap items-center gap-2 text-xs">
-              <span className="text-slate-400 font-medium">Related:</span>
-              {relatedPages.slice(0, 3).map((related) => (
-                <Link
-                  key={related.slug}
-                  href={`/answers/${related.slug}`}
-                  className="weather-focus-ring inline-flex min-h-11 items-center rounded-md border border-slate-800 bg-slate-900/60 px-2.5 py-2 text-slate-300 hover:border-slate-700 hover:text-white transition-colors"
-                >
-                  {related.title} →
-                </Link>
-              ))}
-            </nav>
-          ) : null}
         </div>
 
         <SecondaryPageSection title={headings.posture}>
           <div className="space-y-2 text-sm text-slate-200">
-            <p className="text-xs text-slate-400">Market guidance as of {recordDateLabel}</p>
-            {/* The guidance and its action are the card's now; this section says how to use them. */}
+            {/* The guidance and its action are the card's now, dated by its trust
+                strip ("Data as of"); this section says how to use them. */}
             <p>{page.directAnswer}</p>
             <p>{contextSummary.summaryLine}</p>
             {contextSummary.classificationLine ? (
@@ -280,13 +279,26 @@ export async function DecisionAnswerPageContent({
               before rather than a second shape for one thing. */}
           <AreaTable
             caption="What this week's guidance changes for each decision area"
-            rows={mappedRules.map((rule) => ({
-              area: rule.area,
-              rule: rule.doNow[0] ?? rule.recommendation,
-              pause: { line: rule.pauseTrigger },
-              resume: { line: rule.resumeTrigger },
-              scores: [...rule.pause.conditions, ...rule.resume.conditions].map((condition) => condition.metric),
-            }))}
+            rows={mappedRules.map((rule) => {
+              /* Where this week's scores sit against the rule's own lines, in the
+                 words and badge the homepage's area rows print. */
+              const standing = ruleStanding.find((row) => row.area === rule.area);
+              return {
+                area: rule.area,
+                rule: rule.doNow[0] ?? rule.recommendation,
+                pause: {
+                  line: rule.pauseTrigger,
+                  distance: standing?.pause?.distance,
+                  state: standing?.pause ? resolveLineState(standing.pause.points, "pause", standing.pause.met) : undefined,
+                },
+                resume: {
+                  line: rule.resumeTrigger,
+                  distance: standing?.resume?.distance,
+                  state: standing?.resume ? resolveLineState(standing.resume.points, "resume", standing.resume.met) : undefined,
+                },
+                scores: [...rule.pause.conditions, ...rule.resume.conditions].map((condition) => condition.metric),
+              };
+            })}
             signalLinkBase="/"
           />
         </SecondaryPageSection>
@@ -323,7 +335,7 @@ export async function DecisionAnswerPageContent({
             <h3 className="text-sm font-semibold text-slate-100">Decision note to complete</h3>
             <p className="text-sm text-slate-200">{page.decisionNote}</p>
             <p className="text-sm text-slate-200">
-              Copy this template with the dated market guidance and citation. Fill in the company inputs before using it as an approval.
+              Fill in the company inputs before using it as an approval.
             </p>
             <ReportCta
               href={pagePath}
@@ -355,7 +367,7 @@ export async function DecisionAnswerPageContent({
           <div className="flex flex-wrap gap-2">
             <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
             <ActionLink href="/operate" variant="pill">Plan the week</ActionLink>
-            <ActionLink href="/resolve#direct-answers" variant="pill">More direct answers</ActionLink>
+            <ActionLink href="/resources#answers" variant="pill">More direct answers</ActionLink>
             {relatedPages.map((related) => (
               <ActionLink key={related.slug} href={`/answers/${related.slug}`} variant="pill">{related.title}</ActionLink>
             ))}

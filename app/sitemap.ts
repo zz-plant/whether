@@ -50,7 +50,7 @@ const resolveLastModified = (...candidates: string[]): Date => {
 /*
  * No `lastmod` for a page nothing dates. This was one constant, 2026-02-01,
  * submitted for fifteen pages — twelve of which did not exist yet on that date
- * (/privacy was written 2026-09-17, /pricing 2026-08-28) — and for five that
+ * (/privacy, for one, was written 2026-09-17) — and for five that
  * change every week (/history, /operate, /history/compare and the answer pages)
  * beside `changefreq: weekly`. Google reads `lastmod` only from a sitemap whose
  * dates it finds consistently accurate, so a wrong date on a static page costs
@@ -176,7 +176,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
   const coreEntries: SitemapEntryDescriptor[] = [
     { path: "", lastModified: reportLastModified, changeFrequency: "weekly", priority: 1 },
     { path: "/signals", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.9 },
-    { path: "/resolve", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.82 },
     // Deep links, not destinations: the adoption plan's one-screen redraft ruled
     // that trust is an inline line on `/` with the formula reference kept as a
     // deep link, and compare is a disclosure under history. Both stay indexable;
@@ -194,7 +193,10 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       changeFrequency: "weekly",
       priority: 0.7,
     })),
-    { path: "/resources", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.6 },
+    /* Guides, one of the four header groups since 2026-10-08. It took /resolve's
+       place (a redirect now) and its direct answers, each stamped with this
+       week's standing, so it moves with the read and ranks like a hub. */
+    { path: "/resources", lastModified: reportLastModified, changeFrequency: "weekly", priority: 0.82 },
     { path: "/privacy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/terms-of-service", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
     { path: "/acceptable-use-policy", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.4 },
@@ -203,7 +205,6 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     { path: "/history", lastModified: historyLastModified, changeFrequency: "weekly", priority: 0.7 },
     { path: "/concepts", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.5 },
     { path: "/history/compare", lastModified: historyLastModified, changeFrequency: "weekly", priority: 0.4 },
-    { path: "/pricing", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.55 },
     { path: "/about", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.5 },
     { path: "/contact", lastModified: staticContentLastModified, changeFrequency: "yearly", priority: 0.45 },
     { path: "/share", lastModified: staticContentLastModified, changeFrequency: "monthly", priority: 0.65 },

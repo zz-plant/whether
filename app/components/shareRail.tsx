@@ -49,8 +49,6 @@ const GenericSharePresets = ({
   <button
     type="button"
     onClick={onCopyPlain}
-    data-premium-intent="export_brief"
-    data-premium-cta="share_rail_copy_plain"
     className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
   >
     {copiedTarget === "plain" ? "Copied!" : "Plain text"}
@@ -58,8 +56,6 @@ const GenericSharePresets = ({
   <button
     type="button"
     onClick={onCopySlack}
-    data-premium-intent="export_brief"
-    data-premium-cta="share_rail_copy_slack"
     className="weather-button inline-flex flex-1 min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold"
   >
     {copiedTarget === "slack" ? "Copied!" : "Slack format"}
@@ -137,7 +133,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
         <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Popup className="weather-slide-panel fixed z-50 bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share brief">
+        <Dialog.Popup className="weather-slide-panel fixed z-50 bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share this page">
         <div className="flex items-center justify-between gap-3">
           <h2 className="type-eyebrow text-slate-300">Share</h2>
           <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close share panel">
@@ -180,7 +176,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
                 aria-labelledby={includeContextLabelId}
                 className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
               >
-                <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
+                <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px] data-[checked]:bg-[var(--bg-body)]" />
               </Switch.Root>
               <span id={includeContextLabelId}>Add a one-line explanation of the site</span>
             </label>
@@ -195,7 +191,7 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
               aria-labelledby={slackOverlayLabelId}
               className="relative inline-flex h-5 w-9 items-center rounded-full transition-colors data-[checked]:bg-sky-500 bg-slate-700"
             >
-              <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px]" />
+              <Switch.Thumb className="inline-block h-4 w-4 translate-x-0.5 rounded-full bg-white transition-transform data-[checked]:translate-x-[18px] data-[checked]:bg-[var(--bg-body)]" />
             </Switch.Root>
             <span id={slackOverlayLabelId}>Slack preview overlay</span>
           </label>

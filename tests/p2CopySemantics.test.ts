@@ -27,7 +27,7 @@ describe("P2 beginner copy semantics", () => {
       summary.summaryLine,
       "Conditions are Guarded Expansion and worsening since last week; revisit last week's decisions.",
     );
-    assert.equal(summary.classificationLine, "Underneath, the scores read Sunny.");
+    assert.equal(summary.classificationLine, "On the scores alone, it's Sunny.");
     assert.doesNotMatch(summary.summaryLine, /posture|momentum|YES|NO\b/);
 
     const noComparison = buildDecisionAnswerContextSummary({

@@ -1,20 +1,17 @@
+/* The page ground is the body token and nothing over it. It carried a white
+   sheen down the first 22rem and an emerald-sky-amber wash across the width
+   (2026-10-09): three accent hues at under 2% that said nothing about the
+   week. The regime's own atmosphere, which does, is .weather-regime-ground. */
 .weather-shell {
   background-color: var(--bg-body);
-  background-image:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.018), transparent 22rem),
-    linear-gradient(90deg, rgba(52, 211, 153, 0.018), rgba(56, 189, 248, 0.014), rgba(251, 191, 36, 0.012));
 }
 
 /* Tier 2: Secondary surfaces — bands, section bodies */
 .weather-surface-secondary {
-  @apply rounded-lg border backdrop-blur-sm;
+  @apply rounded-lg border;
   border-color: var(--border-default);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.008)),
-    var(--bg-raised);
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 var(--edge-highlight-faint);
+  background: var(--bg-raised);
+  box-shadow: var(--elev-1);
 }
 
 .weather-panel-static {
@@ -61,16 +58,27 @@
   min-width: 0;
 }
 .weather-home-section {
-  margin-top: 16px;
-  padding-top: var(--layout-content-gap);
+  margin-top: var(--layout-content-gap);
+  padding-top: var(--layout-section-gap);
+}
+/* More air between the brief's five answers from md up, where the page is
+   read top to bottom rather than thumbed: the hairline alone separated them,
+   and at 32px apart the sections ran together. */
+@media (min-width: 768px) {
+  .weather-home-section {
+    margin-top: var(--layout-section-gap);
+    padding-top: var(--space-xl);
+  }
 }
 
-/* Four company choices form equal cells instead of wrapping three then one.
-   Native radio inputs and their existing focus treatment stay in place. */
+/* The four company choices are equal keys on one row from sm up (2026-10-13). They used
+   to break 2 + 2 below 1280px, which split the runway scale across two rows, and to wrap
+   each sublabel mid-phrase beside its label. Labels now stack over their sublabels
+   (`stackSublabel`), which is narrow enough for four across. */
 @media (min-width: 640px) {
   .weather-company-options fieldset {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     min-width: 0;
   }
   .weather-company-options label {
@@ -79,12 +87,8 @@
   }
   .weather-company-options .weather-segment-option {
     width: 100%;
-    text-align: center;
-  }
-}
-@media (min-width: 1280px) {
-  .weather-company-options fieldset {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    flex: 1;
+    justify-content: flex-start;
   }
 }
 
@@ -112,6 +116,15 @@ html[data-focus-mode] [data-home-shell-main] {
   padding-block: 3rem;
 }
 
+/* The weekly brief's own column, named beside the other page measures: the
+   one-screen brief's two inner columns use it (app/page.tsx), and the focus
+   mode above narrows the shell to the same 64rem. Until 2026-10-21 the
+   measure was a hand-typed `max-w-[64rem]` literal twice over, beside a
+   registry it never joined (DD-046). */
+.weather-brief-measure {
+  max-width: 64rem;
+}
+
 .weather-page-shell-standard {
   max-width: 72rem;
 }
@@ -136,24 +149,8 @@ html[data-focus-mode] [data-home-shell-main] {
   inset: 0;
   z-index: 0;
   border-radius: var(--radius-xl);
-  background:
-    linear-gradient(180deg, rgba(7, 18, 38, 0.40) 0%, rgba(8, 27, 47, 0.12) 100%);
+  background: var(--bg-nested-light);
   pointer-events: none;
-}
-
-/* The hub backdrop is a navy wash tuned for the dark ground. On the light
-   theme a 40% navy over cream is a grey slab, and /pricing sat on one; here
-   it fades to the page. */
-html[data-theme="light"] .weather-hub-backdrop {
-  background: linear-gradient(180deg, rgba(15, 23, 42, 0.03) 0%, rgba(15, 23, 42, 0) 100%);
-}
-
-.weather-hub-section-eyebrow {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--app-text-muted);
 }
 
 /* Ink from the text roles, never a literal white: these shells render on
@@ -230,7 +227,7 @@ html[data-theme="light"] .weather-hub-backdrop {
    own, the only control on the site not drawn in --accent-action. */
 a.weather-hub-link-card:hover {
   transform: translateY(-3px);
-  border-color: rgba(56, 189, 248, 0.42);
+  border-color: var(--accent-border);
   box-shadow: var(--elev-4);
 }
 
@@ -250,20 +247,24 @@ a.weather-hub-link-card:hover {
   color: var(--app-text-secondary);
   cursor: pointer;
   touch-action: manipulation;
+  /* Token pair, not a literal: the chip is a secondary control, and the
+     duration and curve are --transition-fast/--ease-out as .weather-chip
+     (surfaces.css) and the controls in controls.css already set them.
+     Reduced-motion end state is the block at the foot of this file. */
   transition:
-    transform 160ms ease,
-    border-color 160ms ease,
-    color 160ms ease;
+    transform var(--transition-fast) var(--ease-out),
+    border-color var(--transition-fast) var(--ease-out),
+    color var(--transition-fast) var(--ease-out);
 }
 
 .weather-hub-chip:hover {
   transform: translateY(-1px);
-  border-color: rgba(56, 189, 248, 0.30);
+  border-color: var(--accent-border);
   color: var(--app-text);
 }
 
 .weather-hub-chip:focus-visible {
-  outline: 2px solid rgba(56, 189, 248, 0.85);
+  outline: 2px solid var(--accent-action);
   outline-offset: 2px;
 }
 
@@ -279,30 +280,19 @@ a.weather-hub-link-card:hover {
   padding: 0;
 }
 
-.weather-secondary-header-layout {
-  display: grid;
-  gap: var(--layout-content-gap);
-}
-
 .weather-secondary-heading {
   display: grid;
   gap: 16px;
-}
-
- .weather-secondary-eyebrow {
-  font-size: var(--fs-xs);
-  font-weight: 500;
-  letter-spacing: 0.04em;
-  text-transform: none;
-  color: var(--app-text-muted);
 }
 
 .weather-secondary-title {
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
   font-weight: 600;
-  font-size: clamp(1.95rem, 1.65rem + 1.35vw, 3rem);
-  line-height: 0.98;
+  /* The page-title step every shell uses (2026-10-27): 24px on a phone, 34px at the
+     widest. It ran 31px to 48px here, while a report page's title was 15px. */
+  font-size: var(--text-fluid-2xl);
+  line-height: 1.1;
   letter-spacing: 0;
   color: var(--app-text);
   text-wrap: balance;
@@ -319,10 +309,6 @@ a.weather-hub-link-card:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
-}
-
-.weather-secondary-aside {
-  min-width: 0;
 }
 
 .weather-secondary-section {
@@ -354,7 +340,9 @@ a.weather-hub-link-card:hover {
 .weather-secondary-section-title {
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
-  font-size: 1.2rem;
+  /* The section-heading step: 22px on a phone, 24px from sm, as every report section. */
+  font-size: 1.375rem;
+  line-height: 1.2;
   font-weight: 600;
   letter-spacing: 0;
   color: var(--app-text);
@@ -412,7 +400,7 @@ a.weather-hub-link-card:hover {
   justify-content: center;
   width: fit-content;
   border-radius: var(--radius-sm);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--border-subtle);
   padding: 0.2rem 0.6rem;
   font-size: 0.62rem;
   font-weight: 600;
@@ -421,45 +409,24 @@ a.weather-hub-link-card:hover {
   touch-action: manipulation;
 }
 
-.weather-tag-sky {
-  border-color: rgba(125, 211, 252, 0.24);
-  background: rgba(14, 165, 233, 0.08);
-  color: rgb(186 230 253);
-}
+/* The tones are roles, as the hue ramps are (tokens.css): amber and rose the
+   crossed red, emerald the clear ink. Each reads its role token, which carries
+   its own light value, so the published brief's stamps clear AA on both
+   grounds without a per-theme rule. There is no action-colour tone: a tag is a
+   display (ui-ux-standards §XXVII). */
 
-.weather-tag-cyan {
-  border-color: rgba(103, 232, 249, 0.22);
-  background: rgba(6, 182, 212, 0.06);
-  color: rgb(207 250 254);
-}
-
-.weather-tag-amber {
-  border-color: rgba(252, 211, 77, 0.24);
-  background: rgba(245, 158, 11, 0.08);
-  color: rgb(254 243 199);
-}
-
+.weather-tag-amber,
 .weather-tag-rose {
-  border-color: rgba(251, 113, 133, 0.22);
-  background: rgba(244, 63, 94, 0.06);
-  color: rgb(255 228 230);
+  border-color: color-mix(in srgb, var(--line-crossed) 30%, transparent);
+  background: color-mix(in srgb, var(--line-crossed) 8%, transparent);
+  color: var(--line-crossed-ink);
 }
 
 .weather-tag-emerald {
-  border-color: rgba(52, 211, 153, 0.22);
-  background: rgba(16, 185, 129, 0.06);
-  color: rgb(209 250 229);
+  border-color: color-mix(in srgb, var(--line-clear) 30%, transparent);
+  background: color-mix(in srgb, var(--line-clear) 6%, transparent);
+  color: var(--line-clear-ink);
 }
-
-/* The tinted tags carry 100-level ink for the dark ground; on the light
-   theme that is pastel on cream, and the posture and confidence stamps at
-   the top of every published brief were unreadable. 700-level here, the
-   same floor the utility remap in tokens.css applies to text-<hue>-*. */
-html[data-theme="light"] .weather-tag-sky { color: #075985; background: rgba(14, 165, 233, 0.10); }
-html[data-theme="light"] .weather-tag-cyan { color: #155e75; background: rgba(6, 182, 212, 0.10); }
-html[data-theme="light"] .weather-tag-amber { color: #92400e; background: rgba(245, 158, 11, 0.12); }
-html[data-theme="light"] .weather-tag-rose { color: #b91c1c; background: rgba(244, 63, 94, 0.09); }
-html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba(16, 185, 129, 0.10); }
 
 .weather-tag-slate {
   border-color: var(--border-strong);
@@ -479,6 +446,18 @@ html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba
   font-size: var(--text-fluid-nano);
 }
 
+/* The week's word as a placard (2026-10-21): the condition's solid fill with
+   its on-accent ink, as a weather service prints a warning level. Only the
+   two places that state this week's condition wear it, the call card's stamp
+   and the report intro's status word (§XXV keeps condition colour to where a
+   condition is named). Lists of past weeks keep the tinted .weather-tag-regime,
+   so the placard stays the one solid block of colour on a page. */
+.weather-tag-placard {
+  border-color: var(--regime-accent);
+  background: var(--regime-accent);
+  color: var(--regime-on-accent);
+}
+
 .weather-panel,
 .weather-panel-static,
 .weather-secondary-header,
@@ -496,14 +475,6 @@ html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba
   }
 }
 
-@media (min-width: 1024px) {
-
-  .weather-secondary-header-layout {
-    grid-template-columns: minmax(0, 1fr) minmax(16rem, 22rem);
-    align-items: start;
-  }
-}
-
 @media (min-width: 1280px) {
   .weather-page-grid-3 {
     grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -517,5 +488,11 @@ html[data-theme="light"] .weather-tag-emerald { color: #047857; background: rgba
   .weather-hub-link-card,
   .weather-hub-chip {
     transition: none;
+  }
+}
+
+@media (min-width: 640px) {
+  .weather-secondary-section-title {
+    font-size: 1.5rem;
   }
 }

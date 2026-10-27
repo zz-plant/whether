@@ -210,12 +210,12 @@ export const TimeMachinePanel = ({
       <div>
         <SectionPanelHeader
           label="Past months"
-          title="See what the brief said in an earlier month"
+          title="Pick a month"
           titleId="time-machine-title"
           description={
             <>
-              Pick a month. The page loads the last Treasury reading on or before it and shows the
-              guidance from that month.
+              The page loads the last Treasury reading on or before it and shows that month&apos;s
+              guidance.
             </>
           }
           aside={
@@ -247,8 +247,7 @@ export const TimeMachinePanel = ({
               </>
             ) : (
               <>
-                This page is showing this week ({latestRecordLabel}). Pick a month below to see what
-                the guidance was then.
+                This page is showing this week ({latestRecordLabel}).
               </>
             )}
           </p>
@@ -351,8 +350,8 @@ export const TimeMachinePanel = ({
               </p>
             </div>
             {isDraft ? (
-              <div className="rounded-md border border-sky-400/20 bg-sky-500/8 px-3 py-3 sm:col-span-2">
-                <p className="type-label text-sky-200">Month picked</p>
+              <div className="rounded-md border border-slate-700/70 bg-slate-900/40 px-3 py-3 sm:col-span-2">
+                <p className="type-label text-slate-300">Month picked</p>
                 <p className="mt-2 text-sm text-slate-200">
                   {selectedLabel} is picked. Load it to see that month&apos;s guidance.
                 </p>

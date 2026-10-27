@@ -4,7 +4,7 @@ import { formatDateUTC, formatScoreValue, formatSignedDelta, formatThresholdNumb
 import { getRegimePublicLabel } from "./regimePresentation";
 import { ruleMetricLabel, type RuleConditionMetric } from "./report/boundedDecisionRules";
 import { DECISION_CONTRACT_LABELS } from "./report/reportCopy";
-import { joinSentences } from "./report/reportFormatting";
+import { joinSentences, withoutReadingsNow } from "./report/reportFormatting";
 
 type AlertChannel = "slack" | "email" | "webhook";
 
@@ -117,9 +117,15 @@ export const buildSignalAlertPayload = (
     gated.length > 0
       ? gated.map((delta) => ({
           code: delta.code,
-          message: joinSentences(buildDecisionVerdictHeadline(delta), delta.action, describeCrossing(delta), delta.reversal),
+          /* The crossing sentence gives the reading, so the rule's own reading sentence is dropped rather than said twice. */
+          message: joinSentences(
+            buildDecisionVerdictHeadline(delta),
+            delta.metric ? withoutReadingsNow(delta.action) : delta.action,
+            describeCrossing(delta),
+            delta.reversal,
+          ),
         }))
-      : payload.reasons ?? [{ code: "signals-updated", message: "Signal values updated with no threshold crossing." }];
+      : payload.reasons ?? [{ code: "signals-updated", message: "Signal values updated; no score crossed a line." }];
 
   return {
     ...payload,
@@ -222,7 +228,7 @@ export const buildWeeklyDigest = (
     return {
       summary: "No alerts this week.",
       bullets: [
-        "Evidence updated with no threshold crossings.",
+        "Evidence updated; no score crossed a line.",
         ...(lastRecorded ? [`Last recorded alert: conditions were ${conditionsOf(lastRecorded)}.`] : []),
       ],
     };
@@ -247,7 +253,7 @@ export const buildWeeklyDigest = (
            which read "Reversal: Conditions change if: …" under this one. */
         (delta) =>
           `${buildDecisionVerdictHeadline(delta)} — ${delta.actionText} ${
-            delta.reversalText.startsWith(`${DECISION_CONTRACT_LABELS.watch.postureFlips}:`) ? "" : "Reversal: "
+            delta.reversalText.startsWith(`${DECISION_CONTRACT_LABELS.watch.postureFlips}:`) ? "" : `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: `
           }${delta.reversalText}`,
       ),
     ],

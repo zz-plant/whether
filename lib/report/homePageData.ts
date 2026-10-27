@@ -1,4 +1,6 @@
 import { unstable_cache } from "next/cache";
+import { ENGINE_VERSION } from "../regimeEngineCore";
+import { getBuildCommit, getDeployedVersion } from "../runtime/versionMetadata";
 import { REPORT_DATA_CACHE_TAG } from "./cacheTags";
 import { loadReportDataSafe } from "./reportData";
 import type { HomePageSearchParams } from "./homeMetadata";
@@ -9,20 +11,32 @@ type CachedHomePageReportResult = Extract<HomePageReportResult, { ok: true }>;
 type HomePageDataDependencies = {
   loadReportDataSafe: typeof loadReportDataSafe;
   unstableCache: typeof unstable_cache;
+  resolveDeployVersion: () => string;
 };
 
 type HomePageFallbackState = Extract<HomePageReportResult, { ok: false }>;
 
 const HOMEPAGE_REPORT_REVALIDATE_SECONDS = 300;
-// Only historical selection changes the canonical report inputs. Sector and
-// interpretation view are presentation overlays applied by homePageAssembler;
-// including them here fragments the shared five-minute data cache without
-// changing the value it stores.
+// Only historical selection changes the canonical report inputs. Every other
+// key (stage and runway in homePageAssembler, cadence on the page) applies after
+// the read; including one here fragments the shared five-minute data cache
+// without changing the value it stores.
 const HOMEPAGE_DATA_PARAM_KEYS = new Set(["month", "year"]);
+
+/**
+ * Names the code that wrote a cache entry. The data cache is KV-backed in production, so its
+ * entries outlive the deploy that wrote them; keying on the Worker version means a deploy that
+ * changes `ReportData`'s shape never reads an entry the old code saved (PR #1563 added a required
+ * field and a pre-merge entry crashed the trust strip). Off Cloudflare the binding is absent, so
+ * the engine calibration plus the commit the bundle was built from stand in.
+ */
+const resolveDeployVersion = () =>
+  getDeployedVersion()?.id ?? `${ENGINE_VERSION}:${getBuildCommit() ?? "unbuilt"}`;
 
 const defaultDependencies: HomePageDataDependencies = {
   loadReportDataSafe,
   unstableCache: unstable_cache,
+  resolveDeployVersion,
 };
 
 class HomePageFallbackResultError extends Error {
@@ -92,7 +106,9 @@ export const createHomePageReportDataLoader = (
   };
 
   const loadCachedHomePageReportResult = resolvedDependencies.unstableCache(
-    async (cacheKey: string): Promise<CachedHomePageReportResult> => {
+    // `_deployVersion` is unused by the loader: it is an argument only so it lands in the key,
+    // since keyParts are fixed when this function is created.
+    async (cacheKey: string, _deployVersion: string): Promise<CachedHomePageReportResult> => {
       const reportResult = await resolvedDependencies.loadReportDataSafe(
         parseHomePageCacheKey(cacheKey),
         { route: "/" },
@@ -115,7 +131,10 @@ export const createHomePageReportDataLoader = (
     const cacheKey = buildHomePageCacheKey(searchParams);
 
     try {
-      const cachedResult = await loadCachedHomePageReportResult(cacheKey);
+      const cachedResult = await loadCachedHomePageReportResult(
+        cacheKey,
+        resolvedDependencies.resolveDeployVersion(),
+      );
       const fallbackEntry = fallbackStateByCacheKey.get(cacheKey);
 
       if (fallbackEntry) {

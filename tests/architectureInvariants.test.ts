@@ -636,6 +636,7 @@ describe("Architecture Invariants", () => {
     const repoRoot = join(dirname(fileURLToPath(import.meta.url)), "..");
     const files = collectSourceFiles(join(repoRoot, "app"));
     const sources = files.map((file) => ({ rel: relative(repoRoot, file), text: readFileSync(file, "utf8") }));
+    const libSources = collectSourceFiles(join(repoRoot, "lib")).map((file) => readFileSync(file, "utf8"));
 
     // Queries inside comments do not run. `briefArtifactScript.tsx` and
     // `lib/report/briefArtifact.ts` both describe a retired `[data-share-section]`
@@ -666,7 +667,14 @@ describe("Architecture Invariants", () => {
        * valueless form and reported two live attributes as dead.
        */
       const producer = new RegExp(`(^|[\\s{])${attribute}(\\s|=|/|>|$)`, "m");
-      const setSomewhere = sources.some(({ rel, text }) => rel !== queriedIn && producer.test(text));
+      /*
+       * Or a builder in lib/ that a page spreads onto an element (`{...frameFactsAttributes(…)}`,
+       * lib/navigation/runningHead.ts): it writes the attribute as an object key, not in JSX.
+       */
+      const builder = new RegExp(`["']${attribute}["']\\s*:`);
+      const setSomewhere =
+        sources.some(({ rel, text }) => rel !== queriedIn && producer.test(text)) ||
+        libSources.some((text) => builder.test(text));
       if (!setSomewhere) {
         orphaned.push(
           `${queriedAt} queries [${attribute}], but nothing in app/ sets it — the selector can never match.`,
@@ -705,6 +713,8 @@ describe("Architecture Invariants", () => {
       "lib/policy/governance.ts",
       "lib/policy/transforms.ts",
       "lib/thresholds.ts",
+      // The candidate ramps score in parallel with the engine and keep its boundary.
+      "lib/research/candidateRamps.ts",
     ];
     const ALSO_ALLOWED = new Set(["lib/types.ts"]);
 

@@ -65,8 +65,9 @@ describe("buildBoundedConditionRails", () => {
     });
 
     assert.equal(hiring.pauseTrigger, "Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44.");
-    /* A line the reading already meets says so, beside the one still to come. */
-    assert.equal(hiring.resumeTrigger, "Resume the held roles when funding pressure is below 66 (already true at 32) and risk appetite is above 54.");
+    /* A line the reading already meets says so, beside the one still to come, and
+       an "and" rule gives both readings so the met half does not read as nearly there. */
+    assert.equal(hiring.resumeTrigger, "Resume the held roles when funding pressure is below 66 and risk appetite is above 54. Funding pressure is 32 and risk appetite is 52 now.");
     assert.deepEqual(rails.map((rail) => [rail.guardrail, rail.clearsAt]), [[76, 66], [44, 54]]);
   });
 
@@ -136,7 +137,7 @@ describe("buildSharedCorridorRails", () => {
     );
     assert.equal(formatPointsToLine(rails[0].pointsToGuardrail, "pause", rails[0].guardrailTripped), "44 pts away");
     assert.equal(formatPointsToLine(rails[0].pointsToClear, "resume", rails[0].clearHolds), "already met");
-    assert.equal(formatPointsToLine(0, "pause", true), "crossed");
+    assert.equal(formatPointsToLine(0, "pause", true), "past the line");
     assert.equal(formatPointsToLine(2.5, "resume", false), "2.5 pts away");
   });
 
@@ -207,7 +208,7 @@ describe("a rule line the reading already meets", () => {
     });
     assert.equal(
       hiring.pauseTrigger,
-      "Pause net-new hiring if funding pressure is above 76 (already true at 90) or risk appetite falls below 44.",
+      "Pause net-new hiring if funding pressure is above 76 or risk appetite falls below 44. Funding pressure is 90 now.",
     );
     assert.doesNotMatch(hiring.pauseTrigger, /rises above 76/);
   });

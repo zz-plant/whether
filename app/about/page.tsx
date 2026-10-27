@@ -20,16 +20,16 @@ import {
   publisherProfilePath,
 } from "../../lib/publisher";
 
-import { OperatingLoopGlyph } from "../components/illustrations/OperatingLoopGlyph";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { describeRecordCadence } from "../../lib/report/trackRecordCopy";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { MethodSection } from "./methodSection";
 
 export const metadata: Metadata = buildPageMetadata({
   title: "About Whether",
   description:
-    "What is new in the Whether Weekly Brief, who writes it, and what it is built from.",
+    "How Whether sets pause and resume lines for startup decisions, who writes it, and where its data comes from.",
   path: publisherProfilePath,
   imageAlt: "About Whether",
 });
@@ -62,100 +62,97 @@ export default function AboutPage() {
       <JsonLdScript data={structuredData} />
 
       <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 sm:px-6 sm:py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">About Whether</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">About Whether</h1>
         <p className="text-sm text-slate-300">
-          Each Monday, Whether says what interest rates and credit mean for a startup&apos;s hiring, spend and raise. Each
-          week it answers three things: what should change right now, how sure we are, and what would change the guidance.
+          Whether publishes free weekly operating guidance for startup leaders, based on interest rates and credit conditions.
         </p>
-        <div className="pt-2">
-          <OperatingLoopGlyph variant="detailed" />
+      </section>
+
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">How it works</h2>
+        <p className="text-sm text-slate-300">
+          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a pause line and a resume line.
+          Set the lines when you make a plan. The gap between pause and resume lines keeps a small move back across
+          the pause line from restarting a decision.
+        </p>
+        <p className="text-sm text-slate-300">
+          Each published brief stays on record. The{" "}
+          <Link href="/history#track-record" className={inlineLinkClass}>
+            track record
+          </Link>{" "}
+          compares past guidance with what happened next, including where it fell short. Some changes in
+          conditions came with no warning, and the{" "}
+          <Link href="/calibration" className={inlineLinkClass}>
+            calibration study
+          </Link>{" "}
+          shows the margin measures distance from a line, not probability.
+        </p>
+      </section>
+
+      <MethodSection />
+
+      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Where it fits and where it does not</h2>
+        <p className="text-sm text-slate-300">
+          {record ? <>{describeRecordCadence(record)} </> : null}
+          Use the brief to set your plan&apos;s lines and get an email when one is crossed.
+        </p>
+        {/* Two blocks, one per list: together they ran 862px, taller than a phone
+            screen, so no screenshot held the answer to "does this fit us" whole. */}
+        <div data-frame-block="" className="space-y-1.5">
+          <p className="text-sm font-semibold text-slate-100">It fits</p>
+          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+            <li>
+              Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year
+              contract, the runway to hold before the next raise.
+            </li>
+            <li>
+              Plans a group approves once and should not re-argue each month: a budget whose second half is released
+              when a line is crossed, or an agreed floor on runway.
+            </li>
+            <li>
+              Venture-backed U.S. companies with one to two years of runway and a next raise that depends on what
+              capital costs.
+            </li>
+            <li>
+              Investors and accelerators sending one reading to every company they back: the{" "}
+              <Link href="/share" className={inlineLinkClass}>
+                portfolio note
+              </Link>{" "}
+              says what the week means at each runway.
+            </li>
+          </ul>
+        </div>
+        <div data-frame-block="" className="space-y-1.5">
+          <p className="text-sm font-semibold text-slate-100">It does not fit</p>
+          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+            <li>
+              A single hire or purchase. The lines are a policy for a kind of decision, not a verdict on one.
+            </li>
+            <li>
+              Under six months of runway. Cash decides before markets do, so the guidance leads with cash there.
+            </li>
+            <li>
+              A company whose funding does not follow U.S. rates: one outside the U.S., or in a sector raising on a boom
+              of its own. The scores read U.S. rates only.
+            </li>
+            <li>
+              Which product work matters most. Rates bear on how much long-payback work a team can carry, not on what
+              to build.
+            </li>
+          </ul>
         </div>
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What is new here</h2>
-        <p className="text-sm text-slate-300">
-          <span className="font-semibold text-slate-100">Lines decided before they are needed.</span> Hiring, spending,
-          fundraising, the roadmap and new bets each get an action, a pause line and a resume line, written down before
-          either is reached. The pause and resume lines sit apart, so one noisy week does not stop a decision and
-          restart it, and nobody re-argues the reasoning on Monday.
-        </p>
-        <p className="text-sm text-slate-300">
-          <span className="font-semibold text-slate-100">A record that grades itself.</span> Every week&apos;s guidance
-          stays published unedited, and the{" "}
-          <Link href="/history#track-record" className={inlineLinkClass}>
-            track record
-          </Link>{" "}
-          scores the archive against what happened next, including where it falls short: changes in conditions that
-          came with no warning, and a confidence figure that the{" "}
-          <Link href="/calibration" className={inlineLinkClass}>
-            calibration study
-          </Link>{" "}
-          shows measures distance from a line, not probability.
-        </p>
-        <p className="text-sm text-slate-300">
-          The inputs are not new. Both scores start from public Treasury rates, by arithmetic short enough to check by
-          hand. It is not a macro blog, and not a forecast.
-        </p>
-      </section>
-
-      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Where it fits, and where it does not</h2>
-        <p className="text-sm text-slate-300">
-          {record ? <>{describeRecordCadence(record)} </> : null}
-          So the use is to set the lines when a plan is made, and to hear the day one is crossed.
-        </p>
-        <p className="text-sm font-semibold text-slate-100">It fits</p>
-        <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
-          <li>
-            Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year
-            contract, the runway to hold before the next raise.
-          </li>
-          <li>
-            Plans a group approves once and should not re-argue each month: a budget whose second half is released
-            when a line is crossed, or an agreed floor on runway.
-          </li>
-          <li>
-            Venture-backed U.S. companies with one to two years of runway, whose next raise depends on what capital
-            costs.
-          </li>
-          <li>
-            Investors and accelerators sending one reading to every company they back: the{" "}
-            <Link href="/share" className={inlineLinkClass}>
-              portfolio note
-            </Link>{" "}
-            says what the week means at each runway.
-          </li>
-        </ul>
-        <p className="text-sm font-semibold text-slate-100">It does not fit</p>
-        <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
-          <li>
-            A single hire or purchase. The lines are a policy for a kind of decision, not a verdict on one.
-          </li>
-          <li>
-            Under six months of runway. Cash decides before markets do, so the guidance leads with cash there.
-          </li>
-          <li>
-            A company whose funding does not follow U.S. rates: one outside the U.S., or in a sector raising on a boom
-            of its own. The scores read U.S. rates only.
-          </li>
-          <li>
-            Which product work matters most. Rates bear on how much long-payback work a team can carry, not on what
-            to build.
-          </li>
-        </ul>
-      </section>
-
-      <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Who writes it</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Who writes it</h2>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">{publisherAuthor.name}</span> — {publisherAuthor.role}
         </p>
         <p className="text-sm text-slate-300">{publisherAuthor.bio}</p>
         <p className="text-sm text-slate-300">
-          The pause-and-resume structure comes from {publisherAuthor.name}&apos;s earlier work on healthcare products:
-          clinical workflows, physician financial guidance and contested medical claims, where a decision with no
-          stopping condition can harm a patient. That work is listed at{" "}
+          The pause-and-resume structure comes from {publisherAuthor.name}&apos;s earlier work on healthcare products.
+          That work is listed at{" "}
           <a href={publisherAuthor.sameAs[0]} className={inlineLinkClass}>
             kanav.net
           </a>
@@ -164,17 +161,18 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">What it is built from</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">What it is built from</h2>
         <p className="text-sm text-slate-300">
           Both scores the brief leads with start from U.S. Treasury rates, read from the St. Louis Fed (FRED). Funding
-          pressure comes from the one-month bill rate, the speed of its rise, and an inverted curve (long rates below short ones); risk appetite comes from the gap between the ten-year and two-year rates. Market-stress readings
-          then adjust them: the extra interest riskier companies pay to borrow, the Chicago Fed&apos;s summary of
-          borrowing conditions, and the VIX, the stock market&apos;s forecast of turbulence. Where the pair lands sets
-          the conditions: Sunny, Cloudy, Stormy or Freezing.
+          pressure comes from the one-month bill rate, the speed of its rise, and long rates falling below short ones.
+          Risk appetite comes from the gap between the ten-year and two-year rates. Market-stress readings then adjust
+          them: the extra interest riskier companies pay to borrow, the Chicago Fed&apos;s summary of borrowing
+          conditions, and the VIX index of expected stock-market turbulence. Where the pair lands sets the conditions:
+          Sunny, Cloudy, Stormy or Freezing.
         </p>
         <p className="text-sm text-slate-300">
-          Two startup-market inputs, the pace of venture funding and tech layoffs, lower risk appetite when they
-          weaken. They come from a curated snapshot rather than a live feed, and every surface that uses them says so.
+          Two startup-market inputs lower risk appetite when they weaken: the pace of venture funding and tech layoffs.
+          They come from a curated snapshot rather than a live feed, and every surface that uses them says so.
         </p>
         <p className="text-sm text-slate-300">
           Inflation and unemployment appear on the signals page but enter neither score. Everything that does is
@@ -191,7 +189,7 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-lg font-semibold text-slate-100">Corrections and questions</h2>
+        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Corrections and questions</h2>
         <p className="text-sm text-slate-300">
           Whether publishes dated records that do not change after the fact. If a published brief is wrong, say so
           and it gets a correction note rather than a silent edit.

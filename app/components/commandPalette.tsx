@@ -4,7 +4,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Dialog } from "@base-ui/react/dialog";
 import { Search, CornerRightUp, Maximize2, Download, Archive, Copy, Calendar, FileText, Terminal, History, Columns2 } from "lucide-react";
-import { loopNavigationLayers, utilityLinks } from "../../lib/navigation/informationArchitecture";
+import { navigationGroups, navigationPages, utilityLinks } from "../../lib/navigation/informationArchitecture";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { openShareRail } from "./globalShareRail";
 import { openTimeMachine } from "./globalTimeMachine";
@@ -42,6 +42,15 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   const queryRef = useRef("");
   const searchInputRef = useRef<HTMLInputElement>(null);
 
+  /* Two actions press controls only the brief renders: Copy Brief's button and
+     the `Shell` main that focus mode narrows. Elsewhere they closed the palette
+     and did nothing, so they are offered where the page has them. Read once:
+     the palette mounts on open, after the page has. */
+  const [briefControls] = useState(() => ({
+    copy: Boolean(document.querySelector('[data-testid="copy-slack-brief-button"]')),
+    focus: Boolean(document.querySelector("[data-home-shell-main]")),
+  }));
+
   const toggleFocusMode = useCallback(() => {
     document.dispatchEvent(new CustomEvent("whether:toggle-focus-mode"));
     onClose();
@@ -53,7 +62,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   }, [router, onClose]);
 
   const commands: CommandItem[] = useMemo(() => {
-    const actionCommands: CommandItem[] = [
+    const allActionCommands: CommandItem[] = [
       {
         id: "copy-slack",
         label: "Copy Slack brief",
@@ -124,8 +133,8 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       },
       {
         id: "export",
-        label: "Share brief",
-        description: "Open share panel with presets",
+        label: "Share this page",
+        description: "Copy the page link, or the brief for a CEO, finance lead or team",
         icon: Download,
         action: () => {
           onClose();
@@ -139,7 +148,6 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         description: "Browse past briefs and the month-end record",
         icon: Archive,
         action: () => navigateTo("/history"),
-        shortcut: "H",
       },
       /* Deliberately here and in the footer rather than in the nav: the page is
          noindex and per-browser, so it is something a reader goes looking for
@@ -152,18 +160,36 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
         action: () => navigateTo("/decisions"),
       },
     ];
+    const actionCommands = allActionCommands.filter(
+      (command) =>
+        (command.id !== "copy-slack" || briefControls.copy) && (command.id !== "focus" || briefControls.focus),
+    );
 
-    const navCommands: CommandItem[] = loopNavigationLayers.map((layer) => ({
-      id: `nav-${layer.key}`,
-      label: layer.label,
-      description: layer.description,
-      icon: CornerRightUp,
-      action: () => navigateTo(layer.href),
-      shortcut: layer.shortcut,
-    }));
+    // The four groups with their keys, then every other page in them. A hub
+    // is its group (one name per URL), so it is listed once, as the group.
+    const groupHrefs = new Set<string>(navigationGroups.map((group) => group.href));
+    const navCommands: CommandItem[] = [
+      ...navigationGroups.map((group) => ({
+        id: `nav-${group.key}`,
+        label: group.label,
+        description: group.description,
+        icon: CornerRightUp,
+        action: () => navigateTo(group.href),
+        shortcut: group.shortcut.toUpperCase(),
+      })),
+      ...navigationPages
+        .filter((page) => !groupHrefs.has(page.href))
+        .map((page) => ({
+          id: `nav-${page.key}`,
+          label: page.label,
+          description: page.description,
+          icon: CornerRightUp,
+          action: () => navigateTo(page.href),
+        })),
+    ];
 
     // Every destination in one list: the utility routes used to live only in
-    // the footer and the More menu, so the palette could not jump to Pricing.
+    // the footer and the More menu, so the palette could not jump to About.
     const utilityCommands: CommandItem[] = utilityLinks
       .filter((link) => link.href !== "/search")
       .map((link) => ({
@@ -175,7 +201,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       }));
 
     return [...actionCommands, ...navCommands, ...utilityCommands];
-  }, [navigateTo, toggleFocusMode, onClose]);
+  }, [navigateTo, toggleFocusMode, onClose, briefControls]);
 
   /*
    * A typed query always offers guidance search, not only the fixed command list.
@@ -293,7 +319,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
           aria-label="Command palette"
         >
           <div className="flex items-center gap-3 border-b border-[color:var(--border-default)] px-4 py-3.5 bg-[color:var(--bg-raised)]/40">
-            <Search className="text-sky-400 shrink-0" size={18} aria-hidden="true" />
+            <Search className="text-slate-400 shrink-0" size={18} aria-hidden="true" />
             <input
               ref={searchInputRef}
               type="text"

@@ -30,7 +30,7 @@ export const buildDecisionAnswerContextSummary = ({
 }) => {
   const canonicalLabel = getRegimePublicLabel(canonicalRegime);
   const classificationLine = canonicalLabel !== displayLabel
-    ? `Underneath, the scores read ${canonicalLabel}.`
+    ? `On the scores alone, it's ${canonicalLabel}.`
     : null;
   const movement = describeScoresMovement(reportDynamics);
   const basis = comparisonBasis(reportDynamics.comparedWith);

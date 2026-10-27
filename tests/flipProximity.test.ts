@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildFlipProximity } from "../lib/report/flipProximity";
-import { buildQuietDayRead, buildStandupLine } from "../lib/report/decisionMovement";
+import { buildStandupLine } from "../lib/report/decisionMovement";
 import { buildCallChangeLine, buildCallChangeLines, buildFlipThreshold, buildWeekCallChangesIf } from "../lib/report/reportEvidence";
 import { describePolicyHold } from "../lib/report/regimeDescription";
 import { evaluateRegime, type RegimeAssessment } from "../lib/regimeEngine";
@@ -13,6 +13,9 @@ import { macros, treasury as heldTreasury } from "./factories/exportFixtures";
 
 const withYields = (yields: TreasuryData["yields"]): RegimeAssessment =>
   evaluateRegime({ ...snapshotData, yields }, undefined, macroSeries);
+
+/* A curve 14bp positive: risk appetite 46 on the record basis, below its line at 50. */
+const STORMY_YIELDS: TreasuryData["yields"] = { oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.85, tenYear: 3.99 };
 
 /* The export fixture's reading: its two scores disagree, so the policy layer holds it. */
 const held = evaluateRegime(heldTreasury, undefined, macros);
@@ -50,10 +53,13 @@ describe("the change line in interest-rate terms", () => {
   });
 
   it("projects from the published score, macro layer included, not from the bare curve", () => {
-    // The bundled reading publishes risk appetite below what the slope alone
-    // scores (the macro layer subtracts), so the move to the boundary is the
-    // published gap over the slope's 40 points per 1%, not the bare formula's.
-    const assessment = evaluateRegime(snapshotData, undefined, macroSeries);
+    // A close of 30 on the volatility index publishes risk appetite below what
+    // the slope alone scores (the record basis's macro layer subtracts 15), so
+    // the move to the boundary is the published gap over the slope's 40 points
+    // per 1%, not the bare formula's.
+    const stressed = macroSeries.map((series) => (series.id === "VIX_INDEX" ? { ...series, value: 30 } : series));
+    const assessment = evaluateRegime(snapshotData, undefined, stressed);
+    assert.ok(assessment.diagnostics.boundaryContributors.length > 0, "the macro layer moved the published score");
     const risk = buildFlipProximity(assessment).find((entry) => entry.axis === "riskAppetite");
     assert.ok(risk);
     const gap = assessment.thresholds.riskAppetiteRegime - assessment.scores.riskAppetite;
@@ -86,7 +92,7 @@ describe("the change line in interest-rate terms", () => {
   });
 
   it("does not offer a rise in risk appetite while the market-stress veto caps it", () => {
-    const base = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+    const base = withYields(STORMY_YIELDS);
     const vetoed = {
       ...base,
       diagnostics: { ...base.diagnostics, boundaryContributors: ["Market stress veto — posture cannot read better than transitional"] },
@@ -102,7 +108,7 @@ describe("the change line in interest-rate terms", () => {
      first step, and reported a 0.01 move toward conditions the scores already sat
      in; the sentence above it said "(already true at 41)". */
   it("translates no line the change sentence calls already crossed", () => {
-    const stormy = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+    const stormy = withYields(STORMY_YIELDS);
     assert.ok(stormy.scores.riskAppetite <= stormy.thresholds.riskAppetiteRegime, "the scores sit on the risk-off side");
     const heldSunny = { ...stormy, regime: "EXPANSION" as const };
     const crossed = buildCallChangeLines(heldSunny).find((line) => line.tripped);
@@ -131,27 +137,6 @@ describe("what would change the guidance, in one line", () => {
   it("is the hold's own condition on a held week", () => {
     const hold = describePolicyHold(held.policyAssessment.refusal);
     assert.equal(buildCallChangeLine({ weeklyCall: callOf(held), assessment: held }), `Conditions change if: ${hold.callChangesIf}`);
-  });
-});
-
-describe("quiet-day read", () => {
-  const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
-  const source = { weeklyCall: callOf(assessment), assessment };
-
-  it("says what would change a week whose guidance held", () => {
-    assert.equal(buildQuietDayRead({ guidanceChange: "held", ...source }), buildCallChangeLine(source));
-  });
-
-  it("renders nothing on a week the guidance moved, or with nothing compared", () => {
-    assert.equal(buildQuietDayRead({ guidanceChange: "conditions", ...source }), null);
-    assert.equal(buildQuietDayRead({ guidanceChange: "lines", ...source }), null);
-    assert.equal(buildQuietDayRead({ guidanceChange: null, ...source }), null);
-  });
-
-  it("carries no market move, percent or flip", () => {
-    const line = buildQuietDayRead({ guidanceChange: "held", ...source });
-    assert.ok(line);
-    assert.doesNotMatch(line, /%|flip|Treasury bill|long rates/i);
   });
 });
 

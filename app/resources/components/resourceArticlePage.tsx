@@ -5,40 +5,24 @@ import {
   buildPageImageUrl,
   buildPageMetadata,
   organizationName,
+  withUpdatedMarker,
 } from "../../../lib/seo";
+import { formatDateUTC } from "../../../lib/formatters";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import { graph } from "../../../lib/seo/pageStructuredData";
-import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
-import type { ResourceArticle, ResourceArticleEmbed, ResourceArticleSection } from "../../../lib/resourceArticles";
+import type { ResourceArticle, ResourceArticleEmbed } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
 import { isIndexableResourceArticleSlug, noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { ActionLink } from "../../components/ui/actionLink";
 
 const boardFrameworkPath = "/resources/board-level-capital-posture-framework";
-
-const sharedDeepDiveSections: ResourceArticleSection[] = [
-  {
-    heading: "Implementation operating cadence (weeks 1-12)",
-    paragraphs: [
-      "Week 1 should produce one source-of-truth decision inventory. List every meaningful commitment across hiring, roadmap, vendor spend, and channel investment. For each item, document owner, expected business effect, time-to-evidence, and reversal path. Most organizations skip this step because it feels administrative, but without it you cannot prioritize risk. In high-pressure periods, invisible commitments become the real source of runway erosion because they continue by inertia. By forcing a complete inventory early, leadership converts diffuse anxiety into a tractable operating map.",
-      "Weeks 2 through 4 should establish threshold design and meeting cadence. Select a small set of indicators that are decision-relevant and resistant to vanity inflation: retention quality, conversion efficiency, delivery reliability, burn multiple movement, and forecast error. Then assign explicit breach duration rules. A single weak week should trigger diagnostic review, not wholesale posture change. Two or more persistent breaches should trigger escalation. The discipline here is consistency, not prediction perfection. Consistent trigger application is what allows teams to make hard calls without re-litigating governance every cycle.",
-      "Weeks 5 through 8 should focus on tranche execution. Every RISKY item should move in bounded increments with kill criteria, while SAFE items continue through a lighter approval path. This period is where most teams discover mismatches between declared posture and practical behavior. Expect to adjust owner maps, escalation response times, and reporting format. Weeks 9 through 12 should emphasize retrospective quality: which triggers fired, which decisions reversed, how quickly rollback happened, and what friction slowed action. The board does not need perfect outcomes; it needs evidence that the operating system is becoming more reliable under stress.",
-    ],
-  },
-  {
-    heading: "Failure modes to avoid while pressure is high",
-    paragraphs: [
-      "Failure mode one is precision theater: adding more dashboards, more scoring columns, and more committees without improving decision speed or quality. Complexity often masquerades as rigor. A good governance system should lower ambiguity and reduce meeting debt. If your process takes longer each week while confidence remains flat, simplify aggressively. Keep the metric set short, the escalation rules explicit, and the artifact format reusable. Leadership attention is a scarce resource; spending it on reporting choreography instead of corrective action is a hidden cost of poor posture design.",
-      "Failure mode two is exception creep. Teams begin with clear SAFE / RISKY / DANGEROUS classes, then gradually grant ad hoc exceptions because each request sounds urgent in isolation. Over time, policy dissolves while everyone still claims discipline. Prevent this by forcing all exceptions into the same log with business rationale, owner, expiry date, and review checkpoint. Expired exceptions should auto-escalate rather than silently persist. This one habit dramatically improves board trust because it shows not only what was approved but also how temporary risk decisions are being managed.",
-      "Failure mode three is delayed reversal. Leaders often wait for certainty before stopping a decision stream, especially when reputational stakes are high. In tightening conditions, delayed reversals are usually more expensive than imperfect reversals. Build social permission for early correction: separate process quality from outcome quality, publish reversal learnings without blame language, and reward teams for disciplined stops that preserve capital for better bets. The organization that can reverse calmly and quickly has a structural advantage over one that only knows how to commit and defend.",
-    ],
-  },
-];
 
 const canonicalPillarPath = "/resources/capital-discipline-venture-backed-companies";
 
@@ -104,10 +88,12 @@ const resolveImportedEmbed = (embed: ResourceArticleEmbed): { src: string; title
   };
 };
 
+/* The guide's own `updatedAt` dates the title, the line under the heading, the
+   sitemap and `dateModified`, so all four move together when the copy does. */
 export const buildResourceArticleMetadata = (article: ResourceArticle): Metadata =>
   ({
     ...buildPageMetadata({
-      title: article.title,
+      title: withUpdatedMarker(article.title, article.updatedAt),
       description: article.description,
       path: `/resources/${article.slug}`,
       imageAlt: article.title,
@@ -119,9 +105,6 @@ export const buildResourceArticleMetadata = (article: ResourceArticle): Metadata
     ...(isIndexableResourceArticleSlug(article.slug) ? {} : { robots: noindexRobots }),
   });
 
-export const composeArticleSections = (article: ResourceArticle) =>
-  article.includeSharedDeepDive ? [...article.sections, ...sharedDeepDiveSections] : article.sections;
-
 type ResourceDecisionArtifact = {
   decisionShiftSummary: string;
   postureSummary: string;
@@ -129,6 +112,8 @@ type ResourceDecisionArtifact = {
   freshnessLabel: string;
   /** The reading's own date; the paste-ready citation printed here ran to three lines of URLs. */
   recordDateLabel: string;
+  /** The answer pages that cite this guide: the same question, with this week's guidance. */
+  weeklyAnswers?: Array<{ href: string; title: string }>;
 };
 
 export function ResourceArticlePage({ article, decisionArtifact }: { article: ResourceArticle; decisionArtifact?: ResourceDecisionArtifact }) {
@@ -170,55 +155,65 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
         <div className="space-y-6 print:text-black">
           <Breadcrumbs
             className="print:hidden"
-            items={[
-              { label: "Home", href: "/" },
-              { label: "Resources", href: "/resources" },
-              { label: article.title },
-            ]}
+            items={toVisibleBreadcrumbs(
+              buildGroupBreadcrumbs(`/resources/${article.slug}`, [{ name: article.title, path: `/resources/${article.slug}` }]),
+            )}
           />
           {decisionArtifact ? (
             <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-              <p className="type-eyebrow">This week&apos;s guidance</p>
-              <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">What the live guidance says before you read on</h2>
+              <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">This week’s guidance</h2>
               <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.postureSummary}</p>
               <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.decisionShiftSummary}</p>
               <div className="grid gap-3 sm:grid-cols-2">
                 {decisionArtifact.mappedRules.map((rule) => (
                   <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
-                    <p className="type-eyebrow text-sky-200">This week&apos;s rule · {decisionAreaLabel(rule.area)}</p>
+                    <p className="type-eyebrow">This week&apos;s rule · {decisionAreaLabel(rule.area)}</p>
                     <p className="font-semibold text-slate-100">{rule.recommendation}</p>
-                    <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
-                    <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>
+                    <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {formatDecisionThreshold(rule.pauseTrigger)}</p>
+                    <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {formatDecisionReversal(rule.resumeTrigger)}</p>
                   </article>
                 ))}
               </div>
+              {decisionArtifact.weeklyAnswers && decisionArtifact.weeklyAnswers.length > 0 ? (
+                <p className="text-sm text-slate-200 print:text-slate-700">
+                  Questions answered this week:{" "}
+                  {decisionArtifact.weeklyAnswers.map((answer, index) => (
+                    <span key={answer.href}>
+                      {index > 0 ? " · " : null}
+                      <Link href={answer.href} className="text-sky-200 underline underline-offset-4">{answer.title}</Link>
+                    </span>
+                  ))}
+                </p>
+              ) : null}
               <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
-                <span>As of {decisionArtifact.recordDateLabel} · signals refreshed {decisionArtifact.freshnessLabel}</span>
+                <span>Data as of {decisionArtifact.recordDateLabel} · checked {decisionArtifact.freshnessLabel}</span>
                 <ActionLink href="/" variant="inline" className="print:hidden">Open this week&apos;s brief</ActionLink>
               </p>
             </section>
           ) : null}
 
           <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
-            <p className="type-eyebrow">Operating brief</p>
             <h1 className="text-2xl font-semibold text-slate-100 print:text-slate-900 sm:text-3xl">{article.title}</h1>
+            <p className="text-xs text-slate-400">
+              Updated <time dateTime={article.updatedAt}>{formatDateUTC(article.updatedAt)}</time>
+            </p>
             <p className="text-sm text-slate-200 print:text-slate-700">{article.description}</p>
             <div className="flex flex-wrap gap-2 text-sm">
               <Link href="/resources/decision-shield-overview" className="text-sky-200 underline underline-offset-4">Decision Shield</Link>
               <span className="text-slate-400">•</span>
-              <Link href="/resources/capital-posture-template" className="text-sky-200 underline underline-offset-4">Capital Posture Template</Link>
+              <Link href="/resources/capital-posture-template" className="text-sky-200 underline underline-offset-4">Capital Planning Template</Link>
             </div>
           </section>
 
-          <section className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
+          <section id="board-facing-summary-block-forwardable" className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
             <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">Summary to forward</h2>
             <ul className="space-y-2 text-sm text-slate-200 print:text-slate-700">
               {article.boardSummary.map((item) => <li key={item}>• {item}</li>)}
             </ul>
           </section>
 
-          {composeArticleSections(article).map((section) => {
-            const anchor = buildAnchor(section.heading);
+          {article.sections.map((section) => {
+            const anchor = section.anchor ?? buildAnchor(section.heading);
             return (
               <section id={anchor} key={section.heading} className="weather-panel space-y-3 px-6 py-6 print:border print:border-slate-300 print:bg-white">
                 <div className="flex flex-wrap items-center justify-between gap-3">

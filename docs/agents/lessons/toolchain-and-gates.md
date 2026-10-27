@@ -1,6 +1,6 @@
 # Toolchain notes and the check gates
 
-Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runner, suppressions, dead-export census, telemetry streams or the gate. Dated entries are the reasoning behind each rule; the commands live in [CLAUDE.md](../../../CLAUDE.md).
+Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runner, suppressions, dead-export census, telemetry streams, an env flag or the gate. Dated entries are the reasoning behind each rule; the commands live in [CLAUDE.md](../../../CLAUDE.md).
 
 ## Toolchain notes (2026-09-02)
 
@@ -76,7 +76,7 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   ESLint and `eslint-config-next` are gone, which is also what let TypeScript move to 7:
   typescript-eslint was the only consumer of the compiler API, which TS 7 does not ship until 7.1.
 - **Suppressions are themselves a gated metric.** `bun run check:suppressions`
-  (`scripts/check-suppression-census.ts`) counts inline lint disables, `@ts-*` comments, skipped
+  (the `suppression-census` package, configured in `scripts/census.config.ts`) counts inline lint disables, `@ts-*` comments, skipped
   tests, lint rules disabled globally, and lint rules an `overrides` block turns off, against a
   hand-edited baseline — and fails when any of them rises. It exists because every other ratchet here —
   the rule burn-down, `lint:types`, the suite — can be turned green by suppressing the finding
@@ -91,11 +91,21 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   change and belongs in its own PR with the reason.
 
   **Both census scripts are mechanism only (2026-10-06).** Everything that names this repo — the
-  scanned roots, the framework's convention names, the data directories, the self-exclusions, both
-  baselines and the test-file floor — is in `scripts/census.config.ts`, and both walk the tree
-  through one shared `scripts/walk-files.mjs`, which is also what `scripts/run-tests.mjs` uses for
-  its discovery guards. One walk, because two copies had already drifted: the guarded `statSync`
-  below existed in the dead-export scan and not in this one.
+  scanned roots, the framework's convention names, the data directories, both baselines and the
+  test-file floor — is in `scripts/census.config.ts`. The dead-export scan walks the tree through
+  `scripts/walk-files.mjs`, which is also what `scripts/run-tests.mjs` uses for its discovery
+  guards; the two census walks had already drifted once (the guarded `statSync` below existed in
+  the dead-export scan and not in this one).
+
+  **The suppression mechanism is a package now (2026-10-07).** It moved to
+  [`suppression-census`](https://github.com/zz-plant/suppression-census) with its fixture tests,
+  and its walk carries the same guard: an entry it cannot stat is skipped, not fatal. The CLI reads
+  `suppressionCensusConfig` out of `scripts/census.config.ts` directly. The self-exclusion list is
+  empty as a result: it existed because the script and its test spelled every pattern out as
+  literals, and the script is gone while `tests/suppressionCensus.test.ts` names no pattern. That
+  file now counts toward the test-file floor, which is why the count rose by one. A package change
+  reaches this repo only through a version bump in `package.json`, so rerun `check:suppressions`
+  and `check:dead-exports` on every bump.
 - **An unused export is a gated metric too (2026-09-15).** `bun run check:dead-exports`
   (`scripts/check-dead-exports.ts`) counts exported declarations under `app/`, `lib/` and
   `worker/` that no other scanned file mentions, against a baseline of **zero**. A sweep that
@@ -164,9 +174,19 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   did not and could not be reproduced. Promote it into the gate after a week of identical runs.
 - **The gate shuffles test order.** `scripts/run-tests.mjs` passes `--randomize` under
   `WHETHER_DEPLOY_GATE=1`; bun prints `--seed=<n>` at the end of every run, and
-  `BUN_TEST_SEED=<n> bun run test` replays the container's order locally. The runner also strips
+  `BUN_TEST_SEED=<n> bun run test` replays the container's order locally (with shards, each
+  shard's seed is base + its index). The runner also strips
   `FRED_API_KEY` and `ALPHA_VANTAGE_API_KEY` from the suite's environment, so a key in a shell
   cannot route a fixture-driven test to a real upstream.
+- **The suite shards across a few processes (2026-10-21).** The runner was one bun process
+  for 441 files while the suite is CPU-bound — half its time in two infrastructure suites
+  (dev-server fixtures, the CLI suite's 62 child processes). It now splits the same file list
+  across up to 3 concurrent bun processes (default: one per core, `BUN_TEST_SHARDS` overrides,
+  a run with a path filter stays single). What runs is unchanged — every file once, shuffled
+  within its shard, same preload, timeout and stripped env; each shard is still one process,
+  so module-state coupling within a shard is unchanged and seed replay is per shard.
+  Measured locally: 29s → ~20s at 3 shards, peak RSS comparable to the single process
+  (~2 GB, dominated by fixture children either way).
 - **The build container always has Cloudflare credentials, and the suite must not see them
   (2026-09-15).** Workers Builds exports `CLOUDFLARE_ACCOUNT_ID` and `CLOUDFLARE_API_TOKEN` so
   wrangler can deploy. `resolveAnalyticsReadConfig` reads both — it accepts `CLOUDFLARE_API_TOKEN`
@@ -179,7 +199,10 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   When a check passes everywhere you can look, enumerate what the place you cannot look *has* that
   you do not — credentials first.
 - **The suite runs offline.** `bunfig.toml` preloads `scripts/test-network-guard.ts` for every
-  `bun test`, and an outbound fetch throws instead of leaving the box; loopback stays open, because
+  `bun test` (the guard itself is the
+  [`bun-test-network-guard`](https://github.com/zz-plant/bun-test-network-guard) package since
+  2026-10-07; the preload keeps this repo's allow variable, hint and ingestion directory), and an
+  outbound fetch throws instead of leaving the box; loopback stays open, because
   `tests/whetherCli.test.ts` starts its own server. This is the same argument as the stripped API
   keys one line up, taken to its end: a result that depends on what the environment happens to
   allow is not a result about the code. Measured 2026-09-03, it took the suite from **49.3s to
@@ -223,8 +246,8 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   unexamined. Two of those five are Worker-authored (`ingest-pipeline`, `cron-step`) and one of
   those two is read back and rendered on `/trust` as "Scheduled runs" — anyone could have posted a
   run that never happened onto the page whose job is to be trustworthy. A third, `premium-funnel`,
-  has its own route with a body cap and a validator, which shadows the dynamic one anyway, so its
-  entry there was a weaker door Next never opened. The accepted set is now the keys of
+  had its own route with a body cap and a validator, which shadowed the dynamic one anyway, so its
+  entry there was a weaker door Next never opened (that route went with the paid tier on 2026-10-14). The accepted set is now the keys of
   `STREAM_VALIDATORS`: a stream with no validator cannot be posted, and adding one without a
   validator does not typecheck. The declared list lives once, in `TELEMETRY_STREAMS`, with the union
   derived from it and the census script reading it.
@@ -241,3 +264,64 @@ Moved out of `CLAUDE.md` so it is read when a task touches lint, the suite runne
   The payload is read only for a route that paints none, and the rows a boundary names as its
   `fallback` are skipped there. Against 6404891a, the commit before #1518 fixed those pages, the old
   audit passed all 35 routes and the new one fails exactly the five.
+
+- **The test runner's guards (moved here from its header, 2026-10-07).** `scripts/run-tests.mjs`
+  only ever looks under `./tests`, so a test file written anywhere else is silently never run, and
+  reads as coverage in review because it is a real suite that passes when invoked directly.
+  `lib/report/forecastModel.test.ts` sat outside for long enough to accumulate 14 cases against a
+  core model, none of which the suite executed. The runner now fails on a stray test file, scanning
+  from the repository root rather than from a list of source roots: an allowlist of roots reproduces
+  the bug it is meant to catch, because the next stray file lands in the directory nobody thought to
+  list. Only build output, vendored code and generated artifacts are skipped; a genuine second suite
+  belongs in `SKIP_DIRECTORIES` with a note. `tests/tools/` is the other scope rule: suites there
+  drive interpreters the build image does not guarantee (today: none; it held a Python analytics
+  script until 2026-09-16), so the deploy gate leaves the directory out and says so only when it
+  excluded something, while every local run and pre-push still runs it. The stripped environment
+  (see the two entries above on API keys and Cloudflare credentials) also drops `SLACK_WEBHOOK_URL`,
+  for a sharper reason than rerouting a fixture: a webhook URL *is* the credential, secret and all,
+  in the path, and `lib/delivery/slack.ts` posts to it through the global `fetch`, so with one
+  exported a test could post to a real Slack channel. The network guard
+  would catch and name it by origin only, but the suite should not be holding the secret at all.
+
+- **The landmark audit's smaller rules (moved here from its headers, 2026-10-07).**
+  - *Readiness, not health.* `/api/health` reports 503 whenever report data is degraded, and an
+    offline FRED is enough, but a degraded server still renders every route's markup, which is all
+    the audit reads. Treating 503 as "not ready" made the check unrunnable offline and sent it off to
+    start a second dev server that vinext refuses to run in the same directory. Any HTTP response
+    means listening; only a transport error means not.
+  - *Concurrency scales with the box.* Route fetches are mostly waiting on the dev server's
+    compile. Measured 2026-09-03 on four cores, the 40-route audit took 51.8s at a concurrency of 4
+    and 33.0s at 8, and 12 bought nothing more. The default is twice the cores, capped at 8, floored
+    at the 4 a two-core build container always had, so the small container behaves exactly as before.
+  - *Streamed routes are read from the flight payload.* A client-streamed route's landmark reaches
+    the response as an escaped RSC flight row inside a script, not as markup. On 2026-08-31 scanning
+    only for `<main>` tags reported 21 of 40 routes as missing a landmark they had; by 2026-10-06
+    every one of the 35 audited routes painted its landmark as markup. The payload is read only for
+    a route that paints no `<main>` at all, and presence is judged rather than counts, because React
+    re-emits a segment's rows when a stream resumes.
+  - *Dead `#anchor`s are judged across routes.* Four dead in-page anchors were found by hand on
+    2026-09-16, all in code that never rendered, so no reader could click one and report it. The
+    audit collects every id a route renders (markup and flight payload both) and every `#anchor` it
+    links to, and fails only an anchor no audited route renders at all. Per page would be a claim
+    about the data: plenty of targets render only under a condition (figures entered, a degraded
+    banner), and that would go red in a container whose log cannot be read from here.
+  - *A dynamic route needs a sample URL per renderer.* `collectMainContentRouteSamples` throws when
+    a new dynamic page has no representative URL pinned, and `/resources/[slug]` pins one pillar and
+    one article so a shared route file cannot hide a regression in either branch.
+
+## Environment flags the code reads (2026-10-27)
+
+Each of these was findable only by reading the file that reads it. Leave them unset for the default.
+
+| Flag | Read by | Effect |
+| --- | --- | --- |
+| `CHECK_SERIAL=1` | `scripts/check-tasks.mjs` | Same as `--serial`: a `bun run check` stage runs fail-fast, one task at a time. |
+| `BUN_TEST_ONLY_FAILURES=1` | `scripts/run-tests.mjs` | Prints failing tests only, as the deploy gate always does. |
+| `BUN_TEST_TIMEOUT_MS=<ms>` | `scripts/run-tests.mjs` | Per-test ceiling; defaults to 60000, or 120000 in the deploy gate. |
+| `RATCHET_REPORT=1` | `tests/uiPrimitiveRatchet.test.ts`, `tests/themeRawPaletteRatchet.test.ts` | Prints the current counts, so a migration that lowers one knows the baseline to write. |
+| `WHETHER_VOCABULARY_REPORT=1` | `tests/readerVocabulary.test.tsx` | Prints each ratcheted word's count per surface. |
+| `LANDMARKS_BASE_URL=<url>` | `scripts/check-main-content-landmarks.mjs` | Audits that server instead of `http://127.0.0.1:3000`; `--base-url` overrides it. |
+| `UI_CAPTURE_BASE_URL=<url>` | `scripts/ui-capture.lib.mjs` | Default server for `ui:shots`, `ui:iterate`, `ui:frames` and `ci:screenshot-smoke`; `--base-url` overrides it. |
+| `UI_CAPTURE_OUT_DIR=<dir>` | `scripts/ci-screenshot-smoke.mjs` | Where the smoke check writes its PNGs (default `artifacts/ui`). The other capture scripts take `--out-dir`. |
+| `WHETHER_CHROMIUM_PATH=<path>` | `scripts/ui-capture.lib.mjs` | A Chromium to launch when Playwright's pinned build is missing; tried only after the default launch fails. |
+| `WHETHER_SMOKE_STRICT_HTML=1` | `scripts/prod-synthetic-smoke.mjs` | `smoke:prod` fails a page answering 403 instead of skipping its HTML checks. |

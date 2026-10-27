@@ -3,6 +3,9 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 import { CALL_CHANGE_RULE } from "../lib/report/trackRecordCopy";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 
@@ -40,7 +43,7 @@ describe("/history leads with the record's answer", () => {
 
     const strip = headings.indexOf("Conditions by month");
     const record = headings.indexOf("Track record");
-    const confidence = headings.indexOf("What the confidence number has been worth");
+    const confidence = headings.indexOf("What the margin has been worth");
     const map = headings.indexOf("How the two scores set conditions");
     const table = headings.indexOf("Monthly readings");
     const briefs = headings.indexOf("Published weekly briefs");
@@ -130,8 +133,10 @@ describe("/trust carries one trust strip", () => {
     const firstSectionHeading = html.indexOf('id="section-formula-reference-heading"');
     assert.ok(strip < firstSectionHeading, "the strip comes before the first explanatory section");
     assert.doesNotMatch(html, /sm:grid-cols-5/, "the five-cell System status strip is gone");
-    assert.doesNotMatch(html, /href="\/trust"/, "on /trust the strip carries no link to itself");
-    for (const cell of ["As of", "Sources", "Confidence", "Could change next week"]) assert.match(html, new RegExp(cell));
+    // The sub-tab row names /trust as the current page (aria-current); the strip itself must not link here.
+    const withoutTabs = html.replace(/<nav[^>]*data-section-tabs[\s\S]*?<\/nav>/, "");
+    assert.doesNotMatch(withoutTabs, /href="\/trust"/, "on /trust the strip carries no link to itself");
+    for (const cell of ["Data as of", "Sources", "Margin", "change next week"]) assert.match(html, new RegExp(cell));
   });
 
   it("draws where the score sits as two ladders at the top of the formula section", async () => {
@@ -141,7 +146,7 @@ describe("/trust carries one trust strip", () => {
     const ladders = [...html.matchAll(/data-score-ladder/g)].map((match) => match.index ?? -1);
     assert.equal(ladders.length, 2);
     assert.ok(ladders.every((index) => index > formula), "both ladders sit inside the formula section");
-    assert.ok(ladders[1] < html.indexOf("Four conditions: funding pressure above"), "the quadrant stays, as the rule's explanation, beneath them");
+    assert.ok(ladders[1] < html.indexOf("Four conditions, picked by whether funding pressure is above"), "the quadrant stays, as the rule's explanation, beneath them");
   });
 });
 

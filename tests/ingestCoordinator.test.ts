@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { readSetting } from "../lib/runtime/settings";
 import { afterEach, describe, it } from "bun:test";
 import { IngestCoordinator, REFRESH_ALARM_INTERVAL_MS } from "../worker/ingestCoordinator";
 import { DurableStorageIngestionStore, type CoordinatorStorage } from "../lib/ingestion/durableStorageStore";
@@ -188,22 +189,40 @@ describe("IngestCoordinator", () => {
     assert.ok(storage.alarm !== null && storage.alarm >= before + REFRESH_ALARM_INTERVAL_MS - 1000, "the next check is armed");
   });
 
+  it("installs the runtime env, so the ingest it runs can read its settings", () => {
+    /* The ingest reads FRED_API_KEY through readSetting, from globalThis. An object that
+       ignored its env refreshed without the key in an isolate nothing else had primed. */
+    const key = "WHETHER_TEST_COORDINATOR_SETTING";
+    try {
+      new IngestCoordinator({ storage: new FakeStorage() }, { [key]: "from-env" });
+      assert.equal(readSetting(key), "from-env");
+    } finally {
+      Reflect.deleteProperty(globalThis, key);
+    }
+  });
+
   it("is constructed the way the runtime constructs it: (state, env), with env never mistaken for fetch", async () => {
     const storage = new FakeStorage();
-    const runtimeEnv = { WHETHER_DURABLE_KV: {}, INGEST_COORDINATOR: {} };
-    const object = new IngestCoordinator({ storage }, runtimeEnv);
-    const client = new IngestCoordinatorStore({ fetch: (request) => object.fetch(request) });
-    await client.writeLatestMaterialized(fullModel(new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()));
-
+    /* No bindings that other suites read: the env is installed on globalThis, which is
+       process-wide, so a stub KV here would reach every later test. */
+    const runtimeEnv = { WHETHER_TEST_COORDINATOR_MARKER: "1" };
+    /* Served before construction: the object takes the global fetch when it is built, so
+       assigning it afterwards sent every family's refresh to the real upstream, and the
+       refresh swallowed each failure. */
     const originalFetch = globalThis.fetch;
     globalThis.fetch = fixtureFetch;
     try {
+      const object = new IngestCoordinator({ storage }, runtimeEnv);
+      const client = new IngestCoordinatorStore({ fetch: (request) => object.fetch(request) });
+      await client.writeLatestMaterialized(fullModel(new Date(Date.now() - 48 * 60 * 60 * 1000).toISOString()));
+
       const response = await object.fetch(new Request(`${COORDINATOR_ORIGIN}${COORDINATOR_ROUTES.refresh}`, { method: "POST" }));
       assert.equal(response.status, 200, "the refresh used the global fetch, not the env object");
       const body: unknown = await response.json();
       assert.ok(body && typeof body === "object" && "refreshed" in body && Array.isArray(body.refreshed) && body.refreshed.length > 0);
     } finally {
       globalThis.fetch = originalFetch;
+      Reflect.deleteProperty(globalThis, "WHETHER_TEST_COORDINATOR_MARKER");
     }
   });
 
@@ -249,5 +268,32 @@ describe("getDefaultIngestionStore backend selection", () => {
     } finally {
       Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
     }
+  });
+
+  it("acquires a fresh Durable Object stub per operation instead of reusing a request-bound stub across requests", async () => {
+    const { object } = coordinatorPair();
+    let getCalls = 0;
+    const singleUseNamespace: CoordinatorNamespace = {
+      idFromName: (name: string) => name,
+      get: () => {
+        getCalls += 1;
+        let used = false;
+        return {
+          fetch: (request: Request) => {
+            if (used) {
+              throw new Error("Cannot perform I/O on behalf of a different request");
+            }
+            used = true;
+            return object.fetch(request);
+          },
+        };
+      },
+    };
+    Object.assign(globalThis, { WHETHER_INGEST_COORDINATOR: "1", INGEST_COORDINATOR: singleUseNamespace });
+
+    const store = getDefaultIngestionStore();
+    assert.equal(await store.readLatestMaterialized(), null);
+    assert.equal(await store.readLatestMaterialized(), null);
+    assert.equal(getCalls, 2, "each operation resolves a fresh stub in its own request context");
   });
 });

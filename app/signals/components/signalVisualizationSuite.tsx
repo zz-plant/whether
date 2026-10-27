@@ -1,6 +1,8 @@
 "use client";
 
+import { ScreenshotCaption } from "../../components/screenshotCaption";
 import { useMemo, useState } from "react";
+import { scaleLinear } from "d3-scale";
 import type { TreasuryData } from "../../../lib/types";
 import { SegmentedControl } from "../../components/ui/segmentedControl";
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
@@ -99,11 +101,14 @@ const linePath = (
   height: number,
   min: number,
   max: number,
-) => buildSegmentedLineSeries({ values, width, height, min, max });
+  baselineY?: number,
+) => buildSegmentedLineSeries({ values, width, height, min, max, curve: "monotone", baselineY });
 
-const toChartX = (value: number, min: number, max: number, width: number) => ((value - min) / (max - min || 1)) * width;
+const toChartX = (value: number, min: number, max: number, width: number) =>
+  scaleLinear().domain([min, max]).range([0, width])(value);
 
-const toChartY = (value: number, min: number, max: number, height: number) => height - ((value - min) / (max - min || 1)) * height;
+const toChartY = (value: number, min: number, max: number, height: number) =>
+  scaleLinear().domain([min, max]).range([height, 0])(value);
 
 const inDomain = (value: number, min: number, max: number) => value >= min && value <= max;
 
@@ -113,12 +118,25 @@ const inDomain = (value: number, min: number, max: number) => value >= min && va
  * black box once the light theme is on.
  */
 const SERIES = {
-  oneMonth: "var(--color-semantic-unchanged-border)",
-  threeMonth: "var(--accent-action)",
-  twoYear: "var(--accent-success)",
-  tenYear: "var(--accent-info)",
   spread10Y2Y: "var(--color-semantic-easing-border)",
-  spread2Y3M: "var(--color-semantic-caution-border)",
+  /* Muted and dashed, not the crossed red: a spread is a series, not a line
+     that has been crossed (2026-10-14). */
+  spread2Y3M: "var(--app-text-muted)",
+} as const;
+
+/**
+ * The four terms, told apart by ink and dash rather than by hue: the short end
+ * in the muted ink, the long end in the full one, and within each a dotted or
+ * dashed line against a solid one. They were sky, green and blue until
+ * 2026-10-09, when the action, success and info accents all became the ink
+ * (Synoptic: colour is for conditions and line states only), and a term is
+ * neither. Ink and dash also survive greyscale, which three hues did not.
+ */
+const RATE_SERIES = {
+  oneMonth: { stroke: "var(--app-text-muted)", dash: "1 4" },
+  threeMonth: { stroke: "var(--app-text-muted)", dash: undefined },
+  twoYear: { stroke: "var(--app-text)", dash: "6 4" },
+  tenYear: { stroke: "var(--app-text)", dash: undefined },
 } as const;
 
 /** Vertical extent as text. A chart with no stated scale cannot be read off. */
@@ -132,10 +150,10 @@ const RIBBON_PERIOD: Record<Cadence, string> = {
 };
 
 const ribbonTone = (value: number | null) => {
-  if (value === null) return "bg-slate-700/70";
+  if (value === null) return "bg-transparent";
   if (value < -0.25) return "bg-rose-500/75";
   if (value <= 0.25) return "bg-amber-500/75";
-  return "bg-emerald-500/75";
+  return "bg-slate-500/40";
 };
 
 const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) => (
@@ -145,14 +163,20 @@ const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) =>
   </header>
 );
 
-const FlatPanel = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <article className={`min-w-0 space-y-2 border border-slate-800/70 bg-slate-950/40 p-2 sm:p-3 ${className}`}>{children}</article>
+/* Each panel ends in its source and its last month-end, inside its border: a panel
+   cropped from the page still says whose chart it is and how recent (2026-10-27). */
+const FlatPanel = ({ children, className = "", source }: { children: React.ReactNode; className?: string; source?: string }) => (
+  <article className={`min-w-0 space-y-2 border border-slate-800/70 bg-slate-950/40 p-2 sm:p-3 ${className}`}>
+    {children}
+    <ScreenshotCaption detail={source} className="pt-1" />
+  </article>
 );
 
 export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalVisualizationSuiteProps) => {
   const [cadence, setCadence] = useState<Cadence>("monthly");
   const points = useMemo(() => byCadence(yieldCurveSeries, cadence), [yieldCurveSeries, cadence]);
   const latest = points.at(-1) ?? null;
+  const panelSource = latest ? `Month-end readings to ${latest.label}` : undefined;
   const midPoint = points[Math.floor((points.length - 1) / 2)] ?? latest;
 
   const rateValues = points.flatMap((point) => [point.oneMonth, point.threeMonth, point.twoYear, point.tenYear]);
@@ -194,7 +218,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const threeMonthSeries = linePath(points.map((point) => point.threeMonth), 100, 36, rateMin, rateMax);
   const twoYearSeries = linePath(points.map((point) => point.twoYear), 100, 36, rateMin, rateMax);
   const tenYearSeries = linePath(points.map((point) => point.tenYear), 100, 36, rateMin, rateMax);
-  const spread10Y2YSeries = linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax);
+  const zeroLineY = scaleLinear().domain([spreadMin, spreadMax]).range([36, 0])(0);
+  const spread10Y2YSeries = linePath(points.map((point) => point.spread10Y2Y), 100, 36, spreadMin, spreadMax, zeroLineY);
   const spread2Y3MSeries = linePath(points.map((point) => point.spread2Y3M), 100, 36, spreadMin, spreadMax);
   const hasRateGaps =
     oneMonthSeries.missingColumns.length > 0
@@ -204,7 +229,6 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
   const hasSpreadGaps =
     spread10Y2YSeries.missingColumns.length > 0
     || spread2Y3MSeries.missingColumns.length > 0;
-  const zeroLineY = 36 - ((0 - spreadMin) / (spreadMax - spreadMin || 1)) * 36;
 
   /* The in-plot series labels that sat here are gone. They were anchored to each
      series' last point at the right edge — exactly where the lines terminate — so
@@ -239,8 +263,11 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
      the summary; a second `<details>` here was a disclosure inside a
      disclosure. */
   return (
+    // One frame per chart and none around the set (2026-10-09): the five panels
+    // sat inside a bordered, filled box inside the disclosure, a frame around
+    // frames that grouped nothing the disclosure did not.
     <div id="visual-diagnostics" className="min-w-0 space-y-4">
-      <div className="rounded-md border border-slate-800/80 bg-slate-950/30 p-2 sm:p-4">
+      <div>
 
         {/* This week's four rates, then what the charts are. The line said
             "Latest: Oct 5" over charts whose last point was the Aug 31
@@ -249,7 +276,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             was the raw record field ("Latest: 2026-10-05") where every other
             line on the page reads "Oct 5, 2026"; it is formatted in UTC, as
             the server formats it, so the client renders the same string. */}
-        <div className="mt-3 space-y-1 border-b border-slate-800/80 pb-3 text-xs">
+        <div className="space-y-1 border-b border-slate-800/80 pb-3 text-xs">
           <p className="tabular-nums text-slate-300">
             Latest: {formatDateUTC(treasury.record_date)} · {treasury.isLive ? "Live reading" : "Last saved reading"} · 1M{" "}
             {formatPercent(treasury.yields.oneMonth)} · 3M {formatPercent(treasury.yields.threeMonth ?? null)} · 2Y{" "}
@@ -271,8 +298,8 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               2Y−3M) and printed "Latest: 0.42%" for Aug 31, beside a row giving
               the same gauge as 0.41pp on Aug 31 and 0.47pp this week. The last
               block is a month-end, and the line under it says so. */}
-          <FlatPanel className="lg:col-span-12">
-            <PanelTitle title="Recession warning gauge over time" subtitle="Ten-year minus two-year rate, one block per period: green is normal, amber is flattening, red is inverted." />
+          <FlatPanel source={panelSource} className="lg:col-span-12">
+            <PanelTitle title="Recession warning gauge over time" subtitle="Ten-year minus two-year rate, one block per period: grey is normal, faint red is flattening, red is inverted." />
             <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
               {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.spread10Y2Y)}`} title={`${point.label}: ${formatSpread(point.spread10Y2Y)}`} />) : <div className="flex-1 bg-slate-700/70" />}
             </div>
@@ -283,14 +310,14 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             ) : null}
           </FlatPanel>
 
-          <FlatPanel className="lg:col-span-8 lg:row-span-2">
+          <FlatPanel source={panelSource} className="lg:col-span-8 lg:row-span-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <PanelTitle title="Rates by term" subtitle="What the government pays to borrow, by how long it is borrowing for." />
               <SegmentedControl
                 options={CADENCE_OPTIONS}
                 value={cadence}
                 onSelect={setCadence}
-                ariaLabel="Chart cadence"
+                ariaLabel="View by month or year"
               />
             </div>
             <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="One-month, three-month, two-year and ten-year Treasury rates">
@@ -298,16 +325,16 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 <rect key={`rate-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
               {oneMonthSeries.paths.map((path, index) => (
-                <path key={`1m-${index}`} d={path} fill="none" stroke={SERIES.oneMonth} strokeWidth="2" />
+                <path key={`1m-${index}`} d={path} fill="none" stroke={RATE_SERIES.oneMonth.stroke} strokeDasharray={RATE_SERIES.oneMonth.dash} strokeWidth="2" />
               ))}
               {threeMonthSeries.paths.map((path, index) => (
-                <path key={`3m-${index}`} d={path} fill="none" stroke={SERIES.threeMonth} strokeWidth="2" />
+                <path key={`3m-${index}`} d={path} fill="none" stroke={RATE_SERIES.threeMonth.stroke} strokeDasharray={RATE_SERIES.threeMonth.dash} strokeWidth="2" />
               ))}
               {twoYearSeries.paths.map((path, index) => (
-                <path key={`2y-${index}`} d={path} fill="none" stroke={SERIES.twoYear} strokeWidth="2" />
+                <path key={`2y-${index}`} d={path} fill="none" stroke={RATE_SERIES.twoYear.stroke} strokeDasharray={RATE_SERIES.twoYear.dash} strokeWidth="2" />
               ))}
               {tenYearSeries.paths.map((path, index) => (
-                <path key={`10y-${index}`} d={path} fill="none" stroke={SERIES.tenYear} strokeWidth="2" />
+                <path key={`10y-${index}`} d={path} fill="none" stroke={RATE_SERIES.tenYear.stroke} strokeDasharray={RATE_SERIES.tenYear.dash} strokeWidth="2" />
               ))}
             </svg>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
@@ -317,13 +344,16 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs tabular-nums">
               {([
-                ["1M", latest?.oneMonth, SERIES.oneMonth],
-                ["3M", latest?.threeMonth, SERIES.threeMonth],
-                ["2Y", latest?.twoYear, SERIES.twoYear],
-                ["10Y", latest?.tenYear, SERIES.tenYear],
-              ] as const).map(([label, value, color]) => (
+                ["1M", latest?.oneMonth, RATE_SERIES.oneMonth],
+                ["3M", latest?.threeMonth, RATE_SERIES.threeMonth],
+                ["2Y", latest?.twoYear, RATE_SERIES.twoYear],
+                ["10Y", latest?.tenYear, RATE_SERIES.tenYear],
+              ] as const).map(([label, value, series]) => (
                 <span key={label} className="inline-flex items-center gap-1.5 text-slate-300">
-                  <span className="h-0.5 w-3 shrink-0" style={{ backgroundColor: color }} aria-hidden="true" />
+                  {/* The key draws the line itself, dash and all, so it matches the chart. */}
+                  <svg width="16" height="4" viewBox="0 0 16 4" className="shrink-0" aria-hidden="true">
+                    <line x1="1" y1="2" x2="15" y2="2" stroke={series.stroke} strokeDasharray={series.dash} strokeWidth="2" strokeLinecap="round" />
+                  </svg>
                   {label} {formatPercent(value ?? null)}
                 </span>
               ))}
@@ -333,11 +363,11 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             {hasRateGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing readings.</p> : null}
           </FlatPanel>
 
-          <FlatPanel className="lg:col-span-4">
+          <FlatPanel source={panelSource} className="lg:col-span-4">
             {/* Unnumbered. The titles were "1)" to "5)" to match DOM order, but a
                 numbered list of charts reads as a report template, and nothing
                 on the page refers to a chart by its number. */}
-            <PanelTitle title="Steepness against level" subtitle="Each dot is one month: across is the two-year rate, up is the gap between the ten-year and two-year rates. Monthly whichever period you pick above." />
+            <PanelTitle title="Steepness against level" subtitle="Each dot is one month: across is the two-year rate, up is the gap between the ten-year and two-year rates. The dots stay monthly whichever period you pick above." />
             <svg
               viewBox="-3 -3 106 78"
               className="weather-data-plot mx-auto h-auto w-full max-w-[24rem]"
@@ -363,14 +393,14 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   markerHeight="4"
                   orient="auto-start-reverse"
                 >
-                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--accent-action)" strokeOpacity="0.55" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
+                  <path d="M1,1 L7,4 L1,7" fill="none" stroke="var(--app-text)" strokeOpacity="0.55" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
                 </marker>
               </defs>
               {scatterPath ? (
                 <path
                   d={scatterPath}
                   fill="none"
-                  stroke="var(--accent-action)"
+                  stroke="var(--app-text)"
                   strokeOpacity="0.28"
                   strokeWidth="0.8"
                   markerMid="url(#scatter-direction-arrow)"
@@ -388,7 +418,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                     cx={x}
                     cy={y}
                     r={isLatestPoint ? "2.3" : "1.8"}
-                    fill="var(--accent-action)"
+                    fill="var(--app-text)"
                     fillOpacity={opacity.toFixed(2)}
                     stroke={isLatestPoint ? "var(--app-text)" : undefined}
                     strokeWidth={isLatestPoint ? "0.5" : undefined}
@@ -414,21 +444,24 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                 X {formatRange(scatterXMin, scatterXMax, "%")} · Y {formatRange(scatterYMin, scatterYMax, "pp")}
               </p>
             ) : null}
-            <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction, not just position.</p>
+            <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction as well as position.</p>
           </FlatPanel>
 
-          <FlatPanel className="lg:col-span-8">
+          <FlatPanel source={panelSource} className="lg:col-span-8">
             <PanelTitle title="Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
             <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="Inversion timeline: ten-year minus two-year spread and two-year minus three-month spread; dashed line marks zero">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />
               ))}
               <line x1="0" y1={zeroLineY} x2="100" y2={zeroLineY} stroke="var(--border-strong)" strokeDasharray="2 2" />
+              {spread10Y2YSeries.areaPaths.map((areaPath, index) => (
+                <path key={`spread-10-2-area-${index}`} d={areaPath} fill={SERIES.spread10Y2Y} fillOpacity="0.08" />
+              ))}
               {spread10Y2YSeries.paths.map((path, index) => (
                 <path key={`spread-10-2-${index}`} d={path} fill="none" stroke={SERIES.spread10Y2Y} strokeWidth="2" />
               ))}
               {spread2Y3MSeries.paths.map((path, index) => (
-                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeWidth="2" />
+                <path key={`spread-2-3-${index}`} d={path} fill="none" stroke={SERIES.spread2Y3M} strokeDasharray="4 3" strokeWidth="2" />
               ))}
             </svg>
             <div className="mt-2 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-400">
@@ -441,7 +474,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             {hasSpreadGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
 
-          <FlatPanel className="lg:col-span-4">
+          <FlatPanel source={panelSource} className="lg:col-span-4">
             <PanelTitle title="Biggest monthly rate moves" subtitle="The months the two-year and ten-year rates moved most, month-end to month-end, largest first." />
             <ul className="space-y-1 text-xs text-slate-200">
               {topShocks.length ? (

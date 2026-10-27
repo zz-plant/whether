@@ -51,7 +51,7 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
     <ReportSection
       id="run-history"
       title={`Scheduled runs, last ${windowDays} days`}
-      description="One row per job that keeps this brief current, from the record each run leaves behind."
+      description="One row for each job that keeps this brief up to date, taken from the log each run writes."
     >
       {runHistory.status === "unavailable" ? (
         <p className="text-sm text-slate-300">
@@ -68,7 +68,7 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
           <p className="text-sm text-slate-300 tabular-nums">
             {countFormat.format(runHistory.totalRuns)} runs · {countFormat.format(runHistory.totalFailures)} failed
           </p>
-          <div className="mt-3 overflow-x-auto rounded-xl border border-white/[0.10]">
+          <div className="mt-3 overflow-x-auto rounded-xl border border-[color:var(--border-subtle)]">
             <table className="w-full min-w-[36rem] text-sm">
               <thead className="type-eyebrow text-fluid-nano text-slate-400">
                 <tr>
@@ -81,7 +81,7 @@ export function RunHistorySection({ runHistory }: { runHistory: CronRunHistory }
               </thead>
               <tbody>
                 {runHistory.steps.map((step) => (
-                  <tr key={step.step} className="border-t border-white/[0.08]">
+                  <tr key={step.step} className="border-t border-[color:var(--border-subtle)]">
                     <th scope="row" className="px-3 py-2 text-left font-medium text-slate-100">
                       <span className="flex items-center gap-1.5">
                         <span

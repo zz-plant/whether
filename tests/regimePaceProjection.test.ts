@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { runAgentTool } from "../lib/agent/tools";
 import { projectRegimeFromPace } from "../lib/report/regimeContext";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * `get_projection` with no arguments asks the question an agent asks most: "if the current trend
@@ -30,7 +33,7 @@ describe("projectRegimeFromPace", () => {
     const tightnessFirst = project(74, 40, -3, 0.5);
     assert.deepEqual(
       { weeks: tightnessFirst.weeksToFlip, regime: tightnessFirst.projectedRegime, label: tightnessFirst.velocityLabel },
-      { weeks: 2, regime: "VOLATILE", label: "At current pace, threshold crossing possible within 2 weeks." },
+      { weeks: 2, regime: "VOLATILE", label: "At this pace, a score could cross its line within 2 weeks." },
     );
 
     // Risk appetite rises through 50 first: SCARCITY becomes DEFENSIVE.
@@ -39,7 +42,7 @@ describe("projectRegimeFromPace", () => {
     assert.equal(riskFirst.projectedRegime, "DEFENSIVE");
 
     // One week, singular.
-    assert.equal(project(72, 40, -3, 0).velocityLabel, "At current pace, threshold crossing possible within 1 week.");
+    assert.equal(project(72, 40, -3, 0).velocityLabel, "At this pace, a score could cross its line within 1 week.");
   });
 
   it("follows both scores across their lines together, from any regime", () => {
@@ -72,7 +75,7 @@ describe("get_projection", () => {
     if (projection.weeksToFlip !== null) {
       assert.ok(typeof projection.projectedRegime === "string" && projection.projectedRegime.length > 0);
     }
-    assert.match(String(projection.velocityLabel), /Stable|Slow|Moving away|At current pace/);
+    assert.match(String(projection.velocityLabel), /Stable|Slow|Moving away|At this pace/);
   });
 
   it("says when the scores sit in another regime than the one given, and projects from the scores", async () => {

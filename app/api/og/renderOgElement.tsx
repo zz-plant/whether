@@ -159,8 +159,6 @@ export const renderOgElement = async (searchParams: URLSearchParams): Promise<Re
   const preview = await loadHomeSharePreview({
     month: searchParams.get("month") ?? undefined,
     year: searchParams.get("year") ?? undefined,
-    sector: searchParams.get("sector") ?? undefined,
-    view: searchParams.get("view") ?? undefined,
   });
   return renderReportOgImage(toImageSafeProps(preview));
 };

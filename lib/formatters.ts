@@ -83,6 +83,20 @@ export const resolveWeekEndingIsoDateUTC = (value: string) => {
 export const formatWeekEndingUTC = (value: string) =>
   formatDateUTC(resolveWeekEndingIsoDateUTC(value));
 
+/**
+ * A week is named by its Monday on every surface (2026-10-09): "Week of Oct 5, 2026".
+ * The homepage named the week by its reading's date (Oct 7, a Wednesday), the frozen
+ * brief by its record date (Oct 6, a Tuesday) and the share card by the Friday it
+ * ends, so one week carried three names.
+ */
+export const formatWeekMondayUTC = (value: string) => {
+  const date = parseDateValue(value);
+  if (!date) {
+    return value;
+  }
+  return formatDateUTC(addUtcDays(date, -((date.getUTCDay() + 6) % 7)).toISOString().slice(0, 10));
+};
+
 /*
  * Assembled from parts, not `timestampFormatter.format()`: the glue between the date and the
  * time is ICU locale data, not an option. Node and workerd write "Mar 10, 2026, 8:00 PM UTC";

@@ -19,12 +19,9 @@ export const requestUrl = (input: RequestInfo | URL): string => {
  * The text of a stubbed request body.
  *
  * `BodyInit` also covers Blob, ArrayBuffer and ReadableStream, which have no
- * useful `toString` — that is what the lint rule objects to. The two kinds
- * these tests actually send do: a string, and the URLSearchParams the Stripe
- * client posts. Anything else has no text form and returns "".
+ * useful `toString` — that is what the lint rule objects to. The one kind
+ * these tests actually send, a string, does. Anything else has no text form
+ * and returns "".
  */
-export const requestBodyText = (body: BodyInit | null | undefined): string => {
-  if (typeof body === "string") return body;
-  if (body instanceof URLSearchParams) return body.toString();
-  return "";
-};
+export const requestBodyText = (body: BodyInit | null | undefined): string =>
+  typeof body === "string" ? body : "";

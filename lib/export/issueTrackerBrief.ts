@@ -9,6 +9,7 @@
  * Jira and Linear both consume the `markdown` form; they differ only in the
  * button that copies them, not in the bytes produced.
  */
+import { formatWeekMondayUTC } from "../formatters";
 import type { BriefDocument } from "../report/briefArtifact";
 import { formatNumberWithUnit } from "../formatters";
 import { buildComplianceStamp } from "../exportNotices";
@@ -75,6 +76,7 @@ export const buildIssueTrackerMarkdownBrief = (
       sourceLine: provenance.sourceUrl,
       timestamp: provenance.recordDate,
       confidence: `${formatExportConfidenceWord(document.confidence)} (how far the scores sit from the line where conditions change)`,
+      basis: provenance.scoringBasis.sentence,
     }),
   ].join("\n");
 };
@@ -131,6 +133,6 @@ export const buildGuardrailTagBlocks = ({
       `**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${formatDecisionThreshold(item.triggerThreshold)}`,
       `**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${formatDecisionReversal(item.reversalCondition)}`,
       ...(callChangesIf ? [`**${DECISION_CONTRACT_LABELS.watch.flipWatch}:** ${callChangesIf}`] : []),
-      `_Week of ${recordDate}_`,
+      `_Week of ${formatWeekMondayUTC(recordDate)}_`,
     ].join("\n"),
   }));

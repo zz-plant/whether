@@ -1,134 +1,117 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import Link from "next/link";
-import { decisionAreaLabel, type DecisionArea } from "../../../lib/report/boundedDecisionRules";
+import { useCallback, useState, type ReactNode } from "react";
 import {
+  decisionAreaCorporateTransmission,
+  decisionAreaLabel,
+  type DecisionArea,
+  type DecisionAreaCorporateTransmission,
+} from "../../../lib/report/boundedDecisionRules";
+import {
+  HOME_DECISION_PARAM,
   HOME_SECTIONS,
   describeAreaPauseStatus,
   describePauseLineCount,
+  type HomeAreaLineSlot,
   type HomeAreaRow,
 } from "../../../lib/report/home/homeSectionModel";
-import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
+import { resolveLineState } from "../../../lib/report/operatingCalls";
+import { AreaIcon, AreaLabel, LineStateBadge } from "../ui/conceptIcons";
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
-import { SignalReading } from "../ui/plainLanguage";
-import { SubscribeForm } from "../SubscribeForm";
 import { CommitmentTest } from "./CommitmentTest";
-import { LastTimeCallChangedCard } from "./LastTimeCallChangedCard";
 import type { RegimeKey } from "../../../lib/regimeEngine";
-import { RUNWAY_CHANGED_EVENT } from "../useOperatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
+import { useClipboardCopy } from "../useClipboardCopy";
+import { CheckIcon, ShareIcon } from "../uiIcons";
 
 /**
- * "What are you deciding?": one question under the call, for every reader.
+ * "What are you deciding?": the five areas, third on the page, after the verdict
+ * and the stage and runway the lines are scaled to (2026-10-09).
  *
- * It was first-visit only, so the page was two products at one URL: a first
- * visit got the question and no evidence, and a returning reader got the
- * evidence and lost the question. The question now shows on every live weekly
- * brief. What stays first-visit only is the fold: the alert form, the record
- * line and the button that opens the rest of the brief, which a returning
- * reader already has open below.
+ * Each choice carries the area's name and where it stands against its pause line,
+ * so the five answers are on the page before any is picked; the click opens that
+ * area's rule and lines. The folded table under it (`AllAreaRules`, passed as
+ * children) prints all five side by side, and keeps every rule in the server HTML.
  *
- * A first-time reader meets a call about the market — "freeze new commitments"
- * — and five sections of evidence for it, and nothing that says what it means
- * for the decision they came with. So on a first visit the brief below the
- * call is folded away (`data-first-visit-collapsible`, hidden pre-paint by the
- * layout bootstrap) and this asks the one question the page can answer for
- * anyone: what are you deciding? Each answer is that area's row of the same
- * table the full brief prints, so the two cannot disagree.
- *
- * Everything is server-rendered and the fold is CSS keyed on an attribute the
- * layout sets before paint, so crawlers, readers without scripts and every
- * returning browser get the full brief exactly as before. "First visit" means
- * this browser has never rendered the brief: `ActivationTracker` stores the
- * week on every visit, and the bootstrap reads that key.
+ * It used to fold the rest of the brief away on a first visit and carry the alert,
+ * the record and a "Show the full brief" button for that visit. The order does
+ * that job for every reader now: the areas, what would change them, and the alert
+ * come before the evidence, so nothing is hidden and nothing is printed twice.
  */
 
-const QUESTION_BY_AREA: Record<DecisionArea, string> = {
-  hiring: "Hire someone",
-  "product-tempo": "Change the roadmap",
-  "capital-raising": "Raise money",
-  "burn-discipline": "Approve new spend",
-  "expansion-bets": "Start something new",
-};
+/**
+ * How far the reading is from a line, as a stamp: a status, so sharp (§XIV).
+ * The state badge carries the pause line's three states and a resume line that
+ * is met, in the inks their columns carry in the area table; a resume line not
+ * yet reached stays a neutral stamp with no glyph, because it is not a pause.
+ */
+function LineDistance({ slot, kind }: { slot: HomeAreaLineSlot; kind: "pause" | "resume" }) {
+  const state = resolveLineState(slot.points, kind, slot.met);
+  if (state) {
+    return (
+      <LineStateBadge state={state} stamp className="whitespace-nowrap align-middle text-fluid-nano">
+        {slot.distance}
+      </LineStateBadge>
+    );
+  }
+  return (
+    <span className="inline-block whitespace-nowrap rounded-sm border border-[color:var(--border-strong)] px-1.5 py-px align-baseline text-fluid-nano font-semibold tabular-nums text-slate-300">
+      {slot.distance}
+    </span>
+  );
+}
 
 export type DecisionPickerOption = HomeAreaRow & {
   /** The answer page that argues this area at length, when one exists. */
   answer?: { href: string; title: string };
 };
 
-/* Module-level on purpose, as in `homeFirstRunOrientation.tsx`: the React
-   compiler's immutability rule refuses a write to the document inside a
-   component body. */
-const revealFullBrief = ({ scroll }: { scroll: boolean }) => {
-  document.documentElement.dataset.homeFirstVisit = "false";
-  if (!scroll) return;
-  const target = document.getElementById(HOME_SECTIONS.changed.id);
-  target?.scrollIntoView({ block: "start" });
-  target?.focus({ preventScroll: true });
-};
-
-/** A link to a folded section (the sticky strip, a shared `#what-would-change`) unfolds the brief. */
-const hashTargetsFoldedBrief = () => {
-  const id = window.location.hash.slice(1);
-  if (!id) return false;
-  return Boolean(document.getElementById(id)?.closest("[data-first-visit-collapsible]"));
+/* The choice rides in the URL (`/?decision=hiring`), so a link copied after
+   picking opens on the same answer, server-rendered. Replace, not push: picking
+   another decision is not a step Back should retrace. The router's own state
+   object is passed through so the app router keeps its entry. */
+const recordDecisionInUrl = (area: DecisionArea) => {
+  const url = new URL(window.location.href);
+  url.searchParams.set(HOME_DECISION_PARAM, area);
+  window.history.replaceState(window.history.state, "", url);
 };
 
 export function DecisionPicker({
   options,
   regime,
-  scores,
-  flipCondition,
-  lastTime,
-  turningPoints,
-  calibration,
+  initialSelected,
+  children,
 }: {
   options: readonly DecisionPickerOption[];
   /** This week's conditions, which pick the runway note the runway test quotes. */
   regime: RegimeKey;
-  /** This week's two scores, printed with what they mean before any line that quotes them. */
-  scores: { tightness: number; riskAppetite: number };
-  flipCondition?: string;
-  /**
-   * On a week conditions changed, the last time they moved the same way and the
-   * lines they turn on: drawn as the same card the folded brief carries, so a
-   * first visit sees the two earlier scores rather than reading them in a
-   * paragraph. Absent on every other week.
-   */
-  lastTime?: { record: LastTimeCallChanged; callChangeLines: { tightness: number; riskAppetite: number } };
-  turningPoints: readonly { label: string; href: string }[];
-  /** Who the lines below are scaled for. The controls that set it sit in the brief, under "What that changes for you". */
-  calibration?: { stageLabel: string; runwayPhrase: string; chosen: boolean };
+  /** The decision the URL names (`?decision=`), open on first paint. */
+  initialSelected?: DecisionArea;
+  /** What follows the choices inside the section: the folded table of all five, and the plan link. */
+  children?: ReactNode;
 }) {
-  const router = useRouter();
-  const [selected, setSelected] = useState<DecisionArea | undefined>(undefined);
-  // A runway typed into the test below moves the band the folded rules are
-  // scaled to without re-rendering them (that would close this card). The
-  // reveal is when they are next seen, so that is when they catch up.
-  const runwayBandMoved = useRef(false);
-
-  useEffect(() => {
-    const onRunwayChanged = (event: Event) => {
-      if (event instanceof CustomEvent && Reflect.get(Object(event.detail), "bandChanged") === true) {
-        runwayBandMoved.current = true;
-      }
-    };
-    window.addEventListener(RUNWAY_CHANGED_EVENT, onRunwayChanged);
-    return () => window.removeEventListener(RUNWAY_CHANGED_EVENT, onRunwayChanged);
-  }, []);
+  const [selected, setSelected] = useState<DecisionArea | undefined>(initialSelected);
   const active = options.find((option) => option.area === selected);
+  const activeTransmission: DecisionAreaCorporateTransmission | undefined = active
+    ? decisionAreaCorporateTransmission[active.area]
+    : undefined;
 
-  useEffect(() => {
-    const unfoldForHash = () => {
-      if (hashTargetsFoldedBrief()) revealFullBrief({ scroll: false });
-    };
-    unfoldForHash();
-    window.addEventListener("hashchange", unfoldForHash);
-    return () => window.removeEventListener("hashchange", unfoldForHash);
-  }, []);
+  const { status: copyStatus, copyToClipboard } = useClipboardCopy({ commitment: "copied_slack" });
+
+  const handleCopySlackTakeaway = useCallback(() => {
+    if (!active) return;
+    const label = decisionAreaLabel(active.area);
+    const bullets: string[] = [];
+    if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
+    if (active.pause?.line) bullets.push(`• *Pause if:* ${active.pause.line}${active.pause.distance ? ` (${active.pause.distance})` : ""}`);
+    if (active.resume?.line) bullets.push(`• *Resume when:* ${active.resume.line}${active.resume.distance ? ` (${active.resume.distance})` : ""}`);
+    if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
+    if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
+
+    const message = `*Whether: ${label} Takeaway*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
+    void copyToClipboard(message, `slack-takeaway-${active.area}`);
+  }, [active, activeTransmission, copyToClipboard]);
 
   /* Each choice carries where its area stands against its pause line, so the
      five answers are on the page before any is picked; the click opens the
@@ -137,35 +120,32 @@ export function DecisionPicker({
     const status = describeAreaPauseStatus(option);
     return {
       key: option.area,
-      label: QUESTION_BY_AREA[option.area],
-      sublabel: status?.text,
-      sublabelTone: status?.crossed ? "caution" : undefined,
+      /* The area's own name, the one every table and paste uses. The choices
+         were verb phrases ("Raise money", "Approve new spend") that named no
+         area, so a reader met two names for each of the five. */
+      label: decisionAreaLabel(option.area),
+      /* 20px: the choice is a card. */
+      icon: <AreaIcon area={option.area} size="card" />,
+      /* The state as glyph and words, so a crossed line and a close one differ
+         in shape as well as ink. */
+      sublabel: status ? <LineStateBadge state={status.state}>{status.text}</LineStateBadge> : undefined,
     };
   });
   const pauseLineCount = describePauseLineCount(options);
 
-  /* Picking a decision is the first deliberate act this block exists to raise.
-     `ActivationTracker` records it as `oriented`, the same as any other control
-     on the page, so nothing here sends it a second time. */
-  const handleReveal = () => {
-    revealFullBrief({ scroll: true });
-    if (runwayBandMoved.current) router.refresh();
-  };
-
   return (
     <section
+      id={HOME_SECTIONS.areas.id}
+      data-page-section={HOME_SECTIONS.areas.id}
       data-testid="decision-picker"
-      aria-labelledby="first-visit-decision-heading"
-      className="order-1 space-y-8 border-t border-slate-800/70 pt-5"
+      tabIndex={-1}
+      aria-labelledby={`${HOME_SECTIONS.areas.id}-heading`}
+      className="weather-section-stack weather-home-section border-t border-[color:var(--border-subtle)] focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
     >
-      {/* Three groups, spaced apart more than anything inside them: the decision,
-          the alert, and the record. One even gap through all of it left the score
-          lines between the choices and the alert card belonging to neither, and
-          the record reading as more of the alert's copy. */}
       <div className="space-y-4">
         <div className="space-y-1">
-          <h2 id="first-visit-decision-heading" className="text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">
-            What are you deciding?
+          <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="text-[1.375rem] font-semibold leading-tight tracking-[-0.015em] text-slate-100 sm:text-fluid-xl">
+            {HOME_SECTIONS.areas.heading}
           </h2>
           {pauseLineCount ? (
             <p data-pause-line-count className="text-fluid-sm font-medium text-slate-200">
@@ -173,49 +153,37 @@ export function DecisionPicker({
             </p>
           ) : null}
           <p className="text-fluid-xs text-slate-400">
-            Pick one. The answer holds until a score crosses one of its lines; most weeks, none does.
+            Pick one. Its answer holds until a score crosses one of its lines, and most weeks none does.
           </p>
-          {/* The answers are scaled to a stage and a runway, and the controls
-              that set them sat mid-page under the content they change. This
-              says whose lines these are where the reader first meets them. */}
-          {calibration ? (
-            <p className="text-fluid-xs text-slate-400" data-calibration-note>
-              Lines set for {calibration.stageLabel} with {calibration.runwayPhrase} of runway
-              {calibration.chosen ? "" : " (the defaults)"}.{" "}
-              <a
-                href="#company-calibration"
-                className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200 max-sm:hidden"
-              >
-                Change
-              </a>
-            </p>
-          ) : null}
         </div>
 
         <SegmentedControl
           options={segmentedOptions}
           value={selected}
-          onSelect={setSelected}
+          onSelect={(area) => {
+            setSelected(area);
+            recordDecisionInUrl(area);
+          }}
           ariaLabel="What are you deciding?"
           layout="choices"
         />
 
-        {/* What the numbers below are measured against. Every line under the
-            choices quotes a score ("Funding pressure > 76", "90 today"), and what
-            100 means was printed only in the folded "What changed" table, so a
-            first visit met numbers it had no way to read. */}
-        <div className="space-y-1">
-          <p id="first-visit-scores-label" className="type-eyebrow">This week&apos;s scores</p>
-          <ul aria-labelledby="first-visit-scores-label" className="space-y-0.5 text-fluid-xs text-slate-400">
-            <li><SignalReading signalKey="tightness" score={scores.tightness} /></li>
-            <li><SignalReading signalKey="riskAppetite" score={scores.riskAppetite} /></li>
-          </ul>
-        </div>
+        {/* No "This week's scores" list here (2026-10-09). It printed both scores
+            and what they mean, which the conditions map's header and the bars in
+            "What changed" print at every width; each line below says how far the
+            reading is from it in points. */}
 
         {active ? (
-          <div aria-live="polite" className="space-y-2 border-l-2 border-sky-500/50 pl-4">
-            <p className="type-eyebrow">{decisionAreaLabel(active.area)}</p>
-            <p className="max-w-[64ch] text-fluid-sm font-semibold leading-snug text-white">{active.rule}</p>
+          /* A card, not a sky rule down its left edge: sky is the colour of a
+             link, and the rule read as a quote rather than as the answer. */
+          <div
+            aria-live="polite"
+            className="space-y-3 rounded-xl border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] px-4 py-4 sm:px-5 animate-in fade-in-50 duration-200 motion-reduce:animate-none"
+          >
+            <p className="type-eyebrow">
+              <AreaLabel area={active.area} />
+            </p>
+            <p className="max-w-[56ch] text-fluid-lg font-semibold leading-snug text-slate-50">{active.rule}</p>
             {active.changed ? (
               /* Amber for an area the week moved, slate for one it did not: the
                  same table cell says "No line crossed" for both. */
@@ -223,12 +191,13 @@ export function DecisionPicker({
                 {active.changed}
               </p>
             ) : null}
-            <dl className="grid max-w-[64ch] gap-1 text-fluid-xs text-slate-300 sm:grid-cols-[auto_1fr] sm:gap-x-4">
+            <dl className="grid max-w-[64ch] gap-x-4 gap-y-2 text-fluid-sm text-slate-200 sm:grid-cols-[auto_1fr] sm:items-baseline">
               {active.pause ? (
                 <>
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
                   <dd>
-                    {active.pause.line} <span className="text-slate-400">· {active.pause.distance}</span>
+                    <span className="tabular-nums">{active.pause.line}</span>{" "}
+                    <LineDistance slot={active.pause} kind="pause" />
                   </dd>
                 </>
               ) : null}
@@ -236,63 +205,81 @@ export function DecisionPicker({
                 <>
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
                   <dd>
-                    {active.resume.line} <span className="text-slate-400">· {active.resume.distance}</span>
+                    <span className="tabular-nums">{active.resume.line}</span>{" "}
+                    <LineDistance slot={active.resume} kind="resume" />
                   </dd>
                 </>
               ) : null}
             </dl>
+            {activeTransmission ? (
+              <div
+                data-transmission-note
+                className="space-y-1.5 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 text-fluid-xs"
+              >
+                <p className="font-semibold text-slate-100">
+                  Why this line governs {decisionAreaLabel(active.area).toLowerCase()}:
+                </p>
+                <p className="leading-relaxed text-slate-300">
+                  {activeTransmission.transmission} {activeTransmission.whyLineMatters}
+                </p>
+                <p className="text-fluid-nano text-slate-400">
+                  <span className="font-medium text-slate-200">Shared rule of thumb:</span> {activeTransmission.ruleOfThumb}
+                </p>
+                {activeTransmission.startupMath ? (
+                  <p className="text-fluid-nano text-slate-400">
+                    <span className="font-medium text-slate-200">Startup math:</span> {activeTransmission.startupMath}
+                  </p>
+                ) : null}
+              </div>
+            ) : null}
+            <details className="weather-auto-chevron border-t border-[color:var(--border-faint)] pt-3" data-commitment-disclosure>
+              <summary className="cursor-pointer select-none text-fluid-xs font-medium text-slate-300 hover:text-slate-100">
+                Test against your cash and runway (optional)
+              </summary>
+              <div className="pt-2">
+                <CommitmentTest regime={regime} area={active.area} showTitle={false} />
+              </div>
+            </details>
             {/* The lines above are the published ones. A plan that needs its own —
                 a hiring plan released at 60 rather than 66 — sets them once on the
                 planning page and hears the day one is crossed. */}
-            <ActionLink href="/operate#ops-plan-lines" variant="inline">
-              Move these lines for your plan →
-            </ActionLink>
-            <CommitmentTest regime={regime} area={active.area} />
-            {active.answer ? (
-              <ActionLink href={active.answer.href} variant="inline">
-                {active.answer.title} →
-              </ActionLink>
-            ) : null}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-3">
+              <div className="flex flex-wrap items-center gap-4">
+                <ActionLink href="/operate#ops-plan-lines" variant="inline">
+                  Move these lines for your plan →
+                </ActionLink>
+                <button
+                  type="button"
+                  onClick={handleCopySlackTakeaway}
+                  data-testid="copy-slack-takeaway"
+                  className="inline-flex items-center gap-1.5 text-fluid-xs font-medium text-slate-300 hover:text-slate-100 transition-colors"
+                  title="Copy a summary of this decision to paste into Slack or a meeting note"
+                >
+                  {copyStatus === "copied" ? (
+                    <CheckIcon className="size-3.5 text-emerald-400" />
+                  ) : (
+                    <ShareIcon className="size-3.5 text-slate-400" />
+                  )}
+                  <span>
+                    {copyStatus === "copied"
+                      ? "Copied takeaway for Slack"
+                      : copyStatus === "copying"
+                        ? "Copying…"
+                        : "Copy takeaway for Slack"}
+                  </span>
+                </button>
+              </div>
+              {active.answer ? (
+                <ActionLink href={active.answer.href} variant="inline">
+                  {active.answer.title} →
+                </ActionLink>
+              ) : null}
+            </div>
           </div>
         ) : null}
       </div>
 
-      {/* First visit only: the alert, the record line and the button that opens
-          the brief. A returning reader has all three in the brief below. */}
-      <div data-first-visit-only="true" className="space-y-8">
-        <SubscribeForm compact defaultFrequency="alerts" condition={flipCondition} />
-
-        {/* The answer to "has this happened before", on the page: the last
-            time conditions moved this way, as the card the folded brief draws,
-            and the turning points as links. A sceptical first visit had to
-            leave to check. */}
-        {lastTime ? <LastTimeCallChangedCard record={lastTime.record} callChangeLines={lastTime.callChangeLines} /> : null}
-
-        {turningPoints.length > 0 ? (
-          <div className="space-y-2">
-            <h3 className="type-eyebrow">Has this happened before?</h3>
-            <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400">
-              Check it against the record. What the guidance said at the last turns:{" "}
-              {turningPoints.map((point, index) => (
-                <span key={point.href}>
-                  {index > 0 ? " · " : null}
-                  <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-                    {point.label}
-                  </Link>
-                </span>
-              ))}
-            </p>
-          </div>
-        ) : null}
-
-        <button
-          type="button"
-          onClick={handleReveal}
-          className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-4 py-2 text-xs font-semibold"
-        >
-          Show the full brief
-        </button>
-      </div>
+      {children}
     </section>
   );
 }

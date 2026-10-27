@@ -18,8 +18,8 @@ as the full brief:
 | --- | --- |
 | `headline` | The state in one sentence, for an agent that only quotes. |
 | `automation` | `{ ready, refusal }`: whether the data is live and current. **Check `ready` before acting without a person looking.** False for a saved copy, a record older than 10 days, or failed assembly; `refusal` says which. It says nothing about what the guidance is. This is `publishReadiness`, not `degraded`. |
-| `freshness` | `fetchedAt`, `recordAgeDays`, `live`, `fallback`. |
-| `conditions` / `confidence` | The weather word and its stable `key`; the published confidence (`HIGH`/`MED`/`LOW`, percent) — the same one the page, `/api/scores` and the CLI carry. |
+| `freshness` | `fetchedAt`, `recordAgeDays`, `live`, `fallback`, `nextCallDue` (the next Monday 14:00 UTC publication; the call is current until then). |
+| `conditions` / `confidence` | The weather word and its stable `key`; the published confidence (`HIGH`/`MED`/`LOW`, percent) — the same one the page, `/api/scores` and the CLI carry. Pages print it as the margin ("Clear of / Within reach of / Close to the line"); see the field-to-label table in `docs/developer/api-reference.md`. |
 | `scores.tightness` / `scores.riskAppetite` | `value`, `meaning`, and against each line: `pause`, `resume` (each `{ line, distance, side, met }`; `met` on the pause line means the pause applies) and `change` (where the conditions themselves change). Then `previous`, `delta`, `perWeek` (the pace to hand a projection) and `moved` (what the delta is made of, signed, adding up to it). |
 | `change` | `direction`, `regimeChanged`, `comparedWith` (the earlier reading, dated: the previous month-end snapshot, **not last week**), `days` and a `note` where part of `moved` is an input the earlier score never had. |
 | `guidance` | `call`, `doNow`, `avoidNow`, `flipConditions`. |
@@ -59,6 +59,8 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
 - Returns summary copy, provenance, and `agentHandoff` (`payload` + `prompt`).
 - The payload now includes `decision_rules`, `decision_delta`, and `flip_watch` so agents can explain what changed, what should change now, and what would flip the call without reconstructing their own regime logic.
 - Returns HTTP 400 for invalid cadence values, and for an unknown `view` (`allowedViews`).
+- `?week=<slug>` (e.g. `2026-w41`) answers that specific frozen week's published brief with its decisions, scores, and provenance. Returns HTTP 404 with `availableWeeks` if unknown.
+- `?period=<slug>` (e.g. `2024-q1` or `2023`) answers that specific posture archive period. Returns HTTP 404 if unknown.
 - `?view=state` answers the compact state above instead of the full brief (default view: `full`).
 - The payload's `confidence` is the published confidence; `decision_delta.compared_with` names the reading the changes are measured against.
 - Includes read-only CORS headers for browser-based tool clients.
@@ -67,16 +69,24 @@ Route: `GET /api/agent?cadence=<weekly|monthly|quarterly|yearly>`
   (`lib/report/briefPublishGuard.ts`). `degraded` is not a freshness signal; this is.
 - `?format=jev` returns the week as a ready-to-send request for TypeSafe's Jev decision model
   (`typesafe/jev`, `lib/jev/jevHandoff.ts`): the agent payload's call as typed state with an empty
-  `plan` slot, and four questions about a plan against the call. The caller fills the plan and calls
-  Jev; Whether never receives it, which is why this is a format and not an endpoint that takes a
+  `plan` slot, and eight questions about a plan against the call. The caller fills the plan and calls
+  the model; Whether never receives it, which is why this is a format and not an endpoint that takes a
   plan. `automationReady` carries `publishReadiness`. Any other `format` is a 400.
+
+  Optional `model=jev|clef|clef-flash|clef-omni` selects the request template (Jev remains
+  the default). `input=audio|video` requires Omni and returns an empty media array for the
+  caller to fill and send directly to Cloudflare; text is the default. See
+  [decision models and advisory audits](../developer/decision-models.md) for transport,
+  missing-evidence handling, media limits, and the brief/screenshot/evidence/evaluation commands.
 
   **Reader text is never sent to Jev (decided 2026-09-23).** Routing `/search` queries or recorded
   decisions through Jev was considered and declined. `/privacy` says the search payload has no field
   that could hold the query, and that everything but recorded decisions stays in the browser. A
   server-side Jev call on that text would make both statements false, and a third-party model reading it
   would need its own section there. The site's use of Jev stays where it is: the handoff format above,
-  where the caller sends their own plan, and `audit:jev-copy`, which reads only the site's own copy.
+  where the caller sends their own plan, and `audit:jev-copy`, which reads only the site's own copy
+  (with Jev, or Cloudflare's Jev-compatible Clef models via `--model`). The audit's file
+  modes are explicit local contributor workflows; they do not change this reader-data policy.
 
 Machine-discovery routes:
 
@@ -152,10 +162,12 @@ Tools (all read-only, and annotated so: `readOnlyHint`, `idempotentHint`):
 
 - `get_state` — **start here.** The compact state above; publishes an `outputSchema`.
 - `get_brief` — the full brief for a cadence (about 22KB). Alias: `get_agent_brief`.
+- `get_standup_line` — one line for a team's daily standup: whether guidance moved and what would change it.
 - `get_decision_rules` — the bounded rules by regime. Keyed by regime, one key for one regime.
+- `get_answer` — one decision answer's guidance, current standing and rules in force, by slug or natural-language question ("should we freeze hiring"); the answer pages are the same ones `/llms.txt` routes questions to.
 - `get_context`, `get_projection` — history and projection for a regime; both default to today's reading. `get_context` counts **months** of month-end snapshots (`monthsActive`, `historicalAvgMonths`), through the `latestSnapshot` it names, because the record is monthly; it was `weeksActive` / `historicalAvgWeeks` over the same monthly series, so an agent told "8 weeks" was being told 8 months. A regime newer than the last month-end has `monthsActive` 0 and a `note` saying so.
 - `get_comps`, `get_signals`, `get_recent_history` — SaaS multiples, data coverage, one signal's trailing window.
-- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `get_analog_playbook` — a plan checked against today's conditions.
+- `stress_test_plan`, `lint_commitment`, `lint_sprint_goal`, `audit_sprint_retro`, `get_analog_playbook` — a plan or sprint retro checked against today's conditions.
 - `list_agent_skills` — the skill contract.
 
 Client config (shape):
@@ -256,6 +268,26 @@ words).
 3. Call `get_brief` only for the wording, the record, or a cadence other than weekly; call `list_agent_skills` once per session (or cache by commit hash) when working from it.
 4. Generate outputs in the order declared by `skills`, using `decision_delta` for “what changed / what changes now” and `flip_watch` for bounded reversal monitoring.
 5. Keep provenance and source URLs attached in any user-facing response.
+
+## Verified ledger writes (client tokens)
+
+`POST /api/decision-memory` scopes a caller by `x-whether-client-id`, an id the caller chooses. A write
+carrying only the id still lands in the ledger, recorded as unverified. An integrator whose entries
+should name the person who made them also sends `x-whether-client-token`; a valid token sets the entry's
+`verifiedOwner` (`app/api/decision-memory/route.ts`).
+
+Tokens are minted out of band, like an API key, by someone who holds the deployment's secret:
+
+```bash
+WHETHER_LEDGER_SECRET=<the deployment's secret> bun scripts/issue-ledger-token.ts <client-id>
+```
+
+- The token is an HMAC-SHA256 of the client id under `WHETHER_LEDGER_SECRET` (`lib/api/clientToken.ts`):
+  valid for that id only, and only on a deployment holding the same secret.
+- The secret must be at least 16 characters. When it is unset or shorter, the script exits 1 and every
+  write stays unverified; the endpoint accepts writes either way.
+- The client id must be 3–128 characters, the range the API accepts.
+- No endpoint mints tokens. One would let anyone sign any id, which is what the token exists to prevent.
 
 ## Production monitoring endpoints
 

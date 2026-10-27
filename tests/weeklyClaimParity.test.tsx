@@ -14,22 +14,21 @@ import { formatConditionsChangeLine } from "../lib/summary/summaryFormatting";
 import { formatGuidance } from "../lib/export/briefBuilders";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
-import { macroSeries } from "../lib/macroSnapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
 import type { OperatingSnapshot } from "../lib/operatingState/types";
 import { getRegimePublicLabel, REGIME_SEVERITY_RANK } from "../lib/regimePresentation";
 import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
-import { buildChangedLead, buildQuietDayRead } from "../lib/report/decisionMovement";
 import { buildFlipProximity } from "../lib/report/flipProximity";
-import { buildHomeQuietDayRead } from "../lib/report/home/homeSectionModel";
 import { describeWeeklyMemoLead } from "../lib/report/homeBrief/decisionNarrative";
 import { buildDecisionMemo, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
 import { createHomePageReportDataLoader } from "../lib/report/homePageData";
 import { assembleHomePage } from "../lib/report/homePageAssembler";
 import { assembleCurrentWeekBrief } from "../lib/report/publishedBriefRecord";
+import { publishedBriefHeadline } from "../lib/report/publishedBriefs";
 import { describePolicyHold } from "../lib/report/regimeDescription";
-import { formatConfidenceChipLabel } from "../lib/report/reportFormatting";
+import { formatMarginStamp } from "../lib/report/reportFormatting";
 import {
   anyPauseLineMet,
   buildCallChangeLine,
@@ -38,6 +37,7 @@ import {
   buildWeekCallChangesIf,
   resolveWeeklyTone,
   splitWeeklyCall,
+  weeklyHeadline,
 } from "../lib/report/reportEvidence";
 import { buildWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { deliverSlackBrief } from "../lib/slack/deliverSlackBrief";
@@ -86,7 +86,7 @@ const thisWeek = {
 };
 
 const weeks: Array<{ name: string; treasury: TreasuryData; macroSeries: MacroSeriesReading[]; held: boolean }> = [
-  { name: "an ordinary week", treasury: { ...snapshotData, ...thisWeek }, macroSeries, held: false },
+  { name: "an ordinary week", treasury: { ...snapshotData, ...thisWeek }, macroSeries: liveMacroSeries, held: false },
   /* The export fixture's reading: its two scores disagree, so the policy layer holds it. */
   { name: "a held week", treasury: { ...fixtureTreasury, ...thisWeek }, macroSeries: macros, held: true },
 ];
@@ -184,7 +184,6 @@ const renderWeek = async (treasury: TreasuryData, readings: MacroSeriesReading[]
     })()),
     memo: buildDecisionMemo(home),
     standup: share.options.flatMap((option) => (option.id === "standup" && option.kind === "text" ? [option.text] : []))[0] ?? "",
-    quietDay: buildHomeQuietDayRead(home, { historical: false }),
     record: frozen.record,
     slack: await postedText(snapshot),
     email: await mailedText(snapshot),
@@ -223,21 +222,38 @@ describe("one week, one set of claims, every surface", () => {
         assert.match(email, new RegExp(`^Conditions: ${conditions} `, "m"), "the Monday email");
       });
 
+      /* One headline action per week (2026-10-09): `weeklyHeadline`, the contract's
+         call opened by the week's direction, on the homepage, the frozen record,
+         every paste, the Monday post and email, and the share card. The action the
+         homepage used to lead with no longer prints as a second headline; the API
+         fields that carry it (`guidance.call`, `memo.action`) keep their values. */
       it("gives the same guidance everywhere", async () => {
         const { home, document, markdown, embedText, card, agent, memo, record, slack, email } = await render(week);
         const { actionNow } = home.weeklyCall;
+        const headline = weeklyHeadline(home.weeklyCall);
         const guidance = formatGuidance(home.weeklyCall);
 
+        assert.equal(
+          headline.action,
+          (week.held ? home.weeklyCall.actionNow : home.weeklyCall.currentCall).trim(),
+          "the headline is the contract's call, or a held week's action",
+        );
+        assert.equal(guidance, headline.composed, "a paste leads with the headline");
         assert.equal(formatGuidance(document.slots), guidance, "the brief document every paste renders");
         assert.ok(markdown.includes(guidance), "/brief.md");
         assert.ok(embedText.includes(`Guidance: ${guidance}`), `the embed:\n${embedText}\nexpected: ${guidance}`);
-        assert.equal(deriveBriefCallFields(home.weeklyDecisionCardModel).primaryCall, actionNow, "the homepage card");
-        assert.equal(card.decision, actionNow, "the share card");
-        assert.equal(agent.guidance.call, actionNow, "the agent state");
-        assert.equal(memo.action, actionNow, "the /api/decision memo");
-        assert.equal(record.actionNow, actionNow, "the frozen record");
+        assert.equal(
+          deriveBriefCallFields(home.weeklyDecisionCardModel, home.weeklyCall).primaryCall,
+          guidance,
+          "the homepage card",
+        );
+        assert.equal(card.decision, headline.action, "the share card");
+        assert.equal(publishedBriefHeadline(record).action, headline.action, "the frozen record");
         assert.equal(slot(slack, "Guidance"), guidance, "the Monday post");
-        assert.equal(slot(email, "Action now"), actionNow, "the Monday email");
+        assert.equal(slot(email, "Guidance"), guidance, "the Monday email");
+        assert.ok(!email.includes(`Action now: ${actionNow}`), "the email prints no second headline");
+        assert.equal(agent.guidance.call, actionNow, "the agent state's field keeps its value");
+        assert.equal(memo.action, actionNow, "the /api/decision memo's field keeps its value");
       });
 
       it("dates and grades the reading the same everywhere", async () => {
@@ -248,11 +264,11 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(document.provenance.recordDate, recordDate);
         assert.equal(agent.recordDate, recordDate);
         assert.match(markdown, new RegExp(`^# Whether Weekly Brief — ${recordDate}$`, "m"));
-        assert.match(embedText, new RegExp(`As of ${recordDate}`));
+        assert.match(embedText, new RegExp(`Data as of ${recordDate}`));
         assert.equal(record.recordDate, recordDate, "the frozen record");
         assert.match(slack, new RegExp(`^Whether Weekly Brief — ${recordDate}$`, "m"), "the Monday post");
         assert.equal(agent.confidence.label, confidence);
-        assert.ok(embedText.includes(formatConfidenceChipLabel(confidence)));
+        assert.ok(embedText.includes(formatMarginStamp(confidence)));
         assert.equal(memo.confidence, confidence, "the /api/decision memo");
         assert.equal(record.confidenceLabel, confidence, "the frozen record");
       });
@@ -294,7 +310,7 @@ describe("one week, one set of claims, every surface", () => {
           pauseApplies: anyPauseLineMet(reportData.actionStripItems, assessment.scores),
         });
         assert.ok(tone, "both weeks are compared");
-        const card = splitWeeklyCall(deriveBriefCallFields(home.weeklyDecisionCardModel).primaryCall);
+        const card = splitWeeklyCall(deriveBriefCallFields(home.weeklyDecisionCardModel, home.weeklyCall).primaryCall);
         const status = home.weeklyDecisionCardModel.status;
 
         /* The memo says what the readings did on both weeks; a held week's headline is
@@ -322,7 +338,7 @@ describe("one week, one set of claims, every surface", () => {
         const { label } = comparedWith;
 
         assert.deepEqual(home.weeklyDecisionCardModel.decision.reportDynamics.comparedWith, comparedWith, "the homepage card");
-        assert.ok(home.weeklyDecisionCardModel.decision.decisionMovement?.sentence.includes(label), "the homepage's what-changed lead");
+        assert.ok(home.weeklyDecisionCardModel.decision.decisionMovement?.sentence.includes(label), "the homepage model's movement sentence");
         assert.deepEqual(document.readings.previous?.comparedWith, comparedWith, "the brief document every paste renders");
         for (const reading of card.readings) assert.ok(reading.previous?.endsWith(`on ${label}`), `the share card: ${reading.previous}`);
         assert.ok(markdown.includes(`vs ${label}`), "/brief.md");
@@ -359,7 +375,7 @@ describe("one week, one set of claims, every surface", () => {
       });
 
       it("says what would change the guidance through one builder", async () => {
-        const { reportData, home, document, markdown, embedText, agent, cli, memo, standup, quietDay, record, slack, email } =
+        const { reportData, home, document, markdown, embedText, agent, cli, memo, standup, record, slack, email } =
           await render(week);
         const { assessment } = reportData;
         const { callChangesIf } = home.weeklyCall;
@@ -377,7 +393,7 @@ describe("one week, one set of claims, every surface", () => {
         assert.equal(slot(email, label), callChangesIf, "the Monday email");
         const decision = home.weeklyDecisionCardModel.decision;
         assert.equal(decision.reversalTrigger, callChangesIf, "the homepage card");
-        assert.ok(deriveBriefCallFields(home.weeklyDecisionCardModel).briefShareLines.includes(`${label}: ${callChangesIf}`), "Copy Brief");
+        assert.ok(deriveBriefCallFields(home.weeklyDecisionCardModel, home.weeklyCall).briefShareLines.includes(`${label}: ${callChangesIf}`), "Copy Brief");
         assert.equal(reportData.flipThreshold, callChangesIf, "/trust, /signals and /resolve");
         assert.equal(record.flipThreshold, callChangesIf, "the frozen record");
         assert.equal(memo.reversalTrigger, callChangesIf, "the /api/decision memo's trigger");
@@ -395,18 +411,6 @@ describe("one week, one set of claims, every surface", () => {
         if (week.held) {
           assert.equal(callChangeLine, `${label}: ${callChangesIf}`);
           assert.deepEqual(agent.guidance.flipConditions, [callChangesIf], "the agent state");
-          /* The quiet-day line, and the lead it closes. The page prints it only on a
-             week whose guidance held against the comparison reading, which turns on
-             the bundled month-end: this fixture held against Aug 31 and changed
-             against Sep 30 (2026-10-07). Whenever it prints, it is the hold's
-             condition. */
-          const heldLine = buildQuietDayRead({ guidanceChange: "held", weeklyCall: home.weeklyCall, assessment });
-          assert.equal(heldLine, `${label}: ${callChangesIf}`, "the quiet-day line on a week that held");
-          assert.ok(quietDay === null || quietDay === heldLine, `the homepage quiet-day line: ${quietDay}`);
-          if (quietDay !== null) {
-            const lead = buildChangedLead({ movement: decision.decisionMovement, quietDayLine: quietDay, fallback: "unused" });
-            assert.ok(lead.endsWith(` ${label}: ${callChangesIf}`), "the homepage's what-changed lead");
-          }
           /* No surface says what moves the conditions in place of the hold. */
           assert.deepEqual(buildFlipProximity(assessment), [], "the homepage's interest-rate terms");
           const lines = buildFlipThreshold(assessment);
@@ -425,9 +429,7 @@ describe("one week, one set of claims, every surface", () => {
           lines.map((line) => line.boundary).sort(),
           "the agent state names the sentence's lines",
         );
-        /* The guidance moved this week, so the homepage prints no quiet-day line. */
         assert.equal(decision.weeklyLeadershipSummary.guidanceChange, "conditions");
-        assert.equal(quietDay, null, "the homepage quiet-day line");
         /* The interest-rate terms translate the sentence's lines, in its order. */
         const untripped = lines.filter((line) => !line.tripped).map((line) => line.metric);
         const translated = buildFlipProximity(assessment).map((entry) => entry.axis);

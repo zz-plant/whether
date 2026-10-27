@@ -267,7 +267,10 @@ export const DecisionShieldPanel = ({
                 buttonLabels={{ copied: "Link copied" }}
                 onClick={handleCopyLink}
               />
-              <RecordDecisionButton buildPayload={buildLedgerPayload} />
+              {/* Not in compare mode: two plans are not one decision, and the
+                  ledger payload there was the hidden list mode's verdict. A
+                  plan is recorded by testing it on its own. */}
+              {planMode === "compare" ? null : <RecordDecisionButton buildPayload={buildLedgerPayload} />}
             </div>
           ) : null}
         </div>

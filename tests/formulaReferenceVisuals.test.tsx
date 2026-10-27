@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { FormulaReference } from "../app/trust/formulaReference";
+import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import {
   REGIME_CONFIDENCE_MEDIUM_THRESHOLD,
   REGIME_CONFIDENCE_NEAR_THRESHOLD,
@@ -13,10 +14,30 @@ describe("formula reference visuals", () => {
   const html = renderToStaticMarkup(<FormulaReference />);
 
   it("draws the regime rule as a quadrant carrying both thresholds", () => {
-    assert.match(html, /Four conditions: funding pressure above/);
+    assert.match(html, /Four conditions, picked by whether funding pressure is above/);
     assert.ok(html.includes(`>${TIGHTNESS_REGIME_THRESHOLD}<`), "tightness threshold labelled on the axis");
     assert.ok(html.includes(`>${RISK_APPETITE_REGIME_THRESHOLD}<`), "risk appetite threshold labelled on the axis");
     assert.doesNotMatch(html, /quadrant of funding pressure vs/, "the prose form is gone");
+  });
+
+  it("draws the quadrant the way up the brief's map does: Freezing top left, Sunny bottom right", () => {
+    /* Until 2026-10-09 /trust put funding pressure across and risk appetite up,
+       so its Sunny sat where the brief's map has Freezing. */
+    const place = (svg: string, word: string) => {
+      const tag = new RegExp(`<text([^>]*)>${word}</text>`).exec(svg)?.[1] ?? "";
+      return { x: Number(/\bx="([\d.]+)"/.exec(tag)?.[1]), y: Number(/\by="([\d.]+)"/.exec(tag)?.[1]) };
+    };
+    const quadrant = html.slice(html.indexOf("<svg", html.indexOf("Four conditions, picked by whether funding pressure is above") - 400));
+    const radar = renderToStaticMarkup(
+      <RegimeRadar tightness={90} riskAppetite={48} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="SCARCITY" />,
+    );
+    for (const [name, svg] of [["/trust", quadrant], ["the brief's map", radar]] as const) {
+      const freezing = place(svg, "Freezing");
+      const sunny = place(svg, "Sunny");
+      assert.ok(Number.isFinite(freezing.x) && Number.isFinite(sunny.x), `${name}: both labels drawn`);
+      assert.ok(freezing.x < sunny.x && freezing.y < sunny.y, `${name}: Freezing is left of and above Sunny`);
+    }
+    assert.match(quadrant, /rotate\(-90\)"[^>]*>Funding pressure →</, "funding pressure is the upright axis");
   });
 
   it("folds the exact arithmetic under the plain-language steps", () => {
@@ -29,10 +50,10 @@ describe("formula reference visuals", () => {
     assert.ok(html.indexOf("Inputs — all public") > fold, "the cards are inside it");
   });
 
-  it("draws confidence as a three-band ladder, named in words", () => {
-    assert.match(html, />Low</);
-    assert.match(html, />Medium</);
-    assert.match(html, />High</);
+  it("draws the margin as a three-band ladder, named in words", () => {
+    assert.match(html, />Close</);
+    assert.match(html, />Within reach</);
+    assert.match(html, />Clear</);
     assert.doesNotMatch(html, />(LOW|MED|HIGH)</, "the engine's band codes are storage, not copy");
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_NEAR_THRESHOLD}<`));
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_MEDIUM_THRESHOLD}<`));
@@ -54,7 +75,7 @@ describe("formula reference visuals", () => {
     assert.equal((withPositions.match(/data-score-ladder/g) ?? []).length, 2);
     assert.match(withPositions, /Last week: 68/);
     assert.ok(
-      withPositions.indexOf("data-score-ladder") < withPositions.indexOf("Four conditions: funding pressure above"),
+      withPositions.indexOf("data-score-ladder") < withPositions.indexOf("Four conditions, picked by whether funding pressure is above"),
       "the ladders draw the reading before the quadrant explains the rule",
     );
   });

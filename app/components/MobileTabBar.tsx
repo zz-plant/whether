@@ -4,26 +4,19 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Drawer } from "@base-ui/react/drawer";
-import { Home, LayoutGrid, FileText, Search, MoreHorizontal } from "lucide-react";
-import {
-  loopNavigationLayers,
-  mobileTabLayers,
-  type NavigationLayerKey,
-} from "../../lib/navigation/informationArchitecture";
+import { Home, LayoutGrid, Archive, BookOpen, MoreHorizontal } from "lucide-react";
+import { navigationGroups, type NavigationGroupKey } from "../../lib/navigation/informationArchitecture";
 import {
   normalizePathname,
-  resolveGlobalHeaderLoopLinks,
+  resolveGlobalHeaderNavigationLinks,
 } from "../../lib/navigation/globalHeader";
 import { MobileNavContent } from "./globalHeaderNavClient";
 
-const TAB_ICONS: Record<NavigationLayerKey, typeof Home> = {
-  "weekly-brief": Home,
-  planning: LayoutGrid,
-  signals: FileText,
-  resolve: FileText,
-  trust: FileText,
-  history: FileText,
-  compare: FileText,
+const TAB_ICONS: Record<NavigationGroupKey, typeof Home> = {
+  "this-week": Home,
+  decide: LayoutGrid,
+  record: Archive,
+  guides: BookOpen,
 };
 
 const SWIPE_MIN_PX = 72;
@@ -54,17 +47,17 @@ const TAB_CLASS =
   "flex min-h-[3.25rem] flex-1 flex-col items-center justify-center gap-0.5 rounded-lg px-1 text-fluid-nano font-medium leading-none no-underline transition-colors focus-visible:outline-2 focus-visible:outline-sky-400";
 
 /**
- * The loop, one thumb-tap away on a phone.
+ * The four groups, one thumb-tap away on a phone.
  *
- * The mobile header used to stack a hamburger sheet plus a second full row of
- * cadence tabs, and the loop the product is built around sat inside the sheet.
  * A fixed bottom bar is the native-app convention every phone user already
- * knows: Brief, Plan and Evidence as tabs, Search opening the palette (the one
- * list of every destination), and More opening the sheet for the rest.
+ * knows: This week, Decide, Record and Guides as tabs, and More opening the
+ * sheet with Search, each group's other pages and the utility links. Until
+ * 2026-10-08 the bar carried Brief, Plan and Evidence beside Search and More,
+ * and Resolve, Trust and History sat behind More.
  *
- * On report routes a horizontal swipe on the page moves to the neighbouring
- * loop tab, so the bar and the gesture agree. The brief keeps its own swipe,
- * which moves the month, and marks itself `data-swipe-owner`.
+ * On a group's pages a horizontal swipe moves to the neighbouring group, so
+ * the bar and the gesture agree. The brief keeps its own swipe, which moves the
+ * month, and marks itself `data-swipe-owner`.
  */
 export function MobileTabBar() {
   const pathname = normalizePathname(usePathname() ?? "/");
@@ -74,21 +67,14 @@ export function MobileTabBar() {
   const [scrolledAway, setScrolledAway] = useState(false);
   const navRef = useRef<HTMLElement>(null);
 
-  const loopLinks = useMemo(() => resolveGlobalHeaderLoopLinks(pathname), [pathname]);
-  const tabs = useMemo(
-    () => mobileTabLayers.map((layer) => ({ ...layer, isActive: loopLinks.find((l) => l.key === layer.key)?.isActive ?? false })),
-    [loopLinks],
-  );
-  const activeInTabs = tabs.some((tab) => tab.isActive);
-  const activeLoopLayer = loopLinks.find((link) => link.isActive);
-  const moreIsActive = !activeInTabs && Boolean(activeLoopLayer);
+  const tabs = useMemo(() => resolveGlobalHeaderNavigationLinks(pathname), [pathname]);
 
   useEffect(() => {
-    // The brief owns its swipe (it moves the month); every other loop route
-    // moves along the loop. Neighbours come from the same ordered list the
+    // The brief owns its swipe (it moves the month); every other grouped route
+    // moves along the groups. Neighbours come from the same ordered list the
     // tabs and the desktop row render.
     if (pathname === "/") return;
-    const currentIndex = loopNavigationLayers.findIndex((layer) => loopLinks.find((l) => l.key === layer.key)?.isActive);
+    const currentIndex = tabs.findIndex((tab) => tab.isActive);
     if (currentIndex < 0) return;
 
     const onStart = (event: TouchEvent) => {
@@ -107,7 +93,7 @@ export function MobileTabBar() {
       const dx = touch.clientX - start.x;
       const dy = touch.clientY - start.y;
       if (Math.abs(dx) < SWIPE_MIN_PX || Math.abs(dx) < Math.abs(dy) * 1.5) return;
-      const next = loopNavigationLayers[currentIndex + (dx < 0 ? 1 : -1)];
+      const next = navigationGroups[currentIndex + (dx < 0 ? 1 : -1)];
       if (next) router.push(next.href);
     };
     document.addEventListener("touchstart", onStart, { passive: true });
@@ -116,7 +102,7 @@ export function MobileTabBar() {
       document.removeEventListener("touchstart", onStart);
       document.removeEventListener("touchend", onEnd);
     };
-  }, [pathname, loopLinks, router]);
+  }, [pathname, tabs, router]);
 
   useEffect(() => {
     // Out of the way while reading down, back on the first move up. A fixed bar
@@ -171,7 +157,7 @@ export function MobileTabBar() {
                   className={`relative ${TAB_CLASS} ${tab.isActive ? "text-sky-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
                 >
                   <Icon aria-hidden="true" size={20} strokeWidth={tab.isActive ? 2.2 : 1.8} />
-                  <span>{tab.navLabel ?? tab.label}</span>
+                  <span>{tab.label}</span>
                   {tab.isActive ? (
                     <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-sky-400" aria-hidden="true" />
                   ) : null}
@@ -182,26 +168,13 @@ export function MobileTabBar() {
           <li className="flex flex-1">
             <button
               type="button"
-              onClick={() => document.dispatchEvent(new CustomEvent("whether-open-command-palette"))}
-              className={`${TAB_CLASS} text-slate-400 hover:text-slate-200`}
-              aria-label="Search or jump to a page"
-            >
-              <Search aria-hidden="true" size={20} strokeWidth={1.8} />
-              <span>Search</span>
-            </button>
-          </li>
-          <li className="flex flex-1">
-            <button
-              type="button"
               onClick={() => setShowMore(true)}
               aria-expanded={showMore}
-              className={`relative ${TAB_CLASS} ${moreIsActive ? "text-sky-300 font-semibold" : "text-slate-400 hover:text-slate-200"}`}
+              aria-label="More: search, every page and about"
+              className={`relative ${TAB_CLASS} text-slate-400 hover:text-slate-200`}
             >
-              <MoreHorizontal aria-hidden="true" size={20} strokeWidth={moreIsActive ? 2.2 : 1.8} />
-              <span>{moreIsActive && activeLoopLayer ? (activeLoopLayer.navLabel ?? activeLoopLayer.label) : "More"}</span>
-              {moreIsActive ? (
-                <span className="absolute bottom-1 h-0.5 w-5 rounded-full bg-sky-400" aria-hidden="true" />
-              ) : null}
+              <MoreHorizontal aria-hidden="true" size={20} strokeWidth={1.8} />
+              <span>More</span>
             </button>
           </li>
         </ul>
@@ -214,7 +187,7 @@ export function MobileTabBar() {
           <Drawer.Viewport className="fixed inset-0 z-50 flex items-end md:hidden">
             <Drawer.Popup className="w-full max-h-[85vh] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-lg">
               <MobileNavContent
-                loopLinks={loopLinks}
+                navigationLinks={tabs}
                 currentPathname={pathname}
                 onClose={() => setShowMore(false)}
               />

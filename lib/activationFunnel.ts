@@ -1,9 +1,8 @@
 /**
  * The activation funnel, and the definition of activation itself.
  *
- * Two telemetry systems already exist — `premiumFunnel.ts` for upgrade intent and
- * `operatorWorkflowTelemetry.ts` for route and panel usage — and neither answers
- * whether the product *works*. For a weekly-ritual product there is exactly one
+ * `operatorWorkflowTelemetry.ts` already measures route and panel usage, and it
+ * does not answer whether the product *works*. For a weekly-ritual product there is exactly one
  * answer to that, and it is not pageviews, HN traffic, or copy clicks: it is
  * whether the same browser came back the following week. A visitor who reads one
  * brief and never returns did not adopt a weekly ritual; they read an article.
@@ -28,7 +27,7 @@
  * advertises no trackers, and this measurement is built to keep that true rather
  * than to be maximally informative.
  */
-import { formatIsoWeekSlug, getIsoWeekInfo } from "./isoWeek";
+import { formatIsoWeekSlug, getIsoWeekInfo, isoWeekMonday, isoWeeksInYear, parseIsoWeekSlug } from "./isoWeek";
 import { sendTelemetry } from "./telemetry/sendTelemetry";
 
 const ACTIVATION_TELEMETRY_ENDPOINT = "/api/telemetry/activation";
@@ -42,6 +41,7 @@ export type ActivationCommitment =
   | "copied_email"
   | "copied_meeting"
   | "copied_brief"
+  | "copied_social"
   | "subscribed";
 
 /**
@@ -53,7 +53,7 @@ type ActivationReturnGap = "same_week" | "next_week" | "within_month" | "lapsed"
 /**
  * Where a visit arrived from, as one of seven words. Never the referring URL,
  * its path, or a query string: the hostname is read in the browser, matched
- * against the lists below, and discarded. `/privacy` 2.6 promises exactly this
+ * against the lists below, and discarded. `/privacy` 2.5 promises exactly this
  * bucket, and for a while it promised it with nothing behind it.
  */
 type ActivationArrival = "direct" | "search" | "social" | "chat" | "shared-link" | "internal" | "other";
@@ -69,6 +69,7 @@ const COMMITMENTS: ActivationCommitment[] = [
   "copied_email",
   "copied_meeting",
   "copied_brief",
+  "copied_social",
   "subscribed",
 ];
 
@@ -166,19 +167,26 @@ export const isActivationEvent = (input: unknown): input is ActivationEvent => {
   return true;
 };
 
-/** ISO weeks between two week slugs, or null when either is unreadable. */
+/**
+ * ISO weeks between two week slugs, or null when either is unreadable — which
+ * includes a week number the year does not have: 2025 ends at w52, so
+ * "2025-w53" names nothing, while 2026 (a Thursday-starting year) really has a
+ * w53. The span crosses year boundaries by the calendar, not by an assumed 52,
+ * so the extra week of a 53-week year counts.
+ */
 export const weeksBetweenSlugs = (fromSlug: string, toSlug: string) => {
-  const from = /^(\d{4})-w(\d{2})$/.exec(fromSlug);
-  const to = /^(\d{4})-w(\d{2})$/.exec(toSlug);
+  const from = parseIsoWeekSlug(fromSlug);
+  const to = parseIsoWeekSlug(toSlug);
 
-  if (!from || !to) {
+  if (!from || !to || from.week > isoWeeksInYear(from.year) || to.week > isoWeeksInYear(to.year)) {
     return null;
   }
 
-  const fromWeeks = Number(from[1]) * 52 + Number(from[2]);
-  const toWeeks = Number(to[1]) * 52 + Number(to[2]);
+  const DAY_MS = 86_400_000;
+  const fromMonday = isoWeekMonday(from).getTime();
+  const toMonday = isoWeekMonday(to).getTime();
 
-  return toWeeks - fromWeeks;
+  return Math.round((toMonday - fromMonday) / (7 * DAY_MS));
 };
 
 export const classifyReturnGap = (weeks: number): ActivationReturnGap => {

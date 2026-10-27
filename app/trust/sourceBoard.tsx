@@ -3,7 +3,7 @@ import type { SourceBoardRow } from "../../lib/report/sourceHealth";
 
 const stateTone = (row: SourceBoardRow) =>
   !row.asIntended
-    ? "text-semantic-caution-fg"
+    ? "text-caveat-fg font-semibold"
     : row.live
       ? "text-semantic-easing-fg"
       : "text-slate-300";
@@ -41,7 +41,7 @@ export function SourceBoard({
     <ReportSection
       id="source-board"
       title="Sources and last update"
-      description="Each feed behind the scores, whether this reading came from it live, how often it updates and when it last did."
+      description="Each feed behind the scores: whether this reading came from it live, how often it updates, and when it last did."
     >
       <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
         {rows.map((row) => (

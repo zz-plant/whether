@@ -59,6 +59,39 @@ describe("segmented line series", () => {
     assert.equal(ys[0], ys[2], "first and last share a value, so they share a height");
     assert.ok(ys[1] > ys[0], "the smaller value sits lower on the canvas");
   });
+
+  it("generates smooth monotonic spline paths with d3-shape", () => {
+    const series = buildSegmentedLineSeries({
+      values: [1, 5, 2, 8, 4],
+      width: 100,
+      height: 40,
+      min: 0,
+      max: 10,
+      curve: "monotone",
+    });
+
+    assert.equal(series.paths.length, 1);
+    const firstPath = series.paths[0] ?? "";
+    assert.match(firstPath, /^M/, "starts with M");
+    assert.match(firstPath, /C/, "contains cubic bezier curves from d3-shape");
+  });
+
+  it("generates closed area paths when baselineY is provided", () => {
+    const series = buildSegmentedLineSeries({
+      values: [1, 5, 2, 8, 4],
+      width: 100,
+      height: 40,
+      min: 0,
+      max: 10,
+      curve: "monotone",
+      baselineY: 20,
+    });
+
+    assert.equal(series.areaPaths.length, 1);
+    const firstArea = series.areaPaths[0] ?? "";
+    assert.match(firstArea, /^M/, "starts with M");
+    assert.match(firstArea, /Z$/, "closed path ending with Z");
+  });
 });
 
 describe("sparkline", () => {
@@ -161,6 +194,17 @@ describe("HistoricalTrendChart", () => {
     assert.match(text, /2 months to Mar 2026/);
     assert.match(html, /aria-label="Risk appetite over 2 months,/);
     assert.doesNotMatch(text, /3 months/, "the point count is not the span");
+  });
+
+  it("draws on the score's 0–100 scale with its change line when given one", () => {
+    const html = renderToStaticMarkup(
+      <HistoricalTrendChart label="Funding pressure" color="red" points={points} periodLabel="months" changeLine={70} />,
+    );
+    assert.match(html, /data-change-line/);
+    assert.match(html, /aria-label="Funding pressure over 2 months, on its 0–100 scale with the change line at 70\./);
+    assert.doesNotMatch(html, /ranging 40–60/, "a fixed scale states the scale, not the data's range");
+    const plain = renderToStaticMarkup(<HistoricalTrendChart label="Tightness" color="red" points={points} />);
+    assert.doesNotMatch(plain, /data-change-line/, "no line without one");
   });
 
   it("shares its projection with the inline sparkline instead of a second implementation", () => {

@@ -11,36 +11,52 @@ import { buildPublishedBriefPath, latestPublishedBrief, publishedBriefDisplay } 
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { getOrderedRegimeLegend } from "../../lib/regimePresentation";
 import { formatDateUTC } from "../../lib/formatters";
+import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCE_RUBRIC, ADVICE_STANCES } from "../../lib/adviceStance";
 import {
   buildCanonBaseRate,
   buildCanonTimeline,
+  canonChangeLines,
   canonEssays,
   describeCanonBaseRate,
   essaysWrittenIn,
   formatCanonAuthors,
   formatCanonPublished,
+  formatCanonShare,
   type CanonReading,
 } from "../../lib/productCanon";
+import {
+  buildAdvicePairs,
+  buildCapitalAdviceLag,
+  buildScoreAlignment,
+  describeAdvicePairs,
+  describeCapitalAdviceLag,
+  describeScoreAlignment,
+} from "../../lib/productCanonMeasures";
 import { ContentPageShell } from "../components/ui/contentPageShell";
+import { SectionTabs } from "../components/sectionTabs";
+import { AdvicePlane, type AdvicePlanePoint } from "./advicePlane";
+import { AdviceCorpusSection } from "./adviceCorpusSection";
 
 export const runtime = "edge";
 
 /**
- * Product-management writing against the month-end record.
+ * Widely read writing on products and capital, against the month-end record.
  *
- * Restored on 2026-09-23 after six months as a redirect to /trust. What changed
- * from the first version, and why, is recorded at the top of
- * `lib/productCanon.ts`; the short form is that every month-specific claim on
- * this page is one the record actually varies by, and the page states the base
- * rate before a reader can mistake a coincidence for a finding.
+ * Restored on 2026-09-23 after six months as a redirect to /trust, and turned
+ * into a test on 2026-10-09: does advice on money and headcount move with the
+ * conditions while advice on method does not? What changed from the first
+ * version, and why, is recorded at the top of `lib/productCanon.ts`. The short
+ * form: every month-specific claim on this page is one the record varies by,
+ * every share sits beside the share of months, and the page says what the
+ * sample shows even where that is less than the question hopes.
  */
 /* The title is the search: "product management reading list" is what people type,
    and the whole tag has to fit a result line (~60 characters with the site suffix).
-   The description leads with what no other reading list has, before Google cuts it. */
+   The H1 asks the page's question; the title stays the phrase people search. */
 export const metadata: Metadata = buildPageMetadata({
   title: "Product Management Reading List, Dated by Market",
   description:
-    `${canonEssays.length} product management essays and books, from Cagan to Torres, each dated and placed on the market conditions of the month it came out.`,
+    `${canonEssays.length} product management essays, books and investor memos, from Cagan to Sequoia, each dated and placed on the market conditions of the month it came out.`,
   path: "/concepts",
   imageAlt: "Product management reading list, dated by market conditions",
   /* Without these the share card is the live weekly-guidance card, so a link to a
@@ -48,13 +64,11 @@ export const metadata: Metadata = buildPageMetadata({
   imageParams: {
     template: "reading",
     eyebrow: "Product management reading list",
-    title: "Product writing, against the market it was written in",
-    subtitle: `${canonEssays.length} essays and books, each dated and placed on the month-end record since 2012.`,
+    title: "Does startup advice follow the market?",
+    subtitle: `${canonEssays.length} essays, books and investor memos, each placed on the month-end record since 2012.`,
     kicker: "Whether — weekly operating guidance",
   },
 });
-
-const percent = (share: number) => `${Math.round(share * 100)}%`;
 
 const monthsLabel = (months: number) => (months === 1 ? "1 month" : `${months} months`);
 
@@ -69,7 +83,7 @@ function ReadingLabel({ reading, recordStart }: { reading: CanonReading; recordS
   if (reading.kind === "before-record") {
     return (
       <span className="text-xs text-slate-400">
-        Before the record{recordStart ? `, which starts ${recordStart}` : ""}
+        Before the record{recordStart ? ` starts on ${recordStart}` : ""}
       </span>
     );
   }
@@ -95,10 +109,10 @@ type TimelineEssay = ReturnType<typeof buildCanonTimeline>[number];
 /*
  * Where the list falls by year: one column per year from the oldest essay to
  * the newest, one square per essay, filled in the conditions the month it came
- * out and hollow outside the record. The list below is 24 entries long, and
- * this is the one view of it that shows the clusters and the colours at once.
- * Drawn from the same timeline the entries print; aria-hidden, with the same
- * facts in a sentence for a screen reader, which also has the list itself.
+ * out and hollow outside the record. This is the one view of the list that
+ * shows the clusters and the colours at once. Drawn from the same timeline the
+ * entries print; aria-hidden, with the same facts in a sentence for a screen
+ * reader, which also has the list itself.
  */
 function EssayYearStrip({ timeline, recordStart }: { timeline: readonly TimelineEssay[]; recordStart: string | null }) {
   if (timeline.length === 0) return null;
@@ -117,7 +131,7 @@ function EssayYearStrip({ timeline, recordStart }: { timeline: readonly Timeline
   return (
     <figure className="max-w-2xl space-y-2" data-essay-year-strip>
       <p className="sr-only">
-        {`${timeline.length} essays by year of first publication, ${firstYear} to ${lastYear}, each marked with the conditions the month it came out.`}
+        {`${timeline.length} texts by year of first publication, ${firstYear} to ${lastYear}, each marked with the conditions the month it came out.`}
       </p>
       <div aria-hidden="true" className="grid grid-flow-col auto-cols-fr items-end gap-px border-b border-[color:var(--border-default)] pb-1">
         {years.map((year) => (
@@ -163,7 +177,7 @@ function EssayYearStrip({ timeline, recordStart }: { timeline: readonly Timeline
           </li>
         ))}
         {[
-          beforeRecord ? `Before the record${recordStart ? `, which starts ${recordStart}` : ""}` : null,
+          beforeRecord ? `Before the record${recordStart ? ` starts on ${recordStart}` : ""}` : null,
           afterRecord ? "After the latest month-end on record" : null,
         ].map((label) =>
           label ? (
@@ -178,12 +192,56 @@ function EssayYearStrip({ timeline, recordStart }: { timeline: readonly Timeline
   );
 }
 
+/* One side of a pair: the advice, the text, its month and the record that month. */
+function PairSide({ essay }: { essay: TimelineEssay }) {
+  return (
+    <div className="grid gap-1 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-x-4">
+      <p className="type-eyebrow">{ADVICE_STANCE_DEFINITIONS[essay.stance].label}</p>
+      <div className="min-w-0 space-y-1">
+        <p className="text-sm text-slate-300">
+          <a href={`#${essay.slug}`} className="text-slate-100 underline decoration-slate-600 underline-offset-4 hover:text-white">
+            {essay.title}
+          </a>{" "}
+          — {formatCanonAuthors(essay)}, {formatCanonPublished(essay)}
+        </p>
+        {essay.reading.kind === "reading" ? (
+          <p className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs tabular-nums text-slate-400">
+            <Tag regime={essay.reading.regime}>{essay.reading.conditions}</Tag>
+            <span>
+              Funding pressure {essay.reading.fundingPressure} · Risk appetite {essay.reading.riskAppetite}
+            </span>
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 export default function ProductCanonPage() {
   const series = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
   const timeline = buildCanonTimeline(series);
   const baseRate = buildCanonBaseRate(series, timeline);
+  const lag = buildCapitalAdviceLag(timeline);
+  const alignment = buildScoreAlignment(series, timeline);
+  const pairs = buildAdvicePairs(timeline);
   const recordStart = series.length > 0 ? formatDateUTC(series[0].recordDate) : null;
   const recordEnd = series.length > 0 ? formatDateUTC(series[series.length - 1].recordDate) : null;
+  const planePoints: AdvicePlanePoint[] = timeline.flatMap((essay) =>
+    essay.reading.kind === "reading"
+      ? [
+          {
+            slug: essay.slug,
+            title: essay.title,
+            published: formatCanonPublished(essay),
+            stance: essay.stance,
+            regime: essay.reading.regime,
+            conditions: essay.reading.conditions,
+            fundingPressure: essay.reading.fundingPressure,
+            riskAppetite: essay.reading.riskAppetite,
+          },
+        ]
+      : [],
+  );
 
   const thisWeek = latestPublishedBrief
     ? {
@@ -198,12 +256,105 @@ export default function ProductCanonPage() {
   return (
     <ContentPageShell measure="wide">
       <JsonLdScript data={buildProductCanonStructuredData({ essays: timeline })} />
+      <SectionTabs currentPath="/concepts" />
 
       <SecondaryPageHeader
-        eyebrow="Reading list"
-        title="Product writing, against the market it was written in"
-        description={`${timeline.length} widely read product management essays and books, each placed on the month-end record${recordStart && recordEnd ? ` (${recordStart} to ${recordEnd})` : ""}: the conditions the month each came out, and how long they had held. A reading list, not evidence for the guidance.`}
+        title="Does startup advice follow the market?"
+        description={`${timeline.length} widely read essays, books and investor memos, each placed on the month-end record${recordStart && recordEnd ? ` from ${recordStart} to ${recordEnd}` : ""}. Advice on hiring, raising and spending is tagged Expand or Conserve, and method advice is tagged Craft. The test is whether the capital texts track the conditions while the craft texts do not. A reading list, not evidence for the guidance.`}
       />
+
+      <SecondaryPageSection title="What the record shows" description={describeCanonBaseRate(baseRate)}>
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+          <AdvicePlane points={planePoints} lines={canonChangeLines} />
+          <div className="min-w-0 space-y-6">
+            <div className="overflow-x-auto">
+              {/* Nowrap and a smaller face below `sm`: at 390px a wrapped cell split each count from its share. */}
+              <table className="w-full whitespace-nowrap text-left text-xs text-slate-300 sm:text-sm">
+                <caption className="sr-only">Texts of each kind published in each set of conditions, against months on record</caption>
+                <thead className="type-eyebrow">
+                  <tr>
+                    <th scope="col" className="py-2 pr-3 font-medium sm:pr-4">Conditions</th>
+                    <th scope="col" className="py-2 pr-3 font-medium sm:pr-4">Months</th>
+                    {ADVICE_STANCES.map((stance) => (
+                      <th key={stance} scope="col" className="py-2 pr-3 font-medium last:pr-0 sm:pr-4">
+                        {ADVICE_STANCE_DEFINITIONS[stance].label}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {baseRate.rows.map((row) => (
+                    <tr key={row.regime} className="border-t border-[color:var(--border-subtle)]">
+                      <th scope="row" className="py-2 pr-3 font-normal text-slate-100 sm:pr-4">{row.conditions}</th>
+                      <td className="py-2 pr-3 tabular-nums sm:pr-4">
+                        {row.months} ({formatCanonShare(row.monthShare)})
+                      </td>
+                      {ADVICE_STANCES.map((stance) => (
+                        <td key={stance} className="py-2 pr-3 tabular-nums last:pr-0 sm:pr-4">
+                          {row.byStance[stance].count} ({formatCanonShare(row.byStance[stance].share)})
+                        </td>
+                      ))}
+                    </tr>
+                  ))}
+                  <tr className="border-t border-[color:var(--border-subtle)] text-slate-400">
+                    <th scope="row" className="py-2 pr-3 font-normal sm:pr-4">On the record</th>
+                    <td className="py-2 pr-3 tabular-nums sm:pr-4">{baseRate.monthsOnRecord}</td>
+                    {ADVICE_STANCES.map((stance) => (
+                      <td key={stance} className="py-2 pr-3 tabular-nums last:pr-0 sm:pr-4">
+                        {baseRate.placed[stance]}
+                      </td>
+                    ))}
+                  </tr>
+                </tbody>
+              </table>
+              {baseRate.beforeRecord > 0 ? (
+                <p className="mt-2 text-xs text-slate-400">
+                  {baseRate.beforeRecord === 1
+                    ? "One text predates the record and is left out of the shares."
+                    : `${baseRate.beforeRecord} texts predate the record and are left out of the shares.`}
+                </p>
+              ) : null}
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-base font-semibold text-slate-100">How soon after the record moved</h3>
+              <ul className="space-y-1.5 text-sm text-slate-300">
+                {describeCapitalAdviceLag(lag).map((sentence) => (
+                  <li key={sentence}>{sentence}</li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="space-y-2">
+              <h3 className="text-base font-semibold text-slate-100">Funding pressure or risk appetite</h3>
+              <ul className="space-y-1.5 text-sm text-slate-300">
+                {describeScoreAlignment(alignment).map((sentence) => (
+                  <li key={sentence}>{sentence}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </SecondaryPageSection>
+
+      <AdviceCorpusSection />
+
+      {pairs.length > 0 ? (
+        <SecondaryPageSection
+          title="Same decision, opposite advice"
+          description={`Each pair is two widely read texts on one decision, pointing opposite ways. ${describeAdvicePairs(pairs)}`}
+        >
+          <ul className="space-y-5">
+            {pairs.map((pair) => (
+              <li key={pair.decision} data-frame-block="" className="space-y-3 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0">
+                <h3 className="text-base font-semibold text-slate-100">{pair.decision}</h3>
+                <PairSide essay={pair.expand} />
+                <PairSide essay={pair.conserve} />
+              </li>
+            ))}
+          </ul>
+        </SecondaryPageSection>
+      ) : null}
 
       {thisWeek ? (
         <SecondaryPageSection
@@ -236,47 +387,8 @@ export default function ProductCanonPage() {
       ) : null}
 
       <SecondaryPageSection
-        title="Where the essays fell, beside where the months fell"
-        description="A share of essays means little without the share of time those conditions held."
-      >
-        <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm text-slate-300">
-            <caption className="sr-only">Essays published in each set of conditions, against months on record</caption>
-            <thead className="type-eyebrow">
-              <tr>
-                <th scope="col" className="py-2 pr-4 font-medium">Conditions</th>
-                <th scope="col" className="py-2 pr-4 font-medium">Months on record</th>
-                <th scope="col" className="py-2 font-medium">Essays published</th>
-              </tr>
-            </thead>
-            <tbody>
-              {baseRate.rows.map((row) => (
-                <tr key={row.regime} className="border-t border-slate-800">
-                  <th scope="row" className="py-2 pr-4 font-normal text-slate-100">{row.conditions}</th>
-                  <td className="py-2 pr-4 tabular-nums">
-                    {row.months} ({percent(row.monthShare)})
-                  </td>
-                  <td className="py-2 tabular-nums">
-                    {row.essays} ({percent(row.essayShare)})
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-        <p className="mt-4 text-sm text-slate-300">{describeCanonBaseRate(baseRate)}</p>
-        {baseRate.essaysBeforeRecord > 0 ? (
-          <p className="mt-2 text-sm text-slate-400">
-            {baseRate.essaysBeforeRecord === 1
-              ? "One essay predates the record and is left out of the shares."
-              : `${baseRate.essaysBeforeRecord} essays predate the record and are left out of the shares.`}
-          </p>
-        ) : null}
-      </SecondaryPageSection>
-
-      <SecondaryPageSection
         title="The list, oldest first"
-        description="The date is first publication. Where an essay became a book, the note says which one the date is."
+        description="The date is first publication. If an essay later became a book, the note says which version the date refers to."
       >
         <EssayYearStrip timeline={timeline} recordStart={recordStart} />
         {/* From `sm` each entry has a rail: when it came out and the conditions
@@ -296,7 +408,14 @@ export default function ProductCanonPage() {
               <li
                 key={essay.slug}
                 id={essay.slug}
-                className="grid gap-x-8 gap-y-2 border-t border-slate-800 pt-4 first:border-t-0 first:pt-0 sm:grid-cols-[10rem_minmax(0,1fr)]"
+                /* Off-screen entries skip their rendering until approached
+                   (2026-10-22): this list is the longest surface on the site
+                   and every entry was fully laid out on load. The intrinsic
+                   size is the estimate the scrollbar uses before an entry
+                   renders; `auto` remembers the real one after. Anchor links
+                   from "this week" above still land: the browser renders a
+                   targeted entry even while it is skipped. */
+                className="grid gap-x-8 gap-y-2 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0 [content-visibility:auto] [contain-intrinsic-size:auto_260px] sm:grid-cols-[10rem_minmax(0,1fr)]"
               >
                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 sm:flex-col sm:items-start">
                   <p className="type-eyebrow">
@@ -326,8 +445,15 @@ export default function ProductCanonPage() {
                       {essay.title}
                     </a>
                   </h3>
-                  <p className="text-sm text-slate-400">{formatCanonAuthors(essay)}</p>
+                  <p className="text-sm text-slate-400">
+                    {formatCanonAuthors(essay)}
+                    {essay.kind === "investorMemo" ? " · investor memo" : null}
+                  </p>
                   <p className="mt-2 text-sm text-slate-300">{essay.argument}</p>
+                  <p className="mt-1 text-xs text-slate-400" data-advice={essay.stance}>
+                    <span className="font-semibold text-slate-200">{ADVICE_STANCE_DEFINITIONS[essay.stance].label}.</span>{" "}
+                    {essay.stanceBasis}
+                  </p>
                   {essay.publishedNote ? <p className="mt-1 text-xs text-slate-400">{essay.publishedNote}</p> : null}
                 </div>
               </li>
@@ -337,8 +463,41 @@ export default function ProductCanonPage() {
       </SecondaryPageSection>
 
       <SecondaryPageSection
+        title="What this does not show"
+        description="The limits are why the result above is stated as shares and not as a finding."
+      >
+        <ul className="space-y-2 text-sm text-slate-300">
+          <li>
+            <span className="text-slate-100">A small, chosen sample.</span> The people who built this page picked these
+            texts because they were widely read. Counting every post in the archives above is how we check that
+            choice.
+          </li>
+          <li>
+            <span className="text-slate-100">Publication, not adoption.</span> Each date is when a text came out. Advice
+            can spread years later, or be drafted months before.
+          </li>
+          <li>
+            <span className="text-slate-100">Texts that share a month.</span> Several memos came out within weeks of each
+            other in 2020 and 2022. They count separately here, though they are closer to one observation.
+          </li>
+          <li>
+            <span className="text-slate-100">Co-occurrence, not cause.</span> The record shows the conditions a text came
+            out in. It cannot show why its author wrote it.
+          </li>
+          <li>
+            <span className="text-slate-100">Nothing before the record.</span> Texts published before the record starts stay
+            on the list but aren&apos;t counted in any share.
+          </li>
+          <li>
+            <span className="text-slate-100">Tags are judgment calls.</span> Each entry prints the line its tag rests on.
+            The rule: {ADVICE_STANCE_RUBRIC}
+          </li>
+        </ul>
+      </SecondaryPageSection>
+
+      <SecondaryPageSection
         title="What the four conditions mean"
-        description="The same four words this week's guidance uses, and what each asks of a team today."
+        description="The same four words this week's guidance uses."
       >
         <ul className="space-y-2 text-sm text-slate-300">
           {getOrderedRegimeLegend().map((entry) => (
@@ -352,14 +511,14 @@ export default function ProductCanonPage() {
       <SecondaryPageSection title="Sources">
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            Conditions each month: the month-end record on{" "}
+            Conditions and scores each month: the month-end record on{" "}
             <ActionLink href="/history" variant="inline">
               the history page
             </ActionLink>
-            , computed by the same method behind this week&rsquo;s guidance. Each essay&rsquo;s date links to that year&rsquo;s page in the archive.
+            , computed by the same method behind this week&rsquo;s guidance. Each text&rsquo;s date links to that year&rsquo;s page in the archive.
           </li>
           <li>
-            Essays: linked at each title, to the author or original publisher wherever it is still online.
+            Texts: each title links to its author, firm or original publisher, wherever it is still online.
           </li>
         </ul>
       </SecondaryPageSection>

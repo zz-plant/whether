@@ -13,6 +13,8 @@ import {
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
+import { navigationLabelByPath } from "../../../lib/navigation/informationArchitecture";
 
 type Params = { slug: string };
 
@@ -60,14 +62,15 @@ export default async function DecideDetailPage({
     return (
       <ContentPageShell>
         <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Resolve", href: "/resolve" },
-            { label: `For ${role.title}` },
-          ]}
+          items={toVisibleBreadcrumbs(
+            buildGroupBreadcrumbs(`/resolve/${slug}`, [
+              { name: "More tools", path: "/resources#more-tools" },
+              { name: `For ${role.title}`, path: `/resolve/${slug}` },
+            ]),
+          )}
         />
         <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-          <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">For {role.title}</h1>
+          <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">For {role.title}</h1>
           <p className="text-sm text-slate-300">Decisions this role usually owns</p>
           <ul className="space-y-2 text-sm text-slate-200">{role.decisions.map((item) => <li key={item}>• {item}</li>)}</ul>
         </section>
@@ -100,14 +103,15 @@ export default async function DecideDetailPage({
   return (
     <ContentPageShell>
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Resolve", href: "/resolve" },
-          { label: situationUseCase?.title || titleCase(slug) },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(`/resolve/${slug}`, [
+            { name: "More tools", path: "/resources#more-tools" },
+            { name: situationUseCase?.title || titleCase(slug), path: `/resolve/${slug}` },
+          ]),
+        )}
       />
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{situationUseCase?.title || titleCase(slug)}</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">{situationUseCase?.title || titleCase(slug)}</h1>
         <p className="text-sm text-slate-300">The strongest paths for this decision.</p>
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
@@ -131,7 +135,9 @@ export default async function DecideDetailPage({
         <h2 className="text-lg font-semibold text-slate-100">Still unsure?</h2>
         <div className="flex gap-3">
           <ActionLink href="/trust#revisit-call" variant="pill">Revisit triggers</ActionLink>
-          <ActionLink href="/trust" variant="pill">Trust</ActionLink>
+          {/* The page's one name, from the IA, not the retired "Trust" the
+             regroup of 2026-10-08 left behind on this handoff. */}
+          <ActionLink href="/trust" variant="pill">{navigationLabelByPath["/trust"]}</ActionLink>
         </div>
       </section>
     </ContentPageShell>

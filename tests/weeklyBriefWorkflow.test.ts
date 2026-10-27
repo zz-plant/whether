@@ -48,6 +48,7 @@ describe("freeze script append-only & correction semantics", () => {
       degraded: true,
       isFallback: false,
       isLive: true,
+      macroSeries: [],
       recordDate: "2026-08-27",
       now: new Date("2026-08-29T04:00:00Z"),
     });
@@ -61,6 +62,7 @@ describe("freeze script append-only & correction semantics", () => {
       isFallback: true,
       isLive: false,
       fallbackReason: "Provider unavailable",
+      macroSeries: [],
       recordDate: "2026-08-27",
       now: new Date("2026-08-29T04:00:00Z"),
     });

@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 
@@ -126,15 +129,17 @@ describe("/signals answers each closed question in its summary", () => {
     const { thresholds } = model.assessment;
     assert.equal(
       summaryAnswer(withTrends, "What would conditions be with different lines?"),
-      `Set at rate ${thresholds.baseRateTightness}% · funding pressure ${thresholds.tightnessRegime} · risk appetite ${thresholds.riskAppetiteRegime}`,
+      `Lines now: rate ${thresholds.baseRateTightness}% · funding pressure ${thresholds.tightnessRegime} · risk appetite ${thresholds.riskAppetiteRegime}`,
     );
   });
 
-  it("past months: the change count the timeline's own card prints", () => {
+  /* The summary is the one place the count prints: the timeline under it carried a
+     "Changes in conditions" card with the same sentence until 2026-10-14. */
+  it("past months: the change count, printed once", () => {
     const answer = summaryAnswer(withTrends, "What did the brief say in an earlier month?");
     assert.ok(answer && /^(No change|\d+ changes?) across the last \d+ months$/.test(answer), answer);
     const timeline = withTrends.slice(withTrends.indexOf('id="regime-timeline"'));
-    assert.ok(timeline.includes(`${answer}.`), "the card under it says the same");
+    assert.ok(!timeline.includes(answer), "the timeline under it does not repeat it");
   });
 
   it("the reference cycle and the zero-rate habits name what the table holds", () => {

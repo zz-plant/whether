@@ -98,6 +98,25 @@ describe("parsePlanCommitment — cadence", () => {
     const parsed = parsePlanCommitment("3 contractors @ $10k per month each");
     assert.equal(parsed.annualUsd, 360_000);
   });
+
+  it("runs a monthly amount for its stated term when that is under a year", () => {
+    // The compare template's contractor: annualising it read $180k for a three-month engagement.
+    const contractor = parsePlanCommitment("Engage 1 specialized contractor for 3 months at $15k/mo");
+    assert.equal(contractor.annualUsd, 45_000);
+    assert.equal(contractor.basis, "$15k a month for 3 months → $45k in the first year");
+
+    assert.equal(parsePlanCommitment("a 6-month contract at $10k a month").annualUsd, 60_000);
+    assert.equal(
+      parsePlanCommitment("2 contractors for 6 months at $10k/mo each").basis,
+      "2 × $10k a month each for 6 months → $120k in the first year",
+    );
+  });
+
+  it("keeps twelve months when the term is a year or more, or is not a term", () => {
+    assert.equal(parsePlanCommitment("a 24-month lease at $8k a month").annualUsd, 96_000);
+    // A runway aside is not how long the commitment runs.
+    assert.equal(parsePlanCommitment("$10k a month, leaving 9 months of runway").annualUsd, 120_000);
+  });
 });
 
 describe("parsePlanCommitment — no amount at all", () => {

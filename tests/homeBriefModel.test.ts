@@ -37,7 +37,7 @@ describe("buildHomeBriefModel", () => {
         changedSignals: [{ key: "tightness", delta: 2 }],
         anomalySignals: [],
       },
-    }, { overlaySector: "consumer" });
+    });
 
     assert.match(model.confidenceLabel, /LOW|MED|HIGH/);
     assert.equal(model.postureWithStageLabel, "Cloudy");
@@ -93,8 +93,6 @@ describe("buildHomeBriefModel", () => {
     assert.ok(model.historicalTimeline.length > 0);
     assert.equal(model.historicalAnalogs.length, 0);
     assert.equal(model.lastYearComparison, null);
-    assert.equal(model.macroOverlay.length, 5);
-    assert.ok(model.macroOverlay.some((item) => item.label.includes("Sector sensitivity (Consumer)")));
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(Array.isArray(model.evidenceItems));
     assert.match(model.whyThisCall[0].detail, /points from its .* line/i);
@@ -142,7 +140,7 @@ describe("buildHomeBriefModel", () => {
        crosses the pause line at 56, so four of the five areas pause. */
     assert.equal(
       dated.weeklyMovement.summary,
-      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose through 56.",
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose above 56.",
     );
     assert.equal(dated.decisionMovement?.comparedWith, "Aug 31");
     assert.doesNotMatch(dated.weeklyMovement.summary, /Pressure increased|Slow new commitments/);
@@ -153,7 +151,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(undated.regimeSignalIndicators[0]?.trendDeltaLabel, "+2.0 vs last week");
     assert.equal(undated.weeklyLeadershipSummary.comparedWith, undefined);
     assert.equal(undated.weeklyLeadershipSummary.shorthandLine, "Operating latitude unchanged since last week.");
-    assert.match(undated.weeklyMovement.summary, /^This week, the pause now applies to .*, because funding pressure rose through 56\.$/);
+    assert.match(undated.weeklyMovement.summary, /^This week, the pause now applies to .*, because funding pressure rose above 56\.$/);
   });
 
   /*
@@ -185,7 +183,7 @@ describe("buildHomeBriefModel", () => {
 
     assert.equal(
       model.weeklyMovement.summary,
-      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose through 76 and risk appetite fell through 44.",
+      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose above 76 and risk appetite fell below 44.",
     );
     assert.equal(model.decisionShiftHeadline, model.weeklyMovement.summary);
     assert.equal(model.decisionMovement?.moved.length, 5);
@@ -244,7 +242,6 @@ describe("buildHomeBriefModel", () => {
     assert.ok(model.historicalTimeline.length > 0);
     assert.equal(model.historicalAnalogs.length, 0);
     assert.equal(model.lastYearComparison, null);
-    assert.equal(model.macroOverlay.length, 5);
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(Array.isArray(model.evidenceItems));
     assert.match(model.whyThisCall[0].detail, /points from its .* line/i);
@@ -342,33 +339,11 @@ describe("buildHomeBriefModel", () => {
        sentence the brief prints, not the nearest line alone. */
     assert.equal(
       model.reversalTrigger,
-      "Funding pressure rises 30 pts to clear 40 (10 today) or risk appetite falls 6 pts to 50 or below (56 today).",
+      "Funding pressure rises 30 pts from 10 to clear 40, or risk appetite falls 6 pts from 56 to 50 or below.",
     );
     assert.equal(model.flipThreshold, model.reversalTrigger);
     assert.equal(model.regimeDistance.dimensionKey, "riskAppetite");
     assert.equal(model.regimeDistance.thresholdDirection, "fallToOrBelow");
-  });
-
-  it("renders selected homepage overlay sector in macro overlay label", () => {
-    const model = buildHomeBriefModel({
-      assessment: {
-        regime: "EXPANSION",
-        diagnostics: { transitionWatch: false },
-        thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
-        scores: { tightness: 40, riskAppetite: 64 },
-      },
-      regimeAlert: null,
-      stopItems: ["Guardrail"],
-      reportDynamics: {
-        directionLabel: "stable",
-        changedSignals: [],
-        anomalySignals: [],
-      },
-    }, { overlaySector: "infrastructure" });
-
-    const overlayRow = model.macroOverlay.find((item) => item.label.includes("Sector sensitivity"));
-    assert.ok(overlayRow);
-    assert.match(overlayRow?.label ?? "", /Infrastructure/);
   });
 
   it("builds ordered historical timeline entries from regime series", () => {
@@ -455,8 +430,8 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.doesNotMatch(model.operatingStanceLine, /Stage expansion/i);
-    assert.match(model.operatingStanceLine, /Hold approvals steady/i);
-    assert.match(model.operatingStanceLine, /retention|margin|revenue-linked/i);
+    assert.match(model.operatingStanceLine, /protects income you have/i);
+    assert.doesNotMatch(model.operatingStanceLine, /approv|retention|renewal/i, "no approval process or business model assumed (2026-10-14)");
   });
 
 
@@ -670,7 +645,8 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.sinceLastReview.items.length, 3);
     assert.ok(model.sinceLastReview.items.some((item) => item.href === "/signals"));
     assert.ok(model.sinceLastReview.items.some((item) => item.href === "/operate"));
-    assert.ok(model.sinceLastReview.items.some((item) => item.href === "/resolve"));
+    // Resolve folded into Decide on 2026-10-08: a change of conditions sends the reader to recheck the plan.
+    assert.equal(model.sinceLastReview.items.find((item) => item.id === "posture-shift")?.href, "/operate");
   });
 
   it("returns compact fallback start-route copy when no meaningful delta exists", () => {

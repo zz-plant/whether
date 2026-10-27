@@ -1,0 +1,71 @@
+import assert from "node:assert/strict";
+import { describe, it } from "bun:test";
+import { renderToStaticMarkup } from "react-dom/server";
+import { WhyConditionsSection } from "../app/components/home/WhyConditionsSection";
+
+/**
+ * The diagnosis section answers "how far can I trust this reading?" where the
+ * reader asks it. Two qualifications decide whether the headline classification
+ * survives inspection: inputs outside the record (counted, they would make
+ * conditions Freezing, not Cloudy) and a score capped at the top of its scale
+ * (90 against a 70 line reads as 20 points, while the pressure behind it is 40).
+ * Both were methodology notes before; both change the classification here.
+ */
+
+const base = {
+  regime: "DEFENSIVE",
+  tightness: 90,
+  riskAppetite: 55,
+  changeLines: { tightness: 70, riskAppetite: 50 },
+};
+
+const render = (overrides: Partial<Parameters<typeof WhyConditionsSection>[0]> = {}) =>
+  renderToStaticMarkup(<WhyConditionsSection {...base} notCounted={[]} warning={null} {...overrides} />);
+
+describe("why conditions", () => {
+  it("prints each reading with what it means, so the scores need no decoding", () => {
+    const html = render();
+    assert.match(html, /Why conditions are Cloudy/);
+    assert.match(html, /Funding pressure/);
+    assert.match(html, /Risk appetite/);
+    // The meaning comes from signalReadingMeaning, not a local phrase.
+    assert.match(html, /money is hard to raise/i);
+  });
+
+  it("states which side of each change line the readings sit on", () => {
+    const html = render();
+    assert.match(html, /Funding pressure is above its 70 change line/);
+    assert.match(html, /risk appetite is above its 50 change line/);
+    assert.match(html, /Together they put conditions in/);
+  });
+
+  it("shows what the excluded inputs would change, when they would change the classification", () => {
+    const html = render({
+      notCounted: [{ metric: "riskAppetite", label: "startup-market inputs", score: 44, published: 55, line: "its change line" }],
+      warning: "Startup-market inputs would put risk appetite at 44, below its change line.",
+    });
+    assert.match(html, /What the headline reading leaves out/);
+    assert.match(html, /would put risk appetite at 44/);
+    // 90 tightness with risk appetite at 44 is Freezing, not the Cloudy headline.
+    assert.match(html, /conditions would be Freezing, not Cloudy/);
+    assert.match(html, /be scored against past month-ends/);
+  });
+
+  it("says nothing about excluded inputs when the basis counts them", () => {
+    const html = render();
+    assert.doesNotMatch(html, /What the headline reading leaves out/);
+  });
+
+  it("gives a capped score's real distance to its change line", () => {
+    const html = render({ saturatedPressure: 110 });
+    assert.match(html, /reads 90 because the score is capped there/);
+    assert.match(html, /without the cap it would read 110/);
+    // 90 against 70 shows 20 points; 110 against 70 is 40 points of pressure.
+    assert.match(html, /20 points on the score but 40 points of pressure/);
+  });
+
+  it("omits the capped note when the score is not capped", () => {
+    const html = render();
+    assert.doesNotMatch(html, /because the score is capped there/);
+  });
+});

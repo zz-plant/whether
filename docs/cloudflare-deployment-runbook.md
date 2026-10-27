@@ -31,14 +31,20 @@ bun scripts/run-checks.mjs --preset deploy
 The `deploy` preset (`scripts/check-tasks.mjs`, where the pre-push hook's preset is declared too)
 is two stages: lint, typecheck, test, assets, suppressions and dead-exports together, then the
 landmark audit on its own once they pass, under `WHETHER_DEPLOY_GATE=1` for the run and every task
-it spawns. The landmark audit runs second and alone: it spawns a dev server and compiles every
-route against it, and a server sharing a small container's cores with lint, tsc, and the suite
-turns a slow route into one that "never answered".
+it spawns. The landmark audit runs second and alone: it starts the production worker under
+`wrangler dev` (the `serve:worker` script), which bundles the worker once and renders every route
+from that bundle, and a workerd container sharing a small box's cores with lint, tsc and the
+suite still turns a cold start into a timeout — the reason it is a stage of its own. (Until
+2026-10-21 it served `vite dev` instead, which compiled each route on first fetch; the audit
+against the worker is not only faster, it is the code that ships.)
 
 `WHETHER_DEPLOY_GATE=1` (read in one place, `scripts/deploy-gate.mjs`) makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
 with a 120s ceiling, and skip `tests/tools/` (it shells out to `python3`, which the build image does
 not guarantee), and gives the landmark audit's dev-server readiness and per-route bounds room for a
-cold start. It did once also drop to "2 workers"; `--max-concurrency` never bounded workers and the
+cold start. A start that still misses its 180s deadline gets one fresh start before the audit fails
+(2026-10-14: two `main` builds that day failed on a dev server that never answered, between builds
+that passed), and every failed start prints the last 30 lines of the dev server's log into the build
+log, which used to name a file inside the container and nothing else. It did once also drop to "2 workers"; `--max-concurrency` never bounded workers and the
 knob is gone. `audit` needs the network and `hotspot-preflight` needs git history, so both stay
 on `bun run check` and pre-push rather than the deploy path. It runs on every push, `main` included,
 so a red gate is a blocked deploy — read the build log in the dashboard, where `run-checks.mjs` names the failing
@@ -63,11 +69,16 @@ example and the pre-fix `embed.js` — over an otherwise fresh clone, which the 
 `Restoring from build output cache` step explains. Two tests failed on content their own commit had
 replaced, everything else passed, and it read as a flaky suite for a day.
 
-**Fix it in the dashboard, not the repo:** clear the project's build cache in Workers Builds
-(Settings → Build → clear build cache) and re-run the build. Nothing pushed to this repository can
-refresh a stale cache, and deleting the assertions that noticed would leave the stale assets
-deploying silently. The message names every drifted path, so check them against the commit before
-assuming the cache.
+**The gate repairs it now (2026-10-14).** Inside Workers Builds (`WORKERS_CI=1`) the gate resets
+every drifted tracked file to HEAD with `git reset --hard`, lists the files it reset under
+`[run-checks] … resetting them to the commit`, and carries on. Git in the container holds the commit,
+so the cache can no longer decide what gets checked or deployed, and nobody has to clear it by hand.
+Untracked leftovers are still only reported. Outside a build container the gate still refuses and
+touches nothing, because there a drifted file is someone's uncommitted work.
+
+If the refusal still appears in a build log, the reset ran and the files differ again, so something
+is rewriting them during the build; clearing the cache will not fix that. Before 2026-10-14 the
+remedy was clearing the build cache in the dashboard (Settings → Build → clear build cache).
 
 ## Tracing
 
@@ -75,8 +86,8 @@ assuming the cache.
 `[observability.traces]` with `head_sampling_rate = 1`. The runtime emits spans for every handler
 invocation, external fetch, and KV or Durable Object operation, with no code change. Export goes
 to an OTLP destination configured in the dashboard (Observability → Destinations); Honeycomb,
-Grafana Cloud, Axiom, and Sentry all accept it. Spans are billed from October 2026, and
-`head_sampling_rate` is the cost knob — the invariant-level questions (how long did FRED take
+Grafana Cloud, Axiom, and Sentry all accept it. Spans move to unified volume pricing on December 1,
+2026 (50 GB/mo included, $0.25/GB thereafter), and `head_sampling_rate` is the cost knob — the invariant-level questions (how long did FRED take
 against the 10s read deadline, what wrote to KV on a read) need a fraction of traffic.
 
 ## Source maps
@@ -101,16 +112,18 @@ the Slack signing secret gates one webhook route.
 | Secret | Read by | Without it |
 | --- | --- | --- |
 | `FRED_API_KEY` | `lib/fred.ts` (`fetchFredRows`) | FRED reads stay on the chart-export CSV. A vintage request (`asOf`) throws instead of returning today's revision. |
-| `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median stays on Yahoo's unofficial endpoint. |
-| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly rather than skipping: the regime-history one at its PR step, the freeze at its first line, before it spends a live read. Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token: contents and pull requests, write, on this repository only. |
+| `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median reads SEC EDGAR filings priced with Cboe's delayed quotes, falling back to Yahoo Finance. Neither needs a key. |
+| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly rather than skipping: the regime-history one at its PR step, the freeze at its first line, before it spends a live read. Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token on this repository only: contents and pull requests, write; checks, read. The checks permission is what lets a Workflow read its branch build before merging (`WHETHER_AUTOMERGE_DATA_PRS`); without it the merge step fails with HTTP 403 and leaves the pull request open. |
 | `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
 | `SLACK_WEBHOOK_URL` | `lib/delivery/slack.ts` (`slackChannel.listTargets`), for the Monday brief, both crons' `check-regime-change` alerts and the month-end pulse | The operator's own channel is not a target. Every post still goes to the channels subscribed through the form (the per-team webhook registry), and the three tripwire alerts — a regime change, a flip window narrowing, and (since 2026-09-17) a flash, an outsized move in the short rate or the curve since the previous read — are still recorded in the step's result and still reach alert subscribers by email through `alert-deliveries`. |
+| `WHETHER_OPS_EMAIL` | `lib/delivery/opsNotice.ts` (`sendOpsFailureNotice`), at the end of each cron run and from both Workflows when they fail | Failures are recorded on `/trust` and reach nobody: every run with a failed step writes a failing `ops-notice` row saying the address is unset. With it, a run where any step failed sends one email to that address through the `EMAIL` binding, naming each failed step and its error; a run where everything succeeded sends nothing. The address is not a secret, but set it with `wrangler secret put` so it stays out of the repository. |
 | `CLOUDFLARE_ACCOUNT_ID` | `lib/telemetry/runHistory.ts`, `lib/export/briefScreenshot.ts` | Both readers below report themselves unconfigured. The account id is not a secret, but it is set the same way so the two tokens cannot be present without it. |
 | `CLOUDFLARE_ANALYTICS_READ_TOKEN` | `lib/telemetry/runHistory.ts` (`loadCronRunHistory`), from `app/trust/trustPageModel.ts` | `/trust` renders no "Scheduled runs" section. With it, the page reads the `cron-step` stream back through the Analytics Engine SQL API and shows runs, failures, and last success per scheduled step for the trailing 30 days, cached 15 minutes per isolate under a 2.5s deadline. Token permission: Account Analytics: Read. |
 | `CLOUDFLARE_BROWSER_RENDERING_TOKEN` | `lib/export/briefScreenshot.ts` (`captureAndStoreBriefScreenshot`), from the Monday cron | The `artifact/brief-screenshot` cron step reports `skipped_unconfigured` and the Slack brief goes out as text blocks. With it, the cron captures the weekly-call block at `/?screenshot=1` through the Browser Rendering screenshot endpoint, stores the PNG in KV under the record date for 60 days, and the Slack post carries it as an image block served from `/api/image/brief-screenshot?date=YYYY-MM-DD`. Token permission: Browser Rendering: Edit. One capture a week sits well inside the free plan's ten minutes of browser time a day. |
 
-The FRED key is free and allows 120 requests a minute; Alpha Vantage's free tier allows 25 a day,
-which the fifteen-symbol basket fits once a day (`next: { revalidate: 86400 }`).
+The FRED key is free and allows 120 requests a minute. Alpha Vantage's free tier allows 25 requests
+a day and 5 a minute: each symbol is fetched at most once a day (`next: { revalidate: 86400 }`), but
+a basket fetched at once still exceeds the per-minute limit, and the comps then fall through to EDGAR.
 
 ## Browser notifications (VAPID keys)
 
@@ -196,7 +209,15 @@ secret refuses in seconds and names the secret in its `brief-freeze` row rather 
    repository should say which one rather than inherit it from a constant two modules away.
 
 Then watch `/trust` → Scheduled runs for a `Brief freeze outcome` row on the next Monday, and
-`automation/weekly-brief-freeze-<slug>` for the pull request. Nothing merges it without a person.
+`automation/weekly-brief-freeze-<slug>` for the pull request.
+
+### Data pull requests merge themselves (2026-10-14)
+
+With `WHETHER_AUTOMERGE_DATA_PRS = "1"` in the top-level `[vars]`, both data Workflows merge the pull request they opened (`worker/workflows/landDataPullRequest.ts`). Each waits five minutes for Cloudflare's branch build to start, checks it every five minutes for up to 45 more, then squash-merges only if `lib/github/dataPullRequestMerge.ts` allows it: the pull request is open, it changes exactly the Workflow's one data file, and every Workers Builds check run on its head commit concluded `success`. The merge is pinned to that commit, so GitHub refuses it if anyone pushed after the check.
+
+The branch build is a real gate only because its deploy command became `bun run deploy:cloudflare:branch-check` on 2026-10-14 ("Branch builds" below). Under `npx wrangler preview`, every branch build failed after the gate passed, so a Workflow would never have merged anything. If that command changes again, check that a green branch build still means the deploy gate passed.
+
+A pull request the Workflow may not merge stays open, and the run fails with the reason. That puts it on `/trust` as a failing outcome row and, where `WHETHER_OPS_EMAIL` is set, in the owner's failure email. Set the var to `"0"` to hand merging back to a person.
 
 Why not wait for a longer preview trial: `data/published_briefs.json` is deliberately never
 backfilled, so every week spent proving this is a week the record can never honestly claim. The
@@ -254,7 +275,15 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 
 The dry-run commands run both validation layers, because neither sees what the other does. They first build the selected environment, then run the adapter's own `--dry-run --skip-build`, which checks the adapter contract — router mode, ISR wiring, and the data and image adapters the routes require — and finally run the repo-local `wrangler deploy --dry-run`, which packages the Worker and validates bindings and upload limits without publishing. A successful dry run therefore provides deploy-package evidence rather than only a scaffold check, and an adapter-contract break reports itself as an adapter error instead of a later packaging failure.
 
-This dry run is now a manual check: `bun run deploy:cloudflare:dry-run`. The workflow that used to run it on every pull request is dispatch-only, because the account stopped paying for Actions minutes on this private repo. Packaging is still exercised on every push by Cloudflare Workers Builds, which builds the Worker and fails the deploy on the same errors the dry run would surface — the difference is that it finds them after the merge rather than before it, so run the dry run by hand on anything that touches bindings, the adapter, or bundle size.
+Locally the production dry run is a manual check: `bun run deploy:cloudflare:dry-run`. The GitHub workflow that ran it on every pull request is dispatch-only, because the account stopped paying for Actions minutes on this private repo.
+
+### Branch builds (Workers Builds Previews)
+
+Every pushed branch gets its own Workers Builds run from the Worker's Previews base config: the same build command (`bun run check:vinext`), then the base config's deploy command. That command is `bun run deploy:cloudflare:branch-check` (set 2026-10-14): it builds against `env.preview` and runs both dry-run layers, the adapter contract and `wrangler deploy --dry-run`, and uploads nothing. So packaging, binding and bundle-size failures show on the pull request's check before the merge.
+
+It used to be `npx wrangler preview`, which every branch failed: it ran Wrangler against the raw sources, without the vinext build, and could not resolve `@opentelemetry/api` or `virtual:vinext-image-adapters`. A permanently red check on every pull request is the signal that hides a real failure (see the removed `Deploy` workflow above). Making it upload is not the fix either. A preview built from the top-level config binds production `WHETHER_DURABLE_KV` and `VINEXT_KV_CACHE`, and the read path writes to KV in the background, so branch code would write production data. Real preview URLs need a Preview whose bindings are the `env.preview` ones; until that is proven, branch builds validate and stop.
+
+The base config lives in Cloudflare, not in this repo. Read it with `cf builds workers get <script tag>` (`cf workers list` gives the tag as `id`).
 
 ### Current toolchain notes
 
@@ -295,7 +324,7 @@ The active `wrangler.toml` declares the following bindings on both the productio
 
 ### Durable KV (`WHETHER_DURABLE_KV`)
 
-All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`, and the subscriber, Slack-webhook, alert and entitlement stores) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`, which refuses a binding without `list()`. Stored JSON is read back through `getJson` / `parseStoredJson` in the same module, narrowed by a zod schema or the store's own parser; an unparseable or non-matching record reads as no record. Every `get…Store()` / `get…Repository()` picks KV or its in-memory fallback through `selectStoreByBinding` (`lib/runtime/storeSelection.ts`), which re-checks the binding on each call the way `getDefaultIngestionStore` does, so a call that ran before the binding was installed no longer leaves the isolate writing to memory.
+All repositories (`lib/operatingState/snapshotStore.ts`, `lib/storage/postureTransitionEventRepository.ts`, `lib/storage/decisionMemoryRepository.ts`, `lib/storage/regimeAlertRepository.ts`, `lib/ingestion/store.ts`, and the subscriber, Slack-webhook and alert stores) store in `WHETHER_DURABLE_KV`; the shared accessor is `getWhetherKv()` in `lib/runtime/kv.ts`, which refuses a binding without `list()`. Stored JSON is read back through `getJson` / `parseStoredJson` in the same module, narrowed by a zod schema or the store's own parser; an unparseable or non-matching record reads as no record. Every `get…Store()` / `get…Repository()` picks KV or its in-memory fallback through `selectStoreByBinding` (`lib/runtime/storeSelection.ts`), which re-checks the binding on each call the way `getDefaultIngestionStore` does, so a call that ran before the binding was installed no longer leaves the isolate writing to memory.
 
 The consolidated state architecture operates around `refreshOperatingState()`, which executes the single authoritative signal refresh, pure regime evaluation, `OperatingSnapshot` persistence, state machine update, and transition recording. Current brief reads project the latest committed `OperatingSnapshot`; explicit historical reads continue to reconstruct the requested period. Read paths perform zero writes while the materialized signal store is current; a cold store ingests inline, and a stale one takes the refresh lock and refreshes off the request (Invariants 1, 1b, 1c in `tests/architectureInvariants.test.ts`).
 

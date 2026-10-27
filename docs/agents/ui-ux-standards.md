@@ -130,9 +130,8 @@
   regime label) leads, in the regime ink at the reading's own size; the trust headline and record
   date follow in the meta half of the same line; the H1 is secondary below `lg` — the bottom tab
   bar owns the route name on a phone. No kicker: "Weekly brief" above every H1 restated the route
-  the header, the sidebar and the tab bar already name. The operating-loop glyph renders from `lg`
-  up only — below that its four steps are the tab bar's tabs, and under the intro it was a second
-  navigation band.
+  the header, the sidebar and the tab bar already name. No emblem beside it either (§XXV): the
+  operating-loop glyph that sat there, and later on `/about`, is deleted.
 - NEVER: give the hero an action that targets the block directly beneath it, or a button to a route
   the header tab already reaches. Four routes pointed the hero button, an inline "↓" link and the
   first index entry at the same anchor, and every secondary button pointed at `/`. A hero action
@@ -194,7 +193,7 @@ Scope: every element that draws a box — a border, a fill, or a lift — under 
   `weather-*` class; it cannot reach one written as Tailwind utilities, so that case is on the
   author.
 - An offset shadow is elevation. A zero-offset coloured halo is emphasis, and is fine at depth —
-  `DecisionHero`'s reconsideration panel tints one amber or emerald by state, which carries meaning
+  `DecisionHero`'s reconsideration panel tints one by line state (the front red or the clear ink), which carries meaning
   rather than lifting the box.
 - MUST: add a new `weather-*` container class to the `:is(...)` lists in that ladder.
   `tests/surfaceDepthLadder.test.ts` derives the set from the stylesheets and fails when one is
@@ -202,7 +201,8 @@ Scope: every element that draws a box — a border, a fill, or a lift — under 
   tints are excluded there by name: a button inside a card is not a nested container.
 - SHOULD: stop at three levels of visible enclosure. Past that the frames stop separating anything —
   a box inside a box inside a box is a list, and spacing and type carry it better. `/operate` sat at
-  five, and the fix was to drop frames rather than to restyle them.
+  five, and the fix was to drop frames rather than to restyle them; since 2026-10-09 its only box is
+  the page intro (§XXV).
 - Measuring this needs the browser, not a grep: computed colours arrive as `oklab()` for any
   Tailwind `/opacity` modifier, so a regex looking for `rgb(` reports a page as clean when it is not.
   Normalise colour through a canvas, and treat "is it positioned" as a question about the ancestor
@@ -232,6 +232,27 @@ take the other's job.
   | Surface | `--radius-2xl` (16px) | `rounded-2xl`, `.weather-surface`, dialog and drawer popups | the outermost container, sheets, the identicon tile |
   | Round | `--radius-full` | `rounded-full` | dots, markers, spinners, switches, progress bars, icon wells, seals |
 
+- MUST: one meaning per mark. Small marks are a vocabulary, and a shape that means two things on
+  one page means neither (added 2026-10-14, when the trust strip's caveat ring sat one section
+  above the score ladder's past-reading ring).
+
+  | Mark | Means | Where |
+  | --- | --- | --- |
+  | Filled dot | lit: chosen, or as it should be | segment lamps, live sources, a series' current point |
+  | Hollow ring | a past reading singled out | the ladder's last reading, the months a call changed and where a trace starts on `/history` |
+  | Dashed ring (`CircleDashed`) | a score close to its line | the line-state "close" glyph (§XXIV) |
+  | Pause and play | a pause line crossed; clear of it, or a resume line met | the line states (§XXIV) |
+  | Outlined diamond (`.weather-caveat-mark`) | read this reading with care | cached sources, a scoring note, an archived week, guidance held back |
+
+  The diamond is the one mark that is not round: it is a warning sign's shape, not a data marker,
+  and its colour is the caveat ink, never the crossed red. A new kind of mark gets a row here
+  before it ships.
+- MUST: a caveat that takes a whole band (cached or late data, an archived month, offline) is
+  `border border-l-4 border-caveat-border bg-caveat-bg text-caveat-fg` with the diamond on its
+  first line, as `HistoricalBanner` draws it. The heavy rule and the mark set it apart from an
+  ordinary band. Never the `amber-*` or `rose-*` utilities: both resolve to the crossed red, and
+  until 2026-10-21 the homepage's late-data line and `/operate`'s cached-data alert drew in them,
+  so late data read as a crossed line.
 - NEVER: `rounded-full` on a text-bearing element. A pill beside a 2px chip is two badge shapes
   for one class of information, and until 2026-09-02 it put the softest shape on the page around
   the most assertive content (`3 NEED ATTENTION`, `HOLD`, `Q4 2018 analog`). Verdicts are
@@ -264,7 +285,7 @@ take the other's job.
   numerals stay sharp on purpose: they are tag-class labels and figures. Sentence-casing every
   eyebrow was considered for this register and rejected — it stacks near-duplicates (`Plan` over
   `Weekly plan`) across the report shells. Rationing eyebrows is per-surface content work
-  (the 2026-09 UI facelift, Phase 2), not a register change.
+  (the 2026-09 UI facelift, Phase 2), not a register change; §XXV says which ones stay.
 
 ## XV. Encoding a number (figure register, and when to draw the line)
 
@@ -309,36 +330,77 @@ Scope: any surface that states a reading, a threshold, or the distance between t
 
 ## XVI. Colour that means something (the regime accent)
 
-Scope: every surface that tints, rules, or labels itself by the week's regime.
+Scope: every surface that tints, rules, or labels itself by the week's regime, and every colour on
+the site, since 2026-10-09.
 
+The palette is Synoptic (`docs/design/palette-directions.md`, applied in
+`docs/feature-specs-current.md` §1.1.69). Colour carries two things and nothing else: the four
+conditions, and where a line stands. Everything else is ink.
+
+| Role | Token | Dark | Light |
+| --- | --- | --- | --- |
+| Ground (night chart / chart paper) | `--bg-body` | `#0f1316` | `#f1f4f3` |
+| Panel | `--bg-panel` | `#171c20` | `#ffffff` |
+| Ink, and the action colour with no regime (§XXVII) | `--app-text`, `--accent-action` | `#edf0ee` | `#121719` |
+| Secondary ink | `--app-text-secondary` | `#cdd3d1` | `#384145` |
+| Muted ink | `--app-text-muted` | `#a0a9a7` | `#525c60` |
+| A line crossed or close (front red) | `--line-crossed-ink` / `--line-crossed` | `#f2685c` / `#e5484d` | `#b4232a` / `#d13b37` |
+| A line clear | `--line-clear-ink` | the ink | the ink |
+| Sunny (Sun) | `--color-condition-sunny` / `-ink` | `#d9a82c` / `#f5cf5a` | `#d9a82c` / `#7a5800` |
+| Cloudy (Haze) | `--color-condition-cloudy` / `-ink` | `#9d7a4a` / `#d6b98a` | `#9d7a4a` / `#74552a` |
+| Stormy (Lightning) | `--color-condition-stormy` / `-ink` | `#8f96e0` / `#b9bfff` | `#8f96e0` / `#4a4fc0` |
+| Freezing (Frost) | `--color-condition-freezing` / `-ink` | `#3a6fa3` / `#8cc0ec` | `#3a6fa3` / `#1d5585` |
+
+- MUST: draw a condition from the condition tokens and a line state from the line-state tokens,
+  never one from the other. Warm is risk appetite on (Sunny, Cloudy), cool is off (Stormy,
+  Freezing); light is cheap money (Sunny, Stormy), dense is dear (Cloudy, Freezing), so the four
+  differ in lightness as well as hue and a red-green colourblind reader keeps them apart. A cleared
+  line printed in Sunny's green and a crossed one in Cloudy's amber until 2026-10-09; on the light
+  theme those two would have been one brown. `tests/regimeColourContract.test.tsx` holds the badge
+  to the line-state utilities and the data-regime map to the condition inks.
+- MUST: name the role, not the hue, in new code: `text-line-crossed-fg`, `border-line-clear-border`,
+  `bg-condition-sunny`, `text-condition-freezing-ink`, the `--accent-*` and text tokens. The stock
+  ramps components already name are folded onto the roles in `tokens.css` (emerald is the clear
+  ink, amber and rose the front red, with amber at half strength as a fill, sky and cyan the
+  action ink); they are kept so 630 class names did not move, not as a vocabulary.
 - MUST: take the regime's colour from the two tokens, never from a hue picked at the call site.
-  `--regime-accent` is the 500-level hue the regime plane and the posture stripe draw in
-  (`REGIME_HEX_COLORS`), for tints, rules and washes through `color-mix`. `--regime-ink` is the
-  same hue as text — the pastel that reads on the dark surfaces, the 700-level that clears 4.5:1
-  on the light ground. Both resolve from a `data-regime` attribute (`tokens.css`), which the page
+  `--regime-accent` is the condition's fill, the one hex the regime plane and the band draw in
+  (`REGIME_HEX_COLORS`, the same in both themes), for tints, rules and washes through `color-mix`.
+  `--regime-ink` is the condition as text: the light ink on the dark ground, the dark one that
+  clears 4.5:1 on the light ground. Both resolve from a `data-regime` attribute (`tokens.css`), which the page
   shells and `DecisionHero` carry via `regimeDataAttribute` (`lib/regimeAccent.ts`). Every
   `ReportShell` caller passes `regime` from its report data — `regimeAccentStyle` was written for
   the section eyebrows and rules to read the week, and until 2026-09-15 no report page fed it, so
   every shell rendered slate under a call its own intro line named. `/history/compare` is the one
   deliberate exception: two weeks on one page, and keying it to either would mislead.
-- SHOULD: keep the regime ink for section-level marks — the `ReportSection` eyebrow and rule, and
-  `.type-eyebrow-section` on a hand-rolled section's own eyebrow (`/signals`, `/history`,
-  `/operate` carry these). A card's own eyebrow inside a section is neutral (`.type-eyebrow`
-  alone); `/signals` carried sky card eyebrows beside a rose section eyebrow, two accents for one
-  hierarchy. Sky stays for what it means elsewhere: links, and the cards whose border is already
-  sky.
-- MUST: keep the four regime hues off the action accent. Sky is what every link, button and focus
-  ring is drawn in, and until 2026-09-16 Stormy was sky-500 — under that call the regime and the
-  controls were one colour. Stormy is violet (`#8b5cf6`, ink `--color-semantic-stormy-fg`);
-  `tests/regimeColourContract.test.tsx` fails if a regime lands back on the sky ramp.
+- SHOULD: keep the regime ink for the marks that name the week: the stamp, a report intro's status
+  word, and `.type-eyebrow-section` on the label of a reading (`SignalReadingPanel`). The
+  `ReportSection` eyebrow and its gradient rule, which carried it on every section, are gone
+  (2026-10-09, §XXV). A card's own label inside a section is neutral (`.type-eyebrow` alone);
+  `/signals` carried sky card eyebrows beside a rose section eyebrow, two accents for one
+  hierarchy.
+- MUST: keep a fixed fifth hue off the action colour. With no regime, links, buttons and focus
+  rings draw in the ink (`--accent-action`); under a shell that knows its regime they draw in the
+  week's ink (`--accent-action: var(--regime-ink)`, 2026-10-14). Either way there is no hue that
+  means "click": sky meant that until 2026-10-09, forced Stormy off blue, and under a Stormy call
+  made the regime and the controls one colour. Because the action colour can now be the
+  condition's own ink, hue no longer tells a control from the condition stamp; form does (§XXVII).
+  Links keep their underline; the primary button is the action colour as a fill with the ground
+  as its label (`--cta-fill`, `--cta-ink`). `tests/regimeColourContract.test.tsx` holds both.
+- MUST: keep a focus ring visible in both themes. It is the ink, 16:1 on the dark ground and 18:1
+  on the light one, with the soft halo (`--focus-halo`) behind it.
+- MUST: tell data series apart by ink and dash, not by a hue, when they are neither a condition
+  nor a line state. The rates chart on `/signals` draws its four terms as muted dotted, muted
+  solid, ink dashed and ink solid, and its key draws the same lines.
 - MUST: paint the page atmosphere from `--regime-atmosphere`, via `.weather-regime-ground`, on
   both shells. The brief's container and the report backdrop each held a regime → tint table of
   their own — the report one had Sunny in teal and never faded, so the ground under every card on
   every report route was lifted to a grey and the depth ladder lost half its separation.
-- MUST: key the report intro (`CommandCenterNavBlock`, `.weather-page-intro`) to the regime like
-  the hero: wash, border and top edge from `--regime-accent`, the status word in `--regime-ink`.
-  It was plain slate under a status line that named the week, so `/` showed a colour and every
-  other route showed none.
+- MUST: print the report intro's status word (`CommandCenterNavBlock`) in `--regime-ink`, and give
+  the intro card no other hue. From 2026-09-16 to 2026-10-09 the card also carried the hero's wash,
+  border tint and 3px top rule (`.weather-page-intro`, now deleted): a second and third drawing of
+  the fact the word states (§XXV). The brief's hero keeps its rule, because it is the card people
+  crop and share.
 - NEVER: print text in `--regime-accent`. At 12–13px on the light ground it sits near 3:1; the
   section eyebrows did this until 2026-09-15.
 - MUST: key a surface's colour to the regime the copy on it states, from the same source. The
@@ -367,8 +429,7 @@ Scope: every surface that tints, rules, or labels itself by the week's regime.
 
 ## XVII. Responsive diagrams
 
-- Keep prose labels in HTML for flow diagrams (`OperatingLoopGlyph`), so labels wrap at
-  mobile widths and text zoom. SVG is for the artwork, not a fixed-width page of text.
+- Keep prose labels in HTML for flow diagrams, so labels wrap at mobile widths and text zoom. SVG is for the artwork, not a fixed-width page of text.
 - Bound the coordinate and rendered widths of text-bearing charts. `ThresholdLadder`
   caps its coordinate width at 300 and rendered width at 1.4 times that; wider parent
   rows must not reduce its labels to miniature type on phones or inflate them on desktop.
@@ -416,6 +477,12 @@ Added 2026-09-23 with DD-028 to DD-030 (`docs/design-debt-prioritized.md`).
 - **Draw each encoding once.** A fact already carried by position and a key does not also need a
   box, a hue and a case. When a block has a border *and* a coloured heading *and* capitals, pick
   one.
+- **Print each fact once per page** (2026-10-09, `docs/feature-specs-current.md` §1.1.63). A fact
+  restated in another element at the same level of detail is clutter: a sentence over the control
+  that shows the same selection, a banner over the section that says it, a score in five places.
+  Keep the richer form (a chart or bar over a sentence, a control over a sentence describing its
+  state) and, when the removed copy was a visual's only text, an sr-only version. A summary over
+  its detail stays. Check both widths first: two elements are duplicates only where both show.
 - **Labels on a chart are laid out for the width they are drawn at.** The server cannot measure
   a track, so compute the layout for each width the component is actually drawn at and let a
   container query choose (`ScoreLadder`); computing for the narrowest width and applying it
@@ -533,3 +600,256 @@ and the rest are short and interruptible.
   entering with `ease-out`. An exit is quicker than its entrance.
 - **Every new transition has a reduced-motion end state:** `motion-reduce:transition-none` on the
   element, or a `prefers-reduced-motion` block beside the rule.
+
+## XXIV. Glyphs beside words (the concept icons)
+
+Added 2026-10-09. Three concepts carry a glyph, and only these three: the four conditions, the five
+decision areas, and where an area stands against its pause line. Everything else stays words.
+
+| Concept | Glyphs | The one mapping | The one component |
+| --- | --- | --- | --- |
+| Conditions | Sunny `Sun`, Cloudy `Cloud`, Stormy `CloudLightning`, Freezing `Snowflake` | `REGIME_ICONS` (`lib/regimePresentation.ts`) | `ConditionIcon`, `ConditionLabel`, and `Tag regime` |
+| Areas | Hiring `Users`, Roadmap `Route`, Fundraising `Landmark`, Spending `Wallet`, New bets `Sprout` | `DECISION_AREA_ICONS` (`lib/report/boundedDecisionRules.ts`) | `AreaIcon`, `AreaLabel`, `GovernedAreas` |
+| Line state | crossed `Pause`, close `CircleDashed`, clear or resume met `Play` | `LINE_STATE_ICONS` (`lib/report/operatingCalls.ts`), state from `resolveLineState` | `LineStateBadge`, `LineStateIcon` |
+
+The components live in `app/components/ui/conceptIcons.tsx`.
+
+- MUST: put the glyph beside its words, never in place of them, and mark it `aria-hidden`. The words
+  carry the meaning for a screen reader and for a paste.
+- MUST: draw a concept through its component. A page that imports `Sun` or `Pause` from
+  `lucide-react` for one of these concepts draws the right glyph until the mapping changes and that
+  page does not. `tests/conceptIcons.test.tsx` rejects the import outside the three mappings (the
+  theme toggle's sun in `uiIcons.tsx` is a lamp, not the weather).
+- MUST: one size scale. 16px (`size-4`) inline, 20px (`size-5`) on a card such as the decision
+  picker's choices or the comparison's period headings. Inside a scaled SVG, pass `width` and
+  `height` in the drawing's units so the glyph lands at 16px at the drawing's cap (the conditions
+  chart uses 12.5 units at its 256px cap).
+- MUST: colour from the tokens the words already use, so shape and colour say the same thing. A
+  condition draws in its regime ink (`data-regime` on the glyph resolves `--regime-ink`); a state
+  in the line-state ink (the front red for crossed or close, the neutral ink for clear); an area in the text colour around
+  it. The shape alone still says it in greyscale, which is what the `/history` band needed: its
+  runs and key told Sunny, Cloudy and Freezing apart by colour alone.
+- "Close" is the margin's own distance: within 5 points (`REGIME_CONFIDENCE_NEAR_THRESHOLD`). A
+  resume line has a state only once it is met; short of it the distance stays plain text.
+- A line in force is a stamp (§XIV): the badge is framed for a pause line crossed and a resume line
+  met, unframed for a distance still to go.
+- NEVER: a glyph in a plain-text artifact. Slack and email pastes, citations, RSS, `llms.txt` and
+  `/brief.md` render words only; the same test holds them to it. The Satori share cards do not
+  draw these glyphs either: lucide's components are client components that read a React context,
+  which Satori cannot render, and a hand-copied vector table would be a second mapping.
+
+## XXV. Decoration that encodes something
+
+Added 2026-10-09 with `docs/feature-specs-current.md` §1.1.65, after a design audit of the
+patterns generated interfaces reach for by default. Structure and decoration must encode something
+true about the content. The site spends its boldness in one place, its signature: the conditions
+chart, the weather glyphs and the pause and play line states (§XXIV). Everything else stays quiet.
+
+- NEVER: an emblem beside a page heading. Seven pages drew one (a calibration curve, the operating
+  loop, an editorial desk, a search radar, a decision shield, a toolkit playbook, valuation
+  multiples) and none plotted anything on the page; they are deleted with their components. A
+  drawing earns its place by drawing data: `TrendGlyph`, `ThresholdLadder`, the conditions chart.
+- NEVER: a row of stat tiles, a large figure over a small label in a box. A figure set larger than
+  the sentence beside it claims to be the page's point, and a row of them makes that claim three or
+  five times. A page with one number to lead with sets it as its own line (`/comps` leads with the
+  median multiple); every other figure is a `FactList` (`app/components/ui/factList.tsx`) in the
+  text's size, beside what it qualifies. Its labels are sentence case.
+- NEVER: a small label above a heading as a kicker. A kicker that restates the heading is deleted.
+  One that carries a fact (the week, the period, the plan tier) moves into the heading's line or a
+  stamp. Small labels stay where they label data: table column heads, `<dt>`s, form fields and
+  legends, chart panels and navigation groups.
+- NEVER: a closing "Next" card. A link a header tab, the footer or a sub-tab already carries is
+  not repeated at the foot of the page. An action only that page knows is an inline link in its
+  last section.
+- MUST: headings and whitespace before boxes. A reading page keeps at most one boxed artifact; on
+  `/` it is the call card, the block people crop. A card inside a card is a list: set it as
+  columns under headings. On `/operate` each step is a section under an h2 with a rule between
+  them; the steps a reader acts on this week are open with no toggle, and only secondary content
+  folds (§XII).
+- MUST: draw a fact once (§XVIII). Stop, Start and Keep limited carry their colour on the list's
+  name only, not also in a tinted box and a coloured edge.
+- NEVER: an emoji in text that leaves the site, whether as a label's prefix or anywhere else. The
+  label carries the meaning. `tests/conceptIcons.test.tsx` renders every share format, the meeting
+  slide, the operator brief, the investor update and the weekly paste, and scans the source of every
+  paste, slide, Slack and email builder.
+- MUST: decoration only where it encodes meaning. No wash over the page ground, no gradient or
+  specular on a control (controls fill from `--bg-raised` and `--bg-nested`, the primary from
+  `--cta-fill`), no halo on hover, no coloured stripe across the top of a card, no accent discs on
+  a slide. Condition colour stays where a condition is named: the stamp, a report intro's status
+  word and the chart.
+- What stays, and why. Focus rings: they mark where the keyboard is. The skeleton shimmer: it says
+  something is loading. The backdrop blur on the sticky strip, the phone tab bar and the command
+  palette: it keeps their text legible over a scrolling page. The call card's regime rule and the
+  site's name inside it, on `/` and on a published week: that card is the one people crop and
+  share, the rule names the week in a crop, and every other page's header names the site already.
+- The week's word as a placard (2026-10-21). The call card's stamp and the report intro's status
+  word print in the condition's solid fill with `--regime-on-accent` ink (`.weather-tag-placard`),
+  so the week's condition is the one solid block of colour on a page. Lists of past weeks keep the
+  tinted `.weather-tag-regime`. The conditions chart lights the week's quadrant and dims the other
+  three, so its colour field says which weather it is before the eye finds the dot.
+
+
+## XXVI. Controls as instrument parts
+
+Added 2026-10-13 with `docs/feature-specs-current.md` §1.1.73. A control is drawn as a part of
+an instrument: what it is shaped like says how it works. The form is physical, the paint is not —
+§XXV's ban on gradients and specular on a control stands.
+
+- MUST: a segmented control is a well with keys in it. The track is recessed (`--bg-nested`,
+  `--well-inset`); the chosen key stands proud of it (`--bg-raised`, `--elev-1`, a strong border);
+  a key sinks while pressed (`translateY(1px)`, `--key-pressed`). All of it lives on
+  `.weather-segment-track` and `.weather-segment-option` in `app/styles/controls.css`, driven by
+  the native radio's `:checked`, `:hover` and `:active`; `ui/segmentedControl.tsx` only lays the
+  parts out. A tint was the whole selected state until now, and at 15% of the ink it barely
+  separated from the track.
+- MUST: every key carries a lamp, unlit until chosen. The choice then reads by form and by a mark
+  as well as by fill, which is what a reader with low contrast sensitivity or a washed-out screen
+  needs. It is a dot, so it is round (§XIV).
+- MUST: options that are points on one ordered scale (runway bands, the funded stages) pass
+  `ordinal`: a rule along the foot of the well with a tick under each key and a pointer under the
+  chosen one. An option off that scale passes `apart` and stands after a divider with no tick:
+  Bootstrapped is not a stage after Series B+.
+- NEVER: a gradient, a specular edge, a texture or a coloured glow to make a control look
+  physical. Depth is shadow geometry from the tokens, which flips colour with the theme and keeps
+  one height in both.
+- Motion is the press only: 120ms on the transform, and none under reduced motion.
+- MUST: the same parts outside a track. A stepper's ends are `.weather-step-key`s standing in a
+  well around what they step (the week stepper, `app/components/home/WeekStepper.tsx`); the end
+  with nothing beyond it sinks flat and unlit rather than drawing a faded copy of a key. A toggle
+  button whose state is `aria-pressed` is a `.weather-key` (the calendar's months). An option in a
+  picker's list carries the lamp (`.weather-choice-item`), not a check over an action-ink wash.
+- NEVER: a translucent popup with nothing blurred behind it. At 95% the page's text read through
+  the header's pickers and the calendar; a popup is opaque, or it blurs what it covers (§XXV keeps
+  the blur where text must stay legible over a scrolling page).
+
+## XXVII. Display or control
+
+Added 2026-10-21. A **control** changes what the page shows or takes the reader somewhere: a
+link, a button, a disclosure, a picker, a segment, a key, a field. A **display** states a fact and
+does nothing when pressed: a stamp, a delta, a figure, a mark, a label, a callout, a chart. Each
+cue below belongs to one side, and a reader learns the split from the first page they use. Since
+2026-10-14 the action colour is the week's ink under a regime shell (§XVI), the same hue as the
+condition stamp, so these cues are the only way left to tell a control from a display.
+
+| Cue | Belongs to | Notes |
+| --- | --- | --- |
+| The action colour: `--accent-action`, and the `sky-*` / `cyan-*` utilities folded onto it | controls | A display that names the condition takes `--regime-ink` from its own token (the stamp, the intro's status word, `.type-eyebrow-section`), never through the action aliases |
+| An underline | links | A term with a definition is a link to it, or plain text with the gloss beside it |
+| The control radius (`--radius-lg`) with a frame | controls | §XIV: a framed display is a stamp at `--radius-sm`, a data tile at `--radius-md`, or unframed |
+| A lift (`--elev-1`) or a press (`translateY`) | controls | |
+| A chevron | disclosures and pickers | §XII |
+| `cursor: pointer`, or any `hover:` change | controls | A row or a run that brightens under the pointer promises a click it does not answer |
+| A lamp (a filled dot in a key) | controls, for the chosen option | A filled dot outside a key is a data mark (§XIV's mark table), drawn in ink or its condition's ink |
+| The stamp frame (`.weather-tag`, `type-stamp`, `rounded-sm border`) | displays | A link drawn as a stamp reads as a label; give it the `pill` or `inline` variant (§X) |
+| The line-state glyphs, the caveat diamond, the condition glyphs | displays | §XIV, §XXIV |
+
+- MUST: draw a display in the ink roles (`--app-text`, `-secondary`, `-muted`, the `slate-*`
+  utilities folded onto them), a condition ink, a line-state ink or the caveat ink. A callout
+  that wants to stand apart takes a neutral frame (`border-slate-700/70` on a `slate-900/40`
+  fill), not a tint of the action colour: under a Cloudy week a sky-tinted note drew as a tan box
+  beside the tan stamp and the tan Copy button, three different jobs in one hue.
+- MUST: draw a data series, a marker line or a progress bar in ink (§XVI's ink-and-dash rule).
+  A scatter in the action colour reads as a selection.
+- A control's own state marks take the action colour: the current tab's rule, a picker's chosen
+  item, a segment's lit lamp, a focused field's ring. They sit inside the control, and the guard
+  reads them as part of it.
+- NEVER: a display set in a control's box. The sticky strip's direction badge was a 28px icon in
+  a 6px frame, the same shape as the download button three items to its right; it is a glyph now,
+  unframed, beside the words it qualifies.
+- NEVER: a control class on a display. `.weather-hub-chip` lifts on hover and sets a pointer; the
+  toolkit cards wrapped one around the word "Tool", inside a card that was itself the link, so it
+  read as a second button. A label inside a link card is a `Tag`.
+- `tests/displayControlCues.test.ts` reads every component under `app/` and fails when an element
+  outside any link, button, label or picker part carries the action colour, a `hover:` change or
+  a control class, or when a link or button carries the stamp frame.
+
+## XXVIII. Every frame is a screenshot
+
+Added 2026-10-27 with `docs/feature-specs-current.md` §1.1.87. A reader shares a page in one of two
+ways. On a phone it is the whole screen, wherever they stopped scrolling. On a laptop it is a box
+dragged around one block. A page reads well as a screenshot only if both pictures name their source
+and hold their unit whole. `bun run ui:frames` (scripts/ui-frames.mjs) walks every live route at a
+1440×900 laptop and a 390×844 phone, frame by frame, and fails a route on either. It is not in the
+gate, which has no browser: run it after layout work, beside `bun run ui:iterate`.
+
+- MUST: name the site in every frame, and on a page that reports a reading, the date and the
+  conditions too. The header hides on scroll, so past the first screen this is the running head's
+  job (`app/components/runningHead.tsx`). A page hands it the facts by spreading
+  `frameFactsAttributes(…)` (`lib/navigation/runningHead.ts`) onto its intro block: the report
+  intro, the brief's call block, `/share`'s heading, a reading page's `SecondaryPageHeader`. A page
+  that marks nothing is named by its h1. On 2026-10-27, before the head, 7 of 83 frames past the
+  first screen named all three.
+- MUST: keep a sticky row below the head, not under it: `top-[var(--running-head-height,0px)]`, as
+  the section chips and the report rail do. The head sets the variable while it shows.
+- MUST: fit every block a reader would frame in one phone frame under the head (about 810px). A
+  block that is a list of units marks each unit `data-frame-block` (the `/signals` rows, the area
+  rows, the published briefs, the `/concepts` pairs), and each unit carries its own labels: a
+  phone row of the signals table says "Since Sep 30" over its change because the column head is
+  hidden there. A block long by nature, opened on purpose, carries `data-frame-exempt` and the
+  reason beside it.
+- MUST: end a chart a reader crops in `ScreenshotCaption`, inside its border, with its period
+  where the figure does not already print one: the record's phase map, the month strip, the score
+  trends, the calibration chart, the signal panels, the `/concepts` charts and the payback chart.
+- MUST: hide a screen-reader table behind a wrapper (`<div className="sr-only"><table>`), never
+  with `sr-only` on the `<table>`. A table cannot shrink below its content, so a 1px one lays out
+  at full width: one on `/concepts` made the phone page 651px wide and every screenshot of it came
+  out zoomed out. `tests/uiFramesLib.test.ts` scans for it.
+- SHOULD: from `xl`, set parallel blocks side by side rather than stacking them in a column whose
+  prose stops at reading width. The homepage's two "what would change" questions, its readings
+  beside what they leave out, and its record's spells beside its changes do this; a laptop frame
+  then holds both halves of an answer.
+- A heading left at the foot of a frame depends on where the reader stopped, and no layout removes
+  it everywhere. The head names the section in the next frame; the audit reports the rest.
+
+### Frames worth opening (2026-10-27, §1.1.88)
+
+A frame that names its source is attributable; one people open also leaves them a question
+and shows them where to look. What the research on images people engage with says, as rules here:
+
+- MUST: carry the week's open question, how near the reading is to changing and to what. The
+  margin names the conditions across the nearer line ("Risk appetite 2 pts from Freezing",
+  `formatMarginReading` with the regime; `regimeAcrossLine` in `lib/regimePhaseSpace.ts`), and the
+  running head prints the same fact in four words (`formatNearestChange`), in the caveat ink when
+  the call could change next week. A small, specific gap ("2 points from Freezing") is what
+  provokes curiosity; a state ("Cloudy") does not. Screens only: pastes keep `formatMargin`.
+- MUST: draw the claim the frame leads with. The brief's card on a phone draws the nearer score's
+  `ScoreLadder` above the trust strip (`DecisionHero`'s `phoneFigure`): from `md` the conditions
+  map does it, and below it a phone screenshot of the card was text alone. The ladder carries last
+  week's dot too, so the card shows a move toward a line, not only a position.
+- MUST: lead a section with its answer, before its evidence. `HomeSection`'s `lead` is the
+  finding, set at `text-fluid-lg` between body and heading: a reader's eye reaches a frame's title
+  first and keeps its claim. "How unusual is this?" leads with this spell beside the earlier ones
+  (`describeSpellLengths` returns `{ lead, rest }`); "Why conditions are …" leads with the rule
+  that answers it, over the table.
+- MUST: keep a focal point at preview size where a frame can. Slack previews an image about 360px
+  tall, so a phone frame shrinks to about 0.43 and a laptop frame to 0.4, and type under about
+  9px there cannot be made out. The brief's section headings are 22px on a phone for this.
+  `bun run ui:frames` reports, per route, how many frames keep one (`hasThumbnailFocal`); it is
+  advisory, because a page's middle cannot all be large type.
+- SHOULD: point a frame at where the rest is. The running head prints the page's address
+  (`whether.work/signals`), short enough to type from a screenshot, and a 2px rule in the week's
+  colour, which still says which weather it is when the words are too small to read.
+
+### Sizes that hold at every width (2026-10-27, §1.1.90)
+
+A size audit of eleven routes at 390px and 1440px found the page title the smallest heading on
+four report pages on a phone (15px under 20px sections), page titles at five sizes from 15px to
+48px, section headings at 13px to 26px, 215 pieces of phone text under 12px (29 under 10px, the
+`/concepts` chart's labels at 5px), and the brief's decision lists at 13px. One step per role now:
+
+- MUST: set a page title in `text-fluid-2xl` (24px on a phone, 34px wide) on every shell: the
+  report intro (`CommandCenterNavBlock`), `.weather-secondary-title`, and the reading pages' h1s.
+  The brief's call is the one exception, as its card's headline.
+- MUST: set a section heading at 22px on a phone and 24px from `sm`
+  (`text-[1.375rem] leading-tight sm:text-2xl`; `.weather-secondary-section-title` matches). The
+  brief's own sections step to `text-fluid-xl` from `sm`. A heading styled as a small label
+  (`type-eyebrow` on an h2) is a section heading at the wrong size.
+- MUST: draw nothing on a phone under 12px. `text-fluid-nano` has a 12px floor; the ladder's line
+  numbers are 12px. A chart whose coordinate box is wider than a phone draws a phone version
+  rather than scaling its labels down (`adviceCorpusSection.tsx` draws a 360-unit drawing below
+  `sm`); a fixed-size diagram sets its labels so they render at 10px or more.
+- MUST: set the lines a reader acts on at `text-fluid-sm`, not caption size: the brief's "Conditions
+  change if", "Pause if", "Resume when" and the chosen area's answer.
+- MUST: keep the trust strip's phone line to one short phrase per cell. The basis warning prints
+  its four-word form there (`ScoringBasis.warningShort`, "startup-market inputs left out"); the full
+  sentence from `sm`, and always when a note explains a different published week.

@@ -1,6 +1,7 @@
 "use client";
 
-import { useId } from "react";
+import { useId, type ReactNode } from "react";
+import { cn } from "../../../lib/utils";
 
 /**
  * The one segmented control.
@@ -44,13 +45,19 @@ export type SegmentedOption<Key extends string> = {
   /**
    * Secondary text. In the "segmented" strip it follows the label above `sm`
    * and hides on a phone; in "choices" it is the option's second line at every
-   * width, because there it carries the answer rather than a gloss.
+   * width, because there it carries the answer rather than a gloss — on the
+   * decision picker, the area's state badge, which brings its own ink.
    */
-  sublabel?: string;
-  /** "caution" prints the second line in the caution ink: a state, not a label (§XVIII). */
-  sublabelTone?: "caution";
+  sublabel?: ReactNode;
+  /** A decorative glyph before the label (`aria-hidden`; the label still names the option). */
+  icon?: ReactNode;
   /** Native tooltip for the option. */
   title?: string;
+  /**
+   * Off the scale an `ordinal` control draws: set after a gap, with no tick. Bootstrapped is
+   * not a stage after Series B+, so it does not sit on the Seed → Series B+ rule.
+   */
+  apart?: boolean;
 };
 
 type SegmentedControlProps<Key extends string> = {
@@ -71,29 +78,46 @@ type SegmentedControlProps<Key extends string> = {
    * things to press.
    */
   layout?: "segmented" | "choices";
+  /**
+   * The options are points on one ordered scale (runway bands, funded stages): engrave a rule
+   * along the foot of the track with a tick under each key and a pointer under the chosen one.
+   */
+  ordinal?: boolean;
+  /**
+   * Set the sublabel under the label at every width, rather than after it from `sm` up. For a
+   * strip whose sublabels say what each choice changes, which wrapped mid-phrase beside the label.
+   */
+  stackSublabel?: boolean;
   className?: string;
 };
 
+/* The paint is on the classes in app/styles/controls.css (§XXVI): the track is
+   a recessed well, each option a key that stands proud when chosen, lights its
+   lamp, and sinks while pressed. Utilities here only lay the parts out. */
 const CONTAINER = {
-  segmented:
-    "inline-flex flex-wrap items-center gap-0.5 rounded-sm border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-0.5",
-  choices: "flex flex-wrap items-center gap-2",
+  segmented: "weather-segment-track inline-flex flex-wrap items-stretch gap-0.5",
+  /* A grid that fills the row: every option the same width, five across where
+     they fit, two on a phone with an odd last one spanning the row. As a
+     wrapping flex row the cards stopped two-thirds of the way across and left
+     a one-card orphan under the pair. */
+  choices:
+    "grid grid-cols-2 gap-2 sm:[grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr))] max-sm:[&>*:nth-child(odd):last-child]:col-span-2",
 } as const;
 
 /* 44px on touch, dropping to 36px only for a fine pointer (controls.css).
    The focus ring is drawn on the painted span from the input's own
    `:focus-visible`, so keyboard focus stays visible with the input clipped.
-
-   Hover is `peer-hover`: the radio is stretched over the option, so the
-   pointer is always over the input and a plain `hover:` on this span never
-   matched. Every segmented control on the site had no hover state at all. */
+   Hover, checked and pressed are `.peer:*` rules in controls.css: the radio is
+   stretched over the option, so the pointer is always over the input. */
 const OPTION_BASE =
-  "weather-segment-option flex min-h-[44px] min-w-[2.75rem] cursor-pointer items-center justify-center px-3 py-1.5 text-fluid-micro font-semibold transition-colors active:scale-[0.97] peer-hover:text-slate-200 peer-checked:bg-sky-500/15 peer-checked:text-[color:var(--app-text)] peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400";
+  "weather-segment-option flex min-h-[44px] min-w-[2.75rem] cursor-pointer items-center justify-center gap-1.5 px-3 py-1.5 text-fluid-micro font-semibold peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-sky-400";
 
 const OPTION = {
-  segmented: `${OPTION_BASE} rounded-sm text-slate-400 peer-hover:bg-slate-800/50`,
-  choices: `${OPTION_BASE} rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] text-slate-300 peer-hover:border-[color:var(--border-strong)] peer-checked:border-sky-500/50`,
+  segmented: OPTION_BASE,
+  choices: cn(OPTION_BASE, "w-full justify-start"),
 } as const;
+
+const Lamp = () => <span className="weather-segment-lamp" aria-hidden="true" />;
 
 export function SegmentedControl<Key extends string>({
   options,
@@ -102,6 +126,8 @@ export function SegmentedControl<Key extends string>({
   ariaLabel,
   onPrefetch,
   layout = "segmented",
+  ordinal = false,
+  stackSublabel = false,
   className,
 }: SegmentedControlProps<Key>) {
   /* One name per rendered group. The home brief mounts three of these, and a
@@ -110,13 +136,16 @@ export function SegmentedControl<Key extends string>({
   const groupName = useId();
 
   return (
-    <fieldset className={className ? `${CONTAINER[layout]} ${className}` : CONTAINER[layout]}>
+    <fieldset
+      className={className ? `${CONTAINER[layout]} ${className}` : CONTAINER[layout]}
+      data-ordinal={ordinal ? "" : undefined}
+    >
       <legend className="sr-only">{ariaLabel}</legend>
       {options.map((option) => (
         <label
           key={option.key}
           title={option.title}
-          className="relative inline-flex"
+          className={cn("relative inline-flex", ordinal && "flex-col", option.apart && "weather-segment-apart")}
         >
           <input
             type="radio"
@@ -131,27 +160,29 @@ export function SegmentedControl<Key extends string>({
             onMouseEnter={onPrefetch ? () => onPrefetch(option.key) : undefined}
             className="peer absolute inset-0 h-full w-full cursor-pointer appearance-none opacity-0"
           />
-          <span className={OPTION[layout]}>
-            {layout === "choices" && option.sublabel ? (
+          <span className={OPTION[layout]} data-layout={layout}>
+            <Lamp />
+            {(layout === "choices" || stackSublabel) && option.sublabel ? (
               <span className="flex flex-col items-start text-left leading-tight">
-                <span>{option.label}</span>
-                <span
-                  className={`mt-0.5 text-fluid-nano font-normal ${
-                    option.sublabelTone === "caution" ? "text-[color:var(--color-semantic-caution-fg)]" : "text-slate-400"
-                  }`}
-                >
-                  {option.sublabel}
+                <span className="inline-flex items-center gap-1.5">
+                  {option.icon}
+                  {option.label}
                 </span>
+                <span className="mt-0.5 text-fluid-nano font-normal text-slate-400">{option.sublabel}</span>
               </span>
             ) : (
               <>
-                <span>{option.label}</span>
+                {option.icon ? <span className="mr-1.5 inline-flex">{option.icon}</span> : null}
+                {/* The name stays on one line; the sublabel beside it wraps. "Series A"
+                    broke after "Series" once the default's sublabel said so. */}
+                <span className="whitespace-nowrap">{option.label}</span>
                 {option.sublabel ? (
                   <span className="ml-1 hidden font-normal opacity-60 sm:inline">· {option.sublabel}</span>
                 ) : null}
               </>
             )}
           </span>
+          {ordinal && !option.apart ? <span className="weather-segment-scale" aria-hidden="true" /> : null}
         </label>
       ))}
     </fieldset>

@@ -9,7 +9,7 @@ import {
 import { slackChannel } from "../lib/delivery/slack";
 import { resetSlackWebhookStore } from "../lib/slack/slackWebhookStore";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
-import { macroSeries } from "../lib/macroSnapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { snapshotData } from "../lib/snapshot";
 
 const payload = { text: "Posture: Guarded\nAction: hold hiring", recordDate: "2026-08-17" };
@@ -165,7 +165,7 @@ describe("Slack brief delivery", () => {
         record_date: "2099-12-31",
         fetched_at: "2099-12-31T12:00:00.000Z",
       },
-      macroSeries,
+      macroSeries: liveMacroSeries,
       now: new Date("2099-12-31T13:00:00.000Z"),
     });
 

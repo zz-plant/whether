@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { assembleHomePage } from "../../lib/report/homePageAssembler";
 import { buildWeeklyOperatorBriefPayload, buildWeeklyOperatorBriefPlainText } from "../../lib/export/weeklyOperatorBrief";
 import { briefSourceFromReportData, buildBriefDocument } from "../../lib/report/briefDocument";
-import { DATA_CAVEAT_LABEL, buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
+import { DATA_CAVEAT_LABEL, DECISION_READINESS_LABEL, buildWeeklyTrustCueLine } from "../../lib/report/trustStatus";
 import { siteUrl } from "../../lib/siteUrl";
 import { renderUseConstraintMarkdown } from "../../lib/report/useConstraint";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
@@ -48,6 +48,11 @@ export function buildBriefMarkdown(homepage: HomePage): string {
        It is `couldCallChangeNextWeek`, the rule the homepage trust strip reads, so the two agree. */
     transitionWatch: homepage.weeklyDecisionCardModel.status.transitionWatch,
   });
+  /* The home model's verdict, the one /trust reads (`buildDecisionReadinessState`
+     runs once, in the home brief builder). The brief printed the margin and a
+     "Data caveat: None." on a week close to a line, and never the Hold that
+     verdict gives; the caveat stays about the data. */
+  const decisionReadiness = homepage.weeklyDecisionCardModel.decision.decisionReadiness;
 
   const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
   const decisions = actionItems
@@ -95,8 +100,9 @@ export function buildBriefMarkdown(homepage: HomePage): string {
 # Whether Weekly Brief — ${reportData.treasury.record_date}
 
 > **Conditions:** ${describeConditions(reportData.assessment.regime, postureLabel)}  
-> **Confidence:** ${trustCue}  
-> **Data as of:** ${homepage.reportShell.recordDateLabel} · Refreshed: ${homepage.reportShell.fetchedAtLabel} · Source: ${homepage.reportShell.treasurySource}
+> **Trust:** ${trustCue}  
+> **${DECISION_READINESS_LABEL}:** ${decisionReadiness.label}. ${decisionReadiness.detail}  
+> **Data as of:** ${homepage.reportShell.recordDateLabel} · Checked: ${homepage.reportShell.fetchedAtLabel} · Source: ${homepage.reportShell.treasurySource}
 
 ---
 

@@ -81,15 +81,16 @@ export function HistoryExplorer({
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h2 className="text-fluid-xl font-semibold text-slate-100">Historical trends</h2>
+          <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Historical trends</h2>
           <p className="text-sm text-slate-300">Conditions and funding pressure, month by month, since 2012.</p>
         </div>
         <ActionLink href="/history/compare" variant="pill">Compare two periods &rarr;</ActionLink>
       </div>
 
       {/* The bar carries its own gesture hints as `title`s; a sentence about how
-          to drag it is not page content. */}
-      <div className="weather-surface space-y-2 p-4">
+          to drag it is not page content. No frame around it (2026-10-09): it
+          sits inside the disclosure that already groups it. */}
+      <div className="space-y-2">
         <p className="type-eyebrow pb-1">Timeline</p>
         <TimelineBar
           currentMonth={selectedMonth || undefined}
@@ -122,7 +123,7 @@ export function HistoryExplorer({
           <select
             value={selectedYear}
             onChange={(event) => { setSelectedYear(Number(event.target.value)); setSelectedMonth(0); }}
-            className="min-h-[44px] rounded-lg border border-[var(--border-default)] bg-[var(--bg-surface)] px-3 py-1.5 text-xs font-medium text-[var(--app-text)]"
+            className="weather-control min-h-[44px] px-3 py-1.5 text-xs font-medium"
             style={{ colorScheme: "light dark" }}
             aria-label="Select year"
           >

@@ -3,7 +3,7 @@ import type { RegimeKey } from "../../../lib/regimeEngine";
 import { REGIME_LABELS, REGIME_STYLE_TOKENS } from "../../../lib/regimePresentation";
 import { formatMonthLabel, formatMonthShortLabel } from "../../../lib/timeMachine/monthFormatting";
 import { SectionPanelHeader } from "../../components/sectionPanelHeader";
-import { describeConditionChanges, summarizeConditionRuns } from "../../../lib/report/evidenceInstrumentSummaries";
+import { summarizeConditionRuns } from "../../../lib/report/evidenceInstrumentSummaries";
 
 
 type RegimeRun = {
@@ -54,18 +54,6 @@ const formatRunSpan = (run: RegimeRun) => {
   return `${formatMonthLabel(run.start.year, run.start.month)}–${formatMonthLabel(run.end.year, run.end.month)}`;
 };
 
-const getSelectedMonthIndex = (
-  series: TimeMachineRegimeEntry[],
-  selectedYear: number,
-  selectedMonth: number,
-) => {
-  return series.findIndex((entry) => entry.year === selectedYear && entry.month === selectedMonth);
-};
-
-const getSelectedMarkerOffset = (selectedIndex: number, totalMonths: number) => {
-  return `calc(${((selectedIndex + 0.5) / Math.max(totalMonths, 1)) * 100}% - 0.5px)`;
-};
-
 export const RegimeTimelinePanel = ({
   series,
   selectedYear,
@@ -74,12 +62,11 @@ export const RegimeTimelinePanel = ({
 }: RegimeTimelinePanelProps) => {
   const currentLabel = formatMonthLabel(selectedYear, selectedMonth);
   const preservedParams = collectPreservedParams(searchParams);
-  /* The runs and the change count through the function the closed summary
-     over this panel reads, so "3 changes across the last 24 months" is one
-     derivation in both places. */
+  /* The runs through the function the disclosure summary over this panel reads.
+     That summary already prints "3 changes across the last 24 months", so this
+     panel no longer repeats it in a card of its own (2026-10-14). */
   const conditionRuns = summarizeConditionRuns(series);
   const { runs, longestRun } = conditionRuns;
-  const selectedIndex = getSelectedMonthIndex(series, selectedYear, selectedMonth);
 
   const buildHref = (month: number, year: number) => {
     const nextParams = new URLSearchParams(preservedParams.toString());
@@ -121,11 +108,11 @@ export const RegimeTimelinePanel = ({
                 return (
                   <div
                     key={`${run.start.year}-${run.start.month}-${run.regime}`}
-                    className="group relative flex min-w-[3.25rem] flex-1 items-end border-r border-slate-950/70 last:border-r-0"
+                    className="relative flex min-w-[3.25rem] flex-1 items-end border-r border-slate-950/70 last:border-r-0"
                     style={{ flexGrow: run.count }}
                   >
                     <div
-                      className={`absolute inset-0 opacity-85 transition-opacity group-hover:opacity-100 ${REGIME_STYLE_TOKENS[run.regime].marker}`}
+                      className={`absolute inset-0 opacity-85 ${REGIME_STYLE_TOKENS[run.regime].marker}`}
                       aria-hidden="true"
                     />
                     <div className="relative z-10 w-full bg-gradient-to-t from-slate-950/80 via-slate-950/35 to-transparent px-2 pb-2 pt-8 sm:px-3">
@@ -139,14 +126,6 @@ export const RegimeTimelinePanel = ({
               })}
             </div>
 
-            {selectedIndex >= 0 ? (
-              <div
-                className="pointer-events-none absolute bottom-2 top-2 z-20 w-px bg-sky-300/95"
-                style={{ left: getSelectedMarkerOffset(selectedIndex, series.length) }}
-                aria-hidden="true"
-              />
-            ) : null}
-
             <div className="absolute inset-0 z-30 flex">
               {series.map((entry) => {
                 const isCurrent = entry.year === selectedYear && entry.month === selectedMonth;
@@ -159,9 +138,19 @@ export const RegimeTimelinePanel = ({
                     href={href}
                     aria-current={isCurrent ? "date" : undefined}
                     aria-label={`${monthLabel}: ${REGIME_LABELS[entry.regime]}`}
-                    className="h-full min-h-[44px] flex-1 focus-visible:z-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
+                    className="relative h-full min-h-[44px] flex-1 focus-visible:z-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
                     style={{ touchAction: "manipulation" }}
                   >
+                    {/* The chosen month's rule is the link's own state, so it is drawn
+                        inside the link, in the action colour (ui-ux-standards §XXVII).
+                        The runs under these links never brighten on hover: the links
+                        sit above them and take the pointer. */}
+                    {isCurrent ? (
+                      <span
+                        className="pointer-events-none absolute inset-y-2 left-1/2 w-px -translate-x-1/2 bg-sky-300/95"
+                        aria-hidden="true"
+                      />
+                    ) : null}
                     <span className="sr-only">
                       {monthLabel} — {REGIME_LABELS[entry.regime]}
                     </span>
@@ -170,13 +159,7 @@ export const RegimeTimelinePanel = ({
               })}
             </div>
           </div>
-          <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-live="polite">
-            <div className="weather-surface p-4">
-              <p className="type-label text-slate-400">Changes in conditions</p>
-              <p className="mt-2 text-sm text-slate-200">
-                {describeConditionChanges(conditionRuns)}.
-              </p>
-            </div>
+          <div className="mt-4" aria-live="polite">
             <div className="weather-surface p-4">
               <p className="type-label text-slate-400">Longest held</p>
               <p className="mt-2 text-sm text-slate-200">

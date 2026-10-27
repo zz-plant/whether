@@ -1,12 +1,11 @@
 import { HomeSection } from "./HomeSection";
-import { LastTimeCallChangedCard } from "./LastTimeCallChangedCard";
 import { BoundedValue } from "../ui/boundedValue";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/homeSectionModel";
-import type { LastTimeCallChanged } from "../../../lib/report/lastTimeCallChanged";
 import { RegimeRadar } from "./RegimeRadar";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
+import { DecisionLineKey } from "../illustrations/DecisionLineKey";
 
 type HomeScoreLadder = {
   metric: "tightness" | "riskAppetite";
@@ -17,12 +16,22 @@ type HomeScoreLadder = {
   lines: HomeLadderLine[];
 };
 
-type FlipProximityLine = { axis: "tightness" | "riskAppetite"; sentence: string };
+type FlipProximityLine = {
+  axis: "tightness" | "riskAppetite";
+  sentence: string;
+  /** How big the move is against a Fed step and the record's months (`describeMarketMoveScale`). */
+  scale?: string | null;
+};
 
 /**
- * Distance to the call changing: both scores as one point among the four
- * conditions, the line that changes them in the same points the ladders use,
- * and — on a week the call changed — the last time it did.
+ * What would change this guidance, fourth on the page (2026-10-09): the pause
+ * line and the resume line the guidance turns on, the line where conditions
+ * themselves change, and both scores as one point among the four conditions.
+ * The pause line printed here only on a read that drew no ladders, so a reader
+ * met "Conditions change if" and the stage's resume line and had to find the
+ * pause line in the area table; it leads now. The last time conditions changed
+ * is "Has this happened before?" further down, and the email link that closed
+ * this section is the alert section directly under it.
  *
  * The two score ladders are not redrawn here. "What changed" draws each score
  * on its ladder with all three lines and the earlier reading's dot, and this
@@ -55,8 +64,8 @@ export function WhatWouldChangeSection({
   reversalTrigger,
   resumeWhen,
   guardrail,
+  leadResume,
   flipConditions,
-  lastTime,
   callChangeLines,
   regime,
   conditionsTrail,
@@ -66,9 +75,11 @@ export function WhatWouldChangeSection({
   reversalTrigger?: string;
   /** The selected stage's discipline for lifting its hold. Beside the call-change line, never in it. */
   resumeWhen?: string;
+  /** The guidance's pause line: the lead area's, as the brief and every paste print it. */
   guardrail?: string;
+  /** The lead area's resume line, where no stage set one of its own. */
+  leadResume?: string;
   flipConditions?: readonly string[];
-  lastTime: LastTimeCallChanged | null;
   callChangeLines: { tightness: number; riskAppetite: number };
   regime?: string;
   /** The month-end path, its domain and its like-for-like note; when passed, the card above draws the quadrant from `md` up. */
@@ -92,19 +103,23 @@ export function WhatWouldChangeSection({
   const marketMoves = ladders.flatMap((ladder) =>
     flipProximity.filter((line) => line.axis === ladder.metric).map((line) => ({ ...line, label: ladder.label })),
   );
-  /* Without ladders (a read that drew none) the pause line and the watch list
-     have nowhere else on the page, so they print here. */
-  const statements = [
-    ...(guardrail && ladders.length === 0 ? [{ label: DECISION_CONTRACT_LABELS.threshold.pauseIf, value: guardrail }] : []),
-    ...(reversalTrigger ? [{ label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: reversalTrigger }] : []),
-    ...(resumeWhen ? [{ label: DECISION_CONTRACT_LABELS.reversal.resumeWhen, value: resumeWhen }] : []),
-    ...(flipConditions && flipConditions.length > 0 && ladders.length === 0
-      ? [{ label: DECISION_CONTRACT_LABELS.watch.watchThisWeek, value: flipConditions.join(" · ") }]
-      : []),
-  ];
+  /* The pause and resume lines answer one question; the change line answers the
+     other. Both are printed under their own heading (2026-10-22). */
+  const resumeLine = resumeWhen ?? leadResume;
 
   return (
-    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading} className="order-4">
+    <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading}>
+      {/* The three lines key folded by default to preserve scan speed (2026-10-25).
+          Available with one click for readers who want line definitions without
+          interrupting the primary flip triggers and pause conditions. */}
+      <details className="weather-auto-chevron mb-5 max-w-3xl text-fluid-xs text-slate-300">
+        <summary className="cursor-pointer select-none font-medium text-slate-400 hover:text-slate-200">
+          What the three lines do (pause, resume, change)
+        </summary>
+        <div className="mt-3">
+          <DecisionLineKey />
+        </div>
+      </details>
       <div
         className={
           ladders.length === 0
@@ -126,42 +141,78 @@ export function WhatWouldChangeSection({
             trail={conditionsTrail?.points}
             trailCaption={conditionsTrail?.caption}
             caveat={conditionsTrail?.caveat}
-            className={`w-full max-w-[240px] mx-auto md:mx-0 shrink-0${conditionsTrail ? " md:hidden" : ""}`}
+            /* 320px on a phone (2026-10-27): at 240 in a 358px column its quadrant names
+               and line numbers drew at 8–10px with empty ground either side. */
+            className={`w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[240px] shrink-0 ${conditionsTrail ? "md:hidden" : ""}`}
           />
         ) : null}
-        <div className="min-w-0 space-y-4">
-          {statements.length > 0 ? (
-            <dl className="space-y-3 text-fluid-xs">
-              {statements.map((statement) => (
-                <div key={statement.label} className="space-y-0.5">
-                  <dt className="font-semibold text-slate-200">{statement.label}</dt>
-                  <dd className="text-slate-300"><BoundedValue>{statement.value}</BoundedValue></dd>
-                </div>
-              ))}
-            </dl>
+        {/* Side by side from xl (2026-10-27): stacked in a 64rem column they left the
+            right half of a laptop screen empty, and a frame held one question and the
+            top of the next. Side by side, one frame holds both answers whole. */}
+        <div className="min-w-0 space-y-4 xl:grid xl:grid-cols-2 xl:items-start xl:gap-8 xl:space-y-0">
+          {/* Two different questions, named as two (2026-10-22): a change in
+              conditions is not permission to resume, and the old flat list read
+              as one question with three answers. The conditions question comes
+              first because it is the one the weather word answers. */}
+          {reversalTrigger || marketMoves.length > 0 ? (
+            <div className="space-y-2">
+              <h3 className="text-fluid-sm font-semibold text-slate-100">When would conditions change?</h3>
+              {reversalTrigger ? (
+                <dl className="text-fluid-sm">
+                  <div className="space-y-0.5">
+                    <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.watch.postureFlips}</dt>
+                    <dd className="text-slate-300"><BoundedValue>{reversalTrigger}</BoundedValue></dd>
+                  </div>
+                </dl>
+              ) : null}
+              {marketMoves.length > 0 ? (
+                <details className="weather-auto-chevron text-fluid-xs">
+                  <summary className="cursor-pointer select-none font-medium text-slate-300">In interest-rate terms</summary>
+                  <ul className="space-y-1.5 text-slate-300">
+                    {marketMoves.map((line) => (
+                      <li key={line.sentence} data-flip-axis={line.axis}>
+                        <span className="text-slate-400">{line.label}:</span> {line.sentence}
+                        {line.scale ? <span className="block text-slate-400">{line.scale}</span> : null}
+                      </li>
+                    ))}
+                  </ul>
+                </details>
+              ) : null}
+            </div>
           ) : null}
-          {marketMoves.length > 0 ? (
-            <details className="weather-auto-chevron text-fluid-xs">
-              <summary className="cursor-pointer select-none font-medium text-slate-300">In interest-rate terms</summary>
-              <ul className="space-y-1.5 text-slate-300">
-                {marketMoves.map((line) => (
-                  <li key={line.sentence} data-flip-axis={line.axis}>
-                    <span className="text-slate-400">{line.label}:</span> {line.sentence}
-                  </li>
-                ))}
-              </ul>
-            </details>
+
+          {guardrail || resumeLine ? (
+            <div className="space-y-2">
+              <h3 className="text-fluid-sm font-semibold text-slate-100">When can paused decisions resume?</h3>
+              <dl className="space-y-3 text-fluid-sm">
+                {guardrail ? (
+                  <div className="space-y-0.5">
+                    <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
+                    <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
+                  </div>
+                ) : null}
+                {resumeLine ? (
+                  <div className="space-y-0.5">
+                    <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
+                    <dd className="text-slate-300"><BoundedValue>{resumeLine}</BoundedValue></dd>
+                  </div>
+                ) : null}
+              </dl>
+              <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
+                A change in conditions is not permission to resume. The resume line is the test, and the
+                weather word alone does not cross it.
+              </p>
+            </div>
           ) : null}
-          <a
-            href="#subscribe"
-            className="weather-hit text-fluid-xs text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
-          >
-            Get an email the day a line is crossed
-          </a>
+
+          {flipConditions && flipConditions.length > 0 && ladders.length === 0 ? (
+            <div className="space-y-0.5 text-fluid-xs">
+              <p className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.watch.watchThisWeek}</p>
+              <p className="text-slate-300">{flipConditions.join(" · ")}</p>
+            </div>
+          ) : null}
         </div>
       </div>
-
-      {lastTime ? <LastTimeCallChangedCard record={lastTime} callChangeLines={callChangeLines} /> : null}
     </HomeSection>
   );
 }

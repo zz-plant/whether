@@ -2,29 +2,60 @@ import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import { formatRegimeSignalValue, type RegimeSignalKey } from "../reportFormatting";
 import { classifyScoreBand, scoreBandScaleLabel } from "../signalTranslations";
 import { describeInputMovement } from "../inputMovement";
-import { formatPointsToLine, toThresholdDistance, type ActionStripItem, type RuleThresholdDistance } from "../operatingCalls";
+import {
+  formatPointsToLine,
+  resolveLineState,
+  toThresholdDistance,
+  type ActionStripItem,
+  type LineState,
+  type RuleThresholdDistance,
+} from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import type { BoundedDecisionRule, DecisionArea, RuleCondition, RuleConditionMetric } from "../boundedDecisionRules";
+import { decisionAreaLabel, isDecisionArea, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { describeScoreMovement } from "../scoreMovement";
-import { buildQuietDayRead, type AreaMovementKind, type DecisionMovement } from "../decisionMovement";
-import type { HomePageAssembly } from "./contracts";
+import { describeNotCountedScore, joinSentences, type ScoringBasis } from "../scoringBasis";
+import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
 
 /**
- * The homepage as five sections in the reader's order: the call, what changed,
- * what that changes by area, what would change the call, and what to do and
- * share. Each section is a heading and an id here, and a component under
+ * The homepage's sections in the reader's order (`HOME_SECTIONS` below). Each
+ * section is a heading and an id here, and a component under
  * app/components/home that draws one of them; the route composes them and
  * nothing else on `/` restates a section's content inside another's.
  */
+/**
+ * The query parameter that carries the picker's choice (`/?decision=hiring`), so a
+ * link to the brief can open on the answer its sender meant. Read on the server,
+ * so the answer is in the first paint; written by the picker on every choice.
+ */
+export const HOME_DECISION_PARAM = "decision";
+
+/** The decision a `?decision=` value names, or undefined for anything that is not an area. */
+export const parseHomeDecision = (value: string | undefined): DecisionArea | undefined =>
+  value !== undefined && isDecisionArea(value) ? value : undefined;
+
+/*
+ * The homepage's sections, in the order they print (2026-10-22): the verdict, the
+ * five areas, whose lines they are, what the conditions are made of, what changed,
+ * what would change the guidance, how unusual this is, and the alert. The order
+ * follows the four questions a reader arrives with — what is happening, what do I
+ * do, what would change it, how far can I trust it — and keeps the plan before
+ * the evidence. `areas` keeps the id the old "What that changes for you" section
+ * had, so a link to it still lands on the areas. The diagnosis heading carries
+ * the week's weather word, so it is passed by the route, not stored here. Sharing
+ * is the page's last line, not a section: a heading over one link (`ShareLinks`).
+ */
 export const HOME_SECTIONS = {
   call: { id: "weekly-call" },
+  areas: { id: "what-it-changes", heading: "Your decisions this week" },
+  calibration: { id: "company-calibration" },
+  diagnosis: { id: "why-conditions" },
   changed: { id: "what-changed", heading: "What changed this week" },
-  consequences: { id: "what-it-changes", heading: "What that changes for you" },
   watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
-  act: { id: "do-and-share", heading: "Do and share" },
+  record: { id: "has-this-happened-before", heading: "How unusual is this?" },
+  alert: { id: "subscribe", heading: "Get notified when something changes" },
 } as const;
 
 /** The three lines a score is drawn against, as the ladder primitive takes them. */
@@ -68,6 +99,7 @@ export const buildSignalChangeRows = ({
   dynamics,
   tightnessPressure,
   tightnessSaturated,
+  scoringBasis,
 }: {
   indicators: readonly RegimeSignalIndicator[];
   /** The week's comparison. Last week comes from here, not from the indicator's label. */
@@ -75,6 +107,8 @@ export const buildSignalChangeRows = ({
   lines: MetricLines;
   tightnessPressure?: number;
   tightnessSaturated?: boolean;
+  /** What each score leaves out (`ReportData.scoringBasis`), said in its row after the move, whichever reading the week compares with. */
+  scoringBasis?: Pick<ScoringBasis, "notCounted">;
 }): SignalChangeRow[] => {
   const byKey = new Map(indicators.map((indicator) => [indicator.key, indicator]));
   return SIGNAL_ORDER.flatMap((key) => {
@@ -97,7 +131,12 @@ export const buildSignalChangeRows = ({
       previous,
       previousLabel: previous === null ? null : formatRegimeSignalValue(previous, key),
       delta,
-      movement: isScore ? describeScoreMovement(key, dynamics.movement?.[key], comparisonBasis(dynamics.comparedWith)) : null,
+      movement: isScore
+        ? joinSentences(
+            describeScoreMovement(key, dynamics.movement?.[key], comparisonBasis(dynamics.comparedWith)),
+            describeNotCountedScore(key, scoringBasis),
+          )
+        : null,
       increaseIsPositive: INCREASE_IS_POSITIVE[key],
       scaleLabel: isScore && typeof value === "number" ? scoreBandScaleLabel(classifyScoreBand(value)) : undefined,
       lines: metricLines
@@ -151,28 +190,8 @@ export const describeWeeklyMovement = ({
         basis.date ? basis.since : "this week",
       );
 
-/**
- * The homepage's quiet-day line for this assembly (`buildQuietDayRead`): what would change
- * the guidance, on a live week whose guidance held against the earlier reading. Nothing on
- * an archived week, which the banner dates, or on one whose conditions or call-change line
- * moved (`regimeAlert`), which leads with that. The page and the claim-parity test both read
- * it here, so the line under test is the one the page prints.
- */
-export const buildHomeQuietDayRead = (
-  homepage: Pick<HomePageAssembly, "reportResult" | "weeklyCall" | "weeklyDecisionCardModel">,
-  { historical }: { historical: boolean },
-): string | null => {
-  const reportData = homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback;
-  if (historical || reportData.regimeAlert) return null;
-  return buildQuietDayRead({
-    guidanceChange: homepage.weeklyDecisionCardModel.decision.weeklyLeadershipSummary.guidanceChange,
-    weeklyCall: homepage.weeklyCall,
-    assessment: reportData.assessment,
-  });
-};
-
 /** One side of an area's rule as a row prints it: the line, the distance in words, and the two facts behind the words. */
-type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean; metric: RuleConditionMetric };
+export type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean; metric: RuleConditionMetric };
 
 export type HomeAreaRow = {
   area: DecisionArea;
@@ -209,15 +228,19 @@ const formatPoints = (points: number) =>
 
 /**
  * Where an area stands against its pause line, short enough to sit under the
- * decision's name in the picker: the answer before the click. "Pause line
- * crossed", or how far the reading is from it. Undefined for an area whose rule
+ * decision's name in the picker: the answer before the click. "Past its
+ * pause line", or how far the reading is from it. Undefined for an area whose rule
  * states no pause line.
  */
-export const describeAreaPauseStatus = (row: Pick<HomeAreaRow, "pause">): { text: string; crossed: boolean } | undefined => {
+export const describeAreaPauseStatus = (
+  row: Pick<HomeAreaRow, "pause">,
+): { text: string; crossed: boolean; state: LineState } | undefined => {
   if (!row.pause) return undefined;
-  if (row.pause.met) return { text: "Pause line crossed", crossed: true };
-  if (row.pause.points === 0) return { text: "At its pause line", crossed: false };
-  return { text: `${formatPoints(row.pause.points)} from its pause line`, crossed: false };
+  /* The badge's state, from the same distance the words below describe. */
+  const state = resolveLineState(row.pause.points, "pause", row.pause.met) ?? "clear";
+  if (row.pause.met) return { text: "Past its pause line", crossed: true, state };
+  if (row.pause.points === 0) return { text: "At its pause line", crossed: false, state };
+  return { text: `${formatPoints(row.pause.points)} from its pause line`, crossed: false, state };
 };
 
 /**
@@ -228,8 +251,33 @@ export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
   const crossed = ruled.filter((row) => row.pause?.met).length;
-  if (crossed === 0) return "No area's pause line is crossed this week.";
-  return `Pause ${crossed === 1 ? "line" : "lines"} crossed in ${crossed} of ${ruled.length} areas this week.`;
+  /* A standing state, said as one: "crossed ... this week" sat under "No score
+     crossed a pause or resume line since Sep 30" and read as a contradiction. */
+  if (crossed === 0) return "No area is past its pause line.";
+  return crossed === 1
+    ? `1 of ${ruled.length} areas is past its pause line.`
+    : `${crossed} of ${ruled.length} areas are past their pause line.`;
+};
+
+/**
+ * The card's bridge from the weather word to the five areas (2026-10-14).
+ *
+ * The condition comes from the change lines and the area answers from the
+ * pause and resume lines, so a card could say "Cloudy: money is available"
+ * over a picker where four areas were held, and nothing tied the two. This
+ * names the held areas on the card without repeating its condition stamp:
+ * "On hold: Hiring, Fundraising, Spending and New bets."
+ */
+export const describeHeldAreasForCard = (
+  rows: readonly Pick<HomeAreaRow, "area" | "pause">[],
+): string | null => {
+  const ruled = rows.filter((row) => row.pause);
+  if (ruled.length === 0) return null;
+  const held = ruled.filter((row) => row.pause?.met).map((row) => decisionAreaLabel(row.area));
+  if (held.length === 0) return "No area is on hold.";
+  if (held.length === ruled.length) return "Every area is on hold.";
+  const list = held.length === 1 ? held[0] : `${held.slice(0, -1).join(", ")} and ${held.at(-1)}`;
+  return `On hold: ${list}.`;
 };
 
 /**
@@ -262,12 +310,12 @@ export const describeConditionsTrail = (recordDates: readonly string[]): string 
   const firstDate = new Date(`${first.slice(0, 10)}T00:00:00Z`);
   const lastDate = new Date(`${last.slice(0, 10)}T00:00:00Z`);
   if (Number.isNaN(firstDate.getTime()) || Number.isNaN(lastDate.getTime())) return null;
-  if (recordDates.length === 1) return `Path: the ${MONTH_YEAR.format(lastDate)} month-end, then now.`;
+  if (recordDates.length === 1) return `Trail: the ${MONTH_YEAR.format(lastDate)} month-end, then this week.`;
   const range =
     firstDate.getUTCFullYear() === lastDate.getUTCFullYear()
       ? `${MONTH_SHORT.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`
       : `${MONTH_YEAR.format(firstDate)}–${MONTH_YEAR.format(lastDate)}`;
-  return `Path: month-ends ${range}, then now.`;
+  return `Trail: month-ends ${range}, then this week.`;
 };
 
 const nearest = (distances: RuleThresholdDistance[]) =>

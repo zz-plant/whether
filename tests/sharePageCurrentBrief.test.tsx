@@ -60,8 +60,9 @@ describe("/share current weekly artifact", () => {
 
     assert.match(html, /Week of /);
     assert.match(html, /data-share-format="slack-post"/, "the server renders the format the page opens on");
-    // The short post leads with the week's action, the line a channel acts on.
-    assert.match(html, /Transmit the committed action\./);
+    // The short post leads with the week's one headline action (`weeklyHeadline`), the call.
+    assert.match(html, /Share the persisted call exactly\./);
+    assert.doesNotMatch(html, /Transmit the committed action\./, "the action is not a second headline");
     // The change condition under its own label, not the resume vocabulary.
     assert.match(html, /Conditions change if: Re-open only from the next committed snapshot\./);
     assert.doesNotMatch(html, /Macro signals.*operating posture/);
@@ -77,7 +78,7 @@ describe("/share current weekly artifact", () => {
     assert.match(fullBrief, /Conditions:/);
     assert.match(fullBrief, /^Guidance: /m);
     assert.match(fullBrief, /Pause if/);
-    assert.match(fullBrief, /Transmit the committed action\./);
+    assert.match(fullBrief, /Share the persisted call exactly\./);
     // The meeting pack carries the Slack brief's per-area lines, resume line included.
     assert.match(textOf("meeting-pack"), /Resume when/);
     assert.match(textOf("meeting-pack"), /Share the persisted call exactly\./);
@@ -97,8 +98,8 @@ describe("/share current weekly artifact", () => {
     const html = renderToStaticMarkup(await SharePage());
     const { options } = await shareOptions();
 
-    assert.match(html, /href="\/api\/export\/board-slide\?format=pptx&amp;stage=seed"/);
-    assert.match(html, /href="\/api\/export\/board-slide\?format=pdf&amp;stage=seed"/);
+    assert.match(html, /href="\/api\/export\/board-slide\?format=pptx&amp;stage=series-a"/);
+    assert.match(html, /href="\/api\/export\/board-slide\?format=pdf&amp;stage=series-a"/);
     assert.match(html, /Download PPTX/);
     assert.match(html, /Download PDF/);
     // Every format is named in the picker the server renders, and each copy action says what it copies.
@@ -167,11 +168,16 @@ describe("/share current weekly artifact", () => {
      draw one slide, so they are one card with one picture; the brief card has its own. */
   it("shows each picture once, sized before it loads", async () => {
     const html = renderToStaticMarkup(await SharePage());
-    const images = [...html.matchAll(/<img [^>]*>/g)].map(([tag]) => tag);
+    const tags = [...html.matchAll(/<img [^>]*>/g)].map(([tag]) => tag);
+    /* The embed section's status badge is its own picture, a line tall; the cards are the rest. */
+    const badges = tags.filter((tag) => tag.includes('src="/api/badge"'));
+    const images = tags.filter((tag) => !badges.includes(tag));
 
+    assert.equal(badges.length, 1, "the badge is shown once");
+    assert.match(badges[0] ?? "", /height="20"/);
     assert.equal(images.length, 2, "one picture per distinct image");
     for (const tag of images) {
-      assert.match(tag, /src="\/api\/image\/(slide\?stage=seed|brief)"/);
+      assert.match(tag, /src="\/api\/image\/(slide|brief)\?stage=series-a"/);
       assert.match(tag, /width="1200"/);
       assert.match(tag, /height="(675|800)"/);
       assert.match(tag, /loading="lazy"/);

@@ -1,12 +1,8 @@
 /**
- * A store chosen by the binding it is built over, re-checked on every call.
- *
- * Each repository used to pick KV or its in-memory fallback the first time it was asked and keep
- * that store for the isolate's life, so one call that ran before the binding was installed left
- * every later request writing to memory. `getDefaultIngestionStore` stopped memoizing for good on
- * the same grounds (AGENTS.md, "re-checks binding"); this is that approach, shared. The store is
- * rebuilt only when the binding it was built over is no longer the one installed, so a stable
- * binding keeps one store — and its write queue — for the isolate's life.
+ * A store chosen by the binding it is built over, re-checked on every call, so a call that
+ * ran before the binding was installed does not leave every later request on the fallback.
+ * Rebuilt only when the installed binding changes, so a stable binding keeps one store and
+ * its write queue. docs/agents/lessons/runtime-helpers.md.
  */
 export const selectStoreByBinding = <Binding, Store>(
   resolve: () => Binding | null,
@@ -28,8 +24,7 @@ export const selectStoreByBinding = <Binding, Store>(
     },
     /**
      * Test hook. With no argument, rebuilds from the binding as it is now. Given a store, holds
-     * it whatever the binding does until the next reset — the suite's "start from an empty
-     * in-memory store", which is what those resets always meant.
+     * it whatever the binding does until the next reset.
      */
     reset: (store?: Store): Store => {
       if (store === undefined) return rebuild();

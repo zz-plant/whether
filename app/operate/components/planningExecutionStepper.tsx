@@ -89,9 +89,16 @@ export const resolveOperationsExecutionStepIdFromLocation = ({
 };
 
 /**
- * One step: an expandable panel. The plan page used to be a checklist, with a
- * Done box on every step and a collapsed "done" state; most steps were reading,
- * not tasks, so the boxes asked the reader to tick off having read.
+ * One step: a section under its own heading, separated from the next by a rule
+ * and whitespace. The plan page used to be a checklist, with a Done box on
+ * every step and a collapsed "done" state; most steps were reading, not tasks,
+ * so the boxes asked the reader to tick off having read.
+ *
+ * Until 2026-10-09 every step was also a bordered, rounded card folded behind a
+ * chevron, the area rules included, so the page read as a stack of equal boxes
+ * and the plan looked no more important than the finance appendix. A step the
+ * reader has to act on this week (`defaultOpen`) is open and has no toggle; only
+ * the secondary steps fold, and a deep link still opens one.
  */
 function StepPanel({
   step,
@@ -104,6 +111,7 @@ function StepPanel({
   isActive: boolean;
   onToggleOpen: () => void;
 }) {
+  const foldable = !step.defaultOpen;
   return (
     <section
       id={step.id}
@@ -111,46 +119,39 @@ function StepPanel({
       // reads it; an "Active" stamp beside the title was the same fact
       // drawn a second time for sighted readers only.
       aria-current={isActive ? "step" : undefined}
-      className={`weather-step-panel space-y-4 rounded-xl border p-4 sm:p-5 ${
-        /* A closed step's edge is the subtle border token, not white at 4%: on
-           the dark ground that drew nothing, and four closed steps read as one
-           run of text with checkboxes. The token keeps it visible in light too. */
-        isOpen ? "border-sky-500/20 bg-slate-900/10" : "border-[var(--border-subtle)] bg-slate-950/[0.05]"
-      }`}
+      className="weather-step-panel space-y-4 py-8 first:pt-0"
     >
-      {/* The rule divides the header from the step body, so a closed step
-          drew a divider with nothing under it. */}
-      <div
-        className={`flex flex-wrap items-start justify-between gap-3 ${
-          isOpen ? "pb-4 border-b border-white/[0.04]" : ""
-        }`}
-      >
+      <div className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0 space-y-1">
           {/* No `step.label` eyebrow here. All six read as a word already
               in the title underneath — PLAN over "Weekly plan", RULES
               over "Rules before you commit" — so the page opened six
               sections with a near-duplicate stacked above each heading. */}
-          {/* A toggle, not a link: with steps opening independently the
-              title's job is expand/collapse, which §IV says is a button.
-              Deep links arrive through the section id, and they open a
-              step without closing the others. */}
-          <h3 className="max-w-2xl text-lg font-semibold tracking-[-0.02em]">
-            <button
-              type="button"
-              onClick={onToggleOpen}
-              aria-expanded={isOpen}
-              aria-controls={`${step.id}-body`}
-              className="inline-flex min-h-11 items-center gap-2 text-left text-slate-100 hover:text-sky-100"
-            >
-              <span
-                aria-hidden="true"
-                className={`text-slate-500 transition-transform ${isOpen ? "rotate-90" : ""}`}
+          {/* A secondary step's title is a toggle, not a link: its job is
+              expand/collapse, which §IV says is a button. Deep links arrive
+              through the section id, and they open a step without closing
+              the others. A step that is always open is a plain heading. */}
+          <h2 className="max-w-2xl text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl">
+            {foldable ? (
+              <button
+                type="button"
+                onClick={onToggleOpen}
+                aria-expanded={isOpen}
+                aria-controls={`${step.id}-body`}
+                className="inline-flex min-h-11 items-center gap-2 text-left text-slate-100 hover:text-sky-100"
               >
-                ›
-              </span>
-              {step.title}
-            </button>
-          </h3>
+                <span
+                  aria-hidden="true"
+                  className={`text-slate-500 transition-transform motion-reduce:transition-none ${isOpen ? "rotate-90" : ""}`}
+                >
+                  ›
+                </span>
+                {step.title}
+              </button>
+            ) : (
+              step.title
+            )}
+          </h2>
           <p className="max-w-2xl text-sm leading-6 text-slate-300">
             {step.description}
           </p>
@@ -181,7 +182,7 @@ function StepPanel({
         </div>
       </div>
       {isOpen && (
-        <div id={`${step.id}-body`} className="mt-4">
+        <div id={`${step.id}-body`} className="pt-2">
           {step.children}
         </div>
       )}
@@ -243,7 +244,7 @@ export function OperationsExecutionStepper({ steps }: { steps: OperationsExecuti
   return (
     <section
       id="planning-stepper"
-      className="mt-6 space-y-6"
+      className="divide-y divide-[color:var(--border-default)]"
       aria-label="Planning sections"
     >
       {steps.map((step) => (

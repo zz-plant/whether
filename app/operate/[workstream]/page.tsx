@@ -1,16 +1,14 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { notFound } from "next/navigation";
-import { buildPageMetadata } from "../../../lib/seo";
+import { buildBreadcrumbList, buildPageMetadata } from "../../../lib/seo";
+import { graph } from "../../../lib/seo/pageStructuredData";
 import { ReportShell } from "../../components/reportShell";
 import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
-import { PremiumGate } from "../components/PremiumGate";
 import { RunwayPlannerPanel } from "../components/runwayPlannerPanel";
 import { ScenarioStudioSimulator } from "../components/scenarioStudioSimulator";
-import { CompactWorkstreamSwitcher } from "../components/planningWorkstreamNav";
-import { WorkstreamNavFallback } from "../../components/suspenseFallbacks";
 import { operationsSectionLinks } from "../../../lib/navigation/planningNavigation";
-import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 
 import { WORKSTREAMS, isWorkstream, workstreamSlugs } from "../workstreams";
 import { isSavedCopy } from "../../../lib/report/provenanceStatus";
@@ -64,33 +62,25 @@ export default async function OperateWorkstreamPage({
           pageTitle: entry.pageTitle,
           pageSummary: entry.pageSummary,
           sectionLinks: operationsSectionLinks[entry.slug] ?? operationsSectionLinks.plan,
+          currentPath,
+          tabsQuery: new URLSearchParams(
+            Object.entries(resolvedSearchParams ?? {}).flatMap(([key, value]) => (value ? [[key, value]] : [])),
+          ).toString() || undefined,
         },
         trust: {
           trustStatusTone,
           showOfflineBadge: isFallback && !reportData.historicalSelection,
         },
+        /* The trail as structured data only. A visible "Decide / Runway planner"
+           sat under the sub-tab row that names the same two pages and marks the
+           same one current (2026-10-09). */
+        payloads: { structuredData: graph([buildBreadcrumbList(buildGroupBreadcrumbs(currentPath))]) },
       }}
     >
       <div className="space-y-6">
-        <Breadcrumbs
-          items={[
-            { label: "Home", href: "/" },
-            { label: "Plan", href: "/operate" },
-            { label: entry.pageTitle },
-          ]}
-        />
-        <Suspense fallback={<WorkstreamNavFallback />}>
-          <CompactWorkstreamSwitcher currentPath={currentPath} />
-        </Suspense>
         {entry.slug === "financial" ? (
           <div id="ops-runway-planner">
-            <PremiumGate
-              source="runway_planner"
-              title="Runway planner"
-              description="Enter cash in the bank, monthly spend and monthly revenue to see how far your runway goes in this week's conditions."
-            >
-              <RunwayPlannerPanel assessment={assessment} sensors={sensors} macroSeries={macroSeries} recordDateLabel={recordDateLabel} />
-            </PremiumGate>
+            <RunwayPlannerPanel assessment={assessment} sensors={sensors} macroSeries={macroSeries} recordDateLabel={recordDateLabel} />
           </div>
         ) : (
           <Suspense fallback={null}>

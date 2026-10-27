@@ -5,15 +5,9 @@ import { describe, it } from "bun:test";
 import { parsePrePushRange } from "../scripts/pre-push-range.mjs";
 
 /*
- * The pre-push hook scopes the review preflight to what the push actually
- * sends, using the plan git writes to the hook's stdin. Before this, the
- * preflight read "last commit plus every uncommitted edit" — a range that
- * fails on other sessions' in-flight work the push does not contain, and that
- * never sees commits 2..n of a multi-commit push (the deploy gate does not
- * re-check the preflight either, so those commits were reviewed nowhere).
- *
- * The stdin format is git's: one "<local ref> <local sha> <remote ref>
- * <remote sha>" line per ref update.
+ * The pre-push hook judges the review preflight on what the push actually sends: the
+ * remote sha as base and the local sha as head, from the plan git writes to the hook's
+ * stdin. The head matters because the pushed ref need not be the one checked out.
  */
 describe("parsePrePushRange", () => {
   const MAIN_UPDATE = "refs/heads/main 1111111111111111111111111111111111111111 refs/heads/main 2222222222222222222222222222222222222222\n";
@@ -25,12 +19,12 @@ describe("parsePrePushRange", () => {
     });
   });
 
-  it("skips deletions and reviews the first real update", () => {
+  it("skips deletions and reads the first real update", () => {
     const text =
-      "refs/heads/gone 0000000000000000000000000000000000000000 refs/heads/gone 2222222222222222222222222222222222222222\n" +
+      "refs/heads/gone 0000000000000000000000000000000000000000 refs/heads/gone 3333333333333333333333333333333333333333\n" +
       MAIN_UPDATE;
 
-    assert.deepEqual(parsePrePushRange(text)?.head, "1111111111111111111111111111111111111111");
+    assert.equal(parsePrePushRange(text)?.head, "1111111111111111111111111111111111111111");
   });
 
   it("skips new branches, which have no remote state to review against", () => {
@@ -38,10 +32,10 @@ describe("parsePrePushRange", () => {
       "refs/heads/new 1111111111111111111111111111111111111111 refs/heads/new 0000000000000000000000000000000000000000\n" +
       MAIN_UPDATE;
 
-    assert.deepEqual(parsePrePushRange(text)?.base, "2222222222222222222222222222222222222222");
+    assert.equal(parsePrePushRange(text)?.base, "2222222222222222222222222222222222222222");
   });
 
-  it("returns null when nothing qualifies, so the hook keeps its default range", () => {
+  it("returns null when nothing qualifies, so the hook keeps its default base", () => {
     assert.equal(parsePrePushRange(""), null);
     assert.equal(
       parsePrePushRange("refs/heads/new 1111111111111111111111111111111111111111 refs/heads/new 0000000000000000000000000000000000000000\n"),

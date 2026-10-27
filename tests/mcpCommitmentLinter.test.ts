@@ -2,6 +2,9 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { listAgentTools } from "../lib/agent/tools";
 import { handleMcpRequest } from "../lib/mcp/httpMcpServer";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 describe("mcpCommitmentLinter and stress-testing tools", () => {
   it("lists the new AI capability tools", () => {
@@ -11,6 +14,7 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
     assert.ok(names.includes("stress_test_plan"));
     assert.ok(names.includes("lint_commitment"));
     assert.ok(names.includes("lint_sprint_goal"));
+    assert.ok(names.includes("audit_sprint_retro"));
     assert.ok(names.includes("get_analog_playbook"));
   });
 
@@ -123,5 +127,34 @@ describe("mcpCommitmentLinter and stress-testing tools", () => {
     assert.ok(typeof data.pauseTrigger === "string" && data.pauseTrigger.length > 0);
     assert.ok(typeof data.reversalTrigger === "string" && data.reversalTrigger.length > 0);
     assert.ok(Array.isArray(data.fragileAssumptions));
+  });
+
+  it("handles tools/call for audit_sprint_retro via MCP JSON-RPC", async () => {
+    const request = new Request("http://localhost/api/mcp", {
+      method: "POST",
+      headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+      body: JSON.stringify({
+        jsonrpc: "2.0",
+        id: 105,
+        method: "tools/call",
+        params: {
+          name: "audit_sprint_retro",
+          arguments: {
+            planText: "Committed to 3 new roles without revenue payback proof.",
+          },
+        },
+      }),
+    });
+
+    const response = await handleMcpRequest(request);
+    const body: any = await response.json();
+
+    assert.equal(body.id, 105);
+    assert.ok(body.result);
+    const data = body.result.structuredContent;
+    assert.ok(data.regime);
+    assert.ok(typeof data.headline === "string");
+    assert.ok(Array.isArray(data.activePauseTriggers));
+    assert.ok(typeof data.markdown === "string");
   });
 });

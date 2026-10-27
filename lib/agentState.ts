@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { formatMarginBand } from "./report/reportFormatting";
 import { buildAgentEndpoints } from "./agent/discovery";
 import { REGIME_KEYS } from "./agent/inputs";
 import { loadAgentInterfaceContext, type AgentInterfaceContext } from "./agentInterface";
@@ -10,6 +11,7 @@ import { buildDecisionMovementForReport } from "./report/decisionMovement";
 import { findSignalDelta } from "./report/evidenceReaderModel";
 import { buildSharedCorridorRails } from "./report/operatingCalls";
 import { describeScoreMovementCaveat, listScoreMovementParts } from "./report/scoreMovement";
+import { toScoringBasisPayload } from "./report/scoringBasis";
 import { signalReadingMeaning } from "./report/signalTranslations";
 import { buildUseConstraint } from "./report/useConstraint";
 import { siteUrl } from "./siteUrl";
@@ -30,6 +32,14 @@ import { isSavedCopy } from "./report/provenanceStatus";
  * Machine fields keep the names the rest of the API uses (`tightness`,
  * `riskAppetite`); each carries the name a reader sees beside it (`label`).
  */
+
+/** The Monday 14:00 UTC publication that follows `now` (strictly after it). */
+export const nextWeeklyCallDue = (now: Date): string => {
+  const due = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate(), 14));
+  due.setUTCDate(due.getUTCDate() + ((8 - due.getUTCDay()) % 7));
+  if (due.getTime() <= now.getTime()) due.setUTCDate(due.getUTCDate() + 7);
+  return due.toISOString();
+};
 
 const sideSchema = z.enum(["above", "below", "at"]);
 
@@ -58,6 +68,31 @@ const scoreSchema = z.object({
     .describe("What `delta` is made of, signed; the points add up to `delta`. Empty when nothing moved or the split is not available."),
 });
 
+/** Which inputs set the scores (`lib/report/scoringBasis.ts`), shared by the state and the full brief. */
+const scoringBasisSchema = z
+  .object({
+    key: z
+      .enum(["record", "extended"])
+      .describe("record: only the inputs the archive scores every month-end move the scores, so the record and the calibration study test the score that sets the guidance. extended: a reading scored before 2026-10-09, whose scores also counted inputs the record cannot test."),
+    label: z.string().describe("The basis in the words a reader sees beside the call."),
+    warning: z
+      .string()
+      .nullable()
+      .describe("What the inputs left out would do, when they would put a score past a change, pause or resume line the published score is not past. Null otherwise."),
+    notCounted: z
+      .array(
+        z.object({
+          score: z.enum(["tightness", "riskAppetite"]),
+          inputs: z.string().describe("What the inputs left out are called."),
+          value: z.number().describe("The score with them counted."),
+          published: z.number().describe("The published score, which leaves them out."),
+          line: z.string().nullable().describe("The line they would carry the score past; null when none."),
+        }),
+      )
+      .describe("Each score the inputs outside the record would move. They move nothing published."),
+  })
+  .describe("Which inputs set the scores. Additive: every other field is unchanged.");
+
 export const agentStateSchema = z.object({
   version: z.literal("v1"),
   generatedAt: z.string(),
@@ -68,6 +103,9 @@ export const agentStateSchema = z.object({
     recordAgeDays: z.number(),
     live: z.boolean().describe("True when the reading came from a live fetch."),
     fallback: z.boolean().describe("True when it is a saved copy, not a live reading."),
+    nextCallDue: z
+      .string()
+      .describe("ISO time of the next weekly publication (Mondays 14:00 UTC, the cron in wrangler.toml). The call is current until then; after it, re-read before quoting."),
   }),
   automation: z
     .object({
@@ -127,15 +165,16 @@ export const agentStateSchema = z.object({
     avoidNow: z.array(z.string()),
     flipConditions: z.array(z.string()).describe("What would change the guidance."),
   }),
+  scoringBasis: scoringBasisSchema,
   use: z.object({ summary: z.string(), humanReview: z.string(), policy: z.string() }),
   links: z.object({ brief: z.string(), full: z.string(), trust: z.string() }),
 });
 
 type AgentState = z.infer<typeof agentStateSchema>;
 
-const CONFIDENCE_MEANING = "How far the scores sit from the line where conditions change. It is not a probability.";
-
-const CONFIDENCE_WORD = { HIGH: "high", MED: "medium", LOW: "low" } as const;
+/* The field keeps its name; pages call the same number the margin (2026-10-09). */
+const CONFIDENCE_MEANING =
+  "The margin: how far the scores sit from the line where conditions change. It is not a probability. Pages print it as \"Margin\".";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -173,7 +212,7 @@ const scoreHeadline = (score: AgentState["scores"]["tightness"]) => {
  * On a held week what would change the guidance is the hold's condition, the
  * brief's "Conditions change if" (`whatFlipsNext.flipTrigger`). This listed the two
  * score lines there too, "Funding pressure above 70" and "Risk appetite at or below
- * 50", beside a call that said to keep last week's plan until the scores agree.
+ * 50", beside a call that said to keep your current plan until the scores agree.
  */
 export const buildAgentGuidance = ({
   reportData,
@@ -210,6 +249,7 @@ export const buildAgentState = (
     isFallback,
     isLive: treasury.isLive,
     fallbackReason: treasury.fallback_reason,
+    macroSeries: reportData.macroSeries,
     recordDate,
     now,
   });
@@ -249,7 +289,7 @@ export const buildAgentState = (
     generatedAt: now.toISOString(),
     recordDate,
     headline: [
-      `${label} (${conditionsMeaning}), ${CONFIDENCE_WORD[confidence.label]} confidence, reading of ${recordDate}.`,
+      `${label} (${conditionsMeaning}), margin ${formatMarginBand(confidence.label).toLowerCase()}, reading of ${recordDate}.`,
       `${scoreHeadline(tightness)}; ${lowerFirst(scoreHeadline(riskAppetite))}.`,
       readiness.ok ? "The data is live and current." : `Do not automate on this: ${readiness.reason}`,
     ].join(" "),
@@ -258,6 +298,7 @@ export const buildAgentState = (
       recordAgeDays,
       live: treasury.isLive === true,
       fallback: isFallback,
+      nextCallDue: nextWeeklyCallDue(now),
     },
     automation: { ready: readiness.ok, refusal: readiness.ok ? null : readiness.reason },
     conditions: { key: assessment.regime, label, meaning: conditionsMeaning },
@@ -277,6 +318,7 @@ export const buildAgentState = (
       })),
     },
     guidance: buildAgentGuidance({ reportData, postureState }),
+    scoringBasis: toScoringBasisPayload(reportData.scoringBasis),
     use: buildUseConstraint(),
     links: {
       brief: endpoints.brief,

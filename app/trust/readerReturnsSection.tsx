@@ -57,7 +57,7 @@ export function ReaderReturnsSection({ line, generatedAt }: ReaderReturnsProps) 
     <ReportSection
       id="reader-returns"
       title="Reader returns"
-      description="How many browsers opened the brief in a later week than the one they last had it."
+      description="How many browsers came back to the brief in a later week."
     >
       <p className="text-sm text-slate-100">{line}</p>
       <p className="mt-2 text-xs leading-5 text-slate-400">

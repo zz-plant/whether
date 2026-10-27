@@ -9,8 +9,8 @@ import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { noindexRobots } from "../../../lib/seo/indexationPolicy";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
-import { ToolkitPlaybookGlyph } from "../../components/illustrations/ToolkitPlaybookGlyph";
 import { ArrowRightIcon } from "../../components/uiIcons";
 type Params = { slug: string };
 
@@ -51,34 +51,31 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           is ready the day that changes. */}
       <JsonLdScript data={buildToolkitHowTo(toolkit)} />
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Resolve", href: "/resolve" },
-          { label: "Toolkits", href: "/resolve#toolkit-library" },
-          { label: toolkit.title },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(`/toolkits/${toolkit.slug}`, [
+            { name: "More tools", path: "/resources#more-tools" },
+            { name: toolkit.title, path: `/toolkits/${toolkit.slug}` },
+          ]),
+        )}
       />
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="space-y-2 max-w-2xl">
-            <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{toolkit.title}</h1>
-            <p className="text-sm text-slate-300">{toolkit.whenToUse}</p>
-            {/* How long and who, stated plainly under the title. They were two
-                capitalised badges above it, the time in the monospace face, and
-                the participant list a whole sentence in capitals: the stamp and
-                figure registers spent on a meeting's logistics. */}
-            <dl className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
-              <div className="flex gap-1.5">
-                <dt className="text-slate-500">Time</dt>
-                <dd className="font-medium text-slate-200">{toolkit.timeToRun}</dd>
-              </div>
-              <div className="flex gap-1.5">
-                <dt className="text-slate-500">Who</dt>
-                <dd className="font-medium text-slate-200">{toolkit.recommendedParticipants}</dd>
-              </div>
-            </dl>
-          </div>
-          <ToolkitPlaybookGlyph size={60} className="self-start sm:self-center" />
+        <div className="space-y-2 max-w-2xl">
+          <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">{toolkit.title}</h1>
+          <p className="text-sm text-slate-300">{toolkit.whenToUse}</p>
+          {/* How long and who, stated plainly under the title. They were two
+              capitalised badges above it, the time in the monospace face, and
+              the participant list a whole sentence in capitals: the stamp and
+              figure registers spent on a meeting's logistics. */}
+          <dl className="flex flex-wrap gap-x-5 gap-y-1 text-xs">
+            <div className="flex gap-1.5">
+              <dt className="text-slate-500">Time</dt>
+              <dd className="font-medium text-slate-200">{toolkit.timeToRun}</dd>
+            </div>
+            <div className="flex gap-1.5">
+              <dt className="text-slate-500">Who</dt>
+              <dd className="font-medium text-slate-200">{toolkit.recommendedParticipants}</dd>
+            </div>
+          </dl>
         </div>
 
         <dl className="grid gap-3 pt-2 sm:grid-cols-2 text-sm border-t border-slate-800/80">

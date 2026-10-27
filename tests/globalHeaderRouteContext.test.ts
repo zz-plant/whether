@@ -4,32 +4,25 @@ import { describe, it } from "bun:test";
 import { hasVisibleActiveNavLink, resolveGlobalHeaderRouteLabel } from "../lib/navigation/globalHeader";
 
 /**
- * The header may drop the route label beside the wordmark only where the
- * navigation shows the route itself.
- *
- * The six loop layers render as tabs, so each of them (and any route nested
- * under one) names itself. Utility and content routes — `/pricing`, `/about`,
- * `/brief/<week>` — sit outside the loop, so the label comes back for those.
+ * The header may drop the route label beside the wordmark only where a group
+ * tab marks the route. Every grouped page and route family does; utility and
+ * legal routes — `/about`, `/share`, `/api-docs` — sit outside the groups, so the
+ * label comes back for those.
  */
 
 describe("route context in the global header", () => {
-  it("reports a visible active link for every loop layer, nested routes included", () => {
-    for (const pathname of ["/", "/signals", "/signals/thresholds", "/operate", "/resolve", "/trust", "/history", "/history/compare"]) {
+  it("reports a visible active link for every grouped route, nested routes included", () => {
+    for (const pathname of ["/", "/signals", "/signals/capital-tightness-watch", "/operate", "/trust", "/history", "/history/compare", "/brief/2026-w31", "/resources/some-article", "/answers/x"]) {
       assert.equal(hasVisibleActiveNavLink(pathname), true, pathname);
     }
   });
 
   it("reports none for utility and unlisted routes, which then keep their label", () => {
-    for (const pathname of [
-      "/pricing",
-      "/about",
-      "/brief/2026-w31",
-      "/resources/some-article",
-    ]) {
+    for (const pathname of ["/about", "/share", "/api-docs"]) {
       assert.equal(hasVisibleActiveNavLink(pathname), false, pathname);
       // Whatever the header falls back to must actually name something.
       const label = resolveGlobalHeaderRouteLabel(pathname);
-      assert.ok(label && label.length > 0, `${pathname} resolves a label`);
+      assert.ok(label && label !== "Page", `${pathname} resolves a label`);
     }
   });
 

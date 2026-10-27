@@ -1,9 +1,29 @@
 #!/usr/bin/env node
+/**
+ * Review preflight: the working tree compared with a base commit.
+ *
+ * Fails when a decision-logic file changed with no test change beside it, or when an
+ * added line carries an `as` type assertion. One comparison: `base` to `head`, where head
+ * is the working tree unless a commit is named, so a local run judges committed and
+ * uncommitted work together.
+ *
+ *   base = --base <ref> | REVIEW_HOTSPOT_BASE | merge-base with main | HEAD~1
+ *   head = --head <ref> | REVIEW_HOTSPOT_HEAD | the working tree
+ *
+ * The merge-base default means a branch is judged on what it changes against main,
+ * however many commits that is, and a merge commit does not read the base's own lines
+ * as new. On main itself (merge-base is HEAD) the last commit is the base. The pre-push
+ * hook passes the remote and local shas, so a push is judged on exactly the commits it
+ * sends, whichever ref is checked out. docs/agents/lessons/tests-and-copy-rules.md.
+ *
+ * Usage:
+ *   node scripts/review-hotspot-preflight.mjs [--base <ref>] [--head <ref>]
+ */
 
 import { existsSync, readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 
-import { execText } from "./exec.mjs";
+import { execOutput, execText } from "./exec.mjs";
 
 const args = process.argv.slice(2);
 
@@ -17,133 +37,59 @@ function hasFlag(name) {
   return args.includes(name);
 }
 
-function isAllZeroSha(value) {
-  return /^0{40}$/.test(value);
+/** The ref, or "" when git cannot resolve it (an all-zero sha, a sha never fetched). */
+function verifiedRef(ref) {
+  if (!ref || /^0+$/.test(ref)) return "";
+  try {
+    return execText("git", ["rev-parse", "--verify", `${ref}^{commit}`]) ? ref : "";
+  } catch {
+    return "";
+  }
 }
 
-function sanitizeBaseRef(base) {
-  if (!base || isAllZeroSha(base)) return "";
-
+function tryGit(gitArgs) {
   try {
-    return execText("git", ["rev-parse", "--verify", base]) ? base : "";
+    return execText("git", gitArgs);
   } catch {
     return "";
   }
 }
 
 /**
- * What the scan compares, and whether that includes uncommitted work.
- *
- * The two modes differ in a way nothing said out loud. `--base` produces a
- * three-dot range, which is commit-to-commit and ignores the working tree
- * entirely. The default produces a single ref, and `git diff <ref>` compares
- * the working tree against it — so the default scan covers the last commit
- * *and* every uncommitted edit, while the CI mode covers neither's overlap.
- * Someone running `bun run check` before committing was reading a result that
- * included a commit they had already pushed, and someone reading a CI run was
- * reading one that could not see a dirty tree at all.
- *
- * `--working-tree` is the third, explicit case: uncommitted changes only.
- * `describeDiffRange` names whichever applies in the printed output, so the
- * line in the gate log says what was actually compared.
+ * The base to diff against. Pure, so the choice is tested without a repository: the
+ * caller supplies what git said.
  */
-
-/**
- * The default range, given what HEAD turns out to be.
- *
- * `HEAD~1` is the first parent, which is right for an ordinary commit and wrong
- * for a merge: on "merge the base branch into this PR", the first parent is the
- * pre-merge branch tip, so `git diff HEAD~1` reports every line the *base*
- * brought in as newly added by this change. The pre-push hook failed that way
- * on a routine base merge, flagging an `as` cast that had been on `main` for a
- * day, and the gate's own fix for a merge conflict could not be pushed without
- * `SKIP_PREPUSH=1`.
- *
- * For a merge, the second parent is the branch being merged *in* — the base —
- * so `HEAD^2...HEAD` is "everything on this branch since it last agreed with
- * the base", which is the change under review. It is a three-dot range, so it
- * ignores the working tree, which is the honest reading on a merge commit
- * anyway: what a merge commit contributes is committed by definition.
- *
- * Pure so the decision is testable without building a repository with two
- * parents; the caller supplies what git said.
- */
-export function resolveDefaultDiffRange({ hasHeadParent, parentCount }) {
-  if (!hasHeadParent) return ["HEAD"];
-  /* Two ranges, because one cannot say both things. `HEAD^2...HEAD` is
-     commit-to-commit and ignores the working tree, and the default mode's whole
-     value is that it sees uncommitted work — a branch cut from this repo's main
-     starts at a merge commit, so keying only off the merge would have made every
-     fresh branch's edits invisible until the first commit. That is a worse bug
-     than the one this fixes. */
-  if (parentCount >= 2) return ["HEAD^2...HEAD", "HEAD"];
-  return ["HEAD~1"];
+export function resolveDiffBase({ explicit = "", mergeBase = "", head = "", hasParent = false }) {
+  if (explicit) return explicit;
+  if (mergeBase && mergeBase !== head) return mergeBase;
+  if (hasParent) return "HEAD~1";
+  return "HEAD";
 }
 
-function countHeadParents() {
-  const line = execText("git", ["rev-list", "--parents", "-n", "1", "HEAD"]);
-  if (!line) return 0;
-  /* "<commit> <parent>..." — every field after the commit itself is a parent. */
-  return line.trim().split(/\s+/).length - 1;
+function resolveBase() {
+  const explicit = verifiedRef(readArg("--base", process.env.REVIEW_HOTSPOT_BASE || ""));
+  const head = tryGit(["rev-parse", "HEAD"]);
+  const mergeBase = tryGit(["merge-base", "HEAD", "origin/main"]) || tryGit(["merge-base", "HEAD", "main"]);
+  const hasParent = Boolean(verifiedRef("HEAD~1"));
+  return resolveDiffBase({ explicit, mergeBase, head, hasParent });
 }
 
-/** Every range the scan compares, in the order they are reported. */
-function getDiffRanges() {
-  const base = sanitizeBaseRef(readArg("--base", process.env.REVIEW_HOTSPOT_BASE || ""));
-  const head = readArg("--head", process.env.REVIEW_HOTSPOT_HEAD || "HEAD");
-
-  if (hasFlag("--working-tree")) {
-    return ["HEAD"];
-  }
-
-  if (base) {
-    return [`${base}...${head}`];
-  }
-
-  try {
-    const hasHeadParent = Boolean(execText("git", ["rev-parse", "--verify", "HEAD~1"]));
-    return resolveDefaultDiffRange({ hasHeadParent, parentCount: countHeadParents() });
-  } catch {
-    return ["HEAD"];
-  }
+/** What `git diff` compares `base` with: a named commit, or the working tree when none is. */
+function resolveHead() {
+  return verifiedRef(readArg("--head", process.env.REVIEW_HOTSPOT_HEAD || ""));
 }
 
-/** Says, in words, which commits and which uncommitted edits a range covers. */
-export function describeDiffRange(diffRange) {
-  if (Array.isArray(diffRange)) {
-    if (diffRange.length === 1) return describeDiffRange(diffRange[0]);
-    return `${diffRange.join(" + ")} (a merge commit: this branch since it last agreed with the base, plus any uncommitted changes)`;
-  }
-  if (diffRange === "HEAD^2...HEAD") {
-    return `${diffRange} (this branch since it last agreed with the base)`;
-  }
-  if (diffRange.includes("...")) {
-    return `${diffRange} (commits only — uncommitted changes are NOT scanned)`;
-  }
-  if (diffRange === "HEAD") {
-    return "HEAD (uncommitted changes only)";
-  }
-  return `${diffRange} (the last commit plus any uncommitted changes)`;
-}
-
-function changedFiles(diffRanges) {
-  const files = new Set();
-  for (const range of diffRanges) {
-    const output = execText("git", ["diff", "--name-only", range]);
-    if (!output) continue;
-    for (const file of output.split("\n")) {
-      const trimmed = file.trim();
-      if (trimmed) files.add(trimmed);
-    }
-  }
-  return [...files];
+function changedFiles(base, head) {
+  const output = execText("git", ["diff", "--name-only", base, ...(head ? [head] : [])]);
+  return output
+    .split("\n")
+    .map((file) => file.trim())
+    .filter(Boolean);
 }
 
 /**
- * Line numbers (1-based) that sit inside a comment. Exported because the scanner reads
- * comment state from the file rather than from the diff: tracking the block-comment open and
- * close markers across added lines alone only works when the opening `/**` is itself added,
- * so editing the middle of an existing doc comment used to hand the matcher bare prose.
+ * Line numbers (1-based) that sit inside a comment. Read from the file rather than the
+ * diff: editing the middle of an existing doc comment hands a diff-only scanner bare prose.
  */
 export function blockCommentLines(source) {
   const inside = new Set();
@@ -162,9 +108,8 @@ export function blockCommentLines(source) {
     const opensBlock = trimmed.includes("/*") && !trimmed.includes("*/", trimmed.indexOf("/*") + 2);
     if (opensBlock) {
       inBlock = true;
-      // Only excuse the line when the comment starts it. `const x = y as Foo; /* note`
-      // carries real code before the opener, and skipping the whole line would let an
-      // assertion through — a false negative in a gate is worse than a false positive.
+      // Only excuse the line when the comment starts it: `const x = y as Foo; /* note`
+      // carries real code before the opener.
       if (trimmed.startsWith("/*")) inside.add(lineNumber);
       return;
     }
@@ -180,17 +125,13 @@ export function blockCommentLines(source) {
 /** Whether one line of code carries a type assertion, ignoring comments and string prose. */
 export function isUnsafeAssertion(code) {
   const withoutComments = code.replace(/\/\*[\s\S]*?\*\//g, "").replace(/\/\/.*/g, "");
-  // Quoted prose ("treats the window as unchanged") tripped the matcher too. A type
-  // assertion cannot occur inside a string literal, so blank those out.
-  // Template literals are left alone — `${...}` can hold real code.
+  // A type assertion cannot occur inside a string literal. Template literals are left
+  // alone: `${...}` can hold real code.
   const withoutStrings = withoutComments
     .replace(/'(?:[^'\\]|\\.)*'/g, "''")
     .replace(/"(?:[^"\\]|\\.)*"/g, '""');
 
-  // Import renaming uses the same `as Name` tokens as a type assertion, but it does
-  // not override or narrow a runtime value. Both forms: the named rename, and the
-  // namespace import — `import * as nextNavigation from "next/navigation"`, which
-  // this refused until a test needed one to spread the real module over a mock.
+  // Import renaming uses the same `as Name` tokens but narrows no runtime value.
   if (
     /^\s*import\s+\{[^}]*\bas\s+[A-Za-z_$][\w$]*[^}]*\}\s+from\b/.test(withoutStrings) ||
     /^\s*import\s+\*\s+as\s+[A-Za-z_$][\w$]*\s+from\b/.test(withoutStrings)
@@ -206,21 +147,23 @@ export function isUnsafeAssertion(code) {
   return /\sas\s+[A-Za-z_$<{(]/.test(withoutStrings) && !/\sas\s+const\b/.test(withoutStrings);
 }
 
-function addedTypeAssertions(diffRanges) {
-  return [...new Set(diffRanges.flatMap((range) => addedTypeAssertionsForRange(range)))];
-}
-
-function addedTypeAssertionsForRange(diffRange) {
-  const diff = execText("git", ["diff", "--unified=0", diffRange, "--", "*.ts", "*.tsx"]);
+function addedTypeAssertions(base, head) {
+  const diff = execText("git", ["diff", "--unified=0", base, ...(head ? [head] : []), "--", "*.ts", "*.tsx"]);
   if (!diff) return [];
 
-  // Comment state comes from the file, not from the added lines. Tracking `/* */` across
-  // added lines alone only works when the opening `/**` is itself added: editing the middle
-  // of an existing doc comment hands the matcher bare prose, and every "renders as a
-  // header" in it reads as a type assertion. The diff's hunk headers carry each added
-  // line's number on the new side, so ask the file which lines are comments.
-  const commentLinesFor = (file) =>
-    existsSync(file) ? blockCommentLines(readFileSync(file, "utf8")) : new Set();
+  // Comment context comes from the same tree the diff's new side describes: the named head
+  // commit when there is one, the working tree otherwise. `execOutput`, not `execText`: a
+  // trimmed leading blank line would shift every line number.
+  const commentLinesFor = (file) => {
+    if (head) {
+      try {
+        return blockCommentLines(execOutput("git", ["show", `${head}:${file}`]));
+      } catch {
+        return new Set();
+      }
+    }
+    return existsSync(file) ? blockCommentLines(readFileSync(file, "utf8")) : new Set();
+  };
 
   const offenders = [];
   let file = null;
@@ -270,28 +213,29 @@ function main() {
       "Review hotspot preflight",
       "",
       "Usage:",
-      "  node scripts/review-hotspot-preflight.mjs [--base <sha>] [--head <sha>] [--working-tree]",
+      "  node scripts/review-hotspot-preflight.mjs [--base <ref>] [--head <ref>]",
       "",
-      "What each mode compares:",
-      "  (default)       the last commit plus any uncommitted changes",
-      "  --base <sha>    commit-to-commit; uncommitted changes are NOT scanned",
-      "  --working-tree  uncommitted changes only",
+      "Compares <base> with <head>, or with the working tree when no head is given.",
+      "Default base: the merge-base with main, or HEAD~1 on main itself.",
+      "REVIEW_HOTSPOT_BASE and REVIEW_HOTSPOT_HEAD set them from the environment.",
       "",
     ].join("\n"));
     process.exit(0);
   }
 
-  const diffRange = getDiffRanges();
-  const files = changedFiles(diffRange);
+  const base = resolveBase();
+  const head = resolveHead();
+  const compared = head ? `${base}..${head}` : `working tree against ${base}`;
+  const files = changedFiles(base, head);
 
   if (files.length === 0) {
-    console.log("No changed files detected for review-hotspot preflight.");
+    console.log(`No changed files (${compared}) for review-hotspot preflight.`);
     return;
   }
 
   const riskySourceChanges = files.filter(requiresTestCoverage);
   const hasTestChanges = files.some(isTestFile);
-  const assertionOffenders = addedTypeAssertions(diffRange);
+  const assertionOffenders = addedTypeAssertions(base, head);
 
   const failures = [];
 
@@ -302,14 +246,6 @@ function main() {
   }
 
   if (assertionOffenders.length > 0) {
-    /*
-     * Name them. `addedTypeAssertions` has collected `file: line` for each one
-     * since this check existed, and the report printed only the count — so the
-     * gate said "one unsafe assertion" and left you to find it by eye across the
-     * whole range. A count is a verdict; the offender is the thing you can act
-     * on, and withholding it is the same defect `run-checks.mjs` was fixed for
-     * on 2026-09-15.
-     */
     failures.push(
       [
         `Unsafe type assertions detected in added lines (${assertionOffenders.length}). Prefer runtime validation/narrowing.`,
@@ -318,7 +254,7 @@ function main() {
     );
   }
 
-  console.log(`Review hotspot preflight range: ${describeDiffRange(diffRange)}`);
+  console.log(`Review hotspot preflight: ${compared}`);
   console.log(`Changed files: ${files.length}`);
   console.log(`Risk-tagged source files: ${riskySourceChanges.length}`);
   console.log(`Test files changed: ${hasTestChanges ? "yes" : "no"}`);

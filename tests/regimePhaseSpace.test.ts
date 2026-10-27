@@ -182,11 +182,11 @@ describe("describePhaseGap", () => {
   it("says which way the reading would have to move, and what it would then read", () => {
     assert.equal(
       describePhaseGap(gaps.tightness),
-      "Funding pressure is 30 points below its boundary. Rising through it alone would read Cloudy.",
+      "Funding pressure is 30 points below its change line. Rising through it alone would read Cloudy.",
     );
     assert.equal(
       describePhaseGap(gaps.riskAppetite),
-      "Risk appetite is 20 points above its boundary. Falling back through it alone would read Stormy.",
+      "Risk appetite is 20 points above its change line. Falling back through it alone would read Stormy.",
     );
   });
 

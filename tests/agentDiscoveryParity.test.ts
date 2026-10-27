@@ -12,6 +12,9 @@ import { describeAgentTools, listAgentTools } from "../lib/agent/tools";
 import { agentManifestResponse } from "../lib/agentManifest";
 import { handleMcpRequest } from "../lib/mcp/httpMcpServer";
 import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INSTRUCTIONS } from "../lib/mcp/serverIdentity";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * A tool that is served and not listed is one an agent never learns to call, and a tool that is
@@ -103,6 +106,7 @@ describe("every place an agent learns what to call", () => {
     const discovery = [...llms.slice(llms.indexOf("## Discovery")).matchAll(/^- [^:]+: (\S+)$/gm)].map((match) => match[1]);
     assert.deepEqual(discovery, [
       `https://whether.work${WHETHER_AGENT_MANIFEST_PATH}`,
+      "https://whether.work/.well-known/webmcp.json",
       "https://whether.work/",
       manifest.endpoints.brief,
       manifest.endpoints.agent,
@@ -137,5 +141,13 @@ describe("every place an agent learns what to call", () => {
     assert.match(manifest.automation.check, /automation\.ready/);
     assert.ok(manifest.automation.refusesWhen.some((reason: string) => /saved copy/.test(reason)));
     assert.match(repoFile("docs", "agents", "agent-interface.md"), /automation\.ready/);
+  });
+
+  it("exposes WebMCP and model-context discovery links in the HTML root layout", () => {
+    const layout = repoFile("app", "layout.tsx");
+    assert.match(layout, /rel="webmcp"/);
+    assert.match(layout, /rel="model-context"/);
+    assert.match(layout, /rel="mcp"/);
+    assert.match(layout, /name="webmcp:endpoint"/);
   });
 });

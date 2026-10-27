@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
-import { afterEach, describe, it } from "bun:test";
+import { describe, it } from "bun:test";
 import { z } from "zod";
 import { getJson, parseStoredJson, type KvNamespace } from "../lib/runtime/kv";
-import {
-  getEntitlementBySessionId,
-  resetEntitlementMemoryStore,
-} from "../lib/billing/entitlements";
 
 const pointSchema = z.object({ x: z.number() });
 
@@ -20,11 +16,6 @@ const memoryKv = (entries: Record<string, string> = {}): KvNamespace & { entries
     list: async () => ({ keys: [], list_complete: true }),
   };
 };
-
-afterEach(() => {
-  Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");
-  resetEntitlementMemoryStore();
-});
 
 describe("parseStoredJson", () => {
   it("reads a value through a schema", () => {
@@ -64,26 +55,5 @@ describe("getJson", () => {
       },
     };
     await assert.rejects(getJson(failing, "p", pointSchema), /kv down/);
-  });
-});
-
-describe("entitlement records", () => {
-  /* Stripe sends null for a guest checkout's customer, and the webhook stores what it was sent. */
-  it("reads a record whose optional fields are null", async () => {
-    const kv = memoryKv({
-      "billing:entitlement:session:cs_null": JSON.stringify({
-        plan: "pro",
-        sessionId: "cs_null",
-        customerEmail: null,
-        stripeCustomerId: null,
-        status: "active",
-        activatedAt: "2026-08-01T00:00:00.000Z",
-      }),
-      "billing:entitlement:session:cs_bad": JSON.stringify({ plan: "pro", sessionId: "cs_bad" }),
-    });
-    Reflect.set(globalThis, "WHETHER_DURABLE_KV", kv);
-
-    assert.equal((await getEntitlementBySessionId("cs_null"))?.status, "active");
-    assert.equal(await getEntitlementBySessionId("cs_bad"), null, "a record with no status is no entitlement");
   });
 });

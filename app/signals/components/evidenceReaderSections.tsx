@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ReportSection } from "../../components/reportSection";
-import { ScoreCell } from "../../components/ui/scoreCell";
+import { ScoreCell, formatPoints } from "../../components/ui/scoreCell";
 import { ScoreLadder } from "../../components/ui/scoreLadder";
+import { GovernedAreas } from "../../components/ui/governedAreas";
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { ActionLink } from "../../components/ui/actionLink";
 import { toRoute } from "../../../lib/navigation/routeType";
@@ -27,7 +28,7 @@ import { buildSignalsFocusHref, focusTabs, type FocusTab } from "../evidenceQuer
  */
 
 const formatValue = (row: SignalReferenceRow, value: number) =>
-  `${value % 1 === 0 ? value.toFixed(0) : value.toFixed(row.units.suffix ? 2 : 1)}${row.units.suffix ?? ""}`;
+  `${formatPoints(value, row.units.decimals)}${row.units.suffix ?? ""}`;
 
 const TONE_CLASS: Record<SignalReferenceRow["direction"]["tone"], string> = {
   easing: "text-semantic-easing-fg",
@@ -111,6 +112,15 @@ export const SignalsWhatChangedSection = ({
           signal label into a narrow strip. */}
       <div className="md:overflow-x-auto overscroll-x-contain">
         <table className="w-full border-collapse text-left text-sm max-md:block md:min-w-[36rem]">
+          {/* The movement note needs the second column's width more than the signal
+              name needs the first's: left to the browser, "+3 from the yield curve…"
+              wrapped to four lines beside a one-line "Why it matters". */}
+          <colgroup className="max-md:hidden">
+            <col className="w-[14rem]" />
+            <col className="w-[20rem]" />
+            <col className="w-[15rem]" />
+            {showNotes ? <col /> : null}
+          </colgroup>
           <caption className="sr-only">{`Every signal this week, against its line and ${basis.reference}`}</caption>
           <thead className="max-md:hidden">
             <tr className="border-b border-slate-800/80 text-xs text-slate-400">
@@ -127,6 +137,8 @@ export const SignalsWhatChangedSection = ({
                 id={row.key}
                 className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-1 max-md:gap-y-4 max-md:py-4"
                 data-signal={row.key}
+                /* On a phone each row is a card of its own, and the unit a screenshot holds. */
+                data-frame-block=""
               >
                 <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-md:p-0">
                   {row.watchHref ? (
@@ -137,30 +149,35 @@ export const SignalsWhatChangedSection = ({
                     row.label
                   )}
                   {row.kindLabel ? <span className="block text-xs font-normal text-slate-500">{row.kindLabel}</span> : null}
-                  {row.key === "baseRate" ? (
+                  {row.key === "tightness" || row.key === "riskAppetite" ? (
+                    /* The areas this score sets the lines for, each opening the
+                       brief on that area's answer. It said "Sets the pause and
+                       resume lines" without saying whose. */
+                    <GovernedAreas metric={row.key} target="brief" className="mt-0.5" />
+                  ) : row.key === "baseRate" ? (
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
-                    </span>
-                  ) : row.key === "curveSlope" ? (
-                    /* Sets risk appetite outright, and adds to funding pressure only
-                       below zero (`computeRiskAppetiteScore` and the inversion points
-                       in regimeEngineCore). This said funding pressure alone. */
-                    <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Feeds into <a href="#call-lines" className="underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted
+                      Feeds into <a href="#call-lines" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
                     </span>
                   ) : (
+                    /* The curve slope. Sets risk appetite outright, and adds to
+                       funding pressure only below zero (`computeRiskAppetiteScore`
+                       and the inversion points in regimeEngineCore). This said
+                       funding pressure alone. */
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Sets operating boundary lines
+                      Feeds into <a href="#call-lines" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted
                     </span>
                   )}
                 </th>
                 <td className="py-2.5 pr-3 max-md:p-0">
+                  {/* The column head, on the row itself where the head is hidden: a phone
+                      frame of one row read "4.02 → 4.11" with nothing saying since when. */}
+                  <span className="mb-1 block text-fluid-nano text-slate-400 md:hidden">{`Since ${basis.reference}`}</span>
                   <DeltaChip row={row} />
                   {/* What the score's move is made of. The chip says how far it
                       went; this says which inputs took it there, and that the
                       earlier score was built from rates alone. */}
                   {row.movement ? (
-                    <p className="mt-1.5 max-w-[18rem] text-pretty text-xs leading-5 text-slate-400" data-movement={row.key}>
+                    <p className="mt-1.5 max-w-[26rem] text-pretty text-xs leading-5 text-slate-400" data-movement={row.key}>
                       {row.movement}
                     </p>
                   ) : null}
@@ -172,13 +189,12 @@ export const SignalsWhatChangedSection = ({
                     /* "This week", not the signal's name: the row header one
                        column over already says it, so every row printed
                        "Funding pressure" twice and on a phone the two sat
-                       two lines apart. It pairs with the earlier reading's date below it. */
+                       two lines apart. No earlier reading under it (2026-10-09):
+                       the chip one column over prints "56 → 49" in the same row. */
                     <ScoreCell
                       label="This week"
                       value={row.value}
                       line={row.line}
-                      previous={row.previous}
-                      previousLabel={row.previousLabel}
                       units={row.units}
                     />
                   )}

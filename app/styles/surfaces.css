@@ -24,14 +24,8 @@
 .weather-surface {
   @apply rounded-2xl border;
   border-color: var(--border-strong);
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.015)),
-    var(--bg-surface);
-  backdrop-filter: blur(calc(16px * var(--shadow-scale)));
-  -webkit-backdrop-filter: blur(calc(16px * var(--shadow-scale)));
-  box-shadow:
-    var(--elev-3),
-    inset 0 1px 0 var(--edge-highlight);
+  background: var(--bg-surface);
+  box-shadow: var(--elev-2);
   transition: border-color 250ms ease, box-shadow 250ms ease;
   container-type: inline-size;
 }
@@ -50,14 +44,8 @@
   @apply rounded-xl border px-4 py-3.5 sm:px-5 sm:py-4;
   border-color: var(--border-default);
   transition: border-color 250ms ease, box-shadow 250ms ease;
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.01)),
-    color-mix(in srgb, var(--bg-body) 38%, transparent);
-  backdrop-filter: blur(calc(12px * var(--shadow-scale)));
-  -webkit-backdrop-filter: blur(calc(12px * var(--shadow-scale)));
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 var(--edge-highlight-faint);
+  background: var(--bg-panel);
+  box-shadow: var(--elev-1);
 }
 
 /* No hover on a container. A stat card that lifts and glows under the pointer
@@ -65,32 +53,33 @@
    (controls.css, layout-shells.css). */
 
 /* Hero card. The one surface whose colour is allowed to say something: its
-   fill, border and top-edge light all come from --regime-accent, which the
-   hero sets on itself from the week's regime (data-regime), so the card is
-   emerald in a Sunny week, rose in a Freezing one, and cannot disagree with
-   the stamp inside it. Before this it was fixed teal — the stripe's colour
-   for Sunny — under every call. No outer glow, since a box
-   that glows lifts off its page, and the depth ladder below already gives
-   the hero the only elevation on the brief. */
+   top-edge rule and border come from --regime-accent, which the hero sets on
+   itself from the week's regime (data-regime), so the card is gold in a Sunny
+   week, frost blue in a Freezing one, and cannot disagree with the stamp
+   inside it. The rule is a status mark, not a side-tab stripe: it carries the
+   week's condition through a crop or a re-encode, which a wash does not. The
+   fill stays the flat panel, so the call, not the box, is what reads first,
+   and there is no outer glow — the depth ladder already gives the hero the
+   brief's only elevation. */
 .weather-hero-card {
   position: relative;
-  /* A flat fill, not a wash. This card is the block people screenshot, and
-     every channel it lands in re-encodes the image: a soft gradient on a dark
-     ground comes back as visible bands. The hue carries on the fill, the
-     border and the top edge, which survive any encoder. */
-  background: color-mix(in srgb, var(--bg-panel) 91%, var(--regime-accent) 9%);
-  border-color: color-mix(in srgb, var(--regime-accent) 34%, var(--border-strong));
+  background:
+    radial-gradient(ellipse 80% 45% at 50% -5%, color-mix(in srgb, var(--regime-accent) 12%, transparent), transparent 75%),
+    var(--bg-panel);
+  border-color: color-mix(in srgb, var(--regime-accent) 20%, var(--border-strong));
   box-shadow:
-    var(--elev-3),
-    inset 0 1px 0 color-mix(in srgb, var(--regime-accent) 22%, var(--edge-highlight));
+    var(--elev-2),
+    inset 0 3px 0 var(--regime-accent);
 }
 
 html[data-theme="light"] .weather-hero-card {
-  background: color-mix(in srgb, var(--bg-panel, #ffffff) 95%, var(--regime-accent) 5%);
-  border-color: color-mix(in srgb, var(--regime-accent) 30%, var(--border-strong));
+  background:
+    radial-gradient(ellipse 80% 45% at 50% -5%, color-mix(in srgb, var(--regime-accent) 8%, transparent), transparent 75%),
+    var(--bg-panel, #ffffff);
+  border-color: color-mix(in srgb, var(--regime-accent) 18%, var(--border-strong));
   box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+    var(--elev-1),
+    inset 0 3px 0 var(--regime-accent);
 }
 
 /* The regime's atmosphere. One wash for both shells: the brief's container
@@ -100,28 +89,6 @@ html[data-theme="light"] .weather-hero-card {
    --bg-body itself, which is what the card ladder was measured against. */
 .weather-regime-ground {
   background-image: linear-gradient(to bottom, var(--regime-atmosphere) 0%, transparent 60%);
-}
-
-/* Report-page intro. The hero card above is the brief's; this is every other
-   route's, and until 2026-09-16 it was plain slate under a status line that
-   named the week — a reader on /operate got no colour cue the hero gives on /.
-   Same treatment as the hero at lower weight, flat for the same reason (it is
-   what a screenshot of a report route catches); the border and top edge take
-   the hue at about two thirds of the hero's mix. */
-.weather-page-intro {
-  background: color-mix(in srgb, var(--bg-raised) 93%, var(--regime-accent) 7%);
-  border-color: color-mix(in srgb, var(--regime-accent) 24%, var(--border-default));
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 color-mix(in srgb, var(--regime-accent) 16%, var(--edge-highlight-faint));
-}
-
-html[data-theme="light"] .weather-page-intro {
-  background: color-mix(in srgb, var(--bg-raised) 96%, var(--regime-accent) 4%);
-  border-color: color-mix(in srgb, var(--regime-accent) 22%, var(--border-default));
-  box-shadow:
-    var(--elev-2),
-    inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 /* New surface system: typographic hierarchy over container hierarchy.
@@ -149,9 +116,10 @@ html[data-theme="light"] .weather-page-intro {
   @apply inline-flex items-center gap-1 rounded-sm border px-2 py-1 text-xs font-semibold;
 }
 
+/* Live data is the clear state: the ink, framed. */
 .weather-data-mode-dynamic {
-  border-color: rgba(16, 185, 129, 0.30);
-  background-color: rgba(16, 185, 129, 0.08);
+  border-color: color-mix(in srgb, var(--line-clear) 30%, transparent);
+  background-color: color-mix(in srgb, var(--line-clear) 8%, transparent);
   color: var(--color-semantic-easing-fg);
 }
 
@@ -194,12 +162,12 @@ html[data-theme="light"] .weather-page-intro {
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro)
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro) {
+    .weather-surface-secondary) {
   box-shadow: none;
   backdrop-filter: none;
   -webkit-backdrop-filter: none;
@@ -213,17 +181,17 @@ html[data-theme="light"] .weather-page-intro {
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro)
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro)
+    .weather-surface-secondary)
   :is(
     .weather-panel, .weather-surface, .weather-card,
     .weather-panel-static, .weather-step-panel,
     .weather-hero-card, .weather-hub-section, .weather-hub-card, .weather-hub-link-card,
-    .weather-surface-secondary, .weather-page-intro):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
+    .weather-surface-secondary):not([class*="weather-surface-"], [class*="border-"], [class*="bg-"], [data-emphasis]) {
   border-color: transparent;
   background: none;
 }
@@ -328,9 +296,12 @@ button .weather-chip:active,
 
 /* Print & PDF optimization --------------------------------------------- */
 @media print {
+  /* Print commits to paper, so these are the light theme's values as
+     literals: Synoptic's ink (#121719), muted ink (#525c60), the ink at 21%
+     on white for a border, and the light front red for a crossed line. */
   body {
     background: #ffffff !important;
-    color: #0f172a !important;
+    color: #121719 !important;
     font-size: 11pt !important;
   }
 
@@ -349,11 +320,11 @@ button .weather-chip:active,
   .weather-card,
   .weather-panel {
     background: #ffffff !important;
-    border: 1px solid #cbd5e1 !important;
+    border: 1px solid #cfd1d1 !important;
     box-shadow: none !important;
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
-    color: #0f172a !important;
+    color: #121719 !important;
     break-inside: avoid;
     page-break-inside: avoid;
   }
@@ -361,33 +332,20 @@ button .weather-chip:active,
   .type-eyebrow,
   .type-data,
   h1, h2, h3, h4, p, span, dt, dd {
-    color: #0f172a !important;
+    color: #121719 !important;
   }
 
   .text-slate-400,
   .text-slate-500,
   .text-slate-300 {
-    color: #475569 !important;
-  }
-
-  .text-sky-200,
-  .text-sky-400 {
-    color: #0369a1 !important;
-  }
-
-  .text-emerald-300,
-  .text-emerald-400 {
-    color: #047857 !important;
+    color: #525c60 !important;
   }
 
   .text-amber-300,
-  .text-amber-400 {
-    color: #b45309 !important;
-  }
-
+  .text-amber-400,
   .text-rose-300,
   .text-rose-400 {
-    color: #b91c1c !important;
+    color: #b4232a !important;
   }
 }
 
@@ -428,7 +386,7 @@ button .weather-chip:active,
     font-size: var(--fs-xs);
     font-weight: 600;
     letter-spacing: 0.01em;
-    color: var(--app-text-muted, #94a3b8);
+    color: var(--app-text-muted);
   }
 }
 

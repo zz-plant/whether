@@ -67,7 +67,11 @@ The argument for not waiting on a longer preview trial: the archive is deliberat
 backfilled, so every week spent proving this is a week the record can never honestly claim, and the
 failure modes are bounded — a bad run throws, opens no pull request, and writes a failing row;
 `assembleCurrentWeekBrief` refuses degraded and fallback data outright; and nothing merges the pull
-request without a person.
+request without a person. (Superseded 2026-10-14: the Workflows now merge their own data pull request
+once Cloudflare's branch build of it is green and it changes only its data file. A person merged w38
+through w41 by hand, and judging that a green gate ran on a one-file data change is mechanical. The
+branch build is the gate a freeze that moves a pinned test fails, before it reaches `main` and blocks
+every deploy. Details: the runbook's "Data pull requests merge themselves".)
 
 Manage them at <https://claude.ai/code/routines>. When an expected PR does not appear, check the
 routine's run log there before assuming nothing changed — a quiet week and a failed run look the
@@ -87,6 +91,23 @@ so the repo saw what looked like quiet weeks. The regime history refresh moved f
 Tuesday 12:00 UTC on 2026-10-06 for this reason. Schedule a routine early in the usage week, and read
 the run log before the code when its pull request does not appear.
 
+**The "Monday" cron ran on Sundays for five months (found 2026-10-14).** `wrangler.toml` said
+`0 14 * * 1`, and Cloudflare counts weekdays from 1 = Sunday, so from the trigger's creation on
+2026-05-18 the weekly email, the Slack brief and both Workflow hand-offs ran at 14:00 UTC on
+Sunday. No `cron-step` row could show it: a step knows whether it worked, never which day it was
+meant to run. It surfaced only because every 14:00 row in the telemetry carried a Sunday date. The
+trigger is `0 14 * * MON` now, and `tests/cronSchedule.test.ts` refuses a numeric weekday. Since the
+once-per-week send markers key on the ISO week of the send, a Sunday send (the end of one ISO week)
+followed by a Monday send (the start of the next) is two sends, not a duplicate the markers catch.
+
+**Failures now reach the owner, not only `/trust` (2026-10-14).** Nothing pushed a failed step
+anywhere, and `/trust` reads the run history only where `CLOUDFLARE_ANALYTICS_READ_TOKEN` is set,
+which production has never had. So unattended meant unobserved. The scheduled handler collects
+every failed step and, at the end of the run, `sendOpsFailureNotice` (`lib/delivery/opsNotice.ts`)
+mails one summary to `WHETHER_OPS_EMAIL`; both Workflows send their own when they fail, because
+they end hours after the cron's notice has gone. A clean run sends nothing. Without the address,
+each failing run writes an `ops-notice` row saying so instead of skipping quietly.
+
 **The refresh committed three of the five files it writes (2026-10-07).** `generateMonthlySummaries.ts`
 also writes `data/time_machine_cache.json` and `data/confidence_record_months.json`, and the routine's
 prompt said "Commit only those three data files". The cache is what the live week compares with when
@@ -99,7 +120,11 @@ moved past it `tests/regimeArchiveReplay.test.ts` failed on the count of replaya
 would block the routine's own push at the pre-push gate. The prompt can only be edited by its owner
 (the routine was created through the HTTP API, and an agent may edit only routines it created): it
 should run the weekly generator between the monthly and quarterly ones, verify with
-`regimeArchiveReplay.test.ts` too, and commit all seven files. The claims read-through was first scheduled Monday 15:47 UTC,
+`regimeArchiveReplay.test.ts` too, and commit all seven files. Since 2026-10-09 the generators also
+fetch FRED's `NFCI` (the Chicago Fed index is on the record basis, spec §1.1.67) and fail the run if
+it does not arrive, so a refresh never writes an archive on another basis; the host is the
+`fred.stlouisfed.org` it already reaches. `bun run archive:index` regenerates the `/history/[period]`
+index from the archive, and the prompt does not run it either. The claims read-through was first scheduled Monday 15:47 UTC,
 inside the window this section describes, and moved to Tuesday 02:13 UTC the same day; it now also
 checks that the month-end archive is current.
 
@@ -187,8 +212,8 @@ deploy gate: `WHETHER_DEPLOY_GATE=1 bun scripts/run-checks.mjs lint typecheck te
 included, runs lint, typecheck, the suite, and the asset check, and then the landmark audit,
 before anything is built or deployed. (Since 2026-10-06 the command is
 `bun scripts/run-checks.mjs --preset deploy`: the same two stages and the same signal, declared
-once in `scripts/check-tasks.mjs` beside the pre-push hook's preset, which `vinext-run.mjs` reads
-too. The lists had been written out in four places and a test compared two of them.) The audit runs second and alone because it spawns a dev
+once in `scripts/check-tasks.mjs` beside the pre-push hook's preset. The lists had been written out
+in four places and a test compared two of them.) The audit runs second and alone because it spawns a dev
 server and compiles every route against it; on a small box a server competing with lint, tsc,
 and the suite for cores turns a slow route into one that "never answered". **A failing test does
 block a deploy.**
@@ -205,33 +230,28 @@ see the toolchain note above for why that never did anything.) The runner also p
 suite it spawns: `bun test` only defaults it when unset, and a build container that sets
 `NODE_ENV=production` runs the suite in production mode, where `programmaticPayloadBuilder` stops
 relaxing its freshness contract and fails on fallback data. Those rules had only ever applied inside
-`scripts/vinext-run.mjs`'s inner gate — a step the build reaches *after* the outer command has
-already passed. `audit` and `hotspot-preflight` still run on pre-push (preflight) and in
+the build step's own inner gate (since removed) — a step the build reached *after* the outer command
+had already passed. `audit` and `hotspot-preflight` still run on pre-push (preflight) and in
 `bun run check` (both); they are excluded from the deploy path, not from the repo.
 
 This paragraph used to say the opposite — that the production branch skips the gate, so "a flaky
 test can never block a deploy" — and that sentence cost two days. Builds failed on all 27 commits
 from 2026-08-31 to 2026-09-01 while the doc said they couldn't, so nobody read the build log; the
-site served Aug-30 code for two days and the fix had to be deployed by hand. The confusion is that
-there are *two* gates. `scripts/vinext-run.mjs` does skip lint/typecheck/test/assets on the
-production branch, and still logs which way it went (`[vinext-run] check gate: …`) — but that gate
-guards `vinext-run build`, which CI only reaches *after* `bun run check` has already passed. The
-inner gate never decides whether a deploy happens.
+site served Aug-30 code for two days and the fix had to be deployed by hand. The confusion was that
+there were *two* gates: `scripts/vinext-run.mjs` also ran the checks before `vinext build` on
+preview branches, and skipped them on production, but that gate guarded only the build step, which
+the deploy reached *after* `bun run check` had already passed. The inner gate never decided whether
+a deploy happened.
 
-**The inner gate no longer repeats the outer one (2026-09-03).** Both were deliberate and each was
-documented on its own; nothing recorded that on a preview build the second could never fail, because
-the first had just passed on the same tree. It was the most expensive thing in the build — roughly a
-minute of lint, typecheck, suite, assets and landmarks re-run on every pull-request push, for no
-signal. Deleting the inner gate would have fixed the waste and given up the guarantee: the build
-command lives in the Cloudflare dashboard, so no test here can prove it still names `check:vinext`,
-and "a gate that quietly stops running is worse than no gate at all" is a rule this repo has already
-paid to learn. So the inner gate is skipped **by evidence**: `run-checks.mjs` under
-`WHETHER_DEPLOY_GATE=1` records which checks passed for the current commit
-(`scripts/check-gate-marker.mjs`, into gitignored `.cache/check-gate/`), and `vinext-run build` runs
-whichever of `GATE_TASKS` that record does not cover — all five, if the dashboard command ever stops
-writing one. The record is refused for a dirty tree, for another commit, and after six hours, so
-every way it can go wrong costs a repeated run rather than a skipped gate. The build log says which
-way it went.
+**The inner gate is gone (2026-10-07).** From 2026-09-03 it was skipped "by evidence": the outer run
+wrote a per-commit marker of what had passed (`scripts/check-gate-marker.mjs`, under
+`.cache/check-gate/`), and `vinext-run build` ran only what the marker did not cover, so that a
+dashboard command silently changed away from `check:vinext` would still be gated. That was a
+marker file, an age bound, a dirty-tree rule, a union across the two stages, a 250-line test and a
+second arrival in every doc, to defend against a dashboard setting no test can read. The guarantee
+it bought is now a line in `docs/cloudflare-deployment-runbook.md`: if the dashboard's build command
+changes, change the `deploy` preset, because the dashboard has no test. `vinext-run.mjs` only starts
+the Vinext CLI, and `tests/deployGateTestScope.test.ts` holds it to importing none of the gate.
 
 **A bound set under the real cost manufactures the failure it claims to detect (2026-09-17).** The
 landmark audit's per-route bound was 60s in the deploy gate. The gate spawns its own dev server, so
@@ -245,10 +265,17 @@ diff** — here, `git archive` into a scratch directory with `node_modules` hard
 `--base-url` pointed at an unused port so the audit starts its own cold server instead of reusing a
 warm one. The bound is still a bound: a route that never answers fails the gate.
 
-**The build container's checkout is not necessarily the commit (2026-09-17), and the gate now
-refuses one that is not.** After `fa1cc6e` merged, every build failed on two assertions — the memo
-example still reading as the blank form, and `public/embed.js` still holding the hardcoded origin —
-while `lint`, `typecheck` and every other test passed, and the same suite was green here through six
+**The cold-compile cost is gone; the bounds stay (2026-10-21).** The audit now serves the
+production worker under `wrangler dev` (`serve:worker`), which bundles once and renders every
+route from the bundle — no per-route cold compile, and it is the code that ships rather than a
+dev transform of it. Locally the stage went 20.3s → 6.9s. The 120s per-route bound and the 180s
+readiness bound remain: they are bounds, not targets, and a cold container still has to bundle
+602 modules once. The bounded history above is why they must not shrink.
+
+**The build container's checkout is not necessarily the commit (2026-09-17), and the gate refuses
+one that is not.** After `fa1cc6e` merged, every build failed on two assertions — the memo example
+still reading as the blank form, and `public/embed.js` still holding the hardcoded origin — while
+`lint`, `typecheck` and every other test passed, and the same suite was green here through six
 consecutive `WHETHER_DEPLOY_GATE=1` runs. The tell was inside one file: in `tests/embedRoute.test.ts`
 the case that reads `public/embed.js` failed while the case beside it, reading `app/api/embed/route.ts`
 and `app/share/embedBuilder.tsx` from the same commit, passed. `app/`, `lib/` and `tests/` were fresh
@@ -258,21 +285,24 @@ the mechanism: something wrote over `public/` after the clone. Two files from on
 disagree in a checkout, so a split like that is never a test problem, and the repo's answers for a
 flaky suite — run it again, run it alone, replay the seed — cannot find it.
 
-`scripts/check-gate-marker.mjs` had the answer the entire time and threw it away: `headCommit()`
-returns `""` for a dirty tree, so the marker was silently not written, and its own doc comment
-asserted that "the build container checks out clean, so this only ever fires locally". Believing
-that sentence cost a day and three wrong public hypotheses. `worktreeDrift()` now reports the
-drifted paths instead of collapsing them into `""`, and under `WHETHER_DEPLOY_GATE=1`
+`worktreeDrift()` (`scripts/exec.mjs`) reports the drifted paths, and under `WHETHER_DEPLOY_GATE=1`
 `run-checks.mjs` prints `HEAD <sha>` and **refuses before running any task** when a tracked file on
 disk differs from it. It is a refusal, not a note, for `check:dead-exports`'s reason and one worse
 than it: the results would be about something other than the commit, *and* the assets that deploy
 come from the same tree, so a green run would ship the drift. Untracked files are reported and
 allowed — a build container may leave something extra behind, which does not make the commit's own
-content wrong.
+content wrong. (The marker had this answer the whole time and threw it away: its `headCommit()`
+returned `""` for a dirty tree and its doc comment asserted the container "checks out clean".
+Believing that sentence cost a day and three wrong public hypotheses.)
 
-Clearing the project's build cache in the Cloudflare dashboard is the remedy, and it is a dashboard
-action: no push from here can fix a stale cache, and deleting the two assertions would have made
-`main` green while hiding the fact that stale static assets were the thing about to deploy.
+Clearing the project's build cache in the Cloudflare dashboard was the remedy until 2026-10-14, by
+hand, every time the cache went stale. That paragraph said no push from here could fix a stale cache,
+which was wrong: the gate runs inside the container, and git there holds the commit. Under
+`WORKERS_CI=1` the gate now runs `restoreTrackedFromHead` (`scripts/exec.mjs`, a `git reset --hard
+HEAD`), names every file it reset, and refuses only if drift survives the reset. Deleting the two
+assertions would still have been wrong: they are what showed that stale static assets were about to
+deploy. The reset is limited to the build container because on a laptop the same drift is
+uncommitted work.
 
 Two things that made a red build hard to read, both fixed 2026-09-01:
 
@@ -293,6 +323,17 @@ window. A branch that failed the build five times running showed nothing in any 
 passing tests and `exited with code 1`; the `❌` line and the assertion had scrolled out of reach.
 Whatever that window keeps, it keeps the end, so the end now carries enough to act on.
 `CHECK_FAILURE_TAIL_LINES` (default 40) sizes it.
+
+A fourth, 2026-10-13: **a passing step prints its verdict, not its output.** The repeat above only
+helps a failing gate. A *passing* gate still filled the window: `bun` 1.3.14 prints a line per
+passing test whenever stdout is not a terminal (the "silent on a pass" below holds only on a TTY),
+fallback warnings like `FRED circuit breaker open` repeated ~700 times, and the deploy step added
+Vite's chunk tables and Wrangler's 600-row module table. The deploy's own result fell out of the log
+and a working build read as a failed one. Now `run-checks` reduces a passing task to its last four
+lines (`CHECK_VERBOSE=1` restores the rest); a failing task keeps its output, with any line repeated
+more than three times printed once with its count; the gate runs `bun test --only-failures`;
+`cloudflare-run.mjs` sets Vite to `warn` when `WORKERS_CI=1` and prints Wrangler's module table as a
+count. A passing build is now ~45 lines and its deploy ~200. `tests/buildLogNoise.test.ts` holds it.
 
 That block also names **the `bun` it ran on**, and says so when that is older than `engines.bun`.
 Nothing enforces the declared range, so a build image shipping its own `bun` runs this gate on

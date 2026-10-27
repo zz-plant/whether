@@ -7,7 +7,6 @@ import { buildCanonicalDecisionCopy, type CanonicalDecisionCopy } from "./canoni
 import { buildHomeBriefModel, buildWeeklyDecisionCardViewModel } from "./homeBriefModel";
 import { loadReportDataSafe, type LoadReportDataSafeResult, type ReportData, type ReportDataFallback, type ReportDataLoadOptions, type ReportSearchParams } from "./reportData";
 import { buildCompactFreshnessMeta, type CompactFreshnessMeta } from "./reportFormatting";
-import { resolveSectorKey, type SectorKey } from "./sectorSensitivity";
 import { buildTrustStatus } from "./trustStatus";
 import { describePolicyHold } from "./regimeDescription";
 import type { PostureStateContract } from "./postureStateContract";
@@ -41,7 +40,6 @@ export type WeeklyBriefSnapshotResult = {
 type BuildWeeklyBriefSnapshotArgs = {
   reportData: ReportData | ReportDataFallback;
   degraded: boolean;
-  overlaySector?: SectorKey;
   postureState?: PostureStateContract | null;
   startupVariantMode?: StartupVariantMode;
   runwayBand?: RunwayBand;
@@ -90,7 +88,6 @@ const buildHomeBriefInput = (
 export const buildWeeklyBriefSnapshot = ({
   reportData,
   degraded,
-  overlaySector = "b2b-saas",
   postureState = null,
   startupVariantMode,
   runwayBand,
@@ -99,7 +96,7 @@ export const buildWeeklyBriefSnapshot = ({
   const isFallback = isSavedCopy(reportData.treasury);
   const homeBriefModel = buildHomeBriefModel(
     buildHomeBriefInput(reportData, postureState),
-    { overlaySector, startupVariantMode, runwayBand, runwayMonths },
+    { startupVariantMode, runwayBand, runwayMonths },
   );
   const freshnessMeta = buildCompactFreshnessMeta({
     updatedAtLabel: reportData.fetchedAtLabel,
@@ -193,7 +190,7 @@ export const buildWeeklyBriefSnapshot = ({
 export const loadWeeklyBriefSnapshot = async (
   searchParams?: ReportSearchParams,
   context?: { route?: string; requestId?: string },
-  options?: ReportDataLoadOptions & { overlaySector?: string },
+  options?: ReportDataLoadOptions,
 ): Promise<WeeklyBriefSnapshotResult> => {
   const reportResult = await loadReportDataSafe(searchParams, context, options);
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
@@ -206,7 +203,6 @@ export const loadWeeklyBriefSnapshot = async (
   const snapshot = buildWeeklyBriefSnapshot({
     reportData,
     degraded: !reportResult.ok,
-    overlaySector: resolveSectorKey(options?.overlaySector),
     postureState,
   });
 

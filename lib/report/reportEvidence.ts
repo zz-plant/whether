@@ -4,7 +4,7 @@ import { getPlaybookGuidance } from "../playbook";
 import { buildCanonicalBoundedDecisionRules, isRuleConditionMet, SPENDING_PAYBACK_BAR_MONTHS } from "./boundedDecisionRules";
 import { signalOrder } from "./briefFormatting";
 import { resolveLineDistanceLabel } from "./confidence";
-import { formatBoundaryDistance, formatConfidencePlainLabel } from "./reportFormatting";
+import { formatBoundaryDistance, formatConfidencePlainLabel, formatReadingsNow } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { REGIME_SEVERITY_RANK } from "../regimePresentation";
 import { formatScoreValue, formatThresholdNumber } from "../formatters";
@@ -78,6 +78,47 @@ export const splitWeeklyCall = (call: string): { action: string; directionLabel?
   const tone = match?.[1];
   if (!match || !tone || !isWeeklyTone(tone)) return { action: call };
   return { action: call.slice(match[0].length), directionLabel: WEEKLY_DIRECTION_LABEL[tone] };
+};
+
+/* The frozen briefs before 2026-09-29 stored the direction as a fragment hinged on
+   a dash ("Conditions tightening — freeze…"); the tone is read from either shape. */
+const LEGACY_DIRECTION = /^Conditions (tightening|easing|holding)\s+—\s+/;
+
+/**
+ * The week's headline action, from one source (2026-10-09).
+ *
+ * The contract carries two week-level sentences, and surfaces disagreed about
+ * which led: the homepage h1 printed the action ("Freeze new commitments and
+ * protect runway."), the frozen brief led with the call ("Approve only renewals,
+ * work already promised to customers, and hires that bring in revenue.") and then
+ * printed the action as its do-now line, so one week had two headlines. The call is
+ * the headline now, everywhere, because it is the more concrete of the two: a
+ * filter a reader can hold a request against, where "protect runway" names a goal.
+ * It is also the same for every reader (a stage changes the action, never the
+ * call) and already carries a held week's wording.
+ *
+ * The action's first sentence, the week's direction, rides along: the homepage
+ * prints it as a label on the stamp line, and a paste, which has no stamp, opens
+ * with it. The action's own instruction is no longer printed as a second headline;
+ * the per-area do-now lines stay where they are, as area lines.
+ */
+export const weeklyHeadline = (call: { actionNow: string; currentCall: string; policyOverrideActive?: boolean }) => {
+  /* A held week is the exception: its call explains the hold ("The two scores
+     point in different directions, so the guidance is not changing this week.")
+     and its action is the instruction ("Keep your current plan…"), so the action
+     is the headline and the explanation follows it in a paste. */
+  if (call.policyOverrideActive) {
+    const action = call.actionNow.trim();
+    return { action, composed: `${action} ${call.currentCall.trim()}`.trim() };
+  }
+  const tone = DIRECTION_SENTENCE.exec(call.actionNow)?.[1] ?? LEGACY_DIRECTION.exec(call.actionNow)?.[1];
+  const action = call.currentCall.trim();
+  if (!tone || !isWeeklyTone(tone)) return { action, composed: action };
+  return {
+    action,
+    directionLabel: WEEKLY_DIRECTION_LABEL[tone],
+    composed: `Conditions are ${tone}. ${action}`,
+  };
 };
 
 /* Whether any area's pause line is met by this reading, from the rule data
@@ -219,7 +260,19 @@ type CallChangeLine = {
   /** Whole points to the line; 0 when it is already crossed, null without a reading. */
   distance: number | null;
   tripped: boolean;
-  /** The clause as the sentence prints it, capitalized: "Risk appetite rises 9 pts to clear 50 (41 today)". */
+  /**
+   * The clause as the sentence prints it, capitalized: "Risk appetite rises 9 pts
+   * from 41 to clear 50". A crossed line states where the score is instead:
+   * "Funding pressure is above 70".
+   */
+  clause: string;
+  /** A crossed line's reading, which the sentence prints after its clauses. */
+  reading?: { label: string; value: string };
+  /**
+   * The line on its own, for a surface with room for one, without a final stop:
+   * the clause, then a crossed line's reading as its own sentence
+   * ("Funding pressure is above 70. Funding pressure is 75 now").
+   */
   text: string;
 };
 
@@ -248,11 +301,13 @@ export const buildCallChangeLines = (
     const boundary = `${label} ${direction === "riseAbove" ? "above" : "at or below"} ${formatThresholdNumber(threshold)}`;
 
     if (typeof now !== "number" || !Number.isFinite(now)) {
-      return { metric, direction, threshold, boundary, distance: null, tripped: false, text: boundary };
+      return { metric, direction, threshold, boundary, distance: null, tripped: false, clause: boundary, text: boundary };
     }
 
     const tripped = direction === "riseAbove" ? now > threshold : now <= threshold;
     if (tripped) {
+      const clause = `${label} is ${direction === "riseAbove" ? "above" : "at or below"} ${formatThresholdNumber(threshold)}`;
+      const reading = { label, value: formatScoreValue(now) };
       return {
         metric,
         direction,
@@ -260,7 +315,9 @@ export const buildCallChangeLines = (
         boundary,
         distance: 0,
         tripped,
-        text: `${boundary} (already true at ${formatScoreValue(now)})`,
+        clause,
+        reading,
+        text: `${clause}. ${formatReadingsNow([reading]).replace(/\.$/, "")}`,
       };
     }
 
@@ -268,13 +325,15 @@ export const buildCallChangeLines = (
     // and a fraction here would be precision the reader cannot act on. The two
     // directions keep their inequality — reaching 70 flips an "at or below"
     // boundary, reaching 50 does not flip an "above" one, so that side says
-    // "clear".
+    // "clear". Today's reading rides in the move ("from 41"), where it was a
+    // parenthesis after it ("(41 today)") until 2026-10-09.
     const distance = Math.max(1, Math.round(Math.abs(threshold - now)));
     const unit = distance === 1 ? "pt" : "pts";
     const move = direction === "riseAbove"
-      ? `rises ${distance} ${unit} to clear ${formatThresholdNumber(threshold)}`
-      : `falls ${distance} ${unit} to ${formatThresholdNumber(threshold)} or below`;
-    return { metric, direction, threshold, boundary, distance, tripped, text: `${label} ${move} (${formatScoreValue(now)} today)` };
+      ? `rises ${distance} ${unit} from ${formatScoreValue(now)} to clear ${formatThresholdNumber(threshold)}`
+      : `falls ${distance} ${unit} from ${formatScoreValue(now)} to ${formatThresholdNumber(threshold)} or below`;
+    const clause = `${label} ${move}`;
+    return { metric, direction, threshold, boundary, distance, tripped, clause, text: clause };
   };
 
   const tightnessDirection: CallChangeLine["direction"] =
@@ -321,16 +380,19 @@ export const buildCallChangeLines = (
  * frozen brief read "Re-open when: No flip condition is tripped yet." and
  * carried no threshold at all.
  *
- * One sentence now, both boundaries, each with its live reading in parentheses.
- * A boundary already crossed says so in place of the status preamble, and sorts
- * first, because that is the half an operator has to act on.
+ * One sentence now, both boundaries, each with its live reading. A boundary
+ * already crossed says so in place of the status preamble, and sorts first,
+ * because that is the half an operator has to act on: its clause says where the
+ * score is, and its reading follows the sentence ("Funding pressure is 75 now.").
  *
  * The distance leads. "Funding pressure at or below 70 (83 today)" handed the
  * reader a subtraction; the number that changes a plan is how far away the
  * line is, in the units the rail beside it draws, so the sentence opens with
- * it — "Funding pressure falls 13 pts to 70 or below (83 today)" — the way a rain alert
- * opens with the minutes, not the radar. The boundary and the live reading
- * stay, because the archive and the embed cite them.
+ * it — "Funding pressure falls 13 pts from 83 to 70 or below" — the way a rain
+ * alert opens with the minutes, not the radar. The boundary and the live
+ * reading stay, because the archive and the embed cite them. The reading moved
+ * into the clause on 2026-10-09: "(83 today)" after each score put two
+ * parentheses of the same kind in one sentence.
  *
  * The clauses are `buildCallChangeLines`, joined, so a surface that prints one
  * of the two lines reads it from there rather than cutting this sentence.
@@ -339,12 +401,17 @@ export const buildFlipThreshold = (
   assessment: CallChangeInputs,
   /** One score's half alone, for a page about the decisions that score rules. */
   only?: "tightness" | "riskAppetite",
-): string =>
+): string => {
+  const lines = buildCallChangeLines(assessment, only);
   // Signal names are capitalized as labels but sit mid-sentence after "or" here,
-  // matching how the bounded rules already write them in prose.
-  `${buildCallChangeLines(assessment, only)
-    .map((line, index) => (index === 0 ? line.text : line.text.charAt(0).toLowerCase() + line.text.slice(1)))
-    .join(" or ")}.`;
+  // matching how the bounded rules already write them in prose. The comma keeps
+  // "to 70 or below" from running into the "or" that joins the second line.
+  const sentence = `${lines
+    .map((line, index) => (index === 0 ? line.clause : line.clause.charAt(0).toLowerCase() + line.clause.slice(1)))
+    .join(", or ")}.`;
+  const readings = lines.flatMap((line) => (line.reading ? [line.reading] : []));
+  return readings.length === 0 ? sentence : `${sentence} ${formatReadingsNow(readings)}`;
+};
 
 /**
  * What would change the guidance this week (docs/claims-ledger.md): the two lines
@@ -366,8 +433,8 @@ export const buildWeekCallChangesIf = <Assessment extends CallChangeInputs & Pic
 
 /**
  * What would change the guidance, as one labelled clause, for a line with room for
- * one: the /share standup, the homepage's quiet-day line and its lapsed-return
- * panel. On a held week it is the hold's own condition (the contract's
+ * one: the /share standup and its work-item blocks (the homepage's quiet-day line
+ * and lapsed-return panel carried it until 2026-10-09). On a held week it is the hold's own condition (the contract's
  * `callChangesIf`); on any other, the nearer of `buildCallChangeLines` in points, a
  * clause of the contract's sentence.
  *

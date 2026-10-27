@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnchorFeedback } from "./anchorFeedback";
 import { FocusModeController } from "./focusModeController";
 import { Skeleton } from "./skeleton";
 import { regimeAccentStyle, regimeDataAttribute } from "../../lib/regimeAccent";
@@ -23,11 +24,11 @@ export function Shell({
        animated for exactly the people who asked it not to. The shapes mirror
        the hero — eyebrow, headline, summary, action row, the stamp column —
        and the two cards under it, so the resolved page lands where the
-       placeholder was (suspenseFallbacks.tsx has the argument). */
+       placeholder was: a fallback of the wrong height is a layout shift. */
     return (
       <div className="flex-1 bg-[var(--bg-body)] text-[var(--app-text)]">
         <main id="main-content" className="mx-auto max-w-[72rem] px-4 py-4 sm:py-5">
-          <output aria-busy="true" aria-label="Loading the weekly brief" className="block">
+          <output aria-busy="true" aria-label="Weekly brief" className="block">
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_18rem] lg:gap-8">
               <div className="space-y-6 min-w-0">
                 <div className="weather-card">
@@ -78,6 +79,12 @@ export function Shell({
       style={regimeAccentStyle(regime)}
     >
       <FocusModeController />
+      {/* What PageShell mounts on every other route: a hash link opens the
+          disclosure it points into and lands once the streamed target has a box.
+          The brief had none, so a link to `#company-calibration` (the shared-arrival
+          greeting's "Scale it to your stage and runway") scrolled to a folded
+          line instead of the stage and runway choices. */}
+      <AnchorFeedback />
       <main id="main-content" data-home-shell-main className={shellMainClassName}>
         {children}
       </main>

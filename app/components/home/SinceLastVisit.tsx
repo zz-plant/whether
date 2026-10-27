@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState, type ReactNode } from "react";
+import Link from "next/link";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { createBrowserSource, useBrowserSource } from "../browserSource";
 import { classifyReturnGap, weeksBetweenSlugs } from "../../../lib/activationFunnel";
@@ -74,6 +75,23 @@ const weeksBetweenRecordDates = (previousRecordDate: string, currentRecordDate: 
 const weeksAgo = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
 /**
+ * What a return has to be told, or null when there is nothing the card above has
+ * not already said: nothing moved since this browser's last visit, or what moved is
+ * the change of conditions the card's stamp line names ("Was Cloudy on Sep 30").
+ */
+export const sinceLastVisitDelta = (
+  previous: Pick<SeenCall, "regimeLabel" | "call">,
+  current: Pick<SeenCall, "regimeLabel" | "call">,
+  cardEarlierRegimeLabel?: string,
+): { regimeChanged: boolean; callChanged: boolean } | null => {
+  const regimeChanged = previous.regimeLabel !== current.regimeLabel;
+  const callChanged = previous.call !== current.call;
+  if (!regimeChanged && !callChanged) return null;
+  if (regimeChanged && previous.regimeLabel === cardEarlierRegimeLabel) return null;
+  return { regimeChanged, callChanged };
+};
+
+/**
  * " (3 weeks ago)" after the date, once the gap is more than a week. A one-week
  * gap is the Monday ritual and the date alone says it; a longer one is the
  * reader the delta panel is for, and the count is what they are missing.
@@ -81,6 +99,14 @@ const weeksAgo = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 export const elapsedWeeksSuffix = (previousRecordDate: string, currentRecordDate: string) => {
   const weeks = weeksBetweenRecordDates(previousRecordDate, currentRecordDate);
   return weeks !== null && weeks > 1 ? ` (${weeksAgo.format(-weeks, "week")})` : "";
+};
+
+export const compareHrefForRecordDate = (recordDate: string): string => {
+  const year = recordDate.slice(0, 4);
+  const rawMonth = Number.parseInt(recordDate.slice(5, 7), 10);
+  return /^\d{4}$/.test(year) && !Number.isNaN(rawMonth) && rawMonth >= 1 && rawMonth <= 12
+    ? `/history/compare?yearB=${year}&monthB=${rawMonth}`
+    : "/history/compare";
 };
 
 /**
@@ -101,29 +127,35 @@ export const elapsedWeeksSuffix = (previousRecordDate: string, currentRecordDate
  * markup — the fallback — is what hydration renders too.
  *
  * A return after more than a week (`within_month` or `lapsed`) leads with a
- * delta panel — regime, call, and what would change it — plus a one-click board
- * deck, because that reader is at a board or planning cadence, not a Monday
+ * delta panel — the change and the call the reader last saw — plus a one-click
+ * board deck, because that reader is at a board or planning cadence, not a Monday
  * ritual. The weekly ritual return (`next_week`) keeps the compact line.
+ *
+ * Only a real delta, and only the part the card above does not say (2026-10-09).
+ * It printed on every return, "the guidance held" included, and on the week of
+ * Oct 5, 2026 it said "conditions changed from Cloudy to Freezing" under a card
+ * whose stamp line said "Was Cloudy on Sep 30", over a section that opened with
+ * the same change. It also carried what would change the guidance and the
+ * lines-crossed sentence, which are sections of their own further down. Now it
+ * renders when the conditions or the call differ from what this browser last
+ * saw, and not when the only difference is the earlier conditions the card
+ * already names (`cardEarlierRegimeLabel`).
  */
 export function SinceLastVisit({
   current,
-  callChangeLine,
+  cardEarlierRegimeLabel,
   boardDeckHref,
-  linesCrossedLead,
   fallback = null,
 }: {
   current: SeenCall;
   /**
-   * What would change the guidance, labelled (`buildCallChangeLine`). It was the
-   * nearest market move ("If the 1-month Treasury bill rate rises 0.15%, conditions
-   * turn Cloudy."), which on a held week named a rate move beside guidance the
-   * hold says is not changing.
+   * The earlier conditions the card's stamp line names ("Was Cloudy on Sep 30"),
+   * when it names any. A visit that last saw those same conditions has nothing to
+   * learn from this note that the card has not said.
    */
-  callChangeLine?: string;
+  cardEarlierRegimeLabel?: string;
   /** One-click board deck download for the lapsed return path. */
   boardDeckHref?: string;
-  /** The lead sentence describing whether any operating lines were crossed. */
-  linesCrossedLead?: string;
   /** What a reader with nothing to compare against sees in this slot instead. */
   fallback?: ReactNode;
 }) {
@@ -137,8 +169,9 @@ export function SinceLastVisit({
   const previous = seen && seen.recordDate !== current.recordDate ? seen : null;
   if (!previous || isDismissed) return fallback;
 
-  const regimeChanged = previous.regimeLabel !== current.regimeLabel;
-  const callChanged = previous.call !== current.call;
+  const delta = sinceLastVisitDelta(previous, current, cardEarlierRegimeLabel);
+  if (!delta) return fallback;
+  const { regimeChanged, callChanged } = delta;
   /* Bucketed the way the activation funnel buckets it: the weekly ritual
      (`next_week`) keeps the compact line, a lapsed reader the product is
      trying to win back (`within_month`, `lapsed`) gets the delta panel. */
@@ -164,20 +197,15 @@ export function SinceLastVisit({
   const compact = (
     <div
       data-testid="since-last-visit"
-      className="flex items-center justify-between gap-3 rounded-lg border border-sky-500/20 bg-sky-500/[0.05] px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
+      className="flex items-center justify-between gap-3 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-2.5 text-fluid-xs leading-5 text-slate-200"
     >
       <div>
-        <span className="font-semibold text-white">Since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
+        <span className="font-semibold text-slate-50">Monday check &mdash; since you were here on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
         {regimeChanged
           ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
-          : callChanged
-            ? `still ${current.regimeLabel}, but the guidance changed.`
-            : `the guidance held, ${current.regimeLabel} and the same do-now line.`}
+          : `still ${current.regimeLabel}, but the guidance changed.`}
         {callChanged ? (
-          <span className="block text-white/60">Then: “{previous.call}”</span>
-        ) : null}
-        {linesCrossedLead ? (
-          <span className="block pt-0.5 text-fluid-nano text-slate-300">{linesCrossedLead}</span>
+          <span className="block text-slate-400">Then: “{previous.call}”</span>
         ) : null}
       </div>
       {dismissButton}
@@ -189,36 +217,41 @@ export function SinceLastVisit({
   /* A lapsed return is at a planning cadence, so lead with the delta and put
      the one-slide summary one click away — the QAU conversion surface. */
   return (
-    <div data-testid="lapsed-return" className="rounded-lg border border-sky-500/20 bg-sky-500/[0.05] px-4 py-3 space-y-2">
+    <div data-testid="lapsed-return" className="rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-4 py-3 space-y-2">
       <div className="flex items-start justify-between gap-2">
         <p className="text-fluid-xs leading-5 text-slate-200">
-          <span className="font-semibold text-white">Since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
+          <span className="font-semibold text-slate-50">Monday check &mdash; since your last read on {previous.recordDateLabel}{elapsedLabel}:</span>{" "}
           {regimeChanged
             ? `conditions changed from ${previous.regimeLabel} to ${current.regimeLabel}.`
-            : `still ${current.regimeLabel}${callChanged ? ", but the guidance changed" : ""}.`}
+            : `still ${current.regimeLabel}, but the guidance changed.`}
         </p>
         {dismissButton}
       </div>
-      <p className="text-fluid-xs leading-5 text-white/60">
-        {callChanged ? <>Then: “{previous.call}” · Now: “{current.call}”</> : <>The guidance holds: “{current.call}”</>}
-        {callChangeLine ? <span className="block text-sky-200/80">{callChangeLine}</span> : null}
-        {linesCrossedLead ? <span className="block text-slate-300">{linesCrossedLead}</span> : null}
-      </p>
-      {boardDeckHref ? (
-        <a
-          href={boardDeckHref}
-          target="_blank"
-          rel="noreferrer"
-          className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline"
+      {/* The call the reader last saw; the call now is the card's heading. */}
+      {callChanged ? <p className="text-fluid-xs leading-5 text-slate-400">Then: “{previous.call}”</p> : null}
+      <div className="flex flex-wrap items-center gap-2">
+        {boardDeckHref ? (
+          <a
+            href={boardDeckHref}
+            target="_blank"
+            rel="noreferrer"
+            className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline"
+          >
+            Download this week&apos;s guidance as a slide
+          </a>
+        ) : null}
+        <Link
+          href={compareHrefForRecordDate(previous.recordDate)}
+          className="weather-button inline-flex min-h-[36px] items-center px-3 py-1.5 text-fluid-micro font-semibold no-underline text-sky-200 hover:text-slate-50"
         >
-          Download this week&apos;s guidance as a slide
-        </a>
-      ) : null}
+          Compare against your last visit &rarr;
+        </Link>
+      </div>
       <p className="text-fluid-nano text-slate-400">
         Runway is a quarterly question, and this gap is longer.{" "}
         <a
           href="#runway-notes"
-          className="text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-white"
+          className="text-slate-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-50"
         >
           Re-check your runway band
         </a>

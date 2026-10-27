@@ -3,38 +3,38 @@ import { existsSync, readdirSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { readFileSync } from "node:fs";
 import { renderToStaticMarkup } from "react-dom/server";
-import { FrameworkSection } from "../app/trust/frameworkSection";
+import { MethodSection } from "../app/about/methodSection";
 import { utilityLinks } from "../lib/navigation/informationArchitecture";
 
 const appPath = (route: string) => new URL(`../app${route}`, import.meta.url).pathname;
 
-describe("bounded decisions: framework and form as a section of /trust", () => {
+describe("the method and its form: a section of /about", () => {
   it("carries both halves — the three parts and the blank form", () => {
-    const html = renderToStaticMarkup(<FrameworkSection />);
+    const html = renderToStaticMarkup(<MethodSection />);
 
     // From the framework half.
-    assert.match(html, /The three parts/);
-    assert.match(html, /Why it works/);
+    assert.match(html, /How the three parts work/);
+    assert.match(html, /Agree on the lines in advance/);
     // From the form half, which used to be /template.
-    assert.match(html, /Fill one in/);
+    assert.match(html, /Decision template to print or copy/);
     assert.match(html, /When you will check/);
-    assert.match(html, /No signup required/);
+    assert.match(html, /No signup or data collection/);
   });
 
   it("anchors the form so an external /template link lands on it", () => {
-    const html = renderToStaticMarkup(<FrameworkSection />);
+    const html = renderToStaticMarkup(<MethodSection />);
     assert.match(html, /id="template"/);
-    assert.match(html, /id="framework"/);
+    assert.match(html, /id="method"/);
 
     // next.config.js ships no types, so this reads the pair as text rather than
     // importing the module into a typechecked test.
     const config = readFileSync(new URL("../next.config.js", import.meta.url).pathname, "utf8");
     assert.match(
       config,
-      /\["\/template", "\/trust#template"\]/,
+      /\["\/template", "\/about#template"\]/,
       "/template must keep a permanent redirect for external links",
     );
-    assert.match(config, /\["\/threshold", "\/trust#framework"\]/, "/threshold redirects to its section of /trust");
+    assert.match(config, /\["\/threshold", "\/about#method"\]/, "/threshold redirects to the method on /about");
   });
 
   it("stops advertising the merged route as a separate destination", () => {

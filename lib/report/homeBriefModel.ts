@@ -4,7 +4,6 @@ import type { DecisionMovement, GuidanceChange } from "./decisionMovement";
 import type { WeeklyTone } from "./reportEvidence";
 import type { ComparedWith } from "./reportDataTypes";
 import type {
-  DecisionTransmission,
   HistoricalAnalog,
   LastYearComparison,
   ReportDynamics,
@@ -12,7 +11,6 @@ import type {
   WeeklyConfidencePoint,
   ConfidenceTrendFraming,
 } from "./reportData";
-import type { SectorKey } from "./sectorSensitivity";
 import type {
   ForecastModel,
   ForecastRegimeLabel,
@@ -26,11 +24,7 @@ import type {
   StartupVariantMode,
 } from "./boundedDecisionRules";
 import type { RunwayBand } from "./operatorRunway";
-import {
-  buildDecisionTransmissionBoundedRules,
-  type ActionStripItem,
-  type RoleAwareOperatingTemplate,
-} from "./operatingCalls";
+import type { ActionStripItem, RoleAwareOperatingTemplate } from "./operatingCalls";
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import type { PostureStateContract } from "./postureStateContract";
 import type { PolicyRefusalCode, RegimeDiagnostics, RegimeKey } from "../regimeEngine";
@@ -113,10 +107,8 @@ export type HomeReportData = {
   historicalAnalogs?: HistoricalAnalog[];
   lastYearComparison?: LastYearComparison | null;
   regimeSeries?: TimeMachineRegimeEntry[];
-  macroProvenance?: { sourceLabel?: string; sourceUrl?: string; statusLabel?: string };
   treasuryProvenance?: { sourceLabel?: string; sourceUrl?: string; statusLabel?: string };
   treasury?: Partial<TreasuryMetadata>;
-  actionStripItems?: ActionStripItem[];
   actionNowShort?: string;
   guardrailThreshold?: string;
   flipThreshold?: string;
@@ -156,11 +148,6 @@ export type HomeBriefHistoricalAnalog = {
   date: string;
   similarityScore: number;
   implication: string;
-};
-
-export type MacroOverlayItem = {
-  label: string;
-  detail: string;
 };
 
 export type RegimeSignalIndicator = {
@@ -265,7 +252,7 @@ export type StartupVariantPolicy = {
   adjustmentsByMode: Record<StartupVariantMode, ScopedVariantDecisionAdjustment>;
 };
 
-type StartRouteDeltaRoute = "/signals" | "/operate" | "/resolve";
+type StartRouteDeltaRoute = "/signals" | "/operate";
 
 type StartRouteDeltaItem = {
   id: "posture-shift" | "top-driver" | "trigger-risk";
@@ -393,7 +380,6 @@ export type WeeklyDecisionCardViewModel = {
     decisionMovement: DecisionMovement | null;
   };
   presentation?: {
-    whyItMattersLine?: string;
     readThisCardItems?: Array<{
       label: string;
       detail: string;
@@ -428,7 +414,6 @@ export type WeeklyDecisionCardViewModel = {
     historicalTimeline: HistoricalTimelineItem[];
     historicalAnalogs: HomeBriefHistoricalAnalog[];
     lastYearComparison: LastYearComparison | null;
-    macroOverlay: MacroOverlayItem[];
   };
   sinceLastReview: StartRouteDeltaBlock;
   artifact: {
@@ -442,98 +427,11 @@ export type WeeklyDecisionCardViewModel = {
 export const buildHomeBriefModel = (
   data: HomeReportData,
   options?: {
-    overlaySector?: SectorKey;
     startupVariantMode?: StartupVariantMode;
     runwayBand?: RunwayBand;
     runwayMonths?: number;
   },
 ) => buildHomeBriefModelInternal(data, options);
-
-const normalizeDecisionTransmissionConfidence = (label: string | undefined): DecisionTransmission["confidence"] => {
-  if (label === "HIGH") return "high";
-  if (label === "MED") return "medium";
-  if (label === "LOW") return "low";
-  return "unknown";
-};
-
-const resolveStalenessLabel = ({
-  timestamp,
-  now,
-  staleAfterHours,
-}: {
-  timestamp?: string | null;
-  now: Date;
-  staleAfterHours: number;
-}): DecisionTransmission["freshness"]["freshnessStatus"] => {
-  if (!timestamp) return "unknown";
-  const parsed = Date.parse(timestamp);
-  if (Number.isNaN(parsed)) return "unknown";
-  return (now.getTime() - parsed) / 3_600_000 > staleAfterHours ? "stale" : "fresh";
-};
-
-export const buildDecisionTransmission = (
-  data: HomeReportData,
-  options?: {
-    overlaySector?: SectorKey;
-    startupVariantMode?: StartupVariantMode;
-    runwayBand?: RunwayBand;
-    runwayMonths?: number;
-    now?: Date;
-    staleAfterHours?: number;
-  },
-): DecisionTransmission => {
-  const homeBriefModel = buildHomeBriefModelInternal(data, options);
-  const now = options?.now ?? new Date();
-  const staleAfterHours = options?.staleAfterHours ?? 48;
-  const provenanceCandidates = [
-    data.treasuryProvenance?.sourceLabel
-      ? {
-          sourceLabel: data.treasuryProvenance.sourceLabel,
-          reference: data.treasuryProvenance.sourceUrl ?? "treasury:source-url-unavailable",
-          isFallback: false,
-        }
-      : null,
-    data.macroProvenance?.sourceLabel
-      ? {
-          sourceLabel: data.macroProvenance.sourceLabel,
-          reference: data.macroProvenance.sourceUrl ?? "macro:source-url-unavailable",
-          isFallback: false,
-        }
-      : null,
-  ];
-  const provenance = provenanceCandidates.filter((item): item is NonNullable<typeof item> => item !== null);
-
-  const boundedRules = buildDecisionTransmissionBoundedRules({
-    rules: homeBriefModel.decisionRules,
-    actionStripItems: data.actionStripItems,
-  });
-
-  return {
-    whatChanged: homeBriefModel.decisionShiftSummary,
-    postureNow:
-      homeBriefModel.actionNowShort?.trim() ||
-      homeBriefModel.operatingStanceLine ||
-      "Hold current operating posture until fresh signal confirmation.",
-    boundedRules,
-    flipConditions:
-      homeBriefModel.compactFlipConditionLabels && homeBriefModel.compactFlipConditionLabels.length > 0
-        ? homeBriefModel.compactFlipConditionLabels
-        : [homeBriefModel.reversalTrigger],
-    freshness: {
-      timestamp: data.treasury?.fetched_at ?? data.fetchedAtLabel ?? "timestamp-unavailable",
-      freshnessStatus: resolveStalenessLabel({
-        timestamp: data.treasury?.fetched_at,
-        now,
-        staleAfterHours,
-      }),
-    },
-    confidence: normalizeDecisionTransmissionConfidence(homeBriefModel.confidenceLabel),
-    provenance:
-      provenance.length > 0
-        ? provenance
-        : [{ sourceLabel: "Sources unavailable", reference: "fallback:manual-source-review-required", isFallback: true }],
-  };
-};
 
 export const buildWeeklyDecisionCardViewModel = ({
   homeBriefModel,

@@ -1,10 +1,9 @@
 import assert from "node:assert/strict";
 import { describe, it, beforeEach } from "bun:test";
 import { POST as subscribeHandler } from "../app/api/slack/subscribe/route";
-import { POST as unsubscribeHandler } from "../app/api/slack/unsubscribe/route";
 import { resetSlackWebhookStore, getSlackWebhookStore } from "../lib/slack/slackWebhookStore";
 
-describe("Slack subscribe/unsubscribe API routes", () => {
+describe("Slack subscribe API route", () => {
   beforeEach(() => {
     resetSlackWebhookStore();
   });
@@ -50,10 +49,11 @@ describe("Slack subscribe/unsubscribe API routes", () => {
 
       const response = await subscribeHandler(request);
       assert.equal(response.status, 200);
-      const body: { ok: boolean; token: string; channelName: string } = await response.json();
+      const body: Record<string, unknown> = await response.json();
       assert.equal(body.ok, true);
       assert.equal(body.channelName, "#exec");
-      assert.ok(body.token);
+      // The off-ramp is deleting the webhook in Slack; there is no token to hand back.
+      assert.equal("token" in body, false);
 
       assert.equal(pingedUrl, "https://hooks.slack.com/services/T00/B00/test1");
       assert.match(String(pingPayload), /Whether Weekly Brief Connected/);
@@ -65,24 +65,5 @@ describe("Slack subscribe/unsubscribe API routes", () => {
     } finally {
       globalThis.fetch = originalFetch;
     }
-  });
-
-  it("unsubscribes using the issued token", async () => {
-    const store = getSlackWebhookStore();
-    const sub = await store.subscribe("https://hooks.slack.com/services/T00/B00/unsub-test");
-
-    const request = new Request("http://localhost/api/slack/unsubscribe", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token: sub.token }),
-    });
-
-    const response = await unsubscribeHandler(request);
-    assert.equal(response.status, 200);
-    const body: { ok: boolean } = await response.json();
-    assert.equal(body.ok, true);
-
-    const active = await store.listActiveWebhooks();
-    assert.equal(active.length, 0);
   });
 });

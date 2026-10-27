@@ -119,7 +119,7 @@ export type ScoreReadingParts = {
   reading: string;
   /** "pause line 76", or "change line 70" where no rail is known. */
   line: string;
-  /** "14 pts above" */
+  /** Against a pause line, "past the line" or "14 pts away"; against the change line, "14 pts above". */
   distance: string;
   /** "was 63 on Aug 31", or "last week 63" where the source has no date; null without an earlier reading. */
   previous: string | null;
@@ -155,7 +155,11 @@ export const buildScoreReadings = ({
       meaning,
       reading: `${parts.reading} (${meaning})`,
       line: parts.line,
-      distance: parts.distance,
+      /* Against a pause line the distance says which side the score is on:
+         "14 pts above" read as past the line for funding pressure and as
+         clear of it for risk appetite, whose pause line is a floor
+         (2026-10-14). */
+      distance: rail ? formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped) : parts.distance,
       previous: parts.previous,
       resume:
         rail && rail.clearsAt !== undefined

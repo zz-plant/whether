@@ -21,20 +21,22 @@ const slot = (met: boolean, points: number) => ({ line: "Funding pressure > 76",
 
 describe("where each decision stands, before a click", () => {
   it("says a crossed pause line as a state, and an uncrossed one as a distance", () => {
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "Pause line crossed", crossed: true });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "4 pts from its pause line", crossed: false });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "1 pt from its pause line", crossed: false });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 0) }), { text: "At its pause line", crossed: false });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "Past its pause line", crossed: true, state: "crossed" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "4 pts from its pause line", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "1 pt from its pause line", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 0) }), { text: "At its pause line", crossed: false, state: "near" });
+    /* Past the 5 points the margin calls close, the line is clear of the reading. */
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 6) }), { text: "6 pts from its pause line", crossed: false, state: "clear" });
     assert.equal(describeAreaPauseStatus({}), undefined, "an area with no pause line has nothing to say");
   });
 
   it("counts the crossed lines over the areas that have one", () => {
     assert.equal(
       describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(true, 2) }, { pause: slot(false, 4) }, {}]),
-      "Pause lines crossed in 2 of 3 areas this week.",
+      "2 of 3 areas are past their pause line.",
     );
-    assert.equal(describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(false, 4) }]), "Pause line crossed in 1 of 2 areas this week.");
-    assert.equal(describePauseLineCount([{ pause: slot(false, 3) }]), "No area's pause line is crossed this week.");
+    assert.equal(describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(false, 4) }]), "1 of 2 areas is past its pause line.");
+    assert.equal(describePauseLineCount([{ pause: slot(false, 3) }]), "No area is past its pause line.");
     assert.equal(describePauseLineCount([{}]), null);
   });
 });
@@ -63,29 +65,30 @@ describe("the map in the card", () => {
   it("names the month-ends its path draws", () => {
     assert.equal(
       describeConditionsTrail(["2026-03-31", "2026-04-30", "2026-08-31"]),
-      "Path: month-ends Mar–Aug 2026, then now.",
+      "Trail: month-ends Mar–Aug 2026, then this week.",
     );
     assert.equal(
       describeConditionsTrail(["2025-11-28", "2026-02-27"]),
-      "Path: month-ends Nov 2025–Feb 2026, then now.",
+      "Trail: month-ends Nov 2025–Feb 2026, then this week.",
     );
-    assert.equal(describeConditionsTrail(["2026-08-31"]), "Path: the Aug 2026 month-end, then now.");
+    assert.equal(describeConditionsTrail(["2026-08-31"]), "Trail: the Aug 2026 month-end, then this week.");
     assert.equal(describeConditionsTrail([]), null);
   });
 
-  it("draws the aside and its note from md up only, and leaves cards without one unchanged", () => {
+  /* The trail's caption is the map's own (2026-10-09). It sat under the trust row in
+     the left column, a column away from the dots it describes. */
+  it("draws the aside from md up only, and leaves cards without one unchanged", () => {
     const withMap = renderToStaticMarkup(
       <DecisionHero
         weeklyCall="Freeze new commitments and protect runway."
         regime="SCARCITY"
         aside={<figure data-testid="map" />}
-        asideNote={["Path: month-ends Mar–Aug 2026, then now."]}
       />,
     );
     assert.match(withMap, /<div class="max-md:hidden"><figure data-testid="map"/);
-    assert.match(withMap, /max-md:hidden[^"]*" data-aside-note="true">Path: month-ends Mar–Aug 2026, then now\./);
+    assert.doesNotMatch(withMap, /data-aside-note/);
 
     const plain = renderToStaticMarkup(<DecisionHero weeklyCall="Hold." regime="SCARCITY" />);
-    assert.doesNotMatch(plain, /max-md:hidden|data-aside-note|md:grid/);
+    assert.doesNotMatch(plain, /max-md:hidden|md:grid/);
   });
 });

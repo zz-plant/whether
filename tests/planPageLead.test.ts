@@ -6,6 +6,9 @@ import { AreaTable } from "../app/components/ui/areaTable";
 import { buildPlanningPageModel } from "../app/operate/planningPageModel";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 import { insightDatabase } from "../data/recommendations";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const FINANCE_RUNWAY_TARGETS: string[] = insightDatabase.financeStrategyMode.regimes.map((entry) => entry.runwayPosture);
 
@@ -85,8 +88,8 @@ describe("/operate opening", () => {
       FINANCE_RUNWAY_TARGETS.includes(description("ops-finance-strategy")),
       "the finance step's line is a regime's runway target",
     );
-    // The four formats the step copies.
-    assert.equal(description("ops-export-briefs"), "Copy this week's brief in one of 4 formats, ready to paste: Slack, Slide, Citation or Agenda.");
+    // No share step: /share holds every format, and the page links there once (2026-10-08).
+    assert.ok(!steps.some((step) => step.id === "ops-export-briefs"), "the share step is back");
 
     for (const retired of [
       "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",
@@ -102,15 +105,17 @@ describe("/operate opening", () => {
  * The two blocks after the steps. Both carried `weather-panel`, whose padding
  * the report row zeroes for an unboxed section, so each drew a border against
  * its own text; the resources disclosure read "Resource templates and guides"
- * and nothing else.
+ * and nothing else. Since 2026-10-09 the warnings are unboxed, set off from the
+ * steps by the same rule that separates them, with no kicker over the heading.
  */
 describe("/operate tail", () => {
-  it("frames Risk checks with its own padding and draws a quiet week as one line", async () => {
+  it("sets the warnings off with a rule, not a card, and draws a quiet week as one line", async () => {
     const { children } = await buildPlanningPageModel();
     const section = elementsIn(children).find((element) => element.props.id === "ops-failure-patterns");
     assert.ok(section, "the risk checks section renders");
-    assert.doesNotMatch(section.props.className ?? "", /\bweather-panel\b/);
-    assert.match(section.props.className ?? "", /\bp-4\b/);
+    assert.doesNotMatch(section.props.className ?? "", /\bweather-panel\b|\brounded|\bp-4\b/);
+    assert.match(section.props.className ?? "", /\bborder-t\b/);
+    assert.ok(!elementsIn(section.props.children).some((element) => /type-eyebrow/.test(element.props.className ?? "")), "no kicker over the heading");
     const text = textIn(section.props.children);
     if (text.includes("No warning this week")) {
       // Nothing to recheck the rules against, and no slab around the sentence.
@@ -119,13 +124,13 @@ describe("/operate tail", () => {
     }
   });
 
-  it("says in the resources summary what the disclosure holds", async () => {
-    const { children } = await buildPlanningPageModel();
-    const summary = elementsIn(children).find((element) => element.type === "summary");
-    assert.ok(summary, "the resources disclosure renders");
-    assert.match(
-      textIn(summary.props.children),
-      /^Resource templates and guides\d+ operating guides and \d+ templates you can fill in and share\.$/,
-    );
+  /* The "Resource templates and guides" disclosure listed the guides Guides lists, and
+     the Share step offered four of /share's formats. Since 2026-10-08 the page ends on
+     its risk checks; the closing "Share or embed this" card that followed them repeated
+     the header's and the footer's way to /share and went on 2026-10-09. */
+  it("ends on the risk checks, with no closing share card", async () => {
+    const { children, reportShellModel } = await buildPlanningPageModel();
+    assert.ok(!elementsIn(children).some((element) => element.type === "summary"), "no resources disclosure");
+    assert.equal(reportShellModel.actions, undefined);
   });
 });

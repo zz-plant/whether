@@ -1,19 +1,8 @@
 #!/usr/bin/env node
 /**
- * Runs repo checks concurrently.
- *
- * lint, typecheck, and test read the same sources and produce nothing the others
- * consume, so running them in sequence just adds their durations together — the
- * serial form spent roughly 90s to do about 35s of work. They run together here,
- * and their output is still emitted in declaration order so a parallel run reads
- * exactly like the serial one did.
- *
- * Every task runs even if an earlier one fails: a single run reports the lint
- * errors and the type errors, rather than surfacing them one build at a time.
- *
- * The tasks, and the presets the gates run, are declared once in
- * scripts/check-tasks.mjs. A preset can have stages: the next stage starts only
- * after every task in the one before it passed, as `a && b` would.
+ * Runs repo checks concurrently, every task even when one fails, with output in
+ * declaration order. Tasks and presets are declared in scripts/check-tasks.mjs; a preset
+ * can have stages, and the next stage starts only after the one before it passed.
  *
  * Usage:
  *   bun scripts/run-checks.mjs                     # every task
@@ -21,14 +10,17 @@
  *   bun scripts/run-checks.mjs --preset pre-push   # what .husky/pre-push runs
  *   bun scripts/run-checks.mjs --preset deploy     # the deploy gate (`check:vinext`)
  *   bun scripts/run-checks.mjs --serial            # fail-fast sequencing
+ *
+ * Why the gate refuses a drifted tree, bounds each task, and repeats failures at the end:
+ * docs/agents/lessons/automation-and-deploy-gate.md.
  */
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
 import { availableParallelism } from "node:os";
 
-import { recordPassedChecks, worktreeDrift } from "./check-gate-marker.mjs";
 import { resolveCheckPlan } from "./check-tasks.mjs";
 import { withDeployGate } from "./deploy-gate.mjs";
+import { restoreTrackedFromHead, worktreeDrift } from "./exec.mjs";
 
 let plan;
 try {
@@ -39,33 +31,23 @@ try {
 }
 
 /*
- * Nothing below means anything until the tree is the commit.
- *
- * On 2026-09-17 the Workers Builds container ran this gate against a checkout
- * whose `public/` still held the previous successful build's files. Two tests
- * read a file their own commit had replaced and failed; every other check passed;
- * and the only reachable log showed a red build with two assertions that could
- * not be reproduced anywhere. It read as suite flakiness for a day, and the
- * repo's answer for that — run it again, run it alone, shuffle it — cannot find
- * it, because the code was never the problem.
- *
- * So this is a refusal rather than a note, for the same reason `check:dead-exports`
- * refuses a tree it cannot fully read instead of scoring it. Two things are wrong
- * with scoring a drifted tree, and the second is worse: the results are about
- * something other than the commit, and the assets that deploy come from that same
- * tree, so a green run would *ship* the drift. Better to stop and name the files.
- *
- * Gate-only. A dirty tree is the normal state of a local `bun run check`, and the
- * claim being made here — "this container is testing the commit it will deploy" —
- * is one only the gate makes. Untracked files are reported and not refused: a
- * build container may legitimately leave something extra behind, and that does not
- * make the commit's own content wrong.
- *
- * Checked again before each stage, as it was when the deploy gate's stages were two
- * separate invocations: an earlier stage must not have changed the tree either.
+ * Gate-only: a run that claims to test the commit it will deploy must be running against
+ * that commit. Untracked files are reported and allowed. A tracked file that differs from
+ * HEAD is restored from HEAD inside Workers Builds, where it can only have come from the
+ * build output cache, and refused and named anywhere else: a dirty tree is the normal state
+ * of a local `bun run check`, and those edits are someone's work.
  */
 const refuseDriftedTree = () => {
-  const drift = worktreeDrift();
+  let drift = worktreeDrift();
+
+  if (drift && drift.tracked.length > 0 && process.env.WORKERS_CI === "1") {
+    process.stdout.write(
+      `[run-checks] ${drift.tracked.length} tracked file(s) differ from HEAD after checkout, ` +
+        `most likely restored by the build output cache; resetting them to the commit:\n` +
+        `${drift.tracked.map(({ code, path }) => `  ${code.padEnd(2)} ${path}`).join("\n")}\n`,
+    );
+    drift = restoreTrackedFromHead();
+  }
 
   if (!drift) {
     process.stdout.write("[run-checks] no readable git checkout here; the checks below run against whatever is on disk.\n");
@@ -90,32 +72,25 @@ const refuseDriftedTree = () => {
         `Every check in this gate judges what is on disk, and so does the build that follows it,\n` +
         `so a run against this tree would score — and deploy — something other than ${drift.commit.slice(0, 8)}.\n` +
         `Refusing rather than reporting a result about a tree nobody pushed.\n\n` +
-        `In a build container this means the checkout was written over after it was made. The build\n` +
-        `output cache restore is the usual candidate: clear this project's build cache and re-run.\n` +
+        `In a build container the gate has already tried resetting these to HEAD and they still differ,\n` +
+        `so something is rewriting them mid-build; clearing the build cache will not help.\n` +
         `Locally, commit or stash the files above, or unset the deploy-gate signal and use \`bun run check\`.\n`,
     );
     process.exit(1);
   }
 };
 
-// Piping the children's output strips their color detection. Hand it back when
-// the parent is attached to a terminal, so local runs stay as readable as before.
+// Piping the children's output strips their color detection; hand it back on a terminal.
 const baseEnv = process.stdout.isTTY
   ? { ...process.env, FORCE_COLOR: process.env.FORCE_COLOR ?? "1" }
   : process.env;
-/*
- * A deploy-gate run passes the signal on, so the suite and the landmark audit take the
- * gate's bounds whether the signal came from the caller's environment or from the
- * preset. A plain `bun run check` never sets it: tests/tools/ is excluded from the
- * deploy path, not from the repo.
- */
+// Only the deploy preset passes the gate signal on; `bun run check` never sets it.
 const childEnv = plan.deployGate ? withDeployGate(baseEnv) : baseEnv;
 
 const running = new Set();
 let aborted = false;
 
-// Without this, Ctrl-C would detach the parent and leave oxlint/tsc/bun test
-// running in the background.
+// Without this, Ctrl-C would detach the parent and leave the children running.
 for (const signal of ["SIGINT", "SIGTERM"]) {
   process.on(signal, () => {
     aborted = true;
@@ -124,18 +99,8 @@ for (const signal of ["SIGINT", "SIGTERM"]) {
   });
 }
 
-/*
- * A task that hangs used to hang the whole gate. `runTask` resolved only on the
- * child's `close` or `error`, and output is buffered until then — so on
- * 2026-08-31 the landmarks check waited on a route that never answered, printed
- * nothing, and the six finished tasks were the last thing anyone saw before
- * Cloudflare killed the build at its thirty-minute ceiling. "Build took too long"
- * was the entire diagnosis available.
- *
- * A bound turns that into a named failure with the child's output attached. Ten
- * minutes is far above any real task here (the slowest, the test suite, takes about
- * 35s in the build container) and far below the ceiling, so it only ever fires on a hang.
- */
+// A hung task is a named failure with its output attached, not a build killed at the
+// platform's ceiling with nothing printed. Far above any real task, far below the ceiling.
 const TASK_TIMEOUT_MS = Number.parseInt(process.env.CHECK_TASK_TIMEOUT_MS ?? "600000", 10);
 
 const assertTaskTimeout = () => {
@@ -165,8 +130,7 @@ const runTask = (task) =>
     let timer;
 
     const settle = (ok, extra = "") => {
-      // The kill below still delivers `close`, so without this the timeout path
-      // would be overwritten by the exit it just caused.
+      // The kill below still delivers `close`; the timeout's verdict must not be overwritten.
       if (settled) return;
       settled = true;
       clearTimeout(timer);
@@ -176,7 +140,6 @@ const runTask = (task) =>
 
     timer = setTimeout(() => {
       child.kill("SIGTERM");
-      // SIGTERM is enough for a well-behaved child; a wedged one needs the second.
       const force = setTimeout(() => child.kill("SIGKILL"), 5_000);
       force.unref?.();
       settle(
@@ -193,14 +156,7 @@ const runTask = (task) =>
 /** How much of a failing task's output the end-of-run repeat carries. */
 const FAILURE_TAIL_LINES = Number.parseInt(process.env.CHECK_FAILURE_TAIL_LINES ?? "40", 10);
 
-/**
- * A one-line note when the running `bun` does not satisfy `engines.bun`.
- *
- * Deliberately a note and not a failure: the declared range is what this repo
- * develops against, and a build image on something older may still be fine.
- * What must not happen is the mismatch going unmentioned next to a failure it
- * could explain.
- */
+/** A note, not a failure, when the running `bun` is older than `engines.bun`. */
 const engineMismatch = () => {
   try {
     const declared = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8")).engines?.bun;
@@ -224,26 +180,74 @@ const FAILURE_MARKED_LINES = 20;
 
 const formatDuration = (ms) => `${(ms / 1000).toFixed(1)}s`;
 
+/** CHECK_VERBOSE=1 prints every passing task's output in full, as this runner used to. */
+const VERBOSE = process.env.CHECK_VERBOSE === "1";
+/** How many closing lines of a passing task stand in for the rest: bun test closes with its seed and counts. */
+const PASSING_SUMMARY_LINES = 4;
+/** A line printed more often than this is noise; it is printed once with its count. */
+const REPEAT_LIMIT = 3;
+
+/** The mark a passing task prints over a warning it means a reader to act on (`⚠ WARNINGS:`). */
+const WARNING_MARK = "⚠";
+
+/*
+ * A passing task's output is usually its verdict and nothing a reader acts on, so it is
+ * reduced to the lines it closes with (`3072 pass`, `Found 0 warnings`). On 2026-10-13 the
+ * passing suite alone was ~1,900 lines, ~700 of them one fallback warning repeated, and the
+ * log window cut off before the step that mattered. A warn-only check is the exception: it
+ * passes on purpose and prints what to fix (curated-freshness lists each stale series under a
+ * `⚠` heading, then the remedy), so everything from its first `⚠` line on is kept.
+ */
+const summarizePassing = (output) => {
+  const lines = output.trim().split("\n").filter((line) => line.trim());
+  const summaryStart = Math.max(0, lines.length - PASSING_SUMMARY_LINES);
+  const firstWarning = lines.findIndex((line) => line.includes(WARNING_MARK));
+  const keepFrom = firstWarning === -1 ? summaryStart : Math.min(firstWarning, summaryStart);
+  return { shown: lines.slice(keepFrom), hidden: keepFrom };
+};
+
+/** Keeps a failing task's output whole, except that a line repeated past the limit is printed once, with its count. */
+const collapseRepeats = (output) => {
+  const lines = output.trim().split("\n");
+  const counts = new Map();
+  for (const line of lines) counts.set(line, (counts.get(line) ?? 0) + 1);
+
+  const printed = new Set();
+  const kept = [];
+  for (const line of lines) {
+    const count = counts.get(line);
+    if (count <= REPEAT_LIMIT || !line.trim()) {
+      kept.push(line);
+      continue;
+    }
+    if (printed.has(line)) continue;
+    printed.add(line);
+    kept.push(`${line}  [×${count}, later repeats hidden]`);
+  }
+  return kept.join("\n");
+};
+
 const report = ({ task, ok, output, ms }) => {
   process.stdout.write(`\n${ok ? "✅" : "❌"} ${task.name} (${formatDuration(ms)})\n`);
   const trimmed = output.trim();
-  if (trimmed) process.stdout.write(`${trimmed}\n`);
+  if (!trimmed) return;
+
+  if (ok && !VERBOSE) {
+    const { shown, hidden } = summarizePassing(trimmed);
+    process.stdout.write(`${collapseRepeats(shown.join("\n"))}\n`);
+    if (hidden > 0) process.stdout.write(`[run-checks] ${hidden} earlier line(s) hidden; CHECK_VERBOSE=1 prints them.\n`);
+    return;
+  }
+
+  process.stdout.write(`${collapseRepeats(trimmed)}\n`);
 };
 
-/**
- * One stage: every task in it, then the record, the summary and the failure repeat.
- * Resolves to whether every task passed. A preset with one stage — and every run that
- * names tasks rather than a preset — is exactly one call, which is the whole run.
- */
+/** One stage: every task in it, then the summary and the failure repeat. Resolves to whether all passed. */
 const runStage = async (selected) => {
   if (plan.deployGate) refuseDriftedTree();
   assertTaskTimeout();
 
-  /*
-   * tsc and bun test are each CPU- and memory-hungry (oxlint finishes in seconds). Running more of them
-   * at once than the box has cores trades wall clock for thrash, and on a small CI
-   * container it is also the difference between fitting in memory and not.
-   */
+  // tsc and bun test are each CPU- and memory-hungry; more in flight than cores is thrash.
   const limit = Math.max(1, Math.min(selected.length, availableParallelism()));
 
   const startedAt = Date.now();
@@ -260,8 +264,7 @@ const runStage = async (selected) => {
     const queue = [...selected];
     const pending = new Map();
 
-    // Await in declaration order so output order never depends on finish order,
-    // while keeping `limit` tasks in flight.
+    // Await in declaration order so output order never depends on finish order.
     for (const task of selected) {
       while (pending.size < limit && queue.length > 0) {
         const next = queue.shift();
@@ -280,60 +283,23 @@ const runStage = async (selected) => {
   const failed = results.filter((result) => !result.ok);
   const notRun = selected.length - results.length;
 
-  /*
-   * Inside the deploy gate, leave a note of what passed so `vinext-run build` does not
-   * repeat it. `check:vinext` is the outer gate and the build is reached afterwards;
-   * until 2026-09-03 both ran the same five checks against the same commit. See
-   * scripts/check-gate-marker.mjs for why the inner gate is skipped rather than deleted.
-   */
-  if (plan.deployGate) {
-    const passed = results.filter((result) => result.ok).map((result) => result.task.name);
-    if (passed.length > 0 && recordPassedChecks(passed)) {
-      process.stdout.write(`[run-checks] recorded for this commit: ${passed.join(", ")}\n`);
-    }
-  }
-
   process.stdout.write(
     `\n${failed.length === 0 ? "All checks passed" : `${failed.length} check(s) failed: ${failed.map((r) => r.task.name).join(", ")}`}` +
       ` in ${formatDuration(Date.now() - startedAt)}${notRun > 0 ? ` (${notRun} not run)` : ""}\n`,
   );
 
   /*
-   * Repeat each failure at the very end, with the tail of its own output.
-   *
-   * The full report above is printed task by task as they finish, and a passing
-   * `test` task alone can be 1,700 lines on a runner whose `bun` prints a line
-   * per test. Cloudflare's build log viewer keeps a bounded window, so on a red
-   * build the `❌` line and the assertion that caused it scroll out of reach and
-   * the only thing left is `exited with code 1` — which is the whole diagnosis,
-   * and the same "a red build is unreadable" failure this file already fixed once
-   * with per-task timeouts. Whatever the window keeps, it keeps the end, so the
-   * end has to carry enough to act on.
+   * Repeat each failure at the end with the lines that named it and the tail of its output:
+   * a bounded log viewer keeps the end, so the end has to carry enough to act on.
    */
   if (failed.length > 0) {
-    /*
-     * The runtime, in the part of the log that survives.
-     *
-     * `package.json` declares `engines.bun`, and nothing enforces it: a build
-     * image that ships its own `bun` runs the gate on whatever it has. That is
-     * not a hypothetical — a container failing this gate in September 2026 was
-     * printing a line per passing test, which only `bun` 1.1.x does, while the
-     * repo pinned 1.3.14. Whoever reads the failure should not have to infer the
-     * toolchain from its output formatting.
-     */
     process.stdout.write(`\n[run-checks] ran on bun ${Bun.version}${engineMismatch() ?? ""}\n`);
 
     for (const result of failed) {
-      const lines = result.output.trimEnd().split("\n");
+      const lines = collapseRepeats(result.output).split("\n");
       const tail = lines.slice(-FAILURE_TAIL_LINES);
       process.stdout.write(`\n───── ${result.task.name} failed (\`bun run ${result.task.script}\`) ─────\n`);
 
-      /*
-       * The tail alone is not enough for the suite: bun reports a failing test
-       * where it runs, which on 1,700 tests is hundreds of lines before the end.
-       * These lines are the answer to "what failed", so they are lifted out and
-       * printed first, and the tail follows as context.
-       */
       const marked = lines.filter((line) => FAILURE_LINE_PATTERN.test(line) && !tail.includes(line));
       if (marked.length > 0) {
         const shown = marked.slice(0, FAILURE_MARKED_LINES);

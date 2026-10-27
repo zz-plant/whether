@@ -41,11 +41,14 @@ export function SubscribeForm({
   compact = false,
   defaultFrequency = "weekly",
   condition,
+  showTitle = true,
 }: {
   compact?: boolean;
   defaultFrequency?: EmailFrequency;
   /** The call-change line, printed as the next change to watch when the form offers alerts. */
   condition?: string;
+  /** False where the section's own heading already says what the form is for. */
+  showTitle?: boolean;
 } = {}) {
   const pathname = usePathname() ?? "/";
   const [channel, setChannel] = useState<SubscribeChannel>("email");
@@ -87,15 +90,15 @@ export function SubscribeForm({
         <span className="inline-flex items-center justify-center rounded-full bg-emerald-500/10 p-2 text-emerald-400">
           <Check className="size-5" aria-hidden="true" />
         </span>
-        <p className="text-fluid-xs font-semibold text-white">
+        <p className="text-fluid-xs font-semibold text-slate-50">
           {channel === "slack" ? "Slack Channel Connected!" : "Subscribed!"}
         </p>
-        <p className="text-fluid-micro text-white/60">
+        <p className="text-fluid-micro text-slate-300">
           {message}
           {alertsOnly ? " After that, you hear from us only when something moves." : null}
         </p>
         {channel === "slack" ? (
-          <p className="text-fluid-nano text-white/40">
+          <p className="text-fluid-nano text-slate-400">
             To stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.
           </p>
         ) : null}
@@ -117,42 +120,48 @@ export function SubscribeForm({
     <div className={compact
       ? "space-y-2 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-surface)] px-4 py-3"
       : "weather-section-border space-y-3"}>
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-        <div>
-          <p className="text-fluid-sm font-medium text-white">
-            {channel === "slack"
-              ? "Automate Monday brief delivery directly to Slack"
-              : alertsOnly
-                ? "Tell me when the guidance changes"
-                : "Get the guidance every Monday, and a note the day it changes"}
-          </p>
-          <p className="mt-0.5 max-w-[64ch] text-fluid-xs text-slate-400">
-            {channel === "slack"
-              ? "Every Monday at 9:00 AM ET, the brief arrives in the channel you choose."
-              : alertsOnly
-                ? <>
-                    {condition ? <>Next change to watch: {condition} </> : null}
-                    One email on the day the guidance changes, a score crosses one of its lines, or a market
-                    input makes an outsized move.
-                  </>
-                : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
-          </p>
-        </div>
+      {/* The channel control sits on the title line, and the description runs
+          the full width under both. Centred beside a four-line paragraph it
+          floated in the card's top-right corner with the text squeezed to half. */}
+      <div className="space-y-1">
+        <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+          {showTitle ? (
+            <p className="text-fluid-sm font-medium text-slate-50">
+              {channel === "slack"
+                ? "Automate Monday brief delivery directly to Slack"
+                : alertsOnly
+                  ? "Tell me when the guidance changes"
+                  : "Get the guidance every Monday, and a note the day it changes"}
+            </p>
+          ) : (
+            <span />
+          )}
 
-        {/* The one segmented control (segmentedControl.tsx): a radio group,
-            so arrows move between the two channels and the pair is one tab
-            stop, rather than two buttons with a hand-drawn selected state. */}
-        <SegmentedControl
-          ariaLabel="Delivery channel"
-          options={CHANNEL_OPTIONS}
-          value={channel}
-          onSelect={(next) => {
-            setChannel(next);
-            setStatus("idle");
-            setMessage("");
-          }}
-          className="self-start sm:self-auto"
-        />
+          {/* The one segmented control (segmentedControl.tsx): a radio group,
+              so arrows move between the two channels and the pair is one tab
+              stop, rather than two buttons with a hand-drawn selected state. */}
+          <SegmentedControl
+            ariaLabel="Delivery channel"
+            options={CHANNEL_OPTIONS}
+            value={channel}
+            onSelect={(next) => {
+              setChannel(next);
+              setStatus("idle");
+              setMessage("");
+            }}
+          />
+        </div>
+        <p className="max-w-[72ch] text-fluid-xs text-slate-400">
+          {channel === "slack"
+            ? "Every Monday at 9:00 AM ET, the brief arrives in the channel you choose."
+            : alertsOnly
+              ? <>
+                  {condition ? <>Next change to watch: {condition} </> : null}
+                  One email on the day the guidance changes, a score crosses one of its lines, or a market
+                  input makes an outsized move.
+                </>
+              : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
+        </p>
       </div>
 
       {channel === "email" ? (
@@ -193,7 +202,7 @@ export function SubscribeForm({
             <button
               type="submit"
               disabled={status === "loading"}
-              className="weather-button-primary min-h-11 px-4 py-2 text-xs disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="weather-button-primary min-h-11 px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
             >
               {status === "loading" ? "Subscribing…" : alertsOnly ? "Email me when it changes" : "Subscribe"}
             </button>
@@ -232,7 +241,7 @@ export function SubscribeForm({
             <button
               type="submit"
               disabled={status === "loading"}
-              className="weather-button-primary min-h-11 px-4 py-2 text-xs disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="weather-button-primary min-h-11 px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
             >
               {status === "loading" ? "Connecting…" : "Connect Slack"}
             </button>
@@ -266,7 +275,7 @@ export function SubscribeForm({
             className="weather-hit inline-flex items-center gap-1.5 font-medium text-sky-400 hover:text-sky-300 transition-colors"
           >
             <Calendar className="size-3" aria-hidden="true" />
-            <span>Add Monday Calendar Hold (9:00 AM)</span>
+            <span>Add a Monday calendar hold (9:00 AM)</span>
           </a>
         )}
       </div>

@@ -238,25 +238,25 @@ describe("signalOps", () => {
 
     const spend = deltas.find((delta) => delta.code === "tightness-upshift");
     assert.equal(spend?.thresholdValue, 76);
-    assert.equal(spend?.action, "Pause new discretionary spend if funding pressure is above 76 (already true at 90).");
+    assert.equal(spend?.action, "Pause new discretionary spend if funding pressure is above 76. Funding pressure is 90 now.");
     assert.equal(spend?.reversal, "Resume new spend when funding pressure falls below 66 and the payback figures still hold.");
     assert.equal(
       deltas.some((delta) => delta.decisionArea === "hiring"),
       false,
-      "risk appetite fell through 50, not through Hiring's pause line at 44",
+      "risk appetite fell below 50, not through Hiring's pause line at 44",
     );
 
     const change = deltas.find((delta) => delta.code === "regime-change");
     assert.equal(
       change?.reversal,
-      "Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).",
+      "Conditions change if: Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 2 pts from 48 to clear 50.",
     );
 
     const hiring = buildDecisionDeltaRules(assessment("SCARCITY", 90, 48), assessment("SCARCITY", 90, 43)).find(
       (delta) => delta.code === "risk-appetite-downshift",
     );
     assert.equal(hiring?.thresholdValue, 44);
-    assert.match(hiring?.action ?? "", /^Pause net-new hiring if .*risk appetite is below 44 \(already true at 43\)\.$/);
+    assert.match(hiring?.action ?? "", /^Pause net-new hiring if .*risk appetite is below 44\. Funding pressure is 90 and risk appetite is 43 now\.$/);
     assert.match(hiring?.reversal ?? "", /funding pressure falls below 66 and risk appetite is above 54/);
 
     for (const delta of deltas) {
@@ -360,12 +360,12 @@ describe("signalOps", () => {
     const spend = payload.reasons.find((reason) => reason.code === "tightness-upshift");
     assert.equal(
       spend?.message,
-      "RECONSIDER SPENDING. Pause new discretionary spend if funding pressure is above 76 (already true at 90). Funding pressure 90 crossed the Spending pause line at 76. Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
+      "RECONSIDER SPENDING. Pause new discretionary spend if funding pressure is above 76. Funding pressure 90 crossed the Spending pause line at 76. Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
     );
     const change = payload.reasons.find((reason) => reason.code === "regime-change");
     assert.equal(
       change?.message,
-      "RECONSIDER THE GUIDANCE. Conditions changed from Sunny to Freezing; reread last week's plan. Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 2 pts to clear 50 (48 today).",
+      "RECONSIDER THE GUIDANCE. Conditions changed from Sunny to Freezing; reread last week's plan. Conditions change if: Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 2 pts from 48 to clear 50.",
     );
     for (const reason of payload.reasons) {
       assert.doesNotMatch(reason.message, /Trigger|\d\.\d\d|\b0\.00\b|The line where conditions change/);

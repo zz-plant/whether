@@ -1,3 +1,4 @@
+import { scaleLinear } from "d3-scale";
 import { buildSparklinePath, rangeLabel, sparklineDomain } from "./ui/sparkline";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "./illustrations/TrendGlyph";
 
@@ -20,6 +21,13 @@ type HistoricalTrendChartProps = {
    * itself.
    */
   periodLabel?: string;
+  /**
+   * The score's change line. When set the chart draws on the score's own 0–100
+   * scale with the line across it, so the shape says how far the score sat from
+   * where conditions change; autoscaled, a 4-point wobble near the line and a
+   * 40-point swing far from it filled the same height (2026-10-12).
+   */
+  changeLine?: number;
 };
 
 const asOfFormatter = new Intl.DateTimeFormat("en-US", {
@@ -43,18 +51,20 @@ export function HistoricalTrendChart({
   points,
   increaseIsPositive = false,
   periodLabel = "periods",
+  changeLine,
 }: HistoricalTrendChartProps) {
   if (points.length < 2) return null;
 
   const values = points.map((p) => p.value);
   // Same projection the inline sparkline uses, so the two never drift apart.
-  const domain = sparklineDomain(values);
+  const domain: readonly [number, number] = typeof changeLine === "number" ? [0, 100] : sparklineDomain(values);
   const [min, max] = domain;
-  const span = max - min || 1;
   const pathD = buildSparklinePath(values, domain, W, H, PAD_Y);
 
   const currentVal = points[points.length - 1].value;
-  const dotY = H - PAD_Y - ((currentVal - min) / span) * (H - PAD_Y * 2);
+  const yScale = scaleLinear().domain([min, max]).range([H - PAD_Y, PAD_Y]);
+  const yFor = (value: number) => yScale(value);
+  const dotY = yFor(currentVal);
   const asOf = formatAsOf(points[points.length - 1].date);
   /* The move is first point to last, so it spans the gaps between points, one
      fewer than the points. This counted the points: twelve month-ends printed
@@ -96,11 +106,26 @@ export function HistoricalTrendChart({
         // width it is given; the stroke and the end dot opt out of the stretch
         // below so neither turns into an ellipse.
         preserveAspectRatio="none"
-        className="w-full h-8 overflow-visible"
+        className={`w-full ${typeof changeLine === "number" ? "h-20" : "h-8"} overflow-visible`}
         // The chart is autoscaled, so the range has to be stated or the shape
         // can't be decoded.
-        aria-label={`${label} over ${moveSpan}, ranging ${rangeLabel(domain)}. Latest ${asOf ? `${asOf} ` : ""}read ${currentVal}.`}
+        aria-label={
+          typeof changeLine === "number"
+            ? `${label} over ${moveSpan}, on its 0–100 scale with the change line at ${changeLine}. Latest ${asOf ? `${asOf} ` : ""}read ${currentVal}.`
+            : `${label} over ${moveSpan}, ranging ${rangeLabel(domain)}. Latest ${asOf ? `${asOf} ` : ""}read ${currentVal}.`
+        }
       >
+        {typeof changeLine === "number" ? (
+          <path
+            d={`M0 ${yFor(changeLine)} L${W} ${yFor(changeLine)}`}
+            stroke="currentColor"
+            strokeOpacity="0.45"
+            strokeWidth="1"
+            strokeDasharray="3 3"
+            vectorEffect="non-scaling-stroke"
+            data-change-line
+          />
+        ) : null}
         <path
           d={pathD}
           fill="none"
@@ -121,7 +146,10 @@ export function HistoricalTrendChart({
           vectorEffect="non-scaling-stroke"
         />
       </svg>
-      <p className="text-fluid-nano text-slate-400">{periodSummary}</p>
+      <p className="text-fluid-nano text-slate-400">
+        {periodSummary}
+        {typeof changeLine === "number" ? ` · change line ${changeLine}, dashed` : ""}
+      </p>
     </div>
   );
 }

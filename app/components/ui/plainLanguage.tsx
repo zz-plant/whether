@@ -3,6 +3,7 @@ import {
   compositeSignalScales,
   formatSignalReading,
   plainEnglishScoreDescription,
+  signalPlainEnglish,
   type CompositeSignalKey,
 } from "../../../lib/report/signalTranslations";
 
@@ -83,5 +84,76 @@ export function SignalScaleNote({
     <Component className={joinClasses("text-fluid-nano text-white/40", className)}>
       {compositeSignalScales[signalKey].directionLabel}
     </Component>
+  );
+}
+
+const isCompositeSignalKey = (key: RegimeSignalKey): key is CompositeSignalKey =>
+  key === "tightness" || key === "riskAppetite";
+
+/**
+ * An expandable plain-English disclosure providing indicator context:
+ * what it captures, its active scale/band meaning, historical era anchors,
+ * and an operator prompt for leadership planning.
+ */
+export function SignalContextDetails({
+  signalKey,
+  score,
+  scaleLabel,
+  className,
+}: {
+  signalKey: RegimeSignalKey;
+  score?: number | null;
+  scaleLabel?: string;
+  className?: string;
+}) {
+  const isComposite = isCompositeSignalKey(signalKey);
+  const info = signalPlainEnglish[signalKey];
+  if (!info) return null;
+
+  return (
+    <details
+      className={joinClasses("weather-auto-chevron text-fluid-nano font-normal text-slate-400", className)}
+      data-signal-context={signalKey}
+    >
+      <summary className="cursor-pointer select-none hover:text-slate-200 transition-colors">
+        {isComposite ? "What the score means" : "What this signal means"}
+      </summary>
+      <div className="mt-1 space-y-1.5 rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-2.5 text-fluid-nano">
+        <p className="text-slate-300">
+          <span className="font-semibold text-slate-200">What it captures: </span>
+          {info.whatItMeasures}
+        </p>
+        {scaleLabel || isComposite ? (
+          <div className="flex flex-wrap items-center gap-x-1.5 text-slate-400">
+            {scaleLabel ? <span className="capitalize">{scaleLabel}</span> : null}
+            {scaleLabel && isComposite ? (
+              <span aria-hidden="true" className="text-slate-600">·</span>
+            ) : null}
+            {isComposite ? (
+              <SignalScaleNote signalKey={signalKey} as="span" className="inline font-normal text-slate-400" />
+            ) : null}
+          </div>
+        ) : null}
+        {isComposite && typeof score === "number" ? (
+          <PlainEnglishScoreNote
+            signalKey={signalKey}
+            score={score}
+            className="whitespace-normal font-normal text-slate-300/90"
+          />
+        ) : null}
+        {info.historicalContext ? (
+          <p className="text-slate-400">
+            <span className="font-medium text-slate-300">Historical context: </span>
+            {info.historicalContext}
+          </p>
+        ) : null}
+        {info.operatorPrompt ? (
+          <p className="border-t border-[color:var(--border-faint)] pt-1 text-slate-400">
+            <span className="font-medium text-slate-200">Ask your team: </span>
+            {info.operatorPrompt}
+          </p>
+        ) : null}
+      </div>
+    </details>
   );
 }

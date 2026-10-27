@@ -5,8 +5,8 @@ cadence strategy in the roadmap's **Engagement by cadence** section and the repo
 framework (one-screen brief → bounded decisions → exports/citation → trust/resilience →
 lowest new-system overhead).
 
-**Status (2026-09-18): all of Tier 1 and Tier 2 shipped** — T1.1–T1.4 and T2.1–T2.5, each with
-the verification named below. Tier 3 and Tier 4 remain open.
+**Status (2026-10-12): all of Tier 1 and Tier 2 shipped** — T1.1–T1.4 and T2.1–T2.5, plus
+T3.1 (Standup line on `/share` and `get_standup_line` MCP tool). Tier 3 remainder and Tier 4 remain open.
 
 Tier 1 ships next because each item reuses a shipped surface, closes a return loop, and adds no
 new product category. Tier 4 is deferred behind a product decision or a stored-secret decision.
@@ -199,6 +199,8 @@ daily cron + `flipProximity.ts` and puts the call at the top of the most frequen
 
 ### T3.2 Sprint-posture recap + retro violation report
 
+**Status (2026-10-22): Shipped** — `lib/report/sprintRetro.ts` audits logged decisions or candidate commitments against `boundedDecisionRules.ts` pause lines; exposed via MCP tool `audit_sprint_retro`; verified in `tests/sprintRetro.test.ts` and `tests/mcpCommitmentLinter.test.ts`.
+
 **Why**: `lib/events/decisionEventStore.ts` logs decisions. Comparing the sprint's decisions against
 the regime's bounded rules surfaces violations ("committed to a speculative build in a DEFENSIVE
 regime").
@@ -213,6 +215,8 @@ regime").
 
 ### T3.3 Persistent board embed
 
+**Status**: Shipped (`data-whether-embed="call-strip"` mode in `public/embed.js`, `buildCallStripEmbedHtml` and `buildCallStripEmbedText` in `app/api/embed/route.ts`, format toggle in `app/share/embedBuilder.tsx`, verified in `tests/embedRoute.test.ts`).
+
 **Why**: `embedBuilder.tsx` ships a widget. A compact always-on strip (regime + call + flip distance)
 above a board, updating daily from the cron, is the continuous analog of the standup line.
 
@@ -226,6 +230,8 @@ cron writes a new snapshot.
 **Verification**: embed route test for the new mode.
 
 ### T3.4 History/compare as the lapsed-user magnet (QAU)
+
+**Status**: Shipped (`SinceLastVisit.tsx` links lapsed visitors to `/history/compare?yearB=...&monthB=...` comparing current conditions against their last visit date; verified in `tests/SinceLastVisit.test.tsx`).
 
 **Why**: `/history/[period]` and Time Machine are pure QAU surfaces (regime at last visit vs today,
 score deltas, flip proximity) but are not the return path.

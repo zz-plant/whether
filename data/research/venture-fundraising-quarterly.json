@@ -1,0 +1,1883 @@
+{
+  "schemaVersion": 1,
+  "about": "U.S. venture deal value (USD billions) and deal count by quarter, read from the 'Deal value ($B)' and 'Deal count' rows of the PitchBook-NVCA Venture Monitor's public summary spreadsheets. Figures and citations only.",
+  "registration": "docs/research/premise-test-preregistration.md",
+  "generator": "scripts/research/ventureFundraising.ts",
+  "vintageRule": {
+    "mature": "Quarter t and quarter t−4 are both read from the earliest retrieved release whose own quarter is at least t+4; with no such release, from the latest retrieved release, marked immature.",
+    "firstPublished": "Quarter t and quarter t−4 are both read from the release that first published t, where it was retrieved."
+  },
+  "releases": [
+    {
+      "quarter": "2019Q2",
+      "title": "Q2 2019 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+      "asOf": "2019-06-30",
+      "savedAt": "2019-07-10T20:18:08Z",
+      "sheet": "Deal Flow x Stage & Qtr",
+      "valueRow": 8,
+      "countRow": 9,
+      "firstQuarter": "2006Q1",
+      "annualTotalsChecked": 13
+    },
+    {
+      "quarter": "2019Q3",
+      "title": "Q3 2019 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2019/10/3Q_2019_PitchBook_NVCA_Venture_Monitor_Summary_XLS-1.xlsx",
+      "asOf": "2019-09-30",
+      "savedAt": "2019-10-07T22:19:28Z",
+      "sheet": "Deal Flow x Stage & Qtr",
+      "valueRow": 8,
+      "countRow": 9,
+      "firstQuarter": "2006Q1",
+      "annualTotalsChecked": 13
+    },
+    {
+      "quarter": "2019Q4",
+      "title": "Q4 2019 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2020/01/Final_4Q_2019_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2019-12-31",
+      "savedAt": "2020-01-11T01:09:24Z",
+      "sheet": "Deal Activity",
+      "valueRow": 45,
+      "countRow": 46,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2020Q1",
+      "title": "Q1 2020 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2020/04/Summary-XLS_Q1_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2020-03-31",
+      "savedAt": "2020-04-10T00:05:29Z",
+      "sheet": "Deal Activity",
+      "valueRow": 46,
+      "countRow": 47,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2020Q2",
+      "title": "Q2 2020 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2020/07/Summary-XLS_Final_Q2_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2020-06-30",
+      "savedAt": "2020-07-10T19:49:22Z",
+      "sheet": "Deal Activity",
+      "valueRow": 46,
+      "countRow": 47,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2020Q3",
+      "title": "Q3 2020 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2020/10/Summary-XLS_Q3_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2020-09-30",
+      "savedAt": "2020-10-09T20:18:23Z",
+      "sheet": "Deal Activity",
+      "valueRow": 49,
+      "countRow": 50,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2020Q4",
+      "title": "Q4 2020 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2021/01/Q4_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2020-12-31",
+      "savedAt": "2021-01-11T20:39:47Z",
+      "sheet": "Deal Activity",
+      "valueRow": 49,
+      "countRow": 50,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 11
+    },
+    {
+      "quarter": "2021Q1",
+      "title": "Q1 2021 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2021/04/Final_Q1_2021_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2021-03-31",
+      "savedAt": "2021-04-14T13:48:26Z",
+      "sheet": "Deal Activity",
+      "valueRow": 49,
+      "countRow": 50,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 11
+    },
+    {
+      "quarter": "2021Q2",
+      "title": "Q2 2021 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2021/07/Q2_2021_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2021-06-30",
+      "savedAt": "2021-07-14T00:49:51Z",
+      "sheet": "Deal Activity",
+      "valueRow": 49,
+      "countRow": 50,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 11
+    },
+    {
+      "quarter": "2021Q3",
+      "title": "Q3 2021 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2021/10/Underlying-Report-Data_Q3-2021-Venture-Monitor.xlsx",
+      "asOf": "2021-09-30",
+      "savedAt": "2021-10-08T21:46:28Z",
+      "sheet": "Deal Activity",
+      "valueRow": 49,
+      "countRow": 50,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 11
+    },
+    {
+      "quarter": "2021Q4",
+      "title": "Q4 2021 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2022/01/Underlying-Report-Data_Q4-2021-Venture-Monitor.xlsx",
+      "asOf": "2021-12-31",
+      "savedAt": "2022-01-07T23:22:17Z",
+      "sheet": "Deal Activity",
+      "valueRow": 49,
+      "countRow": 50,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 12
+    },
+    {
+      "quarter": "2022Q1",
+      "title": "Q1 2022 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2022/04/Q1_2022_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2022-03-31",
+      "savedAt": "2022-04-13T23:17:35Z",
+      "sheet": "Deal Activity",
+      "valueRow": 49,
+      "countRow": 50,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 12
+    },
+    {
+      "quarter": "2022Q2",
+      "title": "Q2 2022 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2022/07/Q2_2022_PitchBook_NVCA_Venture_Monitor_XLS.xlsx",
+      "asOf": "2022-06-30",
+      "savedAt": "2022-07-13T20:19:16Z",
+      "sheet": "Deal Activity",
+      "valueRow": 49,
+      "countRow": 50,
+      "firstQuarter": "2010Q1",
+      "annualTotalsChecked": 12
+    },
+    {
+      "quarter": "2022Q4",
+      "title": "Q4 2022 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2023/02/Underlying-Report-Data_Q4-2022-Venture-Monitor.xlsx",
+      "asOf": "2022-12-31",
+      "savedAt": "2023-01-11T00:45:51Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2012Q1",
+      "annualTotalsChecked": 11
+    },
+    {
+      "quarter": "2023Q1",
+      "title": "Q1 2023 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2023/04/Q1_2023_PitchBook-NVCA_Venture_Monitor_Data.xlsx",
+      "asOf": "2023-03-31",
+      "savedAt": "2023-04-13T19:21:09Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2013Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2023Q2",
+      "title": "Q2 2023 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2023/07/Q2_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2023-06-30",
+      "savedAt": "2023-07-12T16:57:45Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2013Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2023Q3",
+      "title": "Q3 2023 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2023/10/Q3_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2023-09-30",
+      "savedAt": "2023-10-12T15:04:20Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2013Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2023Q4",
+      "title": "Q4 2023 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2024/01/Q4_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+      "asOf": "2023-12-31",
+      "savedAt": "2024-01-10T17:51:29Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2013Q1",
+      "annualTotalsChecked": 11
+    },
+    {
+      "quarter": "2024Q1",
+      "title": "Q1 2024 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2024/04/Q1-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+      "asOf": "2024-03-31",
+      "savedAt": "2024-04-11T04:14:52Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2014Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2024Q2",
+      "title": "Q2 2024 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2024/07/Q2-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+      "asOf": "2024-06-30",
+      "savedAt": "2024-07-10T20:36:11Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2014Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2024Q3",
+      "title": "Q3 2024 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2024/10/Q3-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+      "asOf": "2024-09-30",
+      "savedAt": "2024-10-09T16:45:23Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2014Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2024Q4",
+      "title": "Q4 2024 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2025/01/Q4-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+      "asOf": "2024-12-31",
+      "savedAt": "2025-01-13T17:47:25Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2014Q1",
+      "annualTotalsChecked": 11
+    },
+    {
+      "quarter": "2025Q1",
+      "title": "Q1 2025 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2025/04/Q1-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS-19001-1.xlsx",
+      "asOf": "2025-03-31",
+      "savedAt": "2025-04-15T04:13:25Z",
+      "sheet": "Deal Activity",
+      "valueRow": 52,
+      "countRow": 53,
+      "firstQuarter": "2015Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2025Q2",
+      "title": "Q2 2025 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2025/07/Q2-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS-19728.xlsx",
+      "asOf": "2025-06-30",
+      "savedAt": "2025-07-14T18:48:02Z",
+      "sheet": "Deal Activity",
+      "valueRow": 47,
+      "countRow": 48,
+      "firstQuarter": "2015Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2025Q3",
+      "title": "Q3 2025 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2025/10/Q3_2025_PitchBook-NVCA_Venture_Monitor_Summary_XLS_20370.xlsx",
+      "asOf": "2025-09-30",
+      "savedAt": "2025-10-14T16:12:42Z",
+      "sheet": "Deal activity",
+      "valueRow": 47,
+      "countRow": 48,
+      "firstQuarter": "2015Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2025Q4",
+      "title": "Q4 2025 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2026/01/Q4-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+      "asOf": "2025-12-31",
+      "savedAt": "2026-01-15T04:57:51Z",
+      "sheet": "Deal activity",
+      "valueRow": 47,
+      "countRow": 48,
+      "firstQuarter": "2015Q1",
+      "annualTotalsChecked": 11
+    },
+    {
+      "quarter": "2026Q1",
+      "title": "Q1 2026 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2026/04/Q1-2026-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+      "asOf": "2026-03-31",
+      "savedAt": "2026-04-14T18:54:47Z",
+      "sheet": "Deal activity",
+      "valueRow": 47,
+      "countRow": 48,
+      "firstQuarter": "2016Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2026Q2",
+      "title": "Q2 2026 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/wp-content/uploads/2026/07/Q2-2026-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+      "asOf": "2026-06-30",
+      "savedAt": "2026-07-08T17:02:09Z",
+      "sheet": "VC deal activity",
+      "valueRow": 9,
+      "countRow": 10,
+      "firstQuarter": "2016Q1",
+      "annualTotalsChecked": 10
+    },
+    {
+      "quarter": "2026Q3",
+      "title": "Q3 2026 PitchBook-NVCA Venture Monitor",
+      "url": "https://nvca.org/download/125414/",
+      "asOf": "2026-09-30",
+      "savedAt": "2026-10-07T19:32:50Z",
+      "sheet": "VC deal activity",
+      "valueRow": 9,
+      "countRow": 10,
+      "firstQuarter": "2016Q1",
+      "annualTotalsChecked": 10
+    }
+  ],
+  "unretrieved": [
+    {
+      "releases": "every release before 2019Q2",
+      "reason": "No public copy of the summary spreadsheet on nvca.org or in the Internet Archive's index of nvca.org uploads; NVCA described its spreadsheet data packs of that period as members-only."
+    },
+    {
+      "releases": "2022Q3",
+      "reason": "The release's spreadsheet is not on nvca.org and the Internet Archive holds no copy of it."
+    }
+  ],
+  "quarters": [
+    {
+      "quarter": "2011Q1",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 13.799,
+          "dealCount": 1808
+        },
+        "yearEarlier": {
+          "quarter": "2010Q1",
+          "dealValueUsdBn": 7.839,
+          "dealCount": 1378
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2011Q2",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 10.157,
+          "dealCount": 1643
+        },
+        "yearEarlier": {
+          "quarter": "2010Q2",
+          "dealValueUsdBn": 8.827,
+          "dealCount": 1335
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2011Q3",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 11.146,
+          "dealCount": 1674
+        },
+        "yearEarlier": {
+          "quarter": "2010Q3",
+          "dealValueUsdBn": 6.997,
+          "dealCount": 1287
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2011Q4",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 9.668,
+          "dealCount": 1649
+        },
+        "yearEarlier": {
+          "quarter": "2010Q4",
+          "dealValueUsdBn": 7.7,
+          "dealCount": 1412
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2012Q1",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 9.796,
+          "dealCount": 2108
+        },
+        "yearEarlier": {
+          "quarter": "2011Q1",
+          "dealValueUsdBn": 13.799,
+          "dealCount": 1808
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2012Q2",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 10.978,
+          "dealCount": 1999
+        },
+        "yearEarlier": {
+          "quarter": "2011Q2",
+          "dealValueUsdBn": 10.157,
+          "dealCount": 1643
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2012Q3",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 10.701,
+          "dealCount": 1861
+        },
+        "yearEarlier": {
+          "quarter": "2011Q3",
+          "dealValueUsdBn": 11.146,
+          "dealCount": 1674
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2012Q4",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 9.969,
+          "dealCount": 1913
+        },
+        "yearEarlier": {
+          "quarter": "2011Q4",
+          "dealValueUsdBn": 9.668,
+          "dealCount": 1649
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2013Q1",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 11.319,
+          "dealCount": 2357
+        },
+        "yearEarlier": {
+          "quarter": "2012Q1",
+          "dealValueUsdBn": 9.796,
+          "dealCount": 2108
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2013Q2",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 11.427,
+          "dealCount": 2218
+        },
+        "yearEarlier": {
+          "quarter": "2012Q2",
+          "dealValueUsdBn": 10.978,
+          "dealCount": 1999
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2013Q3",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 11.989,
+          "dealCount": 2339
+        },
+        "yearEarlier": {
+          "quarter": "2012Q3",
+          "dealValueUsdBn": 10.701,
+          "dealCount": 1861
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2013Q4",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 13.073,
+          "dealCount": 2429
+        },
+        "yearEarlier": {
+          "quarter": "2012Q4",
+          "dealValueUsdBn": 9.969,
+          "dealCount": 1913
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2014Q1",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 15.027,
+          "dealCount": 2702
+        },
+        "yearEarlier": {
+          "quarter": "2013Q1",
+          "dealValueUsdBn": 11.319,
+          "dealCount": 2357
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2014Q2",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 20.026,
+          "dealCount": 2617
+        },
+        "yearEarlier": {
+          "quarter": "2013Q2",
+          "dealValueUsdBn": 11.427,
+          "dealCount": 2218
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2014Q3",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 16.771,
+          "dealCount": 2684
+        },
+        "yearEarlier": {
+          "quarter": "2013Q3",
+          "dealValueUsdBn": 11.989,
+          "dealCount": 2339
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2014Q4",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 19.936,
+          "dealCount": 2593
+        },
+        "yearEarlier": {
+          "quarter": "2013Q4",
+          "dealValueUsdBn": 13.073,
+          "dealCount": 2429
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2015Q1",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 20.935,
+          "dealCount": 2883
+        },
+        "yearEarlier": {
+          "quarter": "2014Q1",
+          "dealValueUsdBn": 15.027,
+          "dealCount": 2702
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2015Q2",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 20.758,
+          "dealCount": 2818
+        },
+        "yearEarlier": {
+          "quarter": "2014Q2",
+          "dealValueUsdBn": 20.026,
+          "dealCount": 2617
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2015Q3",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 22.792,
+          "dealCount": 2651
+        },
+        "yearEarlier": {
+          "quarter": "2014Q3",
+          "dealValueUsdBn": 16.771,
+          "dealCount": 2684
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2015Q4",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 19.02,
+          "dealCount": 2487
+        },
+        "yearEarlier": {
+          "quarter": "2014Q4",
+          "dealValueUsdBn": 19.936,
+          "dealCount": 2593
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2016Q1",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 19.867,
+          "dealCount": 2661
+        },
+        "yearEarlier": {
+          "quarter": "2015Q1",
+          "dealValueUsdBn": 20.935,
+          "dealCount": 2883
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2016Q2",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 23.948,
+          "dealCount": 2316
+        },
+        "yearEarlier": {
+          "quarter": "2015Q2",
+          "dealValueUsdBn": 20.758,
+          "dealCount": 2818
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2016Q3",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 18.137,
+          "dealCount": 2272
+        },
+        "yearEarlier": {
+          "quarter": "2015Q3",
+          "dealValueUsdBn": 22.792,
+          "dealCount": 2651
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2016Q4",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 15.39,
+          "dealCount": 2115
+        },
+        "yearEarlier": {
+          "quarter": "2015Q4",
+          "dealValueUsdBn": 19.02,
+          "dealCount": 2487
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2017Q1",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 16.953,
+          "dealCount": 2596
+        },
+        "yearEarlier": {
+          "quarter": "2016Q1",
+          "dealValueUsdBn": 19.867,
+          "dealCount": 2661
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2017Q2",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 21.733,
+          "dealCount": 2502
+        },
+        "yearEarlier": {
+          "quarter": "2016Q2",
+          "dealValueUsdBn": 23.948,
+          "dealCount": 2316
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2017Q3",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 23.642,
+          "dealCount": 2442
+        },
+        "yearEarlier": {
+          "quarter": "2016Q3",
+          "dealValueUsdBn": 18.137,
+          "dealCount": 2272
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2017Q4",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 21.043,
+          "dealCount": 2349
+        },
+        "yearEarlier": {
+          "quarter": "2016Q4",
+          "dealValueUsdBn": 15.39,
+          "dealCount": 2115
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2018Q1",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 29.613,
+          "dealCount": 2549
+        },
+        "yearEarlier": {
+          "quarter": "2017Q1",
+          "dealValueUsdBn": 16.953,
+          "dealCount": 2596
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2018Q2",
+      "mature": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 29.545,
+          "dealCount": 2451
+        },
+        "yearEarlier": {
+          "quarter": "2017Q2",
+          "dealValueUsdBn": 21.733,
+          "dealCount": 2502
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2018Q3",
+      "mature": {
+        "release": "2019Q3",
+        "url": "https://nvca.org/wp-content/uploads/2019/10/3Q_2019_PitchBook_NVCA_Venture_Monitor_Summary_XLS-1.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 31.821,
+          "dealCount": 2377
+        },
+        "yearEarlier": {
+          "quarter": "2017Q3",
+          "dealValueUsdBn": 25.054,
+          "dealCount": 2504
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2018Q4",
+      "mature": {
+        "release": "2019Q4",
+        "url": "https://nvca.org/wp-content/uploads/2020/01/Final_4Q_2019_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 47.378,
+          "dealCount": 2704
+        },
+        "yearEarlier": {
+          "quarter": "2017Q4",
+          "dealValueUsdBn": 21.621,
+          "dealCount": 2462
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2019Q1",
+      "mature": {
+        "release": "2020Q1",
+        "url": "https://nvca.org/wp-content/uploads/2020/04/Summary-XLS_Q1_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 35.016,
+          "dealCount": 3162
+        },
+        "yearEarlier": {
+          "quarter": "2018Q1",
+          "dealValueUsdBn": 28.816,
+          "dealCount": 2883
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2019Q2",
+      "mature": {
+        "release": "2020Q2",
+        "url": "https://nvca.org/wp-content/uploads/2020/07/Summary-XLS_Final_Q2_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 35.973,
+          "dealCount": 3102
+        },
+        "yearEarlier": {
+          "quarter": "2018Q2",
+          "dealValueUsdBn": 30.972,
+          "dealCount": 2743
+        }
+      },
+      "firstPublished": {
+        "release": "2019Q2",
+        "url": "https://nvca.org/wp-content/uploads/2019/08/Final_PitchBook_NVCA_2Q_2019_Venture_Monitor_Summary_XLS.xlsb.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 31.481,
+          "dealCount": 2338
+        },
+        "yearEarlier": {
+          "quarter": "2018Q2",
+          "dealValueUsdBn": 29.545,
+          "dealCount": 2451
+        }
+      }
+    },
+    {
+      "quarter": "2019Q3",
+      "mature": {
+        "release": "2020Q3",
+        "url": "https://nvca.org/wp-content/uploads/2020/10/Summary-XLS_Q3_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 34.121,
+          "dealCount": 2920
+        },
+        "yearEarlier": {
+          "quarter": "2018Q3",
+          "dealValueUsdBn": 34.227,
+          "dealCount": 2650
+        }
+      },
+      "firstPublished": {
+        "release": "2019Q3",
+        "url": "https://nvca.org/wp-content/uploads/2019/10/3Q_2019_PitchBook_NVCA_Venture_Monitor_Summary_XLS-1.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 28.193,
+          "dealCount": 2265
+        },
+        "yearEarlier": {
+          "quarter": "2018Q3",
+          "dealValueUsdBn": 31.821,
+          "dealCount": 2377
+        }
+      }
+    },
+    {
+      "quarter": "2019Q4",
+      "mature": {
+        "release": "2020Q4",
+        "url": "https://nvca.org/wp-content/uploads/2021/01/Q4_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 31.173,
+          "dealCount": 2923
+        },
+        "yearEarlier": {
+          "quarter": "2018Q4",
+          "dealValueUsdBn": 48.342,
+          "dealCount": 2880
+        }
+      },
+      "firstPublished": {
+        "release": "2019Q4",
+        "url": "https://nvca.org/wp-content/uploads/2020/01/Final_4Q_2019_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 34.194,
+          "dealCount": 2215
+        },
+        "yearEarlier": {
+          "quarter": "2018Q4",
+          "dealValueUsdBn": 47.378,
+          "dealCount": 2704
+        }
+      }
+    },
+    {
+      "quarter": "2020Q1",
+      "mature": {
+        "release": "2021Q1",
+        "url": "https://nvca.org/wp-content/uploads/2021/04/Final_Q1_2021_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 35.826,
+          "dealCount": 3283
+        },
+        "yearEarlier": {
+          "quarter": "2019Q1",
+          "dealValueUsdBn": 35.935,
+          "dealCount": 3379
+        }
+      },
+      "firstPublished": {
+        "release": "2020Q1",
+        "url": "https://nvca.org/wp-content/uploads/2020/04/Summary-XLS_Q1_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 34.249,
+          "dealCount": 2298
+        },
+        "yearEarlier": {
+          "quarter": "2019Q1",
+          "dealValueUsdBn": 35.016,
+          "dealCount": 3162
+        }
+      }
+    },
+    {
+      "quarter": "2020Q2",
+      "mature": {
+        "release": "2021Q2",
+        "url": "https://nvca.org/wp-content/uploads/2021/07/Q2_2021_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 37.057,
+          "dealCount": 2715
+        },
+        "yearEarlier": {
+          "quarter": "2019Q2",
+          "dealValueUsdBn": 35.641,
+          "dealCount": 3080
+        }
+      },
+      "firstPublished": {
+        "release": "2020Q2",
+        "url": "https://nvca.org/wp-content/uploads/2020/07/Summary-XLS_Final_Q2_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 34.339,
+          "dealCount": 2197
+        },
+        "yearEarlier": {
+          "quarter": "2019Q2",
+          "dealValueUsdBn": 35.973,
+          "dealCount": 3102
+        }
+      }
+    },
+    {
+      "quarter": "2020Q3",
+      "mature": {
+        "release": "2021Q3",
+        "url": "https://nvca.org/wp-content/uploads/2021/10/Underlying-Report-Data_Q3-2021-Venture-Monitor.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 47.837,
+          "dealCount": 2871
+        },
+        "yearEarlier": {
+          "quarter": "2019Q3",
+          "dealValueUsdBn": 36.123,
+          "dealCount": 3020
+        }
+      },
+      "firstPublished": {
+        "release": "2020Q3",
+        "url": "https://nvca.org/wp-content/uploads/2020/10/Summary-XLS_Q3_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 37.777,
+          "dealCount": 2288
+        },
+        "yearEarlier": {
+          "quarter": "2019Q3",
+          "dealValueUsdBn": 34.121,
+          "dealCount": 2920
+        }
+      }
+    },
+    {
+      "quarter": "2020Q4",
+      "mature": {
+        "release": "2021Q4",
+        "url": "https://nvca.org/wp-content/uploads/2022/01/Underlying-Report-Data_Q4-2021-Venture-Monitor.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 44.862,
+          "dealCount": 3176
+        },
+        "yearEarlier": {
+          "quarter": "2019Q4",
+          "dealValueUsdBn": 32.592,
+          "dealCount": 2969
+        }
+      },
+      "firstPublished": {
+        "release": "2020Q4",
+        "url": "https://nvca.org/wp-content/uploads/2021/01/Q4_2020_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 38.764,
+          "dealCount": 2526
+        },
+        "yearEarlier": {
+          "quarter": "2019Q4",
+          "dealValueUsdBn": 31.173,
+          "dealCount": 2923
+        }
+      }
+    },
+    {
+      "quarter": "2021Q1",
+      "mature": {
+        "release": "2022Q1",
+        "url": "https://nvca.org/wp-content/uploads/2022/04/Q1_2022_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 77.014,
+          "dealCount": 4282
+        },
+        "yearEarlier": {
+          "quarter": "2020Q1",
+          "dealValueUsdBn": 37.619,
+          "dealCount": 3430
+        }
+      },
+      "firstPublished": {
+        "release": "2021Q1",
+        "url": "https://nvca.org/wp-content/uploads/2021/04/Final_Q1_2021_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 69.022,
+          "dealCount": 3042
+        },
+        "yearEarlier": {
+          "quarter": "2020Q1",
+          "dealValueUsdBn": 35.826,
+          "dealCount": 3283
+        }
+      }
+    },
+    {
+      "quarter": "2021Q2",
+      "mature": {
+        "release": "2022Q2",
+        "url": "https://nvca.org/wp-content/uploads/2022/07/Q2_2022_PitchBook_NVCA_Venture_Monitor_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 81.21,
+          "dealCount": 4268
+        },
+        "yearEarlier": {
+          "quarter": "2020Q2",
+          "dealValueUsdBn": 36.805,
+          "dealCount": 2800
+        }
+      },
+      "firstPublished": {
+        "release": "2021Q2",
+        "url": "https://nvca.org/wp-content/uploads/2021/07/Q2_2021_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 75.034,
+          "dealCount": 3296
+        },
+        "yearEarlier": {
+          "quarter": "2020Q2",
+          "dealValueUsdBn": 37.057,
+          "dealCount": 2715
+        }
+      }
+    },
+    {
+      "quarter": "2021Q3",
+      "mature": {
+        "release": "2022Q4",
+        "url": "https://nvca.org/wp-content/uploads/2023/02/Underlying-Report-Data_Q4-2022-Venture-Monitor.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 88.609,
+          "dealCount": 4524
+        },
+        "yearEarlier": {
+          "quarter": "2020Q3",
+          "dealValueUsdBn": 48.681,
+          "dealCount": 3118
+        }
+      },
+      "firstPublished": {
+        "release": "2021Q3",
+        "url": "https://nvca.org/wp-content/uploads/2021/10/Underlying-Report-Data_Q3-2021-Venture-Monitor.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 82.8,
+          "dealCount": 3518
+        },
+        "yearEarlier": {
+          "quarter": "2020Q3",
+          "dealValueUsdBn": 47.837,
+          "dealCount": 2871
+        }
+      }
+    },
+    {
+      "quarter": "2021Q4",
+      "mature": {
+        "release": "2022Q4",
+        "url": "https://nvca.org/wp-content/uploads/2023/02/Underlying-Report-Data_Q4-2022-Venture-Monitor.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 93.945,
+          "dealCount": 4668
+        },
+        "yearEarlier": {
+          "quarter": "2020Q4",
+          "dealValueUsdBn": 45.989,
+          "dealCount": 3485
+        }
+      },
+      "firstPublished": {
+        "release": "2021Q4",
+        "url": "https://nvca.org/wp-content/uploads/2022/01/Underlying-Report-Data_Q4-2021-Venture-Monitor.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 88.238,
+          "dealCount": 3536
+        },
+        "yearEarlier": {
+          "quarter": "2020Q4",
+          "dealValueUsdBn": 44.862,
+          "dealCount": 3176
+        }
+      }
+    },
+    {
+      "quarter": "2022Q1",
+      "mature": {
+        "release": "2023Q1",
+        "url": "https://nvca.org/wp-content/uploads/2023/04/Q1_2023_PitchBook-NVCA_Venture_Monitor_Data.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 82.439,
+          "dealCount": 5243
+        },
+        "yearEarlier": {
+          "quarter": "2021Q1",
+          "dealValueUsdBn": 79.353,
+          "dealCount": 4904
+        }
+      },
+      "firstPublished": {
+        "release": "2022Q1",
+        "url": "https://nvca.org/wp-content/uploads/2022/04/Q1_2022_PitchBook_NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 70.718,
+          "dealCount": 3723
+        },
+        "yearEarlier": {
+          "quarter": "2021Q1",
+          "dealValueUsdBn": 77.014,
+          "dealCount": 4282
+        }
+      }
+    },
+    {
+      "quarter": "2022Q2",
+      "mature": {
+        "release": "2023Q2",
+        "url": "https://nvca.org/wp-content/uploads/2023/07/Q2_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 76.604,
+          "dealCount": 4529
+        },
+        "yearEarlier": {
+          "quarter": "2021Q2",
+          "dealValueUsdBn": 83.811,
+          "dealCount": 4570
+        }
+      },
+      "firstPublished": {
+        "release": "2022Q2",
+        "url": "https://nvca.org/wp-content/uploads/2022/07/Q2_2022_PitchBook_NVCA_Venture_Monitor_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 62.262,
+          "dealCount": 3374
+        },
+        "yearEarlier": {
+          "quarter": "2021Q2",
+          "dealValueUsdBn": 81.21,
+          "dealCount": 4268
+        }
+      }
+    },
+    {
+      "quarter": "2022Q3",
+      "mature": {
+        "release": "2023Q3",
+        "url": "https://nvca.org/wp-content/uploads/2023/10/Q3_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 46.358,
+          "dealCount": 3933
+        },
+        "yearEarlier": {
+          "quarter": "2021Q3",
+          "dealValueUsdBn": 87.262,
+          "dealCount": 4638
+        }
+      },
+      "firstPublished": null
+    },
+    {
+      "quarter": "2022Q4",
+      "mature": {
+        "release": "2023Q4",
+        "url": "https://nvca.org/wp-content/uploads/2024/01/Q4_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 39.829,
+          "dealCount": 3717
+        },
+        "yearEarlier": {
+          "quarter": "2021Q4",
+          "dealValueUsdBn": 98.109,
+          "dealCount": 4828
+        }
+      },
+      "firstPublished": {
+        "release": "2022Q4",
+        "url": "https://nvca.org/wp-content/uploads/2023/02/Underlying-Report-Data_Q4-2022-Venture-Monitor.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 36.231,
+          "dealCount": 2935
+        },
+        "yearEarlier": {
+          "quarter": "2021Q4",
+          "dealValueUsdBn": 93.945,
+          "dealCount": 4668
+        }
+      }
+    },
+    {
+      "quarter": "2023Q1",
+      "mature": {
+        "release": "2024Q1",
+        "url": "https://nvca.org/wp-content/uploads/2024/04/Q1-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 51.591,
+          "dealCount": 4026
+        },
+        "yearEarlier": {
+          "quarter": "2022Q1",
+          "dealValueUsdBn": 80.476,
+          "dealCount": 5466
+        }
+      },
+      "firstPublished": {
+        "release": "2023Q1",
+        "url": "https://nvca.org/wp-content/uploads/2023/04/Q1_2023_PitchBook-NVCA_Venture_Monitor_Data.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 37.001,
+          "dealCount": 2856
+        },
+        "yearEarlier": {
+          "quarter": "2022Q1",
+          "dealValueUsdBn": 82.439,
+          "dealCount": 5243
+        }
+      }
+    },
+    {
+      "quarter": "2023Q2",
+      "mature": {
+        "release": "2024Q2",
+        "url": "https://nvca.org/wp-content/uploads/2024/07/Q2-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 35.434,
+          "dealCount": 3670
+        },
+        "yearEarlier": {
+          "quarter": "2022Q2",
+          "dealValueUsdBn": 77.554,
+          "dealCount": 4553
+        }
+      },
+      "firstPublished": {
+        "release": "2023Q2",
+        "url": "https://nvca.org/wp-content/uploads/2023/07/Q2_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 39.846,
+          "dealCount": 3011
+        },
+        "yearEarlier": {
+          "quarter": "2022Q2",
+          "dealValueUsdBn": 76.604,
+          "dealCount": 4529
+        }
+      }
+    },
+    {
+      "quarter": "2023Q3",
+      "mature": {
+        "release": "2024Q3",
+        "url": "https://nvca.org/wp-content/uploads/2024/10/Q3-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 34.987,
+          "dealCount": 3365
+        },
+        "yearEarlier": {
+          "quarter": "2022Q3",
+          "dealValueUsdBn": 45.001,
+          "dealCount": 4030
+        }
+      },
+      "firstPublished": {
+        "release": "2023Q3",
+        "url": "https://nvca.org/wp-content/uploads/2023/10/Q3_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 36.721,
+          "dealCount": 2716
+        },
+        "yearEarlier": {
+          "quarter": "2022Q3",
+          "dealValueUsdBn": 46.358,
+          "dealCount": 3933
+        }
+      }
+    },
+    {
+      "quarter": "2023Q4",
+      "mature": {
+        "release": "2024Q4",
+        "url": "https://nvca.org/wp-content/uploads/2025/01/Q4-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 37.893,
+          "dealCount": 3499
+        },
+        "yearEarlier": {
+          "quarter": "2022Q4",
+          "dealValueUsdBn": 38.08,
+          "dealCount": 3820
+        }
+      },
+      "firstPublished": {
+        "release": "2023Q4",
+        "url": "https://nvca.org/wp-content/uploads/2024/01/Q4_2023_PitchBook-NVCA_Venture_Monitor_Summary_XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 37.492,
+          "dealCount": 2879
+        },
+        "yearEarlier": {
+          "quarter": "2022Q4",
+          "dealValueUsdBn": 39.829,
+          "dealCount": 3717
+        }
+      }
+    },
+    {
+      "quarter": "2024Q1",
+      "mature": {
+        "release": "2025Q1",
+        "url": "https://nvca.org/wp-content/uploads/2025/04/Q1-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS-19001-1.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 42.398,
+          "dealCount": 3995
+        },
+        "yearEarlier": {
+          "quarter": "2023Q1",
+          "dealValueUsdBn": 53.947,
+          "dealCount": 4240
+        }
+      },
+      "firstPublished": {
+        "release": "2024Q1",
+        "url": "https://nvca.org/wp-content/uploads/2024/04/Q1-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 36.557,
+          "dealCount": 2882
+        },
+        "yearEarlier": {
+          "quarter": "2023Q1",
+          "dealValueUsdBn": 51.591,
+          "dealCount": 4026
+        }
+      }
+    },
+    {
+      "quarter": "2024Q2",
+      "mature": {
+        "release": "2025Q2",
+        "url": "https://nvca.org/wp-content/uploads/2025/07/Q2-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS-19728.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 49.911,
+          "dealCount": 3819
+        },
+        "yearEarlier": {
+          "quarter": "2023Q2",
+          "dealValueUsdBn": 36.622,
+          "dealCount": 3722
+        }
+      },
+      "firstPublished": {
+        "release": "2024Q2",
+        "url": "https://nvca.org/wp-content/uploads/2024/07/Q2-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 55.59,
+          "dealCount": 3108
+        },
+        "yearEarlier": {
+          "quarter": "2023Q2",
+          "dealValueUsdBn": 35.434,
+          "dealCount": 3670
+        }
+      }
+    },
+    {
+      "quarter": "2024Q3",
+      "mature": {
+        "release": "2025Q3",
+        "url": "https://nvca.org/wp-content/uploads/2025/10/Q3_2025_PitchBook-NVCA_Venture_Monitor_Summary_XLS_20370.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 42.571,
+          "dealCount": 3588
+        },
+        "yearEarlier": {
+          "quarter": "2023Q3",
+          "dealValueUsdBn": 36.619,
+          "dealCount": 3577
+        }
+      },
+      "firstPublished": {
+        "release": "2024Q3",
+        "url": "https://nvca.org/wp-content/uploads/2024/10/Q3-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 37.534,
+          "dealCount": 2794
+        },
+        "yearEarlier": {
+          "quarter": "2023Q3",
+          "dealValueUsdBn": 34.987,
+          "dealCount": 3365
+        }
+      }
+    },
+    {
+      "quarter": "2024Q4",
+      "mature": {
+        "release": "2025Q4",
+        "url": "https://nvca.org/wp-content/uploads/2026/01/Q4-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 81.404,
+          "dealCount": 3552
+        },
+        "yearEarlier": {
+          "quarter": "2023Q4",
+          "dealValueUsdBn": 39.908,
+          "dealCount": 3616
+        }
+      },
+      "firstPublished": {
+        "release": "2024Q4",
+        "url": "https://nvca.org/wp-content/uploads/2025/01/Q4-2024-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 74.61,
+          "dealCount": 2859
+        },
+        "yearEarlier": {
+          "quarter": "2023Q4",
+          "dealValueUsdBn": 37.893,
+          "dealCount": 3499
+        }
+      }
+    },
+    {
+      "quarter": "2025Q1",
+      "mature": {
+        "release": "2026Q1",
+        "url": "https://nvca.org/wp-content/uploads/2026/04/Q1-2026-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 53.013,
+          "dealCount": 4327
+        },
+        "yearEarlier": {
+          "quarter": "2024Q1",
+          "dealValueUsdBn": 38.475,
+          "dealCount": 4278
+        }
+      },
+      "firstPublished": {
+        "release": "2025Q1",
+        "url": "https://nvca.org/wp-content/uploads/2025/04/Q1-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS-19001-1.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 91.479,
+          "dealCount": 3003
+        },
+        "yearEarlier": {
+          "quarter": "2024Q1",
+          "dealValueUsdBn": 42.398,
+          "dealCount": 3995
+        }
+      }
+    },
+    {
+      "quarter": "2025Q2",
+      "mature": {
+        "release": "2026Q2",
+        "url": "https://nvca.org/wp-content/uploads/2026/07/Q2-2026-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 85.84,
+          "dealCount": 3643
+        },
+        "yearEarlier": {
+          "quarter": "2024Q2",
+          "dealValueUsdBn": 48.103,
+          "dealCount": 3944
+        }
+      },
+      "firstPublished": {
+        "release": "2025Q2",
+        "url": "https://nvca.org/wp-content/uploads/2025/07/Q2-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS-19728.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 69.928,
+          "dealCount": 3038
+        },
+        "yearEarlier": {
+          "quarter": "2024Q2",
+          "dealValueUsdBn": 49.911,
+          "dealCount": 3819
+        }
+      }
+    },
+    {
+      "quarter": "2025Q3",
+      "mature": {
+        "release": "2026Q3",
+        "url": "https://nvca.org/download/125414/",
+        "immature": false,
+        "current": {
+          "dealValueUsdBn": 69.598,
+          "dealCount": 3738
+        },
+        "yearEarlier": {
+          "quarter": "2024Q3",
+          "dealValueUsdBn": 43.66,
+          "dealCount": 3589
+        }
+      },
+      "firstPublished": {
+        "release": "2025Q3",
+        "url": "https://nvca.org/wp-content/uploads/2025/10/Q3_2025_PitchBook-NVCA_Venture_Monitor_Summary_XLS_20370.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 80.873,
+          "dealCount": 3175
+        },
+        "yearEarlier": {
+          "quarter": "2024Q3",
+          "dealValueUsdBn": 42.571,
+          "dealCount": 3588
+        }
+      }
+    },
+    {
+      "quarter": "2025Q4",
+      "mature": {
+        "release": "2026Q3",
+        "url": "https://nvca.org/download/125414/",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 71.244,
+          "dealCount": 3905
+        },
+        "yearEarlier": {
+          "quarter": "2024Q4",
+          "dealValueUsdBn": 84.96,
+          "dealCount": 3619
+        }
+      },
+      "firstPublished": {
+        "release": "2025Q4",
+        "url": "https://nvca.org/wp-content/uploads/2026/01/Q4-2025-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 91.571,
+          "dealCount": 3379
+        },
+        "yearEarlier": {
+          "quarter": "2024Q4",
+          "dealValueUsdBn": 81.404,
+          "dealCount": 3552
+        }
+      }
+    },
+    {
+      "quarter": "2026Q1",
+      "mature": {
+        "release": "2026Q3",
+        "url": "https://nvca.org/download/125414/",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 253.474,
+          "dealCount": 4009
+        },
+        "yearEarlier": {
+          "quarter": "2025Q1",
+          "dealValueUsdBn": 89.911,
+          "dealCount": 4387
+        }
+      },
+      "firstPublished": {
+        "release": "2026Q1",
+        "url": "https://nvca.org/wp-content/uploads/2026/04/Q1-2026-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 267.235,
+          "dealCount": 3336
+        },
+        "yearEarlier": {
+          "quarter": "2025Q1",
+          "dealValueUsdBn": 53.013,
+          "dealCount": 4327
+        }
+      }
+    },
+    {
+      "quarter": "2026Q2",
+      "mature": {
+        "release": "2026Q3",
+        "url": "https://nvca.org/download/125414/",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 163.922,
+          "dealCount": 4151
+        },
+        "yearEarlier": {
+          "quarter": "2025Q2",
+          "dealValueUsdBn": 88.93,
+          "dealCount": 3679
+        }
+      },
+      "firstPublished": {
+        "release": "2026Q2",
+        "url": "https://nvca.org/wp-content/uploads/2026/07/Q2-2026-PitchBook-NVCA-Venture-Monitor-Summary-XLS.xlsx",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 143.858,
+          "dealCount": 3653
+        },
+        "yearEarlier": {
+          "quarter": "2025Q2",
+          "dealValueUsdBn": 85.84,
+          "dealCount": 3643
+        }
+      }
+    },
+    {
+      "quarter": "2026Q3",
+      "mature": {
+        "release": "2026Q3",
+        "url": "https://nvca.org/download/125414/",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 98.375,
+          "dealCount": 3640
+        },
+        "yearEarlier": {
+          "quarter": "2025Q3",
+          "dealValueUsdBn": 69.598,
+          "dealCount": 3738
+        }
+      },
+      "firstPublished": {
+        "release": "2026Q3",
+        "url": "https://nvca.org/download/125414/",
+        "immature": true,
+        "current": {
+          "dealValueUsdBn": 98.375,
+          "dealCount": 3640
+        },
+        "yearEarlier": {
+          "quarter": "2025Q3",
+          "dealValueUsdBn": 69.598,
+          "dealCount": 3738
+        }
+      }
+    }
+  ]
+}

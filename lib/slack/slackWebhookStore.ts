@@ -3,11 +3,14 @@ import { selectStoreByBinding } from "../runtime/storeSelection";
 import { sha256Hex } from "../crypto";
 import { isSlackWebhookUrl } from "./deliverSlackBrief";
 
+/* No token. One was minted for `/api/slack/unsubscribe` (deleted 2026-10-27), and no
+   screen ever showed it, so no reader could call that route. The off-ramp is the
+   webhook: deleting it in Slack makes the next post 404, and `deactivateByUrl` drops
+   the subscription. Older records still carry a `token`; hydration ignores it. */
 type SlackSubscription = {
   webhookUrl: string;
   channelName?: string;
   teamName?: string;
-  token: string;
   active: boolean;
   subscribedAt: string;
 };
@@ -19,20 +22,15 @@ type SlackSubscribeOptions = {
 
 export interface SlackWebhookStore {
   subscribe(webhookUrl: string, options?: SlackSubscribeOptions): Promise<SlackSubscription>;
-  unsubscribe(token: string): Promise<boolean>;
   deactivateByUrl(webhookUrl: string): Promise<boolean>;
   listActiveWebhooks(): Promise<string[]>;
   listActiveSubscriptions(): Promise<SlackSubscription[]>;
-  getSubscriptionByToken(token: string): Promise<SlackSubscription | null>;
   getSubscriptionByUrl(webhookUrl: string): Promise<SlackSubscription | null>;
   backendStatus(): "durable" | "local-fallback";
 }
 
 const SUB_PREFIX = "slack:sub:";
-const TOKEN_PREFIX = "slack:token:";
 const ACTIVE_PREFIX = "slack:active:";
-
-const generateToken = (): string => crypto.randomUUID();
 
 const hashUrl = (url: string): Promise<string> => sha256Hex(url.trim());
 
@@ -47,12 +45,10 @@ const hydrateSubscription = (raw: unknown): SlackSubscription | null => {
   if (typeof raw !== "object" || raw === null) return null;
 
   const webhookUrl = readStoredString(raw, "webhookUrl");
-  const token = readStoredString(raw, "token");
-  if (!webhookUrl || !token || !isSlackWebhookUrl(webhookUrl)) return null;
+  if (!webhookUrl || !isSlackWebhookUrl(webhookUrl)) return null;
 
   return {
     webhookUrl,
-    token,
     channelName: readStoredString(raw, "channelName"),
     teamName: readStoredString(raw, "teamName"),
     active: readStoredFlag(raw, "active"),
@@ -82,16 +78,13 @@ class KvSlackWebhookStore implements SlackWebhookStore {
         subscribedAt: existing.subscribedAt || new Date().toISOString(),
       };
       await this.kv.put(SUB_PREFIX + key, JSON.stringify(updated)).catch(() => undefined);
-      await this.kv.put(TOKEN_PREFIX + updated.token, key).catch(() => undefined);
       await this.kv.put(ACTIVE_PREFIX + key, key).catch(() => undefined);
       this.fallback.saveToMemory(updated);
       return updated;
     }
 
-    const token = generateToken();
     const sub: SlackSubscription = {
       webhookUrl: trimmed,
-      token,
       channelName: options?.channelName?.trim() || undefined,
       teamName: options?.teamName?.trim() || undefined,
       active: true,
@@ -99,28 +92,10 @@ class KvSlackWebhookStore implements SlackWebhookStore {
     };
 
     await this.kv.put(SUB_PREFIX + key, JSON.stringify(sub)).catch(() => undefined);
-    await this.kv.put(TOKEN_PREFIX + token, key).catch(() => undefined);
     await this.kv.put(ACTIVE_PREFIX + key, key).catch(() => undefined);
     this.fallback.saveToMemory(sub);
 
     return sub;
-  }
-
-  async unsubscribe(token: string): Promise<boolean> {
-    const key = await this.kv.get(TOKEN_PREFIX + token);
-    if (!key) return false;
-
-    const raw = await this.kv.get(SUB_PREFIX + key);
-    if (!raw) return false;
-
-    const sub = hydrateSubscription(JSON.parse(raw));
-    if (!sub) return false;
-    sub.active = false;
-
-    await this.kv.put(SUB_PREFIX + key, JSON.stringify(sub)).catch(() => undefined);
-    await this.kv.delete?.(ACTIVE_PREFIX + key).catch(() => undefined);
-    this.fallback.saveToMemory(sub);
-    return true;
   }
 
   async deactivateByUrl(webhookUrl: string): Promise<boolean> {
@@ -181,19 +156,6 @@ class KvSlackWebhookStore implements SlackWebhookStore {
     return this.fallback.getByUrl(webhookUrl);
   }
 
-  async getSubscriptionByToken(token: string): Promise<SlackSubscription | null> {
-    const key = await this.kv.get(TOKEN_PREFIX + token);
-    if (!key) return this.fallback.getByToken(token);
-    const raw = await this.kv.get(SUB_PREFIX + key);
-    if (raw) {
-      const sub = hydrateSubscription(JSON.parse(raw));
-      if (!sub) return this.fallback.getByToken(token);
-      this.fallback.saveToMemory(sub);
-      return sub;
-    }
-    return this.fallback.getByToken(token);
-  }
-
   backendStatus(): "durable" {
     return "durable";
   }
@@ -201,20 +163,12 @@ class KvSlackWebhookStore implements SlackWebhookStore {
 
 class InMemorySlackWebhookStore implements SlackWebhookStore {
   private readonly byUrl = new Map<string, SlackSubscription>();
-  private readonly byToken = new Map<string, string>();
 
   saveToMemory(sub: SlackSubscription): void {
     this.byUrl.set(sub.webhookUrl, sub);
-    this.byToken.set(sub.token, sub.webhookUrl);
   }
 
   getByUrl(url: string): SlackSubscription | null {
-    return this.byUrl.get(url) ?? null;
-  }
-
-  getByToken(token: string): SlackSubscription | null {
-    const url = this.byToken.get(token);
-    if (!url) return null;
     return this.byUrl.get(url) ?? null;
   }
 
@@ -243,10 +197,8 @@ class InMemorySlackWebhookStore implements SlackWebhookStore {
       return existing;
     }
 
-    const token = generateToken();
     const sub: SlackSubscription = {
       webhookUrl: trimmed,
-      token,
       channelName: options?.channelName?.trim() || undefined,
       teamName: options?.teamName?.trim() || undefined,
       active: true,
@@ -254,15 +206,6 @@ class InMemorySlackWebhookStore implements SlackWebhookStore {
     };
     this.saveToMemory(sub);
     return sub;
-  }
-
-  async unsubscribe(token: string): Promise<boolean> {
-    const url = this.byToken.get(token);
-    if (!url) return false;
-    const sub = this.byUrl.get(url);
-    if (!sub) return false;
-    sub.active = false;
-    return true;
   }
 
   async deactivateByUrl(webhookUrl: string): Promise<boolean> {
@@ -274,10 +217,6 @@ class InMemorySlackWebhookStore implements SlackWebhookStore {
 
   async getSubscriptionByUrl(webhookUrl: string): Promise<SlackSubscription | null> {
     return this.getByUrl(webhookUrl);
-  }
-
-  async getSubscriptionByToken(token: string): Promise<SlackSubscription | null> {
-    return this.getByToken(token);
   }
 
   backendStatus(): "local-fallback" {

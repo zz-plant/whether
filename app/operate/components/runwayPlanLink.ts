@@ -19,9 +19,13 @@
  */
 import {
   isPlannerSector,
+  MAX_PAYBACK_PROJECTS,
   OPERATOR_PROFILE_LIMITS,
+  PAYBACK_PROJECT_NUMBER_KEYS,
+  parsePaybackProjects,
   type OperatorProfile,
   type OperatorProfileNumberKey,
+  type PaybackProjectEntry,
 } from "../../../lib/operatorProfile";
 
 import { DEFAULT_OPERATOR_STAGE, isOperatorStage, type OperatorStage } from "../../../lib/report/operatorStage";
@@ -36,6 +40,7 @@ const NUMBER_PARAMS: Record<OperatorProfileNumberKey, string> = {
   grossMarginPct: "margin",
   raiseAtRunwayMonths: "raiseAt",
   hiringPauseAtRunwayMonths: "hirePauseAt",
+  engineerWeekCostUsd: "engWeek",
 };
 
 /* Iterated instead of `Object.keys`, which widens to string and then needs a
@@ -50,6 +55,7 @@ const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
   "grossMarginPct",
   "raiseAtRunwayMonths",
   "hiringPauseAtRunwayMonths",
+  "engineerWeekCostUsd",
 ];
 
 /* `isPlannerSector` and `isOperatorStage` are the guards the select controls
@@ -60,6 +66,18 @@ const SECTOR_PARAM = "sector";
 const STAGE_PARAM = "stage";
 
 /*
+ * One `project` per row of the planner's project list, in its order:
+ * `weeks_engineers_hours_hourly_other_name`, a blank between underscores for
+ * a figure not given. An underscore because a URL leaves it as typed, where a
+ * tilde comes out as `%7E` in the link people paste. Figures first and the name
+ * last, so a name with an underscore in it costs nothing. An empty row is written too: it is one the reader just
+ * added, and a link that dropped it would take it off their screen, since the
+ * link wins over the stored list where it speaks.
+ */
+const PROJECT_PARAM = "project";
+const PROJECT_SEPARATOR = "_";
+
+/*
  * The whole value is the number, or it is not one. `parseFloat` read the digits
  * off the front and dropped the rest, so a hand-edited `?cash=2.1M` was $2.10 of
  * cash and `?runway=14months` passed as 14. A link the app builds is a plain
@@ -68,7 +86,12 @@ const STAGE_PARAM = "stage";
  */
 const PLAIN_NUMBER = /^-?\d+(?:\.\d+)?(?:e[+-]?\d+)?$/i;
 const SUFFIXED_MONEY = /^(\d+(?:\.\d+)?)([kmb])$/i;
-const MONEY_KEYS: ReadonlySet<OperatorProfileNumberKey> = new Set(["cashUsd", "monthlyBurnUsd", "monthlyRevenueUsd"]);
+const MONEY_KEYS: ReadonlySet<OperatorProfileNumberKey> = new Set([
+  "cashUsd",
+  "monthlyBurnUsd",
+  "monthlyRevenueUsd",
+  "engineerWeekCostUsd",
+]);
 const MONEY_SUFFIXES: Record<string, number> = { k: 1e3, m: 1e6, b: 1e9 };
 
 const readLinkNumber = (key: OperatorProfileNumberKey, raw: string): number | null => {
@@ -78,6 +101,27 @@ const readLinkNumber = (key: OperatorProfileNumberKey, raw: string): number | nu
   const multiplier = suffixed?.[2] ? MONEY_SUFFIXES[suffixed[2].toLowerCase()] : undefined;
   return suffixed?.[1] && multiplier !== undefined ? Number(suffixed[1]) * multiplier : null;
 };
+
+/* Each figure is checked against the project limits by `parsePaybackProjects`,
+   the same parse a stored row goes through. */
+const readLinkProject = (raw: string): Record<string, unknown> => {
+  const parts = raw.split(PROJECT_SEPARATOR);
+  const project: Record<string, unknown> = { name: parts.slice(PAYBACK_PROJECT_NUMBER_KEYS.length).join(PROJECT_SEPARATOR) };
+  PAYBACK_PROJECT_NUMBER_KEYS.forEach((key, index) => {
+    const text = (parts[index] ?? "").trim();
+    if (PLAIN_NUMBER.test(text)) project[key] = Number(text);
+  });
+  return project;
+};
+
+const writeLinkProject = (project: PaybackProjectEntry): string =>
+  [
+    ...PAYBACK_PROJECT_NUMBER_KEYS.map((key) => {
+      const value = project[key];
+      return typeof value === "number" && Number.isFinite(value) ? String(value) : "";
+    }),
+    project.name ?? "",
+  ].join(PROJECT_SEPARATOR);
 
 type SharedRunwayPlan = {
   profile: Partial<OperatorProfile>;
@@ -110,6 +154,9 @@ export const readSharedRunwayPlan = (params: URLSearchParams | null): SharedRunw
   const sector = params.get(SECTOR_PARAM);
   if (sector && isPlannerSector(sector)) profile.sector = sector;
 
+  const projects = params.getAll(PROJECT_PARAM);
+  if (projects.length > 0) profile.paybackProjects = parsePaybackProjects(projects.slice(0, MAX_PAYBACK_PROJECTS).map(readLinkProject));
+
   const stage = params.get(STAGE_PARAM);
   return { profile, stage: stage && isOperatorStage(stage) ? stage : null };
 };
@@ -132,6 +179,7 @@ export const buildSharedRunwayPlanQuery = (profile: OperatorProfile, stage: Oper
   }
 
   if (profile.sector) params.set(SECTOR_PARAM, profile.sector);
+  for (const project of profile.paybackProjects ?? []) params.append(PROJECT_PARAM, writeLinkProject(project));
   if (stage && stage !== DEFAULT_OPERATOR_STAGE) params.set(STAGE_PARAM, stage);
 
   return params.toString();
@@ -152,3 +200,16 @@ export const resolveSharedRunwayProfile = (
   const base: OperatorProfile = linkSetsRunway ? { ...stored, cashUsd: undefined, runwayMonths: undefined } : stored;
   return { ...base, ...shared };
 };
+
+/**
+ * Whether an edit made in the planner still stands over the address bar.
+ *
+ * `queries` is every address the planner has written since the edit began,
+ * starting with the one on screen when it did. The edit stands while the bar
+ * shows one it wrote before the last: the round trip has not landed, and that
+ * older link is not the plan. It is done once the bar shows the last, which says
+ * the same thing; and an address it never wrote is someone else's link, which
+ * wins as any link does.
+ */
+export const plannerEditStands = (queries: readonly string[], currentQuery: string): boolean =>
+  queries.includes(currentQuery) && queries.at(-1) !== currentQuery;

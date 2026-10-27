@@ -11,7 +11,9 @@ import {
 import type { ReportData } from "../../../lib/report/reportData";
 import type { WeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
 import type { MacroSeriesId, MacroSeriesReading, TreasuryYields } from "../../../lib/types";
-import { DECISION_SLOT_TONE } from "../../trust/frameworkSection";
+import { DECISION_SLOT_TONE } from "../../about/methodSection";
+import { isRegimeKey } from "../../../lib/regimePresentation";
+import { AreaIcon, ConditionIcon, LineStateBadge } from "../../components/ui/conceptIcons";
 
 /**
  * One column of the comparison, rendered twice. The two sides used to be ~85
@@ -25,6 +27,9 @@ const getCurveSpread = (yields: TreasuryYields | undefined) =>
     ? yields.tenYear - yields.twoYear
     : null;
 
+/** What the corporate borrowing premium is, said once on the page: under the difference tile. */
+export const BORROWING_PREMIUM_MEANING = "The extra interest mid-grade companies pay to borrow, over the government's rate.";
+
 export const findMacroValue = (series: MacroSeriesReading[] | undefined, id: MacroSeriesId) => {
   const reading = series?.find((entry) => entry.id === id);
   return typeof reading?.value === "number" ? reading.value : null;
@@ -33,13 +38,15 @@ export const findMacroValue = (series: MacroSeriesReading[] | undefined, id: Mac
 const formatPercent = (value: number | null, digits = 2, missing = "N/A") =>
   value === null ? missing : `${value.toFixed(digits)}%`;
 
-const SignalRow = ({ label, value, meaning }: { label: string; value: string; meaning?: string }) => (
+/* A value that is not there is set in the muted ink, not the bold the readings
+   get: "Not on record for this month" in bold read as the loudest cell. */
+const SignalRow = ({ label, value, meaning, missing = false }: { label: string; value: string; meaning?: string; missing?: boolean }) => (
   <tr className="border-b border-slate-800/50 last:border-0">
     <td className="py-2.5 font-medium text-slate-400">
       {label}
       {meaning ? <span className="mt-0.5 block text-fluid-xs font-normal text-slate-500">{meaning}</span> : null}
     </td>
-    <td className="py-2.5 text-right font-semibold tabular-nums text-slate-200">{value}</td>
+    <td className={`py-2.5 text-right tabular-nums ${missing ? "text-slate-500" : "font-semibold text-slate-200"}`}>{value}</td>
   </tr>
 );
 
@@ -72,6 +79,7 @@ export function ComparePeriodColumn({
   /* The macro series go back about three months; a replayed month further back
      has no value of its own, and says so rather than borrowing this week's. */
   const macroMissing = report.historicalSelection ? describeMacroNotOnRecord() : "N/A";
+  const isMissing = (text: string) => text === "N/A" || text === macroMissing;
   /*
    * Each area against its own pause line, in the site's one area order, from the
    * rows and words the homepage and /resolve print. These rows were "Hiring
@@ -90,19 +98,22 @@ export function ComparePeriodColumn({
   });
   const areaStanding = decisionAreaOrder.map((area) => {
     const row = areaRows.find((candidate) => candidate.area === area);
-    return { area, text: (row ? describeAreaPauseStatus(row)?.text : undefined) ?? "—" };
+    return { area, status: row ? describeAreaPauseStatus(row) : undefined };
   });
+  const regime = report.assessment.regime;
 
   return (
     <div className="space-y-6">
       <div className="weather-panel p-6">
-        <div className="flex items-center justify-between gap-3">
-          <p className="type-eyebrow">{label}</p>
+        {/* The period names the heading's line, not a kicker above it (2026-10-09). */}
+        <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+          <h2 className="flex items-center gap-2 text-xl font-bold text-slate-100">
+            <span className="font-semibold text-slate-400">{label}</span>
+            {isRegimeKey(regime) ? <ConditionIcon regime={regime} size="card" /> : null}
+            <span>{status.postureWithStageLabel || status.postureLabel}</span>
+          </h2>
           <span className="text-xs tabular-nums text-slate-400">{report.recordDateLabel}</span>
         </div>
-        <h2 className="mt-4 text-xl font-bold text-slate-100">
-          {status.postureWithStageLabel || status.postureLabel}
-        </h2>
         {/* The latitude's move, about the number: not quoted, since it is no
             longer a sentence about the guidance to cite. */}
         <p className="mt-2 text-sm text-slate-300">{summary.shorthandLine}</p>
@@ -112,10 +123,19 @@ export function ComparePeriodColumn({
         {/* The label as given: lowercasing it printed "Rules in period a". */}
         <h3 className="type-eyebrow">Rules in {label}</h3>
         <div className="space-y-2">
-          {areaStanding.map(({ area, text }) => (
-            <p key={area} className="text-sm">
-              <span className="font-medium text-slate-400">{decisionAreaLabel(area)}:</span>{" "}
-              <span className="font-semibold text-slate-100">{text}</span>
+          {areaStanding.map(({ area, status: standing }) => (
+            <p key={area} className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm">
+              <span className="inline-flex items-center gap-1.5 font-medium text-slate-400">
+                <AreaIcon area={area} />
+                {decisionAreaLabel(area)}:
+              </span>
+              {standing ? (
+                <LineStateBadge state={standing.state} className="font-semibold">
+                  {standing.text}
+                </LineStateBadge>
+              ) : (
+                <span className="font-semibold text-slate-100">—</span>
+              )}
             </p>
           ))}
         </div>
@@ -148,24 +168,16 @@ export function ComparePeriodColumn({
           <tbody>
             <ScoreRow signalKey="tightness" score={scores.tightness} />
             <ScoreRow signalKey="riskAppetite" score={scores.riskAppetite} />
-            <SignalRow
-              label={regimeSignalLabel.baseRate}
-              value={scores.baseRate !== undefined ? formatPercent(scores.baseRate) : "N/A"}
-            />
-            <SignalRow label={`${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`} value={formatPercent(spread)} />
-            <SignalRow
-              label="Corporate borrowing premium"
-              meaning="Extra interest mid-grade companies pay over the government."
-              value={formatPercent(findMacroValue(report.macroSeries, "BBB_CREDIT_SPREAD"), 2, macroMissing)}
-            />
-            <SignalRow
-              label="Inflation, year over year"
-              value={formatPercent(findMacroValue(report.macroSeries, "CPI_YOY"), 2, macroMissing)}
-            />
-            <SignalRow
-              label="Unemployment rate"
-              value={formatPercent(findMacroValue(report.macroSeries, "UNEMPLOYMENT_RATE"), 1, macroMissing)}
-            />
+            {[
+              { label: regimeSignalLabel.baseRate, value: scores.baseRate !== undefined ? formatPercent(scores.baseRate) : "N/A" },
+              { label: `${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`, value: formatPercent(spread) },
+              /* The value alone: the difference tile above defines the term once for both columns. */
+              { label: "Corporate borrowing premium", value: formatPercent(findMacroValue(report.macroSeries, "BBB_CREDIT_SPREAD"), 2, macroMissing) },
+              { label: "Inflation, year over year", value: formatPercent(findMacroValue(report.macroSeries, "CPI_YOY"), 2, macroMissing) },
+              { label: "Unemployment rate", value: formatPercent(findMacroValue(report.macroSeries, "UNEMPLOYMENT_RATE"), 1, macroMissing) },
+            ].map((row) => (
+              <SignalRow key={row.label} label={row.label} value={row.value} missing={isMissing(row.value)} />
+            ))}
           </tbody>
         </table>
       </div>

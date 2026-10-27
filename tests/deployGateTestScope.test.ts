@@ -7,7 +7,6 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { presetTasks, resolveCheckPlan } from "../scripts/check-tasks.mjs";
 import { isDeployGate, withDeployGate } from "../scripts/deploy-gate.mjs";
-import { GATE_TASKS, outstandingChecks } from "../scripts/vinext-run.mjs";
 
 const stageNames = (args: string[], env: Record<string, string | undefined> = {}) =>
   resolveCheckPlan(args, env).stages.map((stage) => stage.map((task) => task.name));
@@ -55,24 +54,19 @@ describe("deploy gate test scope", () => {
     assert.deepEqual(env, { PATH: "/bin" }, "the caller's environment is not mutated");
   });
 
-  it("has the inner gate actually set the signal, or the exclusion never applies", async () => {
-    const gate = await readFile("scripts/vinext-run.mjs", "utf8");
-    assert.match(gate, /env: withDeployGate\(process\.env\)/);
-  });
-
   it("still runs the tool suite outside the gate", async () => {
     /*
      * The rule this protects: tests/tools/ is excluded from the deploy path, not from
      * the repo. The exclusion keys off the signal in the *spawned* runner, so what must
      * never happen is `bun run check`, or the pre-push hook, putting it into a child's
      * environment. Only the deploy preset does — and a caller that already runs under
-     * the signal (vinext-run's inner gate) keeps it.
+     * the signal keeps it.
      */
     assert.equal(resolveCheckPlan([], {}).deployGate, false, "bun run check");
     assert.equal(resolveCheckPlan(["test"], {}).deployGate, false, "a named task");
     assert.equal(resolveCheckPlan(["--preset", "pre-push"], {}).deployGate, false, "the pre-push hook");
     assert.equal(resolveCheckPlan(["--preset", "deploy"], {}).deployGate, true, "the deploy gate");
-    assert.equal(resolveCheckPlan(["lint"], { WHETHER_DEPLOY_GATE: "1" }).deployGate, true, "vinext-run's inner gate");
+    assert.equal(resolveCheckPlan(["lint"], { WHETHER_DEPLOY_GATE: "1" }).deployGate, true, "a caller already under the signal");
 
     const checks = await readFile("scripts/run-checks.mjs", "utf8");
     assert.doesNotMatch(
@@ -88,13 +82,8 @@ describe("deploy gate test scope", () => {
 
   /*
    * Workers Builds is configured to run `bun run check:vinext` on every push, main
-   * included, before anything is built or deployed. Until 2026-09-02 that script was
-   * plain `bun run check`: the whole suite with workstation defaults (8 workers, 60s),
-   * plus tests/tools/, plus `audit` (network) and `hotspot-preflight` (git history) —
-   * none of which the deploy-gate rules above ever reached, because they only took
-   * effect inside vinext-run's inner gate, a step the build reaches after the outer
-   * command has already passed. So the container ran the one configuration this repo
-   * documents as flaky there. The configured command now *is* the deploy gate.
+   * included, before anything is built or deployed. The configured command *is* the
+   * deploy gate (docs/agents/lessons/automation-and-deploy-gate.md).
    */
   it("is what the configured Workers Builds command runs", async () => {
     const packageJson: { scripts?: Record<string, string> } = JSON.parse(await readFile("package.json", "utf8"));
@@ -117,16 +106,10 @@ describe("deploy gate test scope", () => {
     assert.deepEqual(stages.at(-1), ["landmarks"], "landmarks must be the last stage, run by itself");
   });
 
-  it("requires the same tasks as the configured build command", () => {
-    assert.deepEqual(GATE_TASKS, stageNames(["--preset", "deploy"]).flat());
-    assert.deepEqual(GATE_TASKS, presetTasks("deploy"));
-  });
-
   /*
-   * The lists used to be written out in four places — run-checks itself, this hook,
-   * check:vinext, and vinext-run's GATE_TASKS — and only the last two were compared.
-   * Every consumer now names a preset from scripts/check-tasks.mjs, so the test holds
-   * each one to naming it rather than spelling the list out again.
+   * The lists used to be written out in four places and only two were compared. Every
+   * consumer now names a preset from scripts/check-tasks.mjs, so the test holds each one
+   * to naming it rather than spelling the list out again.
    */
   it("runs the pre-push preset from the hook, and lists no task inline", async () => {
     const hook = await readFile(".husky/pre-push", "utf8");
@@ -158,20 +141,10 @@ describe("deploy gate test scope", () => {
     assert.deepEqual(stageNames(["--preset=deploy"]), stageNames(["--preset", "deploy"]));
   });
 
-  /*
-   * The two gates are the same gate reached from two directions: Workers Builds runs
-   * `check:vinext`, then runs the deploy command, which reaches `vinext-run build`.
-   * Until 2026-09-03 that second arrival re-ran all five checks against the tree the
-   * first had just proved — about a minute of repeated work on every pull-request push,
-   * and no signal, because a check that just passed cannot fail. It is skipped by
-   * evidence rather than deleted: `check:vinext` records what it proved for the commit,
-   * and only what that record covers is skipped, so a build reached without the outer
-   * command is gated exactly as it was.
-   */
-  it("skips only the checks a record proves for this very commit", () => {
-    assert.deepEqual(outstandingChecks(GATE_TASKS), []);
-    assert.deepEqual(outstandingChecks([]), GATE_TASKS);
-    assert.deepEqual(outstandingChecks(["lint", "typecheck"]), ["test", "assets", "suppressions", "dead-exports", "landmarks"]);
+  // The build itself runs no second gate: `vinext-run.mjs` only starts the Vinext CLI.
+  it("has no check gate inside the build command", async () => {
+    const runner = await readFile("scripts/vinext-run.mjs", "utf8");
+    assert.doesNotMatch(runner, /import[^\n]*(run-checks|check-tasks|deploy-gate)/);
   });
 });
 
@@ -302,12 +275,11 @@ describe("deploy gate resource defaults", () => {
     assert.ok(runner.includes("...orderArgs"), "the order flags never reach the spawned bun test");
   });
 
-  it("strips data-provider keys and webhook URLs so a shell cannot reroute the suite's upstreams", async () => {
-    // The webhook URLs are the sharper case: their value is the credential, in the path,
-    // and lib/premiumFunnel.ts hands one straight to the global fetch. A test must not be
-    // able to post to a real Slack channel because a shell happened to export one.
+  it("strips data-provider keys and the webhook URL so a shell cannot reroute the suite's upstreams", async () => {
+    // The webhook URL is the sharper case: its value is the credential, in the path. A test
+    // must not be able to post to a real Slack channel because a shell happened to export one.
     const runner = await readFile("scripts/run-tests.mjs", "utf8");
-    for (const key of ["FRED_API_KEY", "ALPHA_VANTAGE_API_KEY", "SLACK_WEBHOOK_URL", "PREMIUM_FUNNEL_WEBHOOK_URL"]) {
+    for (const key of ["FRED_API_KEY", "ALPHA_VANTAGE_API_KEY", "SLACK_WEBHOOK_URL"]) {
       assert.match(runner, new RegExp(`for \\(const key of \\[[^\\]]*'${key}'`), `${key} is no longer stripped`);
     }
   });

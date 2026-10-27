@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, it } from "bun:test";
 import { GET as getAgentRoute } from "../app/api/agent/route";
 import { JEV_MODEL, parseJevResponse, runJev, type JevRequest } from "../lib/jev/jevClient";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
-import { extractSentences, flaggedQuestions } from "../scripts/jev-copy-audit";
+import { extractSentences, findDisagreements, flaggedQuestions } from "../scripts/jev-copy-audit";
 
 /* The response Cloudflare documents for typesafe/jev, verbatim. */
 const documentedResponse = {
@@ -82,6 +82,22 @@ describe("runJev", () => {
     assert.deepEqual(JSON.parse(body), { model: JEV_MODEL, input: request });
   });
 
+  it("posts Clef on its own model path with the request as the body", async () => {
+    const calls: { url: string; init?: RequestInit }[] = [];
+    const fetchImpl: typeof fetch = async (input, init) => {
+      calls.push({ url: input instanceof Request ? input.url : input.toString(), init });
+      return Response.json({ result: { model: "clef-flash", answers: { is_urgent: { type: "noul", noul: 0.2 } } } });
+    };
+    const result = await runJev(request, { ...credentials, fetchImpl, model: "clef-flash" });
+
+    assert.equal(result.ok, true);
+    const [call] = calls;
+    assert.equal(call?.url, "https://api.cloudflare.com/client/v4/accounts/acct/ai/run/@cf/cloudflare/clef-flash");
+    const body = call.init?.body;
+    assert.ok(typeof body === "string");
+    assert.deepEqual(JSON.parse(body), { ...request, model: "clef-flash" });
+  });
+
   it("returns a reason rather than throwing on an error status or a dead network", async () => {
     const status = await runJev(request, { ...credentials, fetchImpl: async () => new Response("no", { status: 403 }) });
     assert.deepEqual(status, { ok: false, reason: "HTTP 403" });
@@ -127,9 +143,13 @@ describe("/api/agent?format=jev", () => {
     assert.deepEqual(jev.request.state.whether.regime, agent.agentHandoff.payload.regime);
     assert.deepEqual(jev.request.state.whether.decision_rules, agent.agentHandoff.payload.decision_rules);
     assert.deepEqual(Object.keys(jev.request.questions).sort(), [
+      "adds_fixed_cost",
       "conflicts_with_call",
       "decision_area",
+      "pause_line_stated",
+      "plan_action_stated",
       "reversibility",
+      "reversibility_stated",
       "wait_for_flip",
     ]);
     assert.deepEqual(Object.keys(jev.request.questions.decision_area.criteria), [
@@ -152,6 +172,21 @@ describe("/api/agent?format=jev", () => {
     assert.equal(body.automationReady, false);
     assert.equal(typeof body.automationRefusal, "string");
     assert.ok(body.automationRefusal.length > 0);
+  });
+
+  it("offers caller-owned audio/video handoffs only for Omni, without taking reader media", async () => {
+    const response = await getAgentRoute(new Request("https://whether.work/api/agent?format=jev&model=clef-omni&input=audio"));
+    const body = await response.json();
+    assert.equal(response.status, 200);
+    assert.equal(body.model, "@cf/cloudflare/clef-omni");
+    assert.equal(body.request.model, "clef-omni");
+    assert.deepEqual(body.request.audio, []);
+    assert.equal(body.request.state.plan, null);
+    assert.match(body.request.questions.conflicts_with_call.instructions, /audio/);
+    assert.equal(body.automationReady, false);
+    for (const query of ["model=jev&input=audio", "model=clef-flash&input=video", "model=unknown", "input=other"]) {
+      assert.equal((await getAgentRoute(new Request(`https://whether.work/api/agent?format=jev&${query}`))).status, 400);
+    }
   });
 
   it("rejects an unknown format with 400 rather than serving the default shape", async () => {
@@ -196,5 +231,29 @@ describe("jev copy audit", () => {
     );
     assert.deepEqual(flags, { presumptuous: 0.91, abstract: 0.8 });
     assert.deepEqual(flaggedQuestions({ ok: false, reason: "HTTP 500" }, 0.8), {});
+  });
+
+  it("lists the questions models split on, and skips a sentence any model failed to judge", () => {
+    const items = [
+      { route: "/", sentence: "Your board will want the runway memo before Monday." },
+      { route: "/trust", sentence: "Funding pressure is 71 against a line of 66." },
+      { route: "/history", sentence: "Every model failed on this one sentence here." },
+    ];
+    const noul = (answers: Record<string, number>) => ({
+      ok: true as const,
+      model: "m",
+      answers: Object.fromEntries(Object.entries(answers).map(([key, p]) => [key, { type: "noul" as const, noul: p }])),
+    });
+    const disagreements = findDisagreements(
+      items,
+      {
+        jev: [noul({ presumptuous: 0.95, cryptic: 0.9 }), noul({ abstract: 0.1 }), noul({ cryptic: 0.9 })],
+        "clef-flash": [noul({ presumptuous: 0.4, cryptic: 0.85 }), noul({ abstract: 0.2 }), { ok: false, reason: "HTTP 500" }],
+      },
+      0.8,
+    );
+    assert.deepEqual(disagreements, [
+      { ...items[0], question: "presumptuous", flaggedBy: ["jev"], clearedBy: ["clef-flash"] },
+    ]);
   });
 });

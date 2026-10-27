@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
+import { MARGIN_LABEL } from "../../lib/report/reportFormatting";
 import { ReportSection } from "../components/reportSection";
+import { UrlDetails } from "../components/ui/urlDetails";
 import { compositeSignalScales, signalPlainEnglish } from "../../lib/report/signalTranslations";
 import {
   BASE_RATE_TIGHTNESS_MULTIPLIER,
@@ -26,6 +28,11 @@ import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 import { ruleMetricLabel } from "../../lib/report/boundedDecisionRules";
 import { ScoreLadder, type LadderLine } from "../components/ui/scoreLadder";
+import {
+  describeRecordBasisInputs,
+  isCountedMarketInput,
+  type ScoringBasis,
+} from "../../lib/report/scoringBasis";
 
 /** One score against its lines, this week and last, as the ladder draws it. */
 type ScorePosition = {
@@ -37,7 +44,15 @@ type ScorePosition = {
 };
 export type ScorePositions = { tightness: ScorePosition; riskAppetite: ScorePosition };
 
+/** "How hard…" to "how hard…", for a definition that follows its term mid-sentence. */
+const lowerFirst = (sentence: string) => `${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}`;
+
 const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
+/* The premise test: the candidate rate ramps scored beside each reading, and the rule that
+   decides whether one replaces the current ramp, fixed before any result (2026-10-09). Served
+   from this site: the repository is private, so its GitHub copies are a 404 for readers. */
+const RAMP_TEST_REGISTRATION_URL = "/research/premise-test-registration.md";
+const RAMP_TEST_RESULTS_URL = "/research/premise-test-results.md";
 
 /** Base rate at which the rate component of tightness saturates. */
 const baseRateSaturation =
@@ -47,6 +62,22 @@ const baseRateSaturation =
 const inversionSaturation = TIGHTNESS_INVERSION_POINTS / CURVE_INVERSION_TIGHTNESS_MULTIPLIER;
 
 const adj = MACRO_ADJUSTMENT_CONSTANTS;
+
+const joinAnd = (items: readonly string[]) =>
+  items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
+
+const upperFirst = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
+
+/**
+ * One sentence after a card's list of market reads, naming the ones the record
+ * basis leaves out ("The spread and the index are shown, not counted."), or
+ * nothing when every read in the list counts. Once per list, not after each.
+ */
+const shownNotCounted = (reads: ReadonlyArray<[Parameters<typeof isCountedMarketInput>[0], string]>) => {
+  const shown = reads.filter(([id]) => !isCountedMarketInput(id)).map(([, name]) => name);
+  if (shown.length === 0) return "";
+  return ` ${upperFirst(joinAnd(shown))} ${shown.length === 1 ? "is" : "are"} shown, not counted.`;
+};
 
 /**
  * What one risk-appetite point is worth in the funding-pressure points that
@@ -63,6 +94,12 @@ const RISK_GAP_EXAMPLE_POINTS = 6;
  * is the thing itself. It explains the rule; where this week's scores sit is
  * drawn by the two ladders that open the section, the same drawing every
  * other route uses for a score.
+ *
+ * Risk appetite runs across and funding pressure up, the orientation of the
+ * brief's conditions map (`RegimeRadar`) and `/history`'s phase map: Freezing
+ * top left, Sunny bottom right. Until 2026-10-09 this one had the axes the
+ * other way round, so a reader who learned the map on `/` met Sunny in the
+ * corner where Freezing had been.
  */
 function RegimeQuadrant() {
   const t = TIGHTNESS_REGIME_THRESHOLD;
@@ -72,16 +109,17 @@ function RegimeQuadrant() {
   const pad = { l: 34, r: 8, t: 8, b: 44 };
   const x = (v: number) => pad.l + (v / 100) * (W - pad.l - pad.r);
   const y = (v: number) => H - pad.b - (v / 100) * (H - pad.t - pad.b);
+  /* x is risk appetite (its line at r), y is funding pressure (its line at t). */
   const cells: Array<{ key: RegimeKey; x0: number; x1: number; y0: number; y1: number }> = [
-    { key: "EXPANSION", x0: 0, x1: t, y0: r, y1: 100 },
-    { key: "VOLATILE", x0: t, x1: 100, y0: r, y1: 100 },
-    { key: "DEFENSIVE", x0: 0, x1: t, y0: 0, y1: r },
-    { key: "SCARCITY", x0: t, x1: 100, y0: 0, y1: r },
+    { key: "SCARCITY", x0: 0, x1: r, y0: t, y1: 100 },
+    { key: "DEFENSIVE", x0: r, x1: 100, y0: t, y1: 100 },
+    { key: "VOLATILE", x0: 0, x1: r, y0: 0, y1: t },
+    { key: "EXPANSION", x0: r, x1: 100, y0: 0, y1: t },
   ];
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="weather-data-plot h-auto w-full max-w-[20rem] text-slate-300" aria-labelledby="regime-quadrant-title">
       <title id="regime-quadrant-title">
-        {`Four conditions: funding pressure above ${t} and risk appetite below ${r} pick the weather.`}
+        {`Four conditions, picked by whether funding pressure is above ${t} and whether risk appetite is below ${r}.`}
       </title>
       {cells.map((cell) => (
         <g key={cell.key}>
@@ -99,12 +137,12 @@ function RegimeQuadrant() {
           </text>
         </g>
       ))}
-      <line x1={x(t)} x2={x(t)} y1={y(0)} y2={y(100)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
-      <line x1={x(0)} x2={x(100)} y1={y(r)} y2={y(r)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
-      <text x={x(t)} y={H - 26} textAnchor="middle" fontSize="12" fill="currentColor">{t}</text>
-      <text x={x(0)} y={H - 6} textAnchor="start" fontSize="11" fill="currentColor" opacity="0.7">Funding pressure →</text>
-      <text x={pad.l - 6} y={y(r)} textAnchor="end" dominantBaseline="middle" fontSize="12" fill="currentColor">{r}</text>
-      <text textAnchor="middle" transform={`translate(11 ${(y(100) + y(0)) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">Risk appetite →</text>
+      <line x1={x(r)} x2={x(r)} y1={y(0)} y2={y(100)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
+      <line x1={x(0)} x2={x(100)} y1={y(t)} y2={y(t)} stroke="currentColor" strokeDasharray="3 3" opacity="0.6" />
+      <text x={x(r)} y={H - 26} textAnchor="middle" fontSize="12" fill="currentColor">{r}</text>
+      <text x={x(0)} y={H - 6} textAnchor="start" fontSize="11" fill="currentColor" opacity="0.7">Risk appetite →</text>
+      <text x={pad.l - 6} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize="12" fill="currentColor">{t}</text>
+      <text textAnchor="middle" transform={`translate(11 ${(y(100) + y(0)) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">Funding pressure →</text>
     </svg>
   );
 }
@@ -120,11 +158,11 @@ function ConfidenceLadder() {
   const max = med * 2;
   const pct = (v: number) => `${(v / max) * 100}%`;
   return (
-    <div aria-label={`Confidence: under ${near} points from the line is Low, under ${med} is Medium, otherwise High.`}>
+    <div aria-label={`${MARGIN_LABEL}: under ${near} points from the line is close, under ${med} is within reach, otherwise clear.`}>
       <div className="flex h-5 w-full max-w-[20rem] overflow-hidden rounded-sm text-fluid-nano font-semibold">
-        <span className="flex items-center justify-center bg-rose-500/30 text-rose-100" style={{ width: pct(near) }}>Low</span>
-        <span className="flex items-center justify-center bg-amber-500/30 text-amber-100" style={{ width: pct(med - near) }}>Medium</span>
-        <span className="flex items-center justify-center bg-emerald-500/25 text-emerald-100" style={{ width: pct(max - med) }}>High</span>
+        <span className="flex items-center justify-center bg-rose-500/30 text-rose-100" style={{ width: pct(near) }}>Close</span>
+        <span className="flex items-center justify-center bg-amber-500/30 text-amber-100" style={{ width: pct(med - near) }}>Within reach</span>
+        <span className="flex items-center justify-center bg-emerald-500/25 text-emerald-100" style={{ width: pct(max - med) }}>Clear</span>
       </div>
       <div className="relative mt-0.5 h-4 w-full max-w-[20rem] text-fluid-nano tabular-nums text-slate-400">
         <span className="absolute left-0">0</span>
@@ -157,7 +195,7 @@ function RampPlot({ id, from, to, points, unit, label }: { id: string; from: num
       <polyline
         points={`${x(x0)},${y(0)} ${x(from)},${y(0)} ${x(to)},${y(points)} ${x(x1)},${y(points)}`}
         fill="none"
-        stroke="var(--accent-action)"
+        stroke="currentColor"
         strokeWidth="2"
       />
       <text x={x(from)} y={H - 6} textAnchor="middle" fontSize="11" fill="currentColor">{fmt(from)}</text>
@@ -183,7 +221,88 @@ function FormulaCard({ title, children }: { title: string; children: ReactNode }
  * with it. Kept outside the healthy-state <details> collapse on /trust so the
  * "Sources and formulas" links from /about and /threshold land on real content.
  */
-export function FormulaReference({ positions }: { positions?: ScorePositions } = {}) {
+export function FormulaReference({
+  positions,
+  scoringBasis,
+  plainLanguageFolded = false,
+  plainLanguageOpen = false,
+}: {
+  positions?: ScorePositions;
+  /** This reading's basis: what the inputs left out would make each score (`ReportData.scoringBasis`). */
+  scoringBasis?: Pick<ScoringBasis, "notCounted">;
+  /** Fold the plain-language derivation behind `?derivation` on a stable week (the page decides; see the call site). */
+  plainLanguageFolded?: boolean;
+  /** The server-resolved open state for that fold (`?derivation=1`). */
+  plainLanguageOpen?: boolean;
+} = {}) {
+  const recordBasis = describeRecordBasisInputs();
+  /* The plain-language tier, lifted out so it can render open or folded from
+   * one definition. */
+  const plainLanguageTier = (
+        <div className="weather-surface mb-3 space-y-3 px-4 py-4">
+          <p className="type-eyebrow">In plain language</p>
+          <ol className="space-y-2 text-sm text-slate-200">
+            <li>
+              <span className="font-semibold text-slate-100">1. Read two things off public U.S.
+              market data.</span>{" "}
+              {/* "Funding pressure is how hard…", one sentence each. With an em dash
+                  the definition's own capital ("Funding pressure — How hard…")
+                  read as a new sentence starting mid-line. */}
+              <span className="text-slate-300">
+                {signalPlainEnglish.tightness.plainLabel} is {lowerFirst(signalPlainEnglish.tightness.whatItMeasures)}{" "}
+                {signalPlainEnglish.riskAppetite.plainLabel} is {lowerFirst(signalPlainEnglish.riskAppetite.whatItMeasures)}
+              </span>
+            </li>
+            <li>
+              <span className="font-semibold text-slate-100">2. Score each one 0&ndash;100.</span>{" "}
+              <span className="text-slate-300">
+                For funding pressure, {compositeSignalScales.tightness.directionLabel}. For risk
+                appetite, {compositeSignalScales.riskAppetite.directionLabel}. Interest rates set most
+                of each score. Market reads adjust it, and step 3 says which of them count.
+              </span>
+            </li>
+            {/* The record basis (2026-10-09). Until then every market read moved the
+                scores, and four published weeks read Freezing on inputs the record
+                could not test, while their month-end, scored on the record's, read
+                Cloudy. The lists come from the engine's own set, so a read that
+                joins the archive moves here when it moves there. */}
+            <li id="record-basis">
+              <span className="font-semibold text-slate-100">3. Count only what the record can test.</span>{" "}
+              <span className="text-slate-300">
+                {upperFirst(joinAnd(recordBasis.counted))} move the scores. The record holds each of them
+                at every month-end since 2012, so the history on the Record and the calibration study
+                test the same score that sets the guidance.
+                {recordBasis.shownBecause.length > 0
+                  ? ` ${upperFirst(recordBasis.shownBecause.join("; "))}. We score and show each of them, but none of them moves the scores.`
+                  : null}
+              </span>
+              {scoringBasis && scoringBasis.notCounted.length > 0 ? (
+                <span className="mt-1 block text-slate-300" data-not-counted>
+                  This week they would put{" "}
+                  {joinAnd(
+                    scoringBasis.notCounted.map(
+                      (entry) => `${ruleMetricLabel[entry.metric].toLowerCase()} at ${entry.score}, where the published score is ${entry.published}`,
+                    ),
+                  )}
+                  .
+                </span>
+              ) : null}
+            </li>
+            <li>
+              <span className="font-semibold text-slate-100">4. Turn the pair into conditions.</span>{" "}
+              <span className="text-slate-300">
+                The quadrant the two scores land in sets the conditions.
+              </span>
+            </li>
+          </ol>
+          {/* No link out for the market terms: each card below says what its own terms
+              mean, so the arithmetic can be read without leaving it. No sentence
+              announcing that either (2026-10-14): it opened on "The exact arithmetic is
+              below.", over the control directly beneath it, and then on "Each card below
+              says what its market terms mean." — both described the page to its reader. */}
+        </div>
+  );
+
   return (
     <ReportSection
       id="formula-reference"
@@ -215,41 +334,30 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
       {/* A reader who does not already know what a Treasury series or a credit
           spread is cannot start at the formulas. This tier says what the score
           does in words first; the grid below it stays exact. */}
-      <div className="weather-surface mb-3 space-y-3 px-4 py-4">
-        <p className="type-eyebrow">In plain language</p>
-        <ol className="space-y-2 text-sm text-slate-200">
-          <li>
-            <span className="font-semibold text-slate-100">1. Read two things off public U.S.
-            market data.</span>{" "}
-            <span className="text-slate-300">
-              {signalPlainEnglish.tightness.plainLabel} &mdash;{" "}
-              {signalPlainEnglish.tightness.whatItMeasures}{" "}
-              {signalPlainEnglish.riskAppetite.plainLabel} &mdash;{" "}
-              {signalPlainEnglish.riskAppetite.whatItMeasures}
-            </span>
-          </li>
-          <li>
-            <span className="font-semibold text-slate-100">2. Score each one 0&ndash;100.</span>{" "}
-            <span className="text-slate-300">
-              For funding pressure, {compositeSignalScales.tightness.directionLabel}. For risk
-              appetite, {compositeSignalScales.riskAppetite.directionLabel}. Interest rates set most
-              of each score; market-stress reads adjust it.
-            </span>
-          </li>
-          <li>
-            <span className="font-semibold text-slate-100">3. Turn the pair into conditions.</span>{" "}
-            <span className="text-slate-300">
-              The quadrant the two scores land in is the environment; the diagram below draws it.
-            </span>
-          </li>
-        </ol>
-        {/* No link out for the market terms: each card below says what its own terms
-            mean where they first appear, so the arithmetic can be read without leaving it. */}
-        <p className="text-xs text-slate-400">
-          The exact arithmetic is below. Each card says what its market terms mean where they
-          first appear.
-        </p>
-      </div>
+      {/* A reader who does not already know what a Treasury series or a credit
+          spread is cannot start at the formulas. This tier says what the score
+          does in words first; the grid below it stays exact.
+
+          On a stable week (no warnings, live sources) the tier folds behind the
+          same chevron register as the arithmetic below it — DD-040's open item:
+          the method held the page on a quiet week, ahead of the source board a
+          scanner comes here to check. The ladders above stay open (they are the
+          reading), and a degraded week renders it open: a reader distrusting the
+          data meets the derivation unprompted. `?derivation=1` opens it from a
+          link (§XII); the summary names what is behind it. */}
+      {plainLanguageFolded ? (
+        <UrlDetails
+          queryKey="derivation"
+          initialOpen={plainLanguageOpen}
+          className="weather-auto-chevron group mb-3"
+          summaryClassName="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100"
+          summary="In plain language — what each score reads, and how the pair sets the conditions"
+        >
+          <div className="mt-4">{plainLanguageTier}</div>
+        </UrlDetails>
+      ) : (
+        plainLanguageTier
+      )}
 
       {/* Wider gutters than a framed grid needs. The depth ladder in
           surfaces.css drops the enclosure on these cards — they sit third
@@ -269,35 +377,35 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series — DGS1MO
-              (the short-term borrowing rate; falls back to DGS3MO), DGS2, DGS10.
+              <span className="text-slate-400">Rates:</span> St. Louis Fed (FRED) daily series DGS1MO,
+              DGS2 and DGS10, with DGS3MO standing in when DGS1MO is missing.
               <span className="mt-1 block text-xs text-slate-400">
                 FRED is the St. Louis Fed&rsquo;s free public data service; each code names one
-                published series. DGS1MO is the one-month Treasury bill rate, which the cards
-                below call the short-term borrowing rate. DGS3MO is the three-month bill, DGS2 the
+                published series. DGS1MO is the one-month Treasury bill rate, and the cards below
+                call it the short-term borrowing rate. DGS3MO is the three-month bill, DGS2 the
                 two-year rate and DGS10 the ten-year.
               </span>
             </li>
             <li>
-              <span className="text-slate-400">Stress reads:</span> high-yield credit spread, Chicago
-              Fed financial conditions index, VIX, venture funding pace, tech layoff index.
-              <span className="mt-1 block text-xs text-slate-400">
-                In order: the extra interest riskier companies pay to borrow, a Fed summary of
-                overall borrowing conditions, expected stock-market turbulence, the pace of venture
-                funding, and the tech layoff trend.
-              </span>
+              <span className="text-slate-400">Market reads that count:</span> {joinAnd(recordBasis.countedMarket)}.
             </li>
+            {recordBasis.shown.length > 0 ? (
+              <li>
+                <span className="text-slate-400">Shown, not counted:</span>{" "}
+                {joinAnd(recordBasis.shown)}. The record has no month-end history to score them against.
+              </li>
+            ) : null}
           </ul>
         </FormulaCard>
 
         <FormulaCard title="Funding pressure · 0–100 · cost of money">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              <code className="text-sky-200">
+              <code className="text-slate-100">
                 min({TIGHTNESS_BASE_RATE_POINTS}, (short-term borrowing rate − {BASE_RATE_TIGHTNESS_THRESHOLD}) ×{" "}
                 {BASE_RATE_TIGHTNESS_MULTIPLIER})
               </code>{" "}
-              The short-term borrowing rate is the one-month Treasury bill rate, in percent.
+              The short-term borrowing rate is read in percent.
 
               <RampPlot
                 id="ramp-base-rate"
@@ -309,13 +417,12 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               />
             </li>
             <li>
-              <code className="text-sky-200">
+              <code className="text-slate-100">
                 + min({TIGHTNESS_INVERSION_POINTS}, inversion depth ×{" "}
                 {CURVE_INVERSION_TIGHTNESS_MULTIPLIER})
               </code>{" "}
-              when the recession warning gauge (10-year minus 2-year rate) is inverted, meaning the
-              ten-year rate is below the two-year. Inversion depth is how far below, in percentage
-              points.
+              when the recession warning gauge (10-year minus 2-year rate) is inverted: the ten-year
+              rate is below the two-year. Inversion depth is how far below, in percentage points.
               <RampPlot
                 id="ramp-inversion"
                 from={0}
@@ -326,7 +433,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               />
             </li>
             <li>
-              <code className="text-sky-200">
+              <code className="text-slate-100">
                 + min({BASE_RATE_VELOCITY_POINTS}, ({BASE_RATE_VELOCITY_LOOKBACK_DAYS}-day rise in the
                 short-term borrowing rate − {BASE_RATE_VELOCITY_THRESHOLD}) × {BASE_RATE_VELOCITY_MULTIPLIER})
               </code>{" "}
@@ -338,6 +445,10 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               {adj.hySpreadStressThreshold}% adds up to +{adj.hySpreadTightnessCap}; the Chicago Fed
               financial conditions index ≥ {adj.chicagoFciTighteningThreshold} adds up to +
               {adj.chicagoFciTightnessCap}.
+              {shownNotCounted([
+                ["HY_CREDIT_SPREAD", "the spread"],
+                ["CHICAGO_FCI", "the index"],
+              ])}
               <span className="mt-1 block text-xs text-slate-400">
                 The high-yield credit spread is the extra interest riskier companies pay to borrow,
                 over the government&rsquo;s rate. The Chicago Fed index summarises borrowing
@@ -350,7 +461,7 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
         <FormulaCard title="Risk appetite · 0–100 · willingness to fund risk">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
-              Recession warning gauge (10-year minus 2-year rate), mapped linearly: {RISK_APPETITE_MIN_SLOPE}% → 0,{" "}
+              Recession warning gauge, mapped linearly: {RISK_APPETITE_MIN_SLOPE}% → 0,{" "}
               +{RISK_APPETITE_MAX_SLOPE}% → 100. The further the ten-year rate sits above the
               two-year, the more willing lenders are to wait for a return.
             </li>
@@ -359,6 +470,11 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               subtracts up to {adj.vixRiskAppetiteCap}; venture funding pace ≤{" "}
               {adj.vcVelocitySlowdownThreshold}% subtracts up to {adj.vcVelocityRiskAppetiteCap};
               the tech layoff index ≥ {adj.layoffPressureThreshold} subtracts up to {adj.layoffRiskAppetiteCap}.
+              {shownNotCounted([
+                ["VIX_INDEX", "the VIX"],
+                ["VC_FUNDING_VELOCITY", "the funding pace"],
+                ["TECH_LAYOFF_TREND", "the layoff index"],
+              ])}
               <span className="mt-1 block text-xs text-slate-400">
                 The VIX is the stock market&rsquo;s own forecast of turbulence over the next month;
                 higher means more expected swings. Venture funding pace is the quarter-over-quarter
@@ -371,31 +487,31 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
               {adj.vixMarketStressVetoMean} or more over its last {adj.vixVetoMeanWindow} readings,
               the score is capped at the line where conditions change ({RISK_APPETITE_REGIME_THRESHOLD});
               between {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
-              {adj.vixVetoSoftCap}. An average rather than one day, so a single spike does not cap a
-              week. While the cap holds, extreme market stress sets the ceiling, not the rates.
+              {adj.vixVetoSoftCap}. It uses an average rather than one day, so a single spike does not
+              cap a week. While the cap holds, extreme market stress sets the ceiling, not the rates.
             </li>
           </ul>
         </FormulaCard>
 
-        <FormulaCard title={`Conditions, ${OPERATING_LATITUDE_LABEL.toLowerCase()}, confidence`}>
+        <FormulaCard title={`Conditions, ${OPERATING_LATITUDE_LABEL.toLowerCase()}, margin`}>
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>
               <span className="text-slate-400">Conditions:</span>
               <RegimeQuadrant />
               <span className="mt-1 block text-xs text-slate-400">
-                At low confidence conditions do not change at all.
+                At the narrowest margin conditions do not change at all.
               </span>
             </li>
             <li>
               <span className="text-slate-400">{OPERATING_LATITUDE_LABEL}:</span>{" "}
-              <code className="text-sky-200">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
+              <code className="text-slate-100">0.7 × risk appetite + 0.3 × (100 − funding pressure)</code>
               <span className="mt-1 block text-xs text-slate-400">
-                The 0–100 score in the copied and Slack briefs and beside each month on the history
-                page: {OPERATING_LATITUDE_GLOSS}.
+                The 0–100 score beside each month on the history page and in the copied and Slack
+                briefs. It measures {OPERATING_LATITUDE_GLOSS}.
               </span>
             </li>
             <li>
-              <span className="text-slate-400">Confidence:</span> how far the scores sit from the
+              <span className="text-slate-400">{MARGIN_LABEL}:</span> how far the scores sit from the
               nearest line where conditions would change, counted in funding-pressure points. A
               risk-appetite point is worth {riskPointWorth}, because it stands for a{" "}
               {riskPointWorth}-times larger move in rates: risk appetite {RISK_GAP_EXAMPLE_POINTS} points
@@ -409,14 +525,15 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
       </div>
       </details>
 
-      {/* The two links sit inside the sentence, so they are inline with vertical
-          padding rather than 44px inline-flex boxes: padding on an inline box
+      {/* The link sits inside the sentence, so it is inline with vertical
+          padding rather than a 44px inline-flex box: padding on an inline box
           widens what a finger can hit without raising the line it sits on (§II,
-          "expand invisible hitboxes"). As boxes, each one set its own line to
-          44px and the paragraph read with a gap under its first line. */}
+          "expand invisible hitboxes"). A second link here, to how to use the
+          pause and resume lines on /about, went where the line closing /trust
+          already points (2026-10-09). */}
       <p className="mt-3 text-xs leading-5 text-slate-400">
-        Every constant above is imported from the scoring engine, not retyped — if the engine
-        changes, this page changes with it.{" "}
+        Every constant above is read from the scoring engine, so a change there changes this
+        page.{" "}
         <a
           href={ENGINE_SOURCE_URL}
           target="_blank"
@@ -424,10 +541,23 @@ export function FormulaReference({ positions }: { positions?: ScorePositions } =
           className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
         >
           Read the engine source →
+        </a>
+      </p>
+      {/* One line, here and nowhere else: the method note for a change under test. */}
+      <p className="mt-2 text-xs leading-5 text-slate-400" data-ramp-test-note>
+        Three other ways to score the short-term borrowing rate are being tested beside each
+        week&rsquo;s reading, and none of them sets the guidance.{" "}
+        <a
+          href={RAMP_TEST_REGISTRATION_URL}
+          className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+        >
+          The test, registered in advance →
         </a>{" "}
-        For the act / pause / reverse method the thresholds feed, see{" "}
-        <a href="#framework" className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-          how to use the thresholds ↓
+        <a
+          href={RAMP_TEST_RESULTS_URL}
+          className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+        >
+          What it found →
         </a>
       </p>
     </ReportSection>

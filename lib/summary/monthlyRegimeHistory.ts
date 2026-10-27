@@ -10,12 +10,15 @@
  * buildHomeBriefModelInternal, which is sync and sits under the report read path's 10s
  * deadline; making it async would turn that entire chain async for data that changes
  * monthly. The async report path primes the KV copy instead, and every sync reader after
- * that sees it.
+ * that sees it. A page that reads the history itself primes first
+ * (`primeMonthlyRegimeHistoryForRead`): a cached report is served without running the
+ * report path, so its prime cannot be counted on.
  */
 import { z } from "zod";
 
 import type { RegimeKey } from "../regimeEngine";
 import { getWhetherKv } from "../runtime/kv";
+import { withDeadline } from "../withDeadline";
 import rawMonthlyRegimeHistory from "../../data/summary_monthly_regime_history.json";
 
 export const MONTHLY_REGIME_HISTORY_KV_KEY = "summary:monthly-regime-history";
@@ -98,6 +101,19 @@ export const primeMonthlyRegimeHistory = async (): Promise<MonthlyRegimeHistoryS
     return "kv";
   } catch {
     return "bundled";
+  }
+};
+
+/** Bound on the prime. It is one KV read, cached per isolate for hours, and the bundled
+ *  snapshot covers a miss — so it is never worth making a page wait on it. */
+const PRIME_DEADLINE_MS = 1_000;
+
+/** The prime as a read path takes it: bounded, and never failing the read. */
+export const primeMonthlyRegimeHistoryForRead = async (): Promise<void> => {
+  try {
+    await withDeadline(primeMonthlyRegimeHistory(), PRIME_DEADLINE_MS, "monthly-regime-history-prime");
+  } catch {
+    /* The bundled floor stands; freshness is the only thing lost. */
   }
 };
 

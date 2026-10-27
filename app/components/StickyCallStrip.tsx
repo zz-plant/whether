@@ -4,11 +4,9 @@ import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Copy, CopyCheck, ImageIcon } from "lucide-react";
 import { useClipboardCopy } from "./useClipboardCopy";
-import { useScrollDirection } from "./useScrollDirection";
 import { buildImageBriefApiPath } from "../../lib/report/imageBriefSearchParams";
 import { TrendGlyph, type TrendDirection } from "./illustrations/TrendGlyph";
 import { DIRECTION_ARROW, DIRECTION_LABEL, type SignalDirection } from "../viewModel";
-import { HOME_SECTIONS } from "../../lib/report/home/homeSectionModel";
 
 type Props = {
   call: string;
@@ -18,15 +16,18 @@ type Props = {
    * week), and then no badge is drawn.
    */
   direction?: SignalDirection;
-  /** The weather word, so the strip states the call the way the hero does. */
+  /** The weather word, for the copied text, which states the call the way the hero does. */
   weatherWord: string;
-  /** The confidence word ("High", "Medium", "Low"); the strip adds "confidence", since a bare "High" beside the call does not say what is high. */
-  confidenceWord: string;
+  /** The margin as the strip prints it: "Margin 1 pt" (`formatStripMargin`). */
+  marginLabel: string;
   shareLines?: string[];
 };
 
 /**
- * Two strips, one per width, and neither in the thumb zone.
+ * The brief's floating actions, from `md` up, out of the thumb zone: the week's
+ * direction, the card as an image and the call as text. It printed the weather
+ * word, the call and the margin too until 2026-10-27; the running head prints
+ * those at the top of the screen now.
  *
  * From `md` up the strip is the floating pill at the foot of the page, shown
  * once the reader has scrolled past the hero. Below `md` the bottom tab bar
@@ -35,33 +36,31 @@ type Props = {
  * itself even while hidden. (Reverses the 2026-08 thumb-zone strip, P0 #1 of
  * the design-improvements tracker retired on 2026-10-05.)
  *
- * The phone variant is one line at the *top*, under the header, shown once
- * the hero has left the viewport: weather word, the call, confidence, and a
- * jump to what the call changes. The top is what keeps it out of the thumb
- * zone. It follows the header's own hide-on-scroll: when the header slides
- * away the strip moves up into its place, by transform, on the same curve.
+ * Below `md` there is no strip of its own (2026-10-27). The phone line that
+ * sat under the header once the hero left the viewport (weather word, call,
+ * margin, a jump to the areas) is the running head's second line now
+ * (`runningHead.tsx`): one bar at the top of every frame, carrying the site
+ * and the week too, so a phone screenshot of the brief names its source.
  *
  * The badge is the only place the weekly direction appears once scrolled, so it
  * states the direction in words rather than leaving a bare arrow character for
  * a screen reader to announce as "upwards arrow".
  */
 const DIRECTION_BADGE: Record<SignalDirection, { glyph: TrendDirection; tone: string }> = {
-  tighten: { glyph: "up", tone: "bg-rose-500/20 text-rose-300 border border-rose-500/30" },
-  ease: { glyph: "down", tone: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30" },
-  hold: { glyph: "flat", tone: "bg-sky-500/20 text-sky-300 border border-sky-500/30" },
+  tighten: { glyph: "up", tone: "text-rose-300" },
+  ease: { glyph: "down", tone: "text-emerald-300" },
+  hold: { glyph: "flat", tone: "text-slate-300" },
 };
 
-/** The hero, which both variants watch: the strip has a job only once it is gone. */
+/** The hero, which the strip watches: it has a job only once the hero is gone. */
 const HERO_ID = "share-ready-artifact";
 
-export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, shareLines }: Props) {
+export function StickyCallStrip({ call, direction, weatherWord, marginLabel, shareLines }: Props) {
   const { status, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const isCopied = status === "copied";
   const currentSearchParams = useSearchParams();
   const [showStrip, setShowStrip] = useState(false);
   const [heroLeft, setHeroLeft] = useState(false);
-  const { direction: scrollDirection, isPastThreshold } = useScrollDirection();
-  const headerHidden = isPastThreshold && scrollDirection === "down";
   const imageBriefHref = useMemo(
     () => buildImageBriefApiPath(currentSearchParams),
     [currentSearchParams],
@@ -106,9 +105,9 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
     };
   }, []);
 
-  /* The phone line watches the hero itself rather than a scroll offset: it
-     appears exactly when the call has scrolled off the top, whatever sits
-     above the hero on this visit (a banner, a since-last-visit line, nothing). */
+  /* The strip watches the hero itself rather than a scroll offset: it waits
+     until the call has scrolled off the top, whatever sits above the hero on
+     this visit (a banner, a since-last-visit line, nothing). */
   useEffect(() => {
     const hero = document.getElementById(HERO_ID);
     if (!hero || !("IntersectionObserver" in window)) return undefined;
@@ -126,7 +125,7 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
 
   const handleCopy = async () => {
     const text = [
-      `Whether · ${weatherWord} · ${confidenceWord} confidence`,
+      `Whether · ${weatherWord} · ${marginLabel}`,
       // Plain-text artifact, so the compact glyph is right here — sourced from
       // the shared map rather than re-derived.
       direction ? `${DIRECTION_ARROW[direction]} ${call}` : call,
@@ -138,55 +137,29 @@ export function StickyCallStrip({ call, direction, weatherWord, confidenceWord, 
 
   return (
     <>
-      {heroLeft ? (
-        <div
-          data-testid="phone-call-strip"
-          className={`fixed inset-x-0 top-[calc(env(safe-area-inset-top)+3.25rem)] z-40 px-3 pt-1.5 transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] md:hidden ${
-            headerHidden ? "-translate-y-[3.25rem]" : "translate-y-0"
-          }`}
-        >
-          <p className="flex items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 text-fluid-xs leading-tight text-slate-100 shadow-[var(--elev-4)] backdrop-blur-xl">
-            <span className="type-stamp shrink-0" style={{ color: "var(--regime-ink)" }}>
-              {weatherWord}
-            </span>
-            <span className="min-w-0 flex-1 truncate font-medium text-white">{call}</span>
-            <span className="shrink-0 text-slate-400">{confidenceWord} confidence</span>
-            <a
-              href={`#${HOME_SECTIONS.consequences.id}`}
-              className="weather-focus-ring inline-flex min-h-[44px] shrink-0 items-center text-sky-300 underline decoration-sky-700 underline-offset-4"
-            >
-              What it changes
-            </a>
-          </p>
-        </div>
-      ) : null}
-      {showStrip ? (
+      {/* Past the scroll offset and with the card off screen: from `md` up the
+          offset alone let the pill rise while the foot of the card, with its
+          weather word and margin, was still in view (2026-10-09). */}
+      {showStrip && heroLeft ? (
         <div
           data-testid="sticky-call-strip"
           className="pointer-events-none fixed inset-x-0 bottom-0 z-40 hidden px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 md:block lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
         >
           {/* One elevation, from the ladder: the strip floats over the page, so it
               takes the top surface step rather than a hand-mixed pair of shadows. */}
-          <div className="pointer-events-auto mx-auto flex max-w-[72rem] items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 shadow-[var(--elev-4)] backdrop-blur-xl lg:max-w-md">
-            <span className="flex min-w-0 flex-1 items-center gap-2 text-fluid-xs font-semibold leading-tight text-slate-100">
-              {direction ? (
-                <span
-                  className={`inline-flex size-7 items-center justify-center rounded-lg text-sm font-bold ${DIRECTION_BADGE[direction].tone}`}
-                >
-                  <TrendGlyph direction={DIRECTION_BADGE[direction].glyph} className="h-4 w-4" />
-                  <span className="sr-only">{`${DIRECTION_LABEL[direction]} this week.`}</span>
-                </span>
-              ) : null}
-              {/* The weather word, not the operating-latitude score it used to
-                  print: the page no longer shows that number anywhere, and a
-                  strip that restates the call should restate it in the words
-                  the hero uses. */}
-              <span className="type-stamp shrink-0 text-xs" style={{ color: "var(--regime-ink)" }}>
-                {weatherWord}
+          <div className="pointer-events-auto ml-auto flex w-fit items-center gap-2 rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)]/95 px-3 py-2 shadow-[var(--elev-4)] backdrop-blur-xl">
+            {/* The week's direction, then the actions. The weather word, the call and
+                the margin are the running head's now (2026-10-27): it prints them at the
+                top of the same screen, and here, 448px wide at the foot of a two-column
+                section, they covered the text a screenshot was taken for. */}
+            {direction ? (
+              /* A glyph, unframed: in a 6px box it was the download button's
+                 shape, three items to its right (ui-ux-standards §XXVII). */
+              <span className={`inline-flex shrink-0 items-center ${DIRECTION_BADGE[direction].tone}`}>
+                <TrendGlyph direction={DIRECTION_BADGE[direction].glyph} className="h-4 w-4" />
+                <span className="sr-only">{`${DIRECTION_LABEL[direction]} this week.`}</span>
               </span>
-              <span className="min-w-0 truncate font-medium text-white">{call}</span>
-            </span>
-            <span className="flex-shrink-0 text-fluid-xs text-slate-400">{confidenceWord} confidence</span>
+            ) : null}
             {/* Both actions are the shared ghost button; a plain `<a>` with its own
                 class chain drops the control radius, the press and the focus ring
                 the class carries. The download is an API path, so it stays an

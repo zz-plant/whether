@@ -38,7 +38,6 @@ describe("ReportShell extracted sections", () => {
         statusLabel="DEFENSIVE"
         trustStatusLabel="HIGH"
         fetchedAtLabel="Mar 6"
-        resolvedNextRefreshLabel="15m cadence"
         showOfflineBadge={false}
         offlineBadgeLabel="Cached"
       />,
@@ -47,15 +46,15 @@ describe("ReportShell extracted sections", () => {
     // No kicker. "Weekly brief" above every H1 restated the route the header
     // tab and the bottom bar already name; the status word leads instead.
     assert.doesNotMatch(html, />Weekly brief</);
-    // The status word is the route's stamp: it prints first, in the regime
-    // ink, at the reading's own size; the trust headline and the record date
-    // follow it in the meta half of the same line.
-    assert.match(html, /text-\[color:var\(--regime-ink\)\]">DEFENSIVE<\/span>/);
-    assert.match(html, /HIGH • As of Mar 5/);
+    // The status word is the route's stamp: it prints first, as the week's
+    // placard; the trust headline and the record date follow it in the meta
+    // half of the same line.
+    assert.match(html, /class="type-stamp weather-tag-placard[^"]*">DEFENSIVE<\/span>/);
+    assert.match(html, /HIGH • Data as of Mar 5/);
     assert.match(html, /Decision summary/);
     // The refresh stamp is labelled for what it is — the pipeline's fetch,
     // distinct from the reading's record date in the status line above.
-    assert.match(html, /Signals refreshed Mar 6/);
+    assert.match(html, /Checked Mar 6/);
     assert.match(html, /Start/);
     assert.match(html, /Export/);
   });
@@ -77,7 +76,7 @@ describe("ReportShell extracted sections", () => {
     );
 
     assert.doesNotMatch(html, /Updated/);
-    assert.match(html, /As of Jul 31, 2026/);
+    assert.match(html, /Data as of Jul 31, 2026/);
   });
 
   it("renders no hero button unless a route asks for one", () => {
@@ -189,7 +188,9 @@ describe("ReportShell extracted sections", () => {
     assert.doesNotMatch(html, /Review order/);
   });
 
-  it("puts the next-step card at the end of the page, once", () => {
+  /* No closing "Next" card (2026-10-09): every one pointed at a header tab or at
+     /share, which the header and the footer already reach. */
+  it("ends on the page's own last section, with no next-step card", () => {
     const html = renderToStaticMarkup(
       <ReportShell
         model={{
@@ -206,21 +207,14 @@ describe("ReportShell extracted sections", () => {
           trust: {
             trustStatusTone: "stable",
           },
-          actions: {
-            nextStep: { href: "/resolve", description: "Still stuck on one decision? Get a yes or no for it.", label: "Resolve a decision" },
-          },
         }}
       >
         <section>Body</section>
       </ReportShell>,
     );
 
-    assert.equal(html.split('data-testid="next-step-card"').length - 1, 1);
-    assert.ok(html.indexOf("Body") < html.indexOf("next-step-card"));
-    assert.match(html, /href="\/resolve"/);
-    // The button names where it goes; it said "Continue →" on every page.
-    assert.match(html, />Resolve a decision</);
-    assert.doesNotMatch(html, /Continue →/);
+    assert.doesNotMatch(html, /next-step-card|aria-label="Next step"/);
+    assert.match(html, /<section>Body<\/section>/);
   });
 });
 
@@ -239,7 +233,7 @@ describe("report route page summaries", () => {
     assert.doesNotMatch(signals, /pageSummary: "What moved/);
 
     const history = await readFile("app/history/page.tsx", "utf8");
-    assert.match(history, /pageSummary: "Look up what the guidance said in any past month, and how it held up."/);
+    assert.match(history, /pageSummary: "Look up the guidance for any past month and see how it held up."/);
     assert.doesNotMatch(history, /Historical conditions and the weekly briefs/);
 
     const plan = await readFile("app/operate/planningPageModel.ts", "utf8");

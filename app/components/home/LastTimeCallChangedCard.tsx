@@ -32,14 +32,16 @@ export function LastTimeCallChangedCard({
     <aside
       data-testid="last-time-call-changed"
       aria-label={`The last time conditions ${lastTimeVerb(record)}`}
-      className="space-y-3 border-t border-slate-800/60 pt-4"
+      className="space-y-3 border-t border-[color:var(--border-subtle)] pt-4"
     >
       <p className="type-eyebrow">The last time conditions {lastTimeVerb(record)}</p>
       <p className="text-fluid-xs leading-5 text-slate-200">
-        <span className="font-semibold text-white">{changedAt}:</span> {record.changedAt.fromLabel} to{" "}
+        <span className="font-semibold text-slate-50">{changedAt}:</span> {record.changedAt.fromLabel} to{" "}
         {record.changedAt.toLabel}. By {after}, {record.monthsLater} months on, the scores stood here.
       </p>
-      <div className="grid gap-x-6 gap-y-3 sm:grid-cols-2">
+      {/* Two cells packed to the left edge, not one per half of the page: each is
+          three short lines, and halves left the second one stranded mid-page. */}
+      <div className="grid gap-x-10 gap-y-3 sm:grid-cols-[max-content_max-content]">
         <ScoreCell
           label={regimeSignalLabel.tightness}
           value={record.tightness.later}

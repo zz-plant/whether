@@ -10,6 +10,14 @@ import { loadReportData } from "../lib/report/reportData";
 import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import type { MacroSeriesId, TreasuryData } from "../lib/types";
+import {
+  findTimeMachineGovernedAssessment,
+  getPreviousTimeMachineSnapshot,
+  getTimeMachineSnapshots,
+} from "../lib/timeMachine/timeMachineCache";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 
@@ -76,13 +84,62 @@ describe("a replayed month carries its own macro readings, or none", () => {
   });
 });
 
+/*
+ * A replay is the governed record, and so is what it is compared with. The month-end
+ * before it and the one a year back were point reads, which disagree with the record's
+ * conditions in 24 of the 177 month-ends on file (2026-10-14). December 2024 reads
+ * DEFENSIVE alone where the record says SCARCITY, so the January 2025 replay announced
+ * a move to Freezing; February 2020 reads EXPANSION where the record says VOLATILE.
+ */
+describe("a replayed month is compared with the record, not a point read", () => {
+  it("reports no change of conditions into January 2025, which the record holds at Freezing", async () => {
+    const january = await loadReportData({ month: "1", year: "2025" });
+    const monthEnd = getPreviousTimeMachineSnapshot(january.treasury.record_date);
+    assert.ok(monthEnd);
+    assert.equal(evaluateRegime(monthEnd).regime, "DEFENSIVE");
+    assert.equal(findTimeMachineGovernedAssessment(monthEnd.record_date)?.regime, "SCARCITY");
+
+    assert.equal(january.assessment.regime, "SCARCITY");
+    assert.equal(january.regimeAlert, null);
+    assert.equal(january.reportDynamics.regimeChanged, false);
+  });
+
+  it("compares March 2020 with February's record and the year-earlier record", async () => {
+    const march = await loadReportData({ month: "3", year: "2020" });
+    const lastYear = march.lastYearComparison;
+    assert.ok(lastYear);
+
+    assert.equal(march.regimeAlert, null, "February 2020's record is already Stormy");
+    assert.equal(lastYear.prior.regime, findTimeMachineGovernedAssessment(lastYear.prior.recordDate)?.regime);
+  });
+
+  // The split's first stage is measured from the rates-alone read of the month-end. Where
+  // the record's scores differ from it, that gap would print as a move in rates.
+  it("splits a month-end move only when the record scores the month-end as the rates alone do", async () => {
+    for (const { year, month } of getTimeMachineSnapshots().slice(-24)) {
+      const replay = await loadReportData({ month: String(month), year: String(year) });
+      const monthEnd = getPreviousTimeMachineSnapshot(replay.treasury.record_date);
+      if (!monthEnd || !replay.monthEndComparison?.movement) continue;
+      const point = evaluateRegime(monthEnd, replay.thresholds).scores;
+      const record = findTimeMachineGovernedAssessment(monthEnd.record_date, replay.thresholds)?.scores ?? point;
+      assert.deepEqual(
+        { tightness: record.tightness, riskAppetite: record.riskAppetite },
+        { tightness: point.tightness, riskAppetite: point.riskAppetite },
+        `${year}-${month} split a move from a month-end the record scores differently`,
+      );
+    }
+  });
+});
+
 describe("/history/compare draws each period from its own month", () => {
   it("prints 'not on record' for a past month's missing inputs, and no invented zero between the two", async () => {
     const { text, columnA, columnB } = await renderCompare({ yearB: "2020", monthB: "3" });
 
     const notOnRecord = columnB.match(/Not on record for this month/g) ?? [];
     assert.equal(notOnRecord.length, MACRO_IDS.length, "Mar 2020's three macro rows say the record has none");
-    assert.match(columnA, /Corporate borrowing premium Extra interest[^.]*\. \d+\.\d{2}%/, "the current week keeps its own figure");
+    assert.match(columnA, /Corporate borrowing premium \d+\.\d{2}%/, "the current week keeps its own figure");
+    /* Defined once, under the difference tile; each column prints its value alone (2026-10-09). */
+    assert.equal((text.match(/The extra interest mid-grade companies pay to borrow, over the government/g) ?? []).length, 1);
 
     assert.doesNotMatch(text, /0\.00%/, "a missing side was read as zero");
     assert.match(text, /Not on record for Period B \(Mar 31, 2020\)\./);
@@ -128,10 +185,10 @@ describe("/history/compare draws each period from its own month", () => {
     for (const area of decisionAreaOrder) {
       const item = reportData.actionStripItems.find((candidate) => operatingLeverToDecisionArea[candidate.lever] === area);
       const crossed = (item?.pauseConditions ?? []).some((line) => isRuleConditionMet(line, scores[line.metric]));
-      const row = new RegExp(`${decisionAreaLabel(area)}\\s*:\\s*Pause line crossed`);
+      const row = new RegExp(`${decisionAreaLabel(area)}\\s*:\\s*Past its pause line`);
       assert.equal(row.test(columnA), crossed, `${decisionAreaLabel(area)} agrees with its pause line at ${scores.tightness}/${scores.riskAppetite}`);
     }
-    assert.match(columnA, /New bets\s*:\s*Pause line crossed/, "new commitments are paused, as the guidance says");
+    assert.match(columnA, /New bets\s*:\s*Past its pause line/, "new commitments are paused, as the guidance says");
   });
 });
 
@@ -196,5 +253,43 @@ describe("the period caption on a replayed month", () => {
     }).weeklyLeadershipSummary;
     assert.equal(summary.boldnessDelta, -7);
     assert.equal(summary.shorthandLine, "Operating latitude down since Dec 30, 2011.");
+  });
+});
+
+/*
+ * Each picker shows the month its column draws (2026-10-09). With no query, Period A
+ * drew the current week while its picker defaulted to the newest month-end the
+ * archive holds, so the page read "Sep 2026 · Cloudy" over a column dated Oct 7,
+ * Freezing. Period B offered the same "current week" choice, which cleared its query
+ * and loaded its Mar 2020 default instead.
+ */
+describe("/history/compare: each period's picker names the month its column draws", () => {
+  const renderSelects = async (searchParams: Record<string, string>) => {
+    const page = await import("../app/history/compare/page");
+    const html = renderToStaticMarkup(await page.default({ searchParams: Promise.resolve(searchParams) }));
+    const selects = [...html.matchAll(/<select[\s\S]*?<\/select>/g)].map((match) => match[0]);
+    assert.equal(selects.length, 2, "one picker per period");
+    const selected = (select: string) => plainText(/<option[^>]*selected=""[^>]*>([^<]*)<\/option>/.exec(select)?.[1] ?? "").trim();
+    const grid = plainText(html.slice(html.indexOf('id="ops-compare-grid"')));
+    return { pickerA: selects[0], pickerB: selects[1], selected, columnA: grid.slice(0, grid.indexOf("Period B")) };
+  };
+
+  it("selects This week for Period A with no query, the week its column draws", async () => {
+    const { pickerA, selected, columnA } = await renderSelects({});
+    const { reportData } = await loadWeeklyBriefSnapshot(undefined, { route: "/history/compare" });
+    assert.equal(selected(pickerA), "This week");
+    assert.ok(columnA.includes(reportData.recordDateLabel), `the column is the current week (${reportData.recordDateLabel})`);
+  });
+
+  it("selects the queried month for Period A, as its column draws it", async () => {
+    const { pickerA, selected, columnA } = await renderSelects({ yearA: "2022", monthA: "9" });
+    assert.match(selected(pickerA), /^Sep 2022 · /);
+    assert.match(columnA, /Sep 30, 2022/);
+  });
+
+  it("offers no current-week choice for Period B, whose blank query means Mar 2020", async () => {
+    const { pickerB, selected } = await renderSelects({});
+    assert.doesNotMatch(pickerB, /<option value="">/);
+    assert.match(selected(pickerB), /^Mar 2020 · /);
   });
 });

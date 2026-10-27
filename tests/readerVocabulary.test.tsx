@@ -35,6 +35,15 @@ import { buildMonthlySummary } from "../lib/summary/monthlySummary";
 import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
 import { buildWeeklyStructured, buildWeeklySummary } from "../lib/summary/weeklySummary";
 import { buildYearlySummary } from "../lib/summary/yearlySummary";
+import { RegimeRadar } from "../app/components/home/RegimeRadar";
+import { DecisionPicker } from "../app/components/home/DecisionPicker";
+import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
+import { CompanyCalibration } from "../app/components/home/CompanyCalibration";
+import { AlertSection } from "../app/components/home/AlertSection";
+import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 mockAny.module("next/navigation", () => ({
@@ -61,7 +70,7 @@ mockAny.module("next/navigation", () => ({
  *   a mechanism name, a fixture company's figures, a UI implementation detail.
  * - Ratcheted: a word that has a place on some surface but was doing a plain sentence's work
  *   on all of them. The count may fall and may not rise,
- *   the way scripts/check-suppression-census.ts holds its numbers. Lower the baseline when
+ *   the way scripts/census.config.ts holds the suppression census's. Lower the baseline when
  *   work earns it; raising one is a decision and belongs in its own PR with the reason.
  *
  * Routes behind the report read path stay out (they suspend at their data boundary offline;
@@ -103,9 +112,39 @@ const BANNED: { name: string; pattern: RegExp }[] = [
      only knew the capitalised forms. */
   { name: "retired score name", pattern: /\b(boldness|latitude signal)\b/i },
   { name: "glossary pointer", pattern: /\b(Open the glossary|Full glossary|Look up a term|What these terms mean)\b/ },
-  /* The header's names are Brief, Plan, Evidence, Resolve, Trust and History
+  /* One vocabulary (2026-10-09). The five areas are Hiring, Roadmap, Fundraising,
+     Spending and New bets (`decisionAreaLabel`); the picker offered verb phrases
+     ("Raise money") and /operate/scenarios a second table ("Investment pace"), so a
+     reader met two names for each area. Capitalised forms are the labels; the
+     lower-case coinages never were prose. "Approve new spend only if…" is the
+     spending rule's sentence as frozen briefs before 2026-10-09 recorded it, which
+     is a rule, not a label, and a record is not rewritten. */
+  {
+    name: "retired area name",
+    pattern:
+      /\b(Change the roadmap|Product tempo|Raise money|Capital raising|Approve new spend(?! only)|Burn discipline|Investment pace|Start something new|Expansion bets|Hire someone)\b|\b(product tempo|burn discipline|expansion bets|investment pace)\b/,
+  },
+  /* The three lines are the pause line, the resume line and the change line.
+     "Threshold", "reversal" and "boundary" named the same lines on the chart titles,
+     the brief's ladders ("Trigger at 76. Reversal at 66.") and the export slots. */
+  {
+    name: "retired line word",
+    pattern: /\b(Threshold|Reversal)\s*:|\b(Trigger|Reversal) at \d|\b(boundary|boundaries)\b|\bnear-threshold\b|\bAgainst its threshold\b|\breversal (trigger|condition)s?\b/i,
+  },
+  { name: "retired signal name", pattern: /\bCapital tightness\b|\bRecession warning watch\b/i },
+  /* The margin (2026-10-09). "Confidence: Low" beside "Freeze new commitments" read
+     as the product doubting its advice; the number is a distance from the change
+     line (/calibration), so it is shown as one. The API field keeps `confidence`. */
+  {
+    name: "confidence as a display label",
+    pattern:
+      /\b(High|Medium|Low|reduced|Guarded|recommendation) confidence\b|\bConfidence\s*[:(]|\bConfidence (High|Medium|Low)\b|\bconfidence (is|was|now|drops?|dropped)\b|\bconfidence (label|number|score|figure|record)\b|\bat (high|medium|low) confidence\b/i,
+  },
+  /* The header's names are This week, Decide, Record and Guides
      (lib/navigation/informationArchitecture.ts). Search results, the answer pages and the 404
-     page still said "Decision Tools", and the resource CTAs "Open Planning", until 2026-10-06. */
+     page still said "Decision Tools", and the resource CTAs "Open Planning", until 2026-10-06.
+     A link's label for a route is held to that route's one name by
+     tests/navigationTargets.test.tsx, which can see the href a label points at. */
   { name: "retired nav name", pattern: /\bDecision Tools\b|\b(Open|in) Planning\b/ },
 ];
 
@@ -119,7 +158,10 @@ const RATCHET: { name: string; pattern: RegExp; baseline: number }[] = [
      the merged copy work (posture 4, regime 0, bounded 0, stance 0). The
      homepage and its components are not rendered here, so a wording fix there
      does not move these numbers — only work on the counted surfaces does. */
-  { name: "posture", pattern: /\bposture\b/gi, baseline: 4 },
+  /* 2026-10-08: posture 4 → 6 and board 10 → 11 without a word added to the site.
+     2026-10-25: posture lowered 6 → 1 after cleaning up template titles, link labels
+     and descriptions across /resources and /answers. */
+  { name: "posture", pattern: /\bposture\b/gi, baseline: 1 },
   { name: "regime", pattern: /\bregime\b/gi, baseline: 0 },
   { name: "corridor", pattern: /\bcorridor\b/gi, baseline: 0 },
   { name: "cadence", pattern: /\bcadence\b/gi, baseline: 0 },
@@ -127,7 +169,7 @@ const RATCHET: { name: string; pattern: RegExp; baseline: number }[] = [
   { name: "bounded", pattern: /\bbounded\b/gi, baseline: 0 },
   { name: "stance", pattern: /\bstance\b/gi, baseline: 0 },
   { name: "flip", pattern: /\bflips?\b/gi, baseline: 0 },
-  { name: "board", pattern: /\bboard\b/gi, baseline: 10 },
+  { name: "board", pattern: /\bboard\b/gi, baseline: 11 },
   /* "The call" did three jobs — the recommendation, the market state and the line between
      states — and was retired on 2026-09-23 for "guidance", "conditions" and "the change line"
      (lib/report/AGENTS.md). Counted in those senses only, so the verb ("call for") and a
@@ -196,18 +238,53 @@ const routeSurfaces: Surface[] = [
       return visibleText(renderToStaticMarkup(await page.default({ params })));
     },
   })),
-  { name: "/pricing", text: async () => visibleText(renderToStaticMarkup((await import("../app/pricing/page")).default())) },
   { name: "/about", text: async () => visibleText(renderToStaticMarkup((await import("../app/about/page")).default())) },
   { name: "/contact", text: async () => visibleText(renderToStaticMarkup((await import("../app/contact/page")).default())) },
   { name: "/privacy", text: async () => visibleText(renderToStaticMarkup((await import("../app/privacy/page")).default())) },
-  { name: "/resources", text: async () => visibleText(renderToStaticMarkup((await import("../app/resources/page")).default())) },
+  { name: "/resources", text: async () => visibleText(renderToStaticMarkup(await (await import("../app/resources/page")).default({}))) },
   { name: "/calibration", text: async () => visibleText(renderToStaticMarkup((await import("../app/calibration/page")).default())) },
   { name: "/concepts", text: async () => visibleText(renderToStaticMarkup((await import("../app/concepts/page")).default())) },
   { name: "/api-docs", text: async () => visibleText(renderToStaticMarkup((await import("../app/api-docs/page")).default())) },
   { name: "/404", text: async () => visibleText(renderToStaticMarkup((await import("../app/not-found")).default())) },
   {
     name: "/resources/decision-shield-overview",
-    text: async () => visibleText(renderToStaticMarkup((await import("../app/resources/decision-shield-overview/page")).default())),
+    text: async () => visibleText(renderToStaticMarkup(await (await import("../app/resources/decision-shield-overview/page")).default())),
+  },
+  /* The homepage suspends at its data boundary here, so its components render on their own. */
+  {
+    name: "/ conditions chart",
+    text: () =>
+      visibleText(
+        renderToStaticMarkup(
+          <RegimeRadar tightness={90} riskAppetite={49} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="SCARCITY" />,
+        ),
+      ),
+  },
+  {
+    name: "/ decision picker",
+    text: () =>
+      visibleText(
+        renderToStaticMarkup(
+          <DecisionPicker
+            options={decisionAreaOrder.map((area) => ({ area, rule: "Rule", pause: undefined, resume: undefined }))}
+            regime="SCARCITY"
+           
+          />,
+        ),
+      ),
+  },
+  {
+    name: "/ legend, stage and runway, alert",
+    text: () =>
+      visibleText(
+        renderToStaticMarkup(
+          <>
+            <ConditionsLegend thresholds={{ tightnessRegime: 70, riskAppetiteRegime: 50 }} currentRegime="SCARCITY" />
+            <CompanyCalibration stageLabel="Series A" activeStage="series-a" />
+            <AlertSection />
+          </>,
+        ),
+      ),
   },
   /* One query reaching the role-and-stage and toolkit entries, whose title and summary named the old hub. */
   { name: "/search?q=guides toolkits", text: () => visibleText(renderToStaticMarkup(<SearchResults initialQuery="guides toolkits" />)) },
@@ -387,7 +464,12 @@ describe("reader vocabulary", () => {
     );
     const summary = RATCHET.map((rule) => `${rule.name} ${totals.get(rule.name) ?? 0}/${rule.baseline}`).join(", ");
     if (process.env.WHETHER_VOCABULARY_REPORT) console.log(`[reader-vocabulary] ${summary}\n${perSurface.join("\n")}`);
-    assert.deepEqual(rose, [], `\nratcheted words rose:\n${rose.join("\n")}\n(${summary})\n`);
+    assert.deepEqual(
+      rose,
+      [],
+      `\nratcheted words rose:\n${rose.join("\n")}\n(${summary})\n` +
+        "WHETHER_VOCABULARY_REPORT=1 bun run test tests/readerVocabulary.test.tsx lists each surface's count.\n",
+    );
   });
 
   /*

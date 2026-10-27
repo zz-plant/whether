@@ -13,7 +13,7 @@ describe("home route render contract", () => {
       "the call must precede its secondary horizon control",
     );
     assert.ok(
-      source.indexOf("<CadenceSelector") < source.indexOf("<WhatChangedSection"),
+      source.indexOf("<CadenceSelector") < source.indexOf("<CompanyCalibration"),
       "the horizon stays beside the call, before the evidence sections",
     );
     const header = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
@@ -34,44 +34,70 @@ describe("home route render contract", () => {
     assert.ok(source.includes('id="weekly-call"'), "the call region still anchors the page");
   });
 
-  it("keeps the active / route carrying the homepage decision contract", () => {
-    /* The hero was unpacked into the five sections a reader asks for, in that
-       order, on 2026-09-22: the call, what changed, what it changes by area,
-       what would change the call, and what to do. The rule this case has always
-       carried is unchanged — each thing is stated once, by the surface that
-       owns it — so the assertions follow the content to its new owners.
-
-       A source read, and it has to be: the claim is about which file mounts
-       what, and this page suspends at its data boundary in this suite. */
+  /*
+   * The order (2026-10-22): the verdict, the five areas, whose lines they are,
+   * what the conditions are made of, what changed, what would change the
+   * guidance, how unusual this is, the alert, and the closing share line. It
+   * follows the four questions a reader arrives with — what is happening, what
+   * do I do, what would change it, how far can I trust it — and keeps the plan
+   * before the evidence.
+   *
+   * A source read, and it has to be: the claim is about which file mounts what, in
+   * what order, and this page suspends at its data boundary in this suite.
+   */
+  it("mounts the homepage's sections once each, in the reader's order", () => {
     const routeSource = readFileSync("app/page.tsx", "utf8");
-
-    for (const section of [
+    const order = [
+      "<DecisionHero",
+      "<DecisionPicker",
+      "<CompanyCalibration",
+      "<WhyConditionsSection",
       "<WhatChangedSection",
-      "<WhatItChangesSection",
       "<WhatWouldChangeSection",
-      "<DoAndShareSection",
-    ]) {
+      "<RecordSection",
+      "<AlertSection",
+      "<ShareLinks",
+    ];
+    for (const section of order) {
       assert.equal(routeSource.split(section).length - 1, 1, `${section} is mounted exactly once`);
     }
+    const positions = order.map((tag) => routeSource.indexOf(tag));
+    assert.deepEqual([...positions].sort((a, b) => a - b), positions, "the sections read in the reader's order");
+    assert.ok(routeSource.indexOf("<AllAreaRules") > routeSource.indexOf("<DecisionPicker"), "all five areas fold under the picker");
+    assert.ok(routeSource.indexOf("<AllAreaRules") < routeSource.indexOf("<WhatWouldChangeSection"));
+    for (const retired of ["<WhatItChangesSection", "<DoAndShareSection", "<FirstVisitExplainer", "offersFirstVisitFold"]) {
+      assert.ok(!routeSource.includes(retired), `${retired} has no place on /`);
+    }
 
-    // The order in the document is the order of the questions.
-    const order = ["<DecisionHero", "<WhatChangedSection", "<WhatItChangesSection", "<WhatWouldChangeSection", "<DoAndShareSection"]
-      .map((tag) => routeSource.indexOf(tag));
-    assert.deepEqual([...order].sort((a, b) => a - b), order, "the sections read in the reader's order");
-    // CSS must not reverse that reading order for sighted phone users.
-    const changedSource = readFileSync("app/components/home/WhatChangedSection.tsx", "utf8");
-    const consequencesSource = readFileSync("app/components/home/WhatItChangesSection.tsx", "utf8");
-    assert.match(changedSource, /className="order-2"/);
-    assert.match(consequencesSource, /className="order-3"/);
+    // CSS must not reorder what the document says: no section carries an order class.
+    for (const file of ["WhatChangedSection", "WhatWouldChangeSection", "DecisionPicker", "AlertSection", "RecordSection", "ShareLinks"]) {
+      const source = readFileSync(`app/components/home/${file}.tsx`, "utf8");
+      assert.doesNotMatch(source, /className="[^"]*\border-\d/, `${file} carries an order class`);
+    }
 
-    // The hero is the state tier and nothing else: every number it used to
-    // carry is a section's now, so it takes no score props at all.
+    // The hero is the state tier: every number it used to carry is a section's now.
     const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
     for (const prop of ["tightness", "riskAppetite", "boldnessScore", "signalData", "boundedConditions"]) {
       assert.ok(!heroSource.includes(`${prop}?:`), `the hero no longer takes ${prop}`);
     }
     assert.ok(!routeSource.includes("<DeltaTrustStrip"), "trust is the one strip under the call, not a duplicate summary card");
     assert.ok(!routeSource.includes("<FlipMeter"), "what would change the call is a section, not a barometer card");
+  });
+
+  it("gives the section headings in that order, from one table", async () => {
+    const { HOME_SECTIONS } = await import("../lib/report/home/homeSectionModel");
+    assert.deepEqual(
+      [HOME_SECTIONS.areas, HOME_SECTIONS.watch, HOME_SECTIONS.changed, HOME_SECTIONS.record, HOME_SECTIONS.alert].map(
+        (section) => section.heading,
+      ),
+      [
+        "Your decisions this week",
+        "What would change this guidance",
+        "What changed this week",
+        "How unusual is this?",
+        "Get notified when something changes",
+      ],
+    );
   });
 
   it("keeps one canonical copy action in the homepage body", () => {
@@ -81,7 +107,7 @@ describe("home route render contract", () => {
     // This used to assert against `ThreeWhethersCard`, which 69221739 stopped rendering and
     // which is now deleted. The DD-005 rule it protected is unchanged, so it moves to the
     // one other body surface that carries a copy control: the non-weekly cadence lead.
-    const actSource = readFileSync("app/components/home/DoAndShareSection.tsx", "utf8");
+    const actSource = readFileSync("app/components/home/ShareLinks.tsx", "utf8");
     const cadenceSource = readFileSync("app/components/CadenceCallCard.tsx", "utf8");
 
     // It sits directly under the call card (2026-09-30): on the first screen,
@@ -92,9 +118,6 @@ describe("home route render contract", () => {
     const heroIndex = routeSource.indexOf("<DecisionHero");
     const copyIndex = routeSource.indexOf("<ShareBriefButton");
     assert.ok(heroIndex > -1 && copyIndex > heroIndex, "Copy Brief follows the call card");
-    // It folds with the brief on a first visit, where the decision picker takes its place.
-    const copyRow = routeSource.slice(routeSource.lastIndexOf("<div", copyIndex), copyIndex);
-    assert.match(copyRow, /data-first-visit-collapsible=\{offersFirstVisitFold/, "Copy Brief folds on a first visit");
     assert.ok(!actSource.includes("<ShareBriefButton"), "the act section does not repeat it");
     const heroSource = readFileSync("app/components/DecisionHero.tsx", "utf8");
     assert.ok(!heroSource.includes("<ShareBriefButton"), "no copy action inside the screenshot card");
@@ -147,9 +170,9 @@ describe("home route render contract", () => {
     assert.ok(!routeSource.includes("<StageSwitcher"), "the interpretation-layer switch is gone from /");
     assert.ok(!routeSource.includes("<ViewSelector"), "the view selector is gone from /");
 
-    // Demoted hubs stay reachable on demand: the command palette mounts every
-    // IA navigation layer and its own history shortcut.
-    assert.ok(paletteSource.includes("loopNavigationLayers"), "command palette mounts the IA navigation layers");
+    // Every group and page stays reachable on demand: the command palette mounts
+    // the IA's groups and pages and its own history shortcut.
+    assert.ok(paletteSource.includes("navigationGroups") && paletteSource.includes("navigationPages"), "command palette mounts the IA groups and pages");
     assert.ok(paletteSource.includes('navigateTo("/history")'), "command palette keeps the history deep link");
   });
 
@@ -180,18 +203,18 @@ describe("home route render contract", () => {
       /<div [^>]*className="[^"]*\bsm:hidden\b[^"]*"[^>]*>\s*<StageDropdownPill \/>\s*<RunwayDropdownPill \/>/,
       "the header keeps the phone pills, and only there",
     );
-    const consequencesSource = readFileSync("app/components/home/WhatItChangesSection.tsx", "utf8");
+    const calibrationSource = readFileSync("app/components/home/CompanyCalibration.tsx", "utf8");
     assert.match(
-      consequencesSource,
-      /<div className="hidden sm:(?:flex|grid)[^"]*">\s*<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
-      "the sm+ tablists sit with the rules they reshape",
+      calibrationSource,
+      /<details className="group hidden sm:block[^"]*"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
+      "the sm+ tablists lead the areas they reshape, folded under the line that names them",
     );
     assert.ok(!routeSource.includes("<RunwayDropdownPill"), "<RunwayDropdownPill has no render site on /");
-    const explainerSource = readFileSync("app/components/homeFirstRunOrientation.tsx", "utf8");
-    assert.ok(!explainerSource.includes("OPERATOR_STAGE_OPTIONS"), "the first-run line no longer asks the stage a third time");
+    const explainerSource = readFileSync("app/components/home/ConditionsLegend.tsx", "utf8");
+    assert.ok(!explainerSource.includes("OPERATOR_STAGE_OPTIONS"), "the legend does not ask the stage a third time");
 
-    // One planning CTA: the pill in the act section.
-    assert.equal(routeSource.split("<DoAndShareSection").length - 1, 1);
+    // One planning CTA: the button that closes the areas section.
+    assert.equal(routeSource.split("Build this week’s plan →").length - 1, 1);
     assert.ok(!routeSource.includes("Open in Planning"), "no second plan CTA above the handoff");
 
     // The record date prints once, in the hero's trust line.

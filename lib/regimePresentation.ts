@@ -1,3 +1,4 @@
+import { Cloud, CloudLightning, Snowflake, Sun, type LucideIcon } from "lucide-react";
 import type { RegimeKey } from "./regimeEngine";
 
 export const REGIME_ORDER: readonly RegimeKey[] = [
@@ -12,6 +13,21 @@ export const REGIME_LABELS: Record<RegimeKey, string> = {
   DEFENSIVE: "Cloudy",
   VOLATILE: "Stormy",
   EXPANSION: "Sunny",
+};
+
+/**
+ * The weather word drawn: one glyph per condition, printed beside the word and
+ * never in place of it (`ConditionIcon`, app/components/ui/conceptIcons.tsx).
+ * The word was the only mark, and on `/history` the band and its legend told
+ * Sunny, Cloudy and Freezing apart by colour alone. The abstract strokes of
+ * `RegimeGlyph` drew one condition once, on the hero's stamp; these are the
+ * weather the words already name.
+ */
+export const REGIME_ICONS: Record<RegimeKey, LucideIcon> = {
+  SCARCITY: Snowflake,
+  DEFENSIVE: Cloud,
+  VOLATILE: CloudLightning,
+  EXPANSION: Sun,
 };
 
 // One table. SHORT, LEGEND, WEATHER and PUBLIC were four byte-identical literals
@@ -34,9 +50,27 @@ const REGIME_LEGEND_LABELS: Record<RegimeKey, string> = REGIME_LABELS;
 export const REGIME_WEATHER_RATIONALES: Record<RegimeKey, string> = {
   SCARCITY: "Money is expensive and hard to raise.",
   DEFENSIVE: "Money is available but pricey.",
-  VOLATILE: "Conditions are changing week to week.",
+  /* Stormy is cheap money and wary investors (below both change lines). It read
+     "Conditions are changing week to week" until 2026-10-21, a leftover of the
+     engine key's name that described neither score; every other surface said
+     what the quadrant measures. */
+  VOLATILE: "Money is cheap but investors are wary.",
   EXPANSION: "Money is cheap and available.",
 };
+
+/**
+ * What each side of the two change lines means in money terms, for a reader who
+ * has not learned the scores: above the funding-pressure line money is pricey,
+ * above the risk-appetite line investors are willing. The conditions legend
+ * builds each condition's meaning from these, and the conditions chart labels
+ * its axes with them, so the two cannot drift apart.
+ */
+export const CONDITION_SIDE_MEANINGS = {
+  pressureAbove: "pricey money",
+  pressureBelow: "cheap money",
+  appetiteAbove: "willing investors",
+  appetiteBelow: "wary investors",
+} as const;
 
 /* The same sentence, led by the weather word, for the legend's screen-reader label. */
 const REGIME_LEGEND_ARIA_LABELS: Record<RegimeKey, string> = {
@@ -71,57 +105,43 @@ export const REGIME_SEVERITY_RANK: Record<RegimeKey, number> = {
   SCARCITY: 3,
 };
 
+/**
+ * A condition as Tailwind classes, for markup that names a regime without a
+ * `data-regime` attribute. Every class reads the condition utilities in
+ * app/styles/tokens.css (`bg-condition-*` is the fill, `text-condition-*-ink`
+ * the text colour), never a stock hue: until 2026-10-09 these were emerald,
+ * amber, violet and rose, the same ramps the line states and the warnings use,
+ * so a Sunny marker and a "copied" tick were one green.
+ */
 export const REGIME_STYLE_TOKENS: Record<
   RegimeKey,
   {
     marker: string;
     badge: string;
     accent: {
-      panel: string;
-      dot: string;
       text: string;
     };
   }
 > = {
   SCARCITY: {
-    marker: "bg-rose-400",
-    badge: "border-rose-500/60 bg-rose-500/15 text-rose-100",
-    accent: {
-      panel: "from-rose-600/20 via-rose-500/10 to-transparent border-rose-500/40",
-      dot: "bg-rose-500",
-      text: "text-rose-200",
-    },
+    marker: "bg-condition-freezing",
+    badge: "border-condition-freezing/60 bg-condition-freezing/15 text-condition-freezing-ink",
+    accent: { text: "text-condition-freezing-ink" },
   },
   DEFENSIVE: {
-    marker: "bg-amber-400",
-    badge: "border-amber-400/60 bg-amber-400/15 text-amber-100",
-    accent: {
-      panel: "from-amber-500/20 via-amber-400/10 to-transparent border-amber-400/40",
-      dot: "bg-amber-400",
-      text: "text-amber-200",
-    },
+    marker: "bg-condition-cloudy",
+    badge: "border-condition-cloudy/60 bg-condition-cloudy/15 text-condition-cloudy-ink",
+    accent: { text: "text-condition-cloudy-ink" },
   },
   VOLATILE: {
-    // Violet across the board, matching REGIME_HEX_COLORS. The marker was
-    // already indigo while the badge and panel were sky, so one regime drew
-    // in two hues — and sky is the action accent, so a Stormy badge read as
-    // a button.
-    marker: "bg-violet-400",
-    badge: "border-violet-400/60 bg-violet-400/15 text-violet-100",
-    accent: {
-      panel: "from-violet-500/20 via-violet-400/10 to-transparent border-violet-400/40",
-      dot: "bg-violet-400",
-      text: "text-violet-200",
-    },
+    marker: "bg-condition-stormy",
+    badge: "border-condition-stormy/60 bg-condition-stormy/15 text-condition-stormy-ink",
+    accent: { text: "text-condition-stormy-ink" },
   },
   EXPANSION: {
-    marker: "bg-emerald-400",
-    badge: "border-emerald-400/60 bg-emerald-400/15 text-emerald-100",
-    accent: {
-      panel: "from-emerald-500/20 via-emerald-400/10 to-transparent border-emerald-400/40",
-      dot: "bg-emerald-400",
-      text: "text-emerald-200",
-    },
+    marker: "bg-condition-sunny",
+    badge: "border-condition-sunny/60 bg-condition-sunny/15 text-condition-sunny-ink",
+    accent: { text: "text-condition-sunny-ink" },
   },
 };
 

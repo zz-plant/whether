@@ -8,7 +8,21 @@ import {
 import { agentApiCorsHeaders } from "../../../lib/agentApiCors";
 import { buildAgentStateResponse } from "../../../lib/agentState";
 import { buildJevHandoff } from "../../../lib/jev/jevHandoff";
+import { DECISION_MODELS, isDecisionModel } from "../../../lib/jev/jevClient";
 import { buildUseConstraint } from "../../../lib/report/useConstraint";
+import {
+  findPublishedBrief,
+  getPublishedBriefs,
+  publishedBriefDisplay,
+  publishedBriefHeadline,
+  buildPublishedBriefPath,
+} from "../../../lib/report/publishedBriefs";
+import {
+  findPostureArchivePeriod,
+  getPostureArchivePeriods,
+  buildPostureArchivePath,
+} from "../../../lib/summary/postureArchive";
+import { buildCanonicalUrl } from "../../../lib/seo";
 
 export const runtime = "edge";
 export const revalidate = 0;
@@ -17,15 +31,87 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const requestedCadence = searchParams.get("cadence") ?? "weekly";
+  const weekParam = searchParams.get("week");
+  const periodParam = searchParams.get("period");
   const format = searchParams.get("format");
+  const model = searchParams.get("model") ?? "jev";
+  const input = searchParams.get("input") ?? "text";
   // The views are the manifest's (`lib/agent/discovery.ts`), so it cannot list one this refuses.
   const view = searchParams.get("view") ?? DEFAULT_AGENT_VIEW;
+
+  if (weekParam) {
+    const brief = findPublishedBrief(weekParam.toLowerCase());
+    if (!brief) {
+      return NextResponse.json(
+        {
+          error: "Published brief not found for the requested week.",
+          requestedWeek: weekParam,
+          availableWeeks: getPublishedBriefs().map((b) => b.slug),
+        },
+        { status: 404, headers: agentApiCorsHeaders },
+      );
+    }
+    const display = publishedBriefDisplay(brief);
+    return NextResponse.json(
+      {
+        type: "published_brief",
+        slug: brief.slug,
+        year: brief.year,
+        week: brief.week,
+        publishedAt: brief.publishedAt,
+        recordDate: brief.recordDate,
+        recordDateLabel: brief.recordDateLabel,
+        headline: publishedBriefHeadline(brief).composed,
+        actionNow: brief.actionNow,
+        regime: brief.regime,
+        conditions: display.conditions,
+        confidence: { label: brief.confidenceLabel },
+        scores: brief.scores ?? null,
+        whatChanged: display.whatChanged,
+        pauseIf: display.pauseIf,
+        conditionsChangeIf: display.conditionsChangeIf,
+        decisions: brief.decisions,
+        evidence: brief.evidence,
+        sourceLabel: brief.sourceLabel,
+        permalink: buildCanonicalUrl(buildPublishedBriefPath(brief.slug)),
+        use: buildUseConstraint(),
+      },
+      { headers: agentApiCorsHeaders },
+    );
+  }
+
+  if (periodParam) {
+    const archivePeriod = findPostureArchivePeriod(periodParam.toLowerCase());
+    if (!archivePeriod) {
+      return NextResponse.json(
+        {
+          error: "Archive period not found for the requested period.",
+          requestedPeriod: periodParam,
+          availablePeriods: getPostureArchivePeriods().map((p) => p.slug),
+        },
+        { status: 404, headers: agentApiCorsHeaders },
+      );
+    }
+    return NextResponse.json(
+      {
+        type: "posture_archive_period",
+        ...archivePeriod,
+        permalink: buildCanonicalUrl(buildPostureArchivePath(archivePeriod.slug)),
+        use: buildUseConstraint(),
+      },
+      { headers: agentApiCorsHeaders },
+    );
+  }
 
   if (format !== null && format !== "jev") {
     return NextResponse.json(
       { error: "Invalid format.", allowedFormats: ["jev"] },
       { status: 400, headers: agentApiCorsHeaders },
     );
+  }
+
+  if (format === "jev" && (!isDecisionModel(model) || !["text", "audio", "video"].includes(input) || (input !== "text" && model !== "clef-omni"))) {
+    return NextResponse.json({ error: "Invalid decision model or input. Audio/video require clef-omni.", allowedModels: Object.keys(DECISION_MODELS), allowedInputs: ["text", "audio", "video"] }, { status: 400, headers: agentApiCorsHeaders });
   }
 
   if (!AGENT_VIEWS.some((allowed) => allowed === view)) {
@@ -71,11 +157,13 @@ export async function GET(request: Request) {
     route: "/api/agent",
   });
 
-  if (format === "jev") {
+  if (format === "jev" && isDecisionModel(model) && (input === "text" || input === "audio" || input === "video")) {
     const handoff = buildJevHandoff({
       payload: payload.agentHandoff.payload,
       publishReadiness: payload.publishReadiness,
       recordDateLabel: payload.recordDateLabel,
+      model,
+      input,
     });
     return NextResponse.json({ ...handoff, cadence: payload.cadence, use: buildUseConstraint() }, {
       headers: agentApiCorsHeaders,

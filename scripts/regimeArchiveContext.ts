@@ -4,9 +4,11 @@
  * The generators walk history sequentially, so they can supply what a
  * point-in-time `evaluateRegime` call cannot: the machine snapshot threaded
  * forward (flips confirm through the gate), the trailing base-rate window the
- * tightening-speed term reads, and the period's VIX reading that drives the
- * shock haircut and the market-stress veto. Each generator fetches the series
- * once per run and slices per period here.
+ * tightening-speed term reads, the period's VIX reading that drives the
+ * shock haircut and the market-stress veto, and the Chicago Fed financial
+ * conditions index (the record basis's two market inputs,
+ * `RECORD_BASIS_MARKET_INPUTS`). Each generator fetches the series once per run
+ * and slices per period here.
  *
  * Everything the three generators shared lives here once: the series fetch,
  * the coverage check, the record-date search, the Treasury snapshot, the
@@ -17,7 +19,7 @@ import { execFileSync } from "node:child_process";
 import type { MacroSeriesReading, TreasuryData } from "../lib/types";
 import { FRED_BASE_URL, isMissingFredValue } from "../lib/fred";
 import { resolveBaseRateVelocityPair, type RegimeAssessment } from "../lib/regimeEngine";
-import { buildReplayVixReading, replayRegimeWalk } from "../lib/timeMachine/regimeReplay";
+import { buildReplayChicagoFciReading, buildReplayVixReading, replayRegimeWalk } from "../lib/timeMachine/regimeReplay";
 
 export type SeriesPoint = { date: string; time: number; value: number | null };
 export type SeriesDataset = { points: SeriesPoint[]; map: Map<string, number> };
@@ -150,6 +152,42 @@ export const resolveBaseRateVelocityWindow = (
 
 export type VixReading = MacroSeriesReading;
 
+/*
+ * The Chicago Fed index is weekly: each observation is dated the Friday its week
+ * ends and published the following Wednesday, so on a given day the newest value
+ * a reader could have seen is dated at least five days back. A period takes the
+ * last observation dated five or more days before it, as the live read would have
+ * had it, not the one published after the period closed. Twenty-one days past
+ * that is three missed releases, and then the period has no reading. The stored
+ * history is every observation a reader had in the 60 days before, so a weekly
+ * replay can rebuild the series from the month-end entries alone.
+ */
+const CHICAGO_FCI_PUBLICATION_LAG_DAYS = 5;
+const CHICAGO_FCI_STALE_AFTER_DAYS = 21;
+const CHICAGO_FCI_HISTORY_DAYS = 60;
+
+/**
+ * The period's Chicago Fed financial conditions reading, or null when the
+ * series has no observation a reader would have had. A holiday or a revision
+ * gap sits in the series as a null placeholder (`isMissingFredValue`) and is
+ * skipped, never read as a zero.
+ */
+export const resolveChicagoFciReading = (
+  dataset: SeriesDataset,
+  asOfTime: number,
+  fetchedAt: string,
+): MacroSeriesReading | null => {
+  const publishedBy = asOfTime - CHICAGO_FCI_PUBLICATION_LAG_DAYS * MS_PER_DAY;
+  const latest = getLatestValidDate(dataset.points.filter((point) => point.time <= publishedBy));
+  if (!latest || publishedBy - latest.time > CHICAGO_FCI_STALE_AFTER_DAYS * MS_PER_DAY) {
+    return null;
+  }
+  const history = dataset.points
+    .filter((point) => point.time <= publishedBy && point.time >= publishedBy - CHICAGO_FCI_HISTORY_DAYS * MS_PER_DAY)
+    .map((point) => ({ date: point.date, value: point.value }));
+  return buildReplayChicagoFciReading({ value: latest.value, recordDate: latest.date, fetchedAt, history });
+};
+
 /**
  * The period's VIX reading, or null when the series could not be fetched or has
  * no observation for the period. Null is the honest absence: the engine then
@@ -204,14 +242,18 @@ const SERIES_SOURCE_URLS = {
 export type TreasuryDatasets = Record<keyof typeof SERIES_CATALOG, SeriesDataset>;
 
 /**
- * Fetch the four Treasury series and VIX for one run. Volatility drives the
- * shock haircut and the market-stress veto, so the replay needs it, but it is
- * not a yield: unavailable means the replay proceeds without it, with a
- * warning, never a crash.
+ * Fetch the four Treasury series, VIX and the Chicago Fed index for one run.
+ * Volatility drives the shock haircut and the market-stress veto, so the replay
+ * needs it, but it is not a yield: unavailable means the replay proceeds
+ * without it, with a warning, never a crash. The Chicago Fed index has no such
+ * allowance: it is on the record basis since engine-2026-10-09b, and an archive
+ * written without it would be scored on a different basis from the live call,
+ * so a failed fetch fails the run before anything is written.
  */
 export const fetchArchiveDatasets = async (): Promise<{
   datasets: TreasuryDatasets;
   vixDataset: SeriesDataset | null;
+  chicagoFciDataset: SeriesDataset;
 }> => {
   const datasets = {
     oneMonth: await fetchSeries(SERIES_CATALOG.oneMonth),
@@ -227,7 +269,8 @@ export const fetchArchiveDatasets = async (): Promise<{
       `VIX series unavailable (${error instanceof Error ? error.message : String(error)}); replaying without the market-stress adjustments.`,
     );
   }
-  return { datasets, vixDataset };
+  const chicagoFciDataset = await fetchSeries("NFCI");
+  return { datasets, vixDataset, chicagoFciDataset };
 };
 
 /**
@@ -346,6 +389,7 @@ export type ArchivePeriodReading<Period> = {
   asOfTime: number;
   treasury: TreasuryData;
   vixReading: MacroSeriesReading | null;
+  chicagoFciReading: MacroSeriesReading | null;
   assessment: RegimeAssessment;
 };
 
@@ -363,6 +407,7 @@ export const replayArchivePeriods = <Period extends { asOf: string }>({
   periods,
   datasets,
   vixDataset,
+  chicagoFciDataset,
   fetchedAt,
   coverage,
   checkRecordDate,
@@ -370,6 +415,7 @@ export const replayArchivePeriods = <Period extends { asOf: string }>({
   periods: readonly Period[];
   datasets: TreasuryDatasets;
   vixDataset: SeriesDataset | null;
+  chicagoFciDataset: SeriesDataset;
   fetchedAt: string;
   coverage: CoverageRule;
   /** Return an error message when the record date does not belong to the period. */
@@ -389,12 +435,14 @@ export const replayArchivePeriods = <Period extends { asOf: string }>({
     }
     const treasury = buildTreasurySnapshot(recordDate, fetchedAt, datasets);
     const vixReading = resolveVixReading(vixDataset, recordDate, asOfTime, fetchedAt);
+    const chicagoFciReading = resolveChicagoFciReading(chicagoFciDataset, asOfTime, fetchedAt);
     return {
       period,
       asOfTime,
       treasury,
       vixReading,
-      macroSeries: vixReading ? [vixReading] : [],
+      chicagoFciReading,
+      macroSeries: [vixReading, chicagoFciReading].filter((reading): reading is MacroSeriesReading => reading !== null),
       baseRateHistory: resolveBaseRateWindow(datasets.oneMonth, recordDate, asOfTime),
     };
   });
@@ -404,6 +452,7 @@ export const replayArchivePeriods = <Period extends { asOf: string }>({
     asOfTime: step.asOfTime,
     treasury: step.treasury,
     vixReading: step.vixReading,
+    chicagoFciReading: step.chicagoFciReading,
     assessment,
   }));
 };

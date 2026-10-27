@@ -5,6 +5,7 @@ import {
   RUNWAY_BAND_OPTIONS,
   type RunwayBand,
 } from "../../lib/report/operatorRunway";
+import { choiceSublabel } from "../../lib/report/operatorStage";
 import { persistOperatorRunway } from "./useOperatorRunway";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 
@@ -35,7 +36,7 @@ export function RunwayPersonaSelector({
   const options: readonly SegmentedOption<RunwayBand>[] = RUNWAY_BAND_OPTIONS.map((option) => ({
     key: option.key,
     label: option.label,
-    sublabel: option.sublabel,
+    sublabel: choiceSublabel(option.sublabel, option.key === DEFAULT_RUNWAY_BAND),
     title: `Tailor operating rules for ${option.label} cash runway (${option.sublabel})`,
   }));
 
@@ -56,6 +57,8 @@ export function RunwayPersonaSelector({
         value={selected}
         onSelect={handleSelectRunway}
         ariaLabel="Cash runway band"
+        ordinal
+        stackSublabel
       />
     </div>
   );

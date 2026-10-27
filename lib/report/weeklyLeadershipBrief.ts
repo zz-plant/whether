@@ -24,8 +24,15 @@ type WeeklyLeadershipBriefInputs = {
 const clamp = (value: number, min: number, max: number) =>
   Math.min(max, Math.max(min, value));
 
+/** Risk appetite's share of operating latitude; the rest is the inverse of funding pressure. */
+export const OPERATING_LATITUDE_RISK_WEIGHT = 0.7;
+
 export const buildBoldnessScore = (tightness: number, riskAppetite: number) =>
-  clamp(Math.round(riskAppetite * 0.7 + (100 - tightness) * 0.3), 0, 100);
+  clamp(
+    Math.round(riskAppetite * OPERATING_LATITUDE_RISK_WEIGHT + (100 - tightness) * (1 - OPERATING_LATITUDE_RISK_WEIGHT)),
+    0,
+    100,
+  );
 
 export const toTrendLabel = (delta: number): TrendLabel => {
   if (delta >= 2) {

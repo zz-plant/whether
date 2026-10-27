@@ -16,7 +16,7 @@ const payload: MeetingSlidePayload = {
   stageLabel: "Series A",
   actionNow: "Freeze non-revenue hires & put every commitment behind a second signoff.",
   pauseIf: "Cash gate: hold every new commitment <whatever> the macro corridor says.",
-  callChangesIf: "Funding pressure at or below 70 (83 today) changes conditions.",
+  callChangesIf: "Funding pressure falls 13 pts from 83 to 70 or below.",
   resumeWhen: "Reverse the freeze only after runway extends past nine months → then re-open.",
   tightness: 83,
   riskAppetite: 40,
@@ -90,7 +90,7 @@ describe("board slide PPTX", () => {
     assert.match(slide, /1\. ACTION NOW/);
     assert.match(slide, /2\. PAUSE IF/);
     assert.match(slide, /3\. CONDITIONS CHANGE IF/);
-    assert.match(slide, /Funding pressure at or below 70/);
+    assert.match(slide, /Funding pressure falls 13 pts from 83 to 70 or below/);
     // The stage's resume line sits beside the change line, never in its card.
     assert.match(slide, /Resume when: Reverse the freeze only after runway extends/);
     assert.match(slide, /This week's guidance \(Series A\)/);
@@ -100,10 +100,13 @@ describe("board slide PPTX", () => {
     assert.match(slide, /hold every new commitment &lt;whatever&gt; the macro corridor/);
     assert.match(slide, /saved copy, not a live reading/);
     assert.doesNotMatch(slide, /<whatever>/);
-    // A defensive regime wears the rose badge; an easing one the emerald.
-    assert.match(slide, /F43F5E/);
+    // Each condition wears its own colour (REGIME_HEX_COLORS): the badge's edge
+    // is Freezing's frost blue here and Sunny's gold on an easing week. It was
+    // rose for Cloudy and Freezing and green for the rest, so Stormy wore Sunny's.
+    assert.match(slide, /<a:srgbClr val="3A6FA3"\/>/);
     const easing = readStoredZip(buildBoardSlidePptx({ ...payload, regime: "EXPANSION" })).get("ppt/slides/slide1.xml")?.content ?? "";
-    assert.doesNotMatch(easing, /F43F5E/);
+    assert.match(easing, /<a:srgbClr val="D9A82C"\/>/);
+    assert.doesNotMatch(easing, /3A6FA3/);
   });
 
   it("is byte-identical for the same week", () => {
@@ -140,5 +143,44 @@ describe("board slide route helpers", () => {
     assert.equal(isBoardSlideFormat("pdf"), true);
     assert.equal(isBoardSlideFormat("svg"), false);
     assert.equal(isBoardSlideFormat(null), false);
+  });
+});
+
+describe("board slide route handler", () => {
+  it("serves a board slide attachment for a specific published week", async () => {
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=2026-w41&format=pptx"));
+    assert.equal(res.status, 200);
+    assert.equal(res.headers.get("Content-Type"), "application/vnd.openxmlformats-officedocument.presentationml.presentation");
+    assert.match(res.headers.get("Content-Disposition") ?? "", /whether-board-slide-2026-10-06\.pptx/);
+  });
+
+  it("returns 404 for an unknown published week", async () => {
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=1999-w01&format=pptx"));
+    assert.equal(res.status, 404);
+  });
+
+  it("rejects a stage with a frozen week: the archive has no calibrated guidance to apply it to", async () => {
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=2026-w41&stage=seed&format=pptx"));
+    assert.equal(res.status, 400);
+    assert.match(await res.text(), /stage applies to the live week only/);
+  });
+
+  it("prints no scores for a brief archived before scores were stored, instead of inventing 50/50", async () => {
+    // 2026-w31 is the archive's real scoreless record: its slide must carry the
+    // honest line and none of the fabricated "50 of 100" readings.
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=2026-w31&format=pptx"));
+    assert.equal(res.status, 200);
+    const slide = readStoredZip(new Uint8Array(await res.arrayBuffer())).get("ppt/slides/slide1.xml")?.content ?? "";
+    assert.match(slide, /No scores were published with this brief\./);
+    assert.doesNotMatch(slide, /Funding pressure 50 of 100/);
+    assert.doesNotMatch(slide, /Risk appetite 50 of 100/);
   });
 });

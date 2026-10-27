@@ -1,7 +1,7 @@
 import type { CSSProperties, ReactElement } from "react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
-import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_BORDER } from "./ogTheme";
+import { GlyphMotif, OG_ACCENT, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY, OG_BORDER } from "./ogTheme";
 
 /**
  * Lens social images for the non-report routes.
@@ -11,17 +11,6 @@ import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_PANEL, OG_TEXT, OG
  * `ImageResponse` as PNG like every other template here.
  */
 export type StaticOgTemplate = "operations" | "signals" | "method" | "solutions" | "guides" | "reading" | "record" | "plain";
-
-const templateAccent: Record<StaticOgTemplate, string> = {
-  operations: "#22d3ee",
-  signals: "#38bdf8",
-  method: "#a78bfa",
-  solutions: "#34d399",
-  guides: "#f59e0b",
-  reading: "#fb923c",
-  record: "#94a3b8",
-  plain: "#38bdf8",
-};
 
 /*
  * The side panel says what kind of page was shared. These were "OPERATIONS LENS",
@@ -60,7 +49,7 @@ const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string
   reading: {
     label: "READING LIST",
     title: "Dated against the market",
-    body: "Each essay placed on the conditions of the month it came out.",
+    body: "Each text placed on the conditions of the month it came out.",
   },
   /* /history and its 82 periods. A closed period, so the panel says where the
      current reading lives instead of implying this is it. */
@@ -123,7 +112,10 @@ export const renderStaticOgImage = ({
   /** Drawn under the panel title: the share of each state in the period. */
   mix?: OgRegimeMix;
 }): ReactElement => {
-  const accent = accentOverride ?? templateAccent[template];
+  /* The ink, unless the card names a condition. Each template had a hue of its
+     own (cyan, sky, violet, green, amber, orange) until 2026-10-09: six colours
+     that named a kind of page, which is not something colour carries here. */
+  const accent = accentOverride ?? OG_ACCENT;
   /* Titles run from "Privacy" to a 65-character trust heading; at one size the
      long ones wrapped to four lines and ran into the footer. */
   const titleSize = title.length > 48 ? 44 : title.length > 30 ? 52 : 58;
@@ -146,7 +138,7 @@ export const renderStaticOgImage = ({
           <div style={{ display: "flex", fontSize: titleSize, fontWeight: 700, lineHeight: 1.08, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, color: OG_TEXT }}>
             {title}
           </div>
-          <div style={{ display: "flex", fontSize: 28, lineHeight: 1.35, color: "#cbd5e1", marginTop: 22 }}>
+          <div style={{ display: "flex", fontSize: 28, lineHeight: 1.35, color: OG_TEXT_SECONDARY, marginTop: 22 }}>
             {subtitle}
           </div>
         </div>
@@ -163,21 +155,21 @@ export const renderStaticOgImage = ({
             background: OG_PANEL,
           }}
         >
-          <div style={{ display: "flex", fontSize: 20, fontWeight: 600, letterSpacing: "0.12em", color: accent }}>
+          <div style={{ display: "flex", fontSize: 20, fontWeight: 600, letterSpacing: "0.12em", color: OG_TEXT_MUTED }}>
             {panel.label}
           </div>
-          <div style={{ display: "flex", fontSize: panelTitleSize, fontWeight: 700, lineHeight: 1.2, color: "#f8fafc", marginTop: 14 }}>
+          <div style={{ display: "flex", fontSize: panelTitleSize, fontWeight: 700, lineHeight: 1.2, color: OG_TEXT, marginTop: 14 }}>
             {panel.title}
           </div>
           {mix && mix.length > 0 ? <MixBar mix={mix} /> : null}
-          <div style={{ display: "flex", fontSize: 22, lineHeight: 1.4, color: "#94a3b8", marginTop: 14 }}>
+          <div style={{ display: "flex", fontSize: 22, lineHeight: 1.4, color: OG_TEXT_MUTED, marginTop: 14 }}>
             {panel.body}
           </div>
         </div>
         ) : null}
       </div>
 
-      <div style={{ display: "flex", fontSize: 22, color: "#64748b", marginTop: 28 }}>{kicker}</div>
+      <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED, marginTop: 28 }}>{kicker}</div>
     </div>
   );
 };

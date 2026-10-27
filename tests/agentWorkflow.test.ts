@@ -5,14 +5,10 @@ import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
 import {
-  buildCompactIndexSummary,
   buildDoctorReport,
   buildHandoffPacket,
-  buildPrewarmReport,
   buildRepoIndex,
   classifyTask,
-  classifyTaskWithLocalModel,
-  readRepoIndex,
   writeRepoIndex,
 } from "../scripts/agent-workflow-lib.mjs";
 
@@ -157,24 +153,121 @@ describe("agent workflow helpers", () => {
     assert.match(result.stdout, /Write scope/);
   });
 
-  it("parses positional tasks after boolean local routing flags", () => {
+  it("parses positional task words after the command", () => {
     const result = spawnSync(
       NODE_BIN,
-      [
-        SCRIPT_PATH,
-        "route",
-        "--local",
-        "--local-base-url",
-        "http://127.0.0.1:1/v1",
-        "--local-timeout-ms",
-        "25",
-        "improve subagent handoff and skill routing",
-      ],
+      [SCRIPT_PATH, "route", "improve subagent handoff and skill routing"],
       { encoding: "utf8" },
     );
 
     assert.equal(result.status, 0);
     assert.match(result.stdout, /Task profile: Skill or MCP workflow/);
+  });
+
+  /*
+   * Until 2026-10-27 the router named docs, targets and checks only, so a task that needed
+   * an advisory tool (no gate runs them) or a lessons file got neither.
+   */
+  it("routes a task to the specialised tool it needs, whatever profile wins", () => {
+    const cases: Array<{ task: string; command: string }> = [
+      { task: "find duplicated helper functions", command: "bun run audit:near-duplicates" },
+      { task: "is this telemetry stream dead", command: "bun run telemetry:streams" },
+      {
+        task: "change a brief format string",
+        command: "WHETHER_UPDATE_BRIEF_GOLDEN=1 bun run test tests/briefFormatsPinned.test.ts",
+      },
+      { task: "OG image font", command: "node scripts/generate-og-fonts.mjs" },
+    ];
+
+    for (const { task, command } of cases) {
+      const route = classifyTask(task);
+      assert.ok(
+        route.tools.some((tool) => tool.command === command),
+        `"${task}" should recommend ${command}; got ${route.tools.map((tool) => tool.command).join(", ") || "nothing"}`,
+      );
+    }
+
+    const printed = spawnSync(NODE_BIN, [SCRIPT_PATH, "route", "is this telemetry stream dead"], { encoding: "utf8" });
+    assert.equal(printed.status, 0);
+    assert.match(printed.stdout, /Specialised Tools:\n- bun run telemetry:streams — /);
+    assert.match(printed.stdout, /Read Before You Touch \(CLAUDE\.md\):\n- docs\/agents\/lessons\/toolchain-and-gates\.md/);
+  });
+
+  it("routes topics to lessons files from CLAUDE.md's table, which it reads rather than copies", () => {
+    const cases: Array<{ task: string; lesson: string }> = [
+      { task: "is this telemetry stream dead", lesson: "docs/agents/lessons/toolchain-and-gates.md" },
+      { task: "the Slack send failed on Monday", lesson: "docs/agents/lessons/automation-and-deploy-gate.md" },
+      { task: "reword the reader-facing strings on /trust", lesson: "docs/agents/lessons/tests-and-copy-rules.md" },
+      { task: "update the share OG metadata", lesson: "docs/agents/lessons/dead-features-and-honesty.md" },
+      { task: "change confidence in regimeEngineCore.ts", lesson: "docs/agents/lessons/regime-scoring.md" },
+      { task: "add a retry around a KV read", lesson: "docs/agents/lessons/runtime-helpers.md" },
+      { task: "choose a first file to read", lesson: "docs/agents/hot-files.md" },
+    ];
+    for (const { task, lesson } of cases) {
+      assert.ok(classifyTask(task).lessons.includes(lesson), `"${task}" should name ${lesson}`);
+    }
+
+    // Every file the table links exists, so a route never sends a reader to a missing page.
+    const claude = fs.readFileSync("CLAUDE.md", "utf8");
+    const section = claude.slice(claude.indexOf("## Read before you touch"), claude.indexOf("### Rules that catch changes here"));
+    const linked = [...section.matchAll(/\]\(([^)\s]+)\)/g)].map((match) => match[1]);
+    assert.ok(linked.length >= 7, `the lessons table no longer parses (${linked.length} links)`);
+    for (const file of linked) assert.ok(fs.existsSync(file ?? ""), `CLAUDE.md links a missing lessons file: ${file}`);
+
+    // A row added to the table is routed with no second edit.
+    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-lessons-"));
+    try {
+      fs.writeFileSync(
+        path.join(temporaryRoot, "CLAUDE.md"),
+        [
+          "## Read before you touch",
+          "",
+          "| Touching… | Read |",
+          "| --- | --- |",
+          '| a widget cache, "left, right" | [widgets](docs/widgets.md) |',
+          "",
+          "### Next section",
+          "| a widget | [not-this](docs/other.md) |",
+        ].join("\n"),
+      );
+      const lessonsFor = (task: string) => classifyTask(task, { repoRoot: temporaryRoot }).lessons;
+      // Plurals match, and every word of the phrase must appear.
+      assert.deepEqual(lessonsFor("evict the widget caches"), ["docs/widgets.md"]);
+      // A quoted topic is one phrase even with a comma in it.
+      assert.deepEqual(lessonsFor("left then right"), ["docs/widgets.md"]);
+      assert.deepEqual(lessonsFor("left only"), []);
+      // The table ends at the next heading.
+      assert.deepEqual(lessonsFor("a widget alone"), []);
+    } finally {
+      fs.rmSync(temporaryRoot, { recursive: true, force: true });
+    }
+  });
+
+  it("names only skills, scripts and files that exist", () => {
+    const { fileMap } = buildRepoIndex({ repoRoot: process.cwd() });
+    const packageJson: { scripts: Record<string, string> } = JSON.parse(fs.readFileSync("package.json", "utf8"));
+
+    for (const profile of [...fileMap.taskProfiles, classifyTask("")]) {
+      for (const skill of profile.skills) {
+        assert.ok(fs.existsSync(`.claude/skills/${skill}/SKILL.md`), `${profile.id} names a missing skill: ${skill}`);
+      }
+    }
+
+    assert.ok(fileMap.toolHints.length > 0);
+    for (const hint of fileMap.toolHints) {
+      // Leading VAR=value assignments set the environment; the program follows them.
+      const words = hint.command.split(/\s+/).filter((word) => !/^[A-Z_]+=/.test(word));
+      const [program, first] = words;
+      if (program === "bun" && first === "run") {
+        const script = words[2] ?? "";
+        assert.ok(packageJson.scripts[script], `${hint.id} runs a missing package script: ${script}`);
+      } else {
+        assert.ok(fs.existsSync(first ?? ""), `${hint.id} runs a missing file: ${first}`);
+      }
+      for (const file of words.filter((word) => /^(tests|scripts)\//.test(word))) {
+        assert.ok(fs.existsSync(file), `${hint.id} names a missing file: ${file}`);
+      }
+    }
   });
 
   it("builds and writes the repo index", () => {
@@ -186,125 +279,9 @@ describe("agent workflow helpers", () => {
       assert.ok(index.testMap.tests.includes("tests/agentWorkflow.test.ts"));
 
       const written = writeRepoIndex({ repoRoot: process.cwd(), outDir: temporaryRoot });
-      const loaded = readRepoIndex({ repoRoot: process.cwd(), outDir: temporaryRoot });
 
-      assert.ok(loaded);
       assert.ok(fs.existsSync(written.paths.fileMap));
-      assert.equal(loaded.index.fileMap.counts.tests, written.index.fileMap.counts.tests);
-
-      const compact = buildCompactIndexSummary(written.index);
-      assert.ok(compact.skills.includes("subagent-handoff"));
-    } finally {
-      fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    }
-  });
-
-  it("falls back when local routing is unavailable", async () => {
-    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-route-"));
-
-    try {
-      const result = await classifyTaskWithLocalModel({
-        task: "improve subagent handoff and skill routing",
-        repoRoot: process.cwd(),
-        fetchImpl: async () => {
-          throw new Error("offline");
-        },
-        outDir: temporaryRoot,
-      });
-
-      assert.equal(result.mode, "fallback");
-      assert.equal(result.route.id, "skill-mcp");
-    } finally {
-      fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    }
-  });
-
-  it("uses the local model response when it returns a known profile", async () => {
-    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-local-"));
-
-    try {
-      const result = await classifyTaskWithLocalModel({
-        task: "improve subagent handoff and skill routing",
-        repoRoot: process.cwd(),
-        fetchImpl: async () => ({
-          ok: true,
-          async json() {
-            return {
-              choices: [
-                {
-                  text: JSON.stringify({
-                    profile_id: "skill-mcp",
-                    rationale: "Local model picked the skill and delegation profile.",
-                  }),
-                },
-              ],
-            };
-          },
-        }),
-        outDir: temporaryRoot,
-      });
-
-      assert.equal(result.mode, "local-model");
-      assert.equal(result.route.source, "local-model");
-      assert.equal(result.route.id, "skill-mcp");
-    } finally {
-      fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    }
-  });
-
-  it("accepts non-JSON local model replies when they mention a known profile", async () => {
-    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-local-freeform-"));
-
-    try {
-      const result = await classifyTaskWithLocalModel({
-        task: "improve subagent handoff and skill routing",
-        repoRoot: process.cwd(),
-        fetchImpl: async () => ({
-          ok: true,
-          async json() {
-            return {
-              choices: [
-                {
-                  text: "profile_id=skill-mcp",
-                },
-              ],
-            };
-          },
-        }),
-        outDir: temporaryRoot,
-      });
-
-      assert.equal(result.mode, "local-model");
-      assert.equal(result.route.id, "skill-mcp");
-    } finally {
-      fs.rmSync(temporaryRoot, { recursive: true, force: true });
-    }
-  });
-
-  it("builds a prewarm report with injected command output", () => {
-    const temporaryRoot = fs.mkdtempSync(path.join(os.tmpdir(), "whether-agent-prewarm-"));
-
-    try {
-      const report = buildPrewarmReport({
-        repoRoot: process.cwd(),
-        outDir: temporaryRoot,
-        commandProbe() {
-          return true;
-        },
-        commandRunner(command, args) {
-          if (command === "lms") {
-            return JSON.stringify({ running: true, port: 1234 });
-          }
-          if (command === "lmstudio-ensure-model") {
-            return `ensured ${args[0]}`;
-          }
-          return "";
-        },
-      });
-
-      assert.equal(report.lmStudio.running, true);
-      assert.equal(report.modelWarm.ok, true);
-      assert.equal(report.index.generated, true);
+      assert.equal(JSON.parse(fs.readFileSync(written.paths.fileMap, "utf8")).counts.tests, written.index.fileMap.counts.tests);
     } finally {
       fs.rmSync(temporaryRoot, { recursive: true, force: true });
     }

@@ -42,6 +42,15 @@ const getOrCreatePersistentClientId = () => {
 
   const created = createOpaqueId();
   window.localStorage.setItem(PERSISTENT_CLIENT_ID_STORAGE_KEY, created);
+  /* A browser that holds this id owns records keyed by it — the decision ledger
+     and the push subscription. Ask for persistent storage so an eviction under
+     storage pressure cannot silently drop them (2026-10-22). Best-effort: the
+     answer is the browser's to give, and nothing here waits on it. */
+  try {
+    void navigator.storage?.persist?.();
+  } catch {
+    // Storage probing is best-effort.
+  }
   return created;
 };
 

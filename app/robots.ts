@@ -1,29 +1,60 @@
 import type { MetadataRoute } from "next";
-import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
+import { WHETHER_AGENT_MANIFEST_PATH, buildAgentEndpoints } from "../lib/agent/discovery";
 import { siteUrl } from "../lib/siteUrl";
 
 // Capital Posture Governance SEO guardrails: make the dashboard discoverable and scannable.
 
 /*
- * `/api/` is closed by default; every API path a public document advertises
- * is opened here by name. `/api/mcp` was the one that slipped: llms.txt led
- * with it as the tool endpoint for agents while this file told the same
- * agents not to fetch it. `tests/robotsRoute.test.ts` now reads llms.txt and
- * checks each `/api/...` path it names against this allow list.
+ * `/api/` is closed by default, and every API path a public document advertises
+ * is opened. Three documents advertise them: the agent manifest, `/llms.txt` and
+ * `/api-docs`. Until 2026-10-27 this list was held to llms.txt alone, so the
+ * manifest's own endpoints (`/api/weekly`, `/api/cadence`, `/api/treasury` and four
+ * more) and most of `/api-docs` were advertised and closed at once.
+ * `tests/robotsRoute.test.ts` reads all three now and checks each `/api/...` path
+ * they name against these rules.
  */
-const ALLOWED_PATHS = [
-  "/",
+
+/* The manifest's endpoints, by path, from the builder the manifest and llms.txt read. */
+const MANIFEST_PATHS = Object.values(buildAgentEndpoints("")).map((url) => url.replace(/\?.*$/, ""));
+
+/* The rest of what `/api-docs` documents. A prefix opens a family whose members are all
+   public reads: every `/api/cli/*` route answers the CLI, every `/api/image/*` route an image. */
+const DOCUMENTED_API_PATHS = [
   "/api/og",
-  "/brief.md",
-  "/api/agent",
-  "/api/mcp",
-  WHETHER_AGENT_MANIFEST_PATH,
-  "/llms.txt",
-  "/llms-full.txt",
   "/api/posture/current",
+  "/api/scores",
+  "/api/comps",
+  "/api/regime-alerts",
+  "/api/decision",
+  "/api/integrations/weekly-mandate",
+  "/api/brief/slack",
+  "/api/image/",
+  "/api/export/board-slide",
+  "/api/embed",
+  "/api/badge",
+  "/api/cli/",
 ];
 
-const DISALLOWED_PATHS = ["/api/"];
+const ALLOWED_PATHS = [
+  ...new Set([
+    "/",
+    ...MANIFEST_PATHS,
+    ...DOCUMENTED_API_PATHS,
+    WHETHER_AGENT_MANIFEST_PATH,
+    "/.well-known/webmcp.json",
+    "/.well-known/mcp.json",
+    "/llms.txt",
+    "/llms-full.txt",
+  ]),
+];
+
+/*
+ * The most specific rule wins (RFC 9309 §2.2.2), so an open path would also open every
+ * route its path is a prefix of. These are the closed ones that share a prefix with an
+ * open one: a route the cron calls with its secret, and the alert digest, which no
+ * document advertises. `/api/health` and `/api/telemetry/*` need no line of their own.
+ */
+const DISALLOWED_PATHS = ["/api/", "/api/brief/slack/deliver", "/api/decision-events", "/api/weekly-digest"];
 
 /**
  * The crawlers that fetch a page to answer a question being asked right now,

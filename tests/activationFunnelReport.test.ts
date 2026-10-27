@@ -118,7 +118,7 @@ describe("activation funnel report", () => {
     const weeks = summarizeActivationRows(
       [
         row("2026-09-16T09:00:00Z", visit()),
-        row("2026-09-23T09:00:00Z", { step: "purchased", path: "/pricing" }),
+        row("2026-09-23T09:00:00Z", { step: "shared", path: "/share" }),
         row("2026-09-23T09:00:00Z", { step: "visited" }),
         row("2026-09-23T09:00:00Z", "not json"),
       ],

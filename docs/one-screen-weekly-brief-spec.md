@@ -2,9 +2,10 @@
 
 > **Status (2026-09-29).** Blocks A–H below are the v2 design intent. The rendered homepage carries none of
 > their required labels ("THIS WEEK", "Operating latitude", "Revisit decisions", "Window velocity", "Memory
-> rail", "Confidence strip", "What changes if wrong"); its sections are the week and the call, "What are you
-> deciding this week?", "What changed this week", "What that changes for you", "What would change this
-> guidance" and "Do and share". Read "Current implementation contract" below and `docs/feature-specs-current.md`
+> rail", "Confidence strip", "What changes if wrong"); since 2026-10-09 its order is the verdict, the stage and
+> runway, "What are you deciding?", "What would change this guidance", "Get an email the day a line is
+> crossed", "What changed this week", "Has this happened before?" and "Share". Read "Current implementation
+> contract" below and `docs/feature-specs-current.md`
 > §1.1 for what ships; do not build to the block labels.
 
 ## Product job to be done
@@ -101,7 +102,6 @@ nowhere rather than invented.
 **States:**
 - `YES — Regime shift detected.`
 - `NO — Hold posture.`
-- Detail panel includes a sector-sensitivity overlay (`?sector=b2b-saas|consumer|infrastructure|fintech|healthcare|ai-platforms`) to show `base posture + sector sensitivity` without altering the canonical weekly posture call; fallback is `b2b-saas`.
 
 **Rules:**
 - Exactly two states: YES / NO.
@@ -162,35 +162,18 @@ nowhere rather than invented.
 ---
 
 
-### Interpretation-layer contract (optional, URL-driven)
-Interpretation layers change explanatory copy without changing the canonical weekly posture call.
-As of the 2026-09 removal audit, no on-page render site reads these layers on `/`; they surface in
-the export artifacts built from the homepage assembly (board summary, call citation) and in the
-share-preview URL param. On-page company conditioning is the profile-driven runway notes panel
-below, not `?view=company`.
+### Company-conditioned notes (translation-only)
+The runway-conditioned notes panel (`RunwayConditionedNotes`, under the weekly call) changes
+explanatory copy without changing the canonical weekly call. It keys on the browser-held operator
+profile, renders nothing until the operator has given a runway figure, never restates a threshold
+number, and never mutates canonical call, lane, or threshold semantics. Its sentences state
+consequences of the corridor, not directives and not alternate actions or re-open conditions. It
+renders on live briefs only: under a Time Machine selection it is omitted, since the profile is
+present-day and an archived regime must not borrow it.
 
-- Query param: `?view=default|sector|company|financial|forecast`
-- Default behavior: missing/invalid `view` resolves to `default`.
-- Layer scope: interpretation layers change only explanatory bullets and do **not** change regime classification, confidence labels, or bounded-rule thresholds.
-- Profile-driven variant: the runway-conditioned notes panel (`RunwayConditionedNotes`, under the
-  weekly call) follows the same translation-only contract but keys on the browser-held operator
-  profile instead of a query param. It renders nothing until the operator has given a runway figure,
-  never restates a threshold number, and never mutates canonical call, lane, or threshold semantics.
-  Its sentences state consequences of the corridor, not directives and not alternate actions or
-  re-open conditions. It renders on live briefs only — under a Time Machine selection it is omitted,
-  since the profile is present-day and an archived regime must not borrow it.
-- Expected layer semantics (screenshot-safe bullets; bounded action framing):
-  - `default`: `Action` (decision delta) + `Trigger` (guardrail) + `Reverse` (reversal condition)
-  - `sector`: one sector-adjusted action line plus explicit tighten/reverse conditions; still translation-only
-  - `company`: top-priority bounded operator rules (max 3 bullets, input-order precedence), each compressed as `Action` + `Trigger` + `Reverse`
-  - `financial`: bounded runway translation as `Action` (risk now), `Trigger` (raise window), `Reverse` (burn delta range)
-  - `forecast`: `Action` (most likely scenario), `Trigger` (distance + crossing risk), `Reverse` (momentum condition)
-- Trust/fallback semantics:
-  - Unknown/missing `view` falls back to `default` without altering canonical weekly-card semantics.
-  - Missing sector/company enrichment falls back to available baseline bullets (or available top rules) without blocking render.
-  - Interpretation panels never mutate posture classification, confidence labels, or top-fold instruction semantics.
-  - Bullets are compact, screenshot-safe directives (short bounded clauses; no long-form methodology text).
-  - Export/citation outputs include interpretation context only when the selected view is non-default, always with translation-only trust language.
+`/` takes no `?view=`. The URL-selected interpretation layers (`default`, `sector`, `company`,
+`financial`, `forecast`) were built by the home assembly and drawn by nothing after their panel
+went on 2026-08-14, and were removed on 2026-10-27 (`docs/feature-specs-current.md` §1.0).
 
 ### Current implementation contract (`/`, `WeeklyDecisionCard`)
 Canonical top-fold order on homepage must remain:
@@ -234,6 +217,8 @@ Implementation guardrails:
 - When every bounded rule clears on the same conditions, state that corridor once above the ledger (`sharedFlipCorridor`). The per-lane `Pause if` / `Clears when` logic stays — it is non-negotiable top-fold content — but the shared corridor tells the operator these lanes flip together, which no single row can. Suppress the line when the rules genuinely diverge.
 - The weekly call and the score that grades it must share the first viewport at 375px. The hero orders call → score → supporting detail when stacked, and restores the two-column grid at `sm` and above.
 - Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move trajectory, continuity, and longer explanation into disclosure content below the primary scan path.
+- "Could change next week" is one flag, `couldCallChangeNextWeek` (`lib/report/trustStatus.ts`): a score inside the engine's near band, or a change held for its confirming reading. The trust strip reads it, and the home model's `transitionWatch` is computed from it for `/brief.md`'s trust line, the memo lines, the change-watch row and the exports. No surface derives its own (`docs/feature-specs-current.md` §1.1.31a).
+- `/brief.md` prints the `Decision readiness` verdict directly under its trust line: the home model's `decisionReadiness`, label then detail. `buildDecisionReadinessState` runs once, in the home brief builder, and `/trust` reads the same value. The provenance `Data caveat` stays about the data, so a live week close to a line reads `Hold` above a caveat of `None.` (`docs/feature-specs-current.md` §1.1.77). As of 2026-10-14 the homepage card does not draw the verdict that the rule above asks of it.
 - Trust on `/` should remain compact: keep one inline verdict in the action lane and avoid duplicating trust as a separate summary card.
 - On `/`, the first scan should read as one dominant weekly decision card. Detailed per-area rules should stay available, but behind a closed-by-default disclosure instead of an always-open matrix.
 - On `/`, the share rail should default to one recommended artifact path first. Alternate artifact modes, shorter variants, and heavier packaging should live behind secondary disclosure UI.
@@ -507,6 +492,8 @@ same thing, the earlier one keeps it.
 ### Home cadence placement (2026-09-12)
 
 The weekly call precedes horizon selection on mobile and desktop. As of 2026-10-03, Weekly / Monthly / Quarterly sits directly under the call beside Copy Brief and confidence details, before the evidence sections. This keeps the selector adjacent to the card it changes without letting wrapped controls push the call down on a phone. Direct `/?cadence=monthly` and `/?cadence=quarterly` links still render their selected call; API cadence semantics are unchanged. No cadence rail belongs above the call or in the global header.
+
+The selected horizon's card (`CadenceCallCard`) carries the weekly card's contract at its horizon: the guidance, `Pause if` and `Resume when`, and under that pair one `ThresholdLadder` per score from `cadenceCallModel.boundedBands`, drawn from the same thresholds as the pair's sentences, with the score, its move since the comparison reading and its distance to each line. A held call drops the pair and the ladders; the weekly card below states the hold's lines.
 
 ### Responsive readability (2026-10-03)
 

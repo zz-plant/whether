@@ -2,9 +2,13 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { GET as getAgent } from "../app/api/agent/route";
 import { loadAgentInterfaceContext, type AgentInterfaceContext } from "../lib/agentInterface";
-import { agentStateSchema, buildAgentState } from "../lib/agentState";
+import { agentStateSchema, buildAgentState, nextWeeklyCallDue } from "../lib/agentState";
 import { buildCliStatusContract } from "../lib/cli/contracts";
 import { resolvePublishedConfidence } from "../lib/report/confidence";
+import { asLiveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The state is what an agent decides from, so it has to hold up against the page's own
@@ -38,6 +42,7 @@ const asLiveReading = (context: AgentInterfaceContext, recordDate: string): Agen
       fallback_reason: null,
       record_date: recordDate,
     },
+    macroSeries: asLiveMacroSeries(context.reportData.macroSeries),
   },
 });
 
@@ -135,7 +140,7 @@ describe("the agent state", () => {
         reportDynamics: { ...context.reportData.reportDynamics, directionLabel: "stable", changedSignals: [], anomalySignals: [], movement: undefined },
       },
     });
-    assert.match(held.change.summary ?? "", /^Conditions held steady since [A-Z][a-z]{2} \d{1,2}; no pause or resume line was crossed\. Last week's guidance stands\.$/);
+    assert.match(held.change.summary ?? "", /^Conditions held steady since [A-Z][a-z]{2} \d{1,2}; no pause or resume line was crossed\. The guidance stands\.$/);
     assert.deepEqual(held.change.crossed, []);
   });
 
@@ -175,6 +180,12 @@ describe("the agent state", () => {
     });
   });
 
+  it("names the next Monday 14:00 UTC publication, strictly after now", () => {
+    assert.equal(nextWeeklyCallDue(new Date("2026-10-19T13:59:00Z")), "2026-10-19T14:00:00.000Z");
+    assert.equal(nextWeeklyCallDue(new Date("2026-10-19T14:00:00Z")), "2026-10-26T14:00:00.000Z");
+    assert.equal(nextWeeklyCallDue(new Date("2026-10-25T23:00:00Z")), "2026-10-26T14:00:00.000Z");
+  });
+
   it("says the data is live and current only for a live reading that is recent", async () => {
     const context = await loadAgentInterfaceContext("test");
     const now = new Date("2026-09-29T12:00:00Z");
@@ -182,7 +193,7 @@ describe("the agent state", () => {
 
     const ready = buildAgentState(live, now);
     assert.deepEqual(ready.automation, { ready: true, refusal: null });
-    assert.deepEqual(ready.freshness, { fetchedAt: live.reportData.treasury.fetched_at, recordAgeDays: 4, live: true, fallback: false });
+    assert.deepEqual(ready.freshness, { fetchedAt: live.reportData.treasury.fetched_at, recordAgeDays: 4, live: true, fallback: false, nextCallDue: "2026-10-05T14:00:00.000Z" });
     assert.match(ready.headline, /The data is live and current\.$/);
 
     const savedCopy = buildAgentState(
@@ -198,6 +209,21 @@ describe("the agent state", () => {
     assert.equal(stale.automation.ready, false);
     assert.match(stale.automation.refusal ?? "", /25 days old/);
     assert.equal(stale.freshness.recordAgeDays, 25);
+
+    const cachedMacro = buildAgentState(
+      {
+        ...live,
+        reportData: {
+          ...live.reportData,
+          macroSeries: live.reportData.macroSeries.map((series) =>
+            series.id === "VIX_INDEX" ? { ...series, isLive: false } : series,
+          ),
+        },
+      },
+      now,
+    );
+    assert.equal(cachedMacro.automation.ready, false);
+    assert.match(cachedMacro.automation.refusal ?? "", /Macro inputs are snapshot values/);
 
     const degraded = buildAgentState({ ...live, degraded: true }, now);
     assert.equal(degraded.automation.ready, false);

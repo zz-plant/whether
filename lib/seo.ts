@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { siteUrl } from "./siteUrl";
 import { decisionTransmissionSearchDescription } from "./report/decisionTransmissionCopy";
+import { formatMonthLongYearUtc, formatMonthYearShortFromValue } from "./formatters";
 
 export const organizationName = "Whether";
 /**
@@ -23,6 +24,14 @@ export const websiteName = "Whether — Weekly Operating Guidance for Startup Le
  */
 export const canonicalPositioningLine =
   "The interest-rate and credit lines that pause or resume your hiring, spend and raise. Checked every Monday, with an email the day one is crossed.";
+/*
+ * The category line as the homepage's first-visit orientation: whom it is for,
+ * then the line itself. The page opens on the week's guidance, which says what
+ * to do and never what the site is; a first-time reader met "Cloudy" and a
+ * headline with no subject.
+ */
+export const homeOrientationLine =
+  `For startup leaders: ${canonicalPositioningLine.charAt(0).toLowerCase()}${canonicalPositioningLine.slice(1)}`;
 export const defaultSiteDescription =
   `${canonicalPositioningLine} ${decisionTransmissionSearchDescription}`;
 
@@ -58,10 +67,10 @@ export const organizationKnowsAbout = [
   "Macroeconomic conditions for startup operating decisions",
   "US Treasury yield curve",
   "Startup hiring decisions",
-  "Capital raising timing",
-  "Burn discipline",
-  "Product tempo",
-  "Expansion bets",
+  "Startup fundraising timing",
+  "Startup spending decisions",
+  "Product roadmap pace",
+  "New bets under tight funding",
 ] as const;
 
 /** The site-level entity ids every page's graph points at. */
@@ -70,6 +79,39 @@ export const websiteId = `${siteUrl}#website`;
 const defaultSocialImagePath = "/api/og?template=report";
 
 export const buildCanonicalUrl = (path: string) => new URL(path, siteUrl).toString();
+
+const parseTitleDate = (value: string | null | undefined): Date | null => {
+  if (!value) return null;
+  const date = new Date(value);
+  return Number.isNaN(date.getTime()) ? null : date;
+};
+
+/*
+ * A month or an "updated" marker in a title is a claim about the data on the
+ * page, so both take the data's own date: the reading an answer states, the
+ * basket's read time on /comps, a guide's `updatedAt`. Never the clock and
+ * never a literal; with no date, the title goes out without one rather than
+ * with a guess. A searcher compares results by these markers, and the month
+ * is the part of a title that goes stale first.
+ */
+
+/** "October 2026" from a dated value, or null when there is no date to name. */
+export const formatTitleMonth = (value: string | null | undefined): string | null => {
+  const date = parseTitleDate(value);
+  return date ? formatMonthLongYearUtc(date.getUTCFullYear(), date.getUTCMonth() + 1) : null;
+};
+
+/**
+ * "How much runway should a startup have? (updated Oct 2026)".
+ *
+ * The answer pages ended in "(Live operator answer)", which nobody searches
+ * for and which said nothing a result list could compare. This says when the
+ * page's content last changed.
+ */
+export const withUpdatedMarker = (title: string, value: string | null | undefined): string => {
+  const date = parseTitleDate(value);
+  return date ? `${title} (updated ${formatMonthYearShortFromValue(date.toISOString())})` : title;
+};
 export const buildSocialImageUrl = (path = defaultSocialImagePath) =>
   buildCanonicalUrl(path);
 
@@ -125,7 +167,7 @@ const TEXT_CARD_TEMPLATES: ReadonlySet<string> = new Set([
   "plain",
 ]);
 
-/** A page title minus its section suffix ("Capital tightness | Evidence"). */
+/** A page title minus its section suffix ("Funding pressure watch | Evidence"). */
 const cardTitle = (title: string) => title.split(" | ")[0] ?? title;
 
 /** A subtitle that ends on a word, inside what the card draws. */

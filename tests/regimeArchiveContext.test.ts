@@ -6,6 +6,7 @@ import {
   getLatestValidDate,
   parseSeries,
   resolveBaseRateVelocityWindow,
+  resolveChicagoFciReading,
   resolveVixReading,
 } from "../scripts/regimeArchiveContext";
 
@@ -115,3 +116,45 @@ describe("resolveBaseRateVelocityWindow", () => {
     assert.equal(window.latestDate, "2024-03-31");
   });
 });
+
+/*
+ * The Chicago Fed index joined the record basis (engine-2026-10-09b), backfilled
+ * from FRED's NFCI. It is weekly, dated the Friday each week ends and published
+ * the Wednesday after, so a period takes the newest observation a reader had then.
+ * Its gaps come through the same parser as every other series.
+ */
+describe("resolveChicagoFciReading", () => {
+  const csv = [
+    "observation_date,NFCI",
+    "2020-03-06,-0.231",
+    "2020-03-13,0.031",
+    "2020-03-20,",
+    "2020-03-27,0.267",
+  ].join("\n");
+
+  it("takes the newest observation published by the period's date, not one published after it", () => {
+    /* Mar 31, 2020: the Mar 27 week was published Apr 1, so the reading is Mar 20's, or the last real one before it. */
+    const reading = resolveChicagoFciReading(parseSeries(csv), asOfTime("2020-03-31"), "");
+    assert.ok(reading);
+    assert.equal(reading.id, "CHICAGO_FCI");
+    assert.equal(reading.record_date, "2020-03-13", "Mar 20 is a gap, so Mar 13's 0.031");
+    assert.equal(reading.value, 0.031);
+    assert.equal(reading.history?.some((point) => point.date === "2020-03-27"), false, "nothing published after the date");
+  });
+
+  it("keeps a gap as a null in the history, never a zero, whether empty or a dot", () => {
+    const dotted = csv.replace("2020-03-20,", "2020-03-20,.");
+    for (const source of [csv, dotted]) {
+      const reading = resolveChicagoFciReading(parseSeries(source), asOfTime("2020-04-01"), "");
+      assert.ok(reading);
+      assert.deepEqual(reading.history?.find((point) => point.date === "2020-03-20"), { date: "2020-03-20", value: null });
+      assert.equal(reading.history?.some((point) => point.value === 0), false);
+      assert.equal(reading.value, 0.267, "Apr 1 has the Mar 27 week");
+    }
+  });
+
+  it("treats three missed releases as an absence", () => {
+    assert.equal(resolveChicagoFciReading(parseSeries(csv), asOfTime("2020-04-25"), ""), null);
+  });
+});
+

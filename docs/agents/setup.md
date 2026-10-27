@@ -19,10 +19,26 @@
 - Refresh checked-in fallback snapshots: `bun run data:refresh-fallbacks`
 - Agent preflight doctor: `bun run agent:doctor`
 - Agent task router: `bun run agent:route -- "<task>"`
-- Local-first agent task router: `bun run agent:route -- --local "<task>"`
 - Subagent handoff packet generator: `bun run agent:handoff -- --job "<job>"`
 - Agent repo index builder: `bun run agent:index`
-- Agent local-stack prewarm: `bun run agent:prewarm`
+
+## Other scripts
+
+Commands no gate runs and no other guide covers. None of them deploys or sends anything.
+
+| Command | What it does |
+| --- | --- |
+| `bun run clean` | Deletes `.next`, `.wrangler`, `out` and the contents of `dist/`, plus stray `dist 2`-style copies. |
+| `bun run build:fresh` | `clean`, then `build`: rules out a stale artifact when a build behaves oddly. |
+| `bun run lint:fix` | `oxlint --fix`: applies oxlint's safe fixes in place. Review the diff before committing. |
+| `bun run ui:shots:list` | The capture targets `ui:shots` knows, one per line (id, label, path). |
+| `bun run eval:cold-reader` | A local model with no context reads `/` and the answer pages as a first visitor; its answers are checked against `/api/agent?view=state`. Uses a model already resident in Ollama (never loads one) and a running dev server; `-- --allow-missing` exits 0 when either is absent. Exit 1 means a page failed to say what it meant to. Advisory. |
+| `bun run assets:visuals` | Regenerates the visual kit under `public/visual-assets/` offline; `-- --check` reports drift without writing. Needs `rsvg-convert` (Homebrew librsvg). |
+| `bun run assets:video` | Renders the MP4, poster and captions for a frozen week (`-- --week YYYY-wNN`, default the latest) into `public/videos/briefs/` and records it in `data/brief_videos.json`. Needs `ffmpeg`. |
+| `bun run advice-corpus:extract` / `:prefilter` / `:classify` | The advice-corpus stages between `:discover` and `:validate`. They read the fetched archives (and `:classify` the local model) into an uncommitted cache. Protocol: `docs/research/advice-corpus-results.md`. |
+| `bun run advice-corpus:data` | Regenerates `data/advice-corpus/monthly.json` from `posts.json` (`-- --from-labels` rebuilds `posts.json` from the cache first); `advice-corpus:check` is its `--check`. |
+| `bun run reviewed-cases:list` | Lists the human labels `reviewed-cases:add` recorded; see `docs/developer/decision-models.md`. |
+| `python3 scripts/perf/audit_page_load_times.py` | curl timings (DNS, TLS, TTFB, total) for production routes, seven runs each, printed as JSON. No package script. Seven of its eight URLs (`/evidence`, `/planning/*`, `/methodology`, `/guides`, `/solutions`) are renamed routes that now redirect, and curl without `-L` times the redirect, so update `URLS` before trusting a number. |
 
 ## IDE workspace defaults
 - Repo-local VS Code compatible workspace settings live under `.vscode/`.
@@ -71,8 +87,6 @@ CLI ergonomics notes:
 - `whether status --compact` is the fastest shell read for the current operating call.
 - `whether agent --compact --json` gives agents a smaller structured handoff than the full `/api/agent` payload.
 - Local CLI runs auto-discover a healthy Whether API on common localhost dev ports when the default `http://localhost:3000` is unavailable.
-- `bun run agent:prewarm` checks LM Studio availability, warms the configured local role with `lmstudio-ensure-model`, and refreshes `artifacts/agent/`.
-- `bun run agent:route -- --local "<task>"` uses the local LM Studio endpoint when available and falls back to the deterministic keyword router if the local call fails or times out.
 - `bun run agent:index` refreshes `artifacts/agent/file-map.json`, `artifacts/agent/skills-map.json`, and `artifacts/agent/test-map.json` for faster routing.
 
 ## Baseline verification after setup

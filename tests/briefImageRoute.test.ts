@@ -90,6 +90,10 @@ const buildHomepage = ({
         },
       },
     }),
+    weeklyCall: {
+      actionNow: "Conditions are tightening. Freeze new commitments and protect runway.",
+      currentCall: "Approve only renewals, work already promised to customers, and hires that bring in revenue.",
+    },
     reportShell: {
       regime: "SCARCITY",
       recordDateLabel: "Sep 25, 2026",
@@ -112,12 +116,21 @@ const asPasted = (reading: ScoreReadingParts) =>
     .join(" · ");
 
 describe("buildBriefImagePayload", () => {
+  /* The card leads with the week's one headline action (`weeklyHeadline`), the
+     sentence the homepage h1 prints, not the action it used to lead with. */
+  it("leads with the week's headline action", () => {
+    assert.equal(
+      buildBriefImagePayload(buildHomepage()).decision,
+      "Approve only renewals, work already promised to customers, and hires that bring in revenue.",
+    );
+  });
+
   it("prints both scores against the lines that change the call, and the earlier reading under its date", () => {
     const payload = buildBriefImagePayload(buildHomepage());
 
     assert.deepEqual(payload.readings.map(asPasted), [
-      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · 14 pts above · was 63 on Aug 31 · resume line 66 (24 pts away)",
-      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · 1 pt below · was 56 on Aug 31 · resume line 54 (11 pts away)",
+      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · past the line · was 63 on Aug 31 · resume line 66 (24 pts away)",
+      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · past the line · was 56 on Aug 31 · resume line 54 (11 pts away)",
     ]);
   });
 
@@ -307,7 +320,7 @@ describe("brief decision card render", () => {
     assert.match(text, /Source: US Treasury and the St\. Louis Fed \(FRED\), plus a curated startup-market snapshot/);
     // Yahoo Finance feeds the SaaS comps only and contributes nothing to either score.
     assert.doesNotMatch(text, /yahoo/i);
-    assert.match(text, /MEDIUM CONFIDENCE/);
+    assert.match(text, /WITHIN REACH OF THE LINE/);
     assert.doesNotMatch(text, /\bMED\b/);
   });
 

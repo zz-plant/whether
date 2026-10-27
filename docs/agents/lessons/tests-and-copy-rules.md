@@ -144,11 +144,12 @@ a failing test or a dead export, and the suite was green through all of them.
   each label to share a word with its heading and failed on "Revisit triggers" → "What would make
   this recommendation wrong?", which is a good short name. A test that fails on a correct label is
   answering a different question from the one in its name.
-- **`/pricing` told a reader their recorded decisions stay in their browser.** `/privacy` 2.4 says
+- **`/pricing` told a reader their recorded decisions stay in their browser.** `/privacy` 2.3 says
   they are held in Cloudflare KV against the browser identifier, which is the truth; the pricing
   bullet bundled them with week close-outs, which *are* local, and called both "saved in this
   browser". Understating where a reader's data goes is the direction that costs trust, and these two
-  pages are read by the same person for the same reason.
+  pages are read by the same person for the same reason. (`/pricing` and this test went with the
+  paid tier on 2026-10-14.)
 - **The mockup's copy button handed over an unmarked sample.** `/mockups/*` is gated off production
   by `app/mockups/layout.tsx` and only runs on the preview lane, which the audit initially missed —
   the route is not the problem. What left it was: the copied text was branded "Whether" and carried
@@ -204,11 +205,23 @@ a failing test or a dead export, and the suite was green through all of them.
   editing at push time, so the gate failed on work the push did not contain — the same failure the
   hook's own caveat warns about, now removed for the check that can be scoped precisely.
   `.husky/pre-push` reads git's stdin plan (`<local ref> <local sha> <remote ref> <remote sha>` per
-  ref) through `scripts/pre-push-range.mjs` and exports the pair as `REVIEW_HOTSPOT_BASE`/`HEAD`,
-  which the preflight already accepted from CI. A new branch, a deletion, and a manual run print
-  nothing and keep the default range; a remote sha the local repo has never fetched fails
-  `sanitizeBaseRef`'s verification and falls back the same way, so every way the scoping can fail
-  costs a wider scan rather than a skipped one.
+  ref) through `scripts/pre-push-range.mjs` and exports the pair as `REVIEW_HOTSPOT_BASE`/`HEAD`.
+  A new branch, a deletion, and a manual run print nothing and keep the default base; a remote sha
+  the local repo has never fetched fails verification and falls back the same way, so every way
+  the scoping can fail costs a wider scan rather than a skipped one.
+
+- **The preflight has one comparison (2026-10-07).** It had grown three: the default (`HEAD~1`
+  plus the working tree, or `HEAD^2...HEAD` plus the working tree on a merge), `--base` (a
+  three-dot commit range that saw no dirty tree) and `--working-tree`, each with its own printed
+  description, for a check that is a filename regex and an `as`-cast grep. It is now `git diff
+  <base>` against the working tree, and the base is the merge-base with `main`, `HEAD~1` on `main`
+  itself, or `--base`/`REVIEW_HOTSPOT_BASE`. The merge-base covers both earlier findings at once: a
+  branch is judged on everything it changes however many commits that is, and a merge commit's
+  first parent is never the base. The one option left is `--head`/`REVIEW_HOTSPOT_HEAD`, a commit
+  to compare with instead of the working tree: the first cut dropped it and the hook passed only
+  the base, and Codex pointed out that `git push origin release` from another branch would then
+  judge the checked-out tree rather than the pushed ref. The hook passes both shas, so a push is
+  commit-to-commit again and never sees another session's uncommitted edits.
 
 **Two findings from that audit were wrong and are recorded here as such.** The mockup route being
 publicly reachable — it is gated, and the gate has its own recorded argument. And `/operate` showing
@@ -264,3 +277,17 @@ the data, but it carried the decision contract's own label for the operating act
 `DATA_CAVEAT_LABEL` now, and on live data it reads "None."
 `tests/pageReaderContradictions.test.tsx` renders `/brief.md` and the strip for three readings, and
 checks that the provenance section uses no operating-action label.
+
+## Clause shapes, counted (2026-10-09)
+
+A line-editing pass found two shapes on nearly every surface that no word list can see: a
+wh-clause stapled onto a list ("Look up what the guidance said in any past month, and how it held
+up."), and a gloss printed twice in one sentence, most of them from one place — the rule-line
+builders, which put "(already true at 90)" inside a met line and "(90 today)" after each score of
+the change line. The builders were fixed once (`formatReadingsNow`, `buildCallChangeLines`), so
+every page, paste, email and alert moved together, and `tests/readerClauseShapes.test.tsx` renders
+the offline pages, all 74 `/history/[period]` pages, the page descriptions, the navigation, every
+golden paste, the frozen records' updates and `/llms.txt`, and fails on either shape. Its
+exceptions are listed at the top of the file. It allows a list whose items are all wh-clauses,
+so a nested one still needs a reader; `docs/editorial-guardrails.md` → Sentence shape has the
+rules it cannot check.

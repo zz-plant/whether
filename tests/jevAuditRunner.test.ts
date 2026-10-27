@@ -1,0 +1,181 @@
+import assert from "node:assert/strict";
+import { mkdtempSync, readFileSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { describe, it } from "bun:test";
+import { runArtifactAudit } from "../scripts/jev-artifact-audit";
+
+const canonical = { recordDate: "2026-10-15", readingId: "reading-1", engineVersion: "test-engine", guidance: "Hold hiring.", sourceUrl: "https://example.com/source" };
+const input = { canonical, artifact: { recordDate: canonical.recordDate, engineVersion: canonical.engineVersion, readingId: canonical.readingId, text: "Hold hiring." } };
+const credentials = { accountId: "account", apiToken: "test-token" };
+
+describe("decision audit CLI workflows", () => {
+  it("retains discovery lineage in evidence reports without sending it to the decision model", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "whether-evidence-lineage-"));
+    try {
+      const inputPath = path.join(dir, "retrieved.json");
+      const retrieval = { model: "embeddinggemma-2:740m", modelDigest: "a".repeat(64), inputDigest: "b".repeat(64), ranking: [{ id: "source", similarity: 0.8 }] };
+      writeFileSync(inputPath, JSON.stringify({ canonical, candidates: [{ id: "source", claim: "Hold hiring.", excerpt: "A quoted passage.", sourceUrl: "https://example.com/source", observedAt: "2026-10-14" }], retrieval }));
+      assert.equal(await runArtifactAudit({ mode: "evidence", inputPath, reportDir: dir, threshold: 0.8, models: ["clef-flash"] }, {
+        ...credentials, fetchImpl: async (_, init) => {
+          const body = init?.body;
+          assert.ok(typeof body === "string");
+          assert.equal(JSON.parse(body).state.retrieval, undefined);
+          return new Response("offline", { status: 503 });
+        },
+      }), 1);
+      const report = JSON.parse(readFileSync(path.join(dir, "evidence-audit.json"), "utf8"));
+      assert.match(report.inputDigest, /^[a-f0-9]{64}$/);
+      assert.deepEqual(report.retrieval, retrieval);
+      assert.equal(report.status, "incomplete");
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it("records exact inputs, version, digest, timing and each model's failures", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "whether-audit-"));
+    try {
+      const inputPath = path.join(dir, "input.json");
+      writeFileSync(inputPath, JSON.stringify(input));
+      const status = await runArtifactAudit({ mode: "brief", inputPath, reportDir: dir, threshold: 0.8, models: ["clef-flash", "clef-omni"] }, {
+        ...credentials,
+        fetchImpl: async (_, init) => {
+          const rawBody = init?.body;
+          assert.ok(typeof rawBody === "string");
+          const body = JSON.parse(rawBody);
+          if (body.model === "clef-omni") return new Response("offline", { status: 503 });
+          return Response.json({ result: { model: "clef-flash", answers: Object.fromEntries(Object.keys(body.questions).map((key) => [key, { type: "noul", noul: 0.01 }])) } });
+        },
+      });
+      assert.equal(status, 1);
+      const report = JSON.parse(readFileSync(path.join(dir, "brief-audit.json"), "utf8"));
+      assert.match(report.requestDigest, /^[a-f0-9]{64}$/);
+      assert.equal(report.questionVersion, "whether-decision-audit-v1");
+      assert.equal(report.state.canonical.readingId, canonical.readingId);
+      assert.equal(report.byModel["clef-flash"].result.ok, true);
+      assert.equal(report.byModel["clef-omni"].result.ok, false);
+      assert.equal(typeof report.byModel["clef-flash"].durationMs, "number");
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it("refuses a mismatched reading without calling a model and replaces a previous report", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "whether-audit-"));
+    try {
+      const inputPath = path.join(dir, "input.json");
+      writeFileSync(inputPath, JSON.stringify({ ...input, artifact: { ...input.artifact, readingId: "other" } }));
+      writeFileSync(path.join(dir, "brief-audit.json"), '{"status":"old"}');
+      let calls = 0;
+      const status = await runArtifactAudit({ mode: "brief", inputPath, reportDir: dir, threshold: 0.8, models: ["clef-flash"] }, { ...credentials, fetchImpl: async () => { calls += 1; throw new Error("must not run"); } });
+      assert.equal(status, 1);
+      assert.equal(calls, 0);
+      assert.equal(JSON.parse(readFileSync(path.join(dir, "brief-audit.json"), "utf8")).status, "failed");
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it("runs labeled evaluations and retains missed contradictions alongside service failures", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "whether-audit-"));
+    try {
+      const inputPath = path.join(dir, "eval.json");
+      writeFileSync(inputPath, JSON.stringify({ cases: [{ id: "contradiction", input, expected: { contradicts_call: true } }] }));
+      assert.equal(await runArtifactAudit({ mode: "eval", inputPath, reportDir: dir, threshold: 0.8, models: ["clef-flash"] }, {
+        ...credentials, fetchImpl: async (_, init) => {
+          const rawBody = init?.body;
+          assert.ok(typeof rawBody === "string");
+          const body = JSON.parse(rawBody);
+          return Response.json({ result: { model: "clef-flash", answers: Object.fromEntries(Object.keys(body.questions).map((key) => [key, { type: "noul", noul: 0.01 }])) } });
+        },
+      }), 0);
+      const report = JSON.parse(readFileSync(path.join(dir, "eval-audit.json"), "utf8"));
+      assert.equal(report.byModel["clef-flash"].summary.falseNegative, 1);
+      assert.equal(report.byModel["clef-flash"].summary.total, 1);
+      assert.equal(report.byModel["clef-flash"].cases[0].expected.contradicts_call, true);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it("sends the selected local screenshot and retains its digest without base64 in the report", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "whether-image-audit-"));
+    try {
+      const inputPath = path.join(dir, "input.json");
+      const imagePath = path.join(dir, "brief.png");
+      writeFileSync(inputPath, JSON.stringify(input));
+      writeFileSync(imagePath, Buffer.from("fixture image bytes"));
+      let calls = 0;
+      const status = await runArtifactAudit({ mode: "screenshot", inputPath, imagePath, reportDir: dir, threshold: 0.8, models: ["clef-flash"] }, {
+        ...credentials, fetchImpl: async (_, init) => {
+          calls += 1;
+          const rawBody = init?.body;
+          assert.ok(typeof rawBody === "string");
+          const body = JSON.parse(rawBody);
+          assert.equal(body.images[0], `data:image/png;base64,${Buffer.from("fixture image bytes").toString("base64")}`);
+          return Response.json({ result: { model: "clef-flash", answers: Object.fromEntries(Object.keys(body.questions).map((key) => [key, { type: "noul", noul: 0.5 }])) } });
+        },
+      });
+      assert.equal(status, 0);
+      assert.equal(calls, 1);
+      const rawReport = readFileSync(path.join(dir, "screenshot-audit.json"), "utf8");
+      assert.doesNotMatch(rawReport, /base64/);
+      const report = JSON.parse(rawReport);
+      assert.match(report.media.sha256, /^[a-f0-9]{64}$/);
+      assert.equal(report.byModel["clef-flash"].unresolved.length, 4);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it("builds the counterevidence packet from typed answers and keeps the change line", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "whether-counterevidence-"));
+    try {
+      const counterinput = {
+        canonical: { recordDate: "2026-10-15", readingId: "reading-1", engineVersion: "test-engine", guidance: "Hold hiring.", changeLine: "Risk appetite above 50", sourceUrl: "https://example.com/source" },
+        candidates: [
+          { id: "rates", claim: "Funding costs increased.", excerpt: "Funding costs increased.", sourceUrl: "https://example.com/source", observedAt: "2026-10-15", side: "support" },
+        ],
+      };
+      const inputPath = path.join(dir, "counterevidence.json");
+      writeFileSync(inputPath, JSON.stringify(counterinput));
+      const status = await runArtifactAudit({ mode: "counterevidence", inputPath, reportDir: dir, threshold: 0.8, models: ["clef-flash"] }, {
+        ...credentials, fetchImpl: async (_, init) => {
+          const rawBody = init?.body;
+          assert.ok(typeof rawBody === "string");
+          const body = JSON.parse(rawBody);
+          const answerFor = (key: string) => key.startsWith("relevance_")
+            ? { type: "score", score: 2, confidence: 1, probabilities: { 0: 0, 1: 0, 2: 1 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } }
+            : { type: "noul", noul: key.startsWith("challenges_") ? 0.95 : 0.99 };
+          return Response.json({ result: { model: "clef-flash", answers: Object.fromEntries(Object.keys(body.questions).map((key) => [key, answerFor(key)])) } });
+        },
+      });
+      assert.equal(status, 0);
+      const report = JSON.parse(readFileSync(path.join(dir, "counterevidence-audit.json"), "utf8"));
+      assert.equal(report.questionVersion, "whether-counterevidence-v1");
+      const packet = report.byModel["clef-flash"].packet;
+      assert.deepEqual(packet.challenges.map((item: { id: string }) => item.id), ["rates"]);
+      assert.equal(packet.reconsideration, "Risk appetite above 50");
+      assert.deepEqual(packet.supporting, []);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+
+  it("scores a labeled counterevidence case in eval mode", async () => {
+    const dir = mkdtempSync(path.join(tmpdir(), "whether-ce-eval-"));
+    try {
+      const counterinput = {
+        canonical: { recordDate: "2026-10-15", readingId: "reading-1", engineVersion: "test-engine", guidance: "Hold hiring.", changeLine: "Risk appetite above 50", sourceUrl: "https://example.com/source" },
+        candidates: [{ id: "rates", claim: "Funding costs increased.", excerpt: "Funding costs increased.", sourceUrl: "https://example.com/source", observedAt: "2026-10-15" }],
+      };
+      const inputPath = path.join(dir, "eval.json");
+      writeFileSync(inputPath, JSON.stringify({ cases: [{ kind: "counterevidence", id: "ce-case-1", input: counterinput, expected: { challenges_0: true, supported_0: true } }] }));
+      const status = await runArtifactAudit({ mode: "eval", inputPath, reportDir: dir, threshold: 0.8, models: ["clef-flash"] }, {
+        ...credentials, fetchImpl: async (_, init) => {
+          const rawBody = init?.body;
+          assert.ok(typeof rawBody === "string");
+          const body = JSON.parse(rawBody);
+          const answerFor = (key: string) => key.startsWith("relevance_")
+            ? { type: "score", score: 2, confidence: 1, probabilities: { 0: 0, 1: 0, 2: 1 }, legend: { 0: "Unrelated", 1: "Context", 2: "Action" } }
+            : { type: "noul", noul: 0.95 };
+          return Response.json({ result: { model: "clef-flash", answers: Object.fromEntries(Object.keys(body.questions).map((key) => [key, answerFor(key)])) } });
+        },
+      });
+      assert.equal(status, 0);
+      const report = JSON.parse(readFileSync(path.join(dir, "eval-audit.json"), "utf8"));
+      assert.ok(report.questionVersions.includes("whether-counterevidence-v1"), "the report says which question set the case used");
+      assert.equal(report.byModel["clef-flash"].summary.truePositive, 2);
+      assert.equal(report.byModel["clef-flash"].summary.total, 2);
+    } finally { rmSync(dir, { recursive: true, force: true }); }
+  });
+});

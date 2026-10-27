@@ -24,7 +24,22 @@ export type OperatorProfileNumberKey =
   | "monthlyGrowthPct"
   | "grossMarginPct"
   | "raiseAtRunwayMonths"
-  | "hiringPauseAtRunwayMonths";
+  | "hiringPauseAtRunwayMonths"
+  | "engineerWeekCostUsd";
+
+export type PaybackProjectNumberKey =
+  | "weeksToShip"
+  | "engineers"
+  | "hoursSavedPerMonth"
+  | "hourlyCostUsd"
+  | "otherMonthlySavingsUsd";
+
+/**
+ * One piece of engineering work the runway planner checks against the payback
+ * bar (`lib/report/projectPayback.ts`). Every field is optional because a row
+ * is filled in a field at a time; the model says what is still missing.
+ */
+export type PaybackProjectEntry = { name?: string } & Partial<Record<PaybackProjectNumberKey, number>>;
 
 export type OperatorProfile = {
   version: typeof OPERATOR_PROFILE_VERSION;
@@ -51,6 +66,10 @@ export type OperatorProfile = {
    */
   raiseAtRunwayMonths?: number;
   hiringPauseAtRunwayMonths?: number;
+  /** What one engineer-week costs the company, loaded: the unit every project's build cost is counted in. */
+  engineerWeekCostUsd?: number;
+  /** The engineering work the planner checks against the payback bar, at most `MAX_PAYBACK_PROJECTS`. */
+  paybackProjects?: readonly PaybackProjectEntry[];
   sector?: PlannerSector;
   updatedAt?: string;
 };
@@ -67,7 +86,29 @@ export const OPERATOR_PROFILE_LIMITS: Record<OperatorProfileNumberKey, { min: nu
   grossMarginPct: { min: 0, max: 100 },
   raiseAtRunwayMonths: { min: 1, max: 60 },
   hiringPauseAtRunwayMonths: { min: 1, max: 60 },
+  engineerWeekCostUsd: { min: 100, max: 100_000 },
 };
+
+/** Beyond these a project's figure is a typo or a units mix-up, and is dropped like a profile figure. */
+const PAYBACK_PROJECT_LIMITS: Record<PaybackProjectNumberKey, { min: number; max: number }> = {
+  weeksToShip: { min: 0.5, max: 104 },
+  engineers: { min: 0.5, max: 100 },
+  hoursSavedPerMonth: { min: 0, max: 100_000 },
+  hourlyCostUsd: { min: 1, max: 5_000 },
+  otherMonthlySavingsUsd: { min: 0, max: 1e8 },
+};
+
+export const PAYBACK_PROJECT_NUMBER_KEYS: readonly PaybackProjectNumberKey[] = [
+  "weeksToShip",
+  "engineers",
+  "hoursSavedPerMonth",
+  "hourlyCostUsd",
+  "otherMonthlySavingsUsd",
+];
+
+/** Four rows: enough to compare a short list, few enough that the chart stays a glance. */
+export const MAX_PAYBACK_PROJECTS = 4;
+export const PAYBACK_PROJECT_NAME_MAX_LENGTH = 60;
 
 const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
   "cashUsd",
@@ -78,6 +119,7 @@ const NUMBER_KEYS: readonly OperatorProfileNumberKey[] = [
   "grossMarginPct",
   "raiseAtRunwayMonths",
   "hiringPauseAtRunwayMonths",
+  "engineerWeekCostUsd",
 ];
 
 const PLANNER_SECTORS: ReadonlySet<string> = new Set(["b2b-saas", "consumer", "infrastructure"]);
@@ -94,6 +136,36 @@ const withinLimits = (key: OperatorProfileNumberKey, value: unknown): value is n
   && value >= OPERATOR_PROFILE_LIMITS[key].min
   && value <= OPERATOR_PROFILE_LIMITS[key].max;
 
+export const isWithinPaybackProjectLimits = (key: PaybackProjectNumberKey, value: unknown): value is number =>
+  typeof value === "number"
+  && Number.isFinite(value)
+  && value >= PAYBACK_PROJECT_LIMITS[key].min
+  && value <= PAYBACK_PROJECT_LIMITS[key].max;
+
+/**
+ * Reads stored or linked projects field by field, as the profile reads its
+ * numbers: a bad figure costs that figure, not the row. An empty row is kept,
+ * because it is one the reader just added and has not filled yet.
+ */
+export const parsePaybackProjects = (value: unknown): PaybackProjectEntry[] => {
+  if (!Array.isArray(value)) return [];
+  const projects: PaybackProjectEntry[] = [];
+  for (const candidate of value.slice(0, MAX_PAYBACK_PROJECTS)) {
+    if (!isRecord(candidate)) continue;
+    const project: PaybackProjectEntry = {};
+    if (typeof candidate.name === "string") {
+      const name = candidate.name.trim().slice(0, PAYBACK_PROJECT_NAME_MAX_LENGTH);
+      if (name) project.name = name;
+    }
+    for (const key of PAYBACK_PROJECT_NUMBER_KEYS) {
+      const figure = candidate[key];
+      if (isWithinPaybackProjectLimits(key, figure)) project[key] = figure;
+    }
+    projects.push(project);
+  }
+  return projects;
+};
+
 /**
  * Reads a stored profile of any shape. Fields that are missing, the wrong
  * type, or outside their limits are dropped one at a time, so a corrupted
@@ -109,6 +181,8 @@ export const parseOperatorProfile = (value: unknown): OperatorProfile => {
     if (withinLimits(key, candidate)) profile[key] = candidate;
   }
   if (isPlannerSector(record.sector)) profile.sector = record.sector;
+  const paybackProjects = parsePaybackProjects(record.paybackProjects);
+  if (paybackProjects.length > 0) profile.paybackProjects = paybackProjects;
   if (typeof record.updatedAt === "string") profile.updatedAt = record.updatedAt;
 
   return profile;
@@ -215,7 +289,9 @@ const compactUsd = new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 });
 /** The text a stored value shows in its field; money shows grouped digits, everything else as typed. */
 export const formatOperatorProfileValue = (key: OperatorProfileNumberKey, value: number | undefined): string => {
   if (value === undefined) return "";
-  if (key === "cashUsd" || key === "monthlyBurnUsd" || key === "monthlyRevenueUsd") return compactUsd.format(value);
+  if (key === "cashUsd" || key === "monthlyBurnUsd" || key === "monthlyRevenueUsd" || key === "engineerWeekCostUsd") {
+    return compactUsd.format(value);
+  }
   return String(value);
 };
 

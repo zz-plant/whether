@@ -34,8 +34,11 @@ describe("/brief/[week] leads with the delta, then the share tool", () => {
     /* w31 stored an avoid-list item where the pause line goes; the card leaves the slot out rather than print it as a trigger. */
     assert.doesNotMatch(card, /Over-engineering/);
     assert.match(card, /Conditions change if/);
-    assert.match(card, /Funding pressure above 70 \(52 today\)/);
-    assert.match(card, /Week of /, "a crop of the card carries its week");
+    assert.match(card, /Funding pressure rises from 52 to clear 70/);
+    /* Once, in the card's heading: the caption at its foot carried the week as well
+       until 2026-10-09, and the heading's "Freezing:" restated the stamp above it. */
+    assert.match(card, /<h1[^>]*>Guidance for the week of [A-Z][a-z]{2} \d{1,2}, \d{4}<\/h1>/, "a crop of the card carries its week");
+    assert.equal((card.match(/[Ww]eek of /g) ?? []).length, 1, "and carries it once");
     assert.equal(html.match(/<h1[\s>]/g)?.length, 1, "the week's title is the page's one h1");
     assert.equal(html.match(/>Conditions change if<\/dt>/g)?.length, 1, "the call-change line is labelled once outside the paste preview");
   });

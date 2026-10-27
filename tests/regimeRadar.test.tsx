@@ -35,6 +35,20 @@ describe("RegimeRadar", () => {
     assert.match(html, /\(something_else\)/);
   });
 
+  it("lights the week's quadrant and dims the other three", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} />);
+
+    assert.equal(html.match(/data-active=""/g)?.length, 1);
+    assert.match(html, /opacity="1" data-quadrant="SCARCITY" data-active=""/);
+    assert.equal(html.match(/opacity="0.45"/g)?.length, 3);
+  });
+
+  it("dims nothing for an unmodelled regime", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} currentRegime="SOMETHING_ELSE" />);
+
+    assert.doesNotMatch(html, /data-active|opacity="0.45"/);
+  });
+
   it("keeps the marker inside the frame when a score is outside 0–100", () => {
     // y runs from 14 (top, tightness 100) to 162 (bottom, tightness 0). A
     // reading beyond the range must clamp to the frame, not draw past it.
@@ -52,32 +66,57 @@ describe("RegimeRadar", () => {
     const withoutPrevious = renderToStaticMarkup(<RegimeRadar {...base} />);
 
     // The trail dot is the only circle at r=2.5 and the trail line is the only
-    // stroke in plain gray.
+    // dashed stroke in the muted ink.
+    const previousTrail = /stroke="var\(--app-text-muted\)" stroke-width="1\.2" stroke-dasharray="2 2"/;
     assert.match(withPrevious, /r="2\.5"/);
-    assert.match(withPrevious, /stroke="#94a3b8"/);
+    assert.match(withPrevious, previousTrail);
     assert.doesNotMatch(withoutPrevious, /r="2\.5"/);
-    assert.doesNotMatch(withoutPrevious, /stroke="#94a3b8"/);
+    assert.doesNotMatch(withoutPrevious, previousTrail);
   });
 
-  it("measures the nearest plotted call-change line, independently of operating pause rules", () => {
-    const current = renderToStaticMarkup(
+  /* The distance to the nearer line is the trust strip's margin, printed once on the
+     page; the map printed it again as a caption (2026-10-09). What the map states in
+     words is each change line's value, at the line, and the four sides for a screen
+     reader: the definition the one-line legend gives where the map is not drawn. */
+  it("labels each change line with its value and defines the four sides, without restating the margin", () => {
+    const html = renderToStaticMarkup(
       <RegimeRadar {...base} tightness={90} riskAppetite={47} tightnessThreshold={70} riskAppetiteThreshold={50} />,
     );
-    assert.match(current, /3 points to nearest change line/);
-    assert.doesNotMatch(current, /0 points to/);
-
-    const horizontal = renderToStaticMarkup(<RegimeRadar {...base} tightness={62} />);
-    assert.match(horizontal, /2 points to nearest change line/);
-
-    const onLine = renderToStaticMarkup(<RegimeRadar {...base} riskAppetite={45} />);
-    assert.match(onLine, /0 points to nearest change line/);
+    assert.match(html, /data-change-line="tightness"[^>]*>70<\/text>/);
+    assert.match(html, /data-change-line="riskAppetite"[^>]*>50<\/text>/);
+    assert.doesNotMatch(html, /to the nearest change line/);
+    assert.match(
+      html,
+      /<p class="sr-only">Funding pressure above 70 and risk appetite below 50: Freezing\. Above 70 and above 50: Cloudy\. Below 70 and below 50: Stormy\. Below 70 and above 50: Sunny\.<\/p>/,
+    );
   });
 
   it("carries accessible title tooltips for threshold boundaries and current position", () => {
     const html = renderToStaticMarkup(<RegimeRadar {...base} />);
 
-    assert.match(html, /<title>Funding pressure boundary at 60<\/title>/);
-    assert.match(html, /<title>Risk appetite boundary at 45<\/title>/);
+    assert.match(html, /<title>Funding pressure change line at 60<\/title>/);
+    assert.match(html, /<title>Risk appetite change line at 45<\/title>/);
+    assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
+  });
+
+  /* The scenario studio draws this map with a hypothetical as the filled dot
+     and this week's reading as the hollow one — the same filled/hollow pair
+     its ladders use. The two points must be named, or a reader of the markup
+     (and a tooltip user) cannot tell which is which (2026-10-22). */
+  it("names both points when a surface passes labels for them", () => {
+    const html = renderToStaticMarkup(
+      <RegimeRadar {...base} previousTightness={55} previousRiskAppetite={35} primaryLabel="Simulated reading" previousLabel="This week" />,
+    );
+
+    assert.match(html, /<title>Simulated reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
+    assert.match(html, /<title>This week: Funding pressure 55, Risk appetite 35<\/title>/);
+  });
+
+  it("keeps the default point name when no label is passed", () => {
+    const html = renderToStaticMarkup(
+      <RegimeRadar {...base} previousTightness={55} previousRiskAppetite={35} />,
+    );
+
     assert.match(html, /<title>Current reading: Funding pressure 75, Risk appetite 30 \(freezing\)<\/title>/);
   });
 });
@@ -101,6 +140,31 @@ describe("RegimeRadar path", () => {
     { tightness: 63, riskAppetite: 56 },
   ];
 
+  it("keeps close month-end hover targets from covering one another", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={[
+      { tightness: 40, riskAppetite: 61, label: "April 2026" },
+      { tightness: 40, riskAppetite: 59, label: "May 2026" },
+    ]} />);
+    const targets = [...html.matchAll(/<circle cx="([\d.]+)" cy="([\d.]+)" r="([\d.]+)" fill="transparent"/g)];
+    assert.equal(targets.length, 2);
+    const [a, b] = targets;
+    assert.ok(a && b);
+    const distance = Math.hypot(Number(a[1]) - Number(b[1]), Number(a[2]) - Number(b[2]));
+    assert.ok(Number(a[3]) + Number(b[3]) <= distance + 0.00001, "neither target may mask its neighbor's date");
+  });
+
+  it("offers the dated readings in HTML for touch, keyboard and screen-reader users", () => {
+    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={[
+      { tightness: 40, riskAppetite: 61, label: "April 2026" },
+      { tightness: 40, riskAppetite: 59, label: "May 2026" },
+    ]} />);
+    const caption = /<figcaption[\s\S]*<\/figcaption>/.exec(html)?.[0] ?? "";
+    assert.match(caption, /<summary[^>]*>Readings on this chart<\/summary>/);
+    assert.match(caption, /April 2026: Funding pressure 40, Risk appetite 61/);
+    assert.match(caption, /May 2026: Funding pressure 40, Risk appetite 59/);
+    assert.match(caption, /Current reading: Funding pressure 90, Risk appetite 48/);
+  });
+
   it("joins every month-end to the current point, and drops the single earlier dot", () => {
     const html = renderToStaticMarkup(
       <RegimeRadar {...base} previousTightness={63} previousRiskAppetite={56} trail={trail} />,
@@ -116,17 +180,20 @@ describe("RegimeRadar path", () => {
       <RegimeRadar
         {...base}
         trail={trail}
-        trailCaption="Path: month-ends Jun–Aug 2026, then now."
+        trailCaption="Trail: month-ends Jun–Aug 2026, then this week."
         caveat="The Aug 31 scores were built from interest rates alone."
       />,
     );
-    assert.match(html, /Path: month-ends Jun–Aug 2026, then now\./);
+    assert.match(html, /Trail: month-ends Jun–Aug 2026, then this week\./);
     assert.match(html, /built from interest rates alone/);
   });
 
-  it("leaves the distance caption to a surface that already states it", () => {
-    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} showDistance={false} />);
-    assert.doesNotMatch(html, /points to nearest change line/);
-    assert.doesNotMatch(html, /<figcaption/, "no empty caption is drawn");
+  it("always says which corner is easiest and which hardest", () => {
+    // The four words are not a severity scale (2026-10-14), so the caption
+    // always carries the orientation, and is never empty.
+    const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} />);
+    assert.match(html, /<figcaption[\s\S]*Easiest bottom right \(Sunny\), hardest top left \(Freezing\)\.[\s\S]*<\/figcaption>/);
+    const withFooter = renderToStaticMarkup(<RegimeRadar {...base} footer={<span>How they are set</span>} />);
+    assert.match(withFooter, /<figcaption[\s\S]*How they are set[\s\S]*<\/figcaption>/, "the footer closes the caption");
   });
 });

@@ -13,9 +13,20 @@
  * than the writer. The ZIP stores its entries uncompressed, which the format
  * allows and every reader accepts; the whole file is under 20 KB.
  */
-import { slideConditions, slideFooterLine, slideReadingLines, slideResumeLine, type MeetingSlidePayload } from "./meetingSlideExport";
+import { slideConditionColors, slideConditions, slideFooterLine, slideReadingLines, slideResumeLine, type MeetingSlidePayload } from "./meetingSlideExport";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
+import {
+  OG_BG,
+  OG_LINE_CROSSED,
+  OG_LINE_CROSSED_MARK,
+  OG_PANEL,
+  OG_RULE,
+  OG_TEXT,
+  OG_TEXT_MUTED,
+  OG_TEXT_SECONDARY,
+} from "../image/ogTheme";
 
 // ---------------------------------------------------------------------------
 // Geometry. The SVG slide is 1200×675; PowerPoint's 16:9 slide is 13.333×7.5in
@@ -40,22 +51,28 @@ type SlideColors = {
   ink: string;
   inkMuted: string;
   inkSoft: string;
-  badge: string;
   accents: readonly [string, string, string];
 };
 
+/** OOXML and the PDF writer take a colour as six hex digits, no "#". */
+const ooxml = (hex: string) => hex.replace("#", "").toUpperCase();
+
+/* The slide's palette (lib/image/ogTheme.ts). The cards' accents follow the
+   meeting slide's labels: the ink for the action and the line where the call
+   changes, the front red for the pause line. */
 const COLORS: SlideColors = {
-  background: "0B1120",
-  card: "1E293B",
-  cardLine: "334155",
-  ink: "FFFFFF",
-  inkMuted: "CBD5E1",
-  inkSoft: "64748B",
-  badge: "10B981",
-  accents: ["38BDF8", "F59E0B", "10B981"],
+  background: ooxml(OG_BG),
+  card: ooxml(OG_PANEL),
+  cardLine: ooxml(OG_RULE),
+  ink: ooxml(OG_TEXT),
+  inkMuted: ooxml(OG_TEXT_SECONDARY),
+  inkSoft: ooxml(OG_TEXT_MUTED),
+  accents: [ooxml(OG_TEXT), ooxml(OG_LINE_CROSSED), ooxml(OG_TEXT)],
 };
 
-const isDefensiveRegime = (regime: string) => regime === "DEFENSIVE" || regime === "SCARCITY";
+/* The condition badge, as the meeting slide draws it. */
+const badgeEdge = (payload: MeetingSlidePayload) => ooxml(slideConditionColors(payload).edge);
+const badgeInk = (payload: MeetingSlidePayload) => ooxml(slideConditionColors(payload).ink);
 
 type SlideCard = {
   label: string;
@@ -184,15 +201,14 @@ const EMPTY_SP_TREE_HEAD =
 
 const buildSlideXml = (payload: MeetingSlidePayload) => {
   shapeId = 1;
-  const badgeColor = isDefensiveRegime(payload.regime) ? "F43F5E" : COLORS.badge;
   const shapes: string[] = [];
 
   shapes.push(
-    textBox({ name: "Eyebrow", x: 80, y: 56, width: 780, height: 22, text: EYEBROW, style: { sizePx: 14, bold: true, color: "94A3B8", tracking: 150 } }),
+    textBox({ name: "Eyebrow", x: 80, y: 56, width: 780, height: 22, text: EYEBROW, style: { sizePx: 14, bold: true, color: COLORS.inkSoft, tracking: 150 } }),
     textBox({ name: "Title", x: 80, y: 82, width: 860, height: 44, text: titleLine(payload), style: { sizePx: 34, bold: true, color: COLORS.ink } }),
     textBox({ name: "Subtitle", x: 80, y: 130, width: 860, height: 24, text: subtitleLine(payload), style: { sizePx: 16, color: COLORS.inkSoft } }),
-    rectangle({ name: "Regime badge", x: 960, y: 80, width: 160, height: 42, fill: "1A2334", line: badgeColor, rounded: true }),
-    textBox({ name: "Regime", x: 960, y: 80, width: 160, height: 42, text: getRegimePublicLabel(payload.regime), style: { sizePx: 15, bold: true, color: badgeColor, tracking: 100 }, align: "ctr", anchor: "ctr" }),
+    rectangle({ name: "Regime badge", x: 960, y: 80, width: 160, height: 42, fill: COLORS.card, line: badgeEdge(payload), rounded: true }),
+    textBox({ name: "Regime", x: 960, y: 80, width: 160, height: 42, text: getRegimePublicLabel(payload.regime), style: { sizePx: 15, bold: true, color: badgeInk(payload), tracking: 100 }, align: "ctr", anchor: "ctr" }),
   );
 
   for (const card of buildCards(payload)) {
@@ -280,9 +296,11 @@ const SLIDE_LAYOUT_XML =
 
 const THEME_XML =
   `${XML_HEADER}<a:theme ${NS_A} name="Whether"><a:themeElements>` +
-  '<a:clrScheme name="Whether"><a:dk1><a:srgbClr val="0B1120"/></a:dk1><a:lt1><a:srgbClr val="FFFFFF"/></a:lt1><a:dk2><a:srgbClr val="1E293B"/></a:dk2><a:lt2><a:srgbClr val="E2E8F0"/></a:lt2>' +
-  '<a:accent1><a:srgbClr val="38BDF8"/></a:accent1><a:accent2><a:srgbClr val="F59E0B"/></a:accent2><a:accent3><a:srgbClr val="10B981"/></a:accent3><a:accent4><a:srgbClr val="F43F5E"/></a:accent4><a:accent5><a:srgbClr val="94A3B8"/></a:accent5><a:accent6><a:srgbClr val="64748B"/></a:accent6>' +
-  '<a:hlink><a:srgbClr val="38BDF8"/></a:hlink><a:folHlink><a:srgbClr val="94A3B8"/></a:folHlink></a:clrScheme>' +
+  /* The deck's theme colours, for anything a reader adds to it: the four
+     conditions as accents 1-4, the front red and the muted ink after them. */
+  `<a:clrScheme name="Whether"><a:dk1><a:srgbClr val="${ooxml(OG_BG)}"/></a:dk1><a:lt1><a:srgbClr val="${ooxml(OG_TEXT)}"/></a:lt1><a:dk2><a:srgbClr val="${ooxml(OG_PANEL)}"/></a:dk2><a:lt2><a:srgbClr val="${ooxml(OG_TEXT_SECONDARY)}"/></a:lt2>` +
+  `<a:accent1><a:srgbClr val="${ooxml(REGIME_HEX_COLORS.EXPANSION)}"/></a:accent1><a:accent2><a:srgbClr val="${ooxml(REGIME_HEX_COLORS.DEFENSIVE)}"/></a:accent2><a:accent3><a:srgbClr val="${ooxml(REGIME_HEX_COLORS.VOLATILE)}"/></a:accent3><a:accent4><a:srgbClr val="${ooxml(REGIME_HEX_COLORS.SCARCITY)}"/></a:accent4><a:accent5><a:srgbClr val="${ooxml(OG_LINE_CROSSED_MARK)}"/></a:accent5><a:accent6><a:srgbClr val="${ooxml(OG_TEXT_MUTED)}"/></a:accent6>` +
+  `<a:hlink><a:srgbClr val="${ooxml(OG_TEXT)}"/></a:hlink><a:folHlink><a:srgbClr val="${ooxml(OG_TEXT_MUTED)}"/></a:folHlink></a:clrScheme>` +
   '<a:fontScheme name="Whether"><a:majorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:majorFont><a:minorFont><a:latin typeface="Calibri"/><a:ea typeface=""/><a:cs typeface=""/></a:minorFont></a:fontScheme>' +
   '<a:fmtScheme name="Whether"><a:fillStyleLst><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:fillStyleLst>' +
   '<a:lnStyleLst><a:ln w="9525"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="12700"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln><a:ln w="19050"><a:solidFill><a:schemeClr val="phClr"/></a:solidFill></a:ln></a:lnStyleLst>' +
@@ -559,21 +577,20 @@ export const buildBoardSlidePdf = async (payload: MeetingSlidePayload): Promise<
 
   page.drawRectangle({ x: 0, y: 0, width: PAGE_WIDTH, height: PAGE_HEIGHT, color: color(COLORS.background) });
 
-  drawText(EYEBROW, { x: 80, y: 56, sizePx: 14, font: bold, fill: "94A3B8", maxWidthPx: 780 });
+  drawText(EYEBROW, { x: 80, y: 56, sizePx: 14, font: bold, fill: COLORS.inkSoft, maxWidthPx: 780 });
   drawText(titleLine(payload), { x: 80, y: 82, sizePx: 34, font: bold, fill: COLORS.ink, maxWidthPx: 860 });
   drawText(subtitleLine(payload), { x: 80, y: 130, sizePx: 16, font: regular, fill: COLORS.inkSoft, maxWidthPx: 860 });
 
-  const badgeColor = isDefensiveRegime(payload.regime) ? "F43F5E" : COLORS.badge;
   page.drawRectangle({
     x: pt(960),
     y: top(80, 42),
     width: pt(160),
     height: pt(42),
-    color: color("1A2334"),
-    borderColor: color(badgeColor),
+    color: color(COLORS.card),
+    borderColor: color(badgeEdge(payload)),
     borderWidth: 1.2,
   });
-  drawText(getRegimePublicLabel(payload.regime), { x: 960, y: 92, sizePx: 15, font: bold, fill: badgeColor, maxWidthPx: 160, align: "center" });
+  drawText(getRegimePublicLabel(payload.regime), { x: 960, y: 92, sizePx: 15, font: bold, fill: badgeInk(payload), maxWidthPx: 160, align: "center" });
 
   for (const card of buildCards(payload)) {
     page.drawRectangle({

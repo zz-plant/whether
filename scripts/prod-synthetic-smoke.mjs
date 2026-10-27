@@ -5,13 +5,18 @@ const strictHtmlChecks = process.env.WHETHER_SMOKE_STRICT_HTML === "1";
 
 const pageChecks = [
   { path: "/", required: ["weekly brief", "share-ready-artifact", "build this week's plan"] },
-  { path: "/evidence", required: ["evidence", "what this means now"] },
+  // "Why it changed" is the page's tab and header name since 2026-10-08; the tab
+  // that read "Evidence" is gone, so the word is no longer a safe marker.
+  { path: "/evidence", required: ["why it changed", "what would change this guidance"] },
   /* "decision help" was asked of /planning here until 2026-10-01; the page stopped
      rendering it on 2026-09-15, so every run since failed on a page that was up.
-     The plan-lines step is what /pricing, the Monday email and the homepage picker
-     all link to. */
-  { path: "/operate", required: ["weekly plan", "set this plan's lines"] },
-  { path: "/resolve", required: ["resolve", "toolkit-library"] },
+     The plan-lines step is what the Monday email and the homepage picker both link
+     to. */
+  // "weekly plan" was the planning switcher's first tab; the Decide group's tabs
+  // replaced it on 2026-10-08.
+  { path: "/operate", required: ["decide", "set this plan's lines"] },
+  // Guides took Resolve's direct answers and its toolkit library (2026-10-08).
+  { path: "/resources", required: ["more-tools", "toolkit-library"] },
   { path: "/acceptable-use-policy", required: ["acceptable use"] },
   { path: "/terms-of-service", required: ["terms of service"] },
 ];
@@ -19,6 +24,8 @@ const pageChecks = [
 const redirectChecks = [
   { from: "/learn", to: "/trust" },
   { from: "/planning", to: "/operate" },
+  { from: "/resolve", to: "/operate" },
+  { from: "/answers", to: "/resources" },
 ];
 
 const retiredRouteChecks = ["/templates"];
@@ -226,7 +233,21 @@ const run = async () => {
     fail("/api/health missing dependencies.reportData");
   }
 
-  console.log("✅ /api/health checks passed");
+  /* A live feed that is stale, unconfirmed or cached, or an ingest model the alarm stopped
+     refreshing, is the failure /api/health exists to surface (2026-10-13: Treasury sat 14h stale
+     behind an "ok"). Fail the run and name what degraded it. */
+  if (healthPayload.status === "degraded") {
+    const degraded = Array.isArray(healthPayload.degradedSources)
+      ? healthPayload.degradedSources
+          .map((row) => `${row.source} ${row.state}${row.age ? ` (${row.age} old)` : ""}`)
+          .join(", ")
+      : "unnamed";
+    const model = healthPayload.dependencies?.ingestModel === "stale"
+      ? `; ingest model last refreshed ${healthPayload.ingestModelAsOf ?? "never"}`
+      : "";
+    fail(`/api/health is degraded: live sources not answering live: ${degraded || "none"}${model}`);
+  }
+  console.log(`✅ /api/health checks passed (commit ${healthPayload.commit ?? "unknown"})`);
   console.log("✅ synthetic smoke completed successfully");
 };
 

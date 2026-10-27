@@ -1,10 +1,11 @@
 import assert from "node:assert/strict";
+import { publishedBriefWeekLabel } from "../lib/report/publishedBriefs";
 import { describe, it } from "bun:test";
 
 import { generateMetadata as scenarioMetadata } from "../app/signals/[cluster]/[decision-scenario]/page";
 import { generateMetadata as briefMetadata } from "../app/brief/[week]/page";
 import { signalScenarioRoutes } from "../app/seoRouteClusters";
-import { getPublishedBriefs } from "../lib/report/publishedBriefs";
+import { buildPublishedBriefDescription, getPublishedBriefs } from "../lib/report/publishedBriefs";
 
 /*
  * A search result shows about 160 characters of a description. The templated
@@ -28,11 +29,28 @@ describe("search snippets", () => {
     assert.equal(seen.size, signalScenarioRoutes.length, "each scenario page describes itself differently");
   });
 
-  it("fit every published week's description", async () => {
+  /*
+   * w40 and w41 shipped one description between them, "Approve only renewals,
+   * work already promised to customers, and hires that bring in revenue.": the
+   * summary belongs to the conditions, and both weeks' "what changed" ran past
+   * the snippet, so each page fell back to the summary alone.
+   */
+  it("fit every published week's description, and give each week its own", async () => {
+    const seen = new Set<string>();
     for (const brief of getPublishedBriefs()) {
       const metadata = await briefMetadata({ params: Promise.resolve({ week: brief.slug }) });
       const description = String(metadata.description ?? "");
       assert.ok(description.length > 0 && description.length <= LIMIT, `${brief.slug}: ${description.length}`);
+      seen.add(description);
     }
+    assert.equal(seen.size, getPublishedBriefs().length, "each published week describes itself differently");
+  });
+
+  it("leads with the week's date when two weeks would say the same thing", () => {
+    const [latest] = getPublishedBriefs();
+    const twin = { ...latest, slug: "2099-w01", recordDate: "2099-01-07", recordDateLabel: "Jan 7, 2099" };
+    const pair = [latest, twin];
+    assert.equal(buildPublishedBriefDescription(latest, pair), `Week of ${publishedBriefWeekLabel(latest)}: ${latest.summary}`);
+    assert.equal(buildPublishedBriefDescription(twin, pair), `Week of Jan 5, 2099: ${latest.summary}`);
   });
 });

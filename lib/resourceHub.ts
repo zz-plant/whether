@@ -1,4 +1,5 @@
-import { resourceArticles } from "./resourceArticles";
+import type { DecisionArea } from "./report/boundedDecisionRules";
+import { getResourceArticleDecisionAreas, resourceArticles, type ResourceArticle } from "./resourceArticles";
 import { resourcePillarPages } from "./resourcesContent";
 import { isIndexableResourceArticleSlug, isIndexableResourcePillarSlug } from "./seo/indexationPolicy";
 
@@ -7,7 +8,22 @@ type ResourceHubEntry = {
   title: string;
   description: string;
   kind: "pillar" | "article" | "standalone";
+  /** The decision area an article argues, for the Guides page's grouping. Frameworks span every area and carry none. */
+  decisionArea?: DecisionArea;
 };
+
+/*
+ * The area each article is about, where the intent mapping reads it wrong: the
+ * hiring-freeze policy is written for a CFO, and the CFO intent leads with
+ * spending, so the Guides page would have filed a hiring guide under Spending.
+ */
+const articleLeadAreaBySlug: Record<string, DecisionArea> = {
+  "should-we-freeze-hiring-high-interest-rate-environment": "hiring",
+  "how-much-runway-do-we-need-tightening-market": "burn-discipline",
+};
+
+const articleLeadArea = (article: ResourceArticle): DecisionArea | undefined =>
+  articleLeadAreaBySlug[article.slug] ?? getResourceArticleDecisionAreas(article)[0];
 
 /**
  * Every indexable page under /resources, for the hub that links them.
@@ -34,6 +50,7 @@ export const buildResourceHubEntries = (): ResourceHubEntry[] => [
       title: article.title,
       description: article.description,
       kind: "article",
+      decisionArea: articleLeadArea(article),
     })),
   /*
    * `standalone`: its own route, in neither content list. It was declared here
@@ -44,7 +61,7 @@ export const buildResourceHubEntries = (): ResourceHubEntry[] => [
     href: "/resources/how-vc-firms-can-enforce-capital-discipline-across-portfolios",
     title: "How VC firms can enforce capital discipline across portfolios",
     description:
-      "A portfolio-level operating standard: one posture read, one set of reversal triggers, applied across every company a firm backs.",
+      "A portfolio-level operating standard: one guidance reading, one set of pause and resume lines, applied across every company a firm backs.",
     kind: "standalone",
   },
 ];

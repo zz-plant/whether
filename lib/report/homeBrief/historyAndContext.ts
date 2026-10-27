@@ -1,7 +1,7 @@
+import { comparisonBasis, describeGuidanceStands } from "../comparisonBasis";
 import { getWeeklyPostureHistory } from "../../summary/weeklyPostureHistory";
 import { formatThresholdNumber } from "../../formatters";
 import { REGIME_LABELS } from "../../regimePresentation";
-import { deriveSectorAdjustedPosture, SECTOR_TAXONOMY } from "../sectorSensitivity";
 import { formatBoundaryDistance, joinSentences, regimeSignalLabelByKey } from "../reportFormatting";
 import { isImprovingSignalDelta } from "../reportData";
 import type {
@@ -9,7 +9,6 @@ import type {
   HistoricalTimelineItem,
   HomeBriefTrustWarning,
   HomeReportData,
-  MacroOverlayItem,
   MemoryRailItem,
   Regime,
   SignalChange,
@@ -145,87 +144,6 @@ export const formatRegimeWithDuration = ({
   return months >= 2 ? `${label} for ${months} months` : label;
 };
 
-const formatDelta = (value: number | null, positiveIsImproving: boolean) => {
-  if (value === null || Number.isNaN(value) || value === 0) {
-    return "→ unchanged";
-  }
-
-  const improving = positiveIsImproving ? value > 0 : value < 0;
-  const arrow = improving ? "↑" : "↓";
-  const direction = improving ? "improving" : "deteriorating";
-  return `${arrow} ${direction}`;
-};
-
-const getMacroSeriesDelta = (
-  macroSeries: HomeReportData["macroSeries"],
-  id: NonNullable<HomeReportData["macroSeries"]>[number]["id"],
-) => {
-  const series = macroSeries?.find((reading) => reading.id === id);
-  const latest = typeof series?.value === "number" ? series.value : null;
-  const history = series?.history ?? [];
-  const previousValue = history.length >= 2 ? history[history.length - 2]?.value : null;
-  const previous = typeof previousValue === "number" ? previousValue : null;
-  const delta = typeof latest === "number" && typeof previous === "number" ? latest - previous : null;
-
-  return { latest, delta };
-};
-
-const sectorActionBiasCopy = {
-  loosen: "Run a step ahead of the base guidance.",
-  tighten: "Run a step behind the base guidance.",
-  hold: "Hold the base guidance as written.",
-} as const;
-
-const describeSectorOverlay = (
-  overlay: ReturnType<typeof deriveSectorAdjustedPosture>,
-): string => {
-  const bias = sectorActionBiasCopy[overlay.actionBias];
-
-  if (overlay.adjustmentStrength === "none") {
-    return `${overlay.adjustedPostureLabel}, with no meaningful sector tilt. ${bias}`;
-  }
-
-  const tilt = overlay.adjustmentDelta > 0 ? "upside" : "downside";
-  return `${overlay.adjustedPostureLabel}, a ${overlay.adjustmentStrength} ${tilt} tilt against the base posture. ${bias}`;
-};
-
-export const buildMacroOverlay = (
-  macroSeries: HomeReportData["macroSeries"],
-  assessment: HomeReportData["assessment"],
-  overlaySector: NonNullable<Parameters<typeof deriveSectorAdjustedPosture>[1]>,
-): MacroOverlayItem[] => {
-  const vcFunding = getMacroSeriesDelta(macroSeries, "VC_FUNDING_VELOCITY");
-  const layoffs = getMacroSeriesDelta(macroSeries, "TECH_LAYOFF_TREND");
-  const ipoWindow = getMacroSeriesDelta(macroSeries, "VIX_INDEX");
-  const saasValuations = getMacroSeriesDelta(macroSeries, "SAAS_VALUATION_MULTIPLE");
-
-  const sectorOverlay = deriveSectorAdjustedPosture(assessment, overlaySector);
-  const sectorLabel = SECTOR_TAXONOMY[overlaySector].label;
-
-  return [
-    {
-      label: "VC funding",
-      detail: `${typeof vcFunding.latest === "number" ? vcFunding.latest.toFixed(1) : "n/a"} · ${formatDelta(vcFunding.delta, true)}`,
-    },
-    {
-      label: "Startup layoffs",
-      detail: `${typeof layoffs.latest === "number" ? layoffs.latest.toFixed(1) : "n/a"} · ${formatDelta(layoffs.delta, false)}`,
-    },
-    {
-      label: "IPO window (VIX)",
-      detail: `${typeof ipoWindow.latest === "number" ? ipoWindow.latest.toFixed(1) : "n/a"} · ${formatDelta(ipoWindow.delta, false)}`,
-    },
-    {
-      label: "SaaS multiples",
-      detail: `${typeof saasValuations.latest === "number" ? saasValuations.latest.toFixed(1) : "n/a"} · ${formatDelta(saasValuations.delta, true)}`,
-    },
-    {
-      label: `Sector sensitivity (${sectorLabel})`,
-      detail: describeSectorOverlay(sectorOverlay),
-    },
-  ];
-};
-
 const describeSignalDirection = (
   signal: SignalChange,
 ): "improved" | "deteriorated" | "held flat" => {
@@ -344,7 +262,7 @@ export const buildFlipRiskMeterState = (
     return {
       progressPercent,
       urgencyLabel: "Medium",
-      detailLabel: "Conditions could change within weeks. Keep approvals reversible and review weekly.",
+      detailLabel: "Conditions could change within weeks. Keep new commitments reversible and review weekly.",
       triggerLabel,
     };
   }
@@ -399,7 +317,7 @@ export const buildStartRouteDeltaBlock = ({
       isReturningUser: true,
       hasMeaningfulDelta: false,
       fallbackCopy:
-        `No change. Last week's guidance stands. ${heldDecision} Re-check when: ${reversalTrigger}`,
+        `No change. ${describeGuidanceStands(comparisonBasis(reportDynamics?.comparedWith))} ${heldDecision} Re-check when: ${reversalTrigger}`,
       items: [],
     };
   }
@@ -416,7 +334,7 @@ export const buildStartRouteDeltaBlock = ({
       id: "posture-shift" as const,
       label: "Conditions changed",
       detail: `Conditions moved from ${REGIME_LABELS[regimeAlert.previousRegime]} to ${REGIME_LABELS[currentRegime]}. Re-check this week's guidance before committing anything you can't undo.`,
-      href: "/resolve" as const,
+      href: "/operate" as const,
     });
   }
 

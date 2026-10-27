@@ -1,0 +1,44 @@
+name: Bug report
+description: A number, page, export or agent answer that is wrong or broken.
+labels: ["bug"]
+body:
+  - type: dropdown
+    id: surface
+    attributes:
+      label: Where did you see it?
+      options:
+        - The website (whether.work)
+        - The Monday email or an alert
+        - A Slack post
+        - A share export (slide, deck, investor update, embed)
+        - The MCP server or JSON API
+        - The CLI
+        - Running it locally
+    validations:
+      required: true
+  - type: input
+    id: url
+    attributes:
+      label: Page, endpoint or command
+      placeholder: https://whether.work/operate · /api/agent?view=state · bun run cli:whether -- status
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happened
+      description: Paste the wrong value, sentence or error as it appeared. A screenshot helps for layout problems.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+      description: If a number looks wrong, say what you compared it with (the source series, another page, last week's brief).
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, client or runtime
+      placeholder: Safari 19 on iPhone · Claude Code · Bun 1.3.14

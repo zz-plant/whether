@@ -9,6 +9,7 @@ import { writeSummaryArchive } from "./summaryArchive";
 import { writeSummaryFile } from "./summaryFile";
 import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
 import { fetchArchiveDatasets } from "./regimeArchiveContext";
+import { carryUnchangedEntries } from "./carryUnchangedEntries";
 import { buildMonthlyArchive, type TimeMachineCacheEntry } from "./regimeArchiveReplay";
 
 const OUTPUT_PATH = "data/monthly_summaries_2012_2025.json";
@@ -39,18 +40,14 @@ const writeTimeMachineCache = async ({
   entries: TimeMachineCacheEntry[];
   mode: "replace" | "merge";
 }) => {
+  const getKey = (entry: TimeMachineCacheEntry) => `${entry.year}-${entry.month}`;
+  const existing = await readTimeMachineCacheEntries();
+  const incoming = carryUnchangedEntries(existing, entries, getKey);
   const nextEntries = mode === "merge"
-    ? (() => {
-        const merged = new Map<string, TimeMachineCacheEntry>();
-        return readTimeMachineCacheEntries().then((existing) => {
-          existing.forEach((entry) => merged.set(`${entry.year}-${entry.month}`, entry));
-          entries.forEach((entry) => merged.set(`${entry.year}-${entry.month}`, entry));
-          return Array.from(merged.values());
-        });
-      })()
-    : Promise.resolve(entries);
+    ? Array.from(new Map([...existing, ...incoming].map((entry) => [getKey(entry), entry])).values())
+    : incoming;
 
-  const sorted = (await nextEntries).sort(
+  const sorted = nextEntries.sort(
     (left, right) => new Date(left.record_date).getTime() - new Date(right.record_date).getTime(),
   );
   await writeJson(TIME_MACHINE_CACHE_PATH, sorted);
@@ -58,8 +55,8 @@ const writeTimeMachineCache = async ({
 
 const generateMonthlySummaries = async () => {
   const now = new Date();
-  const { datasets, vixDataset } = await fetchArchiveDatasets();
-  const { entries: output, timeMachineEntries, mode } = buildMonthlyArchive({ datasets, vixDataset, now });
+  const { datasets, vixDataset, chicagoFciDataset } = await fetchArchiveDatasets();
+  const { entries: output, timeMachineEntries, mode } = buildMonthlyArchive({ datasets, vixDataset, chicagoFciDataset, now });
 
   await writeSummaryFile({
     path: OUTPUT_PATH,

@@ -75,14 +75,15 @@ const weeklyActionGuidanceSaturatedFinancing: Record<RegimeAssessment["regime"],
  * money (`REGIME_WEATHER_RATIONALES`). It printed the policy engine's codes —
  * "⚠️ RISK-OFF / CAPITAL-TIGHT" under a summary that opened "Freezing:" —
  * a second vocabulary for the same four states, in capitals the reader
- * vocabulary test could not see.
+ * vocabulary test could not see. The warning sign and the tick that led the
+ * line went on 2026-10-09: the weather word already says which week it is.
  */
-const climateLabelFor = (regime: RegimeAssessment["regime"], mark: "⚠️" | "✅") =>
-  `${mark} ${getRegimePublicLabel(regime)}: ${getRegimeWeatherRationale(regime)}`;
+const climateLabelFor = (regime: RegimeAssessment["regime"]) =>
+  `${getRegimePublicLabel(regime)}: ${getRegimeWeatherRationale(regime)}`;
 
 const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemplate> = {
   SCARCITY: {
-    climateLabel: climateLabelFor("SCARCITY", "⚠️"),
+    climateLabel: climateLabelFor("SCARCITY"),
     climateSummary: [
       "Capital is expensive and risk tolerance is down.",
       "Assume slower approvals, tighter scrutiny, and low patience for long-horizon bets.",
@@ -103,10 +104,10 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "Running experiments that weaken short-term cash flow",
     ],
     planningQuote:
-      "“Prioritize short-payback, reversible work and stop expansion bets that raise burn or depend on a rebound in risk appetite.”",
+      "“Prioritize short-payback, reversible work and stop new bets that raise burn or depend on a rebound in risk appetite.”",
   },
   DEFENSIVE: {
-    climateLabel: climateLabelFor("DEFENSIVE", "⚠️"),
+    climateLabel: climateLabelFor("DEFENSIVE"),
     climateSummary: [
       "Capital is expensive, but risk appetite is selective rather than frozen.",
       "Expect tighter ROI gates and a focus on efficiency over growth-at-any-price.",
@@ -130,7 +131,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "“Commit to efficiency-first bets that improve retention and margins, and enforce explicit payback gates on every expansion proposal.”",
   },
   VOLATILE: {
-    climateLabel: climateLabelFor("VOLATILE", "⚠️"),
+    climateLabel: climateLabelFor("VOLATILE"),
     climateSummary: [
       "Capital is available, but risk tolerance is muted.",
       "Expect buyers to favor reliability and proof over novelty.",
@@ -154,7 +155,7 @@ const weeklyOutputTemplates: Record<RegimeAssessment["regime"], WeeklyOutputTemp
       "“Lead with reliability and evidence, and keep launches reversible until buyer confidence strengthens.”",
   },
   EXPANSION: {
-    climateLabel: climateLabelFor("EXPANSION", "✅"),
+    climateLabel: climateLabelFor("EXPANSION"),
     climateSummary: [
       "Capital is accessible and financing conditions are supportive.",
       "Expect faster approvals and higher tolerance for bold bets.",
@@ -280,7 +281,7 @@ export const buildWeeklySummary = ({
         "The guidance is not changing this week",
         assessment.policyAssessment.refusal.reasons[0]
           ?? "The signals disagree, or too many inputs are missing",
-        "Keep approvals reversible until the hold lifts",
+        "Keep new commitments reversible until the hold lifts",
       )
     : "";
   const stagedRegimeLabel = stageLabel ? `${regimeLabel} — ${stageLabel}` : regimeLabel;

@@ -7,6 +7,10 @@ import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
 import { macroSeries } from "../lib/macroSnapshot";
 import { snapshotData } from "../lib/snapshot";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * The two artifacts that leave the building.
@@ -38,7 +42,7 @@ const liveSnapshot = (recordDate = "2026-08-28") =>
       record_date: recordDate,
       fetched_at: `${recordDate}T12:00:00.000Z`,
     },
-    macroSeries,
+    macroSeries: liveMacroSeries,
     now: FRESH_NOW,
   });
 
@@ -130,8 +134,8 @@ describe("the weekly email refuses what it cannot stand behind", () => {
 
     const [message] = sent;
     assert.ok(message, "the one subscriber was mailed");
-    assert.match(message.text, /Move these lines for your own plan, and hear the day one is crossed: \S+\/operate#ops-plan-lines/);
-    assert.match(message.html, /<a href="[^"]+\/operate#ops-plan-lines"[^>]*>Move these lines for your own plan<\/a>/);
+    assert.match(message.text, /Set these lines for your own plan and we'll email you the day one is crossed: \S+\/operate#ops-plan-lines/);
+    assert.match(message.html, /<a href="[^"]+\/operate#ops-plan-lines"[^>]*>Set these lines for your own plan<\/a>/);
   });
 
   it("still reports no subscribers as the non-event it is", async () => {

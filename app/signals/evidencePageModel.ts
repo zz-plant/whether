@@ -10,7 +10,7 @@ import {
 } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
-import { createBreadcrumbTrail } from "../../lib/navigation/breadcrumbs";
+import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
 import { shouldSplitDecisionConditionRows } from "../../lib/report/reportFormatting";
 import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
 import {
@@ -145,7 +145,7 @@ const buildStructuredData = () =>
       url: siteUrl,
     },
     buildBreadcrumbList(
-      createBreadcrumbTrail([{ path: "/" }, { path: "/signals" }]),
+      buildGroupBreadcrumbs("/signals"),
     ),
   ]);
 
@@ -202,6 +202,7 @@ const deriveSignalsPageModel = (
       historical: Boolean(historicalSelection),
     }).label,
     assessment,
+    scoringBasis: reportData.scoringBasis,
   });
   const triggerCondition = guardrailThreshold?.trim().length
     ? guardrailThreshold
@@ -220,7 +221,7 @@ const deriveSignalsPageModel = (
   });
   const activeFocus: FocusTab = resolveSignalsFocus(resolvedSearchParams);
   const focusFilter = FOCUS_FILTERS[activeFocus];
-  const signalRows = buildSignalReferenceRows(assessment, reportDynamics);
+  const signalRows = buildSignalReferenceRows(assessment, reportDynamics, reportData.scoringBasis);
   const changedSignalRows = signalRows
     .filter((row) => focusFilter.signals.includes(row.key))
     .map((row) => ({ ...row, note: focusFilter.notes[row.key] ?? null }));

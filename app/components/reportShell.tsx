@@ -36,8 +36,8 @@ import { MobileSectionChips } from "./mobileSectionChips";
 import type { RegimeIconType } from "./pageShell";
 import { resolveTrustReadinessCopy } from "../../lib/report/trustStatus";
 import { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
-import type { OperatingLoopStep } from "./illustrations/OperatingLoopGlyph";
-import { NextStepCard, type NextStep } from "./report-shell/NextStepCard";
+import { SectionTabs } from "./sectionTabs";
+import type { Route } from "../../lib/navigation/routeType";
 import type { ExportCtaProps, ReportCtaProps } from "./report-shell/types";
 import { OfflineNotice } from "./offlineNotice";
 import type { TrustStripProps } from "./trustStrip";
@@ -54,10 +54,14 @@ export type ReportShellModel = {
   };
   page: {
     pageTitle: string;
-    pageSummary: string;
+    /** The page's job in one sentence. Left out where the title already says it
+     *  (/trust: "How much to trust this week's guidance"). */
+    pageSummary?: string;
     sectionLinks: ReportSectionLink[];
-    /** The route's step in the operating loop, drawn beside the intro. */
-    activeStep?: OperatingLoopStep;
+    /** The route's address, for its group's sub-tab row above the intro. Omitted, no row renders. */
+    currentPath?: Route;
+    /** A selection the route carries across its group's pages (an archived month on Decide). */
+    tabsQuery?: string;
   };
   trust: {
     trustStatusTone: "stable" | "warning" | "historical";
@@ -73,12 +77,14 @@ export type ReportShellModel = {
     sidebarVariant?: "full" | "hidden";
   };
   /** A hero action, for a destination the header and the page index do not
-   *  already reach. No route needs one today; the slot stays for the one that does. */
+   *  already reach. No route needs one today; the slot stays for the one that does.
+   *  There is no closing "Next" card (2026-10-09): on /signals, /operate and
+   *  /trust it pointed at a header tab or at "Use it elsewhere", which the
+   *  header and the footer already carry. A next action that only the page
+   *  knows is a link in its last section. */
   actions?: {
     primaryCta?: ReportCtaProps;
     exportCta?: ExportCtaProps | null;
-    nextStep?: NextStep;
-    nextRefreshLabel?: string;
   };
   payloads?: {
     structuredData?: unknown;
@@ -96,7 +102,7 @@ export { CommandCenterNavBlock } from "./report-shell/CommandCenterNavBlock";
 export const ReportShell = ({ model, children }: ReportShellProps) => {
   const {
     status: { statusLabel, statusPrefix, regime, recordDateLabel, fetchedAtLabel = "" },
-    page: { pageTitle, pageSummary, sectionLinks, activeStep },
+    page: { pageTitle, pageSummary, sectionLinks, currentPath, tabsQuery },
     trust: {
       trustStatusTone,
       degradedSourceRows,
@@ -108,16 +114,9 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
     actions: {
       primaryCta,
       exportCta = null,
-      nextStep,
-      nextRefreshLabel,
     } = {},
     payloads: { structuredData, historicalBanner } = {},
   } = model;
-  // Only a historical selection has a refresh state worth a label. The live
-  // masthead used to add "15m cadence" beside the decision date and the refresh
-  // timestamp — a third time marker, advertising a poll interval on a product
-  // whose whole premise is a Monday call.
-  const resolvedNextRefreshLabel = nextRefreshLabel ?? (trustStatusTone === "historical" ? "Fixed historical snapshot" : undefined);
   const contentSections = Children.toArray(children);
   /*
    * A rail with no outline in it is just 13rem of empty column — /history asked
@@ -143,7 +142,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             to a viewport tall, so any page whose content was shorter than the
             rail ended in a screenful of empty space. */}
         {sidebarEnabled ? (
-          <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:overscroll-contain">
+          <aside className="hidden lg:block lg:sticky lg:top-[calc(var(--running-head-height,0px)+1rem)] lg:self-start lg:max-h-[calc(100vh-2rem-var(--running-head-height,0px))] lg:overflow-y-auto lg:overscroll-contain">
             <AppSidebar sectionLinks={sectionLinks} />
           </aside>
         ) : null}
@@ -156,7 +155,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             task block, not separation. Desktop stops at 32px: at 48px, on top
             of the first section's own padding, ~90px of empty ground sat
             between the intro and the page's first heading. */}
-        <div className={`weather-page-stack order-1 min-w-0 ${sidebarEnabled ? "" : "mx-auto w-full max-w-[72rem]"}`}>
+        <div className={`weather-page-stack order-1 min-w-0 ${sidebarEnabled ? "" : "mx-auto w-full weather-page-shell-standard"}`}>
           {/* Every page built on this shell renders a reading, and the service
               worker serves the last copy of any of them when the network is
               gone. `/` carried this notice alone, so /trust — the page the IA
@@ -165,6 +164,9 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               so. The shell already has the record date, which is what makes the
               label true of whatever is on the screen. */}
           <OfflineNotice recordDateLabel={recordDateLabel} />
+
+          {/* The group's pages, as tabs, before the intro names the one this is. */}
+          {currentPath ? <SectionTabs currentPath={currentPath} query={tabsQuery} /> : null}
 
           <CommandCenterNavBlock
             pageTitle={pageTitle}
@@ -176,11 +178,10 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             statusPrefix={statusPrefix}
             trustStatusLabel={trustReadiness.headline}
             fetchedAtLabel={fetchedAtLabel}
-            resolvedNextRefreshLabel={resolvedNextRefreshLabel}
             showOfflineBadge={showOfflineBadge}
             offlineBadgeLabel={offlineBadgeLabel}
-            activeStep={activeStep}
             trustStrip={trustStrip}
+            regime={regime}
           />
 
           {/* The outline, as a row of tabs, where the rail is hidden. Under the
@@ -198,7 +199,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               matched the spacing used *inside* sections. A visible rule plus
               a wider outer gap makes the boundary the strongest horizontal
               signal on the page. */}
-          {/* Token, not divide-white/[0.10]: a hardcoded white rule is
+          {/* Token, not hardcoded white divider: a hardcoded white rule is
               invisible on the light theme's near-white ground, and 0.10 is
               not one of the four alphas the light escape-hatch block
               remaps. */}
@@ -230,8 +231,6 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
               );
             })}
           </div>
-
-          <NextStepCard nextStep={nextStep} />
         </div>
       </div>
     </PageShell>

@@ -16,6 +16,9 @@ test and not a dead export. It is invisible to the whole gate.
   `FirstVisitExplainer`: that element is already the one thing on `/` addressed to someone who has
   never seen the page, and its own comment records what it cost the last time that spot grew a
   second block. Its first link pointed at `#executive-snapshot`, an id no page renders.
+  Rendering it was not the end of it: tested only for being on the page, it kept naming sections the
+  page did not draw ("Summary", "Proof", "Actions") and a stage-and-runway rule the picker under it
+  contradicted, until 2026-10-08. A guide's test has to check its nouns against the page's.
 - **`computeReliabilityScore`** averaged confidence as 90/60/30, an offline flag as 100/50, and a
   degraded-source ratio over `max(degraded + 3, 4)` into a 0-100 figure with three colour bands.
   Its own tests pinned MED at 87 and LOW at 77 with every source healthy, against bands calling 80
@@ -93,7 +96,7 @@ is unmeasured.**
   `docs/feature-specs-current.md` recorded it as "stays, tested, with no client". Unauthenticated
   POST, caller-chosen id and secret, 24KB into KV with no rate limit and no TTL, for two key names
   (`whether-company-metrics`, `whether-decision-log`) naming a module deleted the same day and a key
-  nothing has ever written. `/privacy` 2.4 promises everything but recorded decisions "stays in your
+  nothing has ever written. `/privacy` 2.3 promises everything but recorded decisions "stays in your
   browser and is never sent", which was true only because nothing called it — and
   `tests/privacyPolicy.test.tsx` enumerates `STORAGE_KEYS` and `TELEMETRY_STREAMS`, neither of which
   a server-side write path appears in. A tested endpoint with no client is not a dormant feature.
@@ -152,12 +155,13 @@ verification tokens, the email Stripe reports for a paying customer, a per-brows
 server reads back (`x-whether-client-id`) to scope saved decisions, one cookie, nine browser storage
 keys and eight telemetry streams.
 
-The gap was worse than a missing document, because `/pricing` publishes **"No signup, no key, no
+The gap was worse than a missing document, because `/pricing` published **"No signup, no key, no
 trackers"** and the code is genuinely built to honour it: the search payload has no field that could
 hold the query text, the acquisition bucket drops the referring URL, the intake refuses an
 unexpected key, and the fonts are self-hosted. A claim a reader cannot check is worth less than the
-work behind making it true, and there is real work behind this one — so `/pricing` links to the page
-from the promise itself.
+work behind making it true, and there is real work behind this one — so `/pricing` linked to the page
+from the promise itself. (`/pricing` went with the paid tier on 2026-10-14; `/privacy` section 1
+states each part of the promise now.)
 
 **The page is an inventory, and `tests/privacyPolicy.test.tsx` keeps it one.** Every `STORAGE_KEYS`
 entry and every `TELEMETRY_STREAMS` entry is claimed there by the section that accounts for it, so
@@ -278,6 +282,13 @@ rather than what the metadata code intends, found gaps none of the SEO suites co
   `content/resources/*.json` has to move with its copy — it is the sitemap date and `dateModified`.
 - **Five lookalike Organization nodes** (a name, sometimes a URL, no `@id`) are the site entity by
   id now, and the RSS feed moved out of `sitemap.xml` into a second `Sitemap:` line in robots.txt.
+- **The allow list was checked against one of three documents (2026-10-27).** robots.txt opens
+  `/api/` paths by name, and `tests/robotsRoute.test.ts` held that list to `/llms.txt` alone. The
+  agent manifest and `/api-docs` advertise API paths too, so seven manifest endpoints and most of
+  `/api-docs` (scores, comps, the images, the slide file, the embed) were advertised and disallowed
+  at once. The test reads all three now. An endpoint that should stay closed leaves the document
+  instead (`/api/health` left the manifest), and an open path opens every path it is a prefix of,
+  so a closed neighbour (`/api/weekly-digest` beside `/api/weekly`) needs a Disallow line of its own.
 
 ## A warning that is always on (2026-09-23)
 
@@ -402,3 +413,29 @@ a move of one point through it changes what four areas should do. Direction and 
   forecast unless the card says the change it matched was a different one (Stormy to Freezing, not Sunny to
   Freezing) from very different scores (risk appetite 7, not 43).
 
+
+## Inputs that outlived their readers (2026-10-27)
+
+Five things went, each kept alive by a half that survived its other half.
+
+- **A builder kept as "the live half" after its panel was deleted.** `lib/report/interpretationLayer.ts`
+  built a layer for every `?view=` on `/`, and its test called it live because the assembler consumed it.
+  The assembler only stored it on a model field nothing read; the panel had gone on 2026-08-14 and the
+  exports on 2026-10-06, and copy passes kept rewording its sentences after both. It took
+  `companyProfile.ts`, `forecastWeatherLabel`, `buildRunwayPlanFromRequest` and the image card's `?view=`
+  with it. Storing a value is not reading it: follow the field to where something prints it.
+- **A cookie read that nothing writes.** `whether-ticker` was parsed on every request to `/` after its one
+  writer, `/api/config`, was deleted on 2026-09-06, and `/` never used the result. Deleting a writer means
+  grepping its key's readers in the same commit.
+- **A parameter whose only effect is an undrawn field.** The audit called `?sector=` on `/` ignored; it
+  chose the sector row of `history.macroOverlay`, which nothing has drawn since 2026-08-06. The parameter
+  went from `/` and the share preview, and the field and the overlay behind it followed (spec §3.4.1).
+- **A token route whose token no reader sees.** `/api/slack/subscribe` minted a token, returned it in JSON
+  and indexed it in KV for `/api/slack/unsubscribe`, and no screen showed it. A route whose required input
+  only the server holds has no client, however well it is tested. Stored records still carry the field and
+  still parse.
+- **An export only its test calls, in a module something ships.** `buildDecisionTransmission` arrived on
+  2026-04-02 with its test, its types in `reportData.ts` and a rule builder in `operatingCalls.ts`, and nothing
+  else ever called it; a 2026-09-22 copy pass reworded its placeholders anyway. The dead-export census judges
+  test-only callers per module, so one export in a live module passes, and so does each helper only it calls.
+  Before rewording a builder's strings, find its caller outside `tests/`.

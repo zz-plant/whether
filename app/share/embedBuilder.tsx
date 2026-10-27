@@ -1,7 +1,8 @@
 "use client";
 
+import Image from "next/image";
 import { useCallback, useState } from "react";
-import { locationHashSource, useBrowserSource } from "../components/browserSource";
+import { locationHashSource, useBrowserSource, useHydrated } from "../components/browserSource";
 import { ClipboardActionRow } from "../components/clipboardActionRow";
 import { SegmentedControl } from "../components/ui/segmentedControl";
 import { getClipboardUiState, useClipboardCopy } from "../components/useClipboardCopy";
@@ -26,7 +27,13 @@ const TICKER_PRESETS = [
   ...["GOOGL", "MSFT", "DOCU", "COIN", "UBER", "AAPL"].map((ticker) => ({ key: ticker, label: ticker })),
 ] as const;
 
+const EMBED_FORMAT_OPTIONS = [
+  { key: "brief", label: "Full brief" },
+  { key: "call-strip", label: "One-line strip" },
+] as const;
+
 export function EmbedBuilder() {
+  const [embedMode, setEmbedMode] = useState<"brief" | "call-strip">("brief");
   const [ticker, setTicker] = useState("");
   const [stage, setStage] = useState("");
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
@@ -34,16 +41,23 @@ export function EmbedBuilder() {
      hydrates it again. This was a counter bumped from an effect on every change
      to either field — a second render to reach a value both fields already
      determine. The key is those fields. */
-  const previewKey = `${ticker}|${stage}`;
+  const previewKey = `${embedMode}|${ticker}|${stage}`;
 
   /* The origin is resolved, not written in: this snippet is the thing a reader
      copies into somebody else's page, and on the preview lane a literal made it
      advertise production — so the preview of the embed could never be a preview
      of the embed. `app/api-docs/page.tsx` already builds this with `siteUrl`. */
-  const embedCode = `<div data-whether-embed="brief"${
+  const embedCode = `<div data-whether-embed="${embedMode}"${
     ticker ? ` data-whether-ticker="${ticker}"` : ""
   }${stage ? ` data-whether-stage="${stage}"` : ""}></div>
 <script async src="${siteUrl}/embed.js"></script>`;
+
+  /* The same widget as a whole page, for an editor that embeds by URL (a
+     Notion /embed block, Coda, Confluence's iframe macro). */
+  const frameParams = new URLSearchParams({ format: "page", ...(embedMode === "call-strip" ? { mode: "call-strip" } : {}), ...(ticker ? { ticker } : {}), ...(stage ? { stage } : {}) });
+  const frameUrl = `${siteUrl}/api/embed?${frameParams.toString()}`;
+  /* The conditions as a status badge, for a README, a data room, or an investor page. */
+  const badgeMarkdown = `[![Startup conditions this week, from Whether](${siteUrl}/api/badge)](${siteUrl}/)`;
 
   const handleCopy = useCallback(() => {
     void copyToClipboard(embedCode, "embed");
@@ -54,6 +68,7 @@ export function EmbedBuilder() {
      opens for a link that names it — the retired /embed route redirects to
      /share#embed. */
   const openFromLink = useBrowserSource(locationHashSource) === "embed";
+  const hydrated = useHydrated();
 
   return (
     <details className="weather-auto-chevron" open={openFromLink}>
@@ -61,7 +76,7 @@ export function EmbedBuilder() {
         {/* One block, so the summary's row lays the chevron beside the title
             and its line rather than splitting the two into columns. */}
         <div className="min-w-0 space-y-2">
-          <h2 className="text-xl font-semibold text-slate-100 sm:text-2xl">
+          <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">
             Add a live brief to a newsletter, wiki or dashboard
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
@@ -69,31 +84,41 @@ export function EmbedBuilder() {
           </p>
         </div>
       </summary>
-      <div className="mt-6 space-y-8">
+      <div className="space-y-4">
+        <div className="max-w-xs">
+          <SegmentedControl
+            options={EMBED_FORMAT_OPTIONS}
+            value={embedMode}
+            onSelect={(val) => setEmbedMode(val as "brief" | "call-strip")}
+            ariaLabel="Embed format"
+          />
+        </div>
 
-      {/* minmax(0,…) and min-w-0: a grid item defaults to min-width:auto, so
-          the embed snippet's <pre> pushed its column to 520px inside a 358px
-          grid and the page scrolled sideways on a phone. */}
-      {/* The default snippet is what nearly everyone pastes. Ticker and stage
-          used to be asked for before any preview appeared; they are a
-          refinement now, after the copy button. */}
-      <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
-        <div className="min-w-0 space-y-3">
-          <p className="text-fluid-micro font-semibold tracking-[0.04em] text-slate-400">
-            Live preview
-          </p>
-          <div
-            key={previewKey}
-            data-whether-embed="brief"
-            {...(ticker ? { "data-whether-ticker": ticker } : {})}
-            {...(stage ? { "data-whether-stage": stage } : {})}
-            style={{ minHeight: "80px" }}
-          >
-            <div className="px-3 py-3 text-fluid-micro text-slate-400">
-              {`Loading the live brief${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…`}
+        {/* minmax(0,…) and min-w-0: a grid item defaults to min-width:auto, so
+            the embed snippet's <pre> pushed its column to 520px inside a 358px
+            grid and the page scrolled sideways on a phone. */}
+        {/* The default snippet is what nearly everyone pastes. Ticker and stage
+            used to be asked for before any preview appeared; they are a
+            refinement now, after the copy button. */}
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+          <div className="min-w-0 space-y-3">
+            <p className="text-fluid-micro font-semibold tracking-[0.04em] text-slate-400">
+              Live preview
+            </p>
+            <div
+              key={previewKey}
+              data-whether-embed={embedMode}
+              {...(ticker ? { "data-whether-ticker": ticker } : {})}
+              {...(stage ? { "data-whether-stage": stage } : {})}
+              style={{ minHeight: embedMode === "call-strip" ? "38px" : "80px" }}
+            >
+              {/* Client-side only: the server HTML is what a crawler indexes, and a
+                  "Loading…" sentence there is not part of the page. */}
+              <div className="px-3 py-3 text-fluid-micro text-slate-400">
+                {hydrated ? `Loading the live ${embedMode === "call-strip" ? "call strip" : "brief"}${ticker ? ` for ${ticker}` : ""}${stage ? ` (${stage})` : ""}…` : null}
+              </div>
             </div>
           </div>
-        </div>
         <div className="min-w-0 space-y-3">
           <p className="text-fluid-micro font-semibold tracking-[0.04em] text-slate-400">
             Embed code
@@ -116,6 +141,44 @@ export function EmbedBuilder() {
             week with no API key, and carries a small &ldquo;Macro brief by Whether&rdquo; footer
             linking back here.
           </p>
+        </div>
+      </div>
+
+      <div className="grid gap-6 md:grid-cols-2">
+        <div className="min-w-0 space-y-2">
+          <p className="text-fluid-xs font-semibold text-slate-200">Notion, Coda, or a wiki</p>
+          <p className="text-fluid-micro leading-relaxed text-slate-400">
+            Where scripts are not allowed, paste this address into an embed block. It shows the same widget, with your
+            choices above.
+          </p>
+          <pre className="overflow-x-auto rounded-md border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs text-slate-200">
+            <code>{frameUrl}</code>
+          </pre>
+          <ClipboardActionRow
+            label="Copy embed address"
+            state={getClipboardUiState("embed-frame", { status, error, activeTarget, copiedTarget })}
+            onClick={() => void copyToClipboard(frameUrl, "embed-frame")}
+            buttonLabels={{ error: "Copy failed" }}
+          />
+        </div>
+        <div className="min-w-0 space-y-2">
+          <p className="text-fluid-xs font-semibold text-slate-200">Status badge</p>
+          <p className="text-fluid-micro leading-relaxed text-slate-400">
+            This week&apos;s conditions in one word, for a README, a data room, or an investor page. It changes when
+            the conditions do.
+          </p>
+          {/* The badge as the reader will paste it: the route's own SVG, so
+              `unoptimized` (the worker's optimizer reads static assets only). */}
+          <Image src="/api/badge" alt="Startup conditions this week, from Whether" width={180} height={20} unoptimized className="h-5 w-auto" />
+          <pre className="overflow-x-auto rounded-md border border-[color:var(--border-subtle)] bg-[var(--bg-nested)] p-3 text-fluid-xs text-slate-200">
+            <code>{badgeMarkdown}</code>
+          </pre>
+          <ClipboardActionRow
+            label="Copy badge Markdown"
+            state={getClipboardUiState("embed-badge", { status, error, activeTarget, copiedTarget })}
+            onClick={() => void copyToClipboard(badgeMarkdown, "embed-badge")}
+            buttonLabels={{ error: "Copy failed" }}
+          />
         </div>
       </div>
 

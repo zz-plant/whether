@@ -2,7 +2,8 @@ import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { SourceFreshnessStatus } from "./sourceHealth";
 import { formatScoreValue, formatThresholdNumber } from "../formatters";
-import { REGIME_LABELS } from "../regimePresentation";
+import { REGIME_LABELS, getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
+import { regimeAcrossLine } from "../regimePhaseSpace";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 /* Value import against a type-only back-edge: `signalTranslations` imports
    `RegimeSignalKey` from this module with `import type`, which erases, so this
@@ -31,11 +32,20 @@ export const publicDecisionLabels = {
 const boundedDecisionPhraseFallbacks: DecisionPhraseTriplet = {
   action: "Stage approvals",
   threshold: FALLBACK_PAUSE_THRESHOLD,
-  reversal: "Reverse only after threshold recovery",
+  reversal: "Resume only after conditions recover",
 };
 
 /** The one table, re-exported under the name this module's callers already use. */
 export const regimeSignalLabelByKey: Record<RegimeSignalKey, string> = regimeSignalLabel;
+
+/**
+ * "Sunny — hold the pace" without saying "Sunny" twice: a headline that already
+ * leads with the conditions label stands alone. The feed and the OG images each
+ * used to carry their own prefix check for this, so a change to one was a silent
+ * "Freezing — Freezing" in the other.
+ */
+export const joinConditionsHeadline = (conditions: string, headline: string): string =>
+  headline.startsWith(conditions) ? headline : `${conditions} — ${headline}`;
 
 /**
  * A change of conditions, or a crossed call-change line, between the earlier
@@ -77,7 +87,7 @@ export const buildRegimeAlert = (
     reasons.push(
       `Funding pressure moved ${formatScoreValue(previous.scores.tightness)} → ${formatScoreValue(current.scores.tightness)} ` +
         `and risk appetite moved ${formatScoreValue(previous.scores.riskAppetite)} → ${formatScoreValue(current.scores.riskAppetite)}, ` +
-        "carrying the posture across a boundary."
+        "carrying conditions across a change line."
     );
   }
 
@@ -88,21 +98,73 @@ export const buildRegimeAlert = (
     currentRecordDate,
     previousRecordDate,
     reasons,
-    summary: `The operating stance moved from ${REGIME_LABELS[previous.regime]} to ${REGIME_LABELS[current.regime]}.`,
+    summary: `Conditions moved from ${REGIME_LABELS[previous.regime]} to ${REGIME_LABELS[current.regime]}.`,
   };
 };
 
-const confidencePlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
-  LOW: "Low (close to the line where conditions change; stage decisions)",
-  MED: "Medium (some room before conditions change)",
-  HIGH: "High (well clear of the line where conditions change)",
+/*
+ * The margin (2026-10-09). The engine and the API call it `confidence`, and every
+ * page printed "Confidence: Low" — beside "Freeze new commitments", which read as
+ * the product doubting its own advice. /calibration shows what the number is: how
+ * far the scores sit from the line where conditions change, not a probability, and
+ * conditions held in most months at every distance. So a reader is shown the
+ * distance, under its own name. Codes and API fields keep `confidence`.
+ */
+/** The label for what the API calls `confidence`. */
+export const MARGIN_LABEL = "Margin";
+
+const marginBandWords: Record<"LOW" | "MED" | "HIGH", string> = {
+  LOW: "Close to the line",
+  MED: "Within reach of the line",
+  HIGH: "Clear of the line",
 };
 
-/** The engine's codes, as words. Derived so a rename cannot leave the two apart. */
-const confidenceWords: Record<"LOW" | "MED" | "HIGH", string> = {
-  LOW: "Low",
-  MED: "Medium",
-  HIGH: "High",
+const marginPlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
+  LOW: "Close to the line where conditions change (stage decisions)",
+  MED: "Within reach of the line where conditions change",
+  HIGH: "Clear of the line where conditions change",
+};
+
+/** The band under its label, for a meta line that runs facts together: "Margin: close to the line". */
+export const formatMarginStamp = (confidence: string): string =>
+  `${MARGIN_LABEL}: ${formatMarginBand(confidence).toLowerCase()}`;
+
+/** The margin at its shortest, for the sticky strip and a share line: "Margin 1 pt", or the band. */
+export const formatStripMargin = (confidence: string, points?: number | null): string =>
+  points === undefined || points === null
+    ? formatMarginBand(confidence)
+    : `${MARGIN_LABEL} ${points} ${points === 1 ? "pt" : "pts"}`;
+
+const pointsWord = (points: number) => `${points} ${points === 1 ? "pt" : "pts"}`;
+
+/**
+ * The margin with the score it is measured on: "Risk appetite 1 pt from Freezing".
+ * With the regime, the line is named by what is on its other side (2026-10-27): "from
+ * its change line" left a reader of a screenshot asking what the line changes to, and
+ * the answer is the one word that makes the distance matter. Without it, as before.
+ * Screens only; the pastes keep `formatMargin`'s band-and-points sentence.
+ */
+export const formatMarginReading = (
+  margin: { signal: "tightness" | "riskAppetite"; points: number },
+  regime?: string,
+): string => {
+  const label = regimeSignalLabel[margin.signal];
+  const across = regime && isRegimeKey(regime) ? getRegimePublicLabel(regimeAcrossLine(regime, margin.signal)) : null;
+  if (margin.points === 0) return across ? `${label} at its line to ${across}` : `${label} at its change line`;
+  return across ? `${label} ${pointsWord(margin.points)} from ${across}` : `${label} ${pointsWord(margin.points)} from its change line`;
+};
+
+/**
+ * The nearest change in four words, for the running head: "2 pts from Freezing". The
+ * margin's own number, so it matches the trust strip on the same page.
+ */
+export const formatNearestChange = (
+  margin: { signal: "tightness" | "riskAppetite"; points: number } | null | undefined,
+  regime: string | undefined,
+): string | null => {
+  if (!margin || !regime || !isRegimeKey(regime)) return null;
+  const across = getRegimePublicLabel(regimeAcrossLine(regime, margin.signal));
+  return margin.points === 0 ? `At the line to ${across}` : `${pointsWord(margin.points)} from ${across}`;
 };
 
 /**
@@ -124,7 +186,7 @@ export const formatBoundaryDistance = ({
 }): string => `${label} is ${points.toFixed(1)} points from its ${formatThresholdNumber(threshold)} line.`;
 
 export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): string =>
-  confidencePlainLabels[confidence];
+  marginPlainLabels[confidence];
 
 /**
  * The confidence reading as a reader meets it, not as the engine stores it.
@@ -140,9 +202,30 @@ export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): 
  * carried the code — the drift this collapses. An unrecognised value passes
  * through rather than being reshaped into a claim nothing produced.
  */
-export const formatConfidenceChipLabel = (confidence: string): string => {
-  const word = confidenceWords[confidence as "LOW" | "MED" | "HIGH"];
-  return word ? `${word} confidence` : confidence;
+const isConfidenceCode = (value: string): value is "LOW" | "MED" | "HIGH" =>
+  value === "LOW" || value === "MED" || value === "HIGH";
+
+export const formatMarginBand = (confidence: string): string =>
+  isConfidenceCode(confidence) ? marginBandWords[confidence] : confidence;
+
+/**
+ * The band with the score it is measured on, when the caller holds it: "Close to
+ * the line (risk appetite is 1 point from its change line)". The points are that
+ * score's own, so a reader can check them against the score printed beside it,
+ * and spelled out, because a paste lands where no page explains "pts".
+ */
+export const formatMargin = (
+  confidence: string,
+  margin?: { signal: "tightness" | "riskAppetite"; points: number } | null,
+): string => {
+  const band = formatMarginBand(confidence);
+  if (!margin) return band;
+  const signal = regimeSignalLabel[margin.signal].toLowerCase();
+  const distance =
+    margin.points === 0
+      ? `${signal} is at its change line`
+      : `${signal} is ${margin.points} ${margin.points === 1 ? "point" : "points"} from its change line`;
+  return `${band} (${distance})`;
 };
 
 /** Status tone for a confidence reading.
@@ -201,6 +284,30 @@ const toSentence = (value: string | undefined | null): string => {
 export const joinSentences = (...parts: Array<string | undefined | null>): string =>
   parts.map(toSentence).filter((part) => part.length > 0).join(" ");
 
+/**
+ * The reading a line is already past, as its own sentence after the rule:
+ * "Pause net-new hiring if funding pressure is above 76 or risk appetite falls
+ * below 44. Funding pressure is 90 now." Until 2026-10-09 the reading sat inside
+ * the rule as "(already true at 90)", and the change line carried "(90 today)"
+ * after each score, so one sentence held two glosses of the same kind.
+ */
+export const formatReadingsNow = (readings: ReadonlyArray<{ label: string; value: string }>): string => {
+  if (readings.length === 0) return "";
+  const clauses = readings.map(({ label, value }, index) => {
+    const name = index === 0 ? `${label.charAt(0).toUpperCase()}${label.slice(1)}` : label.toLowerCase();
+    return `${name} is ${value}`;
+  });
+  return `${clauses.join(" and ")} now.`;
+};
+
+/** A sentence `formatReadingsNow` wrote: compaction keeps it with the rule it reports on. */
+const READINGS_NOW_SOURCE = "[A-Z][a-z]*(?: [a-z]+)* is -?\\d+(?:\\.\\d+)?(?: and [a-z]+(?: [a-z]+)* is -?\\d+(?:\\.\\d+)?)* now";
+const READINGS_NOW_SENTENCE = new RegExp(`^${READINGS_NOW_SOURCE}\\.?$`);
+const TRAILING_READINGS_NOW = new RegExp(`\\s+${READINGS_NOW_SOURCE}\\.$`);
+
+/** A rule sentence without its readings, for a surface that states the crossing itself. */
+export const withoutReadingsNow = (text: string): string => text.replace(TRAILING_READINGS_NOW, "");
+
 export const extractCompactClause = (value: string, fallback: string): string => {
   const normalized = value.trim();
   if (!normalized) {
@@ -229,6 +336,13 @@ export const extractCompactClause = (value: string, fallback: string): string =>
   }
 
   const firstClause = boundaryIndex >= 0 ? normalized.slice(0, boundaryIndex) : normalized;
+  /* The cut drops a rule's trailing sentences, except the one giving the reading
+     of a line already met: without it a met line reads as a move still to come.
+     That pair keeps its stops, since the clause is no longer the whole value. */
+  const rest = boundaryIndex >= 0 && normalized[boundaryIndex] === "." ? normalized.slice(boundaryIndex + 1).trim() : "";
+  if (firstClause.trim() && READINGS_NOW_SENTENCE.test(rest)) {
+    return `${firstClause.trim()}. ${rest.replace(/\.?$/, ".")}`;
+  }
   return (firstClause.trim() || fallback).replace(/\.$/, "");
 };
 
@@ -387,7 +501,8 @@ export const buildCompactFreshnessMeta = ({
     : isFallbackSnapshot
       ? "cached"
       : "live";
-  const confidenceCue = confidenceLabel === "HIGH" ? "high-reliability" : confidenceLabel === "MED" ? "mixed-reliability" : "low-reliability";
+  /* The margin, where this said "high-reliability": the band measures distance from a change line, not reliability. */
+  const confidenceCue = formatMarginStamp(confidenceLabel).toLowerCase();
   const fallbackCue = mode === "historical"
     ? "historical"
     : maxAge === "stale"
@@ -438,7 +553,7 @@ export const formatTrustStripDisplay = ({
     : freshness.maxAge === "stale"
       ? "Freshness stale"
       : "Freshness fresh";
-  const confidenceBadge = formatConfidenceChipLabel(confidenceLabel);
+  const confidenceBadge = formatMarginBand(confidenceLabel);
   const safeProvenanceCount = Math.max(0, Math.round(provenanceCount));
   const provenanceBadge = `Sources ${safeProvenanceCount}`;
   const degraded = isFallbackSnapshot || freshness.maxAge === "stale";

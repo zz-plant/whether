@@ -1,7 +1,8 @@
 import { ReportCta } from "../reportCta";
-import { ScreenshotCaption } from "../screenshotCaption";
+import { frameFactsAttributes } from "../../../lib/navigation/runningHead";
+import { isRegimeKey } from "../../../lib/regimePresentation";
+import { formatNearestChange } from "../../../lib/report/reportFormatting";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
-import { OperatingLoopGlyph, type OperatingLoopStep } from "../illustrations/OperatingLoopGlyph";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
 
 /**
@@ -25,32 +26,27 @@ export function CommandCenterNavBlock({
   statusPrefix,
   trustStatusLabel,
   fetchedAtLabel,
-  resolvedNextRefreshLabel,
   showOfflineBadge,
   offlineBadgeLabel,
-  activeStep,
   trustStrip,
+  regime,
 }: {
   pageTitle: string;
-  pageSummary: string;
+  pageSummary?: string;
   recordDateLabel: string;
-  /** Which step of the operating loop this route is, for the glyph beside the
-   *  intro. Declared by the route: it used to be guessed from whether the
-   *  title contained "changed" or "trust", which is a string match standing in
-   *  for a fact the route already knows. Omitted, no glyph renders. */
-  activeStep?: OperatingLoopStep;
   primaryCta?: ReportCtaProps;
   exportCta?: ExportCtaProps | null;
   statusLabel: string;
   statusPrefix?: string;
   trustStatusLabel: string;
   fetchedAtLabel: string;
-  resolvedNextRefreshLabel?: string;
   showOfflineBadge: boolean;
   offlineBadgeLabel: string;
   /** The route's trust strip. It carries the record date and the sources, so
    *  the line beside the status word drops both rather than print them twice. */
   trustStrip?: Omit<TrustStripProps, "className">;
+  /** The reading's regime. With it, the status word is a condition and the running head repeats it. */
+  regime?: string;
 }) {
   // The status word leads and prints in the regime ink — it is this page's
   // equivalent of the hero's stamp, and the only word on the route that
@@ -63,14 +59,16 @@ export function CommandCenterNavBlock({
     // Interpolated only when there is a date. `As of ${x}` is a truthy string
     // even when x is "", so the filter below could never drop it, and a caller
     // passing no record date printed a bare "As of" with nothing after it.
-    !trustStrip && recordDateLabel ? `As of ${recordDateLabel}` : null,
+    !trustStrip && recordDateLabel ? `Data as of ${recordDateLabel}` : null,
     showOfflineBadge ? offlineBadgeLabel : null,
   ]
     .filter(Boolean)
     .join(" • ");
   // Same rule for the refresh stamp: /history passes no fetch time, and
-  // printed "Updated " with nothing after it.
-  const showStamp = Boolean(fetchedAtLabel) || Boolean(resolvedNextRefreshLabel);
+  // printed "Updated " with nothing after it. There is no second stamp: a
+  // "15m cadence" label and, on /history, "Fixed historical snapshot" beside the
+  // status line's own "Historical snapshot" were removed (the second 2026-10-09).
+  const showStamp = Boolean(fetchedAtLabel);
   const showActions = Boolean(primaryCta) || Boolean(exportCta);
   // A phone gets the week's word, the title and one meta line before the
   // first task block (ui-ux-standards §XI). Until 2026-10-07 the intro on
@@ -78,18 +76,36 @@ export function CommandCenterNavBlock({
   // stamp and the caption, each on its own row: about 260px of a 932px
   // screen restating what `/` had just shown. Below `sm` the refresh stamp
   // drops (the record date is the date a phone reader needs; /trust lists
-  // each feed's time), the strip runs as one line, and the caption moves up
-  // beside the status word when that row is the word alone. Beside a
-  // "sources • as of" line (/resolve, /history) it would wrap under it, so
-  // there it stays at the foot of the block.
-  const captionBesideStatus = Boolean(statusLabel) && !introMetaRest;
-  const stampRowOnPhone = Boolean(resolvedNextRefreshLabel) || !captionBesideStatus;
-  const rightColumnOnPhone = stampRowOnPhone || showActions;
+  // each feed's time) and the strip runs as one line.
+  //
+  // No "Whether · whether.work" caption (2026-10-09). It sat inside every
+  // interior intro so a cropped screenshot would still name its source, and
+  // printed the site's name under the header that names it on every route.
+  // The brief's call card keeps it: that card is the block people crop and
+  // share, and #1561 kept it there for that reason.
 
+  // No hue on the card itself (2026-10-09). It carried the regime accent in
+  // its fill, its border and a 3px rule across its top edge, under a status
+  // word that already prints in the regime ink: colour stays where the
+  // condition is named, which here is that word. The brief's hero keeps its
+  // rule, because that card is the one people crop and share.
   return (
     <section
-      className="weather-surface-secondary weather-page-intro weather-inset relative min-w-0"
+      className="weather-surface-secondary weather-inset relative min-w-0"
       aria-label="Page introduction"
+      /* The running head's facts, for every frame after this one (lib/navigation/runningHead.ts). */
+      {...frameFactsAttributes({
+        regime,
+        /* A qualified status (/history's "Last completed month") is a condition word
+           too, and the head keeps its qualifier on the date, so a frame of the record
+           does not read as this week's call. It also carries no regime: that page
+           draws in neutral ink on purpose. */
+        condition: (regime && isRegimeKey(regime)) || statusPrefix ? statusLabel : null,
+        date: recordDateLabel ? `${statusPrefix ?? "Data as of"}${statusPrefix ? ": " : " "}${recordDateLabel}` : null,
+        title: pageTitle,
+        tension: formatNearestChange(trustStrip?.margin, regime),
+        tensionNear: Boolean(trustStrip?.couldChangeNextWeek) || trustStrip?.confidenceLabel === "LOW",
+      })}
     >
       {/* Two columns from lg up: the reading block keeps its measure on the
           left, the timestamp and actions bank right. Stacked, the hero was a
@@ -110,69 +126,51 @@ export function CommandCenterNavBlock({
               prints in the regime ink at the reading's own size; the trust
               headline and the record date stay micro under it. */}
           {statusLabel ? (
-            <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
-                {statusPrefix ? (
-                  <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
-                ) : null}
-                {/* The week's word in the stamp's shape, the same placard the
-                    hero's tag and the sticky strip print. */}
-                <span className="type-stamp text-fluid-base text-[color:var(--regime-ink)]">{statusLabel}</span>
-                {introMetaRest ? (
-                  <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
-                ) : null}
-              </p>
-              {/* Phone: the caption shares the status word's row instead of
-                  taking one of its own at the foot of the block. From `sm` it
-                  sits in the stamp row, below. */}
-              {captionBesideStatus ? <ScreenshotCaption className="ml-auto sm:hidden" /> : null}
-            </div>
+            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
+              {statusPrefix ? (
+                <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
+              ) : null}
+              {/* The week's word in the stamp's shape, the same placard the
+                  hero's tag and the sticky strip print. */}
+              <span className="type-stamp weather-tag-placard self-center rounded-sm border px-2 py-0.5 text-fluid-xs font-semibold">{statusLabel}</span>
+              {introMetaRest ? (
+                <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
+              ) : null}
+            </p>
           ) : introMetaRest ? (
             <p className="text-fluid-xs font-medium leading-4 text-slate-400">{introMetaRest}</p>
           ) : null}
           <h1
             style={{ viewTransitionName: "page-title" }}
-            className="max-w-3xl font-semibold text-slate-100 text-fluid-base lg:text-fluid-2xl"
+            className="max-w-3xl font-semibold leading-tight text-slate-100 text-fluid-2xl"
           >
             {pageTitle}
           </h1>
           {/* On a phone a route with a strip drops the summary: the bottom bar
               already names the page, and the strip is the line a reader
               needs before the first task block. */}
-          <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
-            {pageSummary}
-          </p>
-          {trustStrip ? <TrustStrip {...trustStrip} phoneLayout="line" className="sm:pt-2" /> : null}
+          {pageSummary ? (
+            <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
+              {pageSummary}
+            </p>
+          ) : null}
+          {trustStrip ? <TrustStrip {...trustStrip} regime={regime} phoneLayout="line" className="sm:pt-2" /> : null}
         </div>
 
-        <div className={`space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0 ${rightColumnOnPhone ? "" : "max-sm:hidden"}`.trim()}>
-            {activeStep ? (
-              /* Phone: hidden. The loop the glyph draws is the bottom bar's
-                 row of tabs there, and under the intro it was a second
-                 navigation band pushing the first task block down. */
-              <div className="hidden lg:flex lg:justify-end">
-                <OperatingLoopGlyph activeStep={activeStep} />
-              </div>
+        <div className={`space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0 ${showActions ? "" : "max-sm:hidden"}`.trim()}>
+            {/* No operating-loop strip here. "Signals · Conditions · Plan ·
+                Share" sat beside the intro on /signals, /operate and /trust:
+                it read as tabs, named none of the pages it sat on and linked
+                nowhere. The group's real tabs sit above the intro now
+                (`SectionTabs`). */}
+            {/* Two dates print inside one viewport, so each says what it
+                is: the strip's "Data as of" is the reading the guidance
+                rests on, and this is when the sources were last checked
+                (2026-10-09; it read "Signals refreshed", which did not say
+                which of the two mattered). */}
+            {showStamp ? (
+              <p className="text-fluid-xs text-slate-400 max-sm:hidden lg:text-right">Checked {fetchedAtLabel}</p>
             ) : null}
-
-            {/* The stamp row also carries the caption: the intro is the block a
-                phone screenshot of a report route catches, and a crop of it
-                should still say whose page it came from. It shares the row
-                rather than adding one, so the first task block does not move.
-                On a phone with a status word the caption is beside it instead. */}
-            <div className={`flex flex-wrap items-center gap-x-4 gap-y-2 text-fluid-xs text-slate-400 lg:justify-end lg:text-right ${stampRowOnPhone ? "" : "max-sm:hidden"}`.trim()}>
-                {/* "Signals refreshed", not "Updated": two dates print inside
-                    one viewport (this and "As of" above), and the reader has
-                    to be able to tell the pipeline's fetch from the reading's
-                    record date apart. */}
-                {fetchedAtLabel ? <span className="max-sm:hidden">Signals refreshed {fetchedAtLabel}</span> : null}
-                {resolvedNextRefreshLabel ? (
-                  <span>{resolvedNextRefreshLabel}</span>
-                ) : null}
-                <ScreenshotCaption
-                  className={`${showStamp ? "ml-auto lg:ml-0" : ""} ${captionBesideStatus ? "max-sm:hidden" : ""}`.trim() || undefined}
-                />
-              </div>
 
             {showActions ? (
               <div className="flex flex-wrap items-center gap-2 lg:justify-end">

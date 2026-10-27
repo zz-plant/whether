@@ -3,6 +3,9 @@ import { describe, it, mock } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactElement } from "react";
 import * as nextNavigation from "next/navigation";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const mockAny: any = mock;
 
@@ -75,7 +78,7 @@ describe("a resource article", () => {
     const main = html.indexOf("<main");
     assert.equal(html.slice(0, main).replace(/<[^>]+>/g, "").trim(), "", "nothing renders before the landmark");
     assert.ok(html.indexOf("Open this week&#x27;s brief") > main);
-    assert.match(html, /As of [A-Z][a-z]{2} \d{1,2}, \d{4} · signals refreshed/);
+    assert.match(html, /Data as of [A-Z][a-z]{2} \d{1,2}, \d{4} · checked /);
     assert.doesNotMatch(html, /Start from Weekly Brief|Source note: https?:/);
   });
 });

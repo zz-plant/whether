@@ -12,7 +12,6 @@ const VALID_SECTORS = new Set<SectorKey>([
   "healthcare",
   "ai-platforms",
 ]);
-const VALID_INTERPRETATION_VIEWS = new Set(["default", "operator", "forecast", "sector"]);
 
 const MAX_CONTEXT_VALUE_LENGTH = 48;
 
@@ -20,7 +19,6 @@ const SUPPORTED_IMAGE_BRIEF_PARAM_KEYS = [
   "month",
   "year",
   "sector",
-  "view",
   "cadence",
   "stage",
   "companyStage",
@@ -102,17 +100,12 @@ const normalizeCadence = (value: string | undefined) => {
   return normalized && VALID_CADENCES.has(normalized) ? normalized : undefined;
 };
 
-const normalizeView = (value: string | undefined) => {
-  const normalized = normalizeBoundedText(value)?.toLowerCase();
-  return normalized && VALID_INTERPRETATION_VIEWS.has(normalized) ? normalized : undefined;
-};
-
-const buildSupportedImageBriefSearchParams = (source: SearchParamReader) => {
+/** The brief context the card and route share: only the supported keys, normalized. */
+export const buildSupportedImageBriefSearchParams = (source: SearchParamReader) => {
   const params = new URLSearchParams();
   const month = normalizeMonth(readTrimmed(source, "month"));
   const year = normalizeYear(readTrimmed(source, "year"));
   const sector = normalizeSector(readTrimmed(source, "sector"));
-  const view = normalizeView(readTrimmed(source, "view"));
   const cadence = normalizeCadence(readTrimmed(source, "cadence"));
   const companyStage = normalizeCompanyStage(
     readTrimmed(source, "stage") ?? readTrimmed(source, "companyStage"),
@@ -129,10 +122,6 @@ const buildSupportedImageBriefSearchParams = (source: SearchParamReader) => {
 
   if (sector) {
     params.set("sector", sector);
-  }
-
-  if (view) {
-    params.set("view", view);
   }
 
   if (cadence) {
@@ -163,7 +152,6 @@ export const parseImageBriefRequestContext = (source: SearchParamReader): ImageB
   const month = supportedParams.get("month") ?? undefined;
   const year = supportedParams.get("year") ?? undefined;
   const sector = supportedParams.get("sector") ?? undefined;
-  const view = supportedParams.get("view") ?? undefined;
   const cadence = supportedParams.get("cadence") ?? undefined;
 
   if (month) {
@@ -176,10 +164,6 @@ export const parseImageBriefRequestContext = (source: SearchParamReader): ImageB
 
   if (sector) {
     searchParams.sector = sector;
-  }
-
-  if (view) {
-    searchParams.view = view;
   }
 
   if (cadence) {

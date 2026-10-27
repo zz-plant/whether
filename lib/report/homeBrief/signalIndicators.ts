@@ -237,7 +237,7 @@ const buildInputInfluenceDescription = ({
     return gap >= 0
       ? {
           pressureLabel: gap >= 8 ? "Strong defensive pull" : "Defensive pull",
-          effectDetail: `Funding pressure is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the line at ${tightnessLine} where conditions change; approvals and fixed-cost tolerance stay tighter.`,
+          effectDetail: `Funding pressure is ${rawValue.toFixed(1)}: ${gap.toFixed(1)} points above the line at ${tightnessLine} where conditions change. Approvals and fixed-cost tolerance stay tighter.`,
           watchLabel: `Change line ${tightnessLine}`,
           watchValue: threshold,
           watchDistanceLabel: `${gap.toFixed(1)} pts above the change line`,
@@ -248,7 +248,7 @@ const buildInputInfluenceDescription = ({
         }
       : {
           pressureLabel: Math.abs(gap) >= 8 ? "Expansion support" : "Room to loosen",
-          effectDetail: `Funding pressure is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the line at ${tightnessLine} where conditions change; the guidance has room to loosen if other inputs confirm.`,
+          effectDetail: `Funding pressure is ${rawValue.toFixed(1)}: ${Math.abs(gap).toFixed(1)} points below the line at ${tightnessLine} where conditions change. The guidance has room to loosen if other inputs confirm.`,
           watchLabel: `Change line ${tightnessLine}`,
           watchValue: threshold,
           watchDistanceLabel: `${Math.abs(gap).toFixed(1)} pts below the change line`,
@@ -267,7 +267,7 @@ const buildInputInfluenceDescription = ({
     return gap >= 0
       ? {
           pressureLabel: gap >= 8 ? "Strong expansion support" : "Expansion support",
-          effectDetail: `Risk appetite is ${rawValue.toFixed(1)}, which is ${gap.toFixed(1)} points above the line at ${riskLine} where conditions change; the guidance can carry larger reversible bets.`,
+          effectDetail: `Risk appetite is ${rawValue.toFixed(1)}: ${gap.toFixed(1)} points above the line at ${riskLine} where conditions change. The guidance can carry larger reversible bets.`,
           watchLabel: `Change line ${riskLine}`,
           watchValue: threshold,
           watchDistanceLabel: `${gap.toFixed(1)} pts above the change line`,
@@ -278,7 +278,7 @@ const buildInputInfluenceDescription = ({
         }
       : {
           pressureLabel: Math.abs(gap) >= 8 ? "Risk-off pressure" : "Capping risk-taking",
-          effectDetail: `Risk appetite is ${rawValue.toFixed(1)}, which is ${Math.abs(gap).toFixed(1)} points below the line at ${riskLine} where conditions change; bet size and expansion appetite stay capped.`,
+          effectDetail: `Risk appetite is ${rawValue.toFixed(1)}: ${Math.abs(gap).toFixed(1)} points below the line at ${riskLine} where conditions change. Bet size and expansion appetite stay capped.`,
           watchLabel: `Change line ${riskLine}`,
           watchValue: threshold,
           watchDistanceLabel: `${Math.abs(gap).toFixed(1)} pts below the change line`,

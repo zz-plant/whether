@@ -13,6 +13,7 @@ import {
   buildStoredInputs,
   findWeeklyComparisonReading,
   rescoreStoredInputs,
+  scoreStoredInputs,
   type ComparisonReading,
   type RescoreStoredInputs,
 } from "../lib/report/comparisonReading";
@@ -32,7 +33,10 @@ import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { snapshotData } from "../lib/snapshot";
 import { selectWeekComparison } from "../lib/report/weekComparison";
 import type { TreasuryData } from "../lib/types";
-import { buildAssessmentFixture } from "./fixtures/reportFixtures";
+import { buildAssessmentFixture, liveMacroSeries } from "./fixtures/reportFixtures";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * "What changed this week" compares the reading with last week's published
@@ -173,7 +177,7 @@ describe("a brief frozen by an earlier engine", () => {
 
   it("is scored again from the inputs it stored, and compared with", () => {
     assert.ok(scored.scores.baseRateVelocityPoints, "the stored pair carries the tightening-speed term");
-    assert.ok(scored.diagnostics.boundaryContributors.length > 0, "and the market series adjust the scores");
+    assert.ok(scored.scores.offRecord, "and the market series outside the record are scored, into offRecord");
 
     assert.deepEqual(findWeeklyComparisonReading([earlier], "2026-10-05", ENGINE, rescore), {
       recordDate: "2026-09-29",
@@ -199,8 +203,15 @@ describe("a brief frozen by an earlier engine", () => {
       return series;
     });
     const expected = evaluateRegime(lastWeek, DEFAULT_THRESHOLDS, stressed, null, { baseRateHistory: lastWeek.oneMonthHistory });
-    /* Spreads, conditions, the veto, venture funding and layoffs: the close alone (18) takes nothing. */
-    assert.equal(expected.diagnostics.boundaryContributors.length, 5, "every scored series moved a score");
+    /* Conditions and the veto move the published scores; the high-yield spread, venture funding
+       and layoffs move the off-record ones. The close alone (18) takes nothing. */
+    assert.equal(expected.diagnostics.boundaryContributors.length, 2, "the record's series moved the published scores");
+    assert.deepEqual(expected.scores.offRecord?.inputs, ["HY_CREDIT_SPREAD", "VC_FUNDING_VELOCITY", "TECH_LAYOFF_TREND"]);
+    assert.deepEqual(
+      scoreStoredInputs(evaluateRegime, DEFAULT_THRESHOLDS, buildStoredInputs(lastWeek, stressed), "2026-09-29").scores.offRecord,
+      expected.scores.offRecord,
+      "and the stored inputs say what the ones outside the record would have made the scores",
+    );
 
     const rescored = rescore(buildStoredInputs(lastWeek, stressed), "2026-09-29");
     assert.deepEqual(rescored, {
@@ -261,8 +272,15 @@ describe("a brief frozen by an earlier engine", () => {
     const moved = macroSeries.flatMap((series) =>
       [-1000, 1000].some((value) => {
         const extreme = { ...series, value, history: Array.from({ length: 10 }, () => ({ date: quiet.record_date, value })) };
-        const { tightness, riskAppetite } = evaluateRegime(quiet, DEFAULT_THRESHOLDS, [extreme], null).scores;
-        return tightness !== baseline.tightness || riskAppetite !== baseline.riskAppetite;
+        const { tightness, riskAppetite, offRecord } = evaluateRegime(quiet, DEFAULT_THRESHOLDS, [extreme], null).scores;
+        /* Published or not counted: a record stores what a later engine needs for either. */
+        const counted = offRecord ?? { tightness, riskAppetite };
+        return (
+          tightness !== baseline.tightness ||
+          riskAppetite !== baseline.riskAppetite ||
+          counted.tightness !== baseline.tightness ||
+          counted.riskAppetite !== baseline.riskAppetite
+        );
       })
         ? [series.id]
         : [],
@@ -449,7 +467,7 @@ describe("the assembled homepage on Oct 5, 2026", () => {
             { date: "2026-10-05", value: snapshotData.yields.oneMonth },
           ],
         },
-        macroSeries,
+        macroSeries: liveMacroSeries,
         now: new Date("2026-10-05T12:00:00.000Z"),
       }),
     );

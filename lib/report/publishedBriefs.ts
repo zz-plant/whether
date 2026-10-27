@@ -9,13 +9,15 @@
  *
  * Append the current week with `bun run brief:freeze`.
  */
+import { formatWeekMondayUTC } from "../formatters";
+import { weeklyHeadline } from "./reportEvidence";
 import { z } from "zod";
 import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
-import { formatConfidenceChipLabel, formatDecisionReversal, publicDecisionLabels } from "./reportFormatting";
-import { DECISION_CONTRACT_LABELS } from "./reportCopy";
+import { formatMarginBand, formatDecisionReversal, formatDecisionThreshold, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
+import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildBoundedConditionRails } from "./operatingCalls";
@@ -24,6 +26,9 @@ import { buildScoreReferenceLines } from "../export/scoreReference";
 import { buildComparedWith, comparisonBasis } from "./comparisonBasis";
 import { describeWeeklyMovement } from "./home/homeSectionModel";
 import type { ComparedWith } from "./reportDataTypes";
+import { evaluateRegime, type RegimeAssessment, type RegimeThresholds } from "../regimeEngine";
+import { scoreStoredInputs } from "./comparisonReading";
+import { basisClause, describePublishedWeekBasis, describeScoringBasis } from "./scoringBasis";
 
 const PublishedRuleLineSchema = z.object({
   metric: z.enum(["tightness", "riskAppetite"]),
@@ -223,13 +228,48 @@ const RETIRED_SIGNAL_PHRASES: ReadonlyArray<readonly [RegExp, string]> = [
 /* "70.0" was precision the scores never had (`formatThresholdNumber`). A rate keeps its decimal: "0.0%" is a curve value. */
 const WHOLE_POINT_DECIMAL = /\b(\d+)\.0\b(?!%)/g;
 
-/** A stored rule sentence in today's signal names and whole points. A sentence that needs neither passes through. */
+/*
+ * The readings the records w38 to w41 were frozen with, restated the way the
+ * builders print them since 2026-10-09: same lines, same readings, no
+ * parentheses. A change line's reading moves into its clause ("Funding pressure
+ * falls 20 pts to 70 or below (90 today)" reads "Funding pressure falls 20 pts
+ * from 90 to 70 or below"), and a line the reading already met states where the
+ * score was, with the reading after the sentence ("Funding pressure is above 76
+ * (already true at 90) or …" reads "Funding pressure is above 76 or …. Funding
+ * pressure is 90 now.").
+ */
+const STORED_SCORE = "(funding pressure|risk appetite)";
+const STORED_CHANGE_WITH_DISTANCE = new RegExp(`\\b${STORED_SCORE} (falls|rises) (\\d+) (pts?) (to \\d+ or below|to clear \\d+) \\((\\d+) today\\)`, "gi");
+const STORED_CHANGE_BOUNDARY = new RegExp(`\\b${STORED_SCORE} (above|at or below) (\\d+) \\((\\d+) today\\)`, "gi");
+const STORED_CHANGE_JOIN = new RegExp(` (or below|to clear \\d+) or ${STORED_SCORE}\\b`, "gi");
+const STORED_MET_LINE = new RegExp(`\\b${STORED_SCORE} (is (?:at or )?(?:above|below)|above|at or below) (\\d+) \\(already true at (\\d+)\\)`, "gi");
+
+const restateStoredReadings = (text: string): string => {
+  const readings: Array<{ label: string; value: string }> = [];
+  const restated = text
+    .replace(STORED_CHANGE_WITH_DISTANCE, (_match, score: string, verb: string, distance: string, unit: string, target: string, now: string) =>
+      `${score} ${verb} ${distance} ${unit} from ${now} ${target}`)
+    .replace(STORED_CHANGE_BOUNDARY, (_match, score: string, side: string, line: string, now: string) =>
+      side.toLowerCase() === "above" ? `${score} rises from ${now} to clear ${line}` : `${score} falls from ${now} to ${line} or below`)
+    .replace(STORED_CHANGE_JOIN, (_match, end: string, score: string) => ` ${end}, or ${score}`)
+    .replace(STORED_MET_LINE, (_match, score: string, state: string, line: string, now: string) => {
+      readings.push({ label: score, value: now });
+      return `${score} ${state.startsWith("is ") ? state : `is ${state}`} ${line}`;
+    });
+  if (readings.length === 0) return restated;
+  const sentence = formatReadingsNow(readings);
+  return restated.endsWith(".") ? `${restated} ${sentence}` : `${restated}. ${sentence}`;
+};
+
+/** A stored rule sentence in today's signal names, whole points and reading form. A sentence that needs none of them passes through. */
 const translateStoredSentence = (text: string) =>
-  RETIRED_SIGNAL_PHRASES.reduce(
-    (sentence, [pattern, replacement]) =>
-      sentence.replace(pattern, (match) => (match.charAt(0) === match.charAt(0).toUpperCase() ? upperFirst(replacement) : replacement)),
-    text,
-  ).replace(WHOLE_POINT_DECIMAL, "$1");
+  restateStoredReadings(
+    RETIRED_SIGNAL_PHRASES.reduce(
+      (sentence, [pattern, replacement]) =>
+        sentence.replace(pattern, (match) => (match.charAt(0) === match.charAt(0).toUpperCase() ? upperFirst(replacement) : replacement)),
+      text,
+    ).replace(WHOLE_POINT_DECIMAL, "$1"),
+  );
 
 /*
  * The change line as the first record froze it: a status, then one sentence
@@ -270,6 +310,12 @@ const translateRetiredFlipLine = (text: string): string | null => {
   if (conditions.length === 0) return null;
   const ordered = [...conditions].sort((left, right) => Number(right.tripped) - Number(left.tripped));
   return `${ordered.map((condition, index) => (index === 0 ? upperFirst(condition.text) : lowerFirst(condition.text))).join(" or ")}.`;
+};
+
+/** The first record's change line, in the w38 form and then in today's reading form. */
+const restateRetiredFlipLine = (text: string): string | null => {
+  const restated = translateRetiredFlipLine(text);
+  return restated === null ? null : restateStoredReadings(restated);
 };
 
 /*
@@ -327,7 +373,7 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
     /* From the engine key, not the stored label: the earliest records stored a
        third vocabulary ("Guarded Expansion — Late") that no stripping recovers. */
     conditions: getRegimePublicLabel(brief.regime),
-    confidence: formatConfidenceChipLabel(brief.confidenceLabel === "MEDIUM" ? "MED" : brief.confidenceLabel),
+    confidence: formatMarginBand(brief.confidenceLabel === "MEDIUM" ? "MED" : brief.confidenceLabel),
     source: /^(Canonical|Archived) snapshot/i.test(brief.sourceLabel)
       ? "Saved copy of the published reading"
       : brief.sourceLabel.replace(/\s*\((high|medium|low)( confidence)?\)$/i, ""),
@@ -344,15 +390,23 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
        pause slot as though it were a trigger. A pause line is a score against a
        number; with no number in it there is no line, and the slot is left out. */
     pauseIf: /\d/.test(brief.guardrailThreshold) ? translateStoredSentence(brief.guardrailThreshold) : null,
-    conditionsChangeIf: translateRetiredFlipLine(brief.flipThreshold) ?? translateStoredSentence(brief.flipThreshold),
+    conditionsChangeIf: restateRetiredFlipLine(brief.flipThreshold) ?? translateStoredSentence(brief.flipThreshold),
     whatChanged: displayWhatChanged(brief, comparison),
+    /**
+     * Which inputs set the week's scores, from the engine its record names: "Scored on
+     * more inputs than the record." for every week frozen before 2026-10-09, whose
+     * scores counted the startup-market inputs and the credit reads. Said at render,
+     * from the record, so no frozen field is edited.
+     */
+    basis: describeScoringBasis(brief.scores?.engineVersion),
     /** The earlier reading, as `buildScoreReferenceLines` takes it; null where the record can name none. */
     previous: comparison ? { ...comparison.previous, comparedWith: comparison.comparedWith } : null,
-    /** "+5 vs Sep 22": a score's move in whole points, named by the reading it is against. Null with no reading to name, or no move. */
+    /** A score's move in whole points, as the number and the rendered form ("+5 vs Sep 22") — the sign lives in `delta`, not in something a renderer parses out of the string. Null with no reading to name, or no move. */
     scoreChange: (metric: ScoreMetric) => {
       if (!comparison || !brief.scores) return null;
-      const delta = formatSignedDeltaOrNull(Math.round(brief.scores[metric] - comparison.previous[metric]), 0);
-      return delta ? `${delta} ${comparisonBasis(comparison.comparedWith).versus}` : null;
+      const delta = Math.round(brief.scores[metric] - comparison.previous[metric]);
+      const formatted = formatSignedDeltaOrNull(delta, 0);
+      return formatted ? { delta, label: `${formatted} ${comparisonBasis(comparison.comparedWith).versus}` } : null;
     },
   };
 };
@@ -405,9 +459,66 @@ const briefBySlug = new Map(briefs.map((brief) => [brief.slug, brief]));
 /** Newest first. */
 export const getPublishedBriefs = () => briefs;
 
+const HELD_CALLS = new Set(
+  [...Object.values(POLICY_OVERRIDE_CALL), POLICY_OVERRIDE_CALL_UNNAMED].map((hold) => hold.currentCall.trim()),
+);
+
+/**
+ * A frozen week's headline action, through the same source as the live brief
+ * (`weeklyHeadline`): the stored call, with the stored action's direction.
+ */
+export const publishedBriefHeadline = (brief: Pick<PublishedBrief, "actionNow" | "summary">) =>
+  weeklyHeadline({
+    actionNow: brief.actionNow,
+    currentCall: brief.summary,
+    /* A record stores no hold flag; a held week stored the hold's own call. */
+    policyOverrideActive: HELD_CALLS.has(brief.summary.trim()),
+  });
+
+/** The week's name: its Monday (`formatWeekMondayUTC`), never the record's own weekday. */
+/**
+ * A stored correction opens with its own verb ("Corrected Sep 30, 2026. …"), and every
+ * surface prints it after a "Correction" label, so until 2026-10-21 the page and both
+ * paste formats read "Correction: Corrected Sep 30, 2026." The record stays as stored;
+ * only the doubled verb is dropped when it is printed.
+ */
+export const correctionBody = (correction: string) => correction.replace(/^Corrected\s+/i, "");
+
+export const publishedBriefWeekLabel = (brief: Pick<PublishedBrief, "recordDate">) => formatWeekMondayUTC(brief.recordDate);
+
 /** The page's `<h1>` and `<title>`; the news sitemap must carry the same words. */
 export const buildPublishedBriefTitle = (brief: PublishedBrief) =>
-  `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${brief.recordDateLabel}`;
+  `${publishedBriefDisplay(brief).conditions}: guidance for the week of ${publishedBriefWeekLabel(brief)}`;
+
+/* About what a search result shows of a description. */
+const BRIEF_DESCRIPTION_LIMIT = 160;
+
+const firstSentence = (text: string) => /^.*?[.!?](?=\s|$)/.exec(text)?.[0] ?? text;
+
+/* The guidance, then what moved: in full if it fits a snippet, else its first sentence. */
+const preferredBriefDescription = (brief: PublishedBrief): string | undefined => {
+  const { whatChanged } = publishedBriefDisplay(brief);
+  return [`${brief.summary} What changed: ${whatChanged}`, `${brief.summary} ${firstSentence(whatChanged)}`].find(
+    (candidate) => candidate.length <= BRIEF_DESCRIPTION_LIMIT,
+  );
+};
+
+/**
+ * A published week's meta description, different from every other week's.
+ *
+ * The summary is the conditions' own sentence, so every week under the same
+ * conditions shares it. w40 and w41 shipped the identical description ("Approve
+ * only renewals, work already promised to customers, and hires that bring in
+ * revenue."), because each one's "what changed" ran past the snippet and the
+ * page fell back to the summary alone. Where the preferred wording is too long
+ * or another week would carry the same words, the week's date leads, and no two
+ * weeks share a date.
+ */
+export const buildPublishedBriefDescription = (brief: PublishedBrief, siblings: readonly PublishedBrief[] = briefs) => {
+  const preferred = preferredBriefDescription(brief);
+  const shared = siblings.some((other) => other.slug !== brief.slug && preferredBriefDescription(other) === preferred);
+  return preferred !== undefined && !shared ? preferred : `Week of ${publishedBriefWeekLabel(brief)}: ${brief.summary}`;
+};
 
 /**
  * The week's card, as its page, its feed item and its news sitemap entry all
@@ -417,7 +528,7 @@ export const buildPublishedBriefTitle = (brief: PublishedBrief) =>
  */
 export const buildPublishedBriefImageParams = (brief: PublishedBrief) => ({
   template: "brief-chart",
-  week: brief.recordDateLabel,
+  week: publishedBriefWeekLabel(brief),
   posture: publishedBriefDisplay(brief).conditions,
   regime: brief.regime,
 });
@@ -505,6 +616,32 @@ export const selectCitablePermalinkBrief = (currentRecordDate: string): Publishe
   return brief;
 };
 
+/**
+ * Why the live reading's conditions differ from the citable published week's,
+ * where the record basis is the reason (`describePublishedWeekBasis`): the
+ * week's stored inputs scored by today's engine show its conditions came from
+ * inputs the record cannot test. Null for a week that stored no inputs, and
+ * wherever the basis does not explain the difference. The homepage says it,
+ * once, in its status strip.
+ */
+export const describeCitableBriefBasis = ({
+  currentRecordDate,
+  live,
+  thresholds,
+}: {
+  currentRecordDate: string;
+  live: Pick<RegimeAssessment, "regime">;
+  thresholds: RegimeThresholds;
+}): string | null => {
+  const brief = selectCitablePermalinkBrief(currentRecordDate);
+  if (!brief?.inputs) return null;
+  return describePublishedWeekBasis({
+    live,
+    published: { regime: brief.regime, weekLabel: publishedBriefWeekLabel(brief), engineVersion: brief.scores?.engineVersion },
+    rescored: scoreStoredInputs(evaluateRegime, thresholds, brief.inputs, brief.recordDate),
+  });
+};
+
 export const buildPublishedBriefPath = (slug: string) => `/brief/${slug}` as const;
 
 export const buildPublishedBriefSlug = (year: number, week: number) => formatIsoWeekSlug({ year, week });
@@ -525,16 +662,18 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
     [
       `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)}`,
       `  ${publicDecisionLabels.action}: ${display.sentence(decision.doNow)}`,
-      `  ${publicDecisionLabels.threshold}: ${display.sentence(decision.pauseTrigger)}`,
+      `  ${publicDecisionLabels.threshold}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`,
       `  ${publicDecisionLabels.reversal}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`,
     ].join("\n"),
   );
 
   const evidenceLines = brief.evidence.map((item) => `• ${display.evidenceTitle(item.title)} — ${item.detail}`);
   /* The slots the record can fill: w31 names no pause line (`publishedBriefDisplay`). */
+  /* One headline (`publishedBriefHeadline`). The stored action printed under
+     the do-now slot beside it, and the call again under "Summary", so the paste said
+     the week's instruction three times in two versions. */
   const slots = [
-    { label: publicDecisionLabels.call, value: brief.summary },
-    { label: publicDecisionLabels.action, value: brief.actionNow },
+    { label: publicDecisionLabels.call, value: publishedBriefHeadline(brief).composed },
     ...(display.pauseIf ? [{ label: publicDecisionLabels.threshold, value: display.pauseIf }] : []),
     { label: DECISION_CONTRACT_LABELS.watch.postureFlips, value: display.conditionsChangeIf },
   ];
@@ -542,21 +681,19 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
-    `Conditions: ${display.conditions} (${display.confidence.toLowerCase()})`,
+    `Conditions: ${display.conditions} (margin: ${display.confidence.toLowerCase()})`,
     "",
     `This week's decision (${slots.map((slot) => slot.label).join(" / ")}):`,
     ...slots.map((slot) => `• ${slot.label}: ${slot.value}`),
     ...(readingLines.length > 0 ? ["", "Readings:", ...readingLines] : []),
     "",
-    "Summary:",
-    `• ${brief.summary}`,
-    `• What changed: ${display.whatChanged}`,
+    `What changed: ${display.whatChanged}`,
     ...(decisions.length > 0 ? ["", "Operating limits by area:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
-    ...(brief.correction ? ["", `Correction: ${brief.correction}`] : []),
+    ...(brief.correction ? ["", `Correction: ${correctionBody(brief.correction)}`] : []),
     "",
     "Provenance:",
-    `Record date ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel}`,
+    `Record date ${brief.recordDateLabel} · ${display.source} · captured ${brief.freshnessLabel} · ${basisClause(display.basis.sentence)}`,
     ...(brief.sourceUrl ? [`Source: ${brief.sourceUrl}`] : []),
     "",
     `Permanent URL: ${permalinkUrl}`,
@@ -575,7 +712,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     [
       `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)}`,
       `  - ${DECISION_CONTRACT_LABELS.slot.action}: ${display.sentence(decision.doNow)}`,
-      `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.sentence(decision.pauseTrigger)}`,
+      `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`,
       `  - ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`,
     ].join("\n"),
   );
@@ -584,14 +721,13 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
 
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
-    `Whether Leadership Update — Week of ${brief.recordDateLabel}`,
+    `Whether Leadership Update — Week of ${publishedBriefWeekLabel(brief)}`,
     "",
     `Conditions: ${display.conditions}`,
-    `Confidence: ${display.confidence}`,
-    `Executive summary: ${brief.summary}`,
+    `Margin: ${display.confidence.toLowerCase()}`,
     "",
     "This week's guidance:",
-    `• ${DECISION_CONTRACT_LABELS.action.actionNow}: ${brief.actionNow}`,
+    `• ${publicDecisionLabels.call}: ${publishedBriefHeadline(brief).composed}`,
     ...(display.pauseIf ? [`• ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${display.pauseIf}`] : []),
     `• ${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${display.conditionsChangeIf}`,
     "",
@@ -600,14 +736,42 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     ...readingLines,
     ...(decisions.length > 0 ? ["", "Area decisions:", ...decisions] : []),
     ...(evidenceLines.length > 0 ? ["", "Evidence:", ...evidenceLines] : []),
-    ...(brief.correction ? ["", `Correction note: ${brief.correction}`] : []),
+    ...(brief.correction ? ["", `Correction note: ${correctionBody(brief.correction)}`] : []),
     "",
     "Provenance & citations:",
     `• Record date: ${brief.recordDateLabel}`,
     `• Source: ${display.source}${brief.sourceUrl ? ` (${brief.sourceUrl})` : ""}`,
     `• Freshness: ${brief.freshnessLabel}`,
+    `• ${display.basis.sentence}`,
     "",
     `Permanent URL: ${permalinkUrl}`,
   ].join("\n");
 };
+
+/**
+ * Generates a date-pinned executive board / investor update constructed strictly from PublishedBrief.
+ * Never fetches live report data or external endpoints.
+ */
+export const buildPublishedBriefBoardUpdate = (brief: PublishedBrief): string => {
+  const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
+  const readingLines = buildPublishedBriefReadingLines(brief);
+  const display = publishedBriefDisplay(brief);
+  const decisions = decisionsInAreaOrder(brief).map((decision) =>
+    `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)} (${DECISION_CONTRACT_LABELS.slot.action}: ${display.sentence(decision.doNow)})`,
+  );
+
+  return [
+    `Whether Board Memo — Week of ${publishedBriefWeekLabel(brief)}`,
+    `Macro Posture: ${display.conditions} (Margin: ${display.confidence.toLowerCase()})`,
+    "",
+    `Executive Guidance: ${publishedBriefHeadline(brief).composed}`,
+    ...(display.pauseIf ? [`Operating Threshold: ${display.pauseIf}`] : []),
+    `Posture Flips If: ${display.conditionsChangeIf}`,
+    ...(readingLines.length > 0 ? ["", "Macro Readings:", ...readingLines] : []),
+    ...(decisions.length > 0 ? ["", "Operating Limits by Area:", ...decisions] : []),
+    "",
+    `Permanent Record: ${permalinkUrl} · Captured ${brief.freshnessLabel}`,
+  ].join("\n");
+};
+
 

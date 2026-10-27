@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { DEFAULT_THRESHOLDS } from "../lib/regimeEngineCore";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
-import { areaLinesFromRules, buildDecisionMovement, fitMovementHeadline } from "../lib/report/decisionMovement";
+import { areaLinesFromRules, buildDecisionMovement, describeMovementCause, fitMovementHeadline } from "../lib/report/decisionMovement";
 import type { RegimeKey } from "../lib/regimeEngine";
 import { REGIME_ORDER } from "../lib/regimePresentation";
 
@@ -51,10 +51,25 @@ describe("buildDecisionMovement", () => {
     ]);
     assert.equal(
       result.sentence,
-      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose through 76 and risk appetite fell through 44.",
+      "Since Aug 31, conditions changed from Sunny to Freezing. The pause now applies to every area, because funding pressure rose above 76 and risk appetite fell below 44.",
     );
     // A link preview and a card have room for the consequence and not the evidence.
     assert.equal(result.headline, "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area.");
+  });
+
+  it("groups the areas that held, so a table can say it once instead of once per row", () => {
+    // The week of Oct 6: funding pressure stayed pinned at 90 while risk appetite fell 56 to 48.
+    // Only the roadmap moved; the other four held on the pause side of their lines.
+    const result = movement({ from: { tightness: 90, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 48 }, regime: "SCARCITY", label: "Sep 30" });
+    assert.ok(result);
+    assert.deepEqual(result.moved.map((entry) => entry.area), ["product-tempo"]);
+    assert.deepEqual(result.heldGroups, [
+      {
+        state: "pause",
+        areas: ["hiring", "capital-raising", "burn-discipline", "expansion-bets"],
+        text: "Pause still applies to Hiring, Fundraising, Spending and New bets: no line crossed since Sep 30.",
+      },
+    ]);
   });
 
   it("gives each area only the lines its own rule states", () => {
@@ -63,11 +78,11 @@ describe("buildDecisionMovement", () => {
     const byArea = new Map(result.areas.map((entry) => [entry.area, entry]));
 
     // Spending pauses on funding pressure alone; the roadmap on risk appetite alone.
-    assert.equal(byArea.get("burn-discipline")?.text, "Pause now applies: funding pressure rose through 76.");
-    assert.equal(byArea.get("product-tempo")?.text, "Pause now applies: risk appetite fell through 44.");
+    assert.equal(byArea.get("burn-discipline")?.text, "Pause now applies: funding pressure rose above 76.");
+    assert.equal(byArea.get("product-tempo")?.text, "Pause now applies: risk appetite fell below 44.");
     assert.equal(
       byArea.get("hiring")?.text,
-      "Pause now applies: funding pressure rose through 76 and risk appetite fell through 44.",
+      "Pause now applies: funding pressure rose above 76 and risk appetite fell below 44.",
     );
   });
 
@@ -86,10 +101,21 @@ describe("buildDecisionMovement", () => {
     assert.equal(result.conditions, null);
     assert.equal(
       result.sentence,
-      "Conditions held steady since Sep 15; no pause or resume line was crossed. Last week's guidance stands.",
+      "Conditions held steady since Sep 15; no pause or resume line was crossed. The guidance stands.",
     );
-    assert.ok(result.areas.every((entry) => entry.kind === "held" && entry.text === "No line crossed since Sep 15."));
+    /* Each area names the side of its lines it held on: printed alone, "No line crossed" sat
+       beside "Pause if Funding pressure > 76 · crossed" and read as the row contradicting itself. */
+    assert.ok(result.areas.every((entry) => entry.kind === "held" && entry.text === "Pause still applies: no line crossed since Sep 15."));
     assert.equal(result.headline, result.sentence, "a week that crossed nothing has no evidence to leave out");
+  });
+
+  it("says only that nothing crossed for an area held between its lines", () => {
+    // 70 and 50 sit inside every area's pause and resume lines: nothing is paused or met.
+    const result = movement({ from: { tightness: 70, riskAppetite: 50 }, to: { tightness: 72, riskAppetite: 49 }, regime: "DEFENSIVE" });
+
+    assert.ok(result);
+    assert.ok(result.areas.every((entry) => entry.kind === "held" && entry.state === "hold"));
+    assert.ok(result.areas.every((entry) => entry.text === "No line crossed since Aug 31."));
   });
 
   it("does not turn a small move across a line into a held week", () => {
@@ -100,7 +126,7 @@ describe("buildDecisionMovement", () => {
     assert.deepEqual(result.moved.map((entry) => entry.area), ["hiring", "capital-raising", "burn-discipline", "expansion-bets"]);
     assert.equal(
       result.sentence,
-      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose through 76.",
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets, because funding pressure rose above 76.",
     );
     // A reading that only touches the line has not crossed it.
     const touching = movement({ from: { tightness: 70, riskAppetite: 60 }, to: { tightness: 76, riskAppetite: 60 }, regime: "DEFENSIVE" });
@@ -125,11 +151,11 @@ describe("buildDecisionMovement", () => {
     assert.ok(recovered.moved.every((entry) => entry.kind === "resumable"));
     assert.equal(
       recovered.areas.find((entry) => entry.area === "hiring")?.text,
-      "Pause lifted, resume line met: funding pressure fell through 66 and risk appetite rose through 54.",
+      "Pause lifted, resume line met: funding pressure fell below 66 and risk appetite rose above 54.",
     );
     assert.equal(
       recovered.sentence,
-      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell through 66 and risk appetite rose through 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
     );
 
     // Back out of the pause but not to the resume line: 80 to 72 is through 76 and no further.
@@ -141,7 +167,7 @@ describe("buildDecisionMovement", () => {
       ["burn-discipline", "lifted"],
       ["expansion-bets", "lifted"],
     ]);
-    assert.equal(lifted.areas.find((entry) => entry.area === "burn-discipline")?.text, "Pause lifted: funding pressure fell through 76.");
+    assert.equal(lifted.areas.find((entry) => entry.area === "burn-discipline")?.text, "Pause lifted: funding pressure fell below 76.");
   });
 
   it("says when a resume line stops holding, and leaves the areas it does not touch out", () => {
@@ -155,7 +181,7 @@ describe("buildDecisionMovement", () => {
     assert.equal(result.areas.find((entry) => entry.area === "burn-discipline")?.kind, "held");
     assert.equal(
       result.sentence,
-      "Since Aug 31, the resume line is no longer met for Hiring, Roadmap, Fundraising and New bets, because risk appetite fell through 54.",
+      "Since Aug 31, the resume line is no longer met for Hiring, Roadmap, Fundraising and New bets, because risk appetite fell below 54.",
     );
   });
 
@@ -267,5 +293,24 @@ describe("fitMovementHeadline", () => {
     }
 
     assert.ok(checked > 1000);
+  });
+});
+
+/* The homepage verdict's one line on why (site review, 2026-10-09): the lines the
+   scores crossed, never the consequences, which "What changed this week" states. */
+describe("describeMovementCause", () => {
+  it("names the crossings, and only the crossings", () => {
+    const moved = movement({ from: { tightness: 63, riskAppetite: 56 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
+    assert.ok(moved);
+    const cause = describeMovementCause(moved);
+    assert.match(cause, /^Funding pressure rose above \d+/);
+    assert.match(cause, /risk appetite fell below \d+\.$/);
+    assert.doesNotMatch(cause, /Pause now applies|Resume line/);
+  });
+
+  it("says no line was crossed, dated by the comparison, on a week that held", () => {
+    const held = movement({ from: { tightness: 90, riskAppetite: 43 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
+    assert.ok(held);
+    assert.equal(describeMovementCause(held), "No score crossed a pause or resume line since Aug 31.");
   });
 });

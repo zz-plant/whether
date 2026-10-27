@@ -6,6 +6,7 @@ import { UrlDetails } from "../components/ui/urlDetails";
 import { ChevronDownIcon } from "../components/uiIcons";
 import { isDisclosureOpenInParams } from "../components/ui/disclosureUrlState";
 import { ReportShell } from "../components/reportShell";
+import { ShareOrEmbedLink } from "../components/shareOrEmbedLink";
 import {
   DECISION_CONTRACT_LABELS,
   PRIMARY_AUDIENCE_SUMMARY,
@@ -13,7 +14,6 @@ import {
 import { ReportSection } from "../components/reportSection";
 import { CONFIDENCE_RECORD_TITLE } from "../components/history/confidenceRecord";
 import { FormulaReference } from "./formulaReference";
-import { FrameworkSection } from "./frameworkSection";
 import { RunHistorySection } from "./runHistorySection";
 import { SourceBoard } from "./sourceBoard";
 import { ReaderReturnsSection } from "./readerReturnsSection";
@@ -42,9 +42,7 @@ export default async function MethodPage({
     reportData,
     isFallback,
     sourceBoardRows,
-    citationLine,
     warnings,
-    meetingSnippet,
     revisitBullets,
     scorePositions,
     runHistory,
@@ -52,38 +50,23 @@ export default async function MethodPage({
     reportShellModel,
   } = await buildTrustPageModel();
 
-  /* What is folded on a healthy week: the citation, the limits, the warnings
-     and the snippet. The source board used to lead this group; it is open
-     under the derivation now (`SourceBoard`), because it is the evidence the
-     strip's "Sources" verdict was judged from. */
+  /* What is folded on a healthy week: the limits, the confidence record and the
+     warnings. The source board used to lead this group; it is open under the
+     derivation now (`SourceBoard`), because it is the evidence the strip's
+     "Sources" verdict was judged from. The citation and the meeting snippet
+     that bracketed it moved to /share on 2026-10-08 (`ShareOrEmbedLink`
+     below). */
   const secondaryContent = (
     <>
       <ReportSection
-        id="sources-freshness"
-        title="Cite this guidance"
-        description="The one-line citation for a recap or sourcing note."
-      >
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Meeting citation</p>
-            <p className="text-sm text-slate-200">{citationLine}</p>
-            <p className="text-xs text-slate-400">For a recap or sourcing note.</p>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <ActionLink href="#trust-snapshot" variant="pill">System status</ActionLink>
-              <ActionLink href="#formula-reference" variant="pill">Formula notes</ActionLink>
-            </div>
-          </article>
-        </div>
-      </ReportSection>
-
-      <ReportSection
         id="confidence-limits"
-        title="Confidence and reliability limits"
-        description="How reliable the brief is, what should pause it, and what would force a change."
+        title="Margin and reliability limits"
       >
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">What to watch</p>
+        {/* Two columns under their own headings, not two cards inside the
+            section (2026-10-09); the warnings below are set the same way. */}
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8">
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-slate-100">What to watch</h3>
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
@@ -95,17 +78,16 @@ export default async function MethodPage({
                 <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatDecisionReversal(reportData.actionStripItems[0].reversalCondition)}</li>
               ) : null}
             </ul>
-          </article>
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Escalation rule</p>
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-slate-100">Escalation rule</h3>
             <p className="text-sm text-slate-200">
               If a warning below is active, check the source dates before going ahead.
             </p>
-            <div className="flex flex-wrap gap-2 text-xs">
-              <ActionLink href="#source-board" variant="pill">Recheck freshness</ActionLink>
-              <ActionLink href="#revisit-call" variant="pill">Revisit triggers</ActionLink>
-            </div>
-          </article>
+            {/* No buttons to #source-board and #revisit-call (2026-10-09): the page's
+                index names both sections, and "Check source dates" closes the
+                section below. */}
+          </div>
         </div>
       </ReportSection>
 
@@ -115,7 +97,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="Confidence measures how far the scores sit from the line where conditions change. Whether readings at that distance actually held is measured separately, over the whole archive."
+        description="The margin is how far the scores sit from the line where conditions change. We check separately, across the whole archive, how often readings at that distance actually held."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study
@@ -123,42 +105,37 @@ export default async function MethodPage({
       </ReportSection>
 
       <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
-        <div className="grid gap-3 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">Active warnings</p>
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-8">
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-slate-100">Active warnings</h3>
             {warnings.length === 0 ? (
               <p className="text-sm text-slate-300">No warning is active. Act on the guidance; the pause line still applies.</p>
             ) : (
-              <ul className="space-y-3 text-sm text-slate-200">
+              <ul className="space-y-4 text-sm text-slate-200">
                 {warnings.map((warning) => (
-                  <li key={warning.id} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                  <li key={warning.id}>
                     <p className="font-semibold text-slate-100">{warning.warning}</p>
                     <p className="mt-1 text-slate-300">{warning.mitigationCheck}</p>
                   </li>
                 ))}
               </ul>
             )}
-          </article>
-          <article className="weather-hub-card px-4 py-4">
-            <p className="type-eyebrow">Revisit checklist</p>
-            <ul className="mt-3 space-y-3 text-sm text-slate-200">
+          </div>
+          <div className="space-y-2">
+            <h3 className="text-sm font-semibold text-slate-100">Revisit checklist</h3>
+            <ul className="space-y-4 text-sm text-slate-200">
               {revisitBullets.map((item) => (
-                <li key={item.label} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
-                  <p className="type-eyebrow">{item.label}</p>
+                <li key={item.label}>
+                  <p className="font-semibold text-slate-100">{item.label}</p>
                   {item.detail ? <p className="mt-1">{item.detail}</p> : null}
-                  <Link href={item.href} className="mt-2 inline-flex min-h-[44px] items-center type-eyebrow text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">{item.linkLabel} →</Link>
+                  <Link href={item.href} className="inline-flex min-h-[44px] items-center text-sm font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">{item.linkLabel} →</Link>
                 </li>
               ))}
             </ul>
-          </article>
+          </div>
         </div>
       </ReportSection>
 
-      <ReportSection id="meeting-snippet" title="Meeting snippet" description="Paste into notes or a meeting agenda.">
-        <pre className="overflow-x-auto rounded-lg border border-[color:var(--border-default)] bg-[var(--bg-surface)] px-4 py-4 text-xs leading-6 text-slate-200">
-          <code>{meetingSnippet}</code>
-        </pre>
-      </ReportSection>
     </>
   );
 
@@ -191,7 +168,16 @@ export default async function MethodPage({
 
       {readerReturns ? <ReaderReturnsSection line={readerReturns.line} generatedAt={readerReturns.generatedAt} /> : null}
 
-      <FormulaReference positions={scorePositions} />
+      {/* The derivation folds only on a stable week — the same condition that
+          folds "Limits" below — and opens from `?derivation=1`. On a week with
+          warnings or a cached reading it renders open, where the reader who
+          needs to distrust it finds it unprompted (DD-040). */}
+      <FormulaReference
+        positions={scorePositions}
+        scoringBasis={reportData.scoringBasis}
+        plainLanguageFolded={!isFallback && warnings.length === 0}
+        plainLanguageOpen={isDisclosureOpenInParams(resolvedSearchParams, "derivation")}
+      />
 
       {/* Open, under the derivation: the page's question is whether the
           reading is current enough to act on, and this is where that is
@@ -214,7 +200,7 @@ export default async function MethodPage({
           summaryClassName="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 type-eyebrow select-none"
           summary={
             <>
-              <span>Citation, limits and revisit triggers</span>
+              <span>Limits and the lines that change the guidance</span>
               <span aria-hidden="true" className="inline-flex rounded-md border border-slate-700/50 bg-slate-950/50 px-2 py-1.5 text-slate-400 transition group-open:rotate-180 motion-reduce:transition-none">
                 <ChevronDownIcon className="h-3.5 w-3.5" />
               </span>
@@ -226,12 +212,25 @@ export default async function MethodPage({
           </div>
         </UrlDetails>
       ) : (
-        secondaryContent
+        /* The same spacing as inside the fold: three sections in one row had
+           none between them, which the cards around their contents used to
+           hide (2026-10-09). */
+        <div className="space-y-10">{secondaryContent}</div>
       )}
 
-      {/* Last: how to use the lines is method, not a check on this week's
-          reading (§VIII). Its essay and its blank form are folded inside. */}
-      <FrameworkSection />
+      {/* The citation and the meeting snippet are /share formats now, with every
+          other paste of the week. */}
+      <ShareOrEmbedLink />
+
+      {/* The method moved to /about (2026-10-09): it is the product's thesis, and as
+          the last section of the page a reader opens to check this week's reading
+          it read as an appendix. One line points to it. */}
+      <p className="text-sm text-slate-300">
+        <Link href="/about#method" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+          About
+        </Link>{" "}
+        explains how to use the pause and resume lines, with a worked example and a blank form.
+      </p>
     </ReportShell>
   );
 }

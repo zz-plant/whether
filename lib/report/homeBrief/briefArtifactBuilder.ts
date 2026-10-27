@@ -8,6 +8,7 @@ import { DECISION_CONTRACT_LABELS } from "../reportCopy";
 import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../publishedBriefs";
 import { briefArtifactOf, briefSourceFromReportData, buildBriefDocument } from "../briefDocument";
 import { publisherSourceLabel } from "../provenanceStatus";
+import { weeklyHeadline } from "../reportEvidence";
 
 type HomePageAssembly = Awaited<ReturnType<typeof assembleHomePage>>;
 type WeeklyCard = HomePageAssembly["weeklyDecisionCardModel"];
@@ -22,16 +23,17 @@ type WeeklyCard = HomePageAssembly["weeklyDecisionCardModel"];
  * here instead: "if a UI change requires several components to redefine the
  * same copy, the copy belongs here."
  */
-export const deriveBriefCallFields = (card: WeeklyCard) => {
+export const deriveBriefCallFields = (
+  card: WeeklyCard,
+  weeklyCall: Pick<WeeklyCallContract, "actionNow" | "currentCall">,
+) => {
   const { decision } = card;
-  /* The week's action, as the weekly call contract leads with it
-     (docs/claims-ledger.md). The last fallback is the week's action too: it
-     was the operating latitude's shorthand, "This week's guidance is
-     unchanged.", a sentence about a number standing in the guidance's slot. */
-  const primaryCall =
-    decision.actionNowShort?.trim()
-    || decision.canonicalDecisionCopy?.doNowLines?.[0]
-    || decision.immediateDecision;
+  /* The week's headline action, from the one source every surface reads
+     (`weeklyHeadline`, docs/claims-ledger.md): the h1, the sticky strip, Copy
+     Brief and the share panel. It was the action (`actionNowShort`) while the
+     frozen brief led with the call, so one week had two headlines. */
+  const headline = weeklyHeadline(weeklyCall);
+  const primaryCall = headline.composed;
   const flipConditionLabels = decision.compactFlipConditionLabels ?? [];
   const revisitQueue = decision.revisitQueue;
   const revisitAreaIds = new Set(revisitQueue.map((item) => item.id));
@@ -52,10 +54,9 @@ export const deriveBriefCallFields = (card: WeeklyCard) => {
   const reversalTriggerLabel = decision.reversalTrigger;
   const resumeWhenLabel = decision.resumeWhen;
 
+  /* No week-level do-now line: it was the action the headline replaced, and under
+     the headline it read as a second instruction for the same week. */
   const briefShareLines = [
-    decision.actionNowShort
-      ? `${DECISION_CONTRACT_LABELS.action.doNow}: ${decision.actionNowShort}`
-      : null,
     guardrailLabel ? `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${guardrailLabel}` : null,
     reversalTriggerLabel ? `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reversalTriggerLabel}` : null,
     resumeWhenLabel ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${resumeWhenLabel}` : null,
@@ -65,6 +66,7 @@ export const deriveBriefCallFields = (card: WeeklyCard) => {
   ].filter((line): line is string => Boolean(line));
 
   return {
+    headline,
     primaryCall,
     flipConditionLabels,
     revisitQueue,
@@ -99,7 +101,7 @@ export const buildBriefArtifact = ({
   title: string;
 }): BriefArtifact => {
   const card = homepage.weeklyDecisionCardModel;
-  const fields = deriveBriefCallFields(card);
+  const fields = deriveBriefCallFields(card, homepage.weeklyCall);
   const citableBrief = selectCitablePermalinkBrief(recordDate);
   const treasurySource = homepage.reportShell.treasurySource;
   const { thresholds } = (homepage.reportResult.ok ? homepage.reportResult.data : homepage.reportResult.fallback).assessment;
@@ -108,7 +110,7 @@ export const buildBriefArtifact = ({
     title,
     recordDateLabel: homepage.reportShell.recordDateLabel,
     call: fields.primaryCall,
-    actionNow: card.decision.actionNowShort,
+    actionNow: fields.primaryCall,
     guardrail: fields.guardrailLabel,
     reversal: fields.reversalTriggerLabel,
     resumeWhen: fields.resumeWhenLabel,

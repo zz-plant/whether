@@ -143,6 +143,7 @@ export const buildOperatingSnapshot = ({
     id,
     schemaVersion: 2,
     epoch,
+    engineVersion: ENGINE_VERSION,
     recordDate,
     inputHash,
     sourceSnapshotIds,

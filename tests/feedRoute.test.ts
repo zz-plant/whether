@@ -5,6 +5,12 @@ import { GET } from "../app/feed.xml/route";
 import { formatDateUTC } from "../lib/formatters";
 import { buildPublishedBriefPath, getPublishedBriefs } from "../lib/report/publishedBriefs";
 import { siteUrl } from "../lib/siteUrl";
+import { escapeXml } from "../lib/seo";
+import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
+import { weeklyHeadline } from "../lib/report/reportEvidence";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 const items = (xml: string) => [...xml.matchAll(/<item>([\s\S]*?)<\/item>/g)].map((match) => match[1]);
 const tag = (block: string, name: string) => block.match(new RegExp(`<${name}[^>]*>([\\s\\S]*?)</${name}>`))?.[1] ?? "";
@@ -64,7 +70,7 @@ describe("feed.xml", () => {
    * confidence." Its record date is the one its guid names, and its confidence reads
    * as the published items' do.
    */
-  it("dates the live item by its record date and states confidence once", async () => {
+  it("dates the live item by its record date and states the margin once", async () => {
     const xml = await (await GET()).text();
     const live = items(xml).find((block) => tag(block, "link") === `${siteUrl}/`);
     if (!live) return; // the archive already carries this week
@@ -72,8 +78,11 @@ describe("feed.xml", () => {
     const recordDate = tag(live, "guid").replace("whether-brief-live-", "");
     assert.match(recordDate, /^\d{4}-\d{2}-\d{2}$/);
     assert.equal(tag(live, "pubDate"), new Date(recordDate).toUTCString());
-    assert.match(live, new RegExp(`<strong>Record date:</strong> ${formatDateUTC(recordDate)} · (High|Medium|Low) confidence</p>`));
-    assert.doesNotMatch(live, /Confidence:/);
+    assert.match(live, new RegExp(`<strong>Record date:</strong> ${formatDateUTC(recordDate)} · Margin: (clear of the line|within reach of the line|close to the line)</p>`));
+    assert.doesNotMatch(live, /Confidence:|\b(High|Medium|Low) confidence\b/);
+    /* The week's one headline action (`weeklyHeadline`), not the weekly summary's own sentence. */
+    const { snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "test" });
+    assert.ok(tag(live, "title").includes(escapeXml(weeklyHeadline(snapshot.weeklyCall).action)), tag(live, "title"));
   });
 
   it("is announced from the root layout", () => {

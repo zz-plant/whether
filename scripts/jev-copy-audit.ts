@@ -3,7 +3,7 @@
  * Reader-copy and brief-consistency audit, judged by Jev (`typesafe/jev` on
  * Cloudflare Workers AI).
  *
- * Two modes, both advisory and both outside the gate — the suite runs offline,
+ * Advisory modes outside the gate — the suite runs offline,
  * and a model's answer is not a deterministic check:
  *
  * - `copy` (default) fetches rendered routes from a running server, splits the
@@ -11,16 +11,20 @@
  *   copy audit asked by hand: is it cryptic, figurative, abstract, presumptuous.
  *   `tests/readerVocabulary.test.tsx` can ban a word; it cannot see a sentence
  *   that assumes the reader has a board without saying "board". This can.
- * - `brief` puts the latest published call (`data/published_briefs.json`) and
- *   the generated brief text (`bun run brief:weekly:artifact` writes it to
- *   `artifacts/weekly-slack-brief.txt`) side by side and asks whether the text contradicts
- *   the call — the shape of the `/history` "Reading now" defect, where two
- *   surfaces disagreed and every check was green.
+ * - `brief` compares generated text with its paired canonical document, refusing
+ *   mismatched reading identities before inference.
+ * - `screenshot`, `evidence`, and `eval` review local images, select source-backed
+ *   candidates, and measure labeled cases. See docs/developer/decision-models.md.
  *
  * A flagged sentence is a prompt for a person to read it, not a verdict: Jev
  * gives no reasons, and a probability near the threshold is close to a coin
  * toss. Every Jev call that fails is counted, and any failure exits non-zero,
  * so a run that judged nothing cannot read as a clean one.
+ *
+ * `--model` picks the decision model (`jev`, the default, `clef`, `clef-flash` or `clef-omni`;
+ * see `lib/jev/jevClient.ts`). Two or more, comma-separated, judge every sentence
+ * once per model and list the sentences they disagree on: that list, not the
+ * agreement rate, is what says whether the cheaper model can stand in for Jev.
  *
  * Needs CLOUDFLARE_ACCOUNT_ID and CLOUDFLARE_API_TOKEN (Workers AI: Read/Edit).
  *
@@ -28,14 +32,16 @@
  *   bun run dev   # in another shell
  *   bun run audit:jev-copy
  *   bun run audit:jev-copy -- --routes /,/trust --threshold 0.7
+ *   bun run audit:jev-copy -- --model jev,clef-flash
  *   bun run brief:weekly:artifact && bun run audit:jev-copy -- --mode brief
  */
-import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
-import { runJev, type JevQuestion, type JevResult } from "../lib/jev/jevClient";
+import { isDecisionModel, runJev, type DecisionModel, type JevQuestion, type JevResult } from "../lib/jev/jevClient";
 import { getRegimePublicLabel } from "../lib/regimePresentation";
+import { runArtifactAudit } from "./jev-artifact-audit";
 
-const DEFAULT_ROUTES = ["/", "/trust", "/history", "/signals", "/pricing", "/share", "/operate", "/resolve"];
+export const DEFAULT_ROUTES = ["/", "/trust", "/history", "/signals", "/share", "/operate", "/resources"];
 const DEFAULT_THRESHOLD = 0.8;
 const CONCURRENCY = 4;
 const REPORT_DIR = "artifacts/jev";
@@ -71,29 +77,6 @@ export const COPY_QUESTIONS: Record<string, JevQuestion> = {
     instructions:
       "Does the sentence assume facts about the reader's company or role (a board, a CEO, a finance lead, a set meeting, a stage) that the reader has not told the site?",
     criteria: { true: "Assumes the reader's org structure or circumstances", false: "Makes no such assumption" },
-  },
-};
-
-export const BRIEF_QUESTIONS: Record<string, JevQuestion> = {
-  contradicts_call: {
-    type: "noul",
-    instructions:
-      "Does state.briefText tell the reader something (a condition, an action, a threshold, a confidence) that contradicts state.publishedCall?",
-    criteria: {
-      true: "A reader of the text would act differently than a reader of the published call",
-      false: "The text agrees with the published call, or only adds detail to it",
-    },
-  },
-  conflict_area: {
-    type: "choice",
-    instructions: "If the text and the published call disagree, where is the biggest disagreement?",
-    criteria: {
-      condition: "The named market condition or its severity",
-      action: "What to do now",
-      thresholds: "The lines that pause or resume a decision",
-      confidence: "How sure the call is",
-      none: "They do not disagree",
-    },
   },
 };
 
@@ -133,6 +116,40 @@ export const flaggedQuestions = (result: JevResult, threshold: number): Record<s
   return flags;
 };
 
+export type Disagreement = { route: string; sentence: string; question: string; flaggedBy: string[]; clearedBy: string[] };
+
+/**
+ * Every sentence and question one model flagged and another cleared. A sentence
+ * any model failed to judge is left out: its empty flags would read as a clear.
+ */
+export const findDisagreements = (
+  items: { route: string; sentence: string }[],
+  resultsByModel: Record<string, JevResult[]>,
+  threshold: number,
+): Disagreement[] => {
+  const runs = Object.entries(resultsByModel);
+  return items.flatMap((item, index) => {
+    const judged: { model: string; flags: Record<string, number> }[] = [];
+    for (const [model, results] of runs) {
+      const result = results[index];
+      if (!result?.ok) return [];
+      judged.push({ model, flags: flaggedQuestions(result, threshold) });
+    }
+    return Object.keys(COPY_QUESTIONS).flatMap((question) => {
+      const flaggedBy = judged.filter(({ flags }) => question in flags).map(({ model }) => model);
+      if (flaggedBy.length === 0 || flaggedBy.length === judged.length) return [];
+      const clearedBy = judged.map(({ model }) => model).filter((model) => !flaggedBy.includes(model));
+      return [{ ...item, question, flaggedBy, clearedBy }];
+    });
+  });
+};
+
+const parseModels = (value: string | undefined): DecisionModel[] | null => {
+  const names = [...new Set((value ?? "jev").split(",").map((name) => name.trim()).filter(Boolean))];
+  const models = names.filter(isDecisionModel);
+  return models.length === names.length && models.length > 0 ? models : null;
+};
+
 const parseArgs = (argv: string[]) => {
   const read = (name: string) => {
     const index = argv.indexOf(`--${name}`);
@@ -144,8 +161,15 @@ const parseArgs = (argv: string[]) => {
     baseUrl: read("base-url") ?? "http://localhost:3000",
     routes: read("routes")?.split(",").map((route) => route.trim()).filter(Boolean) ?? DEFAULT_ROUTES,
     threshold,
+    models: parseModels(read("model")),
+    inputPath: read("input"),
+    imagePath: read("image"),
+    reportDir: read("out-dir"),
   };
 };
+
+type Args = ReturnType<typeof parseArgs> & { models: DecisionModel[] };
+type Credentials = { accountId: string; apiToken: string };
 
 const pool = async <T, R>(items: T[], worker: (item: T) => Promise<R>): Promise<R[]> => {
   const results: R[] = Array.from({ length: items.length });
@@ -168,7 +192,7 @@ const writeReport = (name: string, report: unknown) => {
   return file;
 };
 
-const runCopyAudit = async (args: ReturnType<typeof parseArgs>, credentials: { accountId: string; apiToken: string }) => {
+const runCopyAudit = async (args: Args, credentials: Credentials) => {
   const seen = new Set<string>();
   const items: { route: string; sentence: string }[] = [];
   for (const route of args.routes) {
@@ -186,66 +210,45 @@ const runCopyAudit = async (args: ReturnType<typeof parseArgs>, credentials: { a
     }
   }
 
-  console.log(`jev-copy-audit: judging ${items.length} sentences from ${args.routes.length} routes`);
-  const results = await pool(items, (item) =>
-    runJev({ state: { context: COPY_CONTEXT, sentence: item.sentence }, questions: COPY_QUESTIONS }, credentials));
+  console.log(`jev-copy-audit: judging ${items.length} sentences from ${args.routes.length} routes with ${args.models.join(", ")}`);
+  const resultsByModel: Record<string, JevResult[]> = {};
+  const byModel: Record<string, { served: string[]; failed: number; findings: CopyFinding[] }> = {};
+  let failed = 0;
+  for (const model of args.models) {
+    const results = await pool(items, (item) =>
+      runJev({ state: { context: COPY_CONTEXT, sentence: item.sentence }, questions: COPY_QUESTIONS }, { ...credentials, model }));
+    resultsByModel[model] = results;
+    const failures = results.flatMap((result) => (result.ok ? [] : [result.reason]));
+    const findings: CopyFinding[] = items
+      .map((item, index) => ({ ...item, flags: flaggedQuestions(results[index], args.threshold) }))
+      .filter((finding) => Object.keys(finding.flags).length > 0);
+    const served = [...new Set(results.flatMap((result) => (result.ok ? [result.model] : [])))];
+    byModel[model] = { served, failed: failures.length, findings };
+    failed += failures.length;
 
-  const failures = results.flatMap((result) => (result.ok ? [] : [result.reason]));
-  const findings: CopyFinding[] = items
-    .map((item, index) => ({ ...item, flags: flaggedQuestions(results[index], args.threshold) }))
-    .filter((finding) => Object.keys(finding.flags).length > 0);
-  const models = [...new Set(results.flatMap((result) => (result.ok ? [result.model] : [])))];
+    for (const finding of findings) {
+      const flags = Object.entries(finding.flags).map(([key, p]) => `${key} ${p.toFixed(2)}`).join(", ");
+      console.log(`  ${model}  ${finding.route}  [${flags}]\n    ${finding.sentence}`);
+    }
+    console.log(`jev-copy-audit: ${model} flagged ${findings.length} of ${items.length} at ≥${args.threshold} (served by ${served.join(", ") || "none"})`);
+    if (failures.length > 0) console.error(`jev-copy-audit: ${model}: ${failures.length} call(s) failed, first: ${failures[0]}`);
+  }
 
-  const file = writeReport("copy-audit.json", { threshold: args.threshold, models, judged: items.length, failed: failures.length, findings });
-  for (const finding of findings) {
-    const flags = Object.entries(finding.flags).map(([key, p]) => `${key} ${p.toFixed(2)}`).join(", ");
-    console.log(`  ${finding.route}  [${flags}]\n    ${finding.sentence}`);
+  const disagreements = args.models.length > 1 ? findDisagreements(items, resultsByModel, args.threshold) : [];
+  for (const entry of disagreements) {
+    console.log(`  disagree  ${entry.route}  ${entry.question}: flagged by ${entry.flaggedBy.join(", ")}, cleared by ${entry.clearedBy.join(", ")}\n    ${entry.sentence}`);
   }
-  console.log(`jev-copy-audit: ${findings.length} flagged of ${items.length} at ≥${args.threshold} (model ${models.join(", ") || "none"}); report ${file}`);
-  if (failures.length > 0) {
-    console.error(`jev-copy-audit: ${failures.length} Jev call(s) failed, first: ${failures[0]}`);
-    return 1;
-  }
-  return 0;
-};
-
-const runBriefAudit = async (args: ReturnType<typeof parseArgs>, credentials: { accountId: string; apiToken: string }) => {
-  const archive: unknown = JSON.parse(readFileSync("data/published_briefs.json", "utf8"));
-  const latest = Array.isArray(archive) ? archive.at(-1) : null;
-  /* Generated, never a committed copy: the committed one fell back here while it sat three weeks
-     behind the archive, so a "contradiction" would have been its age, not a disagreement. */
-  const briefPath = "artifacts/weekly-slack-brief.txt";
-  if (!existsSync(briefPath)) {
-    console.error(`jev-copy-audit: ${briefPath} is missing; run \`bun run brief:weekly:artifact\` first.`);
-    return 1;
-  }
-  if (!latest || typeof latest !== "object") {
-    console.error("jev-copy-audit: data/published_briefs.json holds no published call to compare against.");
-    return 1;
-  }
-  const { slug, recordDate, postureLabel, confidenceLabel, summary, actionNow, guardrailThreshold, flipThreshold } =
-    latest as Record<string, unknown>;
-  const publishedCall = { slug, recordDate, postureLabel, confidenceLabel, summary, actionNow, guardrailThreshold, flipThreshold };
-
-  const result = await runJev(
-    { state: { publishedCall, briefText: readFileSync(briefPath, "utf8") }, questions: BRIEF_QUESTIONS },
-    credentials,
-  );
-  if (!result.ok) {
-    console.error(`jev-copy-audit: Jev call failed: ${result.reason}`);
-    return 1;
-  }
-  const file = writeReport("brief-audit.json", { publishedCall, briefPath, threshold: args.threshold, model: result.model, answers: result.answers });
-  const contradicts = result.answers.contradicts_call;
-  const area = result.answers.conflict_area;
-  const p = contradicts?.type === "noul" ? contradicts.noul : 0;
-  console.log(`jev-copy-audit: ${briefPath} vs published ${String(slug)} — contradicts ${p.toFixed(2)}`
-    + `${area?.type === "choice" ? `, area ${area.choice}` : ""} (model ${result.model}); report ${file}`);
-  if (p >= args.threshold) console.log("  flagged: read the brief against the published call before it is sent.");
-  return 0;
+  const file = writeReport("copy-audit.json", { threshold: args.threshold, judged: items.length, byModel, disagreements });
+  if (args.models.length > 1) console.log(`jev-copy-audit: ${disagreements.length} disagreement(s) across ${args.models.join(", ")}`);
+  console.log(`jev-copy-audit: report ${file}`);
+  return failed > 0 ? 1 : 0;
 };
 
 if (import.meta.main) {
+  if (process.argv.includes("--help")) {
+    console.log("Usage: bun run audit:jev-copy -- --mode copy|brief|screenshot|evidence|counterevidence|eval --model jev,clef,clef-flash,clef-omni\nFile modes: --input <json> --image <png|jpg|webp> --out-dir <directory> --threshold <0.5..1>\nDefault brief input: artifacts/weekly-slack-brief.txt.audit.json; regenerate with bun run brief:weekly:artifact.\nCounterevidence input: { canonical, candidates:[{id,claim,excerpt,sourceUrl,observedAt,side?}] }; labeled review cases feed `bun run reviewed-cases:add`.\nAll model calls are advisory; review raw probabilities and labeled errors.");
+    process.exit(0);
+  }
   const args = parseArgs(process.argv.slice(2));
   const accountId = process.env.CLOUDFLARE_ACCOUNT_ID?.trim();
   const apiToken = process.env.CLOUDFLARE_API_TOKEN?.trim();
@@ -257,10 +260,16 @@ if (import.meta.main) {
     console.error("jev-copy-audit: --threshold must be in (0, 1].");
     process.exit(2);
   }
-  if (args.mode !== "copy" && args.mode !== "brief") {
-    console.error("jev-copy-audit: --mode must be copy or brief.");
+  if (args.mode !== "copy" && args.mode !== "brief" && args.mode !== "screenshot" && args.mode !== "evidence" && args.mode !== "counterevidence" && args.mode !== "eval") {
+    console.error("jev-copy-audit: --mode must be copy, brief, screenshot, evidence, counterevidence or eval.");
     process.exit(2);
   }
-  const run = args.mode === "brief" ? runBriefAudit : runCopyAudit;
-  process.exit(await run(args, { accountId, apiToken }));
+  const { models } = args;
+  if (!models) {
+    console.error("jev-copy-audit: --model takes jev, clef, clef-flash or clef-omni, comma-separated.");
+    process.exit(2);
+  }
+  process.exit(args.mode === "copy"
+    ? await runCopyAudit({ ...args, models }, { accountId, apiToken })
+    : await runArtifactAudit({ ...args, mode: args.mode, models }, { accountId, apiToken }));
 }

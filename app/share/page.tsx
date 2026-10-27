@@ -1,10 +1,17 @@
+import { Fragment } from "react";
+import { frameFactsAttributes } from "../../lib/navigation/runningHead";
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { Metadata } from "next";
+import { formatWeekMondayUTC } from "../../lib/formatters";
 import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
 import { GuardrailTagControls } from "./guardrailTagControls";
+import { ReusableVisuals } from "./reusableVisuals";
+import { findBriefVideo } from "../../lib/export/briefVideo";
+import { latestPublishedBrief, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { PullPolicyControls } from "./pullPolicyControls";
-import { SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
+import { CalendarSubscribeLinks, SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
 import { BriefArtifactScript } from "../components/briefArtifactScript";
@@ -23,9 +30,16 @@ import {
 } from "../../lib/export/weeklyOperatorBrief";
 import { buildInvestorUpdateSnippetParts } from "../../lib/export/investorUpdateSnippet";
 import { formatSourceFooter } from "../../lib/export/exportTerms";
+import { buildAssistantLinks } from "../../lib/export/askAssistant";
+import { CALENDAR_FEED_PATH } from "../../lib/export/calendarFeed";
+import { buildSocialComposeUrl, formatSocialPost, type SocialNetwork } from "../../lib/export/socialPosts";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../../lib/siteUrl";
+import { buildMeetingSnippet } from "../../lib/report/trustStatus";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
+import { utilityLinks } from "../../lib/navigation/informationArchitecture";
 
 export const runtime = "edge";
 export const revalidate = 300;
@@ -89,8 +103,8 @@ const buildCurrentShareArtifact = async () => {
     recordDate: treasury.record_date,
     callChangesIf: document.slots.callChangesIf,
   });
-  /* Whether the guidance moved, and what would change it, through the builder
-     the quiet-day line on / reads (`buildCallChangeLine`). */
+  /* Whether the guidance moved, and what would change it, through the one-line
+     builder for what would change the guidance (`buildCallChangeLine`). */
   const standupLine = buildStandupLine({
     regime: assessment.regime,
     change: snapshot.homeBriefModel.weeklyLeadershipSummary.guidanceChange,
@@ -123,6 +137,18 @@ const buildCurrentShareArtifact = async () => {
     document,
     areaRows.map((row) => ({ area: row.area, rule: row.rule, pause: row.pause?.line, resume: row.resume?.line })),
   );
+  /* The status block /trust offered as "Meeting snippet" until 2026-10-08: the
+     reading's dates and margin, what would change it and the week's headline. */
+  const meetingSnippet = buildMeetingSnippet({
+    statusLabel: reportData.statusLabel,
+    recordDateLabel: reportData.recordDateLabel,
+    freshnessLabel: reportData.fetchedAtLabel,
+    confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
+    isFallbackSnapshot: snapshot.isFallback,
+    isHistoricalSelection: Boolean(reportData.historicalSelection),
+    flipThreshold: reportData.flipThreshold,
+    guidance: weeklyHeadline(snapshot.weeklyCall).composed,
+  });
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,
@@ -138,6 +164,12 @@ const buildCurrentShareArtifact = async () => {
   ].join("\n");
 
   return {
+    /* The frozen record when there is a current one, so the assistant reads the
+       week the reader is looking at even after next Monday's brief is out. */
+    assistantLinks: buildAssistantLinks(
+      document.provenance.permalink,
+      treasury.record_date ? formatWeekMondayUTC(treasury.record_date) : reportData.recordDateLabel,
+    ),
     recordDate: treasury.record_date,
     recordDateLabel: reportData.recordDateLabel,
     assessment,
@@ -162,7 +194,22 @@ const buildCurrentShareArtifact = async () => {
       formatSourceFooter(document.provenance),
       `Full brief: ${document.provenance.permalink}`,
     ].join("\n"),
+    /* A mail client's new message, addressed to no one: the reader picks the
+       peer. Short on purpose, because some clients cut or refuse a long mailto
+       body; the full brief is one click away at the link. */
+    emailComposeUrl: `mailto:?${new URLSearchParams({
+      subject: `Whether: this week's guidance (${reportData.recordDateLabel})`,
+      body: [
+        document.call,
+        ...(document.slots.pauseIf ? ["", `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${document.slots.pauseIf}`] : []),
+        "",
+        `Full brief: ${document.provenance.permalink}`,
+      ].join("\n"),
+    })
+      .toString()
+      .replaceAll("+", "%20")}`,
     standupLine,
+    meetingSnippet,
     meetingPack,
     issueTrackerBrief,
     investorUpdate,
@@ -198,7 +245,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "slack-post",
       group: "Chat",
       label: "Slack post",
-      hint: "The call, its pause line and what would change it, as a bolded block a channel skims.",
+      hint: "The guidance, its pause line and its change lines, in a short block a channel can skim.",
       kind: "text",
       text: brief("slack"),
       copyLabel: "Copy Slack post",
@@ -220,13 +267,27 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "standup",
       group: "Chat",
       label: "Standup line",
-      hint: "One line for a daily standup: whether the guidance moved this week, and what would change it.",
+      hint: "One line for a daily standup: whether the guidance moved this week and what would change it.",
       kind: "text",
       text: artifact.standupLine,
       copyLabel: "Copy standup line",
       commitment: "copied_brief",
       preview: "chat",
     },
+    ...SOCIAL_FORMATS.map(({ network, label, hint }): ShareFormatOption => {
+      const text = formatSocialPost(artifact.document, network, siteUrl);
+      return {
+        id: `${network}-post`,
+        group: "Social",
+        label,
+        hint,
+        kind: "text",
+        text,
+        copyLabel: `Copy ${label} text`,
+        commitment: "copied_social",
+        compose: { label: `Open in ${SOCIAL_NETWORK_NAMES[network]}`, href: buildSocialComposeUrl(network, text) },
+      };
+    }),
     {
       id: "meeting-pack",
       group: "Meetings",
@@ -237,6 +298,16 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       copyLabel: "Copy meeting pack",
       commitment: "copied_meeting",
       offersCalendar: true,
+    },
+    {
+      id: "meeting-snippet",
+      group: "Meetings",
+      label: "Meeting snippet",
+      hint: "Paste into notes or a meeting agenda: the conditions, the reading's freshness and margin, its change lines and this week's action.",
+      kind: "text",
+      text: artifact.meetingSnippet,
+      copyLabel: "Copy meeting snippet",
+      commitment: "copied_meeting",
     },
     {
       id: "agenda",
@@ -253,7 +324,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "slide-text",
       group: "Meetings",
       label: "Slide text",
-      hint: "A Markdown callout for a deck, Notion or Docs. The slide as an image or a file is under Images and slides.",
+      hint: "A Markdown callout for a deck, Notion or Docs. The slide as a file or a picture is under Files and images, below.",
       kind: "text",
       text: brief("slide"),
       copyLabel: "Copy slide text",
@@ -268,6 +339,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       text: artifact.emailBrief,
       copyLabel: "Copy email",
       commitment: "copied_email",
+      compose: { label: "Send it to a peer", href: artifact.emailComposeUrl },
     },
     {
       id: "investor-update",
@@ -335,20 +407,62 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
   ];
 };
 
+const SOCIAL_NETWORK_NAMES: Record<SocialNetwork, string> = { linkedin: "LinkedIn", x: "X", bluesky: "Bluesky" };
+
+const SOCIAL_FORMATS: readonly { network: SocialNetwork; label: string; hint: string }[] = [
+  {
+    network: "linkedin",
+    label: "LinkedIn post",
+    hint: "For your own feed: the conditions and the guidance in the two lines LinkedIn shows before \"see more,\" then the pause line, each area's rule, and the source.",
+  },
+  {
+    network: "x",
+    label: "X post",
+    hint: "Fits in 280 characters with the link. When the week runs long, the pause line drops first and the guidance is cut to its first sentence.",
+  },
+  {
+    network: "bluesky",
+    label: "Bluesky post",
+    hint: "Fits in 300 characters with the link, cut the same way as the X post.",
+  },
+];
+
+const apiLink = utilityLinks.find((link) => link.href === "/api-docs");
+
 export default async function SharePage() {
   const artifact = await buildCurrentShareArtifact();
+  const video = latestPublishedBrief ? await findBriefVideo(latestPublishedBrief) : undefined;
 
   return (
     <PageShell backdropVariant="default">
       {/* The share rail's island: the global Share button reads it on this page too. */}
       <BriefArtifactScript artifact={artifact.briefArtifact} />
       <div className="weather-page-stack mx-auto max-w-6xl">
-        <section className="weather-panel weather-section-stack p-0" aria-labelledby="share-page-title">
+        <section
+          className="weather-panel weather-section-stack p-0"
+          aria-labelledby="share-page-title"
+          {...frameFactsAttributes({
+            regime: artifact.assessment.regime,
+            condition: getRegimePublicLabel(artifact.assessment.regime),
+            date: `Week of ${artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}`,
+            title: "Share this week's guidance",
+          })}
+        >
           <div className="max-w-2xl space-y-2">
-            {/* The week, where the kicker read "Current weekly artifact" — the
-                product's internal noun for what a reader calls the brief. */}
-            <p className="type-eyebrow type-eyebrow-section">Week of {artifact.recordDateLabel}</p>
-            <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">Share this week&apos;s guidance</h1>
+            {/* The week is part of the heading line (2026-10-09). It was a kicker
+                above it, and before that the kicker read "Current weekly
+                artifact", the product's internal noun for what a reader calls
+                the brief. */}
+            {/* Its own line since 2026-10-21: run on after the title in a 42rem
+                column, the unbreakable "· Week of …" wrapped whole and opened the
+                second line on a stray dot at desktop widths. */}
+            <h1 id="share-page-title" className="text-fluid-2xl font-semibold text-white/90">
+              Share this week&apos;s guidance
+              <span className="sr-only">, </span>
+              <span className="mt-1 block text-fluid-lg font-normal text-slate-400">
+                Week of {artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}
+              </span>
+            </h1>
             <p className="text-sm leading-relaxed text-white/60">
               Paste it into Slack, a meeting doc, a ticket or a letter. Every format carries the same
               pause and resume lines and names its source:{" "}
@@ -364,16 +478,54 @@ export default async function SharePage() {
         <SharePageFormats
           scoreReferences={artifact.scoreReferences}
           options={buildShareOptions(artifact)}
-          calendar={{ title: `Whether weekly brief review — ${artifact.recordDate}`, details: artifact.calendarDetails }}
+          calendar={{
+            title: `Whether weekly brief review — ${artifact.recordDate}`,
+            details: artifact.calendarDetails,
+            feedUrl: `${siteUrl}${CALENDAR_FEED_PATH}`,
+          }}
         />
 
         {/* Text formats first, then the same call as a picture or a file. */}
         <ShareImageArtifacts />
+        <ReusableVisuals video={video} weekLabel={latestPublishedBrief ? publishedBriefWeekLabel(latestPublishedBrief) : undefined} />
 
         {/* Anchored so the retired /embed route lands on it. */}
         <section id="embed" className="weather-panel weather-section-stack p-0">
           <EmbedBuilder />
         </section>
+        {/* The rest of "Use it elsewhere": the same reading for an agent, a
+            script or a feed reader. The API page was a header menu item of its
+            own until 2026-10-08. */}
+        <nav aria-labelledby="share-elsewhere-heading" className="weather-panel weather-section-stack p-0">
+          <h2 id="share-elsewhere-heading" className="text-[1.375rem] leading-tight font-semibold text-white/90 sm:text-2xl">For agents, scripts and feed readers</h2>
+          <p className="text-sm text-slate-300">
+            Ask an assistant what this week means for your company:{" "}
+            {artifact.assistantLinks.map((link, index) => (
+              <Fragment key={link.name}>
+                {index > 0 ? " · " : null}
+                <ActionLink href={link.href} variant="inline" target="_blank" rel="noreferrer">
+                  {link.name}
+                </ActionLink>
+              </Fragment>
+            ))}
+          </p>
+          <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
+            {apiLink ? (
+              <li>
+                <ActionLink href={apiLink.href} variant="inline">{apiLink.label}</ActionLink>
+                <span className="ml-2 text-xs text-white/60">{apiLink.description}</span>
+              </li>
+            ) : null}
+            <li>
+              {/* A file, not a page: the absolute address the feed autodiscovery
+                  link in the layout's <head> names. */}
+              <a href={`${siteUrl}/feed.xml`} className="inline-flex min-h-[44px] items-center text-fluid-xs font-semibold text-sky-300 hover:text-sky-200">RSS</a>
+            </li>
+            <li className="flex items-center">
+              <CalendarSubscribeLinks feedUrl={`${siteUrl}${CALENDAR_FEED_PATH}`} lead="Each Monday's guidance in your calendar" />
+            </li>
+          </ul>
+        </nav>
         <SubscribeForm />
         <div>
           <ActionLink href="/" variant="pill">

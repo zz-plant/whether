@@ -11,17 +11,18 @@ import type { ScoreMovement, ScoreMovementSource } from "./reportDataTypes";
  * inputs, which is what makes the split worth stating: the earlier reading is
  * scored from interest rates alone (`evaluateRegime(snapshot, thresholds)`,
  * no rate-speed history, no market series), while today's also carries the
- * rate-speed term and the market inputs. So a move is part interest rates and
- * part inputs the earlier score never had, and a reader who is told only the
- * total takes the second part for the market moving.
+ * rate-speed term and the market inputs the record scores. So a move is part
+ * interest rates and part inputs the earlier score never had, and a reader who
+ * is told only the total takes the second part for the market moving.
  *
  * The parts are the same inputs scored in stages: rates alone, then with the
- * rate-speed term, then with the startup-market inputs, then as published (which
- * adds stock-market volatility). Each stage's score is a whole number, so the
- * parts add up to the move exactly. The order is the attribution: the startup
- * inputs count as if volatility were absent, and volatility for what it adds on
- * top, because the volatility veto caps the score and the two do not add on
- * their own.
+ * rate-speed term, then as published (which adds the Chicago Fed index to
+ * funding pressure and stock-market volatility to risk appetite).
+ * Each stage's score is a whole number, so the parts add up to the move
+ * exactly. The inputs outside the record (`RegimeScores.offRecord`) are no
+ * part of the move, because the published score leaves them out since
+ * 2026-10-09; what they would add is the score's not-counted line
+ * (`lib/report/scoringBasis.ts`), printed beside the parts.
  */
 type ScorePair = { tightness: number; riskAppetite: number };
 
@@ -36,7 +37,6 @@ const buildScoreMovement = ({
   previous,
   ratesOnly,
   withRateSpeed,
-  withoutVolatility,
   current,
   rebuilt,
 }: {
@@ -46,8 +46,6 @@ const buildScoreMovement = ({
   ratesOnly: ScorePair;
   /** Today's inputs with the rate-speed history added. */
   withRateSpeed: ScorePair;
-  /** Rate speed and every market input except stock-market volatility. */
-  withoutVolatility: ScorePair;
   /** The score the page shows. */
   current: ScorePair;
   /** Today's inputs scored in full from scratch; it has to equal `current` for the split to be trusted. */
@@ -63,14 +61,14 @@ const buildScoreMovement = ({
       parts: partsFrom([
         ["rates", ratesOnly.tightness - previous.tightness],
         ["rateSpeed", withRateSpeed.tightness - ratesOnly.tightness],
-        ["credit", current.tightness - withRateSpeed.tightness],
+        /* The Chicago Fed index, the one market input on the record that moves funding pressure. */
+        ["financialConditions", current.tightness - withRateSpeed.tightness],
       ]),
     },
     riskAppetite: {
       parts: partsFrom([
         ["curve", ratesOnly.riskAppetite - previous.riskAppetite],
-        ["startupMarket", withoutVolatility.riskAppetite - withRateSpeed.riskAppetite],
-        ["marketStress", current.riskAppetite - withoutVolatility.riskAppetite],
+        ["marketStress", current.riskAppetite - withRateSpeed.riskAppetite],
       ]),
     },
   };
@@ -81,9 +79,9 @@ const buildScoreMovement = ({
  * split cannot be trusted. Today's inputs are scored in the same stages the
  * earlier reading was not: rates alone (which is how the earlier reading was
  * scored, so the first part is the rates and nothing else), then with the
- * rate-speed history, then with the market inputs except volatility, and in
- * full. `evaluate` is the loader's own `evaluateRegime`, so the parts come from
- * the engine's arithmetic and not from a second copy of it.
+ * rate-speed history, and in full. `evaluate` is the loader's own
+ * `evaluateRegime`, so the parts come from the engine's arithmetic and not
+ * from a second copy of it.
  */
 export const explainScoreMovement = ({
   previous,
@@ -106,13 +104,6 @@ export const explainScoreMovement = ({
     current,
     ratesOnly: evaluate(treasury, thresholds).scores,
     withRateSpeed: evaluate(treasury, thresholds, [], null, context).scores,
-    withoutVolatility: evaluate(
-      treasury,
-      thresholds,
-      macroSeries.filter((series) => series.id !== "VIX_INDEX"),
-      null,
-      context,
-    ).scores,
     rebuilt: evaluate(treasury, thresholds, macroSeries, null, context).scores,
   });
 };
@@ -128,7 +119,8 @@ const SOURCE_LABEL: Record<ScoreMovementMetric, Partial<Record<ScoreMovementSour
   tightness: {
     rates: "interest rates",
     rateSpeed: "the recent pace of rate rises",
-    credit: "credit-market and financial-conditions stress",
+    financialConditions: "financial-conditions stress",
+    credit: "the high-yield credit spread",
   },
   riskAppetite: {
     curve: "the yield curve",
@@ -136,6 +128,10 @@ const SOURCE_LABEL: Record<ScoreMovementMetric, Partial<Record<ScoreMovementSour
     marketStress: "stock-market volatility",
   },
 };
+
+/** What a score's source is called on the page: the parts of a move, and the inputs a score leaves out (`scoringBasis.ts`). */
+export const scoreSourceLabel = (metric: ScoreMovementMetric, source: ScoreMovementSource) =>
+  SOURCE_LABEL[metric][source] ?? "other inputs";
 
 const METRIC_NAME: Record<ScoreMovementMetric, string> = {
   tightness: "funding pressure",
@@ -150,8 +146,13 @@ const signed = (points: number) => `${points > 0 ? "+" : "-"}${Math.abs(points)}
 const joinClauses = (clauses: string[]) =>
   clauses.length <= 1 ? clauses.join("") : `${clauses.slice(0, -1).join(", ")} and ${clauses[clauses.length - 1]}`;
 
+/* Largest part first, so the input that drove the move is read first: "-11 from
+   startup-market inputs and +4 from the yield curve", not the scoring stages' order
+   (2026-10-12). The net move is the delta beside the row, so it is not repeated here. */
 const clausesFor = (metric: ScoreMovementMetric, movement: ScoreMovement) =>
-  movement.parts.map((part) => `${signed(part.points)} from ${SOURCE_LABEL[metric][part.source] ?? "other inputs"}`);
+  [...movement.parts]
+    .sort((left, right) => Math.abs(right.points) - Math.abs(left.points))
+    .map((part) => `${signed(part.points)} from ${scoreSourceLabel(metric, part.source)}`);
 
 const earlierScore = (basis: ComparisonBasis, plural: boolean) =>
   `${basis.date ? `The ${basis.date}` : "The earlier"} ${plural ? "scores were" : "score was"} built from interest rates alone.`;
@@ -163,7 +164,7 @@ const earlierScore = (basis: ComparisonBasis, plural: boolean) =>
 export const listScoreMovementParts = (metric: ScoreMovementMetric, movement: ScoreMovement | undefined) =>
   (movement?.parts ?? []).map((part) => ({
     source: part.source,
-    label: SOURCE_LABEL[metric][part.source] ?? "other inputs",
+    label: scoreSourceLabel(metric, part.source),
     points: part.points,
   }));
 
@@ -194,7 +195,7 @@ export const describeScoreMovement = (
   const [only] = movement.parts;
   const body =
     movement.parts.length === 1 && only
-      ? `All from ${SOURCE_LABEL[metric][only.source] ?? "other inputs"}.`
+      ? `All from ${scoreSourceLabel(metric, only.source)}.`
       : `${joinClauses(clausesFor(metric, movement))}.`;
   return movement.parts.some((part) => isMissingFromEarlierScore(part.source))
     ? `${body} ${earlierScore(basis, false)}`
@@ -220,7 +221,7 @@ export const describeScoreMovementLine = (
     const [only] = parts.parts;
     const detail =
       parts.parts.length === 1 && only
-        ? `all from ${SOURCE_LABEL[metric][only.source] ?? "other inputs"}`
+        ? `all from ${scoreSourceLabel(metric, only.source)}`
         : joinClauses(clausesFor(metric, parts));
     const total = roundToTenth(parts.parts.reduce((sum, part) => sum + part.points, 0));
     return `${METRIC_NAME[metric]} ${total === 0 ? "did not change" : signed(total)} (${detail})`;

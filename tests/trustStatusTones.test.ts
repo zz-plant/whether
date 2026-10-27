@@ -9,6 +9,33 @@ import { buildCompactFreshnessMeta } from "../lib/report/reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, type PolicyHoldCall } from "../lib/report/reportCopy";
 
 describe("buildTrustStatus trust tones", () => {
+  /* A live week near a change line is not a data caveat: #1604 (2026-10-14)
+     split the two — the readiness verdict carries the hold, and the caveat
+     stays about the data. The PR 1481 review asked for the hold inside this
+     action before that split existed; "None." here is now the deliberate
+     agreement with canonical readiness, which says Hold on its own line. */
+  it("keeps a low-confidence live week's data caveat about the data", () => {
+    const result = buildTrustStatus({
+      historicalSelection: false,
+      isFallback: false,
+      confidenceLabel: "LOW",
+      freshnessLabel: "Updated 1h ago",
+      historicalAction: "unused",
+      fallbackAction: "unused",
+      stableAction: "None.",
+    });
+    assert.equal(result.trustStatusTone, "stable");
+    assert.equal(result.trustStatusAction, "None.");
+    assert.match(result.trustStatusDetail, /Every source answered/);
+    /* The hold the PR 1481 finding asked for lives on the readiness verdict. */
+    const hold = buildDecisionReadinessState({
+      confidenceLabel: "LOW",
+      freshnessLabel: "Updated 1h ago",
+      isFallbackSnapshot: false,
+    });
+    assert.equal(hold.label, "Hold");
+    assert.match(hold.detail, /close to a line/);
+  });
   /* Live data adds nothing to the guidance, so the stable copy says so and no
      more: an approval instruction here read as the week's action under
      guidance to freeze (tests/pageReaderContradictions.test.tsx). */
@@ -30,7 +57,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(result.outageExitGate.metCount, 2);
     assert.equal(
       result.decisionImpactWindow,
-      "Use this live reading for this week's approvals; the pause lines in this week's guidance apply.",
+      "Use this live reading for this week's decisions; the pause lines in this week's guidance apply.",
     );
   });
 
@@ -88,7 +115,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(disagree.trustStatusTone, "warning");
     assert.equal(disagree.trustStatusLabel, "Live data, but guidance held");
     assert.match(disagree.trustStatusDetail, /The two scores point in different directions, so the guidance is not changing this week/);
-    assert.match(disagree.trustStatusAction, /Keep approvals reversible\./);
+    assert.match(disagree.trustStatusAction, /Keep new commitments reversible\./);
     assert.ok(disagree.trustStatusAction.includes(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: the two scores agree.`));
     assert.equal(disagree.decisionImpactWindow, "Only moves you can undo, until the two scores agree.");
 
@@ -192,7 +219,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(caution.label, "Act with caution");
-    assert.equal(caution.detail, `${POLICY_OVERRIDE_CALL["signals-dispersed"].currentCall} Keep approvals reversible.`);
+    assert.equal(caution.detail, `${POLICY_OVERRIDE_CALL["signals-dispersed"].currentCall} Keep new commitments reversible.`);
     assert.doesNotMatch(caution.detail, /policy override|posture|two scores/i);
   });
 

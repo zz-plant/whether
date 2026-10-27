@@ -12,14 +12,21 @@ import { runScheduledAlertDelivery } from "../lib/alert/alertDelivery";
 import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { refreshMonthlyRegimeHistory } from "../lib/summary/refreshMonthlyRegimeHistory";
 import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel";
+import { sendOpsFailureNotice, type FailedStep } from "../lib/delivery/opsNotice";
 import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
-import { agentManifestResponse } from "../lib/agentManifest";
+import { withSpeculationRules } from "../lib/runtime/speculationRules";
+import {
+  agentManifestResponse,
+  WEBMCP_MANIFEST_PATH,
+  MCP_WELL_KNOWN_PATH,
+} from "../lib/agentManifest";
 import { installBindings } from "./bindings";
 
-/* Durable Object and Workflow classes must be exported from the Worker entry to exist. All
-   are trial infrastructure: declared everywhere, used only where the preview lane's vars
-   switch them on (WHETHER_INGEST_COORDINATOR, WHETHER_HISTORY_WORKFLOW,
-   WHETHER_BRIEF_FREEZE_WORKFLOW). */
+/* Durable Object and Workflow classes must be exported from the Worker entry to exist.
+   Declared in every environment so one migration list serves all of them, switched on per
+   environment by their vars: the ingest coordinator and both workflows are in production
+   (WHETHER_INGEST_COORDINATOR, WHETHER_HISTORY_WORKFLOW, WHETHER_BRIEF_FREEZE_WORKFLOW);
+   the design-scratch flags remain preview-only. */
 export { IngestCoordinator } from "./ingestCoordinator";
 export { RegimeHistoryRefreshWorkflow } from "./workflows/regimeHistoryRefresh";
 export { WeeklyBriefFreezeWorkflow } from "./workflows/weeklyBriefFreeze";
@@ -90,7 +97,10 @@ const recordCronStep = (label: string, outcome: { ok: boolean; error?: string },
  * self-fetch through the public edge), bounded by a wall-clock deadline, and its
  * outcome is logged rather than thrown, so one bad dependency degrades a single step.
  */
-const runCronStep = async (label: string, step: () => Promise<{ ok: boolean; error?: string }>) => {
+const runCronStep = async (
+  label: string,
+  step: () => Promise<{ ok: boolean; error?: string }>,
+): Promise<{ ok: boolean; error?: string }> => {
   const startTime = Date.now();
   try {
     const result = await withDeadline(step(), CRON_STEP_TIMEOUT_MS, `cron:${label}`);
@@ -98,10 +108,12 @@ const runCronStep = async (label: string, step: () => Promise<{ ok: boolean; err
     if (!result.ok) {
       console.error(`[cron] ${label} failed`, result.error);
     }
+    return result;
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : "Unknown error";
     recordCronStep(label, { ok: false, error: errorMessage }, Date.now() - startTime);
     console.error(`[cron] ${label} failed`, error);
+    return { ok: false, error: errorMessage };
   }
 };
 
@@ -110,6 +122,13 @@ export default {
     installBindings(env);
 
     const isDailyIngestion = event.cron === "0 2 * * *";
+
+    /* Every failed step on this run, for the one notice the owner gets at the end of it. */
+    const failures: FailedStep[] = [];
+    const step = async (label: string, run: () => Promise<{ ok: boolean; error?: string }>) => {
+      const outcome = await runCronStep(label, run);
+      if (!outcome.ok) failures.push({ step: label, error: outcome.error });
+    };
 
     /* Always refresh operating state to KV with fresh signals. Recorded through the same
        writer as every other step so the trust page's run history shows the ingest itself,
@@ -126,6 +145,7 @@ export default {
     );
     if (!refreshResult.ok) {
       console.error("[cron] refreshOperatingState failed", refreshResult.error);
+      failures.push({ step: "refresh-operating-state", error: refreshResult.error });
     }
 
     const snapshot = refreshResult.ok ? refreshResult.snapshot : null;
@@ -141,17 +161,17 @@ export default {
        The brief email remains weekly-only — the cadence promise is weekly; only
        rule firings break cadence. */
     if (!isDailyIngestion && snapshot && weeklyCall) {
-      await runCronStep("email/send-weekly", () => sendWeeklyBrief({ snapshot, weeklyCall }));
+      await step("email/send-weekly", () => sendWeeklyBrief({ snapshot, weeklyCall }));
 
       /* The weekly call as rendered, for the Slack post's image block. Unconfigured is a
          skip and a failure is logged; either way the post below still goes out as text. */
       let briefImageUrl: string | undefined;
-      await runCronStep("artifact/brief-screenshot", async () => {
+      await step("artifact/brief-screenshot", async () => {
         const result = await captureAndStoreBriefScreenshot({ recordDate: snapshot.recordDate });
         briefImageUrl = result.imageUrl;
         return { ok: result.ok, error: result.error };
       });
-      await runCronStep("slack/deliver-brief", () =>
+      await step("slack/deliver-brief", () =>
         deliverSlackBrief({ snapshot, imageUrl: briefImageUrl }),
       );
     }
@@ -159,7 +179,7 @@ export default {
     // Records the month in progress from the assessment the read path just computed, so the
     // regime history gains months between deploys instead of waiting for a generator run
     // and a merged pull request.
-    await runCronStep("summary-history", async () => {
+    await step("summary-history", async () => {
       const result = await refreshMonthlyRegimeHistory();
       return { ok: result.ok, error: result.error };
     });
@@ -170,7 +190,7 @@ export default {
        records the pulse and sends nothing. Safe to run daily — the KV last-
        pulsed gate makes a re-run within the month a no-op. */
     if (snapshot && weeklyCall) {
-      await runCronStep("month-end-pulse", async () => {
+      await step("month-end-pulse", async () => {
         const result = await runMonthEndPulse({ snapshot, weeklyCall });
         return { ok: result.ok, error: result.error };
       });
@@ -181,7 +201,7 @@ export default {
        cron only has to hand it off. */
     if (!isDailyIngestion && env.WHETHER_HISTORY_WORKFLOW === "1" && env.REGIME_HISTORY_WORKFLOW) {
       const workflow = env.REGIME_HISTORY_WORKFLOW;
-      await runCronStep("regime-history-workflow", async () => {
+      await step("regime-history-workflow", async () => {
         await workflow.create({ id: `regime-history-${new Date().toISOString().slice(0, 10)}`, params: { base: "main" } });
         return { ok: true };
       });
@@ -196,7 +216,7 @@ export default {
       /* Named for what it measures: handing the workflow to Cloudflare. Whether the
          week was actually frozen is a separate `brief-freeze` row the workflow
          writes itself, because this one is green the moment `create()` resolves. */
-      await runCronStep("brief-freeze-start", async () => {
+      await step("brief-freeze-start", async () => {
         await workflow.create({ id: `brief-freeze-${new Date().toISOString().slice(0, 10)}`, params: { base: "main" } });
         return { ok: true };
       });
@@ -208,18 +228,29 @@ export default {
        would keep rewriting a week that is still running. Writes nothing when the read is
        unconfigured, so absent credentials never overwrite last week's counts with zeros. */
     if (!isDailyIngestion) {
-      await runCronStep("activation-funnel", async () => {
+      await step("activation-funnel", async () => {
         const result = await recordActivationFunnel();
         return { ok: result.ok, error: result.error };
       });
     }
 
     if (snapshot && weeklyCall) {
-      await runCronStep("check-regime-change", () => checkRegimeChange({ snapshot, weeklyCall, previousSnapshot }));
-      await runCronStep("alert-deliveries", async () => {
+      await step("check-regime-change", () => checkRegimeChange({ snapshot, weeklyCall, previousSnapshot }));
+      await step("alert-deliveries", async () => {
         const result = await runScheduledAlertDelivery({ snapshot, weeklyCall, previousSnapshot });
         return { ok: result.errors === 0, error: result.errors > 0 ? `${result.errors} delivery errors` : undefined };
       });
+    }
+
+    /* Last, so it covers every step above. Recorded like a step but never added to the list
+       it reports on: a notice that failed is on /trust, and there is nobody else to tell. */
+    const noticeStartedAt = Date.now();
+    const notice = await sendOpsFailureNotice({
+      run: `${isDailyIngestion ? "Daily 02:00 UTC run" : "Monday 14:00 UTC run"}, ${new Date(event.scheduledTime).toISOString().slice(0, 10)}`,
+      failures,
+    });
+    if (!notice.ok || notice.sent) {
+      recordCronStep("ops-notice", notice, Date.now() - noticeStartedAt);
     }
   },
 
@@ -252,12 +283,16 @@ export default {
        is never registered and the request falls through to the app shell, which answers
        with the HTML page rather than the manifest.
        See lib/agentManifest.ts. installBindings must run first — the manifest reads
-       SITE_URL through resolveSiteUrl. */
-    if (url.pathname === WHETHER_AGENT_MANIFEST_PATH) {
+       SITE_URL through resolveSiteUrl. Supports standard agent, WebMCP, and MCP paths. */
+    if (
+      url.pathname === WHETHER_AGENT_MANIFEST_PATH ||
+      url.pathname === WEBMCP_MANIFEST_PATH ||
+      url.pathname === MCP_WELL_KNOWN_PATH
+    ) {
       return agentManifestResponse();
     }
 
-    const response = await handler.fetch(request, env, ctx);
+    const response = withSpeculationRules(await handler.fetch(request, env, ctx));
 
     const cookieHeader = request.headers.get("cookie");
     if (cookieHeader && /whether-(company-stage|company-runway|rate-sensitivity|ticker)=/.test(cookieHeader)) {

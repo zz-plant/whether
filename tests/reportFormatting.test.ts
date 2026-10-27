@@ -86,7 +86,7 @@ describe("reportFormatting regime signal helpers", () => {
       now: new Date("2026-03-12T12:20:00.000Z"),
     });
     assert.equal(live.freshnessBadge, "Freshness fresh");
-    assert.equal(live.confidenceBadge, "High confidence");
+    assert.equal(live.confidenceBadge, "Clear of the line");
     assert.equal(live.provenanceBadge, "Sources 4");
     assert.equal(live.provenanceHref, "/trust");
     assert.equal(live.warningCopy, null);

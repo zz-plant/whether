@@ -1,8 +1,8 @@
 import Link from "next/link";
 import { HomeSection } from "./HomeSection";
 import { ScoreLadder } from "../ui/scoreLadder";
-import { PlainEnglishScoreNote, SignalScaleNote } from "../ui/plainLanguage";
-import { compositeSignalScales } from "../../../lib/report/signalTranslations";
+import { GovernedAreas } from "../ui/governedAreas";
+import { SignalContextDetails } from "../ui/plainLanguage";
 import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
@@ -11,9 +11,11 @@ import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/compa
  * Movement: one row per signal, each a from → to chip and, for the two
  * composite scores, the score on its ladder. The hero's three readout cells
  * and the Key drivers card both drew these same four readings; this is the one
- * drawing. The sentence over the table is the week's movement in one line,
- * and on a read with no previous week it says so once, instead of four empty
- * chips saying nothing.
+ * drawing. The section opens on the table (2026-10-09): its lead sentence
+ * restated the card ("Since Sep 30, conditions changed from Cloudy to
+ * Freezing"), and the areas' own rows say which lines each move crossed. A read
+ * with no previous week still gets one sentence saying so, instead of four
+ * empty chips saying nothing.
  *
  * Every term defines itself in its row (the scale note, what the score means
  * at its level, the line names on the ladder), so the section no longer ends
@@ -27,6 +29,17 @@ import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/compa
 const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasis }) => {
   if (row.previous === null || row.delta === null) {
     return <span className="text-slate-500">—</span>;
+  }
+  /* A score held at the top of its scale is not "unchanged": it cannot show a
+     rise (2026-10-14). The flat chip said "no move" a row before the note that
+     said the move was hidden, at the moment conditions were most extreme. */
+  if (row.saturatedPressure !== undefined && row.delta === 0) {
+    return (
+      <span className="weather-caveat-mark inline-flex items-center rounded-sm border border-current/30 px-1.5 py-0.5 tabular-nums text-caveat-fg" data-delta-capped>
+        <span className="sr-only">{`${row.label} has been at the highest it can read ${basis.since}, so a rise cannot show.`}</span>
+        <span aria-hidden="true">Can&rsquo;t rise further</span>
+      </span>
+    );
   }
   const direction = trendDirectionFromDelta(row.delta);
   const tone = trendToneClass(direction, row.increaseIsPositive);
@@ -43,30 +56,29 @@ const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasi
   );
 };
 
-const isCompositeSignalKey = (key: SignalChangeRow["key"]): key is keyof typeof compositeSignalScales =>
-  Object.prototype.hasOwnProperty.call(compositeSignalScales, key);
-
 export function WhatChangedSection({
   rows,
   lead,
   comparisonUnavailable,
   basis = comparisonBasis(),
+  heading = HOME_SECTIONS.changed.heading,
 }: {
   rows: readonly SignalChangeRow[];
-  /** The movement sentence, or the quiet-day line on a week the call held. */
-  lead: string;
+  /** Said over the table only when there is no earlier reading to compare with. */
+  lead?: string;
   comparisonUnavailable: boolean;
   /** The earlier reading the rows are compared with; "last week" when the week does not date it. */
   basis?: ComparisonBasis;
+  /** "What changed since Aug 31": the heading names the reading the move is measured from. */
+  heading?: string;
 }) {
   return (
     <HomeSection
       id={HOME_SECTIONS.changed.id}
-      heading={HOME_SECTIONS.changed.heading}
+      heading={heading}
       lead={lead}
       /* In the reader's order: first what moved (the evidence), then what
          that changes (the consequences by area). Keeps DOM and visual order aligned. */
-      className="order-2"
     >
       {/* On phones each signal, movement and ladder gets the full measure.
           An auto-width movement column narrowed the signal's description to
@@ -80,7 +92,7 @@ export function WhatChangedSection({
               its level, so it needs room: left to itself the browser gave it the
               width of its longest word and wrapped the notes one word per line. */}
           <colgroup className="max-md:hidden">
-            <col className="w-[15rem]" />
+            <col className="w-[19rem]" />
             <col className="w-[11rem]" />
             <col />
           </colgroup>
@@ -88,7 +100,7 @@ export function WhatChangedSection({
             {`Each signal this week against ${basis.reference} and against its lines`}
           </caption>
           <thead className="max-md:hidden">
-            <tr className="border-b border-slate-800/80 text-xs text-slate-400">
+            <tr className="border-b border-[color:var(--border-subtle)] text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
               <th scope="col" className="py-2 pr-3 font-medium">{`${basis.label} → this week`}</th>
               <th scope="col" className="py-2 font-medium">Against its lines</th>
@@ -107,32 +119,20 @@ export function WhatChangedSection({
                         ? "signal-base-rate"
                         : "signal-curve-slope"
                 }
-                className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-1 max-md:gap-y-4 max-md:py-4"
+                className="border-b border-[color:var(--border-faint)] align-top last:border-b-0 max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
                 data-signal={row.key}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-md:p-0">
                   <div className="space-y-1">
                     <Link
                       href={`/signals#${row.key}`}
-                      className="weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-700 hover:decoration-sky-400 underline-offset-2 transition-colors"
+                      className="weather-hit text-base font-semibold text-slate-100 hover:text-sky-300 underline decoration-slate-600 hover:decoration-sky-400 underline-offset-2 transition-colors"
                       title={`View ${row.label} evidence and historical charts`}
                     >
                       {row.label}
                     </Link>
-                    {row.key === "tightness" ? (
-                      <span className="block text-fluid-nano font-normal text-slate-400">
-                        Governs:{" "}
-                        <a href="#area-hiring" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Hiring</a>,{" "}
-                        <a href="#area-burn-discipline" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Spending</a>,{" "}
-                        <a href="#area-capital-raising" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Capital</a>
-                      </span>
-                    ) : row.key === "riskAppetite" ? (
-                      <span className="block text-fluid-nano font-normal text-slate-400">
-                        Governs:{" "}
-                        <a href="#area-product-tempo" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Roadmap</a>,{" "}
-                        <a href="#area-expansion-bets" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">New bets</a>,{" "}
-                        <a href="#area-capital-raising" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Capital</a>
-                      </span>
+                    {row.key === "tightness" || row.key === "riskAppetite" ? (
+                      <GovernedAreas metric={row.key} target="table" />
                     ) : row.key === "baseRate" ? (
                       <span className="block text-fluid-nano font-normal text-slate-400">
                         Feeds into <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
@@ -154,67 +154,50 @@ export function WhatChangedSection({
                         {row.movement}
                       </p>
                     ) : null}
-                    {/* The scale and what the score means at its level, one click
-                        away. They were four more stacked lines in every row, at
-                        the same small size as the name and the move, so a row
-                        had six layers and no first thing to read. */}
-                    {row.scaleLabel || isCompositeSignalKey(row.key) ? (
-                      <details className="weather-auto-chevron text-fluid-nano font-normal text-slate-400">
-                        <summary className="cursor-pointer select-none">What the score means</summary>
-                        <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-x-1.5">
-                            {row.scaleLabel ? <span className="capitalize">{row.scaleLabel}</span> : null}
-                            {row.scaleLabel && isCompositeSignalKey(row.key) ? (
-                              <span aria-hidden="true" className="text-slate-600">·</span>
-                            ) : null}
-                            {isCompositeSignalKey(row.key) ? (
-                              <SignalScaleNote signalKey={row.key} as="span" className="inline font-normal text-slate-400" />
-                            ) : null}
-                          </div>
-                          {isCompositeSignalKey(row.key) && typeof row.value === "number" ? (
-                            <PlainEnglishScoreNote
-                              signalKey={row.key}
-                              score={row.value}
-                              className="whitespace-normal font-normal text-slate-300/80"
-                            />
-                          ) : null}
-                        </div>
-                      </details>
-                    ) : null}
+                    {/* Plain-English meaning, scale anchors, historical startup era
+                        context, and team reflection prompt. Folded in a 1-click disclosure
+                        to maintain clean table scanning. */}
+                    <SignalContextDetails
+                      signalKey={row.key}
+                      score={typeof row.value === "number" ? row.value : undefined}
+                      scaleLabel={row.scaleLabel}
+                    />
                   </div>
                 </th>
-                <td className="whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0">
-                  <div className="flex flex-col gap-1">
-                    {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
-                    {row.saturatedPressure !== undefined ? (
-                      /* A clipped score cannot move, so the chip reads flat at the
-                         moment conditions are most extreme. Say it. The raw
-                         pressure is what is missing from a score that has
-                         stopped being able to report a move. */
-                      <span className="mt-1 block max-w-[18rem] whitespace-normal text-amber-300/80">
-                        Off the top of the scale. The score can&rsquo;t rise further, so it can&rsquo;t show a move.
-                        {" "}It would read {row.saturatedPressure.toFixed(0)}.
-                      </span>
-                    ) : null}
-                  </div>
+                {/* With nothing to compare, the lead over the table already says so; on a
+                    phone the column has no header, so its dash printed as a lone "—"
+                    line in every row. */}
+                <td className={`whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0 ${comparisonUnavailable ? "max-md:hidden" : ""}`}>
+                  {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
                 </td>
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">
                   {row.lines && typeof row.value === "number" ? (
-                    <ScoreLadder
-                      label={<span className="sr-only">{row.label}</span>}
-                      value={row.value}
-                      previous={comparisonUnavailable ? null : row.previous}
-                      previousLabel={basis.label}
-                      lines={row.lines}
-                    />
+                    <div className="space-y-2">
+                      <ScoreLadder
+                        label={<span className="sr-only">{row.label}</span>}
+                        value={row.value}
+                        previous={comparisonUnavailable ? null : row.previous}
+                        previousLabel={basis.label}
+                        lines={row.lines}
+                      />
+                      {row.saturatedPressure !== undefined ? (
+                        /* A clipped score cannot move, so the chip reads flat at the
+                           moment conditions are most extreme. Say it, under the
+                           ladder that has the width for a sentence: in the chip
+                           column it wrapped to four lines and stretched the row. */
+                        <p className="weather-caveat-mark max-w-[48ch] text-xs text-caveat-fg">
+                          The highest this score can read. Without that limit it would read {row.saturatedPressure.toFixed(0)}, so a further rise can&rsquo;t show here.
+                        </p>
+                      ) : null}
+                    </div>
                   ) : (
                     /* An input, not a score: the call is decided on the two scores
                        it feeds. "No line of its own" was false for the base rate,
                        which funding pressure judges against a line. */
                     <span className="text-xs text-slate-500">
                       {row.key === "baseRate"
-                        ? "Feeds funding pressure; conditions are judged on that score."
-                        : "Feeds both scores; conditions are judged on those."}
+                        ? "Feeds into funding pressure, so it's judged against that score's lines."
+                        : "Feeds into both scores, so it's judged against their lines."}
                     </span>
                   )}
                 </td>

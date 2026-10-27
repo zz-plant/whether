@@ -287,7 +287,7 @@ const buildMarkdownExport = ({ status, changes, brief }) => {
     "## Current Call",
     `- Regime: ${status.regime}`,
     `- Cycle phase: ${status.cyclePhase}`,
-    `- Confidence: ${status.confidence.label} (${status.confidence.score})`,
+    `- Margin: ${status.confidence.label} (${status.confidence.score})`,
     `- Trend: ${status.trend}`,
     `- Summary: ${status.call.summary}`,
     "",
@@ -318,7 +318,7 @@ const buildTextBriefing = ({ status, changes, brief }) => {
     "",
     `Regime: ${status.regime}`,
     `Cycle phase: ${status.cyclePhase}`,
-    `Confidence: ${status.confidence.label} (${status.confidence.score})`,
+    `Margin: ${status.confidence.label} (${status.confidence.score})`,
     `Trend: ${status.trend}`,
     `Freshness: ${freshnessText(status)}`,
     "",
@@ -875,7 +875,7 @@ Top do now: ${(body.call.do ?? []).slice(0, 2).join(" | ") || "n/a"}
 Flip: ${body.call.flipConditions?.[0] ?? "n/a"}
 Freshness: ${freshnessText(body)}`;
 
-const statusText = (body) => `Whether — Current Status\n\nRegime:             ${body.regime}\nCycle Phase:        ${body.cyclePhase}\nConfidence:         ${body.confidence.label} (${body.confidence.score})\nTrend:              ${body.trend}\nDecision Stability: ${body.decisionStability}\nFreshness:          ${freshnessText(body)}\n\nThis Week's Call:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nFlip Conditions:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
+const statusText = (body) => `Whether — Current Status\n\nRegime:             ${body.regime}\nCycle Phase:        ${body.cyclePhase}\nMargin:             ${body.confidence.label} (${body.confidence.score})\nTrend:              ${body.trend}\nDecision Stability: ${body.decisionStability}\nFreshness:          ${freshnessText(body)}\n\nThis Week's Call:\n${body.call.summary}\n\nDo:\n${body.call.do.map((item) => `- ${item}`).join("\n")}\n\nAvoid:\n${body.call.avoid.map((item) => `- ${item}`).join("\n")}\n\nFlip Conditions:\n${body.call.flipConditions.map((item) => `- ${item}`).join("\n")}`;
 
 const callText = (body) => `Call: ${body.call}
 Freshness: ${freshnessText(body)}\n\nLeadership should:\n${body.leadershipShould.map((item) => `- ${item}`).join("\n")}\n\nWatch:\n${body.watch.map((item) => `- ${item}`).join("\n")}`;
@@ -1148,7 +1148,7 @@ const cmdRegime = async (settings, flags) => {
     const plot = history.history.map((item) => `${item.recordDate}  ${item.regime}  ${item.trend}`).join("\n");
     return writeOutput(attachCompanyContextText(`Regime history\n${plot}`, context), settings);
   }
-  const text = attachCompanyContextText(`Regime: ${body.regime}\nPhase: ${body.phase}\nConfidence: ${body.confidence}\nTrend: ${body.trend}\n\nInterpretation:\n${body.interpretation}`, context);
+  const text = attachCompanyContextText(`Regime: ${body.regime}\nPhase: ${body.phase}\nMargin: ${body.confidence}\nTrend: ${body.trend}\n\nInterpretation:\n${body.interpretation}`, context);
   await writeFileIfRequested(flags, isTextOutput(settings) ? text : body, settings);
   writeOutput(isTextOutput(settings) ? text : body, settings);
 };
@@ -1169,7 +1169,7 @@ const cmdDiagnostics = async (settings, subcommand, flags) => {
     const status = await getJson(settings, cliRoutes.status(flags));
     const payload = { updatedAt: status.updatedAt, confidence: status.confidence, degraded: status.degraded };
     const text = attachCompanyContextText(
-      `Updated at: ${status.updatedAt ?? "n/a"}\nConfidence: ${status.confidence?.label ?? "n/a"}\nDegraded: ${status.degraded ? "yes" : "no"}`,
+      `Updated at: ${status.updatedAt ?? "n/a"}\nMargin: ${status.confidence?.label ?? "n/a"}\nDegraded: ${status.degraded ? "yes" : "no"}`,
       context,
     );
     return writeOutput(isTextOutput(settings) ? text : payload, settings);
@@ -1394,7 +1394,8 @@ const cmdDoctor = async (settings) => {
   try {
     const { response, baseUrl } = await fetchApiResponse(settings, endpoint);
     const parsedBody = await parseJsonBody(response);
-    if (!response.ok && response.status === 503 && parsedBody?.status === "degraded") {
+    /* Degraded arrives as a 200 (a stale live feed: the site still serves) or a 503. */
+    if (parsedBody?.status === "degraded" && (response.ok || response.status === 503)) {
       checks.push({
         name: "api/health",
         status: "warning",

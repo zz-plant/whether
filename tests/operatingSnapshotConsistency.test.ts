@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
 import { buildWeeklyOperatorBriefPayload } from "../lib/export/weeklyOperatorBrief";
+import { loadExportSnapshot } from "../lib/export/exportSnapshot";
 import { pauseConditionOnly } from "../lib/export/exportTerms";
 import { briefSourceFromReportData, buildBriefDocument } from "../lib/report/briefDocument";
 import { GET as getWeeklyRoute } from "../app/api/weekly/route";
@@ -122,6 +123,14 @@ describe("OperatingSnapshot read consistency", () => {
     assert.equal(body.summary.regime, persisted.assessment.regime);
     assert.equal(body.summary.inputs[0]?.recordDate, persisted.recordDate);
     assert.equal(deliveryRead.currentRegime, persisted.assessment.regime);
+  });
+
+  it("falls back to bundled snapshot without live macro network fetches when unpersisted", async () => {
+    resetOperatingSnapshotStore();
+    const snapshot = await loadExportSnapshot();
+    assert.ok(snapshot);
+    assert.equal(snapshot.treasury.record_date, snapshotData.record_date);
+    assert.deepEqual(snapshot.macroSeries, macroSeries);
   });
 });
 

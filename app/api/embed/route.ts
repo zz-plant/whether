@@ -4,6 +4,7 @@
  *
  * GET /api/embed?ticker=GOOGL&stage=series-b&format=html
  * GET /api/embed?format=text
+ * GET /api/embed?format=page   (a whole document, for an iframe: Notion, oEmbed)
  */
 
 import { NextResponse } from "next/server";
@@ -12,11 +13,13 @@ import type { OperatorContext } from "../../../lib/report/operatorContext";
 import { operatorStageLabel, parseOperatorStageParam } from "../../../lib/report/operatorStage";
 import { parseOperatorRunwayParam } from "../../../lib/report/operatorRunway";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { formatConfidenceChipLabel, publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { formatMarginStamp, formatStripMargin, publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { formatGuidance } from "../../../lib/export/briefBuilders";
+import { buildCallChangeLines } from "../../../lib/report/reportEvidence";
 import { weeklyCallChangeLines } from "../../../lib/report/weeklyCallContract";
 import { siteUrl } from "../../../lib/siteUrl";
 import { USE_CONSTRAINT_SUMMARY, buildUseConstraint } from "../../../lib/report/useConstraint";
+import { OG_BG, OG_BORDER, OG_PANEL, OG_RULE, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "../../../lib/image/ogTheme";
 
 export const runtime = "edge";
 export const revalidate = 900;
@@ -26,6 +29,7 @@ export async function GET(request: Request) {
   const tickerParam = url.searchParams.get("ticker")?.trim().toUpperCase() || "";
   const format = url.searchParams.get("format") || "html";
   const ref = url.searchParams.get("ref") || "embed";
+  const mode = url.searchParams.get("mode") || (url.searchParams.get("view") === "call-strip" ? "call-strip" : "brief");
 
   // One parse, used for both the calibration and the label. Splitting them is
   // what let `stage=growth` — a value the picker offered and `isOperatorStage`
@@ -45,6 +49,45 @@ export async function GET(request: Request) {
     });
 
     const briefData = buildBriefEmbedData(homepage, { ticker: tickerParam, ref, companyStage });
+
+    if (mode === "call-strip") {
+      if (format === "json") {
+        return NextResponse.json({
+          mode: "call-strip",
+          regime: briefData.regimeLabel,
+          call: briefData.formattedCall,
+          marginLabel: briefData.marginLabel,
+          flipDistance: briefData.flipDistance,
+          flipTrigger: briefData.flipTrigger,
+          recordDate: briefData.recordDate,
+          use: buildUseConstraint(),
+          attribution: {
+            text: "Macro brief by Whether",
+            url: briefData.attributionUrl,
+          },
+        });
+      }
+
+      if (format === "text") {
+        return new NextResponse(buildCallStripEmbedText(briefData), {
+          headers: {
+            "Content-Type": "text/plain; charset=utf-8",
+            "X-Whether-Embed-Version": "1",
+            "Cache-Control": "public, max-age=900, s-maxage=900, stale-while-revalidate=1800",
+          },
+        });
+      }
+
+      const html = format === "page" ? wrapEmbedPage(buildCallStripEmbedHtml(briefData)) : buildCallStripEmbedHtml(briefData);
+
+      return new NextResponse(html, {
+        headers: {
+          "Content-Type": "text/html; charset=utf-8",
+          "X-Whether-Embed-Version": "1",
+          "Cache-Control": "public, max-age=3600, s-maxage=3600",
+        },
+      });
+    }
 
     if (format === "json") {
       return NextResponse.json({
@@ -72,7 +115,7 @@ export async function GET(request: Request) {
     }
 
     // Default: HTML
-    const html = buildBriefEmbedHtml(briefData);
+    const html = format === "page" ? wrapEmbedPage(buildBriefEmbedHtml(briefData)) : buildBriefEmbedHtml(briefData);
 
     return new NextResponse(html, {
       headers: {
@@ -112,13 +155,15 @@ export const buildBriefEmbedData = (
   /* The published band as a reader says it ("Medium confidence"). This was
      the code itself, so the widget's meta line read "Freezing · MED" and the
      text format "Confidence: MED" inside somebody else's newsletter. */
-  const confidenceLabel = formatConfidenceChipLabel(homepage.weeklyDecisionCardModel.status.confidenceLabel);
+  const confidenceLabel = formatMarginStamp(homepage.weeklyDecisionCardModel.status.confidenceLabel);
   const actionItems = homepage.weeklyDecisionCardModel.decision.actionStripItems ?? [];
   const canonicalDecision = homepage.weeklyDecisionCardModel.decision.canonicalDecisionCopy;
   const operatingStanceLine = homepage.weeklyDecisionCardModel.decision.operatingStanceLine;
   const operatingCall = canonicalDecision?.operatingCall ?? operatingStanceLine;
   const actionNow = homepage.weeklyDecisionCardModel.decision.actionNowShort || homepage.weeklyDecisionCardModel.decision.immediateDecision;
-  const doNowItems = actionItems.map((item) => item.areaActionNow);
+  /* Each area's line under its area's name, so the list reads as area lines
+     under the one headline rather than as five more headlines. */
+  const doNowItems = actionItems.map((item) => `${item.label}: ${item.areaActionNow}`);
   /*
    * Read off the same action strip `doNowItems` comes from.
    *
@@ -144,11 +189,30 @@ export const buildBriefEmbedData = (
   const resumeWhen = homepage.weeklyCall.resumeWhen?.trim() || null;
   const reversalCondition = primaryAction?.reversalCondition ?? null;
 
+  const assessment = homepage.reportResult.ok
+    ? homepage.reportResult.data.assessment
+    : homepage.reportResult.fallback.assessment;
+  const [nearest] = [...buildCallChangeLines(assessment)].sort(
+    (left, right) => (left.distance ?? Number.POSITIVE_INFINITY) - (right.distance ?? Number.POSITIVE_INFINITY),
+  );
+  const flipDistance = nearest?.distance ?? null;
+  const rawConfidence = homepage.weeklyDecisionCardModel.status.confidenceLabel ?? "HIGH";
+  const marginLabel = formatStripMargin(rawConfidence, flipDistance);
+  const formattedCall = formatGuidance({
+    actionNow,
+    currentCall: operatingCall,
+    policyOverrideActive: homepage.weeklyCall.policyOverrideActive,
+  });
+
   return {
     operatingCall,
     actionNow,
+    formattedCall,
+    policyOverrideActive: homepage.weeklyCall.policyOverrideActive,
     doNowItems,
     flipTrigger,
+    flipDistance,
+    marginLabel,
     ...(resumeWhen ? { resumeWhen } : {}),
     reversalCondition,
     dataFreshness: homepage.reportShell.fetchedAtLabel,
@@ -170,9 +234,16 @@ export const buildBriefEmbedData = (
 type BriefEmbedData = {
   operatingCall: string;
   actionNow: string;
+  formattedCall?: string;
+  /** A held week leads with the hold's action (`weeklyHeadline`). */
+  policyOverrideActive?: boolean;
   doNowItems: string[];
   /** Where conditions change: the brief's "Conditions change if" sentence. Null when the call published none. Never filler. */
   flipTrigger: string | null;
+  /** Points to nearest change line */
+  flipDistance?: number | null;
+  /** Concise margin / flip distance label for compact views */
+  marginLabel?: string;
   /** Set only when a stage is calibrated: that stage's resume line, printed under its own label. */
   resumeWhen?: string;
   /** Null when the call published no reversal condition. Never filler. */
@@ -237,12 +308,11 @@ export const buildBriefEmbedText = (data: BriefEmbedData): string =>
     /* This line read "Regime: Freezing • Confidence: MED": the engine's noun
        and the confidence code, where every other surface prints the weather
        word under "Conditions" and the band as a word. */
-    `Conditions: ${data.regimeLabel} • ${data.confidenceLabel} • As of ${data.recordDate}`,
+    `Conditions: ${data.regimeLabel} • ${data.confidenceLabel} • Data as of ${data.recordDate}`,
     ``,
     /* The guidance as every other paste leads with it (`formatGuidance`): the
-       do-now line, then the stance. This printed the two under labels of its
-       own, "Operating guidance" and "Decision now", in the other order. */
-    `${publicDecisionLabels.call}: ${formatGuidance({ actionNow: data.actionNow, currentCall: data.operatingCall })}`,
+       week's headline action, opened by its direction. */
+    `${publicDecisionLabels.call}: ${formatGuidance({ actionNow: data.actionNow, currentCall: data.operatingCall, policyOverrideActive: data.policyOverrideActive })}`,
     /* One item per line. Joined with commas, items that carry their own
        ("If you plan to raise, prepare…", "…within a week, each with a review
        date") ran into each other and the list could not be read back. */
@@ -256,38 +326,90 @@ export const buildBriefEmbedText = (data: BriefEmbedData): string =>
   ].join("\n");
 
 export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
-  const { operatingCall, actionNow, doNowItems, postureLabel, confidenceLabel, recordDate, tickerLabel, stageLabel, attributionUrl } = data;
+  const { operatingCall, actionNow, policyOverrideActive, doNowItems, postureLabel, confidenceLabel, recordDate, tickerLabel, stageLabel, attributionUrl } = data;
   // `stageLabel` is only ever a stage the brief was actually calibrated for —
   // the route derives it from the parsed stage, not the raw parameter — so the
   // meta line can carry it without claiming a calibration that did not happen.
-  const metaParts = [postureLabel, confidenceLabel, `As of ${recordDate}`, tickerLabel, stageLabel].filter(Boolean);
+  const metaParts = [postureLabel, confidenceLabel, `Data as of ${recordDate}`, tickerLabel, stageLabel].filter(Boolean);
   const doNowHtml = doNowItems
-    .map((item) => `<p style="font-size:13px;color:rgba(255,255,255,0.6);margin:2px 0;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">${escapeHtml(item)}</p>`)
+    .map((item) => `<p style="font-size:13px;color:${OG_TEXT_SECONDARY};margin:2px 0;padding:4px 0;border-bottom:1px solid ${OG_BORDER};">${escapeHtml(item)}</p>`)
     .join("");
   const changeLinesHtml = embedChangeLines(data)
     .map(
       ({ label, value }) =>
-        `<div style="background:rgba(245,158,11,0.08);border-left:3px solid rgba(245,158,11,0.4);padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px;color:rgba(252,211,77,0.8);"><strong style="color:rgba(251,191,36,0.9);">${escapeHtml(label)}:</strong> ${escapeHtml(value)}</div>`,
+        `<div style="background:${OG_PANEL};border:1px solid ${OG_RULE};padding:10px 14px;border-radius:6px;margin:12px 0;font-size:12px;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${escapeHtml(label)}:</strong> ${escapeHtml(value)}</div>`,
     )
     .join("");
 
-  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;margin:0;padding:16px;background:#0d0f12;border:1px solid rgba(255,255,255,0.06);border-radius:12px;color:rgba(255,255,255,0.9);">
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:560px;margin:0;padding:16px;background:${OG_BG};border:1px solid ${OG_BORDER};border-radius:12px;color:${OG_TEXT};">
   <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-    <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.5);">Whether — Weekly Brief</span>
-    <span style="font-size:10px;color:rgba(255,255,255,0.3);">${escapeHtml(metaParts.join(" · "))}</span>
+    <span style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:${OG_TEXT_MUTED};">Whether — Weekly Brief</span>
+    <span style="font-size:10px;color:${OG_TEXT_MUTED};">${escapeHtml(metaParts.join(" · "))}</span>
   </div>
-  <div style="background:rgba(56,189,248,0.08);border-left:3px solid rgba(56,189,248,0.4);padding:12px 14px;border-radius:6px;margin:8px 0;">
-    <p style="font-size:11px;font-weight:600;color:rgba(125,211,252,0.9);margin:0 0 4px 0;letter-spacing:0.04em;">${publicDecisionLabels.call}</p>
-    <p style="font-size:16px;font-weight:600;color:rgba(255,255,255,0.9);margin:0;line-height:1.4;">${escapeHtml(formatGuidance({ actionNow, currentCall: operatingCall }))}</p>
+  <div style="background:${OG_PANEL};border:1px solid ${OG_RULE};padding:12px 14px;border-radius:6px;margin:8px 0;">
+    <p style="font-size:11px;font-weight:600;color:${OG_TEXT_MUTED};margin:0 0 4px 0;letter-spacing:0.04em;">${publicDecisionLabels.call}</p>
+    <p style="font-size:16px;font-weight:600;color:${OG_TEXT};margin:0;line-height:1.4;">${escapeHtml(formatGuidance({ actionNow, currentCall: operatingCall, policyOverrideActive }))}</p>
   </div>
-  ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:rgba(255,255,255,0.4);margin:0 0 4px 0;">${DECISION_CONTRACT_LABELS.action.doNow}</p>${doNowHtml}</div>` : ""}
+  ${doNowItems.length > 0 ? `<div style="margin:8px 0;"><p style="font-size:11px;font-weight:600;letter-spacing:0.04em;color:${OG_TEXT_MUTED};margin:0 0 4px 0;">${DECISION_CONTRACT_LABELS.action.doNow}</p>${doNowHtml}</div>` : ""}
   ${changeLinesHtml}
-  <div style="margin-top:14px;padding-top:10px;border-top:1px solid rgba(255,255,255,0.04);font-size:11px;color:rgba(255,255,255,0.3);display:flex;justify-content:space-between;">
+  <div style="margin-top:14px;padding-top:10px;border-top:1px solid ${OG_BORDER};font-size:11px;color:${OG_TEXT_MUTED};display:flex;justify-content:space-between;">
     <span>${escapeHtml(USE_CONSTRAINT_SUMMARY)}</span>
   </div>
-  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;color:rgba(255,255,255,0.45);">
-    <span>Macro brief by <a href="${escapeAttribute(attributionUrl)}" style="color:rgba(56,189,248,0.8);text-decoration:underline;font-weight:600;">Whether</a></span>
-    <a href="${escapeAttribute(data.briefUrl)}" style="color:rgba(56,189,248,0.6);text-decoration:underline;">Get your own →</a>
+  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:10px;color:${OG_TEXT_MUTED};">
+    <span>Macro brief by <a href="${escapeAttribute(attributionUrl)}" style="color:${OG_TEXT};text-decoration:underline;font-weight:600;">Whether</a></span>
+    <a href="${escapeAttribute(data.briefUrl)}" style="color:${OG_TEXT_SECONDARY};text-decoration:underline;">Get your own →</a>
   </div>
 </div>`;
 };
+
+/**
+ * The snippet as a whole document, for a frame: Notion's embed block and every
+ * oEmbed consumer (`/api/oembed`) load a URL into an iframe, and a bare
+ * fragment there renders in quirks mode with the browser's 8px margin. Links
+ * open outside the frame, since a brief read inside someone's doc should not
+ * navigate their doc away.
+ */
+const wrapEmbedPage = (fragment: string) => `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whether: this week's guidance</title>
+<base target="_blank">
+<style>html,body{margin:0;background:transparent}</style>
+</head>
+<body>
+${fragment}
+</body>
+</html>`;
+
+export const buildCallStripEmbedHtml = (data: BriefEmbedData): string => {
+  const callText = data.formattedCall ?? formatGuidance({
+    actionNow: data.actionNow,
+    currentCall: data.operatingCall,
+    policyOverrideActive: data.policyOverrideActive,
+  });
+  const marginText = data.marginLabel ?? data.confidenceLabel;
+
+  return `<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:100%;margin:0;padding:8px 12px;background:${OG_BG};border:1px solid ${OG_BORDER};border-radius:8px;color:${OG_TEXT};display:flex;align-items:center;justify-content:space-between;gap:12px;box-sizing:border-box;">
+  <div style="display:flex;align-items:center;gap:10px;min-width:0;flex-wrap:wrap;">
+    <span style="display:inline-flex;align-items:center;padding:2px 8px;border-radius:9999px;font-size:11px;font-weight:700;letter-spacing:0.04em;text-transform:uppercase;background:rgba(237,240,238,0.08);color:${OG_TEXT};border:1px solid ${OG_BORDER};">${escapeHtml(data.regimeLabel)}</span>
+    <span style="font-size:13px;font-weight:600;color:${OG_TEXT};line-height:1.4;">${escapeHtml(callText)}</span>
+    <span style="font-size:12px;color:${OG_TEXT_MUTED};white-space:nowrap;">· ${escapeHtml(marginText)}</span>
+  </div>
+  <div style="font-size:10px;color:${OG_TEXT_MUTED};white-space:nowrap;margin-left:auto;">
+    <a href="${escapeAttribute(data.attributionUrl)}" style="color:${OG_TEXT_SECONDARY};text-decoration:none;font-weight:600;" target="_blank" rel="noopener">Whether &rarr;</a>
+  </div>
+</div>`;
+};
+
+export const buildCallStripEmbedText = (data: BriefEmbedData): string => {
+  const callText = data.formattedCall ?? formatGuidance({
+    actionNow: data.actionNow,
+    currentCall: data.operatingCall,
+    policyOverrideActive: data.policyOverrideActive,
+  });
+  const marginText = data.marginLabel ?? data.confidenceLabel;
+  return `Whether [${data.regimeLabel}]: ${callText} · ${marginText} (${data.attributionUrl})`;
+};
+

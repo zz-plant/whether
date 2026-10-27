@@ -131,7 +131,7 @@ export const DecisionShieldPresetsSection = ({
                   key={starter.name}
                   type="button"
                   onClick={() => onApplyPreset(starter)}
-                  className="inline-flex items-center rounded-sm border border-slate-700/80 bg-slate-900/90 px-2.5 py-0.5 text-fluid-nano font-medium text-slate-300 transition-colors hover:border-sky-500/50 hover:bg-slate-800 hover:text-sky-200"
+                  className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-[44px] items-center px-3 text-fluid-xs font-medium"
                 >
                   {starter.name}
                 </button>

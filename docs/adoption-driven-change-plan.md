@@ -91,7 +91,7 @@ MAKE THE PRODUCT
 | Standalone replay | `/history`, `/history/compare`, Time Machine panel | Keep engine and `decisionArchive.tsx` (record-of-decisions evidence). Demote scrub/playback UX to supporting/advanced. |
 | Multiple export formats | `exportBriefPanel.tsx`, `/brief.md` | One shareable brief is the artifact. Keep Slack + copy-brief primary; demote Jira/wiki/Linear/slide variants. |
 | Decorative regime pages | `/state`, `/comps` | `/state` → gate or retire unless it drives a decision. `/comps` stays dev/utility. |
-| Generic threshold-builder page | `/trust#framework` (was `/threshold`) | A section of the trust page since 2026-09-08; not a product job. |
+| Generic threshold-builder page | `/about#method` (was `/trust#framework`, before that `/threshold`) | A section of `/about` since 2026-10-09; not a product job. |
 
 ## Keep as user evidence (compact)
 

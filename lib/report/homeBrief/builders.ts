@@ -5,6 +5,7 @@ import {
   formatBoundedDecisionAction,
   formatBoundedDecisionReverse,
   formatSharedFlipCorridor,
+  isRuleConditionMet,
 } from "../boundedDecisionRules";
 import {
   buildActionStripItems,
@@ -56,14 +57,12 @@ import {
   buildWeeklyMemoLines,
   describeWeeklyMemoLead,
   buildWeeklyMovementMetric,
-  buildWhyItMattersLine,
   resolvePrimaryShiftRegimeKey,
 } from "./decisionNarrative";
 import {
   buildFlipRiskMeterState as buildFlipRiskMeterStateInternal,
   buildHistoricalTimeline,
   formatRegimeWithDuration,
-  buildMacroOverlay,
   buildMemoryRail,
   buildStartRouteDeltaBlock,
   buildWhyThisCall,
@@ -82,7 +81,6 @@ import type {
   StartupVariantPolicy,
   WeeklyDecisionCardViewModel,
 } from "../homeBriefModel";
-import type { SectorKey } from "../sectorSensitivity";
 import type { WeeklyCallContract } from "../weeklyCallContract";
 import { regimeSignalLabel } from "../signalTranslations";
 import { isSavedCopy } from "../provenanceStatus";
@@ -226,7 +224,6 @@ const buildLeadershipShorthandLine = (
 export const buildHomeBriefModelInternal = (
   data: HomeReportData,
   options?: {
-    overlaySector?: SectorKey;
     startupVariantMode?: StartupVariantPolicy["selectedMode"];
     runwayBand?: RunwayBand;
     runwayMonths?: number;
@@ -251,7 +248,6 @@ export const buildHomeBriefModelInternal = (
     flipThreshold,
     postureState,
   } = data;
-  const overlaySector = options?.overlaySector ?? "b2b-saas";
   // The selected mode drives the pill highlight and defaults to series-a for
   // display. Stage-scoped copy is applied only when the operator explicitly
   // picked a stage, so an untouched brief keeps its canonical action line.
@@ -507,8 +503,19 @@ export const buildHomeBriefModelInternal = (
       ? startupVariantPolicy.adjustmentsByMode[startupVariantMode]?.doNowAdjustments[0]?.trim()
         || actionNowShort?.trim()
       : actionNowShort?.trim();
+  /* The lines still to cross, per area: a held area's resume lines it has not
+     met, an open area's pause lines. Until 2026-10-21 this was every resume
+     line, met or not, so the week of Oct 19 (risk appetite 55) listed "Risk
+     appetite > 54" under "Other things that would change this guidance", and a
+     Sunny week with nothing held listed two lines already true and none that
+     could hold anything. */
+  const linesStillToCross = (rule: (typeof decisionRules)[number]) => {
+    const held = rule.pause.conditions.some((condition) => isRuleConditionMet(condition, currentScores[condition.metric]));
+    return (held ? rule.resume.conditions : rule.pause.conditions)
+      .filter((condition) => !isRuleConditionMet(condition, currentScores[condition.metric]));
+  };
   const canonicalFlipConditions: CanonicalFlipCondition[] = decisionRules.flatMap((rule) =>
-    rule.flipConditions.map((condition) => ({
+    linesStillToCross(rule).map((condition) => ({
       area: rule.area,
       metric: condition.metric,
       operator: condition.operator,
@@ -716,7 +723,6 @@ export const buildHomeBriefModelInternal = (
     memoryRail: buildMemoryRail(recordDateLabel, assessment.regime),
     historicalTimeline,
     lastYearComparison: data.lastYearComparison ?? null,
-    macroOverlay: buildMacroOverlay(macroSeries, assessment, overlaySector),
     evidenceItems: data.reportEvidenceItems ?? [],
     netConstraintSummary,
     postureDeltaLabel,
@@ -747,7 +753,7 @@ export const buildHomeBriefModelInternal = (
       reportDynamics,
       transitionWatch,
       pendingFlipDetail: regimeFlipState.pendingCandidate
-        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending — conditions hold where they are while the change waits on confirmation. The line that would change where it lands: ${regimeSignalLabel[regimeFlipState.watch.dimension]} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
+        ? `A move to ${getRegimePublicLabel(regimeFlipState.pendingCandidate)} is already pending. Conditions hold where they are while the change waits on confirmation. The line that would change where it lands: ${regimeSignalLabel[regimeFlipState.watch.dimension]} ${regimeFlipState.watch.direction === "riseAbove" ? "rising above" : "falling to or below"} ${formatThresholdNumber(regimeFlipState.watch.threshold)}.`
         : undefined,
     }),
   };
@@ -788,9 +794,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
     ?? (homeBriefModel.revisitDecisions
       ? "Revise hiring and roadmap plans now."
       : "Hold last week's operating rules.");
-  const whyItMattersLine = buildWhyItMattersLine({
-    weeklyMovement: homeBriefModel.weeklyMovement,
-  });
   const readThisCardItems = buildReadThisCardItems({
     decisionShiftSummary: homeBriefModel.decisionShiftHeadline,
     immediateDecision,
@@ -861,7 +864,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       decisionMovement: homeBriefModel.decisionMovement,
     },
     presentation: {
-      whyItMattersLine,
       readThisCardItems,
     },
     diagnostics: {
@@ -881,7 +883,6 @@ export const buildWeeklyDecisionCardViewModelInternal = ({
       historicalTimeline: homeBriefModel.historicalTimeline,
       historicalAnalogs: homeBriefModel.historicalAnalogs,
       lastYearComparison: homeBriefModel.lastYearComparison,
-      macroOverlay: homeBriefModel.macroOverlay,
     },
     sinceLastReview: homeBriefModel.sinceLastReview,
     artifact: {

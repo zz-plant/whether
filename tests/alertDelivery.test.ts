@@ -8,6 +8,8 @@ import { resetSubscriberStore, type SubscriberStore } from "../lib/email/subscri
 import type { EmailDeliveryAdapter } from "../lib/email/emailDelivery";
 import type { AlertDecision } from "../lib/alert/alertEvaluator";
 import type { KvNamespace } from "../lib/runtime/kv";
+import { resetRegimeAlertRepository } from "../lib/storage/regimeAlertRepository";
+import { sha256Hex } from "../lib/crypto";
 
 /**
  * Alert mail is enrolled through the email subscription, not through a per-device record.
@@ -48,7 +50,7 @@ const CONDITIONS = {
   tightness: 60,
   riskAppetite: 40,
   actionNow: "Hold irreversible moves until conditions resolve.",
-  callChangesIf: "Funding pressure rises 10 pts to clear 70 (60 today) or risk appetite rises 10 pts to clear 50 (40 today).",
+  callChangesIf: "Funding pressure rises 10 pts from 60 to clear 70, or risk appetite rises 10 pts from 40 to clear 50.",
   recordDate: "2026-08-22",
 };
 
@@ -124,6 +126,29 @@ describe("deliverAlerts", () => {
     assert.equal(first.sent, 1);
     assert.equal(second.sent, 0, "the delivered marker is keyed on the address");
     assert.equal(second.skipped, 1, "withheld, not counted as a send failure");
+  });
+
+  // `GET /api/alert-deliveries` lists this log and `/api/weekly-digest` counts it. Nothing in
+  // production wrote to it, so both read zero however many alerts were mailed.
+  it("logs each successful send, naming the recipient by hash", async () => {
+    const repository = resetRegimeAlertRepository();
+    await subscribeVerified("reader@example.com", { alerts: true });
+    await subscribeVerified("weekly-only@example.com");
+
+    const result = await deliverAlerts(CONDITIONS);
+    const { deliveries } = await repository.listDeliveries();
+
+    assert.equal(result.sent, 1);
+    assert.equal(deliveries.length, 1, "one row per send, none for a subscriber who was not mailed");
+    assert.equal(deliveries[0].channel, "email");
+    assert.equal(deliveries[0].status, "sent");
+    assert.equal(deliveries[0].alertId, "regime_change");
+    assert.equal(deliveries[0].summary, result.alerts[0].headline);
+    assert.equal(deliveries[0].clientId, await sha256Hex("reader@example.com"));
+    assert.ok(!JSON.stringify(deliveries).includes("reader@example.com"), "the log does not carry the address");
+
+    await deliverAlerts({ ...CONDITIONS, regime: "SCARCITY" });
+    assert.equal((await repository.listDeliveries()).deliveries.length, 1, "a withheld repeat is not logged as a send");
   });
 
   // A subscriber record written before the field existed reads as opted out, so the

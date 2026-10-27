@@ -10,10 +10,9 @@ import {
   websiteName,
 } from "../../seo";
 import { siteUrl } from "../../siteUrl";
-import { createBreadcrumbTrail } from "../../navigation/breadcrumbs";
 import { buildAuthorSchema } from "../../publisher";
 import { homeDecisionFaqItems } from "../decisionTransmissionCopy";
-import { formatConfidenceChipLabel } from "../reportFormatting";
+import { MARGIN_LABEL, formatMarginBand } from "../reportFormatting";
 
 /** A JSON-LD document. Typed loosely on purpose — this is serialized to JSON, and
  *  a consumer (or a test) reads nodes by key rather than by a TS shape. Giving the
@@ -81,6 +80,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
       "@id": websiteId,
       name: websiteName,
       url: siteUrl,
+      image: buildOgImageUrl({ template: "report" }),
       description: defaultSiteDescription,
       inLanguage: "en",
       mainEntityOfPage: `${siteUrl}/`,
@@ -111,7 +111,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         "@id": `${siteUrl}/#dataset`,
         name: "US Treasury yield curve snapshot",
         description:
-          "The weekly US Treasury reading Whether bases its guidance on, with its confidence and what would change it.",
+          "The weekly US Treasury reading Whether bases its guidance on, with its margin from the change lines and what would change it.",
         creator: {
           "@id": organizationId,
         },
@@ -127,8 +127,8 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
          * equivalent that parses.
          */
         variableMeasured: [
-          { "@type": "PropertyValue", name: "Operating posture", value: brief.postureLabel },
-          { "@type": "PropertyValue", name: "Regime", value: brief.regimeLabel },
+          { "@type": "PropertyValue", name: "Weekly guidance", value: brief.postureLabel },
+          { "@type": "PropertyValue", name: "Market conditions", value: brief.regimeLabel },
           /*
            * The word, not the engine's code. This shipped `"MED"` — the value
            * `RegimeConfidenceLabel` stores — into the one payload on the site
@@ -137,7 +137,7 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
            * reader-facing surfaces were moved to the word form; this one was
            * missed because nothing renders it on screen.
            */
-          { "@type": "PropertyValue", name: "Confidence", value: formatConfidenceChipLabel(brief.confidenceLabel) },
+          { "@type": "PropertyValue", name: MARGIN_LABEL, value: formatMarginBand(brief.confidenceLabel) },
         ],
         isBasedOn: {
           "@type": "CreativeWork",
@@ -220,6 +220,6 @@ export const buildHomeStructuredData = (brief: HomeBriefStructuredDataInput): Js
         "@id": websiteId,
       },
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }])),
+    buildBreadcrumbList([{ name: "Home", path: "/" }]),
   ],
 });

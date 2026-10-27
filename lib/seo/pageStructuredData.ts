@@ -1,11 +1,10 @@
-import { buildBreadcrumbList, buildCanonicalUrl, organizationId, organizationName, websiteId, websiteName } from "../seo";
+import { buildBreadcrumbList, buildCanonicalUrl, buildOgImageUrl, organizationId, organizationName, websiteId, websiteName } from "../seo";
 import { siteUrl } from "../siteUrl";
 import { buildAuthorSchema, buildPublisherSchema } from "../publisher";
-import { createBreadcrumbTrail } from "../navigation/breadcrumbs";
+import { buildGroupBreadcrumbs, createBreadcrumbTrail } from "../navigation/breadcrumbs";
 import type { PostureArchivePeriod } from "../summary/postureArchiveTypes";
 import type { PublishedBrief } from "../report/publishedBriefs";
-import { PRICING_SUMMARY, type PricingPlan } from "../pricing";
-import type { SaaSValuationSnapshot } from "../saasMultiples";
+import { MARKET_DATA_PROVIDER_LABELS, type SaaSValuationSnapshot } from "../saasMultiples";
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
 
 /**
@@ -28,6 +27,7 @@ const websiteNode = () => ({
   "@id": websiteId,
   name: websiteName,
   url: siteUrl,
+  image: buildOgImageUrl({ template: "report" }),
 });
 
 const isPartOfSite = { "@id": websiteId } as const;
@@ -76,7 +76,7 @@ export const buildHistoryStructuredData = ({
   const periodItems = periods.map((period) => ({
     "@type": "WebPage",
     url: buildCanonicalUrl(`/history/${period.slug}`),
-    name: `${period.title} operating posture`,
+    name: `${period.title} market conditions`,
   }));
   const briefItems = publishedBriefs.map((brief) => ({
     "@type": "Article",
@@ -100,7 +100,7 @@ export const buildHistoryStructuredData = ({
       "@id": `${url}#dataset`,
       name: "Whether monthly regime history",
       description:
-        "Every month-end reading on record: the operating posture, when it changed, and how long each regime held, scored from public US Treasury and macro series.",
+        "Every month-end reading on record, with each change in conditions and the length of each spell, scored from public US Treasury and macro series.",
       url,
       creator: buildPublisherSchema(organizationName),
       license: buildCanonicalUrl("/terms-of-service"),
@@ -115,7 +115,7 @@ export const buildHistoryStructuredData = ({
     {
       "@type": "ItemList",
       "@id": `${url}#periods`,
-      name: "Operating posture by period",
+      name: "Market conditions by period",
       numberOfItems: periodItems.length + briefItems.length,
       itemListElement: [...periodItems, ...briefItems].map((item, index) => ({
         "@type": "ListItem",
@@ -123,70 +123,7 @@ export const buildHistoryStructuredData = ({
         item,
       })),
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/history" }])),
-  ]);
-};
-
-/**
- * `/pricing`: one `Product` with an `Offer` per plan. The paid plans are not on
- * sale yet, so their availability is `PreOrder` rather than `InStock`; the page
- * says so in prose and the markup must not say otherwise.
- */
-export const buildPricingStructuredData = ({
-  plans,
-  paidPlansOnSale,
-}: {
-  plans: readonly PricingPlan[];
-  paidPlansOnSale: boolean;
-}): JsonLdGraph => {
-  const url = buildCanonicalUrl("/pricing");
-  return graph([
-    {
-      "@type": "WebPage",
-      "@id": `${url}#webpage`,
-      url,
-      name: "Pricing",
-      inLanguage: "en",
-      isPartOf: isPartOfSite,
-      mainEntity: { "@id": `${url}#product` },
-    },
-    {
-      "@type": "Product",
-      "@id": `${url}#product`,
-      name: "Whether Weekly Brief",
-      description: PRICING_SUMMARY,
-      /* Inlined, not referenced. An `@id` only resolves against nodes on the
-         same page (see the header), and this graph carries no Organization —
-         the reference dangled, which is the unresolvable entity these builders
-         exist to avoid. `buildPublisherSchema` carries the same `@id`, so the
-         two still describe one entity. */
-      brand: buildPublisherSchema(organizationName),
-      offers: plans.map((plan) => ({
-        "@type": "Offer",
-        name: plan.name,
-        description: plan.tagline,
-        price: plan.monthlyPriceUsd ?? 0,
-        priceCurrency: "USD",
-        ...(plan.monthlyPriceUsd === null
-          ? {}
-          : {
-              priceSpecification: {
-                "@type": "UnitPriceSpecification",
-                price: plan.monthlyPriceUsd,
-                priceCurrency: "USD",
-                billingDuration: 1,
-                billingIncrement: 1,
-                unitCode: "MON",
-              },
-            }),
-        availability:
-          plan.monthlyPriceUsd === null || paidPlansOnSale
-            ? "https://schema.org/InStock"
-            : "https://schema.org/PreOrder",
-        url: plan.monthlyPriceUsd === null ? siteUrl : buildCanonicalUrl(`/contact?plan=${plan.id}`),
-      })),
-    },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/pricing" }])),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/history")),
   ]);
 };
 
@@ -216,7 +153,7 @@ export const buildCompsStructuredData = ({
       "@type": "WebPage",
       "@id": `${url}#webpage`,
       url,
-      name: "Public SaaS Valuation Multiples",
+      name: "SaaS Valuation Multiples",
       inLanguage: "en",
       isPartOf: isPartOfSite,
       ...(data ? { mainEntity: { "@id": `${url}#dataset` } } : {}),
@@ -236,7 +173,7 @@ export const buildCompsStructuredData = ({
             variableMeasured: measured,
             isBasedOn: {
               "@type": "CreativeWork",
-              name: data.source === "alpha-vantage" ? "Alpha Vantage" : "Yahoo Finance",
+              name: MARKET_DATA_PROVIDER_LABELS[data.source],
             },
           },
         ]
@@ -316,7 +253,10 @@ export const buildToolkitHowTo = (toolkit: {
       })),
     },
     buildBreadcrumbList(
-      createBreadcrumbTrail([{ path: "/" }, { path: "/resolve" }, { path: `/toolkits/${toolkit.slug}`, label: toolkit.title }]),
+      buildGroupBreadcrumbs(`/toolkits/${toolkit.slug}`, [
+        { name: "More tools", path: "/resources#more-tools" },
+        { name: toolkit.title, path: `/toolkits/${toolkit.slug}` },
+      ]),
     ),
   ]);
 };
@@ -392,7 +332,7 @@ export const buildAnswerFaqStructuredData = ({
           })),
       ],
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/resolve" }, { path: `/answers/${slug}`, label: question }])),
+    buildBreadcrumbList(buildGroupBreadcrumbs(`/answers/${slug}`, [{ name: question, path: `/answers/${slug}` }])),
   ]);
 };
 
@@ -410,10 +350,11 @@ export const buildCalibrationStudyStructuredData = ({
   totals: { months: number; held: number };
 }): JsonLdGraph => {
   const url = buildCanonicalUrl("/calibration");
-  const name = "Confidence score calibration study";
+  const name = "Margin calibration study";
   const description =
-    `A calibration study of Whether's published confidence percent against ${totals.months} month-end readings: `
-    + "every band understates, and distance from a regime boundary does not order the outcome.";
+    `A calibration study of Whether's published margin against ${totals.months} month-to-month comparisons. `
+    + "The margin is the distance from the line where conditions change. "
+    + "Every band understates how often conditions held, and distance from a change line does not order the outcome.";
 
   return graph([
     {
@@ -430,7 +371,7 @@ export const buildCalibrationStudyStructuredData = ({
       publisher: buildPublisherSchema(organizationName),
       about: {
         "@type": "Thing",
-        name: "Calibration of a macro regime confidence score",
+        name: "Calibration of a distance-from-the-line margin for macro conditions",
       },
       citation: {
         "@type": "CreativeWork",
@@ -457,15 +398,16 @@ export const buildCalibrationStudyStructuredData = ({
         { "@type": "PropertyValue", name: "Readings whose regime held one month later", value: totals.held },
       ],
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/trust" }, { path: "/calibration", label: name }])),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/calibration")),
   ]);
 };
 
 /**
- * `/concepts`: a `CollectionPage` whose `ItemList` names each essay on the page
+ * `/concepts`: a `CollectionPage` whose `ItemList` names each text on the page
  * as the `CreativeWork` it is — its own author, its own URL, its first
  * publication month. The items are the external works themselves, not anchors
- * on this page, because that is what the list is a list of.
+ * on this page, because that is what the list is a list of. A memo signed by a
+ * firm alone is authored by that firm, as an `Organization`.
  */
 export const buildProductCanonStructuredData = ({
   essays,
@@ -473,13 +415,14 @@ export const buildProductCanonStructuredData = ({
   essays: ReadonlyArray<{
     title: string;
     authors: readonly string[];
+    firm?: string;
     format: "essay" | "book";
     sourceUrl: string;
     published: { year: number; month: number };
   }>;
 }): JsonLdGraph => {
   const url = buildCanonicalUrl("/concepts");
-  const name = "Product writing, against the market it was written in";
+  const name = "Does startup advice follow the market?";
   return graph([
     {
       "@type": "CollectionPage",
@@ -499,12 +442,64 @@ export const buildProductCanonStructuredData = ({
             "@type": essay.format === "book" ? "Book" : "Article",
             name: essay.title,
             url: essay.sourceUrl,
-            author: essay.authors.map((name) => ({ "@type": "Person", name })),
+            author:
+              essay.authors.length > 0 || !essay.firm
+                ? essay.authors.map((name) => ({ "@type": "Person", name }))
+                : [{ "@type": "Organization", name: essay.firm }],
             datePublished: `${essay.published.year}-${String(essay.published.month).padStart(2, "0")}`,
           },
         })),
       },
     },
-    buildBreadcrumbList(createBreadcrumbTrail([{ path: "/" }, { path: "/history" }, { path: "/concepts", label: name }])),
+    buildBreadcrumbList(buildGroupBreadcrumbs("/concepts")),
   ]);
 };
+
+/**
+ * `/brief/[week]`: structured data for a frozen weekly brief.
+ * Declares Article schema with explicit temporalCoverage, variableMeasured,
+ * and semantic topics.
+ */
+export const buildPublishedBriefStructuredData = ({
+  brief,
+  canonicalUrl,
+  imageUrl,
+  headline,
+  description,
+}: {
+  brief: PublishedBrief;
+  canonicalUrl: string;
+  imageUrl: string;
+  headline: string;
+  description: string;
+}): JsonLdGraph =>
+  graph([
+    {
+      "@type": "Article",
+      "@id": `${canonicalUrl}#article`,
+      headline,
+      description,
+      datePublished: brief.publishedAt,
+      dateModified: brief.publishedAt,
+      temporalCoverage: `${brief.recordDate}/${brief.recordDate}`,
+      author: buildAuthorSchema(),
+      publisher: buildPublisherSchema(organizationName),
+      image: [imageUrl],
+      url: canonicalUrl,
+      mainEntityOfPage: canonicalUrl,
+      isAccessibleForFree: true,
+      keywords: [
+        "startup operating guidance",
+        "venture capital macro",
+        "startup hiring guidance",
+        "burn rate discipline",
+        `week of ${brief.recordDateLabel}`,
+        brief.regime,
+      ],
+      about: [
+        { "@type": "Thing", name: "Startup Operating Guidance" },
+        { "@type": "Thing", name: "Venture Capital Macro Climate" },
+      ],
+    },
+  ]);
+

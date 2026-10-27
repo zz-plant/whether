@@ -9,10 +9,12 @@ import { describeSignalDirection } from "./signalClusterReading";
 import { comparisonBasis } from "./comparisonBasis";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { describeScoreMovement } from "./scoreMovement";
+import { describeNotCountedScore, joinSentences, type ScoringBasis } from "./scoringBasis";
 import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
 import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
+import { resolveNearestLineMargin, type ConfidenceInputs } from "./confidence";
 
 /**
  * What the evidence page, the answer pages and the scenario pages draw, in the
@@ -23,8 +25,8 @@ import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
  * previous value, the line and the distance.
  *
  * The earlier reading is last week's published brief, or the previous month-end
- * where there is none (`lib/report/comparisonReading.ts`), and each row names it
- * by date (`previousLabel`, from `comparisonBasis`) instead of calling it last week.
+ * where there is none (`lib/report/comparisonReading.ts`), and each row's move
+ * names it by date (from `comparisonBasis`) instead of calling it last week.
  * A comparison is a fact only when one happened. `buildReportDynamics`
  * records a signal's move in `changedSignals` (or `anomalySignals` when it
  * moved past the sanity bound), and says `directionLabel: "unavailable"` when
@@ -67,8 +69,6 @@ export type SignalReferenceRow = {
   /** Null when the series did not resolve this week. */
   value: number | null;
   previous: number | null;
-  /** What `previous` is: the date of the reading it is from ("Aug 31"), or "Last week" where the week does not date it. */
-  previousLabel: string;
   /** The signed move, when one was recorded. */
   delta: number | null;
   line: { value: number; label: string };
@@ -166,6 +166,7 @@ const rowFor = (
   line: SignalReferenceRow["line"],
   units: ScoreUnits,
   dynamics: DynamicsSource,
+  scoringBasis?: Pick<ScoringBasis, "notCounted">,
 ): SignalReferenceRow => {
   const delta = value === null ? null : findSignalDelta(dynamics, key);
   const isScore = key === "tightness" || key === "riskAppetite";
@@ -183,13 +184,12 @@ const rowFor = (
     kindLabel: indicatorKindLabel(key),
     value,
     previous: previousFrom(value, delta),
-    previousLabel: basis.label,
     delta,
     line,
     units,
     betterWhen: BETTER_WHEN[key],
     direction,
-    movement: isScore ? describeScoreMovement(key, dynamics.movement?.[key], basis) : null,
+    movement: isScore ? joinSentences(describeScoreMovement(key, dynamics.movement?.[key], basis), describeNotCountedScore(key, scoringBasis)) : null,
     watchHref: WATCH_HREF_BY_KEY[key],
   };
 };
@@ -198,11 +198,13 @@ const rowFor = (
 export const buildSignalReferenceRows = (
   assessment: Pick<RegimeAssessment, "scores" | "thresholds">,
   dynamics: DynamicsSource,
+  /** What each score leaves out (`ReportData.scoringBasis`), said under its row after the move. */
+  scoringBasis?: Pick<ScoringBasis, "notCounted">,
 ): SignalReferenceRow[] => {
   const { scores, thresholds } = assessment;
   return [
-    rowFor("tightness", scores.tightness, { value: thresholds.tightnessRegime, label: CALL_CHANGE_LINE_LABEL }, SCORE_UNITS, dynamics),
-    rowFor("riskAppetite", scores.riskAppetite, { value: thresholds.riskAppetiteRegime, label: CALL_CHANGE_LINE_LABEL }, SCORE_UNITS, dynamics),
+    rowFor("tightness", scores.tightness, { value: thresholds.tightnessRegime, label: CALL_CHANGE_LINE_LABEL }, SCORE_UNITS, dynamics, scoringBasis),
+    rowFor("riskAppetite", scores.riskAppetite, { value: thresholds.riskAppetiteRegime, label: CALL_CHANGE_LINE_LABEL }, SCORE_UNITS, dynamics, scoringBasis),
     rowFor("baseRate", scores.baseRate, { value: thresholds.baseRateTightness, label: BASE_RATE_LINE_LABEL }, PERCENT_UNITS, dynamics),
     rowFor("curveSlope", scores.curveSlope, { value: 0, label: INVERSION_LINE_LABEL }, SPREAD_UNITS, dynamics),
   ];
@@ -251,28 +253,12 @@ export const buildCallLineLadders = (
   return [forKey("tightness", thresholds.tightnessRegime), forKey("riskAppetite", thresholds.riskAppetiteRegime)];
 };
 
-/* Why the next reading could change conditions. Beside "Confidence: High" a
-   bare "Could change next week: Yes" read as a contradiction; the reason is the
-   nearer line and how far off it is, or a change already waiting on its second
-   reading. Confidence measures something else (how often conditions held at
-   this distance), and the two read together once this one says what it means. */
-const describeChangeReason = (assessment: {
-  regimeTransition?: { pending?: unknown };
-  scores?: { tightness: number; riskAppetite: number };
-  thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
-}): string | undefined => {
-  if (assessment.regimeTransition?.pending) return "a change is waiting on a second reading";
-  const { scores, thresholds } = assessment;
-  if (!scores || !thresholds) return undefined;
-  const nearest = [
-    { key: "tightness" as const, gap: Math.abs(scores.tightness - thresholds.tightnessRegime) },
-    { key: "riskAppetite" as const, gap: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime) },
-  ].sort((left, right) => left.gap - right.gap)[0];
-  if (!nearest) return undefined;
-  const label = regimeSignalLabelByKey[nearest.key].toLowerCase();
-  const points = Math.round(nearest.gap);
-  return points === 0 ? `${label} is at its line` : `${label} is ${points} ${points === 1 ? "pt" : "pts"} from its line`;
-};
+/* Why the next reading could change conditions, when the margin cell beside it
+   does not already say: a change waiting on its second reading. The distance to
+   the nearer line is the margin cell's (`resolveNearestLineMargin`), so the two
+   cells no longer state it twice, or pick different lines to state it from. */
+const describeChangeReason = (assessment: { regimeTransition?: { pending?: unknown } }): string | undefined =>
+  assessment.regimeTransition?.pending ? "a change is waiting on a second reading" : undefined;
 
 /**
  * The four trust facts, the one way every reading route states them.
@@ -297,6 +283,8 @@ export const buildTrustStripProps = ({
   degradedSourceCount = 0,
   confidenceLabel,
   assessment,
+  scoringBasis,
+  basisNote,
 }: {
   recordDateLabel: string;
   isFallback: boolean;
@@ -304,8 +292,12 @@ export const buildTrustStripProps = ({
   /** Sources answering from a fallback (`buildDegradedSourceRows(...).length`). */
   degradedSourceCount?: number;
   confidenceLabel: TrustStripProps["confidenceLabel"];
+  /** Which inputs set the scores, and what the ones left out would do (`ReportData.scoringBasis`). */
+  scoringBasis?: Pick<ScoringBasis, "key" | "value" | "warning" | "warningShort">;
+  /** Why the published week's conditions differ, where the basis is why (`describePublishedWeekBasis`): the homepage's alone. */
+  basisNote?: string | null;
   assessment: Parameters<typeof couldCallChangeNextWeek>[0] & {
-    scores?: { tightness: number; riskAppetite: number };
+    scores?: ConfidenceInputs["scores"];
     thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
   };
 }): Omit<TrustStripProps, "href" | "className"> => ({
@@ -317,6 +309,16 @@ export const buildTrustStripProps = ({
     degradedSourceCount,
   }),
   confidenceLabel,
+  ...(assessment.scores && assessment.thresholds
+    ? { margin: resolveNearestLineMargin({ scores: assessment.scores, thresholds: assessment.thresholds }) }
+    : {}),
   couldChangeNextWeek: couldCallChangeNextWeek(assessment),
   changeReason: couldCallChangeNextWeek(assessment) ? describeChangeReason(assessment) : undefined,
+  basis: {
+    key: scoringBasis?.key ?? "record",
+    value: scoringBasis?.value ?? "The record's inputs",
+    warning: scoringBasis?.warning ?? null,
+    warningShort: scoringBasis?.warningShort ?? null,
+    note: basisNote ?? null,
+  },
 });

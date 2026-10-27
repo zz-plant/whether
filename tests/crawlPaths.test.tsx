@@ -6,6 +6,9 @@ import { Breadcrumbs } from "../app/components/ui/breadcrumbs";
 import SignalsClusterPage from "../app/signals/[cluster]/page";
 import { signalScenarioRoutes } from "../app/seoRouteClusters";
 import { siteUrl } from "../lib/siteUrl";
+import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
+
+serveUnreachableUpstreams();
 
 /*
  * Two things a crawler needs that the 2026-09-23 audit found missing: a way to

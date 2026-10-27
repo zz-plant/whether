@@ -17,6 +17,12 @@ async function main() {
     ...process.env,
   };
 
+  // On Workers Builds, Vite's per-chunk tables are ~1,000 lines nobody reads; warnings and
+  // errors still print. Read by vite.config.ts; an explicit value wins.
+  if (process.env.WORKERS_CI === "1" && !childEnv.WHETHER_BUILD_LOG_LEVEL) {
+    childEnv.WHETHER_BUILD_LOG_LEVEL = "warn";
+  }
+
   if (targetEnv) {
     childEnv.CLOUDFLARE_ENV = targetEnv;
   } else {
@@ -125,10 +131,13 @@ function runCloudflareDeployCaptured(args, env) {
     });
 
     let output = "";
+    const filters = [];
     const tee = (stream, sink) => {
+      const filter = createModuleTableFilter((text) => sink.write(text));
+      filters.push(filter);
       stream.on("data", (chunk) => {
         output += chunk;
-        sink.write(chunk);
+        filter.write(String(chunk));
       });
     };
     tee(child.stdout, process.stdout);
@@ -138,7 +147,10 @@ function runCloudflareDeployCaptured(args, env) {
       console.error(`[cloudflare-run] Failed to start the deploy: ${error.message}`);
       resolve({ status: 1, output });
     });
-    child.on("close", (code) => resolve({ status: code ?? 1, output }));
+    child.on("close", (code) => {
+      for (const filter of filters) filter.end();
+      resolve({ status: code ?? 1, output });
+    });
   });
 }
 
@@ -237,10 +249,65 @@ function runWranglerDryRun(targetEnvName, env) {
 
   const result = spawnSync(process.execPath, args, {
     env,
-    stdio: "inherit",
+    encoding: "utf-8",
+    stdio: ["inherit", "pipe", "pipe"],
+    maxBuffer: 64 * 1024 * 1024,
   });
 
+  const stdout = createModuleTableFilter((text) => process.stdout.write(text));
+  stdout.write(result.stdout ?? "");
+  stdout.end();
+  const stderr = createModuleTableFilter((text) => process.stderr.write(text));
+  stderr.write(result.stderr ?? "");
+  stderr.end();
+
+  if (result.error) console.error(`[cloudflare-run] Wrangler dry run failed to start: ${result.error.message}`);
   return result.status ?? 1;
+}
+
+const TABLE_LINE = /^[┌│├└]/;
+
+/**
+ * Wrangler prints a box-drawn row for every module it attaches: ~300 rows on this Worker,
+ * which pushed the deploy's own result out of the Workers Builds log window on 2026-10-13.
+ * Passes every other line through as it arrives and replaces each table with its row count.
+ * Exported so the rule can be tested without running Wrangler.
+ */
+export function createModuleTableFilter(emit) {
+  let pending = "";
+  let rows = 0;
+  let inTable = false;
+
+  const flushTable = () => {
+    if (!inTable) return;
+    emit(`[cloudflare-run] module table hidden: ${rows} module(s) attached.\n`);
+    inTable = false;
+    rows = 0;
+  };
+
+  const line = (text) => {
+    if (TABLE_LINE.test(text)) {
+      inTable = true;
+      if (text.startsWith("│") && !/^│\s*Name\s*│/.test(text)) rows += 1;
+      return;
+    }
+    flushTable();
+    emit(`${text}\n`);
+  };
+
+  return {
+    write(chunk) {
+      pending += chunk;
+      const parts = pending.split("\n");
+      pending = parts.pop() ?? "";
+      for (const part of parts) line(part);
+    },
+    end() {
+      if (pending) line(pending);
+      pending = "";
+      flushTable();
+    },
+  };
 }
 
 function dedupeWasmArtifacts() {

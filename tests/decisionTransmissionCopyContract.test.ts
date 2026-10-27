@@ -27,19 +27,19 @@ describe("decision transmission copy contract", () => {
     const metadata = await buildHomeMetadata();
     const description = metadata.description ?? "";
 
-    assert.match(description, /what to do now/i);
+    assert.match(description, /the action to take now/i);
     assert.match(description, /the line that pauses it/i);
     assert.match(description, /the line that resumes it/i);
     assert.doesNotMatch(description, /forecast/i);
   });
 
-  it("keeps export briefs explicit about action now, confidence, and change-course conditions", () => {
+  it("keeps export briefs explicit about action now, the margin, and change-course conditions", () => {
     const brief = buildSlackBrief(fixtureBriefDocument({ reading: assessment }));
 
     assert.match(brief, /• Guidance:/);
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /• (High|Medium|Low) confidence/);
-    assert.match(brief, /• What would show it: "Conditions change if" above/);
+    assert.match(brief, /• Margin: (clear of|within reach of|close to) the line/);
+    assert.match(brief, /• How you'd know: watch "Conditions change if" above/);
     assert.match(brief, /• Resume when:/);
     assert.match(brief, /• Conditions change if:/);
   });

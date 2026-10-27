@@ -45,8 +45,8 @@ export const buildLlmsFullCorpus = (baseUrl: string): string => {
     heading(1, "Whether — full text corpus"),
     `Whether is weekly operating guidance for startup leaders. ${canonicalPositioningLine}`,
     [
-      "This file is the site's stable editorial content in one document. It does **not** carry this week's guidance,",
-      `which changes weekly under one URL — fetch ${baseUrl}/brief.md for that, or ${baseUrl}/api/agent for JSON.`,
+      "This file is the site's stable editorial content in one document. It does **not** carry this week's guidance.",
+      `That changes weekly under one URL: fetch ${baseUrl}/brief.md for it, or ${baseUrl}/api/agent for JSON.`,
       `A dated, citable copy of a past week lives at ${baseUrl}/brief/<year>-w<week>.`,
     ].join(" "),
     `Endpoint map: ${baseUrl}/llms.txt · Agent manifest: ${baseUrl}${WHETHER_AGENT_MANIFEST_PATH}`,

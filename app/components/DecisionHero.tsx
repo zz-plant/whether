@@ -1,12 +1,10 @@
+import Link from "next/link";
 import type { ReactNode } from "react";
-import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import { NO_LIVE_READING_CALL } from "../../lib/report/reportCopy";
-import { RegimeGlyph } from "./illustrations/RegimeGlyph";
-import type { RegimeKey } from "../../lib/types";
-import { REGIME_LABELS, REGIME_WEATHER_RATIONALES } from "../../lib/regimePresentation";
+import { REGIME_LABELS, REGIME_WEATHER_RATIONALES, getRegimePublicLabel, isRegimeKey } from "../../lib/regimePresentation";
 import { TrustStrip, type TrustStripProps } from "./trustStrip";
 import { ScreenshotCaption } from "./screenshotCaption";
-import { Sun, Cloud, Zap, Snowflake } from "lucide-react";
+import { ConditionIcon } from "./ui/conceptIcons";
 
 type Props = {
   /** The call, as the page's heading. Absent on a read that produced no live call. */
@@ -29,12 +27,6 @@ type Props = {
    * must leave the decision picker on the first phone screen.
    */
   aside?: ReactNode;
-  /**
-   * What the aside's marks are, under the trust row from `md` up: the map's
-   * path domain and its like-for-like note. Set here rather than under the map
-   * so the graphic stays compact and the left column carries the words.
-   */
-  asideNote?: ReadonlyArray<string>;
   /** Freshness and confidence, drawn once under the call. Absent on an archived week, which the banner above marks. */
   trust?: Omit<TrustStripProps, "href" | "className"> | null;
   /**
@@ -57,25 +49,35 @@ type Props = {
    * opens on, so a search visitor meets the artifact before any explanation.
    */
   question?: string;
+  /**
+   * The week's published brief, where it read different conditions from this
+   * card: a caveat under the call, with the brief it links to. Without it a
+   * reader comparing the card with /history found two answers for one week.
+   */
+  published?: { text: string; href: string };
+  /**
+   * The condition tied to the areas: which are on hold, and where each one's
+   * concrete answer is. The call is a sentence about every decision at once;
+   * this is the line that says which decisions it binds.
+   */
+  areas?: { text: string; href: string; action: string };
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
-};
-
-const REGIME_GLYPH_KEYS = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const satisfies readonly RegimeKey[];
-const isRegimeKey = (value: string): value is RegimeKey =>
-  REGIME_GLYPH_KEYS.some((key) => key === value);
-
-const weatherIconMap: Record<RegimeKey, typeof Sun> = {
-  EXPANSION: Sun,
-  DEFENSIVE: Cloud,
-  VOLATILE: Zap,
-  SCARCITY: Snowflake,
+  /**
+   * The nearer score on its ladder, drawn on a phone only, above the trust strip
+   * (2026-10-27). From `md` the conditions map beside the call draws where the
+   * reading sits; below it the map is hidden, and a phone screenshot of the card
+   * was text alone, with the week's one tension, how near the line it is, stated
+   * in 13px type in the strip. The site's rule is to draw a threshold claim where
+   * it is made (ui-ux-standards §XV); this is that drawing.
+   */
+  phoneFigure?: ReactNode;
 };
 
 /**
- * The state tier, and nothing else: the weather word, what it means for money
- * in one line, the call as the page's heading with its longer sentence as
- * body, and the trust strip. Everything the card used to carry after that —
+ * The state tier, and nothing else: the weather word, the call as the page's
+ * heading, what the word means for money in one line under it, the call's
+ * longer sentence where it says more, and the trust strip. Everything the card used to carry after that —
  * the four signals, the rules by area, the lines and the flip watch, the share
  * actions — is a section of its own under it, in the order a reader asks the
  * questions. What is left fits above the fold on a phone.
@@ -96,16 +98,17 @@ export function DecisionHero({
   direction,
   earlier,
   aside,
-  asideNote,
   trust,
   titleLevel = "h1",
   captionDetail,
   question,
   lines,
+  published,
+  areas,
+  phoneFigure,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
-  const WeatherIcon = regimeKey ? weatherIconMap[regimeKey] : Sun;
   const TitleTag = titleLevel;
   const regimeWeatherLabel = (regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay).toUpperCase();
   const call = weeklyCall ?? NO_LIVE_READING_CALL.currentCall;
@@ -128,35 +131,29 @@ export function DecisionHero({
         {/* With a graphic beside it, the left column stretches to the graphic's
             height and the trust row sits at its foot, so the call is not left
             floating over an empty band. */}
-        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,16rem)] md:gap-6" : undefined}>
-        <div className="flex min-w-0 flex-col gap-3">
-        {/* The regime stamp and its meaning, grouped on the eyebrow line so the eye path flows directly into the call. */}
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1.5">
-          <span
-            className="type-stamp inline-flex items-center gap-1.5 rounded-sm border px-2.5 py-1 text-xs"
-            style={{
-              color: "var(--regime-ink)",
-              borderColor: "color-mix(in srgb, var(--regime-accent) 40%, transparent)",
-              backgroundColor: "color-mix(in srgb, var(--regime-accent) 14%, transparent)",
-            }}
-          >
-            {regimeKey ? (
-              <span className="inline-block w-4 shrink-0" aria-hidden="true">
-                <RegimeGlyph idPrefix="hero-stamp" regime={regimeKey} />
-              </span>
-            ) : (
-              <WeatherIcon size={14} aria-hidden="true" />
-            )}
+        <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-8" : undefined}>
+        <div className="flex min-w-0 flex-col gap-3 sm:gap-4">
+        {/* The kicker: the regime stamp, then what the week did — its direction
+            and, on a week conditions moved, what they were. The regime's
+            meaning is the line under the call, not this one: on the eyebrow it
+            ran four facts together ("hard to raise · Tightening this week ·
+            Was Cloudy on Sep 30") ahead of the call they lead into. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          <span className="type-stamp weather-tag-placard inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-semibold">
+            {/* The weather the word names, beside it. An unknown regime prints
+                its word alone: the sun it used to fall back to claimed a
+                condition nobody had read. */}
+            {regimeKey ? <ConditionIcon regime={regimeKey} /> : null}
             <span>{regimeWeatherLabel}</span>
           </span>
 
-          {regimeKey ? (
-            <span className="text-xs leading-relaxed text-slate-400">
-              {REGIME_WEATHER_RATIONALES[regimeKey]}
-              {direction ? <span className="text-slate-300"> · {direction}</span> : null}
+          {direction || earlier ? (
+            <span className="text-fluid-xs font-medium leading-relaxed text-slate-200">
+              {direction}
               {earlier ? (
                 <span className="font-semibold" style={{ color: "var(--regime-ink)" }} data-earlier-conditions>
-                  {" "}<span className="whitespace-nowrap">· {earlier}</span>
+                  {/* The separator stays on the line before; a wrapped line must not open with "·". */}
+                  {direction ? " · " : null}<span className="whitespace-nowrap">{earlier}</span>
                 </span>
               ) : null}
             </span>
@@ -178,7 +175,7 @@ export function DecisionHero({
             >
               {question}
             </TitleTag>
-            <p className="max-w-2xl text-pretty text-display font-bold leading-[1.1] tracking-[-0.01em] text-white">
+            <p className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50">
               {call}
             </p>
           </>
@@ -186,11 +183,37 @@ export function DecisionHero({
           <TitleTag
             id="weekly-call-title"
             style={{ viewTransitionName: "page-title" }}
-            className="max-w-2xl text-pretty text-display font-bold leading-[1.1] tracking-[-0.01em] text-white"
+            className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50"
           >
             {call}
           </TitleTag>
         )}
+
+        {/* What the weather word means for money, as the line under the call:
+            the stamp names the week, the call says what to do, this says why. */}
+        {regimeKey ? (
+          <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
+            {REGIME_WEATHER_RATIONALES[regimeKey]}
+          </p>
+        ) : null}
+
+        {areas ? (
+          <p className="max-w-xl text-fluid-sm font-medium leading-snug text-slate-100" data-held-areas>
+            {areas.text}{" "}
+            <Link href={areas.href} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
+              {areas.action}
+            </Link>
+          </p>
+        ) : null}
+
+        {published ? (
+          <p className="weather-caveat-mark max-w-xl text-sm leading-relaxed text-caveat-fg" data-published-differs>
+            {published.text}{" "}
+            <Link href={published.href} className="weather-hit underline decoration-slate-600 underline-offset-4">
+              Read the published brief
+            </Link>
+          </p>
+        ) : null}
 
         {lines && lines.length > 0 ? (
           <dl className="grid max-w-2xl gap-x-5 gap-y-2 text-sm sm:grid-cols-[max-content_1fr]">
@@ -204,7 +227,7 @@ export function DecisionHero({
         ) : null}
 
         {detail ? (
-          <div className="max-w-xl border-l-2 border-slate-700/80 pl-3 py-0.5">
+          <div className="max-w-xl border-l-2 border-[color:var(--border-strong)] pl-3 py-0.5">
             <p className="text-sm leading-relaxed text-slate-300">{detail}</p>
           </div>
         ) : null}
@@ -213,11 +236,15 @@ export function DecisionHero({
             directly under the call. The chip-and-popover in the meta row and the
             trust line at the foot of the card both said this; neither said it
             where a reader deciding whether to act would look first. */}
-        {trust ? <TrustStrip {...trust} href="/trust" className="pt-1 md:mt-auto" /> : null}
-        {aside && asideNote && asideNote.length > 0 ? (
-          <p className={`text-fluid-nano text-slate-400 max-md:hidden${trust ? "" : " md:mt-auto"}`} data-aside-note>
-            {asideNote.join(" ")}
-          </p>
+        {phoneFigure ? <div className="md:hidden" data-hero-phone-figure>{phoneFigure}</div> : null}
+        {trust ? (
+          <TrustStrip
+            {...trust}
+            regime={regime}
+            href="/trust"
+            phoneLayout="line"
+            className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4 md:mt-auto"
+          />
         ) : null}
         </div>
         {aside ? <div className="max-md:hidden">{aside}</div> : null}

@@ -69,6 +69,8 @@ export type DecisionMemoryEntry = {
   sources: string[];
   /** Conditions that had to hold for this decision to make sense. Absent on legacy entries. */
   assumptions?: DecisionAssumptionSnapshot;
+  /** The idempotency key the write carried; a retry or replay is deduped on it. Absent on legacy entries. */
+  writeId?: string;
 };
 
 export type DecisionMemoryPayload = {
@@ -80,6 +82,12 @@ export type DecisionMemoryPayload = {
   decision: DecisionInput;
   outcome: Pick<DecisionOutput, "verdict" | "summary" | "guardrail" | "reversalTrigger">;
   assessment: Pick<RegimeAssessment, "regime" | "scores" | "thresholds" | "inputs">;
+  /**
+   * A stable id for this one decision, so a retried or replayed write is
+   * deduped instead of appending the same decision twice. Content-addressed by
+   * the client; absent on entries written before it existed.
+   */
+  writeId?: string;
 };
 
 export type DecisionMemorySnapshotPayload = {
@@ -210,13 +218,14 @@ const isDecisionMemoryEntry = (value: unknown): value is DecisionMemoryEntry => 
     && (value.regime.thresholds === undefined || isThresholds(value.regime.thresholds))
     && Array.isArray(value.sources)
     && value.sources.every((source) => typeof source === "string")
-    && (value.assumptions === undefined || isAssumptionSnapshot(value.assumptions));
+    && (value.assumptions === undefined || isAssumptionSnapshot(value.assumptions))
+    && isOptionalString(value.writeId);
 };
 
 export const parseDecisionMemoryEntry = (value: unknown): DecisionMemoryEntry | null =>
   isDecisionMemoryEntry(value) ? value : null;
 
-const newEntryId = () =>
+export const newEntryId = () =>
   typeof crypto.randomUUID === "function" ? crypto.randomUUID() : `${Date.now()}`;
 
 export const buildDecisionMemoryEntry = (payload: DecisionMemoryPayload): DecisionMemoryEntry => {
@@ -248,6 +257,7 @@ export const buildDecisionMemoryEntry = (payload: DecisionMemoryPayload): Decisi
     assumptions: buildAssumptionSnapshot({
       assessment: payload.assessment,
     }),
+    writeId: payload.writeId,
   };
 };
 

@@ -1,3 +1,4 @@
+import { ScreenshotCaption } from "../components/screenshotCaption";
 import Link from "next/link";
 import { ActionLink } from "../components/ui/actionLink";
 import { Tag } from "../components/ui/tag";
@@ -8,22 +9,25 @@ import { RegimePhaseMap } from "../components/history/RegimePhaseMap";
 import { MonthStrip } from "../components/history/monthStrip";
 import { TrackRecordTable, TrackRecordTiles } from "../components/history/TrackRecord";
 import { TrackRecordSection } from "../components/history/TrackRecordSection";
-import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordBody } from "../components/history/confidenceRecord";
+import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordSummary } from "../components/history/confidenceRecord";
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
 import { formatDateUTC } from "../../lib/formatters";
-import { toWeatherLabel } from "../../lib/regimeLabels";
+import { regimeKeyFromLabel, toWeatherLabel } from "../../lib/regimeLabels";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
+import { ConditionIcon } from "../components/ui/conceptIcons";
 import { ExportBoardAnnexButton } from "../components/history/ExportBoardAnnexButton";
 import { HistoryExplorer } from "./historyExplorer";
+import { ComparePanel } from "../history/compare/ComparePanel";
 import type { Metadata } from "next";
 import { buildPageMetadata } from "../../lib/seo";
 import { regimeSignalLabel } from "../../lib/report/signalTranslations";
+import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../../lib/regimeEngine";
 
 /*
  * /history had no `metadata` export at all, so it inherited the root layout's
@@ -40,7 +44,7 @@ export const metadata: Metadata = buildPageMetadata({
   imageParams: { template: "record", eyebrow: "History" },
 });
 
-type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string };
+type HistorySearchParams = { month?: string; year?: string; span?: string; explore?: string; months?: string; map?: string; compare?: string; yearA?: string; monthA?: string; yearB?: string; monthB?: string };
 
 /** The phase map's window rides in the URL, so its links have to preserve the
  *  other params on the page — a reader who has the raw-conditions disclosure open
@@ -106,6 +110,9 @@ export default async function HistoryPage({
    * ItemList naming the 82 archive periods and every published week that hang
    * off it. Until now the largest cluster in the sitemap had no declared parent.
    */
+  const compareOpen = Boolean(resolvedSearchParams?.yearA || resolvedSearchParams?.monthA || resolvedSearchParams?.compare === "1");
+  const compareContent = compareOpen ? await ComparePanel({ searchParams: resolvedSearchParams }) : null;
+
   const structuredData = buildHistoryStructuredData({
     /* The year strip below is what this page links; the quarters are reachable
        from their parent year. Declaring them here would name URLs the rendered
@@ -148,7 +155,9 @@ export default async function HistoryPage({
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
         },
-        page: { pageTitle: "History", pageSummary: "Look up what the guidance said in any past month, and how it held up.", sectionLinks: historySectionLinks },
+        /* "Record", the group this page is the hub of (`navigationGroups`): the
+           header tab, the sub-tab and the breadcrumb all name it so. */
+        page: { pageTitle: "Record", pageSummary: "Look up the guidance for any past month and see how it held up.", sectionLinks: historySectionLinks, currentPath: "/history" },
         trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
         payloads: { structuredData },
@@ -166,14 +175,20 @@ export default async function HistoryPage({
           aria-labelledby="call-by-month-heading"
           className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
-          <h2 id="call-by-month-heading" className="text-xl font-semibold text-white sm:text-2xl">Conditions by month</h2>
+          <h2 id="call-by-month-heading" className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">Conditions by month</h2>
           {weekAfterRecord ? (
             <p className="text-sm text-slate-300">
-              Since the last month-end, the week of {weekAfterRecord.recordDateLabel} was published as{" "}
+              Since the last month-end, the week of {publishedBriefWeekLabel(weekAfterRecord)} was published as{" "}
               <span className="font-semibold text-white">{publishedBriefDisplay(weekAfterRecord).conditions}</span>.{" "}
-              <ActionLink href={buildPublishedBriefPath(weekAfterRecord.slug)} variant="inline">
+              {/* Inline with vertical padding, not the 44px inline-flex box: on a
+                  phone the box wrapped onto its own line and opened the paragraph
+                  to twice its leading. */}
+              <Link
+                href={buildPublishedBriefPath(weekAfterRecord.slug)}
+                className="weather-hit py-3 font-semibold text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200"
+              >
                 Read that week
-              </ActionLink>
+              </Link>
             </p>
           ) : null}
           <MonthStrip entries={fullSeries} />
@@ -182,24 +197,31 @@ export default async function HistoryPage({
               screens from the strip that draws the same months. */}
           <div className="space-y-2">
             <h3 className="type-eyebrow">Each closed year</h3>
-            <ul className="flex flex-wrap gap-2">
-              {postureArchiveYears.map((year) => (
-                <li key={year.slug}>
-                  <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill">
-                    {year.title}
-                    <span className="ml-2 text-slate-400">{toWeatherLabel(year.operatorLabel)}</span>
-                  </ActionLink>
-                </li>
-              ))}
+            {/* Two even columns on a phone: fourteen chips of three widths
+                wrapped into a ragged stack. From `sm` they flow. */}
+            <ul className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">
+              {postureArchiveYears.map((year) => {
+                const yearRegime = regimeKeyFromLabel(year.operatorLabel);
+                return (
+                  <li key={year.slug}>
+                    <ActionLink href={buildPostureArchivePath(year.slug)} variant="pill" className="max-sm:w-full">
+                      {year.title}
+                      <span className="ml-2 inline-flex items-center gap-1 text-slate-400">
+                        {yearRegime ? <ConditionIcon regime={yearRegime} /> : null}
+                        {toWeatherLabel(year.operatorLabel)}
+                      </span>
+                    </ActionLink>
+                  </li>
+                );
+              })}
             </ul>
           </div>
-          <p className="text-sm text-slate-300">
-            For founders, finance teams and boards comparing funding environments: use the monthly record
-            to examine how the model reads past conditions. Historical readings are not evidence that a
-            forecast was published at the time, or that a company would have achieved a particular result.
-            Use the dated published briefs below when citing what Whether actually recorded.
+          <p className="max-w-prose text-sm text-slate-300">
+            The monthly record shows how the model reads past conditions. It is not evidence that a
+            forecast was published at the time, or of what a company would have done. To cite what
+            Whether actually recorded, use the dated published briefs below.
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="flex flex-wrap gap-x-5 gap-y-1">
             <ActionLink href="/history/compare" variant="inline">Compare funding conditions across periods</ActionLink>
             <ActionLink href="/answers/how-to-brief-executives-on-market-conditions" variant="inline">Prepare a board decision note</ActionLink>
             <ActionLink href="/" variant="inline">Read the current weekly brief</ActionLink>
@@ -216,15 +238,18 @@ export default async function HistoryPage({
           className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
         >
           <div>
-            <h2 id="published-briefs-heading" className="text-xl font-semibold text-white sm:text-2xl">Published weekly briefs</h2>
+            <h2 id="published-briefs-heading" className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">Published weekly briefs</h2>
             {/* Say what the archive holds, not what it aspires to. With one entry,
                 "permanent, immutable calls cited in board documents" promised a
                 record the page could not show. The count is the honest claim; the
-                append-only rule is the guarantee worth stating. */}
+                append-only rule is the guarantee worth stating. The readings go
+                unnumbered (2026-10-09): their count and window are the track
+                record's "Months on record" tile, and this line printed them a
+                second time ("177 month-end readings, Jan 2012 to Sep 2026"). */}
             <p className="text-sm text-slate-300">
               {publishedBriefs.length === 1
-                ? "Permanent, append-only weekly brief records paired with 176 months of monthly readings (2012–2026). Entries are never edited after publication, so past guidance reads the way it was published."
-                : `${publishedBriefs.length} weekly brief records paired with 176 months of monthly readings (2012–2026). Entries are never edited after publication, so past guidance reads the way it was published.`}
+                ? `We keep every weekly brief permanently, next to the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`
+                : `${publishedBriefs.length} weekly brief records paired with the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`}
             </p>
           </div>
           {/* A link card, not a pill coerced into one: the `pill` variant is a
@@ -233,12 +258,13 @@ export default async function HistoryPage({
               is where decision-flow.css puts the one underline. */}
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {publishedBriefs.map((brief) => (
-              <li key={brief.slug}>
+              <li key={brief.slug} data-frame-block="">
                 <Link href={buildPublishedBriefPath(brief.slug)} className="weather-hub-link-card text-slate-100">
                   <p className="text-sm font-semibold text-slate-100 line-clamp-1">{publishedBriefDisplay(brief).headline}</p>
                   <p className="flex items-center justify-between gap-2">
                     <span className="text-fluid-micro tabular-nums text-slate-400">{brief.recordDateLabel}</span>
-                    <Tag tone="slate">{getRegimePublicLabel(brief.regime)}</Tag>
+                    {/* The conditions stamp every page draws: glyph, word and hue. */}
+                    <Tag regime={brief.regime}>{getRegimePublicLabel(brief.regime)}</Tag>
                   </p>
                   <p className="text-fluid-xs text-slate-400 line-clamp-2">{brief.summary}</p>
                 </Link>
@@ -248,9 +274,10 @@ export default async function HistoryPage({
         </section>
       ) : null}
 
-      {/* The tiles, with the confidence record beside them: "how often did the
-          call hold" and "how often was the confidence label right" are the same
-          question asked twice, and the second answer used to live on /trust. */}
+      {/* The tiles, with the confidence record's headline beside them: "how often
+          did the call hold" and "how often was the margin right" are the same
+          question asked twice. The study itself, table and all, is /calibration's;
+          this page drew all of it until 2026-10-09. */}
       <div id="track-record" data-page-section="track-record" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         {/* The export copies the track record, so it sits in that section's
             header. It had a row of its own between the page intro and the
@@ -261,7 +288,7 @@ export default async function HistoryPage({
           aside={
             <div className="space-y-3">
               <h3 className="type-eyebrow">{CONFIDENCE_RECORD_TITLE}</h3>
-              <ConfidenceRecordBody />
+              <ConfidenceRecordSummary />
               <p className="text-fluid-xs text-slate-400">
                 <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Read the calibration study
@@ -278,7 +305,7 @@ export default async function HistoryPage({
 
       {/* Grades the record above: which regime changes were visible in the near band
           beforehand, and which were not. */}
-      <TrackRecordSection series={statsSeries} />
+      <TrackRecordSection series={statsSeries} recordChanges={trackRecord?.regimeChanges} />
 
       <div id="regime-map" data-page-section="regime-map" tabIndex={-1} className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
         <RegimePhaseMap
@@ -299,6 +326,18 @@ export default async function HistoryPage({
       </div>
 
       <UrlDetails
+        queryKey="compare"
+        initialOpen={Boolean(resolvedSearchParams?.yearA || resolvedSearchParams?.monthA || resolvedSearchParams?.compare === "1")}
+        className="weather-auto-chevron weather-panel px-5 py-4"
+        summaryClassName="cursor-pointer select-none text-fluid-xs font-medium text-white/70"
+        summary={<span>Compare two periods side by side</span>}
+      >
+        <div className="mt-4">
+          {compareOpen ? compareContent : <ActionLink href="/history/compare" variant="inline">Open the full comparison</ActionLink>}
+        </div>
+      </UrlDetails>
+
+      <UrlDetails
         queryKey="explore"
         initialOpen={isDisclosureOpenInParams(resolvedSearchParams, "explore")}
         className="weather-auto-chevron weather-panel px-5 py-4"
@@ -316,8 +355,9 @@ export default async function HistoryPage({
             regimeSeries={fullSeries}
           />
           <div className="grid gap-6 sm:grid-cols-2">
-            <HistoricalTrendChart label={regimeSignalLabel.tightness} color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" />
-            <HistoricalTrendChart label={regimeSignalLabel.riskAppetite} color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" />
+            <HistoricalTrendChart label={regimeSignalLabel.tightness} color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" changeLine={TIGHTNESS_REGIME_THRESHOLD} />
+            <HistoricalTrendChart label={regimeSignalLabel.riskAppetite} color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" changeLine={RISK_APPETITE_REGIME_THRESHOLD} />
+            <ScreenshotCaption className="sm:col-span-2" />
           </div>
         </div>
       </UrlDetails>

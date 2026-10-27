@@ -5,9 +5,7 @@ import { POST as subscribePost } from "../app/api/email/subscribe/route";
 import { POST as legacySubscribePost } from "../app/api/subscribe/route";
 import { POST as mcpPost } from "../app/api/mcp/route";
 import { POST as telemetryPost } from "../app/api/telemetry/[stream]/route";
-import { POST as premiumFunnelPost } from "../app/api/telemetry/premium-funnel/route";
 import { resetSubscriberStore } from "../lib/email/subscriberStore";
-import { resetPremiumFunnelEventLogForTests } from "../lib/storage/premiumFunnelEventRepository";
 
 type Limiter = { limit(options: { key: string }): Promise<{ success: boolean }> };
 type BindingName = "WHETHER_SUBSCRIBE_RATE_LIMITER" | "WHETHER_PUBLIC_WRITE_RATE_LIMITER" | "EMAIL";
@@ -46,7 +44,6 @@ afterEach(() => {
   uninstall("WHETHER_PUBLIC_WRITE_RATE_LIMITER");
   uninstall("EMAIL");
   resetSubscriberStore();
-  resetPremiumFunnelEventLogForTests();
   mock.restore();
 });
 
@@ -127,22 +124,16 @@ describe("subscribe endpoints under the limiter", () => {
 });
 
 describe("public write endpoints under the limiter", () => {
-  it("refuses telemetry and premium-funnel intake past the limit", async () => {
+  it("refuses telemetry intake past the limit", async () => {
     const limiter = createLimiter(1);
     install("WHETHER_PUBLIC_WRITE_RATE_LIMITER", limiter.binding);
     const headers = { "cf-connecting-ip": "192.0.2.4" };
-    const event = { type: "premium_intent", source: "export_brief", path: "/operate", ctaId: "copy_slack_brief", occurredAt: new Date().toISOString() };
+    const post = () =>
+      telemetryPost(jsonPost("https://whether.test/api/telemetry/activation", { step: "visited", path: "/" }, headers), {
+        params: { stream: "activation" },
+      });
 
-    const first = await premiumFunnelPost(jsonPost("https://whether.test/api/telemetry/premium-funnel", event, headers));
-    assert.notEqual(first.status, 429);
-
-    const second = await premiumFunnelPost(jsonPost("https://whether.test/api/telemetry/premium-funnel", event, headers));
-    assert.equal(second.status, 429);
-
-    const telemetry = await telemetryPost(
-      jsonPost("https://whether.test/api/telemetry/activation", { step: "committed" }, headers),
-      { params: { stream: "activation" } },
-    );
-    assert.equal(telemetry.status, 429);
+    assert.equal((await post()).status, 202);
+    assert.equal((await post()).status, 429);
   });
 });

@@ -4,10 +4,12 @@ import { describe, it } from "bun:test";
 
 type RedirectEntry = { source: string; destination: string; permanent: boolean };
 type RedirectPair = [source: string, destination: string];
+type ConditionalRedirect = RedirectEntry & { has: Array<{ type: string; key: string }> };
 type NextConfigModule = {
   default: {
     redirects?: () => Promise<RedirectEntry[]>;
   };
+  resolveSelectionRedirects: ConditionalRedirect[];
   canonicalSurfaceRedirectPairs: RedirectPair[];
   solutionRedirectPairs: RedirectPair[];
   iaConsolidationRedirectPairs: RedirectPair[];
@@ -25,13 +27,14 @@ describe("next.config redirects", () => {
       canonicalSurfaceRedirectPairs,
       solutionRedirectPairs,
       iaConsolidationRedirectPairs,
+      resolveSelectionRedirects,
     } = loadNextConfig();
     const redirects = (await nextConfig.redirects?.()) ?? [];
     const hasRedirect = (predicate: (entry: RedirectEntry) => boolean) =>
       redirects.some((entry: RedirectEntry) => predicate(entry));
     const expectedPairs = [...solutionRedirectPairs, ...canonicalSurfaceRedirectPairs, ...iaConsolidationRedirectPairs];
 
-    assert.equal(redirects.length, expectedPairs.length);
+    assert.equal(redirects.length, expectedPairs.length + resolveSelectionRedirects.length);
 
     for (const [source, destination] of expectedPairs) {
       assert.ok(
@@ -39,6 +42,31 @@ describe("next.config redirects", () => {
         `missing redirect ${source} -> ${destination}`,
       );
     }
+  });
+});
+
+/*
+ * /resolve stopped being a page on 2026-10-08. Its role, stage, library and toolkit
+ * views came from its query string, and the `/guides/*` rules sent readers there with
+ * one — browsers hold those 308s. A link that carries a selection lands on Guides'
+ * More tools, where the same views render; the bare path lands on Decide's Test step.
+ */
+describe("/resolve with a selection", () => {
+  it("goes to More tools on Guides, ahead of the bare /resolve rule", async () => {
+    const { default: nextConfig, resolveSelectionRedirects } = loadNextConfig();
+    const redirects = (await nextConfig.redirects?.()) ?? [];
+    assert.deepEqual(
+      resolveSelectionRedirects.map((entry) => entry.has[0]?.key).sort(),
+      ["library", "stage", "stakeholder", "toolkitQuery"],
+    );
+    for (const entry of resolveSelectionRedirects) {
+      assert.equal(entry.source, "/resolve");
+      assert.equal(entry.destination, "/resources#more-tools");
+      assert.equal(entry.permanent, true);
+    }
+    const bare = redirects.findIndex((entry) => entry.source === "/resolve" && !("has" in entry));
+    const lastConditional = Math.max(...resolveSelectionRedirects.map((entry) => redirects.indexOf(entry)));
+    assert.ok(bare > lastConditional, "a selection would otherwise land on Decide and lose its view");
   });
 });
 

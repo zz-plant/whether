@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="128" viewBox="0 0 360 128" role="img" aria-labelledby="dark-condition-expansion-glyph-title dark-condition-expansion-glyph-desc">
+<title id="dark-condition-expansion-glyph-title">Sunny glyph</title>
+<desc id="dark-condition-expansion-glyph-desc">Sunny condition reference: the canonical weather glyph beside its name. Money is cheap and available.</desc>
+<g font-family="Archivo, Arial, sans-serif" font-variant-numeric="tabular-nums">
+
+<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#f5cf5a" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun shrink-0 text-[color:var(--regime-ink)]" data-regime="EXPANSION" data-concept-icon="condition" aria-hidden="true" focusable="false" x="24" y="40"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg><text x="94" y="76" font-size="32" font-weight="600" fill="#f5cf5a" text-anchor="start">Sunny</text>
+</g>
+</svg>

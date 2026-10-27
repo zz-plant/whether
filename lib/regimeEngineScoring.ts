@@ -12,13 +12,13 @@
 import type { MacroSeriesReading, TreasuryData } from "./types";
 import {
   MISSING_SLOPE_FALLBACK,
-  TIGHTNESS_CAP,
   computeBaseRateVelocityPoints,
   computeCurveSlope,
   computeRiskAppetiteScore,
   computeTightnessPressure,
   computeTightnessScore,
   getBaseRate,
+  isTightnessSaturated,
   resolveThresholds,
   type RegimeEvaluationContext,
   type RegimeKey,
@@ -148,7 +148,7 @@ export const scoreRegime = (
     scores: {
       tightness,
       tightnessPressure,
-      tightnessSaturated: tightnessPressure > TIGHTNESS_CAP,
+      tightnessSaturated: isTightnessSaturated(baseRateForScore, thresholds.baseRateTightness, tightness),
       riskAppetite,
       baseRateUsed: baseRate.used,
       baseRate: baseRate.value,
@@ -157,6 +157,8 @@ export const scoreRegime = (
       // Set only when measured: a JSON round-trip drops undefined keys, and a
       // snapshot that re-reads must equal the one that was written.
       ...(velocity.delta === null ? {} : { baseRateVelocityDelta: velocity.delta }),
+      // Set only when an input outside the record basis adjusted a score, for the same reason.
+      ...(macroAdjusted.offRecord ? { offRecord: macroAdjusted.offRecord } : {}),
     },
     diagnostics: diagnosticsWithShock,
     warnings,

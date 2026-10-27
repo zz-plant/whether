@@ -1,6 +1,6 @@
 import type { GovernanceParameterSet } from "./policy/governance";
 import type { RegimeStateTransition } from "./regimeStateMachine";
-import type { TreasuryYields, RegimeKey } from "./types";
+import type { MacroSeriesId, TreasuryYields, RegimeKey } from "./types";
 
 export type { RegimeKey };
 
@@ -20,8 +20,13 @@ export interface RegimeScores {
    * while hand-built fixtures that only pin the classification inputs need not.
    */
   tightnessPressure?: number;
-  /** Whether `tightness` is pinned at its ceiling, so a flat score is the clip
-   *  rather than a flat reading. */
+  /**
+   * Whether `tightness` is pinned at its ceiling, so a flat score is the clip
+   * rather than a flat reading: a higher base rate would not raise it. Either
+   * the rate component is at its own ceiling (`TIGHTNESS_BASE_RATE_POINTS`,
+   * reached at a 4.0% base rate) or the published score is at `TIGHTNESS_CAP`,
+   * whichever component or add-on put it there (`isTightnessSaturated`).
+   */
   tightnessSaturated?: boolean;
   riskAppetite: number;
   baseRateUsed: "FED" | "1M" | "3M" | "MISSING";
@@ -37,7 +42,26 @@ export interface RegimeScores {
   /** The trailing-window base-rate move the velocity term measured, in points.
    *  Absent with the points when no history was supplied. */
   baseRateVelocityDelta?: number;
+  /**
+   * The two scores with the market inputs outside the record basis counted
+   * (`RECORD_BASIS_MARKET_INPUTS`), and which of those inputs adjusted them.
+   * The scores above leave them out, and so do the conditions, the machine and
+   * every line an area is judged against: an input the archive cannot score
+   * cannot be tested by the record that vouches for the call. Reported so a
+   * reader can still see what those inputs say (`lib/report/scoringBasis.ts`).
+   *
+   * Absent when no input outside the record adjusted a score, and on every
+   * assessment scored before 2026-10-09, whose published scores counted them.
+   */
+  offRecord?: OffRecordScores;
 }
+
+/** The scores with every market input counted, and the inputs outside the record basis that moved them. */
+export type OffRecordScores = {
+  tightness: number;
+  riskAppetite: number;
+  inputs: MacroSeriesId[];
+};
 
 type RegimeInput = {
   id: "base-rate" | "two-year" | "ten-year" | "curve-slope";
@@ -368,8 +392,19 @@ export const CONFIDENCE_PERCENT_IMPUTED_CEILING = 30;
  * The archive generators stamp it on every entry they write (`engineVersion`),
  * and the operating snapshot's input hash includes it, so two snapshots of the
  * same inputs scored by different calibrations are stored as two snapshots.
+ *
+ * - `engine-2026-10-06`: the first stamped calibration. Every market input the
+ *   engine reads adjusted the published scores.
+ * - `engine-2026-10-09`: the record basis. Only the market inputs the archive
+ *   scores adjust them (`RECORD_BASIS_MARKET_INPUTS`); the rest are reported in
+ *   `RegimeScores.offRecord` and move nothing.
+ * - `engine-2026-10-09b`: the Chicago Fed index joins the record basis, with
+ *   its month-end history backfilled into the archive from FRED's `NFCI`.
+ * - `engine-2026-10-21`: `tightnessSaturated` means the score has stopped
+ *   responding to the base rate (`isTightnessSaturated`), not that pressure
+ *   passed 100. Only the flag moved: no score, regime or diagnostic did.
  */
-export const ENGINE_VERSION = "engine-2026-10-06";
+export const ENGINE_VERSION = "engine-2026-10-21";
 
 export const DEFAULT_THRESHOLDS: RegimeThresholds = {
   baseRateTightness: BASE_RATE_TIGHTNESS_THRESHOLD,
@@ -568,6 +603,22 @@ export const computeTightnessPressure = (
       : SCORE_MIN;
   return baseRatePoints + inversionPoints + baseRateVelocityPoints;
 };
+
+/**
+ * Whether a published tightness score has stopped responding to the base rate.
+ *
+ * Two ceilings pin it: the rate component's own (90 points, at a 4.0% base rate
+ * on the default threshold), which leaves the score flat at 90 on a positive
+ * curve, and the score's (`TIGHTNESS_CAP`), which inversion, tightening speed or
+ * the Chicago Fed add-on can reach first. Until `engine-2026-10-21` this was
+ * `pressure > TIGHTNESS_CAP`, which set the flag on a 0% bill with a deep
+ * inversion (pressure 101, tightness 25, the inversion clip) and left it unset
+ * from 4.00% to 4.05% on a flat curve, where the score was already flat at 90.
+ * Pressure leaves the add-on out, so it could not see that ceiling either.
+ */
+export const isTightnessSaturated = (baseRate: number, baseRateThreshold: number, tightness: number) =>
+  tightness >= TIGHTNESS_CAP ||
+  Math.round((baseRate - baseRateThreshold) * BASE_RATE_TIGHTNESS_MULTIPLIER) >= TIGHTNESS_BASE_RATE_POINTS;
 
 export const computeTightnessScore = (
   baseRate: number,

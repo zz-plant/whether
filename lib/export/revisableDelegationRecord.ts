@@ -146,7 +146,7 @@ const conditionsFromAssumptions = (
 
 const describeDecision = (entry: DecisionMemoryEntry): string => {
   const decision = entry.decision;
-  if (!decision) return "operating posture";
+  if (!decision) return "standing guidance";
   return `${decision.category} / ${decision.action} (${decision.lifecycle})`;
 };
 

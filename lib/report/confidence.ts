@@ -22,6 +22,9 @@ export type ConfidenceInputs = {
      */
     baseRateUsed?: "FED" | "1M" | "3M" | "MISSING";
     curveSlope?: number | null;
+    /* Optional for the same reason: set on every live assessment, never stored. */
+    tightnessPressure?: number;
+    tightnessSaturated?: boolean;
   };
   thresholds: {
     tightnessRegime: number;
@@ -52,9 +55,58 @@ const hasImputedInputs = ({ scores }: ConfidenceInputs): boolean =>
  * the move the underlying rate or slope would have to make.
  */
 const resolveLineGaps = ({ scores, thresholds }: ConfidenceInputs) => ({
-  tightness: Math.abs(scores.tightness - thresholds.tightnessRegime),
+  tightness: resolveTightnessGap({ scores, thresholds }),
   riskAppetite: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime) * RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
 });
+
+/**
+ * Funding pressure's distance from its line, counting the points the published
+ * score hides.
+ *
+ * The published score is the pressure's clamped form, so a pinned score has to
+ * shed its pressure above that clamp before the published number moves at all,
+ * and the distance from the line is the gap the reader sees plus that headroom.
+ * The headroom is `pressure - score` itself, not `pressure - TIGHTNESS_CAP`:
+ * the base-rate component caps at 90 points, so on the week of Oct 19, 2026
+ * (published 90, pressure 110) the score shed 20 hidden points before it moved
+ * and only then the 20 more to reach the line — 40, not the 30 subtracting the
+ * global cap reported, and nothing at all for pressure 91 through 100, where the
+ * saturation flag stays off. The same holds whenever any clamp binds: an
+ * inversion capped at 25 hides its excess the same way. An unpinned score has
+ * pressure equal to score, so the headroom is zero, and a caller without the
+ * pressure still gets the published gap alone.
+ */
+const resolveTightnessGap = ({ scores, thresholds }: ConfidenceInputs): number => {
+  const gap = Math.abs(scores.tightness - thresholds.tightnessRegime);
+  const hidden =
+    typeof scores.tightnessPressure === "number" && scores.tightness > thresholds.tightnessRegime
+      ? Math.max(0, scores.tightnessPressure - scores.tightness)
+      : 0;
+  return gap + hidden;
+};
+
+/**
+ * The margin a reader is shown: the score nearest its change line, chosen the way
+ * the published label chooses it (on the tightness-equivalent scale), and how many
+ * of that score's own points separate it from the line, so the number can be
+ * checked against the score printed beside it. Null when an input was imputed:
+ * a distance from a stand-in value is not a margin.
+ *
+ * The API keeps calling this `confidence`; pages, pastes and email call it the
+ * margin, because a distance is what it is (docs/developer/api-reference.md).
+ */
+export const resolveNearestLineMargin = (
+  inputs: ConfidenceInputs,
+): { signal: "tightness" | "riskAppetite"; points: number } | null => {
+  if (hasImputedInputs(inputs)) return null;
+  const gaps = resolveLineGaps(inputs);
+  const signal = gaps.riskAppetite < gaps.tightness ? "riskAppetite" : "tightness";
+  const raw =
+    signal === "tightness"
+      ? gaps.tightness
+      : Math.abs(inputs.scores.riskAppetite - inputs.thresholds.riskAppetiteRegime);
+  return { signal, points: Math.round(raw) };
+};
 
 /** Points from the nearest regime boundary, on the tightness scale. */
 export const resolveDistanceToFlip = (inputs: ConfidenceInputs): number => {

@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { readFile } from "node:fs/promises";
 import { describe, it } from "bun:test";
 import { PUBLISH_MAX_RECORD_AGE_DAYS, assessPublishReadiness } from "../lib/report/briefPublishGuard";
+import { liveMacroSeries } from "./fixtures/reportFixtures";
 
 const NOW = new Date("2026-08-29T04:00:00Z");
 
@@ -11,6 +12,7 @@ const ready = (overrides: Partial<Parameters<typeof assessPublishReadiness>[0]> 
     isFallback: false,
     isLive: true,
     fallbackReason: null,
+    macroSeries: liveMacroSeries,
     recordDate: "2026-08-27",
     now: NOW,
     ...overrides,
@@ -56,6 +58,23 @@ describe("publish readiness", () => {
     assert.equal(ready({ recordDate: atLimit.toISOString().slice(0, 10) }).ok, true);
   });
 
+  it("refuses a live Treasury read whose macro inputs fell back to the snapshot", () => {
+    // `loadMacroSeries` keeps the snapshot value for a failed FRED fetch and the engine scores
+    // it, so the Treasury flag alone let a partial macro outage publish as this week's reading.
+    const result = ready({
+      macroSeries: liveMacroSeries.map((series) =>
+        series.id === "VIX_INDEX" || series.id === "CPI_YOY" ? { ...series, isLive: false } : series,
+      ),
+    });
+
+    assert.equal(result.ok, false);
+    assert.match(result.ok === false ? result.reason : "", /Macro inputs are snapshot values/);
+    for (const id of ["VIX_INDEX", "CPI_YOY"]) {
+      const label = liveMacroSeries.find((series) => series.id === id)?.label ?? id;
+      assert.ok(result.ok === false && result.reason.includes(label), `reason names ${label}`);
+    }
+  });
+
   it("still refuses when report assembly failed outright", () => {
     assert.equal(ready({ degraded: true }).ok, false);
   });
@@ -82,6 +101,7 @@ describe("staleness boundary", () => {
           degraded: false,
           isFallback: false,
           isLive: true,
+          macroSeries: liveMacroSeries,
           recordDate: "2026-08-19",
           now,
         }).ok,
@@ -98,6 +118,7 @@ describe("staleness boundary", () => {
           degraded: false,
           isFallback: false,
           isLive: true,
+          macroSeries: liveMacroSeries,
           recordDate: "2026-08-18",
           now: new Date(`2026-08-29${hour}`),
         }).ok,

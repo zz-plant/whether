@@ -64,6 +64,17 @@ describe("homepage heading contract", () => {
     assert.equal(headingFor(html, "weekly-call-title"), "h2");
   });
 
+  it("prints what the weather word means under the call, not on the stamp line", () => {
+    /* The stamp line ran the meaning, the week's direction and the earlier
+       conditions together ahead of the call; the meaning is the line under it. */
+    const html = renderToStaticMarkup(<DecisionHero {...heroProps} weeklyCall="Freeze new commitments." direction="Tightening this week" />);
+    const call = html.indexOf('id="weekly-call-title"');
+    const meaning = html.indexOf("data-regime-meaning");
+    assert.ok(call > 0 && meaning > call, "the meaning follows the call");
+    assert.match(html, /data-regime-meaning="true">Money is available but pricey\.</);
+    assert.ok(html.indexOf("Tightening this week") < call, "the week's direction stays on the stamp line");
+  });
+
   it("anchors the share-ready artifact on the card that is the artifact", () => {
     const html = renderToStaticMarkup(<DecisionHero {...heroProps} />);
     assert.match(html, /id="share-ready-artifact"/);
@@ -88,5 +99,19 @@ describe("homepage heading contract", () => {
   it("hands the h1 to the cadence card when one is selected", () => {
     assert.match(page, /<CadenceCallCard model=\{cadenceCall\} titleLevel="h1" \/>/);
     assert.match(page, /titleLevel=\{cadenceCall \? "h2" : "h1"\}/);
+  });
+
+  /* The week picker printed "Week of Oct 7, 2026" as an h2 above the h1 (site review,
+     2026-10-09), so the outline opened on a date. Every heading the route mounts
+     above the sections is the verdict now, and the sections are h2s under it. */
+  it("puts no heading above the verdict: the week picker and the legend are labels", () => {
+    const picker = readFileSync("app/components/TimeMachineCalendarPicker.tsx", "utf8");
+    const legend = readFileSync("app/components/home/ConditionsLegend.tsx", "utf8");
+    assert.doesNotMatch(picker, /<h[1-6]\b/, "the week label is not a heading");
+    assert.doesNotMatch(legend, /<h[1-6]\b|<details/, "the legend is one line, with no heading or fold");
+    // A live week is named by its Monday; an archived view by its month-end,
+    // since the archive steps a month at a time (2026-10-14).
+    assert.match(page, /currentDateLabel=\{cadenceTitle \?\? periodLabel\}/, "the stepper names the period on screen");
+    assert.match(page, /const periodLabel = historicalSelection\s*\?\s*`Month-end \$\{formatDateUTC\(historicalSelection\.asOf\)\}`\s*:\s*weekOfLabel/, "a live week is named by its Monday, an archived one by its month-end");
   });
 });

@@ -101,7 +101,7 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
           {/* One live region for the whole sequence: advancing a frame replaces
               the content rather than adding a second thing to announce. */}
           <div className="mx-auto flex w-full max-w-4xl flex-1 flex-col justify-center py-8" aria-live="polite">
-            <p className="type-eyebrow text-sky-300/70">{FRAME_TITLES[frame]}</p>
+            <p className="type-eyebrow">{FRAME_TITLES[frame]}</p>
 
             {frame === 0 ? (
               <div className="mt-4 space-y-6">
@@ -149,7 +149,7 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
                   </ol>
                 )}
                 {artifact.noChangeAreas && artifact.noChangeAreas.length > 0 ? (
-                  <p className="border-t border-white/[0.08] pt-4 text-fluid-sm text-white/45">
+                  <p className="border-t border-[color:var(--border-subtle)] pt-4 text-fluid-sm text-white/45">
                     Unchanged: {artifact.noChangeAreas.join(" · ")}
                   </p>
                 ) : null}

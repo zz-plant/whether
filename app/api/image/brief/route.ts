@@ -1,6 +1,7 @@
 import { ImageResponse } from "next/og";
+import { weeklyHeadline } from "../../../../lib/report/reportEvidence";
 import { assembleHomePage } from "../../../../lib/report/homePageAssembler";
-import { renderBriefImage, type BriefImageProps } from "../../../../lib/image/briefImageTemplate";
+import { parseBriefImageVariant, renderBriefImage, type BriefImageProps } from "../../../../lib/image/briefImageTemplate";
 import { loadOgFonts } from "../../../../lib/image/ogFonts";
 import { buildScoreReadings, previousScoresFromDynamics } from "../../../../lib/export/scoreReference";
 import { notLiveReadingLabel, readerSourceLabel } from "../../../../lib/report/homeSharePreview";
@@ -46,6 +47,8 @@ const buildImageContextLabel = (
 
 type BuildBriefImagePayloadInput = {
   weeklyDecisionCardModel: BriefImageHomepage["weeklyDecisionCardModel"];
+  /** The contract the headline is read from (`weeklyHeadline`). */
+  weeklyCall: Pick<BriefImageHomepage["weeklyCall"], "actionNow" | "currentCall">;
   reportShell: Pick<
     BriefImageHomepage["reportShell"],
     "regime" | "recordDateLabel" | "provenance" | "historicalBanner" | "showOfflineBadge"
@@ -65,12 +68,9 @@ export const buildBriefImagePayload = (
   const callChangeLines = model.diagnostics.postureTrajectory?.thresholds;
 
   return {
-    /* The week's action, as the weekly call contract and every paste lead with it
-       (docs/claims-ledger.md). */
-    decision:
-      model.decision.actionNowShort?.trim() ||
-      model.decision.canonicalDecisionCopy?.doNowLines?.[0] ||
-      model.decision.immediateDecision,
+    /* The week's headline action, as the homepage h1 and every paste lead with
+       it (`weeklyHeadline`, docs/claims-ledger.md). */
+    decision: weeklyHeadline(homepage.weeklyCall).action,
     regime: shell.regime,
     /* The derivation `/share` and every paste print: the lines the scores are
        judged against, how far from each, and the earlier reading under its
@@ -97,7 +97,9 @@ export const buildBriefImagePayload = (
 };
 
 export async function GET(request: Request) {
-  const requestContext = parseImageBriefRequestContext(new URL(request.url).searchParams);
+  const searchParams = new URL(request.url).searchParams;
+  const requestContext = parseImageBriefRequestContext(searchParams);
+  const variant = parseBriefImageVariant(searchParams);
   const [homepage, fonts] = await Promise.all([
     assembleHomePage(requestContext),
     loadOgFonts(request.url),
@@ -108,8 +110,8 @@ export async function GET(request: Request) {
   // U+2264 in a flip condition, an arrow). That fetch failing aborts the render
   // after the headers are already sent, so the card downloads as an empty file.
   const image = new ImageResponse(
-    renderBriefImage(buildBriefImagePayload(homepage, requestContext)),
-    { width: 1200, height: 800, ...(fonts ? { fonts } : {}) },
+    renderBriefImage(buildBriefImagePayload(homepage, requestContext), variant),
+    { width: variant.width, height: variant.height, ...(fonts ? { fonts } : {}) },
   );
 
   image.headers.set(

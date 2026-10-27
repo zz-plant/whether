@@ -451,7 +451,7 @@ export function TimelineBar({
             onClick={goToPrevious}
             disabled={!canGoPrevious}
             aria-label="Previous month"
-            className="weather-timeline-control inline-flex items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30 weather-focus-ring"
+            className="weather-timeline-control inline-flex items-center justify-center rounded-md border border-[color:var(--border-subtle)] bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30 weather-focus-ring"
           >
             <ChevronLeft className="size-3.5" aria-hidden="true" />
           </button>
@@ -461,7 +461,7 @@ export function TimelineBar({
             onClick={goToNext}
             disabled={!canGoNext}
             aria-label="Next month"
-            className="weather-timeline-control inline-flex items-center justify-center rounded-md border border-white/10 bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30 weather-focus-ring"
+            className="weather-timeline-control inline-flex items-center justify-center rounded-md border border-[color:var(--border-subtle)] bg-white/[0.04] text-white/70 transition-colors hover:bg-white/[0.08] hover:text-white disabled:pointer-events-none disabled:opacity-30 weather-focus-ring"
           >
             <ChevronRight className="size-3.5" aria-hidden="true" />
           </button>
@@ -517,7 +517,7 @@ export function TimelineBar({
             on the group, where a reader already hovers when looking for zoom. */}
         {showZoomControls ? (
           <div
-            className="flex items-center gap-1 bg-slate-950/70 border border-white/10 p-0.5 rounded-lg text-fluid-micro"
+            className="flex items-center gap-1 bg-slate-950/70 border border-[color:var(--border-subtle)] p-0.5 rounded-lg text-fluid-micro"
             title="Pinch, or hold ⌘/Ctrl and scroll, to zoom. Scroll sideways to pan."
           >
             <span className="px-1.5 text-slate-500 flex items-center gap-0.5">
@@ -573,7 +573,7 @@ export function TimelineBar({
             const absoluteIndex = viewWindow.start + offset;
             const isEntryPreviewed = previewIndex === absoluteIndex;
             const isEntryActive = handleIndex === absoluteIndex;
-            const hexColor = REGIME_HEX_COLORS[entry.regime] ?? "#64748b";
+            const hexColor = REGIME_HEX_COLORS[entry.regime] ?? "var(--regime-accent)";
 
             return (
               <div

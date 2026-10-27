@@ -9,9 +9,6 @@ import {
 } from "../../../lib/seo";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import { graph } from "../../../lib/seo/pageStructuredData";
-import { revisitDecisionPhrase } from "../../../lib/report/decisionTransmissionCopy";
-import { comparisonBasis } from "../../../lib/report/comparisonBasis";
-import { describeScoresMovement } from "../../../lib/report/evidenceReaderModel";
 import {
   canonicalCapitalDisciplinePath,
   findResourcePillarBySlug,
@@ -35,15 +32,19 @@ import {
   downloadableResources,
 } from "../../../lib/downloadableResources";
 import { resourceArticles } from "../../../lib/resourceArticles";
-import { loadWeeklyBriefSnapshot } from "../../../lib/report/weeklyBriefSnapshot";
+import { loadPostureLine } from "../postureLine";
 import {
+  isIndexableAnswerSlug,
   isIndexableResourceArticleSlug,
   isIndexableResourcePillarSlug,
   noindexRobots,
 } from "../../../lib/seo/indexationPolicy";
+import { selectAnswersCiting } from "../../../lib/seo/relatedAnswers";
+import { answerPages } from "../../answers/decisionPages";
 import { ContentMeasurementTracker } from "../../components/contentMeasurementTracker";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { ActionLink } from "../../components/ui/actionLink";
 import { JsonLdScript } from "../../components/jsonLdScript";
 
@@ -74,28 +75,6 @@ const buildSectionAnchor = (heading: string) =>
     .replace(/[^a-z0-9\s-]/g, "")
     .trim()
     .replace(/\s+/g, "-");
-
-/* This week's conditions and direction in one sentence, for a page that is not
-   the brief: the articles' live-guidance block and the pillars' header both
-   print it, so a reader arriving from search meets the current posture before
-   the essay (AGENTS.md, "Thin SEO page"). */
-const loadPostureLine = async (route: string) => {
-  const { reportData, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
-  const { homeBriefModel, displayRegime } = snapshot;
-  /* The answer pages' direction and basis (app/answers/decisionAnswerCopy.ts):
-     this printed the engine's `directionLabel` "this week", which on Oct 5 was
-     "and mixed this week; revisit last week's decisions" for two scores that
-     had both worsened since Aug 31. */
-  const movement = describeScoresMovement(reportData.reportDynamics);
-  const basis = comparisonBasis(reportData.reportDynamics.comparedWith);
-  const direction =
-    movement === null ? ", with no comparison to last week available" : ` and ${movement} ${basis.since}`;
-  return {
-    reportData,
-    snapshot,
-    postureSummary: `Conditions are ${displayRegime.label}${direction}; ${revisitDecisionPhrase(homeBriefModel.revisitDecisions, basis)}.`,
-  };
-};
 
 export async function generateMetadata({ params }: { params: Promise<Params> }): Promise<Metadata> {
   const { slug } = await params;
@@ -151,7 +130,10 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 export default async function ResourcePillarPage({ params }: { params: Promise<Params> }) {
   const { slug } = await params;
   if (isRetiredResourceArticleSlug(slug)) {
-    permanentRedirect("/planning#ops-export-briefs");
+    // Guides, where the remaining guides are. This pointed at a share step on
+    // the plan through the legacy /planning name: two hops into a step that
+    // left the plan on 2026-10-08.
+    permanentRedirect("/resources");
   }
   const downloadableResource = findDownloadableResourceBySlug(slug);
   if (downloadableResource) {
@@ -164,6 +146,8 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
     const { homeBriefModel } = snapshot;
     const decisionAreas = getResourceArticleDecisionAreas(article);
     const mappedRules = homeBriefModel.decisionRules.filter((rule) => decisionAreas.includes(rule.area)).slice(0, 3);
+    const weeklyAnswers = selectAnswersCiting(`/resources/${article.slug}`, answerPages, { isEligible: isIndexableAnswerSlug })
+      .map((answer) => ({ href: `/answers/${answer.slug}`, title: answer.title }));
 
     /* The link back to the brief is inside the article's live-guidance block.
        It was a pair of pills ("Start from Weekly Brief", "Return to Planning")
@@ -177,6 +161,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           mappedRules,
           freshnessLabel: reportData.fetchedAtLabel,
           recordDateLabel: reportData.recordDateLabel,
+          weeklyAnswers,
         }}
       />
     );
@@ -215,10 +200,10 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
   const isParentGuide = `/resources/${page.slug}` === canonicalCapitalDisciplinePath;
   const relatedPages = [
     { href: canonicalCapitalDisciplinePath, label: "Capital discipline for venture-backed companies" },
-    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital posture framework" },
+    { href: "/resources/board-level-capital-posture-framework", label: "Board-level capital framework" },
     { href: "/resources/reversibility-as-governance", label: "Reversibility as governance" },
     { href: resourceSupportingPages.decisionShieldOverview.path, label: "Decision Shield overview" },
-    { href: resourceSupportingPages.capitalPostureTemplate.path, label: "Capital Posture Template" },
+    { href: resourceSupportingPages.capitalPostureTemplate.path, label: "Capital Planning Template" },
   ].filter((link) => link.href !== `/resources/${page.slug}`);
   const linkClass = "text-sky-200 underline decoration-sky-400/60 underline-offset-4 hover:text-sky-100";
   const lexiconByIndex = ["capital-regime", "escalation-thresholds", "reversibility", "30-day-confirmation-logic"] as const;
@@ -232,16 +217,13 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
       />
       <JsonLdScript data={articleSchema} />
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "Resources", href: "/resources" },
-          { label: page.h1 },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(`/resources/${page.slug}`, [{ name: page.h1, path: `/resources/${page.slug}` }]),
+        )}
       />
 
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-        <p className="type-eyebrow">Governance guide</p>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">{page.h1}</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">{page.h1}</h1>
         <p className="text-sm text-slate-200">{page.description}</p>
         <p className="text-sm text-slate-300">{page.boardPackContext}</p>
         {/* The week the guide is being read in. Two pill buttons ("Start from
@@ -251,7 +233,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
           <p className="type-eyebrow">This week</p>
           <p className="text-sm text-slate-200">{postureSummary}</p>
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
-            <span>As of {reportData.recordDateLabel}</span>
+            <span>Data as of {reportData.recordDateLabel}</span>
             <ActionLink href="/" variant="inline">Open this week&apos;s brief</ActionLink>
           </p>
         </div>
@@ -356,7 +338,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
         body="Ask for a walkthrough of the board pack."
         keyword={page.keyword}
         sourceSlug={page.slug}
-        downloadLabel="Download Capital Posture Template"
+        downloadLabel="Download Capital Planning Template"
       />
     </ContentPageShell>
   );

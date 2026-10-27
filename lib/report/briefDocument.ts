@@ -1,4 +1,5 @@
-import type { RegimeAssessment } from "../regimeEngine";
+import { ENGINE_VERSION, type RegimeAssessment } from "../regimeEngine";
+import { weeklyHeadline } from "./reportEvidence";
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { BriefArtifact, BriefDocument } from "./briefArtifact";
@@ -20,6 +21,7 @@ import { buildPostureState } from "./postureStateSource";
 import type { PostureStateContract } from "./postureStateContract";
 import { buildWeeklyBriefSnapshot } from "./weeklyBriefSnapshot";
 import { isSavedCopy, publisherSourceLabel } from "./provenanceStatus";
+import { resolveScoringBasis, type ScoringBasis } from "./scoringBasis";
 
 /**
  * What a brief document is built from: one reading, wherever it was read.
@@ -43,6 +45,12 @@ type BriefDocumentSource = {
   previousScores?: PreviousReading | null;
   /** A Time Machine read, which publishes no live confidence. */
   historical?: boolean;
+  /**
+   * Which inputs set the scores, from the engine that scored the reading
+   * (`resolveScoringBasis`). A source that names none was scored by the
+   * current engine, as a read built here is.
+   */
+  scoringBasis?: ScoringBasis;
 };
 
 /**
@@ -61,6 +69,7 @@ export const briefSourceFromSnapshot = (snapshot: OperatingSnapshot): BriefDocum
     resolveWeekDynamics(snapshot.assessment, snapshot.recordDate).reportDynamics,
     snapshot.assessment.scores,
   ),
+  scoringBasis: resolveScoringBasis({ engineVersion: snapshot.engineVersion, assessment: snapshot.assessment }),
 });
 
 /** The reading the page read path serves, with the comparison it carries. */
@@ -73,6 +82,7 @@ export const briefSourceFromReportData = (reportData: ReportData | ReportDataFal
   sensors: reportData.sensors,
   previousScores: previousScoresFromDynamics(reportData.reportDynamics, reportData.assessment.scores),
   historical: Boolean(reportData.historicalSelection),
+  scoringBasis: reportData.scoringBasis,
 });
 
 /**
@@ -126,16 +136,18 @@ export const buildBriefDocument = (
   const sensors = source.sensors ?? buildSensorReadings(treasury);
   const thresholds = assessment.thresholds;
   const sourceLabel = publisherSourceLabel(source.sourceLabel);
+  const scoringBasis = source.scoringBasis ?? resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment });
 
   return {
     /* The artifact the share rail renders, field for field as /share published it. */
     title: options.title ?? "Whether Weekly Brief",
     recordDateLabel: source.recordDateLabel,
-    /* `actionNow`, not `currentCall`: the homepage artifact leads with the
-       canonical do-now line, and for the bundled fallback snapshot the two
-       differ — so the same Slack button copied two different calls. */
-    call: call.actionNow,
-    actionNow: call.actionNow,
+    /* The week's headline (`weeklyHeadline`), the sentence the homepage leads
+       with. The action went here and the call was dropped, then printed under
+       "Guidance" by other formats, so one week pasted two different headlines;
+       `actionNow` repeats it so no format adds a competing do-now line. */
+    call: weeklyHeadline(call).composed,
+    actionNow: weeklyHeadline(call).composed,
     guardrail: pauseIf,
     reversal: call.callChangesIf,
     resumeWhen: call.resumeWhen,
@@ -152,6 +164,7 @@ export const buildBriefDocument = (
     lines: { tightness: thresholds.tightnessRegime, riskAppetite: thresholds.riskAppetiteRegime },
     stageLabel,
     sourceLabel,
+    basis: scoringBasis.sentence,
 
     conditions: {
       regime: assessment.regime,
@@ -165,6 +178,7 @@ export const buildBriefDocument = (
       recordDate: treasury.record_date,
       isFallback,
       permalink: buildBriefPermalinkUrl(treasury.record_date),
+      scoringBasis,
     },
     slots: {
       currentCall: call.currentCall,
@@ -179,6 +193,9 @@ export const buildBriefDocument = (
     },
     readings: {
       scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
+      ...(assessment.scores.tightnessSaturated === true && typeof assessment.scores.tightnessPressure === "number"
+        ? { tightnessPressure: assessment.scores.tightnessPressure, tightnessSaturated: true }
+        : {}),
       thresholds,
       vsThreshold: {
         tightness: assessment.diagnostics.tightnessVsThreshold,
@@ -253,4 +270,5 @@ export const briefArtifactOf = (document: BriefDocument): BriefArtifact => ({
   lines: document.lines,
   stageLabel: document.stageLabel,
   sourceLabel: document.sourceLabel,
+  basis: document.basis,
 });

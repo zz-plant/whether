@@ -2,7 +2,7 @@ import type { CSSProperties, ReactElement } from "react";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { REGIME_ORDER, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { REGIME_HEX_COLORS } from "../../../lib/regimePhaseSpace";
-import { GlyphMotif, OG_BG, OG_FONT_BODY, OG_FONT_DISPLAY, OG_TEXT, OG_TEXT_MUTED } from "./ogTheme";
+import { GlyphMotif, OG_ACCENT, OG_BG, OG_BORDER_STRONG, OG_CONDITION_INK, OG_FONT_BODY, OG_FONT_DISPLAY, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
 
 /**
  * Chart-forward social image for a published weekly brief.
@@ -63,12 +63,11 @@ export const renderBriefChartOgImage = ({
               alignItems: "center",
               padding: "6px 14px",
               borderRadius: 6,
-              background: "rgba(56, 189, 248, 0.12)",
-              border: "1px solid rgba(56, 189, 248, 0.3)",
+              border: `1px solid ${OG_BORDER_STRONG}`,
               fontSize: 16,
               fontWeight: 600,
               letterSpacing: "0.08em",
-              color: "#38bdf8",
+              color: OG_ACCENT,
               textTransform: "uppercase",
             }}
           >
@@ -78,10 +77,10 @@ export const renderBriefChartOgImage = ({
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", marginTop: 24 }}>
-        <div style={{ display: "flex", fontSize: 62, fontWeight: 700, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, color: accent, lineHeight: 1.05 }}>
+        <div style={{ display: "flex", fontSize: 62, fontWeight: 700, fontFamily: `${OG_FONT_DISPLAY}, ui-sans-serif, system-ui, sans-serif`, color: OG_CONDITION_INK[regime], lineHeight: 1.05 }}>
           {posture}
         </div>
-        <div style={{ display: "flex", fontSize: 30, color: "#cbd5e1", marginTop: 10 }}>{weekLabel ? `Week of ${weekLabel}` : "This week's guidance"}</div>
+        <div style={{ display: "flex", fontSize: 30, color: OG_TEXT_SECONDARY, marginTop: 10 }}>{weekLabel ? `Week of ${weekLabel}` : "This week's guidance"}</div>
       </div>
 
       <div
@@ -114,14 +113,14 @@ export const renderBriefChartOgImage = ({
           justifyContent: "space-between",
           marginTop: 18,
           fontSize: 22,
-          color: "#64748b",
+          color: OG_TEXT_MUTED,
         }}
       >
         <div style={{ display: "flex" }}>{visible[0]?.label ?? ""}</div>
         {/* The bars are quarters, so the newest one can disagree with this week's
             headline. The caption says what they are; the key says what each hue means. */}
         <div style={{ display: "flex", alignItems: "center", gap: 18, fontSize: 18 }}>
-          <div style={{ display: "flex", color: "#94a3b8" }}>Conditions by quarter</div>
+          <div style={{ display: "flex", color: OG_TEXT_SECONDARY }}>Conditions by quarter</div>
           {REGIME_ORDER.map((key) => (
             <div key={key} style={{ display: "flex", alignItems: "center", gap: 6 }}>
               <div style={{ display: "flex", width: 12, height: 12, borderRadius: 3, background: regimeColor[key] }} />

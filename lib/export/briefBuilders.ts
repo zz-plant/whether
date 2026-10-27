@@ -1,4 +1,5 @@
 import { formatNumberWithUnit } from "../formatters";
+import { weeklyHeadline } from "../report/reportEvidence";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { BriefDocument } from "../report/briefArtifact";
 import { buildComplianceStamp } from "../exportNotices";
@@ -10,7 +11,8 @@ import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionR
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { buildScoreMovementLine, buildScoreReferenceLines, type PreviousReading } from "./scoreReference";
 import { areaLinesFromActionStrip, buildDecisionMovement } from "../report/decisionMovement";
-import { describeBaseRateSource, formatExportConfidence } from "./exportTerms";
+import { describeBaseRateSource, formatDocumentMargin, formatExportConfidence } from "./exportTerms";
+import { describeNotCountedLine, NOT_COUNTED_REASON } from "../report/scoringBasis";
 
 /*
  * Every paste reads in the page's order: the call, what changed, what it
@@ -33,7 +35,7 @@ export const EXPORT_SECTION_HEADINGS = {
 
 /** The curve reading's name on first use, per the vocabulary table in `lib/report/AGENTS.md`. */
 export const RECESSION_GAUGE_LABEL = `${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`;
-/** The stamp's confidence note when no label was modeled: what the number measures. */
+/** The stamp's margin note when no label was modeled: what the number measures. */
 const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line where conditions change";
 
 const buildExportStamp = (document: BriefDocument, confidence: string) =>
@@ -41,6 +43,7 @@ const buildExportStamp = (document: BriefDocument, confidence: string) =>
     sourceLine: document.provenance.sourceUrl,
     timestamp: document.provenance.recordDate,
     confidence,
+    basis: document.provenance.scoringBasis.sentence,
   });
 
 type CallSlot = { label: string; value: string };
@@ -67,19 +70,19 @@ export const briefResumeLine = (document: BriefDocument): string | null => {
 };
 
 /**
- * The guidance as a paste leads with it: the do-now line, which the homepage,
- * the email and the post /share copies all print as the guidance, then the
- * operating stance behind it when it says more.
+ * The guidance as a paste leads with it: the week's headline action
+ * (`weeklyHeadline`), opened by the week's direction when there is one. One
+ * sentence of instruction, the same one the homepage h1, the frozen brief, the
+ * Monday email and the share card lead with.
  *
- * These formats printed the stance under "Guidance" and the do-now line under
- * "Do now", so one week's "Guidance:" read "Approve only renewals…" in the
- * Monday post and "Conditions are tightening. Freeze new commitments…" in the
- * post /share copies, while the homepage's heading was the second.
+ * It printed the action and then the call, so a paste carried two instructions
+ * for one week ("Freeze new commitments and protect runway. Approve only
+ * renewals…"), and the frozen brief printed them the other way round.
  */
-export const formatGuidance = (slots: Pick<BriefDocument["slots"], "actionNow" | "currentCall">): string =>
-  slots.currentCall.trim() === slots.actionNow.trim()
-    ? joinSentences(slots.actionNow)
-    : joinSentences(slots.actionNow, slots.currentCall);
+export const formatGuidance = (
+  slots: Pick<BriefDocument["slots"], "actionNow" | "currentCall"> & { policyOverrideActive?: boolean },
+): string =>
+  joinSentences(weeklyHeadline(slots).composed);
 
 const briefCallSlots = (document: BriefDocument): CallSlot[] => {
   const { slots } = document;
@@ -179,13 +182,18 @@ export const briefWeekChangeLine = (document: BriefDocument): string | null =>
     document.readings.previous,
   );
 
-export const buildReadingLines = (
+const buildReadingLines = (
   reading: {
     scores: { tightness: number; riskAppetite: number };
     thresholds: RegimeAssessment["thresholds"];
     regime: RegimeAssessment["regime"];
   },
-  options: { actionStripItems?: readonly ActionStripItem[]; previousScores?: PreviousReading | null } = {},
+  options: {
+    actionStripItems?: readonly ActionStripItem[];
+    previousScores?: PreviousReading | null;
+    /** What each score leaves out (`describeNotCountedLine`), after what moved it. */
+    notCountedLine?: string | null;
+  } = {},
 ): string[] => {
   const items = options.actionStripItems ?? [];
   const scores = { tightness: reading.scores.tightness, riskAppetite: reading.scores.riskAppetite };
@@ -204,6 +212,7 @@ export const buildReadingLines = (
       previous,
     }),
     ...(movementLine ? [movementLine] : []),
+    ...(options.notCountedLine ? [options.notCountedLine] : []),
   ];
 };
 
@@ -211,7 +220,11 @@ export const buildReadingLines = (
 export const briefReadingLines = (document: BriefDocument) =>
   buildReadingLines(
     { scores: document.readings.scores, thresholds: document.readings.thresholds, regime: document.conditions.regime },
-    { actionStripItems: document.areaRows, previousScores: document.readings.previous },
+    {
+      actionStripItems: document.areaRows,
+      previousScores: document.readings.previous,
+      notCountedLine: describeNotCountedLine(document.provenance.scoringBasis),
+    },
   );
 
 /*
@@ -225,12 +238,20 @@ export const briefReadingLines = (document: BriefDocument) =>
  * including a High week twenty points from both lines, and the last line
  * opened "If it is:", a question the reader had not been asked.
  */
+/*
+ * The inputs the record cannot test are a reason the call could be wrong when
+ * they would put a score past a line the published score is not past
+ * (`ScoringBasis.warning`), so the block says what they would do, after the margin.
+ */
 const buildWhyThisCouldBeWrongBlock = (document: BriefDocument) => [
   "",
   "Why this could be wrong:",
-  `• ${formatExportConfidence(document.confidence)}`,
+  `• ${formatDocumentMargin(document)}`,
+  ...(document.provenance.scoringBasis.warning
+    ? [`• ${document.provenance.scoringBasis.warning} ${NOT_COUNTED_REASON}`]
+    : []),
   `• ${document.slots.whyCouldBeWrong}`,
-  `• What would show it: "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, and the readings.`,
+  `• How you'd know: watch "${DECISION_CONTRACT_LABELS.watch.postureFlips}" above, and the readings.`,
 ];
 
 const buildCitationLines = (document: BriefDocument) => [
@@ -316,7 +337,7 @@ export const buildCallCitation = ({
 }) => [
   `Whether Weekly Brief — ${provenance.recordDate}`,
   `Conditions: ${conditions.line}`,
-  `${formatExportConfidence(confidence)} (how far the scores sit from the line where conditions change)`,
+  `Margin: ${formatExportConfidence(confidence).toLowerCase()} (how far the scores sit from the line where conditions change)`,
   `Source note: ${provenance.sourceUrl}`,
   `Full brief: ${provenance.permalink}`,
 ].join("\n");

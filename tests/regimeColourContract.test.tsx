@@ -7,6 +7,8 @@ import { DecisionHero } from "../app/components/DecisionHero";
 import { Sparkline } from "../app/components/ui/sparkline";
 import { REGIME_HEX_COLORS } from "../lib/regimePhaseSpace";
 import { regimeDataAttribute } from "../lib/regimeAccent";
+import { OG_CONDITION_INK } from "../lib/image/ogTheme";
+import type { RegimeKey } from "../lib/types";
 import * as nextNavigation from "next/navigation";
 
 const mockAny: any = mock;
@@ -82,11 +84,44 @@ describe("regime colour contract", () => {
     }
   });
 
-  it("keeps the regime hues off the action accent", () => {
-    // Sky is what every link, button and focus ring here is drawn in. Until
-    // 2026-09-16 Stormy was sky-500, so under that call the regime and the
-    // controls were one colour. `--accent-action` is the token; the check
-    // reads it rather than pinning a hex so a retuned accent still holds.
+  it("holds the condition utilities and the artifact inks to the same values as the map", () => {
+    // Synoptic (2026-10-09). One fill per condition in three places: the
+    // table every canvas and artifact reads, the data-regime map, and the
+    // `bg-condition-*` utilities that name a condition without the attribute.
+    // The artifacts that cannot read CSS (OG cards, slide, deck, email) print
+    // the condition word in the dark theme's ink, so that copy is pinned too.
+    const tokens = readRepoFile("app/styles/tokens.css");
+    const names: ReadonlyArray<[RegimeKey, string]> = [
+      ["EXPANSION", "sunny"],
+      ["DEFENSIVE", "cloudy"],
+      ["VOLATILE", "stormy"],
+      ["SCARCITY", "freezing"],
+    ];
+    for (const [regime, name] of names) {
+      assert.match(tokens, new RegExp(`--color-condition-${name}:\\s*${REGIME_HEX_COLORS[regime]};`), `${regime}'s utility fill is its plane hue`);
+      assert.match(tokens, new RegExp(`--color-condition-${name}-ink:\\s*${OG_CONDITION_INK[regime]};`), `${regime}'s artifact ink is the dark theme's ink`);
+    }
+  });
+
+  it("gives the line states tokens of their own, apart from the conditions", () => {
+    // A cleared line printed in Sunny's ink and a crossed one in Cloudy's until
+    // 2026-10-09; on Synoptic's light theme those two are one brown. The badge
+    // reads the line-state utilities, and the map reads the condition inks.
+    const icons = readRepoFile("app/components/ui/conceptIcons.tsx");
+    const inks = icons.slice(icons.indexOf("const LINE_STATE_INK"), icons.indexOf("/** The state's glyph alone"));
+    assert.match(inks, /crossed: "text-line-crossed-fg"/);
+    assert.match(inks, /clear: "text-line-clear-fg"/);
+    assert.doesNotMatch(inks, /condition|semantic-(easing|caution)/, "a line state borrows no condition's ink");
+    const tokens = readRepoFile("app/styles/tokens.css");
+    assert.doesNotMatch(tokens, /\[data-regime="[A-Z]+"\][^}]*--regime-ink:\s*var\(--color-semantic-/, "no condition reads a line-state family");
+  });
+
+  it("keeps a fixed action hue off the regime hues", () => {
+    // Until 2026-09-16 Stormy was sky-500, the controls' fixed hue, so under
+    // that call the regime and the controls were one colour by accident. The
+    // controls now take the week's own ink on purpose (the next test); with no
+    // regime they fall back to :root's accent, which must still be no
+    // condition's fill. The check reads the token rather than pinning a hex.
     const tokens = readRepoFile("app/styles/tokens.css");
     const accent = tokens.match(/--accent-action:\s*(#[0-9a-f]{6})/i)?.[1]?.toLowerCase();
     assert.ok(accent, "tokens.css declares --accent-action as a hex");
@@ -95,6 +130,36 @@ describe("regime colour contract", () => {
       assert.notEqual(hex.toLowerCase(), accent, `${regime} is not drawn in the action accent`);
       assert.doesNotMatch(hex, skyHue, `${regime} is not on the sky ramp the controls use`);
     }
+  });
+
+  it("draws the action colour in the week's ink under a regime shell", () => {
+    // 2026-10-14: the page read as monochrome with links, buttons and focus in
+    // the text ink. Under [data-regime] the action colour is --regime-ink, and
+    // the tokens derived from it are declared again there, since a custom
+    // property resolves where it is declared and would otherwise keep :root's.
+    const tokens = readRepoFile("app/styles/tokens.css");
+    const scoped = tokens.match(/\n\[data-regime\]\s*\{([^}]*)\}/)?.[1] ?? "";
+    assert.match(scoped, /--accent-action:\s*var\(--regime-ink\)/, "the action colour is the week's ink");
+    for (const derived of ["--accent-border", "--accent-border-soft", "--focus-halo", "--cta-fill"]) {
+      assert.match(scoped, new RegExp(`${derived}:`), `${derived} re-resolves under the regime`);
+    }
+    assert.match(tokens, /:root,\s*\[data-regime\]\s*\{[^}]*--color-sky-400:\s*var\(--accent-action\)/, "the sky aliases follow the scoped action colour");
+  });
+
+  it("keeps the crossed red for lines, and gives caveats their own role", () => {
+    // A cached source, a scoring note and an archived week printed in the
+    // crossed red until 2026-10-14, so a caveat read as a stop.
+    for (const path of ["app/components/trustStrip.tsx", "app/components/historicalBanner.tsx", "app/trust/sourceBoard.tsx"]) {
+      const source = readRepoFile(path);
+      assert.doesNotMatch(source, /semantic-caution|line-crossed/, `${path} prints no caveat in the crossed red`);
+      assert.match(source, /caveat-/, `${path} uses the caveat role`);
+    }
+    // And its own shape: the hollow ring already means "where a reading was" on
+    // the score ladder, so a caveat is the diamond, not a ring (2026-10-14).
+    for (const path of ["app/components/trustStrip.tsx", "app/components/historicalBanner.tsx", "app/components/CadenceCallCard.tsx", "app/signals/components/signalReadingPanel.tsx"]) {
+      assert.match(readRepoFile(path), /weather-caveat-mark/, `${path} marks its caveat with the diamond`);
+    }
+    assert.match(readRepoFile("app/styles/feedback.css"), /\.weather-caveat-mark::before\s*\{[^}]*rotate\(45deg\)/, "the caveat mark is a diamond");
   });
 
   it("paints one atmosphere from the token on both shells", () => {
@@ -135,7 +200,6 @@ describe("regime colour contract", () => {
     // does not.
     const callers = [
       "app/signals/page.tsx",
-      "app/resolve/page.tsx",
       "app/operate/planningPageModel.ts",
       "app/operate/[workstream]/page.tsx",
       "app/trust/trustPageModel.ts",

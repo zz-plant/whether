@@ -41,21 +41,25 @@ import { regimeSignalLabel } from "./report/signalTranslations";
  * mapping in Tailwind class form, which is a different representation rather than
  * a duplicate value.
  *
- * Not yet the whole story. `app/api/og/briefChartTemplate.tsx` and
- * `compareTemplate.tsx` carry a third mapping at the 400 level, and in both of
- * them DEFENSIVE and VOLATILE are swapped relative to every on-site surface — a
- * shared card paints Cloudy sky-blue and Stormy amber. That is a real defect in a
- * shared artifact, but correcting it re-colours published OG images, so it wants
- * its own change rather than riding along with a chart.
+ * The share cards, the meeting slide, the board deck and the email read this
+ * table too, so a condition is one colour wherever it is drawn. The same four
+ * hexes are the `--color-condition-*` utilities and the data-regime map in
+ * app/styles/tokens.css; tests/regimeColourContract.test.tsx holds the three
+ * together.
+ *
+ * Synoptic (2026-10-09, docs/design/palette-directions.md): each condition is
+ * coloured by the weather it names, and the four sit on the chart's two axes.
+ * Warm is risk appetite on, cool is off; light is cheap money, dense is dear.
+ * They differ in lightness as well as hue, so a red-green colourblind reader
+ * keeps them apart: Sunny and Freezing were emerald and rose, 5.6 apart for a
+ * deuteranope (OKLab x100), and are 34.6 apart here. One set serves both
+ * themes; as text, each condition has its own ink per theme in tokens.css.
  */
 export const REGIME_HEX_COLORS: Record<RegimeKey, string> = {
-  EXPANSION: "#10b981", // emerald-500
-  SCARCITY: "#f43f5e", // rose-500
-  DEFENSIVE: "#f59e0b", // amber-500
-  // Violet, not sky. Sky is the action accent — every link, button and focus
-  // ring on the site — so under a Stormy call the regime and the controls
-  // were one colour. The regime set is now four hues no control borrows.
-  VOLATILE: "#8b5cf6", // violet-500
+  EXPANSION: "#d9a82c", // Sun: warm, clear
+  DEFENSIVE: "#9d7a4a", // Haze: warm, dense
+  VOLATILE: "#8f96e0", // Lightning: cool, clear
+  SCARCITY: "#3a6fa3", // Frost: cool, dense
 };
 
 /** Score at which `tightness` stops distinguishing between expensive and very
@@ -150,6 +154,25 @@ export const regimeAtCoordinates = (
   const risky = riskAppetite > thresholds.riskAppetiteRegime;
   if (tight) return risky ? "DEFENSIVE" : "SCARCITY";
   return risky ? "EXPANSION" : "VOLATILE";
+};
+
+/**
+ * The conditions on the other side of one score's change line: crossing the
+ * funding-pressure line flips the upper and lower halves, crossing the risk-appetite
+ * line flips the left and right. It names what a near reading is near, which is the
+ * question a reader of "2 pts from its change line" is left with.
+ */
+export const regimeAcrossLine = (regime: RegimeKey, signal: "tightness" | "riskAppetite"): RegimeKey => {
+  if (signal === "tightness") {
+    if (regime === "DEFENSIVE") return "EXPANSION";
+    if (regime === "EXPANSION") return "DEFENSIVE";
+    if (regime === "SCARCITY") return "VOLATILE";
+    return "SCARCITY";
+  }
+  if (regime === "DEFENSIVE") return "SCARCITY";
+  if (regime === "SCARCITY") return "DEFENSIVE";
+  if (regime === "EXPANSION") return "VOLATILE";
+  return "EXPANSION";
 };
 
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
@@ -315,9 +338,9 @@ export const resolvePhaseSpan = (raw: string | string[] | undefined) => {
 export const describePhaseGap = (gap: PhaseGap) => {
   const points = `${gap.distance.toLocaleString("en-US")} ${gap.distance === 1 ? "point" : "points"}`;
   if (gap.side === "on") {
-    return `${gap.label} is sitting on its boundary; any move decides between here and ${gap.flipsToLabel}.`;
+    return `${gap.label} is sitting on its change line; any move decides between here and ${gap.flipsToLabel}.`;
   }
   return gap.side === "above"
-    ? `${gap.label} is ${points} above its boundary. Falling back through it alone would read ${gap.flipsToLabel}.`
-    : `${gap.label} is ${points} below its boundary. Rising through it alone would read ${gap.flipsToLabel}.`;
+    ? `${gap.label} is ${points} above its change line. Falling back through it alone would read ${gap.flipsToLabel}.`
+    : `${gap.label} is ${points} below its change line. Rising through it alone would read ${gap.flipsToLabel}.`;
 };

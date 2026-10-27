@@ -22,7 +22,7 @@ const signalClusterDefinitions: SignalClusterDefinition[] = [
     slug: "capital-tightness-watch",
     title: "Funding pressure watch",
     summary: "How hard money is to raise this week, before you commit to anything with a long payback.",
-    evidence: "Short-term Treasury rates, and how far funding pressure sits from the line where conditions change.",
+    evidence: "Short-term Treasury rates and funding pressure's distance from the line where conditions change.",
     evidenceKeys: ["tightness", "baseRate"],
     isIndexable: hasYield(snapshotData.yields.threeMonth) && hasYield(snapshotData.yields.tenYear),
   },
@@ -36,7 +36,7 @@ const signalClusterDefinitions: SignalClusterDefinition[] = [
   },
   {
     slug: "yield-curve-flip-watch",
-    title: "Recession warning watch",
+    title: "Recession warning gauge watch",
     summary: "How close long-term rates are to dropping below short-term rates, before you commit to anything you cannot undo.",
     evidence: "The 10-year minus 2-year Treasury rate, week by week, from the live Treasury data.",
     evidenceKeys: ["curveSlope"],

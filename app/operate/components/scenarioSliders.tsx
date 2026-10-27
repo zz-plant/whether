@@ -40,14 +40,13 @@ export function ScenarioSliders({
         <div>
           <div className="flex flex-wrap items-center gap-2">
             <h3 id="sliders-controls-heading" className="type-section text-slate-100 flex items-center gap-2">
-              <SlidersIcon className="h-4 w-4 text-sky-400" />
+              <SlidersIcon className="h-4 w-4 text-slate-400" />
               Sliders
             </h3>
             <Tag tone="amber">Not this week&apos;s data</Tag>
           </div>
-          <p className="mt-1 text-sm text-slate-300">
-            Move either slider. The guidance, the scores, and the rules below update while you move it.
-          </p>
+          {/* No instruction line (2026-10-09): the page intro says to move the two
+              sliders, and the sliders are directly below. */}
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <ClipboardActionRow
@@ -78,7 +77,7 @@ export function ScenarioSliders({
               Short-term borrowing rate
             </label>
             <div className="flex items-center gap-2 tabular-nums">
-              <span className="text-sm font-bold text-sky-200">
+              <span className="text-sm font-bold text-slate-100">
                 {simulatedBaseRate.toFixed(2)}%
               </span>
               <span className="text-xs text-slate-400">
@@ -111,7 +110,7 @@ export function ScenarioSliders({
               Recession warning gauge (10-year minus 2-year rate)
             </label>
             <div className="flex items-center gap-2 tabular-nums">
-              <span className="text-sm font-bold text-sky-200">
+              <span className="text-sm font-bold text-slate-100">
                 {simulatedCurveSlope.toFixed(2)}%
               </span>
               <span className="text-xs text-slate-400">

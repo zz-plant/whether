@@ -6,6 +6,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import type { DecisionArea } from "../../lib/report/boundedDecisionRules";
 import { netMonthlyBurnUsd, resolveProfileRunway, resolveProfileRunwayMonths } from "../../lib/operatorProfile";
+import { HOME_SECTIONS } from "../../lib/report/home/homeSectionModel";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel } from "../../lib/report/operatorRunway";
 import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "../../lib/report/runwayConditionedNotes";
 import { useOperatorProfile } from "./useOperatorProfile";
@@ -18,9 +19,9 @@ import { persistOperatorRunway, useOperatorRunway } from "./useOperatorRunway";
  * 18+ mo") directly under the header's and the section's ("<6 · 6–12 · 12–24 ·
  * 24+ mo"): two controls for the same fact, with different bands, stored in two
  * places, neither updating the other. A reader who picked 12–18 here left the
- * guidance above calibrated to whatever the header said. The band control above
- * (the section selector at sm+, the header pill on a phone) is now the only
- * one, and an exact figure entered on /operate moves it.
+ * guidance above calibrated to whatever the header said. The band control (the
+ * calibration section's selector at sm+, the header pill on a phone) is now the
+ * only one, and an exact figure entered on /operate moves it.
  */
 const useRunwayNotes = (regime: RegimeKey) => {
   const { profile } = useOperatorProfile();
@@ -80,13 +81,18 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
     return (
       <div id="runway-notes" className="space-y-1.5">
         <p className="type-eyebrow text-slate-300">What this guidance means at your runway</p>
-        {/* The control is above, not here. It shows the default until a
-            reader chooses, so this says so rather than letting the default
-            read as an answer the reader gave. */}
+        {/* The control is not here. It shows the default until a reader
+            chooses, so this says so rather than letting the default read as an
+            answer the reader gave. A link rather than "above": these notes sit
+            in the area rules, and the calibration section follows them on a
+            wide screen while a phone's control is the header pill. The anchor
+            opens the section at every width (`AnchorFeedback`). */}
         <p className="text-fluid-nano text-slate-400">
-          Choose your cash runway above and each rule below gains a line on what it changes at that runway:
-          which area protects runway fastest, and what a burn cut buys. It shows{" "}
-          {runwayBandLabel(DEFAULT_RUNWAY_BAND)} until you choose.
+          Showing {runwayBandLabel(DEFAULT_RUNWAY_BAND)} until you{" "}
+          <a href={`#${HOME_SECTIONS.calibration.id}`} className="text-[var(--accent-action)] underline underline-offset-4">
+            pick your cash runway
+          </a>
+          .
         </p>
       </div>
     );

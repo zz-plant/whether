@@ -13,7 +13,7 @@ import {
   type RuleConditionMetric,
 } from "./boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
-import { comparisonBasis } from "./comparisonBasis";
+import { comparisonBasis, describeGuidanceStands } from "./comparisonBasis";
 import type { ActionStripItem } from "./operatingCalls";
 import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import type { ComparedWith, ReportDynamics } from "./reportDataTypes";
@@ -110,6 +110,13 @@ export type DecisionMovement = {
   moved: AreaMovement[];
   /** `moved`, grouped by how it moved: the clauses of the sentence, for a surface that wants them as data. */
   groups: MovementGroup[];
+  /**
+   * The areas that held, grouped by the side of their lines they held on, each group as
+   * one sentence ("Pause still applies to Hiring, Fundraising and Spending: no line
+   * crossed since Sep 30."). A table that prints every area prints a group of two or
+   * more once instead of once per row; a surface showing one area keeps `areas[].text`.
+   */
+  heldGroups: HeldGroup[];
   /** The one sentence: what changed for decisions, and which lines did it. */
   sentence: string;
   /** `sentence` without the lines that did it, for a surface with room for the consequence and not the evidence (a link preview, a card). */
@@ -155,8 +162,10 @@ const upperFirst = (value: string) => `${value.charAt(0).toUpperCase()}${value.s
 const joinAnd = (items: readonly string[]) =>
   items.length <= 1 ? (items[0] ?? "") : `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}`;
 
+/* "through N" read as the deal falling through: crossing a line is going past it,
+   so the preposition follows the direction — rose above 76, fell below 54. */
 const describeCrossing = (line: CrossedLine) =>
-  `${lowerFirst(line.label)} ${line.direction} through ${formatThresholdNumber(line.value)}`;
+  `${lowerFirst(line.label)} ${line.direction} ${line.direction === "rose" ? "above" : "below"} ${formatThresholdNumber(line.value)}`;
 
 const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
   paused: "Pause now applies",
@@ -164,6 +173,33 @@ const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
   resumable: "Resume line met",
   resumeLost: "Resume line no longer met",
 };
+
+/*
+ * A held area says which side of its lines it held on. "No line crossed since Sep 30" printed
+ * alone beside "Pause if Funding pressure > 76 · crossed" read as the row contradicting itself:
+ * the first is about the week, the second about where the score stands. Naming the state the
+ * area held in joins them. Between its lines there is nothing to add.
+ */
+const HELD_STATE_TEXT: Record<AreaState, string | null> = {
+  pause: "Pause still applies",
+  resume: "Resume line still met",
+  hold: null,
+};
+
+const describeHeld = (state: AreaState, window: string) => {
+  const prefix = HELD_STATE_TEXT[state];
+  return prefix ? `${prefix}: no line crossed ${window}.` : `No line crossed ${window}.`;
+};
+
+type HeldGroup = { state: AreaState; areas: DecisionArea[]; text: string };
+
+const HELD_GROUP_TEXT: Record<AreaState, (areas: string, window: string) => string> = {
+  pause: (areas, window) => `Pause still applies to ${areas}: no line crossed ${window}.`,
+  resume: (areas, window) => `Resume line still met for ${areas}: no line crossed ${window}.`,
+  hold: (areas, window) => `No line crossed ${window} for ${areas}.`,
+};
+
+const HELD_STATE_ORDER: readonly AreaState[] = ["pause", "resume", "hold"];
 
 const GROUP_CLAUSE: Record<Exclude<AreaMovementKind, "held">, (areas: string) => string> = {
   paused: (areas) => `the pause now applies to ${areas}`,
@@ -199,7 +235,7 @@ const moveOf = (
   const crossed = decisive[kind].map(({ metric, label, value, direction }) => ({ metric, label, value, direction }));
   const text =
     kind === "held"
-      ? `No line crossed ${window}.`
+      ? describeHeld(to, window)
       : `${from === "pause" && kind === "resumable" ? "Pause lifted, resume line met" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
   return { area: lines.area, kind, state: to, crossed, text };
 };
@@ -276,7 +312,7 @@ export const buildDecisionMovement = ({
     if (moved.length === 0) {
       const nothing = conditions
         ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no pause or resume line was crossed.`
-        : `Conditions held steady ${window}; no pause or resume line was crossed. Last week's guidance stands.`;
+        : `Conditions held steady ${window}; no pause or resume line was crossed. ${describeGuidanceStands(basis)}`;
       return { sentence: nothing, headline: nothing, headlines: [nothing] };
     }
     const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
@@ -309,14 +345,22 @@ export const buildDecisionMovement = ({
     };
   })();
 
-  return { comparedWith: basis.date, conditions, areas: movements, moved, groups, sentence, headline, headlines };
+  const held = movements.filter((entry) => entry.kind === "held");
+  const heldGroups: HeldGroup[] = HELD_STATE_ORDER.flatMap((state) => {
+    const inGroup = held.filter((entry) => entry.state === state).map((entry) => entry.area);
+    return inGroup.length > 0
+      ? [{ state, areas: inGroup, text: HELD_GROUP_TEXT[state](listAreas(inGroup, movements.length), window) }]
+      : [];
+  });
+
+  return { comparedWith: basis.date, conditions, areas: movements, moved, groups, heldGroups, sentence, headline, headlines };
 };
 
 /**
  * What the week did to the guidance: `"conditions"` when the conditions changed (the
  * week's `regimeChanged`, or a change the movement names), `"lines"` when an area's pause
  * or resume line was crossed under the same conditions, `"held"` when neither — the week
- * the movement sentence calls "Last week's guidance stands" — and null when nothing was
+ * the movement sentence calls "The guidance stands" — and null when nothing was
  * compared.
  *
  * Not the operating latitude. That number is a blend of the two scores, so it can stay
@@ -343,6 +387,20 @@ export const describeGuidanceChange = ({
  * none does (an earlier reading with an unusually long label), the shortest, for the
  * caller's own clamp to finish: it cuts less of a sentence than it would of the full one.
  */
+/**
+ * The week's cause in one line, for the verdict on the homepage: the lines the scores
+ * crossed since the earlier reading ("Risk appetite fell through 54."), or that none
+ * was crossed. The decision consequences are "What changed this week"'s sentence; this
+ * is only the why, short enough to sit under the headline action.
+ */
+export const describeMovementCause = (movement: Pick<DecisionMovement, "groups" | "comparedWith">): string => {
+  const crossings = uniqueLines(movement.groups.flatMap((group) => group.crossed)).map(describeCrossing);
+  if (crossings.length > 0) return `${upperFirst(joinAnd(crossings))}.`;
+  return movement.comparedWith
+    ? `No score crossed a pause or resume line since ${movement.comparedWith}.`
+    : "No score crossed a pause or resume line.";
+};
+
 export const fitMovementHeadline = (movement: Pick<DecisionMovement, "headline" | "headlines">, maxLength: number): string =>
   movement.headlines.find((line) => line.length <= maxLength)
   ?? movement.headlines.reduce((shortest, line) => (line.length < shortest.length ? line : shortest), movement.headline);
@@ -372,49 +430,7 @@ export const buildDecisionMovementForReport = ({
   });
 };
 
-/**
- * The line over "What changed this week". With a comparison it is what the week did to the
- * decisions; on a quiet week (`quietDayLine` is set) it is followed by the quiet-day line,
- * so "nothing changed" arrives with the one thing that would change it. Without a
- * comparison that could be read against the lines it is the direction the scores moved.
- *
- * It appended the nearest market move (`buildFlipProximity`) until 2026-10-07, and fell back
- * to the quiet-day line without a movement, which could not happen: the quiet-day line needs
- * a week whose guidance held, and that needs the movement.
- */
-export const buildChangedLead = ({
-  movement,
-  quietDayLine,
-  fallback,
-}: {
-  movement: Pick<DecisionMovement, "sentence" | "moved"> | null;
-  quietDayLine: string | null;
-  fallback: string;
-}): string => {
-  if (!movement) return fallback;
-  const quiet = quietDayLine !== null && movement.moved.length === 0;
-  return quiet ? `${movement.sentence} ${quietDayLine}` : movement.sentence;
-};
-
 type CallChangeSource = Parameters<typeof buildCallChangeLine>[0];
-
-/**
- * The quiet-day read: on a week whose guidance held against the earlier reading, what would
- * change it (`buildCallChangeLine`), so a returning reader learns both that nothing moved
- * and the one thing that would. Null on any other week: one that moved has its own lead,
- * and one with nothing compared has nothing to call quiet.
- *
- * It read "Conditions unchanged — If the 1-month Treasury bill rate rises 0.15%, conditions
- * turn Cloudy." until 2026-10-07: the nearest market move, in "%" for a move in a rate, and
- * on a held week a rate move standing where the hold's own condition belongs.
- */
-export const buildQuietDayRead = ({
-  guidanceChange,
-  ...source
-}: CallChangeSource & {
-  /** What the week did to the guidance (`describeGuidanceChange`); the read prints only when it held. */
-  guidanceChange: GuidanceChange | null;
-}): string | null => (guidanceChange === "held" ? buildCallChangeLine(source) : null);
 
 /**
  * The standup line: one line for a team's daily or sprint standup, saying whether the

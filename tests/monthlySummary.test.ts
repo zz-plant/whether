@@ -46,7 +46,7 @@ describe("buildMonthlySummary", () => {
     assert.match(summary.copy, /PLANNING LANGUAGE TO USE/);
     assert.match(summary.copy, /\nNEXT ACTIONS\n/);
     assert.match(summary.copy, /MONTHLY OPERATING RULES/);
-    assert.match(summary.copy, /TOP REVERSALS/);
+    assert.match(summary.copy, /RESUME LINES/);
     assert.match(summary.copy, /EXECUTION CONSTRAINTS\n\n• /);
     assert.match(summary.copy, /\n\nSource: /);
     assert.doesNotMatch(summary.copy, /Source:\nSource:/);

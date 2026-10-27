@@ -1,9 +1,5 @@
 [
   {
-    "record_date": "2026-09-11",
-    "regime": "DEFENSIVE"
-  },
-  {
     "record_date": "2026-09-18",
     "regime": "DEFENSIVE"
   },
@@ -13,6 +9,10 @@
   },
   {
     "record_date": "2026-10-02",
+    "regime": "DEFENSIVE"
+  },
+  {
+    "record_date": "2026-10-07",
     "regime": "DEFENSIVE"
   }
 ]

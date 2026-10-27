@@ -4,8 +4,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
 import { Tag } from "../../components/ui/tag";
+import { ConditionLabel } from "../../components/ui/conceptIcons";
 import { formatNumberWithUnit } from "../../../lib/formatters";
-import type { RegimeKey } from "../../../lib/regimeEngine";
 import { getRegimeWeatherRationale } from "../../../lib/regimePresentation";
 import {
   buildCanonicalUrl,
@@ -29,7 +29,10 @@ import {
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { essaysPublishedIn, formatCanonAuthors, formatCanonPublished } from "../../../lib/productCanon";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
+import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
 import { JsonLdScript } from "../../components/jsonLdScript";
+import { describeReconstructedPeriod } from "../../../lib/report/trackRecordCopy";
+import { getPublishedBriefs, publishedBriefWeekLabel } from "../../../lib/report/publishedBriefs";
 
 type Params = { period: string };
 
@@ -45,13 +48,6 @@ export function generateStaticParams() {
 }
 
 const shareFormatter = new Intl.NumberFormat("en-US", { style: "percent", maximumFractionDigits: 0 });
-
-const regimeTone: Record<RegimeKey, "sky" | "emerald" | "amber" | "rose"> = {
-  EXPANSION: "emerald",
-  VOLATILE: "amber",
-  DEFENSIVE: "sky",
-  SCARCITY: "rose",
-};
 
 /*
  * The search snippet for a period, so it has to say what is particular to it.
@@ -202,6 +198,11 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
      that link, so a year page names the product writing that came out inside it. */
   const essays = essaysPublishedIn({ year: period.year, quarter: period.kind === "quarter" ? period.quarter : undefined });
   const canonicalUrl = buildCanonicalUrl(buildPostureArchivePath(period.slug));
+  const oldestBrief = getPublishedBriefs().reduce<ReturnType<typeof getPublishedBriefs>[number] | undefined>(
+    (oldest, brief) => (!oldest || brief.recordDate < oldest.recordDate ? brief : oldest),
+    undefined,
+  );
+  const firstPublishedWeek = oldestBrief ? publishedBriefWeekLabel(oldestBrief) : "2026";
 
 
   const articleStructuredData = graph([
@@ -209,8 +210,8 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       "@type": "Article",
       headline: `${period.title} conditions — ${headlineConditions(period)}`,
       description: describePeriod(period),
-      datePublished: period.asOf,
-      dateModified: period.asOf,
+      /* No datePublished: the period's own date claimed the page was published
+         then, which is the impression the visible notice above corrects. */
       author: buildAuthorSchema(),
       publisher: buildPublisherSchema(organizationName),
       url: canonicalUrl,
@@ -225,12 +226,12 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
       <JsonLdScript data={articleStructuredData} />
 
       <Breadcrumbs
-        items={[
-          { label: "Home", href: "/" },
-          { label: "History", href: "/history" },
-          ...(parent ? [{ label: parent.title, href: buildPostureArchivePath(parent.slug) }] : []),
-          { label: period.title },
-        ]}
+        items={toVisibleBreadcrumbs(
+          buildGroupBreadcrumbs(buildPostureArchivePath(period.slug), [
+            ...(parent ? [{ name: parent.title, path: buildPostureArchivePath(parent.slug) }] : []),
+            { name: period.title, path: buildPostureArchivePath(period.slug) },
+          ]),
+        )}
       />
 
       {/* The breadcrumbs above already reach the brief, /history and the parent
@@ -241,18 +242,26 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           period is closed. */}
       <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
         <div>
-          <Tag tone={regimeTone[period.regime]}>{headlineConditions(period)}</Tag>
+          {/* The conditions stamp, in the regime's own hue and glyph. It took a
+              tone from a table of this page's own, which drew Cloudy in sky (the
+              link colour) and Stormy in amber (Cloudy's hue). */}
+          <Tag regime={period.regime}>{headlineConditions(period)}</Tag>
         </div>
-        <h1 className="text-2xl font-semibold text-slate-100 sm:text-3xl">
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">
           Conditions in {period.title}
         </h1>
+        <p className="weather-caveat-mark text-sm text-caveat-fg" data-reconstructed-notice>
+          {describeReconstructedPeriod(period.title, firstPublishedWeek)}
+        </p>
         {headlineSentence ? <p className="text-sm font-semibold text-slate-100">{headlineSentence}</p> : null}
         <p className="text-sm text-slate-300">{period.headline}</p>
         <p className="text-sm text-slate-300">
-          <span className="font-semibold text-slate-100">Standing guidance:</span> {period.guidance}
+          <span className="font-semibold text-slate-100">Guidance, by today&apos;s formula:</span> {period.guidance}
         </p>
+        {/* "Maintained by", not "By": the page is kept by its author today; it
+            was not written in the period it describes. */}
         <p className="text-xs text-slate-400">
-          By{" "}
+          Maintained by{" "}
           <a
             href={publisherProfilePath}
             className="text-sky-300 underline-offset-2 hover:underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
@@ -260,7 +269,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           >
             {publisherAuthor.name}
           </a>{" "}
-          · <time dateTime={period.asOf}>{period.recordDateLabel}</time>
+          · reading dated <time dateTime={period.asOf}>{period.recordDateLabel}</time>
         </p>
       </section>
 
@@ -270,7 +279,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           <ul className="space-y-2 text-sm text-slate-300">
             {period.constraints.map((constraint) => (
               <li key={constraint} className="flex gap-2">
-                <span aria-hidden="true" className="text-sky-300">
+                <span aria-hidden="true" className="text-slate-500">
                   •
                 </span>
                 <span>{constraint}</span>
@@ -288,8 +297,10 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           </p>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.regimeMix.map((share) => (
-              <li key={share.regime} className="flex flex-wrap items-baseline justify-between gap-2">
-                <span className="font-semibold text-slate-100">{share.label}</span>
+              <li key={share.regime} className="flex flex-wrap items-center justify-between gap-2">
+                <ConditionLabel regime={share.regime} className="font-semibold text-slate-100">
+                  {toWeatherLabel(share.label)}
+                </ConditionLabel>
                 <span>
                   {shareFormatter.format(share.share / 100)} · {share.periods} of {period.sampleCount}
                 </span>
@@ -304,10 +315,13 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
           <h2 className="text-lg font-semibold text-slate-100">Changes in conditions inside {period.title}</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {period.transitions.map((transition) => (
-              <li key={transition.asOf} className="flex flex-wrap items-baseline gap-2">
+              <li key={transition.asOf} className="flex flex-wrap items-center gap-2">
                 <span className="font-semibold text-slate-100">{transition.dateLabel}</span>
-                <span>
-                  {toWeatherLabel(transition.fromLabel)} → {toWeatherLabel(transition.toLabel)}
+                <span className="inline-flex flex-wrap items-center gap-1.5">
+                  <ConditionLabel regime={transition.from}>{toWeatherLabel(transition.fromLabel)}</ConditionLabel>
+                  <span aria-hidden="true">→</span>
+                  <span className="sr-only">to</span>
+                  <ConditionLabel regime={transition.to}>{toWeatherLabel(transition.toLabel)}</ConditionLabel>
                 </span>
               </li>
             ))}
@@ -358,7 +372,7 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
 
       {essays.length ? (
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-          <h2 className="text-lg font-semibold text-slate-100">Product writing published in {period.title}</h2>
+          <h2 className="text-lg font-semibold text-slate-100">From the reading list, published in {period.title}</h2>
           <ul className="space-y-2 text-sm text-slate-300">
             {essays.map((essay) => (
               <li key={essay.slug}>
@@ -373,11 +387,11 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
             ))}
           </ul>
           <p className="text-xs text-slate-400">
-            From the{" "}
+            These come from the{" "}
             <Link href="/concepts" className="underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
               product management reading list
             </Link>
-            , where each is placed on the conditions of the month it came out.
+            . It places each title on the conditions of the month it came out.
           </p>
         </section>
       ) : null}
@@ -392,8 +406,9 @@ export default async function PostureArchivePeriodPage({ params }: { params: Pro
                   href={buildPostureArchivePath(child.slug)}
                   className="flex min-h-[44px] flex-col gap-1 rounded-lg px-2 py-2 transition-colors hover:bg-slate-800/40 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-300"
                 >
-                  <span className="text-sm font-semibold text-slate-100">
-                    {child.title} — {toWeatherLabel(child.operatorLabel)}
+                  <span className="flex flex-wrap items-center gap-x-1.5 text-sm font-semibold text-slate-100">
+                    {child.title} —{" "}
+                    <ConditionLabel regime={child.regime}>{toWeatherLabel(child.operatorLabel)}</ConditionLabel>
                   </span>
                   <span className="text-sm text-slate-300">{child.guidance}</span>
                 </Link>

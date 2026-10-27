@@ -9,22 +9,24 @@ import { resolveDistanceToFlip } from "./confidence";
  * The percent is `55 + distance-to-the-nearest-regime-boundary`, capped at 92.
  * It has never been checked against whether calls at a given distance actually
  * held, and docs/agents/lessons/regime-scoring.md has carried that as the open work since the scale was
- * written. This is the check, run over the 176 month-end readings in
- * `data/summary_archive.json` (2012-01 to 2026-08).
+ * written. This is the check, run over the month-end readings in
+ * `data/summary_archive.json` (177 from 2012-01 to 2026-09 as of 2026-10-09, so 176
+ * month-to-month comparisons; `countRecord` in lib/report/trackRecord.ts gives the
+ * current counts, and tests/recordCounts.test.ts holds the two sources together).
  *
  * The answer is not that the number is miscalibrated by some factor. It is that
  * it does not measure what its name implies, in two separate ways:
  *
  *  - **It understates, in every band.** Month-to-month the published regime held
- *    169 times in 175. Every bucket's observed hold rate sits above the percent
+ *    169 times in 176 (as of the September 2026 close). Every bucket's observed hold rate sits above the percent
  *    those months reported, and above its 95% interval — the closest band is the
  *    ceiling, still 7 points low.
  *  - **It does not order the outcome.** Calls at 0-5 points from a boundary held
- *    11 of 11. Calls at 5-10 held 7 of 9. Distance is supposed to be the whole
+ *    11 of 11. Calls at 5-10 held 7 of 10. Distance is supposed to be the whole
  *    signal, and across the two least-confident bands it runs backwards.
  *
- * The archive also cannot support re-fitting the number: six flips in fourteen
- * years is not enough to estimate a probability per band, and a curve fitted to
+ * The archive also cannot support re-fitting the number: seven changes since
+ * 2012 is not enough to estimate a probability per band, and a curve fitted to
  * the base rate would report ~97% for every month, which discriminates nothing.
  * So the percent keeps measuring distance, which is an honest thing to measure,
  * and the record is published beside it rather than folded into it. An operator

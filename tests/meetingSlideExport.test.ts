@@ -36,7 +36,8 @@ describe("Meeting Slide & Notion Exporter", () => {
     const hold = POLICY_OVERRIDE_CALL["inputs-missing"];
     const seed = buildExportSlidePayload(held, "seed");
     assert.equal(seed.stageLabel, "Seed");
-    assert.equal(seed.actionNow, hold.actionNow);
+    assert.ok(seed.actionNow.startsWith(hold.actionNow), "the held week's action leads");
+    assert.ok(seed.actionNow.endsWith(hold.currentCall), "and the reason it is held follows");
     assert.equal(seed.pauseIf, hold.pauseIf);
     assert.equal(seed.resumeWhen, undefined, "a held call has one resume line, its change line");
   });
@@ -83,7 +84,7 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(markdown.includes(`CONDITIONS CHANGE IF**: ${payload.callChangesIf}`));
     assert.ok(markdown.includes(`RESUME WHEN**: ${payload.resumeWhen}`));
     assert.ok(!markdown.includes("CHANGE COURSE IF"), "the slide uses the page's name for the change line");
-    assert.ok(/Medium confidence|High confidence|Low confidence/.test(markdown), "confidence reads as a word, not the engine's code");
+    assert.ok(/Margin: (within reach of|clear of|close to) the line/.test(markdown), "the margin reads as words, not the engine's code");
     assert.ok(markdown.includes("Freezing"));
     assert.ok(!markdown.includes("SCARCITY"), "the engine key must not reach a pasted slide");
   });
@@ -97,13 +98,40 @@ describe("Meeting Slide & Notion Exporter", () => {
     const payload = buildExportSlidePayload(snapshot, "seed");
     const html = formatMeetingSlideHtml(payload);
 
-    assert.ok(html.includes("Whether · Weekly Operating Brief"));
-    assert.ok(html.includes("1. Action now"));
-    assert.ok(html.includes("2. Pause if"));
-    assert.ok(html.includes("3. Conditions change if"));
+    assert.ok(html.includes("Whether · Weekly operating guidance"));
+    /* Parallel, not steps: no "1. 2. 3." before the three labels (2026-10-09). */
+    assert.ok(html.includes(">Action now<"));
+    assert.ok(html.includes(">Pause if<"));
+    assert.ok(html.includes(">Conditions change if<"));
+    assert.doesNotMatch(html, /[123]\. (Action now|Pause if|Conditions change if)/);
     assert.ok(html.includes("Resume when"));
     assert.ok(html.includes("Freezing"));
     assert.ok(!html.includes("SCARCITY"));
+  });
+
+  it("puts the guidance, the watch line and the link in the rich paste, as the Markdown does", () => {
+    // The HTML is the half Slides and Notion paste; it dropped all three.
+    const payload = {
+      ...buildExportSlidePayload(buildOperatingSnapshot({ treasury: mockTreasury, macroSeries }), "seed"),
+      call: "Hold hiring to revenue roles.",
+      clearsWhen: ["Funding pressure < 66", "Risk appetite > 54"],
+      url: "https://whether.test/?stage=seed",
+      isFallback: true,
+    };
+    const markdown = formatMeetingSlideMarkdown(payload);
+    const html = formatMeetingSlideHtml(payload);
+
+    assert.ok(markdown.includes("**GUIDANCE**: Hold hiring to revenue roles."));
+    assert.ok(html.includes(">Guidance<"));
+    assert.ok(html.includes(">Hold hiring to revenue roles.<"));
+    assert.ok(html.includes(">Watch this week<"));
+    assert.ok(html.includes("Funding pressure &lt; 66; Risk appetite &gt; 54"), "comparisons are escaped, not read as tags");
+    assert.ok(html.includes('<a href="https://whether.test/?stage=seed"'));
+    assert.ok(html.includes("saved copy, not a live reading"));
+
+    // No guidance row when the call is the action, as in the Markdown.
+    const same = formatMeetingSlideHtml({ ...payload, call: payload.actionNow });
+    assert.ok(!same.includes(">Guidance<"));
   });
 
   it("generates valid 16:9 standalone SVG slide", () => {
@@ -117,9 +145,43 @@ describe("Meeting Slide & Notion Exporter", () => {
 
     assert.ok(svg.startsWith("<svg"));
     assert.ok(svg.includes('viewBox="0 0 1200 675"'));
-    assert.ok(svg.includes("WHETHER · WEEKLY OPERATING GUIDANCE"));
-    assert.ok(svg.includes("ACTION NOW"));
+    /* Sentence case, no tracking; flat fills, no accent discs; unnumbered cards (2026-10-09). */
+    assert.ok(svg.includes(">Whether · Weekly operating guidance</text>"));
+    assert.doesNotMatch(svg, /letter-spacing="2"|WEEKLY OPERATING/);
+    assert.doesNotMatch(svg, /Gradient|<circle/);
+    assert.ok(svg.includes(">Action now</text>"));
+    assert.doesNotMatch(svg, />[123]\. /);
     assert.ok(svg.includes("Freezing"));
     assert.ok(!svg.includes("SCARCITY"));
+  });
+
+  // The decision cards draw SVG text, which does not wrap: before 2026-10-09 the
+  // 92-character call ran past its card ("…hires that bring in revenu").
+  const cardText = (svg: string, label: string): string[] => {
+    const card = svg.split(label)[1] ?? "";
+    const text = card.slice(card.indexOf("<text"), card.indexOf("</text>", card.indexOf("<text")) + 7);
+    return [...text.matchAll(/<tspan[^>]*>([^<]*)<\/tspan>/g)].map((match) => match[1] ?? "");
+  };
+  const slidePayload = () =>
+    buildExportSlidePayload(buildOperatingSnapshot({ treasury: mockTreasury, macroSeries }), "series-b");
+
+  it("wraps a long call onto two lines inside its card", () => {
+    const call = "Approve only renewals, work already promised to customers, and hires that bring in revenue.";
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), actionNow: call }), ">Action now<");
+    assert.equal(lines.length, 2);
+    assert.equal(lines.join(" "), call);
+  });
+
+  it("keeps a short call on one line", () => {
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), actionNow: "Hold the plan." }), ">Action now<");
+    assert.deepEqual(lines, ["Hold the plan."]);
+  });
+
+  it("cuts text too long for two lines at a word, with an ellipsis", () => {
+    const long = Array.from({ length: 60 }, (_, index) => `word${index}`).join(" ");
+    const lines = cardText(formatMeetingSlideSvg({ ...slidePayload(), pauseIf: long }), ">Pause if<");
+    assert.equal(lines.length, 2);
+    assert.ok(lines[1]?.endsWith("\u2026"));
+    assert.ok(long.startsWith(lines[0] ?? "-"));
   });
 });

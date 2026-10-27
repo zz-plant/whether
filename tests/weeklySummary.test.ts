@@ -72,7 +72,7 @@ describe("buildWeeklySummary", () => {
     const monthly = buildMonthlySummary({ assessment, provenance, record });
     for (const summary of [weekly, monthly]) {
       assert.equal(summary.confidence, "HIGH");
-      assert.ok(summary.summary.includes("The read is solid"), summary.summary);
+      assert.ok(summary.summary.includes("The scores are clear of the change lines"), summary.summary);
     }
 
     // A fallback reading older than five days drops a step, as on every page
@@ -80,7 +80,7 @@ describe("buildWeeklySummary", () => {
     const staleFallback = { ...record, fallback_at: "2026-09-22T12:00:00.000Z", fallback_reason: "upstream down" };
     const stale = buildWeeklySummary({ assessment, provenance, record: staleFallback });
     assert.equal(stale.confidence, "MEDIUM");
-    assert.ok(stale.summary.includes("The read is workable but not settled"), stale.summary);
+    assert.ok(stale.summary.includes("A score is within reach of its change line"), stale.summary);
   });
 
   /*
@@ -103,11 +103,12 @@ describe("buildWeeklySummary", () => {
     assert.equal(assessment.regime, "SCARCITY");
     assert.equal(assessment.policyAssessment.refusal.refused, false);
     assert.equal(assessment.scores.tightness, 90);
-    assert.equal(assessment.scores.riskAppetite, 37);
+    /* On the record basis: the curve's 48, with the startup-market inputs' -11 left out. */
+    assert.equal(assessment.scores.riskAppetite, 48);
 
     const provenance = { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" };
     const changeLine =
-      "Conditions change if: Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 13 pts to clear 50 (37 today).";
+      "Conditions change if: Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 2 pts from 48 to clear 50.";
     for (const summary of [
       buildWeeklySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
       buildMonthlySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record }),
@@ -158,7 +159,7 @@ describe("buildWeeklySummary", () => {
     assert.equal(weekly.confidence, "MEDIUM");
     assert.equal(weekly.title, "Weekly action summary — Oct 5, 2026");
     assert.match(weekly.copy, /\nUpdated Oct 5, 2026\n/);
-    assert.match(weekly.copy, /\nConfidence: Medium\n/);
+    assert.match(weekly.copy, /\nMargin: within reach of the line\n/);
     assert.doesNotMatch(weekly.copy, /high confidence|EXPLICIT_KILL_CRITERIA|SLOWER_STRUCTURED|REVERSIBLE_ONLY/);
   });
 
@@ -193,8 +194,8 @@ describe("buildWeeklySummary", () => {
     const yearly = buildYearlySummary({ assessment, provenance, periodLabel: "2026", record });
 
     assert.match(weekly.copy, /\nWHETHER · Weekly operating guidance\n/);
-    assert.match(weekly.copy, /\nMARKET CLIMATE\n\n⚠️ Freezing: Money is expensive and hard to raise\.\n/);
-    assert.match(weekly.summary, /The guidance is not changing this week\. Too many inputs are missing to support a change in the guidance\. Keep approvals reversible until the hold lifts\./);
+    assert.match(weekly.copy, /\nMARKET CLIMATE\n\nFreezing: Money is expensive and hard to raise\.\n/);
+    assert.match(weekly.summary, /The guidance is not changing this week\. Too many inputs are missing to support a change in the guidance\. Keep new commitments reversible until the hold lifts\./);
     for (const summary of [weekly, monthly]) {
       assert.ok(summary.summary.includes(SHOCK_CROSSING_CUE), summary.summary);
     }

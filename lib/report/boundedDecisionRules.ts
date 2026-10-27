@@ -1,3 +1,4 @@
+import { Landmark, Route as RouteIcon, Sprout, Users, Wallet, type LucideIcon } from "lucide-react";
 import { FALLBACK_PAUSE_THRESHOLD } from "./reportCopy";
 import type { RegimeKey } from "../regimeEngine";
 import { formatScoreValue, formatThresholdNumber } from "../formatters";
@@ -8,6 +9,7 @@ import {
   formatDecisionReversal,
   formatDecisionThreshold,
   formatDecisionTriplet,
+  formatReadingsNow,
 } from "./reportFormatting";
 import { resolveRunwayBand, runwayBandLabel, type RunwayBand } from "./operatorRunway";
 import { regimeSignalLabel } from "./signalTranslations";
@@ -128,37 +130,70 @@ export const isRuleConditionMet = (condition: RuleCondition, current: number): b
  * falling one "falls below"; a resume line on risk appetite reads "is above"
  * because that side of the rule is a state to hold, not a move to watch.
  *
- * A line the reading already meets says so, the way the change line does
- * ("is above 76 (already true at 90)"). Until 2026-10-07 every line read as a
- * move still to come, so a week at 90 was told to pause "if funding pressure
- * rises above 76" on every surface that prints the rule, beside a table
- * marking the same line crossed.
+ * A line the reading already meets says so: its clause states where the score
+ * is ("is above 76", not "rises above 76"), and the rule's sentence is followed
+ * by the reading ("Funding pressure is 90 now."). Until 2026-10-07 every line
+ * read as a move still to come, so a week at 90 was told to pause "if funding
+ * pressure rises above 76" on every surface that prints the rule, beside a
+ * table marking the same line crossed. Until 2026-10-09 the reading sat inside
+ * the clause as "(already true at 90)", a parenthesis that a template carrying
+ * the clause mid-sentence then had to carry too.
  */
+type DescribedCondition = {
+  clause: string;
+  met: boolean;
+  /** Present whenever the score has a reading, met or not. */
+  reading?: { label: string; value: string };
+};
+
 const describeRuleCondition = (
   condition: RuleCondition,
   side: "pause" | "resume",
   scores?: { tightness: number; riskAppetite: number },
-): string => {
+): DescribedCondition => {
   const metric = ruleMetricLabel[condition.metric].toLowerCase();
   const value = formatThresholdNumber(condition.value);
   const current = scores?.[condition.metric];
+  const reading = current === undefined ? undefined : { label: ruleMetricLabel[condition.metric], value: formatScoreValue(current) };
   if (current !== undefined && isRuleConditionMet(condition, current)) {
     const state =
       condition.operator === ">" ? "is above" : condition.operator === ">=" ? "is at or above" : condition.operator === "<" ? "is below" : "is at or below";
-    return `${metric} ${state} ${value} (already true at ${formatScoreValue(current)})`;
+    return { clause: `${metric} ${state} ${value}`, met: true, reading };
   }
   switch (condition.operator) {
     case ">":
-      return side === "resume" && condition.metric === "riskAppetite"
-        ? `${metric} is above ${value}`
-        : `${metric} rises above ${value}`;
+      return {
+        clause: side === "resume" && condition.metric === "riskAppetite"
+          ? `${metric} is above ${value}`
+          : `${metric} rises above ${value}`,
+        met: false,
+        reading,
+      };
     case ">=":
-      return `${metric} is at or above ${value}`;
+      return { clause: `${metric} is at or above ${value}`, met: false, reading };
     case "<":
-      return `${metric} falls below ${value}`;
+      return { clause: `${metric} falls below ${value}`, met: false, reading };
     case "<=":
-      return `${metric} is at or below ${value}`;
+      return { clause: `${metric} is at or below ${value}`, met: false, reading };
   }
+};
+
+/**
+ * A rule's sentence, then the readings once any line it names is met.
+ *
+ * An "or" rule prints the met readings: one is enough to fire it. An "and" rule
+ * prints every reading, because a met half alone reads as nearly there. Until
+ * 2026-10-21 a week at funding pressure 90 and risk appetite 55 was told to
+ * "Resume when funding pressure falls below 66 and risk appetite is above 54.
+ * Risk appetite is 55 now." — one point from the resume line by every number
+ * the sentence gave, and 24 from it by the one it left out.
+ */
+const withReadingsNow = (sentence: string, join: BoundedRuleClause["join"], conditions: DescribedCondition[]): string => {
+  if (!conditions.some((condition) => condition.met)) return sentence;
+  const readings = conditions.flatMap((condition) =>
+    condition.reading && (join === "and" || condition.met) ? [condition.reading] : [],
+  );
+  return readings.length === 0 ? sentence : `${sentence} ${formatReadingsNow(readings)}`;
 };
 
 /** The sentence every surface prints for a clause, derived from its data. */
@@ -167,13 +202,14 @@ const formatRuleClause = (
   side: "pause" | "resume",
   scores?: { tightness: number; riskAppetite: number },
 ): string => {
+  const described = clause.conditions.map((condition) => describeRuleCondition(condition, side, scores));
   const parts = [
-    ...clause.conditions.map((condition) => describeRuleCondition(condition, side, scores)),
+    ...described.map((condition) => condition.clause),
     ...(clause.qualifier ? [clause.qualifier] : []),
   ];
   if (parts.length === 0) return `${clause.verb}.`;
   const connective = side === "pause" ? "if" : "when";
-  return `${clause.verb} ${connective} ${parts.join(` ${clause.join} `)}.`;
+  return withReadingsNow(`${clause.verb} ${connective} ${parts.join(` ${clause.join} `)}.`, clause.join, described);
 };
 
 const withDerivedTriggers = (
@@ -251,12 +287,46 @@ const areaLabels: Record<DecisionArea, string> = {
 };
 
 export const decisionAreaLabel = (area: DecisionArea) => areaLabels[area];
+
+/*
+ * One glyph per area, beside the name and never in place of it (`AreaIcon`,
+ * app/components/ui/conceptIcons.tsx). A sprout for New bets rather than a
+ * flask: the rule is about starting something and letting it grow on proof, and
+ * a flask reads as a lab experiment the rules never mention.
+ */
+export const DECISION_AREA_ICONS: Record<DecisionArea, LucideIcon> = {
+  hiring: Users,
+  "product-tempo": RouteIcon,
+  "capital-raising": Landmark,
+  "burn-discipline": Wallet,
+  "expansion-bets": Sprout,
+};
+
+/*
+ * The score each area's lines are usually drawn on. The area table names it
+ * under a row whose lines do not say ("Line set by Funding pressure"), and the
+ * signal rows invert it ("Governs: Hiring, Fundraising, Spending"), so the two
+ * cannot disagree about which score rules which area.
+ */
+const usualMetrics: Record<DecisionArea, readonly RuleConditionMetric[]> = {
+  hiring: ["tightness"],
+  "burn-discipline": ["tightness"],
+  "product-tempo": ["riskAppetite"],
+  "expansion-bets": ["riskAppetite"],
+  "capital-raising": ["tightness", "riskAppetite"],
+};
+
+export const decisionAreaUsualMetrics = (area: DecisionArea) => usualMetrics[area];
+
+/** The areas a score governs, in the one area order. */
+export const areasGovernedBy = (metric: RuleConditionMetric): DecisionArea[] =>
+  decisionAreaOrder.filter((area) => usualMetrics[area].includes(metric));
 export const isDecisionArea = (value: string): value is DecisionArea =>
   Object.prototype.hasOwnProperty.call(areaLabels, value);
 export const extractCompactClause = extractCompactClauseFromFormatting;
 
 export const formatBoundedDecisionAction = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation">) =>
-  formatDecisionAction(rule.doNow[0] ?? rule.recommendation, "Keep last week's plan");
+  formatDecisionAction(rule.doNow[0] ?? rule.recommendation, "Keep your current plan");
 
 export const formatBoundedDecisionThreshold = (rule: Pick<BoundedDecisionRule, "pauseTrigger">) =>
   formatDecisionThreshold(rule.pauseTrigger, FALLBACK_PAUSE_THRESHOLD);
@@ -270,7 +340,7 @@ export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "do
     threshold: rule.pauseTrigger,
     reversal: rule.resumeTrigger,
     fallbacks: {
-      action: "Keep last week's plan",
+      action: "Keep your current plan",
       threshold: FALLBACK_PAUSE_THRESHOLD,
       reversal: "Resume only after the reading recovers",
     },
@@ -317,6 +387,75 @@ const fmt = formatThresholdNumber;
 export const SPENDING_PAYBACK_BAR_MONTHS = 6;
 
 /**
+ * How macro conditions translate into corporate balance sheets and operations for
+ * each area, giving non-economist founders intuitive mechanics and a shared
+ * operating lexicon without requiring manual inputs.
+ */
+export type DecisionAreaCorporateTransmission = {
+  /** How macroeconomic conditions transmit to this corporate decision area. */
+  transmission: string;
+  /** Why agreeing on this line ahead of time protects the business. */
+  whyLineMatters: string;
+  /** Shared rule of thumb for team rituals and Monday planning. */
+  ruleOfThumb: string;
+  /** Startup unit math grounding the macro condition in operating reality. */
+  startupMath?: string;
+};
+
+export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAreaCorporateTransmission> = {
+  hiring: {
+    transmission:
+      "When capital gets expensive, investors value companies on revenue, not headcount. Every new hire adds fixed monthly spend you can't easily undo if growth slows.",
+    whyLineMatters:
+      "Setting your pause line ahead of time protects the team you already have—so you never find yourself forced into emergency layoffs.",
+    ruleOfThumb:
+      "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, stick strictly to backfills and mission-critical roles.",
+    startupMath:
+      "A $180k hire adds ~$15k/mo in fixed payroll. In tight markets, that single hire requires $300k+ in fresh net ARR to justify at your next round.",
+  },
+  "product-tempo": {
+    transmission:
+      "When the market gets nervous, customers and investors care about what ships and pays off this quarter, not a 3-year vision.",
+    whyLineMatters:
+      "Shorter release cycles give you real user proof faster—and let you pivot before burning months of engineering time.",
+    ruleOfThumb:
+      "In Sunny weather, ship what drives activation and retention. In Stormy or Freezing, back only projects that pay for themselves within 12 months.",
+    startupMath:
+      "A 3-month engineering detour costs ~$75k+ in burn. Focus on features that save current customer renewals this quarter.",
+  },
+  "capital-raising": {
+    transmission:
+      "When investors get cautious, term sheets take twice as long and come with tougher terms. If you wait until runway is tight, you lose all your leverage.",
+    whyLineMatters:
+      "Starting early while conditions are open keeps timing and terms on your side rather than the market's.",
+    ruleOfThumb:
+      "In Sunny weather, raise opportunistically while terms are warm. In Freezing or Stormy, start early and protect your cap table over closing fast.",
+    startupMath:
+      "Term sheet diligence stretches from 4 weeks in Sunny weather to 12+ weeks in Cloudy or Freezing. Start 6 months before your runway line.",
+  },
+  "burn-discipline": {
+    transmission:
+      "SaaS tools, agencies, and extra vendor seats quietly pile up fixed monthly costs that linger long after top-line growth cools.",
+    whyLineMatters:
+      "Requiring a clear 6-month payback keeps money in the bank—which is the best insurance policy when the climate shifts.",
+    ruleOfThumb:
+      "In Sunny weather, invest in growth tooling with clear payback. In Cloudy or Freezing, pause discretionary spend that doesn't quickly pay for itself.",
+    startupMath:
+      "Trimming unused software seats and agency retainers every 90 days routinely extends company runway by 1–2 months.",
+  },
+  "expansion-bets": {
+    transmission:
+      "Big new product lines or expansion bets rely on cheap follow-on money that dries up fast when markets tighten.",
+    whyLineMatters:
+      "Funding new experiments in bite-sized stages means you can wind one down in a week without dragging down the core business.",
+    ruleOfThumb:
+      "In Sunny weather, fund new bets stage-by-stage with written stop triggers. In Stormy or Freezing, run only experiments you can pause on short notice.",
+    startupMath:
+      "Cap experiment risk to under 5% of monthly burn, requiring measurable customer demand before committing dedicated engineering time.",
+  },
+};
+
+/**
  * The payback bar a tight runway (6–12 months of cash) puts in front of every
  * stage rule, hires and growth campaigns included. Derived from the Spending
  * bar so it can never be looser: it said "a nine-month payback" and "six to
@@ -324,16 +463,28 @@ export const SPENDING_PAYBACK_BAR_MONTHS = 6;
  * printed on the same page at six. A tight runway extends the Spending bar to
  * everything; it does not relax it anywhere.
  */
-const TIGHT_RUNWAY_PAYBACK_BAR_MONTHS = SPENDING_PAYBACK_BAR_MONTHS;
+export const TIGHT_RUNWAY_PAYBACK_BAR_MONTHS = SPENDING_PAYBACK_BAR_MONTHS;
+
+/**
+ * The Product tempo rule's bar outside Sunny: it slows roadmap work "that pays
+ * back in more than a year". The rule's sentences say "a year"; the runway
+ * planner's project chart draws the same bar from this number, and
+ * `tests/projectPayback.test.ts` holds the two together.
+ */
+export const ROADMAP_PAYBACK_BAR_MONTHS = 12;
 
 /**
  * The four lines every area's pause and resume conditions are drawn from, set
  * apart from the change lines so a score must travel past a line, not touch it,
- * before a rule moves. One source for the rules below and for the track record's
- * count of months a line was crossed.
+ * before a rule moves. One source for the rules below, the monthly summary's
+ * bands and the track record's count of months a line was crossed.
+ *
+ * Every line is held to the 0-100 scale the scores are on. The tightness pause
+ * line was the one that was not, so a regime line of 95 or more (the advanced
+ * threshold controls go to 100) printed "Funding pressure > 101".
  */
 export const sharedDecisionLines = (thresholds: RuleContext["thresholds"]) => ({
-  tightnessPause: thresholds.tightnessRegime + 6,
+  tightnessPause: Math.min(thresholds.tightnessRegime + 6, 100),
   tightnessResume: Math.max(thresholds.tightnessRegime - 4, 0),
   riskPause: Math.max(thresholds.riskAppetiteRegime - 6, 0),
   riskResume: Math.min(thresholds.riskAppetiteRegime + 4, 100),
@@ -403,14 +554,14 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       avoidNow: isExpansion
         ? ["Don't wait until you need the money to talk to investors."]
         : ["Don't trade term quality for a faster close."],
-      scope: "When to start a raise, how fast to run it, and the worst terms you would accept.",
+      scope: "When to start a raise, how fast to run it, and where to walk away on terms.",
       pause: { verb: "Pause the raise", join: "or", conditions: [riskPauseLine, tightnessPauseLine] },
       resume: { verb: "Resume the full process", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
       rationale: "Start while conditions are good and you choose the terms; start late and the market does.",
     },
     "burn-discipline": {
       area: "burn-discipline",
-      recommendation: `Approve new spend only if it pays back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
+      recommendation: `Approve spending only if it pays back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
       doNow: [`Put a payback figure on every discretionary line before approving it; ${SPENDING_PAYBACK_BAR_MONTHS} months is the bar.`],
       avoidNow: ["Don't sign a multi-quarter commitment without a payback figure."],
       scope: "Hiring, vendor and marketing spend that commits you for more than one quarter.",
@@ -530,10 +681,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't make several permanent hires before one milestone lands.",
         ],
         watchAdjustments: [
-          `Runway trigger: tighten if ${tightnessPauseLine} for 2 readings in a row.`,
+          withReadingsNow(`Runway trigger: tighten if ${tightnessPauseLine.clause} for 2 readings in a row.`, "or", [tightnessPauseLine]),
         ],
         thresholdEmphasis: "Protect runway first; fund one proof of demand at a time rather than breadth.",
-        reversalTriggerDiscipline: `Reverse the hold only after ${tightnessResumeLine} for two readings in a row and one shipped milestone shows traction.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause} for two readings in a row and one shipped milestone shows traction.`, "or", [tightnessResumeLine]),
       };
     }
 
@@ -549,7 +700,7 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't run two expansion programs at once; you won't know which one paid back.",
         ],
         watchAdjustments: [
-          `Payback trigger: revisit the plan if ${riskPauseLine}.`,
+          withReadingsNow(`Payback trigger: revisit the plan if ${riskPauseLine.clause}.`, "or", [riskPauseLine]),
         ],
         /*
          * The Spending bar, not a stage bar of its own: this said "pay back inside
@@ -557,7 +708,7 @@ export const buildScopedVariantDecisionAdjustment = ({
          * spend only inside six. A stage adds emphasis; it never relaxes that bar.
          */
         thresholdEmphasis: `Payback first: fund the channels that convert repeatably and pay back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
-        reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion holds for two weekly reviews.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${riskResumeLine.clause} and conversion holds for two weekly reviews.`, "or", [riskResumeLine]),
       };
     }
 
@@ -573,10 +724,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't add fixed cost on the assumption that valuations recover.",
         ],
         watchAdjustments: [
-          `Leverage trigger: hold expansion if ${tightnessPauseLine}.`,
+          withReadingsNow(`Leverage trigger: hold expansion if ${tightnessPauseLine.clause}.`, "or", [tightnessPauseLine]),
         ],
         thresholdEmphasis: "Efficiency first: show the margin gain before adding headcount.",
-        reversalTriggerDiscipline: `Reverse the hold only when, in the same week, ${tightnessResumeLine} and ${riskResumeLine}.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only when, in the same week, ${tightnessResumeLine.clause} and ${riskResumeLine.clause}.`, "and", [tightnessResumeLine, riskResumeLine]),
       };
     }
 
@@ -592,10 +743,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't grow revenue faster than support and margin can carry it.",
         ],
         watchAdjustments: [
-          `Growth trigger: re-sequence expansion if ${riskPauseLine}.`,
+          withReadingsNow(`Growth trigger: re-sequence expansion if ${riskPauseLine.clause}.`, "or", [riskPauseLine]),
         ],
         thresholdEmphasis: "Prove customer acquisition cost payback, retention and support capacity before adding fixed cost.",
-        reversalTriggerDiscipline: `Reverse the hold only after ${riskResumeLine} and conversion improves, both for two weekly readings.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${riskResumeLine.clause} and conversion improves, both for two weekly readings.`, "or", [riskResumeLine]),
       };
     }
 
@@ -611,10 +762,10 @@ export const buildScopedVariantDecisionAdjustment = ({
           "Don't fund programs that only meet guidance if the market re-rates.",
         ],
         watchAdjustments: [
-          `Guidance trigger: tighten discretionary spend if ${tightnessPauseLine}.`,
+          withReadingsNow(`Guidance trigger: tighten discretionary spend if ${tightnessPauseLine.clause}.`, "or", [tightnessPauseLine]),
         ],
         thresholdEmphasis: "Earnings durability first: cash conversion and hitting guidance before growth.",
-        reversalTriggerDiscipline: `Reverse the hold only when ${tightnessResumeLine} and confidence in your earnings guidance improves with it.`,
+        reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only when ${tightnessResumeLine.clause} and confidence in your earnings guidance improves with it.`, "or", [tightnessResumeLine]),
       };
     }
 
@@ -631,10 +782,10 @@ export const buildScopedVariantDecisionAdjustment = ({
         "Don't start anything that needs outside money to finish.",
       ],
       watchAdjustments: [
-        `Cash trigger: tighten spend if ${tightnessPauseLine} or ${riskPauseLine}.`,
+        withReadingsNow(`Cash trigger: tighten spend if ${tightnessPauseLine.clause} or ${riskPauseLine.clause}.`, "or", [tightnessPauseLine, riskPauseLine]),
       ],
-      thresholdEmphasis: "Cash first: commitments you can reverse, over growth that looks good.",
-      reversalTriggerDiscipline: `Reverse the hold only after ${tightnessResumeLine}, ${riskResumeLine}, and cash payback holds for two weekly readings in a row.`,
+      thresholdEmphasis: "Cash first: pick commitments you can reverse over growth that just looks good.",
+      reversalTriggerDiscipline: withReadingsNow(`Reverse the hold only after ${tightnessResumeLine.clause}, ${riskResumeLine.clause}, and cash payback holds for two weekly readings in a row.`, "and", [tightnessResumeLine, riskResumeLine]),
     };
   };
 

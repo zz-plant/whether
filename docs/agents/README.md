@@ -19,16 +19,14 @@ Start here when you want the fastest correct repo orientation:
 If you will delegate work to a subagent, also read the delegation packet in `mcp-and-skills-playbook.md` before handing work off.
 
 Long-form reasoning behind repo rules lives in `lessons/` (toolchain and gates, automation and the
-deploy gate, tests and copy, dead features and honesty, regime scoring); `hot-files.md` lists the
+deploy gate, tests and copy, dead features and honesty, regime scoring, runtime helpers); `hot-files.md` lists the
 files most work lands in. Open the one that matches the task.
 
 Useful helpers:
 - `bun run agent:doctor`
 - `bun run agent:route -- "<task>"`
-- `bun run agent:route -- --local "<task>"`
 - `bun run agent:handoff -- --job "<job>"`
 - `bun run agent:index`
-- `bun run agent:prewarm`
 
 ## Fast start
 
@@ -133,7 +131,7 @@ Do this before spawning or briefing a subagent:
 
 ## Common blockers
 
-- **403/WAF**: verify `"$WHETHER_API_URL/api/health"`; if edge policy blocks CLI routes, use `GET /api/agent?cadence=weekly` from `agent-interface.md`.
+- **403/WAF**: `bun run check:production-edge [base-url]` fetches `/` and `/api/health` and names the cause: a Cloudflare managed challenge, a challenge page behind a 403, another 4xx/5xx, or a DNS failure. `bun run check:production-assets` checks every static asset, font and OG route for a 200 with the expected content type. If edge policy blocks CLI routes, use `GET /api/agent?cadence=weekly` from `agent-interface.md`.
 - **Missing PATH**: run `bun run cli:whether -- <command>` instead of relying on global `whether`.
 - **No package install**: skip CLI bootstrap and pull briefing data directly:
   - `curl -fsS "${WHETHER_API_URL:-http://localhost:3000}/api/agent?cadence=weekly"`

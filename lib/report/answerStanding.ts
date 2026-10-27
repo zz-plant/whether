@@ -1,5 +1,6 @@
 import type { AnswerPageData } from "../answerContentSource";
 import { describeAreaPauseStatus, type HomeAreaRow } from "./home/homeSectionModel";
+import type { LineState } from "./operatingCalls";
 
 /**
  * Where one answer's question stands this week, for the row on `/resolve` that
@@ -28,11 +29,11 @@ export const describeAnswerStanding = ({
   areaRows: readonly Pick<HomeAreaRow, "area" | "pause">[];
   /** The week's weather word (`getRegimePublicLabel`). */
   conditionsLabel: string;
-}): { kind: "area"; text: string; crossed: boolean } | { kind: "conditions"; text: string } | undefined => {
+}): { kind: "area"; text: string; crossed: boolean; state: LineState } | { kind: "conditions"; text: string } | undefined => {
   if (page.category === "climate") return { kind: "conditions", text: conditionsLabel };
   if (page.category !== "decision") return undefined;
   const lead = page.mappedDecisionAreas[0];
   const row = areaRows.find((candidate) => candidate.area === lead);
   const status = row ? describeAreaPauseStatus(row) : undefined;
-  return status ? { kind: "area", text: status.text, crossed: status.crossed } : undefined;
+  return status ? { kind: "area", text: status.text, crossed: status.crossed, state: status.state } : undefined;
 };

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { ClipboardActionRow } from "../../components/clipboardActionRow";
 import { OperatorProfileNumberField } from "../../components/operatorProfileFields";
 import { getClipboardUiState, useClipboardCopy } from "../../components/useClipboardCopy";
@@ -11,6 +11,7 @@ import { isPlannerSector, resolveProfileRunway, setOperatorProfileField } from "
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import {
   buildSharedRunwayPlanQuery,
+  plannerEditStands,
   readSharedRunwayPlan,
   resolveSharedRunwayProfile,
 } from "./runwayPlanLink";
@@ -32,6 +33,9 @@ import {
 import type { RegimeAssessment } from "../../../lib/regimeEngine";
 import type { ReportData } from "../../../lib/report/reportData";
 import { ScoreCell } from "../../components/ui/scoreCell";
+import { buildEngineeringPaybackLines, buildProjectPaybacks, resolvePaybackBar } from "../../../lib/report/projectPayback";
+import { runwayBandForMonths } from "../../../lib/report/operatorRunway";
+import { ProjectPaybackSection } from "./projectPaybackSection";
 
 const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
   { value: "b2b-saas", label: "B2B SaaS" },
@@ -41,7 +45,7 @@ const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
 
 const strictnessLabel = (value: number) => {
   if (value <= 0) return { label: "Relaxed", tone: "border-emerald-400/40 bg-emerald-500/10 text-emerald-100" };
-  if (value === 1) return { label: "Cautious", tone: "border-sky-400/40 bg-sky-500/10 text-sky-100" };
+  if (value === 1) return { label: "Cautious", tone: "border-slate-600/60 bg-slate-800/40 text-slate-100" };
   if (value === 2) return { label: "Strict", tone: "border-amber-400/40 bg-amber-500/10 text-amber-100" };
   return { label: "Maximum strictness", tone: "border-rose-400/40 bg-rose-500/10 text-rose-100" };
 };
@@ -61,7 +65,7 @@ const RangeBar = ({
   point,
   marker,
   unit = "",
-  tone = "sky",
+  tone = "ink",
   label,
 }: {
   min: number;
@@ -73,13 +77,14 @@ const RangeBar = ({
   /** A second value to compare against, e.g. the operator's own runway. */
   marker?: { value: number; label: string };
   unit?: string;
-  tone?: "sky" | "emerald" | "amber" | "rose";
+  /** "ink" for a neutral figure: the action colour is for controls (ui-ux-standards §XXVII). */
+  tone?: "ink" | "emerald" | "amber" | "rose";
   label: string;
 }) => {
   const span = max - min || 1;
   const pct = (value: number) => `${Math.min(100, Math.max(0, ((value - min) / span) * 100))}%`;
-  const bandColor = { sky: "bg-sky-400/25", emerald: "bg-emerald-400/25", amber: "bg-amber-400/25", rose: "bg-rose-400/25" }[tone];
-  const pointColor = { sky: "bg-sky-300", emerald: "bg-emerald-300", amber: "bg-amber-300", rose: "bg-rose-300" }[tone];
+  const bandColor = { ink: "bg-slate-300/25", emerald: "bg-emerald-400/25", amber: "bg-amber-400/25", rose: "bg-rose-400/25" }[tone];
+  const pointColor = { ink: "bg-slate-300", emerald: "bg-emerald-300", amber: "bg-amber-300", rose: "bg-rose-300" }[tone];
   const fmt = (value: number) => `${Number.isInteger(value) ? value : value.toFixed(1)}${unit}`;
   return (
     <div className="mt-3" aria-label={label}>
@@ -154,17 +159,43 @@ export function RunwayPlannerPanel({
    * shows their figures without overwriting yours.
    */
   const shared = useMemo(() => readSharedRunwayPlan(searchParams), [searchParams]);
-  const profile = useMemo(() => resolveSharedRunwayProfile(storedProfile, shared.profile), [storedProfile, shared.profile]);
-  const stage = shared.stage ?? storedStage;
+  const linkedProfile = useMemo(() => resolveSharedRunwayProfile(storedProfile, shared.profile), [storedProfile, shared.profile]);
+
+  /*
+   * The plan as last edited here, until the address bar catches up with it.
+   * `router.replace` lands a server round trip after the edit, and until then
+   * the link still holds the plan before it. Read back as "the link wins", that
+   * older link was the base the next edit was built on, so a second field typed
+   * inside the round trip wrote the first one back to its old value — in the
+   * stored profile's place, permanently, because the link wins (2026-10-13,
+   * found when a project row's fields went missing one after another).
+   *
+   * `plannerEditStands` says when the address bar has caught up, or been
+   * replaced by someone else's link.
+   */
+  const currentQuery = searchParams?.toString() ?? "";
+  const [ownEdit, setOwnEdit] = useState<{
+    profile: typeof linkedProfile;
+    stage: typeof storedStage;
+    queries: readonly string[];
+  } | null>(null);
+  if (ownEdit && !plannerEditStands(ownEdit.queries, currentQuery)) setOwnEdit(null);
+  const profile = ownEdit?.profile ?? linkedProfile;
+  const stage = ownEdit ? ownEdit.stage : shared.stage ?? storedStage;
 
   /* Every edit writes both, so the address bar is always the plan on screen and
      "copy link" needs no separate button to keep in sync. */
   const syncPlanLink = useCallback(
     (nextProfile: typeof profile, nextStage: typeof stage) => {
       const query = buildSharedRunwayPlanQuery(nextProfile, nextStage);
+      setOwnEdit((previous) => ({
+        profile: nextProfile,
+        stage: nextStage,
+        queries: [...(previous?.queries ?? [currentQuery]), query],
+      }));
       router.replace(toRoute(query ? `${pathname}?${query}` : pathname), { scroll: false });
     },
-    [pathname, router],
+    [currentQuery, pathname, router, setOwnEdit],
   );
 
   const commitProfileField = useCallback(
@@ -207,11 +238,31 @@ export function RunwayPlannerPanel({
     [output, resolution, hydrated, profile.raiseAtRunwayMonths, profile.hiringPauseAtRunwayMonths],
   );
 
-  const shareBlock = useMemo(() => (output ? formatRunwayPlanCompactBlock(output, inYourNumbers) : ""), [output, inYourNumbers]);
+  /* The planner's projects against the bar the published rules set for this
+     week's conditions and this runway. Net burn is spend less revenue, the
+     figure the runway itself is counted in. */
+  const projectPayback = useMemo(() => {
+    if (!resolution.ready) return null;
+    const { runway, burn, revenue } = resolution.request;
+    const bar = resolvePaybackBar(assessment.regime, runwayBandForMonths(runway));
+    const paybacks = buildProjectPaybacks(profile.paybackProjects ?? [], {
+      regime: assessment.regime,
+      runwayMonths: runway,
+      netMonthlyBurnUsd: burn - revenue,
+      engineerWeekCostUsd: profile.engineerWeekCostUsd,
+    });
+    return { bar, paybacks, lines: buildEngineeringPaybackLines(paybacks, bar, assessment.regime) };
+  }, [assessment.regime, profile.engineerWeekCostUsd, profile.paybackProjects, resolution]);
+
+  const shareBlock = useMemo(
+    () => (output ? formatRunwayPlanCompactBlock(output, inYourNumbers, projectPayback?.lines) : ""),
+    [output, inYourNumbers, projectPayback],
+  );
   const { status, error, activeTarget, copiedTarget, copyToClipboard } = useClipboardCopy({ commitment: "copied_brief" });
   const clipboardState = getClipboardUiState("runway-plan", { status, error, activeTarget, copiedTarget });
   const memoClipboardState = getClipboardUiState("budget-memo", { status, error, activeTarget, copiedTarget });
-  const paybackStrictnessLevel = output ? Number.parseInt(output.decisionKnobs.paybackStrictnessLabel, 10) || 0 : 0;
+  /* The level comes through as a number; the label is display copy, never something to parse back. */
+  const paybackStrictnessLevel = output ? output.decisionKnobs.paybackStrictnessLevel : 0;
   const paybackStrictnessState = strictnessLabel(paybackStrictnessLevel);
 
   const memoMarkdown = useMemo(() => {
@@ -229,25 +280,25 @@ export function RunwayPlannerPanel({
       stageLabel: stage ? operatorStageLabel(stage) : "Series A (default)",
       sectorLabel: sectorOptions.find((option) => option.value === request.sector)?.label ?? request.sector,
       inYourNumbers,
+      engineering: projectPayback?.lines ?? null,
     });
-  }, [assessment, sensors, macroSeries, recordDateLabel, output, paybackStrictnessLevel, paybackStrictnessState.label, resolution, stage, inYourNumbers]);
+  }, [assessment, sensors, macroSeries, recordDateLabel, output, paybackStrictnessLevel, paybackStrictnessState.label, resolution, stage, inYourNumbers, projectPayback]);
 
   return (
     <section className="weather-panel-static mt-6 space-y-4 p-6" aria-label="Runway planner">
       <div>
-        <p className="type-label text-slate-400">Runway and burn</p>
-        <h3 className="text-lg font-semibold text-slate-100">Runway planner</h3>
-        <p className="mt-2 text-sm text-slate-300">
-          Check your runway plan against this week&apos;s guidance so burn, fundraising timing, and the lines that pause and resume spending stay aligned.
-        </p>
+        {/* No heading or intro of its own: the page's h1 is "Runway planner", and
+            the intro under it says what the planner sizes against. An h3 gave the
+            outline the same name twice, and a "Runway and burn" paragraph said the
+            intro's sentence again directly under it (2026-10-09). */}
         {/* Native disclosure: the method is evidence for the figures below,
             and its open state is nobody else's business, so no query key. */}
-        <details className="weather-auto-chevron mt-3">
+        <details className="weather-auto-chevron">
           <summary className="text-xs font-semibold text-slate-200">
             How is this calculated?
           </summary>
           <p className="rounded-md border border-slate-700/70 bg-slate-950/70 p-3 text-xs text-slate-300">
-            Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions; growth compounds monthly. The burn multiple is spend over revenue, read as 4x with no revenue and never above 4x, so earning something never scores worse than earning nothing.
+            Runway risk scores your runway against the safe band, your burn against revenue growth, and this week&apos;s conditions. Growth compounds monthly. Burn is compared with monthly revenue: monthly burn divided by monthly revenue, read as 4x with no revenue and never above 4x, so earning something never scores worse than earning nothing.
           </p>
         </details>
       </div>
@@ -259,7 +310,7 @@ export function RunwayPlannerPanel({
         <OperatorProfileNumberField
           field="cashUsd"
           label="Cash in the bank ($)"
-          hint="Your balance today. Runway is worked out from it."
+          hint="Runway is worked out from it."
           placeholder="e.g. $2.1M"
           value={profile.cashUsd}
           onCommit={(value) => commitProfileField("cashUsd", value)}
@@ -366,7 +417,7 @@ export function RunwayPlannerPanel({
                 : describeMissingRunwayInputs(resolution.missing)}
           </p>
           <p className="mt-1 text-fluid-xs text-slate-400">
-            Your figures stay in this browser and are shared with the plan stress test. Nothing is sized until you enter them.
+            Your figures stay in this browser and are shared with the plan stress test.
           </p>
         </div>
       ) : (
@@ -435,7 +486,7 @@ export function RunwayPlannerPanel({
                 marker={{ value: resolution.request.runway, label: "runway ends" }}
                 point={output.raiseTimingWindow.timeToSafeRunwayTargetMonths}
                 unit="mo"
-                tone="sky"
+                tone="ink"
                 label="Raise window against runway"
               />
               {inYourNumbers ? (
@@ -464,7 +515,7 @@ export function RunwayPlannerPanel({
                 point={output.burnAdjustmentRange.recommendedDeltaPercent}
                 marker={{ value: 0, label: "hold" }}
                 unit="%"
-                tone={output.burnAdjustmentRange.recommendedDeltaPercent < 0 ? "amber" : "sky"}
+                tone={output.burnAdjustmentRange.recommendedDeltaPercent < 0 ? "amber" : "ink"}
                 label="Recommended burn change inside its range"
               />
               {inYourNumbers?.burnChange ? (
@@ -484,8 +535,8 @@ export function RunwayPlannerPanel({
             <div>
               <p id="ops-runway-lines-heading" className="text-xs font-semibold text-slate-400">Your own runway lines</p>
               <p className="mt-1 text-fluid-xs text-slate-400">
-                Agree them now, while nothing is urgent. Each gets the month it arrives at today&apos;s net burn, and
-                travels with the link and the memo.
+                Agree them now, while nothing is urgent. Each one shows the month you&apos;d hit it at
+                today&apos;s net burn, and goes out with the link and the memo.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -514,6 +565,21 @@ export function RunwayPlannerPanel({
               </ul>
             ) : null}
           </section>
+
+          {projectPayback ? (
+            <ProjectPaybackSection
+              regime={assessment.regime}
+              bar={projectPayback.bar}
+              runwayMonths={resolution.request.runway}
+              engineerWeekCostUsd={profile.engineerWeekCostUsd}
+              entries={profile.paybackProjects ?? []}
+              paybacks={projectPayback.paybacks}
+              scores={{ tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite }}
+              changeLines={{ tightness: assessment.thresholds.tightnessRegime, riskAppetite: assessment.thresholds.riskAppetiteRegime }}
+              onEngineerWeekCostChange={(value) => commitProfileField("engineerWeekCostUsd", value)}
+              onEntriesChange={(next) => commitProfileField("paybackProjects", next)}
+            />
+          ) : null}
 
           <div className="weather-surface p-4">
             <p className="text-xs font-semibold text-slate-400">The rules this sets</p>
@@ -555,10 +621,6 @@ export function RunwayPlannerPanel({
               state={clipboardState}
               onClick={() => {
                 void copyToClipboard(shareBlock, "runway-plan");
-              }}
-              buttonProps={{
-                "data-premium-intent": "runway_planner",
-                "data-premium-cta": "copy_financial_block",
               }}
               compact
             />

@@ -1,21 +1,26 @@
 /**
  * The engine behind `scripts/agent-workflow.mjs`: keyword routing, the doctor report,
- * handoff packets, the repo index and the local-model router. What it knows about this
- * repository — the task profiles, the core surfaces, where the skills live — is
- * `scripts/agent-workflow.config.mjs`.
+ * handoff packets and the repo index. What it knows about this repository — the task
+ * profiles, the tool hints, where the lessons table and the skills live, the core
+ * surfaces — is `scripts/agent-workflow.config.mjs`.
  */
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import {
   CORE_SURFACES,
   DEFAULT_PROFILE,
-  REPOSITORY_NAME,
+  LESSONS_TABLE,
   SKILLS_DIRECTORY,
   TASK_PROFILES,
+  TOOL_HINTS,
 } from "./agent-workflow.config.mjs";
 import { execOutput, execText, parseGitStatus } from "./exec.mjs";
 import { walkFiles } from "./walk-files.mjs";
+
+/** The checkout this library sits in: where the lessons table is read when no root is given. */
+const LIBRARY_REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 // Explicit so the order is code-unit order on every runtime, not the default's string coercion.
 const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -66,11 +71,116 @@ function listTaskProfiles() {
     rationale: profile.rationale,
     docs: profile.docs,
     targets: profile.targets,
+    skills: profile.skills,
     checks: profile.checks,
   }));
 }
 
-export function classifyTask(task) {
+// Words a topic phrase carries for grammar, not meaning: "a retry" asks only for "retry".
+const PHRASE_STOPWORDS = new Set(["a", "an", "the", "any", "anything", "of", "or", "and", "to", "in", "on", "for", "with", "this", "that", "is", "it"]);
+
+/** Drops plural and -ed/-ing endings, so "streams", "stream" and "streaming" compare equal. */
+function stem(word) {
+  let stemmed = word;
+  if (stemmed.length > 4 && stemmed.endsWith("ies")) stemmed = `${stemmed.slice(0, -3)}y`;
+  else if (stemmed.length > 3 && stemmed.endsWith("s") && !stemmed.endsWith("ss")) stemmed = stemmed.slice(0, -1);
+  if (stemmed.length > 4 && stemmed.endsWith("ed")) stemmed = stemmed.slice(0, -2);
+  else if (stemmed.length > 5 && stemmed.endsWith("ing")) stemmed = stemmed.slice(0, -3);
+  if (stemmed.length > 3 && stemmed.endsWith("e")) stemmed = stemmed.slice(0, -1);
+  return stemmed;
+}
+
+const splitWords = (text) => normalizeText(text).split(/[^a-z0-9]+/).filter(Boolean);
+
+/**
+ * The word sets a phrase matches, one per alternative. A backticked path is named by its
+ * last segment (`lib/runtime/` by "runtime"); a slash between words is a choice
+ * ("email/Slack send" is "email send" or "slack send").
+ */
+function phraseAlternatives(phrase) {
+  const trimmed = phrase.trim();
+  const codePath = /^`([^`]+)`$/.exec(trimmed);
+  if (codePath) {
+    const segment = codePath[1].split("/").filter(Boolean).at(-1) ?? "";
+    const name = segment.replace(/\.[a-z]+$/i, "").toLowerCase();
+    return name ? [[stem(name)]] : [];
+  }
+
+  const words = normalizeText(trimmed).split(/\s+/).filter(Boolean);
+  const choiceIndex = words.findIndex((word) => word.includes("/"));
+  const variants = choiceIndex === -1
+    ? [words]
+    : words[choiceIndex].split("/").filter(Boolean).map((choice) => words.with(choiceIndex, choice));
+  return variants
+    .map((variant) => splitWords(variant.join(" ")).filter((word) => !PHRASE_STOPWORDS.has(word)).map(stem))
+    .filter((required) => required.length > 0);
+}
+
+const phraseMatches = (taskWords, phrase) =>
+  phraseAlternatives(phrase).some((required) => required.every((word) => taskWords.has(word)));
+
+/** Splits a table cell on commas, keeping a quoted phrase ("green here, red there") whole. */
+function splitTopics(cell) {
+  const topics = [];
+  let current = "";
+  let quoted = false;
+  for (const character of cell) {
+    if (character === '"') quoted = !quoted;
+    if (character === "," && !quoted) {
+      topics.push(current);
+      current = "";
+    } else {
+      current += character;
+    }
+  }
+  topics.push(current);
+  return topics.map((topic) => topic.replace(/"/g, "").trim()).filter(Boolean);
+}
+
+/**
+ * The rows of CLAUDE.md's "Read before you touch" table: each row's topics and the file it
+ * links. Empty when the file or the heading is missing; the router then names no lessons.
+ */
+function readLessonsTable(repoRoot) {
+  let text;
+  try {
+    text = fs.readFileSync(path.join(repoRoot, LESSONS_TABLE.file), "utf8");
+  } catch {
+    return [];
+  }
+
+  const lines = text.split("\n");
+  const start = lines.findIndex((line) => line.startsWith(LESSONS_TABLE.heading));
+  if (start === -1) return [];
+
+  const rows = [];
+  for (const line of lines.slice(start + 1)) {
+    if (line.startsWith("#")) break;
+    if (!line.startsWith("|")) continue;
+    const [topics = "", read = ""] = line.split("|").slice(1, -1).map((cell) => cell.trim());
+    const file = /\]\(([^)\s]+)\)/.exec(read)?.[1];
+    if (file) rows.push({ topics: splitTopics(topics), file });
+  }
+  return rows;
+}
+
+function matchLessons(task, repoRoot) {
+  const taskWords = new Set(splitWords(task).map(stem));
+  return unique(
+    readLessonsTable(repoRoot)
+      .filter((row) => row.topics.some((topic) => phraseMatches(taskWords, topic)))
+      .map((row) => row.file),
+  );
+}
+
+function matchTools(task) {
+  const taskWords = new Set(splitWords(task).map(stem));
+  return TOOL_HINTS.filter((hint) => hint.keywords.some((keyword) => phraseMatches(taskWords, keyword))).map(
+    ({ id, command, why }) => ({ id, command, why }),
+  );
+}
+
+export function classifyTask(task, { repoRoot = LIBRARY_REPO_ROOT } = {}) {
   const normalizedTask = normalizeText(task);
 
   if (!normalizedTask) {
@@ -80,8 +190,13 @@ export function classifyTask(task) {
       score: 0,
       task: "",
       source: "keyword-router",
+      lessons: [],
+      tools: [],
     };
   }
+
+  const lessons = matchLessons(task, repoRoot);
+  const tools = matchTools(task);
 
   const scored = TASK_PROFILES.map((profile) => {
     const matchedKeywords = profile.keywords.filter((keyword) => countMatches(normalizedTask, keyword) > 0);
@@ -98,6 +213,8 @@ export function classifyTask(task) {
       score: 0,
       task,
       source: "keyword-router",
+      lessons,
+      tools,
     };
   }
 
@@ -107,11 +224,14 @@ export function classifyTask(task) {
     rationale: winner.profile.rationale,
     docs: winner.profile.docs,
     targets: winner.profile.targets,
+    skills: winner.profile.skills,
     checks: winner.profile.checks,
     matchedKeywords: winner.matchedKeywords,
     score: winner.score,
     task,
     source: "keyword-router",
+    lessons,
+    tools,
   };
 }
 
@@ -175,7 +295,7 @@ export function buildDoctorReport({
   // Untrimmed: the first entry's leading space is its status column (see scripts/exec.mjs).
   const statusOutput = safeShell(() => execOutput("git", ["status", "--porcelain"], cwd), "");
   const changedFiles = parseGitStatus(statusOutput).map(({ code, path: file }) => ({ status: code, file: file.trim() }));
-  const route = classifyTask(task);
+  const route = classifyTask(task, { repoRoot: cwd });
   const relevantPaths = inputPaths.length > 0 ? inputPaths : changedFiles.map((entry) => entry.file);
   const agentFiles = findRelevantAgentFiles(cwd, relevantPaths);
 
@@ -225,11 +345,12 @@ export function buildHandoffPacket({
   skill = "",
 } = {}) {
   const cwd = repoRoot ? path.resolve(repoRoot) : process.cwd();
-  const route = classifyTask(task || job);
+  const route = classifyTask(task || job, { repoRoot: cwd });
   const skillPath = resolveSkillPath(cwd, skill);
   const mergedReadAnchors = unique([
     ...readAnchors,
     ...route.docs,
+    ...route.lessons,
     ...route.targets.slice(0, 2),
     skillPath,
   ]);
@@ -313,6 +434,7 @@ export function buildRepoIndex({ repoRoot } = {}) {
     },
     categories: categorizeFiles(files),
     taskProfiles: listTaskProfiles(),
+    toolHints: TOOL_HINTS,
   };
 
   const skillsMap = {
@@ -350,302 +472,11 @@ export function writeRepoIndex({ repoRoot, outDir } = {}) {
   return { outputDirectory, paths, index };
 }
 
-export function readRepoIndex({ repoRoot, outDir } = {}) {
-  const cwd = repoRoot ? path.resolve(repoRoot) : process.cwd();
-  const outputDirectory = outDir ? path.resolve(cwd, outDir) : path.join(cwd, ARTIFACTS_AGENT_DIR);
-  const paths = {
-    fileMap: path.join(outputDirectory, INDEX_FILENAMES.fileMap),
-    skillsMap: path.join(outputDirectory, INDEX_FILENAMES.skillsMap),
-    testMap: path.join(outputDirectory, INDEX_FILENAMES.testMap),
-  };
-
-  if (!Object.values(paths).every((candidate) => fs.existsSync(candidate))) {
-    return null;
-  }
-
-  return {
-    outputDirectory,
-    paths,
-    index: {
-      fileMap: JSON.parse(fs.readFileSync(paths.fileMap, "utf8")),
-      skillsMap: JSON.parse(fs.readFileSync(paths.skillsMap, "utf8")),
-      testMap: JSON.parse(fs.readFileSync(paths.testMap, "utf8")),
-    },
-  };
-}
-
-export function buildCompactIndexSummary(index) {
-  return {
-    counts: index.fileMap.counts,
-    agentGuides: [
-      ...index.fileMap.categories.rootAgents,
-      ...index.fileMap.categories.nestedAgents.slice(0, 8),
-      ...index.fileMap.categories.docsAgents.slice(0, 8),
-    ],
-    skills: index.skillsMap.skills.map((skill) => skill.name),
-    testsSample: index.testMap.tests.slice(0, 12),
-    taskProfiles: index.fileMap.taskProfiles.map((profile) => ({
-      id: profile.id,
-      label: profile.label,
-      docs: profile.docs,
-      targets: profile.targets.slice(0, 3),
-    })),
-  };
-}
-
-function extractFirstJsonObject(text) {
-  const candidate = String(text ?? "").trim();
-  if (!candidate) return null;
-
-  try {
-    return JSON.parse(candidate);
-  } catch {
-    const match = candidate.match(/\{[\s\S]*\}/);
-    if (!match) return null;
-
-    try {
-      return JSON.parse(match[0]);
-    } catch {
-      return null;
-    }
-  }
-}
-
-function extractProfileSuggestion(content) {
-  const normalizedContent = String(content ?? "");
-  const parsed = extractFirstJsonObject(normalizedContent);
-  if (parsed?.profile_id) {
-    return parsed;
-  }
-
-  const profileIdMatch = normalizedContent.match(/profile_id["']?\s*[:=]\s*["']?([a-z-]+)["']?/i);
-  if (profileIdMatch?.[1]) {
-    return {
-      profile_id: profileIdMatch[1],
-      rationale: normalizedContent.trim(),
-    };
-  }
-
-  const normalized = normalizedContent;
-  for (const profile of [...TASK_PROFILES, DEFAULT_PROFILE]) {
-    if (normalized.includes(profile.id) || normalized.toLowerCase().includes(profile.label.toLowerCase())) {
-      return {
-        profile_id: profile.id,
-        rationale: normalized.trim() || profile.rationale,
-      };
-    }
-  }
-
-  return null;
-}
-
-function sanitizeLocalRationale(rawRationale, fallbackRationale) {
-  const text = String(rawRationale ?? "")
-    .replace(/<think>[\s\S]*?<\/think>/gi, "")
-    .replace(/profile_id\s*[:=]\s*[a-z-]+/gi, "")
-    .replace(/```json|```/gi, "")
-    .trim();
-
-  return text || fallbackRationale;
-}
-
-function findProfileById(profileId) {
-  if (!profileId) return null;
-  const matched = TASK_PROFILES.find((profile) => profile.id === profileId);
-  return matched ?? (profileId === DEFAULT_PROFILE.id ? DEFAULT_PROFILE : null);
-}
-
-export async function classifyTaskWithLocalModel({
-  task,
-  repoRoot,
-  fetchImpl = globalThis.fetch,
-  baseUrl = process.env.LMSTUDIO_BASE_URL || "http://localhost:1234/v1",
-  model = process.env.LMSTUDIO_FAST_MODEL || "qwen3.5-9b",
-  timeoutMs = Number(process.env.LMSTUDIO_ROUTE_TIMEOUT_MS || 4000),
-  outDir,
-  refreshIndex = false,
-} = {}) {
-  const fallback = classifyTask(task);
-
-  if (!fetchImpl || !task) {
-    return {
-      route: fallback,
-      mode: "fallback",
-      fallbackReason: !task ? "missing-task" : "fetch-unavailable",
-    };
-  }
-
-  const cached = !refreshIndex ? readRepoIndex({ repoRoot, outDir }) : null;
-  const indexBundle = cached ?? writeRepoIndex({ repoRoot, outDir });
-  const compactIndex = buildCompactIndexSummary(indexBundle.index);
-
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-
-  try {
-    const response = await fetchImpl(`${baseUrl.replace(/\/$/, "")}/completions`, {
-      method: "POST",
-      headers: {
-        "content-type": "application/json",
-      },
-      signal: controller.signal,
-      body: JSON.stringify({
-        model,
-        temperature: 0,
-        max_tokens: 48,
-        prompt: buildLocalRoutePrompt(task, compactIndex),
-      }),
-    });
-
-    clearTimeout(timer);
-
-    if (!response.ok) {
-      return {
-        route: fallback,
-        mode: "fallback",
-        fallbackReason: `http-${response.status}`,
-        indexPath: indexBundle.outputDirectory,
-      };
-    }
-
-    const payload = await response.json();
-    const content = payload?.choices?.[0]?.text
-      ?? payload?.choices?.[0]?.message?.content
-      ?? payload?.output_text
-      ?? "";
-    const parsed = extractProfileSuggestion(content);
-    const selected = findProfileById(parsed?.profile_id);
-
-    if (!selected) {
-      return {
-        route: fallback,
-        mode: "fallback",
-        fallbackReason: "invalid-local-response",
-        indexPath: indexBundle.outputDirectory,
-      };
-    }
-
-    return {
-      route: {
-        id: selected.id,
-        label: selected.label,
-        rationale: sanitizeLocalRationale(parsed?.rationale, selected.rationale),
-        docs: selected.docs,
-        targets: selected.targets,
-        checks: selected.checks,
-        matchedKeywords: fallback.matchedKeywords,
-        score: fallback.score,
-        task,
-        source: "local-model",
-      },
-      mode: "local-model",
-      model,
-      baseUrl,
-      indexPath: indexBundle.outputDirectory,
-    };
-  } catch (error) {
-    clearTimeout(timer);
-    return {
-      route: fallback,
-      mode: "fallback",
-      fallbackReason: error?.name === "AbortError" ? "timeout" : "request-failed",
-      indexPath: indexBundle.outputDirectory,
-    };
-  }
-}
-
-function buildLocalRoutePrompt(task, compactIndex) {
-  const profileList = compactIndex.taskProfiles.map((profile) => profile.id).join(", ");
-  return [
-    `You classify a ${REPOSITORY_NAME} repository task into exactly one known profile.`,
-    `Known profiles: ${profileList}.`,
-    "Respond with only one line in this format:",
-    "profile_id=<known-profile-id>",
-    `Task: ${task}`,
-  ].join("\n");
-}
-
-function commandExists(command) {
-  try {
-    execText("which", [command], process.cwd());
-    return true;
-  } catch {
-    return false;
-  }
-}
-
-function parseJsonString(value, fallback = null) {
-  try {
-    return JSON.parse(value);
-  } catch {
-    return fallback;
-  }
-}
-
-export function buildPrewarmReport({
-  repoRoot,
-  outDir,
-  skipIndex = false,
-  modelRole = "fast",
-  commandRunner = execText,
-  commandProbe = commandExists,
-} = {}) {
-  const cwd = repoRoot ? path.resolve(repoRoot) : process.cwd();
-  const commands = {
-    lms: commandProbe("lms"),
-    ensureModel: commandProbe("lmstudio-ensure-model"),
-  };
-
-  const serverStatusRaw = commands.lms
-    ? safeShell(() => commandRunner("lms", ["server", "status", "--json", "--quiet"], cwd), "")
-    : "";
-  const serverStatus = serverStatusRaw ? parseJsonString(serverStatusRaw, null) : null;
-
-  const modelWarm = commands.ensureModel
-    ? safeShell(() => commandRunner("lmstudio-ensure-model", [modelRole], cwd), "")
-    : "";
-
-  const index = skipIndex ? null : writeRepoIndex({ repoRoot: cwd, outDir });
-
-  return {
-    repoRoot: cwd,
-    commands,
-    lmStudio: {
-      running: Boolean(serverStatus?.running),
-      port: serverStatus?.port ?? null,
-      raw: serverStatus,
-    },
-    modelWarm: {
-      attempted: commands.ensureModel,
-      role: modelRole,
-      ok: commands.ensureModel ? modelWarm.length > 0 || modelWarm === "" : false,
-      output: modelWarm,
-    },
-    index: skipIndex
-      ? { generated: false, reason: "skipped" }
-      : {
-        generated: true,
-        outputDirectory: index.outputDirectory,
-        paths: index.paths,
-      },
-  };
-}
-
-export function formatRouteReport(route, meta = {}) {
+export function formatRouteReport(route) {
   const lines = [
     `Task profile: ${route.label} (${route.id})`,
     `Why: ${route.rationale}`,
   ];
-
-  if (meta.mode === "local-model") {
-    lines.push(`Route source: local model (${meta.model ?? "unknown"})`);
-  } else if (meta.mode === "fallback" && meta.fallbackReason) {
-    lines.push(`Route source: keyword fallback (${meta.fallbackReason})`);
-  }
-
-  if (meta.indexPath) {
-    lines.push(`Repo index: ${meta.indexPath}`);
-  }
 
   if (route.matchedKeywords?.length) {
     lines.push(`Matched keywords: ${route.matchedKeywords.join(", ")}`);
@@ -663,10 +494,31 @@ export function formatRouteReport(route, meta = {}) {
     }
   }
 
+  if (route.lessons?.length > 0) {
+    lines.push("", `Read Before You Touch (${LESSONS_TABLE.file}):`);
+    for (const lesson of route.lessons) {
+      lines.push(`- ${lesson}`);
+    }
+  }
+
+  if (route.skills?.length > 0) {
+    lines.push("", "Skills:");
+    for (const skill of route.skills) {
+      lines.push(`- ${skill} (${SKILLS_PREFIX}${skill}/SKILL.md)`);
+    }
+  }
+
   if (route.targets?.length > 0) {
     lines.push("", "Work Targets:");
     for (const target of route.targets) {
       lines.push(`- ${target}`);
+    }
+  }
+
+  if (route.tools?.length > 0) {
+    lines.push("", "Specialised Tools:");
+    for (const tool of route.tools) {
+      lines.push(`- ${tool.command} — ${tool.why}`);
     }
   }
 
@@ -778,18 +630,3 @@ export function formatIndexReport(report) {
   return lines.join("\n");
 }
 
-export function formatPrewarmReport(report) {
-  const lines = [
-    `Repo: ${report.repoRoot}`,
-    `LM Studio: ${report.lmStudio.running ? `running on port ${report.lmStudio.port}` : "not running"}`,
-    `Warm fast model: ${report.modelWarm.attempted ? (report.modelWarm.ok ? "ok" : "failed") : "helper unavailable"}`,
-  ];
-
-  if (report.index.generated) {
-    lines.push(`Repo index: ${report.index.outputDirectory}`);
-  } else {
-    lines.push(`Repo index: ${report.index.reason}`);
-  }
-
-  return lines.join("\n");
-}

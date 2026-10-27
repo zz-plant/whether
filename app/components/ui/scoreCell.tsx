@@ -63,7 +63,7 @@ const numberFormatters = new Map<number, Intl.NumberFormat>();
    prints every place it is quoted to (3.50%, 4.05%), as the row's header and
    the brief's chips do. Rounded as written: `toFixed` took 4.05 down to 4.0
    (its binary value is 4.0499…) while the sentence beside it said 4.1. */
-const formatPoints = (points: number, decimals = DEFAULT_UNITS.decimals) => {
+export const formatPoints = (points: number, decimals = DEFAULT_UNITS.decimals) => {
   const formatter =
     numberFormatters.get(decimals)
     ?? new Intl.NumberFormat("en-US", {

@@ -1,7 +1,9 @@
 import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
+import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
+import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { formatConfidenceChipLabel } from "../../lib/report/reportFormatting";
-import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
+import { formatMarginStamp, joinConditionsHeadline } from "../../lib/report/reportFormatting";
+import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefHeadline } from "../../lib/report/publishedBriefs";
 import { buildSocialImageUrl, canonicalPositioningLine, escapeXml, organizationName } from "../../lib/seo";
 import { publisherAuthor } from "../../lib/publisher";
 import { siteUrl } from "../../lib/siteUrl";
@@ -78,7 +80,7 @@ const publishedItems = (): FeedItem[] =>
     const display = publishedBriefDisplay(brief);
     const link = `${siteUrl}${buildPublishedBriefPath(brief.slug)}`;
     return {
-      title: `Week ${brief.slug}: ${display.headline.startsWith(display.conditions) ? display.headline : `${display.conditions} — ${display.headline}`}`,
+      title: `Week ${brief.slug}: ${joinConditionsHeadline(display.conditions, display.headline)}`,
       link,
       guid: link,
       isPermaLink: true,
@@ -87,11 +89,12 @@ const publishedItems = (): FeedItem[] =>
       imageUrl: buildPublishedBriefImageUrl(brief),
       html: [
         `        <p><strong>Conditions:</strong> ${escapeXml(display.conditions)}</p>`,
-        `        <p>${escapeXml(brief.summary)}</p>`,
-        `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(brief.actionNow)}</p>`,
+        /* The week's one headline (`publishedBriefHeadline`); the stored action
+           printed under "Action" beside it, a second instruction for the week. */
+        `        <p>${escapeXml(publishedBriefHeadline(brief).composed)}</p>`,
         /* Through the display layer: w38 and w39 stored "Pressure increased by +3.0 this week", a figure in no unit against Aug 31. */
         `        <p><strong>What changed:</strong> ${escapeXml(display.whatChanged)}</p>`,
-        `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · ${escapeXml(display.confidence)}</p>`,
+        `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · Margin: ${escapeXml(display.confidence.toLowerCase())}</p>`,
         `        <p><a href="${escapeXml(link)}">Read the published brief →</a></p>`,
       ].join("\n"),
     };
@@ -104,14 +107,19 @@ export async function GET() {
     const brief = await buildAgentInterfaceResponse("weekly");
     const summary = brief.summary;
     const regime = summary.regimeLabel;
-    const action = summary.guidance;
+    /* The week's headline action, from the source the homepage h1 and every paste
+       read (`weeklyHeadline`). It printed the weekly summary's own sentence, a third
+       wording of the week's instruction. */
+    const action = await loadWeeklyBriefSnapshot(undefined, { route: "/feed.xml" })
+      .then(({ snapshot }) => weeklyHeadline(snapshot.weeklyCall).action)
+      .catch(() => summary.guidance);
     const recordDateIso = brief.agentHandoff.payload.report_date;
     const recordDateLabel = summary.recordDateLabel ?? recordDateIso;
     /* The published confidence, worded as the archive items below word theirs. This
        printed `summary.confidence`, the engine's own label, as a raw code ("MEDIUM")
        while the page said "High confidence". The phrase carries its own noun, so it
        stands alone: under a "Confidence:" label it read "Confidence: Medium confidence." */
-    const confidence = formatConfidenceChipLabel(brief.confidence.label);
+    const confidence = formatMarginStamp(brief.confidence.label);
 
     /*
      * The current week, until it is frozen. Once the archive holds a record for
@@ -134,7 +142,7 @@ export async function GET() {
             `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(action)}</p>`,
             `        <p><strong>Record date:</strong> ${escapeXml(recordDateLabel)} · ${escapeXml(confidence)}</p>`,
             `        <p><a href="${siteUrl}/">View the live brief →</a></p>`,
-            `        <p style="font-size:0.85rem;color:#64748b;">Based on public data. Your situation may vary.</p>`,
+            `        <p style="font-size:0.85rem;color:#525c60;">Based on public data. Your situation may vary.</p>`,
           ].join("\n"),
         }];
 

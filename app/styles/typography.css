@@ -177,7 +177,7 @@ textarea,
 input,
 summary {
   touch-action: manipulation;
-  -webkit-tap-highlight-color: rgba(15, 23, 42, 0.6);
+  -webkit-tap-highlight-color: rgba(18, 23, 25, 0.6);
 }
 
 /* The one anchor offset. Every way a target reaches the top of the viewport — a hash link,

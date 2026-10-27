@@ -1,5 +1,5 @@
 import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL } from "./reportCopy";
-import { formatConfidenceChipLabel } from "./reportFormatting";
+import { formatMarginBand } from "./reportFormatting";
 import { formatSignalReading } from "./signalTranslations";
 import {
   formatMeetingSlideMarkdown,
@@ -9,6 +9,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import type { MacroSeriesReading } from "../types";
 import type { ActionStripItem } from "./operatingCalls";
 import type { PreviousReading } from "../export/scoreReference";
+import { basisClause, type ScoringBasis } from "./scoringBasis";
 
 /**
  * The week's call as one structured object, so every format the reader can copy
@@ -73,6 +74,8 @@ export type BriefArtifact = {
   stageLabel?: string;
   /** Where the numbers came from, as a reader names the source. */
   sourceLabel?: string;
+  /** Which inputs set the scores, as a sentence: "Scored on the record's inputs." (`ScoringBasis.sentence`). */
+  basis?: string;
 };
 
 type PublishedConfidenceLabel = "HIGH" | "MED" | "LOW";
@@ -121,6 +124,8 @@ export type BriefDocument = BriefArtifact & {
     isFallback: boolean;
     /** The most specific stable URL for the week: the frozen record when there is a current one. */
     permalink: string;
+    /** Which inputs set the scores, and what the inputs left out would do (`resolveScoringBasis`). */
+    scoringBasis: Pick<ScoringBasis, "key" | "sentence" | "warning" | "notCounted">;
   };
   /** The call's slots, from the `WeeklyCallContract`. */
   slots: {
@@ -140,6 +145,9 @@ export type BriefDocument = BriefArtifact & {
   };
   readings: {
     scores: { tightness: number; riskAppetite: number };
+    /** Funding pressure above its ceiling, when pinned there; the margin counts it (`resolveNearestLineMargin`). */
+    tightnessPressure?: number;
+    tightnessSaturated?: boolean;
     thresholds: RegimeAssessment["thresholds"];
     /** How far each score sits from its change line, with the side folded in by the reader. */
     vsThreshold: { tightness: number; riskAppetite: number };
@@ -263,6 +271,7 @@ export const parseBriefArtifact = (raw: string): BriefArtifact | null => {
       : undefined,
     stageLabel: readText(value, "stageLabel"),
     sourceLabel: readText(value, "sourceLabel"),
+    basis: readText(value, "basis"),
   };
 };
 
@@ -296,8 +305,8 @@ export const MONDAY_AGENDA_STEPS: readonly {
   prompt: string;
 }[] = [
   { id: "changed", label: "What changed", minutes: 1, prompt: "Read the guidance and what moved since last Monday." },
-  { id: "thresholds", label: "Check the thresholds", minutes: 1, prompt: "Guardrail and reversal trigger, against this week's scores." },
-  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of a threshold?" },
+  { id: "thresholds", label: "Check the lines", minutes: 1, prompt: "The pause line and the resume line, against this week's scores." },
+  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of its pause line?" },
 ];
 
 export const MONDAY_AGENDA_TITLE = "Monday guidance review";
@@ -357,7 +366,8 @@ const provenanceLine = (artifact: BriefArtifact) =>
   [
     `Source: ${artifact.source}`,
     `data as of ${artifact.recordDateLabel}`,
-    artifact.confidenceLabel ? formatConfidenceChipLabel(artifact.confidenceLabel).toLowerCase() : null,
+    artifact.confidenceLabel ? `margin: ${formatMarginBand(artifact.confidenceLabel).toLowerCase()}` : null,
+    artifact.basis ? basisClause(artifact.basis) : null,
     artifact.isFallback ? "cached snapshot, not a live read" : null,
   ]
     .filter(Boolean)
@@ -386,10 +396,14 @@ export const resolveBriefUrl = (artifact: BriefArtifact, origin: string) =>
  * The `ref` value a pasted brief carries, and the query the homepage reads it
  * back from. A reader who lands on `/` with it arrived from a teammate's
  * paste, not a search or a bookmark, and is greeted as one
- * (`app/components/homeFirstRunOrientation.tsx`).
+ * (`app/components/home/ConditionsLegend.tsx`).
  */
 export const SHARE_REFERRAL_PARAM = "ref";
 export const SHARE_REFERRAL_VALUE = "share";
+
+/** True for a query string (`location.search`) a pasted brief's link carries; any other `ref` is somebody else's tag. */
+export const isSharedArrivalQuery = (search: string) =>
+  new URLSearchParams(search).get(SHARE_REFERRAL_PARAM) === SHARE_REFERRAL_VALUE;
 
 /**
  * The brief URL as it is pasted into a channel: the same address, marked as a
@@ -476,6 +490,7 @@ export const briefArtifactToSlidePayload = (
   ...(artifact.lines ? { lines: artifact.lines } : {}),
   confidence: artifact.confidenceLabel,
   provenance: artifact.sourceLabel ?? artifact.source,
+  ...(artifact.basis ? { basis: artifact.basis } : {}),
   call: artifact.call,
   clearsWhen: artifact.clearsWhen,
   ...(origin ? { url: resolveBriefUrl(artifact, origin) } : {}),

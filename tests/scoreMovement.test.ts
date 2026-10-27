@@ -9,11 +9,13 @@ import type { MacroSeriesReading, TreasuryData } from "../lib/types";
 /*
  * The page says funding pressure went from 63 to 90 and never said which inputs
  * account for the 27. The earlier reading is scored from interest rates alone,
- * while today's also carries the rate-speed term and the market inputs, so part
- * of a move can be an input the earlier score never had. `explainScoreMovement`
- * scores today's inputs in stages through the engine itself, so these run the
- * real engine and hold the property that matters: the parts add up to the move
- * the page shows, exactly, or nothing is printed.
+ * while today's also carries the rate-speed term and the market inputs the
+ * record scores, so part of a move can be an input the earlier score never had.
+ * `explainScoreMovement` scores today's inputs in stages through the engine
+ * itself, so these run the real engine and hold the property that matters: the
+ * parts add up to the move the page shows, exactly, or nothing is printed. The
+ * inputs outside the record (`RECORD_BASIS_MARKET_INPUTS`) move no published
+ * score since 2026-10-09, so they are never a part of a move.
  */
 const treasury: TreasuryData = {
   source: "US Treasury",
@@ -90,14 +92,16 @@ describe("explainScoreMovement", () => {
   it("names each input the earlier score never had, and the parts add up to the move", () => {
     const cases: Array<{ name: string; series: MacroSeriesReading[]; tightness: string[]; riskAppetite: string[] }> = [
       { name: "rate speed", series: [], tightness: ["rates", "rateSpeed"], riskAppetite: ["curve"] },
-      { name: "startup-market inputs", series: startupInputs, tightness: ["rates", "rateSpeed"], riskAppetite: ["curve", "startupMarket"] },
+      /* Outside the record: scored into `offRecord`, no part of the published move. */
+      { name: "startup-market inputs", series: startupInputs, tightness: ["rates", "rateSpeed"], riskAppetite: ["curve"] },
       { name: "stock-market volatility", series: volatility, tightness: ["rates", "rateSpeed"], riskAppetite: ["curve", "marketStress"] },
-      { name: "credit stress", series: credit, tightness: ["rates", "rateSpeed", "credit"], riskAppetite: ["curve"] },
+      /* The Chicago Fed index counts (engine-2026-10-09b); the high-yield spread beside it does not. */
+      { name: "credit stress", series: credit, tightness: ["rates", "rateSpeed", "financialConditions"], riskAppetite: ["curve"] },
       {
         name: "all of them",
         series: [...credit, ...volatility, ...startupInputs],
-        tightness: ["rates", "rateSpeed", "credit"],
-        riskAppetite: ["curve", "startupMarket", "marketStress"],
+        tightness: ["rates", "rateSpeed", "financialConditions"],
+        riskAppetite: ["curve", "marketStress"],
       },
     ];
 
@@ -111,14 +115,19 @@ describe("explainScoreMovement", () => {
     }
   });
 
-  it("gives startup inputs and volatility the move each adds in that order, so a volatility cap is not counted twice", () => {
-    const { previous, current, movement } = explain([...startupInputs, ...volatility]);
-    const startup = movement?.riskAppetite?.parts.find((part) => part.source === "startupMarket")?.points ?? 0;
-    const stress = movement?.riskAppetite?.parts.find((part) => part.source === "marketStress")?.points ?? 0;
-    const alone = explain(startupInputs).movement?.riskAppetite?.parts.find((part) => part.source === "startupMarket")?.points ?? 0;
+  it("leaves the inputs outside the record out of the move, while the score still reports what they would add", () => {
+    const { previous, current, movement } = explain([...startupInputs, ...volatility, ...credit]);
+    const withoutThem = explain([...volatility, ...credit.filter((series) => series.id === "CHICAGO_FCI")]);
 
-    assert.equal(startup, alone, "the startup inputs count as if volatility were absent");
-    assert.equal(startup + stress + (movement?.riskAppetite?.parts.find((part) => part.source === "curve")?.points ?? 0), current.riskAppetite - previous.riskAppetite);
+    assert.deepEqual(movement, withoutThem.movement, "the startup-market reads and the high-yield spread change no part");
+    assert.deepEqual(
+      { tightness: current.tightness, riskAppetite: current.riskAppetite },
+      { tightness: withoutThem.current.tightness, riskAppetite: withoutThem.current.riskAppetite },
+      "nor the published scores",
+    );
+    assert.ok(current.offRecord, "they are scored into offRecord");
+    assert.ok(current.offRecord.riskAppetite < current.riskAppetite, "which says what they would take off risk appetite");
+    assert.equal(sum(movement?.riskAppetite), current.riskAppetite - previous.riskAppetite);
   });
 
   it("prints no split for a score it cannot rebuild from the inputs in hand", () => {
@@ -144,7 +153,7 @@ describe("what a row and a paste say about the move", () => {
   const riskRow: ScoreMovement = {
     parts: [
       { source: "curve", points: -2 },
-      { source: "startupMarket", points: -11 },
+      { source: "marketStress", points: -11 },
     ],
   };
 
@@ -155,7 +164,7 @@ describe("what a row and a paste say about the move", () => {
   it("gives each part its sign, and says the earlier score never had an input that is not rates", () => {
     assert.equal(
       describeScoreMovement("riskAppetite", riskRow, aug31),
-      "-2 from the yield curve and -11 from startup-market inputs. The Aug 31 score was built from interest rates alone.",
+      "-11 from stock-market volatility and -2 from the yield curve. The Aug 31 score was built from interest rates alone.",
     );
     assert.match(
       describeScoreMovement(
@@ -164,12 +173,12 @@ describe("what a row and a paste say about the move", () => {
           parts: [
             { source: "rates", points: 30 },
             { source: "rateSpeed", points: 12 },
-            { source: "credit", points: -4 },
+            { source: "financialConditions", points: -4 },
           ],
         },
         aug31,
       ) ?? "",
-      /^\+30 from interest rates, \+12 from the recent pace of rate rises and -4 from credit-market and financial-conditions stress\./,
+      /^\+30 from interest rates, \+12 from the recent pace of rate rises and -4 from financial-conditions stress\./,
     );
   });
 
@@ -182,7 +191,7 @@ describe("what a row and a paste say about the move", () => {
   it("puts both scores in one line for a paste, carrying the same caveat", () => {
     assert.equal(
       describeScoreMovementLine({ tightness: fundingRow, riskAppetite: riskRow }, aug31),
-      "What moved the scores since Aug 31: funding pressure +27 (all from interest rates); risk appetite -13 (-2 from the yield curve and -11 from startup-market inputs). The Aug 31 scores were built from interest rates alone.",
+      "What moved the scores since Aug 31: funding pressure +27 (all from interest rates); risk appetite -13 (-11 from stock-market volatility and -2 from the yield curve). The Aug 31 scores were built from interest rates alone.",
     );
     // Rates alone need no caveat.
     assert.equal(
@@ -196,11 +205,11 @@ describe("what a row and a paste say about the move", () => {
     const cancelling: ScoreMovement = {
       parts: [
         { source: "rates", points: 5 },
-        { source: "credit", points: -5 },
+        { source: "financialConditions", points: -5 },
       ],
     };
 
-    assert.match(describeScoreMovementLine({ tightness: cancelling }, aug31) ?? "", /funding pressure did not change \(\+5 from interest rates and -5 from credit/);
+    assert.match(describeScoreMovementLine({ tightness: cancelling }, aug31) ?? "", /funding pressure did not change \(\+5 from interest rates and -5 from financial-conditions stress/);
   });
 
   it("is written in the page's words, never the engine's", () => {

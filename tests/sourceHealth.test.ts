@@ -8,6 +8,9 @@ import {
   buildDegradedSourceRows,
   formatSourceFreshnessLabel,
   formatSourceModeLabel,
+  judgeDataFreshness,
+  listDegradedLiveSources,
+  type SourceHealthRow,
 } from "../lib/report/sourceHealth";
 
 const buildTreasury = (overrides: Partial<TreasuryData> = {}): TreasuryData => ({
@@ -131,9 +134,9 @@ describe("buildSourceHealthRows", () => {
     const summary = summarizeSourceHealthCoverage([
       {
         sourceName: "Treasury",
-        cadenceLabel: "Intraday rates",
+        cadenceLabel: "Daily rates",
         freshnessStatus: "fresh",
-        freshnessSlaHours: 6,
+        freshnessSlaHours: 26,
         lastSuccessfulFetchAt: "2026-03-10T00:00:00.000Z",
         ageLabel: "1d",
         activeFallbackReason: null,
@@ -242,6 +245,18 @@ describe("degraded sources", () => {
       assert.equal(buildDegradedSourceRows([treasury]).length, 1);
     }
   });
+  /* The 02:00 UTC cron runs every day. Saturday's fetch read on Monday morning is two missed
+     runs, 49 calendar hours; business-day accounting counts at most 17 of them in any timezone
+     and called it "fresh" against the 26h window. */
+  it("counts a weekend without a Treasury fetch as stale: the cron runs every day", () => {
+    const treasury = buildSourceHealthRows({
+      treasury: buildTreasury({ fetched_at: "2026-10-10T02:01:00Z" }),
+      macroSeries: [],
+      now: new Date("2026-10-12T03:00:00Z"),
+    })[0];
+    assert.equal(treasury.freshnessSlaHours, 26);
+    assert.equal(treasury.freshnessStatus, "stale");
+  });
   /*
    * "Startup/private markets" is a curated snapshot by design and is never
    * live. Counting it as degraded put "Partly cached" on every page, on every
@@ -326,5 +341,111 @@ describe("the /trust source board", () => {
     assert.equal(treasury?.stateLabel, "Not confirmed");
     assert.equal(treasury?.updatedLabel, "No update on record");
     assert.equal(treasury?.asIntended, false);
+  });
+});
+
+describe("Treasury freshness follows the snapshot the cron writes", () => {
+  // Production on 2026-10-13: the 02:01 UTC cron wrote the reading, and at 20:16 UTC a 6h
+  // window called a healthy afternoon stale. Only the cron republishes the snapshot.
+  const fetchedAt = "2026-10-13T02:01:46.905Z";
+  const treasuryRow = (now: string) =>
+    buildSourceHealthRows({ treasury: buildTreasury({ fetched_at: fetchedAt }), macroSeries: [], now: new Date(now) })[0];
+
+  it("is fresh for the whole day between cron runs", () => {
+    assert.equal(treasuryRow("2026-10-13T20:16:47.989Z")?.freshnessStatus, "fresh");
+    assert.equal(treasuryRow("2026-10-14T02:00:00.000Z")?.freshnessStatus, "fresh");
+  });
+
+  it("is stale once a cron run is missed", () => {
+    assert.equal(treasuryRow("2026-10-14T06:00:00.000Z")?.freshnessStatus, "stale");
+  });
+});
+
+describe("listDegradedLiveSources", () => {
+  const row = (overrides: Partial<SourceHealthRow>): SourceHealthRow => ({
+    sourceName: "Treasury",
+    cadenceLabel: "Daily rates",
+    freshnessStatus: "fresh",
+    freshnessSlaHours: 26,
+    lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
+    ageLabel: "14h",
+    activeFallbackReason: null,
+    mode: "live",
+    expectsLive: true,
+    ...overrides,
+  });
+
+  it("names a live source past its window, which /api/health reports as degraded", () => {
+    assert.deepEqual(listDegradedLiveSources([row({ freshnessStatus: "stale" })]), [
+      { source: "Treasury", state: "stale", age: "14h", lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z" },
+    ]);
+  });
+
+  /* /trust counts both as degraded; a health check that skipped them said "ok" during a missing or cached feed. */
+  it("names a live source with no fetch on record, and one answering from a fallback inside its window", () => {
+    const listed = listDegradedLiveSources([
+      row({ freshnessStatus: "unknown", lastSuccessfulFetchAt: null, ageLabel: null }),
+      row({ sourceName: "Market stress", mode: "fallback", activeFallbackReason: "cached: VIX" }),
+    ]);
+    assert.deepEqual(
+      listed.map(({ source, state }) => ({ source, state })),
+      [
+        { source: "Treasury", state: "unconfirmed" },
+        { source: "Market stress", state: "cached" },
+      ],
+    );
+  });
+
+  it("lists exactly the live rows the /trust board marks as not as intended", () => {
+    const rows = buildSourceHealthRows({
+      treasury: buildTreasury({ fetched_at: "2026-03-10T00:00:00.000Z" }),
+      macroSeries: [buildMacroSeriesReading({ id: "VIX_INDEX", isLive: false })],
+      now: new Date("2026-03-10T20:00:00.000Z"),
+    });
+    const board = buildSourceBoardRows(rows);
+    const notAsIntended = rows
+      .filter((entry, index) => entry.expectsLive && board[index]?.asIntended === false)
+      .map((entry) => entry.sourceName);
+    assert.ok(notAsIntended.length > 0, "the fixture degrades at least one live source");
+    assert.deepEqual(
+      listDegradedLiveSources(rows).map((entry) => entry.source),
+      notAsIntended,
+    );
+  });
+
+  it("leaves out fresh sources and curated snapshots, which are current by design", () => {
+    assert.deepEqual(
+      listDegradedLiveSources([
+        row({}),
+        row({ sourceName: "Startup/private markets", freshnessStatus: "stale", expectsLive: false, mode: "snapshot" }),
+      ]),
+      [],
+    );
+  });
+});
+
+describe("judgeDataFreshness", () => {
+  const stale = listDegradedLiveSources([
+    {
+      sourceName: "Treasury",
+      cadenceLabel: "Daily rates",
+      freshnessStatus: "stale",
+      freshnessSlaHours: 26,
+      lastSuccessfulFetchAt: "2026-10-13T02:01:46.905Z",
+      ageLabel: "20h",
+      activeFallbackReason: null,
+      mode: "live",
+      expectsLive: true,
+    },
+  ]);
+
+  it("says unknown when no report loaded, rather than a freshness success nobody measured", () => {
+    assert.equal(judgeDataFreshness(false, []), "unknown");
+    assert.equal(judgeDataFreshness(false, stale), "unknown");
+  });
+
+  it("says stale when a live source is past its window, and ok otherwise", () => {
+    assert.equal(judgeDataFreshness(true, stale), "stale");
+    assert.equal(judgeDataFreshness(true, []), "ok");
   });
 });

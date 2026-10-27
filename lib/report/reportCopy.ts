@@ -1,24 +1,10 @@
 import type { PolicyRefusalCode } from "../regimeEngineCore";
 
-type ReportLinkCopy = {
-  href: string;
-  label: string;
-  description?: string;
-};
-
-type FirstTimeGuideStep = {
-  label: string;
-  detail: string;
-  example: string;
-};
-
 type TermDefinition = {
   value: string;
   term: string;
   summary: string;
 };
-
-type HighlightBullet = { text: string };
 
 // Single vocabulary for the bounded-decision contract (action / threshold /
 // reversal). UI surfaces read the imperative forms (Do now, Pause if, Resume
@@ -36,8 +22,8 @@ type HighlightBullet = { text: string };
 // discover that four words were two.
 //
 // The imperative pair won because the rest of the product already taught it:
-// `FIRST_TIME_GUIDE_HIGHLIGHTS` names "Action now + Pause if + Change course
-// if", `/trust`'s framework explainer works the example in those words, and
+// the first-time guide named "Action now + Pause if + Change course if"
+// (its highlights, since retired), `/trust`'s framework explainer works the example in those words, and
 // the glossary glosses the noun as "Guardrail (pause trigger)" — the synonym
 // was always the second name for the imperative, never the other way round.
 //
@@ -70,10 +56,12 @@ export const OPERATING_LATITUDE_LABEL = "Operating latitude";
 export const OPERATING_LATITUDE_GLOSS = "room to hire, spend and commit; higher means more room";
 
 export const DECISION_CONTRACT_LABELS = {
+  /* Noun slots for exports. "Threshold" and "Reversal" were retired on
+     2026-10-09 for the names every screen already used for the same two lines. */
   slot: {
     action: "Action",
-    threshold: "Threshold",
-    reversal: "Reversal",
+    threshold: "Pause line",
+    reversal: "Resume line",
   },
   action: {
     doNow: "Do now",
@@ -136,8 +124,11 @@ export type PolicyHoldCall = {
 /* Printed after "Pause if", so it is a condition. It was "Hold anything you
    can't undo while the two scores disagree.", an instruction that repeated the
    action above it and read "Pause if: Hold anything…" in every format. It names
-   the hold, not one reason for it, so every reason shares it. */
-const HELD_PAUSE_IF = "The decision can't be undone while the guidance is held.";
+   the hold, not one reason for it, so every reason shares it. Until 2026-10-21
+   it read "The decision can't be undone while the guidance is held.", which
+   names no decision and reads as a warning that nothing can be reversed; it now
+   says which decisions wait, and that the rest go ahead. */
+const HELD_PAUSE_IF = "A decision can't be undone; reversible ones go ahead while the guidance is held.";
 
 /**
  * The guidance when the policy engine refuses to support a change, one entry
@@ -158,12 +149,12 @@ const HELD_PAUSE_IF = "The decision can't be undone while the guidance is held."
 export const POLICY_OVERRIDE_CALL = {
   "signals-disagree": {
     currentCall: "The two scores point in different directions, so the guidance is not changing this week.",
-    actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the scores agree.",
+    actionNow: "Keep your current plan, and hold anything you can't undo until the scores agree.",
     pauseIf: HELD_PAUSE_IF,
     callChangesIf:
       "The two scores point the same way for a second reading; until then the guidance is not changing.",
     holdsUntil: "the two scores agree",
-    whyCouldBeWrong: "The two scores disagree, so this week's direction can't be read with confidence.",
+    whyCouldBeWrong: "The two scores disagree, so this week's direction can't be read clearly.",
   },
   /* The spread of the two scores and the two composites behind them, taken at
      one instant: not a move over time, so nothing here says "swung" or "lately". */
@@ -171,22 +162,22 @@ export const POLICY_OVERRIDE_CALL = {
     currentCall:
       "The signals are spread too far apart to agree on a direction, so the guidance is not changing this week.",
     actionNow:
-      "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the signals line up.",
+      "Keep your current plan, and hold anything you can't undo until the signals line up.",
     pauseIf: HELD_PAUSE_IF,
     callChangesIf: "The signals line up on a later reading; until then the guidance is not changing.",
     holdsUntil: "the signals line up",
-    whyCouldBeWrong: "The signals are spread too far apart, so this week's direction can't be read with confidence.",
+    whyCouldBeWrong: "The signals are spread too far apart, so this week's direction can't be read clearly.",
   },
   /* A live read only: a replayed month is judged on the inputs its record
      carries (`RegimeEvaluationContext.inputsNotOnRecord`), so "this week" is true. */
   "inputs-missing": {
     currentCall: "Too many inputs are missing this week, so the guidance is not changing.",
     actionNow:
-      "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the missing inputs return.",
+      "Keep your current plan, and hold anything you can't undo until the missing inputs return.",
     pauseIf: HELD_PAUSE_IF,
     callChangesIf: "The missing inputs return in a live reading; until then the guidance is not changing.",
     holdsUntil: "the missing inputs return",
-    whyCouldBeWrong: "Too many inputs are missing, so this week's direction can't be read with confidence.",
+    whyCouldBeWrong: "Too many inputs are missing, so this week's direction can't be read clearly.",
   },
 } as const satisfies Record<PolicyRefusalCode, PolicyHoldCall>;
 
@@ -197,11 +188,11 @@ export const POLICY_OVERRIDE_CALL = {
  */
 export const POLICY_OVERRIDE_CALL_UNNAMED = {
   currentCall: "The guidance is on hold, so it is not changing this week.",
-  actionNow: "Keep last week's plan. Hold anything you can't undo, and cap new experiments until the hold lifts.",
+  actionNow: "Keep your current plan, and hold anything you can't undo until the hold lifts.",
   pauseIf: HELD_PAUSE_IF,
   callChangesIf: "The hold lifts on a later reading; until then the guidance is not changing.",
   holdsUntil: "the hold lifts",
-  whyCouldBeWrong: "The guidance is on hold, so this week's direction can't be read with confidence.",
+  whyCouldBeWrong: "The guidance is on hold, so this week's direction can't be read clearly.",
 } as const satisfies PolicyHoldCall;
 
 /**
@@ -214,7 +205,7 @@ export const POLICY_OVERRIDE_CALL_UNNAMED = {
  * builder both read these so the two cannot drift.
  */
 export const NO_LIVE_READING_CALL = {
-  currentCall: "No live reading this week. Keep last week's plan.",
+  currentCall: "No live reading this week. Keep your current plan.",
   pauseIf: "No pause line this week. Hold anything you can't undo; the rest can go ahead.",
   callChangesIf: "A live reading lands; until then the guidance is not changing.",
 } as const;
@@ -231,47 +222,6 @@ export const describeMacroNotOnRecord = (period = "this month") => `Not on recor
 
 export const PRIMARY_AUDIENCE_SUMMARY =
   "Whether is decision-support software, not an authority. This brief starts from U.S. rates, inflation, labor, credit, and funding conditions.";
-
-/* Written to one reader. The earlier version assumed a room — "align on that
-   first before debating edge cases", "only if someone asks why" — and the page
-   knows nothing about who else is there. */
-export const FIRST_TIME_GUIDE_STEPS: FirstTimeGuideStep[] = [
-  {
-    label: "Summary",
-    detail:
-      "Read the guidance first: what to do, what to pause, and what would change it. It starts from the U.S. market environment, not from your company.",
-    example: "Example decision: defer expansion hires when cash is tight.",
-  },
-  {
-    label: "Proof",
-    detail:
-      "Open the score details only if you want to know why the guidance changed or which line is closest.",
-    example: "Example decision: check the recession warning gauge before approving a project that pays back slowly.",
-  },
-  {
-    label: "Actions",
-    detail:
-      "Use the planning page to set your plan's pause and resume lines, and get an email the day one is crossed.",
-    example: "Example decision: release the second half of a hiring plan only once funding pressure falls below 60.",
-  },
-];
-
-export const FIRST_TIME_GUIDE_HIGHLIGHTS: HighlightBullet[] = [
-  {
-    text: `The guidance is three lines: ${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf}, ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}.`,
-  },
-  { text: "Your stage and runway, if you set them, change the notes under the guidance and nothing else." },
-  { text: "Confidence says how far the scores sit from the line where conditions change." },
-  { text: "Past weeks are one click away; this week's guidance comes first." },
-];
-
-export const FIRST_TIME_GUIDE_NEXT_LINKS: ReportLinkCopy[] = [
-  /* Was `#executive-snapshot`, which no page renders. The guide had never been
-     rendered either, so nobody could click it and find that out. */
-  { href: "#weekly-call", label: "This week's guidance" },
-  { href: "/operate#ops-playbook", label: "Plan" },
-  { href: "/signals?advanced=1#time-machine", label: "Past snapshots" },
-];
 
 /**
  * Definitions for machine readers, not a page.
@@ -326,7 +276,7 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
   {
     value: "guardrail",
     term: DECISION_CONTRACT_LABELS.threshold.pauseIf,
-    summary: "The reading at which an area of decisions — hiring, spending, long-term commitments — pauses. Stated as a number agreed in advance.",
+    summary: "The reading at which hiring, spending, long-term commitments or another area of decisions pauses. Stated as a number agreed in advance.",
   },
   {
     value: "resume-line",
@@ -340,8 +290,8 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
   },
   {
     value: "confidence",
-    term: "Confidence (High, Medium, Low)",
-    summary: "How far this week's scores sit from the nearest line. Low means a small move would change conditions, so keep commitments reversible.",
+    term: "Margin (close to, within reach of, or clear of the line)",
+    summary: "How far this week's scores sit from the nearest change line, in points. Close means a small move would change conditions, so keep commitments reversible. The API calls it confidence; it is not a probability.",
   },
   {
     value: "fallback-mode",

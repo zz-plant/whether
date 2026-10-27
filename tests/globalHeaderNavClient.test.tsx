@@ -18,70 +18,49 @@ mockAny.module("next/navigation", () => ({
 }));
 
 describe("GlobalHeaderNavClient", () => {
-  it("renders the whole loop as tabs in the bar, in IA order, with utilities inside More", () => {
-    const html = renderToStaticMarkup(
-      <GlobalHeaderNavClient pathname="/" />,
-    );
-    const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf("<details"));
-    const more = html.slice(html.indexOf("<details"), html.indexOf("</details>"));
+  it("renders the four groups as tabs in order, then the utility links, and no More menu", () => {
+    const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/" />);
+    const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf('aria-label="Utility"'));
+    const utility = html.slice(html.indexOf('aria-label="Utility"'));
 
-    // Six short words fit in a header at any desktop width. Hiding five of
-    // them behind a disclosure made the loop the product is built around
-    // invisible until a chevron was clicked.
-    const positions = ["Brief", "Plan", "Evidence", "Resolve", "Trust", "History"].map((label) => {
+    const positions = ["This week", "Decide", "Record", "Guides"].map((label) => {
       const index = bar.indexOf(`<span>${label}</span>`);
       assert.ok(index > -1, `the bar renders ${label}`);
       return index;
     });
     assert.deepEqual(positions, [...positions].sort((a, b) => a - b), "tabs keep IA order");
-    assert.ok(more.includes('href="/api-docs"'), "More carries the utility links");
-    assert.ok(!more.includes("<span>Plan</span>"), "the loop is not repeated inside More");
-    assert.ok(!bar.includes('href="/api-docs"'), "API is not a tab");
+    for (const retired of ["Brief", "Plan", "Evidence", "Resolve", "Trust", "History"]) {
+      assert.ok(!bar.includes(`<span>${retired}</span>`), `the bar no longer carries ${retired}`);
+    }
+    for (const href of ["/share", "/about"]) {
+      assert.ok(utility.includes(`href="${href}"`), `the utility row links ${href}`);
+    }
+    assert.ok(!html.includes("<details"), "no More menu");
+    assert.ok(!html.includes('href="/api-docs"'), "API & MCP is reached from /share, not the header");
   });
 
   it("shows each tab's one-key shortcut so the keyboard layer is discoverable", () => {
     const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/" />);
-    for (const key of ["p", "e", "r", "t", "h"]) {
-      assert.ok(html.includes(`<kbd aria-hidden="true" class="`) && html.includes(`>${key}</kbd>`), `tab shows the ${key} key`);
+    for (const key of ["w", "d", "r", "g"]) {
+      assert.ok(html.includes(`>${key}</kbd>`), `tab shows the ${key} key`);
     }
   });
 
-  it("marks the matching tab current on a nested report route", () => {
-    const html = renderToStaticMarkup(
-      <GlobalHeaderNavClient pathname="/signals/thresholds" />,
-    );
-    const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf("<details"));
-
-    assert.match(
-      bar,
-      /<a[^>]*href="\/signals"[^>]*aria-current="page"|<a[^>]*aria-current="page"[^>]*href="\/signals"/,
-      "Evidence tab is current",
-    );
+  it("marks the group current on a nested route", () => {
+    const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/signals/capital-tightness-watch" />);
+    const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf('aria-label="Utility"'));
+    assert.match(bar, /<a[^>]*href="\/"[^>]*aria-current="page"|<a[^>]*aria-current="page"[^>]*href="\/"/, "This week is current");
     assert.equal(bar.split('aria-current="page"').length - 1, 1, "exactly one tab is active");
   });
 
-  it("renders resource and framework section in mobile navigation content", () => {
+  it("lists every group's pages and the utility links in the mobile sheet", () => {
     const navigationLinks = resolveGlobalHeaderNavigationLinks("/");
     const html = renderToStaticMarkup(
       <MobileNavContent navigationLinks={navigationLinks} currentPathname="/" onClose={() => {}} />,
     );
-    assert.ok(html.includes("Tools &amp; reference") || html.includes("Tools & reference"), "includes mobile resource section title");
-    assert.ok(html.includes("API &amp; MCP"), "includes API link");
-    // The Template row is gone: the blank form is a section of the Framework
-    // page now, so two rows pointing at halves of one page became one.
-    assert.ok(!html.includes(">Template<"), "no separate Template row");
-    assert.ok(html.includes("About"), "includes About link");
-  });
-
-  it("nests demoted hubs as supporting layers under the brief in mobile", () => {
-    const navigationLinks = resolveGlobalHeaderNavigationLinks("/");
-    const html = renderToStaticMarkup(
-      <MobileNavContent navigationLinks={navigationLinks} currentPathname="/" onClose={() => {}} />,
-    );
-    for (const hub of ["Evidence", "Plan", "Resolve", "Trust"]) {
-      assert.ok(html.includes(hub), `mobile drawer keeps ${hub} reachable under the brief`);
+    for (const label of ["This week", "Why it changed", "Decide", "Runway planner", "Record", "Compare periods", "Calibration", "Product writing", "Guides", "Use it elsewhere", "API &amp; MCP", "About", "Contact"]) {
+      assert.ok(html.includes(label), `the sheet lists ${label}`);
     }
+    assert.ok(html.includes("Search or jump to a page"), "the sheet opens search");
   });
 });
-
-

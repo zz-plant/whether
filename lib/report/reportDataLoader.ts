@@ -1,8 +1,7 @@
 import type { MacroSeriesReading, SensorReading, TreasuryData } from "../types";
-import type { RegimeAssessment, RegimeThresholds } from "../regimeEngine";
+import { ENGINE_VERSION, type RegimeAssessment, type RegimeThresholds } from "../regimeEngine";
 import {
   FRED_SOURCE_LABEL,
-  PROVENANCE_CATALOG_STATUS,
   PROVENANCE_FALLBACK_STATUS,
   PROVENANCE_STATUS,
   historicalMacroStatus,
@@ -27,6 +26,7 @@ import { rescoreStoredInputs, type ComparisonReading, type RescoreStoredInputs }
 import { buildWeekActionNow, buildWeekCallChangesIf } from "./reportEvidence";
 import { monthEndComparisonReading, selectWeekComparison } from "./weekComparison";
 import { explainScoreMovement } from "./scoreMovement";
+import { resolveScoringBasis } from "./scoringBasis";
 import type {
   ComparedWith,
   ConfidenceTrendFraming,
@@ -437,10 +437,23 @@ export const loadReportDataUncachedInternal = async ({
   const comparisonDate = new Date(treasury.record_date);
   comparisonDate.setUTCFullYear(recordDate.getUTCFullYear() - 1);
   const lastYearSnapshot = deps.findTimeMachineSnapshot(comparisonDate.toISOString());
+  /* A replay compares the record with the record: the month-end before it and
+     the one a year back resolve against the governed walk like the selection
+     itself, and fall back to a point read only outside it. Point-read, December
+     2024 is DEFENSIVE where the record /history publishes says SCARCITY, so the
+     January 2025 replay reported a change to Freezing that never happened, and
+     every surface built from the comparison followed it. A live week keeps the
+     point month-end: it is what the operating snapshot compares the same week
+     with (`resolveWeekComparison`). */
+  const governedPrior = (recordDate: string) =>
+    historicalSelection ? deps.findTimeMachineGovernedAssessment(recordDate, thresholds) : null;
+  const previousPointAssessment = previousSnapshot ? deps.evaluateRegime(previousSnapshot, thresholds) : null;
   const previousAssessment = previousSnapshot
-    ? deps.evaluateRegime(previousSnapshot, thresholds)
+    ? governedPrior(previousSnapshot.record_date) ?? previousPointAssessment
     : null;
-  const lastYearAssessment = lastYearSnapshot ? deps.evaluateRegime(lastYearSnapshot, thresholds) : null;
+  const lastYearAssessment = lastYearSnapshot
+    ? governedPrior(lastYearSnapshot.record_date) ?? deps.evaluateRegime(lastYearSnapshot, thresholds)
+    : null;
   // One policy, two readings of it: the treasury strip judges the treasury feed,
   // the macro strip judges the macro series. They differ only in what a replay
   // is called and which feed counts as live.
@@ -483,13 +496,6 @@ export const loadReportDataUncachedInternal = async ({
       isLive: macroSeries.some(hasLiveFlag),
     }),
   };
-  const internalProvenance: ReportProvenance = {
-    sourceLabel: "Whether curated playbook catalog",
-    recordDateLabel: "Static",
-    timestampLabel: "Static catalog",
-    ageLabel: "Static.",
-    statusLabel: PROVENANCE_CATALOG_STATUS,
-  };
   const statusLabel = deps.formatRegimeLabel(assessment.regime);
   const historicalComparison =
     shouldLoadHistoricalLiveComparison && liveAssessment
@@ -516,22 +522,29 @@ export const loadReportDataUncachedInternal = async ({
      moves are split by what made them: the month-end is scored from rates alone
      (above), so today's inputs are scored in stages to say which part of each
      move is rates and which is an input the month-end score never had. No split
-     is printed unless the stages rebuild the assessment on the page. The
-     conditions map draws month-ends, so its like-for-like note reads this split
-     whichever reading the week itself compares with. */
+     is printed unless the stages rebuild the assessment on the page, nor when
+     the month-end is the governed record with scores the rates-alone read does
+     not share: the first stage is measured from that read, so the gap between
+     the two would print as a move in rates. The conditions map draws
+     month-ends, so its like-for-like note reads this split whichever reading
+     the week itself compares with. */
   const monthEndComparison: WeekComparison | null =
     previousSnapshot && previousAssessment
       ? {
           reading: monthEndComparisonReading(previousSnapshot, previousAssessment),
           comparedWith: buildComparedWith(previousSnapshot.record_date, treasury.record_date),
-          movement: explainScoreMovement({
-            previous: previousAssessment.scores,
-            current: assessment.scores,
-            treasury,
-            thresholds,
-            macroSeries: assessmentMacroSeries,
-            evaluate: deps.evaluateRegime,
-          }),
+          movement:
+            previousPointAssessment?.scores.tightness === previousAssessment.scores.tightness &&
+            previousPointAssessment.scores.riskAppetite === previousAssessment.scores.riskAppetite
+              ? explainScoreMovement({
+                  previous: previousAssessment.scores,
+                  current: assessment.scores,
+                  treasury,
+                  thresholds,
+                  macroSeries: assessmentMacroSeries,
+                  evaluate: deps.evaluateRegime,
+                })
+              : undefined,
         }
       : null;
   /* What changed this week is against last week's published brief, where the
@@ -627,9 +640,17 @@ export const loadReportDataUncachedInternal = async ({
     macroStatusLabel: macroProvenance.statusLabel,
     now,
   });
+  /* Which inputs set these scores: the stored snapshot's engine where the read
+     projects one (a snapshot written before the record basis counted every
+     input), the current engine otherwise. */
+  const scoringBasis = resolveScoringBasis({
+    engineVersion: projectsOperatingSnapshot && operatingSnapshot ? operatingSnapshot.engineVersion : ENGINE_VERSION,
+    assessment,
+  });
 
   return {
     assessment,
+    scoringBasis,
     cacheCoverage,
     cacheMonthsByYear,
     fetchedAtLabel,
@@ -638,7 +659,6 @@ export const loadReportDataUncachedInternal = async ({
     historicalComparison,
     historicalSelection,
     historicalAnalogs,
-    internalProvenance,
     invalidHistoricalSelection,
     lastYearComparison,
     liveAssessment,
@@ -767,6 +787,7 @@ export const buildFallbackReportDataInternal = ({
 
   return {
     assessment,
+    scoringBasis: resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment }),
     cacheCoverage,
     cacheMonthsByYear,
     fetchedAtLabel,
@@ -775,13 +796,6 @@ export const buildFallbackReportDataInternal = ({
     historicalComparison: null,
     historicalSelection,
     historicalAnalogs: [],
-    internalProvenance: {
-      sourceLabel: "Whether curated playbook catalog",
-      recordDateLabel: "Static",
-      timestampLabel: "Static catalog",
-      ageLabel: "Static.",
-      statusLabel: PROVENANCE_CATALOG_STATUS,
-    },
     invalidHistoricalSelection,
     lastYearComparison: null,
     liveAssessment,

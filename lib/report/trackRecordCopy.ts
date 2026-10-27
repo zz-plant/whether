@@ -1,3 +1,5 @@
+import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
+import { OPERATING_LATITUDE_RISK_WEIGHT } from "./weeklyLeadershipBrief";
 import { formatMonthYearShortFromValue } from "../formatters";
 import type { TrackRecord } from "./trackRecord";
 
@@ -26,3 +28,69 @@ export const describeRecordCadence = (
   `Since ${formatMonthYearShortFromValue(record.firstRecordDate)}, conditions have changed ${record.regimeChanges} ` +
   `${record.regimeChanges === 1 ? "time" : "times"} in ${record.monthsCovered} months, and a month-end reading crossed ` +
   `one of the pause or resume lines in ${record.lineCrossingMonths} of them. Most Mondays, nothing has moved.`;
+
+/**
+ * What a past period's page is, said at its top (2026-10-09). The year and quarter
+ * pages led with "Standing guidance" and "By Kanav Jain" over a 2012 date, which read
+ * as guidance written in 2012; the first weekly brief was published in 2026, and the
+ * disclaimer that said so lived only on /history. `firstPublishedWeek` is the Monday
+ * of the oldest published brief.
+ */
+export const describeReconstructedPeriod = (periodTitle: string, firstPublishedWeek: string): string =>
+  `This is a reconstruction: what today's published formula says about ${periodTitle}, not guidance we published at the time. ` +
+  `Whether began publishing weekly briefs in the week of ${firstPublishedWeek}.`;
+
+/*
+ * The record's figures as published before its last re-score, kept where the
+ * record is discussed so a change of basis is visible rather than silent
+ * (docs/feature-specs-current.md §1.1.67). Authored, because the engine that
+ * produced them no longer runs: these are the numbers /history and /calibration
+ * printed on the day, from the archive engine-2026-10-06 scored. While the
+ * re-score leaves them unchanged the line points at the figures beside it
+ * rather than printing them twice (§1.1.63); once they differ it prints them.
+ */
+const LAST_RESCORE = {
+  dateLabel: "Oct 9, 2026",
+  change: "the Chicago Fed financial conditions index joined the inputs the record is scored on, the same inputs that now set the guidance",
+  before: { held: 169, comparisons: 176, changes: 7, signaled: 2, graded: 5 },
+} as const;
+
+const percent = (held: number, of: number) => `${Math.round((held / of) * 100)}%`;
+
+const rescoreLead = () => `Re-scored on ${LAST_RESCORE.dateLabel}, when ${LAST_RESCORE.change}.`;
+
+/** /calibration's line on the last re-score: the study's count before it, where that differs from the count above. */
+export const describeCalibrationRescore = (now: { held: number; comparisons: number }): string => {
+  const { before } = LAST_RESCORE;
+  return now.held === before.held && now.comparisons === before.comparisons
+    ? `${rescoreLead()} No month's conditions changed, so the count above is the one published before it.`
+    : `${rescoreLead()} Before it, ${before.held} of ${before.comparisons} comparisons held (${percent(before.held, before.comparisons)}).`;
+};
+
+/** /history's line on the last re-score: the changes and the advance signals before it, where those differ from the tiles. */
+export const describeTrackRecordRescore = (now: { changes: number; signaled: number; graded: number }): string => {
+  const { before } = LAST_RESCORE;
+  return now.changes === before.changes && now.signaled === before.signaled && now.graded === before.graded
+    ? `${rescoreLead()} No month's conditions changed, so the counts above are the ones published before it.`
+    : `${rescoreLead()} Before it, the record showed ${before.changes} changes in conditions, and ${before.signaled} of the last ${before.graded} signaled in advance.`;
+};
+
+/**
+ * Where operating latitude sits against the four conditions (2026-10-14).
+ * /history introduced it as a third score after the page had taught two, and
+ * nothing said how it relates to the weather words. It is a blend of the same
+ * two scores, so the two change lines fix one value of it that no reading in
+ * Sunny's quadrant falls below and none in Freezing's rises above; Cloudy and
+ * Stormy, each hard on one score, can land either side. On the record through
+ * Sep 2026, Sunny months read 50-100, Freezing 0-42, Cloudy 42-49, Stormy 21-69.
+ */
+export const describeLatitudeAgainstConditions = (
+  thresholds: { tightnessRegime: number; riskAppetiteRegime: number } = DEFAULT_THRESHOLDS,
+) => {
+  const boundary = Math.round(
+    OPERATING_LATITUDE_RISK_WEIGHT * thresholds.riskAppetiteRegime + (1 - OPERATING_LATITUDE_RISK_WEIGHT) * (100 - thresholds.tightnessRegime),
+  );
+  /* Said of the quadrants, not the months: conditions change only after a second
+     reading, so a month can carry its old word for one reading past a line. */
+  return `It is not a fifth condition. A reading in Sunny's quadrant is always ${boundary} or higher, and one in Freezing's quadrant is ${boundary} or lower. Readings in Cloudy's or Stormy's quadrant can land on either side, since each is hard on only one score.`;
+};

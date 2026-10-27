@@ -2,6 +2,8 @@ import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
 import { REGIME_SEVERITY_RANK, getRegimePublicLabel } from "../regimePresentation";
 import type { RegimeKey } from "../regimeEngine";
 import { signalReadingMeaning } from "./signalTranslations";
+import { formatMonthLabel } from "../timeMachine/monthFormatting";
+import { RUNWAY_BAND_OPTIONS, type RunwayBand } from "./operatorRunway";
 
 /**
  * The last time the call moved the way it moved this week, and what the two
@@ -16,7 +18,7 @@ import { signalReadingMeaning } from "./signalTranslations";
  * months later. Null when this week's call did not change, or when no earlier
  * change in that direction has three following months on record.
  *
- * Direction, not the exact pair: six changes in fourteen years is too few for
+ * Direction, not the exact pair: seven changes since 2012 is too few for
  * "Sunny to Freezing" to have a precedent most weeks, and the card names the
  * pair it found so a reader can tell the two apart.
  *
@@ -103,9 +105,10 @@ const ABOUT_THE_SAME = 5;
 
 /**
  * The month that was found, set against this week: the change it was and the one this
- * week is, then each score with what it meant, then and now. The meaning rides beside
- * every number (`signalReadingMeaning`), so "7" and "43" say "avoiding risk" and
- * "selective about risk" without the reader knowing which end of the scale is which.
+ * week is, then each score with what it meant, then and now. Each score carries its
+ * meaning (`signalReadingMeaning`), once where both readings share it, so "7" and "43"
+ * say "avoiding risk" and "selective about risk" without the reader knowing which end
+ * of the scale is which.
  * `alike` is where the two are the same change with both scores about where they were;
  * anything else says it is one earlier outcome and not a forecast, because that is what
  * a reader who sees "3 months on, the scores stood here" is most likely to take it for.
@@ -117,13 +120,24 @@ export const describeAgainstToday = (record: LastTimeCallChanged): { alike: bool
     samePair
     && Math.abs(today.tightness - record.tightness.atChange) <= ABOUT_THE_SAME
     && Math.abs(today.riskAppetite - record.riskAppetite.atChange) <= ABOUT_THE_SAME;
-  const reading = (key: "tightness" | "riskAppetite", score: number) => `${score} (${signalReadingMeaning(key, score)})`;
+  /* One sentence per score, and a meaning printed once when both readings share
+     it: "Funding pressure was 79 (money is hard to raise) then and is 90 (money is
+     hard to raise) now; risk appetite was …" carried the same gloss twice in a
+     35-word sentence until 2026-10-09. */
+  const scoreSentence = (key: "tightness" | "riskAppetite", label: string, then: number, now: number) => {
+    const meaningThen = signalReadingMeaning(key, then);
+    const meaningNow = signalReadingMeaning(key, now);
+    return meaningThen === meaningNow
+      ? `${label} was ${then} then and is ${now} now; at both readings, ${meaningThen}.`
+      : `${label} was ${then} then (${meaningThen}) and is ${now} now (${meaningNow}).`;
+  };
   const sentences = [
     ...(samePair
       ? []
       : [`That change was ${changedAt.fromLabel} to ${changedAt.toLabel}; this week's is ${getRegimePublicLabel(today.from)} to ${getRegimePublicLabel(today.to)}.`]),
-    `Then, funding pressure was ${reading("tightness", record.tightness.atChange)} and risk appetite ${reading("riskAppetite", record.riskAppetite.atChange)}; now they are ${reading("tightness", today.tightness)} and ${reading("riskAppetite", today.riskAppetite)}.`,
-    ...(alike ? [] : ["It is one earlier outcome, not a forecast."]),
+    scoreSentence("tightness", "Funding pressure", record.tightness.atChange, today.tightness),
+    scoreSentence("riskAppetite", "Risk appetite", record.riskAppetite.atChange, today.riskAppetite),
+    ...(alike ? [] : ["One earlier outcome, not a forecast."]),
   ];
   return { alike, text: sentences.join(" ") };
 };
@@ -161,4 +175,101 @@ export const findRecentCallChanges = (
     });
   }
   return changes;
+};
+
+type Spell = { regime: RegimeKey; start: MonthRef; end: MonthRef; months: number };
+
+const spellsOf = (series: readonly TimeMachineRegimeEntry[]): Spell[] => {
+  const ordered = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
+  const spells: Spell[] = [];
+  for (const entry of ordered) {
+    const last = spells.at(-1);
+    if (last && last.regime === entry.regime) {
+      last.end = monthRef(entry);
+      last.months += 1;
+    } else {
+      spells.push({ regime: entry.regime, start: monthRef(entry), end: monthRef(entry), months: 1 });
+    }
+  }
+  return spells;
+};
+
+const monthEnds = (count: number) => (count === 1 ? "1 month-end" : `${count} month-ends`);
+const spellRange = (spell: Spell) =>
+  `${formatMonthLabel(spell.start.year, spell.start.month)} to ${formatMonthLabel(spell.end.year, spell.end.month)}`;
+
+/**
+ * How long conditions like this week's lasted before, from the month-end walk.
+ *
+ * A headline says money is tight; what a plan needs to know is for how long,
+ * and the record answers that without a forecast: the earlier spells of these
+ * conditions and their length in month-ends. The record is short (seven spells
+ * since 2012, one of them Freezing), so the sentence counts the spells it
+ * found rather than averaging them, and says once that a count is not a
+ * forecast.
+ *
+ * The spell the record ends in is left out of the earlier ones when it is this
+ * week's conditions, since it has not ended. With a chosen runway band whose
+ * top is shorter than every earlier spell, the sentence says so: that is the
+ * comparison a reader with 12–24 months of cash is making in their head.
+ */
+export const describeSpellLengths = ({
+  series,
+  currentRegime,
+  runwayBand,
+}: {
+  series: readonly TimeMachineRegimeEntry[];
+  currentRegime: RegimeKey;
+  /** The reader's own band; null when they have not chosen one. */
+  runwayBand: RunwayBand | null;
+}): { lead: string; rest: string } | null => {
+  const spells = spellsOf(series);
+  const firstYear = spells.at(0)?.start.year;
+  if (spells.length < 2 || firstYear === undefined) return null;
+  const ongoing = spells.at(-1)?.regime === currentRegime;
+  const earlier = spells.filter((spell, index) => spell.regime === currentRegime && !(ongoing && index === spells.length - 1));
+  const label = getRegimePublicLabel(currentRegime);
+  const completed = spells.slice(0, -1);
+  const shortest = completed.length > 0 ? Math.min(...completed.map((spell) => spell.months)) : null;
+
+  /*
+   * The lead sets this spell beside the earlier ones (2026-10-27): "how long will it
+   * last" is the question the section exists for, and the earlier lengths alone left
+   * a reader to work out how far into this one the record is. Only while the latest
+   * month-end is still in these conditions; a spell that began this week has no
+   * month-end yet, and the lead then names the earlier spells alone.
+   */
+  const current = ongoing ? spells.at(-1)?.months ?? null : null;
+  const soFar = current !== null ? `This ${label} spell has run ${monthEnds(current)} so far. ` : "";
+  let lead = "";
+  if (earlier.length === 0) {
+    lead = current !== null
+      ? `This is the first ${label} spell since ${firstYear}, ${monthEnds(current)} so far.`
+      : `The record since ${firstYear} has no earlier ${label} spell.`;
+  } else if (earlier.length === 1) {
+    const only = earlier.at(0);
+    if (only) {
+      lead = current !== null
+        ? `${soFar}The one earlier ran ${monthEnds(only.months)}, ${spellRange(only)}.`
+        : `The one earlier ${label} spell on record ran ${monthEnds(only.months)}, ${spellRange(only)}.`;
+    }
+  } else {
+    const lengths = earlier.map((spell) => spell.months);
+    const listed = `${lengths.slice(0, -1).join(", ")} and ${monthEnds(lengths.at(-1) ?? 0)}`;
+    lead = current !== null
+      ? `${soFar}The ${earlier.length} earlier ran ${listed}.`
+      : `The record has ${earlier.length} earlier ${label} spells: ${listed} long.`;
+  }
+  const parts: string[] = [];
+  if (shortest !== null) parts.push(`No conditions since ${firstYear} lasted under ${monthEnds(shortest)}.`);
+
+  const band = runwayBand ? RUNWAY_BAND_OPTIONS.find((option) => option.key === runwayBand) : undefined;
+  const bandTop = band?.maxMonths ?? null;
+  if (band && bandTop !== null && earlier.length > 0 && earlier.every((spell) => spell.months > bandTop)) {
+    parts.push(
+      `${earlier.length === 1 ? "That spell" : "Each"} outlasted ${band.phrase} of runway, the band you chose.`,
+    );
+  }
+  parts.push("A count from the record, not a forecast.");
+  return { lead, rest: parts.join(" ") };
 };

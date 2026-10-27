@@ -6,24 +6,41 @@ import {
   buildGuidedTranslationHref,
   GuidedTranslationPanels,
   resolveGuidedTranslationState,
-} from "../app/resolve/components/guidedTranslationPanels";
+} from "../app/resources/components/guidedTranslationPanels";
 import { operationsSectionLinks } from "../lib/navigation/planningNavigation";
 
 describe("guided translation routing", () => {
-  it("routes guide selections into the canonical decide translation anchor", () => {
-    assert.equal(buildGuidedTranslationHref(), "/resolve#guided-translation");
+  it("routes guide selections to their rendered results", () => {
+    assert.equal(buildGuidedTranslationHref(), "/resources#guided-translation");
     assert.equal(
       buildGuidedTranslationHref({ stakeholder: "founders-ceos" }),
-      "/resolve?stakeholder=founders-ceos#guided-translation",
+      "/resources?stakeholder=founders-ceos#guided-translation-results",
     );
     assert.equal(
       buildGuidedTranslationHref({ stage: "series-a", library: "stages" }),
-      "/resolve?stage=series-a&library=stages#guided-translation",
+      "/resources?stage=series-a&library=stages#guided-translation-results",
     );
     assert.equal(
       buildGuidedTranslationHref({ stakeholder: "heads-of-product", stage: "series-b" }),
-      "/resolve?stakeholder=heads-of-product&stage=series-b#guided-translation",
+      "/resources?stakeholder=heads-of-product&stage=series-b#guided-translation-results",
     );
+  });
+
+  it("targets results only when a selection actually renders a panel", () => {
+    for (const params of [
+      { stakeholder: "founders-ceos" },
+      { stage: "series-a" },
+      { library: "stages" },
+      { stakeholder: "missing", stage: "series-a" },
+    ]) {
+      const html = renderToStaticMarkup(createElement(GuidedTranslationPanels, { searchParams: params }));
+      const hash = buildGuidedTranslationHref(params).split("#")[1];
+      assert.ok(html.includes(`id="${hash}"`), "selection link must land on its visible result");
+    }
+    for (const params of [undefined, {}, { stakeholder: "missing" }, { stage: "missing" }, { library: "missing" }]) {
+      assert.equal(renderToStaticMarkup(createElement(GuidedTranslationPanels, { searchParams: params })), "");
+      assert.ok(buildGuidedTranslationHref(params).endsWith("#guided-translation"), "empty or invalid choices return to the browse controls");
+    }
   });
 
   it("resolves selected stakeholder and stage data from query state", () => {
@@ -52,6 +69,8 @@ describe("guided translation routing", () => {
 
     assert.equal(defaultHtml, "");
     assert.match(selectedHtml, /Selected view details/);
-    assert.match(selectedHtml, /Team view/);
+    /* The team's own name heads its panel; a "Team view" kicker sat over it until 2026-10-09. */
+    assert.match(selectedHtml, /<h3[^>]*>[^<]+<\/h3>/);
+    assert.doesNotMatch(selectedHtml, /Team view/);
   });
 });

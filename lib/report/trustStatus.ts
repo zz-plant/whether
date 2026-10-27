@@ -1,5 +1,5 @@
 import type { RegimeDiagnostics } from "../regimeEngine";
-import { formatConfidenceChipLabel, type CompactFreshnessMeta } from "./reportFormatting";
+import { MARGIN_LABEL, formatMarginBand, publicDecisionLabels, type CompactFreshnessMeta } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, type PolicyHoldCall } from "./reportCopy";
 import type { RegimeStateTransition } from "../regimeStateMachine";
 
@@ -45,6 +45,14 @@ export type DecisionReadinessState = {
   tone: TrustStatusTone;
   detail: string;
 };
+
+/**
+ * The name for `DecisionReadinessState` where a reader sees it: whether this
+ * reading can carry this week's decisions. It is not `DATA_CAVEAT_LABEL`,
+ * which says what the state of the data adds; on a live week close to a line
+ * the caveat is "None." and this verdict is the Hold.
+ */
+export const DECISION_READINESS_LABEL = "Decision readiness";
 
 type SourceFreshnessState = Pick<
   CompactFreshnessMeta,
@@ -132,7 +140,7 @@ const buildOutageExitGate = ({
     },
     {
       key: "confidence",
-      label: "Confidence is above low",
+      label: "The scores are clear of a change line",
       met: !confidenceLow,
     },
   ];
@@ -159,7 +167,7 @@ const ALLOWED_DETAILS: Record<TrustStatusTone, [string, string, string]> = {
     "Anything you can't undo, until one live refresh lands.",
   ],
   stable: [
-    "This week's normal approvals under the current guidance.",
+    "This week's usual decisions, under the current guidance.",
     "Nothing extra.",
     "Nothing.",
   ],
@@ -202,7 +210,7 @@ const buildRecoveryPlan = ({
   return {
     owner: "Whoever owns the plan",
     nextCheckpoint: "The next weekly review",
-    exitCondition: "Confidence is above low.",
+    exitCondition: "The scores are clear of a change line.",
   };
 };
 
@@ -263,7 +271,7 @@ export const buildTrustWarnings = ({
     warnings.push({
       id: "stale-cached",
       warning: "No live reading: this is a cached snapshot.",
-      mitigationCheck: "Wait for the next live update before approving anything you can't undo.",
+      mitigationCheck: "Wait for the next live update before committing to anything you can't undo.",
     });
   }
 
@@ -320,7 +328,7 @@ export const buildWeeklyTrustCueLine = ({
      is not "not close", only outside the band where the next reading could
      change conditions. */
   const changeWatch = transitionWatch === "ON" ? "Conditions could change next week" : "Conditions not expected to change next week";
-  return `${formatConfidenceChipLabel(confidenceLabel)} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
+  return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} · Freshness ${normalizeFreshnessLabel(freshnessLabel)} · ${changeWatch}`;
 };
 export const buildCompactTrustSummary = ({
   confidenceLabel,
@@ -344,10 +352,10 @@ export const buildCompactTrustSummary = ({
   }
 
   if (confidenceLabel !== "HIGH") {
-    return `${formatConfidenceChipLabel(confidenceLabel)} (${normalizedFreshness}). Hold anything you can't undo until confidence is back to high.`;
+    return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} (${normalizedFreshness}). Hold anything you can't undo until the scores are clear of the line.`;
   }
 
-  return `${formatConfidenceChipLabel(confidenceLabel)} (${normalizedFreshness}). Fine to act on this week.`;
+  return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} (${normalizedFreshness}). Fine to act on this week.`;
 };
 
 /**
@@ -379,7 +387,7 @@ type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
 const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
   live: "All sources live and current.",
   partlyCached: "Some sources are cached. Hold anything you can't undo until every source is current.",
-  cachedSnapshot: "Live data is late. Keep last week's plan; hold new hires, spend and vendor contracts until it returns.",
+  cachedSnapshot: "Live data is late. Keep your current plan; hold new hires, spend and vendor contracts until it returns.",
   historical: "Historical snapshot. Compare against the live read before changing current plans.",
 };
 
@@ -414,8 +422,6 @@ export const resolveTrustReadinessCopy = ({
   trustStatusTone: TrustStatusTone;
   degradedSourceRows?: Array<unknown>;
   isFallbackSnapshot?: boolean;
-  /** @deprecated No longer read. The headline is derived from state, not sniffed from prose. */
-  trustStatusDetail?: string;
 }): { tone: TrustStatusTone; headline: string } => {
   const status = resolveDataStatus({
     isHistoricalSelection: trustStatusTone === "historical",
@@ -431,7 +437,7 @@ export const resolveTrustReadinessCopy = ({
   // A live feed under reduced confidence is still live; the qualifier says why the
   // tone is amber without inventing a second data state.
   const headline = status === "live" && tone === "warning"
-    ? `${DATA_STATUS_LABELS.live} · reduced confidence`
+    ? `${DATA_STATUS_LABELS.live} · close to a change line`
     : DATA_STATUS_LABELS[status];
 
   return { tone, headline };
@@ -459,7 +465,6 @@ export const buildDecisionReadinessState = ({
     isFallbackSnapshot,
     isHistoricalSelection,
   });
-  const normalizedFreshness = resolvedFreshness.updatedAtLabel;
   const freshnessWeak =
     resolvedFreshness.freshnessStatus === "stale" || resolvedFreshness.freshnessStatus === "unknown";
 
@@ -475,7 +480,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Hold",
       tone: "warning",
-      detail: "Live data is late. Keep last week's plan; anything you can't undo can wait for it.",
+      detail: "Live data is late. Keep your current plan; anything you can't undo can wait for it.",
     };
   }
 
@@ -486,7 +491,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Hold",
       tone: "warning",
-      detail: `${policyHold ? policyHold.currentCall : "Conditions sit close to a line."} Keep last week's plan; anything you can't undo can wait for a clearer reading.`,
+      detail: `${policyHold ? policyHold.currentCall : "Conditions sit close to a line."} Keep your current plan; anything you can't undo can wait for a clearer reading.`,
     };
   }
 
@@ -494,24 +499,30 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Act with caution",
       tone: "warning",
-      detail: `${policyHold.currentCall} Keep approvals reversible.`,
+      detail: `${policyHold.currentCall} Keep new commitments reversible.`,
     };
   }
 
+  /* No check time in the detail: /brief.md prints the detail between two lines
+     that state it, and "(Mar 1, 2026 00:00 UTC)" after "within reach of a
+     change line" read as the line's date. */
   if (isFallbackSnapshot || confidenceLabel === "MED") {
     return {
       label: "Act with caution",
       tone: "warning",
       detail: isFallbackSnapshot
-        ? `Cached reading (${normalizedFreshness}). Act on moves you can undo; hold the rest until live data returns.`
-        : `Confidence is medium (${normalizedFreshness}). Act on moves you can undo; hold the rest until it is high.`,
+        ? "Cached reading. Act on moves you can undo; hold the rest until live data returns."
+        : "The scores are within reach of a change line. Act on moves you can undo; hold the rest until they are clear of it.",
     };
   }
 
+  /* Points back to the guidance rather than past it: "Nothing here argues for
+     holding back this week" read as this week's action under guidance to
+     freeze new commitments, the reason `buildTrustStatus`'s detail lost it. */
   return {
     label: "Act",
     tone: "stable",
-    detail: `Live data (${normalizedFreshness}) and high confidence. Nothing here argues for holding back this week.`,
+    detail: "Live data, with the scores clear of the change lines. This week's guidance and its pause lines apply as written.",
   };
 };
 
@@ -526,7 +537,48 @@ export const buildWeeklyCitationMetaLine = ({
   recordDateLabel: string;
   freshnessLabel: string;
 }) =>
-  `Conditions: ${statusLabel} · ${formatConfidenceChipLabel(confidenceLabel)} · As of ${recordDateLabel} · Data refreshed ${normalizeFreshnessLabel(freshnessLabel)}`;
+  `Conditions: ${statusLabel} · ${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} · Data as of ${recordDateLabel} · checked ${normalizeFreshnessLabel(freshnessLabel)}`;
+
+/**
+ * The status block a reader pastes into meeting notes: the conditions, the
+ * reading's dates, how sure it is, what would change it and what to do now.
+ *
+ * Built on /trust until 2026-10-08 and offered there as "Meeting snippet"; it is
+ * one of /share's formats now, beside the brief's other pastes, and is built
+ * here so the two pages could never have printed different blocks.
+ */
+export const buildMeetingSnippet = ({
+  statusLabel,
+  recordDateLabel,
+  freshnessLabel,
+  confidenceLabel,
+  isFallbackSnapshot,
+  isHistoricalSelection,
+  flipThreshold,
+  guidance,
+}: {
+  statusLabel: string;
+  recordDateLabel: string;
+  freshnessLabel: string;
+  confidenceLabel: "HIGH" | "MED" | "LOW";
+  isFallbackSnapshot: boolean;
+  isHistoricalSelection: boolean;
+  flipThreshold: string;
+  /** The week's headline action as a paste leads with it (`weeklyHeadline(…).composed`). */
+  guidance: string;
+}) => {
+  /* The margin rides in the trust line ("Margin: clear of the line (…)"), so it is
+     stated once; the two dates say which is which (2026-10-09). */
+  const trustSummary = buildCompactTrustSummary({ confidenceLabel, freshnessLabel, isFallbackSnapshot, isHistoricalSelection });
+  return [
+    `Conditions: ${statusLabel}`,
+    `Data as of: ${recordDateLabel}`,
+    `Checked: ${freshnessLabel}`,
+    `Trust: ${trustSummary}`,
+    `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${flipThreshold}`,
+    `${publicDecisionLabels.call}: ${guidance}`,
+  ].join("\n");
+};
 
 /**
  * The name for `trustStatusAction` where a reader sees it: what the state of
@@ -592,9 +644,9 @@ export const buildTrustStatus = ({
   const detail = historicalSelection
     ? `A past week, not this one — not for live decisions.${historicalMacroCoverageDetail}`
     : isFallback
-      ? `Live data is late; this is a cached reading. Keep last week's plan and hold anything you can't undo until it returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
+      ? `Live data is late; this is a cached reading. Keep your current plan and hold anything you can't undo until it returns.${fallbackReason ? ` (${fallbackReason})` : ""}`
       : policyHold
-        ? `${policyHold.currentCall} Hold approvals.`
+        ? `${policyHold.currentCall} Hold new commitments.`
       /* About the data, not the decision: "nothing here argues for holding
          back" read as this week's action in a week whose guidance was to
          freeze new commitments. */
@@ -605,7 +657,7 @@ export const buildTrustStatus = ({
     : isFallback
       ? `${fallbackAction} ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: live data returns from every source.`
       : policyHold
-        ? `Keep approvals reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${policyHold.holdsUntil}.`
+        ? `Keep new commitments reversible. ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${policyHold.holdsUntil}.`
       : stableAction;
 
   const tone: TrustStatusTone = historicalSelection
@@ -621,12 +673,12 @@ export const buildTrustStatus = ({
   });
 
   const outageWindow = historicalSelection
-    ? "A past week. Not for live approvals."
+    ? "A past week. Not for this week's decisions."
     : isFallback
       ? "Only moves you can undo, until a live update lands."
       : policyHold
         ? `Only moves you can undo, until ${policyHold.holdsUntil}.`
-      : "Use this live reading for this week's approvals; the pause lines in this week's guidance apply.";
+      : "Use this live reading for this week's decisions; the pause lines in this week's guidance apply.";
 
   const outageExitGate = buildOutageExitGate({
     isFallback,

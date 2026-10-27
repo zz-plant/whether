@@ -1,56 +1,16 @@
 /**
  * Thin scroll-progress bar pinned below the header.
- * Shows how far the user has scrolled through the page as a fraction of
- * the total scrollable height. Disappears when at the very top.
+ *
+ * Driven by a scroll-driven animation, not a scroll listener: the width grows
+ * over the document's scrollable range and the bar fades in over its first
+ * 120px, which is the threshold the rAF listener used to poll (2026-10-22).
+ * No script runs on scroll, so the bar costs nothing on the busiest page
+ * while the reader is scrolling. The animation machinery lives in
+ * layout-effects.css, keyed on `data-scroll-progress`; on browsers without
+ * the feature the bar stays hidden — a decorative indicator is something a
+ * reader can lose without losing information, which is also why it is
+ * aria-hidden rather than a live progressbar.
  */
-"use client";
-
-import { useEffect, useRef, useState } from "react";
-
 export function ScrollProgressBar() {
-  const [progress, setProgress] = useState(0);
-  const [visible, setVisible] = useState(false);
-  const frameRef = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (frameRef.current) cancelAnimationFrame(frameRef.current);
-      frameRef.current = requestAnimationFrame(() => {
-        const scrollTop = window.scrollY;
-        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-        if (docHeight <= 0) {
-          setProgress(0);
-          setVisible(false);
-          return;
-        }
-        const pct = Math.min(scrollTop / docHeight, 1);
-        setProgress(pct);
-        setVisible(scrollTop > 120);
-      });
-    };
-
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-      cancelAnimationFrame(frameRef.current);
-    };
-  }, []);
-
-  if (!visible) return null;
-
-  return (
-    <div
-      className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px]"
-      role="progressbar"
-      aria-valuenow={Math.round(progress * 100)}
-      aria-valuemin={0}
-      aria-valuemax={100}
-      aria-label="Page scroll progress"
-    >
-      <div
-        className="h-full rounded-sm bg-sky-500/70 transition-[width] duration-150 ease-out"
-        style={{ width: `${progress * 100}%` }}
-      />
-    </div>
-  );
+  return <div aria-hidden="true" data-scroll-progress className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px] bg-slate-400/70" />;
 }

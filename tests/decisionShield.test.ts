@@ -492,6 +492,46 @@ describe("stress test — detection confidence", () => {
     assert.equal(usageFlex.detectionConfidence, "MATCHED");
   });
 
+  it("does not read a bare role noun as a hire", () => {
+    // "lead" and "principal" claimed both of these as hires, ahead of the pricing check.
+    const leadTime = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Reduce sales lead time with a pricing discount",
+    });
+    assert.equal(leadTime.detectedCategory, "PRICING");
+    assert.equal(leadTime.detectionConfidence, "MATCHED");
+
+    const loan = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Repay 20% of loan principal",
+    });
+    assert.equal(loan.detectionConfidence, "ASSUMED");
+
+    const starter = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Hire 1 principal architect at $240k during competitor freeze",
+    });
+    assert.equal(starter.detectedCategory, "HIRING");
+    assert.equal(starter.detectionConfidence, "MATCHED");
+  });
+
+  it("reads recruit and numbered add/open as hiring, without claiming a bare office", () => {
+    // The role-noun removal dropped "recruit", which is unambiguous; "add"/"open"
+    // need a number, so "open a London office" stays an office, not a hire.
+    const recruit = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Recruit 1 principal architect to rebuild our architecture",
+    });
+    assert.equal(recruit.detectedCategory, "HIRING");
+    assert.equal(recruit.detectionConfidence, "MATCHED");
+
+    const add = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Add 3 engineers to the platform team",
+    });
+    assert.equal(add.detectedCategory, "HIRING");
+
+    const open = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "open a London office",
+    });
+    assert.notEqual(open.detectedCategory, "HIRING");
+  });
+
   it("treats an explicit category override as matched, not assumed", () => {
     const result = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "asdf qwerty",
@@ -520,6 +560,16 @@ describe("stress test — runway prose matches the rule it applies", () => {
 
     assert.equal(result.verdict, "DANGEROUS");
     assert.match(result.financialImpactSummary ?? "", /Runway of 9 months is under the 12-month line/);
+  });
+
+  it("does not shrink a monthly commitment by a hyphenated runway aside", () => {
+    // "9-month" here modifies runway, not the commitment: the $10k/mo runs a
+    // full year, not 9 months.
+    const result = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "Pay $10k/mo while maintaining a 9-month runway",
+      companyProfile: cashProfile,
+    });
+    assert.equal(result.commitment.annualUsd, 120_000);
   });
 });
 
@@ -590,6 +640,67 @@ describe("stress test — bootstrapped mode calibration", () => {
     });
     assert.equal(highMargin.verdict, "SAFE");
     assert.match(highMargin.financialImpactSummary ?? "", /Bootstrapped with 80% gross margin/);
+  });
+});
+
+describe("stress test — the fallback assumption matches the scores", () => {
+  const tight: RegimeAssessment = {
+    ...buildExpansionAssessment(),
+    regime: "DEFENSIVE",
+    scores: { tightness: 80, riskAppetite: 35, baseRateUsed: "1M", baseRate: 5.25, curveSlope: 0.2 },
+  };
+
+  it("does not call funding loose for a bootstrapped plan with no margin entered", () => {
+    const result = stressTestDecisionPlan(tight, {
+      planText: "hire 2 engineers",
+      companyProfile: { runwayMonths: 18, businessModel: "BOOTSTRAPPED" },
+    });
+    assert.ok(!result.fragileAssumptions.some((a) => a.includes("Funding is loose")));
+    assert.deepEqual(result.fragileAssumptions, [
+      "Assumes customer revenue keeps paying for this: funding is tight now, so a shortfall would be costly to raise.",
+    ]);
+  });
+
+  it("keeps the loose-funding line when the scores are loose", () => {
+    const result = stressTestDecisionPlan(buildExpansionAssessment(), {
+      planText: "hire 2 engineers",
+      companyProfile: { runwayMonths: 18, businessModel: "BOOTSTRAPPED" },
+    });
+    assert.deepEqual(result.fragileAssumptions, [
+      "Funding is loose now; watch for the short-term borrowing rate moving above 3.20%.",
+    ]);
+  });
+});
+
+describe("compare — the one-click templates grade what they say", () => {
+  // The strings are the templates in `decisionShieldPlanModes.tsx`.
+  it("prefers the monthly flex plan to the annual prepay when pricing starts RISKY", () => {
+    const defensive: RegimeAssessment = {
+      ...buildExpansionAssessment(),
+      regime: "DEFENSIVE",
+      scores: { tightness: 75, riskAppetite: 60, baseRateUsed: "1M", baseRate: 5.25, curveSlope: 0.2 },
+    };
+    const result = compareDecisionPlans(
+      defensive,
+      "Prepay annual SaaS vendor for $60k upfront to lock in 25% discount",
+      "Pay SaaS vendor $6k monthly on flexible rolling terms",
+    );
+    assert.equal(result.planA.verdict, "RISKY");
+    assert.equal(result.planB.verdict, "SAFE");
+    assert.equal(result.preferredPlan, "B");
+  });
+
+  it("sizes the hire at $400k and the contractor at $45k", () => {
+    const result = compareDecisionPlans(
+      buildExpansionAssessment(),
+      "Hire 2 full-time senior engineers at $200k each",
+      "Engage 1 specialized contractor for 3 months at $15k/mo",
+      { cashBalanceUsd: 500_000 },
+    );
+    assert.equal(result.planA.commitment.annualUsd, 400_000);
+    assert.equal(result.planB.commitment.annualUsd, 45_000);
+    assert.equal(result.planA.verdict, "DANGEROUS");
+    assert.equal(result.preferredPlan, "B");
   });
 });
 

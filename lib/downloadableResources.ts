@@ -3,19 +3,19 @@ import type { DownloadableResourcePageConfig } from "../app/resources/components
 export const downloadableResources = {
   "capital-posture-template": {
     metadata: {
-      title: "Capital Posture Template",
+      title: "Capital Planning Template",
       description:
-        "Board-ready capital posture template with SAFE/RISKY/DANGEROUS classifications and reversal trigger fields.",
+        "Board-ready capital planning template with SAFE/RISKY/DANGEROUS classifications and pause line fields.",
       path: "/resources/capital-posture-template",
-      imageAlt: "Capital posture template",
-      imageParams: { template: "guides", title: "Capital Posture Template" },
+      imageAlt: "Capital planning template",
+      imageParams: { template: "guides", title: "Capital Planning Template" },
     },
     heroDescription:
       "Use this skimmable template for weekly leadership syncs and monthly board packets.",
     heroItems: [
-      "Guidance + confidence + timestamp",
+      "Guidance + margin + timestamp",
       "SAFE / RISKY / DANGEROUS decision map",
-      "Reversal triggers with owners and escalation windows",
+      "Pause lines with owners and escalation windows",
     ],
     downloadCta: {
       href: "/downloads/capital-posture-template.md",
@@ -47,16 +47,16 @@ export const downloadableResources = {
   },
   "reversal-trigger-checklist": {
     metadata: {
-      title: "Reversal Trigger Checklist",
+      title: "Pause Line Checklist",
       description:
-        "A short checklist to define, monitor, and escalate reversal triggers for board-visible capital decisions.",
+        "A short checklist for the pause line on a capital decision the board will see: what number it sits at, how long a breach must last, who acts and how to roll back.",
       path: "/resources/reversal-trigger-checklist",
-      imageAlt: "Reversal trigger checklist",
-      imageParams: { template: "guides", title: "Reversal Trigger Checklist" },
+      imageAlt: "Pause line checklist",
+      imageParams: { template: "guides", title: "Pause Line Checklist" },
     },
     heroDescription: "Use before approving any RISKY commitment.",
     heroItems: [
-      "Define threshold value and breach duration.",
+      "Set the pause line's value and how long a breach must last.",
       "Name owner + escalation recipient.",
       "Document rollback path and execution window.",
       "Confirm data source quality and update cadence.",
@@ -86,12 +86,12 @@ export const downloadableResources = {
   },
   "quarterly-capital-posture-memo-example": {
     metadata: {
-      title: "Quarterly Capital Posture Memo Example",
+      title: "Quarterly Capital Planning Memo Example",
       description:
-        "Forward-ready memo example for board updates on posture, risk classes, and reversal trigger logic.",
+        "Forward-ready memo example for board updates on capital conditions, risk classes, and pause line logic.",
       path: "/resources/quarterly-capital-posture-memo-example",
-      imageAlt: "Quarterly capital posture memo example",
-      imageParams: { template: "guides", title: "Quarterly Capital Posture Memo Example" },
+      imageAlt: "Quarterly capital planning memo example",
+      imageParams: { template: "guides", title: "Quarterly Capital Planning Memo Example" },
     },
     /* Worked, not blank. This was 310 bytes of empty headings — the same
        skeleton as the template beside it — while the word "example" is the
@@ -100,11 +100,11 @@ export const downloadableResources = {
        here, because a memo with real-looking figures and no such label is a
        live claim that goes stale the week after it ships. */
     heroDescription:
-      "A worked quarter — posture, decisions, triggers and board asks, filled in — so you can see the format carrying real content before you write your own.",
+      "A worked quarter with guidance, decisions, pause lines and board asks filled in. It shows the format carrying real content before you write your own.",
     heroItems: [
       "One-sentence guidance with the reading behind it",
       "SAFE / RISKY / DANGEROUS decisions classified by reversibility, not size",
-      "Three reversal triggers, each with a number, a duration, an owner and a consequence",
+      "Three pause lines, each with a number, a duration, an owner and a consequence",
       "Board approvals and guardrails requested",
       "Illustrative figures throughout — not a published reading. The live guidance is on the home page.",
     ],

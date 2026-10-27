@@ -229,8 +229,8 @@ export function PlanStressTestMode({
                 <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
               </div>
               <div>
-                <p className="type-eyebrow text-sky-400">A more reversible version</p>
-                <p className="text-fluid-xs text-sky-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
+                <p className="type-eyebrow">A more reversible version</p>
+                <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.reversibleAlternative}</p>
               </div>
               <div>
                 <p className="type-eyebrow">{publicDecisionLabels.reversal}</p>
@@ -262,7 +262,7 @@ const COMPARISON_TEMPLATES = [
   },
   {
     label: "Full-Time Hire vs. Contractor",
-    planA: "Hire 2 full-time senior engineers at $200k",
+    planA: "Hire 2 full-time senior engineers at $200k each",
     planB: "Engage 1 specialized contractor for 3 months at $15k/mo",
   },
   {
@@ -361,12 +361,12 @@ export function ComparePlansMode({
               </div>
             </div>
 
-            {/* Nothing until a plan is typed: an empty mode drew a sky box asking for
+            {/* Nothing until a plan is typed: an empty mode drew a box asking for
                 both plans, under two boxes already asking for them. */}
             <div aria-live="polite">
               {anyPlan ? (
-                <div className="p-3.5 bg-sky-950/30 border border-sky-500/30 rounded-lg flex items-center justify-between">
-                  <span className="text-fluid-xs text-sky-300 font-semibold">
+                <div className="p-3.5 bg-slate-900/40 border border-slate-700/70 rounded-lg flex items-center justify-between">
+                  <span className="text-fluid-xs text-slate-100 font-semibold">
                     {comparisonReady
                       ? `Recommendation: ${comparisonResult.comparativeRecommendation}`
                       : "Describe both plans to compare them."}
