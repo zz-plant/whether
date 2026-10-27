@@ -1147,6 +1147,38 @@ with the link to `/operate#ops-plan-lines`, where each company can move the line
 (§1.1.31), the source stamp (with the saved-copy note on a fallback) and the dated permalink. Built
 on the server; nothing from the reader's browser.
 
+**Distribution beyond the room (2026-10-27).** The formats above go to people who already read
+the brief; these reach people who have not, and each carries the link back.
+- *Social posts.* A "Social" group on `/share`: LinkedIn, X, and Bluesky posts
+  (`lib/export/socialPosts.ts`), each with an "Open in …" link to the network's own composer. The X
+  and Bluesky posts are built from a ladder of candidates so they always fit (280 counted the way X
+  counts, 300 graphemes) and always end on the link: the pause line drops first, then the guidance
+  is cut to its first sentence, then at a word. Copies report the `copied_social` commitment.
+- *Email to a peer.* The Email format adds "Send it to a peer", a `mailto:` with the guidance, the
+  pause line, and the permalink; short because some clients refuse a long body.
+- *Calendar feed.* `GET /calendar.ics` (`lib/export/calendarFeed.ts`): one all-day, free event per
+  frozen week on its Monday, carrying that week's conditions, guidance, and lines, plus a marker
+  for the coming Monday. The repeating Monday hold cannot carry a week's numbers; a subscribed feed
+  can. Linked beside the hold on the meeting formats (webcal for Apple and Outlook, Google's
+  add-by-URL page).
+- *Frames and oEmbed.* `/api/embed?format=page` wraps the widget in a whole document for a Notion
+  embed block or any iframe, and `next.config.js` lifts `X-Frame-Options: DENY` for `/api/embed`
+  alone (`frame-ancestors *`). `GET /api/oembed` (`lib/export/oembed.ts`) answers for `/` and
+  `/share` only, live readings only, since a live widget under a dated record's or an archived
+  month's address would print another week; it keeps the frame within the consumer's `maxwidth`
+  and `maxheight`. The homepage names it in its `<head>`, except on an archived reading.
+- *Status badge.* `GET /api/badge` (`lib/export/statusBadge.ts`): the conditions' weather word as a
+  shields-style SVG for a README, data room, or investor page, in the conditions' color, saying
+  "(saved copy)" on a fallback read. Markdown to copy sits in the embed section.
+- *Portrait card to an app.* "Share the portrait card" hands the brief card's portrait layout
+  (`/api/image/brief?layout=portrait`, 1080×1350, the shape a LinkedIn or Instagram feed shows
+  largest) to the system share sheet as a file, where the browser supports that. The card is
+  fetched when the button mounts because Safari ends the tap's permission at an awaited render.
+- *Assistants.* `/share` links Claude, ChatGPT, and Perplexity with a prompt that names the
+  permalink and asks for the reader's stage, burn, and runway before applying the guidance
+  (`lib/export/askAssistant.ts`). `/api-docs` adds one-click MCP install for Cursor and VS Code and
+  the Claude Code command.
+
 **Flash alerts.** `lib/alert/flashMoves.ts` judges two raw inputs between *consecutive* reads: a
 move of 0.25 points or more in the short rate (a cut between meetings, a bill-market
 dislocation) or 0.20 points or more in 10Y−2Y (a spread blowout) fires the day it lands, whether

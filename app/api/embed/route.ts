@@ -4,6 +4,7 @@
  *
  * GET /api/embed?ticker=GOOGL&stage=series-b&format=html
  * GET /api/embed?format=text
+ * GET /api/embed?format=page   (a whole document, for an iframe: Notion, oEmbed)
  */
 
 import { NextResponse } from "next/server";
@@ -77,7 +78,7 @@ export async function GET(request: Request) {
         });
       }
 
-      const html = buildCallStripEmbedHtml(briefData);
+      const html = format === "page" ? wrapEmbedPage(buildCallStripEmbedHtml(briefData)) : buildCallStripEmbedHtml(briefData);
 
       return new NextResponse(html, {
         headers: {
@@ -114,7 +115,7 @@ export async function GET(request: Request) {
     }
 
     // Default: HTML
-    const html = buildBriefEmbedHtml(briefData);
+    const html = format === "page" ? wrapEmbedPage(buildBriefEmbedHtml(briefData)) : buildBriefEmbedHtml(briefData);
 
     return new NextResponse(html, {
       headers: {
@@ -360,6 +361,27 @@ export const buildBriefEmbedHtml = (data: BriefEmbedData): string => {
   </div>
 </div>`;
 };
+
+/**
+ * The snippet as a whole document, for a frame: Notion's embed block and every
+ * oEmbed consumer (`/api/oembed`) load a URL into an iframe, and a bare
+ * fragment there renders in quirks mode with the browser's 8px margin. Links
+ * open outside the frame, since a brief read inside someone's doc should not
+ * navigate their doc away.
+ */
+const wrapEmbedPage = (fragment: string) => `<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Whether: this week's guidance</title>
+<base target="_blank">
+<style>html,body{margin:0;background:transparent}</style>
+</head>
+<body>
+${fragment}
+</body>
+</html>`;
 
 export const buildCallStripEmbedHtml = (data: BriefEmbedData): string => {
   const callText = data.formattedCall ?? formatGuidance({
