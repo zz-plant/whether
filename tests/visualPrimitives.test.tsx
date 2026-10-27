@@ -340,6 +340,20 @@ describe("TrustStrip", () => {
     assert.doesNotMatch(html, />Yes</);
     assert.doesNotMatch(html, /<dt[^>]*>Could change next week<\/dt>/, "no fourth cell");
     assert.equal((html.match(/1 pt/g) ?? []).length, 1, "the distance prints once");
+    /* With the regime, the line is named by what is on its other side (2026-10-27). */
+    const named = renderToStaticMarkup(
+      <TrustStrip
+        recordDateLabel="Oct 5, 2026"
+        sourcesLive
+        sourcesLabel="All sources live"
+        confidenceLabel="LOW"
+        margin={{ signal: "riskAppetite", points: 1 }}
+        couldChangeNextWeek
+        basis={onRecord}
+        regime="DEFENSIVE"
+      />,
+    );
+    assert.match(named, />Risk appetite 1 pt from Freezing<span[^>]*data-next-week/);
     const waiting = renderToStaticMarkup(
       <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="MED" margin={{ signal: "tightness", points: 9 }} couldChangeNextWeek changeReason="a change is waiting on a second reading" basis={onRecord} />,
     );
@@ -592,12 +606,19 @@ describe("RecordSection", () => {
     { recordDate: "2026-09-30", regime: "DEFENSIVE" },
   ];
   const lines = { tightness: 70, riskAppetite: 50 };
-  it("draws the record as the month strip above the sentences that count it", () => {
-    /* "Has this happened before?" answered in sentences only until 2026-10-21. */
+  it("leads with the answer, then draws the record as the month strip, then the sentences that count it", () => {
+    /* "Has this happened before?" answered in sentences only until 2026-10-21; the
+       answer moved above its band on 2026-10-27, so a frame of the section leads with it. */
     const html = renderToStaticMarkup(
-      <RecordSection lastTime={null} callChangeLines={lines} turningPoints={[]} spellLengths="A spell sentence." record={record} />,
+      <RecordSection
+        lastTime={null}
+        callChangeLines={lines}
+        turningPoints={[]}
+        spellLengths={{ lead: "This spell has run 1 month-end so far.", rest: "A count from the record." }}
+        record={record}
+      />,
     );
-    assert.match(html, /data-month-strip[\s\S]*A spell sentence\./);
+    assert.match(html, /data-section-lead[^>]*>This spell has run 1 month-end so far\.[\s\S]*data-month-strip[\s\S]*A count from the record\./);
   });
 
   it("leaves the band out of an archived view, which passes no record", () => {

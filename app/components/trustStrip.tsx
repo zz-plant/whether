@@ -47,13 +47,19 @@ export type TrustStripProps = {
    *  /trust is one tap away. The margin cell always prints, because it says
    *  whether the call could change next week. */
   phoneLayout?: "grid" | "line";
+  /** The reading's regime. With it, the margin names the conditions across the nearer line. */
+  regime?: string;
   className?: string;
 };
 
 /** What the margin cell prints: the nearer score and its points, or why there is no distance to print. */
-const describeMarginCell = (margin: TrustStripProps["margin"], confidenceLabel: TrustStripProps["confidenceLabel"]) => {
+const describeMarginCell = (
+  margin: TrustStripProps["margin"],
+  confidenceLabel: TrustStripProps["confidenceLabel"],
+  regime: string | undefined,
+) => {
   if (margin === null) return "Not measured: an input is missing";
-  return margin ? formatMarginReading(margin) : formatMarginBand(confidenceLabel);
+  return margin ? formatMarginReading(margin, regime) : formatMarginBand(confidenceLabel);
 };
 
 /* "Not expected", not "No": the boolean says nothing is near its line *this*
@@ -74,6 +80,7 @@ export function TrustStrip({
   basis,
   href,
   phoneLayout = "grid",
+  regime,
   className = "",
 }: TrustStripProps) {
   /* The warning carries its reason: which inputs were left out is not useful
@@ -108,7 +115,7 @@ export function TrustStrip({
        prints, because whether the call holds is the fact a phone reader needs. */
     {
       label: MARGIN_LABEL,
-      value: describeMarginCell(margin, confidenceLabel),
+      value: describeMarginCell(margin, confidenceLabel, regime),
       detail: describeNextWeek(couldChangeNextWeek, changeReason),
       detailKind: "next-week",
       tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caveat" : undefined,

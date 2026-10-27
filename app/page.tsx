@@ -18,7 +18,7 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
-import { formatDecisionReversal, formatStripMargin } from "../lib/report/reportFormatting";
+import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
 import { isRoute } from "../lib/navigation/routeType";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
@@ -76,6 +76,7 @@ import { JsonLdScript } from "./components/jsonLdScript";
 import { PublishedCallWatcher } from "./components/publishedCallWatcher";
 import { OfflineNotice } from "./components/offlineNotice";
 import { frameFactsAttributes } from "../lib/navigation/runningHead";
+import { ScoreLadder } from "./components/ui/scoreLadder";
 import { resolveGlobalHeaderRouteLabel } from "../lib/navigation/globalHeader";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
 import { describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
@@ -506,6 +507,13 @@ async function PageContent({
         }),
   });
 
+  /* The score nearer its change line, on its ladder, for the phone card: the same
+     score the trust strip's margin names, so the drawing and the sentence agree. */
+  const nearestMargin = trustStripProps.margin ?? null;
+  const nearestLadder = nearestMargin ? scoreLadders.find((ladder) => ladder.metric === nearestMargin.signal) ?? null : null;
+  /* The running head's tension, in the margin's own number: "2 pts from Freezing". */
+  const nearestChange = historicalSelection ? null : formatNearestChange(nearestMargin, regime);
+
   /* This week's published brief, where it reads different conditions from the
      card (2026-10-14). The note sat in the trust strip's small print, so a
      reader who opened /history saw the same week under another answer and no
@@ -639,6 +647,8 @@ async function PageContent({
                 /* The page by the name the header gives it, not its h1: the h1 is the
                    card's call, and the strip beside it on desktop prints the call. */
                 title: resolveGlobalHeaderRouteLabel("/"),
+                tension: nearestChange,
+                tensionNear: trustStripProps.couldChangeNextWeek || confidenceLabel === "LOW",
                 call: primaryCall,
                 jump: { href: `#${HOME_SECTIONS.areas.id}`, label: "By area" },
               })}
@@ -685,6 +695,17 @@ async function PageContent({
                 published={publishedNotice}
                 areas={heroAreas}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
+                phoneFigure={
+                  nearestLadder && !historicalSelection ? (
+                    <ScoreLadder
+                      label={nearestLadder.label}
+                      value={nearestLadder.value}
+                      previous={comparisonUnavailable ? null : nearestLadder.previous}
+                      previousLabel={basis.label}
+                      lines={nearestLadder.lines}
+                    />
+                  ) : undefined
+                }
               />
               {/* Live briefs only. The profile holds the operator’s runway as of
                   today; combining it with an archived regime would date the

@@ -4,6 +4,11 @@ import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
 import { readFrameFacts, runningHeadSection, type FrameFacts } from "../../lib/navigation/runningHead";
 import { useScrollDirection } from "./useScrollDirection";
+import { siteUrl } from "../../lib/siteUrl";
+
+const siteHost = new URL(siteUrl).host;
+/** The date inside a phrase like "Week of Oct 19, 2026" or "Last completed month: Sep 30, 2026". */
+const DATE_IN_WORDS = /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.? \d{1,2}, \d{4}/;
 
 /**
  * The running head: one line at the top of the screen, once a page's own intro has
@@ -44,9 +49,12 @@ export function RunningHead() {
       const title = document.querySelector("main h1")?.textContent?.trim() ?? null;
       setFacts(readFrameFacts(source, title));
       setHeaderHeight(header?.getBoundingClientRect().height ?? 0);
-      // The intro, or failing that the page's h1, has left the screen.
+      /* The intro's top, or failing that the page's h1, has gone under the header: the
+         stamp that names the week is at the top of an intro, so a frame that keeps
+         only the intro's foot (the brief's card is taller than a phone screen) has
+         already lost it. */
       const anchor = source ?? document.querySelector("main h1");
-      setShown(anchor ? anchor.getBoundingClientRect().bottom < headerBottom : window.scrollY > 240);
+      setShown(anchor ? anchor.getBoundingClientRect().top + 24 < headerBottom : window.scrollY > 240);
       const headings = [...document.querySelectorAll<HTMLElement>("main h2")]
         .filter((heading) => heading.getClientRects().length > 0 && !heading.closest(".sr-only, details:not([open]) > :not(summary)"))
         .map((heading) => ({ label: heading.textContent?.trim() ?? "", top: heading.getBoundingClientRect().top }));
@@ -77,14 +85,23 @@ export function RunningHead() {
 
   const offset = headerHidden ? 0 : headerHeight;
   const place = section ?? facts.title;
+  /* The page's own address beside the host (2026-10-27): a screenshot cannot be
+     clicked, so the frame says where the rest of it is, short enough to type. */
+  const address = `${siteHost}${pathname && pathname !== "/" ? pathname : ""}`;
+  const phoneDate = facts.date?.match(DATE_IN_WORDS)?.[0] ?? null;
   return (
     <div
       data-running-head
       data-regime={facts.regime ?? undefined}
-      className="fixed inset-x-0 top-0 z-40 border-b border-[color:var(--border-subtle)] bg-[var(--bg-body)]/95 backdrop-blur transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none print:hidden"
+      /* Under a reading, the bar's foot is a 2px rule in the week's colour, as the
+         brief's card carries one (§XIII): at the size Slack shows a screenshot its
+         words cannot be read, and the colour still says which weather it is. */
+      className={`fixed inset-x-0 top-0 z-40 bg-[var(--bg-body)]/95 backdrop-blur transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none print:hidden ${
+        facts.regime ? "border-b-2 border-[color:var(--regime-accent)]" : "border-b border-[color:var(--border-subtle)]"
+      }`}
       style={{ transform: `translateY(${offset}px)` }}
     >
-      <div className="mx-auto flex h-8 max-w-[96rem] items-center gap-2 px-7 text-fluid-nano leading-none text-slate-400">
+      <div className="mx-auto flex h-8 max-w-[96rem] items-center gap-2 px-4 text-fluid-nano leading-none text-slate-400 sm:px-7">
         <p aria-hidden="true" className="flex min-w-0 flex-1 items-center gap-2">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="shrink-0 text-slate-300">
             <path d="M2 14c3-5 6-5 9 0s6 5 9 0" />
@@ -95,9 +112,34 @@ export function RunningHead() {
               {facts.condition}
             </span>
           ) : null}
-          {facts.date ? <span className="shrink-0 tabular-nums">{facts.date}</span> : null}
+          {facts.tension ? (
+            /* The week's open question, by what it would change to. In the caveat
+               ink, with its diamond, when the call could change next week, as the
+               trust strip's margin cell prints it. */
+            <span
+              className={`shrink-0 font-semibold tabular-nums ${facts.tensionNear ? "weather-caveat-mark text-caveat-fg" : "text-slate-200"}`}
+            >
+              {facts.tension}
+            </span>
+          ) : null}
+          {facts.date ? (
+            <span className="shrink-0 tabular-nums">
+              {/* On a phone the date alone: with the tension beside it, "Data as of Oct 23,
+                  2026" ran past the screen's edge and clipped the year off. */}
+              {phoneDate && phoneDate !== facts.date ? (
+                <>
+                  <span className="sm:hidden">{phoneDate}</span>
+                  <span className="max-sm:hidden">{facts.date}</span>
+                </>
+              ) : (
+                facts.date
+              )}
+            </span>
+          ) : null}
           {place ? (
-            <span className="min-w-0 truncate text-slate-300">
+            /* On a phone with a tension there is no width left for the section: the
+               section chips (report pages) or the call line (the brief) carry it. */
+            <span className={`min-w-0 truncate text-slate-300 ${facts.tension ? "max-sm:hidden" : ""}`}>
               {/* From md the brief leads with its call, which the strip at the foot no longer prints. */}
               {facts.call ? (
                 <span className="font-medium text-slate-100 max-md:hidden">{facts.call} · </span>
@@ -108,13 +150,13 @@ export function RunningHead() {
             </span>
           ) : null}
         </p>
-        <span aria-hidden="true" className="shrink-0 max-sm:hidden">whether.work</span>
+        <span aria-hidden="true" className="shrink-0 max-sm:hidden">{address}</span>
       </div>
       {facts.call ? (
         /* The brief's own line on a phone: the call, which is what a screenshot of the
            brief is for, and the jump to what it changes. The desktop brief keeps its
            floating strip for both. */
-        <div className="mx-auto flex h-7 max-w-[96rem] items-center gap-2 px-7 pb-1 text-fluid-xs md:hidden">
+        <div className="mx-auto flex h-7 max-w-[96rem] items-center gap-2 px-4 pb-1 text-fluid-xs sm:px-7 md:hidden">
           <span aria-hidden="true" className="min-w-0 flex-1 truncate font-medium text-slate-50">
             {facts.call}
           </span>

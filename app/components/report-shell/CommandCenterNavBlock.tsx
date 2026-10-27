@@ -1,6 +1,7 @@
 import { ReportCta } from "../reportCta";
 import { frameFactsAttributes } from "../../../lib/navigation/runningHead";
 import { isRegimeKey } from "../../../lib/regimePresentation";
+import { formatNearestChange } from "../../../lib/report/reportFormatting";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
 
@@ -102,6 +103,8 @@ export function CommandCenterNavBlock({
         condition: (regime && isRegimeKey(regime)) || statusPrefix ? statusLabel : null,
         date: recordDateLabel ? `${statusPrefix ?? "Data as of"}${statusPrefix ? ": " : " "}${recordDateLabel}` : null,
         title: pageTitle,
+        tension: formatNearestChange(trustStrip?.margin, regime),
+        tensionNear: Boolean(trustStrip?.couldChangeNextWeek) || trustStrip?.confidenceLabel === "LOW",
       })}
     >
       {/* Two columns from lg up: the reading block keeps its measure on the
@@ -151,7 +154,7 @@ export function CommandCenterNavBlock({
               {pageSummary}
             </p>
           ) : null}
-          {trustStrip ? <TrustStrip {...trustStrip} phoneLayout="line" className="sm:pt-2" /> : null}
+          {trustStrip ? <TrustStrip {...trustStrip} regime={regime} phoneLayout="line" className="sm:pt-2" /> : null}
         </div>
 
         <div className={`space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0 ${showActions ? "" : "max-sm:hidden"}`.trim()}>

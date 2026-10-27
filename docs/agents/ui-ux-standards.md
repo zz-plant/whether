@@ -800,3 +800,32 @@ gate, which has no browser: run it after layout work, beside `bun run ui:iterate
   then holds both halves of an answer.
 - A heading left at the foot of a frame depends on where the reader stopped, and no layout removes
   it everywhere. The head names the section in the next frame; the audit reports the rest.
+
+### Frames worth opening (2026-10-27, §1.1.88)
+
+A frame that names its source is attributable; one people open also leaves them a question
+and shows them where to look. What the research on images people engage with says, as rules here:
+
+- MUST: carry the week's open question, how near the reading is to changing and to what. The
+  margin names the conditions across the nearer line ("Risk appetite 2 pts from Freezing",
+  `formatMarginReading` with the regime; `regimeAcrossLine` in `lib/regimePhaseSpace.ts`), and the
+  running head prints the same fact in four words (`formatNearestChange`), in the caveat ink when
+  the call could change next week. A small, specific gap ("2 points from Freezing") is what
+  provokes curiosity; a state ("Cloudy") does not. Screens only: pastes keep `formatMargin`.
+- MUST: draw the claim the frame leads with. The brief's card on a phone draws the nearer score's
+  `ScoreLadder` above the trust strip (`DecisionHero`'s `phoneFigure`): from `md` the conditions
+  map does it, and below it a phone screenshot of the card was text alone. The ladder carries last
+  week's dot too, so the card shows a move toward a line, not only a position.
+- MUST: lead a section with its answer, before its evidence. `HomeSection`'s `lead` is the
+  finding, set at `text-fluid-lg` between body and heading: a reader's eye reaches a frame's title
+  first and keeps its claim. "How unusual is this?" leads with this spell beside the earlier ones
+  (`describeSpellLengths` returns `{ lead, rest }`); "Why conditions are …" leads with the rule
+  that answers it, over the table.
+- MUST: keep a focal point at preview size where a frame can. Slack previews an image about 360px
+  tall, so a phone frame shrinks to about 0.43 and a laptop frame to 0.4, and type under about
+  9px there cannot be made out. The brief's section headings are 22px on a phone for this.
+  `bun run ui:frames` reports, per route, how many frames keep one (`hasThumbnailFocal`); it is
+  advisory, because a page's middle cannot all be large type.
+- SHOULD: point a frame at where the rest is. The running head prints the page's address
+  (`whether.work/signals`), short enough to type from a screenshot, and a 2px rule in the week's
+  colour, which still says which weather it is when the words are too small to read.

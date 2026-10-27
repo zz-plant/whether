@@ -156,6 +156,25 @@ export const regimeAtCoordinates = (
   return risky ? "EXPANSION" : "VOLATILE";
 };
 
+/**
+ * The conditions on the other side of one score's change line: crossing the
+ * funding-pressure line flips the upper and lower halves, crossing the risk-appetite
+ * line flips the left and right. It names what a near reading is near, which is the
+ * question a reader of "2 pts from its change line" is left with.
+ */
+export const regimeAcrossLine = (regime: RegimeKey, signal: "tightness" | "riskAppetite"): RegimeKey => {
+  if (signal === "tightness") {
+    if (regime === "DEFENSIVE") return "EXPANSION";
+    if (regime === "EXPANSION") return "DEFENSIVE";
+    if (regime === "SCARCITY") return "VOLATILE";
+    return "SCARCITY";
+  }
+  if (regime === "DEFENSIVE") return "SCARCITY";
+  if (regime === "SCARCITY") return "DEFENSIVE";
+  if (regime === "EXPANSION") return "VOLATILE";
+  return "EXPANSION";
+};
+
 const monthFormatter = new Intl.DateTimeFormat("en-US", {
   month: "short",
   year: "numeric",

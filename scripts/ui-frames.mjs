@@ -27,7 +27,7 @@ import {
   waitForLayoutSettled,
 } from "./ui-capture.lib.mjs";
 import { captureStorageSeeds, frameAuditRoutes, frameAuditViewports, frameBlockSelector } from "./ui-capture.config.mjs";
-import { buildFramesGalleryHtml, frameGaps, frameOffsets, routeFailures, tallBlocks } from "./ui-frames.lib.mjs";
+import { buildFramesGalleryHtml, frameGaps, frameOffsets, hasThumbnailFocal, routeFailures, tallBlocks } from "./ui-frames.lib.mjs";
 
 const args = process.argv.slice(2);
 const baseUrl = readArgValue(args, "--base-url", DEFAULT_UI_CAPTURE_BASE_URL);
@@ -64,6 +64,9 @@ const measureFrame = (blockSelector) => {
       .slice(0, 70);
 
   let text = "";
+  // The largest painted type, and the tallest graphic: what is left of a frame at thumbnail size.
+  let largestTextPx = 0;
+  let largestText = "";
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
   for (let node = walker.nextNode(); node; node = walker.nextNode()) {
     const parent = node.parentElement;
@@ -72,6 +75,17 @@ const measureFrame = (blockSelector) => {
     range.selectNodeContents(node);
     if (![...range.getClientRects()].some(onScreen) || !painted(parent)) continue;
     text += ` ${node.textContent}`;
+    const size = Number.parseFloat(getComputedStyle(parent).fontSize) || 0;
+    if (size > largestTextPx) {
+      largestTextPx = size;
+      largestText = node.textContent.trim().replace(/\s+/g, " ").slice(0, 60);
+    }
+  }
+  let largestGraphicPx = 0;
+  for (const graphic of document.querySelectorAll("main svg, main img, main canvas")) {
+    const rect = graphic.getBoundingClientRect();
+    if (!onScreen(rect) || !painted(graphic)) continue;
+    largestGraphicPx = Math.max(largestGraphicPx, Math.min(rect.bottom, vh) - Math.max(rect.top, 0));
   }
   const words = text.replace(/\s+/g, " ");
 
@@ -105,6 +119,9 @@ const measureFrame = (blockSelector) => {
     dated: /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*\.? \d{1,2}(,? \d{4})?\b|\bweek of\b/i.test(words),
     condition: /\b(Sunny|Cloudy|Stormy|Freezing)\b/.test(words),
     headHeight: Math.round(headHeight),
+    largestTextPx: Math.round(largestTextPx),
+    largestText,
+    largestGraphicPx: Math.round(largestGraphicPx),
     cut,
     orphans,
   };
@@ -179,7 +196,8 @@ const run = async () => {
         }));
         // The first frame is the page's own top, which its intro names; the check starts at the second.
         const failures = routeFailures({ frames: frames.slice(1), tall, requires });
-        report.push({ path: route, viewport: name, requires, frames, tall, failures });
+        const focal = frames.filter((frame) => hasThumbnailFocal(frame, viewport.height)).length;
+        report.push({ path: route, viewport: name, requires, frames, tall, failures, focal });
       }
       await context.close();
     }
@@ -194,7 +212,9 @@ const run = async () => {
   for (const route of report) {
     const frameCount = route.frames.length;
     const standing = frameCount - route.frames.slice(1).filter((frame) => frameGaps(frame, route.requires).length > 0).length;
-    console.log(`${route.failures.length ? "✗" : "✓"} ${route.viewport.padEnd(7)} ${route.path.padEnd(20)} ${standing}/${frameCount} frames stand alone · ${route.tall.length} blocks taller than a frame`);
+    console.log(
+      `${route.failures.length ? "✗" : "✓"} ${route.viewport.padEnd(7)} ${route.path.padEnd(20)} ${standing}/${frameCount} frames stand alone · ${route.tall.length} blocks taller than a frame · ${route.focal}/${frameCount} keep a focal point at preview size`,
+    );
     for (const failure of route.failures) console.log(`    ${failure}`);
   }
   console.log(`\nGallery: ${path.join(outDir, "index.html")}`);
