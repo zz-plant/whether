@@ -2989,8 +2989,14 @@ read `?ref=share` on the server. `SharedArrivalNote` reads it in the browser and
 card, "Shared with you." with the category line and the same two steps on the homepage. A record
 with a newer frozen week opens with "Newer guidance is out. This record keeps the week of …" above
 the card and the one link to the live brief; it names no newer week's conditions, because the
-archive can trail the live reading. `isSharedArrivalQuery` (`lib/report/briefArtifact.ts`) is the
-one test of the tag, shared with the activation tracker. `tests/sharedArrival.test.tsx` pins both.
+archive can trail the live reading. "Get it every Monday" goes to the record's own form
+(`#monday-email`), which starts on Monday delivery; on the homepage, a share arrival's alert form
+starts on Monday delivery instead of alerts only, so the link's promise holds. The calibration
+section, hidden below `sm` when it has no note, shows with its controls when a link targets it
+(`target:block`), and the homepage shell now mounts `AnchorFeedback`, as `PageShell` does, so a
+hash link opens the disclosure it points into. `isSharedArrivalQuery` (`lib/report/briefArtifact.ts`)
+is the one test of the tag, shared with the activation tracker. `tests/sharedArrival.test.tsx` pins
+these.
 - **Cloudy → Freezing.** Said once, on the card's stamp line ("Was Cloudy on Sep 30") with the line
   under the call. `SinceLastVisit` renders only when the conditions or the call differ from what
   this browser last saw, and not when the difference is the earlier conditions the card names

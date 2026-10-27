@@ -42,6 +42,13 @@ describe("arriving from a shared link", () => {
     assert.match(html, /Scale it to your stage and runway/);
   });
 
+  it("starts the homepage form on Monday delivery for a shared arrival, so the greeting's promise holds", async () => {
+    const { AlertSection } = await import("../app/components/home/AlertSection");
+    const checked = (html: string) => /<input[^>]*checked=""[^>]*value="(alerts|weekly)"/.exec(html)?.[1];
+    assert.equal(checked(renderToStaticMarkup(<AlertSection defaultFrequency="weekly" />)), "weekly");
+    assert.equal(checked(renderToStaticMarkup(<AlertSection />)), "alerts", "any other visit keeps alerts first");
+  });
+
   it("leaves the greeting's steps off for any other visit", () => {
     const html = renderToStaticMarkup(<ConditionsLegend thresholds={{ tightnessRegime: 70, riskAppetiteRegime: 50 }} />);
     assert.doesNotMatch(html, /Get it every Monday/);
@@ -60,6 +67,12 @@ describe("a dated record that newer weeks replaced", () => {
     assert.ok(notice < html.indexOf('id="share-ready-artifact"'), "it is read before the card");
     assert.ok(html.includes(`This record keeps the week of ${publishedBriefWeekLabel(older)}.`));
     assert.equal(html.match(/Read this week&#x27;s guidance/g)?.length, 1, "one link to the live brief, in the notice");
+  });
+
+  it("sends the record's Monday link to its own form, which starts on Monday delivery", async () => {
+    assert.ok(older);
+    const html = await renderRecord(older.slug);
+    assert.match(html, /<div id="monday-email"/);
   });
 
   it("says nothing of the kind on the latest week", async () => {

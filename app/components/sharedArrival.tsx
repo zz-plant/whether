@@ -49,7 +49,8 @@ export function SharedArrivalNote({ orientation }: { orientation: string }) {
       <p>
         <span className="font-semibold text-slate-100">Shared with you.</span> {orientation}
       </p>
-      <SharedArrivalActions calibrateHref="/#company-calibration" subscribeHref="/#subscribe" />
+      {/* The email is this page's own form, which starts on Monday delivery. */}
+      <SharedArrivalActions calibrateHref="/#company-calibration" subscribeHref="#monday-email" />
     </section>
   );
 }
