@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { AnchorFeedback } from "./anchorFeedback";
 import { FocusModeController } from "./focusModeController";
 import { Skeleton } from "./skeleton";
 import { regimeAccentStyle, regimeDataAttribute } from "../../lib/regimeAccent";
@@ -78,6 +79,12 @@ export function Shell({
       style={regimeAccentStyle(regime)}
     >
       <FocusModeController />
+      {/* What PageShell mounts on every other route: a hash link opens the
+          disclosure it points into and lands once the streamed target has a box.
+          The brief had none, so a link to `#company-calibration` (the shared-arrival
+          greeting's "Scale it to your stage and runway") scrolled to a folded
+          line instead of the stage and runway choices. */}
+      <AnchorFeedback />
       <main id="main-content" data-home-shell-main className={shellMainClassName}>
         {children}
       </main>

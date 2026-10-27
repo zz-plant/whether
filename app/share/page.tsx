@@ -1,3 +1,4 @@
+import { Fragment } from "react";
 import { frameFactsAttributes } from "../../lib/navigation/runningHead";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { Metadata } from "next";
@@ -29,6 +30,10 @@ import {
 } from "../../lib/export/weeklyOperatorBrief";
 import { buildInvestorUpdateSnippetParts } from "../../lib/export/investorUpdateSnippet";
 import { formatSourceFooter } from "../../lib/export/exportTerms";
+import { buildAssistantLinks } from "../../lib/export/askAssistant";
+import { CALENDAR_FEED_PATH } from "../../lib/export/calendarFeed";
+import { buildSocialComposeUrl, formatSocialPost, type SocialNetwork } from "../../lib/export/socialPosts";
+import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../../lib/siteUrl";
@@ -159,6 +164,12 @@ const buildCurrentShareArtifact = async () => {
   ].join("\n");
 
   return {
+    /* The frozen record when there is a current one, so the assistant reads the
+       week the reader is looking at even after next Monday's brief is out. */
+    assistantLinks: buildAssistantLinks(
+      document.provenance.permalink,
+      treasury.record_date ? formatWeekMondayUTC(treasury.record_date) : reportData.recordDateLabel,
+    ),
     recordDate: treasury.record_date,
     recordDateLabel: reportData.recordDateLabel,
     assessment,
@@ -183,6 +194,20 @@ const buildCurrentShareArtifact = async () => {
       formatSourceFooter(document.provenance),
       `Full brief: ${document.provenance.permalink}`,
     ].join("\n"),
+    /* A mail client's new message, addressed to no one: the reader picks the
+       peer. Short on purpose, because some clients cut or refuse a long mailto
+       body; the full brief is one click away at the link. */
+    emailComposeUrl: `mailto:?${new URLSearchParams({
+      subject: `Whether: this week's guidance (${reportData.recordDateLabel})`,
+      body: [
+        document.call,
+        ...(document.slots.pauseIf ? ["", `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${document.slots.pauseIf}`] : []),
+        "",
+        `Full brief: ${document.provenance.permalink}`,
+      ].join("\n"),
+    })
+      .toString()
+      .replaceAll("+", "%20")}`,
     standupLine,
     meetingSnippet,
     meetingPack,
@@ -249,6 +274,20 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       commitment: "copied_brief",
       preview: "chat",
     },
+    ...SOCIAL_FORMATS.map(({ network, label, hint }): ShareFormatOption => {
+      const text = formatSocialPost(artifact.document, network, siteUrl);
+      return {
+        id: `${network}-post`,
+        group: "Social",
+        label,
+        hint,
+        kind: "text",
+        text,
+        copyLabel: `Copy ${label} text`,
+        commitment: "copied_social",
+        compose: { label: `Open in ${SOCIAL_NETWORK_NAMES[network]}`, href: buildSocialComposeUrl(network, text) },
+      };
+    }),
     {
       id: "meeting-pack",
       group: "Meetings",
@@ -300,6 +339,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       text: artifact.emailBrief,
       copyLabel: "Copy email",
       commitment: "copied_email",
+      compose: { label: "Send it to a peer", href: artifact.emailComposeUrl },
     },
     {
       id: "investor-update",
@@ -367,6 +407,26 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
   ];
 };
 
+const SOCIAL_NETWORK_NAMES: Record<SocialNetwork, string> = { linkedin: "LinkedIn", x: "X", bluesky: "Bluesky" };
+
+const SOCIAL_FORMATS: readonly { network: SocialNetwork; label: string; hint: string }[] = [
+  {
+    network: "linkedin",
+    label: "LinkedIn post",
+    hint: "For your own feed: the conditions and the guidance in the two lines LinkedIn shows before \"see more,\" then the pause line, each area's rule, and the source.",
+  },
+  {
+    network: "x",
+    label: "X post",
+    hint: "Fits in 280 characters with the link. When the week runs long, the pause line drops first and the guidance is cut to its first sentence.",
+  },
+  {
+    network: "bluesky",
+    label: "Bluesky post",
+    hint: "Fits in 300 characters with the link, cut the same way as the X post.",
+  },
+];
+
 const apiLink = utilityLinks.find((link) => link.href === "/api-docs");
 
 export default async function SharePage() {
@@ -418,7 +478,11 @@ export default async function SharePage() {
         <SharePageFormats
           scoreReferences={artifact.scoreReferences}
           options={buildShareOptions(artifact)}
-          calendar={{ title: `Whether weekly brief review — ${artifact.recordDate}`, details: artifact.calendarDetails }}
+          calendar={{
+            title: `Whether weekly brief review — ${artifact.recordDate}`,
+            details: artifact.calendarDetails,
+            feedUrl: `${siteUrl}${CALENDAR_FEED_PATH}`,
+          }}
         />
 
         {/* Text formats first, then the same call as a picture or a file. */}
@@ -434,6 +498,17 @@ export default async function SharePage() {
             own until 2026-10-08. */}
         <nav aria-labelledby="share-elsewhere-heading" className="weather-panel weather-section-stack p-0">
           <h2 id="share-elsewhere-heading" className="text-lg font-semibold text-white/90">For agents, scripts and feed readers</h2>
+          <p className="text-sm text-slate-300">
+            Ask an assistant what this week means for your company:{" "}
+            {artifact.assistantLinks.map((link, index) => (
+              <Fragment key={link.name}>
+                {index > 0 ? " · " : null}
+                <ActionLink href={link.href} variant="inline" target="_blank" rel="noreferrer">
+                  {link.name}
+                </ActionLink>
+              </Fragment>
+            ))}
+          </p>
           <ul className="flex flex-wrap gap-x-5 gap-y-1 text-sm">
             {apiLink ? (
               <li>

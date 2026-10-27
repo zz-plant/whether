@@ -816,7 +816,7 @@ async function PageContent({
 
             {/* 8. The alert: hearing the day a line is crossed is how the page is
                 meant to be used, so it follows everything it watches. */}
-            <AlertSection />
+            <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} />
 
             {/* Last, as a line rather than a section: the way out to every share
                 format, and the week's published brief. */}

@@ -11,6 +11,7 @@ import { ActionLink } from "../components/ui/actionLink";
 import { SegmentedControl, type SegmentedOption } from "../components/ui/segmentedControl";
 import { CopyMeetingSlideButton } from "../components/CopyMeetingSlideButton";
 import { CopyImageCardButton } from "../components/CopyImageCardButton";
+import { SharePortraitCardButton } from "./sharePortraitCardButton";
 
 /**
  * The image and file artifacts, on the page whose job is getting the brief out.
@@ -195,6 +196,7 @@ export function ShareImageArtifacts() {
       <div className="flex flex-wrap items-center gap-2">
         <CopyMeetingSlideButton />
         <CopyImageCardButton />
+        <SharePortraitCardButton />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {artifacts.map((artifact) => (
