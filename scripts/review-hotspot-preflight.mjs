@@ -87,6 +87,10 @@ function changedFiles(base, head) {
     .filter(Boolean);
 }
 
+/* A line that starts with a comment: `/*`, or the JSX form `{/*`, which flagged "named as
+   two" in a JSX comment as an assertion on 2026-10-27. */
+const opensComment = (trimmed) => trimmed.startsWith("/*") || trimmed.startsWith("{/*");
+
 /**
  * Line numbers (1-based) that sit inside a comment. Read from the file rather than the
  * diff: editing the middle of an existing doc comment hands a diff-only scanner bare prose.
@@ -110,11 +114,11 @@ export function blockCommentLines(source) {
       inBlock = true;
       // Only excuse the line when the comment starts it: `const x = y as Foo; /* note`
       // carries real code before the opener.
-      if (trimmed.startsWith("/*")) inside.add(lineNumber);
+      if (opensComment(trimmed)) inside.add(lineNumber);
       return;
     }
 
-    if (trimmed.startsWith("//") || (trimmed.startsWith("/*") && trimmed.includes("*/"))) {
+    if (trimmed.startsWith("//") || (opensComment(trimmed) && trimmed.includes("*/"))) {
       inside.add(lineNumber);
     }
   });
