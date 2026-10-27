@@ -138,6 +138,9 @@ describe("/ states the stage and runway in the controls alone", () => {
     assert.match(text(html), /First repeatable revenue \(default\)/);
     assert.match(text(html), /Follow the guidance \(default\)/);
     assert.match(html, /<section[^>]*class="[^"]*max-sm:hidden/, "on a phone the header pills are the controls, and an empty section does not print");
+    /* Unless a link targets it: the shared-arrival greeting's "Scale it to your stage and runway". */
+    assert.match(html, /<section[^>]*class="[^"]*\btarget:block\b/, "a link to the section shows it on a phone");
+    assert.match(html, /<details class="[^"]*\bgroup-target\/calibration:block\b/, "and its controls with it");
   });
 });
 

@@ -206,7 +206,7 @@ describe("home route render contract", () => {
     const calibrationSource = readFileSync("app/components/home/CompanyCalibration.tsx", "utf8");
     assert.match(
       calibrationSource,
-      /<details className="group hidden sm:block"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
+      /<details className="group hidden sm:block[^"]*"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
       "the sm+ tablists lead the areas they reshape, folded under the line that names them",
     );
     assert.ok(!routeSource.includes("<RunwayDropdownPill"), "<RunwayDropdownPill has no render site on /");

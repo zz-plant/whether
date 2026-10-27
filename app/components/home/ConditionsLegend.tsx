@@ -9,6 +9,7 @@ import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
 import { STORAGE_KEYS } from "../../../lib/storage/keys";
 import { formatThresholdNumber } from "../../../lib/formatters";
 import { createBrowserSource, useBrowserSource } from "../browserSource";
+import { SharedArrivalActions } from "../sharedArrival";
 
 const DISMISS_KEY = STORAGE_KEYS.homeOrientationDismissed;
 
@@ -172,6 +173,8 @@ export function ConditionsLegend({
           </Link>
         </span>
       </p>
+      {/* Same-page anchors: the email form and the stage and runway pickers are below. */}
+      {arrival === "share" ? <SharedArrivalActions calibrateHref="#company-calibration" subscribeHref="#subscribe" /> : null}
       </div>
       <button
         type="button"

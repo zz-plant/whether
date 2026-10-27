@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../../lib/report/briefArtifact";
+import { isSharedArrivalQuery } from "../../lib/report/briefArtifact";
 import {
   activationLastWeekStorageKey,
   classifyArrival,
@@ -80,7 +80,7 @@ export function ActivationTracker({ path }: { path: string }) {
     const arrival = classifyArrival({
       referrer: document.referrer,
       siteHost: window.location.hostname,
-      sharedLink: new URLSearchParams(window.location.search).get(SHARE_REFERRAL_PARAM) === SHARE_REFERRAL_VALUE,
+      sharedLink: isSharedArrivalQuery(window.location.search),
     });
     trackActivationEvent({ step: "visited", path, arrival, firstVisit: storedSlug === null });
 

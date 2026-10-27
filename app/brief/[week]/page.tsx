@@ -10,6 +10,7 @@ import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/naviga
 import {
   buildCanonicalUrl,
   buildPageMetadata,
+  homeOrientationLine,
 } from "../../../lib/seo";
 import { publisherAuthor } from "../../../lib/publisher";
 import { buildPublishedBriefStructuredData } from "../../../lib/seo/pageStructuredData";
@@ -25,6 +26,7 @@ import {
   findAdjacentPublishedBriefs,
   findPublishedBrief,
   labelForArea,
+  latestPublishedBrief,
   publishedBriefDisplay,
   publishedBriefHeadline,
   correctionBody,
@@ -128,6 +130,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 }
 
 import { SubscribeForm } from "../../components/SubscribeForm";
+import { SharedArrivalNote } from "../../components/sharedArrival";
 import { JsonLdScript } from "../../components/jsonLdScript";
 import { compositeSignalScales, regimeSignalLabel, signalReadingMeaning } from "../../../lib/report/signalTranslations";
 
@@ -147,6 +150,8 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
   const headline = publishedBriefHeadline(brief);
   const canonicalUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const { previous, next } = findAdjacentPublishedBriefs(brief.slug);
+  /* A newer week is frozen, so this one is no longer the current guidance. */
+  const superseded = Boolean(next && latestPublishedBrief && latestPublishedBrief.slug !== brief.slug);
   const slackUpdate = buildPublishedBriefSlackUpdate(brief);
   const emailUpdate = buildPublishedBriefEmailUpdate(brief);
   const boardUpdate = buildPublishedBriefBoardUpdate(brief);
@@ -194,6 +199,29 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
       />
 
       <article className="flex flex-col gap-6">
+        {/* A pasted link outlives its week: a Slack thread from a month ago
+            still opens this record, and a reader can take it for the current week.
+            Above the card, so it is read before the guidance it dates, and
+            outside it, so a crop of the card stays a clean record. Decided when
+            the page is built, which is every deploy, and every week's freeze
+            deploys; the link goes to the live brief, which is never behind. */}
+        {superseded ? (
+          <p
+            data-newer-guidance
+            className="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border border-[color:var(--border-default)] bg-[var(--bg-raised)] px-4 py-2 text-fluid-xs text-slate-200"
+          >
+            {/* It names no newer week's conditions: the archive can trail the
+                live brief by a week or two, and the link is where the current
+                reading is. */}
+            <span>
+              <span className="font-semibold">Newer guidance is out.</span> This record keeps the week of{" "}
+              {publishedBriefWeekLabel(brief)}.
+            </span>
+            <ActionLink href="/" variant="inline">
+              Read this week&apos;s guidance
+            </ActionLink>
+          </p>
+        ) : null}
         {/* The record in the card the live brief and its share image use:
             stamp, call, lines, date, source. It used to be a panel of tags with
             the call as body text under a generic title, so a screenshot of a
@@ -246,10 +274,14 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               not have to scroll a dated record to find out it is dated. */}
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
             <span>This page keeps one week&apos;s guidance, unchanged since it was published.</span>
-            <ActionLink href="/" variant="inline">
-              Read this week&apos;s guidance
-            </ActionLink>
+            {/* The notice above the card carries this link on a superseded week. */}
+            {superseded ? null : (
+              <ActionLink href="/" variant="inline">
+                Read this week&apos;s guidance
+              </ActionLink>
+            )}
           </p>
+          <SharedArrivalNote orientation={homeOrientationLine} />
         </header>
 
         {/* The delta follows the card, then the share tool. The copy panel used
@@ -498,7 +530,10 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
 
       {/* A shared brief used to be a dead end: the recipient got the citation
           and nothing that brought next Monday's call to them. */}
-      <SubscribeForm />
+      {/* The shared-arrival note's "Get it every Monday" lands here: this form starts on Monday delivery. */}
+      <div id="monday-email">
+        <SubscribeForm />
+      </div>
     </ContentPageShell>
   );
 }
