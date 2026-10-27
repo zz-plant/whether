@@ -10,7 +10,7 @@ import {
 import { formatDateUTC } from "../../../lib/formatters";
 import { buildAuthorSchema, buildPublisherSchema } from "../../../lib/publisher";
 import { graph } from "../../../lib/seo/pageStructuredData";
-import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { formatDecisionReversal, formatDecisionThreshold, publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { decisionAreaLabel, type BoundedDecisionRule } from "../../../lib/report/boundedDecisionRules";
 import type { ResourceArticle, ResourceArticleEmbed } from "../../../lib/resourceArticles";
 import { CopyAnchorButton } from "./copyAnchorButton";
@@ -169,14 +169,14 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
                   <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
                     <p className="type-eyebrow">This week&apos;s rule · {decisionAreaLabel(rule.area)}</p>
                     <p className="font-semibold text-slate-100">{rule.recommendation}</p>
-                    <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {rule.pauseTrigger}</p>
-                    <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {rule.resumeTrigger}</p>
+                    <p className="text-xs text-rose-200">{publicDecisionLabels.threshold}: {formatDecisionThreshold(rule.pauseTrigger)}</p>
+                    <p className="text-xs text-emerald-200">{publicDecisionLabels.reversal}: {formatDecisionReversal(rule.resumeTrigger)}</p>
                   </article>
                 ))}
               </div>
               {decisionArtifact.weeklyAnswers && decisionArtifact.weeklyAnswers.length > 0 ? (
                 <p className="text-sm text-slate-200 print:text-slate-700">
-                  This week&apos;s guidance:{" "}
+                  Questions answered this week:{" "}
                   {decisionArtifact.weeklyAnswers.map((answer, index) => (
                     <span key={answer.href}>
                       {index > 0 ? " · " : null}

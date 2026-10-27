@@ -245,7 +245,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
               only at the foot of the page, past the full brief. A visitor should
               not have to scroll a dated record to find out it is dated. */}
           <p className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-slate-400">
-            <span>This is a frozen record of one week.</span>
+            <span>This page keeps one week&apos;s guidance, unchanged since it was published.</span>
             <ActionLink href="/" variant="inline">
               Read this week&apos;s guidance
             </ActionLink>

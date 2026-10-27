@@ -3029,13 +3029,13 @@ is gone. "What the margin has been worth" is the study's first sentence (96%) an
 | `/trust` | the summary under the title; pills to two sections the index names; a revisit row that only linked back up; a second link to `/about#method` | the title, the index, the closing line |
 | `/brief/<week>` | "Freezing:" in the heading under the stamp; the week in the caption under the heading; "(week of …)" and "Date-pinned record" over the preview | the stamp, the heading, the share heading |
 | `/share` | "PPTX · PDF · SVG" over the three file buttons | the buttons |
-| `/answers/*` | the related links beside the top copy button; "Market guidance as of" under the strip's "Data as of" | "Next for…", the strip |
+| `/answers/*` | the related links beside the top copy button; "Market guidance as of" under the strip's "Data as of" | "Related pages" (was "Next for…"), the strip |
 | `/resources` | each answer row's stamp, the same for every row in an area | one stamp beside the area's name |
 | `/history/compare` | the intro's status word, Period A's conditions on a two-period page | the period headings |
 | `/calibration` | "The record" kicker; the study section's intro restating the page's | the tabs, the page intro |
 | `/trust` | "The exact arithmetic is below." over the "Show the exact arithmetic" control | the control |
 | `/about` | the structure's healthcare origin in "Who writes it" and again in the folded "Why it works", behind a link to `/about` itself | "Who writes it"; "Why it works" keeps the stakes |
-| `/brief/<week>` | "This record is frozen." in the footer, under the header's "This is a frozen record of one week." | the header line; the footer keeps the corrections rule |
+| `/brief/<week>` | "This record is frozen." in the footer, under the header's "This is a frozen record of one week." | the header line (since 2026-10-27 "This page keeps one week's guidance, unchanged since it was published.", because "frozen" beside a week called Freezing read as the conditions); the footer keeps the corrections rule |
 | `/history/compare` | the borrowing premium's definition under the difference tile and in both columns, the tile also repeating both columns' values | the definition under the tile; each column prints its value |
 
 ### 1.1.64 `/concepts` tests whether advice moves with the conditions (2026-10-09)

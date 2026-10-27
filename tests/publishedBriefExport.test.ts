@@ -196,8 +196,9 @@ describe("published brief date-pinned exports", () => {
     // Area-level bounded decisions
     assert.match(slack, /• Hiring: Selective hiring for revenue-linked and reliability roles\./);
     assert.match(slack, /Do now: Prioritize revenue-linked and reliability roles/);
-    assert.match(slack, /Pause if: Pause net-new hiring if funding pressure rises above 76 or risk appetite falls below 44\./);
-    // The rule's own verb is dropped, so the label is not said twice.
+    // The rule's own verb is dropped on both lines, so neither label is said twice.
+    assert.match(slack, /Pause if: Funding pressure rises above 76 or risk appetite falls below 44/);
+    assert.doesNotMatch(slack, /Pause if: Pause/);
     assert.match(slack, /Resume when: Funding pressure falls below 66 and risk appetite is above 54/);
     assert.doesNotMatch(slack, /Resume when: Resume/);
 
@@ -230,7 +231,8 @@ describe("published brief date-pinned exports", () => {
     // Area decisions
     assert.match(email, /• Roadmap: Speed up product work tied to activation and retention goals\./);
     assert.match(email, /- Action: Speed up on product bets/);
-    assert.match(email, /- Pause if: Pause long-payback bets if risk appetite falls below 44/);
+    assert.match(email, /- Pause if: Risk appetite falls below 44/);
+    assert.doesNotMatch(email, /Pause if: Pause/);
     assert.match(email, /- Resume when: Risk appetite is above 54/);
     assert.doesNotMatch(email, /Resume when: Resume/);
 
