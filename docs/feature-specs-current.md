@@ -4557,6 +4557,15 @@ $$
 - `GET /api/mcp?tool=<name>` — every tool as a plain GET (§6.9); `POST /api/mcp?tool=subscribe` unchanged.
 - `bun run mcp:whether` — the local stdio MCP server (`lib/mcp/server.ts`, the one `/api/mcp` runs): the same tools, plus
   `pull_recent_site_info`.
+- **What robots.txt opens is what the documents advertise (2026-10-27).** robots.txt closed `/api/` and opened
+  four API paths, while the manifest advertised `/api/weekly`, `/monthly`, `/quarterly`, `/yearly`, `/cadence`,
+  `/treasury` and `/health`, and `/api-docs` documented ten more that stayed closed. It opens the manifest's endpoints (read from
+  `buildAgentEndpoints`) and every path `/api-docs` documents now; `/api/health` left the manifest instead, as a
+  monitor's probe that loads the report on every call. `/api-docs` gained the `/api/cli/*` routes (with a curl
+  example and how to point the CLI at this site), the mandate targets, `/api/badge`, `/api/decision`, the image
+  and embed parameters, the stored screenshot, `/api/agent`'s `week` and `period`, `/calendar.ics` and
+  `/llms-full.txt`; `/llms.txt` gained the CLI status and history routes, the badge, the calendar and the full
+  text. `tests/robotsRoute.test.ts` holds robots.txt to `/llms.txt`, the manifest and the rendered `/api-docs`.
 
 ### 6.8 Alert cadence (2026-08-11; flash 2026-09-17)
 Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls

@@ -282,6 +282,13 @@ rather than what the metadata code intends, found gaps none of the SEO suites co
   `content/resources/*.json` has to move with its copy — it is the sitemap date and `dateModified`.
 - **Five lookalike Organization nodes** (a name, sometimes a URL, no `@id`) are the site entity by
   id now, and the RSS feed moved out of `sitemap.xml` into a second `Sitemap:` line in robots.txt.
+- **The allow list was checked against one of three documents (2026-10-27).** robots.txt opens
+  `/api/` paths by name, and `tests/robotsRoute.test.ts` held that list to `/llms.txt` alone. The
+  agent manifest and `/api-docs` advertise API paths too, so seven manifest endpoints and most of
+  `/api-docs` (scores, comps, the images, the slide file, the embed) were advertised and disallowed
+  at once. The test reads all three now. An endpoint that should stay closed leaves the document
+  instead (`/api/health` left the manifest), and an open path opens every path it is a prefix of,
+  so a closed neighbour (`/api/weekly-digest` beside `/api/weekly`) needs a Disallow line of its own.
 
 ## A warning that is always on (2026-09-23)
 

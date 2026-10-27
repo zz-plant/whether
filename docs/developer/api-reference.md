@@ -8,8 +8,9 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 - **Format:** JSON.
 - **Runtime:** edge handlers.
 - **Cost:** Whether is free.
-- **Auth:** currently none. Protect public deployments with your own auth/reverse proxy as needed.
+- **Auth:** none for the reads. The routes the scheduler owns (creating a regime alert, `/api/alert-deliveries`, `/api/decision-events`) take `Authorization: Bearer <WHETHER_CRON_SECRET>`. Decision memory reads and writes one owner's entries, named by an `x-whether-client-id` header, and answers 401 without it.
 - **Automation headers:** send `Accept: application/json`; include `Authorization: Bearer <token>` when your deployment is access-controlled.
+- **Crawlers:** `robots.txt` opens every path `/api-docs`, `/llms.txt` and the agent manifest advertise (`tests/robotsRoute.test.ts`), and keeps `/api/health`, telemetry, the alert digest and the scheduler's routes closed.
 - **Rate limiting:** platform-default protections apply; explicit per-endpoint quotas are not yet published.
 - **Versioning:** most payloads include `version: "v1"`.
 
@@ -21,10 +22,19 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | --- | --- | --- |
 | `/api/agent?cadence=<weekly|monthly|quarterly|yearly>` | GET | Agent-focused summary + handoff payload/prompt. |
 | `/api/agent?view=state` | GET | The compact state to decide from (about 3KB, weekly only): conditions, published confidence, `automation.ready`, each score against its pause / resume / change lines, `perWeek` pace, what moved it, guidance. Shape: `agentStateSchema` in `lib/agentState.ts`. |
+| `/api/agent?week=<slug>` / `?period=<slug>` | GET | A frozen published week (`2026-w41`), or an archive quarter or year (`2024-q1`, `2023`), with its permalink. An unknown slug is a 404 listing the slugs on record. |
+| `/api/posture/current` | GET | The current guidance as a small stable object: conditions, funding pressure, direction, confidence, week, summary, url, version. |
+| `/api/scores` | GET | Both scores, their deltas, the distance to the change line and the score nearer to crossing. |
+| `/api/decision` | GET | The week's guidance as one object: the action, each area's action with its pause and resume lines, decisions to revisit, the lines that would change the guidance. |
 | `/api/weekly` | GET | Weekly summary copy + structured fields + summary hash. |
 | `/api/brief/slack` | GET | Slack-ready plain-text weekly brief payload for automation. |
+| `/api/embed?format=<html|text|json|page>` | GET | The brief as a snippet (`html` default; `page` is a whole document for an iframe). `mode=call-strip` is one line; `stage` and `runway` (a band or a number of months) calibrate it; `ticker` labels it. |
+| `/api/image/brief` | GET | The brief card as a PNG, 1200×800; `layout=landscape|square|portrait`, `theme=light`, `month` + `year` for a past month-end, `stage` to calibrate. `ticker` and `sector` only add a label. |
+| `/api/image/brief-screenshot?date=<YYYY-MM-DD|latest>` | GET | The Monday screenshot of the homepage's guidance, kept 60 days; 404 when none is stored. Never captures on request. |
+| `/api/badge` | GET | The week's conditions as an SVG badge, marked when the reading is a saved copy. |
 | `/api/image/slide?stage=<seed|series-a|series-b|growth>` | GET | The call as a 16:9 meeting slide, hand-written SVG. |
 | `/api/export/board-slide?format=<pptx|pdf>&stage=<mode>` | GET | The same slide as a file: a one-slide native PPTX (default) or a one-page 16:9 PDF, served as an attachment named by ISO week. |
+| `/brief.md`, `/feed.xml`, `/calendar.ics` | GET | The brief in Markdown, the RSS feed, and a subscribable calendar with each Monday's guidance for the last 26 weeks. |
 
 ### B) Validate drift and consistency
 
@@ -38,27 +48,27 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
 | `/api/treasury` | GET | Treasury yield data with live/fallback metadata. |
-| `/api/health` | GET | Monitor-friendly service + treasury freshness status. |
+| `/api/comps` | GET | The SaaS basket's median EV/Revenue, with the source that answered; 503 when none does. |
+| `/api/health` | GET | Monitor-friendly service + treasury freshness status. Closed to crawlers and left out of the agent manifest: it loads the report on every call. |
 
 ### D) Run alert and integration workflows
 
 | Endpoint | Method(s) | Purpose |
 | --- | --- | --- |
-| `/api/regime-alerts` | GET, POST | Read/create regime alert events. |
+| `/api/regime-alerts` | GET, POST | Read regime alert events; the `POST` that creates one takes the cron secret. |
 | `/api/weekly-digest` | GET | Build digest summary from stored alert events, including top-level counts plus `degraded`/`backend` markers. |
-| `/api/decision-memory` | GET, POST | List/create Decision Memory entries (`{ entries, count }`), with CSV export via `?format=csv`. |
-| `/api/alert-preferences` | GET, POST | Read/upsert delivery preferences by `clientId` (`{ preferences }`). |
-| `/api/alert-deliveries` | GET, POST | List delivery history and create delivery attempts (`{ deliveries }`). |
-| `/api/slack/subscribe` | POST | Register a Slack Incoming Webhook (`webhookUrl`) plus optional `channelName` for weekly brief delivery; pings the channel to verify (bounded at 5s), stores the subscription in KV, returns a `token` for unsubscribe. |
-| `/api/slack/unsubscribe` | POST | Remove a Slack delivery subscription by its `token`. |
-| `/api/decision-events` | GET | Retrieve regime transition decision events with cursor pagination and optional replay support (`replay=1&initialState=<REGIME>`). |
-| `/api/integrations/weekly-mandate?target=<slack|email|...>` | GET | Destination-specific weekly mandate payload. |
+| `/api/decision-memory` | GET, POST | List/create one owner's Decision Memory entries (`{ entries, followUps, count }`), with `?format=csv` for a spreadsheet and `?format=records` for revisable delegation records (NDJSON). Needs `x-whether-client-id`. |
+| `/api/alert-deliveries` | GET, POST | List delivery history and create delivery attempts (`{ deliveries }`). Both take the cron secret. |
+| `/api/slack/subscribe` | POST | Register a Slack Incoming Webhook (`webhookUrl`) plus optional `channelName` for weekly brief delivery; pings the channel to verify (bounded at 5s) and stores the subscription in KV. Deleting the webhook in Slack stops delivery. |
+| `/api/decision-events` | GET | Retrieve regime transition decision events with cursor pagination and optional replay support (`replay=1&initialState=<REGIME>`). Takes the cron secret. |
+| `/api/integrations/weekly-mandate?target=<slack|notion|linear>` | GET | The weekly mandate shaped for one tool: Slack blocks (the default), a Notion page, or a Linear issue. The channel and database id are placeholders. An unknown target is a 400 listing `supportedTargets`. |
 
 ### E) Discover capabilities for tools/agents
 
 | Endpoint | Method | Purpose |
 | --- | --- | --- |
 | `/llms.txt` | GET | Plain-text machine onboarding + endpoint discovery; its tool section is written from the tool registry. |
+| `/llms-full.txt` | GET | The indexable answer pages, guides and terms in one Markdown file. |
 | `/.well-known/whether-agent.json` | GET | JSON discovery manifest for agent/tool clients: where to `start` per surface, the `views`, how to tell whether a reading is live and current (`automation`), and the MCP endpoint with every tool and its arguments (`mcp.tools`). |
 | `/api/mcp` | POST | MCP streamable-HTTP server (JSON-RPC 2.0). Tools are defined once in `lib/agent/tools.ts`; see `docs/agents/agent-interface.md`. CORS is open for the transport and the reads, so a browser-based client can call it; `?tool=subscribe` stays closed. |
 | `/api/mcp?tool=<name>` | GET | The same tools as a plain GET for an agent with no MCP client; `tool=get_actions` lists them with their arguments and a call that works. A wrong tool or argument is a 400 with what would have worked. |
@@ -70,6 +80,19 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/monthly` | GET | Monthly summary with structured output + summary hash. |
 | `/api/quarterly` | GET | Quarterly summary payload + provenance. |
 | `/api/yearly` | GET | Yearly summary payload + provenance. |
+
+## CLI endpoints
+
+The `whether` CLI reads these; each is public, so a script can call them without it.
+
+| Endpoint | Method | Purpose |
+| --- | --- | --- |
+| `/api/cli/status?asOf=<YYYY-MM>&view=expanded` | GET | What `whether status` prints. `view=expanded` adds what would change the guidance and up to three signal moves. |
+| `/api/cli/history?asOf=<YYYY-MM>` | GET | The conditions at the last 12 month-ends, newest first. Its `weeks` parameter counts month-end entries, not weeks. |
+| `/api/cli/scenario?tightness=<n>&risk-appetite=<n>` | GET | The conditions the given scores would read as, against this week's. |
+| `/api/cli/changes`, `/call`, `/regime`, `/diagnostics` | GET | What the commands of the same name print. Each takes `asOf`. |
+
+A name a route does not take is a 400 that lists the ones it does (`unsupported`, `supported`).
 
 ## Request examples
 
@@ -131,6 +154,8 @@ curl -s "http://localhost:3000/api/weekly-digest" \
 
 Use this endpoint when CLI install/auth flows are blocked but you still need the same core read path that powers `whether status` and `whether brief`.
 
+The `Authorization` header is for an access-controlled deployment of your own; `https://whether.work` needs none.
+
 ```bash
 curl -sS "http://localhost:3000/api/cli/status" \
   -H "Accept: application/json" \
@@ -179,7 +204,7 @@ Weekly cadence note:
 ## Data durability note
 
 - Decision transition events (`/api/decision-events`) persist durably on Cloudflare through the `WHETHER_DURABLE_KV` binding; without it they fall back to process-memory semantics.
-- Alert preferences, decision memory, alerts, and delivery events return stable contracts in all environments and automatically degrade to in-process fallback storage when durable KV bindings are unavailable (`backend: "local-fallback"`, `degraded: true`). `WHETHER_DURABLE_KV` is the one binding that makes that history durable.
+- Decision memory, alerts, and delivery events return stable contracts in all environments and automatically degrade to in-process fallback storage when durable KV bindings are unavailable (`backend: "local-fallback"`, `degraded: true`). `WHETHER_DURABLE_KV` is the one binding that makes that history durable.
 
 ## Regime and posture taxonomy
 
