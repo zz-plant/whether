@@ -143,7 +143,7 @@ export function TrackRecordTiles({
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div>
           <h2 className="text-xl font-semibold text-white sm:text-2xl" id="track-record-heading">Track record</h2>
-          <p className="text-sm text-slate-300">
+          <p className="max-w-prose text-sm text-slate-300">
             Every month-end reading Whether has made, scored with the same published formula, so
             you can check each one against what happened next.
           </p>
@@ -208,11 +208,11 @@ export function TrackRecordTable({
             It is kept rather than replaced by the two, because it is not
             equivalent to them: it is a weighted blend, and the month-to-month
             change column is a move in that blend. */}
-        <p className="text-sm text-slate-300">
+        <p className="max-w-prose text-sm text-slate-300">
           Each month&apos;s {OPERATING_LATITUDE_LABEL.toLowerCase()}, newest first. It is one 0 to 100 score
-          that blends the two scores: {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite and{" "}
-          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% the inverse of funding pressure. Higher
-          means more room to hire, spend and commit. {describeLatitudeAgainstConditions()}{" "}
+          that blends the two: {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite, and{" "}
+          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% how far funding pressure sits below 100.
+          Higher means more room to hire, spend and commit. {describeLatitudeAgainstConditions()}{" "}
           <Link href="/trust#formula-reference" className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
             How it is computed
           </Link>
