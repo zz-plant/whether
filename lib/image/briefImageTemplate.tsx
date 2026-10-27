@@ -42,44 +42,62 @@ export type BriefImageProps = {
  * least air (20), two readings of three lines each (2 x 131 + 10 between) and
  * the footer, chip row then source line (14 + 40 + 8 + 28) come to 769px.
  */
-const WIDTH = 1200;
-const HEIGHT = 800;
+type BriefImageLayout = {
+  width: number;
+  height: number;
+  /** Call sizes, largest first: the largest that keeps the call within `maxCallLines` is used. */
+  callSizes: readonly number[];
+  maxCallLines: number;
+};
+
+/**
+ * The two shapes the card is drawn in. Landscape is the unfurl and the Slack
+ * post. Portrait (4:5) is the largest a LinkedIn or Instagram feed shows a
+ * still: a landscape card there is letterboxed to about half the screen, and
+ * its 22px floor reads at 9px. The portrait card spends the extra height on the
+ * call, which is what a feed scroller reads before deciding to stop.
+ */
+export const BRIEF_IMAGE_LAYOUTS = {
+  landscape: { width: 1200, height: 800, callSizes: [56, 50, 46, 42], maxCallLines: 3 },
+  portrait: { width: 1080, height: 1350, callSizes: [84, 76, 68, 60], maxCallLines: 6 },
+} as const satisfies Record<string, BriefImageLayout>;
+
 const PAD_X = 56;
-const CONTENT_WIDTH = WIDTH - PAD_X * 2;
-const CALL_SIZES = [56, 50, 46, 42] as const;
-const MAX_CALL_LINES = 3;
 /* The value is set at 84px, where a digit is about 50px wide; both rows share
    one column, sized for the longer value, so their labels start on one edge. */
 const VALUE_SIZE = 84;
 const VALUE_GLYPH_WIDTH = 52;
 /* The source has a line of its own under the chip: the label names three inputs, and
    "Source: " takes about 90px of the row. */
-const SOURCE_WIDTH = CONTENT_WIDTH - 90;
+const SOURCE_INSET = 90;
 /* The weather stamp takes about 190px of its row; the scope beside it gets the rest, on one line. */
-const CONTEXT_WIDTH = CONTENT_WIDTH - 230;
+const CONTEXT_INSET = 230;
 
 /* A wide margin is the clear state (the ink); a medium or narrow one is close
    to a line, the crossed state's red, as the site prints it. */
 const confidenceColor = (label: string) => (label === "HIGH" ? OG_TEXT : OG_LINE_CROSSED);
 
-const frameStyle: CSSProperties = {
+const frameStyle = (layout: BriefImageLayout): CSSProperties => ({
   display: "flex",
   flexDirection: "column",
-  width: WIDTH,
-  height: HEIGHT,
+  width: layout.width,
+  height: layout.height,
   padding: "44px 56px 38px",
   background: OG_BG,
   color: OG_TEXT,
   fontFamily: `${OG_FONT_BODY}, ui-sans-serif, system-ui, sans-serif`,
   position: "relative",
-};
+});
 
-/** The largest call size that keeps to three lines, and the call cut to fit at the smallest. */
-const layoutCall = (decision: string): { size: number; text: string } => {
+/** The largest call size that keeps within the layout's lines, and the call cut to fit at the smallest. */
+const layoutCall = (decision: string, layout: BriefImageLayout): { size: number; text: string } => {
+  const contentWidth = layout.width - PAD_X * 2;
+  const smallest = layout.callSizes[layout.callSizes.length - 1] ?? 42;
   const size =
-    CALL_SIZES.find((candidate) => wrappedLines(decision, candidate, CONTENT_WIDTH, DISPLAY_EM).length <= MAX_CALL_LINES) ??
-    CALL_SIZES[CALL_SIZES.length - 1];
-  return { size, text: fitLines(decision, size, CONTENT_WIDTH, DISPLAY_EM, MAX_CALL_LINES) };
+    layout.callSizes.find(
+      (candidate) => wrappedLines(decision, candidate, contentWidth, DISPLAY_EM).length <= layout.maxCallLines,
+    ) ?? smallest;
+  return { size, text: fitLines(decision, size, contentWidth, DISPLAY_EM, layout.maxCallLines) };
 };
 
 /*
@@ -144,7 +162,10 @@ const toImageSafeReading = (reading: ScoreReadingParts): ScoreReadingParts => ({
   resume: reading.resume === null ? null : toImageSafeText(reading.resume),
 });
 
-export const renderBriefImage = (props: BriefImageProps): ReactElement => {
+export const renderBriefImage = (
+  props: BriefImageProps,
+  layout: BriefImageLayout = BRIEF_IMAGE_LAYOUTS.landscape,
+): ReactElement => {
   /* One stray glyph outside the faces' subset aborts the whole render, so
      everything headed for the canvas goes through toImageSafeText. */
   const decision = toImageSafeText(props.decision);
@@ -155,7 +176,8 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
 
   const regimeColor = isRegimeKey(props.regime) ? REGIME_HEX_COLORS[props.regime] : OG_ACCENT;
   const weather = getRegimePublicLabel(props.regime).toUpperCase();
-  const call = layoutCall(decision);
+  const call = layoutCall(decision, layout);
+  const contentWidth = layout.width - PAD_X * 2;
   const valueWidth = Math.max(2, ...readings.map((reading) => reading.value.length)) * VALUE_GLYPH_WIDTH;
   const eyebrow = ["WHETHER", toImageSafeText(props.briefLabel ?? "Weekly Brief")].join(" \u00b7 ").toUpperCase();
   /* The card that lands in someone else's Slack channel said "MED CONFIDENCE".
@@ -163,11 +185,11 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
      the words a reader sees change. */
   const confidenceColour = confidenceColor(props.confidenceLabel);
   const confidenceBadge = toImageSafeText(formatMarginBand(props.confidenceLabel)).toUpperCase();
-  const source = sourceLabel ? `Source: ${fitLines(sourceLabel, 22, SOURCE_WIDTH, SANS_EM, 1)}` : "";
-  const context = contextLabel ? fitLines(contextLabel, 22, CONTEXT_WIDTH, SANS_EM, 1) : "";
+  const source = sourceLabel ? `Source: ${fitLines(sourceLabel, 22, contentWidth - SOURCE_INSET, SANS_EM, 1)}` : "";
+  const context = contextLabel ? fitLines(contextLabel, 22, contentWidth - CONTEXT_INSET, SANS_EM, 1) : "";
 
   return (
-    <div style={frameStyle}>
+    <div style={frameStyle(layout)}>
       <div style={{ position: "absolute", top: 0, left: 0, right: 0, height: 8, background: regimeColor }} />
 
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
@@ -176,6 +198,10 @@ export const renderBriefImage = (props: BriefImageProps): ReactElement => {
         </div>
         <div style={{ display: "flex", fontSize: 22, color: OG_TEXT_MUTED }}>{`Data as of ${recordDate}`}</div>
       </div>
+
+      {/* Portrait has room to spare: the stamp and the call sit in the middle of
+          it rather than leaving a band of empty canvas above the readings. */}
+      {layout.height > layout.width ? <div style={{ display: "flex", flex: 1 }} /> : null}
 
       <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 22 }}>
         <div

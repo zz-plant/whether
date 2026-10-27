@@ -33,7 +33,7 @@ import { useOperatorRunway } from "../components/useOperatorRunway";
  * The selection is the URL hash, so a link can open the page on a format
  * (`/share#investor-update`) and the page's old section anchors still land.
  */
-type ShareFormatGroup = "Chat" | "Meetings" | "Docs and email" | "Tickets and boards" | "Team";
+type ShareFormatGroup = "Chat" | "Social" | "Meetings" | "Docs and email" | "Tickets and boards" | "Team";
 
 type ShareFormatBase = {
   id: string;
@@ -52,6 +52,12 @@ export type ShareFormatOption = ShareFormatBase &
         commitment: ActivationCommitment;
         offersCalendar?: boolean;
         /**
+         * The destination's own composer with the text filled in: a network's
+         * post intent, or a mail client's new message. A plain link; the reader
+         * still presses send there.
+         */
+        compose?: { label: string; href: string };
+        /**
          * "chat" draws the text as the channel will (bold, quote bars, links)
          * for the formats posted into Slack. Every other format previews as the
          * text itself, because there the text is the artifact: a Markdown
@@ -64,7 +70,7 @@ export type ShareFormatOption = ShareFormatBase &
     | { kind: "panel"; content: ReactNode }
   );
 
-const GROUP_ORDER: readonly ShareFormatGroup[] = ["Chat", "Meetings", "Docs and email", "Tickets and boards", "Team"];
+const GROUP_ORDER: readonly ShareFormatGroup[] = ["Chat", "Social", "Meetings", "Docs and email", "Tickets and boards", "Team"];
 
 /** The anchors the stacked page linked to, so an old link opens the format that lived there. */
 const LEGACY_HASHES: Readonly<Record<string, string>> = {
@@ -109,6 +115,32 @@ const CalendarLink = ({ title, details }: { title: string; details: string }) =>
   );
 };
 
+/* The subscribed feed (`/calendar.ics`): every Monday carries its own week's
+   guidance. webcal:// opens Apple Calendar and Outlook; Google takes the same
+   address through its add-by-URL page. */
+const CalendarSubscribeLinks = ({ feedUrl }: { feedUrl: string }) => {
+  const webcal = feedUrl.replace(/^https?:/, "webcal:");
+  const linkClass =
+    "weather-hit text-fluid-xs text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200";
+  return (
+    <span className="text-fluid-xs text-slate-400">
+      Subscribe to each week&apos;s guidance:{" "}
+      <a href={webcal} className={linkClass}>
+        Apple or Outlook
+      </a>{" "}
+      ·{" "}
+      <a
+        href={`https://calendar.google.com/calendar/r?cid=${encodeURIComponent(webcal)}`}
+        target="_blank"
+        rel="noreferrer"
+        className={linkClass}
+      >
+        Google
+      </a>
+    </span>
+  );
+};
+
 export function SharePageFormats({
   scoreReferences = [],
   options,
@@ -117,7 +149,7 @@ export function SharePageFormats({
   /** Each score with its line, distance and last week, from `formatScoreReference`; the on-screen reference for every paste. */
   scoreReferences?: string[];
   options: readonly ShareFormatOption[];
-  calendar: { title: string; details: string };
+  calendar: { title: string; details: string; feedUrl: string };
 }) {
   const hash = useBrowserSource(locationHashSource);
   const selected = resolveShareFormat(options, hash);
@@ -253,7 +285,22 @@ export function SharePageFormats({
                   onClick={() => void copyToClipboard(text, selected.id)}
                   buttonLabels={{ error: "Copy failed" }}
                 />
-                {selected.kind === "text" && selected.offersCalendar ? <CalendarLink {...calendar} /> : null}
+                {selected.kind === "text" && selected.compose ? (
+                  <a
+                    href={selected.compose.href}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="weather-hit inline-flex min-h-[44px] items-center text-fluid-xs font-semibold text-sky-300 underline decoration-sky-500/40 underline-offset-4 hover:text-sky-200"
+                  >
+                    {selected.compose.label}
+                  </a>
+                ) : null}
+                {selected.kind === "text" && selected.offersCalendar ? (
+                  <>
+                    <CalendarLink title={calendar.title} details={calendar.details} />
+                    <CalendarSubscribeLinks feedUrl={calendar.feedUrl} />
+                  </>
+                ) : null}
               </div>
               {error ? (
                 <p className="text-xs text-amber-200">Clipboard access failed. Select the preview text and copy it manually.</p>

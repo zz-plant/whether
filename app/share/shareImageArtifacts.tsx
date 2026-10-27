@@ -6,6 +6,7 @@ import { useOperatorStage } from "../components/useOperatorStage";
 import { ActionLink } from "../components/ui/actionLink";
 import { CopyMeetingSlideButton } from "../components/CopyMeetingSlideButton";
 import { CopyImageCardButton } from "../components/CopyImageCardButton";
+import { SharePortraitCardButton } from "./sharePortraitCardButton";
 
 /**
  * The image and file artifacts, on the page whose job is getting the brief out.
@@ -108,6 +109,12 @@ const buildImageArtifacts = (stage: OperatorStage): readonly ImageArtifact[] => 
         use: "Opens in a new tab.",
         download: false,
       },
+      {
+        href: "/api/image/brief?size=portrait",
+        label: "Open portrait card",
+        use: "1080×1350, the shape a LinkedIn or Instagram feed shows largest; a landscape card there is shown at about half the height.",
+        download: false,
+      },
     ],
   },
 ];
@@ -125,6 +132,7 @@ export function ShareImageArtifacts() {
       <div className="flex flex-wrap items-center gap-2">
         <CopyMeetingSlideButton />
         <CopyImageCardButton />
+        <SharePortraitCardButton />
       </div>
       <div className="grid gap-4 sm:grid-cols-2">
         {artifacts.map((artifact) => (

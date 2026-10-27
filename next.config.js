@@ -246,6 +246,9 @@ const securityHeaders = [
  */
 export const htmlLimitedBots = [
   String.raw`[\w-]+-Google|Google-[\w-]+|Chrome-Lighthouse|Slurp|DuckDuckBot|baiduspider|yandex|sogou|bitlybot|tumblr|vkShare|quora link preview|redditbot|ia_archiver|Bingbot|BingPreview|applebot|facebookexternalhit|facebookcatalog|Twitterbot|LinkedInBot|Slackbot|Discordbot|WhatsApp|SkypeUriPreview|Yeti|googleweblight`,
+  /* Notion, Ghost and most editors unfurl a pasted link through Iframely, which reads the oEmbed
+     discovery link from <head> without running JavaScript. */
+  "Iframely",
   "Googlebot",
   "OAI-SearchBot|ChatGPT-User|GPTBot",
   "PerplexityBot|Perplexity-User",
@@ -262,6 +265,21 @@ const nextConfig = {
       {
         source: "/(.*)",
         headers: securityHeaders,
+      },
+      /*
+       * The embed is the one response meant to sit inside another site's page:
+       * Notion's embed block and every oEmbed consumer frame `/api/embed`. A
+       * later rule's singular header replaces an earlier one's, so this lifts
+       * the DENY for that path alone; `frame-ancestors` is what browsers obey
+       * when both are present. The embed only reads and links out, so there is
+       * nothing in it to click-jack.
+       */
+      {
+        source: "/api/embed",
+        headers: [
+          { key: "X-Frame-Options", value: "ALLOWALL" },
+          { key: "Content-Security-Policy", value: "frame-ancestors *" },
+        ],
       },
     ];
   },

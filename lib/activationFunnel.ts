@@ -41,6 +41,7 @@ export type ActivationCommitment =
   | "copied_email"
   | "copied_meeting"
   | "copied_brief"
+  | "copied_social"
   | "subscribed";
 
 /**
@@ -68,6 +69,7 @@ const COMMITMENTS: ActivationCommitment[] = [
   "copied_email",
   "copied_meeting",
   "copied_brief",
+  "copied_social",
   "subscribed",
 ];
 

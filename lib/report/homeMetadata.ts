@@ -4,6 +4,7 @@ import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { buildHomeSharePath, type HomeShareSearchParams as HomePageSearchParams } from "./homeSharePreview";
 import { decisionTransmissionSearchDescription } from "./decisionTransmissionCopy";
 import { type HomeReportData } from "./homeBriefModel";
+import { buildOEmbedDiscoveryUrl } from "../export/oembed";
 
 export type { HomePageSearchParams };
 
@@ -50,6 +51,9 @@ export const buildHomeMetadata = async (
     description: HOME_DESCRIPTION,
     alternates: {
       canonical: "/",
+      /* oEmbed discovery: an editor that reads it (Notion, Ghost, Iframely)
+         turns a pasted link to the brief into the live widget. */
+      types: { "application/json+oembed": buildOEmbedDiscoveryUrl("/") },
     },
     openGraph: {
       type: "website",
