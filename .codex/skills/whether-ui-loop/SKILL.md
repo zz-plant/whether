@@ -23,6 +23,8 @@ bun run ui:iterate -- --only operator-brief-mobile,operator-brief-desktop
 
 `bun run ui:iterate:list` shows the available targets. If you already own a running dev server and only want raw capture, `bun run ui:shots` skips the server management.
 
+After layout work, also run `bun run ui:frames -- --base-url http://localhost:<port>`. It walks every live route frame by frame at a laptop and a phone and fails a frame that does not name the site (and, where the page reports a reading, the date and conditions) or a block taller than a phone frame. Open `artifacts/ui/frames/index.html` to see the frames. ui-ux-standards §XXVIII.
+
 Capture **both themes**. The default is dark; `--theme light` seeds the theme key the layout bootstrap reads and writes `<id>-light.png` beside the dark set, with its own `index-light.html` and `manifest-light.json`:
 
 ```bash

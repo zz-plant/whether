@@ -346,7 +346,7 @@ export default function ProductCanonPage() {
         >
           <ul className="space-y-5">
             {pairs.map((pair) => (
-              <li key={pair.decision} className="space-y-3 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0">
+              <li key={pair.decision} data-frame-block="" className="space-y-3 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0">
                 <h3 className="text-base font-semibold text-slate-100">{pair.decision}</h3>
                 <PairSide essay={pair.expand} />
                 <PairSide essay={pair.conserve} />

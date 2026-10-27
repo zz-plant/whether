@@ -1,3 +1,4 @@
+import { ScreenshotCaption } from "../screenshotCaption";
 import { ReportSection } from "../reportSection";
 import {
   confidenceCalibration,
@@ -111,6 +112,7 @@ function MarginReliabilityChart({ rows }: { rows: readonly BandRow[] }) {
         Each dot is a band of the table below, sized by its months. Above the dashed line, the band held more
         often than its published percent; below it, less often.
       </figcaption>
+      <ScreenshotCaption />
     </figure>
   );
 }

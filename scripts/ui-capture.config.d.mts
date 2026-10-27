@@ -23,3 +23,14 @@ export function captureStorageSeeds(options: {
   now?: number;
 }): Array<[string, string]>;
 export const uiCaptureTargets: UiCaptureTarget[];
+/** A fact every frame of a route must name, past its first screen. */
+export type FrameFact = "site" | "date" | "conditions";
+/** The routes `bun run ui:frames` walks, with the facts each one's frames must name. */
+export const frameAuditRoutes: Array<{ path: string; requires: FrameFact[] }>;
+export const frameAuditViewports: Array<{
+  name: string;
+  viewport: { width: number; height: number };
+  deviceScaleFactor: number;
+  isMobile?: boolean;
+}>;
+export const frameBlockSelector: string;

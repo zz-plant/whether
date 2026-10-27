@@ -142,7 +142,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             to a viewport tall, so any page whose content was shorter than the
             rail ended in a screenful of empty space. */}
         {sidebarEnabled ? (
-          <aside className="hidden lg:block lg:sticky lg:top-4 lg:self-start lg:max-h-[calc(100vh-2rem)] lg:overflow-y-auto lg:overscroll-contain">
+          <aside className="hidden lg:block lg:sticky lg:top-[calc(var(--running-head-height,0px)+1rem)] lg:self-start lg:max-h-[calc(100vh-2rem-var(--running-head-height,0px))] lg:overflow-y-auto lg:overscroll-contain">
             <AppSidebar sectionLinks={sectionLinks} />
           </aside>
         ) : null}
@@ -181,6 +181,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             showOfflineBadge={showOfflineBadge}
             offlineBadgeLabel={offlineBadgeLabel}
             trustStrip={trustStrip}
+            regime={regime}
           />
 
           {/* The outline, as a row of tabs, where the rail is hidden. Under the

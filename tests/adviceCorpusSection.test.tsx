@@ -15,7 +15,9 @@ describe("the advice corpus section", () => {
   it("draws the chart with a title and gives every quarter a row in a screen-reader table", () => {
     assert.match(html, /<p class="sr-only">Share of posts prescribing expansion and conservation each quarter, 2012 Q1 to 2026 Q3/);
     assert.match(html, /<svg[^>]*aria-hidden="true"/);
-    assert.match(html, /<table class="sr-only"><caption>Share of posts prescribing expansion and conservation each quarter, with funding pressure<\/caption>/);
+    /* Hidden by a wrapper, not on the table: a 1px sr-only table laid out at its content's
+       width and pushed a 390px phone page to 651px (2026-10-27). */
+    assert.match(html, /<div class="sr-only"><table><caption>Share of posts prescribing expansion and conservation each quarter, with funding pressure<\/caption>/);
     const rows = html.match(/<tr><th scope="row">/g) ?? [];
     assert.equal(rows.length, monthly.quarters.length);
     assert.ok(html.includes("<th scope=\"row\">2022 Q3</th>"));

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { frameFactsAttributes } from "../../lib/navigation/runningHead";
 
 /* No eyebrow on either (2026-10-09). "Reading list" over a question and "Page not
    found" over "That page moved." were the last two; the title carries the page. */
@@ -24,7 +25,8 @@ export function SecondaryPageHeader({
   actions,
 }: SecondaryPageHeaderProps) {
   return (
-    <section className="weather-panel weather-secondary-header">
+    /* The running head names the page once this header has scrolled away. */
+    <section className="weather-panel weather-secondary-header" {...frameFactsAttributes({ title })}>
       <div className="weather-secondary-heading">
         <h1 className="weather-secondary-title">{title}</h1>
         {description ? <p className="weather-secondary-description">{description}</p> : null}

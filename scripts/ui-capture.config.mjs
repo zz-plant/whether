@@ -128,3 +128,36 @@ export const uiCaptureTargets = [
     fullPage: true,
   },
 ];
+
+/**
+ * What the frame audit (`bun run ui:frames`, scripts/ui-frames.mjs) walks: the live routes
+ * above plus the record and reading pages a shared screenshot also comes from. Each is
+ * framed at a common laptop screen and a common phone, because those are the two pictures
+ * of a page that get pasted.
+ */
+const READING = ["site", "date", "conditions"];
+const PAGE = ["site"];
+export const frameAuditRoutes = [
+  ...liveRoutes
+    .filter(({ path }) => !path.startsWith("/brief/"))
+    // A page that reports this week's reading names it in every frame; a page that is read
+    // (guides, product writing) names the site, and has no week to name.
+    .map(({ path }) => ({ path, requires: ["/resources", "/concepts"].includes(path) ? PAGE : READING })),
+  { path: "/operate/financial", requires: READING },
+  { path: "/calibration", requires: PAGE },
+  { path: "/about", requires: PAGE },
+];
+
+export const frameAuditViewports = [
+  { name: "desktop", viewport: { width: 1440, height: 900 }, deviceScaleFactor: 1 },
+  { name: "phone", viewport: { width: 390, height: 844 }, deviceScaleFactor: 2, isMobile: true },
+];
+
+/**
+ * The blocks a reader frames: cards, figures and tables. A block that holds another is
+ * judged by the inner one, so a section card is not "too tall" for holding three charts that
+ * each fit. `data-frame-exempt` marks a block that is long by nature and opened on purpose
+ * (the full monthly archive), with the reason beside it in the source.
+ */
+export const frameBlockSelector =
+  "main figure, main table, main .weather-surface, main .weather-panel, main .weather-panel-static, main article, main [data-frame-block]";

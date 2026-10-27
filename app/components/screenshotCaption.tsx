@@ -14,8 +14,11 @@ const siteHost = new URL(siteUrl).host;
  * Hidden from assistive technology: it captions a picture of the block, and a
  * reader already on the page knows where they are.
  *
- * One block carries it: the brief's call card. The interior page intros printed
- * it too until 2026-10-09, under a header that already names the site.
+ * Two kinds of block carry it: the brief's call card, and the charts a reader
+ * crops (the record's maps, the calibration chart, the signal panels, the
+ * product-writing charts; 2026-10-27, ui-ux-standards §XXVIII). The interior
+ * page intros printed it too until 2026-10-09, under a header that already
+ * names the site; the running head names it on every frame now.
  */
 export function ScreenshotCaption({ detail, className = "" }: { detail?: string; className?: string }) {
   return (

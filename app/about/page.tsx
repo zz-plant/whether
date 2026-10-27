@@ -97,45 +97,51 @@ export default function AboutPage() {
           {record ? <>{describeRecordCadence(record)} </> : null}
           Use the brief to set your plan&apos;s lines and get an email when one is crossed.
         </p>
-        <p className="text-sm font-semibold text-slate-100">It fits</p>
-        <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
-          <li>
-            Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year
-            contract, the runway to hold before the next raise.
-          </li>
-          <li>
-            Plans a group approves once and should not re-argue each month: a budget whose second half is released
-            when a line is crossed, or an agreed floor on runway.
-          </li>
-          <li>
-            Venture-backed U.S. companies with one to two years of runway and a next raise that depends on what
-            capital costs.
-          </li>
-          <li>
-            Investors and accelerators sending one reading to every company they back: the{" "}
-            <Link href="/share" className={inlineLinkClass}>
-              portfolio note
-            </Link>{" "}
-            says what the week means at each runway.
-          </li>
-        </ul>
-        <p className="text-sm font-semibold text-slate-100">It does not fit</p>
-        <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
-          <li>
-            A single hire or purchase. The lines are a policy for a kind of decision, not a verdict on one.
-          </li>
-          <li>
-            Under six months of runway. Cash decides before markets do, so the guidance leads with cash there.
-          </li>
-          <li>
-            A company whose funding does not follow U.S. rates: one outside the U.S., or in a sector raising on a boom
-            of its own. The scores read U.S. rates only.
-          </li>
-          <li>
-            Which product work matters most. Rates bear on how much long-payback work a team can carry, not on what
-            to build.
-          </li>
-        </ul>
+        {/* Two blocks, one per list: together they ran 862px, taller than a phone
+            screen, so no screenshot held the answer to "does this fit us" whole. */}
+        <div data-frame-block="" className="space-y-1.5">
+          <p className="text-sm font-semibold text-slate-100">It fits</p>
+          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+            <li>
+              Commitments that run for quarters and cost money to unwind: a hiring plan, a lease or multi-year
+              contract, the runway to hold before the next raise.
+            </li>
+            <li>
+              Plans a group approves once and should not re-argue each month: a budget whose second half is released
+              when a line is crossed, or an agreed floor on runway.
+            </li>
+            <li>
+              Venture-backed U.S. companies with one to two years of runway and a next raise that depends on what
+              capital costs.
+            </li>
+            <li>
+              Investors and accelerators sending one reading to every company they back: the{" "}
+              <Link href="/share" className={inlineLinkClass}>
+                portfolio note
+              </Link>{" "}
+              says what the week means at each runway.
+            </li>
+          </ul>
+        </div>
+        <div data-frame-block="" className="space-y-1.5">
+          <p className="text-sm font-semibold text-slate-100">It does not fit</p>
+          <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
+            <li>
+              A single hire or purchase. The lines are a policy for a kind of decision, not a verdict on one.
+            </li>
+            <li>
+              Under six months of runway. Cash decides before markets do, so the guidance leads with cash there.
+            </li>
+            <li>
+              A company whose funding does not follow U.S. rates: one outside the U.S., or in a sector raising on a boom
+              of its own. The scores read U.S. rates only.
+            </li>
+            <li>
+              Which product work matters most. Rates bear on how much long-payback work a team can carry, not on what
+              to build.
+            </li>
+          </ul>
+        </div>
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">

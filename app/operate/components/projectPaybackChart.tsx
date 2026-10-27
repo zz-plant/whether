@@ -1,3 +1,4 @@
+import { ScreenshotCaption } from "../../components/screenshotCaption";
 import type { PaybackBar, ProjectPayback, SizedProjectPayback } from "../../../lib/report/projectPayback";
 
 /**
@@ -183,6 +184,7 @@ export function ProjectPaybackChart({
           </li>
         ) : null}
       </ul>
+      <ScreenshotCaption detail="Runway planner, on your own figures" />
     </figure>
   );
 }

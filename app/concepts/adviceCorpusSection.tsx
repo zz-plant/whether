@@ -1,3 +1,4 @@
+import { ScreenshotCaption } from "../components/screenshotCaption";
 import monthly from "../../data/advice-corpus/monthly.json";
 import { ADVICE_STANCE_DEFINITIONS } from "../../lib/adviceStance";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
@@ -238,29 +239,35 @@ export function AdviceCorpusSection() {
         <figcaption className="max-w-prose text-fluid-nano text-slate-400">
           {`Quarters with fewer than ${MIN_POSTS} posts aren't plotted. Changes in conditions: ${changes.map((change) => `${formatMonth(change.month)}, ${change.from} to ${change.to}`).join("; ")}.`}
         </figcaption>
-        <table className="sr-only">
-          <caption>Share of posts prescribing expansion and conservation each quarter, with funding pressure</caption>
-          <thead>
-            <tr>
-              <th scope="col">Quarter</th>
-              <th scope="col">Expand</th>
-              <th scope="col">Conserve</th>
-              <th scope="col">Posts</th>
-              <th scope="col">Funding pressure</th>
-            </tr>
-          </thead>
-          <tbody>
-            {quarters.map((quarter) => (
-              <tr key={quarter.period}>
-                <th scope="row">{quarterLabel(quarter.period)}</th>
-                <td>{percent(quarter.expand)}</td>
-                <td>{percent(quarter.conserve)}</td>
-                <td>{quarter.posts}</td>
-                <td>{quarter.fundingPressure ?? "–"}</td>
+        <ScreenshotCaption />
+        {/* The wrapper hides it, not the table: a table cannot shrink below its content,
+            so a 1px sr-only table laid out at 636px and pushed a 390px phone page to
+            651px (2026-10-27), the trap advicePlane.tsx already notes. */}
+        <div className="sr-only">
+          <table>
+            <caption>Share of posts prescribing expansion and conservation each quarter, with funding pressure</caption>
+            <thead>
+              <tr>
+                <th scope="col">Quarter</th>
+                <th scope="col">Expand</th>
+                <th scope="col">Conserve</th>
+                <th scope="col">Posts</th>
+                <th scope="col">Funding pressure</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {quarters.map((quarter) => (
+                <tr key={quarter.period}>
+                  <th scope="row">{quarterLabel(quarter.period)}</th>
+                  <td>{percent(quarter.expand)}</td>
+                  <td>{percent(quarter.conserve)}</td>
+                  <td>{quarter.posts}</td>
+                  <td>{quarter.fundingPressure ?? "–"}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </figure>
       <div className="mt-4 max-w-prose space-y-2 text-sm text-slate-300" data-advice-corpus-finding>
         {finding.map((sentence) => (

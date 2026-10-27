@@ -8,6 +8,7 @@ import { GlobalCommandPalette } from "./components/globalCommandPalette";
 import { GlobalTimeMachine } from "./components/globalTimeMachine";
 import { GlobalShareRail } from "./components/globalShareRail";
 import { MobileTabBar } from "./components/MobileTabBar";
+import { RunningHead } from "./components/runningHead";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
 import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
@@ -247,6 +248,7 @@ export default function RootLayout({
             Skip to content
           </a>
           <GlobalHeader />
+          <RunningHead />
           <GlobalCommandPalette />
           <ServiceWorkerRegistrar />
           <GlobalTimeMachine />

@@ -1,3 +1,4 @@
+import { ScreenshotCaption } from "../screenshotCaption";
 import { scaleLinear } from "d3-scale";
 import { ActionLink } from "../ui/actionLink";
 import { UrlDetails } from "../ui/urlDetails";
@@ -424,6 +425,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                 </>
               ) : null}
             </figcaption>
+            <ScreenshotCaption detail={`${oldest.monthLabel} to ${current.monthLabel}`} className="mt-2" />
           </figure>
 
           <div className="space-y-4">

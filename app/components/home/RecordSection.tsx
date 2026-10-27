@@ -50,20 +50,24 @@ export function RecordSection({
           </p>
         </>
       ) : null}
-      {spellLengths ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{spellLengths}</p> : null}
-      {turningPoints.length > 0 ? (
-        <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">
-          What the guidance said the last few times conditions changed:{" "}
-          {turningPoints.map((point, index) => (
-            <span key={point.href}>
-              {index > 0 ? " · " : null}
-              <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
-                {point.label}
-              </Link>
-            </span>
-          ))}
-        </p>
-      ) : null}
+      {/* How long spells last beside the last few changes, from xl: two short answers
+          that stacked under a full-width band left half a laptop screen empty. */}
+      <div className="space-y-4 xl:grid xl:grid-cols-2 xl:items-start xl:gap-8 xl:space-y-0">
+        {spellLengths ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{spellLengths}</p> : null}
+        {turningPoints.length > 0 ? (
+          <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">
+            What the guidance said the last few times conditions changed:{" "}
+            {turningPoints.map((point, index) => (
+              <span key={point.href}>
+                {index > 0 ? " · " : null}
+                <Link href={point.href} className="weather-hit text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
+                  {point.label}
+                </Link>
+              </span>
+            ))}
+          </p>
+        ) : null}
+      </div>
     </HomeSection>
   );
 }

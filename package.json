@@ -43,6 +43,7 @@
     "ui:shots:list": "node scripts/ui-capture.mjs --list",
     "ui:iterate": "node scripts/ui-iterate.mjs",
     "ui:iterate:list": "node scripts/ui-iterate.mjs --list",
+    "ui:frames": "node scripts/ui-frames.mjs",
     "ci:screenshot-smoke": "node scripts/ci-screenshot-smoke.mjs",
     "summary-archive:migrate-structured": "bun scripts/migrateSummaryArchiveStructured.ts --write",
     "summary-archive:check-structured": "bun scripts/migrateSummaryArchiveStructured.ts",
