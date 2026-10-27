@@ -6,6 +6,8 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 
 - Local: `bun run cli:whether -- <command> [flags]`
 - Binary: `whether`
+- Production: add `--api-base-url https://whether.work`. Without it the CLI reads a local server.
+- The parity commands read public routes (`/api/cli/*`, `/api/agent`, `/api/brief/slack`; parameters in `docs/developer/api-reference.md` and on `/api-docs`), so `curl https://whether.work/api/cli/status` answers what `whether status --json` prints.
 
 ## Top-level commands
 
@@ -53,7 +55,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `changes`: `--as-of <YYYY-MM>`
 - `diagnostics`: `--as-of <YYYY-MM>`
 - `regime`: `--as-of <YYYY-MM>`
-- `history`: `--as-of <YYYY-MM>`, `--weeks <n>`
+- `history`: `--as-of <YYYY-MM>`, `--weeks <n>` (despite the name, `n` month-end entries: the route reads the monthly series, default 12)
 - `scenario`: `--tightness <n>`, `--risk-appetite <n>`
 
 Notes:

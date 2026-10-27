@@ -21,7 +21,12 @@ export const DEFAULT_AGENT_VIEW = "full";
 /** The tool an agent calls first, on every MCP surface. */
 export const AGENT_START_TOOL = "get_state";
 
-/** Every endpoint the manifest advertises, absolute. */
+/**
+ * Every endpoint the manifest advertises, absolute. `robots.ts` opens each of these paths to
+ * crawlers, so an endpoint here is one an agent may fetch. `/api/health` was listed until
+ * 2026-10-27, while robots.txt closed it: it is a monitor's probe and loads the report on every
+ * call, so it left the manifest rather than opening to crawlers.
+ */
 export const buildAgentEndpoints = (baseUrl: string) => ({
   agent: `${baseUrl}/api/agent`,
   state: `${baseUrl}/api/agent?view=state`,
@@ -34,7 +39,6 @@ export const buildAgentEndpoints = (baseUrl: string) => ({
   yearly: `${baseUrl}/api/yearly`,
   cadence: `${baseUrl}/api/cadence`,
   treasury: `${baseUrl}/api/treasury`,
-  health: `${baseUrl}/api/health`,
 });
 
 /* Where to begin, by surface. The state is a tenth the size of the full brief and is what to
