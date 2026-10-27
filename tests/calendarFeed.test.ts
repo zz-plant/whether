@@ -45,9 +45,24 @@ describe("calendar feed", () => {
     assert.doesNotMatch(unfold(ics), /^(SUMMARY|DESCRIPTION):.*[^\\][,;]/m);
   });
 
+  /* From the newest frozen week, so the case holds whichever weeks the archive has:
+     it named Oct 26 until the w44 freeze gave that Monday its own record. */
   it("marks the coming Monday until its own record exists", () => {
-    const body = unfold(ics);
-    assert.ok(body.includes("UID:upcoming-20261026@whether.work"));
+    const latest = [...briefs].sort((a, b) => b.recordDate.localeCompare(a.recordDate))[0];
+    assert.ok(latest, "the archive has at least one week");
+    const recorded = new Date(`${latest.recordDate}T12:00:00Z`);
+    const monday = new Date(recorded);
+    monday.setUTCDate(recorded.getUTCDate() - ((recorded.getUTCDay() + 6) % 7));
+    const wednesday = new Date(monday);
+    wednesday.setUTCDate(monday.getUTCDate() + 2);
+    const coming = new Date(monday);
+    coming.setUTCDate(monday.getUTCDate() + 7);
+    const stamp = coming.toISOString().slice(0, 10).replace(/-/g, "");
+
+    const body = unfold(buildBriefCalendarFeed(briefs, wednesday));
+    assert.ok(body.includes(`UID:upcoming-${stamp}@whether.work`), `the Monday after ${latest.slug} is marked`);
+    const recordedStamp = monday.toISOString().slice(0, 10).replace(/-/g, "");
+    assert.ok(!body.includes(`UID:upcoming-${recordedStamp}@whether.work`), "a Monday with its own record is not");
   });
 
   it("serves the feed as text/calendar", async () => {
