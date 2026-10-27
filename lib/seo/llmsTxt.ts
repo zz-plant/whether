@@ -116,7 +116,7 @@ export const buildLlmsTxt = (baseUrl: string) => {
     "### CLI endpoints",
     "The plain JSON the `whether` CLI reads:",
     `- GET ${baseUrl}/api/cli/status — this week's conditions and guidance. \`?asOf=YYYY-MM\` reads a past month; \`&view=expanded\` adds what would change the guidance and the signals that moved.`,
-    `- GET ${baseUrl}/api/cli/history — the conditions at the last 12 month-ends, newest first. Takes \`?asOf=YYYY-MM\`.`,
+    `- GET ${baseUrl}/api/cli/history — the conditions at each month-end in the last 52 weeks, newest first, each with its own margin and trend. Takes \`?asOf=YYYY-MM\`; \`&weeks=<n>\` (at most 52) narrows the window.`,
     "",
     "### Badge, calendar and full text",
     `- GET ${baseUrl}/api/badge — this week's conditions as an SVG badge for a README or a data room.`,

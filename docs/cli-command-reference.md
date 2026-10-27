@@ -55,7 +55,7 @@ Whether CLI is an operator decision terminal: **environment → call → changes
 - `changes`: `--as-of <YYYY-MM>`
 - `diagnostics`: `--as-of <YYYY-MM>`
 - `regime`: `--as-of <YYYY-MM>`
-- `history`: `--as-of <YYYY-MM>`, `--weeks <n>` (despite the name, `n` month-end entries: the route reads the monthly series, default 12)
+- `history`: `--as-of <YYYY-MM>`, `--weeks <n>` (the month-ends in the last `n` weeks, default and at most 52; until 2026-10-27 `n` counted month-ends)
 - `scenario`: `--tightness <n>`, `--risk-appetite <n>`
 
 Notes:

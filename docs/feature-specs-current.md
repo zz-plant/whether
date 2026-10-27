@@ -4612,6 +4612,12 @@ $$
   and embed parameters, the stored screenshot, `/api/agent`'s `week` and `period`, `/calendar.ics` and
   `/llms-full.txt`; `/llms.txt` gained the CLI status and history routes, the badge, the calendar and the full
   text. `tests/robotsRoute.test.ts` holds robots.txt to `/llms.txt`, the manifest and the rendered `/api-docs`.
+- **`/api/cli/history` rows are their own months (2026-10-27).** Every row carried this week's margin and
+  trend, so a year of month-ends all read "Close to the line" and "mixed"; and `weeks` counted rows. A row is
+  now what `?asOf=` that month reports: its margin from the month's governed assessment, its trend from
+  `buildReportDynamics` against the month-end before. `weeks` is weeks, the month-ends within that many of
+  the newest (1 to 52, default 52, the same twelve rows a request without it always returned).
+  `tests/cliHistoryRoute.test.ts` pins March and January 2026 against their own briefs.
 
 ### 6.8 Alert cadence (2026-08-11; flash 2026-09-17)
 Both crons now evaluate bounded-rule tripwires after ingest: the daily 02:00 UTC run calls
