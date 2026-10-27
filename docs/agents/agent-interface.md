@@ -269,6 +269,26 @@ words).
 4. Generate outputs in the order declared by `skills`, using `decision_delta` for “what changed / what changes now” and `flip_watch` for bounded reversal monitoring.
 5. Keep provenance and source URLs attached in any user-facing response.
 
+## Verified ledger writes (client tokens)
+
+`POST /api/decision-memory` scopes a caller by `x-whether-client-id`, an id the caller chooses. A write
+carrying only the id still lands in the ledger, recorded as unverified. An integrator whose entries
+should name the person who made them also sends `x-whether-client-token`; a valid token sets the entry's
+`verifiedOwner` (`app/api/decision-memory/route.ts`).
+
+Tokens are minted out of band, like an API key, by someone who holds the deployment's secret:
+
+```bash
+WHETHER_LEDGER_SECRET=<the deployment's secret> bun scripts/issue-ledger-token.ts <client-id>
+```
+
+- The token is an HMAC-SHA256 of the client id under `WHETHER_LEDGER_SECRET` (`lib/api/clientToken.ts`):
+  valid for that id only, and only on a deployment holding the same secret.
+- The secret must be at least 16 characters. When it is unset or shorter, the script exits 1 and every
+  write stays unverified; the endpoint accepts writes either way.
+- The client id must be 3–128 characters, the range the API accepts.
+- No endpoint mints tokens. One would let anyone sign any id, which is what the token exists to prevent.
+
 ## Production monitoring endpoints
 
 - `GET /api/health` exposes monitor-friendly service status for synthetic probes.

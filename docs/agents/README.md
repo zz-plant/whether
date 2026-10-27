@@ -131,7 +131,7 @@ Do this before spawning or briefing a subagent:
 
 ## Common blockers
 
-- **403/WAF**: verify `"$WHETHER_API_URL/api/health"`; if edge policy blocks CLI routes, use `GET /api/agent?cadence=weekly` from `agent-interface.md`.
+- **403/WAF**: `bun run check:production-edge [base-url]` fetches `/` and `/api/health` and names the cause: a Cloudflare managed challenge, a challenge page behind a 403, another 4xx/5xx, or a DNS failure. `bun run check:production-assets` checks every static asset, font and OG route for a 200 with the expected content type. If edge policy blocks CLI routes, use `GET /api/agent?cadence=weekly` from `agent-interface.md`.
 - **Missing PATH**: run `bun run cli:whether -- <command>` instead of relying on global `whether`.
 - **No package install**: skip CLI bootstrap and pull briefing data directly:
   - `curl -fsS "${WHETHER_API_URL:-http://localhost:3000}/api/agent?cadence=weekly"`

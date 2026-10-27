@@ -36,6 +36,11 @@ Audit whether surfaced signals are trustable enough to ship or cite.
 - `lib/treasury/`
 - `lib/report/`
 
+## Commands
+
+- `bun run check:curated-freshness`: ages the six hand-curated series in `data/macro_snapshot.json` against their freshness SLA. Read-only and warn-only; nothing fetches these series, so this is the only check that notices when the quarterly curation slips. Run it for any audit that touches a curated series.
+- `bun run data:refresh-fallbacks`: fetches the live upstreams and rewrites the checked-in fallback snapshots under `data/`. It changes the evidence being audited, so do not run it during the audit. Name it in the fix plan when a fallback is stale, and record the commit that refreshed it.
+
 ## Workflow
 
 1. Map source to transform to render for each surfaced signal.
@@ -71,5 +76,5 @@ Return in this order:
 
 ## Maintenance notes
 
-- Last reviewed: 2026-03-16
+- Last reviewed: 2026-10-27 (freshness and refresh commands added)
 - Refresh when provenance policy, trust surfaces, or ingestion pipelines change.

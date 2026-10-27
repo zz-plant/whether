@@ -464,7 +464,12 @@ describe("reader vocabulary", () => {
     );
     const summary = RATCHET.map((rule) => `${rule.name} ${totals.get(rule.name) ?? 0}/${rule.baseline}`).join(", ");
     if (process.env.WHETHER_VOCABULARY_REPORT) console.log(`[reader-vocabulary] ${summary}\n${perSurface.join("\n")}`);
-    assert.deepEqual(rose, [], `\nratcheted words rose:\n${rose.join("\n")}\n(${summary})\n`);
+    assert.deepEqual(
+      rose,
+      [],
+      `\nratcheted words rose:\n${rose.join("\n")}\n(${summary})\n` +
+        "WHETHER_VOCABULARY_REPORT=1 bun run test tests/readerVocabulary.test.tsx lists each surface's count.\n",
+    );
   });
 
   /*

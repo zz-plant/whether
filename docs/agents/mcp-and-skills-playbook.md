@@ -133,7 +133,7 @@ This is the default Whether handoff shape because it keeps delegated work review
 
 Helper commands:
 
-- `bun run agent:route -- "<task>"` for the recommended docs, first files, and minimum checks
+- `bun run agent:route -- "<task>"` for the recommended docs, first files, skills, lessons file, specialised tools and minimum checks
 - `bun run agent:doctor` for branch, dirty-worktree, relevant `AGENTS.md`, and task-profile preflight
 - `bun run agent:handoff -- --job "<job>"` to generate the canonical packet with repo defaults
 - `bun run agent:index` to refresh the repo cache under `artifacts/agent/`
