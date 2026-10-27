@@ -36,6 +36,14 @@ Audit an existing surface for decision clarity, trust, and product-fit drift.
 - `docs/feature-specs-current.md`
 - `docs/agents/ui-ux-standards.md`
 
+## Evidence tools
+
+None of these runs in a gate, and each needs Bash, which this skill does not grant. Run them (or ask the caller for their output) when the audit turns on the question each answers; a result is a lead to read, not a finding.
+
+- `bun run audit:near-duplicates`: helpers rewritten under a new name in another file (cosine >=0.93). `-- --copy` does the same for reader sentences said twice. Needs a local Ollama with `embeddinggemma-2:740m`.
+- `bun run audit:jev-copy`: the copy audit's four questions asked of every sentence on the reader routes. Needs a running server and Workers AI credentials; add `-- --model clef-flash` when Jev answers 402.
+- `bun run telemetry:streams`: rows per Analytics Engine stream over the last 30 days (`WHETHER_TELEMETRY_WINDOW_DAYS` changes it). A stream at zero is dead code or a broken emitter; read the emitter before calling the feature unused. Needs `CLOUDFLARE_ACCOUNT_ID` and an analytics read token.
+
 ## Workflow
 
 1. Define the target surface and the user decision it should support.
@@ -71,5 +79,5 @@ Return in this order:
 
 ## Maintenance notes
 
-- Last reviewed: 2026-03-16
-- Refresh when primary product standards or homepage brief contracts change.
+- Last reviewed: 2026-10-27 (evidence tools added)
+- Refresh when primary product standards or homepage brief contracts change, or when an advisory audit command is added or retired.

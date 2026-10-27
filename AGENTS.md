@@ -15,7 +15,7 @@ If guidance conflicts, obey the higher-priority source and note the conflict in 
 - Package manager `bun`. Install `bun install`; dev `bun run dev`; build `bun run build`.
 - Tests: `bun run test` — ~20s, sharded across processes (`BUN_TEST_SHARDS` overrides; a path filter runs one process). Runs offline: `bunfig.toml` preloads a network guard, so a test needing data serves it (a fixture fetcher or an assigned `globalThis.fetch`).
 - Targeted: `bun run test tests/homeBriefModel.test.ts` (one file), `bun run test -t "reversal trigger"` (by name).
-- Iterate with a targeted test plus `bun run typecheck` (~1.5s incremental). `bun run check` (~20s, every task) is for pre-merge.
+- Iterate with a targeted test plus `bun run typecheck` (~1.5s incremental). `bun run check` (~50s, every task; the landmark audit is the long pole) is for pre-merge.
 - CI on GitHub is manual-only (`workflow_dispatch`); the real gates are `.husky/pre-push` and Cloudflare Workers Builds — see the gate invariant below.
 
 ## Architectural invariants

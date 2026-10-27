@@ -7,16 +7,25 @@
  * and it is the one this codebase most needs: signal history is 92-day trailing
  * windows keyed by signal id, KV payloads arrive shaped, and archive records are
  * read by date — every one of those indexes can be absent, and without the flag
- * the compiler types the read as present. As of 2026-10-09 the tree carries 714
- * such sites (435 in tests, 169 under lib/, 77 under app/, 33 under scripts/), too
+ * the compiler types the read as present. On 2026-10-27 the tree carries 888
+ * such sites (570 in tests, 180 under lib/, 75 under app/, 63 under scripts/), too
  * many to fix in the same change that turns the flag on. So this census ratchets:
  * the baseline below only falls, a fix of a few sites lands with the edit that
  * lowers the number, and at zero the flag goes into tsconfig.json, this check is
  * deleted, and `typecheck` enforces the rule natively — the census is scaffolding
  * for the gap, not a permanent second opinion.
  *
+ * This comment said 714 (counted 2026-10-09) while the baseline merged at 888 on
+ * 2026-10-11: the count grew on the branch and the number was set to the merged
+ * tree. It has not moved since.
+ *
+ * The gate is `tests/checkUncheckedAccess.test.ts`, which runs this count in
+ * every suite run, so pre-push, `bun run check` and the deploy gate all hold it.
+ * A second task in `scripts/check-tasks.mjs` would pay the same tsc pass twice.
+ * Run this script for the per-file breakdown when that test fails.
+ *
  * Usage:
- *   bun run scripts/check-unchecked-indexed-access.ts
+ *   bun run check:unchecked-access
  */
 import { spawnSync } from "node:child_process";
 import { writeFileSync } from "node:fs";

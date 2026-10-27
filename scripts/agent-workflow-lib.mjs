@@ -1,19 +1,26 @@
 /**
  * The engine behind `scripts/agent-workflow.mjs`: keyword routing, the doctor report,
  * handoff packets and the repo index. What it knows about this repository — the task
- * profiles, the core surfaces, where the skills live — is `scripts/agent-workflow.config.mjs`.
+ * profiles, the tool hints, where the lessons table and the skills live, the core
+ * surfaces — is `scripts/agent-workflow.config.mjs`.
  */
 import fs from "node:fs";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 import {
   CORE_SURFACES,
   DEFAULT_PROFILE,
+  LESSONS_TABLE,
   SKILLS_DIRECTORY,
   TASK_PROFILES,
+  TOOL_HINTS,
 } from "./agent-workflow.config.mjs";
 import { execOutput, execText, parseGitStatus } from "./exec.mjs";
 import { walkFiles } from "./walk-files.mjs";
+
+/** The checkout this library sits in: where the lessons table is read when no root is given. */
+const LIBRARY_REPO_ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
 // Explicit so the order is code-unit order on every runtime, not the default's string coercion.
 const byCodeUnit = (a, b) => (a < b ? -1 : a > b ? 1 : 0);
@@ -64,11 +71,116 @@ function listTaskProfiles() {
     rationale: profile.rationale,
     docs: profile.docs,
     targets: profile.targets,
+    skills: profile.skills,
     checks: profile.checks,
   }));
 }
 
-export function classifyTask(task) {
+// Words a topic phrase carries for grammar, not meaning: "a retry" asks only for "retry".
+const PHRASE_STOPWORDS = new Set(["a", "an", "the", "any", "anything", "of", "or", "and", "to", "in", "on", "for", "with", "this", "that", "is", "it"]);
+
+/** Drops plural and -ed/-ing endings, so "streams", "stream" and "streaming" compare equal. */
+function stem(word) {
+  let stemmed = word;
+  if (stemmed.length > 4 && stemmed.endsWith("ies")) stemmed = `${stemmed.slice(0, -3)}y`;
+  else if (stemmed.length > 3 && stemmed.endsWith("s") && !stemmed.endsWith("ss")) stemmed = stemmed.slice(0, -1);
+  if (stemmed.length > 4 && stemmed.endsWith("ed")) stemmed = stemmed.slice(0, -2);
+  else if (stemmed.length > 5 && stemmed.endsWith("ing")) stemmed = stemmed.slice(0, -3);
+  if (stemmed.length > 3 && stemmed.endsWith("e")) stemmed = stemmed.slice(0, -1);
+  return stemmed;
+}
+
+const splitWords = (text) => normalizeText(text).split(/[^a-z0-9]+/).filter(Boolean);
+
+/**
+ * The word sets a phrase matches, one per alternative. A backticked path is named by its
+ * last segment (`lib/runtime/` by "runtime"); a slash between words is a choice
+ * ("email/Slack send" is "email send" or "slack send").
+ */
+function phraseAlternatives(phrase) {
+  const trimmed = phrase.trim();
+  const codePath = /^`([^`]+)`$/.exec(trimmed);
+  if (codePath) {
+    const segment = codePath[1].split("/").filter(Boolean).at(-1) ?? "";
+    const name = segment.replace(/\.[a-z]+$/i, "").toLowerCase();
+    return name ? [[stem(name)]] : [];
+  }
+
+  const words = normalizeText(trimmed).split(/\s+/).filter(Boolean);
+  const choiceIndex = words.findIndex((word) => word.includes("/"));
+  const variants = choiceIndex === -1
+    ? [words]
+    : words[choiceIndex].split("/").filter(Boolean).map((choice) => words.with(choiceIndex, choice));
+  return variants
+    .map((variant) => splitWords(variant.join(" ")).filter((word) => !PHRASE_STOPWORDS.has(word)).map(stem))
+    .filter((required) => required.length > 0);
+}
+
+const phraseMatches = (taskWords, phrase) =>
+  phraseAlternatives(phrase).some((required) => required.every((word) => taskWords.has(word)));
+
+/** Splits a table cell on commas, keeping a quoted phrase ("green here, red there") whole. */
+function splitTopics(cell) {
+  const topics = [];
+  let current = "";
+  let quoted = false;
+  for (const character of cell) {
+    if (character === '"') quoted = !quoted;
+    if (character === "," && !quoted) {
+      topics.push(current);
+      current = "";
+    } else {
+      current += character;
+    }
+  }
+  topics.push(current);
+  return topics.map((topic) => topic.replace(/"/g, "").trim()).filter(Boolean);
+}
+
+/**
+ * The rows of CLAUDE.md's "Read before you touch" table: each row's topics and the file it
+ * links. Empty when the file or the heading is missing; the router then names no lessons.
+ */
+function readLessonsTable(repoRoot) {
+  let text;
+  try {
+    text = fs.readFileSync(path.join(repoRoot, LESSONS_TABLE.file), "utf8");
+  } catch {
+    return [];
+  }
+
+  const lines = text.split("\n");
+  const start = lines.findIndex((line) => line.startsWith(LESSONS_TABLE.heading));
+  if (start === -1) return [];
+
+  const rows = [];
+  for (const line of lines.slice(start + 1)) {
+    if (line.startsWith("#")) break;
+    if (!line.startsWith("|")) continue;
+    const [topics = "", read = ""] = line.split("|").slice(1, -1).map((cell) => cell.trim());
+    const file = /\]\(([^)\s]+)\)/.exec(read)?.[1];
+    if (file) rows.push({ topics: splitTopics(topics), file });
+  }
+  return rows;
+}
+
+function matchLessons(task, repoRoot) {
+  const taskWords = new Set(splitWords(task).map(stem));
+  return unique(
+    readLessonsTable(repoRoot)
+      .filter((row) => row.topics.some((topic) => phraseMatches(taskWords, topic)))
+      .map((row) => row.file),
+  );
+}
+
+function matchTools(task) {
+  const taskWords = new Set(splitWords(task).map(stem));
+  return TOOL_HINTS.filter((hint) => hint.keywords.some((keyword) => phraseMatches(taskWords, keyword))).map(
+    ({ id, command, why }) => ({ id, command, why }),
+  );
+}
+
+export function classifyTask(task, { repoRoot = LIBRARY_REPO_ROOT } = {}) {
   const normalizedTask = normalizeText(task);
 
   if (!normalizedTask) {
@@ -78,8 +190,13 @@ export function classifyTask(task) {
       score: 0,
       task: "",
       source: "keyword-router",
+      lessons: [],
+      tools: [],
     };
   }
+
+  const lessons = matchLessons(task, repoRoot);
+  const tools = matchTools(task);
 
   const scored = TASK_PROFILES.map((profile) => {
     const matchedKeywords = profile.keywords.filter((keyword) => countMatches(normalizedTask, keyword) > 0);
@@ -96,6 +213,8 @@ export function classifyTask(task) {
       score: 0,
       task,
       source: "keyword-router",
+      lessons,
+      tools,
     };
   }
 
@@ -105,11 +224,14 @@ export function classifyTask(task) {
     rationale: winner.profile.rationale,
     docs: winner.profile.docs,
     targets: winner.profile.targets,
+    skills: winner.profile.skills,
     checks: winner.profile.checks,
     matchedKeywords: winner.matchedKeywords,
     score: winner.score,
     task,
     source: "keyword-router",
+    lessons,
+    tools,
   };
 }
 
@@ -173,7 +295,7 @@ export function buildDoctorReport({
   // Untrimmed: the first entry's leading space is its status column (see scripts/exec.mjs).
   const statusOutput = safeShell(() => execOutput("git", ["status", "--porcelain"], cwd), "");
   const changedFiles = parseGitStatus(statusOutput).map(({ code, path: file }) => ({ status: code, file: file.trim() }));
-  const route = classifyTask(task);
+  const route = classifyTask(task, { repoRoot: cwd });
   const relevantPaths = inputPaths.length > 0 ? inputPaths : changedFiles.map((entry) => entry.file);
   const agentFiles = findRelevantAgentFiles(cwd, relevantPaths);
 
@@ -223,11 +345,12 @@ export function buildHandoffPacket({
   skill = "",
 } = {}) {
   const cwd = repoRoot ? path.resolve(repoRoot) : process.cwd();
-  const route = classifyTask(task || job);
+  const route = classifyTask(task || job, { repoRoot: cwd });
   const skillPath = resolveSkillPath(cwd, skill);
   const mergedReadAnchors = unique([
     ...readAnchors,
     ...route.docs,
+    ...route.lessons,
     ...route.targets.slice(0, 2),
     skillPath,
   ]);
@@ -311,6 +434,7 @@ export function buildRepoIndex({ repoRoot } = {}) {
     },
     categories: categorizeFiles(files),
     taskProfiles: listTaskProfiles(),
+    toolHints: TOOL_HINTS,
   };
 
   const skillsMap = {
@@ -370,10 +494,31 @@ export function formatRouteReport(route) {
     }
   }
 
+  if (route.lessons?.length > 0) {
+    lines.push("", `Read Before You Touch (${LESSONS_TABLE.file}):`);
+    for (const lesson of route.lessons) {
+      lines.push(`- ${lesson}`);
+    }
+  }
+
+  if (route.skills?.length > 0) {
+    lines.push("", "Skills:");
+    for (const skill of route.skills) {
+      lines.push(`- ${skill} (${SKILLS_PREFIX}${skill}/SKILL.md)`);
+    }
+  }
+
   if (route.targets?.length > 0) {
     lines.push("", "Work Targets:");
     for (const target of route.targets) {
       lines.push(`- ${target}`);
+    }
+  }
+
+  if (route.tools?.length > 0) {
+    lines.push("", "Specialised Tools:");
+    for (const tool of route.tools) {
+      lines.push(`- ${tool.command} — ${tool.why}`);
     }
   }
 
