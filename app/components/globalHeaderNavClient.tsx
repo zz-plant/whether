@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useMemo } from "react";
-import { Search } from "lucide-react";
+import { Search, Share2 } from "lucide-react";
+import { openShareRail } from "./globalShareRail";
+import { ThemeToggleButton } from "./themeToggleButton";
 import {
   findActivePage,
   resolveGlobalHeaderNavigationLinks,
@@ -27,8 +29,8 @@ const sheetLinkTone = (isActive: boolean) =>
   isActive ? "bg-sky-500/14 text-sky-100 font-semibold" : "text-slate-300 hover:bg-slate-800/50 hover:text-slate-100";
 
 /**
- * The phone's More sheet: Search, then each group with its pages, then the
- * utility links. The bottom bar carries the four groups; this is where a phone
+ * The phone's More sheet: Search, share and theme, then each group with its
+ * pages, then the utility links. The bottom bar carries the four groups; this is where a phone
  * reaches a group's other pages (Compare periods, the runway planner) and the
  * pages outside the groups.
  */
@@ -51,6 +53,23 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
           <Search aria-hidden="true" size={16} strokeWidth={1.8} />
           <span>Search or jump to a page</span>
         </button>
+        {/* The header's share and theme cells, for the phone's brief: below `sm`
+            the home header trades its actions group for the stage and runway
+            pills, which left the theme with no control on that page. */}
+        <div className="flex flex-wrap gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              onClose();
+              openShareRail();
+            }}
+            className={`${SHEET_LINK_CLASS} flex-1 flex-row items-center gap-2 border border-[color:var(--border-default)] text-left ${sheetLinkTone(false)}`}
+          >
+            <Share2 aria-hidden="true" size={16} strokeWidth={1.8} />
+            <span>Share this page</span>
+          </button>
+          <ThemeToggleButton showLabel className="border border-[color:var(--border-default)] !bg-transparent text-slate-300" />
+        </div>
 
         {groups.map((group) => (
           <div key={group.key}>

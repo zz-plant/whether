@@ -14,7 +14,7 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 **Clicks**
 1. Open `/` or click `This week` in the header.
 2. Read the verdict card: the conditions word, the week's headline action, one line on why, and the trust strip (`Data as of`, `Sources`, and `Margin`, which ends with whether the call could change next week). The card's conditions map says what each of the four conditions means; below `md`, where the card has no map, the one-line legend above the week says it.
-3. Every visit reads the same order: the stage and runway the lines are set for, `What are you deciding?` (pick an area), `What would change this guidance`, `Get an email the day a line is crossed`, `What changed this week`, `Has this happened before?` and `Share`.
+3. Every visit reads the same order (re-checked against `app/page.tsx` on 2026-10-27): `What are you deciding?` (pick an area), the stage and runway the lines are set for (`Rules for a <stage> company with <runway> · Change`), `Why conditions are <condition>`, `What changed this week`, `What would change this guidance`, `How unusual is this?`, `Get notified when something changes` and `Share`. Before a band is chosen, the area rules' runway note links `pick your cash runway` to the stage and runway line.
 4. For execution detail, click `Build this week’s plan →` under the areas (the label follows the `Plan horizon` choice), or `Decide` in the header.
 
 **Current output**
@@ -36,7 +36,7 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
    - Docs and email: `Copy email`, `Copy investor update`, `Copy portfolio note`, `Copy citation`
    - Tickets and boards: `Copy ticket brief`; `Work-item tags` copies one area at a time (`Copy <area> tag`) and `Pull policies` one policy at a time (`Copy policy`)
    - Team: `Role memos` (`Copy memo`, `Copy checklist`)
-4. On `/share`, the meeting pack and Monday agenda formats add `Add a Monday review to your calendar`. `Files and images for a deck or a thread` copies the slide and the brief card to the clipboard and holds the board slide (`Download PPTX`, `Download PDF`, `Open SVG`) and `Open brief card`. `For agents, scripts and feed readers` links the API page and the feed.
+4. On `/share`, the meeting pack and Monday agenda formats add `Add a Monday review to your calendar`, and the feed list beside `RSS` offers each Monday's guidance as a calendar subscription (also `Calendar` in the footer). The header's Share cell, `⇧S` and `Share this page` in the palette open the share panel on any route. `Files and images for a deck or a thread` copies the slide and the brief card to the clipboard and holds the board slide (`Download PPTX`, `Download PDF`, `Open SVG`) and `Open brief card`. `For agents, scripts and feed readers` links the API page and the feed.
 5. `Decide` and `/trust` each end on one `Share or embed this →` link to `/share`.
 
 **Current output**

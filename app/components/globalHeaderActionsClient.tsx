@@ -1,6 +1,7 @@
 "use client";
 
-import { Search } from "lucide-react";
+import { Search, Share2 } from "lucide-react";
+import { openShareRail } from "./globalShareRail";
 import { ThemeToggleButton } from "./themeToggleButton";
 import { PresentModeButton } from "./PresentModeButton";
 
@@ -14,7 +15,7 @@ type GlobalHeaderActionsClientProps = {
 };
 
 /**
- * One bordered group, not four or five boxes. Down to search, theme and
+ * One bordered group, not four or five boxes. Down to search, share, theme and
  * (on the brief) present: the settings gear only held a stage selector the
  * explainer and the hero already own, and the "History & export" sheet was a
  * fourth door to three pages the footer, More and ⌘K already open.
@@ -53,11 +54,25 @@ export function GlobalHeaderActionsClient({ showPresentMode = false }: GlobalHea
         <span className="hidden xl:inline flex-1 text-left">Search or jump to…</span>
         <span className="hidden xl:inline"><kbd aria-hidden="true" className="weather-kbd">⌘K</kbd></span>
       </button>
+      {/* The share rail's visible door (2026-10-27). It had one in the report
+          shell's nav block and the header's Export entry, and lost both, which
+          left ⇧S and the palette as the only ways in: the rail's role presets
+          and page-link copy were there for a reader who already knew. The
+          first cell below md, where Search hides. */}
+      <button
+        type="button"
+        onClick={openShareRail}
+        className={`${CELL} max-md:rounded-l-[7px]`}
+        aria-label="Share this page"
+        title="Share this page ⇧S"
+      >
+        <Share2 aria-hidden="true" size={16} strokeWidth={1.8} />
+      </button>
       {/* The light theme has a full token set in tokens.css and layout.tsx
           restores the saved choice pre-paint, but nothing rendered the control,
           so the theme was unreachable from the UI. Takes the cell class rather
           than its own pill default, like the buttons either side. */}
-      <ThemeToggleButton className={`!rounded-none max-sm:!rounded-l-lg !shadow-none !outline-offset-[-2px] ${CELL}`} />
+      <ThemeToggleButton className={`!rounded-none !shadow-none !outline-offset-[-2px] ${CELL}`} />
       {showPresentMode ? (
         <PresentModeButton className="!rounded-none !border-0 !bg-transparent focus-visible:outline-offset-[-2px]" />
       ) : null}

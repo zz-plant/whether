@@ -67,7 +67,7 @@ export async function requestSubscription(
 
 const SLACK_SUBSCRIBE_ENDPOINT = "/api/slack/subscribe";
 
-type SlackSubscribeResult = { ok: boolean; message: string; channelName?: string; token?: string };
+type SlackSubscribeResult = { ok: boolean; message: string; channelName?: string };
 
 export async function requestSlackSubscription(
   webhookUrl: string,
@@ -92,7 +92,6 @@ export async function requestSlackSubscription(
       error?: string;
       message?: string;
       channelName?: string;
-      token?: string;
     } | null = await res.json().catch(() => null);
 
     if (res.ok && data?.ok) {
@@ -100,7 +99,6 @@ export async function requestSlackSubscription(
         ok: true,
         message: data.message || "Connected to Slack! Check your channel for the confirmation ping.",
         channelName: data.channelName,
-        token: data.token,
       };
     }
     return { ok: false, message: data?.error || "Failed to connect Slack webhook. Please try again." };
