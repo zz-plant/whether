@@ -49,7 +49,7 @@ export function TrackRecordSection({
     >
       <div>
         <h2 id="track-record-grading-heading" className="text-xl font-semibold text-white sm:text-2xl">How the record held up</h2>
-        <p className="text-sm text-slate-300">
+        <p className="max-w-prose text-sm text-slate-300">
           The last {counts?.readings ?? record.observations} month-end readings{windowLabel ? `, ${windowLabel},` : ""} graded
           against the same data that produced them.
         </p>
@@ -95,7 +95,7 @@ export function TrackRecordSection({
                     {transition.signaled
                       ? `within ${record.nearBandPts} pts of its line ${transition.leadMonths} mo before`
                       : shockByDate.get(transition.atDate)
-                        ? `none — the score crossed its line from ${record.nearBandPts}+ pts away in one month`
+                        ? `none: it crossed from ${record.nearBandPts}+ pts away in one month`
                         : "none"}
                   </td>
                 </tr>
@@ -110,13 +110,13 @@ export function TrackRecordSection({
         </p>
       ) : null}
 
-      <p className="text-fluid-nano leading-relaxed text-slate-400">
-        Signaled = the score that crossed had spent at least a month within{" "}
+      <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400">
+        Signaled means the score that crossed had spent at least a month within{" "}
         {record.nearBandPts} pts of its line, on either side, before conditions changed. Unsignaled
-        changes are listed just the same — that is the point of this table.
+        changes are listed just the same; that is the point of the table.
       </p>
       {recordChanges !== undefined ? (
-        <p className="text-fluid-nano leading-relaxed text-slate-400" data-record-rescore>
+        <p className="max-w-prose text-fluid-nano leading-relaxed text-slate-400" data-record-rescore>
           {describeTrackRecordRescore({ changes: recordChanges, signaled: record.signaledCount, graded: record.transitions.length })}
         </p>
       ) : null}

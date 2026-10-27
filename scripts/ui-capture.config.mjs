@@ -71,6 +71,9 @@ const liveRoutes = [
   // /history carries the track record that answers "is this a horoscope". /share
   // is where the artifacts are copied.
   { slug: "history", label: "Record", path: "/history" },
+  // Added 2026-10-27: the comparison was reachable from /history and the footer
+  // but had never been captured, so no layout pass had seen it.
+  { slug: "compare", label: "Compare periods", path: "/history/compare" },
   { slug: "brief", label: "Published brief", path: "/brief/2026-w31" },
   { slug: "share", label: "Share", path: "/share" },
   // Restored 2026-09-23: product writing placed on the month-end record.
