@@ -3748,6 +3748,49 @@ the verdict's cause line.
 Pins updated in 14 test files; `briefFormats.golden.json` regenerated with the
 suite's own UPDATE mode, and its diff checked to contain only these sentences.
 
+### 1.1.87 Every frame is a screenshot (2026-10-27)
+
+A frame audit of eleven routes, every screen-height frame at a 1440×900 laptop and a 390×844 phone,
+found 7 of 83 frames past the first screen naming the site, a date and the conditions. The header
+hides on scroll, so the middle of every page was a picture with no source and no week. 45 of 105
+frames cut through a block, and five blocks were taller than a phone screen. After the changes below
+every frame passes on every route, at both sizes (`docs/agents/ui-ux-standards.md` §XXVIII).
+
+- **The running head** (`app/components/runningHead.tsx`, mounted in the layout). Once a page's intro
+  has left the screen, one 32px line at the top names the site, the conditions in the regime's ink,
+  the date and the section on screen, with `whether.work` from `sm` up. It sits under the header
+  while the header shows and takes its place when it hides. Pages hand it their facts by spreading
+  `frameFactsAttributes` (`lib/navigation/runningHead.ts`) onto their intro: the report intro (its
+  status word and "Data as of"; `/history`'s "Last completed month" stays on the date, in neutral
+  ink, as its intro keeps it), the brief's call block (the week, and on a phone a second line with
+  the call and "By area"), `/share`'s heading and every `SecondaryPageHeader`. Pages that mark
+  nothing are named by their h1. The phone call strip under the header (`StickyCallStrip`) is gone:
+  the head's second line is that strip, with the site and the week added. From `md` the head leads
+  with the call instead of the page's name, and the floating desktop strip keeps only the direction
+  glyph and its two actions (the card as an image, the call as text): 448px wide at the foot of a
+  two-column section, its weather word, call and margin covered the text being screenshotted.
+- **Sticky rows clear it.** The section chips and the report rail stick at
+  `var(--running-head-height)`, which the head sets while it shows.
+- **Blocks fit a phone frame.** The `/signals` rows, the decision-area rows, the published briefs on
+  `/history` and the `/concepts` pairs are marked as the units they are on a phone
+  (`data-frame-block`); each `/signals` row prints "Since {date}" over its change, the column head
+  it lost. `/about`'s "Where it fits" (862px) is two blocks, one per list.
+- **Charts name their source.** The phase map, the month strip, the two score trends, the
+  calibration chart, the five signal panels ("Month-end readings to …"), the two `/concepts` charts
+  and the payback chart end in `ScreenshotCaption`, inside their border.
+- **Desktop width.** From `xl` the homepage sets its two "what would change" questions side by side,
+  the readings beside what the headline reading leaves out, and the record's spells beside its last
+  changes.
+- **`/concepts` no longer scrolls sideways on a phone.** The corpus chart's screen-reader table
+  carried `sr-only` itself; a table cannot shrink below its content, so it laid out at 636px and
+  made the page 651px wide. It is wrapped now, as the advice plane's table already was.
+- **`bun run ui:frames`** writes every frame, `report.json` and a gallery to
+  `artifacts/ui/frames/`, and with `--strict` exits non-zero on a frame that lacks a fact or a block
+  taller than a frame. Not in the gate (no browser there). `waitForLayoutSettled` in the capture
+  library returns -1 when the network never idles, so the audit reads the page height itself.
+- Invariant 11 (`tests/architectureInvariants.test.ts`) now counts an attribute builder in `lib/` as
+  a producer, since the running head's facts are spread rather than written in JSX.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

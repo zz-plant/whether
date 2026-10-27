@@ -762,3 +762,41 @@ condition stamp, so these cues are the only way left to tell a control from a di
 - `tests/displayControlCues.test.ts` reads every component under `app/` and fails when an element
   outside any link, button, label or picker part carries the action colour, a `hover:` change or
   a control class, or when a link or button carries the stamp frame.
+
+## XXVIII. Every frame is a screenshot
+
+Added 2026-10-27 with `docs/feature-specs-current.md` §1.1.87. A reader shares a page in one of two
+ways. On a phone it is the whole screen, wherever they stopped scrolling. On a laptop it is a box
+dragged around one block. A page reads well as a screenshot only if both pictures name their source
+and hold their unit whole. `bun run ui:frames` (scripts/ui-frames.mjs) walks every live route at a
+1440×900 laptop and a 390×844 phone, frame by frame, and fails a route on either. It is not in the
+gate, which has no browser: run it after layout work, beside `bun run ui:iterate`.
+
+- MUST: name the site in every frame, and on a page that reports a reading, the date and the
+  conditions too. The header hides on scroll, so past the first screen this is the running head's
+  job (`app/components/runningHead.tsx`). A page hands it the facts by spreading
+  `frameFactsAttributes(…)` (`lib/navigation/runningHead.ts`) onto its intro block: the report
+  intro, the brief's call block, `/share`'s heading, a reading page's `SecondaryPageHeader`. A page
+  that marks nothing is named by its h1. On 2026-10-27, before the head, 7 of 83 frames past the
+  first screen named all three.
+- MUST: keep a sticky row below the head, not under it: `top-[var(--running-head-height,0px)]`, as
+  the section chips and the report rail do. The head sets the variable while it shows.
+- MUST: fit every block a reader would frame in one phone frame under the head (about 810px). A
+  block that is a list of units marks each unit `data-frame-block` (the `/signals` rows, the area
+  rows, the published briefs, the `/concepts` pairs), and each unit carries its own labels: a
+  phone row of the signals table says "Since Sep 30" over its change because the column head is
+  hidden there. A block long by nature, opened on purpose, carries `data-frame-exempt` and the
+  reason beside it.
+- MUST: end a chart a reader crops in `ScreenshotCaption`, inside its border, with its period
+  where the figure does not already print one: the record's phase map, the month strip, the score
+  trends, the calibration chart, the signal panels, the `/concepts` charts and the payback chart.
+- MUST: hide a screen-reader table behind a wrapper (`<div className="sr-only"><table>`), never
+  with `sr-only` on the `<table>`. A table cannot shrink below its content, so a 1px one lays out
+  at full width: one on `/concepts` made the phone page 651px wide and every screenshot of it came
+  out zoomed out. `tests/uiFramesLib.test.ts` scans for it.
+- SHOULD: from `xl`, set parallel blocks side by side rather than stacking them in a column whose
+  prose stops at reading width. The homepage's two "what would change" questions, its readings
+  beside what they leave out, and its record's spells beside its changes do this; a laptop frame
+  then holds both halves of an answer.
+- A heading left at the foot of a frame depends on where the reader stopped, and no layout removes
+  it everywhere. The head names the section in the next frame; the audit reports the rest.

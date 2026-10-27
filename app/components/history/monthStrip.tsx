@@ -1,3 +1,4 @@
+import { ScreenshotCaption } from "../screenshotCaption";
 import { REGIME_LABELS, REGIME_SEVERITY_RANK, isRegimeKey } from "../../../lib/regimePresentation";
 import { regimeDataAttribute } from "../../../lib/regimeAccent";
 import { countRecord } from "../../../lib/report/trackRecord";
@@ -194,6 +195,7 @@ export function MonthStrip({ entries, markers, markersLegend, className = "" }: 
           </span>
         ) : null}
       </figcaption>
+      <ScreenshotCaption />
     </figure>
   );
 }

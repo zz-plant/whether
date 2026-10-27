@@ -137,6 +137,8 @@ export const SignalsWhatChangedSection = ({
                 id={row.key}
                 className="border-b border-slate-800/50 align-top max-md:grid max-md:grid-cols-1 max-md:gap-y-4 max-md:py-4"
                 data-signal={row.key}
+                /* On a phone each row is a card of its own, and the unit a screenshot holds. */
+                data-frame-block=""
               >
                 <th scope="row" className="py-2.5 pr-3 font-semibold text-slate-100 max-md:p-0">
                   {row.watchHref ? (
@@ -167,6 +169,9 @@ export const SignalsWhatChangedSection = ({
                   )}
                 </th>
                 <td className="py-2.5 pr-3 max-md:p-0">
+                  {/* The column head, on the row itself where the head is hidden: a phone
+                      frame of one row read "4.02 → 4.11" with nothing saying since when. */}
+                  <span className="mb-1 block text-fluid-nano text-slate-500 md:hidden">{`Since ${basis.reference}`}</span>
                   <DeltaChip row={row} />
                   {/* What the score's move is made of. The chip says how far it
                       went; this says which inputs took it there, and that the

@@ -144,7 +144,10 @@ export function WhatWouldChangeSection({
             className={`w-full max-w-[240px] mx-auto md:mx-0 shrink-0 ${conditionsTrail ? "md:hidden" : ""}`}
           />
         ) : null}
-        <div className="min-w-0 space-y-4">
+        {/* Side by side from xl (2026-10-27): stacked in a 64rem column they left the
+            right half of a laptop screen empty, and a frame held one question and the
+            top of the next. Side by side, one frame holds both answers whole. */}
+        <div className="min-w-0 space-y-4 xl:grid xl:grid-cols-2 xl:items-start xl:gap-8 xl:space-y-0">
           {/* Two different questions, named as two (2026-10-22): a change in
               conditions is not permission to resume, and the old flat list read
               as one question with three answers. The conditions question comes

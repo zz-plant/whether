@@ -152,7 +152,7 @@ describe("/ ends on one line, not a Share section", () => {
 });
 
 describe("the desktop sticky strip waits for the card to leave the screen", () => {
-  it("is gated on the card, as the phone line is", () => {
+  it("is gated on the card, as the running head is", () => {
     const strip = readFileSync("app/components/StickyCallStrip.tsx", "utf8");
     assert.match(strip, /\{showStrip && heroLeft \? \(/);
   });

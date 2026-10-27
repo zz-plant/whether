@@ -1,3 +1,4 @@
+import { ScreenshotCaption } from "../components/screenshotCaption";
 import Link from "next/link";
 import { ActionLink } from "../components/ui/actionLink";
 import { Tag } from "../components/ui/tag";
@@ -250,7 +251,7 @@ export default async function HistoryPage({
               is where decision-flow.css puts the one underline. */}
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {publishedBriefs.map((brief) => (
-              <li key={brief.slug}>
+              <li key={brief.slug} data-frame-block="">
                 <Link href={buildPublishedBriefPath(brief.slug)} className="weather-hub-link-card text-slate-100">
                   <p className="text-sm font-semibold text-slate-100 line-clamp-1">{publishedBriefDisplay(brief).headline}</p>
                   <p className="flex items-center justify-between gap-2">
@@ -349,6 +350,7 @@ export default async function HistoryPage({
           <div className="grid gap-6 sm:grid-cols-2">
             <HistoricalTrendChart label={regimeSignalLabel.tightness} color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" changeLine={TIGHTNESS_REGIME_THRESHOLD} />
             <HistoricalTrendChart label={regimeSignalLabel.riskAppetite} color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" changeLine={RISK_APPETITE_REGIME_THRESHOLD} />
+            <ScreenshotCaption className="sm:col-span-2" />
           </div>
         </div>
       </UrlDetails>

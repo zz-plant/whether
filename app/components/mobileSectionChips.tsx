@@ -62,7 +62,7 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
        it, they scrolled with the chips, so the right fade slid off the edge it
        marks on the first swipe. The wrapper carries `sticky` too, since a
        sticky element sticks within its parent. */
-    <div className="sticky top-0 z-20 -mx-4 border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 backdrop-blur lg:hidden">
+    <div className="sticky top-[var(--running-head-height,0px)] z-20 -mx-4 border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 backdrop-blur lg:hidden">
       <nav
         ref={navRef}
         aria-label="Page sections"

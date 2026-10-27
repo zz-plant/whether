@@ -1,3 +1,5 @@
+import { frameFactsAttributes } from "../../lib/navigation/runningHead";
+import { getRegimePublicLabel } from "../../lib/regimePresentation";
 import type { Metadata } from "next";
 import { formatWeekMondayUTC } from "../../lib/formatters";
 import { buildPageMetadata } from "../../lib/seo";
@@ -376,7 +378,16 @@ export default async function SharePage() {
       {/* The share rail's island: the global Share button reads it on this page too. */}
       <BriefArtifactScript artifact={artifact.briefArtifact} />
       <div className="weather-page-stack mx-auto max-w-6xl">
-        <section className="weather-panel weather-section-stack p-0" aria-labelledby="share-page-title">
+        <section
+          className="weather-panel weather-section-stack p-0"
+          aria-labelledby="share-page-title"
+          {...frameFactsAttributes({
+            regime: artifact.assessment.regime,
+            condition: getRegimePublicLabel(artifact.assessment.regime),
+            date: `Week of ${artifact.recordDate ? formatWeekMondayUTC(artifact.recordDate) : artifact.recordDateLabel}`,
+            title: "Share this week's guidance",
+          })}
+        >
           <div className="max-w-2xl space-y-2">
             {/* The week is part of the heading line (2026-10-09). It was a kicker
                 above it, and before that the kicker read "Current weekly

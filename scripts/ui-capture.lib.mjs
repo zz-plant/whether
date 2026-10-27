@@ -302,7 +302,7 @@ const LAYOUT_SETTLE_POLL_MS = 150;
  * captures ~2.7x taller than the page any user sees. Wait for the document to
  * stop changing height so the screenshot matches the hydrated layout.
  */
-const waitForLayoutSettled = async (page, timeoutMs = LAYOUT_SETTLE_TIMEOUT_MS) => {
+export const waitForLayoutSettled = async (page, timeoutMs = LAYOUT_SETTLE_TIMEOUT_MS) => {
   const deadline = Date.now() + timeoutMs;
 
   try {
@@ -346,7 +346,7 @@ const resolveExecutableOverride = () => {
   return existsSync(candidate) ? candidate : undefined;
 };
 
-const launchChromium = async () => {
+export const launchChromium = async () => {
   try {
     return await chromium.launch();
   } catch (error) {

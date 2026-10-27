@@ -1,5 +1,6 @@
 "use client";
 
+import { ScreenshotCaption } from "../../components/screenshotCaption";
 import { useMemo, useState } from "react";
 import { scaleLinear } from "d3-scale";
 import type { TreasuryData } from "../../../lib/types";
@@ -162,14 +163,20 @@ const PanelTitle = ({ title, subtitle }: { title: string; subtitle: string }) =>
   </header>
 );
 
-const FlatPanel = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => (
-  <article className={`min-w-0 space-y-2 border border-slate-800/70 bg-slate-950/40 p-2 sm:p-3 ${className}`}>{children}</article>
+/* Each panel ends in its source and its last month-end, inside its border: a panel
+   cropped from the page still says whose chart it is and how recent (2026-10-27). */
+const FlatPanel = ({ children, className = "", source }: { children: React.ReactNode; className?: string; source?: string }) => (
+  <article className={`min-w-0 space-y-2 border border-slate-800/70 bg-slate-950/40 p-2 sm:p-3 ${className}`}>
+    {children}
+    <ScreenshotCaption detail={source} className="pt-1" />
+  </article>
 );
 
 export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalVisualizationSuiteProps) => {
   const [cadence, setCadence] = useState<Cadence>("monthly");
   const points = useMemo(() => byCadence(yieldCurveSeries, cadence), [yieldCurveSeries, cadence]);
   const latest = points.at(-1) ?? null;
+  const panelSource = latest ? `Month-end readings to ${latest.label}` : undefined;
   const midPoint = points[Math.floor((points.length - 1) / 2)] ?? latest;
 
   const rateValues = points.flatMap((point) => [point.oneMonth, point.threeMonth, point.twoYear, point.tenYear]);
@@ -291,7 +298,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               2Y−3M) and printed "Latest: 0.42%" for Aug 31, beside a row giving
               the same gauge as 0.41pp on Aug 31 and 0.47pp this week. The last
               block is a month-end, and the line under it says so. */}
-          <FlatPanel className="lg:col-span-12">
+          <FlatPanel source={panelSource} className="lg:col-span-12">
             <PanelTitle title="Recession warning gauge over time" subtitle="Ten-year minus two-year rate, one block per period: grey is normal, faint red is flattening, red is inverted." />
             <div className="flex min-h-[44px] overflow-hidden rounded-md bg-slate-900/60">
               {points.length ? points.map((point) => <div key={point.label} className={`flex-1 ${ribbonTone(point.spread10Y2Y)}`} title={`${point.label}: ${formatSpread(point.spread10Y2Y)}`} />) : <div className="flex-1 bg-slate-700/70" />}
@@ -303,7 +310,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             ) : null}
           </FlatPanel>
 
-          <FlatPanel className="lg:col-span-8 lg:row-span-2">
+          <FlatPanel source={panelSource} className="lg:col-span-8 lg:row-span-2">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <PanelTitle title="Rates by term" subtitle="What the government pays to borrow, by how long it is borrowing for." />
               <SegmentedControl
@@ -356,7 +363,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             {hasRateGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing readings.</p> : null}
           </FlatPanel>
 
-          <FlatPanel className="lg:col-span-4">
+          <FlatPanel source={panelSource} className="lg:col-span-4">
             {/* Unnumbered. The titles were "1)" to "5)" to match DOM order, but a
                 numbered list of charts reads as a report template, and nothing
                 on the page refers to a chart by its number. */}
@@ -440,7 +447,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             <p className="text-fluid-xs text-slate-400">Older months fade back and arrowheads follow the direction of travel, so the path shows direction as well as position.</p>
           </FlatPanel>
 
-          <FlatPanel className="lg:col-span-8">
+          <FlatPanel source={panelSource} className="lg:col-span-8">
             <PanelTitle title="Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
             <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="Inversion timeline: ten-year minus two-year spread and two-year minus three-month spread; dashed line marks zero">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
@@ -467,7 +474,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             {hasSpreadGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
 
-          <FlatPanel className="lg:col-span-4">
+          <FlatPanel source={panelSource} className="lg:col-span-4">
             <PanelTitle title="Biggest monthly rate moves" subtitle="The months the two-year and ten-year rates moved most, month-end to month-end, largest first." />
             <ul className="space-y-1 text-xs text-slate-200">
               {topShocks.length ? (

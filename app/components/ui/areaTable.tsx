@@ -176,6 +176,8 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
           {ordered.map((row) => (
             <tr
               key={row.area}
+              /* One area per frame unit: on a phone the row is a card with its own line labels. */
+              data-frame-block=""
               id={`area-${row.area}`}
               /* The space before each `${` is load-bearing: Tailwind reads a class
                  glued to an interpolation ("max-md:py-3${") as one token it cannot

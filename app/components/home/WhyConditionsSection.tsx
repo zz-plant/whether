@@ -81,58 +81,66 @@ export function WhyConditionsSection({
 
   return (
     <HomeSection id={HOME_SECTIONS.diagnosis.id} heading={`Why conditions are ${regimeLabel}`}>
-      <table className="w-full border-collapse text-fluid-sm" data-conditions-reading>
-        <caption className="sr-only">
-          The two readings behind this week&rsquo;s conditions, with what each one means.
-        </caption>
-        <thead>
-          <tr className="border-b border-[color:var(--border-subtle)] text-left text-fluid-xs text-slate-400">
-            <th scope="col" className="py-2 pr-4 font-medium">Reading</th>
-            <th scope="col" className="py-2 pr-4 font-medium">Now</th>
-            <th scope="col" className="py-2 font-medium">What it means</th>
-          </tr>
-        </thead>
-        <tbody>
-          {readings.map((reading) => (
-            <tr key={reading.key} className="border-b border-[color:var(--border-subtle)] align-baseline last:border-b-0">
-              <th scope="row" className="py-3 pr-4 text-left font-medium text-slate-200">{reading.label}</th>
-              <td className="py-3 pr-4 tabular-nums text-slate-100">{reading.value}</td>
-              <td className="py-3 text-slate-300">{signalReadingMeaning(reading.key, reading.value)}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* The readings beside what they leave out, from xl (2026-10-27): stacked, the
+          note and the capped-score line sat under a 64rem table with the right half of
+          a laptop screen empty, and a frame cut the section in two. */}
+      <div className={notCounted.length > 0 || cappedDistance ? "xl:grid xl:grid-cols-2 xl:items-start xl:gap-8" : undefined}>
+        <div className="min-w-0">
+          <table className="w-full border-collapse text-fluid-sm" data-conditions-reading>
+            <caption className="sr-only">
+              The two readings behind this week&rsquo;s conditions, with what each one means.
+            </caption>
+            <thead>
+              <tr className="border-b border-[color:var(--border-subtle)] text-left text-fluid-xs text-slate-400">
+                <th scope="col" className="py-2 pr-4 font-medium">Reading</th>
+                <th scope="col" className="py-2 pr-4 font-medium">Now</th>
+                <th scope="col" className="py-2 font-medium">What it means</th>
+              </tr>
+            </thead>
+            <tbody>
+              {readings.map((reading) => (
+                <tr key={reading.key} className="border-b border-[color:var(--border-subtle)] align-baseline last:border-b-0">
+                  <th scope="row" className="py-3 pr-4 text-left font-medium text-slate-200">{reading.label}</th>
+                  <td className="py-3 pr-4 tabular-nums text-slate-100">{reading.value}</td>
+                  <td className="py-3 text-slate-300">{signalReadingMeaning(reading.key, reading.value)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
 
-      {/* The rule that turns two numbers into a weather word, said once and in
-          the reader's terms: each reading sits above or below its change line. */}
-      <p className="mt-3 max-w-3xl text-fluid-sm leading-relaxed text-slate-300">
-        Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
-        line, and risk appetite is {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its{" "}
-        {changeLines.riskAppetite} change line. Together they put conditions in{" "}
-        <span className="font-semibold text-slate-100">{regimeLabel}</span>.
-      </p>
-
-      {notCounted.length > 0 ? (
-        <div className="mt-5 max-w-3xl rounded-sm border-l-2 border-[color:var(--color-caveat-border)] bg-[var(--color-caveat-bg)] py-3 pl-4 pr-3" data-excluded-inputs>
-          <p className="text-fluid-xs font-semibold text-caveat-fg">What the headline reading leaves out</p>
-          <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
-            {warning
-              ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
-              : `If we counted them, we'd have ${notCounted
-                  .map((entry) => `${entry.metric === "tightness" ? "funding pressure" : "risk appetite"} at ${entry.score}`)
-                  .join(" and ")}.`}{" "}
-            {NOT_COUNTED_REASON}
+          {/* The rule that turns two numbers into a weather word, said once and in
+              the reader's terms: each reading sits above or below its change line. */}
+          <p className="mt-3 max-w-3xl text-fluid-sm leading-relaxed text-slate-300">
+            Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
+            line, and risk appetite is {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its{" "}
+            {changeLines.riskAppetite} change line. Together they put conditions in{" "}
+            <span className="font-semibold text-slate-100">{regimeLabel}</span>.
           </p>
         </div>
-      ) : null}
+        <div className="min-w-0">
+          {notCounted.length > 0 ? (
+            <div className="mt-5 max-w-3xl rounded-sm xl:mt-0 border-l-2 border-[color:var(--color-caveat-border)] bg-[var(--color-caveat-bg)] py-3 pl-4 pr-3" data-excluded-inputs>
+              <p className="text-fluid-xs font-semibold text-caveat-fg">What the headline reading leaves out</p>
+              <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
+                {warning
+                  ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
+                  : `If we counted them, we'd have ${notCounted
+                      .map((entry) => `${entry.metric === "tightness" ? "funding pressure" : "risk appetite"} at ${entry.score}`)
+                      .join(" and ")}.`}{" "}
+                {NOT_COUNTED_REASON}
+              </p>
+            </div>
+          ) : null}
 
-      {cappedDistance ? (
-        <p className="mt-4 max-w-3xl text-fluid-xs leading-relaxed text-slate-400" data-capped-reading>
-          Funding pressure reads {tightness} because the score is capped there; without the cap it would read{" "}
-          {saturatedPressure}. The distance to its {changeLines.tightness} change line is therefore{" "}
-          {cappedDistance.shown} points on the score but {cappedDistance.actual} points of pressure.
-        </p>
-      ) : null}
+          {cappedDistance ? (
+            <p className="mt-4 max-w-3xl text-fluid-xs leading-relaxed text-slate-400" data-capped-reading>
+              Funding pressure reads {tightness} because the score is capped there; without the cap it would read{" "}
+              {saturatedPressure}. The distance to its {changeLines.tightness} change line is therefore{" "}
+              {cappedDistance.shown} points on the score but {cappedDistance.actual} points of pressure.
+            </p>
+          ) : null}
+        </div>
+      </div>
 
       <p className="mt-4 text-fluid-xs text-slate-400">
         <Link href="/trust#formula-reference" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">

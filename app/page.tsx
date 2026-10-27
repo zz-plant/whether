@@ -75,6 +75,8 @@ import { getLatestTimeMachineSnapshot } from "../lib/timeMachine/timeMachineCach
 import { JsonLdScript } from "./components/jsonLdScript";
 import { PublishedCallWatcher } from "./components/publishedCallWatcher";
 import { OfflineNotice } from "./components/offlineNotice";
+import { frameFactsAttributes } from "../lib/navigation/runningHead";
+import { resolveGlobalHeaderRouteLabel } from "../lib/navigation/globalHeader";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
 import { describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
@@ -621,7 +623,26 @@ async function PageContent({
             {/* Tier 1, and nothing else: the weather word, the call, and the
                 trust strip. Every other question the reader asks is a section
                 of its own below, in the order they ask them. */}
-            <div id="weekly-call" data-page-section="weekly-call" tabIndex={-1} aria-label="This week’s operating guidance" className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400">
+            <div
+              id="weekly-call"
+              data-page-section="weekly-call"
+              tabIndex={-1}
+              aria-label="This week’s operating guidance"
+              className="focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+              /* What the running head prints once the card has scrolled away: on a
+                 phone it is the brief's own line, the call with the jump to the
+                 areas (lib/navigation/runningHead.ts). */
+              {...frameFactsAttributes({
+                regime,
+                condition: publicRegimeLabel,
+                date: periodLabel,
+                /* The page by the name the header gives it, not its h1: the h1 is the
+                   card's call, and the strip beside it on desktop prints the call. */
+                title: resolveGlobalHeaderRouteLabel("/"),
+                call: primaryCall,
+                jump: { href: `#${HOME_SECTIONS.areas.id}`, label: "By area" },
+              })}
+            >
               {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
               <DecisionHero
                 titleLevel={cadenceCall ? "h2" : "h1"}

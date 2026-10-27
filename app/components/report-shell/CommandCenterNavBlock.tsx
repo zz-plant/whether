@@ -1,4 +1,6 @@
 import { ReportCta } from "../reportCta";
+import { frameFactsAttributes } from "../../../lib/navigation/runningHead";
+import { isRegimeKey } from "../../../lib/regimePresentation";
 import type { ExportCtaProps, ReportCtaProps } from "./types";
 import { TrustStrip, type TrustStripProps } from "../trustStrip";
 
@@ -26,6 +28,7 @@ export function CommandCenterNavBlock({
   showOfflineBadge,
   offlineBadgeLabel,
   trustStrip,
+  regime,
 }: {
   pageTitle: string;
   pageSummary?: string;
@@ -41,6 +44,8 @@ export function CommandCenterNavBlock({
   /** The route's trust strip. It carries the record date and the sources, so
    *  the line beside the status word drops both rather than print them twice. */
   trustStrip?: Omit<TrustStripProps, "className">;
+  /** The reading's regime. With it, the status word is a condition and the running head repeats it. */
+  regime?: string;
 }) {
   // The status word leads and prints in the regime ink — it is this page's
   // equivalent of the hero's stamp, and the only word on the route that
@@ -87,6 +92,17 @@ export function CommandCenterNavBlock({
     <section
       className="weather-surface-secondary weather-inset relative min-w-0"
       aria-label="Page introduction"
+      /* The running head's facts, for every frame after this one (lib/navigation/runningHead.ts). */
+      {...frameFactsAttributes({
+        regime,
+        /* A qualified status (/history's "Last completed month") is a condition word
+           too, and the head keeps its qualifier on the date, so a frame of the record
+           does not read as this week's call. It also carries no regime: that page
+           draws in neutral ink on purpose. */
+        condition: (regime && isRegimeKey(regime)) || statusPrefix ? statusLabel : null,
+        date: recordDateLabel ? `${statusPrefix ?? "Data as of"}${statusPrefix ? ": " : " "}${recordDateLabel}` : null,
+        title: pageTitle,
+      })}
     >
       {/* Two columns from lg up: the reading block keeps its measure on the
           left, the timestamp and actions bank right. Stacked, the hero was a

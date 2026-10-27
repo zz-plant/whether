@@ -1,3 +1,4 @@
+import { ScreenshotCaption } from "../components/screenshotCaption";
 import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCES, type AdviceStance } from "../../lib/adviceStance";
 import { DEFAULT_THRESHOLDS } from "../../lib/regimeEngineCore";
 import { regimeAtCoordinates } from "../../lib/regimePhaseSpace";
@@ -233,6 +234,7 @@ export function AdvicePlane({
           ? ` ${offCorner === 1 ? "One sits" : `${offCorner} sit`} in a different corner from the conditions published that month. ${CALL_CHANGE_RULE}`
           : null}
       </figcaption>
+      <ScreenshotCaption />
     </figure>
   );
 }
