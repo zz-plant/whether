@@ -105,7 +105,7 @@ describe("the homepage's changed-signals table", () => {
 
     assert.match(text, /Aug 31 → this week/);
     assert.match(text, /Aug 31: 63/, "the ladder names its hollow dot for the reading it is drawn from");
-    assert.match(text, /against Aug 31 and against its lines/);
+    assert.match(text, /compares with Aug 31 and with its lines/);
     assert.match(text, /since Aug 31/, "and the move is read out against it");
     assert.doesNotMatch(text, noWords);
   });

@@ -48,35 +48,35 @@ import { regimeSignalLabel } from "./signalTranslations";
 
 const REGIME_PROFILES: Record<RegimeKey, { description: string; constraints: string[] }> = {
   SCARCITY: {
-    description: "Capital is expensive and lenders are pulling back. Prioritize survival over growth.",
+    description: "Money is expensive and lenders are pulling back. Survive first, grow later.",
     constraints: [
-      "Shorten payback windows and preserve cash.",
-      "Delay speculative hiring or large platform rewrites.",
+      "Only spend on things that pay back fast, and hold on to cash.",
+      "Put off speculative hires and big rewrites.",
       "Only back roadmap bets with clear revenue behind them.",
     ],
   },
   DEFENSIVE: {
-    description: "Capital is expensive but funding stays selective. Operate for efficiency.",
+    description: "Money is expensive and investors are picky. Run lean.",
     constraints: [
-      "Focus on margin expansion and retention.",
-      "Cut low-leverage experiments.",
-      "Convert demand with tighter sales cycles.",
+      "Work on margins and keeping customers.",
+      "Cut experiments that won't move much.",
+      "Close deals faster.",
     ],
   },
   VOLATILE: {
-    description: "Capital is cheaper but funding is wary. Build trust and resilience.",
+    description: "Money is cheaper, but investors are wary. Be the safe choice.",
     constraints: [
-      "Ship reliability and security before novelty.",
+      "Ship reliability and security before new features.",
       "Avoid disruptive pivots that spook buyers.",
-      "Lean into proof, references, and guarantees.",
+      "Lean on proof, references and guarantees.",
     ],
   },
   EXPANSION: {
-    description: "Capital is available and financing conditions are supportive. The weekly guidance sets the tempo inside that window.",
+    description: "Money is easy to get and investors are keen. The weekly guidance sets how fast to go.",
     constraints: [
-      "Prioritize reach and learning velocity over perfect finish.",
+      "Get things out and learn fast rather than polishing.",
       "Spend with clear guardrails, even if some experiments fail.",
-      "Scale capacity ahead of demand only where leading signals stay strong.",
+      "Hire ahead of demand only where the early signs stay strong.",
     ],
   },
 };

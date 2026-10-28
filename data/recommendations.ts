@@ -63,7 +63,7 @@ export const insightDatabase = {
     regimes: [
       {
         key: "SCARCITY",
-        tone: "High rates + risk off",
+        tone: "High rates, investors pulling back",
         mandate: "Don't die.",
         insight:
           "Money is scarce and slow to come back. Favour work that pays back in weeks, not quarters.",
@@ -86,14 +86,14 @@ export const insightDatabase = {
         ],
         start: [
           "Founder-led sales and customer recovery",
-          "Annual prepay discounts for immediate cash",
-          "Manual onboarding that avoids new build costs",
+          "Discounts for paying a year up front",
+          "Onboarding customers by hand instead of building new tools",
         ],
         metric: "Cash conversion cycle (how fast $1 spent becomes $1 earned)",
       },
       {
         key: "DEFENSIVE",
-        tone: "High rates + moderate risk",
+        tone: "High rates, investors still selective",
         mandate: "Efficiency first.",
         insight:
           "New customers cost more to win now. Get more from the ones you already have.",
@@ -115,15 +115,15 @@ export const insightDatabase = {
           "Speculative R&D",
         ],
         start: [
-          "Pricing optimization and packaging cleanup",
-          "Churn reduction programs",
-          "Vendor consolidation",
+          "Fixing pricing and simplifying your plans",
+          "Keeping the customers you have",
+          "Using fewer vendors",
         ],
         metric: "Gross margin and net dollar retention",
       },
       {
         key: "VOLATILE",
-        tone: "Low rates + risk off",
+        tone: "Low rates, investors pulling back",
         mandate: "Safety first.",
         insight:
           "Money is cheap, but buyers are nervous. They pay for reliability, not for experiments.",
@@ -147,13 +147,13 @@ export const insightDatabase = {
         start: [
           "Security features and compliance (SOC 2)",
           "Uptime and response-time commitments",
-          "Trust signals in every funnel step",
+          "Proof you can be trusted at every step of the sale",
         ],
         metric: "Win rate (how often deals die as 'no decision')",
       },
       {
         key: "EXPANSION",
-        tone: "Low rates + risk on",
+        tone: "Low rates, investors eager",
         mandate: "Land grab.",
         insight:
           "Money is cheap and investors want growth. Moving fast is worth some waste.",
@@ -170,15 +170,15 @@ export const insightDatabase = {
           ],
         },
         stop: [
-          "Over-engineering before demand proves out",
+          "Over-building before demand shows up",
           "Cost cuts that choke product velocity",
-          "Cautious hiring cycles that miss timing windows",
+          "Hiring so slowly you miss the window",
         ],
         start: [
-          "Compounding referral loops and share mechanics",
-          "Friction-light freemium paths or extended trials",
-          "Fast, bounded product bets in adjacent wedges",
-          "Measured geo expansion where demand signal is clear",
+          "Referrals and easy ways to share",
+          "Free tiers or longer trials that are easy to start",
+          "Small, fast product bets next to what already works",
+          "New regions, one at a time, where demand is clear",
         ],
         metric: "Week-over-week growth and market share",
       },
@@ -362,8 +362,8 @@ export const insightDatabase = {
     regimes: [
       {
         key: "SCARCITY",
-        runwayPosture: "Target 24+ months of runway; freeze non-essential spend.",
-        hiringThrottle: "Only roles with <90-day payback or critical retention impact.",
+        runwayPosture: "Aim for 24+ months of runway, and freeze spending you don't need.",
+        hiringThrottle: "Only roles that pay back in under 90 days or keep key customers.",
         budgetFocus: ["Cash conversion wins", "Vendor consolidation", "Runway extensions"],
         watchSignals: [
           "Curve inversion deepening",
@@ -373,22 +373,22 @@ export const insightDatabase = {
       },
       {
         key: "DEFENSIVE",
-        runwayPosture: "Hold 18–24 months of runway; keep optionality limited.",
-        hiringThrottle: "Add capacity only for high-ROI customer expansion.",
+        runwayPosture: "Keep 18–24 months of runway, and keep side bets small.",
+        hiringThrottle: "Only add people where existing customers will clearly pay for it.",
         budgetFocus: ["Gross margin lift", "Retention defenses", "Pricing cleanup"],
         watchSignals: ["Curve stabilizing", "Base rate plateau", "Inflation cooling"],
       },
       {
         key: "VOLATILE",
-        runwayPosture: "Maintain 18 months runway with liquidity buffers.",
-        hiringThrottle: "Favor customer trust and reliability roles over growth bets.",
+        runwayPosture: "Keep 18 months of runway, with cash set aside.",
+        hiringThrottle: "Hire for reliability and customer trust before growth.",
         budgetFocus: ["Risk controls", "Security/compliance", "Resilience spending"],
         watchSignals: ["Risk appetite suppressed", "Flat curve", "Demand hesitancy"],
       },
       {
         key: "EXPANSION",
-        runwayPosture: "12–18 months runway acceptable with growth safeguards.",
-        hiringThrottle: "Hire ahead of demand in revenue and product acceleration roles.",
+        runwayPosture: "12–18 months of runway is fine if growth has guardrails.",
+        hiringThrottle: "Hire ahead of demand in sales and product.",
         budgetFocus: ["Market capture", "Sales capacity", "Product expansion bets"],
         watchSignals: ["Curve steepening", "Base rates easing", "Risk-on funding"],
       },

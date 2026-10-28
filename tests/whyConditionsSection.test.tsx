@@ -48,7 +48,7 @@ describe("why conditions", () => {
     assert.match(html, /would put risk appetite at 44/);
     // 90 tightness with risk appetite at 44 is Freezing, not the Cloudy headline.
     assert.match(html, /conditions would be Freezing, not Cloudy/);
-    assert.match(html, /be scored against past month-ends/);
+    assert.match(html, /doesn(?:&#x27;|')t go back far enough to check against past months/);
   });
 
   it("says nothing about excluded inputs when the basis counts them", () => {
@@ -58,10 +58,10 @@ describe("why conditions", () => {
 
   it("gives a capped score's real distance to its change line", () => {
     const html = render({ saturatedPressure: 110 });
-    assert.match(html, /reads 90 because the score is capped there/);
-    assert.match(html, /without the cap it would read 110/);
+    assert.match(html, /shows 90 because that(?:&#x27;|’|')s as high as the score goes/);
+    assert.match(html, /uncapped it would be 110/);
     // 90 against 70 shows 20 points; 110 against 70 is 40 points of pressure.
-    assert.match(html, /20 points on the score but 40 points of pressure/);
+    assert.match(html, /20 points above its 70 change line on the\s+score, but really 40/);
   });
 
   it("omits the capped note when the score is not capped", () => {

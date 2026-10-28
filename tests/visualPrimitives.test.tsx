@@ -413,7 +413,7 @@ describe("TrustStrip", () => {
     );
     assert.match(
       html,
-      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They are left out because they can(&#x27;|')t be scored against past month-ends\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
+      /<dt[^>]*>Scored on<\/dt><dd[^>]*>The record(&#x27;|')s inputs<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They(&#x27;|')re left out because their data doesn(&#x27;|')t go back far enough to check against past months\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
     );
   });
 });
@@ -446,7 +446,7 @@ describe("MonthStrip", () => {
     /* The count and the run are /history's tiles and stamp; the band keeps them only
        in its text alternative, and its caption is its domain (2026-10-09). */
     const srOnly = /<p class="sr-only">([\s\S]*?)<\/p>/.exec(html)?.[1]?.replace(/<!--[\s\S]*?-->/g, "") ?? "";
-    assert.match(srOnly, /1 change; Cloudy held 3 months\./);
+    assert.match(srOnly, /they changed 1 time, and it(?:’|')s been Cloudy for 3 months\./);
     const caption = /<figcaption[^>]*>([\s\S]*?)<\/figcaption>/.exec(html)?.[1]?.replace(/<[^>]+>/g, "") ?? "";
     assert.equal(caption.replace(/\s+/g, " ").trim(), "Mar 2026 – Jul 2026");
     const visible = html.replace(/<p class="sr-only">[\s\S]*?<\/p>/, "").replace(/<[^>]+>/g, " ");

@@ -199,8 +199,7 @@ export function WhatWouldChangeSection({
                 ) : null}
               </dl>
               <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
-                A change in conditions is not permission to resume. The resume line is the test, and the
-                weather word alone does not cross it.
+                A change in conditions doesn&rsquo;t mean you can resume. Only crossing the resume line does.
               </p>
             </div>
           ) : null}

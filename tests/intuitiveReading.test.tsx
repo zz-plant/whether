@@ -63,7 +63,7 @@ describe("the conditions map says which corner is which", () => {
     const html = renderToStaticMarkup(
       <RegimeRadar tightness={90} riskAppetite={58} tightnessThreshold={70} riskAppetiteThreshold={50} currentRegime="DEFENSIVE" />,
     );
-    assert.match(html, /Easiest bottom right \(Sunny\), hardest top left \(Freezing\)\./);
+    assert.match(html, /Sunny, bottom right, is the easiest; Freezing, top left, the hardest\./);
   });
 });
 

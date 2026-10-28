@@ -245,7 +245,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "slack-post",
       group: "Chat",
       label: "Slack post",
-      hint: "The guidance, its pause line and its change lines, in a short block a channel can skim.",
+      hint: "The guidance and its lines, in a short post people can skim.",
       kind: "text",
       text: brief("slack"),
       copyLabel: "Copy Slack post",

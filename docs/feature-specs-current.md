@@ -4051,6 +4051,29 @@ and full-page phone captures).
 - **The phone footer** drops its four page columns below `md`, where the tab bar and its More sheet
   list every page.
 
+### 1.1.96 Said the way a colleague would say it (2026-10-28)
+
+A pass over every reader sentence the site renders, and the templates that render in other weeks,
+against one test: would a coworker say this out loud in a Monday meeting? "Commit to what protects
+income you have; new bets wait for cheaper money." failed it: a hollow "what" for an object, no
+"the", and bets doing the waiting.
+
+- **The weekly call** (`buildOperatingStanceLine`), for all five cases: "Protect the revenue you
+  already have, and hold off on new bets until money gets cheaper."; "Only say yes to things that
+  bring in cash or that a customer is already counting on."; "Go for things that pay off soon and
+  that you can undo, and hold off on anything you can't take back."; "Keep growing where demand is
+  proven, and agree now on what would make you stop."; "Put more into what's already working, and
+  grow where demand is proven." Still no business model or approval process assumed.
+- **The area rules** (`boundedDecisionRules.ts`), **the conditions' descriptions and lists**
+  (`regimeDescription.ts`, `data/recommendations.ts`), **the positioning line** (`lib/seo.ts`), the
+  confidence line, the held-guidance lines, the conditions map's caption (its "Monday operating
+  ritual" line went), the spell lengths ("It's been Cloudy for 1 month so far"), the trail, the
+  capped-score notes, the reason inputs are left out, /history, /calibration, /about, the runway
+  planner's hints and four answer summaries.
+- Published weeks keep the words they were published with; only the generators changed.
+- Two rewrites first failed `tests/readerClauseShapes.test.tsx` ("…, or what…", "…, or when…") and
+  were recast; the degraded-copy rule still finds "can't" in the held and capped lines.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:

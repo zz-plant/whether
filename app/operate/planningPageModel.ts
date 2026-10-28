@@ -208,7 +208,7 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Areas",
             title: "This week's rule for each area",
-            description: "Each rule pauses at one line and resumes at another, set apart so one noisy week cannot flip it.",
+            description: "Each rule pauses at one line and resumes at another, far enough apart that one noisy week can't flip it back and forth.",
             hashAliases: ["ops-monthly-action-summary-panel"],
             // The step header directly above already states this label, title, and description.
             children: h(ReportSection, {
@@ -227,7 +227,7 @@ export async function buildPlanningPageModel(
                 h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area" }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
-                    ? "To revisit: recheck last week's approvals before adding fixed cost or widening scope."
+                    ? "Before adding fixed costs or growing scope, look again at what you approved last week."
                     : `Nothing to revisit: keep the current plan unless funding pressure crosses ${assessment.thresholds.tightnessRegime}.`,
                 ),
               ),

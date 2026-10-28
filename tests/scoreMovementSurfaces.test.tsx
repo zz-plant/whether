@@ -44,7 +44,7 @@ const week: ReportDynamics = {
 };
 const withoutMovement: ReportDynamics = { ...week, movement: undefined };
 
-const FUNDING_ROW = "All from interest rates.";
+const FUNDING_ROW = "All of it came from interest rates.";
 const RISK_ROW =
   "-11 from startup-market inputs and -2 from the yield curve. The Aug 31 score was built from interest rates alone.";
 
@@ -82,7 +82,7 @@ describe("the homepage's changed-signals table", () => {
     const risk = html.slice(html.indexOf('data-signal="riskAppetite"'), html.indexOf('data-signal="baseRate"'));
     const text = (markup: string) => markup.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ");
 
-    assert.match(text(funding), /What moved it: All from interest rates\./);
+    assert.match(text(funding), /What moved it: All of it came from interest rates\./);
     assert.match(text(risk), /What moved it: -11 from startup-market inputs and -2 from the yield curve\./);
     assert.match(text(risk), /The Aug 31 score was built from interest rates alone\./);
     assert.equal((html.match(/data-movement=/g) ?? []).length, 2, "the two scores, not the market input");
@@ -116,7 +116,7 @@ describe("the evidence page", () => {
     );
 
     assert.equal((html.match(/data-movement=/g) ?? []).length, 2);
-    assert.match(html, /All from interest rates\./);
+    assert.match(html, /All of it came from interest rates\./);
     assert.match(html, /The Aug 31 score was built from interest rates alone\./);
   });
 

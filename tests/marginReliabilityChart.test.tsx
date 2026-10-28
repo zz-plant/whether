@@ -33,7 +33,7 @@ describe("the margin's reliability chart", () => {
        with the chart rather than contradict it. */
     const above = rows.filter((row) => row.held > row.published).length;
     assert.ok(above > 0);
-    assert.match(html, /Every band below held more often than the percent published for it/);
+    assert.match(html, /Every band below held more often than its published percent/);
     assert.equal(above, rows.length, "the archive the paragraph describes still holds the claim");
   });
 

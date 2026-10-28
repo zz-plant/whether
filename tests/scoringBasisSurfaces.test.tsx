@@ -129,7 +129,7 @@ describe("the basis on every surface", () => {
 
     const slack = buildSlackBrief(document);
     assert.match(slack, /Margin: [^\n]* · Scored on the record's inputs$/m, "the Monday post's stamp");
-    assert.match(slack, new RegExp(`^• ${WARNING.replace(/[.()]/g, "\\$&")} They are left out because they can't be scored against past month-ends\\.$`, "m"), "and why it could be wrong");
+    assert.match(slack, new RegExp(`^• ${WARNING.replace(/[.()]/g, "\\$&")} They're left out because their data doesn't go back far enough to check against past months\\.$`, "m"), "and why it could be wrong");
     assert.match(slack, /^Not counted: risk appetite -11 from startup-market inputs\.$/m, "under what moved the scores");
 
     assert.match(buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(document)), /^Scored on the record's inputs\.$/m, "the operator brief");

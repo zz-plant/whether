@@ -72,8 +72,8 @@ export default function AboutPage() {
         <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">How it works</h2>
         <p className="text-sm text-slate-300">
           Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a pause line and a resume line.
-          Set the lines when you make a plan. The gap between pause and resume lines keeps a small move back across
-          the pause line from restarting a decision.
+          Set the lines when you make a plan. Because the pause and resume lines are apart, a small move back
+          across the pause line doesn&rsquo;t restart anything.
         </p>
         <p className="text-sm text-slate-300">
           Each published brief stays on record. The{" "}
@@ -130,15 +130,15 @@ export default function AboutPage() {
               A single hire or purchase. The lines are a policy for a kind of decision, not a verdict on one.
             </li>
             <li>
-              Under six months of runway. Cash decides before markets do, so the guidance leads with cash there.
+              Under six months of runway. At that point cash matters more than the market, so the guidance starts with cash.
             </li>
             <li>
               A company whose funding does not follow U.S. rates: one outside the U.S., or in a sector raising on a boom
               of its own. The scores read U.S. rates only.
             </li>
             <li>
-              Which product work matters most. Rates bear on how much long-payback work a team can carry, not on what
-              to build.
+              Which product work matters most. Rates affect how much slow-payback work a team can afford, not what it
+              should build.
             </li>
           </ul>
         </div>

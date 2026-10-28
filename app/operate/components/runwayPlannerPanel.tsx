@@ -325,7 +325,7 @@ export function RunwayPlannerPanel({
               ? "Worked out: cash over spend less revenue. Typing a figure replaces the cash."
               : runway?.basis === "cash-flow-positive"
                 ? "Revenue covers your spending, so no runway is counting down."
-                : "Or leave blank and enter cash: it is worked out for you."
+                : "Or leave it blank, enter your cash, and we'll work it out."
           }
           placeholder="e.g. 14"
           value={runway && runway.basis !== "cash-flow-positive" ? runway.months : undefined}
@@ -336,7 +336,7 @@ export function RunwayPlannerPanel({
         <OperatorProfileNumberField
           field="monthlyBurnUsd"
           label="Monthly spend ($)"
-          hint="Everything going out a month, before revenue."
+          hint="Everything you spend in a month, before revenue."
           placeholder="e.g. $450k"
           value={profile.monthlyBurnUsd}
           onCommit={(value) => commitProfileField("monthlyBurnUsd", value)}
@@ -355,7 +355,7 @@ export function RunwayPlannerPanel({
         <OperatorProfileNumberField
           field="monthlyGrowthPct"
           label="Monthly revenue growth (%)"
-          hint="Month over month. Blank reads as flat."
+          hint="Monthly growth. Leave it blank for no growth."
           placeholder="e.g. 6"
           value={profile.monthlyGrowthPct}
           onCommit={(value) => commitProfileField("monthlyGrowthPct", value)}

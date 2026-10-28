@@ -430,7 +430,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.doesNotMatch(model.operatingStanceLine, /Stage expansion/i);
-    assert.match(model.operatingStanceLine, /protects income you have/i);
+    assert.match(model.operatingStanceLine, /Protect the revenue you already have/);
     assert.doesNotMatch(model.operatingStanceLine, /approv|retention|renewal/i, "no approval process or business model assumed (2026-10-14)");
   });
 

@@ -42,7 +42,7 @@ export type ScoringBasisKey = "record" | "extended";
  * without the insider noun. Said after the warning on the status strip and in
  * the Monday post.
  */
-export const NOT_COUNTED_REASON = "They are left out because they can't be scored against past month-ends.";
+export const NOT_COUNTED_REASON = "They're left out because their data doesn't go back far enough to check against past months.";
 
 /** The strip's label for the basis cell; the value is the basis's `value`. */
 export const SCORING_BASIS_LABEL = "Scored on";
