@@ -779,8 +779,9 @@ gate, which has no browser: run it after layout work, beside `bun run ui:iterate
   intro, the brief's call block, `/share`'s heading, a reading page's `SecondaryPageHeader`. A page
   that marks nothing is named by its h1. On 2026-10-27, before the head, 7 of 83 frames past the
   first screen named all three.
-- MUST: keep a sticky row below the head, not under it: `top-[var(--running-head-height,0px)]`, as
-  the section chips and the report rail do. The head sets the variable while it shows.
+- MUST: keep a sticky row below the head and the header, not under them:
+  `top-[var(--top-chrome-height,0px)]`, as the section chips and the report rail do. The head sets
+  the variable to where the two end, so it follows the header in and out.
 - MUST: fit every block a reader would frame in one phone frame under the head (about 810px). A
   block that is a list of units marks each unit `data-frame-block` (the `/signals` rows, the area
   rows, the published briefs, the `/concepts` pairs), and each unit carries its own labels: a

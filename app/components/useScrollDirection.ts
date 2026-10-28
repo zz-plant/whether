@@ -19,6 +19,12 @@ type ScrollDirectionState = {
 };
 
 const SCROLL_THRESHOLD = 80;
+/**
+ * How far the page must move before the direction can change. Without it, the 1–2px
+ * bounce at the end of a flick, or a scroll event with no movement at all, read as
+ * "up" and slid the header back over the content.
+ */
+const DIRECTION_SLOP = 8;
 
 export function useScrollDirection(threshold = SCROLL_THRESHOLD): ScrollDirectionState {
   const [state, setState] = useState<ScrollDirectionState>({
@@ -31,16 +37,23 @@ export function useScrollDirection(threshold = SCROLL_THRESHOLD): ScrollDirectio
   const ticking = useRef(false);
 
   useEffect(() => {
+    /* From where the page is, not from 0 (2026-10-27): a reload or Back can restore
+       the scroll position before this runs, and measured from 0 the reader's first
+       scroll, whichever way, read as "down" and hid the header they were reaching for. */
+    lastScrollY.current = window.scrollY;
     const handleScroll = () => {
       if (ticking.current) return;
       ticking.current = true;
 
       window.requestAnimationFrame(() => {
+        ticking.current = false;
         const currentScrollY = window.scrollY;
-        const direction: ScrollDirection =
-          currentScrollY > lastScrollY.current && currentScrollY > threshold
-            ? "down"
-            : "up";
+        const delta = currentScrollY - lastScrollY.current;
+        /* Under the slop nothing changes and the start point stays put, so slow
+           scrolling still adds up to a direction. Near the top the header shows
+           regardless, so that case always updates. */
+        if (Math.abs(delta) < DIRECTION_SLOP && currentScrollY > threshold) return;
+        const direction: ScrollDirection = delta > 0 && currentScrollY > threshold ? "down" : "up";
 
         lastScrollY.current = currentScrollY;
 
@@ -49,8 +62,6 @@ export function useScrollDirection(threshold = SCROLL_THRESHOLD): ScrollDirectio
           isPastThreshold: currentScrollY > threshold,
           scrollY: currentScrollY,
         });
-
-        ticking.current = false;
       });
     };
 

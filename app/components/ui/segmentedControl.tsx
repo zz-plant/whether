@@ -88,6 +88,12 @@ type SegmentedControlProps<Key extends string> = {
    * strip whose sublabels say what each choice changes, which wrapped mid-phrase beside the label.
    */
   stackSublabel?: boolean;
+  /**
+   * The choice is made and the page has not answered yet: `aria-busy` on the group, and the
+   * chosen lamp breathes until it does (controls.css). For a control whose selection waits
+   * on a navigation.
+   */
+  busy?: boolean;
   className?: string;
 };
 
@@ -128,6 +134,7 @@ export function SegmentedControl<Key extends string>({
   layout = "segmented",
   ordinal = false,
   stackSublabel = false,
+  busy = false,
   className,
 }: SegmentedControlProps<Key>) {
   /* One name per rendered group. The home brief mounts three of these, and a
@@ -139,6 +146,7 @@ export function SegmentedControl<Key extends string>({
     <fieldset
       className={className ? `${CONTAINER[layout]} ${className}` : CONTAINER[layout]}
       data-ordinal={ordinal ? "" : undefined}
+      aria-busy={busy || undefined}
     >
       <legend className="sr-only">{ariaLabel}</legend>
       {options.map((option) => (

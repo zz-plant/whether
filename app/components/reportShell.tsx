@@ -132,7 +132,8 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
 
   return (
     <PageShell regime={regime} structuredData={structuredData}>
-      {historicalBanner}
+      {/* The band's top margin is the shell's: on the brief it sits in the flow under the stepper. */}
+      {historicalBanner ? <div className="mt-6">{historicalBanner}</div> : null}
 
       {/* The rail column exists only where the rail renders. `AppSidebar` is
           hidden below lg, but the grid reserved its column from md, so a
@@ -142,7 +143,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
             to a viewport tall, so any page whose content was shorter than the
             rail ended in a screenful of empty space. */}
         {sidebarEnabled ? (
-          <aside className="hidden lg:block lg:sticky lg:top-[calc(var(--running-head-height,0px)+1rem)] lg:self-start lg:max-h-[calc(100vh-2rem-var(--running-head-height,0px))] lg:overflow-y-auto lg:overscroll-contain">
+          <aside className="hidden lg:block lg:sticky lg:top-[calc(var(--top-chrome-height,0px)+1rem)] lg:self-start lg:max-h-[calc(100vh-2rem-var(--top-chrome-height,0px))] lg:transition-[top] lg:duration-300 lg:ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none lg:overflow-y-auto lg:overscroll-contain">
             <AppSidebar sectionLinks={sectionLinks} />
           </aside>
         ) : null}
