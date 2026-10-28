@@ -26,7 +26,7 @@ describe("live data fallback alert", () => {
 
   it("draws as a caveat, not in the crossed-line red the amber and rose ramps resolve to", () => {
     assert.match(html, /weather-caveat-mark/);
-    assert.match(html, /border-caveat-border/);
+    assert.match(html, /weather-caveat-band/);
     assert.doesNotMatch(html, /\b(?:amber|rose)-\d/);
   });
 });

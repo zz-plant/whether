@@ -52,7 +52,7 @@ export const OfflineNotice = ({ recordDateLabel }: { recordDateLabel: string }) 
   return (
     <output
       aria-live="polite"
-      className="flex w-full flex-wrap items-center gap-x-2 gap-y-1 rounded-xl border border-l-4 border-caveat-border bg-caveat-bg px-4 py-3 text-sm leading-6 text-caveat-fg"
+      className="weather-caveat-band flex w-full flex-wrap items-center gap-x-2 gap-y-1 px-4 py-3 text-sm leading-6"
     >
       <span className="weather-caveat-mark font-medium">You are offline.</span>
       <span>

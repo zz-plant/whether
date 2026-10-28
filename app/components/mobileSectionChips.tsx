@@ -62,7 +62,13 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
        it, they scrolled with the chips, so the right fade slid off the edge it
        marks on the first swipe. The wrapper carries `sticky` too, since a
        sticky element sticks within its parent. */
-    <div className="sticky top-[var(--top-chrome-height,0px)] z-20 -mx-4 transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none border-b border-[color:var(--border-default)] bg-[var(--bg-body)]/95 backdrop-blur lg:hidden">
+    /* Opaque, not 95% over a blur (2026-10-27): a backdrop blur showing through 5% of
+       the fill was a full blur pass on every scroll frame for a difference no one can
+       see, under the running head and over the tab bar doing the same. `top` eases
+       with the header rather than a transform: a transform would also shift the row
+       while it is still in the page's flow, over the content under it. Measured at
+       about 0.1ms of layout a frame. */
+    <div className="sticky top-[var(--top-chrome-height,0px)] z-20 -mx-4 transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none border-b border-[color:var(--border-default)] bg-[var(--bg-body)] lg:hidden">
       <nav
         ref={navRef}
         aria-label="Page sections"

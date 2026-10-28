@@ -52,3 +52,13 @@ describe("transitions name what they move", () => {
     assert.deepEqual(await offendersOf([".css"], /transition(?:-property)?:\s*all\b/), []);
   });
 });
+
+describe("the caveat band is drawn by its class", () => {
+  /* ui-ux-standards §XIV. The band's chain (a 4px caveat rule on a caveat fill) was copied
+     by hand into nine components, and by 2026-10-27 two had drifted to a 2px rule, one
+     without its diamond. `.weather-caveat-band` (feedback.css) is the one drawing; a
+     component that spells the fill again is starting a tenth copy. */
+  it("never spells the band's fill or its rule in a component", async () => {
+    assert.deepEqual(await offendersOf([".tsx"], /\bbg-caveat-bg\b|bg-\[var\(--color-caveat-bg\)\]|border-l-4 border-caveat-border/), []);
+  });
+});

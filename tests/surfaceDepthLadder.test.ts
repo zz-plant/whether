@@ -26,6 +26,9 @@ const NOT_CONTAINERS = new Set([
   "weather-kbd",
   // Keys a reader presses (ui-ux-standards §XXVI): a toggle key and a stepper's ends.
   "weather-key", "weather-step-key",
+  // The caveat band (§XIV): a leaf that never encloses a container, and its border is its
+  // meaning, so the ladder must not flatten it when it sits three boxes deep.
+  "weather-caveat-band",
 ]);
 
 const isPrefixedNonContainer = (name: string) =>

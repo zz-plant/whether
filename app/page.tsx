@@ -560,7 +560,7 @@ async function PageContent({
       {/* A caveat, drawn like the archived-week banner below: the amber it
           used is the crossed-line red, so late data read as a crossed line. */}
       {isDegraded ? (
-        <p className="weather-caveat-mark mb-4 rounded-lg border border-l-4 border-caveat-border bg-caveat-bg px-4 py-2.5 text-fluid-micro text-caveat-fg">
+        <p className="weather-caveat-band weather-caveat-mark mb-4 px-4 py-2.5 text-fluid-micro">
           {resolveDataStatusGuidance({
             isFallbackSnapshot: homepage.reportShell.showOfflineBadge,
             degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 1,

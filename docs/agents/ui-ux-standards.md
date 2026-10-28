@@ -247,10 +247,12 @@ take the other's job.
   The diamond is the one mark that is not round: it is a warning sign's shape, not a data marker,
   and its colour is the caveat ink, never the crossed red. A new kind of mark gets a row here
   before it ships.
-- MUST: a caveat that takes a whole band (cached or late data, an archived month, offline) is
-  `border border-l-4 border-caveat-border bg-caveat-bg text-caveat-fg` with the diamond on its
-  first line, as `HistoricalBanner` draws it. The heavy rule and the mark set it apart from an
-  ordinary band. Never the `amber-*` or `rose-*` utilities: both resolve to the crossed red, and
+- MUST: a caveat that takes a whole band (cached or late data, an archived month, offline,
+  guidance held back) is `.weather-caveat-band` (`app/styles/feedback.css`: the 4px caveat rule,
+  the caveat fill and ink) with the diamond on its first line, as `HistoricalBanner` draws it. The
+  heavy rule and the mark set it apart from an ordinary band. Padding and type size belong to the
+  use. Until 2026-10-27 the chain was copied into nine components and two had drifted to a 2px
+  rule; `tests/craftDetails.test.ts` now rejects a component that spells it again. Never the `amber-*` or `rose-*` utilities: both resolve to the crossed red, and
   until 2026-10-21 the homepage's late-data line and `/operate`'s cached-data alert drew in them,
   so late data read as a crossed line.
 - NEVER: `rounded-full` on a text-bearing element. A pill beside a 2px chip is two badge shapes

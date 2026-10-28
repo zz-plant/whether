@@ -36,7 +36,7 @@ export function LiveDataFallbackAlert({
        paints its border and fill unlayered and beat the utilities here. The
        class is gone, so plain utilities win. */
     <section
-      className="mb-6 rounded-lg border border-l-4 border-caveat-border bg-caveat-bg px-5 py-4 text-sm text-caveat-fg"
+      className="weather-caveat-band mb-6 px-5 py-4 text-sm"
       aria-live="polite"
     >
       <p className="weather-caveat-mark font-semibold">{resolveDataStatusGuidance({ isFallbackSnapshot: true })}</p>

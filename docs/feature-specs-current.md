@@ -3997,6 +3997,31 @@ Follow-ups to §1.1.92.
   still on a desktop and at 360px; at 390px the four conditions an archived week lists wrap one line
   more than this week's one, a 21px move.
 
+### 1.1.94 What a technical audit found (2026-10-27)
+
+An audit of eleven routes at 390px and 1440px in both themes (contrast against the composited
+ground, reflow at 320px, names, labels, headings, motion, scroll cost) passed on contrast, reflow,
+names and labels in both themes, and found:
+
+- **One caveat band.** `.weather-caveat-band` (`app/styles/feedback.css`) draws the 4px caveat rule,
+  fill and ink that nine components had copied by hand. Two had drifted to a 2px rule, and "What the
+  headline reading leaves out" had no diamond; both now draw the band, with the diamond.
+  `tests/craftDetails.test.ts` rejects a component that spells the chain again.
+- **/operate names each step once.** A section under a step that already states its title renders
+  no heading of its own and is named by `aria-label`; it kept an `sr-only` h4 with the step's words,
+  so the heading list read each step twice, two levels down. The decision test's body is a `div`, not
+  a second region with the same name.
+- **The conditions map's ping pulses twice and stops** (2 × 2.4s). It looped for as long as the page
+  was open (WCAG 2.2.2).
+- **An interrupted scrub ends where it started.** The `/history` timeline drops the drag on
+  `pointercancel`, a lost capture, or the window losing focus, without committing, and a second
+  pointer cannot take the handle mid-drag.
+- **Scrolling re-renders nothing that did not change.** The scroll-direction state no longer carries
+  a `scrollY` no one read, and the running head keeps its facts when they are the same: script per
+  scroll frame went from about 1.0ms to 0.25ms on a phone, and layouts per frame from 0.5 to 0.
+- **The running head, section chips and tab bar are opaque** instead of 95% over a backdrop blur, a
+  blur pass per frame that showed through 5% of the fill.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
 in the order a reader asks:

@@ -8,9 +8,11 @@ type ReportSectionProps = {
   variant?: "unified" | "split";
   headingLevel?: "h2" | "h3" | "h4";
   /**
-   * Hide the visible header when an enclosing surface (e.g. a stepper step) already
-   * states this section's title and description. The heading is still rendered
-   * for screen readers so `aria-labelledby` and the `id` anchor keep working.
+   * Hide the header when an enclosing surface (e.g. a stepper step) already states this
+   * section's title and description. No heading is rendered, visible or not: the step's own
+   * heading is the one a screen reader lists, and the section is named by `aria-label`.
+   * It used to keep an `sr-only` h4 with the same words, so /operate's heading list read
+   * "This week's rule for each area" twice, the second time two levels down (2026-10-27).
    */
   hideHeader?: boolean;
   /**
@@ -72,13 +74,10 @@ export function ReportSection({
         data-page-section={id}
         tabIndex={-1}
         className="space-y-2 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
-        aria-labelledby={headingId}
+        aria-labelledby={hideHeader ? undefined : headingId}
+        aria-label={hideHeader ? title : undefined}
       >
-        {hideHeader ? (
-          <HeadingTag id={headingId} className="sr-only">
-            {title}
-          </HeadingTag>
-        ) : (
+        {hideHeader ? null : (
         <div className="weather-panel px-5 py-4">
           <div className="flex items-center gap-1">
             <HeadingTag id={headingId} className="max-w-2xl text-base font-semibold tracking-[-0.02em] text-slate-100 sm:text-lg">

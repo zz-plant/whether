@@ -58,7 +58,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
           </div>
 
           {isActive ? (
-            <div className="mt-3 rounded-md border border-l-4 border-caveat-border bg-caveat-bg px-3 py-2 text-xs text-caveat-fg">
+            <div className="weather-caveat-band mt-3 px-3 py-2 text-xs">
               <div className="flex items-center justify-between gap-2">
                 <span className="weather-caveat-mark">Viewing {currentMonth}/{currentYear}</span>
                 <button type="button" onClick={clearDate} className="underline decoration-slate-600 underline-offset-4 hover:decoration-current">Return to current</button>

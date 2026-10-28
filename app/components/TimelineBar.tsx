@@ -113,6 +113,11 @@ export function TimelineBar({
   const fineAnchorRef = useRef<{ clientX: number; index: number } | null>(null);
   const lastTickRef = useRef<number | null>(null);
   const yearRailRef = useRef<HTMLDivElement>(null);
+  /* The pointer that owns the drag. A second finger landing mid-drag is ignored
+     rather than taking the handle, and a release clears this before it lets go
+     of capture, so the lostpointercapture that release fires is not read as an
+     interruption. */
+  const dragPointerRef = useRef<number | null>(null);
 
   // The record is bundled JSON, so it is available during the first render on
   // both sides. Loading it in an effect instead made the bar pop in after
@@ -230,6 +235,8 @@ export function TimelineBar({
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
+      if (dragPointerRef.current !== null) return;
+      dragPointerRef.current = event.pointerId;
       event.currentTarget.setPointerCapture(event.pointerId);
       setIsDragging(true);
       fineAnchorRef.current = null;
@@ -242,6 +249,7 @@ export function TimelineBar({
 
   const handlePointerMove = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
+      if (isDragging && event.pointerId !== dragPointerRef.current) return;
       const index = indexFromPointer(
         event.clientX,
         event.shiftKey,
@@ -262,6 +270,8 @@ export function TimelineBar({
 
   const handlePointerUp = useCallback(
     (event: React.PointerEvent<HTMLDivElement>) => {
+      if (event.pointerId !== dragPointerRef.current) return;
+      dragPointerRef.current = null;
       if (isDragging) {
         const index = indexFromPointer(
           event.clientX,
@@ -289,6 +299,33 @@ export function TimelineBar({
       setHoverIndex(null);
     }
   }, [isDragging]);
+
+  /* An interrupted drag ends where it started (2026-10-27). The browser can take
+     the gesture (pointercancel), capture can be lost, or the window can lose
+     focus, and none of those is a release: nothing cleared the drag, so the
+     handle stayed live and followed the next pointer that crossed the track with
+     no button down. The month under the handle when the gesture broke is not
+     what the reader chose, so it is dropped, not committed. */
+  const abandonDrag = useCallback(() => {
+    if (dragPointerRef.current === null) return;
+    const node = trackRef.current;
+    const pointerId = dragPointerRef.current;
+    dragPointerRef.current = null;
+    setIsDragging(false);
+    setDragIndex(null);
+    fineAnchorRef.current = null;
+    try {
+      if (node?.hasPointerCapture(pointerId)) node.releasePointerCapture(pointerId);
+    } catch {
+      // Capture already gone with the gesture.
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isDragging) return undefined;
+    window.addEventListener("blur", abandonDrag);
+    return () => window.removeEventListener("blur", abandonDrag);
+  }, [isDragging, abandonDrag]);
 
   const canGoPrevious = handleIndex > 0;
   const canGoNext = handleIndex < liveIndex;
@@ -555,6 +592,8 @@ export function TimelineBar({
         onPointerDown={handlePointerDown}
         onPointerMove={handlePointerMove}
         onPointerUp={handlePointerUp}
+        onPointerCancel={abandonDrag}
+        onLostPointerCapture={abandonDrag}
         onPointerLeave={handlePointerLeave}
         onKeyDown={handleKeyDown}
         tabIndex={0}

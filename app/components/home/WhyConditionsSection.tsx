@@ -121,12 +121,11 @@ export function WhyConditionsSection({
             </tbody>
           </table>
 
-    
         </div>
         <div className="min-w-0">
           {notCounted.length > 0 ? (
-            <div className="mt-5 max-w-3xl rounded-sm xl:mt-0 border-l-2 border-[color:var(--color-caveat-border)] bg-[var(--color-caveat-bg)] py-3 pl-4 pr-3" data-excluded-inputs>
-              <p className="text-fluid-xs font-semibold text-caveat-fg">What the headline reading leaves out</p>
+            <div className="weather-caveat-band mt-5 max-w-3xl px-4 py-3 xl:mt-0" data-excluded-inputs>
+              <p className="weather-caveat-mark text-fluid-xs font-semibold">What the headline reading leaves out</p>
               <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
                 {warning
                   ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`

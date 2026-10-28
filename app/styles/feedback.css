@@ -44,6 +44,22 @@
   }
 }
 
+/* The caveat band (ui-ux-standards §XIV): a whole band that says "read this with
+   care" (cached or late data, an archived month, offline, guidance held back).
+   The 4px rule and the diamond on its first line set it apart from an ordinary
+   panel, and its ink is the caveat's, never the crossed red. One class since
+   2026-10-27: the chain was copied by hand into nine components, and two had
+   drifted to a 2px rule, one of them without its diamond. Padding and type size
+   stay with each use; a band across a page and a note inside a card are not one
+   size. A leaf, never a container (tests/surfaceDepthLadder.test.ts). */
+.weather-caveat-band {
+  border: 1px solid var(--color-caveat-border);
+  border-left-width: 4px;
+  border-radius: var(--radius-lg);
+  background-color: var(--color-caveat-bg);
+  color: var(--color-caveat-fg);
+}
+
 /* The caveat mark: an outlined diamond, the shape of a warning sign, before
    anything that says "read this reading with care" (cached sources, a
    scoring note, an archived week, guidance held back). Its own shape because
