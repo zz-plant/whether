@@ -52,7 +52,7 @@ export const HistoricalBanner = ({
   return (
     <aside
       aria-label={`Viewing archived data for ${monthLabel}`}
-      className="mt-6 flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-l-4 border-caveat-border bg-caveat-bg px-4 py-2.5"
+      className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-l-4 border-caveat-border bg-caveat-bg px-4 py-2.5"
     >
       {/* Not `.type-label`: it applies a hardcoded `text-slate-400` that outranks a
           Tailwind color utility here, so the eyebrow rendered grey in both themes

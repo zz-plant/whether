@@ -567,17 +567,6 @@ async function PageContent({
           })}
         </p>
       ) : null}
-      {historicalSelection ? (
-        <div className="mx-auto weather-brief-measure">
-          <HistoricalBanner
-            year={historicalSelection.year}
-            month={historicalSelection.month}
-            asOfLabel={formatDateUTC(historicalSelection.asOf)}
-            liveHref="/"
-            published={archivedPublishedNotice}
-          />
-        </div>
-      ) : null}
       <div className="mx-auto weather-brief-measure space-y-4 sm:space-y-8">
         <div className="weather-brief-flow">
           {/* Above the brief, not after it. This is the orientation line for a
@@ -619,6 +608,20 @@ async function PageContent({
               history={regimeHistory}
             />
           </div>
+          {/* Under the stepper, not above the page (2026-10-27): inserted above, the
+              band pushed the key a reader had just pressed 142px down on a desktop and
+              150–216px on a phone, so stepping back a second month meant finding it
+              again. Here it lands beside the control that opened it, still above the
+              call, and stepping between archived months moves nothing. */}
+          {historicalSelection ? (
+            <HistoricalBanner
+              year={historicalSelection.year}
+              month={historicalSelection.month}
+              asOfLabel={formatDateUTC(historicalSelection.asOf)}
+              liveHref="/"
+              published={archivedPublishedNotice}
+            />
+          ) : null}
           {/* No timeline scrubber above the call any more. The meta row's chevrons
               and calendar picker are the period controls; the regime stripe
               below the drivers is the memory rail (spec Block G: last months, no

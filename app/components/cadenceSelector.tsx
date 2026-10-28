@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams, usePathname } from "next/navigation";
-import { useCallback } from "react";
+import { useCallback, useState } from "react";
 import { useHydrated } from "./browserSource";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 
@@ -59,11 +59,19 @@ export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => 
      the address bar happens to hold, so a cast would have the type system
      vouch for a string nobody validated. An unknown value falls back to the
      default, which is what the server rendered for it too. */
-  const requested = hydrated ? searchParams?.get("cadence") : null;
-  const current = CADENCES.find((option) => option.key === requested)?.key ?? DEFAULT_CADENCE;
+  const inAddress = hydrated ? searchParams?.get("cadence") : null;
+  const current = CADENCES.find((option) => option.key === inAddress)?.key ?? DEFAULT_CADENCE;
+  /* The choice shows the moment it is made (2026-10-27). The selection used to be
+     read only from the address, which changes when the server's answer lands: on a
+     phone, which never prefetches because it never hovers, a tap lit nothing for
+     about 800ms. Until the address catches up the group is busy and the chosen
+     lamp breathes; once it does, the address is the only source again. */
+  const [chosen, setChosen] = useState<CadenceKey | null>(null);
+  if (chosen !== null && chosen === current) setChosen(null);
 
   const navigate = useCallback(
     (key: CadenceKey) => {
+      setChosen(key);
       router.replace(buildHref(pathname, searchParams, key), { scroll: false });
       onNavigate?.(key);
     },
@@ -80,7 +88,8 @@ export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => 
   return (
     <SegmentedControl
       options={CADENCES}
-      value={current}
+      value={chosen ?? current}
+      busy={chosen !== null}
       onSelect={navigate}
       onPrefetch={prefetch}
       ariaLabel="Planning horizon"

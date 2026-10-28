@@ -27,8 +27,11 @@ const DATE_IN_WORDS = /(?:Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[a-z]*
  * that marks nothing still gets the site and its own h1.
  *
  * It follows the header: under it while the header shows, in its place once the header
- * slides away, by transform on the header's curve. `--running-head-height` on the root
- * tells the sticky rows below it (section chips, the report rail) where to stop.
+ * slides away, by transform on the header's curve. `--top-chrome-height` on the root
+ * tells the sticky rows below it (section chips, the report rail) where to stop: the foot
+ * of the header and the head together. It was the head's height alone, so when the header
+ * came back on a scroll up, the head moved down under it and covered the section chips,
+ * at the moment a reader scrolls up to get around the page (2026-10-27).
  */
 export function RunningHead() {
   const pathname = usePathname();
@@ -74,16 +77,18 @@ export function RunningHead() {
   }, [pathname]);
 
   const visible = shown && facts !== null;
-  const twoLines = Boolean(facts?.call);
+  /* The brief's call line only while the header is away: with the header back, the
+     header, both lines and the tab bar held about 175px of an 844px phone. */
+  const callLine = Boolean(facts?.call) && headerHidden;
+  const offset = headerHidden ? 0 : headerHeight;
   useEffect(() => {
-    // The bar is 2rem tall, a second line on a phone brief adds 1.75rem.
-    const height = !visible ? "0px" : twoLines && window.innerWidth < 768 ? "3.75rem" : "2rem";
-    document.documentElement.style.setProperty("--running-head-height", height);
-  }, [visible, twoLines]);
+    // The bar is 2rem tall, the call line on a phone brief adds 1.75rem.
+    const head = !visible ? "0rem" : callLine && window.innerWidth < 768 ? "3.75rem" : "2rem";
+    document.documentElement.style.setProperty("--top-chrome-height", `calc(${offset}px + ${head})`);
+  }, [visible, callLine, offset]);
 
   if (!visible || !facts) return null;
 
-  const offset = headerHidden ? 0 : headerHeight;
   const place = section ?? facts.title;
   /* The page's own address beside the host (2026-10-27): a screenshot cannot be
      clicked, so the frame says where the rest of it is, short enough to type. */
@@ -152,7 +157,7 @@ export function RunningHead() {
         </p>
         <span aria-hidden="true" className="shrink-0 max-sm:hidden">{address}</span>
       </div>
-      {facts.call ? (
+      {facts.call && callLine ? (
         /* The brief's own line on a phone: the call, which is what a screenshot of the
            brief is for, and the jump to what it changes. The desktop brief keeps its
            floating strip for both. */

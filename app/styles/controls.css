@@ -199,7 +199,9 @@ input:not([type="range"]) {
   position: absolute;
   left: 1rem;
   top: 1rem;
-  z-index: 50;
+  /* Above the sticky header (z-50, and later in the document, so it won the tie and
+     covered the link on every route) and the running head. */
+  z-index: 60;
   transform: translateY(-200%);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-strong);
@@ -437,6 +439,25 @@ details[open] > summary[data-chevron]::after,
 .peer:checked + .weather-segment-option .weather-segment-lamp {
   background-color: var(--accent-action);
   box-shadow: 0 0 0 2px var(--accent-border-soft), 0 0 6px var(--accent-action);
+}
+
+/* Chosen, and the page has not answered yet (`busy` on SegmentedControl): the lamp
+   breathes until it does. The selection itself moved at once; this only says the
+   brief under it is still the old one. Loading, so a keyframe (§XXIII), with a
+   reduced-motion end state of a steady lamp. */
+.weather-segment-track[aria-busy="true"] .peer:checked + .weather-segment-option .weather-segment-lamp {
+  animation: weather-lamp-wait 0.8s ease-in-out infinite alternate;
+}
+
+@keyframes weather-lamp-wait {
+  from { opacity: 1; }
+  to { opacity: 0.3; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-segment-track[aria-busy="true"] .peer:checked + .weather-segment-option .weather-segment-lamp {
+    animation: none;
+  }
 }
 
 /* An ordered scale (runway bands, the funded stages): a rule engraved along the

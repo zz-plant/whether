@@ -3824,7 +3824,7 @@ every frame passes on every route, at both sizes (`docs/agents/ui-ux-standards.m
   glyph and its two actions (the card as an image, the call as text): 448px wide at the foot of a
   two-column section, its weather word, call and margin covered the text being screenshotted.
 - **Sticky rows clear it.** The section chips and the report rail stick at
-  `var(--running-head-height)`, which the head sets while it shows.
+  `var(--top-chrome-height)`, which the head sets to the foot of the header and itself together.
 - **Blocks fit a phone frame.** The `/signals` rows, the decision-area rows, the published briefs on
   `/history` and the `/concepts` pairs are marked as the units they are on a phone
   (`data-frame-block`); each `/signals` row prints "Since {date}" over its change, the column head
@@ -3951,6 +3951,34 @@ commitments and keep spend flexible."
   direction and a held week's headline, and no surface prints it on its own.
 - `tests/weeklyClaimParity.test.tsx` holds the agent state, CLI, memo and investor update to the
   guidance, and checks the agent state, memo and investor update for the second action.
+
+### 1.1.92 Controls stay under the finger (2026-10-27)
+
+An interaction audit of five routes at 390px and 1440px (focus walk, disclosures, controls timed
+from press to change, forms) found eight things that moved, hid or said the wrong thing:
+
+- **Sticky rows clear the header too.** The section chips and the report rail stick at
+  `--top-chrome-height`, the foot of the header and the running head together. They stuck at the
+  head's height alone, so when the header came back on a scroll up the chips went under it.
+- **The header's direction** starts from where a reloaded or restored page is, not from 0, and
+  ignores moves under 8px. A reload mid-page followed by a scroll up hid the header.
+- **The running head drops the brief's call line while the header shows.** Header, both lines and
+  the tab bar held about 175px of an 844px phone.
+- **Plan horizon** lights the chosen option at once and marks the group `aria-busy`, its lamp
+  breathing, until the address catches up. It waited about 800ms on a phone, which never prefetches.
+- **The archived-view band sits under the week stepper.** Above the page, it pushed the stepper
+  142px down on a desktop and 150–216px on a phone. Stepping between archived months now moves
+  nothing; on a first visit the conditions legend above still changes height between this week and
+  an archived one.
+- **Copy Brief opens the share sheet on a touch screen only, labelled "Share Brief".** Desktop
+  browsers with a share menu, and the `C` shortcut, copy the Slack block. Closing the sheet does
+  nothing; any other refusal falls back to the copy.
+- **Screen-reader text is never a scroll anchor** (`.sr-only { overflow-anchor: none }`). Chrome
+  anchored to the conditions map's text alternative, centred in its figure, so opening "Readings on
+  this chart" on a phone scrolled the page 81px.
+- **The subscribe form validates in its own message line** (`noValidate`): a bad address set
+  `aria-invalid` and printed under the form instead of a browser bubble.
+- **"Skip to content"** draws above the sticky header (z-index 60), which covered it on every route.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

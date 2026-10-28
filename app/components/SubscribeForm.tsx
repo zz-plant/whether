@@ -177,7 +177,11 @@ export function SubscribeForm({
         />
       ) : null}
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+      {/* `noValidate` (2026-10-27): the browser's own check stopped a bad address before
+          `handleSubmit` ran, so a reader got a bubble that vanished on the next tap, with no
+          `aria-invalid` and nothing in the message line below. The request helpers check
+          both fields and say what is wrong where every other failure here is said. */}
+      <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-2">
         {channel === "email" ? (
           <div className="flex flex-col gap-2 sm:flex-row">
             <label htmlFor="subscribe-email" className="sr-only">Email address</label>

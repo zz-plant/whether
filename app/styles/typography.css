@@ -192,3 +192,12 @@ html {
   scroll-padding-bottom: calc(env(safe-area-inset-bottom) + 6rem);
 }
 
+/* Text no one sees is never what the page holds still. Chrome keeps the scroll position
+   pinned to a node on screen, and it picked the conditions map's screen-reader paragraph:
+   absolutely positioned in a vertically centred figure, it moved by half of whatever the
+   figure gained, so opening "Readings on this chart" on a phone scrolled the page 81px
+   under the reader's thumb (2026-10-27). */
+.sr-only {
+  overflow-anchor: none;
+}
+
