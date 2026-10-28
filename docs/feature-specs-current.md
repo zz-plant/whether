@@ -4088,8 +4088,8 @@ routes against what they search ("should we hire now", "startup funding market",
   titles for /signals, /operate, /resources, /calibration ("How often the guidance held up") and the
   scenarios page, and plainer descriptions for /history and /history/compare.
 - **The strip's labels.** "Margin" is "Room before a change" (`MARGIN_LABEL`), and the short form
-  "3 pts from a change"; "Scored on: The record's inputs" is "Based on: The same data as every past
-  month". Every paste, the email, the slide, the summaries and the published-brief exports read the
+  "3 pts from a change"; "Scored on: The record's inputs" is "Based on: The same data we used for past
+  months". Every paste, the email, the slide, the summaries and the published-brief exports read the
   label rather than spelling "Margin:", so they changed with it; the week-41 video was regenerated.
 - **Plain labels.** "Affects:" (was "Governs:"), "Scores on this chart", "By year", "How often a close
   call held", "Warned a month ahead", "Typical length", "Changed back within a month", "When to look

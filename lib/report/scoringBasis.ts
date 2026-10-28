@@ -50,8 +50,8 @@ export const SCORING_BASIS_LABEL = "Based on";
 const BASIS_COPY: Record<ScoringBasisKey, { value: string; sentence: string }> = {
   /* Said without "the record" (2026-10-28): the reader's question is whether this week is
      comparable with the past, so the value says that. */
-  record: { value: "The same data as every past month", sentence: "Scored on the same data as every past month." },
-  extended: { value: "More data than past months have", sentence: "Scored on more data than past months have." },
+  record: { value: "The same data we used for past months", sentence: "Scored on the same data we used for past months." },
+  extended: { value: "More data than we had for past months", sentence: "Scored on more data than we had for past months." },
 };
 
 /*

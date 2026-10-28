@@ -31,7 +31,7 @@ serveUnreachableUpstreams();
  * startup-market inputs take risk appetite from 52 to 41, across its change
  * line, so it carries a warning too.
  */
-const RECORD = "Scored on the same data as every past month.";
+const RECORD = "Scored on the same data we used for past months.";
 const WARNING = "Startup-market inputs would put risk appetite at 41, below its change line.";
 
 const liveSnapshot = () =>
@@ -57,7 +57,7 @@ describe("the basis on every surface", () => {
         })}
       />,
     );
-    assert.match(html, /<dt[^>]*>Based on<\/dt><dd[^>]*>The same data as every past month<span[^>]*data-basis-warning/);
+    assert.match(html, /<dt[^>]*>Based on<\/dt><dd[^>]*>The same data we used for past months<span[^>]*data-basis-warning/);
 
     /* A phone's one-line strip prints the warning's four-word form, with the full
        sentence from sm (2026-10-27): it ran four lines of every phone intro. */
@@ -96,12 +96,12 @@ describe("the basis on every surface", () => {
     const page = await import("../app/brief/[week]/page");
     const html = renderToStaticMarkup(await page.default({ params: Promise.resolve({ week: "2026-w41" }) }));
     const card = html.slice(html.indexOf('id="share-ready-artifact"'), html.indexOf("What changed this week"));
-    assert.match(card, /Scored on more data than past months have/, "a week frozen before the record basis says it counted more");
+    assert.match(card, /Scored on more data than we had for past months/, "a week frozen before the record basis says it counted more");
 
     const w41 = findPublishedBrief("2026-w41");
     assert.ok(w41);
-    assert.match(buildPublishedBriefSlackUpdate(w41), /· scored on more data than past months have$/m);
-    assert.match(buildPublishedBriefEmailUpdate(w41), /^• Scored on more data than past months have\.$/m);
+    assert.match(buildPublishedBriefSlackUpdate(w41), /· scored on more data than we had for past months$/m);
+    assert.match(buildPublishedBriefEmailUpdate(w41), /^• Scored on more data than we had for past months\.$/m);
   });
 
   it("is on /trust, with what this week's inputs outside the record would make the scores", () => {
@@ -123,17 +123,17 @@ describe("the basis on every surface", () => {
 
     const island = briefArtifactOf(document);
     for (const format of BRIEF_FORMATS) {
-      assert.match(formatBriefArtifact(island, format.id, "https://origin.test"), /scored on the same data as every past month/, `the ${format.label} paste`);
+      assert.match(formatBriefArtifact(island, format.id, "https://origin.test"), /scored on the same data we used for past months/, `the ${format.label} paste`);
     }
-    assert.match(formatMeetingSlideMarkdown(briefArtifactToSlidePayload(island)), /scored on the same data as every past month/, "the slide");
+    assert.match(formatMeetingSlideMarkdown(briefArtifactToSlidePayload(island)), /scored on the same data we used for past months/, "the slide");
 
     const slack = buildSlackBrief(document);
-    assert.match(slack, /Room before a change: [^\n]* · Scored on the same data as every past month$/m, "the Monday post's stamp");
+    assert.match(slack, /Room before a change: [^\n]* · Scored on the same data we used for past months$/m, "the Monday post's stamp");
     assert.match(slack, new RegExp(`^• ${WARNING.replace(/[.()]/g, "\\$&")} They're left out because their data doesn't go back far enough to check against past months\\.$`, "m"), "and why it could be wrong");
     assert.match(slack, /^Not counted: risk appetite -11 from startup-market inputs\.$/m, "under what moved the scores");
 
-    assert.match(buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(document)), /^Scored on the same data as every past month\.$/m, "the operator brief");
-    assert.match(formatInvestorUpdateSnippet(buildInvestorUpdateSnippetParts(document, []), null), /scored on the same data as every past month\./, "the investor update");
+    assert.match(buildWeeklyOperatorBriefPlainText(buildWeeklyOperatorBriefPayload(document)), /^Scored on the same data we used for past months\.$/m, "the operator brief");
+    assert.match(formatInvestorUpdateSnippet(buildInvestorUpdateSnippetParts(document, []), null), /scored on the same data we used for past months\./, "the investor update");
 
     const { sendWeeklyBrief } = await import("../lib/email/sendWeeklyBrief");
     const { getSubscriberStore, resetSubscriberStore } = await import("../lib/email/subscriberStore");
@@ -151,7 +151,7 @@ describe("the basis on every surface", () => {
       resetSubscriberStore();
     }
     assert.match(mailed[0]?.text ?? "", new RegExp(`^${RECORD} ${WARNING}$`.replace(/[()]/g, "\\$&"), "m"), "the email's text");
-    assert.match(mailed[0]?.html ?? "", /Scored on the same data as every past month\./, "and its HTML");
+    assert.match(mailed[0]?.html ?? "", /Scored on the same data we used for past months\./, "and its HTML");
   });
 
   it("is an additive field in the API and MCP answers, beside every field they had", async () => {
@@ -159,7 +159,7 @@ describe("the basis on every surface", () => {
     const state = buildAgentState(context);
     assert.deepEqual(agentStateSchema.parse(state), state, "the published schema describes it");
     assert.equal(state.scoringBasis.key, "record");
-    assert.equal(state.scoringBasis.label, "Scored on the same data as every past month");
+    assert.equal(state.scoringBasis.label, "Scored on the same data we used for past months");
     assert.equal(state.scoringBasis.warning, context.reportData.scoringBasis.warning);
     assert.deepEqual(state.scores.riskAppetite.moved.map((part) => part.source).includes("startupMarket"), false, "no part of a move is an input left out");
 

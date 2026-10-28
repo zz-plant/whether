@@ -103,7 +103,7 @@ describe("the record basis", () => {
     const basis = resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment });
 
     assert.equal(basis.key, "record");
-    assert.equal(basis.sentence, "Scored on the same data as every past month.");
+    assert.equal(basis.sentence, "Scored on the same data we used for past months.");
     assert.deepEqual(basis.notCounted, [
       {
         metric: "riskAppetite",
@@ -157,7 +157,7 @@ describe("the record basis", () => {
       engineVersion: "engine-2026-10-06",
       assessment: evaluateRegime(OCT_7, DEFAULT_THRESHOLDS, [...ON_RECORD_READS, ...STARTUP_READS]),
     });
-    assert.equal(extended.sentence, "Scored on more data than past months have.");
+    assert.equal(extended.sentence, "Scored on more data than we had for past months.");
     assert.equal(extended.warning, null, "its scores already counted them");
   });
 });

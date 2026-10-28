@@ -3,12 +3,12 @@
   "assets": [
     {
       "slug": "2026-w41",
-      "sourceHash": "25ca7de2e7456ac35624348374203e3662d1897f5ddd7f1b09e9cb3b4abba9cb",
+      "sourceHash": "17a3c4c89c758b3e1bd7a29b6d78866f3b6b444fe85a4bc6e8a44912e004f934",
       "recordDate": "2026-10-06",
       "publishedAt": "2026-10-06T00:00:00.000Z",
-      "video": "/videos/briefs/2026-w41-25ca7de2e7456ac3.mp4",
-      "poster": "/videos/briefs/2026-w41-25ca7de2e7456ac3.png",
-      "captions": "/videos/briefs/2026-w41-25ca7de2e7456ac3.vtt",
+      "video": "/videos/briefs/2026-w41-17a3c4c89c758b3e.mp4",
+      "poster": "/videos/briefs/2026-w41-17a3c4c89c758b3e.png",
+      "captions": "/videos/briefs/2026-w41-17a3c4c89c758b3e.vtt",
       "width": 1280,
       "height": 720,
       "duration": 12,

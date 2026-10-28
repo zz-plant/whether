@@ -296,14 +296,14 @@ describe("AreaTable moved rows", () => {
 });
 
 describe("TrustStrip", () => {
-  const onRecord = { key: "record" as const, value: "The same data as every past month", warning: null };
+  const onRecord = { key: "record" as const, value: "The same data we used for past months", warning: null };
 
   it("is four facts and, off /trust, a link", () => {
     const html = renderToStaticMarkup(
       <TrustStrip recordDateLabel="Sep 18, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="HIGH" couldChangeNextWeek={false} basis={onRecord} href="/trust" />,
     );
     assert.deepEqual([...html.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]), ["Data as of", "Sources", "Room before a change", "Based on"]);
-    assert.match(html, /The same data as every past month/, "the call states its basis");
+    assert.match(html, /The same data we used for past months/, "the call states its basis");
     assert.match(html, /Not expected to change next week/, "the margin cell says whether the call could change");
     assert.match(html, /href="\/trust"/);
     assert.doesNotMatch(html, /HIGH|MED|LOW/, "the engine's confidence key must not reach the reader");
@@ -413,7 +413,7 @@ describe("TrustStrip", () => {
     );
     assert.match(
       html,
-      /<dt[^>]*>Based on<\/dt><dd[^>]*>The same data as every past month<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They(&#x27;|')re left out because their data doesn(&#x27;|')t go back far enough to check against past months\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
+      /<dt[^>]*>Based on<\/dt><dd[^>]*>The same data we used for past months<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They(&#x27;|')re left out because their data doesn(&#x27;|')t go back far enough to check against past months\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
     );
   });
 });
