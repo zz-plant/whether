@@ -218,7 +218,7 @@ describe("published brief date-pinned exports", () => {
 
     assert.match(email, /Whether Leadership Update — Week of Jul 27, 2026/, "the week by its Monday");
     assert.match(email, /Conditions: (Sunny|Cloudy|Stormy|Freezing)\n/);
-    assert.match(email, /^Margin: within reach of the line$/m);
+    assert.match(email, /^Room before a change: within reach of the line$/m);
     assert.match(email, /^• Guidance: Conditions are tightening\. Keep expansion selective/m);
     assert.doesNotMatch(email, /Executive summary:|Action now:/);
     assert.match(email, /What changed this week:\nConditions tightened\. This record does not name the earlier reading it compared with\./);
@@ -251,7 +251,7 @@ describe("published brief date-pinned exports", () => {
     const board = buildPublishedBriefBoardUpdate(july30Brief);
 
     assert.match(board, /^Whether Board Memo — Week of/m);
-    assert.match(board, /^Macro Posture: (Sunny|Cloudy|Stormy|Freezing) \(Margin: .+\)$/m);
+    assert.match(board, /^Macro Posture: (Sunny|Cloudy|Stormy|Freezing) \(Room before a change: .+\)$/m);
     assert.match(board, /^Executive Guidance: .+/m);
     assert.match(board, /^Posture Flips If: .+/m);
     assert.match(board, /Operating Limits by Area:/);

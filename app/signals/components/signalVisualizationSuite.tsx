@@ -282,7 +282,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             {formatPercent(treasury.yields.oneMonth)} · 3M {formatPercent(treasury.yields.threeMonth ?? null)} · 2Y{" "}
             {formatPercent(treasury.yields.twoYear)} · 10Y {formatPercent(treasury.yields.tenYear)}
           </p>
-          <p className="text-slate-400">The charts plot month-end readings.</p>
+          <p className="text-slate-400">The charts plot end-of-month readings.</p>
         </div>
 
         {/* Five panels labelled entirely in maturities and spreads. The key goes

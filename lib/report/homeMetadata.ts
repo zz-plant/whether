@@ -11,7 +11,9 @@ export type { HomePageSearchParams };
 // Keeps "macro" (the search term people actually type) while leading with the
 // ruled stance noun and naming the operator this is built for rather than
 // "leadership teams", which describes a buying committee nobody has met yet.
-const HOME_TITLE = "Weekly Operating Guidance for Startup Leaders";
+/* The words people search for first, then the category line verbatim (docs/editorial-guardrails.md):
+   nobody types "operating guidance" (2026-10-28). */
+const HOME_TITLE = "When to Hire, Raise and Spend: Weekly Operating Guidance for Startup Leaders";
 const HOME_DESCRIPTION = decisionTransmissionSearchDescription;
 
 const buildImageParams = (searchParams: HomePageSearchParams | undefined, reportData?: HomeReportData) => {

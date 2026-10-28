@@ -72,12 +72,13 @@ describe("site review copy fixes", () => {
   /* "Governance Resources" over an image titled "Governance Pillars Emblem", and a
      blurb that "aligns risk, spend, and sequencing through confirmation logic,
      thresholds, and reversible governance artifacts". */
-  it("calls /resources Guides, and its framework blurbs say what the reader gets", async () => {
+  it("calls /resources Guides on the page, titles it for search, and its framework blurbs say what the reader gets", async () => {
     const page = await import("../app/resources/page");
     const html = renderToStaticMarkup(await page.default({}));
     assert.match(html, /<h1[^>]*>Guides<\/h1>/);
     const title = page.metadata.title;
-    assert.equal(typeof title === "string" ? title : JSON.stringify(title), "Guides");
+    /* The <title> says what the guides are about, for search (2026-10-28); the h1 stays the nav's name. */
+    assert.equal(typeof title === "string" ? title : JSON.stringify(title), "Startup Decision Guides: Hiring, Fundraising, Runway and Spending");
     assert.doesNotMatch(html, /Governance Pillars Emblem|Governance resources/i);
     const text = visibleText(html);
     assert.doesNotMatch(text, /confirmation logic|governance artifacts|escalation thresholds|board operating system/i);

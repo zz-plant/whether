@@ -31,7 +31,7 @@ export const buildRecordSummary = (record: TrackRecord, origin: string) =>
     "",
     "## The reading",
     `- **Conditions:** ${describeConditions(record.currentRegime, record.currentRegimeLabel)}`,
-    `- **Held for:** ${record.currentHoldMonths} consecutive month-end readings`,
+    `- **Held for:** ${record.currentHoldMonths} consecutive months`,
     `- **Record length:** ${record.monthsCovered} months of public market data`,
     "",
     "## Sources",
@@ -66,7 +66,7 @@ export function ExportBoardAnnexButton({ record, className = "" }: Props) {
       buttonLabels={{ error: "Copy failed — select the page text" }}
       className={className}
       buttonProps={{
-        title: "Copy a short memo of what the month-end record shows",
+        title: "Copy a short memo of what the monthly record shows",
         "aria-label": "Copy the record summary",
       }}
     />

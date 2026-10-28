@@ -78,7 +78,7 @@ describe("feed.xml", () => {
     const recordDate = tag(live, "guid").replace("whether-brief-live-", "");
     assert.match(recordDate, /^\d{4}-\d{2}-\d{2}$/);
     assert.equal(tag(live, "pubDate"), new Date(recordDate).toUTCString());
-    assert.match(live, new RegExp(`<strong>Record date:</strong> ${formatDateUTC(recordDate)} · Margin: (clear of the line|within reach of the line|close to the line)</p>`));
+    assert.match(live, new RegExp(`<strong>Record date:</strong> ${formatDateUTC(recordDate)} · Room before a change: (clear of the line|within reach of the line|close to the line)</p>`));
     assert.doesNotMatch(live, /Confidence:|\b(High|Medium|Low) confidence\b/);
     /* The week's one headline action (`weeklyHeadline`), not the weekly summary's own sentence. */
     const { snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "test" });

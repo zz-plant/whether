@@ -306,7 +306,7 @@ export const TimeMachinePanel = ({
               className="weather-button-primary inline-flex min-h-[44px] items-center justify-center gap-2 px-4 py-2 text-xs font-semibold disabled:cursor-not-allowed disabled:border-slate-800 disabled:text-slate-400"
             >
               {isPending ? <SpinnerIcon className="h-3 w-3" /> : null}
-              {isPending ? "Loading" : "Load month"}
+              {isPending ? "Loading" : "Show this month"}
             </button>
           </Fieldset.Root>
         </Form>
@@ -315,7 +315,7 @@ export const TimeMachinePanel = ({
             href={clearDraftHref}
             className="justify-center text-slate-300 hover:border-slate-500/70"
           >
-            Clear the pick
+            Clear
           </ActionLink>
           <ActionLink
             href={jumpToLatestHref}

@@ -57,7 +57,7 @@ const assertCadenceCopy = ({
     `Timestamp: ${provenance.timestampLabel}`,
     `Data age: ${provenance.ageLabel}`,
     "",
-    `Source: ${provenance.sourceLabel} (${provenance.sourceUrl}) · ${provenance.timestampLabel} · Margin: clear of the line`,
+    `Source: ${provenance.sourceLabel} (${provenance.sourceUrl}) · ${provenance.timestampLabel} · Room before a change: clear of the line`,
   ].join("\n");
 
   assert.equal(summary.copy, expectedCopy);

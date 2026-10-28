@@ -216,7 +216,7 @@ const buildLeadershipShorthandLine = (
   historical: boolean,
 ) => {
   if (boldnessDelta === null || (historical && !basis.date)) {
-    return historical ? "No earlier month-end to compare with." : "No previous week to compare.";
+    return historical ? "No earlier month to compare with." : "No previous week to compare.";
   }
   return getNetDeltaLabel(boldnessDelta, basis);
 };

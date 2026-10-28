@@ -78,11 +78,11 @@ describe("running head facts", () => {
   });
 
   it("names a page that marks nothing by its own h1, so every frame still names the site and the page", () => {
-    assert.deepEqual(readFrameFacts(null, " Product writing "), {
+    assert.deepEqual(readFrameFacts(null, " Reading list "), {
       regime: null,
       condition: null,
       date: null,
-      title: "Product writing",
+      title: "Reading list",
       tension: null,
       tensionNear: false,
       call: null,

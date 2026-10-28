@@ -5,7 +5,7 @@ import type { BriefDocument } from "../report/briefArtifact";
 import { buildComplianceStamp } from "../exportNotices";
 import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import { formatDecisionReversal, formatDecisionThreshold, joinSentences, publicDecisionLabels } from "../report/reportFormatting";
+import { MARGIN_LABEL, formatDecisionReversal, formatDecisionThreshold, joinSentences, publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { decisionAreaLabel, decisionAreaOrder } from "../report/boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
@@ -337,7 +337,7 @@ export const buildCallCitation = ({
 }) => [
   `Whether Weekly Brief — ${provenance.recordDate}`,
   `Conditions: ${conditions.line}`,
-  `Margin: ${formatExportConfidence(confidence).toLowerCase()} (how far the scores sit from the line where conditions change)`,
+  `${MARGIN_LABEL}: ${formatExportConfidence(confidence).toLowerCase()} (how far the scores sit from the line where conditions change)`,
   `Source note: ${provenance.sourceUrl}`,
   `Full brief: ${provenance.permalink}`,
 ].join("\n");

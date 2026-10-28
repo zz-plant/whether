@@ -63,13 +63,13 @@ export function TrackRecordSection({
           value={counts?.changes ?? record.transitions.length}
           unit={`in the last ${counts?.readings ?? record.observations} months`}
         />
-        <Fact label="Signaled in advance" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
+        <Fact label="Warned a month ahead" value={record.signaledCount} unit={`of ${record.transitions.length}`} />
         <Fact
-          label="Median hold"
+          label="Typical length"
           value={record.medianHoldMonths ?? "—"}
           unit={record.medianHoldMonths != null ? "mo" : undefined}
         />
-        <Fact label="Reversed after one month" value={record.whipsawCount} />
+        <Fact label="Changed back within a month" value={record.whipsawCount} />
       </FactList>
 
       {recentTransitions.length > 0 ? (

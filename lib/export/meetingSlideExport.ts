@@ -5,6 +5,7 @@
  */
 
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
+import { MARGIN_LABEL } from "../report/reportFormatting";
 import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { buildScoreReferenceLines } from "./scoreReference";
@@ -145,7 +146,7 @@ const slideWatchLine = (payload: MeetingSlidePayload): string | null =>
   payload.clearsWhen && payload.clearsWhen.length > 0 ? payload.clearsWhen.join("; ") : null;
 
 /** "Margin: close to the line": the band under its display name (the payload field stays `confidence`). */
-const slideMargin = (payload: { confidence: string }) => `Margin: ${formatExportConfidence(payload.confidence).toLowerCase()}`;
+const slideMargin = (payload: { confidence: string }) => `${MARGIN_LABEL}: ${formatExportConfidence(payload.confidence).toLowerCase()}`;
 
 /** The margin, then the one provenance footer, as every slide format closes. */
 export const slideFooterLine = (payload: MeetingSlidePayload): string =>

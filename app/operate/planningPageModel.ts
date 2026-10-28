@@ -144,13 +144,13 @@ export async function buildPlanningPageModel(
         fetchedAtLabel,
       },
       page: {
-        /* "Decide", the group's name in the header (`navigationGroups`). The H1
+        /* "Plan", the group's name in the header (`navigationGroups`). The H1
            said "Planning" while the tab said "Plan" and the URL said /operate —
-           three names for one section, the single most repeated inconsistency in
-           this IA; on 2026-10-08 the tab became the Decide group and the heading
-           follows it. The <title> keeps its longer descriptive form; only the
-           on-page heading is the section's name. */
-        pageTitle: "Decide",
+           three names for one section; on 2026-10-08 the group became "Decide",
+           and on 2026-10-28 "Plan", the word a reader uses, with the heading
+           following it both times. The <title> keeps its longer descriptive form;
+           only the on-page heading is the section's name. */
+        pageTitle: "Plan",
         pageSummary: "This week's guidance, turned into rules for hiring, spend and the roadmap.",
         /* The warnings section exists only in a week that has warnings, so its link does too. */
         sectionLinks: failureModes.length > 0

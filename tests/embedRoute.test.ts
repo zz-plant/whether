@@ -120,23 +120,23 @@ describe("embed route helpers", () => {
     const stripHtml = buildCallStripEmbedHtml({
       ...briefData,
       formattedCall: `Tighten <script>alert("call")</script> approvals`,
-      marginLabel: "Margin 2 pts",
+      marginLabel: "2 pts from a change",
     });
 
     assert.doesNotMatch(stripHtml, /<script/i);
     assert.match(stripHtml, /&lt;script&gt;alert\(&quot;call&quot;\)&lt;\/script&gt;/);
     assert.match(stripHtml, />Tight</);
-    assert.match(stripHtml, /Margin 2 pts/);
+    assert.match(stripHtml, /2 pts from a change/);
     assert.match(stripHtml, /Whether &rarr;/);
 
     const stripText = buildCallStripEmbedText({
       ...briefData,
       formattedCall: "Tighten spend approvals",
-      marginLabel: "Margin 2 pts",
+      marginLabel: "2 pts from a change",
     });
     assert.equal(
       stripText,
-      `Whether [Tight]: Tighten spend approvals · Margin 2 pts (${briefData.attributionUrl})`,
+      `Whether [Tight]: Tighten spend approvals · 2 pts from a change (${briefData.attributionUrl})`,
     );
   });
 
@@ -217,8 +217,8 @@ describe("the embed says what the brief says", () => {
     const text = buildBriefEmbedText(data);
     const html = buildBriefEmbedHtml(data);
 
-    assert.match(text, /^Conditions: Freezing • Margin: (clear of the line|within reach of the line|close to the line) • Data as of 2026-10-05$/m);
-    assert.match(html, /Freezing · Margin: (clear of the line|within reach of the line|close to the line) · Data as of 2026-10-05/);
+    assert.match(text, /^Conditions: Freezing • Room before a change: (clear of the line|within reach of the line|close to the line) • Data as of 2026-10-05$/m);
+    assert.match(html, /Freezing · Room before a change: (clear of the line|within reach of the line|close to the line) · Data as of 2026-10-05/);
     for (const output of [text, html, JSON.stringify(data)]) {
       assert.doesNotMatch(output, /\b(HIGH|MED|MEDIUM|LOW)\b/);
       assert.doesNotMatch(output, /Regime:/);
@@ -244,12 +244,12 @@ describe("the embed says what the brief says", () => {
 
     assert.equal(typeof data.flipDistance, "number");
     assert.equal(data.flipDistance, 2);
-    assert.match(data.marginLabel ?? "", /Margin 2 pts/);
+    assert.match(data.marginLabel ?? "", /2 pts from a change/);
     assert.ok(data.formattedCall && data.formattedCall.length > 0);
 
     const stripHtml = buildCallStripEmbedHtml(data);
     assert.match(stripHtml, />Freezing</);
-    assert.match(stripHtml, /Margin 2 pts/);
+    assert.match(stripHtml, /2 pts from a change/);
   });
 });
 

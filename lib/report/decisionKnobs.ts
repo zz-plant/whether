@@ -1,4 +1,5 @@
 import type { RegimeKey } from "../regimeEngine";
+import { MARGIN_LABEL } from "./reportFormatting";
 import { buildRuleCondition, decisionAreaLabel, type RuleCondition } from "./boundedDecisionRules";
 import { operatingLeverToDecisionArea } from "./businessAreaMap";
 import { REGIME_LABELS } from "../regimePresentation";
@@ -285,7 +286,7 @@ export const buildWeeklyLockCommitment = ({
   freshnessDegraded,
 }: WeeklyLockCommitmentContext): WeeklyLockCommitment => {
   const trustMarkers = [
-    confidenceDegraded ? "Margin: close to the line" : "",
+    confidenceDegraded ? `${MARGIN_LABEL}: close to the line` : "",
     freshnessDegraded ? "Freshness: Stale" : "",
   ].filter((marker) => marker.length > 0);
 

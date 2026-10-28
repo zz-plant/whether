@@ -30,9 +30,9 @@ import { ToolkitLibraryPanels } from "./components/toolkitLibraryPanels";
 import { OperatorWorkflowRouteTracker } from "../components/operatorWorkflowRouteTracker";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Guides",
+  title: "Startup Decision Guides: Hiring, Fundraising, Runway and Spending",
   description:
-    "The most-asked decision guides, and long-form guides on capital planning, board governance, and reversibility.",
+    "Guides to the decisions startup leaders ask about most: when to hire, when to raise, how much runway to keep, and what to cut when money gets expensive.",
   path: "/resources",
   imageAlt: "Whether guides",
 });

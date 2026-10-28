@@ -110,8 +110,9 @@ export const buildRegimeAlert = (
  * conditions held in most months at every distance. So a reader is shown the
  * distance, under its own name. Codes and API fields keep `confidence`.
  */
-/** The label for what the API calls `confidence`. */
-export const MARGIN_LABEL = "Margin";
+/** The label for what the API calls `confidence`. "Margin" until 2026-10-28, which a reader takes
+ *  for a profit margin; the method pages still call the quantity the margin, glossed on first use. */
+export const MARGIN_LABEL = "Room before a change";
 
 const marginBandWords: Record<"LOW" | "MED" | "HIGH", string> = {
   LOW: "Close to the line",
@@ -125,15 +126,15 @@ const marginPlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
   HIGH: "Clear of the line where conditions change",
 };
 
-/** The band under its label, for a meta line that runs facts together: "Margin: close to the line". */
+/** The band under its label, for a meta line that runs facts together: "Room before a change: close to the line". */
 export const formatMarginStamp = (confidence: string): string =>
   `${MARGIN_LABEL}: ${formatMarginBand(confidence).toLowerCase()}`;
 
-/** The margin at its shortest, for the sticky strip and a share line: "Margin 1 pt", or the band. */
+/** The margin at its shortest, for the sticky strip and a share line: "1 pt from a change", or the band. */
 export const formatStripMargin = (confidence: string, points?: number | null): string =>
   points === undefined || points === null
     ? formatMarginBand(confidence)
-    : `${MARGIN_LABEL} ${points} ${points === 1 ? "pt" : "pts"}`;
+    : `${points} ${points === 1 ? "pt" : "pts"} from a change`;
 
 const pointsWord = (points: number) => `${points} ${points === 1 ? "pt" : "pts"}`;
 

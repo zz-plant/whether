@@ -16,7 +16,7 @@ import rawPublishedBriefs from "../../data/published_briefs.json";
 import { formatIsoWeekSlug, getIsoWeekInfo } from "../isoWeek";
 import { buildCanonicalUrl, buildOgImageUrl } from "../seo";
 import { formatSignedDeltaOrNull, formatThresholdNumber } from "../formatters";
-import { formatMarginBand, formatDecisionReversal, formatDecisionThreshold, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
+import { MARGIN_LABEL, formatMarginBand, formatDecisionReversal, formatDecisionThreshold, formatReadingsNow, publicDecisionLabels } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
@@ -753,7 +753,7 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
     `Whether Leadership Update — Week of ${publishedBriefWeekLabel(brief)}`,
     "",
     `Conditions: ${display.conditions}`,
-    `Margin: ${display.confidence.toLowerCase()}`,
+    `${MARGIN_LABEL}: ${display.confidence.toLowerCase()}`,
     "",
     "This week's guidance:",
     `• ${publicDecisionLabels.call}: ${publishedBriefHeadline(brief).composed}`,
@@ -791,7 +791,7 @@ export const buildPublishedBriefBoardUpdate = (brief: PublishedBrief): string =>
 
   return [
     `Whether Board Memo — Week of ${publishedBriefWeekLabel(brief)}`,
-    `Macro Posture: ${display.conditions} (Margin: ${display.confidence.toLowerCase()})`,
+    `Macro Posture: ${display.conditions} (${MARGIN_LABEL}: ${display.confidence.toLowerCase()})`,
     "",
     `Executive Guidance: ${publishedBriefHeadline(brief).composed}`,
     ...(display.pauseIf ? [`Operating Threshold: ${display.pauseIf}`] : []),

@@ -15,9 +15,9 @@ export const runtime = "edge";
 export const revalidate = 900;
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "Why the Weekly Brief Changed",
+  title: "Interest Rates and Funding Data Behind This Week's Guidance",
   description:
-    "Why the weekly brief changed: what moved, why it matters, and what would make the recommendation change.",
+    "The interest rates, yield curve and funding-market numbers behind this week's startup guidance, and each one's move since last time.",
   path: "/signals",
   imageAlt: "Why the weekly brief changed — evidence overview",
   imageParams: {

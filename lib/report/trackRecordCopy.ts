@@ -26,7 +26,7 @@ export const describeRecordCadence = (
   record: Pick<TrackRecord, "firstRecordDate" | "monthsCovered" | "regimeChanges" | "lineCrossingMonths">,
 ): string =>
   `Since ${formatMonthYearShortFromValue(record.firstRecordDate)}, conditions have changed ${record.regimeChanges} ` +
-  `${record.regimeChanges === 1 ? "time" : "times"} in ${record.monthsCovered} months, and a month-end reading crossed ` +
+  `${record.regimeChanges === 1 ? "time" : "times"} in ${record.monthsCovered} months, and a monthly reading crossed ` +
   `one of the pause or resume lines in ${record.lineCrossingMonths} of them. Most Mondays, nothing has moved.`;
 
 /**

@@ -148,7 +148,8 @@ describe("links into Plan and Resolve use the names the header prints", () => {
      legitimately use a common noun, so these match the whole label. */
   const RETIRED: Array<{ path: string; name: RegExp }> = [
     { path: "/operate", name: /\bPlanning\b/ },
-    { path: "/operate", name: /^Plan$/ },
+    { path: "/operate", name: /^Decide$/ },
+    { path: "/history", name: /^Record$/ },
     { path: "/resolve", name: /\bDecision Tools\b/ },
     { path: "/signals", name: /^Evidence$/ },
     { path: "/trust", name: /^Trust$/ },

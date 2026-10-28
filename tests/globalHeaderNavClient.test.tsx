@@ -23,13 +23,13 @@ describe("GlobalHeaderNavClient", () => {
     const bar = html.slice(html.indexOf('aria-label="Primary"'), html.indexOf('aria-label="Utility"'));
     const utility = html.slice(html.indexOf('aria-label="Utility"'));
 
-    const positions = ["This week", "Decide", "Record", "Guides"].map((label) => {
+    const positions = ["This week", "Plan", "History", "Guides"].map((label) => {
       const index = bar.indexOf(`<span>${label}</span>`);
       assert.ok(index > -1, `the bar renders ${label}`);
       return index;
     });
     assert.deepEqual(positions, [...positions].sort((a, b) => a - b), "tabs keep IA order");
-    for (const retired of ["Brief", "Plan", "Evidence", "Resolve", "Trust", "History"]) {
+    for (const retired of ["Brief", "Decide", "Evidence", "Resolve", "Trust", "Record"]) {
       assert.ok(!bar.includes(`<span>${retired}</span>`), `the bar no longer carries ${retired}`);
     }
     for (const href of ["/share", "/about"]) {
@@ -41,7 +41,7 @@ describe("GlobalHeaderNavClient", () => {
 
   it("shows each tab's one-key shortcut so the keyboard layer is discoverable", () => {
     const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/" />);
-    for (const key of ["w", "d", "r", "g"]) {
+    for (const key of ["w", "p", "h", "g"]) {
       assert.ok(html.includes(`>${key}</kbd>`), `tab shows the ${key} key`);
     }
   });
@@ -58,7 +58,7 @@ describe("GlobalHeaderNavClient", () => {
     const html = renderToStaticMarkup(
       <MobileNavContent navigationLinks={navigationLinks} currentPathname="/" onClose={() => {}} />,
     );
-    for (const label of ["This week", "Why it changed", "Decide", "Runway planner", "Record", "Compare periods", "Calibration", "Product writing", "Guides", "Use it elsewhere", "API &amp; MCP", "About", "Contact"]) {
+    for (const label of ["This week", "Why it changed", "Plan", "Runway planner", "History", "Compare periods", "Calibration", "Reading list", "Guides", "Share and embed", "API &amp; MCP", "About", "Contact"]) {
       assert.ok(html.includes(label), `the sheet lists ${label}`);
     }
     assert.ok(html.includes("Search or jump to a page"), "the sheet opens search");

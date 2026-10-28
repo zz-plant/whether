@@ -58,14 +58,15 @@ export const describeInversionSummary = ({
   inverted2Y3M: number;
 }): string => {
   if (inverted10Y2Y === 0 && inverted2Y3M === 0) {
-    return `No: neither spread below zero in the last ${months} months`;
+    return `No: long-term rates stayed above short-term ones in all of the last ${months} months`;
   }
+  /* In words, not "2Y−3M" and "10Y−2Y" (2026-10-28): the naming table asks for the
+     gauge's full name on first use, and this summary is the question's first line. */
   const count = (inverted: number) => (inverted === 0 ? "none" : `${inverted} of ${months} months`);
-  const [first, second] =
-    inverted2Y3M >= inverted10Y2Y
-      ? [`2Y−3M below zero in ${count(inverted2Y3M)}`, `10Y−2Y in ${count(inverted10Y2Y)}`]
-      : [`10Y−2Y below zero in ${count(inverted10Y2Y)}`, `2Y−3M in ${count(inverted2Y3M)}`];
-  return `Yes: ${first}, ${second}`;
+  const shortCurve = `the 2-year rate below the 3-month rate in ${count(inverted2Y3M)}`;
+  const longCurve = `the 10-year rate below the 2-year rate in ${count(inverted10Y2Y)}`;
+  const [first, second] = inverted2Y3M >= inverted10Y2Y ? [shortCurve, longCurve] : [longCurve, shortCurve];
+  return `Yes: ${first}, and ${second}`;
 };
 
 /**

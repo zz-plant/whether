@@ -41,7 +41,7 @@ export function ScenarioSliders({
           <div className="flex flex-wrap items-center gap-2">
             <h3 id="sliders-controls-heading" className="type-section text-slate-100 flex items-center gap-2">
               <SlidersIcon className="h-4 w-4 text-slate-400" />
-              Sliders
+              Set the rates
             </h3>
             <Tag tone="amber">Not this week&apos;s data</Tag>
           </div>

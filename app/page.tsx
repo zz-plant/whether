@@ -604,8 +604,8 @@ async function PageContent({
             <WeekStepper
               previousHref={prevWeekHref}
               nextHref={nextWeekHref}
-              previousLabel="Previous month-end"
-              nextLabel={nextHistoricalRequest ? "Next month-end" : "This week"}
+              previousLabel="Previous month"
+              nextLabel={nextHistoricalRequest ? "Next month" : "This week"}
               currentDateLabel={cadenceTitle ?? periodLabel}
               isHistorical={Boolean(historicalSelection)}
               history={regimeHistory}

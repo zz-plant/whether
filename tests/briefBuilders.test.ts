@@ -127,7 +127,7 @@ describe("buildSlackBrief", () => {
     // scale) is High. The fixture's engine code says MEDIUM, and neither that
     // code nor its band reaches a paste any more.
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /^• Margin: clear of the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/m);
+    assert.match(brief, /^• Room before a change: clear of the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/m);
     assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
     /* The contract's sentence, which reads the margin: this clear week is
        not told it sits near a line. */
@@ -206,7 +206,7 @@ describe("buildCallCitation", () => {
     const citation = buildCallCitation(fixtureBriefDocument({ weeklyCall: { ...fixtureWeeklyCall(), regimeStage: "Sunny — Late" } }));
 
     assert.match(citation, /^Conditions: Sunny — Late \(money is cheap and available\)$/m);
-    assert.match(citation, /^Margin: clear of the line \(how far the scores sit/m);
+    assert.match(citation, /^Room before a change: clear of the line \(how far the scores sit/m);
     assert.match(citation, /^Source note: https:\/\/fred\.stlouisfed\.org$/m);
     assert.match(citation, /^Full brief: https?:\/\//m);
     assert.doesNotMatch(citation, /EXPANSION|refresh cadence|Score-based/, "the citation is for a reader, not the engine");

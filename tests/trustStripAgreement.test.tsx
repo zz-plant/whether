@@ -261,7 +261,7 @@ describe("one reading's margin across routes and exports", () => {
     assert.equal(surfaces.trust.trustStrip.confidenceLabel, published.label, "/trust strip");
     // The meeting snippet moved from /trust to /share on 2026-10-08; the margin rides in its trust line.
     const snippet = surfaces.pastes?.find((option) => option.id === "meeting-snippet");
-    assert.match(snippet?.kind === "text" ? snippet.text : "", new RegExp(`^Trust: Margin: ${BAND[published.label]} \\(`, "m"), "/share meeting snippet");
+    assert.match(snippet?.kind === "text" ? snippet.text : "", new RegExp(`^Trust: Room before a change: ${BAND[published.label]} \\(`, "m"), "/share meeting snippet");
     assert.equal(surfaces.postureState?.currentState.confidenceLabel, published.label, "posture state (/api/weekly, /api/monthly, MCP)");
     assert.equal(surfaces.postureState?.currentState.confidencePercent, published.percent, "posture state percent");
     assert.equal(surfaces.shareArtifact?.confidenceLabel, published.label, "/share copy picker");
@@ -280,7 +280,7 @@ describe("one reading's margin across routes and exports", () => {
       email: textOf("email"),
     };
     for (const [key, text] of Object.entries(texts)) {
-      const bands = [...text.matchAll(/\bMargin: (clear of the line|within reach of the line|close to the line)\b/gi)]
+      const bands = [...text.matchAll(/\bRoom before a change: (clear of the line|within reach of the line|close to the line)\b/gi)]
         .map((match) => match[1]?.toLowerCase());
       assert.ok(bands.length > 0, `${key} prints a margin band`);
       assert.deepEqual([...new Set(bands)], [BAND[published.label]], `${key} prints one band, the published one`);

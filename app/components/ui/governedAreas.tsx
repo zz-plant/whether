@@ -25,7 +25,7 @@ export function GovernedAreas({
   const areas = areasGovernedBy(metric);
   return (
     <span className={`block text-fluid-nano font-normal text-slate-400 ${className}`.trim()} data-governs={metric}>
-      Governs:{" "}
+      Affects:{" "}
       {areas.map((area, index) => (
         <Fragment key={area}>
           <a

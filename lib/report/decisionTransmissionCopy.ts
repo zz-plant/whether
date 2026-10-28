@@ -1,7 +1,7 @@
 import type { ComparisonBasis } from "./comparisonBasis";
 
 export const decisionTransmissionSearchDescription =
-  "For hiring, fundraising, spending and runway: the action to take now, the line that pauses it, and the line that resumes it.";
+  "Should your startup hire, raise or spend this week? For hiring, fundraising, spending and runway: the action to take now, the line that pauses it, and the line that resumes it.";
 
 /*
  * One phrase for the revisit slot everywhere the model's `revisitDecisions`
@@ -41,6 +41,6 @@ export const homeDecisionFaqItems = [
   {
     question: "How close is the guidance to changing?",
     answer:
-      "Margin measures the distance to the nearest change line in points. Check the data date before acting; margin is not a probability.",
+      "Room before a change is the distance to the nearest change line, in points. Check the data date before acting; it is not a probability.",
   },
 ] as const;

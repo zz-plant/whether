@@ -45,7 +45,7 @@ describe("screenshot caption", () => {
     for (const fetchedAtLabel of ["Oct 7, 2026, 12:19 AM UTC", ""]) {
       const html = renderToStaticMarkup(
         <CommandCenterNavBlock
-          pageTitle="Decide"
+          pageTitle="Plan"
           pageSummary="This week's guidance, turned into rules."
           recordDateLabel="Oct 5, 2026"
           statusLabel="Freezing"

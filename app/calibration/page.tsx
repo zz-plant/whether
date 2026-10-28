@@ -36,11 +36,11 @@ export const runtime = "edge";
  * same study would compete with each other.
  */
 export const metadata: Metadata = buildPageMetadata({
-  title: "Margin calibration study",
+  title: "How Often the Guidance Held Up",
   description:
-    "Whether's margin measures distance from the line where conditions change. This study checks it against every month-end reading since 2012.",
+    "How often the weekly guidance held, checked against every month since 2012, and how close conditions came to changing each time.",
   path: "/calibration",
-  imageAlt: "Whether margin calibration study",
+  imageAlt: "How often the guidance held up",
   imageParams: { template: "method", eyebrow: "The record" },
 });
 
@@ -60,8 +60,8 @@ export default function CalibrationPage() {
           sub-tab row above already name the group, as the report pages dropped
           "Weekly brief" over their titles. */}
       <SecondaryPageHeader
-        title="Margin calibration study"
-        description={`We checked the published margin against ${totals.months} month-to-month comparisons since 2012: how often conditions stayed put at each distance from the line where they change.`}
+        title="How often the guidance held up"
+        description={`We checked the room before a change that every page prints against ${totals.months} month-to-month comparisons since 2012: how often conditions stayed put at each distance from the line where they change.`}
       />
 
       <ConfidenceRecordSection />
@@ -72,7 +72,7 @@ export default function CalibrationPage() {
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            <span className="text-slate-100">Sample.</span> Every month-end reading in the archive
+            <span className="text-slate-100">Sample.</span> Every monthly reading in the archive
             that has a following month to compare against — {totals.months} of them.
             {record ? (
               <>
@@ -88,7 +88,7 @@ export default function CalibrationPage() {
           <li>
             <span className="text-slate-100">Bands.</span> Distance to the nearest line where
             conditions change, in points of funding pressure, with a risk-appetite point converted the
-            same way the published margin converts it. The cut points were chosen before the outcomes
+            same way the room before a change converts it. The cut points were chosen before the outcomes
             were looked at.
           </li>
         </ul>
@@ -113,8 +113,8 @@ export default function CalibrationPage() {
           </li>
         </ul>
         <p className="mt-4 text-sm text-slate-300">
-          So the margin still measures distance, which it can do honestly, and this record sits next to
-          it instead of being folded in.
+          So the room before a change still measures distance, which it can do honestly, and this record
+          sits next to it instead of being folded in.
         </p>
       </SecondaryPageSection>
 

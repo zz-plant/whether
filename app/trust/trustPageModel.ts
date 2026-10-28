@@ -110,8 +110,8 @@ export async function buildTrustPageModel() {
     { href: "#source-board", label: "Sources" },
     // "Cite this guidance" and "Meeting snippet" moved to /share on 2026-10-08,
     // with every other paste of the week.
-    { href: "#confidence-limits", label: "Margin & limits" },
-    { href: "#revisit-call", label: "Revisit triggers" },
+    { href: "#confidence-limits", label: "How close to changing" },
+    { href: "#revisit-call", label: "When to look again" },
   ];
 
   const reportShellModel: ReportShellModel = {

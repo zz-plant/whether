@@ -87,7 +87,7 @@ describe("buildWeeklyLockCommitment", () => {
       freshnessDegraded: true,
     });
 
-    assert.deepEqual(commitment.trustMarkers, ["Margin: close to the line", "Freshness: Stale"]);
+    assert.deepEqual(commitment.trustMarkers, ["Room before a change: close to the line", "Freshness: Stale"]);
     assert.deepEqual(commitment.flipConditions, ["Funding pressure above 62", "Risk appetite above 52"]);
     assert.match(commitment.ownerCadence, /daily until live data/);
   });

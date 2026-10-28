@@ -1,4 +1,5 @@
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
+import { MARGIN_LABEL } from "../report/reportFormatting";
 import { buildComplianceStamp } from "../exportNotices";
 import { formatExportConfidenceWord } from "../export/exportTerms";
 import { formatSourceLine, type SummaryConfidence } from "./summaryFormatting";
@@ -104,9 +105,9 @@ export const renderWeeklySummaryCopy = ({
     "",
     "---",
     "",
-    "MARGIN",
+    MARGIN_LABEL.toUpperCase(),
     "",
-    `Margin: ${confidenceWord}`,
+    `${MARGIN_LABEL}: ${confidenceWord}`,
     "Uncertainty: this is an interpretive read, not a forecast. Check the assumptions against your own numbers before you act on it.",
     "",
     "",

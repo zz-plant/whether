@@ -93,7 +93,7 @@ describe("artifacts that leave the site carry no facts about a company the site 
     const memo = buildRecordSummary(record, "https://example.test");
     assert.doesNotMatch(memo, FIXTURE_COMPANY);
     assert.match(memo, /Sunny/);
-    assert.match(memo, /8 consecutive month-end readings/);
+    assert.match(memo, /8 consecutive months/);
     assert.match(memo, /176 months/);
     assert.match(memo, /https:\/\/example\.test\/history/);
   });

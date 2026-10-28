@@ -350,7 +350,7 @@ export const buildCalibrationStudyStructuredData = ({
   totals: { months: number; held: number };
 }): JsonLdGraph => {
   const url = buildCanonicalUrl("/calibration");
-  const name = "Margin calibration study";
+  const name = "How often the guidance held up";
   const description =
     `A calibration study of Whether's published margin against ${totals.months} month-to-month comparisons. `
     + "The margin is the distance from the line where conditions change. "
