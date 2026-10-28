@@ -468,9 +468,8 @@ export default function ProductCanonPage() {
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
-            <span className="text-slate-100">A small, chosen sample.</span> The people who built this page picked these
-            texts because they were widely read. Counting every post in the archives above is how we check that
-            choice.
+            <span className="text-slate-100">A small, chosen sample.</span> These texts were picked because they
+            were widely read; counting every post in the archives above checks that choice.
           </li>
           <li>
             <span className="text-slate-100">Publication, not adoption.</span> Each date is when a text came out. Advice

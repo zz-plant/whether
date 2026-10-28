@@ -131,7 +131,7 @@ describe("the evidence page", () => {
       />,
     );
 
-    assert.match(html, /Feeds into <a href="#call-lines"[^>]*>Funding pressure<\/a>/);
+    assert.match(html, /Feeds into <a href="#tightness"[^>]*>Funding pressure<\/a>/, "to the score's own row");
     /* The two composites name the areas whose lines they set, each opening the
        brief on that area's answer, with the area's glyph beside its name. */
     assert.match(html, /data-governs="tightness">Governs: <a href="\/\?decision=hiring#what-it-changes"[^>]*><svg[^>]*lucide-users[\s\S]*?<\/svg>Hiring<\/a>/);

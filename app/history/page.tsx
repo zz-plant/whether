@@ -13,7 +13,7 @@ import { CONFIDENCE_RECORD_TITLE, ConfidenceRecordSummary } from "../components/
 import { ReportShell } from "../components/reportShell";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
-import { buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
+import { buildPublishedBriefPath, getPublishedBriefs, groupPublishedBriefRuns, publishedBriefDisplay, publishedBriefRunLabel, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
 import { buildHistoryStructuredData } from "../../lib/seo/pageStructuredData";
 import { buildTrackRecord } from "../../lib/report/trackRecord";
 import { resolvePhaseSpan } from "../../lib/regimePhaseSpace";
@@ -221,11 +221,10 @@ export default async function HistoryPage({
             forecast was published at the time, or of what a company would have done. To cite what
             Whether actually recorded, use the dated published briefs below.
           </p>
-          <div className="flex flex-wrap gap-x-5 gap-y-1">
-            <ActionLink href="/history/compare" variant="inline">Compare funding conditions across periods</ActionLink>
-            <ActionLink href="/answers/how-to-brief-executives-on-market-conditions" variant="inline">Prepare a board decision note</ActionLink>
-            <ActionLink href="/" variant="inline">Read the current weekly brief</ActionLink>
-          </div>
+          {/* One link (2026-10-27). "Compare funding conditions across periods" and "Read
+              the current weekly brief" sat beside it, both already in the page's own tabs
+              and the site's, and the compare page a third time in the fold below. */}
+          <ActionLink href="/answers/how-to-brief-executives-on-market-conditions" variant="inline">Prepare a board decision note</ActionLink>
         </section>
       ) : null}
 
@@ -256,20 +255,40 @@ export default async function HistoryPage({
               control, and it was carrying a border, a fill and a column layout
               it does not own. The title is the anchor's first paragraph, which
               is where decision-flow.css puts the one underline. */}
+          {/* One card per run of the same guidance, each saying the week once and the
+              conditions once (2026-10-27). A card printed "Freezing — week of Oct 6,
+              2026", then "Oct 6, 2026", then a FREEZING stamp, and four weeks of the
+              same two sentences took four cards. The run links its newest week and
+              lists every week under it, since each still has its own page. */}
           <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {publishedBriefs.map((brief) => (
-              <li key={brief.slug} data-frame-block="">
-                <Link href={buildPublishedBriefPath(brief.slug)} className="weather-hub-link-card text-slate-100">
-                  <p className="text-sm font-semibold text-slate-100 line-clamp-1">{publishedBriefDisplay(brief).headline}</p>
-                  <p className="flex items-center justify-between gap-2">
-                    <span className="text-fluid-micro tabular-nums text-slate-400">{brief.recordDateLabel}</span>
-                    {/* The conditions stamp every page draws: glyph, word and hue. */}
-                    <Tag regime={brief.regime}>{getRegimePublicLabel(brief.regime)}</Tag>
-                  </p>
-                  <p className="text-fluid-xs text-slate-400 line-clamp-2">{brief.summary}</p>
-                </Link>
-              </li>
-            ))}
+            {groupPublishedBriefRuns(publishedBriefs).map((run) => {
+              const [newest] = run;
+              return (
+                <li key={newest.slug} data-frame-block="" className="flex flex-col gap-1.5">
+                  {/* `minHeight: 0` beats the card's `min-height: 100%` (an unlayered class a
+                      utility cannot override): at the item's full height it pushed a run's week
+                      links out of the item and onto the next card. */}
+                  <Link href={buildPublishedBriefPath(newest.slug)} className="weather-hub-link-card flex-1 text-slate-100" style={{ minHeight: 0 }}>
+                    <p className="flex items-center justify-between gap-2">
+                      <span className="text-sm font-semibold tabular-nums text-slate-100">{publishedBriefRunLabel(run)}</span>
+                      {/* The conditions stamp every page draws: glyph, word and hue. */}
+                      <Tag regime={newest.regime}>{getRegimePublicLabel(newest.regime)}</Tag>
+                    </p>
+                    <p className="text-fluid-xs text-slate-400 line-clamp-2">{newest.summary}</p>
+                  </Link>
+                  {run.length > 1 ? (
+                    <p className="flex flex-wrap gap-x-3 px-1 text-fluid-xs text-slate-400" data-brief-run-weeks>
+                      <span>Each week:</span>
+                      {run.map((brief) => (
+                        <Link key={brief.slug} href={buildPublishedBriefPath(brief.slug)} className="weather-hit tabular-nums underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
+                          {publishedBriefWeekLabel(brief).replace(/, \d{4}$/, "")}
+                        </Link>
+                      ))}
+                    </p>
+                  ) : null}
+                </li>
+              );
+            })}
           </ul>
         </section>
       ) : null}
@@ -292,10 +311,6 @@ export default async function HistoryPage({
               <p className="text-fluid-xs text-slate-400">
                 <Link href="/calibration" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
                   Read the calibration study
-                </Link>
-                {" · "}
-                <Link href="/concepts" className="weather-hit underline decoration-slate-600 underline-offset-4 hover:text-slate-200">
-                  Product writing on the same record
                 </Link>
               </p>
             </div>

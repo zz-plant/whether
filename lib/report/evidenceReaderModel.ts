@@ -3,14 +3,11 @@ import type { RegimeSignalKey } from "./reportFormatting";
 import { regimeSignalLabelByKey } from "./reportFormatting";
 import { indicatorKindLabel } from "../indicatorClassification";
 import type { ReportDynamics } from "./reportDataTypes";
-import type { ActionStripItem } from "./operatingCalls";
-import { buildSharedCorridorRails } from "./operatingCalls";
 import { describeSignalDirection } from "./signalClusterReading";
 import { comparisonBasis } from "./comparisonBasis";
 import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { describeScoreMovement } from "./scoreMovement";
 import { describeNotCountedScore, joinSentences, type ScoringBasis } from "./scoringBasis";
-import type { LadderLine } from "../../app/components/ui/scoreLadder";
 import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
 import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
@@ -208,49 +205,6 @@ export const buildSignalReferenceRows = (
     rowFor("baseRate", scores.baseRate, { value: thresholds.baseRateTightness, label: BASE_RATE_LINE_LABEL }, PERCENT_UNITS, dynamics),
     rowFor("curveSlope", scores.curveSlope, { value: 0, label: INVERSION_LINE_LABEL }, SPREAD_UNITS, dynamics),
   ];
-};
-
-export type CallLineLadder = {
-  key: "tightness" | "riskAppetite";
-  label: string;
-  value: number;
-  previous: number | null;
-  /** What `previous` is, as `SignalReferenceRow.previousLabel` names it. */
-  previousLabel: string;
-  lines: LadderLine[];
-};
-
-/**
- * The two composite scores against the three lines that decide the call: the
- * pause and resume lines every area shares, and the line where the call itself
- * changes. The pause and resume lines come from the same clause data the rule
- * sentences are derived from, so the ladder cannot draw a line the sentence
- * beside it does not state; a week with no rules draws the call line alone.
- */
-export const buildCallLineLadders = (
-  assessment: Pick<RegimeAssessment, "scores" | "thresholds">,
-  dynamics: DynamicsSource,
-  actionStripItems: readonly Pick<ActionStripItem, "pauseConditions" | "resumeConditions">[],
-): CallLineLadder[] => {
-  const { scores, thresholds } = assessment;
-  const rails = buildSharedCorridorRails(actionStripItems, scores);
-  const forKey = (key: "tightness" | "riskAppetite", callChange: number): CallLineLadder => {
-    const rail = rails.find((candidate) => candidate.metric === key);
-    const lines: LadderLine[] = [];
-    if (rail) lines.push({ kind: "pause", value: rail.guardrail });
-    if (rail?.clearsAt !== undefined) lines.push({ kind: "resume", value: rail.clearsAt });
-    lines.push({ kind: "callChange", value: callChange });
-    const value = scores[key];
-    return {
-      key,
-      label: regimeSignalLabelByKey[key],
-      value,
-      previous: previousFrom(value, findSignalDelta(dynamics, key)),
-      previousLabel: comparisonBasis(dynamics.comparedWith).label,
-      lines,
-    };
-  };
-  return [forKey("tightness", thresholds.tightnessRegime), forKey("riskAppetite", thresholds.riskAppetiteRegime)];
 };
 
 /* Why the next reading could change conditions, when the margin cell beside it

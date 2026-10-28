@@ -35,7 +35,7 @@ describe("why conditions", () => {
   it("states which side of each change line the readings sit on", () => {
     const html = render();
     assert.match(html, /Funding pressure is above its 70 change line/);
-    assert.match(html, /risk appetite is above its 50 change line/);
+    assert.match(html, /Risk appetite is above its 50 change line/);
     assert.match(html, /Together they put conditions in/);
   });
 

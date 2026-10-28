@@ -4022,13 +4022,43 @@ names and labels in both themes, and found:
 - **The running head, section chips and tab bar are opaque** instead of 95% over a backdrop blur, a
   blur pass per frame that showed through 5% of the fill.
 
+### 1.1.95 Say it once (2026-10-27)
+
+A pass for text and elements that repeat what is already on screen, or on the page a link goes to
+(`bun run audit:near-duplicates -- --copy` over eleven routes, a scan for repeated links and blocks,
+and full-page phone captures).
+
+- **The brief.** "Why conditions are Cloudy" states what each side means in its lead and drops the
+  table that printed both scores a third time. The "What changed" chips say where a reading came from
+  ("from 56", or "No change"), since the ladder beside them prints where it is. The risk-appetite row
+  no longer adds "Not counted: −11…": the "What the headline reading leaves out" band says it, and the
+  card's strip links it. The area picker's line drops "Pick one." The conditions map keeps its two
+  scores: it is the one place each width draws them (`tests/onePlacePerFact.test.tsx`).
+- **/signals and /trust link to the brief's "What would change this guidance"** instead of drawing
+  the same ladders and the same "Pause if / Resume when" (§1.2). /signals' chips print "from" like the
+  brief's, and its "Feeds into" links go to the score's own row.
+- **/history.** Consecutive weeks that published the same conditions and summary are one card
+  ("Weeks of Sep 14 – Sep 21, 2026", `groupPublishedBriefRuns`), with each week still linked under
+  it, and a card says its week and conditions once. The body's compare and current-brief links, and
+  the "Product writing" link beside the calibration line, went: the page's tabs carry them.
+- **/operate.** Each area's conditions print funding pressure first, so areas on the same line read
+  the same, and the "Lines set by…" line under each area, which the lines themselves state, went. The
+  warnings section renders only in a week that has warnings.
+- **Pointers and build notes.** /trust's "Every constant above is read from the scoring engine…" and
+  its link to the private repository went; its pointer to /about is the link's own text. /calibration
+  drops "Derived from the month-end archive each time this page is built…", /concepts "The people who
+  built this page picked these texts…", and /share's PNG gloss.
+- **The phone footer** drops its four page columns below `md`, where the tab bar and its More sheet
+  list every page.
+
 ### 1.2 Evidence report (/signals)
-The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
+The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:
 
-- **What changed.** One table of every signal: from → to, its line, and why it matters. The focus
-  filters narrow it and travel in the URL.
-- **What would change this guidance.** The two score ladders with their Pause if and Resume when lines.
+- **What changed.** One table of every signal: where it came from, where it sits against its line,
+  and why it matters. The focus filters narrow it and travel in the URL. Under the table, a link to
+  the brief's "What would change this guidance": the two score ladders with their Pause if and
+  Resume when lines were this page's second section until 2026-10-27, the brief's section drawn again.
 - **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are
   interest rates doing? · Has the yield curve inverted in the last year? · How have the two scores
   moved this year? · What would conditions be with different lines? · What did the brief say in an

@@ -57,10 +57,6 @@ export function WhyConditionsSection({
   warning: string | null;
 }) {
   const regimeLabel = getRegimePublicLabel(regime);
-  const readings = [
-    { key: "tightness" as const, label: "Funding pressure", value: tightness, line: changeLines.tightness },
-    { key: "riskAppetite" as const, label: "Risk appetite", value: riskAppetite, line: changeLines.riskAppetite },
-  ];
   /* Where the reading would land with the excluded inputs counted, in the
      weather vocabulary — the same quadrant function the map uses, so the
      sentence cannot disagree with the picture. */
@@ -85,66 +81,42 @@ export function WhyConditionsSection({
     <HomeSection
       id={HOME_SECTIONS.diagnosis.id}
       heading={`Why conditions are ${regimeLabel}`}
+      /* What each side means, in the lead, and no table under it (2026-10-27). The
+         table printed the two scores a third time on the brief, beside the card's
+         ladder and the rows of "What changed" further down; its one column of its
+         own, what each reading means, is a clause here. */
       lead={(
         <>
           Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
-          line, and risk appetite is {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its{" "}
-          {changeLines.riskAppetite} change line. Together they put conditions in{" "}
+          line: {signalReadingMeaning("tightness", tightness)}. Risk appetite is{" "}
+          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its {changeLines.riskAppetite} change line:{" "}
+          {signalReadingMeaning("riskAppetite", riskAppetite)}. Together they put conditions in{" "}
           <span className="font-semibold">{regimeLabel}</span>.
         </>
       )}
     >
-      {/* The readings beside what they leave out, from xl (2026-10-27): stacked, the
-          note and the capped-score line sat under a 64rem table with the right half of
-          a laptop screen empty, and a frame cut the section in two. */}
-      <div className={notCounted.length > 0 || cappedDistance ? "xl:grid xl:grid-cols-2 xl:items-start xl:gap-8" : undefined}>
-        <div className="min-w-0">
-          <table className="w-full border-collapse text-fluid-sm" data-conditions-reading>
-            <caption className="sr-only">
-              The two readings behind this week&rsquo;s conditions, with what each one means.
-            </caption>
-            <thead>
-              <tr className="border-b border-[color:var(--border-subtle)] text-left text-fluid-xs text-slate-400">
-                <th scope="col" className="py-2 pr-4 font-medium">Reading</th>
-                <th scope="col" className="py-2 pr-4 font-medium">Now</th>
-                <th scope="col" className="py-2 font-medium">What it means</th>
-              </tr>
-            </thead>
-            <tbody>
-              {readings.map((reading) => (
-                <tr key={reading.key} className="border-b border-[color:var(--border-subtle)] align-baseline last:border-b-0">
-                  <th scope="row" className="py-3 pr-4 text-left font-medium text-slate-200">{reading.label}</th>
-                  <td className="py-3 pr-4 tabular-nums text-slate-100">{reading.value}</td>
-                  <td className="py-3 text-slate-300">{signalReadingMeaning(reading.key, reading.value)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-
-        </div>
-        <div className="min-w-0">
-          {notCounted.length > 0 ? (
-            <div className="weather-caveat-band mt-5 max-w-3xl px-4 py-3 xl:mt-0" data-excluded-inputs>
-              <p className="weather-caveat-mark text-fluid-xs font-semibold">What the headline reading leaves out</p>
-              <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
-                {warning
-                  ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
-                  : `If we counted them, we'd have ${notCounted
-                      .map((entry) => `${entry.metric === "tightness" ? "funding pressure" : "risk appetite"} at ${entry.score}`)
-                      .join(" and ")}.`}{" "}
-                {NOT_COUNTED_REASON}
-              </p>
-            </div>
-          ) : null}
-
-          {cappedDistance ? (
-            <p className="mt-4 max-w-3xl text-fluid-xs leading-relaxed text-slate-400" data-capped-reading>
-              Funding pressure reads {tightness} because the score is capped there; without the cap it would read{" "}
-              {saturatedPressure}. The distance to its {changeLines.tightness} change line is therefore{" "}
-              {cappedDistance.shown} points on the score but {cappedDistance.actual} points of pressure.
+      <div className="min-w-0">
+        {notCounted.length > 0 ? (
+          <div className="weather-caveat-band max-w-3xl px-4 py-3" data-excluded-inputs>
+            <p className="weather-caveat-mark text-fluid-xs font-semibold">What the headline reading leaves out</p>
+            <p className="mt-1 text-fluid-sm leading-relaxed text-slate-200">
+              {warning
+                ? `${warning}${countedRegimeLabel !== regimeLabel ? ` If we counted them, conditions would be ${countedRegimeLabel}, not ${regimeLabel}.` : ""}`
+                : `If we counted them, we'd have ${notCounted
+                    .map((entry) => `${entry.metric === "tightness" ? "funding pressure" : "risk appetite"} at ${entry.score}`)
+                    .join(" and ")}.`}{" "}
+              {NOT_COUNTED_REASON}
             </p>
-          ) : null}
-        </div>
+          </div>
+        ) : null}
+
+        {cappedDistance ? (
+          <p className="mt-4 max-w-3xl text-fluid-xs leading-relaxed text-slate-400" data-capped-reading>
+            Funding pressure reads {tightness} because the score is capped there; without the cap it would read{" "}
+            {saturatedPressure}. The distance to its {changeLines.tightness} change line is therefore{" "}
+            {cappedDistance.shown} points on the score but {cappedDistance.actual} points of pressure.
+          </p>
+        ) : null}
       </div>
 
       <p className="mt-4 text-fluid-xs text-slate-400">

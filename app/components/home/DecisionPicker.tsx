@@ -153,7 +153,7 @@ export function DecisionPicker({
             </p>
           ) : null}
           <p className="text-fluid-xs text-slate-400">
-            Pick one. Its answer holds until a score crosses one of its lines, and most weeks none does.
+            Each answer holds until a score crosses one of its lines, and most weeks none does.
           </p>
         </div>
 

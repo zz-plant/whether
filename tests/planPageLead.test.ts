@@ -62,11 +62,9 @@ describe("/operate opening", () => {
         ["ops-decision-shield", true],
       ],
     );
-    // The lead is the brief's own table, and its "Line set by" links leave for the brief,
-    // the only page that draws the score anchors they name.
+    // The lead is the brief's own table.
     const [table] = propsHandedTo(steps[0]?.children, AreaTable);
     assert.ok(table, "the first step is the AreaTable");
-    assert.equal(table.signalLinkBase, "/");
     // The rest wait for a click, and the index lists the steps in the order the page draws them.
     assert.ok(steps.slice(3).every((step) => !step.defaultOpen));
     const indexed = operationsSectionLinks.plan.map((link) => link.href.slice(1));
@@ -109,19 +107,18 @@ describe("/operate opening", () => {
  * steps by the same rule that separates them, with no kicker over the heading.
  */
 describe("/operate tail", () => {
-  it("sets the warnings off with a rule, not a card, and draws a quiet week as one line", async () => {
-    const { children } = await buildPlanningPageModel();
+  /* A quiet week draws no warnings section and no outline link to it (2026-10-27): it
+     drew a heading over "No warning this week", a section announcing it was empty. */
+  it("sets the warnings off with a rule, not a card, and leaves a quiet week without the section", async () => {
+    const { children, reportShellModel } = await buildPlanningPageModel();
     const section = elementsIn(children).find((element) => element.props.id === "ops-failure-patterns");
-    assert.ok(section, "the risk checks section renders");
+    const linked = reportShellModel.page.sectionLinks.some((link) => link.href === "#ops-failure-patterns");
+    assert.equal(linked, Boolean(section), "the outline links the warnings exactly when they render");
+    if (!section) return;
     assert.doesNotMatch(section.props.className ?? "", /\bweather-panel\b|\brounded|\bp-4\b/);
     assert.match(section.props.className ?? "", /\bborder-t\b/);
     assert.ok(!elementsIn(section.props.children).some((element) => /type-eyebrow/.test(element.props.className ?? "")), "no kicker over the heading");
-    const text = textIn(section.props.children);
-    if (text.includes("No warning this week")) {
-      // Nothing to recheck the rules against, and no slab around the sentence.
-      assert.ok(!text.includes("Recheck the rules"));
-      assert.ok(!elementsIn(section.props.children).some((element) => /weather-surface/.test(element.props.className ?? "")));
-    }
+    assert.ok(!textIn(section.props.children).includes("No warning this week"));
   });
 
   /* The "Resource templates and guides" disclosure listed the guides Guides lists, and

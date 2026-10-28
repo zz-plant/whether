@@ -1,6 +1,4 @@
 import { formatGuidance } from "../../lib/export/briefBuilders";
-import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
-import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
 import type { ReportShellModel } from "../components/reportShell";
 import { buildBreadcrumbList } from "../../lib/seo";
@@ -10,11 +8,8 @@ import {
   buildCompactTrustSummary,
   buildTrustWarnings,
 } from "../../lib/report/trustStatus";
-import { buildSharedCorridorRails } from "../../lib/report/operatingCalls";
 import { buildDegradedSourceRows, buildSourceBoardRows } from "../../lib/report/sourceHealth";
-import { buildLadderLines } from "../components/ui/scoreLadder";
 import type { TrustStripProps } from "../components/trustStrip";
-import type { ScorePositions } from "./formulaReference";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { loadCronRunHistory } from "../../lib/telemetry/runHistory";
 import { formatActivationFunnelLine } from "../../lib/telemetry/activationFunnelReport";
@@ -58,29 +53,6 @@ export async function buildTrustPageModel() {
     assessment: reportData.assessment,
     scoringBasis: reportData.scoringBasis,
   });
-  /* Where the two scores sit against their lines, for the ladders that open
-     "How the scores are built". The earlier reading comes from `previousScoresFromDynamics`,
-     the derivation the homepage and every export use: no previous reading at
-     all is `"unavailable"`, which draws no hollow dot rather than a dot claiming
-     a comparison nobody made, and a move past the weekly sanity limit counts.
-     The dot is named by the date of that reading, not "last week". */
-  const scores = reportData.assessment.scores;
-  const thresholds = reportData.assessment.thresholds;
-  const rails = buildSharedCorridorRails(reportData.actionStripItems ?? [], scores);
-  const previousScores = previousScoresFromDynamics(reportData.reportDynamics, scores);
-  const positionFor = (key: "tightness" | "riskAppetite", callChange: number) => {
-    const rail = rails.find((candidate) => candidate.metric === key);
-    return {
-      value: scores[key],
-      previous: previousScores?.[key] ?? null,
-      previousLabel: comparisonBasis(previousScores?.comparedWith).label,
-      lines: buildLadderLines({ pause: rail?.guardrail, resume: rail?.clearsAt, callChange }),
-    };
-  };
-  const scorePositions: ScorePositions = {
-    tightness: positionFor("tightness", thresholds.tightnessRegime),
-    riskAppetite: positionFor("riskAppetite", thresholds.riskAppetiteRegime),
-  };
   const warnings = buildTrustWarnings({
     confidenceLabel: homeBriefModel.confidenceLabel,
     transitionWatch: homeBriefModel.transitionWatch,
@@ -181,7 +153,6 @@ export async function buildTrustPageModel() {
     warnings,
     revisitBullets,
     trustStrip,
-    scorePositions,
     runHistory,
     readerReturns: storedFunnel && readerReturnsLine ? { line: readerReturnsLine, generatedAt: storedFunnel.generatedAt } : null,
     reportShellModel,

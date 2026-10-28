@@ -318,8 +318,11 @@ export default function RootLayout({
                   name links its hub, and its other pages follow. Until
                   2026-10-08 this was a "weekly loop" list of seven layers and a
                   "Tools & reference" list of nine, which between them listed
-                  /history/compare twice, as "Compare" and "Compare periods". */}
-              <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4">
+                  /history/compare twice, as "Compare" and "Compare periods".
+                  From md only (2026-10-27): below it the tab bar and its More sheet
+                  list every page, and the four columns ran about 600px at the foot
+                  of every phone page repeating them. */}
+              <div className="grid grid-cols-2 gap-x-6 gap-y-6 max-md:hidden sm:grid-cols-4">
                 {navigationGroups.map((group) => {
                   const others = [
                     ...pagesInGroup(group.key)

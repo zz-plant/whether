@@ -303,10 +303,8 @@ export const DECISION_AREA_ICONS: Record<DecisionArea, LucideIcon> = {
 };
 
 /*
- * The score each area's lines are usually drawn on. The area table names it
- * under a row whose lines do not say ("Line set by Funding pressure"), and the
- * signal rows invert it ("Governs: Hiring, Fundraising, Spending"), so the two
- * cannot disagree about which score rules which area.
+ * The score each area's lines are usually drawn on, which the signal rows invert
+ * ("Governs: Hiring, Fundraising, Spending").
  */
 const usualMetrics: Record<DecisionArea, readonly RuleConditionMetric[]> = {
   hiring: ["tightness"],
@@ -315,8 +313,6 @@ const usualMetrics: Record<DecisionArea, readonly RuleConditionMetric[]> = {
   "expansion-bets": ["riskAppetite"],
   "capital-raising": ["tightness", "riskAppetite"],
 };
-
-export const decisionAreaUsualMetrics = (area: DecisionArea) => usualMetrics[area];
 
 /** The areas a score governs, in the one area order. */
 export const areasGovernedBy = (metric: RuleConditionMetric): DecisionArea[] =>

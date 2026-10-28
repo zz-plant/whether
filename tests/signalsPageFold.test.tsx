@@ -56,9 +56,13 @@ const summaryAnswer = (markup: string, question: string) => {
 };
 
 describe("/signals leads with the delta and folds its instruments", () => {
-  it("opens on what changed, with no restated call", () => {
-    assert.ok(html.indexOf('id="what-changed"') < html.indexOf('id="call-lines"'));
-    assert.ok(html.indexOf('id="call-lines"') < html.indexOf('id="instruments"'));
+  /* Two sections since 2026-10-27: the call-line ladders and "Pause if / Resume when"
+     between them were the brief's "What would change this guidance" drawn again, and
+     the table links there instead. */
+  it("opens on what changed, with no restated call and no second copy of the brief's lines", () => {
+    assert.ok(html.indexOf('id="what-changed"') < html.indexOf('id="instruments"'));
+    assert.ok(!html.includes('id="call-lines"'));
+    assert.ok(html.includes('href="/#what-would-change"'));
     assert.doesNotMatch(html, /What this means now|id="decision-summary"/);
     assert.ok(!model.sectionLinks.some((link) => link.href === "#decision-summary"));
   });
@@ -181,9 +185,4 @@ describe("/signals what-changed table and rails", () => {
     assert.doesNotMatch(row, /<td[^>]*><span class="text-slate-500">—<\/span><\/td>\s*$/);
   });
 
-  it("caps each rail at the wide track its labels are laid out for", () => {
-    const callLines = html.slice(html.indexOf('id="call-lines"'), html.indexOf('id="instruments"'));
-    assert.match(callLines, /md:grid-cols-\[repeat\(2,minmax\(0,28rem\)\)\]/);
-    assert.doesNotMatch(callLines, /md:grid-cols-2\b/);
-  });
 });

@@ -54,7 +54,8 @@ type ArtifactFile = {
   href: string;
   label: string;
   /** What the file is for, in the place it lands. */
-  use: string;
+  /** What the file is for, where its label does not say. A download button needs no gloss. */
+  use?: string;
   download: boolean;
   /** What the browser names the saved file; the export routes name their own. */
   filename?: string;
@@ -146,7 +147,6 @@ export const buildShareImageArtifacts = (
         {
           href: briefCardSrc,
           label: "Download PNG",
-          use: "Saves the picture, in the shape and theme shown above.",
           download: true,
           filename: "whether-brief.png",
         },

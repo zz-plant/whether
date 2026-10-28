@@ -380,7 +380,6 @@ async function PageContent({
     lines: metricLines,
     tightnessPressure,
     tightnessSaturated,
-    scoringBasis: reportData.scoringBasis,
   });
   const decisionMovement = homepage.weeklyDecisionCardModel.decision.decisionMovement;
   const homeAreaRows = buildHomeAreaRows({

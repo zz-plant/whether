@@ -25,8 +25,6 @@ export type AreaRowText = {
   rule: string;
   pause?: { line: string; distance?: string; state?: LineState };
   resume?: { line: string; distance?: string; state?: LineState };
-  /** The scores the printed lines are drawn on. */
-  scores?: RuleConditionMetric[];
   href?: Route;
 };
 
@@ -42,8 +40,16 @@ const answerHrefForArea = (area: DecisionArea): Route | undefined => {
   return page ? `/answers/${page.slug}` : undefined;
 };
 
+/* Funding pressure first, then risk appetite, in every row (2026-10-27): the rules
+   stored them in either order, so two areas on the same line read "Funding pressure
+   > 76 or Risk appetite < 44" and "Risk appetite < 44 or Funding pressure > 76", and
+   a shared line did not look shared. */
+const METRIC_ORDER: readonly RuleConditionMetric[] = ["tightness", "riskAppetite"];
+
 const joinConditions = (conditions: readonly RuleCondition[], join: "or" | "and", qualifier?: string) => {
-  const parts = conditions.map((condition) => condition.label);
+  const parts = [...conditions]
+    .sort((a, b) => METRIC_ORDER.indexOf(a.metric) - METRIC_ORDER.indexOf(b.metric))
+    .map((condition) => condition.label);
   if (qualifier) parts.push(qualifier);
   return parts.join(` ${join} `);
 };
@@ -73,7 +79,6 @@ export const buildAreaRows = (items: readonly ActionStripItem[]): AreaRowText[] 
         distance: resumeConditions.length > 0 ? distanceTo(item.bindingResume, "resume") : undefined,
         state: resumeConditions.length > 0 ? stateOf(item.bindingResume, "resume") : undefined,
       },
-      scores: [...pauseConditions, ...resumeConditions].map((condition) => condition.metric),
       href: answerHrefForArea(area),
     };
   });

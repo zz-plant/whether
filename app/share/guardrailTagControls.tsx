@@ -65,7 +65,6 @@ export function GuardrailTagControls({ blocks, rows }: { blocks: GuardrailTagBlo
           : row;
       })}
       caption="This week's rule, pause line and resume line for each area, as the tags carry them"
-      signalLinkBase="/"
     />
   );
 }

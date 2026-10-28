@@ -1,21 +1,21 @@
 import Link from "next/link";
 import { ReportSection } from "../../components/reportSection";
 import { ScoreCell, formatPoints } from "../../components/ui/scoreCell";
-import { ScoreLadder } from "../../components/ui/scoreLadder";
 import { GovernedAreas } from "../../components/ui/governedAreas";
-import { BoundedValue } from "../../components/ui/boundedValue";
 import { ActionLink } from "../../components/ui/actionLink";
 import { toRoute } from "../../../lib/navigation/routeType";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import type { CallLineLadder, SignalReferenceRow } from "../../../lib/report/evidenceReaderModel";
+import type { SignalReferenceRow } from "../../../lib/report/evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
 import { buildSignalsFocusHref, focusTabs, type FocusTab } from "../evidenceQueryState";
 
 /**
- * The first two of the evidence page's three sections, in the order a reader
- * answers their questions: what moved, and how close the scores sit to the
- * lines that would change the guidance. The instruments — charts, the line
- * editor, the month picker — are the third, in `evidenceInstruments.tsx`.
+ * The first of the evidence page's two sections: what moved. The instruments —
+ * charts, the line editor, the month picker — are the second, in
+ * `evidenceInstruments.tsx`. How close the scores sit to the lines that would
+ * change the guidance is the brief's section, linked under the table: this page
+ * drew the same two ladders and the same "Pause if / Resume when" until
+ * 2026-10-27.
  *
  * What these replaced (2026-09-22): a decision summary whose "Main pressure"
  * cell restated the first entry of a five-queue "checks" section two screens
@@ -42,20 +42,25 @@ const TONE_CLASS: Record<SignalReferenceRow["direction"]["tone"], string> = {
  * number itself went. A signal with no recorded comparison shows the sentence
  * that is true of it rather than an arrow.
  */
+/* Where the reading came from, not where it is (2026-10-27): the cell one column over
+   prints this week's value against its line, so "90 → 90" beside "This week 90 of 100"
+   said the 90 twice, and an unmoved score drew a chip to say so. */
 const DeltaChip = ({ row }: { row: SignalReferenceRow }) => {
   if (row.value === null) return <span className="text-slate-500">—</span>;
   if (row.previous === null) {
     return <span className={`text-xs ${TONE_CLASS[row.direction.tone]}`}>{row.direction.label}</span>;
+  }
+  const from = formatValue(row, row.previous);
+  if (from === formatValue(row, row.value)) {
+    return <span className="text-xs text-slate-400">No change</span>;
   }
   return (
     <span
       className={`inline-flex items-center gap-1.5 rounded-sm border border-[var(--border-default)] px-1.5 py-0.5 text-xs tabular-nums ${TONE_CLASS[row.direction.tone]}`}
       title={row.direction.label}
     >
-      <span className="text-slate-400">{formatValue(row, row.previous)}</span>
-      <span aria-hidden="true">→</span>
-      <span className="sr-only">to</span>
-      <span className="font-semibold">{formatValue(row, row.value)}</span>
+      <span className="text-slate-400">from</span>
+      <span className="font-semibold">{from}</span>
       <span className="sr-only">{row.direction.label}</span>
     </span>
   );
@@ -156,7 +161,7 @@ export const SignalsWhatChangedSection = ({
                     <GovernedAreas metric={row.key} target="brief" className="mt-0.5" />
                   ) : row.key === "baseRate" ? (
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Feeds into <a href="#call-lines" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
+                      Feeds into <a href="#tightness" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
                     </span>
                   ) : (
                     /* The curve slope. Sets risk appetite outright, and adds to
@@ -164,7 +169,7 @@ export const SignalsWhatChangedSection = ({
                        and the inversion points in regimeEngineCore). This said
                        funding pressure alone. */
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                      Feeds into <a href="#call-lines" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted
+                      Feeds into <a href="#riskAppetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and Funding pressure once inverted
                     </span>
                   )}
                 </th>
@@ -209,6 +214,12 @@ export const SignalsWhatChangedSection = ({
           </tbody>
         </table>
       </div>
+      <p className="text-fluid-xs text-slate-400">
+        <ActionLink href="/#what-would-change" variant="inline">
+          {DECISION_CONTRACT_LABELS.watch.flipWatch}
+        </ActionLink>
+        : each score&rsquo;s pause and resume lines, on the brief.
+      </p>
       {focusInstruments.length > 0 ? (
         <ul className="space-y-1 text-sm text-slate-300" aria-label="Also check">
           {focusInstruments.map((instrument) => (
@@ -222,58 +233,6 @@ export const SignalsWhatChangedSection = ({
           ))}
         </ul>
       ) : null}
-    </ReportSection>
-  );
-};
-
-export const SignalsCallLinesSection = ({
-  ladders,
-  triggerCondition,
-  reversalCondition,
-  showMicroDecisionRows,
-}: {
-  ladders: CallLineLadder[];
-  triggerCondition: string;
-  reversalCondition: string;
-  showMicroDecisionRows: boolean;
-}) => {
-  /* One `<dl>` for both cases. The split rows and the plain rows were the same
-     markup written twice, differing only in whether the sentence went through
-     `BoundedValue`. */
-  const renderCondition = (value: string) =>
-    showMicroDecisionRows ? <BoundedValue>{value}</BoundedValue> : value;
-  return (
-    <ReportSection id="call-lines" title={DECISION_CONTRACT_LABELS.watch.flipWatch}>
-      {/* Each rail capped at 28rem, the wide track `ScoreLadder` lays its
-          labels out for (ui-ux-standards §XVII, §XVIII). Two equal columns
-          of the report width stretched each rail to about 620px on a desktop,
-          with 11px numbers strung along it and the two rails 650px apart. */}
-      <div className="grid gap-x-10 gap-y-6 md:grid-cols-[repeat(2,minmax(0,28rem))]">
-        {ladders.map((ladder) => (
-          <ScoreLadder
-            key={ladder.key}
-            label={ladder.label}
-            value={ladder.value}
-            previous={ladder.previous}
-            previousLabel={ladder.previousLabel}
-            lines={ladder.lines}
-          />
-        ))}
-      </div>
-      {/* Was two tinted cards nested inside this card, inside the section
-          card — three containment levels for two sentences. Labelled rows
-          carry the same distinction with one level, and the hue now sits on
-          the label rather than on a box around it. */}
-      <dl className="space-y-1.5 text-sm text-slate-200">
-        <div className="flex flex-wrap gap-x-2">
-          <dt className="shrink-0 font-semibold text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</dt>
-          <dd className="min-w-0">{renderCondition(triggerCondition)}</dd>
-        </div>
-        <div className="flex flex-wrap gap-x-2">
-          <dt className="shrink-0 font-semibold text-semantic-easing-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</dt>
-          <dd className="min-w-0">{renderCondition(reversalCondition)}</dd>
-        </div>
-      </dl>
     </ReportSection>
   );
 };
