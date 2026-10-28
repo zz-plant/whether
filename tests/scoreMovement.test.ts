@@ -158,7 +158,7 @@ describe("what a row and a paste say about the move", () => {
   };
 
   it("says a move made of rates alone is all from rates, with no caveat to make", () => {
-    assert.equal(describeScoreMovement("tightness", fundingRow, aug31), "All from interest rates.");
+    assert.equal(describeScoreMovement("tightness", fundingRow, aug31), "All of it came from interest rates.");
   });
 
   it("gives each part its sign, and says the earlier score never had an input that is not rates", () => {

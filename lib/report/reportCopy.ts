@@ -128,7 +128,7 @@ export type PolicyHoldCall = {
    it read "The decision can't be undone while the guidance is held.", which
    names no decision and reads as a warning that nothing can be reversed; it now
    says which decisions wait, and that the rest go ahead. */
-const HELD_PAUSE_IF = "A decision can't be undone; reversible ones go ahead while the guidance is held.";
+const HELD_PAUSE_IF = "A decision can't be undone. Anything you can undo can go ahead while the guidance is on hold.";
 
 /**
  * The guidance when the policy engine refuses to support a change, one entry
@@ -152,7 +152,7 @@ export const POLICY_OVERRIDE_CALL = {
     actionNow: "Keep your current plan, and hold anything you can't undo until the scores agree.",
     pauseIf: HELD_PAUSE_IF,
     callChangesIf:
-      "The two scores point the same way for a second reading; until then the guidance is not changing.",
+      "Both scores point the same way for a second reading. Until then, the guidance can't change.",
     holdsUntil: "the two scores agree",
     whyCouldBeWrong: "The two scores disagree, so this week's direction can't be read clearly.",
   },

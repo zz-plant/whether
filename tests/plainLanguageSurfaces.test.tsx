@@ -117,7 +117,7 @@ describe("the plain-English layer beside the week's readings", () => {
 
   it("renders the unclipped pressure beside a saturated score", () => {
     const html = render({ value: 100, valueLabel: "100", delta: 0, saturatedPressure: 114 });
-    assert.match(html, /would read 114/);
+    assert.match(html, /would be 114/);
   });
 
   it("provides historical era context and leadership team prompt", () => {

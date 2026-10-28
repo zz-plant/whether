@@ -149,10 +149,10 @@ export const buildSignalConfidenceReason = ({
 }) => {
   const boundaryClause =
     nearestThresholdGap <= 5
-      ? "Conditions are sitting on the line where they change"
+      ? "Conditions could change any week"
       : nearestThresholdGap <= 12
-        ? "Conditions have modest room before the line where they change"
-        : "Conditions are well clear of the line where they change";
+        ? "Conditions are a little way from changing"
+        : "Conditions are nowhere near changing";
 
   const hasPositiveMoves = changedSignals.some((signal) => signal.delta > 0);
   const hasNegativeMoves = changedSignals.some((signal) => signal.delta < 0);
@@ -161,12 +161,12 @@ export const buildSignalConfidenceReason = ({
     changedSignals.length === 0
       ? "and this week's readings barely moved"
       : directionalSplit || changedSignals.length >= 3
-        ? "and this week's readings pulled against each other"
+        ? "and this week's numbers pointed different ways"
         : "and this week's readings moved together";
 
   const verdict =
     confidenceLabel === "LOW"
-      ? "Treat it as provisional until another read confirms it."
+      ? "Treat it as tentative until next week's numbers back it up."
       : confidenceLabel === "MED"
         ? "Plan against it, but hold anything irreversible."
         : "It is stable enough to decide on this week.";
@@ -200,33 +200,37 @@ export const buildOperatingStanceLine = ({
   //   have", "customers" and "can be undone" hold for any.
   // The worse-week and steady-week sentences now differ only where the advice
   // does: a worsening Sunny week names the stop condition.
+  // - Said the way a colleague would say it (2026-10-28). "Commit to what
+  //   protects income you have; new bets wait for cheaper money." had a hollow
+  //   "what" for an object, no "the", and bets doing the waiting; "Favour" and
+  //   "could not reverse" were a register nobody uses in a meeting.
   if (severityDelta > 0 || directionLabel === "deteriorating") {
     if (currentRegime === "SCARCITY") {
-      return "Commit only to what brings in cash or keeps a promise to a customer.";
+      return "Only say yes to things that bring in cash or that a customer is already counting on.";
     }
     if (currentRegime === "DEFENSIVE") {
-      return "Commit to what protects income you have; new bets wait for cheaper money.";
+      return "Protect the revenue you already have, and hold off on new bets until money gets cheaper.";
     }
     if (currentRegime === "VOLATILE") {
-      return "Favour commitments that pay off soon and can be undone; hold anything you could not reverse.";
+      return "Go for things that pay off soon and that you can undo, and hold off on anything you can't take back.";
     }
-    return "Keep growing where demand is already proven, and decide now what would make you stop.";
+    return "Keep growing where demand is proven, and agree now on what would make you stop.";
   }
 
   if ((severityDelta < 0 || directionLabel === "improving") && currentRegime === "EXPANSION") {
-    return "Put more behind what is already working, and grow where demand is already proven.";
+    return "Put more into what's already working, and grow where demand is proven.";
   }
 
   if (currentRegime === "SCARCITY") {
-    return "Commit only to what brings in cash or keeps a promise to a customer.";
+    return "Only say yes to things that bring in cash or that a customer is already counting on.";
   }
   if (currentRegime === "DEFENSIVE") {
-    return "Commit to what protects income you have; new bets wait for cheaper money.";
+    return "Protect the revenue you already have, and hold off on new bets until money gets cheaper.";
   }
   if (currentRegime === "VOLATILE") {
-    return "Favour commitments that pay off soon and can be undone; hold anything you could not reverse.";
+    return "Go for things that pay off soon and that you can undo, and hold off on anything you can't take back.";
   }
-  return "Put more behind what is already working, and grow where demand is already proven.";
+  return "Put more into what's already working, and grow where demand is proven.";
 };
 
 const trendMemoLines: Record<string, string> = {

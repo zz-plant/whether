@@ -51,19 +51,19 @@ export const describeReconstructedPeriod = (periodTitle: string, firstPublishedW
  */
 const LAST_RESCORE = {
   dateLabel: "Oct 9, 2026",
-  change: "the Chicago Fed financial conditions index joined the inputs the record is scored on, the same inputs that now set the guidance",
+  change: "after adding the Chicago Fed's financial conditions index, so the record uses the same inputs that now set the guidance",
   before: { held: 169, comparisons: 176, changes: 7, signaled: 2, graded: 5 },
 } as const;
 
 const percent = (held: number, of: number) => `${Math.round((held / of) * 100)}%`;
 
-const rescoreLead = () => `Re-scored on ${LAST_RESCORE.dateLabel}, when ${LAST_RESCORE.change}.`;
+const rescoreLead = () => `We re-scored the record on ${LAST_RESCORE.dateLabel}, ${LAST_RESCORE.change}.`;
 
 /** /calibration's line on the last re-score: the study's count before it, where that differs from the count above. */
 export const describeCalibrationRescore = (now: { held: number; comparisons: number }): string => {
   const { before } = LAST_RESCORE;
   return now.held === before.held && now.comparisons === before.comparisons
-    ? `${rescoreLead()} No month's conditions changed, so the count above is the one published before it.`
+    ? `${rescoreLead()} No month's conditions changed, so the count above matches the one published before.`
     : `${rescoreLead()} Before it, ${before.held} of ${before.comparisons} comparisons held (${percent(before.held, before.comparisons)}).`;
 };
 
@@ -71,7 +71,7 @@ export const describeCalibrationRescore = (now: { held: number; comparisons: num
 export const describeTrackRecordRescore = (now: { changes: number; signaled: number; graded: number }): string => {
   const { before } = LAST_RESCORE;
   return now.changes === before.changes && now.signaled === before.signaled && now.graded === before.graded
-    ? `${rescoreLead()} No month's conditions changed, so the counts above are the ones published before it.`
+    ? `${rescoreLead()} No month's conditions changed, so the counts above match the ones published before.`
     : `${rescoreLead()} Before it, the record showed ${before.changes} changes in conditions, and ${before.signaled} of the last ${before.graded} signaled in advance.`;
 };
 

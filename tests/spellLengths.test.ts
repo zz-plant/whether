@@ -30,46 +30,46 @@ describe("how long conditions lasted before", () => {
     const series = walk([S, S, S, F, F, F, F, C, C, S, S]);
     assert.equal(
       spellText({ series, currentRegime: F, runwayBand: null }),
-      "The one earlier Freezing spell on record ran 4 month-ends, Apr 2020 to Jul 2020. No conditions since 2020 lasted under 2 month-ends. A count from the record, not a forecast.",
+      "The only earlier Freezing stretch lasted 4 months, Apr 2020 to Jul 2020. Since 2020, every stretch of conditions has lasted at least 2 months. That's a count of what happened, not a forecast.",
     );
   });
 
   it("leaves the spell the record ends in out of the earlier ones while it is still running", () => {
     const series = walk([F, F, S, S, S, F, F, F]);
-    assert.match(spellText({ series, currentRegime: F, runwayBand: null }) ?? "", /^This Freezing spell has run 3 month-ends so far\. The one earlier ran 2 month-ends/);
+    assert.match(spellText({ series, currentRegime: F, runwayBand: null }) ?? "", /^It's been Freezing for 3 months so far\. The last Freezing stretch lasted 2 months/);
   });
 
   it("counts several earlier spells without averaging them", () => {
     const series = walk([F, F, S, S, F, F, F, C]);
-    assert.match(spellText({ series, currentRegime: F, runwayBand: null }) ?? "", /^The record has 2 earlier Freezing spells: 2 and 3 month-ends long\./);
+    assert.match(spellText({ series, currentRegime: F, runwayBand: null }) ?? "", /^There have been 2 earlier Freezing stretches, lasting 2 and 3 months\./);
   });
 
   it("says when every earlier spell outlasted the top of the reader's runway band", () => {
     const series = walk([...Array(14).fill(F), S, S]);
-    assert.match(spellText({ series, currentRegime: F, runwayBand: "tight" }) ?? "", /That spell outlasted 6–12 months of runway, the band you chose\./);
-    assert.doesNotMatch(spellText({ series, currentRegime: F, runwayBand: "balanced" }) ?? "", /outlasted/);
-    assert.doesNotMatch(spellText({ series, currentRegime: F, runwayBand: "abundant" }) ?? "", /outlasted/);
+    assert.match(spellText({ series, currentRegime: F, runwayBand: "tight" }) ?? "", /That stretch lasted longer than 6–12 months of runway, the band you chose\./);
+    assert.doesNotMatch(spellText({ series, currentRegime: F, runwayBand: "balanced" }) ?? "", /lasted longer than/);
+    assert.doesNotMatch(spellText({ series, currentRegime: F, runwayBand: "abundant" }) ?? "", /lasted longer than/);
   });
 
   it("says when the record has no earlier spell of these conditions", () => {
-    assert.match(spellText({ series: walk([S, S, C, C]), currentRegime: F, runwayBand: null }) ?? "", /^The record since 2020 has no earlier Freezing spell\./);
+    assert.match(spellText({ series: walk([S, S, C, C]), currentRegime: F, runwayBand: null }) ?? "", /^There's no earlier Freezing stretch since 2020\./);
   });
 
   it("reads the bundled record: one Freezing spell, Sep 2022 to Apr 2025", () => {
     const sentence = spellText({ series: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER), currentRegime: F, runwayBand: "balanced" }) ?? "";
-    assert.match(sentence, /The one earlier Freezing spell on record ran 32 month-ends, Sep 2022 to Apr 2025\./);
-    assert.match(sentence, /That spell outlasted 12–24 months of runway/);
+    assert.match(sentence, /The only earlier Freezing stretch lasted 32 months, Sep 2022 to Apr 2025\./);
+    assert.match(sentence, /That stretch lasted longer than 12–24 months of runway/);
   });
 
   /* "How long will it last" is what the section is for: the lead sets the spell the
      record ends in beside the earlier ones (2026-10-27). */
   it("leads with how long this spell has run, beside the earlier ones, while it is still running", () => {
     const one = describeSpellLengths({ series: walk([F, F, F, S, S, F, F]), currentRegime: F, runwayBand: null });
-    assert.equal(one?.lead, "This Freezing spell has run 2 month-ends so far. The one earlier ran 3 month-ends, Jan 2020 to Mar 2020.");
-    assert.match(one?.rest ?? "", /^No conditions since 2020 lasted under 2 month-ends\. A count from the record, not a forecast\.$/);
+    assert.equal(one?.lead, "It's been Freezing for 2 months so far. The last Freezing stretch lasted 3 months, Jan 2020 to Mar 2020.");
+    assert.match(one?.rest ?? "", /^Since 2020, every stretch of conditions has lasted at least 2 months\. That's a count of what happened, not a forecast\.$/);
     const first = describeSpellLengths({ series: walk([S, S, F]), currentRegime: F, runwayBand: null });
-    assert.equal(first?.lead, "This is the first Freezing spell since 2020, 1 month-end so far.");
+    assert.equal(first?.lead, "This is the first Freezing stretch since 2020, 1 month so far.");
     const many = describeSpellLengths({ series: walk([F, F, S, F, F, F, C, F]), currentRegime: F, runwayBand: null });
-    assert.equal(many?.lead, "This Freezing spell has run 1 month-end so far. The 2 earlier ran 2 and 3 month-ends.");
+    assert.equal(many?.lead, "It's been Freezing for 1 month so far. The 2 earlier ones lasted 2 and 3 months.");
   });
 });

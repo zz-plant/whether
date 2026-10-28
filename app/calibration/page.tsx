@@ -61,7 +61,7 @@ export default function CalibrationPage() {
           "Weekly brief" over their titles. */}
       <SecondaryPageHeader
         title="Margin calibration study"
-        description={`The published margin, checked against ${totals.months} month-to-month comparisons since 2012: how often conditions held at each distance from the line where they change.`}
+        description={`We checked the published margin against ${totals.months} month-to-month comparisons since 2012: how often conditions stayed put at each distance from the line where they change.`}
       />
 
       <ConfidenceRecordSection />
@@ -96,7 +96,7 @@ export default function CalibrationPage() {
 
       <SecondaryPageSection
         title="What it does not show"
-        description="The limits are the reason the number was not simply re-fitted."
+        description="These limits are why we didn't just re-fit the number."
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
@@ -113,8 +113,8 @@ export default function CalibrationPage() {
           </li>
         </ul>
         <p className="mt-4 text-sm text-slate-300">
-          So the margin keeps measuring distance, and distance is an honest thing to measure. This
-          record is published beside it rather than folded into it.
+          So the margin still measures distance, which it can do honestly, and this record sits next to
+          it instead of being folded in.
         </p>
       </SecondaryPageSection>
 

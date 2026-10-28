@@ -500,18 +500,18 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
     hiring: {
       area: "hiring",
       recommendation: isExpansion
-        ? "Selective hiring for revenue-linked and reliability roles."
-        : "Backfills + mission-critical hiring only.",
+        ? "Hire selectively, for roles tied to revenue or reliability."
+        : "Only backfills and critical hires.",
       doNow: isExpansion
-        ? ["Approve revenue-linked and reliability roles one at a time; hold everything else."]
-        : ["Limit hiring to backfills and mission-critical roles tied to delivery risk."],
+        ? ["Approve roles tied to revenue or reliability one at a time, and hold everything else."]
+        : ["Only replace people who leave, and hire for roles you can't deliver without."],
       avoidNow: isExpansion
-        ? ["Don't open a hiring plan that no revenue or reliability need explains."]
+        ? ["Don't open roles that aren't tied to revenue or reliability."]
         : ["Don't add roles for capacity you might need, or for work that pays back in more than a year."],
       scope: `Applies to all net-new headcount; current funding pressure ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
       pause: { verb: "Pause net-new hiring", join: "or", conditions: [tightnessPauseLine, riskPauseLine] },
       resume: { verb: "Resume the held roles", join: "and", conditions: [tightnessResumeLine, riskResumeLine] },
-      rationale: "Keep the people who ship, without adding fixed cost you cannot cut later.",
+      rationale: "Keep the people doing the work, and don't add costs you can't cut later.",
     },
     "product-tempo": {
       area: "product-tempo",
@@ -520,7 +520,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         : "Keep the current roadmap moving. Slow anything that pays back in more than a year.",
       doNow: isExpansion
         ? ["Ship the product bets that move activation or retention first."]
-        : ["Keep the core roadmap on schedule; ship the pieces customers can use this quarter first."],
+        : ["Keep the core roadmap on schedule, and ship what customers can use this quarter first."],
       avoidNow: isExpansion
         ? ["Don't commit to scope you can't cut until a shipped milestone shows traction."]
         : ["Don't add roadmap work that pays back in more than a year on weak evidence."],
@@ -537,19 +537,19 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         conditions: [riskResumeLine],
         qualifier: "the weekly reading holds or improves",
       },
-      rationale: "Move fast where the evidence is strong; keep unproven scope small enough to drop.",
+      rationale: "Move fast where the evidence is strong, and keep unproven work small enough to drop.",
     },
     "capital-raising": {
       area: "capital-raising",
       recommendation: isExpansion
         ? "If you plan to raise in the next 12 months, start now while terms are good."
-        : "If you plan to raise, start early and take the terms that last over the ones that close fastest.",
+        : "If you're raising, start early, and pick terms you can live with over a fast close.",
       doNow: isExpansion
         ? ["If a raise is in your plan, run the process now rather than waiting."]
-        : ["If you plan to raise, prepare the materials now so the timing stays yours."],
+        : ["If you're planning to raise, get your materials ready now so you decide when to go out."],
       avoidNow: isExpansion
         ? ["Don't wait until you need the money to talk to investors."]
-        : ["Don't trade term quality for a faster close."],
+        : ["Don't take worse terms just to close faster."],
       scope: "When to start a raise, how fast to run it, and where to walk away on terms.",
       pause: { verb: "Pause the raise", join: "or", conditions: [riskPauseLine, tightnessPauseLine] },
       resume: { verb: "Resume the full process", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },
@@ -558,7 +558,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
     "burn-discipline": {
       area: "burn-discipline",
       recommendation: `Approve spending only if it pays back inside ${SPENDING_PAYBACK_BAR_MONTHS} months.`,
-      doNow: [`Put a payback figure on every discretionary line before approving it; ${SPENDING_PAYBACK_BAR_MONTHS} months is the bar.`],
+      doNow: [`Before you approve any optional spend, work out how long it takes to pay back. ${SPENDING_PAYBACK_BAR_MONTHS} months is the bar.`],
       avoidNow: ["Don't sign a multi-quarter commitment without a payback figure."],
       scope: "Hiring, vendor and marketing spend that commits you for more than one quarter.",
       pause: { verb: "Pause new discretionary spend", join: "or", conditions: [tightnessPauseLine] },
@@ -568,19 +568,19 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
         conditions: [tightnessResumeLine],
         qualifier: "the payback figures still hold",
       },
-      rationale: "Cash you did not spend is the option you keep when conditions turn.",
+      rationale: "Money you don't spend now is money you still have if conditions get worse.",
     },
     "expansion-bets": {
       area: "expansion-bets",
       recommendation: isExpansion
         ? "Start new bets in stages, each with a written stop condition."
-        : "Hold any new bet you can't unwind; keep only the experiments you can stop within a week.",
+        : "Hold off on any new bet you can't undo, and only keep experiments you can stop within a week.",
       doNow: isExpansion
         ? ["Fund each new bet one stage at a time, and write down what would stop it."]
         : ["Keep only the experiments you can stop within a week, each with a review date."],
       avoidNow: isExpansion
-        ? ["Don't sign a commitment you can't unwind until the previous stage has paid off."]
-        : ["Don't start a bet you can't unwind until the reading improves."],
+        ? ["Don't sign a commitment you can't undo until the previous stage has paid off."]
+        : ["Don't start a bet you can't undo until the scores improve."],
       scope: "New market launches, major platform rewrites, and long-cycle initiatives.",
       pause: { verb: "Pause new bets", join: "or", conditions: [riskPauseLine, tightnessPauseLine] },
       resume: { verb: "Resume one stage at a time", join: "and", conditions: [riskResumeLine, tightnessResumeLine] },

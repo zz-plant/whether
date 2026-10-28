@@ -23,7 +23,7 @@ export const websiteName = "Whether — Weekly Operating Guidance for Startup Le
  * is a set of lines checked weekly and an email the day one is crossed.
  */
 export const canonicalPositioningLine =
-  "The interest-rate and credit lines that pause or resume your hiring, spend and raise. Checked every Monday, with an email the day one is crossed.";
+  "We read interest rates and credit markets and tell you when to pause or resume hiring, spending and fundraising. Updated every Monday, with an email the day a line is crossed.";
 /*
  * The category line as the homepage's first-visit orientation: whom it is for,
  * then the line itself. The page opens on the week's guidance, which says what

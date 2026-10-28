@@ -192,7 +192,7 @@ describe("RegimeRadar path", () => {
     // The four words are not a severity scale (2026-10-14), so the caption
     // always carries the orientation, and is never empty.
     const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} />);
-    assert.match(html, /<figcaption[\s\S]*Easiest bottom right \(Sunny\), hardest top left \(Freezing\)\.[\s\S]*<\/figcaption>/);
+    assert.match(html, /<figcaption[\s\S]*Sunny, bottom right, is the easiest; Freezing, top left, the hardest\.[\s\S]*<\/figcaption>/);
     const withFooter = renderToStaticMarkup(<RegimeRadar {...base} footer={<span>How they are set</span>} />);
     assert.match(withFooter, /<figcaption[\s\S]*How they are set[\s\S]*<\/figcaption>/, "the footer closes the caption");
   });

@@ -164,8 +164,8 @@ export function TrackRecordTiles({
           </FactList>
 
           <p className="text-fluid-xs text-slate-400">
-            {CALL_CHANGE_RULE} One noisy month cannot move them, so unchanged conditions are the usual state and a
-            change is the event worth reading.
+            {CALL_CHANGE_RULE} One noisy month can&rsquo;t change them, so most months nothing changes, and a
+            change is worth your attention.
           </p>
         </div>
 
@@ -209,9 +209,9 @@ export function TrackRecordTable({
             equivalent to them: it is a weighted blend, and the month-to-month
             change column is a move in that blend. */}
         <p className="max-w-prose text-sm text-slate-300">
-          Each month&apos;s {OPERATING_LATITUDE_LABEL.toLowerCase()}, newest first. It is one 0 to 100 score
-          that blends the two: {Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}% risk appetite, and{" "}
-          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}% how far funding pressure sits below 100.
+          {OPERATING_LATITUDE_LABEL} for each month, newest first: one 0 to 100 score made of risk appetite
+          ({Math.round(OPERATING_LATITUDE_RISK_WEIGHT * 100)}%) and how far funding pressure is below 100 (
+          {Math.round((1 - OPERATING_LATITUDE_RISK_WEIGHT) * 100)}%).
           Higher means more room to hire, spend and commit. {describeLatitudeAgainstConditions()}{" "}
           <Link href="/trust#formula-reference" className="text-sky-300 underline decoration-sky-700 underline-offset-4 hover:text-sky-200">
             How it is computed

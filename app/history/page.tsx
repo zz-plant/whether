@@ -217,9 +217,8 @@ export default async function HistoryPage({
             </ul>
           </div>
           <p className="max-w-prose text-sm text-slate-300">
-            The monthly record shows how the model reads past conditions. It is not evidence that a
-            forecast was published at the time, or of what a company would have done. To cite what
-            Whether actually recorded, use the dated published briefs below.
+            These months are scored today, with the current model. They don&rsquo;t show what we said at
+            the time or what any company did. For what we actually published, use the dated briefs below.
           </p>
           {/* One link (2026-10-27). "Compare funding conditions across periods" and "Read
               the current weekly brief" sat beside it, both already in the page's own tabs
@@ -247,8 +246,8 @@ export default async function HistoryPage({
                 second time ("177 month-end readings, Jan 2012 to Sep 2026"). */}
             <p className="text-sm text-slate-300">
               {publishedBriefs.length === 1
-                ? `We keep every weekly brief permanently, next to the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`
-                : `${publishedBriefs.length} weekly brief records paired with the month-end readings. Entries are never edited after publication, so past guidance reads the way it was published.`}
+                ? `We keep every weekly brief, next to the monthly readings, and never edit one after it's published.`
+                : `${publishedBriefs.length} weekly briefs, next to the monthly readings. We never edit a brief after it's published.`}
             </p>
           </div>
           {/* A link card, not a pill coerced into one: the `pill` variant is a

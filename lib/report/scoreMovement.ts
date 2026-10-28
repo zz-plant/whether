@@ -182,7 +182,7 @@ export const describeScoreMovementCaveat = (
 };
 
 /**
- * One score's move as the row under it says it: "All from interest rates.",
+ * One score's move as the row under it says it: "All of it came from interest rates.",
  * or the parts with their signs and, where a part is one the earlier score
  * did not have, the sentence that says so. Null when nothing moved.
  */
@@ -195,7 +195,7 @@ export const describeScoreMovement = (
   const [only] = movement.parts;
   const body =
     movement.parts.length === 1 && only
-      ? `All from ${scoreSourceLabel(metric, only.source)}.`
+      ? `All of it came from ${scoreSourceLabel(metric, only.source)}.`
       : `${joinClauses(clausesFor(metric, movement))}.`;
   return movement.parts.some((part) => isMissingFromEarlierScore(part.source))
     ? `${body} ${earlierScore(basis, false)}`

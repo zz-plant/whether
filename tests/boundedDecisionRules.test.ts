@@ -56,7 +56,7 @@ it("threads bounded decision rules into role templates", () => {
   });
 
   const templates = buildRoleAwareOperatingTemplates(rules);
-  assert.match(templates[0]?.doNow ?? "", /Selective hiring|Increase product tempo/i);
+  assert.match(templates[0]?.doNow ?? "", /Hire selectively|Increase product tempo/i);
   assert.doesNotMatch(templates[0]?.avoidNow ?? "", /^Pause/i);
   assert.doesNotMatch(templates[0]?.flipTrigger ?? "", /^Resume/i);
 });
@@ -70,7 +70,7 @@ it("formats bounded decision triplets for scan-time surfaces", () => {
   });
 
   const hiringTriplet = formatBoundedDecisionTriplet(rules[0]!);
-  assert.match(hiringTriplet.action, /backfills|mission-critical/i);
+  assert.match(hiringTriplet.action, /replace people who leave|critical hires/i);
   assert.doesNotMatch(hiringTriplet.threshold, /^Pause/i);
   assert.doesNotMatch(hiringTriplet.reverse, /^Resume/i);
 });

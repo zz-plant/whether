@@ -62,16 +62,16 @@ describe("what conditions were", () => {
 });
 
 describe("the map in the card", () => {
-  it("names the month-ends its path draws", () => {
+  it("names the months its path draws", () => {
     assert.equal(
       describeConditionsTrail(["2026-03-31", "2026-04-30", "2026-08-31"]),
-      "Trail: month-ends Mar–Aug 2026, then this week.",
+      "The trail shows each month, Mar–Aug 2026, then this week.",
     );
     assert.equal(
       describeConditionsTrail(["2025-11-28", "2026-02-27"]),
-      "Trail: month-ends Nov 2025–Feb 2026, then this week.",
+      "The trail shows each month, Nov 2025–Feb 2026, then this week.",
     );
-    assert.equal(describeConditionsTrail(["2026-08-31"]), "Trail: the Aug 2026 month-end, then this week.");
+    assert.equal(describeConditionsTrail(["2026-08-31"]), "The trail shows the end of Aug 2026, then this week.");
     assert.equal(describeConditionsTrail([]), null);
   });
 

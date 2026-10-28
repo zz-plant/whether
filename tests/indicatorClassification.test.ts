@@ -8,6 +8,6 @@ describe("indicator classification", () => {
     assert.equal(indicatorTypeBySignal.riskAppetite, "leading");
     assert.equal(indicatorTypeBySignal.curveSlope, "leading");
     assert.equal(indicatorKindLabel("baseRate"), null);
-    assert.equal(indicatorKindLabel("curveSlope"), "Leading (predictive)");
+    assert.equal(indicatorKindLabel("curveSlope"), "Moves first");
   });
 });

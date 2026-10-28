@@ -112,9 +112,9 @@ export function WhyConditionsSection({
 
         {cappedDistance ? (
           <p className="mt-4 max-w-3xl text-fluid-xs leading-relaxed text-slate-400" data-capped-reading>
-            Funding pressure reads {tightness} because the score is capped there; without the cap it would read{" "}
-            {saturatedPressure}. The distance to its {changeLines.tightness} change line is therefore{" "}
-            {cappedDistance.shown} points on the score but {cappedDistance.actual} points of pressure.
+            Funding pressure shows {tightness} because that&rsquo;s as high as the score goes; uncapped it would be{" "}
+            {saturatedPressure}. So it&rsquo;s {cappedDistance.shown} points above its {changeLines.tightness} change line on the
+            score, but really {cappedDistance.actual}.
           </p>
         ) : null}
       </div>

@@ -116,8 +116,8 @@ export function MonthStrip({ entries, markers, markersLegend, className = "" }: 
   return (
     <figure className={`space-y-2 ${markers?.length ? "mt-7 " : ""}${className}`.trim()} data-month-strip>
       <p className="sr-only">
-        Conditions by month, {monthLabel(sorted[0].recordDate)} to {monthLabel(run.latest)}: {changes}{" "}
-        {changes === 1 ? "change" : "changes"}; {run.label} held {run.held} {run.held === 1 ? "month" : "months"}.
+        Conditions by month, {monthLabel(sorted[0].recordDate)} to {monthLabel(run.latest)}: they changed {changes}{" "}
+        {changes === 1 ? "time" : "times"}, and it&rsquo;s been {run.label} for {run.held} {run.held === 1 ? "month" : "months"}.
         {placedMarkers.length > 0
           ? ` ${placedMarkers.length} ${placedMarkers.length === 1 ? "event is" : "events are"} marked against the months they were recorded in.`
           : null}

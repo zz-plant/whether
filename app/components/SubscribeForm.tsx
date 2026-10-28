@@ -157,8 +157,8 @@ export function SubscribeForm({
             : alertsOnly
               ? <>
                   {condition ? <>Next change to watch: {condition} </> : null}
-                  One email on the day the guidance changes, a score crosses one of its lines, or a market
-                  input makes an outsized move.
+                  We&rsquo;ll email you the day the guidance changes, a score crosses one of its lines, or a market
+                  input jumps.
                 </>
               : "Monday morning: the conditions, the one action they call for, and a link to the evidence behind it."}
         </p>

@@ -48,8 +48,8 @@ export function RecordSection({
               once, under the band, because a reader comparing the two would
               otherwise read the difference as a data gap (2026-10-22). */}
           <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-400" data-record-sampling>
-            The record is month-end readings; the guidance above is this week&rsquo;s. A week that moved the
-            guidance appears here at the month-end it belongs to.
+            This band shows end-of-month readings; the guidance above is this week&rsquo;s. A week that changed
+            the guidance shows up at the end of its month.
           </p>
         </>
       ) : null}

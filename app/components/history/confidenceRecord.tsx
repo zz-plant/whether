@@ -159,8 +159,8 @@ function ConfidenceRecordBody() {
     <div className="space-y-3">
       <p className="text-sm text-slate-200">
         <BaseRateSentence totals={totals} baseRate={baseRate} /> Every band below held more often
-        than the percent published for it, and the two closest bands run in the wrong order. The
-        margin is therefore a distance, not a probability. It says how much room there is before the
+        than its published percent, and the two closest bands are in the wrong order. So read the
+        margin as a distance, not a probability. It says how much room there is before the
         line where conditions change; the count beside it says how often that room mattered.
       </p>
 

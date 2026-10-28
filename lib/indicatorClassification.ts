@@ -16,8 +16,8 @@ export const indicatorTypeBySignal = {
 } as const satisfies Record<RegimeSignalKey, IndicatorType | null>;
 
 const indicatorTypeLabel = {
-  leading: "Leading (predictive)",
-  lagging: "Lagging (confirming)",
+  leading: "Moves first",
+  lagging: "Confirms later",
 } as const;
 
 export const indicatorKindLabel = (key: RegimeSignalKey): string | null => {

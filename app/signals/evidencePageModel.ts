@@ -51,7 +51,7 @@ const FOCUS_FILTERS: Record<FocusTab, FocusFilter> = {
   all: {
     signals: ["tightness", "riskAppetite", "baseRate", "curveSlope"],
     notes: {
-      tightness: "How hard current conditions make new long-payback commitments",
+      tightness: "How hard it is right now to take on commitments that pay back slowly",
       riskAppetite: "How willing markets are to fund risk and faster expansion",
       baseRate: BASE_RATE_NOTE,
       curveSlope: "The earliest sign of whether this week's conditions will hold",

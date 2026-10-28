@@ -93,7 +93,7 @@ describe("what would change this guidance: the pause and resume lines", () => {
     assert.match(lined, /When would conditions change\?/);
     assert.match(lined, /When can paused decisions resume\?/);
     assert.match(lined.replace(/<[^>]+>/g, ""), /Funding pressure falls below 66/);
-    assert.match(lined.replace(/<[^>]+>/g, ""), /not permission to resume/);
+    assert.match(lined.replace(/<[^>]+>/g, ""), /doesn(?:’|')t mean you can resume\. Only crossing the resume line does/);
   });
 
   it("prefers a chosen stage's resume line to the lead area's", () => {
