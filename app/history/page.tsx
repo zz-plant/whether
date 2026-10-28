@@ -38,7 +38,7 @@ import { RISK_APPETITE_REGIME_THRESHOLD, TIGHTNESS_REGIME_THRESHOLD } from "../.
 export const metadata: Metadata = buildPageMetadata({
   title: "History and Track Record",
   description:
-    "Every month-end reading on record, each change in conditions, the length of each spell, and the published weekly briefs behind the track record.",
+    "Startup funding conditions every month since 2012: each change, how long each stretch lasted, and the weekly briefs we published.",
   path: "/history",
   imageAlt: "Whether history and track record",
   imageParams: { template: "record", eyebrow: "History" },
@@ -155,9 +155,9 @@ export default async function HistoryPage({
           recordDateLabel: trackRecord ? formatDateUTC(trackRecord.latestRecordDate) : "",
           fetchedAtLabel: "",
         },
-        /* "Record", the group this page is the hub of (`navigationGroups`): the
+        /* "History", the group this page is the hub of (`navigationGroups`): the
            header tab, the sub-tab and the breadcrumb all name it so. */
-        page: { pageTitle: "Record", pageSummary: "Look up the guidance for any past month and see how it held up.", sectionLinks: historySectionLinks, currentPath: "/history" },
+        page: { pageTitle: "History", pageSummary: "Look up the guidance for any past month and see how it held up.", sectionLinks: historySectionLinks, currentPath: "/history" },
         trust: { trustStatusTone: "historical" },
         chrome: { sidebarVariant: "full" },
         payloads: { structuredData },
@@ -196,7 +196,7 @@ export default async function HistoryPage({
               year" was a section of its own near the foot of the page, ten
               screens from the strip that draws the same months. */}
           <div className="space-y-2">
-            <h3 className="type-eyebrow">Each closed year</h3>
+            <h3 className="type-eyebrow">By year</h3>
             {/* Two even columns on a phone: fourteen chips of three widths
                 wrapped into a ragged stack. From `sm` they flow. */}
             <ul className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap">

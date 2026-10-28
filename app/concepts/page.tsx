@@ -65,7 +65,7 @@ export const metadata: Metadata = buildPageMetadata({
     template: "reading",
     eyebrow: "Product management reading list",
     title: "Does startup advice follow the market?",
-    subtitle: `${canonEssays.length} essays, books and investor memos, each placed on the month-end record since 2012.`,
+    subtitle: `${canonEssays.length} essays, books and investor memos, each placed on the record at the month it came out since 2012.`,
     kicker: "Whether — weekly operating guidance",
   },
 });
@@ -88,7 +88,7 @@ function ReadingLabel({ reading, recordStart }: { reading: CanonReading; recordS
     );
   }
   if (reading.kind === "after-record") {
-    return <span className="text-xs text-slate-400">After the latest month-end on record</span>;
+    return <span className="text-xs text-slate-400">After the latest month on record</span>;
   }
   return (
     <>
@@ -178,7 +178,7 @@ function EssayYearStrip({ timeline, recordStart }: { timeline: readonly Timeline
         ))}
         {[
           beforeRecord ? `Before the record${recordStart ? ` starts on ${recordStart}` : ""}` : null,
-          afterRecord ? "After the latest month-end on record" : null,
+          afterRecord ? "After the latest month on record" : null,
         ].map((label) =>
           label ? (
             <li key={label} className="flex items-center gap-1.5">
@@ -260,7 +260,7 @@ export default function ProductCanonPage() {
 
       <SecondaryPageHeader
         title="Does startup advice follow the market?"
-        description={`${timeline.length} widely read essays, books and investor memos, each placed on the month-end record${recordStart && recordEnd ? ` from ${recordStart} to ${recordEnd}` : ""}. Advice on hiring, raising and spending is tagged Expand or Conserve, and method advice is tagged Craft. The test is whether the capital texts track the conditions while the craft texts do not. A reading list, not evidence for the guidance.`}
+        description={`${timeline.length} widely read essays, books and investor memos, each placed on the record at the month it came out${recordStart && recordEnd ? ` from ${recordStart} to ${recordEnd}` : ""}. Advice on hiring, raising and spending is tagged Expand or Conserve, and method advice is tagged Craft. The test is whether the capital texts track the conditions while the craft texts do not. A reading list, not evidence for the guidance.`}
       />
 
       <SecondaryPageSection title="What the record shows" description={describeCanonBaseRate(baseRate)}>

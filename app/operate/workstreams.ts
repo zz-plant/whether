@@ -30,7 +30,7 @@ export const WORKSTREAMS: Record<Workstream["slug"], Workstream> = {
   },
   scenarios: {
     slug: "scenarios",
-    title: "Scenario studio: what if the numbers were different",
+    title: "What If Rates Change? Test This Week's Guidance",
     description: "Set a different short-term rate and yield curve and see what the guidance and the rules would be.",
     imageAlt: "Whether scenario studio view",
     pageTitle: "Scenarios",

@@ -120,7 +120,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       {
         id: "board-annex",
         label: "Copy the record summary",
-        description: "What the month-end record shows, as a short memo",
+        description: "What the monthly record shows, as a short memo",
         icon: FileText,
         action: () => navigateTo("/history"),
       },
@@ -145,7 +145,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
       {
         id: "history",
         label: "View history & track record",
-        description: "Browse past briefs and the month-end record",
+        description: "Browse past briefs and the monthly record",
         icon: Archive,
         action: () => navigateTo("/history"),
       },

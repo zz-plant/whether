@@ -3,7 +3,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { ActionLink } from "../../components/ui/actionLink";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
-import { publicDecisionLabels } from "../../../lib/report/reportFormatting";
+import { MARGIN_LABEL, publicDecisionLabels } from "../../../lib/report/reportFormatting";
 import { BoundedValue } from "../../components/ui/boundedValue";
 import { Breadcrumbs } from "../../components/ui/breadcrumbs";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../lib/navigation/breadcrumbs";
@@ -252,7 +252,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
           trust={null}
           /* The margin and the basis, inside the card's border: a crop of a cited week
              keeps which inputs set its scores (2026-10-09). */
-          captionDetail={`Margin: ${display.confidence.toLowerCase()} · ${display.basis.sentence.replace(/\.$/, "")}`}
+          captionDetail={`${MARGIN_LABEL}: ${display.confidence.toLowerCase()} · ${display.basis.sentence.replace(/\.$/, "")}`}
         />
 
         <header className="space-y-3">

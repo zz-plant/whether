@@ -21,7 +21,7 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   return buildPageMetadata({
     title: "Compare periods — two months side by side",
-    description: "Two past months side by side: the conditions, the operating latitude, and the rules in force.",
+    description: "Compare two past months side by side: interest rates, the funding market, how much room there was to hire and spend, and the rules in force.",
     path: "/history/compare",
     imageAlt: "Whether comparison of two past periods",
   });

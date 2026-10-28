@@ -43,7 +43,7 @@ describe("/history leads with the record's answer", () => {
 
     const strip = headings.indexOf("Conditions by month");
     const record = headings.indexOf("Track record");
-    const confidence = headings.indexOf("What the margin has been worth");
+    const confidence = headings.indexOf("How often a close call held");
     const map = headings.indexOf("How the two scores set conditions");
     const table = headings.indexOf("Monthly readings");
     const briefs = headings.indexOf("Published weekly briefs");
@@ -136,7 +136,7 @@ describe("/trust carries one trust strip", () => {
     // The sub-tab row names /trust as the current page (aria-current); the strip itself must not link here.
     const withoutTabs = html.replace(/<nav[^>]*data-section-tabs[\s\S]*?<\/nav>/, "");
     assert.doesNotMatch(withoutTabs, /href="\/trust"/, "on /trust the strip carries no link to itself");
-    for (const cell of ["Data as of", "Sources", "Margin", "change next week"]) assert.match(html, new RegExp(cell));
+    for (const cell of ["Data as of", "Sources", "Room before a change", "change next week"]) assert.match(html, new RegExp(cell));
   });
 
   /* The ladders are the brief's (2026-10-27): this section drew the same two, with the

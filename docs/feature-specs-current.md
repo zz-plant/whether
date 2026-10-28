@@ -4074,6 +4074,32 @@ income you have; new bets wait for cheaper money." failed it: a hollow "what" fo
 - Two rewrites first failed `tests/readerClauseShapes.test.tsx` ("…, or what…", "…, or when…") and
   were recast; the degraded-copy rule still finds "can't" in the held and capped lines.
 
+### 1.1.97 Words people search for, and the names they use (2026-10-28)
+
+Titles, navigation and labels in the words a startup leader says or types, from an audit of 14
+routes against what they search ("should we hire now", "startup funding market", "when to raise").
+
+- **Navigation.** The groups are This week, **Plan** (was Decide), **History** (was Record) and
+  Guides; the shortcuts follow (P, H). /concepts is "Reading list" (was "Product writing"), /share
+  "Share and embed" (was "Use it elsewhere"). The pages' h1s follow the group names.
+- **Titles and descriptions.** The brief's title leads with "When to Hire, Raise and Spend" before the
+  category line, which stays verbatim (`docs/editorial-guardrails.md`); its description opens on
+  "Should your startup hire, raise or spend this week?" and keeps the action and its two lines. New
+  titles for /signals, /operate, /resources, /calibration ("How often the guidance held up") and the
+  scenarios page, and plainer descriptions for /history and /history/compare.
+- **The strip's labels.** "Margin" is "Room before a change" (`MARGIN_LABEL`), and the short form
+  "3 pts from a change"; "Scored on: The record's inputs" is "Based on: The same data we used for past
+  months". Every paste, the email, the slide, the summaries and the published-brief exports read the
+  label rather than spelling "Margin:", so they changed with it; the week-41 video was regenerated.
+- **Plain labels.** "Affects:" (was "Governs:"), "Scores on this chart", "By year", "How often a close
+  call held", "Warned a month ahead", "Typical length", "Changed back within a month", "When to look
+  again" (was "Revisit triggers"), the scenario page's "Set the rates", the decision test's examples,
+  the month picker's "Show this month", and "Previous month" / "Next month" on the stepper.
+- **The curve summary** says "the 2-year rate below the 3-month rate" and "the 10-year rate below the
+  2-year rate", not "2Y−3M" and "10Y−2Y" (the naming table's first-use rule), and the last "month-end"
+  phrasings in reader text are months.
+- The naming table in `lib/report/AGENTS.md` carries the new names.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:

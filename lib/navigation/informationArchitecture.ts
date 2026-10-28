@@ -84,9 +84,12 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
   decide: {
     key: "decide",
     href: "/operate",
-    label: "Decide",
+    /* "Plan", what a reader calls it (2026-10-28). It was "Decide" from 2026-10-08, a verb
+       with no object; before that "Plan" over an h1 that said "Planning". The h1 follows
+       this label, so the page has one name again. */
+    label: "Plan",
     description: "Turn this week's guidance into decisions on hiring, roadmap, fundraising, spending and new bets.",
-    shortcut: "d",
+    shortcut: "p",
     memberPrefixes: [],
     crossLinks: [],
     footerLinks: [],
@@ -94,9 +97,11 @@ export const navigationGroupByKey: Record<NavigationGroupKey, NavigationGroup> =
   record: {
     key: "record",
     href: "/history",
-    label: "Record",
+    /* "History", the word in its own URL and the one a reader uses (2026-10-28); "Record"
+       was the archive's name for itself. */
+    label: "History",
     description: "The guidance for every past month and week, scored against what happened next.",
-    shortcut: "r",
+    shortcut: "h",
     memberPrefixes: ["/brief"],
     /* The sources and the score derivation stay on /trust, where they judge this
        week's reading; the record reaches them rather than holding a second copy. */
@@ -162,7 +167,7 @@ export const navigationPages: readonly NavigationPage[] = [
     key: "planning",
     group: "decide",
     href: "/operate",
-    label: "Decide",
+    label: "Plan",
     description: "Each area's rule this week, a test for one move, and the lines you set for your own plan.",
     placement: "tab",
   },
@@ -197,7 +202,7 @@ export const navigationPages: readonly NavigationPage[] = [
     key: "history",
     group: "record",
     href: "/history",
-    label: "Record",
+    label: "History",
     description: "See how funding pressure and risk appetite have changed over time and how the guidance held up.",
     placement: "tab",
   },
@@ -221,7 +226,7 @@ export const navigationPages: readonly NavigationPage[] = [
     key: "concepts",
     group: "record",
     href: "/concepts",
-    label: "Product writing",
+    label: "Reading list",
     description: "Widely read product essays and investor memos, placed on the record since 2012",
     placement: "secondary",
   },
@@ -266,7 +271,7 @@ export const utilityLinks = [
     // Carries the embed builder, the citation and the meeting snippet too: every
     // way the guidance leaves the site starts here.
     href: "/share",
-    label: "Use it elsewhere",
+    label: "Share and embed",
     description: "Copy, cite or embed this week's guidance, or pull it through the API, MCP or RSS",
     header: "lg",
   },

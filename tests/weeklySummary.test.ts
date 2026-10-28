@@ -159,7 +159,7 @@ describe("buildWeeklySummary", () => {
     assert.equal(weekly.confidence, "MEDIUM");
     assert.equal(weekly.title, "Weekly action summary — Oct 5, 2026");
     assert.match(weekly.copy, /\nUpdated Oct 5, 2026\n/);
-    assert.match(weekly.copy, /\nMargin: within reach of the line\n/);
+    assert.match(weekly.copy, /\nRoom before a change: within reach of the line\n/);
     assert.doesNotMatch(weekly.copy, /high confidence|EXPLICIT_KILL_CRITERIA|SLOWER_STRUCTURED|REVERSIBLE_ONLY/);
   });
 

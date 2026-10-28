@@ -1,3 +1,5 @@
+import { MARGIN_LABEL } from "./report/reportFormatting";
+
 export const buildComplianceStamp = ({
   sourceLine,
   timestamp,
@@ -11,5 +13,5 @@ export const buildComplianceStamp = ({
   basis?: string;
 }) => [
   /* "Margin", where this said "Confidence": the number is a distance from the change line (2026-10-09). */
-  `Source: ${sourceLine} · ${timestamp} · Margin: ${confidence}${basis ? ` · ${basis.replace(/\.$/, "")}` : ""}`,
+  `Source: ${sourceLine} · ${timestamp} · ${MARGIN_LABEL}: ${confidence}${basis ? ` · ${basis.replace(/\.$/, "")}` : ""}`,
 ];

@@ -19,7 +19,7 @@ describe("type steps", () => {
   it("sets every page title in the one title step, the report intro's included", () => {
     const html = renderToStaticMarkup(
       <CommandCenterNavBlock
-        pageTitle="Decide"
+        pageTitle="Plan"
         recordDateLabel="Oct 23, 2026"
         statusLabel="Cloudy"
         trustStatusLabel="All sources live"
@@ -28,7 +28,7 @@ describe("type steps", () => {
         offlineBadgeLabel=""
       />,
     );
-    assert.match(html, /<h1[^>]*class="[^"]*\btext-fluid-2xl\b[^"]*"[^>]*>Decide<\/h1>/);
+    assert.match(html, /<h1[^>]*class="[^"]*\btext-fluid-2xl\b[^"]*"[^>]*>Plan<\/h1>/);
     assert.doesNotMatch(html, /<h1[^>]*text-fluid-base/, "15px on a phone, under 20px sections");
     assert.match(ruleBody(css("app/styles/layout-shells.css"), ".weather-secondary-title"), /font-size: var\(--text-fluid-2xl\)/);
   });

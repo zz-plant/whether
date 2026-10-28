@@ -124,7 +124,7 @@ describe("checkRegimeChange Slack delivery", () => {
     };
 
     const result = await checkRegimeChange({ snapshot });
-    const cause = "Startup-market inputs, which the guidance leaves out because they can't be scored against past month-ends, would have kept conditions Stormy.";
+    const cause = "Startup-market inputs, which the guidance leaves out because their data doesn't go back far enough to check against past months, would have kept conditions Stormy.";
     assert.ok(result.alerts?.[0]?.includes(cause), result.alerts?.[0]);
     assert.ok(posted.some((body) => body.includes(cause)), "the Slack post carries it");
 

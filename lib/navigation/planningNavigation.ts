@@ -29,8 +29,8 @@ export const operationsSectionLinks: {
   ],
   scenarios: [
     { href: "#scenario-presets-heading", label: "Presets" },
-    { href: "#sliders-controls-heading", label: "Simulation controls" },
-    { href: "#deltas-heading", label: "Score deltas" },
-    { href: "#playbook-deltas-heading", label: "Playbook deltas" },
+    { href: "#sliders-controls-heading", label: "Set the rates" },
+    { href: "#deltas-heading", label: "Compared with this week" },
+    { href: "#playbook-deltas-heading", label: "What you'd stop and start" },
   ],
 };

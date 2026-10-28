@@ -124,9 +124,9 @@ describe("DecisionShieldPlanModes markup", () => {
 
     assert.ok(markup.includes("id=\"decision-shield-plan-input\""));
     assert.ok(markup.includes("Try an example:"));
-    assert.ok(markup.includes("Vendor prepay vs. yield"));
-    assert.ok(markup.includes("Senior talent sniping"));
-    assert.ok(markup.includes("Sprint tech debt refactor"));
+    assert.ok(markup.includes("Prepay a vendor for a discount"));
+    assert.ok(markup.includes("Hire a senior person from a competitor"));
+    assert.ok(markup.includes("Spend a sprint on tech debt"));
     assert.ok(markup.includes("Flexible contract terms"));
     // The examples are controls with the 44px floor, not 20px chips.
     assert.equal((markup.match(/class="weather-pill /g) ?? []).length, 4);

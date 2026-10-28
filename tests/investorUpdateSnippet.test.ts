@@ -68,7 +68,7 @@ describe("investor update snippet", () => {
     assert.match(parts.response, /Conditions change if: Risk appetite rises above 50 for two reads\.$/);
     assert.doesNotMatch(parts.response, /guardrail|change our course/i);
     assert.doesNotMatch(parts.response, /commitments\.\./, "an existing full stop is not doubled");
-    assert.equal(parts.source, "Source: U.S. Treasury, 2026-09-16, via whether.work · scored on the record's inputs.");
+    assert.equal(parts.source, "Source: U.S. Treasury, 2026-09-16, via whether.work · scored on the same data we used for past months.");
 
     const block = formatInvestorUpdateSnippet(parts, null);
     assert.deepEqual(block.split("\n"), [parts.conditions, "", parts.response, "", parts.source]);

@@ -134,7 +134,7 @@ export default async function DecideDetailPage({
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Still unsure?</h2>
         <div className="flex gap-3">
-          <ActionLink href="/trust#revisit-call" variant="pill">Revisit triggers</ActionLink>
+          <ActionLink href="/trust#revisit-call" variant="pill">When to look again</ActionLink>
           {/* The page's one name, from the IA, not the retired "Trust" the
              regroup of 2026-10-08 left behind on this handoff. */}
           <ActionLink href="/trust" variant="pill">{navigationLabelByPath["/trust"]}</ActionLink>

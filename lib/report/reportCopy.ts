@@ -290,7 +290,7 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
   },
   {
     value: "confidence",
-    term: "Margin (close to, within reach of, or clear of the line)",
+    term: "Room before a change (close to, within reach of, or clear of the line)",
     summary: "How far this week's scores sit from the nearest change line, in points. Close means a small move would change conditions, so keep commitments reversible. The API calls it confidence; it is not a probability.",
   },
   {

@@ -56,15 +56,15 @@ describe("inversion summary", () => {
   it("answers no only when neither spread went below zero", () => {
     assert.equal(
       describeInversionSummary({ months: 12, inverted10Y2Y: 0, inverted2Y3M: 0 }),
-      "No: neither spread below zero in the last 12 months",
+      "No: long-term rates stayed above short-term ones in all of the last 12 months",
     );
     assert.equal(
       describeInversionSummary({ months: 12, inverted10Y2Y: 0, inverted2Y3M: 6 }),
-      "Yes: 2Y−3M below zero in 6 of 12 months, 10Y−2Y in none",
+      "Yes: the 2-year rate below the 3-month rate in 6 of 12 months, and the 10-year rate below the 2-year rate in none",
     );
     assert.equal(
       describeInversionSummary({ months: 12, inverted10Y2Y: 9, inverted2Y3M: 4 }),
-      "Yes: 10Y−2Y below zero in 9 of 12 months, 2Y−3M in 4 of 12 months",
+      "Yes: the 10-year rate below the 2-year rate in 9 of 12 months, and the 2-year rate below the 3-month rate in 4 of 12 months",
     );
   });
 });

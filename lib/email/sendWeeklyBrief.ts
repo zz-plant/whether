@@ -91,7 +91,7 @@ export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | un
     },
     {
       label: MARGIN_LABEL,
-      value: formatDocumentMargin(document).replace(/^Margin: /, ""),
+      value: formatDocumentMargin(document).slice(`${MARGIN_LABEL}: `.length),
       meaning: null,
       distance: null,
     },

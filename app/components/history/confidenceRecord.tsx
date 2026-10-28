@@ -28,7 +28,7 @@ import { CALL_CHANGE_RULE, describeCalibrationRescore } from "../../../lib/repor
  */
 
 /* The margin is what the API calls `confidence` (2026-10-09); the study grades it under its display name. */
-export const CONFIDENCE_RECORD_TITLE = "What the margin has been worth";
+export const CONFIDENCE_RECORD_TITLE = "How often a close call held";
 
 const percentFormat = (value: number) => `${Math.round(value)}%`;
 
@@ -160,8 +160,8 @@ function ConfidenceRecordBody() {
       <p className="text-sm text-slate-200">
         <BaseRateSentence totals={totals} baseRate={baseRate} /> Every band below held more often
         than its published percent, and the two closest bands are in the wrong order. So read the
-        margin as a distance, not a probability. It says how much room there is before the
-        line where conditions change; the count beside it says how often that room mattered.
+        room before a change as a distance, not a probability: it says how far the scores are from
+        the line where conditions change, and the count beside it says how often that room mattered.
       </p>
 
       <MarginReliabilityChart rows={rows} />

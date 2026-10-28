@@ -42,15 +42,15 @@ const runwayHint = (basis: ProfileRunway["basis"] | undefined): string | undefin
 
 const STARTER_PLANS = [
   {
-    label: "Vendor prepay vs. yield",
+    label: "Prepay a vendor for a discount",
     plan: "Prepay annual SaaS vendor for $60k to lock in a 25% discount",
   },
   {
-    label: "Senior talent sniping",
+    label: "Hire a senior person from a competitor",
     plan: "Hire 1 principal architect at $240k during competitor freeze",
   },
   {
-    label: "Sprint tech debt refactor",
+    label: "Spend a sprint on tech debt",
     plan: "Allocate 40% sprint capacity to tech debt refactor",
   },
   {

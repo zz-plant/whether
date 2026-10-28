@@ -11,7 +11,7 @@ export { buildActionsExpansionHref } from "./planningPageModel";
 
 export const runtime = "edge";
 export const metadata: Metadata = buildPageMetadata({
-  title: "Decide: rules, runway and the brief",
+  title: "This Week's Plan: Hiring, Spending and Runway Rules",
   description:
     "Turn this week's guidance into a plan: the rules, your runway, and the brief to share.",
   path: "/operate",

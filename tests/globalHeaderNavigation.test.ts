@@ -20,14 +20,14 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "How much to trust this week");
     assert.equal(resolveGlobalHeaderRouteLabel("/operate/financial"), "Runway planner");
     assert.equal(resolveGlobalHeaderRouteLabel("/history/compare"), "Compare periods");
-    assert.equal(resolveGlobalHeaderRouteLabel("/history/2024"), "Record");
-    assert.equal(resolveGlobalHeaderRouteLabel("/concepts"), "Product writing");
+    assert.equal(resolveGlobalHeaderRouteLabel("/history/2024"), "History");
+    assert.equal(resolveGlobalHeaderRouteLabel("/concepts"), "Reading list");
     assert.equal(resolveGlobalHeaderRouteLabel("/resources/capital-posture-template"), "Guides");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
 
   it("labels utility routes", () => {
-    assert.equal(resolveGlobalHeaderRouteLabel("/share"), "Use it elsewhere");
+    assert.equal(resolveGlobalHeaderRouteLabel("/share"), "Share and embed");
     assert.equal(resolveGlobalHeaderRouteLabel("/api-docs"), "API & MCP");
     assert.equal(resolveGlobalHeaderRouteLabel("/about"), "About");
     assert.equal(resolveGlobalHeaderRouteLabel("/about/"), "About");
@@ -83,8 +83,8 @@ describe("global header navigation helpers", () => {
     const active = (path: string) => resolveGlobalHeaderNavigationLinks(path).filter((link) => link.isActive).map((link) => link.label);
     assert.deepEqual(active("/"), ["This week"]);
     assert.deepEqual(active("/signals"), ["This week"]);
-    assert.deepEqual(active("/operate/financial"), ["Decide"]);
-    assert.deepEqual(active("/brief/2026-w31"), ["Record"]);
+    assert.deepEqual(active("/operate/financial"), ["Plan"]);
+    assert.deepEqual(active("/brief/2026-w31"), ["History"]);
     assert.deepEqual(active("/answers/should-startups-raise-capital-now"), ["Guides"]);
     assert.deepEqual(active("/about"), []);
   });
@@ -93,14 +93,14 @@ describe("global header navigation helpers", () => {
 describe("sub-tabs", () => {
   it("draws the group's pages, the current one marked, with Record's cross-links after", () => {
     const record = resolveSectionTabs("/history/compare");
-    assert.equal(record?.group.label, "Record");
+    assert.equal(record?.group.label, "History");
     assert.deepEqual(
       record?.links.map((link) => [link.label, link.placement, link.isActive]),
       [
-        ["Record", "tab", false],
+        ["History", "tab", false],
         ["Calibration", "tab", false],
         ["Compare periods", "secondary", true],
-        ["Product writing", "secondary", false],
+        ["Reading list", "secondary", false],
         ["Sources", "cross", false],
         ["How the scores are built", "cross", false],
       ],
@@ -119,7 +119,7 @@ describe("sub-tabs", () => {
     assert.deepEqual(
       resolveSectionTabs("/comps")?.links.map((link) => [link.label, link.isActive]),
       [
-        ["Decide", false],
+        ["Plan", false],
         ["Runway planner", false],
         ["Scenarios", false],
         ["SaaS multiples", true],

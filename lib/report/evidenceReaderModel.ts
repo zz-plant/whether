@@ -82,8 +82,8 @@ export type SignalReferenceRow = {
 
 /** The line at which the call itself changes; the ladder's own label for that kind. */
 const CALL_CHANGE_LINE_LABEL = DECISION_CONTRACT_LABELS.watch.changeLine;
-const INVERSION_LINE_LABEL = "Inversion line";
-const BASE_RATE_LINE_LABEL = "Pressure line";
+const INVERSION_LINE_LABEL = "Inverted below";
+const BASE_RATE_LINE_LABEL = "Counts against you above";
 
 const WATCH_HREF_BY_KEY: Record<RegimeSignalKey, string | null> = {
   tightness: "/signals/capital-tightness-watch",

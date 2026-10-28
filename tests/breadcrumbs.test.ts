@@ -16,16 +16,16 @@ describe("breadcrumbs follow the groups", () => {
   it("start a grouped page's trail at its group", () => {
     assert.deepEqual(names(buildGroupBreadcrumbs("/signals")), ["This week", "Why it changed"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/trust")), ["This week", "How much to trust this week"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/operate/financial")), ["Decide", "Runway planner"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/comps")), ["Decide", "SaaS multiples"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/history/compare")), ["Record", "Compare periods"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/calibration")), ["Record", "Calibration"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/concepts")), ["Record", "Product writing"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/operate/financial")), ["Plan", "Runway planner"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/comps")), ["Plan", "SaaS multiples"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/history/compare")), ["History", "Compare periods"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/calibration")), ["History", "Calibration"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/concepts")), ["History", "Reading list"]);
   });
 
   it("put Home before a hub, so no trail is one crumb long", () => {
-    assert.deepEqual(names(buildGroupBreadcrumbs("/operate")), ["Home", "Decide"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/history")), ["Home", "Record"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/operate")), ["Home", "Plan"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/history")), ["Home", "History"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/resources")), ["Home", "Guides"]);
   });
 
@@ -48,7 +48,7 @@ describe("breadcrumbs follow the groups", () => {
     );
     assert.deepEqual(
       names(buildGroupBreadcrumbs("/brief/2026-w31", [{ name: "Week of Jul 27, 2026", path: "/brief/2026-w31" }])),
-      ["Record", "Week of Jul 27, 2026"],
+      ["History", "Week of Jul 27, 2026"],
     );
     assert.deepEqual(
       names(buildGroupBreadcrumbs("/resolve/ceo", [
@@ -61,7 +61,7 @@ describe("breadcrumbs follow the groups", () => {
 
   it("draw the current page last and unlinked", () => {
     assert.deepEqual(toVisibleBreadcrumbs(buildGroupBreadcrumbs("/operate/financial")), [
-      { label: "Decide", href: "/operate" },
+      { label: "Plan", href: "/operate" },
       { label: "Runway planner" },
     ]);
   });
@@ -69,7 +69,7 @@ describe("breadcrumbs follow the groups", () => {
   it("never name a retired tab", () => {
     for (const path of ["/signals", "/operate", "/operate/scenarios", "/trust", "/history", "/history/compare", "/resources"] as const) {
       for (const name of names(buildGroupBreadcrumbs(path))) {
-        assert.ok(!["Evidence", "Plan", "Resolve", "Trust", "History", "Resources"].includes(name), `${path} still says "${name}"`);
+        assert.ok(!["Evidence", "Decide", "Record", "Resolve", "Trust", "Resources"].includes(name), `${path} still says "${name}"`);
       }
     }
   });

@@ -345,7 +345,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "investor-update",
       group: "Docs and email",
       label: "Investor update",
-      hint: "Two paragraphs for a monthly letter: the conditions and how they moved since last month-end, then the guidance and what your runway band means for it.",
+      hint: "Two paragraphs for a monthly letter: the conditions and how they moved since the end of last month, then the guidance and what your runway band means for it.",
       kind: "investor",
       parts: artifact.investorUpdate,
       copyLabel: "Copy investor update",

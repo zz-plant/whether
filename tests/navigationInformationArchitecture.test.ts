@@ -24,8 +24,8 @@ describe("navigation groups", () => {
       navigationGroups.map((group) => [group.label, group.href]),
       [
         ["This week", "/"],
-        ["Decide", "/operate"],
-        ["Record", "/history"],
+        ["Plan", "/operate"],
+        ["History", "/history"],
         ["Guides", "/resources"],
       ],
     );
@@ -125,7 +125,7 @@ describe("utility links", () => {
     assert.deepEqual(
       headerUtilityLinks.map((link) => [link.label, link.href]),
       [
-        ["Use it elsewhere", "/share"],
+        ["Share and embed", "/share"],
         ["About", "/about"],
       ],
     );

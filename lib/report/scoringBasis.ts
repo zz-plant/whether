@@ -45,11 +45,13 @@ export type ScoringBasisKey = "record" | "extended";
 export const NOT_COUNTED_REASON = "They're left out because their data doesn't go back far enough to check against past months.";
 
 /** The strip's label for the basis cell; the value is the basis's `value`. */
-export const SCORING_BASIS_LABEL = "Scored on";
+export const SCORING_BASIS_LABEL = "Based on";
 
 const BASIS_COPY: Record<ScoringBasisKey, { value: string; sentence: string }> = {
-  record: { value: "The record's inputs", sentence: "Scored on the record's inputs." },
-  extended: { value: "More inputs than the record", sentence: "Scored on more inputs than the record." },
+  /* Said without "the record" (2026-10-28): the reader's question is whether this week is
+     comparable with the past, so the value says that. */
+  record: { value: "The same data we used for past months", sentence: "Scored on the same data we used for past months." },
+  extended: { value: "More data than we had for past months", sentence: "Scored on more data than we had for past months." },
 };
 
 /*
@@ -310,7 +312,7 @@ export const describeChangeTheRecordMade = ({
   const inputs = (["tightness", "riskAppetite"] as const)
     .filter((metric) => offRecord[metric] !== assessment.scores[metric])
     .map((metric) => scoreSourceLabel(metric, NOT_COUNTED_SOURCE[metric]));
-  return `${upperFirst(joinAnd(inputs))}, which the guidance leaves out because they can't be scored against past month-ends, would have kept conditions ${getRegimePublicLabel(previousRegime)}.`;
+  return `${upperFirst(joinAnd(inputs))}, which the guidance leaves out because their data doesn't go back far enough to check against past months, would have kept conditions ${getRegimePublicLabel(previousRegime)}.`;
 };
 
 /**

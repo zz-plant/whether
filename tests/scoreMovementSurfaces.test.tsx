@@ -134,8 +134,8 @@ describe("the evidence page", () => {
     assert.match(html, /Feeds into <a href="#tightness"[^>]*>Funding pressure<\/a>/, "to the score's own row");
     /* The two composites name the areas whose lines they set, each opening the
        brief on that area's answer, with the area's glyph beside its name. */
-    assert.match(html, /data-governs="tightness">Governs: <a href="\/\?decision=hiring#what-it-changes"[^>]*><svg[^>]*lucide-users[\s\S]*?<\/svg>Hiring<\/a>/);
-    assert.match(html, /data-governs="riskAppetite">Governs: <a href="\/\?decision=product-tempo#what-it-changes"/);
+    assert.match(html, /data-governs="tightness">Affects: <a href="\/\?decision=hiring#what-it-changes"[^>]*><svg[^>]*lucide-users[\s\S]*?<\/svg>Hiring<\/a>/);
+    assert.match(html, /data-governs="riskAppetite">Affects: <a href="\/\?decision=product-tempo#what-it-changes"/);
     assert.doesNotMatch(html, /Sets the pause and resume lines/, "the line says whose lines");
   });
 });

@@ -15,11 +15,11 @@ describe("weekly email readings", () => {
     });
     const readings = buildWeeklyEmailReadings(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall));
 
-    assert.deepEqual(readings.map((reading) => reading.label), ["Funding pressure", "Risk appetite", "Margin"]);
+    assert.deepEqual(readings.map((reading) => reading.label), ["Funding pressure", "Risk appetite", "Room before a change"]);
     assert.match(readings[0].value, /^\d+\/100$/);
     assert.match(readings[1].value, /^\d+\/100$/);
     // The margin in words and points, under its own label; the engine's code is not for an inbox.
-    assert.equal(readings[2].label, "Margin");
+    assert.equal(readings[2].label, "Room before a change");
     assert.match(readings[2].value, /^(clear of|within reach of|close to) the line \((funding pressure|risk appetite) is (\d+ points? from|at) its change line\)$/);
     assert.match(readings[0].meaning ?? "", /^money is /);
     assert.match(readings[1].meaning ?? "", /^investors are /);

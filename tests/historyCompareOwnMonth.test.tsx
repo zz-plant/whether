@@ -218,7 +218,7 @@ describe("the period caption on a replayed month", () => {
     });
 
   it("says there is nothing to compare where the record starts", () => {
-    assert.equal(modelFor({}).weeklyLeadershipSummary.shorthandLine, "No earlier month-end to compare with.");
+    assert.equal(modelFor({}).weeklyLeadershipSummary.shorthandLine, "No earlier month to compare with.");
   });
 
   /* The caption is the operating latitude's move, about the number. It read "This week's

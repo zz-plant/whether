@@ -59,7 +59,7 @@ export default async function MethodPage({
     <>
       <ReportSection
         id="confidence-limits"
-        title="Margin and reliability limits"
+        title="How close conditions are to changing"
       >
         {/* Two columns under their own headings, not two cards inside the
             section (2026-10-09); the warnings below are set the same way. */}
@@ -96,7 +96,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="The margin is how far the scores sit from the line where conditions change. We check separately, across the whole archive, how often readings at that distance actually held."
+        description="The room before a change is how far the scores sit from the line where conditions change. We check separately, across the whole archive, how often readings at that distance actually held."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study

@@ -175,7 +175,7 @@ type AgentState = z.infer<typeof agentStateSchema>;
 
 /* The field keeps its name; pages call the same number the margin (2026-10-09). */
 const CONFIDENCE_MEANING =
-  "The margin: how far the scores sit from the line where conditions change. It is not a probability. Pages print it as \"Margin\".";
+  "The margin: how far the scores sit from the line where conditions change. It is not a probability. Pages label it \"Room before a change\".";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 

@@ -466,7 +466,7 @@ export function RegimeRadar({
           {readableReadings.length > 1 ? (
             <details className="mx-auto max-w-md text-left">
               {/* `weather-hit`: a 17px line is a 45px target with it, as the other summaries are. */}
-              <summary className="weather-hit w-fit cursor-pointer">Readings on this chart</summary>
+              <summary className="weather-hit w-fit cursor-pointer">Scores on this chart</summary>
               <ul className="list-disc pl-4">
                 {readableReadings.map((reading) => (
                   <li key={reading.key}>{reading.text}</li>
