@@ -44,7 +44,6 @@ export default async function MethodPage({
     sourceBoardRows,
     warnings,
     revisitBullets,
-    scorePositions,
     runHistory,
     readerReturns,
     reportShellModel,
@@ -173,7 +172,6 @@ export default async function MethodPage({
           warnings or a cached reading it renders open, where the reader who
           needs to distrust it finds it unprompted (DD-040). */}
       <FormulaReference
-        positions={scorePositions}
         scoringBasis={reportData.scoringBasis}
         plainLanguageFolded={!isFallback && warnings.length === 0}
         plainLanguageOpen={isDisclosureOpenInParams(resolvedSearchParams, "derivation")}
@@ -226,10 +224,11 @@ export default async function MethodPage({
           the last section of the page a reader opens to check this week's reading
           it read as an appendix. One line points to it. */}
       <p className="text-sm text-slate-300">
+        {/* The link is what it opens, not "About explains how…", a sentence about another page. */}
         <Link href="/about#method" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-          About
-        </Link>{" "}
-        explains how to use the pause and resume lines, with a worked example and a blank form.
+          How to use the pause and resume lines
+        </Link>
+        , with a worked example and a blank form.
       </p>
     </ReportShell>
   );

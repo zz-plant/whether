@@ -3,11 +3,11 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import { WhatWouldChangeSection } from "../app/components/home/WhatWouldChangeSection";
-import { SignalsCallLinesSection, SignalsWhatChangedSection } from "../app/signals/components/evidenceReaderSections";
+import { SignalsWhatChangedSection } from "../app/signals/components/evidenceReaderSections";
 import { previousScoresFromDynamics } from "../lib/export/scoreReference";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
-import { buildCallLineLadders, buildSignalReferenceRows } from "../lib/report/evidenceReaderModel";
+import { buildSignalReferenceRows } from "../lib/report/evidenceReaderModel";
 import { buildSignalChangeRows, describeWeeklyMovement } from "../lib/report/home/homeSectionModel";
 import type { RegimeSignalIndicator } from "../lib/report/homeBriefModel";
 import type { ReportDynamics } from "../lib/report/reportDataTypes";
@@ -165,7 +165,7 @@ describe("the evidence page", () => {
     assert.equal(undated.find((row) => row.key === "curveSlope")?.direction.label, "Unchanged from last week.");
   });
 
-  it("prints the date in the table head, the caption, the score cells and the call-line ladders", () => {
+  it("prints the date in the table head, the caption and the score cells", () => {
     const changed = renderToStaticMarkup(
       <SignalsWhatChangedSection
         rows={rows.map((row) => ({ ...row, note: null }))}
@@ -175,20 +175,13 @@ describe("the evidence page", () => {
         basis={comparisonBasis(comparedWith)}
       />,
     );
-    const ladders = renderToStaticMarkup(
-      <SignalsCallLinesSection
-        ladders={buildCallLineLadders(assessment, datedWeek, [])}
-        triggerCondition="Pause net-new hiring if funding pressure rises above 76."
-        reversalCondition="Resume once both scores are back across their resume lines."
-        showMicroDecisionRows={false}
-      />,
-    );
-    const text = `${changed} ${ladders}`.replace(/<[^>]+>/g, " ");
+    /* The call-line ladders were this page's second section until 2026-10-27; they are
+       the brief's now, linked under the table. */
+    const text = changed.replace(/<[^>]+>/g, " ");
 
     assert.match(text, /Since Aug 31/);
     assert.match(text, /against its line and Aug 31/);
-    assert.match(text, /Aug 31/);
-    assert.match(ladders.replace(/<[^>]+>/g, " "), /Aug 31: \d/);
+    assert.match(changed, /href="\/#what-would-change"/);
     assert.doesNotMatch(text, noWords);
   });
 });

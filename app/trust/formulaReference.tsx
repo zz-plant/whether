@@ -27,27 +27,16 @@ import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 import { ruleMetricLabel } from "../../lib/report/boundedDecisionRules";
-import { ScoreLadder, type LadderLine } from "../components/ui/scoreLadder";
+import { ActionLink } from "../components/ui/actionLink";
 import {
   describeRecordBasisInputs,
   isCountedMarketInput,
   type ScoringBasis,
 } from "../../lib/report/scoringBasis";
 
-/** One score against its lines, this week and last, as the ladder draws it. */
-type ScorePosition = {
-  value: number;
-  previous: number | null;
-  /** What the hollow dot is: the date of the reading it is drawn from, or "Last week" where the week does not date it. */
-  previousLabel?: string;
-  lines: readonly LadderLine[];
-};
-export type ScorePositions = { tightness: ScorePosition; riskAppetite: ScorePosition };
-
 /** "How hard…" to "how hard…", for a definition that follows its term mid-sentence. */
 const lowerFirst = (sentence: string) => `${sentence.charAt(0).toLowerCase()}${sentence.slice(1)}`;
 
-const ENGINE_SOURCE_URL = "https://github.com/zz-plant/whether/blob/main/lib/regimeEngineCore.ts";
 /* The premise test: the candidate rate ramps scored beside each reading, and the rule that
    decides whether one replaces the current ramp, fixed before any result (2026-10-09). Served
    from this site: the repository is private, so its GitHub copies are a 404 for readers. */
@@ -222,12 +211,10 @@ function FormulaCard({ title, children }: { title: string; children: ReactNode }
  * "Sources and formulas" links from /about and /threshold land on real content.
  */
 export function FormulaReference({
-  positions,
   scoringBasis,
   plainLanguageFolded = false,
   plainLanguageOpen = false,
 }: {
-  positions?: ScorePositions;
   /** This reading's basis: what the inputs left out would make each score (`ReportData.scoringBasis`). */
   scoringBasis?: Pick<ScoringBasis, "notCounted">;
   /** Fold the plain-language derivation behind `?derivation` on a stable week (the page decides; see the call site). */
@@ -309,27 +296,15 @@ export function FormulaReference({
       title="How the scores are built"
       description="The full derivation, from public data series to the weekly guidance."
     >
-      {/* Where the score sits, first, and in the one drawing every route uses
-          for it. The quadrant further down used to be the only picture of the
-          two scores on this page, and it draws the rule, not the reading. */}
-      {positions ? (
-        <div className="weather-surface mb-3 grid gap-x-8 gap-y-4 px-4 py-4 sm:grid-cols-2">
-          <ScoreLadder
-            label={ruleMetricLabel.tightness}
-            value={positions.tightness.value}
-            previous={positions.tightness.previous}
-            previousLabel={positions.tightness.previousLabel}
-            lines={positions.tightness.lines}
-          />
-          <ScoreLadder
-            label={ruleMetricLabel.riskAppetite}
-            value={positions.riskAppetite.value}
-            previous={positions.riskAppetite.previous}
-            previousLabel={positions.riskAppetite.previousLabel}
-            lines={positions.riskAppetite.lines}
-          />
-        </div>
-      ) : null}
+      {/* Where this week's scores sit is the brief's section, linked; this page drew the
+          same two ladders, pause, change and resume lines and all, until 2026-10-27. What
+          follows is how the scores are made. */}
+      <p className="mb-3 text-sm text-slate-300">
+        <ActionLink href="/#what-would-change" variant="inline">
+          Where this week&rsquo;s scores sit against their lines
+        </ActionLink>
+        , on the brief.
+      </p>
 
       {/* A reader who does not already know what a Treasury series or a credit
           spread is cannot start at the formulas. This tier says what the score
@@ -525,24 +500,10 @@ export function FormulaReference({
       </div>
       </details>
 
-      {/* The link sits inside the sentence, so it is inline with vertical
-          padding rather than a 44px inline-flex box: padding on an inline box
-          widens what a finger can hit without raising the line it sits on (§II,
-          "expand invisible hitboxes"). A second link here, to how to use the
-          pause and resume lines on /about, went where the line closing /trust
-          already points (2026-10-09). */}
-      <p className="mt-3 text-xs leading-5 text-slate-400">
-        Every constant above is read from the scoring engine, so a change there changes this
-        page.{" "}
-        <a
-          href={ENGINE_SOURCE_URL}
-          target="_blank"
-          rel="noreferrer"
-          className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
-        >
-          Read the engine source →
-        </a>
-      </p>
+      {/* No closing line about the engine (2026-10-27). "Every constant above is read
+          from the scoring engine, so a change there changes this page" described how
+          the page is built, and its "Read the engine source" link went to the private
+          repository, a 404 for every reader. */}
       {/* One line, here and nowhere else: the method note for a change under test. */}
       <p className="mt-2 text-xs leading-5 text-slate-400" data-ramp-test-note>
         Three other ways to score the short-term borrowing rate are being tested beside each

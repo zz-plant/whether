@@ -1,7 +1,7 @@
 import type { ReactElement } from "react";
 import type { SignalsPageModel, SignalsPageSearchParams } from "../evidencePageModel";
 import type { FocusTab } from "../evidenceQueryState";
-import { SignalsCallLinesSection, SignalsWhatChangedSection } from "./evidenceReaderSections";
+import { SignalsWhatChangedSection } from "./evidenceReaderSections";
 import { SignalsInstrumentsSection } from "./evidenceInstruments";
 
 /**
@@ -39,13 +39,6 @@ export const signalsEvidenceSections = ({
     focusInstruments={model.focusInstruments}
     searchParams={searchParams}
     basis={model.basis}
-  />,
-  <SignalsCallLinesSection
-    key="call-lines"
-    ladders={model.callLineLadders}
-    triggerCondition={model.triggerCondition}
-    reversalCondition={model.reversalCondition}
-    showMicroDecisionRows={model.showMicroDecisionRows}
   />,
   <SignalsInstrumentsSection
     key="instruments"

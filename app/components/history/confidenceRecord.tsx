@@ -193,8 +193,7 @@ function ConfidenceRecordBody() {
       <RecentYearParagraph />
 
       <p className="text-fluid-xs text-slate-400">
-        Derived from the month-end archive each time this page is built, so it improves as the
-        record grows. A held month means conditions did not change.
+        A held month means conditions did not change.
         {" "}
         {CALL_CHANGE_RULE}
       </p>

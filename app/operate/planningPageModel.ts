@@ -152,7 +152,10 @@ export async function buildPlanningPageModel(
            on-page heading is the section's name. */
         pageTitle: "Decide",
         pageSummary: "This week's guidance, turned into rules for hiring, spend and the roadmap.",
-        sectionLinks: operationsSectionLinks.plan,
+        /* The warnings section exists only in a week that has warnings, so its link does too. */
+        sectionLinks: failureModes.length > 0
+          ? operationsSectionLinks.plan
+          : operationsSectionLinks.plan.filter((link) => link.href !== "#ops-failure-patterns"),
         currentPath: "/operate",
         tabsQuery: new URLSearchParams(
           Object.entries(resolvedSearchParams ?? {}).flatMap(([key, value]) => (value ? [[key, value]] : [])),
@@ -221,9 +224,7 @@ export async function buildPlanningPageModel(
               h("section", { className: "space-y-4" },
                 /* One row per area, in the order every surface uses, with the rule and
                    both its lines — the same table the brief prints. */
-                // "/": the "Line set by" links name the brief's score anchors, which
-                // this page does not draw; in-page they went nowhere.
-                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area", signalLinkBase: "/" }),
+                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area" }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
                     ? "To revisit: recheck last week's approvals before adding fixed cost or widening scope."
@@ -341,30 +342,27 @@ export async function buildPlanningPageModel(
          (2026-10-09). It was a bordered card with a "Risk checks" label over a
          heading that says what the section holds, and each warning was a box of
          its own with an amber edge inside it: the heading already says they are
-         warnings. A week with no warning is one line, and "Recheck the rules"
-         waits for a warning to recheck them against. */
-      h("section", { id: "ops-failure-patterns", className: "space-y-3 border-t border-[color:var(--border-default)] pt-8", "aria-labelledby": "ops-failure-patterns-title" },
-        h("div", { className: "space-y-1" },
-          h("h2", { id: "ops-failure-patterns-title", className: "text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings to read before you approve"),
-          failureModes.length > 0
-            ? h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and how to check it.")
-            : null,
-        ),
-        failureModes.length === 0
-          ? h("p", { className: "text-sm text-slate-200" }, "No warning this week. Keep the rules above; look again if the data goes stale or a score nears its change line.")
-          : h("ul", { className: "grid gap-x-8 gap-y-4 lg:grid-cols-2" },
+         warnings. Only in a week that has one (2026-10-27): a quiet week drew a
+         heading, "No warning this week" and a button, a section announcing that
+         it had nothing in it. */
+      failureModes.length > 0
+        ? h("section", { id: "ops-failure-patterns", className: "space-y-3 border-t border-[color:var(--border-default)] pt-8", "aria-labelledby": "ops-failure-patterns-title" },
+          h("div", { className: "space-y-1" },
+            h("h2", { id: "ops-failure-patterns-title", className: "text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings to read before you approve"),
+            h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and how to check it."),
+          ),
+          h("ul", { className: "grid gap-x-8 gap-y-4 lg:grid-cols-2" },
             failureModes.map((warning) => h("li", { key: warning.id },
               h("p", { className: "text-sm font-semibold text-slate-100" }, warning.warning),
               h("p", { className: "mt-1 text-sm text-slate-300" }, warning.mitigationCheck),
             )),
           ),
-        h("div", { className: "flex flex-wrap gap-2" },
-          failureModes.length > 0
-            ? h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold" }, "Recheck the rules")
-            : null,
-          h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
-        ),
-      ),
+          h("div", { className: "flex flex-wrap gap-2" },
+            h(Link, { href: "#ops-playbook", className: "weather-button inline-flex min-h-[44px] items-center justify-center px-4 py-2 text-xs font-semibold" }, "Recheck the rules"),
+            h(Link, { href: "/trust#revisit-call", className: "weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-xs font-semibold text-slate-100" }, DECISION_CONTRACT_LABELS.watch.flipWatch),
+          ),
+        )
+        : null,
     ),
   };
 }

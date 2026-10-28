@@ -139,14 +139,16 @@ describe("/trust carries one trust strip", () => {
     for (const cell of ["Data as of", "Sources", "Margin", "change next week"]) assert.match(html, new RegExp(cell));
   });
 
-  it("draws where the score sits as two ladders at the top of the formula section", async () => {
+  /* The ladders are the brief's (2026-10-27): this section drew the same two, with the
+     same pause, change and resume lines, and links to them now. */
+  it("opens the formula section on a link to where the scores sit, not a second pair of ladders", async () => {
     const page = await import("../app/trust/page");
     const html = renderToStaticMarkup(await page.default({}));
     const formula = html.indexOf('id="formula-reference"');
-    const ladders = [...html.matchAll(/data-score-ladder/g)].map((match) => match.index ?? -1);
-    assert.equal(ladders.length, 2);
-    assert.ok(ladders.every((index) => index > formula), "both ladders sit inside the formula section");
-    assert.ok(ladders[1] < html.indexOf("Four conditions, picked by whether funding pressure is above"), "the quadrant stays, as the rule's explanation, beneath them");
+    const link = html.indexOf('href="/#what-would-change"', formula);
+    assert.equal((html.match(/data-score-ladder/g) ?? []).length, 0);
+    assert.ok(link > formula, "the link sits inside the formula section");
+    assert.ok(link < html.indexOf("Four conditions, picked by whether funding pressure is above"), "the quadrant stays, as the rule's explanation, beneath it");
   });
 });
 

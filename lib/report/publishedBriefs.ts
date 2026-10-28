@@ -459,6 +459,35 @@ const briefBySlug = new Map(briefs.map((brief) => [brief.slug, brief]));
 /** Newest first. */
 export const getPublishedBriefs = () => briefs;
 
+/**
+ * Consecutive weeks that published the same guidance, one entry each (2026-10-27).
+ * /history listed a card per week, so four Freezing weeks read as four announcements
+ * of two sentences. Same conditions and same summary make a run; newest first, as
+ * `getPublishedBriefs`. Every week keeps its own page.
+ */
+export const groupPublishedBriefRuns = (list: readonly PublishedBrief[]): PublishedBrief[][] => {
+  const runs: PublishedBrief[][] = [];
+  for (const brief of list) {
+    const run = runs.at(-1);
+    const head = run?.at(0);
+    if (run && head && head.regime === brief.regime && head.summary === brief.summary) run.push(brief);
+    else runs.push([brief]);
+  }
+  return runs;
+};
+
+/** "Week of Oct 6, 2026", or "Weeks of Sep 15 – Oct 6, 2026" for a run. */
+export const publishedBriefRunLabel = (run: readonly PublishedBrief[]): string => {
+  const newest = run.at(0);
+  const oldest = run.at(-1);
+  if (!newest || !oldest) return "";
+  const last = publishedBriefWeekLabel(newest);
+  if (run.length === 1) return `Week of ${last}`;
+  const first = publishedBriefWeekLabel(oldest);
+  const year = last.slice(-6);
+  return `Weeks of ${first.endsWith(year) ? first.slice(0, -6) : first} – ${last}`;
+};
+
 const HELD_CALLS = new Set(
   [...Object.values(POLICY_OVERRIDE_CALL), POLICY_OVERRIDE_CALL_UNNAMED].map((hold) => hold.currentCall.trim()),
 );

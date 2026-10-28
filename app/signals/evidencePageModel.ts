@@ -1,4 +1,3 @@
-import { FALLBACK_PAUSE_THRESHOLD } from "../../lib/report/reportCopy";
 import { loadReportDataSafe } from "../../lib/report/reportData";
 import type { ReportData } from "../../lib/report/reportData";
 import { siteUrl } from "../../lib/siteUrl";
@@ -11,10 +10,8 @@ import {
 import { graph } from "../../lib/seo/pageStructuredData";
 import { buildTrustStatus } from "../../lib/report/trustStatus";
 import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
-import { shouldSplitDecisionConditionRows } from "../../lib/report/reportFormatting";
 import type { RegimeSignalKey } from "../../lib/report/reportFormatting";
 import {
-  buildCallLineLadders,
   buildSignalReferenceRows,
   buildTrustStripProps,
 } from "../../lib/report/evidenceReaderModel";
@@ -22,7 +19,6 @@ import { resolvePublishedConfidence } from "../../lib/report/confidence";
 import { buildDegradedSourceRows } from "../../lib/report/sourceHealth";
 import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { resolveSignalsFocus, type FocusTab } from "./evidenceQueryState";
-import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { isSavedCopy } from "../../lib/report/provenanceStatus";
 
 export type SignalsPageSearchParams = {
@@ -111,7 +107,6 @@ export const focusLabelByTab: Record<FocusTab, string> = {
 /** The page's sections, in the order a reader answers their questions. */
 const signalsSectionLinks = [
   { href: "#what-changed", label: "What changed" },
-  { href: "#call-lines", label: DECISION_CONTRACT_LABELS.watch.flipWatch },
   { href: "#instruments", label: "Deeper evidence" },
 ];
 
@@ -171,8 +166,6 @@ const deriveSignalsPageModel = (
     selectedMonth,
     selectedYear,
     statusLabel,
-    actionStripItems,
-    guardrailThreshold,
     treasury,
     treasuryProvenance,
     reportDynamics,
@@ -204,28 +197,12 @@ const deriveSignalsPageModel = (
     assessment,
     scoringBasis: reportData.scoringBasis,
   });
-  const triggerCondition = guardrailThreshold?.trim().length
-    ? guardrailThreshold
-    : `${FALLBACK_PAUSE_THRESHOLD}.`;
-  // The resume trigger, symmetric with the pause trigger in "Pause if" above.
-  // This rendered `flipThreshold` — the condition that BREAKS the call, which
-  // /trust labels "Call changes if". Printing it under
-  // "Resume when" (then "Safe again when") told an operator the opposite of what it means.
-  const resumeTrigger = actionStripItems?.[0]?.reversalCondition;
-  const reversalCondition = resumeTrigger?.trim().length
-    ? resumeTrigger
-    : "Resume once both scores are back across their resume lines.";
-  const showMicroDecisionRows = shouldSplitDecisionConditionRows({
-    trigger: triggerCondition,
-    reversal: reversalCondition,
-  });
   const activeFocus: FocusTab = resolveSignalsFocus(resolvedSearchParams);
   const focusFilter = FOCUS_FILTERS[activeFocus];
   const signalRows = buildSignalReferenceRows(assessment, reportDynamics, reportData.scoringBasis);
   const changedSignalRows = signalRows
     .filter((row) => focusFilter.signals.includes(row.key))
     .map((row) => ({ ...row, note: focusFilter.notes[row.key] ?? null }));
-  const callLineLadders = buildCallLineLadders(assessment, reportDynamics, actionStripItems ?? []);
 
   return {
     structuredData: buildStructuredData(),
@@ -247,14 +224,10 @@ const deriveSignalsPageModel = (
     isFallback,
     trust,
     trustStrip,
-    triggerCondition,
-    reversalCondition,
-    showMicroDecisionRows,
     activeFocus,
     focusInstruments: focusFilter.instruments,
     changedSignalRows,
-    callLineLadders,
-    /* What the "since" column compares with; the rows and ladders carry the same label. */
+    /* What the "since" column compares with; the rows carry the same label. */
     basis: comparisonBasis(reportDynamics.comparedWith),
     sectionLinks: signalsSectionLinks,
   };

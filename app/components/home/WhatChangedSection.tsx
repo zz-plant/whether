@@ -41,6 +41,12 @@ const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasi
       </span>
     );
   }
+  /* Where the reading came from (2026-10-27). The ladder beside the chip prints this
+     week's value against its lines, so "90 → 90" said the 90 twice, and an unmoved
+     score drew a chip to say so; /signals draws its chip the same way. */
+  if (row.delta === 0) {
+    return <span className="text-slate-400">No change</span>;
+  }
   const direction = trendDirectionFromDelta(row.delta);
   const tone = trendToneClass(direction, row.increaseIsPositive);
   return (
@@ -48,9 +54,8 @@ const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasi
       <span className="sr-only">
         {describeTrend({ label: row.label, delta: row.delta, current: row.value ?? undefined, period: basis.since })}
       </span>
-      <span aria-hidden="true" className="text-slate-400">{row.previousLabel}</span>
-      <span aria-hidden="true">→</span>
-      <span aria-hidden="true" className="font-semibold">{row.valueLabel}</span>
+      <span aria-hidden="true" className="text-slate-400">from</span>
+      <span aria-hidden="true" className="font-semibold">{row.previousLabel}</span>
       <TrendGlyph direction={direction} className="h-3 w-3" />
     </span>
   );

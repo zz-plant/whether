@@ -3,9 +3,7 @@ import type { ReactNode } from "react";
 import {
   decisionAreaLabel,
   decisionAreaOrder,
-  decisionAreaUsualMetrics,
   type DecisionArea,
-  type RuleConditionMetric,
 } from "../../../lib/report/boundedDecisionRules";
 import { NOTHING_TO_RESUME, type LineState } from "../../../lib/report/operatingCalls";
 import type { Route } from "../../../lib/navigation/routeType";
@@ -42,12 +40,6 @@ export type AreaRowData = {
   pause?: AreaLineValue;
   /** The resume line, the distance to it, and its state once it is met. */
   resume?: AreaLineValue;
-  /**
-   * The scores the printed lines are drawn on, for the "Line set by" note
-   * under the area. Absent on a row whose lines are sentences, which falls back
-   * to the score the area is usually ruled by.
-   */
-  scores?: readonly RuleConditionMetric[];
   /** What moved for this area this week, if anything. */
   changed?: ReactNode;
   /**
@@ -78,27 +70,9 @@ type AreaTableProps = {
   caption: string;
   /** Hide the "what changed" column when no row carries one. */
   className?: string;
-  /**
-   * Where the "Line set by" links find the two scores. They name anchors only
-   * the brief draws (`WhatChangedSection`), so a table on another page passes
-   * "/" to send them there; left empty, they stay in the page.
-   */
-  signalLinkBase?: "" | "/";
 };
 
 const orderIndex = (area: DecisionArea) => decisionAreaOrder.indexOf(area);
-
-/*
- * The scores named under the area are the scores its printed lines are drawn
- * on. They were fixed per area, so on a week New bets paused on funding
- * pressure the row read "Line set by Risk appetite" over "Funding pressure >
- * 76", and Hiring's "Funding pressure > 76 or Risk appetite < 44" sat under
- * "Line set by Funding pressure".
- */
-const scoresSettingRow = (row: AreaRowData): readonly RuleConditionMetric[] => {
-  const named = row.scores && row.scores.length > 0 ? row.scores : decisionAreaUsualMetrics(row.area);
-  return (["tightness", "riskAppetite"] as const).filter((score) => named.includes(score));
-};
 
 /* The column names, repeated inside each cell for the stacked phone layout,
    where the header row is not drawn. Hidden from md up, where the header is. */
@@ -148,9 +122,7 @@ const LineCell = ({
  * pause and resume lines side by side, each labelled in its cell. One DOM for
  * both, so the row order and content cannot drift between layouts.
  */
-export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }: AreaTableProps) {
-  const fundingHref = `${signalLinkBase}#signal-funding-pressure`;
-  const riskHref = `${signalLinkBase}#signal-risk-appetite`;
+export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
   const ordered = [...rows].sort((a, b) => orderIndex(a.area) - orderIndex(b.area));
   const showChanged = ordered.some((row) => row.changed);
   const showAction = ordered.some((row) => row.action);
@@ -201,25 +173,9 @@ export function AreaTable({ rows, caption, className = "", signalLinkBase = "" }
                 ) : (
                   <AreaLabel area={row.area} />
                 )}
-                <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
-                  {(() => {
-                    const scores = scoresSettingRow(row);
-                    const links = scores.map((score) => (
-                      <a
-                        key={score}
-                        href={score === "tightness" ? fundingHref : riskHref}
-                        className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300"
-                      >
-                        {score === "tightness" ? "Funding pressure" : "Risk appetite"}
-                      </a>
-                    ));
-                    return scores.length > 1 ? (
-                      <>Lines set by {links[0]} &amp; {links[1]}</>
-                    ) : (
-                      <>Line set by {links[0]}</>
-                    );
-                  })()}
-                </span>
+                {/* No "Lines set by Funding pressure & Risk appetite" under the area
+                    (2026-10-27): the pause and resume lines beside it name their
+                    scores, so every row said them twice. */}
               </th>
               <td className="py-2.5 pr-3 text-slate-200 max-md:col-span-2 max-md:p-0">
                 {row.rule}

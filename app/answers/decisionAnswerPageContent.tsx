@@ -299,7 +299,6 @@ export async function DecisionAnswerPageContent({
                 scores: [...rule.pause.conditions, ...rule.resume.conditions].map((condition) => condition.metric),
               };
             })}
-            signalLinkBase="/"
           />
         </SecondaryPageSection>
 

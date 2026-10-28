@@ -16,7 +16,6 @@ import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { describeScoreMovement } from "../scoreMovement";
-import { describeNotCountedScore, joinSentences, type ScoringBasis } from "../scoringBasis";
 import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
 
 /**
@@ -99,7 +98,6 @@ export const buildSignalChangeRows = ({
   dynamics,
   tightnessPressure,
   tightnessSaturated,
-  scoringBasis,
 }: {
   indicators: readonly RegimeSignalIndicator[];
   /** The week's comparison. Last week comes from here, not from the indicator's label. */
@@ -107,8 +105,6 @@ export const buildSignalChangeRows = ({
   lines: MetricLines;
   tightnessPressure?: number;
   tightnessSaturated?: boolean;
-  /** What each score leaves out (`ReportData.scoringBasis`), said in its row after the move, whichever reading the week compares with. */
-  scoringBasis?: Pick<ScoringBasis, "notCounted">;
 }): SignalChangeRow[] => {
   const byKey = new Map(indicators.map((indicator) => [indicator.key, indicator]));
   return SIGNAL_ORDER.flatMap((key) => {
@@ -131,11 +127,11 @@ export const buildSignalChangeRows = ({
       previous,
       previousLabel: previous === null ? null : formatRegimeSignalValue(previous, key),
       delta,
+      /* What moved it, and not what the score leaves out (2026-10-27): the brief's
+         "What the headline reading leaves out" band says that in full beside the
+         readings, and the strip on the card links it, so this row made it three. */
       movement: isScore
-        ? joinSentences(
-            describeScoreMovement(key, dynamics.movement?.[key], comparisonBasis(dynamics.comparedWith)),
-            describeNotCountedScore(key, scoringBasis),
-          )
+        ? describeScoreMovement(key, dynamics.movement?.[key], comparisonBasis(dynamics.comparedWith))
         : null,
       increaseIsPositive: INCREASE_IS_POSITIVE[key],
       scaleLabel: isScore && typeof value === "number" ? scoreBandScaleLabel(classifyScoreBand(value)) : undefined,

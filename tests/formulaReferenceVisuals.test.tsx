@@ -59,24 +59,14 @@ describe("formula reference visuals", () => {
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_MEDIUM_THRESHOLD}<`));
   });
 
-  it("opens with the two scores on their ladders when the page hands it positions", () => {
-    /* The quadrant draws the rule; where this week's scores sit is the
-       ladder, the one drawing every route uses for a score. Without positions
-       — the static render above — no ladder and no bare score. */
+  /* Where this week's scores sit is the brief's section since 2026-10-27; this page drew
+     the same two ladders. It links there, before the quadrant explains the rule. */
+  it("links to the brief for where the scores sit, and draws no ladder of its own", () => {
     assert.doesNotMatch(html, /data-score-ladder/);
-    const withPositions = renderToStaticMarkup(
-      <FormulaReference
-        positions={{
-          tightness: { value: 72, previous: 68, lines: [{ kind: "callChange", value: TIGHTNESS_REGIME_THRESHOLD }] },
-          riskAppetite: { value: 41, previous: null, lines: [{ kind: "callChange", value: RISK_APPETITE_REGIME_THRESHOLD }] },
-        }}
-      />,
-    );
-    assert.equal((withPositions.match(/data-score-ladder/g) ?? []).length, 2);
-    assert.match(withPositions, /Last week: 68/);
+    assert.match(html, /href="\/#what-would-change"/);
     assert.ok(
-      withPositions.indexOf("data-score-ladder") < withPositions.indexOf("Four conditions, picked by whether funding pressure is above"),
-      "the ladders draw the reading before the quadrant explains the rule",
+      html.indexOf("/#what-would-change") < html.indexOf("Four conditions, picked by whether funding pressure is above"),
+      "the link comes before the quadrant explains the rule",
     );
   });
 

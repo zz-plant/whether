@@ -6,6 +6,8 @@ import {
   findAdjacentPublishedBriefs,
   findPublishedBrief,
   getPublishedBriefs,
+  groupPublishedBriefRuns,
+  publishedBriefRunLabel,
   isPublishedBriefSlug,
   latestPublishedBrief,
   parsePublishedBriefs,
@@ -151,5 +153,37 @@ describe("citable permalink recency gate", () => {
       undefined,
     );
     assert.equal(selectCitablePermalinkBrief(shiftDays(latest.recordDate, 60)), undefined);
+  });
+});
+
+/*
+ * /history lists the published weeks as runs (2026-10-27): consecutive weeks that
+ * published the same conditions and the same summary are one entry, so four
+ * Freezing weeks of two sentences are two cards, not four.
+ */
+describe("published brief runs", () => {
+  const briefs = getPublishedBriefs();
+  const runs = groupPublishedBriefRuns(briefs);
+
+  it("keeps every week, in order, and joins only the same guidance", () => {
+    assert.deepEqual(runs.flat().map((brief) => brief.slug), briefs.map((brief) => brief.slug));
+    for (const run of runs) {
+      for (const brief of run) {
+        assert.equal(brief.regime, run[0].regime);
+        assert.equal(brief.summary, run[0].summary);
+      }
+    }
+    for (const [index, run] of runs.entries()) {
+      const next = runs[index + 1]?.[0];
+      const last = run.at(-1);
+      if (next && last) assert.ok(next.regime !== last.regime || next.summary !== last.summary, "a run ends where the guidance changes");
+    }
+  });
+
+  it("names one week, or the span of a run within one year", () => {
+    const single = runs.find((run) => run.length === 1);
+    if (single) assert.match(publishedBriefRunLabel(single), /^Week of [A-Z][a-z]{2} \d{1,2}, \d{4}$/);
+    const span = runs.find((run) => run.length > 1);
+    if (span) assert.match(publishedBriefRunLabel(span), /^Weeks of [A-Z][a-z]{2} \d{1,2}(, \d{4})? – [A-Z][a-z]{2} \d{1,2}, \d{4}$/);
   });
 });
