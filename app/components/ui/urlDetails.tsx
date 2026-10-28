@@ -72,8 +72,10 @@ export function UrlDetails({
       if (nextHref === currentHref) return;
       // replaceState, not pushState: opening a panel is not a navigation, and
       // pushing would make Back mean "close the panel I just opened" instead of
-      // "go where I came from".
-      window.history.replaceState({}, "", `${nextHref}${window.location.hash}`);
+      // "go where I came from". The router's own state object is passed through,
+      // as the decision picker does, so the app router keeps its entry; `{}` here
+      // dropped it.
+      window.history.replaceState(window.history.state, "", `${nextHref}${window.location.hash}`);
     };
 
     // Back/forward should move the panel with the rest of the page state.

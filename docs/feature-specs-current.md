@@ -3968,8 +3968,7 @@ from press to change, forms) found eight things that moved, hid or said the wron
   breathing, until the address catches up. It waited about 800ms on a phone, which never prefetches.
 - **The archived-view band sits under the week stepper.** Above the page, it pushed the stepper
   142px down on a desktop and 150–216px on a phone. Stepping between archived months now moves
-  nothing; on a first visit the conditions legend above still changes height between this week and
-  an archived one.
+  nothing. On a first visit the conditions legend above it also changed height; §1.1.93 holds it.
 - **Copy Brief opens the share sheet on a touch screen only, labelled "Share Brief".** Desktop
   browsers with a share menu, and the `C` shortcut, copy the Slack block. Closing the sheet does
   nothing; any other refusal falls back to the copy.
@@ -3979,6 +3978,24 @@ from press to change, forms) found eight things that moved, hid or said the wron
 - **The subscribe form validates in its own message line** (`noValidate`): a bad address set
   `aria-invalid` and printed under the form instead of a browser bubble.
 - **"Skip to content"** draws above the sticky header (z-index 60), which covered it on every route.
+
+### 1.1.93 A link opens what the sender had open (2026-10-27)
+
+Follow-ups to §1.1.92.
+
+- **The `/signals` instruments carry their open state in the address**, as the month picker
+  (`advanced`) and the fossil record (`fossil`) already did: the rates charts `rates=1`, the curve
+  `curve=1`, the score trends `trends=1`, the reference cycle `analog=1`. A link to an opened chart
+  used to arrive with all seven questions closed. `/share`'s folds stay out of the address: the text
+  that copies, the template list and the embed's customise panel are the incidental kind §XII
+  exempts, and the embed builder already opens from `#embed`.
+- **`UrlDetails` keeps the router's history state** when it rewrites the address, as the decision
+  picker does; it wrote `{}` over it.
+- **The orientation line stays on an archived week.** It is as true of an archived week as of this
+  one, and a first visit can arrive on a shared archive link. Without it the legend lost a line, so
+  on a first visit the week stepper under it moved up about 62px on the first step back. It now holds
+  still on a desktop and at 360px; at 390px the four conditions an archived week lists wrap one line
+  more than this week's one, a 21px move.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,
