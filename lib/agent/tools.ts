@@ -143,7 +143,9 @@ const AGENT_TOOLS = [
           recordDate: brief.recordDate,
           recordDateLabel: brief.recordDateLabel,
           headline: publishedBriefHeadline(brief).composed,
-          actionNow: brief.actionNow,
+          /* The headline's action. The record's own field is the action the headline stopped
+             leading with on 2026-10-09, kept as the source of the week's direction. */
+          actionNow: publishedBriefHeadline(brief).action,
           regime: brief.regime,
           conditions: display.conditions,
           confidence: { label: brief.confidenceLabel },

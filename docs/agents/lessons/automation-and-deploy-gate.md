@@ -9,7 +9,7 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 
 | Routine | ID | Cadence (UTC) | Produces |
 | --- | --- | --- | --- |
-| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json`, `time_machine_cache.json`, `confidence_record_months.json`, `weekly_summaries_2018_2026.json`, `summary_memory_rail_weekly.json` (see below on the prompt) |
+| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json`, `time_machine_cache.json`, `confidence_record_months.json`, `weekly_summaries_2018_2026.json`, `summary_memory_rail_weekly.json`, `posture_archive_index.json`, `posture_archive_years.json` (once the owner pastes the prompt; see below) |
 | Whether — weekly brief freeze | `trig_01WrbhhT73Ve4bsFK83UNyu9` | Thu 13:00 | current week appended to `data/published_briefs.json` |
 | Whether — claims read-through (Tue, after the Monday send) | `trig_011EVxtoaiNMXk6CnKUPdfnZ` | Tue 02:13 | nothing committed: a read-only report, pushed to the owner's phone, comparing each claim in `docs/claims-ledger.md` across the live surfaces, and whether the weekly and month-end comparison bases are current |
 
@@ -127,6 +127,21 @@ it does not arrive, so a refresh never writes an archive on another basis; the h
 index from the archive, and the prompt does not run it either. The claims read-through was first scheduled Monday 15:47 UTC,
 inside the window this section describes, and moved to Tuesday 02:13 UTC the same day; it now also
 checks that the month-end archive is current.
+
+**Still unpasted on 2026-10-27, and now it blocks pushes.** The Oct 27 run regenerated
+`data/time_machine_cache.json`, found it outside the three paths it may commit, and discarded it
+(no month had landed, so nothing was lost that week). Once October's month-end lands, the old prompt
+would commit the archive's new month without the cache, and `tests/summaryDerivedHistory.test.ts`
+("keeps the time machine cache aligned to the latest monthly archive month") fails on main for every
+later push. The replacement prompt also runs `bun run archive:index`, so a new quarter reaches
+/history, and names the weekly archive by its year-bearing file name. The routines that do push are
+the ones created through the HTTP API (the freeze routine opened w38–w41); one an agent creates has
+no GitHub access, which is why the read-through only reads production. Since 2026-10-27 that prompt
+defines the guidance as the headline ("Conditions are <tone>. <call>") with no separate action claim,
+reads the frozen weeks from `/calendar.ics` and `/api/agent?week=` when the repository is
+unreachable, and no longer asks for pull requests. w42 and w43 were never frozen (the Thursday
+routine hit the usage cap on Oct 22, and the Monday freeze Workflow has opened no pull request since
+it was enabled), so the Oct 26 reading compared with Sep 30; w44 was frozen by hand.
 
 **A freeze must not move a pinned test (2026-10-07).** The routine pushes through the pre-push gate,
 so any test that reads the newest frozen week fails its push and no freeze PR opens. The brief-format

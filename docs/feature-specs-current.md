@@ -2931,7 +2931,7 @@ A live review of every route found the same few things said several ways. Each i
   share and OG cards. It is the contract's call (`currentCall`; `PublishedBrief.summary` frozen), the
   more concrete of the two week-level sentences; the action's first sentence (the direction) rides
   on the stamp or opens a paste, and on a held week the hold's action leads. Per-area "Do now" lines
-  stay area lines. `tests/weeklyHeadline.test.tsx`.
+  stay area lines. Since 2026-10-27 the API surfaces print it too (§1.1.91). `tests/weeklyHeadline.test.tsx`.
 - **Weeks and dates.** A week is named by its Monday (`formatWeekMondayUTC`); the strip says "Data as
   of" and the intro "Checked" for the two dates it prints.
 - **The record.** `countRecord` (`lib/report/trackRecord.ts`) counts readings, comparisons
@@ -3931,6 +3931,26 @@ one size per width (24.6px and 34px); section headings are 22px on a phone. Rule
   from `sm`, and always when a note explains a different published week.
 - **"Readings on this chart"** gets the shared 44px hit area. The other small links the audit found
   (the governed areas, the week keys, `/share`'s summaries) already had it.
+
+### 1.1.91 One action a week, on the API surfaces too (2026-10-27)
+
+The headline stopped leading with the week's action on 2026-10-09 (§1.1.60), but eight surfaces kept
+printing that action as the week's instruction. On the Oct 26 reading the page and the Slack post
+said "Conditions are tightening. Commit to what protects income you have; new bets wait for cheaper
+money." while the agent state's `guidance.call` said "Conditions are tightening. Freeze new
+commitments and keep spend flexible."
+
+- **The guidance** (`formatGuidance`) is now what the agent state's `guidance.call`, the CLI's `call`
+  and `call.summary`, the `/api/decision` memo's `action`, the agent handoff's `decision_now` and
+  `/trust`'s "What it would change" print. A surface without the homepage model resolves it with
+  `resolveWeekGuidance` (`lib/report/weeklyBriefSnapshot.ts`), which reads the same call contract.
+- **The headline's action** (`weeklyHeadline(…).action`) is what the investor update's "Our operating
+  response this month", the embed's JSON `actionNow` and the agent tools' frozen-brief `actionNow`
+  print.
+- **The frozen record** still stores the action as `actionNow`. It is the source of the week's
+  direction and a held week's headline, and no surface prints it on its own.
+- `tests/weeklyClaimParity.test.tsx` holds the agent state, CLI, memo and investor update to the
+  guidance, and checks the agent state, memo and investor update for the second action.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-06 it has three sections,

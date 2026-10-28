@@ -9,6 +9,7 @@ import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "../publish
 import { briefArtifactOf, briefSourceFromReportData, buildBriefDocument } from "../briefDocument";
 import { publisherSourceLabel } from "../provenanceStatus";
 import { weeklyHeadline } from "../reportEvidence";
+import { formatGuidance } from "../../export/briefBuilders";
 
 type HomePageAssembly = Awaited<ReturnType<typeof assembleHomePage>>;
 type WeeklyCard = HomePageAssembly["weeklyDecisionCardModel"];
@@ -158,7 +159,9 @@ export const buildBriefArtifactFromSnapshot = ({
  * The /api/decision memo, from the assembled week. Its action, pause line,
  * "Conditions change if", shift summary and memo lines are the weekly contract's,
  * as every paste prints them (docs/claims-ledger.md); `tests/weeklyClaimParity.test.tsx`
- * holds it to them. The action read the home model's, which says the same sentence
+ * holds it to them. The action is the guidance (`formatGuidance`); it was the contract's
+ * `actionNow`, which stopped being the headline on 2026-10-09 and so told a caller to
+ * "Freeze new commitments" in a week every page led with a different instruction. The action read the home model's, which says the same sentence
  * by a second path, and the memo lines and shift summary were the home model's own:
  * on the held week the parity test renders they said "Conditions change if: Funding
  * pressure rises 25 pts to clear 70 (45 today) or risk appetite falls 12 pts to 50 or
@@ -167,7 +170,7 @@ export const buildBriefArtifactFromSnapshot = ({
 export const buildDecisionMemo = (homepage: Pick<HomePageAssembly, "weeklyCall" | "weeklyDecisionCardModel">) => {
   const model = homepage.weeklyDecisionCardModel;
   return {
-    action: homepage.weeklyCall.actionNow,
+    action: formatGuidance(homepage.weeklyCall),
     stance: model.status.postureLabel,
     postureWithStage: model.status.postureWithStageLabel,
     regime: model.status.regimeKey ?? "EXPANSION",

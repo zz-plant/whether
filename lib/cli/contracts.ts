@@ -233,7 +233,8 @@ export const buildCliCallContract = ({ reportData, postureState, degraded }: { r
   version: "v1",
   generatedAt: new Date().toISOString(),
   freshness: buildFreshness({ reportData, confidenceLabel: postureState.currentState.confidenceLabel, degraded }),
-  call: reportData.actionNowShort,
+  /* The agent state's guidance, so `whether call` and an agent are told one sentence. */
+  call: buildAgentGuidance({ reportData, postureState }).call,
   leadershipShould: reportData.startItems,
   watch: [...postureState.whatFlipsNext.thresholds],
   degraded,

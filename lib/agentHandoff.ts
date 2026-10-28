@@ -42,7 +42,8 @@ const buildSignals = (
 
 type AgentDecisionSupport = {
   reportDynamics: Pick<ReportDynamics, "changedSignals" | "directionLabel" | "regimeChanged" | "comparedWith">;
-  actionNowShort: string;
+  /** The week's guidance as every paste prints it (`buildAgentGuidance(…).call`). */
+  guidance: string;
   startItems: string[];
   stopItems: string[];
   postureState: Pick<PostureStateContract, "currentState" | "lastCommittedChangeEvent" | "whatFlipsNext">;
@@ -123,12 +124,12 @@ const buildDecisionDelta = (assessment: RegimeAssessment, support: AgentDecision
      report it as one. Without a previous reading there is no finding to pass
      on, only the current call. */
   const summary = support.reportDynamics.directionLabel === "unavailable"
-    ? `No previous reading to compare this week against. ${support.actionNowShort}`
+    ? `No previous reading to compare this week against. ${support.guidance}`
     : support.reportDynamics.regimeChanged
-      ? `Regime changed ${basis.date ? basis.since : "this week"}. ${support.actionNowShort}`
+      ? `Regime changed ${basis.date ? basis.since : "this week"}. ${support.guidance}`
       : changedSignals.length === 0
-        ? `No material ${basis.date ? `signal delta ${basis.since}` : "weekly signal delta"}. ${support.actionNowShort}`
-        : `${titleCase(support.reportDynamics.directionLabel)} ${basis.date ? `signal move ${basis.since}` : "weekly signal move"}. ${support.actionNowShort}`;
+        ? `No material ${basis.date ? `signal delta ${basis.since}` : "weekly signal delta"}. ${support.guidance}`
+        : `${titleCase(support.reportDynamics.directionLabel)} ${basis.date ? `signal move ${basis.since}` : "weekly signal move"}. ${support.guidance}`;
 
   return {
     summary,
@@ -138,7 +139,7 @@ const buildDecisionDelta = (assessment: RegimeAssessment, support: AgentDecision
       : null,
     regime_changed: support.reportDynamics.regimeChanged,
     direction_label: support.reportDynamics.directionLabel,
-    decision_now: support.actionNowShort,
+    decision_now: support.guidance,
     do_now: support.startItems,
     avoid_now: support.stopItems,
     changed_signals: changedSignals,

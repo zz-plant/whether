@@ -1,3 +1,4 @@
+import { formatGuidance } from "../../lib/export/briefBuilders";
 import { previousScoresFromDynamics } from "../../lib/export/scoreReference";
 import { comparisonBasis } from "../../lib/report/comparisonBasis";
 import { buildTrustStripProps } from "../../lib/report/evidenceReaderModel";
@@ -99,7 +100,9 @@ export async function buildTrustPageModel() {
   const revisitBullets: Array<{ label: string; detail?: string; href: string; linkLabel: string }> = [
     {
       label: "What it would change",
-      detail: reportData.actionNowShort,
+      /* The guidance as the page and every paste print it. This was the loader's
+         `actionNowShort`, the action the headline stopped leading with on 2026-10-09. */
+      detail: formatGuidance(snapshot.weeklyCall),
       href: "#trust-snapshot",
       linkLabel: "Check system status",
     },

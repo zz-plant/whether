@@ -14,6 +14,7 @@ import { buildYearlySummary, getYearLabel } from "./summary/yearlySummary";
 import { resolveSiteUrl } from "./siteUrl";
 import { isSavedCopy } from "./report/provenanceStatus";
 import { toScoringBasisPayload } from "./report/scoringBasis";
+import { resolveWeekGuidance } from "./report/weeklyBriefSnapshot";
 
 export const supportedAgentCadences = ["weekly", "monthly", "quarterly", "yearly"] as const;
 
@@ -103,7 +104,6 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
 ) => {
   const {
     assessment,
-    actionNowShort,
     macroSeries,
     reportDynamics,
     sensors,
@@ -176,7 +176,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
   const agentPayload = buildAgentPayload(assessment, treasury, sensors, macroSeries, {
     decisionSupport: {
       reportDynamics,
-      actionNowShort,
+      guidance: resolveWeekGuidance(reportData, postureState),
       startItems,
       stopItems,
       postureState,

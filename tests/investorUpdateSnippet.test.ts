@@ -22,7 +22,9 @@ const treasury: TreasuryData = {
 // The live contract's clauses are written for labelled slots and carry no full
 // stop; the block has to supply one or the paragraph runs together.
 const callLines = {
-  actionNow: "Hold net-new hiring and require reversible commitments.",
+  /* The headline action is the call (2026-10-09); the action supplies the week's direction. */
+  currentCall: "Hold net-new hiring and require reversible commitments.",
+  actionNow: "Conditions are tightening. Freeze new commitments and keep spend flexible.",
   pauseIf: "Pause if funding pressure crosses 66",
   callChangesIf: "Risk appetite rises above 50 for two reads",
 };
@@ -60,6 +62,7 @@ describe("investor update snippet", () => {
     assert.match(parts.conditions, /\. Money is [a-z ,]+\. /);
     assert.match(parts.conditions, /Conditions are (well clear of|within reach of|close to) the line where they would change\./);
     assert.match(parts.response, /^Our operating response this month: Hold net-new hiring/);
+    assert.doesNotMatch(parts.response, /Freeze new commitments/, "one action: the headline's, not the action it stopped leading with");
     // The page's slot names, and the rule's own verb dropped under a label that already says it.
     assert.match(parts.response, /Pause if: Funding pressure crosses 66\./);
     assert.match(parts.response, /Conditions change if: Risk appetite rises above 50 for two reads\.$/);
