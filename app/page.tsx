@@ -590,7 +590,11 @@ async function PageContent({
           />
           <ConditionsLegend
             arrival={arrivedFromShare ? "share" : undefined}
-            orientation={historicalSelection ? undefined : homeOrientationLine}
+            /* On an archived week too (2026-10-27): the sentence is as true of March 2020
+               as of this week, a first visit can arrive on a shared archive link, and
+               leaving it out shrank the legend by a line, so on a first visit the week
+               stepper under it jumped up 62px on the first step back. */
+            orientation={homeOrientationLine}
             currentRegime={historicalSelection ? undefined : regime}
             thresholds={reportData.assessment.thresholds}
           />

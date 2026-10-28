@@ -4,6 +4,7 @@ import type { TreasuryData } from "../../../lib/types";
 import type { TimeMachineRegimeEntry } from "../../../lib/timeMachine/timeMachineCache";
 import { getHistoricalAnalogPlaybook } from "../../../lib/analogPlaybook";
 import { UrlDetails } from "../../components/ui/urlDetails";
+import { isDisclosureOpenInParams } from "../../components/ui/disclosureUrlState";
 import { SignalVisualizationSuite } from "./signalVisualizationSuite";
 import { SignalInversionPreview } from "./signalInversionPreview";
 import { SignalSparklineStrip } from "./signalSparklineStrip";
@@ -70,16 +71,22 @@ const formatCoordinate = (value: number, unit: "%" | "pts") =>
  * on the page whose job is to be the proof behind the call. The coordinates are
  * the evidence, so they are what gets shown.
  */
-const AnalogPatternDisclosure = ({ assessment }: { assessment: Pick<RegimeAssessment, "scores"> }) => {
+const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<RegimeAssessment, "scores">; open: boolean }) => {
   const analog = getHistoricalAnalogPlaybook(assessment);
   return (
-    <details id="analog-pattern" className={DISCLOSURE_CLASS}>
-      <summary className={SUMMARY_CLASS}>
+    <UrlDetails
+      id="analog-pattern"
+      queryKey="analog"
+      initialOpen={open}
+      className={DISCLOSURE_CLASS}
+      summaryClassName={SUMMARY_CLASS}
+      summary={
         <InstrumentQuestion
           question="Which past cycle looks most like this one?"
           answer={`${analog.analogPeriod} · ${analog.regimeType}`}
         />
-      </summary>
+      }
+    >
       <div className="space-y-4">
         <p className="text-fluid-xs text-slate-400">
           Closest of {analog.referenceCycleCount} reference cycles on the four readings below.
@@ -132,7 +139,7 @@ const AnalogPatternDisclosure = ({ assessment }: { assessment: Pick<RegimeAssess
           </Link>
         </p>
       </div>
-    </details>
+    </UrlDetails>
   );
 };
 
@@ -199,23 +206,35 @@ export const SignalsInstrumentsSection = ({
         so nothing said they were the same kind of thing or where one ended. A
         box each would put the charts' own cards three frames deep (§XIII). */}
     <div className="divide-y divide-[var(--border-subtle)] border-y border-[var(--border-subtle)]">
-      <details id="signal-diagnostics" className={DISCLOSURE_CLASS}>
-        <summary className={SUMMARY_CLASS}>
-          <InstrumentQuestion question="What are interest rates doing?" answer={ratesAnswer} />
-        </summary>
+      {/* Each opened instrument writes its own query key (2026-10-27), as the month
+          picker and the fossil record already did: a link to "the rates chart open"
+          sent the recipient a page of seven closed questions. */}
+      <UrlDetails
+        id="signal-diagnostics"
+        queryKey="rates"
+        initialOpen={isDisclosureOpenInParams(searchParams, "rates")}
+        className={DISCLOSURE_CLASS}
+        summaryClassName={SUMMARY_CLASS}
+        summary={<InstrumentQuestion question="What are interest rates doing?" answer={ratesAnswer} />}
+      >
         <SignalVisualizationSuite treasury={treasury} yieldCurveSeries={yieldCurveSeries} />
-      </details>
+      </UrlDetails>
 
       <SignalInversionPreview
         yieldCurveSeries={yieldCurveSeries}
         className={DISCLOSURE_CLASS}
         summaryClassName={SUMMARY_CLASS}
+        open={isDisclosureOpenInParams(searchParams, "curve")}
       />
 
-      <details id="trends" className={DISCLOSURE_CLASS}>
-        <summary className={SUMMARY_CLASS}>
-          <InstrumentQuestion question="How have the two scores moved this year?" answer={trendsAnswer} />
-        </summary>
+      <UrlDetails
+        id="trends"
+        queryKey="trends"
+        initialOpen={isDisclosureOpenInParams(searchParams, "trends")}
+        className={DISCLOSURE_CLASS}
+        summaryClassName={SUMMARY_CLASS}
+        summary={<InstrumentQuestion question="How have the two scores moved this year?" answer={trendsAnswer} />}
+      >
         <div className="space-y-4">
           {/* The table above publishes *this week's* reading and this series is
               the month-end archive, so the two disagree by design — for the same
@@ -227,7 +246,7 @@ export const SignalsInstrumentsSection = ({
           </p>
           <SignalSparklineStrip series={scoreSeries} />
         </div>
-      </details>
+      </UrlDetails>
 
       <AdvancedThresholdsSection currentThresholds={assessment.thresholds} />
 
@@ -258,7 +277,7 @@ export const SignalsInstrumentsSection = ({
         />
       </UrlDetails>
 
-      <AnalogPatternDisclosure assessment={assessment} />
+      <AnalogPatternDisclosure assessment={assessment} open={isDisclosureOpenInParams(searchParams, "analog")} />
 
       <FossilRecordSection
         regime={assessment.regime}

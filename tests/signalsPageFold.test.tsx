@@ -63,6 +63,28 @@ describe("/signals leads with the delta and folds its instruments", () => {
     assert.ok(!model.sectionLinks.some((link) => link.href === "#decision-summary"));
   });
 
+  /* A link opens the panels the sender had open (ui-ux-standards §XII). Until 2026-10-27
+     only the month picker (`advanced`) and the fossil record (`fossil`) carried a key, so
+     a link to the rates chart, the curve, the score trends or the reference cycle arrived
+     closed. The write direction is UrlDetails's own. */
+  it("opens each instrument a link names by its query key, and only that one", () => {
+    const openIds = (searchParams: Record<string, string>) => {
+      const markup = renderToStaticMarkup(
+        <>{signalsEvidenceSections({ model, focusLabelByTab, tightnessTrend: TREND([90, 70, 63]), riskAppetiteTrend: TREND([62, 60, 56]), searchParams })}</>,
+      );
+      return [...markup.matchAll(/<details id="([^"]+)"[^>]*\sopen(?:=""|\s|>)/g)].map((match) => match[1]);
+    };
+    for (const [key, id] of [
+      ["rates", "signal-diagnostics"],
+      ["curve", "curve-context"],
+      ["trends", "trends"],
+      ["analog", "analog-pattern"],
+      ["fossil", "fossil-record"],
+    ]) {
+      assert.deepEqual(openIds({ [key]: "1" }), [id], key);
+    }
+  });
+
   it("titles every instrument with its question, and opens none of them", () => {
     for (const question of [
       "What are interest rates doing?",

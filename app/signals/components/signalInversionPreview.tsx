@@ -4,6 +4,7 @@ import { CurveTermsKey, formatSpread } from "./curveTermsKey";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 import { InstrumentQuestion } from "./instrumentQuestion";
 import { describeInversionSummary } from "../../../lib/report/evidenceInstrumentSummaries";
+import { UrlDetails } from "../../components/ui/urlDetails";
 
 type YieldCurvePoint = {
   year: number;
@@ -67,10 +68,13 @@ export function SignalInversionPreview({
   yieldCurveSeries,
   className,
   summaryClassName,
+  open = false,
 }: {
   yieldCurveSeries: YieldCurvePoint[];
   className?: string;
   summaryClassName?: string;
+  /** Opened by a link carrying `curve=1`, the key the panel writes when a reader opens it. */
+  open?: boolean;
 }) {
   const monthlyPoints = toMonthlyPoints(yieldCurveSeries);
   if (monthlyPoints.length === 0) {
@@ -107,9 +111,14 @@ export function SignalInversionPreview({
   const hasGaps = spread10Y2YSeries.missingColumns.length > 0 || spread2Y3MSeries.missingColumns.length > 0;
 
   return (
-    <details id="curve-context" className={className}>
-      {/* The answer from the counts the caption under the chart prints. */}
-      <summary className={summaryClassName}>
+    <UrlDetails
+      id="curve-context"
+      queryKey="curve"
+      initialOpen={open}
+      className={className}
+      summaryClassName={summaryClassName}
+      /* The answer from the counts the caption under the chart prints. */
+      summary={
         <InstrumentQuestion
           question="Has the yield curve inverted in the last year?"
           answer={describeInversionSummary({
@@ -118,7 +127,8 @@ export function SignalInversionPreview({
             inverted2Y3M: monthsInverted2Y3M,
           })}
         />
-      </summary>
+      }
+    >
       <div className="space-y-4">
         {/* The chart is labelled in bond-desk shorthand. This says what it is
             before the reader has to decode the axes. */}
@@ -208,6 +218,6 @@ export function SignalInversionPreview({
           />
         </div>
       </div>
-    </details>
+    </UrlDetails>
   );
 }
