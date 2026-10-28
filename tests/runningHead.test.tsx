@@ -3,7 +3,7 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { CommandCenterNavBlock } from "../app/components/report-shell/CommandCenterNavBlock";
 import { SecondaryPageHeader } from "../app/components/secondaryPageShell";
-import { frameFactsAttributes, readFrameFacts, runningHeadSection } from "../lib/navigation/runningHead";
+import { frameFactsAttributes, readFrameFacts, runningHeadSection, sameFrameFacts } from "../lib/navigation/runningHead";
 
 /*
  * The running head prints, at the top of every frame after a page's intro, the site,
@@ -131,6 +131,18 @@ describe("running head facts", () => {
       "data-frame-facts": "",
       "data-frame-title": "Calibration",
     });
+  });
+});
+
+describe("the facts the head keeps", () => {
+  /* The head reads the page on every scroll frame and keeps what it had when nothing
+     changed, so it re-renders when the page's facts do and not on every frame. */
+  it("matches two reads of the same block, and tells a changed one apart", () => {
+    const attributes = frameFactsAttributes({ regime: "DEFENSIVE", condition: "Cloudy", jump: { href: "#a", label: "By area" } });
+    const first = readFrameFacts({ dataset: datasetOf(attributes) }, null);
+    assert.ok(sameFrameFacts(first, readFrameFacts({ dataset: datasetOf(attributes) }, null)));
+    assert.ok(!sameFrameFacts(first, { ...first, jump: { href: "#b", label: "By area" } }));
+    assert.ok(!sameFrameFacts(first, { ...first, tensionNear: true }));
   });
 });
 

@@ -144,7 +144,7 @@ export function MobileTabBar() {
         data-testid="mobile-tab-bar"
         ref={navRef}
         data-scrolled-away={hidden ? "true" : undefined}
-        className={`fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--border-default)] bg-[var(--bg-body)]/95 px-2 pb-[env(safe-area-inset-bottom)] backdrop-blur transition-transform duration-200 ease-out motion-reduce:transition-none md:hidden ${hidden ? "translate-y-full" : ""}`}
+        className={`fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--border-default)] bg-[var(--bg-body)] px-2 pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out motion-reduce:transition-none md:hidden ${hidden ? "translate-y-full" : ""}`}
       >
         <ul className="flex items-stretch">
           {tabs.map((tab) => {

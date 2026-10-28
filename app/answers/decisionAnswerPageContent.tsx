@@ -228,7 +228,7 @@ export async function DecisionAnswerPageContent({
           })}
         />
         {dataCurrency ? (
-          <p className="weather-caveat-mark rounded-md border border-l-4 border-caveat-border bg-caveat-bg px-3 py-2 text-xs text-caveat-fg">
+          <p className="weather-caveat-band weather-caveat-mark px-3 py-2 text-xs">
             {dataCurrency.summary} {DATA_CURRENCY_ACTION}{" "}
             <ActionLink href={DATA_CURRENCY_ACTION_HREF} variant="inline">Source dates</ActionLink>
           </p>

@@ -22,6 +22,17 @@ describe("ReportSection", () => {
     assert.match(html, /All systems operational/);
   });
 
+  it("names a section whose header the step above states without a second heading", () => {
+    const html = renderToStaticMarkup(
+      <ReportSection id="rules" title="Rules before you commit" variant="split" hideHeader>
+        <p>Body</p>
+      </ReportSection>,
+    );
+    assert.match(html, /<section id="rules"[^>]*aria-label="Rules before you commit"/);
+    assert.doesNotMatch(html, /<h[1-6]/, "the step's heading is the only one");
+    assert.doesNotMatch(html, /aria-labelledby=/);
+  });
+
   it("renders a static section header and body in split variant", () => {
     const html = renderToStaticMarkup(
       <ReportSection

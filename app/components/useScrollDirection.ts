@@ -1,5 +1,5 @@
 /**
- * Tracks scroll direction and position for scroll-aware UI behaviors.
+ * Tracks scroll direction for scroll-aware UI behaviors.
  * Returns `up` / `down` direction and whether the user has scrolled past a threshold.
  *
  * Use case: hide-on-scroll-down headers, show-on-scroll-up FABs, sticky elements.
@@ -14,8 +14,6 @@ type ScrollDirectionState = {
   direction: ScrollDirection;
   /** True when scrollY > threshold, regardless of direction */
   isPastThreshold: boolean;
-  /** Current window.scrollY */
-  scrollY: number;
 };
 
 const SCROLL_THRESHOLD = 80;
@@ -30,7 +28,6 @@ export function useScrollDirection(threshold = SCROLL_THRESHOLD): ScrollDirectio
   const [state, setState] = useState<ScrollDirectionState>({
     direction: "up",
     isPastThreshold: false,
-    scrollY: 0,
   });
 
   const lastScrollY = useRef(0);
@@ -57,11 +54,16 @@ export function useScrollDirection(threshold = SCROLL_THRESHOLD): ScrollDirectio
 
         lastScrollY.current = currentScrollY;
 
-        setState({
-          direction,
-          isPastThreshold: currentScrollY > threshold,
-          scrollY: currentScrollY,
-        });
+        const isPastThreshold = currentScrollY > threshold;
+        /* The same state back when nothing a consumer reads has changed. It used to
+           carry `scrollY`, which no consumer read and which changed every frame, so
+           the header and the running head re-rendered on every frame of a scroll
+           (2026-10-27). */
+        setState((previous) =>
+          previous.direction === direction && previous.isPastThreshold === isPastThreshold
+            ? previous
+            : { direction, isPastThreshold },
+        );
       });
     };
 

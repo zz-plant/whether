@@ -85,6 +85,18 @@ export const readFrameFacts = (element: { dataset: DOMStringMap } | null, fallba
   };
 };
 
+/** Whether two reads carry the same facts, so the head can keep the one it has. */
+export const sameFrameFacts = (a: FrameFacts, b: FrameFacts): boolean =>
+  a.regime === b.regime &&
+  a.condition === b.condition &&
+  a.date === b.date &&
+  a.title === b.title &&
+  a.tension === b.tension &&
+  a.tensionNear === b.tensionNear &&
+  a.call === b.call &&
+  a.jump?.href === b.jump?.href &&
+  a.jump?.label === b.jump?.label;
+
 /**
  * The section a frame is in: the last heading that has reached the line under the head.
  * Null above the first one, where the page's title says enough.

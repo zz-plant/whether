@@ -105,8 +105,10 @@ export const DecisionShieldPanel = ({
     /* The body only. The plan page's step already asks the question and names the
        moves; this panel used to ask it again in its own header, put Copy verdict,
        Copy link and Record above the input — before there was a verdict to copy —
-       and print a provenance block the page's trust line already states. */
-    <section id="decision-shield" aria-label="Test a decision">
+       and print a provenance block the page's trust line already states. A `div`, not a
+       second region: the step's section is already named "Test a decision", and a
+       screen reader entering it heard the name twice (2026-10-27). */
+    <div id="decision-shield">
       <div>
         {/* The toast above is the one announcement of a copy result; two
             live regions restating it read every outcome three times. */}
@@ -275,6 +277,6 @@ export const DecisionShieldPanel = ({
           ) : null}
         </div>
       </div>
-    </section>
+    </div>
   );
 };

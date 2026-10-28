@@ -396,7 +396,12 @@ export function RegimeRadar({
           {/* Non-root SVG geometry scales from an origin of 0 0 unless told
               otherwise, so the ring would travel toward the bottom-right as it
               expanded; fill-box re-anchors each frame to this circle's own
-              center and the pulse expands around the reading it marks. */}
+              center and the pulse expands around the reading it marks.
+              Two pulses, then a still ring (2026-10-27): it looped for as long as
+              the page was open, which only a reduced-motion setting stopped
+              (WCAG 2.2.2 asks that motion beside content end within five
+              seconds), and a reading that moves once a week does not need to
+              throb. 2 × 2.4s finds the eye and stops. */}
           <circle
             cx={currentX}
             cy={currentY}
@@ -405,7 +410,7 @@ export function RegimeRadar({
             stroke="var(--regime-accent)"
             strokeWidth="1"
             className="animate-ping motion-reduce:animate-none opacity-25"
-            style={{ animationDuration: "3s", transformBox: "fill-box", transformOrigin: "center" }}
+            style={{ animationDuration: "2.4s", animationIterationCount: 2, transformBox: "fill-box", transformOrigin: "center" }}
           />
           <circle
             cx={currentX}

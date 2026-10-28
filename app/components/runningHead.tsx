@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
-import { readFrameFacts, runningHeadSection, type FrameFacts } from "../../lib/navigation/runningHead";
+import { readFrameFacts, runningHeadSection, sameFrameFacts, type FrameFacts } from "../../lib/navigation/runningHead";
 import { useScrollDirection } from "./useScrollDirection";
 import { siteUrl } from "../../lib/siteUrl";
 
@@ -50,7 +50,10 @@ export function RunningHead() {
       const headerBottom = header ? Math.max(0, header.getBoundingClientRect().bottom) : 0;
       const source = document.querySelector<HTMLElement>("[data-frame-facts]");
       const title = document.querySelector("main h1")?.textContent?.trim() ?? null;
-      setFacts(readFrameFacts(source, title));
+      /* Kept when unchanged: the facts are the page's, and a new object every scroll
+         frame re-rendered the head on every frame (2026-10-27). */
+      const next = readFrameFacts(source, title);
+      setFacts((previous) => (previous && sameFrameFacts(previous, next) ? previous : next));
       setHeaderHeight(header?.getBoundingClientRect().height ?? 0);
       /* The intro's top, or failing that the page's h1, has gone under the header: the
          stamp that names the week is at the top of an intro, so a frame that keeps
@@ -101,7 +104,7 @@ export function RunningHead() {
       /* Under a reading, the bar's foot is a 2px rule in the week's colour, as the
          brief's card carries one (§XIII): at the size Slack shows a screenshot its
          words cannot be read, and the colour still says which weather it is. */
-      className={`fixed inset-x-0 top-0 z-40 bg-[var(--bg-body)]/95 backdrop-blur transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none print:hidden ${
+      className={`fixed inset-x-0 top-0 z-40 bg-[var(--bg-body)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none print:hidden ${
         facts.regime ? "border-b-2 border-[color:var(--regime-accent)]" : "border-b border-[color:var(--border-subtle)]"
       }`}
       style={{ transform: `translateY(${offset}px)` }}
