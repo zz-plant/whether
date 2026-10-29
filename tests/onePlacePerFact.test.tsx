@@ -59,7 +59,7 @@ describe("/ draws the two scores once at each width", () => {
   );
 
   it("on the card's map from md up, and on the section's map below md", () => {
-    assert.match(hero, /<div class="max-md:hidden"><figure[\s\S]*?Funding pressure 90 · Risk appetite 49/);
+    assert.match(hero, /<div class="weather-hero-aside max-md:hidden"><figure[\s\S]*?Funding pressure 90 · Risk appetite 49/);
     assert.match(watch, /<figure class="[^"]*\bmd:hidden\b[^"]*"[\s\S]*?Funding pressure 90 · Risk appetite 49/);
     assert.match(route, /<WhatWouldChangeSection[\s\S]*?conditionsTrail=\{conditionsTrail\}/, "the route hands the section the trail, which moves its map below md");
   });

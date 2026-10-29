@@ -86,3 +86,64 @@ describe("the changed-signals table", () => {
     assert.match(body, /—/);
   });
 });
+
+
+describe("month-end context beside weekly changes", () => {
+  const points = [
+    { label: "Jul 31, 2026", value: 44 },
+    { label: "Aug 31, 2026", value: 51 },
+    { label: "Sep 30, 2026", value: 61 },
+  ];
+
+  it("keeps score histories on the same stated scale and dates their observations", () => {
+    const html = renderToStaticMarkup(
+      <WhatChangedSection rows={[...rows, { ...rows[0], key: "riskAppetite", label: "Risk appetite", increaseIsPositive: true }]} comparisonUnavailable={false}
+        history={{ tightness: points, riskAppetite: points }} historyCaveat="Earlier scores use fewer inputs." />,
+    );
+    assert.equal((html.match(/Month-end · 0–100/g) ?? []).length, 2);
+    assert.match(html, /3 readings from Jul 31, 2026 to Sep 30, 2026, ranging 0–100/);
+    assert.match(html, /Earlier scores use fewer inputs/);
+  });
+
+  it("does not fabricate a trace or a history caveat when observations are missing", () => {
+    const html = renderToStaticMarkup(
+      <WhatChangedSection rows={rows} comparisonUnavailable history={{ tightness: points.slice(0, 2) }}
+        historyCaveat="Earlier scores use fewer inputs." />,
+    );
+    assert.doesNotMatch(html, /Month-end · 0–100|Earlier scores use fewer inputs/);
+  });
+});
+
+describe("input history small multiples", () => {
+  const series = [
+    { key: "VIX_INDEX", label: "Volatility (VIX)", points: [
+      { label: "Oct 8", value: 15.4 }, { label: "Oct 15", value: 16.5 }, { label: "Oct 22", value: 19.0 },
+    ] },
+    { key: "CPI_YOY", label: "Inflation (CPI)", points: [
+      { label: "Aug 1", value: 3.35 }, { label: "Sep 1", value: 3.72 }, { label: "Oct 1", value: 3.9 },
+    ] },
+  ];
+
+  it("draws one autoscaled sparkline per input with three or more readings", () => {
+    const html = renderToStaticMarkup(
+      <WhatChangedSection rows={rows} comparisonUnavailable inputHistory={series} />,
+    );
+    assert.equal((html.match(/data-testid="input-history-grid"/g) ?? []).length, 1);
+    assert.match(html, /Volatility \(VIX\)/);
+    assert.match(html, /Inflation \(CPI\)/);
+    assert.equal((html.match(/trailing ~90 days/g) ?? []).length, 2);
+  });
+
+  it("renders nothing when every series is too short to draw", () => {
+    const short = series.map((entry) => ({ ...entry, points: entry.points.slice(0, 2) }));
+    const html = renderToStaticMarkup(
+      <WhatChangedSection rows={rows} comparisonUnavailable inputHistory={short} />,
+    );
+    assert.doesNotMatch(html, /data-testid="input-history-grid"|trailing ~90 days/);
+  });
+
+  it("renders nothing when no input history is supplied", () => {
+    const html = renderToStaticMarkup(<WhatChangedSection rows={rows} comparisonUnavailable />);
+    assert.doesNotMatch(html, /data-testid="input-history-grid"|Inputs over the last/);
+  });
+});

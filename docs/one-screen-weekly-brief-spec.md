@@ -524,3 +524,26 @@ contract:
   line when there is one, and the plan handoff with a text link to the direct answers. The
   stress-test card, the retrospective card and the direct-answers band restated the hero or
   recreated another route inline.
+
+
+### Editorial hierarchy and month-end context (2026-10-29)
+
+The weekly call uses a larger desktop display register, with a rule separating its
+conditions map. Phone display sizing stays compact. Section questions use a stronger
+desktop heading register; hovering or focusing a signal row highlights the whole row.
+The hero enters once in 260ms using opacity and transform; reduced motion shows the
+final state immediately.
+
+The two composite rows in “What changed” include up to six preceding month-end score
+observations from the same dated trail as the conditions map. Both traces use the fixed
+0–100 domain, are labelled as month-end observations, and retain the historical scoring
+caveat. They omit the current weekly reading to preserve the sampling distinction and
+render nothing with fewer than three observations. No extra data requests are made.
+
+Below the table, a small-multiples grid draws the trailing ~90-day history of the raw
+inputs behind the scores (inflation, unemployment, credit spreads, volatility, financial
+conditions, yields) from the materialized model's `recentHistory`. Each series autoscales
+to its own range and is labelled with its name; a series with fewer than three readings
+renders nothing, so a cold or legacy store shows no grid. The grid is suppressed on an
+archived week, where the live 92-day window would be anachronistic. It adds no fetch: it
+reads the model the report already loaded. It is context for the scores, not a second verdict.

@@ -85,7 +85,7 @@ describe("the map in the card", () => {
         aside={<figure data-testid="map" />}
       />,
     );
-    assert.match(withMap, /<div class="max-md:hidden"><figure data-testid="map"/);
+    assert.match(withMap, /<div class="weather-hero-aside max-md:hidden"><figure data-testid="map"/);
     assert.doesNotMatch(withMap, /data-aside-note/);
 
     const plain = renderToStaticMarkup(<DecisionHero weeklyCall="Hold." regime="SCARCITY" />);

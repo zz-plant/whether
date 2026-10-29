@@ -496,3 +496,48 @@ a.weather-hub-link-card:hover {
     font-size: 1.5rem;
   }
 }
+
+/* The brief reads as an editorial page: the call owns display size; section
+   questions are the next register. Keep the phone fold compact. */
+.weather-editorial-hero {
+  animation: weather-brief-arrive 260ms ease-out both;
+}
+
+@keyframes weather-brief-arrive {
+  from { opacity: 0.85; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.weather-signal-table tbody tr:focus-within,
+.weather-signal-table tbody tr:hover {
+  background-color: var(--bg-raised);
+}
+
+@media (min-width: 768px) {
+  .weather-editorial-hero .text-display {
+    font-size: clamp(3rem, 4.4vw, 4rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+
+  .weather-hero-aside {
+    border-inline-start: 1px solid var(--border-subtle);
+    padding-inline-start: 1.25rem;
+  }
+
+  .weather-home-section > div:first-child > h2 {
+    font-size: clamp(1.5rem, 2.3vw, 2rem);
+    max-width: 28ch;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .weather-signal-table tbody th,
+  .weather-signal-table tbody td {
+    padding-block: 1.25rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-editorial-hero { animation: none; }
+}
