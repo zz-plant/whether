@@ -65,6 +65,18 @@ const CHECK_PRESETS = {
     deployGate: true,
     stages: [["lint", "typecheck", "test", "assets", "suppressions", "dead-exports"], ["landmarks"]],
   },
+  /*
+   * What the `check` job of `.github/workflows/ci.yml` runs. Actions has network, so
+   * `audit` runs there (it stays off pre-push, where a hook that fails offline teaches
+   * `--no-verify`), and a full-depth checkout is available, but the job keeps today's
+   * list: `lint:types` stays where someone is watching, and the git-history and
+   * warn-only tasks belong to the gates that own them. Single-sourced here so the
+   * workflow cannot drift from the local gate definitions.
+   */
+  ci: {
+    deployGate: false,
+    stages: [["lint", "typecheck", "test", "assets", "audit", "landmarks"]],
+  },
 };
 
 const taskNames = () => CHECK_TASKS.map((task) => task.name).join(", ");
