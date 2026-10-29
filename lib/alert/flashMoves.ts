@@ -27,6 +27,22 @@ export const FLASH_CURVE_MOVE = 0.2;
 /** Two reads more than this far apart are not consecutive in the sense the thresholds assume. */
 const FLASH_MAX_GAP_DAYS = 7;
 
+/**
+ * What a flash asks of the reader. One sentence for every channel (email,
+ * Slack) so the mail and the channel post cannot drift apart.
+ */
+export const FLASH_GUIDANCE =
+  "A move this size between two readings is unusual. This week's guidance stands until the next reading shows where the scores settle; until then, hold anything you can't undo.";
+
+/**
+ * The same alert framed for a team that pulls work continuously: a flash is
+ * the expedite lane. It names a bounded action (review in-flight commitments
+ * that depend on the input) and a horizon (before the next pull), not a new
+ * call — the weekly guidance still stands.
+ */
+export const FLASH_EXPEDITE_LINE =
+  "Expedite: before the next pull, review in-flight work that depends on this move; don't wait for Monday's brief.";
+
 type FlashMetric = "baseRate" | "curveSlope";
 
 export type FlashInputs = {

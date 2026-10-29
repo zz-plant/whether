@@ -5,8 +5,9 @@ cadence strategy in the roadmap's **Engagement by cadence** section and the repo
 framework (one-screen brief → bounded decisions → exports/citation → trust/resilience →
 lowest new-system overhead).
 
-**Status (2026-10-12): all of Tier 1 and Tier 2 shipped** — T1.1–T1.4 and T2.1–T2.5, plus
-T3.1 (Standup line on `/share` and `get_standup_line` MCP tool). Tier 3 remainder and Tier 4 remain open.
+**Status (2026-10-29): Tiers 1–3 shipped except T3.5** — T1.1–T1.4, T2.1–T2.5, T3.1–T3.4, and the
+kanban flash-as-expedite framing. T3.5 (funnel leak) is a measurement read that needs
+`CLOUDFLARE_ACCOUNT_ID` and an analytics read token; Tier 4 stays behind its decisions.
 
 Tier 1 ships next because each item reuses a shipped surface, closes a return loop, and adds no
 new product category. Tier 4 is deferred behind a product decision or a stored-secret decision.
@@ -276,7 +277,7 @@ decision, not a feature.
 
 - **Milestone 7 leftovers** ("Decision Shield expansion not exposed as a primary live route",
   "Saved Decision Shield scenarios/presets not surfaced") are stale: Milestone 10 shipped
-  `/operate/scenarios` with presets and the counterfactual studio. Close these lines or re-scope them
-  to the shipped route.
+  `/operate/scenarios` with presets and the counterfactual studio. *Resolved: both lines in ROADMAP
+  Milestone 7 now name the shipped `DecisionShieldPanel` surfaces on `/operate`.*
 - **Reforge "Insight Database precedent case studies"** is a content item, not a code item; gate it
   behind the same return-loop proof as Tier 2.
