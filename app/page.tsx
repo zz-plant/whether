@@ -142,32 +142,6 @@ const resolveHomeCadence = (value: string | undefined): CadenceCallHorizon | "we
 /** Month-ends on the conditions map's path: half a year, enough to show a direction without crowding the plane. */
 const CONDITIONS_TRAIL_MONTHS = 6;
 
-type RecentHistoryPoint = { date: string; value: number };
-
-const isRecord = (value: unknown): value is Record<string, unknown> =>
-  typeof value === "object" && value !== null;
-
-/**
- * The materialized model is typed `unknown` on the report payload, so read its
- * trailing history by validating the shape rather than asserting it. A missing
- * or legacy model yields no series, which the grid already handles.
- */
-const readRecentHistory = (signals: unknown): Record<string, RecentHistoryPoint[]> => {
-  if (!isRecord(signals) || !isRecord(signals.recentHistory)) return {};
-  const out: Record<string, RecentHistoryPoint[]> = {};
-  for (const [key, points] of Object.entries(signals.recentHistory)) {
-    if (!Array.isArray(points)) continue;
-    out[key] = points.flatMap((point) => {
-      if (!isRecord(point)) return [];
-      const { date, value } = point;
-      return typeof date === "string" && typeof value === "number" && Number.isFinite(value)
-        ? [{ date, value }]
-        : [];
-    });
-  }
-  return out;
-};
-
 /** Raw inputs behind the scores, and the names a reader knows them by. */
 const INPUT_HISTORY_LABELS: Record<string, string> = {
   CPI_YOY: "Inflation (CPI)",
@@ -176,8 +150,6 @@ const INPUT_HISTORY_LABELS: Record<string, string> = {
   BBB_CREDIT_SPREAD: "BBB spread",
   VIX_INDEX: "Volatility (VIX)",
   CHICAGO_FCI: "Financial conditions",
-  TREASURY_10Y: "10-yr yield",
-  TREASURY_2Y: "2-yr yield",
 };
 
 async function PageContent({
@@ -519,15 +491,18 @@ async function PageContent({
       comparisonBasis(reportData.monthEndComparison?.comparedWith),
     ),
   };
-  /* Trailing ~90-day history of the raw inputs behind the scores, from the
-     materialized model (already built at write time, so no extra read). Null
-     values are dropped; series with fewer than three readings render nothing. */
-  const inputHistory = Object.entries(readRecentHistory(reportData.materializedSignals))
-    .filter(([key]) => key in INPUT_HISTORY_LABELS)
-    .map(([key, points]) => ({
-      key,
-      label: INPUT_HISTORY_LABELS[key],
-      points: points.map((point) => ({ label: formatDateUTC(point.date), value: point.value })),
+  /* Trailing history of the raw inputs behind the scores, from the macro series
+     the report already loaded (no extra read). Null values are dropped; series
+     with fewer than three readings render nothing. */
+  const inputHistory = reportData.macroSeries
+    .filter((series) => series.id in INPUT_HISTORY_LABELS)
+    .map((series) => ({
+      key: series.id,
+      label: INPUT_HISTORY_LABELS[series.id],
+      points: (series.history ?? [])
+        .filter((point): point is { date: string; value: number } =>
+          typeof point.value === "number" && Number.isFinite(point.value))
+        .map((point) => ({ label: formatDateUTC(point.date), value: point.value })),
     }))
     .filter((series) => series.points.length >= 3);
   /* On a reading whose conditions differ from the earlier one, the card's stamp
