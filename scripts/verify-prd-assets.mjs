@@ -43,6 +43,7 @@ const assets = [
   { path: "/.well-known/whether-agent.json", expectedType: /application\/json/ },
   { path: "/brief.md", expectedType: /text\/(markdown|plain)/ },
   { path: "/llms.txt", expectedType: /text\/plain/ },
+  { path: "/auth.md", expectedType: /text\/(markdown|plain)/ },
   { path: "/feed.xml", expectedType: /(application|text)\/(rss\+)?xml/ },
 
   // Dynamic Image Generation

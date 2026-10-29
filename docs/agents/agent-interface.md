@@ -97,9 +97,25 @@ Machine-discovery routes:
   never registered and 404s. It did, in production, for as long as it existed. The manifest body
   lives in `lib/agentManifest.ts`; Invariant 10 in `tests/architectureInvariants.test.ts` fails if
   any route file reappears under a dot-directory.
+- `GET /auth.md` answers "what does it take to sign in here" in one page: nothing, for every
+  endpoint the agent surface advertises. The authenticated routes are named so an agent does
+  not hunt for a login that does not exist. `/llms.txt`'s discovery section points at it
+  (`tests/agentDiscoveryParity.test.ts` holds the list).
+- robots.txt declares a Content-Signal line (`contentsignals.org`) in every crawler group:
+  `search=yes, ai-input=yes, ai-train=yes`, the same on-record decision the named training
+  crawlers carry. The rules live in `lib/seo/robotsTxt.ts` and render through
+  `app/robots.txt/route.ts` — the line is not expressible in Next's `MetadataRoute.Robots`.
+  Cloudflare's managed robots.txt (Bot Preference Sync) stays off: with every AI bot policy
+  set to allow it publishes nothing, and set to block it would prepend Disallow rules for
+  exactly the crawlers the groups below serve.
+- Markdown negotiation: `GET /` with `Accept: text/markdown` answers the Markdown brief
+  (`/brief.md`) instead of HTML, and every HTML response carries `Link` headers naming the
+  manifest, `/llms.txt` and `/brief.md` — the HTTP form of the alternates the root layout
+  emits (`lib/runtime/agentResponse.ts`, applied in `worker/index.ts`).
 - The manifest's path, the `start` pointers, the `endpoints` and the `views` are written once, in
-  `lib/agent/discovery.ts`, and read by the manifest, `/llms.txt`, `/llms-full.txt`, `robots.ts`, the
-  root layout's `<link rel="mcp-manifest">`, `/api-docs` and `/api/agent` itself.
+  `lib/agent/discovery.ts`, and read by the manifest, `/llms.txt`, `/llms-full.txt`,
+  `lib/seo/robotsTxt.ts`, the root layout's `<link rel="mcp-manifest">`, `/api-docs` and
+  `/api/agent` itself.
   `tests/agentDiscoveryParity.test.ts` holds `/llms.txt` to the manifest's start pointers and endpoints,
   and every advertised endpoint to a route that serves it.
 

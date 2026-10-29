@@ -1,8 +1,8 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "bun:test";
 import { GET } from "../app/news-sitemap.xml/route";
-import robots from "../app/robots";
 import { buildPublishedBriefPath, buildPublishedBriefTitle, getPublishedBriefs } from "../lib/report/publishedBriefs";
+import { robotsSitemapPaths } from "../lib/seo/robotsTxt";
 import { siteUrl } from "../lib/siteUrl";
 
 const realNow = Date.now;
@@ -33,7 +33,6 @@ describe("news-sitemap.xml", () => {
   });
 
   it("is submitted from robots.txt", () => {
-    const { sitemap } = robots();
-    assert.ok((Array.isArray(sitemap) ? sitemap : [sitemap]).includes(`${siteUrl}/news-sitemap.xml`));
+    assert.ok(robotsSitemapPaths.includes(`${siteUrl}/news-sitemap.xml`));
   });
 });

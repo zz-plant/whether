@@ -15,6 +15,7 @@ import { recordActivationFunnel } from "../lib/telemetry/recordActivationFunnel"
 import { sendOpsFailureNotice, type FailedStep } from "../lib/delivery/opsNotice";
 import { WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
 import { withSpeculationRules } from "../lib/runtime/speculationRules";
+import { negotiateMarkdown, withAgentDiscoveryLinks } from "../lib/runtime/agentResponse";
 import {
   agentManifestResponse,
   WEBMCP_MANIFEST_PATH,
@@ -292,7 +293,13 @@ export default {
       return agentManifestResponse();
     }
 
-    const response = withSpeculationRules(await handler.fetch(request, env, ctx));
+    /* Markdown negotiation: an agent that asks for text/markdown at the homepage is
+       served the Markdown brief instead of HTML (lib/runtime/agentResponse.ts).
+       Browsers never send that Accept header, so no reader sees a difference. */
+    const markdownRequest = negotiateMarkdown(request);
+    const response = withSpeculationRules(
+      withAgentDiscoveryLinks(await handler.fetch(markdownRequest ?? request, env, ctx)),
+    );
 
     const cookieHeader = request.headers.get("cookie");
     if (cookieHeader && /whether-(company-stage|company-runway|rate-sensitivity|ticker)=/.test(cookieHeader)) {
