@@ -85,6 +85,20 @@ describe("feed.xml", () => {
     assert.ok(tag(live, "title").includes(escapeXml(weeklyHeadline(snapshot.weeklyCall).action)), tag(live, "title"));
   });
 
+  /* The published items' html branch had no test, so the 2026-10-28 rename of the
+     margin label reached the live item and missed every frozen week: the feed kept
+     printing "Margin:" beside each record date. The archive is always present, so
+     this runs on every invocation regardless of whether the live item does. */
+  it("words the published items' margin the way the live item does", async () => {
+    const xml = await (await GET()).text();
+    const published = items(xml).filter((block) => tag(block, "link") !== `${siteUrl}/`);
+    assert.ok(published.length > 0, "the archive is the feed's content; at least one frozen week is on the record");
+    for (const item of published) {
+      assert.match(item, /<strong>Record date:<\/strong> [^<]* · Room before a change: (clear of the line|within reach of the line|close to the line)<\/p>/);
+      assert.doesNotMatch(item, /Margin:|Confidence:/);
+    }
+  });
+
   it("is announced from the root layout", () => {
     const layout = readFileSync(new URL("../app/layout.tsx", import.meta.url), "utf8");
     assert.match(layout, /rel="alternate" type="application\/rss\+xml"/);

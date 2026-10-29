@@ -18,7 +18,7 @@ type Props = {
   direction?: SignalDirection;
   /** The weather word, for the copied text, which states the call the way the hero does. */
   weatherWord: string;
-  /** The margin as the strip prints it: "Margin 1 pt" (`formatStripMargin`). */
+  /** The margin as the strip prints it at its shortest: "3 pts from a change" (`formatStripMargin`). */
   marginLabel: string;
   shareLines?: string[];
 };
