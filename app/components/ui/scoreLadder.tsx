@@ -260,7 +260,7 @@ export function ScoreLadder({
   };
   return (
     <figure className={`@container space-y-1.5 ${className}`.trim()} data-score-ladder>
-      <figcaption className="flex flex-wrap items-baseline justify-between gap-x-3 text-xs">
+      <figcaption className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-xs">
         <span className="font-medium text-slate-200">
           {label}
           {worse ? (

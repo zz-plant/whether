@@ -124,7 +124,7 @@ export function SignalContextDetails({
           {info.whatItMeasures}
         </p>
         {scaleLabel || isComposite ? (
-          <div className="flex flex-wrap items-center gap-x-1.5 text-slate-400">
+          <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-slate-400">
             {scaleLabel ? <span className="capitalize">{scaleLabel}</span> : null}
             {scaleLabel && isComposite ? (
               <span aria-hidden="true" className="text-slate-600">·</span>
