@@ -59,11 +59,6 @@ describe("homepage heading contract", () => {
     assert.equal(headingFor(html, "weekly-call-title"), "h1");
   });
 
-  it("drops the hero to an h2 when a cadence card takes the h1", () => {
-    const html = renderToStaticMarkup(<DecisionHero {...heroProps} titleLevel="h2" />);
-    assert.equal(headingFor(html, "weekly-call-title"), "h2");
-  });
-
   it("prints what the weather word means under the call, not on the stamp line", () => {
     /* The stamp line ran the meaning, the week's direction and the earlier
        conditions together ahead of the call; the meaning is the line under it. */
@@ -96,9 +91,16 @@ describe("homepage heading contract", () => {
     assert.match(page, /cadenceCall\.cadenceLabel, cadenceCall\.periodLabel/);
   });
 
-  it("hands the h1 to the cadence card when one is selected", () => {
-    assert.match(page, /<CadenceCallCard model=\{cadenceCall\} titleLevel="h1" \/>/);
-    assert.match(page, /titleLevel=\{cadenceCall \? "h2" : "h1"\}/);
+  it("keeps the hero's h1 at every horizon; the cadence card takes an h2 below it", () => {
+    /* 2026-10-29: the weekly call leads on every view, so the route no longer
+       picks a heading level for either component. */
+    assert.match(page, /<CadenceCallCard model=\{cadenceCall\} \/>/);
+    assert.doesNotMatch(page, /titleLevel/);
+    assert.ok(
+      page.indexOf("<CadenceSelector") < page.indexOf("<CadenceCallCard") &&
+        page.indexOf("<CadenceCallCard") < page.indexOf("<DecisionPicker"),
+      "the horizon card renders below the call's action row, before the areas",
+    );
   });
 
   /* The week picker printed "Week of Oct 7, 2026" as an h2 above the h1 (site review,
@@ -110,8 +112,10 @@ describe("homepage heading contract", () => {
     assert.doesNotMatch(picker, /<h[1-6]\b/, "the week label is not a heading");
     assert.doesNotMatch(legend, /<h[1-6]\b|<details/, "the legend is one line, with no heading or fold");
     // A live week is named by its Monday; an archived view by its month-end,
-    // since the archive steps a month at a time (2026-10-14).
-    assert.match(page, /currentDateLabel=\{cadenceTitle \?\? periodLabel\}/, "the stepper names the period on screen");
+    // since the archive steps a month at a time (2026-10-14). Under a selected
+    // horizon the stepper still names the week (2026-10-29): the horizon band
+    // names its own period on its card below the call.
+    assert.match(page, /currentDateLabel=\{periodLabel\}/, "the stepper names the week at every horizon");
     assert.match(page, /const periodLabel = historicalSelection\s*\?\s*`Month-end \$\{formatDateUTC\(historicalSelection\.asOf\)\}`\s*:\s*weekOfLabel/, "a live week is named by its Monday, an archived one by its month-end");
   });
 });

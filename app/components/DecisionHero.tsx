@@ -30,13 +30,6 @@ type Props = {
   /** Freshness and confidence, drawn once under the call. Absent on an archived week, which the banner above marks. */
   trust?: Omit<TrustStripProps, "href" | "className"> | null;
   /**
-   * The heading level for the call. `h1` by default — it is the page's subject.
-   * `h2` on the one state where a cadence card above it carries the call the
-   * reader asked for; an `h2` above an `h1`, or two `h1`s, both invert the
-   * document outline.
-   */
-  titleLevel?: "h1" | "h2";
-  /**
    * Which reading this is, for the caption at the foot of the card. Only an
    * archived week passes one: a live card dates itself in the trust strip, and
    * an archived card has no strip, so a crop of it would otherwise carry no date.
@@ -99,7 +92,6 @@ export function DecisionHero({
   earlier,
   aside,
   trust,
-  titleLevel = "h1",
   captionDetail,
   question,
   lines,
@@ -109,7 +101,6 @@ export function DecisionHero({
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
-  const TitleTag = titleLevel;
   const regimeWeatherLabel = (regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay).toUpperCase();
   const call = weeklyCall ?? NO_LIVE_READING_CALL.currentCall;
   const detail = callDetail && callDetail.trim() !== call.trim() ? callDetail : undefined;
@@ -168,25 +159,25 @@ export function DecisionHero({
             the same size and place. */}
         {question ? (
           <>
-            <TitleTag
+            <h1
               id="weekly-call-title"
               style={{ viewTransitionName: "page-title" }}
               className="max-w-2xl text-pretty text-fluid-lg font-semibold text-slate-300"
             >
               {question}
-            </TitleTag>
+            </h1>
             <p className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50">
               {call}
             </p>
           </>
         ) : (
-          <TitleTag
+          <h1
             id="weekly-call-title"
             style={{ viewTransitionName: "page-title" }}
             className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50"
           >
             {call}
-          </TitleTag>
+          </h1>
         )}
 
         {/* What the weather word means for money, as the line under the call:

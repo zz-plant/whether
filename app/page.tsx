@@ -335,10 +335,10 @@ async function PageContent({
       }
     : undefined;
 
-  /* The selected horizon, named once. The page's `h1` is the weekly call
-   * itself (`DecisionHero`); this labels the copied artifact, which lands in
-   * someone else's Slack channel where it is the only thing identifying the
-   * source, and the meta row's date. */
+  /* The selected horizon, named once. The weekly call is the page's lead at
+   * every horizon, so this names the horizon where it is the artifact's
+   * identity: the copied brief's title, and an archived view's caption when
+   * one is selected. */
   const cadenceTitle = cadenceCall
     ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
     : null;
@@ -606,7 +606,7 @@ async function PageContent({
               nextHref={nextWeekHref}
               previousLabel="Previous month"
               nextLabel={nextHistoricalRequest ? "Next month" : "This week"}
-              currentDateLabel={cadenceTitle ?? periodLabel}
+              currentDateLabel={periodLabel}
               isHistorical={Boolean(historicalSelection)}
               history={regimeHistory}
             />
@@ -659,9 +659,7 @@ async function PageContent({
                 jump: { href: `#${HOME_SECTIONS.areas.id}`, label: "By area" },
               })}
             >
-              {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
               <DecisionHero
-                titleLevel={cadenceCall ? "h2" : "h1"}
                 weeklyCall={cardCall.action}
                 callDetail={historicalSelection ? undefined : whyLine}
                 regime={regime}
@@ -754,6 +752,13 @@ async function PageContent({
                 </div>
               </div>
             </div>
+
+            {/* The selected horizon's guidance, under the call (2026-10-29): the
+                weekly call leads at every horizon, so a longer horizon joins the
+                brief as a band below it rather than taking the page's lead. The
+                `?cadence=` link a reader shared still opens this card — it opens
+                under this week's call. */}
+            {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
 
             {/* 2. The five areas: the picker, all five side by side folded under it,
                 and the one plan link. */}

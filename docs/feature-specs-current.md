@@ -4100,6 +4100,28 @@ routes against what they search ("should we hire now", "startup funding market",
   phrasings in reader text are months.
 - The naming table in `lib/report/AGENTS.md` carries the new names.
 
+### 1.1.98 The weekly call leads at every horizon (2026-10-29)
+
+The IA question left open twice — §1.1.14d ("whether monthly and quarterly deserve top-level
+persistence, not a styling one") and §1.1.15 ("whether monthly and quarterly deserve a slot on /
+at all") — resolves to no. `/` is the weekly brief; a longer horizon is a consultable addition,
+not a competing lead, and no view state persists beyond the URL the reader shares.
+
+- **The selected horizon's card renders below the call.** `CadenceCallCard` moved out of the top
+  of the `#weekly-call` region to the band between the call's action row and the five areas. The
+  hero keeps its `h1` on every view; the card's headline takes the `h2` and the page-title
+  register (`text-fluid-2xl`, was the hero's `text-display`), and its bridge line points up at
+  the weekly read behind the guidance. The week stepper names the week again under a horizon
+  (`currentDateLabel={periodLabel}`); the card's own eyebrow names the horizon's period.
+- **The control keeps its place.** Weekly / Monthly / Quarterly stays beside Copy Brief where
+  §1.1.14d put it, `?cadence=` deep links still open the horizon card, and the choice still
+  shows at once while the address catches up (§1.1.92). Nothing sticky was added; nothing was.
+- **The heading-level props are gone.** `DecisionHero.titleLevel` and `CadenceCallCard.titleLevel`
+  had the one homepage caller that picked a level between them; with the order fixed, both
+  components hardcode their tag. `tests/homePageHeading.test.tsx` pins the h1, the h2 and the
+  card's position from source; `tests/homeRouteDecisionTransmissionContract.test.tsx` still pins
+  the selector beside the call.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:
