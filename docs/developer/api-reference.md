@@ -10,7 +10,8 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 - **Cost:** Whether is free.
 - **Auth:** none for the reads. The routes the scheduler owns (creating a regime alert, `/api/alert-deliveries`, `/api/decision-events`) take `Authorization: Bearer <WHETHER_CRON_SECRET>`. Decision memory reads and writes one owner's entries, named by an `x-whether-client-id` header, and answers 401 without it.
 - **Automation headers:** send `Accept: application/json`; include `Authorization: Bearer <token>` when your deployment is access-controlled.
-- **Crawlers:** `robots.txt` opens every path `/api-docs`, `/llms.txt` and the agent manifest advertise (`tests/robotsRoute.test.ts`), and keeps `/api/health`, telemetry, the alert digest and the scheduler's routes closed.
+- **Crawlers:** `robots.txt` opens every path `/api-docs`, `/llms.txt` and the agent manifest advertise (`tests/robotsRoute.test.ts`), and keeps `/api/health`, telemetry, the alert digest and the scheduler's routes closed. It carries the Content-Signal declaration (`search=yes, ai-input=yes, ai-train=yes`, rendered from `lib/seo/robotsTxt.ts`).
+- **Markdown negotiation:** `GET /` with `Accept: text/markdown` answers the Markdown brief (`/brief.md`) instead of HTML; every HTML response also carries `Link` headers naming the manifest, `/llms.txt` and `/brief.md` (`lib/runtime/agentResponse.ts`, applied in `worker/index.ts`).
 - **Rate limiting:** platform-default protections apply; explicit per-endpoint quotas are not yet published.
 - **Versioning:** most payloads include `version: "v1"`.
 
@@ -70,6 +71,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/llms.txt` | GET | Plain-text machine onboarding + endpoint discovery; its tool section is written from the tool registry. |
 | `/llms-full.txt` | GET | The indexable answer pages, guides and terms in one Markdown file. |
 | `/.well-known/whether-agent.json` | GET | JSON discovery manifest for agent/tool clients: where to `start` per surface, the `views`, how to tell whether a reading is live and current (`automation`), and the MCP endpoint with every tool and its arguments (`mcp.tools`). |
+| `/auth.md` | GET | What it takes to sign in, in one page: nothing for the reads; the one credential-free write (email subscribe) and the authenticated routes named so an agent does not hunt for a login. |
 | `/api/mcp` | POST | MCP streamable-HTTP server (JSON-RPC 2.0). Tools are defined once in `lib/agent/tools.ts`; see `docs/agents/agent-interface.md`. CORS is open for the transport and the reads, so a browser-based client can call it; `?tool=subscribe` stays closed. |
 | `/api/mcp?tool=<name>` | GET | The same tools as a plain GET for an agent with no MCP client; `tool=get_actions` lists them with their arguments and a call that works. A wrong tool or argument is a 400 with what would have worked. |
 

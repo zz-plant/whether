@@ -156,5 +156,6 @@ export const buildLlmsTxt = (baseUrl: string) => {
     `- Brief (Markdown): ${endpoints.brief}`,
     `- Agent API: ${endpoints.agent}`,
     `- MCP server: ${endpoints.mcp}`,
+    `- Authentication: ${baseUrl}/auth.md`,
   ].join("\n");
 };

@@ -6,7 +6,7 @@ import { describe, it } from "bun:test";
 import { GET as getAgent } from "../app/api/agent/route";
 import { GET as getLlms } from "../app/llms.txt/route";
 import ApiDocsPage from "../app/api-docs/page";
-import robots from "../app/robots";
+import { buildRobotsRules } from "../lib/seo/robotsTxt";
 import { AGENT_START_TOOL, WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/discovery";
 import { describeAgentTools, listAgentTools } from "../lib/agent/tools";
 import { agentManifestResponse } from "../lib/agentManifest";
@@ -111,6 +111,7 @@ describe("every place an agent learns what to call", () => {
       manifest.endpoints.brief,
       manifest.endpoints.agent,
       manifest.endpoints.mcp,
+      "https://whether.work/auth.md",
     ]);
 
     // Every endpoint the manifest advertises is a route the app serves, and robots.txt lets an agent fetch the manifest.
@@ -120,7 +121,7 @@ describe("every place an agent learns what to call", () => {
       const route = await import(`../app${pathname}/route`);
       assert.equal(typeof route.GET, "function", `${name} (${pathname}) is served`);
     }
-    const allowed = robots().rules;
+    const allowed = buildRobotsRules();
     for (const group of Array.isArray(allowed) ? allowed : [allowed]) {
       assert.ok([group.allow ?? []].flat().includes(WHETHER_AGENT_MANIFEST_PATH), "robots.txt allows the manifest");
     }
