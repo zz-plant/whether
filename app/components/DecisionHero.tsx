@@ -114,7 +114,7 @@ export function DecisionHero({
      */
     <section
       id="share-ready-artifact"
-      className="weather-card weather-hero-card weather-inset relative overflow-hidden"
+      className="weather-card weather-hero-card weather-inset relative overflow-hidden weather-editorial-hero"
       aria-labelledby="weekly-call-title"
       data-regime={regimeKey ?? undefined}
     >
@@ -238,7 +238,7 @@ export function DecisionHero({
           />
         ) : null}
         </div>
-        {aside ? <div className="max-md:hidden">{aside}</div> : null}
+        {aside ? <div className="weather-hero-aside max-md:hidden">{aside}</div> : null}
         </div>
 
         {/* The card is the block people screenshot and crop, so it names its
