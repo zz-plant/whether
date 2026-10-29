@@ -94,7 +94,7 @@ describe("a flat operating latitude over a week the guidance changed", () => {
       buildWeeklyOperatorBriefPayload(document, { weeklyLeadershipSummary: model.weeklyLeadershipSummary }),
     );
 
-    assert.match(text, /^Operating latitude: 51\/100 \(room to hire, spend and commit; higher means more room\) · vs Sep 29: no change$/m);
+    assert.match(text, /^Operating latitude: 51\/100 \(room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room\) · vs Sep 29: no change$/m);
     assert.doesNotMatch(text, /guidance is (unchanged|holding)|guidance is holding where it was/i);
   });
 });

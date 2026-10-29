@@ -145,7 +145,7 @@ const slideGuidance = (payload: MeetingSlidePayload): string | null =>
 const slideWatchLine = (payload: MeetingSlidePayload): string | null =>
   payload.clearsWhen && payload.clearsWhen.length > 0 ? payload.clearsWhen.join("; ") : null;
 
-/** "Margin: close to the line": the band under its display name (the payload field stays `confidence`). */
+/** "Room before a change: close to the line": the band under its display name (the payload field stays `confidence`). */
 const slideMargin = (payload: { confidence: string }) => `${MARGIN_LABEL}: ${formatExportConfidence(payload.confidence).toLowerCase()}`;
 
 /** The margin, then the one provenance footer, as every slide format closes. */

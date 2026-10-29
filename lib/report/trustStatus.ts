@@ -567,7 +567,7 @@ export const buildMeetingSnippet = ({
   /** The week's headline action as a paste leads with it (`weeklyHeadline(…).composed`). */
   guidance: string;
 }) => {
-  /* The margin rides in the trust line ("Margin: clear of the line (…)"), so it is
+  /* The margin rides in the trust line ("Room before a change: clear of the line (…)"), so it is
      stated once; the two dates say which is which (2026-10-09). */
   const trustSummary = buildCompactTrustSummary({ confidenceLabel, freshnessLabel, isFallbackSnapshot, isHistoricalSelection });
   return [

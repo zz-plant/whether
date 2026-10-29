@@ -125,8 +125,9 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   transition. "Flip" is the call/decision reversal (bounded decision slot "Reversal");
   "transition" is the forecast-outcome change (stuck forecast indicators). If they
   diverge, flip describes the call reversal, transition describes forecast changes.
-- **The distance from a change line is the "Margin"** on screens, gauges, pastes and email
-  (2026-10-09): "Clear of the line", "Within reach of the line", "Close to the line", with the
+- **The distance from a change line is "Room before a change"** on screens, gauges, pastes and
+  email (2026-10-28; "Margin" until then, which a reader took for a profit margin):
+  "Clear of the line", "Within reach of the line", "Close to the line", with the
   nearer score's points where the surface holds them. "Confidence" (and "Call certainty"
   before it) are retired as reader labels: the number is a distance, not a probability
   (`/calibration`), and "Confidence: Low" beside "Freeze new commitments" read as the product

@@ -53,7 +53,7 @@ export const OPERATING_LATITUDE_LABEL = "Operating latitude";
  * only inside the hero's collapsed "Why this call" panel and on /glossary, so
  * the largest figure on the homepage arrived with no scale above the fold.
  */
-export const OPERATING_LATITUDE_GLOSS = "room to hire, spend and commit; higher means more room";
+export const OPERATING_LATITUDE_GLOSS = "room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room";
 
 export const DECISION_CONTRACT_LABELS = {
   /* Noun slots for exports. "Threshold" and "Reversal" were retired on
