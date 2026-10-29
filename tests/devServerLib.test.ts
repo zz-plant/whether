@@ -138,10 +138,43 @@ const patientProbe = (patienceMs: number) => {
 const hasExited = (child: ChildProcess | undefined) => child?.exitCode != null || child?.signalCode != null;
 
 describe("withDevServer", () => {
-  it("reuses a server that already answers, and leaves it running", async () => {
-    const server = createHttpServer((request, response) => response.end("already up"));
-    await new Promise<void>((resolve) => server.listen(0, "127.0.0.1", resolve));
-    const address = server.address();
+  /* A listener at the default base URL that this checkout does not claim may be another
+     worktree's server or an old build: reusing it audited one tree's landmarks as another's
+     (2026-10-29). The default is a fresh server for this tree; only an explicitly named
+     base URL is audited as given. */
+  it("does not audit a listener no checkout claims: it starts one for this tree instead", async () => {
+    const foreign = createHttpServer((request, response) => response.end("another checkout"));
+    await new Promise<void>((resolve) => foreign.listen(0, "127.0.0.1", resolve));
+    const address = foreign.address();
+    const baseUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+    const root = workspace();
+
+    const statuses: string[] = [];
+    try {
+      const result = await withDevServer({
+        baseUrl,
+        outDir: root,
+        lockfilePath: noLock(root),
+        devScript: fixtureServer(root),
+        timeoutMs: 15000,
+        probe: patientProbe(10000),
+        onStatus: (message: string) => statuses.push(message),
+        body: async (url: string) => ({ url, text: await (await fetch(url)).text() }),
+      });
+
+      assert.notEqual(result.url, baseUrl, "the unclaimed listener is not audited");
+      assert.equal(result.text, "fixture", "the fresh server serves this tree");
+      assert.match(statuses.join("\n"), /no dev server in this checkout claims it/);
+      assert.equal(await (await fetch(baseUrl)).text(), "another checkout", "the foreign server survives");
+    } finally {
+      await new Promise((resolve) => foreign.close(resolve));
+    }
+  });
+
+  it("reuses the server at the base URL when the caller named it explicitly", async () => {
+    const foreign = createHttpServer((request, response) => response.end("the named server"));
+    await new Promise<void>((resolve) => foreign.listen(0, "127.0.0.1", resolve));
+    const address = foreign.address();
     const baseUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
 
     const statuses: string[] = [];
@@ -150,16 +183,52 @@ describe("withDevServer", () => {
         baseUrl,
         outDir: workspace(),
         lockfilePath: noLock(workspace()),
+        explicitBaseUrl: true,
         probe: probeOnce,
         onStatus: (message: string) => statuses.push(message),
         body: async (url: string, started?: unknown) => ({ url, started, text: await (await fetch(url)).text() }),
       });
 
-      assert.deepEqual(result, { url: baseUrl, started: undefined, text: "already up" });
-      assert.match(statuses.join("\n"), /Reusing the server already listening/);
-      assert.equal(await (await fetch(baseUrl)).text(), "already up", "a server it did not start must survive");
+      assert.deepEqual(result, { url: baseUrl, started: undefined, text: "the named server" });
+      assert.match(statuses.join("\n"), /named explicitly/);
+      assert.equal(await (await fetch(baseUrl)).text(), "the named server", "a server it did not start must survive");
     } finally {
-      await new Promise((resolve) => server.close(resolve));
+      await new Promise((resolve) => foreign.close(resolve));
+    }
+  });
+
+  it("prefers the checkout's own dev server over an unclaimed listener at the base URL", async () => {
+    const foreign = createHttpServer((request, response) => response.end("unclaimed"));
+    await new Promise<void>((resolve) => foreign.listen(0, "127.0.0.1", resolve));
+    const address = foreign.address();
+    const baseUrl = `http://127.0.0.1:${typeof address === "object" && address ? address.port : 0}`;
+
+    const checkout = createHttpServer((request, response) => response.end("checkout server"));
+    await new Promise<void>((resolve) => checkout.listen(0, "127.0.0.1", resolve));
+    const checkoutAddress = checkout.address();
+    const appUrl = `http://127.0.0.1:${typeof checkoutAddress === "object" && checkoutAddress ? checkoutAddress.port : 0}`;
+    const root = workspace();
+    const lockfilePath = join(root, "lock.json");
+    writeFileSync(lockfilePath, JSON.stringify({ pid: process.pid, port: 0, hostname: "127.0.0.1", appUrl, startedAt: 0, cwd: root }));
+
+    const statuses: string[] = [];
+    try {
+      const result = await withDevServer({
+        baseUrl,
+        outDir: root,
+        lockfilePath,
+        probe: probeOnce,
+        onStatus: (message: string) => statuses.push(message),
+        body: async (url: string, started?: unknown) => ({ url, started }),
+      });
+
+      assert.deepEqual(result, { url: appUrl, started: undefined });
+      assert.match(statuses.join("\n"), /Reusing this checkout's dev server/);
+    } finally {
+      await Promise.all([
+        new Promise((resolve) => foreign.close(resolve)),
+        new Promise((resolve) => checkout.close(resolve)),
+      ]);
     }
   });
 

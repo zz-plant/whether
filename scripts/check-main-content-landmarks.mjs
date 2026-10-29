@@ -38,7 +38,7 @@ import {
   collectUnresolvedAnchors,
 } from "./main-content-landmarks.mjs";
 import { isDeployGate } from "./deploy-gate.mjs";
-import { isLocalHostname, withDevServer } from "./dev-server.lib.mjs";
+import { isLocalHostname, readCheckoutDevServer, withDevServer } from "./dev-server.lib.mjs";
 
 const args = process.argv.slice(2);
 
@@ -219,9 +219,16 @@ const run = async () => {
     return reportResults(await audit(baseUrl));
   }
 
-  // Only the local-start path depends on the bundle: a server someone already runs, or a
-  // non-local target the audit must not stand in for, is audited exactly as it answers.
-  if (isLocalHostname(new URL(baseUrl).hostname) && !(await probe(baseUrl)).ok) {
+  // The worker bundle only matters when a fresh `serve:worker` will be started. A dev server
+  // this checkout's lock file names compiles from source, so reusing it needs no build — and
+  // the old probe-first rule built one that a reused server then went unused. A base URL the
+  // caller named explicitly is audited as it answers; a non-local target is never stood in for.
+  const explicitBaseUrl = hasFlag("--base-url") || process.env.LANDMARKS_BASE_URL !== undefined;
+  const isLocalTarget = isLocalHostname(new URL(baseUrl).hostname);
+  const checkoutServerClaimed = isLocalTarget && readCheckoutDevServer() !== null;
+  const explicitLocalAnswering =
+    explicitBaseUrl && isLocalTarget && (await probe(baseUrl)).ok;
+  if (isLocalTarget && !checkoutServerClaimed && !explicitLocalAnswering) {
     ensureWorkerBundle();
   }
 
@@ -234,6 +241,7 @@ const run = async () => {
     // A second, fresh start in the deploy gate only: a cold container's first start is the
     // one that has missed its deadline (dev-server.lib.mjs). Locally a failure is real.
     startAttempts: inDeployGate ? 2 : 1,
+    explicitBaseUrl,
     probe,
     onStatus: (message) => console.log(message),
     body: audit,

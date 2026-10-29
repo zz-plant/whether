@@ -8,6 +8,15 @@
  * Readiness is injected rather than fixed here. UI capture will not shoot a page
  * whose assets have not settled, so it passes its own asset-integrity probe;
  * the landmark audit only needs the server to answer, so it passes a plain one.
+ *
+ * Ownership: only a server this checkout can claim is audited by default. The
+ * vinext lock file (`.vinext/dev/lock.json`) names the dev server of *this*
+ * directory, and a server in this directory serves this tree. Anything else
+ * already listening at the default base URL may be another worktree's server or
+ * an old build — silently auditing it reported one tree's landmarks as another's
+ * (2026-10-29: a worktree's `bun run check` reused the main checkout's server and
+ * audited the wrong branch). A base URL given explicitly (`--base-url`) is the
+ * caller naming the thing to audit, so it is reused as asked, with a warning.
  */
 import { createWriteStream, readFileSync } from "node:fs";
 import { mkdir } from "node:fs/promises";
@@ -219,8 +228,12 @@ const startDevServer = async ({ baseUrl, outDir, devScript, logName }) => {
  * directory, so before 2026-10-13 a preview server left up on another port made the
  * landmark audit, and so the pre-push hook, fail with "the dev server exited before it
  * became ready". A server in this directory serves this tree, so it is safe to reuse.
+ * Exported because the landmark audit asks the same question before deciding whether it
+ * must build the worker bundle the started server would serve.
  */
-const readCheckoutDevServer = (lockfilePath) => {
+export const readCheckoutDevServer = (
+  lockfilePath = path.join(process.cwd(), ".vinext", "dev", "lock.json"),
+) => {
   try {
     const lock = JSON.parse(readFileSync(lockfilePath, "utf8"));
     if (!Number.isInteger(lock.pid) || lock.pid <= 0 || typeof lock.appUrl !== "string") return null;
@@ -232,9 +245,19 @@ const readCheckoutDevServer = (lockfilePath) => {
 };
 
 /**
- * Runs `body(baseUrl)` against a ready server, reusing one already listening at
- * `baseUrl` and otherwise starting one. Only a server this call started is
- * stopped afterwards — a dev server the user is running survives the check.
+ * Runs `body(baseUrl)` against a ready server. Reuse order, and what counts as
+ * "safe to reuse":
+ *
+ *   1. a non-local base URL — the remote thing under test, taken as it answers;
+ *   2. the dev server this checkout's lock file names — it serves this tree;
+ *   3. a server already listening at the base URL — only when the caller named
+ *      it explicitly (`explicitBaseUrl`, i.e. `--base-url`), since anything
+ *      else there may belong to another checkout or an older build;
+ *   4. otherwise a fresh start, walking to a nearby free port when the
+ *      requested one is held.
+ *
+ * Only a server this call started is stopped afterwards — a dev server the user
+ * is running survives the check.
  */
 export const withDevServer = async ({
   baseUrl,
@@ -248,17 +271,18 @@ export const withDevServer = async ({
   /** Fresh starts to try before readiness counts as failed. */
   startAttempts = 1,
   lockfilePath = path.join(process.cwd(), ".vinext", "dev", "lock.json"),
+  /** The caller named this base URL on the command line, so it is audited as given. */
+  explicitBaseUrl = false,
 }) => {
   const initialProbe = await probe(baseUrl);
-
-  if (initialProbe.ok) {
-    onStatus(`Reusing the server already listening at ${baseUrl}`);
-    return body(baseUrl);
-  }
 
   /* A remote target (a preview or staging deployment) is the thing under test. Swapping in
      this checkout's dev server, or starting one, would report local code as that deployment. */
   if (!isLocalHostname(new URL(baseUrl).hostname)) {
+    if (initialProbe.ok) {
+      onStatus(`Reusing the remote server already listening at ${baseUrl}`);
+      return body(baseUrl);
+    }
     throw new Error(
       `${baseUrl} did not answer (${initialProbe.error ?? "not ready"}). It is not a local address, so no local server stands in for it.`,
     );
@@ -268,6 +292,21 @@ export const withDevServer = async ({
   if (checkoutServer && (await probe(checkoutServer)).ok) {
     onStatus(`Reusing this checkout's dev server at ${checkoutServer}`);
     return body(checkoutServer);
+  }
+
+  if (initialProbe.ok) {
+    if (explicitBaseUrl) {
+      onStatus(
+        `Reusing the server already listening at ${baseUrl} — named explicitly, so audited as given. ` +
+          `No dev server in this checkout claims it, so it may not be this tree.`,
+      );
+      return body(baseUrl);
+    }
+    onStatus(
+      `${baseUrl} is already serving, but no dev server in this checkout claims it — it may belong to ` +
+        `another checkout or an older build. Auditing a fresh server for this tree instead.`,
+    );
+    /* Falls through: `resolveAutoStartBaseUrl` walks off the held port. */
   }
 
   const target = await resolveAutoStartBaseUrl({ baseUrl, initialProbe });
