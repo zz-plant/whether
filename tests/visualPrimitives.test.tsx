@@ -325,7 +325,7 @@ describe("TrustStrip", () => {
         basis={onRecord}
       />,
     );
-    assert.match(html, />Risk appetite 1 pt from its change line<span[^>]*data-next-week[^>]*> · Could change next week<\/span>/);
+    assert.match(html, />Risk appetite 1 pt from its change line<span[^>]*data-next-week[^>]*>\u00A0·\u00A0Could change next week<\/span>/);
     assert.doesNotMatch(html, />Yes</);
     assert.doesNotMatch(html, /<dt[^>]*>Could change next week<\/dt>/, "no fourth cell");
     assert.equal((html.match(/1 pt/g) ?? []).length, 1, "the distance prints once");
@@ -413,7 +413,7 @@ describe("TrustStrip", () => {
     );
     assert.match(
       html,
-      /<dt[^>]*>Based on<\/dt><dd[^>]*>The same data we used for past months<span[^>]*data-basis-warning[^>]*> · Startup-market inputs would put risk appetite at 49, below its change line\. They(&#x27;|')re left out because their data doesn(&#x27;|')t go back far enough to check against past months\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
+      /<dt[^>]*>Based on<\/dt><dd[^>]*>The same data we used for past months<span[^>]*data-basis-warning[^>]*>\u00A0·\u00A0Startup-market inputs would put risk appetite at 49, below its change line\. They(&#x27;|')re left out because their data doesn(&#x27;|')t go back far enough to check against past months\. The brief for the week of Oct 6 read Freezing\.<\/span>/,
     );
   });
 });

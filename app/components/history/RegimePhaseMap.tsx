@@ -459,7 +459,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               </FactList>
               <dl className="space-y-1 text-fluid-xs">
                 {[gaps.tightness, gaps.riskAppetite].map((gap) => (
-                  <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2">
+                  <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
                     <dt className="text-slate-400">{gap.label}</dt>
                     {/* Out of 100, and the distance said as a direction: "72 / +2 from
                         70" asked the reader to know the scale and to read a slash

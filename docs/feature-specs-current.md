@@ -894,6 +894,8 @@ A screenshot pass over the global chrome — `bun run ui:iterate` plus header/fo
   `navigationLayers` and `utilityLinks`. The lists wrap horizontally on mobile and stack on
   `sm`, which was worth measuring: a plain vertical list gives every link its own 44px row and
   took the mobile footer from ~400px to 1028px before the reflow brought it back to 664px.
+   Wrapped rows get their own gap (2026-10-29): both wrapping rows used `gap-y-0`, so at
+   320–430px a wrapped row sat on the one above it.
 - **The legal row stranded its separators.** `<span>·</span>` siblings are text nodes, so they
   wrap like any other, regularly leaving a dot at the end of a line. Moving them to a CSS
   `::before` only moved the defect — the item that lands first on a wrapped line still carries
@@ -4121,6 +4123,29 @@ not a competing lead, and no view state persists beyond the URL the reader share
   components hardcode their tag. `tests/homePageHeading.test.tsx` pins the h1, the h2 and the
   card's position from source; `tests/homeRouteDecisionTransmissionContract.test.tsx` still pins
   the selector beside the call.
+
+### 1.1.99 Wrapped rows get a row gap (2026-10-29)
+
+A responsive sweep over ten reader routes at 320–1440px found one repeated defect: a flex row
+declared `flex flex-wrap gap-x-*` with no `gap-y`, so when its children wrapped the second row sat
+on the first. The footer's two rows were the first (§1.1.14d); the same class of collision was
+measured in shared components:
+
+- **ScoreLadder** (`figcaption`, the label and its caption), **Fact** (`FactList`, label and value
+  on /history and /comps), **RegimePhaseMap** (the two distance rows), **plainLanguage** (the scale
+  label, dot and note), and the `/resources` context nav take a row gap.
+- **/comps and /signals** dt/dd rows (`flex flex-wrap gap-x-2` with a `shrink-0` term and a
+  `min-w-0` value) take `gap-y-1`: the value drops below its term at phone widths and the two
+  touched.
+- **The record table's "changed" badge** had no break opportunity between the regime word and the
+  badge (`ml-2` is a margin, not a space), so at 320px it ran past the conditions cell into the
+  latitude column. The pair is one wrapping flex row now, so the badge drops below the word.
+- **The published brief's preview** (`<pre>`) wrapped at spaces but not inside a long token, which
+  `overflow-hidden` then clipped; it takes `break-words`, as the share preview already did.
+
+Checked, not changed: 10px and 9px labels inside `aria-hidden` SVG graphics (§XXII allows 10px
+there), the `weather-hit::after` 44px hitboxes, and the timeline year ticks, whose 28px boxes are
+a dense control rather than a 44px target.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,

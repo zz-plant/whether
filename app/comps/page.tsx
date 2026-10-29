@@ -166,27 +166,27 @@ export default async function CompsPage() {
             <p className="text-xs text-slate-500">Data as of {reportData.recordDateLabel}</p>
           </div>
           <dl className="space-y-1.5 text-sm text-slate-200">
-            <div className="flex flex-wrap gap-x-2">
+            <div className="flex flex-wrap gap-x-2 gap-y-1">
               <dt className="shrink-0 font-semibold text-slate-400">{publicDecisionLabels.call}</dt>
               <dd className="min-w-0">{reportData.statusLabel}</dd>
             </div>
             {capitalRule ? (
               <>
-                <div className="flex flex-wrap gap-x-2">
+                <div className="flex flex-wrap gap-x-2 gap-y-1">
                   <dt className="shrink-0 font-semibold text-slate-400">Fundraising</dt>
                   <dd className="min-w-0">{capitalRule.doNow[0] ?? capitalRule.recommendation}</dd>
                 </div>
-                <div className="flex flex-wrap gap-x-2">
+                <div className="flex flex-wrap gap-x-2 gap-y-1">
                   <dt className="shrink-0 font-semibold text-slate-400">{publicDecisionLabels.threshold}</dt>
                   <dd className="min-w-0">{capitalRule.pauseTrigger}</dd>
                 </div>
-                <div className="flex flex-wrap gap-x-2">
+                <div className="flex flex-wrap gap-x-2 gap-y-1">
                   <dt className="shrink-0 font-semibold text-slate-400">{publicDecisionLabels.reversal}</dt>
                   <dd className="min-w-0">{capitalRule.resumeTrigger}</dd>
                 </div>
               </>
             ) : (
-              <div className="flex flex-wrap gap-x-2">
+              <div className="flex flex-wrap gap-x-2 gap-y-1">
                 <dt className="shrink-0 font-semibold text-slate-400">This week&apos;s action</dt>
                 <dd className="min-w-0">{reportData.actionNowShort}</dd>
               </div>

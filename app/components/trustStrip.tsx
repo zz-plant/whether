@@ -208,7 +208,13 @@ export function TrustStrip({
                   data-next-week={cell.detailKind === "next-week" ? "" : undefined}
                   data-basis-warning={cell.detailKind === "basis" ? "" : undefined}
                 >
-                  {" · "}
+                  {/* The dot is bound on both sides (2026-10-29): as a text
+                      separator it wrapped onto the phone line's value and left
+                      "·" at the end of the line, the one place a separator dot
+                      reads as a typo. NBSP keeps it with its word, so a wrap
+                      falls before "value · detail" or inside the detail, never
+                      between the dot and either side. */}
+                  {"\u00A0·\u00A0"}
                   {cell.detailKind === "basis" && basisShort ? (
                     <>
                       <span className="sm:hidden" data-basis-short>

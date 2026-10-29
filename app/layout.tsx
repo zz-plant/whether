@@ -279,7 +279,10 @@ export default function RootLayout({
                     utilityLinks: the hand-written copy that used to live here
                     drifted, and a page fell out of the footer entirely. */}
                 <nav aria-label="About Whether">
-                  <ul className="flex flex-wrap gap-x-4 gap-y-0">
+                  {/* Wrapped lines need their own row: the seven links ran
+                     4+3 at 320px with no vertical gap, so a row sat on the one
+                      above it. */}
+                  <ul className="flex flex-wrap gap-x-4 gap-y-2">
                     {utilityLinks.map((link) => (
                       <li key={link.href}>
                         <Link
@@ -368,7 +371,7 @@ export default function RootLayout({
             <div className="mt-8 flex flex-col gap-3 border-t border-slate-800/40 pt-5 sm:flex-row sm:items-center sm:justify-between">
               <nav
                 aria-label="Legal and credits"
-                className="flex flex-wrap items-center gap-x-6 gap-y-0 text-fluid-micro text-[var(--footer-legal)]"
+                className="flex flex-wrap items-center gap-x-6 gap-y-2 text-fluid-micro text-[var(--footer-legal)]"
               >
                 <Link href="/decisions" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Your decisions</Link>
                 <Link href="/privacy" className="weather-list-link no-underline transition-colors hover:text-[var(--footer-legal-hover)]">Privacy</Link>

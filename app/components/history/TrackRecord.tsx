@@ -81,14 +81,19 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
             <span className="hidden sm:inline">{formatDateUTC(row.recordDate)}</span>
           </td>
           <td className="py-2 pr-3 text-slate-200">
-            <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
-              {row.regimeLabel}
-            </span>
-            {row.changed ? (
-              <span className="ml-2 type-badge text-fluid-micro rounded-sm border border-slate-600/60 px-1.5 py-0.5 text-slate-100">
-                changed
+            {/* A flex row, not inline text: with no break opportunity the
+                "changed" badge ran past the conditions cell and into the
+                latitude column at 320px. */}
+            <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
+                {row.regimeLabel}
               </span>
-            ) : null}
+              {row.changed ? (
+                <span className="type-badge text-fluid-micro rounded-sm border border-slate-600/60 px-1.5 py-0.5 text-slate-100">
+                  changed
+                </span>
+              ) : null}
+            </span>
           </td>
           <td className="py-2 pr-3 text-right font-mono text-slate-200">
             {row.boldness.toLocaleString("en-US")}
