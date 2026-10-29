@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import {
   FLASH_BASE_RATE_MOVE,
   FLASH_CURVE_MOVE,
+  FLASH_EXPEDITE_LINE,
   evaluateFlashMoves,
   flashInputsFrom,
   type FlashInputs,
@@ -107,5 +108,12 @@ describe("flash alerts in the evaluator and the mail", () => {
     assert.match(mail.html, /4\.60% → 4\.30%/);
     assert.match(mail.text, /unsubscribe/i);
     assert.doesNotMatch(mail.text, /tightness|riskAppetite/);
+  });
+
+  it("frames the flash as an expedite signal in text and HTML alike", () => {
+    const mail = flashMoveEmail(move!, "token-1");
+    assert.ok(mail.text.includes(FLASH_EXPEDITE_LINE));
+    assert.ok(mail.html.includes(FLASH_EXPEDITE_LINE));
+    assert.match(FLASH_EXPEDITE_LINE, /^Expedite:/);
   });
 });

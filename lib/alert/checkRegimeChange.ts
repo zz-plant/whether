@@ -7,7 +7,7 @@ import type { WeeklyCallContract } from "../report/weeklyCallContract";
 import { assessReadingReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
 import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { sendRegimeChangePush } from "../push/sendRegimePush";
-import { evaluateFlashMoves, flashInputsFrom, type FlashMove } from "./flashMoves";
+import { evaluateFlashMoves, FLASH_EXPEDITE_LINE, FLASH_GUIDANCE, flashInputsFrom, type FlashMove } from "./flashMoves";
 import { formatExportConfidenceWord } from "../export/exportTerms";
 import { resolvePublishedConfidence } from "../report/confidence";
 
@@ -137,7 +137,7 @@ export const checkRegimeChange = async (options?: {
     alerts.push(`FLASH — ${move.headline}`);
     await postSlackAlerts(
       "Flash — an unusually large move since the last reading",
-      `${move.headline}\nThis week's guidance stands until the next reading shows where the scores settle. Until then, hold anything you can't undo.`,
+      `${move.headline}\n${FLASH_GUIDANCE}\n${FLASH_EXPEDITE_LINE}`,
     );
   }
 

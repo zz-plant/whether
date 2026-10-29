@@ -7,17 +7,13 @@
  */
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import type { FlashMove } from "./flashMoves";
+import { FLASH_EXPEDITE_LINE, FLASH_GUIDANCE, type FlashMove } from "./flashMoves";
 import { sideOfLine, type PublishedLine } from "./alertEvaluator";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { emailTextFooter, renderEmailShell } from "../email/emailShell";
 import { siteUrl } from "../siteUrl";
 import { formatPointsMove, formatScoreValue } from "../formatters";
 import { OG_LINE_CROSSED, OG_LINE_CROSSED_BG, OG_LINE_CROSSED_MARK, OG_PANEL, OG_RULE, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "../image/ogTheme";
-
-/** What a flash asks of the reader, in the mail's text and HTML alike. */
-const FLASH_GUIDANCE =
-  "A move this size between two readings is unusual. This week's guidance stands until the next reading shows where the scores settle; until then, hold anything you can't undo.";
 
 type EmailContent = {
   subject: string;
@@ -221,6 +217,7 @@ export const flashMoveEmail = (
     `Whether Flash Alert`,
     move.headline,
     FLASH_GUIDANCE,
+    FLASH_EXPEDITE_LINE,
     ``,
     `View full brief: ${siteUrl}`,
     ...emailTextFooter(unsubscribeToken),
@@ -237,6 +234,9 @@ export const flashMoveEmail = (
         "What to do",
         FLASH_GUIDANCE,
       ),
+      `</div>`,
+      `<div style="margin-top:12px;">`,
+      sectionBlock("Kanban teams", FLASH_EXPEDITE_LINE),
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
