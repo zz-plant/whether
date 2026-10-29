@@ -121,7 +121,11 @@ export const agentStateSchema = z.object({
   }),
   confidence: z.object({
     label: z.enum(["HIGH", "MED", "LOW"]),
-    percent: z.number(),
+    percent: z
+      .number()
+      .describe(
+        "The margin as a number: 55 plus the points of distance from the line where conditions change, floored at 35 and capped at 92. It is the raw distance, not a probability, and it does not step down when `label` does for a stale fallback — the label carries the staleness judgment.",
+      ),
     meaning: z.string(),
   }),
   scores: z.object({ tightness: scoreSchema, riskAppetite: scoreSchema }),
