@@ -540,10 +540,9 @@ observations from the same dated trail as the conditions map. Both traces use th
 caveat. They omit the current weekly reading to preserve the sampling distinction and
 render nothing with fewer than three observations. No extra data requests are made.
 
-Below the table, a small-multiples grid draws the trailing ~90-day history of the raw
-inputs behind the scores (inflation, unemployment, credit spreads, volatility, financial
-conditions, yields) from the materialized model's `recentHistory`. Each series autoscales
-to its own range and is labelled with its name; a series with fewer than three readings
-renders nothing, so a cold or legacy store shows no grid. The grid is suppressed on an
-archived week, where the live 92-day window would be anachronistic. It adds no fetch: it
-reads the model the report already loaded. It is context for the scores, not a second verdict.
+Below the table, a small-multiples grid draws the trailing history of the raw inputs
+behind the scores (inflation, unemployment, credit spreads, volatility, financial
+conditions) from the macro series the report already loaded. Each series autoscales to its
+own range and is labelled with its name; a series with fewer than three readings renders
+nothing. The grid is suppressed on an archived week, where a live window would be
+anachronistic. It adds no fetch. It is context for the scores, not a second verdict.
