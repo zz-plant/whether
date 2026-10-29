@@ -74,6 +74,9 @@ const liveRoutes = [
   // Added 2026-10-27: the comparison was reachable from /history and the footer
   // but had never been captured, so no layout pass had seen it.
   { slug: "compare", label: "Compare periods", path: "/history/compare" },
+  // Added 2026-10-29: the horizon band renders under the call (§1.1.98), which
+  // the plain "/" captures above cannot show, so no layout pass had seen it.
+  { slug: "horizon", label: "Monthly horizon", path: "/?cadence=monthly" },
   { slug: "brief", label: "Published brief", path: "/brief/2026-w31" },
   { slug: "share", label: "Share", path: "/share" },
   // Restored 2026-09-23: product writing placed on the month-end record.

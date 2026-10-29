@@ -69,25 +69,14 @@ function BoundedBandRail({ band, idSuffix }: { band: HorizonSignalBand; idSuffix
 }
 
 /**
- * The lead for a non-weekly cadence. It sits where the weekly call sits and carries the
- * same contract — the call, its guardrail, its reversal — at the selected horizon, then
- * hands off to the weekly hero below it.
+ * The horizon band for a non-weekly cadence. It renders below the weekly hero and
+ * carries the same contract — the guidance, its pause line, its resume line — at
+ * the selected horizon, while the weekly call keeps the page's lead (2026-10-29).
  *
  * No nested boxes: §XIII gives elevation to the outermost container, and the run of
  * period chips is a list of controls-sized marks rather than a frame inside the frame.
  */
-export function CadenceCallCard({
-  model,
-  /**
-   * `h2` by default. The homepage passes `h1`, because when this card renders
-   * the reader has asked for this horizon and its headline is the page's
-   * subject — the weekly hero below then takes `h2`.
-   */
-  titleLevel: TitleTag = "h2",
-}: {
-  model: CadenceCallModel;
-  titleLevel?: "h1" | "h2";
-}) {
+export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
   const headingId = `${model.horizon}-call-title`;
 
   return (
@@ -106,12 +95,16 @@ export function CadenceCallCard({
       </div>
 
       <div className="space-y-2">
-        <TitleTag
+        {/* The page-title register, not the hero's display face: the weekly call
+            above it is the lead, and this band is one step down from it. The
+            display family still applies through the `:where(h1, h2)` rule in
+            typography.css, so the face needs no utility here. */}
+        <h2
           id={headingId}
-          className="max-w-2xl text-pretty font-sans text-display font-semibold leading-[1.25] tracking-[-0.012em] text-white"
+          className="max-w-2xl text-pretty font-semibold text-fluid-2xl leading-tight tracking-[-0.012em] text-white"
         >
           {model.headline}
-        </TitleTag>
+        </h2>
         {/* Before the regime description, not after it. Under a refusal the headline is
             the hold and the description is still "capital is cheap" — read in that order
             they contradict, and the sentence that reconciles them arrives too late.
@@ -126,8 +119,8 @@ export function CadenceCallCard({
       </div>
 
       {/* Suppressed under a refusal. The hold's threshold and reversal are horizon-neutral
-          and the weekly hero below already carries them, so rendering them here put the
-          same two sentences on screen twice. The bridge line hands the reader down to the
+          and the weekly hero above already carries them, so rendering them here put the
+          same two sentences on screen twice. The bridge line hands the reader up to the
           one place the page states that contract. */}
       {/* The labels are set the way the hero sets the same two — a coloured
           term, then the sentence — rather than as bordered chips: one label,
@@ -189,7 +182,7 @@ export function CadenceCallCard({
           weekly block below, where it always has. Two links to /operate under different
           labels would give the reader nothing to choose between. */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-3">
-        <p className="text-fluid-nano text-slate-400">{model.weeklyBridge} ↓</p>
+        <p className="text-fluid-nano text-slate-400">{model.weeklyBridge} ↑</p>
         <ShareBriefButton
           title={model.shareTitle}
           text={model.headline}

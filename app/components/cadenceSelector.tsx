@@ -9,8 +9,9 @@ type CadenceKey = "weekly" | "monthly" | "quarterly";
 
 /* Each longer horizon says what it adds (2026-10-14): "Monthly" and
    "Quarterly" beside "Plan horizon" did not say whether they change the rules,
-   the wording or only the paste. They put that horizon's call, with its past
-   months or quarters, above this week's. */
+   the wording or only the paste. They add that horizon's guidance, with its
+   past months or quarters, below this week's — since 2026-10-29 the weekly
+   call leads at every horizon, so the band follows the call it extends. */
 const CADENCES: readonly SegmentedOption<CadenceKey>[] = [
   { key: "weekly", label: "Weekly" },
   { key: "monthly", label: "Monthly", sublabel: "adds the month's call" },
