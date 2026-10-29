@@ -101,8 +101,10 @@ export const evaluateFlashMoves = (current: FlashInputs, previous: FlashInputs |
     const to = current[metric];
     if (typeof from !== "number" || typeof to !== "number") continue;
     if (!Number.isFinite(from) || !Number.isFinite(to)) continue;
-    // A hair under the threshold from float noise is not a flash; round first.
-    if (Math.round(Math.abs(to - from) * 100) / 100 < THRESHOLDS[metric]) continue;
+    // A hair under the threshold from float noise still holds: compare with an
+    // epsilon instead of rounding, so 0.3 − 0.1 reads as 0.2 without widening
+    // the threshold to a 0.245 move.
+    if (Math.abs(to - from) < THRESHOLDS[metric] - 1e-9) continue;
     moves.push(describe(metric, from, to, current, previous));
   }
   return moves;

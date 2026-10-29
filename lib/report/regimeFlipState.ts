@@ -12,6 +12,7 @@ import type { RegimeAssessment } from "../regimeEngine";
 import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { formatThresholdNumber } from "../formatters";
+import { resolveLineGaps } from "./confidence";
 import type { BoundaryDimension, BoundaryDirection, Regime } from "./homeBriefModel";
 import { regimeSignalLabel } from "./signalTranslations";
 
@@ -103,7 +104,10 @@ export const buildRegimeFlipState = ({
   regimeTransition,
 }: {
   regime: Regime;
-  scores: Pick<RegimeAssessment["scores"], "tightness" | "riskAppetite">;
+  /* `tightnessPressure` rides along because the watched line is picked on the
+     tightness-equivalent scale (`resolveLineGaps`), where a pinned score's
+     distance includes the points the published number hides. */
+  scores: Pick<RegimeAssessment["scores"], "tightness" | "riskAppetite" | "tightnessPressure">;
   thresholds: Pick<RegimeAssessment["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
   regimeTransition?: RegimeAssessment["regimeTransition"];
 }): RegimeFlipState => {
@@ -120,9 +124,14 @@ export const buildRegimeFlipState = ({
     candidate !== regime && regimeTransition?.pending === true;
 
   if (!machineReportsPending) {
-    const tightnessGap = Math.abs(tightness - thresholds.tightnessRegime);
-    const riskGap = Math.abs(riskAppetite - thresholds.riskAppetiteRegime);
-    const dimension: BoundaryDimension = tightnessGap <= riskGap ? "tightness" : "riskAppetite";
+    // Which boundary is watched is picked on the tightness-equivalent scale
+    // (`resolveLineGaps`), not a raw `min()` of the two point gaps: risk
+    // appetite moves 40 points per point of slope against tightness's 180 per
+    // point of rate, so a raw comparison hands the watch to the risk axis
+    // almost always (`lib/report/confidence.ts`). The printed distances below
+    // stay in each axis's own points.
+    const gaps = resolveLineGaps({ scores, thresholds });
+    const dimension: BoundaryDimension = gaps.tightness <= gaps.riskAppetite ? "tightness" : "riskAppetite";
     const direction = boundaryDirectionForRegime(regime, dimension);
     // The regime that crossing actually produces — a rising tightness line from
     // a willing-risk regime lands on the tight-willing quadrant, while a falling
@@ -223,10 +232,10 @@ export const buildRegimeFlipState = ({
     watch = { dimension: other, direction: otherDirection, threshold: otherThreshold, current: otherCurrent };
   } else {
     // Both boundaries crossed in the same week; the flip target needs no
-    // alternative line. Watch the nearer recovery crossing.
-    const tightnessGap = Math.abs(tightness - thresholds.tightnessRegime);
-    const riskGap = Math.abs(riskAppetite - thresholds.riskAppetiteRegime);
-    const dimension: BoundaryDimension = tightnessGap <= riskGap ? "tightness" : "riskAppetite";
+    // alternative line. Watch the nearer recovery crossing, again picked on
+    // the tightness-equivalent scale.
+    const gaps = resolveLineGaps({ scores, thresholds });
+    const dimension: BoundaryDimension = gaps.tightness <= gaps.riskAppetite ? "tightness" : "riskAppetite";
     const direction: BoundaryDirection =
       dimension === "tightness"
         ? tightnessBeyond ? "fallToOrBelow" : "riseAbove"

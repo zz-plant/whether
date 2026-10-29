@@ -10,6 +10,7 @@ describe("buildFlipRiskMeterState", () => {
       currentValue: 67,
       thresholdValue: 70,
       pointsToFlip: 3,
+      pointsToFlipNormalized: 3,
       thresholdDirection: "riseAbove",
     });
 
@@ -24,10 +25,27 @@ describe("buildFlipRiskMeterState", () => {
       currentValue: 56,
       thresholdValue: 50,
       pointsToFlip: 6,
+      pointsToFlipNormalized: 6,
       thresholdDirection: "fallToOrBelow",
     });
 
     assert.equal(state.urgencyLabel, "Medium");
     assert.ok(state.triggerLabel.includes("to or below"));
+  });
+
+  it("measures urgency on the scale the published margin cuts at, not raw points", () => {
+    // A risk-appetite gap of 3 raw points is 13.5 tightness-equivalent — the
+    // margin rightly calls that clear, so the meter must not call it urgent.
+    const state = buildFlipRiskMeterState({
+      dimensionLabel: "Risk appetite",
+      dimensionKey: "riskAppetite",
+      currentValue: 53,
+      thresholdValue: 50,
+      pointsToFlip: 3,
+      pointsToFlipNormalized: 13.5,
+      thresholdDirection: "fallToOrBelow",
+    });
+
+    assert.equal(state.urgencyLabel, "Low");
   });
 });

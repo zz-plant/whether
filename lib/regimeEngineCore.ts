@@ -289,8 +289,9 @@ export const RISK_APPETITE_REGIME_THRESHOLD = 50;
  * cycle registers by its second meeting instead of its eighth.
  *
  * Calibrated against the one place the level ramp is a known miss: Mar 2022 the
- * 1M bill was ~0% and the 3-month move ~0.5%; a 0.4% threshold makes that read as
- * 6 points (VOLATILE-side "pressure rising"), Jun 2022 the 3-month move was ~0.9%
+ * 1M bill was ~0% and the 3-month move ~0.5%, which reads as 12 points — 0.1%
+ * past the 0.4% threshold, at 120 points per point (VOLATILE-side "pressure
+ * rising") — and Jun 2022 the 3-month move was ~0.9%
  * and the term saturates — tightness 60 on velocity alone, SCARCITY-side once the
  * curve inversion adds its 25. A mid-90s-style 300bp cycle saturates the term;
  * the gradual 2015-18 liftoff (~25bp/quarter) stays at 0, as it should.

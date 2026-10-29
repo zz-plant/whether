@@ -77,6 +77,11 @@ export const previousScoresFromDynamics = (
   current: ScorePair,
 ): PreviousReading | null => {
   if (!dynamics || dynamics.directionLabel === "unavailable") return null;
+  /* `?? 0` is safe on the two scores only: `notCompared` never names them (it
+     holds the rates an earlier reading did not record), and the unavailable
+     guard above already answered "no comparison". A caller that copies this
+     pattern for a rate key would fabricate an unchanged move — the forecast's
+     lookup goes through the shared `findSignalDelta` and keeps null instead. */
   const deltaFor = (metric: RuleConditionMetric) => findSignalDelta(dynamics, metric) ?? 0;
   return {
     tightness: roundToTenth(current.tightness - deltaFor("tightness")),

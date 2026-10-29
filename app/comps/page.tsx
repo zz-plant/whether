@@ -144,9 +144,9 @@ export default async function CompsPage() {
             </p>
             <p className="max-w-2xl text-sm text-slate-300">
               Median revenue growth {formatPercent(comps.data.medianRevenueGrowth)}, across{" "}
-              {comps.data.companyCount === SAAS_BASKET.length
+              {comps.data.growthCompanyCount === SAAS_BASKET.length
                 ? `all ${SAAS_BASKET.length} companies in the basket`
-                : `${comps.data.companyCount} of the ${SAAS_BASKET.length} companies in the basket`}
+                : `${comps.data.growthCompanyCount} of the ${SAAS_BASKET.length} companies in the basket`}
               . As of <time dateTime={comps.data.fetchedAt}>{formatDateUTC(comps.data.fetchedAt)}</time>, from{" "}
               {MARKET_DATA_PROVIDER_LABELS[comps.data.source]}.
             </p>

@@ -400,7 +400,10 @@ export type WeeklyDecisionCardViewModel = {
       dimensionKey: "tightness" | "riskAppetite";
       currentValue: number;
       thresholdValue: number;
+      /** The watched line's distance, in that axis's own points. */
       pointsToFlip: number;
+      /** The same distance on the tightness-equivalent scale the published margin cuts at. */
+      pointsToFlipNormalized: number;
       thresholdDirection: BoundaryDirection;
     };
     flipRiskMeter: FlipRiskMeterState;
