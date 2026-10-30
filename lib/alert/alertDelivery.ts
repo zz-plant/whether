@@ -103,11 +103,12 @@ export const deliverAlertToSubscriber = async (
   conditions: AlertConditions,
   adapter: EmailDeliveryAdapter,
   unsubscribeToken?: string | null,
+  baseUrl?: string,
 ): Promise<boolean> => {
   try {
     let template: ReturnType<typeof decisionVerdictEmail>;
     if (alert.type === "flash" && alert.flash) {
-      template = flashMoveEmail(alert.flash, unsubscribeToken);
+      template = flashMoveEmail(alert.flash, unsubscribeToken, baseUrl);
     } else if (alert.type === "regime_change") {
       /* The engine key reached every subscriber here ("shifted to SCARCITY");
          the weather word and what it means for money is what a reader acts on.
@@ -123,9 +124,10 @@ export const deliverAlertToSubscriber = async (
         actionNow: conditions.actionNow,
         reversal: conditions.callChangesIf,
         unsubscribeToken,
+        baseUrl,
       });
     } else if (alert.line) {
-      template = thresholdCrossingEmail(alert.line, conditions[alert.line.metric], unsubscribeToken);
+      template = thresholdCrossingEmail(alert.line, conditions[alert.line.metric], unsubscribeToken, baseUrl);
     } else {
       return false;
     }
@@ -145,9 +147,10 @@ const sendPlanLineEmail = async (
   sub: Subscriber,
   crossing: { headline: string; body: string },
   adapter: EmailDeliveryAdapter,
+  baseUrl?: string,
 ): Promise<boolean> => {
   try {
-    const template = planLineEmail(crossing, sub.token);
+    const template = planLineEmail(crossing, sub.token, baseUrl);
     const result = await adapter.send({
       to: { email: sub.email },
       subject: template.subject,
@@ -201,6 +204,8 @@ export const runScheduledAlertDelivery = async (options?: {
   weeklyCall?: WeeklyCallContract;
   /** The read before `snapshot`, so a flash can be judged on consecutive reads. */
   previousSnapshot?: OperatingSnapshot | null;
+  /** The origin the mail's links carry; a request-triggered run passes its own host. */
+  baseUrl?: string;
 }): Promise<DeliveryResult> => {
   /* The cron's snapshot, else the stored one, else a report read — the manual
      route's path when nothing is stored. */
@@ -253,11 +258,12 @@ export const runScheduledAlertDelivery = async (options?: {
     ...(flashMoves && flashMoves.length > 0 ? { flashMoves } : {}),
   };
 
-  return deliverAlerts(conditions);
+  return deliverAlerts(conditions, { baseUrl: options?.baseUrl });
 };
 
 export const deliverAlerts = async (
   conditions: AlertConditions,
+  options: { baseUrl?: string } = {},
 ): Promise<DeliveryResult> => {
   const lastKnown = await readAlertState();
   const alerts = evaluateAlert(conditions, lastKnown);
@@ -302,6 +308,7 @@ export const deliverAlerts = async (
         conditions,
         adapter,
         sub.token,
+        options.baseUrl,
       );
       if (ok) {
         sent++;
@@ -319,7 +326,7 @@ export const deliverAlerts = async (
         continue;
       }
       const described = describePlanLineCrossing(crossing, current, { regime: conditions.regime, runway: sub.planRunway });
-      const ok = await sendPlanLineEmail(sub, described, adapter);
+      const ok = await sendPlanLineEmail(sub, described, adapter, options.baseUrl);
       if (ok) {
         sent++;
         await trackAlertDelivery(sub.email, key, described.headline);

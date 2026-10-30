@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { afterEach, describe, it } from "bun:test";
 
-import { fanOut, type DeliveryOutcome } from "../lib/delivery/fanOut";
+import { DEFAULT_FAN_OUT_CONCURRENCY, fanOut, type DeliveryOutcome } from "../lib/delivery/fanOut";
 import { slackAlertBlocks, slackChannel } from "../lib/delivery/slack";
 import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
@@ -107,6 +107,35 @@ describe("fanOut", () => {
       return "sent";
     }, { sequential: true });
     assert.equal(peak, 1);
+  });
+
+  it("holds a large list to the concurrency cap instead of rendering all of it at once", async () => {
+    let inFlight = 0;
+    let peak = 0;
+    const targets = Array.from({ length: 40 }, (_, index) => index);
+    const tally = await fanOut(targets, async () => {
+      inFlight += 1;
+      peak = Math.max(peak, inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      inFlight -= 1;
+      return "sent";
+    });
+    assert.equal(tally.sent, 40);
+    assert.ok(peak <= DEFAULT_FAN_OUT_CONCURRENCY, `peak ${peak} exceeded the cap`);
+    assert.ok(peak > 1, "the pool still runs in parallel");
+  });
+
+  it("honours a caller's own cap", async () => {
+    let inFlight = 0;
+    let peak = 0;
+    await fanOut([1, 2, 3, 4, 5, 6], async () => {
+      inFlight += 1;
+      peak = Math.max(peak, inFlight);
+      await new Promise((resolve) => setTimeout(resolve, 1));
+      inFlight -= 1;
+      return "sent";
+    }, { concurrency: 2 });
+    assert.equal(peak, 2);
   });
 });
 
