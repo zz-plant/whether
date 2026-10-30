@@ -2,9 +2,12 @@ import type { ReactNode } from "react";
 import { scaleLinear } from "d3-scale";
 import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatThresholdNumber } from "../../../lib/formatters";
+import { UrlDetails } from "../ui/urlDetails";
 import { ConditionIcon } from "../ui/conceptIcons";
 
 type RegimeRadarProps = {
+  compact?: boolean;
+  detailsOpen?: boolean;
   tightness: number;
   riskAppetite: number;
   previousTightness?: number | null;
@@ -61,6 +64,8 @@ const xFor = (riskAppetite: number) => xScale(riskAppetite);
 const yFor = (tightness: number) => yScale(tightness);
 
 export function RegimeRadar({
+  compact = false,
+  detailsOpen = false,
   tightness,
   riskAppetite,
   previousTightness,
@@ -459,11 +464,19 @@ export function RegimeRadar({
               and the legend that decodes them in money terms is hidden from `md`
               up, where this chart replaces it. */}
           <span className="block text-slate-300" data-radar-orientation>
-            Higher means {CONDITION_SIDE_MEANINGS.pressureAbove}, further right means {CONDITION_SIDE_MEANINGS.appetiteAbove}. Sunny, bottom right, is the easiest; Freezing, top left, the hardest.
+            {compact ? <>Up: {CONDITION_SIDE_MEANINGS.pressureAbove}. Right: {CONDITION_SIDE_MEANINGS.appetiteAbove}.</> : <>Higher means {CONDITION_SIDE_MEANINGS.pressureAbove}, further right means {CONDITION_SIDE_MEANINGS.appetiteAbove}. Sunny, bottom right, is the easiest; Freezing, top left, the hardest.</>}
           </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
-          {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
-          {readableReadings.length > 1 ? (
+          {!compact && hasTrail && caveat ? <span className="block">{caveat}</span> : null}
+          {compact && (readableReadings.length > 1 || caveat) ? (
+            <UrlDetails queryKey="chart" initialOpen={detailsOpen} summary="Scores on this chart"
+              className="mx-auto max-w-md text-left" summaryClassName="weather-hit w-fit cursor-pointer">
+              {hasTrail && caveat ? <p className="mb-2">{caveat}</p> : null}
+              <ul className="list-disc pl-4">
+                {readableReadings.map((reading) => <li key={reading.key}>{reading.text}</li>)}
+              </ul>
+            </UrlDetails>
+          ) : readableReadings.length > 1 ? (
             <details className="mx-auto max-w-md text-left">
               {/* `weather-hit`: a 17px line is a 45px target with it, as the other summaries are. */}
               <summary className="weather-hit w-fit cursor-pointer">Scores on this chart</summary>

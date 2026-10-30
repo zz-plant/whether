@@ -131,6 +131,8 @@ describe("input history small multiples", () => {
     assert.equal((html.match(/data-testid="input-history-grid"/g) ?? []).length, 1);
     assert.match(html, /Volatility \(VIX\)/);
     assert.match(html, /Inflation \(CPI\)/);
+    assert.match(html, /Range 15.4–19/);
+    assert.match(html, /Range 3.35–3.9/);
     assert.equal((html.match(/trailing ~90 days/g) ?? []).length, 2);
   });
 
@@ -145,5 +147,35 @@ describe("input history small multiples", () => {
   it("renders nothing when no input history is supplied", () => {
     const html = renderToStaticMarkup(<WhatChangedSection rows={rows} comparisonUnavailable />);
     assert.doesNotMatch(html, /data-testid="input-history-grid"|Inputs over the last/);
+  });
+});
+
+describe("compact homepage evidence", () => {
+  it("puts a changed composite first while retaining unchanged score lines and current inputs", () => {
+    const score = rows.find((row) => row.key === "tightness");
+    const input = rows.find((row) => row.key === "curveSlope");
+    assert.ok(score);
+    assert.ok(input);
+    const compactRows: SignalChangeRow[] = [
+      { ...score, delta: 0, previous: 64 },
+      { ...score, key: "riskAppetite", label: "Risk appetite", value: 52, valueLabel: "52", delta: -4, increaseIsPositive: true },
+      input,
+    ];
+    const html = renderToStaticMarkup(<WhatChangedSection rows={compactRows} compact comparisonUnavailable={false} />);
+    assert.ok(html.indexOf('data-signal="riskAppetite"') < html.indexOf('data-signal="tightness"'));
+    assert.match(html, /data-signal="tightness"[\s\S]*?Pause/);
+    assert.match(html, /data-signal="curveSlope"[\s\S]*?0.45%/);
+    assert.doesNotMatch(html, /Feeds into both scores/);
+  });
+
+  it("folds supporting histories, and can restore their shared open state", () => {
+    const props = { rows, compact: true, comparisonUnavailable: false,
+      history: { tightness: [{ label: "Jul", value: 40 }, { label: "Aug", value: 50 }, { label: "Sep", value: 64 }] } };
+    const closed = renderToStaticMarkup(<WhatChangedSection {...props} />);
+    assert.match(closed, /<details[^>]*><summary[^>]*>Score history and market inputs/);
+    assert.doesNotMatch(closed, /<details[^>]*open/);
+    const open = renderToStaticMarkup(<WhatChangedSection {...props} historyOpen />);
+    assert.match(open, /<details[^>]*open=""/);
+    assert.match(open, /Funding pressure, month-end history/);
   });
 });

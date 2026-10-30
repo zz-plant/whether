@@ -364,7 +364,7 @@ async function PageContent({
 
   /* The five sections' data, built once here and drawn by the components under
      app/components/home. The lines every score is judged against are the same
-     three the rules state: the area pause/resume lines from the printed rule,
+     three the rules state: the area pause/restart lines from the printed rule,
      and the call-change line from the engine's own thresholds. */
   const callChangeLines = {
     tightness: reportData.assessment.thresholds.tightnessRegime,
@@ -443,7 +443,7 @@ async function PageContent({
   const stageAction = calibrationChosen && !homepage.weeklyCall.policyOverrideActive
     ? homepage.weeklyCall.stageScopedAdjustments?.[activeStage]?.actionNow
     : undefined;
-  /* The guidance's resume line: the lead area's, as /trust and every paste print it. */
+  /* The guidance's restart line: the lead area's, as /trust and every paste print it. */
   const leadResumeCondition = homepage.weeklyDecisionCardModel.decision.actionStripItems?.[0]?.reversalCondition;
   const decisionPickerOptions: DecisionPickerOption[] = decisionAreaOrder.flatMap((area) => {
     const row = homeAreaRows.find((candidate) => candidate.area === area);
@@ -572,6 +572,20 @@ async function PageContent({
     ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null, omitReason: true } }
     : trustStripProps;
 
+  const periodControl = (
+    <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
+            <WeekStepper
+              previousHref={prevWeekHref}
+              nextHref={nextWeekHref}
+              previousLabel="Previous month"
+              nextLabel={nextHistoricalRequest ? "Next month" : "This week"}
+              currentDateLabel={periodLabel}
+              isHistorical={Boolean(historicalSelection)}
+              history={regimeHistory}
+            />
+    </div>
+  );
+
   return (
     <Shell regime={regime}>
       <BriefArtifactScript artifact={briefArtifact} />
@@ -612,6 +626,7 @@ async function PageContent({
             rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
           />
           <ConditionsLegend
+            compact
             arrival={arrivedFromShare ? "share" : undefined}
             /* On an archived week too (2026-10-27): the sentence is as true of March 2020
                as of this week, a first visit can arrive on a shared archive link, and
@@ -624,17 +639,7 @@ async function PageContent({
           {/* Browse the week before the call. Horizon and confidence details
               follow the call beside Copy Brief, so wrapping controls cannot
               push the reading below the first phone viewport. */}
-          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
-            <WeekStepper
-              previousHref={prevWeekHref}
-              nextHref={nextWeekHref}
-              previousLabel="Previous month"
-              nextLabel={nextHistoricalRequest ? "Next month" : "This week"}
-              currentDateLabel={periodLabel}
-              isHistorical={Boolean(historicalSelection)}
-              history={regimeHistory}
-            />
-          </div>
+          {historicalSelection ? periodControl : null}
           {/* Under the stepper, not above the page (2026-10-27): inserted above, the
               band pushed the key a reader had just pressed 142px down on a desktop and
               150–216px on a phone, so stepping back a second month meant finding it
@@ -684,6 +689,7 @@ async function PageContent({
               })}
             >
               <DecisionHero
+                periodControl={historicalSelection ? undefined : periodControl}
                 weeklyCall={cardCall.action}
                 callDetail={historicalSelection ? undefined : whyLine}
                 regime={regime}
@@ -705,6 +711,8 @@ async function PageContent({
                     trail={conditionsTrail.points}
                     trailCaption={conditionsTrail.caption}
                     caveat={conditionsTrail.caveat}
+                    compact
+                    detailsOpen={searchParams?.chart === "1"}
                     footer={
                       <Link
                         href="/trust#formula-reference"
@@ -765,13 +773,13 @@ async function PageContent({
                   first visit it folds with the brief: on a phone it pushed the
                   decision picker under the tab bar, and that question is the
                   one thing a first visit is asked. */}
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+              <div className="weather-brief-actions mt-4 flex flex-wrap items-center justify-between gap-3">
                 <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
                 {/* Labelled: three bare words beside Copy Brief did not say they
                     set the horizon the guidance is stated for. The confidence chip
                     that sat between them repeated the trust strip on the card. */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-fluid-xs text-slate-400">Plan horizon</span>
+                  <span className="max-sm:sr-only text-fluid-xs text-slate-400">Plan horizon</span>
                   <CadenceSelector />
                 </div>
               </div>
@@ -839,6 +847,8 @@ async function PageContent({
                 row says which of its lines moved. Only a read with nothing to
                 compare says so over it. */}
             <WhatChangedSection
+              compact
+              historyOpen={searchParams?.inputs === "1"}
               heading={`What changed ${basis.since}`}
               rows={signalChangeRows}
               history={{
@@ -852,7 +862,7 @@ async function PageContent({
               basis={basis}
             />
 
-            {/* 6. What would change the guidance: its pause and resume lines, the
+            {/* 6. What would change the guidance: its pause and restart lines, the
                 line where conditions change, and where the reading sits. */}
             <WhatWouldChangeSection
               ladders={scoreLadders}
