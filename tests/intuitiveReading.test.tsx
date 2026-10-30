@@ -44,15 +44,15 @@ describe("the card ties the weather word to the areas", () => {
 });
 
 describe("each ladder says which way is worse", () => {
-  it("reads the direction off the pause and resume lines", () => {
+  it("reads the direction off the pause and restart lines", () => {
     const pressure = renderToStaticMarkup(
       <ScoreLadder label="Funding pressure" value={90} lines={[{ kind: "pause", value: 76 }, { kind: "resume", value: 66 }, { kind: "callChange", value: 70 }]} />,
     );
-    assert.match(pressure, /data-ladder-direction="higher"[^>]*>higher is worse</);
+    assert.ok(pressure.includes('data-ladder-direction="higher"') && pressure.includes("(higher is worse)"));
     const appetite = renderToStaticMarkup(
       <ScoreLadder label="Risk appetite" value={58} lines={[{ kind: "pause", value: 44 }, { kind: "resume", value: 54 }, { kind: "callChange", value: 50 }]} />,
     );
-    assert.match(appetite, /data-ladder-direction="lower"[^>]*>higher is better</);
+    assert.ok(appetite.includes('data-ladder-direction="lower"') && appetite.includes("(higher is better)"));
     const bare = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={90} lines={[{ kind: "callChange", value: 70 }]} />);
     assert.doesNotMatch(bare, /data-ladder-direction/, "a ladder without both lines does not guess");
   });

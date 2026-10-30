@@ -98,7 +98,7 @@ describe("buildWeeklyLockCommitment across the four conditions", () => {
     buildWeeklyLockCommitment({ regime, tightnessRegime: 70, riskAppetiteRegime: 50, confidenceDegraded: false, freshnessDegraded: false })
       .flipConditions;
 
-  it("names the lines each quadrant leaves by, never a pause or resume line", () => {
+  it("names the lines each quadrant leaves by, never a pause or restart line", () => {
     assert.deepEqual(exits("SCARCITY"), ["Funding pressure at or below 70", "Risk appetite above 50"]);
     assert.deepEqual(exits("DEFENSIVE"), ["Funding pressure at or below 70", "Risk appetite at or below 50"]);
     assert.deepEqual(exits("VOLATILE"), ["Funding pressure above 70", "Risk appetite above 50"]);

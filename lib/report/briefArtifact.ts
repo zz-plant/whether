@@ -305,7 +305,7 @@ export const MONDAY_AGENDA_STEPS: readonly {
   prompt: string;
 }[] = [
   { id: "changed", label: "What changed", minutes: 1, prompt: "Read the guidance and what moved since last Monday." },
-  { id: "thresholds", label: "Check the lines", minutes: 1, prompt: "The pause line and the resume line, against this week's scores." },
+  { id: "thresholds", label: "Check the lines", minutes: 1, prompt: "The pause line and the restart line, against this week's scores." },
   { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of its pause line?" },
 ];
 
@@ -468,7 +468,7 @@ const formatAgenda = (artifact: BriefArtifact, origin: string) =>
  * copy. The routes now build a `BriefDocument` and come through here too.
  *
  * The flip conditions (`clearsWhen`) print under their own name, not as the
- * resume line: they are the other things that would change the guidance, and on
+ * restart line: they are the other things that would change the guidance, and on
  * a held week they include why it is held.
  */
 export const briefArtifactToSlidePayload = (

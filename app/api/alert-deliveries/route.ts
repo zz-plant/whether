@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getRegimeAlertRepository } from "../../../lib/storage/regimeAlertRepository";
 import { runScheduledAlertDelivery } from "../../../lib/alert/alertDelivery";
 import { requireCronAuth } from "../../../lib/api/cronAuth";
+import { resolveEmailBaseUrl } from "../../../lib/email/publicBaseUrl";
 
 export const runtime = "edge";
 
@@ -58,7 +59,7 @@ export async function POST(request: Request) {
   if (authError) return authError;
 
   try {
-    const result = await runScheduledAlertDelivery();
+    const result = await runScheduledAlertDelivery({ baseUrl: resolveEmailBaseUrl(request) });
 
     if (result.refused) {
       /* Nothing stored and the report read served the bundled copy: nothing was

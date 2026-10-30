@@ -9,6 +9,8 @@ import { ConditionIcon } from "./ui/conceptIcons";
 type Props = {
   /** The call, as the page's heading. Absent on a read that produced no live call. */
   weeklyCall?: string;
+  /** Live week navigation shares the card header instead of occupying a separate band. */
+  periodControl?: ReactNode;
   /** The longer sentence behind the call; printed only when it says more than the call does. */
   callDetail?: string;
   regime: string;
@@ -86,6 +88,7 @@ type Props = {
  */
 export function DecisionHero({
   weeklyCall,
+  periodControl,
   callDetail,
   regime,
   direction,
@@ -123,13 +126,14 @@ export function DecisionHero({
             height and the trust row sits at its foot, so the call is not left
             floating over an empty band. */}
         <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-8" : undefined}>
-        <div className="flex min-w-0 flex-col gap-3 sm:gap-4">
+        <div className="flex min-w-0 flex-col gap-2 sm:gap-3">
         {/* The kicker: the regime stamp, then what the week did — its direction
             and, on a week conditions moved, what they were. The regime's
             meaning is the line under the call, not this one: on the eyebrow it
             ran four facts together ("hard to raise · Tightening this week ·
             Was Cloudy on Sep 30") ahead of the call they lead into. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          {periodControl ? <div className="weather-hero-period">{periodControl}</div> : null}
           <span className="type-stamp weather-tag-placard inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-semibold">
             {/* The weather the word names, beside it. An unknown regime prints
                 its word alone: the sun it used to fall back to claimed a
@@ -234,6 +238,7 @@ export function DecisionHero({
             regime={regime}
             href="/trust"
             phoneLayout="line"
+            compactLabels={Boolean(periodControl)}
             className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4 md:mt-auto"
           />
         ) : null}

@@ -36,7 +36,7 @@ type WeeklyMandateEnvelope = {
  * so a card states the same change line as the brief. It used to print the
  * posture state's lock-commitment line as "Conditions change if" — a different
  * line from the brief's — and its other flip conditions, one of which ended
- * "tighten again", under "Resume when". The posture state still supplies what
+ * "tighten again", under "Restart when". The posture state still supplies what
  * the document does not carry: when conditions last changed and why, and the
  * structured flip data the JSON keeps (`nextFlip`). A missing posture state
  * used to be filled with "Check again after the next update."; the route

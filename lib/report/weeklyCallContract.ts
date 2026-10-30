@@ -56,7 +56,7 @@ export type WeeklyCallContract = {
 type HomeBriefModel = ReturnType<typeof buildHomeBriefModel>;
 
 /**
- * The call-change line and, when a stage set one, the resume line — each under
+ * The call-change line and, when a stage set one, the restart line — each under
  * its own label. Every surface that prints the contract's reversal side reads
  * this, so the two cannot be merged back under one name by a renderer.
  */
@@ -269,7 +269,7 @@ const buildStageScopedAdjustments = ({
  * not build the call: it projects the stored `OperatingSnapshot`, whose call is
  * stage-agnostic by construction (the cron has no reader). Projecting it as-is
  * meant a reader who had chosen a stage got the stored action, pause and no
- * resume line whenever the store had a snapshot — every live read — and the
+ * restart line whenever the store had a snapshot — every live read — and the
  * calibrated copy only when it did not. The stage adjustments depend on nothing
  * but the scores and thresholds, which the stored assessment carries, so they
  * are recomputed here and the stored call-change line is kept untouched.
@@ -302,7 +302,7 @@ export const applyStageToWeeklyCall = (
     ? {
         actionNow: stageAdj.actionNow,
         pauseIf: stageAdj.pauseIf,
-        // A held call has one resume line, the override's own; a stage's
+        // A held call has one restart line, the override's own; a stage's
         // discipline would be a second, competing one.
         resumeWhen: stageAdj.resumeWhen,
         doNowBullets: dedupeLines(stageAdj.doNowBullets, 3),

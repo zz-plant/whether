@@ -181,8 +181,8 @@ describe("near-duplicate audit", () => {
   it("keeps same-route sentence pairs when asked, and skips what the caller rules out", () => {
     const unit = (file: string, text: string): CodeUnit => ({ file, name: text, line: 1, text });
     const embedded = [
-      { unit: unit("/operate", "Resume line A and B"), vector: [1, 0] },
-      { unit: unit("/operate", "Resume line B and A"), vector: [1, 0.05] },
+      { unit: unit("/operate", "Restart line A and B"), vector: [1, 0] },
+      { unit: unit("/operate", "Restart line B and A"), vector: [1, 0.05] },
       { unit: unit("/history", "Freezing week of Sep 29"), vector: [0, 1] },
       { unit: unit("/history", "Freezing week of Sep 22"), vector: [0.02, 1] },
     ];
@@ -191,7 +191,7 @@ describe("near-duplicate audit", () => {
     assert.equal(nearestPairs(embedded, 0.9, 10).length, 0);
     assert.deepEqual(
       nearestPairs(embedded, 0.9, 10, { sameFile: true, skip }).map(({ a, b }) => `${a.name}~${b.name}`),
-      ["Resume line A and B~Resume line B and A"],
+      ["Restart line A and B~Restart line B and A"],
     );
   });
 

@@ -16,7 +16,7 @@ export type TrustStripProps = {
   recordDateLabel: string;
   /** True when every source answered live for this reading. */
   sourcesLive: boolean;
-  /** One phrase for the sources cell, e.g. "All sources live" or "Cached snapshot from Sep 12". */
+  /** One phrase for the sources cell, e.g. "All sources live" or "Saved copy from Sep 12". */
   sourcesLabel: string;
   /** The published band (the API's `confidence`); it sets the margin cell's tone. */
   confidenceLabel: "HIGH" | "MED" | "LOW";
@@ -55,6 +55,8 @@ export type TrustStripProps = {
    *  /trust is one tap away. The margin cell always prints, because it says
    *  whether the call could change next week. */
   phoneLayout?: "grid" | "line";
+  /** On a phone artifact, the values explain themselves; retain secondary labels for assistive tech. */
+  compactLabels?: boolean;
   /** The reading's regime. With it, the margin names the conditions across the nearer line. */
   regime?: string;
   className?: string;
@@ -88,6 +90,7 @@ export function TrustStrip({
   basis,
   href,
   phoneLayout = "grid",
+  compactLabels = false,
   regime,
   className = "",
 }: TrustStripProps) {
@@ -181,10 +184,10 @@ export function TrustStrip({
                 alone, so "Could change next week Risk appetite is 2 pts" ran together. */}
             {/* A label never wraps: beside a long value ("Scored on" before a warning) it
                 broke onto two lines and read as two labels. */}
-            <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>{cell.label}</dt>
+            <dt className={`${compactLabels && line && cell.label !== "Data as of" ? "max-sm:sr-only " : ""}${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>{cell.label}</dt>
             {line ? " " : null}
             {/* A state carries a mark as well as its ink (a lit dot when live, the
-                caveat diamond when not), so "Partly cached" and
+                caveat diamond when not), so "Some sources saved" and
                 "2 pts from its line" read as flags at a glance and survive a
                 greyscale screenshot. Each shape has one meaning across the site
                 (§XIV's mark vocabulary); a pseudo-element, so the cell's text is

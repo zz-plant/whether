@@ -46,7 +46,7 @@ describe("buildMonthlySummary", () => {
     assert.match(summary.copy, /PLANNING LANGUAGE TO USE/);
     assert.match(summary.copy, /\nNEXT ACTIONS\n/);
     assert.match(summary.copy, /MONTHLY OPERATING RULES/);
-    assert.match(summary.copy, /RESUME LINES/);
+    assert.match(summary.copy, /RESTART LINES/);
     assert.match(summary.copy, /EXECUTION CONSTRAINTS\n\n• /);
     assert.match(summary.copy, /\n\nSource: /);
     assert.doesNotMatch(summary.copy, /Source:\nSource:/);
@@ -67,9 +67,9 @@ describe("buildMonthlySummary", () => {
    * TOP REVERSALS said "Restart paused work once the next reading confirms
    * conditions held." In Freezing, conditions holding is the reason the work is
    * paused, so the line told the reader to restart while still frozen. It names
-   * the resume lines now, the same numbers as the operating rule above it.
+   * the restart lines now, the same numbers as the operating rule above it.
    */
-  it("restarts paused work at the resume lines, not when conditions merely held", () => {
+  it("restarts paused work at the restart lines, not when conditions merely held", () => {
     const freezing = assessAt(4.2, 4.2);
     assert.equal(freezing.regime, "SCARCITY");
     assert.equal(freezing.diagnostics.transitionWatch, true);
@@ -85,7 +85,7 @@ describe("buildMonthlySummary", () => {
     );
     assert.doesNotMatch(summary.copy, /conditions held/);
 
-    // Stormy runs its own rules, each with its own resume line; the reversal names both.
+    // Stormy runs its own rules, each with its own restart line; the reversal names both.
     const stormy = assessAt(3.8, 4.2);
     assert.equal(stormy.regime, "VOLATILE");
     assert.equal(stormy.diagnostics.transitionWatch, true);

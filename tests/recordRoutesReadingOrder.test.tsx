@@ -140,7 +140,7 @@ describe("/trust carries one trust strip", () => {
   });
 
   /* The ladders are the brief's (2026-10-27): this section drew the same two, with the
-     same pause, change and resume lines, and links to them now. */
+     same pause, change and restart lines, and links to them now. */
   it("opens the formula section on a link to where the scores sit, not a second pair of ladders", async () => {
     const page = await import("../app/trust/page");
     const html = renderToStaticMarkup(await page.default({}));

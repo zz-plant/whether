@@ -1,5 +1,6 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
 import { emailTextFooter, escapeHtml, renderEmailShell } from "./emailShell";
+import { resolveEmailBaseUrl } from "./publicBaseUrl";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { assessSnapshotReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
@@ -9,7 +10,6 @@ import { formatDocumentMargin } from "../export/exportTerms";
 import { MARGIN_LABEL, publicDecisionLabels } from "../report/reportFormatting";
 import { weeklyHeadline } from "../report/reportEvidence";
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
-import { siteUrl } from "../siteUrl";
 import { fanOut } from "../delivery/fanOut";
 import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 import type { BriefDocument } from "../report/briefArtifact";
@@ -150,8 +150,15 @@ export const sendWeeklyBrief = async (options?: {
   now?: Date;
   /** Send to subscribers who already had this week's brief. The manual route's explicit opt-in; the cron never passes it. */
   force?: boolean;
+  /**
+   * The origin this send's links carry. A request-triggered run passes the host
+   * it arrived on, so a preview's subscribers get a preview link they can use;
+   * the cron passes nothing and gets the production origin.
+   */
+  baseUrl?: string;
 }): Promise<SendWeeklyBriefResult> => {
   const now = options?.now ?? new Date();
+  const baseUrl = options?.baseUrl ?? resolveEmailBaseUrl();
   const subscriptions = await getActiveSubscriptions();
   const adapter = createCloudflareEmailAdapter();
   const deliveryMode = adapter.mode ?? "live";
@@ -220,11 +227,11 @@ export const sendWeeklyBrief = async (options?: {
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
         ? `Whether — ${regimeLabel}: ${headline.action}`
         : `Whether Brief — ${regimeLabel}`;
-      const briefUrl = siteUrl;
+      const briefUrl = baseUrl;
       /* The lines above are the published ones. The use the record fits is a plan's
          own lines and an email the day one is crossed, and this is the one page
          every subscriber opens each week. */
-      const planLinesUrl = `${siteUrl}/operate#ops-plan-lines`;
+      const planLinesUrl = `${baseUrl}/operate#ops-plan-lines`;
       const isContraction = regime === "SCARCITY" || regime === "DEFENSIVE";
 
       const text = [
@@ -239,7 +246,7 @@ export const sendWeeklyBrief = async (options?: {
         `Set these lines for your own plan and we'll email you the day one is crossed: ${planLinesUrl}`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
-        ...emailTextFooter(recipient.token),
+        ...emailTextFooter(recipient.token, baseUrl),
       ].join("\n");
 
       /* Regime-adaptive email */
@@ -279,6 +286,7 @@ export const sendWeeklyBrief = async (options?: {
           ...sections,
         ].join("\n"),
         unsubscribeToken: recipient.token,
+        baseUrl,
       });
 
       const result = await adapter.send({ to: recipient, subject, html, text });

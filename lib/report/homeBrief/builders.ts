@@ -515,7 +515,7 @@ export const buildHomeBriefModelInternal = (
       ? startupVariantPolicy.adjustmentsByMode[startupVariantMode]?.doNowAdjustments[0]?.trim()
         || actionNowShort?.trim()
       : actionNowShort?.trim();
-  /* The lines still to cross, per area: a held area's resume lines it has not
+  /* The lines still to cross, per area: a held area's restart lines it has not
      met, an open area's pause lines. Until 2026-10-21 this was every resume
      line, met or not, so the week of Oct 19 (risk appetite 55) listed "Risk
      appetite > 54" under "Other things that would change this guidance", and a
@@ -575,7 +575,7 @@ export const buildHomeBriefModelInternal = (
     areas: areaLinesFromRules(decisionRules),
   });
   /* What the week did to the guidance, for every line that says nothing changed:
-     the conditions word, then the pause and resume lines, never the latitude. */
+     the conditions word, then the pause and restart lines, never the latitude. */
   const guidanceChange = describeGuidanceChange({
     movement: decisionMovement,
     regimeChanged: reportDynamics?.regimeChanged,

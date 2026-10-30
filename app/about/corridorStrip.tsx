@@ -4,13 +4,13 @@ import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
  * The three lines of one decision, drawn on the axis they share.
  *
  * The method's worked example states its three numbers in prose, but the thing
- * the numbers *are* — a pause line past the change line, a resume line inside
+ * the numbers *are* — a pause line past the change line, a restart line inside
  * it, and the hold between them — has shape. Until now a reader who wanted the
  * geometry had to hold three sentences against each other; `ScoreLadder` draws
  * a reading against these lines, but a method has no reading to put on the
  * track. This is the drawing for that case: no dot, the three marks, and the
  * band between resume and pause shaded, because the band is the method's point
- * (the pause line without the resume line is a permanent stop, not a pause).
+ * (the pause line without the restart line is a permanent stop, not a pause).
  *
  * Every label and colour comes from the same sources the rest of the product
  * labels these lines with: the noun slots and `watch.changeLine` from

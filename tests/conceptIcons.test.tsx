@@ -131,7 +131,7 @@ describe("where a line stands", () => {
     assert.equal(resolveLineState(undefined, "pause", false), undefined);
   });
 
-  it("gives a resume line a state only once it is met", () => {
+  it("gives a restart line a state only once it is met", () => {
     assert.equal(resolveLineState(0, "resume", true), "clear");
     assert.equal(resolveLineState(3, "resume", false), undefined);
   });
@@ -452,7 +452,7 @@ describe("text that leaves the site carries no glyph", () => {
       name: `share: ${format.label}`,
       text: () => formatBriefArtifact(artifact, format.id, "https://whether.work"),
     })),
-    /* The meeting slide in its three forms, with a stage so the resume line prints. */
+    /* The meeting slide in its three forms, with a stage so the restart line prints. */
     { name: "slide markdown", text: () => formatMeetingSlideMarkdown(buildExportSlidePayload(exportSnapshot(), "seed")) },
     { name: "slide HTML", text: () => formatMeetingSlideHtml(buildExportSlidePayload(exportSnapshot(), "seed")), markup: true },
     { name: "slide SVG", text: () => formatMeetingSlideSvg(buildExportSlidePayload(exportSnapshot(), "seed")), markup: true },

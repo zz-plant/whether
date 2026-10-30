@@ -29,13 +29,13 @@ describe("buildSlackBrief", () => {
     assert.equal(slot(brief, "Do now"), "", "no second slot repeats the guidance");
     assert.equal(slot(brief, "Pause if"), weeklyCall.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), weeklyCall.callChangesIf);
-    for (const label of ["Pause if", "Resume when", "Conditions change if"]) {
+    for (const label of ["Pause if", "Restart when", "Conditions change if"]) {
       assert.ok(!assessment.constraints.includes(slot(brief, label)), `${label} is filled from the operating-constraints list`);
     }
     assert.doesNotMatch(brief, /start nothing new/);
   });
 
-  it("prints the pause line as its condition, and the lead area's resume line apart from the change line", () => {
+  it("prints the pause line as its condition, and the lead area's restart line apart from the change line", () => {
     const brief = buildSlackBrief(
       fixtureBriefDocument({
         weeklyCall: { ...fixtureWeeklyCall(), pauseIf: "Pause net-new hiring if funding pressure rises above 76" },
@@ -43,15 +43,15 @@ describe("buildSlackBrief", () => {
     );
 
     assert.match(brief, /^• Pause if: Funding pressure rises above 76$/m);
-    // Both resume lines hold at 12 / 68, and the line says so rather than reading as a move to come.
-    assert.match(brief, /^• Resume when: Funding pressure is below 66 and risk appetite is above 54\. Funding pressure is 12 and risk appetite is 68 now\.$/m);
-    assert.doesNotMatch(brief, /Pause if: Pause|Resume when: Resume/);
-    assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Resume when \/ Conditions change if\):/);
-    const order = ["• Guidance:", "• Pause if:", "• Resume when:", "• Conditions change if:"].map((label) => brief.indexOf(label));
+    // Both restart lines hold at 12 / 68, and the line says so rather than reading as a move to come.
+    assert.match(brief, /^• Restart when: Funding pressure is below 66 and risk appetite is above 54\. Funding pressure is 12 and risk appetite is 68 now\.$/m);
+    assert.doesNotMatch(brief, /Pause if: Pause|Restart when: Resume/);
+    assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Restart when \/ Conditions change if\):/);
+    const order = ["• Guidance:", "• Pause if:", "• Restart when:", "• Conditions change if:"].map((label) => brief.indexOf(label));
     assert.deepEqual([...order].sort((left, right) => left - right), order, "the slots print in the page's order");
   });
 
-  it("prints a held call's lines and no competing resume line", () => {
+  it("prints a held call's lines and no competing restart line", () => {
     const held = fixtureWeeklyCall({
       ...assessment,
       policyAssessment: {
@@ -66,7 +66,7 @@ describe("buildSlackBrief", () => {
     assert.equal(slot(brief, "Guidance"), joinSentences(hold.actionNow, hold.currentCall), "a held week's action leads");
     assert.equal(slot(brief, "Pause if"), hold.pauseIf);
     assert.equal(slot(brief, "Conditions change if"), hold.callChangesIf);
-    assert.equal(slot(brief, "Resume when"), "");
+    assert.equal(slot(brief, "Restart when"), "");
     assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Conditions change if\):/);
   });
 
@@ -74,12 +74,12 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(fixtureBriefDocument());
 
     // Each score carries what it means beside the number: a paste has no page to explain the scale.
-    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts away · resume line 66 \(already met\)$/m);
-    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts away · resume line 54 \(already met\)$/m);
+    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts away · restart line 66 \(already met\)$/m);
+    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts away · restart line 54 \(already met\)$/m);
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.
-    assert.match(brief, /Resume when: Funding pressure < 66 \(already met\) and the payback figures still hold/);
+    assert.match(brief, /Restart when: Funding pressure < 66 \(already met\) and the payback figures still hold/);
   });
 
   it("resolves its change-course cross-reference to a label it actually prints", () => {
@@ -166,12 +166,12 @@ describe("buildSlackBrief", () => {
     // Recovery from the Sep 25 reading: the sentence comes before the readings that are its evidence.
     assert.equal(
       lines[changed + 1],
-      "Since Aug 31, conditions changed from Freezing to Sunny. The resume line is now met for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. The restart line is now met for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
     );
     assert.match(lines[changed + 2] ?? "", /^Funding pressure 12 of 100 /);
 
     const uncompared = buildSlackBrief(fixtureBriefDocument());
-    assert.doesNotMatch(uncompared, /pause or resume line|resume line is now met|pause now applies/);
+    assert.doesNotMatch(uncompared, /pause or restart line|restart line is now met|pause now applies/);
   });
 
   it("keeps citation-ready source lines in exported briefs", () => {
@@ -194,7 +194,7 @@ describe("buildBoardSlideBullets", () => {
     const bullets = buildBoardSlideBullets(document);
     const brief = buildSlackBrief(document);
 
-    for (const label of ["Guidance", "Do now", "Pause if", "Resume when", "Conditions change if"]) {
+    for (const label of ["Guidance", "Do now", "Pause if", "Restart when", "Conditions change if"]) {
       assert.equal(slot(bullets, label), slot(brief, label), `${label} differs between the slide bullets and the Slack brief`);
     }
     assert.match(bullets, /^Funding pressure 12 of 100 /m);

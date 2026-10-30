@@ -124,10 +124,10 @@ describe("CadenceCallCard", () => {
     assert.match(html, /id="cadence-band-riskAppetite-monthly-title"/);
     assert.match(html, /Funding pressure: 61/);
     assert.match(html, /Risk appetite: 56/);
-    // Distance to each edge, named as the pause line and the resume line — the
+    // Distance to each edge, named as the pause line and the restart line — the
     // two names the rest of the page uses for the pair.
-    assert.ok(html.includes("15 points from the pause line · 5 from the resume line"));
-    assert.ok(html.includes("12 points from the pause line · 2 from the resume line"));
+    assert.ok(html.includes("15 points from the pause line · 5 from the restart line"));
+    assert.ok(html.includes("12 points from the pause line · 2 from the restart line"));
   });
 
   it("states a tripped edge rather than measuring zero distance to it", () => {

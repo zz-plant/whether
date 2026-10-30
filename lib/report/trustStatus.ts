@@ -348,7 +348,7 @@ export const buildCompactTrustSummary = ({
   }
 
   if (isFallbackSnapshot) {
-    return `Cached snapshot (${normalizedFreshness}). Live data is late; hold anything you can't undo until it lands.`;
+    return `Saved copy (${normalizedFreshness}). Live data is late; hold anything you can't undo until it lands.`;
   }
 
   if (confidenceLabel !== "HIGH") {
@@ -371,8 +371,8 @@ const DATA_STATUS_LABELS = {
    * date and may be partly cached. What is live is the sources — the badge
    * says so. */
   live: "All sources live",
-  partlyCached: "Partly cached",
-  cachedSnapshot: "Cached snapshot",
+  partlyCached: "Some sources saved",
+  cachedSnapshot: "Saved copy",
   historical: "Historical snapshot",
 } as const;
 

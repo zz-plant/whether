@@ -15,13 +15,13 @@
     {
       "slug": "30-day-confirmation-logic",
       "term": "30-day confirmation logic",
-      "definition": "A governance cadence where directional data must persist for roughly one operating month before capital posture changes are expanded or locked in.",
+      "definition": "A governance cadence where directional data must persist for roughly one operating month before capital discipline changes are expanded or locked in.",
       "boardPrompt": "Which indicators must confirm for 30 days before we increase commitments, and what do we do if confirmation fails?"
     },
     {
       "slug": "capital-regime",
       "term": "Capital regime",
-      "definition": "The current operating posture for capital allocation defined by cost of capital, demand reliability, and financing optionality rather than optimism bias.",
+      "definition": "The current operating guidance for capital allocation defined by cost of capital, demand reliability, and financing optionality rather than optimism bias.",
       "boardPrompt": "Given this capital regime, which commitments are mandatory, optional, deferred, or prohibited this quarter?"
     }
   ],

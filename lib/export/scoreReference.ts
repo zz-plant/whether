@@ -44,7 +44,7 @@ export type PreviousReading = ScorePair & {
 /** What each of the three lines is called in a paste. */
 const SCORE_LINE_LABELS = {
   pause: "pause line",
-  resume: "resume line",
+  resume: "restart line",
   callChange: "change line",
 } as const;
 
@@ -128,7 +128,7 @@ export type ScoreReadingParts = {
   distance: string;
   /** "was 63 on Aug 31", or "last week 63" where the source has no date; null without an earlier reading. */
   previous: string | null;
-  /** "resume line 66 (24 pts away)"; null without a rail that carries one. */
+  /** "restart line 66 (24 pts away)"; null without a rail that carries one. */
   resume: string | null;
 };
 
@@ -176,9 +176,9 @@ export const buildScoreReadings = ({
 /**
  * One line per score.
  *
- * `Funding pressure 12 of 100 (money is easy to raise) · pause line 76 · 64 pts below · was 15 on Aug 31 · resume line 66 (already met)`
+ * `Funding pressure 12 of 100 (money is easy to raise) · pause line 76 · 64 pts below · was 15 on Aug 31 · restart line 66 (already met)`
  *
- * With a rail the reference line is the pause line and the resume line follows
+ * With a rail the reference line is the pause line and the restart line follows
  * with its own distance, because "how close to re-opening" is the second thing
  * a reader decides on. Without one it is the call-change line, which is the
  * engine's threshold in force and always known.

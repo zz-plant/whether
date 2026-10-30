@@ -6,6 +6,7 @@ import { planLineEmail } from "../lib/alert/alertTemplates";
 import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
 import { escapeHtml } from "../lib/email/emailShell";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
+import { resolveEmailBaseUrl } from "../lib/email/publicBaseUrl";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
 import { liveMacroSeries } from "./fixtures/reportFixtures";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
@@ -171,6 +172,11 @@ describe("the shared email shell, on production", () => {
       PRODUCTION_SHELL_FOOTER.map((line) => line.replace("TOKEN", encodeURIComponent(subscriber.token))),
     );
     assert.match(message.text, /\n---\nWhether · weekly operating brief\nUnsubscribe: https:\/\/whether\.work\/api\/email\/unsubscribe\?token=\S+$/);
+
+    /* Gmail clips a message over 102 KB, and a clipped brief ends in a "View
+       entire message" link instead of the footer. The rendered brief is the one
+       thing that leaves the building weekly, so the ceiling is a test. */
+    assert.ok(message.html.length < 100_000, `the brief's HTML is ${message.html.length} bytes; Gmail clips past 102 KB`);
   });
 
   /* A source read, because on production the two are the same string. */
@@ -180,9 +186,65 @@ describe("the shared email shell, on production", () => {
       "lib/email/sendWeeklyBrief.ts",
       "lib/alert/alertTemplates.ts",
       "lib/alert/monthEndPulse.ts",
+      "lib/email/publicBaseUrl.ts",
     ]) {
       const source = readFileSync(new URL(`../${file}`, import.meta.url), "utf8");
       assert.doesNotMatch(source, /https:\/\/whether\.work/, `${file} resolves its links through lib/siteUrl`);
+    }
+  });
+});
+
+describe("the shared email shell, on a deployment that is not production", () => {
+  const previewOrigin = "https://abc123-whether.example.workers.dev";
+
+  it("points every link at the host the send came from", () => {
+    const { html, text } = planLineEmail({ headline: "PH", body: "PB" }, "tok", previewOrigin);
+
+    assert.match(html, new RegExp(`href="${previewOrigin.replace(/\./g, "\\.")}"`), "the brief button carries the send's origin");
+    assert.match(html, /abc123-whether\.example\.workers\.dev\/api\/email\/unsubscribe\?token=tok/, "the footer link reaches the deployment that sent it");
+    assert.doesNotMatch(html, /https:\/\/whether\.work/, "no link in the mail points at production");
+    assert.match(text, /Unsubscribe: https:\/\/abc123-whether\.example\.workers\.dev\/api\/email\/unsubscribe\?token=tok/);
+  });
+
+  it("carries the send's host through the weekly brief", async () => {
+    resetSubscriberStore();
+    const store = getSubscriberStore();
+    const subscriber = await store.subscribe("preview@example.com");
+    await store.verifyEmail(subscriber.confirmToken ?? "");
+
+    const now = new Date("2026-08-31T12:00:00.000Z");
+    const snapshot = buildOperatingSnapshot({
+      treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
+      macroSeries: liveMacroSeries,
+      now,
+    });
+
+    const mail = captureMail();
+    try {
+      await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now, baseUrl: previewOrigin });
+    } finally {
+      mail.restore();
+    }
+
+    const [message] = mail.sent;
+    assert.ok(message);
+    assert.match(message.html, /abc123-whether\.example\.workers\.dev\/api\/email\/unsubscribe\?token=/, "the footer link reaches the deployment that sent it");
+    assert.match(message.text, /https:\/\/abc123-whether\.example\.workers\.dev\/operate#ops-plan-lines/, "the plan-lines link stays on the deployment");
+    assert.doesNotMatch(message.text, /https:\/\/whether\.work/, "no link in the brief points at production");
+  });
+
+  it("takes the origin from a trusted request host and ignores a forged one", () => {
+    const configured = [process.env.APP_BASE_URL, process.env.NEXT_PUBLIC_APP_URL];
+    delete process.env.APP_BASE_URL;
+    delete process.env.NEXT_PUBLIC_APP_URL;
+    try {
+      assert.equal(resolveEmailBaseUrl(new Request("http://localhost:8787/api/email/send-weekly")), "http://localhost:8787");
+      assert.equal(resolveEmailBaseUrl(new Request(`${previewOrigin}/api/email/send-weekly`)), previewOrigin);
+      assert.equal(resolveEmailBaseUrl(new Request("https://evil.example/api/email/send-weekly")), siteUrl, "a forged Host header cannot choose the link target");
+      assert.equal(resolveEmailBaseUrl(), siteUrl, "a cron send has no request and keeps the production origin");
+    } finally {
+      if (configured[0] !== undefined) process.env.APP_BASE_URL = configured[0];
+      if (configured[1] !== undefined) process.env.NEXT_PUBLIC_APP_URL = configured[1];
     }
   });
 });

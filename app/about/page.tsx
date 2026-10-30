@@ -27,9 +27,9 @@ import { ContentPageShell } from "../components/ui/contentPageShell";
 import { MethodSection } from "./methodSection";
 
 export const metadata: Metadata = buildPageMetadata({
-  title: "About Whether",
+  title: "How Whether works",
   description:
-    "How Whether sets pause and resume lines for startup decisions, who writes it, and where its data comes from.",
+    "How Whether sets pause and restart lines for startup decisions, who writes it, and where its data comes from.",
   path: publisherProfilePath,
   imageAlt: "About Whether",
 });
@@ -62,7 +62,7 @@ export default function AboutPage() {
       <JsonLdScript data={structuredData} />
 
       <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5 sm:px-6 sm:py-6">
-        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">About Whether</h1>
+        <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">How Whether works</h1>
         <p className="text-sm text-slate-300">
           Whether publishes free weekly operating guidance for startup leaders, based on interest rates and credit conditions.
         </p>
@@ -71,8 +71,8 @@ export default function AboutPage() {
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">How it works</h2>
         <p className="text-sm text-slate-300">
-          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a pause line and a resume line.
-          Set the lines when you make a plan. Because the pause and resume lines are apart, a small move back
+          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a pause line and a restart line.
+          Set the lines when you make a plan. Because the pause and restart lines are apart, a small move back
           across the pause line doesn&rsquo;t restart anything.
         </p>
         <p className="text-sm text-slate-300">

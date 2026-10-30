@@ -228,7 +228,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.decisionShiftSummary, /^Conditions held steady this week; no pause or resume line was crossed\. Last week's guidance stands\./);
+    assert.match(model.decisionShiftSummary, /^Conditions held steady this week; no pause or restart line was crossed\. Last week's guidance stands\./);
     assert.match(model.decisionShiftSummary, /Conditions change if:/);
     assert.equal(model.decisionMovement?.moved.length, 0);
     assert.equal(model.decisionRules.length, 5);
@@ -538,7 +538,7 @@ describe("buildHomeBriefModel", () => {
     });
 
     assert.equal(model.decisionMatrix.columns.length, 3);
-    assert.deepEqual(model.decisionMatrix.columns.map((column) => column.label), ["Approve", "Delay", "Resume when"]);
+    assert.deepEqual(model.decisionMatrix.columns.map((column) => column.label), ["Approve", "Delay", "Restart when"]);
     assert.equal(model.decisionMatrix.rows.length, 4);
 
     for (const row of model.decisionMatrix.rows) {

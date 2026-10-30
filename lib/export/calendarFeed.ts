@@ -124,7 +124,7 @@ export const buildBriefCalendarFeed = (briefs: readonly PublishedBrief[], now: D
         stamp: now,
         monday: nextMonday,
         summary: "Whether: this week's guidance is out",
-        description: `The week's conditions, guidance, and pause and resume lines.\n\n${buildCanonicalUrl("/")}`,
+        description: `The week's conditions, guidance, and pause and restart lines.\n\n${buildCanonicalUrl("/")}`,
         url: buildCanonicalUrl("/"),
       });
 

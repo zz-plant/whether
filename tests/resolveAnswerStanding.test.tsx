@@ -40,7 +40,7 @@ describe("an answer's standing this week", () => {
         areaRows: ROWS,
         conditionsLabel: "Freezing",
       }),
-      { kind: "area", text: "Past its pause line", crossed: true, state: "crossed" },
+      { kind: "area", text: "On hold", crossed: true, state: "crossed" },
     );
     assert.deepEqual(
       describeAnswerStanding({
@@ -48,7 +48,7 @@ describe("an answer's standing this week", () => {
         areaRows: ROWS,
         conditionsLabel: "Freezing",
       }),
-      { kind: "area", text: "4 pts from its pause line", crossed: false, state: "near" },
+      { kind: "area", text: "4 pts from pausing", crossed: false, state: "near" },
     );
   });
 

@@ -104,7 +104,7 @@ describe("buildGuardrailTagBlocks", () => {
     },
   ];
 
-  it("builds one block per business area, each carrying the conditions, the pause and resume lines and what would change the guidance", () => {
+  it("builds one block per business area, each carrying the conditions, the pause and restart lines and what would change the guidance", () => {
     const blocks = buildGuardrailTagBlocks({
       actionStripItems: items,
       postureLabel: "Cloudy",
@@ -117,14 +117,14 @@ describe("buildGuardrailTagBlocks", () => {
       assert.match(block.markdown, /\*\*Conditions:\*\* Cloudy/);
       assert.match(block.markdown, /\*\*Action now:\*\* /);
       assert.match(block.markdown, /\*\*Pause if:\*\* /);
-      assert.match(block.markdown, /\*\*Resume when:\*\* /);
+      assert.match(block.markdown, /\*\*Restart when:\*\* /);
       assert.match(block.markdown, /Week of Mar 2, 2026/, "the week by its Monday");
     }
     assert.match(blocks[0].markdown, /Hold speculative hiring\./);
     // The area heads the block, so the lines under it carry only their condition.
     assert.match(blocks[0].markdown, /^\*\*Hiring\*\*$/m);
     assert.match(blocks[0].markdown, /\*\*Pause if:\*\* Net-new hiring above 56$/m);
-    assert.doesNotMatch(blocks[0].markdown, /Pause if:\*\* Pause|Resume when:\*\* Resume/);
+    assert.doesNotMatch(blocks[0].markdown, /Pause if:\*\* Pause|Restart when:\*\* Resume/);
     assert.match(blocks[1].markdown, /Keep expansion bets reversible\./);
   });
 

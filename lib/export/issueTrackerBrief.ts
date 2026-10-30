@@ -87,7 +87,7 @@ export const buildIssueTrackerMarkdownBrief = (
  * This is the credential-free slice of the Linear/Jira sync: no tokens are
  * stored and nothing is written to the tracker — the operator copies one block
  * per area into the card description, and the card now carries the conditions,
- * the area's pause and resume lines, and what would change the guidance. The
+ * the area's pause and restart lines, and what would change the guidance. The
  * block uses the same bounded-rule fields the Slack brief and the hero print, so
  * a card cannot state a threshold the weekly call does not.
  */
@@ -125,7 +125,7 @@ export const buildGuardrailTagBlocks = ({
     label: item.label,
     ownerLabel: item.ownerLabel,
     markdown: [
-      /* The pause and resume lines below name only their condition, so the area
+      /* The pause and restart lines below name only their condition, so the area
          they belong to heads the block. */
       `**${decisionAreaLabel(operatingLeverToDecisionArea[item.lever])}**`,
       `**Conditions:** ${postureLabel}`,

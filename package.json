@@ -30,6 +30,8 @@
     "review:comment-trends:update": "bun scripts/review-comment-trends.mjs --repo zz-plant/whether --limit 200 --out docs/research/review-comment-trends.latest.json --summary-out docs/research/review-comment-trends.latest.md",
     "review:hotspot-preflight": "bun scripts/review-hotspot-preflight.mjs",
     "check:landmarks": "node scripts/check-main-content-landmarks.mjs",
+    "e2e:email": "node scripts/e2e/email-flows.mjs",
+    "email:test": "node scripts/e2e/email-live.mjs",
     "eval:cold-reader": "bun scripts/evals/cold-reader.ts",
     "eval:evidence-retrieval": "bun scripts/evals/evidence-retrieval.ts",
     "agent:doctor": "node scripts/agent-workflow.mjs doctor",

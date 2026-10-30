@@ -119,7 +119,7 @@ const formatSignedScore = (value: number) =>
 
 /**
  * The two distances a rail carries, as points from the pause line and from the
- * resume line — the two names the rest of the page uses for the pair. An
+ * restart line — the two names the rest of the page uses for the pair. An
  * earlier version chipped the edges with the contract labels ("5 to Pause if ·
  * Change course if short by 3"), which read as a sentence with its verbs
  * missing.
@@ -135,8 +135,8 @@ export const formatBandHeadroom = (band: HorizonSignalBand): string => {
   const toPause = `${formatScore(band.toPause)} points from the pause line`;
 
   return band.resumeHolds
-    ? `${toPause} · ${formatScore(band.toResume)} from the resume line`
-    : `${toPause} · ${formatScore(band.toResume)} short of the resume line`;
+    ? `${toPause} · ${formatScore(band.toResume)} from the restart line`
+    : `${toPause} · ${formatScore(band.toResume)} short of the restart line`;
 };
 
 /** The reading itself, and the move that produced it. Null movement stays null rather

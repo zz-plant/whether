@@ -118,13 +118,13 @@ describe("the record basis", () => {
   });
 
   it("names an area's line when the inputs left out would cross no change line, and says nothing when they cross none", () => {
-    /* A 0.6% curve: risk appetite 64 on the record; the curated reads take 11, to 53, under the resume line at 54. */
+    /* A 0.6% curve: risk appetite 64 on the record; the curated reads take 11, to 53, under the restart line at 54. */
     const steeper = { ...OCT_7, yields: { ...OCT_7.yields, tenYear: 5.39 } };
     const resumeOnly = resolveScoringBasis({
       engineVersion: ENGINE_VERSION,
       assessment: evaluateRegime(steeper, DEFAULT_THRESHOLDS, STARTUP_READS),
     });
-    assert.equal(resumeOnly.warning, "Startup-market inputs would put risk appetite at 53, below the resume line for Hiring, Roadmap, Fundraising and New bets.");
+    assert.equal(resumeOnly.warning, "Startup-market inputs would put risk appetite at 53, below the restart line for Hiring, Roadmap, Fundraising and New bets.");
 
     /* A 1.2% curve: risk appetite 88; less 11 is 77, past no line the published score is not past. */
     const steep = { ...OCT_7, yields: { ...OCT_7.yields, tenYear: 5.99 } };

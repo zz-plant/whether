@@ -79,7 +79,7 @@ const scoringBasisSchema = z
     warning: z
       .string()
       .nullable()
-      .describe("What the inputs left out would do, when they would put a score past a change, pause or resume line the published score is not past. Null otherwise."),
+      .describe("What the inputs left out would do, when they would put a score past a change, pause or restart line the published score is not past. Null otherwise."),
     notCounted: z
       .array(
         z.object({
@@ -141,13 +141,13 @@ export const agentStateSchema = z.object({
     summary: z
       .string()
       .nullable()
-      .describe("What the change did to the decisions, in one sentence: which areas' pause or resume lines were crossed since `comparedWith`, or that none were. Null when nothing was compared."),
+      .describe("What the change did to the decisions, in one sentence: which areas' pause or restart lines were crossed since `comparedWith`, or that none were. Null when nothing was compared."),
     crossed: z
       .array(
         z.object({
           moved: z
             .enum(["paused", "lifted", "resumable", "resumeLost"])
-            .describe("paused: the pause now applies. lifted: it no longer does, and the resume line is not met yet. resumable: the resume lines now hold. resumeLost: they no longer do."),
+            .describe("paused: the pause now applies. lifted: it no longer does, and the restart line is not met yet. resumable: the restart lines now hold. resumeLost: they no longer do."),
           areas: z
             .array(z.enum(["hiring", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"]))
             .describe("The areas that moved this way, in the brief's row order."),

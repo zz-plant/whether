@@ -44,7 +44,7 @@ describe("/trust says each thing once", () => {
   it("does not restate what /about's 'How it works' already says", async () => {
     const { default: AboutPage } = await import("../app/about/page");
     const html = renderToStaticMarkup(<AboutPage />);
-    assert.equal((html.match(/an action, a pause line and a resume line/g) ?? []).length, 1);
+    assert.equal((html.match(/an action, a pause line and a restart line/g) ?? []).length, 1);
     const explanation = html.indexOf("How it works");
     assert.ok(explanation !== -1 && explanation < html.indexOf('id="method"'), "the method follows How it works");
   });
@@ -432,9 +432,9 @@ describe("an area row prints the line that explains its state", () => {
    * its nearest line, so fundraising's pause read "Risk appetite < 44 · at the
    * line" beside "Pause now applies: funding pressure rose above 76", and
    * hiring's resume read "Risk appetite > 54 · 10 pts away" while funding
-   * pressure, 24 points from its resume line, was what kept hiring paused.
+   * pressure, 24 points from its restart line, was what kept hiring paused.
    */
-  it("shows a crossed pause line, and the furthest unmet resume line", async () => {
+  it("shows a crossed pause line, and the furthest unmet restart line", async () => {
     const { buildHomeAreaRows } = await import("../lib/report/home/homeSectionModel");
     const { buildCanonicalBoundedDecisionRules } = await import("../lib/report/boundedDecisionRules");
     const scores = { tightness: 90, riskAppetite: 44 };

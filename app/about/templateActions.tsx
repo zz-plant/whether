@@ -15,7 +15,7 @@ import { getClipboardUiState, useClipboardCopy } from "../components/useClipboar
  */
 
 const TEMPLATE_MARKDOWN = [
-  "# Decision with a pause line and a resume line",
+  "# Decision with a pause line and a restart line",
   "",
   "## Decision",
   "",
@@ -26,7 +26,7 @@ const TEMPLATE_MARKDOWN = [
   "## Pause line (pause if)",
   "",
   "",
-  "## Resume line (resume when)",
+  "## Restart line (restart when)",
   "",
   "",
   "## When you will check",

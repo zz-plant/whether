@@ -27,7 +27,7 @@ import {
 /*
  * The slide's three slot labels are the page's. `callChangesIf` carries the
  * line where the call itself changes, so it prints as "Call changes if"; the
- * levels at which a pause lifts print as "Resume when". They were "Change
+ * levels at which a pause lifts print as "Restart when". They were "Change
  * course if" and "Clears when", two more names for concepts the page already
  * names.
  */
@@ -111,7 +111,7 @@ export const slideReadingLines = (payload: MeetingSlidePayload): string[] => {
   });
 };
 
-/** The stage's resume line as every slide format prints it, or null without a stage. */
+/** The stage's restart line as every slide format prints it, or null without a stage. */
 export const slideResumeLine = (payload: MeetingSlidePayload): string | null =>
   payload.resumeWhen ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${payload.resumeWhen}` : null;
 
@@ -139,8 +139,8 @@ const slideGuidance = (payload: MeetingSlidePayload): string | null =>
 
 /*
  * The other things that would change the guidance, under the name the share
- * formats give them. They printed as the resume line once, which on a held week
- * put "why the guidance is held" under "Resume when".
+ * formats give them. They printed as the restart line once, which on a held week
+ * put "why the guidance is held" under "Restart when".
  */
 const slideWatchLine = (payload: MeetingSlidePayload): string | null =>
   payload.clearsWhen && payload.clearsWhen.length > 0 ? payload.clearsWhen.join("; ") : null;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireCronAuth } from "../../../lib/api/cronAuth";
 import { runMonthEndPulse } from "../../../lib/alert/monthEndPulse";
+import { resolveEmailBaseUrl } from "../../../lib/email/publicBaseUrl";
 
 export const runtime = "edge";
 
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
     const authError = requireCronAuth(request);
     if (authError) return authError;
 
-    const result = await runMonthEndPulse();
+    const result = await runMonthEndPulse({ baseUrl: resolveEmailBaseUrl(request) });
     if (!result.ok) {
       /* A missing KV binding is a dependency the run lacks, not a fault in it. The pulse's
          message goes on to say what that costs, so match its start, not the whole string. */

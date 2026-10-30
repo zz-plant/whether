@@ -68,7 +68,7 @@ const shiftOf = (condition: RuleCondition): "up" | "down" =>
  * into their sentences: "Re-open spend only if funding pressure falls back to
  * 70", while the published Spending rule resumes below 66, and "Pause net-new
  * hiring" the week risk appetite crossed 50, while the published Hiring rule
- * pauses below 44. They fire on the area's own pause and resume lines now and
+ * pauses below 44. They fire on the area's own pause and restart lines now and
  * say the area's own published sentences, so /api/regime-alerts and the weekly
  * digest state the lines every page prints. The codes keep their meaning
  * (`tightness-upshift` is funding pressure crossing up into a pause).

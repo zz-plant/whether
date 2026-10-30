@@ -68,8 +68,8 @@ describe("what would change this guidance", () => {
 
 /* The pause line printed here only on a read that drew no ladders, so a reader met
    "Conditions change if" and had to find the pause line in the area table (site
-   review, 2026-10-09). The section leads with the pause and resume lines now. */
-describe("what would change this guidance: the pause and resume lines", () => {
+   review, 2026-10-09). The section leads with the pause and restart lines now. */
+describe("what would change this guidance: the pause and restart lines", () => {
   const lined = renderToStaticMarkup(
     <WhatWouldChangeSection
       ladders={[{ metric: "tightness", label: "Funding pressure", value: 90, previous: 63, lines: [{ kind: "callChange", value: 70 }] }]}
@@ -88,15 +88,15 @@ describe("what would change this guidance: the pause and resume lines", () => {
        permission to resume, so the two groups are named apart. */
     const change = lined.indexOf(">Conditions change if<");
     const pause = lined.indexOf(">Pause if<");
-    const resume = lined.indexOf(">Resume when<");
-    assert.ok(change > 0 && pause > change && resume > pause, "conditions change, then the pause and resume lines");
+    const resume = lined.indexOf(">Restart when<");
+    assert.ok(change > 0 && pause > change && resume > pause, "conditions change, then the pause and restart lines");
     assert.match(lined, /When would conditions change\?/);
     assert.match(lined, /When can paused decisions resume\?/);
     assert.match(lined.replace(/<[^>]+>/g, ""), /Funding pressure falls below 66/);
-    assert.match(lined.replace(/<[^>]+>/g, ""), /doesn(?:’|')t mean you can resume\. Only crossing the resume line does/);
+    assert.match(lined.replace(/<[^>]+>/g, ""), /doesn(?:’|')t mean you can resume\. Only crossing the restart line does/);
   });
 
-  it("prefers a chosen stage's resume line to the lead area's", () => {
+  it("prefers a chosen stage's restart line to the lead area's", () => {
     const staged = renderToStaticMarkup(
       <WhatWouldChangeSection
         ladders={[]}

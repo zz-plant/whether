@@ -1,6 +1,7 @@
 import Link from "next/link";
+import { UrlDetails } from "../ui/urlDetails";
 import { HomeSection } from "./HomeSection";
-import { Sparkline, interquartileRange, type SparklinePoint } from "../ui/sparkline";
+import { Sparkline, interquartileRange, sparklineDomain, type SparklinePoint } from "../ui/sparkline";
 import { ScoreLadder } from "../ui/scoreLadder";
 import { GovernedAreas } from "../ui/governedAreas";
 import { SignalContextDetails } from "../ui/plainLanguage";
@@ -63,10 +64,11 @@ const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasi
 };
 
 /** A history is a shape only with at least three actual readings. */
-function MonthEndHistory({ points, label }: { points?: readonly SparklinePoint[]; label: string }) {
+function MonthEndHistory({ points, label, showLabel = false }: { points?: readonly SparklinePoint[]; label: string; showLabel?: boolean }) {
   if (!points || points.length < 3) return null;
   return (
     <figure className="weather-signal-history mt-4 whitespace-normal text-slate-400">
+      {showLabel ? <p className="mb-2 text-fluid-xs text-slate-300">{label}</p> : null}
       <Sparkline
         points={points}
         label={`${label}, month-end history`}
@@ -98,6 +100,11 @@ function InputHistoryGrid({ series }: { series: readonly { key: string; label: s
               widthEm={8}
               tone="unchanged"
             />
+            <p className="mt-1 text-fluid-nano tabular-nums text-slate-400">
+              Range {sparklineDomain(entry.points.map((point) => point.value))
+                .map((value) => new Intl.NumberFormat("en-US", { maximumFractionDigits: 2 }).format(value))
+                .join("–")}
+            </p>
           </li>
         ))}
       </ul>
@@ -114,8 +121,12 @@ export function WhatChangedSection({
   history,
   historyCaveat,
   inputHistory,
+  compact = false,
+  historyOpen = false,
 }: {
   rows: readonly SignalChangeRow[];
+  compact?: boolean;
+  historyOpen?: boolean;
   /** Month-end history on a shared 0–100 scale; never presented as weekly observations. */
   history?: Partial<Record<SignalChangeRow["key"], readonly SparklinePoint[]>>;
   historyCaveat?: string | null;
@@ -129,6 +140,15 @@ export function WhatChangedSection({
   /** "What changed since Aug 31": the heading names the reading the move is measured from. */
   heading?: string;
 }) {
+  const displayRows = compact
+    ? [...rows].sort((a, b) => {
+        const priority = (row: SignalChangeRow) =>
+          row.key === "tightness" || row.key === "riskAppetite" ? (row.delta ? 0 : 1) : 2;
+        return priority(a) - priority(b);
+      })
+    : rows;
+  const hasHistory = Object.values(history ?? {}).some((points) => points.length >= 3)
+    || (inputHistory ?? []).some((entry) => entry.points.length >= 3);
   return (
     <HomeSection
       id={HOME_SECTIONS.changed.id}
@@ -164,7 +184,7 @@ export function WhatChangedSection({
             </tr>
           </thead>
           <tbody className="max-md:block">
-            {rows.map((row) => (
+            {displayRows.map((row) => (
               <tr
                 key={row.key}
                 id={
@@ -178,6 +198,7 @@ export function WhatChangedSection({
                 }
                 className="border-b border-[color:var(--border-faint)] align-top last:border-b-0 max-md:grid max-md:grid-cols-1 max-md:gap-y-3 max-md:py-4"
                 data-signal={row.key}
+                data-input={compact && row.key !== "tightness" && row.key !== "riskAppetite" ? "" : undefined}
               >
                 <th scope="row" className="py-2.5 pr-4 align-top font-semibold text-slate-100 max-md:p-0">
                   <div className="space-y-1">
@@ -190,11 +211,11 @@ export function WhatChangedSection({
                     </Link>
                     {row.key === "tightness" || row.key === "riskAppetite" ? (
                       <GovernedAreas metric={row.key} target="table" />
-                    ) : row.key === "baseRate" ? (
+                    ) : !compact && row.key === "baseRate" ? (
                       <span className="block text-fluid-nano font-normal text-slate-400">
                         Feeds into <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a>
                       </span>
-                    ) : row.key === "curveSlope" ? (
+                    ) : !compact && row.key === "curveSlope" ? (
                       <span className="block text-fluid-nano font-normal text-slate-400">
                         Feeds into <a href="#signal-risk-appetite" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Risk appetite</a>, and{" "}
                         <a href="#signal-funding-pressure" className="weather-hit underline decoration-slate-600 underline-offset-2 hover:text-sky-300">Funding pressure</a> once inverted
@@ -214,11 +235,11 @@ export function WhatChangedSection({
                     {/* Plain-English meaning, scale anchors, historical startup era
                         context, and team reflection prompt. Folded in a 1-click disclosure
                         to maintain clean table scanning. */}
-                    <SignalContextDetails
+                    {!compact || row.lines ? <SignalContextDetails
                       signalKey={row.key}
                       score={typeof row.value === "number" ? row.value : undefined}
                       scaleLabel={row.scaleLabel}
-                    />
+                    /> : null}
                   </div>
                 </th>
                 {/* With nothing to compare, the lead over the table already says so; on a
@@ -226,7 +247,7 @@ export function WhatChangedSection({
                     line in every row. */}
                 <td className={`whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0 ${comparisonUnavailable ? "max-md:hidden" : ""}`}>
                   {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
-                  <MonthEndHistory points={history?.[row.key]} label={row.label} />
+                  {!compact ? <MonthEndHistory points={history?.[row.key]} label={row.label} /> : null}
                 </td>
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">
                   {row.lines && typeof row.value === "number" ? (
@@ -253,9 +274,10 @@ export function WhatChangedSection({
                        it feeds. "No line of its own" was false for the base rate,
                        which funding pressure judges against a line. */
                     <span className="text-xs text-slate-500">
+                      {compact ? <span className="tabular-nums text-slate-200">{row.valueLabel}</span> : <>
                       {row.key === "baseRate"
                         ? "Feeds into funding pressure, so it's judged against that score's lines."
-                        : "Feeds into both scores, so it's judged against their lines."}
+                        : "Feeds into both scores, so it's judged against their lines."}</>}
                     </span>
                   )}
                 </td>
@@ -264,12 +286,23 @@ export function WhatChangedSection({
           </tbody>
         </table>
       </div>
-      {historyCaveat && Object.values(history ?? {}).some((points) => points.length >= 3) ? (
-        <p className="max-w-3xl text-fluid-xs text-slate-400">{historyCaveat}</p>
-      ) : null}
-      {inputHistory && inputHistory.some((series) => series.points.length >= 3) ? (
-        <InputHistoryGrid series={inputHistory} />
-      ) : null}
+      {compact && hasHistory ? (
+        <UrlDetails queryKey="inputs" initialOpen={historyOpen}
+          summary="Score history and market inputs" summaryClassName="weather-hit text-fluid-xs text-slate-300">
+          <div className="space-y-4 pt-3">
+            <div className="flex flex-wrap gap-8">
+              {rows.map((row) => <MonthEndHistory showLabel key={row.key} points={history?.[row.key]} label={row.label} />)}
+            </div>
+            {historyCaveat ? <p className="max-w-3xl text-fluid-xs text-slate-400">{historyCaveat}</p> : null}
+            {inputHistory ? <InputHistoryGrid series={inputHistory} /> : null}
+          </div>
+        </UrlDetails>
+      ) : <>
+        {historyCaveat && Object.values(history ?? {}).some((points) => points.length >= 3) ? (
+          <p className="max-w-3xl text-fluid-xs text-slate-400">{historyCaveat}</p>
+        ) : null}
+        {inputHistory ? <InputHistoryGrid series={inputHistory} /> : null}
+      </>}
     </HomeSection>
   );
 }

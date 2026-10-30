@@ -5,7 +5,7 @@ import type {
   TrackRecordRow,
 } from "../../../lib/report/trackRecord";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/formatters";
-import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
+import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
 import { OPERATING_LATITUDE_RISK_WEIGHT } from "../../../lib/report/weeklyLeadershipBrief";
 import { CALL_CHANGE_RULE, describeLatitudeAgainstConditions } from "../../../lib/report/trackRecordCopy";
 import { Fact, FactList } from "../ui/factList";
@@ -60,7 +60,12 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
       <tr className="border-b border-slate-800/80 text-slate-400">
         <th scope="col" className="py-2 pr-3 font-medium">Month</th>
         <th scope="col" className="py-2 pr-3 font-medium">Conditions</th>
-        <th scope="col" className="py-2 pr-3 text-right font-medium">{OPERATING_LATITUDE_LABEL} (0–100)</th>
+        <th scope="col" className="py-2 pr-3 text-right font-medium">
+          {OPERATING_LATITUDE_LABEL} (0–100)
+          {/* The noun never prints without its gloss: "latitude" is the one
+              term a competitor cannot use and the one a reader cannot guess. */}
+          <span className="block text-[0.65rem] font-normal leading-tight text-slate-500">{OPERATING_LATITUDE_GLOSS}</span>
+        </th>
         <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
       </tr>
     </thead>

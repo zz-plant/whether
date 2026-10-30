@@ -890,7 +890,7 @@ describe("regime engine properties: the state machine", () => {
 });
 
 // ---------------------------------------------------------------------------
-// The pause and resume lines (lib/report/boundedDecisionRules.ts)
+// The pause and restart lines (lib/report/boundedDecisionRules.ts)
 // ---------------------------------------------------------------------------
 
 const rulesFor = (thresholds: { tightnessRegime: number; riskAppetiteRegime: number }) =>
@@ -908,7 +908,7 @@ const areaSides = (thresholds: { tightnessRegime: number; riskAppetiteRegime: nu
 
 const drawScores = (draw: Draw): Scores => ({ tightness: draw.int(0, 100), riskAppetite: draw.int(0, 100) });
 
-describe("regime engine properties: pause and resume lines", () => {
+describe("regime engine properties: pause and restart lines", () => {
   it("draws the corridor at pause 76 and resume 66 on the default lines", () => {
     assert.deepEqual(sharedDecisionLines(DEFAULT_THRESHOLDS), {
       tightnessPause: 76,
@@ -974,7 +974,7 @@ describe("regime engine properties: pause and resume lines", () => {
    * more (the advanced threshold controls allow up to 100) printed
    * "Funding pressure > 101".
    */
-  property("every shared pause and resume line sits on the 0-100 scale", drawThresholds, (thresholds) => {
+  property("every shared pause and restart line sits on the 0-100 scale", drawThresholds, (thresholds) => {
     for (const [name, value] of Object.entries(sharedDecisionLines(thresholds))) {
       assert.ok(value >= 0 && value <= 100, `${name} at ${value}`);
     }

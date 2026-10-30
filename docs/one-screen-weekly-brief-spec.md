@@ -187,7 +187,7 @@ Canonical top-fold order on homepage must remain:
 
 Implementation guardrails:
 - Canonical weekly-call semantics must come from one shared structured payload (`weeklyCall`) before any route-specific rendering. The homepage card, copy CTA, command bar, and exported operator brief must agree on the four core lines: `Current call`, `Action now`, `Pause if`, and `Change course if`. Shared artifacts should lead with the weekly leadership `Operating latitude`; tightness belongs in `Pause if` / bounded-condition copy rather than as the primary scalar.
-- The weekly call's reversal side is two fields, printed under two labels (2026-09-22). `weeklyCall.callChangesIf` is where the call itself changes — the regime flip trigger — under `Call changes if`; a stage never replaces it. `weeklyCall.resumeWhen` is set only when a stage or runway is calibrated and carries that stage's `reversalTriggerDiscipline` under `Resume when`, beside the call-change line. They used to share one field (`changeCourseIf`), so choosing a stage swapped the flip trigger out for a resume condition while every surface still labelled it `Call changes if`. Surfaces print both through `weeklyCallChangeLines`. A read that projects the stored `OperatingSnapshot` lays the reader's stage over the stored (stage-agnostic) call with `applyStageToWeeklyCall`; before that, a chosen stage reached the brief only when the store was empty.
+- The weekly call's reversal side is two fields, printed under two labels (2026-09-22). `weeklyCall.callChangesIf` is where the call itself changes — the regime flip trigger — under `Call changes if`; a stage never replaces it. `weeklyCall.resumeWhen` is set only when a stage or runway is calibrated and carries that stage's `reversalTriggerDiscipline` under `Restart when`, beside the call-change line. They used to share one field (`changeCourseIf`), so choosing a stage swapped the flip trigger out for a resume condition while every surface still labelled it `Call changes if`. Surfaces print both through `weeklyCallChangeLines`. A read that projects the stored `OperatingSnapshot` lays the reader's stage over the stored (stage-agnostic) call with `applyStageToWeeklyCall`; before that, a chosen stage reached the brief only when the store was empty.
 - Action-strip contract requirement: every surfaced item (homepage, operations, export payload) must include non-empty `action`, `threshold`, and `reversalCondition` fields.
 - The homepage action strip translates structured lane states into explicit action phrases (`Keep this closed`, `Proceed with guardrails`, `Stage the next move`, `Move ahead now`). The underlying `Closed` / `Guarded` / `Staged` / `Open` values remain stable for model consumers.
 - Canonical bounded-decision phrasing must come from `lib/report/reportFormatting.ts` (`formatDecisionTriplet` and friends), with exact scan labels:
@@ -196,7 +196,7 @@ Implementation guardrails:
   - **Reversal** (displayed as “Flip condition” in some surfaces): what must recover/hold before loosening or re-opening.
   - Prefix normalization (`Pause ...`, `Resume ...`) is handled centrally; consumers should pass raw rule text and avoid custom string assembly.
 - Dynamic fallback copy must remain decision-complete. Do not emit placeholders such as `Stay the course`, `current track`, `standard guardrails`, or `trigger confirmation` without naming the held decision, measurable threshold, and reversal condition.
-- Flat-week and returning-user summaries must state `No change. Last week's calls stand.`, name at least one decision that remains in force, and include the nearest recheck condition. Since 2026-09-29 the sentence is derived, not fixed: `Conditions held steady since <date>; no pause or resume line was crossed. Last week's guidance stands.` (`lib/report/decisionMovement.ts`, `docs/feature-specs-current.md` §1.1.28), followed on a quiet week by the nearest line. A week that crossed a line says which areas it moved and through which line, and never a figure in a unit of its own or an instruction the guidance does not carry.
+- Flat-week and returning-user summaries must state `No change. Last week's calls stand.`, name at least one decision that remains in force, and include the nearest recheck condition. Since 2026-09-29 the sentence is derived, not fixed: `Conditions held steady since <date>; no pause or restart line was crossed. Last week's guidance stands.` (`lib/report/decisionMovement.ts`, `docs/feature-specs-current.md` §1.1.28), followed on a quiet week by the nearest line. A week that crossed a line says which areas it moved and through which line, and never a figure in a unit of its own or an instruction the guidance does not carry.
 - Boundary commentary must name the signal, current distance, threshold direction, and decision consequence. Qualitative watch language alone (`worth watching`, `next release`) does not satisfy the bounded-decision contract.
 - Trust readiness describes whether the current read can support this week's approvals; it must point operators back to the thresholds in the current call rather than independently declaring decisions safe.
 - Decision readiness and trust must use structured freshness state, not display copy. Consumers should gate on machine-readable staleness (`fresh`, `stale`, `unknown`) and source mode (`live`, `cached`, `historical`) rather than inferring trust from a rendered timestamp string.
@@ -213,7 +213,7 @@ Implementation guardrails:
 - The compact backdrop row should also make the audience default explicit: the external backdrop is calibrated to U.S. Treasury, labor, inflation, credit, and funding conditions unless a downstream surface says otherwise.
 - The canonical weekly-call block should expose a compact `Decision readiness` verdict (`Act`, `Act with caution`, or `Hold`) in the first scan path; extra trust explanation should appear only when trust is degraded or historical.
 - When `revisitDecisions` is true, the canonical weekly-call block should surface a compact `Revisit queue` (max 3 items) with the lane and **why that lane is queued this week** — not the bounded action. The action is already stated verbatim in the bounded-decisions ledger below, and rendering it twice made the queue pure duplication. Each item carries `driver` (the signal move) and `recheck` (the area-specific instruction); because one signal can queue up to three lanes, a `driver` shared by every visible item is hoisted above the list instead of repeated per row.
-- A flat week is a first-class state, not an empty delta. When `weeklyLeadershipSummary.guidanceChange` is `"held"` (no change of conditions and no pause or resume line crossed; never the operating latitude's move, which can be flat on a week a line was crossed), state it once in plain language with its consequence (`No change` / `Last week's calls stand.`) rather than repeating "no change vs last week" across every delta widget. The score block keeps the delta label next to the number it describes; the direction word stands alone beside the call.
+- A flat week is a first-class state, not an empty delta. When `weeklyLeadershipSummary.guidanceChange` is `"held"` (no change of conditions and no pause or restart line crossed; never the operating latitude's move, which can be flat on a week a line was crossed), state it once in plain language with its consequence (`No change` / `Last week's calls stand.`) rather than repeating "no change vs last week" across every delta widget. The score block keeps the delta label next to the number it describes; the direction word stands alone beside the call.
 - When every bounded rule clears on the same conditions, state that corridor once above the ledger (`sharedFlipCorridor`). The per-lane `Pause if` / `Clears when` logic stays — it is non-negotiable top-fold content — but the shared corridor tells the operator these lanes flip together, which no single row can. Suppress the line when the rules genuinely diverge.
 - The weekly call and the score that grades it must share the first viewport at 375px. The hero orders call → score → supporting detail when stacked, and restores the two-column grid at `sm` and above.
 - Above the fold, trust and rationale copy must stay compressed: keep posture, action now, confidence, flip risk, and the bounded call visible; move trajectory, continuity, and longer explanation into disclosure content below the primary scan path.
@@ -358,7 +358,7 @@ Drift guardrails:
 
 - Each mode must provide explicit bounded language for both:
   - action emphasis (`doNowAdjustments` / `avoidAdjustments` / `watchAdjustments`), and
-  - reversal condition discipline (`reversalTriggerDiscipline`), which reaches readers as `weeklyCall.resumeWhen` under `Resume when` — never as the call-change line.
+  - reversal condition discipline (`reversalTriggerDiscipline`), which reaches readers as `weeklyCall.resumeWhen` under `Restart when` — never as the call-change line.
 - Reversal language should remain trigger-based (clear condition + resume rule), not narrative advice.
 - If mode copy changes, update both the bounded rules source and this contract in the same PR.
 
@@ -493,12 +493,12 @@ same thing, the earlier one keeps it.
 
 The weekly call precedes horizon selection on mobile and desktop. As of 2026-10-03, Weekly / Monthly / Quarterly sits directly under the call beside Copy Brief and confidence details, before the evidence sections. This keeps the selector adjacent to the card it changes without letting wrapped controls push the call down on a phone. Direct `/?cadence=monthly` and `/?cadence=quarterly` links still render their selected call; API cadence semantics are unchanged. No cadence rail belongs above the call or in the global header.
 
-As of 2026-10-29 the weekly call leads at every horizon: the selected horizon's card (`CadenceCallCard`) renders below the brief's action row, before the areas, as an `h2` band in the page-title register (`text-fluid-2xl`, not the hero's display size). A longer horizon is a consultable addition, not a competing lead, and nothing about the view persists beyond the URL. The card still carries the weekly card's contract at its horizon: the guidance, `Pause if` and `Resume when`, and under that pair one `ThresholdLadder` per score from `cadenceCallModel.boundedBands`, drawn from the same thresholds as the pair's sentences, with the score, its move since the comparison reading and its distance to each line. A held call drops the pair and the ladders; the weekly card above states the hold's lines.
+As of 2026-10-29 the weekly call leads at every horizon: the selected horizon's card (`CadenceCallCard`) renders below the brief's action row, before the areas, as an `h2` band in the page-title register (`text-fluid-2xl`, not the hero's display size). A longer horizon is a consultable addition, not a competing lead, and nothing about the view persists beyond the URL. The card still carries the weekly card's contract at its horizon: the guidance, `Pause if` and `Restart when`, and under that pair one `ThresholdLadder` per score from `cadenceCallModel.boundedBands`, drawn from the same thresholds as the pair's sentences, with the score, its move since the comparison reading and its distance to each line. A held call drops the pair and the ladders; the weekly card above states the hold's lines.
 
 ### Responsive readability (2026-10-03)
 
 - On a first visit, the opening line uses `websiteName` from `lib/seo.ts`; the longer explanation of the two scores stays inside the existing reading guide. The dismiss icon retains its accessible name and 44px target.
-- The shared area-rule table and homepage signal-change table remain stacked below `md`, so landscape phones can read pause/resume lines and ladders without horizontal scrolling. Each phone signal row gives its description, movement and ladder the full column width; a clipped-score explanation cannot squeeze the signal label into one word per line. Desktop retains the table columns and their semantic headers.
+- The shared area-rule table and homepage signal-change table remain stacked below `md`, so landscape phones can read pause/restart lines and ladders without horizontal scrolling. Each phone signal row gives its description, movement and ladder the full column width; a clipped-score explanation cannot squeeze the signal label into one word per line. Desktop retains the table columns and their semantic headers.
 - Shared navigation and control sizing follow `docs/agents/ui-ux-standards.md` §VI; touch sizing depends on pointer capability as well as viewport width.
 
 ### Declutter pass (2026-09-15)
@@ -546,3 +546,25 @@ conditions) from the macro series the report already loaded. Each series autosca
 own range and is labelled with its name; a series with fewer than three readings renders
 nothing. The grid is suppressed on an archived week, where a live window would be
 anachronistic. It adds no fetch. It is context for the scores, not a second verdict.
+
+Raw-input history traces state their individual plotted ranges beside each trace, retaining decimal precision so rate and index movements can be read without inferring a common scale.
+
+### Space allocation pass (2026-10-29)
+
+The first-visit introduction is the category line only; the call explains the current
+condition. Live week navigation sits inside the artifact header, while archived navigation
+stays above its historical banner. The display is bounded to 24px on phones and 52px on
+desktop. Related sections use tighter separators instead of repeating a large opening gap.
+
+The hero map retains its axis meanings and dated sampling caption; its historical scoring
+qualification folds with its readings (`?chart=1` restores the open state). The evidence table
+puts changed composite scores first, keeps all decision lines visible, and compresses raw
+inputs to a comparison plus current value. Score and raw-input histories fold into “Score
+history and market inputs” (`?inputs=1`). The full evidence route remains available through
+the signal labels. The explicit plotted ranges and insufficient-history behavior still apply.
+
+The live artifact's phone trust line visually omits the secondary term labels (Sources,
+Room before a change, Based on), preserving them for screen readers and retaining every
+value and warning. Its date label stays visible. Copy Brief and the horizon choices use
+smaller horizontal control insets below 640px so they can share a row; narrow screens
+still wrap naturally, and all touch targets keep their 44px minimum height.

@@ -70,7 +70,7 @@ function BoundedBandRail({ band, idSuffix }: { band: HorizonSignalBand; idSuffix
 
 /**
  * The horizon band for a non-weekly cadence. It renders below the weekly hero and
- * carries the same contract — the guidance, its pause line, its resume line — at
+ * carries the same contract — the guidance, its pause line, its restart line — at
  * the selected horizon, while the weekly call keeps the page's lead (2026-10-29).
  *
  * No nested boxes: §XIII gives elevation to the outermost container, and the run of

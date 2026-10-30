@@ -6,7 +6,7 @@ import { LineStateIcon } from "./conceptIcons";
  * A score drawn against its lines.
  *
  * The product's mechanic is a 0–100 score judged against three lines: the
- * pause line, the resume line, and the line where the call itself changes.
+ * pause line, the restart line, and the line where the call itself changes.
  * "How close are we" is the one fact that decides whether to act this week or
  * wait, and it was rendered as text ("64 pts away"), as rails inside a box, as
  * a sparkline, as a quadrant SVG on /trust and as bare numbers on the answer
@@ -175,7 +175,7 @@ export const nearestLadderLine = (value: number, lines: readonly LadderLine[]) =
 
 /**
  * The three lines as a ladder takes them, from the numbers a surface has. The
- * pause and resume lines come from a rule's rails (`buildSharedCorridorRails`)
+ * pause and restart lines come from a rule's rails (`buildSharedCorridorRails`)
  * and are absent when the rule states none; the call-change line is the
  * threshold in force and is always drawn.
  */
@@ -196,7 +196,7 @@ export const buildLadderLines = ({
 /** The line's name inside a sentence ("9 pts above the pause line"). */
 const LINE_PHRASES: Record<LadderLineKind, string> = {
   pause: "pause line",
-  resume: "resume line",
+  resume: "restart line",
   callChange: "change line",
 };
 
@@ -211,7 +211,7 @@ export const describeLadderPosition = (value: number, lines: readonly LadderLine
 
 /**
  * Which end of the scale is worse, read off the ladder's own lines: a pause
- * line above the resume line means a rising score is the bad direction
+ * line above the restart line means a rising score is the bad direction
  * (funding pressure); below it, a falling one (risk appetite). Null without
  * both lines, where the ladder cannot say (2026-10-14: the two scores point
  * opposite ways, and nothing on a ladder said which).
@@ -265,7 +265,7 @@ export function ScoreLadder({
           {label}
           {worse ? (
             <span className="ml-1.5 font-normal text-slate-400" data-ladder-direction={worse}>
-              {worse === "higher" ? "higher is worse" : "higher is better"}
+              {worse === "higher" ? "(higher is worse)" : "(higher is better)"}
             </span>
           ) : null}
         </span>

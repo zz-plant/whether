@@ -730,7 +730,7 @@ describe("share text — plan stress test artifact", () => {
     assert.match(shared, /Plan: "hire 3 engineers at \$180k each"/);
     assert.match(shared, /Decision verdict: /);
     assert.match(shared, /Pause if/);
-    assert.match(shared, /Resume when/);
+    assert.match(shared, /Restart when/);
   });
 
   it("includes gross margin for bootstrapped mode", () => {

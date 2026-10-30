@@ -69,10 +69,10 @@ export default async function MethodPage({
             <ul className="space-y-2 text-sm text-slate-200">
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.watch.postureFlips}:</span> {reportData.flipThreshold}</li>
               <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}:</span> {reportData.guardrailThreshold}</li>
-              {/* The lead area's resume line, as the brief and every paste print
+              {/* The lead area's restart line, as the brief and every paste print
                   it. This slot said "confidence is back to high and conditions
                   have held for a second reading" under the same label, so the
-                  page named a second resume line the plan never uses. */}
+                  page named a second restart line the plan never uses. */}
               {reportData.actionStripItems[0]?.reversalCondition ? (
                 <li><span className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}:</span> {formatDecisionReversal(reportData.actionStripItems[0].reversalCondition)}</li>
               ) : null}
@@ -226,7 +226,7 @@ export default async function MethodPage({
       <p className="text-sm text-slate-300">
         {/* The link is what it opens, not "About explains how…", a sentence about another page. */}
         <Link href="/about#method" className="font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
-          How to use the pause and resume lines
+          How to use the pause and restart lines
         </Link>
         , with a worked example and a blank form.
       </p>

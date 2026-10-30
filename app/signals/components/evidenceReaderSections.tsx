@@ -14,7 +14,7 @@ import { buildSignalsFocusHref, focusTabs, type FocusTab } from "../evidenceQuer
  * charts, the line editor, the month picker — are the second, in
  * `evidenceInstruments.tsx`. How close the scores sit to the lines that would
  * change the guidance is the brief's section, linked under the table: this page
- * drew the same two ladders and the same "Pause if / Resume when" until
+ * drew the same two ladders and the same "Pause if / Restart when" until
  * 2026-10-27.
  *
  * What these replaced (2026-09-22): a decision summary whose "Main pressure"
@@ -157,7 +157,7 @@ export const SignalsWhatChangedSection = ({
                   {row.key === "tightness" || row.key === "riskAppetite" ? (
                     /* The areas this score sets the lines for, each opening the
                        brief on that area's answer. It said "Sets the pause and
-                       resume lines" without saying whose. */
+                       restart lines" without saying whose. */
                     <GovernedAreas metric={row.key} target="brief" className="mt-0.5" />
                   ) : row.key === "baseRate" ? (
                     <span className="mt-0.5 block text-fluid-nano font-normal text-slate-400">
@@ -218,7 +218,7 @@ export const SignalsWhatChangedSection = ({
         <ActionLink href="/#what-would-change" variant="inline">
           {DECISION_CONTRACT_LABELS.watch.flipWatch}
         </ActionLink>
-        : each score&rsquo;s pause and resume lines, on the brief.
+        : each score&rsquo;s pause and restart lines, on the brief.
       </p>
       {focusInstruments.length > 0 ? (
         <ul className="space-y-1 text-sm text-slate-300" aria-label="Also check">

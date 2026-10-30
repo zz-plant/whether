@@ -80,10 +80,10 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   forecast synonym.
 - **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS`**
   (`lib/report/reportCopy.ts`): general imperative forms on screens are Do now / Pause if /
-  Resume when, and the line where conditions themselves change is Conditions change if. "Change
+  Restart when, and the line where conditions themselves change is Conditions change if. "Change
   course if" and "Re-open when" are retired (2026-09-22): the first read as the guidance changing,
-  which it named only on some surfaces, and the second was a third name for the resume line.
-  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports are Action / Pause line / Resume line ("Threshold" and "Reversal" were retired on 2026-10-09, with "boundary" and "trigger" for the same lines). Consume these
+  which it named only on some surfaces, and the second was a third name for the restart line.
+  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports are Action / Pause line / Restart line ("Threshold" and "Reversal" were retired on 2026-10-09, with "boundary" and "trigger" for the same lines). Consume these
   exports instead of hardcoding slot words in components. Per-area bounded rules now render on
   `/operate` ("Rules by area"). The homepage scan ledger was deleted with `ThreeWhethersCard`
   (2026-09-01), and `ACTION_STRIP_DISPLAY_COPY` went with it. Its vocabulary is retired: do not
@@ -133,6 +133,24 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   (`/calibration`), and "Confidence: Low" beside "Freeze new commitments" read as the product
   doubting its own advice. API and JSON fields keep `confidence`; the mapping is in
   `docs/developer/api-reference.md`.
+- **Three data nouns, three jobs** (2026-10-30). *Score* is one of the two 0–100 numbers
+  (Funding pressure, Risk appetite). *Reading* is this week's data as a whole, the thing with a
+  date. *Signal* is an underlying series (CPI, VIX, a credit spread), and appears in reader text
+  only on `/signals`, where the page is about the series themselves. A sentence that says "the
+  signal moved" when it means a score, or "the reading is 90" when it means a score, is the
+  drift this names. Existing copy is swept as surfaces are touched; new copy follows the rule.
+- **The hold lifts at the restart line** (2026-10-30). "Resume line" / "Resume when" became
+  "Restart line" / "Restart when": in the Hiring row the label read as a CV line, and the label is
+  scanned alone in a table cell. The identifiers (`resumeWhen`, `resume`, `resumeLine` in JSON) are
+  contracts and did not move; only the words a reader sees did. The verb stays "restart" too, so a
+  row never mixes "Restart line" with "Resume hiring".
+- **The guard reaches the content layer too** (2026-10-30). `tests/readerVocabulary.test.tsx`
+  renders `app/` routes, so it never saw the article bodies, resource metadata or downloadable
+  templates — and that is where the retired words survived longest: one public memo carried
+  "Posture at quarter end: Defensive · Confidence: MED" and "the call moved off Expansion".
+  `tests/contentVocabulary.test.ts` now scans `content/**/*.json` and `public/downloads/*.md`
+  for the retired senses (not the bare word: "compliance posture" is ordinary English). Slugs,
+  paths and JSON keys stay as they are — they are contracts, not copy.
 
 ## Headings (h1–h4, eyebrows, section labels)
 

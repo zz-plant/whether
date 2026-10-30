@@ -32,7 +32,7 @@ export const noul = (question: string, yes: string, no: string): JevQuestion => 
 const artifactQuestions: Record<string, JevQuestion> = {
   contradicts_call: noul("Does `artifact.text` contradict `canonical.guidance` or `canonical.action`?", "A reader would take a conflicting action", "Agrees or paraphrases faithfully"),
   weakens_pause_line: noul("Does `artifact.text` remove or weaken a condition in `canonical.pauseLine`? If no pause line is supplied, answer no.", "Allows action the printed pause line disallows", "Preserves its meaning, or no pause line was supplied"),
-  changes_resume_line: noul("Does `artifact.text` change the meaning of `canonical.resumeLine`? If no resume line is supplied, answer no.", "Changes when the action may resume", "Preserves the condition, or none was supplied"),
+  changes_resume_line: noul("Does `artifact.text` change the meaning of `canonical.resumeLine`? If no restart line is supplied, answer no.", "Changes when the action may resume", "Preserves the condition, or none was supplied"),
   unsupported_claim: noul("Does `artifact.text` claim facts about the reader's company or the guidance that `canonical`, including its full document in `canonical.context` when supplied, does not establish?", "Adds an unsupported factual assertion", "Only expresses the supplied guidance and conditions"),
 };
 

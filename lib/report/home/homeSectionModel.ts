@@ -234,9 +234,9 @@ export const describeAreaPauseStatus = (
   if (!row.pause) return undefined;
   /* The badge's state, from the same distance the words below describe. */
   const state = resolveLineState(row.pause.points, "pause", row.pause.met) ?? "clear";
-  if (row.pause.met) return { text: "Past its pause line", crossed: true, state };
+  if (row.pause.met) return { text: "On hold", crossed: true, state };
   if (row.pause.points === 0) return { text: "At its pause line", crossed: false, state };
-  return { text: `${formatPoints(row.pause.points)} from its pause line`, crossed: false, state };
+  return { text: `${formatPoints(row.pause.points)} from pausing`, crossed: false, state };
 };
 
 /**
@@ -248,18 +248,18 @@ export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">
   if (ruled.length === 0) return null;
   const crossed = ruled.filter((row) => row.pause?.met).length;
   /* A standing state, said as one: "crossed ... this week" sat under "No score
-     crossed a pause or resume line since Sep 30" and read as a contradiction. */
-  if (crossed === 0) return "No area is past its pause line.";
+     crossed a pause or restart line since Sep 30" and read as a contradiction. */
+  if (crossed === 0) return "No area is on hold.";
   return crossed === 1
-    ? `1 of ${ruled.length} areas is past its pause line.`
-    : `${crossed} of ${ruled.length} areas are past their pause line.`;
+    ? `1 of ${ruled.length} areas is on hold.`
+    : `${crossed} of ${ruled.length} areas are on hold.`;
 };
 
 /**
  * The card's bridge from the weather word to the five areas (2026-10-14).
  *
  * The condition comes from the change lines and the area answers from the
- * pause and resume lines, so a card could say "Cloudy: money is available"
+ * pause and restart lines, so a card could say "Cloudy: money is available"
  * over a picker where four areas were held, and nothing tied the two. This
  * names the held areas on the card without repeating its condition stamp:
  * "On hold: Hiring, Fundraising, Spending and New bets."
@@ -327,7 +327,7 @@ const nearest = (distances: RuleThresholdDistance[]) =>
  * fundraising's pause as "Risk appetite < 44 · at the line" beside "Pause now
  * applies: funding pressure rose through 76", and hiring's resume as "Risk
  * appetite > 54 · 10 pts away" while funding pressure, 24 points from its own
- * resume line, was what kept hiring paused.
+ * restart line, was what kept hiring paused.
  */
 const pauseLineToShow = (distances: RuleThresholdDistance[]) =>
   distances.find((distance) => distance.satisfied) ?? nearest(distances);

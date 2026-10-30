@@ -14,7 +14,7 @@ const FINANCE_RUNWAY_TARGETS: string[] = insightDatabase.financeStrategyMode.reg
 
 /*
  * /operate leads with this week's rules (2026-10-07). It opened on an empty
- * stress-test form, with the area table — the pause and resume lines a reader
+ * stress-test form, with the area table — the pause and restart lines a reader
  * acts on — closed three steps down, and every closed step read as a title and
  * a sentence about the gesture. Read from the page model's element tree, not a
  * render: the stepper is a client component, and what is pinned here is what
@@ -79,7 +79,7 @@ describe("/operate opening", () => {
     const description = (id: string) => steps.find((step) => step.id === id)?.description ?? "";
 
     // The areas the form starts from, by name.
-    assert.match(description("ops-plan-lines"), /^Start from the published pause and resume lines for Hiring, .+ and New bets, /);
+    assert.match(description("ops-plan-lines"), /^Start from the published pause and restart lines for Hiring, .+ and New bets, /);
     // The quarter's runway target, from the same entry the panel draws.
     assert.match(description("ops-finance-strategy"), /\d+\+? months/);
     assert.ok(
@@ -90,7 +90,7 @@ describe("/operate opening", () => {
     assert.ok(!steps.some((step) => step.id === "ops-export-briefs"), "the share step is back");
 
     for (const retired of [
-      "Move the published pause and resume lines to fit your plan, and get an email the day one is crossed.",
+      "Move the published pause and restart lines to fit your plan, and get an email the day one is crossed.",
       "Budget direction and cash timing for the quarter.",
       "Copy or download the brief in the format you need.",
     ]) {

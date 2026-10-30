@@ -187,10 +187,10 @@ export const buildBriefEmbedData = (
    * no reading produced; the field is omitted rather than filled. It then
    * printed "Watch: Funding pressure < 66" — the first of the rules' resume
    * conditions (`compactFlipConditionLabels`), falling back to the lead rule's
-   * pause line. On Oct 5 that was Hiring's resume line, 24 points away, while
+   * pause line. On Oct 5 that was Hiring's restart line, 24 points away, while
    * the line that changes conditions was risk appetite clearing 50, 2 points
    * away. It is now the brief's own "Conditions change if" sentence, printed
-   * under that label, with a stage's resume line under its own.
+   * under that label, with a stage's restart line under its own.
    */
   const primaryAction = actionItems[0];
   const flipTrigger = homepage.weeklyCall.callChangesIf.trim() || null;
@@ -252,7 +252,7 @@ type BriefEmbedData = {
   flipDistance?: number | null;
   /** Concise margin / flip distance label for compact views */
   marginLabel?: string;
-  /** Set only when a stage is calibrated: that stage's resume line, printed under its own label. */
+  /** Set only when a stage is calibrated: that stage's restart line, printed under its own label. */
   resumeWhen?: string;
   /** Null when the call published no reversal condition. Never filler. */
   reversalCondition: string | null;
@@ -304,7 +304,7 @@ const escapeHtml = (value: string): string =>
 
 const escapeAttribute = escapeHtml;
 
-/* The change line under the brief's label, and a stage's resume line under its
+/* The change line under the brief's label, and a stage's restart line under its
    own, through the helper every surface that prints them reads. */
 const embedChangeLines = ({ flipTrigger, resumeWhen }: Pick<BriefEmbedData, "flipTrigger" | "resumeWhen">) =>
   flipTrigger ? weeklyCallChangeLines({ callChangesIf: flipTrigger, resumeWhen }) : [];

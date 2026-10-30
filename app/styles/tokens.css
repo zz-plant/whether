@@ -23,7 +23,7 @@
      stands. Everything else is ink.
 
      Line states. A pause line crossed or close prints in the front red; a
-     line cleared, or a resume line met, prints in the neutral ink and lets
+     line cleared, or a restart line met, prints in the neutral ink and lets
      the play glyph say "clear". Until 2026-10-09 these were Sunny's green and
      Cloudy's amber, so a cleared line read as "Sunny" and a crossed one as
      "Cloudy"; on Synoptic's light theme those two inks are one brown. The
@@ -48,7 +48,7 @@
   --color-caveat-fg: var(--app-text);
   --color-caveat-border: var(--app-text-muted);
   --color-caveat-bg: var(--bg-raised);
-  /* "Resume when": a resume line, so the clear ink. */
+  /* "Restart when": a restart line, so the clear ink. */
   --color-semantic-reversal-fg: var(--line-clear-ink);
   --color-semantic-unchanged-border: var(--app-text-muted);
 

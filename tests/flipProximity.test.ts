@@ -157,7 +157,7 @@ describe("standup line", () => {
   it("says the guidance changed at a line when the conditions did not, and claims nothing without a comparison", () => {
     assert.equal(
       buildStandupLine({ regime: "DEFENSIVE", change: "lines", ...source }),
-      `Guidance changed at a pause or resume line; review pace. ${callChange}`,
+      `Guidance changed at a pause or restart line; review pace. ${callChange}`,
     );
     assert.equal(buildStandupLine({ regime: "DEFENSIVE", change: null, ...source }), `No earlier reading to compare with. ${callChange}`);
   });

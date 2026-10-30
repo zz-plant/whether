@@ -31,7 +31,7 @@ import { buildCallChangeLine } from "./reportEvidence";
  * guidance it sat under.
  *
  * Each area is a small state against its own lines: paused when any pause line holds,
- * resumable when every numeric resume line holds, holding otherwise. This compares that
+ * resumable when every numeric restart line holds, holding otherwise. This compares that
  * state at the earlier reading with the state now, and names the lines that decided it.
  * Nothing here scores or classifies: it reads the same conditions the rules table prints,
  * through the same `isRuleConditionMet`, so it cannot say a line was crossed that the row
@@ -64,10 +64,10 @@ export const areaLinesFromActionStrip = (
 type AreaState = "pause" | "hold" | "resume";
 
 /**
- * How an area moved between the two readings. `resumable` is where the resume lines now
+ * How an area moved between the two readings. `resumable` is where the restart lines now
  * hold, from a pause or from holding: a state that excludes the pause, so a pause that
  * lifted on the way is not a separate movement. `lifted` is a pause that no longer applies
- * with the resume lines not yet met.
+ * with the restart lines not yet met.
  */
 export type AreaMovementKind = "paused" | "lifted" | "resumable" | "resumeLost" | "held";
 
@@ -170,8 +170,8 @@ const describeCrossing = (line: CrossedLine) =>
 const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
   paused: "Pause now applies",
   lifted: "Pause lifted",
-  resumable: "Resume line met",
-  resumeLost: "Resume line no longer met",
+  resumable: "Restart line met",
+  resumeLost: "Restart line no longer met",
 };
 
 /*
@@ -182,7 +182,7 @@ const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
  */
 const HELD_STATE_TEXT: Record<AreaState, string | null> = {
   pause: "Pause still applies",
-  resume: "Resume line still met",
+  resume: "Restart line still met",
   hold: null,
 };
 
@@ -195,7 +195,7 @@ type HeldGroup = { state: AreaState; areas: DecisionArea[]; text: string };
 
 const HELD_GROUP_TEXT: Record<AreaState, (areas: string, window: string) => string> = {
   pause: (areas, window) => `Pause still applies to ${areas}: no line crossed ${window}.`,
-  resume: (areas, window) => `Resume line still met for ${areas}: no line crossed ${window}.`,
+  resume: (areas, window) => `Restart line still met for ${areas}: no line crossed ${window}.`,
   hold: (areas, window) => `No line crossed ${window} for ${areas}.`,
 };
 
@@ -204,8 +204,8 @@ const HELD_STATE_ORDER: readonly AreaState[] = ["pause", "resume", "hold"];
 const GROUP_CLAUSE: Record<Exclude<AreaMovementKind, "held">, (areas: string) => string> = {
   paused: (areas) => `the pause now applies to ${areas}`,
   lifted: (areas) => `the pause no longer applies to ${areas}`,
-  resumable: (areas) => `the resume line is now met for ${areas}`,
-  resumeLost: (areas) => `the resume line is no longer met for ${areas}`,
+  resumable: (areas) => `the restart line is now met for ${areas}`,
+  resumeLost: (areas) => `the restart line is no longer met for ${areas}`,
 };
 
 const GROUP_ORDER: readonly Exclude<AreaMovementKind, "held">[] = ["paused", "lifted", "resumable", "resumeLost"];
@@ -223,7 +223,7 @@ const moveOf = (
   const resumeFlips = flippedLines(lines.resume, previous, current);
   const liftedPause = pauseFlips.filter((flip) => !flip.holds);
   const resumeNowHolds = resumeFlips.filter((flip) => flip.holds);
-  /* Coming out of a pause into resumable, the resume line is the further one a score has
+  /* Coming out of a pause into resumable, the restart line is the further one a score has
      passed, so it is the line named; the pause line it also passed is implied by it. */
   const decisive: Record<AreaMovementKind, Flip[]> = {
     held: [],
@@ -236,7 +236,7 @@ const moveOf = (
   const text =
     kind === "held"
       ? describeHeld(to, window)
-      : `${from === "pause" && kind === "resumable" ? "Pause lifted, resume line met" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
+      : `${from === "pause" && kind === "resumable" ? "Pause lifted, restart line met" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
   return { area: lines.area, kind, state: to, crossed, text };
 };
 
@@ -311,8 +311,8 @@ export const buildDecisionMovement = ({
   const { sentence, headline, headlines } = ((): { sentence: string; headline: string; headlines: string[] } => {
     if (moved.length === 0) {
       const nothing = conditions
-        ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no pause or resume line was crossed.`
-        : `Conditions held steady ${window}; no pause or resume line was crossed. ${describeGuidanceStands(basis)}`;
+        ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no pause or restart line was crossed.`
+        : `Conditions held steady ${window}; no pause or restart line was crossed. ${describeGuidanceStands(basis)}`;
       return { sentence: nothing, headline: nothing, headlines: [nothing] };
     }
     const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
@@ -326,7 +326,7 @@ export const buildDecisionMovement = ({
        conditions clause goes first, because the card prints the conditions now in its own
        label; then the areas go to a count. */
     const withoutConditions = `${upperFirst(window)}, ${clauses.join("; ")}.`;
-    const counted = `${lead}${countAreas(moved.length, movements.length)} crossed a pause or resume line.`;
+    const counted = `${lead}${countAreas(moved.length, movements.length)} crossed a pause or restart line.`;
     /* Short sentences, each group with its own cause. It was one sentence with a
        semicolon between the groups and a colon before every cause at once — 45
        words on a week that changed conditions and moved areas two ways — so a
@@ -359,7 +359,7 @@ export const buildDecisionMovement = ({
 /**
  * What the week did to the guidance: `"conditions"` when the conditions changed (the
  * week's `regimeChanged`, or a change the movement names), `"lines"` when an area's pause
- * or resume line was crossed under the same conditions, `"held"` when neither — the week
+ * or restart line was crossed under the same conditions, `"held"` when neither — the week
  * the movement sentence calls "The guidance stands" — and null when nothing was
  * compared.
  *
@@ -397,8 +397,8 @@ export const describeMovementCause = (movement: Pick<DecisionMovement, "groups" 
   const crossings = uniqueLines(movement.groups.flatMap((group) => group.crossed)).map(describeCrossing);
   if (crossings.length > 0) return `${upperFirst(joinAnd(crossings))}.`;
   return movement.comparedWith
-    ? `No score crossed a pause or resume line since ${movement.comparedWith}.`
-    : "No score crossed a pause or resume line.";
+    ? `No line was crossed since ${movement.comparedWith}.`
+    : "No line was crossed.";
 };
 
 export const fitMovementHeadline = (movement: Pick<DecisionMovement, "headline" | "headlines">, maxLength: number): string =>
@@ -459,5 +459,5 @@ export const buildStandupLine = ({
   if (change === null) return `No earlier reading to compare with. ${callChange}`;
   if (change === "held") return `Guidance unchanged; no pace change. ${callChange}`;
   if (change === "conditions") return `Conditions changed to ${getRegimePublicLabel(regime)}; review pace. ${callChange}`;
-  return `Guidance changed at a pause or resume line; review pace. ${callChange}`;
+  return `Guidance changed at a pause or restart line; review pace. ${callChange}`;
 };

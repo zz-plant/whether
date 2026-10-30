@@ -18,7 +18,7 @@ const textOf = (node: ReactNode): string => {
 };
 
 const props: BriefImageProps = {
-  decision: "Hold net-new hiring and freeze discretionary spend until funding pressure falls back under the resume line and stays there for two readings in a row.",
+  decision: "Hold net-new hiring and freeze discretionary spend until funding pressure falls back under the restart line and stays there for two readings in a row.",
   regime: "SCARCITY",
   readings: buildScoreReadings({
     scores: { tightness: 100, riskAppetite: 43 },

@@ -74,7 +74,7 @@ const ONE_WEEK_MS = 7 * 24 * 60 * 60 * 1000;
  * The lines a threshold alert watches, from the same source as the rules.
  *
  * These were the fixed marks 50 and 75 on both scores, which no rule uses: the
- * pause and resume lines sit at 76 / 66 on funding pressure and 44 / 54 on risk
+ * pause and restart lines sit at 76 / 66 on funding pressure and 44 / 54 on risk
  * appetite, and the change lines at 70 and 50. So the alert the homepage offers
  * ("an email the day a score crosses its line") fired at marks the page never
  * printed, and the email called 75 "the pause line".
@@ -105,7 +105,7 @@ const checkRegimeChange = (
 
 /**
  * Which side of a line a score is on. A score exactly on a line is on the side where the
- * line does not hold: a pause or resume line holds strictly beyond its number, as the area
+ * line does not hold: a pause or restart line holds strictly beyond its number, as the area
  * rules state it ("> 76", "< 66"), and the change line is crossed only above it, the way
  * `classifyRegime` reads a score equal to the threshold. Comparing `>=` on one side and
  * `<=` on the other made a score landing on a line miss the crossing, and a score leaving
@@ -147,9 +147,9 @@ const buildThresholdDecision = (line: PublishedLine, score: number): AlertDecisi
  * 66, 70 and 76 in one move; three emails about one move would be the noise this
  * stream promises not to make, so the letter names the last line the move
  * crossed, which is the one whose state now holds: the pause line on that rise,
- * the resume line on a fall from 80 to 60. Ranking pause before change before
+ * the restart line on a fall from 80 to 60. Ranking pause before change before
  * resume whatever the direction named the pause line on the fall too, so the
- * letter said held work resumes "once each area's resume line is met" with the
+ * letter said held work resumes "once each area's restart line is met" with the
  * score already past it, and the resume letter never came, since delivery sends
  * one threshold alert per score.
  */
