@@ -89,7 +89,7 @@ const listSent = async (attempt = 0) => {
       await new Promise((resolve) => setTimeout(resolve, 500));
       return listSent(attempt + 1);
     }
-    throw new Error(`explorer unreachable: ${error}`);
+    throw new Error(`explorer unreachable: ${String(error)}`);
   }
   if (!response.ok) {
     /* The local capture store is a dev aid with a row budget; a long session of
