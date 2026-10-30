@@ -104,7 +104,7 @@ export async function buildPlanningPageModel(
   const failureModes = snapshot.homeBriefModel.failureModes ?? [];
   /* What each closed step holds, said on the closed step (§XII: "a summary that
      shows the current values"). Until 2026-10-07 the three read "Move the
-     published pause and resume lines…", "Budget direction and cash timing for
+     published pause and restart lines…", "Budget direction and cash timing for
      the quarter." and "Copy or download the brief in the format you need." —
      a title and a sentence about the gesture, which read as empty boxes. */
   const planLineDefaults = planLinesFromRules(buildCanonicalBoundedDecisionRules({
@@ -114,7 +114,7 @@ export async function buildPlanningPageModel(
   }));
   const listOf = (items: readonly string[], type: "conjunction" | "disjunction") =>
     new Intl.ListFormat("en-GB", { style: "long", type }).format(items);
-  const planLinesSummary = `Start from the published pause and resume lines for ${listOf(
+  const planLinesSummary = `Start from the published pause and restart lines for ${listOf(
     planLineDefaults.map((line) => decisionAreaLabel(line.area)),
     "conjunction",
   )}, then move the ones your plan needs. You get an email the day one is crossed.`;
@@ -199,7 +199,7 @@ export async function buildPlanningPageModel(
           {
             id: "ops-monthly-action-summary",
             /* First and open (2026-10-07): the page's job is this week's rules, and
-               the pause and resume lines are what a reader acts on (§XII never
+               the pause and restart lines are what a reader acts on (§XII never
                collapses them). From 2026-10-06 the page opened on an empty
                decision form instead, with this table closed three steps down —
                on a phone the form was all a reader saw after the intro. This is

@@ -172,7 +172,7 @@ export const renderMonthlySummaryCopy = ({
       `${DECISION_CONTRACT_LABELS.slot.reversal}: ${rule.reversal}`,
     ])),
     "",
-    "RESUME LINES",
+    "RESTART LINES",
     "",
     ...toBullets(structured.reversalConditions),
     "",

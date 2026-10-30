@@ -184,7 +184,7 @@ export function EmbedBuilder() {
 
       <details className="weather-auto-chevron">
         <summary className="text-fluid-xs font-semibold text-slate-200">
-          <span>Customise: ticker and company stage</span>
+          <span>Customize: ticker and company stage</span>
         </summary>
         <div className="mt-3 max-w-sm space-y-3">
           <div>

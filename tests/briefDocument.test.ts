@@ -46,7 +46,7 @@ describe("the brief document", () => {
     assert.equal(document.slots.actionNow, snapshot.weeklyCall.actionNow);
     assert.equal(document.slots.callChangesIf, snapshot.weeklyCall.callChangesIf);
     assert.deepEqual(document.slots.flipConditionLabels, snapshot.weeklyCall.flipConditionLabels);
-    assert.equal(document.slots.resumeWhen, undefined, "no stage, no resume line");
+    assert.equal(document.slots.resumeWhen, undefined, "no stage, no restart line");
     assert.equal(document.conditions.label, snapshot.weeklyCall.regimeStage);
     assert.match(document.conditions.line, new RegExp(`^${snapshot.weeklyCall.regimeStage} \\(`));
   });

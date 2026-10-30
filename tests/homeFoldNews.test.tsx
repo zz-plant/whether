@@ -21,22 +21,22 @@ const slot = (met: boolean, points: number) => ({ line: "Funding pressure > 76",
 
 describe("where each decision stands, before a click", () => {
   it("says a crossed pause line as a state, and an uncrossed one as a distance", () => {
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "Past its pause line", crossed: true, state: "crossed" });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "4 pts from its pause line", crossed: false, state: "near" });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "1 pt from its pause line", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "On hold", crossed: true, state: "crossed" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "4 pts from pausing", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "1 pt from pausing", crossed: false, state: "near" });
     assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 0) }), { text: "At its pause line", crossed: false, state: "near" });
     /* Past the 5 points the margin calls close, the line is clear of the reading. */
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 6) }), { text: "6 pts from its pause line", crossed: false, state: "clear" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 6) }), { text: "6 pts from pausing", crossed: false, state: "clear" });
     assert.equal(describeAreaPauseStatus({}), undefined, "an area with no pause line has nothing to say");
   });
 
   it("counts the crossed lines over the areas that have one", () => {
     assert.equal(
       describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(true, 2) }, { pause: slot(false, 4) }, {}]),
-      "2 of 3 areas are past their pause line.",
+      "2 of 3 areas are on hold.",
     );
-    assert.equal(describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(false, 4) }]), "1 of 2 areas is past its pause line.");
-    assert.equal(describePauseLineCount([{ pause: slot(false, 3) }]), "No area is past its pause line.");
+    assert.equal(describePauseLineCount([{ pause: slot(true, 1) }, { pause: slot(false, 4) }]), "1 of 2 areas is on hold.");
+    assert.equal(describePauseLineCount([{ pause: slot(false, 3) }]), "No area is on hold.");
     assert.equal(describePauseLineCount([{}]), null);
   });
 });

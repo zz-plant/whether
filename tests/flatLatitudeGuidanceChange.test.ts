@@ -67,7 +67,7 @@ describe("a flat operating latitude over a week the guidance changed", () => {
 
     assert.equal(
       buildStandupLine({ regime: "DEFENSIVE", change: summary.guidanceChange, ...source }),
-      "Guidance changed at a pause or resume line; review pace. Conditions change if: Risk appetite falls 4 pts from 54 to 50 or below.",
+      "Guidance changed at a pause or restart line; review pace. Conditions change if: Risk appetite falls 4 pts from 54 to 50 or below.",
     );
   });
 

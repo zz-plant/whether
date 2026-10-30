@@ -100,7 +100,7 @@ type NotCountedScore = {
   published: number;
   /**
    * The line they would carry the score past that the published score is not
-   * past: "its change line", or an area's pause or resume line. Null when they
+   * past: "its change line", or an area's pause or restart line. Null when they
    * would cross none, and then nothing they say changes the guidance.
    */
   line: string | null;
@@ -193,7 +193,7 @@ type BasisAssessment = Pick<RegimeAssessment, "regime" | "scores" | "thresholds"
 /**
  * The line a score would cross between its published value and `counted`, in
  * the order a reader weighs them: the change line, which moves the conditions,
- * then an area's pause line, then its resume line. The area lines are the
+ * then an area's pause line, then its restart line. The area lines are the
  * published ones (`buildCanonicalBoundedDecisionRules`), judged by the
  * predicate the rules table prints with.
  */
@@ -215,7 +215,7 @@ const crossedLine = (metric: RuleConditionMetric, counted: number, assessment: B
         ),
       )
       .map((rule) => rule.area);
-    if (areas.length > 0) return `the ${side} line for ${listAreas(areas)}`;
+    if (areas.length > 0) return `the ${side === "pause" ? "pause" : "restart"} line for ${listAreas(areas)}`;
   }
   return null;
 };

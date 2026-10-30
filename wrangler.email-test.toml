@@ -1,0 +1,206 @@
+name = "whether"
+main = "./worker/index.ts"
+compatibility_date = "2026-03-15"
+compatibility_flags = ["nodejs_compat"]
+# vite.config.ts emits source maps for the server environments only (never the client), and
+# Wrangler uploads them so Workers Logs stack traces name real files and lines. Fetched after the
+# invocation completes; no runtime cost. The map for the entry is under 1MB against a 15MB limit.
+upload_source_maps = true
+preview_urls = true
+
+# Tail logs and runtime errors stay in the Workers dashboard for the active deploy.
+# `head_sampling_rate = 1` keeps invocation logs unsampled while we tune cost.
+[observability]
+enabled = true
+head_sampling_rate = 1
+
+# Automatic tracing (open beta): spans for every handler invocation, external fetch, and
+# KV/DO operation, with no code change. This is the evidence the read-deadline and
+# zero-writes invariants lacked in the 2026-08-30 to 2026-09-02 incidents. Export goes to
+# an OTLP destination configured in the dashboard (Observability -> Destinations). Spans
+# move to unified volume pricing on December 1, 2026 (50 GB/mo included, $0.25/GB thereafter);
+# head_sampling_rate remains the cost knob.
+[observability.traces]
+enabled = true
+head_sampling_rate = 1
+
+# Render close to the data, not the visitor: each request makes several sequential KV
+# round-trips (materialized model, event logs) plus upstream FRED calls, so Smart
+# Placement's latency profile beats edge placement for this Worker.
+[placement]
+mode = "smart"
+
+[assets]
+binding = "ASSETS"
+directory = "./dist/client"
+not_found_handling = "none"
+
+[images]
+binding = "IMAGES"
+
+# Surfaces the deployed Worker version (id, tag, timestamp) at runtime so
+# `/api/health` and other surfaces can report a live commit/version reference
+# without relying on Pages-only env vars. See app/api/health/route.ts.
+[version_metadata]
+binding = "CF_VERSION_METADATA"
+
+# Rate limiting bindings (lib/runtime/rateLimit.ts). Counters are per key per Cloudflare
+# location and eventually consistent: abuse control, not accounting. The subscribe limiter
+# fronts every path that sends a verification email; the public-write limiter fronts the
+# browser telemetry intake and the per-ticker quote proxy. `namespace_id` is account-wide:
+# two bindings sharing one share their counters, which is why the preview lane has its own.
+[[ratelimits]]
+name = "WHETHER_SUBSCRIBE_RATE_LIMITER"
+namespace_id = "1001"
+simple = { limit = 5, period = 60 }
+
+[[ratelimits]]
+name = "WHETHER_PUBLIC_WRITE_RATE_LIMITER"
+namespace_id = "1002"
+simple = { limit = 60, period = 60 }
+
+# Workers Analytics Engine dataset for telemetry streams (web-vitals,
+# operator-workflow, content-measurement). lib/telemetry/analyticsEngine.ts
+# is the single write path; routes call writeAnalytics(stream, event).
+# Datasets are auto-created on first write, so no extra provisioning is needed.
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "whether_telemetry"
+
+# Durable KV for regime alerts, decision events, decision memory, alert preferences,
+# posture events, and ingestion snapshots. The repos in lib/storage/* and
+# lib/events/decisionEventStore.ts probe globalThis.WHETHER_DURABLE_KV first and
+# fall back to in-memory per-isolate storage when the binding is missing.
+[[kv_namespaces]]
+binding = "WHETHER_DURABLE_KV"
+id = "cb5c7f5947e94592b4127aa25fa8541d"
+preview_id = "d116663399244346bd302324b485e8f3"
+
+# Vinext ISR / data cache (fetch, "use cache", unstable_cache). See vite.config.ts
+# cache.data adapter. Created via `wrangler kv namespace create VINEXT_KV_CACHE`.
+[[kv_namespaces]]
+binding = "VINEXT_KV_CACHE"
+id = "2e843b0be3ef42e2a8a863b5e78b0fc4"
+# `wrangler dev --remote` sessions write to the preview namespace, not the prod cache.
+preview_id = "241a4b51d9aa4eab844ad103c3b78e74"
+
+# Trial infrastructure (docs/agents/data-and-platform.md). Both classes are exported from
+# worker/index.ts and declared in every environment so one migration list serves both, but
+# only the preview lane's vars switch them on (WHETHER_INGEST_COORDINATOR,
+# WHETHER_HISTORY_WORKFLOW). Unused, an object class and a workflow definition cost nothing.
+[[durable_objects.bindings]]
+name = "INGEST_COORDINATOR"
+class_name = "IngestCoordinator"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["IngestCoordinator"]
+
+[[workflows]]
+name = "whether-regime-history-refresh"
+binding = "REGIME_HISTORY_WORKFLOW"
+class_name = "RegimeHistoryRefreshWorkflow"
+
+# Freezes the week's brief into data/published_briefs.json behind a pull request, from inside
+# Cloudflare where FRED is reachable. Switched on by WHETHER_BRIEF_FREEZE_WORKFLOW (preview only).
+[[workflows]]
+name = "whether-weekly-brief-freeze"
+binding = "BRIEF_FREEZE_WORKFLOW"
+class_name = "WeeklyBriefFreezeWorkflow"
+
+[[send_email]]
+name = "EMAIL"
+remote = true
+
+[triggers]
+# Daily 02:00 UTC ingest, and the weekly send at 14:00 UTC Monday. Weekdays are written as names:
+# Cloudflare counts 1 = Sunday, so the "0 14 * * 1" this replaced sent the Monday brief on Sundays
+# from May to October 2026. tests/cronSchedule.test.ts rejects a numeric weekday.
+crons = ["0 2 * * *", "0 14 * * MON"]
+
+[vars]
+NEXT_PUBLIC_SITE_URL = "https://whether.work"
+WHETHER_INGEST_COORDINATOR = "1"
+WHETHER_HISTORY_WORKFLOW = "1"
+WHETHER_BRIEF_FREEZE_WORKFLOW = "1"
+# Both data Workflows merge their own pull request once Cloudflare's branch build of it is green
+# and it changes only their data file (lib/github/dataPullRequestMerge.ts). "0" hands the merge
+# back to a person without a code change.
+WHETHER_AUTOMERGE_DATA_PRS = "1"
+GITHUB_REPOSITORY = "zz-plant/whether"
+
+[env.preview]
+preview_urls = true
+upload_source_maps = true
+
+[env.preview.placement]
+mode = "smart"
+
+[env.preview.vars]
+NEXT_PUBLIC_SITE_URL = "https://whether.work"
+# The trial switches. Production leaves both unset until the preview lane has proven them.
+WHETHER_INGEST_COORDINATOR = "1"
+WHETHER_HISTORY_WORKFLOW = "1"
+WHETHER_BRIEF_FREEZE_WORKFLOW = "1"
+# The Analytics Engine dataset this lane writes, so the trust page's run history reads its
+# own lane back (lib/telemetry/runHistory.ts). Production reads the default, whether_telemetry.
+WHETHER_TELEMETRY_DATASET = "whether_telemetry_preview"
+# Design-scratch routes under /mockups. Production leaves this unset, so those
+# routes 404 there; the preview lane keeps them for design review.
+WHETHER_ENABLE_MOCKUPS = "1"
+GITHUB_REPOSITORY = "zz-plant/whether"
+
+[env.preview.images]
+binding = "IMAGES"
+
+[env.preview.version_metadata]
+binding = "CF_VERSION_METADATA"
+
+[env.preview.observability]
+enabled = true
+head_sampling_rate = 1
+
+[env.preview.observability.traces]
+enabled = true
+head_sampling_rate = 1
+
+[[env.preview.ratelimits]]
+name = "WHETHER_SUBSCRIBE_RATE_LIMITER"
+namespace_id = "1101"
+simple = { limit = 5, period = 60 }
+
+[[env.preview.ratelimits]]
+name = "WHETHER_PUBLIC_WRITE_RATE_LIMITER"
+namespace_id = "1102"
+simple = { limit = 60, period = 60 }
+
+[[env.preview.analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "whether_telemetry_preview"
+
+# Mirror of the production WHETHER_DURABLE_KV binding for the preview environment.
+[[env.preview.kv_namespaces]]
+binding = "WHETHER_DURABLE_KV"
+id = "d116663399244346bd302324b485e8f3"
+preview_id = "d116663399244346bd302324b485e8f3"
+
+# Dedicated namespace: preview deploys must not share (and poison) the production
+# ISR/data cache. Created via `wrangler kv namespace create VINEXT_KV_CACHE_PREVIEW`.
+[[env.preview.kv_namespaces]]
+binding = "VINEXT_KV_CACHE"
+id = "241a4b51d9aa4eab844ad103c3b78e74"
+preview_id = "241a4b51d9aa4eab844ad103c3b78e74"
+
+[[env.preview.durable_objects.bindings]]
+name = "INGEST_COORDINATOR"
+class_name = "IngestCoordinator"
+
+[[env.preview.workflows]]
+name = "whether-regime-history-refresh-preview"
+binding = "REGIME_HISTORY_WORKFLOW"
+class_name = "RegimeHistoryRefreshWorkflow"
+
+[[env.preview.workflows]]
+name = "whether-weekly-brief-freeze-preview"
+binding = "BRIEF_FREEZE_WORKFLOW"
+class_name = "WeeklyBriefFreezeWorkflow"

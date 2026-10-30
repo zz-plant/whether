@@ -190,10 +190,10 @@ export const describePlanLineCrossing = (
   return crossing.side === "pause"
     ? {
       headline: `${area}: your pause line was crossed`,
-      body: `You set ${area.toLowerCase()} to pause if ${clause}. ${today} The plan you made for ${area.toLowerCase()} pauses until your resume line holds.${atRunway}`,
+      body: `You set ${area.toLowerCase()} to pause if ${clause}. ${today} The plan you made for ${area.toLowerCase()} pauses until your restart line holds.${atRunway}`,
     }
     : {
-      headline: `${area}: your resume line holds`,
-      body: `You set ${area.toLowerCase()} to resume when ${clause}. ${today} The work you held can resume.${atRunway}`,
+      headline: `${area}: your restart line holds`,
+      body: `You set ${area.toLowerCase()} to restart when ${clause}. ${today} The work you held can resume.${atRunway}`,
     };
 };

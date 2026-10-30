@@ -9,7 +9,7 @@ serveUnreachableUpstreams();
 /*
  * The signal watch pages opened on a bare heading, with the week's call in a
  * bulleted block further down that printed the call-change line under "Resume
- * when" — the label for an area's resume line, at a different number. They open
+ * when" — the label for an area's restart line, at a different number. They open
  * on the brief's own card now: the stamp, the signal as the heading, the call,
  * and the lines it holds between, each under its own label.
  */
@@ -23,7 +23,7 @@ describe("a signal watch page", () => {
     assert.match(text, /Funding pressure watch/);
     assert.match(text, /Conditions change if/);
     assert.match(text, /Pause if/);
-    assert.doesNotMatch(text, /Resume when/, "no area resume label on the call-change line");
+    assert.doesNotMatch(text, /Restart when/, "no area resume label on the call-change line");
     assert.doesNotMatch(text, /handoff/i);
   });
 });

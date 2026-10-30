@@ -56,12 +56,15 @@ describe("why conditions", () => {
     assert.doesNotMatch(html, /What the headline reading leaves out/);
   });
 
-  it("gives a capped score's real distance to its change line", () => {
+  it("gives a capped score's distance to its change line, and only one distance", () => {
     const html = render({ saturatedPressure: 110 });
     assert.match(html, /shows 90 because that(?:&#x27;|’|')s as high as the score goes/);
     assert.match(html, /uncapped it would be 110/);
-    // 90 against 70 shows 20 points; 110 against 70 is 40 points of pressure.
-    assert.match(html, /20 points above its 70 change line on the\s+score, but really 40/);
+    // The line is set against the printed score, so 90 against 70 is the distance.
+    assert.match(html, /the distance is 20 points above\s+the 70 change line/);
+    /* The uncapped distance was printed beside it, so one paragraph gave two
+       answers to "how far past the line" and a reader had to choose. */
+    assert.doesNotMatch(html, /but really/, "one paragraph must not give two distances");
   });
 
   it("omits the capped note when the score is not capped", () => {

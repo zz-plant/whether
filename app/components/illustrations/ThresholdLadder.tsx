@@ -159,7 +159,7 @@ export function ThresholdLadder({
   const thresholdDesc =
     reversalValue === undefined
       ? `Pause line at ${formatNumber(triggerValue)}${unit}.`
-      : `Pause line at ${formatNumber(triggerValue)}${unit}. Resume line at ${formatNumber(reversalValue)}${unit}.`;
+      : `Pause line at ${formatNumber(triggerValue)}${unit}. Restart line at ${formatNumber(reversalValue)}${unit}.`;
 
   const movementDesc =
     previousValue === undefined

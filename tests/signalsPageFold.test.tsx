@@ -56,7 +56,7 @@ const summaryAnswer = (markup: string, question: string) => {
 };
 
 describe("/signals leads with the delta and folds its instruments", () => {
-  /* Two sections since 2026-10-27: the call-line ladders and "Pause if / Resume when"
+  /* Two sections since 2026-10-27: the call-line ladders and "Pause if / Restart when"
      between them were the brief's "What would change this guidance" drawn again, and
      the table links there instead. */
   it("opens on what changed, with no restated call and no second copy of the brief's lines", () => {

@@ -42,8 +42,8 @@ describe("buildTrustStripProps", () => {
   it("names the four data states with the phrase table /trust uses", () => {
     const base = { recordDateLabel: "Sep 18, 2026", confidenceLabel: "HIGH" as const, assessment: assessment(false), scoringBasis: ON_RECORD };
     assert.equal(buildTrustStripProps({ ...base, isFallback: false }).sourcesLabel, "All sources live");
-    assert.equal(buildTrustStripProps({ ...base, isFallback: false, degradedSourceCount: 2 }).sourcesLabel, "Partly cached");
-    assert.equal(buildTrustStripProps({ ...base, isFallback: true }).sourcesLabel, "Cached snapshot");
+    assert.equal(buildTrustStripProps({ ...base, isFallback: false, degradedSourceCount: 2 }).sourcesLabel, "Some sources saved");
+    assert.equal(buildTrustStripProps({ ...base, isFallback: true }).sourcesLabel, "Saved copy");
     const historical = buildTrustStripProps({ ...base, isFallback: false, isHistorical: true });
     assert.equal(historical.sourcesLabel, "Historical snapshot");
     assert.equal(historical.sourcesLive, false, "a past month is not drawn in the live tone");
@@ -94,7 +94,7 @@ describe("answer page trust strip", () => {
       const slug = answerPages[0]?.slug ?? "";
       const html = renderToStaticMarkup(await DecisionAnswerPageContent({ slug, route: `/answers/${slug}` }));
       assert.doesNotMatch(html, />Live</);
-      assert.match(html, /Cached snapshot|Partly cached/);
+      assert.match(html, /Saved copy|Some sources saved/);
     } finally {
       if (previousBinding) Object.defineProperty(globalThis, "WHETHER_DURABLE_KV", previousBinding);
       else Reflect.deleteProperty(globalThis, "WHETHER_DURABLE_KV");

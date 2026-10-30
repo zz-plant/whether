@@ -1,16 +1,16 @@
-# Capital Posture Template
+# Capital Discipline Template
 
-## 1) Posture call
-- Current posture:
-- Confidence:
+## 1) This quarter's guidance
+- Conditions:
+- Room before a change:
 - Effective date:
 
-## 2) SAFE / RISKY / DANGEROUS portfolio map
+## 2) Committed / Staged / Off the table
 | Initiative | Class | Owner | Reversal path | Next review |
 |---|---|---|---|---|
 
-## 3) Trigger dashboard (a signal must hold for 30 days before the posture changes)
-| Signal | Threshold | Current | Direction | Action if breached |
+## 3) Watch list (a reading must hold for two consecutive readings before the guidance changes)
+| Signal | Line | Current | Direction | Action if breached |
 |---|---|---|---|---|
 
 ## 4) Board notes

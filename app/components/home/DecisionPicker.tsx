@@ -42,8 +42,8 @@ import { CheckIcon, ShareIcon } from "../uiIcons";
 
 /**
  * How far the reading is from a line, as a stamp: a status, so sharp (§XIV).
- * The state badge carries the pause line's three states and a resume line that
- * is met, in the inks their columns carry in the area table; a resume line not
+ * The state badge carries the pause line's three states and a restart line that
+ * is met, in the inks their columns carry in the area table; a restart line not
  * yet reached stays a neutral stamp with no glyph, because it is not a pause.
  */
 function LineDistance({ slot, kind }: { slot: HomeAreaLineSlot; kind: "pause" | "resume" }) {
@@ -105,7 +105,7 @@ export function DecisionPicker({
     const bullets: string[] = [];
     if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
     if (active.pause?.line) bullets.push(`• *Pause if:* ${active.pause.line}${active.pause.distance ? ` (${active.pause.distance})` : ""}`);
-    if (active.resume?.line) bullets.push(`• *Resume when:* ${active.resume.line}${active.resume.distance ? ` (${active.resume.distance})` : ""}`);
+    if (active.resume?.line) bullets.push(`• *Restart when:* ${active.resume.line}${active.resume.distance ? ` (${active.resume.distance})` : ""}`);
     if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
     if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
 
@@ -153,7 +153,7 @@ export function DecisionPicker({
             </p>
           ) : null}
           <p className="text-fluid-xs text-slate-400">
-            Each answer holds until a score crosses one of its lines, and most weeks none does.
+            Each area holds past its pause line and restarts past its restart line. Most weeks neither happens.
           </p>
         </div>
 

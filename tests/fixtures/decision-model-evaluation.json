@@ -19,7 +19,7 @@
           "recordDate": "2026-10-15",
           "engineVersion": "illustrative-fixture-v1",
           "readingId": "authored-reading-1",
-          "text": "Hold net-new hiring while funding pressure remains above 70. Resume when funding pressure falls below 66."
+          "text": "Hold net-new hiring while funding pressure remains above 70. Restart when funding pressure falls below 66."
         }
       },
       "expected": {

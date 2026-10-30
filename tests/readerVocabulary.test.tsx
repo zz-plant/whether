@@ -124,7 +124,7 @@ const BANNED: { name: string; pattern: RegExp }[] = [
     pattern:
       /\b(Change the roadmap|Product tempo|Raise money|Capital raising|Approve new spend(?! only)|Burn discipline|Investment pace|Start something new|Expansion bets|Hire someone)\b|\b(product tempo|burn discipline|expansion bets|investment pace)\b/,
   },
-  /* The three lines are the pause line, the resume line and the change line.
+  /* The three lines are the pause line, the restart line and the change line.
      "Threshold", "reversal" and "boundary" named the same lines on the chart titles,
      the brief's ladders ("Trigger at 76. Reversal at 66.") and the export slots. */
   {

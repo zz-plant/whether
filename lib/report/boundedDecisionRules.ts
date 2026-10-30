@@ -127,7 +127,7 @@ export const isRuleConditionMet = (condition: RuleCondition, current: number): b
 
 /**
  * The one sentence form of a condition. A rising line reads "rises above", a
- * falling one "falls below"; a resume line on risk appetite reads "is above"
+ * falling one "falls below"; a restart line on risk appetite reads "is above"
  * because that side of the rule is a state to hold, not a move to watch.
  *
  * A line the reading already meets says so: its clause states where the score
@@ -184,8 +184,8 @@ const describeRuleCondition = (
  * An "or" rule prints the met readings: one is enough to fire it. An "and" rule
  * prints every reading, because a met half alone reads as nearly there. Until
  * 2026-10-21 a week at funding pressure 90 and risk appetite 55 was told to
- * "Resume when funding pressure falls below 66 and risk appetite is above 54.
- * Risk appetite is 55 now." — one point from the resume line by every number
+ * "Restart when funding pressure falls below 66 and risk appetite is above 54.
+ * Risk appetite is 55 now." — one point from the restart line by every number
  * the sentence gave, and 24 from it by the one it left out.
  */
 const withReadingsNow = (sentence: string, join: BoundedRuleClause["join"], conditions: DescribedCondition[]): string => {
@@ -643,11 +643,11 @@ export const buildScopedVariantDecisionAdjustment = ({
 }): ScopedVariantDecisionAdjustment => {
   const resolvedBand = resolveRunwayBand(runwayBand, runwayMonths);
   /*
-   * The resume lines a stage's hold lifts on: the same two lines, with the same
+   * The restart lines a stage's hold lifts on: the same two lines, with the same
    * numbers and wording, the area rules print (`sharedDecisionLines`,
    * `describeRuleCondition`). Series A read "Reverse the hold only after the
    * trigger clears", naming no line and no number, and Series B and Public named
-   * "their resume lines" and "the line" without saying where either sat.
+   * "their restart lines" and "the line" without saying where either sat.
    */
   const { tightnessResume, riskResume, tightnessPause, riskPause } = sharedDecisionLines(thresholds);
   /*
@@ -830,7 +830,7 @@ const scaleAdjustmentToRunway = (
         "Cash gate: under six months of runway, hold every new commitment whatever this week's guidance says.",
         ...base.watchAdjustments,
       ],
-      thresholdEmphasis: "Runway is what limits you this week, not the guidance. The pause and resume lines apply again once cash clears nine months.",
+      thresholdEmphasis: "Runway is what limits you this week, not the guidance. The pause and restart lines apply again once cash clears nine months.",
       reversalTriggerDiscipline: "Reverse the freeze only after runway extends past nine months or bridge financing is banked.",
     };
   }

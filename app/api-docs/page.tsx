@@ -81,7 +81,7 @@ export default function ApiDocsPage() {
         <h1 className="text-fluid-2xl font-semibold leading-tight text-slate-100">API and agent tools</h1>
         <p className="text-sm text-slate-300">
           Read this week's guidance from an AI agent, a script, or a dashboard. Whether serves the guidance, the two
-          scores behind it, and the pause and resume lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Whether is free, and the API needs no key.
+          scores behind it, and the pause and restart lines through a Model Context Protocol (MCP) server, REST endpoints, a CLI, and an embeddable widget. Whether is free, and the API needs no key.
         </p>
 
         <section className="space-y-4">
@@ -263,7 +263,7 @@ export default function ApiDocsPage() {
               tryLabel="Try it"
             >
               This week&apos;s guidance in one JSON object: the action, each area&apos;s action with its pause
-              and resume lines, the decisions to revisit, and the lines that would change the guidance.
+              and restart lines, the decisions to revisit, and the lines that would change the guidance.
             </Endpoint>
             <Endpoint
               signature="GET /api/scores"
@@ -323,7 +323,7 @@ export default function ApiDocsPage() {
               tryHref="/api/brief/slack"
               tryLabel="Try it"
             >
-              The week&apos;s guidance preformatted for Slack — action, pause line, resume line.
+              The week&apos;s guidance preformatted for Slack — action, pause line, restart line.
               Post it to a channel without reformatting.
             </Endpoint>
             <Endpoint

@@ -6,7 +6,7 @@ import { TemplateActions } from "./templateActions";
 
 /* The worked example quotes the published lines, so a reader who checks it
    against the brief finds the same numbers. It said "below 64", a line no rule
-   uses; the resume line is 66. */
+   uses; the restart line is 66. */
 const EXAMPLE_LINES = sharedDecisionLines({
   tightnessRegime: TIGHTNESS_REGIME_THRESHOLD,
   riskAppetiteRegime: RISK_APPETITE_REGIME_THRESHOLD,
@@ -15,7 +15,7 @@ const EXAMPLE_LINES = sharedDecisionLines({
 /**
  * One hue per slot, from the semantic tokens the hero draws its own dt labels
  * in: the action in the easing green, the pause line in caution amber, the
- * resume line in the reversal rose. `/history/compare` reads the same map for
+ * restart line in the reversal rose. `/history/compare` reads the same map for
  * its rules block. Plain utilities on purpose: `.type-eyebrow` is unlayered and
  * its own colour beats any `text-*` utility placed beside it.
  */
@@ -29,7 +29,7 @@ const slotLabelClass = (slot: keyof typeof DECISION_SLOT_TONE) =>
   `text-fluid-xs font-semibold ${DECISION_SLOT_TONE[slot]}`;
 
 /*
- * The method: an action, a pause line and a resume line, written down before the
+ * The method: an action, a pause line and a restart line, written down before the
  * action begins. It was the last section of /trust ("How to use the thresholds"),
  * a page a reader opens to check whether this week's reading is current, where
  * the product's thesis read as an appendix. It sits on /about beside "How it
@@ -44,7 +44,7 @@ export function MethodSection() {
   return (
     <section id="method" aria-labelledby="method-heading" className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
       <h2 id="method-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">
-        How to use the pause and resume lines
+        How to use the pause and restart lines
       </h2>
 
       <section className="space-y-3">
@@ -54,10 +54,10 @@ export function MethodSection() {
         <div className="space-y-2 border-l-2 border-slate-600 pl-4">
           <p className="text-sm text-slate-200 font-semibold">{DECISION_CONTRACT_LABELS.slot.action}: Hire only for roles that pay back inside six months.</p>
           <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.threshold}: Pause all hiring if funding pressure crosses {EXAMPLE_LINES.tightnessPause}.</p>
-          <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Resume hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>
+          <p className="text-sm text-slate-300">{DECISION_CONTRACT_LABELS.slot.reversal}: Restart hiring when funding pressure falls below {EXAMPLE_LINES.tightnessResume}.</p>
         </div>
         {/* The example's three lines, drawn on the axis they share: the pause
-            line past the change line, the resume line inside it, and the hold
+            line past the change line, the restart line inside it, and the hold
             between them that makes a pause temporary (2026-10-21). */}
         <CorridorStrip
           changeLine={TIGHTNESS_REGIME_THRESHOLD}
@@ -95,7 +95,7 @@ export function MethodSection() {
           <section className="space-y-4">
             <h3 className="type-eyebrow">Agree on the lines in advance</h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Write down the pause and resume lines before committing cash. When a line is crossed, review the
+              Write down the pause and restart lines before committing cash. When a line is crossed, review the
               decision against the condition you agreed on.
             </p>
             <p className="text-sm text-slate-300 leading-relaxed">

@@ -11,7 +11,7 @@ causes. They need to be fixed in this order, because each one inflates the next.
 
 1. **One concept, many names.** Some examples:
    - The line that re-opens a paused decision ships under about 13 names: "Change course if",
-     "Re-open when", "Clears only when", "Resume when", "reopen line", "Reversal (clears when)",
+     "Re-open when", "Clears only when", "Restart when", "reopen line", "Reversal (clears when)",
      "Reversal trigger", "WATCH:", "FLIP:", and others.
    - The line where the call itself changes ships under about 9: "Posture flips", "watch line",
      "regime boundary", "regime line", "posture boundary", "Flip trigger", and others.
@@ -62,7 +62,7 @@ follows it. The decisions below cover only what the table left open.
 
 | # | Question | Decision |
 |---|---|---|
-| D1 | Names for the three lines | **Pause if** / **Resume when** / **Call changes if**. `DECISION_CONTRACT_LABELS.reversal.resumeWhen` replaces `changeCourseIf`, and `publicDecisionLabels.reversal` reads it, so "Re-open when" is gone. |
+| D1 | Names for the three lines | **Pause if** / **Restart when** / **Call changes if**. `DECISION_CONTRACT_LABELS.reversal.resumeWhen` replaces `changeCourseIf`, and `publicDecisionLabels.reversal` reads it, so "Re-open when" is gone. |
 | D2 | "Posture" | Already settled on `main`: "the call". Reader copy keeps ratcheting it down. |
 | D3 | Operating latitude | Keep the name (table). `OPERATING_LATITUDE_GLOSS` sits beside the number wherever the number is. Retire "Boldness" and "BOLDNESS BUDGET". |
 | D4 | Confidence | The word names the engine band only (High / Medium / Low confidence). No percent on reader surfaces. Data freshness never uses the word. |
@@ -84,7 +84,7 @@ the PNGs as a first-time reader. The repo has learned that source reads miss wha
   - The three lines, per D1. That means every file in the sweep:
     - the hero rails;
     - `publicDecisionLabels.reversal`;
-    - `operatingCalls.ts` ("caution line", "reopen line", "Resume when");
+    - `operatingCalls.ts` ("caution line", "reopen line", "Restart when");
     - `workspaceModel.ts` ("stop line");
     - `signalIndicators.ts`, `decisionStaleness.ts`, `thresholdsPanel.tsx` and
       `evidenceSectionShared.ts` ("watch line");
@@ -264,7 +264,7 @@ retired score names and every pointer to the old page. `TERM_DEFINITIONS` keeps 
 `llms-full.txt` for machine readers.
 
 One finding changed the plan. `weeklyCall.changeCourseIf` holds the line where the call changes,
-not the resume line, so every surface that printed it now labels it "Call changes if". The other
+not the restart line, so every surface that printed it now labels it "Call changes if". The other
 conditions that would change the call print under "Watch this week". Before this, both carried
 "Change course if", which was ambiguous enough to fit either meaning.
 
@@ -272,7 +272,7 @@ Left open, deliberately:
 
 - ~~**`changeCourseIf` has two meanings.**~~ Resolved: the field is split into `callChangesIf`
   (always the flip trigger) and an optional `resumeWhen` (the stage's discipline, printed under
-  "Resume when" beside it). See `lib/report/weeklyCallContract.ts`.
+  "Restart when" beside it). See `lib/report/weeklyCallContract.ts`.
 - **"Capital posture" in `/resources`.** It is the target keyword of a whole content cluster,
   including slugs, titles and downloads. Renaming it is an SEO decision, not a copy fix.
 - **Score distances are written "pts"** (`formatPointsToLine`, `scoreCell`). The abbreviation

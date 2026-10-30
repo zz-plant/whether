@@ -136,7 +136,7 @@ const isOperatingSnapshot = (value: unknown): value is OperatingSnapshot => {
 /**
  * A snapshot written before the contract split carries the call-change line as
  * `changeCourseIf`. That is already the right value: snapshots are built with
- * no stage, and the stage's resume line was the only thing that ever replaced
+ * no stage, and the stage's restart line was the only thing that ever replaced
  * the flip trigger there. So the old field is read as the new one rather than
  * discarding every stored snapshot over a rename.
  */

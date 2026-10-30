@@ -142,10 +142,10 @@ describe("runway-scaled decision rules", () => {
 
   /*
    * Series A in a Freezing week read "Reverse the hold only after the trigger
-   * clears", naming no line; each stage now names the resume line or lines the
+   * clears", naming no line; each stage now names the restart line or lines the
    * area rules print, with their numbers.
    */
-  it("names the area rules' resume lines in every stage's resume line", () => {
+  it("names the area rules' restart lines in every stage's restart line", () => {
     const freezing = { tightnessRegime: 70, riskAppetiteRegime: 50 };
     const live = { tightness: 90, riskAppetite: 48 };
     const resumeFor = (mode: StartupVariantMode) =>
@@ -161,7 +161,7 @@ describe("runway-scaled decision rules", () => {
     assert.match(resumeFor("public"), /funding pressure falls below 66/);
     assert.match(resumeFor("bootstrapped"), /funding pressure falls below 66, risk appetite is above 54/);
     for (const { mode } of startupVariantModes) {
-      assert.doesNotMatch(resumeFor(mode), /the trigger|the line\b|their resume lines/, mode);
+      assert.doesNotMatch(resumeFor(mode), /the trigger|the line\b|their restart lines/, mode);
       assert.match(resumeFor(mode), /\b(66|54)\b/, mode);
     }
   });

@@ -131,14 +131,14 @@ pull rules is the kanban-native form.
 
 **Scope**
 - Add a kanban-pull rendering of the bounded rules: "stop pulling speculative-class cards when X;
-  resume when Y", derived from the existing conditions without new regime logic.
+  restart when Y", derived from the existing conditions without new regime logic.
 - Surface on `/operate` and as a copyable block on `/share`.
 
 **Acceptance**: a kanban team can copy a pull-policy block whose pause and resume conditions match
 `operatingCalls.ts` conditions verbatim.
 
 **Verification**: unit test asserting the pull-policy lines are the same conditions as the pause/
-resume lines, reformatted.
+restart lines, reformatted.
 
 ### T2.3 WIP caps derived from the regime (kanban)
 

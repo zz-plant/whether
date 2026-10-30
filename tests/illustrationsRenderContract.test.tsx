@@ -27,7 +27,7 @@ describe("ThresholdLadder", () => {
     );
   });
 
-  it("names the pause and resume lines in the description", () => {
+  it("names the pause and restart lines in the description", () => {
     const html = renderToStaticMarkup(
       <ThresholdLadder
         idPrefix="l2"
@@ -42,7 +42,7 @@ describe("ThresholdLadder", () => {
     );
     assertNoNaN(html);
     assertTokensWrapped(html);
-    assert.match(html, /Pause line at 6%\. Resume line at 2%\./);
+    assert.match(html, /Pause line at 6%\. Restart line at 2%\./);
     assert.match(html, /Real rate: 4%/);
   });
 
@@ -163,7 +163,7 @@ describe("ThresholdLadder", () => {
 
     assert.match(html, />Clears when</);
     // Same split as `triggerLabel`: the description keeps the generic noun.
-    assert.match(html, /Resume line at 66\./);
+    assert.match(html, /Restart line at 66\./);
   });
 
   it("lifts the reversal caption clear of the trigger caption when they would collide", () => {

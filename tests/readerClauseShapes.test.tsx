@@ -154,7 +154,7 @@ describe("the detectors", () => {
   it("catch a gloss printed twice, digits aside, and pass the ladders' distance tags", () => {
     assert.equal(repeatedGloss("Funding pressure was 79 (money is hard to raise) then and is 90 (money is hard to raise) now."), "money is hard to raise");
     assert.equal(repeatedGloss("Funding pressure falls 20 pts to 70 or below (90 today) or risk appetite rises 1 pt to clear 50 (49 today)."), "# today");
-    assert.equal(repeatedGloss("Pause if < 44 (4 pts away) Resume when > 54 (6 pts away)"), null);
+    assert.equal(repeatedGloss("Pause if < 44 (4 pts away) Restart when > 54 (6 pts away)"), null);
     assert.equal(repeatedGloss("Risk appetite was 7 then (investors are avoiding risk) and is 49 now (investors are selective about risk)."), null);
   });
 });
@@ -237,7 +237,7 @@ describe("the rule-line builders print a reading after the rule, never in parent
   const thresholds = { tightnessRegime: 70, riskAppetiteRegime: 50 };
   const grid = [10, 32, 45, 66, 70, 76, 90].flatMap((tightness) => [7, 41, 44, 49, 50, 54, 62].map((riskAppetite) => ({ tightness, riskAppetite })));
 
-  it("for every area's pause and resume line, every stage's lines and the change line", () => {
+  it("for every area's pause and restart line, every stage's lines and the change line", () => {
     const lines = REGIME_ORDER.flatMap((regime) =>
       grid.flatMap((scores) => {
         const rules = buildCanonicalBoundedDecisionRules({ regime, thresholds, scores });

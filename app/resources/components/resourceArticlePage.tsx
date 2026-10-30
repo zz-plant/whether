@@ -129,7 +129,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
       publisher: buildPublisherSchema(organizationName),
       mainEntityOfPage: canonicalUrl,
       url: canonicalUrl,
-      keywords: [article.keyword, "capital posture", "board memo"],
+      keywords: [article.keyword, "capital discipline", "board memo"],
       // Google's Article rich result asks for both dates and an image; the page
       // published neither, so it was eligible for a plain blue link only.
       datePublished: article.publishedAt,
@@ -278,7 +278,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
             <div className="space-y-2 border-t border-slate-700/80 pt-3 text-xs text-slate-300">
               <p className="font-semibold text-slate-100">Related pages</p>
               <Link href={canonicalPillarPath} className="block text-sky-200 underline underline-offset-4">Capital discipline for venture-backed companies</Link>
-              <Link href={boardFrameworkPath} className="block text-sky-200 underline underline-offset-4">Board-level Capital Posture Framework</Link>
+              <Link href={boardFrameworkPath} className="block text-sky-200 underline underline-offset-4">Board-level capital discipline framework</Link>
               <Link href={article.toolLink.href} className="block text-sky-200 underline underline-offset-4">Tool page</Link>
             </div>
           </div>

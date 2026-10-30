@@ -50,7 +50,7 @@ export type ActionStripItem = {
   reversalCondition: string;
   /** The pause lines as data, so a surface can draw or tabulate them instead of reprinting the sentence. */
   pauseConditions?: RuleCondition[];
-  /** The resume lines as data. */
+  /** The restart lines as data. */
   resumeConditions?: RuleCondition[];
   /** The lever's clock: when the action is felt and what unwinding costs. Absent for fallback rows. */
   latencyLine?: string;
@@ -64,7 +64,7 @@ export type ActionStripItem = {
   /** Nearest pause line and the points to it; zero once tripped. */
   nearestPause?: RuleThresholdDistance;
   /**
-   * The resume line holding the area back, and the points to it: the furthest
+   * The restart line holding the area back, and the points to it: the furthest
    * line still unmet, because a resume needs every one of its lines; zero once
    * they all hold. It was the nearest line, so a row read "Funding pressure < 66
    * and Risk appetite > 54 · 6 pts away" while funding pressure was 24 points
@@ -89,7 +89,7 @@ const findRule = (rules: BoundedDecisionRule[], area: DecisionArea) =>
 const OPERATING_LEVER_FALLBACK = {
   areaActionNow: "Keep your current plan for this area.",
   triggerThreshold: "Pause if funding pressure exceeds 60 or risk appetite falls below 40.",
-  reversalCondition: "Resume expansion when funding pressure drops below 50 and risk appetite is above 50.",
+  reversalCondition: "Restart expansion when funding pressure drops below 50 and risk appetite is above 50.",
 } satisfies Omit<ActionStripItem, "lever" | "label">;
 
 type CurrentScores = {
@@ -147,7 +147,7 @@ type BoundedConditionRail = {
   current: number;
   /** Crossing this trips the rule. */
   guardrail: number;
-  /** Where the trip clears. Absent when the rule states no resume line. */
+  /** Where the trip clears. Absent when the rule states no restart line. */
   clearsAt?: number;
   /**
    * Run the rail from `max` to `min`. Funding pressure trips high and risk
@@ -168,7 +168,7 @@ type BoundedConditionRail = {
 };
 
 /**
- * Rail coordinates for a rule's pause and resume lines.
+ * Rail coordinates for a rule's pause and restart lines.
  *
  * Both sides come from the same clause data the sentences are derived from, so
  * a rail cannot state a threshold the sentence beside it does not. A clause
@@ -235,7 +235,7 @@ export const buildBoundedConditionRails = ({
  *
  * All five rules are built from the same four lines in different pairs, so a
  * per-area rail set repeats the same two rails five times. This collects the
- * first pause and resume line stated per signal across the items and draws
+ * first pause and restart line stated per signal across the items and draws
  * that pair; per-area rows then only need to say which lines apply and how far
  * off they are.
  */
@@ -284,14 +284,14 @@ export const formatPointsToLine = (
 ): string => {
   if (points === undefined || !Number.isFinite(points)) return "—";
   /* "Past the line", not "crossed": a state, not an event. Beside "No score
-     crossed a pause or resume line since Sep 30", "crossed" read as this
+     crossed a pause or restart line since Sep 30", "crossed" read as this
      week's news (2026-10-14). */
   if (met) return kind === "pause" ? "past the line" : "already met";
   if (points === 0) return "at the line";
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"} away`;
 };
 
-/** A resume line met on an area that is not on hold: there is no hold to lift, so not "already met". */
+/** A restart line met on an area that is not on hold: there is no hold to lift, so not "already met". */
 export const NOTHING_TO_RESUME = "nothing to resume";
 
 /**
@@ -305,9 +305,9 @@ const CLOSE_TO_LINE_POINTS = REGIME_CONFIDENCE_NEAR_THRESHOLD;
 
 /**
  * Where a reading stands against one side of an area's rule, for the state
- * badge: a pause line crossed, close to it, or clear of it. A resume line has
+ * badge: a pause line crossed, close to it, or clear of it. A restart line has
  * a state only once it is met ("clear"); short of it, the distance is plain
- * text, because a resume line not yet reached is not a pause.
+ * text, because a restart line not yet reached is not a pause.
  */
 export type LineState = "crossed" | "near" | "clear";
 
@@ -329,7 +329,7 @@ export const resolveLineState = (
  * closed. The warning triangle was the other candidate for "close", and it is
  * already the toast's error mark (`AlertTriangleIcon`), so it would say
  * "something failed" about a line nobody has crossed. The signal-bar keys draw
- * the pause and resume lines with the same two glyphs.
+ * the pause and restart lines with the same two glyphs.
  */
 export const LINE_STATE_ICONS: Record<LineState, LucideIcon> = {
   crossed: Pause,
@@ -478,7 +478,7 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
  * it is the same data.
  *
  * The verb stays the area's action so the block reads as "pull {action} until
- * X, resume when Y" rather than a generic "be cautious".
+ * X, restart when Y" rather than a generic "be cautious".
  */
 export type PullPolicyBlock = {
   area: BusinessAreaKey;
@@ -487,7 +487,7 @@ export type PullPolicyBlock = {
   pull: string;
   /** Stop pulling when: the pause conditions, as the hero prints them. */
   stopPullingWhen: string;
-  /** Resume when: the resume conditions, or the reversal if none are stated. */
+  /** Restart when: the resume conditions, or the reversal if none are stated. */
   resumeWhen: string;
   /** Copy-ready markdown for a board header or wiki. */
   markdown: string;

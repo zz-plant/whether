@@ -87,7 +87,7 @@ export default function PrivacyPage() {
               Subscribing stores your address, the time you subscribed and whether you have confirmed it.
               It records whether you want the Monday brief itself and whether you opted in to alerts between
               Mondays: conditions changing, a score crossing its line, or an outsized move in a market input.
-              If you set pause and resume lines for your own plan on the planning page, it stores them as
+              If you set pause and restart lines for your own plan on the planning page, it stores them as
               numbers on the two scores for each area you chose, held unconfirmed until you click the link.
               If you left that box ticked, it also stores the runway band you had chosen when you set those
               lines, and the date. The band is one of four, such as 12–24 months, and never a cash or runway
@@ -128,7 +128,7 @@ export default function PrivacyPage() {
               Decisions you record are stored in Cloudflare KV against the identifier above, with the
               reading at the time so a later week can be compared against the decision&apos;s
               own assumptions. Everything else you set stays in your browser and is never sent: your
-              operator profile, Decision Shield presets, drafts of your own pause and resume lines, the last
+              operator profile, Decision Shield presets, drafts of your own pause and restart lines, the last
               guidance this browser saw, the number of decisions you last recorded, the theme, and the
               one-time explainers you have dismissed. The brief reads that number so it asks for your record
               only when there is one. A Decision Shield link you copy is the exception. The plan you typed is

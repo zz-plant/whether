@@ -102,7 +102,7 @@ export function buildBriefMarkdown(homepage: HomePage): string {
 > **Conditions:** ${describeConditions(reportData.assessment.regime, postureLabel)}  
 > **Trust:** ${trustCue}  
 > **${DECISION_READINESS_LABEL}:** ${decisionReadiness.label}. ${decisionReadiness.detail}  
-> **Data as of:** ${homepage.reportShell.recordDateLabel} · Checked: ${homepage.reportShell.fetchedAtLabel} · Source: ${homepage.reportShell.treasurySource}
+> **Data as of:** ${homepage.reportShell.recordDateLabel} · Last checked: ${homepage.reportShell.fetchedAtLabel} · Source: ${homepage.reportShell.treasurySource}
 
 ---
 
@@ -137,8 +137,8 @@ ${operatorCopy}
 ## Provenance
 
 - **Data source:** ${homepage.reportShell.treasurySource}
-- **Record date:** ${homepage.reportShell.recordDateLabel}
-- **Last refreshed:** ${homepage.reportShell.fetchedAtLabel}
+- **Data as of:** ${homepage.reportShell.recordDateLabel}
+- **Last checked:** ${homepage.reportShell.fetchedAtLabel}
 - **Data status:** ${homepage.reportShell.trustStatusLabel}
 - **Conditions:** ${getRegimePublicLabel(homepage.reportShell.regime)}
 ${homepage.reportShell.trustStatusDetail ? `- **Detail:** ${homepage.reportShell.trustStatusDetail}` : ""}

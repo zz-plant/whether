@@ -44,7 +44,7 @@ counterevidence mode verifies. Contract, commands and evaluation limits: [decisi
 - The desktop `More` menu closes on an outside click or Escape; Escape returns focus to its trigger.
 - Answer pages expose `Copy decision brief` in the header and after the decision content.
   Both copy the same answer, bounded rule, citation, and freshness line.
-- Evidence and Trust use the shared `Pause if` and `Resume when` labels.
+- Evidence and Trust use the shared `Pause if` and `Restart when` labels.
 
 ### Responsive reading behavior (2026-10-03)
 
@@ -185,7 +185,7 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    `SinceLastVisit` (only when the conditions or the call differ from what this browser last saw,
    and not when the difference is the earlier conditions the stamp line names) and `YourRecordNote`
    (live briefs only), then Copy Brief (DD-005's one primary action) and the Plan horizon control.
-   `CadenceCallCard` states the horizon's guidance and its Pause if / Resume when pair, and under the
+   `CadenceCallCard` states the horizon's guidance and its Pause if / Restart when pair, and under the
    pair draws one `ThresholdLadder` for funding pressure and one for risk appetite
    (`cadenceCallModel.boundedBands`, built by `buildHorizonSignalBands` in
    `lib/summary/horizonOperatingRules.ts` from the thresholds the pair's sentences use): the score,
@@ -215,7 +215,7 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    each area's row says which of its lines moved. A read with no comparison says so over it.
 6. **What would change this guidance** (`WhatWouldChangeSection`): two questions, named apart —
    when conditions change (the change line, in points, with the market move folded under it) and
-   when a paused decision may resume (the pause line and the resume line, a chosen stage's else the
+   when a paused decision may resume (the pause line and the restart line, a chosen stage's else the
    lead area's). A sentence says a change in conditions is not permission to resume. Below `md` the
    conditions map draws here (no distance caption: the trust strip's margin states it).
 7. **How unusual is this?** (`RecordSection`): on a week conditions changed, the last time
@@ -239,7 +239,7 @@ section and the runway notes. `/` mounts `ActivationTracker` and `OperatorWorkfl
 the workflow stream records route transitions (§1.1.30).
 
 The decision contract's labels come from `DECISION_CONTRACT_LABELS` (`lib/report/reportCopy.ts`):
-`Do now` / `Action now`, `Pause if`, `Resume when`, and `Conditions change if`. The lines are built in
+`Do now` / `Action now`, `Pause if`, `Restart when`, and `Conditions change if`. The lines are built in
 one weekly-call contract (`WeeklyCallContract`, `lib/report/weeklyCallContract.ts`) rather than
 route-local copy assembly, so the card, Copy Brief and the exported briefs agree. Its change side is
 `callChangesIf` (where the conditions change) plus, only when a stage is set, `resumeWhen` (the
@@ -335,11 +335,11 @@ the slide bullets appended — beside the Slack brief and now carry the slide bu
 
 ### 1.1.1c A reading follows the rule; it does not sit in parentheses inside it (2026-10-09)
 The rule-line builders stapled a gloss onto every line that carried a reading: a met pause or
-resume line read "funding pressure is above 76 (already true at 90)", and the change line put
+restart line read "funding pressure is above 76 (already true at 90)", and the change line put
 "(90 today)" after one score and "(49 today)" after the other, two parentheses of one kind in one
 sentence, on every page, paste, email and alert that prints the rule.
 
-- **Pause and resume lines** (`formatRuleClause`, the stage lines in
+- **Pause and restart lines** (`formatRuleClause`, the stage lines in
   `buildScopedVariantDecisionAdjustment`): a met line states where the score is ("is above 76"),
   and the reading follows the rule as its own sentence, `formatReadingsNow`
   (`lib/report/reportFormatting.ts`): "Pause net-new hiring if funding pressure is above 76 or risk
@@ -540,7 +540,7 @@ A route-set pass against the IA boundary rules found three consolidations worth 
 that looked worth making and was not.
 
 - **The method moved to `/about#method` (2026-10-09)**, beside "What is new here", as "How to use
-  the pause and resume lines", in the screen vocabulary (pause and resume lines, not threshold and
+  the pause and restart lines", in the screen vocabulary (pause and restart lines, not threshold and
   reversal). It is the product's thesis, and as the last section of `/trust` it read as an appendix
   to a page a reader opens to check this week's reading; `/trust` keeps a one-line link.
   `/threshold` redirects to `/about#method` and `/template` to `/about#template`.
@@ -645,7 +645,7 @@ merged is the part with no such constraint:
   button's carried neither. Both now compose `formatMeetingSlideMarkdown` through
   `briefArtifactToSlidePayload`, so the meeting slide gained the clears-when line it was missing
   and the snapshot marker. `tests/briefArtifactFormats.test.ts` asserts the two are byte-identical.
-  (2026-10-06: the "clears-when line" was the flip conditions, printed as the resume line; it prints
+  (2026-10-06: the "clears-when line" was the flip conditions, printed as the restart line; it prints
   as "Watch this week" now, and the slide routes go through the same adapter. §5.3.1.)
   (2026-10-06: `buildSlackBrief` and `buildCallCitation` render the brief document now. The
   archive keeps every record it wrote; the records written after it carry the contract's call,
@@ -1145,7 +1145,7 @@ read.
 **The portfolio note (2026-10-01).** "Portfolio note" on `/share` (`lib/export/portfolioNote.ts`)
 runs the other way from the investor update: one investor platform team or accelerator writing to
 the companies it backs. Their runways differ, so it carries no runway sentence of its own reader;
-it prints the conditions and confidence, each area's rule with its pause and resume lines (the
+it prints the conditions and confidence, each area's rule with its pause and restart lines (the
 same `buildAreaRows` strings as the plan page), and what the week means at all four runway bands
 from `buildRunwayConditionedNotes`, with the band named once rather than in every note. It ends
 with the link to `/operate#ops-plan-lines`, where each company can move the lines for its own plan
@@ -1301,7 +1301,7 @@ under the call:
 
 - **"What are you deciding?"** Five choices (hire, roadmap, raise, spend, something new),
   each answered with that area's row of the same table the full brief prints (the rule, its pause
-  and resume lines, and the distance to each), plus the answer page that leads with that area.
+  and restart lines, and the distance to each), plus the answer page that leads with that area.
   Since 2026-10-01 the question drops "this week" and says the answer holds until a score crosses
   one of its lines, which most weeks none does; the category line (`canonicalPositioningLine`)
   leads with the lines and the crossing email rather than with Monday, for the same reason.
@@ -1533,7 +1533,7 @@ week any more.
 - **Where it prints.** The homepage table's column head, caption, the sentence over it ("The scores moved
   toward tighter money since Aug 31.") and both ladders' hollow dot; `/signals` (table head, each row's move,
   score cells, call-line ladders); `/trust` ladders; `/share`, Slack and every paste ("… · 14 pts above ·
-  was 63 on Aug 31 · resume line 66 (24 pts away)"), the "• vs Aug 31: worse" direction line and the
+  was 63 on Aug 31 · restart line 66 (24 pts away)"), the "• vs Aug 31: worse" direction line and the
   Operating latitude line; the `/api/posture/current` summary; the agent payload's `decision_delta`
   (`compared_with: { record_date, label }` beside `from` and `delta`, and a summary that says "since Aug 31");
   the home brief's own labels (posture delta, indicator deltas, net delta, and the weekly-movement sentence the
@@ -1625,15 +1625,15 @@ Aug 31 (§1.1.26). Nothing said what a reader who acts on lines needs to know, w
 **What ships.** One derivation, `buildDecisionMovement` (`lib/report/decisionMovement.ts`), read by every
 surface below. Each area is a small state against its own lines, taken from the same conditions the rules
 table prints through the same `isRuleConditionMet`: *paused* when any pause line holds, *resumable* when
-every numeric resume line holds, *holding* otherwise. It compares the state at the earlier reading with the
+every numeric restart line holds, *holding* otherwise. It compares the state at the earlier reading with the
 state now and names the lines that decided it. Five movements: `paused`, `lifted`, `resumable`,
-`resumeLost`, `held`. Coming out of a pause into resumable names the resume line, the further one a score
+`resumeLost`, `held`. Coming out of a pause into resumable names the restart line, the further one a score
 has passed. The sentence, for the Sep 25 read:
 
 > Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to every area: funding
 > pressure rose through 76 and risk appetite fell through 44.
 
-A week nothing crossed says so and stops: `Conditions held steady since Sep 15; no pause or resume line was
+A week nothing crossed says so and stops: `Conditions held steady since Sep 15; no pause or restart line was
 crossed. Last week's guidance stands.` A change of conditions with no line crossed says that
 (`tests/decisionMovement.test.ts` holds the shapes). It claims nothing without an earlier reading, nothing
 about the market state when the assessed state is not what the scores classify into (a change waiting on
@@ -1661,8 +1661,8 @@ print `headline`, the sentence without its evidence, and the box holds 140 chara
 174, so the card printed "…Spending and New bets; the…". `headlines` now carries the headline and then
 whole sentences that say less, and `fitMovementHeadline` takes the first that fits: the conditions clause
 goes first, because the card prints the conditions now in its own label ("Since Aug 31, the pause now
-applies to Hiring, Fundraising, Spending and New bets; the resume line is no longer met for Roadmap."),
-then the areas go to a count ("…and every area crossed a pause or resume line."). `tests/decisionMovement.test.ts`
+applies to Hiring, Fundraising, Spending and New bets; the restart line is no longer met for Roadmap."),
+then the areas go to a count ("…and every area crossed a pause or restart line."). `tests/decisionMovement.test.ts`
 holds every reading on a grid to the box.
 
 **Your record, on the brief.** `/decisions` was reachable from the footer, the command palette and the confirmation under the Decision Shield's record button, and nothing in the brief connected the two halves of one question (which of my commitments rest on what moved?). A
@@ -1755,7 +1755,7 @@ leaving was the measurement and the owner's own checks:
   two widths now agree; "Show the full brief" brings everything back.
 - **The first-visit question says what its numbers mean.** Under the choices, both scores print through
   `SignalReading` ("Funding pressure 90/100: money is hard to raise"), above every line that quotes a
-  score: the answer's pause and resume lines and the alert box's "(90 today)". What 100 meant was
+  score: the answer's pause and restart lines and the alert box's "(90 today)". What 100 meant was
   printed only in the folded *What changed* table.
 - **"Has this happened before" is answered on the page.** On a week the guidance changed, one sentence
   from `summarizeLastTimeCallChanged` sits above the turning-point links: the month it last moved this
@@ -1775,11 +1775,11 @@ true.
   reads `publishedScoreLines(thresholds)`: pause and resume at 76 / 66 on funding pressure and
   44 / 54 on risk appetite (`sharedDecisionLines`), and the change lines at 70 and 50. A move
   that passes several lines sends one letter per score, naming the last line it crossed, the one
-  whose state now holds: the pause line on a rise from 63 to 90, the 66 resume line on a fall from
+  whose state now holds: the pause line on a rise from 63 to 90, the 66 restart line on a fall from
   80 to 60. Until 2026-10-14 it ranked pause, then change, then resume whatever the direction, so
   that fall named the pause line and the resume letter never came. A score exactly on a line sits
   on the side where the line does not hold (`sideOfLine`): on a change line it counts as below, as
-  `classifyRegime` reads it, and on a pause or resume line it counts as not met, because the rules
+  `classifyRegime` reads it, and on a pause or restart line it counts as not met, because the rules
   state those strictly (`> 76`, `< 66`). The dedupe key is per score (`threshold:<metric>`), so a
   funding-pressure crossing no longer silences a risk-appetite one in the same week.
 - **A plan's own lines.** `/operate` has a step, "Set this plan's lines" (`ops-plan-lines`,
@@ -1884,7 +1884,7 @@ a pair again beside the radar in *What would change this guidance* (DD-039).
 
 - *What changed* keeps them. Each row carries where the score is, where it was, and where its lines
   are (`tests/whatChangedSignalRows.test.tsx`).
-- *What that changes* drops the rails. Each area row prints its pause and resume lines and the distance
+- *What that changes* drops the rails. Each area row prints its pause and restart lines and the distance
   to each, which refers up to the ladders. `/operate` keeps the rails over its own rules table, where no
   ladder sits above it.
 - *What would change this guidance* keeps the radar (the second dimension) and lists the market move
@@ -1981,7 +1981,7 @@ under an area's resume label.
   `question` (the page's question or signal, set as the heading above the call) and `lines` (the
   lines the answer holds between). The stamp, the trust strip and the screenshot caption come with it.
 - **Answer pages.** The card shows this week's answer for the page's decision areas
-  (`payload.currentCall`), its Do now / Pause if / Resume when lines, and the page's enduring
+  (`payload.currentCall`), its Do now / Pause if / Restart when lines, and the page's enduring
   `shortAnswer` under the call. Copy decision brief and the related questions follow the card.
 - **Signal watch pages.** The card shows the week's call with its Pause if and Conditions change if
   lines; the signal's own reading follows it. `DecisionContractBlock` had no caller left and was
@@ -2272,7 +2272,7 @@ A screenshot review of the plan page found it opening on the least informative t
 the tabs, "Test a decision" with the full stress-test form (runway, monthly spend, a model select, a
 three-line box, example chips) above a "Decision verdict" panel that said there was no verdict. On a
 phone that form was everything below the intro. The page's job (`docs/agents/ui-ux-standards.md`
-§VIII: operating guardrails) was behind it, and the area table — the pause and resume lines, which
+§VIII: operating guardrails) was behind it, and the area table — the pause and restart lines, which
 §XII says are never collapsed — sat closed three steps down as a title and one sentence.
 
 - **Order.** This week's rule for each area (open), Rules before you commit (open), Test a decision
@@ -2295,7 +2295,7 @@ phone that form was everything below the intro. The page's job (`docs/agents/ui-
   rather than 20px chips, with their label on its own line on a phone so they pair up.
 - **Closed steps say what is behind them** (§XII, "a summary that shows the current values"). Set
   this plan's lines names the areas its form starts from ("Start from the published pause and
-  resume lines for Hiring, Roadmap, Fundraising, Spending and New bets, …"); Finance strategy prints
+  restart lines for Hiring, Roadmap, Fundraising, Spending and New bets, …"); Finance strategy prints
   the quarter's runway target ("Target 24+ months of runway; freeze non-essential spend.",
   `financeStrategyFor`); Share the brief names its four formats from `BRIEF_FORMATS`. They used to
   read as a title and a sentence about the gesture, which is what made them look like empty boxes.
@@ -2471,7 +2471,7 @@ contradicted another surface, or the reading itself.
   beside a sentence saying the rate rose 0.2 to 4.1; index values print without ".00". brief.md and
   the operator brief are headed with the reading's date, not the Friday of its week. The evidence
   timeline's month reads "Showing:", where "Current: Aug 2026" sat under an October reading.
-- **Labels.** `/trust`'s "Resume when" is the plan's resume line, not a second one about
+- **Labels.** `/trust`'s "Restart when" is the plan's restart line, not a second one about
   confidence; the last-time card's value label is "Change line"
   (`DECISION_CONTRACT_LABELS.watch.changeLine`); the Slack post's "Why this could be wrong" reads
   the confidence instead of telling every week "the scores sit near a line", and no longer opens a
@@ -2500,15 +2500,15 @@ The read in §1.1.49 went on to the other surfaces that assemble sentences from 
   sentence; "the signals behind it are barely moving" is gone, because the number behind it was a
   distance, not a speed. The weekly paste's confidence line is the published word, not the data
   tier, and it no longer lists the engine's governance settings as raw keys. The monthly reversal
-  names the resume lines that re-open paused work. `/api/summary-delta` says "Conditions held at …"
+  names the restart lines that re-open paused work. `/api/summary-delta` says "Conditions held at …"
   and reads an age label's unit, where "6m." became six hours.
 - **Embed and alerts.** The embed's "Watch" line was Hiring's resume condition; it prints the
-  weekly call's "Conditions change if" (and a calibrated stage's "Resume when"), the published
+  weekly call's "Conditions change if" (and a calibrated stage's "Restart when"), the published
   confidence word in place of "MED", the record date, and one do-now item per line. The
   regime-change email prints the do-now line under "Action now" (it carried the regime's
   description) and the brief's change line (it said "the readings return to the previous
   conditions", the wrong way out). The decision deltas behind `/api/regime-alerts` and the digest
-  fire on each area's published pause and resume lines, not the change lines. Threshold alerts print
+  fire on each area's published pause and restart lines, not the change lines. Threshold alerts print
   whole points; the weekly email says "1 point". The week's direction is judged on the two scores
   whenever either moved, so `/api/posture/current` reads "Since Aug 31: worse." where the gauge's
   0.06 rise had made a 27-point tightening "mixed".
@@ -2612,7 +2612,7 @@ Four facts were still stated two ways on one page or paste.
   measured whenever a comparison exists rather than only on a regime alert (closing §1.1.26's "found,
   not changed"), and the quiet-day and standup lines read `describeGuidanceChange`
   (`lib/report/decisionMovement.ts`: `regimeChanged` or the movement's conditions change, then a crossed
-  pause or resume line, else held). `steadyWeek`, `notchShiftLabel` and `netDeltaLabel` are gone; the
+  pause or restart line, else held). `steadyWeek`, `notchShiftLabel` and `netDeltaLabel` are gone; the
   last two were read nowhere.
 - **Line precision.** The home model's "how close conditions are" line, the flip meter, the
   signal-influence rows and the regime-alert reasons printed the change line as "70.0"; the canonical
@@ -2789,7 +2789,7 @@ discretionar… (truncated — full brief on the site)").
 
 A first visit met "Freezing", a four-corner chart, "2 pts from its line", "Pause line crossed" and "Change
 line 70" within one screen, and nothing on `/` said what the other three weather words meant or that the
-change line and an area's pause and resume lines are different lines. The one element addressed to a
+change line and an area's pause and restart lines are different lines. The one element addressed to a
 newcomer, "How to read this page" in `FirstVisitExplainer`, did not help: its steps were named "Summary",
 "Proof" and "Actions", which no section is called; it sent the reader to "the score details" and "the
 planning page"; it linked "Past snapshots" for the tab called History; and it said a stage and runway
@@ -2800,13 +2800,13 @@ changed "the notes under the guidance and nothing else" above a picker that says
   "Pick what you're deciding", "Act on it"), lists the four conditions with their meanings
   (`getOrderedRegimeLegend`, laid out in the chart's corners and marking this week's on a live reading),
   tells the change line (with `CALL_CHANGE_RULE`, which `/` did not otherwise print) from each area's pause
-  and resume lines, and ends on Plan, Evidence and History with the IA's own names and descriptions.
+  and restart lines, and ends on Plan, Evidence and History with the IA's own names and descriptions.
   `FIRST_TIME_GUIDE_HIGHLIGHTS` and `FIRST_TIME_GUIDE_NEXT_LINKS` are deleted; the second was a third copy
   of the IA. It stays folded, and hidden for a returning browser.
 - **A held area names its side of the lines.** "No line crossed since Sep 30." printed alone beside "Pause
   if Funding pressure > 76 · crossed" read as the row contradicting itself. An area held past its pause
-  line now reads "Pause still applies: no line crossed since Sep 30.", one held past its resume line
-  "Resume line still met: …", and one between its lines keeps the plain sentence (`describeHeld`,
+  line now reads "Pause still applies: no line crossed since Sep 30.", one held past its restart line
+  "Restart line still met: …", and one between its lines keeps the plain sentence (`describeHeld`,
   `lib/report/decisionMovement.ts`). This prints in the picker's note and the by-area **Changed** column.
 - **Tabs say what they are for.** The desktop tabs' hover title is the IA description (with the one-key
   jump after it), where it was the tab's own name. The phone's More sheet lists every page under "Pages"
@@ -2873,12 +2873,12 @@ reader-facing sentence changed; every change is where a value sits or how it is 
   of 16–18px, leads at `text-fluid-sm`, with `--layout-section-gap` above each hairline from `md`.
 - **The picker's answer** is a card instead of a sky rule down its left edge, the rule at
   `text-fluid-lg`, and each line's distance a stamp: caution when a pause line is in force, easing
-  when a resume line is met, neutral otherwise.
+  when a restart line is met, neutral otherwise.
 - **The area table.** The row whose lines the week crossed (`changedKind` other than `held`) takes a
   caution tint and its "Changed" cell the caution ink (`AreaRowData.moved`). A line in force is drawn
   as a stamp; a distance still to go stays text.
 - **Every `ScoreLadder`** shades the range each line guards — amber beyond the pause line, green
-  beyond the resume line, each on the side it faces, judged from the other lines on the track, and
+  beyond the restart line, each on the side it faces, judged from the other lines on the track, and
   none where there is nothing to judge by — and draws the move between the earlier dot and this
   week's. This reaches `/signals`, `/trust`, the answer pages and `/history/compare` too.
 
@@ -2921,7 +2921,7 @@ A live review of every route found the same few things said several ways. Each i
 
 - **Areas, lines, signals.** Areas print as Hiring, Roadmap, Fundraising, Spending and New bets
   (`decisionAreaLabel`, which the `/operate` levers now read too); lines as the pause line, the
-  resume line and the change line (export noun slots Action / Pause line / Resume line); signals as
+  restart line and the change line (export noun slots Action / Pause line / Restart line); signals as
   Funding pressure, Risk appetite and Recession warning gauge, in full on charts. Slugs and JSON
   fields are unchanged. `tests/readerVocabulary.test.tsx` bans the retired names.
 - **The margin.** What the API calls `confidence` prints as the margin: "Clear of / Within reach of /
@@ -2975,10 +2975,10 @@ sits beside its words, never in place of them, and is `aria-hidden`.
   The area table takes the state as data (`AreaRowData.pause.state`) instead of parsing its
   distance string. The signal bars' keys draw pause beside "Pause NN" and play beside "Resume NN";
   the change line keeps its tick. The published week's two rails do the same beside "Pause if" and
-  "Resume when".
+  "Restart when".
 - **Areas.** On the picker's choices (20px), Guides' area headings, every area table row, the
   published week's "Guidance by area", `/history/compare`, and the "Governs:" line under each score
-  on `/` and, new, on `/signals` (it said "Sets the pause and resume lines" without saying whose;
+  on `/` and, new, on `/signals` (it said "Sets the pause and restart lines" without saying whose;
   its links open the brief on that area's answer). Both read `areasGovernedBy`, the inverse of the
   table the area rows name their score from (`decisionAreaUsualMetrics`, moved from the area
   table). The runway note on `/` draws an hourglass, since the wallet is Spending's.
@@ -3217,7 +3217,7 @@ test, while the calibration study's "96% held" and the track record vouched for 
   the published score is not past, that is the warning, in the status strip's basis cell and in the
   Slack brief's "Why this could be wrong": "Startup-market inputs would put risk appetite at 49,
   below its change line." (the Oct 7 reading). The change line is named first, then an area's pause line, then its
-  resume line. The score breakdown no longer counts them as a part of any move: the parts are
+  restart line. The score breakdown no longer counts them as a part of any move: the parts are
   rates, the pace of rate rises and volatility, and still add up to the move exactly.
 - **The basis label.** One phrase, "Scored on the record's inputs." A reading scored by an earlier
   engine says "Scored on more inputs than the record." (`scoringBasisForEngine`: `engine-2026-10-06`
@@ -3300,7 +3300,7 @@ those were scored on more inputs than the record, and frozen weeks are never edi
 basis the one of them that stored its inputs, w41, reads Cloudy (90 / 59) and agrees; w38–w40 stored
 no inputs to re-score. Every other line of the archive diff is the regeneration itself: fetch
 timestamps, the engine stamp, the reader copy merged since the last regeneration on 2026-10-07 (the
-margin vocabulary, "Pause line" and "Resume line"), Q3 2026 added to the period index and the OG
+margin vocabulary, "Pause line" and "Restart line"), Q3 2026 added to the period index and the OG
 timeline, and the week ending Oct 9, 2026 added to the weekly archive (Cloudy, record date Oct 7).
 
 `/calibration` and `/history`'s "How the record held up" each say when the record was re-scored and
@@ -3366,7 +3366,7 @@ and the closest pair under either red-green deficiency is Stormy–Freezing at 1
 **Line states are their own tokens** (`--line-*`, `text-line-crossed-fg`, `text-line-clear-fg`). A
 cleared line printed in Sunny's green and a crossed one in Cloudy's amber, so a state read as a
 condition. The caution, tightening and easing families now alias the line states, so every consumer
-of them moved at once: Stop and a pause line are the front red, Start and a resume line the ink,
+of them moved at once: Stop and a pause line are the front red, Start and a restart line the ink,
 Keep limited the secondary ink. The radar's corner words read the condition inks.
 
 **The stock hue ramps are folded onto roles.** About 630 class names say emerald, amber, rose, sky or
@@ -3647,8 +3647,8 @@ devices, lines a team shares) would have needed accounts, which Whether does not
   read other conditions says so in its banner.
 - **The archive's unit is named.** The stepper's ends are "Previous month-end" and "Next month-end"
   (or "This week"), and an archived view is "Month-end Sep 30, 2026", not "Week of Sep 28".
-- **Line positions are states.** "Pause line crossed" read as this week's event under "No score
-  crossed a pause or resume line since …". It is "Past its pause line"; the count is "4 of 5 areas
+- **Line positions are states.** "Pause line crossed" read as this week's event under "No line
+  was crossed since …". It is "Past its pause line"; the count is "4 of 5 areas
   are past their pause line"; table cells say "past the line". Pastes state a pause-line distance as
   "past the line" or "N pts away", where "14 pts above" meant opposite things for the two scores.
 - **The three lines are defined once**, at the head of "What would change this guidance".
@@ -3664,7 +3664,7 @@ devices, lines a team shares) would have needed accounts, which Whether does not
 Read against the week of Oct 19 (funding pressure 90, pinned at its ceiling with 110 of pressure;
 risk appetite 55), four sentences told a reader something the numbers did not support.
 
-- **A half-met resume line gives both readings.** "Resume when funding pressure falls below 66
+- **A half-met restart line gives both readings.** "Restart when funding pressure falls below 66
   and risk appetite is above 54. Risk appetite is 55 now." quoted the half already met, so the
   resume read as one point away; funding pressure was 24 points from it. An "and" rule now prints
   every reading once any of its lines is met ("Funding pressure is 90 and risk appetite is 55
@@ -3676,9 +3676,9 @@ risk appetite 55), four sentences told a reader something the numbers did not su
   "20 pts from its change line"; the line the week could cross next was risk appetite's, 5 points
   away, and the margin names it now. The brief document carries the pressure, so every paste
   agrees with the page.
-- **"Watch this week" lists lines still to cross.** It was every rule's resume lines, met or not:
+- **"Watch this week" lists lines still to cross.** It was every rule's restart lines, met or not:
   "Risk appetite > 54" at 55, and on a Sunny week with nothing held, two lines already true and
-  none that could hold anything. A held area now lists the resume lines it has not met, an open
+  none that could hold anything. A held area now lists the restart lines it has not met, an open
   area its pause lines (`linesStillToCross`, `lib/report/homeBrief/builders.ts`).
 - **A held week's pause line names the decisions that wait.** "The decision can't be undone while
   the guidance is held." read as a warning that nothing could be reversed. It is "A decision can't
@@ -3926,7 +3926,7 @@ one size per width (24.6px and 34px); section headings are 22px on a phone. Rule
 - **Small type:** `text-fluid-nano` has a 12px floor, the ladder's line numbers are 12px, the
   `/about` corridor diagram's labels render at about 11px, and "Since Sep 30" on `/signals` rows is
   in the readable ink.
-- **The brief's decision lists** ("Conditions change if", "Pause if", "Resume when", and the chosen
+- **The brief's decision lists** ("Conditions change if", "Pause if", "Restart when", and the chosen
   area's answer) are `text-fluid-sm`.
 - **Trust strip on a phone:** the basis warning prints its short form, "startup-market inputs left
   out" (`ScoringBasis.warningShort`), with the caveat diamond and the link to /trust; the full sentence
@@ -4037,7 +4037,7 @@ and full-page phone captures).
   card's strip links it. The area picker's line drops "Pick one." The conditions map keeps its two
   scores: it is the one place each width draws them (`tests/onePlacePerFact.test.tsx`).
 - **/signals and /trust link to the brief's "What would change this guidance"** instead of drawing
-  the same ladders and the same "Pause if / Resume when" (§1.2). /signals' chips print "from" like the
+  the same ladders and the same "Pause if / Restart when" (§1.2). /signals' chips print "from" like the
   brief's, and its "Feeds into" links go to the score's own row.
 - **/history.** Consecutive weeks that published the same conditions and summary are one card
   ("Weeks of Sep 14 – Sep 21, 2026", `groupPublishedBriefRuns`), with each week still linked under
@@ -4154,7 +4154,7 @@ in the order a reader asks:
 - **What changed.** One table of every signal: where it came from, where it sits against its line,
   and why it matters. The focus filters narrow it and travel in the URL. Under the table, a link to
   the brief's "What would change this guidance": the two score ladders with their Pause if and
-  Resume when lines were this page's second section until 2026-10-27, the brief's section drawn again.
+  Restart when lines were this page's second section until 2026-10-27, the brief's section drawn again.
 - **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are
   interest rates doing? · Has the yield curve inverted in the last year? · How have the two scores
   moved this year? · What would conditions be with different lines? · What did the brief say in an
@@ -4215,7 +4215,7 @@ See `docs/glossary-retirement-plan.md`.
 ### 1.5.1 About and identity framing (`/about`)
 The About page is where the product says what it claims. Since 2026-10-01 it carries, in order:
 - **What is new here**: two claims and no more — lines decided before they are needed (each area's
-  action, pause line and resume line, set apart), and a record that grades itself (`/history` track
+  action, pause line and restart line, set apart), and a record that grades itself (`/history` track
   record, `/calibration`). It says the inputs are not new.
 - **Where it fits, and where it does not**: a cadence sentence derived from the archive
   (`describeRecordCadence` over `buildTrackRecord`: conditions changed, and months a pause or resume
@@ -4535,14 +4535,14 @@ that never came:
   tests.
 
 **The Monday post and the email print one call.** The post's call slots (Guidance, Do now, Pause
-if, Resume when, Conditions change if) were derived from the lead area row and
+if, Restart when, Conditions change if) were derived from the lead area row and
 `assessment.description`, while the email read the snapshot's `WeeklyCallContract`, which swaps
 in `POLICY_OVERRIDE_CALL` (keyed by refusal reason since §1.1.51) on a held week. So a held week mailed "the guidance is not changing this
 week" and posted the lead area's own action and pause line, and an ordinary week posted a
 different change line from the one mailed. The post reads the contract now, on the Monday path,
 the manual `POST /api/brief/slack/deliver` path and `GET /api/brief/slack`: the pause line as its
-condition only (`pauseConditionOnly`, as the email prints it), the lead area's resume line plus a
-stage's when one is set, and no resume line on a held call, whose change line is its one resume
+condition only (`pauseConditionOnly`, as the email prints it), the lead area's restart line plus a
+stage's when one is set, and no restart line on a held call, whose change line is its one resume
 line. `tests/mondaySlackMatchesEmail.test.ts` holds the two to the same lines on a held and an
 ordinary week.
 
@@ -4579,8 +4579,8 @@ call stays held whatever the stage.
 and PDF routes). The browser's way stood 50 in for a missing risk appetite and "MED" for a missing
 confidence, printed the conditions label as the reader's stage ("Stage: Stormy"), handed the weather
 word to the badge as if it were the engine key (so a Freezing slide wore Sunny's colour), judged
-the scores against the engine's default lines, and printed the flip conditions as the resume line,
-which on a held week put "why the guidance is held" under "Resume when". The server's way never
+the scores against the engine's default lines, and printed the flip conditions as the restart line,
+which on a held week put "why the guidance is held" under "Restart when". The server's way never
 said a reading was a saved copy, and printed a stage's action over a held call. Both now go through
 `briefArtifactToSlidePayload`; the routes pass a `BriefDocument` (`buildExportSlidePayload`), and
 the island carries the fields the slide reads (`regime`, `recordDate`, `lines`, `stageLabel`,
@@ -4622,8 +4622,8 @@ document for its block. On a saved-copy week the footer names the publisher, not
 **The integration mandate renders the document** (`buildWeeklyMandatePayload(target, document,
 postureState)`, `/api/integrations/weekly-mandate`). It printed the posture state's lock-commitment
 line as "Conditions change if" — a different line from the brief's — and its other flip conditions
-as "- Resume when:" bullets, one of which ended "tighten again". The markdown now prints the brief's
-change line, the resume line the Slack post prints (none on a held week), and the flip conditions as
+as "- Restart when:" bullets, one of which ended "tighten again". The markdown now prints the brief's
+change line, the restart line the Slack post prints (none on a held week), and the flip conditions as
 "Watch this week". The posture state still supplies the last change in conditions and the JSON's
 structured `metadata.nextFlip`, which is the posture state's own and can name a different line from
 the markdown's. Its invented fallback ("Check again after the next update.") went: the route always
@@ -4808,7 +4808,7 @@ $$
 
 ### 6.6 Open Graph
 - `GET /api/og` — PNG Open Graph image with regime metadata (supports Time Machine selection); `template=report` is the weekly card.
-- `GET /api/image/brief` — the brief card as a 1200×800 PNG: the call, both scores against their pause and resume lines, confidence and source (§1.1.25). Takes the page's `?month=`, `?year=`, `?sector=`, `?stage=` and `?cadence=` context.
+- `GET /api/image/brief` — the brief card as a 1200×800 PNG: the call, both scores against their pause and restart lines, confidence and source (§1.1.25). Takes the page's `?month=`, `?year=`, `?sector=`, `?stage=` and `?cadence=` context.
 
 ### 6.7 Agent access (MCP)
 - `GET /api/agent?view=state` — the compact state to decide from (§6.9); `?view=full` (the default) is the whole brief.
@@ -5029,7 +5029,7 @@ surfaces do not reintroduce the old words.
   the condition that *breaks* the call, which `/trust` correctly labels "This recommendation
   breaks if" — so the same string appeared under opposite meanings on two pages. It now reads
   `actionStripItems[0].reversalCondition`, symmetric with the pause trigger in "Wrong if" above it.
-  (2026-09-29: both rows now print the canonical slot labels, "Pause if" and "Resume when";
+  (2026-09-29: both rows now print the canonical slot labels, "Pause if" and "Restart when";
   "Wrong if" / "Safe again when" were a third name for the pair.)
 - **The hero's resume row is labeled `clearsWhen`, not `flipWatch`.** That row holds the resume
   thresholds (66 / 54), and sat directly under the reversal row (70 / 50) as a near-synonym
@@ -5059,3 +5059,12 @@ action-ink wash, and the calendar's months and known periods are keys that stand
 The three pickers that drew at 95% opacity with nothing blurred behind them are opaque: the page's
 text read through them (`docs/agents/ui-ux-standards.md` §XXVI).
 
+
+### Homepage space allocation (2026-10-29)
+
+The live week picker sits inside the call card header, below a single-sentence first-visit
+category line. The hero display and inter-section spacing are compressed. Changed composite
+scores lead the evidence table; unchanged composites retain their visible bounded lines,
+and raw inputs retain their current values in compact rows. Supporting histories are in a
+URL-carried disclosure (`inputs=1`), and the hero chart's scoring qualification is in its
+readings disclosure (`chart=1`). See `one-screen-weekly-brief-spec.md`, “Space allocation pass”.

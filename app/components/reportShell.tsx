@@ -107,7 +107,7 @@ export const ReportShell = ({ model, children }: ReportShellProps) => {
       trustStatusTone,
       degradedSourceRows,
       showOfflineBadge = false,
-      offlineBadgeLabel = "Cached snapshot",
+      offlineBadgeLabel = "Saved copy",
       strip: trustStrip,
     },
     chrome: { sidebarVariant = "full" } = {},

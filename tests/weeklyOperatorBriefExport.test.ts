@@ -80,7 +80,7 @@ describe("weekly operator brief export adapters", () => {
     assert.equal(payload.callChangesIf, weeklyCall.callChangesIf);
     assert.deepEqual(payload.doNowBullets, weeklyCall.doNowBullets);
     assert.deepEqual(payload.flipConditionLabels, weeklyCall.flipConditionLabels);
-    assert.equal(payload.resumeWhen, undefined, "no stage, no resume line");
+    assert.equal(payload.resumeWhen, undefined, "no stage, no restart line");
   });
 
   it("renders the plain text in the page's order", () => {
@@ -110,13 +110,13 @@ describe("weekly operator brief export adapters", () => {
     assert.match(text, /Other things that would change this guidance:\n• Risk appetite > 50\n• Yield curve steepens/);
   });
 
-  it("prints a stage's resume line beside the call-change line, never in its place", () => {
+  it("prints a stage's restart line beside the call-change line, never in its place", () => {
     const text = buildWeeklyOperatorBriefPlainText(
       buildWeeklyOperatorBriefPayload(documentFor({ ...weeklyCall, resumeWhen: "Two weekly reads below the pause line" }), {
       }),
     );
 
-    assert.match(text, /^Conditions change if: Funding pressure at or below 70\nResume when: Two weekly reads below the pause line$/m);
+    assert.match(text, /^Conditions change if: Funding pressure at or below 70\nRestart when: Two weekly reads below the pause line$/m);
   });
 
   it("names the reading the latitude move is measured against, where the week records one", () => {

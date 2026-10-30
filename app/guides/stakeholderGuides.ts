@@ -7,7 +7,7 @@ import { stageGuides } from "./stageGuides";
  * entropy", a "Promotion accelerant" block with career ladders drawn in arrows,
  * eight bullets per role that restated one idea eight ways, and a positioning
  * line per role ("Founder/CEO → Lead with clarity."). Each bullet here names a
- * thing the reader can do with a pause line, a resume line or the weekly
+ * thing the reader can do with a pause line, a restart line or the weekly
  * reading.
  */
 type StakeholderGuide = {
@@ -46,7 +46,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         stageSlug: "series-b",
         guidance:
-          "Agree one set of pause and resume lines with your finance lead, so planning arguments start from the same numbers.",
+          "Agree one set of pause and restart lines with your finance lead, so planning arguments start from the same numbers.",
       },
       {
         stageSlug: "series-c",
@@ -61,7 +61,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     tagline: "Pace the roadmap to how much money there is to spend.",
     bullets: [
       "Put short-payback work first while funding pressure is above its pause line.",
-      "Defer long bets until the resume line clears, and say which line you are waiting on.",
+      "Defer long bets until the restart line clears, and say which line you are waiting on.",
       "Argue for scope with the same numbers finance is using.",
       "Cut burn through what you choose to build, not only through budget cuts.",
     ],
@@ -77,7 +77,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         stageSlug: "series-b",
         guidance:
-          "Bring the pause and resume lines to roadmap reviews, so the debate is about numbers rather than people.",
+          "Bring the pause and restart lines to roadmap reviews, so the debate is about numbers rather than people.",
       },
       {
         stageSlug: "series-c",
@@ -90,7 +90,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     title: "CFOs and finance leads",
     tagline: "Turn rates and risk appetite into spending rules other teams can follow.",
     bullets: [
-      "Give each area a pause line and a resume line instead of a blanket freeze.",
+      "Give each area a pause line and a restart line instead of a blanket freeze.",
       "Set hiring and spend limits that move when the reading moves, not when someone panics.",
       "Show the board an outside reference for why the plan is tight or loose.",
       "Replace everyone's own take on the economy with one weekly reading anyone can check.",
@@ -194,7 +194,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       },
       {
         stageSlug: "series-b",
-        guidance: "Expect written pause and resume lines, and planning assumptions shared across teams.",
+        guidance: "Expect written pause and restart lines, and planning assumptions shared across teams.",
       },
       {
         stageSlug: "series-c",

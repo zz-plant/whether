@@ -31,7 +31,7 @@ export function ScenarioDeltas({
 }) {
   const regimeShifted = simulatedAssessment.regime !== liveAssessment.regime;
   /* The scenario's own lines: where its call would change, and the pause and
-     resume lines its rules state. This week's reading is the hollow dot. */
+     restart lines its rules state. This week's reading is the hollow dot. */
   const ladderLines = buildScenarioLadderLines(simulatedAssessment);
 
   return (

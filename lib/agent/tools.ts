@@ -108,7 +108,7 @@ const AGENT_TOOLS = [
     name: "get_state",
     title: "Get the current state",
     description:
-      "Start here. The current reading in one small answer of about 3KB. It holds the conditions and the margin from their change lines, the data's freshness, each score against its pause, resume and change lines, the moves behind each score since the earlier reading, the areas whose pause or resume lines those moves crossed, and the guidance. automation.ready says whether the data is live and current.",
+      "Start here. The current reading in one small answer of about 3KB. It holds the conditions and the margin from their change lines, the data's freshness, each score against its pause, resume and change lines, the moves behind each score since the earlier reading, the areas whose pause or restart lines those moves crossed, and the guidance. automation.ready says whether the data is live and current.",
     input: {},
     output: agentStateSchema,
     example: {},
@@ -380,7 +380,7 @@ const AGENT_TOOLS = [
     name: "stress_test_plan",
     title: "Stress-test a planned decision against today's conditions",
     description:
-      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the resume line.",
+      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the restart line.",
     input: {
       planText: textInput.describe("The planned decision or initiative in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),

@@ -26,7 +26,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/agent?week=<slug>` / `?period=<slug>` | GET | A frozen published week (`2026-w41`), or an archive quarter or year (`2024-q1`, `2023`), with its permalink. An unknown slug is a 404 listing the slugs on record. |
 | `/api/posture/current` | GET | The current guidance as a small stable object: conditions, funding pressure, direction, confidence, week, summary, url, version. |
 | `/api/scores` | GET | Both scores, their deltas, the distance to the change line and the score nearer to crossing. |
-| `/api/decision` | GET | The week's guidance as one object: the action, each area's action with its pause and resume lines, decisions to revisit, the lines that would change the guidance. |
+| `/api/decision` | GET | The week's guidance as one object: the action, each area's action with its pause and restart lines, decisions to revisit, the lines that would change the guidance. |
 | `/api/weekly` | GET | Weekly summary copy + structured fields + summary hash. |
 | `/api/brief/slack` | GET | Slack-ready plain-text weekly brief payload for automation. |
 | `/api/embed?format=<html|text|json|page>` | GET | The brief as a snippet (`html` default; `page` is a whole document for an iframe). `mode=call-strip` is one line; `stage` and `runway` (a band or a number of months) calibrate it; `ticker` labels it. |
@@ -63,6 +63,10 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/slack/subscribe` | POST | Register a Slack Incoming Webhook (`webhookUrl`) plus optional `channelName` for weekly brief delivery; pings the channel to verify (bounded at 5s) and stores the subscription in KV. Deleting the webhook in Slack stops delivery. |
 | `/api/decision-events` | GET | Retrieve regime transition decision events with cursor pagination and optional replay support (`replay=1&initialState=<REGIME>`). Takes the cron secret. |
 | `/api/integrations/weekly-mandate?target=<slack|notion|linear>` | GET | The weekly mandate shaped for one tool: Slack blocks (the default), a Notion page, or a Linear issue. The channel and database id are placeholders. An unknown target is a 400 listing `supportedTargets`. |
+| `/api/email/send-weekly` | POST | Send this week's brief to every confirmed subscriber. Takes the cron secret. It sends only from a **stored reading** — the one the cron writes — and answers `refused_unpublishable` when none exists rather than mailing a stand-in. `?force=1` re-sends to subscribers who already had it. |
+| `/api/email/subscribe` | POST | The one credential-free write: `{ email, weekly?, alerts?, planLines?, runwayBand? }`. Mails a confirmation link; nothing is enrolled until that inbox confirms, and a change to an existing address waits the same way. |
+| `/api/email/verify`, `/api/email/unsubscribe` | GET, POST | The confirmation and unsubscribe pages. `GET` shows what the change would do and only `POST` applies it, so a link scanner cannot confirm or unsubscribe on a reader's behalf. A mail client's RFC 8058 one-click `POST` to the footer link works too. |
+| `/api/month-end-pulse` | POST | Send the month-end block to alert subscribers. Takes the cron secret, and likewise needs a stored reading. |
 
 ### E) Discover capabilities for tools/agents
 

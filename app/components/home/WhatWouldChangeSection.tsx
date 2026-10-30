@@ -25,10 +25,10 @@ type FlipProximityLine = {
 
 /**
  * What would change this guidance, fourth on the page (2026-10-09): the pause
- * line and the resume line the guidance turns on, the line where conditions
+ * line and the restart line the guidance turns on, the line where conditions
  * themselves change, and both scores as one point among the four conditions.
  * The pause line printed here only on a read that drew no ladders, so a reader
- * met "Conditions change if" and the stage's resume line and had to find the
+ * met "Conditions change if" and the stage's restart line and had to find the
  * pause line in the area table; it leads now. The last time conditions changed
  * is "Has this happened before?" further down, and the email link that closed
  * this section is the alert section directly under it.
@@ -77,7 +77,7 @@ export function WhatWouldChangeSection({
   resumeWhen?: string;
   /** The guidance's pause line: the lead area's, as the brief and every paste print it. */
   guardrail?: string;
-  /** The lead area's resume line, where no stage set one of its own. */
+  /** The lead area's restart line, where no stage set one of its own. */
   leadResume?: string;
   flipConditions?: readonly string[];
   callChangeLines: { tightness: number; riskAppetite: number };
@@ -103,7 +103,7 @@ export function WhatWouldChangeSection({
   const marketMoves = ladders.flatMap((ladder) =>
     flipProximity.filter((line) => line.axis === ladder.metric).map((line) => ({ ...line, label: ladder.label })),
   );
-  /* The pause and resume lines answer one question; the change line answers the
+  /* The pause and restart lines answer one question; the change line answers the
      other. Both are printed under their own heading (2026-10-22). */
   const resumeLine = resumeWhen ?? leadResume;
 
@@ -199,7 +199,7 @@ export function WhatWouldChangeSection({
                 ) : null}
               </dl>
               <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
-                A change in conditions doesn&rsquo;t mean you can resume. Only crossing the resume line does.
+                A change in conditions doesn&rsquo;t mean you can resume. Only crossing the restart line does.
               </p>
             </div>
           ) : null}

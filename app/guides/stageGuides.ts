@@ -40,7 +40,7 @@ export const stageGuides: readonly StageGuide[] = [
       "Founders setting hiring pace and burn.",
       "A first head of product arguing from limits rather than preference.",
     ],
-    bestUse: "Write short-cycle rules with a pause line and a resume line for each.",
+    bestUse: "Write short-cycle rules with a pause line and a restart line for each.",
   },
   {
     slug: "series-b",

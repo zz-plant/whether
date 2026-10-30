@@ -27,7 +27,7 @@ describe("ScoreLadder", () => {
     assert.equal(nearestLadderLine(72, lines)?.line.kind, "callChange");
     assert.equal(describeLadderPosition(72, lines), "72 of 100 · 2 pts above the change line");
     assert.equal(describeLadderPosition(76, lines), "76 of 100 · at the pause line");
-    assert.equal(describeLadderPosition(60, lines), "60 of 100 · 6 pts below the resume line");
+    assert.equal(describeLadderPosition(60, lines), "60 of 100 · 6 pts below the restart line");
   });
 
   it("draws last week hollow only when there is a last week", () => {
@@ -97,7 +97,7 @@ describe("ScoreLadder", () => {
 
   it("shades the range each line guards, on the side it faces", () => {
     /* Funding pressure pauses above its pause line and resumes below its
-       resume line; risk appetite is the other way up. The side comes from the
+       restart line; risk appetite is the other way up. The side comes from the
        lines themselves, never from which score it is. */
     const zone = (html: string, kind: string) =>
       new RegExp(`data-ladder-zone="${kind}"[^>]*style="left:([\\d.]+)%;width:([\\d.]+)%"`).exec(html)?.slice(1).map(Number);
@@ -225,7 +225,7 @@ describe("AreaTable", () => {
     assert.equal(rows.length, 2);
     for (const row of rows) {
       assert.match(row, />Pause line</);
-      assert.match(row, />Resume line</);
+      assert.match(row, />Restart line</);
     }
     assert.doesNotMatch(html, /class="[^"]*(?<![:\w-])min-w-\[/, "no minimum width outside sm, or the table scrolls sideways on a phone");
   });
@@ -238,7 +238,7 @@ describe("AreaTable moved rows", () => {
         caption="test"
         rows={[
           { area: "hiring", rule: "Backfills only.", changed: "Pause still applies: no line crossed since Sep 30." },
-          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Resume line no longer met: risk appetite fell below 54.", moved: true },
+          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Restart line no longer met: risk appetite fell below 54.", moved: true },
         ]}
       />,
     );
@@ -285,13 +285,13 @@ describe("AreaTable moved rows", () => {
     assert.doesNotMatch(near[1], /border/, "a distance still to go is not framed");
     assert.match(near[2], /lucide-circle-dashed/);
     const met = badge("clear").exec(html);
-    assert.ok(met, "a resume line met is the state badge");
+    assert.ok(met, "a restart line met is the state badge");
     assert.match(met[1], /rounded-sm border[^"]*text-line-clear-fg|text-line-clear-fg[^"]*rounded-sm border/);
     assert.match(met[2], /lucide-play/);
-    // An area that is not on hold has no hold to lift: its met resume line is
+    // An area that is not on hold has no hold to lift: its met restart line is
     // not a restart (2026-10-14).
     assert.match(html, /Risk appetite &gt; 54<span class="block text-xs text-slate-400">nothing to resume<\/span>/);
-    assert.match(html, /<span class="block text-xs text-slate-400">24 pts away<\/span>/, "a resume line still to reach is plain text, with no glyph");
+    assert.match(html, /<span class="block text-xs text-slate-400">24 pts away<\/span>/, "a restart line still to reach is plain text, with no glyph");
   });
 });
 
