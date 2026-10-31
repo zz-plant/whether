@@ -48,8 +48,8 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Popup className="weather-slide-panel fixed z-50 mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[20rem] sm:mr-4 top-0 right-0 rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl" aria-label="Time machine">
+        <Dialog.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/40" />
+        <Dialog.Popup className="weather-slide-panel fixed z-[var(--z-modal)] mt-14 mr-2 w-[calc(100vw-1.5rem)] sm:w-[20rem] sm:mr-4 top-0 right-0 rounded-lg border border-slate-700/70 bg-slate-950/95 p-4 shadow-xl backdrop-blur-xl" aria-label="Time machine">
           <div className="flex items-center justify-between gap-3">
             <h2 className="type-eyebrow text-slate-300">Historical view</h2>
             <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close">

@@ -152,6 +152,30 @@ Two levels only: the page ground and a raised panel. Nested content uses the nes
 shadow. Shadows are reserved for things that genuinely float — menus, the command palette, the
 toast — and are written as tokens so a utility cannot smuggle in a third level.
 
+Depth also has an order, and it is one scale (`app/styles/tokens.css`), named by relationship
+rather than by widget:
+
+| Step | Value | What lives there |
+| --- | --- | --- |
+| `--z-raised` | 10 | in-page sticky: section chips, a sticky panel |
+| `--z-chrome` | 20 | global header, running head, tab bar, floating CTA |
+| `--z-chrome-top` | 30 | the scroll-progress rule and the skip link |
+| `--z-overlay` | 40 | a backdrop |
+| `--z-modal` | 50 | the panel a backdrop dims |
+| `--z-menu` | 60 | menus, selects, popovers, tooltips — over whatever opened them |
+| `--z-toast` | 70 | toasts |
+| `--z-presentation` | 80 | presentation focus mode, for a shared screen |
+
+Anything that can meet a global layer uses `z-[var(--z-…)]`; `tests/zLayers.test.ts` fails a
+component that hand-picks 40 or 50, or hard-codes a layer number. Bare `z-10`/`z-20` remain legal
+for stacking *inside* a positioned parent — a chart's cursor over its track, a card's content over
+its own wash — because the parent contains it and it can never meet a global layer.
+
+Until 2026-10-31 the scale existed and nothing used it: the header, the running head, every
+dialog, the palette, the slide panels and the toast all sat on 40 or 50 and DOM order settled the
+stack. The scroll rule painted under the header, the skip link needed an invented `z-index: 60` to
+escape it, and a toast could appear beneath the palette it was reporting on.
+
 ## Shapes
 
 Small radii: 2px for badges and inline stamps, 4–6px for panels and controls, 10px for the

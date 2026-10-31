@@ -143,7 +143,7 @@ export function StickyCallStrip({ call, direction, weatherWord, marginLabel, sha
       {showStrip && heroLeft ? (
         <div
           data-testid="sticky-call-strip"
-          className="pointer-events-none fixed inset-x-0 bottom-0 z-40 hidden px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 md:block lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
+          className="pointer-events-none fixed inset-x-0 bottom-0 z-[var(--z-chrome)] hidden px-3 pb-[max(0.65rem,env(safe-area-inset-bottom))] pt-2 md:block lg:inset-x-auto lg:bottom-6 lg:right-6 lg:px-0 lg:pb-0 lg:pt-0 lg:bg-none bg-gradient-to-t from-[var(--bg-body)] via-[var(--bg-body)]/88 to-transparent"
         >
           {/* One elevation, from the ladder: the strip floats over the page, so it
               takes the top surface step rather than a hand-mixed pair of shadows. */}

@@ -355,12 +355,42 @@
   --accent-border: rgba(237, 240, 238, 0.38);
   --accent-border-soft: rgba(237, 240, 238, 0.16);
 
-  /* Z-index scale */
-  --z-dropdown: 10;
-  --z-sticky: 20;
-  --z-overlay: 30;
-  --z-modal: 40;
-  --z-toast: 50;
+  /* Z-index scale (2026-10-31). Seven values named by relationship, not by
+     widget, because that is the only thing that decides an order: what sits
+     over what, and why.
+
+     Until today these five tokens existed and nothing used them — every
+     floating element hand-rolled `z-40` or `z-50`, so the sticky header, the
+     running head, the tab bar, every dialog, the command palette, the slide
+     panels and the toast all shared two numbers, and the stack was settled by
+     DOM and portal order. Three things fell out of that: the scroll-progress
+     rule (same layer as the header, earlier in the document) painted under it;
+     the skip link needed an invented `z-index: 60` to escape the header it
+     shares a layer with; and the toast could appear under the command palette
+     it was reporting on. Values that meet a global layer come from here now,
+     through `z-[var(--z-…)]`, and `tests/zLayers.test.ts` holds it.
+
+     10/20 are also used as *local* stacking inside a positioned parent (a
+     chart's cursor over its track, a card's content over its own wash). That
+     is a different job: contained by the parent, it cannot meet a global
+     layer, and it does not need a token. */
+  --z-raised: 10;      /* in-page sticky: section chips, a sticky panel */
+  --z-chrome: 20;      /* global header, running head, tab bar, floating CTA */
+  --z-chrome-top: 30;  /* the two rules that ride on the chrome — the
+                          scroll-progress bar and the skip link. Over the header,
+                          under any overlay: a dialog dims the page it covers,
+                          and these are part of the page. */
+  --z-overlay: 40;     /* a backdrop */
+  --z-modal: 50;       /* the panel a backdrop dims */
+  --z-menu: 60;        /* menus, selects, popovers, tooltips — over whatever
+                          opened them, including a dialog, because a menu is
+                          only ever open in the context of its trigger */
+  --z-toast: 70;       /* toasts, over everything they report on */
+  --z-presentation: 80; /* presentation focus mode: a shared screen, so it
+                           covers the app and its toasts too. Backdrop and
+                           frames share this step and the frames come second in
+                           the document, which settles their order inside one
+                           component. */
 
   /* CTA button: the action colour as a fill, flat. It was a stock sky/cyan
      gradient, then a flat steel blue (#2b6c8c) under light ink, until
