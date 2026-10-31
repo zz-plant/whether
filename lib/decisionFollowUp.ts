@@ -129,7 +129,7 @@ const isDecisionFollowUpRecord = (value: unknown): value is DecisionFollowUpReco
     && typeof value.entryId === "string"
     && typeof value.response === "string"
     && FOLLOW_UP_RESPONSES.has(value.response)
-    && (value.outcome === undefined || FOLLOW_UP_OUTCOMES.has(String(value.outcome)))
+    && (value.outcome === undefined || (typeof value.outcome === "string" && FOLLOW_UP_OUTCOMES.has(value.outcome)))
     && (value.note === undefined
       || (typeof value.note === "string" && value.note.length <= FOLLOW_UP_NOTE_MAX_LENGTH))
     && isConditions(value.conditions);
@@ -147,7 +147,7 @@ const isDecisionFollowUpPayload = (value: unknown): value is DecisionFollowUpPay
     && typeof value.entryId === "string"
     && typeof value.response === "string"
     && FOLLOW_UP_RESPONSES.has(value.response)
-    && (value.outcome === undefined || FOLLOW_UP_OUTCOMES.has(String(value.outcome)))
+    && (value.outcome === undefined || (typeof value.outcome === "string" && FOLLOW_UP_OUTCOMES.has(value.outcome)))
     && (value.note === undefined
       || (typeof value.note === "string" && value.note.length <= FOLLOW_UP_NOTE_MAX_LENGTH))
     && isConditions(value.conditions);

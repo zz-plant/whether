@@ -1,7 +1,7 @@
 import { getJson, getWhetherKv, parseStoredJson, readKvValues, type KvNamespace } from "../runtime/kv";
 import { selectStoreByBinding } from "../runtime/storeSelection";
 import { parsePlanLines, parsePlanRunway, type PlanLines, type PlanRunway } from "../alert/planLines";
-import type { RunwayBand } from "../report/operatorRunway";
+import { isRunwayBand, type RunwayBand } from "../report/operatorRunway";
 import { isOperatorStage, type OperatorStage } from "../report/operatorStage";
 /**
  * Subscriber storage using Cloudflare KV.
@@ -60,6 +60,12 @@ export type Subscriber = {
   planRunway?: PlanRunway;
   /** The company stage this address set when it subscribed; absent means the published call. */
   stage?: OperatorStage;
+  /**
+   * The runway band the reader has chosen on the site, independent of plan
+   * lines. A company under six months reads the cash-first note for its band;
+   * without this it got the generic brief until it happened to set lines.
+   */
+  runwayBand?: RunwayBand;
   /**
    * A hard bounce, a complaint, or an address the owner retired. Suppressed
    * addresses stay on record but are dropped from every send list, so a dead
@@ -363,6 +369,7 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     weekly: readStoredFlagDefaultOn(raw, "weekly"),
     planLines: parsePlanLines(Reflect.get(raw, "planLines")) ?? [],
     ...(isOperatorStage(Reflect.get(raw, "stage")) ? { stage: Reflect.get(raw, "stage") as OperatorStage } : {}),
+    ...(isRunwayBand(Reflect.get(raw, "runwayBand")) ? { runwayBand: Reflect.get(raw, "runwayBand") as RunwayBand } : {}),
     ...(Reflect.get(raw, "suppressed") === true ? { suppressed: true } : {}),
     ...readPlanRunway(raw),
     ...readPendingPlanLines(raw),
@@ -383,6 +390,7 @@ const newSubscriber = (email: string, options: SubscribeOptions | undefined, now
   weekly: options?.weekly ?? !options?.planLines,
   planLines: [],
   ...(options?.stage ? { stage: options.stage } : {}),
+  ...(options?.runwayBand ? { runwayBand: options.runwayBand } : {}),
   ...(options?.planLines ? { pendingPlanLines: options.planLines, ...pendingRunwayFor(options, now) } : {}),
   ...issueConfirmation(now),
 });

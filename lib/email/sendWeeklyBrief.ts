@@ -213,7 +213,7 @@ export const sendWeeklyBrief = async (options?: {
         ? applyStageToWeeklyCall(weeklyCall, {
             assessment: snapshot.assessment,
             startupVariantMode: recipient.stage,
-            runwayBand: recipient.planRunway?.band,
+            runwayBand: recipient.runwayBand ?? recipient.planRunway?.band,
           })
         : weeklyCall;
 
