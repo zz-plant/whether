@@ -248,13 +248,13 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
     value: "tightness",
     term: "Funding pressure",
     summary:
-      "A 0-100 score for how hard it is for U.S. companies to raise or borrow money. Higher means harder: conserve cash and extend runway.",
+      "A 0-100 score for how hard it is to raise or borrow money in dollars. Higher means harder: conserve cash and extend runway.",
   },
   {
     value: "risk-appetite",
     term: "Risk appetite",
     summary:
-      "A 0-100 score for how willing U.S. investors and buyers are to fund new products, hires and growth bets. Higher means more willing.",
+      "A 0-100 score for how willing investors are to fund new products, hires and growth bets priced in dollars. Higher means more willing.",
   },
   {
     value: "boldness-score",
