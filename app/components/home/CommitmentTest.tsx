@@ -179,7 +179,7 @@ export function CommitmentTest({
                   style={{ width: `${Math.min(100, Math.max(0, (impact.runwayAfter / 36) * 100))}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[10px] tabular-nums text-slate-500">
+              <div className="flex justify-between text-[11px] tabular-nums text-slate-500">
                 <span>0 mo</span>
                 <span className="text-rose-400/80">6 mo</span>
                 <span className="text-amber-400/80">12 mo</span>

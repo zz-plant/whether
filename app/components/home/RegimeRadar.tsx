@@ -213,7 +213,7 @@ export function RegimeRadar({
         <text
           x={PLOT_X + 6}
           y={PLOT_Y + 12}
-          className="text-[10px] font-bold uppercase tracking-wider"
+          className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-freezing-ink)"
         >
           Freezing
@@ -222,7 +222,7 @@ export function RegimeRadar({
           x={PLOT_RIGHT - 6}
           y={PLOT_Y + 12}
           textAnchor="end"
-          className="text-[10px] font-bold uppercase tracking-wider"
+          className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-cloudy-ink)"
         >
           Cloudy
@@ -230,7 +230,7 @@ export function RegimeRadar({
         <text
           x={PLOT_X + 6}
           y={PLOT_BOTTOM - 6}
-          className="text-[10px] font-bold uppercase tracking-wider"
+          className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-stormy-ink)"
         >
           Stormy
@@ -239,7 +239,7 @@ export function RegimeRadar({
           x={PLOT_RIGHT - 6}
           y={PLOT_BOTTOM - 6}
           textAnchor="end"
-          className="text-[10px] font-bold uppercase tracking-wider"
+          className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-sunny-ink)"
         >
           Sunny
@@ -283,7 +283,7 @@ export function RegimeRadar({
         <text
           x={PLOT_RIGHT + 3}
           y={Math.min(LINE_LABEL_MAX_Y, Math.max(LINE_LABEL_MIN_Y, boundaryY)) + 3}
-          className="fill-slate-400 text-[9px] tabular-nums"
+          className="fill-slate-400 text-[11px] tabular-nums"
           data-change-line="tightness"
         >
           {tightnessLine}
@@ -292,7 +292,7 @@ export function RegimeRadar({
           x={boundaryX}
           y={PLOT_Y - 3}
           textAnchor="middle"
-          className="fill-slate-400 text-[9px] tabular-nums"
+          className="fill-slate-400 text-[11px] tabular-nums"
           data-change-line="riskAppetite"
         >
           {riskAppetiteLine}
