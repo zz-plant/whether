@@ -568,3 +568,16 @@ Room before a change, Based on), preserving them for screen readers and retainin
 value and warning. Its date label stays visible. Copy Brief and the horizon choices use
 smaller horizontal control insets below 640px so they can share a row; narrow screens
 still wrap naturally, and all touch targets keep their 44px minimum height.
+
+### What the reader may hear (2026-10-31)
+
+A seventh section, “What you may be hearing” (`#what-you-may-hear`), sits between “What
+would change this guidance” and “How unusual is this?”. It translates the lines the
+section above just named into the questions they invite: one question per crossed area,
+one per role thread and one per speaker, capped at three, each drawn as a chat pair — the
+group asks, the published line answers. The section renders nothing on a week no pause
+line is crossed, or on an archived week, so it never becomes a standing block that says
+the same thing every week.
+“By role →” opens Guides' role list, where each role's full thread lives. The copy and the
+selection rule are in `app/guides/stakeholderGuides.ts`; the pairs are drawn by the same
+`HearingBubbles` component the role panels use.

@@ -119,6 +119,37 @@ The header carries four groups, each with a hub, read from one module
 - **Discoverability.** The sitemap drops `/resolve` and ranks `/resources` as a hub; `/llms.txt`
   carries a Site section built from the same groups.
 
+### 1.0b What the reader may hear, by role and on the brief (2026-10-31)
+
+A role selection on Guides (`/resources?stakeholder=<slug>`) opens the role's panel and, under it,
+a thread of the questions the published lines tend to bring and the answer each one already has
+(`HearingThread`, `app/resources/components/guidedTranslationPanels.tsx`). The copy lives beside
+the role's bullets in `app/guides/stakeholderGuides.ts` as
+`hearing: { from, question, answer, area? }[]`. The homepage prints the same pairs as its seventh
+section (`#what-you-may-hear`, §1.1) when a pause line is crossed.
+
+- **Two bubbles per question, one component.** The group asks on the left, in a recessed bubble
+  with a square bottom-left corner and the speaker's name inside it; the published answer sits
+  right-aligned on the panel surface with a square bottom-right corner. `HearingBubbles`
+  (`app/components/ui/hearingBubbles.tsx`) draws both surfaces, so Guides and `/` cannot show the
+  same pair two ways.
+- **The question is asked, not asserted.** "How do we decide a hire is safe while the hiring pause
+  line is crossed?", never "Why are you still hiring?" — a reader without that group or that
+  problem is not told what their week looks like. The speaker is a function ("Finance", "Board",
+  "Budget owners"), never "your CFO". Every answer restates a published line and promises no
+  outcome; `tests/guidedTranslationRouting.test.ts` holds the question mark, the non-empty answer,
+  the speaker and the badge length.
+- **`area` is what the homepage selects on.** A question about one area carries it; a question
+  about the whole set of lines, a plan, a pack or a quarter carries none and never appears on `/`.
+  `selectHearingForAreas` takes one question per crossed area, then one per role thread and one
+  per speaker, capped at three. No pause line crossed, no section.
+- **Stage-only views keep no thread.** The hearing content is role-scoped, so `?stage=` alone
+  renders the stage panel and its per-team guidance, not a thread.
+- **No mascot.** The product's one drawn vocabulary is the weather glyphs (`ConditionIcon`); a
+  character on a decision page would be ornament the page has to carry. The initials badge is the
+  thread's identity. A mascot belongs, if anywhere, in a share artifact or a first-visit empty
+  state, neither of which this surface has.
+
 ### 1.0 Rationalized IA (one screen + reachable depth)
 *Superseded for navigation by §1.0a; the route notes below still hold unless §1.0a says otherwise.*
 Primary IA is now a single surface — the **Weekly Brief** — with everything else reachable
@@ -218,15 +249,22 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    when a paused decision may resume (the pause line and the restart line, a chosen stage's else the
    lead area's). A sentence says a change in conditions is not permission to resume. Below `md` the
    conditions map draws here (no distance caption: the trust strip's margin states it).
-7. **How unusual is this?** (`RecordSection`): on a week conditions changed, the last time
+7. **What you may be hearing** (`home/HearingSection.tsx`, `#what-you-may-hear`): the questions
+   this week's crossed pause lines invite, one per crossed area, group and speaker
+   (`selectHearingForAreas`, `app/guides/stakeholderGuides.ts`), each drawn as a chat pair — the
+   group asks, the published line answers (`app/components/ui/hearingBubbles.tsx`, the same pair
+   Guides' role panels print). It renders nothing on a week no pause line is crossed, so a calm
+   brief does not grow a section that repeats every week, and nothing on an archived week, whose
+   lines are a record rather than a present conversation. "By role →" opens Guides' role list.
+8. **How unusual is this?** (`RecordSection`): on a week conditions changed, the last time
    they moved the same way and where the scores stood three months on; on every week, how long
    these conditions lasted before (§1.1.76); the last turns as links. On a live week the record is
    drawn above those sentences as `/history`'s month strip (every month-end since 2012 in its
    weather, 2026-10-21), with one line separating the sampling conventions — the record is
    month-end readings, the guidance above is this week's.
-8. **Get notified when something changes** (`AlertSection`, `#subscribe`): the one subscribe form,
+9. **Get notified when something changes** (`AlertSection`, `#subscribe`): the one subscribe form,
    starting on alerts only with the Monday email one choice away, and the push toggle.
-9. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
+10. **The closing line** (`ShareLinks`), with no heading: "Share or embed this →" to `/share`, which
    holds the slide and image copies and every other format since 2026-10-08, and the week's
    published brief named by its week ("Published brief for the week of Oct 5, 2026 →").
 
