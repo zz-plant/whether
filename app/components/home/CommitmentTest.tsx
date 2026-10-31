@@ -119,7 +119,7 @@ export function CommitmentTest({
                 key={preset.value}
                 type="button"
                 onClick={() => setCostDraft(preset.value)}
-                className="weather-hit rounded-md border border-[color:var(--border-default)] bg-[color:var(--bg-raised)] px-2 py-0.5 text-[11px] font-medium text-slate-300 transition-colors hover:border-[color:var(--border-strong)] hover:text-slate-50"
+                className="weather-hit rounded-md border border-[color:var(--border-default)] bg-[color:var(--bg-raised)] px-2 py-0.5 text-[12px] font-medium text-slate-300 transition-colors hover:border-[color:var(--border-strong)] hover:text-slate-50"
               >
                 {preset.label}
               </button>

@@ -153,7 +153,13 @@ export function DecisionPicker({
             </p>
           ) : null}
           <p className="text-fluid-xs text-slate-400">
-            Each area holds past its pause line and restarts past its restart line. Most weeks neither happens.
+            Each area holds past its pause line and restarts past its restart line.{" "}
+            {/* "Most weeks neither happens" sat under a count saying four of five were
+                held, so the page contradicted itself in consecutive lines. The
+                expectation line prints only when it is true of this week. */}
+            {options.some((option) => option.pause?.met)
+              ? "Held means the call above already applies to that area."
+              : "Most weeks neither happens."}
           </p>
         </div>
 
