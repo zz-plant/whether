@@ -40,6 +40,12 @@ export type BriefArtifact = {
   /** A stage's discipline for lifting its hold; absent without a stage. */
   resumeWhen?: string;
   clearsWhen?: readonly string[];
+  /**
+   * The week's spoken line: one sentence to use in a meeting and one to retire,
+   * from the regime playbook. A score does not travel through a company; a
+   * sentence does, so the artifact carries both.
+   */
+  phrase?: { say: string; avoid: string };
   regimeLabel: string;
   tightness: number;
   riskAppetite: number;
@@ -245,6 +251,10 @@ export const parseBriefArtifact = (raw: string): BriefArtifact | null => {
   const linesValue = value.lines;
   const lineTightness = isRecord(linesValue) ? readNumber(linesValue, "tightness") : undefined;
   const lineRiskAppetite = isRecord(linesValue) ? readNumber(linesValue, "riskAppetite") : undefined;
+  const phraseValue = value.phrase;
+  const phraseSay = isRecord(phraseValue) ? readText(phraseValue, "say") : undefined;
+  const phraseAvoid = isRecord(phraseValue) ? readText(phraseValue, "avoid") : undefined;
+  const phrase = phraseSay && phraseAvoid ? { say: phraseSay, avoid: phraseAvoid } : undefined;
 
   return {
     title,
@@ -260,6 +270,7 @@ export const parseBriefArtifact = (raw: string): BriefArtifact | null => {
     reversal: readText(value, "reversal"),
     resumeWhen: readText(value, "resumeWhen"),
     clearsWhen: readTextList(value, "clearsWhen"),
+    ...(phrase ? { phrase } : {}),
     revisit: readRevisit(value),
     noChangeAreas: readTextList(value, "noChangeAreas"),
     permalinkPath: readText(value, "permalinkPath"),
@@ -421,6 +432,9 @@ const formatSlack = (artifact: BriefArtifact, origin: string) =>
     `*${artifact.title} — ${artifact.recordDateLabel}*`,
     `> *Guidance:* ${artifact.call}`,
     ...conditionLines(artifact).map((line) => `> • ${line}`),
+    ...(artifact.phrase
+      ? [`> • Say: “${artifact.phrase.say}”`, `> • Avoid: “${artifact.phrase.avoid}”`]
+      : []),
     "",
     `${signalLine(artifact)} · ${artifact.regimeLabel}`,
     `${provenanceLine(artifact)}`,
@@ -440,6 +454,9 @@ const formatAgenda = (artifact: BriefArtifact, origin: string) =>
     ...(actionRestatesCall(artifact)
       ? []
       : [`**${DECISION_CONTRACT_LABELS.action.doNow}:** ${artifact.actionNow}`]),
+    ...(artifact.phrase
+      ? [`**Say:** “${artifact.phrase.say}” · **Avoid:** “${artifact.phrase.avoid}”`]
+      : []),
     ...MONDAY_AGENDA_STEPS.flatMap((step, index) => [
       `${index + 1}. **${step.label}** (${step.minutes} min) — ${step.prompt}`,
       // The thresholds step carries the week's numbers under it, so the room
@@ -493,6 +510,7 @@ export const briefArtifactToSlidePayload = (
   ...(artifact.basis ? { basis: artifact.basis } : {}),
   call: artifact.call,
   clearsWhen: artifact.clearsWhen,
+  ...(artifact.phrase ? { phrase: artifact.phrase } : {}),
   ...(origin ? { url: resolveBriefUrl(artifact, origin) } : {}),
   isFallback: artifact.isFallback,
 });

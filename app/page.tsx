@@ -18,6 +18,7 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
+import { getPlaybookForRegime } from "../lib/playbook";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
 import { isRoute } from "../lib/navigation/routeType";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
@@ -598,6 +599,14 @@ async function PageContent({
   const heroAreas = heldAreasLine
     ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
     : undefined;
+  /* One sentence the reader can say in a meeting, from the same playbook /operate
+     prints in full. A score has to be interpreted; a sentence can be repeated.
+     A held week prints none: "take share while money is cheap" under "hold
+     anything you can't undo" is two instructions disagreeing. */
+  const heroPhrase =
+    !historicalSelection && !reportData.assessment.policyAssessment?.refusal?.refused && isRegimeKey(regime)
+      ? getPlaybookForRegime(regime)?.leadershipPhrases.more[0]
+      : undefined;
   const heroTrust = publishedNotice
     ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null, omitReason: true } }
     : trustStripProps;
@@ -765,6 +774,7 @@ async function PageContent({
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
                 areas={heroAreas}
+                phrase={heroPhrase}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
                 phoneFigure={
                   nearestLadder && !historicalSelection ? (

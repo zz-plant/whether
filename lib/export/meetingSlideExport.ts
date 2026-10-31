@@ -36,6 +36,8 @@ const SLIDE_LABELS = {
   pause: DECISION_CONTRACT_LABELS.threshold.pauseIf,
   callChange: DECISION_CONTRACT_LABELS.watch.postureFlips,
   resume: DECISION_CONTRACT_LABELS.reversal.resumeWhen,
+  say: "Say",
+  avoid: "Avoid",
 } as const;
 
 export interface MeetingSlidePayload {
@@ -77,6 +79,12 @@ export interface MeetingSlidePayload {
   call?: string;
   /** The other things that would change the guidance, printed under their own name. */
   clearsWhen?: readonly string[];
+  /**
+   * The week's spoken line: one sentence to use in a meeting and one to retire,
+   * from the regime playbook. Guidance travels through a company as words, not
+   * scores, so the slide carries the words.
+   */
+  phrase?: { say: string; avoid: string };
   /** Where to read the whole brief. Absent when the caller has no origin. */
   url?: string;
   /** True when the reading came off a snapshot rather than a live fetch. */
@@ -171,6 +179,12 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
     // Labels only (2026-10-09): a target, a warning sign, a tick and a cycle
     // arrow sat in front of them, four pictures restating four words.
     `> **${SLIDE_LABELS.action.toUpperCase()}**: ${payload.actionNow}`,
+    ...(payload.phrase
+      ? [
+          `> **${SLIDE_LABELS.say.toUpperCase()}**: “${payload.phrase.say}”`,
+          `> **${SLIDE_LABELS.avoid.toUpperCase()}**: “${payload.phrase.avoid}”`,
+        ]
+      : []),
     `> **${SLIDE_LABELS.pause.toUpperCase()}**: ${payload.pauseIf}`,
     // The stage's own discipline for lifting its hold, when one is chosen.
     ...(payload.resumeWhen ? [`> **${SLIDE_LABELS.resume.toUpperCase()}**: ${payload.resumeWhen}`] : []),
@@ -230,7 +244,19 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
         <span style="font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${SLIDE_LABELS.action}</span>
         <div style="font-size: 13px; font-weight: 600; color: ${OG_TEXT}; margin-top: 2px;">${esc(payload.actionNow)}</div>
       </td>
-    </tr>
+    </tr>${
+      payload.phrase
+        ? `
+    <tr>
+      <td style="padding: 8px 0;">
+        <span style="font-size: 12px; font-weight: 700; color: ${OG_TEXT};">${SLIDE_LABELS.say}</span>
+        <div style="font-size: 13px; color: ${OG_TEXT_SECONDARY}; margin-top: 2px;">“${esc(payload.phrase.say)}”</div>
+        <span style="display: block; margin-top: 6px; font-size: 12px; font-weight: 700; color: ${OG_TEXT_MUTED};">${SLIDE_LABELS.avoid}</span>
+        <div style="font-size: 13px; color: ${OG_TEXT_MUTED}; margin-top: 2px;">“${esc(payload.phrase.avoid)}”</div>
+      </td>
+    </tr>`
+        : ""
+    }
     <tr>
       <td style="padding: 8px 0;">
         <span style="font-size: 12px; font-weight: 700; color: ${OG_LINE_CROSSED};">${SLIDE_LABELS.pause}</span>

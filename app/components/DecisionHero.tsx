@@ -84,6 +84,12 @@ type Props = {
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
   /**
+   * The week's spoken line, from the regime playbook: the sentence a leader can
+   * use in a meeting. Guidance travels as words; one line on the card is the
+   * difference between a score a reader has to interpret and something to say.
+   */
+  phrase?: string;
+  /**
    * The nearer score on its ladder, drawn on a phone only, above the trust strip
    * (2026-10-27). From `md` the conditions map beside the call draws where the
    * reading sits; below it the map is hidden, and a phone screenshot of the card
@@ -124,6 +130,7 @@ export function DecisionHero({
   captionDetail,
   question,
   lines,
+  phrase,
   published,
   areas,
   reading,
@@ -278,6 +285,12 @@ export function DecisionHero({
           <div className="max-w-xl border-l-2 border-[color:var(--border-strong)] pl-3 py-0.5">
             <p className="text-sm leading-relaxed text-slate-300">{detail}</p>
           </div>
+        ) : null}
+
+        {phrase ? (
+          <p className="max-w-xl text-fluid-sm leading-relaxed text-slate-300" data-say-line>
+            <span className="font-semibold text-slate-200">Say it:</span> “{phrase}”
+          </p>
         ) : null}
 
         {/* Freshness and confidence, once, where every reading route puts them:

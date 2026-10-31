@@ -31,6 +31,12 @@ export type TrustStripProps = {
   /** Why it could, when the distance does not already say: "a change is waiting on a second reading". */
   changeReason?: string;
   /**
+   * How often conditions held at this distance, from the month-end record
+   * (`calibrationForDistance`). A historical count, not a probability: the brief
+   * quotes its own base rate rather than leaving the reader to find /calibration.
+   */
+  baseRate?: { held: number; months: number } | null;
+  /**
    * Which inputs set the scores (`resolveScoringBasis`): the cell's value, and
    * after it what the inputs left out would do to a line, where they would
    * move one ("Startup-market inputs would put risk appetite at 49, below its
@@ -87,6 +93,7 @@ export function TrustStrip({
   margin,
   couldChangeNextWeek,
   changeReason,
+  baseRate,
   basis,
   href,
   phoneLayout = "grid",
@@ -115,6 +122,8 @@ export function TrustStrip({
     detail?: string;
     /** Which fact the detail is, for a reader of the markup: the next-week forecast, or the basis's warning. */
     detailKind?: "next-week" | "basis";
+    /** A historical count at the margin's distance, printed after the detail. */
+    baseRate?: string;
     /** `caveat`: read this reading with care (the caveat diamond); `easing`: in the state it should be (a filled dot, lit). Never the crossed red, which is for lines. */
     tone?: "caveat" | "easing";
     routine?: boolean;
@@ -134,6 +143,7 @@ export function TrustStrip({
       value: describeMarginCell(margin, confidenceLabel, regime),
       detail: describeNextWeek(couldChangeNextWeek, changeReason),
       detailKind: "next-week",
+      ...(baseRate ? { baseRate: `Held ${baseRate.held} of ${baseRate.months} months at this distance` } : {}),
       tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caveat" : undefined,
     },
     /* Which inputs set the scores, on every call (2026-10-09). Routine on the
@@ -228,6 +238,12 @@ export function TrustStrip({
                   ) : (
                     cell.detail
                   )}
+                </span>
+              ) : null}
+              {cell.baseRate ? (
+                <span className="font-normal text-slate-500" data-base-rate>
+                  {"\u00A0·\u00A0"}
+                  {cell.baseRate}
                 </span>
               ) : null}
             </dd>
