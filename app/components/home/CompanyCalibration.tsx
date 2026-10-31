@@ -54,7 +54,7 @@ export function CompanyCalibration({
           the call and "What are you deciding?", so the first thing asked of a
           reader was to configure the page. The line says whose rules these are,
           which is the part every reader needs; the keys are one click away. */}
-      <details className="group hidden sm:block group-target/calibration:block" data-company-calibration>
+      <details className="group block group-target/calibration:block" data-company-calibration>
         <summary className="weather-hit cursor-pointer list-none text-fluid-xs text-slate-300 [&::-webkit-details-marker]:hidden">
           {/* One span: the site's summary rule lays its children out as a flex row, which spread the sentence's words across the line. */}
           <span>
