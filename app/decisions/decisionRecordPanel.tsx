@@ -16,8 +16,13 @@ import { publicDecisionLabels } from "../../lib/report/reportFormatting";
 import { useHydrated } from "../components/browserSource";
 import { fetchDecisionLedger, logDecisionFollowUp, logDecisionSnapshotToLedger } from "../components/decisionLedgerClient";
 import { MonthStrip } from "../components/history/monthStrip";
-import type { DecisionFollowUpResponse } from "../../lib/decisionFollowUp";
-import { FOLLOW_UP_NOTE_MAX_LENGTH } from "../../lib/decisionFollowUp";
+import {
+  FOLLOW_UP_NOTE_MAX_LENGTH,
+  isOutcomeReviewDue,
+  OUTCOME_OPTIONS,
+  type DecisionFollowUpOutcome,
+  type DecisionFollowUpResponse,
+} from "../../lib/decisionFollowUp";
 import type { DecisionMemorySnapshotPayload } from "../../lib/decisionMemory";
 import {
   buildDecisionRecordView,
@@ -80,6 +85,10 @@ type ReviewContext = {
 
 const FollowUpForm = ({ row, review }: { row: DecisionRecordRow; review: ReviewContext }) => {
   const [response, setResponse] = useState<DecisionFollowUpResponse | null>(null);
+  /* Only asked once the decision is old enough to answer: the response above is
+     about what you did when the assumptions moved, this is about what happened. */
+  const [outcome, setOutcome] = useState<DecisionFollowUpOutcome | null>(null);
+  const outcomeDue = isOutcomeReviewDue(row.recordDate);
   const [note, setNote] = useState("");
   const [state, setState] = useState<"idle" | "saving" | "failed">("idle");
   const [error, setError] = useState<string | null>(null);
@@ -96,6 +105,7 @@ const FollowUpForm = ({ row, review }: { row: DecisionRecordRow; review: ReviewC
       recordDate: review.recordDate,
       entryId: row.id,
       response,
+      ...(outcome ? { outcome } : {}),
       note: note.trim() || undefined,
       conditions: { tightness: review.current.tightness, riskAppetite: review.current.riskAppetite },
     });
@@ -158,6 +168,25 @@ const FollowUpForm = ({ row, review }: { row: DecisionRecordRow; review: ReviewC
           {state === "failed" && error ? <p className="type-label text-amber-200">{error}</p> : null}
         </div>
       </fieldset>
+
+      {outcomeDue ? (
+        <fieldset className="mt-4 border-t border-[color:var(--border-faint)] pt-3">
+          <legend className="type-eyebrow text-slate-200">Did it work?</legend>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {OUTCOME_OPTIONS.map((option) => (
+              <button
+                key={option.value}
+                type="button"
+                onClick={() => setOutcome(option.value)}
+                aria-pressed={outcome === option.value}
+                className="weather-key weather-focus-ring inline-flex min-h-11 items-center gap-1.5 px-2.5 py-2 text-xs font-semibold"
+              >
+                {option.label}
+              </button>
+            ))}
+          </div>
+        </fieldset>
+      ) : null}
       <output className="sr-only" aria-live="polite">
         {state === "saving" ? "Recording your review." : state === "failed" && error ? error : ""}
       </output>

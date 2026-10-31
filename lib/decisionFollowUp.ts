@@ -18,6 +18,17 @@ import { newEntryId } from "./decisionMemory";
 
 export type DecisionFollowUpResponse = "continued" | "changed" | "deferred";
 
+/**
+ * Whether the decision did what it was for.
+ *
+ * The response above records what the operator *did* when the assumptions moved;
+ * this records what happened afterwards, which is the half the product never
+ * asked for. It is answered late — ninety days after the reading the decision
+ * was made against — because asking "did it work" in the same breath as "did
+ * you change course" gets answered before anyone can know.
+ */
+export type DecisionFollowUpOutcome = "worked" | "partly" | "did-not" | "too-early";
+
 type DecisionFollowUpConditions = {
   /** Funding pressure when the response was recorded. */
   tightness: number;
@@ -40,6 +51,8 @@ export type DecisionFollowUpRecord = {
   /** The ledger entry this response is about. */
   entryId: string;
   response: DecisionFollowUpResponse;
+  /** What happened, answered at the outcome review rather than at the response. */
+  outcome?: DecisionFollowUpOutcome;
   /** Optional free text: what changed, or when to revisit a deferred decision. */
   note?: string;
   conditions: DecisionFollowUpConditions;
@@ -52,6 +65,7 @@ export type DecisionFollowUpPayload = {
   recordDate: string;
   entryId: string;
   response: DecisionFollowUpResponse;
+  outcome?: DecisionFollowUpOutcome;
   note?: string;
   conditions: DecisionFollowUpConditions;
 };
@@ -61,6 +75,28 @@ const FOLLOW_UP_RESPONSES: ReadonlySet<string> = new Set([
   "changed",
   "deferred",
 ]);
+
+const FOLLOW_UP_OUTCOMES: ReadonlySet<string> = new Set(["worked", "partly", "did-not", "too-early"]);
+
+export const OUTCOME_OPTIONS: ReadonlyArray<{ value: DecisionFollowUpOutcome; label: string }> = [
+  { value: "worked", label: "Worked" },
+  { value: "partly", label: "Partly" },
+  { value: "did-not", label: "Did not" },
+  { value: "too-early", label: "Too early" },
+];
+
+/** How long after the reading a decision is old enough to say whether it worked. */
+const OUTCOME_REVIEW_AFTER_DAYS = 90;
+
+/**
+ * Whether a decision recorded against `recordDate` is due for its outcome
+ * review. Date-only, so the answer does not depend on the reader's time zone.
+ */
+export const isOutcomeReviewDue = (recordDate: string, now: Date = new Date()): boolean => {
+  const recorded = Date.parse(`${recordDate}T00:00:00Z`);
+  if (Number.isNaN(recorded)) return false;
+  return now.getTime() - recorded >= OUTCOME_REVIEW_AFTER_DAYS * 24 * 60 * 60 * 1000;
+};
 
 export const FOLLOW_UP_NOTE_MAX_LENGTH = 500;
 
@@ -93,6 +129,7 @@ const isDecisionFollowUpRecord = (value: unknown): value is DecisionFollowUpReco
     && typeof value.entryId === "string"
     && typeof value.response === "string"
     && FOLLOW_UP_RESPONSES.has(value.response)
+    && (value.outcome === undefined || FOLLOW_UP_OUTCOMES.has(String(value.outcome)))
     && (value.note === undefined
       || (typeof value.note === "string" && value.note.length <= FOLLOW_UP_NOTE_MAX_LENGTH))
     && isConditions(value.conditions);
@@ -110,6 +147,7 @@ const isDecisionFollowUpPayload = (value: unknown): value is DecisionFollowUpPay
     && typeof value.entryId === "string"
     && typeof value.response === "string"
     && FOLLOW_UP_RESPONSES.has(value.response)
+    && (value.outcome === undefined || FOLLOW_UP_OUTCOMES.has(String(value.outcome)))
     && (value.note === undefined
       || (typeof value.note === "string" && value.note.length <= FOLLOW_UP_NOTE_MAX_LENGTH))
     && isConditions(value.conditions);
@@ -128,6 +166,7 @@ export const buildDecisionFollowUpRecord = (payload: DecisionFollowUpPayload): D
   },
   entryId: payload.entryId,
   response: payload.response,
+  ...(payload.outcome ? { outcome: payload.outcome } : {}),
   note: payload.note,
   conditions: payload.conditions,
 });
