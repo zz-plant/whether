@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { findStageGuide, stageGuides } from "../../guides/stageGuides";
 import { findStakeholderGuide, stakeholderGuides } from "../../guides/stakeholderGuides";
+import { HearingBubbles } from "../../components/ui/hearingBubbles";
 
 export type GuidedTranslationSearchParams = {
   stakeholder?: string;
@@ -74,6 +75,40 @@ export function resolveGuidedTranslationState(params?: GuidedTranslationSearchPa
   };
 }
 
+/**
+ * The thread a role selection opens: what the reader may hear from that group,
+ * and what the published line says back.
+ *
+ * The badge is initials, once, and `aria-hidden`: the heading above names the
+ * group, and a drawn face on a decision page would be ornament the page has to
+ * carry. The bubbles are `HearingBubbles` (`app/components/ui/hearingBubbles`),
+ * the same pair the homepage section prints.
+ */
+function HearingThread({ guide }: { guide: (typeof stakeholderGuides)[number] }) {
+  return (
+    <article
+      className="weather-hub-card px-4 py-4 xl:grid xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:gap-6"
+      aria-labelledby="guided-hearing-heading"
+    >
+      <div className="flex items-start gap-3">
+        <span
+          aria-hidden="true"
+          className="mt-0.5 inline-flex size-8 shrink-0 items-center justify-center rounded-full border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] text-[10px] font-semibold uppercase text-slate-300"
+        >
+          {guide.avatar}
+        </span>
+        <div className="space-y-1">
+          <p id="guided-hearing-heading" className="type-eyebrow">What you may be hearing</p>
+          <p className="max-w-prose text-xs text-slate-400">
+            The questions the published lines tend to bring, and the answer each one has. Which reach you depends on who you answer to.
+          </p>
+        </div>
+      </div>
+      <HearingBubbles entries={guide.hearing} className="max-w-2xl" />
+    </article>
+  );
+}
+
 export function GuidedTranslationPanels({
   searchParams,
 }: {
@@ -97,49 +132,52 @@ export function GuidedTranslationPanels({
   return (
     <section id="guided-translation-results" className="space-y-4" aria-label="Selected view details">
       {selectedStakeholder ? (
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <h3 className="text-lg font-semibold text-slate-100">{selectedStakeholder.title}</h3>
-              <Link
-                href={buildGuidedTranslationHref(selectedStage ? { stage: selectedStage.slug } : undefined)}
-                className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100"
-              >
-                Clear team choice
-              </Link>
-            </div>
-            <p className="text-sm font-semibold text-slate-100">{selectedStakeholder.tagline}</p>
-            <ul className="space-y-2 text-sm text-slate-200">
-              {selectedStakeholder.bullets.map((bullet) => (
-                <li key={bullet} className="flex gap-3">
-                  <span aria-hidden="true" className="text-slate-500">•</span>
-                  <span>{bullet}</span>
-                </li>
-              ))}
-            </ul>
-          </article>
-
-          <article className="weather-hub-card space-y-3 px-4 py-4">
-            <p className="type-eyebrow">How this changes by stage</p>
-            <ul className="space-y-3 text-sm text-slate-200">
-              {selectedStakeholder.stageSpecificContent.map((entry) => {
-                const stage = findStageGuide(entry.stageSlug);
-                return (
-                  <li key={entry.stageSlug} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
-                    <p className="font-semibold text-slate-100">{stage?.title}</p>
-                    <p className="mt-1">{entry.guidance}</p>
-                    <Link
-                      href={buildGuidedTranslationHref({ stakeholder: selectedStakeholder.slug, stage: entry.stageSlug })}
-                      className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
-                    >
-                      Open {stage?.title ?? "stage"} view
-                    </Link>
+        <>
+          <div className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+            <article className="weather-hub-card space-y-3 px-4 py-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <h3 className="text-lg font-semibold text-slate-100">{selectedStakeholder.title}</h3>
+                <Link
+                  href={buildGuidedTranslationHref(selectedStage ? { stage: selectedStage.slug } : undefined)}
+                  className="weather-pill inline-flex min-h-[44px] items-center justify-center px-3 py-2 text-xs font-semibold text-slate-100"
+                >
+                  Clear team choice
+                </Link>
+              </div>
+              <p className="text-sm font-semibold text-slate-100">{selectedStakeholder.tagline}</p>
+              <ul className="space-y-2 text-sm text-slate-200">
+                {selectedStakeholder.bullets.map((bullet) => (
+                  <li key={bullet} className="flex gap-3">
+                    <span aria-hidden="true" className="text-slate-500">•</span>
+                    <span>{bullet}</span>
                   </li>
-                );
-              })}
-            </ul>
-          </article>
-        </div>
+                ))}
+              </ul>
+            </article>
+
+            <article className="weather-hub-card space-y-3 px-4 py-4">
+              <p className="type-eyebrow">How this changes by stage</p>
+              <ul className="space-y-3 text-sm text-slate-200">
+                {selectedStakeholder.stageSpecificContent.map((entry) => {
+                  const stage = findStageGuide(entry.stageSlug);
+                  return (
+                    <li key={entry.stageSlug} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                      <p className="font-semibold text-slate-100">{stage?.title}</p>
+                      <p className="mt-1">{entry.guidance}</p>
+                      <Link
+                        href={buildGuidedTranslationHref({ stakeholder: selectedStakeholder.slug, stage: entry.stageSlug })}
+                        className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                      >
+                        Open {stage?.title ?? "stage"} view
+                      </Link>
+                    </li>
+                  );
+                })}
+              </ul>
+            </article>
+          </div>
+          <HearingThread guide={selectedStakeholder} />
+        </>
       ) : null}
 
       {selectedStage ? (

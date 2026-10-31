@@ -51,6 +51,8 @@ import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
+import { HearingSection } from "./components/home/HearingSection";
+import { selectHearingForAreas } from "./guides/stakeholderGuides";
 import { ActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { ShareLinks } from "./components/home/ShareLinks";
@@ -402,6 +404,13 @@ async function PageContent({
     movement: decisionMovement,
     scores: { tightness, riskAppetite },
   });
+  /* The questions this week's crossed pause lines invite, for the section after
+     the lines: one per crossed area, one per group, one per speaker
+     (`selectHearingForAreas`). Empty on a week no pause line is crossed, and the
+     section renders nothing. */
+  const hearingPreview = selectHearingForAreas(
+    homeAreaRows.filter((row) => row.pause?.met).map((row) => row.area),
+  );
   const scoreLadders = [
     {
       metric: "tightness" as const,
@@ -929,7 +938,14 @@ async function PageContent({
               conditionsTrail={conditionsTrail}
             />
 
-            {/* 7. How unusual is this? */}
+            {/* 7. Who will ask about those lines: the questions this week's
+                crossed lines invite, and the answer each one has. Renders
+                nothing on a week no pause line is crossed, and nothing on an
+                archived week, whose lines are a record rather than a present
+                conversation. */}
+            {historicalSelection ? null : <HearingSection entries={hearingPreview} />}
+
+            {/* 8. How unusual is this? */}
             <RecordSection
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
@@ -938,7 +954,7 @@ async function PageContent({
               record={historicalSelection ? undefined : recordSeries}
             />
 
-            {/* 8. The alert: hearing the day a line is crossed is how the page is
+            {/* 9. The alert: hearing the day a line is crossed is how the page is
                 meant to be used, so it follows everything it watches. */}
             <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} />
 
