@@ -111,8 +111,9 @@ export default function AboutPage() {
               when a line is crossed, or an agreed floor on runway.
             </li>
             <li>
-              Venture-backed U.S. companies with one to two years of runway and a next raise that depends on what
-              capital costs.
+              Venture-backed companies with one to two years of runway and a next raise that depends on what capital
+              costs. The test is the currency of the raise, not the address: a company in Toronto, London or Berlin
+              raising from U.S. funds prices its round off the same rates this brief reads.
             </li>
             <li>
               Investors and accelerators sending one reading to every company they back: the{" "}
@@ -133,8 +134,10 @@ export default function AboutPage() {
               Under six months of runway. At that point cash matters more than the market, so the guidance starts with cash.
             </li>
             <li>
-              A company whose funding does not follow U.S. rates: one outside the U.S., or in a sector raising on a boom
-              of its own. The scores read U.S. rates only.
+              A company whose funding does not follow U.S. rates: one raising locally in a currency whose central bank
+              sets its own price of money, or one in a sector raising on a boom of its own. Where you are registered is
+              not the test; a company outside the U.S. that raises from U.S. funds borrows at U.S. rates, and the scores
+              are its cost of capital.
             </li>
             <li>
               Which product work matters most. Rates affect how much slow-payback work a team can afford, not what it
