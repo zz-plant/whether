@@ -100,7 +100,6 @@ export async function buildTrustPageModel() {
      method before the revisit triggers, while the page drew the formula first,
      the method next and every other section folded at its foot. */
   const sectionLinks = [
-    { href: "#trust-snapshot", label: "System status" },
     // Only when the telemetry read is configured: an index entry for a section that
     // never renders is a broken anchor.
     ...(runHistory.status === "unconfigured" ? [] : [{ href: "#run-history", label: "Scheduled runs" }]),
@@ -112,6 +111,9 @@ export async function buildTrustPageModel() {
     // with every other paste of the week.
     { href: "#confidence-limits", label: "How close to changing" },
     { href: "#revisit-call", label: "When to look again" },
+    /* Last, with the section itself: the owner's cron-health panel led a page a
+       reader opens to check this week's reading. */
+    { href: "#trust-snapshot", label: "System status" },
   ];
 
   const reportShellModel: ReportShellModel = {

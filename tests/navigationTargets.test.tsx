@@ -173,7 +173,7 @@ describe("links into Plan and Resolve use the names the header prints", () => {
       { name: "/resources/decision-shield-overview", html: renderToStaticMarkup(await DecisionShieldOverview()) },
       { name: "/resources/capital-posture-template", html: await renderResource("capital-posture-template") },
       { name: `/resources/${resourcePillarPages[0].slug}`, html: await renderResource(resourcePillarPages[0].slug) },
-      /* The empty state hand-listed "Evidence", "Plan", "Toolkit library" and
+      /* The empty state hand-listed "Why it changed", "Plan", "Toolkit library" and
          "Trust" until 2026-10-23 — the recovery surface is the one place a
          reader cannot afford a name the header no longer prints. */
       { name: "/search (nothing matched)", html: renderToStaticMarkup(<SearchResults initialQuery="zzqx-no-such-entry" />) },
