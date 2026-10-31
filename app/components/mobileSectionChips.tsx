@@ -68,7 +68,7 @@ export function MobileSectionChips({ sectionLinks }: { sectionLinks: ReportSecti
        with the header rather than a transform: a transform would also shift the row
        while it is still in the page's flow, over the content under it. Measured at
        about 0.1ms of layout a frame. */
-    <div className="sticky top-[var(--top-chrome-height,0px)] z-20 -mx-4 transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none border-b border-[color:var(--border-default)] bg-[var(--bg-body)] lg:hidden">
+    <div className="sticky top-[var(--top-chrome-height,0px)] z-[var(--z-raised)] -mx-4 transition-[top] duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none border-b border-[color:var(--border-default)] bg-[var(--bg-body)] lg:hidden">
       <nav
         ref={navRef}
         aria-label="Page sections"

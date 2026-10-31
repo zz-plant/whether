@@ -86,9 +86,9 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
   return (
     <Dialog.Root open onOpenChange={(next) => { if (!next) onExit(); }}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-[60] bg-slate-950/95 backdrop-blur-sm" />
+        <Dialog.Backdrop className="fixed inset-0 z-[var(--z-presentation)] bg-slate-950/95 backdrop-blur-sm" />
         <Dialog.Popup
-          className="fixed inset-0 z-[61] flex flex-col justify-between p-6 sm:p-12"
+          className="fixed inset-0 z-[var(--z-presentation)] flex flex-col justify-between p-6 sm:p-12"
           aria-label="Brief presentation"
         >
           <div className="flex items-baseline justify-between gap-4 text-fluid-xs text-white/50">

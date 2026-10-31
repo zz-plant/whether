@@ -98,7 +98,7 @@ export function TimeMachineCalendarPicker({
       </p>
 
       <Popover.Portal>
-        <Popover.Positioner side="bottom" align="start" sideOffset={8} className="z-50">
+        <Popover.Positioner side="bottom" align="start" sideOffset={8} className="z-[var(--z-menu)]">
           <Popover.Popup
             aria-label="Select brief period"
             className="max-h-96 w-80 overflow-y-auto overscroll-contain rounded-xl border border-[color:var(--border-strong)] bg-[color:var(--bg-raised)] p-3 shadow-2xl"

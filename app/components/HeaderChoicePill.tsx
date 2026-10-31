@@ -78,7 +78,7 @@ export function HeaderChoicePill<Key extends string>({
         </Select.Icon>
       </Select.Trigger>
       <Select.Portal>
-        <Select.Positioner side="bottom" align="end" sideOffset={6} className="z-50">
+        <Select.Positioner side="bottom" align="end" sideOffset={6} className="z-[var(--z-menu)]">
           <Select.Popup className="w-52 rounded-xl border border-slate-800/90 bg-slate-950 p-1.5 shadow-2xl">
             <Select.List>
               {options.map((option) => (
