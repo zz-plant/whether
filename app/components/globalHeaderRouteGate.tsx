@@ -11,8 +11,6 @@ import { useHydrated } from "./browserSource";
 import { GlobalHeaderActionsClient } from "./globalHeaderActionsClient";
 import { GlobalHeaderNavClient } from "./globalHeaderNavClient";
 import { GlobalHeaderScrollWrapper } from "./globalHeaderScrollWrapper";
-import { StageDropdownPill } from "./StageDropdownPill";
-import { RunwayDropdownPill } from "./RunwayDropdownPill";
 import { RunwayServerSync } from "./RunwayServerSync";
 
 type GlobalHeaderRouteGateProps = {
@@ -77,18 +75,10 @@ export function GlobalHeaderRouteGate({ initialPathname = "/" }: GlobalHeaderRou
           </Link>
           <GlobalHeaderNavClient pathname={pathname} />
           <div className="flex shrink-0 items-center justify-end gap-1.5 max-[360px]:w-full sm:gap-2 [&_button:focus-visible]:outline-2 [&_button:focus-visible]:outline-offset-2 [&_button:focus-visible]:outline-sky-400 [&_a:focus-visible]:outline-2 [&_a:focus-visible]:outline-offset-2 [&_a:focus-visible]:outline-sky-400">
-            {/* Hidden on a first visit to the folded brief (app/styles/home-flow.css):
-                at 375px the two pills wrapped their own labels and truncated the
-                name of the page, to offer a stage and a runway the reader had not
-                given. Above `sm` the same choices sit in a section the first visit
-                folds, so this keeps the two widths alike; "Show the full brief"
-                brings both back. */}
-            {isHomeBrief ? (
-              <div data-first-visit-header-choices="true" className="flex flex-wrap items-center justify-end gap-1 sm:hidden">
-                <StageDropdownPill />
-                <RunwayDropdownPill />
-              </div>
-            ) : null}
+            {/* The stage and runway pills left the phone header (2026-10-31).
+                They existed because the inline calibration was `hidden sm:block`,
+                so a phone had no way to answer. The calibration is visible at
+                every width now, so the header is brand, nav and search again. */}
             <div className={isHomeBrief ? "hidden sm:block" : undefined}>
               <GlobalHeaderActionsClient showPresentMode={isHomeBrief} />
             </div>

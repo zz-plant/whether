@@ -195,18 +195,16 @@ describe("home route render contract", () => {
       assert.ok(!routeSource.includes(tag), `${tag} has no render site on /`);
     }
 
-    // One control per axis at every width: the header's phone-only pills and
-    // the hero's tablists above `sm` are complementary, and nothing else asks.
+    /* One control per axis at every width. The phone pills existed only because
+       the inline calibration was sm-only; it is visible everywhere now, so the
+       header asks nothing and the calibration is the one control. */
     const headerSource = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
-    assert.match(
-      headerSource,
-      /<div [^>]*className="[^"]*\bsm:hidden\b[^"]*"[^>]*>\s*<StageDropdownPill \/>\s*<RunwayDropdownPill \/>/,
-      "the header keeps the phone pills, and only there",
-    );
+    assert.ok(!headerSource.includes("<StageDropdownPill"), "the header asks for no stage");
+    assert.ok(!headerSource.includes("<RunwayDropdownPill"), "the header asks for no runway");
     const calibrationSource = readFileSync("app/components/home/CompanyCalibration.tsx", "utf8");
     assert.match(
       calibrationSource,
-      /<details className="group hidden sm:block[^"]*"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
+      /<details className="group block[^"]*"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
       "the sm+ tablists lead the areas they reshape, folded under the line that names them",
     );
     assert.ok(!routeSource.includes("<RunwayDropdownPill"), "<RunwayDropdownPill has no render site on /");
