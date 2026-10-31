@@ -236,8 +236,13 @@ export const sendWeeklyBrief = async (options?: {
       const basisLine = [document.provenance.scoringBasis.sentence, document.provenance.scoringBasis.warning]
         .filter((part): part is string => Boolean(part))
         .join(" ");
+      /* A phone shows roughly 40 characters of a subject and a desktop around
+         70; "Whether — Cloudy: Protect the revenue you already have, and hold
+         off on new bets until money gets cheaper." was 105 and lost its point
+         in every list view. The first clause carries the action. */
+      const subjectAction = headline.action.split(/,\s|;\s|\s+and\s+/)[0]?.trim() || headline.action;
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
-        ? `Whether — ${regimeLabel}: ${headline.action}`
+        ? `Whether — ${regimeLabel}: ${subjectAction}`
         : `Whether Brief — ${regimeLabel}`;
       const briefUrl = baseUrl;
       /* The lines above are the published ones. The use the record fits is a plan's
