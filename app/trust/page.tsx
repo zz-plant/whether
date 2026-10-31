@@ -149,19 +149,7 @@ export default async function MethodPage({
           recommendation wrong?", the flip condition under "Confidence and
           reliability limits". The id stays: the rail, the search command and
           three in-page links point at #trust-snapshot as "System status". */}
-      <section
-        id="trust-snapshot"
-        data-page-section="trust-snapshot"
-        tabIndex={-1}
-        aria-labelledby="section-trust-snapshot-heading"
-        className="space-y-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
-      >
-        <h2 id="section-trust-snapshot-heading" className="sr-only">System status</h2>
-        <p className="text-xs leading-5 text-slate-400">
-          {/* PRIMARY_AUDIENCE_SUMMARY already opens with the "not an authority" sentence — don't restate it here. */}
-          {PRIMARY_AUDIENCE_SUMMARY} Check the sources and add your own numbers before acting on anything you can't undo.
-        </p>
-      </section>
+
 
       <RunHistorySection runHistory={runHistory} />
 
@@ -230,6 +218,23 @@ export default async function MethodPage({
         </Link>
         , with a worked example and a blank form.
       </p>
+      {/* Last, not first: this is the owner's cron-health panel, and it led a
+          page a reader opens to check this week's reading. The anchor and the
+          sr-only heading stay, so the rail and the search still land here. */}
+      <section
+        id="trust-snapshot"
+        data-page-section="trust-snapshot"
+        tabIndex={-1}
+        aria-labelledby="section-trust-snapshot-heading"
+        className="space-y-3 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-sky-400"
+      >
+        <h2 id="section-trust-snapshot-heading" className="sr-only">System status</h2>
+        <p className="text-xs leading-5 text-slate-400">
+          {/* PRIMARY_AUDIENCE_SUMMARY already opens with the "not an authority" sentence — don't restate it here. */}
+          {PRIMARY_AUDIENCE_SUMMARY} Check the sources and add your own numbers before acting on anything you can't undo.
+        </p>
+      </section>
+
     </ReportShell>
   );
 }

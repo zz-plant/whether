@@ -17,7 +17,7 @@ describe("global header navigation helpers", () => {
   it("names a route by its page", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/"), "This week");
     assert.equal(resolveGlobalHeaderRouteLabel("/signals/capital-tightness-watch"), "Why it changed");
-    assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "How much to trust this week");
+    assert.equal(resolveGlobalHeaderRouteLabel("/trust"), "Method");
     assert.equal(resolveGlobalHeaderRouteLabel("/operate/financial"), "Runway planner");
     assert.equal(resolveGlobalHeaderRouteLabel("/history/compare"), "Compare periods");
     assert.equal(resolveGlobalHeaderRouteLabel("/history/2024"), "History");
@@ -113,7 +113,7 @@ describe("sub-tabs", () => {
       [
         ["This week", false],
         ["Why it changed", true],
-        ["How much to trust this week", false],
+        ["Method", false],
       ],
     );
     assert.deepEqual(

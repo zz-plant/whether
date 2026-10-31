@@ -835,20 +835,7 @@ async function PageContent({
               />
             ) : null}
 
-            {/* 4. What the conditions are made of, and what the reading leaves out:
-                the two scores with their meanings, the excluded inputs that would
-                change the classification, and the capped score's real distance. */}
-            <WhyConditionsSection
-              regime={regime}
-              tightness={tightness}
-              riskAppetite={riskAppetite}
-              changeLines={callChangeLines}
-              saturatedPressure={tightnessSaturated ? tightnessPressure : undefined}
-              notCounted={reportData.scoringBasis.notCounted}
-              warning={reportData.scoringBasis.warning}
-            />
-
-            {/* 5. What changed. One table, every signal, each against the earlier
+            {/* 4. What changed. One table, every signal, each against the earlier
                 reading and against its own lines. It opens on the table: the card
                 says what the week did to the conditions and why, and each area's
                 row says which of its lines moved. Only a read with nothing to
@@ -867,6 +854,19 @@ async function PageContent({
               lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
               comparisonUnavailable={comparisonUnavailable}
               basis={basis}
+            />
+
+            {/* 5. What the conditions are made of, and what the reading leaves out:
+                the two scores with their meanings, the excluded inputs that would
+                change the classification, and the capped score's real distance. */}
+            <WhyConditionsSection
+              regime={regime}
+              tightness={tightness}
+              riskAppetite={riskAppetite}
+              changeLines={callChangeLines}
+              saturatedPressure={tightnessSaturated ? tightnessPressure : undefined}
+              notCounted={reportData.scoringBasis.notCounted}
+              warning={reportData.scoringBasis.warning}
             />
 
             {/* 6. What would change the guidance: its pause and restart lines, the

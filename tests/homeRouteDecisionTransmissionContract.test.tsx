@@ -51,8 +51,11 @@ describe("home route render contract", () => {
       "<DecisionHero",
       "<DecisionPicker",
       "<CompanyCalibration",
-      "<WhyConditionsSection",
+      /* Delta before explanation: what changed this week, then what the
+         reading is made of. The reader scanning for "what is different"
+         met three paragraphs of mechanism first. */
       "<WhatChangedSection",
+      "<WhyConditionsSection",
       "<WhatWouldChangeSection",
       "<RecordSection",
       "<AlertSection",

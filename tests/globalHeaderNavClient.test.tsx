@@ -29,7 +29,7 @@ describe("GlobalHeaderNavClient", () => {
       return index;
     });
     assert.deepEqual(positions, [...positions].sort((a, b) => a - b), "tabs keep IA order");
-    for (const retired of ["Brief", "Decide", "Evidence", "Resolve", "Trust", "Record"]) {
+    for (const retired of ["Brief", "Decide", "Why it changed", "Resolve", "Trust", "Record"]) {
       assert.ok(!bar.includes(`<span>${retired}</span>`), `the bar no longer carries ${retired}`);
     }
     for (const href of ["/share", "/about"]) {

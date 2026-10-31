@@ -15,7 +15,7 @@ const names = (trail: Array<{ name: string }>) => trail.map((item) => item.name)
 describe("breadcrumbs follow the groups", () => {
   it("start a grouped page's trail at its group", () => {
     assert.deepEqual(names(buildGroupBreadcrumbs("/signals")), ["This week", "Why it changed"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/trust")), ["This week", "How much to trust this week"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/trust")), ["This week", "Method"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/operate/financial")), ["Plan", "Runway planner"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/comps")), ["Plan", "SaaS multiples"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/history/compare")), ["History", "Compare periods"]);

@@ -159,7 +159,9 @@ export const navigationPages: readonly NavigationPage[] = [
     key: "trust",
     group: "this-week",
     href: "/trust",
-    label: "How much to trust this week",
+    /* Six words in a nav row, and it undersold the page: sources, derivation
+       and the close-call record. "Method" is what a doubting reader looks for. */
+    label: "Method",
     description: "Check freshness, the margin, source coverage and the lines that would change the brief.",
     placement: "secondary",
   },
