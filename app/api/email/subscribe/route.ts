@@ -33,8 +33,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // The reader's runway band, sent with plan lines so a crossing email can say
-    // what the crossing means at it. One of four bands or nothing: never a figure.
+    // The reader's runway band. It scales the brief (the under-six-months reader
+    // gets the cash-first note) and, with plan lines, says what a crossing means
+    // at it. One of four bands or nothing: never a figure.
     const runwayBand = isRunwayBand(body.runwayBand) ? body.runwayBand : undefined;
     // The company stage the reader set on the site, so the Monday brief prints the
     // rules scaled to it. A band, never a figure.

@@ -54,7 +54,7 @@ export async function requestSubscription(
         ...(typeof options?.alerts === "boolean" ? { alerts: options.alerts } : {}),
         ...(typeof options?.weekly === "boolean" ? { weekly: options.weekly } : {}),
         ...(options?.planLines ? { planLines: options.planLines } : {}),
-        ...(options?.planLines && options.runwayBand ? { runwayBand: options.runwayBand } : {}),
+        ...(options?.runwayBand ? { runwayBand: options.runwayBand } : {}),
         ...(options?.stage ? { stage: options.stage } : {}),
       }),
     });

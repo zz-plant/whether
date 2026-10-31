@@ -8,6 +8,7 @@ import { trackActivationEvent } from "../../lib/activationFunnel";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
 import { useOperatorStage } from "./useOperatorStage";
+import { useOperatorRunway } from "./useOperatorRunway";
 
 type SubscribeChannel = "email" | "slack";
 type EmailFrequency = "alerts" | "weekly";
@@ -55,6 +56,9 @@ export function SubscribeForm({
   /* The stage the reader already set for the on-site rules; their brief prints
      the same rules, so the signup carries it rather than asking again. */
   const { stage } = useOperatorStage();
+  /* The runway band the reader already chose for the on-site notes; their brief
+     prints the same one, so the signup carries it rather than asking again. */
+  const { runwayBand } = useOperatorRunway();
   const [channel, setChannel] = useState<SubscribeChannel>("email");
   const [frequency, setFrequency] = useState<EmailFrequency>(defaultFrequency);
   const alertsOnly = channel === "email" && frequency === "alerts";
@@ -78,7 +82,7 @@ export function SubscribeForm({
         trackActivationEvent({ step: "committed", path: pathname, commitment: "subscribed" });
       }
     } else {
-      const result = await requestSubscription(email, { alerts: true, weekly: frequency === "weekly", ...(stage ? { stage } : {}) });
+      const result = await requestSubscription(email, { alerts: true, weekly: frequency === "weekly", ...(stage ? { stage } : {}), ...(runwayBand ? { runwayBand } : {}) });
       setStatus(result.ok ? "success" : "error");
       setMessage(result.message);
       if (result.ok) {

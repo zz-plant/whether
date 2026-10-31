@@ -5,6 +5,7 @@
  */
 
 import type { OperatorStage } from "../report/operatorStage";
+import type { RunwayBand } from "../report/operatorRunway";
 import type { PlanLines, PlanRunway } from "../alert/planLines";
 
 type EmailRecipient = {
@@ -20,6 +21,8 @@ type EmailRecipient = {
   planRunway?: PlanRunway;
   /** The lines they set for their own plan, which the brief prints first. */
   planLines?: PlanLines[];
+  /** The runway band they chose on the site, which picks the note their brief prints. */
+  runwayBand?: RunwayBand;
   /** The subscriber's unsubscribe token, so outgoing mail can carry a one-click link. */
   token?: string;
 };
@@ -116,5 +119,6 @@ export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
     ...(sub.stage ? { stage: sub.stage } : {}),
     ...(sub.planRunway ? { planRunway: sub.planRunway } : {}),
     ...(sub.planLines.length > 0 ? { planLines: sub.planLines } : {}),
+    ...(sub.runwayBand ? { runwayBand: sub.runwayBand } : {}),
   }));
 };

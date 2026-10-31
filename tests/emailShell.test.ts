@@ -322,6 +322,28 @@ describe("the brief a reader actually gets", () => {
     assert.ok(message.text.indexOf("Your lines:") < message.text.indexOf("Guidance:"), "their lines lead the published ones");
   });
 
+  it("prints the cash-first note for a reader under six months, without plan lines", async () => {
+    const sendTo = async (email: string, runwayBand?: "critical" | "balanced") => {
+      resetSubscriberStore();
+      const store = getSubscriberStore();
+      const subscriber = await store.subscribe(email, runwayBand ? { runwayBand } : undefined);
+      await store.verifyEmail(subscriber.confirmToken ?? "");
+      const snapshot = snapshotFor();
+      const mail = captureMail();
+      try {
+        await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now: new Date("2026-08-31T12:00:00.000Z") });
+      } finally {
+        mail.restore();
+      }
+      return mail.sent[0]?.text ?? "";
+    };
+
+    const generic = await sendTo("no-band@example.com");
+    const cashFirst = await sendTo("six-months@example.com", "critical");
+    assert.ok(generic.length > 0 && cashFirst.length > 0);
+    assert.notEqual(cashFirst, generic, "a reader under six months gets a different brief");
+  });
+
   it("scales the rules to the stage the reader set", async () => {
     const sendTo = async (email: string, stage?: "seed" | "series-b") => {
       resetSubscriberStore();
