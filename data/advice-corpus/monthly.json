@@ -5,6 +5,18 @@
  "eligible": "capital-relevant posts addressed to founders, prefilter candidates; each firm present in a period weighs equally",
  "eligiblePosts": 407,
  "firms": ["Andreessen Horowitz","Benchmark","Bessemer Venture Partners","First Round Capital","Greylock Partners","NFX","Sequoia Capital","Tomasz Tunguz (Redpoint, then Theory Ventures)","Union Square Ventures","Y Combinator"],
+ "firmPosts": [
+  {"firm":"Tomasz Tunguz (Redpoint, then Theory Ventures)","posts":159},
+  {"firm":"Union Square Ventures","posts":61},
+  {"firm":"Y Combinator","posts":45},
+  {"firm":"First Round Capital","posts":39},
+  {"firm":"NFX","posts":38},
+  {"firm":"Andreessen Horowitz","posts":29},
+  {"firm":"Bessemer Venture Partners","posts":23},
+  {"firm":"Greylock Partners","posts":8},
+  {"firm":"Sequoia Capital","posts":3},
+  {"firm":"Benchmark","posts":2}
+ ],
  "eras": [
   {"from":"2012-01","to":"2022-06","fundingPressure":"at or below 70","posts":305,"firms":10,"expand":0.297,"conserve":0.4716,"craft":0.1412,"none":0.0903},
   {"from":"2022-07","to":"2025-11","fundingPressure":"above 70","posts":90,"firms":8,"expand":0.3915,"conserve":0.4,"craft":0.1676,"none":0.0409},

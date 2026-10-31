@@ -12,6 +12,7 @@ import type { ScoreUnits } from "../../app/components/ui/scoreCell";
 import type { TrustStripProps } from "../../app/components/trustStrip";
 import { couldCallChangeNextWeek, resolveDataStatusLabel } from "./trustStatus";
 import { resolveNearestLineMargin, type ConfidenceInputs } from "./confidence";
+import { calibrationForDistance } from "./confidenceCalibration";
 
 /**
  * What the evidence page, the answer pages and the scenario pages draw, in the
@@ -254,25 +255,34 @@ export const buildTrustStripProps = ({
     scores?: ConfidenceInputs["scores"];
     thresholds?: { tightnessRegime: number; riskAppetiteRegime: number };
   };
-}): Omit<TrustStripProps, "href" | "className"> => ({
-  recordDateLabel,
-  sourcesLive: !isHistorical && !isFallback && degradedSourceCount === 0,
-  sourcesLabel: resolveDataStatusLabel({
-    isHistoricalSelection: isHistorical,
-    isFallbackSnapshot: isFallback,
-    degradedSourceCount,
-  }),
-  confidenceLabel,
-  ...(assessment.scores && assessment.thresholds
-    ? { margin: resolveNearestLineMargin({ scores: assessment.scores, thresholds: assessment.thresholds }) }
-    : {}),
-  couldChangeNextWeek: couldCallChangeNextWeek(assessment),
-  changeReason: couldCallChangeNextWeek(assessment) ? describeChangeReason(assessment) : undefined,
-  basis: {
-    key: scoringBasis?.key ?? "record",
-    value: scoringBasis?.value ?? "The record's inputs",
-    warning: scoringBasis?.warning ?? null,
-    warningShort: scoringBasis?.warningShort ?? null,
-    note: basisNote ?? null,
-  },
-});
+}): Omit<TrustStripProps, "href" | "className"> => {
+  const margin =
+    assessment.scores && assessment.thresholds
+      ? resolveNearestLineMargin({ scores: assessment.scores, thresholds: assessment.thresholds })
+      : undefined;
+  const calibration = margin ? calibrationForDistance(margin.points) : null;
+
+  return {
+    recordDateLabel,
+    sourcesLive: !isHistorical && !isFallback && degradedSourceCount === 0,
+    sourcesLabel: resolveDataStatusLabel({
+      isHistoricalSelection: isHistorical,
+      isFallbackSnapshot: isFallback,
+      degradedSourceCount,
+    }),
+    confidenceLabel,
+    ...(margin ? { margin } : {}),
+    ...(calibration && calibration.months >= 5
+      ? { baseRate: { held: calibration.held, months: calibration.months } }
+      : {}),
+    couldChangeNextWeek: couldCallChangeNextWeek(assessment),
+    changeReason: couldCallChangeNextWeek(assessment) ? describeChangeReason(assessment) : undefined,
+    basis: {
+      key: scoringBasis?.key ?? "record",
+      value: scoringBasis?.value ?? "The record's inputs",
+      warning: scoringBasis?.warning ?? null,
+      warningShort: scoringBasis?.warningShort ?? null,
+      note: basisNote ?? null,
+    },
+  };
+};

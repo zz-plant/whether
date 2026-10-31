@@ -91,9 +91,7 @@ export function FossilRecordSection({
                   {row.domain}
                 </td>
                 <td className="py-3 pr-3 text-slate-400 align-top leading-relaxed">
-                  <span className="line-through decoration-slate-600/80">
-                    {row.lowRateArtifact}
-                  </span>
+                  {row.lowRateArtifact}
                 </td>
                 <td className="py-3 pr-3 text-slate-100 font-medium align-top leading-relaxed">
                   {row.highRateArtifact}

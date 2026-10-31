@@ -12,6 +12,7 @@ import { buildPublishedBriefPath, selectCitablePermalinkBrief } from "./publishe
 import { RUNWAY_BAND_OPTIONS } from "./operatorRunway";
 import { buildRunwayConditionedNotes, resolveRunwayForNotes } from "./runwayConditionedNotes";
 import { getRegimePublicLabel } from "../regimePresentation";
+import { getPlaybookForRegime } from "../playbook";
 import { buildSensorReadings } from "../sensors";
 import { describeConditions, pauseConditionOnly } from "../export/exportTerms";
 import { buildBriefPermalinkUrl } from "../export/briefPermalink";
@@ -137,6 +138,11 @@ export const buildBriefDocument = (
   const thresholds = assessment.thresholds;
   const sourceLabel = publisherSourceLabel(source.sourceLabel);
   const scoringBasis = source.scoringBasis ?? resolveScoringBasis({ engineVersion: ENGINE_VERSION, assessment });
+  const playbook = getPlaybookForRegime(assessment.regime);
+  /* The first line of each list, guarded: a playbook without one prints none rather
+     than a phrase object with an undefined side. */
+  const sayPhrase = playbook?.leadershipPhrases.more[0];
+  const avoidPhrase = playbook?.leadershipPhrases.less[0];
 
   return {
     /* The artifact the share rail renders, field for field as /share published it. */
@@ -152,6 +158,9 @@ export const buildBriefDocument = (
     reversal: call.callChangesIf,
     resumeWhen: call.resumeWhen,
     clearsWhen: call.flipConditionLabels,
+    ...(sayPhrase && avoidPhrase && !assessment.policyAssessment?.refusal?.refused
+      ? { phrase: { say: sayPhrase, avoid: avoidPhrase } }
+      : {}),
     regimeLabel: getRegimePublicLabel(assessment.regime),
     tightness: assessment.scores.tightness,
     riskAppetite: assessment.scores.riskAppetite,

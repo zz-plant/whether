@@ -20,7 +20,7 @@ describe("breadcrumbs follow the groups", () => {
     assert.deepEqual(names(buildGroupBreadcrumbs("/comps")), ["Plan", "SaaS multiples"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/history/compare")), ["History", "Compare periods"]);
     assert.deepEqual(names(buildGroupBreadcrumbs("/calibration")), ["History", "Calibration"]);
-    assert.deepEqual(names(buildGroupBreadcrumbs("/concepts")), ["History", "Reading list"]);
+    assert.deepEqual(names(buildGroupBreadcrumbs("/concepts")), ["History", "Advice vs. market"]);
   });
 
   it("put Home before a hub, so no trail is one crumb long", () => {
