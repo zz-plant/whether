@@ -153,6 +153,34 @@ describe("no first-visit fold", () => {
   });
 });
 
+describe("an opened card asks the question it answers", () => {
+  const withAnswer: DecisionPickerOption[] = OPTIONS.map((option) =>
+    option.area === "hiring"
+      ? { ...option, answer: { href: "/answers/should-startups-hire-engineers-right-now", title: "Should startups hire engineers right now?" } }
+      : option,
+  );
+
+  it("leads with the reader's question, then this week's answer", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" initialSelected="hiring" />);
+    assert.match(html, /<h3[^>]*data-decision-question[^>]*>Should startups hire engineers right now\?<\/h3>/, "the card asks what the reader came to ask");
+    assert.ok(
+      html.indexOf("Should startups hire engineers right now?") < html.indexOf("Rule for hiring"),
+      "the question comes before the rule that answers it",
+    );
+  });
+
+  it("does not print the question twice in one card", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" initialSelected="hiring" />);
+    assert.equal(html.match(/Should startups hire engineers right now\?/g)?.length, 2, "the heading and the row's tooltip");
+    assert.match(html, /Read the full answer →/, "the link names what it opens, not the question again");
+  });
+
+  it("carries the question as the row's tooltip", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" />);
+    assert.match(html, /title="Should startups hire engineers right now\?"/);
+  });
+});
+
 describe("a link can carry the decision (`/?decision=`)", () => {
   const render = (initialSelected?: DecisionPickerOption["area"]) =>
     renderToStaticMarkup(

@@ -39,6 +39,42 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
 - Do not imply legal, compliance, or fiduciary advice.
 - Use “supports,” “improves consistency,” or “increases decision quality” instead of absolute outcome claims.
 
+### Past and future claims (2026-10-31)
+- **Future:** no point estimates, no certainty language, no “will.” A forecast is a cone or a
+  conditional, never a number presented as an outcome.
+- **Past:** state the estimate, the interval and the sample. Call a registered miss a finding.
+  A pre-registered test that returns a null result has produced a finding — a negative one — and
+  must not be downgraded to “shares, not a finding” or “not evidence.” Hedging a completed
+  measurement protects nothing; it hides the result the method earned.
+- The pillar-page rules above (no “predict downturns,” prefer governance/discipline/reversibility)
+  govern claims about the future. They do not license withholding a past result.
+
+## The three registers, and how they balance
+
+Every surface makes claims out of three materials, and they are not interchangeable:
+
+1. **The question** — the reader's words. Where one exists, it comes from
+   `content/answers/pages.json` (the answer page's own heading), so the short
+   answer and the long answer cannot drift into two different questions.
+2. **The number** — a published input, out of our control. Stated as a sentence
+   where the claim it supports is made, not only drawn in a chart. Funding
+   pressure and risk appetite are the whole set; a fourth number would be
+   invented resolution.
+3. **The interpretation** — what we say it means, plus one click to the basis it
+   rests on. At most one sentence of meaning per claim; the method belongs one
+   click away, never in the card that gets screenshotted.
+
+The rule is co-location, not volume: **a first-screen claim carries the number it
+rests on and one link to its basis.** A surface may drop a register only when it
+is not making a claim. This is why the card's meaning line prints
+"Funding pressure 90, risk appetite 55" beside the weather word rather than
+leaving the scores inside the conditions map (2026-10-31), and why the decision
+picker's opened card asks the question before it answers.
+
+What this rules out: a meaning line that is a constant (the same words every week
+for one regime), a claim whose evidence is only a chart, and a second surface
+answering a question the answer pages already answer.
+
 ## CTA policy
 - Every long-form pillar should include a midpoint CTA and end CTA.
 - CTA language should map to clear operator outcomes:

@@ -256,6 +256,75 @@ export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">
 };
 
 /**
+ * The one exception worth a band above the call (2026-10-31): where the binding
+ * line sits, when an area is on hold or close to it.
+ *
+ * The crossed state was drawn in five places — the stamp, the ladder, the
+ * picker's badges, the area table and the card's own "On hold:" line — and
+ * loud in none, so a week with an area held looked like a week with none. The
+ * band is the page's silhouette changing with the weather: it exists only when
+ * there is an exception, and it says the one thing the card does not, how far
+ * the binding line is. It names no state word of its own ("on hold" is the
+ * card's line) and it repeats no distance the picker draws: it is the sentence
+ * a reader would otherwise assemble from two places.
+ *
+ * Which area: the one closest to its binding line. On hold, that is the nearest
+ * restart line, because lifting a hold is the action; close, the nearest pause
+ * line. Ties go to the page's own order.
+ */
+export type LineStateBandModel = {
+  state: Exclude<LineState, "clear">;
+  area: DecisionArea;
+  text: string;
+  href: string;
+  action: string;
+};
+
+export const describeLineStateBand = (
+  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[],
+): LineStateBandModel | null => {
+  const ruled = rows.filter((row) => row.pause);
+  if (ruled.length === 0) return null;
+
+  const band = (state: LineStateBandModel["state"], row: Pick<HomeAreaRow, "area" | "pause" | "resume">, text: string) => ({
+    state,
+    area: row.area,
+    text,
+    href: `#${HOME_SECTIONS.areas.id}`,
+    action: "What to do",
+  });
+
+  /* Held: the area whose restart line is nearest, since that is the hold that
+     lifts first. An area with no numeric restart line still belongs here — it
+     is on hold — it just cannot say how far from lifting it is. */
+  const held = ruled.filter((row) => row.pause?.met);
+  if (held.length > 0) {
+    const nearestRestart = (row: Pick<HomeAreaRow, "resume">) =>
+      row.resume && !row.resume.met && Number.isFinite(row.resume.points) ? row.resume.points : Number.POSITIVE_INFINITY;
+    const binding = held.reduce((best, row) => (nearestRestart(row) < nearestRestart(best) ? row : best));
+    const restart = binding.resume;
+    return band(
+      "crossed",
+      binding,
+      restart && !restart.met && Number.isFinite(restart.points)
+        ? `${decisionAreaLabel(binding.area)} — ${restart.distance} from its restart line.`
+        : `${decisionAreaLabel(binding.area)} is on hold.`,
+    );
+  }
+
+  /* Close: the shared cutoff, through the same resolver the badges use, so the
+     band cannot call a reading close that the picker calls clear. */
+  const close = ruled.filter((row) => resolveLineState(row.pause?.points, "pause", row.pause?.met) === "near");
+  if (close.length === 0) return null;
+  const binding = close.reduce((best, row) => ((row.pause?.points ?? 0) < (best.pause?.points ?? 0) ? row : best));
+  return band(
+    "near",
+    binding,
+    `${decisionAreaLabel(binding.area)} — ${binding.pause?.distance} from its pause line.`,
+  );
+};
+
+/**
  * The card's bridge from the weather word to the five areas (2026-10-14).
  *
  * The condition comes from the change lines and the area answers from the
