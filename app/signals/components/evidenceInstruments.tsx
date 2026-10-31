@@ -196,7 +196,7 @@ export const SignalsInstrumentsSection = ({
     {/* The same inset as a ReportSection's header (px-5, none on a phone), so
         this title lines up with every section title above it. */}
     <div className="px-5 max-sm:px-0">
-      <h2 id="instruments-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">
+      <h2 id="instruments-heading" className="type-section">
         Charts, past months and checks
       </h2>
     </div>

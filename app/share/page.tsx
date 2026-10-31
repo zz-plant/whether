@@ -497,7 +497,7 @@ export default async function SharePage() {
             script or a feed reader. The API page was a header menu item of its
             own until 2026-10-08. */}
         <nav aria-labelledby="share-elsewhere-heading" className="weather-panel weather-section-stack p-0">
-          <h2 id="share-elsewhere-heading" className="text-[1.375rem] leading-tight font-semibold text-white/90 sm:text-2xl">For agents, scripts and feed readers</h2>
+          <h2 id="share-elsewhere-heading" className="type-section">For agents, scripts and feed readers</h2>
           <p className="text-sm text-slate-300">
             Ask an assistant what this week means for your company:{" "}
             {artifact.assistantLinks.map((link, index) => (

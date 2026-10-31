@@ -134,7 +134,7 @@ export default async function ResourcesHubPage({
 
         <section id="answers" aria-labelledby="resources-answers-heading" className="space-y-4">
           <div className="space-y-1">
-            <h2 id="resources-answers-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">This week&apos;s answers, by area</h2>
+            <h2 id="resources-answers-heading" className="type-section">This week&apos;s answers, by area</h2>
             <p className="text-sm text-slate-300">Under this week&apos;s guidance: {liveAction}</p>
             {/* The tally over the list, as the homepage prints it over its five
                 choices: the count a reader would otherwise assemble by opening
@@ -225,7 +225,7 @@ export default async function ResourcesHubPage({
         </section>
 
         <section aria-labelledby="resources-pillars-heading" className="space-y-3">
-          <h2 id="resources-pillars-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Governance frameworks</h2>
+          <h2 id="resources-pillars-heading" className="type-section">Governance frameworks</h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {frameworks.map((entry) => (
               <li key={entry.href}>
@@ -256,7 +256,7 @@ export default async function ResourcesHubPage({
             "AI Claims") answer questions outside the five areas; their pages
             keep their addresses. Open when a link arrives with a selection. */}
         <section id="more-tools" aria-labelledby="resources-more-tools-heading" className="space-y-3">
-          <h2 id="resources-more-tools-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">More tools</h2>
+          <h2 id="resources-more-tools-heading" className="type-section">More tools</h2>
           {/* The worksheets by name, outside the fold (2026-10-27). They were
               listed only inside the closed disclosure below, so a reader who
               did not open it never learned the site had them. */}

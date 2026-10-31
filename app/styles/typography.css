@@ -5,12 +5,22 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* The one section heading (2026-10-31). A page's h2 and a panel's title are the
+   same job at different depths, and they were hand-rolled at 32 call sites in
+   five spellings: two `sm` sizes (`text-2xl` 24px fixed and `fluid-xl` 26px at
+   the wide end), two inks (`text-white` and `text-slate-100`), three tracking
+   values, and — through `.type-section`'s old 1.5–1.875rem — a panel title
+   larger than the page section it sat in. Adjacent to a card heading
+   (`text-fluid-lg`, 17–20px) the 22px version was a 1.1x step, which is not a
+   step. One primitive now, sized so the ladder reads: h1 28–52, h2 22–26,
+   h3 17–20, body 15–17.
+   Ink is set here and may be overridden by a caller that has a reason. */
 .type-section {
-  @apply font-semibold leading-snug;
-  font-size: clamp(1.5rem, 1.125rem + 1.5vw, 1.875rem);
+  @apply font-semibold leading-tight text-slate-100;
+  font-size: clamp(1.375rem, 1rem + 1.1vw, 1.625rem);
   font-family: var(--font-display);
   font-stretch: var(--font-stretch-display);
-  letter-spacing: -0.005em;
+  letter-spacing: -0.015em;
 }
 
 /* Unified label primitive — use for all section/section-header metadata labels.

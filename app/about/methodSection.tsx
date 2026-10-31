@@ -43,7 +43,7 @@ const slotLabelClass = (slot: keyof typeof DECISION_SLOT_TONE) =>
 export function MethodSection() {
   return (
     <section id="method" aria-labelledby="method-heading" className="weather-panel space-y-4 px-6 max-sm:px-0 py-6">
-      <h2 id="method-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">
+      <h2 id="method-heading" className="type-section">
         How to use the pause and restart lines
       </h2>
 

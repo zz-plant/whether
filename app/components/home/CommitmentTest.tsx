@@ -119,7 +119,7 @@ export function CommitmentTest({
                 key={preset.value}
                 type="button"
                 onClick={() => setCostDraft(preset.value)}
-                className="weather-hit rounded-md border border-[color:var(--border-default)] bg-[color:var(--bg-raised)] px-2 py-0.5 text-[12px] font-medium text-slate-300 transition-colors hover:border-[color:var(--border-strong)] hover:text-slate-50"
+                className="weather-hit rounded-md border border-[color:var(--border-default)] bg-[color:var(--bg-raised)] px-2 py-0.5 text-fluid-nano font-medium text-slate-300 transition-colors hover:border-[color:var(--border-strong)] hover:text-slate-50"
               >
                 {preset.label}
               </button>
@@ -179,7 +179,7 @@ export function CommitmentTest({
                   style={{ width: `${Math.min(100, Math.max(0, (impact.runwayAfter / 36) * 100))}%` }}
                 />
               </div>
-              <div className="flex justify-between text-[11px] tabular-nums text-slate-500">
+              <div className="flex justify-between text-fluid-nano tabular-nums text-slate-500">
                 <span>0 mo</span>
                 <span className="text-rose-400/80">6 mo</span>
                 <span className="text-amber-400/80">12 mo</span>

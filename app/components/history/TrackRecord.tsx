@@ -64,7 +64,7 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
           {OPERATING_LATITUDE_LABEL} (0–100)
           {/* The noun never prints without its gloss: "latitude" is the one
               term a competitor cannot use and the one a reader cannot guess. */}
-          <span className="block text-[0.65rem] font-normal leading-tight text-slate-500">{OPERATING_LATITUDE_GLOSS}</span>
+          <span className="block text-fluid-nano font-normal leading-tight text-slate-500">{OPERATING_LATITUDE_GLOSS}</span>
         </th>
         <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
       </tr>
@@ -152,7 +152,7 @@ export function TrackRecordTiles({
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="track-record-heading">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div>
-          <h2 className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl" id="track-record-heading">Track record</h2>
+          <h2 className="type-section" id="track-record-heading">Track record</h2>
           <p className="max-w-prose text-sm text-slate-300">
             Every month-end reading Whether has made, scored with the same published formula, so
             you can check each one against what happened next.
@@ -212,7 +212,7 @@ export function TrackRecordTable({
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
       <div>
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl" id="monthly-calls-heading">Monthly readings</h2>
+        <h2 className="type-section" id="monthly-calls-heading">Monthly readings</h2>
         {/* Defined where it first appears (2026-10-09): the homepage reads two
             scores and never introduces a third, so a reader met this one cold.
             It is kept rather than replaced by the two, because it is not

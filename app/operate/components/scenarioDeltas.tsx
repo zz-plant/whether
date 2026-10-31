@@ -50,7 +50,7 @@ export function ScenarioDeltas({
           <Tag regime={simulatedAssessment.regime}>
             {getRegimePublicLabel(simulatedAssessment.regime)}
           </Tag>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-fluid-nano text-slate-400">
             {regimeShifted ? "Conditions would change" : "Same conditions as this week"}
           </p>
         </div>

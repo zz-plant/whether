@@ -15,21 +15,32 @@ colors:
   light-ink: "#121719"
 typography:
   display:
-    fontFamily: "Archivo Variable, system-ui, sans-serif"
-    fontSize: "clamp(1.5rem, 1.1rem + 1.8vw, 2.125rem)"
+    fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
+    fontSize: "clamp(1.75rem, 1.2rem + 2.2vw, 3.25rem)"
     fontWeight: 600
-    lineHeight: 1.15
+    lineHeight: 1.06
+    letterSpacing: "-0.018em"
+  section:
+    fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
+    fontSize: "clamp(1.375rem, 1rem + 1.1vw, 1.625rem)"
+    fontWeight: 600
+    lineHeight: 1.25
     letterSpacing: "-0.015em"
   body:
-    fontFamily: "Archivo Variable, system-ui, sans-serif"
+    fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
     fontSize: "clamp(0.9375rem, 0.8rem + 0.5vw, 1.0625rem)"
     fontWeight: 400
     lineHeight: 1.6
   label:
-    fontFamily: "Archivo Variable, system-ui, sans-serif"
+    fontFamily: "Archivo, Archivo Fallback, system-ui, sans-serif"
     fontSize: "clamp(0.75rem, 0.66rem + 0.15vw, 0.8125rem)"
     fontWeight: 600
     letterSpacing: "0.08em"
+  mono:
+    fontFamily: "Chivo Mono, Archivo, ui-monospace, monospace"
+    fontSize: "inherit"
+    fontWeight: 400
+    fontVariantNumeric: "tabular-nums"
 rounded:
   sm: "2px"
   md: "4px"
@@ -89,12 +100,39 @@ Light theme swaps the ground and the ink and keeps the four condition fills.
 
 ## Typography
 
-One family: **Archivo Variable**, self-hosted. Hierarchy comes from size and weight, not from a
-second face.
+**Archivo** (variable, self-hosted) is the whole interface: one family, hierarchy from size,
+weight and width, not from a second face. It is a grotesque with a real provenance and a real
+reason — its variable `wdth` axis is what lets the same face set the call semi-condensed
+(87.5%) and the regime stamp expanded (125%), so the placard and the headline are one voice at
+two widths instead of two typefaces agreeing by accident. Nothing in the interface is set in a
+default: no Inter, no Roboto, no system-ui as identity.
+
+**Chivo Mono** (same foundry) is the one companion, and only where figures must line up: pasted
+previews, the compare table, anything carrying `.mono`. It is a role, not a mood.
 
 Sizes are fluid `clamp()` tokens (`--text-fluid-nano` through `--text-fluid-2xl`), so the brief
-reflows from a 390px phone to a wide desktop without a breakpoint ladder. The floor is 12px:
-captions and hint lines were 11px and unreadable under the controls they explained.
+reflows from a 390px phone to a wide desktop without a breakpoint ladder. The role ladder, and
+why the steps are these:
+
+| Role | Size | Class |
+| --- | --- | --- |
+| The week's call (h1) | 28 → 52px | `.text-display` |
+| A page section or panel title (h2/h3) | 22 → 26px | `.type-section` |
+| A card's own heading | 17 → 20px | `text-fluid-lg` |
+| Body and prose | 15 → 17px | `text-fluid-base` |
+| Secondary prose | 13 → 15px | `text-fluid-sm` |
+| Label, eyebrow, metadata | 12 → 14px | `.type-eyebrow`, `.type-label` |
+| Stamp, badge | 12 → 13px | `.type-stamp`, `.type-badge` |
+
+Every step is at least 1.15x the one below it at both ends of the range; two sizes closer than
+that read as one job set twice. A role with no class above is a role that will be hand-rolled:
+the section heading was, at 32 call sites in five spellings, until `.type-section` became the one
+primitive.
+
+The floor is 12px for anything read as a word. Chart annotations inside a fixed-geometry drawing
+(the conditions map's quadrant labels and tick numbers) sit at 11px, where 12px collides with the
+plane's own edges; they are drawing, not prose, and the sentence beside each chart carries the
+meaning.
 
 Headings are sentence case, semibold, tight tracking. Eyebrows are uppercase by CSS only — never
 typed in caps — and classify without repeating the heading.
