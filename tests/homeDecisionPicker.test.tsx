@@ -101,6 +101,11 @@ describe("decision picker", () => {
   });
 
   it("counts the crossed pause lines once, over the choices", () => {
+    /* The expectation line and the count used to contradict each other in
+       consecutive lines: "4 of 5 areas are on hold" over "most weeks neither
+       happens". It prints only when it is true of this week. */
+    assert.match(html, /Held means the call above already applies to that area\./);
+    assert.doesNotMatch(html, /Most weeks neither happens\./);
     const count = html.indexOf("4 of 5 areas are on hold.");
     assert.ok(count > html.indexOf("Your decisions this week"), "the count sits under the heading");
     assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");

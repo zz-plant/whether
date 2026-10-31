@@ -774,7 +774,14 @@ async function PageContent({
                   decision picker under the tab bar, and that question is the
                   one thing a first visit is asked. */}
               <div className="weather-brief-actions mt-4 flex flex-wrap items-center justify-between gap-3">
-                <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
+                <div className="flex flex-wrap items-center gap-3">
+                  <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
+                  {/* The core loop, beside the artifact rather than 4,000px below
+                      it: the alert is what a quiet week is for. */}
+                  <ActionLink href={`#${HOME_SECTIONS.alert.id}`} variant="inline">
+                    Get the alert →
+                  </ActionLink>
+                </div>
                 {/* Labelled: three bare words beside Copy Brief did not say they
                     set the horizon the guidance is stated for. The confidence chip
                     that sat between them repeated the trust strip on the card. */}
