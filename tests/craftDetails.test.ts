@@ -62,3 +62,16 @@ describe("the caveat band is drawn by its class", () => {
     assert.deepEqual(await offendersOf([".tsx"], /\bbg-caveat-bg\b|bg-\[var\(--color-caveat-bg\)\]|border-l-4 border-caveat-border/), []);
   });
 });
+
+describe("a section heading is set by its class", () => {
+  /* 2026-10-31. The h2 was hand-rolled at 27 call sites in five spellings — two `sm`
+     sizes (`text-2xl` 24px fixed and `fluid-xl` 26px at the wide end), two inks
+     (`text-white` and `text-slate-100`) and three tracking values — while a sixth
+     spelling lived in `.type-section` at a larger size, so a panel title outranked the
+     page section holding it. One primitive now. A component that spells the size again
+     is starting a seventh. */
+  it("never hard-codes a section heading's size or tracking", async () => {
+    assert.deepEqual(await offendersOf([".tsx"], /text-\[1\.375rem\]/), []);
+    assert.deepEqual(await offendersOf([".tsx"], /text-\[1\.5rem\]/), []);
+  });
+});

@@ -154,7 +154,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
            is the second read — how the two scores decide the call — and a
            heading that said "where this month sits" made it compete with
            them for the first question. */
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl" id="phase-map-heading">
+        <h2 className="type-section" id="phase-map-heading">
           How the two scores set conditions
         </h2>
       }

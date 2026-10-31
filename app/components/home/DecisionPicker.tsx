@@ -149,7 +149,7 @@ export function DecisionPicker({
     >
       <div className="space-y-4">
         <div className="space-y-1">
-          <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="text-[1.375rem] font-semibold leading-tight tracking-[-0.015em] text-slate-100 sm:text-fluid-xl">
+          <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="type-section">
             {HOME_SECTIONS.areas.heading}
           </h2>
           {pauseLineCount ? (

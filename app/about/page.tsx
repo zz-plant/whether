@@ -69,7 +69,7 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">How it works</h2>
+        <h2 className="type-section">How it works</h2>
         <p className="text-sm text-slate-300">
           Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a pause line and a restart line.
           Set the lines when you make a plan. Because the pause and restart lines are apart, a small move back
@@ -92,7 +92,7 @@ export default function AboutPage() {
       <MethodSection />
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Where it fits and where it does not</h2>
+        <h2 className="type-section">Where it fits and where it does not</h2>
         <p className="text-sm text-slate-300">
           {record ? <>{describeRecordCadence(record)} </> : null}
           Use the brief to set your plan&apos;s lines and get an email when one is crossed.
@@ -148,7 +148,7 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Who writes it</h2>
+        <h2 className="type-section">Who writes it</h2>
         <p className="text-sm text-slate-300">
           <span className="font-semibold text-slate-100">{publisherAuthor.name}</span> — {publisherAuthor.role}
         </p>
@@ -164,7 +164,7 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">What it is built from</h2>
+        <h2 className="type-section">What it is built from</h2>
         <p className="text-sm text-slate-300">
           Both scores the brief leads with start from U.S. Treasury rates, read from the St. Louis Fed (FRED). Funding
           pressure comes from the one-month bill rate, the speed of its rise, and long rates falling below short ones.
@@ -192,7 +192,7 @@ export default function AboutPage() {
       </section>
 
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Corrections and questions</h2>
+        <h2 className="type-section">Corrections and questions</h2>
         <p className="text-sm text-slate-300">
           Whether publishes dated records that do not change after the fact. If a published brief is wrong, say so
           and it gets a correction note rather than a silent edit.

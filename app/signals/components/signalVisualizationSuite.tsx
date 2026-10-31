@@ -431,7 +431,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   y={Math.max(8, toChartY(monthlyScatter[monthlyScatter.length - 1].y, scatterYMin, scatterYMax, 72) - 4)}
                   textAnchor="end"
                   fontSize="5"
-                  fontFamily="Inter, system-ui, sans-serif"
+                  fontFamily="Archivo, system-ui, sans-serif"
                   fill="var(--app-text-secondary)"
                   className="uppercase tracking-[0.04em]"
                 >

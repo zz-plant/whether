@@ -111,7 +111,7 @@ export function TimeMachineDatePicker({ onClose }: { onClose: () => void }) {
             </div>
           )}
           <div className="mt-4 border-t border-slate-800/60 pt-3 text-center">
-            <Link href="/history" onClick={() => onClose()} className="inline-flex items-center gap-1 text-[0.7rem] font-medium text-sky-200 hover:text-sky-100 hover:underline">
+            <Link href="/history" onClick={() => onClose()} className="inline-flex items-center gap-1 text-fluid-nano font-medium text-sky-200 hover:text-sky-100 hover:underline">
               Go to History Dashboard &rarr;
             </Link>
           </div>
