@@ -67,6 +67,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/email/subscribe` | POST | The one credential-free write: `{ email, weekly?, alerts?, planLines?, runwayBand? }`. Mails a confirmation link; nothing is enrolled until that inbox confirms, and a change to an existing address waits the same way. |
 | `/api/email/verify`, `/api/email/unsubscribe` | GET, POST | The confirmation and unsubscribe pages. `GET` shows what the change would do and only `POST` applies it, so a link scanner cannot confirm or unsubscribe on a reader's behalf. A mail client's RFC 8058 one-click `POST` to the footer link works too. |
 | `/api/month-end-pulse` | POST | Send the month-end block to alert subscribers. Takes the cron secret, and likewise needs a stored reading. |
+| `/api/email/suppress` | POST | `{ email }`, cron secret. Stops every send to one address without deleting its record: a hard bounce or a complaint. The record stays so the address can be restored. Bounce events still need wiring to it. |
 
 ### E) Discover capabilities for tools/agents
 

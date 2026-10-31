@@ -86,6 +86,27 @@ const resumeHolds = (line: PlanLines, scores: Scores) =>
 type PlanLineCrossing = { area: DecisionArea; side: "pause" | "resume"; line: PlanLines };
 
 /**
+ * Where each of a reader's own lines stands right now, in their words.
+ *
+ * The brief prints the published rules for everyone; a reader who set their own
+ * lines should see those first, because they are the ones they chose. One
+ * clause per area, so a five-line plan stays a sentence.
+ */
+export const describePlanLineStates = (
+  lines: readonly PlanLines[],
+  scores: Scores,
+): string | null => {
+  if (lines.length === 0) return null;
+  const states = lines.map((line) => {
+    const area = decisionAreaLabel(line.area).toLowerCase();
+    if (pauseHolds(line, scores)) return `${area} on hold`;
+    if (resumeHolds(line, scores)) return `${area} running`;
+    return `${area} between its lines`;
+  });
+  return states.length === 1 ? states[0] ?? null : `${states.slice(0, -1).join(", ")} and ${states.at(-1) ?? ""}`;
+};
+
+/**
  * The plan lines that started holding between two readings. A pause or resume
  * that already held at the previous reading is not news, and one that stops
  * holding is the other side's business: a pause ends when the resume holds.

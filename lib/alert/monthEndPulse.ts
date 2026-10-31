@@ -29,7 +29,7 @@ import { getWhetherKv } from "../runtime/kv";
 import { monthKeyFor } from "../summary/monthlyRegimeHistory";
 import { getSubscriberStore } from "../email/subscriberStore";
 import { createCloudflareEmailAdapter } from "../email/emailDelivery";
-import { escapeHtml, renderEmailShell, unsubscribeFooterText } from "../email/emailShell";
+import { escapeHtml, renderEmailShell, unsubscribeFooterText, unsubscribeHeaders } from "../email/emailShell";
 import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { fanOut } from "../delivery/fanOut";
 import { resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
@@ -152,6 +152,7 @@ const sendEmailPulse = async (headline: string, block: string, baseUrl?: string)
       const result = await adapter.send({
         to: subscriber,
         subject: `Whether — ${headline}`,
+        headers: unsubscribeHeaders(subscriber.token, baseUrl),
         text: [block, "", ...unsubscribeFooterText(subscriber.token, baseUrl)].join("\n"),
         /* The shell every Whether email uses, which gives this one the footer
            and the unsubscribe link its HTML part never carried. The block is
