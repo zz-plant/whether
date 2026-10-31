@@ -1,5 +1,5 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
-import { emailTextFooter, escapeHtml, renderEmailShell } from "./emailShell";
+import { emailTextFooter, escapeHtml, renderEmailShell, unsubscribeHeaders } from "./emailShell";
 import { resolveEmailBaseUrl } from "./publicBaseUrl";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
@@ -14,6 +14,8 @@ import { fanOut } from "../delivery/fanOut";
 import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 import type { BriefDocument } from "../report/briefArtifact";
 import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
+import { applyStageToWeeklyCall } from "../report/weeklyCallContract";
+import { describePlanLineStates } from "../alert/planLines";
 import { briefWeekChangeLine, EXPORT_SECTION_HEADINGS } from "../export/briefBuilders";
 import { OG_CONDITION_INK, OG_LINE_CROSSED, OG_PANEL, OG_RULE, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "../image/ogTheme";
 
@@ -201,29 +203,39 @@ export const sendWeeklyBrief = async (options?: {
     return refuse(readiness.reason);
   }
 
-  /* Past the guard, every line below is a reading rather than a stand-in for one,
-     from the brief document every other format renders. */
-  const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), weeklyCall);
-  const regime = document.conditions.regime;
-  const regimeLabel = getRegimePublicLabel(regime);
-  const readings = buildWeeklyEmailReadings(document);
-  /* What moved since the earlier reading, named by its date, as every paste opens
-     "What changed this week". Absent on a week with nothing compared. */
-  const weekChange = briefWeekChangeLine(document);
-  /* The week's headline action, the one the homepage h1 and every paste lead with. */
-  const headline = weeklyHeadline(document.slots);
-  const pauseIf = document.slots.pauseIf;
-  const changeLines = weeklyCallChangeLines(document.slots);
-  const recordDate = document.recordDateLabel;
-  /* Which inputs set the scores, beside them, and what the inputs left out would
-     do where they would move a line (`ScoringBasis`). */
-  const basisLine = [document.provenance.scoringBasis.sentence, document.provenance.scoringBasis.warning]
-    .filter((part): part is string => Boolean(part))
-    .join(" ");
-
   const tally = await fanOut(
     subscriptions,
     async (recipient) => {
+      /* A subscriber who told the site their stage gets the rules scaled to it,
+         the same ones the homepage prints for them. Everyone else gets the
+         published call unchanged. */
+      const call = recipient.stage
+        ? applyStageToWeeklyCall(weeklyCall, {
+            assessment: snapshot.assessment,
+            startupVariantMode: recipient.stage,
+            runwayBand: recipient.planRunway?.band,
+          })
+        : weeklyCall;
+
+      /* Past the guard, every line below is a reading rather than a stand-in for one,
+         from the brief document every other format renders. */
+      const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), call);
+      const regime = document.conditions.regime;
+      const regimeLabel = getRegimePublicLabel(regime);
+      const readings = buildWeeklyEmailReadings(document);
+      /* What moved since the earlier reading, named by its date, as every paste opens
+         "What changed this week". Absent on a week with nothing compared. */
+      const weekChange = briefWeekChangeLine(document);
+      /* The week's headline action, the one the homepage h1 and every paste lead with. */
+      const headline = weeklyHeadline(document.slots);
+      const pauseIf = document.slots.pauseIf;
+      const changeLines = weeklyCallChangeLines(document.slots);
+      const recordDate = document.recordDateLabel;
+      /* Which inputs set the scores, beside them, and what the inputs left out would
+         do where they would move a line (`ScoringBasis`). */
+      const basisLine = [document.provenance.scoringBasis.sentence, document.provenance.scoringBasis.warning]
+        .filter((part): part is string => Boolean(part))
+        .join(" ");
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
         ? `Whether — ${regimeLabel}: ${headline.action}`
         : `Whether Brief — ${regimeLabel}`;
@@ -234,9 +246,13 @@ export const sendWeeklyBrief = async (options?: {
       const planLinesUrl = `${baseUrl}/operate#ops-plan-lines`;
       const isContraction = regime === "SCARCITY" || regime === "DEFENSIVE";
 
+      /* The reader's own lines lead, when they set any: the published rules
+         below are everyone's, these are the ones they chose. */
+      const ownLines = describePlanLineStates(recipient.planLines ?? [], snapshot.assessment.scores);
       const text = [
         `Whether Weekly Brief — ${recordDate}`,
         `Conditions: ${document.conditions.line}`,
+        ...(ownLines ? [`Your lines: ${ownLines}.`] : []),
         ...readingsText(readings),
         basisLine,
         ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
@@ -283,13 +299,16 @@ export const sendWeeklyBrief = async (options?: {
         title: "Whether Weekly Brief",
         body: [
           `<p style="color:${OG_TEXT_MUTED};font-size:0.85rem;margin:0 0 20px;">${recordDate}</p>`,
+          ...(ownLines
+            ? [`<p style="font-size:0.9rem;margin:0 0 12px;color:${OG_TEXT};">Your lines: <span style="color:${OG_TEXT_SECONDARY};">${escapeHtml(ownLines)}.</span></p>`]
+            : []),
           ...sections,
         ].join("\n"),
         unsubscribeToken: recipient.token,
         baseUrl,
       });
 
-      const result = await adapter.send({ to: recipient, subject, html, text });
+      const result = await adapter.send({ to: recipient, subject, html, text, headers: unsubscribeHeaders(recipient.token, baseUrl) });
       return result.ok ? "sent" : "failed";
     },
     /* Once per subscriber per ISO week, so a manual run after the Monday cron

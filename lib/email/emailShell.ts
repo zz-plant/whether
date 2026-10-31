@@ -50,6 +50,24 @@ export const unsubscribeFooterText = (
   return url ? [`Unsubscribe: ${url}`] : [];
 };
 
+/**
+ * The headers that make a mail client's own unsubscribe button work.
+ *
+ * RFC 8058 one-click needs both: `List-Unsubscribe` names the URL, and
+ * `List-Unsubscribe-Post` says a bare POST to it is a valid unsubscribe. Gmail
+ * and Apple Mail only draw the button when both are present; without them the
+ * endpoint still works, but only from the footer link, two clicks in.
+ */
+export const unsubscribeHeaders = (
+  token: string | null | undefined,
+  baseUrl: string = siteUrl,
+): Record<string, string> => {
+  const url = buildUnsubscribeUrl(token, baseUrl);
+  return url
+    ? { "List-Unsubscribe": `<${url}>`, "List-Unsubscribe-Post": "List-Unsubscribe=One-Click" }
+    : {};
+};
+
 /** The plain-text part's closing lines, under the body. */
 export const emailTextFooter = (
   token: string | null | undefined,

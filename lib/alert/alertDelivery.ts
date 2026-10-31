@@ -9,6 +9,7 @@ import {
   createCloudflareEmailAdapter,
   type EmailDeliveryAdapter,
 } from "../email/emailDelivery";
+import { unsubscribeHeaders } from "../email/emailShell";
 import { getSubscriberStore, type Subscriber } from "../email/subscriberStore";
 import type { OperatingSnapshot } from "../operatingState/types";
 import type { WeeklyCallContract } from "../report/weeklyCallContract";
@@ -136,6 +137,7 @@ export const deliverAlertToSubscriber = async (
       subject: template.subject,
       html: template.html,
       text: template.text,
+      headers: unsubscribeHeaders(unsubscribeToken, baseUrl),
     });
     return result.ok;
   } catch {
@@ -156,6 +158,7 @@ const sendPlanLineEmail = async (
       subject: template.subject,
       html: template.html,
       text: template.text,
+      headers: unsubscribeHeaders(sub.token, baseUrl),
     });
     return result.ok;
   } catch {

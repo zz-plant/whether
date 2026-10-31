@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { afterEach, beforeEach, describe, it } from "bun:test";
-import { resetSubscriberStore, type SubscriberStore } from "../lib/email/subscriberStore";
+import { getSubscriberStore, resetSubscriberStore, type SubscriberStore } from "../lib/email/subscriberStore";
 import { getActiveSubscriptions } from "../lib/email/emailDelivery";
 import { describeConfirmation, describeSubscription, subscribeAndSendVerification } from "../lib/email/subscriptionFlow";
 import type { KvNamespace } from "../lib/runtime/kv";
@@ -143,6 +143,22 @@ describe("alerts-only subscription", () => {
  * footer of every Monday brief and alert carries for unsubscribing. Anyone holding
  * one forwarded email could request a change for its reader and confirm it.
  */
+describe("an address that should stop receiving", () => {
+  it("is dropped from both send lists without losing its record", async () => {
+    resetSubscriberStore();
+    const store = getSubscriberStore();
+    const sub = await store.subscribe("bounced@example.com", { weekly: true, alerts: true });
+    await store.verifyEmail(sub.confirmToken ?? "");
+    assert.equal((await store.listWeeklySubscribers()).length, 1, "precondition: it is on both lists");
+
+    assert.equal(await store.suppress("bounced@example.com"), true);
+    assert.equal((await store.listWeeklySubscribers()).length, 0);
+    assert.equal((await store.listAlertSubscribers()).length, 0);
+    assert.ok(await store.getSubscriberByEmail("bounced@example.com"), "the record stays, so the address can be restored");
+    assert.equal(await store.suppress("never-subscribed@example.com"), false);
+  });
+});
+
 describe("who can confirm a change", () => {
   it("does not accept the token from an email footer as confirmation", async () => {
     const reader = await subscribeVerified("reader@example.com");

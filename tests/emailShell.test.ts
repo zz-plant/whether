@@ -4,7 +4,7 @@ import { readFileSync } from "node:fs";
 
 import { planLineEmail } from "../lib/alert/alertTemplates";
 import { runMonthEndPulse } from "../lib/alert/monthEndPulse";
-import { escapeHtml } from "../lib/email/emailShell";
+import { escapeHtml, unsubscribeHeaders } from "../lib/email/emailShell";
 import { sendWeeklyBrief } from "../lib/email/sendWeeklyBrief";
 import { resolveEmailBaseUrl } from "../lib/email/publicBaseUrl";
 import { getSubscriberStore, resetSubscriberStore } from "../lib/email/subscriberStore";
@@ -57,10 +57,10 @@ class FakeKv implements KvNamespace {
 
 /** Installs an EMAIL binding that keeps what it was handed; the stub drops the bodies. */
 const captureMail = () => {
-  const sent: Array<{ subject: string; html: string; text: string }> = [];
+  const sent: Array<{ subject: string; html: string; text: string; headers?: Record<string, string> }> = [];
   const previous = Reflect.get(globalThis, "EMAIL");
   Reflect.set(globalThis, "EMAIL", {
-    send: async (message: { subject: string; html: string; text: string }) => {
+    send: async (message: { subject: string; html: string; text: string; headers?: Record<string, string> }) => {
       sent.push(message);
     },
   });
@@ -246,6 +246,102 @@ describe("the shared email shell, on a deployment that is not production", () =>
       if (configured[0] !== undefined) process.env.APP_BASE_URL = configured[0];
       if (configured[1] !== undefined) process.env.NEXT_PUBLIC_APP_URL = configured[1];
     }
+  });
+});
+
+describe("what a mail client can act on", () => {
+  it("advertises the one-click unsubscribe the endpoint already accepts", () => {
+    const headers = unsubscribeHeaders("tok", "https://example.workers.dev");
+    assert.deepEqual(headers, {
+      "List-Unsubscribe": "<https://example.workers.dev/api/email/unsubscribe?token=tok>",
+      "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+    });
+    assert.deepEqual(unsubscribeHeaders(null), {}, "no token, no header rather than a broken one");
+  });
+
+  it("sends the header on the weekly brief", async () => {
+    resetSubscriberStore();
+    const store = getSubscriberStore();
+    const subscriber = await store.subscribe("headers@example.com");
+    await store.verifyEmail(subscriber.confirmToken ?? "");
+
+    const now = new Date("2026-08-31T12:00:00.000Z");
+    const snapshot = buildOperatingSnapshot({
+      treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
+      macroSeries: liveMacroSeries,
+      now,
+    });
+
+    const mail = captureMail();
+    try {
+      await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now });
+    } finally {
+      mail.restore();
+    }
+
+    const [message] = mail.sent;
+    assert.ok(message?.headers?.["List-Unsubscribe"]?.includes(`token=${encodeURIComponent(subscriber.token)}`));
+    assert.equal(message?.headers?.["List-Unsubscribe-Post"], "List-Unsubscribe=One-Click");
+  });
+});
+
+describe("the brief a reader actually gets", () => {
+  const snapshotFor = () => buildOperatingSnapshot({
+    treasury: { ...snapshotData, isLive: true, record_date: "2026-08-28", fetched_at: "2026-08-28T12:00:00.000Z" },
+    macroSeries: liveMacroSeries,
+    now: new Date("2026-08-31T12:00:00.000Z"),
+  });
+
+  it("prints the reader's own lines first when they set any", async () => {
+    resetSubscriberStore();
+    const store = getSubscriberStore();
+    const subscriber = await store.subscribe("own-lines@example.com", {
+      planLines: [{
+        area: "hiring",
+        pause: [{ metric: "tightness", operator: ">", value: 76 }],
+        resume: [{ metric: "tightness", operator: "<", value: 66 }],
+      }],
+      runwayBand: "balanced",
+      /* A plan-lines-only signup asks for the crossing email and no Monday one;
+         this test is about the Monday brief. */
+      weekly: true,
+    });
+    await store.verifyEmail(subscriber.confirmToken ?? "");
+
+    const snapshot = snapshotFor();
+    const mail = captureMail();
+    try {
+      await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now: new Date("2026-08-31T12:00:00.000Z") });
+    } finally {
+      mail.restore();
+    }
+
+    const [message] = mail.sent;
+    assert.ok(message);
+    assert.match(message.text, /\nYour lines: hiring (on hold|running|between its lines)\./);
+    assert.ok(message.text.indexOf("Your lines:") < message.text.indexOf("Guidance:"), "their lines lead the published ones");
+  });
+
+  it("scales the rules to the stage the reader set", async () => {
+    const sendTo = async (email: string, stage?: "seed" | "series-b") => {
+      resetSubscriberStore();
+      const store = getSubscriberStore();
+      const subscriber = await store.subscribe(email, stage ? { stage } : undefined);
+      await store.verifyEmail(subscriber.confirmToken ?? "");
+      const snapshot = snapshotFor();
+      const mail = captureMail();
+      try {
+        await sendWeeklyBrief({ snapshot, weeklyCall: snapshot.weeklyCall, now: new Date("2026-08-31T12:00:00.000Z") });
+      } finally {
+        mail.restore();
+      }
+      return mail.sent[0]?.text ?? "";
+    };
+
+    const unscaled = await sendTo("no-stage@example.com");
+    const seed = await sendTo("seed@example.com", "seed");
+    assert.ok(unscaled.length > 0 && seed.length > 0);
+    assert.notEqual(seed, unscaled, "a reader who set a stage gets rules scaled to it");
   });
 });
 

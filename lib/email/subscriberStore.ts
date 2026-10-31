@@ -2,6 +2,7 @@ import { getJson, getWhetherKv, parseStoredJson, readKvValues, type KvNamespace 
 import { selectStoreByBinding } from "../runtime/storeSelection";
 import { parsePlanLines, parsePlanRunway, type PlanLines, type PlanRunway } from "../alert/planLines";
 import type { RunwayBand } from "../report/operatorRunway";
+import { isOperatorStage, type OperatorStage } from "../report/operatorStage";
 /**
  * Subscriber storage using Cloudflare KV.
  * Stores individual subscriber records keyed by email
@@ -57,6 +58,14 @@ export type Subscriber = {
    * is replaced or cleared with them.
    */
   planRunway?: PlanRunway;
+  /** The company stage this address set when it subscribed; absent means the published call. */
+  stage?: OperatorStage;
+  /**
+   * A hard bounce, a complaint, or an address the owner retired. Suppressed
+   * addresses stay on record but are dropped from every send list, so a dead
+   * mailbox is not retried every Monday.
+   */
+  suppressed?: boolean;
   /** The band sent with `pendingPlanLines`. Absent beside pending lines means they carry none. */
   pendingPlanRunway?: PlanRunway;
   /**
@@ -104,6 +113,13 @@ type SubscribeOptions = {
   planLines?: PlanLines[];
   /** The reader's runway band, sent with `planLines`; kept only beside a non-empty set of lines. */
   runwayBand?: RunwayBand;
+  /**
+   * The company stage the reader set on the site. Kept on the record so the
+   * Monday brief can print the rules scaled to it. Set only when the record is
+   * created: a request can name any address, and re-rendering someone else's
+   * brief for another stage is a change only their inbox should make.
+   */
+  stage?: OperatorStage;
 };
 
 /**
@@ -144,6 +160,8 @@ export interface SubscriberStore {
   listWeeklySubscribers(): Promise<Subscriber[]>;
   getSubscriberByEmail(email: string): Promise<Subscriber | null>;
   getSubscriberByToken(token: string): Promise<Subscriber | null>;
+  /** Stop sending to an address without deleting its record: a hard bounce or a complaint. */
+  suppress(email: string): Promise<boolean>;
   backendStatus(): "durable" | "local-fallback";
 }
 
@@ -344,6 +362,8 @@ const hydrateSubscriber = (raw: unknown): Subscriber | null => {
     alerts: readStoredFlag(raw, "alerts"),
     weekly: readStoredFlagDefaultOn(raw, "weekly"),
     planLines: parsePlanLines(Reflect.get(raw, "planLines")) ?? [],
+    ...(isOperatorStage(Reflect.get(raw, "stage")) ? { stage: Reflect.get(raw, "stage") as OperatorStage } : {}),
+    ...(Reflect.get(raw, "suppressed") === true ? { suppressed: true } : {}),
     ...readPlanRunway(raw),
     ...readPendingPlanLines(raw),
     ...readPendingFlags(raw),
@@ -362,6 +382,7 @@ const newSubscriber = (email: string, options: SubscribeOptions | undefined, now
   alerts: options?.alerts === true,
   weekly: options?.weekly ?? !options?.planLines,
   planLines: [],
+  ...(options?.stage ? { stage: options.stage } : {}),
   ...(options?.planLines ? { pendingPlanLines: options.planLines, ...pendingRunwayFor(options, now) } : {}),
   ...issueConfirmation(now),
 });
@@ -509,7 +530,7 @@ class KvSubscriberStore implements SubscriberStore {
 
       for (const raw of raws) {
         const sub = parseStoredJson(raw, hydrateSubscriber);
-        if (sub?.active && sub.verified) {
+        if (sub?.active && sub.verified && !sub.suppressed) {
           this.fallback.saveToMemory(sub);
           subscribers.push(sub);
         }
@@ -539,6 +560,17 @@ class KvSubscriberStore implements SubscriberStore {
       return sub;
     }
     return this.fallback.getByEmail(normalized);
+  }
+
+  async suppress(email: string): Promise<boolean> {
+    const normalized = normalizeEmail(email);
+    if (!normalized) return false;
+    const existing = await this.getSubscriberByEmail(normalized);
+    if (!existing) return false;
+    const sub: Subscriber = { ...existing, suppressed: true };
+    await this.kv.put(SUB_PREFIX + normalized, JSON.stringify(sub)).catch(() => { /* non-fatal */ });
+    this.fallback.saveToMemory(sub);
+    return true;
   }
 
   async getSubscriberByToken(token: string): Promise<Subscriber | null> {
@@ -647,6 +679,15 @@ class InMemorySubscriberStore implements SubscriberStore {
 
   async getSubscriberByToken(token: string): Promise<Subscriber | null> {
     return this.getByToken(token);
+  }
+
+  async suppress(email: string): Promise<boolean> {
+    const normalized = normalizeEmail(email);
+    if (!normalized) return false;
+    const existing = this.getByEmail(normalized);
+    if (!existing) return false;
+    this.saveToMemory({ ...existing, suppressed: true });
+    return true;
   }
 
   backendStatus(): "local-fallback" {

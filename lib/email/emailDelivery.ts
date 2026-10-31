@@ -4,11 +4,22 @@
  * via a minimal adapter interface.
  */
 
+import type { OperatorStage } from "../report/operatorStage";
+import type { PlanLines, PlanRunway } from "../alert/planLines";
+
 type EmailRecipient = {
   email: string;
   name?: string;
-  tickerConfig?: string;
-  stageConfig?: string;
+  /**
+   * The reader's company stage, as they set it on the site. Used to scale the
+   * five areas' rules the way the homepage already does; absent means the
+   * published call, unscaled.
+   */
+  stage?: OperatorStage;
+  /** The band they set beside their plan lines, which a crossing email names. */
+  planRunway?: PlanRunway;
+  /** The lines they set for their own plan, which the brief prints first. */
+  planLines?: PlanLines[];
   /** The subscriber's unsubscribe token, so outgoing mail can carry a one-click link. */
   token?: string;
 };
@@ -16,7 +27,18 @@ type EmailRecipient = {
 export type EmailDeliveryAdapter = {
   /** Absent means live (custom adapters in tests are real senders). */
   mode?: "live" | "stub";
-  send: (params: { to: EmailRecipient; subject: string; html: string; text: string }) => Promise<{ ok: true } | { ok: false; error: string }>;
+  send: (params: {
+    to: EmailRecipient;
+    subject: string;
+    html: string;
+    text: string;
+    /**
+     * Headers the client acts on. `List-Unsubscribe` and `List-Unsubscribe-Post`
+     * are what make Gmail and Apple Mail show their own unsubscribe button;
+     * without them the one-click endpoint exists but nothing advertises it.
+     */
+    headers?: Record<string, string>;
+  }) => Promise<{ ok: true } | { ok: false; error: string }>;
 };
 
 export const EMAIL_NOT_CONFIGURED_ERROR = "Email delivery is not configured on this deployment.";
@@ -61,7 +83,7 @@ export const createCloudflareEmailAdapter = (
 
   return {
     mode: "live",
-    send: async ({ to, subject, html, text }) => {
+    send: async ({ to, subject, html, text, headers }) => {
       try {
         await emailBinding.send({
           to: to.email,
@@ -69,6 +91,7 @@ export const createCloudflareEmailAdapter = (
           subject,
           html,
           text,
+          ...(headers && Object.keys(headers).length > 0 ? { headers } : {}),
         });
         return { ok: true };
       } catch (error) {
@@ -87,5 +110,11 @@ export const getActiveSubscriptions = async (): Promise<EmailRecipient[]> => {
   const subscribers = await store.listWeeklySubscribers();
   // Carries the token, which the weekly brief's unsubscribe link needs. This returned
   // bare addresses until 2026-09-07, which is why that mail went out without one.
-  return subscribers.map((sub) => ({ email: sub.email, token: sub.token }));
+  return subscribers.map((sub) => ({
+    email: sub.email,
+    token: sub.token,
+    ...(sub.stage ? { stage: sub.stage } : {}),
+    ...(sub.planRunway ? { planRunway: sub.planRunway } : {}),
+    ...(sub.planLines.length > 0 ? { planLines: sub.planLines } : {}),
+  }));
 };

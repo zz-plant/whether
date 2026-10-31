@@ -7,6 +7,7 @@ import { requestSubscription, requestSlackSubscription } from "./subscribeReques
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
+import { useOperatorStage } from "./useOperatorStage";
 
 type SubscribeChannel = "email" | "slack";
 type EmailFrequency = "alerts" | "weekly";
@@ -51,6 +52,9 @@ export function SubscribeForm({
   showTitle?: boolean;
 } = {}) {
   const pathname = usePathname() ?? "/";
+  /* The stage the reader already set for the on-site rules; their brief prints
+     the same rules, so the signup carries it rather than asking again. */
+  const { stage } = useOperatorStage();
   const [channel, setChannel] = useState<SubscribeChannel>("email");
   const [frequency, setFrequency] = useState<EmailFrequency>(defaultFrequency);
   const alertsOnly = channel === "email" && frequency === "alerts";
@@ -74,7 +78,7 @@ export function SubscribeForm({
         trackActivationEvent({ step: "committed", path: pathname, commitment: "subscribed" });
       }
     } else {
-      const result = await requestSubscription(email, { alerts: true, weekly: frequency === "weekly" });
+      const result = await requestSubscription(email, { alerts: true, weekly: frequency === "weekly", ...(stage ? { stage } : {}) });
       setStatus(result.ok ? "success" : "error");
       setMessage(result.message);
       if (result.ok) {

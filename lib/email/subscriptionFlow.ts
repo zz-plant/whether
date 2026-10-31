@@ -3,6 +3,7 @@ import { confirmationMailCapped, getSubscriberStore, withPendingApplied, type Su
 import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateLimit";
 import { describePlanLines, type PlanLines, type PlanRunway } from "../alert/planLines";
 import { runwayBandPhrase, type RunwayBand } from "../report/operatorRunway";
+import type { OperatorStage } from "../report/operatorStage";
 import { escapeHtml } from "./emailShell";
 import { buildEmailActionUrl } from "./publicBaseUrl";
 
@@ -122,6 +123,7 @@ export const subscribeAndSendVerification = async ({
   weekly,
   planLines,
   runwayBand,
+  stage,
   request,
   adapter = createCloudflareEmailAdapter(),
 }: {
@@ -134,6 +136,8 @@ export const subscribeAndSendVerification = async ({
   planLines?: PlanLines[];
   /** The reader's runway band, held beside `planLines` and confirmed with them. */
   runwayBand?: RunwayBand;
+  /** The company stage the reader had set on the site; scales their Monday brief. */
+  stage?: OperatorStage;
   request?: Request;
   adapter?: EmailDeliveryAdapter;
 }) => {
@@ -156,7 +160,7 @@ export const subscribeAndSendVerification = async ({
     return { subscriber: existing, verifyUrl: null };
   }
 
-  const subscriber = await store.subscribe(email, { alerts, weekly, planLines, runwayBand });
+  const subscriber = await store.subscribe(email, { alerts, weekly, planLines, runwayBand, stage });
   /* The request's own link, never the permanent token: that one is in the footer
      of every email this address has been sent. The caller's response is the same
      whichever email goes out, so it says nothing about whether the address is
