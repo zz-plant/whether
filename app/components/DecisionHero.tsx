@@ -11,6 +11,18 @@ type Props = {
   weeklyCall?: string;
   /** Live week navigation shares the card header instead of occupying a separate band. */
   periodControl?: ReactNode;
+  /**
+   * Where this reading is scaled to — the reader's stage and runway, as a chip
+   * on the stamp line that opens the control which sets them (2026-10-31).
+   *
+   * The shared call is correctly shared: every reader gets the same evidence
+   * and the same headline. What differs is the rule behind it, and the stage
+   * and runway that set that rule sat 2,000px down the page, so the card read
+   * as if one company's answer were everyone's. A weather reading opens with
+   * the place it is for; this is that, and it is the only place on `/` the
+   * choice is visible without scrolling.
+   */
+  location?: { label: string; href: string; hint: string };
   /** The longer sentence behind the call; printed only when it says more than the call does. */
   callDetail?: string;
   regime: string;
@@ -44,6 +56,19 @@ type Props = {
    * opens on, so a search visitor meets the artifact before any explanation.
    */
   question?: string;
+  /**
+   * The two published scores the meaning rests on, and where the rules behind
+   * them are read (2026-10-31): "Funding pressure 90, risk appetite 55."
+   *
+   * The meaning line is the one place on the card that can join "what this
+   * means" to "what it rests on", and it printed a constant — the same words
+   * every Cloudy week — while the two scores lived only inside the map. A
+   * reader could screenshot the weather word but not cite it. The numbers ride
+   * behind the meaning as a sentence, not a second element, and `whyHref` is
+   * the one click to the section that shows the change lines and what is left
+   * out of the score.
+   */
+  reading?: { numbers: string; whyHref: string };
   /**
    * The week's published brief, where it read different conditions from this
    * card: a caveat under the call, with the brief it links to. Without it a
@@ -89,6 +114,7 @@ type Props = {
 export function DecisionHero({
   weeklyCall,
   periodControl,
+  location,
   callDetail,
   regime,
   direction,
@@ -100,6 +126,7 @@ export function DecisionHero({
   lines,
   published,
   areas,
+  reading,
   phoneFigure,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
@@ -141,6 +168,21 @@ export function DecisionHero({
             {regimeKey ? <ConditionIcon regime={regimeKey} /> : null}
             <span>{regimeWeatherLabel}</span>
           </span>
+
+          {/* The reader's place, beside the weather: a chip rather than a line,
+              because it is a control (it opens the stage and runway selectors)
+              and the stamp row is the card's chrome. No glyph — §XXIV gives
+              each mark a meaning, and "your company" has none yet. */}
+          {location ? (
+            <Link
+              href={location.href}
+              title={location.hint}
+              data-reading-location
+              className="weather-hit inline-flex items-center rounded-md border border-[color:var(--border-subtle)] px-2 py-1 text-fluid-xs font-medium text-slate-300 hover:border-[color:var(--border-strong)] hover:text-slate-100"
+            >
+              {location.label}
+            </Link>
+          ) : null}
 
           {direction || earlier ? (
             <span className="text-fluid-xs font-medium leading-relaxed text-slate-200">
@@ -189,6 +231,17 @@ export function DecisionHero({
         {regimeKey ? (
           <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
             {REGIME_WEATHER_RATIONALES[regimeKey]}
+            {reading ? (
+              <>
+                {" "}
+                <span className="tabular-nums" data-reading-numbers>
+                  {reading.numbers}
+                </span>{" "}
+                <Link href={reading.whyHref} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
+                  Why
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : null}
 

@@ -124,6 +124,11 @@ export function DecisionPicker({
          were verb phrases ("Raise money", "Approve new spend") that named no
          area, so a reader met two names for each of the five. */
       label: decisionAreaLabel(option.area),
+      /* The question the row answers, as the native tooltip. The five cards
+         carry the noun a reader scans for; the question they typed into a
+         search box is the same string the answer page leads with, so it rides
+         here rather than in a third line the grid has no room for. */
+      title: option.answer?.title,
       /* 20px: the choice is a card. */
       icon: <AreaIcon area={option.area} size="card" />,
       /* The state as glyph and words, so a crossed line and a close one differ
@@ -189,6 +194,16 @@ export function DecisionPicker({
             <p className="type-eyebrow">
               <AreaLabel area={active.area} />
             </p>
+            {/* The question first, in the reader's words, then this week's
+                answer to it. The five cards scan by noun; a card that has been
+                opened has the room to ask what the reader came to ask, and the
+                string is the answer page's own heading, so the short answer
+                here and the long answer there cannot diverge. */}
+            {active.answer ? (
+              <h3 data-decision-question className="max-w-[56ch] text-pretty text-fluid-sm font-semibold leading-snug text-slate-300">
+                {active.answer.title}
+              </h3>
+            ) : null}
             <p className="max-w-[56ch] text-fluid-lg font-semibold leading-snug text-slate-50">{active.rule}</p>
             {active.changed ? (
               /* Amber for an area the week moved, slate for one it did not: the
@@ -277,7 +292,7 @@ export function DecisionPicker({
               </div>
               {active.answer ? (
                 <ActionLink href={active.answer.href} variant="inline">
-                  {active.answer.title} →
+                  Read the full answer →
                 </ActionLink>
               ) : null}
             </div>

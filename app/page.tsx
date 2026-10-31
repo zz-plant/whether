@@ -47,6 +47,7 @@ import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
 import { AllAreaRules } from "./components/home/AllAreaRules";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
+import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
 import { ActionLink } from "./components/ui/actionLink";
@@ -61,9 +62,11 @@ import {
   describeConditionsTrail,
   describeEarlierConditions,
   describeHeldAreasForCard,
+  describeLineStateBand,
   describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
+import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { RegimeRadar } from "./components/home/RegimeRadar";
@@ -438,6 +441,21 @@ async function PageContent({
      defaults, said once, at the head of the areas. */
   const calibrationChosen = Boolean(data.operatorContext.companyStage || data.operatorContext.companyRunway);
   const stageLabel = operatorStageLabel(operatorStageForVariantMode(activeStage));
+  /* Where this reading is scaled to, as a chip in the card's stamp row
+     (2026-10-31). The call is correctly the same for every reader, so the
+     localization belongs in the chrome rather than in a second call. The
+     trailing clause is the band's own meaning ("cash first"), printed only when
+     the band actually reshaped the rule — a default band reads "follow the
+     guidance", which is what the shared call already says. */
+  const readingLocation = !historicalSelection && activeCadence === "weekly"
+    ? {
+        label: runwayScopedAdjustment?.runwayLabel
+          ? `${stageLabel} · ${runwayBandLabel(activeRunway ?? DEFAULT_RUNWAY_BAND)} · ${runwayBandSublabel(activeRunway ?? DEFAULT_RUNWAY_BAND).toLowerCase()}`
+          : `${stageLabel} · ${runwayBandLabel(activeRunway ?? DEFAULT_RUNWAY_BAND)}`,
+        href: `#${HOME_SECTIONS.calibration.id}`,
+        hint: "Change your stage and runway",
+      }
+    : undefined;
   /* A chosen stage's own action, as a stage line; the headline stays the
      week's, which is the same for every reader. */
   const stageAction = calibrationChosen && !homepage.weeklyCall.policyOverrideActive
@@ -565,6 +583,18 @@ async function PageContent({
       }
     : undefined;
   const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(decisionPickerOptions);
+  /* The week's exception, above the call: null on a calm week, so the page's
+     silhouette changes with the weather rather than being drawn the same way
+     whatever the reading says. */
+  const lineStateBand = historicalSelection ? null : describeLineStateBand(homeAreaRows);
+  /* The meaning line under the call carries the two scores it rests on: they
+     lived only inside the map, so the week's word could be screenshotted but
+     not cited. One click to the section that shows the change lines and what
+     the score leaves out. */
+  const heroReading = {
+    numbers: `Funding pressure ${Math.round(tightness)}, risk appetite ${Math.round(riskAppetite)}.`,
+    whyHref: `#${HOME_SECTIONS.diagnosis.id}`,
+  };
   const heroAreas = heldAreasLine
     ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
     : undefined;
@@ -688,8 +718,13 @@ async function PageContent({
                 jump: { href: `#${HOME_SECTIONS.areas.id}`, label: "By area" },
               })}
             >
+              {/* Above the card, inside the region it belongs to. Renders nothing
+                  unless an area is on hold or close to its line. */}
+              {lineStateBand ? <LineStateBand model={lineStateBand} /> : null}
               <DecisionHero
                 periodControl={historicalSelection ? undefined : periodControl}
+                location={readingLocation}
+                reading={heroReading}
                 weeklyCall={cardCall.action}
                 callDetail={historicalSelection ? undefined : whyLine}
                 regime={regime}
