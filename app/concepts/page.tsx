@@ -10,6 +10,7 @@ import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCac
 import { buildPublishedBriefPath, latestPublishedBrief, publishedBriefDisplay } from "../../lib/report/publishedBriefs";
 import { buildPostureArchivePath, postureArchiveYears } from "../../lib/summary/postureArchiveYears";
 import { getOrderedRegimeLegend } from "../../lib/regimePresentation";
+import { getPlaybookForRegime } from "../../lib/playbook";
 import { formatDateUTC } from "../../lib/formatters";
 import { ADVICE_STANCE_DEFINITIONS, ADVICE_STANCE_RUBRIC, ADVICE_STANCES } from "../../lib/adviceStance";
 import {
@@ -260,7 +261,7 @@ export default function ProductCanonPage() {
 
       <SecondaryPageHeader
         title="Does startup advice follow the market?"
-        description={`${timeline.length} widely read essays, books and investor memos, each placed on the record at the month it came out${recordStart && recordEnd ? ` from ${recordStart} to ${recordEnd}` : ""}. Advice on hiring, raising and spending is tagged Expand or Conserve, and method advice is tagged Craft. The test is whether the capital texts track the conditions while the craft texts do not. A reading list, not evidence for the guidance.`}
+        description={`Mostly no: the advice did not change direction when the money did. ${timeline.length} widely read essays, books and investor memos, each placed on the record at the month it came out${recordStart && recordEnd ? ` from ${recordStart} to ${recordEnd}` : ""}. Advice on hiring, raising and spending is tagged Expand or Conserve, and method advice is tagged Craft. The test is whether the capital texts track the conditions while the craft texts do not. The list below is a reading list. The corpus beneath it tests the list.`}
       />
 
       <SecondaryPageSection title="What the record shows" description={describeCanonBaseRate(baseRate)}>
@@ -464,7 +465,7 @@ export default function ProductCanonPage() {
 
       <SecondaryPageSection
         title="What this does not show"
-        description="The limits are why the result above is stated as shares and not as a finding."
+        description="Every number above carries its limit. None of them is a forecast."
       >
         <ul className="space-y-2 text-sm text-slate-300">
           <li>
@@ -496,14 +497,28 @@ export default function ProductCanonPage() {
 
       <SecondaryPageSection
         title="What the four conditions mean"
-        description="The same four words this week's guidance uses."
+        description="The four words this week's guidance uses. Each pairs the work it rewards with the work it punishes."
       >
-        <ul className="space-y-2 text-sm text-slate-300">
-          {getOrderedRegimeLegend().map((entry) => (
-            <li key={entry.regime}>
-              <span className="text-slate-100">{entry.label}.</span> {entry.weatherRationale}
-            </li>
-          ))}
+        <ul className="space-y-3 text-sm text-slate-300">
+          {getOrderedRegimeLegend().map((entry) => {
+            const playbook = getPlaybookForRegime(entry.regime);
+            return (
+              <li key={entry.regime} className="space-y-1">
+                <p>
+                  <span className="text-slate-100">{entry.label}.</span> {entry.weatherRationale}
+                </p>
+                {playbook ? (
+                  <>
+                    <p className="text-slate-400">{playbook.insight}</p>
+                    <p className="text-slate-400">
+                      <span className="text-slate-300">Do more:</span> {playbook.start.slice(0, 2).join(" · ")}.{" "}
+                      <span className="text-slate-300">Do less:</span> {playbook.stop.slice(0, 2).join(" · ")}.
+                    </p>
+                  </>
+                ) : null}
+              </li>
+            );
+          })}
         </ul>
       </SecondaryPageSection>
 

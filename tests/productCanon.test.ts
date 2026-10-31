@@ -362,8 +362,8 @@ describe("product canon: the list itself", () => {
     if (latestPublishedBrief) assert.ok(html.includes(`href="/brief/${latestPublishedBrief.slug}"`));
   });
 
-  it("keeps the line that this is a reading list, not evidence for the guidance", async () => {
-    assert.match(await renderPage(), /A reading list, not evidence for the guidance\./);
+  it("keeps the line that the list is a reading list and the corpus tests it", async () => {
+    assert.match(await renderPage(), /The list below is a reading list\. The corpus beneath it tests the list\./);
   });
 });
 

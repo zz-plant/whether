@@ -228,8 +228,8 @@ export const navigationPages: readonly NavigationPage[] = [
     key: "concepts",
     group: "record",
     href: "/concepts",
-    label: "Reading list",
-    description: "Widely read product essays and investor memos, placed on the record since 2012",
+    label: "Advice vs. market",
+    description: "Does startup advice follow the market? Widely read essays and investor memos, placed on the record since 2012",
     placement: "secondary",
   },
   {

@@ -29,6 +29,7 @@ const MODULES = [
     sources: {
       registration: "docs/research/advice-corpus-preregistration.md",
       results: "docs/research/advice-corpus-results.md",
+      note: "docs/research/2026-10-31-advice-corpus-null-result.md",
     },
   },
 ] as const;

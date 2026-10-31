@@ -21,7 +21,7 @@ describe("global header navigation helpers", () => {
     assert.equal(resolveGlobalHeaderRouteLabel("/operate/financial"), "Runway planner");
     assert.equal(resolveGlobalHeaderRouteLabel("/history/compare"), "Compare periods");
     assert.equal(resolveGlobalHeaderRouteLabel("/history/2024"), "History");
-    assert.equal(resolveGlobalHeaderRouteLabel("/concepts"), "Reading list");
+    assert.equal(resolveGlobalHeaderRouteLabel("/concepts"), "Advice vs. market");
     assert.equal(resolveGlobalHeaderRouteLabel("/resources/capital-posture-template"), "Guides");
     assert.equal(resolveGlobalHeaderRouteLabel("/nonexistent"), "Page");
   });
@@ -100,7 +100,7 @@ describe("sub-tabs", () => {
         ["History", "tab", false],
         ["Calibration", "tab", false],
         ["Compare periods", "secondary", true],
-        ["Reading list", "secondary", false],
+        ["Advice vs. market", "secondary", false],
         ["Sources", "cross", false],
         ["How the scores are built", "cross", false],
       ],
