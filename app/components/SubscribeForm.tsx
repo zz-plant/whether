@@ -98,8 +98,11 @@ export function SubscribeForm({
         <span className="inline-flex items-center justify-center rounded-full bg-emerald-500/10 p-2 text-emerald-400">
           <Check className="size-5" aria-hidden="true" />
         </span>
-        <p className="text-fluid-xs font-semibold text-slate-50">
-          {channel === "slack" ? "Slack Channel Connected!" : "Subscribed!"}
+        {/* The heading names the outcome that actually happened. "Subscribed!"
+            claimed a state that only becomes true when the reader clicks the
+            link in the mail. */}
+        <p className="text-fluid-sm font-semibold text-slate-50">
+          {channel === "slack" ? "Slack channel connected" : "Check your inbox"}
         </p>
         <p className="text-fluid-micro text-slate-300">
           {message}
@@ -118,7 +121,7 @@ export function SubscribeForm({
           }}
           className="mt-2 text-fluid-nano text-sky-400 hover:text-sky-300 underline"
         >
-          Subscribe another destination
+          {channel === "slack" ? "Connect another channel" : "Use a different address"}
         </button>
       </div>
     );
