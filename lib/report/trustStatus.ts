@@ -371,7 +371,7 @@ const DATA_STATUS_LABELS = {
    * date and may be partly cached. What is live is the sources — the badge
    * says so. */
   live: "All sources live",
-  partlyCached: "Some sources saved",
+  partlyCached: "Partly current",
   cachedSnapshot: "Saved copy",
   historical: "Historical snapshot",
 } as const;
@@ -386,7 +386,7 @@ type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
  */
 const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
   live: "All sources live and current.",
-  partlyCached: "Some sources are cached. Hold anything you can't undo until every source is current.",
+  partlyCached: "Some sources are saved copies. Hold anything you can't undo until every source is live.",
   cachedSnapshot: "Live data is late. Keep your current plan; hold new hires, spend and vendor contracts until it returns.",
   historical: "Historical snapshot. Compare against the live read before changing current plans.",
 };

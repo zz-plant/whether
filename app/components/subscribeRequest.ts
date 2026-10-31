@@ -29,10 +29,10 @@ type SubscribeOptions = {
 
 export const SUBSCRIBE_ENDPOINT = "/api/email/subscribe";
 
-const INVALID_EMAIL_MESSAGE = "Please enter a valid email address.";
-const VERIFY_MESSAGE = "Check your email to verify your subscription.";
-const FAILURE_MESSAGE = "Failed to subscribe. Please try again.";
-const NETWORK_MESSAGE = "A network error occurred. Please try again.";
+const INVALID_EMAIL_MESSAGE = "Enter a full email address, like you@company.com.";
+const VERIFY_MESSAGE = "Check your inbox. Nothing is sent until you click the link.";
+const FAILURE_MESSAGE = "That did not go through. Try again in a moment.";
+const NETWORK_MESSAGE = "You are offline, or the connection dropped. Try again.";
 
 export async function requestSubscription(
   email: string,

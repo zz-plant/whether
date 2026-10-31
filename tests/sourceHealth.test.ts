@@ -259,7 +259,7 @@ describe("degraded sources", () => {
   });
   /*
    * "Startup/private markets" is a curated snapshot by design and is never
-   * live. Counting it as degraded put "Some sources saved" on every page, on every
+   * live. Counting it as degraded put "Partly current" on every page, on every
    * visit, in warning amber — with the guidance to hold until "every source is
    * current", which could never happen.
    */
