@@ -14,11 +14,29 @@ type ExecutiveTemplate =
 export const buildExecutiveMemo = (
   assessment: RegimeAssessment,
   recordDateLabel: string,
-  template: ExecutiveTemplate | undefined
+  template: ExecutiveTemplate | undefined,
+  format: "plain" | "slack" = "plain"
 ) => {
-
   if (!template) {
     return "No memo for this week's guidance.";
+  }
+
+  if (format === "slack") {
+    return [
+      `*Weekly Brief — ${recordDateLabel}*`,
+      `*This week's conditions:* ${getRegimePublicLabel(assessment.regime)}`,
+      "",
+      `*Summary:* ${template.executiveSummary}`,
+      "",
+      "*Pause-if checks:*",
+      ...template.decisionGuardrails.map((item) => `• ${item}`),
+      "",
+      "*Decision templates:*",
+      ...template.decisionTemplates.map((item) => `• ${item}`),
+      "",
+      `*${DECISION_CONTRACT_LABELS.watch.postureFlips}:*`,
+      ...template.reversalTriggers.map((item) => `• ${item}`),
+    ].join("\n");
   }
 
   return [
@@ -103,7 +121,11 @@ export const ExecutiveBriefingPanel = ({
   );
 
   const executiveMemo = useMemo(
-    () => buildExecutiveMemo(assessment, recordDateLabel, template),
+    () => buildExecutiveMemo(assessment, recordDateLabel, template, "plain"),
+    [assessment, recordDateLabel, template]
+  );
+  const slackMemo = useMemo(
+    () => buildExecutiveMemo(assessment, recordDateLabel, template, "slack"),
     [assessment, recordDateLabel, template]
   );
   const guardrailChecklist = useMemo(
@@ -131,12 +153,20 @@ export const ExecutiveBriefingPanel = ({
               {template.executiveSummary}
             </p>
           </div>
-          <ClipboardActionRow
-            label="Copy memo"
-            state={clipboardState("Memo")}
-            onClick={() => void copyToClipboard(executiveMemo, "Memo")}
-            buttonLabels={{ error: "Copy failed" }}
-          />
+          <div className="flex flex-wrap items-center gap-2">
+            <ClipboardActionRow
+              label="Copy for Slack"
+              state={clipboardState("Slack")}
+              onClick={() => void copyToClipboard(slackMemo, "Slack")}
+              buttonLabels={{ error: "Copy failed" }}
+            />
+            <ClipboardActionRow
+              label="Copy memo"
+              state={clipboardState("Memo")}
+              onClick={() => void copyToClipboard(executiveMemo, "Memo")}
+              buttonLabels={{ error: "Copy failed" }}
+            />
+          </div>
         </div>
       </div>
 

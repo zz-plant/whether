@@ -41,7 +41,7 @@ describe("a score at the top of its scale", () => {
   it("stays silent when the score is simply flat and not clipped", () => {
     const html = render([row({ value: 64, valueLabel: "64", delta: 0 })]);
 
-    assert.ok(!html.includes("This is as high as the score goes"), "a flat week is not a clipped one");
+    assert.ok(!html.includes("Treasury rates are maxed out on this gauge"), "a flat week is not a clipped one");
   });
 
   it("stays silent when there is a move", () => {

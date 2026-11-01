@@ -36,6 +36,9 @@ import { ScoreCell } from "../../components/ui/scoreCell";
 import { buildEngineeringPaybackLines, buildProjectPaybacks, resolvePaybackBar } from "../../../lib/report/projectPayback";
 import { runwayBandForMonths } from "../../../lib/report/operatorRunway";
 import { ProjectPaybackSection } from "./projectPaybackSection";
+import { RunwayMacroFanChart } from "./runwayMacroFanChart";
+import { buildRunwayMacroFanModel } from "../../../lib/report/runwayMacroFan";
+import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
 
 const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
   { value: "b2b-saas", label: "B2B SaaS" },
@@ -209,6 +212,25 @@ export function RunwayPlannerPanel({
 
   const resolution = useMemo(() => resolveRunwayPlannerRequest(profile, stage), [profile, stage]);
   const runway = useMemo(() => resolveProfileRunway(profile), [profile]);
+
+  const macroFanModel = useMemo(() => {
+    if (!resolution.ready) return null;
+    const initialCash =
+      typeof profile.cashUsd === "number" && profile.cashUsd > 0
+        ? profile.cashUsd
+        : resolution.request.runway * resolution.request.burn;
+    const netBurn = resolution.request.burn - resolution.request.revenue;
+    const series = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
+
+    return buildRunwayMacroFanModel({
+      initialCashUsd: initialCash,
+      netMonthlyBurnUsd: netBurn,
+      newMonthlyCostUsd: 0,
+      maxMonths: 36,
+      macroSeries: series,
+      currentRegime: assessment.regime,
+    });
+  }, [profile.cashUsd, resolution, assessment.regime]);
 
   const output = useMemo(
     () =>
@@ -531,6 +553,8 @@ export function RunwayPlannerPanel({
           {/* The company's own lines on its own runway, agreed before they are
               needed. The published lines say when the market changes the plan;
               these say when the company's cash does, and the month that is. */}
+          {macroFanModel ? <RunwayMacroFanChart model={macroFanModel} /> : null}
+
           <section id="ops-runway-lines" aria-labelledby="ops-runway-lines-heading" className="weather-surface space-y-3 p-4">
             <div>
               <p id="ops-runway-lines-heading" className="text-xs font-semibold text-slate-400">Your own runway lines</p>

@@ -15,6 +15,12 @@ const defaultFeaturedStakeholderSlugs = [
   "finance-leaders",
 ] as const;
 
+type FeaturedStakeholderSlug = (typeof defaultFeaturedStakeholderSlugs)[number];
+
+function isFeaturedStakeholderSlug(slug: string): slug is FeaturedStakeholderSlug {
+  return defaultFeaturedStakeholderSlugs.some((candidate) => candidate === slug);
+}
+
 export function buildGuidedTranslationHref(params?: GuidedTranslationSearchParams) {
   const query = new URLSearchParams();
   if (params?.stakeholder) {
@@ -44,9 +50,9 @@ export function resolveGuidedTranslationState(params?: GuidedTranslationSearchPa
   const selectedStage = params?.stage
     ? findStageGuide(params.stage)
     : undefined;
-  const featuredStakeholders = stakeholderGuides.filter((guide) =>
-    defaultFeaturedStakeholderSlugs.includes(guide.slug as (typeof defaultFeaturedStakeholderSlugs)[number]),
-  );
+  const featuredStakeholders = selectedStakeholder
+    ? stakeholderGuides.filter((guide) => guide.slug !== selectedStakeholder.slug)
+    : stakeholderGuides.filter((guide) => isFeaturedStakeholderSlug(guide.slug));
   const showStageLibrary = params?.library === "stages" || Boolean(selectedStage);
   const relatedStakeholderGuides = selectedStage
     ? stakeholderGuides
@@ -100,7 +106,7 @@ function HearingThread({ guide }: { guide: (typeof stakeholderGuides)[number] })
         <div className="space-y-1">
           <p id="guided-hearing-heading" className="type-eyebrow">What you may be hearing</p>
           <p className="max-w-prose text-xs text-slate-400">
-            The questions the published lines tend to bring, and the answer each one has. Which reach you depends on who you answer to.
+            The pushback, takes and questions that come up in the room, and the reply each line gives. Which reach you depends on who you answer to.
           </p>
         </div>
       </div>
@@ -161,12 +167,12 @@ export function GuidedTranslationPanels({
                 {selectedStakeholder.stageSpecificContent.map((entry) => {
                   const stage = findStageGuide(entry.stageSlug);
                   return (
-                    <li key={entry.stageSlug} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                    <li key={entry.stageSlug} className="rounded-md border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-3 py-3">
                       <p className="font-semibold text-slate-100">{stage?.title}</p>
                       <p className="mt-1">{entry.guidance}</p>
                       <Link
                         href={buildGuidedTranslationHref({ stakeholder: selectedStakeholder.slug, stage: entry.stageSlug })}
-                        className="mt-2 inline-flex min-h-[44px] items-center text-xs font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
+                        className="weather-hit mt-2 inline-flex items-center text-xs font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100"
                       >
                         Open {stage?.title ?? "stage"} view
                       </Link>
@@ -204,7 +210,7 @@ export function GuidedTranslationPanels({
               ))}
             </ul>
             {selectedStage.failureMode ? (
-              <p className="rounded-md border border-amber-400/30 bg-amber-500/10 px-3 py-3 text-sm text-amber-100">
+              <p className="weather-caveat-band weather-caveat-mark px-3 py-2.5 text-sm">
                 <span className="font-semibold">Where it goes wrong:</span> {selectedStage.failureMode}
               </p>
             ) : null}
@@ -214,12 +220,12 @@ export function GuidedTranslationPanels({
             <p className="type-eyebrow">How each team should read this stage</p>
             <ul className="space-y-3 text-sm text-slate-200">
               {relatedStakeholderGuides.map((guide) => (
-                <li key={guide.slug} className="rounded-md border border-slate-700/70 bg-slate-950/50 px-3 py-3">
+                <li key={guide.slug} className="rounded-md border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-3 py-3">
                   <p className="font-semibold text-slate-100">{guide.title}</p>
                   <p className="mt-1">{guide.guidance}</p>
                   <Link
                     href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: selectedStage.slug })}
-                    className="mt-2 inline-flex min-h-[44px] items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
+                    className="weather-hit mt-2 inline-flex items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
                   >
                     Open {guide.title} view
                   </Link>
@@ -237,7 +243,7 @@ export function GuidedTranslationPanels({
             <p className="text-sm text-slate-300">{guide.tagline}</p>
             <Link
               href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: selectedStage?.slug })}
-              className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
+              className="weather-hit inline-flex items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
             >
               Open {guide.title} view
             </Link>
@@ -254,7 +260,7 @@ export function GuidedTranslationPanels({
             <div className="overflow-x-auto weather-hub-card px-4 py-4">
               <table className="w-full min-w-[420px] text-left text-sm text-slate-200">
                 <thead>
-                  <tr className="border-b border-slate-700 type-eyebrow">
+                  <tr className="border-b border-[color:var(--border-default)] type-eyebrow">
                     <th className="py-2 pr-4">Stage</th>
                     <th className="py-2 pr-4">Team size</th>
                     <th className="py-2">Most useful for</th>
@@ -262,7 +268,7 @@ export function GuidedTranslationPanels({
                 </thead>
                 <tbody>
                   {stageGuides.map((stage) => (
-                    <tr key={stage.slug} className="border-b border-slate-800/80 align-top">
+                    <tr key={stage.slug} className="border-b border-[color:var(--border-subtle)] align-top">
                       <td className="py-3 pr-4 font-semibold text-slate-100">{stage.title}</td>
                       <td className="py-3 pr-4">{stage.teamSize}</td>
                       <td className="py-3">{stage.primaryValue}</td>
@@ -280,7 +286,7 @@ export function GuidedTranslationPanels({
                 <p className="text-xs text-slate-300">{stage.primaryValue}</p>
                 <Link
                   href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: selectedStakeholder?.slug })}
-                  className="inline-flex min-h-[44px] items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
+                  className="weather-hit inline-flex items-center text-xs font-medium text-sky-300 underline decoration-slate-600 underline-offset-4 hover:text-sky-200"
                 >
                   Open stage view
                 </Link>

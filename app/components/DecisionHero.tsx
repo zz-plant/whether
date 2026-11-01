@@ -185,7 +185,7 @@ export function DecisionHero({
               href={location.href}
               title={location.hint}
               data-reading-location
-              className="weather-hit inline-flex items-center rounded-md border border-[color:var(--border-subtle)] px-2 py-1 text-fluid-xs font-medium text-slate-300 hover:border-[color:var(--border-strong)] hover:text-slate-100"
+              className="weather-hit inline-flex items-center rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2.5 py-1 text-fluid-xs font-medium text-slate-200 hover:border-[color:var(--border-strong)] hover:text-slate-100"
             >
               {location.label}
             </Link>

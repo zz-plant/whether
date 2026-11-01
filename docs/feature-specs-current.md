@@ -122,27 +122,31 @@ The header carries four groups, each with a hub, read from one module
 ### 1.0b What the reader may hear, by role and on the brief (2026-10-31)
 
 A role selection on Guides (`/resources?stakeholder=<slug>`) opens the role's panel and, under it,
-a thread of the questions the published lines tend to bring and the answer each one already has
-(`HearingThread`, `app/resources/components/guidedTranslationPanels.tsx`). The copy lives beside
-the role's bullets in `app/guides/stakeholderGuides.ts` as
-`hearing: { from, question, answer, area? }[]`. The homepage prints the same pairs as its seventh
-section (`#what-you-may-hear`, §1.1) when a pause line is crossed.
+a thread of the pushback, competing takes and questions the published lines tend to bring in the
+room and the reply each line gives (`HearingThread`,
+`app/resources/components/guidedTranslationPanels.tsx`). The copy lives beside the role's bullets
+in `app/guides/stakeholderGuides.ts` as `hearing: { from, question, answer, area? }[]`. The
+homepage prints the same pairs as its seventh section (`#what-you-may-hear`, §1.1) when a pause
+line is crossed.
 
-- **Two bubbles per question, one component.** The group asks on the left, in a recessed bubble
-  with a square bottom-left corner and the speaker's name inside it; the published answer sits
-  right-aligned on the panel surface with a square bottom-right corner. `HearingBubbles`
-  (`app/components/ui/hearingBubbles.tsx`) draws both surfaces, so Guides and `/` cannot show the
-  same pair two ways.
-- **The question is asked, not asserted.** "How do we decide a hire is safe while the hiring pause
-  line is crossed?", never "Why are you still hiring?" — a reader without that group or that
-  problem is not told what their week looks like. The speaker is a function ("Finance", "Board",
-  "Budget owners"), never "your CFO". Every answer restates a published line and promises no
-  outcome; `tests/guidedTranslationRouting.test.ts` holds the question mark, the non-empty answer,
-  the speaker and the badge length.
-- **`area` is what the homepage selects on.** A question about one area carries it; a question
-  about the whole set of lines, a plan, a pack or a quarter carries none and never appears on `/`.
-  `selectHearingForAreas` takes one question per crossed area, then one per role thread and one
-  per speaker, capped at three. No pause line crossed, no section.
+- **Two bubbles per exchange, one component.** The group speaks on the left, in a recessed bubble
+  with a square bottom-left corner and the speaker's name in a sentence-case eyebrow (`type-eyebrow`);
+  the published reply sits right-aligned on the panel surface with a square bottom-right corner under
+  a `What to say` eyebrow. `HearingBubbles` (`app/components/ui/hearingBubbles.tsx`) draws both
+  surfaces, so Guides and `/` cannot show the same pair two ways.
+- **Pushback, takes and questions in the speaker's voice.** Entries include objections ("This role
+  is too important to wait…"), market takes ("Public markets bounced this month…") and direct
+  questions ("Are we freezing everything, or just hiring?"), so the reader is ahead of what comes up
+  in the room rather than only polite questions about the rules. The speaker is a function ("Hiring
+  manager", "Investors", "Budget owners", "Board"), never "your CFO". Every reply restates a
+  published line and promises no outcome; `tests/guidedTranslationRouting.test.ts` holds both
+  statements and questions, the non-empty reply, the speaker and the badge length.
+- **`area` is what the homepage selects on.** Every one of the five decision areas carries tagged
+  exchanges across the role guides; a question about the whole set of lines, a plan, a pack or a
+  quarter carries none and never appears on `/`. `selectHearingForAreas` takes one exchange per
+  crossed area, then one per role thread and one per speaker, capped at three. No pause line
+  crossed, no section. "By role →" links directly to an open role panel on `/resources`, which lists
+  the other five roles to switch between without repeating the role already on screen.
 - **Stage-only views keep no thread.** The hearing content is role-scoped, so `?stage=` alone
   renders the stage panel and its per-team guidance, not a thread.
 - **No mascot.** The product's one drawn vocabulary is the weather glyphs (`ConditionIcon`); a

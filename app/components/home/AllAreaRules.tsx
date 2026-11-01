@@ -1,10 +1,11 @@
 import { AreaTable, type AreaRowData } from "../ui/areaTable";
+import { AreaCorridorLadder } from "../ui/areaCorridorLadder";
 import { RunwayAreaNote, RunwayConditionedNotes } from "../RunwayConditionedNotes";
 import { CommitmentTestDisclosure } from "./CommitmentTest";
 import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import type { HomeAreaRow } from "../../../lib/report/home/homeSectionModel";
 import type { DecisionMovement } from "../../../lib/report/decisionMovement";
-import { resolveLineState } from "../../../lib/report/operatingCalls";
+import { resolveLineState, type DecisionCorridorModel } from "../../../lib/report/operatingCalls";
 import type { RegimeKey } from "../../../lib/regimeEngine";
 import { toRoute, type Route } from "../../../lib/navigation/routeType";
 
@@ -31,6 +32,7 @@ export function AllAreaRules({
   planHref,
   isHistorical,
   heldGroups = [],
+  corridorModel,
 }: {
   rows: readonly HomeAreaRow[];
   /** The held areas grouped by state (`buildDecisionMovement`); a group of two or more prints once. */
@@ -39,6 +41,8 @@ export function AllAreaRules({
   planHref: Route;
   /** Live briefs only carry the operator's runway: it dates a company's cash position to today. */
   isHistorical: boolean;
+  /** The 5-area normalized corridor ladder model. */
+  corridorModel?: DecisionCorridorModel;
 }) {
   const sharedHeld = heldGroups.filter((group) => group.areas.length > 1);
   const saidOnce = new Set(sharedHeld.flatMap((group) => group.areas));
@@ -69,29 +73,32 @@ export function AllAreaRules({
   }));
 
   return (
-    <details className="weather-auto-chevron group" data-all-area-rules>
-      <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
-        All five areas, side by side
-      </summary>
-      <div className="mt-4 space-y-4">
-        {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
-        {sharedHeld.length > 0 ? (
-          <div className="space-y-1 text-fluid-xs text-slate-400" data-held-groups>
-            {sharedHeld.map((group) => (
-              <p key={group.state}>{group.text}</p>
-            ))}
-          </div>
-        ) : null}
-        <p className="text-fluid-xs text-slate-300">
-          Agree on these lines in calm weather so course corrections are automatic, not emergency debates.
-        </p>
-        <AreaTable
-          rows={tableRows}
-          caption={`${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf} and ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}, by area`}
-        />
-        {/* Live briefs only, like the runway notes: it reads today's cash. */}
-        {isHistorical ? null : <CommitmentTestDisclosure regime={regime} />}
-      </div>
-    </details>
+    <div className="space-y-4">
+      {corridorModel ? <AreaCorridorLadder model={corridorModel} /> : null}
+      <details className="weather-auto-chevron group" data-all-area-rules>
+        <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
+          All five areas, side by side
+        </summary>
+        <div className="mt-4 space-y-4">
+          {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
+          {sharedHeld.length > 0 ? (
+            <div className="space-y-1 text-fluid-xs text-slate-400" data-held-groups>
+              {sharedHeld.map((group) => (
+                <p key={group.state}>{group.text}</p>
+              ))}
+            </div>
+          ) : null}
+          <p className="text-fluid-xs text-slate-300">
+            Agree on these lines in calm weather so course corrections are automatic, not emergency debates.
+          </p>
+          <AreaTable
+            rows={tableRows}
+            caption={`${DECISION_CONTRACT_LABELS.action.actionNow}, ${DECISION_CONTRACT_LABELS.threshold.pauseIf} and ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}, by area`}
+          />
+          {/* Live briefs only, like the runway notes: it reads today's cash. */}
+          {isHistorical ? null : <CommitmentTestDisclosure regime={regime} />}
+        </div>
+      </details>
+    </div>
   );
 }

@@ -9,6 +9,8 @@ import {
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ActionLink } from "../components/ui/actionLink";
 import { ConfidenceRecordSection } from "../components/history/confidenceRecord";
+import { PremiseOutcomeScatterChart } from "../components/history/premiseOutcomeScatterChart";
+import { loadPremiseTestBacktestModel } from "../../lib/research/premiseBacktestModel";
 import { confidenceCalibrationTotals } from "../../lib/report/confidenceCalibration";
 import { countRecord } from "../../lib/report/trackRecord";
 import { getTimeMachineRegimeSeries } from "../../lib/timeMachine/timeMachineCache";
@@ -50,6 +52,7 @@ export default function CalibrationPage() {
      this page cannot say "six" while they say seven. */
   const record = countRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER));
   const since = record ? formatMonthYearShortFromValue(record.firstRecordDate) : "2012";
+  const premiseModel = loadPremiseTestBacktestModel();
 
   return (
     <ContentPageShell measure="wide">
@@ -65,6 +68,13 @@ export default function CalibrationPage() {
       />
 
       <ConfidenceRecordSection />
+
+      <SecondaryPageSection
+        title="What happened to venture fundraising after lines were crossed"
+        description="Across 51 quarters from 2012 to 2024, forward 4-quarter U.S. venture deal value growth when Funding Pressure was tight (> 70) vs. calm (≤ 70)."
+      >
+        <PremiseOutcomeScatterChart model={premiseModel} className="max-w-xl" />
+      </SecondaryPageSection>
 
       <SecondaryPageSection
         title="How it was measured"

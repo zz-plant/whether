@@ -93,7 +93,7 @@ describe("what would change this guidance: the pause and restart lines", () => {
     assert.match(lined, /When would conditions change\?/);
     assert.match(lined, /When can paused decisions resume\?/);
     assert.match(lined.replace(/<[^>]+>/g, ""), /Funding pressure falls below 66/);
-    assert.match(lined.replace(/<[^>]+>/g, ""), /doesn(?:’|')t mean you can resume\. Only crossing the restart line does/);
+    assert.match(lined.replace(/<[^>]+>/g, ""), /doesn(?:’|')t mean you can resume\. Unfreezing requires a safety buffer/);
   });
 
   it("prefers a chosen stage's restart line to the lead area's", () => {

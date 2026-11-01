@@ -207,7 +207,7 @@ export function ProjectPaybackSection({
         <p className="mt-1 text-sm text-slate-100">{describePaybackBar(bar, regime)}</p>
         {whatMovesBar ? <p className="mt-1 text-fluid-xs text-slate-300">{whatMovesBar}</p> : null}
         <p className="mt-1 text-fluid-xs text-slate-400">
-          Price each piece of work by what it saves: hours someone no longer spends, and bills it cuts.
+          Price each piece of work by what it saves: the payback bar measures how fast savings recoup build costs post-launch (hours someone no longer spends, and bills it cuts).
         </p>
       </div>
 

@@ -89,11 +89,11 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
   curveSlope: {
     plainLabel: "Recession warning gauge",
     whatItMeasures:
-      "A U.S. Treasury market signal that historically warns of recession. Negative (inverted) means caution.",
+      "A U.S. Treasury market signal that historically warns of recession. Negative (inverted) means short-term borrowing costs exceed long-term yields, which signals caution.",
     highMeans:
       "No recession warning — the yield curve is normal. Long-horizon planning is safer.",
     lowMeans:
-      "Recession warning active — the yield curve is inverted or flat. Favor short-payback projects and keep options open.",
+      "Recession warning active — short-term rates exceed long-term yields. Favor short-payback projects and keep options open.",
     midMeans:
       "Curve is neutral/flat — don't rely on this signal alone; also check funding pressure and risk appetite.",
     jargonTerm: "Yield curve slope",

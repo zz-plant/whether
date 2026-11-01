@@ -40,8 +40,6 @@ export const metadata: Metadata = buildPageMetadata({
 /** Typed route for a direct-answer page; the dynamic segment is `[slug]`. */
 const answerPageHref = (slug: string): Route => `/answers/${slug}`;
 
-const featuredStakeholderSlugs: readonly string[] = ["founders-ceos", "heads-of-product", "finance-leaders"];
-
 const ROW_CLASS = "grid min-h-[44px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3 hover:bg-slate-900/40";
 
 /*
@@ -102,7 +100,6 @@ export default async function ResourcesHubPage({
     }))
     .filter((group) => group.answers.length > 0 || group.guides.length > 0);
 
-  const featuredStakeholders = stakeholderGuides.filter((guide) => featuredStakeholderSlugs.includes(guide.slug));
   const hasToolSelection = Boolean(
     resolvedSearchParams?.stakeholder
     || resolvedSearchParams?.stage
@@ -281,7 +278,7 @@ export default async function ResourcesHubPage({
                 <nav id="guided-translation" aria-labelledby="guided-translation-title" className="space-y-3">
                   <h3 id="guided-translation-title" className="text-sm type-eyebrow text-slate-300">By role or stage</h3>
                   <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
-                    {featuredStakeholders.slice(0, 2).map((guide) => (
+                    {stakeholderGuides.map((guide) => (
                       <li key={guide.slug}>
                         <Link
                           href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
@@ -293,7 +290,7 @@ export default async function ResourcesHubPage({
                         </Link>
                       </li>
                     ))}
-                    {stageGuides.slice(0, 2).map((stage) => (
+                    {stageGuides.map((stage) => (
                       <li key={stage.slug}>
                         <Link
                           href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}

@@ -1,6 +1,7 @@
 import {
   distanceToRuleCondition,
   isRuleConditionMet,
+  decisionAreaLabel,
   formatActionStripReversalText,
   formatActionStripThresholdText,
   formatBoundedDecisionAction,
@@ -523,3 +524,118 @@ export const buildPullPolicyBlocks = (
       ].join("\n"),
     };
   });
+
+/**
+ * 5-Area Corridor Ladder: all 5 operating areas positioned on normalized 0–100 scales
+ * where trouble / pause is ALWAYS to the right (satisfying ui-ux-standards §XV).
+ * Each row carries its pause line, restart line, deadband, current distance to unlock,
+ * and current line state.
+ */
+type AreaCorridorLadderItem = {
+  area: DecisionArea;
+  label: string;
+  metric: RuleConditionMetric;
+  currentScore: number;
+  pauseLine: number;
+  resumeLine: number;
+  /** Normalized 0–100 coordinate for the reading (trouble/pause is on the right). */
+  normalizedCurrent: number;
+  /** Normalized coordinate for the pause line. */
+  normalizedPause: number;
+  /** Normalized coordinate for the resume line. */
+  normalizedResume: number;
+  /** Buffer zone width in points (|pauseLine - resumeLine|). */
+  deadbandPoints: number;
+  /** Distance in score points needed to cross the resume line (0 if already met or area not on hold). */
+  distanceToUnlock: number;
+  state: LineState;
+};
+
+export type DecisionCorridorModel = {
+  areas: readonly AreaCorridorLadderItem[];
+  tightnessScore: number;
+  riskAppetiteScore: number;
+  heldCount: number;
+  /** Area closest to lifting its hold, if any are on hold. */
+  closestToUnlock: AreaCorridorLadderItem | null;
+};
+
+export const buildDecisionCorridorModel = (
+  rules: readonly BoundedDecisionRule[],
+  scores: CurrentScores,
+): DecisionCorridorModel => {
+  const items: AreaCorridorLadderItem[] = [];
+
+  for (const rule of rules) {
+    // Primary binding metric for the area: tightness for hiring/spending, riskAppetite for roadmap/bets.
+    // For capital-raising, pick tightness if paused by it or nearest to it.
+    const pauseTightness = rule.pause.conditions.find((c) => c.metric === "tightness");
+    const resumeTightness = rule.resume.conditions.find((c) => c.metric === "tightness");
+    const pauseRisk = rule.pause.conditions.find((c) => c.metric === "riskAppetite");
+    const resumeRisk = rule.resume.conditions.find((c) => c.metric === "riskAppetite");
+
+    const useTightness =
+      rule.area === "hiring" || rule.area === "burn-discipline" || !pauseRisk
+        ? true
+        : rule.area === "product-tempo" || rule.area === "expansion-bets" || !pauseTightness
+          ? false
+          : (scores.tightness / 100) >= (1 - scores.riskAppetite / 100);
+
+    const pauseCond = useTightness ? pauseTightness : pauseRisk;
+    const resumeCond = useTightness ? resumeTightness : resumeRisk;
+
+    if (!pauseCond || !resumeCond) continue;
+
+    const metric: RuleConditionMetric = useTightness ? "tightness" : "riskAppetite";
+    const currentScore = scores[metric];
+    const pauseLine = pauseCond.value;
+    const resumeLine = resumeCond.value;
+
+    // Normalize so 0 is easiest/safest and 100 is strictest/trouble.
+    // Tightness: 0 is cheap (safe), 100 is tight (trouble) -> already aligned.
+    // Risk appetite: 100 is high appetite (safe), 0 is low (trouble) -> invert (100 - val).
+    const normalizedCurrent = useTightness ? currentScore : 100 - currentScore;
+    const normalizedPause = useTightness ? pauseLine : 100 - pauseLine;
+    const normalizedResume = useTightness ? resumeLine : 100 - resumeLine;
+
+    const deadbandPoints = Math.abs(pauseLine - resumeLine);
+    const pauseMet = isRuleConditionMet(pauseCond, currentScore);
+    const resumeMet = isRuleConditionMet(resumeCond, currentScore);
+
+    const pauseDist = distanceToRuleCondition(pauseCond, currentScore);
+    const resumeDist = distanceToRuleCondition(resumeCond, currentScore);
+
+    const state = resolveLineState(pauseDist, "pause", pauseMet) ?? "clear";
+    const distanceToUnlock = pauseMet && !resumeMet ? resumeDist : 0;
+
+    items.push({
+      area: rule.area,
+      label: decisionAreaLabel(rule.area),
+      metric,
+      currentScore,
+      pauseLine,
+      resumeLine,
+      normalizedCurrent,
+      normalizedPause,
+      normalizedResume,
+      deadbandPoints,
+      distanceToUnlock,
+      state,
+    });
+  }
+
+  const heldAreas = items.filter((item) => item.state === "crossed");
+  const closestToUnlock =
+    heldAreas.length > 0
+      ? [...heldAreas].sort((a, b) => a.distanceToUnlock - b.distanceToUnlock)[0] ?? null
+      : null;
+
+  return {
+    areas: items,
+    tightnessScore: scores.tightness,
+    riskAppetiteScore: scores.riskAppetite,
+    heldCount: heldAreas.length,
+    closestToUnlock,
+  };
+};
+

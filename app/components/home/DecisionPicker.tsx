@@ -16,6 +16,11 @@ import {
   type HomeAreaRow,
 } from "../../../lib/report/home/homeSectionModel";
 import { resolveLineState } from "../../../lib/report/operatingCalls";
+import {
+  DEFAULT_RUNWAY_BAND,
+  runwayBandPhrase,
+  type RunwayBand,
+} from "../../../lib/report/operatorRunway";
 import { AreaIcon, AreaLabel, LineStateBadge } from "../ui/conceptIcons";
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
@@ -81,6 +86,8 @@ export function DecisionPicker({
   options,
   regime,
   initialSelected,
+  stageLabel,
+  activeRunway,
   children,
 }: {
   options: readonly DecisionPickerOption[];
@@ -88,6 +95,10 @@ export function DecisionPicker({
   regime: RegimeKey;
   /** The decision the URL names (`?decision=`), open on first paint. */
   initialSelected?: DecisionArea;
+  /** The stage the company rules are calibrated for. */
+  stageLabel?: string;
+  /** The runway band the rules are calibrated for. */
+  activeRunway?: RunwayBand;
   /** What follows the choices inside the section: the folded table of all five, and the plan link. */
   children?: ReactNode;
 }) {
@@ -149,9 +160,20 @@ export function DecisionPicker({
     >
       <div className="space-y-4">
         <div className="space-y-1">
-          <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="type-section">
-            {HOME_SECTIONS.areas.heading}
-          </h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="type-section">
+              {HOME_SECTIONS.areas.heading}
+            </h2>
+            {stageLabel ? (
+              <a
+                href={`#${HOME_SECTIONS.calibration.id}`}
+                className="weather-hit text-fluid-xs text-slate-400 hover:text-slate-200 underline decoration-slate-600 underline-offset-2"
+                title="Click to calibrate your stage and runway"
+              >
+                Rules for {stageLabel} · {runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}
+              </a>
+            ) : null}
+          </div>
           {pauseLineCount ? (
             <p data-pause-line-count className="text-fluid-sm font-medium text-slate-200">
               {pauseLineCount}

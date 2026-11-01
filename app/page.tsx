@@ -69,6 +69,7 @@ import {
   describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
+import { buildDecisionCorridorModel } from "../lib/report/operatingCalls";
 import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
@@ -404,6 +405,10 @@ async function PageContent({
     movement: decisionMovement,
     scores: { tightness, riskAppetite },
   });
+  const corridorModel = buildDecisionCorridorModel(
+    homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
+    { tightness, riskAppetite },
+  );
   /* The questions this week's crossed pause lines invite, for the section after
      the lines: one per crossed area, one per group, one per speaker
      (`selectHearingForAreas`). Empty on a week no pause line is crossed, and the
@@ -859,6 +864,8 @@ async function PageContent({
               options={decisionPickerOptions}
               initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM])}
               regime={regime}
+              stageLabel={stageLabel}
+              activeRunway={activeRunway}
             >
               <AllAreaRules
                 rows={homeAreaRows}
@@ -866,6 +873,7 @@ async function PageContent({
                 regime={regime}
                 planHref={isRoute(operateHref) ? operateHref : "/operate"}
                 isHistorical={Boolean(historicalSelection)}
+                corridorModel={corridorModel}
               />
               <div>
                 <ActionLink href={operateHref} variant="primary">

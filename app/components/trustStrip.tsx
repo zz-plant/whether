@@ -143,7 +143,7 @@ export function TrustStrip({
       value: describeMarginCell(margin, confidenceLabel, regime),
       detail: describeNextWeek(couldChangeNextWeek, changeReason),
       detailKind: "next-week",
-      ...(baseRate ? { baseRate: `Held ${baseRate.held} of ${baseRate.months} months at this distance` } : {}),
+      ...(baseRate ? { baseRate: `Past conditions held ${baseRate.held} of ${baseRate.months} months at this distance` } : {}),
       tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caveat" : undefined,
     },
     /* Which inputs set the scores, on every call (2026-10-09). Routine on the

@@ -11,26 +11,28 @@ import { decisionAreaOrder, type DecisionArea } from "../../lib/report/boundedDe
  * thing the reader can do with a pause line, a restart line or the weekly
  * reading.
  *
- * `hearing` is the other half of the same job (2026-10-31): the questions the
- * published lines tend to bring once a reader takes them into a room, and the
- * answer each one already has. The question is written as the group asks it,
- * never as a claim about the reader's company — "How do we decide a hire is
- * safe…", not "Why are you still hiring…" — so a reader without that group, or
- * without that problem, is not told what their week looks like. The answer
- * restates a published line; it never promises an outcome.
+ * `hearing` is the other half of the same job (2026-10-31): the pushback,
+ * competing takes, rationalizations and questions that come up once a reader
+ * takes the published lines into a room, and what the line says back. The
+ * prompt is written in the speaker's own voice — an objection ("This role is
+ * too important to wait…"), a market take ("Public markets bounced this
+ * month…") or a direct question ("Are we freezing everything, or just
+ * hiring?") — so the reader is ready for what people actually say, not only for
+ * polite questions about the rules. The speaker is a function, never "your
+ * CFO". Every reply restates a published line and promises no outcome.
  */
 type StakeholderHearing = {
   /** Who is speaking: the function or group, never "your <role>". */
   from: string;
-  /** The question, in the group's voice. Ends in a question mark. */
+  /** What the group tends to say in the room: pushback, a take or a question. */
   question: string;
-  /** What the published line says back, in one sentence. */
+  /** What to say back from the published line, in one or two sentences. */
   answer: string;
   /**
-   * The area whose line the question is about, where it is about one. The
-   * homepage shows the questions whose area has a crossed pause line this week;
-   * a question about the whole set of lines (or about a plan, a pack or a
-   * quarter) carries none.
+   * The area whose line the exchange is about, where it is about one. The
+   * homepage shows the exchanges whose area has a crossed pause line this week;
+   * one about the whole set of lines (or about a plan, a pack or a quarter)
+   * carries none.
    */
   area?: DecisionArea;
 };
@@ -63,20 +65,21 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     ],
     hearing: [
       {
-        from: "Finance",
-        question: "How do we decide a hire is safe while the hiring pause line is crossed?",
-        answer: "Name the restart line the role waits on, and the date it last cleared.",
+        from: "Hiring manager",
+        question: "This role is too important to wait — leaving it open will cost us the quarter.",
+        answer: "While the hiring pause line is crossed, only backfills that protect current revenue go through. Additions wait for the restart line.",
         area: "hiring",
       },
       {
         from: "Leadership team",
-        question: "Which of the five areas is binding this quarter?",
-        answer: "Whichever area's pause line is crossed. The others stay on their own lines.",
+        question: "Competitors are still spending on new bets. If we hold back now, we'll fall behind.",
+        answer: "Let them spend pricey money. Keep new bets small and reversible until the restart line clears.",
+        area: "expansion-bets",
       },
       {
         from: "Team",
-        question: "Are we stopping everything, or just hiring?",
-        answer: "Each area pauses on its own line, so read that area before changing its plan.",
+        question: "Are we freezing everything, or just hiring?",
+        answer: "Each area pauses on its own line, so check that area's line before changing its plan.",
       },
     ],
     stageSpecificContent: [
@@ -115,21 +118,21 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     ],
     hearing: [
       {
-        from: "CEO",
-        question: "Which roadmap work survives a tight quarter?",
-        answer: "Short payback first; long bets wait for the restart line.",
+        from: "Sales",
+        question: "We already promised a customer this feature for the quarter — we can't push it back.",
+        answer: "If the current team can ship it with a short payback, keep it. If it needs new spend, name the restart line it waits on.",
         area: "product-tempo",
       },
       {
-        from: "Sales",
-        question: "Can we still commit to a launch date?",
-        answer: "Only if the launch needs no new spend. Otherwise name the line it waits on.",
-        area: "product-tempo",
+        from: "Leadership team",
+        question: "We need a big new product bet on the roadmap to show growth for the next round.",
+        answer: "While the new-bets pause line is crossed, order the roadmap by payback speed and keep new bets to small trials.",
+        area: "expansion-bets",
       },
       {
         from: "Finance",
-        question: "Why does scope keep moving when the numbers move?",
-        answer: "Scope follows the spending line. Ask which line moved, and when.",
+        question: "Why are we still funding product experiments when spending is on hold?",
+        answer: "Long-payback bets are paused; short-payback work that protects existing revenue stays on the roadmap.",
         area: "burn-discipline",
       },
     ],
@@ -166,21 +169,21 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     ],
     hearing: [
       {
-        from: "CEO",
-        question: "Can we afford the plan we already approved?",
-        answer: "Check it against each area's pause line, then say where spend holds and where it stops.",
+        from: "Investors",
+        question: "Public markets bounced this month — we should go out and raise now.",
+        answer: "One green week doesn't clear the fundraising line. Wait until funding pressure and risk appetite cross the restart line before opening a round.",
+        area: "capital-raising",
+      },
+      {
+        from: "Budget owners",
+        question: "This spend was already in the approved annual plan — why is it on hold now?",
+        answer: "An approved budget sets the ceiling; the pause line sets the timing. Uncommitted spend waits until the spending restart line clears.",
         area: "burn-discipline",
       },
       {
         from: "Board",
-        question: "What number would make us loosen this?",
-        answer: "The restart line for that area, and the date it last cleared.",
-        area: "burn-discipline",
-      },
-      {
-        from: "Budget owners",
-        question: "Why does one budget move and not the others?",
-        answer: "Each area moves on its own line, and only when that line is crossed.",
+        question: "What number would make us loosen the plan and lean back in?",
+        answer: "Each area loosens when its own restart line clears, not on a calendar date or a single headline.",
         area: "burn-discipline",
       },
     ],
@@ -216,19 +219,21 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     ],
     hearing: [
       {
-        from: "CEO",
-        question: "Do we need a new plan, or the same plan with new numbers?",
-        answer: "Same plan, re-cut for the areas whose lines moved.",
+        from: "Department leads",
+        question: "Our internal numbers look fine — why let outside interest rates slow our plan?",
+        answer: "Internal results set what we can afford today; the cost of money sets how hard the next dollar is to raise.",
+        area: "burn-discipline",
+      },
+      {
+        from: "Leadership team",
+        question: "We just set quarterly goals three weeks ago. Changing them now will whiplash the team.",
+        answer: "Keep the goals and adjust pacing only in the areas whose pause line crossed, as agreed in advance.",
+        area: "expansion-bets",
       },
       {
         from: "Board",
         question: "What changed since the last pack?",
-        answer: "One line per area, with the date each moved.",
-      },
-      {
-        from: "Leadership team",
-        question: "Who owns the decision when a line is crossed?",
-        answer: "The area owner, against the line agreed before the crossing.",
+        answer: "One line per area: which score moved, which pause or restart line crossed, and the date it moved.",
       },
     ],
     stageSpecificContent: [
@@ -264,20 +269,20 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     hearing: [
       {
         from: "Product",
-        question: "Can we keep the delivery date with a smaller team?",
-        answer: "Say what comes off scope first, and which line protects it.",
+        question: "Can we still keep the delivery date even though the new engineering hires are on hold?",
+        answer: "Only by trimming scope to what the current team can ship cleanly. Name what comes off the list while the hiring line is crossed.",
         area: "product-tempo",
       },
       {
         from: "Finance",
-        question: "Why does reliability cost more in a tight quarter?",
-        answer: "It is the spend that stays when growth spend stops.",
+        question: "Cloud and tooling costs keep creeping up — why can't we pause reliability work this quarter?",
+        answer: "Infrastructure built ahead of demand pauses; reliability work that keeps current customers paying stays.",
         area: "burn-discipline",
       },
       {
-        from: "Hiring manager",
-        question: "Can we add the engineers we planned?",
-        answer: "Only if the hiring line has cleared, and say when it last did.",
+        from: "Engineers",
+        question: "On-call is stretched thin. When do we open hiring again?",
+        answer: "When the hiring restart line clears. Until then, slow feature tempo rather than burning out the team.",
         area: "hiring",
       },
     ],
@@ -314,19 +319,22 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     ],
     hearing: [
       {
-        from: "Management",
-        question: "What would make the team change this plan?",
-        answer: "The restart line for the area, and the date it was last crossed.",
-      },
-      {
         from: "Other directors",
-        question: "Is the team consistent quarter to quarter?",
-        answer: "Compare the lines and the wording across quarters.",
+        question: "Every portfolio company is cutting right now — should management cut 20% across the board too?",
+        answer: "Blanket cuts punish working products. Check each area against its own pause line and runway before cutting across the board.",
+        area: "burn-discipline",
       },
       {
         from: "Management",
-        question: "Is this a market cut or a results cut?",
-        answer: "The line says which. Results are the other half.",
+        question: "Competitors are pulling back, so this is our chance to spend aggressively and take share.",
+        answer: "Taking share works when unit economics already clear the bar and runway covers the bet. Check the new-bets restart line first.",
+        area: "expansion-bets",
+      },
+      {
+        from: "Co-investors",
+        question: "Is the team slowing down because the market tightened or because results slipped?",
+        answer: "The pause line says how much is the market; the company's own numbers explain the rest.",
+        area: "capital-raising",
       },
     ],
     stageSpecificContent: [

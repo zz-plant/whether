@@ -572,12 +572,13 @@ still wrap naturally, and all touch targets keep their 44px minimum height.
 ### What the reader may hear (2026-10-31)
 
 A seventh section, “What you may be hearing” (`#what-you-may-hear`), sits between “What
-would change this guidance” and “How unusual is this?”. It translates the lines the
-section above just named into the questions they invite: one question per crossed area,
-one per role thread and one per speaker, capped at three, each drawn as a chat pair — the
-group asks, the published line answers. The section renders nothing on a week no pause
-line is crossed, or on an archived week, so it never becomes a standing block that says
-the same thing every week.
-“By role →” opens Guides' role list, where each role's full thread lives. The copy and the
-selection rule are in `app/guides/stakeholderGuides.ts`; the pairs are drawn by the same
-`HearingBubbles` component the role panels use.
+would change this guidance” and “How unusual is this?”. It gets the reader ahead of the
+pushback, competing takes and questions the crossed lines above tend to bring into the
+room: one exchange per crossed area, one per role thread and one per speaker, capped at
+three, each drawn as a chat pair — what the group says on the left, and what to say back
+from the published line on the right. The section renders nothing on a week no pause line
+is crossed, or on an archived week, so it never becomes a standing block that says the
+same thing every week.
+“By role →” opens the lead role's thread on Guides, with the remaining roles listed below
+it. The copy and the selection rule are in `app/guides/stakeholderGuides.ts`; the pairs are
+drawn by the same `HearingBubbles` component the role panels use.
