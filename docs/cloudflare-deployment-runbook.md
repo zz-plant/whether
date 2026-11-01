@@ -38,6 +38,13 @@ suite still turns a cold start into a timeout — the reason it is a stage of it
 2026-10-21 it served `vite dev` instead, which compiled each route on first fetch; the audit
 against the worker is not only faster, it is the code that ships.)
 
+The deploy step (`bun run deploy:cloudflare`) now runs with `--skip-build-if-current`, so it
+uploads the bundle the audit just built instead of building a second time: one Workers Builds
+push pays one Vite build, not two. The freshness check is the audit's own
+(`scripts/worker-bundle.mjs`, shared), and the reuse applies to the production lane only — a
+missing or stale bundle still builds first, and a named environment (`--env preview`) always
+builds its own configuration.
+
 `WHETHER_DEPLOY_GATE=1` (read in one place, `scripts/deploy-gate.mjs`) makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
 with a 120s ceiling, and skip `tests/tools/` (it shells out to `python3`, which the build image does
 not guarantee), and gives the landmark audit's dev-server readiness and per-route bounds room for a
@@ -271,7 +278,7 @@ This flow keeps dependency installation to a single explicit `bun install --froz
 - Generic Vinext commands still route through [`scripts/vinext-run.mjs`](../scripts/vinext-run.mjs)
 - Cloudflare-targeted build/deploy commands route through [`scripts/cloudflare-run.mjs`](../scripts/cloudflare-run.mjs)
 
-`deploy:cloudflare` builds against the top-level Wrangler config and then runs the dedicated `@vinext/cloudflare deploy --skip-build` CLI, so the build artifact and deploy target stay on the same environment contract without relying on Vinext's deprecated deploy compatibility shim.
+`deploy:cloudflare` builds against the top-level Wrangler config and then runs the dedicated `@vinext/cloudflare deploy --skip-build` CLI, so the build artifact and deploy target stay on the same environment contract without relying on Vinext's deprecated deploy compatibility shim. It runs with `--skip-build-if-current`: when `dist/` already holds a bundle current for this tree — the gate's landmark audit just built one — it uploads that bundle instead of rebuilding; a missing or stale bundle still builds first.
 
 The dry-run commands run both validation layers, because neither sees what the other does. They first build the selected environment, then run the adapter's own `--dry-run --skip-build`, which checks the adapter contract — router mode, ISR wiring, and the data and image adapters the routes require — and finally run the repo-local `wrangler deploy --dry-run`, which packages the Worker and validates bindings and upload limits without publishing. A successful dry run therefore provides deploy-package evidence rather than only a scaffold check, and an adapter-contract break reports itself as an adapter error instead of a later packaging failure.
 

@@ -13,3 +13,14 @@ export function createModuleTableFilter(emit: (text: string) => void): {
   write(chunk: string): void;
   end(): void;
 };
+
+/**
+ * Whether the deploy may reuse the bundle already in dist/ instead of building again:
+ * only when `--skip-build-if-current` was passed, the target is the production lane (no
+ * `--env`), and the bundle is current for this tree. `targetEnv` is `""` for production.
+ */
+export function shouldReuseCurrentBundle(options: {
+  skipBuildIfCurrent?: boolean;
+  targetEnv?: string;
+  current?: boolean;
+}): boolean;

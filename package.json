@@ -20,7 +20,7 @@
     "test:watch": "bun scripts/run-tests.mjs --watch",
     "time-machine:update-summaries": "bun scripts/updateTimeMachineSummariesSince.mjs",
     "mcp:whether": "bun scripts/mcp/whether-mcp-server.ts",
-    "deploy:cloudflare": "node scripts/cloudflare-run.mjs deploy",
+    "deploy:cloudflare": "node scripts/cloudflare-run.mjs deploy --skip-build-if-current",
     "deploy:cloudflare:dry-run": "node scripts/cloudflare-run.mjs deploy --dry-run",
     "deploy:cloudflare:preview": "node scripts/cloudflare-run.mjs deploy --env preview",
     "deploy:cloudflare:preview:dry-run": "node scripts/cloudflare-run.mjs deploy --env preview --dry-run",

@@ -3,6 +3,8 @@ import { existsSync, readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
+import { isWorkerBundleCurrent } from "./worker-bundle.mjs";
+
 async function main() {
   const [action, ...rawArgs] = process.argv.slice(2);
 
@@ -47,7 +49,23 @@ async function main() {
     ensureWranglerAuth(childEnv);
   }
 
-  if (!parsed.skipBuild) {
+  // One build per Workers Builds push, not two. The landmark audit in the gate
+  // (`check-main-content-landmarks.mjs`) builds the worker bundle and serves it, so when
+  // that bundle is current for this tree the deploy can upload it directly. The freshness
+  // check is the audit's own (`scripts/worker-bundle.mjs`), and the production lane only —
+  // a named environment builds a different configuration than the audit's bundle. When the
+  // bundle is missing or stale the check says no and this builds, exactly as before.
+  const reuseCurrentBundle = shouldReuseCurrentBundle({
+    skipBuildIfCurrent: parsed.skipBuildIfCurrent,
+    targetEnv,
+    current: isWorkerBundleCurrent(),
+  });
+
+  if (reuseCurrentBundle) {
+    console.log("[cloudflare-run] reusing the current worker bundle (--skip-build-if-current); no rebuild.");
+    dedupeWasmArtifacts();
+    if (!parsed.skipBuild) deployArgs.push("--skip-build");
+  } else if (!parsed.skipBuild) {
     const buildStatus = runVinext(["build"], childEnv);
     if (buildStatus !== 0) {
       process.exit(buildStatus);
@@ -159,6 +177,7 @@ function parseArgs(args) {
     preview: false,
     dryRun: false,
     skipBuild: false,
+    skipBuildIfCurrent: false,
     env: undefined,
     passthrough: [],
   };
@@ -194,10 +213,28 @@ function parseArgs(args) {
       continue;
     }
 
+    if (arg === "--skip-build-if-current") {
+      result.skipBuildIfCurrent = true;
+      continue;
+    }
+
     result.passthrough.push(arg);
   }
 
   return result;
+}
+
+/**
+ * Whether the deploy may reuse the bundle already in dist/ instead of building again.
+ *
+ * `--skip-build-if-current` is the reuse request. It applies only to the production lane
+ * (no `--env`): the landmark audit and the production deploy build the same tree, while a
+ * named environment builds a different configuration. `current` is the audit's own
+ * freshness verdict (`isWorkerBundleCurrent`), so a stale or missing bundle never reuses.
+ * Exported so the rule can be tested without running a deploy.
+ */
+export function shouldReuseCurrentBundle({ skipBuildIfCurrent = false, targetEnv = "", current = false } = {}) {
+  return Boolean(skipBuildIfCurrent && !targetEnv && current);
 }
 
 function rebuildDeployArgs(parsed, targetEnvName) {

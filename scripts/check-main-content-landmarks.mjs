@@ -29,7 +29,6 @@
  */
 import process from "node:process";
 import { availableParallelism } from "node:os";
-import { existsSync } from "node:fs";
 import { spawnSync } from "node:child_process";
 
 import {
@@ -39,41 +38,13 @@ import {
 } from "./main-content-landmarks.mjs";
 import { isDeployGate } from "./deploy-gate.mjs";
 import { isLocalHostname, readCheckoutDevServer, withDevServer } from "./dev-server.lib.mjs";
+import { isWorkerBundleCurrent } from "./worker-bundle.mjs";
 
 const args = process.argv.slice(2);
 
-/* The worker bundle the audit serves. The marker is what wrangler's redirect points at;
-   the redirect itself is what makes `wrangler dev` leave the root wrangler.toml (whose
-   [assets] intentionally has no directory) and read the built configuration instead. */
-const WORKER_BUNDLE_MARKER = "dist/server/wrangler.json";
-const WORKER_BUNDLE_REDIRECT = ".wrangler/deploy/config.json";
-// Everything the bundle is compiled from. A source newer than the marker means dist/ was
-// built before an edit; auditing it would report on the last build, not this tree.
-const WORKER_BUNDLE_SOURCES = [
-  "app",
-  "worker",
-  "lib",
-  "public",
-  "content",
-  "data",
-  "vite.config.ts",
-  "wrangler.toml",
-  "package.json",
-  "bun.lock",
-];
-
-const isWorkerBundleCurrent = () => {
-  if (!existsSync(WORKER_BUNDLE_MARKER) || !existsSync(WORKER_BUNDLE_REDIRECT)) return false;
-  // Metadata-only walk; no content hashing. A find error means "not provably current",
-  // so the caller rebuilds — a wasted build is cheaper than an audit of stale code.
-  const newer = spawnSync(
-    "find",
-    [...WORKER_BUNDLE_SOURCES.filter((entry) => existsSync(entry)), "-newer", WORKER_BUNDLE_MARKER],
-    { encoding: "utf8" },
-  );
-  return newer.status === 0 && newer.stdout.trim() === "";
-};
-
+/* The worker bundle the audit serves lives in `scripts/worker-bundle.mjs`, which also
+   owns the "is it current?" check the production deploy reuses (`--skip-build-if-current`
+   in scripts/cloudflare-run.mjs), so both decide on the same bundle the same way. */
 const ensureWorkerBundle = () => {
   if (isWorkerBundleCurrent()) return;
   console.log("The worker bundle is missing or older than the sources; building it first.");
