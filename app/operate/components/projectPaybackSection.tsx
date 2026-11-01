@@ -113,28 +113,47 @@ const BUTTON_CLASS =
 function ProjectRow({
   index,
   entry,
+  payback,
   onChange,
   onRemove,
 }: {
   index: number;
   entry: PaybackProjectEntry;
+  payback?: ProjectPayback;
   onChange: (next: PaybackProjectEntry) => void;
   /** Absent for the blank row shown before anything is entered: there is nothing to remove. */
   onRemove?: () => void;
 }) {
+  const isSized = payback && payback.status === "sized";
   return (
-    <fieldset className="space-y-3 border-t border-[var(--border-default)] pt-3">
+    <fieldset className="space-y-3 rounded-xl border border-[var(--border-default)] bg-[var(--bg-panel)] p-3.5">
       <legend className="sr-only">Project {index + 1}</legend>
-      <div className="flex min-h-[44px] items-center justify-between gap-3">
-        <p aria-hidden="true" className="text-xs font-semibold text-slate-300">
-          Project {index + 1}
-        </p>
+      <div className="flex min-h-[44px] flex-wrap items-center justify-between gap-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <p aria-hidden="true" className="text-xs font-semibold text-slate-200">
+            Project {index + 1}
+          </p>
+          {isSized && (payback.verdict === "clears" || payback.verdict === "no-bar") ? (
+            <span className="inline-flex items-center gap-1 rounded-md border border-emerald-400/30 bg-emerald-500/10 px-2 py-0.5 text-fluid-nano font-semibold text-emerald-300">
+              Clears bar {payback.breakEvenMonth !== null ? `· month ${Math.ceil(payback.breakEvenMonth)}` : ""}
+            </span>
+          ) : isSized && payback.verdict === "misses" ? (
+            <span className="inline-flex items-center gap-1 rounded-md border border-amber-400/30 bg-amber-500/10 px-2 py-0.5 text-fluid-nano font-semibold text-amber-300">
+              Exceeds bar {payback.breakEvenMonth !== null ? `· month ${Math.ceil(payback.breakEvenMonth)}` : ""}
+            </span>
+          ) : isSized && payback.verdict === "held" ? (
+            <span className="inline-flex items-center gap-1 rounded-md border border-rose-400/30 bg-rose-500/10 px-2 py-0.5 text-fluid-nano font-semibold text-rose-300">
+              Held by cash gate
+            </span>
+          ) : null}
+        </div>
         {onRemove ? (
           <button type="button" onClick={onRemove} aria-label={`Remove project ${index + 1}`} className={BUTTON_CLASS}>
             Remove
           </button>
         ) : null}
       </div>
+
       <div className="grid gap-3 sm:grid-cols-3">
         <ProjectNameField value={entry.name} onCommit={(name) => onChange(withProjectField(entry, "name", name))} />
         {PROJECT_FIELDS.map((field) => (
@@ -157,6 +176,12 @@ function ProjectRow({
           />
         ))}
       </div>
+
+      {isSized ? (
+        <div className="border-t border-[var(--border-subtle)] pt-2 text-fluid-nano text-slate-300">
+          <p>{payback.sentence}</p>
+        </div>
+      ) : null}
     </fieldset>
   );
 }
@@ -226,6 +251,7 @@ export function ProjectPaybackSection({
           key={index}
           index={index}
           entry={entry}
+          payback={paybacks[index]}
           onChange={(next) => commitRows(rows.map((row, rowIndex) => (rowIndex === index ? next : row)))}
           onRemove={entries.length > 0 ? () => commitRows(rows.filter((_, rowIndex) => rowIndex !== index)) : undefined}
         />
