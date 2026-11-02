@@ -134,7 +134,7 @@ describe("the shared email shell, on production", () => {
         "PH",
         "PB",
         "",
-        "Your lines: https://whether.work/operate#ops-plan-lines",
+        "Review your lines: https://whether.work/operate#ops-plan-lines",
         "---",
         "Whether · weekly operating brief",
         "Unsubscribe: https://whether.work/api/email/unsubscribe?token=tok",

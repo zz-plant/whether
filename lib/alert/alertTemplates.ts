@@ -190,7 +190,7 @@ export const planLineEmail = (
     headline,
     body,
     ``,
-    `Your lines: ${baseUrl}/operate#ops-plan-lines`,
+    `Review your lines: ${baseUrl}/operate#ops-plan-lines`,
     ...emailTextFooter(unsubscribeToken, baseUrl),
   ].join("\n");
   const html = renderEmailShell({
