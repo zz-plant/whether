@@ -89,8 +89,12 @@ export function AreaCorridorLadder({
               <div className="relative h-2.5 w-full rounded-full bg-[color:var(--bg-raised)] overflow-hidden">
                 {/* Safety buffer zone */}
                 {hasGap ? (
+                  /* Neutral ink, not amber (2026-11-02). Amber resolves to the
+                     crossed red, so the gap between the pause and restart lines
+                     — the one stretch of the scale where nothing happens — was
+                     drawn in the colour of the trouble it exists to delay. */
                   <div
-                    className="absolute inset-y-0 bg-amber-400/20 border-x border-amber-400/40"
+                    className="absolute inset-y-0 border-x border-[color:var(--app-text-muted)]/40 bg-[color:var(--app-text-muted)]/18"
                     style={{
                       left: `${leftPercent}%`,
                       width: `${widthPercent}%`,
@@ -134,7 +138,7 @@ export function AreaCorridorLadder({
           <span>Left: restart zone</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block h-2 w-4 bg-amber-400/20 border border-amber-400/40" />
+          <span className="inline-block h-2 w-4 border border-[color:var(--app-text-muted)]/40 bg-[color:var(--app-text-muted)]/18" />
           <span>Shaded: gap before pausing</span>
         </span>
         <span className="flex items-center gap-1.5">
