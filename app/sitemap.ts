@@ -166,7 +166,7 @@ const resolveSitemapReadiness = async (): Promise<{
  * with it, and crawl diagnostics read per segment instead of one undifferentiated
  * list. `pages` holds the hubs and static pages that are not part of a corpus.
  */
-const SITEMAP_SEGMENTS = ["pages", "answers", "signals", "history", "briefs"] as const;
+export const SITEMAP_SEGMENTS = ["pages", "answers", "signals", "history", "briefs"] as const;
 type SitemapSegment = (typeof SITEMAP_SEGMENTS)[number];
 
 export async function generateSitemaps(): Promise<Array<{ id: SitemapSegment }>> {
