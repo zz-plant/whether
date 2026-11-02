@@ -17,6 +17,8 @@ import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocu
 import { applyStageToWeeklyCall } from "../report/weeklyCallContract";
 import { describePlanLineStates } from "../alert/planLines";
 import { briefWeekChangeLine, EXPORT_SECTION_HEADINGS } from "../export/briefBuilders";
+import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
+import { decisionAreaOrder } from "../report/boundedDecisionRules";
 import { OG_CONDITION_INK, OG_LINE_CROSSED, OG_PANEL, OG_RULE, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "../image/ogTheme";
 
 /**
@@ -80,6 +82,8 @@ export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | un
     {
       label: regimeSignalLabel.tightness,
       value: `${scores.tightness}/100`,
+      score: scores.tightness,
+      threshold: document.readings.thresholds.tightnessRegime ?? null,
       meaning: signalReadingMeaning("tightness", scores.tightness),
       /* Above the line is the tighter regime, so above is the worse side here. */
       distance: distanceFromLine(vsThreshold.tightness, "above"),
@@ -87,6 +91,8 @@ export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | un
     {
       label: regimeSignalLabel.riskAppetite,
       value: `${scores.riskAppetite}/100`,
+      score: scores.riskAppetite,
+      threshold: document.readings.thresholds.riskAppetiteRegime ?? null,
       meaning: signalReadingMeaning("riskAppetite", scores.riskAppetite),
       /* The risk line is a floor: below it is risk-off. */
       distance: distanceFromLine(vsThreshold.riskAppetite, "below"),
@@ -94,6 +100,8 @@ export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | un
     {
       label: MARGIN_LABEL,
       value: formatDocumentMargin(document).slice(`${MARGIN_LABEL}: `.length),
+      score: null,
+      threshold: null,
       meaning: null,
       distance: null,
     },
@@ -119,6 +127,10 @@ const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
             `<td style="padding:12px 16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};vertical-align:top;">`,
             `<p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT_MUTED};margin:0 0 4px;">${reading.label}</p>`,
             `<p style="font-size:1.25rem;font-weight:600;margin:0;color:${OG_TEXT};font-variant-numeric:tabular-nums;">${reading.value}</p>`,
+            reading.score !== null
+              ? `<div style="margin:6px 0 0;height:6px;background:${OG_RULE};border-radius:3px;overflow:hidden;"><div style="width:${reading.score}%;height:6px;background:${OG_TEXT};border-radius:3px;"></div></div>` +
+                (reading.threshold !== null ? `<p style="font-size:0.7rem;margin:4px 0 0;color:${OG_TEXT_MUTED};">line at ${reading.threshold}</p>` : "")
+              : "",
             reading.meaning ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${OG_TEXT_SECONDARY};">${reading.meaning}</p>` : "",
             reading.distance ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${deltaColor};">${reading.distance.label}</p>` : "",
             `</td>`,
@@ -230,6 +242,13 @@ export const sendWeeklyBrief = async (options?: {
       const headline = weeklyHeadline(document.slots);
       const pauseIf = document.slots.pauseIf;
       const changeLines = weeklyCallChangeLines(document.slots);
+       /* Per-area actions, so the email stands on its own: what to do in each
+          area this week, not just the overall call. Sorted in the page's area
+          order, the same order every paste prints. */
+       const areaRows = [...document.areaRows].sort((left, right) =>
+         decisionAreaOrder.indexOf(operatingLeverToDecisionArea[left.lever]) -
+         decisionAreaOrder.indexOf(operatingLeverToDecisionArea[right.lever]),
+       );
       const recordDate = document.recordDateLabel;
       /* Which inputs set the scores, beside them, and what the inputs left out would
          do where they would move a line (`ScoringBasis`). */
@@ -264,7 +283,10 @@ export const sendWeeklyBrief = async (options?: {
         `${publicDecisionLabels.call}: ${headline.composed}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
         ...changeLines.map(({ label, value }) => `${label}: ${value}`),
+        ...(areaRows.length ? [`${EXPORT_SECTION_HEADINGS.areas}:`] : []),
+        ...areaRows.map((row) => `• ${row.label}: ${row.areaActionNow}`),
         `Set these lines for your own plan and we'll email you the day one is crossed: ${planLinesUrl}`,
+        `Share or cite this week's brief: ${baseUrl}/share`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
         ...emailTextFooter(recipient.token, baseUrl),
@@ -285,6 +307,26 @@ export const sendWeeklyBrief = async (options?: {
           ? [`<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${EXPORT_SECTION_HEADINGS.changed}:</strong> ${escapeHtml(weekChange)}</p>`]
           : []),
       );
+       if (areaRows.length > 0) {
+         sections.push(
+           `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
+           `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,
+           `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT_MUTED};margin:0 0 8px;">${EXPORT_SECTION_HEADINGS.areas}</p>`,
+           ...areaRows.map(
+             (row) =>
+               `<p style="font-size:0.9rem;margin:0 0 8px;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${escapeHtml(row.label)}.</strong> ${escapeHtml(row.areaActionNow)}</p>`,
+           ),
+           `</td></tr></table>`,
+         );
+       }
+       sections.push(
+         `<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};">`,
+         `<a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;font-weight:600;">Set these lines for your own plan →</a>`,
+         ` · `,
+         `<a href="${baseUrl}/share" style="color:${OG_TEXT};text-decoration:underline;">Share or cite this brief →</a>`,
+         `</p>`,
+       );
+
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
         `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,
