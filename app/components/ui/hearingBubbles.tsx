@@ -69,8 +69,14 @@ export function HearingBubbles({
                   <button
                     type="button"
                     onClick={() => void copyScript(entry.answer)}
-                    aria-label={`Copy reply to ${entry.from}`}
-                    className="inline-flex min-h-[24px] items-center gap-1 rounded border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-0.5 text-fluid-nano text-slate-300 opacity-90 transition-colors hover:border-[color:var(--border-default)] hover:bg-[color:var(--bg-card)] hover:text-slate-100 focus-visible:opacity-100"
+                    /* The visible label is "Copy script", so the accessible name
+                       has to contain those words (WCAG 2.5.3): "Copy reply to
+                       Hiring manager" left a speech-input user with nothing to
+                       say. And 24px was under this repo's own 44px floor — the
+                       button sits in a bubble header, so the height grows rather
+                       than the type (2026-11-02). */
+                    aria-label={`Copy script — reply to ${entry.from}`}
+                    className="weather-hit inline-flex min-h-11 items-center gap-1 rounded border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-0.5 text-fluid-nano text-slate-300 opacity-90 transition-colors hover:border-[color:var(--border-default)] hover:bg-[color:var(--bg-card)] hover:text-slate-100 focus-visible:opacity-100"
                   >
                     {isCopied ? (
                       <>
