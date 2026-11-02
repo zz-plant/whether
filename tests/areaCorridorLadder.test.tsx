@@ -3,6 +3,7 @@ import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
 import { buildDecisionCorridorModel } from "../lib/report/operatingCalls";
 import { buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
+import { buildHomeAreaRows } from "../lib/report/home/homeSectionModel";
 import { AreaCorridorLadder } from "../app/components/ui/areaCorridorLadder";
 
 describe("5-area decision corridor ladder model & component", () => {
@@ -42,13 +43,89 @@ describe("5-area decision corridor ladder model & component", () => {
     const html = renderToStaticMarkup(<AreaCorridorLadder model={model} />);
 
     assert.match(html, /data-area-corridor-ladder/);
-    assert.match(html, /Decision corridor &amp; unlocking order/);
+    assert.match(html, /How close each area is to its line/);
     assert.match(html, /Safety buffer: \d+ pts gap/);
     assert.match(html, /On hold · \d+ pts to unlock/);
+    assert.match(html, /\d+ pts from pausing/);
     assert.match(html, /Hiring/);
     assert.match(html, /Roadmap/);
     assert.match(html, /Fundraising/);
     assert.match(html, /Spending/);
     assert.match(html, /New bets/);
+    /* Four areas sit 24 points from their restart line on this reading, so the
+       caption names the count rather than picking one of them. */
+    assert.match(html, /4 areas 24 pts from unlocking/);
+    assert.doesNotMatch(html, /closest to unlocking/);
+  });
+
+  /*
+   * One rule, one line, one answer (2026-11-01). The ladder used to pick a metric
+   * per area from a fixed table — risk appetite for roadmap and new bets — while
+   * the card beside it showed a pause line already crossed if there was one. At
+   * funding pressure 90 and risk appetite 55 the card said "New bets · On hold"
+   * (its tightness line, at 90) and the ladder said "11 pts from pausing" (its
+   * risk-appetite line, at 55): two statements about one area, on one screen.
+   *
+   * The grid is the guard: every reading, every area, the same state and the same
+   * distance in both surfaces.
+   */
+  it("binds the same pause line the area cards do, at every reading", () => {
+    const regimes = ["SCARCITY", "DEFENSIVE", "VOLATILE", "EXPANSION"] as const;
+    const disagreements: string[] = [];
+    for (const regime of regimes) {
+      for (let tightness = 0; tightness <= 100; tightness += 10) {
+        for (let riskAppetite = 0; riskAppetite <= 100; riskAppetite += 10) {
+          const gridScores = { tightness, riskAppetite };
+          const gridRules = buildCanonicalBoundedDecisionRules({
+            regime,
+            thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+            scores: gridScores,
+          });
+          const cards = buildHomeAreaRows({ decisionRules: gridRules, movement: null, scores: gridScores });
+          const ladder = buildDecisionCorridorModel(gridRules, gridScores);
+          for (const area of ladder.areas) {
+            const card = cards.find((candidate) => candidate.area === area.area);
+            if (!card?.pause) continue;
+            const held = area.state === "crossed";
+            const cardPoints = card.pause.met ? 0 : card.pause.points;
+            const ladderPoints = held ? 0 : area.distanceToPause;
+            if (card.pause.met !== held || Math.abs(cardPoints - ladderPoints) > 1e-9) {
+              disagreements.push(
+                `${regime} ${tightness}/${riskAppetite} ${area.area}: card ${card.pause.met ? "On hold" : `${card.pause.points} pts`} (${card.pause.metric}), ladder ${area.state} ${area.distanceToPause} pts (${area.metric})`,
+              );
+            }
+          }
+        }
+      }
+    }
+    assert.deepEqual(disagreements, [], `\n${disagreements.slice(0, 10).join("\n")}\n`);
+  });
+
+  /* A rule whose restart line is on the other metric has no gap to shade on this
+     row's scale. It still says where the area stands. No canonical rule has that
+     shape, so the fixture strips hiring's tightness restart line. */
+  it("draws a row without a shaded gap when the two lines are on different metrics", () => {
+    const splitScores = { tightness: 90, riskAppetite: 55 };
+    const splitRules = buildCanonicalBoundedDecisionRules({
+      regime: "SCARCITY",
+      thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+      scores: splitScores,
+    }).map((rule) =>
+      rule.area === "hiring"
+        ? {
+            ...rule,
+            resume: { ...rule.resume, conditions: rule.resume.conditions.filter((condition) => condition.metric !== "tightness") },
+          }
+        : rule,
+    );
+    const model = buildDecisionCorridorModel(splitRules, splitScores);
+    const hiring = model.areas.find((area) => area.area === "hiring");
+    assert.ok(hiring);
+    assert.equal(hiring.metric, "tightness");
+    assert.equal(hiring.resumeLine, undefined);
+    assert.equal(hiring.normalizedResume, undefined);
+    assert.equal(hiring.distanceToUnlock, undefined);
+    const html = renderToStaticMarkup(<AreaCorridorLadder model={model} />);
+    assert.match(html, /On hold<\/span>/);
   });
 });

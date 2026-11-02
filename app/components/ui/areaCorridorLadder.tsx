@@ -1,4 +1,5 @@
 import type { DecisionCorridorModel } from "../../../lib/report/operatingCalls";
+import { formatPoints } from "../../../lib/report/home/homeSectionModel";
 import { AreaIcon } from "./conceptIcons";
 
 /**
@@ -16,26 +17,39 @@ export function AreaCorridorLadder({
 }) {
   if (model.areas.length === 0) return null;
 
+  /* "Closest" only when one area is closest. Four areas can sit the same distance
+     from their restart line — at funding pressure 90 four of the five do — and a
+     caption naming one of them claims an order the readings do not support. */
+  const closest = model.closestToUnlock;
+  const tiedAtClosest = closest
+    ? model.areas.filter((area) => area.state === "crossed" && area.distanceToUnlock === closest.distanceToUnlock).length
+    : 0;
+
   return (
     <figure
       data-area-corridor-ladder
       className={`rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-4 space-y-3 ${className}`.trim()}
     >
       <figcaption className="flex flex-wrap items-baseline justify-between gap-2 text-xs">
-        <span className="font-semibold text-slate-200">Decision corridor & unlocking order</span>
+        <span className="font-semibold text-slate-200">How close each area is to its line</span>
         <span className="tabular-nums text-slate-400">
           {model.heldCount === 0
             ? "All 5 areas clear of pause lines"
-            : model.closestToUnlock
-              ? `${model.closestToUnlock.label} closest to unlocking (${model.closestToUnlock.distanceToUnlock} pts away)`
-              : `${model.heldCount} of 5 areas on hold`}
+            : closest && tiedAtClosest > 1
+              ? `${tiedAtClosest} areas ${closest.distanceToUnlock} pts from unlocking`
+              : closest
+                ? `${closest.label} closest to unlocking (${closest.distanceToUnlock} pts away)`
+                : `${model.heldCount} of 5 areas on hold`}
         </span>
       </figcaption>
 
       <div className="space-y-2.5">
         {model.areas.map((area) => {
-          const leftPercent = Math.min(area.normalizedResume, area.normalizedPause);
-          const widthPercent = Math.abs(area.normalizedPause - area.normalizedResume);
+          /* A rule whose restart line is on the other metric has no gap to shade
+             on this row's scale; the pause marker and the reading still draw. */
+          const hasGap = area.normalizedResume !== undefined;
+          const leftPercent = hasGap ? Math.min(area.normalizedResume!, area.normalizedPause) : 0;
+          const widthPercent = hasGap ? Math.abs(area.normalizedPause - area.normalizedResume!) : 0;
           const isHeld = area.state === "crossed";
           const isNear = area.state === "near";
 
@@ -55,12 +69,18 @@ export function AreaCorridorLadder({
                 <span className="tabular-nums">
                   {isHeld ? (
                     <span className="text-semantic-caution-fg font-medium">
-                      On hold · {area.distanceToUnlock} pts to unlock
+                      {area.distanceToUnlock === undefined
+                        ? "On hold"
+                        : `On hold · ${area.distanceToUnlock} pts to unlock`}
                     </span>
                   ) : isNear ? (
-                    <span className="text-amber-300 font-medium">Near pause line</span>
+                    <span className="text-amber-300 font-medium">
+                      Close · {formatPoints(area.distanceToPause)} from pausing
+                    </span>
                   ) : (
-                    <span className="text-slate-400">Clear</span>
+                    <span className="text-slate-400">
+                      {formatPoints(area.distanceToPause)} from pausing
+                    </span>
                   )}
                 </span>
               </div>
@@ -68,19 +88,23 @@ export function AreaCorridorLadder({
               {/* Corridor Track */}
               <div className="relative h-2.5 w-full rounded-full bg-[color:var(--bg-raised)] overflow-hidden">
                 {/* Safety buffer zone */}
-                <div
-                  className="absolute inset-y-0 bg-amber-400/20 border-x border-amber-400/40"
-                  style={{
-                    left: `${leftPercent}%`,
-                    width: `${widthPercent}%`,
-                  }}
-                  title={`Safety buffer: ${area.deadbandPoints} pts gap between pause (${area.pauseLine}) and restart (${area.resumeLine})`}
-                />
+                {hasGap ? (
+                  <div
+                    className="absolute inset-y-0 bg-amber-400/20 border-x border-amber-400/40"
+                    style={{
+                      left: `${leftPercent}%`,
+                      width: `${widthPercent}%`,
+                    }}
+                    title={`Safety buffer: ${area.deadbandPoints} pts gap between pause (${area.pauseLine}) and restart (${area.resumeLine})`}
+                  />
+                ) : null}
                 {/* Resume line marker */}
-                <div
-                  className="absolute inset-y-0 w-0.5 bg-semantic-easing-border z-10"
-                  style={{ left: `${area.normalizedResume}%` }}
-                />
+                {hasGap ? (
+                  <div
+                    className="absolute inset-y-0 w-0.5 bg-semantic-easing-border z-10"
+                    style={{ left: `${area.normalizedResume}%` }}
+                  />
+                ) : null}
                 {/* Pause line marker */}
                 <div
                   className="absolute inset-y-0 w-0.5 bg-semantic-caution-border z-10"
@@ -107,15 +131,15 @@ export function AreaCorridorLadder({
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 pt-1 text-fluid-nano text-slate-400 border-t border-[color:var(--border-faint)]">
         <span className="flex items-center gap-1.5">
           <span className="inline-block size-2 rounded-full bg-emerald-400" />
-          <span>Left: Safe / Restart zone</span>
+          <span>Left: restart zone</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-2 w-4 bg-amber-400/20 border border-amber-400/40" />
-          <span>Shaded: Safety buffer</span>
+          <span>Shaded: gap before pausing</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block size-2 rounded-full bg-semantic-caution-fg" />
-          <span>Right: Paused zone</span>
+          <span>Right: pause zone</span>
         </span>
       </div>
     </figure>

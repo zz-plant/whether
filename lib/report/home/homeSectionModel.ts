@@ -5,6 +5,7 @@ import { describeInputMovement } from "../inputMovement";
 import {
   formatPointsToLine,
   resolveLineState,
+  selectPauseCondition,
   toThresholdDistance,
   type ActionStripItem,
   type LineState,
@@ -221,7 +222,12 @@ const lineSlot = (distance: RuleThresholdDistance | undefined, kind: "pause" | "
       }
     : undefined;
 
-const formatPoints = (points: number) =>
+/**
+ * A points count as the brief prints it: "1 pt", "11 pts", "10.5 pts". Shared by
+ * the picker's area cards and the ladder under them, which print the same
+ * distance for the same area.
+ */
+export const formatPoints = (points: number) =>
   `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"}`;
 
 /**
@@ -385,14 +391,13 @@ export const describeConditionsTrail = (recordDates: readonly string[]): string 
   return `The trail shows each month, ${range}, then this week.`;
 };
 
-const nearest = (distances: RuleThresholdDistance[]) =>
-  [...distances].sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
-
 /*
  * The one line a row prints for each side, chosen by what explains the state.
  * A pause holds on any of its lines, so the line to show is one already crossed,
- * else the nearest. A resume needs all of its lines, so the line to show is the
- * furthest still unmet — the one actually holding it back — else any.
+ * else the nearest — `selectPauseCondition`, shared with the ladder under these
+ * cards so the two cannot describe one area differently. A resume needs all of
+ * its lines, so the line to show is the furthest still unmet — the one actually
+ * holding it back — else any.
  *
  * Both used to take the nearest. On the week of Sep 29, 2026 that printed
  * fundraising's pause as "Risk appetite < 44 · at the line" beside "Pause now
@@ -400,9 +405,6 @@ const nearest = (distances: RuleThresholdDistance[]) =>
  * appetite > 54 · 10 pts away" while funding pressure, 24 points from its own
  * restart line, was what kept hiring paused.
  */
-const pauseLineToShow = (distances: RuleThresholdDistance[]) =>
-  distances.find((distance) => distance.satisfied) ?? nearest(distances);
-
 const resumeLineToShow = (distances: RuleThresholdDistance[]) => {
   const unmet = distances.filter((distance) => !distance.satisfied);
   return unmet.length > 0
@@ -449,7 +451,7 @@ export const buildHomeAreaRows = ({
         area,
         rule: item.areaActionNow,
         pause: lineSlot(
-          item.pauseConditions?.length ? pauseLineToShow(distancesFor(item.pauseConditions, scores)) : item.nearestPause,
+          item.pauseConditions?.length ? selectPauseCondition(item.pauseConditions, scores) : item.nearestPause,
           "pause",
         ),
         resume: lineSlot(
@@ -466,7 +468,7 @@ export const buildHomeAreaRows = ({
   return decisionRules.map((rule) => ({
     area: rule.area,
     rule: rule.doNow[0] ?? rule.recommendation,
-    pause: lineSlot(pauseLineToShow(distancesFor(rule.pause.conditions, scores)), "pause"),
+    pause: lineSlot(selectPauseCondition(rule.pause.conditions, scores), "pause"),
     resume: lineSlot(resumeLineToShow(distancesFor(rule.resume.conditions, scores)), "resume"),
     ...changedFor(rule.area),
     pauseQualifier: rule.pause.qualifier,
