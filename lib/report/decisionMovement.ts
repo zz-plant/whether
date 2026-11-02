@@ -396,9 +396,14 @@ export const describeGuidanceChange = ({
 export const describeMovementCause = (movement: Pick<DecisionMovement, "groups" | "comparedWith">): string => {
   const crossings = uniqueLines(movement.groups.flatMap((group) => group.crossed)).map(describeCrossing);
   if (crossings.length > 0) return `${upperFirst(joinAnd(crossings))}.`;
+  /* "No new line", not "No line" (2026-11-01): this prints on the card directly
+     under "On hold: Hiring, Fundraising, Spending and New bets", and the two
+     read as a contradiction. The four areas did cross their pause lines; they
+     crossed them before the earlier reading, and this sentence is about the
+     week since. */
   return movement.comparedWith
-    ? `No line was crossed since ${movement.comparedWith}.`
-    : "No line was crossed.";
+    ? `No new line was crossed since ${movement.comparedWith}.`
+    : "No new line was crossed.";
 };
 
 export const fitMovementHeadline = (movement: Pick<DecisionMovement, "headline" | "headlines">, maxLength: number): string =>

@@ -79,7 +79,7 @@ export function CompanyCalibration({
             Rules for a <span className="font-semibold text-slate-100">{stageLabel}</span> company with{" "}
             <span className="font-semibold text-slate-100">{runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}</span> of runway
             <span aria-hidden="true"> · </span>
-            <span className="text-[var(--accent-action)] underline underline-offset-4 group-open:hidden">Change</span>
+            <span className="text-[var(--accent-action)] underline underline-offset-4 group-open:hidden">Change stage and runway</span>
             <span className="hidden text-[var(--accent-action)] underline underline-offset-4 group-open:inline">Done</span>
           </span>
         </summary>

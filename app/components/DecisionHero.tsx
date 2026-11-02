@@ -179,15 +179,25 @@ export function DecisionHero({
           {/* The reader's place, beside the weather: a chip rather than a line,
               because it is a control (it opens the stage and runway selectors)
               and the stamp row is the card's chrome. No glyph — §XXIV gives
-              each mark a meaning, and "your company" has none yet. */}
+              each mark a meaning, and "your company" has none yet. So the
+              affordance is the word (2026-11-02): beside a filled placard that
+              is not a control, a bordered chip with no other mark read as a
+              second badge, and its only hint was a `title` that a touch screen
+              never shows. It now carries the same "change" the disclosure below
+              it is labelled with, so the control that rescales every rule on
+              the page can be found without hovering. */}
           {location ? (
             <Link
               href={location.href}
               title={location.hint}
               data-reading-location
-              className="weather-hit inline-flex items-center rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2.5 py-1 text-fluid-xs font-medium text-slate-200 hover:border-[color:var(--border-strong)] hover:text-slate-100"
+              className="weather-hit inline-flex items-center gap-1.5 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2.5 py-1 text-fluid-xs font-medium text-slate-200 hover:border-[color:var(--border-strong)] hover:text-slate-100"
             >
-              {location.label}
+              <span>{location.label}</span>
+              <span aria-hidden="true" className="text-slate-500">·</span>
+              <span className="text-slate-400 underline decoration-slate-600 underline-offset-2">
+                change<span className="sr-only"> stage and runway</span>
+              </span>
             </Link>
           ) : null}
 

@@ -77,7 +77,7 @@ export function AllAreaRules({
       {corridorModel ? <AreaCorridorLadder model={corridorModel} /> : null}
       <details className="weather-auto-chevron group" data-all-area-rules>
         <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
-          All five areas, side by side
+          Every area's rule
         </summary>
         <div className="mt-4 space-y-4">
           {isHistorical ? null : <RunwayConditionedNotes regime={regime} />}
