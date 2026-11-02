@@ -5,7 +5,7 @@ export type ContentIntent = "cfo" | "board" | "vp-product" | "vc-partner";
 type ContentEventType = "organic_entrance" | "cta_conversion" | "assisted_conversion";
 
 /**
- * How a visit arrived, in five buckets and nothing finer.
+ * How a visit arrived, in six buckets and nothing finer.
  *
  * The event was named `organic_entrance` and checked no referrer at all, so
  * direct, paid, and inbound-from-social visits were all counted as organic —
@@ -17,7 +17,7 @@ type ContentEventType = "organic_entrance" | "cta_conversion" | "assisted_conver
  * trackers, and "someone arrived from a search engine" is the whole of what
  * the refresh loop needs to know.
  */
-export type ContentAcquisitionSource = "search" | "social" | "referral" | "direct" | "internal";
+export type ContentAcquisitionSource = "search" | "social" | "ai" | "referral" | "direct" | "internal";
 
 export type ContentMeasurementEvent = {
   pagePath: string;
@@ -31,6 +31,22 @@ export type ContentMeasurementEvent = {
 };
 
 const SEARCH_HOST_PATTERN = /(^|\.)(google|bing|duckduckgo|yahoo|ecosia|startpage|brave|baidu|yandex|qwant|kagi)\./i;
+
+/**
+ * AI assistants, which are now a discovery path of their own. They were folded
+ * into `referral`, so a page cited in a ChatGPT or Perplexity answer looked the
+ * same as a link from a blog. Only the bucket is kept, as with every other
+ * source: the assistant, not the conversation.
+ */
+const AI_HOSTS = new Set([
+  "chatgpt.com",
+  "chat.openai.com",
+  "perplexity.ai",
+  "www.perplexity.ai",
+  "claude.ai",
+  "copilot.microsoft.com",
+  "gemini.google.com",
+]);
 const SOCIAL_HOSTS = new Set([
   "t.co",
   "x.com",
@@ -50,7 +66,7 @@ const SOCIAL_HOSTS = new Set([
 ]);
 
 export const isContentAcquisitionSource = (value: string): value is ContentAcquisitionSource =>
-  value === "search" || value === "social" || value === "referral" || value === "direct" || value === "internal";
+  value === "search" || value === "social" || value === "ai" || value === "referral" || value === "direct" || value === "internal";
 
 /** Classify a referrer into a bucket. Exported for the test; the caller passes `document.referrer`. */
 export const classifyAcquisitionSource = (referrer: string, currentHost: string): ContentAcquisitionSource => {
@@ -66,6 +82,9 @@ export const classifyAcquisitionSource = (referrer: string, currentHost: string)
 
   if (!host) return "direct";
   if (host === currentHost.toLowerCase()) return "internal";
+  /* Exact hosts first: `gemini.google.com` would otherwise match the search
+     pattern on `google.` and read as a search engine. */
+  if (AI_HOSTS.has(host)) return "ai";
   if (SEARCH_HOST_PATTERN.test(host)) return "search";
   if (SOCIAL_HOSTS.has(host)) return "social";
   return "referral";

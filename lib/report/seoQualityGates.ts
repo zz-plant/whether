@@ -1,6 +1,18 @@
 /** How old a reading may be and still be published as current. Shared with `lib/seo/freshnessIndexation.ts`. */
 export const DEFAULT_FRESHNESS_WINDOW_HOURS = 72;
 
+/**
+ * How old the week's call may be before its pages are withheld from the index.
+ *
+ * The reading refreshes daily; the call refreshes weekly (Mondays). Judging both
+ * on the 72-hour read window meant a single missed daily ingest, or a Friday
+ * failure plus a weekend, flipped every answer page and sitemap entry to
+ * `noindex` together. The call's own clock is the week plus slack: ten days
+ * covers a missed Monday publish without de-indexing a still-current call. A
+ * stale *read* now degrades the trust strip rather than the index.
+ */
+export const CALL_FRESHNESS_WINDOW_HOURS = 10 * 24;
+
 type SeoQualityGateId =
   | "decision-completeness"
   | "decision-transmission"
@@ -41,6 +53,8 @@ type EvaluateSeoQualityGatesInput = {
   evidenceCount?: number;
   evidenceTitles?: string[];
   fetchedAtIso?: string;
+  /** The record date the week's call was struck on. Its own clock, slower than the reading's. */
+  recordDateIso?: string;
   isFallbackSnapshot?: boolean;
   freshnessWindowHours?: number;
   trustSummary?: string;
@@ -90,13 +104,24 @@ const buildFreshnessGate = (input: EvaluateSeoQualityGatesInput, now: Date): Seo
     reasons.push("fallback-snapshot");
   }
 
-  const freshnessWindowHours = input.freshnessWindowHours ?? DEFAULT_FRESHNESS_WINDOW_HOURS;
-  const fetchedAtMs = input.fetchedAtIso ? new Date(input.fetchedAtIso).getTime() : Number.NaN;
-  if (Number.isNaN(fetchedAtMs)) {
+  /*
+   * Two clocks. A page is judged on the week's call (the record date), which
+   * moves weekly and gets the ten-day window. The reading's age is a trust-strip
+   * concern, not an indexing one, so `fetchedAtIso` is only the fallback clock
+   * for callers that do not know the record date (and for the 72-hour unit tests).
+   */
+  const usesCallClock = Boolean(input.recordDateIso);
+  const clockIso = input.recordDateIso ?? input.fetchedAtIso;
+  const windowHours = usesCallClock
+    ? CALL_FRESHNESS_WINDOW_HOURS
+    : (input.freshnessWindowHours ?? DEFAULT_FRESHNESS_WINDOW_HOURS);
+
+  const clockMs = clockIso ? new Date(clockIso).getTime() : Number.NaN;
+  if (Number.isNaN(clockMs)) {
     reasons.push("freshness-unknown");
   } else {
-    const ageHours = (now.getTime() - fetchedAtMs) / (1000 * 60 * 60);
-    if (ageHours > freshnessWindowHours) {
+    const ageHours = (now.getTime() - clockMs) / (1000 * 60 * 60);
+    if (ageHours > windowHours) {
       reasons.push("freshness-stale");
     }
   }
@@ -104,6 +129,7 @@ const buildFreshnessGate = (input: EvaluateSeoQualityGatesInput, now: Date): Seo
   return {
     passed: reasons.length === 0,
     reasons,
+    details: { clock: usesCallClock ? "call" : "read", windowHours },
   };
 };
 

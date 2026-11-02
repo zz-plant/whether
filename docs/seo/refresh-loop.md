@@ -1,16 +1,44 @@
 # Monthly refresh loop for high-performing pages
 
-## Trigger criteria
+## Two loops, not one
+
+The traffic-triggered loop below is the *second* loop. It only fires for pages
+already performing, so on its own it never touches a young page that needs
+structural work. The *first* loop is structural and runs on a schedule:
+
+**Quarterly structural audit** — `bun run seo:corpus-audit` (no traffic data
+needed). It fails on duplicate enduring answers and on pages with fewer than two
+onward links, and it warns on pages missing `watchouts`, page-specific `faq`, or
+`updatedAt`. Backfill the warnings during the quarterly pass, then treat the
+audit as a hard gate.
+
+**When the call flips** — every answer page mapped to a flipped area is a review
+candidate. The page renders both its enduring answer and the live call; when
+they disagree (e.g. "hold base pay" under a "loosen spending" week), the reader
+sees a contradiction. Re-read those pages by hand; do not auto-rewrite them.
+
+## Trigger criteria (traffic loop)
 Refresh any page meeting one of:
 - Top quartile organic entrances in its cluster for 2 consecutive months.
 - CTA conversion rate above cluster median for 2 consecutive months.
 - Assisted conversion contribution in top quartile for 2 consecutive months.
+
+Until the corpus has enough traffic for quartiles to mean anything, rank by
+structural signals first (distinctness, onward-link depth, copy-call drift) and
+treat traffic as the tiebreaker.
 
 ## Refresh actions
 1. Verify the dated guidance comes from the canonical report. Review company examples and inputs; do not hardcode current macro thresholds in editorial content.
 2. Refresh metadata only when the enduring answer or query fit changes. Keep weekly readings on the page and live social card, not in stable search descriptions.
 3. Verify CTA language and destination still map to current funnel.
 4. Re-check internal links and keep at least three canonical links live.
+5. Append a row to `content/answers/ledger.json` when the enduring answer changes:
+   `{ slug, changedAt, summary }`. The ledger is the source of truth; the page prints
+   "Answer last reviewed: …" and the sitemap uses `max(ledger date, weekly call date)`, so a
+   review that predates the current week is not hidden behind a weekly `lastmod` bump. Never
+   edit or delete a ledger row — a later `changedAt` for the same slug wins. `seo:corpus-audit`
+   fails if a page's own `updatedAt` disagrees with the ledger or if a ledger row names a slug
+   no page serves.
 
 ## Changelog policy
 Each refreshed page should include a `Changelog` section with:
@@ -20,6 +48,12 @@ Each refreshed page should include a `Changelog` section with:
 - rationale for update
 
 This improves trust and recency for boards/operators reviewing the same page repeatedly.
+
+## What the structured data is for
+`FAQPage` is worth keeping for answer engines and entity clarity, but Google
+restricted FAQ rich results to authoritative government and health sites in 2023.
+Do not plan around FAQ snippets in Google results; plan around the page's visible
+Q&A and the structured data LLM crawlers read.
 
 ## Automated queue artifact
 

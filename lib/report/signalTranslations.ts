@@ -36,32 +36,32 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
   tightness: {
     plainLabel: "Funding pressure",
     whatItMeasures:
-      "How hard or easy it is for U.S. companies to raise and borrow money.",
+      "How hard or easy it is for U.S. companies to raise, borrow, and replace cash.",
     highMeans:
-      "Money is tight — conserve cash, extend runway, defer big bets. Fundraising windows are narrow.",
+      "Money is tight and capital is scarce — projects need fast cash payback. Conserve cash, extend runway, and prioritize work that pays back in under 90 days. Fundraising windows are narrow.",
     lowMeans:
-      "Money is flowing — you can invest in growth, hire ahead of revenue, and lengthen payback timelines.",
+      "Money is flowing and capital is available. You can invest in growth, hire ahead of revenue, and take on longer projects.",
     midMeans:
-      "Money is balanced — invest with milestones and keep options open.",
+      "Money is balanced — fund proven milestones; unproven bets face questions. Keep options open.",
     jargonTerm: "Funding pressure",
-    operatorPrompt: "If I needed to raise or borrow money this month, how hard would it be?",
+    operatorPrompt: "Can we afford a project that takes a year to pay back, or do we need cash in 90 days?",
     historicalContext:
-      "During the 2020–2021 funding boom, this read 20–35. In the 2022–2023 reset, it peaked above 80. Above 70 means money is scarce and rounds take longer.",
+      "During the 2020–2021 funding boom, this read 20–35. In the 2022–2023 reset, it peaked above 80. Above 70 means money is scarce, investors demand proof of revenue, and rounds take longer.",
   },
   riskAppetite: {
     plainLabel: "Risk appetite",
     whatItMeasures:
-      "How willing U.S. investors and buyers are to take risks on new products, hires, and growth bets.",
+      "How willing customers, buyers, and investors are to take risks on new products, hires, and unproven bets.",
     highMeans:
-      "Investors and markets are bold — launch new products, expand headcount, raise capital confidently.",
+      "Investors and markets are bold — buyers want new tools, and investors fund growth. Launch new products, expand headcount, and raise capital confidently.",
     lowMeans:
-      "Markets are risk-averse — focus on retention, profitability, and core product. Delay speculative launches.",
+      "Markets are risk-averse — buyers freeze extra budgets and demand clear return on investment. Focus on retention, profitability, and core product. Delay speculative launches.",
     midMeans:
-      "Markets are selectively open — prove traction before scaling; get customer evidence before making large commitments.",
+      "Markets are selectively open — buyers require clear customer proof before signing large contracts. Prove traction before scaling.",
     jargonTerm: "Risk appetite",
-    operatorPrompt: "Would a new product launch or expansion hire get funded or questioned?",
+    operatorPrompt: "Are customers looking to cut costs, or are they eager to try something new?",
     historicalContext:
-      "During bull markets, this reads 70–85+. In major pullbacks, it falls below 30. Below 45 means investors demand proof of retention and profitability over pure growth.",
+      "During bull markets, this reads 70–85+. In major pullbacks, it falls below 30. Below 45 means investors and buyers demand proof of retention and profitability over pure growth.",
   },
   baseRate: {
     /*
@@ -89,11 +89,11 @@ export const signalPlainEnglish: Record<RegimeSignalKey, SignalPlainEnglish> = {
   curveSlope: {
     plainLabel: "Recession warning gauge",
     whatItMeasures:
-      "A U.S. Treasury market signal that historically warns of recession. Negative (inverted) means short-term borrowing costs exceed long-term yields, which signals caution.",
+      "A U.S. Treasury market signal that historically warns whether economic conditions favor long-horizon bets or short-payback milestones. Negative (inverted) signals caution.",
     highMeans:
-      "No recession warning — the yield curve is normal. Long-horizon planning is safer.",
+      "No recession warning — the yield curve is normal. Long-horizon planning and multi-year project commitments are safer.",
     lowMeans:
-      "Recession warning active — short-term rates exceed long-term yields. Favor short-payback projects and keep options open.",
+      "Recession warning active — short-term rates exceed long-term yields. Favor short-payback projects and keep commitments reversible.",
     midMeans:
       "Curve is neutral/flat — don't rely on this signal alone; also check funding pressure and risk appetite.",
     jargonTerm: "Yield curve slope",

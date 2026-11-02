@@ -27,9 +27,9 @@ jobs:
       - name: Setup Bun and install dependencies
         uses: ./.github/actions/setup-bun
 
-      - name: Freeze the current week
+      - name: Freeze the current week and refresh the SEO runbook
         id: freeze
-        run: bun run brief:freeze
+        run: bun run seo:weekly-runbook
 
       - name: Verify the frozen record parses and routes
         run: bun run test tests/publishedBriefs.test.ts

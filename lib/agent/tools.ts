@@ -27,7 +27,7 @@ import {
   buildPostureArchivePath,
 } from "../summary/postureArchive";
 import { answerPages, matchDecisionPage } from "../../app/answers/decisionPages";
-import { getRegimePublicLabel } from "../regimePresentation";
+import { buildAnswerObject } from "../answers/answerObject";
 import { buildCanonicalUrl } from "../seo";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
 import { AgentInputError, createAgentToolRegistry, defineTool } from "./registry";
@@ -198,34 +198,39 @@ const AGENT_TOOLS = [
       const mappedRules = snapshot.homeBriefModel.decisionRules.filter((rule) =>
         page.mappedDecisionAreas.includes(rule.area),
       );
-      const permalink = buildCanonicalUrl(`/answers/${page.slug}`);
-      const recordDate = reportData.recordDateLabel;
-      const conditions = getRegimePublicLabel(reportData.assessment.regime);
+      /* One answer object, the same one the page renders. */
+      const answer = buildAnswerObject({
+        page,
+        recordDateLabel: reportData.recordDateLabel,
+        regime: reportData.assessment.regime,
+        scores: reportData.assessment.scores,
+        mappedRules,
+      });
 
       return {
         type: "decision_answer",
-        slug: page.slug,
-        title: page.title,
-        permalink,
-        category: page.category,
-        shortAnswer: page.shortAnswer,
-        directAnswer: page.directAnswer,
-        audience: page.audience,
+        slug: answer.slug,
+        title: answer.title,
+        permalink: answer.permalink,
+        category: answer.category,
+        shortAnswer: answer.shortAnswer,
+        directAnswer: answer.directAnswer,
+        audience: answer.audience,
         currentStanding: {
-          recordDate,
-          conditions,
-          scores: reportData.assessment.scores,
+          recordDate: answer.standing.recordDateLabel,
+          conditions: answer.standing.conditions,
+          scores: answer.standing.scores,
         },
-        rulesInForce: mappedRules.map((rule) => ({
+        rulesInForce: answer.rules.map((rule) => ({
           area: rule.area,
-          actionNow: rule.doNow[0] ?? rule.recommendation,
-          pauseIf: rule.pauseTrigger,
-          resumeWhen: rule.resumeTrigger,
+          actionNow: rule.actionNow,
+          pauseIf: rule.pauseIf,
+          resumeWhen: rule.resumeWhen,
         })),
-        companyInputs: page.companyInputs,
-        decisionNoteTemplate: page.decisionNote,
-        citation: `Whether Weekly Brief (Week of ${recordDate}): "${page.title}" — ${permalink}`,
-        attributionSnippet: `According to Whether's weekly guidance for startup leaders (Week of ${recordDate}, ${permalink}): "${page.shortAnswer}"`,
+        companyInputs: answer.companyInputs,
+        decisionNoteTemplate: answer.decisionNote,
+        citation: answer.citation,
+        attributionSnippet: answer.attributionSnippet,
         use: buildUseConstraint(),
       };
     },

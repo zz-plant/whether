@@ -47,6 +47,8 @@ type PageMetric = {
    * this can read far below `entrances30d` on a window that spans the change.
    */
   organicSearchEntrances30d: number;
+  /** Entrances an AI assistant (ChatGPT, Perplexity, Claude) referred. */
+  aiEntrances30d: number;
   /** The full split, so a reader can see what share is still unclassified. */
   entrancesBySource: Record<ContentAcquisitionSource | "unclassified", number>;
   ctaConversions30d: number;
@@ -69,9 +71,9 @@ type PageMetricsFile = {
 
 const ENTRANCE_DEFINITION =
   "entrances30d counts every first-visit entrance per session. organicSearchEntrances30d "
-  + "counts the ones a search engine referred; entrancesBySource.unclassified counts rows "
-  + "written before the tracker classified acquisition, so a window spanning that change "
-  + "under-reports every classified bucket.";
+  + "counts the ones a search engine referred; aiEntrances30d counts the ones an AI assistant "
+  + "referred; entrancesBySource.unclassified counts rows written before the tracker classified "
+  + "acquisition, so a window spanning that change under-reports every classified bucket.";
 
 type ParsedEvent = {
   pagePath: string;
@@ -126,7 +128,8 @@ const parseRow = (row: TelemetryRow): ParsedEvent | null => {
 const emptyMetric = (): PageMetric => ({
   entrances30d: 0,
   organicSearchEntrances30d: 0,
-  entrancesBySource: { search: 0, social: 0, referral: 0, direct: 0, internal: 0, unclassified: 0 },
+  aiEntrances30d: 0,
+  entrancesBySource: { search: 0, social: 0, ai: 0, referral: 0, direct: 0, internal: 0, unclassified: 0 },
   ctaConversions30d: 0,
   ctaConversionRate: null,
   assistedConversions30d: 0,
@@ -166,6 +169,7 @@ export const buildPageMetrics = (
       metric.entrances30d += 1;
       metric.entrancesBySource[event.source ?? "unclassified"] += 1;
       if (event.source === "search") metric.organicSearchEntrances30d += 1;
+      if (event.source === "ai") metric.aiEntrances30d += 1;
     }
     else if (event.type === "cta_conversion") metric.ctaConversions30d += 1;
     else if (event.type === "assisted_conversion") metric.assistedConversions30d += 1;
