@@ -28,7 +28,7 @@ export function HearingSection({
     <HomeSection
       id={HOME_SECTIONS.hearing.id}
       heading={HOME_SECTIONS.hearing.heading}
-      lead="The pushback, takes and questions this week's crossed lines bring into the room, and the reply each line gives."
+      lead="The pushback, questions and objections the areas on hold invite, and the reply each one gets."
       action={(
         <ActionLink
           href={`/resources?stakeholder=${firstEntry.guide.slug}#guided-translation-results`}

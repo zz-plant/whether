@@ -89,10 +89,17 @@ export function WhyConditionsSection({
          own, what each reading means, is a clause here. */
       lead={(
         <>
+          {/* One template for two lines with opposite polarity (2026-11-01). "Risk
+              appetite is above its 50 change line: investors are selective about
+              risk" read as a penalty, because the funding-pressure sentence before
+              it uses the colon to mean "this is what being above the line costs
+              you". Above the risk-appetite line is the safe side. The semicolon
+              states the position and then the reading, and the score is named so a
+              reader can hold it against the line on the map. */}
           Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
           line: {signalReadingMeaning("tightness", tightness)}. Risk appetite is{" "}
-          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its {changeLines.riskAppetite} change line:{" "}
-          {signalReadingMeaning("riskAppetite", riskAppetite)}. Together they put conditions in{" "}
+          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its {changeLines.riskAppetite} change line;
+          at {Math.round(riskAppetite)}, {signalReadingMeaning("riskAppetite", riskAppetite)}. Together they put conditions in{" "}
           <span className="font-semibold">{regimeLabel}</span>.
         </>
       )}

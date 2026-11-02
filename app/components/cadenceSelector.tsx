@@ -14,8 +14,8 @@ type CadenceKey = "weekly" | "monthly" | "quarterly";
    call leads at every horizon, so the band follows the call it extends. */
 const CADENCES: readonly SegmentedOption<CadenceKey>[] = [
   { key: "weekly", label: "Weekly" },
-  { key: "monthly", label: "Monthly", sublabel: "adds the month's call" },
-  { key: "quarterly", label: "Quarterly", sublabel: "adds the quarter's call" },
+  { key: "monthly", label: "Monthly", sublabel: "adds the month's guidance" },
+  { key: "quarterly", label: "Quarterly", sublabel: "adds the quarter's guidance" },
 ];
 
 const DEFAULT_CADENCE: CadenceKey = "weekly";

@@ -77,7 +77,7 @@ describe("the by-area Changed column", () => {
     assert.ok(rows.every((row) => row.changed === undefined && row.changedKind === undefined));
     assert.doesNotMatch(renderTable(rows), /<th[^>]*>Changed<\/th>/);
     assert.ok(movement);
-    assert.equal(describeMovementCause(movement), "No line was crossed since Aug 31.");
+    assert.equal(describeMovementCause(movement), "No new line was crossed since Aug 31.");
   });
 
   it("carries no claim where nothing was compared", () => {

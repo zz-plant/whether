@@ -131,6 +131,21 @@ describe("the card says where the reading is scaled to", () => {
     assert.match(html, /Series A · 6–12 mo · short payback only/);
   });
 
+  it("names the action in the chip, not only in a title a touch screen never shows", () => {
+    // Beside a filled placard that is not a control, the bordered chip read as a
+    // second badge: its only hint was `title`, which has no hover to fire on a
+    // phone (2026-11-02).
+    const html = renderToStaticMarkup(
+      <DecisionHero
+        weeklyCall="Hold approvals steady."
+        regime="DEFENSIVE"
+        location={{ label: "Series A · 12–24 mo", href: "#company-calibration", hint: "Change your stage and runway" }}
+      />,
+    );
+    assert.match(html, />change<span class="sr-only"> stage and runway<\/span>/);
+    assert.match(html, /underline/);
+  });
+
   it("draws nothing when the page has no stage to name", () => {
     const html = renderToStaticMarkup(<DecisionHero weeklyCall="Hold approvals steady." regime="DEFENSIVE" />);
     assert.ok(!html.includes("data-reading-location"));

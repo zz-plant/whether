@@ -311,6 +311,6 @@ describe("describeMovementCause", () => {
   it("says no line was crossed, dated by the comparison, on a week that held", () => {
     const held = movement({ from: { tightness: 90, riskAppetite: 43 }, to: { tightness: 90, riskAppetite: 43 }, regime: "SCARCITY" });
     assert.ok(held);
-    assert.equal(describeMovementCause(held), "No line was crossed since Aug 31.");
+    assert.equal(describeMovementCause(held), "No new line was crossed since Aug 31.");
   });
 });

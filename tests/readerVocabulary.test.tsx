@@ -37,10 +37,12 @@ import { buildWeeklyStructured, buildWeeklySummary } from "../lib/summary/weekly
 import { buildYearlySummary } from "../lib/summary/yearlySummary";
 import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { DecisionPicker } from "../app/components/home/DecisionPicker";
+import { AreaCorridorLadder } from "../app/components/ui/areaCorridorLadder";
+import { buildDecisionCorridorModel } from "../lib/report/operatingCalls";
 import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
 import { CompanyCalibration } from "../app/components/home/CompanyCalibration";
 import { AlertSection } from "../app/components/home/AlertSection";
-import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
+import { decisionAreaOrder, buildCanonicalBoundedDecisionRules } from "../lib/report/boundedDecisionRules";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
 
 serveUnreachableUpstreams();
@@ -262,13 +264,43 @@ const routeSurfaces: Surface[] = [
   },
   {
     name: "/ decision picker",
+    /* One area on hold, so the held branch of the expectation line renders and is
+       counted (2026-11-01). With every pause undefined the picker printed "Most
+       weeks neither happens", and the other branch — which carried the retired
+       word "call" — never reached this file. */
     text: () =>
       visibleText(
         renderToStaticMarkup(
           <DecisionPicker
-            options={decisionAreaOrder.map((area) => ({ area, rule: "Rule", pause: undefined, resume: undefined }))}
+            options={decisionAreaOrder.map((area, index) => ({
+              area,
+              rule: "Rule",
+              pause:
+                index === 0
+                  ? { line: "Funding pressure > 76", distance: "On hold", points: 0, met: true, metric: "tightness" as const }
+                  : undefined,
+              resume: undefined,
+            }))}
             regime="SCARCITY"
            
+          />,
+        ),
+      ),
+  },
+  {
+    name: "/ area ladder",
+    text: () =>
+      visibleText(
+        renderToStaticMarkup(
+          <AreaCorridorLadder
+            model={buildDecisionCorridorModel(
+              buildCanonicalBoundedDecisionRules({
+                regime: "SCARCITY",
+                thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
+                scores: { tightness: 90, riskAppetite: 55 },
+              }),
+              { tightness: 90, riskAppetite: 55 },
+            )}
           />,
         ),
       ),

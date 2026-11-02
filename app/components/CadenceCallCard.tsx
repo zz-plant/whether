@@ -187,6 +187,7 @@ export function CadenceCallCard({ model }: { model: CadenceCallModel }) {
           title={model.shareTitle}
           text={model.headline}
           lines={model.shareLines}
+          url={model.shareUrl}
           label={model.shareLabel}
           copiedLabel={model.shareCopiedLabel}
           showLabel

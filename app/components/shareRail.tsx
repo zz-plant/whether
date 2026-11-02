@@ -10,6 +10,7 @@ import {
   formatBriefArtifact,
   type BriefFormatId,
 } from "../../lib/report/briefArtifact";
+import { siteUrl } from "../../lib/siteUrl";
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
@@ -108,11 +109,12 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
 
   const activeFormat = BRIEF_FORMATS.find((option) => option.id === format) ?? BRIEF_FORMATS[0];
 
-  /* `window` is read here rather than in `formatBriefArtifact` so the formatters
-     stay pure and testable off a fixed origin. The panel only ever renders in a
-     browser, but the effect-loaded artifact means the first pass has none. */
+  /* The canonical origin, not `window.location.origin` (2026-11-02): the same
+     string is now what Copy Brief under the call copies, and a paste outlives
+     the host it was made on. A preview deployment writing its own hostname into
+     a Slack message leaves a dead link behind it. */
   const briefText = useMemo(
-    () => (artifact ? formatBriefArtifact(artifact, format, window.location.origin) : ""),
+    () => (artifact ? formatBriefArtifact(artifact, format, siteUrl) : ""),
     [artifact, format],
   );
 

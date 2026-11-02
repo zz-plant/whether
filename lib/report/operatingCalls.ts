@@ -134,6 +134,28 @@ export const toThresholdDistance = (condition: RuleCondition, scores: CurrentSco
 };
 
 /**
+ * The one pause line a rule is judged by.
+ *
+ * A pause holds on *any* of its lines (the conditions are an OR), so the line to
+ * show is one already crossed, else the nearest. This is the choice the area
+ * cards have always made, and the ladder under them now makes the same one
+ * (2026-11-01): it picked a metric per area from a fixed table instead —
+ * risk appetite for roadmap and new bets — so at funding pressure 90 and risk
+ * appetite 55 the card said "New bets · On hold" (its tightness line, at 90) and
+ * the ladder said "11 pts from pausing" (its risk-appetite line, at 55). Two
+ * statements about one area, from one rule, disagreeing on screen.
+ */
+export const selectPauseCondition = (
+  conditions: readonly RuleCondition[] | undefined,
+  scores: CurrentScores,
+): RuleThresholdDistance | undefined => {
+  const distances = (conditions ?? []).map((condition) => toThresholdDistance(condition, scores));
+  if (distances.length === 0) return undefined;
+  return distances.find((distance) => distance.satisfied)
+    ?? [...distances].sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
+};
+
+/**
  * One composite signal, ready to draw as a threshold rail.
  *
  * A bounded rule is three numbers on one scale — where the signal is, where it
@@ -537,17 +559,28 @@ type AreaCorridorLadderItem = {
   metric: RuleConditionMetric;
   currentScore: number;
   pauseLine: number;
-  resumeLine: number;
+  /** The restart line, when the rule states one on the same metric as the pause line. */
+  resumeLine?: number;
   /** Normalized 0–100 coordinate for the reading (trouble/pause is on the right). */
   normalizedCurrent: number;
   /** Normalized coordinate for the pause line. */
   normalizedPause: number;
-  /** Normalized coordinate for the resume line. */
-  normalizedResume: number;
-  /** Buffer zone width in points (|pauseLine - resumeLine|). */
+  /** Normalized coordinate for the restart line, when it shares the pause line's metric. */
+  normalizedResume?: number;
+  /** Buffer zone width in points (|pauseLine - resumeLine|); 0 when there is no gap to draw. */
   deadbandPoints: number;
-  /** Distance in score points needed to cross the resume line (0 if already met or area not on hold). */
-  distanceToUnlock: number;
+  /**
+   * Distance in score points needed to cross the restart line. Undefined when the
+   * area is not on hold, or when its restart line is on the other metric and so
+   * cannot be placed on this row's scale.
+   */
+  distanceToUnlock?: number;
+  /**
+   * Distance in score points still to travel before the pause line is crossed
+   * (0 once it is). Printed on rows that are not on hold; a held row prints its
+   * distance to unlock instead.
+   */
+  distanceToPause: number;
   state: LineState;
 };
 
@@ -567,46 +600,38 @@ export const buildDecisionCorridorModel = (
   const items: AreaCorridorLadderItem[] = [];
 
   for (const rule of rules) {
-    // Primary binding metric for the area: tightness for hiring/spending, riskAppetite for roadmap/bets.
-    // For capital-raising, pick tightness if paused by it or nearest to it.
-    const pauseTightness = rule.pause.conditions.find((c) => c.metric === "tightness");
-    const resumeTightness = rule.resume.conditions.find((c) => c.metric === "tightness");
-    const pauseRisk = rule.pause.conditions.find((c) => c.metric === "riskAppetite");
-    const resumeRisk = rule.resume.conditions.find((c) => c.metric === "riskAppetite");
+    /* The line the card beside this ladder judges the area by, not a metric
+       picked from a per-area table: one rule, one line, one answer. */
+    const pause = selectPauseCondition(rule.pause.conditions, scores);
+    if (!pause) continue;
 
-    const useTightness =
-      rule.area === "hiring" || rule.area === "burn-discipline" || !pauseRisk
-        ? true
-        : rule.area === "product-tempo" || rule.area === "expansion-bets" || !pauseTightness
-          ? false
-          : (scores.tightness / 100) >= (1 - scores.riskAppetite / 100);
+    const metric: RuleConditionMetric = pause.metric;
+    /* The gap the ladder shades runs between the pause and restart lines, so it
+       needs both on the same scale. A rule whose restart line is on the other
+       metric draws the pause marker and the reading alone — the row still says
+       where the area stands, it just has no gap to shade. */
+    const resume = rule.resume.conditions.find((condition) => condition.metric === metric);
 
-    const pauseCond = useTightness ? pauseTightness : pauseRisk;
-    const resumeCond = useTightness ? resumeTightness : resumeRisk;
-
-    if (!pauseCond || !resumeCond) continue;
-
-    const metric: RuleConditionMetric = useTightness ? "tightness" : "riskAppetite";
     const currentScore = scores[metric];
-    const pauseLine = pauseCond.value;
-    const resumeLine = resumeCond.value;
+    const pauseLine = pause.value;
+    const resumeLine = resume?.value;
 
     // Normalize so 0 is easiest/safest and 100 is strictest/trouble.
     // Tightness: 0 is cheap (safe), 100 is tight (trouble) -> already aligned.
     // Risk appetite: 100 is high appetite (safe), 0 is low (trouble) -> invert (100 - val).
-    const normalizedCurrent = useTightness ? currentScore : 100 - currentScore;
-    const normalizedPause = useTightness ? pauseLine : 100 - pauseLine;
-    const normalizedResume = useTightness ? resumeLine : 100 - resumeLine;
+    const normalizedCurrent = metric === "tightness" ? currentScore : 100 - currentScore;
+    const normalizedPause = metric === "tightness" ? pauseLine : 100 - pauseLine;
+    const normalizedResume = resumeLine === undefined ? undefined : metric === "tightness" ? resumeLine : 100 - resumeLine;
 
-    const deadbandPoints = Math.abs(pauseLine - resumeLine);
-    const pauseMet = isRuleConditionMet(pauseCond, currentScore);
-    const resumeMet = isRuleConditionMet(resumeCond, currentScore);
+    const deadbandPoints = resumeLine === undefined ? 0 : Math.abs(pauseLine - resumeLine);
+    const pauseMet = pause.satisfied;
+    const resumeMet = resume ? isRuleConditionMet(resume, currentScore) : undefined;
 
-    const pauseDist = distanceToRuleCondition(pauseCond, currentScore);
-    const resumeDist = distanceToRuleCondition(resumeCond, currentScore);
+    const pauseDist = pause.pointsToLine;
+    const resumeDist = resume ? distanceToRuleCondition(resume, currentScore) : undefined;
 
     const state = resolveLineState(pauseDist, "pause", pauseMet) ?? "clear";
-    const distanceToUnlock = pauseMet && !resumeMet ? resumeDist : 0;
+    const distanceToUnlock = pauseMet && resumeMet === false && resumeDist !== undefined ? resumeDist : undefined;
 
     items.push({
       area: rule.area,
@@ -620,14 +645,18 @@ export const buildDecisionCorridorModel = (
       normalizedResume,
       deadbandPoints,
       distanceToUnlock,
+      distanceToPause: pauseDist,
       state,
     });
   }
 
   const heldAreas = items.filter((item) => item.state === "crossed");
+  /* Only an area whose restart line shares the pause line's metric has a
+     distance to unlock; one without a shaded gap cannot be "closest". */
+  const unlockable = heldAreas.filter((item) => item.distanceToUnlock !== undefined);
   const closestToUnlock =
-    heldAreas.length > 0
-      ? [...heldAreas].sort((a, b) => a.distanceToUnlock - b.distanceToUnlock)[0] ?? null
+    unlockable.length > 0
+      ? [...unlockable].sort((a, b) => (a.distanceToUnlock ?? 0) - (b.distanceToUnlock ?? 0))[0] ?? null
       : null;
 
   return {
