@@ -5,7 +5,7 @@ import { buildCadenceCallModel } from "../lib/report/cadenceCallModel";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { getMonthlyActionGuidance } from "../lib/summary/monthlySummary";
 import { getQuarterlyActionGuidance } from "../lib/summary/quarterlySummary";
-import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
+import { POLICY_OVERRIDE_CALL } from "../lib/report/reportCopy";
 import type { PolicyRefusalCode, RegimeKey } from "../lib/regimeEngine";
 
 const rawAssessment = evaluateRegime({
@@ -277,9 +277,25 @@ describe("buildCadenceCallModel", () => {
   });
 
   it("names the artifact by horizon so shared guidance is not labelled weekly", () => {
-    assert.equal(build("monthly").shareTitle, "Whether Monthly Guidance");
-    assert.equal(build("quarterly").shareTitle, "Whether Quarterly Guidance");
-    assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.threshold.pauseIf}: `)));
-    assert.ok(build("monthly").shareLines.some((line) => line.startsWith(`${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: `)));
+    assert.match(build("monthly").shareTitle, /^Whether Monthly Guidance — /);
+    assert.match(build("quarterly").shareTitle, /^Whether Quarterly Guidance — /);
+    // The rule's own sentences, not a slot label in front of them: the paste used
+    // to read "Pause if: Pause new hires … if …" (2026-11-02).
+    const monthly = build("monthly");
+    assert.ok(monthly.shareLines.every((line) => !line.includes(": Pause ")), "no doubled slot verb");
+    assert.ok(monthly.shareLines.some((line) => line.startsWith("Pause new hires")), "the pause rule, as written");
+    assert.ok(monthly.shareLines.some((line) => line.startsWith("Restart them when")), "the restart rule, as written");
+  });
+
+  it("gives a paste a dated title and the view it describes, not the bare live page", () => {
+    // The paste was `*Whether Monthly Guidance*` over whatever host the reader
+    // happened to be on: undated, and pointing at `/`, which becomes a different
+    // month's call next month (2026-11-02). Nothing freezes a horizon derived at
+    // render, so the period in the title is what keeps the paste readable and the
+    // link names the view that reproduces the card.
+    const monthly = build("monthly");
+    assert.equal(monthly.shareTitle, `Whether Monthly Guidance — ${monthly.periodLabel}`);
+    assert.equal(monthly.shareUrl, "https://whether.work/?cadence=monthly&ref=share");
+    assert.equal(build("quarterly").shareUrl, "https://whether.work/?cadence=quarterly&ref=share");
   });
 });

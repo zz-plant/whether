@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
-import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
+import { formatBriefArtifact, SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
+import { siteUrl } from "../lib/siteUrl";
 import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
@@ -368,6 +369,17 @@ async function PageContent({
     recordDate: reportData.treasury.record_date,
     title: cadenceTitle ?? "Whether Weekly Brief",
   });
+
+  /* The one Slack paste, from the one formatter (2026-11-02). Copy Brief under
+     the card built its own shape — an undated title over `window.location.href`
+     — while the share panel copied `formatBriefArtifact`: dated, with the
+     signal and provenance lines, and pointing at the frozen record. Two pastes
+     of one artifact, and the one on the card was the only one that could not be
+     cited. It now copies the panel's string, so the artifact that travels and
+     the artifact on the page are the same document. `siteUrl`, not the request
+     host: a paste is read later, from somewhere else, and a preview host does
+     not outlive it. */
+  const briefSlackBlock = formatBriefArtifact(briefArtifact, "slack", siteUrl);
 
   /* The five sections' data, built once here and drawn by the components under
      app/components/home. The lines every score is judged against are the same
@@ -834,7 +846,7 @@ async function PageContent({
                   one thing a first visit is asked. */}
               <div className="weather-brief-actions mt-4 flex flex-wrap items-center justify-between gap-3">
                 <div className="flex flex-wrap items-center gap-3">
-                  <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
+                  <ShareBriefButton text={primaryCall} lines={briefShareLines} slackBlock={briefSlackBlock} showLabel />
                   {/* The core loop, beside the artifact rather than 4,000px below
                       it: the alert is what a quiet week is for. */}
                   <ActionLink href={`#${HOME_SECTIONS.alert.id}`} variant="inline">
