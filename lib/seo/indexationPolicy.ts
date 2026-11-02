@@ -34,6 +34,13 @@ export const indexableAnswerSlugs = [
   "how-much-runway-should-we-have-before-we-raise",
   "what-should-startups-do-before-a-downturn",
   "should-we-hire-our-first-salesperson-now",
+  "should-startups-raise-prices-now",
+  "should-startups-do-layoffs-now",
+  "should-startups-invest-in-retention-or-acquisition",
+  "should-startups-raise-a-bridge-round-now",
+  "should-startups-change-compensation-now",
+  "should-startups-expand-internationally-now",
+  "should-startups-consolidate-vendors-now",
 ] as const;
 
 const indexableAnswerSlugSet = new Set<string>(indexableAnswerSlugs);

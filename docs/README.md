@@ -98,6 +98,7 @@ Use these when shaping follow-on work, not as sole implementation truth:
 - `seo/quality-gates.md` — publish gates and QA checklist
 - `seo/measurement-model.md` — analytics and event schema
 - `seo/refresh-loop.md` — refresh trigger criteria
+- `seo/platform-shift-plan.md` — phased shift from build-time/pull SEO to event-driven/agent-pull
 
 ## Historical specs and proposals
 

@@ -104,7 +104,7 @@ describe("the agent tool registry", () => {
     assert.equal(byFragment.slug, "when-should-startups-cut-burn");
 
     // A topic the answers don't cover is refused with the list of what does exist.
-    const unknown = await refusal(runAgentTool("get_answer", { question: "bridge round" }, "http"));
+    const unknown = await refusal(runAgentTool("get_answer", { question: "cryptocurrency" }, "http"));
     assert.match(unknown.message, /Available decision topics/);
     assert.ok(unknown.problems.some((problem) => problem.allowed?.includes("should-startups-raise-capital-now")));
   });

@@ -97,9 +97,9 @@ export function WhyConditionsSection({
               states the position and then the reading, and the score is named so a
               reader can hold it against the line on the map. */}
           Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
-          line: {signalReadingMeaning("tightness", tightness)}. Risk appetite is{" "}
-          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its {changeLines.riskAppetite} change line;
-          at {Math.round(riskAppetite)}, {signalReadingMeaning("riskAppetite", riskAppetite)}. Together they put conditions in{" "}
+          line ({signalReadingMeaning("tightness", tightness)}). Risk appetite is{" "}
+          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its {changeLines.riskAppetite} change line
+          at {Math.round(riskAppetite)} ({signalReadingMeaning("riskAppetite", riskAppetite)}). Together they put conditions in{" "}
           <span className="font-semibold">{regimeLabel}</span>.
         </>
       )}

@@ -137,6 +137,9 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
   // The live tier's own label, which read "Live (high confidence)" until 2026-10-07.
   const seoProvenanceStatusLabel = isTestRuntime ? PROVENANCE_STATUS.live : context.reportData.treasuryProvenance?.statusLabel;
   const seoFetchedAtIso = isTestRuntime ? new Date().toISOString() : context.reportData.treasury.fetched_at;
+  /* The freshness gate reads the call's record date, so the test runtime pins it
+     fresh alongside the read; the bundled snapshot's date is months old. */
+  const seoRecordDateIso = isTestRuntime ? new Date().toISOString() : context.reportData.treasury.record_date;
   const { reportData, isFallbackSnapshot, snapshot } = context;
   const { homeBriefModel } = snapshot;
 
@@ -158,6 +161,7 @@ const buildRecordForRoute = (route: ProgrammaticRouteDefinition, context: Payloa
     isFallbackSnapshot,
     provenanceStatusLabel: seoProvenanceStatusLabel,
     fetchedAtIso: seoFetchedAtIso,
+    recordDateIso: seoRecordDateIso,
     pageKey: route.url,
     siblingsInCluster,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),

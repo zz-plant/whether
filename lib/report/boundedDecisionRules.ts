@@ -401,19 +401,19 @@ export type DecisionAreaCorporateTransmission = {
 export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAreaCorporateTransmission> = {
   hiring: {
     transmission:
-      "When capital gets expensive, investors value companies on revenue, not headcount. Every new hire adds fixed monthly spend you can't easily undo if growth slows.",
+      "When capital gets expensive, investors reward teams that generate revenue with lean headcount, and penalize adding payroll ahead of sales. Every new hire adds fixed monthly spend you can't easily undo if sales cycles drag.",
     whyLineMatters:
       "Setting your pause line ahead of time protects the team you already have—so you never find yourself forced into emergency layoffs.",
     ruleOfThumb:
       "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, stick strictly to backfills and mission-critical roles.",
     startupMath:
-      "A $180k hire adds ~$15k/mo in fixed payroll. In tight markets, that single hire requires $300k+ in fresh net ARR to justify at your next round.",
+      "A $180k hire adds ~$15k/mo in fixed payroll. In tight markets, that single hire requires $300k+ in fresh revenue to justify at your next round.",
   },
   "product-tempo": {
     transmission:
-      "When the market gets nervous, customers and investors care about what ships and pays off this quarter, not a 3-year vision.",
+      "When conditions get cautious, buyers care about what ships and delivers value this quarter, not a 3-year vision. They reward reliability and clear savings over unproven features.",
     whyLineMatters:
-      "Shorter release cycles give you real user proof faster—and let you pivot before burning months of engineering time.",
+      "Shorter release cycles give you real user proof faster—and let you adjust before burning months of engineering time.",
     ruleOfThumb:
       "In Sunny weather, ship what drives activation and retention. In Stormy or Freezing, back only projects that pay for themselves within 12 months.",
     startupMath:
@@ -421,7 +421,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
   },
   "capital-raising": {
     transmission:
-      "When investors get cautious, term sheets take twice as long and come with tougher terms. If you wait until runway is tight, you lose all your leverage.",
+      "When risk appetite drops, investors reward proven revenue and clear runway, while penalizing growth that relies on continuous outside capital. If you wait until runway is tight, you lose your leverage.",
     whyLineMatters:
       "Starting early while conditions are open keeps timing and terms on your side rather than the market's.",
     ruleOfThumb:
@@ -431,9 +431,9 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
   },
   "burn-discipline": {
     transmission:
-      "SaaS tools, agencies, and extra vendor seats quietly pile up fixed monthly costs that linger long after top-line growth cools.",
+      "When funding pressure rises, small monthly expenses quietly add up. Unused software seats and long agency commitments burn runway with zero return.",
     whyLineMatters:
-      "Requiring a clear 6-month payback keeps money in the bank—which is the best insurance policy when the climate shifts.",
+      "Requiring a clear 6-month payback keeps money in the bank—which is the best insurance policy when conditions shift.",
     ruleOfThumb:
       "In Sunny weather, invest in growth tooling with clear payback. In Cloudy or Freezing, pause discretionary spend that doesn't quickly pay for itself.",
     startupMath:
@@ -441,7 +441,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
   },
   "expansion-bets": {
     transmission:
-      "Big new product lines or expansion bets rely on cheap follow-on money that dries up fast when markets tighten.",
+      "In tight conditions, big new product lines are risky because follow-on money is slow to arrive. Run small experiments that prove customer demand before committing full team capacity.",
     whyLineMatters:
       "Funding new experiments in bite-sized stages means you can wind one down in a week without dragging down the core business.",
     ruleOfThumb:

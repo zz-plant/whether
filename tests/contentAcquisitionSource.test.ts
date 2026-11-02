@@ -23,6 +23,16 @@ describe("acquisition classification", () => {
     assert.equal(classifyAcquisitionSource("https://someblog.example/post", host), "referral");
   });
 
+  it("separates an AI assistant from a plain referral", () => {
+    assert.equal(classifyAcquisitionSource("https://chatgpt.com/", host), "ai");
+    assert.equal(classifyAcquisitionSource("https://www.perplexity.ai/search/x", host), "ai");
+    assert.equal(classifyAcquisitionSource("https://claude.ai/chat/x", host), "ai");
+    assert.equal(classifyAcquisitionSource("https://copilot.microsoft.com/", host), "ai");
+    /* A Google-hosted assistant is not a Google search, and Bing stays search. */
+    assert.equal(classifyAcquisitionSource("https://gemini.google.com/app", host), "ai");
+    assert.equal(classifyAcquisitionSource("https://www.bing.com/search?q=x", host), "search");
+  });
+
   it("reads no referrer, and an unparseable one, as direct", () => {
     assert.equal(classifyAcquisitionSource("", host), "direct");
     assert.equal(classifyAcquisitionSource("   ", host), "direct");
@@ -40,16 +50,17 @@ describe("acquisition classification", () => {
    * trackers, and the refresh loop needs nothing finer than "from a search
    * engine".
    */
-  it("classifies into five buckets and nothing finer", () => {
+  it("classifies into six buckets and nothing finer", () => {
     const buckets = new Set([
       classifyAcquisitionSource("https://www.google.com/", host),
       classifyAcquisitionSource("https://t.co/abc", host),
+      classifyAcquisitionSource("https://chatgpt.com/", host),
       classifyAcquisitionSource("https://someblog.example/", host),
       classifyAcquisitionSource("", host),
       classifyAcquisitionSource("https://whether.work/x", host),
     ]);
 
-    assert.deepEqual([...buckets].sort(), ["direct", "internal", "referral", "search", "social"]);
+    assert.deepEqual([...buckets].sort(), ["ai", "direct", "internal", "referral", "search", "social"]);
   });
 });
 

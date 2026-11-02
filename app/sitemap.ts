@@ -4,13 +4,14 @@ import { snapshotData } from "../lib/snapshot";
 import { resourcePillarPages } from "../lib/resourcesContent";
 import { resourceArticles } from "../lib/resourceArticles";
 import { buildResourceHubEntries } from "../lib/resourceHub";
-import { answerPages } from "./answers/decisionPages";
+import { readAnswerPages } from "../lib/answers/answerContentStore";
 import { signalScenarioRoutes } from "./seoRouteClusters";
 import { evaluateSeoQualityGates } from "../lib/report/seoQualityGates";
 import { isRetiredSitemapPath } from "./sitemapExclusions";
 import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { readProgrammaticPayload } from "../lib/seo/programmaticPayloadBuilder";
-import { isStaleForIndexing, shouldNoindexPayload } from "../lib/seo/freshnessIndexation";
+import { isCallStaleForIndexing, shouldNoindexPayload } from "../lib/seo/freshnessIndexation";
+import { resolveAnswerUpdatedAt } from "../lib/answers/contentLedger";
 import { signalsClusterStaticParams } from "./signals/clusterRoutes";
 import { workstreamSlugs } from "./operate/workstreams";
 import {
@@ -46,6 +47,10 @@ const resolveLastModified = (...candidates: string[]): Date => {
   }
   return fallbackLastModified;
 };
+
+/** The newest of the dates that parse, or null. An answer page's honest `lastmod`. */
+const latestDate = (...candidates: Array<Date | null>): Date | null =>
+  candidates.reduce<Date | null>((latest, date) => (date && (!latest || date > latest) ? date : latest), null);
 
 /*
  * No `lastmod` for a page nothing dates. This was one constant, 2026-02-01,
@@ -120,8 +125,8 @@ const resolveSitemapReadiness = async (): Promise<{
    * whose pages render `noindex`: that gate treats only a fallback snapshot as
    * degraded, while the page also withholds a read that is not `treasury.isLive`.
    */
-  const watchHubsFresh = !isStaleForIndexing({
-    fetchedAtIso: reportData.treasury.fetched_at,
+  const watchHubsFresh = !isCallStaleForIndexing({
+    recordDateIso: reportData.treasury.record_date,
     isFallbackSnapshot: degraded || !reportData.treasury.isLive,
   });
 
@@ -141,6 +146,7 @@ const resolveSitemapReadiness = async (): Promise<{
     evidenceCount: reportData.reportEvidenceItems.length,
     evidenceTitles: reportData.reportEvidenceItems.map((item) => item.title),
     fetchedAtIso: reportData.treasury.fetched_at,
+    recordDateIso: reportData.treasury.record_date,
     isFallbackSnapshot: degraded,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
@@ -154,7 +160,26 @@ const resolveSitemapReadiness = async (): Promise<{
   return { programmaticEligible, watchHubsFresh, reportLastModified: liveReportLastModified };
 };
 
-export default async function sitemap(options?: { programmaticEligible?: boolean }): Promise<MetadataRoute.Sitemap> {
+/**
+ * One child sitemap per content type. Next renders `/sitemap.xml` as an index
+ * over these, so a stale answer segment drops without taking history or briefs
+ * with it, and crawl diagnostics read per segment instead of one undifferentiated
+ * list. `pages` holds the hubs and static pages that are not part of a corpus.
+ */
+const SITEMAP_SEGMENTS = ["pages", "answers", "signals", "history", "briefs"] as const;
+type SitemapSegment = (typeof SITEMAP_SEGMENTS)[number];
+
+export async function generateSitemaps(): Promise<Array<{ id: SitemapSegment }>> {
+  return SITEMAP_SEGMENTS.map((id) => ({ id }));
+}
+
+const isSitemapSegment = (value: string): value is SitemapSegment =>
+  SITEMAP_SEGMENTS.some((segment) => segment === value);
+
+export default async function sitemap(options?: {
+  id?: string;
+  programmaticEligible?: boolean;
+}): Promise<MetadataRoute.Sitemap> {
   /* One read for three questions now; the override skips it, as it always has,
      and falls back to the bundled dates because it has no live read to offer. */
   const readiness = options?.programmaticEligible === undefined
@@ -243,12 +268,19 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
       priority: 0.59,
     }));
 
-  const decisionAnswerEntries: SitemapEntryDescriptor[] = (programmaticEligible ? answerPages : [])
+  const publishedAnswers = programmaticEligible ? await readAnswerPages() : [];
+  const decisionAnswerEntries: SitemapEntryDescriptor[] = publishedAnswers
     .filter((page) => isIndexableAnswerSlug(page.slug))
     .map((page) => ({
       path: `/answers/${page.slug}`,
-      // Each answer states this week's call, so it moves with the read.
-      lastModified: reportLastModified,
+      /* The page's body changes with the week's call, and its enduring answer
+         changes when an editor reviews it. The honest date is the newer of the
+         two, so a review that predates the current week does not hide behind a
+         weekly bump. */
+      lastModified: latestDate(
+        parseLastModified(resolveAnswerUpdatedAt(page.slug, page.updatedAt) ?? ""),
+        reportLastModified,
+      ),
       changeFrequency: "weekly",
       priority: 0.58,
     }));
@@ -312,17 +344,27 @@ export default async function sitemap(options?: { programmaticEligible?: boolean
     (entry): entry is SitemapEntryDescriptor => entry !== null,
   );
 
-  return [
-    ...coreEntries,
-    ...resourcePillarEntries,
-    ...resourceArticleEntries,
-    ...vcAuthorityEntries,
-    ...decisionAnswerEntries,
-    ...signalWatchEntries,
-    ...signalsClusterEntries,
-    ...archivePeriodEntries,
-    ...publishedBriefEntries,
-  ]
+  const bySegment: Record<SitemapSegment, SitemapEntryDescriptor[]> = {
+    pages: coreEntries,
+    answers: [
+      ...resourcePillarEntries,
+      ...resourceArticleEntries,
+      ...vcAuthorityEntries,
+      ...decisionAnswerEntries,
+    ],
+    signals: [...signalWatchEntries, ...signalsClusterEntries],
+    history: archivePeriodEntries,
+    briefs: publishedBriefEntries,
+  };
+
+  /* A direct call with no `id` (tests, the share-card fixture) asks for the whole
+     list; Next always passes the segment it is rendering. */
+  const requestedId = options?.id;
+  const selected = requestedId && isSitemapSegment(requestedId)
+    ? bySegment[requestedId]
+    : SITEMAP_SEGMENTS.flatMap((segment) => bySegment[segment]);
+
+  return selected
     .filter((entry) => !isRetiredSitemapPath(entry.path))
     .map(buildEntry);
 }

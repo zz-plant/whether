@@ -66,6 +66,7 @@ export const buildSeoDecisionPayload = ({
   isFallbackSnapshot,
   provenanceStatusLabel,
   fetchedAtIso,
+  recordDateIso,
   pageKey,
   siblingsInCluster,
   provenanceLinks,
@@ -83,6 +84,8 @@ export const buildSeoDecisionPayload = ({
   isFallbackSnapshot: boolean;
   provenanceStatusLabel?: string;
   fetchedAtIso?: string;
+  /** The record date the call was struck on; the freshness gate's slower clock. */
+  recordDateIso?: string;
   pageKey?: string;
   siblingsInCluster?: SeoQualitySiblingInput[];
   provenanceLinks?: string[];
@@ -171,6 +174,7 @@ export const buildSeoDecisionPayload = ({
       evidenceCount: evidence.length,
       evidenceTitles: evidence.map((item) => item.title),
       fetchedAtIso,
+      recordDateIso,
       isFallbackSnapshot,
       trustSummary,
       citationMeta,

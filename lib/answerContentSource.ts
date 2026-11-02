@@ -9,7 +9,7 @@ const decisionAreaSchema = z.enum([
   "expansion-bets",
 ]);
 
-const answerPageSchema = z.object({
+export const answerPageSchema = z.object({
   slug: z.string().min(1),
   keyword: z.string().min(1),
   title: z.string().min(1),
@@ -30,6 +30,16 @@ const answerPageSchema = z.object({
   mappedDecisionAreas: z.array(decisionAreaSchema).min(1),
   thresholdFocus: z.enum(["tightness", "risk", "both"]),
   featuredOrder: z.number().int().positive().optional(),
+  /** When the enduring answer last changed, ISO date. Distinct from the weekly reading. */
+  updatedAt: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).optional(),
+  /** Common ways this decision goes wrong, in the reader's words. */
+  watchouts: z.array(z.string().min(1)).min(2).max(5).optional(),
+  /** Page-specific questions and answers, distinct from the weekly payload. */
+  faq: z
+    .array(z.object({ question: z.string().min(1), answer: z.string().min(1) }))
+    .min(1)
+    .max(4)
+    .optional(),
 });
 
 

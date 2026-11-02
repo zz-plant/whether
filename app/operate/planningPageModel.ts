@@ -77,6 +77,35 @@ export async function buildPlanningPageModel(
       publisher: { "@id": organizationId },
     },
     buildBreadcrumbList(buildGroupBreadcrumbs("/operate")),
+    {
+      "@type": "FAQPage",
+      mainEntity: [
+        {
+          "@type": "Question",
+          name: "How do I turn this week's guidance into a plan?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "Start from the action for each area, then set the pause line and restart line that fit your cash and runway.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "What changes when I set my stage and runway?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "The pause lines and rules scale to your cash, so the same guidance becomes a specific rule for your company.",
+          },
+        },
+        {
+          "@type": "Question",
+          name: "How often does the plan change?",
+          acceptedAnswer: {
+            "@type": "Answer",
+            text: "The guidance refreshes each week, and the plan follows it. Set your own lines once and the alert tells you the day one is crossed.",
+          },
+        },
+      ],
+    },
   ]);
 
   const weeklySnapshotResult = await loadWeeklyBriefSnapshot(resolvedSearchParams, { route: "/operate" });

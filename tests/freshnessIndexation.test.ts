@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { isStaleForIndexing, shouldNoindexPayload, INDEXATION_FRESHNESS_WINDOW_HOURS } from "../lib/seo/freshnessIndexation";
-import { DEFAULT_FRESHNESS_WINDOW_HOURS } from "../lib/report/seoQualityGates";
+import { isCallStaleForIndexing, isStaleForIndexing, shouldNoindexPayload, INDEXATION_FRESHNESS_WINDOW_HOURS } from "../lib/seo/freshnessIndexation";
+import { CALL_FRESHNESS_WINDOW_HOURS, DEFAULT_FRESHNESS_WINDOW_HOURS } from "../lib/report/seoQualityGates";
 
 const now = new Date("2026-09-15T12:00:00.000Z");
 const hoursAgo = (hours: number) => new Date(now.getTime() - hours * 60 * 60 * 1000).toISOString();
@@ -21,6 +21,16 @@ describe("freshness indexation", () => {
     assert.equal(isStaleForIndexing({ fetchedAtIso: hoursAgo(1), isFallbackSnapshot: true, now }), true);
     assert.equal(isStaleForIndexing({ fetchedAtIso: "not a date", now }), true);
     assert.equal(isStaleForIndexing({ fetchedAtIso: null, now }), true);
+  });
+
+  it("judges indexing on the call's own clock, not the reading's", () => {
+    /* A read that is a few days old — a missed daily ingest — is not a stale
+       call, so it must not de-index the page. */
+    assert.equal(isCallStaleForIndexing({ recordDateIso: hoursAgo(24 * 4), now }), false);
+    assert.equal(isCallStaleForIndexing({ recordDateIso: hoursAgo(CALL_FRESHNESS_WINDOW_HOURS - 1), now }), false);
+    assert.equal(isCallStaleForIndexing({ recordDateIso: hoursAgo(CALL_FRESHNESS_WINDOW_HOURS + 1), now }), true);
+    assert.equal(isCallStaleForIndexing({ recordDateIso: null, now }), true);
+    assert.equal(isCallStaleForIndexing({ recordDateIso: hoursAgo(1), isFallbackSnapshot: true, now }), true);
   });
 
   it("reads a payload's own verdict, plus freshness and provenance reasons", () => {

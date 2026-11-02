@@ -153,6 +153,13 @@ answering a question the answer pages already answer.
   "Pressure" and "Appetite" alone are retired. The three watch pages keep their slugs
   (`capital-tightness-watch`, `risk-appetite-watch`, `yield-curve-flip-watch`) and are titled
   "Funding pressure watch", "Risk appetite watch" and "Recession warning gauge watch".
+- **Operational transmission (signals to startup behavior)**: Plain-English explanations must
+  translate signals into startup operating friction rather than financial market theory.
+  Funding pressure captures *how forgiving time and capital are* (capital replacement cost and
+  project payback speed); Risk appetite captures *customer and buyer scrutiny* (willingness to
+  buy new software vs. freezing budgets). Operating rules frame guidance around rewarded
+  behaviors (e.g. short payback, retention, uptime) vs. penalized behaviors (e.g. fixed
+  headcount ahead of revenue, unvalidated multi-quarter bets).
 - **The five areas are Hiring, Roadmap, Fundraising, Spending and New bets**
   (`decisionAreaLabel`). Slugs (`product-tempo`, `capital-raising`, `burn-discipline`,
   `expansion-bets`) are contracts and stay; no surface prints them or a verb-phrase stand-in

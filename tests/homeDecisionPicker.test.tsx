@@ -172,7 +172,7 @@ describe("an opened card asks the question it answers", () => {
   it("does not print the question twice in one card", () => {
     const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" initialSelected="hiring" />);
     assert.equal(html.match(/Should startups hire engineers right now\?/g)?.length, 2, "the heading and the row's tooltip");
-    assert.match(html, /Read the full answer →/, "the link names what it opens, not the question again");
+    assert.match(html, /Read the citable defense →/, "the link names what it opens, not the question again");
   });
 
   it("carries the question as the row's tooltip", () => {
@@ -212,5 +212,6 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     const picker = readFileSync(new URL("../app/components/home/DecisionPicker.tsx", import.meta.url), "utf8");
     assert.match(picker, /url\.searchParams\.set\(HOME_DECISION_PARAM, area\)/);
     assert.match(picker, /window\.history\.replaceState\(/, "a choice replaces the entry rather than adding one for Back to retrace");
+    assert.match(picker, /calibrationParts/, "includes stage and runway calibration context in the Slack takeaway artifact");
   });
 });

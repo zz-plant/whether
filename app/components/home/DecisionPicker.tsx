@@ -18,6 +18,7 @@ import {
 import { resolveLineState } from "../../../lib/report/operatingCalls";
 import {
   DEFAULT_RUNWAY_BAND,
+  runwayBandLabel,
   runwayBandPhrase,
   type RunwayBand,
 } from "../../../lib/report/operatorRunway";
@@ -113,16 +114,22 @@ export function DecisionPicker({
   const handleCopySlackTakeaway = useCallback(() => {
     if (!active) return;
     const label = decisionAreaLabel(active.area);
+    const calibrationParts: string[] = [];
+    if (stageLabel) calibrationParts.push(stageLabel);
+    if (activeRunway) calibrationParts.push(`${runwayBandLabel(activeRunway)} runway`);
+    const calibrationHeader = calibrationParts.length > 0 ? ` (${calibrationParts.join(" · ")})` : "";
+
     const bullets: string[] = [];
     if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
     if (active.pause?.line) bullets.push(`• *Pause if:* ${active.pause.line}${active.pause.distance ? ` (${active.pause.distance})` : ""}`);
     if (active.resume?.line) bullets.push(`• *Restart when:* ${active.resume.line}${active.resume.distance ? ` (${active.resume.distance})` : ""}`);
+    if (activeTransmission?.whyLineMatters) bullets.push(`• *Why this line matters:* ${activeTransmission.whyLineMatters}`);
     if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
     if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
 
-    const message = `*Whether: ${label} Takeaway*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
+    const message = `*Whether: ${label} Takeaway${calibrationHeader}*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
     void copyToClipboard(message, `slack-takeaway-${active.area}`);
-  }, [active, activeTransmission, copyToClipboard]);
+  }, [active, activeRunway, activeTransmission, copyToClipboard, stageLabel]);
 
   /* Each choice carries where its area stands against its pause line, so the
      five answers are on the page before any is picked; the click opens the
@@ -314,7 +321,7 @@ export function DecisionPicker({
               </div>
               {active.answer ? (
                 <ActionLink href={active.answer.href} variant="inline">
-                  Read the full answer →
+                  Read the citable defense →
                 </ActionLink>
               ) : null}
             </div>

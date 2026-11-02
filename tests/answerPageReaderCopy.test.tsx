@@ -4,6 +4,9 @@ import { renderToStaticMarkup } from "react-dom/server";
 import * as nextNavigation from "next/navigation";
 import { answerPages } from "../app/answers/decisionPages";
 import { compositeSignalScales } from "../lib/report/signalTranslations";
+import { decisionAnswerOutputSchema, runAgentTool } from "../lib/agent/tools";
+import { buildAnswerObject } from "../lib/answers/answerObject";
+import { loadWeeklyBriefSnapshot } from "../lib/report/weeklyBriefSnapshot";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
 
 serveUnreachableUpstreams();
@@ -100,5 +103,84 @@ describe("answer page reader copy", () => {
 
     assert.match(faq, /Risk appetite is \d+ of 100/);
     assert.match(faq, /funding pressure is \d+ of 100/);
+  });
+
+  it("dates a reviewed answer from the content ledger", async () => {
+    const slug = "should-startups-raise-prices-now";
+    const html = await renderAnswer(slug);
+    const visible = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "");
+    assert.match(visible, /Answer last reviewed: 2026-11-02\./);
+  });
+
+  /*
+   * The page and `get_answer` each rebuilt the answer from the same fields, so a
+   * change to one could leave the other on the old text. Both read
+   * `buildAnswerObject` now; this pins that the page's visible answer and the
+   * agent's payload are the same object.
+   */
+  it("serves the agent the same answer the page renders", async () => {
+    const slug = "should-startups-raise-prices-now";
+    const page = answerPages.find((candidate) => candidate.slug === slug);
+    assert.ok(page);
+
+    const { reportData, snapshot } = await loadWeeklyBriefSnapshot();
+    const mappedRules = snapshot.homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
+    const object = buildAnswerObject({
+      page,
+      recordDateLabel: reportData.recordDateLabel,
+      regime: reportData.assessment.regime,
+      scores: reportData.assessment.scores,
+      mappedRules,
+    });
+
+    const agent = decisionAnswerOutputSchema.parse(
+      await runAgentTool("get_answer", { question: slug }, "http"),
+    );
+
+    assert.equal(agent.shortAnswer, object.shortAnswer);
+    assert.equal(agent.directAnswer, object.directAnswer);
+    assert.deepEqual(agent.companyInputs, object.companyInputs);
+    assert.equal(agent.decisionNoteTemplate, object.decisionNote);
+    assert.deepEqual(agent.rulesInForce, object.rules.map((rule) => ({
+      area: rule.area,
+      actionNow: rule.actionNow,
+      pauseIf: rule.pauseIf,
+      resumeWhen: rule.resumeWhen,
+    })));
+
+    const visible = (await renderAnswer(slug))
+      .replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "")
+      .replace(/&#x27;|&#39;/g, "'")
+      .replace(/&quot;/g, '"')
+      .replace(/&amp;/g, "&");
+    assert.ok(visible.includes(object.shortAnswer), "the page renders the object's short answer");
+    assert.ok(visible.includes(object.directAnswer), "the page renders the object's direct answer");
+    assert.ok(visible.includes(object.decisionNote), "the page renders the object's decision note");
+    for (const input of object.companyInputs) {
+      assert.ok(visible.includes(input), `the page renders the object's company input: ${input}`);
+    }
+  });
+
+  it("renders each page's own watchouts and questions, not a template body", async () => {
+    for (const page of answerPages) {
+      if (!page.watchouts?.length && !page.faq?.length) continue;
+      const html = await renderAnswer(page.slug);
+      const visible = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/g, "");
+      if (page.watchouts?.length) {
+        assert.ok(visible.includes("Common ways this goes wrong"), `${page.slug} lost its watchouts heading`);
+        for (const watchout of page.watchouts) {
+          assert.ok(visible.includes(watchout), `${page.slug} lost watchout: ${watchout}`);
+        }
+      }
+      if (page.faq?.length) {
+        assert.ok(visible.includes("Common questions"), `${page.slug} lost its questions heading`);
+        const faqScript = html.match(/<script[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/)?.[1] ?? "";
+        for (const item of page.faq) {
+          assert.ok(visible.includes(item.question), `${page.slug} lost question: ${item.question}`);
+          assert.ok(visible.includes(item.answer), `${page.slug} lost answer: ${item.question}`);
+          assert.ok(faqScript.includes(item.question), `${page.slug} question missing from FAQPage`);
+        }
+      }
+    }
   });
 });
