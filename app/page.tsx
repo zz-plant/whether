@@ -33,6 +33,7 @@ import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { describeMarketMoveScale } from "../lib/report/marketMoveScale";
 import { describeGuidanceChange, describeMovementCause } from "../lib/report/decisionMovement";
+import { anyPauseLineMet } from "../lib/report/reportEvidence";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory, primeMonthlyRegimeHistoryForRead } from "../lib/summary/monthlyRegimeHistory";
@@ -493,7 +494,8 @@ async function PageContent({
     ? homepage.weeklyCall.stageScopedAdjustments?.[activeStage]?.actionNow
     : undefined;
   /* The guidance's restart line: the lead area's, as /trust and every paste print it. */
-  const leadResumeCondition = homepage.weeklyDecisionCardModel.decision.actionStripItems?.[0]?.reversalCondition;
+  const leadItem = homepage.weeklyDecisionCardModel.decision.actionStripItems?.at(0);
+  const leadResumeCondition = leadItem?.reversalCondition;
   const decisionPickerOptions: DecisionPickerOption[] = decisionAreaOrder.flatMap((area) => {
     const row = homeAreaRows.find((candidate) => candidate.area === area);
     if (!row) return [];
@@ -982,6 +984,7 @@ async function PageContent({
                 resumeWhen={resumeWhenLabel}
                 guardrail={guardrailLabel}
                 leadResume={leadResumeCondition ? formatDecisionReversal(leadResumeCondition) : undefined}
+                leadHeld={leadItem ? anyPauseLineMet([leadItem], { tightness, riskAppetite }) : undefined}
                 flipConditions={flipConditionLabels}
                 callChangeLines={callChangeLines}
                 regime={regime}

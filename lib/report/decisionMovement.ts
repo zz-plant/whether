@@ -168,15 +168,17 @@ const describeCrossing = (line: CrossedLine) =>
   `${lowerFirst(line.label)} ${line.direction} ${line.direction === "rose" ? "above" : "below"} ${formatThresholdNumber(line.value)}`;
 
 /*
- * The area's state in the reader's verbs, pause and restart, not the line behind
- * them (2026-11-03). "Restart line met" and "no line crossed" put the mechanism in
- * every row; the line itself is printed beside the row with its number.
+ * The area's state in the reader's words, not the line behind it (2026-11-03):
+ * "Restart line met" and "no line crossed" put the mechanism in every row. The
+ * restart side says "restart condition", not "can restart": it moves for areas that
+ * are not paused too, and "Roadmap can no longer restart" read as nonsense for an
+ * area that was running.
  */
 const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
   paused: "Pause now applies",
   lifted: "Pause lifted",
-  resumable: "Can now restart",
-  resumeLost: "Can no longer restart",
+  resumable: "Restart condition now holds",
+  resumeLost: "Restart condition no longer holds",
 };
 
 /*
@@ -187,7 +189,7 @@ const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
  */
 const HELD_STATE_TEXT: Record<AreaState, string | null> = {
   pause: "Pause still applies",
-  resume: "Can still restart",
+  resume: "Restart condition still holds",
   hold: null,
 };
 
@@ -200,7 +202,7 @@ type HeldGroup = { state: AreaState; areas: DecisionArea[]; text: string };
 
 const HELD_GROUP_TEXT: Record<AreaState, (areas: string, window: string) => string> = {
   pause: (areas, window) => `Pause still applies to ${areas}; no change ${window}.`,
-  resume: (areas, window) => `${areas} can still restart; no change ${window}.`,
+  resume: (areas, window) => `Restart condition still holds for ${areas}; no change ${window}.`,
   hold: (areas, window) => `No change ${window} for ${areas}.`,
 };
 
@@ -209,8 +211,8 @@ const HELD_STATE_ORDER: readonly AreaState[] = ["pause", "resume", "hold"];
 const GROUP_CLAUSE: Record<Exclude<AreaMovementKind, "held">, (areas: string) => string> = {
   paused: (areas) => `the pause now applies to ${areas}`,
   lifted: (areas) => `the pause no longer applies to ${areas}`,
-  resumable: (areas) => `${areas} can now restart`,
-  resumeLost: (areas) => `${areas} can no longer restart`,
+  resumable: (areas) => `the restart condition now holds for ${areas}`,
+  resumeLost: (areas) => `the restart condition no longer holds for ${areas}`,
 };
 
 const GROUP_ORDER: readonly Exclude<AreaMovementKind, "held">[] = ["paused", "lifted", "resumable", "resumeLost"];
@@ -241,7 +243,7 @@ const moveOf = (
   const text =
     kind === "held"
       ? describeHeld(to, window)
-      : `${from === "pause" && kind === "resumable" ? "Pause lifted, can restart" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
+      : `${from === "pause" && kind === "resumable" ? "Pause lifted, restart condition holds" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
   return { area: lines.area, kind, state: to, crossed, text };
 };
 

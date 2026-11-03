@@ -113,6 +113,12 @@ export function DecisionPicker({
 }) {
   const [selected, setSelected] = useState<DecisionArea | undefined>(initialSelected);
   const active = options.find((option) => option.area === selected);
+  /* One side of the rule, the one that can change the area's state (2026-11-03), as the
+     rules table and every paste print it: an area on hold shows when it restarts, any
+     other area when it pauses. "Nothing to resume" beside a running area is gone. */
+  const activeHeld = Boolean(active?.pause?.met);
+  const activePause = active?.pause && (!activeHeld || !active.resume) ? active.pause : undefined;
+  const activeResume = active?.resume && (activeHeld || !active.pause) ? active.resume : undefined;
   const activeTransmission: DecisionAreaCorporateTransmission | undefined = active
     ? decisionAreaCorporateTransmission[active.area]
     : undefined;
@@ -129,15 +135,15 @@ export function DecisionPicker({
 
     const bullets: string[] = [];
     if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
-    if (active.pause?.line) bullets.push(`• *Pause if:* ${active.pause.line}${active.pause.distance ? ` (${active.pause.distance})` : ""}`);
-    if (active.resume?.line) bullets.push(`• *Restart when:* ${active.resume.line}${active.resume.distance ? ` (${active.resume.distance})` : ""}`);
-    if (activeTransmission?.whyLineMatters) bullets.push(`• *Why this line matters:* ${activeTransmission.whyLineMatters}`);
+    if (activePause?.line) bullets.push(`• *Pause if:* ${activePause.line}${activePause.distance ? ` (${activePause.distance})` : ""}`);
+    if (activeResume?.line) bullets.push(`• *Restart when:* ${activeResume.line}${activeResume.distance ? ` (${activeResume.distance})` : ""}`);
+    if (activeTransmission?.whyLineMatters) bullets.push(`• *Why it matters:* ${activeTransmission.whyLineMatters}`);
     if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
     if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
 
     const message = `*Whether: ${label} Takeaway${calibrationHeader}*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
     void copyToClipboard(message, `slack-takeaway-${active.area}`);
-  }, [active, activeRunway, activeTransmission, copyToClipboard, stageLabel]);
+  }, [active, activePause, activeResume, activeRunway, activeTransmission, copyToClipboard, stageLabel]);
 
   /* Each choice carries where its area stands against its pause line, so the
      five answers are on the page before any is picked; the click opens the
@@ -249,21 +255,21 @@ export function DecisionPicker({
               </p>
             ) : null}
             <dl className="grid max-w-[64ch] gap-x-4 gap-y-2 text-fluid-sm text-slate-200 sm:grid-cols-[auto_1fr] sm:items-baseline">
-              {active.pause ? (
+              {activePause ? (
                 <>
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
                   <dd>
-                    <span className="tabular-nums">{active.pause.line}</span>{" "}
-                    <LineDistance slot={active.pause} kind="pause" />
+                    <span className="tabular-nums">{activePause.line}</span>{" "}
+                    <LineDistance slot={activePause} kind="pause" />
                   </dd>
                 </>
               ) : null}
-              {active.resume ? (
+              {activeResume ? (
                 <>
                   <dt className="text-slate-400">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</dt>
                   <dd>
-                    <span className="tabular-nums">{active.resume.line}</span>{" "}
-                    <LineDistance slot={active.resume} kind="resume" />
+                    <span className="tabular-nums">{activeResume.line}</span>{" "}
+                    <LineDistance slot={activeResume} kind="resume" />
                   </dd>
                 </>
               ) : null}
@@ -274,7 +280,7 @@ export function DecisionPicker({
                 className="space-y-1.5 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 text-fluid-xs"
               >
                 <p className="font-semibold text-slate-100">
-                  Why this line governs {decisionAreaLabel(active.area).toLowerCase()}:
+                  Why this matters for {decisionAreaLabel(active.area).toLowerCase()}:
                 </p>
                 <p className="leading-relaxed text-slate-300">
                   {activeTransmission.transmission} {activeTransmission.whyLineMatters}
@@ -303,7 +309,7 @@ export function DecisionPicker({
             <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[color:var(--border-faint)] pt-3">
               <div className="flex flex-wrap items-center gap-4">
                 <ActionLink href="/operate#ops-plan-lines" variant="inline">
-                  Move these lines for your plan →
+                  Set your own rules →
                 </ActionLink>
                 <button
                   type="button"

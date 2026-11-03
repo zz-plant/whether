@@ -60,14 +60,14 @@ export type HomeLoadMetric = keyof HomeLoadMeasure;
  * `bun run check:home-load` prints. Raising one is a policy change and belongs in its own PR.
  */
 export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
-  words: 1969,
-  numbers: 341,
-  wordsBeforeAreas: 410,
+  words: 1839,
+  numbers: 332,
+  wordsBeforeAreas: 372,
   folds: 9,
   buttons: 8,
   fields: 26,
-  fundingPressure: 52,
-  riskAppetite: 70,
+  fundingPressure: 37,
+  riskAppetite: 52,
 };
 
 /** The test writes its measurement to the path in this variable when it is set; the CLI reads it back. */

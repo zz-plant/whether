@@ -304,7 +304,7 @@ describe("AreaTable moved rows", () => {
         caption="test"
         rows={[
           { area: "hiring", rule: "Backfills only.", changed: "Pause still applies; no change since Sep 30." },
-          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Can no longer restart: risk appetite fell below 54.", moved: true },
+          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Restart condition no longer holds: risk appetite fell below 54.", moved: true },
         ]}
       />,
     );

@@ -195,7 +195,7 @@ describe("a link can carry the decision (`/?decision=`)", () => {
   it("opens on the decision the URL names, in the first paint", () => {
     const html = render("product-tempo");
     assert.match(html, /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "the named area's answer is server-rendered open");
-    assert.match(html, /Why this line governs roadmap:/i, "renders zero-input corporate transmission intuition");
+    assert.match(html, /Why this matters for roadmap:/i, "renders zero-input corporate transmission intuition");
     assert.match(html, /Shared rule of thumb:/i, "renders team ritual rule of thumb");
     assert.match(html, /Startup math:/i, "renders concrete unit economics math");
     assert.match(html, /Copy takeaway for Slack/i, "renders 1-click Slack takeaway action");

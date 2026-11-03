@@ -63,10 +63,10 @@ describe("the by-area Changed column", () => {
     const byArea = new Map(rows.map((row) => [row.area, row]));
 
     // The roadmap held past its restart line, and says so.
-    assert.equal(byArea.get("product-tempo")?.changed, "Can still restart; no change since Aug 31.");
+    assert.equal(byArea.get("product-tempo")?.changed, "Restart condition still holds; no change since Aug 31.");
     assert.equal(byArea.get("product-tempo")?.changedKind, "held");
     assert.equal(byArea.get("hiring")?.changedKind, "paused");
-    assert.match(renderTable(rows), /Can still restart; no change since Aug 31\./);
+    assert.match(renderTable(rows), /Restart condition still holds; no change since Aug 31\./);
   });
 
   /* On a week no line was crossed the card's line under the call says so once

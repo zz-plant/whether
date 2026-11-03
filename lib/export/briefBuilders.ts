@@ -196,6 +196,26 @@ export const briefWeekChangeLine = (document: BriefDocument): string | null =>
     document.readings.previous,
   );
 
+/**
+ * Whether the document's week is quiet (2026-11-03): an earlier reading was compared,
+ * no area paused or restarted, the conditions held, the room before a change is
+ * plenty, and the guidance is not on hold. Most Mondays are (seven changes in 177 months), and on them the Monday email
+ * leaves out the two readings and their basis, which say again what held. The homepage
+ * folds the same sections on the same kind of week (`quietWeek` in `app/page.tsx`).
+ */
+export const briefIsQuietWeek = (document: BriefDocument): boolean => {
+  const movement = buildDecisionMovement({
+    scores: { tightness: document.readings.scores.tightness, riskAppetite: document.readings.scores.riskAppetite },
+    previous: document.readings.previous,
+    thresholds: document.readings.thresholds,
+    regime: document.conditions.regime,
+    areas: areaLinesFromActionStrip(document.areaRows),
+  });
+  /* Not a held week: the guidance is on hold because of the readings, and they are what explains it. */
+  if (document.slots.policyOverrideActive) return false;
+  return movement !== null && movement.moved.length === 0 && movement.conditions === null && document.confidence === "HIGH";
+};
+
 const buildReadingLines = (
   reading: {
     scores: { tightness: number; riskAppetite: number };
