@@ -31,6 +31,34 @@ describe("the card ties the weather word to the areas", () => {
     assert.equal(describeHeldAreasForCard([]), null);
   });
 
+  it("names the score holding them when one score holds them all", () => {
+    const held = (metric: "tightness" | "riskAppetite", value: number, holdsAbove: boolean) => ({
+      ...slot(true),
+      metric,
+      value,
+      holdsAbove,
+    });
+    const rows = [
+      { area: "hiring" as const, pause: held("tightness", 76, true) },
+      { area: "product-tempo" as const, pause: slot(false) },
+      { area: "capital-raising" as const, pause: held("tightness", 76, true) },
+    ];
+    assert.equal(describeHeldAreasForCard(rows), "On hold while funding pressure is above 76: Hiring and Fundraising.");
+    assert.equal(
+      describeHeldAreasForCard(rows.map((row) => ({ ...row, pause: held("tightness", 76, true) }))),
+      "Every area is on hold while funding pressure is above 76.",
+    );
+    assert.equal(
+      describeHeldAreasForCard([
+        { area: "hiring" as const, pause: held("tightness", 76, true) },
+        { area: "product-tempo" as const, pause: slot(false) },
+        { area: "capital-raising" as const, pause: held("riskAppetite", 44, false) },
+      ]),
+      "On hold: Hiring and Fundraising.",
+      "two scores holding different areas: the list alone, not one score's reason",
+    );
+  });
+
   it("puts the line on the card with a link to the areas' answers", () => {
     const html = renderToStaticMarkup(
       <DecisionHero

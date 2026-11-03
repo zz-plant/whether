@@ -6,7 +6,7 @@ import { DecisionPicker, type DecisionPickerOption } from "../app/components/hom
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
 import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
-import { parseHomeDecision } from "../lib/report/home/homeSectionModel";
+import { buildHomeDecisionCookie, parseHomeDecision, readHomeDecisionCookie } from "../lib/report/home/homeSectionModel";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import * as nextNavigation from "next/navigation";
 
@@ -208,10 +208,23 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     assert.equal(parseHomeDecision("payroll"), undefined);
     assert.equal(parseHomeDecision(undefined), undefined);
     const page = readFileSync(new URL("../app/page.tsx", import.meta.url), "utf8");
-    assert.match(page, /initialSelected=\{parseHomeDecision\(searchParams\?\.\[HOME_DECISION_PARAM\]\)\}/);
+    assert.match(
+      page,
+      /initialSelected=\{parseHomeDecision\(searchParams\?\.\[HOME_DECISION_PARAM\]\) \?\? data\.operatorContext\.decisionArea \?\? undefined\}/,
+      "a link's decision wins, then the reader's last choice",
+    );
     const picker = readFileSync(new URL("../app/components/home/DecisionPicker.tsx", import.meta.url), "utf8");
     assert.match(picker, /url\.searchParams\.set\(HOME_DECISION_PARAM, area\)/);
     assert.match(picker, /window\.history\.replaceState\(/, "a choice replaces the entry rather than adding one for Back to retrace");
+    assert.match(picker, /document\.cookie = buildHomeDecisionCookie\(area\)/, "and is kept for the next visit");
     assert.match(picker, /calibrationParts/, "includes stage and runway calibration context in the Slack takeaway artifact");
+  });
+
+  it("keeps the last choice in a cookie that holds only the area's slug", () => {
+    assert.equal(readHomeDecisionCookie(buildHomeDecisionCookie("capital-raising").split(";")[0]), "capital-raising");
+    assert.equal(readHomeDecisionCookie("whether-company-runway=12-24; whether-home-decision=hiring"), "hiring");
+    assert.equal(readHomeDecisionCookie("whether-home-decision=payroll"), null, "anything that is not an area is ignored");
+    assert.equal(readHomeDecisionCookie(null), null);
+    assert.match(buildHomeDecisionCookie("hiring"), /^whether-home-decision=hiring; path=\/; max-age=\d+; SameSite=Lax$/);
   });
 });

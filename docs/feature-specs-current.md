@@ -303,6 +303,27 @@ decision, flip condition, and core rate context instead of falling back to a gen
 Cold opens into `/` show the shared route loading shell (`app/loading.tsx`, `RouteLoadingShell`)
 until the report resolves.
 
+### 1.1.0q Quiet weeks fold, the reader's decision is kept, and settings live in one place (2026-11-03)
+
+- **Quiet weeks fold.** On a live, compared week where no area moved, conditions held, the margin
+  is not in its lowest band and the trust strip does not say conditions could change next week,
+  the sections that explain the guidance (what changed, why conditions are what they are, what
+  would change them, what you may be hearing, how unusual this is) fold under "The full reading"
+  (`QuietWeekFold`). Above the fold: "Nothing is close to changing this week. Get an email the day
+  an area pauses or restarts, and skip the Mondays when nothing moves." The sections stay
+  server-rendered, and a link to any of them opens the fold (`AnchorFeedback`). On the
+  2026-10-26 reading, rendered with quiet mode forced, visible words on `/` fell from 1,327 to
+  581 and numbers from 191 to 82.
+- **The last decision is kept.** Picking an area under "What are you deciding?" writes the
+  `whether-home-decision` cookie (the area's slug only; `/privacy` §2.4 lists it), and the next
+  visit opens on it. A `?decision=` link still wins.
+- **Settings in one fold.** The plan-horizon control left the card's action row and folds with
+  stage and runway under the calibration line ("Change settings"), which now
+  renders at every horizon on a live brief.
+- **The card names the score holding the areas** when one score holds them all: "On hold while
+  funding pressure is above 76: Hiring, Fundraising, Spending and New bets." With two scores
+  holding different areas it lists the areas alone.
+
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
 The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate
 Slack copy button and the MCP/API chip were removed on 2026-09-02: `Copy Brief` already produces

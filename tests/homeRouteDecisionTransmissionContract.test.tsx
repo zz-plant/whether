@@ -3,18 +3,19 @@ import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 
 describe("home route render contract", () => {
-  it("keeps the horizon control beside the card it changes", () => {
-    // The horizon stays adjacent to the card it changes, after the call so
-    // wrapping secondary controls cannot take the phone's first viewport.
+  it("folds the horizon control with stage and runway, after the call", () => {
+    // Set once, so it lives with the other settings (2026-11-03): beside Copy
+    // Brief every reading of the call passed a control nobody changes weekly.
     const source = readFileSync("app/page.tsx", "utf8");
     assert.equal(source.split("<CadenceSelector").length - 1, 1);
     assert.ok(
       source.indexOf("<CadenceSelector") > source.indexOf("<DecisionHero"),
       "the call must precede its secondary horizon control",
     );
+    assert.match(source, /horizon=\{<CadenceSelector \/>\}/, "the control is CompanyCalibration's horizon slot");
     assert.ok(
-      source.indexOf("<CadenceSelector") < source.indexOf("<CompanyCalibration"),
-      "the horizon stays beside the call, before the evidence sections",
+      source.indexOf("<CadenceSelector") > source.indexOf("<CompanyCalibration"),
+      "the horizon renders inside the calibration fold",
     );
     const header = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
     assert.ok(!header.includes("<CadenceSelector"));

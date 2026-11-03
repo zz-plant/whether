@@ -30,6 +30,13 @@ far can I trust it:
    change the guidance, and how unusual this is
 3. offer the alert the day a line is crossed, then sharing
 
+On a quiet week (2026-11-03: live, compared, no area moved, conditions held, nothing close to
+changing; the rule is `quietWeek` in `app/page.tsx`) step 2's explanatory sections — what changed,
+why conditions are what they are, what would change them, who will ask, how unusual this is — fold
+under "The full reading" (`QuietWeekFold`), with the alert's promise above the fold. The card, the
+areas and the calibration line stay open: they are the answer. Settings (stage, runway, plan
+horizon) live in the one calibration fold, not beside the call.
+
 Planning is the default next step.
 Evidence, trust, replay, and tools are exception paths.
 

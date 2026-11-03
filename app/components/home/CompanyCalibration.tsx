@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import { Hourglass } from "lucide-react";
 import { StagePersonaSelector } from "../StagePersonaSelector";
 import { RunwayPersonaSelector } from "../RunwayPersonaSelector";
@@ -28,6 +28,7 @@ export function CompanyCalibration({
   activeRunway,
   runwayEmphasis,
   stageAction,
+  horizon,
 }: {
   /** The chosen stage's name, for the stage line. */
   stageLabel: string;
@@ -37,6 +38,12 @@ export function CompanyCalibration({
   runwayEmphasis?: string;
   /** The chosen stage's own action; only for a reader who chose one, as a stage line under the headline. */
   stageAction?: string;
+  /**
+   * The plan-horizon control, folded here with the other settings (2026-11-03). It sat
+   * beside Copy Brief on the card, so every reading of the call passed a control that
+   * is set once; setup lives in one place now, one click from the card's chip.
+   */
+  horizon?: ReactNode;
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
@@ -79,13 +86,19 @@ export function CompanyCalibration({
             Rules for a <span className="font-semibold text-slate-100">{stageLabel}</span> company with{" "}
             <span className="font-semibold text-slate-100">{runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}</span> of runway
             <span aria-hidden="true"> · </span>
-            <span className="text-[var(--accent-action)] underline underline-offset-4 group-open:hidden">Change stage and runway</span>
+            <span className="text-[var(--accent-action)] underline underline-offset-4 group-open:hidden">{horizon ? "Change settings" : "Change stage and runway"}</span>
             <span className="hidden text-[var(--accent-action)] underline underline-offset-4 group-open:inline">Done</span>
           </span>
         </summary>
         <div className="mt-3 grid gap-3 weather-company-options">
           <StagePersonaSelector activeStage={activeStage} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
           <RunwayPersonaSelector activeRunway={activeRunway} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
+          {horizon ? (
+            <div className="flex flex-wrap items-center gap-1.5 sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" data-plan-horizon>
+              <span className="type-eyebrow mr-1">Plan horizon</span>
+              {horizon}
+            </div>
+          ) : null}
           <p className="text-fluid-nano text-slate-400">
             Your stage and runway set when each area pauses and what it allows.
           </p>

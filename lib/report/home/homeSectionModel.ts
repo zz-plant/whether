@@ -13,7 +13,7 @@ import {
   type RuleThresholdDistance,
 } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import { decisionAreaLabel, isDecisionArea, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
+import { decisionAreaLabel, isDecisionArea, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -36,6 +36,28 @@ export const HOME_DECISION_PARAM = "decision";
 /** The decision a `?decision=` value names, or undefined for anything that is not an area. */
 export const parseHomeDecision = (value: string | undefined): DecisionArea | undefined =>
   value !== undefined && isDecisionArea(value) ? value : undefined;
+
+/*
+ * The last decision the reader picked, so the next visit opens on it (2026-11-03).
+ * A reader arrives with one decision in flight, and the picker asked them to find it
+ * again every Monday. One cookie holding the area's slug, like the stage and runway
+ * cookies; a `?decision=` link still wins, since its sender meant that answer.
+ */
+const HOME_DECISION_COOKIE = "whether-home-decision";
+const HOME_DECISION_COOKIE_MAX_AGE_SECONDS = 365 * 24 * 60 * 60;
+
+export const readHomeDecisionCookie = (cookieHeader: string | null | undefined): DecisionArea | null => {
+  if (!cookieHeader) return null;
+  for (const part of cookieHeader.split(";")) {
+    const [rawKey, ...rest] = part.split("=");
+    if (rawKey?.trim() !== HOME_DECISION_COOKIE) continue;
+    return parseHomeDecision(rest.join("=").trim()) ?? null;
+  }
+  return null;
+};
+
+export const buildHomeDecisionCookie = (area: DecisionArea): string =>
+  `${HOME_DECISION_COOKIE}=${area}; path=/; max-age=${HOME_DECISION_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
 
 /*
  * The homepage's sections, in the order they print (2026-10-22): the verdict, the
@@ -198,8 +220,17 @@ export const describeWeeklyMovement = ({
         basis.date ? basis.since : "this week",
       );
 
-/** One side of an area's rule as a row prints it: the line, the distance in words, and the two facts behind the words. */
-export type HomeAreaLineSlot = { line: string; distance: string; points: number; met: boolean; metric: RuleConditionMetric };
+/** One side of an area's rule as a row prints it: the line, the distance in words, and the facts behind the words. */
+export type HomeAreaLineSlot = {
+  line: string;
+  distance: string;
+  points: number;
+  met: boolean;
+  metric: RuleConditionMetric;
+  /** The line's number, and which side of it the condition holds on, for a sentence that names it. */
+  value?: number;
+  holdsAbove?: boolean;
+};
 
 export type HomeAreaRow = {
   area: DecisionArea;
@@ -225,6 +256,8 @@ const lineSlot = (distance: RuleThresholdDistance | undefined, kind: "pause" | "
     ? {
         line: distance.label,
         metric: distance.metric,
+        value: distance.value,
+        holdsAbove: distance.operator === ">" || distance.operator === ">=",
         distance: formatPointsToLine(distance.pointsToLine, kind, distance.satisfied),
         points: distance.pointsToLine,
         met: distance.satisfied,
@@ -364,17 +397,35 @@ export const describeLineStateBand = (
  * over a picker where four areas were held, and nothing tied the two. This
  * names the held areas on the card without repeating its condition stamp:
  * "On hold: Hiring, Fundraising, Spending and New bets."
+ *
+ * Since 2026-11-03 it also names the score holding them when one score holds them
+ * all ("On hold while funding pressure is above 76: …"). The card prints the
+ * weather word and the two scores just above, and "Cloudy: money is available"
+ * over four held areas left the reader to work out that the holds come from the
+ * score, not the weather word.
  */
+const describeHoldingScore = (slots: readonly HomeAreaLineSlot[]): string | null => {
+  const [first] = slots;
+  if (!first || first.value === undefined || first.holdsAbove === undefined) return null;
+  const same = slots.every(
+    (slot) => slot.metric === first.metric && slot.value === first.value && slot.holdsAbove === first.holdsAbove,
+  );
+  if (!same) return null;
+  return `${ruleMetricLabel[first.metric].toLowerCase()} is ${first.holdsAbove ? "above" : "below"} ${first.value}`;
+};
+
 export const describeHeldAreasForCard = (
   rows: readonly Pick<HomeAreaRow, "area" | "pause">[],
 ): string | null => {
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
-  const held = ruled.filter((row) => row.pause?.met).map((row) => decisionAreaLabel(row.area));
+  const heldRows = ruled.filter((row) => row.pause?.met);
+  const held = heldRows.map((row) => decisionAreaLabel(row.area));
   if (held.length === 0) return "No area is on hold.";
-  if (held.length === ruled.length) return "Every area is on hold.";
+  const holding = describeHoldingScore(heldRows.flatMap((row) => (row.pause ? [row.pause] : [])));
+  if (held.length === ruled.length) return holding ? `Every area is on hold while ${holding}.` : "Every area is on hold.";
   const list = held.length === 1 ? held[0] : `${held.slice(0, -1).join(", ")} and ${held.at(-1)}`;
-  return `On hold: ${list}.`;
+  return holding ? `On hold while ${holding}: ${list}.` : `On hold: ${list}.`;
 };
 
 /**

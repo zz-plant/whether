@@ -10,6 +10,7 @@ import {
 import {
   HOME_DECISION_PARAM,
   HOME_SECTIONS,
+  buildHomeDecisionCookie,
   describeAreaPauseStatus,
   describePauseLineCount,
   type HomeAreaLineSlot,
@@ -83,6 +84,8 @@ const recordDecisionInUrl = (area: DecisionArea) => {
   const url = new URL(window.location.href);
   url.searchParams.set(HOME_DECISION_PARAM, area);
   window.history.replaceState(window.history.state, "", url);
+  /* And for the next visit, so a reader with one decision in flight opens on it. */
+  document.cookie = buildHomeDecisionCookie(area);
 };
 
 export function DecisionPicker({
