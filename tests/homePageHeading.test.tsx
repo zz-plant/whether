@@ -97,9 +97,9 @@ describe("homepage heading contract", () => {
     assert.match(page, /<CadenceCallCard model=\{cadenceCall\} \/>/);
     assert.doesNotMatch(page, /titleLevel/);
     assert.ok(
-      page.indexOf("<CadenceSelector") < page.indexOf("<CadenceCallCard") &&
+      page.indexOf("<DecisionHero") < page.indexOf("<CadenceCallCard") &&
         page.indexOf("<CadenceCallCard") < page.indexOf("<DecisionPicker"),
-      "the horizon card renders below the call's action row, before the areas",
+      "the horizon card renders below the call, before the areas",
     );
   });
 

@@ -138,12 +138,14 @@ export default function PrivacyPage() {
           </div>
 
           <div className="space-y-2">
-            <h3 className={subheading}>2.4 Two cookies, set only if you calibrate the guidance</h3>
+            <h3 className={subheading}>2.4 Three cookies, set only by a choice you make</h3>
             <p className={paragraph}>
               Picking a company stage writes a cookie so the panels on a page agree with each other
               and the guidance is calibrated the same way everywhere. Picking a cash runway band writes a
               second one for the same reason. Each holds only the band you picked, never a cash figure.
-              Each is read only by this site and set by no other action.
+              Picking a decision under &ldquo;What are you deciding?&rdquo; writes a third, holding only
+              that area&rsquo;s name, so your next visit opens on the same answer. Each is read only by
+              this site and set by no other action.
             </p>
           </div>
 
@@ -242,7 +244,7 @@ export default function PrivacyPage() {
           </li>
           <li>
             Clear site data for this site to remove everything held in your browser: the identifier,
-            presets, drafts, and the stage and runway cookies.
+            presets, drafts, and the stage, runway and decision cookies.
           </li>
           <li>
             Ask for a copy of what is held against your address, or for it to be deleted, by emailing{" "}

@@ -17,6 +17,7 @@ import { ConditionsLegend } from "./components/home/ConditionsLegend";
 import { WeekStepper } from "./components/home/WeekStepper";
 import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
+import { QuietWeekFold } from "./components/home/QuietWeekFold";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
 import { getPlaybookForRegime } from "../lib/playbook";
@@ -31,7 +32,7 @@ import { formatDateUTC, formatWeekMondayUTC } from "../lib/formatters";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { buildFlipProximity } from "../lib/report/flipProximity";
 import { describeMarketMoveScale } from "../lib/report/marketMoveScale";
-import { describeMovementCause } from "../lib/report/decisionMovement";
+import { describeGuidanceChange, describeMovementCause } from "../lib/report/decisionMovement";
 import { operatorStageForVariantMode, operatorStageLabel } from "../lib/report/operatorStage";
 import { guardrailMatchesRule, ruleMetricLabel } from "../lib/report/boundedDecisionRules";
 import { getMonthlyRegimeHistory, primeMonthlyRegimeHistoryForRead } from "../lib/summary/monthlyRegimeHistory";
@@ -644,6 +645,25 @@ async function PageContent({
     ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null, omitReason: true } }
     : trustStripProps;
 
+  /* A quiet week (2026-11-03): no area moved and the conditions held since the
+     earlier reading, and nothing is close to changing. The card and the areas are
+     the whole answer, so the sections that explain them fold (`QuietWeekFold`). Live,
+     compared, current readings only: a saved copy or a week with no comparison has
+     not shown that nothing moved. */
+  const guidanceChange = describeGuidanceChange({
+    movement: decisionMovement,
+    regimeChanged: homepage.weeklyDecisionCardModel.decision.reportDynamics.regimeChanged,
+  });
+  const quietWeek =
+    !historicalSelection
+    && !savedCopy
+    && !isDegraded
+    && !comparisonUnavailable
+    && guidanceChange === "held"
+    && !trustStripProps.couldChangeNextWeek
+    && confidenceLabel !== "LOW"
+    && lineStateBand?.state !== "near";
+
   const periodControl = (
     <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
             <WeekStepper
@@ -865,13 +885,8 @@ async function PageContent({
                     Get the alert →
                   </ActionLink>
                 </div>
-                {/* Labelled: three bare words beside Copy Brief did not say they
-                    set the horizon the guidance is stated for. The confidence chip
-                    that sat between them repeated the trust strip on the card. */}
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="max-sm:sr-only text-fluid-xs text-slate-400">Plan horizon</span>
-                  <CadenceSelector />
-                </div>
+                {/* No plan-horizon control here (2026-11-03): it is set once, so it
+                    folds with stage and runway under the calibration line below. */}
               </div>
             </div>
 
@@ -886,7 +901,7 @@ async function PageContent({
                 and the one plan link. */}
             <DecisionPicker
               options={decisionPickerOptions}
-              initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM])}
+              initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM]) ?? data.operatorContext.decisionArea ?? undefined}
               regime={regime}
               stageLabel={stageLabel}
               activeRunway={activeRunway}
@@ -907,18 +922,19 @@ async function PageContent({
               </div>
             </DecisionPicker>
 
-            {/* 3. Whose lines these are. Live weekly brief only: the profile holds
-                the reader's company as of today, and an archived week or a longer
-                horizon was reached by choosing it. Sits after the areas because the
-                table above already names the company it is scaled to; this is where
-                the reader changes that. */}
-            {!historicalSelection && activeCadence === "weekly" ? (
+            {/* 3. Whose rules these are, and the settings behind them. Live briefs
+                only: the profile holds the reader's company as of today. At every
+                horizon since 2026-11-03, because the horizon control folds here too.
+                Sits after the areas because the table above already names the
+                company it is scaled to; this is where the reader changes that. */}
+            {!historicalSelection ? (
               <CompanyCalibration
                 stageLabel={stageLabel}
                 activeStage={activeStage}
                 activeRunway={activeRunway}
                 runwayEmphasis={runwayEmphasis}
                 stageAction={stageAction}
+                horizon={<CadenceSelector />}
               />
             ) : null}
 
@@ -927,65 +943,67 @@ async function PageContent({
                 says what the week did to the conditions and why, and each area's
                 row says which of its lines moved. Only a read with nothing to
                 compare says so over it. */}
-            <WhatChangedSection
-              compact
-              historyOpen={searchParams?.inputs === "1"}
-              heading={`What changed ${basis.since}`}
-              rows={signalChangeRows}
-              history={{
-                tightness: conditionsTrail.points.map((point) => ({ label: point.label, value: point.tightness })),
-                riskAppetite: conditionsTrail.points.map((point) => ({ label: point.label, value: point.riskAppetite })),
-              }}
-              historyCaveat={conditionsTrail.caveat}
-              inputHistory={historicalSelection ? undefined : inputHistory}
-              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
-              comparisonUnavailable={comparisonUnavailable}
-              basis={basis}
-            />
+            <QuietWeekFold quiet={quietWeek} regimeLabel={publicRegimeLabel}>
+              <WhatChangedSection
+                compact
+                historyOpen={searchParams?.inputs === "1"}
+                heading={`What changed ${basis.since}`}
+                rows={signalChangeRows}
+                history={{
+                  tightness: conditionsTrail.points.map((point) => ({ label: point.label, value: point.tightness })),
+                  riskAppetite: conditionsTrail.points.map((point) => ({ label: point.label, value: point.riskAppetite })),
+                }}
+                historyCaveat={conditionsTrail.caveat}
+                inputHistory={historicalSelection ? undefined : inputHistory}
+                lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
+                comparisonUnavailable={comparisonUnavailable}
+                basis={basis}
+              />
 
-            {/* 5. What the conditions are made of, and what the reading leaves out:
-                the two scores with their meanings, the excluded inputs that would
-                change the classification, and the capped score's real distance. */}
-            <WhyConditionsSection
-              regime={regime}
-              tightness={tightness}
-              riskAppetite={riskAppetite}
-              changeLines={callChangeLines}
-              saturatedPressure={tightnessSaturated ? tightnessPressure : undefined}
-              notCounted={reportData.scoringBasis.notCounted}
-              warning={reportData.scoringBasis.warning}
-            />
+              {/* 5. What the conditions are made of, and what the reading leaves out:
+                  the two scores with their meanings, the excluded inputs that would
+                  change the classification, and the capped score's real distance. */}
+              <WhyConditionsSection
+                regime={regime}
+                tightness={tightness}
+                riskAppetite={riskAppetite}
+                changeLines={callChangeLines}
+                saturatedPressure={tightnessSaturated ? tightnessPressure : undefined}
+                notCounted={reportData.scoringBasis.notCounted}
+                warning={reportData.scoringBasis.warning}
+              />
 
-            {/* 6. What would change the guidance: its pause and restart lines, the
-                line where conditions change, and where the reading sits. */}
-            <WhatWouldChangeSection
-              ladders={scoreLadders}
-              flipProximity={v2HeroSignalData.flipProximity}
-              reversalTrigger={reversalTriggerLabel}
-              resumeWhen={resumeWhenLabel}
-              guardrail={guardrailLabel}
-              leadResume={leadResumeCondition ? formatDecisionReversal(leadResumeCondition) : undefined}
-              flipConditions={flipConditionLabels}
-              callChangeLines={callChangeLines}
-              regime={regime}
-              conditionsTrail={conditionsTrail}
-            />
+              {/* 6. What would change the guidance: its pause and restart lines, the
+                  line where conditions change, and where the reading sits. */}
+              <WhatWouldChangeSection
+                ladders={scoreLadders}
+                flipProximity={v2HeroSignalData.flipProximity}
+                reversalTrigger={reversalTriggerLabel}
+                resumeWhen={resumeWhenLabel}
+                guardrail={guardrailLabel}
+                leadResume={leadResumeCondition ? formatDecisionReversal(leadResumeCondition) : undefined}
+                flipConditions={flipConditionLabels}
+                callChangeLines={callChangeLines}
+                regime={regime}
+                conditionsTrail={conditionsTrail}
+              />
 
-            {/* 7. Who will ask about those lines: the questions this week's
-                crossed lines invite, and the answer each one has. Renders
-                nothing on a week no pause line is crossed, and nothing on an
-                archived week, whose lines are a record rather than a present
-                conversation. */}
-            {historicalSelection ? null : <HearingSection entries={hearingPreview} />}
+              {/* 7. Who will ask about those lines: the questions this week's
+                  crossed lines invite, and the answer each one has. Renders
+                  nothing on a week no pause line is crossed, and nothing on an
+                  archived week, whose lines are a record rather than a present
+                  conversation. */}
+              {historicalSelection ? null : <HearingSection entries={hearingPreview} />}
 
-            {/* 8. How unusual is this? */}
-            <RecordSection
-              lastTime={lastTimeCallChanged}
-              callChangeLines={callChangeLines}
-              turningPoints={turningPoints}
-              spellLengths={spellLengths}
-              record={historicalSelection ? undefined : recordSeries}
-            />
+              {/* 8. How unusual is this? */}
+              <RecordSection
+                lastTime={lastTimeCallChanged}
+                callChangeLines={callChangeLines}
+                turningPoints={turningPoints}
+                spellLengths={spellLengths}
+                record={historicalSelection ? undefined : recordSeries}
+              />
+            </QuietWeekFold>
 
             {/* 9. The alert: hearing the day a line is crossed is how the page is
                 meant to be used, so it follows everything it watches. */}

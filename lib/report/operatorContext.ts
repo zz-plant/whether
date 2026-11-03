@@ -14,6 +14,8 @@
  */
 import { readOperatorStageCookie, type OperatorStage } from "./operatorStage";
 import { readOperatorRunwayCookie, type RunwayBand } from "./operatorRunway";
+import { readHomeDecisionCookie } from "./home/homeSectionModel";
+import type { DecisionArea } from "./boundedDecisionRules";
 
 export type CompanyStage = OperatorStage;
 
@@ -21,6 +23,8 @@ export interface OperatorContext {
   companyStage: CompanyStage | null;
   companyRunway: RunwayBand | null;
   ticker: string | null;
+  /** The decision area the reader last picked on the homepage. */
+  decisionArea?: DecisionArea | null;
 }
 
 const EMPTY_OPERATOR_CONTEXT: OperatorContext = { companyStage: null, companyRunway: null, ticker: null };
@@ -40,5 +44,6 @@ export const parseOperatorContextFromCookies = (
     companyStage: readOperatorStageCookie(cookieHeader),
     companyRunway: readOperatorRunwayCookie(cookieHeader),
     ticker: null,
+    decisionArea: readHomeDecisionCookie(cookieHeader),
   };
 };
