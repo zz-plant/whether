@@ -5,6 +5,7 @@ import { isOperatorWorkflowEvent } from "../../../../lib/operatorWorkflowTelemet
 import { isActivationEvent } from "../../../../lib/activationFunnel";
 import { isContentMeasurementEvent } from "../../../../lib/contentMeasurement";
 import { isSearchTelemetryEvent } from "../../../../lib/searchTelemetry";
+import { isDeadClickEvent } from "../../../../lib/deadClickTelemetry";
 import { checkRateLimit, clientKeyFor, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
 
 export const runtime = "edge";
@@ -33,6 +34,7 @@ const STREAM_VALIDATORS = {
   activation: isActivationEvent,
   "content-measurement": isContentMeasurementEvent,
   search: isSearchTelemetryEvent,
+  "dead-click": isDeadClickEvent,
 } satisfies Partial<Record<TelemetryStream, (input: unknown) => boolean>>;
 
 type BrowserWritableStream = keyof typeof STREAM_VALIDATORS;

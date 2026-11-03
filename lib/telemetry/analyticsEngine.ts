@@ -78,6 +78,12 @@ export const TELEMETRY_STREAMS = [
    * intake rather than left as a convention.
    */
   "search",
+  /**
+   * A click that did nothing on something that looked as if it would: the page, the
+   * section and the kind of element, never the words or the position
+   * (`lib/deadClickTelemetry.ts`; `isDeadClickEvent` refuses any other key).
+   */
+  "dead-click",
 ] as const;
 
 export type TelemetryStream = (typeof TELEMETRY_STREAMS)[number];

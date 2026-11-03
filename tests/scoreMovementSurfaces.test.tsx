@@ -121,6 +121,11 @@ describe("the evidence page", () => {
     /* The premise test found both scores move with fundraising in the same quarter
        (docs/research/premise-test-results.md), so the table claims neither leads. */
     assert.doesNotMatch(html, /Moves first|Confirms later/);
+    /* The from-chip is a fact, unframed and with no hover title (2026-11-03): framed,
+       with its move in a title, it read as a control and a tap showed nothing. */
+    const chip = /<span class="inline-flex items-center gap-1.5 text-xs tabular-nums[^"]*"><span class="text-slate-400">from<\/span>/.exec(html);
+    assert.ok(chip, "the from-chip renders");
+    assert.doesNotMatch(html, /<span[^>]*title="[^"]*points since/);
   });
 
   it("prints rollup indicators bridging instruments to composite score ladders", () => {

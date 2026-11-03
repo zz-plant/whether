@@ -72,6 +72,7 @@
     "check:suppressions": "bun --bun suppression-census --config scripts/census.config.ts --export suppressionCensusConfig",
     "check:dead-exports": "bun run scripts/check-dead-exports.ts",
     "telemetry:streams": "bun run scripts/telemetry-stream-census.ts",
+    "telemetry:dead-clicks": "bun run scripts/dead-click-report.ts",
     "audit:jev-copy": "bun run scripts/jev-copy-audit.ts",
     "audit:near-duplicates": "bun run scripts/near-duplicates.ts",
     "evidence:retrieve": "bun scripts/retrieve-evidence.ts",

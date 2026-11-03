@@ -39,6 +39,7 @@ const READERS: Record<string, string> = {
   "cron-step": "lib/telemetry/runHistory.ts → /trust",
   "content-measurement": "scripts/seo-page-metrics.ts → SEO refresh queue",
   search: "this census only",
+  "dead-click": "scripts/dead-click-report.ts → which parts of a page are pressed and do nothing",
 };
 
 const rowSchema = z.object({
