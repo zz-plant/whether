@@ -436,7 +436,8 @@ const artifactSurfaces: Surface[] = [
     name: "portfolio note",
     text: () =>
       buildPortfolioNote(fixtureBriefDocument(), [
-        { area: "hiring", rule: "Limit hiring to backfills", pause: "Funding pressure > 76", resume: "Risk appetite > 54" },
+        { area: "hiring", rule: "Limit hiring to backfills", pause: { line: "Funding pressure > 76" }, resume: { line: "Risk appetite > 54" } },
+        { area: "burn-discipline", rule: "Payback on every line", pause: { line: "Funding pressure > 76", state: "crossed" }, resume: { line: "Funding pressure < 66" } },
       ]),
   },
   { name: "published brief (Slack)", text: () => (latestPublishedBrief ? buildPublishedBriefSlackUpdate(latestPublishedBrief) : "") },

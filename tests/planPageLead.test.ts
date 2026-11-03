@@ -65,6 +65,8 @@ describe("/operate opening", () => {
     // The lead is the brief's own table.
     const [table] = propsHandedTo(steps[0]?.children, AreaTable);
     assert.ok(table, "the first step is the AreaTable");
+    // Where a reader sets rules of their own, so both sides of each rule, not the one the brief draws.
+    assert.equal(table.bothSides, true);
     // The rest wait for a click, and the index lists the steps in the order the page draws them.
     assert.ok(steps.slice(3).every((step) => !step.defaultOpen));
     const indexed = operationsSectionLinks.plan.map((link) => link.href.slice(1));

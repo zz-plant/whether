@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactElement } from "react";
-import type { ScoreReadingParts } from "../export/scoreReference";
+import { scoreReadingDetail, type ScoreReadingParts } from "../export/scoreReference";
 import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
 import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
 import { formatMarginStamp } from "../report/reportFormatting";
@@ -12,7 +12,7 @@ export type BriefImageProps = {
   decision: string;
   /** The engine key; it picks the weather word and its colour. */
   regime: string;
-  /** Both scores with the line each is judged against and the earlier reading, dated (`buildScoreReadings`). */
+  /** Both scores with the earlier reading, dated, and what would change things (`buildScoreReadings`). */
   readings: readonly ScoreReadingParts[];
   confidenceLabel: string;
   recordDate: string;
@@ -65,7 +65,9 @@ export const parseBriefImageVariant = (source: { get(name: string): string | nul
  * the 800px canvas, measured off a render: padding (44 + 38), the header (30),
  * the stamp and its margin (22 + 54), a three-line call at 56px (14 + 185), the
  * least air (20), two readings of three lines each (2 x 131 + 10 between) and
- * the footer, chip row then source line (14 + 40 + 8 + 28) come to 769px.
+ * the footer, chip row then source line (14 + 40 + 8 + 28) come to 769px. A
+ * reading draws two lines since 2026-11-03 (its restart line no longer takes a
+ * third), so that is a ceiling now.
  */
 const WIDTH = 1200;
 const HEIGHT = 800;
@@ -114,8 +116,8 @@ const layoutCall = (decision: string): { size: number; text: string } => {
  * string here instead of several adjacent JSX children.
  */
 const readingRow = (reading: ScoreReadingParts, valueWidth: number, palette: typeof DARK_PALETTE) => {
-  /* The order every surface prints: the line, how far from it, then the earlier reading. */
-  const detail = [reading.line, reading.distance, reading.previous].filter((part) => part !== null).join(" \u00b7 ");
+  /* The order every surface prints: the earlier reading, then what would change things. */
+  const detail = scoreReadingDetail(reading);
   return (
     <div
       key={reading.metric}
@@ -148,9 +150,6 @@ const readingRow = (reading: ScoreReadingParts, valueWidth: number, palette: typ
           <div style={{ display: "flex", fontSize: 24, color: palette.muted }}>{reading.meaning}</div>
         </div>
         <div style={{ display: "flex", fontSize: 24, color: palette.secondary }}>{detail}</div>
-        {reading.resume ? (
-          <div style={{ display: "flex", fontSize: 24, color: palette.muted }}>{reading.resume}</div>
-        ) : null}
       </div>
     </div>
   );
@@ -163,10 +162,8 @@ const toImageSafeReading = (reading: ScoreReadingParts): ScoreReadingParts => ({
   value: toImageSafeText(reading.value),
   meaning: toImageSafeText(reading.meaning),
   reading: toImageSafeText(reading.reading),
-  line: toImageSafeText(reading.line),
-  distance: toImageSafeText(reading.distance),
   previous: reading.previous === null ? null : toImageSafeText(reading.previous),
-  resume: reading.resume === null ? null : toImageSafeText(reading.resume),
+  condition: toImageSafeText(reading.condition),
 });
 
 const renderStandardBriefImage = (props: BriefImageProps, palette: typeof DARK_PALETTE): ReactElement => {
@@ -339,7 +336,7 @@ const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVari
 
         <div style={{ display: "flex", flexDirection: "column", width: landscape ? columnWidth : "100%", gap: 12, justifyContent: landscape ? "center" : "flex-end" }}>
           {readings.map((reading) => {
-            const detail = [reading.line, reading.distance, reading.previous].filter((part) => part !== null).join(" · ");
+            const detail = scoreReadingDetail(reading);
             return (
               <div key={reading.metric} style={{
                 display: "flex", flexDirection: landscape ? "column" : "row", alignItems: landscape ? "stretch" : "center",
@@ -354,7 +351,6 @@ const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVari
                   </div>
                   <div style={{ display: "flex", fontSize: readingSize, lineHeight: 1.2, color: palette.muted }}>{reading.meaning}</div>
                   <div style={{ display: "flex", fontSize: readingSize, lineHeight: 1.2, color: palette.secondary }}>{detail}</div>
-                  {reading.resume ? <div style={{ display: "flex", fontSize: readingSize, lineHeight: 1.2, color: palette.muted }}>{reading.resume}</div> : null}
                 </div>
               </div>
             );

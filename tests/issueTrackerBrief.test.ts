@@ -39,9 +39,9 @@ describe("buildIssueTrackerMarkdownBrief", () => {
   it("carries both composite scores and the rate inputs behind them", () => {
     const brief = buildIssueTrackerMarkdownBrief(fixtureBriefDocument());
 
-    // Each score with the lines it is judged against and the distance to them.
-    assert.match(brief, /Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts away/);
-    assert.match(brief, /Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts away/);
+    // Each score with the one line that can change things this week, and the distance to it.
+    assert.match(brief, /Funding pressure 12 of 100 \(money is easy to raise\) · pauses above 76 \(64 pts away\)/);
+    assert.match(brief, /Risk appetite 68 of 100 \(investors are selective about risk\) · pauses below 44 \(24 pts away\)/);
     // The series is named in words, never as the engine's "(1M)".
     assert.match(brief, /Short-term borrowing rate:\*\* 3\.75% \(read from the 1-month Treasury bill\)/);
     assert.doesNotMatch(brief, /\(1M\)/);

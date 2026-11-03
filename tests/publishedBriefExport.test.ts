@@ -38,12 +38,13 @@ describe("published brief readings block", () => {
       ],
     };
 
-    /* Value, the line it is judged against, the distance, the earlier reading — the
-       four parts `formatScoreReference` prints wherever a score appears, so the
-       archive reads the way the page does. The earlier reading carries its date. */
+    /* Value, the earlier reading, and the one line that can change things with its
+       distance — the parts every score prints wherever it appears, so the archive
+       reads the way the page does. The earlier reading carries its date; nothing is
+       on hold at 32 / 52, so each names where it pauses. */
     assert.deepEqual(buildPublishedBriefReadingLines(brief), [
-      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · pause line 76 · 44 pts away · was 40 on Jun 30 · restart line 66 (already met)",
-      "Risk appetite 52 of 100 (investors are selective about risk) · pause line 44 · 8 pts away · was 59 on Jun 30 · restart line 54 (2 pts away)",
+      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · was 40 on Jun 30 · pauses above 76 (44 pts away)",
+      "Risk appetite 52 of 100 (investors are selective about risk) · was 59 on Jun 30 · pauses below 44 (8 pts away)",
     ]);
     assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure 32 of 100/);
     assert.deepEqual(buildPublishedBriefReadingLines(base), [], "a record frozen without scores prints no readings block");
@@ -55,6 +56,24 @@ describe("published brief readings block", () => {
     });
     assert.equal(lines.length, 2);
     for (const line of lines) assert.doesNotMatch(line, /last week|was \d+ on/);
+  });
+});
+
+describe("published brief area rows", () => {
+  it("prints each frozen area by the one side that could change it that week", () => {
+    // w44 froze funding pressure 90 and risk appetite 53: every area with a funding-pressure
+    // pause was on hold, and the roadmap, which pauses on risk appetite alone, was not.
+    const w44 = findPublishedBrief("2026-w44");
+    assert.ok(w44?.scores);
+    for (const paste of [buildPublishedBriefSlackUpdate(w44), buildPublishedBriefEmailUpdate(w44)]) {
+      const row = (label: string) => paste.split("\n• ").find((block) => block.startsWith(`${label}: `)) ?? "";
+      for (const area of ["Hiring", "Fundraising", "Spending", "New bets"]) {
+        assert.match(row(area), /Restart when: /, `${area} is on hold, so its restart line prints`);
+        assert.doesNotMatch(row(area), /Pause if: /, `${area} is past its pause line, so it does not print`);
+      }
+      assert.match(row("Roadmap"), /Pause if: Risk appetite falls below 44/);
+      assert.doesNotMatch(row("Roadmap"), /Restart when: /, "the roadmap is not on hold, so it has nothing to restart");
+    }
   });
 });
 

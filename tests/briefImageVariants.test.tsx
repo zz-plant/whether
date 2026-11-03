@@ -94,7 +94,7 @@ describe("brief image variants", () => {
           assert.ok(part && text.includes(part), `the ${layout} card must carry "${part}" without cutting it`);
         }
         for (const reading of props.readings) {
-          for (const part of [reading.label, reading.value, reading.meaning, reading.line, reading.distance, reading.previous, reading.resume]) {
+          for (const part of [reading.label, reading.value, reading.meaning, reading.previous, reading.condition]) {
             assert.ok(part && text.includes(part), `the ${layout} card must carry "${part}"`);
           }
         }

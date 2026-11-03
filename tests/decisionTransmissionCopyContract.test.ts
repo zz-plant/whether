@@ -40,8 +40,11 @@ describe("decision transmission copy contract", () => {
     assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /• Room before a change: (plenty|some|little)\b/);
     assert.match(brief, /• How you'd know: watch "Conditions change if" above/);
-    assert.match(brief, /• Restart when:/);
     assert.match(brief, /• Conditions change if:/);
+    // The lead area's restart line prints while it is on hold, the one week it can change anything.
+    assert.doesNotMatch(brief, /• Restart when:/, "hiring is not on hold at funding pressure 72");
+    const held = buildAssessmentFixture({ scores: { tightness: 90 } });
+    assert.match(buildSlackBrief(fixtureBriefDocument({ reading: held })), /• Restart when:/);
   });
 
   it("keeps FAQ structured data aligned with the rendered weekly decision FAQ prompts", () => {

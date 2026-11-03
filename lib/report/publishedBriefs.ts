@@ -20,7 +20,7 @@ import { MARGIN_LABEL, formatMarginBand, formatDecisionReversal, formatDecisionT
 import { DECISION_CONTRACT_LABELS, POLICY_OVERRIDE_CALL, POLICY_OVERRIDE_CALL_UNNAMED } from "./reportCopy";
 import { regimeSignalLabel } from "./signalTranslations";
 import { getRegimePublicLabel } from "../regimePresentation";
-import { buildBoundedConditionRails } from "./operatingCalls";
+import { buildBoundedConditionRails, selectPauseCondition } from "./operatingCalls";
 import { decisionAreaLabel, decisionAreaOrder, isDecisionArea } from "./boundedDecisionRules";
 import { buildScoreReferenceLines } from "../export/scoreReference";
 import { buildComparedWith, comparisonBasis } from "./comparisonBasis";
@@ -413,8 +413,9 @@ export const publishedBriefDisplay = (brief: PublishedBrief) => {
 
 /**
  * The readings against their lines, one line per score, in the shape every
- * export prints (`lib/export/scoreReference.ts`): value, line, distance, the
- * earlier reading. The frozen record's prose already says the rule; this says
+ * export prints (`lib/export/scoreReference.ts`): value, the earlier reading,
+ * and the side of the rule that could change things with its distance. The
+ * frozen record's prose already says the rule; this says
  * the numbers, so a reader of the pasted block sees where each reading sits
  * without parsing a sentence. The earlier reading is dated by the reading it
  * is ("was 85 on Sep 22"), never "last week" by default. Empty for records that
@@ -433,6 +434,21 @@ export const buildPublishedBriefReadingLines = (brief: PublishedBrief): string[]
     rails,
     previous: publishedBriefDisplay(brief).previous,
   });
+};
+
+type PublishedDecision = PublishedBrief["decisions"][number];
+
+/**
+ * Which side of a frozen rule a paste prints: the one that could change the
+ * area that week, its restart line while a pause line held against the week's
+ * scores and its pause line otherwise (`selectPauseCondition`, as the live rows
+ * judge it). A record frozen without its lines or its scores cannot say which,
+ * and keeps both.
+ */
+const decidingRuleSides = (brief: PublishedBrief, decision: PublishedDecision): { pause: boolean; resume: boolean } => {
+  if (!brief.scores || !decision.pause?.length) return { pause: true, resume: true };
+  const onHold = selectPauseCondition(decision.pause, brief.scores)?.satisfied === true;
+  return { pause: !onHold, resume: onHold };
 };
 
 /** The record's area decisions in the page's row order; an area the table does not know keeps its place at the end. */
@@ -687,14 +703,15 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
   const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const readingLines = buildPublishedBriefReadingLines(brief);
   const display = publishedBriefDisplay(brief);
-  const decisions = decisionsInAreaOrder(brief).map((decision) =>
-    [
+  const decisions = decisionsInAreaOrder(brief).map((decision) => {
+    const sides = decidingRuleSides(brief, decision);
+    return [
       `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)}`,
       `  ${publicDecisionLabels.action}: ${display.sentence(decision.doNow)}`,
-      `  ${publicDecisionLabels.threshold}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`,
-      `  ${publicDecisionLabels.reversal}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`,
-    ].join("\n"),
-  );
+      ...(sides.pause ? [`  ${publicDecisionLabels.threshold}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`] : []),
+      ...(sides.resume ? [`  ${publicDecisionLabels.reversal}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`] : []),
+    ].join("\n");
+  });
 
   const evidenceLines = brief.evidence.map((item) => `• ${display.evidenceTitle(item.title)} — ${item.detail}`);
   /* The slots the record can fill: w31 names no pause line (`publishedBriefDisplay`). */
@@ -737,14 +754,15 @@ export const buildPublishedBriefEmailUpdate = (brief: PublishedBrief): string =>
   const permalinkUrl = buildCanonicalUrl(buildPublishedBriefPath(brief.slug));
   const readingLines = buildPublishedBriefReadingLines(brief);
   const display = publishedBriefDisplay(brief);
-  const decisions = decisionsInAreaOrder(brief).map((decision) =>
-    [
+  const decisions = decisionsInAreaOrder(brief).map((decision) => {
+    const sides = decidingRuleSides(brief, decision);
+    return [
       `• ${labelForArea(decision.area)}: ${display.sentence(decision.call)}`,
       `  - ${DECISION_CONTRACT_LABELS.slot.action}: ${display.sentence(decision.doNow)}`,
-      `  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`,
-      `  - ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`,
-    ].join("\n"),
-  );
+      ...(sides.pause ? [`  - ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(display.sentence(decision.pauseTrigger))}`] : []),
+      ...(sides.resume ? [`  - ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(display.sentence(decision.resumeTrigger))}`] : []),
+    ].join("\n");
+  });
 
   const evidenceLines = brief.evidence.map((item) => `• ${display.evidenceTitle(item.title)}: ${item.detail}`);
 

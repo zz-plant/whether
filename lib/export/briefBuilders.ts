@@ -3,7 +3,7 @@ import { weeklyHeadline } from "../report/reportEvidence";
 import type { RegimeAssessment } from "../regimeEngine";
 import type { BriefDocument } from "../report/briefArtifact";
 import { buildComplianceStamp } from "../exportNotices";
-import { buildSharedCorridorRails, formatPointsToLine, type ActionStripItem } from "../report/operatingCalls";
+import { buildSharedCorridorRails, formatPointsToLine, selectPauseCondition, type ActionStripItem } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { MARGIN_LABEL, formatDecisionReversal, formatDecisionThreshold, joinSentences, publicDecisionLabels } from "../report/reportFormatting";
 import { regimeSignalLabel } from "../report/signalTranslations";
@@ -49,19 +49,31 @@ const buildExportStamp = (document: BriefDocument, confidence: string) =>
 type CallSlot = { label: string; value: string };
 
 /**
+ * Whether an area is on hold: the pause line it is judged by holds
+ * (`selectPauseCondition`, the line the homepage's rows and ladder judge it by).
+ * Only one side of a rule can change the area then — its restart line — and
+ * only the pause line can for any other area, so a paste prints that side alone.
+ */
+const isOnHold = (item: ActionStripItem, scores: BriefDocument["readings"]["scores"]) =>
+  selectPauseCondition(item.pauseConditions, scores)?.satisfied === true;
+
+/**
  * The call's slots, in the order every paste prints them: the contract's call,
  * action and pause line (its condition only, as the email prints it), the
- * restart line, and where conditions change. The restart line is the lead area's,
- * then a stage's discipline when one is chosen: both say when a hold lifts. A
- * held call prints none, because its change line is its one restart line
- * (`applyStageToWeeklyCall` keeps a stage's out for the same reason) and an
- * area's would compete with it.
+ * restart line, and where conditions change. The restart line is the lead area's
+ * while that area is on hold, then a stage's discipline when one is chosen: both
+ * say when a hold lifts. A lead area that is not on hold has none to lift, and
+ * printed "Restart when … Funding pressure is 32 and risk appetite is 52 now."
+ * beside a pause line 44 points off until 2026-11-03. A held call prints none,
+ * because its change line is its one restart line (`applyStageToWeeklyCall`
+ * keeps a stage's out for the same reason) and an area's would compete with it.
  */
 /** The restart line beside the call, or null for a held call or a week with none. */
 export const briefResumeLine = (document: BriefDocument): string | null => {
   const { slots } = document;
   if (slots.policyOverrideActive) return null;
-  const leadResume = document.areaRows[0]?.reversalCondition?.trim();
+  const lead = document.areaRows[0];
+  const leadResume = lead && isOnHold(lead, document.readings.scores) ? lead.reversalCondition.trim() : undefined;
   const lines = [
     ...(leadResume ? [formatDecisionReversal(leadResume)] : []),
     ...(slots.resumeWhen ? [slots.resumeWhen] : []),
@@ -103,18 +115,20 @@ const areaOrderIndex = (item: ActionStripItem) => decisionAreaOrder.indexOf(oper
 
 /**
  * One row per decision area, in the page's row order (`decisionAreaOrder`),
- * each with its rule, its pause and restart lines with a distance, and its
- * timing. The rows used to follow the model's priority order and skip the
- * lead item, so a reader who checks Fundraising every Monday found it in a
- * different place in every paste — and never in the same place as on the page.
+ * each with its rule, the one side of it that can change the area with a
+ * distance (its restart line on hold, else its pause line), and its timing.
+ * The rows used to follow the model's priority order and skip the lead item,
+ * so a reader who checks Fundraising every Monday found it in a different
+ * place in every paste — and never in the same place as on the page.
  */
 export const buildAreaRowLines = (document: BriefDocument) =>
   [...document.areaRows]
     .sort((left, right) => areaOrderIndex(left) - areaOrderIndex(right))
     .flatMap((item) => [
       `• ${decisionAreaLabel(operatingLeverToDecisionArea[item.lever])}: ${item.areaActionNow}`,
-      `  ${publicDecisionLabels.threshold}: ${formatItemLines(item, "pause")}`,
-      `  ${publicDecisionLabels.reversal}: ${formatItemLines(item, "resume")}`,
+      isOnHold(item, document.readings.scores)
+        ? `  ${publicDecisionLabels.reversal}: ${formatItemLines(item, "resume")}`
+        : `  ${publicDecisionLabels.threshold}: ${formatItemLines(item, "pause")}`,
       ...(item.latencyLine ? [`  ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
     ]);
 

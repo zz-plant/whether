@@ -56,7 +56,8 @@ describe("expansion controls rendering", () => {
       scores,
     });
     const rows = buildAreaRows(buildActionStripItems(rules, scores));
-    const html = renderToStaticMarkup(require("react").createElement(AreaTable, { rows, caption: "test" }));
+    /* Both sides, as /operate draws them: it is where a reader sets rules of their own. */
+    const html = renderToStaticMarkup(require("react").createElement(AreaTable, { rows, caption: "test", bothSides: true }));
 
     assert.match(html, /<table/);
     assert.match(html, /Funding pressure &gt; 76/);

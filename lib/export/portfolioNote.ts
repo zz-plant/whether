@@ -1,5 +1,6 @@
 import type { BriefDocument } from "../report/briefArtifact";
 import { decisionAreaLabel, type DecisionArea } from "../report/boundedDecisionRules";
+import type { LineState } from "../report/operatingCalls";
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { formatThresholdNumber, formatWeekMondayUTC } from "../formatters";
 import { signalReadingMeaning } from "../report/signalTranslations";
@@ -16,8 +17,9 @@ import { buildCanonicalUrl } from "../seo";
  * prints what the week means at each of the four bands — the document's
  * every-band runway, from the same notes the brief prints for the band a
  * reader picks (`buildRunwayConditionedNotes`) — and
- * every area's rule with its two lines. It ends where a company can set lines of
- * its own, because a shared reading is the start of a plan, not the plan.
+ * every area's rule with the one side of it that can change the area this week.
+ * It ends where a company can set lines of its own, because a shared reading is
+ * the start of a plan, not the plan.
  *
  * Built on the server from the cached reading: no runway, no company, nothing
  * from the reader's browser.
@@ -26,24 +28,26 @@ import { buildCanonicalUrl } from "../seo";
 type PortfolioArea = {
   area: DecisionArea;
   rule: string;
-  /** "Funding pressure > 76", as the area tables print it. */
-  pause?: string;
-  resume?: string;
+  /** "Funding pressure > 76", as the area tables print it; a `"crossed"` state is an area on hold. */
+  pause?: { line: string; state?: LineState };
+  resume?: { line: string };
 };
 
 const capitalize = (text: string) => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
 
 const asSentence = (text: string) => (/[.!?]$/.test(text.trim()) ? text.trim() : `${text.trim()}.`);
 
+/* The one side that can change the area this week: when it restarts, for an
+   area on hold, else when it pauses. Every company reads the same scores, so
+   which side applies is the same for all of them; the note printed both until
+   2026-11-03. */
 const formatArea = ({ area, rule, pause, resume }: PortfolioArea) => {
-  const clause = [
-    pause ? `${DECISION_CONTRACT_LABELS.threshold.pauseIf.toLowerCase()} ${pause}` : null,
-    resume ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen.toLowerCase()} ${resume}` : null,
-  ]
-    .filter((line): line is string => line !== null)
-    .join("; ");
-  const lines = clause ? ` ${clause.charAt(0).toUpperCase()}${clause.slice(1)}.` : "";
-  return `- ${decisionAreaLabel(area)}: ${asSentence(rule)}${lines}`;
+  const clause = pause?.state === "crossed" && resume
+    ? `${DECISION_CONTRACT_LABELS.reversal.resumeWhen} ${resume.line}`
+    : pause
+      ? `${DECISION_CONTRACT_LABELS.threshold.pauseIf} ${pause.line}`
+      : null;
+  return `- ${decisionAreaLabel(area)}: ${asSentence(rule)}${clause ? ` ${clause}.` : ""}`;
 };
 
 /**
@@ -71,7 +75,7 @@ export const buildPortfolioNote = (document: BriefDocument, areas: readonly Port
     `Conditions: ${document.conditions.line}. ${confidence}.`,
     `Funding pressure is ${formatThresholdNumber(tightness)} of 100 (${signalReadingMeaning("tightness", tightness)}); risk appetite is ${formatThresholdNumber(riskAppetite)} of 100 (${signalReadingMeaning("riskAppetite", riskAppetite)}).`,
     "",
-    "The rule for each area, with when it pauses and when it restarts:",
+    "The rule for each area:",
     ...areas.map(formatArea),
     "",
     "What it means at your runway:",

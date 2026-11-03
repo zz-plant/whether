@@ -84,8 +84,9 @@ const buildCurrentShareArtifact = async () => {
    * the formats live.
    */
   const issueTrackerBrief = buildIssueTrackerMarkdownBrief(document);
-  /* The same five rows the plan page tabulates, so an area's rule and its two
-     lines read identically on both surfaces. */
+  /* The same five rows the plan page tabulates, so an area's rule and its
+     lines read identically on both surfaces; each row's pause state says which
+     side the note prints. */
   const areaRows = buildAreaRows(actionStripItems);
   /* One citation for the week: the one the picker offers. The meeting pack and
      the email carried a second, the answer pages', with a different shape. */
@@ -99,10 +100,7 @@ const buildCurrentShareArtifact = async () => {
   const investorUpdate = buildInvestorUpdateSnippetParts(document, getMonthlyRegimeHistory());
   /* One sender to many companies, so every runway band rather than the reader's:
      the investor update above runs the other way. */
-  const portfolioNote = buildPortfolioNote(
-    document,
-    areaRows.map((row) => ({ area: row.area, rule: row.rule, pause: row.pause?.line, resume: row.resume?.line })),
-  );
+  const portfolioNote = buildPortfolioNote(document, areaRows);
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,
