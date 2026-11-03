@@ -244,9 +244,11 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    inspection — inputs outside the record (counted, they would move a score across its change line;
    the counted weather word is printed) and a capped score's real distance (90 against a 70 line
    reads as 20 points; the uncapped pressure is 40). Both were methodology notes before (2026-10-22).
-5. **What changed since {reading}** (`WhatChangedSection`): one row per signal, the earlier reading →
-   this week's with the comparison dated (§1.1.26), each composite score on its ladder with what
-   moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
+5. **What changed since {reading}** (`WhatChangedSection`): one row per signal, opening on what the
+   move means in everyday words (`signalMoveMeaning.ts`, size words cut on the brief's existing
+   scales, 2026-11-03), then each composite score on its ladder with the comparison dated on its
+   hollow dot (§1.1.26) and what moved it (§1.1.27); a market input prints this week's value over
+   the earlier one. It opens on the table: the movement sentence (§1.1.28) restated the card, and
    each area's row says which of its lines moved. A read with no comparison says so over it.
 6. **What would change this guidance** (`WhatWouldChangeSection`): two questions, named apart —
    when conditions change (the change line, in points, with the market move folded under it) and
