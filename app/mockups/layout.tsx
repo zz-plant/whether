@@ -10,7 +10,7 @@ import { notFound } from "next/navigation";
  *
  * Gated here rather than per page because two of the four are client
  * components, and a server layout is the one place that covers the whole
- * subtree regardless. Follows the trial-switch convention in wrangler.toml —
+ * subtree regardless. Follows the trial-switch convention in cloudflare.config.ts —
  * the preview lane sets the flag, production leaves it unset — so designers
  * keep the routes on preview deploys and in local dev.
  */

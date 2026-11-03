@@ -33,6 +33,7 @@ const INDEX_FILENAMES = {
   testMap: "test-map.json",
 };
 const SKIP_DIRECTORIES = new Set([
+  ".cloudflare",
   ".git",
   ".next",
   ".wrangler",

@@ -165,6 +165,30 @@ archive did not have. It never ran far enough to find out, because production ha
 `GITHUB_TOKEN`; every instance from Oct 19 to Nov 2 failed on that line. Once the token is set and
 the first rebuild lands, the routine can be disabled; until then both write the same files.
 
+**The deploy moved from Wrangler to `cf` (2026-11-03).** `cloudflare.config.ts` replaced
+`wrangler.toml` (`cf migrate` drafted it), the Cloudflare Vite plugin moved to its v2 beta, which
+reads that file and writes Build Output to `.cloudflare/output/v0/`, and `@vinext/cloudflare`
+deploys with `cf deploy --prebuilt` whenever the file exists. Both lanes come from one builder, so
+the preview lane can no longer drift from production one hand-copied block at a time; a lane is
+Vite's mode (`--mode preview`), not `CLOUDFLARE_ENV`. What needed care: Wrangler's ordered Durable
+Object `migrations` became `worker.exports`, the class's whole lifecycle in one declaration, so
+`IngestCoordinator` must stay `exports.durableObject({ storage: "sqlite" })` or a deploy asks to
+delete or convert a live namespace (`tests/cloudflareConfig.test.ts` holds it); and a Vite preview
+serves Build Output exactly as recorded, with no `--var`, `.dev.vars` or process-environment
+override, so `serve:worker` previews a copy with `WHETHER_ENABLE_MOCKUPS=1` added rather than the
+output `deploy:cloudflare` uploads. `cf` cannot set a single secret or tail logs yet; those stay
+`npx wrangler … --name whether`. Removing Wrangler also removed the `path-to-regexp@6` it hoisted,
+which `tests/redirectResolution.test.ts` had imported without declaring; it is a dev dependency
+now. Verified locally: the build, `cf deploy --dry-run` on both lanes (every production binding
+Wrangler deployed, resolved), the landmark audit and `bun run e2e:email` (50 of 53, the same three
+failures as `main` under `wrangler dev`). Not verified until the first deploy after merge: the
+upload itself and the exports lifecycle against the live Worker.
+
+**Never set `WORKERS_CI=1` outside Workers Builds (2026-11-03).** The gate takes it to mean a build
+container and `git reset --hard`s every drifted tracked file, so a local `WORKERS_CI=1 bun run
+check:vinext` silently discards uncommitted work: it erased 37 files of this migration once. To
+rehearse the build, commit first, or run `bun run check:vinext` without it.
+
 **A freeze must not move a pinned test (2026-10-07).** The routine pushes through the pre-push gate,
 so any test that reads the newest frozen week fails its push and no freeze PR opens. The brief-format
 golden did: every paste's "Full brief" link cited the newest frozen week even for fixtures dated weeks
@@ -388,8 +412,8 @@ Vite's chunk tables and Wrangler's 600-row module table. The deploy's own result
 and a working build read as a failed one. Now `run-checks` reduces a passing task to its last four
 lines (`CHECK_VERBOSE=1` restores the rest); a failing task keeps its output, with any line repeated
 more than three times printed once with its count; the gate runs `bun test --only-failures`;
-`cloudflare-run.mjs` sets Vite to `warn` when `WORKERS_CI=1` and prints Wrangler's module table as a
-count. A passing build is now ~45 lines and its deploy ~200. `tests/buildLogNoise.test.ts` holds it.
+`cloudflare-run.mjs` sets Vite to `warn` when `WORKERS_CI=1` and printed Wrangler's module table as a
+count (`cf` prints none, so the filter went with Wrangler on 2026-11-03). A passing build is now ~45 lines and its deploy ~200. `tests/buildLogNoise.test.ts` holds it.
 
 That block also names **the `bun` it ran on**, and says so when that is older than `engines.bun`.
 Nothing enforces the declared range, so a build image shipping its own `bun` runs this gate on

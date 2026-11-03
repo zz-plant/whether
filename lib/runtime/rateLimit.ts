@@ -1,5 +1,5 @@
 /**
- * Workers rate limiting bindings (`[[ratelimits]]` in wrangler.toml, installed on globalThis
+ * Workers rate limiting bindings (`bindings.rateLimit` in cloudflare.config.ts, installed on globalThis
  * with every other binding). One binding carries one limit: the subscribe endpoints (each
  * accepted POST sends mail from this domain) and the public writes (telemetry intake, the
  * quote proxy whose upstream limits the Worker as a whole). Permissive and eventually

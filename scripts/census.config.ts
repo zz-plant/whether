@@ -19,6 +19,7 @@ import type { DeadExportsConfig } from "./check-dead-exports";
  * file either one reads.
  */
 const GENERATED_DIRECTORIES = [
+  ".cloudflare",
   ".next",
   ".open-next",
   ".vercel",
@@ -35,7 +36,7 @@ const DECLARATION_ROOTS = ["app", "lib", "worker"];
 
 /**
  * Files whose identifiers count as references. Wider than the declaration roots on purpose:
- * a script, a test, or `wrangler.toml` naming a Durable Object class is a real consumer.
+ * a script, a test, or `cloudflare.config.ts` naming a Durable Object class is a real consumer.
  *
  * `packages` was in this list for `@whether/decision-engine`, whose entire content was
  * `export * from "../../../lib/report/index"` and which nothing imported. A star re-export
@@ -49,7 +50,7 @@ const REFERENCE_ROOTS = [...DECLARATION_ROOTS, "scripts", "tests", ".github"];
 
 /*
  * Wider than the declaration set on purpose. A symbol can be named from a `.jsx` file, an
- * ambient `.d.ts`, a nested `wrangler.toml` naming a Durable Object class, or a workflow
+ * ambient `.d.ts`, a root `cloudflare.config.ts` naming a Durable Object class, or a workflow
  * YAML — and each one the scan cannot see turns a live export into a reported orphan.
  */
 const REFERENCE_EXTENSIONS = [

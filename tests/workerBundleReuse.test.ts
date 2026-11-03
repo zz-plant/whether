@@ -23,39 +23,44 @@ describe("worker bundle freshness (isWorkerBundleCurrent)", () => {
     for (const root of roots.splice(0)) rmSync(root, { recursive: true, force: true });
   });
 
-  /** A tree whose dist/ bundle is current: sources written first, the marker last. */
+  const MARKER = [".cloudflare", "output", "v0", "config.json"];
+  const writeMarker = (root: string, mode: string) =>
+    writeFileSync(join(root, ...MARKER), JSON.stringify({ buildContext: { isPreview: false, mode } }));
+
+  /** A tree whose Build Output is a current production build: sources written first, the marker last. */
   const makeCurrentFixture = () => {
     const root = mkdtempSync(join(tmpdir(), "worker-bundle-"));
     roots.push(root);
-    mkdirSync(join(root, "dist", "server"), { recursive: true });
-    mkdirSync(join(root, ".wrangler", "deploy"), { recursive: true });
+    mkdirSync(join(root, ...MARKER.slice(0, -1)), { recursive: true });
     mkdirSync(join(root, "app"), { recursive: true });
-    writeFileSync(join(root, ".wrangler", "deploy", "config.json"), "{}");
     writeFileSync(join(root, "app", "page.tsx"), "export default function Page() {}\n");
-    writeFileSync(join(root, "dist", "server", "wrangler.json"), "{}");
+    writeMarker(root, "production");
     return root;
   };
 
-  it("is current when the marker exists and no bundled source is newer", () => {
+  it("is current when the marker records a production build and no bundled source is newer", () => {
     assert.equal(isWorkerBundleCurrent(makeCurrentFixture()), true);
   });
 
   it("is not current when a bundled source is newer than the marker", () => {
     const root = makeCurrentFixture();
-    utimesSync(join(root, "dist", "server", "wrangler.json"), LONG_AGO, LONG_AGO);
+    utimesSync(join(root, ...MARKER), LONG_AGO, LONG_AGO);
     assert.equal(isWorkerBundleCurrent(root), false);
   });
 
-  it("is not current when the marker or wrangler's redirect is missing", () => {
-    const root = makeCurrentFixture();
-    rmSync(join(root, "dist", "server", "wrangler.json"), { force: true });
-    assert.equal(isWorkerBundleCurrent(root), false);
+  it("is not current when the marker is missing, unreadable, or records another mode", () => {
+    const missing = makeCurrentFixture();
+    rmSync(join(missing, ...MARKER), { force: true });
+    assert.equal(isWorkerBundleCurrent(missing), false);
 
-    const noRedirect = mkdtempSync(join(tmpdir(), "worker-bundle-noredirect-"));
-    roots.push(noRedirect);
-    mkdirSync(join(noRedirect, "dist", "server"), { recursive: true });
-    writeFileSync(join(noRedirect, "dist", "server", "wrangler.json"), "{}");
-    assert.equal(isWorkerBundleCurrent(noRedirect), false);
+    const unreadable = makeCurrentFixture();
+    writeFileSync(join(unreadable, ...MARKER), "not json");
+    assert.equal(isWorkerBundleCurrent(unreadable), false);
+
+    // A preview build is the other lane's Worker: deploy:cloudflare must never reuse it.
+    const preview = makeCurrentFixture();
+    writeMarker(preview, "preview");
+    assert.equal(isWorkerBundleCurrent(preview), false);
   });
 });
 

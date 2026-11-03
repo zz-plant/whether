@@ -140,7 +140,7 @@ const isKvNamespace = (value: unknown): value is KvNamespace =>
   && typeof Reflect.get(value, "put") === "function"
   && typeof Reflect.get(value, "list") === "function";
 
-/** The durable KV binding installed by worker/index.ts; the only data namespace wrangler.toml declares. */
+/** The durable KV binding installed by worker/index.ts; the only data namespace cloudflare.config.ts declares. */
 export const getWhetherKv = (): KvNamespace | null => {
   const candidate: unknown = Reflect.get(globalThis, "WHETHER_DURABLE_KV");
   if (!isKvNamespace(candidate)) {

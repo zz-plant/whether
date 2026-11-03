@@ -5,7 +5,7 @@ import { resetSubscriberStore } from "../lib/email/subscriberStore";
 import { resetSlackWebhookStore } from "../lib/slack/slackWebhookStore";
 
 /*
- * WHETHER_DURABLE_KV is the only data namespace wrangler.toml declares. The
+ * WHETHER_DURABLE_KV is the only data namespace cloudflare.config.ts declares. The
  * accessor used to fall back to per-domain names (INGESTION_KV,
  * POSTURE_EVENTS_KV, DECISION_MEMORY_KV), and the regime-alert and
  * decision-event stores read two more off globalThis (REGIME_ALERTS_KV,

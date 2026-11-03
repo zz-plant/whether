@@ -106,7 +106,7 @@ export const agentStateSchema = z.object({
     fallback: z.boolean().describe("True when it is a saved copy, not a live reading."),
     nextCallDue: z
       .string()
-      .describe("ISO time of the next weekly publication (Mondays 14:00 UTC, the cron in wrangler.toml). The call is current until then; after it, re-read before quoting."),
+      .describe("ISO time of the next weekly publication (Mondays 14:00 UTC, the cron in cloudflare.config.ts). The call is current until then; after it, re-read before quoting."),
   }),
   automation: z
     .object({

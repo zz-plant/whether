@@ -28,7 +28,7 @@ Commands no gate runs and no other guide covers. None of them deploys or sends a
 
 | Command | What it does |
 | --- | --- |
-| `bun run clean` | Deletes `.next`, `.wrangler`, `out` and the contents of `dist/`, plus stray `dist 2`-style copies. |
+| `bun run clean` | Deletes `.cloudflare` (the Build Output), `.next`, `.wrangler`, `out` and the contents of `dist/`, plus stray `dist 2`-style copies. |
 | `bun run build:fresh` | `clean`, then `build`: rules out a stale artifact when a build behaves oddly. |
 | `bun run lint:fix` | `oxlint --fix`: applies oxlint's safe fixes in place. Review the diff before committing. |
 | `bun run ui:shots:list` | The capture targets `ui:shots` knows, one per line (id, label, path). |
