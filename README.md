@@ -109,11 +109,20 @@ bun run cli:whether -- watch --changes-only
 
 ### Connect an agent
 
-In Claude Code:
+In Claude Code, the plugin adds the connector and a skill that tells Claude when this week's call
+applies (hiring, raising, burn, runway, a board update):
+
+```bash
+claude plugin install whether --marketplace zz-plant/whether
+```
+
+The connector alone:
 
 ```bash
 claude mcp add --transport http whether https://whether.work/api/mcp
 ```
+
+In claude.ai, add `https://whether.work/api/mcp` as a custom connector (Settings → Connectors).
 
 In Cursor or VS Code, one click: [Add to Cursor](https://cursor.com/install-mcp?name=whether&config=eyJ1cmwiOiJodHRwczovL3doZXRoZXIud29yay9hcGkvbWNwIn0%3D) · [Add to VS Code](https://vscode.dev/redirect/mcp/install?name=whether&config=%7B%22type%22%3A%22http%22%2C%22url%22%3A%22https%3A%2F%2Fwhether.work%2Fapi%2Fmcp%22%7D)
 

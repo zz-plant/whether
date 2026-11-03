@@ -11,7 +11,7 @@ import { AGENT_START_TOOL, WHETHER_AGENT_MANIFEST_PATH } from "../lib/agent/disc
 import { describeAgentTools, listAgentTools } from "../lib/agent/tools";
 import { agentManifestResponse } from "../lib/agentManifest";
 import { handleMcpRequest } from "../lib/mcp/httpMcpServer";
-import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INSTRUCTIONS } from "../lib/mcp/serverIdentity";
+import { MCP_PROTOCOL_VERSIONS, MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS } from "../lib/mcp/serverIdentity";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
 
 serveUnreachableUpstreams();
@@ -75,6 +75,42 @@ describe("every place an agent learns what to call", () => {
     assert.deepEqual(named.filter((name) => !names.includes(name)), [], "every tool the instructions name is served");
     assert.deepEqual(names.filter((name) => !named.includes(name)).sort(), [...leftToToolsList].sort(), "every served tool is named or left out on purpose");
     assert.ok(MCP_SERVER_INSTRUCTIONS.includes(`Call ${AGENT_START_TOOL} first`));
+  });
+
+  it("sends Claude's plugin and the MCP registry entry to the server the manifest names, and the skill only to tools it serves", async () => {
+    /* Three files outside the app tell a client where the server is: the plugin's `.mcp.json`
+       (Claude Code, claude.ai and Cowork install it from `.claude-plugin/marketplace.json`), the
+       official MCP registry's `server.json`, and the README. None is read by a route, so nothing
+       else fails when one goes stale. */
+    const manifest = await agentManifestResponse().json();
+    const pluginRoot = join("plugins", "whether");
+    const plugin = JSON.parse(repoFile(pluginRoot, ".claude-plugin", "plugin.json"));
+    const marketplace = JSON.parse(repoFile(".claude-plugin", "marketplace.json"));
+    const pluginMcp = JSON.parse(repoFile(pluginRoot, ".mcp.json"));
+    const registryEntry = JSON.parse(repoFile("server.json"));
+
+    assert.deepEqual(pluginMcp.mcpServers, { [MCP_SERVER_INFO.name]: { type: "http", url: manifest.mcp.endpoint } });
+    assert.deepEqual(registryEntry.remotes, [{ type: "streamable-http", url: manifest.mcp.endpoint }]);
+    assert.equal(registryEntry.version, MCP_SERVER_INFO.version, "the registry entry names the version initialize reports");
+    assert.ok(registryEntry.description.length <= 100, "the registry refuses a longer description");
+    assert.deepEqual(
+      marketplace.plugins.map((entry: { name: string; source: string }) => [entry.name, entry.source]),
+      [[plugin.name, `./${pluginRoot}`]],
+    );
+    assert.ok(repoFile("README.md").includes(`claude plugin install ${plugin.name} --marketplace zz-plant/whether`));
+    assert.ok(
+      readFileSync(join(process.cwd(), pluginRoot, plugin.icon)).equals(readFileSync(join(process.cwd(), "public", "icon-512.png"))),
+      "the plugin's icon is the site's",
+    );
+
+    const skill = repoFile(pluginRoot, "skills", "hire-raise-spend", "SKILL.md");
+    const names = httpTools.map((tool) => tool.name);
+    const skillTools = [...new Set(skill.match(/\b[a-z]+(?:_[a-z]+)+\b/g) ?? [])].filter((word) => /^(get|stress|lint|audit|list)_/.test(word));
+    assert.deepEqual(skillTools.filter((name) => !names.includes(name)), [], "every tool the skill names is served");
+    assert.ok(skill.includes(manifest.endpoints.state), "the skill's fallback is the state endpoint");
+    for (const tool of skill.matchAll(/\?tool=([a-z_]+)/g)) {
+      assert.ok(names.includes(tool[1] ?? ""), `the skill's plain GET for ${tool[1]} is a served tool`);
+    }
   });
 
   it("points to the state where an agent begins, and the route answers it", async () => {

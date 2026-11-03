@@ -22,16 +22,22 @@ export const MCP_SERVER_INFO = {
 } as const;
 
 /* Read by the client at initialize and usually placed in the model's context, so it says
-   where to start and what to check before acting, and leaves the per-tool detail to the
-   tool descriptions. It names tools by hand, as prose grouped by use; get_signals,
+   which questions Whether answers, where to start and what to check before acting, and leaves
+   the per-tool detail to the tool descriptions. A model reaches for a server whose instructions
+   name the question it was asked; until 2026-10-28 these opened on "public macro data" and never
+   said hire, raise or burn. It names tools by hand, as prose grouped by use; get_signals,
    get_analog_playbook and list_agent_skills are left to tools/list on purpose.
    `tests/agentDiscoveryParity.test.ts` fails on a name the registry does not serve, and on a
    tool added to the registry until it is named here or left out on purpose there. */
 export const MCP_SERVER_INSTRUCTIONS =
-  "Whether turns public macro data into weekly operating guidance for startup leaders. " +
+  "Whether turns public U.S. interest-rate and credit-market data into weekly operating guidance for startup leaders: " +
+  "when to pause or resume hiring, spending and fundraising. It answers when someone asks whether their company should hire " +
+  "or freeze hiring, raise now or wait, cut burn, or what the current funding or macro climate means for those plans. " +
   `Call ${AGENT_START_TOOL} first: one small answer with the conditions, the margin, whether the data is live and current ` +
-  "(automation.ready; when it is false, say so and stop), where each score sits against its pause, resume and change lines, " +
-  "what moved each score, and the guidance. " +
+  "(automation.ready; when it is false, tell the user the reading is not current, and do not act on it without a person looking), " +
+  "where each score sits against its pause, resume and change lines, what moved each score, and the guidance. " +
+  "The call is the same for every company; what it means for one depends on its runway and stage, so apply it to those " +
+  "when the user gives them. Quote the reading's date and link the page an answer came from. " +
   "get_brief is the full weekly brief (about 22KB), for its wording, provenance and the other cadences. " +
   "get_standup_line is the daily standup line with guidance movement and flip conditions. " +
   "get_decision_rules gives the bounded rules behind the guidance. " +

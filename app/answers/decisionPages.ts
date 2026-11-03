@@ -84,42 +84,97 @@ const answerPageBySlug = new Map(answerPages.map((page) => [page.slug, page]));
 
 export const findDecisionPage = (slug: string) => answerPageBySlug.get(slug);
 
+const normalizeQuestion = (text: string) =>
+  text.toLowerCase().replace(/[^\p{L}\p{N}\s-]+/gu, " ").replace(/\s+/g, " ").trim();
+
+const answerPageByQuestion = new Map(answerPages.flatMap((page) =>
+  [page.title, page.keyword, ...page.askedAs].map((question) => [normalizeQuestion(question), page] as const),
+));
+
+/* Words that carry no topic: a question's grammar, and the words every answer shares
+   ("startups", "now", "this week"). Left in, they would let "should we raise" match any
+   page whose title starts with "Should". */
+const QUERY_STOPWORDS = new Set([
+  "a", "about", "am", "an", "and", "any", "are", "as", "at", "be", "can", "company", "could", "do", "does",
+  "for", "from", "get", "given", "good", "how", "i", "if", "in", "is", "it", "its", "me", "mean", "my",
+  "now", "of", "on", "or", "our", "right", "should", "so", "startup", "startups", "still", "that", "the",
+  "this", "time", "to", "us", "wait", "we", "week", "what", "when", "will", "with", "would", "yet", "you",
+]);
+
+/* One spelling per word, so "hiring", "hires" and "hire" are one term, and "engineering" and
+   "engineers" another. Crude on purpose: both sides of a match go through it, so it only has to
+   be consistent, not correct English. It leaves "-er" alone, which would make "engineer" "engine". */
+const stemQueryWord = (word: string) => {
+  const suffix = ["ing", "ies", "es", "ed", "s"].find(
+    (candidate) => word.endsWith(candidate) && word.length - candidate.length >= 3,
+  );
+  let stem = suffix ? word.slice(0, -suffix.length) + (suffix === "ies" ? "y" : "") : word;
+  if (stem.length > 3 && stem.endsWith("e")) stem = stem.slice(0, -1);
+  return stem.replace(/([bdgmnpt])\1$/, "$1");
+};
+
+/** Each topic word in the text, stemmed, with how many times it appears. */
+const queryTerms = (text: string) => {
+  const counts = new Map<string, number>();
+  for (const word of text.toLowerCase().split(/[^\p{L}\p{N}]+/u)) {
+    if (word.length === 0 || QUERY_STOPWORDS.has(word)) continue;
+    const term = stemQueryWord(word);
+    counts.set(term, (counts.get(term) ?? 0) + 1);
+  }
+  return counts;
+};
+
+const answerPageTerms = answerPages.map((page) => ({
+  page,
+  terms: queryTerms([page.slug, page.keyword, page.title, ...page.askedAs].join(" ")),
+}));
+
+/* How much a term says about which page is meant: "hire" is on four pages and says less
+   than "runway", which is on one. A word no page uses counts at the weight of a word on one. */
+const pagesWithTerm = new Map<string, number>();
+for (const { terms } of answerPageTerms) {
+  for (const term of terms.keys()) pagesWithTerm.set(term, (pagesWithTerm.get(term) ?? 0) + 1);
+}
+const termWeight = (term: string) => Math.log(1 + answerPages.length / (pagesWithTerm.get(term) ?? 1));
+
 /**
- * Finds the decision page matching an exact slug, a partial slug, or a natural language query.
+ * Finds the decision page matching a slug, part of one, or a question as someone asked it.
  * Used by agent tool calling and API endpoints so callers can look up guidance by question or topic.
+ *
+ * An agent passes the user's own words ("should I hire a second engineer?"), which name a
+ * topic without repeating a page's title. Until 2026-10-28 a question matched only when every
+ * word in it appeared in one page's slug, keyword or title, and 10 of 11 such questions were
+ * refused. Each page now carries the ways people ask it (`askedAs`); an exact question goes to
+ * its declared page before topic scoring. Other questions go to the page that shares more than
+ * half their weight, the one most about those words when several do: "should we hire" is the
+ * hiring-freeze answer, which says "hire" most, not the first salesperson's, whose title happens
+ * to begin that way. A slug's words are among its terms, so
+ * part of a slug ("cut-burn") matches the same way. A question no page shares that much with
+ * ("bridge round") is refused, with the list of what there is.
  */
 export const matchDecisionPage = (query: string): DecisionPageDefinition | undefined => {
   /* Strip punctuation so a caller's natural-language question ("should we freeze
      hiring?") matches the same as its words would: the trailing "?" otherwise
-     survives into "hiring?" and misses every slug, keyword, title and token. */
-  const normalized = query.toLowerCase().replace(/[^\p{L}\p{N}\s-]+/gu, " ").replace(/\s+/g, " ").trim();
+     survives into "hiring?" and misses every slug and term. */
+  const normalized = normalizeQuestion(query);
   if (!normalized) return undefined;
 
-  const direct = answerPageBySlug.get(normalized);
+  const direct = answerPageBySlug.get(normalized) ?? answerPageByQuestion.get(normalized);
   if (direct) return direct;
 
-  /* A natural-language phrase matches a slug fragment once spaces read as hyphens
-     ("cut burn" → "when-should-startups-cut-burn"); the keyword and title checks below
-     handle the rest of the natural language. */
-  const hyphenated = normalized.replace(/\s+/g, "-");
-  const slugMatch = answerPages.find((page) => page.slug === hyphenated || page.slug.includes(hyphenated));
-  if (slugMatch) return slugMatch;
+  const asked = [...queryTerms(normalized).keys()];
+  const askedWeight = asked.reduce((sum, term) => sum + termWeight(term), 0);
+  if (askedWeight === 0) return undefined;
 
-  const keywordMatch = answerPages.find((page) => page.keyword.toLowerCase().includes(normalized));
-  if (keywordMatch) return keywordMatch;
-
-  const titleMatch = answerPages.find((page) => page.title.toLowerCase().includes(normalized));
-  if (titleMatch) return titleMatch;
-
-  const tokens = normalized.split(/\s+/).filter((word) => word.length >= 3);
-  if (tokens.length > 0) {
-    return answerPages.find((page) => {
-      const pageText = `${page.slug} ${page.keyword} ${page.title}`.toLowerCase();
-      return tokens.every((token) => pageText.includes(token));
-    });
+  let best: { page: DecisionPageDefinition; rank: number } | undefined;
+  for (const { page, terms } of answerPageTerms) {
+    const shared = asked.filter((term) => terms.has(term));
+    const sharedWeight = shared.reduce((sum, term) => sum + termWeight(term), 0);
+    if (sharedWeight / askedWeight <= 0.5) continue;
+    const rank = shared.reduce((sum, term) => sum + termWeight(term) * (1 + Math.log(terms.get(term) ?? 1)), 0);
+    if (rank > (best?.rank ?? 0)) best = { page, rank };
   }
-
-  return undefined;
+  return best?.page;
 };
 
 /**
