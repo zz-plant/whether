@@ -87,7 +87,7 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 3. Read `Rules before you commit`, also open: the top three `Stop`, `Start` and `Keep limited` rules. Click `Show all rules` for the full lists.
 4. Before approving, read `Warnings to read before you approve` under `Risk checks` at the foot of the page.
 
-The page index runs `Rule for each area` · `Rules before you commit` · `Test a decision` · `Set this plan's lines` · `Finance strategy` · `Risk checks`.
+The page index runs `Rule for each area` · `Rules before you commit` · `Test a decision` · `Set your own rules` · `Finance strategy` · `Risk checks`.
 
 **Current output**
 - Each area's rule with its pause and restart lines
@@ -154,7 +154,7 @@ The toolkit page's breadcrumb reads `Guides` › `More tools` › the toolkit; `
 **Clicks**
 1. On `/`, set `Stage` and `Cash runway` under the verdict, where the page says whose lines these are; on a phone, the same two choices sit in the header. The pause and restart lines rescale to them.
 2. Click `Decide` and enter the company's figures in `Runway planner` (section 6).
-3. On a live week, adjust the lines under `Set this plan's lines` and click `Email me when a line is crossed`.
+3. On a live week, adjust the numbers under `Set your own rules` and click `Email me when these change`.
 4. Copy the result from `/share` (section 2).
 
 **Current output**
@@ -187,5 +187,5 @@ The toolkit page's breadcrumb reads `Guides` › `More tools` › the toolkit; `
 
 - The header no longer says `Planning` or `Decision Tools`; those tabs are `Plan` and `Resolve`. `/planning` redirects to `/operate`, `/evidence` to `/signals`, and `/decision-tools` to `/resolve`.
 - The ship checklist and its GO / WAIT / KILL score are gone: `/resolve/ship-checklist` redirects to `/resolve#direct-answers`.
-- Decision Memory and the regime alert log are gone from Plan. `/operate/memory` redirects to `/history`, and `#regime-alert-log` opens the `Share the brief` step. Email alerts come from the subscribe form under `Do and share` on `/` and from `Set this plan's lines`.
+- Decision Memory and the regime alert log are gone from Plan. `/operate/memory` redirects to `/history`, and `#regime-alert-log` opens the `Share the brief` step. Email alerts come from the subscribe form under `Do and share` on `/` and from `Set your own rules`.
 - Most click labels in that version no longer exist; `git show 6a55a222:docs/current-jtbd-click-paths.md` prints it.

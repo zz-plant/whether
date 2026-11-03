@@ -269,7 +269,7 @@ export const buildWeeklySummary = ({
   const financingSaturated = assessment.scores.tightnessSaturated === true;
   const guidance = getWeeklyActionGuidance(assessment.regime, { financingSaturated });
   const transitionCue = assessment.diagnostics.transitionWatch
-    ? "A score is sitting near the line where conditions change, so check again before expanding any commitment."
+    ? "A score is close to changing conditions, so check again before expanding any commitment."
     : "";
   const shockCue = assessment.diagnostics.shockCrossing ? SHOCK_CROSSING_CUE : "";
   /* This led with "A policy override is holding the posture in place" and closed

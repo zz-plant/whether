@@ -710,7 +710,7 @@ export const buildPublishedBriefSlackUpdate = (brief: PublishedBrief): string =>
   /* The page's order: the call, what changed, one row per area, evidence, sources. */
   return [
     `Whether Weekly Brief — ${brief.recordDateLabel}`,
-    `Conditions: ${display.conditions} (margin: ${display.confidence.toLowerCase()})`,
+    `Conditions: ${display.conditions} (${MARGIN_LABEL.toLowerCase()}: ${display.confidence.toLowerCase()})`,
     "",
     `This week's decision (${slots.map((slot) => slot.label).join(" / ")}):`,
     ...slots.map((slot) => `• ${slot.label}: ${slot.value}`),

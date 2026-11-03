@@ -30,7 +30,7 @@ describe("buildRegimeFlipState", () => {
     });
 
     assert.equal(state.pendingCandidate, "DEFENSIVE");
-    assert.match(state.text, /Funding pressure is 74, already above its change line at 70\./);
+    assert.match(state.text, /Funding pressure is 74, already above 70\./);
     assert.match(state.text, /Conditions have not changed yet/);
     assert.match(state.text, /waits on confirmation/);
     assert.match(state.text, /turn Cloudy once it holds/);

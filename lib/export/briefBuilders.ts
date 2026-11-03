@@ -36,7 +36,7 @@ export const EXPORT_SECTION_HEADINGS = {
 /** The curve reading's name on first use, per the vocabulary table in `lib/report/AGENTS.md`. */
 export const RECESSION_GAUGE_LABEL = `${regimeSignalLabel.curveSlope} (10-year minus 2-year rate)`;
 /** The stamp's margin note when no label was modeled: what the number measures. */
-const CONFIDENCE_STAMP_NOTE = "how far the scores sit from the line where conditions change";
+const CONFIDENCE_STAMP_NOTE = "how far the scores are from changing conditions";
 
 const buildExportStamp = (document: BriefDocument, confidence: string) =>
   buildComplianceStamp({
@@ -337,7 +337,7 @@ export const buildCallCitation = ({
 }) => [
   `Whether Weekly Brief — ${provenance.recordDate}`,
   `Conditions: ${conditions.line}`,
-  `${MARGIN_LABEL}: ${formatExportConfidence(confidence).toLowerCase()} (how far the scores sit from the line where conditions change)`,
+  `${MARGIN_LABEL}: ${formatExportConfidence(confidence).toLowerCase()} (${CONFIDENCE_STAMP_NOTE})`,
   `Source note: ${provenance.sourceUrl}`,
   `Full brief: ${provenance.permalink}`,
 ].join("\n");

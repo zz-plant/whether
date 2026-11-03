@@ -56,20 +56,20 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     assert.match(brief, /\*\*Conditions:\*\* Sunny — Late \(money is cheap and available\)/);
     // A ticket is read by a whole team; the engine key is for the JSON routes.
     assert.doesNotMatch(brief, /Regime:|EXPANSION/);
-    assert.match(brief, /Room before a change: clear of the line \(how far the scores sit/);
+    assert.match(brief, /Room before a change: plenty \(how far the scores are from changing conditions/);
   });
 
   it("stamps the reading's published margin, not the engine's code", () => {
     // The fixture's engine code says MEDIUM; its scores are 58 and 18 points
     // out (81 on the tightness scale), which publishes as High.
     const far = buildIssueTrackerMarkdownBrief(fixtureBriefDocument());
-    assert.match(far, /Room before a change: clear of the line \(how far the scores sit from the line where conditions change\)/);
+    assert.match(far, /Room before a change: plenty \(how far the scores are from changing conditions\)/);
     assert.doesNotMatch(far, /MEDIUM/);
 
     // Two points under the risk line is nine on the tightness scale: Medium.
     const nearLine = { ...assessment, scores: { ...assessment.scores, riskAppetite: 48 } };
     const near = buildIssueTrackerMarkdownBrief(fixtureBriefDocument({ reading: nearLine }));
-    assert.match(near, /Room before a change: within reach of the line \(how far the scores sit/);
+    assert.match(near, /Room before a change: some \(how far the scores are from changing conditions/);
   });
 
   it("produces identical bytes for Jira and Linear, which both consume markdown", () => {

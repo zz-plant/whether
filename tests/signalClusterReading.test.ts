@@ -84,19 +84,19 @@ describe("signal cluster reading", () => {
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 52 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(above.distanceLabel, /2 points above the line at 50 where conditions change/);
+    assert.match(above.distanceLabel, /2 points above 50, where conditions change/);
 
     const below = buildSignalClusterReading(
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 41 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(below.distanceLabel, /9 points below the line at 50 where conditions change/);
+    assert.match(below.distanceLabel, /9 points below 50, where conditions change/);
 
     const exact = buildSignalClusterReading(
       "risk-appetite-watch",
       buildReportData({ scores: { riskAppetite: 50 }, thresholds: { riskAppetiteRegime: 50 } }),
     );
-    assert.match(exact.distanceLabel, /Exactly at the line at 50 where conditions change/);
+    assert.match(exact.distanceLabel, /Exactly at 50, where conditions change/);
   });
 
   /*

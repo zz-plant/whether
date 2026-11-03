@@ -34,7 +34,7 @@ describe("buildTrustStatus trust tones", () => {
       isFallbackSnapshot: false,
     });
     assert.equal(hold.label, "Hold");
-    assert.match(hold.detail, /close to a line/);
+    assert.match(hold.detail, /close to changing/);
   });
   /* Live data adds nothing to the guidance, so the stable copy says so and no
      more: an approval instruction here read as the week's action under
@@ -57,7 +57,7 @@ describe("buildTrustStatus trust tones", () => {
     assert.equal(result.outageExitGate.metCount, 2);
     assert.equal(
       result.decisionImpactWindow,
-      "Use this live reading for this week's decisions; the pause lines in this week's guidance apply.",
+      "Use this live reading for this week's decisions; this week's pauses apply.",
     );
   });
 
@@ -200,7 +200,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.equal(hold.label, "Hold");
-    assert.match(hold.detail, /close to a line/);
+    assert.match(hold.detail, /close to changing/);
     assert.doesNotMatch(hold.detail, /fresh data|posture|policy/i);
   });
 
@@ -235,7 +235,7 @@ describe("buildTrustStatus trust tones", () => {
 
     assert.equal(held.label, "Hold");
     assert.ok(held.detail.startsWith(POLICY_OVERRIDE_CALL["inputs-missing"].currentCall), held.detail);
-    assert.doesNotMatch(held.detail, /close to a line/);
+    assert.doesNotMatch(held.detail, /close to changing/);
   });
 
 });

@@ -9,6 +9,7 @@ import {
   isRuleConditionMet,
   ruleMetricLabel,
   type DecisionArea,
+  type RuleCondition,
   type RuleConditionMetric,
 } from "./boundedDecisionRules";
 import { scoreSourceLabel } from "./scoreMovement";
@@ -100,8 +101,9 @@ type NotCountedScore = {
   published: number;
   /**
    * The line they would carry the score past that the published score is not
-   * past: "its change line", or an area's pause or restart line. Null when they
-   * would cross none, and then nothing they say changes the guidance.
+   * past, as its number and what it decides: "50" for the change line, "46,
+   * where Fundraising would pause" for an area's. Null when they would cross
+   * none, and then nothing they say changes the guidance.
    */
   line: string | null;
 };
@@ -200,22 +202,22 @@ type BasisAssessment = Pick<RegimeAssessment, "regime" | "scores" | "thresholds"
 const crossedLine = (metric: RuleConditionMetric, counted: number, assessment: BasisAssessment): string | null => {
   const published = assessment.scores[metric];
   const changeLine = metric === "tightness" ? assessment.thresholds.tightnessRegime : assessment.thresholds.riskAppetiteRegime;
-  if (published > changeLine !== counted > changeLine) return "its change line";
+  /* The number, not "its change line" (2026-11-03): the sentence goes on to say
+     what conditions it would make, which is what the line means. */
+  if (published > changeLine !== counted > changeLine) return String(changeLine);
   const rules = buildCanonicalBoundedDecisionRules({
     regime: assessment.regime,
     thresholds: assessment.thresholds,
     scores: assessment.scores,
   });
   for (const side of ["pause", "resume"] as const) {
-    const areas = rules
-      .filter((rule) =>
-        rule[side].conditions.some(
-          (condition) =>
-            condition.metric === metric && isRuleConditionMet(condition, published) !== isRuleConditionMet(condition, counted),
-        ),
-      )
-      .map((rule) => rule.area);
-    if (areas.length > 0) return `the ${side === "pause" ? "pause" : "restart"} line for ${listAreas(areas)}`;
+    const flips = (condition: RuleCondition) =>
+      condition.metric === metric && isRuleConditionMet(condition, published) !== isRuleConditionMet(condition, counted);
+    const crossing = rules.filter((rule) => rule[side].conditions.some(flips));
+    const value = crossing.flatMap((rule) => rule[side].conditions.filter(flips)).at(0)?.value;
+    if (crossing.length > 0 && value !== undefined) {
+      return `${value}, where ${listAreas(crossing.map((rule) => rule.area))} would ${side === "pause" ? "pause" : "restart"}`;
+    }
   }
   return null;
 };

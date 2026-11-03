@@ -17,13 +17,15 @@ export const organizationName = "Whether";
  */
 export const websiteName = "Whether — Weekly Operating Guidance for Startup Leaders";
 /*
- * The line leads with the lines, not the day. The record moves a few times a
+ * The line leads with the decisions, not the day. The record moves a few times a
  * year (`lineCrossingMonths` in `lib/report/trackRecord.ts`), so "each Monday"
  * as the opening promised news the weekly reading rarely has; the use that fits
- * is a set of lines checked weekly and an email the day one is crossed.
+ * is a pause-or-resume answer checked weekly and an email the day it changes.
+ * "The day a line is crossed" (until 2026-11-03) named the mechanism on every
+ * page; the reader's question is the answer, not the line.
  */
 export const canonicalPositioningLine =
-  "We read interest rates and credit markets and tell you when to pause or resume hiring, spending and fundraising. Updated every Monday, with an email the day a line is crossed.";
+  "We read interest rates and credit markets and tell you when to pause or resume hiring, spending and fundraising. Updated every Monday, with an email the day that changes.";
 /*
  * The category line as the homepage's first-visit orientation: whom it is for,
  * then the line itself. The page opens on the week's guidance, which says what

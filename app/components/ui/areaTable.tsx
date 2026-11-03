@@ -7,6 +7,7 @@ import {
 } from "../../../lib/report/boundedDecisionRules";
 import { NOTHING_TO_RESUME, type LineState } from "../../../lib/report/operatingCalls";
 import type { Route } from "../../../lib/navigation/routeType";
+import { DECISION_CONTRACT_LABELS } from "../../../lib/report/reportCopy";
 import { AreaIcon, AreaLabel, LineStateBadge } from "./conceptIcons";
 
 /**
@@ -134,8 +135,8 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
           <tr className="border-b border-[color:var(--border-subtle)] text-xs text-slate-400">
             <th scope="col" className="py-2 pr-3 font-medium">Area</th>
             <th scope="col" className="py-2 pr-3 font-medium">This week</th>
-            <th scope="col" className="py-2 pr-3 font-medium text-semantic-caution-fg">Pause line</th>
-            <th scope="col" className="py-2 pr-3 font-medium text-semantic-easing-fg">Restart line</th>
+            <th scope="col" className="py-2 pr-3 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</th>
+            <th scope="col" className="py-2 pr-3 font-medium text-semantic-easing-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</th>
             {showChanged ? <th scope="col" className="py-2 pr-3 font-medium">Changed</th> : null}
             {showAction ? (
               <th scope="col" className="py-2 font-medium">
@@ -182,11 +183,11 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                 {row.note}
               </td>
               <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
-                <CellLabel className="text-semantic-caution-fg">Pause line</CellLabel>
+                <CellLabel className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</CellLabel>
                 <LineCell value={row.pause} kind="pause" />
               </td>
               <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
-                <CellLabel className="text-semantic-easing-fg">Restart line</CellLabel>
+                <CellLabel className="text-semantic-easing-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</CellLabel>
                 {/* A met restart line on an area that is not on hold stamped "already
                     met" beside "14 pts away" from its pause line, which read as a
                     restart (2026-10-14). With the pause line not crossed there is

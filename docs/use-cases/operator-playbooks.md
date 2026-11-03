@@ -116,7 +116,7 @@ month, and what comes in.
 5. Copy the block or the **Budget memo** (both carry the dated lines and your own lines) into the
    investor update or board pre-read. The planner's link carries the figures and the lines, so a
    co-founder or investor opens the same plan. The figures otherwise stay in the browser.
-6. Under **Set this plan's lines** on `/operate`, leave "Say what a crossing means at my runway"
+6. Under **Set your own rules** on `/operate`, leave "Say what a pause or restart means at my runway"
    ticked: the email the day a market line is crossed then says what it means at your runway band.
 
 ### Exemplary FP&A Rule

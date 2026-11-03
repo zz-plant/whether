@@ -111,10 +111,10 @@ describe("the record basis", () => {
         label: "startup-market inputs",
         score: 48,
         published: 59,
-        line: "its change line",
+        line: "50",
       },
     ]);
-    assert.equal(basis.warning, "Startup-market inputs would put risk appetite at 48, below its change line.");
+    assert.equal(basis.warning, "Startup-market inputs would put risk appetite at 48, below 50.");
   });
 
   it("names an area's line when the inputs left out would cross no change line, and says nothing when they cross none", () => {
@@ -124,7 +124,7 @@ describe("the record basis", () => {
       engineVersion: ENGINE_VERSION,
       assessment: evaluateRegime(steeper, DEFAULT_THRESHOLDS, STARTUP_READS),
     });
-    assert.equal(resumeOnly.warning, "Startup-market inputs would put risk appetite at 53, below the restart line for Hiring, Roadmap, Fundraising and New bets.");
+    assert.equal(resumeOnly.warning, "Startup-market inputs would put risk appetite at 53, below 54, where Hiring, Roadmap, Fundraising and New bets would restart.");
 
     /* A 1.2% curve: risk appetite 88; less 11 is 77, past no line the published score is not past. */
     const steep = { ...OCT_7, yields: { ...OCT_7.yields, tenYear: 5.99 } };

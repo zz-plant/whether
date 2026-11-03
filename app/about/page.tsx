@@ -71,9 +71,8 @@ export default function AboutPage() {
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">How it works</h2>
         <p className="text-sm text-slate-300">
-          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a pause line and a restart line.
-          Set the lines when you make a plan. Because the pause and restart lines are apart, a small move back
-          across the pause line doesn&rsquo;t restart anything.
+          Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a score at which to pause and a
+          score at which to restart. The two are set apart, so a small move back doesn&rsquo;t restart anything.
         </p>
         <p className="text-sm text-slate-300">
           Each published brief stays on record. The{" "}
@@ -85,7 +84,7 @@ export default function AboutPage() {
           <Link href="/calibration" className={inlineLinkClass}>
             calibration study
           </Link>{" "}
-          shows the margin measures distance from a line, not probability.
+          shows the room before a change is a distance, not a probability.
         </p>
       </section>
 
@@ -95,7 +94,7 @@ export default function AboutPage() {
         <h2 className="type-section">Where it fits and where it does not</h2>
         <p className="text-sm text-slate-300">
           {record ? <>{describeRecordCadence(record)} </> : null}
-          Use the brief to set your plan&apos;s lines and get an email when one is crossed.
+          Set when each area pauses and restarts for your own plan, and get an email the day one does.
         </p>
         {/* Two blocks, one per list: together they ran 862px, taller than a phone
             screen, so no screenshot held the answer to "does this fit us" whole. */}
@@ -108,7 +107,7 @@ export default function AboutPage() {
             </li>
             <li>
               Plans a group approves once and should not re-argue each month: a budget whose second half is released
-              when a line is crossed, or an agreed floor on runway.
+              when spending restarts, or an agreed floor on runway.
             </li>
             <li>
               Venture-backed companies with one to two years of runway and a next raise that depends on what capital
@@ -128,7 +127,7 @@ export default function AboutPage() {
           <p className="text-sm font-semibold text-slate-100">It does not fit</p>
           <ul className="list-disc space-y-1.5 pl-5 text-sm text-slate-300">
             <li>
-              A single hire or purchase. The lines are a policy for a kind of decision, not a verdict on one.
+              A single hire or purchase. The rules are a policy for a kind of decision, not a verdict on one.
             </li>
             <li>
               Under six months of runway. At that point cash matters more than the market, so the guidance starts with cash.

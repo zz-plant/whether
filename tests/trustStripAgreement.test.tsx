@@ -196,7 +196,7 @@ const propsHandedTo = <P,>(node: ReactNode, component: (props: P) => ReactNode):
 const uncached: typeof unstable_cache = (load) => load;
 
 /* The display name for the API's `confidence` is the margin (2026-10-09). */
-const BAND = { HIGH: "clear of the line", MED: "within reach of the line", LOW: "close to the line" } as const;
+const BAND = { HIGH: "plenty", MED: "some", LOW: "little" } as const;
 
 describe("one reading's margin across routes and exports", () => {
   it("is the published band on /, /signals, /operate, /trust, the API posture state and every /share paste", async () => {
@@ -277,7 +277,7 @@ describe("one reading's margin across routes and exports", () => {
       email: textOf("email"),
     };
     for (const [key, text] of Object.entries(texts)) {
-      const bands = [...text.matchAll(/\bRoom before a change: (clear of the line|within reach of the line|close to the line)\b/gi)]
+      const bands = [...text.matchAll(/\bRoom before a change: (plenty|some|little)\b/gi)]
         .map((match) => match[1]?.toLowerCase());
       assert.ok(bands.length > 0, `${key} prints a margin band`);
       assert.deepEqual([...new Set(bands)], [BAND[published.label]], `${key} prints one band, the published one`);
@@ -285,6 +285,6 @@ describe("one reading's margin across routes and exports", () => {
     }
     const investor = pastes.find((candidate) => candidate.id === "investor-update");
     assert.ok(investor?.kind === "investor", "/share offers the investor update");
-    assert.match(investor.parts.conditions, /Conditions are well clear of the line where they would change\./, "investor update");
+    assert.match(investor.parts.conditions, /Conditions are well clear of a change\./, "investor update");
   });
 });

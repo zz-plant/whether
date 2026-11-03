@@ -43,7 +43,7 @@ describe("the band states the week's exception, or nothing", () => {
   it("names the area and its distance when a line is close", () => {
     const model = describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 3) }]);
     assert.equal(model?.state, "near");
-    assert.equal(model?.text, "Hiring — 3 pts away from its pause line.");
+    assert.equal(model?.text, "Hiring — 3 pts from pausing.");
     assert.equal(model?.href, "#what-it-changes");
   });
 
@@ -52,7 +52,7 @@ describe("the band states the week's exception, or nothing", () => {
       { area: "hiring", pause: pauseSlot(true, 0), resume: restartSlot(false, 12) },
     ]);
     assert.equal(model?.state, "crossed");
-    assert.equal(model?.text, "Hiring — 12 pts away from its restart line.");
+    assert.equal(model?.text, "Hiring — 12 pts from restarting.");
   });
 
   it("picks the hold that lifts first", () => {
@@ -60,7 +60,7 @@ describe("the band states the week's exception, or nothing", () => {
       { area: "hiring", pause: pauseSlot(true, 0), resume: restartSlot(false, 12) },
       { area: "capital-raising", pause: pauseSlot(true, 0), resume: restartSlot(false, 4) },
     ]);
-    assert.equal(model?.text, "Fundraising — 4 pts away from its restart line.");
+    assert.equal(model?.text, "Fundraising — 4 pts from restarting.");
   });
 
   it("still states a hold with no numeric restart line", () => {
@@ -81,10 +81,10 @@ describe("the band states the week's exception, or nothing", () => {
 describe("the band is drawn in the line state's ink", () => {
   it("prints the sentence and the way to the areas", () => {
     const html = renderToStaticMarkup(
-      <LineStateBand model={{ state: "near", area: "hiring", text: "Hiring — 3 pts away from its pause line.", href: "#what-it-changes", action: "What to do" }} />,
+      <LineStateBand model={{ state: "near", area: "hiring", text: "Hiring — 3 pts from pausing.", href: "#what-it-changes", action: "What to do" }} />,
     );
     assert.match(html, /data-line-state-band="near"/);
-    assert.match(html, /Hiring — 3 pts away from its pause line\./);
+    assert.match(html, /Hiring — 3 pts from pausing\./);
     assert.match(html, /href="#what-it-changes"/);
   });
 

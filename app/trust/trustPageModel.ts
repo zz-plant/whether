@@ -82,7 +82,7 @@ export async function buildTrustPageModel() {
       label: "How you'd know it cleared",
       detail: isFallback
         ? "One live refresh has landed from every source."
-        : "The scores are clear of the change lines and conditions have held for a second reading.",
+        : "The scores are clear of a change and conditions have held for a second reading.",
       href: "#source-board",
       linkLabel: "Check source dates",
     },

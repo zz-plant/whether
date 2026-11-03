@@ -100,10 +100,15 @@ export const decisionVerdictEmail = ({
   return { subject, html, text };
 };
 
-const LINE_NAME: Record<PublishedLine["kind"], string> = {
-  pause: "the pause line",
-  change: "the line where conditions change",
-  resume: "the restart line",
+/*
+ * What the number decides, in the reader's verbs (2026-11-03). The letter said
+ * "the pause line is 76" and "It crossed above that line", which named the
+ * mechanism twice before saying what it means.
+ */
+const LINE_MEANING: Record<PublishedLine["kind"], string> = {
+  pause: "where areas pause",
+  change: "where conditions change",
+  resume: "where held areas can restart",
 };
 
 /**
@@ -120,12 +125,12 @@ const describeLineCrossing = (line: PublishedLine, value: number): string => {
   const nowHolds = side === line.holdsWhen;
   if (line.kind === "pause") {
     return nowHolds
-      ? "Every area whose rule pauses on this line pauses now. Read this week's guidance before acting on last week's plan."
-      : "The pause on this line no longer holds. Held work resumes only once each area's restart line is met.";
+      ? "Every area that pauses at this score pauses now. Read this week's guidance before acting on last week's plan."
+      : "That pause no longer applies. Held work restarts only once each area's restart condition is met.";
   }
   return nowHolds
-    ? "Work held on this line can resume once every restart line for its area is met."
-    : "This restart line is no longer met. Read this week's guidance before resuming held work.";
+    ? "Work held here can restart once every restart condition for its area is met."
+    : "That restart condition no longer holds. Read this week's guidance before restarting held work.";
 };
 
 /**
@@ -140,14 +145,14 @@ export const thresholdCrossingEmail = (
   baseUrl: string = siteUrl,
 ): EmailContent => {
   const metricLabel = regimeSignalLabel[line.metric];
-  const lineName = LINE_NAME[line.kind];
+  const side = sideOfLine(line, value);
   /* Whole points, the way every page and the brief print a score. This read
      "Funding pressure is 90.0; the pause line is 76." and "90.0 / 76": a
      decimal the scores are never published with, beside a line printed without one. */
   const score = formatScoreValue(value);
-  const reading = `${metricLabel} is ${score}; ${lineName} is ${line.value}.`;
-  const whatToDo = `It crossed ${sideOfLine(line, value)} that line since the last alert. ${describeLineCrossing(line, value)}`;
-  const subject = `Whether Alert — ${metricLabel} crossed ${lineName} (${line.value})`;
+  const reading = `${metricLabel} is ${score}, ${side} ${line.value} (${LINE_MEANING[line.kind]}) since the last alert.`;
+  const whatToDo = describeLineCrossing(line, value);
+  const subject = `Whether Alert — ${metricLabel} ${side === "above" ? "rose above" : "fell below"} ${line.value}`;
   const text = [
     `Whether Threshold Alert`,
     reading,
@@ -162,7 +167,7 @@ export const thresholdCrossingEmail = (
     body: [
       alertBanner(
         severity,
-        `<strong>${metricLabel}</strong> is <strong>${score}</strong>; ${lineName} is <strong>${line.value}</strong>. ${whatToDo}`,
+        `<strong>${metricLabel}</strong> is <strong>${score}</strong>, ${side} <strong>${line.value}</strong> (${LINE_MEANING[line.kind]}) since the last alert. ${whatToDo}`,
       ),
       `<div style="margin-top:12px;">`,
       sectionBlock(metricLabel, `${score} / ${line.value}`, severity === "info" ? OG_TEXT_MUTED : OG_LINE_CROSSED, OG_TEXT),
@@ -190,7 +195,7 @@ export const planLineEmail = (
     headline,
     body,
     ``,
-    `Review your lines: ${baseUrl}/operate#ops-plan-lines`,
+    `Review your rules: ${baseUrl}/operate#ops-plan-lines`,
     ...emailTextFooter(unsubscribeToken, baseUrl),
   ].join("\n");
   const html = renderEmailShell({

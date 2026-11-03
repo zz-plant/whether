@@ -60,7 +60,7 @@ describe("investor update snippet", () => {
     assert.match(parts.conditions, /Over the month, funding pressure ((rose|fell) \d+ points? to|held at) \d+ of 100: money is [a-z ]+\. Risk appetite ((rose|fell) \d+ points? to|held at) \d+ of 100: investors [a-z ]+\./);
     // The weather word carries what it means for money, for an investor who has never seen the site.
     assert.match(parts.conditions, /\. Money is [a-z ,]+\. /);
-    assert.match(parts.conditions, /Conditions are (well clear of|within reach of|close to) the line where they would change\./);
+    assert.match(parts.conditions, /Conditions are (well clear of|within reach of|close to) a change\./);
     assert.match(parts.response, /^Our operating response this month: Hold net-new hiring/);
     assert.doesNotMatch(parts.response, /Freeze new commitments/, "one action: the headline's, not the action it stopped leading with");
     // The page's slot names, and the rule's own verb dropped under a label that already says it.

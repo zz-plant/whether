@@ -93,7 +93,7 @@ const page = async () => {
     banner: firstMatch(html, /<p class="weather-caveat-band weather-caveat-mark[^"]*">(.*?)<\/p>/s),
     call: firstMatch(html, /id="weekly-call-title"[^>]*>(.*?)<\/h1>/s),
     strip: /data-trust-strip[^>]*>(.*?)<\/dl>/s.exec(html)?.[1] ?? "",
-    /* Each area row's cells after its name: rule, pause line, restart line, and "Changed" when drawn. */
+    /* Each area row's cells after its name: rule, pause rule, restart rule, and "Changed" when drawn. */
     areaRows: [...html.matchAll(/<tr[^>]*data-area="([a-z-]+)"[^>]*>(.*?)<\/tr>/gs)].map((match) => ({
       area: match[1] ?? "",
       cells: [...(match[2] ?? "").matchAll(/<td[^>]*>(.*?)<\/td>/gs)].map((cell) => decode(cell[1] ?? "")),
@@ -133,9 +133,9 @@ describe("the saved-copy homepage", () => {
     assert.equal(areaRows.length, 5);
     for (const { area, cells } of areaRows) {
       const [, pause = "", restart = ""] = cells;
-      assert.match(pause, /^Pause line /, `${area}: ${cells.join(" | ")}`);
-      if (/past the line/.test(pause)) continue;
-      assert.match(restart, /^Restart line .* nothing to resume$/, `${area}: ${restart}`);
+      assert.match(pause, /^Pause if /, `${area}: ${cells.join(" | ")}`);
+      if (/in effect/.test(pause)) continue;
+      assert.match(restart, /^Restart when .* nothing to resume$/, `${area}: ${restart}`);
     }
   });
 

@@ -114,19 +114,25 @@ export const buildRegimeAlert = (
  *  for a profit margin; the method pages still call the quantity the margin, glossed on first use. */
 export const MARGIN_LABEL = "Room before a change";
 
+/*
+ * The bands say how much room, not where the line is (2026-11-03). "Close to /
+ * Within reach of / Clear of the line" put "the line" on every stamp, strip and
+ * paste, after a label that already said "Room before a change". The band is the
+ * label's answer, so it is printed after it: "Room before a change: plenty".
+ */
 const marginBandWords: Record<"LOW" | "MED" | "HIGH", string> = {
-  LOW: "Close to the line",
-  MED: "Within reach of the line",
-  HIGH: "Clear of the line",
+  LOW: "Little",
+  MED: "Some",
+  HIGH: "Plenty",
 };
 
 const marginPlainLabels: Record<"LOW" | "MED" | "HIGH", string> = {
-  LOW: "Close to the line where conditions change (stage decisions)",
-  MED: "Within reach of the line where conditions change",
-  HIGH: "Clear of the line where conditions change",
+  LOW: "Little room before conditions change (stage decisions)",
+  MED: "Some room before conditions change",
+  HIGH: "Plenty of room before conditions change",
 };
 
-/** The band under its label, for a meta line that runs facts together: "Room before a change: close to the line". */
+/** The band under its label, for a meta line that runs facts together, or anywhere the band stands alone: "Room before a change: little". */
 export const formatMarginStamp = (confidence: string): string =>
   `${MARGIN_LABEL}: ${formatMarginBand(confidence).toLowerCase()}`;
 
@@ -151,8 +157,8 @@ export const formatMarginReading = (
 ): string => {
   const label = regimeSignalLabel[margin.signal];
   const across = regime && isRegimeKey(regime) ? getRegimePublicLabel(regimeAcrossLine(regime, margin.signal)) : null;
-  if (margin.points === 0) return across ? `${label} at its line to ${across}` : `${label} at its change line`;
-  return across ? `${label} ${pointsWord(margin.points)} from ${across}` : `${label} ${pointsWord(margin.points)} from its change line`;
+  if (margin.points === 0) return across ? `${label} on the edge of ${across}` : `${label} on the edge of a change`;
+  return `${label} ${pointsWord(margin.points)} from ${across ?? "a change"}`;
 };
 
 /**
@@ -165,7 +171,7 @@ export const formatNearestChange = (
 ): string | null => {
   if (!margin || !regime || !isRegimeKey(regime)) return null;
   const across = getRegimePublicLabel(regimeAcrossLine(regime, margin.signal));
-  return margin.points === 0 ? `At the line to ${across}` : `${pointsWord(margin.points)} from ${across}`;
+  return margin.points === 0 ? `On the edge of ${across}` : `${pointsWord(margin.points)} from ${across}`;
 };
 
 /**
@@ -184,7 +190,7 @@ export const formatBoundaryDistance = ({
   label: string;
   points: number;
   threshold: number;
-}): string => `${label} is ${points.toFixed(1)} points from its ${formatThresholdNumber(threshold)} line.`;
+}): string => `${label} is ${points.toFixed(1)} points from ${formatThresholdNumber(threshold)}.`;
 
 export const formatConfidencePlainLabel = (confidence: "LOW" | "MED" | "HIGH"): string =>
   marginPlainLabels[confidence];
@@ -210,8 +216,8 @@ export const formatMarginBand = (confidence: string): string =>
   isConfidenceCode(confidence) ? marginBandWords[confidence] : confidence;
 
 /**
- * The band with the score it is measured on, when the caller holds it: "Close to
- * the line (risk appetite is 1 point from its change line)". The points are that
+ * The band with the score it is measured on, when the caller holds it: "Little
+ * (risk appetite is 1 point away)", printed after its label. The points are that
  * score's own, so a reader can check them against the score printed beside it,
  * and spelled out, because a paste lands where no page explains "pts".
  */
@@ -224,8 +230,8 @@ export const formatMargin = (
   const signal = regimeSignalLabel[margin.signal].toLowerCase();
   const distance =
     margin.points === 0
-      ? `${signal} is at its change line`
-      : `${signal} is ${margin.points} ${margin.points === 1 ? "point" : "points"} from its change line`;
+      ? `${signal} is on the edge`
+      : `${signal} is ${margin.points} ${margin.points === 1 ? "point" : "points"} away`;
   return `${band} (${distance})`;
 };
 

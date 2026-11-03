@@ -104,8 +104,8 @@ describe("which line a move names", () => {
     assert.equal(decision?.severity, "info");
 
     const mail = thresholdCrossingEmail(line, 60, null);
-    assert.match(mail.text, /It crossed below that line since the last alert\. Work held on this line can resume/);
-    assert.doesNotMatch(mail.text, /pause on this line no longer holds/);
+    assert.match(mail.text, /below 66 \(where held areas can restart\) since the last alert\.\nWork held here can restart/);
+    assert.doesNotMatch(mail.text, /That pause no longer applies/);
   });
 
   it("names the line a partial move stopped past", () => {
@@ -145,7 +145,7 @@ describe("a score on the line", () => {
     assert.ok(line, "landing on 66 from below crossed a line");
     assert.equal(line.kind, "resume");
     const mail = thresholdCrossingEmail(line, 66, null);
-    assert.match(mail.text, /It crossed above that line since the last alert\. This restart line is no longer met/);
+    assert.match(mail.text, /above 66 \(where held areas can restart\) since the last alert\.\nThat restart condition no longer holds/);
   });
 });
 
@@ -153,21 +153,21 @@ describe("alert email copy", () => {
   it("names the metrics the way every other surface does", () => {
     const [tightnessPause, , , , riskChange] = publishedScoreLines();
     const credit = thresholdCrossingEmail(tightnessPause, 78, null);
-    assert.match(credit.subject, /Funding pressure crossed the pause line \(76\)/);
+    assert.match(credit.subject, /Funding pressure rose above 76$/);
     assert.ok(!/tightness/i.test(credit.text), "alert text still says tightness");
     assert.ok(!/tightness/i.test(credit.html), "alert html still says tightness");
 
     const sentiment = thresholdCrossingEmail(riskChange, 42, null);
-    assert.match(sentiment.subject, /Risk appetite crossed the line where conditions change \(50\)/);
+    assert.match(sentiment.subject, /Risk appetite fell below 50$/);
     assert.ok(!/investor appetite/i.test(sentiment.text));
   });
 
-  /* "Funding pressure is 90.0; the pause line is 76." and "90.0 / 76": every
+  /* "Funding pressure is 90.0, above 76 ..." and "90.0 / 76": every
      other surface prints a score in whole points. */
   it("prints the score in whole points, as the brief does", () => {
     const [tightnessPause] = publishedScoreLines();
     const mail = thresholdCrossingEmail(tightnessPause, 90, null);
-    assert.match(mail.text, /^Funding pressure is 90; the pause line is 76\.$/m);
+    assert.match(mail.text, /^Funding pressure is 90, above 76 \(where areas pause\) since the last alert\.$/m);
     assert.match(mail.html, />90 \/ 76</);
     assert.doesNotMatch(mail.text + mail.html, /\b90\.0\b/);
 

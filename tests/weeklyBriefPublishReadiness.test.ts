@@ -110,7 +110,7 @@ describe("the weekly email refuses what it cannot stand behind", () => {
     assert.equal(result.error, undefined);
   });
 
-  it("points every subscriber at their own plan's lines, in both bodies", async () => {
+  it("points every subscriber at their own plan's rules, in both bodies", async () => {
     await withOneSubscriber();
     const snapshot = liveSnapshot();
     /* The stub logs the subject and drops the bodies, so a binding that keeps
@@ -134,8 +134,8 @@ describe("the weekly email refuses what it cannot stand behind", () => {
 
     const [message] = sent;
     assert.ok(message, "the one subscriber was mailed");
-    assert.match(message.text, /Set these lines for your own plan and we'll email you the day one is crossed: \S+\/operate#ops-plan-lines/);
-    assert.match(message.html, /<a href="[^"]+\/operate#ops-plan-lines"[^>]*>Set these lines for your own plan<\/a>/);
+    assert.match(message.text, /Set these rules for your own plan and we'll email you the day an area pauses or restarts: \S+\/operate#ops-plan-lines/);
+    assert.match(message.html, /<a href="[^"]+\/operate#ops-plan-lines"[^>]*>Set these rules for your own plan<\/a>/);
   });
 
   it("still reports no subscribers as the non-event it is", async () => {

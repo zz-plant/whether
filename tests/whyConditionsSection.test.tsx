@@ -34,15 +34,15 @@ describe("why conditions", () => {
 
   it("states which side of each change line the readings sit on", () => {
     const html = render();
-    assert.match(html, /Funding pressure is above its 70 change line/);
-    assert.match(html, /Risk appetite is above its 50 change line/);
+    assert.match(html, /Funding pressure is 90, above 70 \(money is hard to raise\)/);
+    assert.match(html, /Risk appetite is 55, above 50 \(/);
     assert.match(html, /Together they put conditions in/);
   });
 
   it("shows what the excluded inputs would change, when they would change the classification", () => {
     const html = render({
-      notCounted: [{ metric: "riskAppetite", label: "startup-market inputs", score: 44, published: 55, line: "its change line" }],
-      warning: "Startup-market inputs would put risk appetite at 44, below its change line.",
+      notCounted: [{ metric: "riskAppetite", label: "startup-market inputs", score: 44, published: 55, line: "50" }],
+      warning: "Startup-market inputs would put risk appetite at 44, below 50.",
     });
     assert.match(html, /What the headline reading leaves out/);
     assert.match(html, /would put risk appetite at 44/);
@@ -60,8 +60,8 @@ describe("why conditions", () => {
     const html = render({ saturatedPressure: 110 });
     assert.match(html, /shows 90 because that(?:&#x27;|’|')s as high as the score goes/);
     assert.match(html, /uncapped it would be 110/);
-    // The line is set against the printed score, so 90 against 70 is the distance.
-    assert.match(html, /the distance is 20 points above\s+the 70 change line/);
+    // Conditions are judged on the printed score, so 90 against 70 is the distance.
+    assert.match(html, /Conditions are judged on the capped 90, 20 points above\s+70\./);
     /* The uncapped distance was printed beside it, so one paragraph gave two
        answers to "how far past the line" and a reader had to choose. */
     assert.doesNotMatch(html, /but really/, "one paragraph must not give two distances");

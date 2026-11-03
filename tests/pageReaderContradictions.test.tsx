@@ -44,7 +44,7 @@ describe("/trust says each thing once", () => {
   it("does not restate what /about's 'How it works' already says", async () => {
     const { default: AboutPage } = await import("../app/about/page");
     const html = renderToStaticMarkup(<AboutPage />);
-    assert.equal((html.match(/an action, a pause line and a restart line/g) ?? []).length, 1);
+    assert.equal((html.match(/an action, a score at which to pause and a score at which to restart/g) ?? []).length, 1);
     const explanation = html.indexOf("How it works");
     assert.ok(explanation !== -1 && explanation < html.indexOf('id="method"'), "the method follows How it works");
   });
@@ -303,7 +303,7 @@ describe("/about says how often the guidance moves, from the record", () => {
 
     assert.match(text, /Where it fits and where it does not/);
     assert.ok(text.includes(`changed ${record.regimeChanges} times in ${record.monthsCovered} months`));
-    assert.ok(text.includes(`lines in ${record.lineCrossingMonths} of them`));
+    assert.ok(text.includes(`an area paused or restarted in ${record.lineCrossingMonths} of them`));
   });
 });
 
@@ -446,7 +446,7 @@ describe("an area row prints the line that explains its state", () => {
     const row = (area: string) => rows.find((candidate) => candidate.area === area);
 
     assert.equal(row("capital-raising")?.pause?.line, "Funding pressure > 76");
-    assert.equal(row("capital-raising")?.pause?.distance, "past the line");
+    assert.equal(row("capital-raising")?.pause?.distance, "in effect");
     assert.equal(row("hiring")?.resume?.line, "Funding pressure < 66");
     assert.equal(row("hiring")?.resume?.distance, "24 pts away");
   });

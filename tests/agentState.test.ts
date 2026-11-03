@@ -140,7 +140,7 @@ describe("the agent state", () => {
         reportDynamics: { ...context.reportData.reportDynamics, directionLabel: "stable", changedSignals: [], anomalySignals: [], movement: undefined },
       },
     });
-    assert.match(held.change.summary ?? "", /^Conditions held steady since [A-Z][a-z]{2} \d{1,2}; no pause or restart line was crossed\. The guidance stands\.$/);
+    assert.match(held.change.summary ?? "", /^Conditions held steady since [A-Z][a-z]{2} \d{1,2}, and no area paused or restarted\. The guidance stands\.$/);
     assert.deepEqual(held.change.crossed, []);
   });
 

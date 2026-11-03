@@ -101,7 +101,7 @@ export const describePlanLineStates = (
     const area = decisionAreaLabel(line.area).toLowerCase();
     if (pauseHolds(line, scores)) return `${area} on hold`;
     if (resumeHolds(line, scores)) return `${area} running`;
-    return `${area} between its lines`;
+    return `${area} between pause and restart`;
   });
   return states.length === 1 ? states[0] ?? null : `${states.slice(0, -1).join(", ")} and ${states.at(-1) ?? ""}`;
 };
@@ -210,11 +210,11 @@ export const describePlanLineCrossing = (
   const atRunway = context?.runway ? ` ${describeCrossingAtRunway(crossing.area, context.regime, context.runway)}` : "";
   return crossing.side === "pause"
     ? {
-      headline: `${area}: your pause line was crossed`,
-      body: `You set ${area.toLowerCase()} to pause if ${clause}. ${today} The plan you made for ${area.toLowerCase()} pauses until your restart line holds.${atRunway}`,
+      headline: `${area}: pause now, by your rule`,
+      body: `You set ${area.toLowerCase()} to pause if ${clause}. ${today} The plan you made for ${area.toLowerCase()} pauses until your restart condition holds.${atRunway}`,
     }
     : {
-      headline: `${area}: your restart line holds`,
+      headline: `${area}: clear to restart, by your rule`,
       body: `You set ${area.toLowerCase()} to restart when ${clause}. ${today} The work you held can resume.${atRunway}`,
     };
 };

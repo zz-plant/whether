@@ -41,6 +41,6 @@ export const homeDecisionFaqItems = [
   {
     question: "How close is the guidance to changing?",
     answer:
-      "Room before a change is the distance, in points, from the nearer score to its change line. It is a distance, not a probability.",
+      "Room before a change is how many points the nearer score can move before conditions change. It is a distance, not a probability.",
   },
 ] as const;

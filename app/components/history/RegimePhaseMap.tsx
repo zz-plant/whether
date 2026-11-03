@@ -134,7 +134,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
     `Conditions change when funding pressure crosses ${thresholds.tightness} or risk appetite crosses ${thresholds.riskAppetite}.`,
     describePhaseGap(gaps.tightness),
     describePhaseGap(gaps.riskAppetite),
-    `The plotted path covers ${model.points.length} months, from ${oldest.monthLabel} to ${current.monthLabel}, and crosses a change line ${model.changes.length} times.`,
+    `The plotted path covers ${model.points.length} months, from ${oldest.monthLabel} to ${current.monthLabel}, and changes conditions ${model.changes.length} times.`,
   ].join(" ");
 
   return (
@@ -476,7 +476,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                         {gap.side === "on"
                           ? "on"
                           : `${gap.distance} ${gap.side}`}{" "}
-                        the line at {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
+                        {gap.axis === "tightness" ? thresholds.tightness : thresholds.riskAppetite}
                       </span>
                     </dd>
                   </div>

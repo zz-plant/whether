@@ -158,7 +158,7 @@ export const checkRegimeChange = async (options?: {
       alerts.push(`WATCH — conditions could change soon: ${projection.velocityLabel}`);
       await postSlackAlerts(
         "Conditions could change soon",
-        `${projection.velocityLabel}\nA score is closing on the line where conditions change. Hold anything you can't undo until it settles.`,
+        `${projection.velocityLabel}\nA score is closing in on a change in conditions. Hold anything you can't undo until it settles.`,
       );
     }
   }
@@ -171,7 +171,7 @@ export const checkRegimeChange = async (options?: {
   const currentConfidence = resolvePublishedConfidence({ assessment, record }).label;
   if (prevConfidence === "HIGH" && currentConfidence !== "HIGH") {
     alerts.push(
-      `The margin narrowed from ${formatExportConfidenceWord(prevConfidence)} to ${formatExportConfidenceWord(currentConfidence)}. Read the guidance before acting on it.`,
+      `The room before a change narrowed from ${formatExportConfidenceWord(prevConfidence)} to ${formatExportConfidenceWord(currentConfidence)}. Read the guidance before acting on it.`,
     );
   }
 

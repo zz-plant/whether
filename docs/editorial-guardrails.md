@@ -169,9 +169,10 @@ answering a question the answer pages already answer.
   "transition" is the forecast-outcome change (stuck forecast indicators). If they
   diverge, flip describes the call reversal, transition describes forecast changes.
 - **The distance from a change line is "Room before a change"** on screens, gauges, pastes and
-  email (2026-10-28; "Margin" until then, which a reader took for a profit margin):
-  "Clear of the line", "Within reach of the line", "Close to the line", with the
-  nearer score's points where the surface holds them. "Confidence" (and "Call certainty"
+  email (2026-10-28; "Margin" until then, which a reader took for a profit margin),
+  answered "Plenty", "Some" or "Little" after the label, with the nearer score's points where
+  the surface holds them. The bands said "Clear of / Within reach of / Close to the line" until
+  2026-11-03. "Confidence" (and "Call certainty"
   before it) are retired as reader labels: the number is a distance, not a probability
   (`/calibration`), and "Confidence: Low" beside "Freeze new commitments" read as the product
   doubting its own advice. API and JSON fields keep `confidence`; the mapping is in
@@ -187,6 +188,16 @@ answering a question the answer pages already answer.
   scanned alone in a table cell. The identifiers (`resumeWhen`, `resume`, `resumeLine` in JSON) are
   contracts and did not move; only the words a reader sees did. The verb stays "restart" too, so a
   row never mixes "Restart line" with "Resume hiring".
+- **Say the number or the verb, not the line** (2026-11-03). The brief explained its own
+  mechanism in most sentences: "24 pts away from its restart line", "No new line was crossed",
+  "5 pts above the change line", "Clear of the line", a key to "what the three lines do", and
+  "an email the day a line is crossed" under every page title. A reader asks what to do and
+  what would change it, so a sentence says the area's verb ("Hiring — 24 pts from restarting",
+  "No area changed since Sep 30") or the number ("risk appetite is 55, above 50"). "Pause
+  line", "Restart line" and "Change line" stay as labels beside a number (a ladder tick, a
+  table header in exports, a chart), and the method sections (/about#method, /trust) are where
+  the lines are explained. A new sentence that needs "line" to make sense is a sign the number
+  or the verb is missing from it.
 - **The guard reaches the content layer too** (2026-10-30). `tests/readerVocabulary.test.tsx`
   renders `app/` routes, so it never saw the article bodies, resource metadata or downloadable
   templates — and that is where the retired words survived longest: one public memo carried

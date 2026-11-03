@@ -251,7 +251,7 @@ export const describeWeeklyMemoLead = (trendLabel: string, weeklyTone: WeeklyTon
   if (weeklyTone === null) return "No previous reading to compare this week against.";
   if (weeklyTone === "tightening") return trendMemoLines.Deteriorating;
   if (weeklyTone === "easing") return trendMemoLines.Improving;
-  if (trendLabel === "Improving") return "The readings improved this week, but a pause line still applies, so the guidance holds.";
+  if (trendLabel === "Improving") return "The readings improved this week, but a pause still applies, so the guidance holds.";
   return trendMemoLines[trendLabel] ?? trendMemoLines.Stable;
 };
 

@@ -167,11 +167,16 @@ const joinAnd = (items: readonly string[]) =>
 const describeCrossing = (line: CrossedLine) =>
   `${lowerFirst(line.label)} ${line.direction} ${line.direction === "rose" ? "above" : "below"} ${formatThresholdNumber(line.value)}`;
 
+/*
+ * The area's state in the reader's verbs, pause and restart, not the line behind
+ * them (2026-11-03). "Restart line met" and "no line crossed" put the mechanism in
+ * every row; the line itself is printed beside the row with its number.
+ */
 const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
   paused: "Pause now applies",
   lifted: "Pause lifted",
-  resumable: "Restart line met",
-  resumeLost: "Restart line no longer met",
+  resumable: "Can now restart",
+  resumeLost: "Can no longer restart",
 };
 
 /*
@@ -182,21 +187,21 @@ const AREA_TEXT: Record<Exclude<AreaMovementKind, "held">, string> = {
  */
 const HELD_STATE_TEXT: Record<AreaState, string | null> = {
   pause: "Pause still applies",
-  resume: "Restart line still met",
+  resume: "Can still restart",
   hold: null,
 };
 
 const describeHeld = (state: AreaState, window: string) => {
   const prefix = HELD_STATE_TEXT[state];
-  return prefix ? `${prefix}: no line crossed ${window}.` : `No line crossed ${window}.`;
+  return prefix ? `${prefix}; no change ${window}.` : `No change ${window}.`;
 };
 
 type HeldGroup = { state: AreaState; areas: DecisionArea[]; text: string };
 
 const HELD_GROUP_TEXT: Record<AreaState, (areas: string, window: string) => string> = {
-  pause: (areas, window) => `Pause still applies to ${areas}: no line crossed ${window}.`,
-  resume: (areas, window) => `Restart line still met for ${areas}: no line crossed ${window}.`,
-  hold: (areas, window) => `No line crossed ${window} for ${areas}.`,
+  pause: (areas, window) => `Pause still applies to ${areas}; no change ${window}.`,
+  resume: (areas, window) => `${areas} can still restart; no change ${window}.`,
+  hold: (areas, window) => `No change ${window} for ${areas}.`,
 };
 
 const HELD_STATE_ORDER: readonly AreaState[] = ["pause", "resume", "hold"];
@@ -204,8 +209,8 @@ const HELD_STATE_ORDER: readonly AreaState[] = ["pause", "resume", "hold"];
 const GROUP_CLAUSE: Record<Exclude<AreaMovementKind, "held">, (areas: string) => string> = {
   paused: (areas) => `the pause now applies to ${areas}`,
   lifted: (areas) => `the pause no longer applies to ${areas}`,
-  resumable: (areas) => `the restart line is now met for ${areas}`,
-  resumeLost: (areas) => `the restart line is no longer met for ${areas}`,
+  resumable: (areas) => `${areas} can now restart`,
+  resumeLost: (areas) => `${areas} can no longer restart`,
 };
 
 const GROUP_ORDER: readonly Exclude<AreaMovementKind, "held">[] = ["paused", "lifted", "resumable", "resumeLost"];
@@ -236,7 +241,7 @@ const moveOf = (
   const text =
     kind === "held"
       ? describeHeld(to, window)
-      : `${from === "pause" && kind === "resumable" ? "Pause lifted, restart line met" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
+      : `${from === "pause" && kind === "resumable" ? "Pause lifted, can restart" : AREA_TEXT[kind]}: ${joinAnd(crossed.map(describeCrossing))}.`;
   return { area: lines.area, kind, state: to, crossed, text };
 };
 
@@ -311,8 +316,8 @@ export const buildDecisionMovement = ({
   const { sentence, headline, headlines } = ((): { sentence: string; headline: string; headlines: string[] } => {
     if (moved.length === 0) {
       const nothing = conditions
-        ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no pause or restart line was crossed.`
-        : `Conditions held steady ${window}; no pause or restart line was crossed. ${describeGuidanceStands(basis)}`;
+        ? `Conditions changed from ${conditions.from} to ${conditions.to} ${window}, but no area paused or restarted.`
+        : `Conditions held steady ${window}, and no area paused or restarted. ${describeGuidanceStands(basis)}`;
       return { sentence: nothing, headline: nothing, headlines: [nothing] };
     }
     const clauses = groups.map((group) => GROUP_CLAUSE[group.kind](listAreas(group.areas, movements.length)));
@@ -326,7 +331,7 @@ export const buildDecisionMovement = ({
        conditions clause goes first, because the card prints the conditions now in its own
        label; then the areas go to a count. */
     const withoutConditions = `${upperFirst(window)}, ${clauses.join("; ")}.`;
-    const counted = `${lead}${countAreas(moved.length, movements.length)} crossed a pause or restart line.`;
+    const counted = `${lead}${countAreas(moved.length, movements.length)} paused or restarted.`;
     /* Short sentences, each group with its own cause. It was one sentence with a
        semicolon between the groups and a colon before every cause at once — 45
        words on a week that changed conditions and moved areas two ways — so a
@@ -396,14 +401,13 @@ export const describeGuidanceChange = ({
 export const describeMovementCause = (movement: Pick<DecisionMovement, "groups" | "comparedWith">): string => {
   const crossings = uniqueLines(movement.groups.flatMap((group) => group.crossed)).map(describeCrossing);
   if (crossings.length > 0) return `${upperFirst(joinAnd(crossings))}.`;
-  /* "No new line", not "No line" (2026-11-01): this prints on the card directly
-     under "On hold: Hiring, Fundraising, Spending and New bets", and the two
-     read as a contradiction. The four areas did cross their pause lines; they
-     crossed them before the earlier reading, and this sentence is about the
-     week since. */
+  /* "No area changed", not "No line" (2026-11-01, reworded 2026-11-03): this
+     prints on the card directly under "On hold: Hiring, Fundraising, Spending and
+     New bets", and "No line was crossed" read as a contradiction. The four areas
+     paused before the earlier reading, and this sentence is about the week since. */
   return movement.comparedWith
-    ? `No new line was crossed since ${movement.comparedWith}.`
-    : "No new line was crossed.";
+    ? `No area changed since ${movement.comparedWith}.`
+    : "No area changed this week.";
 };
 
 export const fitMovementHeadline = (movement: Pick<DecisionMovement, "headline" | "headlines">, maxLength: number): string =>
@@ -464,5 +468,5 @@ export const buildStandupLine = ({
   if (change === null) return `No earlier reading to compare with. ${callChange}`;
   if (change === "held") return `Guidance unchanged; no pace change. ${callChange}`;
   if (change === "conditions") return `Conditions changed to ${getRegimePublicLabel(regime)}; review pace. ${callChange}`;
-  return `Guidance changed at a pause or restart line; review pace. ${callChange}`;
+  return `An area paused or restarted; review pace. ${callChange}`;
 };

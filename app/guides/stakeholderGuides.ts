@@ -58,7 +58,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     avatar: "CEO",
     tagline: "Decide what to hire, spend and raise this week, and say why in one line.",
     bullets: [
-      "Check the pause line before approving a hire or a large contract.",
+      "Check whether hiring is paused before approving a hire or a large contract.",
       "Time a raise against how hard money is to get, not against the news.",
       "Give the leadership team one reading to argue from on Monday.",
       "Send investors the same guidance you are running the company on.",
@@ -67,19 +67,19 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         from: "Hiring manager",
         question: "This role is too important to wait — leaving it open will cost us the quarter.",
-        answer: "While the hiring pause line is crossed, only backfills that protect current revenue go through. Additions wait for the restart line.",
+        answer: "While hiring is paused, only backfills that protect current revenue go through. New roles wait until hiring restarts.",
         area: "hiring",
       },
       {
         from: "Leadership team",
         question: "Competitors are still spending on new bets. If we hold back now, we'll fall behind.",
-        answer: "Let them spend pricey money. Keep new bets small and reversible until the restart line clears.",
+        answer: "Let them spend pricey money. Keep new bets small and reversible until new bets restart.",
         area: "expansion-bets",
       },
       {
         from: "Team",
         question: "Are we freezing everything, or just hiring?",
-        answer: "Each area pauses on its own line, so check that area's line before changing its plan.",
+        answer: "Each area pauses and restarts on its own terms, so check that area before changing its plan.",
       },
     ],
     stageSpecificContent: [
@@ -96,12 +96,12 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         stageSlug: "series-b",
         guidance:
-          "Agree one set of pause and restart lines with your finance lead, so planning arguments start from the same numbers.",
+          "Agree when each area pauses and restarts with your finance lead, so planning arguments start from the same numbers.",
       },
       {
         stageSlug: "series-c",
         guidance:
-          "Keep the same lines quarter to quarter, so board updates and large approvals are judged against a record.",
+          "Keep the same pause and restart points quarter to quarter, so board updates and large approvals are judged against a record.",
       },
     ],
   },
@@ -111,8 +111,8 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     avatar: "Prod",
     tagline: "Pace the roadmap to how much money there is to spend.",
     bullets: [
-      "Put short-payback work first while funding pressure is above its pause line.",
-      "Defer long bets until the restart line clears, and say which line you are waiting on.",
+      "Put short-payback work first while funding pressure is high.",
+      "Defer long bets until new bets restart, and say which score you are waiting on.",
       "Argue for scope with the same numbers finance is using.",
       "Cut burn through what you choose to build, not only through budget cuts.",
     ],
@@ -120,13 +120,13 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         from: "Sales",
         question: "We already promised a customer this feature for the quarter — we can't push it back.",
-        answer: "If the current team can ship it with a short payback, keep it. If it needs new spend, name the restart line it waits on.",
+        answer: "If the current team can ship it with a short payback, keep it. If it needs new spend, name the score it waits on.",
         area: "product-tempo",
       },
       {
         from: "Leadership team",
         question: "We need a big new product bet on the roadmap to show growth for the next round.",
-        answer: "While the new-bets pause line is crossed, order the roadmap by payback speed and keep new bets to small trials.",
+        answer: "While new bets are paused, order the roadmap by payback speed and keep new bets to small trials.",
         area: "expansion-bets",
       },
       {
@@ -148,7 +148,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         stageSlug: "series-b",
         guidance:
-          "Bring the pause and restart lines to roadmap reviews, so the debate is about numbers rather than people.",
+          "Bring each area's pause and restart numbers to roadmap reviews, so the debate is about numbers rather than people.",
       },
       {
         stageSlug: "series-c",
@@ -162,7 +162,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     avatar: "CFO",
     tagline: "Turn rates and risk appetite into spending rules other teams can follow.",
     bullets: [
-      "Give each area a pause line and a restart line instead of a blanket freeze.",
+      "Give each area its own point to pause and to restart instead of a blanket freeze.",
       "Set hiring and spend limits that move when the reading moves, not when someone panics.",
       "Show the board an outside reference for why the plan is tight or loose.",
       "Replace everyone's own take on the economy with one weekly reading anyone can check.",
@@ -171,19 +171,19 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         from: "Investors",
         question: "Public markets bounced this month — we should go out and raise now.",
-        answer: "One green week doesn't clear the fundraising line. Wait until funding pressure and risk appetite cross the restart line before opening a round.",
+        answer: "One good week doesn't restart fundraising. Wait until both scores meet its restart condition before opening a round.",
         area: "capital-raising",
       },
       {
         from: "Budget owners",
         question: "This spend was already in the approved annual plan — why is it on hold now?",
-        answer: "An approved budget sets the ceiling; the pause line sets the timing. Uncommitted spend waits until the spending restart line clears.",
+        answer: "An approved budget sets the ceiling; the pause sets the timing. Uncommitted spend waits until spending restarts.",
         area: "burn-discipline",
       },
       {
         from: "Board",
         question: "What number would make us loosen the plan and lean back in?",
-        answer: "Each area loosens when its own restart line clears, not on a calendar date or a single headline.",
+        answer: "Each area restarts on its own condition, not on a calendar date or a single headline.",
         area: "burn-discipline",
       },
     ],
@@ -214,7 +214,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     bullets: [
       "Open planning with this week's guidance, so trade-offs start from agreed limits.",
       "Keep board and investor material consistent with what the company is actually doing.",
-      "Note which decisions were made under which conditions, and revisit them when a line moves.",
+      "Note which decisions were made under which conditions, and revisit them when an area pauses or restarts.",
       "Spend less time settling whose view of the market wins.",
     ],
     hearing: [
@@ -227,13 +227,13 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         from: "Leadership team",
         question: "We just set quarterly goals three weeks ago. Changing them now will whiplash the team.",
-        answer: "Keep the goals and adjust pacing only in the areas whose pause line crossed, as agreed in advance.",
+        answer: "Keep the goals and adjust pacing only in the areas that paused, as agreed in advance.",
         area: "expansion-bets",
       },
       {
         from: "Board",
         question: "What changed since the last pack?",
-        answer: "One line per area: which score moved, which pause or restart line crossed, and the date it moved.",
+        answer: "One line per area: which score moved, whether the area paused or restarted, and the date.",
       },
     ],
     stageSpecificContent: [
@@ -264,13 +264,13 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       "Favour reliability and cost work when money is tight, and delivery speed when it is not.",
       "Hold off on infrastructure built for scale you have not reached.",
       "Back hiring plans with the reading finance and product also use.",
-      "Change the plan when a line is crossed, not when the mood changes.",
+      "Change the plan when an area pauses or restarts, not when the mood changes.",
     ],
     hearing: [
       {
         from: "Product",
         question: "Can we still keep the delivery date even though the new engineering hires are on hold?",
-        answer: "Only by trimming scope to what the current team can ship cleanly. Name what comes off the list while the hiring line is crossed.",
+        answer: "Only by trimming scope to what the current team can ship cleanly. Name what comes off the list while hiring is paused.",
         area: "product-tempo",
       },
       {
@@ -282,7 +282,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         from: "Engineers",
         question: "On-call is stretched thin. When do we open hiring again?",
-        answer: "When the hiring restart line clears. Until then, slow feature tempo rather than burning out the team.",
+        answer: "When hiring restarts. Until then, slow feature tempo rather than burning out the team.",
         area: "hiring",
       },
     ],
@@ -298,11 +298,11 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         stageSlug: "series-b",
         guidance:
-          "Tie engineering spend to the same lines as the rest of the company, so growth pushes and cuts are judged against the same lines.",
+          "Tie engineering spend to the same pause and restart points as the rest of the company, so growth pushes and cuts are judged alike.",
       },
       {
         stageSlug: "series-c",
-        guidance: "Use the lines to set hiring bars and to approve large infrastructure spend.",
+        guidance: "Use the hiring and spending pauses to set hiring bars and to approve large infrastructure spend.",
       },
     ],
   },
@@ -313,27 +313,27 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
     tagline: "See whether management's plan fits the conditions it is operating in.",
     bullets: [
       "Judge hiring pace and burn against how hard money is to raise right now.",
-      "Ask management which line would change their plan, and check it next quarter.",
-      "Judge a tightening against lines agreed before it, not against the mood in the room.",
+      "Ask management which number would change their plan, and check it next quarter.",
+      "Judge a tightening against terms agreed before it, not against the mood in the room.",
       "Back expansion when conditions allow it, and restraint when they don't.",
     ],
     hearing: [
       {
         from: "Other directors",
         question: "Every portfolio company is cutting right now — should management cut 20% across the board too?",
-        answer: "Blanket cuts punish working products. Check each area against its own pause line and runway before cutting across the board.",
+        answer: "Blanket cuts punish working products. Check whether each area is paused, and your runway, before cutting across the board.",
         area: "burn-discipline",
       },
       {
         from: "Management",
         question: "Competitors are pulling back, so this is our chance to spend aggressively and take share.",
-        answer: "Taking share works when unit economics already clear the bar and runway covers the bet. Check the new-bets restart line first.",
+        answer: "Taking share works when unit economics already clear the bar and runway covers the bet. Check that new bets aren't paused first.",
         area: "expansion-bets",
       },
       {
         from: "Co-investors",
         question: "Is the team slowing down because the market tightened or because results slipped?",
-        answer: "The pause line says how much is the market; the company's own numbers explain the rest.",
+        answer: "The pause says how much is the market; the company's own numbers explain the rest.",
         area: "capital-raising",
       },
     ],
@@ -348,11 +348,11 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       },
       {
         stageSlug: "series-b",
-        guidance: "Expect written pause and restart lines, and planning assumptions shared across teams.",
+        guidance: "Expect written pause and restart points, and planning assumptions shared across teams.",
       },
       {
         stageSlug: "series-c",
-        guidance: "How consistently the lines are kept over time is a fair test of how the company is run.",
+        guidance: "How consistently those points are kept over time is a fair test of how the company is run.",
       },
     ],
   },

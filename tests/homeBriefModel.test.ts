@@ -95,7 +95,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.lastYearComparison, null);
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(Array.isArray(model.evidenceItems));
-    assert.match(model.whyThisCall[0].detail, /points from its .* line/i);
+    assert.match(model.whyThisCall[0].detail, / is [\d.]+ points from \d+\./i);
     assert.match(model.whyThisCall[0].detail, /re-check .* approvals/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
     assert.equal(typeof model.regimeVelocity.displayLabel, "string");
@@ -105,7 +105,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.inputInfluence.length, 4);
     assert.equal(model.inputInfluence[0]?.key, "tightness");
     assert.match(model.inputInfluence[0]?.effectDetail ?? "", /where conditions change|approvals/i);
-    assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /the change line/i);
+    assert.match(model.inputInfluence[0]?.watchDistanceLabel ?? "", /^\d+\.\d pts (above|below)$/);
     assert.equal(model.inputInfluence[0]?.pressureDirection, "higher-is-worse");
     assert.deepEqual(model.inputInfluence[0]?.chartDomain, { min: 0, max: 100 });
     assert.equal(model.regimeSignalIndicators[0]?.label, "Funding pressure");
@@ -228,7 +228,7 @@ describe("buildHomeBriefModel", () => {
       },
     });
 
-    assert.match(model.decisionShiftSummary, /^Conditions held steady this week; no pause or restart line was crossed\. Last week's guidance stands\./);
+    assert.match(model.decisionShiftSummary, /^Conditions held steady this week, and no area paused or restarted\. Last week's guidance stands\./);
     assert.match(model.decisionShiftSummary, /Conditions change if:/);
     assert.equal(model.decisionMovement?.moved.length, 0);
     assert.equal(model.decisionRules.length, 5);
@@ -244,7 +244,7 @@ describe("buildHomeBriefModel", () => {
     assert.equal(model.lastYearComparison, null);
     assert.equal(model.whyThisCall.length, 3);
     assert.ok(Array.isArray(model.evidenceItems));
-    assert.match(model.whyThisCall[0].detail, /points from its .* line/i);
+    assert.match(model.whyThisCall[0].detail, / is [\d.]+ points from \d+\./i);
     assert.match(model.whyThisCall[0].detail, /re-check .* approvals/i);
     assert.match(model.decisionRules[0].pauseTrigger, /\d/);
     assert.equal(model.weeklyMovement.direction, "stable");

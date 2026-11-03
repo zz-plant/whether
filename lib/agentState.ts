@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { formatMarginBand } from "./report/reportFormatting";
+import { formatMarginStamp } from "./report/reportFormatting";
 import { buildAgentEndpoints } from "./agent/discovery";
 import { REGIME_KEYS } from "./agent/inputs";
 import { loadAgentInterfaceContext, type AgentInterfaceContext } from "./agentInterface";
@@ -179,7 +179,7 @@ type AgentState = z.infer<typeof agentStateSchema>;
 
 /* The field keeps its name; pages call the same number the margin (2026-10-09). */
 const CONFIDENCE_MEANING =
-  "The margin: how far the scores sit from the line where conditions change. It is not a probability. Pages label it \"Room before a change\".";
+  "The margin: how far the scores are from changing conditions. It is not a probability. Pages label it \"Room before a change\".";
 
 const MS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -296,7 +296,7 @@ export const buildAgentState = (
     generatedAt: now.toISOString(),
     recordDate,
     headline: [
-      `${label} (${conditionsMeaning}), margin ${formatMarginBand(confidence.label).toLowerCase()}, reading of ${recordDate}.`,
+      `${label} (${conditionsMeaning}), ${formatMarginStamp(confidence.label).toLowerCase()}, reading of ${recordDate}.`,
       `${scoreHeadline(tightness)}; ${lowerFirst(scoreHeadline(riskAppetite))}.`,
       readiness.ok ? "The data is live and current." : `Do not automate on this: ${readiness.reason}`,
     ].join(" "),

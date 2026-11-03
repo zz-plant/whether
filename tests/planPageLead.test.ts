@@ -79,7 +79,7 @@ describe("/operate opening", () => {
     const description = (id: string) => steps.find((step) => step.id === id)?.description ?? "";
 
     // The areas the form starts from, by name.
-    assert.match(description("ops-plan-lines"), /^Start from the published pause and restart lines for Hiring, .+ and New bets, /);
+    assert.match(description("ops-plan-lines"), /^Start from the published rules for Hiring, .+ and New bets, /);
     // The quarter's runway target, from the same entry the panel draws.
     assert.match(description("ops-finance-strategy"), /\d+\+? months/);
     assert.ok(

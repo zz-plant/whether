@@ -6,10 +6,10 @@ import type { HomeAreaRow } from "../lib/report/home/homeSectionModel";
 
 /*
  * DD-039's open item: on a week one area moved, the folded table printed "Pause still
- * applies: no line crossed since Sep 30." in each of the other four rows. The held areas
+ * applies; no change since Sep 30." in each of the other four rows. The held areas
  * share one sentence over the table now, and the moved area keeps its row's note.
  */
-const held = "Pause still applies: no line crossed since Sep 30.";
+const held = "Pause still applies; no change since Sep 30.";
 const row = (area: HomeAreaRow["area"], changed: string, changedKind: HomeAreaRow["changedKind"]): HomeAreaRow => ({
   area,
   rule: `Rule for ${area}`,
@@ -22,7 +22,7 @@ describe("all five areas, side by side", () => {
     <AllAreaRules
       rows={[
         row("hiring", held, "held"),
-        row("product-tempo", "Restart line no longer met: risk appetite fell below 54.", "resumeLost"),
+        row("product-tempo", "Can no longer restart: risk appetite fell below 54.", "resumeLost"),
         row("capital-raising", held, "held"),
         row("burn-discipline", held, "held"),
         row("expansion-bets", held, "held"),
@@ -31,7 +31,7 @@ describe("all five areas, side by side", () => {
         {
           state: "pause",
           areas: ["hiring", "capital-raising", "burn-discipline", "expansion-bets"],
-          text: "Pause still applies to Hiring, Fundraising, Spending and New bets: no line crossed since Sep 30.",
+          text: "Pause still applies to Hiring, Fundraising, Spending and New bets; no change since Sep 30.",
         },
       ]}
       regime="SCARCITY"
@@ -46,7 +46,7 @@ describe("all five areas, side by side", () => {
   });
 
   it("keeps the moved area's note in its row", () => {
-    assert.match(html, /Restart line no longer met: risk appetite fell below 54\./);
+    assert.match(html, /Can no longer restart: risk appetite fell below 54\./);
     assert.match(html, /data-moved="true"/);
   });
 });

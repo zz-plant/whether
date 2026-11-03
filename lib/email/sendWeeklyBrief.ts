@@ -40,12 +40,12 @@ const distanceFromLine = (
   if (typeof vsThreshold !== "number" || !Number.isFinite(vsThreshold)) return null;
 
   const points = Math.round(Math.abs(vsThreshold) * 10) / 10;
-  if (points === 0) return { label: "sitting on the line where conditions change", worse: true };
+  if (points === 0) return { label: "right where conditions change", worse: true };
 
   const side = vsThreshold > 0 ? "above" : "below";
   /* A score one point off its line read "1 points above the line…". */
   const unit = points === 1 ? "point" : "points";
-  return { label: `${points} ${unit} ${side} the line where conditions change`, worse: side === worseSide };
+  return { label: `${points} ${unit} ${side} where conditions change`, worse: side === worseSide };
 };
 
 /**
@@ -276,7 +276,7 @@ export const sendWeeklyBrief = async (options?: {
       const text = [
         `Whether Weekly Brief — ${recordDate}`,
         `Conditions: ${document.conditions.line}`,
-        ...(ownLines ? [`Your lines: ${ownLines}.`] : []),
+        ...(ownLines ? [`Your rules: ${ownLines}.`] : []),
         ...readingsText(readings),
         basisLine,
         ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
@@ -285,7 +285,7 @@ export const sendWeeklyBrief = async (options?: {
         ...changeLines.map(({ label, value }) => `${label}: ${value}`),
         ...(areaRows.length ? [`${EXPORT_SECTION_HEADINGS.areas}:`] : []),
         ...areaRows.map((row) => `• ${row.label}: ${row.areaActionNow}`),
-        `Set these lines for your own plan and we'll email you the day one is crossed: ${planLinesUrl}`,
+        `Set these rules for your own plan and we'll email you the day an area pauses or restarts: ${planLinesUrl}`,
         `Share or cite this week's brief: ${baseUrl}/share`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
@@ -338,7 +338,7 @@ export const sendWeeklyBrief = async (options?: {
           `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT};margin:${index === 0 ? "0" : "12px"} 0 6px;">${label}</p>`,
           `<p style="font-size:0.9rem;margin:0;color:${OG_TEXT_SECONDARY};">${value}</p>`,
         ]),
-        `<p style="font-size:0.8rem;margin:16px 0 0;color:${OG_TEXT_MUTED};"><a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;">Set these lines for your own plan</a> and we'll email you the day one is crossed.</p>`,
+        `<p style="font-size:0.8rem;margin:16px 0 0;color:${OG_TEXT_MUTED};"><a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;">Set these rules for your own plan</a> and we'll email you the day an area pauses or restarts.</p>`,
         `</td></tr></table>`
       );
 
@@ -347,7 +347,7 @@ export const sendWeeklyBrief = async (options?: {
         body: [
           `<p style="color:${OG_TEXT_MUTED};font-size:0.85rem;margin:0 0 20px;">${recordDate}</p>`,
           ...(ownLines
-            ? [`<p style="font-size:0.9rem;margin:0 0 12px;color:${OG_TEXT};">Your lines: <span style="color:${OG_TEXT_SECONDARY};">${escapeHtml(ownLines)}.</span></p>`]
+            ? [`<p style="font-size:0.9rem;margin:0 0 12px;color:${OG_TEXT};">Your rules: <span style="color:${OG_TEXT_SECONDARY};">${escapeHtml(ownLines)}.</span></p>`]
             : []),
           ...sections,
         ].join("\n"),

@@ -90,7 +90,7 @@ describe("brief image variants", () => {
         assert.deepEqual(variant, { layout, theme, width, height });
         const tree = renderBriefImage(props, variant);
         const text = textOf(tree);
-        for (const part of [props.decision, props.contextLabel, props.sourceLabel, props.recordDate, "WITHIN REACH OF THE LINE", "whether.work"]) {
+        for (const part of [props.decision, props.contextLabel, props.sourceLabel, props.recordDate, "ROOM BEFORE A CHANGE: SOME", "whether.work"]) {
           assert.ok(part && text.includes(part), `the ${layout} card must carry "${part}" without cutting it`);
         }
         for (const reading of props.readings) {

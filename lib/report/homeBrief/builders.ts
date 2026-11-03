@@ -93,7 +93,7 @@ type RevisitDriverSignal = {
 };
 
 const revisitReasonByArea: Record<WeeklyDecisionCardViewModel["decision"]["revisitQueue"][number]["id"], string> = {
-  hiring: "Re-check the hiring line before opening a new role.",
+  hiring: "Check whether hiring is paused before opening a new role.",
   "product-tempo": "Look at the roadmap again before assuming last week's pace still holds.",
   "capital-raising": "If you plan to raise, re-check the timing before assuming the window is unchanged.",
   "burn-discipline": "Re-approve optional spend before committing to new monthly costs.",

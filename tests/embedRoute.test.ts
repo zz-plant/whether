@@ -217,8 +217,8 @@ describe("the embed says what the brief says", () => {
     const text = buildBriefEmbedText(data);
     const html = buildBriefEmbedHtml(data);
 
-    assert.match(text, /^Conditions: Freezing • Room before a change: (clear of the line|within reach of the line|close to the line) • Data as of 2026-10-05$/m);
-    assert.match(html, /Freezing · Room before a change: (clear of the line|within reach of the line|close to the line) · Data as of 2026-10-05/);
+    assert.match(text, /^Conditions: Freezing • Room before a change: (plenty|some|little) • Data as of 2026-10-05$/m);
+    assert.match(html, /Freezing · Room before a change: (plenty|some|little) · Data as of 2026-10-05/);
     for (const output of [text, html, JSON.stringify(data)]) {
       assert.doesNotMatch(output, /\b(HIGH|MED|MEDIUM|LOW)\b/);
       assert.doesNotMatch(output, /Regime:/);

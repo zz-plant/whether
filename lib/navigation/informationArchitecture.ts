@@ -162,7 +162,7 @@ export const navigationPages: readonly NavigationPage[] = [
     /* Six words in a nav row, and it undersold the page: sources, derivation
        and the close-call record. "Method" is what a doubting reader looks for. */
     label: "Method",
-    description: "Check freshness, the margin, source coverage and the lines that would change the brief.",
+    description: "Check freshness, the room before a change, source coverage and what would change the brief.",
     placement: "secondary",
   },
   {
@@ -170,7 +170,7 @@ export const navigationPages: readonly NavigationPage[] = [
     group: "decide",
     href: "/operate",
     label: "Plan",
-    description: "Each area's rule this week, a test for one move, and the lines you set for your own plan.",
+    description: "Each area's rule this week, a test for one move, and the rules you set for your own plan.",
     placement: "tab",
   },
   {
@@ -213,7 +213,7 @@ export const navigationPages: readonly NavigationPage[] = [
     group: "record",
     href: "/calibration",
     label: "Calibration",
-    description: "How often conditions held at each margin from the line, 2012–2026",
+    description: "How often conditions held at each distance from a change, 2012–2026",
     placement: "tab",
   },
   {

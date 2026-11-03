@@ -87,7 +87,7 @@ export function CompanyCalibration({
           <StagePersonaSelector activeStage={activeStage} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
           <RunwayPersonaSelector activeRunway={activeRunway} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
           <p className="text-fluid-nano text-slate-400">
-            Choose your stage and runway to scale pause lines and rules to your cash.
+            Your stage and runway set when each area pauses and what it allows.
           </p>
         </div>
       </details>

@@ -96,7 +96,7 @@ export default async function MethodPage({
       <ReportSection
         id="confidence-record"
         title={CONFIDENCE_RECORD_TITLE}
-        description="The room before a change is how far the scores sit from the line where conditions change. We check separately, across the whole archive, how often readings at that distance actually held."
+        description="The room before a change is how far the scores are from changing conditions. We check separately, across the whole archive, how often readings at that distance actually held."
       >
         <ActionLink href="/calibration" variant="pill">
           Read the calibration study

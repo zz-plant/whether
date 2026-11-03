@@ -31,14 +31,14 @@ export function AreaCorridorLadder({
       className={`rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-4 space-y-3 ${className}`.trim()}
     >
       <figcaption className="flex flex-wrap items-baseline justify-between gap-2 text-xs">
-        <span className="font-semibold text-slate-200">How close each area is to its line</span>
+        <span className="font-semibold text-slate-200">How far each area is from changing</span>
         <span className="tabular-nums text-slate-400">
           {model.heldCount === 0
-            ? "All 5 areas clear of pause lines"
+            ? "No area is close to pausing"
             : closest && tiedAtClosest > 1
-              ? `${tiedAtClosest} areas ${closest.distanceToUnlock} pts from unlocking`
+              ? `${tiedAtClosest} areas ${closest.distanceToUnlock} pts from restarting`
               : closest
-                ? `${closest.label} closest to unlocking (${closest.distanceToUnlock} pts away)`
+                ? `${closest.label} closest to restarting (${closest.distanceToUnlock} pts away)`
                 : `${model.heldCount} of 5 areas on hold`}
         </span>
       </figcaption>
@@ -71,7 +71,7 @@ export function AreaCorridorLadder({
                     <span className="text-semantic-caution-fg font-medium">
                       {area.distanceToUnlock === undefined
                         ? "On hold"
-                        : `On hold · ${area.distanceToUnlock} pts to unlock`}
+                        : `On hold · ${area.distanceToUnlock} pts from restarting`}
                     </span>
                   ) : isNear ? (
                     <span className="text-amber-300 font-medium">

@@ -157,14 +157,14 @@ const formatSignedScore = (value: number) =>
  */
 export const formatBandHeadroom = (band: HorizonSignalBand): string => {
   if (band.pauseTripped) {
-    return "Past the pause line";
+    return "Paused";
   }
 
-  const toPause = `${formatScore(band.toPause)} points from the pause line`;
+  const toPause = `${formatScore(band.toPause)} points from pausing`;
 
   return band.resumeHolds
-    ? `${toPause} · ${formatScore(band.toResume)} from the restart line`
-    : `${toPause} · ${formatScore(band.toResume)} short of the restart line`;
+    ? `${toPause} · ${formatScore(band.toResume)} from restarting`
+    : `${toPause} · ${formatScore(band.toResume)} short of restarting`;
 };
 
 /** The reading itself, and the move that produced it. Null movement stays null rather

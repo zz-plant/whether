@@ -353,7 +353,7 @@ export const buildCalibrationStudyStructuredData = ({
   const name = "How often the guidance held up";
   const description =
     `A calibration study of Whether's published margin against ${totals.months} month-to-month comparisons. `
-    + "The margin is the distance from the line where conditions change. "
+    + "The margin is how far the scores are from changing conditions. "
     + "Every band understates how often conditions held, and distance from a change line does not order the outcome.";
 
   return graph([

@@ -93,7 +93,7 @@ export async function buildPlanningPageModel(
           name: "What changes when I set my stage and runway?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "The pause lines and rules scale to your cash, so the same guidance becomes a specific rule for your company.",
+            text: "The rules scale to your cash, so the same guidance becomes a specific rule for your company.",
           },
         },
         {
@@ -101,7 +101,7 @@ export async function buildPlanningPageModel(
           name: "How often does the plan change?",
           acceptedAnswer: {
             "@type": "Answer",
-            text: "The guidance refreshes each week, and the plan follows it. Set your own lines once and the alert tells you the day one is crossed.",
+            text: "The guidance refreshes each week, and the plan follows it. Set your own rules once and the alert tells you the day an area pauses or restarts.",
           },
         },
       ],
@@ -143,10 +143,10 @@ export async function buildPlanningPageModel(
   }));
   const listOf = (items: readonly string[], type: "conjunction" | "disjunction") =>
     new Intl.ListFormat("en-GB", { style: "long", type }).format(items);
-  const planLinesSummary = `Start from the published pause and restart lines for ${listOf(
+  const planLinesSummary = `Start from the published rules for ${listOf(
     planLineDefaults.map((line) => decisionAreaLabel(line.area)),
     "conjunction",
-  )}, then move the ones your plan needs. You get an email the day one is crossed.`;
+  )}, move the numbers your plan needs, and get an email the day an area pauses or restarts.`;
   const financeSummary =
     financeStrategyFor(assessment.regime)?.runwayPosture ?? "Budget direction and cash timing for the quarter.";
   /* Freshness and confidence, once, under the h1 before anything asks the
@@ -237,7 +237,7 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Areas",
             title: "This week's rule for each area",
-            description: "Each rule pauses at one line and resumes at another, far enough apart that one noisy week can't flip it back and forth.",
+            description: "Each area pauses at one score and restarts at another, far enough apart that one noisy week can't flip it back and forth.",
             hashAliases: ["ops-monthly-action-summary-panel"],
             // The step header directly above already states this label, title, and description.
             children: h(ReportSection, {
@@ -309,7 +309,7 @@ export async function buildPlanningPageModel(
             defaultOpen: true,
             label: "Test",
             title: "Test a decision",
-            description: "Check one move against this week's lines before you commit to it: a hire, a price change, a roadmap bet or an acquisition.",
+            description: "Check one move against this week's guidance before you commit to it: a hire, a price change, a roadmap bet or an acquisition.",
             hashAliases: ["ops-decision-shield-panel"],
             // The question this header used to ask now heads DecisionShieldPanel itself, so the
             // step reads "Test a decision" → "Is this move safe right now?" with nothing between.
@@ -335,8 +335,8 @@ export async function buildPlanningPageModel(
             ? []
             : [{
               id: "ops-plan-lines",
-              label: "Lines",
-              title: "Set this plan's lines",
+              label: "Your rules",
+              title: "Set your own rules",
               description: planLinesSummary,
               children: h(PlanLinesForm, { defaults: planLineDefaults }),
             }]),

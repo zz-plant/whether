@@ -69,7 +69,7 @@ export const buildIssueTrackerMarkdownBrief = (
     ...buildComplianceStamp({
       sourceLine: provenance.sourceUrl,
       timestamp: provenance.recordDate,
-      confidence: `${formatExportConfidenceWord(document.confidence)} (how far the scores sit from the line where conditions change)`,
+      confidence: `${formatExportConfidenceWord(document.confidence)} (how far the scores are from changing conditions)`,
       basis: provenance.scoringBasis.sentence,
     }),
   ].join("\n");

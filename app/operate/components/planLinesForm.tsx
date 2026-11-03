@@ -117,14 +117,14 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
       ...(runwayBand && sendBand ? { runwayBand } : {}),
     });
     setStatus(result.ok ? "success" : "error");
-    setMessage(result.ok ? "Check your email to confirm. Your lines count from the moment you do." : result.message);
+    setMessage(result.ok ? "Check your email to confirm. Your rules count from the moment you do." : result.message);
     if (result.ok) trackActivationEvent({ step: "committed", path: "/operate", commitment: "subscribed" });
   };
 
   if (defaults.length === 0) return null;
 
   return (
-    <form onSubmit={handleSubmit} aria-label={"Set this plan's lines"} data-testid="plan-lines-form" className="space-y-4">
+    <form onSubmit={handleSubmit} aria-label={"Set your own rules"} data-testid="plan-lines-form" className="space-y-4">
       {/* The step's own line already says these start at the published lines and
           that a crossing sends one email; this says how to use them. */}
       <p className="max-w-[68ch] text-sm text-slate-300">
@@ -147,7 +147,7 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
                 {decisionAreaLabel(line.area)}
               </label>
               <fieldset disabled={!on} className="space-y-2 text-xs text-slate-300 disabled:opacity-50">
-                <legend className="sr-only">{decisionAreaLabel(line.area)} lines</legend>
+                <legend className="sr-only">{decisionAreaLabel(line.area)} rule</legend>
                 <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
                   <span className="text-slate-400">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</span>
                   <ConditionInputs
@@ -182,8 +182,8 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
             className="mt-0.5 size-4 shrink-0 accent-sky-500"
           />
           <span>
-            Say what a crossing means at my runway ({runwayBandLabel(runwayBand)}). Every company on the published
-            lines is emailed the same day; your runway is what makes the email yours.
+            Say what a pause or restart means at my runway ({runwayBandLabel(runwayBand)}). Every company on the
+            published rules is emailed the same day; your runway is what makes the email yours.
           </span>
         </label>
       ) : null}
@@ -221,7 +221,7 @@ export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) 
               disabled={status === "loading" || watched.size === 0}
               className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-11 items-center justify-center px-4 py-2 text-xs font-semibold disabled:opacity-50"
             >
-              {status === "loading" ? "Sending…" : "Email me when a line is crossed"}
+              {status === "loading" ? "Sending…" : "Email me when these change"}
             </button>
           </div>
           {status === "error" ? (

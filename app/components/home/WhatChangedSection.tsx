@@ -174,13 +174,13 @@ export function WhatChangedSection({
             <col />
           </colgroup>
           <caption className="sr-only">
-            {`How each signal compares with ${basis.reference} and with its lines`}
+            {`How each signal compares with ${basis.reference}, and where it stands now`}
           </caption>
           <thead className="max-md:hidden">
             <tr className="border-b border-[color:var(--border-subtle)] text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
               <th scope="col" className="py-2 pr-3 font-medium">{`${basis.label} → this week`}</th>
-              <th scope="col" className="py-2 font-medium">Against its lines</th>
+              <th scope="col" className="py-2 font-medium">Where it stands</th>
             </tr>
           </thead>
           <tbody className="max-md:block">
@@ -276,8 +276,8 @@ export function WhatChangedSection({
                     <span className="text-xs text-slate-500">
                       {compact ? <span className="tabular-nums text-slate-200">{row.valueLabel}</span> : <>
                       {row.key === "baseRate"
-                        ? "Feeds into funding pressure, so it's judged against that score's lines."
-                        : "Feeds into both scores, so it's judged against their lines."}</>}
+                        ? "Feeds into funding pressure, so it counts through that score."
+                        : "Feeds into both scores, so it counts through them."}</>}
                     </span>
                   )}
                 </td>

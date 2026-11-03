@@ -26,8 +26,8 @@ export const describeRecordCadence = (
   record: Pick<TrackRecord, "firstRecordDate" | "monthsCovered" | "regimeChanges" | "lineCrossingMonths">,
 ): string =>
   `Since ${formatMonthYearShortFromValue(record.firstRecordDate)}, conditions have changed ${record.regimeChanges} ` +
-  `${record.regimeChanges === 1 ? "time" : "times"} in ${record.monthsCovered} months, and a monthly reading crossed ` +
-  `one of the pause or restart lines in ${record.lineCrossingMonths} of them. Most Mondays, nothing has moved.`;
+  `${record.regimeChanges === 1 ? "time" : "times"} in ${record.monthsCovered} months, and an area paused or restarted ` +
+  `in ${record.lineCrossingMonths} of them. Most Mondays, nothing has moved.`;
 
 /**
  * What a past period's page is, said at its top (2026-10-09). The year and quarter

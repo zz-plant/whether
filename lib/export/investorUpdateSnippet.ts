@@ -54,9 +54,9 @@ const RUNWAY_IMPLICATIONS: Record<RunwayBand, string> = {
 };
 
 const CONFIDENCE_PHRASES: Record<BriefDocument["confidence"], string> = {
-  HIGH: "well clear of the line where they would change",
-  MED: "within reach of the line where they would change",
-  LOW: "close to the line where they would change",
+  HIGH: "well clear of a change",
+  MED: "within reach of a change",
+  LOW: "close to a change",
 };
 
 /** The last month-end reading before the month the record date falls in. */

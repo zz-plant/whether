@@ -14,7 +14,7 @@ describe("the method and its form: a section of /about", () => {
 
     // From the framework half.
     assert.match(html, /How the three parts work/);
-    assert.match(html, /Agree on the lines in advance/);
+    assert.match(html, /Agree on them in advance/);
     // From the form half, which used to be /template.
     assert.match(html, /Decision template to print or copy/);
     assert.match(html, /When you will check/);

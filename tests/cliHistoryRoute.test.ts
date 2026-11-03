@@ -55,13 +55,13 @@ describe("GET /api/cli/history", () => {
     assert.deepEqual(march, {
       recordDate: "2026-03-31",
       regime: "EXPANSION",
-      confidenceLabel: "Within reach of the line where conditions change",
+      confidenceLabel: "Some room before conditions change",
       trend: "deteriorating",
     });
     assert.deepEqual(january, {
       recordDate: "2026-01-30",
       regime: "EXPANSION",
-      confidenceLabel: "Clear of the line where conditions change",
+      confidenceLabel: "Plenty of room before conditions change",
       trend: "improving",
     });
 

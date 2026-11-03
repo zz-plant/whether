@@ -127,12 +127,12 @@ describe("buildSlackBrief", () => {
     // scale) is High. The fixture's engine code says MEDIUM, and neither that
     // code nor its band reaches a paste any more.
     assert.match(brief, /Why this could be wrong:/);
-    assert.match(brief, /^• Room before a change: clear of the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/m);
+    assert.match(brief, /^• Room before a change: plenty \((funding pressure|risk appetite) is \d+ points? away\)$/m);
     assert.doesNotMatch(brief, /MEDIUM|\bMED\b/);
     /* The contract's sentence, which reads the margin: this clear week is
        not told it sits near a line. */
-    assert.doesNotMatch(brief, /The scores sit near a line/);
-    assert.match(brief, /• The scores are clear of the change lines, but a signal can still reverse/);
+    assert.doesNotMatch(brief, /The scores sit near a line|close enough that a small move could change conditions/);
+    assert.match(brief, /• The scores are clear of a change, but a signal can still reverse/);
   });
 
   it("carries each area's timing line into the per-area rows", () => {
@@ -166,12 +166,12 @@ describe("buildSlackBrief", () => {
     // Recovery from the Sep 25 reading: the sentence comes before the readings that are its evidence.
     assert.equal(
       lines[changed + 1],
-      "Since Aug 31, conditions changed from Freezing to Sunny. The restart line is now met for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. Every area can now restart, because funding pressure fell below 66 and risk appetite rose above 54.",
     );
     assert.match(lines[changed + 2] ?? "", /^Funding pressure 12 of 100 /);
 
     const uncompared = buildSlackBrief(fixtureBriefDocument());
-    assert.doesNotMatch(uncompared, /pause or restart line|restart line is now met|pause now applies/);
+    assert.doesNotMatch(uncompared, /an area paused or restarted|can now restart|pause now applies/);
   });
 
   it("keeps citation-ready source lines in exported briefs", () => {
@@ -206,7 +206,7 @@ describe("buildCallCitation", () => {
     const citation = buildCallCitation(fixtureBriefDocument({ weeklyCall: { ...fixtureWeeklyCall(), regimeStage: "Sunny — Late" } }));
 
     assert.match(citation, /^Conditions: Sunny — Late \(money is cheap and available\)$/m);
-    assert.match(citation, /^Room before a change: clear of the line \(how far the scores sit/m);
+    assert.match(citation, /^Room before a change: plenty \(how far the scores are from changing conditions\)$/m);
     assert.match(citation, /^Source note: https:\/\/fred\.stlouisfed\.org$/m);
     assert.match(citation, /^Full brief: https?:\/\//m);
     assert.doesNotMatch(citation, /EXPANSION|refresh cadence|Score-based/, "the citation is for a reader, not the engine");

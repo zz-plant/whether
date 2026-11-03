@@ -497,7 +497,7 @@ What changed for operators:
   audience", "Decision check / Is this move safe right now?", "Compare two plans", "Memos by
   executive role", "What operators have asked for next". The escalation block's eyebrow and h2
   swapped ("Decision help" / "Still have one open question?"). That block left on 2026-09-15, and
-  the production smoke now asks `/operate` for "Set this plan's lines" instead.
+  the production smoke now asks `/operate` for "Set your own rules" instead.
 - `/signals`: "Closest past cycle" with plain labels replaces the emoji-led analog block; the bare
   "Trends" eyebrow is a heading naming both series.
 - `/trust`: h1 "How much to trust this week's call" (was "Forecast confidence"); the two "Source…"
@@ -1824,7 +1824,7 @@ true.
   `classifyRegime` reads it, and on a pause or restart line it counts as not met, because the rules
   state those strictly (`> 76`, `< 66`). The dedupe key is per score (`threshold:<metric>`), so a
   funding-pressure crossing no longer silences a risk-appetite one in the same week.
-- **A plan's own lines.** `/operate` has a step, "Set this plan's lines" (`ops-plan-lines`,
+- **A plan's own lines.** `/operate` has a step, "Set your own rules" ("Set this plan's lines" until 2026-11-03; `ops-plan-lines`,
   after the rules, live weeks only), that starts from the published rules
   (`planLinesFromRules`) and lets a reader move each number and untick areas. The lines go with
   an email address to `/api/email/subscribe` (`planLines`, parsed whole by `parsePlanLines`;
