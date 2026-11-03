@@ -122,15 +122,36 @@ export function RegimeRadar({
   const prevY = hasPrevious ? yFor(previousTightness!) : null;
   /* The dated readings, again in HTML: the SVG titles on the dots are
      pointer-only, so touch, keyboard and screen-reader users read the same
-     values here. */
+     values here. A table since 2026-11-03: one sentence per month named both
+     scores in every row, twice per page. */
   const readableReadings = [
-    ...trailPoints.flatMap((point, index) =>
-      point.title ? [{ key: `trail-${index}`, text: point.title }] : []),
+    ...(trail ?? []).flatMap((point, index) =>
+      point.label ? [{ key: `trail-${index}`, label: point.label, tightness: point.tightness, riskAppetite: point.riskAppetite }] : []),
     ...(hasPrevious && previousLabel
-      ? [{ key: "previous", text: `${previousLabel}: Funding pressure ${previousTightness}, Risk appetite ${previousRiskAppetite}` }]
+      ? [{ key: "previous", label: previousLabel, tightness: previousTightness, riskAppetite: previousRiskAppetite }]
       : []),
-    { key: "current", text: `${primaryLabel ?? "Current reading"}: Funding pressure ${tightness}, Risk appetite ${riskAppetite}` },
+    { key: "current", label: primaryLabel ?? "Current reading", tightness, riskAppetite },
   ];
+  const readingsTable = (
+    <table className="w-full border-collapse text-left tabular-nums">
+      <thead>
+        <tr className="text-slate-400">
+          <th scope="col" className="py-0.5 pr-3 font-medium">Reading</th>
+          <th scope="col" className="py-0.5 pr-3 font-medium">Funding pressure</th>
+          <th scope="col" className="py-0.5 font-medium">Risk appetite</th>
+        </tr>
+      </thead>
+      <tbody>
+        {readableReadings.map((reading) => (
+          <tr key={reading.key}>
+            <th scope="row" className="whitespace-nowrap py-0.5 pr-3 font-normal">{reading.label}</th>
+            <td className="py-0.5 pr-3">{reading.tightness}</td>
+            <td className="py-0.5">{reading.riskAppetite}</td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
 
   // Which change line is nearer (horizontal vs vertical), for the projection guide.
   // The distance in points is the trust strip's margin, printed once beside the map.
@@ -477,19 +498,13 @@ export function RegimeRadar({
             <UrlDetails queryKey="chart" initialOpen={detailsOpen} summary="Scores on this chart"
               className="mx-auto max-w-md text-left" summaryClassName="weather-hit w-fit cursor-pointer">
               {hasTrail && caveat ? <p className="mb-2">{caveat}</p> : null}
-              <ul className="list-disc pl-4">
-                {readableReadings.map((reading) => <li key={reading.key}>{reading.text}</li>)}
-              </ul>
+              {readingsTable}
             </UrlDetails>
           ) : readableReadings.length > 1 ? (
             <details className="mx-auto max-w-md text-left">
               {/* `weather-hit`: a 17px line is a 45px target with it, as the other summaries are. */}
               <summary className="weather-hit w-fit cursor-pointer">Scores on this chart</summary>
-              <ul className="list-disc pl-4">
-                {readableReadings.map((reading) => (
-                  <li key={reading.key}>{reading.text}</li>
-                ))}
-              </ul>
+              {readingsTable}
             </details>
           ) : null}
           {footer ? <span className="block pt-1">{footer}</span> : null}

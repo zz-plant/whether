@@ -16,7 +16,7 @@ import type { BriefDocument } from "../report/briefArtifact";
 import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
 import { applyStageToWeeklyCall } from "../report/weeklyCallContract";
 import { describePlanLineStates } from "../alert/planLines";
-import { briefWeekChangeLine, EXPORT_SECTION_HEADINGS } from "../export/briefBuilders";
+import { briefIsQuietWeek, briefWeekChangeLine, EXPORT_SECTION_HEADINGS } from "../export/briefBuilders";
 import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 import { decisionAreaOrder } from "../report/boundedDecisionRules";
 import { OG_CONDITION_INK, OG_LINE_CROSSED, OG_PANEL, OG_RULE, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "../image/ogTheme";
@@ -238,6 +238,10 @@ export const sendWeeklyBrief = async (options?: {
       /* What moved since the earlier reading, named by its date, as every paste opens
          "What changed this week". Absent on a week with nothing compared. */
       const weekChange = briefWeekChangeLine(document);
+      /* A quiet week's email leaves out the two readings and their basis: the
+         week-change line says they held, and the call keeps every slot the Slack post
+         prints, "Conditions change if" included. */
+      const quiet = briefIsQuietWeek(document);
       /* The week's headline action, the one the homepage h1 and every paste lead with. */
       const headline = weeklyHeadline(document.slots);
       const pauseIf = document.slots.pauseIf;
@@ -277,8 +281,7 @@ export const sendWeeklyBrief = async (options?: {
         `Whether Weekly Brief — ${recordDate}`,
         `Conditions: ${document.conditions.line}`,
         ...(ownLines ? [`Your rules: ${ownLines}.`] : []),
-        ...readingsText(readings),
-        basisLine,
+        ...(quiet ? [] : [...readingsText(readings), basisLine]),
         ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
         `${publicDecisionLabels.call}: ${headline.composed}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
@@ -301,8 +304,9 @@ export const sendWeeklyBrief = async (options?: {
         `<p style="font-size:1.1rem;font-weight:600;margin:0;color:${OG_CONDITION_INK[regime]};">${regimeLabel}</p>`,
         `<p style="font-size:0.85rem;margin:4px 0 0;color:${OG_TEXT_SECONDARY};">${getRegimeWeatherRationale(regime)}</p>`,
         `</td></tr></table>`,
-        readingsHtml(readings),
-        `<p style="font-size:0.8rem;margin:8px 0 0;color:${OG_TEXT_MUTED};">${escapeHtml(basisLine)}</p>`,
+        ...(quiet
+          ? []
+          : [readingsHtml(readings), `<p style="font-size:0.8rem;margin:8px 0 0;color:${OG_TEXT_MUTED};">${escapeHtml(basisLine)}</p>`]),
         ...(weekChange
           ? [`<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${EXPORT_SECTION_HEADINGS.changed}:</strong> ${escapeHtml(weekChange)}</p>`]
           : []),
@@ -321,7 +325,7 @@ export const sendWeeklyBrief = async (options?: {
        }
        sections.push(
          `<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};">`,
-         `<a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;font-weight:600;">Set these lines for your own plan →</a>`,
+         `<a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;font-weight:600;">Set these rules for your own plan →</a>`,
          ` · `,
          `<a href="${baseUrl}/share" style="color:${OG_TEXT};text-decoration:underline;">Share or cite this brief →</a>`,
          `</p>`,

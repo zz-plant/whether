@@ -259,7 +259,7 @@ describe("assembleCurrentWeekBrief", () => {
     assert.doesNotMatch(result.record.whatChanged, /Pressure (increased|eased)|Slow new commitments|Move faster on/);
     assert.match(
       result.record.whatChanged,
-      /no area paused or restarted|pause now applies|pause no longer applies|can now restart|can no longer restart/,
+      /no area paused or restarted|pause now applies|pause no longer applies|restart condition now holds|restart condition no longer holds/,
     );
   });
 

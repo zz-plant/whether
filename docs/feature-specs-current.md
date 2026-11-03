@@ -324,6 +324,22 @@ until the report resolves.
   funding pressure is above 76: Hiring, Fundraising, Spending and New bets." With two scores
   holding different areas it lists the areas alone.
 
+### 1.1.0s One side of each rule on the brief, the map's readings as a table, a quiet Monday email (2026-11-03)
+
+- "What would change this guidance" prints the side of the lead area's rule that can change it:
+  "When can paused decisions resume?" with "Restart when" while the lead area is on hold, or
+  "What would pause decisions?" with "Pause if" otherwise (`leadHeld`).
+- The decision picker's answer and its Slack takeaway print the same one side: an area on hold,
+  when it restarts; any other area, when it pauses. "Nothing to resume" is gone from the picker.
+- `/brief.md` prints one side per area.
+- The conditions map's "Scores on this chart" is a table: each score is named once, in its
+  column header, instead of in every month's row.
+- The Monday email on a quiet week (`briefIsQuietWeek`: compared, no area moved, conditions
+  held, plenty of room, guidance not on hold) leaves out the two readings and their basis; the
+  week-change line says they held, and the call keeps every slot the Slack post prints.
+- The homepage load budget (`scripts/check-home-load.ts`) falls to the combined measurement:
+  1,839 words, 372 before the areas, 332 numbers, 37 "Funding pressure" and 52 "Risk appetite".
+
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
 The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate
 Slack copy button and the MCP/API chip were removed on 2026-09-02: `Copy Brief` already produces

@@ -161,9 +161,13 @@ describe("RegimeRadar path", () => {
     ]} />);
     const caption = /<figcaption[\s\S]*<\/figcaption>/.exec(html)?.[0] ?? "";
     assert.match(caption, /<summary[^>]*>Scores on this chart<\/summary>/);
-    assert.match(caption, /April 2026: Funding pressure 40, Risk appetite 61/);
-    assert.match(caption, /May 2026: Funding pressure 40, Risk appetite 59/);
-    assert.match(caption, /Current reading: Funding pressure 90, Risk appetite 48/);
+    /* A table (2026-11-03): each score is named once, in its column header, not in every row. */
+    assert.match(caption, /<th scope="col"[^>]*>Funding pressure<\/th><th scope="col"[^>]*>Risk appetite<\/th>/);
+    const row = (label: string) => new RegExp(`<th scope="row"[^>]*>${label}</th><td[^>]*>(\\d+)</td><td[^>]*>(\\d+)</td>`).exec(caption)?.slice(1);
+    assert.deepEqual(row("April 2026"), ["40", "61"]);
+    assert.deepEqual(row("May 2026"), ["40", "59"]);
+    assert.deepEqual(row("Current reading"), ["90", "48"]);
+    assert.equal(caption.match(/Funding pressure/g)?.length, 1, "the name appears once");
   });
 
   it("joins every month-end to the current point, and drops the single earlier dot", () => {

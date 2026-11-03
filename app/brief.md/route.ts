@@ -10,6 +10,7 @@ import { weeklyCallChangeLines } from "../../lib/report/weeklyCallContract";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { formatDecisionReversal, formatDecisionThreshold } from "../../lib/report/reportFormatting";
 import { describeConditions, pauseConditionOnly } from "../../lib/export/exportTerms";
+import { selectPauseCondition } from "../../lib/report/operatingCalls";
 import { formatGuidance } from "../../lib/export/briefBuilders";
 
 type HomePage = Awaited<ReturnType<typeof assembleHomePage>>;
@@ -59,9 +60,13 @@ export function buildBriefMarkdown(homepage: HomePage): string {
     .map((item) =>
       [
         /* A dash, not parentheses: a line the reading already meets carries
-           "(already true at 90)", which nested inside them. */
+           "(already true at 90)", which nested inside them. One side of the rule
+           (2026-11-03), as every paste prints it: an area on hold, its restart
+           line; any other area, its pause line. */
         `- ${item.areaActionNow}`,
-        ` — ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(item.triggerThreshold)} · ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.reversalCondition)}`,
+        selectPauseCondition(item.pauseConditions, reportData.assessment.scores)?.satisfied === true
+          ? ` — ${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(item.reversalCondition)}`
+          : ` — ${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(item.triggerThreshold)}`,
         ...(item.latencyLine ? [` · ${DECISION_CONTRACT_LABELS.timing.latency}: ${item.latencyLine}`] : []),
       ].join(""),
     )

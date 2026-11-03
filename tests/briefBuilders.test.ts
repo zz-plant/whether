@@ -185,12 +185,12 @@ describe("buildSlackBrief", () => {
     // Recovery from the Sep 25 reading: the sentence comes before the readings that are its evidence.
     assert.equal(
       lines[changed + 1],
-      "Since Aug 31, conditions changed from Freezing to Sunny. Every area can now restart, because funding pressure fell below 66 and risk appetite rose above 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. The restart condition now holds for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
     );
     assert.match(lines[changed + 2] ?? "", /^Funding pressure 12 of 100 /);
 
     const uncompared = buildSlackBrief(fixtureBriefDocument());
-    assert.doesNotMatch(uncompared, /an area paused or restarted|can now restart|pause now applies/);
+    assert.doesNotMatch(uncompared, /an area paused or restarted|restart condition now holds|pause now applies/);
   });
 
   it("keeps citation-ready source lines in exported briefs", () => {

@@ -64,6 +64,7 @@ export function WhatWouldChangeSection({
   resumeWhen,
   guardrail,
   leadResume,
+  leadHeld,
   flipConditions,
   callChangeLines,
   regime,
@@ -78,6 +79,12 @@ export function WhatWouldChangeSection({
   guardrail?: string;
   /** The lead area's restart line, where no stage set one of its own. */
   leadResume?: string;
+  /**
+   * Whether the lead area's pause applies this week. Only one side can change its
+   * state (2026-11-03): on hold, the restart condition; otherwise the pause. Unknown
+   * prints both, as before.
+   */
+  leadHeld?: boolean;
   flipConditions?: readonly string[];
   callChangeLines: { tightness: number; riskAppetite: number };
   regime?: string;
@@ -104,7 +111,8 @@ export function WhatWouldChangeSection({
   );
   /* The pause and restart lines answer one question; the change line answers the
      other. Both are printed under their own heading (2026-10-22). */
-  const resumeLine = resumeWhen ?? leadResume;
+  const resumeLine = leadHeld === false ? undefined : resumeWhen ?? leadResume;
+  const pauseLine = leadHeld === true ? undefined : guardrail;
 
   return (
     <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading}>
@@ -172,14 +180,16 @@ export function WhatWouldChangeSection({
             </div>
           ) : null}
 
-          {guardrail || resumeLine ? (
+          {pauseLine || resumeLine ? (
             <div className="space-y-2">
-              <h3 className="text-fluid-sm font-semibold text-slate-100">When can paused decisions resume?</h3>
+              <h3 className="text-fluid-sm font-semibold text-slate-100">
+                {resumeLine ? "When can paused decisions resume?" : "What would pause decisions?"}
+              </h3>
               <dl className="space-y-3 text-fluid-sm">
-                {guardrail ? (
+                {pauseLine ? (
                   <div className="space-y-0.5">
                     <dt className="font-semibold text-slate-200">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</dt>
-                    <dd className="text-slate-300"><BoundedValue>{guardrail}</BoundedValue></dd>
+                    <dd className="text-slate-300"><BoundedValue>{pauseLine}</BoundedValue></dd>
                   </div>
                 ) : null}
                 {resumeLine ? (
@@ -189,9 +199,11 @@ export function WhatWouldChangeSection({
                   </div>
                 ) : null}
               </dl>
-              <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
-                Better conditions alone won&rsquo;t lift a pause. The restart condition sits further out, so one good week can&rsquo;t undo it.
-              </p>
+              {resumeLine ? (
+                <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
+                  Better conditions alone won&rsquo;t lift a pause. The restart condition sits further out, so one good week can&rsquo;t undo it.
+                </p>
+              ) : null}
             </div>
           ) : null}
 

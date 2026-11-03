@@ -151,11 +151,11 @@ describe("buildDecisionMovement", () => {
     assert.ok(recovered.moved.every((entry) => entry.kind === "resumable"));
     assert.equal(
       recovered.areas.find((entry) => entry.area === "hiring")?.text,
-      "Pause lifted, can restart: funding pressure fell below 66 and risk appetite rose above 54.",
+      "Pause lifted, restart condition holds: funding pressure fell below 66 and risk appetite rose above 54.",
     );
     assert.equal(
       recovered.sentence,
-      "Since Aug 31, conditions changed from Freezing to Sunny. Every area can now restart, because funding pressure fell below 66 and risk appetite rose above 54.",
+      "Since Aug 31, conditions changed from Freezing to Sunny. The restart condition now holds for every area, because funding pressure fell below 66 and risk appetite rose above 54.",
     );
 
     // Back out of the pause but not to the restart line: 80 to 72 is through 76 and no further.
@@ -181,7 +181,7 @@ describe("buildDecisionMovement", () => {
     assert.equal(result.areas.find((entry) => entry.area === "burn-discipline")?.kind, "held");
     assert.equal(
       result.sentence,
-      "Since Aug 31, Hiring, Roadmap, Fundraising and New bets can no longer restart, because risk appetite fell below 54.",
+      "Since Aug 31, the restart condition no longer holds for Hiring, Roadmap, Fundraising and New bets, because risk appetite fell below 54.",
     );
   });
 
@@ -252,13 +252,13 @@ describe("fitMovementHeadline", () => {
     assert.ok(result);
     assert.equal(
       result.headline,
-      "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to Hiring, Fundraising, Spending and New bets; Roadmap can no longer restart.",
+      "Since Aug 31, conditions changed from Sunny to Freezing and the pause now applies to Hiring, Fundraising, Spending and New bets; the restart condition no longer holds for Roadmap.",
     );
 
     // The card prints the conditions now in its own label, so that clause goes first.
     assert.equal(
       fitMovementHeadline(result, 140),
-      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets; Roadmap can no longer restart.",
+      "Since Aug 31, the pause now applies to Hiring, Fundraising, Spending and New bets; the restart condition no longer holds for Roadmap.",
     );
     // Then the areas go to a count, still a whole sentence.
     assert.equal(
