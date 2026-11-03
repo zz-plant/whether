@@ -42,14 +42,14 @@ const CRON_STEP_LABELS: Record<string, string> = {
   "activation-funnel": "Reader return record",
   "check-regime-change": "Regime-change check",
   "alert-deliveries": "Alert deliveries",
-  "regime-history-workflow": "Regime history pull request",
+  "regime-history-workflow": "Regime archive rebuild started",
   /* Two rows, because they answer different questions. The `-start` row is green
      the moment the cron hands the workflow to Cloudflare; the other is written by
      the workflow itself and is the one that knows whether the week was frozen. */
   "brief-freeze-start": "Brief freeze started",
   "brief-freeze": "Brief freeze outcome",
   /* Written by the regime-history Workflow itself, for the same reason as `brief-freeze`. */
-  "regime-history": "Regime history outcome",
+  "regime-history": "Regime archive rebuild outcome",
   /* Whether the owner was told about the run's failures (lib/delivery/opsNotice.ts). */
   "ops-notice": "Failure notice",
 };

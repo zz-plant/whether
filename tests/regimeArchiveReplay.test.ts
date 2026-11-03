@@ -1,17 +1,15 @@
 import assert from "node:assert/strict";
-import { afterEach, beforeEach, describe, it } from "bun:test";
+import { describe, it } from "bun:test";
 import { z } from "zod";
 
-import timeMachineCache from "../data/time_machine_cache.json";
-import summaryArchive from "../data/summary_archive.json";
 import { ENGINE_VERSION } from "../lib/regimeEngineCore";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
-import { parseSeries, type TreasuryDatasets } from "../scripts/regimeArchiveContext";
+import { bundledArchive as archive, bundledCache as cache, buildBundledSeries, CacheEntrySchema } from "./fixtures/bundledArchiveSeries";
 import {
   buildMonthlyArchive,
   buildQuarterlyYearlyArchive,
   buildWeeklyArchive,
-} from "../scripts/regimeArchiveReplay";
+} from "../lib/summary/regimeArchiveReplay";
 
 /*
  * The archive generators replayed offline, on series rebuilt from the bundled
@@ -25,144 +23,18 @@ import {
  * basis since engine-2026-10-09b), and the yields each weekly, quarterly and
  * yearly entry was read at. Rebuilt into
  * FRED-shaped series, they are enough for the generators' own code
- * (`scripts/regimeArchiveReplay.ts`, the code the scripts run) to reproduce the
+ * (`lib/summary/regimeArchiveReplay.ts`, the code the scripts and the Worker run) to reproduce the
  * records. Before 2026-10-06 the replay loop existed four times (the runtime
  * walk and three generators); this is what pins the one copy left to the data
  * all four produced.
  */
 
-const YieldsSchema = z.object({
-  oneMonth: z.number().nullable().optional(),
-  threeMonth: z.number().nullable().optional(),
-  twoYear: z.number().nullable().optional(),
-  tenYear: z.number().nullable().optional(),
-});
-const HistoryPointSchema = z.object({ date: z.string(), value: z.number().nullable() });
-const CacheEntrySchema = z.object({
-  year: z.number(),
-  month: z.number(),
-  vix: z.number().nullable().optional(),
-  vixHistory: z.array(HistoryPointSchema).nullable().optional(),
-  baseRateVelocityWindow: z
-    .object({ compareDate: z.string(), compareValue: z.number(), latestDate: z.string(), latestValue: z.number() })
-    .nullable()
-    .optional(),
-  chicagoFci: z.number().nullable().optional(),
-  chicagoFciHistory: z.array(HistoryPointSchema).nullable().optional(),
-  source: z.string(),
-  record_date: z.string(),
-  isLive: z.boolean().optional(),
-  yields: YieldsSchema,
-});
-const ArchiveEntrySchema = z.object({
-  cadence: z.enum(["weekly", "monthly", "quarterly", "yearly"]),
-  year: z.number(),
-  week: z.number().optional(),
-  month: z.number().optional(),
-  quarter: z.number().optional(),
-  asOf: z.string(),
-  record_date: z.string(),
-  tightness: z.number().optional(),
-  riskAppetite: z.number().optional(),
-  summary: z.object({
-    regime: z.string(),
-    inputs: z.array(
-      z.object({ id: z.string(), label: z.string(), value: z.number().nullable(), recordDate: z.string() }),
-    ),
-  }),
-});
-
-const cache = z.array(CacheEntrySchema).parse(timeMachineCache);
-const archive = z.array(ArchiveEntrySchema).parse(summaryArchive);
-
-/** FRED-shaped series rebuilt from the bundle; a missing print is an empty field, as FRED writes it. */
-const buildBundledSeries = () => {
-  const series = {
-    DGS1MO: new Map<string, number | null>(),
-    DGS3MO: new Map<string, number | null>(),
-    DGS2: new Map<string, number | null>(),
-    DGS10: new Map<string, number | null>(),
-    VIXCLS: new Map<string, number | null>(),
-    NFCI: new Map<string, number | null>(),
-  };
-  const conflicts: string[] = [];
-  const put = (map: Map<string, number | null>, date: string, value: number | null | undefined) => {
-    if (value === undefined) return;
-    if (map.has(date)) {
-      if (map.get(date) !== value) conflicts.push(`${date}: ${map.get(date)} vs ${value}`);
-      return;
-    }
-    map.set(date, value);
-  };
-
-  for (const entry of cache) {
-    put(series.DGS1MO, entry.record_date, entry.yields.oneMonth ?? null);
-    put(series.DGS3MO, entry.record_date, entry.yields.threeMonth ?? null);
-    put(series.DGS2, entry.record_date, entry.yields.twoYear ?? null);
-    put(series.DGS10, entry.record_date, entry.yields.tenYear ?? null);
-    const window = entry.baseRateVelocityWindow;
-    if (window) {
-      put(series.DGS1MO, window.compareDate, window.compareValue);
-      put(series.DGS1MO, window.latestDate, window.latestValue);
-    }
-    for (const point of entry.vixHistory ?? []) put(series.VIXCLS, point.date, point.value);
-    for (const point of entry.chicagoFciHistory ?? []) put(series.NFCI, point.date, point.value);
-  }
-  for (const entry of archive) {
-    if (entry.cadence === "monthly") continue;
-    for (const input of entry.summary.inputs) {
-      if (input.value === null) continue;
-      if (input.id === "base-rate") {
-        put(input.label.includes("(3M)") ? series.DGS3MO : series.DGS1MO, input.recordDate, input.value);
-      } else if (input.id === "two-year") {
-        put(series.DGS2, input.recordDate, input.value);
-      } else if (input.id === "ten-year") {
-        put(series.DGS10, input.recordDate, input.value);
-      }
-    }
-  }
-
-  const toDataset = (id: keyof typeof series) =>
-    parseSeries(
-      [
-        `observation_date,${id}`,
-        ...[...series[id].entries()]
-          .sort(([left], [right]) => left.localeCompare(right))
-          .map(([date, value]) => `${date},${value === null ? "" : value}`),
-      ].join("\n"),
-    );
-  const datasets: TreasuryDatasets = {
-    oneMonth: toDataset("DGS1MO"),
-    threeMonth: toDataset("DGS3MO"),
-    twoYear: toDataset("DGS2"),
-    tenYear: toDataset("DGS10"),
-  };
-  return { datasets, vixDataset: toDataset("VIXCLS"), chicagoFciDataset: toDataset("NFCI"), conflicts };
-};
-
 // The archives on record were regenerated on Oct 9, 2026 (engine-2026-10-09b); the weekly range ends at the Friday it covers.
 const NOW = new Date("2026-10-09T18:29:43.682Z");
-
-// A partial-run variable in the environment would scope what the builders write.
-const HISTORY_ENV = ["HISTORY_START_YEAR", "HISTORY_END_YEAR", "HISTORY_WEEKS"];
-const savedEnv = new Map<string, string | undefined>();
 
 const bundled = buildBundledSeries();
 
 describe("archive replay from bundled series", () => {
-  beforeEach(() => {
-    for (const key of HISTORY_ENV) {
-      savedEnv.set(key, process.env[key]);
-      delete process.env[key];
-    }
-  });
-  afterEach(() => {
-    for (const [key, value] of savedEnv) {
-      if (value === undefined) delete process.env[key];
-      else process.env[key] = value;
-    }
-  });
-
   it("rebuilds the series without contradicting itself", () => {
     // Every source that names an observation agrees on its value.
     assert.deepEqual(bundled.conflicts, []);

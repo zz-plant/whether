@@ -13,7 +13,8 @@
  */
 import { readFileSync, writeFileSync } from "node:fs";
 import { z } from "zod";
-import { fetchSeries, type SeriesDataset } from "../regimeArchiveContext";
+import { fetchSeries } from "../fredSeriesFetch";
+import type { SeriesDataset } from "../../lib/summary/regimeArchiveContext";
 import { getTimeMachineSnapshots } from "../../lib/timeMachine/timeMachineCache";
 
 export const RATE_INPUTS_PATH = "data/research/premise-test-rate-inputs.json";

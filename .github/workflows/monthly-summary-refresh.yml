@@ -4,6 +4,7 @@ name: Monthly Summary Refresh
 # for Actions minutes: "Whether — regime history refresh", Tuesday 12:00 UTC (Monday until
 # 2026-10-06, when the account's weekly usage cap rejected it three weeks running),
 # https://claude.ai/code/routines/trig_016331bnhHUZx2SWjWew2z5m
+# Since 2026-11-03 the Worker rebuilds the archive itself (worker/workflows/regimeHistoryRefresh.ts).
 # Kept runnable by hand for a restored Actions budget or a one-off backfill.
 on:
   workflow_dispatch:

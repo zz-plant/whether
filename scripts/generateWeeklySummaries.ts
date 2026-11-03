@@ -1,32 +1,20 @@
 /**
  * Weekly summary archive generator for the Regime Station Time Machine.
  * Pulls Treasury snapshots and builds copy-ready weekly summaries for historical review.
- * The replay itself is `buildWeeklyArchive` (`regimeArchiveReplay.ts`); this script
- * fetches and writes.
+ * The replay itself is `buildWeeklyArchive` (`lib/summary/regimeArchiveReplay.ts`) and the
+ * files it writes are `writeWeeklyArchive` (`lib/summary/regimeArchiveFiles.ts`); this
+ * script fetches and runs them on the working tree.
  */
-import { writeSummaryArchive } from "./summaryArchive";
-import { writeSummaryFile } from "./summaryFile";
-import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
-import { fetchArchiveDatasets } from "./regimeArchiveContext";
-import { buildWeeklyArchive } from "./regimeArchiveReplay";
-
-const START_YEAR = 2018;
-const OUTPUT_PATH = (endYear: number) =>
-  `data/weekly_summaries_${START_YEAR}_${endYear}.json`;
+import { workingTreeStore } from "./dataFileStore";
+import { fetchSeries } from "./fredSeriesFetch";
+import { readArchiveScope } from "./archiveScope";
+import { fetchArchiveDatasets } from "../lib/summary/regimeArchiveContext";
+import { buildWeeklyArchive } from "../lib/summary/regimeArchiveReplay";
+import { writeWeeklyArchive } from "../lib/summary/regimeArchiveFiles";
 
 const generateWeeklySummaries = async () => {
-  const now = new Date();
-  const { datasets, vixDataset, chicagoFciDataset } = await fetchArchiveDatasets();
-  const { entries: output, effectiveEndYear, mode } = buildWeeklyArchive({ datasets, vixDataset, chicagoFciDataset, now });
-
-  await writeSummaryFile({
-    path: OUTPUT_PATH(effectiveEndYear),
-    entries: output,
-    mode,
-    getKey: (entry) => `${entry.year}-${entry.week}`,
-  });
-  await writeSummaryArchive({ weeklyEntries: output, mode });
-  await refreshDerivedSummaryHistory();
+  const datasets = await fetchArchiveDatasets(fetchSeries);
+  await writeWeeklyArchive(workingTreeStore, buildWeeklyArchive({ ...datasets, now: new Date(), scope: readArchiveScope() }));
 };
 
 generateWeeklySummaries().catch((error) => {

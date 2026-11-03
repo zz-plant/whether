@@ -485,7 +485,7 @@ type BaseRateObservation = { date: string; value: number };
  * Exposed because the archive generator stores this pair on each Time Machine
  * cache entry, so the runtime walk can score the same move from two numbers
  * that the generator scored from the full daily series. It used to re-implement
- * this search in `scripts/regimeArchiveContext.ts`; two copies of a window rule
+ * this search in `lib/summary/regimeArchiveContext.ts`; two copies of a window rule
  * is how the walk and the archives came to disagree before (050e9371).
  */
 export const resolveBaseRateVelocityPair = (

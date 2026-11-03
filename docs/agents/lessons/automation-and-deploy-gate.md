@@ -9,7 +9,7 @@ the same scripts the old workflow did, opens a PR, and never merges it.
 
 | Routine | ID | Cadence (UTC) | Produces |
 | --- | --- | --- | --- |
-| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json`, `time_machine_cache.json`, `confidence_record_months.json`, `weekly_summaries_2018_2026.json`, `summary_memory_rail_weekly.json`, `posture_archive_index.json`, `posture_archive_years.json` (once the owner pastes the prompt; see below) |
+| Whether — regime history refresh | `trig_016331bnhHUZx2SWjWew2z5m` | Tue 12:00 | `data/summary_archive.json`, `summary_monthly_regime_history.json`, `monthly_summaries_2012_2025.json`, `time_machine_cache.json`, `confidence_record_months.json`, `weekly_summaries_2018_2026.json`, `summary_memory_rail_weekly.json`, `posture_archive_index.json`, `posture_archive_years.json` (once the owner pastes the prompt; see below). Superseded by the Worker's rebuild since 2026-11-03 ("The rebuild moved into the Worker"); disable it once that has landed a pull request |
 | Whether — weekly brief freeze | `trig_01WrbhhT73Ve4bsFK83UNyu9` | Thu 13:00 | current week appended to `data/published_briefs.json` |
 | Whether — claims read-through (Tue, after the Monday send) | `trig_011EVxtoaiNMXk6CnKUPdfnZ` | Tue 02:13 | nothing committed: a read-only report, pushed to the owner's phone, comparing each claim in `docs/claims-ledger.md` across the live surfaces, and whether the weekly and month-end comparison bases are current |
 
@@ -142,6 +142,28 @@ reads the frozen weeks from `/calendar.ics` and `/api/agent?week=` when the repo
 unreachable, and no longer asks for pull requests. w42 and w43 were never frozen (the Thursday
 routine hit the usage cap on Oct 22, and the Monday freeze Workflow has opened no pull request since
 it was enabled), so the Oct 26 reading compared with Sep 30; w44 was frozen by hand.
+
+**The rebuild moved into the Worker (2026-11-03).** `RegimeHistoryRefreshWorkflow` now runs the
+whole refresh the routine was for: the monthly, weekly and quarterly generators and
+`archive:index`, against `main` as it stands, with every changed file in one commit on
+`automation/regime-archive-rebuild` (`lib/summary/regimeArchivePullRequest.ts`). The generators'
+code moved from `scripts/` to `lib/summary/` so the scripts and the Worker run one copy; with the
+same series and clock, the refactored scripts wrote the same bytes as the old ones in all 14 data
+files. Measured against FRED's full history: six series (983KB of CSV), about 1.2s of CPU against
+the 30s default, about 28 subrequests against 10,000, and a working set of about 45-48MB. Memory
+is the tight one: production isolates sat at 53MB median and 88MB p99 that week, against 128MB, so
+a rebuild landing on a busy isolate can exceed it and is left to the step retries. If "Exceeded
+Memory" shows up in the instance logs, the next step is a Worker of its own for this Workflow,
+whose baseline would be a few MB. Two findings shaped the schedule. A month-end is dated by its
+calendar day, so Oct 31 (a Saturday) needs Monday Nov 2's print, which FRED had not posted at
+Tuesday 01:44 UTC; the routine's Tuesday slot could never land such a month the week it ended. And
+the Chicago Fed index is revised weekly, so every rebuild rewrites history somewhere. The
+Workflow therefore runs daily and opens a pull request on Tuesdays, or the day a new month-end
+appears. The KV-only pull request it opened before could not have merged: the month rail must
+equal the archive's month-ends (`tests/summaryDerivedHistory.test.ts`), and it added months the
+archive did not have. It never ran far enough to find out, because production has no
+`GITHUB_TOKEN`; every instance from Oct 19 to Nov 2 failed on that line. Once the token is set and
+the first rebuild lands, the routine can be disabled; until then both write the same files.
 
 **A freeze must not move a pinned test (2026-10-07).** The routine pushes through the pre-push gate,
 so any test that reads the newest frozen week fails its push and no freeze PR opens. The brief-format

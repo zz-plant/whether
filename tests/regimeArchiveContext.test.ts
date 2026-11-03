@@ -8,7 +8,7 @@ import {
   resolveBaseRateVelocityWindow,
   resolveChicagoFciReading,
   resolveVixReading,
-} from "../scripts/regimeArchiveContext";
+} from "../lib/summary/regimeArchiveContext";
 
 const asOfTime = (date: string) => Date.parse(`${date}T00:00:00Z`);
 

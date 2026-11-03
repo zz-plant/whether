@@ -1,9 +1,9 @@
 /**
- * The little of GitHub's REST API a Workflow needs to land one data file behind a pull
- * request: read a branch head, create a branch, read and write one file, open a PR, and —
- * where the lane merges its own data pull requests — read the PR, its files and its checks,
- * and merge it. Fetch is injected so the whole client runs against an in-memory fake under
- * bun tests.
+ * The little of GitHub's REST API a Workflow needs to land data behind a pull request: read a
+ * branch head, create a branch, read and write one file, commit several files at once (the
+ * archive rebuild writes up to ten, the largest 5MB), open a PR, and — where the lane merges
+ * its own data pull requests — read the PR, its files and its checks, and merge it. Fetch is
+ * injected so the whole client runs against an in-memory fake under bun tests.
  *
  * The token travels only in the Authorization header, never in a URL, so no error message
  * built from a URL or a status can carry it.
@@ -34,6 +34,12 @@ const pullRequestDetailSchema = z.object({
 export type GitHubPullRequestDetail = { number: number; html_url: string; open: boolean; merged: boolean; headSha: string };
 
 const pullRequestFilesSchema = z.array(z.object({ filename: z.string() }));
+
+const gitObjectSchema = z.object({ sha: z.string() });
+const gitCommitSchema = z.object({ sha: z.string(), tree: gitObjectSchema });
+
+/** One file of a multi-file commit: its full new text. */
+type GitHubFileWrite = { path: string; content: string };
 
 const checkRunsSchema = z.object({
   check_runs: z.array(
@@ -95,10 +101,19 @@ export class GitHubRepoClient {
     return this.options.repository;
   }
 
-  private async request(operation: string, path: string, init: RequestInit = {}, allow: number[] = []): Promise<Response> {
+  private async request(
+    operation: string,
+    path: string,
+    { accept, ...init }: RequestInit & { accept?: string } = {},
+    allow: number[] = [],
+  ): Promise<Response> {
     const response = await this.fetcher(`${this.baseUrl}${path}`, {
       ...init,
-      headers: { ...this.headers, ...(init.body ? { "content-type": "application/json" } : {}) },
+      headers: {
+        ...this.headers,
+        ...(accept ? { accept } : {}),
+        ...(init.body ? { "content-type": "application/json" } : {}),
+      },
     });
     if (!response.ok && !allow.includes(response.status)) {
       let detail: string | undefined;
@@ -144,6 +159,62 @@ export class GitHubRepoClient {
     return { sha: body.sha, content: fromBase64Utf8(body.content) };
   }
 
+  /**
+   * A file's text at `ref`, or null when it does not exist there. The raw media type, because
+   * the contents API leaves `content` empty for a file over 1MB and the summary archive is 5MB;
+   * raw serves up to 100MB.
+   */
+  async getFileText(path: string, ref: string): Promise<string | null> {
+    const response = await this.request(
+      "read file",
+      `/contents/${path.split("/").map(encodeURIComponent).join("/")}?ref=${encodeURIComponent(ref)}`,
+      { accept: "application/vnd.github.raw+json" },
+      [404],
+    );
+    return response.status === 404 ? null : response.text();
+  }
+
+  private async postGitObject(operation: string, path: string, body: unknown): Promise<string> {
+    const response = await this.request(operation, path, { method: "POST", body: JSON.stringify(body) });
+    const parsed = gitObjectSchema.safeParse(await response.json());
+    if (!parsed.success) throw new GitHubApiError(operation, response.status, "no sha in response");
+    return parsed.data.sha;
+  }
+
+  /**
+   * Every file in one commit on top of `parentSha`, and `branch` pointed at it: created when
+   * missing, moved (forced) when it exists, so a re-run replaces the branch's last attempt
+   * rather than stacking on it. Blobs, a tree over the parent's, a commit, the ref — the Git
+   * Data API, since the contents API writes one file per commit. Returns the commit's sha.
+   */
+  async commitFiles(input: { branch: string; parentSha: string; message: string; files: GitHubFileWrite[] }): Promise<string> {
+    const parentResponse = await this.request("read commit", `/git/commits/${encodeURIComponent(input.parentSha)}`);
+    const parent = gitCommitSchema.safeParse(await parentResponse.json());
+    if (!parent.success) throw new GitHubApiError("read commit", parentResponse.status, "unexpected commit payload");
+
+    const tree: { path: string; mode: "100644"; type: "blob"; sha: string }[] = [];
+    for (const file of input.files) {
+      const sha = await this.postGitObject("create blob", "/git/blobs", { content: file.content, encoding: "utf-8" });
+      tree.push({ path: file.path, mode: "100644", type: "blob", sha });
+    }
+    const treeSha = await this.postGitObject("create tree", "/git/trees", { base_tree: parent.data.tree.sha, tree });
+    const commitSha = await this.postGitObject("create commit", "/git/commits", {
+      message: input.message,
+      tree: treeSha,
+      parents: [input.parentSha],
+    });
+
+    if ((await this.getBranchHeadSha(input.branch)) === null) {
+      await this.createBranch(input.branch, commitSha);
+    } else {
+      await this.request("move branch", `/git/refs/heads/${encodeURIComponent(input.branch)}`, {
+        method: "PATCH",
+        body: JSON.stringify({ sha: commitSha, force: true }),
+      });
+    }
+    return commitSha;
+  }
+
   async putFile(input: { path: string; branch: string; message: string; content: string; sha?: string }): Promise<void> {
     await this.request("write file", `/contents/${input.path.split("/").map(encodeURIComponent).join("/")}`, {
       method: "PUT",
@@ -177,7 +248,7 @@ export class GitHubRepoClient {
     return { number, html_url, open: state === "open", merged, headSha: head.sha };
   }
 
-  /** Paths the pull request changes. One page of 100: a data pull request changes one file, and more is already a refusal. */
+  /** Paths the pull request changes. One page of 100: the largest data pull request, the archive rebuild, changes ten. */
   async listPullRequestFiles(number: number): Promise<string[]> {
     const response = await this.request("list pull request files", `/pulls/${number}/files?per_page=100`);
     const parsed = pullRequestFilesSchema.safeParse(await response.json());

@@ -1,6 +1,8 @@
 /**
- * Summary archive loader for Time Machine timeline playback.
- * Validates cached weekly/monthly summaries for historical review.
+ * The summary archive's schema (`data/summary_archive.json`), for whatever reads the
+ * archive as text: the posture index stage of an archive refresh
+ * (`regimeArchiveFiles.ts`) parses the archive that refresh just wrote. No route bundles
+ * the 5MB file; pages read the extracts the refresh writes beside it.
  */
 import { z } from "zod";
 import { buildMonthlyStructured, type MonthlySummary } from "./monthlySummary";
@@ -9,7 +11,6 @@ import type { RegimeKey } from "../regimeEngine";
 import { buildWeeklyStructured, type WeeklySummary } from "./weeklySummary";
 import { getGovernanceParametersForPosture } from "../policy/governance";
 import type { YearlySummary } from "./yearlySummary";
-import rawArchive from "../../data/summary_archive.json";
 
 export type SummaryArchiveEntry =
   | {
@@ -232,9 +233,3 @@ export const parseSummaryArchive = (input: unknown): SummaryArchiveEntry[] => {
   console.error("Summary archive failed validation.", parsedArchive.error.format());
   return [];
 };
-
-const sortedArchive = parseSummaryArchive(rawArchive).sort(
-  (a, b) => new Date(a.asOf).getTime() - new Date(b.asOf).getTime()
-);
-
-export const getSummaryArchive = () => sortedArchive;

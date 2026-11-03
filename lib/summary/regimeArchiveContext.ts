@@ -13,15 +13,15 @@
  * Everything the three generators shared lives here once: the series fetch,
  * the coverage check, the record-date search, the Treasury snapshot, the
  * provenance labels and the period replay. They each carried a copy of all of
- * it until 2026-10-06.
+ * it until 2026-10-06. It moved from scripts/ to lib/ on 2026-11-03 so the
+ * Worker's rebuild (`regimeArchiveRebuild.ts`) runs this code, not a copy of it.
  */
-import { execFileSync } from "node:child_process";
-import type { MacroSeriesReading, TreasuryData } from "../lib/types";
-import { FRED_BASE_URL, isMissingFredValue } from "../lib/fred";
-import { resolveBaseRateVelocityPair, type RegimeAssessment } from "../lib/regimeEngine";
-import { buildReplayChicagoFciReading, buildReplayVixReading, replayRegimeWalk } from "../lib/timeMachine/regimeReplay";
+import type { MacroSeriesReading, TreasuryData } from "../types";
+import { FRED_BASE_URL, FRED_FETCH_HEADERS, isMissingFredValue } from "../fred";
+import { resolveBaseRateVelocityPair, type RegimeAssessment } from "../regimeEngine";
+import { buildReplayChicagoFciReading, buildReplayVixReading, replayRegimeWalk } from "../timeMachine/regimeReplay";
 
-export type SeriesPoint = { date: string; time: number; value: number | null };
+type SeriesPoint = { date: string; time: number; value: number | null };
 export type SeriesDataset = { points: SeriesPoint[]; map: Map<string, number> };
 
 export const MS_PER_DAY = 86400000;
@@ -80,34 +80,21 @@ export const getLatestValidDate = (points: SeriesPoint[]): (SeriesPoint & { valu
 };
 
 /**
- * Fetch one FRED series in full through the CSV export: `fetch()` first, and
- * when that fails for any reason, `curl` — which has succeeded where Bun's
- * fetch has not on some networks — with one warning naming the failure.
+ * One FRED series in full, through the CSV export: a rebuild's six series are
+ * six subrequests. A failed response throws. The scripts fall back to curl
+ * (`scripts/fredSeriesFetch.ts`); the Worker's Workflow retries the step.
  */
-export const fetchSeries = async (seriesId: string): Promise<SeriesDataset> => {
-  const sourceUrl = `${FRED_BASE_URL}?id=${seriesId}`;
-
-  try {
-    const response = await fetch(sourceUrl);
-    if (!response.ok) {
-      throw new Error(`FRED series fetch failed for ${seriesId}: ${response.status}`);
-    }
-    return parseSeries(await response.text());
-  } catch (error) {
-    const csv = execFileSync("curl", ["-fsSL", sourceUrl], {
-      encoding: "utf8",
-      stdio: ["ignore", "pipe", "pipe"],
-    });
-    if (error instanceof Error) {
-      console.warn(`fetch() failed for ${seriesId}; retried with curl fallback (${error.message}).`);
-    }
-    return parseSeries(csv);
+export const fetchFredSeries = async (seriesId: string, fetcher: typeof fetch = fetch): Promise<SeriesDataset> => {
+  const response = await fetcher(`${FRED_BASE_URL}?id=${encodeURIComponent(seriesId)}`, { headers: FRED_FETCH_HEADERS });
+  if (!response.ok) {
+    throw new Error(`FRED series fetch failed for ${seriesId}: ${response.status}`);
   }
+  return parseSeries(await response.text());
 };
 
 /** Trailing base-rate window for the velocity term: every observation at or
  *  before the record date inside the lookback, ascending. */
-export const resolveBaseRateWindow = (
+const resolveBaseRateWindow = (
   dataset: SeriesDataset,
   recordDate: string,
   asOfTime: number,
@@ -150,7 +137,7 @@ export const resolveBaseRateVelocityWindow = (
     : null;
 };
 
-export type VixReading = MacroSeriesReading;
+type VixReading = MacroSeriesReading;
 
 /*
  * The Chicago Fed index is weekly: each observation is dated the Friday its week
@@ -250,11 +237,15 @@ export type TreasuryDatasets = Record<keyof typeof SERIES_CATALOG, SeriesDataset
  * written without it would be scored on a different basis from the live call,
  * so a failed fetch fails the run before anything is written.
  */
-export const fetchArchiveDatasets = async (): Promise<{
+export type ArchiveDatasets = {
   datasets: TreasuryDatasets;
   vixDataset: SeriesDataset | null;
   chicagoFciDataset: SeriesDataset;
-}> => {
+};
+
+export const fetchArchiveDatasets = async (
+  fetchSeries: (seriesId: string) => Promise<SeriesDataset>,
+): Promise<ArchiveDatasets> => {
   const datasets = {
     oneMonth: await fetchSeries(SERIES_CATALOG.oneMonth),
     threeMonth: await fetchSeries(SERIES_CATALOG.threeMonth),
@@ -384,7 +375,7 @@ const buildTreasurySnapshot = (
 };
 
 /** One period of an archive replay, after its inputs were resolved and scored. */
-export type ArchivePeriodReading<Period> = {
+type ArchivePeriodReading<Period> = {
   period: Period;
   asOfTime: number;
   treasury: TreasuryData;

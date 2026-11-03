@@ -207,9 +207,9 @@ provenance formatters, plus a re-implementation of the engine's velocity-window 
 copies is what 050e9371 had to repair. Now:
 
 - `replayRegimeWalk` and `buildReplayVixReading` (`lib/timeMachine/regimeReplay.ts`) are the walk; the
-  runtime walk and `replayArchivePeriods` (`scripts/regimeArchiveContext.ts`) both call them.
+  runtime walk and `replayArchivePeriods` (`lib/summary/regimeArchiveContext.ts`) both call them.
 - The cadence logic each generator owned is `buildWeeklyArchive`, `buildMonthlyArchive` and
-  `buildQuarterlyYearlyArchive` in `scripts/regimeArchiveReplay.ts`; the `generate*Summaries.ts` scripts
+  `buildQuarterlyYearlyArchive` in `lib/summary/regimeArchiveReplay.ts`; the `generate*Summaries.ts` scripts
   fetch, call one, and write.
 - The velocity pair the cache stores comes from the engine's `resolveBaseRateVelocityPair`, the same search
   that scores the term.
