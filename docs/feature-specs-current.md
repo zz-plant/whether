@@ -3712,12 +3712,42 @@ risk appetite 55), four sentences told a reader something the numbers did not su
   every reading once any of its lines is met ("Funding pressure is 90 and risk appetite is 55
   now."); an "or" rule still prints only the met ones, since one fires it
   (`withReadingsNow`, `lib/report/boundedDecisionRules.ts`).
-- **The margin counts what the ceiling hides.** A pinned score sheds its pressure above the cap
-  before the published number moves, so its gap to the change line is the published gap plus that
-  headroom (`resolveTightnessGap`, `lib/report/confidence.ts`). The margin named funding pressure
+- **The margin counts what the ceiling hides.** A pinned score sheds pressure before the
+  published number moves, so its gap to the change line is the published gap plus those hidden
+  points (`resolveTightnessGap`, `lib/report/confidence.ts`). The margin named funding pressure
   "20 pts from its change line"; the line the week could cross next was risk appetite's, 5 points
-  away, and the margin names it now. The brief document carries the pressure, so every paste
-  agrees with the page.
+  away, and the margin names it now. The brief document carries the pressure, the speed term and
+  the curve, so every paste agrees with the page.
+
+  The hidden points are counted along the base rate, the input the ceiling tag is about (§1.1.81):
+  the rate component's points past its own 90-point ceiling, plus the points by which the rate
+  component, the inversion term (capped at 25), the speed term and the Chicago Fed add-on sum past
+  100. The week of Oct 19 has a 4.11% bill on a positive curve, a rate component of 110: 20 hidden
+  points, 40 to the line. Until 2026-10-24 the count was `pressure − 100`, which gave that week 10;
+  until 2026-11-02 it was `pressure − score`, which gave it the right 20 but was wrong in two other
+  ways. Pressure keeps the inversion past its cap, which only a steepening curve sheds, and that is
+  risk appetite's line, measured on its own; and pressure leaves out the add-on the published score
+  carries. So `pressure − score` counted 15 hidden points where there are none, at a 3.78% bill
+  under a 0.8-point inversion (published 75, 5 from the line), and 5 too few on a positive-curve
+  week the add-on lifts to 95. On the bundled month-ends the fix moves ten distances, all inverted months from Nov 2022 to
+  Aug 2023, already at 100 and far from the line, and four of the margins they print. No month's
+  label or percent changes:
+
+  | Month-end | Inversion term | Margin before | Margin after |
+  | --- | --- | --- | --- |
+  | 2022-11-30 | 35 | funding pressure 128 | funding pressure 118 |
+  | 2022-12-30 | 27 | funding pressure 129 | funding pressure 127 |
+  | 2023-02-28 | 44 | funding pressure 201 | funding pressure 182 |
+  | 2023-04-28 | 30 | funding pressure 113 | funding pressure 108 |
+
+  The other six (Jan, Mar, May to Aug 2023) print risk appetite's margin before and after. One
+  case is undercounted, and the code says so: the add-on's points past the 100 clip are on no
+  score, so a reading the Chicago Fed index tops up to 100 shows up to 10 fewer hidden points than
+  it has. The index's add-on has fired at two month-ends since 2012 (Mar and Apr 2020, at a score of
+  2), neither of them one. Counting it needs the add-on's points on the scores, which is a scorer
+  change and an `ENGINE_VERSION` bump. `tests/regimeMath.test.ts` steps the bill down one rate
+  point at a time through `evaluateRegime` and holds the count to the points the published score
+  sheds before it moves.
 - **"Watch this week" lists lines still to cross.** It was every rule's restart lines, met or not:
   "Risk appetite > 54" at 55, and on a Sunny week with nothing held, two lines already true and
   none that could hold anything. A held area now lists the restart lines it has not met, an open
@@ -3746,7 +3776,9 @@ Two defects the regime engine's property tests found (`tests/regimeEnginePropert
 
   The other 175 keep theirs, among them 22 flagged at 100 and the 15 flagged at 90 from Aug 2024
   to Oct 2025, whose rate component was already at its ceiling. Neither changed month's margin
-  moves: its pressure is under 100, so the ceiling hides no points from it.
+  moved with the flag, because the margin then counted only pressure past 100. Since 2026-10-24
+  it counts the rate component past its own ceiling (§1.1.80), so those months show 9 and 4
+  hidden points (funding pressure 29 and 24 from its change line).
 - **The funding-pressure pause line is held to 100**, like the other three shared lines
   (`sharedDecisionLines`). A regime line of 95 or more on the threshold controls printed
   "Funding pressure > 101". The monthly summary's bands read the same function now, rather than a
