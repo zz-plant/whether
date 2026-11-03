@@ -92,7 +92,7 @@ describe("the homepage's changed-signals table", () => {
     dynamics: datedWeek,
   });
 
-  it("heads its comparison column with the date and draws the hollow dot under it", () => {
+  it("dates the comparison on the ladder's hollow dot and in the caption", () => {
     const html = renderToStaticMarkup(
       <WhatChangedSection
         rows={rows}
@@ -103,7 +103,10 @@ describe("the homepage's changed-signals table", () => {
     );
     const text = html.replace(/<[^>]+>/g, " ");
 
-    assert.match(text, /Aug 31 → this week/);
+    /* The column head said "Aug 31 → this week" over a column of from-chips until
+       2026-11-03; the row leads with what the move means now, and the heading the
+       route passes ("What changed since Aug 31") dates it. */
+    assert.ok(text.includes("Money got much harder to raise."), "27 points, said in the reader's words");
     assert.match(text, /Aug 31: 63/, "the ladder names its hollow dot for the reading it is drawn from");
     assert.match(text, /compares with Aug 31, and where it stands now/);
     assert.match(text, /since Aug 31/, "and the move is read out against it");
@@ -115,7 +118,6 @@ describe("the homepage's changed-signals table", () => {
       <WhatChangedSection rows={rows} lead="The scores moved toward tighter money this week." comparisonUnavailable={false} />,
     );
 
-    assert.match(html, /Last week → this week/);
     assert.match(html, /Last week: 63/);
   });
 

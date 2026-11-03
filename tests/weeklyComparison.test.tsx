@@ -447,7 +447,7 @@ describe("the assembled homepage on Oct 5, 2026", () => {
       <WhatChangedSection rows={rows} lead={movement?.sentence ?? ""} comparisonUnavailable={false} basis={basis} />,
     ).replace(/<[^>]+>/g, " ");
 
-    assert.match(text, new RegExp(`${monthEnd.label} → this week`));
+    assert.ok(text.includes(`${monthEnd.label}: `), "the ladders' hollow dot names the month-end");
     assert.doesNotMatch(text, /Sep 29/);
   });
 
