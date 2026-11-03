@@ -5,61 +5,63 @@ import { Sparkline, interquartileRange, sparklineDomain, type SparklinePoint } f
 import { ScoreLadder } from "../ui/scoreLadder";
 import { GovernedAreas } from "../ui/governedAreas";
 import { SignalContextDetails } from "../ui/plainLanguage";
-import { TrendGlyph, describeTrend, trendDirectionFromDelta, trendToneClass } from "../illustrations/TrendGlyph";
+import { TrendGlyph, trendToneClass } from "../illustrations/TrendGlyph";
 import { HOME_SECTIONS, type SignalChangeRow } from "../../../lib/report/home/homeSectionModel";
 import { comparisonBasis, type ComparisonBasis } from "../../../lib/report/comparisonBasis";
+import { describeSignalMoveMeaning, type SignalMoveMeaning } from "../../../lib/report/signalMoveMeaning";
 
 /**
- * Movement: one row per signal, each a from → to chip and, for the two
- * composite scores, the score on its ladder. The hero's three readout cells
- * and the Key drivers card both drew these same four readings; this is the one
- * drawing. The section opens on the table (2026-10-09): its lead sentence
- * restated the card ("Since Sep 30, conditions changed from Cloudy to
- * Freezing"), and the areas' own rows say which lines each move crossed. A read
- * with no previous week still gets one sentence saying so, instead of four
- * empty chips saying nothing.
+ * Movement: one row per signal, each opening on what the move means in everyday
+ * words and, for the two composite scores, the score on its ladder. The hero's
+ * three readout cells and the Key drivers card both drew these same four
+ * readings; this is the one drawing. The section opens on the table
+ * (2026-10-09): its lead sentence restated the card ("Since Sep 30, conditions
+ * changed from Cloudy to Freezing"), and the areas' own rows say which lines
+ * each move crossed. A read with no previous week still gets one sentence saying
+ * so, instead of four empty rows saying nothing.
  *
  * Every term defines itself in its row (the scale note, what the score means
  * at its level, the line names on the ladder), so the section no longer ends
  * by sending a reader to a glossary.
  *
- * The column and the ladders' hollow dot name the reading they compare with
- * ("Sep 29 → this week"): last week's published brief, or the previous
- * month-end where there is none. The column used to say "Last week" over a
- * month-end. A row the earlier reading did not record draws "—".
+ * The row leads with the meaning (2026-11-03): "Money got easier to raise.",
+ * "Borrowing got slightly cheaper.", "No real change." (`signalMoveMeaning.ts`
+ * sets the size words). It was a column of from-chips ("from 40 ↘") beside the
+ * ladder, which a reader without macro background could not turn into anything,
+ * and which repeated the ladder's own hollow-dot key ("Sep 29: 40"). The numbers
+ * stay, second: on the ladder for a score, in the value cell for a market input.
+ * The ladders' hollow dot and an input's earlier value name the reading they
+ * compare with: last week's published brief, or the previous month-end where
+ * there is none.
  */
-const DeltaChip = ({ row, basis }: { row: SignalChangeRow; basis: ComparisonBasis }) => {
-  if (row.previous === null || row.delta === null) {
-    return <span className="text-slate-500">—</span>;
-  }
+const meaningOf = (row: SignalChangeRow, basis: ComparisonBasis) =>
+  describeSignalMoveMeaning({
+    key: row.key,
+    value: row.value,
+    delta: row.delta,
+    saturated: row.saturatedPressure !== undefined,
+    basis,
+  });
+
+const MoveMeaning = ({ row, meaning }: { row: SignalChangeRow; meaning: SignalMoveMeaning }) => {
   /* A score held at the top of its scale is not "unchanged": it cannot show a
-     rise (2026-10-14). The flat chip said "no move" a row before the note that
-     said the move was hidden, at the moment conditions were most extreme. */
-  if (row.saturatedPressure !== undefined && row.delta === 0) {
+     rise (2026-10-14). A flat "No change" said "no move" a row before the note
+     that said the move was hidden, at the moment conditions were most extreme. */
+  if (meaning.capped) {
     return (
-      <span className="weather-caveat-mark inline-flex items-center rounded-sm border border-current/30 px-1.5 py-0.5 tabular-nums text-caveat-fg" data-delta-capped>
-        <span className="sr-only">{`${row.label} has been at the top of its scale ${basis.since}, so it can't show a rise.`}</span>
-        <span aria-hidden="true">Can&rsquo;t rise further</span>
-      </span>
+      <p className="weather-caveat-mark text-sm font-medium text-caveat-fg" data-delta-capped data-move-meaning={row.key}>
+        {meaning.text}
+      </p>
     );
   }
-  /* Where the reading came from (2026-10-27). The ladder beside the chip prints this
-     week's value against its lines, so "90 → 90" said the 90 twice, and an unmoved
-     score drew a chip to say so; /signals draws its chip the same way. */
-  if (row.delta === 0) {
-    return <span className="text-slate-400">No change</span>;
-  }
-  const direction = trendDirectionFromDelta(row.delta);
-  const tone = trendToneClass(direction, row.increaseIsPositive);
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-sm border border-current/30 px-1.5 py-0.5 tabular-nums ${tone}`}>
-      <span className="sr-only">
-        {describeTrend({ label: row.label, delta: row.delta, current: row.value ?? undefined, period: basis.since })}
-      </span>
-      <span aria-hidden="true" className="text-slate-400">from</span>
-      <span aria-hidden="true" className="font-semibold">{row.previousLabel}</span>
-      <TrendGlyph direction={direction} className="h-3 w-3" />
-    </span>
+    <p
+      className={`flex items-baseline gap-1.5 text-sm font-medium ${trendToneClass(meaning.direction, row.increaseIsPositive)}`}
+      data-move-meaning={row.key}
+    >
+      {meaning.direction === "flat" ? null : <TrendGlyph direction={meaning.direction} className="h-3 w-3 shrink-0 self-center" />}
+      <span>{meaning.text}</span>
+    </p>
   );
 };
 
@@ -140,10 +142,15 @@ export function WhatChangedSection({
   /** "What changed since Aug 31": the heading names the reading the move is measured from. */
   heading?: string;
 }) {
+  const meanings = new Map(rows.map((row) => [row.key, meaningOf(row, basis)] as const));
+  /* A score that moved enough to say so goes first; one whose row says "No real
+     change." keeps its place, or the table opened on a row with nothing to say. */
   const displayRows = compact
     ? [...rows].sort((a, b) => {
         const priority = (row: SignalChangeRow) =>
-          row.key === "tightness" || row.key === "riskAppetite" ? (row.delta ? 0 : 1) : 2;
+          row.key === "tightness" || row.key === "riskAppetite"
+            ? (meanings.get(row.key)?.direction ?? "flat") === "flat" ? 1 : 0
+            : 2;
         return priority(a) - priority(b);
       })
     : rows;
@@ -157,20 +164,21 @@ export function WhatChangedSection({
       /* In the reader's order: first what moved (the evidence), then what
          that changes (the consequences by area). Keeps DOM and visual order aligned. */
     >
-      {/* On phones each signal, movement and ladder gets the full measure.
-          An auto-width movement column narrowed the signal's description to
-          one word per line whenever a clipped score needed an explanation. */}
+      {/* On phones each signal, its meaning and its ladder get the full measure.
+          The meaning sits under the name, not in a column of its own, so it
+          leads the row at every width: as a middle column it printed after the
+          score's fold on a phone. */}
       <div className="md:overflow-x-auto overscroll-x-contain">
         <table
           className="weather-signal-table w-full border-collapse text-left text-sm max-md:block md:min-w-[42rem] md:table-fixed"
           data-testid="what-changed-table"
         >
-          {/* The signal column carries the scale note and what the score means at
-              its level, so it needs room: left to itself the browser gave it the
-              width of its longest word and wrapped the notes one word per line. */}
+          {/* The signal column carries the meaning, the scale note and what the
+              score means at its level, so it needs room: left to itself the
+              browser gave it the width of its longest word and wrapped the notes
+              one word per line. */}
           <colgroup className="max-md:hidden">
-            <col className="w-[19rem]" />
-            <col className="w-[11rem]" />
+            <col className="w-[20rem]" />
             <col />
           </colgroup>
           <caption className="sr-only">
@@ -179,7 +187,6 @@ export function WhatChangedSection({
           <thead className="max-md:hidden">
             <tr className="border-b border-[color:var(--border-subtle)] text-xs text-slate-400">
               <th scope="col" className="py-2 pr-3 font-medium">Signal</th>
-              <th scope="col" className="py-2 pr-3 font-medium">{`${basis.label} → this week`}</th>
               <th scope="col" className="py-2 font-medium">Where it stands</th>
             </tr>
           </thead>
@@ -209,6 +216,8 @@ export function WhatChangedSection({
                     >
                       {row.label}
                     </Link>
+                    {/* With nothing to compare, the lead over the table says so once. */}
+                    {comparisonUnavailable ? null : <MoveMeaning row={row} meaning={meanings.get(row.key) ?? meaningOf(row, basis)} />}
                     {row.key === "tightness" || row.key === "riskAppetite" ? (
                       <GovernedAreas metric={row.key} target="table" />
                     ) : !compact && row.key === "baseRate" ? (
@@ -222,10 +231,10 @@ export function WhatChangedSection({
                       </span>
                     ) : null}
                     {/* Which inputs took the score from the earlier reading to
-                        this one. The chip says how far it went; without this a
-                        27-point move reads as the market having moved 27 points,
-                        when part of a score's move can be an input the earlier
-                        score never had. */}
+                        this one. The meaning above says which way and how far;
+                        without this a 27-point move reads as the market having
+                        moved 27 points, when part of a score's move can be an
+                        input the earlier score never had. */}
                     {row.movement ? (
                       <p className="text-fluid-xs font-normal leading-relaxed text-slate-300" data-movement={row.key}>
                         <span className="text-slate-400">What moved it: </span>
@@ -242,13 +251,6 @@ export function WhatChangedSection({
                     /> : null}
                   </div>
                 </th>
-                {/* With nothing to compare, the lead over the table already says so; on a
-                    phone the column has no header, so its dash printed as a lone "—"
-                    line in every row. */}
-                <td className={`whitespace-nowrap py-2.5 pr-3 text-xs align-top max-md:p-0 ${comparisonUnavailable ? "max-md:hidden" : ""}`}>
-                  {comparisonUnavailable ? <span className="text-slate-500">—</span> : <DeltaChip row={row} basis={basis} />}
-                  {!compact ? <MonthEndHistory points={history?.[row.key]} label={row.label} /> : null}
-                </td>
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">
                   {row.lines && typeof row.value === "number" ? (
                     <div className="space-y-2">
@@ -260,26 +262,36 @@ export function WhatChangedSection({
                         lines={row.lines}
                       />
                       {row.saturatedPressure !== undefined ? (
-                        /* A clipped score cannot move, so the chip reads flat at the
-                           moment conditions are most extreme. Say it, under the
-                           ladder that has the width for a sentence: in the chip
-                           column it wrapped to four lines and stretched the row. */
+                        /* A clipped score cannot move, so its row would read flat at
+                           the moment conditions are most extreme. The meaning says
+                           what that leaves the reader with; this says why, with the
+                           uncapped number, under the ladder that has the width. */
                         <p className="weather-caveat-mark max-w-[48ch] text-xs text-caveat-fg">
                           This is as high as the score goes. Uncapped it would be {row.saturatedPressure.toFixed(0)}, so a further rise can&rsquo;t show here.
                         </p>
                       ) : null}
                     </div>
                   ) : (
-                    /* An input, not a score: the call is decided on the two scores
-                       it feeds. "No line of its own" was false for the base rate,
-                       which funding pressure judges against a line. */
-                    <span className="text-xs text-slate-500">
-                      {compact ? <span className="tabular-nums text-slate-200">{row.valueLabel}</span> : <>
-                      {row.key === "baseRate"
-                        ? "Feeds into funding pressure, so it counts through that score."
-                        : "Feeds into both scores, so it counts through them."}</>}
-                    </span>
+                    /* An input, not a score: this week's value, and the earlier one
+                       where it moved, in the hollow-dot key's words ("Sep 29: 4.11").
+                       The guidance is decided on the two scores it feeds. "No line of
+                       its own" was false for the base rate, which funding pressure
+                       judges against a line. */
+                    <div className="space-y-1 text-xs text-slate-500">
+                      <span className="block tabular-nums text-slate-200">{row.valueLabel}</span>
+                      {!comparisonUnavailable && row.delta !== null && row.delta !== 0 && row.previousLabel ? (
+                        <span className="block text-[12px] tabular-nums text-slate-400">{`${basis.label}: ${row.previousLabel}`}</span>
+                      ) : null}
+                      {compact ? null : (
+                        <span className="block">
+                          {row.key === "baseRate"
+                            ? "Feeds into funding pressure, so it counts through that score."
+                            : "Feeds into both scores, so it counts through them."}
+                        </span>
+                      )}
+                    </div>
                   )}
+                  {!compact ? <MonthEndHistory points={history?.[row.key]} label={row.label} /> : null}
                 </td>
               </tr>
             ))}

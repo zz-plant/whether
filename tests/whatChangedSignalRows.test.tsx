@@ -4,6 +4,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { WhatChangedSection } from "../app/components/home/WhatChangedSection";
 import { compositeSignalScales } from "../lib/report/signalTranslations";
 import type { SignalChangeRow } from "../lib/report/home/homeSectionModel";
+import { comparisonBasis } from "../lib/report/comparisonBasis";
 
 /*
  * The four signals were drawn twice on the homepage — once as the hero's
@@ -74,16 +75,71 @@ describe("the changed-signals table", () => {
     assert.ok(!html.includes('href="/glossary"'));
   });
 
-  it("draws no delta at all when there was no comparison", () => {
+  it("draws no move at all when there was no comparison", () => {
     const degraded = renderToStaticMarkup(
       <WhatChangedSection rows={rows} lead="No previous week to compare the scores against." comparisonUnavailable />,
     );
     assert.match(degraded, /No previous week to compare/);
-    // The from→to chip is the comparison; with none to make, the cell is a dash.
-    // Scoped to the rows: the column header names the comparison either way.
+    // The lead says it once; a row saying "No change." would be the manufactured-stable claim.
     const body = degraded.slice(degraded.indexOf('data-signal="tightness"'));
-    assert.doesNotMatch(body, /→/, "a missing comparison is not a flat one");
-    assert.match(body, /—/);
+    assert.doesNotMatch(body, /data-move-meaning|No change|No real change/, "a missing comparison is not a flat one");
+    assert.doesNotMatch(body, /Last week: /, "and no hollow dot or earlier value to name");
+  });
+});
+
+/*
+ * Each row opens on what the move means in everyday words (2026-11-03). The
+ * column of from-chips ("from 61 ↗") beside the ladder told a reader without
+ * macro background a number, not what it did for them, and repeated the
+ * ladder's own hollow-dot key. The numbers stay, second.
+ */
+describe("each row leads with what the move means", () => {
+  const html = renderToStaticMarkup(
+    <WhatChangedSection rows={rows} comparisonUnavailable={false} basis={comparisonBasis({ label: "Sep 29" })} />,
+  );
+  const rowOf = (key: string) => {
+    const start = html.indexOf(`data-signal="${key}"`);
+    const next = html.indexOf("data-signal=", start + 1);
+    return html.slice(start, next === -1 ? undefined : next);
+  };
+
+  it("puts the sentence under the signal's name, ahead of its areas, its fold and its numbers", () => {
+    const row = rowOf("tightness");
+    const meaning = row.indexOf("Money got slightly harder to raise.");
+    assert.ok(meaning > row.indexOf("Funding pressure"), "after the name");
+    assert.ok(meaning < row.indexOf("Affects"), "before the areas it affects");
+    assert.ok(meaning < row.indexOf("What the score means"), "before the fold");
+    assert.ok(meaning < row.indexOf("Sep 29: 61"), "before the earlier reading, which the ladder keeps");
+  });
+
+  it("keeps a market input's numbers beside it, this week's then the earlier one", () => {
+    const row = rowOf("curveSlope");
+    const text = row.replace(/<[^>]+>/g, " ");
+    assert.ok(text.includes("Moved slightly closer to a recession warning."), text);
+    assert.ok(text.indexOf("0.45%") < text.indexOf("Sep 29: 0.50%"), text);
+  });
+
+  it("no longer prints a from-chip or a column for it", () => {
+    assert.doesNotMatch(html, /→ this week/);
+    assert.ok(!html.includes(">from<"), "the chip's word");
+    assert.equal((html.match(/<th scope="col"/g) ?? []).length, 2, "the signal and where it stands");
+  });
+
+  it("does not open the compact table on a score whose move is too small to say", () => {
+    const score = rows.find((row) => row.key === "tightness");
+    assert.ok(score);
+    const compact = renderToStaticMarkup(
+      <WhatChangedSection
+        compact
+        comparisonUnavailable={false}
+        rows={[
+          { ...score, value: 90, valueLabel: "90", delta: 0, previous: 90, previousLabel: "90", saturatedPressure: 99 },
+          { ...score, key: "riskAppetite", label: "Risk appetite", value: 51, valueLabel: "51", delta: -2, previous: 53, previousLabel: "53", increaseIsPositive: true },
+        ]}
+      />,
+    );
+    assert.ok(compact.indexOf('data-signal="tightness"') < compact.indexOf('data-signal="riskAppetite"'), "the page's own order holds");
+    assert.ok(compact.includes("No real change."));
   });
 });
 
