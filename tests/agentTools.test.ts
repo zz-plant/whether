@@ -138,6 +138,8 @@ describe("the agent tool registry", () => {
       "market context for our board update": "how-to-brief-executives-on-market-conditions",
       "do we have enough runway": "how-much-runway-should-we-have-before-we-raise",
       "freeze-or-selectively": "should-we-freeze-or-selectively-hire",
+      // What a model passed in a headless run on 2026-11-02, the company's details and all.
+      "should I hire two more engineers this quarter with 14 months of runway": "should-startups-hire-engineers-right-now",
     };
     for (const [question, slug] of Object.entries(asked)) {
       assert.equal(matchDecisionPage(question)?.slug, slug, question);

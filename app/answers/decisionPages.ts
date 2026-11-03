@@ -130,12 +130,12 @@ const answerPageTerms = answerPages.map((page) => ({
 }));
 
 /* How much a term says about which page is meant: "hire" is on four pages and says less
-   than "runway", which is on one. A word no page uses counts at the weight of a word on one. */
+   than "runway", which is on one. */
 const pagesWithTerm = new Map<string, number>();
 for (const { terms } of answerPageTerms) {
   for (const term of terms.keys()) pagesWithTerm.set(term, (pagesWithTerm.get(term) ?? 0) + 1);
 }
-const termWeight = (term: string) => Math.log(1 + answerPages.length / (pagesWithTerm.get(term) ?? 1));
+const termWeight = (term: string) => Math.log(1 + answerPages.length / (pagesWithTerm.get(term) ?? answerPages.length));
 
 /**
  * Finds the decision page matching a slug, part of one, or a question as someone asked it.
@@ -145,8 +145,8 @@ const termWeight = (term: string) => Math.log(1 + answerPages.length / (pagesWit
  * topic without repeating a page's title. Until 2026-10-28 a question matched only when every
  * word in it appeared in one page's slug, keyword or title, and 10 of 11 such questions were
  * refused. Each page now carries the ways people ask it (`askedAs`); an exact question goes to
- * its declared page before topic scoring. Other questions go to the page that shares more than
- * half their weight, the one most about those words when several do: "should we hire" is the
+ * its declared page before topic scoring. Other questions go to a page that shares two of their
+ * topic words or more than half their weight, the one most about those words when several do: "should we hire" is the
  * hiring-freeze answer, which says "hire" most, not the first salesperson's, whose title happens
  * to begin that way. A slug's words are among its terms, so
  * part of a slug ("cut-burn") matches the same way. A question no page shares that much with
@@ -162,7 +162,10 @@ export const matchDecisionPage = (query: string): DecisionPageDefinition | undef
   const direct = answerPageBySlug.get(normalized) ?? answerPageByQuestion.get(normalized);
   if (direct) return direct;
 
-  const asked = [...queryTerms(normalized).keys()];
+  /* Only words some page uses count: "two", "14" and "quarter" in "should I hire two more
+     engineers this quarter with 14 months of runway" say nothing about which page is meant,
+     and an agent adds the company's details to the question as often as not. */
+  const asked = [...queryTerms(normalized).keys()].filter((term) => pagesWithTerm.has(term));
   const askedWeight = asked.reduce((sum, term) => sum + termWeight(term), 0);
   if (askedWeight === 0) return undefined;
 
@@ -170,7 +173,7 @@ export const matchDecisionPage = (query: string): DecisionPageDefinition | undef
   for (const { page, terms } of answerPageTerms) {
     const shared = asked.filter((term) => terms.has(term));
     const sharedWeight = shared.reduce((sum, term) => sum + termWeight(term), 0);
-    if (sharedWeight / askedWeight <= 0.5) continue;
+    if (shared.length < 2 && sharedWeight / askedWeight <= 0.5) continue;
     const rank = shared.reduce((sum, term) => sum + termWeight(term) * (1 + Math.log(terms.get(term) ?? 1)), 0);
     if (rank > (best?.rank ?? 0)) best = { page, rank };
   }
