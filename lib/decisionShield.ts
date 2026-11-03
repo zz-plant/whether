@@ -182,7 +182,7 @@ export const evaluateDecision = (
 
   return {
     verdict,
-    summary: `On this week's signals, ${actionLabel.toLowerCase()} is ${VERDICT_COPY[verdict]} for a ${LIFECYCLE_COPY[input.lifecycle]} team in ${REGIME_LABELS[assessment.regime]} conditions.`,
+    summary: `On this week's signals, ${actionLabel.toLowerCase()} is ${VERDICT_COPY[verdict]} for a ${LIFECYCLE_COPY[input.lifecycle]} company in ${REGIME_LABELS[assessment.regime]} conditions.`,
     bullets,
     guardrail: DECISION_GUARDRAILS[input.action],
     reversalTrigger: buildReversalTrigger(assessment),
@@ -521,7 +521,7 @@ export const stressTestDecisionPlan = (
   let reversibleAlternative = "";
   if (category === "HIRING") {
     reversibleAlternative =
-      "Cap permanent full-time hiring to 50% of the planned reqs; convert remainder to 6-month contract-to-hire with milestone-gated conversion.";
+      "Hire for new roles on 6-month contract-to-hire terms that convert at a milestone. When hiring several, keep permanent offers to half the plan.";
   } else if (category === "INFRASTRUCTURE") {
     reversibleAlternative =
       "Avoid multi-year upfront reservations; use 6-to-12 month convertible commitments or monthly rolling tiers to preserve liquidity.";
