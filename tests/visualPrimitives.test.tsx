@@ -75,10 +75,19 @@ describe("ScoreLadder", () => {
        number; the key carries the names, in the order the ticks sit. */
     const html = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={85} lines={lines} />);
     assert.doesNotMatch(html, /data-ladder-row="\d+"[^>]*>[^<]*[A-Za-z]/, "a tick label carries no name");
-    const key = html.slice(html.indexOf("data-ladder-key"));
-    const order = ["Resume", "Change line", "Pause"].map((name) => key.indexOf(`>${name}<`));
+    const keyOrder = (markup: string, names: string[]) => {
+      const key = markup.slice(markup.indexOf("data-ladder-key"));
+      return names.map((name) => key.indexOf(`>${name}<`));
+    };
+    /* Funding pressure is drawn high to low (2026-11-03), so its key reads pause first. */
+    const order = keyOrder(html, ["Pause", "Change line", "Resume"]);
     assert.ok(order.every((index) => index > 0), "the key names every line");
     assert.deepEqual([...order].sort((a, b) => a - b), order, "the key reads in tick order");
+    const appetite = renderToStaticMarkup(
+      <ScoreLadder label="Risk appetite" value={48} lines={[{ kind: "pause", value: 44 }, { kind: "callChange", value: 50 }, { kind: "resume", value: 54 }]} />,
+    );
+    const appetiteOrder = keyOrder(appetite, ["Pause", "Change line", "Resume"]);
+    assert.deepEqual([...appetiteOrder].sort((a, b) => a - b), appetiteOrder, "risk appetite also reads pause, change, resume: worse on the left");
   });
 
   it("lays labels out per track width, and puts the common lines on one row on a wide track", () => {
@@ -98,12 +107,14 @@ describe("ScoreLadder", () => {
   it("shades the range each line guards, on the side it faces", () => {
     /* Funding pressure pauses above its pause line and resumes below its
        restart line; risk appetite is the other way up. The side comes from the
-       lines themselves, never from which score it is. */
+       lines themselves, never from which score it is. Since 2026-11-03 a score
+       that is worse higher is drawn high to low, so both pause ranges sit at the
+       left and both resume ranges at the right. */
     const zone = (html: string, kind: string) =>
       new RegExp(`data-ladder-zone="${kind}"[^>]*style="left:([\\d.]+)%;width:([\\d.]+)%"`).exec(html)?.slice(1).map(Number);
     const pressure = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={90} lines={lines} />);
-    assert.deepEqual(zone(pressure, "pause"), [76, 24]);
-    assert.deepEqual(zone(pressure, "resume"), [0, 66]);
+    assert.deepEqual(zone(pressure, "pause"), [0, 24]);
+    assert.deepEqual(zone(pressure, "resume"), [34, 66]);
 
     const appetite: LadderLine[] = [
       { kind: "pause", value: 44 },
@@ -118,14 +129,18 @@ describe("ScoreLadder", () => {
     const pauseOnly = renderToStaticMarkup(
       <ScoreLadder label="Funding pressure" value={60} lines={[{ kind: "pause", value: 76 }, { kind: "callChange", value: 70 }]} />,
     );
-    assert.deepEqual(zone(pauseOnly, "pause"), [76, 24]);
+    assert.deepEqual(zone(pauseOnly, "pause"), [0, 24], "drawn high to low on the change line's word alone");
     const changeOnly = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={60} lines={[{ kind: "callChange", value: 70 }]} />);
     assert.doesNotMatch(changeOnly, /data-ladder-zone/);
   });
 
   it("draws the move between the two dots only when the reading moved", () => {
-    const moved = renderToStaticMarkup(<ScoreLadder label="Risk appetite" value={48} previous={56} lines={lines} />);
+    const appetiteLines: LadderLine[] = [{ kind: "pause", value: 44 }, { kind: "callChange", value: 50 }, { kind: "resume", value: 54 }];
+    const moved = renderToStaticMarkup(<ScoreLadder label="Risk appetite" value={48} previous={56} lines={appetiteLines} />);
     assert.match(moved, /data-ladder-move[^>]*style="left:48%;width:8%"/);
+    /* Funding pressure from 61 to 72, drawn high to low: from 39% to 28% of the track. */
+    const pressureMoved = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={72} previous={61} lines={lines} />);
+    assert.match(pressureMoved, /data-ladder-move[^>]*style="left:28%;width:11%"/);
     const still = renderToStaticMarkup(<ScoreLadder label="Funding pressure" value={90} previous={90} lines={lines} />);
     assert.doesNotMatch(still, /data-ladder-move/);
   });

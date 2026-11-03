@@ -303,6 +303,22 @@ decision, flip condition, and core rate context instead of falling back to a gen
 Cold opens into `/` show the shared route loading shell (`app/loading.tsx`, `RouteLoadingShell`)
 until the report resolves.
 
+### 1.1.0r Easier is up and right on every drawing (2026-11-03)
+
+- The conditions map on `/` (`RegimeRadar`), `/history` (`RegimePhaseMap`), the `/trust`
+  quadrant and the `/concepts` advice plane draw funding pressure rising downward: Sunny is top
+  right, Stormy top left, Cloudy bottom right, Freezing bottom left. The y-axis reads
+  "← Funding pressure"; the caption says "Up: cheap money. Right: willing investors."
+- `ScoreLadder` draws a score that is worse higher from high to low (from the pause and restart
+  lines, or the change line when one of the pair is missing), so the pause range is on the left
+  and the restart range on the right for both scores; the key reads in tick order.
+- The area corridor ladder on `/` mirrors its rows the same way: "Left: pause zone", "Right:
+  restart zone".
+- Names and numbers do not change: published briefs are never edited and print "Funding
+  pressure 90". Time-series line charts keep their natural axis.
+- The `/trust` margin ladder's bands read Little / Some / Plenty, as every other surface does
+  since 2026-11-03.
+
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
 The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate
 Slack copy button and the MCP/API chip were removed on 2026-09-02: `Copy Brief` already produces

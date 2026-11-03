@@ -48,8 +48,14 @@ export function AreaCorridorLadder({
           /* A rule whose restart line is on the other metric has no gap to shade
              on this row's scale; the pause marker and the reading still draw. */
           const hasGap = area.normalizedResume !== undefined;
-          const leftPercent = hasGap ? Math.min(area.normalizedResume!, area.normalizedPause) : 0;
-          const widthPercent = hasGap ? Math.abs(area.normalizedPause - area.normalizedResume!) : 0;
+          /* Mirrored (2026-11-03): the model puts the pause zone at the right of every
+             row, and every other scale on the site now puts the easier side there, so
+             the restart zone is drawn right and the pause zone left. */
+          const mirror = (percent: number) => 100 - percent;
+          const resumeAt = area.normalizedResume === undefined ? undefined : mirror(area.normalizedResume);
+          const pauseAt = mirror(area.normalizedPause);
+          const leftPercent = resumeAt === undefined ? 0 : Math.min(resumeAt, pauseAt);
+          const widthPercent = resumeAt === undefined ? 0 : Math.abs(pauseAt - resumeAt);
           const isHeld = area.state === "crossed";
           const isNear = area.state === "near";
 
@@ -106,13 +112,13 @@ export function AreaCorridorLadder({
                 {hasGap ? (
                   <div
                     className="absolute inset-y-0 w-0.5 bg-semantic-easing-border z-10"
-                    style={{ left: `${area.normalizedResume}%` }}
+                    style={{ left: `${resumeAt}%` }}
                   />
                 ) : null}
                 {/* Pause line marker */}
                 <div
                   className="absolute inset-y-0 w-0.5 bg-semantic-caution-border z-10"
-                  style={{ left: `${area.normalizedPause}%` }}
+                  style={{ left: `${pauseAt}%` }}
                 />
                 {/* Current reading dot */}
                 <div
@@ -123,7 +129,7 @@ export function AreaCorridorLadder({
                         ? "border-amber-400 bg-amber-400"
                         : "border-[var(--bg-panel)] bg-slate-100"
                   }`}
-                  style={{ left: `${Math.min(100, Math.max(0, area.normalizedCurrent))}%` }}
+                  style={{ left: `${mirror(Math.min(100, Math.max(0, area.normalizedCurrent)))}%` }}
                   title={`Score: ${area.currentScore} (normalized ${Math.round(area.normalizedCurrent)}%)`}
                 />
               </div>
@@ -134,16 +140,16 @@ export function AreaCorridorLadder({
 
       <div className="flex flex-wrap items-center justify-between gap-x-4 gap-y-1 pt-1 text-fluid-nano text-slate-400 border-t border-[color:var(--border-faint)]">
         <span className="flex items-center gap-1.5">
-          <span className="inline-block size-2 rounded-full bg-emerald-400" />
-          <span>Left: restart zone</span>
+          <span className="inline-block size-2 rounded-full bg-semantic-caution-fg" />
+          <span>Left: pause zone</span>
         </span>
         <span className="flex items-center gap-1.5">
           <span className="inline-block h-2 w-4 border border-[color:var(--app-text-muted)]/40 bg-[color:var(--app-text-muted)]/18" />
           <span>Shaded: gap before pausing</span>
         </span>
         <span className="flex items-center gap-1.5">
-          <span className="inline-block size-2 rounded-full bg-semantic-caution-fg" />
-          <span>Right: pause zone</span>
+          <span className="inline-block size-2 rounded-full bg-emerald-400" />
+          <span>Right: restart zone</span>
         </span>
       </div>
     </figure>

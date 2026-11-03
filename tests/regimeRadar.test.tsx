@@ -50,13 +50,14 @@ describe("RegimeRadar", () => {
   });
 
   it("keeps the marker inside the frame when a score is outside 0–100", () => {
-    // y runs from 14 (top, tightness 100) to 162 (bottom, tightness 0). A
-    // reading beyond the range must clamp to the frame, not draw past it.
+    // y runs from 14 (top, tightness 0) to 162 (bottom, tightness 100): funding
+    // pressure rises downward so up is the easier side (2026-11-03). A reading
+    // beyond the range must clamp to the frame, not draw past it.
     const above = renderToStaticMarkup(<RegimeRadar {...base} tightness={120} />);
     const below = renderToStaticMarkup(<RegimeRadar {...base} tightness={-5} />);
 
-    assert.match(above, /cy="14"/);
-    assert.match(below, /cy="162"/);
+    assert.match(above, /cy="162"/);
+    assert.match(below, /cy="14"/);
   });
 
   it("draws the dashed trail only when a previous reading exists", () => {
@@ -192,7 +193,7 @@ describe("RegimeRadar path", () => {
     // The four words are not a severity scale (2026-10-14), so the caption
     // always carries the orientation, and is never empty.
     const html = renderToStaticMarkup(<RegimeRadar {...base} trail={trail} />);
-    assert.match(html, /<figcaption[\s\S]*Sunny, bottom right, is the easiest; Freezing, top left, the hardest\.[\s\S]*<\/figcaption>/);
+    assert.match(html, /<figcaption[\s\S]*Sunny, top right, is the easiest; Freezing, bottom left, the hardest\.[\s\S]*<\/figcaption>/);
     const withFooter = renderToStaticMarkup(<RegimeRadar {...base} footer={<span>How they are set</span>} />);
     assert.match(withFooter, /<figcaption[\s\S]*How they are set[\s\S]*<\/figcaption>/, "the footer closes the caption");
   });

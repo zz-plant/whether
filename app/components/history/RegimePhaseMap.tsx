@@ -53,7 +53,9 @@ const PLOT_BOTTOM = PLOT_Y + PLOT_SIZE;
 const TICKS = [0, 25, 50, 75, 100] as const;
 
 const xScale = scaleLinear().domain([0, 100]).range([PLOT_X, PLOT_RIGHT]).clamp(true);
-const yScale = scaleLinear().domain([0, 100]).range([PLOT_BOTTOM, PLOT_Y]).clamp(true);
+/* Funding pressure rises downward, as on the brief's map (2026-11-03): up and right
+   are both the easier side, so Sunny is top right. */
+const yScale = scaleLinear().domain([0, 100]).range([PLOT_Y, PLOT_BOTTOM]).clamp(true);
 
 const xFor = (riskAppetite: number) => xScale(riskAppetite);
 const yFor = (tightness: number) => yScale(tightness);
@@ -113,10 +115,10 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
   /* Corner-anchored so the four names stay clear of the crosshair the boundaries
      make in the middle, which is exactly where the interesting readings sit. */
   const quadrants = [
-    { regime: "SCARCITY" as const, x: PLOT_X, y: PLOT_Y, w: boundaryX - PLOT_X, h: boundaryY - PLOT_Y, tx: PLOT_X + 8, ty: PLOT_Y + 17, anchor: "start" as const, fill: "var(--phase-scarcity)" },
-    { regime: "DEFENSIVE" as const, x: boundaryX, y: PLOT_Y, w: PLOT_RIGHT - boundaryX, h: boundaryY - PLOT_Y, tx: PLOT_RIGHT - 8, ty: PLOT_Y + 17, anchor: "end" as const, fill: "var(--phase-defensive)" },
-    { regime: "VOLATILE" as const, x: PLOT_X, y: boundaryY, w: boundaryX - PLOT_X, h: PLOT_BOTTOM - boundaryY, tx: PLOT_X + 8, ty: PLOT_BOTTOM - 9, anchor: "start" as const, fill: "var(--phase-volatile)" },
-    { regime: "EXPANSION" as const, x: boundaryX, y: boundaryY, w: PLOT_RIGHT - boundaryX, h: PLOT_BOTTOM - boundaryY, tx: PLOT_RIGHT - 8, ty: PLOT_BOTTOM - 9, anchor: "end" as const, fill: "var(--phase-expansion)" },
+    { regime: "SCARCITY" as const, x: PLOT_X, y: boundaryY, w: boundaryX - PLOT_X, h: PLOT_BOTTOM - boundaryY, tx: PLOT_X + 8, ty: PLOT_BOTTOM - 9, anchor: "start" as const, fill: "var(--phase-scarcity)" },
+    { regime: "DEFENSIVE" as const, x: boundaryX, y: boundaryY, w: PLOT_RIGHT - boundaryX, h: PLOT_BOTTOM - boundaryY, tx: PLOT_RIGHT - 8, ty: PLOT_BOTTOM - 9, anchor: "end" as const, fill: "var(--phase-defensive)" },
+    { regime: "VOLATILE" as const, x: PLOT_X, y: PLOT_Y, w: boundaryX - PLOT_X, h: boundaryY - PLOT_Y, tx: PLOT_X + 8, ty: PLOT_Y + 17, anchor: "start" as const, fill: "var(--phase-volatile)" },
+    { regime: "EXPANSION" as const, x: boundaryX, y: PLOT_Y, w: PLOT_RIGHT - boundaryX, h: boundaryY - PLOT_Y, tx: PLOT_RIGHT - 8, ty: PLOT_Y + 17, anchor: "end" as const, fill: "var(--phase-expansion)" },
   ];
 
   const runs = buildRuns(model.points);
@@ -405,7 +407,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
                 fill="var(--app-text-secondary)"
                 transform={`rotate(-90 13 ${PLOT_Y + PLOT_SIZE / 2})`}
               >
-                Funding pressure →
+                ← Funding pressure
               </text>
             </svg>
 

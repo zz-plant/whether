@@ -48,7 +48,8 @@ const ICON = 13;
 const RADIUS: Record<AdviceStance, number> = { expand: 5.5, conserve: 5.5, craft: 3.4 };
 
 const xFor = (riskAppetite: number) => PLOT_X + (Math.max(0, Math.min(100, riskAppetite)) / 100) * PLOT_SIZE;
-const yFor = (fundingPressure: number) => PLOT_Y + (1 - Math.max(0, Math.min(100, fundingPressure)) / 100) * PLOT_SIZE;
+/* Funding pressure rises downward, as on every conditions map (2026-11-03): up and right are the easier side. */
+const yFor = (fundingPressure: number) => PLOT_Y + (Math.max(0, Math.min(100, fundingPressure)) / 100) * PLOT_SIZE;
 
 type PlacedMark = AdvicePlanePoint & { x: number; y: number; r: number };
 
@@ -112,10 +113,10 @@ export function AdvicePlane({
      two sit just under the funding-pressure line, clear of the marks stacked
      along the bottom edge. */
   const quadrants: { regime: RegimeKey; x: number; y: number; w: number; h: number; fill: string; left: boolean; labelY: number }[] = [
-    { regime: "SCARCITY", x: PLOT_X, y: PLOT_Y, w: boundaryX - PLOT_X, h: boundaryY - PLOT_Y, fill: "var(--phase-scarcity)", left: true, labelY: PLOT_Y + 8 },
-    { regime: "DEFENSIVE", x: boundaryX, y: PLOT_Y, w: PLOT_RIGHT - boundaryX, h: boundaryY - PLOT_Y, fill: "var(--phase-defensive)", left: false, labelY: PLOT_Y + 8 },
-    { regime: "VOLATILE", x: PLOT_X, y: boundaryY, w: boundaryX - PLOT_X, h: PLOT_BOTTOM - boundaryY, fill: "var(--phase-volatile)", left: true, labelY: boundaryY + 8 },
-    { regime: "EXPANSION", x: boundaryX, y: boundaryY, w: PLOT_RIGHT - boundaryX, h: PLOT_BOTTOM - boundaryY, fill: "var(--phase-expansion)", left: false, labelY: boundaryY + 8 },
+    { regime: "SCARCITY", x: PLOT_X, y: boundaryY, w: boundaryX - PLOT_X, h: PLOT_BOTTOM - boundaryY, fill: "var(--phase-scarcity)", left: true, labelY: boundaryY + 8 },
+    { regime: "DEFENSIVE", x: boundaryX, y: boundaryY, w: PLOT_RIGHT - boundaryX, h: PLOT_BOTTOM - boundaryY, fill: "var(--phase-defensive)", left: false, labelY: boundaryY + 8 },
+    { regime: "VOLATILE", x: PLOT_X, y: PLOT_Y, w: boundaryX - PLOT_X, h: boundaryY - PLOT_Y, fill: "var(--phase-volatile)", left: true, labelY: PLOT_Y + 8 },
+    { regime: "EXPANSION", x: boundaryX, y: PLOT_Y, w: PLOT_RIGHT - boundaryX, h: boundaryY - PLOT_Y, fill: "var(--phase-expansion)", left: false, labelY: PLOT_Y + 8 },
   ];
 
   return (
@@ -182,7 +183,7 @@ export function AdvicePlane({
           fill="var(--app-text-secondary)"
           transform={`rotate(-90 13 ${PLOT_Y + PLOT_SIZE / 2})`}
         >
-          Funding pressure →
+          ← Funding pressure
         </text>
       </svg>
 

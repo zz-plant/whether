@@ -97,7 +97,8 @@ function RegimeQuadrant() {
   const H = 194;
   const pad = { l: 34, r: 8, t: 8, b: 44 };
   const x = (v: number) => pad.l + (v / 100) * (W - pad.l - pad.r);
-  const y = (v: number) => H - pad.b - (v / 100) * (H - pad.t - pad.b);
+  /* Funding pressure rises downward, as on every conditions map (2026-11-03). */
+  const y = (v: number) => pad.t + (v / 100) * (H - pad.t - pad.b);
   /* x is risk appetite (its line at r), y is funding pressure (its line at t). */
   const cells: Array<{ key: RegimeKey; x0: number; x1: number; y0: number; y1: number }> = [
     { key: "SCARCITY", x0: 0, x1: r, y0: t, y1: 100 },
@@ -112,7 +113,7 @@ function RegimeQuadrant() {
       </title>
       {cells.map((cell) => (
         <g key={cell.key}>
-          <rect x={x(cell.x0)} y={y(cell.y1)} width={x(cell.x1) - x(cell.x0)} height={y(cell.y0) - y(cell.y1)} fill={REGIME_HEX_COLORS[cell.key]} fillOpacity="0.16" />
+          <rect x={x(cell.x0)} y={y(cell.y0)} width={x(cell.x1) - x(cell.x0)} height={y(cell.y1) - y(cell.y0)} fill={REGIME_HEX_COLORS[cell.key]} fillOpacity="0.16" />
           <text
             x={(x(cell.x0) + x(cell.x1)) / 2}
             y={(y(cell.y0) + y(cell.y1)) / 2}
@@ -131,7 +132,7 @@ function RegimeQuadrant() {
       <text x={x(r)} y={H - 26} textAnchor="middle" fontSize="12" fill="currentColor">{r}</text>
       <text x={x(0)} y={H - 6} textAnchor="start" fontSize="11" fill="currentColor" opacity="0.7">Risk appetite →</text>
       <text x={pad.l - 6} y={y(t)} textAnchor="end" dominantBaseline="middle" fontSize="12" fill="currentColor">{t}</text>
-      <text textAnchor="middle" transform={`translate(11 ${(y(100) + y(0)) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">Funding pressure →</text>
+      <text textAnchor="middle" transform={`translate(11 ${(y(100) + y(0)) / 2}) rotate(-90)`} fontSize="11" fill="currentColor" opacity="0.7">← Funding pressure</text>
     </svg>
   );
 }
@@ -147,17 +148,17 @@ function ConfidenceLadder() {
   const max = med * 2;
   const pct = (v: number) => `${(v / max) * 100}%`;
   return (
-    <div aria-label={`${MARGIN_LABEL}: under ${near} points from the line is close, under ${med} is within reach, otherwise clear.`}>
+    <div aria-label={`${MARGIN_LABEL}: under ${near} points is little, under ${med} is some, otherwise plenty.`}>
       <div className="flex h-5 w-full max-w-[20rem] overflow-hidden rounded-sm text-fluid-nano font-semibold">
-        <span className="flex items-center justify-center bg-rose-500/30 text-rose-100" style={{ width: pct(near) }}>Close</span>
-        <span className="flex items-center justify-center bg-amber-500/30 text-amber-100" style={{ width: pct(med - near) }}>Within reach</span>
-        <span className="flex items-center justify-center bg-emerald-500/25 text-emerald-100" style={{ width: pct(max - med) }}>Clear</span>
+        <span className="flex items-center justify-center bg-rose-500/30 text-rose-100" style={{ width: pct(near) }}>Little</span>
+        <span className="flex items-center justify-center bg-amber-500/30 text-amber-100" style={{ width: pct(med - near) }}>Some</span>
+        <span className="flex items-center justify-center bg-emerald-500/25 text-emerald-100" style={{ width: pct(max - med) }}>Plenty</span>
       </div>
       <div className="relative mt-0.5 h-4 w-full max-w-[20rem] text-fluid-nano tabular-nums text-slate-400">
         <span className="absolute left-0">0</span>
         <span className="absolute -translate-x-1/2" style={{ left: pct(near) }}>{near}</span>
         <span className="absolute -translate-x-1/2" style={{ left: pct(med) }}>{med}</span>
-        <span className="absolute right-0">points from the line</span>
+        <span className="absolute right-0">points from a change</span>
       </div>
     </div>
   );
