@@ -1413,7 +1413,7 @@ still work.
 from 176 monthly rows. The bundler inlined it as a 4.3MB chunk on `/trust`, `/history` and
 `/calibration`, compiled and validated on every fresh Worker instance; those were the three slowest
 pages in the 30-day real-user timings. It reads `data/confidence_record_months.json` (13KB) now,
-written with the archive by `scripts/summaryArchive.ts` and by `bun run archive:index`, and
+written with the archive by `lib/summary/regimeArchiveFiles.ts` (every generator and `bun run archive:index`), and
 `tests/confidenceCalibration.test.ts` fails if the extract and the archive disagree. The chunk is 17KB;
 cold module evaluation measured 33ms against 1.6ms on a workstation. This undid a regression of the
 rule `generatePostureArchiveIndex.ts` already stated: the full archive stays out of route bundles.
@@ -3300,7 +3300,7 @@ reads that has a long public series, so the record is scored on the same basis a
 - **What was backfilled, and from where.** The live engine reads FRED's `NFCI` (weekly, 1971 on;
   `lib/macroSnapshot.ts`, `lib/ingestion/families.ts`), and so does the archive now:
   `fetchArchiveDatasets` fetches it through the shared parser (`parseSeries`, every value through
-  `isMissingFredValue`), and `resolveChicagoFciReading` (`scripts/regimeArchiveContext.ts`) gives
+  `isMissingFredValue`), and `resolveChicagoFciReading` (`lib/summary/regimeArchiveContext.ts`) gives
   each period the newest observation a reader had then. An observation is dated the Friday its week
   ends and published the Wednesday after, so a period takes the last one dated five or more days
   before it (Mar 31, 2020 reads Mar 20's 0.175, not Mar 27's, published Apr 1); three missed
@@ -4350,7 +4350,7 @@ Trust/readiness computation now consumes structured freshness state (`fresh` / `
   confirmations a full replay produces.
 - One walk (2026-10-06): the runtime replay and all three generators thread the
   engine through `replayRegimeWalk` (`lib/timeMachine/regimeReplay.ts`), and the
-  generators' period logic is `scripts/regimeArchiveReplay.ts`.
+  generators' period logic is `lib/summary/regimeArchiveReplay.ts`.
   `tests/regimeArchiveReplay.test.ts` replays every cadence offline from series
   rebuilt out of the bundled data and holds it to the archive on record.
 - Every entry a generator writes carries `engineVersion` (`ENGINE_VERSION`, the

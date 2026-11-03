@@ -1,20 +1,21 @@
 /**
  * What each archive generator writes, built from the fetched series and a clock.
  *
- * The three `generate*Summaries.ts` scripts fetch the series, call one of these
- * and write the result; everything between is here so it can be run offline
- * on fixture series (`tests/regimeArchiveGolden.test.ts` replays every cadence
- * from the bundled data and holds it to the archive on record). Each builder
+ * The three `generate*Summaries.ts` scripts and the Worker's rebuild
+ * (`regimeArchiveRebuild.ts`) fetch the series, call these and write the result;
+ * everything between is here so it can be run offline on fixture series
+ * (`tests/regimeArchiveReplay.test.ts` replays every cadence from the bundled
+ * data and holds it to the archive on record). Each builder
  * resolves its periods, scores them as one threaded walk
  * (`replayArchivePeriods`), and turns each reading into the archived entry.
  */
-import { ENGINE_VERSION } from "../lib/regimeEngine";
-import { buildMonthlySummary, type MonthlySummary } from "../lib/summary/monthlySummary";
-import { buildQuarterlySummary } from "../lib/summary/quarterlySummary";
-import { buildWeeklySummary, type WeeklySummary } from "../lib/summary/weeklySummary";
-import { buildYearlySummary } from "../lib/summary/yearlySummary";
-import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
-import type { TreasuryData } from "../lib/types";
+import { ENGINE_VERSION } from "../regimeEngine";
+import { buildMonthlySummary, type MonthlySummary } from "./monthlySummary";
+import { buildQuarterlySummary } from "./quarterlySummary";
+import { buildWeeklySummary, type WeeklySummary } from "./weeklySummary";
+import { buildYearlySummary } from "./yearlySummary";
+import { resolveHistoricalDate } from "../timeMachine/timeMachine";
+import type { TreasuryData } from "../types";
 import {
   buildArchiveProvenance,
   formatArchiveDate,
@@ -23,18 +24,16 @@ import {
   resolveEffectiveEndTime,
   withArchiveInputSources,
   type BaseRateVelocityWindow,
-  type SeriesDataset,
-  type TreasuryDatasets,
+  type ArchiveDatasets,
 } from "./regimeArchiveContext";
-import { resolveYearRange } from "./summaryRange";
+import { resolveYearRange, type ArchiveScope } from "./summaryRange";
 
-type ArchiveInputs = {
-  datasets: TreasuryDatasets;
-  vixDataset: SeriesDataset | null;
-  /** The Chicago Fed index, weekly; on the record basis since engine-2026-10-09b. */
-  chicagoFciDataset: SeriesDataset;
+/** The series (the Chicago Fed index is on the record basis since engine-2026-10-09b) and the run. */
+type ArchiveInputs = ArchiveDatasets & {
   /** The run's clock: fetch timestamps, data ages and the last completed week. */
   now: Date;
+  /** What a partial run writes; the walk always starts at the first period. */
+  scope?: ArchiveScope;
 };
 
 type ArchiveMode = "replace" | "merge";
@@ -49,7 +48,6 @@ type EngineStamp = { engineVersion: string };
 // ── Weekly ──
 
 const WEEKLY_START_YEAR = 2018;
-const HISTORY_WEEKS_ENV = "HISTORY_WEEKS";
 
 export type WeeklySummaryArchiveEntry = {
   year: number;
@@ -58,22 +56,6 @@ export type WeeklySummaryArchiveEntry = {
   record_date: string;
   summary: WeeklySummary;
 } & EngineStamp;
-
-const resolveHistoryWeeksLimit = () => {
-  const value = process.env[HISTORY_WEEKS_ENV];
-  if (!value) {
-    return null;
-  }
-
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed) || parsed <= 0) {
-    throw new Error(
-      `${HISTORY_WEEKS_ENV} must be a positive integer (received "${value}").`
-    );
-  }
-
-  return parsed;
-};
 
 const getIsoWeekInfo = (date: Date) => {
   const target = new Date(
@@ -136,10 +118,10 @@ const buildWeekDescriptors = (
 
 /**
  * Every Friday-ending week from 2018 to the last completed one. The walk
- * threads every week of the range even when `HISTORY_WEEKS` scopes the write,
+ * threads every week of the range even when `scope.historyWeeks` limits the write,
  * so a merge lands with the confirmations a full replay would have produced.
  */
-export const buildWeeklyArchive = ({ datasets, vixDataset, chicagoFciDataset, now }: ArchiveInputs): {
+export const buildWeeklyArchive = ({ datasets, vixDataset, chicagoFciDataset, now, scope = {} }: ArchiveInputs): {
   entries: WeeklySummaryArchiveEntry[];
   effectiveEndYear: number;
   mode: ArchiveMode;
@@ -155,13 +137,14 @@ export const buildWeeklyArchive = ({ datasets, vixDataset, chicagoFciDataset, no
     defaultEndYear: Math.min(now.getUTCFullYear(), effectiveEndYear),
     minYear: WEEKLY_START_YEAR,
     maxYear: effectiveEndYear,
+    scope,
   });
   const endDateOverride =
     endYear === effectiveEndYear
       ? latestCompletedWeekEnd
       : new Date(Date.UTC(endYear, 11, 31));
   const weeks = buildWeekDescriptors(startYear, endYear, endDateOverride);
-  const historyWeeksLimit = resolveHistoryWeeksLimit();
+  const historyWeeksLimit = scope.historyWeeks ?? null;
   const scopedWeeks =
     historyWeeksLimit === null ? weeks : weeks.slice(Math.max(0, weeks.length - historyWeeksLimit));
   const scopedAsOfs = new Set(scopedWeeks.map((week) => week.asOf));
@@ -244,14 +227,14 @@ const isSameMonthAndYear = (value: string, asOf: string) => {
 };
 
 /**
- * Every month-end from 2012. A partial run (`HISTORY_START_YEAR`, which
+ * Every month-end from 2012. A partial run (`scope.startYear`, from `HISTORY_START_YEAR`, which
  * `time-machine:update-summaries` sets to 2024 by default) still walks from
  * the first year and only filters which records it writes. Starting the walk at
  * the requested year began it with no machine state, so the first selected
  * month instant-committed its quadrant and later confirmations could differ
  * from the full replay the merge target was built from.
  */
-export const buildMonthlyArchive = ({ datasets, vixDataset, chicagoFciDataset, now }: ArchiveInputs): {
+export const buildMonthlyArchive = ({ datasets, vixDataset, chicagoFciDataset, now, scope = {} }: ArchiveInputs): {
   entries: MonthlySummaryArchiveEntry[];
   timeMachineEntries: TimeMachineCacheEntry[];
   mode: ArchiveMode;
@@ -264,6 +247,7 @@ export const buildMonthlyArchive = ({ datasets, vixDataset, chicagoFciDataset, n
     defaultEndYear: effectiveEndYear,
     minYear: MONTHLY_START_YEAR,
     maxYear: effectiveEndYear,
+    scope,
   });
 
   const periods: { year: number; month: number; asOf: string }[] = [];
@@ -368,10 +352,10 @@ const isSameYear = (value: string, asOf: string) => {
  * One threaded walk across quarters and years: each year's four quarter-ends,
  * then the year-end read once more as the year. The year re-reads December, so
  * the machine sees that reading twice; that is how the archive on record was
- * built, and the replay keeps it. A partial run (`HISTORY_START_YEAR`) still
+ * built, and the replay keeps it. A partial run (`scope.startYear`) still
  * walks from the first year and only filters which records it writes.
  */
-export const buildQuarterlyYearlyArchive = ({ datasets, vixDataset, chicagoFciDataset, now }: ArchiveInputs): {
+export const buildQuarterlyYearlyArchive = ({ datasets, vixDataset, chicagoFciDataset, now, scope = {} }: ArchiveInputs): {
   quarterlyEntries: QuarterlySummaryArchiveEntry[];
   yearlyEntries: YearlySummaryArchiveEntry[];
   mode: ArchiveMode;
@@ -384,6 +368,7 @@ export const buildQuarterlyYearlyArchive = ({ datasets, vixDataset, chicagoFciDa
     defaultEndYear: effectiveEndYear,
     minYear: QUARTERLY_START_YEAR,
     maxYear: effectiveEndYear,
+    scope,
   });
 
   const periods: QuarterOrYear[] = [];

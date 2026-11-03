@@ -4,7 +4,7 @@ import { readSetting } from "./runtime/settings";
 
 export const FRED_BASE_URL = "https://fred.stlouisfed.org/graph/fredgraph.csv";
 
-const FRED_FETCH_HEADERS = {
+export const FRED_FETCH_HEADERS = {
   accept: "text/csv,application/csv;q=0.9,application/json;q=0.8,*/*;q=0.7",
   "user-agent": "WhetherDataBot/1.0 (+https://whether.work)",
 } as const;

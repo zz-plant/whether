@@ -28,7 +28,7 @@ or an error that is thrown.
 The two paths mark a missing observation differently, and the CSV export changed its mark. The
 API sends `"."`; the export used to, and now leaves the field empty. `isMissingFredValue` in
 `lib/fred.ts` is the one guard, and every parser — the client's CSV and API readers and the
-archive generators' shared `parseSeries` in `scripts/regimeArchiveContext.ts` — goes through it,
+archive generators' shared `parseSeries` in `lib/summary/regimeArchiveContext.ts` — goes through it,
 because `Number("")` is `0` and a parser that only checks for `"."` reads a market holiday as a
 zero print. That is how seven month-end Treasury records shipped with every yield at 0, and ~160
 holiday VIX closes sat at 0 in the veto's trailing mean, until 2026-09-14. A holiday stays in a
@@ -125,12 +125,16 @@ and 1c describe the behavior it must keep.
 
 ## Regime history Workflow
 
-`worker/workflows/regimeHistoryRefresh.ts` records the KV month in progress into
-`data/summary_monthly_regime_history.json` behind a pull request, in retried steps that fail
-visibly instead of reporting success without a PR. It merges over the file on the base branch as
-it stands at run time, never the series bundled into the running deployment, so a preview built
-from an older commit cannot undo months that reached `main` after it was built. It adds only what the Worker observed: no
-backfill, no regenerated history — the canonical series is still the generator scripts' job.
+`worker/workflows/regimeHistoryRefresh.ts` rebuilds the regime archive from FRED's full history and
+lands every file that changed behind one pull request on `automation/regime-archive-rebuild`: the
+summary archive, the month rail, the homepage's four weeks, the monthly and weekly summary files,
+the Time Machine cache, the calibration extract and the `/history` index. It runs the generators'
+own code (`lib/summary/regimeArchiveRebuild.ts` over `regimeArchiveFiles.ts` and
+`regimeArchiveReplay.ts`), reads the base branch at one commit and commits on top of that same
+commit, never over the series bundled into the running deployment. The daily 02:00 UTC cron starts
+it; it opens a pull request on Tuesdays, or on any day a month-end the base lacks appears on FRED.
+Until 2026-11-03 it only copied the KV month in progress into the month rail, which
+`tests/summaryDerivedHistory.test.ts` rejects whenever the archive does not have that month yet.
 Promoted to production (`WHETHER_HISTORY_WORKFLOW=1`); needs `GITHUB_TOKEN`.
 
 ## Brief freeze Workflow

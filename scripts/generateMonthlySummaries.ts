@@ -1,72 +1,20 @@
 /**
  * Monthly summary archive generator for the Regime Station Time Machine.
  * Pulls Treasury snapshots and builds copy-ready monthly summaries for historical review.
- * The replay itself is `buildMonthlyArchive` (`regimeArchiveReplay.ts`); this script
- * fetches and writes, the Time Machine cache included.
+ * The replay itself is `buildMonthlyArchive` (`lib/summary/regimeArchiveReplay.ts`) and the
+ * files it writes, the Time Machine cache included, are `writeMonthlyArchive`
+ * (`lib/summary/regimeArchiveFiles.ts`); this script fetches and runs them on the working tree.
  */
-import { readFile, writeFile } from "node:fs/promises";
-import { writeSummaryArchive } from "./summaryArchive";
-import { writeSummaryFile } from "./summaryFile";
-import { refreshDerivedSummaryHistory } from "./refreshDerivedSummaryHistory";
-import { fetchArchiveDatasets } from "./regimeArchiveContext";
-import { carryUnchangedEntries } from "./carryUnchangedEntries";
-import { buildMonthlyArchive, type TimeMachineCacheEntry } from "./regimeArchiveReplay";
-
-const OUTPUT_PATH = "data/monthly_summaries_2012_2025.json";
-const TIME_MACHINE_CACHE_PATH = "data/time_machine_cache.json";
-
-const writeJson = async (filePath: string, value: unknown) => {
-  await writeFile(filePath, `${JSON.stringify(value, null, 2)}\n`, "utf8");
-};
-
-const readTimeMachineCacheEntries = async (): Promise<TimeMachineCacheEntry[]> => {
-  try {
-    const raw = await readFile(TIME_MACHINE_CACHE_PATH, "utf8");
-    const parsed = JSON.parse(raw) as TimeMachineCacheEntry[];
-    return Array.isArray(parsed) ? parsed : [];
-  } catch (error) {
-    const resolvedError = error as NodeJS.ErrnoException;
-    if (resolvedError.code === "ENOENT") {
-      return [];
-    }
-    throw error;
-  }
-};
-
-const writeTimeMachineCache = async ({
-  entries,
-  mode,
-}: {
-  entries: TimeMachineCacheEntry[];
-  mode: "replace" | "merge";
-}) => {
-  const getKey = (entry: TimeMachineCacheEntry) => `${entry.year}-${entry.month}`;
-  const existing = await readTimeMachineCacheEntries();
-  const incoming = carryUnchangedEntries(existing, entries, getKey);
-  const nextEntries = mode === "merge"
-    ? Array.from(new Map([...existing, ...incoming].map((entry) => [getKey(entry), entry])).values())
-    : incoming;
-
-  const sorted = nextEntries.sort(
-    (left, right) => new Date(left.record_date).getTime() - new Date(right.record_date).getTime(),
-  );
-  await writeJson(TIME_MACHINE_CACHE_PATH, sorted);
-};
+import { workingTreeStore } from "./dataFileStore";
+import { fetchSeries } from "./fredSeriesFetch";
+import { readArchiveScope } from "./archiveScope";
+import { fetchArchiveDatasets } from "../lib/summary/regimeArchiveContext";
+import { buildMonthlyArchive } from "../lib/summary/regimeArchiveReplay";
+import { writeMonthlyArchive } from "../lib/summary/regimeArchiveFiles";
 
 const generateMonthlySummaries = async () => {
-  const now = new Date();
-  const { datasets, vixDataset, chicagoFciDataset } = await fetchArchiveDatasets();
-  const { entries: output, timeMachineEntries, mode } = buildMonthlyArchive({ datasets, vixDataset, chicagoFciDataset, now });
-
-  await writeSummaryFile({
-    path: OUTPUT_PATH,
-    entries: output,
-    mode,
-    getKey: (entry) => `${entry.year}-${entry.month}`,
-  });
-  await writeSummaryArchive({ monthlyEntries: output, mode });
-  await writeTimeMachineCache({ entries: timeMachineEntries, mode });
-  await refreshDerivedSummaryHistory();
+  const datasets = await fetchArchiveDatasets(fetchSeries);
+  await writeMonthlyArchive(workingTreeStore, buildMonthlyArchive({ ...datasets, now: new Date(), scope: readArchiveScope() }));
 };
 
 generateMonthlySummaries().catch((error) => {

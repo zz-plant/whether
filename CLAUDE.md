@@ -160,7 +160,7 @@ Canonical modules — extend these before creating new ones:
 - **Regime engine** — `lib/regimeEngineScoring.ts` (`scoreRegime`, codes only),
   `lib/regimeStateMachine.ts`, `lib/regimeEngineCore.ts`; the copy in `lib/report/regimeDescription.ts`;
   `lib/regimeEngine.ts` composes them (`evaluateRegime`). One replay walk:
-  `lib/timeMachine/regimeReplay.ts`; the archive generators' cadence logic: `scripts/regimeArchiveReplay.ts`
+  `lib/timeMachine/regimeReplay.ts`; the archive generators' cadence logic: `lib/summary/regimeArchiveReplay.ts`, the files they write: `lib/summary/regimeArchiveFiles.ts`
 - **Runtime helpers** — `lib/runtime/` (settings, KV and stored JSON, store selection, retry and
   circuit breaker, background work), `lib/crypto.ts`, `lib/constantTimeCompare.ts`
 - **Trust / continuity** — `lib/report/trustStatus.ts`, `lib/report/reportFormatting.ts`,
@@ -206,5 +206,5 @@ reading the set. Product specs live in `docs/`.
   Seven month-ends in `data/time_machine_cache.json` carried all-zero yields, and the stress
   veto's trailing VIX mean was pulled down by holiday zeros, until 2026-09-14. Route every FRED
   value through `isMissingFredValue` (`lib/fred.ts`); the archive generators share one parser in
-  `scripts/regimeArchiveContext.ts` for the same reason.
+  `lib/summary/regimeArchiveContext.ts` for the same reason.
 - Use `rg` for discovery; avoid `ls -R` and `grep -R`.

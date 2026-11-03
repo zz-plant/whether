@@ -31,7 +31,7 @@ import {
 } from "../lib/regimeStateMachine";
 import { buildCanonicalBoundedDecisionRules, isRuleConditionMet, sharedDecisionLines } from "../lib/report/boundedDecisionRules";
 import type { MacroSeriesId, MacroSeriesReading, SeriesHistoryPoint, TreasuryData } from "../lib/types";
-import { parseSeries } from "../scripts/regimeArchiveContext";
+import { parseSeries } from "../lib/summary/regimeArchiveContext";
 
 /*
  * Properties of the regime engine that must hold for every input, not only for
@@ -982,7 +982,7 @@ describe("regime engine properties: pause and restart lines", () => {
 });
 
 // ---------------------------------------------------------------------------
-// FRED missing values (lib/fred.ts, scripts/regimeArchiveContext.ts)
+// FRED missing values (lib/fred.ts, lib/summary/regimeArchiveContext.ts)
 // ---------------------------------------------------------------------------
 
 const MISSING_KINDS = ["blank", "dot", "space"] as const;

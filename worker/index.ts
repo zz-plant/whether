@@ -197,10 +197,12 @@ export default {
       });
     }
 
-    /* Monday only, and only where the trial is on: start the Workflow that turns the KV month
-       in progress into a pull request. It runs on its own (retried steps, its own log), so the
-       cron only has to hand it off. */
-    if (!isDailyIngestion && env.WHETHER_HISTORY_WORKFLOW === "1" && env.REGIME_HISTORY_WORKFLOW) {
+    /* The daily run, where the lane is on: start the Workflow that rebuilds the regime archive
+       from FRED behind a pull request. Daily because a month-end must land within days of its
+       first print reaching FRED; the Workflow itself decides what is worth a pull request
+       (lib/summary/regimeArchivePullRequest.ts). It runs on its own (retried steps, its own
+       log), so the cron only has to hand it off. */
+    if (isDailyIngestion && env.WHETHER_HISTORY_WORKFLOW === "1" && env.REGIME_HISTORY_WORKFLOW) {
       const workflow = env.REGIME_HISTORY_WORKFLOW;
       await step("regime-history-workflow", async () => {
         await workflow.create({ id: `regime-history-${new Date().toISOString().slice(0, 10)}`, params: { base: "main" } });

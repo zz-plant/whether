@@ -4,16 +4,16 @@ type SummaryRange = {
   isPartial: boolean;
 };
 
-const parseYearOverride = (value: string | undefined, label: string) => {
-  if (!value) {
-    return null;
-  }
-
-  const parsed = Number(value);
-  if (!Number.isInteger(parsed)) {
-    throw new Error(`${label} must be an integer year (received "${value}").`);
-  }
-  return parsed;
+/**
+ * Which part of the archive a run writes. Empty is the whole archive, which is what the
+ * Worker's rebuild always writes; the scripts read the fields from HISTORY_START_YEAR,
+ * HISTORY_END_YEAR and HISTORY_WEEKS (`scripts/archiveScope.ts`).
+ */
+export type ArchiveScope = {
+  startYear?: number;
+  endYear?: number;
+  /** Write only the last N weeks of the weekly archive; the walk still threads every week. */
+  historyWeeks?: number;
 };
 
 export const resolveYearRange = ({
@@ -21,19 +21,16 @@ export const resolveYearRange = ({
   defaultEndYear,
   minYear = defaultStartYear,
   maxYear = defaultEndYear,
+  scope = {},
 }: {
   defaultStartYear: number;
   defaultEndYear: number;
   minYear?: number;
   maxYear?: number;
+  scope?: ArchiveScope;
 }): SummaryRange => {
-  const startYearOverride = parseYearOverride(
-    process.env.HISTORY_START_YEAR,
-    "HISTORY_START_YEAR"
-  );
-  const endYearOverride = parseYearOverride(process.env.HISTORY_END_YEAR, "HISTORY_END_YEAR");
-  const startYear = startYearOverride ?? defaultStartYear;
-  const endYear = endYearOverride ?? defaultEndYear;
+  const startYear = scope.startYear ?? defaultStartYear;
+  const endYear = scope.endYear ?? defaultEndYear;
 
   if (startYear < minYear || startYear > maxYear) {
     throw new Error(

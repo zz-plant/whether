@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { carryUnchangedEntries } from "../scripts/carryUnchangedEntries";
+import { carryUnchangedEntries } from "../lib/summary/carryUnchangedEntries";
 
 const entry = (fetchedAt: string, label: string, tightness: number) => ({
   year: 2012,

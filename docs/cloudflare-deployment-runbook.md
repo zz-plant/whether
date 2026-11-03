@@ -120,7 +120,7 @@ the Slack signing secret gates one webhook route.
 | --- | --- | --- |
 | `FRED_API_KEY` | `lib/fred.ts` (`fetchFredRows`) | FRED reads stay on the chart-export CSV. A vintage request (`asOf`) throws instead of returning today's revision. |
 | `ALPHA_VANTAGE_API_KEY` | `lib/saasMultiples.ts` | The SaaS comps median reads SEC EDGAR filings priced with Cboe's delayed quotes, falling back to Yahoo Finance. Neither needs a key. |
-| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly rather than skipping: the regime-history one at its PR step, the freeze at its first line, before it spends a live read. Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token on this repository only: contents and pull requests, write; checks, read. The checks permission is what lets a Workflow read its branch build before merging (`WHETHER_AUTOMERGE_DATA_PRS`); without it the merge step fails with HTTP 403 and leaves the pull request open. |
+| `GITHUB_TOKEN` | `worker/workflows/regimeHistoryRefresh.ts`, `worker/workflows/weeklyBriefFreeze.ts` | Both Workflows fail loudly at their first line rather than skipping, the freeze before it spends a live read and the archive rebuild before it fetches FRED. Production has never had it: every regime-history instance from 2026-10-19 to 2026-11-02 ended "GITHUB_TOKEN is not configured". Each writes a failing `cron-step` row naming the missing secret, so a lane switched on without it says so on `/trust` instead of going quiet. Fine-grained token on this repository only: contents and pull requests, write; checks, read. The checks permission is what lets a Workflow read its branch build before merging (`WHETHER_AUTOMERGE_DATA_PRS`); without it the merge step fails with HTTP 403 and leaves the pull request open. |
 | `SLACK_SIGNING_SECRET` | `lib/api/slackSignature.ts` (`requireSlackSignature`), from `app/api/webhooks/slack/actions/route.ts` | Production answers every interactive Slack action with 503 `slack_signing_secret_not_configured`; outside production the route accepts unsigned requests so it can be exercised without a Slack app. With it, the route checks `X-Slack-Signature` (HMAC-SHA256 over `v0:{timestamp}:{raw body}`) and refuses timestamps more than five minutes off, both with 401. Set it on both lanes; the value is the app's signing secret under Basic Information at api.slack.com. |
 | `SLACK_WEBHOOK_URL` | `lib/delivery/slack.ts` (`slackChannel.listTargets`), for the Monday brief, both crons' `check-regime-change` alerts and the month-end pulse | The operator's own channel is not a target. Every post still goes to the channels subscribed through the form (the per-team webhook registry), and the three tripwire alerts — a regime change, a flip window narrowing, and (since 2026-09-17) a flash, an outsized move in the short rate or the curve since the previous read — are still recorded in the step's result and still reach alert subscribers by email through `alert-deliveries`. |
 | `WHETHER_OPS_EMAIL` | `lib/delivery/opsNotice.ts` (`sendOpsFailureNotice`), at the end of each cron run and from both Workflows when they fail | Failures are recorded on `/trust` and reach nobody: every run with a failed step writes a failing `ops-notice` row saying the address is unset. With it, a run where any step failed sends one email to that address through the `EMAIL` binding, naming each failed step and its error; a run where everything succeeded sends nothing. The address is not a secret, but set it with `wrangler secret put` so it stays out of the repository. |
@@ -179,10 +179,16 @@ only, so production keeps its current behavior until the trial is promoted:
   from a Worker through the stub, not publicly) reports whether a model exists and when the next
   alarm fires.
 - **`RegimeHistoryRefreshWorkflow`** (`worker/workflows/regimeHistoryRefresh.ts`), bound as
-  `REGIME_HISTORY_WORKFLOW`, turns the KV month in progress into a pull request against
-  `data/summary_monthly_regime_history.json`. `WHETHER_HISTORY_WORKFLOW = "1"` makes the Monday
-  cron start one instance (`bunx wrangler workflows instances list whether-regime-history-refresh
-  --env preview` shows the runs). It needs `GITHUB_TOKEN` and `GITHUB_REPOSITORY`.
+  `REGIME_HISTORY_WORKFLOW`, rebuilds the regime archive from FRED and puts every changed data
+  file behind one pull request on `automation/regime-archive-rebuild`.
+  `WHETHER_HISTORY_WORKFLOW = "1"` makes the daily 02:00 UTC cron start one instance; it opens a
+  pull request on Tuesdays, or the day a new month-end reaches FRED, and otherwise ends with
+  "Tuesday's rebuild lands them" (`bunx wrangler workflows instances list
+  whether-regime-history-refresh` shows the runs). To land a change by hand on another day:
+  `bunx wrangler workflows trigger whether-regime-history-refresh '{"landAnyChange":true}'`. It
+  needs `GITHUB_TOKEN` and `GITHUB_REPOSITORY`. One run is six FRED requests and about 22 GitHub
+  requests; memory, not CPU, is its tight limit (`lib/summary/regimeArchiveRebuild.ts` has the
+  numbers).
 
 - **`WeeklyBriefFreezeWorkflow`** (`worker/workflows/weeklyBriefFreeze.ts`), bound as
   `BRIEF_FREEZE_WORKFLOW`, freezes this week's brief into `data/published_briefs.json` behind a
