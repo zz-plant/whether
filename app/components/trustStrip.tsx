@@ -1,3 +1,4 @@
+import { DefinedTerm } from "./ui/definedTerm";
 import Link from "next/link";
 import { MARGIN_LABEL, formatMarginBand, formatMarginReading } from "../../lib/report/reportFormatting";
 import { NOT_COUNTED_REASON, SCORING_BASIS_LABEL, type ScoringBasisKey } from "../../lib/report/scoringBasis";
@@ -210,7 +211,10 @@ export function TrustStrip({
                 alone, so "Could change next week Risk appetite is 2 pts" ran together. */}
             {/* A label never wraps: beside a long value ("Scored on" before a warning) it
                 broke onto two lines and read as two labels. */}
-            <dt className={`${compactLabels && line && cell.label !== "Data as of" ? "max-sm:sr-only " : ""}${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>{cell.label}</dt>
+            <dt className={`${compactLabels && line && cell.label !== "Data as of" ? "max-sm:sr-only " : ""}${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>
+              {/* Tap-to-define on a strip that links to /trust (2026-11-03): the label is a coined term. */}
+              {href && cell.label === MARGIN_LABEL ? <DefinedTerm term="confidence">{cell.label}</DefinedTerm> : cell.label}
+            </dt>
             {line ? " " : null}
             {/* A state carries a mark as well as its ink (a lit dot when live, the
                 caveat diamond when not), so "Some sources saved" and

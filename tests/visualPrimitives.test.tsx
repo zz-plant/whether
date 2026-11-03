@@ -372,7 +372,10 @@ describe("TrustStrip", () => {
     );
     /* Live sources and the record's own inputs are method a reader can't act on
        (2026-11-03): a strip that links to /trust leaves them there, at every width. */
-    assert.deepEqual([...linked.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]), ["Data as of", "Room before a change"]);
+    const dtText = (markup: string) => [...markup.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>/g)].map((match) => (match[1] ?? "").replace(/<[^>]+>/g, "").trim());
+    assert.deepEqual(dtText(linked), ["Data as of", "Room before a change"]);
+    /* Off /trust the coined label is a tap-to-define term (2026-11-03). */
+    assert.match(linked, /<button type="button" popovertarget="term-confidence"[^>]*>Room before a change<\/button>/i);
     const html = renderToStaticMarkup(
       <TrustStrip recordDateLabel="Sep 18, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="HIGH" couldChangeNextWeek={false} basis={onRecord} />,
     );
@@ -433,7 +436,7 @@ describe("TrustStrip", () => {
      live sources and the record's own inputs are left to /trust (at every width
      since 2026-11-03), and cached sources or a warning never are. */
   it("leaves only the routine facts to /trust, and only when it links there", () => {
-    const labels = (html: string) => [...html.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]);
+    const labels = (html: string) => [...html.matchAll(/<dt[^>]*>([\s\S]*?)<\/dt>/g)].map((match) => (match[1] ?? "").replace(/<[^>]+>/g, "").trim());
     const cellClass = (html: string, label: string) =>
       new RegExp(`<div class="([^"]*)"><dt[^>]*>${label}</dt>`).exec(html)?.[1] ?? "";
     const base = { recordDateLabel: "Oct 5, 2026", sourcesLabel: "All sources live", couldChangeNextWeek: true, basis: onRecord };

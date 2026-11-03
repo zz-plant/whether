@@ -275,7 +275,7 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
   {
     value: "regime",
     term: "Conditions (the four weather labels)",
-    summary: "Each week falls into one of four: Sunny (money cheap and available), Cloudy (available but pricey), Stormy (changing week to week), Freezing (expensive and hard to raise).",
+    summary: "Each week falls into one of four, from the two scores: Sunny (cheap money, willing investors), Cloudy (pricey money, willing investors), Stormy (cheap money, wary investors), Freezing (pricey money, wary investors).",
   },
   {
     value: "guardrail",
@@ -294,8 +294,8 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
   },
   {
     value: "confidence",
-    term: "Room before a change (close to, within reach of, or clear of the line)",
-    summary: "How far this week's scores sit from the nearest change line, in points. Close means a small move would change conditions, so keep commitments reversible. The API calls it confidence; it is not a probability.",
+    term: "Room before a change",
+    summary: "How far the scores can move before conditions change: plenty, some or little. Little means a small move would change them, so keep commitments you can undo. It is a distance, not a probability.",
   },
   {
     value: "fallback-mode",
