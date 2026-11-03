@@ -5,6 +5,7 @@ import { ScoreLadder, buildLadderLines, describeLadderPosition, layoutLadderLabe
 import { ScoreCell, formatScoreReference } from "../app/components/ui/scoreCell";
 import { AreaTable } from "../app/components/ui/areaTable";
 import { TrustStrip } from "../app/components/trustStrip";
+import { TermDefinitionLayer } from "../app/components/ui/definedTerm";
 import { MonthStrip, describeCurrentRun } from "../app/components/history/monthStrip";
 import { RecordSection } from "../app/components/home/RecordSection";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
@@ -360,6 +361,19 @@ describe("AreaTable moved rows", () => {
     // not a restart (2026-10-14).
     assert.match(html, /Risk appetite &gt; 54<span class="block text-xs text-slate-400">nothing to resume<\/span>/);
     assert.match(html, /<span class="block text-xs text-slate-400">24 pts away<\/span>/, "a restart line still to reach is plain text, with no glyph");
+  });
+});
+
+describe("TermDefinitionLayer", () => {
+  /* A card over the page says how to close it (2026-11-03), with the popover's own
+     hide action, so no script is needed. */
+  it("puts a close button in every definition card, aimed at its own card", () => {
+    const html = renderToStaticMarkup(<TermDefinitionLayer />);
+    const cards = [...html.matchAll(/<dialog id="(term-[a-z-]+)"[^>]*>([\s\S]*?)<\/dialog>/g)];
+    assert.ok(cards.length >= 3);
+    for (const [, id, body] of cards) {
+      assert.match(body ?? "", new RegExp(`^<button type="button" popovertarget="${id}" popovertargetaction="hide" aria-label="Close [^"]+"`, "i"), `${id} closes itself`);
+    }
   });
 });
 

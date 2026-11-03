@@ -46,7 +46,7 @@ const DEFAULT_START_ITEMS = ["Invest in margin-positive moves."];
 const CANONICAL_RULE_FALLBACK = {
   actionNow: formatDecisionAction("Keep your current plan and hold new commitments."),
   triggerThreshold: formatDecisionThreshold("Pause if funding pressure rises above 60 or risk appetite falls below 40."),
-  reversalCondition: formatDecisionReversal("Resume staged approvals when funding pressure falls below 50 and risk appetite is above 50."),
+  reversalCondition: formatDecisionReversal("Resume staged commitments when funding pressure falls below 50 and risk appetite is above 50."),
 } satisfies Omit<PlaybookOperatingLever, "lever" | "label">;
 
 const DEFAULT_PLAYBOOK_RULE_CONTEXT = {

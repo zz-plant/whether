@@ -1,6 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { TRACK_RECORD_MIN_MONTHS, buildTrackRecord } from "../lib/report/trackRecord";
+import { describeSlideRecord } from "../lib/report/trackRecordCopy";
 import type { TimeMachineRegimeEntry } from "../lib/timeMachine/timeMachineCache";
 
 const entry = (
@@ -122,5 +123,30 @@ describe("current hold start date", () => {
 
     assert.equal(record?.currentHoldStartDate, "2026-06-28");
     assert.equal(record?.currentHoldStartDate, record?.latestRecordDate);
+  });
+});
+
+describe("the slide's record line", () => {
+  const record = buildTrackRecord(series([
+    "SCARCITY", "SCARCITY", "DEFENSIVE", "EXPANSION", "EXPANSION", "EXPANSION", "EXPANSION",
+  ]));
+
+  it("names how long the conditions on the slide have held, then the record's count", () => {
+    assert.equal(
+      describeSlideRecord("EXPANSION", record),
+      "Sunny since Apr 2026. The monthly record back to Jan 2026 shows conditions changing 2 times in 7 months.",
+    );
+  });
+
+  it("drops the hold when the week's conditions differ from the last month-end", () => {
+    // A Stormy week over a record ending Sunny: "Sunny since Apr 2026" would sit under a Stormy badge.
+    assert.equal(
+      describeSlideRecord("VOLATILE", record),
+      "The monthly record back to Jan 2026 shows conditions changing 2 times in 7 months.",
+    );
+  });
+
+  it("prints nothing without a record", () => {
+    assert.equal(describeSlideRecord("EXPANSION", null), null);
   });
 });

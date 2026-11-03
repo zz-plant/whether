@@ -40,10 +40,11 @@ Good work makes the brief faster to understand, the decision delta more explicit
 
 Whether should feel like a weekly operating brief, a pacing authority, a meeting shorthand, a Slack screenshot product, a citeable decision artifact — not a macro blog, framework museum, or sprawling reporting platform. These are internal framings, not copy: outward surfaces use the one category line in `lib/seo.ts` (*weekly operating guidance for startup leaders*); see `docs/editorial-guardrails.md`.
 
-Two framings govern applying the guidance to one company:
+Three framings govern applying the guidance to one company:
 
 - **Shared evidence, company-specific action**: every company reads the same signals and lines; what it does depends on its own cash, stage and runway. Prefer calibration to the reader's numbers over one identical action pushed to every reader.
 - **A policy agreed in advance**: lines set ahead of time, so changing course is a line being crossed, not a meeting.
+- **Agnostic to company size**: the guidance names the decision, not the org chart. It cannot tell a founder working alone from a company with a board and a finance lead, so it never presumes a second signer, an approval chain or a team. Where a role does exist, an opt-in tool serves it (the board slide, the investor update, the portfolio note) and may name it. `tests/sizeAgnosticGuidance.test.ts` renders the guidance and holds it to this.
 
 ## Operational definitions
 

@@ -106,6 +106,10 @@ const footerLines = (payload: MeetingSlidePayload): string[] => [
   slideFooterLine(payload),
 ];
 
+/* The record's line sits between the subtitle and the first card, where the SVG
+   slide draws it (`formatMeetingSlideSvg`, baseline 170). */
+const RECORD_TOP = 158;
+
 const titleLine = (payload: MeetingSlidePayload) => `This week's guidance${payload.stageLabel ? ` (${payload.stageLabel})` : ""}`;
 /* The badge carries only the weather word; its meaning rides in the subtitle, as on the SVG slide. */
 const subtitleLine = (payload: MeetingSlidePayload) => `${payload.recordDate} · ${slideConditions(payload)}`;
@@ -210,6 +214,9 @@ const buildSlideXml = (payload: MeetingSlidePayload) => {
     rectangle({ name: "Regime badge", x: 960, y: 80, width: 160, height: 42, fill: COLORS.card, line: badgeEdge(payload), rounded: true }),
     textBox({ name: "Regime", x: 960, y: 80, width: 160, height: 42, text: getRegimePublicLabel(payload.regime), style: { sizePx: 15, bold: true, color: badgeInk(payload), tracking: 100 }, align: "ctr", anchor: "ctr" }),
   );
+  if (payload.record) {
+    shapes.push(textBox({ name: "Record", x: 80, y: RECORD_TOP, width: 1040, height: 18, text: payload.record, style: { sizePx: 13, color: COLORS.inkSoft } }));
+  }
 
   for (const card of buildCards(payload)) {
     shapes.push(
@@ -580,6 +587,9 @@ export const buildBoardSlidePdf = async (payload: MeetingSlidePayload): Promise<
   drawText(EYEBROW, { x: 80, y: 56, sizePx: 14, font: bold, fill: COLORS.inkSoft, maxWidthPx: 780 });
   drawText(titleLine(payload), { x: 80, y: 82, sizePx: 34, font: bold, fill: COLORS.ink, maxWidthPx: 860 });
   drawText(subtitleLine(payload), { x: 80, y: 130, sizePx: 16, font: regular, fill: COLORS.inkSoft, maxWidthPx: 860 });
+  if (payload.record) {
+    drawText(payload.record, { x: 80, y: RECORD_TOP, sizePx: 13, font: regular, fill: COLORS.inkSoft, maxWidthPx: 1040 });
+  }
 
   page.drawRectangle({
     x: pt(960),

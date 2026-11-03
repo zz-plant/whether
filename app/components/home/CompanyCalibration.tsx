@@ -42,8 +42,10 @@ export function CompanyCalibration({
    * The plan-horizon control, folded here with the other settings (2026-11-03). It sat
    * beside Copy Brief on the card, so every reading of the call passed a control that
    * is set once; setup lives in one place now, one click from the card's chip.
+   * `current` is named in the folded line, which otherwise said only stage and runway,
+   * so the fold did not say a horizon was in it.
    */
-  horizon?: ReactNode;
+  horizon?: { control: ReactNode; current: "weekly" | "monthly" | "quarterly" };
 }) {
   const detailsRef = useRef<HTMLDetailsElement>(null);
 
@@ -85,8 +87,13 @@ export function CompanyCalibration({
           <span>
             Rules for a <span className="font-semibold text-slate-100">{stageLabel}</span> company with{" "}
             <span className="font-semibold text-slate-100">{runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}</span> of runway
+            {horizon ? (
+              <>
+                , planned <span className="font-semibold text-slate-100">{horizon.current}</span>
+              </>
+            ) : null}
             <span aria-hidden="true"> · </span>
-            <span className="text-[var(--accent-action)] underline underline-offset-4 group-open:hidden">{horizon ? "Change settings" : "Change stage and runway"}</span>
+            <span className="text-[var(--accent-action)] underline underline-offset-4 group-open:hidden">{horizon ? "Change" : "Change stage and runway"}</span>
             <span className="hidden text-[var(--accent-action)] underline underline-offset-4 group-open:inline">Done</span>
           </span>
         </summary>
@@ -96,11 +103,11 @@ export function CompanyCalibration({
           {horizon ? (
             <div className="flex flex-wrap items-center gap-1.5 @xl:grid @xl:grid-cols-[6rem_minmax(0,1fr)]" data-plan-horizon>
               <span className="type-eyebrow mr-1">Plan horizon</span>
-              {horizon}
+              {horizon.control}
             </div>
           ) : null}
           <p className="text-fluid-nano text-slate-400">
-            Your stage and runway set when each area pauses and what it allows.
+            Stage and runway set when each area pauses and what it allows.
           </p>
         </div>
       </details>

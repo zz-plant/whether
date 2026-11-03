@@ -141,6 +141,16 @@ describe("/ states the stage and runway in the controls alone", () => {
     assert.match(html, /<section[^>]*class="[^"]*\btarget:block\b/, "a link to the section shows it on a phone");
     assert.match(html, /<details class="[^"]*\bgroup-target\/calibration:block\b/, "and its controls with it");
   });
+
+  it("names the plan horizon in the folded line once it folds there", () => {
+    // The fold has held the horizon since 2026-11-03; a line naming only stage and
+    // runway did not say it was in there.
+    const html = renderToStaticMarkup(
+      <CompanyCalibration stageLabel="Series A" activeStage="series-a" horizon={{ control: <span data-control />, current: "monthly" }} />,
+    );
+    assert.match(text(html), /Rules for a Series A company with 12–24 months of runway, planned monthly · Change(?! settings)/);
+    assert.match(html, /data-plan-horizon/);
+  });
 });
 
 describe("/ ends on one line, not a Share section", () => {

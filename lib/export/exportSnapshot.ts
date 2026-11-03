@@ -12,8 +12,11 @@ import {
   buildPublishedBriefPath,
   type PublishedBrief,
 } from "../report/publishedBriefs";
+import { buildTrackRecord } from "../report/trackRecord";
+import { describeSlideRecord } from "../report/trackRecordCopy";
 import { buildCanonicalUrl } from "../seo";
 import { snapshotData } from "../snapshot";
+import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 import type { MeetingSlidePayload } from "./meetingSlideExport";
 
 /**
@@ -35,6 +38,21 @@ export const loadExportSnapshot = async (): Promise<OperatingSnapshot | null> =>
 };
 
 /**
+ * The slide with the record's line on it: the monthly record as it stood on the
+ * slide's own date, so a frozen September week, or a saved copy served during an
+ * outage, does not count a month-end that came after it. The browser's slide never
+ * comes through here, which is why the record is on the files and the picture and
+ * not on the pasted slide.
+ */
+export const withSlideRecord = (payload: MeetingSlidePayload): MeetingSlidePayload => {
+  const record = describeSlideRecord(
+    payload.regime,
+    buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER, undefined, payload.recordDateIso)),
+  );
+  return record ? { ...payload, record } : payload;
+};
+
+/**
  * The slide the SVG, PPTX and PDF routes draw: the snapshot's brief document,
  * laid over the reader's stage, through the same adapter the share panel's
  * "Slide" format uses.
@@ -48,7 +66,7 @@ export const buildExportSlidePayload = (
   snapshot: OperatingSnapshot,
   stage: StartupVariantMode | null,
 ): MeetingSlidePayload =>
-  briefArtifactToSlidePayload(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall, { stage }));
+  withSlideRecord(briefArtifactToSlidePayload(buildBriefDocument(briefSourceFromSnapshot(snapshot), snapshot.weeklyCall, { stage })));
 
 /**
  * Builds a meeting slide payload from a frozen PublishedBrief.
@@ -59,6 +77,9 @@ export const publishedBriefToSlidePayload = (
 ): MeetingSlidePayload => {
   const display = publishedBriefDisplay(brief);
   const headline = publishedBriefHeadline(brief);
+  /* No record line here: a brief's video is matched to this payload by its hash
+     (`findBriefVideo`), and a re-scored record would retire every video whose call
+     never changed. The board-slide route adds the line (`withSlideRecord`). */
   return {
     recordDate: brief.recordDateLabel,
     recordDateIso: brief.recordDate,

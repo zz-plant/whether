@@ -254,13 +254,18 @@ export function WhatChangedSection({
                 <td className="py-2.5 max-md:p-0 md:min-w-[14rem]">
                   {row.lines && typeof row.value === "number" ? (
                     <div className="space-y-2">
-                      <ScoreLadder
-                        label={<span className="sr-only">{row.label}</span>}
-                        value={row.value}
-                        previous={comparisonUnavailable ? null : row.previous}
-                        previousLabel={basis.label}
-                        lines={row.lines}
-                      />
+                      {/* The ladder opens what the name beside it opens (2026-11-03): a
+                          bar reads as something to press. Out of the tab order, since
+                          the name is the same link. */}
+                      <Link href={`/signals#${row.key}`} tabIndex={-1} className="block no-underline hover:brightness-110">
+                        <ScoreLadder
+                          label={<span className="sr-only">{row.label}</span>}
+                          value={row.value}
+                          previous={comparisonUnavailable ? null : row.previous}
+                          previousLabel={basis.label}
+                          lines={row.lines}
+                        />
+                      </Link>
                       {row.saturatedPressure !== undefined ? (
                         /* A clipped score cannot move, so its row would read flat at
                            the moment conditions are most extreme. The meaning says

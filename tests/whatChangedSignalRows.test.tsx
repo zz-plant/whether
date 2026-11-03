@@ -48,6 +48,12 @@ describe("the changed-signals table", () => {
     <WhatChangedSection rows={rows} lead="The scores moved toward tighter money this week." comparisonUnavailable={false} />,
   );
 
+  it("opens a score's evidence from its ladder as well as its name", () => {
+    /* The ladder read as something to press and did nothing (2026-11-03). */
+    /* Attribute order is the renderer's; another file mocks next/link and changes it. */
+    assert.match(html, /<a(?=[^>]*\btabindex="-1")(?=[^>]*\bhref="\/signals#tightness")[^>]*><figure[^>]*data-score-ladder/);
+  });
+
   it("draws every signal once, in one table", () => {
     assert.equal((html.match(/data-signal=/g) ?? []).length, rows.length);
     assert.equal((html.match(/data-testid="what-changed-table"/g) ?? []).length, 1);

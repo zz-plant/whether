@@ -54,11 +54,11 @@ const DeltaChip = ({ row }: { row: SignalReferenceRow }) => {
   if (from === formatValue(row, row.value)) {
     return <span className="text-xs text-slate-400">No change</span>;
   }
+  /* Unframed (2026-11-03): a bordered chip with its move in a hover title read as a
+     control, and a tap on a phone showed nothing. The column head says since when,
+     the next column what it reads now. */
   return (
-    <span
-      className={`inline-flex items-center gap-1.5 rounded-sm border border-[var(--border-default)] px-1.5 py-0.5 text-xs tabular-nums ${TONE_CLASS[row.direction.tone]}`}
-      title={row.direction.label}
-    >
+    <span className={`inline-flex items-center gap-1.5 text-xs tabular-nums ${TONE_CLASS[row.direction.tone]}`}>
       <span className="text-slate-400">from</span>
       <span className="font-semibold">{from}</span>
       <span className="sr-only">{row.direction.label}</span>
