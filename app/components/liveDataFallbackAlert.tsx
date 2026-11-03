@@ -1,11 +1,13 @@
-import { formatDateUTC, formatTimestampUTC } from "../../lib/formatters";
-import { resolveDataStatusGuidance } from "../../lib/report/trustStatus";
+import { formatTimestampUTC } from "../../lib/formatters";
+import { describeSavedCopyBanner, resolveDataStatusGuidance } from "../../lib/report/trustStatus";
 import { ManualRefreshButton } from "./manualRefreshButton";
 import { ActionLink } from "./ui/actionLink";
 
 type LiveDataFallbackAlertProps = {
   lastCachedTimestamp: string;
   effectiveRecordDate?: string;
+  /** When the age is measured to; the render time unless a test pins it. */
+  now?: Date;
 };
 
 /*
@@ -20,12 +22,18 @@ type LiveDataFallbackAlertProps = {
  * materialized Treasury model is missing signals, the canonical build fills
  * the gaps from the snapshot and still stamps the refresh time, so calling
  * that a live reading claimed data the displayed rates never had (2026-10-24).
+ *
+ * The headline names the reading and its age, as the homepage banner does
+ * (2026-11-02), so "Rates are as of …" no longer follows the check time.
  */
 export function LiveDataFallbackAlert({
   lastCachedTimestamp,
   effectiveRecordDate,
+  now = new Date(),
 }: LiveDataFallbackAlertProps) {
-  const recordLine = effectiveRecordDate ? ` Rates are as of ${formatDateUTC(effectiveRecordDate)}.` : "";
+  const headline = effectiveRecordDate
+    ? describeSavedCopyBanner({ recordDate: effectiveRecordDate, now, guidanceHeld: false })
+    : resolveDataStatusGuidance({ isFallbackSnapshot: true });
 
   return (
     /* A caveat, not a stop (2026-10-21): it drew in the amber utilities, which
@@ -39,10 +47,8 @@ export function LiveDataFallbackAlert({
       className="weather-caveat-band mb-6 px-5 py-4 text-sm"
       aria-live="polite"
     >
-      <p className="weather-caveat-mark font-semibold">{resolveDataStatusGuidance({ isFallbackSnapshot: true })}</p>
-      <p className="mt-1">
-        Last checked {formatTimestampUTC(lastCachedTimestamp)}.{recordLine}
-      </p>
+      <p className="weather-caveat-mark font-semibold">{headline}</p>
+      <p className="mt-1">Last checked {formatTimestampUTC(lastCachedTimestamp)}.</p>
       <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
         {/* The one place this control's scope matches its effect: the whole brief
             is on cached data, so reloading the whole page is the retry. */}

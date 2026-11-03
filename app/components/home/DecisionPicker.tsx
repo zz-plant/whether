@@ -15,7 +15,7 @@ import {
   type HomeAreaLineSlot,
   type HomeAreaRow,
 } from "../../../lib/report/home/homeSectionModel";
-import { resolveLineState } from "../../../lib/report/operatingCalls";
+import { NOTHING_TO_RESUME, resolveLineState } from "../../../lib/report/operatingCalls";
 import {
   DEFAULT_RUNWAY_BAND,
   runwayBandLabel,
@@ -53,7 +53,9 @@ import { CheckIcon, ShareIcon } from "../uiIcons";
  * yet reached stays a neutral stamp with no glyph, because it is not a pause.
  */
 function LineDistance({ slot, kind }: { slot: HomeAreaLineSlot; kind: "pause" | "resume" }) {
-  const state = resolveLineState(slot.points, kind, slot.met);
+  /* A restart line on an area that is not on hold lifts nothing, met or not: a
+     neutral stamp, as the area table prints it. */
+  const state = slot.distance === NOTHING_TO_RESUME ? undefined : resolveLineState(slot.points, kind, slot.met);
   if (state) {
     return (
       <LineStateBadge state={state} stamp className="whitespace-nowrap align-middle text-fluid-nano">
@@ -89,6 +91,7 @@ export function DecisionPicker({
   initialSelected,
   stageLabel,
   activeRunway,
+  savedReadingDate,
   children,
 }: {
   options: readonly DecisionPickerOption[];
@@ -100,6 +103,8 @@ export function DecisionPicker({
   stageLabel?: string;
   /** The runway band the rules are calibrated for. */
   activeRunway?: RunwayBand;
+  /** The reading's date when the page shows a saved copy: the count over the choices is that reading's. */
+  savedReadingDate?: string;
   /** What follows the choices inside the section: the folded table of all five, and the plan link. */
   children?: ReactNode;
 }) {
@@ -154,7 +159,7 @@ export function DecisionPicker({
       sublabel: status ? <LineStateBadge state={status.state}>{status.text}</LineStateBadge> : undefined,
     };
   });
-  const pauseLineCount = describePauseLineCount(options);
+  const pauseLineCount = describePauseLineCount(options, savedReadingDate);
 
   return (
     <section

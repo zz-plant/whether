@@ -30,6 +30,8 @@ export type TrustStripProps = {
   couldChangeNextWeek: boolean;
   /** Why it could, when the distance does not already say: "a change is waiting on a second reading". */
   changeReason?: string;
+  /** The reading is a saved copy, not this week's: the margin cell says nothing about next week. */
+  savedCopy?: boolean;
   /**
    * How often conditions held at this distance, from the month-end record
    * (`calibrationForDistance`). A historical count, not a probability: the brief
@@ -93,6 +95,7 @@ export function TrustStrip({
   margin,
   couldChangeNextWeek,
   changeReason,
+  savedCopy = false,
   baseRate,
   basis,
   href,
@@ -141,8 +144,7 @@ export function TrustStrip({
     {
       label: MARGIN_LABEL,
       value: describeMarginCell(margin, confidenceLabel, regime),
-      detail: describeNextWeek(couldChangeNextWeek, changeReason),
-      detailKind: "next-week",
+      ...(savedCopy ? {} : { detail: describeNextWeek(couldChangeNextWeek, changeReason), detailKind: "next-week" as const }),
       ...(baseRate ? { baseRate: `Past conditions held ${baseRate.held} of ${baseRate.months} months at this distance` } : {}),
       tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caveat" : undefined,
     },

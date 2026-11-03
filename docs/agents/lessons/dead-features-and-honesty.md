@@ -439,3 +439,30 @@ Five things went, each kept alive by a half that survived its other half.
   else ever called it; a 2026-09-22 copy pass reworded its placeholders anyway. The dead-export census judges
   test-only callers per module, so one export in a live module passes, and so does each helper only it calls.
   Before rewording a builder's strings, find its caller outside `tests/`.
+
+## A saved copy is two states, and only one shows the banner (2026-11-02)
+
+The homepage reaches "Saved copy" two ways, and they render differently. **A failed read** (`loadReportDataSafe`
+returns `ok: false`, on a deadline or a store outage) serves the bundled snapshot, whose assessment is held for
+missing inputs: the banner shows and the hero's call is a hold. **A read that succeeds on saved Treasury data**
+(`ok: true`, `isSavedCopy(treasury)`, usually a materialized model with series filled from the snapshot) shows
+no banner, and its call is the reading's own. `isDegraded` is `!reportResult.ok`; `showOfflineBadge` is the
+saved-copy flag. `/operate` gates its alert on the second, so on the `ok: true` path it warns and `/` does not.
+
+- **Reproduce the failed read offline by making the operating-state store throw**, not with a hanging fetch:
+  every live read asks it for the latest snapshot, so the throw takes the same `catch` the 10s deadline
+  does, without the wait. A KV binding that throws looked like the same thing and passed alone, but
+  `resetOperatingSnapshotStore()` holds an in-memory store for the rest of the process, so after any file
+  that calls it the read succeeded. `tests/savedCopyHomepage.test.tsx` renders `app/page` that way
+  (`renderToReadableStream` and `allReady`), with `loadHomePageAssembly` replaced by the same assembly
+  minus cookies and the data cache: mocking `next/cache` instead fails after any file that loads
+  `homePageData` first, because its default loader captured the real `unstable_cache` at load. The dev
+  server cannot show the state either: it runs in workerd on its own local KV, so blocking Node's
+  `fetch` changes nothing.
+- **Every forward-looking word is a claim about the reading's date.** "Could change next week", "Past
+  conditions held 11 of 11 months at this distance", "No area is on hold" and "No previous week to compare"
+  were each true of a Jun 17 reading and false of the Oct 21 page that printed them. A saved copy keeps the
+  distances and states, dated, and drops the forecasts.
+- **Two holds on one screen are two instructions.** The banner held "new hires, spend and vendor contracts
+  until it returns", and the call under it held "anything you can't undo until the missing inputs return".
+  Where the call is already a hold, the banner says only what the data is.

@@ -261,6 +261,10 @@ export const buildTrustStripProps = ({
       ? resolveNearestLineMargin({ scores: assessment.scores, thresholds: assessment.thresholds })
       : undefined;
   const calibration = margin ? calibrationForDistance(margin.points) : null;
+  /* A saved copy is not this week's reading, so the cell keeps its distance and
+     drops what reads it forward: "Could change next week" and the months held
+     at this distance, both said of a Jun 17 reading on Oct 21 (2026-11-02). */
+  const savedCopy = isFallback && !isHistorical;
 
   return {
     recordDateLabel,
@@ -272,11 +276,12 @@ export const buildTrustStripProps = ({
     }),
     confidenceLabel,
     ...(margin ? { margin } : {}),
-    ...(calibration && calibration.months >= 5
+    ...(calibration && calibration.months >= 5 && !savedCopy
       ? { baseRate: { held: calibration.held, months: calibration.months } }
       : {}),
     couldChangeNextWeek: couldCallChangeNextWeek(assessment),
     changeReason: couldCallChangeNextWeek(assessment) ? describeChangeReason(assessment) : undefined,
+    ...(savedCopy ? { savedCopy } : {}),
     basis: {
       key: scoringBasis?.key ?? "record",
       value: scoringBasis?.value ?? "The record's inputs",

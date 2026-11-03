@@ -136,7 +136,11 @@ describe("/trust carries one trust strip", () => {
     // The sub-tab row names /trust as the current page (aria-current); the strip itself must not link here.
     const withoutTabs = html.replace(/<nav[^>]*data-section-tabs[\s\S]*?<\/nav>/, "");
     assert.doesNotMatch(withoutTabs, /href="\/trust"/, "on /trust the strip carries no link to itself");
-    for (const cell of ["Data as of", "Sources", "Room before a change", "change next week"]) assert.match(html, new RegExp(cell));
+    for (const cell of ["Data as of", "Sources", "Room before a change"]) assert.match(html, new RegExp(cell));
+    /* The margin's next-week forecast is a live reading's: offline, /trust usually reads the
+       saved copy, which is not this week's and says nothing about next week (2026-11-02). */
+    if (/Saved copy/.test(html)) assert.doesNotMatch(html, /change next week/);
+    else assert.match(html, /change next week/);
   });
 
   /* The ladders are the brief's (2026-10-27): this section drew the same two, with the

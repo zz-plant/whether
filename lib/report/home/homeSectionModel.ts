@@ -3,6 +3,7 @@ import { formatRegimeSignalValue, type RegimeSignalKey } from "../reportFormatti
 import { classifyScoreBand, scoreBandScaleLabel } from "../signalTranslations";
 import { describeInputMovement } from "../inputMovement";
 import {
+  NOTHING_TO_RESUME,
   formatPointsToLine,
   resolveLineState,
   selectPauseCondition,
@@ -165,6 +166,11 @@ export const buildSignalChangeRows = ({
  */
 const NO_COMPARISON_SENTENCE = "No previous week to compare the scores against.";
 
+/* A saved copy has no previous week because it is not a new reading, and
+   that is the fact to state (2026-11-02). */
+const describeSavedCopyComparison = (savedReadingDate: string) =>
+  `Nothing new to compare: this is the saved ${savedReadingDate} reading.`;
+
 const INPUT_MOVEMENT_SENTENCE: Record<ReturnType<typeof describeInputMovement>, (window: string) => string> = {
   "steady inputs": (window) => `Neither score moved much ${window}.`,
   "tightening inputs": (window) => `The scores moved toward tighter money ${window}.`,
@@ -177,14 +183,17 @@ export const describeWeeklyMovement = ({
   riskAppetiteDelta,
   comparisonUnavailable,
   basis = comparisonBasis(),
+  savedReadingDate,
 }: {
   tightnessDelta: number;
   riskAppetiteDelta: number;
   comparisonUnavailable: boolean;
   basis?: ComparisonBasis;
+  /** The reading's date when the page shows a saved copy. */
+  savedReadingDate?: string;
 }) =>
   comparisonUnavailable
-    ? NO_COMPARISON_SENTENCE
+    ? savedReadingDate ? describeSavedCopyComparison(savedReadingDate) : NO_COMPARISON_SENTENCE
     : INPUT_MOVEMENT_SENTENCE[describeInputMovement(tightnessDelta, riskAppetiteDelta)](
         basis.date ? basis.since : "this week",
       );
@@ -250,11 +259,26 @@ export const describeAreaPauseStatus = (
 /**
  * How many areas' pause lines this reading has crossed, said once over the
  * picker: the count a reader would otherwise assemble by opening five answers.
+ *
+ * On a saved copy (`savedReadingDate`) the count is the old reading's, said in
+ * the past tense with its date. "No area is on hold." printed under a banner
+ * saying to hold new hires and spend until live data returns, so a reader could
+ * not tell whether hiring was held (2026-11-02).
  */
-export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">[]): string | null => {
+export const describePauseLineCount = (
+  rows: readonly Pick<HomeAreaRow, "pause">[],
+  savedReadingDate?: string,
+): string | null => {
   const ruled = rows.filter((row) => row.pause);
   if (ruled.length === 0) return null;
   const crossed = ruled.filter((row) => row.pause?.met).length;
+  if (savedReadingDate) {
+    const on = `on the ${savedReadingDate} reading`;
+    if (crossed === 0) return `No area was on hold ${on}.`;
+    return crossed === 1
+      ? `1 of ${ruled.length} areas was on hold ${on}.`
+      : `${crossed} of ${ruled.length} areas were on hold ${on}.`;
+  }
   /* A standing state, said as one: "crossed ... this week" sat under "No score
      crossed a pause or restart line since Sep 30" and read as a contradiction. */
   if (crossed === 0) return "No area is on hold.";
@@ -415,6 +439,18 @@ const resumeLineToShow = (distances: RuleThresholdDistance[]) => {
 const distancesFor = (conditions: readonly RuleCondition[] | undefined, scores: { tightness: number; riskAppetite: number }) =>
   (conditions ?? []).map((condition) => toThresholdDistance(condition, scores));
 
+/*
+ * A restart line lifts a hold, so it has a distance only on an area that is on
+ * hold. Between the two lines an area that is not paused printed "Risk appetite
+ * > 54 · 2 pts away", which reads as something to wait for when there is
+ * nothing to wait for (2026-11-02). The row keeps the line and says so; `met`
+ * and `points` stay the reading's facts.
+ */
+const withIdleRestart = (row: HomeAreaRow): HomeAreaRow =>
+  row.pause && !row.pause.met && row.resume
+    ? { ...row, resume: { ...row.resume, distance: NOTHING_TO_RESUME } }
+    : row;
+
 /**
  * One row per area, whichever source the week carries. The action strip is
  * the stage-scoped rule set the brief prints; the canonical rules are what it
@@ -462,7 +498,7 @@ export const buildHomeAreaRows = ({
         pauseQualifier: item.pauseQualifier,
         resumeQualifier: item.resumeQualifier,
       };
-    });
+    }).map(withIdleRestart);
   }
 
   return decisionRules.map((rule) => ({
@@ -473,5 +509,5 @@ export const buildHomeAreaRows = ({
     ...changedFor(rule.area),
     pauseQualifier: rule.pause.qualifier,
     resumeQualifier: rule.resume.qualifier,
-  }));
+  })).map(withIdleRestart);
 };
