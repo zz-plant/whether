@@ -190,9 +190,18 @@ precision instrument, not as a consumer app.
   `11 pts from pausing`). Selecting one opens its action, pause line and restart line.
 - **The line ladder** — a 0–100 track with ticks for the change line, the pause line and the
   restart line, and a dot for the reading. Labels never overlap; the track is aria-hidden and
-  the sentence beside it carries the meaning.
+  the sentence beside it carries the meaning. A score that is worse higher (funding pressure)
+  is drawn high to low, so every ladder has its pause range on the left and its restart range
+  on the right.
 - **The conditions map** — a quadrant plane with a monthly trail, drawn from the same four
-  fills, with the domain stated in its caption.
+  fills, with the domain stated in its caption. Funding pressure rises downward, so up and
+  right are both the easier side: Sunny top right, Freezing bottom left. The same orientation
+  on `/`, `/history`, `/trust` and `/concepts`.
+- **Easier is up and right** (2026-11-03). The two scores point opposite ways (high funding
+  pressure is bad, high risk appetite is good), and the published record prints both as they
+  are, so the numbers and names stay. Every drawing aligns instead: a plot, ladder or corridor
+  puts the easier side up or to the right. Time-series line charts keep the natural axis and
+  say "(higher is worse)".
 - **The trust strip** — data as of, sources, room before a change. Always present, always
   compact, one link to `/trust`.
 - **Action links** — one shared component; an arrow only where the destination is a next step,

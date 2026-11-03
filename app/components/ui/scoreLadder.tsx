@@ -221,6 +221,19 @@ const ladderWorseDirection = (lines: readonly LadderLine[]): "higher" | "lower" 
   return pause.value > resume.value ? "higher" : "lower";
 };
 
+/* Which end is worse when only one of the pair is drawn: the change line faces it, as it
+   does for the shaded ranges. Only for the drawing; the "(higher is worse)" note keeps to
+   ladders that state both lines. */
+const ladderWorseByChangeLine = (lines: readonly LadderLine[]): "higher" | "lower" | null => {
+  const change = lines.find((line) => line.kind === "callChange");
+  const pause = lines.find((line) => line.kind === "pause");
+  const resume = lines.find((line) => line.kind === "resume");
+  if (!change) return null;
+  if (pause && pause.value !== change.value) return pause.value > change.value ? "higher" : "lower";
+  if (resume && resume.value !== change.value) return resume.value < change.value ? "higher" : "lower";
+  return null;
+};
+
 export function ScoreLadder({
   label,
   value,
@@ -232,6 +245,12 @@ export function ScoreLadder({
 }: ScoreLadderProps) {
   const caption = describeLadderPosition(value, lines);
   const worse = ladderWorseDirection(lines);
+  /* A score that is worse higher is drawn high to low (2026-11-03), so right is the
+     easier side on every ladder, as up and right are on the conditions map. The two
+     scores point opposite ways, and a reader had to check the "(higher is worse)"
+     note to know which end of each track was good. */
+  const reversed = (worse ?? ladderWorseByChangeLine(lines)) === "higher";
+  const at = (point: number) => (reversed ? roundPercent(100 - clampPercent(point, max)) : clampPercent(point, max));
   /* Rows for each width the ladder is drawn at; the container query on the
      track picks one. Positions go through custom properties so one element
      serves both layouts. */
@@ -242,14 +261,16 @@ export function ScoreLadder({
   const laidOut = narrow.map(({ line, row }) => ({ line, row, wideRow: wideRows.get(line) ?? row }));
   const maxRow = (key: "row" | "wideRow") => Math.max(0, ...laidOut.map((entry) => entry[key]));
   const hasPrevious = typeof previous === "number" && Number.isFinite(previous);
-  const zones = ladderZones(lines, max);
+  const zones = ladderZones(lines, max).map((zone) =>
+    reversed ? { ...zone, left: roundPercent(100 - zone.left - zone.width) } : zone,
+  );
   /* The move from the earlier reading to this one, as a segment between the
      two dots, so a week's change reads as a distance travelled. */
   const move =
     hasPrevious && previous !== value
       ? {
-          left: roundPercent(Math.min(clampPercent(previous, max), clampPercent(value, max))),
-          width: roundPercent(Math.abs(clampPercent(value, max) - clampPercent(previous, max))),
+          left: roundPercent(Math.min(at(previous), at(value))),
+          width: roundPercent(Math.abs(at(value) - at(previous))),
         }
       : null;
   const trackStyle: TrackStyle = {
@@ -294,7 +315,7 @@ export function ScoreLadder({
             key={`tick-${line.kind}-${line.value}`}
             data-ladder-tick
             className={`absolute top-1.5 h-[calc(18px+var(--row)*13px)] w-0.5 -translate-x-1/2 @[28rem]:h-[calc(18px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[0]}`}
-            style={markStyle(clampPercent(line.value, max), row, wideRow)}
+            style={markStyle(at(line.value), row, wideRow)}
           />
         ))}
         {laidOut.map(({ line, row, wideRow }) => (
@@ -303,7 +324,7 @@ export function ScoreLadder({
             data-ladder-row={row}
             data-ladder-row-wide={wideRow}
             className={`absolute top-[calc(26px+var(--row)*13px)] -translate-x-1/2 whitespace-nowrap rounded-[2px] bg-[var(--bg-body)] px-0.5 text-[12px] leading-none tabular-nums @[28rem]:top-[calc(26px+var(--row-wide)*13px)] ${LINE_CLASS[line.kind].split(" ")[1]}`}
-            style={markStyle(clampPercent(line.value, max), row, wideRow)}
+            style={markStyle(at(line.value), row, wideRow)}
           >
             {tickText(line)}
           </span>
@@ -318,13 +339,13 @@ export function ScoreLadder({
         {hasPrevious ? (
           <span
             className="absolute top-2.5 h-2.5 w-2.5 -translate-x-1/2 rounded-full border-2 border-slate-300 bg-[var(--bg-body)]"
-            style={{ left: `${clampPercent(previous, max)}%` }}
+            style={{ left: `${at(previous)}%` }}
             title={`${previousLabel}: ${formatPoints(previous)}`}
           />
         ) : null}
         <span
           className="absolute top-2 h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-[var(--bg-panel)] bg-slate-100"
-          style={{ left: `${clampPercent(value, max)}%` }}
+          style={{ left: `${at(value)}%` }}
         />
       </div>
       {/* The lines' key, left to right in the order the ticks sit, so a line
@@ -332,7 +353,7 @@ export function ScoreLadder({
           lines carry the pause and play glyphs the state badge uses, so the two
           differ in shape as well as ink; the change line keeps its plain tick. */}
       <p className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[12px] leading-none text-slate-400" data-ladder-key>
-        {narrow.map(({ line }) => (
+        {(reversed ? [...narrow].reverse() : narrow).map(({ line }) => (
           <span key={`key-${line.kind}-${line.value}`} className="inline-flex items-center gap-1">
             {line.kind === "callChange" ? (
               <span aria-hidden="true" className={`inline-block h-2 w-0.5 ${LINE_CLASS[line.kind].split(" ")[0]}`} />

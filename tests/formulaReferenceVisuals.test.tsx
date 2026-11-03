@@ -20,9 +20,10 @@ describe("formula reference visuals", () => {
     assert.doesNotMatch(html, /quadrant of funding pressure vs/, "the prose form is gone");
   });
 
-  it("draws the quadrant the way up the brief's map does: Freezing top left, Sunny bottom right", () => {
+  it("draws the quadrant the way up the brief's map does: Freezing bottom left, Sunny top right", () => {
     /* Until 2026-10-09 /trust put funding pressure across and risk appetite up,
-       so its Sunny sat where the brief's map has Freezing. */
+       so its Sunny sat where the brief's map has Freezing. Since 2026-11-03 funding
+       pressure rises downward on both, so up and right are the easier side. */
     const place = (svg: string, word: string) => {
       const tag = new RegExp(`<text([^>]*)>${word}</text>`).exec(svg)?.[1] ?? "";
       return { x: Number(/\bx="([\d.]+)"/.exec(tag)?.[1]), y: Number(/\by="([\d.]+)"/.exec(tag)?.[1]) };
@@ -35,9 +36,9 @@ describe("formula reference visuals", () => {
       const freezing = place(svg, "Freezing");
       const sunny = place(svg, "Sunny");
       assert.ok(Number.isFinite(freezing.x) && Number.isFinite(sunny.x), `${name}: both labels drawn`);
-      assert.ok(freezing.x < sunny.x && freezing.y < sunny.y, `${name}: Freezing is left of and above Sunny`);
+      assert.ok(freezing.x < sunny.x && freezing.y > sunny.y, `${name}: Freezing is left of and below Sunny`);
     }
-    assert.match(quadrant, /rotate\(-90\)"[^>]*>Funding pressure →</, "funding pressure is the upright axis");
+    assert.match(quadrant, /rotate\(-90\)"[^>]*>← Funding pressure</, "funding pressure is the upright axis, rising downward");
   });
 
   it("folds the exact arithmetic under the plain-language steps", () => {
@@ -51,9 +52,9 @@ describe("formula reference visuals", () => {
   });
 
   it("draws the margin as a three-band ladder, named in words", () => {
-    assert.match(html, />Close</);
-    assert.match(html, />Within reach</);
-    assert.match(html, />Clear</);
+    assert.match(html, />Little</);
+    assert.match(html, />Some</);
+    assert.match(html, />Plenty</);
     assert.doesNotMatch(html, />(LOW|MED|HIGH)</, "the engine's band codes are storage, not copy");
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_NEAR_THRESHOLD}<`));
     assert.ok(html.includes(`>${REGIME_CONFIDENCE_MEDIUM_THRESHOLD}<`));

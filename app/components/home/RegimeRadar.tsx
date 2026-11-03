@@ -58,7 +58,12 @@ const LINE_LABEL_MIN_Y = TOP_ICON_Y + QUADRANT_ICON + 7;
 const LINE_LABEL_MAX_Y = BOTTOM_ICON_Y - 2;
 
 const xScale = scaleLinear().domain([0, 100]).range([PLOT_X, PLOT_RIGHT]).clamp(true);
-const yScale = scaleLinear().domain([0, 100]).range([PLOT_BOTTOM, PLOT_Y]).clamp(true);
+/* Funding pressure rises downward (2026-11-03), so up and right are both the easier
+   side and Sunny is the top-right corner. The two scores read in opposite directions
+   (high pressure is bad, high appetite is good), and an up-and-right map whose best
+   corner was bottom right asked the reader to hold that in mind on every look. The
+   number and its name do not change: the published record prints them. */
+const yScale = scaleLinear().domain([0, 100]).range([PLOT_Y, PLOT_BOTTOM]).clamp(true);
 
 const xFor = (riskAppetite: number) => xScale(riskAppetite);
 const yFor = (tightness: number) => yScale(tightness);
@@ -142,10 +147,10 @@ export function RegimeRadar({
      before the eye found the dot; now the week's weather is the one colour
      field on the plot. An unmodelled regime lights nothing and dims nothing. */
   const quadrants = [
-    { key: "SCARCITY", x: PLOT_X, y: PLOT_Y, width: boundaryX - PLOT_X, height: boundaryY - PLOT_Y, fill: "var(--phase-scarcity)" },
-    { key: "DEFENSIVE", x: boundaryX, y: PLOT_Y, width: PLOT_RIGHT - boundaryX, height: boundaryY - PLOT_Y, fill: "var(--phase-defensive)" },
-    { key: "VOLATILE", x: PLOT_X, y: boundaryY, width: boundaryX - PLOT_X, height: PLOT_BOTTOM - boundaryY, fill: "var(--phase-volatile)" },
-    { key: "EXPANSION", x: boundaryX, y: boundaryY, width: PLOT_RIGHT - boundaryX, height: PLOT_BOTTOM - boundaryY, fill: "var(--phase-expansion)" },
+    { key: "SCARCITY", x: PLOT_X, y: boundaryY, width: boundaryX - PLOT_X, height: PLOT_BOTTOM - boundaryY, fill: "var(--phase-scarcity)" },
+    { key: "DEFENSIVE", x: boundaryX, y: boundaryY, width: PLOT_RIGHT - boundaryX, height: PLOT_BOTTOM - boundaryY, fill: "var(--phase-defensive)" },
+    { key: "VOLATILE", x: PLOT_X, y: PLOT_Y, width: boundaryX - PLOT_X, height: boundaryY - PLOT_Y, fill: "var(--phase-volatile)" },
+    { key: "EXPANSION", x: boundaryX, y: PLOT_Y, width: PLOT_RIGHT - boundaryX, height: boundaryY - PLOT_Y, fill: "var(--phase-expansion)" },
   ];
   const activeKey = currentRegime.toUpperCase();
   const hasActive = quadrants.some((quadrant) => quadrant.key === activeKey);
@@ -180,8 +185,8 @@ export function RegimeRadar({
       >
         <title>{`Funding pressure ${tightness} vs risk appetite ${riskAppetite} (${weatherLabel})`}</title>
 
-        {/* The four conditions: Freezing top left, Cloudy top right, Stormy
-            bottom left, Sunny bottom right. The week's is drawn twice over. */}
+        {/* The four conditions: Stormy top left, Sunny top right, Freezing
+            bottom left, Cloudy bottom right. The week's is drawn twice over. */}
         {quadrants.map((quadrant) => {
           const active = quadrant.key === activeKey;
           return (
@@ -212,7 +217,7 @@ export function RegimeRadar({
             Cloudy in the caution one), which tied a condition to a state. */}
         <text
           x={PLOT_X + 6}
-          y={PLOT_Y + 12}
+          y={PLOT_BOTTOM - 6}
           className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-freezing-ink)"
         >
@@ -220,7 +225,7 @@ export function RegimeRadar({
         </text>
         <text
           x={PLOT_RIGHT - 6}
-          y={PLOT_Y + 12}
+          y={PLOT_BOTTOM - 6}
           textAnchor="end"
           className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-cloudy-ink)"
@@ -229,7 +234,7 @@ export function RegimeRadar({
         </text>
         <text
           x={PLOT_X + 6}
-          y={PLOT_BOTTOM - 6}
+          y={PLOT_Y + 12}
           className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-stormy-ink)"
         >
@@ -237,7 +242,7 @@ export function RegimeRadar({
         </text>
         <text
           x={PLOT_RIGHT - 6}
-          y={PLOT_BOTTOM - 6}
+          y={PLOT_Y + 12}
           textAnchor="end"
           className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-sunny-ink)"
@@ -250,10 +255,10 @@ export function RegimeRadar({
             ones. Inside, "Freezing" and its glyph would reach the change line
             at the default risk-appetite line of 50. 12.5 units is 16px at the
             plot's 16rem (256px) cap. */}
-        <ConditionIcon regime="SCARCITY" x={PLOT_X - QUADRANT_ICON - 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
-        <ConditionIcon regime="DEFENSIVE" x={PLOT_RIGHT + 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
-        <ConditionIcon regime="VOLATILE" x={PLOT_X - QUADRANT_ICON - 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
-        <ConditionIcon regime="EXPANSION" x={PLOT_RIGHT + 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
+        <ConditionIcon regime="SCARCITY" x={PLOT_X - QUADRANT_ICON - 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
+        <ConditionIcon regime="DEFENSIVE" x={PLOT_RIGHT + 2} y={BOTTOM_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
+        <ConditionIcon regime="VOLATILE" x={PLOT_X - QUADRANT_ICON - 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
+        <ConditionIcon regime="EXPANSION" x={PLOT_RIGHT + 2} y={TOP_ICON_Y} width={QUADRANT_ICON} height={QUADRANT_ICON} />
 
         {/* Grid and threshold boundary crosshairs */}
         <line
@@ -450,7 +455,7 @@ export function RegimeRadar({
           transform={`rotate(-90, ${PLOT_X - 8}, ${PLOT_Y + PLOT_SIZE / 2})`}
           className="fill-slate-400 text-[11px]"
         >
-          Funding pressure ↑
+          ← Funding pressure
         </text>
       </svg>
 
@@ -464,7 +469,7 @@ export function RegimeRadar({
               and the legend that decodes them in money terms is hidden from `md`
               up, where this chart replaces it. */}
           <span className="block text-slate-300" data-radar-orientation>
-            {compact ? <>Up: {CONDITION_SIDE_MEANINGS.pressureAbove}. Right: {CONDITION_SIDE_MEANINGS.appetiteAbove}.</> : <>Higher means {CONDITION_SIDE_MEANINGS.pressureAbove}, further right means {CONDITION_SIDE_MEANINGS.appetiteAbove}. Sunny, bottom right, is the easiest; Freezing, top left, the hardest.</>}
+            {compact ? <>Up: {CONDITION_SIDE_MEANINGS.pressureBelow}. Right: {CONDITION_SIDE_MEANINGS.appetiteAbove}.</> : <>Up means {CONDITION_SIDE_MEANINGS.pressureBelow}, right means {CONDITION_SIDE_MEANINGS.appetiteAbove}. Sunny, top right, is the easiest; Freezing, bottom left, the hardest.</>}
           </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {!compact && hasTrail && caveat ? <span className="block">{caveat}</span> : null}
