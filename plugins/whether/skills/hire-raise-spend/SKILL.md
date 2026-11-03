@@ -45,4 +45,7 @@ rules; Whether does not predict when a recession will happen.
 For a specific plan ("hire three engineers next quarter", "sign a three-year lease"), call
 `stress_test_plan` with the plan in plain words, or fetch
 `https://whether.work/api/mcp?tool=stress_test_plan&planText=<the plan, URL-encoded>`. It returns
-a verdict, the assumptions that would break first, and the pause and resume lines that apply.
+a verdict, the assumptions that would break first, and the pause and resume lines that apply. A null
+verdict means it has no rules for that kind of decision: say so, and use the `answer` it points to
+rather than guessing a grade. Pass `cashUsd` and `monthlySpendUsd` when the user has given them, so
+the plan is sized against their cash.

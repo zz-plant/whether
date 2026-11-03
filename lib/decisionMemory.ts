@@ -1,4 +1,4 @@
-import type { DecisionInput, DecisionOutput, LifecycleStage, PlanStressTestResult } from "./decisionShield";
+import type { DecisionInput, DecisionOutput, GradedPlan, LifecycleStage } from "./decisionShield";
 import type { RegimeAssessment } from "./regimeEngine";
 
 /**
@@ -481,7 +481,7 @@ export const buildPlanStressTestMemoryPayload = ({
   planText: string;
   lifecycle: LifecycleStage;
   result: Pick<
-    PlanStressTestResult,
+    GradedPlan,
     "detectedCategory" | "detectedAction" | "verdict" | "headline" | "boundedGuardrail" | "reversalTrigger"
   >;
   assessment: Pick<RegimeAssessment, "regime" | "scores" | "thresholds" | "inputs">;

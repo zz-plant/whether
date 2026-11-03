@@ -208,4 +208,20 @@ describe("parseMoneyInput", () => {
       assert.equal(parseMoneyInput(raw), null, `expected null for ${JSON.stringify(raw)}`);
     }
   });
+
+  it("reads dollars written as a word, and never a bare number", () => {
+    assert.equal(parsePlanCommitment("Spend 300 dollars a month on ads").annualUsd, 3_600);
+    assert.equal(parsePlanCommitment("A 1,500 usd tool").annualUsd, 1_500);
+    assert.equal(parsePlanCommitment("Hire 3 people").annualUsd, null);
+  });
+
+  it("caps a monthly amount at a term in weeks or spelled out", () => {
+    assert.equal(parsePlanCommitment("$300 a month for six weeks").annualUsd, 600);
+    assert.equal(parsePlanCommitment("$300 a month for 8 weeks").annualUsd, 600);
+    assert.equal(parsePlanCommitment("a 2-week trial at $300 a month").annualUsd, 300);
+    assert.equal(parsePlanCommitment("$1k/mo for three months").annualUsd, 3_000);
+    assert.equal(parsePlanCommitment("$300 a month for many weeks").annualUsd, 3_600);
+    // "9 months of runway" is still an aside, not a term.
+    assert.equal(parsePlanCommitment("$10k/mo while maintaining a nine-month runway").annualUsd, 120_000);
+  });
 });

@@ -267,20 +267,12 @@ interface PlanStressTestRequest {
   companyProfile?: CompanyFinancialProfile;
 }
 
-export interface PlanStressTestResult {
+/** A plan the test could read as one of the decisions it has rules for. */
+export interface GradedPlan {
   verdict: DecisionVerdict;
   headline: string;
   detectedCategory: DecisionCategory;
   detectedAction: DecisionAction;
-  /**
-   * Whether the category came from something in the sentence or from the
-   * fallback. Unmatched text still classifies as HIRE so every lookup keyed by
-   * `DecisionAction` keeps working, and callers used to have no way to tell that
-   * apart from a real match — "asdf qwerty" produced "Hire is considered SAFE"
-   * with the same confidence as a described hiring plan. Surfaces must show this
-   * and offer a correction.
-   */
-  detectionConfidence: "MATCHED" | "ASSUMED";
   /** What the sentence said about size. `annualUsd` is null when it said nothing. */
   commitment: ParsedCommitment;
   /** The commitment against available cash, when the caller supplied enough to divide by. */
@@ -296,30 +288,72 @@ export interface PlanStressTestResult {
   financialImpactSummary?: string;
 }
 
+/**
+ * A plan the test has no rules for, and says so.
+ *
+ * Unmatched text used to classify as HIRE, because every table here is keyed by
+ * `DecisionAction`: "Raise prices from $9 to $19" and "Take a $50k angel check"
+ * came back "Hire is considered DANGEROUS", the second with $50k of incoming
+ * money read as a first-year cost. A flag on the result said the category was
+ * assumed, and no surface read it. No verdict is the honest answer to a decision
+ * the matrix has no row for.
+ */
+interface UngradedPlan {
+  verdict: null;
+  headline: string;
+  /** What to do instead: the decisions the test can grade. */
+  nextStep: string;
+  /** Words `matchDecisionPage` resolves to the answer that does cover this, when the plan named a topic. */
+  answerTopic: string | null;
+}
+
+export type PlanStressTestResult = GradedPlan | UngradedPlan;
+
 export interface PlanComparisonResult {
   planA: PlanStressTestResult;
   planB: PlanStressTestResult;
-  preferredPlan: "A" | "B" | "TIE";
+  /** Null when either plan could not be graded, so there is nothing to prefer. */
+  preferredPlan: "A" | "B" | "TIE" | null;
   comparativeRecommendation: string;
 }
 
-type Detection = { category: DecisionCategory; action: DecisionAction; confidence: "MATCHED" | "ASSUMED" };
+type Detection = { category: DecisionCategory; action: DecisionAction } | { ungraded: Omit<UngradedPlan, "verdict"> };
+
+const GRADABLE_DECISIONS =
+  "It grades hiring, infrastructure, vendor deals and discounts, rewrites, acquisitions and geographic expansion.";
+
+/* Checked before the hiring words, so "Raise a $2M seed to hire engineers" is not
+   a hire whose first-year cost is $2M. Only the money's direction matters here. */
+const RAISING_MONEY =
+  /\b(?:raise|raising)\s+(?:an?\s+|our\s+|the\s+|some\s+)?(?:\$|\d|seed|pre-seed|series|bridge|round|capital|money|funding|venture)|\b(?:angel\s+(?:check|cheque|round|investor|investment)|seed\s+round|bridge\s+round|series\s+[a-d]\b|convertible\s+note|venture\s+debt|fundraise)\b/;
+
+/* Before the pricing words, which grade a discount: a price rise is the opposite
+   move, and "Discount is RISKY" answered "raise my price" with the wrong decision. */
+const RAISING_PRICE =
+  /\b(?:raise|raising|increase|increasing|hike|hiking|double|doubling)\s+(?:\S+\s+){0,3}?(?:price|prices|pricing)\b|\bpric(?:e|ing)\s+(?:increase|rise|hike)\b|\bcharge\s+more\b/;
 
 const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCategory): Detection => {
   if (categoryOverride) {
-    /* The caller said which kind of decision this is, so there is nothing to
-       infer and nothing to be unsure about. */
-    const matched = "MATCHED" as const;
-    if (categoryOverride === "HIRING") return { category: "HIRING", action: "HIRE", confidence: matched };
-    if (categoryOverride === "INFRASTRUCTURE") return { category: "INFRASTRUCTURE", action: "INFRA_SPEND", confidence: matched };
-    if (categoryOverride === "PRICING") return { category: "PRICING", action: "DISCOUNT", confidence: matched };
-    if (categoryOverride === "ROADMAP") return { category: "ROADMAP", action: "REWRITE", confidence: matched };
-    if (categoryOverride === "M_AND_A") return { category: "M_AND_A", action: "ACQUIRE", confidence: matched };
-    if (categoryOverride === "GEOGRAPHIC_EXPANSION") return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION", confidence: matched };
-    return { category: "RESTRUCTURING", action: "RESTRUCTURE", confidence: matched };
+    /* The caller said which kind of decision this is, so there is nothing to infer. */
+    if (categoryOverride === "HIRING") return { category: "HIRING", action: "HIRE" };
+    if (categoryOverride === "INFRASTRUCTURE") return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
+    if (categoryOverride === "PRICING") return { category: "PRICING", action: "DISCOUNT" };
+    if (categoryOverride === "ROADMAP") return { category: "ROADMAP", action: "REWRITE" };
+    if (categoryOverride === "M_AND_A") return { category: "M_AND_A", action: "ACQUIRE" };
+    if (categoryOverride === "GEOGRAPHIC_EXPANSION") return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION" };
+    return { category: "RESTRUCTURING", action: "RESTRUCTURE" };
   }
 
   const lower = text.toLowerCase();
+  if (RAISING_MONEY.test(lower)) {
+    return {
+      ungraded: {
+        headline: "Not graded: this brings money in, and the stress test grades commitments that spend it.",
+        nextStep: `${GRADABLE_DECISIONS} The answer on raising capital covers this one.`,
+        answerTopic: "should-startups-raise-capital-now",
+      },
+    };
+  }
   /* No bare "lead", "principal" or "architect": each is a role only beside a
      hiring verb, and that verb already matches here ("Hire 1 principal
      architect"). Alone they claimed "sales lead time" and "loan principal" as
@@ -328,35 +362,47 @@ const detectCategoryAndAction = (text: string, categoryOverride?: DecisionCatego
      ("add 3 engineers", "open 2 roles"), matching the parse layer's
      HEADCOUNT_AFTER_VERB, so "open a London office" still reads as an office. */
   if (
-    /\b(hire|hiring|headcount|recruit|recruiting|poach|engineer|engineers|sdr|developer|team member)\b/.test(lower)
+    /\b(hire|hires|hired|hiring|headcount|recruit|recruiting|poach|engineer|engineers|sdr|developer|contractor|contractors|freelancer|consultant|team member)\b/.test(lower)
     || /\b(?:add|adding|open)\s+\d{1,4}\b/.test(lower)
+    || /\b\d{1,4}\s+(?:new\s+)?(?:roles?|people)\b/.test(lower)
   ) {
-    return { category: "HIRING", action: "HIRE", confidence: "MATCHED" };
+    return { category: "HIRING", action: "HIRE" };
   }
   if (/\b(lease|office|rent|real estate|sq ft|square foot)\b/.test(lower)) {
-    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND", confidence: "MATCHED" };
+    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
   }
   if (/\b(cloud|aws|gpu|server|cluster|instances|infrastructure|database|hosting)\b/.test(lower)) {
-    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND", confidence: "MATCHED" };
+    return { category: "INFRASTRUCTURE", action: "INFRA_SPEND" };
   }
-  if (/\b(discount|pricing|price|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contract)\b/.test(lower)) {
-    return { category: "PRICING", action: "DISCOUNT", confidence: "MATCHED" };
+  if (RAISING_PRICE.test(lower)) {
+    return {
+      ungraded: {
+        headline: "Not graded: this raises a price, and the stress test grades discounts, the opposite move.",
+        nextStep: `${GRADABLE_DECISIONS} The answer on raising prices covers this one.`,
+        answerTopic: "should-startups-raise-prices-now",
+      },
+    };
+  }
+  if (/\b(discount|discounts|pricing|price|prices|deal|contract discount|payment term|prepay|vendor|annual commit|usage flex|usage-based|annual contract)\b/.test(lower)) {
+    return { category: "PRICING", action: "DISCOUNT" };
   }
   if (/\b(acquire|acquisition|merger|m&a|buy company)\b/.test(lower)) {
-    return { category: "M_AND_A", action: "ACQUIRE", confidence: "MATCHED" };
+    return { category: "M_AND_A", action: "ACQUIRE" };
   }
   if (/\b(rewrite|refactor|architecture|rebuild|v2 migration|tech debt)\b/.test(lower)) {
-    return { category: "ROADMAP", action: "REWRITE", confidence: "MATCHED" };
+    return { category: "ROADMAP", action: "REWRITE" };
   }
   if (/\b(expand|international|europe|asia|new market|geo)\b/.test(lower)) {
-    return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION", confidence: "MATCHED" };
+    return { category: "GEOGRAPHIC_EXPANSION", action: "REGIONAL_EXPANSION" };
   }
 
-  /* Nothing in the sentence named a decision type. Still HIRING, because every
-     downstream table is keyed by `DecisionAction` and there is no "unknown"
-     column — but flagged, so the surface can show what it assumed and let the
-     reader correct it rather than quietly grading the wrong kind of decision. */
-  return { category: "HIRING", action: "HIRE", confidence: "ASSUMED" };
+  return {
+    ungraded: {
+      headline: "Not graded: this doesn't name a decision the stress test has rules for.",
+      nextStep: `${GRADABLE_DECISIONS} Name one of those in the plan, or read this week's guidance for the area it touches.`,
+      answerTopic: null,
+    },
+  };
 };
 
 /** Names the rule that decided, not the week, unless the week is what decided. */
@@ -390,7 +436,9 @@ export const stressTestDecisionPlan = (
   request: PlanStressTestRequest
 ): PlanStressTestResult => {
   const lifecycle = request.lifecycle ?? "GROWTH";
-  const { category, action, confidence: detectionConfidence } = detectCategoryAndAction(request.planText, request.category);
+  const detection = detectCategoryAndAction(request.planText, request.category);
+  if ("ungraded" in detection) return { verdict: null, ...detection.ungraded };
+  const { category, action } = detection;
   const profile = request.companyProfile;
 
   const baseEvaluation = evaluateDecision(assessment, {
@@ -547,7 +595,6 @@ export const stressTestDecisionPlan = (
     }),
     detectedCategory: category,
     detectedAction: action,
-    detectionConfidence,
     commitment,
     runwayShare,
     sizingNote,
@@ -568,6 +615,16 @@ export const compareDecisionPlans = (
 ): PlanComparisonResult => {
   const planA = stressTestDecisionPlan(assessment, { planText: planAText, companyProfile });
   const planB = stressTestDecisionPlan(assessment, { planText: planBText, companyProfile });
+
+  if (planA.verdict === null || planB.verdict === null) {
+    const ungraded = planA.verdict !== null ? "Plan B could not" : planB.verdict !== null ? "Plan A could not" : "Neither plan could";
+    return {
+      planA,
+      planB,
+      preferredPlan: null,
+      comparativeRecommendation: `${ungraded} be graded, so there is nothing to compare yet.`,
+    };
+  }
 
   const scoreMap: Record<DecisionVerdict, number> = {
     SAFE: 3,

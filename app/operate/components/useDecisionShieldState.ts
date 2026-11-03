@@ -153,7 +153,7 @@ export const useDecisionShieldState = ({
      is only judgeable later against the conditions its author actually saw. */
   const buildLedgerPayload = useCallback(
     (): DecisionMemoryPayload => {
-      if (planMode === "natural_language" && planReady) {
+      if (planMode === "natural_language" && planReady && stressTestResult.verdict !== null) {
         return {
           recordDate,
           decision: {

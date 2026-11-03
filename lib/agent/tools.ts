@@ -3,10 +3,11 @@ import { buildAgentInterfaceResponse, loadAgentInterfaceContext, pullRecentSiteI
 import { agentSkills } from "../agentSkills";
 import { agentStateSchema, buildAgentState } from "../agentState";
 import { getHistoricalAnalogPlaybook } from "../analogPlaybook";
-import { stressTestDecisionPlan } from "../decisionShield";
+import { companyFinancialProfileFor, stressTestDecisionPlan, type PlanStressTestResult } from "../decisionShield";
 import { loadCanonicalReportInputs } from "../ingestion/materialized";
 import { DEFAULT_THRESHOLDS } from "../regimeEngineCore";
-import { buildCanonicalBoundedDecisionRules, formatBoundedDecisionTriplet } from "../report/boundedDecisionRules";
+import { buildCanonicalBoundedDecisionRules, formatStandingRuleTriplet } from "../report/boundedDecisionRules";
+import { EMPTY_OPERATOR_PROFILE } from "../operatorProfile";
 import { getRegimeContext, projectRegimeFromPace } from "../report/regimeContext";
 import { buildUseConstraint } from "../report/useConstraint";
 import { fetchSaaSValuations, SAAS_BASKET } from "../saasMultiples";
@@ -29,7 +30,7 @@ import {
 import { answerPages, matchDecisionPage } from "../../app/answers/decisionPages";
 import { buildAnswerObject } from "../answers/answerObject";
 import { buildCanonicalUrl } from "../seo";
-import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
+import { REGIME_KEYS, SIGNAL_KEYS, businessModelInput, decisionCategoryInput, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
 import { AgentInputError, createAgentToolRegistry, defineTool } from "./registry";
 
 /**
@@ -96,12 +97,53 @@ const todayAssessment = async () => (await todayContext()).reportData.assessment
 
 const todayState = async () => buildAgentState(await todayContext());
 
+/* The builder needs scores, and these are not a reading: the triplet leaves them out. It printed
+   them until 2026-11-03, "Funding pressure is 50 and risk appetite is 50 now" in a week of 90 and 55. */
 const rulesFor = (regime: (typeof REGIME_KEYS)[number]) =>
   buildCanonicalBoundedDecisionRules({
     regime,
     thresholds: DEFAULT_THRESHOLDS,
     scores: { tightness: 50, riskAppetite: 50 },
-  }).map((rule) => ({ area: rule.area, ...formatBoundedDecisionTriplet(rule) }));
+  }).map((rule) => ({ area: rule.area, ...formatStandingRuleTriplet(rule) }));
+
+/* What a plan tool takes beyond the plan: the kind of decision when the wording doesn't say,
+   and the figures that size it. The page reads these from the browser's profile; an agent has
+   no profile, so every plan it sent was graded on conditions alone. */
+const planFigureInputs = {
+  category: decisionCategoryInput.optional().describe("The kind of decision, when the plan's wording doesn't name one the test has rules for."),
+  cashUsd: numberInput.optional().describe("Cash in the bank, in dollars. Sizes the plan against it."),
+  monthlySpendUsd: numberInput.optional().describe("Total monthly spend, in dollars, before revenue."),
+  monthlyRevenueUsd: numberInput.optional().describe("Monthly revenue, in dollars."),
+  runwayMonths: numberInput.optional().describe("Months of runway, when you don't have cash and spend to work it out from."),
+  businessModel: businessModelInput.optional().describe("How the company is funded."),
+};
+
+const companyProfileFromFigures = ({
+  cashUsd,
+  monthlySpendUsd,
+  monthlyRevenueUsd,
+  runwayMonths,
+  businessModel,
+}: {
+  cashUsd?: number;
+  monthlySpendUsd?: number;
+  monthlyRevenueUsd?: number;
+  runwayMonths?: number;
+  businessModel?: "VC_BACKED" | "BOOTSTRAPPED";
+}) => {
+  if ([cashUsd, monthlySpendUsd, monthlyRevenueUsd, runwayMonths, businessModel].every((value) => value === undefined)) return undefined;
+  return companyFinancialProfileFor(
+    { ...EMPTY_OPERATOR_PROFILE, cashUsd, monthlyBurnUsd: monthlySpendUsd, monthlyRevenueUsd, runwayMonths },
+    businessModel,
+  );
+};
+
+/* A plan with no verdict still leaves the caller somewhere: the answer that covers it, when one does. */
+const withAnswerForUngraded = (plan: PlanStressTestResult, planText: string) => {
+  if (plan.verdict !== null) return { ...plan };
+  const page = matchDecisionPage(plan.answerTopic ?? planText);
+  return { ...plan, answer: page ? { slug: page.slug, title: page.title, permalink: buildCanonicalUrl(`/answers/${page.slug}`) } : null };
+};
 
 const AGENT_TOOLS = [
   defineTool({
@@ -389,14 +431,21 @@ const AGENT_TOOLS = [
     name: "stress_test_plan",
     title: "Stress-test a planned decision against today's conditions",
     description:
-      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the restart line. Use it when someone describes a specific plan and asks whether it holds up in this market.",
+      "Audits a proposed operational decision (hiring, cloud commit, office lease, vendor deal or discount) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the restart line. A plan it has no rules for comes back with a null verdict and where to look instead; pass `category` if you know which kind of decision it is. Pass the company's figures to size it. Use it when someone describes a specific plan and asks whether it holds up in this market.",
     input: {
       planText: textInput.describe("The planned decision or initiative in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),
+      ...planFigureInputs,
     },
     example: { planText: "Sign a three-year cloud commitment" },
-    run: async ({ planText, lifecycle }) => {
-      return { ...stressTestDecisionPlan(await todayAssessment(), { planText, lifecycle: lifecycle ?? "GROWTH" }) };
+    run: async ({ planText, lifecycle, category, ...figures }) => {
+      const plan = stressTestDecisionPlan(await todayAssessment(), {
+        planText,
+        lifecycle: lifecycle ?? "GROWTH",
+        category,
+        companyProfile: companyProfileFromFigures(figures),
+      });
+      return withAnswerForUngraded(plan, planText);
     },
   }),
   defineTool({
@@ -404,24 +453,32 @@ const AGENT_TOOLS = [
     title: "Lint a spec or contract for fixed commitments",
     description:
       "Scans an engineering PRD, RFC or contract for fixed capital lock-in (multi-year reservations, large upfront cash commitments) and offers reversible alternatives, against today's conditions.",
-    input: { specText: textInput.describe("The PRD, RFC, or procurement specification text.") },
+    input: { specText: textInput.describe("The PRD, RFC, or procurement specification text."), ...planFigureInputs },
     example: { specText: "Reserve 3 years of capacity, paid upfront" },
-    run: async ({ specText }) => {
-      return { ...stressTestDecisionPlan(await todayAssessment(), { planText: specText }) };
+    run: async ({ specText, category, ...figures }) => {
+      const plan = stressTestDecisionPlan(await todayAssessment(), { planText: specText, category, companyProfile: companyProfileFromFigures(figures) });
+      return withAnswerForUngraded(plan, specText);
     },
   }),
   defineTool({
     name: "lint_sprint_goal",
     title: "Lint a sprint goal against today's conditions",
     description:
-      "Takes a sprint goal or story-level plan and says whether it holds, pauses, or needs a written way to undo it under today's conditions, with the pause line that would fire. A sprint goal is a planned decision at smaller granularity, so this reuses the stress-test engine.",
+      "Takes a sprint goal or story-level plan and says whether it holds, pauses, or needs a written way to undo it under today's conditions, with the pause line that would fire; `not_graded` when the test has no rules for it. A sprint goal is a planned decision at smaller granularity, so this reuses the stress-test engine.",
     input: {
       goalText: textInput.describe("The sprint goal or story-level plan in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),
+      ...planFigureInputs,
     },
     example: { goalText: "Hire two contractors for the launch" },
-    run: async ({ goalText, lifecycle }) => {
-      const plan = stressTestDecisionPlan(await todayAssessment(), { planText: goalText, lifecycle: lifecycle ?? "GROWTH" });
+    run: async ({ goalText, lifecycle, category, ...figures }) => {
+      const plan = stressTestDecisionPlan(await todayAssessment(), {
+        planText: goalText,
+        lifecycle: lifecycle ?? "GROWTH",
+        category,
+        companyProfile: companyProfileFromFigures(figures),
+      });
+      if (plan.verdict === null) return { ...withAnswerForUngraded(plan, goalText), verdict: "not_graded" };
       /* The stress-test engine grades on SAFE/RISKY/DANGEROUS; a sprint goal needs a verdict an
          engineer can act on, mapped 1:1 so the source of the call stays visible: SAFE holds,
          RISKY pauses, DANGEROUS needs a reversal guardrail before it is pulled. */
@@ -431,7 +488,6 @@ const AGENT_TOOLS = [
         headline: plan.headline,
         detectedCategory: plan.detectedCategory,
         detectedAction: plan.detectedAction,
-        detectionConfidence: plan.detectionConfidence,
         // The pause line and reversal trigger are the bounded rule's own, so the caller can paste them without re-deriving them.
         pauseTrigger: plan.boundedGuardrail,
         reversalTrigger: plan.reversalTrigger,
@@ -467,6 +523,7 @@ const AGENT_TOOLS = [
         };
       }
       const plan = stressTestDecisionPlan(assessment, { planText, lifecycle: lifecycle ?? "GROWTH" });
+      if (plan.verdict === null) return { violationCount: 0, violations: [], ...withAnswerForUngraded(plan, planText) };
       const candidate: SprintDecisionCandidate = {
         title: planText,
         category: plan.detectedCategory,

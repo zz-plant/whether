@@ -350,6 +350,19 @@ export const formatBoundedDecisionTriplet = (rule: Pick<BoundedDecisionRule, "do
 };
 
 /**
+ * The same triplet as the rule itself, for a surface printing the rule apart from any reading.
+ * The rule's own trigger sentences name the scores it was built with ("Funding pressure is 50
+ * now"), which only a surface holding this week's scores can say.
+ */
+export const formatStandingRuleTriplet = (rule: Pick<BoundedDecisionRule, "doNow" | "recommendation" | "pause" | "resume">) =>
+  formatBoundedDecisionTriplet({
+    doNow: rule.doNow,
+    recommendation: rule.recommendation,
+    pauseTrigger: formatRuleClause(rule.pause, "pause"),
+    resumeTrigger: formatRuleClause(rule.resume, "resume"),
+  });
+
+/**
  * Whether a printed guardrail sentence is this rule's pause clause.
  *
  * The homepage may print a stage-scoped or policy-override guardrail in the

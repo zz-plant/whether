@@ -271,8 +271,11 @@ export const DecisionShieldPanel = ({
               />
               {/* Not in compare mode: two plans are not one decision, and the
                   ledger payload there was the hidden list mode's verdict. A
-                  plan is recorded by testing it on its own. */}
-              {planMode === "compare" ? null : <RecordDecisionButton buildPayload={buildLedgerPayload} />}
+                  plan is recorded by testing it on its own, and one with no
+                  verdict has nothing to record. */}
+              {planMode === "compare" || (planMode === "natural_language" && stressTestResult.verdict === null) ? null : (
+                <RecordDecisionButton buildPayload={buildLedgerPayload} />
+              )}
             </div>
           ) : null}
         </div>

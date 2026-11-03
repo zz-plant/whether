@@ -127,6 +127,7 @@ const queryTerms = (text: string) => {
 const answerPageTerms = answerPages.map((page) => ({
   page,
   terms: queryTerms([page.slug, page.keyword, page.title, ...page.askedAs].join(" ")),
+  about: queryTerms([page.slug, page.keyword, page.title].join(" ")),
 }));
 
 /* How much a term says about which page is meant: "hire" is on four pages and says less
@@ -146,7 +147,7 @@ const termWeight = (term: string) => Math.log(1 + answerPages.length / (pagesWit
  * word in it appeared in one page's slug, keyword or title, and 10 of 11 such questions were
  * refused. Each page now carries the ways people ask it (`askedAs`); an exact question goes to
  * its declared page before topic scoring. Other questions go to a page that shares two of their
- * topic words or more than half their weight, the one most about those words when several do: "should we hire" is the
+ * topic words, or more than half their weight in a word of its own title, the one most about those words when several do: "should we hire" is the
  * hiring-freeze answer, which says "hire" most, not the first salesperson's, whose title happens
  * to begin that way. A slug's words are among its terms, so
  * part of a slug ("cut-burn") matches the same way. A question no page shares that much with
@@ -170,10 +171,13 @@ export const matchDecisionPage = (query: string): DecisionPageDefinition | undef
   if (askedWeight === 0) return undefined;
 
   let best: { page: DecisionPageDefinition; rank: number } | undefined;
-  for (const { page, terms } of answerPageTerms) {
+  for (const { page, terms, about } of answerPageTerms) {
     const shared = asked.filter((term) => terms.has(term));
     const sharedWeight = shared.reduce((sum, term) => sum + termWeight(term), 0);
-    if (shared.length < 2 && sharedWeight / askedWeight <= 0.5) continue;
+    /* One shared word has to be what the page is about, not a way someone once asked it: "start"
+       in a phrasing sent "should I start a company now" to the new-product-lines answer, and
+       "offer" sent a question about a customer's discount to compensation. */
+    if (shared.length < 2 && (sharedWeight / askedWeight <= 0.5 || !shared.every((term) => about.has(term)))) continue;
     const rank = shared.reduce((sum, term) => sum + termWeight(term) * (1 + Math.log(terms.get(term) ?? 1)), 0);
     if (rank > (best?.rank ?? 0)) best = { page, rank };
   }
