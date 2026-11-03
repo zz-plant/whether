@@ -190,10 +190,11 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                 {/* A met restart line on an area that is not on hold stamped "already
                     met" beside "14 pts away" from its pause line, which read as a
                     restart (2026-10-14). With the pause line not crossed there is
-                    nothing to resume, and the cell says that instead. */}
+                    nothing to resume, and the cell says that instead — short of the
+                    restart line too, where it printed "2 pts away" (2026-11-02). */}
                 <LineCell
                   value={
-                    row.pause && row.pause.state !== "crossed" && row.resume?.state
+                    row.pause && row.pause.state !== "crossed" && row.resume
                       ? { line: row.resume.line, distance: NOTHING_TO_RESUME }
                       : row.resume
                   }

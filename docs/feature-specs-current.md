@@ -4997,13 +4997,33 @@ source coverage, colour-coded emerald ≥80, amber ≥60, rose <60. It was drawn
 strip's sources, confidence and record date carry what it summarized.
 
 ### 8.6 Degraded-state decision guidance
-**Location**: `app/page.tsx`, `resolveDataStatusGuidance` in `lib/report/trustStatus.ts`.
+**Location**: `app/page.tsx`, `resolveDataStatusGuidance` and `describeSavedCopyBanner` in
+`lib/report/trustStatus.ts`.
 
-When the reading is a fallback snapshot or a source is degraded, an amber line above the brief
-states that data state's guidance, for example "Live data is late. Keep last week's plan; hold new
-hires, spend and vendor contracts until it returns." The reliability-score warning this section
-first described ("Stage all irreversible decisions until the next clean refresh.") left
+When the report read fails, a caveat line above the brief states that data state's guidance. On a
+saved copy it names the reading and its age: "Live data is late, so this is the Jun 17, 2026
+reading, 4 months old." Where the guidance is held (the bundled copy always is, for missing inputs)
+the hero's call is the one instruction and the line stops there; otherwise it adds "Keep your
+current plan; hold new hires, spend and vendor contracts until live data returns." `/operate`'s
+`LiveDataFallbackAlert` opens on the same sentence with the hold. The reliability-score warning this
+section first described ("Stage all irreversible decisions until the next clean refresh.") left
 `BriefHero.tsx` on 2026-05-23.
+
+On a saved copy the rest of the page speaks for the old reading, not for this week (2026-11-02).
+Until then the Jun 17 copy, read on Oct 21, printed "No area is on hold." under the banner's hold,
+"Could change next week" in the trust strip, and "No previous week to compare" over the signal
+table. Now:
+- the card prints no held-areas line and no exception band;
+- the count over the areas is dated and past tense ("No area was on hold on the Jun 17, 2026
+  reading.");
+- the trust strip's margin keeps its distance and drops the next-week forecast and the base rate,
+  on every route that draws it (`buildTrustStripProps` sets `savedCopy`);
+- "What changed" says "Nothing new to compare: this is the saved Jun 17, 2026 reading."
+
+On any reading, an area that is not on hold prints "nothing to resume" in its restart cell, in the
+picker and the area table, rather than a distance to a line that has no hold to lift
+(`buildHomeAreaRows`, `AreaTable`). `tests/savedCopyHomepage.test.tsx` renders the route with the
+operating-state store down and holds each of these.
 
 ### 8.7 Print layout
 **Location**: the `@media print` blocks in `app/styles/layout-effects.css` (imported by

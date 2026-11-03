@@ -2,6 +2,7 @@ import type { RegimeDiagnostics } from "../regimeEngine";
 import { MARGIN_LABEL, formatMarginBand, publicDecisionLabels, type CompactFreshnessMeta } from "./reportFormatting";
 import { DECISION_CONTRACT_LABELS, type PolicyHoldCall } from "./reportCopy";
 import type { RegimeStateTransition } from "../regimeStateMachine";
+import { formatDateUTC } from "../formatters";
 
 type TrustStatusTone = "stable" | "warning" | "historical";
 
@@ -378,6 +379,9 @@ const DATA_STATUS_LABELS = {
 
 type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
 
+/** What a saved copy holds, on every surface that states the saved-copy state. */
+const SAVED_COPY_HOLD = "Keep your current plan; hold new hires, spend and vendor contracts until live data returns.";
+
 /**
  * What each data state means for approvals, in one sentence each. The homepage
  * banner, the freshness popover and the export panel used to word this four
@@ -387,8 +391,54 @@ type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
 const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
   live: "All sources live and current.",
   partlyCached: "Some sources are saved copies. Hold anything you can't undo until every source is live.",
-  cachedSnapshot: "Live data is late. Keep your current plan; hold new hires, spend and vendor contracts until it returns.",
+  cachedSnapshot: `Live data is late. ${SAVED_COPY_HOLD}`,
   historical: "Historical snapshot. Compare against the live read before changing current plans.",
+};
+
+const wholeMonthsBetween = (from: Date, to: Date) =>
+  (to.getUTCFullYear() - from.getUTCFullYear()) * 12
+  + (to.getUTCMonth() - from.getUTCMonth())
+  - (to.getUTCDate() < from.getUTCDate() ? 1 : 0);
+
+/**
+ * How old a reading is, in the unit a reader would say it: "2 days old",
+ * "3 weeks old", "4 months old". Null when the date does not parse.
+ */
+const describeReadingAge = (recordDate: string, now: Date): string | null => {
+  const recorded = new Date(`${recordDate.slice(0, 10)}T00:00:00Z`);
+  if (Number.isNaN(recorded.getTime())) return null;
+  const days = Math.max(0, Math.floor((now.getTime() - recorded.getTime()) / 86_400_000));
+  const months = wholeMonthsBetween(recorded, now);
+  const count = (value: number, unit: string) => `${value} ${unit}${value === 1 ? "" : "s"} old`;
+  if (days < 1) return "less than a day old";
+  if (days < 14) return count(days, "day");
+  if (months < 2) return count(Math.floor(days / 7), "week");
+  return count(months, "month");
+};
+
+/**
+ * The saved copy's banner, which says how late "late" is (2026-11-02).
+ *
+ * The bundled copy a failed read falls back to was the Jun 17 reading on a page
+ * read on Oct 21, and the banner said only "Live data is late". It now names the
+ * reading and its age. Where the guidance is already held, the hero's call is
+ * the instruction, so the banner states the facts alone: the two used to give
+ * the hold twice, over different decisions and until different events
+ * ("until it returns" over "until the missing inputs return").
+ */
+export const describeSavedCopyBanner = ({
+  recordDate,
+  now,
+  guidanceHeld,
+}: {
+  recordDate: string;
+  now: Date;
+  /** The week's guidance is a hold, which the hero prints as its call. */
+  guidanceHeld: boolean;
+}) => {
+  const age = describeReadingAge(recordDate, now);
+  const reading = `Live data is late, so this is the ${formatDateUTC(recordDate)} reading${age ? `, ${age}` : ""}.`;
+  return guidanceHeld ? reading : `${reading} ${SAVED_COPY_HOLD}`;
 };
 
 export const resolveDataStatusGuidance = (input: Parameters<typeof resolveDataStatus>[0]) =>

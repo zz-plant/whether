@@ -22,7 +22,7 @@ import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
 import { getPlaybookForRegime } from "../lib/playbook";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
 import { isRoute } from "../lib/navigation/routeType";
-import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
+import { describeSavedCopyBanner, resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
   buildV2HeroSignalData,
   type SignalDirection,
@@ -183,6 +183,9 @@ async function PageContent({
 
   const { homepage, reportData } = data;
   const isDegraded = !homepage.reportResult.ok;
+  /* The bundled copy a failed read serves, or a reading filled from it. */
+  const savedCopy = homepage.reportShell.showOfflineBadge;
+  const savedReadingDate = savedCopy ? reportData.recordDateLabel : undefined;
 
   const timeMachineRequest = parseTimeMachineRequest(searchParams);
   const operateHref = buildTimeMachineHref("/operate", timeMachineRequest);
@@ -609,11 +612,15 @@ async function PageContent({
         href: buildPublishedBriefPath(differingBrief.slug),
       }
     : undefined;
-  const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(decisionPickerOptions);
+  /* A saved copy's lines are an old reading's, so the card states no hold of its
+     own: the banner (or, on a held week, the call) says what waits for live data,
+     and the areas below are dated to the reading. "No area is on hold." sat under
+     "hold new hires, spend and vendor contracts" (2026-11-02). */
+  const heldAreasLine = historicalSelection || savedCopy ? null : describeHeldAreasForCard(decisionPickerOptions);
   /* The week's exception, above the call: null on a calm week, so the page's
      silhouette changes with the weather rather than being drawn the same way
      whatever the reading says. */
-  const lineStateBand = historicalSelection ? null : describeLineStateBand(homeAreaRows);
+  const lineStateBand = historicalSelection || savedCopy ? null : describeLineStateBand(homeAreaRows);
   /* The meaning line under the call carries the two scores it rests on: they
      lived only inside the map, so the week's word could be screenshotted but
      not cited. One click to the section that shows the change lines and what
@@ -663,10 +670,15 @@ async function PageContent({
           used is the crossed-line red, so late data read as a crossed line. */}
       {isDegraded ? (
         <p className="weather-caveat-band weather-caveat-mark mb-4 px-4 py-2.5 text-fluid-micro">
-          {resolveDataStatusGuidance({
-            isFallbackSnapshot: homepage.reportShell.showOfflineBadge,
-            degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 1,
-          })}
+          {savedCopy
+            ? describeSavedCopyBanner({
+                recordDate: reportData.treasury.record_date,
+                now: new Date(),
+                guidanceHeld: homepage.weeklyCall.policyOverrideActive,
+              })
+            : resolveDataStatusGuidance({
+                degradedSourceCount: homepage.reportShell.degradedSourceRows?.length ?? 1,
+              })}
         </p>
       ) : null}
       <div className="mx-auto weather-brief-measure space-y-4 sm:space-y-8">
@@ -878,6 +890,7 @@ async function PageContent({
               regime={regime}
               stageLabel={stageLabel}
               activeRunway={activeRunway}
+              savedReadingDate={savedReadingDate}
             >
               <AllAreaRules
                 rows={homeAreaRows}
@@ -925,7 +938,7 @@ async function PageContent({
               }}
               historyCaveat={conditionsTrail.caveat}
               inputHistory={historicalSelection ? undefined : inputHistory}
-              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
+              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis, savedReadingDate }) : undefined}
               comparisonUnavailable={comparisonUnavailable}
               basis={basis}
             />
