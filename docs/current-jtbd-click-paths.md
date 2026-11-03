@@ -31,11 +31,11 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 1. On `/`, click `Copy Brief` under the verdict card. It copies a Slack-formatted brief, or opens the device's share sheet where the browser offers one. The `C` key and `Copy Slack brief` in the command palette press the same button.
 2. Under `Share`, click `Share or embed this →`, or `Use it elsewhere` in the header (`/share`).
 3. On `/share`, pick a format from the list (the `Format` select on a phone), then click its copy button:
-   - Chat: `Copy Slack post`, `Copy full brief`, `Copy standup line`
-   - Meetings: `Copy meeting snippet`, `Copy meeting pack`, `Copy agenda`, `Copy slide text`
+   - Chat: `Copy Slack post`, `Copy full brief`
+   - Social: `Copy LinkedIn post text`, `Copy X post text`, `Copy Bluesky post text`
+   - Meetings: `Copy meeting pack`, `Copy agenda`, `Copy slide text`
    - Docs and email: `Copy email`, `Copy investor update`, `Copy portfolio note`, `Copy citation`
-   - Tickets and boards: `Copy ticket brief`; `Work-item tags` copies one area at a time (`Copy <area> tag`) and `Pull policies` one policy at a time (`Copy policy`)
-   - Team: `Role memos` (`Copy memo`, `Copy checklist`)
+   - Tickets: `Copy ticket brief`
 4. On `/share`, the meeting pack and Monday agenda formats add `Add a Monday review to your calendar`, and the feed list beside `RSS` offers each Monday's guidance as a calendar subscription (also `Calendar` in the footer). The header's Share cell, `⇧S` and `Share this page` in the palette open the share panel on any route. `Files and images for a deck or a thread` copies the slide and the brief card to the clipboard and holds the board slide (`Download PPTX`, `Download PDF`, `Open SVG`) and `Open brief card`. `For agents, scripts and feed readers` links the API page and the feed.
 5. `Decide` and `/trust` each end on one `Share or embed this →` link to `/share`.
 

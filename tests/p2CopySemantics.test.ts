@@ -2,12 +2,7 @@ import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { buildDecisionAnswerContextSummary } from "../app/answers/decisionAnswerCopy";
 import { buildShareText } from "../app/operate/components/decisionShieldUtils";
-import {
-  buildExecutiveMemo,
-  buildGuardrailChecklist,
-} from "../app/operate/components/executiveBriefingPanel";
 import { evaluateDecision } from "../lib/decisionShield";
-import { insightDatabase } from "../data/recommendations";
 import { buildAssessmentFixture } from "./fixtures/reportFixtures";
 
 describe("P2 beginner copy semantics", () => {
@@ -114,16 +109,5 @@ describe("P2 beginner copy semantics", () => {
 
     assert.match(shareText, /This week's conditions: Cloudy/);
     assert.doesNotMatch(shareText, /^Regime:|Posture/m);
-  });
-
-  it("keeps strategy and executive briefs framed as weekly-call context, not raw regime jargon", () => {
-    const assessment = buildAssessmentFixture({ regime: "DEFENSIVE" });
-    const executiveTemplate = insightDatabase.executiveBriefingSuite.regimes.find((entry) => entry.key === assessment.regime);
-    const executiveMemo = buildExecutiveMemo(assessment, "Mar 1, 2026", executiveTemplate);
-    const checklist = buildGuardrailChecklist(assessment, executiveTemplate);
-
-    assert.match(executiveMemo, /This week's conditions: Cloudy/);
-    assert.doesNotMatch(executiveMemo, /^Regime:|Posture|Executive/m);
-    assert.match(checklist, /Pause-if Checklist — Cloudy/);
   });
 });

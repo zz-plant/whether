@@ -6,8 +6,6 @@ import { isValidElement, type ReactNode } from "react";
 import { NextRequest } from "next/server";
 import SharePage from "../app/share/page";
 import { SharePageFormats } from "../app/share/sharePageFormats";
-import { GuardrailTagControls } from "../app/share/guardrailTagControls";
-import { PullPolicyControls } from "../app/share/pullPolicyControls";
 import { BriefArtifactScript } from "../app/components/briefArtifactScript";
 import { GET as getSlideImage } from "../app/api/image/slide/route";
 import { GET as getBoardSlide } from "../app/api/export/board-slide/route";
@@ -146,14 +144,8 @@ const collectShare = async (out: Record<string, string>) => {
   for (const option of formats.options) {
     if (option.kind === "text") {
       out[`share: ${option.id}`] = option.text;
-    } else if (option.kind === "investor") {
+    } else {
       for (const band of BANDS) out[`share: investor-update (${band ?? "no band"})`] = formatInvestorUpdateSnippet(option.parts, band);
-    } else if (option.id === "work-item-tags") {
-      const tags = propsHandedTo(option.content, GuardrailTagControls)[0];
-      out["share: work-item-tags"] = (tags?.blocks ?? []).map((block) => block.markdown).join("\n\n");
-    } else if (option.id === "pull-policies") {
-      const policies = propsHandedTo(option.content, PullPolicyControls)[0];
-      out["share: pull-policies"] = JSON.stringify(policies ?? null);
     }
   }
 

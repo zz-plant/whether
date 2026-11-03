@@ -9,7 +9,6 @@ import { macroSeries } from "../lib/macroSnapshot";
 import { buildOperatingSnapshot } from "../lib/operatingState/snapshot";
 import { resetOperatingSnapshotStore } from "../lib/operatingState/snapshotStore";
 import { snapshotData } from "../lib/snapshot";
-import { decisionAreaLabel, decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 
 const originalFetch = globalThis.fetch;
 
@@ -89,7 +88,7 @@ describe("/share current weekly artifact", () => {
     assert.notEqual(textOf("slack-post"), fullBrief);
     const labels = options.map((option) => option.label);
     assert.equal(new Set(labels).size, labels.length, "no two formats share a name");
-    for (const label of ["Slack post", "Full brief", "Meeting pack", "Investor update", "Portfolio note", "Work-item tags", "Role memos"]) {
+    for (const label of ["Slack post", "Full brief", "Meeting pack", "Investor update", "Portfolio note", "Ticket brief", "Email"]) {
       assert.ok(labels.includes(label), `offers ${label}`);
     }
   });
@@ -107,26 +106,10 @@ describe("/share current weekly artifact", () => {
     assert.match(html, />Portfolio note</);
     const copyLabel = (id: string) => {
       const option = options.find((candidate) => candidate.id === id);
-      return option && option.kind !== "panel" ? option.copyLabel : "";
+      return option?.copyLabel ?? "";
     };
     assert.equal(copyLabel("investor-update"), "Copy investor update");
     assert.equal(copyLabel("portfolio-note"), "Copy portfolio note");
-  });
-
-  /* DD-037: each area's tag button sits in that area's row, not in a row of five under the table. */
-  it("puts each area's tag button in that area's row", async () => {
-    const { options } = await shareOptions();
-    const tags = options.find((option) => option.id === "work-item-tags");
-    assert.ok(tags?.kind === "panel", "the work-item tags are a format of their own");
-    const html = renderToStaticMarkup(<>{tags.content}</>);
-
-    const tagRows = [...html.matchAll(/<tr[^>]*data-area="([^"]+)"[^>]*>([\s\S]*?)<\/tr>/g)].filter(([, , row]) => /tag<\/button>|tag</.test(row ?? ""));
-    assert.equal(tagRows.length, decisionAreaOrder.length, "one tag row per area");
-    for (const [, area, row] of tagRows) {
-      const label = decisionAreaOrder.find((key) => key === area);
-      assert.ok(label, `known area ${area}`);
-      assert.match(row ?? "", new RegExp(`Copy ${decisionAreaLabel(label)} tag`), `${area}'s button is in its own row`);
-    }
   });
 
   /* The Slack post previewed as its own markup: asterisks, `> •` prefixes, a monospace block.
@@ -152,7 +135,7 @@ describe("/share current weekly artifact", () => {
       const option = options.find((candidate) => candidate.id === id);
       return option?.kind === "text" ? (option.preview ?? "text") : option?.kind;
     };
-    assert.deepEqual(["slack-post", "full-brief", "standup"].map(preview), ["chat", "chat", "chat"]);
+    assert.deepEqual(["slack-post", "full-brief"].map(preview), ["chat", "chat"]);
     assert.deepEqual(["meeting-pack", "agenda", "slide-text", "email", "citation", "ticket-brief", "portfolio-note"].map(preview), Array(7).fill("text"));
     assert.match(textOf("slack-post"), /^\*Whether Weekly Brief/, "the option still carries the markup it copies");
   });
@@ -199,8 +182,8 @@ describe("/share current weekly artifact", () => {
     }
     assert.equal((html.match(/Ready to paste/g) ?? []).length, 1, "one preview");
     for (const id of ["formats", "image-artifacts", "embed"]) assert.match(html, new RegExp(`id="${id}"`));
-    // The stacked page's anchors open the format that lived there.
-    for (const id of ["slack-post", "work-item-tags", "role-memos"]) {
+    // The stacked page's anchors, and the formats folded on 2026-11-03, open the format that carries them.
+    for (const id of ["slack-post", "ticket-brief", "agenda", "email"]) {
       assert.ok(options.some((option) => option.id === id), `${id} is still a format`);
     }
   });

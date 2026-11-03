@@ -6,11 +6,9 @@ import { formatWeekMondayUTC } from "../../lib/formatters";
 import { buildPageMetadata } from "../../lib/seo";
 import { PageShell } from "../components/pageShell";
 import { ActionLink } from "../components/ui/actionLink";
-import { GuardrailTagControls } from "./guardrailTagControls";
 import { ReusableVisuals } from "./reusableVisuals";
 import { findBriefVideo } from "../../lib/export/briefVideo";
 import { latestPublishedBrief, publishedBriefWeekLabel } from "../../lib/report/publishedBriefs";
-import { PullPolicyControls } from "./pullPolicyControls";
 import { CalendarSubscribeLinks, SharePageFormats, type ShareFormatOption } from "./sharePageFormats";
 import { EmbedBuilder } from "./embedBuilder";
 import { ShareImageArtifacts } from "./shareImageArtifacts";
@@ -20,10 +18,7 @@ import { formatBriefArtifact } from "../../lib/report/briefArtifact";
 import { briefReadingLines, buildBoardSlideBullets } from "../../lib/export/briefBuilders";
 import { buildAreaRows } from "../operate/areaRows";
 import { buildPortfolioNote } from "../../lib/export/portfolioNote";
-import { buildIssueTrackerMarkdownBrief, buildGuardrailTagBlocks } from "../../lib/export/issueTrackerBrief";
-import { buildStandupLine } from "../../lib/report/decisionMovement";
-import { buildPullPolicyBlocks } from "../../lib/report/operatingCalls";
-import { buildWipGuidance } from "../../lib/report/wipPolicy";
+import { buildIssueTrackerMarkdownBrief } from "../../lib/export/issueTrackerBrief";
 import {
   buildWeeklyOperatorBriefPayload,
   buildWeeklyOperatorBriefPlainText,
@@ -37,8 +32,6 @@ import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { getMonthlyRegimeHistory } from "../../lib/summary/monthlyRegimeHistory";
 import { siteUrl } from "../../lib/siteUrl";
-import { buildMeetingSnippet } from "../../lib/report/trustStatus";
-import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { utilityLinks } from "../../lib/navigation/informationArchitecture";
 
 export const runtime = "edge";
@@ -91,36 +84,9 @@ const buildCurrentShareArtifact = async () => {
    * the formats live.
    */
   const issueTrackerBrief = buildIssueTrackerMarkdownBrief(document);
-  /* The credential-free slice of the Linear/Jira sync: one paste-ready
-     guardrail block per business area, built from the same bounded-rule fields
-     the hero and Slack brief print. No tokens, no tracker integration — the
-     operator pastes the block into the work item description and the card
-     carries the conditions, the pause and restart lines, and what would change
-     the guidance, in the brief's own sentence. */
-  const guardrailTagBlocks = buildGuardrailTagBlocks({
-    actionStripItems,
-    postureLabel: document.conditions.line,
-    recordDate: treasury.record_date,
-    callChangesIf: document.slots.callChangesIf,
-  });
-  /* Whether the guidance moved, and what would change it, through the one-line
-     builder for what would change the guidance (`buildCallChangeLine`). */
-  const standupLine = buildStandupLine({
-    regime: assessment.regime,
-    change: snapshot.homeBriefModel.weeklyLeadershipSummary.guidanceChange,
-    weeklyCall: snapshot.weeklyCall,
-    assessment,
-  });
-  /* Kanban pull policies: the same pause/resume conditions re-verbed for a
-     pull system, copyable for a board header or wiki. */
-  const pullPolicyBlocks = buildPullPolicyBlocks(actionStripItems);
   /* The same five rows the plan page tabulates, so an area's rule and its two
      lines read identically on both surfaces. */
   const areaRows = buildAreaRows(actionStripItems);
-  /* The regime as a numeric WIP cap. The runway band is browser-held (cookie),
-     so the server copy states the regime cap; the pull-policy section above
-     carries the thresholds that gate it. */
-  const wipGuidance = buildWipGuidance({ regime: assessment.regime });
   /* One citation for the week: the one the picker offers. The meeting pack and
      the email carried a second, the answer pages', with a different shape. */
   const citation = formatBriefArtifact(document, "citation", siteUrl);
@@ -137,18 +103,6 @@ const buildCurrentShareArtifact = async () => {
     document,
     areaRows.map((row) => ({ area: row.area, rule: row.rule, pause: row.pause?.line, resume: row.resume?.line })),
   );
-  /* The status block /trust offered as "Meeting snippet" until 2026-10-08: the
-     reading's dates and margin, what would change it and the week's headline. */
-  const meetingSnippet = buildMeetingSnippet({
-    statusLabel: reportData.statusLabel,
-    recordDateLabel: reportData.recordDateLabel,
-    freshnessLabel: reportData.fetchedAtLabel,
-    confidenceLabel: snapshot.homeBriefModel.confidenceLabel,
-    isFallbackSnapshot: snapshot.isFallback,
-    isHistoricalSelection: Boolean(reportData.historicalSelection),
-    flipThreshold: reportData.flipThreshold,
-    guidance: weeklyHeadline(snapshot.weeklyCall).composed,
-  });
   const meetingPack = [
     "WEEKLY BRIEF",
     weeklyOperatorBrief,
@@ -208,16 +162,10 @@ const buildCurrentShareArtifact = async () => {
     })
       .toString()
       .replaceAll("+", "%20")}`,
-    standupLine,
-    meetingSnippet,
     meetingPack,
     issueTrackerBrief,
     investorUpdate,
     portfolioNote,
-    guardrailTagBlocks,
-    areaRows,
-    pullPolicyBlocks,
-    wipGuidance,
     calendarDetails: [
       "Read this week's Whether guidance.",
       "",
@@ -229,7 +177,6 @@ const buildCurrentShareArtifact = async () => {
 };
 
 import { SubscribeForm } from "../components/SubscribeForm";
-import { ExecutiveBriefingPanel } from "../operate/components/executiveBriefingPanel";
 
 /**
  * The formats, in the picker's order. The share rail's four formats are built
@@ -263,17 +210,6 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       commitment: "copied_slack",
       preview: "chat",
     },
-    {
-      id: "standup",
-      group: "Chat",
-      label: "Standup line",
-      hint: "One line for a daily standup: whether the guidance moved this week and what would change it.",
-      kind: "text",
-      text: artifact.standupLine,
-      copyLabel: "Copy standup line",
-      commitment: "copied_brief",
-      preview: "chat",
-    },
     ...SOCIAL_FORMATS.map(({ network, label, hint }): ShareFormatOption => {
       const text = formatSocialPost(artifact.document, network, siteUrl);
       return {
@@ -298,16 +234,6 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       copyLabel: "Copy meeting pack",
       commitment: "copied_meeting",
       offersCalendar: true,
-    },
-    {
-      id: "meeting-snippet",
-      group: "Meetings",
-      label: "Meeting snippet",
-      hint: "Paste into notes or a meeting agenda: the conditions, the reading's freshness and margin, its change lines and this week's action.",
-      kind: "text",
-      text: artifact.meetingSnippet,
-      copyLabel: "Copy meeting snippet",
-      commitment: "copied_meeting",
     },
     {
       id: "agenda",
@@ -372,37 +298,13 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
     },
     {
       id: "ticket-brief",
-      group: "Tickets and boards",
+      group: "Tickets",
       label: "Ticket brief",
       hint: "The guidance in Markdown for a Jira or Linear ticket, or a wiki page.",
       kind: "text",
       text: artifact.issueTrackerBrief,
       copyLabel: "Copy ticket brief",
       commitment: "copied_brief",
-    },
-    {
-      id: "work-item-tags",
-      group: "Tickets and boards",
-      label: "Work-item tags",
-      hint: "One block per area for a Linear or Jira card description: this week's rule, its pause line and what would change it. No integration and no tokens; each button copies its own row.",
-      kind: "panel",
-      content: <GuardrailTagControls blocks={artifact.guardrailTagBlocks} rows={artifact.areaRows} />,
-    },
-    {
-      id: "pull-policies",
-      group: "Tickets and boards",
-      label: "Pull policies",
-      hint: "For a kanban board or wiki: how many bets can run at once this week, then per area what to keep pulling, when to stop and when to resume. Pick a runway band on the brief to scale the cap to your cash.",
-      kind: "panel",
-      content: <PullPolicyControls blocks={artifact.pullPolicyBlocks} wipGuidance={artifact.wipGuidance} />,
-    },
-    {
-      id: "role-memos",
-      group: "Team",
-      label: "Role memos",
-      hint: "The week's summary, pause-if checks and what would change it, as a memo and a checklist to send to a team.",
-      kind: "panel",
-      content: <ExecutiveBriefingPanel assessment={artifact.assessment} recordDateLabel={artifact.recordDateLabel} />,
     },
   ];
 };

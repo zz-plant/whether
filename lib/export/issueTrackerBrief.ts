@@ -9,18 +9,12 @@
  * Jira and Linear both consume the `markdown` form; they differ only in the
  * button that copies them, not in the bytes produced.
  */
-import { formatWeekMondayUTC } from "../formatters";
 import type { BriefDocument } from "../report/briefArtifact";
 import { formatNumberWithUnit } from "../formatters";
 import { buildComplianceStamp } from "../exportNotices";
 import { EXPORT_SECTION_HEADINGS, RECESSION_GAUGE_LABEL, buildAreaRowLines, briefReadingLines, buildCallLines } from "./briefBuilders";
 import { describeBaseRateSource, formatExportConfidenceWord } from "./exportTerms";
-import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
 import { regimeSignalLabel } from "../report/signalTranslations";
-import { formatDecisionReversal, formatDecisionThreshold } from "../report/reportFormatting";
-import type { ActionStripItem } from "../report/operatingCalls";
-import { decisionAreaLabel } from "../report/boundedDecisionRules";
-import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
 
 type IssueTrackerFormat = "markdown" | "wiki";
 
@@ -80,59 +74,3 @@ export const buildIssueTrackerMarkdownBrief = (
     }),
   ].join("\n");
 };
-
-/**
- * A per-business-area guardrail block an operator pastes into a work item.
- *
- * This is the credential-free slice of the Linear/Jira sync: no tokens are
- * stored and nothing is written to the tracker — the operator copies one block
- * per area into the card description, and the card now carries the conditions,
- * the area's pause and restart lines, and what would change the guidance. The
- * block uses the same bounded-rule fields the Slack brief and the hero print, so
- * a card cannot state a threshold the weekly call does not.
- */
-export type GuardrailTagBlock = {
-  /** Business-area lever, e.g. `hiring-stance`. */
-  area: string;
-  /** Reader-facing business-area label, e.g. "Hiring posture". */
-  label: string;
-  /** The role that owns this lever's line, when known. */
-  ownerLabel?: string;
-  /** The paste-ready markdown block. */
-  markdown: string;
-};
-
-export const buildGuardrailTagBlocks = ({
-  actionStripItems,
-  postureLabel,
-  recordDate,
-  callChangesIf,
-}: {
-  actionStripItems: readonly ActionStripItem[];
-  postureLabel: string;
-  recordDate: string;
-  /**
-   * What would change the guidance: the brief's "Conditions change if" sentence
-   * (`WeeklyCallContract.callChangesIf`), the hold's own condition on a held week.
-   * It was the nearest market move ("If the 1-month Treasury bill rate rises 0.15%,
-   * conditions turn Cloudy."), which on a held week named a rate move beside
-   * guidance the hold says is not changing.
-   */
-  callChangesIf?: string;
-}): GuardrailTagBlock[] =>
-  actionStripItems.map((item) => ({
-    area: item.lever,
-    label: item.label,
-    ownerLabel: item.ownerLabel,
-    markdown: [
-      /* The pause and restart lines below name only their condition, so the area
-         they belong to heads the block. */
-      `**${decisionAreaLabel(operatingLeverToDecisionArea[item.lever])}**`,
-      `**Conditions:** ${postureLabel}`,
-      `**${DECISION_CONTRACT_LABELS.action.actionNow}:** ${item.areaActionNow}`,
-      `**${DECISION_CONTRACT_LABELS.threshold.pauseIf}:** ${formatDecisionThreshold(item.triggerThreshold)}`,
-      `**${DECISION_CONTRACT_LABELS.reversal.resumeWhen}:** ${formatDecisionReversal(item.reversalCondition)}`,
-      ...(callChangesIf ? [`**${DECISION_CONTRACT_LABELS.watch.flipWatch}:** ${callChangesIf}`] : []),
-      `_Week of ${formatWeekMondayUTC(recordDate)}_`,
-    ].join("\n"),
-  }));
