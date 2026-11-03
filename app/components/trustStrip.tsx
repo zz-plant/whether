@@ -51,6 +51,8 @@ export type TrustStripProps = {
     warning: string | null;
     /** The warning in four words, for the phone line (`ScoringBasis.warningShort`). */
     warningShort?: string | null;
+    /** What counting the left-out inputs would change (`ScoringBasis.consequence`). */
+    consequence?: string | null;
     note?: string | null;
     omitReason?: boolean;
   };
@@ -69,6 +71,8 @@ export type TrustStripProps = {
   regime?: string;
   className?: string;
 };
+
+const upperFirst = (value: string) => `${value.charAt(0).toUpperCase()}${value.slice(1)}`;
 
 /** What the margin cell prints: the nearer score and its points, or why there is no distance to print. */
 const describeMarginCell = (
@@ -107,14 +111,22 @@ export function TrustStrip({
   /* The warning carries its reason: which inputs were left out is not useful
      without why (2026-10-14). When omitReason is true (e.g. hero when publishedNotice already explains it),
      we keep warning but avoid duplicate repetition. */
-  const basisDetail = [basis.warning, basis.warning && !basis.omitReason ? NOT_COUNTED_REASON : null, basis.note]
+  /* A strip that links to /trust says what the left-out inputs would change, not how
+     (2026-11-03): "Counted, conditions would be Freezing." beside "Startup-market inputs
+     left out". The arithmetic and the reason are /trust's, one tap away. */
+  const consequenceFirst = Boolean(href && basis.consequence && basis.warningShort);
+  const basisDetail = (
+    consequenceFirst
+      ? [basis.consequence, basis.note]
+      : [basis.warning, basis.warning && !basis.omitReason ? NOT_COUNTED_REASON : null, basis.note]
+  )
     .filter((part): part is string => Boolean(part))
     .join(" ");
   /* On the phone line, with /trust a tap away and no note to carry, the warning's short
      form: the full sentence and its reason ran four lines of a report intro under a
      15px title (2026-10-27), so the intro was mostly caveat. The diamond stays on it. */
   const basisShort =
-    phoneLayout === "line" && href && basis.warningShort && !basis.note ? basis.warningShort : null;
+    !consequenceFirst && phoneLayout === "line" && href && basis.warningShort && !basis.note ? basis.warningShort : null;
   /* `routine`: the fact is in the state a reader does not need to act on.
      Only the phone line leaves those out, and only when the strip links to
      the page that states them; an exception (cached sources, Low confidence)
@@ -155,7 +167,7 @@ export function TrustStrip({
        note on why the published week differs always prints. */
     {
       label: SCORING_BASIS_LABEL,
-      value: basis.value,
+      value: consequenceFirst && basis.warningShort ? upperFirst(basis.warningShort) : basis.value,
       ...(basisDetail ? { detail: basisDetail, detailKind: "basis" as const } : {}),
       tone: basisDetail || basis.key === "extended" ? "caveat" : undefined,
       routine: !basisDetail && basis.key === "record",
@@ -173,24 +185,26 @@ export function TrustStrip({
      strands a dot at the start of a line (the defect the footer's separators
      had). A space between label and value keeps the copied text readable. */
   const line = phoneLayout === "line";
-  const foldRoutine = line && Boolean(href);
+  /* Routine cells leave a strip that links to /trust at every width (2026-11-03), not
+     only on the phone line: "Sources: Live" and "Based on: The same data we used for
+     past months" are method a reader cannot act on, and /trust states them. */
+  const foldRoutine = Boolean(href);
   const layout = line
     ? "text-xs max-sm:leading-5 sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-1"
     : "grid grid-cols-2 gap-x-4 gap-y-2 text-xs sm:flex sm:flex-wrap sm:items-center sm:gap-x-6 sm:gap-y-1";
-  const cellLayout = (folded: boolean) =>
-    line
-      ? `${folded ? "max-sm:hidden" : "max-sm:inline"} max-sm:not-first:before:mx-1.5 max-sm:not-first:before:text-slate-600 max-sm:not-first:before:content-['·'] sm:flex sm:flex-row sm:items-baseline sm:gap-1.5`
-      : "flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-1.5";
+  const cellLayout = line
+    ? "max-sm:inline max-sm:not-first:before:mx-1.5 max-sm:not-first:before:text-slate-600 max-sm:not-first:before:content-['·'] sm:flex sm:flex-row sm:items-baseline sm:gap-1.5"
+    : "flex flex-col gap-0.5 sm:flex-row sm:items-baseline sm:gap-1.5";
   const termLayout = line ? "max-sm:inline " : "";
   return (
     <div className={`${layout} ${className}`.trim()} data-trust-strip>
       <dl className="contents">
-        {cells.map((cell) => (
+        {cells.filter((cell) => !(foldRoutine && cell.routine)).map((cell) => (
           /* The margin cell carries two facts, so on the phone grid it takes the
              row the could-change cell used to share with it. */
           <div
             key={cell.label}
-            className={`${cellLayout(foldRoutine && Boolean(cell.routine))}${!line && cell.detail ? " max-sm:col-span-2" : ""}`}
+            className={`${cellLayout}${!line && cell.detail ? " max-sm:col-span-2" : ""}`}
           >
             {/* On the one-line phone layout the label and value are told apart by shade
                 alone, so "Could change next week Risk appetite is 2 pts" ran together. */}

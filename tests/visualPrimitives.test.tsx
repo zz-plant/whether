@@ -366,14 +366,21 @@ describe("AreaTable moved rows", () => {
 describe("TrustStrip", () => {
   const onRecord = { key: "record" as const, value: "The same data we used for past months", warning: null };
 
-  it("is four facts and, off /trust, a link", () => {
-    const html = renderToStaticMarkup(
+  it("is four facts, and off /trust a link with the routine ones left to /trust", () => {
+    const linked = renderToStaticMarkup(
       <TrustStrip recordDateLabel="Sep 18, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="HIGH" couldChangeNextWeek={false} basis={onRecord} href="/trust" />,
     );
+    /* Live sources and the record's own inputs are method a reader can't act on
+       (2026-11-03): a strip that links to /trust leaves them there, at every width. */
+    assert.deepEqual([...linked.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]), ["Data as of", "Room before a change"]);
+    const html = renderToStaticMarkup(
+      <TrustStrip recordDateLabel="Sep 18, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="HIGH" couldChangeNextWeek={false} basis={onRecord} />,
+    );
     assert.deepEqual([...html.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]), ["Data as of", "Sources", "Room before a change", "Based on"]);
-    assert.match(html, /The same data we used for past months/, "the call states its basis");
+    assert.match(html, /The same data we used for past months/, "the call states its basis where nothing links to /trust");
+    const htmlLinked = linked;
     assert.match(html, /Not expected to change next week/, "the margin cell says whether the call could change");
-    assert.match(html, /href="\/trust"/);
+    assert.match(htmlLinked, /href="\/trust"/);
     assert.doesNotMatch(html, /HIGH|MED|LOW/, "the engine's confidence key must not reach the reader");
     assert.doesNotMatch(html, /Confidence/, "the margin is not called confidence on a page");
   });
@@ -423,24 +430,25 @@ describe("TrustStrip", () => {
 
   /* The report intro's phone line (ui-ux-standards §XI): the record date and
      the margin cell, which says whether the call could change, always print;
-     live sources fold behind the link to /trust, and cached ones never do. */
-  it("folds only the routine facts on a phone, and only when it links to /trust", () => {
+     live sources and the record's own inputs are left to /trust (at every width
+     since 2026-11-03), and cached sources or a warning never are. */
+  it("leaves only the routine facts to /trust, and only when it links there", () => {
+    const labels = (html: string) => [...html.matchAll(/<dt[^>]*>([^<]+)<\/dt>/g)].map((match) => match[1]);
     const cellClass = (html: string, label: string) =>
       new RegExp(`<div class="([^"]*)"><dt[^>]*>${label}</dt>`).exec(html)?.[1] ?? "";
     const base = { recordDateLabel: "Oct 5, 2026", sourcesLabel: "All sources live", couldChangeNextWeek: true, basis: onRecord };
 
     const routine = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" href="/trust" phoneLayout="line" />);
-    assert.match(cellClass(routine, "Sources"), /max-sm:hidden/);
-    assert.doesNotMatch(cellClass(routine, "Margin"), /max-sm:hidden/, "whether the call could change always prints");
-    assert.doesNotMatch(cellClass(routine, "Data as of"), /max-sm:hidden/);
+    assert.ok(!labels(routine).includes("Sources"), "live sources are left to /trust");
+    assert.ok(!labels(routine).includes("Based on"), "the record's own inputs are left to /trust");
+    assert.ok(labels(routine).includes("Room before a change"), "whether the call could change always prints");
+    assert.ok(labels(routine).includes("Data as of"));
 
     const exceptions = renderToStaticMarkup(
       <TrustStrip {...base} sourcesLive={false} sourcesLabel="Cached snapshot" confidenceLabel="LOW" href="/trust" phoneLayout="line" />,
     );
-    assert.doesNotMatch(cellClass(exceptions, "Sources"), /max-sm:hidden/, "cached sources always print");
-    assert.doesNotMatch(cellClass(exceptions, "Margin"), /max-sm:hidden/, "a margin close to the line always prints");
-
-    assert.match(cellClass(routine, "Based on"), /max-sm:hidden/, "the record's own inputs fold like live sources");
+    assert.ok(labels(exceptions).includes("Sources"), "cached sources always print");
+    assert.doesNotMatch(cellClass(exceptions, "Sources"), /max-sm:hidden/);
     const warned = renderToStaticMarkup(
       <TrustStrip
         {...base}
@@ -451,15 +459,15 @@ describe("TrustStrip", () => {
         basis={{ ...onRecord, warning: "Startup-market inputs would put risk appetite at 49, below its change line." }}
       />,
     );
-    assert.doesNotMatch(cellClass(warned, "Scored on"), /max-sm:hidden/, "a warning always prints");
+    assert.ok(labels(warned).includes("Based on"), "a warning always prints");
     const extended = renderToStaticMarkup(
       <TrustStrip {...base} sourcesLive confidenceLabel="MED" href="/trust" phoneLayout="line" basis={{ key: "extended", value: "More inputs than the record", warning: null }} />,
     );
-    assert.doesNotMatch(cellClass(extended, "Scored on"), /max-sm:hidden/, "a reading scored on more than the record always says so");
+    assert.ok(labels(extended).includes("Based on"), "a reading scored on more than the record always says so");
 
-    /* /trust has no link to fold behind: the strip is its System status. */
+    /* /trust has no link to leave them to: the strip is its System status. */
     const onTrust = renderToStaticMarkup(<TrustStrip {...base} sourcesLive confidenceLabel="MED" phoneLayout="line" />);
-    assert.doesNotMatch(onTrust, /max-sm:hidden/);
+    assert.deepEqual(labels(onTrust), ["Data as of", "Sources", "Room before a change", "Based on"]);
   });
 
   /* The record basis (2026-10-09): the inputs the record cannot test move no line, and

@@ -75,7 +75,11 @@ describe("the basis on every surface", () => {
         href="/trust"
       />,
     );
-    assert.match(line, /<span class="sm:hidden" data-basis-short="true">startup-market inputs left out<\/span><span class="max-sm:hidden">Startup-market inputs would put risk appetite at 41/);
+    /* A strip that links to /trust leads with what counting them would change
+       (2026-11-03); the arithmetic and the reason stay on unlinked strips and /trust. */
+    assert.equal(reportData.scoringBasis.consequence, "Counted, conditions would be Stormy.");
+    assert.match(line, /<dt[^>]*>Based on<\/dt>\s*<dd[^>]*>Startup-market inputs left out<span[^>]*data-basis-warning[^>]*>\u00A0·\u00A0Counted, conditions would be Stormy\.<\/span>/);
+    assert.doesNotMatch(line, /would put risk appetite at 41/);
     assert.match(html, /Startup-market inputs would put risk appetite at 41, below 50\./);
 
     for (const path of [
