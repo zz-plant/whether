@@ -318,7 +318,7 @@ until the report resolves.
   `whether-home-decision` cookie (the area's slug only; `/privacy` §2.4 lists it), and the next
   visit opens on it. A `?decision=` link still wins.
 - **Settings in one fold.** The plan-horizon control left the card's action row and folds with
-  stage and runway under the calibration line ("Change stage, runway or horizon"), which now
+  stage and runway under the calibration line ("Change settings"), which now
   renders at every horizon on a live brief.
 - **The card names the score holding the areas** when one score holds them all: "On hold while
   funding pressure is above 76: Hiring, Fundraising, Spending and New bets." With two scores
