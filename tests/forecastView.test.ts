@@ -60,3 +60,12 @@ describe("the brief as a forecast", () => {
     assert.match(easing.next, /^If the pace of the last 4 weeks holds, Hiring could restart in about \d+ weeks?\.$/);
   });
 });
+
+describe("the next change", () => {
+  it("carries a pace no further than four weeks", () => {
+    /* Risk appetite drifting down half a point a week from 53: the change line at 50 is six
+       weeks out and Roadmap's pause at 44 eighteen, both past the horizon. */
+    const slow = buildForecastView({ ...base, rows: [row("product-tempo", false)], previous: { tightness: 90, riskAppetite: 55 } });
+    assert.equal(slow.next, "If the pace of the last 4 weeks holds, nothing changes in the next 4 weeks.");
+  });
+});

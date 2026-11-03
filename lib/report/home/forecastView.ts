@@ -118,6 +118,9 @@ const impactOf = (row: HomeAreaRow): AreaImpact => {
 
 const clampScore = (value: number) => Math.max(0, Math.min(100, value));
 
+/** How far a pace is carried: the horizon `projectRegimeFromPace` keeps to. */
+const PROJECTION_WEEKS = 4;
+
 /** Weeks until a score at `pace` points a week reaches `target`, or null when it is not heading there. */
 const weeksTo = (score: number, pace: number, target: number): number | null => {
   if (pace === 0 || Math.sign(target - score) !== Math.sign(pace)) return null;
@@ -174,7 +177,9 @@ export const buildForecastView = ({
     const slot = row.pause?.met ? row.resume : row.pause;
     if (!slot || slot.value === undefined) return [];
     const eta = weeksTo(scoreOf(slot.metric), paceOf(slot.metric), slot.value);
-    return eta !== null && eta <= 13 ? [{ row, eta, restart: Boolean(row.pause?.met) }] : [];
+    /* Four weeks, as far as the conditions projection runs: a straight line drawn
+       further says more than the data does. */
+    return eta !== null && eta <= PROJECTION_WEEKS ? [{ row, eta, restart: Boolean(row.pause?.met) }] : [];
   });
   const soonest = areaChanges.reduce<(typeof areaChanges)[number] | undefined>(
     (best, change) => (best === undefined || change.eta < best.eta ? change : best),
@@ -187,7 +192,7 @@ export const buildForecastView = ({
       ? `If ${window} holds, conditions could turn ${getRegimePublicLabel(projection.projectedRegime)} within ${projection.weeksToFlip} ${projection.weeksToFlip === 1 ? "week" : "weeks"}.`
       : soonest
         ? `If ${window} holds, ${decisionAreaLabel(soonest.row.area)} could ${soonest.restart ? "restart" : "pause"} in about ${soonest.eta} ${soonest.eta === 1 ? "week" : "weeks"}.`
-        : `If ${window} holds, nothing changes this quarter.`;
+        : `If ${window} holds, nothing changes in the next ${PROJECTION_WEEKS} weeks.`;
 
   /* The strip: this week from the reading; four weeks from the pace, as far as the
      projection runs; the quarter from the record, as a frequency. */
