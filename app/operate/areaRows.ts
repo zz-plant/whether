@@ -20,7 +20,7 @@ import { findLeadAnswerForArea } from "../answers/decisionPages";
  * a client component takes the type alone — this module reads the answer
  * pages for the row links, which must not follow it into a client bundle.
  */
-export type AreaRowText = {
+type AreaRowText = {
   area: DecisionArea;
   rule: string;
   pause?: { line: string; distance?: string; state?: LineState };

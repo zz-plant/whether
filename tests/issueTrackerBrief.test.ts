@@ -1,11 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import {
-  buildGuardrailTagBlocks,
-  buildIssueTrackerMarkdownBrief,
-} from "../lib/export/issueTrackerBrief";
+import { buildIssueTrackerMarkdownBrief } from "../lib/export/issueTrackerBrief";
 import { assessment, fixtureBriefDocument, fixtureWeeklyCall } from "./factories/exportFixtures";
-import type { ActionStripItem } from "../lib/report/operatingCalls";
 
 /**
  * These two builders lived inside `exportBriefPanel.tsx`, a 940-line client
@@ -81,87 +77,5 @@ describe("buildIssueTrackerMarkdownBrief", () => {
     const linear = buildIssueTrackerMarkdownBrief(fixtureBriefDocument(), "markdown");
 
     assert.equal(jira, linear);
-  });
-});
-
-describe("buildGuardrailTagBlocks", () => {
-  const items: ActionStripItem[] = [
-    {
-      lever: "hiring-stance",
-      label: "Hiring posture",
-      ownerLabel: "VP Eng",
-      areaActionNow: "Hold speculative hiring.",
-      triggerThreshold: "Pause net-new hiring above 56.",
-      reversalCondition: "Resume below 46.",
-    },
-    {
-      lever: "investment-pace",
-      label: "Investment pace",
-      ownerLabel: "CEO",
-      areaActionNow: "Keep expansion bets reversible.",
-      triggerThreshold: "Pause expansion spend above 70.",
-      reversalCondition: "Resume below 60.",
-    },
-  ];
-
-  it("builds one block per business area, each carrying the conditions, the pause and restart lines and what would change the guidance", () => {
-    const blocks = buildGuardrailTagBlocks({
-      actionStripItems: items,
-      postureLabel: "Cloudy",
-      recordDate: "2026-03-04",
-      callChangesIf: "The two scores point the same way for a second reading; until then the guidance is not changing.",
-    });
-
-    assert.equal(blocks.length, 2);
-    for (const block of blocks) {
-      assert.match(block.markdown, /\*\*Conditions:\*\* Cloudy/);
-      assert.match(block.markdown, /\*\*Action now:\*\* /);
-      assert.match(block.markdown, /\*\*Pause if:\*\* /);
-      assert.match(block.markdown, /\*\*Restart when:\*\* /);
-      assert.match(block.markdown, /Week of Mar 2, 2026/, "the week by its Monday");
-    }
-    assert.match(blocks[0].markdown, /Hold speculative hiring\./);
-    // The area heads the block, so the lines under it carry only their condition.
-    assert.match(blocks[0].markdown, /^\*\*Hiring\*\*$/m);
-    assert.match(blocks[0].markdown, /\*\*Pause if:\*\* Net-new hiring above 56$/m);
-    assert.doesNotMatch(blocks[0].markdown, /Pause if:\*\* Pause|Restart when:\*\* Resume/);
-    assert.match(blocks[1].markdown, /Keep expansion bets reversible\./);
-  });
-
-  /* It carried the nearest market move ("If the 1-month Treasury bill rate rises
-     0.15%, conditions turn Cloudy."), which on a held week named a rate move beside
-     guidance the hold says is not changing. */
-  it("carries the brief's own sentence for what would change the guidance", () => {
-    const blocks = buildGuardrailTagBlocks({
-      actionStripItems: items,
-      postureLabel: "Cloudy",
-      recordDate: "2026-03-04",
-      callChangesIf: "The two scores point the same way for a second reading; until then the guidance is not changing.",
-    });
-
-    assert.ok(
-      blocks.every((block) =>
-        block.markdown.includes(
-          "**What would change this guidance:** The two scores point the same way for a second reading; until then the guidance is not changing.",
-        ),
-      ),
-    );
-  });
-
-  it("omits the line when it is not given", () => {
-    const blocks = buildGuardrailTagBlocks({
-      actionStripItems: items,
-      postureLabel: "Cloudy",
-      recordDate: "2026-03-04",
-    });
-
-    assert.ok(blocks.every((block) => !block.markdown.includes("What would change this guidance")));
-  });
-
-  it("returns no blocks for an empty action strip", () => {
-    assert.deepEqual(
-      buildGuardrailTagBlocks({ actionStripItems: [], postureLabel: "Cloudy", recordDate: "2026-03-04" }),
-      [],
-    );
   });
 });

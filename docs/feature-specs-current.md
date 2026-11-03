@@ -111,7 +111,7 @@ The header carries four groups, each with a hub, read from one module
   disclosure; clearing the last valid selection returns to `#guided-translation`
   inside the browse controls. Invalid selections must not target an absent result.
 - **Sharing has one home.** `/share` holds every format, the slide and card clipboard buttons
-  (moved from the brief), the meeting snippet (moved from `/trust`) and the links to API & MCP and
+  (moved from the brief), the meeting snippet (moved from `/trust`; folded into the agenda in §1.1.100) and the links to API & MCP and
   RSS. The brief's Do and share and Trust each carry one "Share or embed this →" link
   (`app/components/shareOrEmbedLink.tsx`); Decide's Share step is gone, and its closing card to
   `/share` went in §1.1.65. Trust's one-line citation
@@ -1974,14 +1974,15 @@ work-item tags, the pull policies and the role memos. That was about 5,700px on 
   drawn once.
 - **Sets of blocks** (a tag per area, a pull policy per area plus the WIP cap, the role memo and
   checklist) render their own per-block copy controls in the preview's place.
-  `GuardrailTagControls` and `PullPolicyControls` are bodies now; the picker names them.
+  `GuardrailTagControls` and `PullPolicyControls` are bodies now; the picker names them. (All three
+  were removed in §1.1.100.)
 - **Canonical links.** The rail's four formats are built on the server against `siteUrl`, so the
   brief link a reader pastes points at the brief rather than at a preview host, and the server
   renders the preview the page opens on.
 - **URL state.** The selection is the hash (`/share#investor-update`), written with
   `replaceState` so switching formats adds no history entries. The old section anchors still
-  land: `#meeting-slack` opens the Slack post, `#tickets-kanban` the work-item tags,
-  `#role-memos` the role memos. `#image-artifacts` and `#embed` stay real sections.
+  land: `#meeting-slack` opens the Slack post, `#tickets-kanban` the ticket brief,
+  `#role-memos` the email (§1.1.100). `#image-artifacts` and `#embed` stay real sections.
 - **Embed folded.** The embed builder is a disclosure, open only when the hash is `#embed` (the
   retired `/embed` route redirects there).
 - **Calendar link built in the browser.** "Add a Monday review" is computed from the reader's
@@ -4220,6 +4221,29 @@ measured in shared components:
 Checked, not changed: 10px and 9px labels inside `aria-hidden` SVG graphics (§XXII allows 10px
 there), the `weather-hit::after` 44px hitboxes, and the timeline year ticks, whose 28px boxes are
 a dense control rather than a 44px target.
+
+### 1.1.100 `/share` keeps one format per job (2026-11-03)
+
+`/share` offered 18 formats. Five were a cut of another, and every format is pinned word for word
+in `tests/briefFormatsPinned.test.ts`, so each was one more place a copy change had to land:
+
+| Removed | Was | Carried by | Old hash opens |
+| --- | --- | --- | --- |
+| Standup line | whether the guidance moved, then what would change it | the Slack post's first lines | `#slack-post` |
+| Meeting snippet | conditions, dates, trust line, change line, guidance | the agenda and the meeting pack | `#agenda` |
+| Work-item tags | one ticket block per area | the ticket brief | `#ticket-brief` |
+| Pull policies | per-area stop and resume lines and a regime WIP cap | the ticket brief | `#ticket-brief` |
+| Role memos | the week as a memo and a checklist per role | the email | `#email` |
+
+The "Tickets and boards" group is "Tickets", and the "Team" group is gone with its one format. The
+picker has no `panel` kind left: every format is text or the investor update. Deleted with them:
+`GuardrailTagControls`, `PullPolicyControls`, `ExecutiveBriefingPanel` and the
+`executiveBriefingSuite` copy it read, `buildGuardrailTagBlocks`, `buildPullPolicyBlocks`,
+`buildMeetingSnippet` and `lib/report/wipPolicy.ts`. `buildStandupLine` stays: the MCP tool
+`get_standup_line` serves it. The golden file lost exactly the four removed keys per fixture, so
+no remaining format changed a byte. This is the "one shareable brief" direction in
+`docs/adoption-driven-change-plan.md`, applied to the formats that duplicated others; the Slack post
+and full brief stay as two on purpose (§1.1.35).
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,

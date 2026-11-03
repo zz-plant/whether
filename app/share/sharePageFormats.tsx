@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, type ReactNode } from "react";
+import { useMemo } from "react";
 import type { ActivationCommitment } from "../../lib/activationFunnel";
 import {
   formatInvestorUpdateSnippet,
@@ -23,9 +23,14 @@ import { useOperatorRunway } from "../components/useOperatorRunway";
  * the role memos — about 5,700px on desktop and 10,000 on a phone, with the
  * Slack text drawn three times (DD-041). Worse, the cards' preview showed only
  * what had already been copied, so a reader copied blind. Now one list, one
- * preview, one copy action; the formats that are sets of blocks (a tag per
- * area, a policy per area, the role memo) render their own per-block copy
- * controls in the preview's place.
+ * preview, one copy action.
+ *
+ * Five formats left on 2026-11-03, each a cut of another: the standup line (the
+ * Slack post's first lines), the meeting snippet (the agenda's facts), the
+ * work-item tags and pull policies (the ticket brief, one area at a time) and
+ * the role memos (the email, split by role). Every format is pinned word for
+ * word in `tests/briefFormatsPinned.test.ts`, so each one is a place a copy
+ * change has to land; their old hashes open the format that carries them.
  *
  * Two Slack texts, on purpose: the short post (the share rail's Slack format,
  * the shape a channel skims) and the full brief (the weekly operator brief, for
@@ -34,7 +39,7 @@ import { useOperatorRunway } from "../components/useOperatorRunway";
  * The selection is the URL hash, so a link can open the page on a format
  * (`/share#investor-update`) and the page's old section anchors still land.
  */
-type ShareFormatGroup = "Chat" | "Social" | "Meetings" | "Docs and email" | "Tickets and boards" | "Team";
+type ShareFormatGroup = "Chat" | "Social" | "Meetings" | "Docs and email" | "Tickets";
 
 type ShareFormatBase = {
   id: string;
@@ -68,16 +73,19 @@ export type ShareFormatOption = ShareFormatBase &
       }
     /** Composed in the browser: its last paragraph reads the reader's runway band, and the page is cached. */
     | { kind: "investor"; parts: InvestorUpdateSnippetParts; copyLabel: string }
-    | { kind: "panel"; content: ReactNode }
   );
 
-const GROUP_ORDER: readonly ShareFormatGroup[] = ["Chat", "Social", "Meetings", "Docs and email", "Tickets and boards", "Team"];
+const GROUP_ORDER: readonly ShareFormatGroup[] = ["Chat", "Social", "Meetings", "Docs and email", "Tickets"];
 
 /** The anchors the stacked page linked to, so an old link opens the format that lived there. */
 const LEGACY_HASHES: Readonly<Record<string, string>> = {
   "meeting-slack": "slack-post",
-  "tickets-kanban": "work-item-tags",
-  "role-memos": "role-memos",
+  "tickets-kanban": "ticket-brief",
+  standup: "slack-post",
+  "meeting-snippet": "agenda",
+  "work-item-tags": "ticket-brief",
+  "pull-policies": "ticket-brief",
+  "role-memos": "email",
 };
 
 /** The format a hash names, or the first format when it names none. */
@@ -191,11 +199,7 @@ export function SharePageFormats({
   };
 
   const text =
-    selected.kind === "text"
-      ? selected.text
-      : selected.kind === "investor"
-        ? formatInvestorUpdateSnippet(selected.parts, runwayBand)
-        : "";
+    selected.kind === "text" ? selected.text : formatInvestorUpdateSnippet(selected.parts, runwayBand);
   const hint =
     selected.kind === "investor" && !runwayBand
       ? `${selected.hint} Pick a runway band on the brief to add what it means for your cash.`
@@ -280,10 +284,7 @@ export function SharePageFormats({
             <h3 className="text-fluid-base font-semibold text-slate-100 max-md:sr-only">{selected.label}</h3>
             <p className="text-xs leading-relaxed text-slate-400">{hint}</p>
           </div>
-          {selected.kind === "panel" ? (
-            selected.content
-          ) : (
-            <>
+          <>
               {selected.kind === "text" && selected.preview === "chat" ? (
                 <ChatPreview label={selected.label} text={text} />
               ) : (
@@ -311,8 +312,7 @@ export function SharePageFormats({
               {error ? (
                 <p className="text-xs text-amber-200">Clipboard access failed. Select the preview text and copy it manually.</p>
               ) : null}
-            </>
-          )}
+          </>
         </div>
       </div>
     </section>

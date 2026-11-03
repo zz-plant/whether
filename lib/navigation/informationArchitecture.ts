@@ -270,7 +270,7 @@ export const navigationLabelByPath = navigationPages.reduce<Record<string, strin
  */
 export const utilityLinks = [
   {
-    // Carries the embed builder, the citation and the meeting snippet too: every
+    // Carries the embed builder and the citation too: every
     // way the guidance leaves the site starts here.
     href: "/share",
     label: "Share and embed",

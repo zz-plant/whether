@@ -107,8 +107,8 @@ export async function buildTrustPageModel() {
     ...(readerReturnsLine ? [{ href: "#reader-returns", label: "Reader returns" }] : []),
     { href: "#formula-reference", label: "Formula reference" },
     { href: "#source-board", label: "Sources" },
-    // "Cite this guidance" and "Meeting snippet" moved to /share on 2026-10-08,
-    // with every other paste of the week.
+    // "Cite this guidance" moved to /share on 2026-10-08, with every other paste
+    // of the week; "Meeting snippet" went with it and was folded into the agenda.
     { href: "#confidence-limits", label: "How close to changing" },
     { href: "#revisit-call", label: "When to look again" },
     /* Last, with the section itself: the owner's cron-health panel led a page a

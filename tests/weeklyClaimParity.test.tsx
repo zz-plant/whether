@@ -10,6 +10,8 @@ import { SharePageFormats } from "../app/share/sharePageFormats";
 import { formatInvestorUpdateSnippet } from "../lib/export/investorUpdateSnippet";
 import { buildAgentState } from "../lib/agentState";
 import { loadAgentInterfaceContext } from "../lib/agentInterface";
+import { callAgentTool } from "../lib/agent/tools";
+import { z } from "zod";
 import { buildCliStatusExpandedContract } from "../lib/cli/contracts";
 import { formatConditionsChangeLine } from "../lib/summary/summaryFormatting";
 import { formatGuidance } from "../lib/export/briefBuilders";
@@ -52,7 +54,7 @@ import { macros, treasury as fixtureTreasury } from "./factories/exportFixtures"
  * Each claim a reader can act on has one builder, and every surface that prints
  * the claim prints that builder's value: the homepage card and its quiet-day line,
  * the share card, /brief.md, the embed, the brief document every paste renders, the
- * agent state, the /share standup line, the /api/decision memo, the frozen archive
+ * agent state, the MCP standup line, the /api/decision memo, the frozen archive
  * record, and the Monday Slack post and email. Until 2026-10-07 the week's action had
  * three builders. On an ordinary week the pastes led with the lead area's rule while
  * the page, the embed and the card led with the week's headline; on a held week the
@@ -184,7 +186,8 @@ const renderWeek = async (treasury: TreasuryData, readings: MacroSeriesReading[]
       };
     })()),
     memo: buildDecisionMemo(home),
-    standup: share.options.flatMap((option) => (option.id === "standup" && option.kind === "text" ? [option.text] : []))[0] ?? "",
+    /* The standup line left /share on 2026-11-03; `get_standup_line` is where it is served. */
+    standup: z.object({ standupLine: z.string() }).parse((await callAgentTool("get_standup_line", {}, "http")).structuredContent).standupLine,
     investorUpdate: share.options.flatMap((option) => (option.kind === "investor" ? [formatInvestorUpdateSnippet(option.parts, null)] : []))[0] ?? "",
     record: frozen.record,
     slack: await postedText(snapshot),
@@ -424,7 +427,7 @@ describe("one week, one set of claims, every surface", () => {
         /* The one-line surfaces: the nearer line in points, a clause of the sentence,
            or on a held week the hold's own condition. */
         const callChangeLine = buildCallChangeLine({ weeklyCall: home.weeklyCall, assessment });
-        assert.ok(standup.endsWith(` ${callChangeLine}`), `the /share standup line: ${standup}`);
+        assert.ok(standup.endsWith(` ${callChangeLine}`), `the MCP standup line: ${standup}`);
         assert.doesNotMatch(standup, /%|flip/i, "the standup line in points, without engine words");
         if (week.held) {
           assert.equal(callChangeLine, `${label}: ${callChangesIf}`);
@@ -480,7 +483,7 @@ describe("one week, one set of claims, every surface", () => {
         assert.ok(agent.guidance.call.startsWith(hold.actionNow), "the agent state");
         assert.equal(memo.guardrail, hold.pauseIf, "the /api/decision memo");
         assert.equal(record.summary, hold.currentCall, "the frozen record");
-        assert.ok(standup.startsWith("Guidance on hold this week; no pace change."), `the /share standup line: ${standup}`);
+        assert.ok(standup.startsWith("Guidance on hold this week; no pace change."), `the MCP standup line: ${standup}`);
       });
     });
   }

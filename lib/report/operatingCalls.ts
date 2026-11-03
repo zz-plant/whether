@@ -15,7 +15,6 @@ import { CircleDashed, Pause, Play, type LucideIcon } from "lucide-react";
 import { formatDecisionLatencyLine } from "./decisionLatency";
 import { businessAreaLabel, businessAreaOrder, businessAreaOwner, type BusinessAreaKey } from "./decisionKnobs";
 import { joinSentences } from "./reportFormatting";
-import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../regimeEngineCore";
 
 /**
@@ -489,65 +488,6 @@ export const buildRoleAwareOperatingTemplates = (rules: BoundedDecisionRule[]): 
 };
 
 /**
- * Kanban pull-policy blocks, derived from the same pause/resume conditions the
- * weekly call prints.
- *
- * Kanban teams pull continuously — there is no sprint boundary to attach a
- * ceremony to — so the value is the regime stated as a pull policy: when to
- * stop pulling a class of work and when to resume. The conditions are the
- * bounded rules' own `pauseConditions` / `resumeConditions` (plus any
- * qualitative pause/resume qualifier), re-verbed for a pull system. A card
- * pasted from here cannot state a threshold the weekly call does not, because
- * it is the same data.
- *
- * The verb stays the area's action so the block reads as "pull {action} until
- * X, restart when Y" rather than a generic "be cautious".
- */
-export type PullPolicyBlock = {
-  area: BusinessAreaKey;
-  label: string;
-  /** What the team keeps pulling, in the area's own action terms. */
-  pull: string;
-  /** Stop pulling when: the pause conditions, as the hero prints them. */
-  stopPullingWhen: string;
-  /** Restart when: the resume conditions, or the reversal if none are stated. */
-  resumeWhen: string;
-  /** Copy-ready markdown for a board header or wiki. */
-  markdown: string;
-};
-
-const conditionLabel = (condition: RuleCondition): string => condition.label;
-
-const listConditions = (conditions: readonly RuleCondition[]): string =>
-  conditions.length === 0 ? "" : conditions.map(conditionLabel).join(" or ");
-
-export const buildPullPolicyBlocks = (
-  items: readonly ActionStripItem[],
-): PullPolicyBlock[] =>
-  items.map((item) => {
-    const pauseLines = listConditions(item.pauseConditions ?? []);
-    const pauseClause = [pauseLines, item.pauseQualifier].filter(Boolean).join(" or ");
-    const resumeLines = listConditions(item.resumeConditions ?? []);
-    const resumeClause = [resumeLines, item.resumeQualifier].filter(Boolean).join(" and ");
-    const stopPullingWhen = pauseClause || item.triggerThreshold;
-    const resumeWhen = resumeClause || item.reversalCondition;
-
-    return {
-      area: item.lever,
-      label: item.label,
-      pull: item.areaActionNow,
-      stopPullingWhen,
-      resumeWhen,
-      markdown: [
-        `**Pull policy — ${item.label}**`,
-        `Pull: ${item.areaActionNow}`,
-        `Stop pulling when: ${stopPullingWhen}`,
-        `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${resumeWhen}`,
-      ].join("\n"),
-    };
-  });
-
-/**
  * 5-Area Corridor Ladder: all 5 operating areas positioned on normalized 0–100 scales
  * where trouble / pause is ALWAYS to the right (satisfying ui-ux-standards §XV).
  * Each row carries its pause line, restart line, deadband, current distance to unlock,
@@ -667,4 +607,3 @@ export const buildDecisionCorridorModel = (
     closestToUnlock,
   };
 };
-

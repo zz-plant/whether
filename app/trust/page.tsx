@@ -54,7 +54,7 @@ export default async function MethodPage({
      derivation now (`SourceBoard`), because it is the evidence the strip's
      "Sources" verdict was judged from. The citation and the meeting snippet
      that bracketed it moved to /share on 2026-10-08 (`ShareOrEmbedLink`
-     below). */
+     below); the snippet was folded into the agenda there on 2026-11-03. */
   const secondaryContent = (
     <>
       <ReportSection
@@ -204,8 +204,7 @@ export default async function MethodPage({
         <div className="space-y-10">{secondaryContent}</div>
       )}
 
-      {/* The citation and the meeting snippet are /share formats now, with every
-          other paste of the week. */}
+      {/* The citation is a /share format now, with every other paste of the week. */}
       <ShareOrEmbedLink />
 
       {/* The method moved to /about (2026-10-09): it is the product's thesis, and as

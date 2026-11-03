@@ -65,7 +65,7 @@ describe("one way out to /share from each reading page", () => {
 });
 
 describe("/share holds what the other pages stopped carrying", () => {
-  it("offers the meeting snippet beside the citation, and the slide and card clipboard buttons", async () => {
+  it("offers the citation, and the slide and card clipboard buttons", async () => {
     const page = await import("../app/share/page");
     const optionIds: string[] = [];
     const walk = (node: unknown): void => {
@@ -75,7 +75,6 @@ describe("/share holds what the other pages stopped carrying", () => {
       walk(node.props.children);
     };
     walk(await page.default());
-    assert.ok(optionIds.includes("meeting-snippet"), "the meeting snippet is a format");
     assert.ok(optionIds.includes("citation"), "the citation is a format");
     const files = readFileSync("app/share/shareImageArtifacts.tsx", "utf8");
     assert.match(files, /<CopyMeetingSlideButton \/>/);
