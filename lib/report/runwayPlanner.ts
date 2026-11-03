@@ -342,12 +342,12 @@ export const buildRunwayPlan = (rawInput: RunwayPlannerInput): RunwayPlannerOutp
     safeRunwayBand: {
       minMonths: round(safeBand.minMonths),
       maxMonths: round(safeBand.maxMonths),
-      summary: `A ${STAGE_LABELS[input.stage]} ${SECTOR_LABELS[input.sector]} team should hold ${round(safeBand.minMonths)}–${round(safeBand.maxMonths)} months of runway.`,
+      summary: `A ${STAGE_LABELS[input.stage]} ${SECTOR_LABELS[input.sector]} company should hold ${round(safeBand.minMonths)}–${round(safeBand.maxMonths)} months of runway.`,
     },
     raiseTimingWindow: {
       ...raiseWindow,
       timeToSafeRunwayTargetMonths,
-      summary: `Open the raise between month ${raiseWindow.startMonth} and ${raiseWindow.endMonth}. Safe runway is ${timeToSafeRunwayTargetMonths} months out, with approvals moving at a ${knobLevelWords(approvalVelocity.label)} pace.`,
+      summary: `Open the raise between month ${raiseWindow.startMonth} and ${raiseWindow.endMonth}. Safe runway is ${timeToSafeRunwayTargetMonths} months out, with decisions moving at a ${knobLevelWords(approvalVelocity.label)} pace.`,
     },
     burnAdjustmentRange: {
       recommendedDeltaPercent,
