@@ -4250,7 +4250,10 @@ The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it
 in the order a reader asks:
 
 - **What changed.** One table of every signal: where it came from, where it sits against its line,
-  and why it matters. The focus filters narrow it and travel in the URL. Under the table, a link to
+  and why it matters. Since 2026-11-03 a row no longer says "Moves first" (risk appetite, the curve)
+  or "Confirms later" (funding pressure): the premise test found both scores track deal count most
+  closely in the same quarter and the next, falling off together (`docs/research/premise-test-results.md`,
+  "Lead and lag"), so neither label was supported. The focus filters narrow it and travel in the URL. Under the table, a link to
   the brief's "What would change this guidance": the two score ladders with their Pause if and
   Restart when lines were this page's second section until 2026-10-27, the brief's section drawn again.
 - **Deeper evidence.** Seven instruments, each a closed disclosure titled with its question: What are

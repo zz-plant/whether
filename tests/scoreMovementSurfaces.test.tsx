@@ -118,6 +118,9 @@ describe("the evidence page", () => {
     assert.equal((html.match(/data-movement=/g) ?? []).length, 2);
     assert.match(html, /All of it came from interest rates\./);
     assert.match(html, /The Aug 31 score was built from interest rates alone\./);
+    /* The premise test found both scores move with fundraising in the same quarter
+       (docs/research/premise-test-results.md), so the table claims neither leads. */
+    assert.doesNotMatch(html, /Moves first|Confirms later/);
   });
 
   it("prints rollup indicators bridging instruments to composite score ladders", () => {

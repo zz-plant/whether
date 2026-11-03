@@ -1,7 +1,6 @@
 import type { RegimeAssessment } from "../regimeEngine";
 import type { RegimeSignalKey } from "./reportFormatting";
 import { regimeSignalLabelByKey } from "./reportFormatting";
-import { indicatorKindLabel } from "../indicatorClassification";
 import type { ReportDynamics } from "./reportDataTypes";
 import { describeSignalDirection } from "./signalClusterReading";
 import { comparisonBasis } from "./comparisonBasis";
@@ -62,8 +61,6 @@ export type SignalDynamicsSource = SignalDeltaSource & Partial<Pick<ReportDynami
 export type SignalReferenceRow = {
   key: RegimeSignalKey;
   label: string;
-  /** "Leading (predictive)" or "Lagging (confirming)"; null for an input that is neither. */
-  kindLabel: string | null;
   /** Null when the series did not resolve this week. */
   value: number | null;
   previous: number | null;
@@ -179,7 +176,6 @@ const rowFor = (
   return {
     key,
     label: regimeSignalLabelByKey[key],
-    kindLabel: indicatorKindLabel(key),
     value,
     previous: previousFrom(value, delta),
     delta,
