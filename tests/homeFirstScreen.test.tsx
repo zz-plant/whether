@@ -40,11 +40,14 @@ describe("the band states the week's exception, or nothing", () => {
     assert.equal(describeLineStateBand([{ area: "hiring" }]), null);
   });
 
-  it("names the area and its distance when a line is close", () => {
+  /* The distance is how big a move it takes against the month-end record
+     (2026-11-03), not points of a score no reader has a feel for. */
+  it("names the area and how big a move would pause it when a line is close", () => {
     const model = describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 3) }]);
     assert.equal(model?.state, "near");
-    assert.equal(model?.text, "Hiring — 3 pts from pausing.");
+    assert.equal(model?.text, "Hiring — an unusual move from pausing.");
     assert.equal(model?.href, "#what-it-changes");
+    assert.equal(describeLineStateBand([{ area: "hiring", pause: pauseSlot(false, 0) }])?.text, "Hiring is on the edge of pausing.");
   });
 
   it("says how far a hold is from lifting, not just that it is one", () => {
@@ -52,15 +55,15 @@ describe("the band states the week's exception, or nothing", () => {
       { area: "hiring", pause: pauseSlot(true, 0), resume: restartSlot(false, 12) },
     ]);
     assert.equal(model?.state, "crossed");
-    assert.equal(model?.text, "Hiring — 12 pts from restarting.");
+    assert.equal(model?.text, "Hiring — a rare move from restarting.");
   });
 
   it("picks the hold that lifts first", () => {
     const model = describeLineStateBand([
       { area: "hiring", pause: pauseSlot(true, 0), resume: restartSlot(false, 12) },
-      { area: "capital-raising", pause: pauseSlot(true, 0), resume: restartSlot(false, 4) },
+      { area: "capital-raising", pause: pauseSlot(true, 0), resume: restartSlot(false, 2) },
     ]);
-    assert.equal(model?.text, "Fundraising — 4 pts from restarting.");
+    assert.equal(model?.text, "Fundraising — an unusual move from restarting.");
   });
 
   it("still states a hold with no numeric restart line", () => {
@@ -81,10 +84,10 @@ describe("the band states the week's exception, or nothing", () => {
 describe("the band is drawn in the line state's ink", () => {
   it("prints the sentence and the way to the areas", () => {
     const html = renderToStaticMarkup(
-      <LineStateBand model={{ state: "near", area: "hiring", text: "Hiring — 3 pts from pausing.", href: "#what-it-changes", action: "What to do" }} />,
+      <LineStateBand model={{ state: "near", area: "hiring", text: "Hiring — a common move from pausing.", href: "#what-it-changes", action: "What to do" }} />,
     );
     assert.match(html, /data-line-state-band="near"/);
-    assert.match(html, /Hiring — 3 pts from pausing\./);
+    assert.ok(html.includes("Hiring — a common move from pausing."));
     assert.match(html, /href="#what-it-changes"/);
   });
 

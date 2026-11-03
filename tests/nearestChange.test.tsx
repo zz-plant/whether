@@ -27,10 +27,13 @@ describe("the nearest change, by what it changes to", () => {
     }
   });
 
+  /* The distance is how big a move it takes against the month-end record
+     (2026-11-03): "Risk appetite 2 pts from Freezing" was a size no reader could judge. */
   it("names the conditions across the change in the margin, and without a regime says a change", () => {
-    assert.equal(formatMarginReading({ signal: "riskAppetite", points: 2 }, "DEFENSIVE"), "Risk appetite 2 pts from Freezing");
+    assert.equal(formatMarginReading({ signal: "riskAppetite", points: 2 }, "DEFENSIVE"), "A common risk-appetite move from Freezing");
     assert.equal(formatMarginReading({ signal: "tightness", points: 0 }, "EXPANSION"), "Funding pressure on the edge of Cloudy");
-    assert.equal(formatMarginReading({ signal: "riskAppetite", points: 1 }), "Risk appetite 1 pt from a change");
+    assert.equal(formatMarginReading({ signal: "riskAppetite", points: 1 }), "A common risk-appetite move from a change");
+    assert.equal(formatMarginReading({ signal: "tightness", points: 20 }, "DEFENSIVE"), "A rare funding-pressure move from Sunny");
   });
 
   it("says it in four words for the running head, and nothing without a margin or a regime", () => {
@@ -61,7 +64,7 @@ describe("a brief frame worth opening", () => {
       />,
     );
     assert.match(html, /<div class="md:hidden" data-hero-phone-figure="true"><p>the ladder<\/p><\/div>/);
-    assert.ok(html.indexOf("data-hero-phone-figure") < html.indexOf("Risk appetite 2 pts from Freezing"), "the drawing, then the sentence");
+    assert.ok(html.indexOf("data-hero-phone-figure") < html.indexOf("A common risk-appetite move from Freezing"), "the drawing, then the sentence");
   });
 
   it("leads a section with its answer, before its evidence", () => {

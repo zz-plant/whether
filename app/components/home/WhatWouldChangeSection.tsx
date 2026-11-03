@@ -17,8 +17,11 @@ type HomeScoreLadder = {
 
 type FlipProximityLine = {
   axis: "tightness" | "riskAppetite";
+  /** The move in everyday terms first: a Fed step for the short rate (`buildFlipProximity`). */
   sentence: string;
-  /** How big the move is against a Fed step and the record's months (`describeMarketMoveScale`). */
+  /** The instrument that everyday size stands for, on the line under it. */
+  instrument?: string;
+  /** How often the record's months moved that far (`describeMarketMoveScale`). */
   scale?: string | null;
 };
 
@@ -168,12 +171,17 @@ export function WhatWouldChangeSection({
                 <details className="weather-auto-chevron text-fluid-xs">
                   <summary className="cursor-pointer select-none font-medium text-slate-300">In interest-rate terms</summary>
                   <ul className="space-y-1.5 text-slate-300">
-                    {marketMoves.map((line) => (
-                      <li key={line.sentence} data-flip-axis={line.axis}>
-                        <span className="text-slate-400">{line.label}:</span> {line.sentence}
-                        {line.scale ? <span className="block text-slate-400">{line.scale}</span> : null}
-                      </li>
-                    ))}
+                    {/* The everyday size leads; the instrument and the record's count are the
+                        secondary line, for the reader who wants the market's own units. */}
+                    {marketMoves.map((line) => {
+                      const detail = [line.instrument, line.scale].filter(Boolean).join(" ");
+                      return (
+                        <li key={line.sentence} data-flip-axis={line.axis}>
+                          <span className="text-slate-400">{line.label}:</span> {line.sentence}
+                          {detail ? <span className="block text-slate-400">{detail}</span> : null}
+                        </li>
+                      );
+                    })}
                   </ul>
                 </details>
               ) : null}

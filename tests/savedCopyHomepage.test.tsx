@@ -224,6 +224,6 @@ describe("a saved copy's lines are the reading's", () => {
     const saved = renderToStaticMarkup(<TrustStrip {...buildTrustStripProps({ ...base, isFallback: true })} />);
     assert.match(live, /Could change next week/);
     assert.doesNotMatch(saved, /next week|Past conditions held/);
-    assert.match(saved, /Risk appetite 2 pts/);
+    assert.ok(saved.includes("A common risk-appetite move"), "a saved copy still states its distance");
   });
 });
