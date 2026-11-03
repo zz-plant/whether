@@ -34,7 +34,12 @@ export const formatDocumentMargin = (document: {
   confidence: BriefDocument["confidence"];
   readings: Pick<BriefDocument["readings"], "scores"> & {
     thresholds: Pick<BriefDocument["readings"]["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
-  } & Partial<Pick<BriefDocument["readings"], "baseRateUsed" | "curveSlope" | "tightnessPressure" | "tightnessSaturated">>;
+  } & Partial<
+    Pick<
+      BriefDocument["readings"],
+      "baseRateUsed" | "curveSlope" | "tightnessPressure" | "tightnessSaturated" | "baseRateVelocityPoints"
+    >
+  >;
 }): string => {
   const margin = resolveNearestLineMargin({
     scores: {
@@ -43,6 +48,7 @@ export const formatDocumentMargin = (document: {
       curveSlope: document.readings.curveSlope,
       tightnessPressure: document.readings.tightnessPressure,
       tightnessSaturated: document.readings.tightnessSaturated,
+      baseRateVelocityPoints: document.readings.baseRateVelocityPoints,
     },
     thresholds: document.readings.thresholds,
   });

@@ -4,9 +4,14 @@ import {
   CONFIDENCE_PERCENT_FLOOR,
   CONFIDENCE_PERCENT_CEILING,
   CONFIDENCE_PERCENT_IMPUTED_CEILING,
+  CURVE_INVERSION_TIGHTNESS_MULTIPLIER,
+  MISSING_SLOPE_FALLBACK,
   RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
   REGIME_CONFIDENCE_NEAR_THRESHOLD,
   REGIME_CONFIDENCE_MEDIUM_THRESHOLD,
+  TIGHTNESS_BASE_RATE_POINTS,
+  TIGHTNESS_CAP,
+  TIGHTNESS_INVERSION_POINTS,
 } from "../regimeEngineCore";
 import { isSavedCopy } from "./provenanceStatus";
 
@@ -22,9 +27,14 @@ export type ConfidenceInputs = {
      */
     baseRateUsed?: "FED" | "1M" | "3M" | "MISSING";
     curveSlope?: number | null;
-    /* Optional for the same reason: set on every live assessment, never stored. */
+    /*
+     * Optional for the same reason: set on every live assessment, never stored.
+     * The pressure is counted with the curve slope and the speed term beside it
+     * (`resolveTightnessGap`), so a caller that passes it passes those too.
+     */
     tightnessPressure?: number;
     tightnessSaturated?: boolean;
+    baseRateVelocityPoints?: number;
   };
   thresholds: {
     tightnessRegime: number;
@@ -68,26 +78,45 @@ export const resolveLineGaps = ({ scores, thresholds }: ConfidenceInputs) => ({
  * Funding pressure's distance from its line, counting the points the published
  * score hides.
  *
- * The published score is the pressure's clamped form, so a pinned score has to
- * shed its pressure above that clamp before the published number moves at all,
- * and the distance from the line is the gap the reader sees plus that headroom.
- * The headroom is `pressure - score` itself, not `pressure - TIGHTNESS_CAP`:
- * the base-rate component caps at 90 points, so on the week of Oct 19, 2026
- * (published 90, pressure 110) the score shed 20 hidden points before it moved
- * and only then the 20 more to reach the line — 40, not the 30 subtracting the
- * global cap reported, and nothing at all for pressure 91 through 100, where the
- * saturation flag stays off. The same holds whenever any clamp binds: an
- * inversion capped at 25 hides its excess the same way. An unpinned score has
- * pressure equal to score, so the headroom is zero, and a caller without the
- * pressure still gets the published gap alone.
+ * A pinned score sheds pressure before the published number moves, and the
+ * distance from the line is the gap the reader sees plus those hidden points.
+ * They are counted along the base rate, the input the pin is about: the flag
+ * says a higher rate would not raise the score (`isTightnessSaturated`), and
+ * this counts how far a lower one must go before it lowers it. Two ceilings
+ * hide rate points: the rate component's own at 90, and the score's at 100,
+ * which the rate component shares with the inversion and speed terms and the
+ * Chicago Fed add-on.
+ *
+ * `pressure - score` answered a different question. Pressure keeps the
+ * inversion past its 25-point cap, which only a steepening curve sheds, and a
+ * steepening curve is risk appetite's line, measured on its own; and pressure
+ * leaves out the add-on the published score carries. So it counted 10 points
+ * too many at Nov 2022's month-end (an inversion worth 35), 15 where there are
+ * none at a 3.78% bill under a 0.8-point inversion (published 75, pressure 90,
+ * where a falling rate moves the score at once), and 5 too few on a
+ * positive-curve week the add-on lifts to 95. The speed term is capped before it
+ * enters either number, so it hides nothing of its own. On the week of Oct 19,
+ * 2026 (published 90, pressure 110, a positive curve) the rate component reads
+ * 110: the score sheds 20 hidden points before it moves and 20 more to reach the
+ * line, 40 in all.
+ *
+ * One case is undercounted. The add-on's points past the 100 clip are on no
+ * score, so a reading the Chicago Fed index tops up to 100 counts up to 10
+ * fewer hidden points than it has, and the count errs toward less room. No
+ * month-end since 2012 is one: the index's add-on has fired only in Mar and
+ * Apr 2020, at a score of 2. A caller without the pressure gets the published
+ * gap alone.
  */
 const resolveTightnessGap = ({ scores, thresholds }: ConfidenceInputs): number => {
   const gap = Math.abs(scores.tightness - thresholds.tightnessRegime);
-  const hidden =
-    typeof scores.tightnessPressure === "number" && scores.tightness > thresholds.tightnessRegime
-      ? Math.max(0, scores.tightnessPressure - scores.tightness)
-      : 0;
-  return gap + hidden;
+  if (typeof scores.tightnessPressure !== "number" || scores.tightness <= thresholds.tightnessRegime) return gap;
+  // The slope the engine scored: a missing curve is scored at its stand-in.
+  const slope = scores.curveSlope === null ? MISSING_SLOPE_FALLBACK : (scores.curveSlope ?? 0);
+  const inversion = slope < 0 ? Math.round(Math.abs(slope) * CURVE_INVERSION_TIGHTNESS_MULTIPLIER) : 0;
+  const speed = scores.baseRateVelocityPoints ?? 0;
+  const rate = scores.tightnessPressure - inversion - speed;
+  const beforeClip = Math.min(rate, TIGHTNESS_BASE_RATE_POINTS) + Math.min(inversion, TIGHTNESS_INVERSION_POINTS) + speed;
+  return gap + Math.max(0, rate - TIGHTNESS_BASE_RATE_POINTS) + Math.max(0, beforeClip - TIGHTNESS_CAP);
 };
 
 /**

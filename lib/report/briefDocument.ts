@@ -203,7 +203,11 @@ export const buildBriefDocument = (
     readings: {
       scores: { tightness: assessment.scores.tightness, riskAppetite: assessment.scores.riskAppetite },
       ...(assessment.scores.tightnessSaturated === true && typeof assessment.scores.tightnessPressure === "number"
-        ? { tightnessPressure: assessment.scores.tightnessPressure, tightnessSaturated: true }
+        ? {
+            tightnessPressure: assessment.scores.tightnessPressure,
+            tightnessSaturated: true,
+            baseRateVelocityPoints: assessment.scores.baseRateVelocityPoints ?? 0,
+          }
         : {}),
       thresholds,
       vsThreshold: {
