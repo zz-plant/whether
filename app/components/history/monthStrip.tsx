@@ -4,6 +4,7 @@ import { regimeDataAttribute } from "../../../lib/regimeAccent";
 import { countRecord } from "../../../lib/report/trackRecord";
 import { ConditionIcon } from "../ui/conceptIcons";
 import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
+import { buildMonthBriefHref } from "../../../lib/timeMachine/monthFormatting";
 
 /**
  * The record's answer in one band: every month coloured by the call, the
@@ -13,6 +14,12 @@ import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
  *
  * Each segment carries `data-regime`, so its colour comes from the same
  * token the page shells use (`--regime-accent`), never a per-component table.
+ *
+ * Each month opens the brief as it read that month (2026-11-03). The band looked
+ * like a row of things to open and opened nothing, and its month names were hover
+ * titles a touch screen never shows. Out of the tab order: the band is hidden from
+ * assistive tech, which reads the sentence above it, and 177 stops would bury the
+ * page's controls.
  */
 /** The two scores are optional: a caller with them gets them in each month's hover title. */
 type MonthStripEntry = { recordDate: string; regime: string; tightness?: number; riskAppetite?: number };
@@ -139,10 +146,13 @@ export function MonthStrip({ entries, markers, markersLegend, className = "" }: 
           {sorted.map((entry, index) => {
             const changed = index > 0 && entry.regime !== sorted[index - 1].regime;
             return (
-              <span
+              <a
                 key={entry.recordDate}
+                href={buildMonthBriefHref(entry.recordDate)}
+                tabIndex={-1}
+                aria-label={monthTitle(entry)}
                 data-regime={regimeDataAttribute(entry.regime)}
-                className={`h-full flex-1 bg-[var(--regime-accent)] ${changed ? "border-l border-[var(--bg-body)]" : ""}`}
+                className={`h-full flex-1 bg-[var(--regime-accent)] hover:brightness-125 ${changed ? "border-l border-[var(--bg-body)]" : ""}`}
                 title={monthTitle(entry)}
               />
             );

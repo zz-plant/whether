@@ -5,6 +5,7 @@ import { describeTrackRecordRescore } from "../../../lib/report/trackRecordCopy"
 import { getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatMonthYearShortFromValue } from "../../../lib/formatters";
 import { Fact, FactList } from "../ui/factList";
+import { buildMonthBriefHref } from "../../../lib/timeMachine/monthFormatting";
 
 /**
  * The page above this calls itself the permanent record cited in board
@@ -84,9 +85,17 @@ export function TrackRecordSection({
             </thead>
             <tbody>
               {recentTransitions.map((transition) => (
-                <tr key={transition.atDate} className="border-b border-[color:var(--border-subtle)]">
+                <tr key={transition.atDate} className="group relative border-b border-[color:var(--border-subtle)]">
                   <td className="py-2.5 pr-4 whitespace-nowrap text-slate-400">
-                    {formatMonthYearShortFromValue(transition.atDate)}
+                    {/* The row opens the brief as it read that month: a dated change with
+                        an arrow read as a row to open (2026-11-03). The date is the link,
+                        and its ::after spans the row. */}
+                    <a
+                      href={buildMonthBriefHref(transition.atDate)}
+                      className="underline decoration-slate-600 underline-offset-4 after:absolute after:inset-0 group-hover:text-slate-200"
+                    >
+                      {formatMonthYearShortFromValue(transition.atDate)}
+                    </a>
                   </td>
                   <td className="py-2.5 pr-4 text-slate-200">
                     {label(transition.from)} → {label(transition.to)}
