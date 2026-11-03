@@ -825,6 +825,7 @@ async function PageContent({
                     caveat={conditionsTrail.caveat}
                     compact
                     detailsOpen={searchParams?.chart === "1"}
+                    readingsId="conditions-map-readings"
                     footer={
                       <Link
                         href="/trust#formula-reference"

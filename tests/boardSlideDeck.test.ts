@@ -109,6 +109,15 @@ describe("board slide PPTX", () => {
     assert.doesNotMatch(easing, /3A6FA3/);
   });
 
+  it("prints the record's line under the date when the payload carries one, and nothing when it does not", () => {
+    const record = "Freezing since Aug 2026. The monthly record back to Jan 2012 shows conditions changing 7 times in 177 months.";
+    const withRecord = readStoredZip(buildBoardSlidePptx({ ...payload, record })).get("ppt/slides/slide1.xml")?.content ?? "";
+    assert.match(withRecord, /name="Record"/);
+    assert.ok(withRecord.includes(`<a:t>${record}</a:t>`));
+    const without = readStoredZip(buildBoardSlidePptx(payload)).get("ppt/slides/slide1.xml")?.content ?? "";
+    assert.doesNotMatch(without, /name="Record"/);
+  });
+
   it("is byte-identical for the same week", () => {
     assert.deepEqual(buildBoardSlidePptx(payload), buildBoardSlidePptx({ ...payload }));
     const core = readStoredZip(buildBoardSlidePptx(payload)).get("docProps/core.xml")?.content ?? "";
@@ -182,5 +191,19 @@ describe("board slide route handler", () => {
     assert.match(slide, /No scores were published with this brief\./);
     assert.doesNotMatch(slide, /Funding pressure 50 of 100/);
     assert.doesNotMatch(slide, /Risk appetite 50 of 100/);
+  });
+
+  it("counts the record only up to a frozen week's own date", async () => {
+    // A July slide printed with today's record would count month-ends it never saw.
+    const { GET: getBoardSlide } = await import("../app/api/export/board-slide/route");
+    const { NextRequest } = await import("next/server");
+    const { buildTrackRecord } = await import("../lib/report/trackRecord");
+    const { getTimeMachineRegimeSeries } = await import("../lib/timeMachine/timeMachineCache");
+    const res = await getBoardSlide(new NextRequest("https://whether.work/api/export/board-slide?week=2026-w31&format=pptx"));
+    const slide = readStoredZip(new Uint8Array(await res.arrayBuffer())).get("ppt/slides/slide1.xml")?.content ?? "";
+    const counted = Number(/conditions changing \d+ times? in (\d+) months/.exec(slide)?.[1]);
+    const whole = buildTrackRecord(getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER))?.monthsCovered ?? 0;
+    assert.ok(counted > 0, "the frozen week's slide carries the record's line");
+    assert.ok(counted < whole, `a July week counts ${counted} months, fewer than the whole record's ${whole}`);
   });
 });

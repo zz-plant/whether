@@ -143,6 +143,7 @@ export function WhatWouldChangeSection({
             trail={conditionsTrail?.points}
             trailCaption={conditionsTrail?.caption}
             caveat={conditionsTrail?.caveat}
+            readingsId="conditions-chart-readings"
             /* 320px on a phone (2026-10-27): at 240 in a 358px column its quadrant names
                and line numbers drew at 8–10px with empty ground either side. */
             className={`w-full max-w-[320px] mx-auto md:mx-0 md:max-w-[240px] shrink-0 ${conditionsTrail ? "md:hidden" : ""}`}

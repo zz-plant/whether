@@ -105,3 +105,14 @@ export const formatMonthLongLabel = (year: number, month: number) => {
   return monthLongFormatter.format(new Date(Date.UTC(year, month - 1, 1)));
 };
 
+
+/**
+ * The brief as it read at a month-end on the record, from that month-end's date
+ * ("2026-09-30" → "/?month=9&year=2026", the URL the week stepper steps to). For the
+ * record's pictures and tables (2026-11-03): a coloured month or a dated change looked
+ * like something to open and opened nothing.
+ */
+export const buildMonthBriefHref = (recordDate: string) => {
+  const [year, month] = recordDate.split("-").map(Number);
+  return `/?month=${month}&year=${year}`;
+};

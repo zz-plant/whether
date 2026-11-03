@@ -28,6 +28,12 @@ type RegimeRadarProps = {
   /** A last line under the caption: on the brief's card, the link to how the lines are set. */
   footer?: ReactNode;
   /**
+   * The id the "Scores on this chart" fold takes, so a tap on the map opens it: the
+   * dots name their readings in hover titles, which a touch screen never shows.
+   * Unique per page; without it the map is a picture and nothing more.
+   */
+  readingsId?: string;
+  /**
    * What the filled marker is. The brief's map reads "Current reading"; a
    * surface that plots a hypothetical (the scenario studio's map: the
    * simulated reading as the dot, this week's as the hollow one, the same
@@ -82,6 +88,7 @@ export function RegimeRadar({
   trailCaption,
   caveat,
   footer,
+  readingsId,
   primaryLabel,
   previousLabel,
   className = "",
@@ -175,6 +182,17 @@ export function RegimeRadar({
   ];
   const activeKey = currentRegime.toUpperCase();
   const hasActive = quadrants.some((quadrant) => quadrant.key === activeKey);
+  /* A tap on the map opens the readings it plots (2026-11-03). Out of the tab order and
+     hidden like the picture: the fold's own summary is the keyboard's way in. */
+  const readingsFold = compact ? readableReadings.length > 1 || Boolean(caveat) : readableReadings.length > 1;
+  const linkToReadings = (chart: ReactNode) =>
+    readingsId && readingsFold ? (
+      <a href={`#${readingsId}`} tabIndex={-1} aria-hidden="true" title="Scores on this chart" className="block w-full max-w-[16rem]">
+        {chart}
+      </a>
+    ) : (
+      chart
+    );
 
   return (
     <figure
@@ -198,7 +216,7 @@ export function RegimeRadar({
         {`Funding pressure below ${tightnessLine} and risk appetite above ${riskAppetiteLine}: Sunny. The opposite: Freezing. Both above: Cloudy. Both below: Stormy.`}
       </p>
 
-      <svg
+      {linkToReadings(<svg
         viewBox={`0 0 ${VIEW_W} ${VIEW_H}`}
         /* 16rem (256px) at most: the plot is the card's one picture, and at
            200px its month-end trail bunched into a knot beside the current
@@ -482,7 +500,7 @@ export function RegimeRadar({
         >
           ← Funding pressure
         </text>
-      </svg>
+      </svg>)}
 
       {/* Always captioned with which corner is which (2026-10-14). The four
           words read as a severity scale and are not one: Sunny is easy on both
@@ -499,13 +517,13 @@ export function RegimeRadar({
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
           {!compact && hasTrail && caveat ? <span className="block">{caveat}</span> : null}
           {compact && (readableReadings.length > 1 || caveat) ? (
-            <UrlDetails queryKey="chart" initialOpen={detailsOpen} summary="Scores on this chart"
+            <UrlDetails id={readingsId} queryKey="chart" initialOpen={detailsOpen} summary="Scores on this chart"
               className="mx-auto max-w-md text-left" summaryClassName="weather-hit w-fit cursor-pointer">
               {hasTrail && caveat ? <p className="mb-2">{caveat}</p> : null}
               {readingsTable}
             </UrlDetails>
           ) : readableReadings.length > 1 ? (
-            <details className="mx-auto max-w-md text-left">
+            <details id={readingsId} className="mx-auto max-w-md text-left">
               {/* `weather-hit`: a 17px line is a 45px target with it, as the other summaries are. */}
               <summary className="weather-hit w-fit cursor-pointer">Scores on this chart</summary>
               {readingsTable}
