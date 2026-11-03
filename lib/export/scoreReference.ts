@@ -1,4 +1,4 @@
-import { scoreReferenceParts } from "../../app/components/ui/scoreCell";
+import { formatPoints, scoreReferenceParts } from "../../app/components/ui/scoreCell";
 import { DEFAULT_THRESHOLDS, type RegimeThresholds } from "../regimeEngineCore";
 import { ruleMetricLabel, type RuleConditionMetric } from "../report/boundedDecisionRules";
 import { buildSharedCorridorRails, formatPointsToLine } from "../report/operatingCalls";
@@ -9,17 +9,18 @@ import { describeScoreMovementLine } from "../report/scoreMovement";
 import { signalReadingMeaning } from "../report/signalTranslations";
 
 /**
- * The two scores as every export prints them: value, the line each is judged
- * against, the distance to it, and the earlier reading — in that order, through the
+ * The two scores as every export prints them: value, the earlier reading, and
+ * what would change the areas with how far it is — in that order, through the
  * same `scoreReferenceParts` the page's `ScoreCell` is drawn from. Before this each
  * builder printed its own shape ("Funding pressure 12 / Risk appetite 68",
  * "Signals: Funding pressure 83 · Risk Appetite 40", "79/100 (9 pts above the
  * line…)"), and none of them carried the earlier reading even where the inputs had it.
  *
- * The line is the pause line when the export knows one (a rule's rails), else
- * the line where the call itself changes. The earlier reading prints only when
- * the caller's inputs carry it, under the date they say it is from; nothing
- * here invents a comparison.
+ * Against a rule's rails a score names the one side that can change the areas
+ * it sets: where they restart while its pause is in effect, else where they
+ * pause. Without rails it names the line where conditions change. The earlier
+ * reading prints only when the caller's inputs carry it, under the date they
+ * say it is from; nothing here invents a comparison.
  */
 type ScorePair = Record<RuleConditionMetric, number>;
 
@@ -41,14 +42,27 @@ export type PreviousReading = ScorePair & {
   movement?: ReportDynamics["movement"];
 };
 
-/** What each of the three lines is called in a paste. */
-const SCORE_LINE_LABELS = {
-  pause: "pause line",
-  resume: "restart line",
-  callChange: "change line",
-} as const;
+/** The line where conditions change, as a paste names it beside its number. */
+const CALL_CHANGE_LINE_LABEL = "change line";
 
 type CorridorRail = ReturnType<typeof buildSharedCorridorRails>[number];
+
+/**
+ * The side of a rail that can change the areas this week, as a verb and a
+ * number: "restarts below 66 (24 pts away)" while the pause is in effect,
+ * else "pauses above 76 (44 pts away)". A paste printed both sides with their
+ * distances, "pause line 76 · in effect · … · restart line 66 (24 pts away)",
+ * until 2026-11-03, and only one of them could move anything. Funding
+ * pressure pauses high and restarts low; risk appetite the other way round
+ * (`invert`). A pause in effect on a rail with no restart line says so.
+ */
+const describeDecidingSide = (rail: CorridorRail): string => {
+  const pausesHigh = !rail.invert;
+  if (rail.guardrailTripped && rail.clearsAt !== undefined) {
+    return `restarts ${pausesHigh ? "below" : "above"} ${formatPoints(rail.clearsAt)} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`;
+  }
+  return `pauses ${pausesHigh ? "above" : "below"} ${formatPoints(rail.guardrail)} (${formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped)})`;
+};
 
 const SCORE_METRICS: readonly RuleConditionMetric[] = ["tightness", "riskAppetite"];
 
@@ -108,7 +122,8 @@ type ScoreReferenceInput = {
 
 /**
  * One score's reference as the parts it prints, in print order. A surface that
- * sets the number in its own type size (the brief card) draws the parts itself;
+ * sets the number in its own type size (the brief card) draws the parts itself,
+ * with `scoreReadingDetail` for everything after the reading;
  * `buildScoreReferenceLines` joins the same parts, so the card and the paste
  * cannot say different things about the same week.
  */
@@ -122,14 +137,14 @@ export type ScoreReadingParts = {
   meaning: string;
   /** The paste's first segment: "Funding pressure 90 of 100 (money is hard to raise)". */
   reading: string;
-  /** "pause line 76", or "change line 70" where no rail is known. */
-  line: string;
-  /** Against a pause line, "past the line" or "14 pts away"; against the change line, "14 pts above". */
-  distance: string;
   /** "was 63 on Aug 31", or "last week 63" where the source has no date; null without an earlier reading. */
   previous: string | null;
-  /** "restart line 66 (24 pts away)"; null without a rail that carries one. */
-  resume: string | null;
+  /**
+   * What would change things, and how far: against a rail the one side that
+   * can ("restarts below 66 (24 pts away)", "pauses below 44 (8 pts away)"),
+   * else the line where conditions change ("change line 70 · 14 pts above").
+   */
+  condition: string;
 };
 
 export const buildScoreReadings = ({
@@ -140,16 +155,13 @@ export const buildScoreReadings = ({
 }: ScoreReferenceInput): ScoreReadingParts[] =>
   SCORE_METRICS.map((metric) => {
     const rail = rails.find((candidate) => candidate.metric === metric);
-    const line = rail
-      ? { value: rail.guardrail, label: SCORE_LINE_LABELS.pause }
-      : { value: callChangeLine(thresholds, metric), label: SCORE_LINE_LABELS.callChange };
     /* The meaning rides beside the number, so a paste read by someone who has
        never seen the page still says which end of the scale is bad. */
     const meaning = signalReadingMeaning(metric, scores[metric]);
     const parts = scoreReferenceParts({
       label: ruleMetricLabel[metric],
       value: scores[metric],
-      line,
+      line: { value: callChangeLine(thresholds, metric), label: CALL_CHANGE_LINE_LABEL },
       previous: previous?.[metric] ?? null,
       previousDate: previous?.comparedWith?.label ?? null,
     });
@@ -159,31 +171,23 @@ export const buildScoreReadings = ({
       value: parts.value,
       meaning,
       reading: `${parts.reading} (${meaning})`,
-      line: parts.line,
-      /* Against a pause line the distance says which side the score is on:
-         "14 pts above" read as past the line for funding pressure and as
-         clear of it for risk appetite, whose pause line is a floor
-         (2026-10-14). */
-      distance: rail ? formatPointsToLine(rail.pointsToGuardrail, "pause", rail.guardrailTripped) : parts.distance,
       previous: parts.previous,
-      resume:
-        rail && rail.clearsAt !== undefined
-          ? `${SCORE_LINE_LABELS.resume} ${rail.clearsAt} (${formatPointsToLine(rail.pointsToClear, "resume", rail.clearHolds)})`
-          : null,
+      condition: rail ? describeDecidingSide(rail) : `${parts.line} · ${parts.distance}`,
     };
   });
+
+/** Everything a score prints after its reading: the earlier reading, then what would change things. */
+export const scoreReadingDetail = (parts: Pick<ScoreReadingParts, "previous" | "condition">): string =>
+  [parts.previous, parts.condition].filter((part) => part !== null).join(" · ");
 
 /**
  * One line per score.
  *
- * `Funding pressure 12 of 100 (money is easy to raise) · pause line 76 · 64 pts below · was 15 on Aug 31 · restart line 66 (already met)`
+ * `Funding pressure 90 of 100 (money is hard to raise) · was 63 on Aug 31 · restarts below 66 (24 pts away)`
  *
- * With a rail the reference line is the pause line and the restart line follows
- * with its own distance, because "how close to re-opening" is the second thing
- * a reader decides on. Without one it is the call-change line, which is the
- * engine's threshold in force and always known.
+ * With a rail the line ends on the side that can change the areas, because
+ * that is the one number a reader decides on. Without one it is the change
+ * line, which is the engine's threshold in force and always known.
  */
 export const buildScoreReferenceLines = (input: ScoreReferenceInput): string[] =>
-  buildScoreReadings(input).map((parts) =>
-    [parts.reading, parts.line, parts.distance, parts.previous, parts.resume].filter((part) => part !== null).join(" · "),
-  );
+  buildScoreReadings(input).map((parts) => `${parts.reading} · ${scoreReadingDetail(parts)}`);

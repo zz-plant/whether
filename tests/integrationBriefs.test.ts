@@ -104,8 +104,19 @@ describe("integration briefs", () => {
     // The brief's own change line, not the posture state's lock commitment.
     assert.match(envelope.markdown, new RegExp(`^Conditions change if: ${document.slots.callChangesIf.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "m"));
     assert.doesNotMatch(envelope.markdown, /Tightness ≤ 66 for 2 consecutive refreshes/);
-    assert.match(envelope.markdown, /^Restart when: /m);
-    assert.doesNotMatch(envelope.markdown, /Restart when: .*tighten again/i, "a condition that tightens is not a restart line");
+    // At 72 / 48 hiring, the lead area, is not on hold: it has no hold to lift, so no restart line.
+    assert.doesNotMatch(envelope.markdown, /^Restart when: /m);
+    // On hold at 90, its restart line is what can change it.
+    const held = { ...assessment, scores: { ...assessment.scores, tightness: 90 } };
+    const heldMarkdown = buildWeeklyMandateEnvelope(
+      buildBriefDocument(
+        { assessment: held, treasury, macroSeries: [], recordDateLabel: "Mar 1, 2026", sourceLabel: "Federal Reserve Economic Data (FRED)" },
+        fixtureWeeklyCall(held),
+      ),
+      postureState,
+    ).markdown;
+    assert.match(heldMarkdown, /^Restart when: Funding pressure falls below 66/m);
+    assert.doesNotMatch(heldMarkdown, /Restart when: .*tighten again/i, "a condition that tightens is not a restart line");
     assert.doesNotMatch(envelope.markdown, /flip|Reversal:|regime|DEFENSIVE/i);
     // What the document does not carry still comes from the posture state.
     assert.equal(envelope.lastChange.reason, "Tightness crossed above 70.");

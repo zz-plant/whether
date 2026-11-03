@@ -37,9 +37,13 @@ export type AreaRowData = {
   area: DecisionArea;
   /** This week's rule for the area, as an imperative. */
   rule: ReactNode;
-  /** The pause line, the distance to it as the caller formats it, and its state for the badge. */
+  /**
+   * The pause line, the distance to it as the caller formats it, and its state
+   * for the badge. A `"crossed"` state puts the area on hold, and the row then
+   * draws its restart side instead.
+   */
   pause?: AreaLineValue;
-  /** The restart line, the distance to it, and its state once it is met. */
+  /** The restart line, the distance to it, and its state once it is met. Drawn only for an area on hold, or with `bothSides`. */
   resume?: AreaLineValue;
   /** What moved for this area this week, if anything. */
   changed?: ReactNode;
@@ -71,14 +75,43 @@ type AreaTableProps = {
   caption: string;
   /** Hide the "what changed" column when no row carries one. */
   className?: string;
+  /**
+   * Draw both sides of every rule. /operate is where a reader sets rules of
+   * their own, so it needs the pair; every other surface draws one side.
+   */
+  bothSides?: boolean;
 };
 
 const orderIndex = (area: DecisionArea) => decisionAreaOrder.indexOf(area);
 
+type RuleSide = "pause" | "resume";
+
+/* Only one side of a rule can change an area's state: an area on hold changes
+   when it restarts, any other area when it pauses. The row drew both until
+   2026-11-03, each with its distance, so a reader held four numbers to find
+   the one that decides. A held row with no restart side keeps its pause,
+   stamped in effect. */
+const decidingSide = (row: AreaRowData): RuleSide =>
+  row.pause?.state === "crossed" && row.resume ? "resume" : "pause";
+
+const SIDE_LABEL: Record<RuleSide, string> = {
+  pause: DECISION_CONTRACT_LABELS.threshold.pauseIf,
+  resume: DECISION_CONTRACT_LABELS.reversal.resumeWhen,
+};
+
+const SIDE_INK: Record<RuleSide, string> = {
+  pause: "text-semantic-caution-fg",
+  resume: "text-semantic-easing-fg",
+};
+
+/* The column's name when its rows are on different sides; each cell then names its own. */
+const MIXED_SIDES_HEADER = "What changes it";
+
 /* The column names, repeated inside each cell for the stacked phone layout,
-   where the header row is not drawn. Hidden from md up, where the header is. */
-const CellLabel = ({ children, className = "" }: { children: ReactNode; className?: string }) => (
-  <span className={`mb-0.5 block text-xs font-medium md:hidden ${className}`.trim()}>{children}</span>
+   where the header row is not drawn. Hidden from md up, where the header is,
+   unless the header cannot name the cell (`fromMd`). */
+const CellLabel = ({ children, className = "", fromMd = false }: { children: ReactNode; className?: string; fromMd?: boolean }) => (
+  <span className={`mb-0.5 block text-xs font-medium ${fromMd ? "" : "md:hidden"} ${className}`.replace(/\s+/g, " ").trim()}>{children}</span>
 );
 
 const LineCell = ({
@@ -116,17 +149,33 @@ const LineCell = ({
   );
 };
 
+/* The one side that can change the row's area, named in the cell: on a phone,
+   where no header is drawn, and from md up when the rows are on different sides. */
+const SideCell = ({ row, labelFromMd }: { row: AreaRowData; labelFromMd: boolean }) => {
+  const side = decidingSide(row);
+  return (
+    <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:col-span-2 max-md:p-0" data-rule-side={side}>
+      <CellLabel className={SIDE_INK[side]} fromMd={labelFromMd}>{SIDE_LABEL[side]}</CellLabel>
+      <LineCell value={side === "resume" ? row.resume : row.pause} kind={side} />
+    </td>
+  );
+};
+
 /**
- * A table from md up. Below it the four columns do not fit a phone — the
- * restart line sat off the right edge behind a sideways scroll — so each row
- * restacks as a block: the area, the rule across the full width, then the
- * pause and restart lines side by side, each labelled in its cell. One DOM for
- * both, so the row order and content cannot drift between layouts.
+ * A table from md up. Below it the columns do not fit a phone — the restart
+ * line sat off the right edge behind a sideways scroll — so each row restacks
+ * as a block: the area, the rule across the full width, then the side that can
+ * change the area (both sides, side by side, with `bothSides`), labelled in its
+ * cell. One DOM for both, so the row order and content cannot drift between
+ * layouts.
  */
-export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
+export function AreaTable({ rows, caption, className = "", bothSides = false }: AreaTableProps) {
   const ordered = [...rows].sort((a, b) => orderIndex(a.area) - orderIndex(b.area));
   const showChanged = ordered.some((row) => row.changed);
   const showAction = ordered.some((row) => row.action);
+  /* Every row on one side: the header names it, as each of the pair's headers did. */
+  const [firstSide, ...otherSides] = ordered.map(decidingSide);
+  const sharedSide = firstSide && otherSides.every((side) => side === firstSide) ? firstSide : null;
   return (
     <div className={`md:overflow-x-auto overscroll-x-contain ${className}`.trim()}>
       <table className="w-full border-collapse text-left text-sm max-md:block md:min-w-[36rem]">
@@ -135,8 +184,16 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
           <tr className="border-b border-[color:var(--border-subtle)] text-xs text-slate-400">
             <th scope="col" className="py-2 pr-3 font-medium">Area</th>
             <th scope="col" className="py-2 pr-3 font-medium">This week</th>
-            <th scope="col" className="py-2 pr-3 font-medium text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</th>
-            <th scope="col" className="py-2 pr-3 font-medium text-semantic-easing-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</th>
+            {bothSides ? (
+              <>
+                <th scope="col" className={`py-2 pr-3 font-medium ${SIDE_INK.pause}`}>{SIDE_LABEL.pause}</th>
+                <th scope="col" className={`py-2 pr-3 font-medium ${SIDE_INK.resume}`}>{SIDE_LABEL.resume}</th>
+              </>
+            ) : (
+              <th scope="col" className={`py-2 pr-3 font-medium ${sharedSide ? SIDE_INK[sharedSide] : ""}`.trim()}>
+                {sharedSide ? SIDE_LABEL[sharedSide] : MIXED_SIDES_HEADER}
+              </th>
+            )}
             {showChanged ? <th scope="col" className="py-2 pr-3 font-medium">Changed</th> : null}
             {showAction ? (
               <th scope="col" className="py-2 font-medium">
@@ -182,26 +239,32 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                 {row.rule}
                 {row.note}
               </td>
-              <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
-                <CellLabel className="text-semantic-caution-fg">{DECISION_CONTRACT_LABELS.threshold.pauseIf}</CellLabel>
-                <LineCell value={row.pause} kind="pause" />
-              </td>
-              <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
-                <CellLabel className="text-semantic-easing-fg">{DECISION_CONTRACT_LABELS.reversal.resumeWhen}</CellLabel>
-                {/* A met restart line on an area that is not on hold stamped "already
-                    met" beside "14 pts away" from its pause line, which read as a
-                    restart (2026-10-14). With the pause line not crossed there is
-                    nothing to resume, and the cell says that instead — short of the
-                    restart line too, where it printed "2 pts away" (2026-11-02). */}
-                <LineCell
-                  value={
-                    row.pause && row.pause.state !== "crossed" && row.resume
-                      ? { line: row.resume.line, distance: NOTHING_TO_RESUME }
-                      : row.resume
-                  }
-                  kind="resume"
-                />
-              </td>
+              {bothSides ? (
+                <>
+                  <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
+                    <CellLabel className={SIDE_INK.pause}>{SIDE_LABEL.pause}</CellLabel>
+                    <LineCell value={row.pause} kind="pause" />
+                  </td>
+                  <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
+                    <CellLabel className={SIDE_INK.resume}>{SIDE_LABEL.resume}</CellLabel>
+                    {/* A met restart line on an area that is not on hold stamped "already
+                        met" beside "14 pts away" from its pause line, which read as a
+                        restart (2026-10-14). With the pause line not crossed there is
+                        nothing to resume, and the cell says that instead — short of the
+                        restart line too, where it printed "2 pts away" (2026-11-02). */}
+                    <LineCell
+                      value={
+                        row.pause && row.pause.state !== "crossed" && row.resume
+                          ? { line: row.resume.line, distance: NOTHING_TO_RESUME }
+                          : row.resume
+                      }
+                      kind="resume"
+                    />
+                  </td>
+                </>
+              ) : (
+                <SideCell row={row} labelFromMd={sharedSide === null} />
+              )}
               {showChanged ? (
                 <td
                   className={`py-2.5 pr-3 max-md:col-span-2 max-md:p-0 ${row.moved ? "font-medium text-amber-200/90" : "text-slate-400"} ${

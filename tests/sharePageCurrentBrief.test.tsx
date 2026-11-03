@@ -78,8 +78,10 @@ describe("/share current weekly artifact", () => {
     assert.match(fullBrief, /^Guidance: /m);
     assert.match(fullBrief, /Pause if/);
     assert.match(fullBrief, /Share the persisted call exactly\./);
-    // The meeting pack carries the Slack brief's per-area lines, restart line included.
-    assert.match(textOf("meeting-pack"), /Restart when/);
+    // The meeting pack carries the Slack brief's per-area lines: each area's pause line here,
+    // because no area is on hold on the bundled reading, so none prints a restart line.
+    assert.match(textOf("meeting-pack"), /• Hiring: [^\n]+\n {2}Pause if: /);
+    assert.doesNotMatch(textOf("meeting-pack"), /^ {2}Restart when: /m);
     assert.match(textOf("meeting-pack"), /Share the persisted call exactly\./);
     // The pause line under its label carries the condition only, not the rule's own verb.
     assert.match(textOf("slack-post"), /Pause if: The snapshot cannot be read\./);

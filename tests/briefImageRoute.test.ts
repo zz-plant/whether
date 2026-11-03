@@ -4,7 +4,7 @@ import { describe, it } from "bun:test";
 import { ImageResponse } from "next/og";
 import { isValidElement, type ReactNode } from "react";
 import { buildBriefImagePayload } from "../app/api/image/brief/route";
-import { buildScoreReadings, buildScoreReferenceLines, type ScoreReadingParts } from "../lib/export/scoreReference";
+import { buildScoreReadings, buildScoreReferenceLines, scoreReadingDetail, type ScoreReadingParts } from "../lib/export/scoreReference";
 import { renderBriefImage, type BriefImageProps } from "../lib/image/briefImageTemplate";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "../lib/image/ogFonts";
 import { DISPLAY_EM, SANS_EM, wrappedLines } from "../lib/image/textFit";
@@ -111,7 +111,7 @@ const buildHomepage = ({
 
 /** The paste's own shape: the parts in print order, joined. */
 const asPasted = (reading: ScoreReadingParts) =>
-  [reading.reading, reading.line, reading.distance, reading.previous, reading.resume]
+  [reading.reading, reading.previous, reading.condition]
     .filter((part) => part !== null)
     .join(" · ");
 
@@ -125,13 +125,16 @@ describe("buildBriefImagePayload", () => {
     );
   });
 
-  it("prints both scores against the lines that change the call, and the earlier reading under its date", () => {
+  it("prints both scores with the earlier reading under its date, then the one line that can change things", () => {
     const payload = buildBriefImagePayload(buildHomepage());
 
+    /* Both pauses are in effect, so each score names where it restarts and nothing
+       about the pause line it is already past (2026-11-03). */
     assert.deepEqual(payload.readings.map(asPasted), [
-      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · in effect · was 63 on Aug 31 · restart line 66 (24 pts away)",
-      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · in effect · was 56 on Aug 31 · restart line 54 (11 pts away)",
+      "Funding pressure 90 of 100 (money is hard to raise) · was 63 on Aug 31 · restarts below 66 (24 pts away)",
+      "Risk appetite 43 of 100 (investors are selective about risk) · was 56 on Aug 31 · restarts above 54 (11 pts away)",
     ]);
+    for (const reading of payload.readings) assert.doesNotMatch(asPasted(reading), /pause line|in effect|pauses/);
   });
 
   it("is the derivation /share and every export call, not a second one", () => {
@@ -189,8 +192,8 @@ describe("buildBriefImagePayload", () => {
     const payload = buildBriefImagePayload(buildHomepage({ withRails: false }));
 
     // The model's own call-change lines (73 and 50 here), never a number the card made up.
-    assert.deepEqual(payload.readings.map((reading) => reading.line), ["change line 73", "change line 50"]);
-    assert.deepEqual(payload.readings.map((reading) => reading.resume), [null, null]);
+    assert.deepEqual(payload.readings.map((reading) => reading.condition.split(" · ")[0]), ["change line 73", "change line 50"]);
+    for (const reading of payload.readings) assert.doesNotMatch(reading.condition, /restart|pause/);
   });
 
   it("names the source in a reader's words, and says when it is not this week's live reading", () => {
@@ -275,8 +278,8 @@ describe("brief decision card render", () => {
     const text = collectText(renderBriefImage(briefImageProps));
 
     for (const reading of briefImageProps.readings) {
-      assert.notEqual(reading.resume, null, "the fixture states a restart line for both scores");
-      for (const part of [reading.label, reading.value, reading.meaning, reading.line, reading.distance, reading.resume]) {
+      assert.match(reading.condition, /^restarts /, "the fixture holds both scores past their pause lines");
+      for (const part of [reading.label, reading.value, reading.meaning, reading.previous, reading.condition]) {
         assert.ok(part !== null && text.includes(part), `the card should print "${part}"`);
       }
     }
@@ -289,26 +292,29 @@ describe("brief decision card render", () => {
     });
     const text = collectText(renderBriefImage({ ...briefImageProps, readings }));
 
-    assert.match(text, /change line 70 · 20 pts above · was 63 on Aug 31/);
-    assert.match(text, /change line 50 · 7 pts below · was 56 on Aug 31/);
+    assert.match(text, /was 63 on Aug 31 · change line 70 · 20 pts above/);
+    assert.match(text, /was 56 on Aug 31 · change line 50 · 7 pts below/);
   });
 
   it("keeps the longest dated detail line on one row, which is what the 800px budget assumes", () => {
-    // A detail line that wraps is a fourth line in a reading, and the card has no room for one
-    // (`briefImageTemplate.tsx` measures 769px with three). The text column is the content width
-    // less the reading's padding, the widest value column (three digits) and the gap.
+    // A detail line that wraps is a third line in a reading, and the card's budget
+    // (`briefImageTemplate.tsx`, 769px) was measured with three. The text column is the content
+    // width less the reading's padding, the widest value column (three digits) and the gap.
     const columnWidth = 1088 - 48 - 3 * 52 - 28;
-    const longest = buildScoreReadings({
-      scores: { tightness: 100, riskAppetite: 100 },
-      previous: {
-        tightness: 100,
-        riskAppetite: 100,
-        comparedWith: { recordDate: "2025-12-31", label: "Dec 31, 2025" },
-      },
-    });
+    const previous = {
+      tightness: 100,
+      riskAppetite: 100,
+      comparedWith: { recordDate: "2025-12-31", label: "Dec 31, 2025" },
+    };
+    const extreme = { tightness: 100, riskAppetite: 0 };
+    const longest = [
+      ...buildScoreReadings({ scores: { tightness: 100, riskAppetite: 100 }, previous }),
+      // The longest rail detail: both pauses in effect, as far from restarting as a score can be.
+      ...buildScoreReadings({ scores: extreme, previous, rails: buildSharedCorridorRails(pauseAndResumeLines, extreme) }),
+    ];
 
     for (const reading of longest) {
-      const detail = [reading.line, reading.distance, reading.previous].filter((part) => part !== null).join(" \u00b7 ");
+      const detail = scoreReadingDetail(reading);
       assert.equal(wrappedLines(detail, 24, columnWidth, SANS_EM).length, 1, `"${detail}" wraps`);
     }
   });

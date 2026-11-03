@@ -4245,6 +4245,26 @@ no remaining format changed a byte. This is the "one shareable brief" direction 
 `docs/adoption-driven-change-plan.md`, applied to the formats that duplicated others; the Slack post
 and full brief stay as two on purpose (§1.1.35).
 
+### 1.1.101 One side of each rule per area (2026-11-03)
+
+Each area has a pause line and a restart line, and every row and paste printed both, beside the
+score, the earlier reading and a distance to each. Only one can change the area: an area on hold
+changes when it restarts, and any other area when it pauses. Rows now print that side alone.
+
+| Surface | Before | After (held area) |
+| --- | --- | --- |
+| Score lines (`buildScoreReferenceLines`: /share, Slack, ticket, board, frozen-brief pastes, the brief card) | `Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · in effect · was 90 on Sep 30 · restart line 66 (24 pts away)` | `Funding pressure 90 of 100 (money is hard to raise) · was 90 on Sep 30 · restarts below 66 (24 pts away)` |
+| Area rows in pastes (`buildAreaRowLines`) | `Pause if: …` and `Restart when: …` | `Restart when: Funding pressure < 66 (24 pts away) and Risk appetite > 54` |
+| Area table (`AreaTable`: homepage, answer pages) | Pause if and Restart when columns | one column, headed by the side when every row shares it, "What changes it" with the side in each cell when they differ |
+| Portfolio note | `Pause if …; restart when ….` | `Restart when ….` |
+
+An area not on hold prints its pause line the same way (`pauses below 44 (9 pts away)`, `Pause if:
+Risk appetite < 44 (9 pts away)`). The restart line beside the guidance in the Slack brief, the
+board bullets and the mandate routes (`briefResumeLine`) is the lead area's while that area is on
+hold, and absent otherwise; a stage's restart discipline still prints. Frozen briefs judge their
+own scores against their own lines, and a record frozen without them keeps both sides. `/operate`
+keeps both columns (`AreaTable bothSides`): it is where a reader sets rules of their own.
+
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,
 in the order a reader asks:
@@ -5079,10 +5099,11 @@ table. Now:
   on every route that draws it (`buildTrustStripProps` sets `savedCopy`);
 - "What changed" says "Nothing new to compare: this is the saved Jun 17, 2026 reading."
 
-On any reading, an area that is not on hold prints "nothing to resume" in its restart cell, in the
-picker and the area table, rather than a distance to a line that has no hold to lift
-(`buildHomeAreaRows`, `AreaTable`). `tests/savedCopyHomepage.test.tsx` renders the route with the
-operating-state store down and holds each of these.
+On any reading, an area that is not on hold prints "nothing to resume" in its restart cell in the
+picker, rather than a distance to a line that has no hold to lift (`buildHomeAreaRows`); the area
+table prints no restart cell for it at all since 2026-11-03 (§1.1.101), except on `/operate`.
+`tests/savedCopyHomepage.test.tsx` renders the route with the operating-state store down and holds
+each of these.
 
 ### 8.7 Print layout
 **Location**: the `@media print` blocks in `app/styles/layout-effects.css` (imported by

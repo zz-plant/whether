@@ -252,8 +252,9 @@ export async function buildPlanningPageModel(
                  page refer to, so it is what the page keeps. */
               h("section", { className: "space-y-4" },
                 /* One row per area, in the order every surface uses, with the rule and
-                   both its lines — the same table the brief prints. */
-                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area" }),
+                   both its lines: the brief's table draws only the side that can change
+                   each area, and this is the page where a reader sets rules of their own. */
+                h(AreaTable, { rows: buildAreaRows(actionStripItems), caption: "This week's rule for each decision area", bothSides: true }),
                 h("p", { className: "text-xs leading-5 text-slate-400" },
                   snapshot.homeBriefModel.revisitDecisions
                     ? "Before adding fixed costs or growing scope, look again at what you approved last week."

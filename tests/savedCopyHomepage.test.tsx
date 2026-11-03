@@ -128,14 +128,14 @@ describe("the saved-copy homepage", () => {
     assert.match(text, new RegExp(`(No area was|\\d+ of \\d+ areas (was|were)) on hold on the ${readingDate} reading\\.`));
   });
 
-  it("prints no restart distance for an area that is not on hold", async () => {
+  it("prints one side per area: its restart line on hold, else its pause line", async () => {
     const { areaRows } = await page();
     assert.equal(areaRows.length, 5);
     for (const { area, cells } of areaRows) {
-      const [, pause = "", restart = ""] = cells;
-      assert.match(pause, /^Pause if /, `${area}: ${cells.join(" | ")}`);
-      if (/in effect/.test(pause)) continue;
-      assert.match(restart, /^Restart when .* nothing to resume$/, `${area}: ${restart}`);
+      const [, condition = ""] = cells;
+      assert.match(condition, /^(Pause if|Restart when) /, `${area}: ${cells.join(" | ")}`);
+      // No restart line on an area with nothing to restart, and no pause line it is already past.
+      assert.doesNotMatch(condition, /nothing to resume|in effect/, `${area}: ${condition}`);
     }
   });
 

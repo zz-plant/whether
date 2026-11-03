@@ -35,19 +35,22 @@ describe("buildSlackBrief", () => {
     assert.doesNotMatch(brief, /start nothing new/);
   });
 
-  it("prints the pause line as its condition, and the lead area's restart line apart from the change line", () => {
-    const brief = buildSlackBrief(
-      fixtureBriefDocument({
-        weeklyCall: { ...fixtureWeeklyCall(), pauseIf: "Pause net-new hiring if funding pressure rises above 76" },
-      }),
-    );
+  it("prints the pause line as its condition, and the lead area's restart line apart from the change line while it is on hold", () => {
+    const pauseIf = "Pause net-new hiring if funding pressure rises above 76";
+    const open = buildSlackBrief(fixtureBriefDocument({ weeklyCall: { ...fixtureWeeklyCall(), pauseIf } }));
 
-    assert.match(brief, /^• Pause if: Funding pressure rises above 76$/m);
-    // Both restart lines hold at 12 / 68, and the line says so rather than reading as a move to come.
-    assert.match(brief, /^• Restart when: Funding pressure is below 66 and risk appetite is above 54\. Funding pressure is 12 and risk appetite is 68 now\.$/m);
-    assert.doesNotMatch(brief, /Pause if: Pause|Restart when: Resume/);
-    assert.match(brief, /This week's decision \(Guidance \/ Pause if \/ Restart when \/ Conditions change if\):/);
-    const order = ["• Guidance:", "• Pause if:", "• Restart when:", "• Conditions change if:"].map((label) => brief.indexOf(label));
+    assert.match(open, /^• Pause if: Funding pressure rises above 76$/m);
+    // At 12 / 68 hiring is not on hold, so it has no hold to lift and no restart line beside the call.
+    assert.equal(slot(open, "Restart when"), "");
+    assert.match(open, /This week's decision \(Guidance \/ Pause if \/ Conditions change if\):/);
+
+    // At funding pressure 90 hiring is on hold, and the line it restarts at is the one that can change it.
+    const reading = { ...assessment, scores: { ...assessment.scores, tightness: 90 } };
+    const held = buildSlackBrief(fixtureBriefDocument({ reading, weeklyCall: { ...fixtureWeeklyCall(reading), pauseIf } }));
+    assert.match(held, /^• Restart when: Funding pressure falls below 66 and risk appetite is above 54\. Funding pressure is 90 and risk appetite is 68 now\.$/m);
+    assert.doesNotMatch(held, /Pause if: Pause|Restart when: Resume/);
+    assert.match(held, /This week's decision \(Guidance \/ Pause if \/ Restart when \/ Conditions change if\):/);
+    const order = ["• Guidance:", "• Pause if:", "• Restart when:", "• Conditions change if:"].map((label) => held.indexOf(label));
     assert.deepEqual([...order].sort((left, right) => left - right), order, "the slots print in the page's order");
   });
 
@@ -74,12 +77,28 @@ describe("buildSlackBrief", () => {
     const brief = buildSlackBrief(fixtureBriefDocument());
 
     // Each score carries what it means beside the number: a paste has no page to explain the scale.
-    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pause line 76 · 64 pts away · restart line 66 \(already met\)$/m);
-    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pause line 44 · 24 pts away · restart line 54 \(already met\)$/m);
+    // Nothing is on hold at 12 / 68, so each names where it pauses and nothing about restarting.
+    assert.match(brief, /^Funding pressure 12 of 100 \(money is easy to raise\) · pauses above 76 \(64 pts away\)$/m);
+    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pauses below 44 \(24 pts away\)$/m);
     // Per-area rows print lines with a distance, not the rule's sentence.
     assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or/);
     // The qualifier is part of the rule and prints with the lines.
-    assert.match(brief, /Restart when: Funding pressure < 66 \(already met\) and the payback figures still hold/);
+    assert.match(brief, /Pause if: Risk appetite < 44 \(24 pts away\) or two weekly readings in a row come in weaker/);
+    // One side per area: no area is on hold, so no row prints a restart line.
+    assert.doesNotMatch(brief, /^ {2}Restart when:/m);
+  });
+
+  it("prints an area on hold by where it restarts, and the score that holds it by the same line", () => {
+    const reading = { ...assessment, scores: { ...assessment.scores, tightness: 90 } };
+    const brief = buildSlackBrief(fixtureBriefDocument({ reading, weeklyCall: fixtureWeeklyCall(reading) }));
+
+    assert.match(brief, /^Funding pressure 90 of 100 \(money is hard to raise\) · restarts below 66 \(24 pts away\)$/m);
+    assert.match(brief, /^Risk appetite 68 of 100 \(investors are selective about risk\) · pauses below 44 \(24 pts away\)$/m);
+    assert.doesNotMatch(brief, /pause line|restart line|in effect/, "neither the pause line it is past nor the line's name");
+    // Spending pauses on funding pressure alone, so it is on hold; its restart qualifier prints with the line.
+    assert.match(brief, /• Spending: [^\n]+\n {2}Restart when: Funding pressure < 66 \(24 pts away\) and the payback figures still hold\n/);
+    // The roadmap pauses on risk appetite alone, which is clear of its line: its pause line is what can change it.
+    assert.match(brief, /• Roadmap: [^\n]+\n {2}Pause if: Risk appetite < 44 \(24 pts away\) or two weekly readings in a row come in weaker\n/);
   });
 
   it("resolves its change-course cross-reference to a label it actually prints", () => {

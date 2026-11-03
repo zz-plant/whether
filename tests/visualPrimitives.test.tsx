@@ -209,25 +209,76 @@ describe("AreaTable", () => {
     assert.match(html, /—/, "an empty slot renders a dash, not a reflow");
   });
 
-  it("labels the pause and resume cells in every row, for the stacked phone layout", () => {
+  it("labels the condition cells in every row, for the stacked phone layout", () => {
     /* Below sm the header row is not drawn and each row restacks, so a cell
-       that did not name itself would leave two bare conditions side by side. */
-    const html = renderToStaticMarkup(
-      <AreaTable
-        caption="test"
-        rows={[
-          { area: "hiring", rule: "Backfills only.", pause: { line: "Funding pressure > 76" }, resume: { line: "Risk appetite > 54" } },
-          { area: "product-tempo", rule: "Keep the roadmap." },
-        ]}
-      />,
-    );
-    const rows = html.split("data-area=").slice(1);
-    assert.equal(rows.length, 2);
-    for (const row of rows) {
-      assert.match(row, />Pause if</);
-      assert.match(row, />Restart when</);
+       that did not name itself would leave a bare condition. */
+    const rows = [
+      { area: "hiring" as const, rule: "Backfills only.", pause: { line: "Funding pressure > 76" }, resume: { line: "Risk appetite > 54" } },
+      { area: "product-tempo" as const, rule: "Keep the roadmap." },
+    ];
+    const oneSide = renderToStaticMarkup(<AreaTable caption="test" rows={rows} />);
+    const bothSides = renderToStaticMarkup(<AreaTable caption="test" rows={rows} bothSides />);
+    for (const html of [oneSide, bothSides]) {
+      const cells = html.split("data-area=").slice(1);
+      assert.equal(cells.length, 2);
+      for (const row of cells) {
+        assert.match(row, />Pause if</);
+        assert.equal(row.includes(">Restart when<"), html === bothSides, "a restart label only where the row draws the restart side");
+      }
+      assert.doesNotMatch(html, /class="[^"]*(?<![:\w-])min-w-\[/, "no minimum width outside sm, or the table scrolls sideways on a phone");
     }
-    assert.doesNotMatch(html, /class="[^"]*(?<![:\w-])min-w-\[/, "no minimum width outside sm, or the table scrolls sideways on a phone");
+  });
+});
+
+describe("AreaTable one side per row", () => {
+  const held = {
+    area: "hiring" as const,
+    rule: "Backfills only.",
+    pause: { line: "Funding pressure > 76", distance: "in effect", state: "crossed" as const },
+    resume: { line: "Funding pressure < 66 and Risk appetite > 54", distance: "24 pts away" },
+  };
+  const open = {
+    area: "product-tempo" as const,
+    rule: "Keep the roadmap.",
+    pause: { line: "Risk appetite < 44", distance: "11 pts away", state: "clear" as const },
+    resume: { line: "Risk appetite > 54", distance: "nothing to resume" },
+  };
+  const header = (html: string) => /<thead[\s\S]*?<\/thead>/.exec(html)?.[0] ?? "";
+  const rowOf = (html: string, area: string) => html.split("data-area=").find((row) => row.startsWith(`"${area}"`)) ?? "";
+
+  it("draws an area on hold by its restart line alone, and any other area by its pause line alone", () => {
+    const html = renderToStaticMarkup(<AreaTable caption="test" rows={[held, open]} />);
+    const hiring = rowOf(html, "hiring");
+    assert.match(hiring, /data-rule-side="resume"/);
+    assert.ok(hiring.includes("Funding pressure &lt; 66 and Risk appetite &gt; 54") && hiring.includes("24 pts away"));
+    assert.doesNotMatch(hiring, /Funding pressure &gt; 76|in effect|Pause if/, "the pause it is already past is not drawn");
+    const roadmap = rowOf(html, "product-tempo");
+    assert.match(roadmap, /data-rule-side="pause"/);
+    assert.ok(roadmap.includes("Risk appetite &lt; 44") && roadmap.includes("11 pts away"));
+    assert.doesNotMatch(roadmap, /Risk appetite &gt; 54|nothing to resume|Restart when/, "no restart line on an area with nothing to restart");
+  });
+
+  it("names the side in the header when every row shares it, and in each cell when they differ", () => {
+    const allOpen = renderToStaticMarkup(<AreaTable caption="test" rows={[open, { ...open, area: "hiring" }]} />);
+    assert.match(header(allOpen), /<th scope="col" class="[^"]*text-semantic-caution-fg">Pause if<\/th>/);
+    assert.doesNotMatch(header(allOpen), /Restart when|What changes it/);
+    assert.match(allOpen, /<span class="[^"]*md:hidden[^"]*">Pause if<\/span>/, "the header names it from md up, so the cell label is for phones");
+
+    const allHeld = renderToStaticMarkup(<AreaTable caption="test" rows={[held, { ...held, area: "burn-discipline" }]} />);
+    assert.match(header(allHeld), /<th scope="col" class="[^"]*text-semantic-easing-fg">Restart when<\/th>/);
+
+    const mixed = renderToStaticMarkup(<AreaTable caption="test" rows={[held, open]} />);
+    assert.match(header(mixed), />What changes it<\/th>/);
+    assert.doesNotMatch(header(mixed), /Pause if|Restart when/);
+    for (const label of ["Pause if", "Restart when"]) {
+      assert.match(mixed, new RegExp(`<span class="mb-0\\.5 block text-xs font-medium text-semantic-[a-z]+-fg">${label}</span>`), `${label} is labelled in its cell from md up too`);
+    }
+  });
+
+  it("keeps the pause, stamped in effect, on a held area with no restart line", () => {
+    const html = renderToStaticMarkup(<AreaTable caption="test" rows={[{ ...held, resume: undefined }]} />);
+    assert.match(html, /data-rule-side="pause"/);
+    assert.match(html, /<span data-line-state-badge="crossed" class="[^"]*rounded-sm border/);
   });
 });
 
@@ -248,9 +299,11 @@ describe("AreaTable moved rows", () => {
   });
 
   it("draws a line in force as a stamp, and a distance still to go as text", () => {
+    /* Both sides, as /operate draws them, so one table holds every state. */
     const html = renderToStaticMarkup(
       <AreaTable
         caption="test"
+        bothSides
         rows={[
           {
             area: "hiring",
