@@ -130,13 +130,13 @@ describe("the plain-English layer beside the week's readings", () => {
 });
 
 describe("curve chart shorthand", () => {
-  it("expands every label the curve charts render", () => {
-    const html = renderToStaticMarkup(
-      <CurveTermsKey terms={["spread10Y2Y", "spread2Y3M", "maturities", "bp"]} />,
-    );
-    assert.match(html, /Ten-year rate minus two-year rate/);
-    assert.match(html, /Two-year rate minus three-month rate/);
+  /* The legends print names since 2026-11-03 ("Recession warning gauge", "2-year");
+     the key keeps the units and names the gauge's instrument once, beside its name. */
+  it("defines the units and names the gauge's instrument, never as its label", () => {
+    const html = renderToStaticMarkup(<CurveTermsKey terms={["spread10Y2Y", "pp", "bp"]} />);
+    assert.match(html, /<dt[^>]*>Recession warning gauge<\/dt><dd>Ten-year rate minus two-year rate\.<\/dd>/);
     assert.match(html, /one hundredth of a percentage point/);
-    assert.match(html, /How long the government is borrowing for/);
+    assert.match(html, /Percentage point/);
+    assert.doesNotMatch(html, /10Y|2Y|3M|1M/);
   });
 });

@@ -8,7 +8,7 @@ import { SegmentedControl } from "../../components/ui/segmentedControl";
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
 import { formatDateUTC } from "../../../lib/formatters";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
-import { CurveTermsKey, formatSpread } from "./curveTermsKey";
+import { CURVE_SPREAD_LABELS, CurveTermsKey, formatSpread } from "./curveTermsKey";
 
 /* No "Weekly". The series is the month-end archive, one reading a month, so the
    weekly option drew the same month-end points under day labels and called
@@ -278,17 +278,19 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             the server formats it, so the client renders the same string. */}
         <div className="space-y-1 border-b border-slate-800/80 pb-3 text-xs">
           <p className="tabular-nums text-slate-300">
-            Latest: {formatDateUTC(treasury.record_date)} · {treasury.isLive ? "Live reading" : "Last saved reading"} · 1M{" "}
-            {formatPercent(treasury.yields.oneMonth)} · 3M {formatPercent(treasury.yields.threeMonth ?? null)} · 2Y{" "}
-            {formatPercent(treasury.yields.twoYear)} · 10Y {formatPercent(treasury.yields.tenYear)}
+            Latest: {formatDateUTC(treasury.record_date)} · {treasury.isLive ? "Live reading" : "Last saved reading"} · 1-month{" "}
+            {formatPercent(treasury.yields.oneMonth)} · 3-month {formatPercent(treasury.yields.threeMonth ?? null)} · 2-year{" "}
+            {formatPercent(treasury.yields.twoYear)} · 10-year {formatPercent(treasury.yields.tenYear)}
           </p>
           <p className="text-slate-400">The charts plot end-of-month readings.</p>
         </div>
 
-        {/* Five panels labelled entirely in maturities and spreads. The key goes
-            above them, not below, so the shorthand is defined before it is used. */}
+        {/* Five panels labelled in maturities and spreads, each by its name
+            (2026-11-03: "1M", "10Y−2Y" and "2Y−3M" were desk shorthand the key
+            then expanded). The key goes above them, not below, so the units and
+            the gauge's instrument are defined before they are used. */}
         <CurveTermsKey
-          terms={["maturities", "spread10Y2Y", "spread2Y3M", "pp", "bp"]}
+          terms={["spread10Y2Y", "pp", "bp"]}
           className="mt-3 border-b border-slate-800/80 pb-3"
         />
 
@@ -344,10 +346,10 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
             </div>
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs tabular-nums">
               {([
-                ["1M", latest?.oneMonth, RATE_SERIES.oneMonth],
-                ["3M", latest?.threeMonth, RATE_SERIES.threeMonth],
-                ["2Y", latest?.twoYear, RATE_SERIES.twoYear],
-                ["10Y", latest?.tenYear, RATE_SERIES.tenYear],
+                ["1-month", latest?.oneMonth, RATE_SERIES.oneMonth],
+                ["3-month", latest?.threeMonth, RATE_SERIES.threeMonth],
+                ["2-year", latest?.twoYear, RATE_SERIES.twoYear],
+                ["10-year", latest?.tenYear, RATE_SERIES.tenYear],
               ] as const).map(([label, value, series]) => (
                 <span key={label} className="inline-flex items-center gap-1.5 text-slate-300">
                   {/* The key draws the line itself, dash and all, so it matches the chart. */}
@@ -469,7 +471,9 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               <span>{midPoint?.label ?? "Mid"}</span>
               <span>{latest?.label ?? "Latest"}</span>
             </div>
-            <p className="text-xs tabular-nums text-slate-300">10Y−2Y {formatSpread(latest?.spread10Y2Y ?? null)} · 2Y−3M {formatSpread(latest?.spread2Y3M ?? null)}</p>
+            <p className="text-xs tabular-nums text-slate-300">
+              {CURVE_SPREAD_LABELS.spread10Y2Y} {formatSpread(latest?.spread10Y2Y ?? null)} · {CURVE_SPREAD_LABELS.spread2Y3M} {formatSpread(latest?.spread2Y3M ?? null)}
+            </p>
             <p className="text-fluid-xs tabular-nums text-slate-400">Vertical scale {formatRange(spreadMin, spreadMax, "pp")}</p>
             {hasSpreadGaps ? <p className="text-fluid-xs text-slate-400">Breaks indicate missing spread reads.</p> : null}
           </FlatPanel>
@@ -480,7 +484,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
               {topShocks.length ? (
                 topShocks.map((shock) => (
                   <li key={shock.label} className="px-1 py-0.5 tabular-nums">
-                    <span className="mono text-slate-400">{shock.label}</span> · 2Y {formatBpMove(shock.delta2Y)} · 10Y {formatBpMove(shock.delta10Y)}
+                    <span className="mono text-slate-400">{shock.label}</span> · 2-year {formatBpMove(shock.delta2Y)} · 10-year {formatBpMove(shock.delta10Y)}
                   </li>
                 ))
               ) : (

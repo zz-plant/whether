@@ -48,7 +48,7 @@ describe("an answer's standing this week", () => {
         areaRows: ROWS,
         conditionsLabel: "Freezing",
       }),
-      { kind: "area", text: "4 pts from pausing", crossed: false, state: "near" },
+      { kind: "area", text: "A common move from pausing", crossed: false, state: "near" },
     );
   });
 

@@ -18,6 +18,7 @@ import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { describeScoreMovement } from "../scoreMovement";
+import { describeScoreMoveBand } from "../marketMoveScale";
 import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
 
 /**
@@ -273,10 +274,22 @@ export const formatPoints = (points: number) =>
   `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"}`;
 
 /**
+ * How far a slot's score is from its line, in words a reader can judge (2026-11-03):
+ * "a rare move", from how often the month-end record moved that score that far in one
+ * month (`describeScoreMoveBand`). "11 pts from pausing" was a distance in a unit no
+ * reader has a feel for; the ladder under the picker keeps the points beside the band.
+ * The points, where the record cannot say.
+ */
+const describeSlotDistance = (slot: Pick<HomeAreaLineSlot, "metric" | "points">): string =>
+  describeScoreMoveBand(slot.metric, slot.points) ?? formatPoints(slot.points);
+
+const capitalize = (text: string) => `${text.charAt(0).toUpperCase()}${text.slice(1)}`;
+
+/**
  * Where an area stands against its pause line, short enough to sit under the
- * decision's name in the picker: the answer before the click. "Past its
- * pause line", or how far the reading is from it. Undefined for an area whose rule
- * states no pause line.
+ * decision's name in the picker: the answer before the click. "On hold", or how
+ * big a move would pause it ("An unusual move from pausing"). Undefined for an
+ * area whose rule states no pause line.
  */
 export const describeAreaPauseStatus = (
   row: Pick<HomeAreaRow, "pause">,
@@ -285,8 +298,9 @@ export const describeAreaPauseStatus = (
   /* The badge's state, from the same distance the words below describe. */
   const state = resolveLineState(row.pause.points, "pause", row.pause.met) ?? "clear";
   if (row.pause.met) return { text: "On hold", crossed: true, state };
-  if (row.pause.points === 0) return { text: "At its pause line", crossed: false, state };
-  return { text: `${formatPoints(row.pause.points)} from pausing`, crossed: false, state };
+  /* The verb, not the line (2026-11-03): "At its pause line" explained the mechanism. */
+  if (row.pause.points === 0) return { text: "On the edge of pausing", crossed: false, state };
+  return { text: `${capitalize(describeSlotDistance(row.pause))} from pausing`, crossed: false, state };
 };
 
 /**
@@ -368,11 +382,14 @@ export const describeLineStateBand = (
       row.resume && !row.resume.met && Number.isFinite(row.resume.points) ? row.resume.points : Number.POSITIVE_INFINITY;
     const binding = held.reduce((best, row) => (nearestRestart(row) < nearestRestart(best) ? row : best));
     const restart = binding.resume;
+    /* How big a move lifts the hold, against the record ("a rare move from
+       restarting"), where "24 pts from restarting" gave a size with nothing to
+       hold it against (2026-11-03). */
     return band(
       "crossed",
       binding,
       restart && !restart.met && Number.isFinite(restart.points)
-        ? `${decisionAreaLabel(binding.area)} — ${formatPoints(restart.points)} from restarting.`
+        ? `${decisionAreaLabel(binding.area)} — ${describeSlotDistance(restart)} from restarting.`
         : `${decisionAreaLabel(binding.area)} is on hold.`,
     );
   }
@@ -382,10 +399,13 @@ export const describeLineStateBand = (
   const close = ruled.filter((row) => resolveLineState(row.pause?.points, "pause", row.pause?.met) === "near");
   if (close.length === 0) return null;
   const binding = close.reduce((best, row) => ((row.pause?.points ?? 0) < (best.pause?.points ?? 0) ? row : best));
+  const pause = binding.pause;
   return band(
     "near",
     binding,
-    `${decisionAreaLabel(binding.area)} — ${formatPoints(binding.pause?.points ?? 0)} from pausing.`,
+    pause && pause.points > 0
+      ? `${decisionAreaLabel(binding.area)} — ${describeSlotDistance(pause)} from pausing.`
+      : `${decisionAreaLabel(binding.area)} is on the edge of pausing.`,
   );
 };
 
@@ -561,4 +581,37 @@ export const buildHomeAreaRows = ({
     pauseQualifier: rule.pause.qualifier,
     resumeQualifier: rule.resume.qualifier,
   })).map(withIdleRestart);
+};
+
+const lowerFirst = (value: string) => `${value.charAt(0).toLowerCase()}${value.slice(1)}`;
+
+/*
+ * One decision answered before the reader picks one (2026-11-03): the area nearest to
+ * changing, as the question a founder would ask and this week's answer to it. "Hiring
+ * this month? Wait until funding pressure falls below 66." A first visit met five
+ * choices and a sentence about the guidance, and had to know which to open; this says
+ * what the page is for by doing it once. On hold, the area whose restart is nearest;
+ * otherwise the one nearest its pause. Null when no area states a numeric line.
+ */
+const slotPhrase = (slot: HomeAreaLineSlot): string | null =>
+  slot.value === undefined || slot.holdsAbove === undefined
+    ? null
+    : `${ruleMetricLabel[slot.metric].toLowerCase()} ${slot.holdsAbove ? "rises above" : "falls below"} ${slot.value}`;
+
+export const describeFirstAnswer = (
+  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[],
+): string | null => {
+  const nearest = <T extends Pick<HomeAreaRow, "area" | "pause" | "resume">>(candidates: T[], points: (row: T) => number) =>
+    candidates.reduce<T | undefined>((best, row) => (best === undefined || points(row) < points(best) ? row : best), undefined);
+  const held = rows.filter((row) => row.pause?.met && row.resume && !row.resume.met);
+  const heldRow = nearest(held, (row) => row.resume?.points ?? Number.POSITIVE_INFINITY);
+  if (heldRow?.resume) {
+    const phrase = slotPhrase(heldRow.resume);
+    return `${decisionAreaLabel(heldRow.area)} this month? ${phrase ? `Wait until ${phrase}` : `Wait: ${formatPoints(heldRow.resume.points)} from restarting`}.`;
+  }
+  /* Not on hold: the badge's own distance, so the answer and the choice below it agree. */
+  const open = rows.filter((row) => row.pause && !row.pause.met);
+  const openRow = nearest(open, (row) => row.pause?.points ?? Number.POSITIVE_INFINITY);
+  const openStatus = openRow ? describeAreaPauseStatus(openRow) : undefined;
+  return openRow && openStatus ? `${decisionAreaLabel(openRow.area)} this month? Go ahead: ${lowerFirst(openStatus.text)}.` : null;
 };

@@ -388,10 +388,11 @@ describe("TrustStrip", () => {
     assert.doesNotMatch(html, /Confidence/, "the margin is not called confidence on a page");
   });
 
-  /* The margin cell prints the distance in the nearer score's own points, then whether
-     the call could change next week: one cell, where a fourth answered "Yes" beside
-     the distance it restated (2026-10-09). */
-  it("prints the margin in points and says in the same cell whether the call could change", () => {
+  /* The margin cell prints the distance as how big a move of the nearer score it takes
+     against the month-end record (2026-11-03; in that score's points until then), then
+     whether the call could change next week: one cell, where a fourth answered "Yes"
+     beside the distance it restated (2026-10-09). */
+  it("prints the margin as a move the record makes and says in the same cell whether the call could change", () => {
     const html = renderToStaticMarkup(
       <TrustStrip
         recordDateLabel="Oct 5, 2026"
@@ -403,10 +404,10 @@ describe("TrustStrip", () => {
         basis={onRecord}
       />,
     );
-    assert.match(html, />Risk appetite 1 pt from a change<span[^>]*data-next-week[^>]*>\u00A0·\u00A0Could change next week<\/span>/);
+    assert.match(html, />A common risk-appetite move from a change<span[^>]*data-next-week[^>]*>\u00A0·\u00A0Could change next week<\/span>/);
     assert.doesNotMatch(html, />Yes</);
     assert.doesNotMatch(html, /<dt[^>]*>Could change next week<\/dt>/, "no fourth cell");
-    assert.equal((html.match(/1 pt/g) ?? []).length, 1, "the distance prints once");
+    assert.equal((html.match(/common/g) ?? []).length, 1, "the distance prints once");
     /* With the regime, the line is named by what is on its other side (2026-10-27). */
     const named = renderToStaticMarkup(
       <TrustStrip
@@ -420,7 +421,7 @@ describe("TrustStrip", () => {
         regime="DEFENSIVE"
       />,
     );
-    assert.match(named, />Risk appetite 1 pt from Freezing<span[^>]*data-next-week/);
+    assert.match(named, />A common risk-appetite move from Freezing<span[^>]*data-next-week/);
     const waiting = renderToStaticMarkup(
       <TrustStrip recordDateLabel="Oct 5, 2026" sourcesLive sourcesLabel="All sources live" confidenceLabel="MED" margin={{ signal: "tightness", points: 9 }} couldChangeNextWeek changeReason="a change is waiting on a second reading" basis={onRecord} />,
     );

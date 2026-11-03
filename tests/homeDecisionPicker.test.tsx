@@ -6,7 +6,7 @@ import { DecisionPicker, type DecisionPickerOption } from "../app/components/hom
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
 import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
-import { buildHomeDecisionCookie, parseHomeDecision, readHomeDecisionCookie } from "../lib/report/home/homeSectionModel";
+import { buildHomeDecisionCookie, describeAreaPauseStatus, describeFirstAnswer, parseHomeDecision, readHomeDecisionCookie, type HomeAreaLineSlot } from "../lib/report/home/homeSectionModel";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import * as nextNavigation from "next/navigation";
 
@@ -85,7 +85,9 @@ describe("decision picker", () => {
   it("puts each area's standing on its choice, so the answers are on the page before a click", () => {
     const choices = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
     assert.equal((choices.match(/On hold/g) ?? []).length, 4);
-    assert.match(choices, /4 pts from pausing/);
+    /* The distance as a move the record makes: risk appetite moved 4 points or more
+       in most months since 2012 (2026-11-03; "4 pts from pausing" until then). */
+    assert.match(choices, /A common move from pausing/);
     /* The shared state badge: a crossed line in the line state's own red with
        the pause glyph, a close one with the dashed circle, so the two differ in
        shape. */
@@ -94,21 +96,29 @@ describe("decision picker", () => {
       /data-line-state-badge="crossed" class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>On hold</,
       "a crossed line is drawn as a state, in the crossed ink",
     );
-    assert.match(choices, /data-line-state-badge="near"[^>]*><svg[^>]*lucide-circle-dashed[\s\S]*?<\/svg><span>4 pts from pausing</);
+    assert.match(choices, /data-line-state-badge="near"[^>]*><svg[^>]*lucide-circle-dashed[\s\S]*?<\/svg><span>A common move from pausing</);
     /* Each choice is a card, so its area glyph is the 20px size. */
     assert.equal((choices.match(/data-concept-icon="area"/g) ?? []).length, 5);
     assert.equal((choices.match(/class="lucide [^"]*size-5" data-concept-icon="area"/g) ?? []).length, 5);
   });
 
-  it("counts the crossed pause lines once, over the choices", () => {
-    /* The expectation line and the count used to contradict each other in
-       consecutive lines: "4 of 5 areas are on hold" over "most weeks neither
-       happens". It prints only when it is true of this week. */
-    assert.match(html, /An area on hold is already covered by this week&#x27;s guidance\./);
-    assert.doesNotMatch(html, /Most weeks no area pauses or restarts\./);
-    const count = html.indexOf("4 of 5 areas are on hold.");
-    assert.ok(count > html.indexOf("Your decisions this week"), "the count sits under the heading");
-    assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");
+  it("answers one decision before any is picked, and counts the holds only on a saved copy", () => {
+    /* A first visit met five choices and "An area on hold is already covered by this
+       week's guidance" (2026-11-03). It now reads one answer: the held area nearest
+       its restart. The count ("4 of 5 areas are on hold.") repeated the card's
+       "On hold …" line and the badges on a live week, so it prints on a saved copy
+       alone, where it carries the reading's date. */
+    assert.match(html, /<p data-first-answer="true"[^>]*>Hiring this month\? Wait: 17 pts from restarting\.<\/p>/);
+    assert.doesNotMatch(html, /already covered by this week/);
+    assert.doesNotMatch(html, /4 of 5 areas are on hold\./);
+    const answer = html.indexOf("data-first-answer");
+    assert.ok(answer > html.indexOf("Your decisions this week") && answer < html.indexOf("<fieldset"), "under the heading, over the choices");
+
+    const saved = renderToStaticMarkup(<DecisionPicker options={OPTIONS} regime="SCARCITY" savedReadingDate="Jun 17, 2026" />);
+    assert.match(saved, /4 of 5 areas were on hold on the Jun 17, 2026 reading\./);
+
+    const opened = renderToStaticMarkup(<DecisionPicker options={OPTIONS} regime="SCARCITY" initialSelected="hiring" />);
+    assert.doesNotMatch(opened, /data-first-answer/, "gone once an area is open");
   });
 
   it("carries no engine vocabulary", () => {
@@ -226,5 +236,31 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     assert.equal(readHomeDecisionCookie("whether-home-decision=payroll"), null, "anything that is not an area is ignored");
     assert.equal(readHomeDecisionCookie(null), null);
     assert.match(buildHomeDecisionCookie("hiring"), /^whether-home-decision=hiring; path=\/; max-age=\d+; SameSite=Lax$/);
+  });
+});
+
+describe("the first answer", () => {
+  const slot = (overrides: Partial<HomeAreaLineSlot>): HomeAreaLineSlot => ({ line: "", distance: "", points: 10, met: false, metric: "tightness", ...overrides });
+
+  it("names the condition that lifts the nearest hold", () => {
+    assert.equal(
+      describeFirstAnswer([
+        { area: "hiring", pause: slot({ met: true }), resume: slot({ points: 24, value: 66, holdsAbove: false }) },
+        { area: "capital-raising", pause: slot({ met: true }), resume: slot({ points: 30, value: 60, holdsAbove: false }) },
+      ]),
+      "Hiring this month? Wait until funding pressure falls below 66.",
+    );
+  });
+
+  it("with nothing on hold, says go ahead and how far the nearest pause is, as its badge does", () => {
+    const roadmap = { area: "product-tempo" as const, pause: slot({ points: 9, metric: "riskAppetite" }) };
+    const badge = describeAreaPauseStatus(roadmap)?.text ?? "";
+    assert.ok(badge.length > 0);
+    assert.equal(
+      describeFirstAnswer([{ area: "hiring", pause: slot({ points: 20 }) }, roadmap]),
+      `Roadmap this month? Go ahead: ${badge.charAt(0).toLowerCase()}${badge.slice(1)}.`,
+      "the badge's own words",
+    );
+    assert.equal(describeFirstAnswer([]), null);
   });
 });

@@ -12,6 +12,7 @@ import {
   HOME_SECTIONS,
   buildHomeDecisionCookie,
   describeAreaPauseStatus,
+  describeFirstAnswer,
   describePauseLineCount,
   type HomeAreaLineSlot,
   type HomeAreaRow,
@@ -113,6 +114,7 @@ export function DecisionPicker({
 }) {
   const [selected, setSelected] = useState<DecisionArea | undefined>(initialSelected);
   const active = options.find((option) => option.area === selected);
+  const firstAnswer = describeFirstAnswer(options);
   /* One side of the rule, the one that can change the area's state (2026-11-03), as the
      rules table and every paste print it: an area on hold shows when it restarts, any
      other area when it pauses. "Nothing to resume" beside a running area is gone. */
@@ -195,19 +197,21 @@ export function DecisionPicker({
               </a>
             ) : null}
           </div>
-          {pauseLineCount ? (
+          {/* A saved copy only (2026-11-03): on a live week the card's "On hold …" line
+              and the badges below say the same count. */}
+          {pauseLineCount && savedReadingDate ? (
             <p data-pause-line-count className="text-fluid-sm font-medium text-slate-200">
               {pauseLineCount}
             </p>
           ) : null}
-          <p className="text-fluid-xs text-slate-400">
-            {/* "Most weeks neither happens" sat under a count saying four of five were
-                held, so the page contradicted itself in consecutive lines. The
-                expectation line prints only when it is true of this week. */}
-            {options.some((option) => option.pause?.met)
-              ? "An area on hold is already covered by this week's guidance."
-              : "Most weeks no area pauses or restarts."}
-          </p>
+          {/* One decision answered before any is picked (2026-11-03), in place of "An
+              area on hold is already covered by this week's guidance", which told a
+              first visit nothing it could act on. Gone once an area is open. */}
+          {firstAnswer && !active ? (
+            <p data-first-answer className="text-fluid-sm text-slate-300">
+              {firstAnswer}
+            </p>
+          ) : null}
         </div>
 
         <SegmentedControl

@@ -133,7 +133,7 @@ Since 2026-10-09 no page, paste or email prints "Confidence". The number measure
 | | `MED` / `MEDIUM` | Some |
 | | `LOW` | Little |
 | `confidence.percent` / `confidencePercent` | 30 to 92 | Not printed on pages; the calibration study's "Published %" column |
-| (derived from `scores` and `thresholds`) | the nearer score, chosen as the band chooses it | "Risk appetite 1 pt from Freezing" on the trust strip; "(risk appetite is 1 point away)" in pastes, after "Room before a change: little" |
+| (derived from `scores` and `thresholds`) | the nearer score, chosen as the band chooses it | "A common risk-appetite move from Freezing" on the trust strip (the points as a move the month-end record makes, `describeScoreMoveBand`; "Risk appetite 1 pt from Freezing" until 2026-11-03); "(risk appetite is 1 point away)" in pastes, after "Room before a change: little" |
 
 The band still steps down a level on a saved copy older than 48 hours, as `confidence.label` always has; the strip's Sources cell names the saved copy. Wording lives in `lib/report/reportFormatting.ts` (`MARGIN_LABEL`, `formatMarginBand`, `formatMargin`); the points come from `resolveNearestLineMargin` in `lib/report/confidence.ts`.
 
