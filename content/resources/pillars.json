@@ -89,7 +89,7 @@
       {
         "heading": "Governance operating cadence: 30-day confirmation and threshold response",
         "paragraphs": [
-          "Require a move in an indicator to last 30 days before it changes a decision. Thirty days is the shortest window that filters out a one-off weekly spike, and short enough that the board does not see deterioration a quarter late.",
+          "Require a move in an indicator to last 30 days before it changes a decision. Thirty days is the shortest window that filters out a one-off weekly spike, and short enough that the board will not see deterioration a quarter late.",
           "For the 30-day rule to work, write down three things: which indicators are watched, how long a move must last to count, and which spending change each lasting move triggers. If any of the three is left open, the rule gets applied differently each month.",
           "The board enforces consistency. Management is free to act inside the thresholds but may not reinterpret them each month. Applying the same thresholds every month is what keeps the board’s trust when results are mixed."
         ],
@@ -138,7 +138,7 @@
         "heading": "Operating scorecards boards should require every month",
         "paragraphs": [
           "Separate leading indicators from lagging ones, and note how far each can be trusted. Quarterly revenue growth is familiar and easy to present, but by the time a lagging number falls, the options have already narrowed. Add forward-looking measures: sales-cycle length, onboarding completion rate, and early cohort retention.",
-          "Mark how reliable each metric is. If a metric is improving but rests on incomplete instrumentation, say so on the page, so the board does not commit more money on a fragile reading. Before approving an incremental commitment, ask whether the improvement would survive better data.",
+          "Mark how reliable each metric is. If a metric is improving but rests on incomplete instrumentation, say so on the page, so the board will not commit more money on a fragile reading. Before approving an incremental commitment, ask whether the improvement would survive better data.",
           "Break metrics out by customer segment. A company-wide average can hide decline in high-value segments while low-value segments inflate top-line activity. With limited runway, that distortion steers spend toward traction that is not real.",
           "Review cash conversion and decision speed together. If decisions take longer while burn stays flat, the company is paying for internal drag, not learning. Track spend against decision cycle time, and ask which approval steps slow decisions without producing information.",
           "Add a variance note to each scorecard section. Finance, product, and sales and marketing often read the same movement differently; instead of forcing agreement, record each view with a confidence rating and the next check it calls for. The board sees the disagreement without the decision slowing down.",
@@ -166,7 +166,7 @@
           "Which assumptions depend on outside events, and which can we control? Give outside dependencies larger buffers and shorter review intervals. Give internal assumptions a named owner and dated checkpoints. The split shows the board where its scrutiny can change the outcome.",
           "How does this proposal change our options 90 days from now? A strong proposal keeps or widens the company’s options while it gathers evidence; a weak one uses options up fast and teaches little. Asking this makes directors judge flexibility, not an isolated return-on-investment story.",
           "If a threshold is breached, what do we do in the first 48 hours? Strong teams set containment, communication, and the handoff of the decision in advance. Without a 48-hour plan, escalation turns into late triage and the damage spreads.",
-          "Which decision from last quarter would we make differently with what we know now, and what have we changed so we do not repeat it? The answer should name a rule, threshold or document the board changed after last quarter’s retrospective."
+          "Which decision from last quarter would we make differently with what we know now, and what have we changed so we will not repeat it? The answer should name a rule, threshold or document the board changed after last quarter’s retrospective."
         ],
         "reference": true
       },
@@ -540,7 +540,7 @@
         "paragraphs": [
           "A healthy portfolio mixes reversible experiments with a few deliberate irreversible bets. The board’s job is to let irreversible exposure grow only as the evidence improves. Review the ratio of the two every month and discuss any drift.",
           "Give each experiment a fixed budget and a hard stop condition. Teams can then test quickly without returning for approval, and the downside stays capped. Speed with a capped downside is what reversibility governance buys.",
-          "Hold irreversible bets to a higher bar: strategic fit, evidence that has lasted, and a contingency plan ready to run. A compelling upside story without a contingency plan does not qualify for approval.",
+          "Hold irreversible bets to a higher bar: strategic fit, evidence that has lasted, and a contingency plan ready to run. A compelling upside story without a contingency plan cannot qualify for approval.",
           "As the portfolio grows, map the dependencies between decisions. Two decisions that are each reversible can become hard to unwind together if they share infrastructure, sales commitments, or promises to customers. Group decisions that share infrastructure, sales commitments, or customer promises together in the board pack.",
           "For each decision, list the future choices it rules out alongside its expected value. Reversible decisions keep future paths open; irreversible ones close them, so ration irreversible decisions deliberately.",
           "Keep committing, but in a form the company can still change, and keep the cost of correcting below the level of material damage."

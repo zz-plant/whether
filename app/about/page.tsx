@@ -72,7 +72,7 @@ export default function AboutPage() {
         <h2 className="type-section">How it works</h2>
         <p className="text-sm text-slate-300">
           Hiring, Roadmap, Fundraising, Spending and New bets each get an action, a score at which to pause and a
-          score at which to restart. The two are set apart, so a small move back doesn&rsquo;t restart anything.
+          score at which to restart. The two are set apart, so a small move back won&rsquo;t restart anything.
         </p>
         <p className="text-sm text-slate-300">
           Each published brief stays on record. The{" "}
@@ -193,7 +193,7 @@ export default function AboutPage() {
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="type-section">Corrections and questions</h2>
         <p className="text-sm text-slate-300">
-          Whether publishes dated records that do not change after the fact. If a published brief is wrong, say so
+          Whether publishes dated records that will not change after the fact. If a published brief is wrong, say so
           and it gets a correction note rather than a silent edit.
         </p>
         <div className="flex flex-wrap gap-2 pt-1">

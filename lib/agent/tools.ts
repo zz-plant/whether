@@ -306,7 +306,7 @@ const AGENT_TOOLS = [
     name: "get_projection",
     title: "Project weeks to a change in conditions",
     description:
-      "Weeks until the scores cross a line where conditions change at a given pace, and the regime they would then be in. A score moving away from its line does not cross it. With no arguments it uses today's scores and their pace; give scores to ask what-if, and any pace you leave out is taken as 0. `inputs` says which values were yours, which were today's, and which were assumed.",
+      "Weeks until the scores cross a line where conditions change at a given pace, and the regime they would then be in. A score moving away from its line will not cross it. With no arguments it uses today's scores and their pace; give scores to ask what-if, and any pace you leave out is taken as 0. `inputs` says which values were yours, which were today's, and which were assumed.",
     input: {
       regime: regimeInput.optional().describe(`${REGIME_ARGUMENT} Defaults to today's conditions. The projection runs from where the scores sit; the result says so when they sit in another regime.`),
       tightness: numberInput.optional().describe("Funding pressure, 0 to 100. Defaults to today's."),

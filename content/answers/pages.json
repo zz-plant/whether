@@ -268,7 +268,7 @@
     "thresholdFocus": "both",
     "featuredOrder": 4,
     "contextHeading": "Set hiring freeze and reopening criteria",
-    "context": "A freeze controls new commitments; it does not resolve workload or determine which work can stop. Pair it with a scope review so the remaining team can meet the commitments you keep. Reopening should depend on affordable capacity needs as well as improving market conditions.",
+    "context": "A freeze controls new commitments; it will not resolve workload or determine which work can stop. Pair it with a scope review so the remaining team can meet the commitments you keep. Reopening should depend on affordable capacity needs as well as improving market conditions.",
     "companyInputs": [
       "Cash impact of approved offers, open requisitions and essential backfills.",
       "Work to stop or defer if vacancies remain unfilled.",
@@ -308,7 +308,7 @@
     "thresholdFocus": "both",
     "featuredOrder": 6,
     "contextHeading": "Separate sales capacity from demand quality",
-    "context": "Hiring more reps cannot by itself repair weak demand or poor retention. Compare performance by tenure and territory so a few productive reps do not hide a weak ramp process. Set a company-specific payback limit against gross margin and available cash.",
+    "context": "Hiring more reps cannot by itself repair weak demand or poor retention. Compare performance by tenure and territory so a few productive reps cannot hide a weak ramp process. Set a company-specific payback limit against gross margin and available cash.",
     "companyInputs": [
       "Qualified demand, win rate and coverage per fully ramped rep.",
       "Recruiting cost, compensation, ramp duration and sales-cycle length.",

@@ -168,7 +168,7 @@ export const POLICY_OVERRIDE_CALL = {
     actionNow:
       "Keep your current plan, and hold anything you can't undo until the signals line up.",
     pauseIf: HELD_PAUSE_IF,
-    callChangesIf: "The signals line up on a later reading; until then the guidance is not changing.",
+    callChangesIf: "The signals line up on a later reading; until then the guidance won't change.",
     holdsUntil: "the signals line up",
     whyCouldBeWrong: "The signals are spread too far apart, so this week's direction can't be read clearly.",
   },
@@ -179,7 +179,7 @@ export const POLICY_OVERRIDE_CALL = {
     actionNow:
       "Keep your current plan, and hold anything you can't undo until the missing inputs return.",
     pauseIf: HELD_PAUSE_IF,
-    callChangesIf: "The missing inputs return in a live reading; until then the guidance is not changing.",
+    callChangesIf: "The missing inputs return in a live reading; until then the guidance won't change.",
     holdsUntil: "the missing inputs return",
     whyCouldBeWrong: "Too many inputs are missing, so this week's direction can't be read clearly.",
   },
@@ -194,7 +194,7 @@ export const POLICY_OVERRIDE_CALL_UNNAMED = {
   currentCall: "The guidance is on hold, so it is not changing this week.",
   actionNow: "Keep your current plan, and hold anything you can't undo until the hold lifts.",
   pauseIf: HELD_PAUSE_IF,
-  callChangesIf: "The hold lifts on a later reading; until then the guidance is not changing.",
+  callChangesIf: "The hold lifts on a later reading; until then the guidance won't change.",
   holdsUntil: "the hold lifts",
   whyCouldBeWrong: "The guidance is on hold, so this week's direction can't be read clearly.",
 } as const satisfies PolicyHoldCall;
@@ -211,7 +211,7 @@ export const POLICY_OVERRIDE_CALL_UNNAMED = {
 export const NO_LIVE_READING_CALL = {
   currentCall: "No live reading this week. Keep your current plan.",
   pauseIf: "No pause line this week. Hold anything you can't undo; the rest can go ahead.",
-  callChangesIf: "A live reading lands; until then the guidance is not changing.",
+  callChangesIf: "A live reading lands; until then the guidance won't change.",
 } as const;
 
 /**

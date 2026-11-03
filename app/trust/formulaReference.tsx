@@ -24,6 +24,7 @@ import {
 } from "../../lib/regimeEngine";
 import type { RegimeKey } from "../../lib/regimeEngine";
 import { REGIME_HEX_COLORS } from "../../lib/regimePhaseSpace";
+import { SHOCK_CROSSING_POINTS } from "../../lib/regimeStateMachine";
 import { REGIME_LABELS } from "../../lib/regimePresentation";
 import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../lib/report/reportCopy";
 import { ruleMetricLabel } from "../../lib/report/boundedDecisionRules";
@@ -462,7 +463,7 @@ export function FormulaReference({
               {adj.vixMarketStressVetoMean} or more over its last {adj.vixVetoMeanWindow} readings,
               the score is capped at the line where conditions change ({RISK_APPETITE_REGIME_THRESHOLD});
               between {adj.vixMarketStressUnwindMean} and {adj.vixMarketStressVetoMean} it is capped at{" "}
-              {adj.vixVetoSoftCap}. It uses an average rather than one day, so a single spike does not
+              {adj.vixVetoSoftCap}. It uses an average rather than one day, so a single spike cannot
               cap a week. While the cap holds, extreme market stress sets the ceiling, not the rates.
             </li>
           </ul>
@@ -474,7 +475,11 @@ export function FormulaReference({
               <span className="text-slate-400">Conditions:</span>
               <RegimeQuadrant />
               <span className="mt-1 block text-xs text-slate-400">
-                At the narrowest margin conditions do not change at all.
+                {/* A rule, not a record (2026-11-03): the state machine holds conditions while
+                    the margin is at its lowest band and lets only a shock crossing through. */}
+                At the narrowest margin conditions cannot change, unless one reading moves a score{" "}
+                {SHOCK_CROSSING_POINTS} points or more, from more than {REGIME_CONFIDENCE_NEAR_THRESHOLD} away, past
+                where conditions change.
               </span>
             </li>
             <li>

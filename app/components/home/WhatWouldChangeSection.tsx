@@ -190,7 +190,7 @@ export function WhatWouldChangeSection({
                 ) : null}
               </dl>
               <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
-                Better conditions alone don&rsquo;t lift a pause. The restart condition sits further out, so one good week can&rsquo;t undo it.
+                Better conditions alone won&rsquo;t lift a pause. The restart condition sits further out, so one good week can&rsquo;t undo it.
               </p>
             </div>
           ) : null}

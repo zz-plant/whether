@@ -519,7 +519,7 @@ const evidenceLineBySignal: Record<ReportDynamics["changedSignals"][number]["key
    the bar, which is nothing. */
 const curveSlopeImplication = (delta: number): string =>
   delta > 0
-    ? `Keep the ${SPENDING_PAYBACK_BAR_MONTHS}-month payback bar on new spend; a rising gauge does not lengthen it.`
+    ? `Keep the ${SPENDING_PAYBACK_BAR_MONTHS}-month payback bar on new spend; a rising gauge should not lengthen it.`
     : `Keep the ${SPENDING_PAYBACK_BAR_MONTHS}-month payback bar on new spend; a falling gauge is a reason to hold it, not stretch it.`;
 
 /* For a rate the earlier reading did not record (`ReportDynamics.notCompared`). */
