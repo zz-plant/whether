@@ -198,7 +198,7 @@ export function ShareImageArtifacts() {
         <CopyImageCardButton />
         <SharePortraitCardButton />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="weather-switch gap-4 [--col-min:16rem]">
         {artifacts.map((artifact) => (
           <article key={artifact.title} className="weather-card flex flex-col gap-3" data-image-artifact={artifact.title}>
             {/* The picture the files draw. Not a link: the actions below open

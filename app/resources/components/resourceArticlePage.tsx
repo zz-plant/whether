@@ -164,7 +164,7 @@ export function ResourceArticlePage({ article, decisionArtifact }: { article: Re
               <h2 className="text-lg font-semibold text-slate-100 print:text-slate-900">This week’s guidance</h2>
               <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.postureSummary}</p>
               <p className="text-sm text-slate-200 print:text-slate-700">{decisionArtifact.decisionShiftSummary}</p>
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="weather-grid gap-3 [--grid-max:2]">
                 {decisionArtifact.mappedRules.map((rule) => (
                   <article key={rule.area} className="weather-surface space-y-2 px-4 py-4 text-sm">
                     <p className="type-eyebrow">This week&apos;s rule · {decisionAreaLabel(rule.area)}</p>

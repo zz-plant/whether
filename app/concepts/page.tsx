@@ -196,7 +196,7 @@ function EssayYearStrip({ timeline, recordStart }: { timeline: readonly Timeline
 /* One side of a pair: the advice, the text, its month and the record that month. */
 function PairSide({ essay }: { essay: TimelineEssay }) {
   return (
-    <div className="grid gap-1 sm:grid-cols-[6rem_minmax(0,1fr)] sm:gap-x-4">
+    <div className="weather-sidebar-start gap-x-4 gap-y-1 [--aside:6rem] [--main-min:20rem]">
       <p className="type-eyebrow">{ADVICE_STANCE_DEFINITIONS[essay.stance].label}</p>
       <div className="min-w-0 space-y-1">
         <p className="text-sm text-slate-300">
@@ -265,7 +265,7 @@ export default function ProductCanonPage() {
       />
 
       <SecondaryPageSection title="What the record shows" description={describeCanonBaseRate(baseRate)}>
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,26rem)_minmax(0,1fr)]">
+        <div className="weather-sidebar-start gap-8 [--aside:26rem] [--main-min:24rem]">
           <AdvicePlane points={planePoints} lines={canonChangeLines} />
           <div className="min-w-0 space-y-6">
             <div className="overflow-x-auto">
@@ -397,7 +397,7 @@ export default function ProductCanonPage() {
             and the stamps as the record's colours, so the list can be scanned
             for either without reading every entry. On a phone the rail is the
             entry's first line. The date opens that year in the archive. */}
-        <ol className="mt-6 space-y-5">
+        <ol className="@container mt-6 space-y-5">
           {timeline.map((essay) => {
             const year = String(essay.published.year);
             const published = (
@@ -416,9 +416,9 @@ export default function ProductCanonPage() {
                    renders; `auto` remembers the real one after. Anchor links
                    from "this week" above still land: the browser renders a
                    targeted entry even while it is skipped. */
-                className="grid gap-x-8 gap-y-2 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0 [content-visibility:auto] [contain-intrinsic-size:auto_260px] sm:grid-cols-[10rem_minmax(0,1fr)]"
+                className="grid gap-x-8 gap-y-2 border-t border-[color:var(--border-subtle)] pt-4 first:border-t-0 first:pt-0 [content-visibility:auto] [contain-intrinsic-size:auto_260px] @xl:grid-cols-[10rem_minmax(0,1fr)]"
               >
-                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 sm:flex-col sm:items-start">
+                <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 @xl:flex-col @xl:items-start">
                   <p className="type-eyebrow">
                     {archivedYears.has(year) ? (
                       <a
@@ -431,7 +431,7 @@ export default function ProductCanonPage() {
                       published
                     )}
                   </p>
-                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 max-sm:contents">
+                  <p className="flex flex-wrap items-center gap-x-2 gap-y-1 @max-xl:contents">
                     <span className="sr-only">Conditions that month: </span>
                     <ReadingLabel reading={essay.reading} recordStart={recordStart} />
                   </p>

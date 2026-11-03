@@ -259,7 +259,7 @@ export default async function HistoryPage({
               2026", then "Oct 6, 2026", then a FREEZING stamp, and four weeks of the
               same two sentences took four cards. The run links its newest week and
               lists every week under it, since each still has its own page. */}
-          <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="weather-grid gap-3">
             {groupPublishedBriefRuns(publishedBriefs).map((run) => {
               const [newest] = run;
               return (
@@ -368,10 +368,10 @@ export default async function HistoryPage({
             initialYear={Number(resolvedSearchParams?.year) || 0}
             regimeSeries={fullSeries}
           />
-          <div className="grid gap-6 sm:grid-cols-2">
+          <div className="weather-grid gap-6 [--col-min:18rem] [--grid-max:2]">
             <HistoricalTrendChart label={regimeSignalLabel.tightness} color="var(--color-semantic-tightening-border)" points={tightnessTrend} periodLabel="months" changeLine={TIGHTNESS_REGIME_THRESHOLD} />
             <HistoricalTrendChart label={regimeSignalLabel.riskAppetite} color="var(--color-semantic-easing-border)" points={riskAppetiteTrend} increaseIsPositive periodLabel="months" changeLine={RISK_APPETITE_REGIME_THRESHOLD} />
-            <ScreenshotCaption className="sm:col-span-2" />
+            <ScreenshotCaption className="col-span-full" />
           </div>
         </div>
       </UrlDetails>

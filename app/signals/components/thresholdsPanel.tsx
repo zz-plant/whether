@@ -335,7 +335,7 @@ export const ThresholdsPanel = ({
             <p className="mt-2 text-sm text-slate-300">
               Start with one preset, then expand the detailed controls only if you need your own lines.
             </p>
-            <div className="mt-3 grid gap-3 md:grid-cols-3">
+            <div className="mt-3 weather-switch gap-3 [--col-min:12rem]">
               {thresholdPresets.map((preset) => (
                 <button
                   key={preset.id}
@@ -361,8 +361,8 @@ export const ThresholdsPanel = ({
           <details className={DISCLOSURE_CLASS}>
             <summary className={DISCLOSURE_SUMMARY_CLASS}>Edit exact numbers</summary>
             <div className="pt-4">
-              <Form onFormSubmit={handleSubmit} className="grid gap-4">
-                <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-[1fr,1fr,1fr,auto]">
+              <Form onFormSubmit={handleSubmit} className="@container grid gap-4">
+                <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 @3xl:grid-cols-[1fr,1fr,1fr,auto]">
                   <Fieldset.Legend className="sr-only">Set threshold guardrails</Fieldset.Legend>
                   <ThresholdNumberField
                     id="threshold-base-rate"
@@ -436,7 +436,7 @@ export const ThresholdsPanel = ({
           </details>
         </div>
 
-        <div className="mt-6 grid gap-4 lg:grid-cols-[1.2fr,1fr]">
+        <div className="mt-6 weather-switch gap-4 [--col-min:18rem]">
           <div className="weather-surface p-4">
             <p className="type-eyebrow">Applied thresholds</p>
             <div className="mt-3 space-y-2 text-sm text-slate-300">

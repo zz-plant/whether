@@ -220,7 +220,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Trust and evidence</h2>
         <p className="text-sm text-slate-300">{payload.citationMeta}</p>
-        <div className="grid gap-3 sm:grid-cols-3">
+        <div className="weather-grid gap-3 [--col-min:13rem]">
           {payload.evidence.map((item) => (
             <article key={item.title} className="rounded-lg border border-slate-700/70 bg-slate-950/50 px-4 py-4">
               <p className="type-eyebrow">{item.confidenceLabel}</p>

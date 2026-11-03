@@ -161,7 +161,7 @@ export default async function ResourcesHubPage({
                   </h3>
                   {areaStanding ? <AnswerStandingStamp standing={areaStanding} regime={regime} className="" /> : null}
                 </div>
-                <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
+                <ul className="@container divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
                   {group.answers.map((page) => {
                     const answerStanding = describeAnswerStanding({ page, areaRows, conditionsLabel });
                     const standing = answerStanding?.kind === "conditions" ? answerStanding : undefined;
@@ -175,25 +175,25 @@ export default async function ResourcesHubPage({
                             phone and in a column of its own from `sm`. */}
                         <Link
                           href={answerPageHref(page.slug)}
-                          className={`${ROW_CLASS} ${standing ? "sm:grid-cols-[minmax(0,1fr)_auto_auto]" : ""}`}
+                          className={`${ROW_CLASS} ${standing ? "@lg:grid-cols-[minmax(0,1fr)_auto_auto]" : ""}`}
                         >
                           <p className="col-start-1 row-start-1 text-sm font-semibold text-slate-100">{page.title}</p>
                           {standing ? (
                             <AnswerStandingStamp
                               standing={standing}
                               regime={regime}
-                              className="col-start-1 row-start-2 justify-self-start sm:col-start-2 sm:row-span-2 sm:row-start-1 sm:justify-self-end"
+                              className="col-start-1 row-start-2 justify-self-start @lg:col-start-2 @lg:row-span-2 @lg:row-start-1 @lg:justify-self-end"
                             />
                           ) : null}
                           <span
                             aria-hidden="true"
                             className={`col-start-2 row-start-1 shrink-0 text-slate-500 ${
-                              standing ? "row-span-3 sm:col-start-3 sm:row-span-2" : "row-span-2"
+                              standing ? "row-span-3 @lg:col-start-3 @lg:row-span-2" : "row-span-2"
                             }`}
                           >
                             ›
                           </span>
-                          <p className={`col-start-1 text-xs text-slate-400 ${standing ? "row-start-3 sm:row-start-2" : "row-start-2"}`}>
+                          <p className={`col-start-1 text-xs text-slate-400 ${standing ? "row-start-3 @lg:row-start-2" : "row-start-2"}`}>
                             {page.shortAnswer}
                           </p>
                         </Link>
@@ -223,7 +223,7 @@ export default async function ResourcesHubPage({
 
         <section aria-labelledby="resources-pillars-heading" className="space-y-3">
           <h2 id="resources-pillars-heading" className="type-section">Governance frameworks</h2>
-          <ul className="grid gap-3 sm:grid-cols-2">
+          <ul className="weather-grid gap-3 [--grid-max:2]">
             {frameworks.map((entry) => (
               <li key={entry.href}>
                 <Link href={entry.href} className="weather-surface block space-y-1 px-4 py-4 text-sm text-slate-100 hover:border-sky-500/50">
@@ -274,7 +274,7 @@ export default async function ResourcesHubPage({
               Browse by role, company stage, situation or toolkit
             </summary>
             <div className="mt-4 space-y-6">
-              <section className="grid gap-4 lg:grid-cols-2">
+              <section className="weather-switch gap-4 [--col-min:20rem]">
                 <nav id="guided-translation" aria-labelledby="guided-translation-title" className="space-y-3">
                   <h3 id="guided-translation-title" className="text-sm type-eyebrow text-slate-300">By role or stage</h3>
                   <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
@@ -306,7 +306,7 @@ export default async function ResourcesHubPage({
                 </nav>
                 <ToolkitLibraryPanels query={resolvedSearchParams?.toolkitQuery} />
               </section>
-              <section className="grid gap-4 lg:grid-cols-2">
+              <section className="weather-switch gap-4 [--col-min:20rem]">
                 <div className="space-y-3">
                   <h3 className="text-sm type-eyebrow text-slate-300">Help by role</h3>
                   <div className="flex flex-wrap gap-2">

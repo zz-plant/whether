@@ -51,6 +51,80 @@
 }
 .weather-inset { padding: var(--layout-card-padding); }
 
+/* How a box sets its children side by side (ui-ux-standards §XXIX). The page
+   frame answers to the viewport; everything inside it answers to its own
+   width. Until 2026-11-03 each of about ninety layouts picked a viewport
+   breakpoint of its own (two equal columns split at sm in 24 places, md in 12,
+   lg in 7, xl in 2), so a block inside the report rail's column or beside an
+   aside split on the screen's width, not on the room it had, and the same
+   two-up block split at four different widths depending on who wrote it.
+
+   Three shapes, each deciding from the room it is given:
+   - switch: two to four peers, all side by side or all stacked, never 2 + 1;
+   - sidebar: a main column and an aside of --aside, which stacks when the
+     main column would keep less than --main-min (a share of the box, 55% by
+     default, or a length such as a chart's 28rem);
+   - grid: a list of like items, as many columns as fit at --col-min, up to
+     --grid-max.
+
+   --col-min is the narrowest a column reads at, not a breakpoint. The steps:
+   10rem a figure with its label, 13rem a field or a short card, 16rem (the
+   default) a card or a paragraph, 20rem a chart or a long paragraph. Set it
+   at the call site as `[--col-min:13rem]`.
+
+   Layered, so a utility on the same element (a gap, items-start) wins. */
+@layer components {
+  .weather-switch {
+    --switch-cols: 2;
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .weather-switch:has(> :nth-child(3)) { --switch-cols: 3; }
+  .weather-switch:has(> :nth-child(4)) { --switch-cols: 4; }
+  /* Negative below the threshold (clamped to 0, so the row shares the width),
+     enormous above it (so each child takes a line of its own). */
+  .weather-switch > * {
+    flex-grow: 1;
+    flex-basis: calc((var(--switch-cols) * var(--col-min, 16rem) - 100%) * 999);
+    min-width: 0;
+  }
+
+  .weather-sidebar,
+  .weather-sidebar-start {
+    display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
+  }
+  .weather-sidebar > *,
+  .weather-sidebar-start > * {
+    flex-grow: 1;
+    flex-basis: var(--aside, 18rem);
+    min-width: 0;
+  }
+  /* The main column: first in .weather-sidebar, last in -start. Its minimum
+     is the whole switch, so it is important: a `min-w-0` utility on the same
+     element (the usual guard on a flex child) outranks this layer and squeezed
+     the /share preview to 38px on a phone instead of stacking it. */
+  .weather-sidebar > :first-child,
+  .weather-sidebar-start > :last-child {
+    flex-basis: 0;
+    flex-grow: 999;
+    min-inline-size: min(100%, var(--main-min, 55%)) !important;
+  }
+
+  /* The +1px floor is the cap: a column wider than 1 / (max + 1) of the box
+     leaves no room for one more. */
+  .weather-grid {
+    display: grid;
+    grid-template-columns: repeat(
+      auto-fill,
+      minmax(max(min(100%, var(--col-min, 16rem)), 100% / (var(--grid-max, 3) + 1) + 1px), 1fr)
+    );
+    min-width: 0;
+  }
+}
+
 .weather-brief-flow {
   display: flex;
   flex-direction: column;
@@ -72,8 +146,12 @@
 /* The four company choices are equal keys on one row from sm up (2026-10-13). They used
    to break 2 + 2 below 1280px, which split the runway scale across two rows, and to wrap
    each sublabel mid-phrase beside its label. Labels now stack over their sublabels
-   (`stackSublabel`), which is narrow enough for four across. */
-@media (min-width: 640px) {
+   (`stackSublabel`), which is narrow enough for four across. Keyed to the shelf's
+   own width since 2026-11-03 (§XXIX), at the 36rem the shelf had at sm. */
+.weather-company-options {
+  container-type: inline-size;
+}
+@container (min-width: 36rem) {
   .weather-company-options fieldset {
     display: grid;
     grid-template-columns: repeat(4, minmax(0, 1fr));

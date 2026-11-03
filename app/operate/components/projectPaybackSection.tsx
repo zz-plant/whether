@@ -85,7 +85,7 @@ function ProjectNameField({ value, onCommit }: { value: string | undefined; onCo
     if ((name || undefined) !== value) onCommit(name || undefined);
   };
   return (
-    <div className="sm:col-span-3">
+    <div className="col-span-full">
       <label htmlFor={id} className="block text-fluid-nano text-slate-400">
         What it is
       </label>
@@ -154,7 +154,7 @@ function ProjectRow({
         ) : null}
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-3">
+      <div className="weather-grid gap-3 [--col-min:13rem]">
         <ProjectNameField value={entry.name} onCommit={(name) => onChange(withProjectField(entry, "name", name))} />
         {PROJECT_FIELDS.map((field) => (
           <NumberDraftField

@@ -194,7 +194,7 @@ export function SubscribeForm({
           both fields and say what is wrong where every other failure here is said. */}
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-2">
         {channel === "email" ? (
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-wrap gap-2">
             <label htmlFor="subscribe-email" className="sr-only">Email address</label>
             <input
               id="subscribe-email"
@@ -212,18 +212,18 @@ export function SubscribeForm({
               disabled={status === "loading"}
               aria-invalid={status === "error" ? true : undefined}
               aria-describedby={message ? "subscribe-message" : undefined}
-              className="min-h-11 flex-1 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-slate-100 transition-colors placeholder:text-slate-500 disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="min-h-11 min-w-0 grow-[999] basis-56 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-slate-100 transition-colors placeholder:text-slate-500 disabled:opacity-50 weather-focus-ring weather-press-scale"
             />
             <button
               type="submit"
               disabled={status === "loading"}
-              className="weather-button-primary min-h-11 px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="weather-button-primary min-h-11 grow px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
             >
               {status === "loading" ? "Subscribing…" : alertsOnly ? "Email me when it changes" : "Subscribe"}
             </button>
           </div>
         ) : (
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-wrap gap-2">
             <label htmlFor="slack-webhook-url" className="sr-only">Slack Incoming Webhook URL</label>
             <input
               id="slack-webhook-url"
@@ -240,7 +240,7 @@ export function SubscribeForm({
               disabled={status === "loading"}
               aria-invalid={status === "error" ? true : undefined}
               aria-describedby={message ? "subscribe-message" : undefined}
-              className="min-h-11 flex-1 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-slate-100 transition-colors placeholder:text-slate-500 disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="min-h-11 min-w-0 grow-[999] basis-56 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-slate-100 transition-colors placeholder:text-slate-500 disabled:opacity-50 weather-focus-ring weather-press-scale"
             />
             <label htmlFor="slack-channel-name" className="sr-only">Channel name</label>
             <input
@@ -251,12 +251,12 @@ export function SubscribeForm({
               onChange={(e) => setChannelName(e.target.value)}
               placeholder="#leadership (optional)"
               disabled={status === "loading"}
-              className="min-h-11 w-full sm:w-36 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-slate-100 transition-colors placeholder:text-slate-500 disabled:opacity-50 weather-focus-ring"
+              className="min-h-11 min-w-0 grow basis-36 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-nested)] px-3 py-2 text-base sm:text-xs text-slate-100 transition-colors placeholder:text-slate-500 disabled:opacity-50 weather-focus-ring"
             />
             <button
               type="submit"
               disabled={status === "loading"}
-              className="weather-button-primary min-h-11 px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
+              className="weather-button-primary min-h-11 grow px-4 py-2 text-fluid-xs font-semibold disabled:opacity-50 weather-focus-ring weather-press-scale"
             >
               {status === "loading" ? "Connecting…" : "Connect Slack"}
             </button>

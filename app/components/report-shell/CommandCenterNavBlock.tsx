@@ -107,98 +107,102 @@ export function CommandCenterNavBlock({
         tensionNear: Boolean(trustStrip?.couldChangeNextWeek) || trustStrip?.confidenceLabel === "LOW",
       })}
     >
-      {/* Two columns from lg up: the reading block keeps its measure on the
-          left, the timestamp and actions bank right. Stacked, the hero was a
+      {/* Two columns once the intro is 48rem wide (by its own width since
+          2026-11-03: at lg the report rail takes 13rem of the viewport, so the
+          intro split just as it lost the room for it): the reading block keeps
+          its measure on the left, the timestamp and actions bank right. Stacked, the hero was a
           full-width box holding a max-w-3xl column, so ~40% of every report
           hero rendered empty — and the CTAs sat a title, a summary and a meta
           line below the fold-line they belong on. */}
       {/* A flex gap rather than space-y: the right column is hidden on a phone
           when nothing in it shows there, and a margin on the left column would
           still have opened 8px under the meta line. */}
-      <div className="flex flex-col gap-2 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-10 lg:gap-y-0">
-        <div className="min-w-0 space-y-1.5">
-          {/* No kicker. "Weekly brief" above every H1 restated the route the
-              header tab, the sidebar and the bottom bar already name, and it
-              made distinct pages read as variations of one landing page. */}
-          {/* The condition leads, the page title follows. A phone shows the
-              route name in the bottom bar already, and the week's word —
-              Freezing, Sunny — is the fact the reader came for. The word
-              prints in the regime ink at the reading's own size; the trust
-              headline and the record date stay micro under it. */}
-          {statusLabel ? (
-            <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
-              {statusPrefix ? (
-                <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
-              ) : null}
-              {/* The week's word in the stamp's shape, the same placard the
-                  hero's tag and the sticky strip print. */}
-              <span className="type-stamp weather-tag-placard self-center rounded-sm border px-2 py-0.5 text-fluid-xs font-semibold">{statusLabel}</span>
-              {introMetaRest ? (
-                <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
-              ) : null}
-            </p>
-          ) : introMetaRest ? (
-            <p className="text-fluid-xs font-medium leading-4 text-slate-400">{introMetaRest}</p>
-          ) : null}
-          <h1
-            style={{ viewTransitionName: "page-title" }}
-            className="max-w-3xl font-semibold leading-tight text-slate-100 text-fluid-2xl"
-          >
-            {pageTitle}
-          </h1>
-          {/* On a phone a route with a strip drops the summary: the bottom bar
-              already names the page, and the strip is the line a reader
-              needs before the first task block. */}
-          {pageSummary ? (
-            <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
-              {pageSummary}
-            </p>
-          ) : null}
-          {trustStrip ? <TrustStrip {...trustStrip} regime={regime} phoneLayout="line" className="sm:pt-2" /> : null}
-        </div>
-
-        <div className={`space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0 ${showActions ? "" : "max-sm:hidden"}`.trim()}>
-            {/* No operating-loop strip here. "Signals · Conditions · Plan ·
-                Share" sat beside the intro on /signals, /operate and /trust:
-                it read as tabs, named none of the pages it sat on and linked
-                nowhere. The group's real tabs sit above the intro now
-                (`SectionTabs`). */}
-            {/* Two dates print inside one viewport, so each says what it
-                is: the strip's "Data as of" is the reading the guidance
-                rests on, and this is when the sources were last checked
-                (2026-10-09; it read "Signals refreshed", which did not say
-                which of the two mattered). */}
-            {showStamp ? (
-              <p className="text-fluid-xs text-slate-400 max-sm:hidden lg:text-right">Checked {fetchedAtLabel}</p>
-            ) : null}
-
-            {showActions ? (
-              <div className="flex flex-wrap items-center gap-2 lg:justify-end">
-                {primaryCta ? (
-                  <ReportCta
-                    href={primaryCta.href}
-                    copyText={primaryCta.copyText}
-                    copyTarget={primaryCta.copyTarget}
-                    label={primaryCta.label}
-                    className="weather-cta weather-cta-primary px-4 py-2"
-                  >
-                    {primaryCta.label}
-                  </ReportCta>
+      <div className="@container">
+        <div className="flex flex-col gap-2 @3xl:grid @3xl:grid-cols-[minmax(0,1fr)_auto] @3xl:items-start @3xl:gap-x-10 @3xl:gap-y-0">
+          <div className="min-w-0 space-y-1.5">
+            {/* No kicker. "Weekly brief" above every H1 restated the route the
+                header tab, the sidebar and the bottom bar already name, and it
+                made distinct pages read as variations of one landing page. */}
+            {/* The condition leads, the page title follows. A phone shows the
+                route name in the bottom bar already, and the week's word —
+                Freezing, Sunny — is the fact the reader came for. The word
+                prints in the regime ink at the reading's own size; the trust
+                headline and the record date stay micro under it. */}
+            {statusLabel ? (
+              <p className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5 leading-tight">
+                {statusPrefix ? (
+                  <span className="text-fluid-xs font-medium text-slate-400">{statusPrefix}</span>
                 ) : null}
-                {exportCta ? (
-                  <ReportCta
-                    href={exportCta.href}
-                    copyText={exportCta.copyText}
-                    copyTarget={exportCta.copyTarget}
-                    telemetryEvent={exportCta.telemetryEvent}
-                    label={exportCta.label}
-                    className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
-                  >
-                    {exportCta.label}
-                  </ReportCta>
+                {/* The week's word in the stamp's shape, the same placard the
+                    hero's tag and the sticky strip print. */}
+                <span className="type-stamp weather-tag-placard self-center rounded-sm border px-2 py-0.5 text-fluid-xs font-semibold">{statusLabel}</span>
+                {introMetaRest ? (
+                  <span className="text-fluid-xs font-medium text-slate-400">{introMetaRest}</span>
                 ) : null}
-              </div>
+              </p>
+            ) : introMetaRest ? (
+              <p className="text-fluid-xs font-medium leading-4 text-slate-400">{introMetaRest}</p>
             ) : null}
+            <h1
+              style={{ viewTransitionName: "page-title" }}
+              className="max-w-3xl font-semibold leading-tight text-slate-100 text-fluid-2xl"
+            >
+              {pageTitle}
+            </h1>
+            {/* On a phone a route with a strip drops the summary: the bottom bar
+                already names the page, and the strip is the line a reader
+                needs before the first task block. */}
+            {pageSummary ? (
+              <p className={`max-w-3xl text-sm leading-relaxed text-slate-300 sm:text-fluid-base ${trustStrip ? "max-sm:hidden" : ""}`.trim()}>
+                {pageSummary}
+              </p>
+            ) : null}
+            {trustStrip ? <TrustStrip {...trustStrip} regime={regime} phoneLayout="line" className="sm:pt-2" /> : null}
+          </div>
+
+          <div className={`space-y-3 @3xl:min-w-[14rem] @3xl:max-w-sm @3xl:shrink-0 ${showActions ? "" : "max-sm:hidden"}`.trim()}>
+              {/* No operating-loop strip here. "Signals · Conditions · Plan ·
+                  Share" sat beside the intro on /signals, /operate and /trust:
+                  it read as tabs, named none of the pages it sat on and linked
+                  nowhere. The group's real tabs sit above the intro now
+                  (`SectionTabs`). */}
+              {/* Two dates print inside one viewport, so each says what it
+                  is: the strip's "Data as of" is the reading the guidance
+                  rests on, and this is when the sources were last checked
+                  (2026-10-09; it read "Signals refreshed", which did not say
+                  which of the two mattered). */}
+              {showStamp ? (
+                <p className="text-fluid-xs text-slate-400 max-sm:hidden @3xl:text-right">Checked {fetchedAtLabel}</p>
+              ) : null}
+
+              {showActions ? (
+                <div className="flex flex-wrap items-center gap-2 @3xl:justify-end">
+                  {primaryCta ? (
+                    <ReportCta
+                      href={primaryCta.href}
+                      copyText={primaryCta.copyText}
+                      copyTarget={primaryCta.copyTarget}
+                      label={primaryCta.label}
+                      className="weather-cta weather-cta-primary px-4 py-2"
+                    >
+                      {primaryCta.label}
+                    </ReportCta>
+                  ) : null}
+                  {exportCta ? (
+                    <ReportCta
+                      href={exportCta.href}
+                      copyText={exportCta.copyText}
+                      copyTarget={exportCta.copyTarget}
+                      telemetryEvent={exportCta.telemetryEvent}
+                      label={exportCta.label}
+                      className="inline-flex min-h-[44px] items-center justify-center rounded-md border border-slate-700/50 bg-slate-950/40 px-3 py-2 text-center text-xs font-semibold tracking-[0.05em] text-slate-300 hover:border-sky-400/50 hover:text-slate-100"
+                    >
+                      {exportCta.label}
+                    </ReportCta>
+                  ) : null}
+                </div>
+              ) : null}
+          </div>
         </div>
       </div>
     </section>

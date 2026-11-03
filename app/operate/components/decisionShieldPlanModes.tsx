@@ -119,7 +119,7 @@ export function PlanStressTestMode({
             Runway and monthly spend are optional; with both, the verdict is sized against the cash they imply, at
             spend less any revenue you entered on the runway planner.
           </p>
-          <div className={`grid gap-3 sm:grid-cols-3 ${businessModel === "BOOTSTRAPPED" ? "lg:grid-cols-4" : ""}`}>
+          <div className="weather-switch gap-3 [--col-min:10rem]">
             {/* The runway every surface reads: worked out from cash where the
                 runway planner has one, so this box and the test below agree. */}
             <OperatorProfileNumberField
@@ -175,7 +175,7 @@ export function PlanStressTestMode({
       <div aria-live="polite">
         {planReady ? (
           <div className="rounded-lg border border-slate-800 bg-slate-950/90 p-4 space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <p className="type-label text-slate-400">Decision verdict</p>
                 <div className="flex items-center gap-2 mt-1.5">
@@ -223,7 +223,7 @@ export function PlanStressTestMode({
               </ul>
             </div>
 
-            <div className="border-t border-slate-800 pt-2.5 grid sm:grid-cols-3 gap-3">
+            <div className="border-t border-slate-800 pt-2.5 weather-switch gap-3 [--col-min:12rem]">
               <div>
                 <p className="type-eyebrow">{publicDecisionLabels.threshold}</p>
                 <p className="text-fluid-xs text-slate-200 mt-0.5">{stressTestResult.boundedGuardrail}</p>
@@ -307,7 +307,7 @@ export function ComparePlansMode({
               </div>
             </div>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="weather-switch gap-4 [--col-min:18rem]">
               <div className="space-y-2">
                 <label className="text-xs font-bold text-slate-300" htmlFor="decision-shield-plan-a">Plan A</label>
                 <textarea

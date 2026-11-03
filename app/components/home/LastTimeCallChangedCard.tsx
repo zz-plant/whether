@@ -40,8 +40,9 @@ export function LastTimeCallChangedCard({
         {record.changedAt.toLabel}. By {after}, {record.monthsLater} months on, the scores stood here.
       </p>
       {/* Two cells packed to the left edge, not one per half of the page: each is
-          three short lines, and halves left the second one stranded mid-page. */}
-      <div className="grid gap-x-10 gap-y-3 sm:grid-cols-[max-content_max-content]">
+          three short lines, and halves left the second one stranded mid-page. They
+          wrap on their own widths, so they sit together wherever both fit. */}
+      <div className="flex flex-wrap gap-x-10 gap-y-3">
         <ScoreCell
           label={regimeSignalLabel.tightness}
           value={record.tightness.later}

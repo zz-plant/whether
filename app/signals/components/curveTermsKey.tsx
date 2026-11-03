@@ -64,7 +64,7 @@ export function CurveTermsKey({
 }) {
   return (
     <div className={className}>
-      <dl className="grid gap-1.5 text-xs text-slate-400 sm:grid-cols-2">
+      <dl className="weather-grid gap-1.5 text-xs text-slate-400 [--grid-max:2]">
         {terms.map((term) => {
           const copy = TERM_COPY[term];
           return (

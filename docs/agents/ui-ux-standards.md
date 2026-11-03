@@ -856,3 +856,46 @@ four report pages on a phone (15px under 20px sections), page titles at five siz
 - MUST: keep the trust strip's phone line to one short phrase per cell. The basis warning prints
   its four-word form there (`ScoringBasis.warningShort`, "startup-market inputs left out"); the full
   sentence from `sm`, and always when a note explains a different published week.
+
+## XXIX. How containers wrap and stack
+
+Added 2026-11-03. The page frame answers to the viewport; everything inside it answers to its own
+box. Until now about ninety layouts each chose a viewport breakpoint at which to set their children
+side by side: two equal columns split at `sm` in 24 places, `md` in 12, `lg` in 7 and `xl` in 2. A
+breakpoint reads the screen, not the room. The report intro split into a title column and an action
+column at `lg`, which is where the report rail appears and takes 13rem of that room. On the
+homepage, the two "what would change" answers stayed stacked until `xl`, though a 1024px laptop
+holds both.
+
+Three shapes in `app/styles/layout-shells.css` cover nearly every case. Each one decides from the
+width it is given:
+
+| Shape | For | Settings |
+| --- | --- | --- |
+| `weather-switch` | Two to four peers. They sit all side by side or all stacked, never 2 + 1. | `--col-min`: the narrowest a peer reads at |
+| `weather-sidebar` / `weather-sidebar-start` | A main column and an aside of fixed width. The aside comes last or first. | `--aside`, `--main-min` (a share of the box, 55% by default, or a length) |
+| `weather-grid` | A list of like items, filled in order. | `--col-min`, `--grid-max` (3 by default) |
+
+- MUST: set a column change inside the page frame with one of these, or with a container query
+  (`@container` on an ancestor, `@md:`-style variants) when the layout needs fixed steps. Four
+  preset keys go two by two and then one row, which a fitted grid cannot promise. So does a row
+  whose cells realign when they sit side by side (the report intro, the `/trust` source ledger).
+  `tests/containerLayout.test.ts` rejects a viewport-keyed `grid-cols-`, `col-span-`, `row-span-`,
+  `flex-row` or `contents` anywhere else.
+- A layout stays keyed to the screen only when it is the frame (header, footer, report rail) or
+  changes something else by the screen at the same moment. Examples are a figure swapped for
+  another at `md`, a native select in place of a list on a phone, and a table whose column heads
+  hide by the screen. The test names each such file with its reason, and fails when an entry no
+  longer needs one.
+- `--col-min` is a reading width, not a breakpoint: 10rem for a figure with its label, 13rem for a
+  field or short card, 16rem (the default) for a card or paragraph, 20rem for a chart or long
+  paragraph. Set it beside the shape, as `[--col-min:13rem]`; the test rejects one set anywhere
+  else.
+- NEVER: make a shape's direct child another shape. The child reads its own `--col-min` for its
+  parent's threshold. Wrap the inner one, or use a plain `flex flex-wrap` cluster inside a card.
+- Content that wraps on its own widths (stamps, links, facts beside each other, an input and its
+  button) is a cluster: `flex flex-wrap` with a gap, and `grow-[999] basis-56` on the part that
+  should take the room. It needs no breakpoint at all.
+- The shapes live in `@layer components`, so a gap or `items-start` on the same element wins. The
+  one exception is the sidebar's `--main-min`, which is `!important`, because a `min-w-0` on the
+  main column would otherwise cancel the stacking.

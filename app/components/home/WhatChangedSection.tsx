@@ -90,7 +90,7 @@ function InputHistoryGrid({ series }: { series: readonly { key: string; label: s
   return (
     <div className="weather-input-history mt-4" data-testid="input-history-grid">
       <p className="mb-2 text-fluid-xs font-medium text-slate-300">Inputs over the last ~90 days</p>
-      <ul className="grid grid-cols-2 gap-x-4 gap-y-3 sm:grid-cols-3">
+      <ul className="weather-grid gap-x-4 gap-y-3 [--col-min:10rem]">
         {usable.map((entry) => (
           <li key={entry.key} className="min-w-0">
             <div className="flex items-baseline justify-between gap-2">

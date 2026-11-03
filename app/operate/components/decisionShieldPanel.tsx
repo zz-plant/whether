@@ -172,7 +172,7 @@ export const DecisionShieldPanel = ({
                   Pick a stage, an area, and an action. The verdict below says whether the move is safe this week, what would pause it, and what would reopen it.
                 </p>
               </div>
-              <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 lg:grid-cols-3">
+              <Fieldset.Root className="weather-grid min-w-0 gap-4 border-0 p-0 [--col-min:12rem]">
                 <Fieldset.Legend className="sr-only">Choose the lifecycle, category, and action for this decision</Fieldset.Legend>
                 <LabeledSelectField
                   label="Lifecycle"
@@ -205,7 +205,7 @@ export const DecisionShieldPanel = ({
                 onApplyPreset={applyPresetSelection}
               />
 
-              <div className="grid gap-4 lg:grid-cols-[1.2fr,1fr]">
+              <div className="weather-switch gap-4 [--col-min:18rem]">
                 <div className="weather-surface p-4">
                   <p className="type-label text-slate-400">Decision verdict</p>
                   <div
@@ -230,7 +230,7 @@ export const DecisionShieldPanel = ({
                   </ul>
                 </div>
               </div>
-              <div className="grid gap-4 lg:grid-cols-2">
+              <div className="weather-switch gap-4 [--col-min:16rem]">
                 <div className="weather-surface p-4">
                   <p className="type-label text-slate-400">{publicDecisionLabels.threshold}</p>
                   <p className="mt-3 type-data text-slate-300 break-words">{output.guardrail}</p>

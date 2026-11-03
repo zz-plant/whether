@@ -23,21 +23,21 @@ export function RouteLoadingShell({ pageTitle = "Weekly brief" }: RouteLoadingSh
           className="mx-auto w-full max-w-[72rem] space-y-4"
         >
         {/* Shaped like what replaces it — the report intro (kicker, status line,
-            title, summary; the stamp and action column banking right from lg)
+            title, summary; the stamp and action column banking right from a 48rem intro)
             and the first section's rule, heading and card — so the resolved
             route lands where the placeholder was. This used to print two
             badges and a four-question list no resolved page renders. */}
-        <div className="weather-surface-secondary px-4 py-3.5 sm:px-5 sm:py-4">
-          <div className="space-y-3 lg:grid lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start lg:gap-x-10 lg:space-y-0">
+        <div className="weather-surface-secondary @container px-4 py-3.5 sm:px-5 sm:py-4">
+          <div className="space-y-3 @3xl:grid @3xl:grid-cols-[minmax(0,1fr)_auto] @3xl:items-start @3xl:gap-x-10 @3xl:space-y-0">
             <div className="min-w-0 space-y-2">
               <Skeleton className="h-3 w-20 rounded-sm bg-slate-500/28" />
               <Skeleton className="h-3 w-56 rounded-sm bg-slate-500/24" />
               <Skeleton className="h-8 w-full max-w-xl rounded-md bg-slate-500/40" />
               <Skeleton className="h-4 w-full max-w-2xl rounded-sm bg-slate-500/24" />
             </div>
-            <div className="space-y-3 lg:min-w-[14rem] lg:max-w-sm lg:shrink-0">
-              <Skeleton className="h-3 w-40 rounded-sm bg-slate-500/22 lg:ml-auto" />
-              <Skeleton className="h-11 w-36 rounded-lg bg-slate-500/28 lg:ml-auto" />
+            <div className="space-y-3 @3xl:min-w-[14rem] @3xl:max-w-sm @3xl:shrink-0">
+              <Skeleton className="h-3 w-40 rounded-sm bg-slate-500/22 @3xl:ml-auto" />
+              <Skeleton className="h-11 w-36 rounded-lg bg-slate-500/28 @3xl:ml-auto" />
             </div>
           </div>
         </div>

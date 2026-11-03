@@ -241,7 +241,7 @@ export default async function ResourcePillarPage({ params }: { params: Promise<P
 
       <nav aria-labelledby="pillar-index-heading" className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 id="pillar-index-heading" className="text-lg font-semibold text-slate-100">On this page</h2>
-        <ol className="grid gap-2 text-sm text-slate-200 sm:grid-cols-2">
+        <ol className="weather-grid gap-2 text-sm text-slate-200 [--grid-max:2]">
           {argumentSections.map((section) => (
             <li key={section.heading}>
               <Link href={`#${buildSectionAnchor(section.heading)}`} className={linkClass}>

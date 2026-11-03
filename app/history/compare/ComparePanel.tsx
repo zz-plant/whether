@@ -90,7 +90,7 @@ export async function ComparePanel({
 
   return (
     <div className="space-y-6">
-      <div id="compare-selectors" className="weather-panel grid gap-6 md:grid-cols-2">
+      <div id="compare-selectors" className="weather-panel weather-switch gap-6 [--col-min:16rem]">
         <DateSelector
           label="Period A"
           paramPrefix="A"
@@ -108,7 +108,7 @@ export async function ComparePanel({
         />
       </div>
 
-      <section id="compare-key-deltas" className="weather-panel p-6">
+      <section id="compare-key-deltas" className="weather-panel @container p-6">
         <p className="type-label text-slate-400">Difference</p>
         <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
 
@@ -137,7 +137,7 @@ export async function ComparePanel({
           </div>
         </div>
 
-        <div className="mt-4 grid gap-x-8 gap-y-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_14rem]">
+        <div className="mt-4 grid gap-x-8 gap-y-4 @3xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_14rem]">
           {ladders.map((ladder) => (
             <ScoreLadder
               key={ladder.label}
@@ -163,7 +163,7 @@ export async function ComparePanel({
         </p>
       </section>
 
-      <div id="ops-compare-grid" className="grid gap-6 lg:grid-cols-2">
+      <div id="ops-compare-grid" className="weather-switch gap-6 [--col-min:22rem]">
         <ComparePeriodColumn snapshot={snapA} report={reportA} label="Period A" />
         <ComparePeriodColumn snapshot={snapB} report={reportB} label="Period B" />
       </div>

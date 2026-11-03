@@ -70,7 +70,7 @@ export function CommitmentTest({
   return (
     <div data-testid="commitment-test" className="space-y-2 border-t border-[color:var(--border-faint)] pt-3">
       {showTitle ? <p className="text-fluid-xs font-medium text-slate-200">Test it against your runway</p> : null}
-      <div className="grid gap-2 sm:grid-cols-2">
+      <div className="weather-grid gap-2 [--col-min:13rem] [--grid-max:2]">
         <OperatorProfileNumberField
           field="cashUsd"
           label="Cash in the bank"

@@ -320,7 +320,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         {readings.length > 0 ? (
           <section className="weather-panel space-y-4 px-6 max-sm:px-0 py-6" aria-labelledby="published-readings">
             <h2 id="published-readings" className="text-lg font-semibold text-slate-100">The numbers behind the guidance</h2>
-            <dl className="grid gap-4 sm:grid-cols-2">
+            <dl className="weather-switch gap-4 [--col-min:16rem]">
               {readings.map((reading) => {
                 const rail = rails.find((candidate) => candidate.metric === reading.key);
                 const deltaUp = reading.change ? reading.change.delta > 0 : undefined;

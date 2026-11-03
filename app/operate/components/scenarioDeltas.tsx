@@ -58,7 +58,7 @@ export function ScenarioDeltas({
         {/* Two ladders, one drawing: the scenario's score as the dot, this
             week's as the hollow one, the three lines labelled. The tiles this
             replaces printed "79 / 100" with the line nowhere on the page. */}
-        <div className="grid gap-6 sm:grid-cols-2">
+        <div className="weather-switch gap-6 [--col-min:18rem]">
           <ScoreLadder
             label={
               <>
@@ -115,7 +115,7 @@ export function ScenarioDeltas({
 
         {/* Two plain lists with the colour on their names, like Decide's Stop and
             Start lists (2026-10-09); each was a card with a capitalised verb. */}
-        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
+        <div className="weather-switch gap-x-8 gap-y-6 [--col-min:14rem]">
           <div className="space-y-2">
             <h4 className="text-sm font-semibold text-semantic-tightening-fg">What to stop in this scenario</h4>
             <ul className="list-disc space-y-2 pl-4 text-xs text-slate-300">

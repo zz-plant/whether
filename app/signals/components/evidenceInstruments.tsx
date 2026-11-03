@@ -120,7 +120,7 @@ const AnalogPatternDisclosure = ({ assessment, open }: { assessment: Pick<Regime
             ))}
           </tbody>
         </table>
-        <dl className="grid gap-3 border-t border-slate-800 pt-4 sm:grid-cols-3">
+        <dl className="weather-switch gap-3 border-t border-slate-800 pt-4 [--col-min:12rem]">
           {[
             { label: "Common mistake then", value: analog.consensusTrap },
             { label: "What held up then", value: analog.winningMove },

@@ -149,7 +149,7 @@ export default async function SignalsClusterPage({ params }: { params: Promise<P
           <h2 id="signal-decisions-heading" className="text-lg font-semibold text-slate-100">
             What this signal means for each decision
           </h2>
-          <ul className="grid gap-2 sm:grid-cols-2">
+          <ul className="weather-grid gap-2 [--grid-max:2]">
             {decisionScenarioDefinitions.map((scenario) => (
               <li key={scenario.slug}>
                 <Link

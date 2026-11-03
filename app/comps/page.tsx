@@ -114,16 +114,14 @@ export default async function CompsPage() {
     >
       <SectionTabs currentPath="/comps" />
       <article className="weather-panel space-y-6 px-5 max-sm:px-0 py-5">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="space-y-2 max-w-2xl">
-            <h1 className="text-fluid-2xl font-semibold text-slate-100">
-              SaaS valuation multiples{readMonth ? `, ${readMonth}` : ""}
-            </h1>
-            <p className="text-sm text-slate-300">
-              Median enterprise value to revenue multiples for a basket of {SAAS_BASKET.length} public
-              SaaS companies.
-            </p>
-          </div>
+        <div className="space-y-2 max-w-2xl">
+          <h1 className="text-fluid-2xl font-semibold text-slate-100">
+            SaaS valuation multiples{readMonth ? `, ${readMonth}` : ""}
+          </h1>
+          <p className="text-sm text-slate-300">
+            Median enterprise value to revenue multiples for a basket of {SAAS_BASKET.length} public
+            SaaS companies.
+          </p>
         </div>
 
         {/* One figure leads: the median multiple, the number a valuation

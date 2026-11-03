@@ -20,7 +20,7 @@ export function ScenarioPresets({
   onResetToLive: () => void;
 }) {
   return (
-    <section aria-labelledby="scenario-presets-heading" className="weather-panel p-5">
+    <section aria-labelledby="scenario-presets-heading" className="weather-panel @container p-5">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
           <h3 id="scenario-presets-heading" className="type-eyebrow">
@@ -44,7 +44,9 @@ export function ScenarioPresets({
         )}
       </div>
 
-      <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Four keys, so two steps the panel's own width picks: two by two, then
+          one row. A fitted grid would leave one stranded under three. */}
+      <div className="mt-4 grid gap-3 @md:grid-cols-2 @4xl:grid-cols-4">
         {SCENARIO_PRESETS.map((preset) => {
           const isActive =
             Math.abs(simulatedBaseRate - preset.rate) < 0.05 &&

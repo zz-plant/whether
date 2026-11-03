@@ -41,7 +41,7 @@ export const FinanceStrategyPanel = ({ regime }: { regime: RegimeAssessment["reg
   }
 
   return (
-    <dl id="finance-strategy" className="grid gap-4 text-sm text-slate-300 md:grid-cols-3">
+    <dl id="finance-strategy" className="weather-switch gap-4 text-sm text-slate-300 [--col-min:13rem]">
       <div>
         <dt className="type-eyebrow">Hiring throttle</dt>
         <dd className="mt-2 text-slate-200">{entry.hiringThrottle}</dd>

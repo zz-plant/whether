@@ -78,7 +78,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
           </dl>
         </div>
 
-        <dl className="grid gap-3 pt-2 sm:grid-cols-2 text-sm border-t border-slate-800/80">
+        <dl className="weather-grid gap-3 pt-2 text-sm border-t border-slate-800/80 [--grid-max:2]">
           <div className="weather-surface p-3.5 space-y-1">
             <dt className="type-eyebrow">Decide now</dt>
             <dd className="text-slate-100 font-medium">{toolkit.decisionThisSession}</dd>
@@ -87,7 +87,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
             <dt className="type-eyebrow">What it gets you</dt>
             <dd className="text-slate-100 font-medium">{toolkit.operatingOutcome}</dd>
           </div>
-          <div className="weather-surface p-3.5 space-y-1 sm:col-span-2">
+          <div className="weather-surface p-3.5 space-y-1 col-span-full">
             <dt className="type-eyebrow">What you leave with</dt>
             <dd className="text-slate-100 font-medium">{toolkit.decisionArtifact}</dd>
           </div>
@@ -164,7 +164,7 @@ export default async function ToolkitDetailPage({ params }: { params: Promise<Pa
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Start from your role or situation</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="weather-grid gap-3 [--grid-max:2]">
           {decisionPaths.roles.map((path) => (
             <Link key={path.slug} href={path.href as Route} className="weather-surface space-y-1 px-4 py-4 text-sm text-slate-100">
               <p className="type-eyebrow text-slate-300">Role path</p>
