@@ -104,10 +104,12 @@ export const buildRegimeFlipState = ({
   regimeTransition,
 }: {
   regime: Regime;
-  /* `tightnessPressure` rides along because the watched line is picked on the
-     tightness-equivalent scale (`resolveLineGaps`), where a pinned score's
-     distance includes the points the published number hides. */
-  scores: Pick<RegimeAssessment["scores"], "tightness" | "riskAppetite" | "tightnessPressure">;
+  /* `tightnessPressure`, the curve slope and the speed term ride along because
+     the watched line is picked on the tightness-equivalent scale
+     (`resolveLineGaps`), where a pinned score's distance includes the points
+     the published number hides, and the count reads all three. */
+  scores: Pick<RegimeAssessment["scores"], "tightness" | "riskAppetite" | "tightnessPressure">
+    & Partial<Pick<RegimeAssessment["scores"], "curveSlope" | "baseRateVelocityPoints">>;
   thresholds: Pick<RegimeAssessment["thresholds"], "tightnessRegime" | "riskAppetiteRegime">;
   regimeTransition?: RegimeAssessment["regimeTransition"];
 }): RegimeFlipState => {
