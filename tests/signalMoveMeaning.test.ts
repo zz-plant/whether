@@ -4,7 +4,7 @@ import { FLASH_BASE_RATE_MOVE, FLASH_CURVE_MOVE } from "../lib/alert/flashMoves"
 import { REGIME_CONFIDENCE_NEAR_THRESHOLD } from "../lib/regimeEngineCore";
 import { comparisonBasis } from "../lib/report/comparisonBasis";
 import { describeInputMovement } from "../lib/report/inputMovement";
-import { describeMarketMoveScale } from "../lib/report/marketMoveScale";
+import { describeRateMoveInFedSteps } from "../lib/report/marketMoveScale";
 import type { RegimeSignalKey } from "../lib/report/reportFormatting";
 import { describeSignalMoveMeaning } from "../lib/report/signalMoveMeaning";
 
@@ -70,8 +70,8 @@ describe("what a market input's move means", () => {
 
   it("calls three basis points or fewer no real change, the tolerance a Fed-move count rounds within", () => {
     /* The Fed-move count rounds within three basis points: 0.27 is "about one", 0.29 is not. */
-    assert.equal(describeMarketMoveScale({ input: "baseRate", move: 0.27, baseRateUsed: "FED", series: [] }), "About one quarter-point Fed move.");
-    assert.equal(describeMarketMoveScale({ input: "baseRate", move: 0.29, baseRateUsed: "FED", series: [] }), "More than one quarter-point Fed move.");
+    assert.equal(describeRateMoveInFedSteps(0.27, "Cloudy"), "About one quarter-point Fed hike turns conditions Cloudy.");
+    assert.equal(describeRateMoveInFedSteps(0.29, "Cloudy"), "More than one quarter-point Fed hike turns conditions Cloudy.");
 
     assert.equal(text("baseRate", 0.03, 4.1), "No real change.");
     assert.equal(text("baseRate", -0.04, 4.1), "Borrowing got slightly cheaper.");
