@@ -416,6 +416,36 @@ service groups alerts with one cause rather than listing each town.
 - The homepage load budget falls to 1,668 words, 41 "Risk appetite" and 21 fields. Buttons move
   from 11 to 16 with fields from 26 to 21: the same five controls, radios before and buttons now.
 
+### 1.1.0w Places a reader presses and gets nothing (2026-11-03)
+
+A scan of `/`, `/operate`, `/history`, `/resources` and `/signals` at a laptop and a phone for
+things drawn to look pressable with no link, button or handler under them, and what a tap lands on.
+
+- **Area rows on the brief.** The area's glyph and its rule answer a tap as the name does: the
+  name's button stretches over the row's header (`AreaGroups`), not over the detail under it.
+- **The record's month strip** (`MonthStrip`, on `/`, `/history` and `/decisions`). Each month
+  opens the brief as it read that month (`buildMonthBriefHref`, the stepper's own URL). Out of the
+  tab order, since the band is hidden from assistive tech and 177 stops would bury the page.
+- **The track record's changes** (`/history`). Each row opens its month; the date is the link and
+  spans the row.
+- **The conditions map** (`RegimeRadar`, the brief and "What would change"). A tap opens "Scores
+  on this chart", whose table carries what the dots' hover titles did. `AnchorFeedback` now also
+  lands a click on a link to the hash already in the URL, after the click's own popstate, so a
+  second tap reopens a fold the reader closed.
+- **"What changed" ladders** open the score's evidence, as the name beside them does.
+- **The `/signals` from-chips** are unframed and carry no hover title: a framed chip with its move
+  in a title read as a control, and a tap showed nothing.
+- **The footer wordmark** goes home.
+- **Left as displays** (§XXVII: a link or button is never drawn as a stamp): the conditions
+  placard, the "in effect" and "On hold" stamps, and the stepper's flat end where no later reading
+  exists, which already reads as disabled (§XXVI).
+- **Measured.** `DeadClickBeacon` (root layout) reports a click with nothing pressable under it,
+  on a chart, glyph, stamp, hover title, heading or table cell, once per section and kind per
+  page view; a click on anything else only as one burst of rapid clicks on a spot. The `dead-click`
+  stream carries the path, the section id, the kind, whether it was a burst and the pointer type;
+  `isDeadClickEvent` refuses any other key, and `/privacy` §2.5 says so. `bun run
+  telemetry:dead-clicks` groups it by page, section and kind.
+
 ### 1.1.0x A visible way out of everything that covers the page (2026-11-03)
 
 - **Presentation mode** (`PresentationFrames`) has an × on every frame. It closed on Esc or the

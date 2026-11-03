@@ -83,9 +83,17 @@ export function AreaGroups({
               {group.areas.map((entry) => {
                 const open = selected === entry.area;
                 return (
-                  <li key={entry.area} id={`area-${entry.area}`} className="flex max-w-[68ch] gap-2.5 text-fluid-base leading-snug text-slate-200">
-                    <AreaIcon area={entry.area} className="mt-1 shrink-0 text-slate-400" />
-                    <div className="min-w-0 flex-1 space-y-1">
+                  <li
+                    key={entry.area}
+                    id={`area-${entry.area}`}
+                    className="grid max-w-[68ch] grid-cols-[auto_minmax(0,1fr)] gap-x-2.5 gap-y-1 text-fluid-base leading-snug text-slate-200"
+                  >
+                    {/* The glyph and the rule answer a tap as the name does (2026-11-03): only
+                        the name was the button, and a reader who learned the row opens tapped
+                        the glyph or the sentence and got nothing. The button's ::after spans
+                        this header, not the detail under it, so the detail's own links work. */}
+                    <div className={`col-span-2 grid grid-cols-subgrid ${onToggle ? "group relative" : ""}`}>
+                      <AreaIcon area={entry.area} className="mt-1 shrink-0 text-slate-400" />
                       <p>
                         {onToggle ? (
                           <button
@@ -93,7 +101,7 @@ export function AreaGroups({
                             aria-expanded={open}
                             aria-controls={open ? `area-${entry.area}-detail` : undefined}
                             onClick={() => onToggle(entry.area)}
-                            className="weather-hit inline-flex items-baseline gap-1 rounded-sm font-semibold text-slate-50 underline decoration-slate-500 decoration-dotted underline-offset-4 hover:decoration-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                            className="inline-flex cursor-pointer items-baseline gap-1 rounded-sm font-semibold text-slate-50 underline decoration-slate-500 decoration-dotted underline-offset-4 after:absolute after:inset-0 after:rounded-sm group-hover:decoration-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                           >
                             {entry.label}
                             <ChevronDown
@@ -106,14 +114,14 @@ export function AreaGroups({
                         )}{" "}
                         {sentence(entry.rule)}
                       </p>
-                      {entry.changed ? <p className="text-fluid-xs text-slate-400">{entry.changed}</p> : null}
-                      {note ? note(entry.area) : null}
-                      {open && detail ? (
-                        <div id={`area-${entry.area}-detail`} aria-live="polite">
-                          {detail(entry.area)}
-                        </div>
-                      ) : null}
                     </div>
+                    {entry.changed ? <p className="col-start-2 text-fluid-xs text-slate-400">{entry.changed}</p> : null}
+                    {note ? <div className="col-start-2 empty:hidden">{note(entry.area)}</div> : null}
+                    {open && detail ? (
+                      <div id={`area-${entry.area}-detail`} aria-live="polite" className="col-start-2">
+                        {detail(entry.area)}
+                      </div>
+                    ) : null}
                   </li>
                 );
               })}
