@@ -63,7 +63,7 @@ describe("reader-facing number formatting", () => {
       />,
     );
 
-    assert.match(html, /Room before a change<\/dt>\s*<dd[^>]*>Some</, "the strip prints the band in words, under its label");
+    assert.match(html, /Room before a change(?:<\/button>)?\s*<\/dt>\s*<dd[^>]*>Some</, "the strip prints the band in words, under its label");
     assert.doesNotMatch(html, /\bMED\b/);
   });
 

@@ -90,7 +90,9 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
   numbers: 298,
   wordsBeforeAreas: 341,
   folds: 9,
-  buttons: 8,
+  /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
+     appetite, room before a change). A deliberate raise, said here and in its PR. */
+  buttons: 11,
   fields: 26,
   fundingPressure: 35,
   riskAppetite: 48,

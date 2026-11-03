@@ -1,3 +1,4 @@
+import { TermDefinitionLayer } from "./ui/definedTerm";
 import type { ReactNode } from "react";
 import { AnchorFeedback } from "./anchorFeedback";
 import { FocusModeController } from "./focusModeController";
@@ -88,6 +89,7 @@ export function Shell({
       <main id="main-content" data-home-shell-main className={shellMainClassName}>
         {children}
       </main>
+      <TermDefinitionLayer />
     </div>
   );
 }

@@ -5,6 +5,7 @@ import { REGIME_LABELS, REGIME_WEATHER_RATIONALES, getRegimePublicLabel, isRegim
 import { TrustStrip, type TrustStripProps } from "./trustStrip";
 import { ScreenshotCaption } from "./screenshotCaption";
 import { ConditionIcon } from "./ui/conceptIcons";
+import { DefinedTerm } from "./ui/definedTerm";
 
 type Props = {
   /** The call, as the page's heading. Absent on a read that produced no live call. */
@@ -132,6 +133,24 @@ type Props = {
  * graphic beside the call (the conditions map and its month-end path). Neither
  * renders unless passed, so the answer pages draw the card as before.
  */
+/* The two score names in the facts line, each a tap-to-define button (2026-11-03). */
+const SCORE_TERMS = [
+  { name: "funding pressure", term: "tightness" },
+  { name: "risk appetite", term: "risk-appetite" },
+] as const;
+
+const withDefinedScores = (facts: string): ReactNode[] =>
+  facts.split(/(funding pressure|risk appetite)/).map((part, index) => {
+    const match = SCORE_TERMS.find((candidate) => candidate.name === part);
+    return match ? (
+      <DefinedTerm key={index} term={match.term}>
+        {part}
+      </DefinedTerm>
+    ) : (
+      part
+    );
+  });
+
 export function DecisionHero({
   weeklyCall,
   periodControl,
@@ -274,7 +293,7 @@ export function DecisionHero({
               <>
                 {reading.facts ? null : " "}
                 <span className="tabular-nums" data-reading-numbers>
-                  {reading.facts ?? reading.numbers}
+                  {reading.facts ? withDefinedScores(reading.facts) : reading.numbers}
                 </span>{" "}
                 <Link href={reading.whyHref} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
                   Why
