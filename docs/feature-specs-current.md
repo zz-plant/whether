@@ -446,6 +446,19 @@ things drawn to look pressable with no link, button or handler under them, and w
   `isDeadClickEvent` refuses any other key, and `/privacy` §2.5 says so. `bun run
   telemetry:dead-clicks` groups it by page, section and kind.
 
+### 1.1.0x A visible way out of everything that covers the page (2026-11-03)
+
+- **Presentation mode** (`PresentationFrames`) has an × on every frame. It closed on Esc or the
+  last frame's Done, and a phone or a tablet has no Esc.
+- **Search** (`CommandPalette`) has an × on a phone, where the ESC badge is hidden and the sheet
+  closed only on a tap on the strip of page above it.
+- **Term definitions** (`TermDefinitionLayer`) each carry an × that closes the card with the
+  popover's own hide action, so no script is needed.
+- **The phone's More sheet** (`MobileNavContent`) has an × beside its grab handle.
+- No ×, on purpose: the saved-copy, archived-month and late-data banners and the crossed-line band
+  (dismissing one lets a reader act without its caveat), the sticky strip, and inline folds and
+  the opened area, which close the way they opened.
+
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
 The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate
 Slack copy button and the MCP/API chip were removed on 2026-09-02: `Copy Brief` already produces

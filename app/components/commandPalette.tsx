@@ -8,6 +8,7 @@ import { navigationGroups, navigationPages, utilityLinks } from "../../lib/navig
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { openShareRail } from "./globalShareRail";
 import { openTimeMachine } from "./globalTimeMachine";
+import { CloseIcon } from "./uiIcons";
 
 type CommandItem = {
   id: string;
@@ -335,6 +336,14 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
             <span className="shrink-0 hidden md:inline-flex">
               <kbd className="weather-kbd">ESC</kbd>
             </span>
+            {/* Its phone counterpart (2026-11-03): with no ESC badge and no Esc key, the
+                sheet closed only on a tap on the strip of page above it. */}
+            <Dialog.Close
+              aria-label="Close search"
+              className="-my-2 -mr-2 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center rounded-md text-slate-400 hover:bg-[color:var(--bg-raised)] hover:text-slate-100 md:hidden"
+            >
+              <CloseIcon className="size-4" />
+            </Dialog.Close>
           </div>
           <nav aria-label="Command results" className="max-h-[60dvh] overflow-y-auto overscroll-contain py-2 pb-[max(0.5rem,env(safe-area-inset-bottom))] md:max-h-80 md:pb-2">
             {filtered.length === 0 ? (
