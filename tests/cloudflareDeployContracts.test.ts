@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { describe, it } from "bun:test";
 import { resolveCheckPlan } from "../scripts/check-tasks.mjs";
-import { findPublishedVersionId } from "../scripts/cloudflare-run.mjs";
+import { findPreviewUrls, findPublishedVersionId } from "../scripts/cloudflare-run.mjs";
 
 describe("Cloudflare deploy contracts", () => {
   const source = readFileSync(new URL("../scripts/cloudflare-run.mjs", import.meta.url), "utf8");
@@ -13,14 +13,14 @@ describe("Cloudflare deploy contracts", () => {
 
   it("uses the dedicated Cloudflare adapter instead of the deprecated vinext deploy shim", () => {
     assert.match(source, /node_modules[\s\S]*@vinext[\s\S]*cloudflare[\s\S]*dist[\s\S]*cli\.js/);
-    assert.match(source, /runCloudflareDeploy\(deployArgs, childEnv\)/);
+    assert.match(source, /runCloudflareDeploy\(adapterContractArgs, childEnv\)/);
     assert.doesNotMatch(source, /runVinext\(deployArgs, childEnv\)/);
   });
 
-  it("builds and asks cf to validate the Build Output on dry runs, in the lane's mode", () => {
+  it("builds and asks cf to validate the Build Output on dry runs, in the mode the build recorded", () => {
     assert.match(source, /if \(!parsed\.skipBuild\)/);
-    assert.match(source, /"deploy", "--prebuilt", "--dry-run", "--mode", targetEnvName \?\? "production"/);
-    assert.match(source, /runCfDryRun\(targetEnv, childEnv\)/);
+    assert.match(source, /"deploy", "--prebuilt", "--dry-run", "--mode", "production"/);
+    assert.match(source, /runCfDryRun\(childEnv\)/);
   });
 
   // The adapter validator and cf check different things: the adapter knows the router
@@ -28,18 +28,45 @@ describe("Cloudflare deploy contracts", () => {
   // Output and every binding. Running only the second let an adapter-contract break reach a
   // real deploy after the dry run went green.
   it("validates the adapter contract before cf validates the Build Output", () => {
-    const dryRunBranch = source.slice(source.indexOf("if (parsed.dryRun)"));
-    const adapterIndex = dryRunBranch.indexOf("runCloudflareDeploy(deployArgs, childEnv)");
-    const cfIndex = dryRunBranch.indexOf("runCfDryRun(targetEnv, childEnv)");
+    const dryRunBranch = source.slice(source.indexOf("if (parsed.dryRun || preview)"));
+    const adapterIndex = dryRunBranch.indexOf("runCloudflareDeploy(adapterContractArgs, childEnv)");
+    const cfIndex = dryRunBranch.indexOf("runCfDryRun(childEnv)");
 
     assert.ok(adapterIndex >= 0, "dry run invokes the adapter validator");
     assert.ok(cfIndex > adapterIndex, "cf validates only after the adapter does");
     assert.match(source, /if \(adapterStatus !== 0\)/, "a failed adapter validation stops the dry run");
   });
 
-  it("builds a lane in its Vite mode, which is what selects it in cloudflare.config.ts", () => {
-    assert.match(source, /"build", \.\.\.\(targetEnvName \? \["--mode", targetEnvName\] : \[\]\)/);
+  it("builds a Worker Preview with the flag that hands isPreview to cloudflare.config.ts, and never inherits it", () => {
+    assert.match(source, /childEnv\.CLOUDFLARE_PREVIEW_BUILD = "true";/);
+    assert.match(source, /delete childEnv\.CLOUDFLARE_PREVIEW_BUILD;/);
     assert.doesNotMatch(source, /CLOUDFLARE_ENV/, "the Wrangler-era environment variable selects nothing under cf");
+  });
+
+  // Every pushed branch deploys one (`deploy:cloudflare:branch-check`, the deploy command Workers
+  // Builds runs for a branch), after the same adapter contract check a dry run makes.
+  it("uploads a preview with cf previews deploy, after the adapter contract check", () => {
+    assert.match(packageJson, /"deploy:cloudflare:branch-check": "node scripts\/cloudflare-run\.mjs deploy --env preview"/);
+    const previewBranch = source.slice(source.indexOf("if (parsed.dryRun || preview)"));
+    assert.ok(previewBranch.indexOf("runCloudflareDeploy(adapterContractArgs, childEnv)") >= 0);
+    assert.ok(previewBranch.indexOf("runCfPreviewDeploy(childEnv)") > previewBranch.indexOf("runCloudflareDeploy(adapterContractArgs"));
+    assert.match(source, /"previews", "deploy", "--prebuilt", "--mode", "production"/);
+  });
+
+  it("calls a preview deployed only when cf names its https URL", () => {
+    const result = JSON.stringify({
+      type: "preview",
+      preview_name: "claude-cf-cli-migration",
+      preview_urls: ["https://claude-cf-cli-migration-whether.kanavj.workers.dev"],
+      deployment_urls: ["https://abc123-whether.kanavj.workers.dev"],
+    });
+    assert.deepEqual(findPreviewUrls(`${result}\n`), [
+      "https://claude-cf-cli-migration-whether.kanavj.workers.dev",
+      "https://abc123-whether.kanavj.workers.dev",
+    ]);
+    assert.deepEqual(findPreviewUrls(JSON.stringify({ preview_urls: [] })), []);
+    assert.deepEqual(findPreviewUrls("not json"), []);
+    assert.deepEqual(findPreviewUrls(undefined), []);
   });
 
   // CI no longer runs on push or pull request — the workflows went manual-only when the

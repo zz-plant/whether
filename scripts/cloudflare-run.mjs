@@ -7,21 +7,26 @@ import { isWorkerBundleCurrent } from "./worker-bundle.mjs";
 
 /**
  * Builds and deploys the Worker with `cf` (`cloudflare.config.ts`; Wrangler until 2026-11-03).
- * A lane is a mode: production is the default, `--env preview` (or `--preview`) builds and
- * deploys `--mode preview`, the `whether-preview` Worker. The deploy itself is vinext's
- * Cloudflare adapter, which runs `cf deploy --prebuilt` against the Build Output in
- * `.cloudflare/output/v0/`.
+ * Production is the default. `--env preview` (or `--preview`) is a Worker Preview of `whether`
+ * instead: the build sets `CLOUDFLARE_PREVIEW_BUILD=true`, which hands `isPreview` to
+ * cloudflare.config.ts, and the deploy uploads it with `cf previews deploy`, named after the
+ * branch. A production deploy is vinext's Cloudflare adapter, which runs `cf deploy --prebuilt`
+ * against the Build Output in `.cloudflare/output/v0/`.
  */
 async function main() {
   const [action, ...rawArgs] = process.argv.slice(2);
 
   if (!action || !["build", "deploy"].includes(action)) {
-    console.error("Usage: node scripts/cloudflare-run.mjs <build|deploy> [--env <name> | --preview] [deploy flags]");
+    console.error("Usage: node scripts/cloudflare-run.mjs <build|deploy> [--env preview | --preview] [deploy flags]");
     process.exit(1);
   }
 
   const parsed = parseArgs(rawArgs);
-  const targetEnv = parsed.env ?? (parsed.preview ? "preview" : undefined);
+  if (parsed.env !== undefined && parsed.env !== "preview") {
+    console.error(`Unknown target "${String(parsed.env)}": the Worker deploys to production, or to a Worker Preview with --env preview.`);
+    process.exit(1);
+  }
+  const preview = parsed.preview || parsed.env === "preview";
   const childEnv = {
     ...process.env,
   };
@@ -32,13 +37,21 @@ async function main() {
     childEnv.WHETHER_BUILD_LOG_LEVEL = "warn";
   }
 
-  console.log(`Cloudflare target: ${targetEnv ?? "production"}`);
-
-  if (action === "build") {
-    process.exit(runVinextBuild(targetEnv, childEnv));
+  // What the Cloudflare Vite plugin reads to record a preview build (and to evaluate
+  // cloudflare.config.ts with `isPreview: true`). Never inherited by a production build.
+  if (preview) {
+    childEnv.CLOUDFLARE_PREVIEW_BUILD = "true";
+  } else {
+    delete childEnv.CLOUDFLARE_PREVIEW_BUILD;
   }
 
-  const deployArgs = rebuildDeployArgs(parsed, targetEnv);
+  console.log(`Cloudflare target: ${preview ? "a Worker Preview of whether" : "production"}`);
+
+  if (action === "build") {
+    process.exit(runVinextBuild(childEnv));
+  }
+
+  const deployArgs = ["deploy", ...parsed.passthrough];
 
   if (!parsed.dryRun) {
     ensureCfAuth(childEnv);
@@ -47,12 +60,12 @@ async function main() {
   // One build per Workers Builds push, not two. The landmark audit in the gate
   // (`check-main-content-landmarks.mjs`) builds the worker bundle and serves it, so when
   // that bundle is current for this tree the deploy can upload it directly. The freshness
-  // check is the audit's own (`scripts/worker-bundle.mjs`), and the production lane only —
-  // a named environment builds a different configuration than the audit's bundle. When the
-  // bundle is missing or stale the check says no and this builds, exactly as before.
+  // check is the audit's own (`scripts/worker-bundle.mjs`), and production only — a preview
+  // is a different build. When the bundle is missing or stale the check says no and this
+  // builds, exactly as before.
   const reuseCurrentBundle = shouldReuseCurrentBundle({
     skipBuildIfCurrent: parsed.skipBuildIfCurrent,
-    targetEnv,
+    targetEnv: preview ? "preview" : "",
     current: isWorkerBundleCurrent(),
   });
 
@@ -60,7 +73,7 @@ async function main() {
     console.log("[cloudflare-run] reusing the current worker bundle (--skip-build-if-current); no rebuild.");
     if (!parsed.skipBuild) deployArgs.push("--skip-build");
   } else if (!parsed.skipBuild) {
-    const buildStatus = runVinextBuild(targetEnv, childEnv);
+    const buildStatus = runVinextBuild(childEnv);
     if (buildStatus !== 0) {
       process.exit(buildStatus);
     }
@@ -72,15 +85,18 @@ async function main() {
   // routes require — and skips both the build and `cf`. `cf deploy --dry-run` validates the
   // Build Output and resolves every binding without sending a request. An adapter-contract
   // break surfaces here as a clear adapter error rather than as a confusing packaging
-  // failure, or as a real deploy that fails after CI went green.
-  if (parsed.dryRun) {
-    // deployArgs already carries --dry-run and --skip-build, so this validates without
-    // building or publishing.
-    const adapterStatus = runCloudflareDeploy(deployArgs, childEnv);
+  // failure, or as a real deploy that fails after CI went green. A preview gets the first
+  // layer only: `cf previews deploy` has no dry run, and `cf deploy` refuses preview output.
+  const adapterContractArgs = deployArgs.includes("--dry-run") ? deployArgs : [...deployArgs, "--dry-run"];
+  if (parsed.dryRun || preview) {
+    const adapterStatus = runCloudflareDeploy(adapterContractArgs, childEnv);
     if (adapterStatus !== 0) {
       process.exit(adapterStatus);
     }
-    process.exit(runCfDryRun(targetEnv, childEnv));
+    if (preview) {
+      process.exit(parsed.dryRun ? 0 : runCfPreviewDeploy(childEnv));
+    }
+    process.exit(runCfDryRun(childEnv));
   }
 
   const { status, output } = await runCloudflareDeployCaptured(deployArgs, childEnv);
@@ -118,6 +134,23 @@ async function main() {
 export function findPublishedVersionId(output) {
   const match = /Current Version ID:\s*([0-9a-fA-F-]{36})/.exec(output ?? "");
   return match ? match[1] : null;
+}
+
+/**
+ * The URLs a `cf previews deploy` result names, or none. Its result is one JSON object on
+ * stdout; an upload that printed no URL is, as with `findPublishedVersionId`, not a deploy.
+ * Exported so the rule can be tested without uploading a preview.
+ */
+export function findPreviewUrls(stdout) {
+  const start = (stdout ?? "").indexOf("{");
+  if (start === -1) return [];
+  try {
+    const result = JSON.parse(stdout.slice(start));
+    const urls = [...(Array.isArray(result?.preview_urls) ? result.preview_urls : []), ...(Array.isArray(result?.deployment_urls) ? result.deployment_urls : [])];
+    return urls.filter((url) => typeof url === "string" && url.startsWith("https://"));
+  } catch {
+    return [];
+  }
 }
 
 /**
@@ -214,35 +247,19 @@ function parseArgs(args) {
 /**
  * Whether the deploy may reuse the bundle already built instead of building again.
  *
- * `--skip-build-if-current` is the reuse request. It applies only to the production lane
- * (no `--env`): the landmark audit and the production deploy build the same tree, while a
- * named environment builds a different configuration. `current` is the audit's own
- * freshness verdict (`isWorkerBundleCurrent`), so a stale, missing or other-mode bundle
- * never reuses. Exported so the rule can be tested without running a deploy.
+ * `--skip-build-if-current` is the reuse request. It applies only to production (no
+ * `--env`): the landmark audit and the production deploy build the same tree, while a preview
+ * is a different build. `current` is the audit's own freshness verdict
+ * (`isWorkerBundleCurrent`), so a stale, missing or preview bundle never reuses. Exported so
+ * the rule can be tested without running a deploy.
  */
 export function shouldReuseCurrentBundle({ skipBuildIfCurrent = false, targetEnv = "", current = false } = {}) {
   return Boolean(skipBuildIfCurrent && !targetEnv && current);
 }
 
-/** The adapter maps `--env` to the Vite mode it deploys, so the lane carries through unchanged. */
-function rebuildDeployArgs(parsed, targetEnvName) {
-  const args = ["deploy"];
-
-  if (targetEnvName) {
-    args.push("--env", targetEnvName);
-  }
-
-  args.push(...parsed.passthrough);
-  return args;
-}
-
-/** `vinext build` hands its arguments to Vite, whose mode selects the lane in cloudflare.config.ts. */
-function runVinextBuild(targetEnvName, env) {
-  const result = spawnSync(
-    process.execPath,
-    ["scripts/vinext-run.mjs", "build", ...(targetEnvName ? ["--mode", targetEnvName] : [])],
-    { env, stdio: "inherit" },
-  );
+/** `vinext build` runs Vite in its production mode; `CLOUDFLARE_PREVIEW_BUILD` in `env` makes it a preview build. */
+function runVinextBuild(env) {
+  const result = spawnSync(process.execPath, ["scripts/vinext-run.mjs", "build"], { env, stdio: "inherit" });
 
   return result.status ?? 1;
 }
@@ -265,21 +282,47 @@ function runCloudflareDeploy(args, env) {
 
 const cfBin = () => join(process.cwd(), "node_modules", "cf", "bin", "cf");
 
-/** The Build Output records the mode it was built in, and `cf` refuses a deploy that asks for another. */
-function runCfDryRun(targetEnvName, env) {
+/** Vite builds record the mode they ran in, `production` here, and `cf` refuses a deploy that asks for another. */
+function runCfDryRun(env) {
   if (!existsSync(cfBin())) {
     console.error(`Unable to locate cf at ${cfBin()}. Run bun install first.`);
     return 1;
   }
 
-  const result = spawnSync(
-    process.execPath,
-    [cfBin(), "deploy", "--prebuilt", "--dry-run", "--mode", targetEnvName ?? "production"],
-    { env, stdio: "inherit" },
-  );
+  const result = spawnSync(process.execPath, [cfBin(), "deploy", "--prebuilt", "--dry-run", "--mode", "production"], {
+    env,
+    stdio: "inherit",
+  });
 
   if (result.error) console.error(`[cloudflare-run] cf dry run failed to start: ${result.error.message}`);
   return result.status ?? 1;
+}
+
+/** Uploads the preview build, named after the branch `cf` reads from Workers Builds or git, and prints its URL. */
+function runCfPreviewDeploy(env) {
+  if (!existsSync(cfBin())) {
+    console.error(`Unable to locate cf at ${cfBin()}. Run bun install first.`);
+    return 1;
+  }
+
+  const result = spawnSync(process.execPath, [cfBin(), "previews", "deploy", "--prebuilt", "--mode", "production"], {
+    env,
+    encoding: "utf-8",
+    stdio: ["inherit", "pipe", "inherit"],
+    maxBuffer: 16 * 1024 * 1024,
+  });
+  process.stdout.write(result.stdout ?? "");
+
+  if (result.error) console.error(`[cloudflare-run] cf previews deploy failed to start: ${result.error.message}`);
+  if ((result.status ?? 1) !== 0) return result.status ?? 1;
+
+  const urls = findPreviewUrls(result.stdout);
+  if (urls.length === 0) {
+    console.error("[cloudflare-run] cf previews deploy exited 0 but reported no preview URL.");
+    return 1;
+  }
+  for (const url of urls) console.log(`[cloudflare-run] preview: ${url}`);
+  return 0;
 }
 
 /**

@@ -48,8 +48,8 @@ The deploy step (`bun run deploy:cloudflare`) now runs with `--skip-build-if-cur
 uploads the bundle the audit just built instead of building a second time: one Workers Builds
 push pays one Vite build, not two. The freshness check is the audit's own
 (`scripts/worker-bundle.mjs`, shared), and the reuse applies to the production lane only — a
-missing or stale bundle still builds first, and a named environment (`--env preview`) always
-builds its own configuration.
+missing or stale bundle still builds first, and a Worker Preview (`--env preview`) always
+builds its own.
 
 `WHETHER_DEPLOY_GATE=1` (read in one place, `scripts/deploy-gate.mjs`) makes `scripts/run-tests.mjs` shuffle test order, pin `NODE_ENV=test`, run
 with a 120s ceiling, and skip `tests/tools/` (it shells out to `python3`, which the build image does
@@ -115,8 +115,9 @@ stack trace pointing into minified code.
 
 ## Secrets and provider keys
 
-Secrets are set per Worker with `npx wrangler secret put <NAME> --name whether` (`--name
-whether-preview` for the preview lane; `cf` cannot set a single secret yet) and reach library code through `globalThis`, like every binding; `readSetting`
+Secrets are set on the Worker with `npx wrangler secret put <NAME> --name whether` (`cf`
+cannot set a single secret yet; Worker Previews inherit none, which is why a branch preview never
+holds the GitHub token or a Slack webhook) and reach library code through `globalThis`, like every binding; `readSetting`
 (`lib/runtime/settings.ts`) reads one by name, falling back to `process.env` for scripts and
 local runs, and treats an empty value as unset at either source. The site serves
 without any of them: each provider key switches a read from a keyless path to a keyed one, and
@@ -255,17 +256,19 @@ and the `refresh-operating-state` row on the preview `/trust` run history shows 
 ## Validating config without deploying
 
 `bun run test tests/cloudflareConfig.test.ts tests/cronSchedule.test.ts` evaluates
-`cloudflare.config.ts` for both lanes offline. The dry runs (`bun run deploy:cloudflare:dry-run`,
-`bun run deploy:cloudflare:preview:dry-run`) build the lane and run `cf deploy --prebuilt
---dry-run`, which validates the Build Output and prints every binding it resolved without
-credentials or a request; run one after any config edit.
+`cloudflare.config.ts` for production and for a preview offline. `bun run deploy:cloudflare:dry-run`
+builds production and runs `cf deploy --prebuilt --dry-run`, which validates the Build Output and
+prints every binding it resolved without credentials or a request; run it after any config edit.
+`bun run deploy:cloudflare:preview:dry-run` builds a preview and runs the adapter's contract check
+only: `cf previews deploy` has no dry run.
 
 ## Build + deploy commands
 
-This repo has one configuration, [`cloudflare.config.ts`](../cloudflare.config.ts), with two lanes
-selected by Vite's mode:
-- `production`: the default (`cf build`, `cf deploy` and `vinext build` run in `production` mode)
-- `preview`: `--mode preview`, the `whether-preview` Worker
+This repo has one configuration, [`cloudflare.config.ts`](../cloudflare.config.ts), for one Worker,
+`whether`, in two shapes:
+- production: every ordinary build
+- a Worker Preview: a build with `isPreview` set (`CLOUDFLARE_PREVIEW_BUILD=true`), deployed with
+  `cf previews deploy` under the branch's name
 
 Use this command sequence in CI to keep Cloudflare Workers deploys deterministic and auditable:
 
@@ -278,15 +281,15 @@ bun run deploy:cloudflare
 
 This flow keeps dependency installation to a single explicit `bun install --frozen-lockfile` step and uses Vinext as the only build/deploy adapter.
 
-`bun run build:cloudflare` and `bun run deploy:cloudflare` route through [`scripts/cloudflare-run.mjs`](../scripts/cloudflare-run.mjs), which passes the lane's mode to the Vinext build (`--mode preview` for `--env preview`) and then deploys that Build Output in the same mode. `cf` refuses a prebuilt deploy whose mode differs from the one the build recorded, so the build and the deploy target cannot drift apart.
+`bun run build:cloudflare` and `bun run deploy:cloudflare` route through [`scripts/cloudflare-run.mjs`](../scripts/cloudflare-run.mjs), which builds with Vinext (setting `CLOUDFLARE_PREVIEW_BUILD=true` for `--env preview`) and then deploys that Build Output: production with `cf deploy --prebuilt`, a preview with `cf previews deploy --prebuilt`. `cf` refuses a preview build on the first and a production build on the second, so the build and the deploy target cannot drift apart.
 
 ## Branch deploy commands
 
 - **Production deploy:** `bun run deploy:cloudflare`
 - **Production deploy dry run:** `bun run deploy:cloudflare:dry-run`
-- **Preview build-only validation:** `bun run build:cloudflare:preview`
-- **Preview deploy:** `bun run deploy:cloudflare:preview`
-- **Preview deploy dry run:** `bun run deploy:cloudflare:preview:dry-run`
+- **Preview build only:** `bun run build:cloudflare:preview`
+- **Preview deploy (named after the current branch):** `bun run deploy:cloudflare:preview`
+- **Preview build and adapter check:** `bun run deploy:cloudflare:preview:dry-run`
 
 ## Production lane
 
@@ -303,9 +306,11 @@ Locally the production dry run is a manual check: `bun run deploy:cloudflare:dry
 
 ### Branch builds (Workers Builds Previews)
 
-Every pushed branch gets its own Workers Builds run from the Worker's Previews base config: the same build command (`bun run check:vinext`), then the base config's deploy command. That command is `bun run deploy:cloudflare:branch-check` (set 2026-10-14): it builds the preview lane (`--mode preview`) and runs both dry-run layers, the adapter contract and `cf deploy --prebuilt --dry-run`, and uploads nothing. So packaging, binding and bundle-size failures show on the pull request's check before the merge.
+Every pushed branch gets its own Workers Builds run from the Worker's Previews base config: the same build command (`bun run check:vinext`), then the base config's deploy command, `bun run deploy:cloudflare:branch-check`. Since 2026-11-03 that deploys a Worker Preview of the branch: it builds with `isPreview` set, runs the adapter's contract check, uploads with `cf previews deploy`, and prints the Preview's URL into the build log (`[cloudflare-run] preview: …`). Packaging, binding and bundle-size failures still show on the pull request's check before the merge, and so does a Preview that would not upload — which also keeps a data pull request from merging itself, so a red preview upload is worth reading.
 
-It used to be `npx wrangler preview`, which every branch failed: it ran Wrangler against the raw sources, without the vinext build, and could not resolve `@opentelemetry/api` or `virtual:vinext-image-adapters`. A permanently red check on every pull request is the signal that hides a real failure (see the removed `Deploy` workflow above). Making it upload is not the fix either. A preview built from the production lane binds production `WHETHER_DURABLE_KV` and `VINEXT_KV_CACHE`, and the read path writes to KV in the background, so branch code would write production data. Real preview URLs need a Preview whose bindings are the preview lane's; until that is proven, branch builds validate and stop.
+What a Preview runs against is the reason this waited. Cloudflare gives each Preview its own Durable Object namespace and none of production's secrets, and cron triggers never fire on one; but KV, Analytics Engine, rate-limit counters and Workflows are shared unless the configuration says otherwise, and the read path writes to KV in the background. So `cloudflare.config.ts` gives a Preview the preview resources (`WHETHER_DURABLE_KV_PREVIEW`, created 2026-11-03 because the id `wrangler.toml` named had never existed; `VINEXT_KV_CACHE_PREVIEW`; `whether_telemetry_preview`; its own rate-limit namespaces), no Workflow binding (it would start the production Workflow), no `EMAIL`, and the mockups switch on. `tests/cloudflareConfig.test.ts` fails if a Preview ever shares a resource with production. Preview URLs are public, like the site.
+
+The command was `npx wrangler preview` until 2026-10-14, which every branch failed: it ran Wrangler against the raw sources, without the vinext build, and could not resolve `@opentelemetry/api` or `virtual:vinext-image-adapters`. From then until 2026-11-03 it validated a separate `whether-preview` Worker that was never deployed, and uploaded nothing. Previews cap at 500 per Worker and 100 deployments each, and every pushed branch makes one; remove a merged branch's with `npx cf previews delete <branch>` if the count nears the cap.
 
 The base config lives in Cloudflare, not in this repo. Read it with `cf builds workers get <script tag>` (`cf workers list` gives the tag as `id`).
 
@@ -316,21 +321,16 @@ The base config lives in Cloudflare, not in this repo. Read it with `cf builds w
 - Web-vitals telemetry now uses the official [`web-vitals`](https://www.npmjs.com/package/web-vitals) package in [`app/components/webVitalsTracker.tsx`](../app/components/webVitalsTracker.tsx) instead of `next/web-vitals`, which keeps the current Vinext compatibility check free of that prior warning.
 - Root layout fonts now load from CSS in [`app/globals.css`](../app/globals.css) instead of `next/font/google` in [`app/layout.tsx`](../app/layout.tsx), which removes the last repo-local compatibility gap on the active Vinext lane.
 
-## Preview lane
+## Worker Previews
 
-The preview lane is the `preview` mode of [`cloudflare.config.ts`](../cloudflare.config.ts): the same builder as production with its own Worker name, KV namespaces, telemetry dataset and rate-limit namespaces, and no `EMAIL` binding.
+A Worker Preview is the `isPreview` shape of [`cloudflare.config.ts`](../cloudflare.config.ts), deployed under the `whether` Worker with its own URL ("Branch builds" above has what it shares and what it does not).
 
-`bun run deploy:cloudflare:preview`:
-- runs the Vinext build with `--mode preview`
-- deploys that Build Output with `cf deploy --prebuilt --mode preview`
+`bun run deploy:cloudflare:preview` (also what a branch build runs):
+- runs the Vinext build with `CLOUDFLARE_PREVIEW_BUILD=true`
+- runs the adapter's contract check
+- uploads the Build Output with `cf previews deploy --prebuilt`, named after the current branch, and prints its URL
 
-Validation commands for the preview lane:
-
-```bash
-bun run check
-bun run build:cloudflare:preview
-bun run deploy:cloudflare:preview:dry-run
-```
+To deploy one from a workstation, `npx cf auth login` first.
 
 ## Runtime bindings
 

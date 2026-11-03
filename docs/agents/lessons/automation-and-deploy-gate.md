@@ -168,9 +168,12 @@ the first rebuild lands, the routine can be disabled; until then both write the 
 **The deploy moved from Wrangler to `cf` (2026-11-03).** `cloudflare.config.ts` replaced
 `wrangler.toml` (`cf migrate` drafted it), the Cloudflare Vite plugin moved to its v2 beta, which
 reads that file and writes Build Output to `.cloudflare/output/v0/`, and `@vinext/cloudflare`
-deploys with `cf deploy --prebuilt` whenever the file exists. Both lanes come from one builder, so
-the preview lane can no longer drift from production one hand-copied block at a time; a lane is
-Vite's mode (`--mode preview`), not `CLOUDFLARE_ENV`. What needed care: Wrangler's ordered Durable
+deploys with `cf deploy --prebuilt` whenever the file exists. Production and a Worker Preview come
+from one builder, so the preview shape can no longer drift from production one hand-copied block
+at a time. Every branch build now deploys a Preview, which the never-deployed `whether-preview`
+Worker never managed: the config gives it the preview KV, telemetry and rate-limit resources and no
+Workflow or mail, and the preview durable namespace had to be created first, because the id
+`wrangler.toml` named for it had never existed. What needed care: Wrangler's ordered Durable
 Object `migrations` became `worker.exports`, the class's whole lifecycle in one declaration, so
 `IngestCoordinator` must stay `exports.durableObject({ storage: "sqlite" })` or a deploy asks to
 delete or convert a live namespace (`tests/cloudflareConfig.test.ts` holds it); and a Vite preview
