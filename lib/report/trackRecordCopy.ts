@@ -30,6 +30,28 @@ export const describeRecordCadence = (
   `in ${record.lineCrossingMonths} of them. Most Mondays, nothing has moved.`;
 
 /**
+ * The record in one line, for the slide a board reads (2026-11-03).
+ *
+ * A director weighing a weekly call against their own judgement asks how often it
+ * has moved before; the slide answered with this week alone. The hold is named only
+ * when the last month-end shows the conditions the week does: a Stormy week over a
+ * record that ends Cloudy would print "Cloudy since Mar 2026" under a Stormy badge,
+ * so that week gets the count alone. Null without a record, so nothing prints.
+ */
+export const describeSlideRecord = (
+  regime: string,
+  record: Pick<TrackRecord, "firstRecordDate" | "monthsCovered" | "regimeChanges" | "currentRegime" | "currentRegimeLabel" | "currentHoldStartDate"> | null,
+): string | null => {
+  if (!record) return null;
+  const count =
+    `The monthly record back to ${formatMonthYearShortFromValue(record.firstRecordDate)} shows conditions changing ` +
+    `${record.regimeChanges} ${record.regimeChanges === 1 ? "time" : "times"} in ${record.monthsCovered} months.`;
+  return record.currentRegime === regime
+    ? `${record.currentRegimeLabel} since ${formatMonthYearShortFromValue(record.currentHoldStartDate)}. ${count}`
+    : count;
+};
+
+/**
  * What a past period's page is, said at its top (2026-10-09). The year and quarter
  * pages led with "Standing guidance" and "By Kanav Jain" over a 2012 date, which read
  * as guidance written in 2012; the first weekly brief was published in 2026, and the

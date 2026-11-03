@@ -3,6 +3,7 @@ import {
   buildExportSlidePayload,
   loadExportSnapshot,
   publishedBriefToSlidePayload,
+  withSlideRecord,
 } from "../../../../lib/export/exportSnapshot";
 import {
   BOARD_SLIDE_FORMATS,
@@ -52,7 +53,7 @@ export async function GET(request: NextRequest) {
     if (!brief) {
       return new NextResponse(`Published brief not found for week ${rawWeek}`, { status: 404 });
     }
-    payload = publishedBriefToSlidePayload(brief, stage);
+    payload = withSlideRecord(publishedBriefToSlidePayload(brief, stage));
   } else {
     const snapshot = await loadExportSnapshot();
     if (!snapshot) {

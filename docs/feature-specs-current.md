@@ -1329,6 +1329,14 @@ LibreOffice; the PDF uses `@cantoo/pdf-lib` (already in the tree for the CLI) wi
 fonts, mapping the few characters WinAnsi lacks rather than failing the export. Served as an
 attachment named by ISO week (`whether-board-slide-2026-09-16.pptx`; the payload now carries
 `recordDateIso` beside the display label). Both routes share `lib/export/exportSnapshot.ts`.
+Since 2026-11-03 the slide carries the record under its date (`describeSlideRecord` in
+`lib/report/trackRecordCopy.ts`): how long the conditions have held, then how often the monthly
+record has changed them ("Cloudy since Sep 2026. The monthly record back to Jan 2012 shows
+conditions changing 7 times in 177 months."). It answers the director who asks how often the
+guidance has moved before. The record is read as of the slide's own date, so a frozen week or a
+saved copy counts no later month-end, and the hold is dropped when the week's conditions differ
+from the last month-end's. Only the server routes set it; the slide pasted from the browser has
+no record and prints no line.
 Linked as two cards under "Files and images for a deck or a thread" on `/share`, and listed on
 `/api-docs`.
 
