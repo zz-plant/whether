@@ -67,8 +67,9 @@ describe("home route render contract", () => {
     }
     const positions = order.map((tag) => routeSource.indexOf(tag));
     assert.deepEqual([...positions].sort((a, b) => a - b), positions, "the sections read in the reader's order");
-    assert.ok(routeSource.indexOf("<AllAreaRules") > routeSource.indexOf("<DecisionPicker"), "all five areas fold under the picker");
-    assert.ok(routeSource.indexOf("<AllAreaRules") < routeSource.indexOf("<WhatWouldChangeSection"));
+    assert.ok(routeSource.indexOf("<AreaGroups") > routeSource.indexOf("<DecisionPicker"), "every area's rule leads the picker");
+    assert.ok(routeSource.indexOf("<AreaDistancesFold") > routeSource.indexOf("<AreaGroups"), "the distances fold under the rules");
+    assert.ok(routeSource.indexOf("<AreaDistancesFold") < routeSource.indexOf("<WhatWouldChangeSection"));
     for (const retired of ["<WhatItChangesSection", "<DoAndShareSection", "<FirstVisitExplainer", "offersFirstVisitFold"]) {
       assert.ok(!routeSource.includes(retired), `${retired} has no place on /`);
     }

@@ -93,10 +93,10 @@ const page = async () => {
     banner: firstMatch(html, /<p class="weather-caveat-band weather-caveat-mark[^"]*">(.*?)<\/p>/s),
     call: firstMatch(html, /id="weekly-call-title"[^>]*>(.*?)<\/h1>/s),
     strip: /data-trust-strip[^>]*>(.*?)<\/dl>/s.exec(html)?.[1] ?? "",
-    /* Each area row's cells after its name: rule, pause rule, restart rule, and "Changed" when drawn. */
-    areaRows: [...html.matchAll(/<tr[^>]*data-area="([a-z-]+)"[^>]*>(.*?)<\/tr>/gs)].map((match) => ({
-      area: match[1] ?? "",
-      cells: [...(match[2] ?? "").matchAll(/<td[^>]*>(.*?)<\/td>/gs)].map((cell) => decode(cell[1] ?? "")),
+    /* Each group of areas: its condition, and the areas it holds (`AreaGroups`). */
+    areaGroups: [...html.matchAll(/<section aria-label="[^"]*" class="[^"]*py-4">(.*?)<\/section>/gs)].map((match) => ({
+      condition: firstMatch(match[1] ?? "", /data-group-condition="true">(.*?)<\/p>/s),
+      areas: [...(match[1] ?? "").matchAll(/id="area-([a-z-]+)"/g)].map((area) => area[1] ?? ""),
     })),
   };
 };
@@ -129,13 +129,12 @@ describe("the saved-copy homepage", () => {
   });
 
   it("prints one side per area: its restart line on hold, else its pause line", async () => {
-    const { areaRows } = await page();
-    assert.equal(areaRows.length, 5);
-    for (const { area, cells } of areaRows) {
-      const [, condition = ""] = cells;
-      assert.match(condition, /^(Pause if|Restart when) /, `${area}: ${cells.join(" | ")}`);
+    const { areaGroups } = await page();
+    assert.equal(areaGroups.flatMap((group) => group.areas).length, 5);
+    for (const { areas, condition } of areaGroups) {
+      assert.match(condition, /^(Pauses if|Restarts when) /, `${areas.join(", ")}: ${condition}`);
       // No restart line on an area with nothing to restart, and no pause line it is already past.
-      assert.doesNotMatch(condition, /nothing to resume|in effect/, `${area}: ${condition}`);
+      assert.doesNotMatch(condition, /nothing to resume|in effect/, `${areas.join(", ")}: ${condition}`);
     }
   });
 

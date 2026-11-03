@@ -227,11 +227,13 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    its move since the comparison reading, and how far it sits from the pause line and the resume
    line. When the guidance is held the card prints neither the pair nor the ladders; the weekly card
    below states the hold's lines.
-2. **The five areas** (`DecisionPicker`, `#what-it-changes`, "Your decisions this week"): each
-   area by its name with its standing against its pause line; a choice opens its rule, lines and
-   the runway test. All five side by side fold under it (`AllAreaRules`: the area table, the runway
-   notes and the commitment test), then the one plan button. No "This week's scores" list: the map
-   and the bars in section 5 print the scores at every width.
+2. **The five areas** (`DecisionPicker`, `#what-it-changes`, "Your decisions this week"): every
+   area's rule, grouped by the condition that changes it (`AreaGroups`, from `buildAreaGroups`):
+   "On hold: Hiring, Fundraising, Spending and New bets", the restart condition, today's score and
+   the size of the move, then each area's action. Under it, five name-only choices; one opens its
+   rule, lines and the runway test. A fold (`AreaDistancesFold`) holds the distance ladder, the
+   runway notes' heading and the commitment test, then the one plan button. No "This week's
+   scores" list: the map and the bars in section 5 print the scores at every width.
 3. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
    only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
    its default choice, a chosen stage's own action as a stage line, and the runway emphasis once a
@@ -375,6 +377,24 @@ until the report resolves.
   cell and the full sentence.
 - The map on the card no longer repeats both scores in its header; the facts line beside it
   states them.
+
+### 1.1.0v Every area's rule, grouped by what changes it (2026-11-03)
+
+The one idea the forecast concept's critique kept (`/mockups/forecast`, retired with it): a warning
+service groups alerts with one cause rather than listing each town.
+
+- "Your decisions this week" leads with `AreaGroups`: the areas that share a state and the
+  condition that changes it, as one group. A held group is headed "On hold" with the crossed-line
+  glyph in the line ink, never a side stripe or "WARNING"; then the condition ("Restarts when
+  funding pressure falls below 66."), today's score and the size of the move from the record ("It
+  is 90 today, a rare move away."), and each area's action. A move this week stays with the area it
+  moved; the standing state is the group's heading.
+- It replaces the folded "Every area's rule" table, which printed the shared restart line in four
+  rows, and the one-sentence first answer (`describeFirstAnswer`, §1.1.0u). The rows carry the
+  `#area-…` anchors the distance ladder and "What changed" link to.
+- The five choices carry the area's name and glyph only: the group over them says each state.
+- `buildDecisionMovement` no longer returns `heldGroups`; the table was its only reader.
+- The homepage load budget falls to 1,720 words, 291 numbers and 45 "Risk appetite".
 
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
 The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate

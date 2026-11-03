@@ -13,7 +13,7 @@ import {
   type RuleThresholdDistance,
 } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import { decisionAreaLabel, isDecisionArea, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
+import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -583,35 +583,67 @@ export const buildHomeAreaRows = ({
   })).map(withIdleRestart);
 };
 
-const lowerFirst = (value: string) => `${value.charAt(0).toLowerCase()}${value.slice(1)}`;
-
-/*
- * One decision answered before the reader picks one (2026-11-03): the area nearest to
- * changing, as the question a founder would ask and this week's answer to it. "Hiring
- * this month? Wait until funding pressure falls below 66." A first visit met five
- * choices and a sentence about the guidance, and had to know which to open; this says
- * what the page is for by doing it once. On hold, the area whose restart is nearest;
- * otherwise the one nearest its pause. Null when no area states a numeric line.
- */
+/* A line as the condition it names: "funding pressure falls below 66". Null for a line that states no number. */
 const slotPhrase = (slot: HomeAreaLineSlot): string | null =>
   slot.value === undefined || slot.holdsAbove === undefined
     ? null
     : `${ruleMetricLabel[slot.metric].toLowerCase()} ${slot.holdsAbove ? "rises above" : "falls below"} ${slot.value}`;
 
-export const describeFirstAnswer = (
-  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[],
-): string | null => {
-  const nearest = <T extends Pick<HomeAreaRow, "area" | "pause" | "resume">>(candidates: T[], points: (row: T) => number) =>
-    candidates.reduce<T | undefined>((best, row) => (best === undefined || points(row) < points(best) ? row : best), undefined);
-  const held = rows.filter((row) => row.pause?.met && row.resume && !row.resume.met);
-  const heldRow = nearest(held, (row) => row.resume?.points ?? Number.POSITIVE_INFINITY);
-  if (heldRow?.resume) {
-    const phrase = slotPhrase(heldRow.resume);
-    return `${decisionAreaLabel(heldRow.area)} this month? ${phrase ? `Wait until ${phrase}` : `Wait: ${formatPoints(heldRow.resume.points)} from restarting`}.`;
+/*
+ * The areas grouped by the condition that changes them (2026-11-03), the one idea the
+ * forecast concept's critique kept: a warning service groups alerts with one cause
+ * rather than listing each town, and four areas held by funding pressure above 76 are
+ * one fact with four actions. Each group carries its condition, today's score and how
+ * big a move that is, so the reader never has to hold a line in mind while finding the
+ * number it is measured against. Held groups first; then the areas close to pausing;
+ * then the rest.
+ */
+export type AreaGroup = {
+  state: LineState;
+  /** "On hold", "Close to pausing" or "Not on hold". */
+  status: string;
+  /** "Restarts when funding pressure falls below 66." */
+  condition: string | null;
+  /** Today's score and how big a move the condition is: "It is 90 today, a rare move away." */
+  distance: string | null;
+  areas: { area: DecisionArea; label: string; rule: string; changed?: string }[];
+};
+
+const STATE_ORDER: readonly LineState[] = ["crossed", "near", "clear"];
+
+const GROUP_STATUS: Record<LineState, string> = {
+  crossed: "On hold",
+  near: "Close to pausing",
+  clear: "Not on hold",
+};
+
+export const buildAreaGroups = (
+  rows: readonly HomeAreaRow[],
+  scores: { tightness: number; riskAppetite: number },
+): AreaGroup[] => {
+  const groups = new Map<string, AreaGroup>();
+  const ordered = [...rows].sort((left, right) => decisionAreaOrder.indexOf(left.area) - decisionAreaOrder.indexOf(right.area));
+  for (const row of ordered) {
+    if (!row.pause) continue;
+    const held = row.pause.met;
+    const slot = held ? row.resume : row.pause;
+    const state: LineState = held ? "crossed" : resolveLineState(row.pause.points, "pause", false) === "near" ? "near" : "clear";
+    const phrase = slot ? slotPhrase(slot) : null;
+    const condition = phrase ? `${held ? "Restarts when" : "Pauses if"} ${phrase}.` : null;
+    /* The score the condition just named, so "it": the name twice in two sentences was
+       the page's most repeated term. At the line there is no move to size. */
+    const band = slot ? describeScoreMoveBand(slot.metric, slot.points) : null;
+    const distance = slot && phrase ? `It is ${Math.round(scores[slot.metric])} today${band ? `, ${band} away` : ""}.` : null;
+    const key = `${state}|${condition ?? ""}`;
+    const group = groups.get(key) ?? { state, status: GROUP_STATUS[state], condition, distance, areas: [] };
+    group.areas.push({
+      area: row.area,
+      label: decisionAreaLabel(row.area),
+      rule: row.rule,
+      /* A move this week stays with the area it moved; the standing state is the group's. */
+      ...(row.changed && row.changedKind && row.changedKind !== "held" ? { changed: row.changed } : {}),
+    });
+    groups.set(key, group);
   }
-  /* Not on hold: the badge's own distance, so the answer and the choice below it agree. */
-  const open = rows.filter((row) => row.pause && !row.pause.met);
-  const openRow = nearest(open, (row) => row.pause?.points ?? Number.POSITIVE_INFINITY);
-  const openStatus = openRow ? describeAreaPauseStatus(openRow) : undefined;
-  return openRow && openStatus ? `${decisionAreaLabel(openRow.area)} this month? Go ahead: ${lowerFirst(openStatus.text)}.` : null;
+  return STATE_ORDER.flatMap((state) => [...groups.values()].filter((group) => group.state === state));
 };

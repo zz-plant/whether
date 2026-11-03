@@ -86,8 +86,8 @@ export type HomeLoadReading = z.infer<typeof readingSchema>;
  * `bun run check:home-load` prints. Raising one is a policy change and belongs in its own PR.
  */
 export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
-  words: 1772,
-  numbers: 298,
+  words: 1720,
+  numbers: 291,
   wordsBeforeAreas: 341,
   folds: 9,
   /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
@@ -95,7 +95,7 @@ export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
   buttons: 11,
   fields: 26,
   fundingPressure: 35,
-  riskAppetite: 48,
+  riskAppetite: 45,
   jargon: 9,
   hardSentences: 2,
   longestSentence: 23,

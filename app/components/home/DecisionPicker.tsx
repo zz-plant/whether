@@ -11,8 +11,6 @@ import {
   HOME_DECISION_PARAM,
   HOME_SECTIONS,
   buildHomeDecisionCookie,
-  describeAreaPauseStatus,
-  describeFirstAnswer,
   describePauseLineCount,
   type HomeAreaLineSlot,
   type HomeAreaRow,
@@ -37,10 +35,12 @@ import { CheckIcon, ShareIcon } from "../uiIcons";
  * "What are you deciding?": the five areas, third on the page, after the verdict
  * and the stage and runway the lines are scaled to (2026-10-09).
  *
- * Each choice carries the area's name and where it stands against its pause line,
- * so the five answers are on the page before any is picked; the click opens that
- * area's rule and lines. The folded table under it (`AllAreaRules`, passed as
- * children) prints all five side by side, and keeps every rule in the server HTML.
+ * The five answers are on the page before any is picked: every area's rule, grouped by
+ * the condition that changes it (`AreaGroups`, passed as `summary`), leads the section.
+ * The choices under it open one area for why its rule matters, its lines and a test
+ * against the reader's cash; they carry the name alone (2026-11-03), because the
+ * group over them already says each area's state, and a badge beside each name said
+ * it a second time.
  *
  * It used to fold the rest of the brief away on a first visit and carry the alert,
  * the record and a "Show the full brief" button for that visit. The order does
@@ -96,6 +96,7 @@ export function DecisionPicker({
   stageLabel,
   activeRunway,
   savedReadingDate,
+  summary,
   children,
 }: {
   options: readonly DecisionPickerOption[];
@@ -109,12 +110,13 @@ export function DecisionPicker({
   activeRunway?: RunwayBand;
   /** The reading's date when the page shows a saved copy: the count over the choices is that reading's. */
   savedReadingDate?: string;
-  /** What follows the choices inside the section: the folded table of all five, and the plan link. */
+  /** Every area's rule at once, over the choices: the grouped rules. */
+  summary?: ReactNode;
+  /** What follows the choices inside the section: the fold behind the rules, and the plan link. */
   children?: ReactNode;
 }) {
   const [selected, setSelected] = useState<DecisionArea | undefined>(initialSelected);
   const active = options.find((option) => option.area === selected);
-  const firstAnswer = describeFirstAnswer(options);
   /* One side of the rule, the one that can change the area's state (2026-11-03), as the
      rules table and every paste print it: an area on hold shows when it restarts, any
      other area when it pauses. "Nothing to resume" beside a running area is gone. */
@@ -147,29 +149,22 @@ export function DecisionPicker({
     void copyToClipboard(message, `slack-takeaway-${active.area}`);
   }, [active, activePause, activeResume, activeRunway, activeTransmission, copyToClipboard, stageLabel]);
 
-  /* Each choice carries where its area stands against its pause line, so the
-     five answers are on the page before any is picked; the click opens the
-     rule and its lines. The count over them is the same rows, summed. */
-  const segmentedOptions: SegmentedOption<DecisionArea>[] = options.map((option) => {
-    const status = describeAreaPauseStatus(option);
-    return {
-      key: option.area,
-      /* The area's own name, the one every table and paste uses. The choices
-         were verb phrases ("Raise money", "Approve new spend") that named no
-         area, so a reader met two names for each of the five. */
-      label: decisionAreaLabel(option.area),
-      /* The question the row answers, as the native tooltip. The five cards
-         carry the noun a reader scans for; the question they typed into a
-         search box is the same string the answer page leads with, so it rides
-         here rather than in a third line the grid has no room for. */
-      title: option.answer?.title,
-      /* 20px: the choice is a card. */
-      icon: <AreaIcon area={option.area} size="card" />,
-      /* The state as glyph and words, so a crossed line and a close one differ
-         in shape as well as ink. */
-      sublabel: status ? <LineStateBadge state={status.state}>{status.text}</LineStateBadge> : undefined,
-    };
-  });
+  /* The name and glyph only: the grouped rules over the choices say each area's
+     state. The count over them, on a saved copy, is the same rows summed. */
+  const segmentedOptions: SegmentedOption<DecisionArea>[] = options.map((option) => ({
+    key: option.area,
+    /* The area's own name, the one every table and paste uses. The choices
+       were verb phrases ("Raise money", "Approve new spend") that named no
+       area, so a reader met two names for each of the five. */
+    label: decisionAreaLabel(option.area),
+    /* The question the row answers, as the native tooltip. The five cards
+       carry the noun a reader scans for; the question they typed into a
+       search box is the same string the answer page leads with, so it rides
+       here rather than in a third line the grid has no room for. */
+    title: option.answer?.title,
+    /* 20px: the choice is a card. */
+    icon: <AreaIcon area={option.area} size="card" />,
+  }));
   const pauseLineCount = describePauseLineCount(options, savedReadingDate);
 
   return (
@@ -204,15 +199,13 @@ export function DecisionPicker({
               {pauseLineCount}
             </p>
           ) : null}
-          {/* One decision answered before any is picked (2026-11-03), in place of "An
-              area on hold is already covered by this week's guidance", which told a
-              first visit nothing it could act on. Gone once an area is open. */}
-          {firstAnswer && !active ? (
-            <p data-first-answer className="text-fluid-sm text-slate-300">
-              {firstAnswer}
-            </p>
-          ) : null}
         </div>
+
+        {summary}
+
+        <p className="text-fluid-sm text-slate-300">
+          Open an area for why its rule matters and a test against your cash.
+        </p>
 
         <SegmentedControl
           options={segmentedOptions}
