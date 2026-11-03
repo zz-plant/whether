@@ -3,9 +3,17 @@
     "slug": "startup-funding-climate-this-week",
     "keyword": "startup funding climate this week",
     "title": "Startup funding climate this week",
+    "askedAs": [
+      "how is the VC funding market right now",
+      "is venture funding drying up",
+      "what are interest rates doing to startup funding",
+      "what does a Fed rate cut mean for startups",
+      "how are macro conditions for startups",
+      "tech funding environment and outlook"
+    ],
     "category": "climate",
     "shortAnswer": "Read startup funding conditions through rates and credit alongside your runway, investor conversations and the milestone a round must fund.",
-    "directAnswer": "Use the dated market reading below to review financing assumptions. Keep the company\u2019s cash deadline and investor evidence in the decision; a broad funding score cannot tell you whether a particular round will close.",
+    "directAnswer": "Use the dated market reading below to review financing assumptions. Keep the company’s cash deadline and investor evidence in the decision; a broad funding score cannot tell you whether a particular round will close.",
     "audience": "Founders, finance leaders and board operators",
     "applyHeading": "What the reading changes in your financing plan",
     "mappedDecisionAreas": [
@@ -37,6 +45,12 @@
     "slug": "is-it-risk-on-or-risk-off-for-startups",
     "keyword": "is it risk-on or risk-off for startups",
     "title": "Is it risk-on or risk-off for startups?",
+    "askedAs": [
+      "are investors risk on or risk off",
+      "market sentiment for startups",
+      "is risk appetite improving",
+      "are markets rewarding growth or profitability"
+    ],
     "category": "climate",
     "shortAnswer": "Partly: investors are selective, not shut. Fund the commitments that carry proof, stage the rest behind a review date, and keep a way to stop.",
     "directAnswer": "Compare the current risk reading with the commitments you are considering. Better market conditions can support a review of expansion, but each bet still needs customer evidence, a spending limit and a way to stop.",
@@ -50,7 +64,7 @@
     "thresholdFocus": "both",
     "featuredOrder": 11,
     "contextHeading": "Turn market changes into an operating review",
-    "context": "Whether\u2019s forecast concerns movement between operating conditions, not an exact recession date, company revenue or investment return. After a rate or credit event, inspect the dated evidence before changing a plan. Historical comparisons show how the model reads past conditions, not how your company would have performed.",
+    "context": "Whether’s forecast concerns movement between operating conditions, not an exact recession date, company revenue or investment return. After a rate or credit event, inspect the dated evidence before changing a plan. Historical comparisons show how the model reads past conditions, not how your company would have performed.",
     "companyInputs": [
       "The commitments that become harder to reverse as spending or hiring increases.",
       "Customer demand, available cash and the next evidence milestone for each bet.",
@@ -72,6 +86,12 @@
     "slug": "should-startups-hire-engineers-right-now",
     "keyword": "should startups hire engineers right now",
     "title": "Should startups hire engineers right now?",
+    "askedAs": [
+      "should we hire more engineers",
+      "should I hire a second engineer",
+      "add engineering headcount",
+      "grow the engineering team or hire developers"
+    ],
     "category": "decision",
     "shortAnswer": "Hire when a specific delivery, reliability or revenue bottleneck justifies the full cost and the downside cash plan can fund the role.",
     "directAnswer": "Name the work an additional engineer unlocks and compare hiring with reducing scope or reassigning capacity. Approve the role only with a funded ramp period and a measurable outcome; a market score cannot establish that need.",
@@ -107,6 +127,12 @@
     "slug": "should-startups-slow-roadmap-expansion",
     "keyword": "should startups slow roadmap expansion",
     "title": "Should startups slow roadmap expansion?",
+    "askedAs": [
+      "should we cut scope on the roadmap",
+      "slow down product development",
+      "ship fewer features this quarter",
+      "narrow the product roadmap"
+    ],
     "category": "decision",
     "shortAnswer": "Cut new scope if it would push out work customers are counting on, or if you don't have the people for it. Protect work that clearly delivers or keeps customers.",
     "directAnswer": "Separate committed delivery from optional expansion. Stage new scope behind customer evidence and a capacity check, then revisit it when the cash plan and team can support the next milestone.",
@@ -142,6 +168,13 @@
     "slug": "should-startups-raise-capital-now",
     "keyword": "should startups raise capital now",
     "title": "Should startups raise capital now?",
+    "askedAs": [
+      "is now a good time to raise money",
+      "should we raise a seed round",
+      "should we raise a series A or wait",
+      "when should we fundraise",
+      "go out to investors and raise a round"
+    ],
     "category": "decision",
     "shortAnswer": "Prepare now if the time to close a round plus a delay would leave less than your minimum cash buffer. Do not wait for better conditions to start.",
     "directAnswer": "Work backward from the date cash would reach your minimum buffer. Include preparation, investor conversations, diligence and a delayed close; do not wait for better market conditions if that leaves the company unable to fund its plan.",
@@ -176,6 +209,12 @@
     "slug": "when-should-startups-cut-burn",
     "keyword": "when should startups cut burn",
     "title": "When should startups cut burn?",
+    "askedAs": [
+      "should we cut costs",
+      "reduce spending or expenses",
+      "lower our burn rate",
+      "extend runway by spending less"
+    ],
     "category": "decision",
     "shortAnswer": "Review burn when your cash plan no longer funds the next milestone with a contingency buffer; tighter funding conditions make that review more urgent.",
     "directAnswer": "Model a slower revenue or fundraising case before approving more recurring spend. Reduce commitments that do not protect delivery, retention or the next milestone, and set a cash buffer for restoring them.",
@@ -210,6 +249,12 @@
     "slug": "should-we-freeze-or-selectively-hire",
     "keyword": "should we freeze hiring",
     "title": "Should we freeze hiring this week?",
+    "askedAs": [
+      "should we slow down hiring",
+      "pause hiring or keep hiring",
+      "is it time for a hiring freeze",
+      "should I hire now or wait"
+    ],
     "category": "decision",
     "shortAnswer": "Freeze hiring when your cash plan can't support new commitments, and decide on backfills and critical roles one by one.",
     "directAnswer": "Review open requisitions against cash, customer commitments and existing capacity. Give every exception a named approver, a full cost and a review date, and define the evidence needed to reopen hiring.",
@@ -245,6 +290,11 @@
     "slug": "should-we-expand-sales-headcount-now",
     "keyword": "should we expand sales headcount now",
     "title": "Should we expand sales headcount now?",
+    "askedAs": [
+      "should we hire more sales reps",
+      "add account executives or SDRs",
+      "grow the sales team"
+    ],
     "category": "decision",
     "shortAnswer": "Add sales capacity when qualified demand exceeds current coverage and the cash plan can fund recruiting, ramp and the sales cycle.",
     "directAnswer": "Check whether the bottleneck is sales capacity or insufficient qualified demand. Add a small cohort of reps only after the existing team demonstrates repeatable conversion and the downside plan funds their ramp.",
@@ -280,6 +330,11 @@
     "slug": "should-we-delay-new-product-lines",
     "keyword": "should we delay new product lines",
     "title": "Should we delay new product lines?",
+    "askedAs": [
+      "should we launch a new product",
+      "delay a second product",
+      "start a new product bet"
+    ],
     "category": "decision",
     "shortAnswer": "Delay a new product line when demand is unproven or its build and support costs would put the core business at risk.",
     "directAnswer": "Fund the smallest test that can establish demand before committing to a full product line. Set a customer milestone, a spending limit and an exit condition, including the ongoing support the product would require.",
@@ -315,6 +370,12 @@
     "slug": "how-fast-should-we-scale-go-to-market",
     "keyword": "how fast should we scale go to market",
     "title": "How fast should we scale go-to-market?",
+    "askedAs": [
+      "should we expand into new markets",
+      "scale marketing spend",
+      "how fast should we grow",
+      "GTM expansion"
+    ],
     "category": "decision",
     "shortAnswer": "Increase go-to-market spend in steps only when retention, conversion and gross-margin-adjusted payback support the added cash commitment.",
     "directAnswer": "Set the next spending increment against a proven customer segment or channel. Pause further increases when conversion, retention or payback misses the agreed range; resume after new cohort evidence supports the cash plan.",
@@ -350,6 +411,12 @@
     "slug": "how-to-brief-executives-on-market-conditions",
     "keyword": "how to brief executives on market conditions",
     "title": "How to brief executives on market conditions",
+    "askedAs": [
+      "market context for a board update",
+      "macro section of an investor update",
+      "what to tell the board about the economy",
+      "brief leadership on the market"
+    ],
     "category": "explanation",
     "shortAnswer": "Brief executives on the dated change, the decision it affects, the company evidence and the trigger for revisiting it.",
     "directAnswer": "Keep the briefing to one decision note with a source date and an owner. State what changed externally, whether it changes the company plan, and the business evidence required before acting.",
@@ -363,7 +430,7 @@
     "thresholdFocus": "both",
     "featuredOrder": 9,
     "contextHeading": "A market-conditions note for an executive meeting",
-    "context": "Separate the external market reading from the cash, customer and delivery evidence behind management decisions. For a portfolio review, use the same questions across companies but keep each company\u2019s runway and commitments separate. Historical reconstructions provide context; published weekly briefs document what was actually recorded.",
+    "context": "Separate the external market reading from the cash, customer and delivery evidence behind management decisions. For a portfolio review, use the same questions across companies but keep each company’s runway and commitments separate. Historical reconstructions provide context; published weekly briefs document what was actually recorded.",
     "companyInputs": [
       "The source date, the previous reading and any missing or fallback data.",
       "The company decision affected, its owner and the internal evidence supporting a change.",
@@ -385,8 +452,13 @@
     "slug": "how-much-runway-should-we-have-before-we-raise",
     "keyword": "how much runway do we need",
     "title": "How much runway should we have before we raise?",
+    "askedAs": [
+      "how many months of runway do we need",
+      "how much cash do we need before fundraising",
+      "is 12 months of runway enough"
+    ],
     "category": "decision",
-    "shortAnswer": "Size cash to the safe band for the current conditions \u2014 9 to 18 months of runway in Sunny conditions, 15 to 24 in Cloudy, 18 to 30 in Freezing \u2014 and open the raise while you are still above the band's floor.",
+    "shortAnswer": "Size cash to the safe band for the current conditions — 9 to 18 months of runway in Sunny conditions, 15 to 24 in Cloudy, 18 to 30 in Freezing — and open the raise while you are still above the band's floor.",
     "directAnswer": "Enter cash, monthly spend and revenue in the runway planner, compare the result to the band your current conditions imply, and set the raise window the planner gives: months 4 through 8 with comfortable coverage, 2 through 5 when coverage is thin, immediately when it is critical.",
     "audience": "Founders, CFOs and board members",
     "applyHeading": "Compare your runway to the band",
@@ -396,7 +468,7 @@
     ],
     "thresholdFocus": "both",
     "contextHeading": "Why the band moves with conditions",
-    "context": "The band is the runway planner's model: it widens in Freezing conditions because closes take longer and rounds are fewer, and narrows in Sunny ones because capital is easier to reach. Stage widens it further \u2014 seed adds three months, Series A adds two. The band is a planning default, not a forecast: the record shows how conditions changed after each line, not what a particular round will fetch.",
+    "context": "The band is the runway planner's model: it widens in Freezing conditions because closes take longer and rounds are fewer, and narrows in Sunny ones because capital is easier to reach. Stage widens it further — seed adds three months, Series A adds two. The band is a planning default, not a forecast: the record shows how conditions changed after each line, not what a particular round will fetch.",
     "companyInputs": [
       "Cash in the bank and monthly spend, net of revenue.",
       "The months a raise consumes: preparation, partner meetings, diligence and a delayed close.",
@@ -418,9 +490,15 @@
     "slug": "what-should-startups-do-before-a-downturn",
     "keyword": "prepare for a downturn",
     "title": "What should startups do before a downturn?",
+    "askedAs": [
+      "is a recession coming",
+      "prepare for a recession",
+      "downturn playbook",
+      "what if the economy slows down"
+    ],
     "category": "decision",
     "shortAnswer": "Work out now what each pause line would mean for your company. The stop points are already set, so getting ready means knowing your runway, burn and demand, not guessing when things turn.",
-    "directAnswer": "Put cash, burn and demand numbers next to the pause lines for hiring, roadmap and spend, and write down for each what you would cut, defer or stop if it trips \u2014 so a change of conditions triggers a decision you already made.",
+    "directAnswer": "Put cash, burn and demand numbers next to the pause lines for hiring, roadmap and spend, and write down for each what you would cut, defer or stop if it trips — so a change of conditions triggers a decision you already made.",
     "audience": "Founders, COOs and CFOs",
     "applyHeading": "Decide now what a tripped line means",
     "mappedDecisionAreas": [
@@ -456,9 +534,14 @@
     "slug": "should-we-hire-our-first-salesperson-now",
     "keyword": "first salesperson",
     "title": "Should we hire our first salesperson now?",
+    "askedAs": [
+      "first sales hire",
+      "hire a founding account executive",
+      "when to hire the first salesperson"
+    ],
     "category": "decision",
     "shortAnswer": "Treat the first sales hire as an expansion bet: fund it one stage at a time with the stage gates written down, and size it against the risk appetite line like every other new bet.",
-    "directAnswer": "Make the hire when founder-led sales shows repeatable evidence \u2014 the same segment, the same pitch, closed deals \u2014 and the fully loaded cost is in the cash plan with a written stop condition attached.",
+    "directAnswer": "Make the hire when founder-led sales shows repeatable evidence — the same segment, the same pitch, closed deals — and the fully loaded cost is in the cash plan with a written stop condition attached.",
     "audience": "Founders, CEOs and heads of sales",
     "applyHeading": "Gate the hire like a bet",
     "mappedDecisionAreas": [
@@ -466,7 +549,7 @@
     ],
     "thresholdFocus": "risk",
     "contextHeading": "What the record can and cannot tell you",
-    "context": "The risk appetite score says how willing markets are to fund risk and faster expansion; it does not say whether your deals convert. The hire is a bet on your own evidence, gated by the same line the other new bets use: when risk appetite falls below its pause line, new commitments stop \u2014 and a first salesperson who arrives just before that line is a bet made on the edge.",
+    "context": "The risk appetite score says how willing markets are to fund risk and faster expansion; it does not say whether your deals convert. The hire is a bet on your own evidence, gated by the same line the other new bets use: when risk appetite falls below its pause line, new commitments stop — and a first salesperson who arrives just before that line is a bet made on the edge.",
     "companyInputs": [
       "Closed deals from founder-led sales: count, segment and cycle length.",
       "The fully loaded cost of the rep and the cash plan that carries it.",
@@ -488,6 +571,11 @@
     "slug": "should-startups-raise-prices-now",
     "keyword": "should startups raise prices",
     "title": "Should startups raise prices now?",
+    "askedAs": [
+      "should we increase our prices",
+      "is it a good time for a price increase",
+      "raise pricing on existing customers"
+    ],
     "category": "decision",
     "shortAnswer": "Raise prices only where customers already see the value, and only with a clear way back. Hold the base price steady if churn risk is real or if buyers are scrutinizing spend.",
     "directAnswer": "Test a price increase on new customers or one segment first, measure churn and win rate, and keep the rollback path open. Do not raise prices across the board while buyers are cutting vendors.",
@@ -541,6 +629,11 @@
     "slug": "should-startups-do-layoffs-now",
     "keyword": "should startups do layoffs",
     "title": "Should startups do layoffs now?",
+    "askedAs": [
+      "do we need layoffs",
+      "should we lay people off",
+      "reduce headcount or do a RIF"
+    ],
     "category": "decision",
     "shortAnswer": "Cut roles only when the runway math forces it or when the role no longer fits the plan. Protect the people who ship and sell; avoid cuts that save little cash but cost momentum.",
     "directAnswer": "Work out how many months of runway each cut buys, then cut the roles that do not map to revenue or core delivery. Avoid blanket cuts that weaken the team without fixing the cash line.",
@@ -594,6 +687,11 @@
     "slug": "should-startups-invest-in-retention-or-acquisition",
     "keyword": "should startups invest in retention or acquisition",
     "title": "Should startups invest in retention or acquisition?",
+    "askedAs": [
+      "focus on retention or new customers",
+      "should we cut acquisition spend",
+      "churn or growth first"
+    ],
     "category": "decision",
     "shortAnswer": "Protect retention first when buyers are cautious. Spend on acquisition only where payback is short and the channel is proven.",
     "directAnswer": "When customers are scrutinizing spend, keeping the ones you have beats chasing new ones. Fund acquisition only where it pays back quickly and the message already lands.",
@@ -647,6 +745,11 @@
     "slug": "should-startups-raise-a-bridge-round-now",
     "keyword": "should startups raise a bridge round",
     "title": "Should startups raise a bridge round now?",
+    "askedAs": [
+      "should we raise a bridge round",
+      "extension round or bridge from existing investors",
+      "do we need a bridge before the next round"
+    ],
     "category": "decision",
     "shortAnswer": "Raise a bridge only if it extends runway to a real milestone and the terms are survivable. Otherwise cut to default alive first.",
     "directAnswer": "A bridge buys time, not a strategy. Take one only when it reaches a milestone that changes the next raise. The terms must not trap you. Otherwise reduce burn to live on current cash.",
@@ -700,6 +803,11 @@
     "slug": "should-startups-change-compensation-now",
     "keyword": "should startups change compensation",
     "title": "Should startups change compensation now?",
+    "askedAs": [
+      "should we give raises this year",
+      "adjust salaries or equity",
+      "cut pay or offer more equity"
+    ],
     "category": "decision",
     "shortAnswer": "Hold base pay steady and shift toward variable or equity-heavy pay when cash is tight. Cut fixed payroll before cutting people.",
     "directAnswer": "When cash is tight, protect take-home where you can and move upside into variable pay or equity. Reduce fixed payroll through structure before you reduce headcount.",
@@ -753,6 +861,11 @@
     "slug": "should-startups-expand-internationally-now",
     "keyword": "should startups expand internationally",
     "title": "Should startups expand internationally now?",
+    "askedAs": [
+      "should we expand to Europe",
+      "open in a new country",
+      "international expansion"
+    ],
     "category": "decision",
     "shortAnswer": "Expand only where demand is already proven and the cost is reversible. Hold new markets until the core is stable.",
     "directAnswer": "International expansion is a multi-quarter bet. Take it only where customers already ask for it and the cost can be unwound. Otherwise deepen the core market first.",
@@ -806,6 +919,11 @@
     "slug": "should-startups-consolidate-vendors-now",
     "keyword": "should startups consolidate vendors",
     "title": "Should startups consolidate vendors now?",
+    "askedAs": [
+      "cut SaaS tools and software spend",
+      "consolidate our vendors",
+      "renegotiate vendor contracts"
+    ],
     "category": "decision",
     "shortAnswer": "Cut tools and vendors that do not pay back within six months. Keep the ones that save time or revenue.",
     "directAnswer": "When cash is tight, every subscription and agency seat must earn its keep. Consolidate where overlap exists and pause spend that cannot show a quick payback.",

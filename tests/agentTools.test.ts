@@ -6,6 +6,7 @@ import { z } from "zod";
 import { AgentInputError, createAgentToolRegistry, defineTool, describeToolParams, labelChoices } from "../lib/agent/registry";
 import { callAgentTool, decisionAnswerOutputSchema, describeAgentTools, listAgentTools, runAgentTool } from "../lib/agent/tools";
 import { loadAgentInterfaceContext } from "../lib/agentInterface";
+import { answerPages, matchDecisionPage } from "../app/answers/decisionPages";
 import { buildAgentState } from "../lib/agentState";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import { serveUnreachableUpstreams } from "./fixtures/unreachableUpstreams";
@@ -103,10 +104,49 @@ describe("the agent tool registry", () => {
     );
     assert.equal(byFragment.slug, "when-should-startups-cut-burn");
 
-    // A topic the answers don't cover is refused with the list of what does exist.
+    // A topic the answers don't cover is refused with the list of what does exist, by title.
     const unknown = await refusal(runAgentTool("get_answer", { question: "cryptocurrency" }, "http"));
-    assert.match(unknown.message, /Available decision topics/);
+    assert.match(unknown.message, /Available decision topics: Startup funding climate this week \(startup-funding-climate-this-week\)/);
+    assert.match(unknown.message, /get_state answers it/);
     assert.ok(unknown.problems.some((problem) => problem.allowed?.includes("should-startups-raise-capital-now")));
+  });
+
+  it("returns each curated question's own answer before fuzzy topic ranking", () => {
+    for (const page of answerPages) {
+      for (const question of [page.slug, page.title, page.keyword, ...page.askedAs]) {
+        assert.equal(matchDecisionPage(question)?.slug, page.slug, question);
+        assert.equal(matchDecisionPage(`  ${question.toUpperCase()}?  `)?.slug, page.slug, question);
+      }
+    }
+  });
+
+  it("finds the answer for a question as a user asks it, not only as a page's title reads", () => {
+    /* An agent passes the user's words. Each of these was refused until 2026-10-28, when a
+       question had to repeat every one of its words from one page's title. */
+    const asked: Record<string, string> = {
+      "Should I hire a second engineer?": "should-startups-hire-engineers-right-now",
+      "is now a good time to raise a seed round": "should-startups-raise-capital-now",
+      "should we raise a series A or wait": "should-startups-raise-capital-now",
+      "how is the VC funding market right now": "startup-funding-climate-this-week",
+      "what do interest rates mean for my startup": "startup-funding-climate-this-week",
+      "do we need to cut costs": "when-should-startups-cut-burn",
+      "should we slow down hiring": "should-we-freeze-or-selectively-hire",
+      "should we hire": "should-we-freeze-or-selectively-hire",
+      "should we hire sales reps": "should-we-expand-sales-headcount-now",
+      "when should I hire my first AE": "should-we-hire-our-first-salesperson-now",
+      "is a recession coming": "what-should-startups-do-before-a-downturn",
+      "market context for our board update": "how-to-brief-executives-on-market-conditions",
+      "do we have enough runway": "how-much-runway-should-we-have-before-we-raise",
+      "freeze-or-selectively": "should-we-freeze-or-selectively-hire",
+      // What a model passed in a headless run on 2026-11-02, the company's details and all.
+      "should I hire two more engineers this quarter with 14 months of runway": "should-startups-hire-engineers-right-now",
+    };
+    for (const [question, slug] of Object.entries(asked)) {
+      assert.equal(matchDecisionPage(question)?.slug, slug, question);
+    }
+    for (const offTopic of ["pizza recipes", "cryptocurrency", "", "   "]) {
+      assert.equal(matchDecisionPage(offTopic), undefined, JSON.stringify(offTopic));
+    }
   });
 
   it("refuses a tool that does not exist, and lists the ones that do", async () => {

@@ -1,0 +1,19 @@
+{
+  "name": "whether",
+  "owner": {
+    "name": "Kanav Jain",
+    "url": "https://whether.work"
+  },
+  "metadata": {
+    "description": "Whether's plugin for Claude: weekly operating guidance for startup leaders."
+  },
+  "plugins": [
+    {
+      "name": "whether",
+      "source": "./plugins/whether",
+      "description": "This week's call on startup hiring, fundraising and burn, read from U.S. interest-rate and credit-market data.",
+      "homepage": "https://whether.work",
+      "category": "productivity"
+    }
+  ]
+}

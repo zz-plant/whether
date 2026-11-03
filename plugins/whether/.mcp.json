@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "whether": {
+      "type": "http",
+      "url": "https://whether.work/api/mcp"
+    }
+  }
+}

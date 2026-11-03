@@ -13,6 +13,8 @@ export const answerPageSchema = z.object({
   slug: z.string().min(1),
   keyword: z.string().min(1),
   title: z.string().min(1),
+  /** How people ask this question in their own words. Read by `matchDecisionPage`, so an agent passing a user's question finds the page; never printed. */
+  askedAs: z.array(z.string().min(1)).min(3),
   category: z.enum(["climate", "decision", "explanation"]),
   shortAnswer: z.string().min(1),
   directAnswer: z.string().min(1),

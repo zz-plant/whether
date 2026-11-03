@@ -108,7 +108,7 @@ const AGENT_TOOLS = [
     name: "get_state",
     title: "Get the current state",
     description:
-      "Start here. The current reading in one small answer of about 3KB. It holds the conditions and the margin from their change lines, the data's freshness, each score against its pause, resume and change lines, the moves behind each score since the earlier reading, the areas whose pause or restart lines those moves crossed, and the guidance. automation.ready says whether the data is live and current.",
+      "This week's call on startup hiring, spending, fundraising and burn, read from U.S. interest-rate and credit-market data and published every Monday. Use it when someone asks whether to hire or freeze hiring, raise now or wait, cut burn, or what today's funding or macro conditions mean for their company. The smallest answer to decide from, about 3KB: the conditions and the margin from their change lines, each score against its pause, restart and change lines, the moves behind each score since the earlier reading, the areas those moves crossed a line for, the guidance, and the data's freshness. automation.ready is false when the reading is a saved copy or more than 10 days old.",
     input: {},
     output: agentStateSchema,
     example: {},
@@ -179,9 +179,9 @@ const AGENT_TOOLS = [
     name: "get_answer",
     title: "Get decision answer",
     description:
-      "Get Whether's curated operating guidance, current standing, and bounded rules for one of its decision answers — hiring, roadmap expansion, raising capital, burn, sales headcount, product lines, go-to-market, briefing executives, or this week's funding climate and risk-on/risk-off posture.",
+      "Whether's answer to one startup operating question, with this week's standing, the rules in force and a line to cite: hiring or a hiring freeze, engineers, sales headcount or a first salesperson, layoffs, compensation, raising capital or a bridge round, runway before a raise, cutting burn, vendors, pricing, retention versus acquisition, the roadmap, new product lines, go-to-market pace, international expansion, preparing for a downturn, a board or executive briefing, the funding climate, or risk-on versus risk-off. Pass the question as the user asked it.",
     input: {
-      question: textInput.describe("A question, topic, or answer slug (e.g. 'should-we-freeze-or-selectively-hire', 'should we freeze hiring', 'cut burn')."),
+      question: textInput.describe("The question in the user's words, a topic, or an answer slug (e.g. 'should I hire a second engineer', 'cut burn', 'should-we-freeze-or-selectively-hire')."),
     },
     example: { question: "should-we-freeze-or-selectively-hire" },
     output: decisionAnswerOutputSchema,
@@ -189,7 +189,11 @@ const AGENT_TOOLS = [
       const page = matchDecisionPage(question);
       if (!page) {
         const availableTopics = answerPages.map((candidate) => candidate.slug);
-        const message = `No answer found matching ${JSON.stringify(question)}. Available decision topics: ${availableTopics.join(", ")}.`;
+        /* Titles, not slugs: a caller picking the nearest answer reads the question it answers. */
+        const message =
+          `No answer found matching ${JSON.stringify(question)}. Available decision topics: ` +
+          `${answerPages.map((candidate) => `${candidate.title} (${candidate.slug})`).join("; ")}. ` +
+          `For what this week's conditions mean in general, get_state answers it.`;
         throw new AgentInputError(message, "invalid_arguments", [
           { argument: "question", message: `Unknown decision topic ${JSON.stringify(question)}.`, allowed: availableTopics },
         ]);
@@ -353,7 +357,7 @@ const AGENT_TOOLS = [
   defineTool({
     name: "get_comps",
     title: "Get SaaS valuation comps",
-    description: `Median SaaS EV/Revenue multiple across ${SAAS_BASKET.length} public companies, from SEC filings and delayed prices, or Yahoo Finance when those are down; the result names its source. Fails with each source's reason when none answers.`,
+    description: `Median SaaS EV/Revenue multiple across ${SAAS_BASKET.length} public companies, from SEC filings and delayed prices, or Yahoo Finance when those are down; the result names its source. Use it when someone asks what public SaaS companies trade at. Fails with each source's reason when none answers.`,
     openWorld: true,
     input: {},
     example: {},
@@ -385,7 +389,7 @@ const AGENT_TOOLS = [
     name: "stress_test_plan",
     title: "Stress-test a planned decision against today's conditions",
     description:
-      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the restart line.",
+      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the restart line. Use it when someone describes a specific plan and asks whether it holds up in this market.",
     input: {
       planText: textInput.describe("The planned decision or initiative in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),

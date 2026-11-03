@@ -1,0 +1,26 @@
+{
+  "name": "whether",
+  "displayName": "Whether",
+  "version": "1.0.0",
+  "description": "This week's call on startup hiring, fundraising and burn, read from U.S. interest-rate and credit-market data: what is paused, and the lines that would resume it.",
+  "author": {
+    "name": "Kanav Jain",
+    "url": "https://whether.work"
+  },
+  "homepage": "https://whether.work",
+  "repository": "https://github.com/zz-plant/whether",
+  "license": "MIT",
+  "icon": "./.claude-plugin/icon.png",
+  "documentationUrl": "https://whether.work/api-docs",
+  "privacyPolicyUrl": "https://whether.work/privacy",
+  "keywords": [
+    "startups",
+    "hiring",
+    "fundraising",
+    "burn",
+    "runway",
+    "interest rates",
+    "macro",
+    "operating plan"
+  ]
+}
