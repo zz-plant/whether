@@ -1,6 +1,6 @@
 import { scaleLinear } from "d3-scale";
 import { formatMonthLabel, toMonthInput } from "../../../lib/timeMachine/monthFormatting";
-import { CurveTermsKey, formatSpread } from "./curveTermsKey";
+import { CURVE_SPREAD_LABELS, CurveTermsKey, formatSpread } from "./curveTermsKey";
 import { buildSegmentedLineSeries } from "./segmentedLineSeries";
 import { InstrumentQuestion } from "./instrumentQuestion";
 import { describeInversionSummary } from "../../../lib/report/evidenceInstrumentSummaries";
@@ -184,8 +184,8 @@ export function SignalInversionPreview({
               just printed with their colours, one restating this sentence, and
               one for gaps — which read as a second control strip. */}
           <p className="mt-1 text-xs tabular-nums text-slate-400">
-            Dashed zero line; below it, the curve is inverted. 10Y−2Y has been inverted{" "}
-            {monthsInverted10Y2Y} of {monthlyPoints.length} months, 2Y−3M {monthsInverted2Y3M} of{" "}
+            Dashed zero line; below it, the curve is inverted. The {CURVE_SPREAD_LABELS.spread10Y2Y.toLowerCase()} has been inverted{" "}
+            {monthsInverted10Y2Y} of {monthlyPoints.length} months, the {CURVE_SPREAD_LABELS.spread2Y3M} spread {monthsInverted2Y3M} of{" "}
             {monthlyPoints.length}.{hasGaps ? " Breaks are missing monthly reads." : ""}
           </p>
           <div className="mt-2 flex items-center justify-between type-eyebrow">
@@ -196,11 +196,11 @@ export function SignalInversionPreview({
           <div className="mt-3 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-300">
             <span className="inline-flex items-center gap-1.5">
               <span className="w-3 border-t-2 border-[var(--color-semantic-easing-border)]" aria-hidden="true" />
-              <span>10Y−2Y <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread10Y2Y ?? null)}</strong></span>
+              <span>{CURVE_SPREAD_LABELS.spread10Y2Y} <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread10Y2Y ?? null)}</strong></span>
             </span>
             <span className="inline-flex items-center gap-1.5">
               <span className="w-3 border-t-2 border-dashed border-[var(--app-text-muted)]" aria-hidden="true" />
-              <span>2Y−3M <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread2Y3M ?? null)}</strong></span>
+              <span>{CURVE_SPREAD_LABELS.spread2Y3M} <strong className="font-semibold tabular-nums text-slate-100">{formatSpread(latest?.spread2Y3M ?? null)}</strong></span>
             </span>
             <span>{monthlyPoints[0]?.label} → {latest?.label}</span>
             {/* Autoscaled to the visible window, so the extent has to be stated. */}
@@ -208,12 +208,12 @@ export function SignalInversionPreview({
               Vertical scale {formatSpread(spreadMin)} to {formatSpread(spreadMax)}
             </span>
           </div>
-          {/* Expands the axis shorthand. Without it, "10Y−2Y 0.41pp" is
-              unreadable to anyone who has not traded bonds. The readings were
-              in bp ("+41.0 bp") on a page whose gauge row prints the same
-              spread as 0.41pp, so the key defines pp now. */}
+          {/* Names the gauge's instrument and defines pp. The legend said "10Y−2Y
+              0.41pp" until 2026-11-03, shorthand this key then expanded. The
+              readings were in bp ("+41.0 bp") on a page whose gauge row prints
+              the same spread as 0.41pp, so the key defines pp now. */}
           <CurveTermsKey
-            terms={["spread10Y2Y", "spread2Y3M", "pp"]}
+            terms={["spread10Y2Y", "pp"]}
             className="mt-3 border-t border-slate-800/80 pt-3"
           />
         </div>

@@ -44,12 +44,36 @@ describe("the change line in interest-rate terms", () => {
       // bond-desk token in the one line saying how close the call is to changing.
       assert.match(
         entry.sentence,
-        /^If (long rates (rise|fall) \d+\.\d{2} percentage points (further above|closer to) short rates|the 1-month Treasury bill rate (rises|falls) \d+\.\d{2} percentage points), conditions turn (Sunny|Cloudy|Stormy|Freezing)\.$/,
+        /^(If long rates (rise|fall) \d+\.\d{2} percentage points (further above|closer to) short rates, conditions turn|(About|Less than|More than) (one|\d+) quarter-point Fed (hike|cut)s? turns? conditions) (Sunny|Cloudy|Stormy|Freezing)\.$/,
       );
       assert.doesNotMatch(entry.sentence, /%|10Y|2Y|1M\b|flip/);
       assert.notEqual(entry.crossesTo, assessment.regime);
       assert.doesNotMatch(entry.sentence, /tightness|riskAppetite|threshold|score/i, "reader copy carries no engine vocabulary");
     }
+  });
+
+  /* The short rate's line led with the bill ("If the 1-month Treasury bill rate
+     falls 0.17 percentage points"), the one instrument a reader without a bond
+     desk cannot place. The Fed step leads now, and the bill follows it. */
+  it("leads the short rate's line with a Fed step and names the bill rate after it", () => {
+    const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+    const rate = buildFlipProximity(assessment).find((entry) => entry.axis === "tightness");
+    assert.ok(rate, "the funding-pressure line is reachable from this reading");
+    assert.ok(rate.sentence.includes("quarter-point Fed"), rate.sentence);
+    assert.doesNotMatch(rate.sentence, /Treasury/);
+    assert.match(rate.instrument ?? "", /^That is the 1-month Treasury bill rate (rising|falling) \d+\.\d{2} percentage points\.$/);
+    const curve = buildFlipProximity(assessment).find((entry) => entry.axis === "riskAppetite");
+    assert.equal(curve?.instrument, undefined, "the curve's sentence says the move in plain words already");
+  });
+
+  it("does not say the federal funds rate's noun twice", () => {
+    const assessment = withYields({ oneMonth: 3.68, threeMonth: 3.7, twoYear: 3.7, tenYear: 3.99 });
+    const fedFunds: RegimeAssessment["scores"]["baseRateUsed"] = "FED";
+    const onFedFunds = { ...assessment, scores: { ...assessment.scores, baseRateUsed: fedFunds } };
+    const rate = buildFlipProximity(onFedFunds).find((entry) => entry.axis === "tightness");
+    assert.ok(rate);
+    assert.ok(rate.instrument?.startsWith("That is the federal funds rate "), rate.instrument);
+    assert.ok(!rate.instrument?.includes("rate rate"), rate.instrument);
   });
 
   it("projects from the published score, macro layer included, not from the bare curve", () => {

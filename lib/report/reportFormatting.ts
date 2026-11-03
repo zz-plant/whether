@@ -9,6 +9,7 @@ import { DECISION_CONTRACT_LABELS } from "./reportCopy";
    `RegimeSignalKey` from this module with `import type`, which erases, so this
    is not a runtime cycle. */
 import { regimeSignalLabel } from "./signalTranslations";
+import { describeScoreMoveBand } from "./marketMoveScale";
 
 export type RegimeSignalKey = "tightness" | "riskAppetite" | "baseRate" | "curveSlope";
 
@@ -145,11 +146,16 @@ export const formatStripMargin = (confidence: string, points?: number | null): s
 const pointsWord = (points: number) => `${points} ${points === 1 ? "pt" : "pts"}`;
 
 /**
- * The margin with the score it is measured on: "Risk appetite 1 pt from Freezing".
- * With the regime, the line is named by what is on its other side (2026-10-27): "from
- * its change line" left a reader of a screenshot asking what the line changes to, and
- * the answer is the one word that makes the distance matter. Without it, as before.
- * Screens only; the pastes keep `formatMargin`'s band-and-points sentence.
+ * The margin with the score it is measured on: "A common risk-appetite move from
+ * Freezing". With the regime, the line is named by what is on its other side
+ * (2026-10-27): "from its change line" left a reader of a screenshot asking what the
+ * line changes to, and the answer is the one word that makes the distance matter.
+ *
+ * The distance is how big a move it takes, against the month-end record
+ * (`describeScoreMoveBand`, 2026-11-03). "Risk appetite 3 pts from Freezing" was a
+ * size in a unit no reader has a feel for; the band says whether the record makes a
+ * move that big most months or almost never. The points stand in where the record
+ * cannot say. Screens only; the pastes keep `formatMargin`'s band-and-points sentence.
  */
 export const formatMarginReading = (
   margin: { signal: "tightness" | "riskAppetite"; points: number },
@@ -158,7 +164,11 @@ export const formatMarginReading = (
   const label = regimeSignalLabel[margin.signal];
   const across = regime && isRegimeKey(regime) ? getRegimePublicLabel(regimeAcrossLine(regime, margin.signal)) : null;
   if (margin.points === 0) return across ? `${label} on the edge of ${across}` : `${label} on the edge of a change`;
-  return `${label} ${pointsWord(margin.points)} from ${across ?? "a change"}`;
+  /* "A common risk-appetite move": the score as the move's modifier, so the cell
+     still names the score without growing a word. */
+  const band = describeScoreMoveBand(margin.signal, margin.points, { named: true });
+  if (!band) return `${label} ${pointsWord(margin.points)} from ${across ?? "a change"}`;
+  return `${band.charAt(0).toUpperCase()}${band.slice(1)} from ${across ?? "a change"}`;
 };
 
 /**

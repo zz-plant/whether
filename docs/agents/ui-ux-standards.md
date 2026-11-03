@@ -810,8 +810,8 @@ A frame that names its source is attributable; one people open also leaves them 
 and shows them where to look. What the research on images people engage with says, as rules here:
 
 - MUST: carry the week's open question, how near the reading is to changing and to what. The
-  margin names the conditions across the nearer line ("Risk appetite 2 pts from Freezing",
-  `formatMarginReading` with the regime; `regimeAcrossLine` in `lib/regimePhaseSpace.ts`), and the
+  margin names the conditions across the nearer line ("A common risk-appetite move from Freezing",
+  `formatMarginReading` with the regime, the distance as a move the record makes since 2026-11-03; `regimeAcrossLine` in `lib/regimePhaseSpace.ts`), and the
   running head prints the same fact in four words (`formatNearestChange`), in the caveat ink when
   the call could change next week. A small, specific gap ("2 points from Freezing") is what
   provokes curiosity; a state ("Cloudy") does not. Screens only: pastes keep `formatMargin`.
