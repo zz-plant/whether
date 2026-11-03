@@ -19,6 +19,8 @@ import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderMod
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { describeScoreMovement } from "../scoreMovement";
 import { describeScoreMoveBand } from "../marketMoveScale";
+import { describePastHolds } from "../lastTimeCallChanged";
+import type { TimeMachineRegimeEntry } from "../../timeMachine/timeMachineCache";
 import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
 
 /**
@@ -57,8 +59,9 @@ export const readHomeDecisionCookie = (cookieHeader: string | null | undefined):
   return null;
 };
 
-export const buildHomeDecisionCookie = (area: DecisionArea): string =>
-  `${HOME_DECISION_COOKIE}=${area}; path=/; max-age=${HOME_DECISION_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
+/** The remembered decision; `null` forgets it, for a reader who closes the area they had open. */
+export const buildHomeDecisionCookie = (area: DecisionArea | null): string =>
+  `${HOME_DECISION_COOKIE}=${area ?? ""}; path=/; max-age=${area ? HOME_DECISION_COOKIE_MAX_AGE_SECONDS : 0}; SameSite=Lax`;
 
 /*
  * The homepage's sections, in the order they print (2026-10-22): the verdict, the
@@ -597,6 +600,12 @@ const slotPhrase = (slot: HomeAreaLineSlot): string | null =>
  * big a move that is, so the reader never has to hold a line in mind while finding the
  * number it is measured against. Held groups first; then the areas close to pausing;
  * then the rest.
+ *
+ * Then which way the score went since the comparison reading, against the condition
+ * ("4 points closer since Oct 19"): a size with no direction says nothing about
+ * whether to get ready. And a held group says when its hold began and how long the
+ * earlier ones at the same lines took to lift (`describePastHolds`), because "restarts
+ * when" names what lifts a hold and not when.
  */
 export type AreaGroup = {
   state: LineState;
@@ -604,10 +613,31 @@ export type AreaGroup = {
   status: string;
   /** "Restarts when funding pressure falls below 66." */
   condition: string | null;
-  /** Today's score and how big a move the condition is: "It is 90 today, a rare move away." */
+  /** Today's score, how big a move the condition is, and which way it went: "It is 90 today, a rare move away, unchanged since Oct 19." */
   distance: string | null;
+  /** A held group's record: "It rose above 76 in Sep 2026. The last time, in Sep 2022, it took 39 months to fall below 66." */
+  history: string | null;
   areas: { area: DecisionArea; label: string; rule: string; changed?: string }[];
 };
+
+/* Closer or farther from the condition, in the points the page prints. */
+const describeTrend = (slot: HomeAreaLineSlot, today: number, earlier: number, since: string): string | null => {
+  const { value, holdsAbove } = slot;
+  if (value === undefined || holdsAbove === undefined) return null;
+  const gap = (score: number) => (holdsAbove ? value - Math.round(score) : Math.round(score) - value);
+  const closer = gap(earlier) - gap(today);
+  if (closer === 0) return `unchanged ${since}`;
+  const points = Math.abs(closer) === 1 ? "1 point" : `${Math.abs(closer)} points`;
+  return `${points} ${closer > 0 ? "closer" : "farther"} ${since}`;
+};
+
+/* A move this week stays with the area it moved. A restart condition that came or went
+   on an area not on hold lifts nothing, so it is not news there ("Restart condition no
+   longer holds" sat under "Not on hold: Roadmap"); the trend says how the score moved. */
+const showsChange = (row: HomeAreaRow) =>
+  Boolean(row.changed) &&
+  (row.changedKind === "paused" || row.changedKind === "lifted" ||
+    ((row.changedKind === "resumable" || row.changedKind === "resumeLost") && Boolean(row.pause?.met)));
 
 const STATE_ORDER: readonly LineState[] = ["crossed", "near", "clear"];
 
@@ -620,6 +650,15 @@ const GROUP_STATUS: Record<LineState, string> = {
 export const buildAreaGroups = (
   rows: readonly HomeAreaRow[],
   scores: { tightness: number; riskAppetite: number },
+  {
+    comparison,
+    record,
+  }: {
+    /** The earlier reading and how to name it ("since Oct 19"); none when nothing was compared. */
+    comparison?: { scores: { tightness: number; riskAppetite: number }; since: string } | null;
+    /** The month-end record, for a held group's history; none on an archived month. */
+    record?: readonly TimeMachineRegimeEntry[];
+  } = {},
 ): AreaGroup[] => {
   const groups = new Map<string, AreaGroup>();
   const ordered = [...rows].sort((left, right) => decisionAreaOrder.indexOf(left.area) - decisionAreaOrder.indexOf(right.area));
@@ -633,15 +672,31 @@ export const buildAreaGroups = (
     /* The score the condition just named, so "it": the name twice in two sentences was
        the page's most repeated term. At the line there is no move to size. */
     const band = slot ? describeScoreMoveBand(slot.metric, slot.points) : null;
-    const distance = slot && phrase ? `It is ${Math.round(scores[slot.metric])} today${band ? `, ${band} away` : ""}.` : null;
-    const key = `${state}|${condition ?? ""}`;
-    const group = groups.get(key) ?? { state, status: GROUP_STATUS[state], condition, distance, areas: [] };
+    const trend = slot && comparison ? describeTrend(slot, scores[slot.metric], comparison.scores[slot.metric], comparison.since) : null;
+    const distance = slot && phrase
+      ? `It is ${Math.round(scores[slot.metric])} today${[band ? `${band} away` : null, trend].filter(Boolean).map((part) => `, ${part}`).join("")}.`
+      : null;
+    /* The record reads the lines the group shows, so both must be on one score. */
+    const history =
+      held && record && row.resume && row.pause.metric === row.resume.metric &&
+      row.pause.value !== undefined && row.pause.holdsAbove !== undefined &&
+      row.resume.value !== undefined && row.resume.holdsAbove !== undefined
+        ? describePastHolds({
+            series: record,
+            metric: row.pause.metric,
+            pause: { value: row.pause.value, holdsAbove: row.pause.holdsAbove },
+            restart: { value: row.resume.value, holdsAbove: row.resume.holdsAbove },
+          })
+        : null;
+    /* A held group's history reads its pause line too, so areas held by different pause
+       lines are different groups even when one restart lifts them. */
+    const key = `${state}|${condition ?? ""}|${history ?? ""}`;
+    const group = groups.get(key) ?? { state, status: GROUP_STATUS[state], condition, distance, history, areas: [] };
     group.areas.push({
       area: row.area,
       label: decisionAreaLabel(row.area),
       rule: row.rule,
-      /* A move this week stays with the area it moved; the standing state is the group's. */
-      ...(row.changed && row.changedKind && row.changedKind !== "held" ? { changed: row.changed } : {}),
+      ...(showsChange(row) && row.changed ? { changed: row.changed } : {}),
     });
     groups.set(key, group);
   }

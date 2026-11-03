@@ -365,3 +365,69 @@ export const describeSpellLengths = ({
   parts.push("That's a count of what happened, not a forecast.");
   return { lead, rest: parts.join(" ") };
 };
+
+type HoldLine = { value: number; holdsAbove: boolean };
+
+const isPast = (score: number, line: HoldLine) => (line.holdsAbove ? score > line.value : score < line.value);
+
+/**
+ * How long a hold has run, and how long the earlier ones at the same lines took to lift,
+ * from the month-end walk (2026-11-03): "It rose above 76 in Sep 2026. The last time, in
+ * Sep 2022, it took 39 months to fall below 66." "Restarts when funding pressure falls
+ * below 66" says what lifts a hold and not when, and when is what a hiring plan needs.
+ *
+ * A hold starts at the first month-end past the pause line and lifts at the first one past
+ * the restart line, as the rule does between them. Today's lines are read back over the
+ * whole record, so this is what the score did, not what a published rule said at the time.
+ * A hold already running in the record's first month is left out: its start is not on it.
+ * Months, not weeks, because the record is month-ends: a hold that began this week has no
+ * start to name yet. Counts, not a range or a median, while there are fewer than three.
+ * Null when the two lines are on different scores.
+ */
+export const describePastHolds = ({
+  series,
+  metric,
+  pause,
+  restart,
+}: {
+  series: readonly TimeMachineRegimeEntry[];
+  metric: "tightness" | "riskAppetite";
+  pause: HoldLine;
+  restart: HoldLine;
+}): string | null => {
+  const ordered = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate));
+  const firstYear = ordered.at(0)?.year;
+  if (ordered.length < 24 || firstYear === undefined) return null;
+  const holds: { start: TimeMachineRegimeEntry; months: number }[] = [];
+  let open: { start: TimeMachineRegimeEntry; index: number } | null = null;
+  let censored = false;
+  for (const [index, entry] of ordered.entries()) {
+    if (!open && isPast(entry[metric], pause)) {
+      open = { start: entry, index };
+      censored = index === 0;
+    } else if (open && isPast(entry[metric], restart)) {
+      if (!censored) holds.push({ start: open.start, months: index - open.index });
+      open = null;
+    }
+  }
+  const rose = pause.holdsAbove ? "rose above" : "fell below";
+  const lifted = restart.holdsAbove ? "rise above" : "fall below";
+  const since = open && !censored ? `It ${rose} ${pause.value} in ${formatMonthLabel(open.start.year, open.start.month)}` : null;
+  if (holds.length === 0) {
+    return since
+      ? `${since}, for the first time since the record began in ${firstYear}.`
+      : `It had not ${pause.holdsAbove ? "risen above" : "fallen below"} ${pause.value} since the record began in ${firstYear}.`;
+  }
+  const lead = since ? `${since}. ` : "";
+  const only = holds.length === 1 ? holds.at(0) : undefined;
+  if (only) {
+    return `${lead}The last time, in ${formatMonthLabel(only.start.year, only.start.month)}, it took ${monthEnds(only.months)} to ${lifted} ${restart.value}.`;
+  }
+  const lengths = holds.map((hold) => hold.months);
+  if (holds.length === 2) {
+    return `${lead}The 2 earlier times, it took ${lengths.join(" and ")} months to ${lifted} ${restart.value}.`;
+  }
+  const sorted = [...lengths].sort((a, b) => a - b);
+  const median = sorted.at(Math.floor((sorted.length - 1) / 2)) ?? 0;
+  return `${lead}The ${holds.length} earlier times, it took ${sorted.at(0)} to ${monthEnds(sorted.at(-1) ?? 0)} to ${lifted} ${restart.value}; half took ${monthEnds(median)} or fewer.`;
+};

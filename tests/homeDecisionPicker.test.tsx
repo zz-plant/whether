@@ -6,7 +6,7 @@ import { DecisionPicker, type DecisionPickerOption } from "../app/components/hom
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
 import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
-import { buildHomeDecisionCookie, parseHomeDecision, readHomeDecisionCookie } from "../lib/report/home/homeSectionModel";
+import { buildAreaGroups, buildHomeDecisionCookie, parseHomeDecision, readHomeDecisionCookie } from "../lib/report/home/homeSectionModel";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import * as nextNavigation from "next/navigation";
 
@@ -39,14 +39,16 @@ const OPTIONS: DecisionPickerOption[] = decisionAreaOrder.map((area, index) => (
      week of Oct 5, 2026 read at the default calibration. */
   pause:
     index === 1
-      ? { line: "Risk appetite < 40", distance: "4 pts away", points: 4, met: false, metric: "riskAppetite" }
-      : { line: "Funding pressure > 76", distance: "crossed", points: 14, met: true, metric: "tightness" },
-  resume: { line: "Funding pressure < 66", distance: "17 pts away", points: 17, met: false, metric: "tightness" },
+      ? { line: "Risk appetite < 40", distance: "4 pts away", points: 4, met: false, metric: "riskAppetite", value: 40, holdsAbove: false }
+      : { line: "Funding pressure > 76", distance: "crossed", points: 14, met: true, metric: "tightness", value: 76, holdsAbove: true },
+  resume: { line: "Funding pressure < 66", distance: "17 pts away", points: 17, met: false, metric: "tightness", value: 66, holdsAbove: false },
 }));
+
+const GROUPS = buildAreaGroups(OPTIONS, { tightness: 83, riskAppetite: 44 });
 
 describe("decision picker", () => {
   const html = renderToStaticMarkup(
-    <DecisionPicker options={OPTIONS} regime="SCARCITY">
+    <DecisionPicker options={OPTIONS} groups={GROUPS} regime="SCARCITY">
       <p data-child>The fold</p>
     </DecisionPicker>,
   );
@@ -71,8 +73,8 @@ describe("decision picker", () => {
     assert.doesNotMatch(html, /Tell me when the guidance changes|The last time conditions|Has this happened before|Lines set for/);
   });
 
-  it("prints what it is handed after the choices", () => {
-    assert.ok(html.indexOf("data-child") > html.indexOf("<fieldset"), "the fold follows the choices");
+  it("prints what it is handed after the groups", () => {
+    assert.ok(html.indexOf("data-child") > html.lastIndexOf('id="area-'), "the fold follows the rules");
   });
 
   /* The scores print on the conditions map and in "What changed" at every width;
@@ -82,19 +84,13 @@ describe("decision picker", () => {
     assert.doesNotMatch(html, /\/100: /);
   });
 
-  it("leads with every area's rule, then choices that carry the name alone", () => {
-    /* The grouped rules say each area's state (2026-11-03); a badge on each choice
-       said it a second time, an inch below. */
-    const withSummary = renderToStaticMarkup(
-      <DecisionPicker options={OPTIONS} regime="SCARCITY" summary={<div data-summary>Grouped rules</div>} />,
-    );
-    const summary = withSummary.indexOf("data-summary");
-    assert.ok(summary > withSummary.indexOf("Your decisions this week") && summary < withSummary.indexOf("<fieldset"), "under the heading, over the choices");
-    const choices = withSummary.slice(withSummary.indexOf("<fieldset"), withSummary.indexOf("</fieldset>"));
-    assert.doesNotMatch(choices, /On hold|from pausing|data-line-state-badge/);
-    /* Each choice is a card, so its area glyph is the 20px size. */
-    assert.equal((choices.match(/class="lucide [^"]*size-5" data-concept-icon="area"/g) ?? []).length, 5);
-    assert.match(withSummary, /Open an area for why its rule matters and a test against your cash\./);
+  it("names each area once, as the control that opens it", () => {
+    /* A strip of five choices under the groups printed the five names again, and the
+       badges on it said each state a second time (2026-11-03). */
+    assert.doesNotMatch(html, /<fieldset|type="radio"|data-line-state-badge/);
+    const toggles = [...html.matchAll(/<button type="button" aria-expanded="false"[^>]*>([^<]+)<svg/g)].map((match) => match[1]);
+    assert.deepEqual(toggles, ["Hiring", "Fundraising", "Spending", "New bets", "Roadmap"], "held first, then the rest");
+    assert.ok(html.indexOf("data-area-groups") > html.indexOf("Your decisions this week"), "under the heading");
   });
 
   it("counts the holds only on a saved copy", () => {
@@ -102,7 +98,7 @@ describe("decision picker", () => {
        live week, so it prints on a saved copy alone, where it carries the reading's date. */
     assert.doesNotMatch(html, /already covered by this week/);
     assert.doesNotMatch(html, /4 of 5 areas are on hold\./);
-    const saved = renderToStaticMarkup(<DecisionPicker options={OPTIONS} regime="SCARCITY" savedReadingDate="Jun 17, 2026" />);
+    const saved = renderToStaticMarkup(<DecisionPicker options={OPTIONS} groups={GROUPS} regime="SCARCITY" savedReadingDate="Jun 17, 2026" />);
     assert.match(saved, /4 of 5 areas were on hold on the Jun 17, 2026 reading\./);
   });
 
@@ -155,24 +151,16 @@ describe("an opened card asks the question it answers", () => {
       : option,
   );
 
-  it("leads with the reader's question, then this week's answer", () => {
-    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" initialSelected="hiring" />);
-    assert.match(html, /<h3[^>]*data-decision-question[^>]*>Should startups hire engineers right now\?<\/h3>/, "the card asks what the reader came to ask");
+  it("opens under the area's rule with the reader's question, once", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} groups={GROUPS} regime="SCARCITY" initialSelected="hiring" />);
+    assert.match(html, /<p data-decision-question[^>]*>Should startups hire engineers right now\?<\/p>/, "the detail asks what the reader came to ask");
     assert.ok(
-      html.indexOf("Should startups hire engineers right now?") < html.indexOf("Rule for hiring"),
-      "the question comes before the rule that answers it",
+      html.indexOf("Rule for hiring") < html.indexOf("Should startups hire engineers right now?"),
+      "under the rule the group already prints, not a second copy of it",
     );
-  });
-
-  it("does not print the question twice in one card", () => {
-    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" initialSelected="hiring" />);
-    assert.equal(html.match(/Should startups hire engineers right now\?/g)?.length, 2, "the heading and the row's tooltip");
+    assert.equal(html.match(/Should startups hire engineers right now\?/g)?.length, 1);
+    assert.equal(html.match(/Rule for hiring/g)?.length, 1, "the rule is said once, in its group");
     assert.match(html, /Read the citable defense →/, "the link names what it opens, not the question again");
-  });
-
-  it("carries the question as the row's tooltip", () => {
-    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" />);
-    assert.match(html, /title="Should startups hire engineers right now\?"/);
   });
 });
 
@@ -181,21 +169,22 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     renderToStaticMarkup(
       <DecisionPicker
         options={OPTIONS}
+        groups={GROUPS}
         regime="SCARCITY"
-       
         initialSelected={initialSelected}
       />,
     );
 
   it("opens on the decision the URL names, in the first paint", () => {
     const html = render("product-tempo");
-    assert.match(html, /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "the named area's answer is server-rendered open");
+    assert.match(html, /aria-expanded="true" aria-controls="area-product-tempo-detail"[^>]*>Roadmap</, "the named area is open");
+    assert.match(html, /id="area-product-tempo-detail" aria-live="polite"/, "and its detail is server-rendered");
     assert.match(html, /Why this matters for roadmap:/i, "renders zero-input corporate transmission intuition");
     assert.match(html, /Shared rule of thumb:/i, "renders team ritual rule of thumb");
     assert.match(html, /Startup math:/i, "renders concrete unit economics math");
     assert.match(html, /Copy takeaway for Slack/i, "renders 1-click Slack takeaway action");
-    assert.match(html, /checked=""[^>]*value="product-tempo"|value="product-tempo"[^>]*checked=""/);
-    assert.doesNotMatch(render(), /aria-live="polite"[^>]*>[\s\S]*Rule for product-tempo/, "no answer open without one");
+    assert.equal((html.match(/aria-expanded="true"/g) ?? []).length, 1, "one area open at a time");
+    assert.doesNotMatch(render(), /-detail"/, "no detail open without one");
   });
 
   it("reads only an area from the parameter, and writes every choice back to it", () => {
@@ -210,6 +199,7 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     );
     const picker = readFileSync(new URL("../app/components/home/DecisionPicker.tsx", import.meta.url), "utf8");
     assert.match(picker, /url\.searchParams\.set\(HOME_DECISION_PARAM, area\)/);
+    assert.match(picker, /url\.searchParams\.delete\(HOME_DECISION_PARAM\)/, "closing the area takes it out of the URL");
     assert.match(picker, /window\.history\.replaceState\(/, "a choice replaces the entry rather than adding one for Back to retrace");
     assert.match(picker, /document\.cookie = buildHomeDecisionCookie\(area\)/, "and is kept for the next visit");
     assert.match(picker, /calibrationParts/, "includes stage and runway calibration context in the Slack takeaway artifact");
@@ -221,5 +211,6 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     assert.equal(readHomeDecisionCookie("whether-home-decision=payroll"), null, "anything that is not an area is ignored");
     assert.equal(readHomeDecisionCookie(null), null);
     assert.match(buildHomeDecisionCookie("hiring"), /^whether-home-decision=hiring; path=\/; max-age=\d+; SameSite=Lax$/);
+    assert.equal(buildHomeDecisionCookie(null), "whether-home-decision=; path=/; max-age=0; SameSite=Lax", "closing it forgets it");
   });
 });

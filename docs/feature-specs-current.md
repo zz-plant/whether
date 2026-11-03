@@ -229,10 +229,13 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    below states the hold's lines.
 2. **The five areas** (`DecisionPicker`, `#what-it-changes`, "Your decisions this week"): every
    area's rule, grouped by the condition that changes it (`AreaGroups`, from `buildAreaGroups`):
-   "On hold: Hiring, Fundraising, Spending and New bets", the restart condition, today's score and
-   the size of the move, then each area's action. Under it, five name-only choices; one opens its
-   rule, lines and the runway test. A fold (`AreaDistancesFold`) holds the distance ladder, the
-   runway notes' heading and the commitment test, then the one plan button. No "This week's
+   "On hold: Hiring, Fundraising, Spending and New bets", the restart condition, today's score, the
+   size of the move and which way it went, when the hold began and how long the earlier ones at
+   those lines took (`describePastHolds`), each area's action, and on a live brief "Email me when
+   they restart" (`/operate?watch=…#ops-plan-lines`, those areas ticked). Each area's name opens,
+   under its rule, why it matters, the runway test and the share links. A fold
+   (`AreaDistancesFold`) holds the distance ladder, the runway notes' heading and the commitment
+   test, then the one plan button. No "This week's
    scores" list: the map and the bars in section 5 print the scores at every width.
 3. **Stage and runway** (`home/CompanyCalibration.tsx`, `#company-calibration`, live weekly brief
    only): the stage and runway tablists from `sm` up (the header's pills on a phone), each marking
@@ -392,9 +395,26 @@ service groups alerts with one cause rather than listing each town.
 - It replaces the folded "Every area's rule" table, which printed the shared restart line in four
   rows, and the one-sentence first answer (`describeFirstAnswer`, §1.1.0u). The rows carry the
   `#area-…` anchors the distance ladder and "What changed" link to.
-- The five choices carry the area's name and glyph only: the group over them says each state.
 - `buildDecisionMovement` no longer returns `heldGroups`; the table was its only reader.
-- The homepage load budget falls to 1,720 words, 291 numbers and 45 "Risk appetite".
+- **How long.** A held group says when its hold began and how long the earlier ones at the same
+  lines took to lift, from the month-end record with today's lines read back: "It rose above 76 in
+  Sep 2026. The last time, in Sep 2022, it took 39 months to fall below 66." Counts below three
+  holds, then a range and the middle. A hold already running in the record's first month is left
+  out, and a hold that began after the last month-end gets no start date.
+- **Which way.** Each condition says whether the score moved toward it since the comparison
+  reading: "unchanged since Sep 30", "3 points closer since Sep 30".
+- **An email on the condition.** A held group on a live brief links to the plan-lines form with
+  only its areas ticked (`buildPlanLinesWatchHref`, `parsePlanLinesWatch`); the form keeps ticking
+  every area when the link names none.
+- **One list.** The five choices under the groups are gone. Each area's name is the button that
+  opens its detail under its own rule (the question, why it matters, the runway test, Slack copy
+  and the answer page); the detail no longer restates the rule or its lines. Closing it takes
+  `?decision=` out of the URL and forgets the remembered choice.
+- **A note that read as a contradiction.** A restart condition gained or lost on an area not on
+  hold ("Restart condition no longer holds" under "Not on hold: Roadmap") no longer prints there;
+  the trend says how the score moved.
+- The homepage load budget falls to 1,668 words, 41 "Risk appetite" and 21 fields. Buttons move
+  from 11 to 16 with fields from 26 to 21: the same five controls, radios before and buttons now.
 
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
 The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate

@@ -49,8 +49,6 @@ import Link from "next/link";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
 import { AreaDistancesFold } from "./components/home/AreaDistancesFold";
-import { AreaGroups } from "./components/home/AreaGroups";
-import { RunwayAreaNote } from "./components/RunwayConditionedNotes";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
@@ -918,12 +916,12 @@ async function PageContent({
               stageLabel={stageLabel}
               activeRunway={activeRunway}
               savedReadingDate={savedReadingDate}
-              summary={
-                <AreaGroups
-                  groups={buildAreaGroups(homeAreaRows, { tightness, riskAppetite })}
-                  note={historicalSelection ? undefined : (area) => <RunwayAreaNote regime={regime} area={area} />}
-                />
-              }
+              isHistorical={Boolean(historicalSelection)}
+              groups={buildAreaGroups(homeAreaRows, { tightness, riskAppetite }, {
+                comparison: previousScores ? { scores: previousScores, since: basis.since } : null,
+                /* An archived month's record would have to end at that month. */
+                record: historicalSelection ? undefined : recordSeries,
+              })}
             >
               <AreaDistancesFold regime={regime} isHistorical={Boolean(historicalSelection)} corridorModel={corridorModel} />
               <div>
