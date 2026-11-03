@@ -9,8 +9,9 @@
  * audit would have rebuilt.
  *
  * The bundle is the Build Output the Cloudflare Vite plugin writes (`.cloudflare/output/v0/`).
- * Its root `config.json` records the mode it was built in, and only a production build counts:
- * a preview build in the same directory must never be what `deploy:cloudflare` reuses.
+ * Its root `config.json` records how it was built, and only a production build counts: a Worker
+ * Preview build lands in the same directory (the branch build makes one) and must never be what
+ * `deploy:cloudflare` reuses.
  */
 import { existsSync, readFileSync } from "node:fs";
 import { join } from "node:path";
@@ -33,24 +34,25 @@ export const WORKER_BUNDLE_SOURCES = [
   "bun.lock",
 ];
 
-const recordedMode = (marker) => {
+const isProductionBuild = (marker) => {
   try {
-    const parsed = JSON.parse(readFileSync(marker, "utf8"));
-    return typeof parsed?.buildContext?.mode === "string" ? parsed.buildContext.mode : null;
+    const { buildContext } = JSON.parse(readFileSync(marker, "utf8"));
+    return buildContext?.mode === "production" && buildContext?.isPreview === false;
   } catch {
-    return null;
+    return false;
   }
 };
 
 /**
  * Whether the built worker bundle is a production build that is current for the tree at
- * `cwd`: the marker exists, records the production mode, and no bundled source is newer.
+ * `cwd`: the marker exists, records a production build that is not a preview, and no bundled
+ * source is newer.
  * Metadata-only walk; no content hashing. A find error means "not provably current", so
  * the caller rebuilds — a wasted build is cheaper than a deploy of stale code.
  */
 export function isWorkerBundleCurrent(cwd = process.cwd()) {
   const marker = join(cwd, WORKER_BUNDLE_MARKER);
-  if (!existsSync(marker) || recordedMode(marker) !== "production") return false;
+  if (!existsSync(marker) || !isProductionBuild(marker)) return false;
   const newer = spawnSync(
     "find",
     [...WORKER_BUNDLE_SOURCES.filter((entry) => existsSync(join(cwd, entry))), "-newer", marker],

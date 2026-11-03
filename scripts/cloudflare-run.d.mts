@@ -6,9 +6,16 @@
 export function findPublishedVersionId(output: string | undefined | null): string | null;
 
 /**
+ * The https URLs a `cf previews deploy` result names (`preview_urls`, then `deployment_urls`),
+ * or none when its output carries no parseable result.
+ */
+export function findPreviewUrls(stdout: string | undefined | null): string[];
+
+/**
  * Whether the deploy may reuse the bundle already built instead of building again:
- * only when `--skip-build-if-current` was passed, the target is the production lane (no
- * `--env`), and the bundle is current for this tree. `targetEnv` is `""` for production.
+ * only when `--skip-build-if-current` was passed, the target is production (no `--env`), and
+ * the bundle is current for this tree. `targetEnv` is `""` for production, `"preview"` for a
+ * Worker Preview.
  */
 export function shouldReuseCurrentBundle(options: {
   skipBuildIfCurrent?: boolean;
