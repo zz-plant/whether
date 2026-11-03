@@ -35,6 +35,12 @@ type Props = {
    */
   earlier?: string;
   /**
+   * Since when these conditions have held ("Since Apr 2026"), on the stamp line before
+   * the direction (2026-11-03): without it a reader can't tell the week's news from the
+   * standing state. Absent on a week the conditions changed, which `earlier` says.
+   */
+  since?: string;
+  /**
    * A graphic for the card's right-hand column from `md` up: on the brief, the
    * conditions map. The card is what people screenshot, so a picture of where
    * the reading sits travels with the call. Hidden below `md`, where the card
@@ -68,7 +74,16 @@ type Props = {
    * the one click to the section that shows the change lines and what is left
    * out of the score.
    */
-  reading?: { numbers: string; whyHref: string };
+  reading?: {
+    numbers: string;
+    whyHref: string;
+    /**
+     * The two plain facts the weather word stands for, each score set against the
+     * record (`describeConditionFacts`, 2026-11-03). When present it is the whole
+     * meaning line, in place of the regime's rationale and the bare numbers.
+     */
+    facts?: string | null;
+  };
   /**
    * The week's published brief, where it read different conditions from this
    * card: a caveat under the call, with the brief it links to. Without it a
@@ -125,6 +140,7 @@ export function DecisionHero({
   regime,
   direction,
   earlier,
+  since,
   aside,
   trust,
   captionDetail,
@@ -201,8 +217,14 @@ export function DecisionHero({
             </Link>
           ) : null}
 
-          {direction || earlier ? (
+          {since || direction || earlier ? (
             <span className="text-fluid-xs font-medium leading-relaxed text-slate-200">
+              {since && !earlier ? (
+                <span data-conditions-since>
+                  {since}
+                  {direction ? " · " : null}
+                </span>
+              ) : null}
               {direction}
               {earlier ? (
                 <span className="font-semibold" style={{ color: "var(--regime-ink)" }} data-earlier-conditions>
@@ -247,12 +269,12 @@ export function DecisionHero({
             the stamp names the week, the call says what to do, this says why. */}
         {regimeKey ? (
           <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
-            {REGIME_WEATHER_RATIONALES[regimeKey]}
+            {reading?.facts ? null : REGIME_WEATHER_RATIONALES[regimeKey]}
             {reading ? (
               <>
-                {" "}
+                {reading.facts ? null : " "}
                 <span className="tabular-nums" data-reading-numbers>
-                  {reading.numbers}
+                  {reading.facts ?? reading.numbers}
                 </span>{" "}
                 <Link href={reading.whyHref} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
                   Why

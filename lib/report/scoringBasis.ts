@@ -124,6 +124,14 @@ export type ScoringBasis = {
    * strip links to /trust, which says the rest. Null when there is no warning.
    */
   warningShort?: string | null;
+  /**
+   * What counting the left-out inputs would change, in the reader's terms: "Counted,
+   * conditions would be Freezing." or "Counted, Fundraising would pause." (2026-11-03).
+   * The card's strip prints this rather than the method: a reader without the macro
+   * background cannot weigh "startup-market inputs would put risk appetite at 44,
+   * below 50", but can weigh a different answer. Null when nothing would change.
+   */
+  consequence?: string | null;
 };
 
 /*
@@ -222,6 +230,21 @@ const crossedLine = (metric: RuleConditionMetric, counted: number, assessment: B
   return null;
 };
 
+/*
+ * The answer the left-out inputs would give: other conditions first, since they move
+ * every area; otherwise the areas whose pause or restart they would flip.
+ */
+const describeConsequence = (notCounted: readonly NotCountedScore[], assessment: BasisAssessment): string | null => {
+  const counted = {
+    tightness: notCounted.find((entry) => entry.metric === "tightness")?.score ?? assessment.scores.tightness,
+    riskAppetite: notCounted.find((entry) => entry.metric === "riskAppetite")?.score ?? assessment.scores.riskAppetite,
+  };
+  const countedRegime = classifyRegimeQuadrant({ ...counted, thresholds: assessment.thresholds });
+  if (countedRegime !== assessment.regime) return `Counted, conditions would be ${getRegimePublicLabel(countedRegime)}.`;
+  const areaChange = notCounted.flatMap((entry) => (entry.line?.includes(", where ") ? [entry.line.slice(entry.line.indexOf(", where ") + 8)] : [])).at(0);
+  return areaChange ? `Counted, ${areaChange}.` : null;
+};
+
 const describeCrossing = (entry: NotCountedScore & { line: string }) =>
   `${upperFirst(entry.label)} would put ${ruleMetricLabel[entry.metric].toLowerCase()} at ${entry.score}, ${
     entry.score < entry.published ? "below" : "above"
@@ -258,6 +281,7 @@ export const resolveScoringBasis = ({
     notCounted,
     warning: crossing.length > 0 ? `${crossing.map(describeCrossing).join("; ")}.` : null,
     warningShort: crossing.length > 0 ? `${[...new Set(crossing.map((entry) => entry.label))].join(" and ")} left out` : null,
+    consequence: crossing.length > 0 ? describeConsequence(notCounted, assessment) : null,
   };
 };
 
