@@ -86,16 +86,19 @@ export type HomeLoadReading = z.infer<typeof readingSchema>;
  * `bun run check:home-load` prints. Raising one is a policy change and belongs in its own PR.
  */
 export const HOME_LOAD_BASELINE: HomeLoadMeasure = {
-  words: 1772,
-  numbers: 298,
+  words: 1668,
+  numbers: 291,
   wordsBeforeAreas: 341,
   folds: 9,
   /* 8 → 11 (2026-11-03): three tap-to-define terms on the card (funding pressure, risk
-     appetite, room before a change). A deliberate raise, said here and in its PR. */
-  buttons: 11,
-  fields: 26,
+     appetite, room before a change). A deliberate raise, said here and in its PR.
+     11 → 16 with fields 26 → 21 (2026-11-03): the five area choices were radios and are
+     the area names in the grouped rules now, which open as buttons. The same five
+     controls, counted under another tag; the two move together, never one alone. */
+  buttons: 16,
+  fields: 21,
   fundingPressure: 35,
-  riskAppetite: 48,
+  riskAppetite: 41,
   jargon: 9,
   hardSentences: 2,
   longestSentence: 23,

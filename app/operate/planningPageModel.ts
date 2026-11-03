@@ -5,7 +5,7 @@ import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
 import { buildBreadcrumbList, organizationId, websiteId } from "../../lib/seo";
 import { graph } from "../../lib/seo/pageStructuredData";
 import { buildGroupBreadcrumbs } from "../../lib/navigation/breadcrumbs";
-import { operationsSectionLinks } from "../../lib/navigation/planningNavigation";
+import { operationsSectionLinks, parsePlanLinesWatch } from "../../lib/navigation/planningNavigation";
 import { formatDateUTC } from "../../lib/formatters";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { siteUrl } from "../../lib/siteUrl";
@@ -339,7 +339,7 @@ export async function buildPlanningPageModel(
               label: "Your rules",
               title: "Set your own rules",
               description: planLinesSummary,
-              children: h(PlanLinesForm, { defaults: planLineDefaults }),
+              children: h(PlanLinesForm, { defaults: planLineDefaults, watch: parsePlanLinesWatch(resolvedSearchParams) }),
             }]),
           {
             id: "ops-finance-strategy",

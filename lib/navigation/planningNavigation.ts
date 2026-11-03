@@ -1,4 +1,20 @@
 import type { ReportSectionLink } from "../../app/components/reportShellNavigation";
+import { isDecisionArea, type DecisionArea } from "../report/boundedDecisionRules";
+
+/*
+ * "Email me when they restart" (2026-11-03): a link from a group of held areas on `/` to
+ * the plan-lines form, with only those areas ticked (`?watch=hiring,capital-raising`).
+ * The form starts with every area ticked; a reader who came for one restart would
+ * otherwise sign up for five areas' emails without meaning to.
+ */
+const PLAN_LINES_WATCH_PARAM = "watch";
+
+export const buildPlanLinesWatchHref = (areas: readonly DecisionArea[]) =>
+  `/operate?${PLAN_LINES_WATCH_PARAM}=${areas.join(",")}#ops-plan-lines`;
+
+/** The areas a `?watch=` names, in its order; empty when it names none. */
+export const parsePlanLinesWatch = (params: Record<string, string | undefined> | undefined): DecisionArea[] =>
+  [...new Set((params?.[PLAN_LINES_WATCH_PARAM] ?? "").split(","))].filter(isDecisionArea);
 
 export const operationsSectionLinks: {
   plan: ReportSectionLink[];

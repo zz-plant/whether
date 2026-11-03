@@ -13,12 +13,14 @@ import {
   type RuleThresholdDistance,
 } from "../operatingCalls";
 import { operatingLeverToDecisionArea } from "../businessAreaMap";
-import { decisionAreaLabel, isDecisionArea, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
+import { decisionAreaLabel, decisionAreaOrder, isDecisionArea, ruleMetricLabel, type BoundedDecisionRule, type DecisionArea, type RuleCondition, type RuleConditionMetric } from "../boundedDecisionRules";
 import type { RegimeSignalIndicator } from "../homeBriefModel";
 import { findSignalDelta, type SignalDynamicsSource } from "../evidenceReaderModel";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
 import { describeScoreMovement } from "../scoreMovement";
 import { describeScoreMoveBand } from "../marketMoveScale";
+import { describePastHolds } from "../lastTimeCallChanged";
+import type { TimeMachineRegimeEntry } from "../../timeMachine/timeMachineCache";
 import type { AreaMovementKind, DecisionMovement } from "../decisionMovement";
 
 /**
@@ -57,8 +59,9 @@ export const readHomeDecisionCookie = (cookieHeader: string | null | undefined):
   return null;
 };
 
-export const buildHomeDecisionCookie = (area: DecisionArea): string =>
-  `${HOME_DECISION_COOKIE}=${area}; path=/; max-age=${HOME_DECISION_COOKIE_MAX_AGE_SECONDS}; SameSite=Lax`;
+/** The remembered decision; `null` forgets it, for a reader who closes the area they had open. */
+export const buildHomeDecisionCookie = (area: DecisionArea | null): string =>
+  `${HOME_DECISION_COOKIE}=${area ?? ""}; path=/; max-age=${area ? HOME_DECISION_COOKIE_MAX_AGE_SECONDS : 0}; SameSite=Lax`;
 
 /*
  * The homepage's sections, in the order they print (2026-10-22): the verdict, the
@@ -583,35 +586,119 @@ export const buildHomeAreaRows = ({
   })).map(withIdleRestart);
 };
 
-const lowerFirst = (value: string) => `${value.charAt(0).toLowerCase()}${value.slice(1)}`;
-
-/*
- * One decision answered before the reader picks one (2026-11-03): the area nearest to
- * changing, as the question a founder would ask and this week's answer to it. "Hiring
- * this month? Wait until funding pressure falls below 66." A first visit met five
- * choices and a sentence about the guidance, and had to know which to open; this says
- * what the page is for by doing it once. On hold, the area whose restart is nearest;
- * otherwise the one nearest its pause. Null when no area states a numeric line.
- */
+/* A line as the condition it names: "funding pressure falls below 66". Null for a line that states no number. */
 const slotPhrase = (slot: HomeAreaLineSlot): string | null =>
   slot.value === undefined || slot.holdsAbove === undefined
     ? null
     : `${ruleMetricLabel[slot.metric].toLowerCase()} ${slot.holdsAbove ? "rises above" : "falls below"} ${slot.value}`;
 
-export const describeFirstAnswer = (
-  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[],
-): string | null => {
-  const nearest = <T extends Pick<HomeAreaRow, "area" | "pause" | "resume">>(candidates: T[], points: (row: T) => number) =>
-    candidates.reduce<T | undefined>((best, row) => (best === undefined || points(row) < points(best) ? row : best), undefined);
-  const held = rows.filter((row) => row.pause?.met && row.resume && !row.resume.met);
-  const heldRow = nearest(held, (row) => row.resume?.points ?? Number.POSITIVE_INFINITY);
-  if (heldRow?.resume) {
-    const phrase = slotPhrase(heldRow.resume);
-    return `${decisionAreaLabel(heldRow.area)} this month? ${phrase ? `Wait until ${phrase}` : `Wait: ${formatPoints(heldRow.resume.points)} from restarting`}.`;
+/*
+ * The areas grouped by the condition that changes them (2026-11-03), the one idea the
+ * forecast concept's critique kept: a warning service groups alerts with one cause
+ * rather than listing each town, and four areas held by funding pressure above 76 are
+ * one fact with four actions. Each group carries its condition, today's score and how
+ * big a move that is, so the reader never has to hold a line in mind while finding the
+ * number it is measured against. Held groups first; then the areas close to pausing;
+ * then the rest.
+ *
+ * Then which way the score went since the comparison reading, against the condition
+ * ("4 points closer since Oct 19"): a size with no direction says nothing about
+ * whether to get ready. And a held group says when its hold began and how long the
+ * earlier ones at the same lines took to lift (`describePastHolds`), because "restarts
+ * when" names what lifts a hold and not when.
+ */
+export type AreaGroup = {
+  state: LineState;
+  /** "On hold", "Close to pausing" or "Not on hold". */
+  status: string;
+  /** "Restarts when funding pressure falls below 66." */
+  condition: string | null;
+  /** Today's score, how big a move the condition is, and which way it went: "It is 90 today, a rare move away, unchanged since Oct 19." */
+  distance: string | null;
+  /** A held group's record: "It rose above 76 in Sep 2026. The last time, in Sep 2022, it took 39 months to fall below 66." */
+  history: string | null;
+  areas: { area: DecisionArea; label: string; rule: string; changed?: string }[];
+};
+
+/* Closer or farther from the condition, in the points the page prints. */
+const describeTrend = (slot: HomeAreaLineSlot, today: number, earlier: number, since: string): string | null => {
+  const { value, holdsAbove } = slot;
+  if (value === undefined || holdsAbove === undefined) return null;
+  const gap = (score: number) => (holdsAbove ? value - Math.round(score) : Math.round(score) - value);
+  const closer = gap(earlier) - gap(today);
+  if (closer === 0) return `unchanged ${since}`;
+  const points = Math.abs(closer) === 1 ? "1 point" : `${Math.abs(closer)} points`;
+  return `${points} ${closer > 0 ? "closer" : "farther"} ${since}`;
+};
+
+/* A move this week stays with the area it moved. A restart condition that came or went
+   on an area not on hold lifts nothing, so it is not news there ("Restart condition no
+   longer holds" sat under "Not on hold: Roadmap"); the trend says how the score moved. */
+const showsChange = (row: HomeAreaRow) =>
+  Boolean(row.changed) &&
+  (row.changedKind === "paused" || row.changedKind === "lifted" ||
+    ((row.changedKind === "resumable" || row.changedKind === "resumeLost") && Boolean(row.pause?.met)));
+
+const STATE_ORDER: readonly LineState[] = ["crossed", "near", "clear"];
+
+const GROUP_STATUS: Record<LineState, string> = {
+  crossed: "On hold",
+  near: "Close to pausing",
+  clear: "Not on hold",
+};
+
+export const buildAreaGroups = (
+  rows: readonly HomeAreaRow[],
+  scores: { tightness: number; riskAppetite: number },
+  {
+    comparison,
+    record,
+  }: {
+    /** The earlier reading and how to name it ("since Oct 19"); none when nothing was compared. */
+    comparison?: { scores: { tightness: number; riskAppetite: number }; since: string } | null;
+    /** The month-end record, for a held group's history; none on an archived month. */
+    record?: readonly TimeMachineRegimeEntry[];
+  } = {},
+): AreaGroup[] => {
+  const groups = new Map<string, AreaGroup>();
+  const ordered = [...rows].sort((left, right) => decisionAreaOrder.indexOf(left.area) - decisionAreaOrder.indexOf(right.area));
+  for (const row of ordered) {
+    if (!row.pause) continue;
+    const held = row.pause.met;
+    const slot = held ? row.resume : row.pause;
+    const state: LineState = held ? "crossed" : resolveLineState(row.pause.points, "pause", false) === "near" ? "near" : "clear";
+    const phrase = slot ? slotPhrase(slot) : null;
+    const condition = phrase ? `${held ? "Restarts when" : "Pauses if"} ${phrase}.` : null;
+    /* The score the condition just named, so "it": the name twice in two sentences was
+       the page's most repeated term. At the line there is no move to size. */
+    const band = slot ? describeScoreMoveBand(slot.metric, slot.points) : null;
+    const trend = slot && comparison ? describeTrend(slot, scores[slot.metric], comparison.scores[slot.metric], comparison.since) : null;
+    const distance = slot && phrase
+      ? `It is ${Math.round(scores[slot.metric])} today${[band ? `${band} away` : null, trend].filter(Boolean).map((part) => `, ${part}`).join("")}.`
+      : null;
+    /* The record reads the lines the group shows, so both must be on one score. */
+    const history =
+      held && record && row.resume && row.pause.metric === row.resume.metric &&
+      row.pause.value !== undefined && row.pause.holdsAbove !== undefined &&
+      row.resume.value !== undefined && row.resume.holdsAbove !== undefined
+        ? describePastHolds({
+            series: record,
+            metric: row.pause.metric,
+            pause: { value: row.pause.value, holdsAbove: row.pause.holdsAbove },
+            restart: { value: row.resume.value, holdsAbove: row.resume.holdsAbove },
+          })
+        : null;
+    /* A held group's history reads its pause line too, so areas held by different pause
+       lines are different groups even when one restart lifts them. */
+    const key = `${state}|${condition ?? ""}|${history ?? ""}`;
+    const group = groups.get(key) ?? { state, status: GROUP_STATUS[state], condition, distance, history, areas: [] };
+    group.areas.push({
+      area: row.area,
+      label: decisionAreaLabel(row.area),
+      rule: row.rule,
+      ...(showsChange(row) && row.changed ? { changed: row.changed } : {}),
+    });
+    groups.set(key, group);
   }
-  /* Not on hold: the badge's own distance, so the answer and the choice below it agree. */
-  const open = rows.filter((row) => row.pause && !row.pause.met);
-  const openRow = nearest(open, (row) => row.pause?.points ?? Number.POSITIVE_INFINITY);
-  const openStatus = openRow ? describeAreaPauseStatus(openRow) : undefined;
-  return openRow && openStatus ? `${decisionAreaLabel(openRow.area)} this month? Go ahead: ${lowerFirst(openStatus.text)}.` : null;
+  return STATE_ORDER.flatMap((state) => [...groups.values()].filter((group) => group.state === state));
 };

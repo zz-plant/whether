@@ -39,6 +39,7 @@ import { MonthStrip } from "../app/components/history/monthStrip";
 import { DecisionHero } from "../app/components/DecisionHero";
 import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { DecisionPicker } from "../app/components/home/DecisionPicker";
+import { buildAreaGroups } from "../lib/report/home/homeSectionModel";
 import { buildCallCitation, buildSlackBrief } from "../lib/export/briefBuilders";
 import { formatMeetingSlideHtml, formatMeetingSlideMarkdown, formatMeetingSlideSvg } from "../lib/export/meetingSlideExport";
 import { buildExportSlidePayload } from "../lib/export/exportSnapshot";
@@ -216,17 +217,18 @@ describe("a glyph sits beside its words and is hidden from assistive tech", () =
     assert.doesNotMatch(unknown, /data-concept-icon/, "an unknown regime prints its word without a borrowed glyph");
   });
 
-  it("on the area cards, the area table, the signal bars' keys and /history's band", () => {
+  it("on the area groups, the area table, the signal bars' keys and /history's band", () => {
+    const pickerOptions = decisionAreaOrder.map((area, index) => ({
+      area,
+      rule: "Rule",
+      pause: { line: "Funding pressure > 76", distance: index === 1 ? "4 pts away" : "crossed", points: index === 1 ? 4 : 0, met: index !== 1, metric: "tightness" as const },
+    }));
     const html = renderToStaticMarkup(
       <>
         <DecisionPicker
-          options={decisionAreaOrder.map((area, index) => ({
-            area,
-            rule: "Rule",
-            pause: { line: "Funding pressure > 76", distance: index === 1 ? "4 pts away" : "crossed", points: index === 1 ? 4 : 0, met: index !== 1, metric: "tightness" },
-          }))}
+          options={pickerOptions}
+          groups={buildAreaGroups(pickerOptions, { tightness: 90, riskAppetite: 50 })}
           regime="SCARCITY"
-         
         />
         <AreaTable
           caption="test"

@@ -37,6 +37,8 @@ import { buildWeeklyStructured, buildWeeklySummary } from "../lib/summary/weekly
 import { buildYearlySummary } from "../lib/summary/yearlySummary";
 import { RegimeRadar } from "../app/components/home/RegimeRadar";
 import { DecisionPicker } from "../app/components/home/DecisionPicker";
+import { buildAreaGroups } from "../lib/report/home/homeSectionModel";
+import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import { AreaCorridorLadder } from "../app/components/ui/areaCorridorLadder";
 import { buildDecisionCorridorModel } from "../lib/report/operatingCalls";
 import { ConditionsLegend } from "../app/components/home/ConditionsLegend";
@@ -268,24 +270,31 @@ const routeSurfaces: Surface[] = [
        counted (2026-11-01). With every pause undefined the picker printed "Most
        weeks neither happens", and the other branch — which carried the retired
        word "call" — never reached this file. */
-    text: () =>
-      visibleText(
+    text: () => {
+      const options = decisionAreaOrder.map((area, index) => ({
+        area,
+        rule: "Rule",
+        pause:
+          index === 0
+            ? { line: "Funding pressure > 76", distance: "On hold", points: 0, met: true, metric: "tightness" as const, value: 76, holdsAbove: true }
+            : undefined,
+        resume: index === 0
+          ? { line: "Funding pressure < 66", distance: "24 pts away", points: 24, met: false, metric: "tightness" as const, value: 66, holdsAbove: false }
+          : undefined,
+      }));
+      return visibleText(
         renderToStaticMarkup(
           <DecisionPicker
-            options={decisionAreaOrder.map((area, index) => ({
-              area,
-              rule: "Rule",
-              pause:
-                index === 0
-                  ? { line: "Funding pressure > 76", distance: "On hold", points: 0, met: true, metric: "tightness" as const }
-                  : undefined,
-              resume: undefined,
-            }))}
+            options={options}
+            groups={buildAreaGroups(options, { tightness: 90, riskAppetite: 50 }, {
+              comparison: { scores: { tightness: 88, riskAppetite: 50 }, since: "since Oct 19" },
+              record: getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER),
+            })}
             regime="SCARCITY"
-           
           />,
         ),
-      ),
+      );
+    },
   },
   {
     name: "/ area ladder",

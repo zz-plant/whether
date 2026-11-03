@@ -77,11 +77,21 @@ function ConditionInputs({
   );
 }
 
-export function PlanLinesForm({ defaults }: { defaults: readonly PlanLines[] }) {
+export function PlanLinesForm({
+  defaults,
+  watch = [],
+}: {
+  defaults: readonly PlanLines[];
+  /** The areas a link asked to watch (`?watch=`); every area when it names none of these. */
+  watch?: readonly DecisionArea[];
+}) {
   const [lines, setLines] = useState<PlanLines[]>(() =>
     defaults.map((line) => ({ ...line, pause: [...line.pause], resume: [...line.resume] })),
   );
-  const [watched, setWatched] = useState<ReadonlySet<DecisionArea>>(() => new Set(defaults.map((line) => line.area)));
+  const [watched, setWatched] = useState<ReadonlySet<DecisionArea>>(() => {
+    const asked = defaults.map((line) => line.area).filter((area) => watch.includes(area));
+    return new Set(asked.length > 0 ? asked : defaults.map((line) => line.area));
+  });
   const { runwayBand } = useOperatorRunway();
   const [sendBand, setSendBand] = useState(true);
   const [email, setEmail] = useState("");

@@ -22,7 +22,6 @@ import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/ca
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
 import { getPlaybookForRegime } from "../lib/playbook";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
-import { isRoute } from "../lib/navigation/routeType";
 import { describeSavedCopyBanner, resolveDataStatusGuidance } from "../lib/report/trustStatus";
 import {
   buildV2HeroSignalData,
@@ -49,7 +48,7 @@ import { resolveHistoricalDate } from "../lib/timeMachine/timeMachine";
 import Link from "next/link";
 import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
-import { AllAreaRules } from "./components/home/AllAreaRules";
+import { AreaDistancesFold } from "./components/home/AreaDistancesFold";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
 import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
@@ -63,6 +62,7 @@ import { ShareBriefButton } from "./components/shareBriefButton";
 import {
   HOME_DECISION_PARAM,
   parseHomeDecision,
+  buildAreaGroups,
   buildHomeAreaRows,
   buildSignalChangeRows,
   describeConditionsTrail,
@@ -916,15 +916,14 @@ async function PageContent({
               stageLabel={stageLabel}
               activeRunway={activeRunway}
               savedReadingDate={savedReadingDate}
+              isHistorical={Boolean(historicalSelection)}
+              groups={buildAreaGroups(homeAreaRows, { tightness, riskAppetite }, {
+                comparison: previousScores ? { scores: previousScores, since: basis.since } : null,
+                /* An archived month's record would have to end at that month. */
+                record: historicalSelection ? undefined : recordSeries,
+              })}
             >
-              <AllAreaRules
-                rows={homeAreaRows}
-                heldGroups={decisionMovement?.heldGroups}
-                regime={regime}
-                planHref={isRoute(operateHref) ? operateHref : "/operate"}
-                isHistorical={Boolean(historicalSelection)}
-                corridorModel={corridorModel}
-              />
+              <AreaDistancesFold regime={regime} isHistorical={Boolean(historicalSelection)} corridorModel={corridorModel} />
               <div>
                 <ActionLink href={operateHref} variant="primary">
                   {cadenceCall?.planLabel ?? "Build this week’s plan →"}
