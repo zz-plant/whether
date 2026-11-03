@@ -223,7 +223,7 @@ export const describeConditionsSince = ({
  */
 const shareWords = (share: number) => (share >= 0.95 ? "almost every month" : "most months");
 
-const describeScoreAgainstRecord = ({
+export const describeScoreAgainstRecord = ({
   series,
   metric,
   value,
