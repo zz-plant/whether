@@ -562,3 +562,36 @@ export const buildHomeAreaRows = ({
     resumeQualifier: rule.resume.qualifier,
   })).map(withIdleRestart);
 };
+
+const lowerFirst = (value: string) => `${value.charAt(0).toLowerCase()}${value.slice(1)}`;
+
+/*
+ * One decision answered before the reader picks one (2026-11-03): the area nearest to
+ * changing, as the question a founder would ask and this week's answer to it. "Hiring
+ * this month? Wait until funding pressure falls below 66." A first visit met five
+ * choices and a sentence about the guidance, and had to know which to open; this says
+ * what the page is for by doing it once. On hold, the area whose restart is nearest;
+ * otherwise the one nearest its pause. Null when no area states a numeric line.
+ */
+const slotPhrase = (slot: HomeAreaLineSlot): string | null =>
+  slot.value === undefined || slot.holdsAbove === undefined
+    ? null
+    : `${ruleMetricLabel[slot.metric].toLowerCase()} ${slot.holdsAbove ? "rises above" : "falls below"} ${slot.value}`;
+
+export const describeFirstAnswer = (
+  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[],
+): string | null => {
+  const nearest = <T extends Pick<HomeAreaRow, "area" | "pause" | "resume">>(candidates: T[], points: (row: T) => number) =>
+    candidates.reduce<T | undefined>((best, row) => (best === undefined || points(row) < points(best) ? row : best), undefined);
+  const held = rows.filter((row) => row.pause?.met && row.resume && !row.resume.met);
+  const heldRow = nearest(held, (row) => row.resume?.points ?? Number.POSITIVE_INFINITY);
+  if (heldRow?.resume) {
+    const phrase = slotPhrase(heldRow.resume);
+    return `${decisionAreaLabel(heldRow.area)} this month? ${phrase ? `Wait until ${phrase}` : `Wait: ${formatPoints(heldRow.resume.points)} from restarting`}.`;
+  }
+  /* Not on hold: the badge's own distance, so the answer and the choice below it agree. */
+  const open = rows.filter((row) => row.pause && !row.pause.met);
+  const openRow = nearest(open, (row) => row.pause?.points ?? Number.POSITIVE_INFINITY);
+  const openStatus = openRow ? describeAreaPauseStatus(openRow) : undefined;
+  return openRow && openStatus ? `${decisionAreaLabel(openRow.area)} this month? Go ahead: ${lowerFirst(openStatus.text)}.` : null;
+};

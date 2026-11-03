@@ -191,7 +191,8 @@ export function RegimeRadar({
           condition. On the brief it is the only statement of the four from `md`
           up, where the one-line conditions legend gives way to this map. */}
       <p className="sr-only">
-        {`Funding pressure above ${tightnessLine} and risk appetite below ${riskAppetiteLine}: Freezing. Above ${tightnessLine} and above ${riskAppetiteLine}: Cloudy. Below ${tightnessLine} and below ${riskAppetiteLine}: Stormy. Below ${tightnessLine} and above ${riskAppetiteLine}: Sunny.`}
+        {/* The two cuts once (2026-11-03): it repeated both numbers for each of the four. */}
+        {`Funding pressure below ${tightnessLine} and risk appetite above ${riskAppetiteLine}: Sunny. The opposite: Freezing. Both above: Cloudy. Both below: Stormy.`}
       </p>
 
       <svg

@@ -88,7 +88,7 @@ describe("RegimeRadar", () => {
     assert.doesNotMatch(html, /to the nearest change line/);
     assert.match(
       html,
-      /<p class="sr-only">Funding pressure above 70 and risk appetite below 50: Freezing\. Above 70 and above 50: Cloudy\. Below 70 and below 50: Stormy\. Below 70 and above 50: Sunny\.<\/p>/,
+      /<p class="sr-only">Funding pressure below 70 and risk appetite above 50: Sunny\. The opposite: Freezing\. Both above: Cloudy\. Both below: Stormy\.<\/p>/,
     );
   });
 
