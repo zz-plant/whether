@@ -1,7 +1,7 @@
 import { readdirSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
-const targets = [".next", ".wrangler", "out"];
+const targets = [".cloudflare", ".next", ".wrangler", "out"];
 
 // Remove the dist/ directory fully (children only, so we preserve `dist/` itself as a mount)
 try {

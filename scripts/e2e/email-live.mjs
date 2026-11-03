@@ -17,17 +17,15 @@
  * anyone but the address you name. The tunnel and the worker stay up so the
  * links in the mail keep working; press Ctrl-C to stop them.
  *
- * `send_email` only sends for real when the binding is `remote = true`, and
- * vinext's virtual modules break `wrangler dev --config <other file>`. So this
- * patches `wrangler.toml` for the length of the run and restores it from a
- * backup on every exit path — including a crash, on the next run.
+ * `send_email` only sends for real when the binding connects to the remote
+ * resource. `serve:worker --remote-email` sets that on its own copy of the Build
+ * Output (scripts/serve-worker.mjs), so the tracked config is never edited; until
+ * 2026-11-03 this patched `wrangler.toml` and restored it from a backup.
  */
 import { spawn } from "node:child_process";
-import { existsSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
+import { rmSync } from "node:fs";
 
 const BASE = "http://localhost:8787";
-const CONFIG = "wrangler.toml";
-const BACKUP = "wrangler.toml.email-test-backup";
 const PERSIST = ".wrangler/email-test";
 const SECRET = "email-test-secret";
 const DAILY_CRON = "0 2 * * *";
@@ -39,13 +37,6 @@ if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(address)) {
   process.exit(2);
 }
 
-/* A previous run that died before restoring would leave `remote = true` in the
-   config, which a deploy would inherit. Put it back before doing anything else. */
-if (existsSync(BACKUP)) {
-  renameSync(BACKUP, CONFIG);
-  console.log("[setup] restored wrangler.toml from an interrupted run");
-}
-
 const children = [];
 let restored = false;
 
@@ -53,12 +44,10 @@ const restore = () => {
   if (restored) return;
   restored = true;
   for (const child of children) child.kill("SIGTERM");
-  if (existsSync(BACKUP)) renameSync(BACKUP, CONFIG);
 };
 
-/* Every way out restores the config. `timeout` sends SIGTERM, and Node runs no
-   `exit` hook for a signal it does not handle — that is how a `remote = true`
-   survived a run on 2026-10-30 and sat in the working tree. */
+/* Every way out stops the tunnel and the worker. `timeout` sends SIGTERM, and Node
+   runs no `exit` hook for a signal it does not handle. */
 const stop = (signal) => {
   console.log(`\n${signal}: stopping; the links in the mail stop working now`);
   restore();
@@ -127,17 +116,22 @@ const main = async () => {
   console.log(`     ${url}`);
 
   console.log("2/4  starting the worker with the live email binding");
-  const original = readFileSync(CONFIG, "utf8");
-  if (!original.includes('[[send_email]]\nname = "EMAIL"')) {
-    throw new Error("wrangler.toml no longer has the EMAIL binding block this script patches");
-  }
-  writeFileSync(BACKUP, original);
-  writeFileSync(CONFIG, original.replace('[[send_email]]\nname = "EMAIL"', '[[send_email]]\nname = "EMAIL"\nremote = true'));
   rmSync(PERSIST, { recursive: true, force: true });
 
   const worker = spawn(
     "bun",
-    ["run", "serve:worker", "--", "--persist-to", PERSIST, "--var", `APP_BASE_URL:${url}`, "--var", `WHETHER_CRON_SECRET:${SECRET}`],
+    [
+      "run",
+      "serve:worker",
+      "--",
+      "--remote-email",
+      "--persist-to",
+      PERSIST,
+      "--var",
+      `APP_BASE_URL:${url}`,
+      "--var",
+      `WHETHER_CRON_SECRET:${SECRET}`,
+    ],
     { stdio: ["ignore", "pipe", "pipe"] },
   );
   children.push(worker);

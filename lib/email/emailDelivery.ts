@@ -74,7 +74,7 @@ export const createCloudflareEmailAdapter = (
         send: async () => ({ ok: false, error: EMAIL_NOT_CONFIGURED_ERROR }),
       };
     }
-    console.warn("[EMAIL] No EMAIL binding found — using stub. Add send_email binding to wrangler.toml.");
+    console.warn("[EMAIL] No EMAIL binding found — using stub. Add the EMAIL sendEmail binding to cloudflare.config.ts.");
     return {
       mode: "stub",
       send: async ({ to, subject }) => {

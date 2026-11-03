@@ -1,10 +1,17 @@
 import { spawn, spawnSync } from "node:child_process";
-import { existsSync, readdirSync, rmSync } from "node:fs";
+import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { pathToFileURL } from "node:url";
 
 import { isWorkerBundleCurrent } from "./worker-bundle.mjs";
 
+/**
+ * Builds and deploys the Worker with `cf` (`cloudflare.config.ts`; Wrangler until 2026-11-03).
+ * A lane is a mode: production is the default, `--env preview` (or `--preview`) builds and
+ * deploys `--mode preview`, the `whether-preview` Worker. The deploy itself is vinext's
+ * Cloudflare adapter, which runs `cf deploy --prebuilt` against the Build Output in
+ * `.cloudflare/output/v0/`.
+ */
 async function main() {
   const [action, ...rawArgs] = process.argv.slice(2);
 
@@ -25,28 +32,16 @@ async function main() {
     childEnv.WHETHER_BUILD_LOG_LEVEL = "warn";
   }
 
-  if (targetEnv) {
-    childEnv.CLOUDFLARE_ENV = targetEnv;
-  } else {
-    delete childEnv.CLOUDFLARE_ENV;
-  }
-
-  if (targetEnv) {
-    console.log(`Cloudflare target: ${targetEnv}`);
-  } else {
-    console.log("Cloudflare target: production");
-  }
+  console.log(`Cloudflare target: ${targetEnv ?? "production"}`);
 
   if (action === "build") {
-    const status = runVinext(["build"], childEnv);
-    if (status === 0) dedupeWasmArtifacts();
-    process.exit(status);
+    process.exit(runVinextBuild(targetEnv, childEnv));
   }
 
   const deployArgs = rebuildDeployArgs(parsed, targetEnv);
 
   if (!parsed.dryRun) {
-    ensureWranglerAuth(childEnv);
+    ensureCfAuth(childEnv);
   }
 
   // One build per Workers Builds push, not two. The landmark audit in the gate
@@ -63,23 +58,21 @@ async function main() {
 
   if (reuseCurrentBundle) {
     console.log("[cloudflare-run] reusing the current worker bundle (--skip-build-if-current); no rebuild.");
-    dedupeWasmArtifacts();
     if (!parsed.skipBuild) deployArgs.push("--skip-build");
   } else if (!parsed.skipBuild) {
-    const buildStatus = runVinext(["build"], childEnv);
+    const buildStatus = runVinextBuild(targetEnv, childEnv);
     if (buildStatus !== 0) {
       process.exit(buildStatus);
     }
-    dedupeWasmArtifacts();
     deployArgs.push("--skip-build");
   }
 
   // Two layers, because neither sees what the other does. The adapter's own --dry-run
   // checks the adapter contract — router mode, ISR wiring, the data and image adapters the
-  // routes require — and skips both the build and Wrangler. Wrangler's dry run packages the
-  // Worker and catches invalid bindings, oversized bundles, and other upload-time failures.
-  // An adapter-contract break surfaces here as a clear adapter error rather than as a
-  // confusing packaging failure, or as a real deploy that fails after CI went green.
+  // routes require — and skips both the build and `cf`. `cf deploy --dry-run` validates the
+  // Build Output and resolves every binding without sending a request. An adapter-contract
+  // break surfaces here as a clear adapter error rather than as a confusing packaging
+  // failure, or as a real deploy that fails after CI went green.
   if (parsed.dryRun) {
     // deployArgs already carries --dry-run and --skip-build, so this validates without
     // building or publishing.
@@ -87,7 +80,7 @@ async function main() {
     if (adapterStatus !== 0) {
       process.exit(adapterStatus);
     }
-    process.exit(runWranglerDryRun(targetEnv, childEnv));
+    process.exit(runCfDryRun(targetEnv, childEnv));
   }
 
   const { status, output } = await runCloudflareDeployCaptured(deployArgs, childEnv);
@@ -95,23 +88,22 @@ async function main() {
     process.exit(status);
   }
 
-  /* The adapter reports success on an upload that never happened. It runs Wrangler with
-     execFileSync — which throws on a non-zero exit — then scans the output for a
-     workers.dev URL and, finding none, returns the string
-     "(URL not detected in wrangler output)" and resolves normally. So a Wrangler run that
-     exits 0 after printing only the module table, uploading nothing, reaches the caller as
-     a successful deploy. That happened on 2026-09-01: the command exited 0, printed its
-     footer, and left production on the previous version. Nothing downstream noticed.
+  /* The adapter reports success on an upload that never happened. It scans the deploy's
+     output for a workers.dev URL and, finding none, returns the string
+     "(URL not detected in cf output)" and resolves normally. Under Wrangler, a run that
+     exited 0 after printing only the module table, uploading nothing, reached the caller as
+     a successful deploy: that happened on 2026-09-01, and production stayed on the previous
+     version without anything downstream noticing.
 
-     `Current Version ID` is printed only once an upload actually lands, so its absence is
-     the deploy not having happened. Judge on that, not on the exit code — the same lesson
-     as briefPublishGuard, where a loader that degrades gracefully turned a failed run into
-     a successful-looking one. */
+     `Current Version ID` is printed only once an upload actually lands (`cf` prints it as
+     Wrangler did), so its absence is the deploy not having happened. Judge on that, not on
+     the exit code — the same lesson as briefPublishGuard, where a loader that degrades
+     gracefully turned a failed run into a successful-looking one. */
   const versionId = findPublishedVersionId(output);
   if (!versionId) {
-    console.error("[cloudflare-run] Wrangler exited 0 but never reported a published version.");
+    console.error("[cloudflare-run] The deploy exited 0 but never reported a published version.");
     console.error("[cloudflare-run] Nothing was uploaded; production is unchanged. Re-run the deploy.");
-    console.error("[cloudflare-run] Confirm with: bunx wrangler deployments list");
+    console.error("[cloudflare-run] Confirm with: npx cf workers deployments list --worker whether");
     process.exit(1);
   }
 
@@ -119,9 +111,8 @@ async function main() {
   process.exit(0);
 }
 
-
 /**
- * The version id Wrangler prints once an upload has actually landed. Exported so the
+ * The version id the deploy prints once an upload has actually landed. Exported so the
  * rule can be tested without running a deploy.
  */
 export function findPublishedVersionId(output) {
@@ -149,13 +140,10 @@ function runCloudflareDeployCaptured(args, env) {
     });
 
     let output = "";
-    const filters = [];
     const tee = (stream, sink) => {
-      const filter = createModuleTableFilter((text) => sink.write(text));
-      filters.push(filter);
       stream.on("data", (chunk) => {
         output += chunk;
-        filter.write(String(chunk));
+        sink.write(chunk);
       });
     };
     tee(child.stdout, process.stdout);
@@ -166,7 +154,6 @@ function runCloudflareDeployCaptured(args, env) {
       resolve({ status: 1, output });
     });
     child.on("close", (code) => {
-      for (const filter of filters) filter.end();
       resolve({ status: code ?? 1, output });
     });
   });
@@ -225,18 +212,19 @@ function parseArgs(args) {
 }
 
 /**
- * Whether the deploy may reuse the bundle already in dist/ instead of building again.
+ * Whether the deploy may reuse the bundle already built instead of building again.
  *
  * `--skip-build-if-current` is the reuse request. It applies only to the production lane
  * (no `--env`): the landmark audit and the production deploy build the same tree, while a
  * named environment builds a different configuration. `current` is the audit's own
- * freshness verdict (`isWorkerBundleCurrent`), so a stale or missing bundle never reuses.
- * Exported so the rule can be tested without running a deploy.
+ * freshness verdict (`isWorkerBundleCurrent`), so a stale, missing or other-mode bundle
+ * never reuses. Exported so the rule can be tested without running a deploy.
  */
 export function shouldReuseCurrentBundle({ skipBuildIfCurrent = false, targetEnv = "", current = false } = {}) {
   return Boolean(skipBuildIfCurrent && !targetEnv && current);
 }
 
+/** The adapter maps `--env` to the Vite mode it deploys, so the lane carries through unchanged. */
 function rebuildDeployArgs(parsed, targetEnvName) {
   const args = ["deploy"];
 
@@ -248,11 +236,13 @@ function rebuildDeployArgs(parsed, targetEnvName) {
   return args;
 }
 
-function runVinext(args, env) {
-  const result = spawnSync(process.execPath, ["scripts/vinext-run.mjs", ...args], {
-    env,
-    stdio: "inherit",
-  });
+/** `vinext build` hands its arguments to Vite, whose mode selects the lane in cloudflare.config.ts. */
+function runVinextBuild(targetEnvName, env) {
+  const result = spawnSync(
+    process.execPath,
+    ["scripts/vinext-run.mjs", "build", ...(targetEnvName ? ["--mode", targetEnvName] : [])],
+    { env, stdio: "inherit" },
+  );
 
   return result.status ?? 1;
 }
@@ -273,111 +263,40 @@ function runCloudflareDeploy(args, env) {
   return result.status ?? 1;
 }
 
-function runWranglerDryRun(targetEnvName, env) {
-  const wranglerPath = join(process.cwd(), "node_modules", "wrangler", "bin", "wrangler.js");
+const cfBin = () => join(process.cwd(), "node_modules", "cf", "bin", "cf");
 
-  if (!existsSync(wranglerPath)) {
-    console.error(`Unable to locate Wrangler at ${wranglerPath}. Run bun install first.`);
+/** The Build Output records the mode it was built in, and `cf` refuses a deploy that asks for another. */
+function runCfDryRun(targetEnvName, env) {
+  if (!existsSync(cfBin())) {
+    console.error(`Unable to locate cf at ${cfBin()}. Run bun install first.`);
     return 1;
   }
 
-  const args = ["--no-deprecation", wranglerPath, "deploy", "--dry-run"];
-  if (targetEnvName) args.push("--env", targetEnvName);
+  const result = spawnSync(
+    process.execPath,
+    [cfBin(), "deploy", "--prebuilt", "--dry-run", "--mode", targetEnvName ?? "production"],
+    { env, stdio: "inherit" },
+  );
 
-  const result = spawnSync(process.execPath, args, {
-    env,
-    encoding: "utf-8",
-    stdio: ["inherit", "pipe", "pipe"],
-    maxBuffer: 64 * 1024 * 1024,
-  });
-
-  const stdout = createModuleTableFilter((text) => process.stdout.write(text));
-  stdout.write(result.stdout ?? "");
-  stdout.end();
-  const stderr = createModuleTableFilter((text) => process.stderr.write(text));
-  stderr.write(result.stderr ?? "");
-  stderr.end();
-
-  if (result.error) console.error(`[cloudflare-run] Wrangler dry run failed to start: ${result.error.message}`);
+  if (result.error) console.error(`[cloudflare-run] cf dry run failed to start: ${result.error.message}`);
   return result.status ?? 1;
 }
 
-const TABLE_LINE = /^[┌│├└]/;
-
 /**
- * Wrangler prints a box-drawn row for every module it attaches: ~300 rows on this Worker,
- * which pushed the deploy's own result out of the Workers Builds log window on 2026-10-13.
- * Passes every other line through as it arrives and replaces each table with its row count.
- * Exported so the rule can be tested without running Wrangler.
+ * Workers Builds supplies CLOUDFLARE_API_TOKEN, and `cf` prefers it over any saved login.
+ * Locally, `cf auth whoami` answers for the profile `cf auth login` saved.
  */
-export function createModuleTableFilter(emit) {
-  let pending = "";
-  let rows = 0;
-  let inTable = false;
-
-  const flushTable = () => {
-    if (!inTable) return;
-    emit(`[cloudflare-run] module table hidden: ${rows} module(s) attached.\n`);
-    inTable = false;
-    rows = 0;
-  };
-
-  const line = (text) => {
-    if (TABLE_LINE.test(text)) {
-      inTable = true;
-      if (text.startsWith("│") && !/^│\s*Name\s*│/.test(text)) rows += 1;
-      return;
-    }
-    flushTable();
-    emit(`${text}\n`);
-  };
-
-  return {
-    write(chunk) {
-      pending += chunk;
-      const parts = pending.split("\n");
-      pending = parts.pop() ?? "";
-      for (const part of parts) line(part);
-    },
-    end() {
-      if (pending) line(pending);
-      pending = "";
-      flushTable();
-    },
-  };
-}
-
-function dedupeWasmArtifacts() {
-  const wasmRoot = join("dist", "server", "resvg.wasm");
-  if (!existsSync(wasmRoot)) return;
-
-  try {
-    const entries = readdirSync(join("dist", "server", "assets")).filter(
-      (f) => f.startsWith("resvg-") && f.endsWith(".wasm"),
-    );
-    for (const entry of entries) {
-      const assetPath = join("dist", "server", "assets", entry);
-      rmSync(assetPath, { force: true });
-      console.log(`[cloudflare-run] Removed duplicate WASM asset: assets/${entry}`);
-    }
-  } catch {
-    // assets dir may be empty or missing
-  }
-}
-
-function ensureWranglerAuth(env) {
-  if (env.CLOUDFLARE_API_TOKEN || (env.CLOUDFLARE_API_KEY && env.CLOUDFLARE_EMAIL)) {
+function ensureCfAuth(env) {
+  if (env.CLOUDFLARE_API_TOKEN) {
     return;
   }
 
-  const wranglerBin = join(process.cwd(), "node_modules", ".bin", "wrangler");
-
-  if (!existsSync(wranglerBin)) {
-    console.error("Unable to locate Wrangler. Run bun install first.");
+  if (!existsSync(cfBin())) {
+    console.error(`Unable to locate cf at ${cfBin()}. Run bun install first.`);
     process.exit(1);
   }
 
-  const result = spawnSync(wranglerBin, ["whoami"], {
+  const result = spawnSync(process.execPath, [cfBin(), "auth", "whoami"], {
     env,
     encoding: "utf-8",
     stdio: "pipe",
@@ -388,7 +307,7 @@ function ensureWranglerAuth(env) {
   }
 
   console.error("Cloudflare authentication is required before deploy.");
-  console.error("Run `wrangler login` for local use or set `CLOUDFLARE_API_TOKEN` for CI/non-interactive deploys.");
+  console.error("Run `npx cf auth login` for local use or set `CLOUDFLARE_API_TOKEN` for CI/non-interactive deploys.");
 
   if (result.stderr?.trim()) {
     console.error(result.stderr.trim());

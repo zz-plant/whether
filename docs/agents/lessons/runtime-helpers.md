@@ -36,7 +36,7 @@ itself still runs.
   a record an older deploy wrote in another shape is unusable in the same way unparseable text is,
   and every caller already treated that as "no record". `getJson` still rejects on a failing `get`:
   an outage is not a missing record.
-- **One namespace.** `WHETHER_DURABLE_KV` is the only KV namespace `wrangler.toml` declares for
+- **One namespace.** `WHETHER_DURABLE_KV` is the only KV namespace `cloudflare.config.ts` declares for
   data; the per-domain names `getWhetherKv` used to fall back to were never bound anywhere.
 
 ## One reader for a setting (`settings.ts`)

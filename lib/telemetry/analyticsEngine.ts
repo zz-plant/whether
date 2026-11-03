@@ -1,9 +1,7 @@
 // Thin wrapper around the Cloudflare Workers Analytics Engine binding.
 //
-// The binding is configured in wrangler.toml as:
-//   [[analytics_engine_datasets]]
-//   binding = "ANALYTICS"
-//   dataset = "whether_telemetry"
+// The binding is configured in cloudflare.config.ts as:
+//   ANALYTICS: bindings.analyticsEngineDataset({ name: "whether_telemetry" })
 //
 // At runtime it is exposed on globalThis. When the binding is not present
 // (local dev, tests, or any non-Workers environment) we fall back to
@@ -103,7 +101,7 @@ export const writeAnalytics = (
 
   if (!binding) {
     // Preserve the previous local/dev signal (still useful in `bun run dev`
-    // and `wrangler dev` tail logs) while making it clear this is the
+    // and `bun run serve:worker` logs) while making it clear this is the
     // fallback path so engineers know durable storage requires the binding.
     console.info(`[telemetry:${stream}:fallback]`, event);
     return;

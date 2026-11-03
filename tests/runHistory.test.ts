@@ -19,7 +19,7 @@ const SETTINGS = ["CLOUDFLARE_ACCOUNT_ID", "CLOUDFLARE_ANALYTICS_READ_TOKEN", "W
  * `resolveAnalyticsReadConfig` reads `globalThis` first and `process.env` second, so these
  * assertions are only about the bindings if the environment is empty of them too. It was
  * not, in the one place it mattered: Workers Builds exports CLOUDFLARE_ACCOUNT_ID and
- * CLOUDFLARE_API_TOKEN so wrangler can deploy, and the resolver accepts that second token
+ * CLOUDFLARE_API_TOKEN so the deploy can authenticate, and the resolver accepts that second token
  * name. "Unconfigured" was true on every developer machine and false in the build
  * container, and the build that caught it was the one whose log could not be read.
  * `scripts/run-tests.mjs` strips all four from the suite; this file does not rely on that.

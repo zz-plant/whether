@@ -17,24 +17,29 @@ describe("Cloudflare deploy contracts", () => {
     assert.doesNotMatch(source, /runVinext\(deployArgs, childEnv\)/);
   });
 
-  it("builds and asks Wrangler to package dry runs", () => {
+  it("builds and asks cf to validate the Build Output on dry runs, in the lane's mode", () => {
     assert.match(source, /if \(!parsed\.skipBuild\)/);
-    assert.match(source, /wranglerPath, "deploy", "--dry-run"/);
-    assert.match(source, /runWranglerDryRun\(targetEnv, childEnv\)/);
+    assert.match(source, /"deploy", "--prebuilt", "--dry-run", "--mode", targetEnvName \?\? "production"/);
+    assert.match(source, /runCfDryRun\(targetEnv, childEnv\)/);
   });
 
-  // The adapter validator and Wrangler check different things: the adapter knows the
-  // router mode, ISR wiring, and which data/image adapters the routes require; Wrangler
-  // knows bindings and upload limits. Running only the second let an adapter-contract
-  // break reach a real deploy after the dry run went green.
-  it("validates the adapter contract before Wrangler packages the dry run", () => {
+  // The adapter validator and cf check different things: the adapter knows the router
+  // mode, ISR wiring, and which data/image adapters the routes require; cf knows the Build
+  // Output and every binding. Running only the second let an adapter-contract break reach a
+  // real deploy after the dry run went green.
+  it("validates the adapter contract before cf validates the Build Output", () => {
     const dryRunBranch = source.slice(source.indexOf("if (parsed.dryRun)"));
     const adapterIndex = dryRunBranch.indexOf("runCloudflareDeploy(deployArgs, childEnv)");
-    const wranglerIndex = dryRunBranch.indexOf("runWranglerDryRun(targetEnv, childEnv)");
+    const cfIndex = dryRunBranch.indexOf("runCfDryRun(targetEnv, childEnv)");
 
     assert.ok(adapterIndex >= 0, "dry run invokes the adapter validator");
-    assert.ok(wranglerIndex > adapterIndex, "Wrangler packages only after adapter validation");
+    assert.ok(cfIndex > adapterIndex, "cf validates only after the adapter does");
     assert.match(source, /if \(adapterStatus !== 0\)/, "a failed adapter validation stops the dry run");
+  });
+
+  it("builds a lane in its Vite mode, which is what selects it in cloudflare.config.ts", () => {
+    assert.match(source, /"build", \.\.\.\(targetEnvName \? \["--mode", targetEnvName\] : \[\]\)/);
+    assert.doesNotMatch(source, /CLOUDFLARE_ENV/, "the Wrangler-era environment variable selects nothing under cf");
   });
 
   // CI no longer runs on push or pull request — the workflows went manual-only when the
@@ -75,11 +80,11 @@ describe("Cloudflare deploy contracts", () => {
 
   /**
    * On 2026-09-01 `bun run deploy:cloudflare` exited 0 without deploying: Wrangler printed
-   * the module table, uploaded nothing, and exited 0. The adapter runs Wrangler through
-   * execFileSync — which throws only on a non-zero exit — then scans for a workers.dev URL
-   * and, finding none, returns "(URL not detected in wrangler output)" and resolves
-   * normally. Production stayed on the previous version and the command reported success.
-   * The captured output of both runs is the fixture here.
+   * the module table, uploaded nothing, and exited 0. The adapter scans the deploy's output
+   * for a workers.dev URL and, finding none, returns "(URL not detected in … output)" and
+   * resolves normally. Production stayed on the previous version and the command reported
+   * success. The captured output of both Wrangler runs is the fixture here; `cf` prints the
+   * same `Current Version ID:` line, behind its own box-drawn prefix (the last fixture).
    */
   const PUBLISHED_RUN = [
     "  Total Upload: 6715.93 KiB / gzip: 2093.33 KiB",
@@ -96,6 +101,10 @@ describe("Cloudflare deploy contracts", () => {
 
   it("recognizes a deploy that actually published", () => {
     assert.equal(findPublishedVersionId(PUBLISHED_RUN), "de266f59-b3d4-4507-97e0-24150149713c");
+    assert.equal(
+      findPublishedVersionId("├  Deploy\n│  Uploaded whether (6.20 sec)\n│  Current Version ID: de266f59-b3d4-4507-97e0-24150149713c\n"),
+      "de266f59-b3d4-4507-97e0-24150149713c",
+    );
   });
 
   it("refuses to call the 2026-09-01 silent no-op a deploy", () => {
@@ -117,8 +126,8 @@ describe("Cloudflare deploy contracts", () => {
 
   it("streams the deploy rather than buffering it, so the slowest step stays visible", () => {
     assert.match(source, /stdio: \["inherit", "pipe", "pipe"\]/);
-    // Each chunk goes to the module-table filter as it arrives, which prints whole lines at once.
-    assert.match(source, /filter\.write\(String\(chunk\)\)/);
+    // Each chunk is printed as it arrives and kept for the published-version check.
+    assert.match(source, /output \+= chunk;\s*sink\.write\(chunk\);/);
   });
 
   it("does not run a deploy when imported", () => {

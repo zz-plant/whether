@@ -26,7 +26,7 @@ const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === "object" && value !== null;
 
 /**
- * The key is a Worker secret (`wrangler secret put FRED_API_KEY`), installed on globalThis
+ * The key is a Worker secret (`npx wrangler secret put FRED_API_KEY --name whether`), installed on globalThis
  * by worker/index.ts like every other binding, or an environment variable for scripts and
  * local runs. With no key, every read stays on the CSV path it has always used.
  */

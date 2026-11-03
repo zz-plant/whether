@@ -50,3 +50,6 @@ homepage-*.png
 # One-off QA capture dumps (stale artifacts, not inputs)
 output/
 scratch/
+
+# Cloudflare Build Output, the audit preview built from it, and generated Worker types
+.cloudflare/

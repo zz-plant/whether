@@ -12,10 +12,10 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 ## Active lane
 ### `current-vinext` (production baseline)
 - Dev/start/build/deploy: `bun run dev`, `bun run start`, `bun run build`, `bun run deploy:cloudflare`
-- Cloudflare path: Vinext + [`wrangler.toml`](../wrangler.toml)
+- Cloudflare path: Vinext + [`cloudflare.config.ts`](../cloudflare.config.ts) (`wrangler.toml` until 2026-11-03)
 - Preview deploy wrapper: `bun run deploy:cloudflare:preview`
 - Vite/Vinext config: [`vite.config.ts`](../vite.config.ts)
-- Cloudflare preview environment: `env.preview` in [`wrangler.toml`](../wrangler.toml)
+- Cloudflare preview environment: the `preview` mode of [`cloudflare.config.ts`](../cloudflare.config.ts)
 - Worker entry: [`worker/index.ts`](../worker/index.ts)
 - Node preflight: [`scripts/vinext-run.mjs`](../scripts/vinext-run.mjs) fails fast outside Node 22+.
 - Cloudflare env coordination: [`scripts/cloudflare-run.mjs`](../scripts/cloudflare-run.mjs) applies the same target environment to both build and deploy.

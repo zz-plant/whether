@@ -4,52 +4,14 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { afterEach, describe, it } from "bun:test";
-import { createModuleTableFilter } from "../scripts/cloudflare-run.mjs";
 
 /*
  * A Workers Builds log is a bounded window. On 2026-10-13 the gate's passing output
  * (~1,900 lines, ~700 of them one fallback warning), Vite's chunk tables and Wrangler's
- * module table filled it, and the deploy's own result was cut off. What passes says so
+ * module table filled it, and the deploy's own result was cut off. `cf` prints no module
+ * table, so the filter that collapsed Wrangler's went with it on 2026-11-03. What passes says so
  * in a line; what fails keeps its output.
  */
-describe("Wrangler's module table", () => {
-  const run = (chunks: string[]) => {
-    let printed = "";
-    const filter = createModuleTableFilter((text: string) => {
-      printed += text;
-    });
-    for (const chunk of chunks) filter.write(chunk);
-    filter.end();
-    return printed;
-  };
-
-  const TABLE = [
-    "Attaching additional modules:",
-    "┌──────────┬──────┐",
-    "│ Name     │ Type │",
-    "├──────────┼──────┤",
-    "│ a.js     │ esm  │",
-    "├──────────┼──────┤",
-    "│ b.wasm   │ wasm │",
-    "└──────────┴──────┘",
-    "Current Version ID: de266f59-b3d4-4507-97e0-24150149713c",
-    "",
-  ].join("\n");
-
-  it("prints a count in place of the rows, and every other line as it was", () => {
-    const printed = run([TABLE]);
-    assert.doesNotMatch(printed, /│/);
-    assert.match(printed, /module table hidden: 2 module\(s\) attached/);
-    assert.match(printed, /^Attaching additional modules:$/m);
-    assert.match(printed, /^Current Version ID: de266f59/m);
-  });
-
-  it("reads a table split across chunks mid-line the same way", () => {
-    const split = TABLE.match(/[\s\S]{1,7}/g) ?? [];
-    assert.equal(run(split), run([TABLE]));
-  });
-});
-
 describe("run-checks output", () => {
   const REPO_ROOT = process.cwd();
   const roots: string[] = [];

@@ -18,8 +18,8 @@ export default defineConfig({
   /* The commit /api/health reports (lib/runtime/versionMetadata.ts); "" from a dirty checkout. */
   define: { __WHETHER_BUILD_COMMIT__: JSON.stringify(buildCommit()) },
   environments: {
-    /* Server source maps only. Wrangler uploads them (`upload_source_maps` in wrangler.toml)
-       so Workers Logs stack traces name real files and lines instead of a bundle offset.
+    /* Server source maps only. `cf deploy` uploads every map in the Build Output, so Workers
+       Logs stack traces name real files and lines instead of a bundle offset.
        They are never served to a browser: the client environment keeps Vite's default. */
     rsc: { build: { sourcemap: true } },
     ssr: { build: { sourcemap: true } },

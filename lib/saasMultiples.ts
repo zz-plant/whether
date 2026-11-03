@@ -163,7 +163,7 @@ const ALPHA_VANTAGE_URL = "https://www.alphavantage.co/query";
 const ALPHA_VANTAGE_REVALIDATE_SECONDS = 24 * 60 * 60;
 
 /**
- * A Worker secret (`wrangler secret put ALPHA_VANTAGE_API_KEY`) installed on globalThis by
+ * A Worker secret (`npx wrangler secret put ALPHA_VANTAGE_API_KEY --name whether`; `cf` cannot set one yet) installed on globalThis by
  * worker/index.ts, or an environment variable for scripts. Absent, the basket starts at EDGAR.
  */
 const resolveAlphaVantageApiKey = (): string | null => readSetting("ALPHA_VANTAGE_API_KEY");

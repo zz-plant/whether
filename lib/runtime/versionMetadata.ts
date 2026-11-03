@@ -30,7 +30,7 @@ declare const __WHETHER_BUILD_COMMIT__: string | undefined;
 /**
  * The git commit this bundle was built from, so "is my merge live?" is one request rather
  * than a comparison of timestamps. The version binding cannot carry it: the deploy adapter
- * passes no `--tag` to Wrangler. Null when the build had no commit to read.
+ * passes no tag to `cf deploy`. Null when the build had no commit to read.
  */
 export const getBuildCommit = (): string | null =>
   typeof __WHETHER_BUILD_COMMIT__ === "string" && /^[0-9a-f]{7,40}$/.test(__WHETHER_BUILD_COMMIT__)

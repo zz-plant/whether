@@ -6,21 +6,20 @@
  * is fetched; every route is audited, and a new dynamic page with no sample URL throws.
  * Bounds and their history: docs/agents/lessons/automation-and-deploy-gate.md.
  *
- * The server is the production worker under `wrangler dev` (the `serve:worker` script),
- * not `vite dev`: workerd bundles the worker once and then every route renders from that
- * bundle, where vite compiled each route on first fetch — the difference between a
- * ~5s audit and a ~20s one locally, and a cold-container worst case of minutes. It is
- * also the code that actually ships. `WHETHER_ENABLE_MOCKUPS=1` keeps the gated design
- * routes renderable so their coverage does not silently drop out of the audit.
+ * The server is the production worker's Build Output previewed in workerd (the
+ * `serve:worker` script, `scripts/serve-worker.mjs`), not `vite dev`: workerd loads the
+ * bundle once and then every route renders from it, where vite compiled each route on first
+ * fetch — the difference between a ~5s audit and a ~20s one locally, and a cold-container
+ * worst case of minutes. It is also the code that actually ships. `WHETHER_ENABLE_MOCKUPS=1`
+ * keeps the gated design routes renderable so their coverage does not silently drop out of
+ * the audit; the serve script adds it to a copy of the output, never to the output itself.
  *
- * `wrangler dev` reads the root `wrangler.toml` only until the build has written its
- * redirect (`.wrangler/deploy/config.json` -> `dist/server/wrangler.json`), which carries
- * the real `assets.directory` — without it, wrangler refuses to start ("The `assets`
- * property ... is missing the required `directory` property"), which is what failed every
- * Workers Builds run after 30a126e0: the deploy gate runs before any build, so a fresh
- * container had no redirect to read. The audit therefore builds first when the bundle is
- * missing, and also when any bundled source is newer than it — a stale bundle would audit
- * the last build instead of the tree being checked, which `vite dev` could never do.
+ * There is nothing to serve until a build has written the Build Output, and the deploy gate
+ * runs before any build, so a fresh container has none (under Wrangler, the missing build
+ * redirect failed every Workers Builds run after 30a126e0). The audit therefore builds first
+ * when the bundle is missing, and also when any bundled source is newer than it — a stale
+ * bundle would audit the last build instead of the tree being checked, which `vite dev`
+ * could never do.
  *
  * Usage:
  *   node scripts/check-main-content-landmarks.mjs
