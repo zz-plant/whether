@@ -153,7 +153,10 @@ export const SignalsWhatChangedSection = ({
                   ) : (
                     row.label
                   )}
-                  {row.kindLabel ? <span className="block text-xs font-normal text-slate-500">{row.kindLabel}</span> : null}
+                  {/* No "Moves first" / "Confirms later" under the name (2026-11-03): the
+                      premise test found both scores track deal count in the same quarter and the
+                      next, with the same decay (docs/research/premise-test-results.md, "Lead and
+                      lag"), so neither label held. */}
                   {row.key === "tightness" || row.key === "riskAppetite" ? (
                     /* The areas this score sets the lines for, each opening the
                        brief on that area's answer. It said "Sets the pause and
