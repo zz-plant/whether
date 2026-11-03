@@ -20,6 +20,11 @@ import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigat
  *
  * Each area's name opens what the picker knows about it under its own rule (`detail`).
  * The five choices that did that sat under the groups and printed the five names again.
+ *
+ * The name is drawn as a control (2026-11-03): a bordered disclosure trigger, the
+ * week picker's shape. It was a dotted underline, the mark the card's defined terms
+ * carry, so the five names read as definitions and the runway test and "Set your own
+ * rules" behind them went unopened.
  */
 const HEADING_INK: Record<AreaGroup["state"], string> = {
   crossed: "text-line-crossed-fg",
@@ -84,7 +89,12 @@ export function AreaGroups({
                 const open = selected === entry.area;
                 return (
                   <li key={entry.area} id={`area-${entry.area}`} className="flex max-w-[68ch] gap-2.5 text-fluid-base leading-snug text-slate-200">
-                    <AreaIcon area={entry.area} className="mt-1 shrink-0 text-slate-400" />
+                    {/* Centred on the button when the name is one: `.weather-button` is 46px
+                        on a touch screen and 36px under a mouse (controls.css). */}
+                    <AreaIcon
+                      area={entry.area}
+                      className={`shrink-0 text-slate-400 ${onToggle ? "mt-[15px] [@media(min-width:640px)_and_(hover:hover)_and_(pointer:fine)]:mt-2.5" : "mt-1"}`}
+                    />
                     <div className="min-w-0 flex-1 space-y-1">
                       <p>
                         {onToggle ? (
@@ -93,12 +103,12 @@ export function AreaGroups({
                             aria-expanded={open}
                             aria-controls={open ? `area-${entry.area}-detail` : undefined}
                             onClick={() => onToggle(entry.area)}
-                            className="weather-hit inline-flex items-baseline gap-1 rounded-sm font-semibold text-slate-50 underline decoration-slate-500 decoration-dotted underline-offset-4 hover:decoration-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                            className="weather-button weather-hit mr-1 inline-flex items-center gap-1 align-baseline font-semibold text-slate-50 hover:border-[color:var(--accent-action)] aria-expanded:border-[color:var(--accent-action)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                           >
                             {entry.label}
                             <ChevronDown
                               aria-hidden="true"
-                              className={`size-3.5 self-center text-slate-400 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`}
+                              className={`size-3.5 text-slate-300 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`}
                             />
                           </button>
                         ) : (

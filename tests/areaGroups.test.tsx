@@ -196,6 +196,18 @@ describe("AreaGroups", () => {
     assert.equal((opened.match(/data-detail/g) ?? []).length, 1, "one area open");
   });
 
+  it("draws each name as a control, not as a defined term", () => {
+    // The dotted underline is the defined-term mark on the card; on the names it read
+    // as a definition, and the runway test behind each one went unopened.
+    const html = renderToStaticMarkup(<AreaGroups groups={buildAreaGroups(ROWS, SCORES)} onToggle={() => {}} />);
+    const buttons = html.match(/<button type="button" aria-expanded=[^>]*>/g) ?? [];
+    assert.equal(buttons.length, 5);
+    for (const button of buttons) {
+      assert.match(button, /class="weather-button /);
+      assert.doesNotMatch(button, /decoration-dotted/);
+    }
+  });
+
   it("renders nothing with no groups", () => {
     assert.equal(renderToStaticMarkup(<AreaGroups groups={[]} />), "");
   });
