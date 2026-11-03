@@ -1,5 +1,5 @@
 import { z } from "zod";
-import type { LifecycleStage } from "../decisionShield";
+import type { CompanyFinancialProfile, DecisionCategory, LifecycleStage } from "../decisionShield";
 import type { SignalKey } from "../ingestion/types";
 import type { RegimeKey } from "../regimeEngineCore";
 import { REGIME_LABELS } from "../regimePresentation";
@@ -58,6 +58,22 @@ export const regimeInput = labelChoices(
 export const signalKeyInput = z.preprocess(upperCased, z.enum(SIGNAL_KEYS));
 
 export const lifecycleInput = z.preprocess(upperCased, z.enum(LIFECYCLE_STAGES));
+
+const DECISION_CATEGORIES = [
+  "HIRING",
+  "ROADMAP",
+  "PRICING",
+  "INFRASTRUCTURE",
+  "M_AND_A",
+  "GEOGRAPHIC_EXPANSION",
+  "RESTRUCTURING",
+] as const satisfies readonly DecisionCategory[];
+
+export const decisionCategoryInput = z.preprocess(upperCased, z.enum(DECISION_CATEGORIES));
+
+const BUSINESS_MODELS = ["VC_BACKED", "BOOTSTRAPPED"] as const satisfies readonly NonNullable<CompanyFinancialProfile["businessModel"]>[];
+
+export const businessModelInput = z.preprocess(upperCased, z.enum(BUSINESS_MODELS));
 
 export const lowerCasedInput = (value: unknown) => (typeof value === "string" ? value.trim().toLowerCase() : value);
 

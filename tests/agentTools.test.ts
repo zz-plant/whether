@@ -144,7 +144,8 @@ describe("the agent tool registry", () => {
     for (const [question, slug] of Object.entries(asked)) {
       assert.equal(matchDecisionPage(question)?.slug, slug, question);
     }
-    for (const offTopic of ["pizza recipes", "cryptocurrency", "", "   "]) {
+    // One incidental word a page's phrasing happens to use is not a match.
+    for (const offTopic of ["pizza recipes", "cryptocurrency", "", "   ", "should I start a company now", "should our support agent offer a 20% discount to save this customer"]) {
       assert.equal(matchDecisionPage(offTopic), undefined, JSON.stringify(offTopic));
     }
   });
@@ -180,6 +181,44 @@ describe("what an agent may pass, and what it is told when it passes something e
     }
     const rules = await runAgentTool("get_decision_rules", { regime: "cloudy" }, "http");
     assert.deepEqual(Object.keys(rules), ["DEFENSIVE"]);
+  });
+
+  it("prints the rules without a reading nobody took", async () => {
+    const rules = await runAgentTool("get_decision_rules", {}, "http");
+    assert.ok(Object.keys(rules).length > 0);
+    assert.doesNotMatch(JSON.stringify(rules), /\bis 50\b/);
+  });
+
+  it("says when a plan has no rules, and where to look instead", async () => {
+    const price = await runAgentTool("stress_test_plan", { planText: "Raise prices from $9 to $19 a month" }, "http");
+    assert.equal(price.verdict, null);
+    assert.match(JSON.stringify(price.answer), /"slug":"should-startups-raise-prices-now"/);
+    const angel = await runAgentTool("stress_test_plan", { planText: "Take a $50k angel check" }, "http");
+    assert.equal(angel.verdict, null);
+    assert.match(JSON.stringify(angel.answer), /"slug":"should-startups-raise-capital-now"/);
+    const ads = await runAgentTool("lint_sprint_goal", { goalText: "Spend $300 a month on ads for six weeks" }, "http");
+    assert.equal(ads.verdict, "not_graded");
+    assert.equal(ads.answer, null);
+    const retro = await runAgentTool("audit_sprint_retro", { planText: "Quit my contract work" }, "http");
+    assert.equal(retro.verdict, null);
+    assert.equal(retro.violationCount, 0);
+  });
+
+  it("sizes a plan against the figures an agent passes", async () => {
+    const plan = { planText: "Hire 1 engineer at $200k" };
+    const unsized = await runAgentTool("stress_test_plan", plan, "http");
+    assert.equal(unsized.runwayShare, null);
+    const sized = await runAgentTool("stress_test_plan", { ...plan, cashUsd: "300000", monthlySpendUsd: 10_000, monthlyRevenueUsd: 5_000 }, "http");
+    assert.equal(sized.verdict, "DANGEROUS");
+    assert.equal(sized.verdictDriver, "SIZE");
+    assert.match(String(sized.sizingNote), /67% of \$300k cash on hand/);
+  });
+
+  it("grades what the wording could not when the agent names the category", async () => {
+    const plan = await runAgentTool("stress_test_plan", { planText: "Raise prices", category: "pricing" }, "http");
+    assert.equal(plan.detectedCategory, "PRICING");
+    const refused = await refusal(runAgentTool("stress_test_plan", { planText: "Raise prices", category: "ADS" }, "http"));
+    assert.ok(refused.toJSON().problems.some((problem) => problem.argument === "category"));
   });
 
   it("refuses a regime it does not know with every one it does", async () => {

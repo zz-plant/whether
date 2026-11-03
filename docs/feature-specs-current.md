@@ -709,6 +709,11 @@ assumptions optimistic in three ways, and this pass fixed each:
   operating knobs"; the two functions that would have applied it had no callers. The setting,
   the cookie field, and the functions are removed rather than given a consumer the product has
   not asked for (see AGENTS.md on speculative personalization).
+- **A plan the stress test has no rules for gets no verdict (2026-11-03).** Unmatched text classified
+  as a hire, so a price rise, an angel check or an ad test came back "Hire is considered…", the check
+  with its $50k read as a cost; a `detectionConfidence` flag said so and no surface read it. The result
+  is now `verdict: null` with a next step, the page and the plan tools say "Not graded", the record
+  button stays away, and a comparison with such a plan prefers neither.
 - **Numbers were typed in for the reader.** The runway planner and the `/operate` stress test
   opened on fictional companies (including a 75% gross margin no control exposed, which could
   turn RISKY into SAFE). Both now start empty and say what to enter; runway, burn, revenue, and

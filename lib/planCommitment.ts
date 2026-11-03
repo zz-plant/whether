@@ -51,13 +51,13 @@ const MAX_PLAUSIBLE_USD = 1e12;
 const SUFFIX_MULTIPLIERS: Record<string, number> = { k: 1e3, m: 1e6, b: 1e9 };
 
 /*
- * Two shapes, and both are required to carry a marker: a `$`, or a k/m/b suffix.
+ * Three shapes, and each is required to carry a marker: a `$`, a k/m/b suffix, or the word itself.
  * A bare integer must never register as money, or "hire 3 engineers" sizes the
  * plan at three dollars. That is also why the suffix branch is anchored with
  * `\b` — "12 months" and "18 mo" would otherwise read as 12 and 18 million.
  */
 const MONEY_PATTERN =
-  /\$\s?(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*([kKmMbB])?|\b(\d+(?:\.\d+)?)\s*([kKmMbB])\b/g;
+  /\$\s?(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s*([kKmMbB])?|\b(\d+(?:\.\d+)?)\s*([kKmMbB])\b|\b(\d{1,3}(?:,\d{3})+|\d+(?:\.\d+)?)\s+(?:dollars?|usd|bucks)\b/gi;
 
 const PEOPLE_NOUNS =
   "engineers?|developers?|designers?|architects?|leads?|principals?|hires?|reps?|sdrs?|aes?|contractors?|managers?|analysts?|people|persons?|heads?|ftes?|roles?|seats?|headcount";
@@ -91,7 +91,17 @@ const ANNUAL_MARKER = /(\bper\s+year\b|\/\s?yr\b|\bannual(?:ly)?\b|\ba\s+year\b|
  * not shrink the cost ("$10k/mo while maintaining a 9-month runway" is $120k a
  * year, not $90k).
  */
-const TERM_MONTHS = /\b(?:(?:for|over)\s+(\d{1,2})\s+months?|(\d{1,2})[- ]month\b(?!\s*(?:of\s+)?(?:runway|buffer|reserve)\b))/i;
+const TERM_MONTHS = /\b(?:(?:for|over)\s+(\d{1,2}|[a-z]+)\s+months?|(\d{1,2}|[a-z]+)[- ]month\b(?!\s*(?:of\s+)?(?:runway|buffer|reserve)\b))/i;
+/* The same term in weeks, which bills as the months it touches: six weeks of a monthly fee is two months of it. */
+const TERM_WEEKS = /\b(?:(?:for|over)\s+(\d{1,2}|[a-z]+)\s+weeks?|(\d{1,2}|[a-z]+)[- ]week\b)/i;
+
+const SPELLED_NUMBERS = ["one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve"];
+
+const readTermCount = (match: RegExpExecArray | null): number => {
+  const raw = (match?.[1] ?? match?.[2] ?? "").toLowerCase();
+  const spelled = SPELLED_NUMBERS.indexOf(raw);
+  return spelled >= 0 ? spelled + 1 : Number.parseInt(raw, 10);
+};
 
 const usdFormatter = new Intl.NumberFormat("en-US", {
   style: "currency",
@@ -126,7 +136,7 @@ export const formatCommitmentUsd = (value: number): string => {
 const readMoneyTokens = (text: string): number[] => {
   const tokens: number[] = [];
   for (const match of text.matchAll(MONEY_PATTERN)) {
-    const digits = match[1] ?? match[3];
+    const digits = match[1] ?? match[3] ?? match[5];
     const suffix = (match[2] ?? match[4] ?? "").toLowerCase();
     if (!digits) continue;
     const base = Number.parseFloat(digits.replace(/,/g, ""));
@@ -148,8 +158,8 @@ const readHeadcount = (text: string): number | null => {
 
 /** Months a monthly amount runs in the first year: the stated term, or 12. */
 const readMonthsInFirstYear = (text: string): number => {
-  const match = TERM_MONTHS.exec(text);
-  const term = Number.parseInt(match?.[1] ?? match?.[2] ?? "", 10);
+  const weeks = readTermCount(TERM_WEEKS.exec(text));
+  const term = Number.isFinite(weeks) && weeks > 0 ? Math.ceil((weeks * 12) / 52) : readTermCount(TERM_MONTHS.exec(text));
   return Number.isFinite(term) && term > 0 && term < 12 ? term : 12;
 };
 

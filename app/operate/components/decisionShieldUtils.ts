@@ -78,6 +78,11 @@ type BuildShareTextOptions = {
   grossMarginPct?: number;
 };
 
+const comparedPlanLines = (plan: PlanStressTestResult) =>
+  plan.verdict === null
+    ? ["- Decision verdict: Not graded", `- ${plan.headline}`]
+    : [`- Decision verdict: ${plan.verdict}`, `- ${publicDecisionLabels.threshold}: ${plan.boundedGuardrail}`];
+
 export const buildShareText = (
   assessment: RegimeAssessment,
   lifecycle: LifecycleStage,
@@ -99,8 +104,12 @@ export const buildShareText = (
       `Lifecycle: ${formatOptionLabel(lifecycle, lifecycleOptions)}`,
       "",
       `Plan: "${options.planText.trim()}"`,
-      `Decision verdict: ${res.verdict}`,
+      `Decision verdict: ${res.verdict ?? "Not graded"}`,
       `Summary: ${res.headline}`,
+    ];
+    if (res.verdict === null) return [...lines, res.nextStep].join("\n");
+
+    lines.push(
       ...(res.sizingNote ? ["", `Sizing: ${res.sizingNote}`] : []),
       ...(res.fragileAssumptions.length > 0
         ? ["", "What this plan assumes:", ...res.fragileAssumptions.map((a) => `- ${a}`)]
@@ -109,7 +118,7 @@ export const buildShareText = (
       `${publicDecisionLabels.threshold}: ${res.boundedGuardrail}`,
       ...(res.reversibleAlternative ? [`A more reversible version: ${res.reversibleAlternative}`] : []),
       `${publicDecisionLabels.reversal}: ${res.reversalTrigger}`,
-    ];
+    );
 
     return lines.join("\n");
   }
@@ -122,12 +131,10 @@ export const buildShareText = (
       `Recommendation: ${cmp.comparativeRecommendation}`,
       "",
       `Plan A: "${options.planText.trim()}"`,
-      `- Decision verdict: ${cmp.planA.verdict}`,
-      `- ${publicDecisionLabels.threshold}: ${cmp.planA.boundedGuardrail}`,
+      ...comparedPlanLines(cmp.planA),
       "",
       `Plan B: "${options.planBText.trim()}"`,
-      `- Decision verdict: ${cmp.planB.verdict}`,
-      `- ${publicDecisionLabels.threshold}: ${cmp.planB.boundedGuardrail}`,
+      ...comparedPlanLines(cmp.planB),
     ];
 
     return lines.join("\n");

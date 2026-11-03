@@ -173,8 +173,15 @@ export function PlanStressTestMode({
           no panel at all, rather than one that says it is empty. The live region
           is always mounted so the verdict's arrival is announced. */}
       <div aria-live="polite">
-        {planReady ? (
+        {!planReady ? null : (
           <div className="rounded-lg border border-slate-800 bg-slate-950/90 p-4 space-y-3">
+            {stressTestResult.verdict === null ? (
+              <>
+                <p className="type-data text-slate-200 break-words font-medium">{stressTestResult.headline}</p>
+                <p className="text-fluid-xs text-slate-300">{stressTestResult.nextStep}</p>
+              </>
+            ) : (
+              <>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <div>
                 <p className="type-label text-slate-400">Decision verdict</p>
@@ -237,8 +244,10 @@ export function PlanStressTestMode({
                 <p className="text-fluid-xs text-slate-300 mt-0.5">{stressTestResult.reversalTrigger}</p>
               </div>
             </div>
+              </>
+            )}
           </div>
-        ) : null}
+        )}
       </div>
     </div>
   );
@@ -271,6 +280,23 @@ const COMPARISON_TEMPLATES = [
     planB: "Allocate 40% sprint capacity to tech debt refactor",
   },
 ] as const;
+
+function ComparedPlanVerdict({ plan }: { plan: PlanStressTestResult }) {
+  const tone =
+    plan.verdict === null
+      ? "bg-slate-500/20 text-slate-300"
+      : plan.verdict === "SAFE"
+      ? "bg-emerald-500/20 text-emerald-300"
+      : plan.verdict === "RISKY"
+      ? "bg-amber-500/20 text-amber-300"
+      : "bg-rose-500/20 text-rose-300";
+  return (
+    <>
+      <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${tone}`}>Verdict: {plan.verdict ?? "Not graded"}</span>
+      <p className="text-fluid-xs text-slate-300 mt-1.5">{plan.verdict === null ? plan.headline : plan.reversibleAlternative}</p>
+    </>
+  );
+}
 
 export function ComparePlansMode({
   planText,
@@ -320,16 +346,7 @@ export function ComparePlansMode({
                 />
                 {planReady ? (
                 <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
-                  <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
-                    comparisonResult.planA.verdict === "SAFE"
-                      ? "bg-emerald-500/20 text-emerald-300"
-                      : comparisonResult.planA.verdict === "RISKY"
-                      ? "bg-amber-500/20 text-amber-300"
-                      : "bg-rose-500/20 text-rose-300"
-                  }`}>
-                    Verdict: {comparisonResult.planA.verdict}
-                  </span>
-                  <p className="text-fluid-xs text-slate-300 mt-1.5">{comparisonResult.planA.reversibleAlternative}</p>
+                  <ComparedPlanVerdict plan={comparisonResult.planA} />
                 </div>
                 ) : null}
               </div>
@@ -346,16 +363,7 @@ export function ComparePlansMode({
                 />
                 {planBText.trim() ? (
                 <div className="p-3 bg-slate-950/90 border border-slate-800 rounded-lg">
-                  <span className={`px-2 py-0.5 text-fluid-nano font-bold rounded ${
-                    comparisonResult.planB.verdict === "SAFE"
-                      ? "bg-emerald-500/20 text-emerald-300"
-                      : comparisonResult.planB.verdict === "RISKY"
-                      ? "bg-amber-500/20 text-amber-300"
-                      : "bg-rose-500/20 text-rose-300"
-                  }`}>
-                    Verdict: {comparisonResult.planB.verdict}
-                  </span>
-                  <p className="text-fluid-xs text-slate-300 mt-1.5">{comparisonResult.planB.reversibleAlternative}</p>
+                  <ComparedPlanVerdict plan={comparisonResult.planB} />
                 </div>
                 ) : null}
               </div>

@@ -2,10 +2,16 @@ import assert from "node:assert/strict";
 import { beforeEach, describe, it } from "bun:test";
 import { POST as postDecisionMemoryRoute } from "../app/api/decision-memory/route";
 import { buildPlanStressTestMemoryPayload, parseDecisionMemoryEntry } from "../lib/decisionMemory";
-import { stressTestDecisionPlan } from "../lib/decisionShield";
+import { stressTestDecisionPlan as runStressTest, type GradedPlan } from "../lib/decisionShield";
 import { evaluateRegime } from "../lib/regimeEngine";
 import { resetDecisionMemoryRepository } from "../lib/storage/decisionMemoryRepository";
 import type { TreasuryData } from "../lib/types";
+
+const stressTestDecisionPlan = (...args: Parameters<typeof runStressTest>): GradedPlan => {
+  const plan = runStressTest(...args);
+  if (plan.verdict === null) throw new Error(`Expected a verdict: ${plan.headline}`);
+  return plan;
+};
 
 const treasury: TreasuryData = {
   record_date: "2026-08-31",

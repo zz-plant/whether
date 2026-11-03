@@ -3,9 +3,15 @@
  */
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { companyFinancialProfileFor, evaluateDecision, stressTestDecisionPlan, compareDecisionPlans } from "../lib/decisionShield";
+import { companyFinancialProfileFor, evaluateDecision, stressTestDecisionPlan as runStressTest, compareDecisionPlans, type GradedPlan } from "../lib/decisionShield";
 import { buildShareText } from "../app/operate/components/decisionShieldUtils";
 import type { RegimeAssessment } from "../lib/regimeEngine";
+
+const stressTestDecisionPlan = (...args: Parameters<typeof runStressTest>): GradedPlan => {
+  const plan = runStressTest(...args);
+  if (plan.verdict === null) throw new Error(`Expected a verdict: ${plan.headline}`);
+  return plan;
+};
 
 describe("decision shield verdicts", () => {
   it("flags hiring as dangerous in scarcity", () => {
@@ -383,6 +389,7 @@ describe("stress test — sizing the plan against available cash", () => {
     // $700k of $2.7m is 26%: over the 25% line, under the 50% one.
     const elevated = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "a $700k platform contract",
+      category: "INFRASTRUCTURE",
       companyProfile: cashProfile,
     });
     assert.equal(elevated.verdict, "RISKY");
@@ -454,10 +461,46 @@ describe("stress test — sizing the plan against available cash", () => {
 });
 
 describe("stress test — detection confidence", () => {
-  it("flags a sentence that named no decision type, rather than silently grading it as a hire", () => {
-    const result = stressTestDecisionPlan(buildExpansionAssessment(), { planText: "asdf qwerty" });
-    assert.equal(result.detectedAction, "HIRE");
-    assert.equal(result.detectionConfidence, "ASSUMED");
+  it("gives no verdict for a sentence that names no decision it has rules for", () => {
+    for (const planText of [
+      "asdf qwerty",
+      "Spend $300 a month on Google ads for six weeks",
+      "Quit my contract work to go full time on my SaaS",
+      "Repay 20% of loan principal",
+    ]) {
+      const result = runStressTest(buildExpansionAssessment(), { planText });
+      assert.equal(result.verdict, null, planText);
+      assert.match(result.headline, /^Not graded/, planText);
+    }
+  });
+
+  it("does not read money coming in as a cost, or a price rise as a discount", () => {
+    for (const planText of ["Take a $50k angel check", "Raise a $2M seed round to hire 3 engineers", "Raise capital this quarter"]) {
+      const result = runStressTest(buildExpansionAssessment(), { planText });
+      assert.equal(result.verdict, null, planText);
+      assert.ok(result.verdict === null && result.answerTopic === "should-startups-raise-capital-now", planText);
+    }
+    for (const planText of ["Raise prices from $9 to $19 a month", "Raise my price to $19", "Increase our annual pricing", "Ship a price increase"]) {
+      const result = runStressTest(buildExpansionAssessment(), { planText });
+      assert.equal(result.verdict, null, planText);
+      assert.ok(result.verdict === null && result.answerTopic === "should-startups-raise-prices-now", planText);
+    }
+  });
+
+  it("still grades the discount side of pricing, in the plural too", () => {
+    const result = stressTestDecisionPlan(buildExpansionAssessment(), { planText: "Cut prices 20% with discounts for annual prepay" });
+    assert.equal(result.detectedAction, "DISCOUNT");
+  });
+
+  it("lets a caller who knows the kind of decision grade what the wording could not", () => {
+    const result = stressTestDecisionPlan(buildExpansionAssessment(), { planText: "Raise prices from $9 to $19", category: "PRICING" });
+    assert.equal(result.detectedCategory, "PRICING");
+  });
+
+  it("compares nothing when a plan has no verdict", () => {
+    const comparison = compareDecisionPlans(buildExpansionAssessment(), "Quit my contract work", "Hire 1 engineer at $150k");
+    assert.equal(comparison.preferredPlan, null);
+    assert.equal(comparison.comparativeRecommendation, "Plan A could not be graded, so there is nothing to compare yet.");
   });
 
   it("reports a real keyword match as matched", () => {
@@ -465,31 +508,26 @@ describe("stress test — detection confidence", () => {
       planText: "signing a $50k annual cloud commit",
     });
     assert.equal(cloud.detectedCategory, "INFRASTRUCTURE");
-    assert.equal(cloud.detectionConfidence, "MATCHED");
 
     const prepay = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "Prepay annual SaaS vendor for $60k to lock in a 25% discount",
     });
     assert.equal(prepay.detectedCategory, "PRICING");
-    assert.equal(prepay.detectionConfidence, "MATCHED");
 
     const techDebt = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "Allocate 40% sprint capacity to tech debt refactor",
     });
     assert.equal(techDebt.detectedCategory, "ROADMAP");
-    assert.equal(techDebt.detectionConfidence, "MATCHED");
 
     const poach = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "Poach 1 principal architect from competitor",
     });
     assert.equal(poach.detectedCategory, "HIRING");
-    assert.equal(poach.detectionConfidence, "MATCHED");
 
     const usageFlex = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "Shift enterprise renewals from $60k ARR commit to usage flex",
     });
     assert.equal(usageFlex.detectedCategory, "PRICING");
-    assert.equal(usageFlex.detectionConfidence, "MATCHED");
   });
 
   it("does not read a bare role noun as a hire", () => {
@@ -498,18 +536,16 @@ describe("stress test — detection confidence", () => {
       planText: "Reduce sales lead time with a pricing discount",
     });
     assert.equal(leadTime.detectedCategory, "PRICING");
-    assert.equal(leadTime.detectionConfidence, "MATCHED");
 
-    const loan = stressTestDecisionPlan(buildExpansionAssessment(), {
+    const loan = runStressTest(buildExpansionAssessment(), {
       planText: "Repay 20% of loan principal",
     });
-    assert.equal(loan.detectionConfidence, "ASSUMED");
+    assert.equal(loan.verdict, null);
 
     const starter = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "Hire 1 principal architect at $240k during competitor freeze",
     });
     assert.equal(starter.detectedCategory, "HIRING");
-    assert.equal(starter.detectionConfidence, "MATCHED");
   });
 
   it("reads recruit and numbered add/open as hiring, without claiming a bare office", () => {
@@ -519,7 +555,6 @@ describe("stress test — detection confidence", () => {
       planText: "Recruit 1 principal architect to rebuild our architecture",
     });
     assert.equal(recruit.detectedCategory, "HIRING");
-    assert.equal(recruit.detectionConfidence, "MATCHED");
 
     const add = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "Add 3 engineers to the platform team",
@@ -538,7 +573,6 @@ describe("stress test — detection confidence", () => {
       category: "PRICING",
     });
     assert.equal(result.detectedCategory, "PRICING");
-    assert.equal(result.detectionConfidence, "MATCHED");
   });
 });
 
@@ -567,6 +601,7 @@ describe("stress test — runway prose matches the rule it applies", () => {
     // full year, not 9 months.
     const result = stressTestDecisionPlan(buildExpansionAssessment(), {
       planText: "Pay $10k/mo while maintaining a 9-month runway",
+      category: "INFRASTRUCTURE",
       companyProfile: cashProfile,
     });
     assert.equal(result.commitment.annualUsd, 120_000);
@@ -697,6 +732,7 @@ describe("compare — the one-click templates grade what they say", () => {
       "Engage 1 specialized contractor for 3 months at $15k/mo",
       { cashBalanceUsd: 500_000 },
     );
+    assert.ok(result.planA.verdict !== null && result.planB.verdict !== null);
     assert.equal(result.planA.commitment.annualUsd, 400_000);
     assert.equal(result.planB.commitment.annualUsd, 45_000);
     assert.equal(result.planA.verdict, "DANGEROUS");

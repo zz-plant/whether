@@ -314,5 +314,27 @@ describe("DecisionShieldPanel markup", () => {
       assert.ok(markup.includes("Saved scenarios"), "dropdown presets render in dropdown mode");
     });
   });
-});
 
+  it("shows a plan with no rules as not graded, with no verdict badge or lines to follow", () => {
+    const html = renderToStaticMarkup(
+      <PlanStressTestMode
+        planText="Raise prices from $9 to $19"
+        setPlanText={() => {}}
+        planReady
+        profile={EMPTY_OPERATOR_PROFILE}
+        setProfileField={() => {}}
+        businessModel="BOOTSTRAPPED"
+        setBusinessModel={() => {}}
+        stressTestResult={{
+          verdict: null,
+          headline: "Not graded: this raises a price, and the stress test grades discounts, the opposite move.",
+          nextStep: "It grades hiring.",
+          answerTopic: "should-startups-raise-prices-now",
+        }}
+      />,
+    );
+    assert.match(html, /Not graded: this raises a price/);
+    assert.match(html, /It grades hiring\./);
+    assert.doesNotMatch(html, /Decision verdict/);
+  });
+});

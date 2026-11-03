@@ -1,7 +1,13 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import { compareDecisionPlans, stressTestDecisionPlan } from "../lib/decisionShield";
+import { compareDecisionPlans, stressTestDecisionPlan as runStressTest, type GradedPlan } from "../lib/decisionShield";
 import type { RegimeAssessment } from "../lib/regimeEngine";
+
+const stressTestDecisionPlan = (...args: Parameters<typeof runStressTest>): GradedPlan => {
+  const plan = runStressTest(...args);
+  if (plan.verdict === null) throw new Error(`Expected a verdict: ${plan.headline}`);
+  return plan;
+};
 
 const createMockAssessment = (overrides: Partial<RegimeAssessment> = {}): RegimeAssessment =>
   ({
