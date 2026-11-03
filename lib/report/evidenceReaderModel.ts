@@ -244,7 +244,7 @@ export const buildTrustStripProps = ({
   degradedSourceCount?: number;
   confidenceLabel: TrustStripProps["confidenceLabel"];
   /** Which inputs set the scores, and what the ones left out would do (`ReportData.scoringBasis`). */
-  scoringBasis?: Pick<ScoringBasis, "key" | "value" | "warning" | "warningShort">;
+  scoringBasis?: Pick<ScoringBasis, "key" | "value" | "warning" | "warningShort" | "consequence">;
   /** Why the published week's conditions differ, where the basis is why (`describePublishedWeekBasis`): the homepage's alone. */
   basisNote?: string | null;
   assessment: Parameters<typeof couldCallChangeNextWeek>[0] & {
@@ -283,6 +283,7 @@ export const buildTrustStripProps = ({
       value: scoringBasis?.value ?? "The record's inputs",
       warning: scoringBasis?.warning ?? null,
       warningShort: scoringBasis?.warningShort ?? null,
+      consequence: scoringBasis?.consequence ?? null,
       note: basisNote ?? null,
     },
   };

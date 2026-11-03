@@ -1,5 +1,5 @@
 import type { TimeMachineRegimeEntry } from "../timeMachine/timeMachineCache";
-import { REGIME_SEVERITY_RANK, getRegimePublicLabel } from "../regimePresentation";
+import { REGIME_SEVERITY_RANK, getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
 import type { RegimeKey } from "../regimeEngine";
 import { signalReadingMeaning } from "./signalTranslations";
 import { formatMonthLabel } from "../timeMachine/monthFormatting";
@@ -192,6 +192,96 @@ const spellsOf = (series: readonly TimeMachineRegimeEntry[]): Spell[] => {
     }
   }
   return spells;
+};
+
+/**
+ * Since when this week's conditions have held, for the card's stamp line: "Since Apr
+ * 2026" (2026-11-03). A reader can't tell from "Cloudy" alone whether it is this week's
+ * news or the standing state. Null when the latest month-end is not in these
+ * conditions (a change that began this week, which the stamp's "Was …" already says)
+ * or the record does not reach back to a change.
+ */
+export const describeConditionsSince = ({
+  series,
+  currentRegime,
+}: {
+  series: readonly TimeMachineRegimeEntry[];
+  currentRegime: RegimeKey;
+}): string | null => {
+  const spells = spellsOf(series);
+  const current = spells.at(-1);
+  if (spells.length < 2 || !current || current.regime !== currentRegime) return null;
+  return `Since ${formatMonthLabel(current.start.year, current.start.month)}`;
+};
+
+/**
+ * Where a score sits against every month-end on the record, in words, for a reader who
+ * has no feel for the 0–100 scale (2026-11-03): "higher than in most months since 2012",
+ * or "about typical" in the middle fifth. Words, not "9 of 10": the reader needs the
+ * rank, not a second fraction beside the score. Higher and lower, not better and worse:
+ * the sentence it sits in says which way the score is bad.
+ */
+const shareWords = (share: number) => (share >= 0.95 ? "almost every month" : "most months");
+
+const describeScoreAgainstRecord = ({
+  series,
+  metric,
+  value,
+}: {
+  series: readonly TimeMachineRegimeEntry[];
+  metric: "tightness" | "riskAppetite";
+  value: number;
+}): string | null => {
+  const firstYear = [...series].sort((a, b) => a.recordDate.localeCompare(b.recordDate)).at(0)?.year;
+  if (series.length < 24 || firstYear === undefined) return null;
+  const below = series.filter((entry) => entry[metric] < value).length / series.length;
+  const above = series.filter((entry) => entry[metric] > value).length / series.length;
+  if (below >= 0.6) return `higher than in ${shareWords(below)} since ${firstYear}`;
+  if (above >= 0.6) return `lower than in ${shareWords(above)} since ${firstYear}`;
+  return "about typical";
+};
+
+/*
+ * Which side of each change line each condition sits on. From the assessed conditions,
+ * not the raw scores, so the facts under the weather word cannot disagree with it while
+ * a change waits on its second reading.
+ */
+const CONDITION_SIDES: Record<RegimeKey, { money: "pricey" | "cheap"; investors: "willing" | "wary" }> = {
+  SCARCITY: { money: "pricey", investors: "wary" },
+  DEFENSIVE: { money: "pricey", investors: "willing" },
+  VOLATILE: { money: "cheap", investors: "wary" },
+  EXPANSION: { money: "cheap", investors: "willing" },
+};
+
+/**
+ * The two plain facts the weather word stands for, each with its score set against the
+ * record (2026-11-03): "Money is pricey: funding pressure 90, higher than in most
+ * months since 2012. Investors are willing: risk appetite 53, about typical." It takes
+ * the place of the regime's one-line rationale under the call: the four words are not a
+ * severity scale (Stormy is not worse than Cloudy), and the two facts are what they
+ * encode. Null for an unmodelled regime.
+ */
+export const describeConditionFacts = ({
+  series,
+  regime,
+  tightness,
+  riskAppetite,
+}: {
+  series: readonly TimeMachineRegimeEntry[];
+  regime: string;
+  tightness: number;
+  riskAppetite: number;
+}): string | null => {
+  if (!isRegimeKey(regime)) return null;
+  const sides = CONDITION_SIDES[regime];
+  /* "since 2012" once: the second comparison is against the same record. */
+  const pressure = describeScoreAgainstRecord({ series, metric: "tightness", value: tightness });
+  const appetiteRecord = describeScoreAgainstRecord({ series, metric: "riskAppetite", value: riskAppetite });
+  const appetite = pressure?.includes(" since ") ? appetiteRecord?.replace(/ since \d{4}$/, "") : appetiteRecord;
+  return (
+    `Money is ${sides.money}: funding pressure ${Math.round(tightness)}${pressure ? `, ${pressure}` : ""}. ` +
+    `Investors are ${sides.investors}: risk appetite ${Math.round(riskAppetite)}${appetite ? `, ${appetite}` : ""}.`
+  );
 };
 
 /* Months, as a colleague counts them (2026-10-28). Each is a month-end reading, and the
