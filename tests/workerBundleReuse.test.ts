@@ -24,8 +24,8 @@ describe("worker bundle freshness (isWorkerBundleCurrent)", () => {
   });
 
   const MARKER = [".cloudflare", "output", "v0", "config.json"];
-  const writeMarker = (root: string, mode: string) =>
-    writeFileSync(join(root, ...MARKER), JSON.stringify({ buildContext: { isPreview: false, mode } }));
+  const writeMarker = (root: string, mode: string, isPreview = false) =>
+    writeFileSync(join(root, ...MARKER), JSON.stringify({ buildContext: { isPreview, mode } }));
 
   /** A tree whose Build Output is a current production build: sources written first, the marker last. */
   const makeCurrentFixture = () => {
@@ -48,7 +48,7 @@ describe("worker bundle freshness (isWorkerBundleCurrent)", () => {
     assert.equal(isWorkerBundleCurrent(root), false);
   });
 
-  it("is not current when the marker is missing, unreadable, or records another mode", () => {
+  it("is not current when the marker is missing, unreadable, or records another mode or a preview", () => {
     const missing = makeCurrentFixture();
     rmSync(join(missing, ...MARKER), { force: true });
     assert.equal(isWorkerBundleCurrent(missing), false);
@@ -57,9 +57,14 @@ describe("worker bundle freshness (isWorkerBundleCurrent)", () => {
     writeFileSync(join(unreadable, ...MARKER), "not json");
     assert.equal(isWorkerBundleCurrent(unreadable), false);
 
-    // A preview build is the other lane's Worker: deploy:cloudflare must never reuse it.
+    const otherMode = makeCurrentFixture();
+    writeMarker(otherMode, "development");
+    assert.equal(isWorkerBundleCurrent(otherMode), false);
+
+    // A Worker Preview build records the production mode too, and lands in the same directory
+    // on every branch build: deploy:cloudflare must never reuse it.
     const preview = makeCurrentFixture();
-    writeMarker(preview, "preview");
+    writeMarker(preview, "production", true);
     assert.equal(isWorkerBundleCurrent(preview), false);
   });
 });
