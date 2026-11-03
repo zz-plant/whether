@@ -20,6 +20,14 @@ import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigat
  *
  * Each area's name opens what the picker knows about it under its own rule (`detail`).
  * The five choices that did that sat under the groups and printed the five names again.
+ *
+ * The name is drawn as a control (2026-11-03): a bordered disclosure trigger, the
+ * week picker's shape. It was a dotted underline, the mark the card's defined terms
+ * carry, so the five names read as definitions and the runway test and "Set your own
+ * rules" behind them went unopened. The border and fill are utilities, not
+ * `.weather-button`: that class lifts on hover and presses on :active with a
+ * transform, which would pin the row-wide ::after to the button mid-hover and drop a
+ * press that started on the rule.
  */
 const HEADING_INK: Record<AreaGroup["state"], string> = {
   crossed: "text-line-crossed-fg",
@@ -93,7 +101,8 @@ export function AreaGroups({
                         the glyph or the sentence and got nothing. The button's ::after spans
                         this header, not the detail under it, so the detail's own links work. */}
                     <div className={`col-span-2 grid grid-cols-subgrid ${onToggle ? "group relative" : ""}`}>
-                      <AreaIcon area={entry.area} className="mt-1 shrink-0 text-slate-400" />
+                      {/* Centred on the bordered name when it is a button, on the first line of text when not. */}
+                      <AreaIcon area={entry.area} className={`shrink-0 text-slate-400 ${onToggle ? "mt-1.5" : "mt-1"}`} />
                       <p>
                         {onToggle ? (
                           <button
@@ -101,12 +110,12 @@ export function AreaGroups({
                             aria-expanded={open}
                             aria-controls={open ? `area-${entry.area}-detail` : undefined}
                             onClick={() => onToggle(entry.area)}
-                            className="inline-flex cursor-pointer items-baseline gap-1 rounded-sm font-semibold text-slate-50 underline decoration-slate-500 decoration-dotted underline-offset-4 after:absolute after:inset-0 after:rounded-sm group-hover:decoration-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                            className="mr-1 inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-raised)] px-2 py-0.5 align-baseline font-semibold text-slate-50 after:absolute after:inset-0 after:rounded-sm group-hover:border-[color:var(--accent-action)] aria-expanded:border-[color:var(--accent-action)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                           >
                             {entry.label}
                             <ChevronDown
                               aria-hidden="true"
-                              className={`size-3.5 self-center text-slate-400 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`}
+                              className={`size-3.5 text-slate-300 transition-transform motion-reduce:transition-none ${open ? "rotate-180" : ""}`}
                             />
                           </button>
                         ) : (

@@ -12,7 +12,11 @@ describe("home route render contract", () => {
       source.indexOf("<CadenceSelector") > source.indexOf("<DecisionHero"),
       "the call must precede its secondary horizon control",
     );
-    assert.match(source, /horizon=\{<CadenceSelector \/>\}/, "the control is CompanyCalibration's horizon slot");
+    assert.match(
+      source,
+      /horizon=\{\{ control: <CadenceSelector \/>, current: activeCadence \}\}/,
+      "the control is CompanyCalibration's horizon slot, with the horizon in force for its folded line",
+    );
     assert.ok(
       source.indexOf("<CadenceSelector") > source.indexOf("<CompanyCalibration"),
       "the horizon renders inside the calibration fold",

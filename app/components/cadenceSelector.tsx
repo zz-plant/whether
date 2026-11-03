@@ -45,9 +45,9 @@ function buildHref(
  *
  * It used to sit at the foot of the page while the card it controls renders at
  * the top, and compensated with a `scrollIntoView` back up — so operating the
- * control correctly required an involuntary scroll. It now sits directly under
- * the call beside Copy Brief: adjacent to its target without pushing the call
- * down on a phone. It needs no reveal.
+ * control correctly required an involuntary scroll. It sat beside Copy Brief
+ * under the call until 2026-11-03, and folds with stage and runway now: it is set
+ * once, and the folded line names the horizon in force (`CompanyCalibration`).
  */
 export function CadenceSelector({ onNavigate }: { onNavigate?: (key: string) => void } = {}) {
   const router = useRouter();

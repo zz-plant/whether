@@ -944,7 +944,7 @@ async function PageContent({
                 activeRunway={activeRunway}
                 runwayEmphasis={runwayEmphasis}
                 stageAction={stageAction}
-                horizon={<CadenceSelector />}
+                horizon={{ control: <CadenceSelector />, current: activeCadence }}
               />
             ) : null}
 

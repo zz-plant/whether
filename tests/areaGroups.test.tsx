@@ -204,6 +204,21 @@ describe("AreaGroups", () => {
     assert.doesNotMatch(header, /weather-hit/, "a positioned button would pin the ::after to itself");
   });
 
+  it("draws each name as a control, not as a defined term", () => {
+    // The dotted underline is the defined-term mark on the card; on the names it read
+    // as a definition, and the runway test behind each one went unopened.
+    const html = renderToStaticMarkup(<AreaGroups groups={buildAreaGroups(ROWS, SCORES)} onToggle={() => {}} />);
+    const buttons = html.match(/<button type="button" aria-expanded=[^>]*>/g) ?? [];
+    assert.equal(buttons.length, 5);
+    for (const button of buttons) {
+      assert.match(button, /\brounded-lg border border-\[color:var\(--border-strong\)\]/, "the control radius and border");
+      assert.doesNotMatch(button, /decoration-dotted/);
+      // `.weather-button` moves on hover and :active; a transform would make the button
+      // the row-wide ::after's containing block mid-press.
+      assert.doesNotMatch(button, /weather-button/);
+    }
+  });
+
   it("renders nothing with no groups", () => {
     assert.equal(renderToStaticMarkup(<AreaGroups groups={[]} />), "");
   });
