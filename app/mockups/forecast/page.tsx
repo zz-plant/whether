@@ -130,7 +130,7 @@ export default async function ForecastMockupPage() {
       <div className="mx-auto max-w-5xl space-y-8 px-4 py-6">
         <p className="rounded-md border border-dashed border-slate-600 px-3 py-2 text-xs text-slate-400">
           Concept, not the product: this week&rsquo;s reading ({homepage.reportShell.recordDateLabel}) laid out the way a
-          weather forecast is. <Link href="/" className="underline underline-offset-4">The brief as it ships</Link>
+          weather forecast is. <Link href="/" className="underline underline-offset-4">The live brief</Link>
         </p>
 
         {/* 1. What it means for you: impact levels, the way a warning service leads. */}
