@@ -354,6 +354,26 @@ until the report resolves.
   below 70 and risk appetite above 50: Sunny. The opposite: Freezing. Both above: Cloudy. Both
   below: Stormy.") instead of both numbers for each of the four.
 
+### 1.1.0t The card for a reader without the macro background (2026-11-03)
+
+- **Two plain facts under the call.** The regime's one-line rationale and the bare scores
+  ("Money is available but pricey. Funding pressure 90, risk appetite 55.") became the two facts
+  the weather word stands for, each score set against every month-end since 2012
+  (`describeConditionFacts`): "Money is pricey: funding pressure 90, higher than in most months
+  since 2012. Investors are willing: risk appetite 53, lower than in most months." The sides come
+  from the assessed conditions, so the facts cannot disagree with the weather word while a change
+  waits on confirmation. The rank is in words ("most months", "almost every month", "about
+  typical"), not a second fraction.
+- **Since when.** The stamp line opens with "Since Sep 2026" when the latest month-end is in
+  this week's conditions (`describeConditionsSince`); a week the conditions changed keeps "Was …".
+- **The strip says what a caveat would change.** A strip that links to /trust leaves the routine
+  cells (live sources, the record's own inputs) to /trust at every width, and the left-out
+  inputs' warning reads as its consequence: "Startup-market inputs left out · Counted, conditions
+  would be Freezing." (`ScoringBasis.consequence`). Unlinked strips (/trust itself) keep every
+  cell and the full sentence.
+- The map on the card no longer repeats both scores in its header; the facts line beside it
+  states them.
+
 ### 1.1.1 Decision Hero operator shortcuts (2026-08-29)
 The Decision Hero header embeds two progressive-disclosure operator shortcuts (the separate
 Slack copy button and the MCP/API chip were removed on 2026-09-02: `Copy Brief` already produces

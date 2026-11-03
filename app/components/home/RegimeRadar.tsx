@@ -183,9 +183,12 @@ export function RegimeRadar({
     >
       <div className="mb-1.5 flex w-full flex-wrap items-center justify-between gap-x-2 gap-y-1 text-fluid-nano text-slate-300">
         <span className="font-semibold text-slate-100">Conditions</span>
-        <span className="tabular-nums text-slate-400">
-          Funding pressure {tightness} · Risk appetite {riskAppetite}
-        </span>
+        {/* Not on the card (2026-11-03): the facts line beside the map states both scores. */}
+        {compact ? null : (
+          <span className="tabular-nums text-slate-400">
+            Funding pressure {tightness} · Risk appetite {riskAppetite}
+          </span>
+        )}
       </div>
       {/* The picture's text alternative: which side of each change line is which
           condition. On the brief it is the only statement of the four from `md`

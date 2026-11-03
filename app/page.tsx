@@ -89,7 +89,7 @@ import { frameFactsAttributes } from "../lib/navigation/runningHead";
 import { ScoreLadder } from "./components/ui/scoreLadder";
 import { resolveGlobalHeaderRouteLabel } from "../lib/navigation/globalHeader";
 import { DecisionPicker, type DecisionPickerOption } from "./components/home/DecisionPicker";
-import { describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
+import { describeConditionFacts, describeConditionsSince, describeSpellLengths, findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
 import { formatMonthLabel } from "../lib/timeMachine/monthFormatting";
 import { findLeadAnswerForArea } from "./answers/decisionPages";
@@ -631,7 +631,14 @@ async function PageContent({
   const heroReading = {
     numbers: `Funding pressure ${Math.round(tightness)}, risk appetite ${Math.round(riskAppetite)}.`,
     whyHref: `#${HOME_SECTIONS.diagnosis.id}`,
+    /* The two facts the weather word stands for, each score against the record
+       (2026-11-03). Live readings only: an archived month is set against a record
+       that runs past it. */
+    facts: historicalSelection ? null : describeConditionFacts({ series: recordSeries, regime, tightness, riskAppetite }),
   };
+  const conditionsSince = historicalSelection || !isRegimeKey(regime)
+    ? undefined
+    : describeConditionsSince({ series: recordSeries, currentRegime: regime }) ?? undefined;
   const heroAreas = heldAreasLine
     ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
     : undefined;
@@ -799,6 +806,7 @@ async function PageContent({
                 regime={regime}
                 direction={historicalSelection ? undefined : cardCall.directionLabel}
                 earlier={earlierConditions}
+                since={conditionsSince}
                 /* The map from `md` up, where it is the one definition of the four
                    conditions: each change line's value at its end, the path's
                    domain as its caption, and the link to how the lines are set.
