@@ -5,7 +5,6 @@ import { HOME_SECTIONS, type HomeLadderLine } from "../../../lib/report/home/hom
 import { RegimeRadar } from "./RegimeRadar";
 import { regimeAtCoordinates } from "../../../lib/regimePhaseSpace";
 import { DEFAULT_THRESHOLDS } from "../../../lib/regimeEngineCore";
-import { DecisionLineKey } from "../illustrations/DecisionLineKey";
 
 type HomeScoreLadder = {
   metric: "tightness" | "riskAppetite";
@@ -109,17 +108,9 @@ export function WhatWouldChangeSection({
 
   return (
     <HomeSection id={HOME_SECTIONS.watch.id} heading={HOME_SECTIONS.watch.heading}>
-      {/* The three lines key folded by default to preserve scan speed (2026-10-25).
-          Available with one click for readers who want line definitions without
-          interrupting the primary flip triggers and pause conditions. */}
-      <details className="weather-auto-chevron mb-5 max-w-3xl text-fluid-xs text-slate-300">
-        <summary className="cursor-pointer select-none font-medium text-slate-400 hover:text-slate-200">
-          What the three lines do (pause, resume, change)
-        </summary>
-        <div className="mt-3">
-          <DecisionLineKey />
-        </div>
-      </details>
+      {/* No key to the three lines (2026-11-03): the two questions below answer
+          what each line does, in the reader's terms, and the key was a third
+          explanation of the mechanism on one page. */}
       <div
         className={
           ladders.length === 0
@@ -199,7 +190,7 @@ export function WhatWouldChangeSection({
                 ) : null}
               </dl>
               <p className="max-w-[52ch] text-fluid-xs leading-relaxed text-slate-400">
-                A change in conditions doesn&rsquo;t mean you can resume. Unfreezing requires a safety buffer past the change line (crossing the restart line) to prevent whipsaw.
+                Better conditions alone don&rsquo;t lift a pause. The restart condition sits further out, so one good week can&rsquo;t undo it.
               </p>
             </div>
           ) : null}

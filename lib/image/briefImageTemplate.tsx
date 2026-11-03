@@ -2,7 +2,7 @@ import type { CSSProperties, ReactElement } from "react";
 import type { ScoreReadingParts } from "../export/scoreReference";
 import { REGIME_HEX_COLORS } from "../regimePhaseSpace";
 import { getRegimePublicLabel, isRegimeKey } from "../regimePresentation";
-import { formatMarginBand } from "../report/reportFormatting";
+import { formatMarginStamp } from "../report/reportFormatting";
 import { OG_FONT_BODY, OG_FONT_DISPLAY, OG_FONT_STAMP, toImageSafeText } from "./ogFonts";
 import { OG_BG, OG_BORDER, OG_CONDITION_INK, OG_LINE_CROSSED, OG_PANEL, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "./ogTheme";
 import { SANS_EM, DISPLAY_EM, fitLines, wrappedLines } from "./textFit";
@@ -187,7 +187,7 @@ const renderStandardBriefImage = (props: BriefImageProps, palette: typeof DARK_P
      The colour keys off the raw code, which is what the engine stores; only
      the words a reader sees change. */
   const confidenceColour = confidenceColor(props.confidenceLabel, palette);
-  const confidenceBadge = toImageSafeText(formatMarginBand(props.confidenceLabel)).toUpperCase();
+  const confidenceBadge = toImageSafeText(formatMarginStamp(props.confidenceLabel)).toUpperCase();
   const source = sourceLabel ? `Source: ${fitLines(sourceLabel, 22, SOURCE_WIDTH, SANS_EM, 1)}` : "";
   const context = contextLabel ? fitLines(contextLabel, 22, CONTEXT_WIDTH, SANS_EM, 1) : "";
 
@@ -365,7 +365,7 @@ const renderVariantBriefImage = (props: BriefImageProps, variant: BriefImageVari
       <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: 24 }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 24 }}>
           <div style={{ display: "flex", padding: "4px 12px", borderRadius: 2, border: `1px solid ${confidenceInk}`, color: confidenceInk, fontSize: 22, fontWeight: 600, letterSpacing: "0.04em" }}>
-            {toImageSafeText(formatMarginBand(props.confidenceLabel)).toUpperCase()}
+            {toImageSafeText(formatMarginStamp(props.confidenceLabel)).toUpperCase()}
           </div>
           <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: palette.secondary }}>whether.work</div>
         </div>

@@ -124,18 +124,18 @@ describe("CadenceCallCard", () => {
     assert.match(html, /id="cadence-band-riskAppetite-monthly-title"/);
     assert.match(html, /Funding pressure: 61/);
     assert.match(html, /Risk appetite: 56/);
-    // Distance to each edge, named as the pause line and the restart line — the
-    // two names the rest of the page uses for the pair.
-    assert.ok(html.includes("15 points from the pause line · 5 from the restart line"));
-    assert.ok(html.includes("12 points from the pause line · 2 from the restart line"));
+    // Distance to each edge, in the verbs the rest of the page uses for the pair:
+    // pausing and restarting.
+    assert.ok(html.includes("15 points from pausing · 5 from restarting"));
+    assert.ok(html.includes("12 points from pausing · 2 from restarting"));
   });
 
   it("states a tripped edge rather than measuring zero distance to it", () => {
     // The bare fixture reads 100 against a 76 guardrail: already past it, not near it.
     const html = render("monthly");
 
-    assert.ok(html.includes("Past the pause line"));
-    assert.ok(!html.includes("0 points from the pause line"));
+    assert.match(html, />Paused<\/p>/);
+    assert.doesNotMatch(html, /(?<![\d.])0 points from pausing/);
   });
 
   it("calls one threshold by one name across chip, rail, and readout", () => {

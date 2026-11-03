@@ -39,12 +39,12 @@ const weekWith = (directionLabel: ReportDynamics["directionLabel"], tightness: n
 };
 
 describe("the week's direction beside the guidance", () => {
-  it("holds on an improving week while a pause line is met, in the memo as in the headline", () => {
-    // Funding pressure 60 is past the pause line at 56.
+  it("holds on an improving week while a pause applies, in the memo as in the headline", () => {
+    // Funding pressure 60 is above 56, where an area pauses.
     const model = weekWith("improving", 60);
     assert.equal(model.weeklyTone, "holding");
     assert.doesNotMatch(model.weeklyMemoLines[0] ?? "", /loosened/);
-    assert.equal(model.weeklyMemoLines[0], "The readings improved this week, but a pause line still applies, so the guidance holds.");
+    assert.equal(model.weeklyMemoLines[0], "The readings improved this week, but a pause still applies, so the guidance holds.");
 
     const clear = weekWith("improving", 45);
     assert.equal(clear.weeklyTone, "easing");

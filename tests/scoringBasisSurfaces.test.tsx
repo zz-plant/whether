@@ -32,7 +32,7 @@ serveUnreachableUpstreams();
  * line, so it carries a warning too.
  */
 const RECORD = "Scored on the same data we used for past months.";
-const WARNING = "Startup-market inputs would put risk appetite at 41, below its change line.";
+const WARNING = "Startup-market inputs would put risk appetite at 41, below 50.";
 
 const liveSnapshot = () =>
   buildOperatingSnapshot({
@@ -76,7 +76,7 @@ describe("the basis on every surface", () => {
       />,
     );
     assert.match(line, /<span class="sm:hidden" data-basis-short="true">startup-market inputs left out<\/span><span class="max-sm:hidden">Startup-market inputs would put risk appetite at 41/);
-    assert.match(html, /Startup-market inputs would put risk appetite at 41, below its change line\./);
+    assert.match(html, /Startup-market inputs would put risk appetite at 41, below 50\./);
 
     for (const path of [
       "app/page.tsx",

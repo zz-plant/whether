@@ -339,7 +339,7 @@ export const describeLineStateBand = (
       "crossed",
       binding,
       restart && !restart.met && Number.isFinite(restart.points)
-        ? `${decisionAreaLabel(binding.area)} — ${restart.distance} from its restart line.`
+        ? `${decisionAreaLabel(binding.area)} — ${formatPoints(restart.points)} from restarting.`
         : `${decisionAreaLabel(binding.area)} is on hold.`,
     );
   }
@@ -352,7 +352,7 @@ export const describeLineStateBand = (
   return band(
     "near",
     binding,
-    `${decisionAreaLabel(binding.area)} — ${binding.pause?.distance} from its pause line.`,
+    `${decisionAreaLabel(binding.area)} — ${formatPoints(binding.pause?.points ?? 0)} from pausing.`,
   );
 };
 

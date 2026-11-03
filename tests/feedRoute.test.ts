@@ -78,7 +78,7 @@ describe("feed.xml", () => {
     const recordDate = tag(live, "guid").replace("whether-brief-live-", "");
     assert.match(recordDate, /^\d{4}-\d{2}-\d{2}$/);
     assert.equal(tag(live, "pubDate"), new Date(recordDate).toUTCString());
-    assert.match(live, new RegExp(`<strong>Data as of:</strong> ${formatDateUTC(recordDate)} · Room before a change: (clear of the line|within reach of the line|close to the line)</p>`));
+    assert.match(live, new RegExp(`<strong>Data as of:</strong> ${formatDateUTC(recordDate)} · Room before a change: (plenty|some|little)</p>`));
     assert.doesNotMatch(live, /Confidence:|\b(High|Medium|Low) confidence\b/);
     /* The week's one headline action (`weeklyHeadline`), not the weekly summary's own sentence. */
     const { snapshot } = await loadWeeklyBriefSnapshot(undefined, { route: "test" });
@@ -94,7 +94,7 @@ describe("feed.xml", () => {
     const published = items(xml).filter((block) => tag(block, "link") !== `${siteUrl}/`);
     assert.ok(published.length > 0, "the archive is the feed's content; at least one frozen week is on the record");
     for (const item of published) {
-      assert.match(item, /<strong>Data as of:<\/strong> [^<]* · Room before a change: (clear of the line|within reach of the line|close to the line)<\/p>/);
+      assert.match(item, /<strong>Data as of:<\/strong> [^<]* · Room before a change: (plenty|some|little)<\/p>/);
       assert.doesNotMatch(item, /Margin:|Confidence:/);
     }
   });

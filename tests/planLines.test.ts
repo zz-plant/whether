@@ -66,10 +66,10 @@ describe("judging plan lines", () => {
     assert.deepEqual(both.map((crossing) => crossing.side), ["resume"]);
   });
 
-  it("writes the email in the reader's terms: their area, their line, today's scores", () => {
+  it("writes the email in the reader's terms: their area, their rule, today's scores", () => {
     const [crossing] = evaluatePlanLineCrossings([HIRING], { tightness: 74, riskAppetite: 50 }, { tightness: 70, riskAppetite: 50 });
     const { headline, body } = describePlanLineCrossing(crossing, { tightness: 74, riskAppetite: 50 });
-    assert.equal(headline, "Hiring: your pause line was crossed");
+    assert.equal(headline, "Hiring: pause now, by your rule");
     assert.match(body, /pause if Funding pressure > 72 or Risk appetite < 40/);
     assert.match(body, /Funding pressure is 74 and risk appetite 50 today/);
   });
@@ -297,7 +297,7 @@ describe("the /operate step", () => {
       assert.ok(html.includes(label), `${label} missing from the form`);
     }
     assert.ok(html.includes('value="76"'), "the published pause line is the starting value");
-    assert.match(html, /Email me when a line is crossed/);
+    assert.match(html, /Email me when these change/);
   });
 
   it("refuses malformed lines whole rather than storing part of them", async () => {

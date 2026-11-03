@@ -93,13 +93,13 @@ export function MethodSection() {
           </section>
 
           <section className="space-y-4">
-            <h3 className="type-eyebrow">Agree on the lines in advance</h3>
+            <h3 className="type-eyebrow">Agree on them in advance</h3>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Write down the pause and restart lines before committing cash. When a line is crossed, review the
-              decision against the condition you agreed on.
+              Write down when you would pause and when you would restart before committing cash. When either
+              happens, review the decision against the condition you agreed on.
             </p>
             <p className="text-sm text-slate-300 leading-relaxed">
-              These lines give you a reason to review a decision. They cannot establish that it is right or safe;
+              They give you a reason to review a decision. They cannot establish that it is right or safe;
               check your cash position and the costs of stopping or restarting.
             </p>
           </section>
@@ -147,7 +147,7 @@ export function MethodSection() {
 
             <div className="space-y-2">
               <p className="type-eyebrow">When you will check</p>
-              <p className="text-xs text-slate-400">How often will you check the lines?</p>
+              <p className="text-xs text-slate-400">How often will you check?</p>
               <div className="h-8 border-b border-slate-700/50" />
             </div>
           </div>

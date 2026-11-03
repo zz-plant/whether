@@ -25,7 +25,7 @@ describe("projectRegimeFromPace", () => {
     assert.equal(deeper.sitsIn, "SCARCITY");
     assert.equal(deeper.weeksToFlip, null);
     assert.equal(deeper.projectedRegime, null);
-    assert.equal(deeper.velocityLabel, "Moving away from the lines — no change in conditions expected soon.");
+    assert.equal(deeper.velocityLabel, "Moving away from a change in conditions; none expected soon.");
   });
 
   it("names the week and the regime when a score is closing on its line", () => {
@@ -33,7 +33,7 @@ describe("projectRegimeFromPace", () => {
     const tightnessFirst = project(74, 40, -3, 0.5);
     assert.deepEqual(
       { weeks: tightnessFirst.weeksToFlip, regime: tightnessFirst.projectedRegime, label: tightnessFirst.velocityLabel },
-      { weeks: 2, regime: "VOLATILE", label: "At this pace, a score could cross its line within 2 weeks." },
+      { weeks: 2, regime: "VOLATILE", label: "At this pace, conditions could change within 2 weeks." },
     );
 
     // Risk appetite rises through 50 first: SCARCITY becomes DEFENSIVE.
@@ -42,7 +42,7 @@ describe("projectRegimeFromPace", () => {
     assert.equal(riskFirst.projectedRegime, "DEFENSIVE");
 
     // One week, singular.
-    assert.equal(project(72, 40, -3, 0).velocityLabel, "At this pace, a score could cross its line within 1 week.");
+    assert.equal(project(72, 40, -3, 0).velocityLabel, "At this pace, conditions could change within 1 week.");
   });
 
   it("follows both scores across their lines together, from any regime", () => {

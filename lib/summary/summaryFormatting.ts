@@ -7,9 +7,9 @@ import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
    all the band measures (2026-10-09). It read "The read is solid / shaky", a claim
    about certainty the number never made. */
 const CONFIDENCE_COPY = {
-  HIGH: "The scores are clear of the change lines",
-  MEDIUM: "A score is within reach of its change line",
-  LOW: "A score is close to its change line",
+  HIGH: "The scores are clear of a change",
+  MEDIUM: "A score is within reach of a change",
+  LOW: "A score is close to a change",
 } as const;
 
 /** The confidence a summary stores and prints, in the archive's LOW / MEDIUM / HIGH spelling. */
@@ -74,7 +74,7 @@ export const formatConditionsChangeLine = (assessment: RegimeAssessment) =>
  * named no line. One sentence for both, so they cannot drift apart again.
  */
 export const SHOCK_CROSSING_CUE =
-  "A score jumped well past the line where conditions change in a single reading, so conditions changed without the second reading that normally confirms a change. Treat the change as unconfirmed until the next reading.";
+  "A score moved so far in a single reading that conditions changed without the second reading that normally confirms a change. Treat the change as unconfirmed until the next reading.";
 
 type SourceLineInput = {
   sourceLabel: string;

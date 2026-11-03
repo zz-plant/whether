@@ -1,5 +1,5 @@
 import { DECISION_CONTRACT_LABELS, NO_LIVE_READING_CALL } from "./reportCopy";
-import { formatMarginBand } from "./reportFormatting";
+import { formatMarginStamp } from "./reportFormatting";
 import { formatSignalReading } from "./signalTranslations";
 import {
   formatMeetingSlideMarkdown,
@@ -321,8 +321,8 @@ export const MONDAY_AGENDA_STEPS: readonly {
   prompt: string;
 }[] = [
   { id: "changed", label: "What changed", minutes: 1, prompt: "Read the guidance and what moved since last Monday." },
-  { id: "thresholds", label: "Check the lines", minutes: 1, prompt: "The pause line and the restart line, against this week's scores." },
-  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment sits on the wrong side of its pause line?" },
+  { id: "thresholds", label: "Check what is paused", minutes: 1, prompt: "Which areas are paused, and how far is each from restarting?" },
+  { id: "revisit", label: "Decide what to revisit", minutes: 1, prompt: "Which active hiring, spend or raise commitment is in an area that is paused?" },
 ];
 
 export const MONDAY_AGENDA_TITLE = "Monday guidance review";
@@ -382,7 +382,7 @@ const provenanceLine = (artifact: BriefArtifact) =>
   [
     `Source: ${artifact.source}`,
     `data as of ${artifact.recordDateLabel}`,
-    artifact.confidenceLabel ? `margin: ${formatMarginBand(artifact.confidenceLabel).toLowerCase()}` : null,
+    artifact.confidenceLabel ? formatMarginStamp(artifact.confidenceLabel).toLowerCase() : null,
     artifact.basis ? basisClause(artifact.basis) : null,
     artifact.isFallback ? "cached snapshot, not a live read" : null,
   ]

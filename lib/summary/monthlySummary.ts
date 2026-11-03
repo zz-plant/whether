@@ -166,7 +166,7 @@ export const buildMonthlyStructured = ({
   const reversalConditions = [
     transitionWatch
       ? restartWhen
-      : "Re-check the plan if conditions weaken or a score nears its change line.",
+      : "Re-check the plan if conditions weaken or a score nears a change.",
     "Re-check the plan as soon as any execution constraint starts to bind.",
   ];
   const source = formatSourceLine(provenance);
@@ -210,7 +210,7 @@ export const buildMonthlySummary = ({
   const guidance = getMonthlyActionGuidance(assessment.regime, { financingSaturated });
   const operatingRules = getMonthlyOperatingRules(assessment);
   const transitionCue = assessment.diagnostics.transitionWatch
-    ? "A score is sitting near the line where conditions change, so hold major scope changes until the next reading."
+    ? "A score is close to changing conditions, so hold major scope changes until the next reading."
     : "";
   // The weekly summary's sentence (`SHOCK_CROSSING_CUE`), which says why it replaced "This flip crossed its line…".
   const shockCue = assessment.diagnostics.shockCrossing ? SHOCK_CROSSING_CUE : "";

@@ -96,10 +96,12 @@ export function WhyConditionsSection({
               you". Above the risk-appetite line is the safe side. The semicolon
               states the position and then the reading, and the score is named so a
               reader can hold it against the line on the map. */}
-          Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
-          line ({signalReadingMeaning("tightness", tightness)}). Risk appetite is{" "}
-          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its {changeLines.riskAppetite} change line
-          at {Math.round(riskAppetite)} ({signalReadingMeaning("riskAppetite", riskAppetite)}). Together they put conditions in{" "}
+          {/* The cut as a number, not "its 70 change line" (2026-11-03): the
+              heading already says these are the lines conditions turn on. */}
+          Funding pressure is {Math.round(tightness)}, {tightness > changeLines.tightness ? "above" : "below"}{" "}
+          {changeLines.tightness} ({signalReadingMeaning("tightness", tightness)}). Risk appetite is{" "}
+          {Math.round(riskAppetite)}, {riskAppetite > changeLines.riskAppetite ? "above" : "below"} {changeLines.riskAppetite}{" "}
+          ({signalReadingMeaning("riskAppetite", riskAppetite)}). Together they put conditions in{" "}
           <span className="font-semibold">{regimeLabel}</span>.
         </>
       )}
@@ -122,8 +124,8 @@ export function WhyConditionsSection({
         {cappedDistance ? (
           <p className="mt-4 max-w-3xl text-fluid-xs leading-relaxed text-slate-400" data-capped-reading>
             Funding pressure shows {tightness} because that&rsquo;s as high as the score goes; uncapped it would be{" "}
-            {saturatedPressure}. The line is set against the capped score, so the distance is {cappedDistance} points above
-            the {changeLines.tightness} change line.
+            {saturatedPressure}. Conditions are judged on the capped {tightness}, {cappedDistance} points above{" "}
+            {changeLines.tightness}.
           </p>
         ) : null}
       </div>

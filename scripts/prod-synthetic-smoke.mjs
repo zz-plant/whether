@@ -14,7 +14,7 @@ const pageChecks = [
      to. */
   // "weekly plan" was the planning switcher's first tab; the Decide group's tabs
   // replaced it on 2026-10-08.
-  { path: "/operate", required: ["decide", "set this plan's lines"] },
+  { path: "/operate", required: ["decide", "set your own rules"] },
   // Guides took Resolve's direct answers and its toolkit library (2026-10-08).
   { path: "/resources", required: ["more-tools", "toolkit-library"] },
   { path: "/acceptable-use-policy", required: ["acceptable use"] },

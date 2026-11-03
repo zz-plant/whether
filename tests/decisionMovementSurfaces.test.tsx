@@ -63,10 +63,10 @@ describe("the by-area Changed column", () => {
     const byArea = new Map(rows.map((row) => [row.area, row]));
 
     // The roadmap held past its restart line, and says so.
-    assert.equal(byArea.get("product-tempo")?.changed, "Restart line still met: no line crossed since Aug 31.");
+    assert.equal(byArea.get("product-tempo")?.changed, "Can still restart; no change since Aug 31.");
     assert.equal(byArea.get("product-tempo")?.changedKind, "held");
     assert.equal(byArea.get("hiring")?.changedKind, "paused");
-    assert.match(renderTable(rows), /Restart line still met: no line crossed since Aug 31\./);
+    assert.match(renderTable(rows), /Can still restart; no change since Aug 31\./);
   });
 
   /* On a week no line was crossed the card's line under the call says so once
@@ -77,7 +77,7 @@ describe("the by-area Changed column", () => {
     assert.ok(rows.every((row) => row.changed === undefined && row.changedKind === undefined));
     assert.doesNotMatch(renderTable(rows), /<th[^>]*>Changed<\/th>/);
     assert.ok(movement);
-    assert.equal(describeMovementCause(movement), "No new line was crossed since Aug 31.");
+    assert.equal(describeMovementCause(movement), "No area changed since Aug 31.");
   });
 
   it("carries no claim where nothing was compared", () => {

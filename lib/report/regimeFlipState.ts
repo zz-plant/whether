@@ -184,10 +184,10 @@ export const buildRegimeFlipState = ({
   const beyondSentence = (dimension: BoundaryDimension): string => {
     if (dimension === "tightness") {
       const side = tightnessBeyond ? "above" : "at or below";
-      return `${TIGHTNESS_BOUNDARY_LABEL} is ${formatThresholdNumber(tightness)}, already ${side} its change line at ${formatThresholdNumber(thresholds.tightnessRegime)}.`;
+      return `${TIGHTNESS_BOUNDARY_LABEL} is ${formatThresholdNumber(tightness)}, already ${side} ${formatThresholdNumber(thresholds.tightnessRegime)}.`;
     }
     const side = riskCollapsed ? "at or below" : "above";
-    return `${RISK_BOUNDARY_LABEL} is ${formatThresholdNumber(riskAppetite)}, already ${side} its change line at ${formatThresholdNumber(thresholds.riskAppetiteRegime)}.`;
+    return `${RISK_BOUNDARY_LABEL} is ${formatThresholdNumber(riskAppetite)}, already ${side} ${formatThresholdNumber(thresholds.riskAppetiteRegime)}.`;
   };
 
   const causes: BoundaryDimension[] = [];

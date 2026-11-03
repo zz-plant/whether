@@ -43,7 +43,7 @@ describe("5-area decision corridor ladder model & component", () => {
     const html = renderToStaticMarkup(<AreaCorridorLadder model={model} />);
 
     assert.match(html, /data-area-corridor-ladder/);
-    assert.match(html, /How close each area is to its line/);
+    assert.match(html, /How far each area is from changing/);
     assert.match(html, /Safety buffer: \d+ pts gap/);
     /* The gap between the two lines is the one stretch of the scale where
        nothing happens, so it may not be drawn in the crossed red (2026-11-02).
@@ -51,7 +51,7 @@ describe("5-area decision corridor ladder model & component", () => {
        neutral ink instead. */
     assert.doesNotMatch(html, /amber-400\/20/);
     assert.ok(html.includes("bg-[color:var(--app-text-muted)]/18"), "the buffer is drawn in the neutral ink");
-    assert.match(html, /On hold · \d+ pts to unlock/);
+    assert.match(html, /On hold · \d+ pts from restarting/);
     assert.match(html, /\d+ pts from pausing/);
     assert.match(html, /Hiring/);
     assert.match(html, /Roadmap/);
@@ -60,8 +60,8 @@ describe("5-area decision corridor ladder model & component", () => {
     assert.match(html, /New bets/);
     /* Four areas sit 24 points from their restart line on this reading, so the
        caption names the count rather than picking one of them. */
-    assert.match(html, /4 areas 24 pts from unlocking/);
-    assert.doesNotMatch(html, /closest to unlocking/);
+    assert.match(html, /4 areas 24 pts from restarting/);
+    assert.doesNotMatch(html, /closest to restarting/);
   });
 
   /*

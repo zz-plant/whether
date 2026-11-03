@@ -150,7 +150,7 @@ describe("/brief.md states the decision readiness verdict", () => {
     assert.ok(afterTrustLine);
     // Freezing guidance approves only renewals; "Act" means the reading can carry
     // that guidance, so the line must not read as leave to approve more.
-    assert.match(readiness.detail, /guidance and its pause lines apply/);
+    assert.match(readiness.detail, /guidance applies as written/);
     assert.doesNotMatch(line ?? "", /holding back|hold back|proceed|approval flow/i);
   });
 

@@ -200,7 +200,7 @@ describe("buildReportEvidenceItems", () => {
   it("labels distance from the line by the distance, not by the size of the week's move", () => {
     const { assessment, item } = weekOf(oct5);
     // Risk appetite moved 8 points and sits 2 from its line: it is not "well clear".
-    assert.doesNotMatch(item("riskAppetite").confidenceLabel, /well clear/);
+    assert.doesNotMatch(item("riskAppetite").confidenceLabel, /well clear|plenty/i);
     // The nearest line is the one the page's own confidence is measured from, so
     // that card and the trust strip say the same word.
     assert.equal(
@@ -208,12 +208,12 @@ describe("buildReportEvidenceItems", () => {
       formatConfidencePlainLabel(resolvePublishedConfidence({ assessment }).label),
     );
     // Funding pressure is 20 points past its line: that one is well clear.
-    assert.match(item("tightness").confidenceLabel, /^Clear of the line/);
+    assert.match(item("tightness").confidenceLabel, /^Plenty of room/);
 
-    // The other way round: a half-point move used to read Low ("close to the
-    // line") whatever the distance. 6.5 points above the risk line is not close.
+    // The other way round: a half-point move used to read Low ("little room")
+    // whatever the distance. 6.5 points above the risk line is not close.
     const quiet = weekOf({ ...oct5, riskAppetite: 56.5 });
-    assert.match(quiet.item("riskAppetite").confidenceLabel, /^Clear of the line/);
+    assert.match(quiet.item("riskAppetite").confidenceLabel, /^Plenty of room/);
   });
 
   it("states the recession warning gauge's payback bar as the Spending rule's, with no condition the reading contradicts", () => {

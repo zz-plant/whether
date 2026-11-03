@@ -16,7 +16,7 @@ import type { BriefDocument } from "../report/briefArtifact";
 import { basisClause } from "../report/scoringBasis";
 
 /**
- * The margin band ("Close to the line") from either spelling of the engine's
+ * The margin band ("Little") from either spelling of the engine's
  * code. The assessment says `MEDIUM` and the home model says `MED`; both reached
  * exports verbatim. The API field stays `confidence`; a paste says "Margin".
  */
@@ -27,7 +27,7 @@ export const formatExportConfidence = (code: string): string =>
 export const formatExportConfidenceWord = (code: string): string => formatExportConfidence(code).toLowerCase();
 
 /**
- * "Margin: close to the line (1 pt from the change line)", from the document's own
+ * "Room before a change: little (risk appetite is 1 point away)", from the document's own
  * readings, so every paste prints the distance the band stands for.
  */
 export const formatDocumentMargin = (document: {

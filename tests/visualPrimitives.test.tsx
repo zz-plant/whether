@@ -25,9 +25,9 @@ const lines = [
 describe("ScoreLadder", () => {
   it("names the nearest line and the distance to it", () => {
     assert.equal(nearestLadderLine(72, lines)?.line.kind, "callChange");
-    assert.equal(describeLadderPosition(72, lines), "72 of 100 · 2 pts above the change line");
-    assert.equal(describeLadderPosition(76, lines), "76 of 100 · at the pause line");
-    assert.equal(describeLadderPosition(60, lines), "60 of 100 · 6 pts below the restart line");
+    assert.equal(describeLadderPosition(72, lines), "72 of 100 · 2 pts above 70");
+    assert.equal(describeLadderPosition(76, lines), "76 of 100 · at 76");
+    assert.equal(describeLadderPosition(60, lines), "60 of 100 · 6 pts below 66");
   });
 
   it("draws last week hollow only when there is a last week", () => {
@@ -224,8 +224,8 @@ describe("AreaTable", () => {
     const rows = html.split("data-area=").slice(1);
     assert.equal(rows.length, 2);
     for (const row of rows) {
-      assert.match(row, />Pause line</);
-      assert.match(row, />Restart line</);
+      assert.match(row, />Pause if</);
+      assert.match(row, />Restart when</);
     }
     assert.doesNotMatch(html, /class="[^"]*(?<![:\w-])min-w-\[/, "no minimum width outside sm, or the table scrolls sideways on a phone");
   });
@@ -237,8 +237,8 @@ describe("AreaTable moved rows", () => {
       <AreaTable
         caption="test"
         rows={[
-          { area: "hiring", rule: "Backfills only.", changed: "Pause still applies: no line crossed since Sep 30." },
-          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Restart line no longer met: risk appetite fell below 54.", moved: true },
+          { area: "hiring", rule: "Backfills only.", changed: "Pause still applies; no change since Sep 30." },
+          { area: "product-tempo", rule: "Keep the roadmap.", changed: "Can no longer restart: risk appetite fell below 54.", moved: true },
         ]}
       />,
     );
@@ -325,7 +325,7 @@ describe("TrustStrip", () => {
         basis={onRecord}
       />,
     );
-    assert.match(html, />Risk appetite 1 pt from its change line<span[^>]*data-next-week[^>]*>\u00A0·\u00A0Could change next week<\/span>/);
+    assert.match(html, />Risk appetite 1 pt from a change<span[^>]*data-next-week[^>]*>\u00A0·\u00A0Could change next week<\/span>/);
     assert.doesNotMatch(html, />Yes</);
     assert.doesNotMatch(html, /<dt[^>]*>Could change next week<\/dt>/, "no fourth cell");
     assert.equal((html.match(/1 pt/g) ?? []).length, 1, "the distance prints once");

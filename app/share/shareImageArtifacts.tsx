@@ -104,7 +104,7 @@ export const buildShareImageArtifacts = (
          (2026-10-09). */
       title: "Board slide",
       description:
-        `One slide: the guidance, its pause line, its change lines and both scores, drawn for a ${operatorStageLabel(stage)} company (the stage you picked on the brief).`,
+        `One slide: the guidance, when it pauses, what would change conditions and both scores, drawn for a ${operatorStageLabel(stage)} company (the stage you picked on the brief).`,
       preview: {
         src: `/api/image/slide?stage=${stage}`,
         width: 1200,
@@ -141,7 +141,7 @@ export const buildShareImageArtifacts = (
         src: briefCardSrc,
         width: variant.width,
         height: variant.height,
-        alt: "This week's brief card: the guidance and both scores against their lines.",
+        alt: "This week's brief card: the guidance and both scores.",
       },
       files: [
         {

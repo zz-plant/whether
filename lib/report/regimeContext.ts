@@ -142,7 +142,7 @@ export function getRegimeProjection(
 
   const weeksEstimate = Math.round(minDist / maxVelocity);
   const velocityLabel = weeksEstimate <= 4
-    ? `At this pace, a score could cross its line within ${weeksEstimate} ${weeksEstimate === 1 ? "week" : "weeks"}.`
+    ? `At this pace, conditions could change within ${weeksEstimate} ${weeksEstimate === 1 ? "week" : "weeks"}.`
     : `Slow trend — no change in conditions expected soon.`;
 
   /* Project which regime would follow */
@@ -208,7 +208,7 @@ export function projectRegimeFromPace({
       return {
         weeksToFlip: week,
         projectedRegime: then,
-        velocityLabel: `At this pace, a score could cross its line within ${week} ${week === 1 ? "week" : "weeks"}.`,
+        velocityLabel: `At this pace, conditions could change within ${week} ${week === 1 ? "week" : "weeks"}.`,
         sitsIn,
       };
     }
@@ -223,7 +223,7 @@ export function projectRegimeFromPace({
     projectedRegime: null,
     velocityLabel: closing
       ? "Slow trend — no change in conditions expected soon."
-      : "Moving away from the lines — no change in conditions expected soon.",
+      : "Moving away from a change in conditions; none expected soon.",
     sitsIn,
   };
 }

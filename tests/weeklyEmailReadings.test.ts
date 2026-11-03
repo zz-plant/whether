@@ -20,7 +20,7 @@ describe("weekly email readings", () => {
     assert.match(readings[1].value, /^\d+\/100$/);
     // The margin in words and points, under its own label; the engine's code is not for an inbox.
     assert.equal(readings[2].label, "Room before a change");
-    assert.match(readings[2].value, /^(clear of|within reach of|close to) the line \((funding pressure|risk appetite) is (\d+ points? from|at) its change line\)$/);
+    assert.match(readings[2].value, /^(plenty|some|little) \((funding pressure|risk appetite) is (\d+ points? away|on the edge)\)$/);
     assert.match(readings[0].meaning ?? "", /^money is /);
     assert.match(readings[1].meaning ?? "", /^investors are /);
   });
@@ -35,8 +35,8 @@ describe("weekly email readings", () => {
       confidence: "MED",
     });
 
-    assert.equal(readings[0].distance?.label, "1 point above the line where conditions change");
-    assert.equal(readings[1].distance?.label, "2 points below the line where conditions change");
+    assert.equal(readings[0].distance?.label, "1 point above where conditions change");
+    assert.equal(readings[1].distance?.label, "2 points below where conditions change");
   });
 
   it("sends nothing numeric without a snapshot rather than inventing a reading", () => {

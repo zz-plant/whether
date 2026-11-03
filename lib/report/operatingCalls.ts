@@ -289,7 +289,7 @@ export const buildSharedCorridorRails = (
 };
 
 /**
- * "44 pts away", "at the line", "past the line" or "already met" — a distance, not a
+ * "44 pts away", "at the line", "in effect" or "already met" — a distance, not a
  * sentence. `met` is the operator's verdict; a strict line at zero distance is
  * "at the line", which is not the same claim as tripped.
  *
@@ -305,10 +305,10 @@ export const formatPointsToLine = (
   met: boolean | undefined,
 ): string => {
   if (points === undefined || !Number.isFinite(points)) return "—";
-  /* "Past the line", not "crossed": a state, not an event. Beside "No score
-     crossed a pause or restart line since Sep 30", "crossed" read as this
-     week's news (2026-10-14). */
-  if (met) return kind === "pause" ? "past the line" : "already met";
+  /* A state, not an event: beside a sentence about the week, "crossed" read as
+     this week's news (2026-10-14). "In effect", not "past the line" (2026-11-03):
+     the cell already sits under "Pause line", so the tag said "line" twice. */
+  if (met) return kind === "pause" ? "in effect" : "already met";
   if (points === 0) return "at the line";
   return `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"} away`;
 };

@@ -94,6 +94,8 @@ type PhaseGap = {
   /** Where the call lands if this axis alone crosses and the other holds. */
   flipsTo: RegimeKey;
   flipsToLabel: string;
+  /** The score at which conditions change on this axis. */
+  boundary: number;
 };
 
 /**
@@ -214,6 +216,7 @@ const buildGap = (
     side: delta > 0 ? "above" : delta < 0 ? "below" : "on",
     flipsTo,
     flipsToLabel: REGIME_LABELS[flipsTo],
+    boundary,
   };
 };
 
@@ -338,9 +341,9 @@ export const resolvePhaseSpan = (raw: string | string[] | undefined) => {
 export const describePhaseGap = (gap: PhaseGap) => {
   const points = `${gap.distance.toLocaleString("en-US")} ${gap.distance === 1 ? "point" : "points"}`;
   if (gap.side === "on") {
-    return `${gap.label} is sitting on its change line; any move decides between here and ${gap.flipsToLabel}.`;
+    return `${gap.label} is sitting at ${gap.boundary}; any move decides between here and ${gap.flipsToLabel}.`;
   }
   return gap.side === "above"
-    ? `${gap.label} is ${points} above its change line. Falling back through it alone would read ${gap.flipsToLabel}.`
-    : `${gap.label} is ${points} below its change line. Rising through it alone would read ${gap.flipsToLabel}.`;
+    ? `${gap.label} is ${points} above ${gap.boundary}. Falling back below it alone would read ${gap.flipsToLabel}.`
+    : `${gap.label} is ${points} below ${gap.boundary}. Rising above it alone would read ${gap.flipsToLabel}.`;
 };

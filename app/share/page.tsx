@@ -192,7 +192,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "slack-post",
       group: "Chat",
       label: "Slack post",
-      hint: "The guidance and its lines, in a short post people can skim.",
+      hint: "The guidance and when each area pauses, in a short post people can skim.",
       kind: "text",
       text: brief("slack"),
       copyLabel: "Copy Slack post",
@@ -280,7 +280,7 @@ const buildShareOptions = (artifact: Awaited<ReturnType<typeof buildCurrentShare
       id: "portfolio-note",
       group: "Docs and email",
       label: "Portfolio note",
-      hint: "For an investor or accelerator writing to the companies it backs: each area's rule and lines, a note on the week for every runway band, and a link for each company to set its own lines.",
+      hint: "For an investor or accelerator writing to the companies it backs: each area's rule, a note on the week for every runway band, and a link for each company to set its own lines.",
       kind: "text",
       text: artifact.portfolioNote,
       copyLabel: "Copy portfolio note",
@@ -367,7 +367,7 @@ export default async function SharePage() {
             </h1>
             <p className="text-sm leading-relaxed text-white/60">
               Paste it into Slack, a meeting doc, a ticket or a letter. Every format carries the same
-              pause and restart lines and names its source:{" "}
+              pause and restart rules and names its source:{" "}
               {/* A link named for the host, not a bare URL printed as text. */}
               <a href={artifact.sourceUrl} className="text-sky-300 underline-offset-2 hover:underline">
                 {artifact.sourceHost}

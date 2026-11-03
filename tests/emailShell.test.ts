@@ -134,7 +134,7 @@ describe("the shared email shell, on production", () => {
         "PH",
         "PB",
         "",
-        "Review your lines: https://whether.work/operate#ops-plan-lines",
+        "Review your rules: https://whether.work/operate#ops-plan-lines",
         "---",
         "Whether · weekly operating brief",
         "Unsubscribe: https://whether.work/api/email/unsubscribe?token=tok",
@@ -292,7 +292,7 @@ describe("the brief a reader actually gets", () => {
     now: new Date("2026-08-31T12:00:00.000Z"),
   });
 
-  it("prints the reader's own lines first when they set any", async () => {
+  it("prints the reader's own rules first when they set any", async () => {
     resetSubscriberStore();
     const store = getSubscriberStore();
     const subscriber = await store.subscribe("own-lines@example.com", {
@@ -318,8 +318,8 @@ describe("the brief a reader actually gets", () => {
 
     const [message] = mail.sent;
     assert.ok(message);
-    assert.match(message.text, /\nYour lines: hiring (on hold|running|between its lines)\./);
-    assert.ok(message.text.indexOf("Your lines:") < message.text.indexOf("Guidance:"), "their lines lead the published ones");
+    assert.match(message.text, /\nYour rules: hiring (on hold|running|between pause and restart)\./);
+    assert.ok(message.text.indexOf("Your rules:") < message.text.indexOf("Guidance:"), "their rules lead the published ones");
   });
 
   it("prints the cash-first note for a reader under six months, without plan lines", async () => {

@@ -129,8 +129,8 @@ describe("buildBriefImagePayload", () => {
     const payload = buildBriefImagePayload(buildHomepage());
 
     assert.deepEqual(payload.readings.map(asPasted), [
-      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · past the line · was 63 on Aug 31 · restart line 66 (24 pts away)",
-      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · past the line · was 56 on Aug 31 · restart line 54 (11 pts away)",
+      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · in effect · was 63 on Aug 31 · restart line 66 (24 pts away)",
+      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · in effect · was 56 on Aug 31 · restart line 54 (11 pts away)",
     ]);
   });
 
@@ -320,7 +320,7 @@ describe("brief decision card render", () => {
     assert.match(text, /Source: US Treasury and the St\. Louis Fed \(FRED\), plus a curated startup-market snapshot/);
     // Yahoo Finance feeds the SaaS comps only and contributes nothing to either score.
     assert.doesNotMatch(text, /yahoo/i);
-    assert.match(text, /WITHIN REACH OF THE LINE/);
+    assert.match(text, /ROOM BEFORE A CHANGE: SOME/);
     assert.doesNotMatch(text, /\bMED\b/);
   });
 

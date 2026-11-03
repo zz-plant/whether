@@ -141,7 +141,7 @@ const buildOutageExitGate = ({
     },
     {
       key: "confidence",
-      label: "The scores are clear of a change line",
+      label: "The scores are clear of a change",
       met: !confidenceLow,
     },
   ];
@@ -163,7 +163,7 @@ const ALLOWED_DETAILS: Record<TrustStatusTone, [string, string, string]> = {
     "New fixed-cost commitments.",
   ],
   warning: [
-    "Changes you can undo, inside the pause lines already set.",
+    "Changes you can undo, within the pauses already set.",
     "New hires and multi-quarter vendor contracts.",
     "Anything you can't undo, until one live refresh lands.",
   ],
@@ -211,7 +211,7 @@ const buildRecoveryPlan = ({
   return {
     owner: "Whoever owns the plan",
     nextCheckpoint: "The next weekly review",
-    exitCondition: "The scores are clear of a change line.",
+    exitCondition: "The scores are clear of a change.",
   };
 };
 
@@ -283,7 +283,7 @@ export const buildTrustWarnings = ({
   ) {
     warnings.push({
       id: "boundary-whipsaw",
-      warning: "Conditions sit near a line and the scores moved both ways this week.",
+      warning: "Conditions are close to changing and the scores moved both ways this week.",
       mitigationCheck: "Wait for one more week that reads the same way before adding fixed costs.",
     });
   }
@@ -353,7 +353,7 @@ export const buildCompactTrustSummary = ({
   }
 
   if (confidenceLabel !== "HIGH") {
-    return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} (${normalizedFreshness}). Hold anything you can't undo until the scores are clear of the line.`;
+    return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} (${normalizedFreshness}). Hold anything you can't undo until there is more room.`;
   }
 
   return `${MARGIN_LABEL}: ${formatMarginBand(confidenceLabel).toLowerCase()} (${normalizedFreshness}). Fine to act on this week.`;
@@ -487,7 +487,7 @@ export const resolveTrustReadinessCopy = ({
   // A live feed under reduced confidence is still live; the qualifier says why the
   // tone is amber without inventing a second data state.
   const headline = status === "live" && tone === "warning"
-    ? `${DATA_STATUS_LABELS.live} · close to a change line`
+    ? `${DATA_STATUS_LABELS.live} · close to a change`
     : DATA_STATUS_LABELS[status];
 
   return { tone, headline };
@@ -541,7 +541,7 @@ export const buildDecisionReadinessState = ({
     return {
       label: "Hold",
       tone: "warning",
-      detail: `${policyHold ? policyHold.currentCall : "Conditions sit close to a line."} Keep your current plan; anything you can't undo can wait for a clearer reading.`,
+      detail: `${policyHold ? policyHold.currentCall : "Conditions are close to changing."} Keep your current plan; anything you can't undo can wait for a clearer reading.`,
     };
   }
 
@@ -562,7 +562,7 @@ export const buildDecisionReadinessState = ({
       tone: "warning",
       detail: isFallbackSnapshot
         ? "Cached reading. Act on moves you can undo; hold the rest until live data returns."
-        : "The scores are within reach of a change line. Act on moves you can undo; hold the rest until they are clear of it.",
+        : "The scores are within reach of a change. Act on moves you can undo; hold the rest until there is more room.",
     };
   }
 
@@ -572,7 +572,7 @@ export const buildDecisionReadinessState = ({
   return {
     label: "Act",
     tone: "stable",
-    detail: "Live data, with the scores clear of the change lines. This week's guidance and its pause lines apply as written.",
+    detail: "Live data, with the scores clear of a change. This week's guidance applies as written.",
   };
 };
 
@@ -687,7 +687,7 @@ export const buildTrustStatus = ({
       ? "Only moves you can undo, until a live update lands."
       : policyHold
         ? `Only moves you can undo, until ${policyHold.holdsUntil}.`
-      : "Use this live reading for this week's decisions; the pause lines in this week's guidance apply.";
+      : "Use this live reading for this week's decisions; this week's pauses apply.";
 
   const outageExitGate = buildOutageExitGate({
     isFallback,

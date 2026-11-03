@@ -149,7 +149,7 @@ export async function DecisionAnswerPageContent({
        "Threshold context: risk appetite 42 vs 50, tightness 79 vs 70" — two bare
        comparisons, one of them under the engine's name for a score the rest of
        the site calls funding pressure. */
-    answer: `${answer.shortAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)} line where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`,
+    answer: `${answer.shortAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)}, where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`,
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,

@@ -40,7 +40,7 @@ describe("reader-facing number formatting", () => {
 
   it("brackets every distance, including the ones that read as words", () => {
     assert.equal(parenthesizePointsToLine(11, "resume", false), "(11 pts away)");
-    assert.equal(parenthesizePointsToLine(0, "pause", true), "(past the line)");
+    assert.equal(parenthesizePointsToLine(0, "pause", true), "(in effect)");
     assert.equal(parenthesizePointsToLine(0, "pause", false), "(at the line)");
     assert.equal(parenthesizePointsToLine(undefined, "pause", false), "(—)");
   });
@@ -63,7 +63,7 @@ describe("reader-facing number formatting", () => {
       />,
     );
 
-    assert.ok(html.includes("Within reach of the line"), "the strip prints the band in words");
+    assert.match(html, /Room before a change<\/dt>\s*<dd[^>]*>Some</, "the strip prints the band in words, under its label");
     assert.doesNotMatch(html, /\bMED\b/);
   });
 
@@ -71,9 +71,9 @@ describe("reader-facing number formatting", () => {
     /* The two surfaces that print this hold display strings whose provenance
        the type system has lost. Inventing a word for an unrecognised value
        would be a claim nothing produced. */
-    assert.equal(formatMarginBand("MED"), "Within reach of the line");
-    assert.equal(formatMarginBand("LOW"), "Close to the line");
-    assert.equal(formatMarginBand("HIGH"), "Clear of the line");
+    assert.equal(formatMarginBand("MED"), "Some");
+    assert.equal(formatMarginBand("LOW"), "Little");
+    assert.equal(formatMarginBand("HIGH"), "Plenty");
     assert.equal(formatMarginBand("Unverified"), "Unverified");
   });
 });

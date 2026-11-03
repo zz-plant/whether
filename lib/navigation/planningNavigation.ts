@@ -15,7 +15,7 @@ export const operationsSectionLinks: {
     { href: "#ops-monthly-action-summary", label: "Rule for each area" },
     { href: "#ops-playbook", label: "Rules before you commit" },
     { href: "#ops-decision-shield", label: "Test a decision" },
-    { href: "#ops-plan-lines", label: "Set this plan's lines" },
+    { href: "#ops-plan-lines", label: "Set your own rules" },
     { href: "#ops-finance-strategy", label: "Finance strategy" },
     { href: "#ops-failure-patterns", label: "Warnings before you approve" },
   ],

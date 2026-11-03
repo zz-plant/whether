@@ -105,7 +105,7 @@ describe("decision picker", () => {
        consecutive lines: "4 of 5 areas are on hold" over "most weeks neither
        happens". It prints only when it is true of this week. */
     assert.match(html, /An area on hold is already covered by this week&#x27;s guidance\./);
-    assert.doesNotMatch(html, /Most weeks neither happens\./);
+    assert.doesNotMatch(html, /Most weeks no area pauses or restarts\./);
     const count = html.indexOf("4 of 5 areas are on hold.");
     assert.ok(count > html.indexOf("Your decisions this week"), "the count sits under the heading");
     assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");

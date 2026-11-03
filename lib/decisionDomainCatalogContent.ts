@@ -342,7 +342,7 @@ export const rawDecisionDomainCatalog = {
       stopTrigger:
         "Stop deciding by consensus in meetings when no owner is named or the decision could change next week.",
       reversalTrigger:
-        "Return to tighter approvals if delegated calls exceed their risk limits or a score nears the line where conditions change.",
+        "Return to tighter approvals if delegated calls exceed their risk limits or a score nears a change in conditions.",
       decisionArtifact: "Decision rights matrix with an escalation ladder and a weekly review slot.",
       timeToRun: "60 minutes to map rights, plus 15-minute weekly operating review.",
       recommendedParticipants:

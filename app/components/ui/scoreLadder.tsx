@@ -193,20 +193,18 @@ export const buildLadderLines = ({
   { kind: "callChange" as const, value: callChange },
 ];
 
-/** The line's name inside a sentence ("9 pts above the pause line"). */
-const LINE_PHRASES: Record<LadderLineKind, string> = {
-  pause: "pause line",
-  resume: "restart line",
-  callChange: "change line",
-};
-
+/*
+ * The nearest line by its number, not its name ("5 pts above 50", until
+ * 2026-11-03 "5 pts above the change line"): the ladder under the caption labels
+ * every tick, so the number finds the tick and the name said "line" again.
+ */
 export const describeLadderPosition = (value: number, lines: readonly LadderLine[]) => {
   const nearest = nearestLadderLine(value, lines);
   if (!nearest) return `${formatPoints(value)} of 100`;
-  const phrase = nearest.line.label ? `${nearest.line.label.toLowerCase()} line` : LINE_PHRASES[nearest.line.kind];
-  if (nearest.distance === 0) return `${formatPoints(value)} of 100 · at the ${phrase}`;
+  const at = formatPoints(nearest.line.value);
+  if (nearest.distance === 0) return `${formatPoints(value)} of 100 · at ${at}`;
   const side = value > nearest.line.value ? "above" : "below";
-  return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} ${nearest.distance === 1 ? "pt" : "pts"} ${side} the ${phrase}`;
+  return `${formatPoints(value)} of 100 · ${formatPoints(nearest.distance)} ${nearest.distance === 1 ? "pt" : "pts"} ${side} ${at}`;
 };
 
 /**
