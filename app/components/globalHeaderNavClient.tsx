@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useMemo } from "react";
 import { Search, Share2 } from "lucide-react";
 import { openShareRail } from "./globalShareRail";
+import { CloseIcon } from "./uiIcons";
 import { ThemeToggleButton } from "./themeToggleButton";
 import {
   findActivePage,
@@ -40,7 +41,19 @@ export function MobileNavContent({ navigationLinks: propLinks, currentPathname, 
 
   return (
     <div className="w-full px-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] pt-3">
-      <div className="mx-auto mb-3 h-1 w-10 rounded-sm bg-slate-700" />
+      {/* The grab handle says the sheet swipes away; the × says it closes, for a reader
+          who does not know the gesture (2026-11-03). */}
+      <div className="relative mb-3 flex h-8 items-center justify-center">
+        <div className="h-1 w-10 rounded-sm bg-slate-700" />
+        <button
+          type="button"
+          onClick={onClose}
+          aria-label="Close menu"
+          className="absolute -right-2 top-1/2 inline-flex min-h-11 min-w-11 -translate-y-1/2 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800/60 hover:text-slate-100"
+        >
+          <CloseIcon className="size-4" />
+        </button>
+      </div>
       <div className="space-y-4">
         <button
           type="button"

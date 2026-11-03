@@ -17,6 +17,16 @@ mockAny.module("next/navigation", () => ({
   useRouter: () => ({ push: () => {}, replace: () => {}, prefetch: () => {} }),
 }));
 
+describe("MobileNavContent", () => {
+  /* The grab handle says the sheet swipes away; the × says it closes (2026-11-03). */
+  it("carries a close button beside the handle, ahead of the menu", () => {
+    const html = renderToStaticMarkup(<MobileNavContent currentPathname="/" onClose={() => {}} />);
+    const close = html.indexOf('aria-label="Close menu"');
+    assert.ok(close > -1);
+    assert.ok(close < html.indexOf("Search or jump to a page"), "first in the sheet's reading order");
+  });
+});
+
 describe("GlobalHeaderNavClient", () => {
   it("renders the four groups as tabs in order, then the utility links, and no More menu", () => {
     const html = renderToStaticMarkup(<GlobalHeaderNavClient pathname="/" />);
