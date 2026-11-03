@@ -85,6 +85,12 @@ export interface MeetingSlidePayload {
    * scores, so the slide carries the words.
    */
   phrase?: { say: string; avoid: string };
+  /**
+   * How long the conditions have held and how often the monthly record has changed
+   * them (`describeSlideRecord`). Set by the export routes, which read the record
+   * on the server; the browser's slide has no record and prints no line for it.
+   */
+  record?: string;
   /** Where to read the whole brief. Absent when the caller has no origin. */
   url?: string;
   /** True when the reading came off a snapshot rather than a live fetch. */
@@ -174,6 +180,7 @@ export function formatMeetingSlideMarkdown(payload: MeetingSlidePayload): string
   return [
     `> **Whether: this week's guidance** — *${payload.recordDate}*`,
     `> **Conditions**: ${slideConditions(payload)}${payload.stageLabel ? ` · **Stage**: ${payload.stageLabel}` : ""}`,
+    ...(payload.record ? [`> *${payload.record}*`] : []),
     `>`,
     ...(guidance ? [`> **GUIDANCE**: ${guidance}`] : []),
     // Labels only (2026-10-09): a target, a warning sign, a tick and a cycle
@@ -220,7 +227,12 @@ export function formatMeetingSlideHtml(payload: MeetingSlidePayload): string {
     <div>
       <span style="font-size: 12px; color: ${OG_TEXT_MUTED}; font-weight: 600;">Whether · Weekly operating guidance</span>
       <h2 style="margin: 4px 0 0 0; font-size: 18px; color: ${OG_TEXT};">This week's guidance${payload.stageLabel ? ` — ${esc(payload.stageLabel)}` : ""}</h2>
-      <p style="margin: 4px 0 0 0; font-size: 12px; color: ${OG_TEXT_MUTED};">Conditions: ${esc(slideConditions(payload))}</p>
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: ${OG_TEXT_MUTED};">Conditions: ${esc(slideConditions(payload))}</p>${
+        payload.record
+          ? `
+      <p style="margin: 4px 0 0 0; font-size: 12px; color: ${OG_TEXT_MUTED};">${esc(payload.record)}</p>`
+          : ""
+      }
     </div>
     <div style="text-align: right;">
       <span style="border: 1px solid ${badgeEdge}; color: ${badgeInk}; padding: 4px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em;">${esc(getRegimePublicLabel(payload.regime))}</span>
@@ -358,8 +370,13 @@ export function formatMeetingSlideSvg(payload: MeetingSlidePayload): string {
   <g transform="translate(80, 70)">
     <text x="0" y="0" font-family="-apple-system, system-ui, sans-serif" font-size="15" font-weight="600" fill="${OG_TEXT_MUTED}">Whether · Weekly operating guidance</text>
     <text x="0" y="44" font-family="-apple-system, system-ui, sans-serif" font-size="34" font-weight="800" fill="${OG_TEXT}">This week's guidance${payload.stageLabel ? ` (${esc(payload.stageLabel)})` : ""}</text>
-    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="${OG_TEXT_MUTED}">${esc(payload.recordDate)} · ${esc(slideConditions(payload))}</text>
-    
+    <text x="0" y="74" font-family="-apple-system, system-ui, sans-serif" font-size="16" font-weight="500" fill="${OG_TEXT_MUTED}">${esc(payload.recordDate)} · ${esc(slideConditions(payload))}</text>${
+      payload.record
+        ? `
+    <text x="0" y="100" font-family="-apple-system, system-ui, sans-serif" font-size="13" font-weight="500" fill="${OG_TEXT_MUTED}">${esc(payload.record)}</text>`
+        : ""
+    }
+
     <!-- Regime Badge -->
     <g transform="translate(880, 10)">
       <rect x="0" y="0" width="160" height="42" rx="21" fill="${badgeColor}" fill-opacity="0.15" stroke="${badgeColor}" stroke-width="1.5"/>
