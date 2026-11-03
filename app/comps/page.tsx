@@ -223,7 +223,7 @@ export default async function CompsPage() {
             Founders, finance teams and board members can use the basket to question valuation assumptions.
             Compare growth, gross margin, retention, scale and the revenue period before choosing a comparable.
             Public shares are liquid; a private round also depends on its terms, investor demand and company risk.
-            Multiplying private ARR by this median does not produce a supported valuation.
+            Multiplying private ARR by this median will not produce a supported valuation.
           </p>
           <p className="text-sm text-slate-300 leading-relaxed">
             For the board note, record the observation date, selected comparable, revenue basis and the differences

@@ -14,7 +14,7 @@ const buildAuthMd = (): string => [
   "",
   "- The one write that takes no credentials is subscribing an email to the weekly brief: `POST /api/mcp?tool=subscribe` with `{ \"email\": \"name@company.com\" }`.",
   "- Email confirmation links carry a one-time token, show what they would change, and apply it only when the confirm button is used.",
-  "- The scheduler's routes (delivering the digest, decision events, alert deliveries) take `Authorization: Bearer <WHETHER_CRON_SECRET>`, stay closed in robots.txt, and are not for agents.",
+  "- The scheduler's routes (delivering the digest, decision events, alert deliveries) take `Authorization: Bearer <WHETHER_CRON_SECRET>`, stay closed in robots.txt, and agents must not call them.",
   "- `/api/decision-memory` is reachable but owner-scoped: it answers 401 without an `x-whether-client-id` header naming the owner whose entries are read or written.",
   "- The CLI's `whether auth status` verifies a key you keep (`WHETHER_API_KEY`) against `GET /api/auth/status`; no public endpoint requires it.",
   "",

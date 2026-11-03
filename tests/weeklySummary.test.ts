@@ -134,7 +134,7 @@ describe("buildWeeklySummary", () => {
     const provenance = { sourceLabel: "FRED", timestampLabel: "Oct 5, 2026", ageLabel: "6m.", statusLabel: "Canonical snapshot (high confidence)" };
     const summary = buildWeeklySummary({ assessment, provenance, recordDateLabel: "Oct 5, 2026", record });
     assert.ok(
-      summary.summary.includes("Conditions change if: The missing inputs return in a live reading; until then the guidance is not changing."),
+      summary.summary.includes("Conditions change if: The missing inputs return in a live reading; until then the guidance won't change."),
       summary.summary,
     );
     assert.doesNotMatch(summary.summary, /pts to clear|or below \(/);

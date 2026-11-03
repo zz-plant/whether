@@ -37,11 +37,11 @@ mockAny.module("next/navigation", () => ({
  * Same shape as tests/noComparisonHonesty.test.ts: build or render each state
  * the suite can reach offline, and hold the sentence to a rule rather than to
  * its exact wording. It has to say what is absent (no live reading, a score
- * that can't move, a call that is not changing, inputs that are missing) and it
+ * that can't move, a call that is not changing or won't change, inputs that are missing) and it
  * may not fall back on the abstractions the audit found standing in for it.
  */
 
-const SAYS_WHAT_IS_MISSING = /no live|late|not changing|can't|missing/i;
+const SAYS_WHAT_IS_MISSING = /no live|late|not changing|won't change|can't|missing/i;
 const ABSTRACTS_INSTEAD = /bounded|discipline|policy|threshold is available/i;
 
 /* React renders the JSX apostrophe entity as the typographic character. */

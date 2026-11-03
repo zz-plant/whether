@@ -171,7 +171,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         from: "Investors",
         question: "Public markets bounced this month — we should go out and raise now.",
-        answer: "One good week doesn't restart fundraising. Wait until both scores meet its restart condition before opening a round.",
+        answer: "One good week won't restart fundraising. Wait until both scores meet its restart condition before opening a round.",
         area: "capital-raising",
       },
       {
@@ -194,7 +194,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       },
       {
         stageSlug: "series-a",
-        guidance: "Set hiring and spend limits so burn does not grow ahead of repeatable revenue.",
+        guidance: "Set hiring and spend limits so burn cannot grow ahead of repeatable revenue.",
       },
       {
         stageSlug: "series-b",
