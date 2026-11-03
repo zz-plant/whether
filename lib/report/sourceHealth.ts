@@ -302,7 +302,7 @@ const buildGroupedRow = ({
  * is exactly what it is supposed to be.
  *
  * This used to count every row that was not live, and that one curated group
- * is never live, so every page on every visit reported "Partly cached" in
+ * is never live, so every page on every visit reported "Some sources saved" in
  * warning amber and told the reader to "hold anything you can't undo until
  * every source is current" — a condition that can never be met — while /trust,
  * reading the same read, said no warning was active and it was fine to act. A
@@ -371,7 +371,7 @@ export type SourceBoardRow = {
 
 /*
  * The state word, in the strip's vocabulary ("All sources live", "Partly
- * cached"), so a reader who sees "Partly cached" under the h1 finds the cached
+ * cached"), so a reader who sees "Some sources saved" under the h1 finds the cached
  * row by the same word. Age and absence come first: a live source that has not
  * answered inside its window is stale before it is anything else.
  */

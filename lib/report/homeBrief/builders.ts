@@ -11,7 +11,7 @@ import {
   buildActionStripItems,
   buildRoleAwareOperatingTemplates,
 } from "../operatingCalls";
-import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolvePublishedConfidence } from "../confidence";
+import { FRESH_FALLBACK_HOURS, resolveDistanceToFlip, resolveLineGaps, resolvePublishedConfidence } from "../confidence";
 import { buildRegimeFlipState, boundaryDirectionForRegime } from "../regimeFlipState";
 import { type ReportDynamics } from "../reportData";
 import { comparisonBasis, type ComparisonBasis } from "../comparisonBasis";
@@ -426,7 +426,17 @@ export const buildHomeBriefModelInternal = (
   // which is the nearest unsatisfied boundary when the call and readings agree,
   // and the line that changes the flip target when a quadrant change is
   // pending. Measuring the satisfied boundary instead reported points to a
-  // crossing that had already happened.
+  // crossing that had already happened. The watched line is chosen on the
+  // tightness-equivalent scale inside `buildRegimeFlipState`; `pointsToFlip`
+  // stays in the watched axis's own points (what the sentence prints), and
+  // `pointsToFlipNormalized` is that same watched line's distance on the scale
+  // the published margin cuts at, so the flip meter cannot disagree with the
+  // margin. In a pending change the watched line is the *other* boundary, not
+  // the cause, so this is the line's own gap, not the global minimum.
+  const lineGaps = resolveLineGaps({
+    scores: assessment.scores,
+    thresholds: assessment.thresholds,
+  });
   const regimeDistance =
     regimeFlipState.watch.dimension === "tightness"
       ? {
@@ -435,6 +445,7 @@ export const buildHomeBriefModelInternal = (
           currentValue: assessment.scores.tightness,
           thresholdValue: regimeFlipState.watch.threshold,
           pointsToFlip: Math.abs(regimeFlipState.watch.threshold - assessment.scores.tightness),
+          pointsToFlipNormalized: lineGaps.tightness,
           thresholdDirection: regimeFlipState.watch.direction,
         }
       : {
@@ -443,6 +454,7 @@ export const buildHomeBriefModelInternal = (
           currentValue: assessment.scores.riskAppetite,
           thresholdValue: regimeFlipState.watch.threshold,
           pointsToFlip: Math.abs(regimeFlipState.watch.threshold - assessment.scores.riskAppetite),
+          pointsToFlipNormalized: lineGaps.riskAppetite,
           thresholdDirection: regimeFlipState.watch.direction,
         };
 
@@ -503,7 +515,7 @@ export const buildHomeBriefModelInternal = (
       ? startupVariantPolicy.adjustmentsByMode[startupVariantMode]?.doNowAdjustments[0]?.trim()
         || actionNowShort?.trim()
       : actionNowShort?.trim();
-  /* The lines still to cross, per area: a held area's resume lines it has not
+  /* The lines still to cross, per area: a held area's restart lines it has not
      met, an open area's pause lines. Until 2026-10-21 this was every resume
      line, met or not, so the week of Oct 19 (risk appetite 55) listed "Risk
      appetite > 54" under "Other things that would change this guidance", and a
@@ -563,7 +575,7 @@ export const buildHomeBriefModelInternal = (
     areas: areaLinesFromRules(decisionRules),
   });
   /* What the week did to the guidance, for every line that says nothing changed:
-     the conditions word, then the pause and resume lines, never the latitude. */
+     the conditions word, then the pause and restart lines, never the latitude. */
   const guidanceChange = describeGuidanceChange({
     movement: decisionMovement,
     regimeChanged: reportDynamics?.regimeChanged,

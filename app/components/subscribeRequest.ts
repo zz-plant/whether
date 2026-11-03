@@ -10,6 +10,7 @@
 
 import type { PlanLines } from "../../lib/alert/planLines";
 import type { RunwayBand } from "../../lib/report/operatorRunway";
+import type { OperatorStage } from "../../lib/report/operatorStage";
 
 type SubscribeResult = { ok: boolean; message: string };
 
@@ -22,14 +23,16 @@ type SubscribeOptions = {
   planLines?: PlanLines[];
   /** The reader's runway band, sent with `planLines` so a crossing email can say what it means at it. */
   runwayBand?: RunwayBand;
+  /** The company stage they set on the site, so their Monday brief prints the scaled rules. */
+  stage?: OperatorStage;
 };
 
 export const SUBSCRIBE_ENDPOINT = "/api/email/subscribe";
 
-const INVALID_EMAIL_MESSAGE = "Please enter a valid email address.";
-const VERIFY_MESSAGE = "Check your email to verify your subscription.";
-const FAILURE_MESSAGE = "Failed to subscribe. Please try again.";
-const NETWORK_MESSAGE = "A network error occurred. Please try again.";
+const INVALID_EMAIL_MESSAGE = "Enter a full email address, like you@company.com.";
+const VERIFY_MESSAGE = "Check your inbox. Nothing is sent until you click the link.";
+const FAILURE_MESSAGE = "That did not go through. Try again in a moment.";
+const NETWORK_MESSAGE = "You are offline, or the connection dropped. Try again.";
 
 export async function requestSubscription(
   email: string,
@@ -51,7 +54,8 @@ export async function requestSubscription(
         ...(typeof options?.alerts === "boolean" ? { alerts: options.alerts } : {}),
         ...(typeof options?.weekly === "boolean" ? { weekly: options.weekly } : {}),
         ...(options?.planLines ? { planLines: options.planLines } : {}),
-        ...(options?.planLines && options.runwayBand ? { runwayBand: options.runwayBand } : {}),
+        ...(options?.runwayBand ? { runwayBand: options.runwayBand } : {}),
+        ...(options?.stage ? { stage: options.stage } : {}),
       }),
     });
     const data: { ok?: boolean; error?: string } | null = await res.json().catch(() => null);

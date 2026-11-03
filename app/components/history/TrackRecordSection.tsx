@@ -48,7 +48,7 @@ export function TrackRecordSection({
       aria-labelledby="track-record-grading-heading"
     >
       <div>
-        <h2 id="track-record-grading-heading" className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">How the record held up</h2>
+        <h2 id="track-record-grading-heading" className="type-section">How the record held up</h2>
         <p className="max-w-prose text-sm text-slate-300">
           The last {counts?.readings ?? record.observations} month-end readings{windowLabel ? `, ${windowLabel},` : ""} graded
           against the same data that produced them.

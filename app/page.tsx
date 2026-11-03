@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import { buildHomeMetadata, type HomePageSearchParams } from "../lib/report/homeMetadata";
 import { BriefArtifactScript } from "./components/briefArtifactScript";
 import { buildBriefArtifact, deriveBriefCallFields } from "../lib/report/homeBrief/briefArtifactBuilder";
-import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
+import { formatBriefArtifact, SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "../lib/report/briefArtifact";
+import { siteUrl } from "../lib/siteUrl";
 import { homeOrientationLine } from "../lib/seo";
 import { loadHomePageAssembly } from "../lib/report/homePageAssemblyLoader";
 import { Shell } from "./components/Shell";
@@ -18,6 +19,7 @@ import { CadenceCallCard } from "./components/CadenceCallCard";
 import { CadenceSelector } from "./components/cadenceSelector";
 import { buildCadenceCallModel, type CadenceCallHorizon } from "../lib/report/cadenceCallModel";
 import { getRegimePublicLabel, isRegimeKey } from "../lib/regimePresentation";
+import { getPlaybookForRegime } from "../lib/playbook";
 import { formatDecisionReversal, formatNearestChange, formatStripMargin } from "../lib/report/reportFormatting";
 import { isRoute } from "../lib/navigation/routeType";
 import { resolveDataStatusGuidance } from "../lib/report/trustStatus";
@@ -47,8 +49,11 @@ import { WhatChangedSection } from "./components/home/WhatChangedSection";
 import { WhyConditionsSection } from "./components/home/WhyConditionsSection";
 import { AllAreaRules } from "./components/home/AllAreaRules";
 import { CompanyCalibration } from "./components/home/CompanyCalibration";
+import { LineStateBand } from "./components/home/LineStateBand";
 import { AlertSection } from "./components/home/AlertSection";
 import { RecordSection } from "./components/home/RecordSection";
+import { HearingSection } from "./components/home/HearingSection";
+import { selectHearingForAreas } from "./guides/stakeholderGuides";
 import { ActionLink } from "./components/ui/actionLink";
 import { WhatWouldChangeSection } from "./components/home/WhatWouldChangeSection";
 import { ShareLinks } from "./components/home/ShareLinks";
@@ -61,9 +66,12 @@ import {
   describeConditionsTrail,
   describeEarlierConditions,
   describeHeldAreasForCard,
+  describeLineStateBand,
   describeWeeklyMovement,
   HOME_SECTIONS,
 } from "../lib/report/home/homeSectionModel";
+import { buildDecisionCorridorModel } from "../lib/report/operatingCalls";
+import { DEFAULT_RUNWAY_BAND, runwayBandLabel, runwayBandSublabel } from "../lib/report/operatorRunway";
 import { findLastTimeCallChanged } from "../lib/report/lastTimeCallChanged";
 import { describeScoreMovementCaveat } from "../lib/report/scoreMovement";
 import { RegimeRadar } from "./components/home/RegimeRadar";
@@ -141,6 +149,16 @@ const resolveHomeCadence = (value: string | undefined): CadenceCallHorizon | "we
 
 /** Month-ends on the conditions map's path: half a year, enough to show a direction without crowding the plane. */
 const CONDITIONS_TRAIL_MONTHS = 6;
+
+/** Raw inputs behind the scores, and the names a reader knows them by. */
+const INPUT_HISTORY_LABELS: Record<string, string> = {
+  CPI_YOY: "Inflation (CPI)",
+  UNEMPLOYMENT_RATE: "Unemployment",
+  HY_CREDIT_SPREAD: "High-yield spread",
+  BBB_CREDIT_SPREAD: "BBB spread",
+  VIX_INDEX: "Volatility (VIX)",
+  CHICAGO_FCI: "Financial conditions",
+};
 
 async function PageContent({
   searchParams,
@@ -335,10 +353,10 @@ async function PageContent({
       }
     : undefined;
 
-  /* The selected horizon, named once. The page's `h1` is the weekly call
-   * itself (`DecisionHero`); this labels the copied artifact, which lands in
-   * someone else's Slack channel where it is the only thing identifying the
-   * source, and the meta row's date. */
+  /* The selected horizon, named once. The weekly call is the page's lead at
+   * every horizon, so this names the horizon where it is the artifact's
+   * identity: the copied brief's title, and an archived view's caption when
+   * one is selected. */
   const cadenceTitle = cadenceCall
     ? [cadenceCall.cadenceLabel, cadenceCall.periodLabel].filter(Boolean).join(" — ")
     : null;
@@ -352,9 +370,20 @@ async function PageContent({
     title: cadenceTitle ?? "Whether Weekly Brief",
   });
 
+  /* The one Slack paste, from the one formatter (2026-11-02). Copy Brief under
+     the card built its own shape — an undated title over `window.location.href`
+     — while the share panel copied `formatBriefArtifact`: dated, with the
+     signal and provenance lines, and pointing at the frozen record. Two pastes
+     of one artifact, and the one on the card was the only one that could not be
+     cited. It now copies the panel's string, so the artifact that travels and
+     the artifact on the page are the same document. `siteUrl`, not the request
+     host: a paste is read later, from somewhere else, and a preview host does
+     not outlive it. */
+  const briefSlackBlock = formatBriefArtifact(briefArtifact, "slack", siteUrl);
+
   /* The five sections' data, built once here and drawn by the components under
      app/components/home. The lines every score is judged against are the same
-     three the rules state: the area pause/resume lines from the printed rule,
+     three the rules state: the area pause/restart lines from the printed rule,
      and the call-change line from the engine's own thresholds. */
   const callChangeLines = {
     tightness: reportData.assessment.thresholds.tightnessRegime,
@@ -388,6 +417,17 @@ async function PageContent({
     movement: decisionMovement,
     scores: { tightness, riskAppetite },
   });
+  const corridorModel = buildDecisionCorridorModel(
+    homepage.weeklyDecisionCardModel.decision.decisionRules ?? [],
+    { tightness, riskAppetite },
+  );
+  /* The questions this week's crossed pause lines invite, for the section after
+     the lines: one per crossed area, one per group, one per speaker
+     (`selectHearingForAreas`). Empty on a week no pause line is crossed, and the
+     section renders nothing. */
+  const hearingPreview = selectHearingForAreas(
+    homeAreaRows.filter((row) => row.pause?.met).map((row) => row.area),
+  );
   const scoreLadders = [
     {
       metric: "tightness" as const,
@@ -428,12 +468,27 @@ async function PageContent({
      defaults, said once, at the head of the areas. */
   const calibrationChosen = Boolean(data.operatorContext.companyStage || data.operatorContext.companyRunway);
   const stageLabel = operatorStageLabel(operatorStageForVariantMode(activeStage));
+  /* Where this reading is scaled to, as a chip in the card's stamp row
+     (2026-10-31). The call is correctly the same for every reader, so the
+     localization belongs in the chrome rather than in a second call. The
+     trailing clause is the band's own meaning ("cash first"), printed only when
+     the band actually reshaped the rule — a default band reads "follow the
+     guidance", which is what the shared call already says. */
+  const readingLocation = !historicalSelection && activeCadence === "weekly"
+    ? {
+        label: runwayScopedAdjustment?.runwayLabel
+          ? `${stageLabel} · ${runwayBandLabel(activeRunway ?? DEFAULT_RUNWAY_BAND)} · ${runwayBandSublabel(activeRunway ?? DEFAULT_RUNWAY_BAND).toLowerCase()}`
+          : `${stageLabel} · ${runwayBandLabel(activeRunway ?? DEFAULT_RUNWAY_BAND)}`,
+        href: `#${HOME_SECTIONS.calibration.id}`,
+        hint: "Change your stage and runway",
+      }
+    : undefined;
   /* A chosen stage's own action, as a stage line; the headline stays the
      week's, which is the same for every reader. */
   const stageAction = calibrationChosen && !homepage.weeklyCall.policyOverrideActive
     ? homepage.weeklyCall.stageScopedAdjustments?.[activeStage]?.actionNow
     : undefined;
-  /* The guidance's resume line: the lead area's, as /trust and every paste print it. */
+  /* The guidance's restart line: the lead area's, as /trust and every paste print it. */
   const leadResumeCondition = homepage.weeklyDecisionCardModel.decision.actionStripItems?.[0]?.reversalCondition;
   const decisionPickerOptions: DecisionPickerOption[] = decisionAreaOrder.flatMap((area) => {
     const row = homeAreaRows.find((candidate) => candidate.area === area);
@@ -481,6 +536,20 @@ async function PageContent({
       comparisonBasis(reportData.monthEndComparison?.comparedWith),
     ),
   };
+  /* Trailing history of the raw inputs behind the scores, from the macro series
+     the report already loaded (no extra read). Null values are dropped; series
+     with fewer than three readings render nothing. */
+  const inputHistory = reportData.macroSeries
+    .filter((series) => series.id in INPUT_HISTORY_LABELS)
+    .map((series) => ({
+      key: series.id,
+      label: INPUT_HISTORY_LABELS[series.id],
+      points: (series.history ?? [])
+        .filter((point): point is { date: string; value: number } =>
+          typeof point.value === "number" && Number.isFinite(point.value))
+        .map((point) => ({ label: formatDateUTC(point.date), value: point.value })),
+    }))
+    .filter((series) => series.points.length >= 3);
   /* On a reading whose conditions differ from the earlier one, the card's stamp
      line says what they were, dated by the comparison's own basis. */
   const earlierConditions =
@@ -541,12 +610,46 @@ async function PageContent({
       }
     : undefined;
   const heldAreasLine = historicalSelection ? null : describeHeldAreasForCard(decisionPickerOptions);
+  /* The week's exception, above the call: null on a calm week, so the page's
+     silhouette changes with the weather rather than being drawn the same way
+     whatever the reading says. */
+  const lineStateBand = historicalSelection ? null : describeLineStateBand(homeAreaRows);
+  /* The meaning line under the call carries the two scores it rests on: they
+     lived only inside the map, so the week's word could be screenshotted but
+     not cited. One click to the section that shows the change lines and what
+     the score leaves out. */
+  const heroReading = {
+    numbers: `Funding pressure ${Math.round(tightness)}, risk appetite ${Math.round(riskAppetite)}.`,
+    whyHref: `#${HOME_SECTIONS.diagnosis.id}`,
+  };
   const heroAreas = heldAreasLine
     ? { text: heldAreasLine, href: `#${HOME_SECTIONS.areas.id}`, action: "What to do in each area" }
     : undefined;
+  /* One sentence the reader can say in a meeting, from the same playbook /operate
+     prints in full. A score has to be interpreted; a sentence can be repeated.
+     A held week prints none: "take share while money is cheap" under "hold
+     anything you can't undo" is two instructions disagreeing. */
+  const heroPhrase =
+    !historicalSelection && !reportData.assessment.policyAssessment?.refusal?.refused && isRegimeKey(regime)
+      ? getPlaybookForRegime(regime)?.leadershipPhrases.more[0]
+      : undefined;
   const heroTrust = publishedNotice
     ? { ...trustStripProps, basis: { ...trustStripProps.basis, note: null, omitReason: true } }
     : trustStripProps;
+
+  const periodControl = (
+    <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
+            <WeekStepper
+              previousHref={prevWeekHref}
+              nextHref={nextWeekHref}
+              previousLabel="Previous month"
+              nextLabel={nextHistoricalRequest ? "Next month" : "This week"}
+              currentDateLabel={periodLabel}
+              isHistorical={Boolean(historicalSelection)}
+              history={regimeHistory}
+            />
+    </div>
+  );
 
   return (
     <Shell regime={regime}>
@@ -588,6 +691,7 @@ async function PageContent({
             rendered={{ week: reportData.treasury.record_date, regime: reportData.assessment.regime }}
           />
           <ConditionsLegend
+            compact
             arrival={arrivedFromShare ? "share" : undefined}
             /* On an archived week too (2026-10-27): the sentence is as true of March 2020
                as of this week, a first visit can arrive on a shared archive link, and
@@ -600,17 +704,7 @@ async function PageContent({
           {/* Browse the week before the call. Horizon and confidence details
               follow the call beside Copy Brief, so wrapping controls cannot
               push the reading below the first phone viewport. */}
-          <div className="flex flex-wrap items-center justify-between gap-x-2 gap-y-2">
-            <WeekStepper
-              previousHref={prevWeekHref}
-              nextHref={nextWeekHref}
-              previousLabel="Previous month"
-              nextLabel={nextHistoricalRequest ? "Next month" : "This week"}
-              currentDateLabel={cadenceTitle ?? periodLabel}
-              isHistorical={Boolean(historicalSelection)}
-              history={regimeHistory}
-            />
-          </div>
+          {historicalSelection ? periodControl : null}
           {/* Under the stepper, not above the page (2026-10-27): inserted above, the
               band pushed the key a reader had just pressed 142px down on a desktop and
               150–216px on a phone, so stepping back a second month meant finding it
@@ -659,9 +753,13 @@ async function PageContent({
                 jump: { href: `#${HOME_SECTIONS.areas.id}`, label: "By area" },
               })}
             >
-              {cadenceCall ? <CadenceCallCard model={cadenceCall} titleLevel="h1" /> : null}
+              {/* Above the card, inside the region it belongs to. Renders nothing
+                  unless an area is on hold or close to its line. */}
+              {lineStateBand ? <LineStateBand model={lineStateBand} /> : null}
               <DecisionHero
-                titleLevel={cadenceCall ? "h2" : "h1"}
+                periodControl={historicalSelection ? undefined : periodControl}
+                location={readingLocation}
+                reading={heroReading}
                 weeklyCall={cardCall.action}
                 callDetail={historicalSelection ? undefined : whyLine}
                 regime={regime}
@@ -683,6 +781,8 @@ async function PageContent({
                     trail={conditionsTrail.points}
                     trailCaption={conditionsTrail.caption}
                     caveat={conditionsTrail.caveat}
+                    compact
+                    detailsOpen={searchParams?.chart === "1"}
                     footer={
                       <Link
                         href="/trust#formula-reference"
@@ -700,6 +800,7 @@ async function PageContent({
                 trust={historicalSelection ? null : heroTrust}
                 published={publishedNotice}
                 areas={heroAreas}
+                phrase={heroPhrase}
                 captionDetail={historicalSelection ? `Archived: ${cadenceTitle ?? periodLabel}` : undefined}
                 phoneFigure={
                   nearestLadder && !historicalSelection ? (
@@ -743,17 +844,31 @@ async function PageContent({
                   first visit it folds with the brief: on a phone it pushed the
                   decision picker under the tab bar, and that question is the
                   one thing a first visit is asked. */}
-              <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
-                <ShareBriefButton text={primaryCall} lines={briefShareLines} showLabel />
+              <div className="weather-brief-actions mt-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="flex flex-wrap items-center gap-3">
+                  <ShareBriefButton text={primaryCall} lines={briefShareLines} slackBlock={briefSlackBlock} showLabel />
+                  {/* The core loop, beside the artifact rather than 4,000px below
+                      it: the alert is what a quiet week is for. */}
+                  <ActionLink href={`#${HOME_SECTIONS.alert.id}`} variant="inline">
+                    Get the alert →
+                  </ActionLink>
+                </div>
                 {/* Labelled: three bare words beside Copy Brief did not say they
                     set the horizon the guidance is stated for. The confidence chip
                     that sat between them repeated the trust strip on the card. */}
                 <div className="flex flex-wrap items-center gap-2">
-                  <span className="text-fluid-xs text-slate-400">Plan horizon</span>
+                  <span className="max-sm:sr-only text-fluid-xs text-slate-400">Plan horizon</span>
                   <CadenceSelector />
                 </div>
               </div>
             </div>
+
+            {/* The selected horizon's guidance, under the call (2026-10-29): the
+                weekly call leads at every horizon, so a longer horizon joins the
+                brief as a band below it rather than taking the page's lead. The
+                `?cadence=` link a reader shared still opens this card — it opens
+                under this week's call. */}
+            {cadenceCall ? <CadenceCallCard model={cadenceCall} /> : null}
 
             {/* 2. The five areas: the picker, all five side by side folded under it,
                 and the one plan link. */}
@@ -761,6 +876,8 @@ async function PageContent({
               options={decisionPickerOptions}
               initialSelected={parseHomeDecision(searchParams?.[HOME_DECISION_PARAM])}
               regime={regime}
+              stageLabel={stageLabel}
+              activeRunway={activeRunway}
             >
               <AllAreaRules
                 rows={homeAreaRows}
@@ -768,6 +885,7 @@ async function PageContent({
                 regime={regime}
                 planHref={isRoute(operateHref) ? operateHref : "/operate"}
                 isHistorical={Boolean(historicalSelection)}
+                corridorModel={corridorModel}
               />
               <div>
                 <ActionLink href={operateHref} variant="primary">
@@ -791,7 +909,28 @@ async function PageContent({
               />
             ) : null}
 
-            {/* 4. What the conditions are made of, and what the reading leaves out:
+            {/* 4. What changed. One table, every signal, each against the earlier
+                reading and against its own lines. It opens on the table: the card
+                says what the week did to the conditions and why, and each area's
+                row says which of its lines moved. Only a read with nothing to
+                compare says so over it. */}
+            <WhatChangedSection
+              compact
+              historyOpen={searchParams?.inputs === "1"}
+              heading={`What changed ${basis.since}`}
+              rows={signalChangeRows}
+              history={{
+                tightness: conditionsTrail.points.map((point) => ({ label: point.label, value: point.tightness })),
+                riskAppetite: conditionsTrail.points.map((point) => ({ label: point.label, value: point.riskAppetite })),
+              }}
+              historyCaveat={conditionsTrail.caveat}
+              inputHistory={historicalSelection ? undefined : inputHistory}
+              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
+              comparisonUnavailable={comparisonUnavailable}
+              basis={basis}
+            />
+
+            {/* 5. What the conditions are made of, and what the reading leaves out:
                 the two scores with their meanings, the excluded inputs that would
                 change the classification, and the capped score's real distance. */}
             <WhyConditionsSection
@@ -804,20 +943,7 @@ async function PageContent({
               warning={reportData.scoringBasis.warning}
             />
 
-            {/* 5. What changed. One table, every signal, each against the earlier
-                reading and against its own lines. It opens on the table: the card
-                says what the week did to the conditions and why, and each area's
-                row says which of its lines moved. Only a read with nothing to
-                compare says so over it. */}
-            <WhatChangedSection
-              heading={`What changed ${basis.since}`}
-              rows={signalChangeRows}
-              lead={comparisonUnavailable ? describeWeeklyMovement({ tightnessDelta, riskAppetiteDelta, comparisonUnavailable, basis }) : undefined}
-              comparisonUnavailable={comparisonUnavailable}
-              basis={basis}
-            />
-
-            {/* 6. What would change the guidance: its pause and resume lines, the
+            {/* 6. What would change the guidance: its pause and restart lines, the
                 line where conditions change, and where the reading sits. */}
             <WhatWouldChangeSection
               ladders={scoreLadders}
@@ -832,7 +958,14 @@ async function PageContent({
               conditionsTrail={conditionsTrail}
             />
 
-            {/* 7. How unusual is this? */}
+            {/* 7. Who will ask about those lines: the questions this week's
+                crossed lines invite, and the answer each one has. Renders
+                nothing on a week no pause line is crossed, and nothing on an
+                archived week, whose lines are a record rather than a present
+                conversation. */}
+            {historicalSelection ? null : <HearingSection entries={hearingPreview} />}
+
+            {/* 8. How unusual is this? */}
             <RecordSection
               lastTime={lastTimeCallChanged}
               callChangeLines={callChangeLines}
@@ -841,7 +974,7 @@ async function PageContent({
               record={historicalSelection ? undefined : recordSeries}
             />
 
-            {/* 8. The alert: hearing the day a line is crossed is how the page is
+            {/* 9. The alert: hearing the day a line is crossed is how the page is
                 meant to be used, so it follows everything it watches. */}
             <AlertSection defaultFrequency={arrivedFromShare ? "weekly" : "alerts"} />
 

@@ -7,7 +7,7 @@ import { buildDegradedSourceRows } from "../../../lib/report/sourceHealth";
 import { resolvePublishedConfidence } from "../../../lib/report/confidence";
 import { buildPageMetadata } from "../../../lib/seo";
 import { loadReportDataSafe } from "../../../lib/report/reportData";
-import { isStaleForIndexing } from "../../../lib/seo/freshnessIndexation";
+import { isCallStaleForIndexing, isStaleForIndexing } from "../../../lib/seo/freshnessIndexation";
 import { findSignalsCluster, isSignalsClusterSlug, signalsClusterStaticParams } from "../clusterRoutes";
 import { ContentPageShell } from "../../components/ui/contentPageShell";
 import { SignalReadingPanel } from "../components/signalReadingPanel";
@@ -36,15 +36,22 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
 
   const reportResult = await loadReportDataSafe(undefined, { route: `/signals/${cluster}:metadata` });
   const reportData = reportResult.ok ? reportResult.data : reportResult.fallback;
-  const stale = isStaleForIndexing({
+  /* Two clocks: the card's reading is withheld when the *read* is old (a cached
+     figure must not outlive the page's warning), while indexing follows the
+     *call's* record date, which moves weekly and tolerates a missed daily ingest. */
+  const readStale = isStaleForIndexing({
     fetchedAtIso: reportData.treasury.fetched_at,
+    isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
+  });
+  const callStale = isCallStaleForIndexing({
+    recordDateIso: reportData.treasury.record_date,
     isFallbackSnapshot: !reportResult.ok || !reportData.treasury.isLive,
   });
   /* This week's reading on the card, where every signals card carried the same
      "EVIDENCE / What moved" box. Only while the reading is live: a stale figure
      on a card that platforms cache for days is the one place it would outlive
      the page's own warning. */
-  const reading = !stale && isSignalClusterSlug(cluster) ? buildSignalClusterReading(cluster, reportData) : null;
+  const reading = !readStale && isSignalClusterSlug(cluster) ? buildSignalClusterReading(cluster, reportData) : null;
   const readingPanel: Record<string, string> = reading?.displayValue
     ? {
         panelLabel: "This week",
@@ -85,7 +92,7 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
    * few hours past its refresh is still indexed and one older than the window
    * is not, whichever store it came from.
    */
-  if (stale) {
+  if (callStale) {
     metadata.robots = { index: false, follow: true };
   }
 

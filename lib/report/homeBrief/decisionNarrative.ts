@@ -18,7 +18,7 @@ export const resolvePrimaryShiftRegimeKey = (regime: Regime) =>
 
 /* `reversalTrigger` here is the line where the call itself changes (the caller
    passes `conciseFlipThreshold`), so it takes that line's name. It read
-   "Re-open when", which is the resume line's old name — the same string was
+   "Re-open when", which is the restart line's old name — the same string was
    labelled one line on the hero and the other line here. */
 const CALL_CHANGES_IF = DECISION_CONTRACT_LABELS.watch.postureFlips;
 

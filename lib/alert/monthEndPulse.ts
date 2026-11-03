@@ -29,7 +29,7 @@ import { getWhetherKv } from "../runtime/kv";
 import { monthKeyFor } from "../summary/monthlyRegimeHistory";
 import { getSubscriberStore } from "../email/subscriberStore";
 import { createCloudflareEmailAdapter } from "../email/emailDelivery";
-import { escapeHtml, renderEmailShell, unsubscribeFooterText } from "../email/emailShell";
+import { escapeHtml, renderEmailShell, unsubscribeFooterText, unsubscribeHeaders } from "../email/emailShell";
 import { slackAlertBlocks, slackChannel } from "../delivery/slack";
 import { fanOut } from "../delivery/fanOut";
 import { resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
@@ -143,7 +143,7 @@ const postSlackPulse = async (headline: string, block: string): Promise<number> 
 };
 
 /** Send the month-end block to every alert subscriber, never throwing. */
-const sendEmailPulse = async (headline: string, block: string): Promise<number> => {
+const sendEmailPulse = async (headline: string, block: string, baseUrl?: string): Promise<number> => {
   const adapter = createCloudflareEmailAdapter();
   try {
     const subscribers = await getSubscriberStore().listAlertSubscribers();
@@ -152,7 +152,8 @@ const sendEmailPulse = async (headline: string, block: string): Promise<number> 
       const result = await adapter.send({
         to: subscriber,
         subject: `Whether — ${headline}`,
-        text: [block, "", ...unsubscribeFooterText(subscriber.token)].join("\n"),
+        headers: unsubscribeHeaders(subscriber.token, baseUrl),
+        text: [block, "", ...unsubscribeFooterText(subscriber.token, baseUrl)].join("\n"),
         /* The shell every Whether email uses, which gives this one the footer
            and the unsubscribe link its HTML part never carried. The block is
            text a reader pastes into a letter, so all of it is escaped: this
@@ -161,6 +162,7 @@ const sendEmailPulse = async (headline: string, block: string): Promise<number> 
           title: headline,
           body: `<div style="white-space:pre-wrap;color:${OG_TEXT_SECONDARY};font-size:0.9rem;line-height:1.6;">${escapeHtml(block).replace(/\n/g, "<br/>")}</div>`,
           unsubscribeToken: subscriber.token,
+          baseUrl,
         }),
       });
       return result.ok ? "sent" : "failed";
@@ -179,6 +181,8 @@ const sendEmailPulse = async (headline: string, block: string): Promise<number> 
 export const runMonthEndPulse = async (options?: {
   snapshot?: OperatingSnapshot;
   weeklyCall?: WeeklyCallContract;
+  /** The origin the mail's links carry; a request-triggered run passes its own host. */
+  baseUrl?: string;
 }): Promise<MonthEndPulseResult> => {
   /* The cron's snapshot, or the stored one for a manual run. With neither there
      is nothing to compare: a report read would serve the bundled copy on an
@@ -221,7 +225,7 @@ export const runMonthEndPulse = async (options?: {
   }
 
   const block = buildBlock(snapshot, weeklyCall);
-  const sentEmail = await sendEmailPulse(verdict.headline, block);
+  const sentEmail = await sendEmailPulse(verdict.headline, block, options?.baseUrl);
   const postedSlack = await postSlackPulse(verdict.headline, block);
   await kv.put(LAST_PULSED_KEY, verdict.monthKey).catch(() => undefined);
 

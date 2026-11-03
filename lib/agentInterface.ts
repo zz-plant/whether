@@ -137,7 +137,7 @@ export const buildAgentInterfaceFromContext = <Cadence extends AgentCadence>(
      expression cannot narrow against a generic and would need one. */
   const summaryBuilders: { [C in AgentCadence]: () => SummaryByCadence[C] } = {
     /* The record date, not `weeklyRecordDateLabel` (the week-ending Friday). The
-       RSS live item prints this as "Record date:", and on the Oct 5, 2026 reading
+       RSS live item prints this as "Data as of:", and on the Oct 5, 2026 reading
        it said Oct 9 beside a guid and pubDate dated Oct 5. */
     weekly: () =>
       buildWeeklySummary({

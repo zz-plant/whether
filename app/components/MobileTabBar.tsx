@@ -144,7 +144,7 @@ export function MobileTabBar() {
         data-testid="mobile-tab-bar"
         ref={navRef}
         data-scrolled-away={hidden ? "true" : undefined}
-        className={`fixed inset-x-0 bottom-0 z-40 border-t border-[color:var(--border-default)] bg-[var(--bg-body)] px-2 pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out motion-reduce:transition-none md:hidden ${hidden ? "translate-y-full" : ""}`}
+        className={`fixed inset-x-0 bottom-0 z-[var(--z-chrome)] border-t border-[color:var(--border-default)] bg-[var(--bg-body)] px-2 pb-[env(safe-area-inset-bottom)] transition-transform duration-200 ease-out motion-reduce:transition-none md:hidden ${hidden ? "translate-y-full" : ""}`}
       >
         <ul className="flex items-stretch">
           {tabs.map((tab) => {
@@ -182,9 +182,9 @@ export function MobileTabBar() {
 
       <Drawer.Root open={showMore} onOpenChange={setShowMore}>
         <Drawer.Portal>
-          <Drawer.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
+          <Drawer.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/50 backdrop-blur-sm" />
           {/* Viewport is what gives the sheet its swipe-to-dismiss and scroll lock. */}
-          <Drawer.Viewport className="fixed inset-0 z-50 flex items-end md:hidden">
+          <Drawer.Viewport className="fixed inset-0 z-[var(--z-modal)] flex items-end md:hidden">
             <Drawer.Popup className="w-full max-h-[85vh] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-800/70 bg-slate-950/95 backdrop-blur-lg">
               <MobileNavContent
                 navigationLinks={tabs}

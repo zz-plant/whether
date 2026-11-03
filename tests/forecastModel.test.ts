@@ -78,7 +78,10 @@ describe("forecast model probabilities and risk bounds", () => {
   });
 
   it("raises crossing risk to high when nearest distance is inside boundary band", () => {
-    const current = evaluateRegime(makeTreasury({ baseRate: 3.93, curveSlope: 0.19, recordDate: "2026-06-01" }));
+    // Distance is tightness-equivalent (resolveDistanceToFlip): tightness 72 is
+    // 2 points from its line, which the risk appetite gap of 2 raw points (9
+    // tightness-equivalent) does not beat.
+    const current = evaluateRegime(makeTreasury({ baseRate: 3.9, curveSlope: 0.19, recordDate: "2026-06-01" }));
     const previous = evaluateRegime(makeTreasury({ baseRate: 3.99, curveSlope: 0.25, recordDate: "2026-05-01" }));
 
     const model = buildForecastModel({

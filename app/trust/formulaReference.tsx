@@ -297,7 +297,7 @@ export function FormulaReference({
       description="The full derivation, from public data series to the weekly guidance."
     >
       {/* Where this week's scores sit is the brief's section, linked; this page drew the
-          same two ladders, pause, change and resume lines and all, until 2026-10-27. What
+          same two ladders, pause, change and restart lines and all, until 2026-10-27. What
           follows is how the scores are made. */}
       <p className="mb-3 text-sm text-slate-300">
         <ActionLink href="/#what-would-change" variant="inline">

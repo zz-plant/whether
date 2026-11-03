@@ -73,14 +73,14 @@ const renderSection = (snapshot: ReturnType<typeof snapshotFor>) => {
   );
 };
 
-describe("a stage's resume line is not where the call changes", () => {
+describe("a stage's restart line is not where the call changes", () => {
   const seedDiscipline = buildScopedVariantDecisionAdjustment({
     mode: "seed",
     thresholds: reportData.assessment.thresholds,
     scores: reportData.assessment.scores,
   }).reversalTriggerDiscipline;
 
-  it("keeps the flip trigger under 'Call changes if' and puts the stage discipline under 'Resume when'", () => {
+  it("keeps the flip trigger under 'Call changes if' and puts the stage discipline under 'Restart when'", () => {
     const staged = snapshotFor("seed");
     assert.equal(staged.weeklyCall.callChangesIf, flipTrigger);
     assert.equal(staged.weeklyCall.resumeWhen, seedDiscipline);
@@ -101,7 +101,7 @@ describe("a stage's resume line is not where the call changes", () => {
     ]);
   });
 
-  it("leaves the call-change line unchanged by the stage, and prints no resume line without one", () => {
+  it("leaves the call-change line unchanged by the stage, and prints no restart line without one", () => {
     const unstaged = snapshotFor();
     assert.equal(unstaged.weeklyCall.callChangesIf, snapshotFor("seed").weeklyCall.callChangesIf);
     assert.equal(unstaged.weeklyCall.resumeWhen, undefined);

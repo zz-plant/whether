@@ -164,7 +164,7 @@ describe("a degraded state says what is missing", () => {
 
       assertDegradedSentence(model.headline, `${horizon} headline`);
       assertDegradedSentence(model.boundedRule.threshold, `${horizon} pause line`);
-      assertDegradedSentence(model.boundedRule.reversal, `${horizon} resume line`);
+      assertDegradedSentence(model.boundedRule.reversal, `${horizon} restart line`);
       assert.equal(model.overrideReason, "Too many inputs are missing.");
 
       const html = plain(renderToStaticMarkup(createElement(CadenceCallCard, { model })));

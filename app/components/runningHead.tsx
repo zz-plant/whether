@@ -104,7 +104,7 @@ export function RunningHead() {
       /* Under a reading, the bar's foot is a 2px rule in the week's colour, as the
          brief's card carries one (§XIII): at the size Slack shows a screenshot its
          words cannot be read, and the colour still says which weather it is. */
-      className={`fixed inset-x-0 top-0 z-40 bg-[var(--bg-body)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none print:hidden ${
+      className={`fixed inset-x-0 top-0 z-[var(--z-chrome)] bg-[var(--bg-body)] transition-transform duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] motion-reduce:transition-none print:hidden ${
         facts.regime ? "border-b-2 border-[color:var(--regime-accent)]" : "border-b border-[color:var(--border-subtle)]"
       }`}
       style={{ transform: `translateY(${offset}px)` }}

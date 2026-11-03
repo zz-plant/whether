@@ -12,5 +12,5 @@
  * aria-hidden rather than a live progressbar.
  */
 export function ScrollProgressBar() {
-  return <div aria-hidden="true" data-scroll-progress className="pointer-events-none fixed inset-x-0 top-0 z-50 h-[3px] bg-slate-400/70" />;
+  return <div aria-hidden="true" data-scroll-progress className="pointer-events-none fixed inset-x-0 top-0 z-[var(--z-chrome-top)] h-[3px] bg-slate-400/70" />;
 }

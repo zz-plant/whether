@@ -1,4 +1,5 @@
 import { ScreenshotCaption } from "../components/screenshotCaption";
+import { FindingCard } from "../components/ui/findingCard";
 import monthly from "../../data/advice-corpus/monthly.json";
 import { ADVICE_STANCE_DEFINITIONS } from "../../lib/adviceStance";
 import { getRegimePublicLabel } from "../../lib/regimePresentation";
@@ -20,6 +21,7 @@ import { SecondaryPageSection } from "../components/secondaryPageShell";
 /* Served from this site (app/research/), because the repository is private. */
 const REGISTRATION_URL = "/research/advice-corpus-preregistration.md";
 const RESULTS_URL = "/research/advice-corpus-results.md";
+const NULL_RESULT_URL = "/research/advice-corpus-null-result.md";
 const FUNDING_LINE = 70;
 /** A quarter with fewer eligible posts than this draws no point: one post is not a share. */
 const MIN_POSTS = 3;
@@ -30,6 +32,7 @@ type Quarter = {
   firms: number;
   expand: number | null;
   conserve: number | null;
+  craft: number | null;
   fundingPressure: number | null;
 };
 
@@ -53,6 +56,7 @@ function buildModel() {
       firms: row.firms,
       expand: enough ? row.expand : null,
       conserve: enough ? row.conserve : null,
+      craft: enough ? row.craft : null,
       fundingPressure: pressure.length > 0 ? Math.round(pressure.reduce((sum, value) => sum + value, 0) / pressure.length) : null,
     };
   });
@@ -64,7 +68,12 @@ function buildModel() {
     if (!previous || previous.regime === entry.regime || quarterOfMonth(month) < first || quarterOfMonth(month) > last) return [];
     return [{ month, from: getRegimePublicLabel(previous.regime), to: getRegimePublicLabel(entry.regime) }];
   });
-  return { quarters, changes };
+  /* The first era above the line is the crossing the study registered. The delta is the
+     difference between the two era shares the finding prints, so the chart annotation and
+     the sentence cannot disagree. */
+  const [below, above] = monthly.eras;
+  const delta = below && above ? Math.round((above.expand - below.expand) * 100) : null;
+  return { quarters, changes, crossingMonth: above?.from ?? null, delta };
 }
 
 /*
@@ -108,30 +117,41 @@ const monthsBetween = (from: string, to: string) =>
   (Number(to.slice(0, 4)) - Number(from.slice(0, 4))) * 12 + Number(to.slice(5, 7)) - Number(from.slice(5, 7)) + 1;
 
 /**
- * The measured result and its limits, from the committed eras: the decade below funding
- * pressure's line against the first stretch above it. The second sentence is the registered
- * verdict (results document, H1 and H2); every number comes from the data, none is typed in.
+ * The measured result, stated as the finding it is: the registered prediction, the
+ * observed move, and the limits that travel with it. Numbers come from the committed
+ * eras; the direction and the kappa are the results document's.
  */
 function buildFinding() {
   const [below, above] = monthly.eras;
-  if (!below || !above || below.expand === null || above.expand === null || below.conserve === null || above.conserve === null) return [];
+  if (!below || !above) return null;
   const pct = (share: number) => `${Math.round(share * 100)}%`;
-  return [
-    `Before July 2022, ${pct(below.expand)} of these posts told founders to expand and ${pct(below.conserve)} to conserve. In the ${monthsBetween(above.from, above.to)} months funding pressure then stayed above its line, the shares were ${pct(above.expand)} and ${pct(above.conserve)}.`,
-    "That is not the shift the study predicted in advance. In its registered tests, expansion advice did not become rarer above the line, and no lag from 0 to 12 months shows conservation advice rising after the crossing.",
-    `A local model labelled the posts, and its labels agree with a careful reader's at kappa ${STANCE_KAPPA}, below the 0.6 the study set itself. One crossing of the line also cannot separate funding pressure from everything else that changed in 2022.`,
-  ];
+  const signed = (points: number) => `${points >= 0 ? "+" : "−"}${Math.abs(points)}`;
+  const expandDelta = Math.round((above.expand - below.expand) * 100);
+  const conserveDelta = Math.round((above.conserve - below.conserve) * 100);
+  return {
+    claim: "Investor advice did not turn conservative when money got expensive.",
+    evidence: [
+      `From the decade below funding pressure's line to the months above it, the share telling founders to expand moved ${signed(expandDelta)} points and the share telling them to conserve moved ${signed(conserveDelta)}.`,
+      `Before July 2022, ${pct(below.expand)} told founders to expand and ${pct(below.conserve)} to conserve. In the ${monthsBetween(above.from, above.to)} months funding pressure then stayed above its line, the shares were ${pct(above.expand)} and ${pct(above.conserve)}.`,
+      "What moved instead was the scoreboard: efficiency measures entered the vocabulary in 2022 while the advice kept pointing the same way.",
+    ],
+    limit: `The study predicted the opposite in advance, and its registered tests count the result against that prediction. The labels are a local model's, agreeing with a careful reader on about two posts in three (kappa ${STANCE_KAPPA}, below the 0.6 the study set itself). One crossing cannot separate funding pressure from everything else that changed that year.`,
+  };
 }
 
 function CorpusChart({
   layout,
   quarters,
   changes,
+  crossingMonth,
+  delta,
   className,
 }: {
   layout: ChartLayout;
   quarters: ReturnType<typeof buildModel>["quarters"];
   changes: ReturnType<typeof buildModel>["changes"];
+  crossingMonth: ReturnType<typeof buildModel>["crossingMonth"];
+  delta: ReturnType<typeof buildModel>["delta"];
   className: string;
 }) {
   const firstQuarter = quarters.at(0);
@@ -153,6 +173,7 @@ function CorpusChart({
   const lastIndex = lastExpand ? quarters.indexOf(lastExpand) : -1;
   const expandLabel = ADVICE_STANCE_DEFINITIONS.expand.label;
   const conserveLabel = ADVICE_STANCE_DEFINITIONS.conserve.label;
+  const craftLabel = ADVICE_STANCE_DEFINITIONS.craft.label;
   return (
     <svg viewBox={`0 0 ${layout.viewW} ${VIEW_H}`} className={className} aria-hidden="true">
       <text x={layout.plotLeft} y={TOP_Y - 6} fontSize={layout.label} fill="var(--app-text-muted)">
@@ -199,6 +220,17 @@ function CorpusChart({
         strokeDasharray="5 3"
         strokeLinejoin="round"
       />
+      {/* The third stance, and the point of the chart: method advice barely moved across the
+          line. It drew nothing before 2026-10-31, so the sentence "the advice kept pointing
+          the same way" had no picture. */}
+      <path
+        d={linePath(quarters.map((quarter) => quarter.craft), xOf, shareY)}
+        fill="none"
+        stroke="var(--app-text-muted)"
+        strokeWidth="1.5"
+        strokeDasharray="1.5 2.5"
+        strokeLinejoin="round"
+      />
       {lastExpand && lastIndex >= 0 ? (
         <g fontSize={layout.label} fontWeight="600" fill="var(--app-text-secondary)">
           <text x={xOf(lastIndex) + 6} y={shareY(lastExpand.expand ?? 0) + 4}>
@@ -206,6 +238,35 @@ function CorpusChart({
           </text>
           <text x={xOf(lastIndex) + 6} y={shareY(lastExpand.conserve ?? 0) + 4}>
             {conserveLabel}
+          </text>
+        </g>
+      ) : null}
+      {/* The registered crossing, drawn where it happened and labelled with the move the
+          study did not predict. Without it the reader has to read three sentences to learn
+          that the two lines moved the wrong way; the chart itself said nothing about it. */}
+      {crossingMonth && delta !== null ? (
+        <g data-funding-crossing={crossingMonth}>
+          <line
+            x1={xOfMonth(crossingMonth)}
+            x2={xOfMonth(crossingMonth)}
+            y1={BOTTOM_Y}
+            y2={AXIS_Y}
+            stroke="var(--app-text-muted)"
+            strokeWidth="1"
+            strokeDasharray="2 3"
+          />
+          <text
+            x={xOfMonth(crossingMonth) - 5}
+            y={BOTTOM_Y + 13}
+            textAnchor="end"
+            fontSize={layout.tick}
+            fill="var(--app-text-secondary)"
+          >
+            <tspan x={xOfMonth(crossingMonth) - 5}>Funding pressure above {FUNDING_LINE}</tspan>
+            <tspan x={xOfMonth(crossingMonth) - 5} dy={12}>
+              {expandLabel} {delta >= 0 ? "+" : "−"}
+              {Math.abs(delta)} pts after
+            </tspan>
           </text>
         </g>
       ) : null}
@@ -218,7 +279,7 @@ function CorpusChart({
       {quarters.map((quarter, index) => (
         <rect key={quarter.period} x={xOf(index) - step / 2} y={TOP_Y} width={step} height={AXIS_Y - TOP_Y} fill="transparent">
           <title>
-            {`${quarterLabel(quarter.period)}: ${expandLabel.toLowerCase()} ${percent(quarter.expand)}, ${conserveLabel.toLowerCase()} ${percent(quarter.conserve)} of ${quarter.posts} posts from ${quarter.firms} firms; funding pressure ${quarter.fundingPressure ?? "–"}`}
+            {`${quarterLabel(quarter.period)}: ${expandLabel.toLowerCase()} ${percent(quarter.expand)}, ${conserveLabel.toLowerCase()} ${percent(quarter.conserve)}, ${craftLabel.toLowerCase()} ${percent(quarter.craft)} of ${quarter.posts} posts from ${quarter.firms} firms; funding pressure ${quarter.fundingPressure ?? "–"}`}
           </title>
         </rect>
       ))}
@@ -227,37 +288,67 @@ function CorpusChart({
 }
 
 export function AdviceCorpusSection() {
-  const { quarters, changes } = buildModel();
+  const { quarters, changes, crossingMonth, delta } = buildModel();
   const finding = buildFinding();
   const firstQuarter = quarters[0];
-  if (!firstQuarter || quarters.length < 2) return null;
+  if (!firstQuarter || quarters.length < 2 || !finding) return null;
   const expandLabel = ADVICE_STANCE_DEFINITIONS.expand.label;
   const conserveLabel = ADVICE_STANCE_DEFINITIONS.conserve.label;
+  const craftLabel = ADVICE_STANCE_DEFINITIONS.craft.label;
+  const largestFirm = monthly.firmPosts[0];
+  const largestShare = largestFirm ? Math.round((largestFirm.posts / monthly.eligiblePosts) * 100) : null;
 
   return (
     <SecondaryPageSection
-      title="Every post, not the famous ones"
-      description={`${monthly.eligiblePosts.toLocaleString("en-US")} posts about money addressed to founders, from ${monthly.firms.length} investors' archives, each labelled by a rule written down before any was read.`}
+      title="The advice gap"
+      description={`${monthly.eligiblePosts.toLocaleString("en-US")} posts about money addressed to founders, from ${monthly.firms.length} firms' archives, each labelled by a rule written down before any was read.`}
     >
-      <figure className="space-y-3" data-advice-corpus-chart>
+      {/* The finding leads, the chart is its evidence (2026-10-31). The section used to
+          open with the drawing and reach the result three paragraphs later, which is the
+          opposite of the brief's own delta-first rule. */}
+      <div data-advice-corpus-finding>
+        <FindingCard
+          claim={finding.claim}
+          evidence={
+            <>
+              {finding.evidence.map((sentence) => (
+                <p key={sentence}>{sentence}</p>
+              ))}
+            </>
+          }
+          limit={finding.limit}
+          source={{ label: "The results", href: RESULTS_URL, note: "§3 and §4" }}
+        />
+        <p className="mt-2 max-w-prose text-fluid-nano text-slate-400">
+          What would change this: a second crossing with more posts after it, or labels that clear the study&apos;s
+          agreement bar. The corpus is dated, so a later run can.
+        </p>
+      </div>
+      <figure className="mt-4 space-y-3" data-advice-corpus-chart>
         {/* The chart is for sighted readers; the sentence and the table below carry the same values. */}
         <p className="sr-only">
           {`Share of posts prescribing expansion and conservation each quarter, ${quarterLabel(firstQuarter.period)} to ${quarterLabel(quarters.at(-1)?.period ?? "")}, with funding pressure on the same dates. The table below has every value.`}
         </p>
-        <CorpusChart layout={NARROW} quarters={quarters} changes={changes} className="block h-auto w-full sm:hidden" />
-        <CorpusChart layout={WIDE} quarters={quarters} changes={changes} className="block h-auto w-full max-w-3xl max-sm:hidden" />
+        <CorpusChart layout={NARROW} quarters={quarters} changes={changes} crossingMonth={crossingMonth} delta={delta} className="block h-auto w-full sm:hidden" />
+        <CorpusChart layout={WIDE} quarters={quarters} changes={changes} crossingMonth={crossingMonth} delta={delta} className="block h-auto w-full max-w-3xl max-sm:hidden" />
         <ul aria-hidden="true" className="flex flex-wrap gap-x-5 gap-y-1 text-xs text-slate-300">
           <li className="flex items-center gap-1.5">
             <svg aria-hidden="true" width="18" height="4" className="shrink-0">
               <line x1="0" x2="18" y1="2" y2="2" stroke="var(--app-text)" strokeWidth="2" />
             </svg>
-            {expandLabel}: grow faster, hire or spend ahead, raise to accelerate
+            {expandLabel}: {ADVICE_STANCE_DEFINITIONS.expand.question}
           </li>
           <li className="flex items-center gap-1.5">
             <svg aria-hidden="true" width="18" height="4" className="shrink-0">
               <line x1="0" x2="18" y1="2" y2="2" stroke="var(--app-text-secondary)" strokeWidth="2" strokeDasharray="5 3" />
             </svg>
-            {conserveLabel}: protect cash, slow hiring, extend runway
+            {conserveLabel}: {ADVICE_STANCE_DEFINITIONS.conserve.question}
+          </li>
+          <li className="flex items-center gap-1.5">
+            <svg aria-hidden="true" width="18" height="4" className="shrink-0">
+              <line x1="0" x2="18" y1="2" y2="2" stroke="var(--app-text-muted)" strokeWidth="1.5" strokeDasharray="1.5 2.5" />
+            </svg>
+            {craftLabel}: {ADVICE_STANCE_DEFINITIONS.craft.question}
           </li>
           <li className="flex items-center gap-1.5">
             <span className="inline-block h-3 w-px bg-[var(--phase-boundary)]" />A change in conditions
@@ -278,6 +369,7 @@ export function AdviceCorpusSection() {
                 <th scope="col">Quarter</th>
                 <th scope="col">Expand</th>
                 <th scope="col">Conserve</th>
+                <th scope="col">Craft</th>
                 <th scope="col">Posts</th>
                 <th scope="col">Funding pressure</th>
               </tr>
@@ -288,6 +380,7 @@ export function AdviceCorpusSection() {
                   <th scope="row">{quarterLabel(quarter.period)}</th>
                   <td>{percent(quarter.expand)}</td>
                   <td>{percent(quarter.conserve)}</td>
+                  <td>{percent(quarter.craft)}</td>
                   <td>{quarter.posts}</td>
                   <td>{quarter.fundingPressure ?? "–"}</td>
                 </tr>
@@ -296,10 +389,21 @@ export function AdviceCorpusSection() {
           </table>
         </div>
       </figure>
-      <div className="mt-4 max-w-prose space-y-2 text-sm text-slate-300" data-advice-corpus-finding>
-        {finding.map((sentence) => (
-          <p key={sentence}>{sentence}</p>
-        ))}
+      <div className="mt-5 max-w-prose" data-advice-corpus-sample>
+        <p className="text-fluid-nano text-slate-400">
+          Who is in the sample. Each firm weighs equally in the shares
+          {largestFirm && largestShare !== null
+            ? `, and the largest archive, ${largestFirm.firm}, is ${largestShare}% of the ${monthly.eligiblePosts} eligible posts.`
+            : "."}
+        </p>
+        <ul className="mt-2 grid gap-x-6 gap-y-1 text-fluid-nano text-slate-300 sm:grid-cols-2">
+          {monthly.firmPosts.map((firm) => (
+            <li key={firm.firm} className="flex justify-between gap-3 border-b border-[color:var(--border-subtle)] py-1 last:border-0 sm:last:border-b">
+              <span className="min-w-0 break-words">{firm.firm}</span>
+              <span className="shrink-0 tabular-nums text-slate-400">{firm.posts}</span>
+            </li>
+          ))}
+        </ul>
       </div>
       <p className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-sm">
         <a href={REGISTRATION_URL} className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
@@ -307,6 +411,9 @@ export function AdviceCorpusSection() {
         </a>
         <a href={RESULTS_URL} className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
           Every number, with its interval →
+        </a>
+        <a href={NULL_RESULT_URL} className="py-3 font-semibold text-sky-200 underline decoration-slate-600 underline-offset-4 hover:text-slate-100">
+          The null result, dated →
         </a>
       </p>
     </SecondaryPageSection>

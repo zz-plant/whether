@@ -112,6 +112,31 @@ export async function ComparePanel({
         <p className="type-label text-slate-400">Difference</p>
         <h2 className="type-section text-slate-100 mt-1">What changed between them</h2>
 
+        <div className="mt-3 flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-panel)] p-3">
+          <div className="flex flex-wrap items-center gap-2 text-xs">
+            <span className="font-semibold text-slate-300">Macro conditions:</span>
+            <span className="rounded border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-semibold text-slate-100">
+              {getRegimePublicLabel(reportA.assessment.regime)} (Period A)
+            </span>
+            <span className="text-slate-500">vs</span>
+            <span className="rounded border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-0.5 font-semibold text-slate-300">
+              {getRegimePublicLabel(reportB.assessment.regime)} (Period B)
+            </span>
+          </div>
+          <div className="flex flex-wrap items-center gap-2 text-fluid-nano font-mono">
+            {reportA.assessment.scores.tightness !== reportB.assessment.scores.tightness ? (
+              <span className={`rounded border px-2 py-0.5 ${reportA.assessment.scores.tightness > reportB.assessment.scores.tightness ? "border-amber-700/40 bg-amber-950/30 text-amber-300" : "border-emerald-700/40 bg-emerald-950/30 text-emerald-300"}`}>
+                Funding pressure: {reportA.assessment.scores.tightness - reportB.assessment.scores.tightness > 0 ? "+" : ""}{reportA.assessment.scores.tightness - reportB.assessment.scores.tightness} pts
+              </span>
+            ) : null}
+            {reportA.assessment.scores.riskAppetite !== reportB.assessment.scores.riskAppetite ? (
+              <span className={`rounded border px-2 py-0.5 ${reportA.assessment.scores.riskAppetite > reportB.assessment.scores.riskAppetite ? "border-emerald-700/40 bg-emerald-950/30 text-emerald-300" : "border-amber-700/40 bg-amber-950/30 text-amber-300"}`}>
+                Risk appetite: {reportA.assessment.scores.riskAppetite - reportB.assessment.scores.riskAppetite > 0 ? "+" : ""}{reportA.assessment.scores.riskAppetite - reportB.assessment.scores.riskAppetite} pts
+              </span>
+            ) : null}
+          </div>
+        </div>
+
         <div className="mt-4 grid gap-x-8 gap-y-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_14rem]">
           {ladders.map((ladder) => (
             <ScoreLadder

@@ -16,6 +16,12 @@ import {
   type HomeAreaRow,
 } from "../../../lib/report/home/homeSectionModel";
 import { resolveLineState } from "../../../lib/report/operatingCalls";
+import {
+  DEFAULT_RUNWAY_BAND,
+  runwayBandLabel,
+  runwayBandPhrase,
+  type RunwayBand,
+} from "../../../lib/report/operatorRunway";
 import { AreaIcon, AreaLabel, LineStateBadge } from "../ui/conceptIcons";
 import { SegmentedControl, type SegmentedOption } from "../ui/segmentedControl";
 import { ActionLink } from "../ui/actionLink";
@@ -42,8 +48,8 @@ import { CheckIcon, ShareIcon } from "../uiIcons";
 
 /**
  * How far the reading is from a line, as a stamp: a status, so sharp (§XIV).
- * The state badge carries the pause line's three states and a resume line that
- * is met, in the inks their columns carry in the area table; a resume line not
+ * The state badge carries the pause line's three states and a restart line that
+ * is met, in the inks their columns carry in the area table; a restart line not
  * yet reached stays a neutral stamp with no glyph, because it is not a pause.
  */
 function LineDistance({ slot, kind }: { slot: HomeAreaLineSlot; kind: "pause" | "resume" }) {
@@ -81,6 +87,8 @@ export function DecisionPicker({
   options,
   regime,
   initialSelected,
+  stageLabel,
+  activeRunway,
   children,
 }: {
   options: readonly DecisionPickerOption[];
@@ -88,6 +96,10 @@ export function DecisionPicker({
   regime: RegimeKey;
   /** The decision the URL names (`?decision=`), open on first paint. */
   initialSelected?: DecisionArea;
+  /** The stage the company rules are calibrated for. */
+  stageLabel?: string;
+  /** The runway band the rules are calibrated for. */
+  activeRunway?: RunwayBand;
   /** What follows the choices inside the section: the folded table of all five, and the plan link. */
   children?: ReactNode;
 }) {
@@ -102,16 +114,22 @@ export function DecisionPicker({
   const handleCopySlackTakeaway = useCallback(() => {
     if (!active) return;
     const label = decisionAreaLabel(active.area);
+    const calibrationParts: string[] = [];
+    if (stageLabel) calibrationParts.push(stageLabel);
+    if (activeRunway) calibrationParts.push(`${runwayBandLabel(activeRunway)} runway`);
+    const calibrationHeader = calibrationParts.length > 0 ? ` (${calibrationParts.join(" · ")})` : "";
+
     const bullets: string[] = [];
     if (active.rule) bullets.push(`• *Guidance:* ${active.rule}`);
     if (active.pause?.line) bullets.push(`• *Pause if:* ${active.pause.line}${active.pause.distance ? ` (${active.pause.distance})` : ""}`);
-    if (active.resume?.line) bullets.push(`• *Resume when:* ${active.resume.line}${active.resume.distance ? ` (${active.resume.distance})` : ""}`);
+    if (active.resume?.line) bullets.push(`• *Restart when:* ${active.resume.line}${active.resume.distance ? ` (${active.resume.distance})` : ""}`);
+    if (activeTransmission?.whyLineMatters) bullets.push(`• *Why this line matters:* ${activeTransmission.whyLineMatters}`);
     if (activeTransmission?.ruleOfThumb) bullets.push(`• *Rule of thumb:* ${activeTransmission.ruleOfThumb}`);
     if (activeTransmission?.startupMath) bullets.push(`• *Startup math:* ${activeTransmission.startupMath}`);
 
-    const message = `*Whether: ${label} Takeaway*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
+    const message = `*Whether: ${label} Takeaway${calibrationHeader}*\n${bullets.join("\n")}\n\n*Full brief:* https://whether.work/?decision=${active.area}`;
     void copyToClipboard(message, `slack-takeaway-${active.area}`);
-  }, [active, activeTransmission, copyToClipboard]);
+  }, [active, activeRunway, activeTransmission, copyToClipboard, stageLabel]);
 
   /* Each choice carries where its area stands against its pause line, so the
      five answers are on the page before any is picked; the click opens the
@@ -124,6 +142,11 @@ export function DecisionPicker({
          were verb phrases ("Raise money", "Approve new spend") that named no
          area, so a reader met two names for each of the five. */
       label: decisionAreaLabel(option.area),
+      /* The question the row answers, as the native tooltip. The five cards
+         carry the noun a reader scans for; the question they typed into a
+         search box is the same string the answer page leads with, so it rides
+         here rather than in a third line the grid has no room for. */
+      title: option.answer?.title,
       /* 20px: the choice is a card. */
       icon: <AreaIcon area={option.area} size="card" />,
       /* The state as glyph and words, so a crossed line and a close one differ
@@ -144,16 +167,33 @@ export function DecisionPicker({
     >
       <div className="space-y-4">
         <div className="space-y-1">
-          <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="text-[1.375rem] font-semibold leading-tight tracking-[-0.015em] text-slate-100 sm:text-fluid-xl">
-            {HOME_SECTIONS.areas.heading}
-          </h2>
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 id={`${HOME_SECTIONS.areas.id}-heading`} className="type-section">
+              {HOME_SECTIONS.areas.heading}
+            </h2>
+            {stageLabel ? (
+              <a
+                href={`#${HOME_SECTIONS.calibration.id}`}
+                className="weather-hit text-fluid-xs text-slate-400 hover:text-slate-200 underline decoration-slate-600 underline-offset-2"
+                title="Click to calibrate your stage and runway"
+              >
+                Rules for {stageLabel} · {runwayBandPhrase(activeRunway ?? DEFAULT_RUNWAY_BAND)}
+              </a>
+            ) : null}
+          </div>
           {pauseLineCount ? (
             <p data-pause-line-count className="text-fluid-sm font-medium text-slate-200">
               {pauseLineCount}
             </p>
           ) : null}
           <p className="text-fluid-xs text-slate-400">
-            Each answer holds until a score crosses one of its lines, and most weeks none does.
+            An area pauses when it crosses its pause line, and restarts when it crosses its restart line.{" "}
+            {/* "Most weeks neither happens" sat under a count saying four of five were
+                held, so the page contradicted itself in consecutive lines. The
+                expectation line prints only when it is true of this week. */}
+            {options.some((option) => option.pause?.met)
+              ? "An area on hold is already covered by this week's guidance."
+              : "Most weeks neither happens."}
           </p>
         </div>
 
@@ -183,6 +223,16 @@ export function DecisionPicker({
             <p className="type-eyebrow">
               <AreaLabel area={active.area} />
             </p>
+            {/* The question first, in the reader's words, then this week's
+                answer to it. The five cards scan by noun; a card that has been
+                opened has the room to ask what the reader came to ask, and the
+                string is the answer page's own heading, so the short answer
+                here and the long answer there cannot diverge. */}
+            {active.answer ? (
+              <h3 data-decision-question className="max-w-[56ch] text-pretty text-fluid-sm font-semibold leading-snug text-slate-300">
+                {active.answer.title}
+              </h3>
+            ) : null}
             <p className="max-w-[56ch] text-fluid-lg font-semibold leading-snug text-slate-50">{active.rule}</p>
             {active.changed ? (
               /* Amber for an area the week moved, slate for one it did not: the
@@ -271,7 +321,7 @@ export function DecisionPicker({
               </div>
               {active.answer ? (
                 <ActionLink href={active.answer.href} variant="inline">
-                  {active.answer.title} →
+                  Read the citable defense →
                 </ActionLink>
               ) : null}
             </div>

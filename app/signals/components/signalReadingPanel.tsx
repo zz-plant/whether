@@ -48,7 +48,7 @@ export function SignalReadingPanel({
 
       <dl className="space-y-1.5 text-sm text-slate-200">
         {hasValue ? (
-          <div className="flex flex-wrap gap-x-2">
+          <div className="flex flex-wrap gap-x-2 gap-y-1">
             <dt className="shrink-0 font-semibold text-slate-400">Against its change line</dt>
             <dd className="min-w-0">{reading.distanceLabel}</dd>
           </div>
@@ -60,13 +60,13 @@ export function SignalReadingPanel({
             snapshot until 2026-10-07, and the heading called a five-week gap a
             week. It is last week's brief now where the archive has one. */}
         {hasValue ? (
-          <div className="flex flex-wrap gap-x-2">
+          <div className="flex flex-wrap gap-x-2 gap-y-1">
             <dt className="shrink-0 font-semibold text-slate-400">Movement</dt>
             <dd className={`min-w-0 ${directionClassName[reading.directionTone]}`}>{reading.directionLabel}</dd>
           </div>
         ) : null}
         {reading.inputs.length > 0 ? (
-          <div className="flex flex-wrap gap-x-2">
+          <div className="flex flex-wrap gap-x-2 gap-y-1">
             <dt className="shrink-0 font-semibold text-slate-400">Built from</dt>
             <dd className="min-w-0 tabular-nums">
               {reading.inputs.map((input) => `${input.label} ${input.value}`).join(" · ")}

@@ -17,9 +17,9 @@ const series = (regimes: TimeMachineRegimeEntry["regime"][]) =>
   regimes.map((regime, index) => entry(`2026-${String(index + 1).padStart(2, "0")}-28`, regime));
 
 describe("track record", () => {
-  it("counts the months a pause or resume line was crossed, which the conditions alone undercount", () => {
+  it("counts the months a pause or restart line was crossed, which the conditions alone undercount", () => {
     /* One regime throughout, so `regimeChanges` is 0, while risk appetite walks
-       through the 54 resume line (month 2), back under it (month 4), and through
+       through the 54 restart line (month 2), back under it (month 4), and through
        the 44 pause line (month 5). Funding pressure stays between 66 and 76,
        where neither of its lines holds. A move that stays above the line
        (month 3) is not a crossing. */

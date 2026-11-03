@@ -72,6 +72,8 @@ export type SaaSValuationSnapshot = {
   medianEvToRevenue: number | null;
   medianRevenueGrowth: number | null;
   companyCount: number;
+  /** Companies the growth median covers — fewer than `companyCount` when a read could not produce growth. */
+  growthCompanyCount: number;
   fetchedAt: string;
   /** Which provider produced the basket, so a consumer can tell the official read from a fallback. */
   source: MarketDataProvider;
@@ -277,12 +279,16 @@ const summarize = (provider: MarketDataProvider, results: ValuationRead[], now: 
     if (result.status !== "ok") continue;
     const { evToRevenue, revenueGrowth } = result.value;
     if (evToRevenue !== null && evToRevenue > 0) evValues.push(Math.round(evToRevenue * 10) / 10);
-    if (revenueGrowth !== null && revenueGrowth > 0) growthValues.push(Math.round(revenueGrowth * 1000) / 10);
+    /* Every reported growth belongs in the median, decliners included: a
+       "median revenue growth" over growers only is survivorship bias, and the
+       page states the sample beside the number. */
+    if (revenueGrowth !== null) growthValues.push(Math.round(revenueGrowth * 1000) / 10);
   }
   return {
     medianEvToRevenue: median(evValues),
     medianRevenueGrowth: median(growthValues),
     companyCount: evValues.length,
+    growthCompanyCount: growthValues.length,
     fetchedAt: now.toISOString(),
     source: provider,
   };
@@ -307,6 +313,7 @@ const snapshotSchema = z.object({
   medianEvToRevenue: z.number().nullable(),
   medianRevenueGrowth: z.number().nullable(),
   companyCount: z.number(),
+  growthCompanyCount: z.number(),
   fetchedAt: z.string(),
   source: z.enum(MARKET_DATA_PROVIDERS),
 });

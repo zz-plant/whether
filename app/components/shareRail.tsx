@@ -10,6 +10,7 @@ import {
   formatBriefArtifact,
   type BriefFormatId,
 } from "../../lib/report/briefArtifact";
+import { siteUrl } from "../../lib/siteUrl";
 import { Dialog } from "@base-ui/react/dialog";
 import { Switch } from "@base-ui/react/switch";
 import { CloseIcon } from "./uiIcons";
@@ -108,11 +109,12 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
 
   const activeFormat = BRIEF_FORMATS.find((option) => option.id === format) ?? BRIEF_FORMATS[0];
 
-  /* `window` is read here rather than in `formatBriefArtifact` so the formatters
-     stay pure and testable off a fixed origin. The panel only ever renders in a
-     browser, but the effect-loaded artifact means the first pass has none. */
+  /* The canonical origin, not `window.location.origin` (2026-11-02): the same
+     string is now what Copy Brief under the call copies, and a paste outlives
+     the host it was made on. A preview deployment writing its own hostname into
+     a Slack message leaves a dead link behind it. */
   const briefText = useMemo(
-    () => (artifact ? formatBriefArtifact(artifact, format, window.location.origin) : ""),
+    () => (artifact ? formatBriefArtifact(artifact, format, siteUrl) : ""),
     [artifact, format],
   );
 
@@ -132,8 +134,8 @@ export function ShareRail({ onClose }: { onClose: () => void }) {
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/40" />
-        <Dialog.Popup className="weather-slide-panel fixed z-50 bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share this page">
+        <Dialog.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/40" />
+        <Dialog.Popup className="weather-slide-panel fixed z-[var(--z-modal)] bottom-0 right-0 w-full max-h-[calc(100dvh-4rem)] overflow-y-auto overscroll-contain rounded-t-2xl border border-slate-700/70 bg-slate-950/95 p-4 pb-[max(1rem,env(safe-area-inset-bottom))] shadow-xl backdrop-blur-xl sm:top-0 sm:bottom-auto sm:mt-14 sm:mr-4 sm:w-[22rem] sm:rounded-lg" aria-label="Share this page">
         <div className="flex items-center justify-between gap-3">
           <h2 className="type-eyebrow text-slate-300">Share</h2>
           <Dialog.Close className="flex min-h-[44px] min-w-[44px] items-center justify-center rounded-md text-sm text-slate-400 hover:bg-slate-800/60 hover:text-slate-200" aria-label="Close share panel">

@@ -73,7 +73,7 @@ export const ToastProviderRoot = ({ children }: { children: ReactNode }) => (
     <Toast.Portal>
       {/* Clears the bottom tab bar and the home indicator on phones; from md
           the bar is gone and the viewport sits in the corner. */}
-      <Toast.Viewport className="fixed bottom-[calc(env(safe-area-inset-bottom)+4.5rem)] right-6 z-50 flex w-[min(360px,calc(100vw-2rem))] flex-col gap-3 md:bottom-6">
+      <Toast.Viewport className="fixed bottom-[calc(env(safe-area-inset-bottom)+4.5rem)] right-6 z-[var(--z-toast)] flex w-[min(360px,calc(100vw-2rem))] flex-col gap-3 md:bottom-6">
         <ToastList />
       </Toast.Viewport>
     </Toast.Portal>

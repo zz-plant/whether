@@ -40,8 +40,6 @@ export const metadata: Metadata = buildPageMetadata({
 /** Typed route for a direct-answer page; the dynamic segment is `[slug]`. */
 const answerPageHref = (slug: string): Route => `/answers/${slug}`;
 
-const featuredStakeholderSlugs: readonly string[] = ["founders-ceos", "heads-of-product", "finance-leaders"];
-
 const ROW_CLASS = "grid min-h-[44px] grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3 hover:bg-slate-900/40";
 
 /*
@@ -102,7 +100,6 @@ export default async function ResourcesHubPage({
     }))
     .filter((group) => group.answers.length > 0 || group.guides.length > 0);
 
-  const featuredStakeholders = stakeholderGuides.filter((guide) => featuredStakeholderSlugs.includes(guide.slug));
   const hasToolSelection = Boolean(
     resolvedSearchParams?.stakeholder
     || resolvedSearchParams?.stage
@@ -134,7 +131,7 @@ export default async function ResourcesHubPage({
 
         <section id="answers" aria-labelledby="resources-answers-heading" className="space-y-4">
           <div className="space-y-1">
-            <h2 id="resources-answers-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">This week&apos;s answers, by area</h2>
+            <h2 id="resources-answers-heading" className="type-section">This week&apos;s answers, by area</h2>
             <p className="text-sm text-slate-300">Under this week&apos;s guidance: {liveAction}</p>
             {/* The tally over the list, as the homepage prints it over its five
                 choices: the count a reader would otherwise assemble by opening
@@ -218,14 +215,14 @@ export default async function ResourcesHubPage({
           })}
 
           {/* Two references the answers lean on, linked under the list they serve. */}
-          <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5">
+          <nav aria-label="Context for these answers" className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <ActionLink href="/comps" variant="inline">SaaS valuation multiples</ActionLink>
             <ActionLink href="/history/compare" variant="inline">Compare historical funding conditions</ActionLink>
           </nav>
         </section>
 
         <section aria-labelledby="resources-pillars-heading" className="space-y-3">
-          <h2 id="resources-pillars-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">Governance frameworks</h2>
+          <h2 id="resources-pillars-heading" className="type-section">Governance frameworks</h2>
           <ul className="grid gap-3 sm:grid-cols-2">
             {frameworks.map((entry) => (
               <li key={entry.href}>
@@ -256,7 +253,7 @@ export default async function ResourcesHubPage({
             "AI Claims") answer questions outside the five areas; their pages
             keep their addresses. Open when a link arrives with a selection. */}
         <section id="more-tools" aria-labelledby="resources-more-tools-heading" className="space-y-3">
-          <h2 id="resources-more-tools-heading" className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">More tools</h2>
+          <h2 id="resources-more-tools-heading" className="type-section">More tools</h2>
           {/* The worksheets by name, outside the fold (2026-10-27). They were
               listed only inside the closed disclosure below, so a reader who
               did not open it never learned the site had them. */}
@@ -281,7 +278,7 @@ export default async function ResourcesHubPage({
                 <nav id="guided-translation" aria-labelledby="guided-translation-title" className="space-y-3">
                   <h3 id="guided-translation-title" className="text-sm type-eyebrow text-slate-300">By role or stage</h3>
                   <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
-                    {featuredStakeholders.slice(0, 2).map((guide) => (
+                    {stakeholderGuides.map((guide) => (
                       <li key={guide.slug}>
                         <Link
                           href={buildGuidedTranslationHref({ stakeholder: guide.slug, stage: resolvedSearchParams?.stage })}
@@ -293,7 +290,7 @@ export default async function ResourcesHubPage({
                         </Link>
                       </li>
                     ))}
-                    {stageGuides.slice(0, 2).map((stage) => (
+                    {stageGuides.map((stage) => (
                       <li key={stage.slug}>
                         <Link
                           href={buildGuidedTranslationHref({ stage: stage.slug, stakeholder: resolvedSearchParams?.stakeholder })}

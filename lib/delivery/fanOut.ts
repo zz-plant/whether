@@ -38,6 +38,45 @@ type FanOutOptions<Target> = {
   once?: { markers: SentMarkers; keyOf: (target: Target) => string };
   /** One at a time, for a channel whose sends share a connection budget (push). Parallel otherwise. */
   sequential?: boolean;
+  /**
+   * How many deliveries may be in flight at once when not sequential.
+   *
+   * Email is the reason this exists: every recipient's message is rendered from
+   * the same brief and then sent, so an unbounded fan-out holds one full render
+   * per subscriber in memory at the same moment. A send to a few dozen addresses
+   * killed the worker mid-run in local testing (2026-10-30), which on the Monday
+   * cron means the brief goes to some of the list and not the rest. A bounded
+   * pool keeps the send alive and costs nothing but a little wall time.
+   */
+  concurrency?: number;
+};
+
+/** Enough to use the request's idle time without holding a whole list in memory. */
+export const DEFAULT_FAN_OUT_CONCURRENCY = 8;
+
+/**
+ * Run `run` over `items` with at most `limit` in flight. The results come back in
+ * completion order; every caller counts them rather than reading them by index.
+ */
+const runPool = async <Item, Result>(
+  items: readonly Item[],
+  limit: number,
+  run: (item: Item) => Promise<Result>,
+): Promise<Result[]> => {
+  const results: Result[] = [];
+  let next = 0;
+  const worker = async () => {
+    for (;;) {
+      const index = next;
+      next += 1;
+      if (index >= items.length) return;
+      const item = items[index];
+      if (item === undefined) continue;
+      results.push(await run(item));
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(limit, items.length) }, worker));
+  return results;
 };
 
 const deliverOne = async <Target>(
@@ -71,13 +110,18 @@ export const fanOut = async <Target>(
   deliver: (target: Target) => Promise<DeliveryOutcome>,
   options: FanOutOptions<Target> = {},
 ): Promise<FanOutTally> => {
-  const outcomes: Array<DeliveryOutcome | "skipped"> = [];
+  let outcomes: Array<DeliveryOutcome | "skipped">;
   if (options.sequential) {
+    outcomes = [];
     for (const target of targets) {
       outcomes.push(await deliverOne(target, deliver, options));
     }
   } else {
-    outcomes.push(...(await Promise.all(targets.map((target) => deliverOne(target, deliver, options)))));
+    outcomes = await runPool(
+      targets,
+      Math.max(1, options.concurrency ?? DEFAULT_FAN_OUT_CONCURRENCY),
+      (target) => deliverOne(target, deliver, options),
+    );
   }
 
   const count = (outcome: DeliveryOutcome | "skipped") => outcomes.filter((entry) => entry === outcome).length;

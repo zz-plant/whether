@@ -287,6 +287,25 @@ dev transform of it. Locally the stage went 20.3s → 6.9s. The 120s per-route b
 readiness bound remain: they are bounds, not targets, and a cold container still has to bundle
 602 modules once. The bounded history above is why they must not shrink.
 
+**One build per push (2026-10-31).** A Workers Builds push used to pay two Vite builds: the
+audit built the worker bundle to serve, then `deploy:cloudflare` rebuilt it from scratch.
+`deploy:cloudflare` now runs with `--skip-build-if-current`, which reuses the audit's bundle
+when it is current for the tree and builds otherwise. The freshness check moved out of the
+audit into `scripts/worker-bundle.mjs`, so both decide the same way; the reuse is production-lane
+only, because a named environment builds a different configuration. The audit's own bounds and
+the gate's order are untouched — the gate still runs before anything is built or deployed.
+
+**A server that answers is not necessarily this tree's server (2026-10-29).** The dev-server
+lifecycle reused whatever listened at the base URL, so a worktree's `bun run check` found the
+main checkout's dev server still up on port 3000, audited *that* branch's routes, and failed the
+landmark stage once before a rerun (with the stale server gone) passed. `withDevServer` now
+reuses, in order: a remote target as given; the dev server this checkout's lock file names
+(`.vinext/dev/lock.json` — it serves this tree); and a listener at the base URL only when the
+caller named it explicitly (`--base-url`). Anything else unclaimed there gets a fresh server on
+a nearby port, which also removes the build the old rule performed and then never used. The
+test that pinned the old behavior ("reuse a server that already answers") pinned the bug; it
+now pins the rule.
+
 **The build container's checkout is not necessarily the commit (2026-09-17), and the gate refuses
 one that is not.** After `fa1cc6e` merged, every build failed on two assertions — the memo example
 still reading as the blank form, and `public/embed.js` still holding the hardcoded origin — while

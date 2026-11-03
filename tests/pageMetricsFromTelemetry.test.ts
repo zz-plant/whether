@@ -103,14 +103,30 @@ describe("page metrics from telemetry", () => {
     const comps = metrics.byUrl["/comps"];
     assert.equal(comps?.entrances30d, 5);
     assert.equal(comps?.organicSearchEntrances30d, 2);
+    assert.equal(comps?.aiEntrances30d, 0);
     assert.deepEqual(comps?.entrancesBySource, {
       search: 2,
       social: 1,
+      ai: 0,
       referral: 0,
       direct: 1,
       internal: 0,
       unclassified: 1,
     });
+  });
+
+  it("counts an AI-assistant referral in its own bucket, apart from search and referral", () => {
+    const metrics = buildPageMetrics([
+      entrance("/answers/should-startups-hire-engineers-right-now", "ai"),
+      entrance("/answers/should-startups-hire-engineers-right-now", "search"),
+    ]);
+
+    const answer = metrics.byUrl["/answers/should-startups-hire-engineers-right-now"];
+    assert.equal(answer?.entrances30d, 2);
+    assert.equal(answer?.aiEntrances30d, 1);
+    assert.equal(answer?.organicSearchEntrances30d, 1);
+    assert.equal(answer?.entrancesBySource.ai, 1);
+    assert.equal(answer?.entrancesBySource.search, 1);
   });
 
   it("drops a source outside the model rather than counting it as a bucket", () => {

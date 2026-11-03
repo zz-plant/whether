@@ -105,7 +105,7 @@ describe("the agent tool registry", () => {
     assert.equal(byFragment.slug, "when-should-startups-cut-burn");
 
     // A topic the answers don't cover is refused with the list of what does exist, by title.
-    const unknown = await refusal(runAgentTool("get_answer", { question: "bridge round" }, "http"));
+    const unknown = await refusal(runAgentTool("get_answer", { question: "cryptocurrency" }, "http"));
     assert.match(unknown.message, /Available decision topics: Startup funding climate this week \(startup-funding-climate-this-week\)/);
     assert.match(unknown.message, /get_state answers it/);
     assert.ok(unknown.problems.some((problem) => problem.allowed?.includes("should-startups-raise-capital-now")));
@@ -142,7 +142,7 @@ describe("the agent tool registry", () => {
     for (const [question, slug] of Object.entries(asked)) {
       assert.equal(matchDecisionPage(question)?.slug, slug, question);
     }
-    for (const offTopic of ["pizza recipes", "bridge round", "", "   "]) {
+    for (const offTopic of ["pizza recipes", "cryptocurrency", "", "   "]) {
       assert.equal(matchDecisionPage(offTopic), undefined, JSON.stringify(offTopic));
     }
   });

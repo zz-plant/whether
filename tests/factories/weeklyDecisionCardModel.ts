@@ -358,7 +358,7 @@ export const buildWeeklyDecisionCardModel = (
       tightness: 64,
       riskAppetite: 52,
     },
-    regimeDistance: { dimensionLabel: "Tightness", currentValue: 64, thresholdValue: 70, pointsToFlip: 6, dimensionKey: "tightness", thresholdDirection: "riseAbove" },
+    regimeDistance: { dimensionLabel: "Tightness", currentValue: 64, thresholdValue: 70, pointsToFlip: 6, pointsToFlipNormalized: 6, dimensionKey: "tightness", thresholdDirection: "riseAbove" },
     flipRiskMeter: {
       progressPercent: 50,
       urgencyLabel: "Medium",

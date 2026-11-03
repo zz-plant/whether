@@ -34,7 +34,7 @@ const collectText = (node: ReactNode): string => {
 
 /**
  * This week as the card is asked to draw it: both scores against a pause and a
- * resume line, and a week whose signals moved against the Aug 31 snapshot (the
+ * restart line, and a week whose signals moved against the Aug 31 snapshot (the
  * last month-end, which is what the loader compares a Sep 25 read with).
  */
 const scores = { tightness: 90, riskAppetite: 43 };
@@ -129,8 +129,8 @@ describe("buildBriefImagePayload", () => {
     const payload = buildBriefImagePayload(buildHomepage());
 
     assert.deepEqual(payload.readings.map(asPasted), [
-      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · past the line · was 63 on Aug 31 · resume line 66 (24 pts away)",
-      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · past the line · was 56 on Aug 31 · resume line 54 (11 pts away)",
+      "Funding pressure 90 of 100 (money is hard to raise) · pause line 76 · past the line · was 63 on Aug 31 · restart line 66 (24 pts away)",
+      "Risk appetite 43 of 100 (investors are selective about risk) · pause line 44 · past the line · was 56 on Aug 31 · restart line 54 (11 pts away)",
     ]);
   });
 
@@ -264,7 +264,7 @@ const briefImageProps: BriefImageProps = buildBriefImagePayload(buildHomepage())
 const fullCardProps: BriefImageProps = {
   ...briefImageProps,
   decision:
-    "Hold net-new hiring and freeze discretionary spend until funding pressure falls back under the resume line and stays there for two readings in a row.",
+    "Hold net-new hiring and freeze discretionary spend until funding pressure falls back under the restart line and stays there for two readings in a row.",
   contextLabel: "Historical mode active · March 2026 · Fintech · Series B",
   sourceLabel: "US Treasury and the St. Louis Fed (FRED), plus a curated startup-market snapshot",
   readings: buildBriefImagePayload(buildHomepage()).readings.map((reading) => ({ ...reading, value: "100" })),
@@ -275,7 +275,7 @@ describe("brief decision card render", () => {
     const text = collectText(renderBriefImage(briefImageProps));
 
     for (const reading of briefImageProps.readings) {
-      assert.notEqual(reading.resume, null, "the fixture states a resume line for both scores");
+      assert.notEqual(reading.resume, null, "the fixture states a restart line for both scores");
       for (const part of [reading.label, reading.value, reading.meaning, reading.line, reading.distance, reading.resume]) {
         assert.ok(part !== null && text.includes(part), `the card should print "${part}"`);
       }

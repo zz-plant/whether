@@ -84,24 +84,29 @@ describe("decision picker", () => {
 
   it("puts each area's standing on its choice, so the answers are on the page before a click", () => {
     const choices = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
-    assert.equal((choices.match(/Past its pause line/g) ?? []).length, 4);
-    assert.match(choices, /4 pts from its pause line/);
+    assert.equal((choices.match(/On hold/g) ?? []).length, 4);
+    assert.match(choices, /4 pts from pausing/);
     /* The shared state badge: a crossed line in the line state's own red with
        the pause glyph, a close one with the dashed circle, so the two differ in
        shape. */
     assert.match(
       choices,
-      /data-line-state-badge="crossed" class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>Past its pause line</,
+      /data-line-state-badge="crossed" class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>On hold</,
       "a crossed line is drawn as a state, in the crossed ink",
     );
-    assert.match(choices, /data-line-state-badge="near"[^>]*><svg[^>]*lucide-circle-dashed[\s\S]*?<\/svg><span>4 pts from its pause line</);
+    assert.match(choices, /data-line-state-badge="near"[^>]*><svg[^>]*lucide-circle-dashed[\s\S]*?<\/svg><span>4 pts from pausing</);
     /* Each choice is a card, so its area glyph is the 20px size. */
     assert.equal((choices.match(/data-concept-icon="area"/g) ?? []).length, 5);
     assert.equal((choices.match(/class="lucide [^"]*size-5" data-concept-icon="area"/g) ?? []).length, 5);
   });
 
   it("counts the crossed pause lines once, over the choices", () => {
-    const count = html.indexOf("4 of 5 areas are past their pause line.");
+    /* The expectation line and the count used to contradict each other in
+       consecutive lines: "4 of 5 areas are on hold" over "most weeks neither
+       happens". It prints only when it is true of this week. */
+    assert.match(html, /An area on hold is already covered by this week&#x27;s guidance\./);
+    assert.doesNotMatch(html, /Most weeks neither happens\./);
+    const count = html.indexOf("4 of 5 areas are on hold.");
     assert.ok(count > html.indexOf("Your decisions this week"), "the count sits under the heading");
     assert.ok(count < html.indexOf("<fieldset"), "and over the choices it sums");
   });
@@ -148,6 +153,34 @@ describe("no first-visit fold", () => {
   });
 });
 
+describe("an opened card asks the question it answers", () => {
+  const withAnswer: DecisionPickerOption[] = OPTIONS.map((option) =>
+    option.area === "hiring"
+      ? { ...option, answer: { href: "/answers/should-startups-hire-engineers-right-now", title: "Should startups hire engineers right now?" } }
+      : option,
+  );
+
+  it("leads with the reader's question, then this week's answer", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" initialSelected="hiring" />);
+    assert.match(html, /<h3[^>]*data-decision-question[^>]*>Should startups hire engineers right now\?<\/h3>/, "the card asks what the reader came to ask");
+    assert.ok(
+      html.indexOf("Should startups hire engineers right now?") < html.indexOf("Rule for hiring"),
+      "the question comes before the rule that answers it",
+    );
+  });
+
+  it("does not print the question twice in one card", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" initialSelected="hiring" />);
+    assert.equal(html.match(/Should startups hire engineers right now\?/g)?.length, 2, "the heading and the row's tooltip");
+    assert.match(html, /Read the citable defense →/, "the link names what it opens, not the question again");
+  });
+
+  it("carries the question as the row's tooltip", () => {
+    const html = renderToStaticMarkup(<DecisionPicker options={withAnswer} regime="SCARCITY" />);
+    assert.match(html, /title="Should startups hire engineers right now\?"/);
+  });
+});
+
 describe("a link can carry the decision (`/?decision=`)", () => {
   const render = (initialSelected?: DecisionPickerOption["area"]) =>
     renderToStaticMarkup(
@@ -179,5 +212,6 @@ describe("a link can carry the decision (`/?decision=`)", () => {
     const picker = readFileSync(new URL("../app/components/home/DecisionPicker.tsx", import.meta.url), "utf8");
     assert.match(picker, /url\.searchParams\.set\(HOME_DECISION_PARAM, area\)/);
     assert.match(picker, /window\.history\.replaceState\(/, "a choice replaces the entry rather than adding one for Back to retrace");
+    assert.match(picker, /calibrationParts/, "includes stage and runway calibration context in the Slack takeaway artifact");
   });
 });

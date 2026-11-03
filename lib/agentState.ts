@@ -79,7 +79,7 @@ const scoringBasisSchema = z
     warning: z
       .string()
       .nullable()
-      .describe("What the inputs left out would do, when they would put a score past a change, pause or resume line the published score is not past. Null otherwise."),
+      .describe("What the inputs left out would do, when they would put a score past a change, pause or restart line the published score is not past. Null otherwise."),
     notCounted: z
       .array(
         z.object({
@@ -121,7 +121,11 @@ export const agentStateSchema = z.object({
   }),
   confidence: z.object({
     label: z.enum(["HIGH", "MED", "LOW"]),
-    percent: z.number(),
+    percent: z
+      .number()
+      .describe(
+        "The margin as a number: 55 plus the points of distance from the line where conditions change, floored at 35 and capped at 92. It is the raw distance, not a probability, and it does not step down when `label` does for a stale fallback — the label carries the staleness judgment.",
+      ),
     meaning: z.string(),
   }),
   scores: z.object({ tightness: scoreSchema, riskAppetite: scoreSchema }),
@@ -137,13 +141,13 @@ export const agentStateSchema = z.object({
     summary: z
       .string()
       .nullable()
-      .describe("What the change did to the decisions, in one sentence: which areas' pause or resume lines were crossed since `comparedWith`, or that none were. Null when nothing was compared."),
+      .describe("What the change did to the decisions, in one sentence: which areas' pause or restart lines were crossed since `comparedWith`, or that none were. Null when nothing was compared."),
     crossed: z
       .array(
         z.object({
           moved: z
             .enum(["paused", "lifted", "resumable", "resumeLost"])
-            .describe("paused: the pause now applies. lifted: it no longer does, and the resume line is not met yet. resumable: the resume lines now hold. resumeLost: they no longer do."),
+            .describe("paused: the pause now applies. lifted: it no longer does, and the restart line is not met yet. resumable: the restart lines now hold. resumeLost: they no longer do."),
           areas: z
             .array(z.enum(["hiring", "product-tempo", "capital-raising", "burn-discipline", "expansion-bets"]))
             .describe("The areas that moved this way, in the brief's row order."),

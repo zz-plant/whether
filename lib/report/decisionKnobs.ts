@@ -272,7 +272,7 @@ export const deriveDecisionKnobs = (context: DecisionKnobContext): DecisionKnob[
  * Until 2026-10-07 these were the same three lines in every regime — "Funding
  * pressure ≤ 66 for two readings in a row", "Risk appetite ≥ 54 for two
  * readings in a row" and "Funding pressure > 76 or risk appetite < 44: tighten
- * again" — the pause and resume lines of the default stage, offset from the
+ * again" — the pause and restart lines of the default stage, offset from the
  * change lines by fixed amounts. So a Freezing week's Slack post said
  * conditions change at 66 when the homepage said 70, told a Sunny week to watch
  * funding pressure fall below a line it was already under, and told a week

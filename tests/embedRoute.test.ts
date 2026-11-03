@@ -150,7 +150,7 @@ describe("embed route helpers", () => {
  * The Oct 5 2026 reading: Freezing, funding pressure 90 against its change
  * line of 70, risk appetite 48 against 50, taken on a Monday whose week ends
  * on Friday Oct 9. The embed printed "Watch: Funding pressure < 66" (Hiring's
- * resume line, 24 points off) where the brief prints the change line, "MED"
+ * restart line, 24 points off) where the brief prints the change line, "MED"
  * where it prints a confidence word, the engine's "Regime:", the week's
  * Friday as the date, and a do-now list joined on commas its items also use.
  */
@@ -173,7 +173,7 @@ describe("the embed says what the brief says", () => {
       },
     );
 
-  it("prints the change line under the brief's label, not a rule's resume line", async () => {
+  it("prints the change line under the brief's label, not a rule's restart line", async () => {
     const homepage = await assembleFreezingWeek();
     const data = buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: null });
     const text = buildBriefEmbedText(data);
@@ -203,12 +203,12 @@ describe("the embed says what the brief says", () => {
     }
   });
 
-  it("prints a calibrated stage's resume line under its own label, beside the change line", async () => {
+  it("prints a calibrated stage's restart line under its own label, beside the change line", async () => {
     const homepage = await assembleFreezingWeek("series-a");
     const text = buildBriefEmbedText(buildBriefEmbedData(homepage, { ticker: "", ref: "embed", companyStage: "series-a" }));
 
     const change = text.indexOf("Conditions change if: ");
-    const resume = text.indexOf("Resume when: ");
+    const resume = text.indexOf("Restart when: ");
     assert.ok(change >= 0 && resume > change, text);
   });
 

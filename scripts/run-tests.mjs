@@ -155,16 +155,68 @@ const quietArgs = inDeployGate || process.env.BUN_TEST_ONLY_FAILURES === '1' ? [
  * (the CLI suite alone spawns 62), and the cap keeps the total bounded. Override with
  * BUN_TEST_SHARDS; a run with a path filter stays one process, since the caller named
  * what they want.
+ *
+ * Each shard prints its own `Ran N tests across M files` summary, and the shards interleave
+ * on one terminal — the summary that happens to land last read as the suite total, and it
+ * is not (2026-10-29: "1113 across 155" was one shard of a 3,463-test suite). The parent
+ * therefore pipes each shard's output through a `[shard i]` prefix and adds the counts up,
+ * so the run ends with one total that is the suite's.
  */
 const children = [];
 
-const spawnShard = (shardSeed, files) => {
+/** A shard's counted summary: the `N pass / M fail / K skip` lines and bun's own total line. */
+export const parseShardSummary = (output) => {
+  const counts = { pass: 0, fail: 0, skip: 0, tests: 0, files: 0 };
+  for (const line of output.split('\n')) {
+    const count = /^(\d+) (pass|fail|skip)\s*$/.exec(line.trim());
+    if (count) counts[count[2]] = Number(count[1]);
+    const ran = /^Ran (\d+) tests? across (\d+) files?/.exec(line.trim());
+    if (ran) {
+      counts.tests = Number(ran[1]);
+      counts.files = Number(ran[2]);
+    }
+  }
+  return counts;
+};
+
+/** Streams a child's stdout/stderr through a `[shard i]` prefix, line-buffered. */
+const prefixShardOutput = (child, label) => {
+  for (const stream of ['stdout', 'stderr']) {
+    let buffered = '';
+    child[stream].on('data', (chunk) => {
+      buffered += chunk.toString();
+      const lines = buffered.split('\n');
+      buffered = lines.pop() ?? '';
+      for (const line of lines) process.stdout.write(`[${label}] ${line}\n`);
+    });
+    child[stream].on('end', () => {
+      if (buffered) process.stdout.write(`[${label}] ${buffered}\n`);
+    });
+  }
+};
+
+/** Resolves with the shard's parsed summary once the child closes. */
+const collectShardSummary = (child) =>
+  new Promise((resolve) => {
+    let output = '';
+    child.stdout.on('data', (chunk) => {
+      output += chunk.toString();
+    });
+    child.stderr.on('data', (chunk) => {
+      output += chunk.toString();
+    });
+    child.on('close', () => resolve(parseShardSummary(output)));
+  });
+
+
+const spawnShard = (shardSeed, files, shardIndex) => {
   const orderArgs = buildOrderArgs(shardSeed);
   const child = spawn('bun', ['test', `--timeout=${testTimeoutMs}`, ...concurrencyArgs, ...orderArgs, ...quietArgs, ...files], {
-    stdio: 'inherit',
+    stdio: ['ignore', 'pipe', 'pipe'],
     env: childEnv,
   });
   children.push(child);
+  prefixShardOutput(child, `shard ${shardIndex + 1}`);
   return child;
 };
 
@@ -232,14 +284,35 @@ const runSharded = async () => {
   }
 
   const shards = [];
+  const shardOutputs = [];
   for (let index = 0; index < effectiveShards; index += 1) {
     const child = spawnShard(String(seedBase + index), [...flagArgs, ...shardFiles[index]]);
+    shardOutputs.push(collectShardSummary(child));
     shards.push(child);
   }
 
   const results = await Promise.all(
     shards.map((child) => new Promise((resolve) => child.on('exit', (code, signal) => resolve({ code, signal })))),
   );
+  const summaries = await Promise.all(shardOutputs);
+
+  /* One total for the whole suite: a shard's own summary is that shard's, and whichever
+     shard finishes last used to read as the suite's. */
+  const totals = summaries.reduce(
+    (sum, counts) => ({
+      pass: sum.pass + counts.pass,
+      fail: sum.fail + counts.fail,
+      skip: sum.skip + counts.skip,
+      tests: sum.tests + counts.tests,
+      files: sum.files + counts.files,
+    }),
+    { pass: 0, fail: 0, skip: 0, tests: 0, files: 0 },
+  );
+  console.log(
+    `[test-runner] suite total: ${totals.pass} pass, ${totals.fail} fail, ${totals.skip} skip, ` +
+      `${totals.tests} test(s) across ${totals.files} file(s) in ${effectiveShards} shard(s).`,
+  );
+
   const signaled = results.find((result) => result.signal);
   if (signaled) {
     for (const child of children) child.kill(signaled.signal);
@@ -252,4 +325,6 @@ const runSharded = async () => {
   process.exit(failed > 0 ? 1 : 0);
 };
 
-await runSharded();
+if (import.meta.main) {
+  await runSharded();
+}

@@ -7,7 +7,7 @@ import { AreaIcon } from "./conceptIcons";
  * "Governs: Hiring, Fundraising, Spending" under a score: the areas whose lines
  * the score sets, each a link with its area glyph. The homepage and `/signals`
  * printed this from two hand-written lists (and `/signals` printed "Sets the
- * pause and resume lines" instead); both read `areasGovernedBy` now, the same
+ * pause and restart lines" instead); both read `areasGovernedBy` now, the same
  * table the area rows name their score from.
  *
  * `target` says where a link lands: "table" is the area's row on this page

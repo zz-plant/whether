@@ -30,6 +30,9 @@ const buildLiveInputs = ({
     reportEvidenceItems,
     treasury: {
       fetched_at: fetchedAt,
+      /* The call clock reads the record date, so it must be current for the
+         freshness gate to pass; the fixture's default is a fixed past date. */
+      record_date: new Date().toISOString().slice(0, 10),
       source: "https://fred.stlouisfed.org/series/DGS10",
     },
     macroSeries: [

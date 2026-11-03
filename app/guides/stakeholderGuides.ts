@@ -1,4 +1,5 @@
 import { stageGuides } from "./stageGuides";
+import { decisionAreaOrder, type DecisionArea } from "../../lib/report/boundedDecisionRules";
 
 /*
  * Written for the person in the role, about what they would do differently this
@@ -7,14 +8,43 @@ import { stageGuides } from "./stageGuides";
  * entropy", a "Promotion accelerant" block with career ladders drawn in arrows,
  * eight bullets per role that restated one idea eight ways, and a positioning
  * line per role ("Founder/CEO → Lead with clarity."). Each bullet here names a
- * thing the reader can do with a pause line, a resume line or the weekly
+ * thing the reader can do with a pause line, a restart line or the weekly
  * reading.
+ *
+ * `hearing` is the other half of the same job (2026-10-31): the pushback,
+ * competing takes, rationalizations and questions that come up once a reader
+ * takes the published lines into a room, and what the line says back. The
+ * prompt is written in the speaker's own voice — an objection ("This role is
+ * too important to wait…"), a market take ("Public markets bounced this
+ * month…") or a direct question ("Are we freezing everything, or just
+ * hiring?") — so the reader is ready for what people actually say, not only for
+ * polite questions about the rules. The speaker is a function, never "your
+ * CFO". Every reply restates a published line and promises no outcome.
  */
+type StakeholderHearing = {
+  /** Who is speaking: the function or group, never "your <role>". */
+  from: string;
+  /** What the group tends to say in the room: pushback, a take or a question. */
+  question: string;
+  /** What to say back from the published line, in one or two sentences. */
+  answer: string;
+  /**
+   * The area whose line the exchange is about, where it is about one. The
+   * homepage shows the exchanges whose area has a crossed pause line this week;
+   * one about the whole set of lines (or about a plan, a pack or a quarter)
+   * carries none.
+   */
+  area?: DecisionArea;
+};
+
 type StakeholderGuide = {
   slug: string;
   title: string;
+  /** Two or three characters for the thread badge; decorative, never the name. */
+  avatar: string;
   tagline: string;
   bullets: readonly string[];
+  hearing: readonly StakeholderHearing[];
   stageSpecificContent: readonly {
     stageSlug: (typeof stageGuides)[number]["slug"];
     guidance: string;
@@ -25,12 +55,32 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
   {
     slug: "founders-ceos",
     title: "Founders and CEOs",
+    avatar: "CEO",
     tagline: "Decide what to hire, spend and raise this week, and say why in one line.",
     bullets: [
       "Check the pause line before approving a hire or a large contract.",
       "Time a raise against how hard money is to get, not against the news.",
       "Give the leadership team one reading to argue from on Monday.",
       "Send investors the same guidance you are running the company on.",
+    ],
+    hearing: [
+      {
+        from: "Hiring manager",
+        question: "This role is too important to wait — leaving it open will cost us the quarter.",
+        answer: "While the hiring pause line is crossed, only backfills that protect current revenue go through. Additions wait for the restart line.",
+        area: "hiring",
+      },
+      {
+        from: "Leadership team",
+        question: "Competitors are still spending on new bets. If we hold back now, we'll fall behind.",
+        answer: "Let them spend pricey money. Keep new bets small and reversible until the restart line clears.",
+        area: "expansion-bets",
+      },
+      {
+        from: "Team",
+        question: "Are we freezing everything, or just hiring?",
+        answer: "Each area pauses on its own line, so check that area's line before changing its plan.",
+      },
     ],
     stageSpecificContent: [
       {
@@ -46,7 +96,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         stageSlug: "series-b",
         guidance:
-          "Agree one set of pause and resume lines with your finance lead, so planning arguments start from the same numbers.",
+          "Agree one set of pause and restart lines with your finance lead, so planning arguments start from the same numbers.",
       },
       {
         stageSlug: "series-c",
@@ -58,12 +108,33 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
   {
     slug: "heads-of-product",
     title: "Heads of product",
+    avatar: "Prod",
     tagline: "Pace the roadmap to how much money there is to spend.",
     bullets: [
       "Put short-payback work first while funding pressure is above its pause line.",
-      "Defer long bets until the resume line clears, and say which line you are waiting on.",
+      "Defer long bets until the restart line clears, and say which line you are waiting on.",
       "Argue for scope with the same numbers finance is using.",
       "Cut burn through what you choose to build, not only through budget cuts.",
+    ],
+    hearing: [
+      {
+        from: "Sales",
+        question: "We already promised a customer this feature for the quarter — we can't push it back.",
+        answer: "If the current team can ship it with a short payback, keep it. If it needs new spend, name the restart line it waits on.",
+        area: "product-tempo",
+      },
+      {
+        from: "Leadership team",
+        question: "We need a big new product bet on the roadmap to show growth for the next round.",
+        answer: "While the new-bets pause line is crossed, order the roadmap by payback speed and keep new bets to small trials.",
+        area: "expansion-bets",
+      },
+      {
+        from: "Finance",
+        question: "Why are we still funding product experiments when spending is on hold?",
+        answer: "Long-payback bets are paused; short-payback work that protects existing revenue stays on the roadmap.",
+        area: "burn-discipline",
+      },
     ],
     stageSpecificContent: [
       {
@@ -77,7 +148,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       {
         stageSlug: "series-b",
         guidance:
-          "Bring the pause and resume lines to roadmap reviews, so the debate is about numbers rather than people.",
+          "Bring the pause and restart lines to roadmap reviews, so the debate is about numbers rather than people.",
       },
       {
         stageSlug: "series-c",
@@ -88,12 +159,33 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
   {
     slug: "finance-leaders",
     title: "CFOs and finance leads",
+    avatar: "CFO",
     tagline: "Turn rates and risk appetite into spending rules other teams can follow.",
     bullets: [
-      "Give each area a pause line and a resume line instead of a blanket freeze.",
+      "Give each area a pause line and a restart line instead of a blanket freeze.",
       "Set hiring and spend limits that move when the reading moves, not when someone panics.",
       "Show the board an outside reference for why the plan is tight or loose.",
       "Replace everyone's own take on the economy with one weekly reading anyone can check.",
+    ],
+    hearing: [
+      {
+        from: "Investors",
+        question: "Public markets bounced this month — we should go out and raise now.",
+        answer: "One green week doesn't clear the fundraising line. Wait until funding pressure and risk appetite cross the restart line before opening a round.",
+        area: "capital-raising",
+      },
+      {
+        from: "Budget owners",
+        question: "This spend was already in the approved annual plan — why is it on hold now?",
+        answer: "An approved budget sets the ceiling; the pause line sets the timing. Uncommitted spend waits until the spending restart line clears.",
+        area: "burn-discipline",
+      },
+      {
+        from: "Board",
+        question: "What number would make us loosen the plan and lean back in?",
+        answer: "Each area loosens when its own restart line clears, not on a calendar date or a single headline.",
+        area: "burn-discipline",
+      },
     ],
     stageSpecificContent: [
       {
@@ -117,12 +209,32 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
   {
     slug: "strategy-chief-of-staff",
     title: "Strategy and chiefs of staff",
+    avatar: "CoS",
     tagline: "Get the leadership team working from the same reading before planning starts.",
     bullets: [
       "Open planning with this week's guidance, so trade-offs start from agreed limits.",
       "Keep board and investor material consistent with what the company is actually doing.",
       "Note which decisions were made under which conditions, and revisit them when a line moves.",
       "Spend less time settling whose view of the market wins.",
+    ],
+    hearing: [
+      {
+        from: "Department leads",
+        question: "Our internal numbers look fine — why let outside interest rates slow our plan?",
+        answer: "Internal results set what we can afford today; the cost of money sets how hard the next dollar is to raise.",
+        area: "burn-discipline",
+      },
+      {
+        from: "Leadership team",
+        question: "We just set quarterly goals three weeks ago. Changing them now will whiplash the team.",
+        answer: "Keep the goals and adjust pacing only in the areas whose pause line crossed, as agreed in advance.",
+        area: "expansion-bets",
+      },
+      {
+        from: "Board",
+        question: "What changed since the last pack?",
+        answer: "One line per area: which score moved, which pause or restart line crossed, and the date it moved.",
+      },
     ],
     stageSpecificContent: [
       {
@@ -146,12 +258,33 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
   {
     slug: "vps-of-engineering",
     title: "Engineering leads",
+    avatar: "Eng",
     tagline: "Match hiring and infrastructure spend to what the company can afford.",
     bullets: [
       "Favour reliability and cost work when money is tight, and delivery speed when it is not.",
       "Hold off on infrastructure built for scale you have not reached.",
       "Back hiring plans with the reading finance and product also use.",
       "Change the plan when a line is crossed, not when the mood changes.",
+    ],
+    hearing: [
+      {
+        from: "Product",
+        question: "Can we still keep the delivery date even though the new engineering hires are on hold?",
+        answer: "Only by trimming scope to what the current team can ship cleanly. Name what comes off the list while the hiring line is crossed.",
+        area: "product-tempo",
+      },
+      {
+        from: "Finance",
+        question: "Cloud and tooling costs keep creeping up — why can't we pause reliability work this quarter?",
+        answer: "Infrastructure built ahead of demand pauses; reliability work that keeps current customers paying stays.",
+        area: "burn-discipline",
+      },
+      {
+        from: "Engineers",
+        question: "On-call is stretched thin. When do we open hiring again?",
+        answer: "When the hiring restart line clears. Until then, slow feature tempo rather than burning out the team.",
+        area: "hiring",
+      },
     ],
     stageSpecificContent: [
       {
@@ -176,12 +309,33 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
   {
     slug: "boards-investors",
     title: "Boards and investors",
+    avatar: "Bd",
     tagline: "See whether management's plan fits the conditions it is operating in.",
     bullets: [
       "Judge hiring pace and burn against how hard money is to raise right now.",
       "Ask management which line would change their plan, and check it next quarter.",
       "Judge a tightening against lines agreed before it, not against the mood in the room.",
       "Back expansion when conditions allow it, and restraint when they don't.",
+    ],
+    hearing: [
+      {
+        from: "Other directors",
+        question: "Every portfolio company is cutting right now — should management cut 20% across the board too?",
+        answer: "Blanket cuts punish working products. Check each area against its own pause line and runway before cutting across the board.",
+        area: "burn-discipline",
+      },
+      {
+        from: "Management",
+        question: "Competitors are pulling back, so this is our chance to spend aggressively and take share.",
+        answer: "Taking share works when unit economics already clear the bar and runway covers the bet. Check the new-bets restart line first.",
+        area: "expansion-bets",
+      },
+      {
+        from: "Co-investors",
+        question: "Is the team slowing down because the market tightened or because results slipped?",
+        answer: "The pause line says how much is the market; the company's own numbers explain the rest.",
+        area: "capital-raising",
+      },
     ],
     stageSpecificContent: [
       {
@@ -194,7 +348,7 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
       },
       {
         stageSlug: "series-b",
-        guidance: "Expect written pause and resume lines, and planning assumptions shared across teams.",
+        guidance: "Expect written pause and restart lines, and planning assumptions shared across teams.",
       },
       {
         stageSlug: "series-c",
@@ -206,3 +360,38 @@ export const stakeholderGuides: readonly StakeholderGuide[] = [
 
 export const findStakeholderGuide = (slug: string) =>
   stakeholderGuides.find((guide) => guide.slug === slug);
+
+/**
+ * The questions this week's crossed lines invite, for the homepage.
+ *
+ * One per area, in the order the areas print, then one per group and one per
+ * speaker: two bubbles headed "Finance" in the same card read as one voice
+ * asking twice. A question about the whole set of lines (a plan, a pack, a
+ * quarter) carries no `area` and is never selected here — the homepage shows
+ * what this week's crossed lines bring and says nothing on a week none are.
+ */
+export const selectHearingForAreas = (
+  crossedAreas: readonly DecisionArea[],
+  limit = 3,
+): { guide: StakeholderGuide; hearing: StakeholderHearing }[] => {
+  const crossed = new Set(crossedAreas);
+  const picks: { guide: StakeholderGuide; hearing: StakeholderHearing }[] = [];
+  const usedGroups = new Set<string>();
+  const usedSpeakers = new Set<string>();
+
+  for (const area of decisionAreaOrder) {
+    if (!crossed.has(area)) continue;
+    for (const guide of stakeholderGuides) {
+      if (usedGroups.has(guide.slug)) continue;
+      const hearing = guide.hearing.find((entry) => entry.area === area && !usedSpeakers.has(entry.from));
+      if (!hearing) continue;
+      picks.push({ guide, hearing });
+      usedGroups.add(guide.slug);
+      usedSpeakers.add(hearing.from);
+      break;
+    }
+    if (picks.length >= limit) break;
+  }
+
+  return picks;
+};

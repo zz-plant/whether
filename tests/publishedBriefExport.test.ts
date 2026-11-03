@@ -42,8 +42,8 @@ describe("published brief readings block", () => {
        four parts `formatScoreReference` prints wherever a score appears, so the
        archive reads the way the page does. The earlier reading carries its date. */
     assert.deepEqual(buildPublishedBriefReadingLines(brief), [
-      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · pause line 76 · 44 pts away · was 40 on Jun 30 · resume line 66 (already met)",
-      "Risk appetite 52 of 100 (investors are selective about risk) · pause line 44 · 8 pts away · was 59 on Jun 30 · resume line 54 (2 pts away)",
+      "Funding pressure 32 of 100 (money is neither easy nor hard to raise) · pause line 76 · 44 pts away · was 40 on Jun 30 · restart line 66 (already met)",
+      "Risk appetite 52 of 100 (investors are selective about risk) · pause line 44 · 8 pts away · was 59 on Jun 30 · restart line 54 (2 pts away)",
     ]);
     assert.match(buildPublishedBriefSlackUpdate(brief), /Readings:\nFunding pressure 32 of 100/);
     assert.deepEqual(buildPublishedBriefReadingLines(base), [], "a record frozen without scores prints no readings block");
@@ -199,12 +199,12 @@ describe("published brief date-pinned exports", () => {
     // The rule's own verb is dropped on both lines, so neither label is said twice.
     assert.match(slack, /Pause if: Funding pressure rises above 76 or risk appetite falls below 44/);
     assert.doesNotMatch(slack, /Pause if: Pause/);
-    assert.match(slack, /Resume when: Funding pressure falls below 66 and risk appetite is above 54/);
-    assert.doesNotMatch(slack, /Resume when: Resume/);
+    assert.match(slack, /Restart when: Funding pressure falls below 66 and risk appetite is above 54/);
+    assert.doesNotMatch(slack, /Restart when: Resume/);
 
     // Provenance
     assert.match(slack, /Provenance:/);
-    assert.match(slack, /Record date Jul 30, 2026 · Saved copy of the published reading · captured Aug 1, 2026 at 1:51 PM UTC/);
+    assert.match(slack, /Data as of Jul 30, 2026 · Saved copy of the published reading · captured Aug 1, 2026 at 1:51 PM UTC/);
     assert.match(slack, /Source: https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO/);
 
     // Permanent URL
@@ -233,11 +233,11 @@ describe("published brief date-pinned exports", () => {
     assert.match(email, /- Action: Speed up on product bets/);
     assert.match(email, /- Pause if: Risk appetite falls below 44/);
     assert.doesNotMatch(email, /Pause if: Pause/);
-    assert.match(email, /- Resume when: Risk appetite is above 54/);
-    assert.doesNotMatch(email, /Resume when: Resume/);
+    assert.match(email, /- Restart when: Risk appetite is above 54/);
+    assert.doesNotMatch(email, /Restart when: Resume/);
 
     // Provenance & citations
-    assert.match(email, /• Record date: Jul 30, 2026/);
+    assert.match(email, /• Data as of: Jul 30, 2026/);
     assert.match(email, /• Source: Saved copy of the published reading \(https:\/\/fred\.stlouisfed\.org\/series\/DGS1MO\)/);
     assert.match(email, /• Freshness: Aug 1, 2026 at 1:51 PM UTC/);
 

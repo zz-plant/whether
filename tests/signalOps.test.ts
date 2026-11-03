@@ -184,7 +184,7 @@ describe("signalOps", () => {
             decisionArea: "spend",
             actionText: "Resume new spend when funding pressure falls below 66 and the payback figures still hold.",
             triggerValue: 65,
-            thresholdLabel: "Spending resume line",
+            thresholdLabel: "Spending restart line",
             thresholdValue: 66,
             confidence: "MEDIUM",
             reversalText: "Pause new discretionary spend if funding pressure rises above 76.",

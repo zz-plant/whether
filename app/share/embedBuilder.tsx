@@ -76,7 +76,7 @@ export function EmbedBuilder() {
         {/* One block, so the summary's row lays the chevron beside the title
             and its line rather than splitting the two into columns. */}
         <div className="min-w-0 space-y-2">
-          <h2 className="text-[1.375rem] leading-tight font-semibold text-slate-100 sm:text-2xl">
+          <h2 className="type-section">
             Add a live brief to a newsletter, wiki or dashboard
           </h2>
           <p className="max-w-2xl text-sm leading-relaxed text-slate-300">
@@ -184,7 +184,7 @@ export function EmbedBuilder() {
 
       <details className="weather-auto-chevron">
         <summary className="text-fluid-xs font-semibold text-slate-200">
-          <span>Customise: ticker and company stage</span>
+          <span>Customize: ticker and company stage</span>
         </summary>
         <div className="mt-3 max-w-sm space-y-3">
           <div>

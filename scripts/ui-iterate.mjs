@@ -72,6 +72,9 @@ const run = async () => {
     devScript,
     logName: "ui-iterate.dev.log",
     timeoutMs,
+    // A --base-url the caller passed names the thing to capture; the default is
+    // this checkout's own server, which the ownership rule picks or starts.
+    explicitBaseUrl: args.includes("--base-url"),
     probe: probeBaseUrl,
     onStatus: (message) => console.log(message),
     body: capture,

@@ -39,7 +39,7 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(seed.actionNow.startsWith(hold.actionNow), "the held week's action leads");
     assert.ok(seed.actionNow.endsWith(hold.currentCall), "and the reason it is held follows");
     assert.equal(seed.pauseIf, hold.pauseIf);
-    assert.equal(seed.resumeWhen, undefined, "a held call has one resume line, its change line");
+    assert.equal(seed.resumeWhen, undefined, "a held call has one restart line, its change line");
   });
 
   it("extracts and formats slide payloads across stages", () => {
@@ -82,7 +82,7 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(markdown.includes("ACTION NOW"));
     assert.ok(markdown.includes("PAUSE IF"));
     assert.ok(markdown.includes(`CONDITIONS CHANGE IF**: ${payload.callChangesIf}`));
-    assert.ok(markdown.includes(`RESUME WHEN**: ${payload.resumeWhen}`));
+    assert.ok(markdown.includes(`RESTART WHEN**: ${payload.resumeWhen}`));
     assert.ok(!markdown.includes("CHANGE COURSE IF"), "the slide uses the page's name for the change line");
     assert.ok(/Room before a change: (within reach of|clear of|close to) the line/.test(markdown), "the margin reads as words, not the engine's code");
     assert.ok(markdown.includes("Freezing"));
@@ -104,7 +104,7 @@ describe("Meeting Slide & Notion Exporter", () => {
     assert.ok(html.includes(">Pause if<"));
     assert.ok(html.includes(">Conditions change if<"));
     assert.doesNotMatch(html, /[123]\. (Action now|Pause if|Conditions change if)/);
-    assert.ok(html.includes("Resume when"));
+    assert.ok(html.includes("Restart when"));
     assert.ok(html.includes("Freezing"));
     assert.ok(!html.includes("SCARCITY"));
   });

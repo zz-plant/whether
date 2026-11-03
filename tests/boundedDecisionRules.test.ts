@@ -93,7 +93,7 @@ it("ensures every operating lever item includes bounded decision fields", () => 
   }
 });
 
-it("keeps the pause line nearest the reading and the resume line holding the area back", () => {
+it("keeps the pause line nearest the reading and the restart line holding the area back", () => {
   const rules = buildCanonicalBoundedDecisionRules({
     regime: "DEFENSIVE",
     thresholds: { tightnessRegime: 70, riskAppetiteRegime: 50 },
@@ -215,7 +215,7 @@ describe("kanban pull-policy blocks", () => {
   });
   const items = buildActionStripItems(rules, { tightness: 52, riskAppetite: 46 });
 
-  it("states stop/resume lines from the same conditions the pause/resume lines carry", () => {
+  it("states stop/restart lines from the same conditions the pause/restart lines carry", () => {
     const blocks = buildPullPolicyBlocks(items);
 
     assert.equal(blocks.length, items.length);
@@ -230,11 +230,11 @@ describe("kanban pull-policy blocks", () => {
       for (const condition of item.resumeConditions ?? []) {
         assert.ok(
           block.resumeWhen.includes(condition.label),
-          `${block.label} resume line must carry the resume condition "${condition.label}"`,
+          `${block.label} restart line must carry the resume condition "${condition.label}"`,
         );
       }
       assert.ok(block.stopPullingWhen.length > 0, "a pull policy without a stop line is not a policy");
-      assert.ok(block.resumeWhen.length > 0, "a pull policy without a resume line is not a policy");
+      assert.ok(block.resumeWhen.length > 0, "a pull policy without a restart line is not a policy");
     }
   });
 
@@ -244,14 +244,14 @@ describe("kanban pull-policy blocks", () => {
       label: "Product priorities",
       areaActionNow: "Keep the roadmap reversible.",
       triggerThreshold: "Pause speculative builds above 60.",
-      reversalCondition: "Resume when funding pressure drops below 50.",
+      reversalCondition: "Restart when funding pressure drops below 50.",
     }];
 
     const [block] = buildPullPolicyBlocks(fallback);
 
     assert.ok(block);
     assert.equal(block.stopPullingWhen, "Pause speculative builds above 60.");
-    assert.equal(block.resumeWhen, "Resume when funding pressure drops below 50.");
+    assert.equal(block.resumeWhen, "Restart when funding pressure drops below 50.");
     assert.match(block.markdown, /Pull policy — Product priorities/);
     assert.match(block.markdown, /Pull: Keep the roadmap reversible\./);
   });

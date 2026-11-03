@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
-import sitemap from "../app/sitemap";
+import sitemap, { generateSitemaps } from "../app/sitemap";
 import { findResourcePillarBySlug } from "../lib/resourcesContent";
 import { snapshotData } from "../lib/snapshot";
 import { siteUrl } from "../lib/siteUrl";
@@ -181,5 +181,41 @@ describe("sitemap", () => {
     const year = entryByUrl.get(`${siteUrl}/history/2022`);
     const quarter = entryByUrl.get(`${siteUrl}/history/2022-q2`);
     assert.ok((year?.priority ?? 0) > (quarter?.priority ?? 1));
+  });
+});
+
+describe("segmented sitemaps", () => {
+  it("splits the corpus into one child per content type", async () => {
+    const segments = await generateSitemaps();
+    assert.deepEqual(segments.map((segment) => segment.id), ["pages", "answers", "signals", "history", "briefs"]);
+  });
+
+  it("keeps history and briefs when the live answer segment is withheld", async () => {
+    const answers = await sitemap({ id: "answers", programmaticEligible: false });
+    assert.ok(
+      answers.every((entry) => !entry.url.includes("/answers/")),
+      "a stale live payload must drop the decision answers",
+    );
+
+    /* Closed records carry no freshness risk, so they survive a stale live read. */
+    const history = await sitemap({ id: "history", programmaticEligible: false });
+    assert.ok(history.length > 0);
+    assert.ok(history.every((entry) => entry.url.includes("/history/")));
+
+    const briefs = await sitemap({ id: "briefs", programmaticEligible: false });
+    assert.ok(briefs.length > 0);
+    assert.ok(briefs.every((entry) => entry.url.includes("/brief/")));
+  });
+
+  it("puts each route in exactly one child", async () => {
+    const seen = new Map<string, string>();
+    for (const segment of ["pages", "answers", "signals", "history", "briefs"] as const) {
+      for (const entry of await sitemap({ id: segment, programmaticEligible: true })) {
+        assert.ok(!seen.has(entry.url), `${entry.url} appears in both ${seen.get(entry.url)} and ${segment}`);
+        seen.set(entry.url, segment);
+      }
+    }
+    const all = await sitemap({ programmaticEligible: true });
+    assert.equal(seen.size, all.length);
   });
 });

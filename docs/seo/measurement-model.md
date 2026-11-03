@@ -10,8 +10,14 @@ Analytics model lives in `lib/contentMeasurement.ts`.
 - optional: `ctaId`
 - optional: `internalPath` (for assisted conversion path reporting)
 
+## Acquisition buckets
+`source` is one of `search | social | ai | referral | direct | internal` (or absent on rows written
+before classification existed). `ai` covers assistant referrals (ChatGPT, Perplexity, Claude,
+Copilot, Gemini); a search engine is still `search` even when an assistant hosts it.
+
 ## Reporting outputs
 - Organic entrances by cluster.
+- AI-referred entrances per page (`aiEntrances30d`), beside search-referred entrances.
 - CTA conversions by page.
 - CTA conversions by cluster.
 - Assisted conversions by internal link path.
@@ -32,9 +38,9 @@ For each priority cluster, record a dated 28-day baseline and compare like-for-l
 
 1. From Search Console: actual queries, landing pages, impressions, clicks and average position.
    Group query variants by the decision they ask about; do not invent volume estimates.
-2. From the existing page-metrics artifact: `organicSearchEntrances30d`, all entrances, acquisition
-   buckets and copy CTA activations. Keep its 30-day window explicit rather than combining counts
-   with the 28-day Search Console window as if they were one denominator.
+2. From the existing page-metrics artifact: `organicSearchEntrances30d`, `aiEntrances30d`, all
+   entrances, acquisition buckets and copy CTA activations. Keep its 30-day window explicit rather
+   than combining counts with the 28-day Search Console window as if they were one denominator.
 3. From assisted-conversion events: paths into the weekly brief and planning. A click is not proof
    that a decision was adopted. A copy activation is not proof of successful pasting or sharing.
 4. Review subscription and repeat-use evidence only if it can be attributed with the existing

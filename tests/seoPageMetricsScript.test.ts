@@ -198,6 +198,7 @@ describe("refreshQueueOptionsFor", () => {
       eventsRead: 10,
       eventsParsed: 10,
       path: "/tmp/page-metrics.json",
+      aiEntrances: 0,
     });
 
     assert.deepEqual(options, {});

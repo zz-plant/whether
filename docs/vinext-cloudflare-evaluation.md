@@ -54,7 +54,7 @@ This repo remains Cloudflare-first. Vinext is now the production build/deploy la
 - Homepage, Signals, and Operations preserve decision-transmission behavior.
 - Representative dynamic content pages from Answers, Resources, Toolkits, Guides, and Posture render correctly.
 - Route handlers preserve payload shape, status codes, and cache behavior.
-- Metadata routes (`sitemap.xml`, `robots.txt`) remain correct.
+- Metadata routes and their route-handler replacements stay correct (`sitemap.xml` is a metadata route; `robots.txt` is `app/robots.txt/route.ts`, which renders the Content-Signal line the metadata format cannot express).
 - Search-param-driven navigation flows remain intact.
 
 ### Gate D — Cloudflare operations parity

@@ -2,7 +2,7 @@ import { buildAgentInterfaceResponse } from "../../lib/agentInterface";
 import { loadWeeklyBriefSnapshot } from "../../lib/report/weeklyBriefSnapshot";
 import { weeklyHeadline } from "../../lib/report/reportEvidence";
 import { DECISION_CONTRACT_LABELS } from "../../lib/report/reportCopy";
-import { formatMarginStamp, joinConditionsHeadline } from "../../lib/report/reportFormatting";
+import { formatMarginStamp, joinConditionsHeadline, MARGIN_LABEL } from "../../lib/report/reportFormatting";
 import { buildPublishedBriefImageUrl, buildPublishedBriefPath, getPublishedBriefs, publishedBriefDisplay, publishedBriefHeadline } from "../../lib/report/publishedBriefs";
 import { buildSocialImageUrl, canonicalPositioningLine, escapeXml, organizationName } from "../../lib/seo";
 import { publisherAuthor } from "../../lib/publisher";
@@ -94,7 +94,7 @@ const publishedItems = (): FeedItem[] =>
         `        <p>${escapeXml(publishedBriefHeadline(brief).composed)}</p>`,
         /* Through the display layer: w38 and w39 stored "Pressure increased by +3.0 this week", a figure in no unit against Aug 31. */
         `        <p><strong>What changed:</strong> ${escapeXml(display.whatChanged)}</p>`,
-        `        <p><strong>Record date:</strong> ${escapeXml(brief.recordDateLabel)} · Margin: ${escapeXml(display.confidence.toLowerCase())}</p>`,
+        `        <p><strong>Data as of:</strong> ${escapeXml(brief.recordDateLabel)} · ${MARGIN_LABEL}: ${escapeXml(display.confidence.toLowerCase())}</p>`,
         `        <p><a href="${escapeXml(link)}">Read the published brief →</a></p>`,
       ].join("\n"),
     };
@@ -140,7 +140,7 @@ export async function GET() {
           html: [
             `        <p><strong>Conditions:</strong> ${escapeXml(regime)}</p>`,
             `        <p><strong>${DECISION_CONTRACT_LABELS.slot.action}:</strong> ${escapeXml(action)}</p>`,
-            `        <p><strong>Record date:</strong> ${escapeXml(recordDateLabel)} · ${escapeXml(confidence)}</p>`,
+            `        <p><strong>Data as of:</strong> ${escapeXml(recordDateLabel)} · ${escapeXml(confidence)}</p>`,
             `        <p><a href="${siteUrl}/">View the live brief →</a></p>`,
             `        <p style="font-size:0.85rem;color:#525c60;">Based on public data. Your situation may vary.</p>`,
           ].join("\n"),

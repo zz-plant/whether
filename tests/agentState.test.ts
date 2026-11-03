@@ -126,7 +126,7 @@ describe("the agent state", () => {
     for (const group of state.change.crossed) {
       assert.ok(group.areas.length > 0 && group.because.length > 0, "a group names its areas and the lines that decided it");
       for (const line of group.because) {
-        // A pause moved on a pause line and a resume moved on a resume line: the ones in `scores`.
+        // A pause moved on a pause line and a resume moved on a restart line: the ones in `scores`.
         const named = group.moved === "paused" || group.moved === "lifted" ? state.scores[line.score].pause : state.scores[line.score].resume;
         assert.equal(line.line, named?.line, `${group.moved} on ${line.score} names the line the score is read against`);
       }
@@ -140,7 +140,7 @@ describe("the agent state", () => {
         reportDynamics: { ...context.reportData.reportDynamics, directionLabel: "stable", changedSignals: [], anomalySignals: [], movement: undefined },
       },
     });
-    assert.match(held.change.summary ?? "", /^Conditions held steady since [A-Z][a-z]{2} \d{1,2}; no pause or resume line was crossed\. The guidance stands\.$/);
+    assert.match(held.change.summary ?? "", /^Conditions held steady since [A-Z][a-z]{2} \d{1,2}; no pause or restart line was crossed\. The guidance stands\.$/);
     assert.deepEqual(held.change.crossed, []);
   });
 

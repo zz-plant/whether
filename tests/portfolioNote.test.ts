@@ -51,8 +51,8 @@ describe("portfolio note", () => {
 
   it("gives each area its rule and both lines, under the page's own slot names", () => {
     const note = build();
-    assert.match(note, /- Hiring: Limit hiring to backfills and mission-critical roles tied to delivery risk\. Pause if Funding pressure > 76; resume when Risk appetite > 54\./);
-    assert.match(note, /- Spending: Put a payback figure on every discretionary line before approving it\. Pause if Funding pressure > 76; resume when Funding pressure < 66\./);
+    assert.match(note, /- Hiring: Limit hiring to backfills and mission-critical roles tied to delivery risk\. Pause if Funding pressure > 76; restart when Risk appetite > 54\./);
+    assert.match(note, /- Spending: Put a payback figure on every discretionary line before approving it\. Pause if Funding pressure > 76; restart when Funding pressure < 66\./);
     assert.match(note, /- Roadmap: Keep the core roadmap on schedule\.$/m, "an area with no numeric line prints its rule alone");
   });
 

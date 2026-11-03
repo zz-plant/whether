@@ -48,7 +48,7 @@ export function HomeSection({
         {/* 22px on a phone, from the fluid step's 20 (2026-10-27): the heading is a phone
             frame's title, and Slack previews a phone screenshot at about 0.43 of its
             size, where 20px type lands under the 9px a reader can make out. */}
-        <h2 id={headingId} className="text-[1.375rem] font-semibold leading-tight tracking-[-0.015em] text-slate-100 sm:text-fluid-xl">
+        <h2 id={headingId} className="type-section">
           {heading}
         </h2>
         {action}

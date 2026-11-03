@@ -39,6 +39,42 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
 - Do not imply legal, compliance, or fiduciary advice.
 - Use “supports,” “improves consistency,” or “increases decision quality” instead of absolute outcome claims.
 
+### Past and future claims (2026-10-31)
+- **Future:** no point estimates, no certainty language, no “will.” A forecast is a cone or a
+  conditional, never a number presented as an outcome.
+- **Past:** state the estimate, the interval and the sample. Call a registered miss a finding.
+  A pre-registered test that returns a null result has produced a finding — a negative one — and
+  must not be downgraded to “shares, not a finding” or “not evidence.” Hedging a completed
+  measurement protects nothing; it hides the result the method earned.
+- The pillar-page rules above (no “predict downturns,” prefer governance/discipline/reversibility)
+  govern claims about the future. They do not license withholding a past result.
+
+## The three registers, and how they balance
+
+Every surface makes claims out of three materials, and they are not interchangeable:
+
+1. **The question** — the reader's words. Where one exists, it comes from
+   `content/answers/pages.json` (the answer page's own heading), so the short
+   answer and the long answer cannot drift into two different questions.
+2. **The number** — a published input, out of our control. Stated as a sentence
+   where the claim it supports is made, not only drawn in a chart. Funding
+   pressure and risk appetite are the whole set; a fourth number would be
+   invented resolution.
+3. **The interpretation** — what we say it means, plus one click to the basis it
+   rests on. At most one sentence of meaning per claim; the method belongs one
+   click away, never in the card that gets screenshotted.
+
+The rule is co-location, not volume: **a first-screen claim carries the number it
+rests on and one link to its basis.** A surface may drop a register only when it
+is not making a claim. This is why the card's meaning line prints
+"Funding pressure 90, risk appetite 55" beside the weather word rather than
+leaving the scores inside the conditions map (2026-10-31), and why the decision
+picker's opened card asks the question before it answers.
+
+What this rules out: a meaning line that is a constant (the same words every week
+for one regime), a claim whose evidence is only a chart, and a second surface
+answering a question the answer pages already answer.
+
 ## CTA policy
 - Every long-form pillar should include a midpoint CTA and end CTA.
 - CTA language should map to clear operator outcomes:
@@ -80,10 +116,10 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   forecast synonym.
 - **Bounded-decision slot labels come from `DECISION_CONTRACT_LABELS`**
   (`lib/report/reportCopy.ts`): general imperative forms on screens are Do now / Pause if /
-  Resume when, and the line where conditions themselves change is Conditions change if. "Change
+  Restart when, and the line where conditions themselves change is Conditions change if. "Change
   course if" and "Re-open when" are retired (2026-09-22): the first read as the guidance changing,
-  which it named only on some surfaces, and the second was a third name for the resume line.
-  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports are Action / Pause line / Resume line ("Threshold" and "Reversal" were retired on 2026-10-09, with "boundary" and "trigger" for the same lines). Consume these
+  which it named only on some surfaces, and the second was a third name for the restart line.
+  Other conditions that would change the guidance print under "Watch this week". Noun slots in exports are Action / Pause line / Restart line ("Threshold" and "Reversal" were retired on 2026-10-09, with "boundary" and "trigger" for the same lines). Consume these
   exports instead of hardcoding slot words in components. Per-area bounded rules now render on
   `/operate` ("Rules by area"). The homepage scan ledger was deleted with `ThreeWhethersCard`
   (2026-09-01), and `ACTION_STRIP_DISPLAY_COPY` went with it. Its vocabulary is retired: do not
@@ -117,6 +153,13 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   "Pressure" and "Appetite" alone are retired. The three watch pages keep their slugs
   (`capital-tightness-watch`, `risk-appetite-watch`, `yield-curve-flip-watch`) and are titled
   "Funding pressure watch", "Risk appetite watch" and "Recession warning gauge watch".
+- **Operational transmission (signals to startup behavior)**: Plain-English explanations must
+  translate signals into startup operating friction rather than financial market theory.
+  Funding pressure captures *how forgiving time and capital are* (capital replacement cost and
+  project payback speed); Risk appetite captures *customer and buyer scrutiny* (willingness to
+  buy new software vs. freezing budgets). Operating rules frame guidance around rewarded
+  behaviors (e.g. short payback, retention, uptime) vs. penalized behaviors (e.g. fixed
+  headcount ahead of revenue, unvalidated multi-quarter bets).
 - **The five areas are Hiring, Roadmap, Fundraising, Spending and New bets**
   (`decisionAreaLabel`). Slugs (`product-tempo`, `capital-raising`, `burn-discipline`,
   `expansion-bets`) are contracts and stay; no surface prints them or a verb-phrase stand-in
@@ -125,13 +168,32 @@ Primary-surface copy should follow: weather/context → weekly posture → concr
   transition. "Flip" is the call/decision reversal (bounded decision slot "Reversal");
   "transition" is the forecast-outcome change (stuck forecast indicators). If they
   diverge, flip describes the call reversal, transition describes forecast changes.
-- **The distance from a change line is the "Margin"** on screens, gauges, pastes and email
-  (2026-10-09): "Clear of the line", "Within reach of the line", "Close to the line", with the
+- **The distance from a change line is "Room before a change"** on screens, gauges, pastes and
+  email (2026-10-28; "Margin" until then, which a reader took for a profit margin):
+  "Clear of the line", "Within reach of the line", "Close to the line", with the
   nearer score's points where the surface holds them. "Confidence" (and "Call certainty"
   before it) are retired as reader labels: the number is a distance, not a probability
   (`/calibration`), and "Confidence: Low" beside "Freeze new commitments" read as the product
   doubting its own advice. API and JSON fields keep `confidence`; the mapping is in
   `docs/developer/api-reference.md`.
+- **Three data nouns, three jobs** (2026-10-30). *Score* is one of the two 0–100 numbers
+  (Funding pressure, Risk appetite). *Reading* is this week's data as a whole, the thing with a
+  date. *Signal* is an underlying series (CPI, VIX, a credit spread), and appears in reader text
+  only on `/signals`, where the page is about the series themselves. A sentence that says "the
+  signal moved" when it means a score, or "the reading is 90" when it means a score, is the
+  drift this names. Existing copy is swept as surfaces are touched; new copy follows the rule.
+- **The hold lifts at the restart line** (2026-10-30). "Resume line" / "Resume when" became
+  "Restart line" / "Restart when": in the Hiring row the label read as a CV line, and the label is
+  scanned alone in a table cell. The identifiers (`resumeWhen`, `resume`, `resumeLine` in JSON) are
+  contracts and did not move; only the words a reader sees did. The verb stays "restart" too, so a
+  row never mixes "Restart line" with "Resume hiring".
+- **The guard reaches the content layer too** (2026-10-30). `tests/readerVocabulary.test.tsx`
+  renders `app/` routes, so it never saw the article bodies, resource metadata or downloadable
+  templates — and that is where the retired words survived longest: one public memo carried
+  "Posture at quarter end: Defensive · Confidence: MED" and "the call moved off Expansion".
+  `tests/contentVocabulary.test.ts` now scans `content/**/*.json` and `public/downloads/*.md`
+  for the retired senses (not the bare word: "compliance posture" is ordinary English). Slugs,
+  paths and JSON keys stay as they are — they are contracts, not copy.
 
 ## Headings (h1–h4, eyebrows, section labels)
 

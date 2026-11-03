@@ -37,7 +37,7 @@ export async function POST(request: Request) {
               type: "section",
               text: {
                 type: "mrkdwn",
-                text: `This channel${channelName ? ` (${channelName})` : ""} is now connected to Whether. Expect the weekly brief every Monday, plus an alert if conditions change mid-week.\n\n*What each brief carries:*\n• This week's guidance and what changed\n• What to do now, with the pause and resume lines for each area\n• What would change the guidance\n\nTo stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.`,
+                text: `This channel${channelName ? ` (${channelName})` : ""} is now connected to Whether. Expect the weekly brief every Monday, plus an alert if conditions change mid-week.\n\n*What each brief carries:*\n• This week's guidance and what changed\n• What to do now, with the pause and restart lines for each area\n• What would change the guidance\n\nTo stop delivery, delete this webhook in your Slack admin. Whether removes it automatically.`,
               },
             },
           {

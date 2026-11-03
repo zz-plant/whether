@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 import { renderToStaticMarkup } from "react-dom/server";
-import robots from "../app/robots";
+import { buildRobotsRules, CONTENT_SIGNAL, renderRobotsTxt, robotsSitemapPaths } from "../lib/seo/robotsTxt";
 import ApiDocsPage from "../app/api-docs/page";
 import { GET as llmsTxt } from "../app/llms.txt/route";
 import { GET as llmsFullTxt } from "../app/llms-full.txt/route";
@@ -16,7 +16,7 @@ import { siteUrl } from "../lib/siteUrl";
  * group is given.
  */
 describe("robots.txt against every document that advertises an API path", () => {
-  const rule = robots().rules;
+  const rule = buildRobotsRules();
   const groups = Array.isArray(rule) ? rule : [rule];
   const prefixes = (value: string | string[] | undefined) => (Array.isArray(value) ? value : value ? [value] : []);
 
@@ -88,3 +88,48 @@ describe("robots.txt against every document that advertises an API path", () => 
     }
   });
 });
+
+/*
+ * The file is rendered from the same rules (app/robots.txt/route.ts, because the
+ * Content-Signal line is not representable in Next's MetadataRoute.Robots), so the
+ * text and the rules above are one artifact — these hold the render to the model.
+ */
+describe("the rendered robots.txt text", () => {
+  const text = renderRobotsTxt();
+  const rules = buildRobotsRules();
+
+  it("declares the content signals in every user-agent group", () => {
+    /* One User-Agent line per crawler named in a group, one signal line per group. */
+    const userAgentLines = [...text.matchAll(/^User-Agent: (.+)$/gm)].map((match) => match[1]);
+    const expected = rules.flatMap((rule) => (Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent]));
+    assert.deepEqual(userAgentLines, expected, "every named crawler gets its User-Agent line");
+    assert.equal([...text.matchAll(/^Content-Signal: /gm)].length, rules.length, "one signal line per group");
+    assert.ok(text.includes(`Content-Signal: ${CONTENT_SIGNAL}`));
+  });
+
+  it("renders every allow and disallow path the rules carry", () => {
+    for (const rule of rules) {
+      const allows = Array.isArray(rule.allow) ? rule.allow : rule.allow ? [rule.allow] : [];
+      const disallows = Array.isArray(rule.disallow) ? rule.disallow : rule.disallow ? [rule.disallow] : [];
+      for (const path of allows) {
+        assert.ok(text.includes(`Allow: ${path}`), `${path} is opened in the rendered file`);
+      }
+      for (const path of disallows) {
+        assert.ok(text.includes(`Disallow: ${path}`), `${path} is closed in the rendered file`);
+      }
+    }
+  });
+
+  it("submits the sitemaps and the host", () => {
+    for (const url of robotsSitemapPaths) {
+      assert.ok(text.includes(`Sitemap: ${url}`), `${url} is submitted`);
+    }
+    assert.ok(text.includes(`Host: ${siteUrl}`));
+  });
+
+  it("stays plain text served at the root", () => {
+    assert.ok(text.startsWith("#"), "the header explains the file before any directive");
+    assert.ok(!text.includes("undefined"), "no directive was dropped to a literal undefined");
+  });
+});
+

@@ -66,6 +66,7 @@ const buildPayloadForPage = (page: DecisionPageDefinition, inputs: AnswerLaunchR
     isFallbackSnapshot: degraded,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     fetchedAtIso: reportData.treasury.fetched_at,
+    recordDateIso: reportData.treasury.record_date,
     pageKey: `/answers/${page.slug}`,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
@@ -115,6 +116,7 @@ export const scoreAnswerLaunchReadiness = async (
       evidenceCount: payload.evidence.length,
       evidenceTitles: payload.evidence.map((item) => item.title),
       fetchedAtIso: inputs.reportData.treasury.fetched_at,
+      recordDateIso: inputs.reportData.treasury.record_date,
       isFallbackSnapshot: inputs.degraded,
       provenanceStatusLabel: inputs.reportData.treasuryProvenance?.statusLabel,
       provenanceLinks: [inputs.reportData.treasury.source, inputs.reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),

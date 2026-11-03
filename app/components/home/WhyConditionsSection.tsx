@@ -68,11 +68,13 @@ export function WhyConditionsSection({
     riskAppetiteRegime: changeLines.riskAppetite,
   });
   const countedRegimeLabel = getRegimePublicLabel(countedRegime);
-  /* The capped score's real distance: the uncapped pressure against the same
-     change line, beside the number the score prints. */
+  /* How far the printed (capped) score sits from its change line. The uncapped
+     distance was printed beside it too, so one paragraph gave two answers to
+     "how far past the line" and a reader had to pick. The line is set against the
+     capped score, so that is the only distance this states. */
   const cappedDistance =
     typeof saturatedPressure === "number" && saturatedPressure > tightness
-      ? { shown: Math.abs(tightness - changeLines.tightness), actual: Math.abs(saturatedPressure - changeLines.tightness) }
+      ? Math.abs(tightness - changeLines.tightness)
       : null;
 
   return (
@@ -87,10 +89,17 @@ export function WhyConditionsSection({
          own, what each reading means, is a clause here. */
       lead={(
         <>
+          {/* One template for two lines with opposite polarity (2026-11-01). "Risk
+              appetite is above its 50 change line: investors are selective about
+              risk" read as a penalty, because the funding-pressure sentence before
+              it uses the colon to mean "this is what being above the line costs
+              you". Above the risk-appetite line is the safe side. The semicolon
+              states the position and then the reading, and the score is named so a
+              reader can hold it against the line on the map. */}
           Funding pressure is {tightness > changeLines.tightness ? "above" : "below"} its {changeLines.tightness} change
-          line: {signalReadingMeaning("tightness", tightness)}. Risk appetite is{" "}
-          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its {changeLines.riskAppetite} change line:{" "}
-          {signalReadingMeaning("riskAppetite", riskAppetite)}. Together they put conditions in{" "}
+          line ({signalReadingMeaning("tightness", tightness)}). Risk appetite is{" "}
+          {riskAppetite > changeLines.riskAppetite ? "above" : "below"} its {changeLines.riskAppetite} change line
+          at {Math.round(riskAppetite)} ({signalReadingMeaning("riskAppetite", riskAppetite)}). Together they put conditions in{" "}
           <span className="font-semibold">{regimeLabel}</span>.
         </>
       )}
@@ -113,8 +122,8 @@ export function WhyConditionsSection({
         {cappedDistance ? (
           <p className="mt-4 max-w-3xl text-fluid-xs leading-relaxed text-slate-400" data-capped-reading>
             Funding pressure shows {tightness} because that&rsquo;s as high as the score goes; uncapped it would be{" "}
-            {saturatedPressure}. So it&rsquo;s {cappedDistance.shown} points above its {changeLines.tightness} change line on the
-            score, but really {cappedDistance.actual}.
+            {saturatedPressure}. The line is set against the capped score, so the distance is {cappedDistance} points above
+            the {changeLines.tightness} change line.
           </p>
         ) : null}
       </div>

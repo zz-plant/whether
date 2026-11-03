@@ -40,7 +40,7 @@ describe("decision transmission copy contract", () => {
     assert.match(brief, /Why this could be wrong:/);
     assert.match(brief, /• Room before a change: (clear of|within reach of|close to) the line/);
     assert.match(brief, /• How you'd know: watch "Conditions change if" above/);
-    assert.match(brief, /• Resume when:/);
+    assert.match(brief, /• Restart when:/);
     assert.match(brief, /• Conditions change if:/);
   });
 

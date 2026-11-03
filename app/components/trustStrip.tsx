@@ -16,7 +16,7 @@ export type TrustStripProps = {
   recordDateLabel: string;
   /** True when every source answered live for this reading. */
   sourcesLive: boolean;
-  /** One phrase for the sources cell, e.g. "All sources live" or "Cached snapshot from Sep 12". */
+  /** One phrase for the sources cell, e.g. "All sources live" or "Saved copy from Sep 12". */
   sourcesLabel: string;
   /** The published band (the API's `confidence`); it sets the margin cell's tone. */
   confidenceLabel: "HIGH" | "MED" | "LOW";
@@ -30,6 +30,12 @@ export type TrustStripProps = {
   couldChangeNextWeek: boolean;
   /** Why it could, when the distance does not already say: "a change is waiting on a second reading". */
   changeReason?: string;
+  /**
+   * How often conditions held at this distance, from the month-end record
+   * (`calibrationForDistance`). A historical count, not a probability: the brief
+   * quotes its own base rate rather than leaving the reader to find /calibration.
+   */
+  baseRate?: { held: number; months: number } | null;
   /**
    * Which inputs set the scores (`resolveScoringBasis`): the cell's value, and
    * after it what the inputs left out would do to a line, where they would
@@ -55,6 +61,8 @@ export type TrustStripProps = {
    *  /trust is one tap away. The margin cell always prints, because it says
    *  whether the call could change next week. */
   phoneLayout?: "grid" | "line";
+  /** On a phone artifact, the values explain themselves; retain secondary labels for assistive tech. */
+  compactLabels?: boolean;
   /** The reading's regime. With it, the margin names the conditions across the nearer line. */
   regime?: string;
   className?: string;
@@ -85,9 +93,11 @@ export function TrustStrip({
   margin,
   couldChangeNextWeek,
   changeReason,
+  baseRate,
   basis,
   href,
   phoneLayout = "grid",
+  compactLabels = false,
   regime,
   className = "",
 }: TrustStripProps) {
@@ -112,6 +122,8 @@ export function TrustStrip({
     detail?: string;
     /** Which fact the detail is, for a reader of the markup: the next-week forecast, or the basis's warning. */
     detailKind?: "next-week" | "basis";
+    /** A historical count at the margin's distance, printed after the detail. */
+    baseRate?: string;
     /** `caveat`: read this reading with care (the caveat diamond); `easing`: in the state it should be (a filled dot, lit). Never the crossed red, which is for lines. */
     tone?: "caveat" | "easing";
     routine?: boolean;
@@ -131,6 +143,7 @@ export function TrustStrip({
       value: describeMarginCell(margin, confidenceLabel, regime),
       detail: describeNextWeek(couldChangeNextWeek, changeReason),
       detailKind: "next-week",
+      ...(baseRate ? { baseRate: `Past conditions held ${baseRate.held} of ${baseRate.months} months at this distance` } : {}),
       tone: confidenceLabel === "LOW" || couldChangeNextWeek ? "caveat" : undefined,
     },
     /* Which inputs set the scores, on every call (2026-10-09). Routine on the
@@ -181,10 +194,10 @@ export function TrustStrip({
                 alone, so "Could change next week Risk appetite is 2 pts" ran together. */}
             {/* A label never wraps: beside a long value ("Scored on" before a warning) it
                 broke onto two lines and read as two labels. */}
-            <dt className={`${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>{cell.label}</dt>
+            <dt className={`${compactLabels && line && cell.label !== "Data as of" ? "max-sm:sr-only " : ""}${termLayout}${line ? "max-sm:after:content-[':'] " : ""}text-slate-500 sm:shrink-0 sm:whitespace-nowrap`}>{cell.label}</dt>
             {line ? " " : null}
             {/* A state carries a mark as well as its ink (a lit dot when live, the
-                caveat diamond when not), so "Partly cached" and
+                caveat diamond when not), so "Some sources saved" and
                 "2 pts from its line" read as flags at a glance and survive a
                 greyscale screenshot. Each shape has one meaning across the site
                 (§XIV's mark vocabulary); a pseudo-element, so the cell's text is
@@ -208,7 +221,13 @@ export function TrustStrip({
                   data-next-week={cell.detailKind === "next-week" ? "" : undefined}
                   data-basis-warning={cell.detailKind === "basis" ? "" : undefined}
                 >
-                  {" · "}
+                  {/* The dot is bound on both sides (2026-10-29): as a text
+                      separator it wrapped onto the phone line's value and left
+                      "·" at the end of the line, the one place a separator dot
+                      reads as a typo. NBSP keeps it with its word, so a wrap
+                      falls before "value · detail" or inside the detail, never
+                      between the dot and either side. */}
+                  {"\u00A0·\u00A0"}
                   {cell.detailKind === "basis" && basisShort ? (
                     <>
                       <span className="sm:hidden" data-basis-short>
@@ -219,6 +238,12 @@ export function TrustStrip({
                   ) : (
                     cell.detail
                   )}
+                </span>
+              ) : null}
+              {cell.baseRate ? (
+                <span className="font-normal text-slate-500" data-base-rate>
+                  {"\u00A0·\u00A0"}
+                  {cell.baseRate}
                 </span>
               ) : null}
             </dd>

@@ -216,10 +216,10 @@
     "slug": "board-level-capital-posture-framework",
     "publishedAt": "2026-03-03",
     "updatedAt": "2026-10-27",
-    "keyword": "board level capital posture framework",
-    "title": "Board-Level Capital Posture Framework",
+    "keyword": "board level capital discipline framework",
+    "title": "Board-Level Capital Discipline Framework",
     "description": "A matrix that turns market signals and your company's own readiness into what the board approves, defers or stops. It lists the documents each approval needs and a quarter-by-quarter rollout.",
-    "h1": "Board Level Capital Posture Framework",
+    "h1": "Board-level capital discipline framework",
     "canonicalPath": "/resources/capital-discipline-venture-backed-companies",
     "parentTopic": false,
     "cluster": "authority",
@@ -228,9 +228,9 @@
     "midpointCtaLabel": "Request a Board Pack Walkthrough",
     "sections": [
       {
-        "heading": "Defining board-level capital posture in practical terms",
+        "heading": "Defining board-level capital discipline in practical terms",
         "paragraphs": [
-          "A board level capital posture framework is a fixed method for deciding how much capital the company commits, given market conditions and how well the company is executing. It is not a policy memo written once: the board re-runs it each month, and it ties evidence and confidence to who may act.",
+          "A board-level capital discipline framework is a fixed method for deciding how much capital the company commits, given market conditions and how well the company is executing. It is not a policy memo written once: the board re-runs it each month, and it ties evidence and confidence to who may act.",
           "The board sets limits and leaves execution to management. The limits answer three questions: which commitments management may make, which need more evidence first, and which are off the table until conditions improve.",
           "When the limits are written down, teams move quickly inside them. When they are vague, every decision becomes a one-off negotiation, so decisions slow down and risk rises at the same time."
         ],
@@ -252,7 +252,7 @@
         ]
       },
       {
-        "heading": "The three-layer posture framework",
+        "heading": "The three-layer framework",
         "paragraphs": [
           "Keep three layers apart: market conditions, company capacity, and decision rules. Separating them stops two common mistakes: blaming weak execution on the market, and treating a temporary market swing as a strategic collapse.",
           "Layer one, market conditions, covers the cost of capital, demand reliability, and the company’s options for raising money. Layer two, company capacity, covers cash resilience, execution throughput, and strain on the organization. Layer three, decision rules, covers escalation thresholds, how hard each decision is to undo, and the review schedule.",
@@ -283,7 +283,7 @@
         ]
       },
       {
-        "heading": "Building a posture-to-action matrix the board can trust",
+        "heading": "Building a discipline-to-action matrix the board can trust",
         "paragraphs": [
           "Map each level of commitment to specific actions in hiring, roadmap scope, sales and marketing spend, vendor contracts, and financing options. Require every entry to say both when to expand and when to contract.",
           "For each area, mark which decisions management makes and which the board reserves. Without that line, management expands commitments during a few good weeks, before the improvement has lasted.",
@@ -355,7 +355,7 @@
         ]
       },
       {
-        "heading": "Framework diagnostics: how to know posture governance is actually working",
+        "heading": "Framework diagnostics: how to know the discipline is actually working",
         "paragraphs": [
           "A working framework changes decisions and behavior in ways you can measure. Early signs: fewer exceptions, escalated issues closed faster, and spending that moves when confidence moves. If none of these appear, the framework exists on paper only.",
           "Count the board requests that management did not see coming. When management knows which documents will be required, surprise requests drop. Frequent surprises point to unclear limits or uneven enforcement.",

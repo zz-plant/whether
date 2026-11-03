@@ -50,7 +50,7 @@ const OUTPUT_PATH = join(OUTPUT_DIR, "page-metrics.json");
 const rowSchema = z.object({ blob2: z.string().nullable().optional() });
 
 export type RefreshPageMetricsResult =
-  | { status: "written"; pages: number; eventsRead: number; eventsParsed: number; path: string }
+  | { status: "written"; pages: number; eventsRead: number; eventsParsed: number; path: string; aiEntrances: number }
   | { status: "skipped"; reason: string }
   | { status: "failed"; reason: string };
 
@@ -131,12 +131,15 @@ export const refreshPageMetrics = async (): Promise<RefreshPageMetricsResult> =>
   await mkdir(OUTPUT_DIR, { recursive: true });
   await writeFile(OUTPUT_PATH, `${JSON.stringify(metrics, null, 2)}\n`, "utf8");
 
+  const aiEntrances = Object.values(metrics.byUrl).reduce((total, metric) => total + metric.aiEntrances30d, 0);
+
   return {
     status: "written",
     pages: pageCount,
     eventsRead: metrics.eventsRead,
     eventsParsed: metrics.eventsParsed,
     path: OUTPUT_PATH,
+    aiEntrances,
   };
 };
 
@@ -166,7 +169,7 @@ export const refreshQueueOptionsFor = (
 
 export const describeRefreshPageMetrics = (result: RefreshPageMetricsResult): string => {
   if (result.status === "written") {
-    return `seo:page-metrics — ${result.pages} pages from ${result.eventsParsed}/${result.eventsRead} events → ${result.path}`;
+    return `seo:page-metrics — ${result.pages} pages from ${result.eventsParsed}/${result.eventsRead} events, ${result.aiEntrances} AI-referred entrance(s) → ${result.path}`;
   }
   if (result.status === "skipped") {
     return `seo:page-metrics — skipped: ${result.reason}`;

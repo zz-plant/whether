@@ -51,8 +51,11 @@ describe("home route render contract", () => {
       "<DecisionHero",
       "<DecisionPicker",
       "<CompanyCalibration",
-      "<WhyConditionsSection",
+      /* Delta before explanation: what changed this week, then what the
+         reading is made of. The reader scanning for "what is different"
+         met three paragraphs of mechanism first. */
       "<WhatChangedSection",
+      "<WhyConditionsSection",
       "<WhatWouldChangeSection",
       "<RecordSection",
       "<AlertSection",
@@ -133,7 +136,6 @@ describe("home route render contract", () => {
   it("copies the brief the reader is previewing, not a blurb about the product", () => {
     const railSource = readFileSync("app/components/shareRail.tsx", "utf8");
     const routeSource = readFileSync("app/page.tsx", "utf8");
-
     // The panel copied a fixed marketing sentence plus a URL under both format
     // names, and its third control read the decision card out of
     // `[data-share-section="decision"]` — an attribute nothing in this app sets,
@@ -150,6 +152,48 @@ describe("home route render contract", () => {
     assert.ok(
       routeSource.includes("<BriefArtifactScript"),
       "the route publishes the brief the globally-mounted panel reads",
+    );
+  });
+
+  it("pastes the same artifact the share panel does, from the same formatter", () => {
+    const railSource = readFileSync("app/components/shareRail.tsx", "utf8");
+    const routeSource = readFileSync("app/page.tsx", "utf8");
+    const buttonSource = readFileSync("app/components/shareBriefButton.tsx", "utf8");
+
+    // Copy Brief assembled its own block: an undated title over
+    // `window.location.href`, which on `/` is the page that re-renders every week.
+    // The panel beside it copied `formatBriefArtifact` — dated, with the signal and
+    // provenance lines, and linking the frozen record. Two pastes of one artifact,
+    // and the one on the card was the only one that could not be cited (2026-11-02).
+    assert.ok(routeSource.includes(`formatBriefArtifact(briefArtifact, "slack", siteUrl)`), "the route formats the paste with the panel's own formatter");
+    assert.ok(routeSource.includes("slackBlock={briefSlackBlock}"), "and hands it to the copy control");
+    assert.ok(buttonSource.includes("slackBlock"), "the copy control accepts a whole-artifact block");
+    const copyCall = routeSource.slice(routeSource.indexOf("<ShareBriefButton")).split("/>")[0] ?? "";
+    assert.ok(copyCall.includes("slackBlock="), "the canonical copy action passes the block");
+    assert.ok(!copyCall.includes("url="), "so it never falls back to the host it was made on");
+    assert.ok(
+      railSource.includes("formatBriefArtifact(artifact, format, siteUrl)"),
+      "the panel and the card must agree on the origin the paste points at",
+    );
+  });
+
+  it("gives every copy path a dated title and an address that outlives the host", () => {
+    const cadenceSource = readFileSync("app/components/CadenceCallCard.tsx", "utf8");
+    const modelSource = readFileSync("lib/report/cadenceCallModel.ts", "utf8");
+
+    // The horizon card copied `*Whether Monthly Guidance*` over the request host,
+    // so a paste was undated and its link became a different month's call. No
+    // record freezes a horizon derived at render, so the model dates the title
+    // and names the view instead (2026-11-02).
+    assert.ok(cadenceSource.includes("url={model.shareUrl}"), "the horizon card cites the model's address");
+    assert.ok(modelSource.includes("siteUrl"), "built off the canonical origin, not the request host");
+    assert.ok(
+      modelSource.includes('url.searchParams.set("cadence", horizon)'),
+      "and pointing at the view that reproduces the card",
+    );
+    assert.ok(
+      modelSource.includes("shareTitle: periodLabel ? `${copy.shareTitle} — ${periodLabel}` : copy.shareTitle"),
+      "with the period in the title, which is the only thing that dates a paste with no frozen record",
     );
   });
 
@@ -195,18 +239,16 @@ describe("home route render contract", () => {
       assert.ok(!routeSource.includes(tag), `${tag} has no render site on /`);
     }
 
-    // One control per axis at every width: the header's phone-only pills and
-    // the hero's tablists above `sm` are complementary, and nothing else asks.
+    /* One control per axis at every width. The phone pills existed only because
+       the inline calibration was sm-only; it is visible everywhere now, so the
+       header asks nothing and the calibration is the one control. */
     const headerSource = readFileSync("app/components/globalHeaderRouteGate.tsx", "utf8");
-    assert.match(
-      headerSource,
-      /<div [^>]*className="[^"]*\bsm:hidden\b[^"]*"[^>]*>\s*<StageDropdownPill \/>\s*<RunwayDropdownPill \/>/,
-      "the header keeps the phone pills, and only there",
-    );
+    assert.ok(!headerSource.includes("<StageDropdownPill"), "the header asks for no stage");
+    assert.ok(!headerSource.includes("<RunwayDropdownPill"), "the header asks for no runway");
     const calibrationSource = readFileSync("app/components/home/CompanyCalibration.tsx", "utf8");
     assert.match(
       calibrationSource,
-      /<details className="group hidden sm:block[^"]*"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
+      /<details[^>]*className="group block[^"]*"[^>]*>[\s\S]*?<StagePersonaSelector[^>]*\/>\s*<RunwayPersonaSelector/,
       "the sm+ tablists lead the areas they reshape, folded under the line that names them",
     );
     assert.ok(!routeSource.includes("<RunwayDropdownPill"), "<RunwayDropdownPill has no render site on /");

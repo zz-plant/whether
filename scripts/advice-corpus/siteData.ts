@@ -91,6 +91,11 @@ export function buildMonthlyFile(postsFile: PostsFile) {
     eligible: "capital-relevant posts addressed to founders, prefilter candidates; each firm present in a period weighs equally",
     eligiblePosts: eligible.length,
     firms: [...new Set(eligible.map((post) => post.firm))].sort(),
+    /** Eligible posts per firm, so a reader can see who the sample is made of. */
+    firmPosts: [...new Set(eligible.map((post) => post.firm))]
+      .sort()
+      .map((firm) => ({ firm, posts: eligible.filter((post) => post.firm === firm).length }))
+      .sort((left, right) => right.posts - left.posts || left.firm.localeCompare(right.firm)),
     eras: eraShares(eligible).map((era) => ({
       from: era.from,
       to: era.to,

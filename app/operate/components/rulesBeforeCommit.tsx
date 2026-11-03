@@ -114,11 +114,11 @@ export function RulesBeforeCommit({
       {playbook ? (
         <details className="weather-auto-chevron">
           <summary className="text-xs font-semibold text-slate-300">
-            Phrases to use, and to avoid, in this week&apos;s meetings
+            What to say this week, and what to stop saying
           </summary>
           <div className="mt-4 grid gap-4 md:grid-cols-2">
             <div>
-              <p className="text-xs font-semibold text-emerald-200">More often</p>
+              <p className="text-xs font-semibold text-semantic-easing-fg">Say more</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 {playbook.leadershipPhrases.more.map((item) => (
                   <li key={item} className="break-words">
@@ -128,7 +128,7 @@ export function RulesBeforeCommit({
               </ul>
             </div>
             <div>
-              <p className="text-xs font-semibold text-rose-200">Less often</p>
+              <p className="text-xs font-semibold text-semantic-tightening-fg">Say less</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">
                 {playbook.leadershipPhrases.less.map((item) => (
                   <li key={item} className="break-words">

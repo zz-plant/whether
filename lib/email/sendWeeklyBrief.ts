@@ -1,5 +1,6 @@
 import { createCloudflareEmailAdapter, getActiveSubscriptions } from "./emailDelivery";
-import { emailTextFooter, escapeHtml, renderEmailShell } from "./emailShell";
+import { emailTextFooter, escapeHtml, renderEmailShell, unsubscribeHeaders } from "./emailShell";
+import { resolveEmailBaseUrl } from "./publicBaseUrl";
 import type { OperatingSnapshot } from "../operatingState/types";
 import { weeklyCallChangeLines, type WeeklyCallContract } from "../report/weeklyCallContract";
 import { assessSnapshotReadiness, resolveOperatingSnapshot } from "../operatingState/resolveSnapshot";
@@ -9,12 +10,15 @@ import { formatDocumentMargin } from "../export/exportTerms";
 import { MARGIN_LABEL, publicDecisionLabels } from "../report/reportFormatting";
 import { weeklyHeadline } from "../report/reportEvidence";
 import { regimeSignalLabel, signalReadingMeaning } from "../report/signalTranslations";
-import { siteUrl } from "../siteUrl";
 import { fanOut } from "../delivery/fanOut";
 import { onceFor, weeklyPeriodKey } from "../delivery/onceFor";
 import type { BriefDocument } from "../report/briefArtifact";
 import { briefSourceFromSnapshot, buildBriefDocument } from "../report/briefDocument";
+import { applyStageToWeeklyCall } from "../report/weeklyCallContract";
+import { describePlanLineStates } from "../alert/planLines";
 import { briefWeekChangeLine, EXPORT_SECTION_HEADINGS } from "../export/briefBuilders";
+import { operatingLeverToDecisionArea } from "../report/businessAreaMap";
+import { decisionAreaOrder } from "../report/boundedDecisionRules";
 import { OG_CONDITION_INK, OG_LINE_CROSSED, OG_PANEL, OG_RULE, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "../image/ogTheme";
 
 /**
@@ -78,6 +82,8 @@ export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | un
     {
       label: regimeSignalLabel.tightness,
       value: `${scores.tightness}/100`,
+      score: scores.tightness,
+      threshold: document.readings.thresholds.tightnessRegime ?? null,
       meaning: signalReadingMeaning("tightness", scores.tightness),
       /* Above the line is the tighter regime, so above is the worse side here. */
       distance: distanceFromLine(vsThreshold.tightness, "above"),
@@ -85,6 +91,8 @@ export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | un
     {
       label: regimeSignalLabel.riskAppetite,
       value: `${scores.riskAppetite}/100`,
+      score: scores.riskAppetite,
+      threshold: document.readings.thresholds.riskAppetiteRegime ?? null,
       meaning: signalReadingMeaning("riskAppetite", scores.riskAppetite),
       /* The risk line is a floor: below it is risk-off. */
       distance: distanceFromLine(vsThreshold.riskAppetite, "below"),
@@ -92,6 +100,8 @@ export const buildWeeklyEmailReadings = (document: WeeklyEmailReadingSource | un
     {
       label: MARGIN_LABEL,
       value: formatDocumentMargin(document).slice(`${MARGIN_LABEL}: `.length),
+      score: null,
+      threshold: null,
       meaning: null,
       distance: null,
     },
@@ -117,6 +127,10 @@ const readingsHtml = (readings: ReturnType<typeof buildWeeklyEmailReadings>) =>
             `<td style="padding:12px 16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};vertical-align:top;">`,
             `<p style="font-size:0.7rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT_MUTED};margin:0 0 4px;">${reading.label}</p>`,
             `<p style="font-size:1.25rem;font-weight:600;margin:0;color:${OG_TEXT};font-variant-numeric:tabular-nums;">${reading.value}</p>`,
+            reading.score !== null
+              ? `<div style="margin:6px 0 0;height:6px;background:${OG_RULE};border-radius:3px;overflow:hidden;"><div style="width:${reading.score}%;height:6px;background:${OG_TEXT};border-radius:3px;"></div></div>` +
+                (reading.threshold !== null ? `<p style="font-size:0.7rem;margin:4px 0 0;color:${OG_TEXT_MUTED};">line at ${reading.threshold}</p>` : "")
+              : "",
             reading.meaning ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${OG_TEXT_SECONDARY};">${reading.meaning}</p>` : "",
             reading.distance ? `<p style="font-size:0.8rem;margin:4px 0 0;color:${deltaColor};">${reading.distance.label}</p>` : "",
             `</td>`,
@@ -150,8 +164,15 @@ export const sendWeeklyBrief = async (options?: {
   now?: Date;
   /** Send to subscribers who already had this week's brief. The manual route's explicit opt-in; the cron never passes it. */
   force?: boolean;
+  /**
+   * The origin this send's links carry. A request-triggered run passes the host
+   * it arrived on, so a preview's subscribers get a preview link they can use;
+   * the cron passes nothing and gets the production origin.
+   */
+  baseUrl?: string;
 }): Promise<SendWeeklyBriefResult> => {
   const now = options?.now ?? new Date();
+  const baseUrl = options?.baseUrl ?? resolveEmailBaseUrl();
   const subscriptions = await getActiveSubscriptions();
   const adapter = createCloudflareEmailAdapter();
   const deliveryMode = adapter.mode ?? "live";
@@ -194,52 +215,81 @@ export const sendWeeklyBrief = async (options?: {
     return refuse(readiness.reason);
   }
 
-  /* Past the guard, every line below is a reading rather than a stand-in for one,
-     from the brief document every other format renders. */
-  const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), weeklyCall);
-  const regime = document.conditions.regime;
-  const regimeLabel = getRegimePublicLabel(regime);
-  const readings = buildWeeklyEmailReadings(document);
-  /* What moved since the earlier reading, named by its date, as every paste opens
-     "What changed this week". Absent on a week with nothing compared. */
-  const weekChange = briefWeekChangeLine(document);
-  /* The week's headline action, the one the homepage h1 and every paste lead with. */
-  const headline = weeklyHeadline(document.slots);
-  const pauseIf = document.slots.pauseIf;
-  const changeLines = weeklyCallChangeLines(document.slots);
-  const recordDate = document.recordDateLabel;
-  /* Which inputs set the scores, beside them, and what the inputs left out would
-     do where they would move a line (`ScoringBasis`). */
-  const basisLine = [document.provenance.scoringBasis.sentence, document.provenance.scoringBasis.warning]
-    .filter((part): part is string => Boolean(part))
-    .join(" ");
-
   const tally = await fanOut(
     subscriptions,
     async (recipient) => {
+      /* A subscriber who told the site their stage gets the rules scaled to it,
+         the same ones the homepage prints for them. Everyone else gets the
+         published call unchanged. */
+      const call = recipient.stage
+        ? applyStageToWeeklyCall(weeklyCall, {
+            assessment: snapshot.assessment,
+            startupVariantMode: recipient.stage,
+            runwayBand: recipient.runwayBand ?? recipient.planRunway?.band,
+          })
+        : weeklyCall;
+
+      /* Past the guard, every line below is a reading rather than a stand-in for one,
+         from the brief document every other format renders. */
+      const document = buildBriefDocument(briefSourceFromSnapshot(snapshot), call);
+      const regime = document.conditions.regime;
+      const regimeLabel = getRegimePublicLabel(regime);
+      const readings = buildWeeklyEmailReadings(document);
+      /* What moved since the earlier reading, named by its date, as every paste opens
+         "What changed this week". Absent on a week with nothing compared. */
+      const weekChange = briefWeekChangeLine(document);
+      /* The week's headline action, the one the homepage h1 and every paste lead with. */
+      const headline = weeklyHeadline(document.slots);
+      const pauseIf = document.slots.pauseIf;
+      const changeLines = weeklyCallChangeLines(document.slots);
+       /* Per-area actions, so the email stands on its own: what to do in each
+          area this week, not just the overall call. Sorted in the page's area
+          order, the same order every paste prints. */
+       const areaRows = [...document.areaRows].sort((left, right) =>
+         decisionAreaOrder.indexOf(operatingLeverToDecisionArea[left.lever]) -
+         decisionAreaOrder.indexOf(operatingLeverToDecisionArea[right.lever]),
+       );
+      const recordDate = document.recordDateLabel;
+      /* Which inputs set the scores, beside them, and what the inputs left out would
+         do where they would move a line (`ScoringBasis`). */
+      const basisLine = [document.provenance.scoringBasis.sentence, document.provenance.scoringBasis.warning]
+        .filter((part): part is string => Boolean(part))
+        .join(" ");
+      /* A phone shows roughly 40 characters of a subject and a desktop around
+         70; "Whether — Cloudy: Protect the revenue you already have, and hold
+         off on new bets until money gets cheaper." was 105 and lost its point
+         in every list view. The first clause carries the action. */
+      const subjectAction = headline.action.split(/,\s|;\s|\s+and\s+/)[0]?.trim() || headline.action;
       const subject = regime === "SCARCITY" || regime === "DEFENSIVE"
-        ? `Whether — ${regimeLabel}: ${headline.action}`
+        ? `Whether — ${regimeLabel}: ${subjectAction}`
         : `Whether Brief — ${regimeLabel}`;
-      const briefUrl = siteUrl;
+      const briefUrl = baseUrl;
       /* The lines above are the published ones. The use the record fits is a plan's
          own lines and an email the day one is crossed, and this is the one page
          every subscriber opens each week. */
-      const planLinesUrl = `${siteUrl}/operate#ops-plan-lines`;
+      const planLinesUrl = `${baseUrl}/operate#ops-plan-lines`;
       const isContraction = regime === "SCARCITY" || regime === "DEFENSIVE";
 
+      /* The reader's own lines lead, when they set any: the published rules
+         below are everyone's, these are the ones they chose. */
+      const ownLines = describePlanLineStates(recipient.planLines ?? [], snapshot.assessment.scores);
       const text = [
         `Whether Weekly Brief — ${recordDate}`,
         `Conditions: ${document.conditions.line}`,
+        ...(ownLines ? [`Your lines: ${ownLines}.`] : []),
         ...readingsText(readings),
         basisLine,
         ...(weekChange ? [`${EXPORT_SECTION_HEADINGS.changed}: ${weekChange}`] : []),
         `${publicDecisionLabels.call}: ${headline.composed}`,
         `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${pauseIf}`,
         ...changeLines.map(({ label, value }) => `${label}: ${value}`),
+        ...(areaRows.length ? [`${EXPORT_SECTION_HEADINGS.areas}:`] : []),
+        ...areaRows.map((row) => `• ${row.label}: ${row.areaActionNow}`),
         `Set these lines for your own plan and we'll email you the day one is crossed: ${planLinesUrl}`,
+        `Share or cite this week's brief: ${baseUrl}/share`,
         ...(isContraction ? [] : [`\nView the full brief, toolkits, and trends:`]),
         briefUrl,
-        ...emailTextFooter(recipient.token),
+        ...emailTextFooter(recipient.token, baseUrl),
       ].join("\n");
 
       /* Regime-adaptive email */
@@ -257,6 +307,26 @@ export const sendWeeklyBrief = async (options?: {
           ? [`<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${EXPORT_SECTION_HEADINGS.changed}:</strong> ${escapeHtml(weekChange)}</p>`]
           : []),
       );
+       if (areaRows.length > 0) {
+         sections.push(
+           `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
+           `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,
+           `<p style="font-size:0.75rem;text-transform:uppercase;letter-spacing:0.1em;color:${OG_TEXT_MUTED};margin:0 0 8px;">${EXPORT_SECTION_HEADINGS.areas}</p>`,
+           ...areaRows.map(
+             (row) =>
+               `<p style="font-size:0.9rem;margin:0 0 8px;color:${OG_TEXT_SECONDARY};"><strong style="color:${OG_TEXT};">${escapeHtml(row.label)}.</strong> ${escapeHtml(row.areaActionNow)}</p>`,
+           ),
+           `</td></tr></table>`,
+         );
+       }
+       sections.push(
+         `<p style="font-size:0.9rem;margin:12px 0 0;color:${OG_TEXT_SECONDARY};">`,
+         `<a href="${planLinesUrl}" style="color:${OG_TEXT};text-decoration:underline;font-weight:600;">Set these lines for your own plan →</a>`,
+         ` · `,
+         `<a href="${baseUrl}/share" style="color:${OG_TEXT};text-decoration:underline;">Share or cite this brief →</a>`,
+         `</p>`,
+       );
+
       sections.push(
         `<table role="presentation" style="width:100%;border-collapse:collapse;margin-top:12px;"><tr>`,
         `<td style="padding:16px;border:1px solid ${OG_RULE};border-radius:8px;background:${OG_PANEL};">`,
@@ -276,12 +346,16 @@ export const sendWeeklyBrief = async (options?: {
         title: "Whether Weekly Brief",
         body: [
           `<p style="color:${OG_TEXT_MUTED};font-size:0.85rem;margin:0 0 20px;">${recordDate}</p>`,
+          ...(ownLines
+            ? [`<p style="font-size:0.9rem;margin:0 0 12px;color:${OG_TEXT};">Your lines: <span style="color:${OG_TEXT_SECONDARY};">${escapeHtml(ownLines)}.</span></p>`]
+            : []),
           ...sections,
         ].join("\n"),
         unsubscribeToken: recipient.token,
+        baseUrl,
       });
 
-      const result = await adapter.send({ to: recipient, subject, html, text });
+      const result = await adapter.send({ to: recipient, subject, html, text, headers: unsubscribeHeaders(recipient.token, baseUrl) });
       return result.ok ? "sent" : "failed";
     },
     /* Once per subscriber per ISO week, so a manual run after the Monday cron

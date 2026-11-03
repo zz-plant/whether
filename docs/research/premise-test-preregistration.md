@@ -18,7 +18,7 @@ consequences follow, all stated in the code's own comments:
 
 - above 4% the score is pinned at its ceiling, so further tightening is invisible;
 - each basis point of the bill is 1.8 points of the score, so the 10 points between an area's
-  pause line and its resume line (76 and 66) are under six basis points of the bill;
+  pause line and its restart line (76 and 66) are under six basis points of the bill;
 - a debt-ceiling or month-end bill dislocation can move the published conditions "for a reason
   that is not monetary".
 

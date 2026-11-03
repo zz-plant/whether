@@ -3,6 +3,7 @@ import { subscribeAndSendVerification } from "../../../../lib/email/subscription
 import { RateLimitedError, rateLimitedResponse } from "../../../../lib/runtime/rateLimit";
 import { parsePlanLines } from "../../../../lib/alert/planLines";
 import { isRunwayBand } from "../../../../lib/report/operatorRunway";
+import { isOperatorStage } from "../../../../lib/report/operatorStage";
 
 export const runtime = "edge";
 
@@ -32,11 +33,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // The reader's runway band, sent with plan lines so a crossing email can say
-    // what the crossing means at it. One of four bands or nothing: never a figure.
+    // The reader's runway band. It scales the brief (the under-six-months reader
+    // gets the cash-first note) and, with plan lines, says what a crossing means
+    // at it. One of four bands or nothing: never a figure.
     const runwayBand = isRunwayBand(body.runwayBand) ? body.runwayBand : undefined;
+    // The company stage the reader set on the site, so the Monday brief prints the
+    // rules scaled to it. A band, never a figure.
+    const stage = isOperatorStage(body.stage) ? body.stage : undefined;
 
-    await subscribeAndSendVerification({ email, alerts, weekly, planLines, runwayBand, request });
+    await subscribeAndSendVerification({ email, alerts, weekly, planLines, runwayBand, stage, request });
 
     return NextResponse.json({ ok: true, message: "Check your email to confirm." });
   } catch (error) {

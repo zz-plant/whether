@@ -104,8 +104,8 @@ describe("integration briefs", () => {
     // The brief's own change line, not the posture state's lock commitment.
     assert.match(envelope.markdown, new RegExp(`^Conditions change if: ${document.slots.callChangesIf.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}$`, "m"));
     assert.doesNotMatch(envelope.markdown, /Tightness ≤ 66 for 2 consecutive refreshes/);
-    assert.match(envelope.markdown, /^Resume when: /m);
-    assert.doesNotMatch(envelope.markdown, /Resume when: .*tighten again/i, "a condition that tightens is not a resume line");
+    assert.match(envelope.markdown, /^Restart when: /m);
+    assert.doesNotMatch(envelope.markdown, /Restart when: .*tighten again/i, "a condition that tightens is not a restart line");
     assert.doesNotMatch(envelope.markdown, /flip|Reversal:|regime|DEFENSIVE/i);
     // What the document does not carry still comes from the posture state.
     assert.equal(envelope.lastChange.reason, "Tightness crossed above 70.");

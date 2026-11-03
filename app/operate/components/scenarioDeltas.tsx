@@ -31,7 +31,7 @@ export function ScenarioDeltas({
 }) {
   const regimeShifted = simulatedAssessment.regime !== liveAssessment.regime;
   /* The scenario's own lines: where its call would change, and the pause and
-     resume lines its rules state. This week's reading is the hollow dot. */
+     restart lines its rules state. This week's reading is the hollow dot. */
   const ladderLines = buildScenarioLadderLines(simulatedAssessment);
 
   return (
@@ -50,7 +50,7 @@ export function ScenarioDeltas({
           <Tag regime={simulatedAssessment.regime}>
             {getRegimePublicLabel(simulatedAssessment.regime)}
           </Tag>
-          <p className="text-[11px] text-slate-400">
+          <p className="text-fluid-nano text-slate-400">
             {regimeShifted ? "Conditions would change" : "Same conditions as this week"}
           </p>
         </div>

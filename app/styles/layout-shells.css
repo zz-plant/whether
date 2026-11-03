@@ -58,16 +58,14 @@
   min-width: 0;
 }
 .weather-home-section {
-  margin-top: var(--layout-content-gap);
-  padding-top: var(--layout-section-gap);
+  margin-top: 4px;
+  padding-top: 20px;
 }
-/* More air between the brief's five answers from md up, where the page is
-   read top to bottom rather than thumbed: the hairline alone separated them,
-   and at 32px apart the sections ran together. */
+/* Related questions share a compact separator; the flow owns the remaining gap. */
 @media (min-width: 768px) {
   .weather-home-section {
-    margin-top: var(--layout-section-gap);
-    padding-top: var(--space-xl);
+    margin-top: 8px;
+    padding-top: 24px;
   }
 }
 
@@ -495,4 +493,79 @@ a.weather-hub-link-card:hover {
   .weather-secondary-section-title {
     font-size: 1.5rem;
   }
+}
+
+/* The brief reads as an editorial page: the call owns display size; section
+   questions are the next register. Keep the phone fold compact. */
+.weather-editorial-hero {
+  animation: weather-brief-arrive 260ms ease-out both;
+}
+
+@keyframes weather-brief-arrive {
+  from { opacity: 0.85; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.weather-signal-table tbody tr:focus-within,
+.weather-signal-table tbody tr:hover {
+  background-color: var(--bg-raised);
+}
+
+@media (min-width: 768px) {
+  .weather-editorial-hero .text-display {
+    font-size: clamp(2.5rem, 3.5vw, 3.25rem);
+    line-height: 1.02;
+    letter-spacing: -0.03em;
+  }
+
+  .weather-hero-aside {
+    border-inline-start: 1px solid var(--border-subtle);
+    padding-inline-start: 1.25rem;
+  }
+
+  .weather-home-section > div:first-child > h2 {
+    font-size: clamp(1.5rem, 2.3vw, 2rem);
+    max-width: 28ch;
+    line-height: 1.1;
+    letter-spacing: -0.025em;
+  }
+
+  .weather-signal-table tbody th,
+  .weather-signal-table tbody td {
+    padding-block: 0.875rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .weather-editorial-hero { animation: none; }
+}
+
+/* The week is part of the artifact header, close to the call it dates. */
+.weather-hero-period { flex-basis: 100%; margin-bottom: 0.25rem; }
+.weather-signal-table tr[data-input] th,
+.weather-signal-table tr[data-input] td { padding-block: 0.5rem; }
+@media (max-width: 767px) {
+  .weather-signal-table tr[data-input] {
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 1rem;
+    row-gap: 0.5rem;
+    padding-block: 0.75rem;
+  }
+  .weather-signal-table tr[data-input] th { grid-column: 1 / -1; }
+  .weather-signal-table tr[data-input] th,
+  .weather-signal-table tr[data-input] td { padding: 0; }
+}
+
+@media (max-width: 767px) {
+  .weather-editorial-hero .text-display {
+    font-size: 1.5rem;
+    line-height: 1.06;
+  }
+}
+
+/* Keep the artifact action and its horizon together where both fit. Only the
+   horizontal inset shrinks: each option retains its 44px touch height. */
+@media (max-width: 639px) {
+  .weather-brief-actions { gap: 0.5rem; }
+  .weather-brief-actions .weather-segment-option { padding-inline: 0.5rem; }
 }

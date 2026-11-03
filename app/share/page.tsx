@@ -95,7 +95,7 @@ const buildCurrentShareArtifact = async () => {
      guardrail block per business area, built from the same bounded-rule fields
      the hero and Slack brief print. No tokens, no tracker integration — the
      operator pastes the block into the work item description and the card
-     carries the conditions, the pause and resume lines, and what would change
+     carries the conditions, the pause and restart lines, and what would change
      the guidance, in the brief's own sentence. */
   const guardrailTagBlocks = buildGuardrailTagBlocks({
     actionStripItems,
@@ -465,7 +465,7 @@ export default async function SharePage() {
             </h1>
             <p className="text-sm leading-relaxed text-white/60">
               Paste it into Slack, a meeting doc, a ticket or a letter. Every format carries the same
-              pause and resume lines and names its source:{" "}
+              pause and restart lines and names its source:{" "}
               {/* A link named for the host, not a bare URL printed as text. */}
               <a href={artifact.sourceUrl} className="text-sky-300 underline-offset-2 hover:underline">
                 {artifact.sourceHost}
@@ -497,7 +497,7 @@ export default async function SharePage() {
             script or a feed reader. The API page was a header menu item of its
             own until 2026-10-08. */}
         <nav aria-labelledby="share-elsewhere-heading" className="weather-panel weather-section-stack p-0">
-          <h2 id="share-elsewhere-heading" className="text-[1.375rem] leading-tight font-semibold text-white/90 sm:text-2xl">For agents, scripts and feed readers</h2>
+          <h2 id="share-elsewhere-heading" className="type-section">For agents, scripts and feed readers</h2>
           <p className="text-sm text-slate-300">
             Ask an assistant what this week means for your company:{" "}
             {artifact.assistantLinks.map((link, index) => (

@@ -96,3 +96,10 @@ describe("conditions legend", () => {
     assert.match(html, /data-weather-first-run-orientation="true"/);
   });
 });
+
+it("keeps the homepage introduction to its category line without repeating condition definitions", () => {
+  const html = renderToStaticMarkup(<ConditionsLegend compact thresholds={THRESHOLDS} currentRegime="DEFENSIVE" orientation="Long introduction." />);
+  assert.match(html, /Weekly operating guidance for startup leaders/);
+  assert.doesNotMatch(html, /data-conditions-definitions|Long introduction/);
+  assert.match(html, /Dismiss this introduction/);
+});

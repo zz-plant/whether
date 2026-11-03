@@ -107,7 +107,7 @@ export function AreaLabel({ area, size = "inline", className }: { area: Decision
 }
 
 /* The line states' own tokens, not a condition's: the front red for a pause
-   line crossed or close, the neutral ink for one cleared or a resume line met,
+   line crossed or close, the neutral ink for one cleared or a restart line met,
    so the play glyph is what says "clear". Until 2026-10-09 these were the
    caution and easing families, which were also Cloudy's and Sunny's inks. */
 const LINE_STATE_INK: Record<LineState, string> = {

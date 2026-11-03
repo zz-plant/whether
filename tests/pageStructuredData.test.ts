@@ -90,7 +90,7 @@ describe("/history", () => {
 describe("/comps", () => {
   it("declares a dataset only when there is a reading", () => {
     const withData = buildCompsStructuredData({
-      data: { medianEvToRevenue: 8.2, medianRevenueGrowth: null, companyCount: 15, fetchedAt: "2026-09-15T14:00:00.000Z", source: "yahoo" },
+      data: { medianEvToRevenue: 8.2, medianRevenueGrowth: null, companyCount: 15, growthCompanyCount: 15, fetchedAt: "2026-09-15T14:00:00.000Z", source: "yahoo" },
       tickers: ["SNOW", "SHOP"],
     });
     const dataset = one(withData, "Dataset");

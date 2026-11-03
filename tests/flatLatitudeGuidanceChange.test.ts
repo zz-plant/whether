@@ -67,7 +67,7 @@ describe("a flat operating latitude over a week the guidance changed", () => {
 
     assert.equal(
       buildStandupLine({ regime: "DEFENSIVE", change: summary.guidanceChange, ...source }),
-      "Guidance changed at a pause or resume line; review pace. Conditions change if: Risk appetite falls 4 pts from 54 to 50 or below.",
+      "Guidance changed at a pause or restart line; review pace. Conditions change if: Risk appetite falls 4 pts from 54 to 50 or below.",
     );
   });
 
@@ -94,7 +94,7 @@ describe("a flat operating latitude over a week the guidance changed", () => {
       buildWeeklyOperatorBriefPayload(document, { weeklyLeadershipSummary: model.weeklyLeadershipSummary }),
     );
 
-    assert.match(text, /^Operating latitude: 51\/100 \(room to hire, spend and commit; higher means more room\) · vs Sep 29: no change$/m);
+    assert.match(text, /^Operating latitude: 51\/100 \(room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room\) · vs Sep 29: no change$/m);
     assert.doesNotMatch(text, /guidance is (unchanged|holding)|guidance is holding where it was/i);
   });
 });

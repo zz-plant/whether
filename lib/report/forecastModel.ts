@@ -11,6 +11,8 @@ import { getMonthlyRegimeHistory } from "../summary/monthlyRegimeHistory";
 import { getTimeMachineRegimeSeries } from "../timeMachine/timeMachineCache";
 import type { MacroSeriesId, MacroSeriesReading } from "../types";
 import type { ReportDynamics } from "./reportData";
+import { findSignalDelta } from "./evidenceReaderModel";
+import { resolveDistanceToFlip } from "./confidence";
 
 export type ForecastRegimeLabel =
   | "Expansion"
@@ -18,7 +20,7 @@ export type ForecastRegimeLabel =
   | "Scarcity"
   | "Defensive";
 type SignalDirection = "up" | "down" | "flat";
-type SignalTrajectoryLabel = "improving" | "deteriorating" | "stable";
+type SignalTrajectoryLabel = "improving" | "deteriorating" | "stable" | "unmeasured";
 type CrossingRiskLabel = "low" | "medium" | "high";
 type BoundaryMomentum =
   | "toward-threshold"
@@ -248,8 +250,13 @@ const toTrajectory = ({
   delta,
 }: {
   key: "tightness" | "riskAppetite" | "curveSlope";
-  delta: number;
+  delta: number | null;
 }): SignalTrajectoryLabel => {
+  /* Null is "the earlier reading did not record this signal", not a zero move:
+     the label says unmeasured rather than claiming stability. */
+  if (delta === null) {
+    return "unmeasured";
+  }
   const direction = toDirection(
     delta,
     key === "curveSlope" ? 0.001 : DIRECTION_EPSILON,
@@ -310,10 +317,10 @@ const normalizeProbabilities = (
   return normalized;
 };
 
-const findSignalDelta = (
-  dynamics: ReportDynamics,
-  key: ReportDynamics["changedSignals"][number]["key"],
-) => dynamics.changedSignals.find((signal) => signal.key === key)?.delta ?? 0;
+/* The shared lookup, not a local copy: it also reads `anomalySignals` and
+   answers null for a signal the earlier reading did not record
+   (`ReportDynamics.notCompared` names the two rates), so a rate without an
+   earlier print is "not measured" here instead of a fabricated zero move. */
 
 const deriveTightnessTrajectoryDelta = ({
   tightnessDelta,
@@ -321,13 +328,22 @@ const deriveTightnessTrajectoryDelta = ({
   curveDelta,
 }: {
   tightnessDelta: number;
-  baseRateDelta: number;
-  curveDelta: number;
+  /* Null when the earlier reading did not record the rate (`notCompared`): the
+     proxy needs both moves, so a missing one skips the proxy rather than
+     pretending the rate did not move. */
+  baseRateDelta: number | null;
+  curveDelta: number | null;
 }) => {
   if (Math.abs(tightnessDelta) > DIRECTION_EPSILON) {
     return tightnessDelta;
   }
 
+  /* Rates-only proxy, in curve-equivalent points: tightness moves ~3.6 curve
+     points per rate point (180 per rate point against 50 per inversion point),
+     rounded to 4, and a steepening curve loosens. */
+  if (baseRateDelta === null || curveDelta === null) {
+    return 0;
+  }
   const proxyDelta = baseRateDelta * 4 - curveDelta;
   return Math.abs(proxyDelta) > DIRECTION_EPSILON ? proxyDelta : 0;
 };
@@ -549,8 +565,12 @@ export const buildForecastModel = ({
   reportDynamics: ReportDynamics;
   macroSeries: MacroSeriesReading[];
 }): ForecastModel => {
-  const tightnessDelta = findSignalDelta(reportDynamics, "tightness");
-  const riskDelta = findSignalDelta(reportDynamics, "riskAppetite");
+  /* `?? 0` is safe on the two scores: `notCompared` only ever names the rates,
+     and a score delta is null here only when nothing was compared at all, where
+     the forecast's neutral "no measured motion" drift of 0 is the intent. The
+     two rates keep their null: an unrecorded earlier print is not a zero move. */
+  const tightnessDelta = findSignalDelta(reportDynamics, "tightness") ?? 0;
+  const riskDelta = findSignalDelta(reportDynamics, "riskAppetite") ?? 0;
   const curveDelta = findSignalDelta(reportDynamics, "curveSlope");
   const baseRateDelta = findSignalDelta(reportDynamics, "baseRate");
   const tightnessTrajectoryDelta = deriveTightnessTrajectoryDelta({
@@ -560,15 +580,33 @@ export const buildForecastModel = ({
   });
   const macroDownsideBias = computeMacroDownsideBias(macroSeries);
 
+  /* The macro bias is a signed average of the series' latest moves, so it is a
+     per-period drift estimate, not a weekly rate; the 7 and the 8 spread it
+     over the coming week, and risk appetite takes the slightly larger share
+     (8) because the series feeding it (VIX, credit) move harder on a downside
+     shock than the funding-pressure add-ons do. Tuned pair, changed together. */
   const projectedTightnessDrift = tightnessDelta + macroDownsideBias * 7;
   const projectedRiskDrift = riskDelta - macroDownsideBias * 8;
 
+  /* Signed, per-axis gaps for the momentum read: each axis's motion toward or
+     away from its own line. These are deliberately not compared with each
+     other — the nearest-boundary judgment above is where the 4.5x scale
+     conversion belongs. */
   const tightnessGap =
     assessment.scores.tightness - assessment.thresholds.tightnessRegime;
   const riskGap =
     assessment.scores.riskAppetite - assessment.thresholds.riskAppetiteRegime;
+
+  /* The forecast's boundary pressure measures the same distance the published
+     margin does (`resolveDistanceToFlip`): tightness-equivalent, with a pinned
+     score's hidden points counted. A raw `min()` of the two point gaps hands
+     "nearest" to the risk axis almost always, because its scale is 4.5x more
+     compressed (`lib/report/confidence.ts`). */
   const nearestDistance = Math.round(
-    Math.min(Math.abs(tightnessGap), Math.abs(riskGap)),
+    resolveDistanceToFlip({
+      scores: assessment.scores,
+      thresholds: assessment.thresholds,
+    }),
   );
 
   const baseVolatilityScale = clamp(

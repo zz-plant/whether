@@ -274,7 +274,7 @@ type WeeklyLeadershipSummary = {
   boldnessDelta: number | null;
   /**
    * What the week did to the guidance (`describeGuidanceChange`): the conditions
-   * changed, a pause or resume line was crossed, or neither; null when nothing
+   * changed, a pause or restart line was crossed, or neither; null when nothing
    * was compared. Renderers that say "nothing changed" read this, never the
    * latitude's move, which can be zero on a week a line was crossed. It was
    * `steadyWeek`, the latitude moving a point or less, until 2026-10-07.
@@ -400,7 +400,10 @@ export type WeeklyDecisionCardViewModel = {
       dimensionKey: "tightness" | "riskAppetite";
       currentValue: number;
       thresholdValue: number;
+      /** The watched line's distance, in that axis's own points. */
       pointsToFlip: number;
+      /** The same distance on the tightness-equivalent scale the published margin cuts at. */
+      pointsToFlipNormalized: number;
       thresholdDirection: BoundaryDirection;
     };
     flipRiskMeter: FlipRiskMeterState;

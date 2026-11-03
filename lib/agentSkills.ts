@@ -29,12 +29,12 @@ const BRIEFING_STEPS: readonly BriefingStep[] = [
     skill: {
       id: "regime-summary",
       label: "Regime summary",
-      purpose: "Explain the capital posture in plain English with the top macro signals.",
+      purpose: "Explain this week's guidance in plain English with the top macro signals.",
       inputs: ["regime", "scores", "macro_signals", "data_warnings"],
       outputs: ["summary_bullets"],
     },
     briefingAction: "Summarize the regime in plain English.",
-    promptAsk: "A 3-bullet summary of the capital posture.",
+    promptAsk: "A 3-bullet summary of this week's guidance.",
   },
   {
     skill: {
@@ -62,12 +62,12 @@ const BRIEFING_STEPS: readonly BriefingStep[] = [
     skill: {
       id: "flip-watch",
       label: "Flip watch",
-      purpose: "Track the change lines, the pause and resume lines, and each score's distance from them before irreversible moves.",
+      purpose: "Track the change lines, the pause and restart lines, and each score's distance from them before irreversible moves.",
       inputs: ["flip_watch", "decision_rules", "signals"],
       outputs: ["flip_watchlist"],
     },
     briefingAction: "Track the change lines before making irreversible commitments.",
-    promptAsk: "A watchlist of the change lines and the pause and resume lines, with how far each score sits from them.",
+    promptAsk: "A watchlist of the change lines and the pause and restart lines, with how far each score sits from them.",
   },
   {
     skill: {

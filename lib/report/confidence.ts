@@ -53,8 +53,13 @@ const hasImputedInputs = ({ scores }: ConfidenceInputs): boolean =>
  * nearer to flipping, but because its scale is 4.5x more compressed. The risk gap
  * is converted to its tightness equivalent first, so "nearest" means nearest in
  * the move the underlying rate or slope would have to make.
+ *
+ * This is the one conversion, exported for every surface that must pick which of
+ * the two lines is nearer (the flip state's watched boundary, the forecast's
+ * boundary pressure). A raw `min()` anywhere else re-asserts the equivalence
+ * `RISK_GAP_TO_TIGHTNESS_EQUIVALENT` exists to deny.
  */
-const resolveLineGaps = ({ scores, thresholds }: ConfidenceInputs) => ({
+export const resolveLineGaps = ({ scores, thresholds }: ConfidenceInputs) => ({
   tightness: resolveTightnessGap({ scores, thresholds }),
   riskAppetite: Math.abs(scores.riskAppetite - thresholds.riskAppetiteRegime) * RISK_GAP_TO_TIGHTNESS_EQUIVALENT,
 });
@@ -206,6 +211,12 @@ export type ConfidenceRecord = {
  * the /share paste printed theirs while / and /signals printed this. The
  * engine's label is its confirmation gate and stays its own; it is not a
  * published fact.
+ *
+ * The label and the percent answer different questions and can disagree on a
+ * stale fallback: the label carries the staleness judgment (one step down past
+ * 48 hours, two past 120), while the percent stays the distance the scores sit
+ * from the line — a distance does not shrink because the data is old. A served
+ * pair can therefore read LOW beside a high percent; the label is the verdict.
  */
 export const resolvePublishedConfidence = ({
   assessment,

@@ -24,23 +24,11 @@ jobs:
     timeout-minutes: 20
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.14
-      - uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          restore-keys: |
-            bun-${{ runner.os }}-
-      - run: bun install --frozen-lockfile
+      - uses: ./.github/actions/setup-bun
 
-      # lint/typecheck/test/assets are mutually independent; running them as
-      # separate steps just added their durations together. This runs them
-      # concurrently and reports every failure in one pass instead of stopping
-      # at the first. Named explicitly so review:hotspot-preflight stays owned by
-      # its own workflow, which needs a full-depth checkout.
-      - run: bun scripts/run-checks.mjs lint typecheck test assets audit landmarks
+      # The task list is the `ci` preset in scripts/check-tasks.mjs, the same source the
+      # local gates name theirs from, so this job cannot drift from what a push checks.
+      - run: bun scripts/run-checks.mjs --preset ci
 
       # Absorbed from the former Upgrade Guardrails workflow. That job ran lint,
       # typecheck, and test as steps and then ran `check:vinext` -- which is
@@ -74,16 +62,7 @@ jobs:
     needs: check
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v2
-        with:
-          bun-version: 1.3.14
-      - uses: actions/cache@v4
-        with:
-          path: ~/.bun/install/cache
-          key: bun-${{ runner.os }}-${{ hashFiles('bun.lock') }}
-          restore-keys: |
-            bun-${{ runner.os }}-
-      - run: bun install --frozen-lockfile
+      - uses: ./.github/actions/setup-bun
       - run: bunx playwright install --with-deps chromium
       - run: bun run build
       - name: Start server

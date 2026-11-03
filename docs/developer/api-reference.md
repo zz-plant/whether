@@ -10,7 +10,8 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 - **Cost:** Whether is free.
 - **Auth:** none for the reads. The routes the scheduler owns (creating a regime alert, `/api/alert-deliveries`, `/api/decision-events`) take `Authorization: Bearer <WHETHER_CRON_SECRET>`. Decision memory reads and writes one owner's entries, named by an `x-whether-client-id` header, and answers 401 without it.
 - **Automation headers:** send `Accept: application/json`; include `Authorization: Bearer <token>` when your deployment is access-controlled.
-- **Crawlers:** `robots.txt` opens every path `/api-docs`, `/llms.txt` and the agent manifest advertise (`tests/robotsRoute.test.ts`), and keeps `/api/health`, telemetry, the alert digest and the scheduler's routes closed.
+- **Crawlers:** `robots.txt` opens every path `/api-docs`, `/llms.txt` and the agent manifest advertise (`tests/robotsRoute.test.ts`), and keeps `/api/health`, telemetry, the alert digest and the scheduler's routes closed. It carries the Content-Signal declaration (`search=yes, ai-input=yes, ai-train=yes`, rendered from `lib/seo/robotsTxt.ts`).
+- **Markdown negotiation:** `GET /` with `Accept: text/markdown` answers the Markdown brief (`/brief.md`) instead of HTML; every HTML response also carries `Link` headers naming the manifest, `/llms.txt` and `/brief.md` (`lib/runtime/agentResponse.ts`, applied in `worker/index.ts`).
 - **Rate limiting:** platform-default protections apply; explicit per-endpoint quotas are not yet published.
 - **Versioning:** most payloads include `version: "v1"`.
 
@@ -25,7 +26,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/agent?week=<slug>` / `?period=<slug>` | GET | A frozen published week (`2026-w41`), or an archive quarter or year (`2024-q1`, `2023`), with its permalink. An unknown slug is a 404 listing the slugs on record. |
 | `/api/posture/current` | GET | The current guidance as a small stable object: conditions, funding pressure, direction, confidence, week, summary, url, version. |
 | `/api/scores` | GET | Both scores, their deltas, the distance to the change line and the score nearer to crossing. |
-| `/api/decision` | GET | The week's guidance as one object: the action, each area's action with its pause and resume lines, decisions to revisit, the lines that would change the guidance. |
+| `/api/decision` | GET | The week's guidance as one object: the action, each area's action with its pause and restart lines, decisions to revisit, the lines that would change the guidance. |
 | `/api/weekly` | GET | Weekly summary copy + structured fields + summary hash. |
 | `/api/brief/slack` | GET | Slack-ready plain-text weekly brief payload for automation. |
 | `/api/embed?format=<html|text|json|page>` | GET | The brief as a snippet (`html` default; `page` is a whole document for an iframe). `mode=call-strip` is one line; `stage` and `runway` (a band or a number of months) calibrate it; `ticker` labels it. |
@@ -62,6 +63,11 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/api/slack/subscribe` | POST | Register a Slack Incoming Webhook (`webhookUrl`) plus optional `channelName` for weekly brief delivery; pings the channel to verify (bounded at 5s) and stores the subscription in KV. Deleting the webhook in Slack stops delivery. |
 | `/api/decision-events` | GET | Retrieve regime transition decision events with cursor pagination and optional replay support (`replay=1&initialState=<REGIME>`). Takes the cron secret. |
 | `/api/integrations/weekly-mandate?target=<slack|notion|linear>` | GET | The weekly mandate shaped for one tool: Slack blocks (the default), a Notion page, or a Linear issue. The channel and database id are placeholders. An unknown target is a 400 listing `supportedTargets`. |
+| `/api/email/send-weekly` | POST | Send this week's brief to every confirmed subscriber. Takes the cron secret. It sends only from a **stored reading** — the one the cron writes — and answers `refused_unpublishable` when none exists rather than mailing a stand-in. `?force=1` re-sends to subscribers who already had it. |
+| `/api/email/subscribe` | POST | The one credential-free write: `{ email, weekly?, alerts?, planLines?, runwayBand? }`. Mails a confirmation link; nothing is enrolled until that inbox confirms, and a change to an existing address waits the same way. |
+| `/api/email/verify`, `/api/email/unsubscribe` | GET, POST | The confirmation and unsubscribe pages. `GET` shows what the change would do and only `POST` applies it, so a link scanner cannot confirm or unsubscribe on a reader's behalf. A mail client's RFC 8058 one-click `POST` to the footer link works too. |
+| `/api/month-end-pulse` | POST | Send the month-end block to alert subscribers. Takes the cron secret, and likewise needs a stored reading. |
+| `/api/email/suppress` | POST | `{ email }`, cron secret. Stops every send to one address without deleting its record: a hard bounce or a complaint. The record stays so the address can be restored. Bounce events still need wiring to it. |
 
 ### E) Discover capabilities for tools/agents
 
@@ -70,6 +76,7 @@ Whether exposes read-first JSON endpoints for weekly posture transmission, caden
 | `/llms.txt` | GET | Plain-text machine onboarding + endpoint discovery; its tool section is written from the tool registry. |
 | `/llms-full.txt` | GET | The indexable answer pages, guides and terms in one Markdown file. |
 | `/.well-known/whether-agent.json` | GET | JSON discovery manifest for agent/tool clients: where to `start` per surface, the `views`, how to tell whether a reading is live and current (`automation`), and the MCP endpoint with every tool and its arguments (`mcp.tools`). |
+| `/auth.md` | GET | What it takes to sign in, in one page: nothing for the reads; the one credential-free write (email subscribe) and the authenticated routes named so an agent does not hunt for a login. |
 | `/api/mcp` | POST | MCP streamable-HTTP server (JSON-RPC 2.0). Tools are defined once in `lib/agent/tools.ts`; see `docs/agents/agent-interface.md`. CORS is open for the transport and the reads, so a browser-based client can call it; `?tool=subscribe` stays closed. |
 | `/api/mcp?tool=<name>` | GET | The same tools as a plain GET for an agent with no MCP client; `tool=get_actions` lists them with their arguments and a call that works. A wrong tool or argument is a 400 with what would have worked. |
 

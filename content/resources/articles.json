@@ -46,7 +46,7 @@
         "heading": "Build the role list",
         "paragraphs": [
           "List each open role and planned backfill with its purpose, cost if unfilled, evidence window and time to reverse. Classify it as safe, risky or dangerous.",
-          "Review the list with finance and hiring managers. Record one measurable indicator per approval, the pause and resume lines, and an owner and review date for each exception. Include the list in the weekly memo."
+          "Review the list with finance and hiring managers. Record one measurable indicator per approval, the pause and restart lines, and an owner and review date for each exception. Include the list in the weekly memo."
         ],
         "anchor": "what-operators-should-do-first"
       }
@@ -62,7 +62,7 @@
       },
       {
         "question": "What should I send my board about hiring?",
-        "answer": "Send the approved role list, exceptions with owners and review dates, and the pause and resume lines."
+        "answer": "Send the approved role list, exceptions with owners and review dates, and the pause and restart lines."
       }
     ],
     "toolLink": {
@@ -109,7 +109,7 @@
         "paragraphs": [
           "Agree on numerical limits and review periods for retention, gross margin and cash forecast error before changing the runway target.",
           "Example pause line: retention stays below your limit for two consecutive monthly readings while gross margin keeps falling. Increase the runway target and suspend non-core commitments.",
-          "Example resume line: renewals and conversion improve for 30 days, cash forecast error narrows and financing access improves. Release one investment installment while keeping projected runway above the agreed floor."
+          "Example restart line: renewals and conversion improve for 30 days, cash forecast error narrows and financing access improves. Release one investment installment while keeping projected runway above the agreed floor."
         ],
         "anchor": "reversal-trigger-logic-for-runway-posture"
       },

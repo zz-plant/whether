@@ -123,11 +123,13 @@ describe("fetch-based main-content guard", () => {
       [[{ name: "landmarks", script: "check:landmarks" }]],
     );
     // The hook runs the pre-push preset and `check:vinext` (what Workers Builds runs on
-    // every push, main included) runs the deploy preset; tests/deployGateTestScope.test.ts
-    // holds each consumer to its preset. Both presets carry the audit.
+    // every push, main included) runs the deploy preset; the Actions check job runs the
+    // `ci` preset. tests/deployGateTestScope.test.ts holds each consumer to its preset.
+    // All three carry the audit.
     assert.ok(presetTasks("pre-push").includes("landmarks"), "the pre-push gate no longer runs landmarks");
     assert.ok(presetTasks("deploy").includes("landmarks"), "the deploy gate no longer runs landmarks");
-    assert.match(workflow, /run-checks\.mjs[^\n]*\blandmarks\b/);
+    assert.ok(presetTasks("ci").includes("landmarks"), "the Actions gate no longer runs landmarks");
+    assert.match(workflow, /run-checks\.mjs --preset ci/);
   });
 
   /*

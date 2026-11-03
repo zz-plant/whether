@@ -24,7 +24,7 @@ export function DecisionLineKey({ className = "" }: { className?: string }) {
         <div className="grid grid-cols-[8rem_minmax(0,1fr)] gap-x-2 sm:block">
           <dt className="flex items-center gap-1.5 font-semibold text-line-clear-fg">
             <LineStateIcon state="clear" />
-            <span>Resume line</span>
+            <span>Restart line</span>
           </dt>
           <dd className="text-slate-400 sm:mt-1 sm:pl-[1.375rem]">Once a score is back past it, restart those areas.</dd>
         </div>
@@ -39,7 +39,7 @@ export function DecisionLineKey({ className = "" }: { className?: string }) {
         </div>
       </dl>
       <p className="rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-2.5 text-fluid-nano text-slate-300">
-        <span className="font-semibold text-slate-200">Why pause and resume lines differ:</span> Think of the gap like a thermostat. A buffer between pausing and resuming stops your team from thrashing between sudden freezes and restarts week to week.
+        <span className="font-semibold text-slate-200">Why pause and restart lines differ:</span> Think of the gap like a thermostat. A buffer between pausing and resuming stops your team from thrashing between sudden freezes and restarts week to week.
       </p>
     </div>
   );

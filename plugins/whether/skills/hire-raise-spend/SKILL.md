@@ -1,6 +1,6 @@
 ---
 name: hire-raise-spend
-description: This week's call on whether a startup should hire or freeze hiring, raise now or wait, cut burn or keep spending, from Whether's reading of U.S. interest-rate and credit-market data (whether.work, published every Monday). Use when someone asks about the timing of hiring, fundraising, burn, runway, sales headcount or go-to-market expansion against today's market; asks what the funding climate, interest rates or a possible recession mean for their company; or is drafting a board update, investor update or planning memo that needs this week's market context.
+description: This week's call on whether a startup should hire or freeze hiring, raise now or wait, cut burn or keep spending, from Whether's reading of U.S. interest-rate and credit-market data (whether.work, published every Monday). Use when someone asks about the timing of hiring, layoffs, fundraising or a bridge round, burn, runway, pricing, sales headcount or go-to-market and international expansion against today's market; asks what the funding climate, interest rates or a possible recession mean for their company; or is drafting a board update, investor update or planning memo that needs this week's market context.
 ---
 
 # Hire, raise, spend: this week's call

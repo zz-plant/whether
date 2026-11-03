@@ -52,7 +52,7 @@
       "are markets rewarding growth or profitability"
     ],
     "category": "climate",
-    "shortAnswer": "Use risk appetite to review how much uncertainty new commitments carry; validate demand and cash capacity before increasing exposure.",
+    "shortAnswer": "Partly: investors are selective, not shut. Fund the commitments that carry proof, stage the rest behind a review date, and keep a way to stop.",
     "directAnswer": "Compare the current risk reading with the commitments you are considering. Better market conditions can support a review of expansion, but each bet still needs customer evidence, a spending limit and a way to stop.",
     "audience": "Leadership teams",
     "applyHeading": "Which commitments the risk reading should gate",
@@ -116,6 +116,10 @@
       {
         "label": "Should we freeze hiring this week?",
         "href": "/answers/should-we-freeze-or-selectively-hire"
+      },
+      {
+        "label": "Plan the week",
+        "href": "/operate"
       }
     ]
   },
@@ -153,6 +157,10 @@
       {
         "label": "Roadmap focus toolkit",
         "href": "/toolkits/focus"
+      },
+      {
+        "label": "Should we delay new product lines?",
+        "href": "/answers/should-we-delay-new-product-lines"
       }
     ]
   },
@@ -168,7 +176,7 @@
       "go out to investors and raise a round"
     ],
     "category": "decision",
-    "shortAnswer": "Start fundraising preparation before your downside runway falls inside the time needed to reach investors, close a round and absorb delays.",
+    "shortAnswer": "Prepare now if the time to close a round plus a delay would leave less than your minimum cash buffer. Do not wait for better conditions to start.",
     "directAnswer": "Work backward from the date cash would reach your minimum buffer. Include preparation, investor conversations, diligence and a delayed close; do not wait for better market conditions if that leaves the company unable to fund its plan.",
     "audience": "Founders, CEOs and CFOs",
     "applyHeading": "When to start the raise",
@@ -205,7 +213,7 @@
       "should we cut costs",
       "reduce spending or expenses",
       "lower our burn rate",
-      "do we need layoffs to extend runway"
+      "extend runway by spending less"
     ],
     "category": "decision",
     "shortAnswer": "Review burn when your cash plan no longer funds the next milestone with a contingency buffer; tighter funding conditions make that review more urgent.",
@@ -271,6 +279,10 @@
       {
         "label": "The standing policy: which roles to keep, gate or pause",
         "href": "/resources/should-we-freeze-hiring-high-interest-rate-environment"
+      },
+      {
+        "label": "Plan the week",
+        "href": "/operate"
       }
     ]
   },
@@ -307,6 +319,10 @@
       {
         "label": "Set the next growth spending step",
         "href": "/answers/how-fast-should-we-scale-go-to-market"
+      },
+      {
+        "label": "Plan the week",
+        "href": "/operate"
       }
     ]
   },
@@ -343,6 +359,10 @@
       {
         "label": "Launch gates toolkit",
         "href": "/toolkits/launch-gates"
+      },
+      {
+        "label": "Should startups slow roadmap expansion?",
+        "href": "/answers/should-startups-slow-roadmap-expansion"
       }
     ]
   },
@@ -354,7 +374,7 @@
       "should we expand into new markets",
       "scale marketing spend",
       "how fast should we grow",
-      "GTM expansion, or expanding to Europe or another country"
+      "GTM expansion"
     ],
     "category": "decision",
     "shortAnswer": "Increase go-to-market spend in steps only when retention, conversion and gross-margin-adjusted payback support the added cash commitment.",
@@ -488,7 +508,7 @@
     ],
     "thresholdFocus": "both",
     "contextHeading": "Why the lines are written in advance",
-    "context": "Each pause line sits six points past the line where conditions change, and each resume line four points inside it, so one noisy reading cannot reverse a decision and restart it. The margin study found the published margin measures distance from that line, not probability. What the record cannot tell you is your own demand: the company inputs below are yours to fill in.",
+    "context": "Each pause line sits six points past the line where conditions change, and each restart line four points inside it, so one noisy reading cannot reverse a decision and restart it. The margin study found the published margin measures distance from that line, not probability. What the record cannot tell you is your own demand: the company inputs below are yours to fill in.",
     "companyInputs": [
       "Runway in months against the safe band for the current conditions.",
       "Which commitments stop, defer or survive a pause in each area.",
@@ -544,6 +564,411 @@
       {
         "href": "/operate",
         "label": "Test the hire against this week's lines"
+      }
+    ]
+  },
+  {
+    "slug": "should-startups-raise-prices-now",
+    "keyword": "should startups raise prices",
+    "title": "Should startups raise prices now?",
+    "askedAs": [
+      "should we increase our prices",
+      "is it a good time for a price increase",
+      "raise pricing on existing customers"
+    ],
+    "category": "decision",
+    "shortAnswer": "Raise prices only where customers already see the value, and only with a clear way back. Hold the base price steady if churn risk is real or if buyers are scrutinizing spend.",
+    "directAnswer": "Test a price increase on new customers or one segment first, measure churn and win rate, and keep the rollback path open. Do not raise prices across the board while buyers are cutting vendors.",
+    "audience": "Founders, revenue and product leadership",
+    "applyHeading": "When and how to raise prices",
+    "mappedDecisionAreas": [
+      "burn-discipline",
+      "expansion-bets"
+    ],
+    "thresholdFocus": "both",
+    "featuredOrder": 12,
+    "contextHeading": "Pricing during a tighter market",
+    "context": "A price increase is a bet on customer willingness to pay more while they are watching budgets. It works when the product clearly saves time or money; it backfires when buyers are cutting vendors.",
+    "companyInputs": [
+      "Current churn, renewal rates and win rates by segment.",
+      "How much of the product's value is already proven in customer outcomes.",
+      "The cost and effort of rolling back a price change if it fails."
+    ],
+    "decisionNote": "Raise prices for [segment] by [amount] starting [date]. Watch [churn and win rate]. Roll back if [pause line] is crossed. Hold the base price for [segment] until [milestone]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Pricing change toolkit",
+        "href": "/toolkits/claims"
+      },
+      {
+        "label": "Plan the week",
+        "href": "/operate"
+      }
+    ],
+    "watchouts": [
+      "Raising prices on every customer at once, so you cannot tell which segment pushed back.",
+      "Grandfathering old customers forever, which leaves the new price untested.",
+      "Cutting support or reliability to offset churn, which makes the price look worse."
+    ],
+    "faq": [
+      {
+        "question": "How do we test a price increase without losing customers?",
+        "answer": "Start with new customers or one segment. Compare churn and win rate against the old price before you widen it."
+      },
+      {
+        "question": "What should we do if churn rises after the change?",
+        "answer": "Roll back the increase for the segment that pushed back, and keep it where customers stayed."
+      },
+      {
+        "question": "Is a price increase a substitute for cutting costs?",
+        "answer": "No. Pricing changes take time to land. Cut spend that cannot show a quick payback while the new price is tested."
+      }
+    ]
+  },
+  {
+    "slug": "should-startups-do-layoffs-now",
+    "keyword": "should startups do layoffs",
+    "title": "Should startups do layoffs now?",
+    "askedAs": [
+      "do we need layoffs",
+      "should we lay people off",
+      "reduce headcount or do a RIF"
+    ],
+    "category": "decision",
+    "shortAnswer": "Cut roles only when the runway math forces it or when the role no longer fits the plan. Protect the people who ship and sell; avoid cuts that save little cash but cost momentum.",
+    "directAnswer": "Work out how many months of runway each cut buys, then cut the roles that do not map to revenue or core delivery. Avoid blanket cuts that weaken the team without fixing the cash line.",
+    "audience": "Founders, CEOs and finance leaders",
+    "applyHeading": "When and how to reduce headcount",
+    "mappedDecisionAreas": [
+      "hiring",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "tightness",
+    "featuredOrder": 13,
+    "contextHeading": "Headcount during a tighter market",
+    "context": "Layoffs are a cash decision with a long shadow. They buy runway but cost trust, speed and institutional knowledge. Make them deliberate, not reactive.",
+    "companyInputs": [
+      "Current runway in months and the burn target needed to extend it.",
+      "Which roles map directly to revenue or core delivery.",
+      "Severance, notice and re-hiring costs for each role."
+    ],
+    "decisionNote": "Cut [roles] to extend runway to [months]. Protect [core roles]. Re-hire only when [milestone] is met and runway exceeds [months]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Plan the week",
+        "href": "/operate"
+      },
+      {
+        "label": "Runway planning",
+        "href": "/answers/how-much-runway-should-we-have-before-we-raise"
+      }
+    ],
+    "watchouts": [
+      "Cutting across teams evenly, which removes the people who ship and sell.",
+      "Announcing cuts before severance and notice are settled, which costs trust twice.",
+      "Cutting so deep that the remaining team cannot deliver the plan."
+    ],
+    "faq": [
+      {
+        "question": "How much runway should a layoff buy?",
+        "answer": "Enough to reach a milestone that changes the next raise, not just a few extra weeks."
+      },
+      {
+        "question": "Should we cut before or after a fundraise?",
+        "answer": "Cut first if the raise is uncertain. A smaller team raises on better terms than a team that looks unaffordable."
+      },
+      {
+        "question": "How do we keep the remaining team?",
+        "answer": "Say what changed, who is affected, and how the plan works now. Silence is what makes people leave."
+      }
+    ]
+  },
+  {
+    "slug": "should-startups-invest-in-retention-or-acquisition",
+    "keyword": "should startups invest in retention or acquisition",
+    "title": "Should startups invest in retention or acquisition?",
+    "askedAs": [
+      "focus on retention or new customers",
+      "should we cut acquisition spend",
+      "churn or growth first"
+    ],
+    "category": "decision",
+    "shortAnswer": "Protect retention first when buyers are cautious. Spend on acquisition only where payback is short and the channel is proven.",
+    "directAnswer": "When customers are scrutinizing spend, keeping the ones you have beats chasing new ones. Fund acquisition only where it pays back quickly and the message already lands.",
+    "audience": "Founders, growth and product leadership",
+    "applyHeading": "Choosing between retention and acquisition",
+    "mappedDecisionAreas": [
+      "product-tempo",
+      "expansion-bets"
+    ],
+    "thresholdFocus": "risk",
+    "featuredOrder": 14,
+    "contextHeading": "Retention vs acquisition in a tighter market",
+    "context": "Growth spend is easy to justify when buyers are eager and hard to justify when they are cutting. Retention is the safer bet because it compounds and costs less than re-acquiring a lost customer.",
+    "companyInputs": [
+      "Current retention and churn by segment.",
+      "Payback period and cost per acquisition by channel.",
+      "Which segments expand spend and which are at risk of leaving."
+    ],
+    "decisionNote": "Fund retention work for [segment] now. Hold acquisition spend for [channel] until payback is [months]. Revisit when [milestone] is met. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Plan the week",
+        "href": "/operate"
+      },
+      {
+        "label": "Roadmap focus",
+        "href": "/answers/should-startups-slow-roadmap-expansion"
+      }
+    ],
+    "watchouts": [
+      "Spending on acquisition while the product still leaks customers.",
+      "Cutting retention work to protect a growth number, which raises churn later.",
+      "Measuring retention only at the company level, which hides the segment that is leaving."
+    ],
+    "faq": [
+      {
+        "question": "How do we know retention is the better bet?",
+        "answer": "When churn is high or payback on acquisition is long, keeping customers costs less than replacing them."
+      },
+      {
+        "question": "When is acquisition worth funding?",
+        "answer": "When a channel pays back quickly and the message already lands with the segment."
+      },
+      {
+        "question": "Should we do both at once?",
+        "answer": "Only if cash allows. Otherwise fund retention first and keep acquisition to the one proven channel."
+      }
+    ]
+  },
+  {
+    "slug": "should-startups-raise-a-bridge-round-now",
+    "keyword": "should startups raise a bridge round",
+    "title": "Should startups raise a bridge round now?",
+    "askedAs": [
+      "should we raise a bridge round",
+      "extension round or bridge from existing investors",
+      "do we need a bridge before the next round"
+    ],
+    "category": "decision",
+    "shortAnswer": "Raise a bridge only if it extends runway to a real milestone and the terms are survivable. Otherwise cut to default alive first.",
+    "directAnswer": "A bridge buys time, not a strategy. Take one only when it reaches a milestone that changes the next raise. The terms must not trap you. Otherwise reduce burn to live on current cash.",
+    "audience": "Founders and finance leadership",
+    "applyHeading": "When to take a bridge round",
+    "mappedDecisionAreas": [
+      "capital-raising",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "both",
+    "featuredOrder": 15,
+    "contextHeading": "Bridge rounds during a tighter market",
+    "context": "Bridges are common when the next priced round is out of reach. They help when they fund a milestone that improves the story; they hurt when they only delay a hard decision.",
+    "companyInputs": [
+      "Runway today and the runway the bridge would create.",
+      "The milestone the bridge must fund and its cost.",
+      "Terms: discount, cap, maturity and what happens if the milestone slips."
+    ],
+    "decisionNote": "Take the bridge only if it reaches [milestone] with [months] of runway. Otherwise cut burn to [target] and revisit in [weeks]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Runway planning",
+        "href": "/answers/how-much-runway-should-we-have-before-we-raise"
+      },
+      {
+        "label": "Plan the week",
+        "href": "/operate"
+      }
+    ],
+    "watchouts": [
+      "Taking a bridge that only delays a cut you will still have to make.",
+      "Accepting terms that make the next priced round harder.",
+      "Funding a milestone that does not change the story for the next raise."
+    ],
+    "faq": [
+      {
+        "question": "How is a bridge different from a normal round?",
+        "answer": "A bridge is smaller and faster, and usually uses a cap or discount instead of a full price. It buys time to reach a milestone."
+      },
+      {
+        "question": "What terms should we avoid?",
+        "answer": "Terms that give away control or make the next round unattractive. Read the maturity and what happens if the milestone slips."
+      },
+      {
+        "question": "What if we cannot raise a bridge?",
+        "answer": "Cut burn to live on current cash. A smaller company that survives is better than one that runs out mid-raise."
+      }
+    ]
+  },
+  {
+    "slug": "should-startups-change-compensation-now",
+    "keyword": "should startups change compensation",
+    "title": "Should startups change compensation now?",
+    "askedAs": [
+      "should we give raises this year",
+      "adjust salaries or equity",
+      "cut pay or offer more equity"
+    ],
+    "category": "decision",
+    "shortAnswer": "Hold base pay steady and shift toward variable or equity-heavy pay when cash is tight. Cut fixed payroll before cutting people.",
+    "directAnswer": "When cash is tight, protect take-home where you can and move upside into variable pay or equity. Reduce fixed payroll through structure before you reduce headcount.",
+    "audience": "Founders, HR and finance leaders",
+    "applyHeading": "Adjusting compensation in a tighter market",
+    "mappedDecisionAreas": [
+      "hiring",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "tightness",
+    "featuredOrder": 16,
+    "contextHeading": "Compensation during a tighter market",
+    "context": "Compensation is the largest fixed cost most startups carry. Changing it is slower and more sensitive than changing tooling or vendors, so it should be deliberate and clearly explained.",
+    "companyInputs": [
+      "Current cash runway and the burn target you need.",
+      "Fixed payroll as a share of monthly burn.",
+      "How competitors and peers are adjusting pay."
+    ],
+    "decisionNote": "Hold base pay for [role]. Move [percent] to variable or equity for [role]. Review in [months]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Plan the week",
+        "href": "/operate"
+      },
+      {
+        "label": "Headcount planning",
+        "href": "/answers/should-startups-do-layoffs-now"
+      }
+    ],
+    "watchouts": [
+      "Cutting base pay without explaining the trade, which pushes people to leave.",
+      "Moving too much pay into equity when the team needs cash now.",
+      "Changing pay for new hires only, which creates two tiers and resentment."
+    ],
+    "faq": [
+      {
+        "question": "Should we cut salaries or headcount first?",
+        "answer": "Cut fixed payroll through structure before cutting people. A pay change keeps the team; a layoff removes it."
+      },
+      {
+        "question": "How do we explain a pay change?",
+        "answer": "Say what the cash position is, what changes, and when it will be reviewed. People accept a clear trade more than a surprise."
+      },
+      {
+        "question": "Is equity a substitute for pay?",
+        "answer": "Only for people who value the upside and can wait. Do not assume everyone can."
+      }
+    ]
+  },
+  {
+    "slug": "should-startups-expand-internationally-now",
+    "keyword": "should startups expand internationally",
+    "title": "Should startups expand internationally now?",
+    "askedAs": [
+      "should we expand to Europe",
+      "open in a new country",
+      "international expansion"
+    ],
+    "category": "decision",
+    "shortAnswer": "Expand only where demand is already proven and the cost is reversible. Hold new markets until the core is stable.",
+    "directAnswer": "International expansion is a multi-quarter bet. Take it only where customers already ask for it and the cost can be unwound. Otherwise deepen the core market first.",
+    "audience": "Founders and go-to-market leadership",
+    "applyHeading": "When to enter a new market",
+    "mappedDecisionAreas": [
+      "expansion-bets",
+      "product-tempo"
+    ],
+    "thresholdFocus": "risk",
+    "featuredOrder": 17,
+    "contextHeading": "International expansion in a tighter market",
+    "context": "New markets cost more and pay back slower than deepening an existing one. In a cautious market, the bar for a new geography or segment rises.",
+    "companyInputs": [
+      "Existing demand signals from the target market.",
+      "Cost to support a new market: legal, payments, support, localization.",
+      "Whether the core market still has room to grow."
+    ],
+    "decisionNote": "Enter [market] only if [demand signal] holds and cost is [amount]. Otherwise deepen [core market] until [milestone]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Plan the week",
+        "href": "/operate"
+      },
+      {
+        "label": "New bets",
+        "href": "/answers/should-we-delay-new-product-lines"
+      }
+    ],
+    "watchouts": [
+      "Entering a market because a competitor did, without local demand.",
+      "Underestimating legal, payments and support costs.",
+      "Splitting the team across markets before the core is stable."
+    ],
+    "faq": [
+      {
+        "question": "How do we know a market is ready?",
+        "answer": "When customers there already ask for the product and the cost to serve them is clear."
+      },
+      {
+        "question": "Should we hire locally or sell remotely first?",
+        "answer": "Sell remotely first to prove demand. Hire locally only after demand is repeatable."
+      },
+      {
+        "question": "What if the new market stalls?",
+        "answer": "Keep the entry reversible. Fund one stage at a time so you can stop without dragging down the core."
+      }
+    ]
+  },
+  {
+    "slug": "should-startups-consolidate-vendors-now",
+    "keyword": "should startups consolidate vendors",
+    "title": "Should startups consolidate vendors now?",
+    "askedAs": [
+      "cut SaaS tools and software spend",
+      "consolidate our vendors",
+      "renegotiate vendor contracts"
+    ],
+    "category": "decision",
+    "shortAnswer": "Cut tools and vendors that do not pay back within six months. Keep the ones that save time or revenue.",
+    "directAnswer": "When cash is tight, every subscription and agency seat must earn its keep. Consolidate where overlap exists and pause spend that cannot show a quick payback.",
+    "audience": "Founders, finance and operations leaders",
+    "applyHeading": "When to consolidate vendors",
+    "mappedDecisionAreas": [
+      "burn-discipline"
+    ],
+    "thresholdFocus": "tightness",
+    "featuredOrder": 18,
+    "contextHeading": "Vendor spend in a tighter market",
+    "context": "Small monthly costs pile up and linger after growth cools. A clear payback rule keeps money in the bank when the climate shifts.",
+    "companyInputs": [
+      "Monthly cost of each tool, agency or vendor seat.",
+      "Which tools overlap or are unused.",
+      "Payback period for each in time saved or revenue gained."
+    ],
+    "decisionNote": "Keep [tool] with [months] payback. Cut [tool] with no clear payback. Review the full stack in [weeks]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Plan the week",
+        "href": "/operate"
+      },
+      {
+        "label": "Burn planning",
+        "href": "/answers/when-should-startups-cut-burn"
+      }
+    ],
+    "watchouts": [
+      "Cutting a tool the team relies on to hit a savings number.",
+      "Keeping overlapping tools because switching feels slow.",
+      "Renewing annual contracts before checking usage."
+    ],
+    "faq": [
+      {
+        "question": "How do we decide which tools to cut?",
+        "answer": "Keep what saves time or revenue within six months. Cut what is unused or overlaps another tool."
+      },
+      {
+        "question": "Will cutting tools slow the team down?",
+        "answer": "It can if you cut the wrong ones. Check usage and ask the team before you cancel."
+      },
+      {
+        "question": "How often should we review the stack?",
+        "answer": "Before each renewal cycle, and again when cash gets tight."
       }
     ]
   }

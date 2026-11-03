@@ -105,14 +105,14 @@ const getMonthlyOperatingRules = (assessment: RegimeAssessment): MonthlyStructur
 };
 
 /**
- * What re-opens paused work this month: the resume lines of the month's own
+ * What re-opens paused work this month: the restart lines of the month's own
  * operating rules, off the same bands (`buildHorizonThresholdBands`), so the
  * reversal and the rules above it quote one set of numbers.
  *
  * The bullet used to read "Restart paused work once the next reading confirms
  * conditions held". In Freezing, conditions holding means still Freezing, which
  * is why the work is paused, so it told the reader to restart while frozen. The
- * resume lines are what lifts a pause, in every regime.
+ * restart lines are what lifts a pause, in every regime.
  */
 const getMonthlyRestartLine = (assessment: RegimeAssessment) => {
   const { tightnessResume, riskResume } = buildHorizonThresholdBands(assessment);
@@ -125,7 +125,7 @@ const getMonthlyRestartLine = (assessment: RegimeAssessment) => {
 };
 
 /** An archived month carries no scores, so its restart line has no numbers to quote. */
-const RESTART_LINE_WITHOUT_SCORES = "Restart paused work only once the resume lines in the operating rules hold.";
+const RESTART_LINE_WITHOUT_SCORES = "Restart paused work only once the restart lines in the operating rules hold.";
 
 export const buildMonthlyStructured = ({
   regimeLabel,
@@ -144,7 +144,7 @@ export const buildMonthlyStructured = ({
   constraints: string[];
   provenance: MonthlySummaryProvenance;
   operatingRules?: MonthlyStructured["operatingRules"];
-  /** The resume lines that re-open paused work (`getMonthlyRestartLine`). */
+  /** The restart lines that re-open paused work (`getMonthlyRestartLine`). */
   restartWhen?: string;
 }): MonthlyStructured => {
   // The guidance sentence is stated once, in the planning language, which is the

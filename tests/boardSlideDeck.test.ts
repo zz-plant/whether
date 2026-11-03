@@ -91,8 +91,8 @@ describe("board slide PPTX", () => {
     assert.match(slide, /2\. PAUSE IF/);
     assert.match(slide, /3\. CONDITIONS CHANGE IF/);
     assert.match(slide, /Funding pressure falls 13 pts from 83 to 70 or below/);
-    // The stage's resume line sits beside the change line, never in its card.
-    assert.match(slide, /Resume when: Reverse the freeze only after runway extends/);
+    // The stage's restart line sits beside the change line, never in its card.
+    assert.match(slide, /Restart when: Reverse the freeze only after runway extends/);
     assert.match(slide, /This week's guidance \(Series A\)/);
     assert.match(slide, /<a:t>Freezing<\/a:t>/);
     assert.doesNotMatch(slide, /SCARCITY/);

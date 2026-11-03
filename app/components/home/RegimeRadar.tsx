@@ -2,9 +2,12 @@ import type { ReactNode } from "react";
 import { scaleLinear } from "d3-scale";
 import { CONDITION_SIDE_MEANINGS, getRegimePublicLabel } from "../../../lib/regimePresentation";
 import { formatThresholdNumber } from "../../../lib/formatters";
+import { UrlDetails } from "../ui/urlDetails";
 import { ConditionIcon } from "../ui/conceptIcons";
 
 type RegimeRadarProps = {
+  compact?: boolean;
+  detailsOpen?: boolean;
   tightness: number;
   riskAppetite: number;
   previousTightness?: number | null;
@@ -61,6 +64,8 @@ const xFor = (riskAppetite: number) => xScale(riskAppetite);
 const yFor = (tightness: number) => yScale(tightness);
 
 export function RegimeRadar({
+  compact = false,
+  detailsOpen = false,
   tightness,
   riskAppetite,
   previousTightness,
@@ -208,7 +213,7 @@ export function RegimeRadar({
         <text
           x={PLOT_X + 6}
           y={PLOT_Y + 12}
-          className="text-[10px] font-bold uppercase tracking-wider"
+          className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-freezing-ink)"
         >
           Freezing
@@ -217,7 +222,7 @@ export function RegimeRadar({
           x={PLOT_RIGHT - 6}
           y={PLOT_Y + 12}
           textAnchor="end"
-          className="text-[10px] font-bold uppercase tracking-wider"
+          className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-cloudy-ink)"
         >
           Cloudy
@@ -225,7 +230,7 @@ export function RegimeRadar({
         <text
           x={PLOT_X + 6}
           y={PLOT_BOTTOM - 6}
-          className="text-[10px] font-bold uppercase tracking-wider"
+          className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-stormy-ink)"
         >
           Stormy
@@ -234,7 +239,7 @@ export function RegimeRadar({
           x={PLOT_RIGHT - 6}
           y={PLOT_BOTTOM - 6}
           textAnchor="end"
-          className="text-[10px] font-bold uppercase tracking-wider"
+          className="text-[11px] font-bold uppercase tracking-wider"
           fill="var(--color-condition-sunny-ink)"
         >
           Sunny
@@ -278,7 +283,7 @@ export function RegimeRadar({
         <text
           x={PLOT_RIGHT + 3}
           y={Math.min(LINE_LABEL_MAX_Y, Math.max(LINE_LABEL_MIN_Y, boundaryY)) + 3}
-          className="fill-slate-400 text-[9px] tabular-nums"
+          className="fill-slate-400 text-[11px] tabular-nums"
           data-change-line="tightness"
         >
           {tightnessLine}
@@ -287,7 +292,7 @@ export function RegimeRadar({
           x={boundaryX}
           y={PLOT_Y - 3}
           textAnchor="middle"
-          className="fill-slate-400 text-[9px] tabular-nums"
+          className="fill-slate-400 text-[11px] tabular-nums"
           data-change-line="riskAppetite"
         >
           {riskAppetiteLine}
@@ -459,11 +464,19 @@ export function RegimeRadar({
               and the legend that decodes them in money terms is hidden from `md`
               up, where this chart replaces it. */}
           <span className="block text-slate-300" data-radar-orientation>
-            Higher means {CONDITION_SIDE_MEANINGS.pressureAbove}, further right means {CONDITION_SIDE_MEANINGS.appetiteAbove}. Sunny, bottom right, is the easiest; Freezing, top left, the hardest.
+            {compact ? <>Up: {CONDITION_SIDE_MEANINGS.pressureAbove}. Right: {CONDITION_SIDE_MEANINGS.appetiteAbove}.</> : <>Higher means {CONDITION_SIDE_MEANINGS.pressureAbove}, further right means {CONDITION_SIDE_MEANINGS.appetiteAbove}. Sunny, bottom right, is the easiest; Freezing, top left, the hardest.</>}
           </span>
           {hasTrail && trailCaption ? <span className="block">{trailCaption}</span> : null}
-          {hasTrail && caveat ? <span className="block">{caveat}</span> : null}
-          {readableReadings.length > 1 ? (
+          {!compact && hasTrail && caveat ? <span className="block">{caveat}</span> : null}
+          {compact && (readableReadings.length > 1 || caveat) ? (
+            <UrlDetails queryKey="chart" initialOpen={detailsOpen} summary="Scores on this chart"
+              className="mx-auto max-w-md text-left" summaryClassName="weather-hit w-fit cursor-pointer">
+              {hasTrail && caveat ? <p className="mb-2">{caveat}</p> : null}
+              <ul className="list-disc pl-4">
+                {readableReadings.map((reading) => <li key={reading.key}>{reading.text}</li>)}
+              </ul>
+            </UrlDetails>
+          ) : readableReadings.length > 1 ? (
             <details className="mx-auto max-w-md text-left">
               {/* `weather-hit`: a 17px line is a 45px target with it, as the other summaries are. */}
               <summary className="weather-hit w-fit cursor-pointer">Scores on this chart</summary>

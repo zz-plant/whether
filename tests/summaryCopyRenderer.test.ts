@@ -134,7 +134,7 @@ describe("summaryCopyRenderer", () => {
     assert.match(copy, /\nNEXT ACTIONS\n/);
     assert.match(copy, /MONTHLY OPERATING RULES/);
     assert.match(copy, /Action: Run no more than three concurrent experiments/);
-    assert.match(copy, /RESUME LINES/);
+    assert.match(copy, /RESTART LINES/);
     assert.match(copy, /EXECUTION CONSTRAINTS/);
     assert.match(copy, /EXECUTION CONSTRAINTS\n\n• Sequence delivery around revenue durability/);
     // The source line once sat under a bare "Source:" heading: "Source:\nSource: …".

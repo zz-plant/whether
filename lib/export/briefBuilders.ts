@@ -51,13 +51,13 @@ type CallSlot = { label: string; value: string };
 /**
  * The call's slots, in the order every paste prints them: the contract's call,
  * action and pause line (its condition only, as the email prints it), the
- * resume line, and where conditions change. The resume line is the lead area's,
+ * restart line, and where conditions change. The restart line is the lead area's,
  * then a stage's discipline when one is chosen: both say when a hold lifts. A
- * held call prints none, because its change line is its one resume line
+ * held call prints none, because its change line is its one restart line
  * (`applyStageToWeeklyCall` keeps a stage's out for the same reason) and an
  * area's would compete with it.
  */
-/** The resume line beside the call, or null for a held call or a week with none. */
+/** The restart line beside the call, or null for a held call or a week with none. */
 export const briefResumeLine = (document: BriefDocument): string | null => {
   const { slots } = document;
   if (slots.policyOverrideActive) return null;
@@ -103,7 +103,7 @@ const areaOrderIndex = (item: ActionStripItem) => decisionAreaOrder.indexOf(oper
 
 /**
  * One row per decision area, in the page's row order (`decisionAreaOrder`),
- * each with its rule, its pause and resume lines with a distance, and its
+ * each with its rule, its pause and restart lines with a distance, and its
  * timing. The rows used to follow the model's priority order and skip the
  * lead item, so a reader who checks Fundraising every Monday found it in a
  * different place in every paste — and never in the same place as on the page.

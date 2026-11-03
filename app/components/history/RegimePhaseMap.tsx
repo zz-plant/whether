@@ -154,7 +154,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
            is the second read — how the two scores decide the call — and a
            heading that said "where this month sits" made it compete with
            them for the first question. */
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl" id="phase-map-heading">
+        <h2 className="type-section" id="phase-map-heading">
           How the two scores set conditions
         </h2>
       }
@@ -459,7 +459,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
               </FactList>
               <dl className="space-y-1 text-fluid-xs">
                 {[gaps.tightness, gaps.riskAppetite].map((gap) => (
-                  <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2">
+                  <div key={gap.axis} className="flex flex-wrap items-baseline justify-between gap-x-2 gap-y-0.5">
                     <dt className="text-slate-400">{gap.label}</dt>
                     {/* Out of 100, and the distance said as a direction: "72 / +2 from
                         70" asked the reader to know the scale and to read a slash

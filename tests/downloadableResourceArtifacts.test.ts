@@ -51,9 +51,9 @@ describe("downloadable resource artifacts", () => {
     );
     // The things a memo example exists to demonstrate, each of which the blank
     // version named as a heading and left empty.
-    assert.match(memo, /Reversal trigger logic/i);
-    assert.match(memo, /SAFE/);
-    assert.match(memo, /DANGEROUS/);
+    assert.match(memo, /Pause and resume conditions/i);
+    assert.match(memo, /Committed/);
+    assert.match(memo, /Off the table/);
     assert.ok(memo.length > 1500, "an example this short cannot be carrying worked content");
   });
 

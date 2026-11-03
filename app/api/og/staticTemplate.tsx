@@ -36,7 +36,7 @@ const templatePanelCopy: Record<StaticOgTemplate, { label: string; title: string
   },
   solutions: {
     label: "DECISIONS",
-    title: "Pause and resume lines",
+    title: "Pause and restart lines",
     body: "This week's guidance, turned into lines each team can act on.",
   },
   guides: {

@@ -5,7 +5,7 @@ import type {
   TrackRecordRow,
 } from "../../../lib/report/trackRecord";
 import { formatDateUTC, formatMonthYearShortFromValue } from "../../../lib/formatters";
-import { OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
+import { OPERATING_LATITUDE_GLOSS, OPERATING_LATITUDE_LABEL } from "../../../lib/report/reportCopy";
 import { OPERATING_LATITUDE_RISK_WEIGHT } from "../../../lib/report/weeklyLeadershipBrief";
 import { CALL_CHANGE_RULE, describeLatitudeAgainstConditions } from "../../../lib/report/trackRecordCopy";
 import { Fact, FactList } from "../ui/factList";
@@ -60,7 +60,12 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
       <tr className="border-b border-slate-800/80 text-slate-400">
         <th scope="col" className="py-2 pr-3 font-medium">Month</th>
         <th scope="col" className="py-2 pr-3 font-medium">Conditions</th>
-        <th scope="col" className="py-2 pr-3 text-right font-medium">{OPERATING_LATITUDE_LABEL} (0–100)</th>
+        <th scope="col" className="py-2 pr-3 text-right font-medium">
+          {OPERATING_LATITUDE_LABEL} (0–100)
+          {/* The noun never prints without its gloss: "latitude" is the one
+              term a competitor cannot use and the one a reader cannot guess. */}
+          <span className="block text-fluid-nano font-normal leading-tight text-slate-500">{OPERATING_LATITUDE_GLOSS}</span>
+        </th>
         <th scope="col" className="hidden py-2 text-right font-medium sm:table-cell">Change</th>
       </tr>
     </thead>
@@ -81,14 +86,19 @@ const RecordTable = ({ rows, caption }: { rows: TrackRecordRow[]; caption: strin
             <span className="hidden sm:inline">{formatDateUTC(row.recordDate)}</span>
           </td>
           <td className="py-2 pr-3 text-slate-200">
-            <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
-              {row.regimeLabel}
-            </span>
-            {row.changed ? (
-              <span className="ml-2 type-badge text-fluid-micro rounded-sm border border-slate-600/60 px-1.5 py-0.5 text-slate-100">
-                changed
+            {/* A flex row, not inline text: with no break opportunity the
+                "changed" badge ran past the conditions cell and into the
+                latitude column at 320px. */}
+            <span className="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+              <span className={row.changed ? "font-semibold text-slate-100" : undefined}>
+                {row.regimeLabel}
               </span>
-            ) : null}
+              {row.changed ? (
+                <span className="type-badge text-fluid-micro rounded-sm border border-slate-600/60 px-1.5 py-0.5 text-slate-100">
+                  changed
+                </span>
+              ) : null}
+            </span>
           </td>
           <td className="py-2 pr-3 text-right font-mono text-slate-200">
             {row.boldness.toLocaleString("en-US")}
@@ -142,7 +152,7 @@ export function TrackRecordTiles({
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="track-record-heading">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
         <div>
-          <h2 className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl" id="track-record-heading">Track record</h2>
+          <h2 className="type-section" id="track-record-heading">Track record</h2>
           <p className="max-w-prose text-sm text-slate-300">
             Every month-end reading Whether has made, scored with the same published formula, so
             you can check each one against what happened next.
@@ -202,7 +212,7 @@ export function TrackRecordTable({
   return (
     <section className="weather-panel space-y-4 px-5 max-sm:px-0 py-5" aria-labelledby="monthly-calls-heading">
       <div>
-        <h2 className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl" id="monthly-calls-heading">Monthly readings</h2>
+        <h2 className="type-section" id="monthly-calls-heading">Monthly readings</h2>
         {/* Defined where it first appears (2026-10-09): the homepage reads two
             scores and never introduces a third, so a reader met this one cold.
             It is kept rather than replaced by the two, because it is not

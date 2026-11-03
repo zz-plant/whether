@@ -90,7 +90,7 @@ Navigation (regrouped 2026-10-08; see `docs/feature-specs-current.md` §1.0a): t
 The page index runs `Rule for each area` · `Rules before you commit` · `Test a decision` · `Set this plan's lines` · `Finance strategy` · `Risk checks`.
 
 **Current output**
-- Each area's rule with its pause and resume lines
+- Each area's rule with its pause and restart lines
 - Stop, start and keep-limited rules for new commitments
 - Warnings that name an assumption the plan rests on and how to check it
 
@@ -152,13 +152,13 @@ The toolkit page's breadcrumb reads `Guides` › `More tools` › the toolkit; `
 **JTBD:** When the base weekly call needs company-specific guardrails or exceptions, carry it into Plan instead of using a separate personalization branch.
 
 **Clicks**
-1. On `/`, set `Stage` and `Cash runway` under the verdict, where the page says whose lines these are; on a phone, the same two choices sit in the header. The pause and resume lines rescale to them.
+1. On `/`, set `Stage` and `Cash runway` under the verdict, where the page says whose lines these are; on a phone, the same two choices sit in the header. The pause and restart lines rescale to them.
 2. Click `Decide` and enter the company's figures in `Runway planner` (section 6).
 3. On a live week, adjust the lines under `Set this plan's lines` and click `Email me when a line is crossed`.
 4. Copy the result from `/share` (section 2).
 
 **Current output**
-- Pause and resume lines scaled to the company's stage and runway
+- Pause and restart lines scaled to the company's stage and runway
 - Plan lines the team agreed, with an email when one is crossed
 - Share formats built on the live weekly call
 

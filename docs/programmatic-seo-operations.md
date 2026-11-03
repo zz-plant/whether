@@ -1,9 +1,12 @@
 # Programmatic SEO operations runbook
 
 > **Scope decision (2026-08-29, from `docs/product-marketing-review-2026-08-29.md`).** SEO is no
-> longer resourced as a growth channel in its own right. The corpus stands at 11 answer pages and 2
+> longer resourced as a growth channel in its own right. The corpus stood at 11 answer pages and 2
 > resource articles; that will not compound, and the fix is not to relax the thin-page guardrail,
-> which is correct and protects the brand more than the pages would earn.
+> which is correct and protects the brand more than the pages would earn. The answer corpus has
+> since grown to 21 decision-query pages (2026-11-02) by adding the backlog clusters below
+> (pricing, layoffs, retention vs acquisition, bridge rounds, compensation, international
+> expansion, vendor consolidation) on the same bounded-decision template.
 >
 > What stays: **decision-query answer pages** — "should we hire engineers right now" and its
 > neighbours. Those are the pages where the live posture makes the page non-thin automatically, which
@@ -120,9 +123,26 @@ Use this shortlist before creating any additional long-tail pages.
 | Pricing posture | "Can we raise prices in this macro regime?" | Action now + customer risk trigger + rollback condition + source freshness | Copy/share weekly posture artifact |
 | Runway planning | "How many months runway should we target now?" | Target runway band + assumptions + reversal trigger + source confidence | Open operator checklist in `/operate` |
 
+All five backlog clusters now have at least one answer page (2026-11-02): hiring pace
+(`should-startups-hire-engineers-right-now`, `should-we-freeze-or-selectively-hire`), burn
+discipline (`when-should-startups-cut-burn`), GTM efficiency
+(`how-fast-should-we-scale-go-to-market`), pricing posture
+(`should-startups-raise-prices-now`), and runway planning
+(`how-much-runway-should-we-have-before-we-raise`). The adjacent clusters — retention vs
+acquisition, bridge rounds, layoffs, compensation, international expansion and vendor
+consolidation — were added in the same pass, each mapped to the bounded-decision contract.
+The next candidates are deeper variants inside a cluster (e.g. segment-level pricing, down vs
+bridge terms) rather than new top-level questions.
+
 Selection rule:
 - Expand a cluster only when it can map to the bounded-decision contract above.
 - If intent cannot produce an action + threshold + reversal condition, merge it into an existing page instead of launching new URLs.
+
+Per-page depth (2026-11-02): an answer page also carries `watchouts` (the common ways the
+decision goes wrong) and `faq` (page-specific questions, distinct from the weekly payload). Both
+are optional in `lib/answerContentSource.ts` and render on the page and in its `FAQPage` node.
+They exist so a page is not a template body with a swapped title: a new page should add at least
+two watchouts and one page-specific question that a sibling page would not answer the same way.
 
 ## Distinctness audit: count distinct bodies before generating URLs
 
@@ -176,6 +196,7 @@ Failure policy:
 
 ```bash
 bun run seo:answers:launch-readiness
+bun run seo:corpus-audit
 bun run seo:weekly-runbook
 bun run brief:freeze
 bun run archive:index
@@ -184,6 +205,7 @@ bun run archive:index
 ## Notes
 
 - `seo:answers:launch-readiness` fails if any answer page cannot pass baseline completeness/trust/uniqueness checks.
+- `seo:corpus-audit` is the traffic-independent structural check: duplicate enduring answers and thin onward-link depth fail; missing watchouts, page questions or `updatedAt` warn. Run it quarterly and before a corpus expansion.
 - `seo:weekly-runbook` generates payload artifacts, refreshes page metrics from telemetry, then generates the refresh queue/status artifacts, and freezes the current week's brief. The metrics step runs before the queue because the queue ranks pages against whatever metrics file is on disk. It is skipped without Cloudflare credentials (the queue still runs, reading a missing file as "no metrics yet"); if it fails with credentials present, the runbook stops rather than ranking pages against metrics it could not refresh. See `docs/seo/refresh-loop.md`.
 - `brief:freeze` appends the current ISO week to `data/published_briefs.json`. It refuses to run on a degraded snapshot and never rewrites an existing week without `--force`, because a published brief that silently changes is not citable.
 - `archive:index` regenerates the `/history/[period]` period index from the summary archive. Run it after the summary archive changes.

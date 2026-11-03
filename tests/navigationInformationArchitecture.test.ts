@@ -65,7 +65,7 @@ describe("navigation groups", () => {
 
   it("calls /signals 'Why it changed' and /trust 'How much to trust this week'", () => {
     assert.equal(navigationLabelByPath["/signals"], "Why it changed");
-    assert.equal(navigationLabelByPath["/trust"], "How much to trust this week");
+    assert.equal(navigationLabelByPath["/trust"], "Method");
   });
 
   it("files Product writing under Record as a secondary page, not a tab", () => {

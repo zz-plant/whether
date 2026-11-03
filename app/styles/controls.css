@@ -199,9 +199,12 @@ input:not([type="range"]) {
   position: absolute;
   left: 1rem;
   top: 1rem;
-  /* Above the sticky header (z-50, and later in the document, so it won the tie and
-     covered the link on every route) and the running head. */
-  z-index: 60;
+  /* Above the chrome it would otherwise sit under: the sticky header and the
+     running head share one layer (--z-chrome), and both are later in the
+     document, so the tie went to them and the link was covered on every route.
+     It was an invented 60 until 2026-10-31, when the scale it was escaping
+     became real: the skip link rides in --z-chrome-top, with the scroll rule. */
+  z-index: var(--z-chrome-top);
   transform: translateY(-200%);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-strong);

@@ -348,7 +348,7 @@ export const buildCompactTrustSummary = ({
   }
 
   if (isFallbackSnapshot) {
-    return `Cached snapshot (${normalizedFreshness}). Live data is late; hold anything you can't undo until it lands.`;
+    return `Saved copy (${normalizedFreshness}). Live data is late; hold anything you can't undo until it lands.`;
   }
 
   if (confidenceLabel !== "HIGH") {
@@ -371,8 +371,8 @@ const DATA_STATUS_LABELS = {
    * date and may be partly cached. What is live is the sources — the badge
    * says so. */
   live: "All sources live",
-  partlyCached: "Partly cached",
-  cachedSnapshot: "Cached snapshot",
+  partlyCached: "Partly current",
+  cachedSnapshot: "Saved copy",
   historical: "Historical snapshot",
 } as const;
 
@@ -386,7 +386,7 @@ type DataStatusKey = keyof typeof DATA_STATUS_LABELS;
  */
 const DATA_STATUS_GUIDANCE: Record<DataStatusKey, string> = {
   live: "All sources live and current.",
-  partlyCached: "Some sources are cached. Hold anything you can't undo until every source is current.",
+  partlyCached: "Some sources are saved copies. Hold anything you can't undo until every source is live.",
   cachedSnapshot: "Live data is late. Keep your current plan; hold new hires, spend and vendor contracts until it returns.",
   historical: "Historical snapshot. Compare against the live read before changing current plans.",
 };
@@ -567,7 +567,7 @@ export const buildMeetingSnippet = ({
   /** The week's headline action as a paste leads with it (`weeklyHeadline(…).composed`). */
   guidance: string;
 }) => {
-  /* The margin rides in the trust line ("Margin: clear of the line (…)"), so it is
+  /* The margin rides in the trust line ("Room before a change: clear of the line (…)"), so it is
      stated once; the two dates say which is which (2026-10-09). */
   const trustSummary = buildCompactTrustSummary({ confidenceLabel, freshnessLabel, isFallbackSnapshot, isHistoricalSelection });
   return [

@@ -17,7 +17,7 @@ import {
 } from "./runwayPlanLink";
 import { buildBudgetMemoMarkdown } from "./budgetMemo";
 import { toRoute } from "../../../lib/navigation/routeType";
-import { isOperatorStage, OPERATOR_STAGE_OPTIONS, operatorStageLabel } from "../../../lib/report/operatorStage";
+import { isOperatorStage, OPERATOR_STAGE_OPTIONS, operatorStageLabel, type OperatorStage } from "../../../lib/report/operatorStage";
 import {
   buildRunwayPlan,
   describeRunwayPlanInYourNumbers,
@@ -36,11 +36,27 @@ import { ScoreCell } from "../../components/ui/scoreCell";
 import { buildEngineeringPaybackLines, buildProjectPaybacks, resolvePaybackBar } from "../../../lib/report/projectPayback";
 import { runwayBandForMonths } from "../../../lib/report/operatorRunway";
 import { ProjectPaybackSection } from "./projectPaybackSection";
+import { RunwayMacroFanChart } from "./runwayMacroFanChart";
+import { buildRunwayMacroFanModel } from "../../../lib/report/runwayMacroFan";
+import { getTimeMachineRegimeSeries } from "../../../lib/timeMachine/timeMachineCache";
 
 const sectorOptions: Array<{ value: PlannerSector; label: string }> = [
   { value: "b2b-saas", label: "B2B SaaS" },
   { value: "consumer", label: "Consumer" },
   { value: "infrastructure", label: "Infrastructure" },
+];
+
+const STAGE_PRESETS: ReadonlyArray<{
+  stage: OperatorStage;
+  label: string;
+  badge: string;
+  cashUsd: number;
+  monthlyBurnUsd: number;
+  monthlyRevenueUsd: number;
+}> = [
+  { stage: "seed", label: "Seed", badge: "$1.2M cash · $80k/mo spend", cashUsd: 1_200_000, monthlyBurnUsd: 80_000, monthlyRevenueUsd: 15_000 },
+  { stage: "series-a", label: "Series A", badge: "$3.5M cash · $220k/mo spend", cashUsd: 3_500_000, monthlyBurnUsd: 220_000, monthlyRevenueUsd: 60_000 },
+  { stage: "series-b", label: "Series B+", badge: "$8.5M cash · $450k/mo spend", cashUsd: 8_500_000, monthlyBurnUsd: 450_000, monthlyRevenueUsd: 200_000 },
 ];
 
 const strictnessLabel = (value: number) => {
@@ -207,8 +223,41 @@ export function RunwayPlannerPanel({
     [profile, setProfileField, stage, syncPlanLink],
   );
 
+  const applyPreset = useCallback(
+    (preset: (typeof STAGE_PRESETS)[number]) => {
+      setProfileField("cashUsd", preset.cashUsd);
+      setProfileField("monthlyBurnUsd", preset.monthlyBurnUsd);
+      setProfileField("monthlyRevenueUsd", preset.monthlyRevenueUsd);
+      setStage(preset.stage);
+      let next = setOperatorProfileField(profile, "cashUsd", preset.cashUsd);
+      next = setOperatorProfileField(next, "monthlyBurnUsd", preset.monthlyBurnUsd);
+      next = setOperatorProfileField(next, "monthlyRevenueUsd", preset.monthlyRevenueUsd);
+      syncPlanLink(next, preset.stage);
+    },
+    [profile, setProfileField, setStage, syncPlanLink],
+  );
+
   const resolution = useMemo(() => resolveRunwayPlannerRequest(profile, stage), [profile, stage]);
   const runway = useMemo(() => resolveProfileRunway(profile), [profile]);
+
+  const macroFanModel = useMemo(() => {
+    if (!resolution.ready) return null;
+    const initialCash =
+      typeof profile.cashUsd === "number" && profile.cashUsd > 0
+        ? profile.cashUsd
+        : resolution.request.runway * resolution.request.burn;
+    const netBurn = resolution.request.burn - resolution.request.revenue;
+    const series = getTimeMachineRegimeSeries(Number.MAX_SAFE_INTEGER);
+
+    return buildRunwayMacroFanModel({
+      initialCashUsd: initialCash,
+      netMonthlyBurnUsd: netBurn,
+      newMonthlyCostUsd: 0,
+      maxMonths: 36,
+      macroSeries: series,
+      currentRegime: assessment.regime,
+    });
+  }, [profile.cashUsd, resolution, assessment.regime]);
 
   const output = useMemo(
     () =>
@@ -306,101 +355,127 @@ export function RunwayPlannerPanel({
       {/* Cash first: it is the figure a founder can read off a bank app, and
           runway is worked out from it. A runway typed in still works, and
           typing either replaces the other (`setOperatorProfileField`). */}
-      <div id="ops-runway-inputs" className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
-        <OperatorProfileNumberField
-          field="cashUsd"
-          label="Cash in the bank ($)"
-          hint="Runway is worked out from it."
-          placeholder="e.g. $2.1M"
-          value={profile.cashUsd}
-          onCommit={(value) => commitProfileField("cashUsd", value)}
-          className="weather-surface p-3"
-          labelClassName="block text-sm text-slate-200"
-        />
-        <OperatorProfileNumberField
-          field="runwayMonths"
-          label="Runway (months)"
-          hint={
-            runway?.basis === "cash"
-              ? "Worked out: cash over spend less revenue. Typing a figure replaces the cash."
-              : runway?.basis === "cash-flow-positive"
-                ? "Revenue covers your spending, so no runway is counting down."
-                : "Or leave it blank, enter your cash, and we'll work it out."
-          }
-          placeholder="e.g. 14"
-          value={runway && runway.basis !== "cash-flow-positive" ? runway.months : undefined}
-          onCommit={(value) => commitProfileField("runwayMonths", value)}
-          className="weather-surface p-3"
-          labelClassName="block text-sm text-slate-200"
-        />
-        <OperatorProfileNumberField
-          field="monthlyBurnUsd"
-          label="Monthly spend ($)"
-          hint="Everything you spend in a month, before revenue."
-          placeholder="e.g. $450k"
-          value={profile.monthlyBurnUsd}
-          onCommit={(value) => commitProfileField("monthlyBurnUsd", value)}
-          className="weather-surface p-3"
-          labelClassName="block text-sm text-slate-200"
-        />
-        <OperatorProfileNumberField
-          field="monthlyRevenueUsd"
-          label="Monthly revenue ($)"
-          placeholder="e.g. $300k, or 0"
-          value={profile.monthlyRevenueUsd}
-          onCommit={(value) => commitProfileField("monthlyRevenueUsd", value)}
-          className="weather-surface p-3"
-          labelClassName="block text-sm text-slate-200"
-        />
-        <OperatorProfileNumberField
-          field="monthlyGrowthPct"
-          label="Monthly revenue growth (%)"
-          hint="Monthly growth. Leave it blank for no growth."
-          placeholder="e.g. 6"
-          value={profile.monthlyGrowthPct}
-          onCommit={(value) => commitProfileField("monthlyGrowthPct", value)}
-          optional
-          className="weather-surface p-3"
-          labelClassName="block text-sm text-slate-200"
-        />
-        <label className="weather-surface p-3 text-sm text-slate-200">
-          Sector
-          <select
-            className={selectClassName}
-            style={{ colorScheme: "light dark" }}
-            value={profile.sector ?? "b2b-saas"}
-            onChange={(event) => {
-              if (isPlannerSector(event.target.value)) commitProfileField("sector", event.target.value);
-            }}
-          >
-            {sectorOptions.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
+      <div id="ops-runway-inputs" className="space-y-3">
+        {/* Stage Benchmark Presets Row */}
+        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-panel)] p-2.5">
+          <p className="text-xs font-medium text-slate-300">
+            Explore with a stage benchmark:
+          </p>
+          <div className="flex flex-wrap items-center gap-1.5">
+            {STAGE_PRESETS.map((preset) => (
+              <button
+                key={preset.stage}
+                type="button"
+                onClick={() => applyPreset(preset)}
+                className={`weather-hit inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors ${
+                  stage === preset.stage
+                    ? "border-[color:var(--border-strong)] bg-[color:var(--bg-card)] text-slate-100"
+                    : "border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] text-slate-300 hover:border-[color:var(--border-default)] hover:text-slate-100"
+                }`}
+              >
+                <span>{preset.label}</span>
+                <span className="hidden sm:inline text-fluid-nano text-slate-400">({preset.badge})</span>
+              </button>
             ))}
-          </select>
-        </label>
-        <label className="weather-surface p-3 text-sm text-slate-200">
-          Stage
-          <select
-            className={selectClassName}
-            style={{ colorScheme: "light dark" }}
-            value={stage ?? ""}
-            onChange={(event) => {
-              const next = isOperatorStage(event.target.value) ? event.target.value : null;
-              setStage(next);
-              syncPlanLink(profile, next);
-            }}
-          >
-            <option value="">Not set · defaults to Series A</option>
-            {OPERATOR_STAGE_OPTIONS.map((option) => (
-              <option key={option.key} value={option.key}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-          <span className="mt-1 block text-fluid-nano text-slate-500">Same stage as the weekly guidance.</span>
-        </label>
+          </div>
+        </div>
+
+        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+          <OperatorProfileNumberField
+            field="cashUsd"
+            label="Cash in the bank ($)"
+            hint="Runway is worked out from it."
+            placeholder="e.g. $2.1M"
+            value={profile.cashUsd}
+            onCommit={(value) => commitProfileField("cashUsd", value)}
+            className="weather-surface p-3"
+            labelClassName="block text-sm text-slate-200"
+          />
+          <OperatorProfileNumberField
+            field="runwayMonths"
+            label="Runway (months)"
+            hint={
+              runway?.basis === "cash"
+                ? "Worked out: cash over spend less revenue. Typing a figure replaces the cash."
+                : runway?.basis === "cash-flow-positive"
+                  ? "Revenue covers your spending, so no runway is counting down."
+                  : "Or leave it blank, enter your cash, and we'll work it out."
+            }
+            placeholder="e.g. 14"
+            value={runway && runway.basis !== "cash-flow-positive" ? runway.months : undefined}
+            onCommit={(value) => commitProfileField("runwayMonths", value)}
+            className="weather-surface p-3"
+            labelClassName="block text-sm text-slate-200"
+          />
+          <OperatorProfileNumberField
+            field="monthlyBurnUsd"
+            label="Monthly spend ($)"
+            hint="Everything you spend in a month, before revenue."
+            placeholder="e.g. $450k"
+            value={profile.monthlyBurnUsd}
+            onCommit={(value) => commitProfileField("monthlyBurnUsd", value)}
+            className="weather-surface p-3"
+            labelClassName="block text-sm text-slate-200"
+          />
+          <OperatorProfileNumberField
+            field="monthlyRevenueUsd"
+            label="Monthly revenue ($)"
+            placeholder="e.g. $300k, or 0"
+            value={profile.monthlyRevenueUsd}
+            onCommit={(value) => commitProfileField("monthlyRevenueUsd", value)}
+            className="weather-surface p-3"
+            labelClassName="block text-sm text-slate-200"
+          />
+          <OperatorProfileNumberField
+            field="monthlyGrowthPct"
+            label="Monthly revenue growth (%)"
+            hint="Monthly growth. Leave it blank for no growth."
+            placeholder="e.g. 6"
+            value={profile.monthlyGrowthPct}
+            onCommit={(value) => commitProfileField("monthlyGrowthPct", value)}
+            optional
+            className="weather-surface p-3"
+            labelClassName="block text-sm text-slate-200"
+          />
+          <label className="weather-surface p-3 text-sm text-slate-200">
+            Sector
+            <select
+              className={selectClassName}
+              style={{ colorScheme: "light dark" }}
+              value={profile.sector ?? "b2b-saas"}
+              onChange={(event) => {
+                if (isPlannerSector(event.target.value)) commitProfileField("sector", event.target.value);
+              }}
+            >
+              {sectorOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="weather-surface p-3 text-sm text-slate-200">
+            Stage
+            <select
+              className={selectClassName}
+              style={{ colorScheme: "light dark" }}
+              value={stage ?? ""}
+              onChange={(event) => {
+                const next = isOperatorStage(event.target.value) ? event.target.value : null;
+                setStage(next);
+                syncPlanLink(profile, next);
+              }}
+            >
+              <option value="">Not set · defaults to Series A</option>
+              {OPERATOR_STAGE_OPTIONS.map((option) => (
+                <option key={option.key} value={option.key}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <span className="mt-1 block text-fluid-nano text-slate-500">Same stage as the weekly guidance.</span>
+          </label>
+        </div>
       </div>
 
       {/* The same id on both branches, because exactly one of them is ever in the
@@ -408,15 +483,33 @@ export function RunwayPlannerPanel({
           Before this, "Runway analysis" did nothing until figures were entered —
           which is the visit where a reader most needs to be told what is missing. */}
       {!resolution.ready || !output ? (
-        <div id="ops-runway-risk" className="weather-surface !border-dashed p-4" aria-live="polite">
-          <p className="text-sm text-slate-100">
-            {resolution.ready
-              ? "Sizing the plan…"
-              : resolution.cashFlowPositive
-                ? CASH_FLOW_POSITIVE_PLANNER_NOTE
-                : describeMissingRunwayInputs(resolution.missing)}
-          </p>
-          <p className="mt-1 text-fluid-xs text-slate-400">
+        <div id="ops-runway-risk" className="weather-surface !border-dashed p-5" aria-live="polite">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <p className="text-sm font-semibold text-slate-100">
+              {resolution.ready
+                ? "Sizing the plan…"
+                : resolution.cashFlowPositive
+                  ? CASH_FLOW_POSITIVE_PLANNER_NOTE
+                  : describeMissingRunwayInputs(resolution.missing)}
+            </p>
+            <span className="rounded bg-[color:var(--bg-panel)] px-2 py-0.5 text-fluid-nano text-slate-400">
+              Runway Sizing Cockpit
+            </span>
+          </div>
+
+          <div className="mt-3 flex flex-wrap gap-2 text-xs">
+            <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 ${typeof profile.cashUsd === "number" || typeof profile.runwayMonths === "number" ? "border border-emerald-500/30 bg-emerald-950/20 text-emerald-300" : "border border-amber-500/30 bg-amber-950/20 text-amber-300"}`}>
+              {typeof profile.cashUsd === "number" || typeof profile.runwayMonths === "number" ? "Cash / Runway set" : "Required: Cash or Runway"}
+            </span>
+            <span className={`inline-flex items-center gap-1 rounded-md px-2 py-1 ${typeof profile.monthlyBurnUsd === "number" ? "border border-emerald-500/30 bg-emerald-950/20 text-emerald-300" : "border border-amber-500/30 bg-amber-950/20 text-amber-300"}`}>
+              {typeof profile.monthlyBurnUsd === "number" ? "Spend set" : "Required: Monthly spend"}
+            </span>
+            <span className="inline-flex items-center gap-1 rounded-md border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] px-2 py-1 text-slate-400">
+              {typeof profile.monthlyRevenueUsd === "number" ? `Revenue: $${(profile.monthlyRevenueUsd / 1000).toFixed(0)}k/mo` : "Revenue: optional"}
+            </span>
+          </div>
+
+          <p className="mt-3 text-fluid-xs text-slate-400">
             Your figures stay in this browser and are shared with the plan stress test.
           </p>
         </div>
@@ -531,6 +624,8 @@ export function RunwayPlannerPanel({
           {/* The company's own lines on its own runway, agreed before they are
               needed. The published lines say when the market changes the plan;
               these say when the company's cash does, and the month that is. */}
+          {macroFanModel ? <RunwayMacroFanChart model={macroFanModel} /> : null}
+
           <section id="ops-runway-lines" aria-labelledby="ops-runway-lines-heading" className="weather-surface space-y-3 p-4">
             <div>
               <p id="ops-runway-lines-heading" className="text-xs font-semibold text-slate-400">Your own runway lines</p>

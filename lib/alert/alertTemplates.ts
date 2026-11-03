@@ -1,23 +1,19 @@
 /**
  * Alert email templates, in the one shell every Whether email uses
  * (`lib/email/emailShell.ts`). Each template returns { subject, html, text }
- * for use with the email adapter. Links resolve through `lib/siteUrl`, like the
- * weekly brief's: these wrote the production origin until the shell stopped
- * being a copy.
+ * for use with the email adapter. Links carry the origin the send came from
+ * (`lib/email/publicBaseUrl.ts`), defaulting to production for the cron; these
+ * wrote the production origin until the shell stopped being a copy.
  */
 
 import { DECISION_CONTRACT_LABELS } from "../report/reportCopy";
-import type { FlashMove } from "./flashMoves";
+import { FLASH_EXPEDITE_LINE, FLASH_GUIDANCE, type FlashMove } from "./flashMoves";
 import { sideOfLine, type PublishedLine } from "./alertEvaluator";
 import { regimeSignalLabel } from "../report/signalTranslations";
 import { emailTextFooter, renderEmailShell } from "../email/emailShell";
 import { siteUrl } from "../siteUrl";
 import { formatPointsMove, formatScoreValue } from "../formatters";
 import { OG_LINE_CROSSED, OG_LINE_CROSSED_BG, OG_LINE_CROSSED_MARK, OG_PANEL, OG_RULE, OG_TEXT, OG_TEXT_MUTED, OG_TEXT_SECONDARY } from "../image/ogTheme";
-
-/** What a flash asks of the reader, in the mail's text and HTML alike. */
-const FLASH_GUIDANCE =
-  "A move this size between two readings is unusual. This week's guidance stands until the next reading shows where the scores settle; until then, hold anything you can't undo.";
 
 type EmailContent = {
   subject: string;
@@ -63,28 +59,31 @@ export const decisionVerdictEmail = ({
   actionNow,
   reversal,
   unsubscribeToken,
+  baseUrl = siteUrl,
 }: {
   headline: string;
   why: string;
   actionNow: string;
   reversal: string;
   unsubscribeToken?: string | null;
+  /** The origin this mail was sent from; see `lib/email/publicBaseUrl.ts`. */
+  baseUrl?: string;
 }): EmailContent => {
   const subject = `Whether Alert — ${headline}`;
   const text = [
-    `Whether Decision Alert`,
+    `Whether Alert`,
     headline,
     why,
     `${DECISION_CONTRACT_LABELS.action.actionNow}: ${actionNow}`,
     `${DECISION_CONTRACT_LABELS.watch.postureFlips}: ${reversal}`,
     ``,
-    `View full brief: ${siteUrl}`,
-    ...emailTextFooter(unsubscribeToken),
+    `View full brief: ${baseUrl}`,
+    ...emailTextFooter(unsubscribeToken, baseUrl),
   ].join("\n");
   const html = renderEmailShell({
-    title: "Whether Decision Alert",
+    title: "Whether Alert",
     body: [
-      alertBanner("critical", `<strong>${headline}</strong> — conditions have moved outside the range recorded when this decision was made.`),
+      alertBanner("critical", `<strong>${headline}</strong> — conditions changed since the last reading.`),
       `<div style="margin-top:12px;">`,
       sectionBlock("Why", why),
       `</div>`,
@@ -96,6 +95,7 @@ export const decisionVerdictEmail = ({
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
+    baseUrl,
   });
   return { subject, html, text };
 };
@@ -103,12 +103,12 @@ export const decisionVerdictEmail = ({
 const LINE_NAME: Record<PublishedLine["kind"], string> = {
   pause: "the pause line",
   change: "the line where conditions change",
-  resume: "the resume line",
+  resume: "the restart line",
 };
 
 /**
  * What crossing a line asks of the reader, by the line's kind and the side the
- * score is now on. A pause or resume line matters on the side where it holds;
+ * score is now on. A pause or restart line matters on the side where it holds;
  * crossing back out of it is said too, because a reader acting on last week's
  * pause needs to know it no longer applies.
  */
@@ -121,22 +121,23 @@ const describeLineCrossing = (line: PublishedLine, value: number): string => {
   if (line.kind === "pause") {
     return nowHolds
       ? "Every area whose rule pauses on this line pauses now. Read this week's guidance before acting on last week's plan."
-      : "The pause on this line no longer holds. Held work resumes only once each area's resume line is met.";
+      : "The pause on this line no longer holds. Held work resumes only once each area's restart line is met.";
   }
   return nowHolds
-    ? "Work held on this line can resume once every resume line for its area is met."
-    : "This resume line is no longer met. Read this week's guidance before resuming held work.";
+    ? "Work held on this line can resume once every restart line for its area is met."
+    : "This restart line is no longer met. Read this week's guidance before resuming held work.";
 };
 
 /**
  * Threshold crossing alert — a score crossed one of the published lines: the
- * pause and resume lines every area's rule shares, or the line where
+ * pause and restart lines every area's rule shares, or the line where
  * conditions change.
  */
 export const thresholdCrossingEmail = (
   line: PublishedLine,
   value: number,
   unsubscribeToken?: string | null,
+  baseUrl: string = siteUrl,
 ): EmailContent => {
   const metricLabel = regimeSignalLabel[line.metric];
   const lineName = LINE_NAME[line.kind];
@@ -152,8 +153,8 @@ export const thresholdCrossingEmail = (
     reading,
     whatToDo,
     ``,
-    `View full brief: ${siteUrl}`,
-    ...emailTextFooter(unsubscribeToken),
+    `View full brief: ${baseUrl}`,
+    ...emailTextFooter(unsubscribeToken, baseUrl),
   ].join("\n");
   const severity = line.kind === "resume" ? "info" : "warning";
   const html = renderEmailShell({
@@ -168,6 +169,7 @@ export const thresholdCrossingEmail = (
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
+    baseUrl,
   });
   return { subject, html, text };
 };
@@ -180,6 +182,7 @@ export const thresholdCrossingEmail = (
 export const planLineEmail = (
   { headline, body }: { headline: string; body: string },
   unsubscribeToken?: string | null,
+  baseUrl: string = siteUrl,
 ): EmailContent => {
   const subject = `Whether Alert — ${headline}`;
   const text = [
@@ -187,8 +190,8 @@ export const planLineEmail = (
     headline,
     body,
     ``,
-    `Your lines: ${siteUrl}/operate#ops-plan-lines`,
-    ...emailTextFooter(unsubscribeToken),
+    `Review your lines: ${baseUrl}/operate#ops-plan-lines`,
+    ...emailTextFooter(unsubscribeToken, baseUrl),
   ].join("\n");
   const html = renderEmailShell({
     title: "Whether Plan Alert",
@@ -199,6 +202,7 @@ export const planLineEmail = (
       `</div>`,
     ].join("\n"),
     unsubscribeToken,
+    baseUrl,
   });
   return { subject, html, text };
 };
@@ -211,6 +215,7 @@ export const planLineEmail = (
 export const flashMoveEmail = (
   move: FlashMove,
   unsubscribeToken?: string | null,
+  baseUrl: string = siteUrl,
 ): EmailContent => {
   const size = formatPointsMove(move.delta);
   const direction = move.delta < 0 ? "fell" : "rose";
@@ -221,9 +226,10 @@ export const flashMoveEmail = (
     `Whether Flash Alert`,
     move.headline,
     FLASH_GUIDANCE,
+    FLASH_EXPEDITE_LINE,
     ``,
-    `View full brief: ${siteUrl}`,
-    ...emailTextFooter(unsubscribeToken),
+    `View full brief: ${baseUrl}`,
+    ...emailTextFooter(unsubscribeToken, baseUrl),
   ].join("\n");
   const html = renderEmailShell({
     title: "Whether Flash Alert",
@@ -238,8 +244,12 @@ export const flashMoveEmail = (
         FLASH_GUIDANCE,
       ),
       `</div>`,
+      `<div style="margin-top:12px;">`,
+      sectionBlock("Kanban teams", FLASH_EXPEDITE_LINE),
+      `</div>`,
     ].join("\n"),
     unsubscribeToken,
+    baseUrl,
   });
   return { subject, html, text };
 };

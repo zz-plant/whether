@@ -306,7 +306,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
   return (
     <Dialog.Root open onOpenChange={(nextOpen) => { if (!nextOpen) onClose(); }}>
       <Dialog.Portal>
-        <Dialog.Backdrop className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm" />
+        <Dialog.Backdrop className="fixed inset-0 z-[var(--z-overlay)] bg-black/50 backdrop-blur-sm" />
         {/* A bottom sheet below md, the centered dialog above it. The palette's
             only phone entry points are the Search tab and the header's button,
             and a keyboard-driven menu pinned at 12vh with C/F/ESC badges is a
@@ -315,7 +315,7 @@ export function CommandPalette({ onClose }: { onClose: () => void }) {
             highlight — with no hardware keyboard, index 0 never moves, and a
             permanent first-row highlight only competes with the field above. */}
         <Dialog.Popup
-          className="fixed inset-x-0 bottom-0 z-50 max-h-[85dvh] overflow-hidden rounded-t-2xl border-t border-[color:var(--border-strong)] bg-[color:var(--bg-panel)]/95 shadow-2xl backdrop-blur-2xl md:inset-x-auto md:bottom-auto md:left-1/2 md:top-[12vh] md:w-full md:max-w-lg md:-translate-x-1/2 md:rounded-2xl md:border"
+          className="fixed inset-x-0 bottom-0 z-[var(--z-modal)] max-h-[85dvh] overflow-hidden rounded-t-2xl border-t border-[color:var(--border-strong)] bg-[color:var(--bg-panel)]/95 shadow-2xl backdrop-blur-2xl md:inset-x-auto md:bottom-auto md:left-1/2 md:top-[12vh] md:w-full md:max-w-lg md:-translate-x-1/2 md:rounded-2xl md:border"
           aria-label="Command palette"
         >
           <div className="flex items-center gap-3 border-b border-[color:var(--border-default)] px-4 py-3.5 bg-[color:var(--bg-raised)]/40">

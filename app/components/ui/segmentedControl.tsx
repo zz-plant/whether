@@ -185,7 +185,11 @@ export function SegmentedControl<Key extends string>({
                     broke after "Series" once the default's sublabel said so. */}
                 <span className="whitespace-nowrap">{option.label}</span>
                 {option.sublabel ? (
-                  <span className="ml-1 hidden font-normal opacity-60 sm:inline">· {option.sublabel}</span>
+                  /* `text-slate-400`, not `opacity-60` on the inherited ink
+                     (2026-11-02): 60% over the track's ground measured 3.5:1 in
+                     the dark theme and 2.53:1 in the light one, under the 4.5:1
+                     a 12.8px label needs. The muted role is 7.1:1 and 6.2:1. */
+                  <span className="ml-1 hidden font-normal text-slate-400 sm:inline">· {option.sublabel}</span>
                 ) : null}
               </>
             )}

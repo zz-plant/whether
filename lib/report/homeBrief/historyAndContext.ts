@@ -244,12 +244,21 @@ export const buildFlipRiskMeterState = (
     };
   }
 
-  const pointsToFlip = Math.max(0, Math.round(regimeDistance.pointsToFlip));
+  const pointsToFlip = Math.max(0, Math.round(regimeDistance.pointsToFlipNormalized));
   const clampedDistance = Math.min(pointsToFlip, 12);
   const progressPercent = Math.max(10, Math.round(((12 - clampedDistance) / 12) * 100));
   const triggerLabel = `${regimeDistance.dimensionLabel} ${regimeDistance.thresholdDirection === "riseAbove" ? "above" : "to or below"} ${formatThresholdNumber(regimeDistance.thresholdValue)}.`;
 
-  if (pointsToFlip <= 3) {
+  /* Urgency is measured on the tightness-equivalent scale the published margin
+     cuts at (`pointsToFlipNormalized`), at the margin's own 5/12 boundaries —
+     inverted, so this meter and the "Room before a change" line can never give
+     one geometry two verdicts. On a raw-points scale the risk axis's bands
+     would fire 4.5x early: risk appetite 3 points from its line is 13.5
+     tightness-equivalent, which the margin rightly calls clear. */
+
+  /* The bands are the published margin's own: HIGH margin (more than 12) is
+     Low urgency, MED (to 12) Medium, LOW (to 5) High. */
+  if (pointsToFlip <= 5) {
     return {
       progressPercent,
       urgencyLabel: "High",
@@ -258,7 +267,7 @@ export const buildFlipRiskMeterState = (
     };
   }
 
-  if (pointsToFlip <= 6) {
+  if (pointsToFlip <= 12) {
     return {
       progressPercent,
       urgencyLabel: "Medium",

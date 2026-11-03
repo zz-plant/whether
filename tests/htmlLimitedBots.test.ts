@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import { describe, it } from "bun:test";
 
-import robots from "../app/robots";
+import { buildRobotsRules } from "../lib/seo/robotsTxt";
 
 /*
  * A requester on this list gets <title>, description, canonical and OG tags in
@@ -16,7 +16,7 @@ const limited = new RegExp(htmlLimitedBots, "i");
 
 describe("html-limited bots", () => {
   it("covers every crawler robots.txt names", () => {
-    const named = [robots().rules]
+    const named = [buildRobotsRules()]
       .flat()
       .flatMap((rule): unknown[] => [rule.userAgent].flat())
       .filter((agent): agent is string => typeof agent === "string" && agent !== "*");

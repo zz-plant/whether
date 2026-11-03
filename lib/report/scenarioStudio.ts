@@ -83,7 +83,7 @@ type ScenarioLadderLines = { pause?: number; resume?: number; callChange: number
 
 /**
  * The three lines each score is judged against in a scenario: where the call
- * changes, and the pause and resume lines the scenario's own rules state.
+ * changes, and the pause and restart lines the scenario's own rules state.
  * Read off the same rule data the rules table prints (`buildSharedCorridorRails`
  * over the canonical rules), never re-derived from the thresholds by hand, so
  * the ladder cannot draw a line the scenario's rules do not state. A rule that

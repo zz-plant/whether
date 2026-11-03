@@ -16,6 +16,8 @@ import type { RegimeAssessment, RegimeKey } from "../regimeEngine";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { getMonthlyActionGuidance } from "../summary/monthlySummary";
 import { getQuarterlyActionGuidance } from "../summary/quarterlySummary";
+import { siteUrl } from "../siteUrl";
+import { SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE } from "./briefArtifact";
 import {
   buildHorizonOperatingRule,
   buildHorizonSignalBands,
@@ -24,7 +26,6 @@ import {
 } from "../summary/horizonOperatingRules";
 import { formatQuarterLabel } from "../summary/summaryFormatting";
 import { formatMonthYearShortFromValue } from "../formatters";
-import { DECISION_CONTRACT_LABELS } from "./reportCopy";
 import { describePolicyHold } from "./regimeDescription";
 
 /** The two horizons the selector offers beside the weekly default. */
@@ -63,7 +64,20 @@ export type CadenceCallModel = {
   weeklyBridge: string;
   planHref: string;
   planLabel: string;
+  /**
+   * The block's heading: the horizon's name, dated by the period it describes.
+   * A paste of a derived horizon has no frozen record to fall back on, so the
+   * date is the only thing that keeps it readable once `/` has moved on to the
+   * next month (2026-11-02).
+   */
   shareTitle: string;
+  /**
+   * Where a paste points. `?cadence=<horizon>` is the view that reproduces this
+   * card; there is no `/brief/<slug>` for a month or a quarter, because nothing
+   * freezes one. Built off `siteUrl` rather than the request host, so a paste
+   * outlives the deployment that made it.
+   */
+  shareUrl: string;
   /** Distinct from the hero's "Copy Brief". Both controls sit on `/` under a non-weekly
    *  cadence and copy different artifacts, so each has to name the one it copies. */
   shareLabel: string;
@@ -109,6 +123,20 @@ const HORIZON_COPY: Record<
   },
 };
 
+/**
+ * The address a horizon's paste carries: the view that reproduces this card,
+ * marked as a share the way every other paste is (`?ref=share`, read back by
+ * `ConditionsLegend`). There is no `/brief/<slug>` for a month or a quarter —
+ * nothing freezes one — so this names the live view and the model's dated title
+ * carries the period.
+ */
+const buildCadenceShareUrl = (horizon: CadenceCallHorizon): string => {
+  const url = new URL("/", siteUrl);
+  url.searchParams.set("cadence", horizon);
+  url.searchParams.set(SHARE_REFERRAL_PARAM, SHARE_REFERRAL_VALUE);
+  return url.toString();
+};
+
 const formatScore = (value: number) =>
   new Intl.NumberFormat(undefined, { maximumFractionDigits: 1 }).format(value);
 
@@ -119,7 +147,7 @@ const formatSignedScore = (value: number) =>
 
 /**
  * The two distances a rail carries, as points from the pause line and from the
- * resume line — the two names the rest of the page uses for the pair. An
+ * restart line — the two names the rest of the page uses for the pair. An
  * earlier version chipped the edges with the contract labels ("5 to Pause if ·
  * Change course if short by 3"), which read as a sentence with its verbs
  * missing.
@@ -135,8 +163,8 @@ export const formatBandHeadroom = (band: HorizonSignalBand): string => {
   const toPause = `${formatScore(band.toPause)} points from the pause line`;
 
   return band.resumeHolds
-    ? `${toPause} · ${formatScore(band.toResume)} from the resume line`
-    : `${toPause} · ${formatScore(band.toResume)} short of the resume line`;
+    ? `${toPause} · ${formatScore(band.toResume)} from the restart line`
+    : `${toPause} · ${formatScore(band.toResume)} short of the restart line`;
 };
 
 /** The reading itself, and the move that produced it. Null movement stays null rather
@@ -344,12 +372,21 @@ export const buildCadenceCallModel = ({
     weeklyBridge: copy.weeklyBridge,
     planHref,
     planLabel: copy.planLabel,
-    shareTitle: copy.shareTitle,
+    shareTitle: periodLabel ? `${copy.shareTitle} — ${periodLabel}` : copy.shareTitle,
+    shareUrl: buildCadenceShareUrl(horizon),
     shareLabel: copy.shareLabel,
     shareCopiedLabel: "Guidance copied",
     shareLines: [
-      `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${boundedRule.threshold}`,
-      `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${boundedRule.reversal}`,
+      /*
+       * The rule's two sentences as they are written, with no slot label in front
+       * of them (2026-11-02). Both already carry their own verb — "Pause new hires
+       * … if funding pressure rises above 76", "Restart them when …" — so prefixing
+       * the label printed "Pause if: Pause new hires … if …" in every paste of this
+       * card. The weekly paste labels short condition fragments, which is a
+       * different shape; this one is prose.
+       */
+      boundedRule.threshold,
+      boundedRule.reversal,
     ],
   };
 };

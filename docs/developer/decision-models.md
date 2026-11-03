@@ -58,7 +58,7 @@ That last judgment concerns the supplied rule, not a forecast of company perform
 Code must check `automationReady` before using any answer. A missing action requires
 clarification. If reversibility is not established, ignore its Score and ask for the
 terms. A low conflict probability alone does not establish permission. Copy a pause or
-resume line from the supplied canonical rule; do not invent one from a model answer.
+restart line from the supplied canonical rule; do not invent one from a model answer.
 Use explicit company numbers and existing arithmetic for cost and runway calculations.
 
 Omni accepts base64 data URLs: PNG/JPEG/WebP images, WAV/MP3 audio, and MP4/WebM video.
@@ -196,7 +196,7 @@ can be chunked into passages; the tool itself is collection-agnostic. The canoni
 the paired brief audit bundle (or any file holding the canonical object alone).
 
 EmbeddingGemma 2 (local Ollama, `embeddinggemma-2:740m`) embeds every passage and two query
-frames: the call as printed (guidance, action, pause and resume lines), and the opposite
+frames: the call as printed (guidance, action, pause and restart lines), and the opposite
 stance — money is cheaper again, the freeze lifts, companies resume hiring and the new bets
 they postponed — stated without the call's metric vocabulary. That separation is a measured
 finding, not an assumption (2026-10-23): a challenge frame that restated the call's change

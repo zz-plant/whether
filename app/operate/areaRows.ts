@@ -10,7 +10,7 @@ import { findLeadAnswerForArea } from "../answers/decisionPages";
  *
  * Built once here for both surfaces that tabulate the five areas — the plan
  * page's weekly plan and the guardrail tags on /share — so the rule, the pause
- * line and its distance, and the resume line and its distance are the same
+ * line and its distance, and the restart line and its distance are the same
  * strings on both, and the /share table can be handed to a client component
  * as plain text. The lines come from the rule's own condition data
  * (`pauseConditions` / `resumeConditions`), never re-parsed from the sentence;

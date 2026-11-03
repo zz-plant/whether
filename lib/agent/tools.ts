@@ -27,7 +27,7 @@ import {
   buildPostureArchivePath,
 } from "../summary/postureArchive";
 import { answerPages, matchDecisionPage } from "../../app/answers/decisionPages";
-import { getRegimePublicLabel } from "../regimePresentation";
+import { buildAnswerObject } from "../answers/answerObject";
 import { buildCanonicalUrl } from "../seo";
 import { REGIME_KEYS, SIGNAL_KEYS, lifecycleInput, lowerCasedInput, numberInput, regimeInput, signalKeyInput, textInput } from "./inputs";
 import { AgentInputError, createAgentToolRegistry, defineTool } from "./registry";
@@ -108,7 +108,7 @@ const AGENT_TOOLS = [
     name: "get_state",
     title: "Get the current state",
     description:
-      "This week's call on startup hiring, spending, fundraising and burn, read from U.S. interest-rate and credit-market data and published every Monday. Use it when someone asks whether to hire or freeze hiring, raise now or wait, cut burn, or what today's funding or macro conditions mean for their company. The smallest answer to decide from, about 3KB: the conditions and the margin from their change lines, each score against its pause, resume and change lines, the moves behind each score since the earlier reading, the areas those moves crossed a line for, the guidance, and the data's freshness. automation.ready is false when the reading is a saved copy or more than 10 days old.",
+      "This week's call on startup hiring, spending, fundraising and burn, read from U.S. interest-rate and credit-market data and published every Monday. Use it when someone asks whether to hire or freeze hiring, raise now or wait, cut burn, or what today's funding or macro conditions mean for their company. The smallest answer to decide from, about 3KB: the conditions and the margin from their change lines, each score against its pause, restart and change lines, the moves behind each score since the earlier reading, the areas those moves crossed a line for, the guidance, and the data's freshness. automation.ready is false when the reading is a saved copy or more than 10 days old.",
     input: {},
     output: agentStateSchema,
     example: {},
@@ -179,7 +179,7 @@ const AGENT_TOOLS = [
     name: "get_answer",
     title: "Get decision answer",
     description:
-      "Whether's answer to one startup operating question, with this week's standing, the rules in force and a line to cite: hiring or a hiring freeze, engineers, sales headcount or a first salesperson, raising capital, runway before a raise, cutting burn, the roadmap, new product lines, go-to-market pace, preparing for a downturn, a board or executive briefing, the funding climate, or risk-on versus risk-off. Pass the question as the user asked it.",
+      "Whether's answer to one startup operating question, with this week's standing, the rules in force and a line to cite: hiring or a hiring freeze, engineers, sales headcount or a first salesperson, layoffs, compensation, raising capital or a bridge round, runway before a raise, cutting burn, vendors, pricing, retention versus acquisition, the roadmap, new product lines, go-to-market pace, international expansion, preparing for a downturn, a board or executive briefing, the funding climate, or risk-on versus risk-off. Pass the question as the user asked it.",
     input: {
       question: textInput.describe("The question in the user's words, a topic, or an answer slug (e.g. 'should I hire a second engineer', 'cut burn', 'should-we-freeze-or-selectively-hire')."),
     },
@@ -202,34 +202,39 @@ const AGENT_TOOLS = [
       const mappedRules = snapshot.homeBriefModel.decisionRules.filter((rule) =>
         page.mappedDecisionAreas.includes(rule.area),
       );
-      const permalink = buildCanonicalUrl(`/answers/${page.slug}`);
-      const recordDate = reportData.recordDateLabel;
-      const conditions = getRegimePublicLabel(reportData.assessment.regime);
+      /* One answer object, the same one the page renders. */
+      const answer = buildAnswerObject({
+        page,
+        recordDateLabel: reportData.recordDateLabel,
+        regime: reportData.assessment.regime,
+        scores: reportData.assessment.scores,
+        mappedRules,
+      });
 
       return {
         type: "decision_answer",
-        slug: page.slug,
-        title: page.title,
-        permalink,
-        category: page.category,
-        shortAnswer: page.shortAnswer,
-        directAnswer: page.directAnswer,
-        audience: page.audience,
+        slug: answer.slug,
+        title: answer.title,
+        permalink: answer.permalink,
+        category: answer.category,
+        shortAnswer: answer.shortAnswer,
+        directAnswer: answer.directAnswer,
+        audience: answer.audience,
         currentStanding: {
-          recordDate,
-          conditions,
-          scores: reportData.assessment.scores,
+          recordDate: answer.standing.recordDateLabel,
+          conditions: answer.standing.conditions,
+          scores: answer.standing.scores,
         },
-        rulesInForce: mappedRules.map((rule) => ({
+        rulesInForce: answer.rules.map((rule) => ({
           area: rule.area,
-          actionNow: rule.doNow[0] ?? rule.recommendation,
-          pauseIf: rule.pauseTrigger,
-          resumeWhen: rule.resumeTrigger,
+          actionNow: rule.actionNow,
+          pauseIf: rule.pauseIf,
+          resumeWhen: rule.resumeWhen,
         })),
-        companyInputs: page.companyInputs,
-        decisionNoteTemplate: page.decisionNote,
-        citation: `Whether Weekly Brief (Week of ${recordDate}): "${page.title}" — ${permalink}`,
-        attributionSnippet: `According to Whether's weekly guidance for startup leaders (Week of ${recordDate}, ${permalink}): "${page.shortAnswer}"`,
+        companyInputs: answer.companyInputs,
+        decisionNoteTemplate: answer.decisionNote,
+        citation: answer.citation,
+        attributionSnippet: answer.attributionSnippet,
         use: buildUseConstraint(),
       };
     },
@@ -384,7 +389,7 @@ const AGENT_TOOLS = [
     name: "stress_test_plan",
     title: "Stress-test a planned decision against today's conditions",
     description:
-      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the resume line. Use it when someone describes a specific plan and asks whether it holds up in this market.",
+      "Audits a proposed operational decision (hiring, cloud commit, office lease, GTM pricing) against today's funding pressure and risk appetite, and returns the fragile assumptions, the pause line and the restart line. Use it when someone describes a specific plan and asks whether it holds up in this market.",
     input: {
       planText: textInput.describe("The planned decision or initiative in plain English."),
       lifecycle: lifecycleInput.optional().describe("Company lifecycle stage; defaults to GROWTH."),

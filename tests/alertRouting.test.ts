@@ -93,9 +93,9 @@ describe("which line a move names", () => {
   });
 
   // The same three lines the other way. Ranked pause first whatever the direction, this
-  // named 76 and the email said held work resumes "once each area's resume line is met"
+  // named 76 and the email said held work resumes "once each area's restart line is met"
   // with the score already under 66, and no resume alert followed: one per score.
-  it("names the resume line on a fall through all three funding-pressure lines", () => {
+  it("names the restart line on a fall through all three funding-pressure lines", () => {
     const decision = crossing("tightness", 80, 60);
     const line = decision?.line;
     assert.ok(line, "the fall crossed a line");
@@ -118,7 +118,7 @@ describe("which line a move names", () => {
 
 /*
  * A score exactly on a line is on the side where the line does not hold: past the change
- * line only above it, as `classifyRegime` reads equality, and past a pause or resume line
+ * line only above it, as `classifyRegime` reads equality, and past a pause or restart line
  * only strictly beyond it, as the rules state them ("> 76", "< 66"). Comparing `>=` and
  * `<=` missed a score landing on the line and fired on one leaving it for the same side.
  */
@@ -140,12 +140,12 @@ describe("a score on the line", () => {
     assert.equal(thresholdFor(68, 70), undefined);
   });
 
-  it("leaves the resume line unmet at its own number, as the rule reads it", () => {
+  it("leaves the restart line unmet at its own number, as the rule reads it", () => {
     const line = thresholdFor(64, 66)?.line;
     assert.ok(line, "landing on 66 from below crossed a line");
     assert.equal(line.kind, "resume");
     const mail = thresholdCrossingEmail(line, 66, null);
-    assert.match(mail.text, /It crossed above that line since the last alert\. This resume line is no longer met/);
+    assert.match(mail.text, /It crossed above that line since the last alert\. This restart line is no longer met/);
   });
 });
 

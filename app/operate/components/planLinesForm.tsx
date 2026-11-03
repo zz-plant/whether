@@ -12,7 +12,7 @@ import { runwayBandLabel } from "../../../lib/report/operatorRunway";
 import { useOperatorRunway } from "../../components/useOperatorRunway";
 
 /**
- * "Set this plan's lines": the step where a plan's pause and resume lines are
+ * "Set this plan's lines": the step where a plan's pause and restart lines are
  * agreed once, and an email goes out the day one is crossed.
  *
  * The guidance moves a few times a year, so this is the use that fits it: lines

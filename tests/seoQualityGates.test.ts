@@ -107,6 +107,31 @@ describe("seo quality gates", () => {
     assert.equal(result.gates.uniqueness.passed, false);
   });
 
+  it("keeps a page eligible when the reading is a few days old but the call is current", () => {
+    /* The read clock (72h) would flag this fetchedAt, but the call's record date
+       is what gates indexing, and it is within the ten-day call window. */
+    const result = evaluateSeoQualityGates({
+      pageKey: "/answers/should-startups-raise-prices-now",
+      currentCall: "Hold base prices.",
+      immediateAction: "Test on new customers first.",
+      triggerThreshold: "Pause if churn rises above 8%.",
+      reversalCondition: "Restart when churn holds.",
+      evidenceCount: 2,
+      evidenceTitles: ["Treasury volatility", "Credit spreads"],
+      fetchedAtIso: "2026-02-08T12:00:00.000Z",
+      recordDateIso: "2026-02-10T00:00:00.000Z",
+      provenanceStatusLabel: "Live (high confidence)",
+      provenanceLinks: ["https://fred.stlouisfed.org/series/DGS10"],
+      confidenceLabel: "HIGH",
+      fallbackLabel: "live",
+      trustSummary: "High confidence",
+      citationMeta: "Cite: 2026-02-10 UTC",
+    }, new Date("2026-02-12T00:00:00.000Z"));
+
+    assert.equal(result.gates.freshness.passed, true, "a four-day-old read is not a stale call");
+    assert.deepEqual(result.gates.freshness.details, { clock: "call", windowHours: 10 * 24 });
+  });
+
   it("fails thin-page and trust gates for incomplete sections and missing trust labels", () => {
     const result = evaluateSeoQualityGates({
       pageKey: "/answers/should-we-hire-engineers-right-now",

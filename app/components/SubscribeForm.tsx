@@ -7,6 +7,8 @@ import { requestSubscription, requestSlackSubscription } from "./subscribeReques
 import { trackActivationEvent } from "../../lib/activationFunnel";
 import { buildMondayCalendarUrl } from "./calendarButton";
 import { SegmentedControl, type SegmentedOption } from "./ui/segmentedControl";
+import { useOperatorStage } from "./useOperatorStage";
+import { useOperatorRunway } from "./useOperatorRunway";
 
 type SubscribeChannel = "email" | "slack";
 type EmailFrequency = "alerts" | "weekly";
@@ -51,6 +53,12 @@ export function SubscribeForm({
   showTitle?: boolean;
 } = {}) {
   const pathname = usePathname() ?? "/";
+  /* The stage the reader already set for the on-site rules; their brief prints
+     the same rules, so the signup carries it rather than asking again. */
+  const { stage } = useOperatorStage();
+  /* The runway band the reader already chose for the on-site notes; their brief
+     prints the same one, so the signup carries it rather than asking again. */
+  const { runwayBand } = useOperatorRunway();
   const [channel, setChannel] = useState<SubscribeChannel>("email");
   const [frequency, setFrequency] = useState<EmailFrequency>(defaultFrequency);
   const alertsOnly = channel === "email" && frequency === "alerts";
@@ -74,7 +82,7 @@ export function SubscribeForm({
         trackActivationEvent({ step: "committed", path: pathname, commitment: "subscribed" });
       }
     } else {
-      const result = await requestSubscription(email, { alerts: true, weekly: frequency === "weekly" });
+      const result = await requestSubscription(email, { alerts: true, weekly: frequency === "weekly", ...(stage ? { stage } : {}), ...(runwayBand ? { runwayBand } : {}) });
       setStatus(result.ok ? "success" : "error");
       setMessage(result.message);
       if (result.ok) {
@@ -90,8 +98,11 @@ export function SubscribeForm({
         <span className="inline-flex items-center justify-center rounded-full bg-emerald-500/10 p-2 text-emerald-400">
           <Check className="size-5" aria-hidden="true" />
         </span>
-        <p className="text-fluid-xs font-semibold text-slate-50">
-          {channel === "slack" ? "Slack Channel Connected!" : "Subscribed!"}
+        {/* The heading names the outcome that actually happened. "Subscribed!"
+            claimed a state that only becomes true when the reader clicks the
+            link in the mail. */}
+        <p className="text-fluid-sm font-semibold text-slate-50">
+          {channel === "slack" ? "Slack channel connected" : "Check your inbox"}
         </p>
         <p className="text-fluid-micro text-slate-300">
           {message}
@@ -110,7 +121,7 @@ export function SubscribeForm({
           }}
           className="mt-2 text-fluid-nano text-sky-400 hover:text-sky-300 underline"
         >
-          Subscribe another destination
+          {channel === "slack" ? "Connect another channel" : "Use a different address"}
         </button>
       </div>
     );

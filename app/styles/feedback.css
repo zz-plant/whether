@@ -60,6 +60,23 @@
   color: var(--color-caveat-fg);
 }
 
+/* The line-state band (2026-10-31): the week's exception, above the call. A
+   crossed or close pause line is the one thing that changes what a reader does
+   this week, and `/` drew it in five small places and loud in none.
+   Deliberately not `.weather-caveat-band`: the caveat's ink and diamond say
+   "read this reading with care" (late or saved data, an archived month), which
+   is a different claim from "a line was crossed". This one takes the
+   line-state family the badges and the pause column already draw in, and the
+   same 4px rule, which is what makes a band read as a band. A leaf, never a
+   container (tests/surfaceDepthLadder.test.ts). */
+.weather-line-band {
+  border: 1px solid color-mix(in srgb, var(--line-crossed) 45%, transparent);
+  border-left-width: 4px;
+  border-radius: var(--radius-lg);
+  background-color: var(--line-crossed-bg);
+  color: var(--line-crossed-ink);
+}
+
 /* The caveat mark: an outlined diamond, the shape of a warning sign, before
    anything that says "read this reading with care" (cached sources, a
    scoring note, an archived week, guidance held back). Its own shape because

@@ -5,6 +5,7 @@ import { describeInputMovement } from "../inputMovement";
 import {
   formatPointsToLine,
   resolveLineState,
+  selectPauseCondition,
   toThresholdDistance,
   type ActionStripItem,
   type LineState,
@@ -38,13 +39,14 @@ export const parseHomeDecision = (value: string | undefined): DecisionArea | und
 /*
  * The homepage's sections, in the order they print (2026-10-22): the verdict, the
  * five areas, whose lines they are, what the conditions are made of, what changed,
- * what would change the guidance, how unusual this is, and the alert. The order
- * follows the four questions a reader arrives with — what is happening, what do I
- * do, what would change it, how far can I trust it — and keeps the plan before
- * the evidence. `areas` keeps the id the old "What that changes for you" section
- * had, so a link to it still lands on the areas. The diagnosis heading carries
- * the week's weather word, so it is passed by the route, not stored here. Sharing
- * is the page's last line, not a section: a heading over one link (`ShareLinks`).
+ * what would change the guidance, who will ask about it, how unusual this is, and
+ * the alert. The order follows the four questions a reader arrives with — what is
+ * happening, what do I do, what would change it, how far can I trust it — and keeps
+ * the plan before the evidence. `areas` keeps the id the old "What that changes for
+ * you" section had, so a link to it still lands on the areas. The diagnosis heading
+ * carries the week's weather word, so it is passed by the route, not stored here.
+ * Sharing is the page's last line, not a section: a heading over one link
+ * (`ShareLinks`).
  */
 export const HOME_SECTIONS = {
   call: { id: "weekly-call" },
@@ -53,6 +55,7 @@ export const HOME_SECTIONS = {
   diagnosis: { id: "why-conditions" },
   changed: { id: "what-changed", heading: "What changed this week" },
   watch: { id: "what-would-change", heading: DECISION_CONTRACT_LABELS.watch.flipWatch },
+  hearing: { id: "what-you-may-hear", heading: "What you may be hearing" },
   record: { id: "has-this-happened-before", heading: "How unusual is this?" },
   alert: { id: "subscribe", heading: "Get notified when something changes" },
 } as const;
@@ -219,7 +222,12 @@ const lineSlot = (distance: RuleThresholdDistance | undefined, kind: "pause" | "
       }
     : undefined;
 
-const formatPoints = (points: number) =>
+/**
+ * A points count as the brief prints it: "1 pt", "11 pts", "10.5 pts". Shared by
+ * the picker's area cards and the ladder under them, which print the same
+ * distance for the same area.
+ */
+export const formatPoints = (points: number) =>
   `${points.toFixed(points % 1 === 0 ? 0 : 1)} ${points === 1 ? "pt" : "pts"}`;
 
 /**
@@ -234,9 +242,9 @@ export const describeAreaPauseStatus = (
   if (!row.pause) return undefined;
   /* The badge's state, from the same distance the words below describe. */
   const state = resolveLineState(row.pause.points, "pause", row.pause.met) ?? "clear";
-  if (row.pause.met) return { text: "Past its pause line", crossed: true, state };
+  if (row.pause.met) return { text: "On hold", crossed: true, state };
   if (row.pause.points === 0) return { text: "At its pause line", crossed: false, state };
-  return { text: `${formatPoints(row.pause.points)} from its pause line`, crossed: false, state };
+  return { text: `${formatPoints(row.pause.points)} from pausing`, crossed: false, state };
 };
 
 /**
@@ -248,18 +256,87 @@ export const describePauseLineCount = (rows: readonly Pick<HomeAreaRow, "pause">
   if (ruled.length === 0) return null;
   const crossed = ruled.filter((row) => row.pause?.met).length;
   /* A standing state, said as one: "crossed ... this week" sat under "No score
-     crossed a pause or resume line since Sep 30" and read as a contradiction. */
-  if (crossed === 0) return "No area is past its pause line.";
+     crossed a pause or restart line since Sep 30" and read as a contradiction. */
+  if (crossed === 0) return "No area is on hold.";
   return crossed === 1
-    ? `1 of ${ruled.length} areas is past its pause line.`
-    : `${crossed} of ${ruled.length} areas are past their pause line.`;
+    ? `1 of ${ruled.length} areas is on hold.`
+    : `${crossed} of ${ruled.length} areas are on hold.`;
+};
+
+/**
+ * The one exception worth a band above the call (2026-10-31): where the binding
+ * line sits, when an area is on hold or close to it.
+ *
+ * The crossed state was drawn in five places — the stamp, the ladder, the
+ * picker's badges, the area table and the card's own "On hold:" line — and
+ * loud in none, so a week with an area held looked like a week with none. The
+ * band is the page's silhouette changing with the weather: it exists only when
+ * there is an exception, and it says the one thing the card does not, how far
+ * the binding line is. It names no state word of its own ("on hold" is the
+ * card's line) and it repeats no distance the picker draws: it is the sentence
+ * a reader would otherwise assemble from two places.
+ *
+ * Which area: the one closest to its binding line. On hold, that is the nearest
+ * restart line, because lifting a hold is the action; close, the nearest pause
+ * line. Ties go to the page's own order.
+ */
+export type LineStateBandModel = {
+  state: Exclude<LineState, "clear">;
+  area: DecisionArea;
+  text: string;
+  href: string;
+  action: string;
+};
+
+export const describeLineStateBand = (
+  rows: readonly Pick<HomeAreaRow, "area" | "pause" | "resume">[],
+): LineStateBandModel | null => {
+  const ruled = rows.filter((row) => row.pause);
+  if (ruled.length === 0) return null;
+
+  const band = (state: LineStateBandModel["state"], row: Pick<HomeAreaRow, "area" | "pause" | "resume">, text: string) => ({
+    state,
+    area: row.area,
+    text,
+    href: `#${HOME_SECTIONS.areas.id}`,
+    action: "What to do",
+  });
+
+  /* Held: the area whose restart line is nearest, since that is the hold that
+     lifts first. An area with no numeric restart line still belongs here — it
+     is on hold — it just cannot say how far from lifting it is. */
+  const held = ruled.filter((row) => row.pause?.met);
+  if (held.length > 0) {
+    const nearestRestart = (row: Pick<HomeAreaRow, "resume">) =>
+      row.resume && !row.resume.met && Number.isFinite(row.resume.points) ? row.resume.points : Number.POSITIVE_INFINITY;
+    const binding = held.reduce((best, row) => (nearestRestart(row) < nearestRestart(best) ? row : best));
+    const restart = binding.resume;
+    return band(
+      "crossed",
+      binding,
+      restart && !restart.met && Number.isFinite(restart.points)
+        ? `${decisionAreaLabel(binding.area)} — ${restart.distance} from its restart line.`
+        : `${decisionAreaLabel(binding.area)} is on hold.`,
+    );
+  }
+
+  /* Close: the shared cutoff, through the same resolver the badges use, so the
+     band cannot call a reading close that the picker calls clear. */
+  const close = ruled.filter((row) => resolveLineState(row.pause?.points, "pause", row.pause?.met) === "near");
+  if (close.length === 0) return null;
+  const binding = close.reduce((best, row) => ((row.pause?.points ?? 0) < (best.pause?.points ?? 0) ? row : best));
+  return band(
+    "near",
+    binding,
+    `${decisionAreaLabel(binding.area)} — ${binding.pause?.distance} from its pause line.`,
+  );
 };
 
 /**
  * The card's bridge from the weather word to the five areas (2026-10-14).
  *
  * The condition comes from the change lines and the area answers from the
- * pause and resume lines, so a card could say "Cloudy: money is available"
+ * pause and restart lines, so a card could say "Cloudy: money is available"
  * over a picker where four areas were held, and nothing tied the two. This
  * names the held areas on the card without repeating its condition stamp:
  * "On hold: Hiring, Fundraising, Spending and New bets."
@@ -314,24 +391,20 @@ export const describeConditionsTrail = (recordDates: readonly string[]): string 
   return `The trail shows each month, ${range}, then this week.`;
 };
 
-const nearest = (distances: RuleThresholdDistance[]) =>
-  [...distances].sort((left, right) => left.pointsToLine - right.pointsToLine)[0];
-
 /*
  * The one line a row prints for each side, chosen by what explains the state.
  * A pause holds on any of its lines, so the line to show is one already crossed,
- * else the nearest. A resume needs all of its lines, so the line to show is the
- * furthest still unmet — the one actually holding it back — else any.
+ * else the nearest — `selectPauseCondition`, shared with the ladder under these
+ * cards so the two cannot describe one area differently. A resume needs all of
+ * its lines, so the line to show is the furthest still unmet — the one actually
+ * holding it back — else any.
  *
  * Both used to take the nearest. On the week of Sep 29, 2026 that printed
  * fundraising's pause as "Risk appetite < 44 · at the line" beside "Pause now
  * applies: funding pressure rose through 76", and hiring's resume as "Risk
  * appetite > 54 · 10 pts away" while funding pressure, 24 points from its own
- * resume line, was what kept hiring paused.
+ * restart line, was what kept hiring paused.
  */
-const pauseLineToShow = (distances: RuleThresholdDistance[]) =>
-  distances.find((distance) => distance.satisfied) ?? nearest(distances);
-
 const resumeLineToShow = (distances: RuleThresholdDistance[]) => {
   const unmet = distances.filter((distance) => !distance.satisfied);
   return unmet.length > 0
@@ -378,7 +451,7 @@ export const buildHomeAreaRows = ({
         area,
         rule: item.areaActionNow,
         pause: lineSlot(
-          item.pauseConditions?.length ? pauseLineToShow(distancesFor(item.pauseConditions, scores)) : item.nearestPause,
+          item.pauseConditions?.length ? selectPauseCondition(item.pauseConditions, scores) : item.nearestPause,
           "pause",
         ),
         resume: lineSlot(
@@ -395,7 +468,7 @@ export const buildHomeAreaRows = ({
   return decisionRules.map((rule) => ({
     area: rule.area,
     rule: rule.doNow[0] ?? rule.recommendation,
-    pause: lineSlot(pauseLineToShow(distancesFor(rule.pause.conditions, scores)), "pause"),
+    pause: lineSlot(selectPauseCondition(rule.pause.conditions, scores), "pause"),
     resume: lineSlot(resumeLineToShow(distancesFor(rule.resume.conditions, scores)), "resume"),
     ...changedFor(rule.area),
     pauseQualifier: rule.pause.qualifier,

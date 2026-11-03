@@ -398,7 +398,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
                  corridor. */
               <div className="overflow-x-auto">
                 <table className="weather-stack-table w-full border-collapse text-left text-sm text-slate-300">
-                  <caption className="sr-only">Action, pause line and resume line for each area</caption>
+                  <caption className="sr-only">Action, pause line and restart line for each area</caption>
                   <thead>
                     <tr className="border-b border-slate-800/80 text-fluid-nano text-slate-400">
                       <th scope="col" className="py-1.5 pr-3 font-medium">Area</th>
@@ -479,7 +479,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
         <footer className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Provenance</h2>
           <p className="text-sm text-slate-300">
-            Record date {brief.recordDateLabel} · {display.source} · captured {brief.freshnessLabel}
+            Data as of {brief.recordDateLabel} · {display.source} · captured {brief.freshnessLabel}
           </p>
           {brief.sourceUrl ? (
             <p className="text-sm">

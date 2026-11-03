@@ -48,11 +48,16 @@ describe("buildRegimeFlipState", () => {
     });
 
     assert.equal(state.pendingCandidate, null);
-    // The nearest boundary is risk appetite, and crossing it from a willing-risk
-    // call names the regime that crossing actually produces — Stormy, the
-    // loose-unwilling quadrant — not the call's primary shift target.
-    assert.match(state.text, /Risk appetite falls from 62 to 50 or below\. Conditions then turn Stormy\./);
-    assert.equal(state.watch.dimension, "riskAppetite");
+    // The watched boundary is picked on the tightness-equivalent scale, not a
+    // raw point gap: tightness sits 14 points from its line while risk appetite
+    // sits 12 points from its own, but the risk axis moves 4.5 points per
+    // underlying slope point, so in the move the driver would have to make the
+    // tightness line is by far the nearer one (a 0.08pp rate move against a
+    // 0.30pp curve move). Crossing it from a willing-risk call names the
+    // regime that crossing actually produces — Cloudy, the tight-willing
+    // quadrant.
+    assert.match(state.text, /Funding pressure rises from 56 to above 70\. Conditions then turn Cloudy\./);
+    assert.equal(state.watch.dimension, "tightness");
   });
 
   it("keeps the future-conditional line when readings disagree with the call but no transition data exists", () => {

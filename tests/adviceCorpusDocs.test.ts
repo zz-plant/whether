@@ -15,12 +15,14 @@ describe("the advice corpus documents served on the site", () => {
   it("match docs/research/ exactly", () => {
     assert.equal(ADVICE_CORPUS_DOCS.registration, readFileSync("docs/research/advice-corpus-preregistration.md", "utf8"), FIX);
     assert.equal(ADVICE_CORPUS_DOCS.results, readFileSync("docs/research/advice-corpus-results.md", "utf8"), FIX);
+    assert.equal(ADVICE_CORPUS_DOCS.note, readFileSync("docs/research/2026-10-31-advice-corpus-null-result.md", "utf8"), FIX);
   });
 
   it("are served as readable text at the paths /concepts links", async () => {
     const routes = [
       { route: await import("../app/research/advice-corpus-preregistration.md/route"), text: ADVICE_CORPUS_DOCS.registration },
       { route: await import("../app/research/advice-corpus-results.md/route"), text: ADVICE_CORPUS_DOCS.results },
+      { route: await import("../app/research/advice-corpus-null-result.md/route"), text: ADVICE_CORPUS_DOCS.note },
     ];
     for (const { route, text } of routes) {
       const response = await route.GET();

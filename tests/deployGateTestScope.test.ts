@@ -7,6 +7,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { presetTasks, resolveCheckPlan } from "../scripts/check-tasks.mjs";
 import { isDeployGate, withDeployGate } from "../scripts/deploy-gate.mjs";
+import { parseShardSummary } from "../scripts/run-tests.mjs";
 
 const stageNames = (args: string[], env: Record<string, string | undefined> = {}) =>
   resolveCheckPlan(args, env).stages.map((stage) => stage.map((task) => task.name));
@@ -80,6 +81,13 @@ describe("deploy gate test scope", () => {
     );
   });
 
+  it("adds the shards' summaries into one suite total", () => {
+    /* A shard's tail: bun prints the counts, then its own `Ran` line. Whichever shard
+       finished last used to be the only total a reader saw, and it was one shard's. */
+    const counts = parseShardSummary(" 1120 pass\n 0 fail\n 2 skip\nRan 1122 tests across 210 files. [12.0s]\n");
+    assert.deepEqual(counts, { pass: 1120, fail: 0, skip: 2, tests: 1122, files: 210 });
+  });
+
   /*
    * Workers Builds is configured to run `bun run check:vinext` on every push, main
    * included, before anything is built or deployed. The configured command *is* the
@@ -120,6 +128,36 @@ describe("deploy gate test scope", () => {
       ["lint", "lint:types", "typecheck", "test", "assets", "suppressions", "dead-exports", "hotspot-preflight", "landmarks"],
     ]);
     assert.equal(resolveCheckPlan(["--preset", "pre-push"], {}).deployGate, false);
+  });
+
+  /*
+   * The Actions check job used to spell its task list inline, the same drift the preset
+   * file exists to end: when the preset list moved, the workflow kept auditing whatever
+   * its copy said. It now names the `ci` preset like the hook names `pre-push`, and the
+   * bun setup/cache/install steps come from one composite action rather than four copies.
+   */
+  it("runs the ci preset from the Actions check job, and every workflow sets bun up once", async () => {
+    const workflow = await readFile(".github/workflows/ci.yml", "utf8");
+    const invocations = workflow
+      .split("\n")
+      .filter((line) => line.includes("run-checks.mjs") && line.trim().startsWith("- run:"))
+      .map((line) => line.trim());
+    assert.deepEqual(invocations, ["- run: bun scripts/run-checks.mjs --preset ci"]);
+
+    assert.deepEqual(stageNames(["--preset", "ci"]), [["lint", "typecheck", "test", "assets", "audit", "landmarks"]]);
+    assert.equal(resolveCheckPlan(["--preset", "ci"], {}).deployGate, false);
+
+    const workflows = ["ci.yml", "monthly-summary-refresh.yml", "review-hotspot-preflight.yml", "weekly-brief-freeze.yml"];
+    for (const name of workflows) {
+      const file = await readFile(`.github/workflows/${name}`, "utf8");
+      assert.ok(
+        file.includes("uses: ./.github/actions/setup-bun"),
+        `${name} sets bun up through the composite action`,
+      );
+      assert.doesNotMatch(file, /oven-sh\/setup-bun@/, `${name} no longer carries its own bun setup copy`);
+    }
+    const composite = await readFile(".github/actions/setup-bun/action.yml", "utf8");
+    assert.match(composite, /bun-version: 1\.3\.14/, "the pinned bun version is defined once, in the action");
   });
 
   it("keeps `bun run check` as every task, in one stage", async () => {

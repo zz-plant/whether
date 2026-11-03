@@ -51,8 +51,9 @@ describe("requestSubscription", () => {
 
     assert.equal(result.ok, true);
     // The address is unverified until the emailed link is clicked, so the surface may not
-    // claim the subscription is live.
-    assert.match(result.message, /verify/i);
+    // claim the subscription is live. It says what to do, and that nothing is sent yet.
+    assert.match(result.message, /click the link/i);
+    assert.doesNotMatch(result.message, /subscribed/i);
   });
 
   it("surfaces the server's rejection instead of reporting success", async () => {
@@ -74,7 +75,7 @@ describe("requestSubscription", () => {
     );
 
     assert.equal(result.ok, false);
-    assert.match(result.message, /network/i);
+    assert.match(result.message, /offline|connection dropped/i);
   });
 
   it("rejects an unusable address without calling the endpoint", async () => {

@@ -1,0 +1,39 @@
+{
+  "answers": [
+    {
+      "slug": "should-startups-raise-prices-now",
+      "changedAt": "2026-11-02",
+      "summary": "Initial page: pricing posture, watchouts, page-specific questions."
+    },
+    {
+      "slug": "should-startups-do-layoffs-now",
+      "changedAt": "2026-11-02",
+      "summary": "Initial page: headcount reduction, watchouts, page-specific questions."
+    },
+    {
+      "slug": "should-startups-invest-in-retention-or-acquisition",
+      "changedAt": "2026-11-02",
+      "summary": "Initial page: retention vs acquisition, watchouts, page-specific questions."
+    },
+    {
+      "slug": "should-startups-raise-a-bridge-round-now",
+      "changedAt": "2026-11-02",
+      "summary": "Initial page: bridge rounds, watchouts, page-specific questions."
+    },
+    {
+      "slug": "should-startups-change-compensation-now",
+      "changedAt": "2026-11-02",
+      "summary": "Initial page: compensation, watchouts, page-specific questions."
+    },
+    {
+      "slug": "should-startups-expand-internationally-now",
+      "changedAt": "2026-11-02",
+      "summary": "Initial page: international expansion, watchouts, page-specific questions."
+    },
+    {
+      "slug": "should-startups-consolidate-vendors-now",
+      "changedAt": "2026-11-02",
+      "summary": "Initial page: vendor consolidation, watchouts, page-specific questions."
+    }
+  ]
+}

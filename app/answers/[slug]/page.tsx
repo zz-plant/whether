@@ -17,7 +17,10 @@ type DecisionPageProps = {
 };
 
 export const dynamicParams = true;
-export const revalidate = 900;
+/* The reading refreshes daily and the call weekly; `revalidateTag("report-data")`
+   invalidates on ingest, so this timer is only a fallback. Fifteen minutes was
+   96 renders a day for data that changes once. */
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return highValueAnswerStaticParams;
@@ -128,6 +131,7 @@ export async function generateMetadata({ params }: DecisionPageProps): Promise<M
     isFallbackSnapshot: degraded,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     fetchedAtIso: reportData.treasury.fetched_at,
+    recordDateIso: reportData.treasury.record_date,
     pageKey: `/answers/${page.slug}`,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });

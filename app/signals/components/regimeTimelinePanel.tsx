@@ -138,7 +138,7 @@ export const RegimeTimelinePanel = ({
                     href={href}
                     aria-current={isCurrent ? "date" : undefined}
                     aria-label={`${monthLabel}: ${REGIME_LABELS[entry.regime]}`}
-                    className="relative h-full min-h-[44px] flex-1 focus-visible:z-40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
+                    className="relative h-full min-h-[44px] flex-1 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-300/90 focus-visible:ring-offset-1 focus-visible:ring-offset-slate-950"
                     style={{ touchAction: "manipulation" }}
                   >
                     {/* The chosen month's rule is the link's own state, so it is drawn

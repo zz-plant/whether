@@ -142,7 +142,7 @@ describe("buildTrustStatus trust tones", () => {
     });
 
     assert.match(freshness.line, /degraded/);
-    assert.match(trust, /Cached snapshot/);
+    assert.match(trust, /Saved copy/);
     assert.match(trust, /Unavailable/);
   });
 

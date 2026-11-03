@@ -241,7 +241,7 @@ take the other's job.
   | Filled dot | lit: chosen, or as it should be | segment lamps, live sources, a series' current point |
   | Hollow ring | a past reading singled out | the ladder's last reading, the months a call changed and where a trace starts on `/history` |
   | Dashed ring (`CircleDashed`) | a score close to its line | the line-state "close" glyph (§XXIV) |
-  | Pause and play | a pause line crossed; clear of it, or a resume line met | the line states (§XXIV) |
+  | Pause and play | a pause line crossed; clear of it, or a restart line met | the line states (§XXIV) |
   | Outlined diamond (`.weather-caveat-mark`) | read this reading with care | cached sources, a scoring note, an archived week, guidance held back |
 
   The diamond is the one mark that is not round: it is a warning sign's shape, not a data marker,
@@ -632,8 +632,8 @@ The components live in `app/components/ui/conceptIcons.tsx`.
   it. The shape alone still says it in greyscale, which is what the `/history` band needed: its
   runs and key told Sunny, Cloudy and Freezing apart by colour alone.
 - "Close" is the margin's own distance: within 5 points (`REGIME_CONFIDENCE_NEAR_THRESHOLD`). A
-  resume line has a state only once it is met; short of it the distance stays plain text.
-- A line in force is a stamp (§XIV): the badge is framed for a pause line crossed and a resume line
+  restart line has a state only once it is met; short of it the distance stays plain text.
+- A line in force is a stamp (§XIV): the badge is framed for a pause line crossed and a restart line
   met, unframed for a distance still to go.
 - NEVER: a glyph in a plain-text artifact. Slack and email pastes, citations, RSS, `llms.txt` and
   `/brief.md` render words only; the same test holds them to it. The Satori share cards do not
@@ -852,7 +852,7 @@ four report pages on a phone (15px under 20px sections), page titles at five siz
   rather than scaling its labels down (`adviceCorpusSection.tsx` draws a 360-unit drawing below
   `sm`); a fixed-size diagram sets its labels so they render at 10px or more.
 - MUST: set the lines a reader acts on at `text-fluid-sm`, not caption size: the brief's "Conditions
-  change if", "Pause if", "Resume when" and the chosen area's answer.
+  change if", "Pause if", "Restart when" and the chosen area's answer.
 - MUST: keep the trust strip's phone line to one short phrase per cell. The basis warning prints
   its four-word form there (`ScoringBasis.warningShort`, "startup-market inputs left out"); the full
   sentence from `sm`, and always when a note explains a different published week.

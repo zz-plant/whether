@@ -188,7 +188,7 @@ export function ShareImageArtifacts() {
   const artifacts = buildShareImageArtifacts(stage ?? DEFAULT_OPERATOR_STAGE, source, layout, theme);
   return (
     <section id="image-artifacts" className="weather-panel weather-section-stack p-0" aria-labelledby="share-files-heading">
-      <h2 id="share-files-heading" className="text-[1.375rem] leading-tight font-semibold text-white sm:text-2xl">Files and images for a deck or a thread</h2>
+      <h2 id="share-files-heading" className="type-section">Files and images for a deck or a thread</h2>
       {/* The slide and the card straight onto the clipboard. These two buttons
           sat in the brief's "Do and share" until 2026-10-08, one of five places
           the site offered the same week; the brief links here instead. Both read

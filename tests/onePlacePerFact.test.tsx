@@ -59,7 +59,7 @@ describe("/ draws the two scores once at each width", () => {
   );
 
   it("on the card's map from md up, and on the section's map below md", () => {
-    assert.match(hero, /<div class="max-md:hidden"><figure[\s\S]*?Funding pressure 90 · Risk appetite 49/);
+    assert.match(hero, /<div class="weather-hero-aside max-md:hidden"><figure[\s\S]*?Funding pressure 90 · Risk appetite 49/);
     assert.match(watch, /<figure class="[^"]*\bmd:hidden\b[^"]*"[\s\S]*?Funding pressure 90 · Risk appetite 49/);
     assert.match(route, /<WhatWouldChangeSection[\s\S]*?conditionsTrail=\{conditionsTrail\}/, "the route hands the section the trail, which moves its map below md");
   });
@@ -137,8 +137,7 @@ describe("/ states the stage and runway in the controls alone", () => {
     assert.doesNotMatch(text(html), /Lines set for|the defaults/);
     assert.match(text(html), /First repeatable revenue \(default\)/);
     assert.match(text(html), /Follow the guidance \(default\)/);
-    assert.match(html, /<section[^>]*class="[^"]*max-sm:hidden/, "on a phone the header pills are the controls, and an empty section does not print");
-    /* Unless a link targets it: the shared-arrival greeting's "Scale it to your stage and runway". */
+    assert.doesNotMatch(html, /max-sm:hidden/, "since #1698 the header pills are gone, so the inline calibration renders at every width");
     assert.match(html, /<section[^>]*class="[^"]*\btarget:block\b/, "a link to the section shows it on a phone");
     assert.match(html, /<details class="[^"]*\bgroup-target\/calibration:block\b/, "and its controls with it");
   });

@@ -27,7 +27,11 @@ type TermDefinition = {
 // the glossary glosses the noun as "Guardrail (pause trigger)" — the synonym
 // was always the second name for the imperative, never the other way round.
 //
-// "Change course if" then became "Resume when" (2026-09-22). The glossary had
+// "Change course if" then became "Restart when" (2026-10-30; "Restart when"
+// until then, because "Restart line: Resume hiring when…" read as a CV line in
+// the Hiring row, and the label is scanned alone in a table).
+//
+// "Change course if" then became "Restart when" (2026-09-22). The glossary had
 // to spend three adjacent entries telling it apart from "Call changes if",
 // because both read as "the call changes" — and the line it names does
 // something narrower: it re-opens the decisions the pause line held. A name
@@ -53,7 +57,7 @@ export const OPERATING_LATITUDE_LABEL = "Operating latitude";
  * only inside the hero's collapsed "Why this call" panel and on /glossary, so
  * the largest figure on the homepage arrived with no scale above the fold.
  */
-export const OPERATING_LATITUDE_GLOSS = "room to hire, spend and commit; higher means more room";
+export const OPERATING_LATITUDE_GLOSS = "room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room";
 
 export const DECISION_CONTRACT_LABELS = {
   /* Noun slots for exports. "Threshold" and "Reversal" were retired on
@@ -61,7 +65,7 @@ export const DECISION_CONTRACT_LABELS = {
   slot: {
     action: "Action",
     threshold: "Pause line",
-    reversal: "Resume line",
+    reversal: "Restart line",
   },
   action: {
     doNow: "Do now",
@@ -72,12 +76,12 @@ export const DECISION_CONTRACT_LABELS = {
   },
   reversal: {
     /**
-     * Where a hold lifts: an area's resume line, and — when a stage is set —
+     * Where a hold lifts: an area's restart line, and — when a stage is set —
      * that stage's discipline for lifting its hold (`WeeklyCallContract.resumeWhen`).
      * Never where the call itself changes; that is `watch.postureFlips`, and the
      * two print side by side, never one in place of the other.
      */
-    resumeWhen: "Resume when",
+    resumeWhen: "Restart when",
   },
   watch: {
     flipWatch: "What would change this guidance",
@@ -244,13 +248,13 @@ export const TERM_DEFINITIONS: readonly TermDefinition[] = [
     value: "tightness",
     term: "Funding pressure",
     summary:
-      "A 0-100 score for how hard it is for U.S. companies to raise or borrow money. Higher means harder: conserve cash and extend runway.",
+      "A 0-100 score for how hard it is to raise or borrow money in dollars. Higher means harder: conserve cash and extend runway.",
   },
   {
     value: "risk-appetite",
     term: "Risk appetite",
     summary:
-      "A 0-100 score for how willing U.S. investors and buyers are to fund new products, hires and growth bets. Higher means more willing.",
+      "A 0-100 score for how willing investors are to fund new products, hires and growth bets priced in dollars. Higher means more willing.",
   },
   {
     value: "boldness-score",

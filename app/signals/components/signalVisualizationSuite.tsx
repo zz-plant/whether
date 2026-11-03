@@ -431,7 +431,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
                   y={Math.max(8, toChartY(monthlyScatter[monthlyScatter.length - 1].y, scatterYMin, scatterYMax, 72) - 4)}
                   textAnchor="end"
                   fontSize="5"
-                  fontFamily="Inter, system-ui, sans-serif"
+                  fontFamily="Archivo, system-ui, sans-serif"
                   fill="var(--app-text-secondary)"
                   className="uppercase tracking-[0.04em]"
                 >
@@ -448,7 +448,7 @@ export const SignalVisualizationSuite = ({ treasury, yieldCurveSeries }: SignalV
           </FlatPanel>
 
           <FlatPanel source={panelSource} className="lg:col-span-8">
-            <PanelTitle title="Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion." />
+            <PanelTitle title="Inversion timeline" subtitle="How far each spread sits above or below zero. Below zero is an inversion: short-term borrowing costs exceed long-term yields." />
             <svg viewBox="-2 -2 104 40" className="weather-data-plot h-auto w-full" aria-label="Inversion timeline: ten-year minus two-year spread and two-year minus three-month spread; dashed line marks zero">
               {[...spread10Y2YSeries.missingColumns, ...spread2Y3MSeries.missingColumns].map((column, index) => (
                 <rect key={`spread-gap-${index}`} x={column.x} y="0" width={column.width} height="36" fill="var(--border-subtle)" />

@@ -135,7 +135,7 @@ export function createVisualAssets(): VisualAsset[] {
       add(`area-${area}-tile`, "areas", `${name} area tile`, `${name} reusable operating area tile, in neutral ink. This reference names the area without prescribing a current action.`, 560, 260,
         box(1, 1, 558, 258, p) + text(32, 44, "Operating area", 18, p.muted)
         + icon(<AreaIcon area={area} />, 32, 83, 56, p.ink) + text(112, 127, name, 44, p.ink, 700)
-        + text(32, 210, "Action · pause line · resume line", 24, p.secondary), false, true);
+        + text(32, 210, "Action · pause line · restart line", 24, p.secondary), false, true);
     }
     for (const state of ["crossed", "near", "clear"] as const) {
       const ink = state === "clear" ? p.ink : p.line;
@@ -210,7 +210,7 @@ export function createVisualAssets(): VisualAsset[] {
       header("Keep trouble on the same side", 1200, p) + rail(380, "Funding pressure · higher is tighter", 72, 70, 60)
       + rail(700, "Risk appetite · lower is tighter · scale reversed", 50, 35, 45, true)
       + text(80, 850, "Illustrative rules · pressure rises; appetite falls.", 26, p.secondary)
-      + footer(1200, 1000, p, "Both scales show 0–100; each keeps its own pause and resume lines."), true, true);
+      + footer(1200, 1000, p, "Both scales show 0–100; each keeps its own pause and restart lines."), true, true);
 
     const timelineStates: RegimeKey[] = ["SCARCITY", "DEFENSIVE", "DEFENSIVE", "VOLATILE", "EXPANSION", "EXPANSION"];
     let timeline = header("A condition timeline", 1400, p, "Illustrative example · a fictional sequence of six weeks");
@@ -249,7 +249,7 @@ export function createVisualAssets(): VisualAsset[] {
       if (i < stages.length - 1) path += arrow(x + 279, 373, x + 294, 373, p.muted);
     });
     path += text(64, 561, "Revisit when an agreed line is crossed or the evidence changes.", 30, p.ink, 600);
-    add("decision-path", "diagrams", "Signals to decision path", "Process template: read dated signals, name the conditions using the weekly call, choose an action calibrated to company constraints, set pause and resume lines, and share the cited artifact. It contains no current recommendation.", 1600, 720, path + footer(1600, 720, p, "Signals → posture → decision → artifact"), true, true);
+    add("decision-path", "diagrams", "Signals to decision path", "Process template: read dated signals, name the conditions using the weekly call, choose an action calibrated to company constraints, set pause and restart lines, and share the cited artifact. It contains no current recommendation.", 1600, 720, path + footer(1600, 720, p, "Signals → posture → decision → artifact"), true, true);
 
     let branches = header("Agree the pause and the way back", 1200, p);
     branches += box(350, 245, 500, 128, p) + text(600, 319, "Check the agreed lines", 34, p.ink, 600, "middle")
@@ -259,7 +259,7 @@ export function createVisualAssets(): VisualAsset[] {
       + text(151, 528, "Pause at the agreed line", 30, p.line, 600)
       + wrapped(92, 595, "[Write the action to hold and the condition that trips it.]", 25, p.secondary, 32)
       + box(656, 465, 480, 230, p) + icon(<LineStateIcon state="clear" />, 684, 497, 40, p.ink)
-      + text(743, 528, "Resume when its line holds", 29, p.ink, 600)
+      + text(743, 528, "Restart when its line holds", 29, p.ink, 600)
       + wrapped(684, 595, "[Write what must be true before the action resumes.]", 25, p.secondary, 32);
     add("pause-resume-path", "diagrams", "Pause and resume decision path", "Blank bounded decision template with separate branches for the agreed pause condition and the resume condition. Pause uses the canonical pause glyph and line ink; resume uses the canonical play glyph and neutral ink. Placeholders contain no current guidance.", 1200, 850, branches + footer(1200, 850, p, "A pause and a resume can have different conditions."), true, true);
 
@@ -269,9 +269,9 @@ export function createVisualAssets(): VisualAsset[] {
       const y = 330 + i * 122;
       matrix += line(80, y - 41, 1420, y - 41, p.rule) + icon(<AreaIcon area={area} />, 80, y - 26, 32, p.ink)
         + text(130, y, decisionAreaLabel(area), 28, p.ink, 600)
-        + text(410, y, "[Write the action]", 25, p.secondary) + text(770, y, "[Agreed pause line]", 25, p.secondary) + text(1130, y, "[Agreed resume line]", 25, p.secondary);
+        + text(410, y, "[Write the action]", 25, p.secondary) + text(770, y, "[Agreed pause line]", 25, p.secondary) + text(1130, y, "[Agreed restart line]", 25, p.secondary);
     });
-    add("operating-rules", "frames", "Five area operating rules", "Blank operating rule template covering the five canonical areas: Hiring, Roadmap, Fundraising, Spending and New bets. Each row has placeholders for action, pause line and resume line. No advice or current reading is prefilled.", 1500, 1040, matrix + footer(1500, 1040, p), true, true);
+    add("operating-rules", "frames", "Five area operating rules", "Blank operating rule template covering the five canonical areas: Hiring, Roadmap, Fundraising, Spending and New bets. Each row has placeholders for action, pause line and restart line. No advice or current reading is prefilled.", 1500, 1040, matrix + footer(1500, 1040, p), true, true);
 
     let delta = header("What changed in the decision", 1200, p);
     delta += text(80, 269, "Previous action", 25, p.muted) + text(650, 269, "This week’s action", 25, p.muted)

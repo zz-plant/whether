@@ -11,6 +11,14 @@ type Props = {
   /** Labeled decision bullets ("Do now: …", "Pause if: …") appended below the operating call. */
   lines?: string[];
   url?: string;
+  /**
+   * The exact block to copy, when the caller already holds the whole artifact
+   * (`formatBriefArtifact(artifact, "slack", origin)`). The header share panel
+   * copies that string; a caller that passes this one copies the same words,
+   * the same dated title and the same link, instead of a second shape of the
+   * brief assembled here (2026-11-02).
+   */
+  slackBlock?: string;
   className?: string;
   /** Icon-only when false; the name still reaches assistive tech through `aria-label`. */
   showLabel?: boolean;
@@ -26,6 +34,7 @@ export function ShareBriefButton({
   text,
   lines,
   url = typeof window !== "undefined" ? window.location.href : "",
+  slackBlock,
   className = "",
   showLabel = false,
   label = "Copy Brief",
@@ -41,7 +50,10 @@ export function ShareBriefButton({
   const { status, copyToClipboard } = useClipboardCopy({ commitment: "copied_slack" });
   const didFail = status === "error";
   const bulletBlock = lines && lines.length > 0 ? `\n\n${lines.map((line) => `• ${line}`).join("\n")}` : "";
-  const payload = { title, text: `${text}${bulletBlock}`, url };
+  /* The caller's whole-artifact block wins when it has one, so this control and
+     the share panel write the same words and link the same record. */
+  const shareText = slackBlock ?? `${text}${bulletBlock}`;
+  const payload = { title, text: shareText, url };
   /*
    * The share sheet on a touch screen only, and named for what it does (2026-10-27).
    * The button said "Copy Brief" and opened the share sheet wherever the browser had
@@ -61,7 +73,8 @@ export function ShareBriefButton({
     // `title` names the artifact, so the pasted block has to use it. Hardcoding the
     // weekly heading here meant a monthly or quarterly call arrived in Slack labelled
     // "Whether Weekly Brief" — the wrong horizon on a message people act on.
-    const formattedSlackBrief = `*${title}*\n> *Guidance:* ${payload.text}\n\n*Full brief:* ${url || "https://whether.work"}`;
+    const formattedSlackBrief =
+      slackBlock ?? `*${title}*\n> *Guidance:* ${payload.text}\n\n*Full brief:* ${url || "https://whether.work"}`;
     if (offersShare) {
       /* Closing the sheet is a choice, not a failure. Any other refusal (no user
          gesture left, a share target that errored) falls back to the copy, which

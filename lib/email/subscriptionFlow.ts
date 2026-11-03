@@ -3,54 +3,9 @@ import { confirmationMailCapped, getSubscriberStore, withPendingApplied, type Su
 import { checkRateLimit, clientKeyFor, RateLimitedError } from "../runtime/rateLimit";
 import { describePlanLines, type PlanLines, type PlanRunway } from "../alert/planLines";
 import { runwayBandPhrase, type RunwayBand } from "../report/operatorRunway";
-import { siteUrl } from "../siteUrl";
+import type { OperatorStage } from "../report/operatorStage";
 import { escapeHtml } from "./emailShell";
-
-const normalizeBaseUrl = (value: string | null | undefined) => {
-  if (!value) return null;
-  try {
-    return new URL(value).toString().replace(/\/$/, "");
-  } catch {
-    return null;
-  }
-};
-
-/* Hosts a confirmation link may point at: the site, this worker on workers.dev
-   (production, or a preview version's "<id>-whether.<account>.workers.dev"),
-   and a developer's machine. A preview keeps its own host because its
-   subscribers live in its own KV, where a whether.work link could not find them. */
-const siteHost = new URL(siteUrl).hostname;
-const isTrustedLinkHost = (hostname: string) =>
-  hostname === siteHost
-  || hostname === `www.${siteHost}`
-  || /^(?:[a-z0-9-]+-)?whether\.[a-z0-9-]+\.workers\.dev$/.test(hostname)
-  || hostname === "localhost"
-  || hostname === "127.0.0.1"
-  || hostname === "[::1]";
-
-/**
- * Where a confirmation link points. Configured explicitly, that; otherwise the
- * host the request came in on, but only one of ours. Until 2026-10-02 any
- * request host was taken as given, so a request that reached the worker under a
- * forged Host header would mail a reader a confirm link to someone else's site,
- * and a link-scanning mail filter would hand that site the token.
- */
-const resolvePublicAppBaseUrl = (request?: Request) => {
-  const configured = normalizeBaseUrl(process.env.APP_BASE_URL ?? process.env.NEXT_PUBLIC_APP_URL);
-  if (configured) return configured;
-
-  if (request) {
-    const url = new URL(request.url);
-    if (isTrustedLinkHost(url.hostname)) return url.origin;
-  }
-
-  return siteUrl;
-};
-
-const buildEmailActionUrl = (path: string, request?: Request) => {
-  const baseUrl = resolvePublicAppBaseUrl(request);
-  return new URL(path, baseUrl).toString();
-};
+import { buildEmailActionUrl } from "./publicBaseUrl";
 
 const joinClauses = (clauses: readonly string[]) =>
   clauses.length <= 1 ? (clauses[0] ?? "") : `${clauses.slice(0, -1).join(", ")} and ${clauses[clauses.length - 1]}`;
@@ -168,6 +123,7 @@ export const subscribeAndSendVerification = async ({
   weekly,
   planLines,
   runwayBand,
+  stage,
   request,
   adapter = createCloudflareEmailAdapter(),
 }: {
@@ -180,6 +136,8 @@ export const subscribeAndSendVerification = async ({
   planLines?: PlanLines[];
   /** The reader's runway band, held beside `planLines` and confirmed with them. */
   runwayBand?: RunwayBand;
+  /** The company stage the reader had set on the site; scales their Monday brief. */
+  stage?: OperatorStage;
   request?: Request;
   adapter?: EmailDeliveryAdapter;
 }) => {
@@ -202,7 +160,7 @@ export const subscribeAndSendVerification = async ({
     return { subscriber: existing, verifyUrl: null };
   }
 
-  const subscriber = await store.subscribe(email, { alerts, weekly, planLines, runwayBand });
+  const subscriber = await store.subscribe(email, { alerts, weekly, planLines, runwayBand, stage });
   /* The request's own link, never the permanent token: that one is in the footer
      of every email this address has been sent. The caller's response is the same
      whichever email goes out, so it says nothing about whether the address is

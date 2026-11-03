@@ -25,7 +25,7 @@ export function GlobalHeaderScrollWrapper({ children }: GlobalHeaderScrollWrappe
      reduced-motion end state: the header shows and hides instantly. */
   return (
     <header
-      className={`mx-auto sticky top-0 z-50 w-full max-w-[96rem] px-4 transition motion-reduce:transition-none duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
+      className={`mx-auto sticky top-0 z-[var(--z-chrome)] w-full max-w-[96rem] px-4 transition motion-reduce:transition-none duration-300 ease-[cubic-bezier(0.22,1,0.36,1)] ${
         hidden ? "-translate-y-full" : "translate-y-0"
       } ${atTop ? "" : "shadow-[0_4px_12px_-8px_rgba(0,0,0,0.4)]"}`}
     >

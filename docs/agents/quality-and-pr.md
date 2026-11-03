@@ -10,11 +10,12 @@ Run the smallest meaningful verification set for the scope and risk of your chan
 | Broad/refactor/high-risk logic change | `bun run check` + targeted regression coverage |
 
 Additional requirements:
-- Nothing on GitHub blocks a merge: `ci.yml` is manual-only. Cloudflare Workers Builds runs the deploy gate (`bun run check:vinext`) and the build on every push, so a failing test or broken build blocks the deploy, not the merge. Run `bun run check` before merging.
+- Nothing on GitHub blocks a merge: `ci.yml` is manual-only (Actions billing), and when it runs it executes the `ci` preset of `scripts/check-tasks.mjs` — the same single source the local gates name theirs from, with bun setup shared through `.github/actions/setup-bun`. Cloudflare Workers Builds runs the deploy gate (`bun run check:vinext`) and the build on every push, so a failing test or broken build blocks the deploy, not the merge. Run `bun run check` before merging.
 - Add/update tests when changing scoring, classification, or decision behavior.
 - Validate deterministic fallback behavior for data-path changes.
 - Capture command outcomes in your PR summary.
 - `bun run review:hotspot-preflight` now runs inside `bun run check` and should be run early while developing logic changes. On pre-push it is scoped to the commits the push sends, so the range it reviews there is exactly what lands on the remote.
+- Email flows have a lifecycle harness: `bun run e2e:email` drives subscribe → confirm → alert → weekly brief → unsubscribe against a running worker and reads the mail it actually sent. Start the worker with `bun run serve:worker -- --var WHETHER_CRON_SECRET:e2e-secret`; run it from a clean `.wrangler/state` (the local capture store is a dev aid with a row budget). It needs no real address and sends nothing outside the machine. `serve:worker` serves the **built** app routes, so run `bun run build` after changing anything under `app/` before trusting a run.
 
 ## Commit quality
 - Keep commits coherent, reviewable, and intentionally scoped.

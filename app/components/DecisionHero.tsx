@@ -9,6 +9,20 @@ import { ConditionIcon } from "./ui/conceptIcons";
 type Props = {
   /** The call, as the page's heading. Absent on a read that produced no live call. */
   weeklyCall?: string;
+  /** Live week navigation shares the card header instead of occupying a separate band. */
+  periodControl?: ReactNode;
+  /**
+   * Where this reading is scaled to — the reader's stage and runway, as a chip
+   * on the stamp line that opens the control which sets them (2026-10-31).
+   *
+   * The shared call is correctly shared: every reader gets the same evidence
+   * and the same headline. What differs is the rule behind it, and the stage
+   * and runway that set that rule sat 2,000px down the page, so the card read
+   * as if one company's answer were everyone's. A weather reading opens with
+   * the place it is for; this is that, and it is the only place on `/` the
+   * choice is visible without scrolling.
+   */
+  location?: { label: string; href: string; hint: string };
   /** The longer sentence behind the call; printed only when it says more than the call does. */
   callDetail?: string;
   regime: string;
@@ -30,13 +44,6 @@ type Props = {
   /** Freshness and confidence, drawn once under the call. Absent on an archived week, which the banner above marks. */
   trust?: Omit<TrustStripProps, "href" | "className"> | null;
   /**
-   * The heading level for the call. `h1` by default — it is the page's subject.
-   * `h2` on the one state where a cadence card above it carries the call the
-   * reader asked for; an `h2` above an `h1`, or two `h1`s, both invert the
-   * document outline.
-   */
-  titleLevel?: "h1" | "h2";
-  /**
    * Which reading this is, for the caption at the foot of the card. Only an
    * archived week passes one: a live card dates itself in the trust strip, and
    * an archived card has no strip, so a crop of it would otherwise carry no date.
@@ -49,6 +56,19 @@ type Props = {
    * opens on, so a search visitor meets the artifact before any explanation.
    */
   question?: string;
+  /**
+   * The two published scores the meaning rests on, and where the rules behind
+   * them are read (2026-10-31): "Funding pressure 90, risk appetite 55."
+   *
+   * The meaning line is the one place on the card that can join "what this
+   * means" to "what it rests on", and it printed a constant — the same words
+   * every Cloudy week — while the two scores lived only inside the map. A
+   * reader could screenshot the weather word but not cite it. The numbers ride
+   * behind the meaning as a sentence, not a second element, and `whyHref` is
+   * the one click to the section that shows the change lines and what is left
+   * out of the score.
+   */
+  reading?: { numbers: string; whyHref: string };
   /**
    * The week's published brief, where it read different conditions from this
    * card: a caveat under the call, with the brief it links to. Without it a
@@ -63,6 +83,12 @@ type Props = {
   areas?: { text: string; href: string; action: string };
   /** The lines this answer is bounded by, under the call: pause, resume, where the call changes. */
   lines?: ReadonlyArray<{ label: string; value: string }>;
+  /**
+   * The week's spoken line, from the regime playbook: the sentence a leader can
+   * use in a meeting. Guidance travels as words; one line on the card is the
+   * difference between a score a reader has to interpret and something to say.
+   */
+  phrase?: string;
   /**
    * The nearer score on its ladder, drawn on a phone only, above the trust strip
    * (2026-10-27). From `md` the conditions map beside the call draws where the
@@ -93,23 +119,25 @@ type Props = {
  */
 export function DecisionHero({
   weeklyCall,
+  periodControl,
+  location,
   callDetail,
   regime,
   direction,
   earlier,
   aside,
   trust,
-  titleLevel = "h1",
   captionDetail,
   question,
   lines,
+  phrase,
   published,
   areas,
+  reading,
   phoneFigure,
 }: Props) {
   const regimeDisplay = getRegimePublicLabel(regime);
   const regimeKey = isRegimeKey(regime) ? regime : undefined;
-  const TitleTag = titleLevel;
   const regimeWeatherLabel = (regimeKey ? REGIME_LABELS[regimeKey] : regimeDisplay).toUpperCase();
   const call = weeklyCall ?? NO_LIVE_READING_CALL.currentCall;
   const detail = callDetail && callDetail.trim() !== call.trim() ? callDetail : undefined;
@@ -123,7 +151,7 @@ export function DecisionHero({
      */
     <section
       id="share-ready-artifact"
-      className="weather-card weather-hero-card weather-inset relative overflow-hidden"
+      className="weather-card weather-hero-card weather-inset relative overflow-hidden weather-editorial-hero"
       aria-labelledby="weekly-call-title"
       data-regime={regimeKey ?? undefined}
     >
@@ -132,13 +160,14 @@ export function DecisionHero({
             height and the trust row sits at its foot, so the call is not left
             floating over an empty band. */}
         <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-8" : undefined}>
-        <div className="flex min-w-0 flex-col gap-3 sm:gap-4">
+        <div className="flex min-w-0 flex-col gap-2 sm:gap-3">
         {/* The kicker: the regime stamp, then what the week did — its direction
             and, on a week conditions moved, what they were. The regime's
             meaning is the line under the call, not this one: on the eyebrow it
             ran four facts together ("hard to raise · Tightening this week ·
             Was Cloudy on Sep 30") ahead of the call they lead into. */}
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
+          {periodControl ? <div className="weather-hero-period">{periodControl}</div> : null}
           <span className="type-stamp weather-tag-placard inline-flex items-center gap-2 rounded-sm border px-3 py-1.5 text-sm font-semibold">
             {/* The weather the word names, beside it. An unknown regime prints
                 its word alone: the sun it used to fall back to claimed a
@@ -146,6 +175,31 @@ export function DecisionHero({
             {regimeKey ? <ConditionIcon regime={regimeKey} /> : null}
             <span>{regimeWeatherLabel}</span>
           </span>
+
+          {/* The reader's place, beside the weather: a chip rather than a line,
+              because it is a control (it opens the stage and runway selectors)
+              and the stamp row is the card's chrome. No glyph — §XXIV gives
+              each mark a meaning, and "your company" has none yet. So the
+              affordance is the word (2026-11-02): beside a filled placard that
+              is not a control, a bordered chip with no other mark read as a
+              second badge, and its only hint was a `title` that a touch screen
+              never shows. It now carries the same "change" the disclosure below
+              it is labelled with, so the control that rescales every rule on
+              the page can be found without hovering. */}
+          {location ? (
+            <Link
+              href={location.href}
+              title={location.hint}
+              data-reading-location
+              className="weather-hit inline-flex items-center gap-1.5 rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-nested)] px-2.5 py-1 text-fluid-xs font-medium text-slate-200 hover:border-[color:var(--border-strong)] hover:text-slate-100"
+            >
+              <span>{location.label}</span>
+              <span aria-hidden="true" className="text-slate-500">·</span>
+              <span className="text-slate-400 underline decoration-slate-600 underline-offset-2">
+                change<span className="sr-only"> stage and runway</span>
+              </span>
+            </Link>
+          ) : null}
 
           {direction || earlier ? (
             <span className="text-fluid-xs font-medium leading-relaxed text-slate-200">
@@ -168,25 +222,25 @@ export function DecisionHero({
             the same size and place. */}
         {question ? (
           <>
-            <TitleTag
+            <h1
               id="weekly-call-title"
               style={{ viewTransitionName: "page-title" }}
               className="max-w-2xl text-pretty text-fluid-lg font-semibold text-slate-300"
             >
               {question}
-            </TitleTag>
+            </h1>
             <p className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50">
               {call}
             </p>
           </>
         ) : (
-          <TitleTag
+          <h1
             id="weekly-call-title"
             style={{ viewTransitionName: "page-title" }}
             className="max-w-2xl text-pretty text-display font-bold leading-[1.06] tracking-[-0.018em] text-slate-50"
           >
             {call}
-          </TitleTag>
+          </h1>
         )}
 
         {/* What the weather word means for money, as the line under the call:
@@ -194,6 +248,17 @@ export function DecisionHero({
         {regimeKey ? (
           <p className="max-w-xl text-pretty text-fluid-base leading-snug text-slate-300" data-regime-meaning>
             {REGIME_WEATHER_RATIONALES[regimeKey]}
+            {reading ? (
+              <>
+                {" "}
+                <span className="tabular-nums" data-reading-numbers>
+                  {reading.numbers}
+                </span>{" "}
+                <Link href={reading.whyHref} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
+                  Why
+                </Link>
+              </>
+            ) : null}
           </p>
         ) : null}
 
@@ -232,6 +297,12 @@ export function DecisionHero({
           </div>
         ) : null}
 
+        {phrase ? (
+          <p className="max-w-xl text-fluid-sm leading-relaxed text-slate-300" data-say-line>
+            <span className="font-semibold text-slate-200">Say it:</span> “{phrase}”
+          </p>
+        ) : null}
+
         {/* Freshness and confidence, once, where every reading route puts them:
             directly under the call. The chip-and-popover in the meta row and the
             trust line at the foot of the card both said this; neither said it
@@ -243,11 +314,12 @@ export function DecisionHero({
             regime={regime}
             href="/trust"
             phoneLayout="line"
+            compactLabels={Boolean(periodControl)}
             className="border-t border-[color:var(--border-faint)] pt-3 sm:pt-4 md:mt-auto"
           />
         ) : null}
         </div>
-        {aside ? <div className="max-md:hidden">{aside}</div> : null}
+        {aside ? <div className="weather-hero-aside max-md:hidden">{aside}</div> : null}
         </div>
 
         {/* The card is the block people screenshot and crop, so it names its

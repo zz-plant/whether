@@ -14,10 +14,12 @@ import {
 import { DECISION_CONTRACT_LABELS } from "../../../../lib/report/reportCopy";
 import { findSignalsCluster } from "../../clusterRoutes";
 import { findDecisionScenario, signalScenarioRoutes } from "../../../seoRouteClusters";
+import { findLeadAnswerForArea } from "../../../answers/decisionPages";
 import { ContentMeasurementTracker } from "../../../components/contentMeasurementTracker";
 import { ReportCta } from "../../../components/reportCta";
 import { ContentPageShell } from "../../../components/ui/contentPageShell";
 import { Breadcrumbs } from "../../../components/ui/breadcrumbs";
+import { ActionLink } from "../../../components/ui/actionLink";
 import { buildGroupBreadcrumbs, toVisibleBreadcrumbs } from "../../../../lib/navigation/breadcrumbs";
 import { toRoute } from "../../../../lib/navigation/routeType";
 import { compositeSignalScales } from "../../../../lib/report/signalTranslations";
@@ -57,7 +59,8 @@ const buildSignalDecisionBrief = ({
 type Params = { cluster: string; "decision-scenario": string };
 
 export const dynamicParams = true;
-export const revalidate = 900;
+/* Payloads regenerate weekly; the tag invalidation covers a new read. */
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return signalScenarioRoutes.map((route) => ({ cluster: route.signalSlug, "decision-scenario": route.decisionScenario }));
@@ -145,6 +148,7 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
   const pagePath = `/signals/${cluster}/${decisionScenario}`;
   const payloadRecord = await readProgrammaticPayload(`/signals/${cluster}/${decisionScenario}`);
   const payload = payloadRecord.payload;
+  const leadAnswer = findLeadAnswerForArea(scenario.slug);
   const contentIntent =
     signalScenarioIntentBySlug[decisionScenario as keyof typeof signalScenarioIntentBySlug] ?? "board";
   const copyText = buildSignalDecisionBrief({
@@ -250,6 +254,9 @@ export default async function SignalDecisionScenarioPage({ params }: { params: P
         <div className="flex flex-wrap gap-2 text-xs font-semibold">
           <Link href="/" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Weekly brief</Link>
           <Link href={`/signals/${cluster}`} className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">The evidence</Link>
+          {leadAnswer ? (
+            <ActionLink href={`/answers/${leadAnswer.slug}`} variant="pill">Full answer</ActionLink>
+          ) : null}
           <Link href="/resolve/ceo" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">Decision tool</Link>
           <Link href="/operate#ops-monthly-action-summary" className="weather-pill inline-flex min-h-[44px] items-center px-3 py-2 text-slate-100">What to do</Link>
         </div>

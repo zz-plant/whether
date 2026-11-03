@@ -159,7 +159,9 @@ export const navigationPages: readonly NavigationPage[] = [
     key: "trust",
     group: "this-week",
     href: "/trust",
-    label: "How much to trust this week",
+    /* Six words in a nav row, and it undersold the page: sources, derivation
+       and the close-call record. "Method" is what a doubting reader looks for. */
+    label: "Method",
     description: "Check freshness, the margin, source coverage and the lines that would change the brief.",
     placement: "secondary",
   },
@@ -226,8 +228,8 @@ export const navigationPages: readonly NavigationPage[] = [
     key: "concepts",
     group: "record",
     href: "/concepts",
-    label: "Reading list",
-    description: "Widely read product essays and investor memos, placed on the record since 2012",
+    label: "Advice vs. market",
+    description: "Does startup advice follow the market? Widely read essays and investor memos, placed on the record since 2012",
     placement: "secondary",
   },
   {

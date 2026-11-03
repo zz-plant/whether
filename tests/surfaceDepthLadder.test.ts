@@ -29,6 +29,9 @@ const NOT_CONTAINERS = new Set([
   // The caveat band (§XIV): a leaf that never encloses a container, and its border is its
   // meaning, so the ladder must not flatten it when it sits three boxes deep.
   "weather-caveat-band",
+  // The line-state band (2026-10-31): the same shape of leaf as the caveat band,
+  // stating a crossed or close line above the call. It holds a sentence, no container.
+  "weather-line-band",
 ]);
 
 const isPrefixedNonContainer = (name: string) =>

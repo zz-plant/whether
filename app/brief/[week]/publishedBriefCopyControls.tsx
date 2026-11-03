@@ -171,7 +171,7 @@ export function PublishedBriefCopyControls({
               the light theme while the remap turned the block near-white. */}
           <pre
             id="published-brief-preview"
-            className={`${previewOpen ? "max-h-96 overflow-auto overscroll-contain" : "max-h-24 overflow-hidden"} whitespace-pre-wrap rounded-md border border-slate-800/80 bg-[color:var(--bg-nested)] p-3 text-xs leading-relaxed text-slate-200 font-mono`}
+            className={`${previewOpen ? "max-h-96 overflow-auto overscroll-contain" : "max-h-24 overflow-hidden"} whitespace-pre-wrap break-words rounded-md border border-slate-800/80 bg-[color:var(--bg-nested)] p-3 text-xs leading-relaxed text-slate-200 font-mono`}
           >
             {activeText}
           </pre>

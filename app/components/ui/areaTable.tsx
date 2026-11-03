@@ -38,7 +38,7 @@ export type AreaRowData = {
   rule: ReactNode;
   /** The pause line, the distance to it as the caller formats it, and its state for the badge. */
   pause?: AreaLineValue;
-  /** The resume line, the distance to it, and its state once it is met. */
+  /** The restart line, the distance to it, and its state once it is met. */
   resume?: AreaLineValue;
   /** What moved for this area this week, if anything. */
   changed?: ReactNode;
@@ -90,7 +90,7 @@ const LineCell = ({
   if (!value) return <span className="text-slate-500">—</span>;
 
   /* A line in force is a status, so its badge is a stamp (§XIV): a pause line
-     crossed, or a resume line met. A distance still to go stays unframed. A
+     crossed, or a restart line met. A distance still to go stays unframed. A
      crossed pause line takes the caution ink, the colour of the column it sits
      in; it was red, the same red a Freezing week paints the page, so "in
      force" read as "error". */
@@ -117,9 +117,9 @@ const LineCell = ({
 
 /**
  * A table from md up. Below it the four columns do not fit a phone — the
- * resume line sat off the right edge behind a sideways scroll — so each row
+ * restart line sat off the right edge behind a sideways scroll — so each row
  * restacks as a block: the area, the rule across the full width, then the
- * pause and resume lines side by side, each labelled in its cell. One DOM for
+ * pause and restart lines side by side, each labelled in its cell. One DOM for
  * both, so the row order and content cannot drift between layouts.
  */
 export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
@@ -135,7 +135,7 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
             <th scope="col" className="py-2 pr-3 font-medium">Area</th>
             <th scope="col" className="py-2 pr-3 font-medium">This week</th>
             <th scope="col" className="py-2 pr-3 font-medium text-semantic-caution-fg">Pause line</th>
-            <th scope="col" className="py-2 pr-3 font-medium text-semantic-easing-fg">Resume line</th>
+            <th scope="col" className="py-2 pr-3 font-medium text-semantic-easing-fg">Restart line</th>
             {showChanged ? <th scope="col" className="py-2 pr-3 font-medium">Changed</th> : null}
             {showAction ? (
               <th scope="col" className="py-2 font-medium">
@@ -174,7 +174,7 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                   <AreaLabel area={row.area} />
                 )}
                 {/* No "Lines set by Funding pressure & Risk appetite" under the area
-                    (2026-10-27): the pause and resume lines beside it name their
+                    (2026-10-27): the pause and restart lines beside it name their
                     scores, so every row said them twice. */}
               </th>
               <td className="py-2.5 pr-3 text-slate-200 max-md:col-span-2 max-md:p-0">
@@ -186,8 +186,8 @@ export function AreaTable({ rows, caption, className = "" }: AreaTableProps) {
                 <LineCell value={row.pause} kind="pause" />
               </td>
               <td className="py-2.5 pr-3 tabular-nums text-slate-300 max-md:p-0">
-                <CellLabel className="text-semantic-easing-fg">Resume line</CellLabel>
-                {/* A met resume line on an area that is not on hold stamped "already
+                <CellLabel className="text-semantic-easing-fg">Restart line</CellLabel>
+                {/* A met restart line on an area that is not on hold stamped "already
                     met" beside "14 pts away" from its pause line, which read as a
                     restart (2026-10-14). With the pause line not crossed there is
                     nothing to resume, and the cell says that instead. */}

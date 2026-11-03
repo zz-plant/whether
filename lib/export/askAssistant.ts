@@ -18,7 +18,7 @@ export const buildAssistantPrompt = (briefUrl: string, weekLabel: string) =>
   [
     `Read Whether's weekly operating guidance for startups for the week of ${weekLabel}: ${briefUrl}`,
     "Then ask me for my company's stage, monthly burn, and months of runway, and tell me what the guidance means for my hiring, spending, and fundraising this week.",
-    "Quote its pause and resume lines exactly where they apply, and say which of my plans sits on the wrong side of one.",
+    "Quote its pause and restart lines exactly where they apply, and say which of my plans sits on the wrong side of one.",
   ].join(" ");
 
 export const buildAssistantLinks = (briefUrl: string, weekLabel: string): AssistantLink[] => {

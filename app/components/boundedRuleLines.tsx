@@ -39,8 +39,8 @@ export const RuleLines = ({
       {conditions.map((condition) => {
         const isNearest = nearest && nearest.metric === condition.metric && nearest.value === condition.value;
         /* The distance as the state badge where the line has a state — a pause
-           line crossed, close or clear, a resume line met — and as muted text
-           for a resume line still to reach. */
+           line crossed, close or clear, a restart line met — and as muted text
+           for a restart line still to reach. */
         const state = isNearest ? resolveLineState(nearest.pointsToLine, kind, nearest.satisfied) : undefined;
         const distance = isNearest ? formatPointsToLine(nearest.pointsToLine, kind, nearest.satisfied) : null;
         return (

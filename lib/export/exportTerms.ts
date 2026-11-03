@@ -23,7 +23,7 @@ import { basisClause } from "../report/scoringBasis";
 export const formatExportConfidence = (code: string): string =>
   formatMarginBand(code === "MEDIUM" ? "MED" : code);
 
-/** The band, lower-cased for a slot already labelled "Margin". */
+/** The band, lower-cased for a slot already labelled "Room before a change". */
 export const formatExportConfidenceWord = (code: string): string => formatExportConfidence(code).toLowerCase();
 
 /**

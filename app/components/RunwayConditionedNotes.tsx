@@ -89,7 +89,7 @@ export function RunwayConditionedNotes({ regime }: { regime: RegimeKey }) {
             opens the section at every width (`AnchorFeedback`). */}
         <p className="text-fluid-nano text-slate-400">
           Showing {runwayBandLabel(DEFAULT_RUNWAY_BAND)} until you{" "}
-          <a href={`#${HOME_SECTIONS.calibration.id}`} className="text-[var(--accent-action)] underline underline-offset-4">
+          <a href={`#${HOME_SECTIONS.calibration.id}`} className="weather-hit text-[var(--accent-action)] underline underline-offset-4">
             pick your cash runway
           </a>
           .

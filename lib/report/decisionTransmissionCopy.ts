@@ -31,16 +31,16 @@ export const homeDecisionFaqItems = [
   {
     question: "What changed this week?",
     answer:
-      "Compare the current signals with the previous reading to see whether the guidance changed.",
+      "Each brief compares both scores with the previous reading and names any pause, resume or change line that was crossed. Most weeks none is, and the brief says so.",
   },
   {
     question: "What should we do differently right now?",
     answer:
-      "Use the action, pause line and resume line for your decision area, adjusted to your stage and runway.",
+      "The brief gives each area one action, the pause line that holds it and the restart line that restarts it, scaled to your company stage and cash runway.",
   },
   {
     question: "How close is the guidance to changing?",
     answer:
-      "Room before a change is the distance to the nearest change line, in points. Check the data date before acting; it is not a probability.",
+      "Room before a change is the distance, in points, from the nearer score to its change line. It is a distance, not a probability.",
   },
 ] as const;

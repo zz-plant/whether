@@ -80,7 +80,7 @@ describe("weekly operator brief export adapters", () => {
     assert.equal(payload.callChangesIf, weeklyCall.callChangesIf);
     assert.deepEqual(payload.doNowBullets, weeklyCall.doNowBullets);
     assert.deepEqual(payload.flipConditionLabels, weeklyCall.flipConditionLabels);
-    assert.equal(payload.resumeWhen, undefined, "no stage, no resume line");
+    assert.equal(payload.resumeWhen, undefined, "no stage, no restart line");
   });
 
   it("renders the plain text in the page's order", () => {
@@ -94,7 +94,7 @@ describe("weekly operator brief export adapters", () => {
 
     assert.match(text, /Weekly Operator Brief — 2026-03-04/);
     // The number never travels without what it measures.
-    assert.match(text, /Operating latitude: 58\/100 \(room to hire, spend and commit; higher means more room\) · vs last week: \+4 points/);
+    assert.match(text, /Operating latitude: 58\/100 \(room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room\) · vs last week: \+4 points/);
     assert.match(text, /^Room before a change: close to the line \((funding pressure|risk appetite) is \d+ points? from its change line\)$/m);
     assert.doesNotMatch(text, /\bLOW\b|Boldness/);
     assert.ok(text.indexOf("Operating latitude:") < text.indexOf("Conditions:"));
@@ -110,13 +110,13 @@ describe("weekly operator brief export adapters", () => {
     assert.match(text, /Other things that would change this guidance:\n• Risk appetite > 50\n• Yield curve steepens/);
   });
 
-  it("prints a stage's resume line beside the call-change line, never in its place", () => {
+  it("prints a stage's restart line beside the call-change line, never in its place", () => {
     const text = buildWeeklyOperatorBriefPlainText(
       buildWeeklyOperatorBriefPayload(documentFor({ ...weeklyCall, resumeWhen: "Two weekly reads below the pause line" }), {
       }),
     );
 
-    assert.match(text, /^Conditions change if: Funding pressure at or below 70\nResume when: Two weekly reads below the pause line$/m);
+    assert.match(text, /^Conditions change if: Funding pressure at or below 70\nRestart when: Two weekly reads below the pause line$/m);
   });
 
   it("names the reading the latitude move is measured against, where the week records one", () => {
@@ -144,7 +144,7 @@ describe("weekly operator brief export adapters", () => {
         weeklyLeadershipSummary: { boldnessScore: 51, boldnessDelta: 0, comparedWith: { recordDate: "2026-09-29", label: "Sep 29" } },
       }),
     );
-    assert.match(flat, /^Operating latitude: 51\/100 \(room to hire, spend and commit; higher means more room\) · vs Sep 29: no change\nConditions:/m);
+    assert.match(flat, /^Operating latitude: 51\/100 \(room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room\) · vs Sep 29: no change\nConditions:/m);
     assert.doesNotMatch(flat, /guidance is (unchanged|holding)/i);
 
     const notCompared = buildWeeklyOperatorBriefPlainText(
@@ -152,7 +152,7 @@ describe("weekly operator brief export adapters", () => {
         weeklyLeadershipSummary: { boldnessScore: 51, boldnessDelta: null },
       }),
     );
-    assert.match(notCompared, /^Operating latitude: 51\/100 \(room to hire, spend and commit; higher means more room\)$/m);
+    assert.match(notCompared, /^Operating latitude: 51\/100 \(room to hire, spend and commit, blended from risk appetite and funding pressure; higher means more room\)$/m);
     assert.doesNotMatch(notCompared, /no change|vs last week/);
   });
 

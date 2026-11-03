@@ -24,7 +24,7 @@ export function FactList({ children, className = "" }: { children: ReactNode; cl
 
 export function Fact({ label, value, unit }: { label: ReactNode; value: ReactNode; unit?: ReactNode }) {
   return (
-    <div className="flex flex-wrap items-baseline gap-x-1.5">
+    <div className="flex flex-wrap items-baseline gap-x-1.5 gap-y-1">
       <dt className="text-slate-400">{label}</dt>
       <dd className="font-medium tabular-nums text-slate-100">
         {value}

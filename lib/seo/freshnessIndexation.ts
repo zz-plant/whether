@@ -1,4 +1,4 @@
-import { DEFAULT_FRESHNESS_WINDOW_HOURS } from "../report/seoQualityGates";
+import { CALL_FRESHNESS_WINDOW_HOURS, DEFAULT_FRESHNESS_WINDOW_HOURS } from "../report/seoQualityGates";
 import type { SeoDecisionPayload } from "../report/seoDecisionPayload";
 
 /**
@@ -31,6 +31,35 @@ export const isStaleForIndexing = ({
   const fetchedAtMs = fetchedAtIso ? new Date(fetchedAtIso).getTime() : Number.NaN;
   if (Number.isNaN(fetchedAtMs)) return true;
   const ageHours = (now.getTime() - fetchedAtMs) / (1000 * 60 * 60);
+  return ageHours > windowHours;
+};
+
+/**
+ * Whether a live-posture page is too stale on the week's call to be indexed.
+ *
+ * Separate from `isStaleForIndexing` on purpose. That one reads the *reading's*
+ * age and is right for a cached card that must not show a stale figure; this one
+ * reads the *call's* record date and is right for indexing. Judging both on the
+ * 72-hour read window made one missed daily ingest de-index the whole corpus,
+ * while the call it served was still this week's.
+ */
+export const isCallStaleForIndexing = ({
+  recordDateIso,
+  isFallbackSnapshot = false,
+  now = new Date(),
+  windowHours = CALL_FRESHNESS_WINDOW_HOURS,
+}: {
+  /** The record date the week's call was struck on. */
+  recordDateIso: string | null | undefined;
+  /** The bundled snapshot rather than a live or materialized read. */
+  isFallbackSnapshot?: boolean;
+  now?: Date;
+  windowHours?: number;
+}): boolean => {
+  if (isFallbackSnapshot) return true;
+  const recordMs = recordDateIso ? new Date(recordDateIso).getTime() : Number.NaN;
+  if (Number.isNaN(recordMs)) return true;
+  const ageHours = (now.getTime() - recordMs) / (1000 * 60 * 60);
   return ageHours > windowHours;
 };
 

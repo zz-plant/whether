@@ -136,7 +136,7 @@ describe("the evidence page", () => {
        brief on that area's answer, with the area's glyph beside its name. */
     assert.match(html, /data-governs="tightness">Affects: <a href="\/\?decision=hiring#what-it-changes"[^>]*><svg[^>]*lucide-users[\s\S]*?<\/svg>Hiring<\/a>/);
     assert.match(html, /data-governs="riskAppetite">Affects: <a href="\/\?decision=product-tempo#what-it-changes"/);
-    assert.doesNotMatch(html, /Sets the pause and resume lines/, "the line says whose lines");
+    assert.doesNotMatch(html, /Sets the pause and restart lines/, "the line says whose lines");
   });
 });
 

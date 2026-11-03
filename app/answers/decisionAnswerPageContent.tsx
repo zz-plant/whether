@@ -1,11 +1,11 @@
 import { notFound } from "next/navigation";
 import { weeklyHeadline } from "../../lib/report/reportEvidence";
-import { decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
+import { decisionAreaCorporateTransmission, decisionAreaLabel } from "../../lib/report/boundedDecisionRules";
 import {
   answerPages,
-  findDecisionPage,
   getDecisionPageContentMeasurement,
 } from "./decisionPages";
+import { findPublishedDecisionPage } from "../../lib/answers/answerContentStore";
 import { buildSeoDecisionPayload } from "../../lib/report/seoDecisionPayload";
 import { selectRelatedAnswers } from "../../lib/seo/relatedAnswers";
 import { buildAnswerFaqStructuredData } from "../../lib/seo/pageStructuredData";
@@ -40,6 +40,7 @@ import { ReportCta } from "../components/reportCta";
 import { JsonLdScript } from "../components/jsonLdScript";
 import { ContentPageShell } from "../components/ui/contentPageShell";
 import { isSavedCopy } from "../../lib/report/provenanceStatus";
+import { buildAnswerObject } from "../../lib/answers/answerObject";
 
 export async function DecisionAnswerPageContent({
   slug,
@@ -48,13 +49,21 @@ export async function DecisionAnswerPageContent({
   slug: string;
   route: string;
 }) {
-  const page = findDecisionPage(slug);
+  const page = await findPublishedDecisionPage(slug);
   if (!page) notFound();
 
   const { reportData, degraded, snapshot } = await loadWeeklyBriefSnapshot(undefined, { route });
   const { assessment, recordDateLabel, reportDynamics, fetchedAtLabel } = reportData;
   const { homeBriefModel, displayRegime, callCitation } = snapshot;
   const mappedRules = homeBriefModel.decisionRules.filter((rule) => page.mappedDecisionAreas.includes(rule.area));
+  /* One answer object: the page renders it and `get_answer` returns it. */
+  const answer = buildAnswerObject({
+    page,
+    recordDateLabel,
+    regime: assessment.regime,
+    scores: assessment.scores,
+    mappedRules,
+  });
   const ruleStanding = buildHomeAreaRows({
     decisionRules: mappedRules,
     movement: null,
@@ -64,8 +73,8 @@ export async function DecisionAnswerPageContent({
     assessment,
     mappedRules,
     mappedDecisionAreas: page.mappedDecisionAreas,
-    fallbackCurrentCall: page.shortAnswer,
-    fallbackImmediateAction: page.directAnswer,
+    fallbackCurrentCall: answer.shortAnswer,
+    fallbackImmediateAction: answer.directAnswer,
     reportEvidenceItems: reportData.reportEvidenceItems,
     freshnessLabel: fetchedAtLabel,
     recordDateLabel,
@@ -74,6 +83,7 @@ export async function DecisionAnswerPageContent({
     isFallbackSnapshot: degraded,
     provenanceStatusLabel: reportData.treasuryProvenance?.statusLabel,
     fetchedAtIso: reportData.treasury.fetched_at,
+    recordDateIso: reportData.treasury.record_date,
     pageKey: `/answers/${page.slug}`,
     provenanceLinks: [reportData.treasury.source, reportData.macroSeries[0]?.sourceUrl].filter((link): link is string => Boolean(link)),
   });
@@ -83,6 +93,7 @@ export async function DecisionAnswerPageContent({
      its own headline, and neither was the week's. */
   const headline = weeklyHeadline(snapshot.weeklyCall);
   const leadArea = page.mappedDecisionAreas.find((area) => mappedRules.some((rule) => rule.area === area));
+  const leadTransmission = leadArea ? decisionAreaCorporateTransmission[leadArea] : undefined;
   const areaDoNowLabel = leadArea
     ? `${decisionAreaLabel(leadArea)} · ${DECISION_CONTRACT_LABELS.action.doNow}`
     : DECISION_CONTRACT_LABELS.action.doNow;
@@ -105,18 +116,21 @@ export async function DecisionAnswerPageContent({
      the person reading it can act on; whether the reading is current is. */
   const dataCurrency = buildDataCurrencyNotice(payload.noindexReasons, { recordDateLabel });
   const pagePath = `/answers/${page.slug}` as const;
+  const reviewedAt = answer.lastReviewed;
   const measurement = getDecisionPageContentMeasurement(page);
   const copyText = [
     page.title,
-    `Short answer: ${page.shortAnswer}`,
+    `Short answer: ${answer.shortAnswer}`,
     `For: ${page.audience}`,
-    `Company inputs to check: ${page.companyInputs.join(" ")}`,
-    `Decision note to complete: ${page.decisionNote}`,
+    `Company inputs to check: ${answer.companyInputs.join(" ")}`,
+    `Decision note to complete: ${answer.decisionNote}`,
     `Market guidance as of ${recordDateLabel}`,
     `${publicDecisionLabels.call}: ${headline.composed}`,
     `${areaDoNowLabel}: ${payload.immediateAction}`,
     `${DECISION_CONTRACT_LABELS.threshold.pauseIf}: ${formatDecisionThreshold(payload.triggerThreshold)}`,
     `${DECISION_CONTRACT_LABELS.reversal.resumeWhen}: ${formatDecisionReversal(payload.reversalCondition)}`,
+    ...(leadTransmission?.ruleOfThumb ? [`Rule of thumb: ${leadTransmission.ruleOfThumb}`] : []),
+    ...(leadTransmission?.startupMath ? [`Startup math: ${leadTransmission.startupMath}`] : []),
     `Citation: ${callCitation}`,
     `Freshness: ${fetchedAtLabel}`,
     ...(dataCurrency ? [`Data status: ${dataCurrency.summary}`] : []),
@@ -135,7 +149,7 @@ export async function DecisionAnswerPageContent({
        "Threshold context: risk appetite 42 vs 50, tightness 79 vs 70" — two bare
        comparisons, one of them under the engine's name for a score the rest of
        the site calls funding pressure. */
-    answer: `${page.shortAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)} line where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`,
+    answer: `${answer.shortAnswer} Market guidance as of ${recordDateLabel}: ${payload.currentCall} Risk appetite is ${assessment.scores.riskAppetite.toFixed(0)} of 100, against the ${formatThresholdNumber(assessment.thresholds.riskAppetiteRegime)} line where conditions change; funding pressure is ${assessment.scores.tightness.toFixed(0)} of 100, against ${formatThresholdNumber(assessment.thresholds.tightnessRegime)}.`,
     payload,
     datePublishedIso: reportData.treasury.record_date,
     dateModifiedIso: reportData.treasury.fetched_at,
@@ -145,7 +159,7 @@ export async function DecisionAnswerPageContent({
     additionalQuestions: [
       {
         question: "Which company inputs should we check before acting?",
-        answer: page.companyInputs.join(" "),
+        answer: answer.companyInputs.join(" "),
       },
       {
         question: "What should we do about it this week?",
@@ -165,6 +179,7 @@ export async function DecisionAnswerPageContent({
           ? `${payload.evidence.map((item) => item.title).join(", ")}. ${payload.citationMeta}`
           : payload.citationMeta,
       },
+      ...(answer.faq ?? []),
     ],
   });
 
@@ -209,7 +224,7 @@ export async function DecisionAnswerPageContent({
           question={page.title}
           weeklyCall={headline.action}
           direction={headline.directionLabel}
-          callDetail={page.shortAnswer}
+          callDetail={answer.shortAnswer}
           regime={assessment.regime}
           lines={[
             { label: areaDoNowLabel, value: payload.immediateAction },
@@ -257,20 +272,49 @@ export async function DecisionAnswerPageContent({
           <div className="space-y-2 text-sm text-slate-200">
             {/* The guidance and its action are the card's now, dated by its trust
                 strip ("Data as of"); this section says how to use them. */}
-            <p>{page.directAnswer}</p>
+            <p>{answer.directAnswer}</p>
             <p>{contextSummary.summaryLine}</p>
             {contextSummary.classificationLine ? (
               <p className="text-xs text-slate-400">{contextSummary.classificationLine}</p>
             ) : null}
           </div>
+          {leadTransmission ? (
+            <div
+              data-transmission-note
+              className="mt-3 space-y-1.5 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 text-xs"
+            >
+              <p className="font-semibold text-slate-100">
+                Operating rationale for {leadArea ? decisionAreaLabel(leadArea).toLowerCase() : "this decision"}:
+              </p>
+              <p className="leading-relaxed text-slate-300">
+                {leadTransmission.transmission} {leadTransmission.whyLineMatters}
+              </p>
+              <p className="text-slate-400">
+                <span className="font-medium text-slate-200">Shared rule of thumb:</span> {leadTransmission.ruleOfThumb}
+              </p>
+              {leadTransmission.startupMath ? (
+                <p className="text-slate-400">
+                  <span className="font-medium text-slate-200">Startup math:</span> {leadTransmission.startupMath}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
         </SecondaryPageSection>
 
         <SecondaryPageSection title={page.contextHeading}>
           <p className="text-sm text-slate-200">{page.context}</p>
           <h3 className="mt-4 text-sm font-semibold text-slate-100">Company inputs to check</h3>
           <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-200">
-            {page.companyInputs.map((input) => <li key={input}>{input}</li>)}
+            {answer.companyInputs.map((input) => <li key={input}>{input}</li>)}
           </ul>
+          {answer.watchouts && answer.watchouts.length > 0 ? (
+            <>
+              <h3 className="mt-4 text-sm font-semibold text-slate-100">Common ways this goes wrong</h3>
+              <ul className="mt-2 list-disc space-y-2 pl-5 text-sm text-slate-200">
+                {answer.watchouts.map((watchout) => <li key={watchout}>{watchout}</li>)}
+              </ul>
+            </>
+          ) : null}
         </SecondaryPageSection>
 
         <SecondaryPageSection title={headings.rules}>
@@ -332,7 +376,7 @@ export async function DecisionAnswerPageContent({
         <SecondaryPageSection title={headings.copy}>
           <div className="space-y-3">
             <h3 className="text-sm font-semibold text-slate-100">Decision note to complete</h3>
-            <p className="text-sm text-slate-200">{page.decisionNote}</p>
+            <p className="text-sm text-slate-200">{answer.decisionNote}</p>
             <p className="text-sm text-slate-200">
               Fill in the company inputs before using it as an approval.
             </p>
@@ -355,6 +399,9 @@ export async function DecisionAnswerPageContent({
         <SecondaryPageSection title={headings.citation}>
           <p className="text-xs text-slate-300">{callCitation}</p>
           <p className="text-xs text-slate-400">Data date: {recordDateLabel} · freshness: {fetchedAtLabel}.</p>
+          {reviewedAt ? (
+            <p className="text-xs text-slate-400">Answer last reviewed: {reviewedAt}.</p>
+          ) : null}
           <ul className="mt-3 space-y-1">
             {page.supportingLinks.map((link) => (
               <li key={link.href}><ActionLink href={link.href} variant="inline">{link.label}</ActionLink></li>
@@ -362,7 +409,23 @@ export async function DecisionAnswerPageContent({
           </ul>
         </SecondaryPageSection>
 
+        {answer.faq && answer.faq.length > 0 ? (
+          <SecondaryPageSection title="Common questions">
+            <dl className="space-y-3">
+              {answer.faq.map((item) => (
+                <div key={item.question}>
+                  <dt className="text-sm font-semibold text-slate-100">{item.question}</dt>
+                  <dd className="mt-1 text-sm text-slate-200">{item.answer}</dd>
+                </div>
+              ))}
+            </dl>
+          </SecondaryPageSection>
+        ) : null}
+
         <SecondaryPageSection title={headings.next}>
+          <div className="mb-3 rounded-lg border border-[color:var(--border-subtle)] bg-[color:var(--bg-nested)] p-3 text-xs text-slate-300">
+            <span className="font-medium text-slate-100">Company calibration:</span> Choose your stage and runway to scale this rule and its pause line to your cash in the <ActionLink href="/" variant="inline">weekly operating brief →</ActionLink>
+          </div>
           <div className="flex flex-wrap gap-2">
             <ActionLink href="/" variant="pill">Weekly brief</ActionLink>
             <ActionLink href="/operate" variant="pill">Plan the week</ActionLink>

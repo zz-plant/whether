@@ -63,7 +63,7 @@ type CliChangesContract = {
   basis: string;
   /** The earlier reading itself, when the loader recorded it; null when it did not. */
   comparedWith: { recordDate: string; label: string } | null;
-  /** What the change did to the decisions: which areas' pause or resume lines were crossed since `comparedWith`, or that none were. Null when nothing was compared. */
+  /** What the change did to the decisions: which areas' pause or restart lines were crossed since `comparedWith`, or that none were. Null when nothing was compared. */
   decision: string | null;
   changed: Array<{
     metric: "tightness" | "risk_appetite" | "base_rate" | "curve_slope";

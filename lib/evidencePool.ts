@@ -39,7 +39,7 @@ type PoolCanonical = z.infer<typeof poolCanonicalSchema>;
 
 /**
  * The retrieval frame for "what backs the call": the guidance as printed, with
- * its pause and resume lines, so passages about the same operating mechanism
+ * its pause and restart lines, so passages about the same operating mechanism
  * rank highest.
  */
 export const buildSupportQuery = (canonical: PoolCanonical): string =>

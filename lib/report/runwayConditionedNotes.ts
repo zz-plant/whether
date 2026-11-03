@@ -178,7 +178,7 @@ export const buildRunwayConditionedNotes = ({
   const notes: RunwayConditionedNote[] = [
     {
       area: "burn-discipline",
-      note: `With ${runway} of runway, runway is not what limits you this week. The pause and resume lines are.`,
+      note: `With ${runway} of runway, runway is not what limits you this week. The pause and restart lines are.`,
     },
   ];
   if (isTightening) {

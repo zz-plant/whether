@@ -112,9 +112,9 @@ describe("brief artifact formats", () => {
     // thresholds.
     const entries = briefConditionEntries(artifact);
     /* The same names the hero prints. The third row is the other conditions
-       that would change the call (`flipConditionLabels`), not the resume line,
+       that would change the call (`flipConditionLabels`), not the restart line,
        so it is not labelled as one: it read "Change course if" here, and then
-       briefly "Resume when", over conditions that tighten the call. */
+       briefly "Restart when", over conditions that tighten the call. */
     assert.deepEqual(
       entries.map((entry) => entry.label),
       [
