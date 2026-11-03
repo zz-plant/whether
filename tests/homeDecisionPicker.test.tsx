@@ -6,7 +6,7 @@ import { DecisionPicker, type DecisionPickerOption } from "../app/components/hom
 import { findLeadAnswerForArea } from "../app/answers/decisionPages";
 import { findRecentCallChanges } from "../lib/report/lastTimeCallChanged";
 import { decisionAreaOrder } from "../lib/report/boundedDecisionRules";
-import { buildHomeDecisionCookie, describeFirstAnswer, parseHomeDecision, readHomeDecisionCookie, type HomeAreaLineSlot } from "../lib/report/home/homeSectionModel";
+import { buildHomeDecisionCookie, describeAreaPauseStatus, describeFirstAnswer, parseHomeDecision, readHomeDecisionCookie, type HomeAreaLineSlot } from "../lib/report/home/homeSectionModel";
 import { getTimeMachineRegimeSeries } from "../lib/timeMachine/timeMachineCache";
 import * as nextNavigation from "next/navigation";
 
@@ -85,7 +85,9 @@ describe("decision picker", () => {
   it("puts each area's standing on its choice, so the answers are on the page before a click", () => {
     const choices = html.slice(html.indexOf("<fieldset"), html.indexOf("</fieldset>"));
     assert.equal((choices.match(/On hold/g) ?? []).length, 4);
-    assert.match(choices, /4 pts from pausing/);
+    /* The distance as a move the record makes: risk appetite moved 4 points or more
+       in most months since 2012 (2026-11-03; "4 pts from pausing" until then). */
+    assert.match(choices, /A common move from pausing/);
     /* The shared state badge: a crossed line in the line state's own red with
        the pause glyph, a close one with the dashed circle, so the two differ in
        shape. */
@@ -94,7 +96,7 @@ describe("decision picker", () => {
       /data-line-state-badge="crossed" class="[^"]*text-line-crossed-fg[^"]*"><svg[^>]*lucide-pause[\s\S]*?<\/svg><span>On hold</,
       "a crossed line is drawn as a state, in the crossed ink",
     );
-    assert.match(choices, /data-line-state-badge="near"[^>]*><svg[^>]*lucide-circle-dashed[\s\S]*?<\/svg><span>4 pts from pausing</);
+    assert.match(choices, /data-line-state-badge="near"[^>]*><svg[^>]*lucide-circle-dashed[\s\S]*?<\/svg><span>A common move from pausing</);
     /* Each choice is a card, so its area glyph is the 20px size. */
     assert.equal((choices.match(/data-concept-icon="area"/g) ?? []).length, 5);
     assert.equal((choices.match(/class="lucide [^"]*size-5" data-concept-icon="area"/g) ?? []).length, 5);
@@ -251,12 +253,13 @@ describe("the first answer", () => {
   });
 
   it("with nothing on hold, says go ahead and how far the nearest pause is, as its badge does", () => {
+    const roadmap = { area: "product-tempo" as const, pause: slot({ points: 9, metric: "riskAppetite" }) };
+    const badge = describeAreaPauseStatus(roadmap)?.text ?? "";
+    assert.ok(badge.length > 0);
     assert.equal(
-      describeFirstAnswer([
-        { area: "hiring", pause: slot({ points: 20 }) },
-        { area: "product-tempo", pause: slot({ points: 9, metric: "riskAppetite" }) },
-      ]),
-      "Roadmap this month? Go ahead: 9 pts from pausing.",
+      describeFirstAnswer([{ area: "hiring", pause: slot({ points: 20 }) }, roadmap]),
+      `Roadmap this month? Go ahead: ${badge.charAt(0).toLowerCase()}${badge.slice(1)}.`,
+      "the badge's own words",
     );
     assert.equal(describeFirstAnswer([]), null);
   });

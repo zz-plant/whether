@@ -244,9 +244,11 @@ every reader, with one `h1` and an `h2` per section after it (`HOME_SECTIONS` in
    inspection — inputs outside the record (counted, they would move a score across its change line;
    the counted weather word is printed) and a capped score's real distance (90 against a 70 line
    reads as 20 points; the uncapped pressure is 40). Both were methodology notes before (2026-10-22).
-5. **What changed since {reading}** (`WhatChangedSection`): one row per signal, the earlier reading →
-   this week's with the comparison dated (§1.1.26), each composite score on its ladder with what
-   moved it (§1.1.27). It opens on the table: the movement sentence (§1.1.28) restated the card, and
+5. **What changed since {reading}** (`WhatChangedSection`): one row per signal, opening on what the
+   move means in everyday words (`signalMoveMeaning.ts`, size words cut on the brief's existing
+   scales, 2026-11-03), then each composite score on its ladder with the comparison dated on its
+   hollow dot (§1.1.26) and what moved it (§1.1.27); a market input prints this week's value over
+   the earlier one. It opens on the table: the movement sentence (§1.1.28) restated the card, and
    each area's row says which of its lines moved. A read with no comparison says so over it.
 6. **What would change this guidance** (`WhatWouldChangeSection`): two questions, named apart —
    when conditions change (the change line, in points, with the market move folded under it) and
@@ -3706,7 +3708,8 @@ popover or a forecast.
   of the 176 months on record."). A count, not a median: the bill sat at zero from 2012 to 2015 and
   moves in Fed steps since, so its median month was 0.03 and every distance read as many months.
   The federal funds rate has no month-end series and gets the Fed comparison alone; the curve, which
-  the Fed does not set, gets the count alone.
+  the Fed does not set, gets the count alone. Since 2026-11-03 the Fed step leads the line and the
+  bill rate follows it, and the count reads as a ratio (§1.1.102).
 - **How long these conditions lasted before** (`describeSpellLengths`, `lib/report/lastTimeCallChanged.ts`),
   under "Has this happened before?" on every live week. The earlier spells of this week's conditions
   and their length in month-ends ("The one earlier Freezing spell on record ran 32 month-ends, Sep
@@ -4351,6 +4354,37 @@ board bullets and the mandate routes (`briefResumeLine`) is the lead area's whil
 hold, and absent otherwise; a stage's restart discipline still prints. Frozen briefs judge their
 own scores against their own lines, and a record frozen without them keeps both sides. `/operate`
 keeps both columns (`AreaTable bothSides`): it is where a reader sets rules of their own.
+
+### 1.1.102 Distances a reader can judge (2026-11-03)
+
+The two scores are 0–100 numbers no reader has a feel for, so a distance in their points said nothing
+a reader could act on. Each distance on the brief's first screens now says how often the month-end
+record moved that score that far in one month (`describeScoreMoveBand`, `lib/report/marketMoveScale.ts`,
+reading the same month-end scores `/history` and `/calibration` read). The bands are the two
+cadences an operator plans on: "a common move" at least 1 month in 3, "an unusual move" at least
+1 in 12, "a rare move" less often, "a record move" never. On the record to Sep 2026 that is risk
+appetite common to 5 points and rare from 14, and funding pressure, which held still in 157 of 176
+months, unusual from 1 point and rare from 4. A band counts moves in either direction and is not
+the chance of the next month's move. The points stay beside a scale: the picker's ladder and the
+area table.
+
+The rate fold leads with the size a reader meets in the news, and the instrument follows. The
+record's count reads as a ratio rather than "k of the n months on record". On `/signals`, the
+curve legends, captions and the biggest-moves list print names, not desk shorthand: "Recession
+warning gauge" for 10Y−2Y, "2-year minus 3-month" for 2Y−3M, and "1-month", "2-year" and
+"10-year" for the maturities. The key keeps the units and names the gauge's instrument once.
+
+| Surface | Before | After |
+| --- | --- | --- |
+| Band above the card (`describeLineStateBand`) | Hiring — 24 pts from restarting. | Hiring — a rare move from restarting. |
+| Picker badge (`describeAreaPauseStatus`; also `/resolve`, `/history/compare`) | 8 pts from pausing · At its pause line | An unusual move from pausing · On the edge of pausing |
+| Trust strip margin (`formatMarginReading`) | Risk appetite 2 pts from Stormy | A common risk-appetite move from Stormy |
+| "In interest-rate terms" (`buildFlipProximity`, `describeMarketMoveScale`) | If the 1-month Treasury bill rate rises 0.22 percentage points, conditions turn Cloudy. / About one quarter-point Fed move. The rate moved that far in one month in 16 of the 176 months on record. | About one quarter-point Fed hike turns conditions Cloudy. / That is the 1-month Treasury bill rate rising 0.22 percentage points. The rate moved that far in about 1 month in 11 since 2012. |
+| `/signals` inversion legend | 10Y−2Y 0.41pp · 2Y−3M 0.68pp | Recession warning gauge 0.41pp · 2-year minus 3-month 0.68pp |
+| `/signals` biggest moves | Mar 2022 · 2Y +84 bp · 10Y +49 bp | Mar 2022 · 2-year +84 bp · 10-year +49 bp |
+
+The running head keeps its four-word "2 pts from Freezing" (`formatNearestChange`), and the pastes
+keep `formatMargin`'s band and points: neither has room for a second clause.
 
 ### 1.2 Evidence report (/signals)
 The evidence report is the appendix behind the weekly brief. Since 2026-10-27 it has two sections,

@@ -1,17 +1,31 @@
+import { regimeSignalLabel } from "../../../lib/report/signalTranslations";
+
 /**
- * Expands the bond-desk shorthand the curve charts are labelled in.
+ * Defines the units and the one instrument the curve charts are labelled in.
  *
- * The axes say "10Y-2Y", "2Y-3M", "pp" and "bp" because that is what fits in a 100-unit
- * viewBox. That is fine for a reader who already trades bonds and unreadable for
- * everyone else, so every surface that renders those labels renders this key with
- * them. Shared so the curve surfaces cannot drift apart on what a term means.
+ * The legends said "10Y−2Y", "2Y−3M", "1M, 3M, 2Y, 10Y", "pp" and "bp", and this key
+ * expanded each, so a reader met desk shorthand first and its meaning a line later.
+ * Since 2026-11-03 the legends print the names ("Recession warning gauge", "2-year
+ * minus 3-month", "2-year", "10-year"), and the key keeps what a name cannot carry:
+ * the units, and the instrument behind the gauge, named once here rather than as its
+ * label. Shared so the curve surfaces cannot drift apart on what a term means.
  *
  * It is the whole definition, not a pointer to one: /signals is the method layer, where
  * instrument names are allowed only when they are defined on the same screen. It used to
  * end in a "Full glossary" link, and that page is gone.
  */
 
-type CurveTerm = "spread10Y2Y" | "spread2Y3M" | "maturities" | "pp" | "bp";
+type CurveTerm = "spread10Y2Y" | "pp" | "bp";
+
+/**
+ * The two spreads as the legends name them. The ten-year minus two-year spread is
+ * the recession warning gauge everywhere else on the site; the shorter one has no
+ * name of its own, so its legend says what it is.
+ */
+export const CURVE_SPREAD_LABELS: Record<"spread10Y2Y" | "spread2Y3M", string> = {
+  spread10Y2Y: regimeSignalLabel.curveSlope,
+  spread2Y3M: "2-year minus 3-month",
+};
 
 /**
  * A spread's level — the recession warning gauge or its short-end sibling — in
@@ -25,19 +39,9 @@ export const formatSpread = (value: number | null) => (typeof value === "number"
 
 const TERM_COPY: Record<CurveTerm, { label: string; toneClass: string; definition: string }> = {
   spread10Y2Y: {
-    label: "10Y−2Y",
+    label: CURVE_SPREAD_LABELS.spread10Y2Y,
     toneClass: "text-emerald-200",
     definition: "Ten-year rate minus two-year rate.",
-  },
-  spread2Y3M: {
-    label: "2Y−3M",
-    toneClass: "text-amber-200",
-    definition: "Two-year rate minus three-month rate.",
-  },
-  maturities: {
-    label: "1M, 3M, 2Y, 10Y",
-    toneClass: "text-slate-300",
-    definition: "How long the government is borrowing for: one/three months, two/ten years.",
   },
   pp: {
     label: "pp",

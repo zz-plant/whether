@@ -103,7 +103,7 @@ describe("operating latitude against the four conditions", () => {
 });
 
 describe("a score at the top of its scale", () => {
-  it("says so in the change column instead of showing a flat move", () => {
+  it("says so where the row's meaning leads instead of showing a flat move", () => {
     const row: SignalChangeRow = {
       key: "tightness",
       label: "Funding pressure",
@@ -117,7 +117,8 @@ describe("a score at the top of its scale", () => {
       saturatedPressure: 113,
     };
     const html = renderToStaticMarkup(<WhatChangedSection rows={[row]} comparisonUnavailable={false} />);
-    assert.match(html, /data-delta-capped[\s\S]*Can’t rise further/);
-    assert.doesNotMatch(html, /100<\/span><span aria-hidden="true">→/, "no flat 100 → 100 chip");
+    const capped = html.slice(html.indexOf("data-delta-capped"));
+    assert.ok(html.includes("data-delta-capped") && capped.includes(">Money is as hard to raise as this score can show.<"), html);
+    assert.ok(!html.includes("No change."), "a pinned score is not an unmoved one");
   });
 });

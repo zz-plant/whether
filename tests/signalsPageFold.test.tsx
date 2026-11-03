@@ -122,12 +122,12 @@ describe("/signals answers each closed question in its summary", () => {
     assert.ok(typeof oneMonth === "number");
     assert.ok(answer?.startsWith(`1-month rate ${oneMonth.toFixed(2)}%`), answer);
     const panel = withTrends.slice(withTrends.indexOf('id="signal-diagnostics"'), withTrends.indexOf('id="curve-context"'));
-    assert.match(panel, new RegExp(`Latest: [^<]*1M (<!-- -->)?${oneMonth.toFixed(2).replace(".", "\\.")}%`), "the panel prints the rate the summary quotes");
+    assert.match(panel, new RegExp(`Latest: [^<]*1-month (<!-- -->)?${oneMonth.toFixed(2).replace(".", "\\.")}%`), "the panel prints the rate the summary quotes");
   });
 
   it("inversion: yes or no, from the counts the chart's caption prints", () => {
     const answer = summaryAnswer(withTrends, "Has the yield curve inverted in the last year?") ?? "";
-    const caption = withTrends.match(/10Y−2Y has been inverted\s*(?:<!-- -->)?\s*(\d+)\s*(?:<!-- -->)? of (?:<!-- -->)?(\d+)(?:<!-- -->)? months, 2Y−3M (?:<!-- -->)?(\d+)/);
+    const caption = withTrends.match(/recession warning gauge(?:<!-- -->)? has been inverted\s*(?:<!-- -->)?\s*(\d+)\s*(?:<!-- -->)? of (?:<!-- -->)?(\d+)(?:<!-- -->)? months, the (?:<!-- -->)?2-year minus 3-month(?:<!-- -->)? spread (?:<!-- -->)?(\d+)/);
     assert.ok(caption, "the caption prints the counts");
     const [, longCount, months, shortCount] = caption;
     if (longCount === "0" && shortCount === "0") {

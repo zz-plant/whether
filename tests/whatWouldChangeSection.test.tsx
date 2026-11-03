@@ -36,7 +36,12 @@ const html = renderToStaticMarkup(
       { metric: "riskAppetite", label: "Risk appetite", value: 47, previous: 56, lines: [{ kind: "callChange", value: 50 }] },
     ]}
     flipProximity={[
-      { axis: "tightness", sentence: "If the 1-month Treasury bill rate falls 0.15%, conditions turn Stormy." },
+      {
+        axis: "tightness",
+        sentence: "Less than one quarter-point Fed cut turns conditions Stormy.",
+        instrument: "That is the 1-month Treasury bill rate falling 0.15 percentage points.",
+        scale: "The rate moved that far in about 1 month in 6 since 2012.",
+      },
     ]}
     reversalTrigger="Funding pressure falls 20 pts from 90 to 70 or below, or risk appetite rises 3 pts from 47 to clear 50."
     callChangeLines={{ tightness: 70, riskAppetite: 50 }}
@@ -63,6 +68,19 @@ describe("what would change this guidance", () => {
     assert.ok(fold !== -1, "the market move has its own disclosure");
     assert.ok(html.lastIndexOf("<details", fold) !== -1 && html.indexOf("Treasury bill rate") > fold);
     assert.doesNotMatch(html.slice(html.lastIndexOf("<details", fold), fold), /\sopen/, "and it starts closed");
+  });
+
+  /* "If the 1-month Treasury bill rate falls 0.17 percentage points" led with the
+     instrument (2026-11-03). The everyday size leads now; the bill and the record's
+     count are the line under it. */
+  it("leads each move with its everyday size and puts the instrument on the line under it", () => {
+    const line = html.slice(html.indexOf('data-flip-axis="tightness"'), html.indexOf("</li>", html.indexOf('data-flip-axis="tightness"')));
+    assert.ok(line.includes("Funding pressure:</span> Less than one quarter-point Fed cut turns conditions Stormy."), line);
+    assert.ok(
+      line.includes('<span class="block text-slate-400">That is the 1-month Treasury bill rate falling 0.15 percentage points. The rate moved that far in about 1 month in 6 since 2012.</span>'),
+      line,
+    );
+    assert.ok(line.indexOf("Fed cut") < line.indexOf("Treasury bill"), "the everyday size first");
   });
 });
 

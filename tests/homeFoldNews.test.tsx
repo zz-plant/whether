@@ -20,13 +20,21 @@ import {
 const slot = (met: boolean, points: number) => ({ line: "Funding pressure > 76", distance: "", points, met, metric: "tightness" as const });
 
 describe("where each decision stands, before a click", () => {
-  it("says a crossed pause line as a state, and an uncrossed one as a distance", () => {
+  /* A distance is how big a move would pause the area, against the month-end record
+     (2026-11-03): "4 pts from pausing" was a size in a unit no reader has a feel for.
+     Funding pressure held still in most months since 2012, so even a 1-point move in
+     it is unusual; risk appetite moves a few points most months. */
+  it("says a crossed pause line as a state, and an uncrossed one as how big a move would pause it", () => {
     assert.deepEqual(describeAreaPauseStatus({ pause: slot(true, 14) }), { text: "On hold", crossed: true, state: "crossed" });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "4 pts from pausing", crossed: false, state: "near" });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "1 pt from pausing", crossed: false, state: "near" });
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 0) }), { text: "At its pause line", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 4) }), { text: "A rare move from pausing", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 1) }), { text: "An unusual move from pausing", crossed: false, state: "near" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 0) }), { text: "On the edge of pausing", crossed: false, state: "near" });
     /* Past the 5 points the margin calls close, the line is clear of the reading. */
-    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 6) }), { text: "6 pts from pausing", crossed: false, state: "clear" });
+    assert.deepEqual(describeAreaPauseStatus({ pause: slot(false, 6) }), { text: "A rare move from pausing", crossed: false, state: "clear" });
+    assert.deepEqual(
+      describeAreaPauseStatus({ pause: { ...slot(false, 3), metric: "riskAppetite" } }),
+      { text: "A common move from pausing", crossed: false, state: "near" },
+    );
     assert.equal(describeAreaPauseStatus({}), undefined, "an area with no pause line has nothing to say");
   });
 
