@@ -20,6 +20,12 @@ of them, which is less obvious.
   Nov 2025 and Sep 2026, flat at 90 on 99 and 94 points of pressure.
   `tests/regimeEngineProperties.test.ts` holds the flag to that meaning in both directions.
 
+  For the same reason, `pressure − score` is not the points a pinned score hides, and neither is
+  `pressure − 100`; the margin has shipped both. Pressure keeps the inversion past its 25-point cap,
+  which a falling rate never sheds, and it leaves out the add-on the score carries.
+  `resolveTightnessGap` (`lib/report/confidence.ts`) counts along the base rate, and
+  `tests/regimeMath.test.ts` holds it to the scorer (spec §1.1.80).
+
   The delta row used to render only when the delta was non-zero, so at the ceiling it vanished:
   100/100, no direction, and the reader left to infer from the ceiling tag that the silence meant
   "off the top" rather than "flat". It now says so. Pressure is computed per read and never
