@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Dialog } from "@base-ui/react/dialog";
-import { CheckIcon, CopyIcon } from "./uiIcons";
+import { CheckIcon, CloseIcon, CopyIcon } from "./uiIcons";
 import { ClipboardActionRow } from "./clipboardActionRow";
 import { isTypingTarget } from "./KeyboardShortcuts";
 import { useBriefArtifact } from "./useBriefArtifact";
@@ -91,10 +91,20 @@ export function PresentationFrames({ onExit }: { onExit: () => void }) {
           className="fixed inset-0 z-[var(--z-presentation)] flex flex-col justify-between p-6 sm:p-12"
           aria-label="Brief presentation"
         >
-          <div className="flex items-baseline justify-between gap-4 text-fluid-xs text-white/50">
+          <div className="flex items-center justify-between gap-4 text-fluid-xs text-white/50">
             <span className="type-eyebrow">{artifact.title} · {artifact.recordDateLabel}</span>
-            <span className="tabular-nums" aria-hidden="true">
-              {frame + 1} / {FRAME_TITLES.length}
+            <span className="flex items-center gap-2">
+              <span className="tabular-nums" aria-hidden="true">
+                {frame + 1} / {FRAME_TITLES.length}
+              </span>
+              {/* A way out on every frame (2026-11-03). It was Esc or stepping to the last
+                  frame's Done, and a phone or a tablet has no Esc. */}
+              <Dialog.Close
+                aria-label="Exit presentation"
+                className="-my-2 -mr-2 inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-slate-400 hover:bg-slate-800/60 hover:text-slate-200 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+              >
+                <CloseIcon className="size-4" />
+              </Dialog.Close>
             </span>
           </div>
 

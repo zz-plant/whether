@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { TERM_DEFINITIONS } from "../../../lib/report/reportCopy";
+import { CloseIcon } from "../uiIcons";
 
 /*
  * Tap-to-define for the site's coined terms (2026-11-03). A reader without the macro
@@ -42,8 +43,20 @@ export function TermDefinitionLayer() {
             id={popoverId(value)}
             popover="auto"
             aria-label={entry.term}
-            className="m-auto max-w-sm rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] p-4 text-left text-sm leading-relaxed text-slate-200 shadow-xl"
+            className="relative m-auto max-w-sm rounded-lg border border-[color:var(--border-default)] bg-[color:var(--bg-panel)] p-4 pr-12 text-left text-sm leading-relaxed text-slate-200 shadow-xl"
           >
+            {/* A card over the page says how to close it (2026-11-03): Escape and a tap
+                outside both did, and nothing on the card told a reader so. The popover
+                closes itself, so this needs no script either. */}
+            <button
+              type="button"
+              popoverTarget={popoverId(value)}
+              popoverTargetAction="hide"
+              aria-label={`Close ${entry.term}`}
+              className="absolute right-1 top-1 inline-flex min-h-11 min-w-11 items-center justify-center rounded-md text-slate-400 hover:bg-[color:var(--bg-raised)] hover:text-slate-100"
+            >
+              <CloseIcon className="size-4" />
+            </button>
             <p className="font-semibold text-slate-100">{entry.term}</p>
             <p className="mt-1">{entry.summary}</p>
           </dialog>

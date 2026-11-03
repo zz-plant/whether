@@ -102,9 +102,23 @@ export const AnchorFeedback = () => {
       const id = readHashId(window.location.hash);
       if (id) landOnTarget(id);
     };
+    /* A link to the hash already in the URL fires no hashchange, so a second tap on one
+       (the conditions map, after its fold was closed) did nothing (2026-11-03). After a
+       tick: the click's own fragment navigation fires popstate, and a URL-kept fold
+       (`UrlDetails`) closes itself on popstate to match a URL that does not name it yet. */
+    const onSameHashClick = (event: MouseEvent) => {
+      const link = event.target instanceof Element ? event.target.closest("a[href^='#']") : null;
+      if (!(link instanceof HTMLAnchorElement) || link.hash !== window.location.hash) return;
+      const id = readHashId(link.hash);
+      if (id) window.setTimeout(() => landOnTarget(id), 0);
+    };
     onHash();
     window.addEventListener("hashchange", onHash);
-    return () => window.removeEventListener("hashchange", onHash);
+    document.addEventListener("click", onSameHashClick);
+    return () => {
+      window.removeEventListener("hashchange", onHash);
+      document.removeEventListener("click", onSameHashClick);
+    };
   }, []);
 
   return null;

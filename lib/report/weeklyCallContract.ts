@@ -84,7 +84,7 @@ const buildPolicyOverrideActionLines = (assessment: RegimeAssessment) => {
   const governance = assessment.policyAssessment.governanceParameters;
   const lines = [
     governance.approvalVelocity === "SLOWER_STRUCTURED"
-      ? "Send approvals through a slower, structured review."
+      ? "Write the case for every new commitment, and wait a day before agreeing to it."
       : undefined,
     governance.rollbackRequirement === "REVERSIBLE_ONLY"
       ? "Only make new commitments you can undo."

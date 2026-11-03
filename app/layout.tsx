@@ -8,6 +8,7 @@ import { GlobalCommandPalette } from "./components/globalCommandPalette";
 import { GlobalTimeMachine } from "./components/globalTimeMachine";
 import { GlobalShareRail } from "./components/globalShareRail";
 import { MobileTabBar } from "./components/MobileTabBar";
+import { DeadClickBeacon } from "./components/deadClickBeacon";
 import { RunningHead } from "./components/runningHead";
 import { ScrollProgressBar } from "./components/scrollProgressBar";
 import { ScreenshotDetector } from "./components/ScreenshotDetector";
@@ -257,6 +258,7 @@ export default function RootLayout({
           <GlobalShareRail />
           <MobileTabBar />
           <ScreenshotDetector />
+          <DeadClickBeacon />
           {children}
         </ToastProviderRoot>
         <footer className="border-t border-slate-800/60 bg-[var(--bg-body)] px-4 py-8 sm:py-10">
@@ -269,7 +271,12 @@ export default function RootLayout({
             <div className="grid gap-8 lg:grid-cols-[minmax(0,16rem)_minmax(0,1fr)] lg:gap-12">
               <div className="space-y-3">
                 <div className="space-y-2">
-                  <p className="text-sm font-semibold tracking-[0.08em] text-white">Whether</p>
+                  {/* The wordmark goes home, as one at the foot of a page is expected to (2026-11-03). */}
+                  <p className="text-sm font-semibold tracking-[0.08em] text-white">
+                    <Link href="/" className="weather-hit no-underline hover:text-slate-200">
+                      Whether
+                    </Link>
+                  </p>
                   <p className="max-w-[32ch] text-fluid-micro leading-relaxed text-[var(--footer-legal)]">
                     {canonicalPositioningLine}
                   </p>

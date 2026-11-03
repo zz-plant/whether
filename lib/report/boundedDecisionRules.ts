@@ -401,9 +401,9 @@ export type DecisionAreaCorporateTransmission = {
 export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAreaCorporateTransmission> = {
   hiring: {
     transmission:
-      "When capital gets expensive, investors reward teams that generate revenue with lean headcount, and penalize adding payroll ahead of sales. Every new hire adds fixed monthly spend you can't easily undo if sales cycles drag.",
+      "When capital gets expensive, investors reward companies that generate revenue with lean headcount, and penalize adding payroll ahead of sales. Every new hire adds fixed monthly spend you can't easily undo if sales cycles drag.",
     whyLineMatters:
-      "Setting your pause line ahead of time protects the team you already have—so you never find yourself forced into emergency layoffs.",
+      "Setting your pause line ahead of time protects the commitments you already carry, so a slow quarter never forces emergency cuts.",
     ruleOfThumb:
       "In Sunny weather, approve revenue and core delivery hires one by one. In Cloudy or Freezing, stick strictly to backfills and mission-critical roles.",
     startupMath:
@@ -417,7 +417,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
     ruleOfThumb:
       "In Sunny weather, ship what drives activation and retention. In Stormy or Freezing, back only projects that pay for themselves within 12 months.",
     startupMath:
-      "A 3-month engineering detour costs ~$75k+ in burn. Focus on features that save current customer renewals this quarter.",
+      "A 3-month engineering detour costs three months of engineering, whether that is salaries or your own time. Focus on features that save current customer renewals this quarter.",
   },
   "capital-raising": {
     transmission:
@@ -441,7 +441,7 @@ export const decisionAreaCorporateTransmission: Record<DecisionArea, DecisionAre
   },
   "expansion-bets": {
     transmission:
-      "In tight conditions, big new product lines are risky because follow-on money is slow to arrive. Run small experiments that prove customer demand before committing full team capacity.",
+      "In tight conditions, big new product lines are risky because follow-on money is slow to arrive. Run small experiments that prove customer demand before committing full-time capacity.",
     whyLineMatters:
       "Funding new experiments in bite-sized stages means you can wind one down in a week without dragging down the core business.",
     ruleOfThumb:
@@ -511,7 +511,7 @@ export const buildCanonicalBoundedDecisionRules = ({ regime, thresholds, scores 
       scope: `Applies to all net-new headcount; current funding pressure ${fmt(scores.tightness)} and risk appetite ${fmt(scores.riskAppetite)}.`,
       pause: { verb: "Pause net-new hiring", join: "or", conditions: [tightnessPauseLine, riskPauseLine] },
       resume: { verb: "Resume the held roles", join: "and", conditions: [tightnessResumeLine, riskResumeLine] },
-      rationale: "Keep the people doing the work, and don't add costs you can't cut later.",
+      rationale: "Protect the work already under way, and don't add costs you can't cut later.",
     },
     "product-tempo": {
       area: "product-tempo",
@@ -818,7 +818,7 @@ const scaleAdjustmentToRunway = (
       runwayLabel,
       description: `${base.description} Under six months of cash, keeping cash overrides this week's guidance.`,
       doNowAdjustments: [
-        "Freeze non-revenue hires and put a second signoff on every discretionary commitment.",
+        "Freeze non-revenue hires, and write down the payback of every discretionary commitment before anyone signs it.",
         "Bring cash forward where you can: annual-upfront terms, earlier invoicing.",
         ...base.doNowAdjustments,
       ],

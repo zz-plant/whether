@@ -96,7 +96,7 @@ const revisitReasonByArea: Record<WeeklyDecisionCardViewModel["decision"]["revis
   hiring: "Check whether hiring is paused before opening a new role.",
   "product-tempo": "Look at the roadmap again before assuming last week's pace still holds.",
   "capital-raising": "If you plan to raise, re-check the timing before assuming the window is unchanged.",
-  "burn-discipline": "Re-approve optional spend before committing to new monthly costs.",
+  "burn-discipline": "Check the payback on optional spend before committing to new monthly costs.",
   "expansion-bets": "Re-check new bets before treating them as committed.",
 };
 

@@ -194,6 +194,14 @@ describe("AreaGroups", () => {
     assert.match(opened, /aria-expanded="true" aria-controls="area-hiring-detail"[^>]*>Hiring<svg/);
     assert.ok(opened.indexOf("data-detail") > opened.indexOf("Rule for hiring"), "under the rule");
     assert.equal((opened.match(/data-detail/g) ?? []).length, 1, "one area open");
+    /* The glyph and the rule answer a tap too: the button's ::after spans the row's
+       header, which holds both, and not the detail under it, whose links must work. */
+    const row = opened.slice(opened.indexOf('id="area-hiring"'), opened.indexOf('id="area-capital-raising"'));
+    const header = row.slice(row.indexOf('<div class="col-span-2 grid grid-cols-subgrid group relative">'), row.indexOf("data-detail"));
+    assert.match(header, /^<div class="col-span-2 grid grid-cols-subgrid group relative"><svg[^>]*data-concept-icon="area"/, "the glyph is inside the header");
+    assert.match(header, /<button[^>]*class="[^"]*after:absolute after:inset-0[^"]*"/);
+    assert.ok(header.indexOf("Rule for hiring") > 0 && header.indexOf("Rule for hiring") < header.lastIndexOf("</div>"), "and so is the rule");
+    assert.doesNotMatch(header, /weather-hit/, "a positioned button would pin the ::after to itself");
   });
 
   it("draws each name as a control, not as a defined term", () => {
@@ -203,8 +211,11 @@ describe("AreaGroups", () => {
     const buttons = html.match(/<button type="button" aria-expanded=[^>]*>/g) ?? [];
     assert.equal(buttons.length, 5);
     for (const button of buttons) {
-      assert.match(button, /class="weather-button /);
+      assert.match(button, /\brounded-lg border border-\[color:var\(--border-strong\)\]/, "the control radius and border");
       assert.doesNotMatch(button, /decoration-dotted/);
+      // `.weather-button` moves on hover and :active; a transform would make the button
+      // the row-wide ::after's containing block mid-press.
+      assert.doesNotMatch(button, /weather-button/);
     }
   });
 

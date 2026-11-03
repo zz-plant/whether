@@ -88,7 +88,7 @@ describe("runway-scaled decision rules", () => {
       assert.equal(critical.runwayLabel, "<6 mo runway");
       // The gate leads; the stage rule follows rather than being replaced.
       assert.match(critical.doNowAdjustments[0] ?? "", /freeze non-revenue hires/i);
-      assert.match(critical.doNowAdjustments[0] ?? "", /second signoff/i);
+      assert.match(critical.doNowAdjustments[0] ?? "", /write down the payback/i);
       assert.ok(base.doNowAdjustments.every((line) => critical.doNowAdjustments.includes(line)));
       assert.match(critical.avoidAdjustments[0] ?? "", /follow-on financing/i);
       assert.match(critical.watchAdjustments[0] ?? "", /under six months of runway/i);

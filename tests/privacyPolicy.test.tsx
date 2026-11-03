@@ -43,6 +43,7 @@ const TELEMETRY_STREAM_SECTIONS: Record<(typeof TELEMETRY_STREAMS)[number], stri
   activation: "2.5 — funnel steps",
   "content-measurement": "2.5 — coarse acquisition bucket",
   search: "2.5 — the shape of a search, never its text",
+  "dead-click": "2.5 — a click that did nothing: the page, the section and the kind of element",
   /* Worker-authored. No browser writes these and no reader appears in them, but
      they are listed so the census covers the whole union rather than the part
      that happens to be browser-facing. */

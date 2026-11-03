@@ -24,7 +24,10 @@ import { buildPlanLinesWatchHref } from "../../../lib/navigation/planningNavigat
  * The name is drawn as a control (2026-11-03): a bordered disclosure trigger, the
  * week picker's shape. It was a dotted underline, the mark the card's defined terms
  * carry, so the five names read as definitions and the runway test and "Set your own
- * rules" behind them went unopened.
+ * rules" behind them went unopened. The border and fill are utilities, not
+ * `.weather-button`: that class lifts on hover and presses on :active with a
+ * transform, which would pin the row-wide ::after to the button mid-hover and drop a
+ * press that started on the rule.
  */
 const HEADING_INK: Record<AreaGroup["state"], string> = {
   crossed: "text-line-crossed-fg",
@@ -88,14 +91,18 @@ export function AreaGroups({
               {group.areas.map((entry) => {
                 const open = selected === entry.area;
                 return (
-                  <li key={entry.area} id={`area-${entry.area}`} className="flex max-w-[68ch] gap-2.5 text-fluid-base leading-snug text-slate-200">
-                    {/* Centred on the button when the name is one: `.weather-button` is 46px
-                        on a touch screen and 36px under a mouse (controls.css). */}
-                    <AreaIcon
-                      area={entry.area}
-                      className={`shrink-0 text-slate-400 ${onToggle ? "mt-[15px] [@media(min-width:640px)_and_(hover:hover)_and_(pointer:fine)]:mt-2.5" : "mt-1"}`}
-                    />
-                    <div className="min-w-0 flex-1 space-y-1">
+                  <li
+                    key={entry.area}
+                    id={`area-${entry.area}`}
+                    className="grid max-w-[68ch] grid-cols-[auto_minmax(0,1fr)] gap-x-2.5 gap-y-1 text-fluid-base leading-snug text-slate-200"
+                  >
+                    {/* The glyph and the rule answer a tap as the name does (2026-11-03): only
+                        the name was the button, and a reader who learned the row opens tapped
+                        the glyph or the sentence and got nothing. The button's ::after spans
+                        this header, not the detail under it, so the detail's own links work. */}
+                    <div className={`col-span-2 grid grid-cols-subgrid ${onToggle ? "group relative" : ""}`}>
+                      {/* Centred on the bordered name when it is a button, on the first line of text when not. */}
+                      <AreaIcon area={entry.area} className={`shrink-0 text-slate-400 ${onToggle ? "mt-1.5" : "mt-1"}`} />
                       <p>
                         {onToggle ? (
                           <button
@@ -103,7 +110,7 @@ export function AreaGroups({
                             aria-expanded={open}
                             aria-controls={open ? `area-${entry.area}-detail` : undefined}
                             onClick={() => onToggle(entry.area)}
-                            className="weather-button weather-hit mr-1 inline-flex items-center gap-1 align-baseline font-semibold text-slate-50 hover:border-[color:var(--accent-action)] aria-expanded:border-[color:var(--accent-action)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
+                            className="mr-1 inline-flex cursor-pointer items-center gap-1 rounded-lg border border-[color:var(--border-strong)] bg-[var(--bg-raised)] px-2 py-0.5 align-baseline font-semibold text-slate-50 after:absolute after:inset-0 after:rounded-sm group-hover:border-[color:var(--accent-action)] aria-expanded:border-[color:var(--accent-action)] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-sky-400"
                           >
                             {entry.label}
                             <ChevronDown
@@ -116,14 +123,14 @@ export function AreaGroups({
                         )}{" "}
                         {sentence(entry.rule)}
                       </p>
-                      {entry.changed ? <p className="text-fluid-xs text-slate-400">{entry.changed}</p> : null}
-                      {note ? note(entry.area) : null}
-                      {open && detail ? (
-                        <div id={`area-${entry.area}-detail`} aria-live="polite">
-                          {detail(entry.area)}
-                        </div>
-                      ) : null}
                     </div>
+                    {entry.changed ? <p className="col-start-2 text-fluid-xs text-slate-400">{entry.changed}</p> : null}
+                    {note ? <div className="col-start-2 empty:hidden">{note(entry.area)}</div> : null}
+                    {open && detail ? (
+                      <div id={`area-${entry.area}-detail`} aria-live="polite" className="col-start-2">
+                        {detail(entry.area)}
+                      </div>
+                    ) : null}
                   </li>
                 );
               })}
