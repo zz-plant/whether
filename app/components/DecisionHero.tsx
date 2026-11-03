@@ -195,7 +195,7 @@ export function DecisionHero({
             height and the trust row sits at its foot, so the call is not left
             floating over an empty band. */}
         <div className={aside ? "md:grid md:grid-cols-[minmax(0,1fr)_minmax(0,18rem)] md:gap-8" : undefined}>
-        <div className="flex min-w-0 flex-col gap-2 sm:gap-3">
+        <div className="@container flex min-w-0 flex-col gap-2 sm:gap-3">
         {/* The kicker: the regime stamp, then what the week did — its direction
             and, on a week conditions moved, what they were. The regime's
             meaning is the line under the call, not this one: on the eyebrow it
@@ -322,9 +322,9 @@ export function DecisionHero({
         ) : null}
 
         {lines && lines.length > 0 ? (
-          <dl className="grid max-w-2xl gap-x-5 gap-y-2 text-sm sm:grid-cols-[max-content_1fr]">
+          <dl className="grid max-w-2xl gap-x-5 gap-y-2 text-sm @lg:grid-cols-[max-content_1fr]">
             {lines.map((line) => (
-              <div key={line.label} className="space-y-0.5 sm:contents sm:space-y-0">
+              <div key={line.label} className="space-y-0.5 @lg:contents @lg:space-y-0">
                 <dt className="font-semibold text-slate-300">{line.label}</dt>
                 <dd className="text-slate-100">{line.value}</dd>
               </div>

@@ -43,12 +43,12 @@ export function SourceBoard({
       title="Sources and last update"
       description="Each feed behind the scores: whether this reading came from it live, how often it updates, and when it last did."
     >
-      <ul className="divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
+      <ul className="@container divide-y divide-[color:var(--border-default)] border-y border-[color:var(--border-default)]">
         {rows.map((row) => (
           <li
             key={row.sourceName}
             data-source-row={row.sourceName}
-            className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-0.5 py-2.5 text-sm lg:grid-cols-[minmax(0,12rem)_minmax(0,9rem)_minmax(0,9rem)_minmax(0,1fr)]"
+            className="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-4 gap-y-0.5 py-2.5 text-sm @3xl:grid-cols-[minmax(0,12rem)_minmax(0,9rem)_minmax(0,9rem)_minmax(0,1fr)]"
           >
             <span className="font-medium text-slate-100">{row.sourceName}</span>
             <span className={`flex items-center gap-1.5 font-medium ${stateTone(row)}`}>
@@ -58,9 +58,9 @@ export function SourceBoard({
             {/* One muted line on a phone, two columns from `lg`: the wrapper
                 drops out of the box tree there and its two halves take their
                 own cells, so the row reads in the same order either way. */}
-            <span className="col-span-2 text-xs text-slate-400 lg:contents lg:text-sm">
+            <span className="col-span-2 text-xs text-slate-400 @3xl:contents @3xl:text-sm">
               <span>{row.cadenceLabel}</span>
-              <span aria-hidden="true" className="lg:hidden"> · </span>
+              <span aria-hidden="true" className="@3xl:hidden"> · </span>
               <span className="tabular-nums">{row.updatedLabel}</span>
             </span>
           </li>

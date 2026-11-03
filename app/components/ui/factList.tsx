@@ -10,15 +10,17 @@ import type { ReactNode } from "react";
  * (2026-10-09). A page that has one figure to lead with sets it in its own
  * line (`/comps`); everything else is a fact beside the section it qualifies.
  *
- * Wrapped as a row from `sm`, stacked on a phone. The label stays first and the
- * value follows it, so a paste or a screen reader reads "Months on record 177
- * since Jan 2012", the same order the tiles printed.
+ * Wrapped as a row once the list has 24rem, stacked in a phone's column. Its
+ * own width decides (ui-ux-standards §XXIX), not the screen's: on /history it
+ * sits in one of two columns. The label stays first and the value follows it,
+ * so a paste or a screen reader reads "Months on record 177 since Jan 2012",
+ * the same order the tiles printed.
  */
 export function FactList({ children, className = "" }: { children: ReactNode; className?: string }) {
   return (
-    <dl className={`flex flex-col gap-y-1 text-sm sm:flex-row sm:flex-wrap sm:gap-x-6 ${className}`.trim()}>
-      {children}
-    </dl>
+    <div className={`@container ${className}`.trim()}>
+      <dl className="flex flex-col gap-y-1 text-sm @sm:flex-row @sm:flex-wrap @sm:gap-x-6">{children}</dl>
+    </div>
   );
 }
 

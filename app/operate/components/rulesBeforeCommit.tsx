@@ -80,7 +80,7 @@ export function RulesBeforeCommit({
       <p className="text-sm text-slate-200">
         {playbook ? playbook.insight : "This week's rules did not load. Hold new commitments until they do."}
       </p>
-      <div id={rulesId} className="grid gap-6 md:grid-cols-3 md:gap-8">
+      <div id={rulesId} className="weather-switch gap-x-8 gap-y-6 [--col-min:13rem]">
         {lists.map((list) => (
           <div key={list.key}>
             <h3 className={`text-sm font-semibold ${list.labelClassName}`}>{list.label}</h3>
@@ -116,7 +116,7 @@ export function RulesBeforeCommit({
           <summary className="text-xs font-semibold text-slate-300">
             What to say this week, and what to stop saying
           </summary>
-          <div className="mt-4 grid gap-4 md:grid-cols-2">
+          <div className="mt-4 weather-switch gap-4 [--col-min:14rem]">
             <div>
               <p className="text-xs font-semibold text-semantic-easing-fg">Say more</p>
               <ul className="mt-3 space-y-2 text-sm text-slate-300">

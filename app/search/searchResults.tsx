@@ -187,7 +187,7 @@ export const SearchResults = ({
           {SEARCH_JOB_ORDER.filter((jobKey) => grouped[jobKey].length > 0).map((jobKey) => (
             <section key={jobKey} aria-labelledby={`search-job-${jobKey}`} className="space-y-3">
               <h2 id={`search-job-${jobKey}`} className="type-eyebrow">{searchJobLabels[jobKey]}</h2>
-              <ul className="grid gap-3 sm:grid-cols-2">
+              <ul className="weather-grid gap-3 [--grid-max:2]">
                 {grouped[jobKey].map((entity) => (
                   <li key={entity.id}>
                     <Link

@@ -91,10 +91,10 @@ export function CompanyCalibration({
           </span>
         </summary>
         <div className="mt-3 grid gap-3 weather-company-options">
-          <StagePersonaSelector activeStage={activeStage} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
-          <RunwayPersonaSelector activeRunway={activeRunway} className="sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" />
+          <StagePersonaSelector activeStage={activeStage} className="@xl:grid @xl:grid-cols-[6rem_minmax(0,1fr)]" />
+          <RunwayPersonaSelector activeRunway={activeRunway} className="@xl:grid @xl:grid-cols-[6rem_minmax(0,1fr)]" />
           {horizon ? (
-            <div className="flex flex-wrap items-center gap-1.5 sm:grid sm:grid-cols-[6rem_minmax(0,1fr)]" data-plan-horizon>
+            <div className="flex flex-wrap items-center gap-1.5 @xl:grid @xl:grid-cols-[6rem_minmax(0,1fr)]" data-plan-horizon>
               <span className="type-eyebrow mr-1">Plan horizon</span>
               {horizon}
             </div>

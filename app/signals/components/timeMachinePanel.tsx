@@ -276,8 +276,8 @@ export const TimeMachinePanel = ({
           </nav>
         </div>
 
-        <Form onFormSubmit={handleSubmit} className="mt-6">
-          <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 md:grid-cols-[1fr,auto]">
+        <Form onFormSubmit={handleSubmit} className="@container mt-6">
+          <Fieldset.Root className="grid min-w-0 gap-4 border-0 p-0 @2xl:grid-cols-[1fr,auto]">
             <Fieldset.Legend className="sr-only">Choose a month and load it</Fieldset.Legend>
             <TimeMachineMonthPicker
               monthRef={monthRef}
@@ -324,8 +324,8 @@ export const TimeMachinePanel = ({
             Latest month
           </ActionLink>
         </div>
-        <div className="mt-4 grid gap-3 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,0.85fr)]">
-          <div className="weather-surface grid gap-3 p-4 sm:grid-cols-2">
+        <div className="mt-4 weather-switch gap-3 [--col-min:18rem]">
+          <div className="weather-surface flex flex-wrap gap-x-8 gap-y-3 p-4">
             <div>
               <p className="type-label text-slate-400">Latest reading</p>
               <p className="mt-2 text-sm text-slate-200">
@@ -350,7 +350,7 @@ export const TimeMachinePanel = ({
               </p>
             </div>
             {isDraft ? (
-              <div className="rounded-md border border-slate-700/70 bg-slate-900/40 px-3 py-3 sm:col-span-2">
+              <div className="rounded-md border border-slate-700/70 bg-slate-900/40 basis-full px-3 py-3">
                 <p className="type-label text-slate-300">Month picked</p>
                 <p className="mt-2 text-sm text-slate-200">
                   {selectedLabel} is picked. Load it to see that month&apos;s guidance.

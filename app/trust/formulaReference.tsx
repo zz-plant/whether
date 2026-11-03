@@ -350,7 +350,7 @@ export function FormulaReference({
         <summary className="flex min-h-11 cursor-pointer list-none items-center gap-2 text-sm font-semibold text-sky-200 hover:text-slate-100">
           Show the exact arithmetic
         </summary>
-      <div className="mt-4 grid gap-x-10 gap-y-8 lg:grid-cols-2">
+      <div className="mt-4 weather-grid gap-x-10 gap-y-8 [--col-min:22rem] [--grid-max:2]">
         <FormulaCard title="Inputs — all public">
           <ul className="space-y-1.5 text-sm text-slate-200">
             <li>

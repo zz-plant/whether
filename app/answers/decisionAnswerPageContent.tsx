@@ -355,7 +355,7 @@ export async function DecisionAnswerPageContent({
             on the three pages a returning reader already knows their way around.
             Same primitives, on the surface that needs them most.
           */}
-          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+          <div className="mt-3 weather-switch gap-3 [--col-min:16rem]">
             {compositeReadings.map((reading) => (
               <div key={reading.key} className="space-y-1">
                 {/* Drawn against the line, not printed bare: how far the score sits

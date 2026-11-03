@@ -93,7 +93,7 @@ export function resolveGuidedTranslationState(params?: GuidedTranslationSearchPa
 function HearingThread({ guide }: { guide: (typeof stakeholderGuides)[number] }) {
   return (
     <article
-      className="weather-hub-card px-4 py-4 xl:grid xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] xl:gap-6"
+      className="weather-hub-card px-4 py-4 @4xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)] @4xl:gap-6"
       aria-labelledby="guided-hearing-heading"
     >
       <div className="flex items-start gap-3">
@@ -136,10 +136,10 @@ export function GuidedTranslationPanels({
   }
 
   return (
-    <section id="guided-translation-results" className="space-y-4" aria-label="Selected view details">
+    <section id="guided-translation-results" className="@container space-y-4" aria-label="Selected view details">
       {selectedStakeholder ? (
         <>
-          <div className="grid gap-3 xl:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)]">
+          <div className="weather-switch gap-3 [--col-min:22rem]">
             <article className="weather-hub-card space-y-3 px-4 py-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="text-lg font-semibold text-slate-100">{selectedStakeholder.title}</h3>
@@ -187,7 +187,7 @@ export function GuidedTranslationPanels({
       ) : null}
 
       {selectedStage ? (
-        <div className="grid gap-3 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+        <div className="weather-switch gap-3 [--col-min:22rem]">
           <article className="weather-hub-card space-y-3 px-4 py-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="text-lg font-semibold text-slate-100">{selectedStage.title}</h3>
@@ -236,7 +236,7 @@ export function GuidedTranslationPanels({
         </div>
       ) : null}
 
-      <div className="grid gap-4 md:grid-cols-2">
+      <div className="weather-grid gap-4 [--col-min:18rem] [--grid-max:2]">
         {featuredStakeholders.map((guide) => (
           <article key={guide.slug} className="weather-hub-card space-y-2 px-4 py-4">
             <h3 className="text-base font-semibold text-slate-100">{guide.title}</h3>
@@ -279,7 +279,7 @@ export function GuidedTranslationPanels({
             </div>
           ) : null}
 
-          <div className="grid gap-3 md:grid-cols-2">
+          <div className="weather-grid gap-3 [--col-min:18rem] [--grid-max:2]">
             {stageGuides.map((stage) => (
               <article key={stage.slug} className="weather-hub-card space-y-2 px-4 py-4">
                 <p className="text-sm font-semibold text-slate-100">{stage.title}</p>

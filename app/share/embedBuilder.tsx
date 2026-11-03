@@ -100,7 +100,7 @@ export function EmbedBuilder() {
         {/* The default snippet is what nearly everyone pastes. Ticker and stage
             used to be asked for before any preview appeared; they are a
             refinement now, after the copy button. */}
-        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_18rem]">
+        <div className="weather-sidebar gap-8 [--aside:18rem]">
           <div className="min-w-0 space-y-3">
             <p className="text-fluid-micro font-semibold tracking-[0.04em] text-slate-400">
               Live preview
@@ -144,7 +144,7 @@ export function EmbedBuilder() {
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="weather-switch gap-6 [--col-min:20rem]">
         <div className="min-w-0 space-y-2">
           <p className="text-fluid-xs font-semibold text-slate-200">Notion, Coda, or a wiki</p>
           <p className="text-fluid-micro leading-relaxed text-slate-400">

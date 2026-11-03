@@ -10,7 +10,7 @@ The two compatibility entrypoints contain imports only. Add a rule to the narrow
 
 ## Layout modules
 
-- `layout-shells.css` — shared page shells, grids, panels, tags, and responsive layout.
+- `layout-shells.css` — shared page shells, panels, tags, and the three shapes a box sets its children in (`weather-switch`, `weather-sidebar`, `weather-grid`; ui-ux-standards §XXIX).
 - `home-flow.css` — homepage decision-flow bands and their desktop behavior.
 - `layout-effects.css` — shell/reveal motion, compact viewport rules, reduced motion, and print styles.
 

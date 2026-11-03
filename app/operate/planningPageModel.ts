@@ -381,7 +381,7 @@ export async function buildPlanningPageModel(
             h("h2", { id: "ops-failure-patterns-title", className: "text-[1.375rem] leading-tight font-semibold tracking-[-0.02em] text-slate-100 sm:text-2xl" }, "Warnings to read before you approve"),
             h("p", { className: "text-sm text-slate-300" }, "Each one names an assumption the plan rests on and how to check it."),
           ),
-          h("ul", { className: "grid gap-x-8 gap-y-4 lg:grid-cols-2" },
+          h("ul", { className: "weather-grid gap-x-8 gap-y-4 [--col-min:20rem] [--grid-max:2]" },
             failureModes.map((warning) => h("li", { key: warning.id },
               h("p", { className: "text-sm font-semibold text-slate-100" }, warning.warning),
               h("p", { className: "mt-1 text-sm text-slate-300" }, warning.mitigationCheck),

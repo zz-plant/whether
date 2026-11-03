@@ -69,7 +69,7 @@ export function ScenarioSliders({
         </div>
       </div>
 
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="weather-switch gap-6 [--col-min:18rem]">
         {/* Base Rate Slider */}
         <div className="weather-surface p-5 space-y-3">
           <div className="flex items-center justify-between">

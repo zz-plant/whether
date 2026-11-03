@@ -222,7 +222,7 @@ const RecordRow = ({ row, review }: { row: DecisionRecordRow; review?: ReviewCon
     ) : null}
 
     {row.guardrail || row.reversalTrigger ? (
-      <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2">
+      <dl className="mt-4 weather-grid gap-2 text-sm [--col-min:13rem] [--grid-max:2]">
         {row.guardrail ? (
           <div>
             <dt className="type-eyebrow">{publicDecisionLabels.threshold}</dt>

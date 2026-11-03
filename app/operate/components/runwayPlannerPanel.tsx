@@ -380,7 +380,7 @@ export function RunwayPlannerPanel({
           </div>
         </div>
 
-        <div className="grid gap-3 md:grid-cols-2 lg:grid-cols-3">
+        <div className="weather-grid gap-3 [--col-min:13rem] [--grid-max:4]">
           <OperatorProfileNumberField
             field="cashUsd"
             label="Cash in the bank ($)"
@@ -515,7 +515,7 @@ export function RunwayPlannerPanel({
         </div>
       ) : (
         <>
-          <div id="ops-runway-risk" className="grid gap-3 md:grid-cols-2">
+          <div id="ops-runway-risk" className="weather-switch gap-3 [--col-min:16rem]">
             <article className="weather-surface p-4">
               {/* The score with its reference: the line it is judged against here
                   is where it would sit if conditions worsened, which is the one
@@ -634,7 +634,7 @@ export function RunwayPlannerPanel({
                 today&apos;s net burn, and goes out with the link and the memo.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="weather-switch gap-3 [--col-min:13rem]">
               <OperatorProfileNumberField
                 field="raiseAtRunwayMonths"
                 label="Start raising at (months of runway)"

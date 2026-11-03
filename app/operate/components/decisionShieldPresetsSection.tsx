@@ -118,7 +118,7 @@ export const DecisionShieldPresetsSection = ({
       <output className="sr-only" aria-live="polite">
         {presetStatus ?? ""}
       </output>
-      <div className="mt-4 grid gap-3 md:grid-cols-2">
+      <div className="mt-4 weather-grid gap-3 [--col-min:18rem] [--grid-max:2]">
         {presets.length === 0 ? (
           <div className="col-span-full space-y-3">
             <p className="text-sm text-slate-400">

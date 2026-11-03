@@ -196,7 +196,7 @@ export function RegimePhaseMap({ series, activeSpan, spanHref, totalMonths, open
           </nav>
         </div>
 
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_15rem]">
+        <div className="weather-sidebar gap-5 [--aside:15rem] [--main-min:28rem]">
           <figure className="m-0">
             {/* The chart is hidden from assistive tech, and real text carries its
                 content instead: the paragraph below, the visible caption, and the

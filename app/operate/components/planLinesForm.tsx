@@ -205,7 +205,7 @@ export function PlanLinesForm({
         </output>
       ) : (
         <div className="space-y-2">
-          <div className="flex flex-col gap-2 sm:flex-row">
+          <div className="flex flex-wrap gap-2">
             <label htmlFor="plan-lines-email" className="sr-only">Email address</label>
             <input
               id="plan-lines-email"
@@ -224,12 +224,12 @@ export function PlanLinesForm({
               disabled={status === "loading"}
               aria-invalid={status === "error" ? true : undefined}
               aria-describedby={message ? "plan-lines-message" : undefined}
-              className="weather-input min-h-11 flex-1 px-3 py-2 text-base text-slate-100 placeholder:text-slate-500 sm:text-xs"
+              className="weather-input min-h-11 min-w-0 grow-[999] basis-56 px-3 py-2 text-base text-slate-100 placeholder:text-slate-500 sm:text-xs"
             />
             <button
               type="submit"
               disabled={status === "loading" || watched.size === 0}
-              className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-11 items-center justify-center px-4 py-2 text-xs font-semibold disabled:opacity-50"
+              className="weather-button weather-focus-ring weather-press-scale inline-flex min-h-11 grow items-center justify-center px-4 py-2 text-xs font-semibold disabled:opacity-50"
             >
               {status === "loading" ? "Sending…" : "Email me when these change"}
             </button>

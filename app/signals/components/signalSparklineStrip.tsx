@@ -37,7 +37,7 @@ export function SignalSparklineStrip({ series }: { series: SignalSparklineSeries
   if (drawable.length === 0) return null;
 
   return (
-    <ul className="grid gap-3 sm:grid-cols-2" aria-label="Signal readings over the window">
+    <ul className="weather-grid gap-3 [--grid-max:2]" aria-label="Signal readings over the window">
       {drawable.flatMap((item) => {
         /* The window through the function the summary over this strip reads,
            so the closed question and the opened cells quote the same move. */

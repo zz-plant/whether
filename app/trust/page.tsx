@@ -63,7 +63,7 @@ export default async function MethodPage({
       >
         {/* Two columns under their own headings, not two cards inside the
             section (2026-10-09); the warnings below are set the same way. */}
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-8">
+        <div className="weather-switch gap-x-8 gap-y-6 [--col-min:18rem]">
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-slate-100">What to watch</h3>
             <ul className="space-y-2 text-sm text-slate-200">
@@ -104,7 +104,7 @@ export default async function MethodPage({
       </ReportSection>
 
       <ReportSection id="revisit-call" title="What would make this recommendation wrong?">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,1.1fr)_minmax(0,0.9fr)] lg:gap-8">
+        <div className="weather-switch gap-x-8 gap-y-6 [--col-min:18rem]">
           <div className="space-y-2">
             <h3 className="text-sm font-semibold text-slate-100">Active warnings</h3>
             {warnings.length === 0 ? (

@@ -161,7 +161,7 @@ export function TrackRecordTiles({
         {action}
       </div>
 
-      <div className={aside ? "grid gap-6 lg:grid-cols-2" : ""}>
+      <div className={aside ? "weather-switch gap-6 [--col-min:20rem]" : ""}>
         <div className="space-y-3">
           <FactList>
             <Fact label="Months on record" value={record.monthsCovered.toLocaleString("en-US")} unit={since} />

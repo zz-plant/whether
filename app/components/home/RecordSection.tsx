@@ -53,9 +53,10 @@ export function RecordSection({
           </p>
         </>
       ) : null}
-      {/* How long spells last beside the last few changes, from xl: two short answers
-          that stacked under a full-width band left half a laptop screen empty. */}
-      <div className="space-y-4 xl:grid xl:grid-cols-2 xl:items-start xl:gap-8 xl:space-y-0">
+      {/* How long spells last beside the last few changes, wherever the column holds
+          two at 20rem: two short answers that stacked under a full-width band left
+          half a laptop screen empty. */}
+      <div className="weather-switch items-start gap-x-8 gap-y-4 [--col-min:20rem]">
         {spellLengths?.rest ? <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">{spellLengths.rest}</p> : null}
         {turningPoints.length > 0 ? (
           <p className="max-w-[72ch] text-fluid-xs leading-relaxed text-slate-300">

@@ -389,16 +389,16 @@ export function AdviceCorpusSection() {
           </table>
         </div>
       </figure>
-      <div className="mt-5 max-w-prose" data-advice-corpus-sample>
+      <div className="@container mt-5 max-w-prose" data-advice-corpus-sample>
         <p className="text-fluid-nano text-slate-400">
           Who is in the sample. Each firm weighs equally in the shares
           {largestFirm && largestShare !== null
             ? `, and the largest archive, ${largestFirm.firm}, is ${largestShare}% of the ${monthly.eligiblePosts} eligible posts.`
             : "."}
         </p>
-        <ul className="mt-2 grid gap-x-6 gap-y-1 text-fluid-nano text-slate-300 sm:grid-cols-2">
+        <ul className="mt-2 grid gap-x-6 gap-y-1 text-fluid-nano text-slate-300 @md:grid-cols-2">
           {monthly.firmPosts.map((firm) => (
-            <li key={firm.firm} className="flex justify-between gap-3 border-b border-[color:var(--border-subtle)] py-1 last:border-0 sm:last:border-b">
+            <li key={firm.firm} className="flex justify-between gap-3 border-b border-[color:var(--border-subtle)] py-1 last:border-0 @md:last:border-b">
               <span className="min-w-0 break-words">{firm.firm}</span>
               <span className="shrink-0 tabular-nums text-slate-400">{firm.posts}</span>
             </li>

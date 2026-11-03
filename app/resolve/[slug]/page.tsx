@@ -82,7 +82,7 @@ export default async function DecideDetailPage({
         </section>
         <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
           <h2 className="text-lg font-semibold text-slate-100">Recommended tools</h2>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="weather-grid gap-3 [--grid-max:2]">
             {recommendedToolkitSlugs.map((slugItem) => {
               const toolkit = findToolkitDefinition(slugItem);
               if (!toolkit) return null;
@@ -116,7 +116,7 @@ export default async function DecideDetailPage({
       </section>
       <section className="weather-panel space-y-3 px-6 max-sm:px-0 py-6">
         <h2 className="text-lg font-semibold text-slate-100">Recommended tools</h2>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="weather-grid gap-3 [--grid-max:2]">
           {recommendedToolkitSlugs.map((toolkitSlug) => {
             const toolkit = findToolkitDefinition(toolkitSlug);
             if (!toolkit) return null;
