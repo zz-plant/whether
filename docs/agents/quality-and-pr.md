@@ -14,7 +14,7 @@ Additional requirements:
 - Add/update tests when changing scoring, classification, or decision behavior.
 - Validate deterministic fallback behavior for data-path changes.
 - Capture command outcomes in your PR summary.
-- `bun run review:hotspot-preflight` now runs inside `bun run check` and should be run early while developing logic changes. On pre-push it is scoped to the commits the push sends, so the range it reviews there is exactly what lands on the remote.
+- `bun run review:hotspot-preflight` now runs inside `bun run check` and should be run early while developing logic changes. On pre-push it is scoped to the commits the push sends, or to the merge-base with `main` when the push brings `main` into a branch, so a merge is judged on the branch's own changes rather than everything `main` did.
 - Email flows have a lifecycle harness: `bun run e2e:email` drives subscribe → confirm → alert → weekly brief → unsubscribe against a running worker and reads the mail it actually sent. Start the worker with `bun run serve:worker -- --var WHETHER_CRON_SECRET:e2e-secret`; run it from a clean `.wrangler/state` (the local capture store is a dev aid with a row budget). It needs no real address and sends nothing outside the machine. `serve:worker` serves the **built** app routes, so run `bun run build` after changing anything under `app/` before trusting a run.
 
 ## Commit quality

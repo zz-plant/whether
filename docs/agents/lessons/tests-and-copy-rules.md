@@ -223,6 +223,28 @@ a failing test or a dead export, and the suite was green through all of them.
   judge the checked-out tree rather than the pushed ref. The hook passes both shas, so a push is
   commit-to-commit again and never sees another session's uncommitted edits.
 
+- **A push that merged `main` was judged on all of `main` (fixed 2026-11-03).** "Exactly the
+  commits it sends" is the wrong question for a merge: merging `main` into `feat/viral-loops` sent
+  every commit since the branch left, so `git diff <remote tip> <head>` read 530 files of `main`'s
+  work as the branch's, and the push failed on code the branch never touched. It went out with
+  `SKIP_PREPUSH=1`, on the one gate this repo still enforces. `scripts/pre-push-range.mjs` now moves
+  the base to the merge-base with `main` whenever the remote tip does not already hold it (a merge,
+  a rebase, a sha never fetched); a plain push and any push to `main` keep the remote tip. The range
+  script owns this rather than the preflight, so `--base` still means exactly what it says. A merge
+  push does re-judge the branch's earlier commits, which is what the default mode does anyway; the
+  merge's own conflict resolution is in the diff, so an assertion written there is caught.
+
+- **The `as` detector reads the syntax tree (2026-11-03).** Each false positive had earned its own
+  patch: line comments, block comments, the `{/*` form, quoted strings, a word list for "as of". The
+  next ones were `<p>Download as CSV</p>` and a backticked message, which line-matching cannot tell
+  from code, and the entry above recording that template literals were left alone is why. Across the
+  repo the parser (`rolldown/utils`) and the regex agreed on 235 lines; the regex alone flagged 7
+  (JSX text, multi-line and `import type` aliases, a test's regex literal) and missed 5 real casts
+  (a string-literal union, two tuples, a number union, a template-literal type). So new
+  lines are now held to more than they were, and a file that does not parse fails rather than
+  passing unread. `rolldown` is a declared dev dependency because `vite`'s re-export of the same
+  parser takes about five times as long to import.
+
 **Two findings from that audit were wrong and are recorded here as such.** The mockup route being
 publicly reachable — it is gated, and the gate has its own recorded argument. And `/operate` showing
 four of six sections collapsed: `resolveInitialOpenStepIds` opens the first step plus anything

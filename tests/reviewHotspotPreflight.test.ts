@@ -5,9 +5,9 @@ import { mkdtempSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
-  blockCommentLines,
-  isUnsafeAssertion,
+  addedLinesByFile,
   resolveDiffBase,
+  typeAssertionLines,
 } from "../scripts/review-hotspot-preflight.mjs";
 
 /*
@@ -40,94 +40,142 @@ describe("the diff base", () => {
   });
 });
 
-describe("blockCommentLines", () => {
-  const source = [
-    "/**", //                       1
-    " * Renders as a header.", //   2
-    " */", //                       3
-    "const a = 1;", //              4
-    "// reads as boilerplate", //   5
-    "const b = 2;", //              6
-    "/* one-liner as such */", //   7
-    "const c = 3;", //              8
-  ].join("\n");
+/*
+ * The detector reads the syntax tree, so only an assertion can match. A regex over lines
+ * flagged the prose "named as two" in a JSX comment on 2026-10-27, and "Download as CSV" in
+ * JSX text, while missing `value as "brief"` and `value as [A, B]`.
+ */
+describe("typeAssertionLines", () => {
+  const lines = async (source: string, file = "sample.tsx") => [...((await typeAssertionLines(file, source)) ?? [])];
 
-  it("covers a doc comment from its opener to its closer", () => {
-    const inside = blockCommentLines(source);
-
-    assert.ok(inside.has(1) && inside.has(2) && inside.has(3), "the whole block");
-    assert.ok(!inside.has(4), "code after the block is code");
+  it("finds a real assertion, whatever the type looks like", async () => {
+    assert.deepEqual(await lines("const rows = JSON.parse(raw) as Row[];"), [1]);
+    assert.deepEqual(await lines("const value = input as { id: string };"), [1]);
+    assert.deepEqual(await lines('const mode = value as "brief" | "strip";'), [1]);
+    assert.deepEqual(await lines("const pair = value as [Left, Right];"), [1]);
+    assert.deepEqual(await lines("const step = (next - 1) as 0 | 1;"), [1]);
+    assert.deepEqual(await lines("const route = path as `/resources/${string}`;"), [1]);
   });
 
-  it("covers line comments and single-line block comments", () => {
-    const inside = blockCommentLines(source);
-
-    assert.ok(inside.has(5));
-    assert.ok(inside.has(7));
-    assert.ok(!inside.has(6) && !inside.has(8));
+  it("reports a double assertion once, on the line it sits on", async () => {
+    assert.deepEqual(await lines("const a = 1;\nconst b = value as unknown as Foo;\n"), [2]);
   });
 
-  it("covers JSX comments, single-line and opening a block", () => {
+  it("reads the line of the assertion in a statement that spans several", async () => {
+    assert.deepEqual(await lines("const a = compute(\n  value,\n) as Foo;\n"), [3]);
+  });
+
+  it("counts lines correctly past characters wider than a byte", async () => {
+    assert.deepEqual(await lines("// Em dash — and 🌦 before it\nconst a = '—';\nconst b = value as Foo;\n"), [3]);
+  });
+
+  it("allows as const", async () => {
+    assert.deepEqual(await lines('const modes = ["auto", "tv"] as const;'), []);
+  });
+
+  it("allows import and export aliases, renamed or namespaced", async () => {
+    assert.deepEqual(await lines('import { macroSeries as snapshotMacroSeries } from "../lib/macroSnapshot";'), []);
+    assert.deepEqual(await lines('import * as nextNavigation from "next/navigation";'), []);
+    assert.deepEqual(await lines('import type { Props as SharedProps } from "./types";'), []);
+    assert.deepEqual(await lines('export { a as b } from "./a";'), []);
+    assert.deepEqual(await lines("import {\n  first as second,\n} from './names';"), []);
+  });
+
+  it("ignores prose in comments of every shape", async () => {
     const source = [
-      "{/* Two different questions, named as two */}", // 1
-      "{/* A note that runs on, named as two", //          2
-      "   more of it */}", //                              3
-      "<Section as={tag} />", //                           4
+      "// this renders as a header",
+      "/* one-liner as such */",
+      "/**",
+      " * Rounds of narrowing returned a clientId as its own.",
+      " */",
+      "const a = 1; /* trailing note as written",
+      "   that runs on as more */",
     ].join("\n");
-    const inside = blockCommentLines(source);
-
-    assert.ok(inside.has(1) && inside.has(2) && inside.has(3));
-    assert.ok(!inside.has(4), "JSX code is code");
+    assert.deepEqual(await lines(source), []);
   });
 
-  it("does not excuse a line that carries code before the comment opener", () => {
-    const source = ["const x = value as Foo; /* trailing note", " * continues here", " */"].join("\n");
-    const inside = blockCommentLines(source);
-
-    assert.ok(!inside.has(1), "line 1 has real code on it");
-    assert.ok(inside.has(2) && inside.has(3), "the continuation is still comment");
-  });
-});
-
-describe("isUnsafeAssertion", () => {
-  it("flags a real assertion", () => {
-    assert.equal(isUnsafeAssertion("  const rows = JSON.parse(raw) as Row[];"), true);
-    assert.equal(isUnsafeAssertion("  const value = input as { id: string };"), true);
-  });
-
-  it("allows as const", () => {
-    assert.equal(isUnsafeAssertion('  const modes = ["auto", "tv"] as const;'), false);
+  it("ignores the JSX comments that failed a push, as a child and among props", async () => {
+    const source = [
+      "const page = (",
+      "  <Section",
+      "    /* a prop comment, named as two */",
+      "    title={title}",
+      "  >",
+      "    {/* Two different questions, named as two */}",
+      "    {/* A note that runs on, named as two",
+      "       more of it */}",
+      "  </Section>",
+      ");",
+    ].join("\n");
+    assert.deepEqual(await lines(source), []);
   });
 
-  it("allows import aliases, renamed or namespaced", () => {
-    assert.equal(
-      isUnsafeAssertion('import { macroSeries as snapshotMacroSeries } from "../lib/macroSnapshot";'),
-      false,
-    );
-    /* The namespace form carries the same `as Name` tokens and overrides nothing.
-       It was refused until a test needed one to spread the real `next/navigation`
-       over a mock, and the gate then failed on an import. */
-    assert.equal(isUnsafeAssertion('import * as nextNavigation from "next/navigation";'), false);
+  it("ignores prose in strings and templates, and reads the code inside a template", async () => {
+    assert.deepEqual(await lines('const label = "treats the window as unchanged";'), []);
+    assert.deepEqual(await lines("const label = 'treats the window as unchanged';"), []);
+    assert.deepEqual(await lines("const label = `treats the window as unchanged`;"), []);
+    assert.deepEqual(await lines("const label = `treats ${input as Foo} as unchanged`;"), [1]);
   });
 
-  it("ignores English prose, quoted or not", () => {
-    assert.equal(isUnsafeAssertion("  // this renders as a header"), false);
-    assert.equal(isUnsafeAssertion('  const label = "treats the window as unchanged";'), false);
-    assert.equal(isUnsafeAssertion("  // as of the latest record"), false);
+  it("ignores JSX text and the as prop", async () => {
+    assert.deepEqual(await lines("const a = <p>You may not present outputs as official guidance</p>;"), []);
+    assert.deepEqual(await lines("const a = <Section as={tag} />;"), []);
+  });
+
+  it("reads a .ts file in the .ts grammar, where an angle bracket is a generic or a cast", async () => {
+    assert.deepEqual(await lines("const a = <Foo>value;\nconst b = value as Foo;\n", "sample.ts"), [2]);
+  });
+
+  it("says when it cannot read the file rather than reporting none", async () => {
+    assert.equal(await typeAssertionLines("sample.tsx", "const = ;"), null);
   });
 });
 
-// The scanner used to track comment state across added lines only, so editing the middle
-// of an existing doc comment handed it bare prose with the opener nowhere in the diff.
-// Every "renders as a header" in that prose was reported as a type assertion, and the
-// check failed on a change that added no code at all.
-describe("prose inside an edited doc comment", () => {
-  it("is excluded by line number even though the line alone looks like an assertion", () => {
-    const editedLine = " * rounds of narrowing got here. First this returned a clientId as its own";
-    const file = ["/**", editedLine, " */", "const x = 1;"].join("\n");
+describe("addedLinesByFile", () => {
+  it("reads the new side of each hunk, counted or single-line", () => {
+    const diff = [
+      "diff --git a/one.ts b/one.ts",
+      "--- a/one.ts",
+      "+++ b/one.ts",
+      "@@ -1,2 +1,3 @@ context",
+      "-gone",
+      "-gone too",
+      "+first",
+      "+second",
+      "+third",
+      "@@ -9 +10 @@",
+      "-old",
+      "+new",
+      "diff --git a/two.ts b/two.ts",
+      "--- a/two.ts",
+      "+++ b/two.ts",
+      "@@ -3 +3,0 @@",
+      "-only removed",
+    ].join("\n");
+    const added = addedLinesByFile(diff);
 
-    assert.equal(isUnsafeAssertion(editedLine), true, "the line alone is indistinguishable");
-    assert.ok(blockCommentLines(file).has(2), "but the file says line 2 is a comment");
+    assert.deepEqual([...(added.get("one.ts") ?? [])], [1, 2, 3, 10]);
+    assert.deepEqual([...(added.get("two.ts") ?? [])], []);
+  });
+
+  it("does not read added code as a file header or a hunk", () => {
+    const diff = [
+      "--- a/one.ts",
+      "+++ b/one.ts",
+      "@@ -0,0 +1,2 @@",
+      "+++ b/other.ts",
+      "+@@ -0,0 +50,1 @@",
+      "\\ No newline at end of file",
+      "--- a/two.ts",
+      "+++ b/two.ts",
+      "@@ -0,0 +7 @@",
+      "+const a = 1;",
+    ].join("\n");
+    const added = addedLinesByFile(diff);
+
+    assert.deepEqual([...added.keys()], ["one.ts", "two.ts"]);
+    assert.deepEqual([...(added.get("one.ts") ?? [])], [1, 2]);
+    assert.deepEqual([...(added.get("two.ts") ?? [])], [7]);
   });
 });
 

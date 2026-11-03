@@ -134,6 +134,7 @@
     "path-to-regexp": "6.3.0",
     "postcss": "8.5.10",
     "react-server-dom-webpack": "^19.2.8",
+    "rolldown": "1.2.6",
     "shadcn": "^4.21.0",
     "suppression-census": "0.1.0",
     "tailwindcss": "4.3.3",
