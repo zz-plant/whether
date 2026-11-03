@@ -342,6 +342,20 @@ until the report resolves.
 - The homepage load budget (`scripts/check-home-load.ts`) falls to the combined measurement:
   1,839 words, 372 before the areas, 332 numbers, 37 "Funding pressure" and 52 "Risk appetite".
 
+### 1.1.0u One decision answered before any is picked (2026-11-03)
+
+- Under "Your decisions this week", before the reader picks an area, one sentence answers the
+  decision nearest to changing (`describeFirstAnswer`): the held area nearest its restart ("Hiring
+  this month? Wait until funding pressure falls below 66."), or, with nothing on hold, the area
+  nearest its pause, in its badge's own words ("Roadmap this month? Go ahead: 9 pts from
+  pausing."). It replaces "An area on hold is already covered by this week's guidance", and goes
+  once an area is open.
+- "4 of 5 areas are on hold." prints on a saved copy only, where it carries the reading's date; on
+  a live week the card's "On hold …" line and the badges say it.
+- The conditions map's screen-reader description states the two cuts once ("Funding pressure
+  below 70 and risk appetite above 50: Sunny. The opposite: Freezing. Both above: Cloudy. Both
+  below: Stormy.") instead of both numbers for each of the four.
+
 ### 1.1.0t The card for a reader without the macro background (2026-11-03)
 
 - **Two plain facts under the call.** The regime's one-line rationale and the bare scores
