@@ -192,12 +192,23 @@ answering a question the answer pages already answer.
   mechanism in most sentences: "24 pts away from its restart line", "No new line was crossed",
   "5 pts above the change line", "Clear of the line", a key to "what the three lines do", and
   "an email the day a line is crossed" under every page title. A reader asks what to do and
-  what would change it, so a sentence says the area's verb ("Hiring — 24 pts from restarting",
+  what would change it, so a sentence says the area's verb ("Hiring — a rare move from restarting",
   "No area changed since Sep 30") or the number ("risk appetite is 55, above 50"). "Pause
   line", "Restart line" and "Change line" stay as labels beside a number (a ladder tick, a
   table header in exports, a chart), and the method sections (/about#method, /trust) are where
   the lines are explained. A new sentence that needs "line" to make sense is a sign the number
   or the verb is missing from it.
+- **A distance says how big a move it takes** (2026-11-03). The two scores are 0–100 numbers no
+  reader has a feel for, so "11 pts from pausing" and "Risk appetite 3 pts from Freezing" gave a
+  size with nothing to hold it against. A badge, the band above the card and the trust strip say
+  how often the month-end record since 2012 moved that score that far in one month: "a common
+  move" (at least 1 month in 3, so a quarter's plan should expect one), "an unusual move" (at
+  least 1 in 12, about once a year), "a rare move" (less often), "a record move" (never). The
+  points stay beside a scale, on the ladder and in the area table. A market move leads with the
+  size a reader meets in the news ("Less than one quarter-point Fed cut turns conditions Stormy")
+  and names the instrument after it, with the count as a ratio ("about 1 month in 6 since 2012").
+  Both are counts of past months in either direction, never a chance: no "likely", no odds.
+  `describeScoreMoveBand` and `describeRateMoveInFedSteps` in `lib/report/marketMoveScale.ts`.
 - **One side of a rule per area** (2026-11-03). Only one side can change an area: an area on hold
   changes when it restarts, any other area when it pauses. A row, a paste and a score line print
   that side alone, with its number and distance ("restarts below 66 (24 pts away)", "Pause if:

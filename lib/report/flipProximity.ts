@@ -47,6 +47,7 @@ import {
 import { classifyRegimeQuadrant } from "../regimeStateMachine";
 import { formatPointsMove } from "../formatters";
 import { BASE_RATE_SOURCE_LABELS } from "./regimeDescription";
+import { describeRateMoveInFedSteps } from "./marketMoveScale";
 import { getRegimePublicLabel } from "../regimePresentation";
 import { buildCallChangeLines } from "./reportEvidence";
 
@@ -60,6 +61,8 @@ type FlipProximity = {
   crossesTo: RegimeKey;
   /** One sentence in the reader's terms, no score vocabulary. */
   sentence: string;
+  /** The market instrument the sentence's everyday size stands for, where the sentence does not name it. */
+  instrument?: string;
 };
 
 const SCAN_STEP = 0.01;
@@ -137,15 +140,20 @@ const tightnessProximity = ({ scores, thresholds }: ProximityInputs, line: CallC
   const move = scanForCrossing(line, projectAt);
   if (move === null) return null;
   const crossesTo = classifyRegimeQuadrant({ tightness: projectAt(move), riskAppetite: scores.riskAppetite, thresholds });
-  const direction = move > 0 ? "rises" : "falls";
   const label = BASE_RATE_SOURCE_LABELS[scores.baseRateUsed];
+  /* "The federal funds rate" already ends in its noun; the bills do not. */
+  const rate = label.endsWith(" rate") ? label : `${label} rate`;
   return {
     axis: "tightness",
     input: "baseRate",
     inputMove: move,
     pointsToBoundary: Math.abs(scores.tightness - thresholds.tightnessRegime),
     crossesTo,
-    sentence: `If ${label.charAt(0).toLowerCase()}${label.slice(1)} rate ${direction} ${formatPointsMove(move)}, conditions turn ${getRegimePublicLabel(crossesTo)}.`,
+    /* The Fed step first, the bill rate it stands for after (2026-11-03): "If the
+       1-month Treasury bill rate falls 0.17 percentage points" led with the one
+       instrument a reader without a bond desk cannot place. */
+    sentence: describeRateMoveInFedSteps(move, getRegimePublicLabel(crossesTo)),
+    instrument: `That is ${rate.charAt(0).toLowerCase()}${rate.slice(1)} ${move > 0 ? "rising" : "falling"} ${formatPointsMove(move)}.`,
   };
 };
 
