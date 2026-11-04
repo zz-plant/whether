@@ -531,7 +531,7 @@ export default async function PublishedBriefPage({ params }: { params: Promise<P
       {/* A shared brief used to be a dead end: the recipient got the citation
           and nothing that brought next Monday's call to them. */}
       {/* The shared-arrival note's "Get it every Monday" lands here: this form starts on Monday delivery. */}
-      <div id="monday-email">
+      <div id="monday-email" data-print-hide>
         <SubscribeForm />
       </div>
     </ContentPageShell>
