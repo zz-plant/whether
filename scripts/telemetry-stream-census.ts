@@ -41,6 +41,7 @@ const READERS: Record<string, string> = {
   activation: "lib/telemetry/activationFunnelReport.ts → /trust; scripts/first-act-report.ts → which section a visit first used",
   search: "this census only",
   "dead-click": "scripts/dead-click-report.ts → which parts of a page are pressed and do nothing",
+  "agent-tool": "scripts/agent-tool-report.ts → which tools agents call and where they are refused",
 };
 
 const rowSchema = z.object({

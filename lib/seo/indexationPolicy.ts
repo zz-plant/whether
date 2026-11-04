@@ -38,6 +38,7 @@ export const indexableAnswerSlugs = [
   "should-startups-do-layoffs-now",
   "should-startups-invest-in-retention-or-acquisition",
   "should-startups-raise-a-bridge-round-now",
+  "should-startups-take-venture-debt-now",
   "should-startups-change-compensation-now",
   "should-startups-expand-internationally-now",
   "should-startups-consolidate-vendors-now",

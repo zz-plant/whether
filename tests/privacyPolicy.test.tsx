@@ -38,6 +38,7 @@ const STORAGE_KEY_SECTIONS: Record<keyof typeof STORAGE_KEYS, string> = {
 
 /** Every `TELEMETRY_STREAMS` entry, against the section of /privacy that covers it. */
 const TELEMETRY_STREAM_SECTIONS: Record<(typeof TELEMETRY_STREAMS)[number], string> = {
+  "agent-tool": "2.5",
   "web-vitals": "2.5 — how fast a page loaded",
   "operator-workflow": "2.5 — which route was moved to from which",
   activation: "2.5 — funnel steps",

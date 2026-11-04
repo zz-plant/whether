@@ -9,7 +9,10 @@
       "what are interest rates doing to startup funding",
       "what does a Fed rate cut mean for startups",
       "how are macro conditions for startups",
-      "tech funding environment and outlook"
+      "tech funding environment and outlook",
+      "do rate cuts help startups",
+      "will interest rate cuts make fundraising easier",
+      "how do rate hikes and rate cuts affect a startup"
     ],
     "category": "climate",
     "shortAnswer": "Read startup funding conditions through rates and credit alongside your runway, investor conversations and the milestone a round must fund.",
@@ -374,7 +377,9 @@
       "should we expand into new markets",
       "scale marketing spend",
       "how fast should we grow",
-      "GTM expansion"
+      "GTM expansion",
+      "should we spend more on ads",
+      "ad spend or advertising"
     ],
     "category": "decision",
     "shortAnswer": "Increase go-to-market spend in steps only when retention, conversion and gross-margin-adjusted payback support the added cash commitment.",
@@ -969,6 +974,65 @@
       {
         "question": "How often should we review the stack?",
         "answer": "Before each renewal cycle, and again when cash gets tight."
+      }
+    ]
+  },
+  {
+    "slug": "should-startups-take-venture-debt-now",
+    "keyword": "should startups take venture debt",
+    "title": "Should startups take venture debt now?",
+    "askedAs": [
+      "should we take venture debt",
+      "is venture debt a good idea",
+      "venture debt or equity",
+      "borrow instead of selling equity"
+    ],
+    "category": "decision",
+    "shortAnswer": "Take venture debt only if you can make every payment even when the next round comes late. Do not use it to replace a round you cannot raise.",
+    "directAnswer": "Venture debt adds runway in exchange for fixed payments. Before signing, check that the company can cover those payments if the next round slips, and that the loan's conditions would not let the lender call it early.",
+    "audience": "Founders and finance leadership",
+    "applyHeading": "When to take venture debt",
+    "mappedDecisionAreas": [
+      "capital-raising",
+      "burn-discipline"
+    ],
+    "thresholdFocus": "tightness",
+    "featuredOrder": 19,
+    "contextHeading": "Venture debt during a tighter market",
+    "context": "Funding pressure says something about what borrowing costs and how hard the next round may be to close. It cannot say whether a lender will offer your company terms it can live with, so read the loan itself.",
+    "companyInputs": [
+      "Cash today, monthly burn and the runway the loan adds after its payments.",
+      "Interest rate, fees, warrants and the date principal payments start.",
+      "Conditions in the loan: minimum cash, revenue targets and what lets the lender call it."
+    ],
+    "decisionNote": "Take the loan only if we can make every payment with the next round [months] late. Amount: [amount]. Condition to watch: [condition]. Otherwise cut burn to [target]. Owner: [name]. Review: [date].",
+    "supportingLinks": [
+      {
+        "label": "Bridge rounds",
+        "href": "/answers/should-startups-raise-a-bridge-round-now"
+      },
+      {
+        "label": "Runway planning",
+        "href": "/answers/how-much-runway-should-we-have-before-we-raise"
+      }
+    ],
+    "watchouts": [
+      "Counting the whole loan as runway when a minimum cash condition makes part of it unspendable.",
+      "Planning to repay from a round that has not closed.",
+      "Reading the interest rate and missing the fees, warrants and early repayment terms."
+    ],
+    "faq": [
+      {
+        "question": "How is venture debt different from a bridge round?",
+        "answer": "A bridge usually converts into equity at the next round. Venture debt is a loan with scheduled payments, so it can cost less ownership and leaves less room when cash runs short."
+      },
+      {
+        "question": "Does a minimum cash condition change our runway?",
+        "answer": "Yes. Cash the loan requires you to hold is cash you cannot spend, so leave it out when you work out runway."
+      },
+      {
+        "question": "What if the payments only work when the next round closes on time?",
+        "answer": "Treat that as a reason not to sign. Cut burn or raise equity instead, because the payments stay due if the round slips."
       }
     ]
   }
